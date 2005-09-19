@@ -640,9 +640,9 @@ enum {
 };
 
 struct _decovartype_;
-struct _unit_;
+class CUnit;
 
-typedef void DrawDecoFunc(int x, int y, const struct _unit_* unit,
+typedef void DrawDecoFunc(int x, int y, const CUnit *unit,
 	const struct _decovartype_* Deco);
 
 /**
@@ -967,7 +967,7 @@ extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 extern void DefineVariableField(struct lua_State* l, struct _variable_type_* var, int lua_index);
 
 	/// Update custom Variables with other variable (like Hp, ...)
-extern void UpdateUnitVariables(const struct _unit_* unit);
+extern void UpdateUnitVariables(const CUnit *unit);
 
 //@}
 

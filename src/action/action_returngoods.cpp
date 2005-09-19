@@ -56,7 +56,7 @@
 **
 **  @todo  FIXME: move this into action_resource?
 */
-void HandleActionReturnGoods(Unit* unit)
+void HandleActionReturnGoods(CUnit *unit)
 {
 	Assert(unit->Type->Harvester);
 
@@ -77,7 +77,7 @@ void HandleActionReturnGoods(Unit* unit)
 
 	// If depot was destroyed search for another one.
 	if (!unit->Orders[0].Goal) {
-		Unit* destu;
+		CUnit *destu;
 
 		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
 				unit->CurrentResource))) {

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Sat Sep 17 16:37:06 2005.
+** Generated automatically by tolua++-1.0.6 on Mon Sep 19 11:53:26 2005.
 */
 
 #ifndef __cplusplus
@@ -13,6 +13,7 @@
 /* Exported function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 
+#include "stratagus.h"
 #include "ui.h"
 #include "minimap.h"
 #ifdef _MSC_VER

@@ -78,7 +78,7 @@ void MapMarkSeenTile(int x, int y)
 {
 	int tile;
 	int seentile;
-	MapField* mf;
+	MapField *mf;
 
 	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 	//
@@ -312,7 +312,7 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 **
 **  @return      True if could be entered, false otherwise.
 */
-int UnitTypeCanBeAt(const UnitType* type, int x, int y)
+int UnitTypeCanBeAt(const UnitType *type, int x, int y)
 {
 	int addx;  // iterator
 	int addy;  // iterator
@@ -339,7 +339,7 @@ int UnitTypeCanBeAt(const UnitType* type, int x, int y)
 **
 **  @return      True if could be placeded, false otherwise.
 */
-int UnitCanBeAt(const Unit* unit, int x, int y)
+int UnitCanBeAt(const CUnit *unit, int x, int y)
 {
 	Assert(unit);
 	return UnitTypeCanBeAt(unit->Type, x, y);
@@ -352,7 +352,7 @@ void PreprocessMap(void)
 {
 	int ix;
 	int iy;
-	MapField* mf;
+	MapField *mf;
 
 	for (ix = 0; ix < TheMap.Info.MapWidth; ++ix) {
 		for (iy = 0; iy < TheMap.Info.MapHeight; ++iy) {
@@ -377,7 +377,7 @@ void PreprocessMap(void)
 **
 **  @param info  MapInfo pointer.
 */
-void FreeMapInfo(MapInfo* info)
+void FreeMapInfo(MapInfo *info)
 {
 	if (info) {
 		free(info->Description);
@@ -472,7 +472,7 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 	int *lookuptable;
 	int removedtile;
 	int flags;
-	MapField* mf;
+	MapField *mf;
 
 
 	//  Outside of map or no wood.
@@ -652,7 +652,7 @@ void MapFixNeighbors(unsigned short type, int seen, int x, int y)
 */
 void MapClearTile(unsigned short type, unsigned x, unsigned y)
 {
-	MapField* mf;
+	MapField *mf;
 	int removedtile;
 	int flags;
 
@@ -696,8 +696,8 @@ void MapClearTile(unsigned short type, unsigned x, unsigned y)
 */
 static void RegenerateForestTile(int x, int y)
 {
-	MapField* mf;
-	MapField* tmp;
+	MapField *mf;
+	MapField *tmp;
 
 	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 	if (mf->Tile != TheMap.Tileset.RemovedTree) {
@@ -764,7 +764,7 @@ void RegenerateForest(void)
 **
 **  @param mapname    map filename
 **/
-void LoadStratagusMapInfo(const char* mapname) 
+void LoadStratagusMapInfo(const char *mapname) 
 {
 	// Set the default map setup by replacing .smp with .sms
 	free(TheMap.Info.Filename);

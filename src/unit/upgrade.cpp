@@ -556,7 +556,7 @@ int UpgradeIdByIdent(const char *ident)
 */
 static void ConvertUnitTypeTo(Player *player, const UnitType *src, UnitType *dst)
 {
-	Unit *unit;
+	CUnit *unit;
 	int i;
 	int j;
 
@@ -605,8 +605,8 @@ static void ApplyUpgradeModifier(Player *player, const UpgradeModifier *um)
 	int pn;                     // player number.
 	int varModified;            // 0 if variable is not modified.
 	int numunits;               // number of unit of the current type.
-	Unit *unitupgrade[UnitMax]; // array of unit of the current type
-	Unit *unit;                 // current unit.
+	CUnit *unitupgrade[UnitMax]; // array of unit of the current type
+	CUnit *unit;                 // current unit.
 
 	Assert(player);
 	Assert(um);

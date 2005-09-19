@@ -297,12 +297,12 @@ static int AStarFindNode(int eo)
 **
 **  @todo FIXME : use current_cost or remove this attribut.
 */
-static int CostMoveTo(const Unit* unit, int ex, int ey, int mask, int current_cost) {
+static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask, int current_cost) {
 	int i;     // iterator on tilesize.
 	int j;     // iterator on tilesize.
 	int flag;  // flag of the map.
 	int cost;  // result cost.
-	Unit* goal;
+	CUnit *goal;
 	cost = 0;
 
 	// Doesn't cost anything to move to ourselves :)
@@ -355,8 +355,8 @@ static int CostMoveTo(const Unit* unit, int ex, int ey, int mask, int current_co
 /**
 ** MarkAStarGoal
 */
-static int AStarMarkGoal(const Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange,
-				int mask, int* num_in_close)
+static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int minrange, int maxrange,
+	int mask, int *num_in_close)
 {
 	int cx[4];
 	int cy[4];
@@ -529,7 +529,7 @@ static int AStarMarkGoal(const Unit* unit, int gx, int gy, int gw, int gh, int m
 /**
 ** Find path.
 */
-int AStarFindPath(const Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path)
+int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char *path)
 {
 	int i;
 	int j;
@@ -580,7 +580,7 @@ int AStarFindPath(const Unit* unit, int gx, int gy, int gw, int gh, int minrange
 		return PF_UNREACHABLE;
 	}
 
-	eo=y*TheMap.Info.MapWidth+x;
+	eo = y * TheMap.Info.MapWidth + x;
 	// it is quite important to start from 1 rather than 0, because we use
 	// 0 as a way to represent nodes that we have not visited yet.
 	AStarMatrix[eo].CostFromStart=1;
@@ -767,14 +767,14 @@ int AStarFindPath(const Unit* unit, int gx, int gy, int gw, int gh, int minrange
 ** @return >0 remaining path length, 0 wait for path, -1
 ** reached goal, -2 can't reach the goal.
 */
-int NextPathElement(Unit* unit,int* pxd,int *pyd)
+int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 {
 	int result;
 
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
-	*pxd=0;
-	*pyd=0;
+	*pxd = 0;
+	*pyd = 0;
 
 	// Goal has moved, need to recalculate path or no cached path
 	if( unit->Data.Move.Length <= 0 ||

@@ -66,7 +66,7 @@ int CursorMax; /// Number of cursor.
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-CursorType* Cursors;
+CursorType *Cursors;
 
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
@@ -89,11 +89,11 @@ int CursorStartScrMapY;
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-UnitType* CursorBuilding;           /// building cursor
+UnitType *CursorBuilding;           /// building cursor
 
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-CursorType* GameCursor;             /// current shown cursor-type
+CursorType *GameCursor;             /// current shown cursor-type
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -104,14 +104,12 @@ CursorType* GameCursor;             /// current shown cursor-type
 **
 **  @param race  Cursor graphics of this race to load.
 */
-void LoadCursors(const char* race)
+void LoadCursors(const char *race)
 {
-	int i;
-
 	//
 	//  Load the graphics
 	//
-	for (i = 0; i < CursorMax; ++i) {
+	for (int i = 0; i < CursorMax; ++i) {
 		//
 		//  Only load cursors of this race or universal cursors.
 		//
@@ -135,11 +133,9 @@ void LoadCursors(const char* race)
 **
 **  @note If we have more cursors, we should add hash to find them faster.
 */
-CursorType* CursorTypeByIdent(const char* ident)
+CursorType *CursorTypeByIdent(const char *ident)
 {
-	int i;
-
-	for (i = 0; i < CursorMax; ++i) {
+	for (int i = 0; i < CursorMax; ++i) {
 		if (strcmp(Cursors[i].Ident, ident)) {
 			continue;
 		}
@@ -163,7 +159,7 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 {
 	int w;
 	int h;
-	const Viewport* vp;
+	const Viewport *vp;
 
 	//
 	//  Clip to map window.
@@ -216,7 +212,7 @@ static void DrawBuildingCursor(void)
 	int h;
 	int mask;
 	const Viewport* vp;
-	Unit* ontop;
+	CUnit *ontop;
 
 	// Align to grid
 	vp = UI.MouseViewport;
@@ -344,9 +340,7 @@ void InitVideoCursors(void)
 */
 void CleanCursors(void)
 {
-	int i;
-
-	for (i = 0; i < CursorMax; ++i) {
+	for (int i = 0; i < CursorMax; ++i) {
 		FreeGraphic(Cursors[i].G);
 		free(Cursors[i].Ident);
 		free(Cursors[i].Race);

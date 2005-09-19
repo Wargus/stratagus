@@ -125,7 +125,7 @@ static int CclSetRevealAttacker(lua_State* l)
 **
 **  @return   The unit pointer
 */
-static Unit* CclGetUnit(lua_State* l)
+static CUnit *CclGetUnit(lua_State* l)
 {
 	return UnitSlots[(int)LuaToNumber(l, -1)];
 }
@@ -298,7 +298,7 @@ void CclParseOrder(lua_State* l, Order* order)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should get the orders.
 */
-static void CclParseOrders(lua_State* l, Unit* unit)
+static void CclParseOrders(lua_State* l, CUnit *unit)
 {
 	int j;
 
@@ -315,7 +315,7 @@ static void CclParseOrders(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-static void CclParseBuilt(lua_State* l, Unit* unit)
+static void CclParseBuilt(lua_State* l, CUnit *unit)
 {
 	const char* value;
 	int args;
@@ -369,7 +369,7 @@ static void CclParseBuilt(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-static void CclParseResWorker(lua_State* l, Unit* unit)
+static void CclParseResWorker(lua_State* l, CUnit *unit)
 {
 	const char* value;
 	int args;
@@ -401,7 +401,7 @@ static void CclParseResWorker(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-static void CclParseResearch(lua_State* l, Unit* unit)
+static void CclParseResearch(lua_State* l, CUnit *unit)
 {
 	const char* value;
 	int args;
@@ -431,7 +431,7 @@ static void CclParseResearch(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-static void CclParseUpgradeTo(lua_State* l, Unit* unit)
+static void CclParseUpgradeTo(lua_State* l, CUnit *unit)
 {
 	const char* value;
 	int args;
@@ -460,7 +460,7 @@ static void CclParseUpgradeTo(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-static void CclParseTrain(lua_State* l, Unit* unit)
+static void CclParseTrain(lua_State* l, CUnit *unit)
 {
 	const char* value;
 	int args;
@@ -489,7 +489,7 @@ static void CclParseTrain(lua_State* l, Unit* unit)
 **  @param l     Lua state.
 **  @param unit  Unit pointer which should be filled with the data.
 */
-static void CclParseMove(lua_State* l, Unit* unit)
+static void CclParseMove(lua_State* l, CUnit *unit)
 {
 	const char* value;
 	int args;
@@ -538,7 +538,7 @@ static void CclParseMove(lua_State* l, Unit* unit)
 static int CclUnit(lua_State* l)
 {
 	const char* value;
-	Unit* unit;
+	CUnit *unit;
 	UnitType* type;
 	UnitType* seentype;
 	Player* player;
@@ -893,7 +893,7 @@ static int CclUnit(lua_State* l)
 */
 static int CclMoveUnit(lua_State* l)
 {
-	Unit* unit;
+	CUnit *unit;
 	int heading;
 	int mask;
 	int ix;
@@ -937,7 +937,7 @@ static int CclMoveUnit(lua_State* l)
 static int CclCreateUnit(lua_State* l)
 {
 	UnitType* unittype;
-	Unit* unit;
+	CUnit *unit;
 	int heading;
 	int playerno;
 	int mask;
@@ -995,7 +995,7 @@ static int CclCreateUnit(lua_State* l)
 */
 static int CclSetResourcesHeld(lua_State* l)
 {
-	Unit* unit;
+	CUnit *unit;
 	int value;
 
 	LuaCheckArgs(l, 2);
@@ -1028,8 +1028,8 @@ static int CclOrderUnit(lua_State* l)
 	int dx2;
 	int dy2;
 	const UnitType* unittype;
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int an;
 	int j;
 	const char* order;
@@ -1095,7 +1095,7 @@ static int CclOrderUnit(lua_State* l)
 				if (!strcmp(order,"move")) {
 					CommandMove(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
-					Unit* attack;
+					CUnit *attack;
 
 					attack = TargetOnMap(unit, dx1, dy1, dx2 + 1, dy2 + 1);
 					CommandAttack(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, attack, 1);
@@ -1123,8 +1123,8 @@ static int CclKillUnit(lua_State* l)
 	int j;
 	int plynr;
 	const UnitType* unittype;
-	Unit* unit;
-	Unit** table;
+	CUnit *unit;
+	CUnit **table;
 
 	LuaCheckArgs(l, 2);
 
@@ -1172,8 +1172,8 @@ static int CclKillUnitAt(lua_State* l)
 	int x2;
 	int y2;
 	const UnitType* unittype;
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int an;
 	int j;
 	int s;
@@ -1261,7 +1261,7 @@ static int CclGetUnits(lua_State* l)
 */
 static int CclGetUnitVariable(lua_State* l)
 {
-	const Unit* unit;
+	const CUnit *unit;
 	int index;
 
 	lua_pushvalue(l, 1);
@@ -1286,7 +1286,7 @@ static int CclGetUnitVariable(lua_State* l)
 */
 static int CclSetUnitVariable(lua_State* l)
 {
-	Unit* unit;
+	CUnit *unit;
 	int index;
 	int value;
 
@@ -1328,7 +1328,7 @@ static int CclSlotUsage(lua_State* l)
 	}
 	UnitSlotFree = LuaToNumber(l, 1);
 	for (i = 0; i < UnitSlotFree; i++) {
-		UnitSlots[i] = (Unit*)calloc(1, sizeof(Unit));
+		UnitSlots[i] = (CUnit *)calloc(1, sizeof(CUnit));
 		UnitSlots[i]->Slot = i;
 	}
 	for (i = 2; i <= args; i++) {

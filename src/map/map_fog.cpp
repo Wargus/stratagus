@@ -67,13 +67,13 @@ static const int FogTable[16] = {
 	 0,11,10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 };
 
-unsigned char* VisionTable[3];
-int* VisionLookup;
+unsigned char *VisionTable[3];
+int *VisionLookup;
 
-static unsigned char* VisibleTable;
+static unsigned char *VisibleTable;
 
 #ifndef USE_OPENGL
-static SDL_Surface* OnlyFogSurface;
+static SDL_Surface *OnlyFogSurface;
 static Graphic AlphaFogG;
 #endif
 
@@ -91,13 +91,13 @@ static Graphic AlphaFogG;
 **
 **  @return        Number of units that can see this square.
 */
-static int LookupSight(const Player* player, int tx, int ty)
+static int LookupSight(const Player *player, int tx, int ty)
 {
 	int i;
 	int visiblecount;
 	int range;
 	int mapdistance;
-	Unit* unit;
+	CUnit *unit;
 
 	visiblecount = 0;
 	for (i = 0; i < player->TotalNumUnits; ++i) {
@@ -130,11 +130,11 @@ static int LookupSight(const Player* player, int tx, int ty)
 **
 **  @return        0 unexplored, 1 explored, > 1 visible.
 */
-unsigned char IsTileVisible(const Player* player, int x, int y)
+unsigned char IsTileVisible(const Player *player, int x, int y)
 {
 	int i;
 	unsigned char visiontype;
-	unsigned char* visible;
+	unsigned char *visible;
 
 	visible = TheMap.Fields[y * TheMap.Info.MapWidth + x].Visible;
 	visiontype = visible[player->Index];
@@ -174,12 +174,12 @@ unsigned char IsTileVisible(const Player* player, int x, int y)
 **
 **  @return        Filtered mask after taking fog into account
 */
-int MapFogFilterFlags(Player* player, int x, int y, int mask)
+int MapFogFilterFlags(Player *player, int x, int y, int mask)
 {
 	int nunits;
 	int unitcount;
 	int fogmask;
-	Unit* table[UnitMax];
+	CUnit *table[UnitMax];
 
 	// Calculate Mask for tile with fog
 	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
@@ -205,7 +205,7 @@ int MapFogFilterFlags(Player* player, int x, int y, int mask)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-void MapMarkTileSight(const Player* player, int x, int y)
+void MapMarkTileSight(const Player *player, int x, int y)
 {
 	unsigned char v;
 
@@ -242,7 +242,7 @@ void MapMarkTileSight(const Player* player, int x, int y)
 **  @param x       X tile to mark.
 **  @param y       Y tile to mark.
 */
-void MapUnmarkTileSight(const Player* player, int x, int y)
+void MapUnmarkTileSight(const Player *player, int x, int y)
 {
 	unsigned char v;
 
@@ -284,7 +284,7 @@ void MapUnmarkTileSight(const Player* player, int x, int y)
 ** @param x       X tile to mark.
 ** @param y       Y tile to mark.
 */
-void MapMarkTileDetectCloak(const Player* player, int x, int y)
+void MapMarkTileDetectCloak(const Player *player, int x, int y)
 {
 	unsigned char v;
 
@@ -304,7 +304,7 @@ void MapMarkTileDetectCloak(const Player* player, int x, int y)
 ** @param x       X tile to mark.
 ** @param y       Y tile to mark.
 */
-void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
+void MapUnmarkTileDetectCloak(const Player *player, int x, int y)
 {
 	unsigned char v;
 
@@ -329,7 +329,7 @@ void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 **  @param marker  Function to mark or unmark sight
 */
 void MapSight(const Player* player, int x, int y, int w, int h, int range,
-	void (*marker)(const Player*, int, int))
+	void (*marker)(const Player *, int, int))
 {
 	int mx;
 	int my;
@@ -631,7 +631,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 **
 **  @param vp  Viewport pointer.
 */
-void DrawMapFogOfWar(Viewport* vp)
+void DrawMapFogOfWar(Viewport *vp)
 {
 	int sx;
 	int sy;
@@ -707,7 +707,7 @@ void InitMapFogOfWar(void)
 	unsigned char g;
 	unsigned char b;
 	Uint32 color;
-	SDL_Surface* s;
+	SDL_Surface *s;
 #endif
 
 	TheMap.FogGraphic->Load();
@@ -811,7 +811,7 @@ void CleanMapFogOfWar(void)
 */
 void InitVisionTable(void)
 {
-	int* visionlist;
+	int *visionlist;
 	int maxsize;
 	int sizex;
 	int sizey;

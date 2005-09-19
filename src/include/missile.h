@@ -331,7 +331,7 @@
 ----------------------------------------------------------------------------*/
 
 class Graphic;
-struct _unit_;
+class CUnit;
 struct _viewport_;
 class CLFile;
 
@@ -452,8 +452,8 @@ struct _missile_ {
 	int Wait;         /// delay between frames
 	int Delay;        /// delay to showup
 
-	struct _unit_* SourceUnit;  /// unit that fires (could be killed)
-	struct _unit_* TargetUnit;  /// target unit, used for spells
+	CUnit *SourceUnit;  /// unit that fires (could be killed)
+	CUnit *TargetUnit;  /// target unit, used for spells
 
 	int Damage;  /// direct damage that missile applies
 
@@ -511,7 +511,7 @@ extern Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx,
 extern Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx,
 	int dy);
 	/// fire a missile
-extern void FireMissile(struct _unit_* unit);
+extern void FireMissile(CUnit *unit);
 
 	/// Draw all missiles
 extern void DrawMissile(const Missile* missile);

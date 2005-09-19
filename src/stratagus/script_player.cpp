@@ -61,7 +61,7 @@
 **
 **  @return   The player pointer
 */
-static Player* CclGetPlayer(lua_State* l)
+static Player *CclGetPlayer(lua_State *l)
 {
 	return &Players[(int)LuaToNumber(l, -1)];
 }
@@ -71,10 +71,10 @@ static Player* CclGetPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclPlayer(lua_State* l)
+static int CclPlayer(lua_State *l)
 {
-	const char* value;
-	Player* player;
+	const char *value;
+	Player *player;
 	int i;
 	int args;
 	int j;
@@ -91,7 +91,7 @@ static int CclPlayer(lua_State* l)
 		NumPlayers = i + 1;
 	}
 	player->Index = i;
-	if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
+	if (!(player->Units = (CUnit **)calloc(UnitMax, sizeof(CUnit *)))) {
 		DebugPrint("Not enough memory to create player %d.\n" _C_ i);
 		return 0;
 	}
@@ -349,9 +349,9 @@ static int CclPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclChangeUnitsOwner(lua_State* l)
+static int CclChangeUnitsOwner(lua_State *l)
 {
-	Unit* table[UnitMax];
+	CUnit *table[UnitMax];
 	int n;
 	int oldp;
 	int newp;
@@ -402,7 +402,7 @@ static int CclChangeUnitsOwner(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclGetThisPlayer(lua_State* l)
+static int CclGetThisPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	if (ThisPlayer) {
@@ -418,7 +418,7 @@ static int CclGetThisPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetThisPlayer(lua_State* l)
+static int CclSetThisPlayer(lua_State *l)
 {
 	int plynr;
 
@@ -435,7 +435,7 @@ static int CclSetThisPlayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetMaxSelectable(lua_State* l)
+static int CclSetMaxSelectable(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	MaxSelectable = LuaToNumber(l, 1);
@@ -449,7 +449,7 @@ static int CclSetMaxSelectable(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetAllPlayersUnitLimit(lua_State* l)
+static int CclSetAllPlayersUnitLimit(lua_State *l)
 {
 	int i;
 
@@ -467,7 +467,7 @@ static int CclSetAllPlayersUnitLimit(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetAllPlayersBuildingLimit(lua_State* l)
+static int CclSetAllPlayersBuildingLimit(lua_State *l)
 {
 	int i;
 
@@ -485,7 +485,7 @@ static int CclSetAllPlayersBuildingLimit(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetAllPlayersTotalUnitLimit(lua_State* l)
+static int CclSetAllPlayersTotalUnitLimit(lua_State *l)
 {
 	int i;
 
@@ -505,11 +505,11 @@ static int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 **
 **  @return          FIXME: should return old state.
 */
-static int CclSetDiplomacy(lua_State* l)
+static int CclSetDiplomacy(lua_State *l)
 {
 	int plynr;
 	int base;
-	const char* state;
+	const char *state;
 
 	LuaCheckArgs(l, 3);
 	base = LuaToNumber(l, 1);
@@ -534,7 +534,7 @@ static int CclSetDiplomacy(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDiplomacy(lua_State* l)
+static int CclDiplomacy(lua_State *l)
 {
 	lua_pushnumber(l, ThisPlayer->Index);
 	lua_insert(l, 1);
@@ -548,7 +548,7 @@ static int CclDiplomacy(lua_State* l)
 **
 **  @return   FIXME: should return old state.
 */
-static int CclSetSharedVision(lua_State* l)
+static int CclSetSharedVision(lua_State *l)
 {
 	int plynr;
 	int base;
@@ -570,7 +570,7 @@ static int CclSetSharedVision(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSharedVision(lua_State* l)
+static int CclSharedVision(lua_State *l)
 {
 	lua_pushnumber(l, ThisPlayer->Index);
 	lua_insert(l, 1);
@@ -582,14 +582,14 @@ static int CclSharedVision(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineRaceNames(lua_State* l)
+static int CclDefineRaceNames(lua_State *l)
 {
 	int i;
 	int j;
 	int k;
 	int args;
 	int subargs;
-	const char* value;
+	const char *value;
 
 	PlayerRaces.Count = 0;
 	args = lua_gettop(l);
@@ -638,7 +638,7 @@ static int CclDefineRaceNames(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefinePlayerColors(lua_State* l)
+static int CclDefinePlayerColors(lua_State *l)
 {
 	int i;
 	int args;
@@ -688,7 +688,7 @@ static int CclDefinePlayerColors(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclNewPlayerColors(lua_State* l)
+static int CclNewPlayerColors(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	SetPlayersPalette();
@@ -701,7 +701,7 @@ static int CclNewPlayerColors(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefinePlayerColorIndex(lua_State* l)
+static int CclDefinePlayerColorIndex(lua_State *l)
 {
 	int i;
 
@@ -725,10 +725,10 @@ static int CclDefinePlayerColorIndex(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclGetPlayerData(lua_State* l)
+static int CclGetPlayerData(lua_State *l)
 {
-	Player* p;
-	const char* data;
+	Player *p;
+	const char *data;
 
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
@@ -834,10 +834,10 @@ static int CclGetPlayerData(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetPlayerData(lua_State* l)
+static int CclSetPlayerData(lua_State *l)
 {
-	Player* p;
-	const char* data;
+	Player *p;
+	const char *data;
 
 	if (lua_gettop(l) < 3) {
 		LuaError(l, "incorrect argument");
@@ -929,9 +929,9 @@ static int CclSetPlayerData(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetAiType(lua_State* l)
+static int CclSetAiType(lua_State *l)
 {
-	Player* p;
+	Player *p;
 
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");

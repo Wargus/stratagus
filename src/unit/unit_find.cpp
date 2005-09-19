@@ -84,9 +84,9 @@
 **
 ** @return        Unit, if an unit of correct type is on the field.
 */
-Unit* UnitCacheOnXY(int x, int y, unsigned type)
+CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 {
-	Unit* table[UnitMax];
+	CUnit *table[UnitMax];
 	int n;
 
 	n = UnitCacheOnTile(x, y, table);
@@ -110,9 +110,9 @@ Unit* UnitCacheOnXY(int x, int y, unsigned type)
 **
 **  @return       Returns the number of units found.
 */
-int FindUnitsByType(const UnitType* type, Unit** table)
+int FindUnitsByType(const UnitType *type, CUnit **table)
 {
-	Unit* unit;
+	CUnit *unit;
 	int i;
 	int num;
 
@@ -134,11 +134,11 @@ int FindUnitsByType(const UnitType* type, Unit** table)
 **
 **  @return        Returns the number of units found.
 */
-int FindPlayerUnitsByType(const Player* player,const UnitType* type,
-	Unit** table)
+int FindPlayerUnitsByType(const Player *player, const UnitType *type,
+	CUnit **table)
 {
-	Unit* unit;
-	Unit** units;
+	CUnit *unit;
+	CUnit **units;
 	int num;
 	int nunits;
 	int typecount;
@@ -167,9 +167,9 @@ int FindPlayerUnitsByType(const Player* player,const UnitType* type,
 **
 **  @return    Returns first found unit on tile.
 */
-Unit* UnitOnMapTile(int tx, int ty)
+CUnit *UnitOnMapTile(int tx, int ty)
 {
-	Unit* table[UnitMax];
+	CUnit *table[UnitMax];
 	int n;
 	int i;
 
@@ -197,12 +197,12 @@ Unit* UnitOnMapTile(int tx, int ty)
 **
 **  @return        Returns ideal target on map tile.
 */
-Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
+CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
-	Unit* best;
-	const UnitType* type;
+	CUnit *table[UnitMax];
+	CUnit *unit;
+	CUnit *best;
+	const UnitType *type;
 	int n;
 	int i;
 
@@ -245,9 +245,9 @@ Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 **
 **  @return          Returns the deposit if found, or NoUnitP.
 */
-Unit* ResourceOnMap(int tx, int ty, int resource)
+CUnit *ResourceOnMap(int tx, int ty, int resource)
 {
-	Unit* table[UnitMax];
+	CUnit *table[UnitMax];
 	int i;
 	int n;
 
@@ -273,9 +273,9 @@ Unit* ResourceOnMap(int tx, int ty, int resource)
 **
 **  @return          Returns the deposit if found, or NoUnitP.
 */
-Unit* ResourceDepositOnMap(int tx, int ty, int resource)
+CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
 {
-	Unit* table[UnitMax];
+	CUnit *table[UnitMax];
 	int i;
 	int n;
 
@@ -310,7 +310,7 @@ Unit* ResourceDepositOnMap(int tx, int ty, int resource)
 **  @note   Limited to attack range smaller than 16.
 **  @note Will be moved to unit_ai.c soon.
 */
-static Unit* FindRangeAttack(const Unit* u, int range)
+static CUnit *FindRangeAttack(const CUnit *u, int range)
 {
 	int x;
 	int y;
@@ -324,11 +324,11 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 	int hp_damage_evaluate;
 	int good[32][32];
 	int bad[32][32];
-	Unit* table[UnitMax];
-	Unit* dest;
-	const UnitType* dtype;
-	const UnitType* type;
-	const Player* player;
+	CUnit *table[UnitMax];
+	CUnit *dest;
+	const UnitType *dtype;
+	const UnitType *type;
+	const Player *player;
 	int xx;
 	int yy;
 	int best_x;
@@ -337,7 +337,7 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 	int i;
 	int sbad;
 	int sgood;
-	Unit* best;
+	CUnit *best;
 
 	type = u->Type;
 	player = u->Player;
@@ -589,12 +589,12 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 **  @return       Unit to be attacked.
 **
 */
-Unit* AttackUnitsInDistance(const Unit* unit, int range)
+CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 {
-	Unit* dest;
-	const UnitType* type;
-	const UnitType* dtype;
-	Unit* table[UnitMax];
+	CUnit *dest;
+	const UnitType *type;
+	const UnitType *dtype;
+	CUnit *table[UnitMax];
 	int x;
 	int y;
 	int n;
@@ -603,8 +603,8 @@ Unit* AttackUnitsInDistance(const Unit* unit, int range)
 	int attackrange;
 	int cost;
 	int best_cost;
-	const Player* player;
-	Unit* best_unit;
+	const Player *player;
+	CUnit *best_unit;
 
 	// if necessary, take possible damage on allied units into account...
 	if (unit->Type->Missile.Missile->Range > 1 &&
@@ -702,7 +702,7 @@ Unit* AttackUnitsInDistance(const Unit* unit, int range)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-Unit* AttackUnitsInRange(const Unit* unit)
+CUnit *AttackUnitsInRange(const CUnit *unit)
 {
 	Assert(unit->Type->CanAttack);
 	return AttackUnitsInDistance(unit, unit->Stats->Variables[ATTACKRANGE_INDEX].Max);
@@ -715,10 +715,10 @@ Unit* AttackUnitsInRange(const Unit* unit)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-Unit* AttackUnitsInReactRange(const Unit* unit)
+CUnit *AttackUnitsInReactRange(const CUnit *unit)
 {
 	int range;
-	const UnitType* type;
+	const UnitType *type;
 
 	type = unit->Type;
 	Assert(unit->Type->CanAttack);

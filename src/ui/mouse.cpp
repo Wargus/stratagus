@@ -70,7 +70,7 @@ int MouseButtons;                            /// Current pressed mouse buttons
 
 int KeyModifiers;                            /// Current keyboard modifiers
 
-Unit* UnitUnderCursor;                       /// Unit under cursor
+CUnit *UnitUnderCursor;                       /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
 char GameMenuButtonClicked;                  /// Menu button was clicked
@@ -107,8 +107,8 @@ void DoRightButton(int sx, int sy)
 	int i;
 	int x;                  // coordinate in tile.
 	int y;                  // coordinate in tile.
-	Unit* dest;             // unit under the cursor if any.
-	Unit* unit;             // one of the selected unit.
+	CUnit *dest;             // unit under the cursor if any.
+	CUnit *unit;             // one of the selected unit.
 	UnitType* type;
 	int action;             // default action for unit.
 	int acknowledged;       // to play sound
@@ -894,8 +894,8 @@ void UIHandleMouseMove(int x, int y)
 static int SendRepair(int sx, int sy)
 {
 	int i;
-	Unit* unit;
-	Unit* dest;
+	CUnit *unit;
+	CUnit *dest;
 	int ret;
 
 	ret = 0;
@@ -931,8 +931,8 @@ static int SendMove(int sx, int sy)
 {
 	int i;
 	int flush;
-	Unit* unit;
-	Unit* transporter;
+	CUnit *unit;
+	CUnit *transporter;
 	int ret;
 
 	ret = 0;
@@ -988,8 +988,8 @@ static int SendMove(int sx, int sy)
 static int SendAttack(int sx, int sy)
 {
 	int i;
-	Unit* unit;  // selected unit.
-	Unit* dest;  // unit under cursor if any.
+	CUnit *unit;  // selected unit.
+	CUnit *dest;  // unit under cursor if any.
 	int ret;
 
 	ret = 0;
@@ -1028,7 +1028,7 @@ static int SendAttack(int sx, int sy)
 static int SendAttackGround(int sx, int sy)
 {
 	int i;
-	Unit* unit;
+	CUnit *unit;
 	int ret;
 
 	ret = 0;
@@ -1056,7 +1056,7 @@ static int SendAttackGround(int sx, int sy)
 static int SendPatrol(int sx, int sy)
 {
 	int i;
-	Unit* unit;
+	CUnit *unit;
 	int ret;
 
 	ret = 0;
@@ -1083,8 +1083,8 @@ static int SendResource(int sx, int sy)
 	int x;
 	int y;
 	int res;
-	Unit* unit;
-	Unit* dest;
+	CUnit *unit;
+	CUnit *dest;
 	int ret;
 
 	ret = 0;
@@ -1182,8 +1182,8 @@ static int SendUnload(int sx, int sy)
 static int SendSpellCast(int sx, int sy)
 {
 	int i;
-	Unit* unit;
-	Unit* dest;
+	CUnit *unit;
+	CUnit *dest;
 	int ret;
 
 	ret = 0;
@@ -1281,7 +1281,7 @@ static void SendCommand(int sx, int sy)
 */
 static void DoSelectionButtons(int num, unsigned button)
 {
-	Unit* unit;
+	CUnit *unit;
 
 	if (GameObserve || GamePaused) {
 		return;
@@ -1424,7 +1424,7 @@ void UIHandleButtonDown(unsigned button)
 	static int OldShowAttackRange;
 	static int OldShowOrders;
 	static int OldValid;
-	Unit* uins;
+	CUnit *uins;
 	int i;
 
 /**
@@ -1561,7 +1561,7 @@ void UIHandleButtonDown(unsigned button)
 			GameCursor = UI.Scroll.Cursor;
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
-				Unit* unit;
+				CUnit *unit;
 				// FIXME: Rethink the complete chaos of coordinates here
 				// FIXME: Johns: Perhaps we should use a pixel map coordinates
 				int x;
@@ -1796,7 +1796,7 @@ void UIHandleButtonUp(unsigned button)
 	if (CursorState == CursorStateRectangle &&
 			!(MouseButtons & LeftButton)) { // leave select mode
 		int num;
-		Unit* unit;
+		CUnit *unit;
 
 		unit = NULL;
 		//

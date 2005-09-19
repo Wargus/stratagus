@@ -162,7 +162,7 @@ static unsigned QuadFromTile(int x, int y)
 **  @param marks   Already visited tile types.
 **  @param tile    Tile pointer.
 */
-static int FindTilePath(int base, int goal, int length, char* marks, int* tile)
+static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 {
 	int i;
 	int l;
@@ -283,9 +283,9 @@ find_solid:
 			return i;
 		}
 	} else {
-		char* marks;
+		char *marks;
 
-		marks = (char*)malloc(TheMap.Tileset.NumTerrainTypes);
+		marks = (char *)malloc(TheMap.Tileset.NumTerrainTypes);
 		memset(marks, 0, TheMap.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		marks[type2] = type2;
@@ -440,7 +440,7 @@ void ChangeTile(int x, int y, int tile)
 */
 static void EditorChangeTile(int x, int y, int tile, int d)
 {
-	MapField* mf;
+	MapField *mf;
 
 	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
@@ -475,7 +475,7 @@ static void EditorTileChanged2(int x, int y, int d)
 	unsigned q2;
 	unsigned u;
 	int tile;
-	MapField* mf;
+	MapField *mf;
 
 	quad = QuadFromTile(x, y);
 
@@ -648,7 +648,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 **  @param count      the number of times to add the unit
 **  @param value      resources to be stored in that unit
 */
-static void EditorRandomizeUnit(const char* unit_type, int count, int value)
+static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
 	int mx;
 	int my;
@@ -660,7 +660,7 @@ static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 	int tw;
 	int th;
 	UnitType* type;
-	Unit* unit;
+	CUnit *unit;
 
 	mx = TheMap.Info.MapWidth;
 	my = TheMap.Info.MapHeight;
@@ -717,7 +717,7 @@ static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 */
 static void EditorDestroyAllUnits(void)
 {
-	Unit* unit;
+	CUnit *unit;
 
 	while (NumUnits != 0) {
 		unit = Units[0];

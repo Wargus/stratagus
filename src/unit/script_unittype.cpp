@@ -1813,10 +1813,10 @@ static int CclDefineDecorations(lua_State* l)
 /**
 **  Update unit variables which are not user defined.
 */
-void UpdateUnitVariables(const Unit* unit)
+void UpdateUnitVariables(const CUnit *unit)
 {
 	int i;
-	const UnitType* type; // unit->Type.
+	const UnitType *type; // unit->Type.
 
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values

@@ -63,12 +63,12 @@
 **
 **  @return        Returns ideal target on map tile.
 */
-static Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
+static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
-	Unit* best;
-	const UnitType* type;
+	CUnit *table[UnitMax];
+	CUnit *unit;
+	CUnit *best;
+	const UnitType *type;
 	int n;
 	int i;
 
@@ -114,7 +114,7 @@ static Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 **
 **  @note only works for water transporters!
 */
-static void AiMarkWaterTransporter(const Unit* unit, unsigned char* matrix)
+static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -217,8 +217,8 @@ static void AiMarkWaterTransporter(const Unit* unit, unsigned char* matrix)
 **
 **  @return        True if target found.
 */
-static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy,
-	int* ds)
+static int AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int *dy,
+	int *ds)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -244,10 +244,10 @@ static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* d
 		OnIsle
 	};
 	unsigned char state;
-	unsigned char* m;
+	unsigned char *m;
 
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2;
-	points = (struct p*)malloc(size * sizeof(*points));
+	points = (struct p *)malloc(size * sizeof(*points));
 
 	x = unit->X;
 	y = unit->Y;
@@ -368,7 +368,7 @@ static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* d
 **
 **  @return       True if wall found.
 */
-int AiFindWall(AiForce* force)
+int AiFindWall(AiForce *force)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -387,12 +387,12 @@ int AiFindWall(AiForce* force)
 	int ep;
 	int i;
 	int w;
-	unsigned char* m;
-	unsigned char* matrix;
+	unsigned char *m;
+	unsigned char *matrix;
 	int destx;
 	int desty;
-	AiUnit* aiunit;
-	Unit* unit;
+	AiUnit *aiunit;
+	CUnit *unit;
 
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
@@ -411,7 +411,7 @@ int AiFindWall(AiForce* force)
 	x = unit->X;
 	y = unit->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (struct p*)malloc(size * sizeof(*points));
+	points = (struct p *)malloc(size * sizeof(*points));
 
 	destx = -1;
 	desty = -1;
@@ -508,15 +508,15 @@ int AiFindWall(AiForce* force)
 **  @fixme transporter are more selective now (flag with unittypeland).
 **         We must manage it.
 */
-int AiPlanAttack(AiForce* force)
+int AiPlanAttack(AiForce *force)
 {
-	unsigned char* watermatrix;
-	const AiUnit* aiunit;
+	unsigned char *watermatrix;
+	const AiUnit *aiunit;
 	int x;
 	int y;
 	int i;
 	int state;
-	Unit* transporter;
+	CUnit *transporter;
 
 	DebugPrint("Planning for force #%d of player #%d\n" _C_
 		force - AiPlayer->Force _C_ AiPlayer->Player->Index);
@@ -544,7 +544,7 @@ int AiPlanAttack(AiForce* force)
 	transporter = NULL;
 	if (state) {
 		for (i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
-			Unit* unit;
+			CUnit *unit;
 
 			unit = AiPlayer->Player->Units[i];
 			if (unit->Type->CanTransport && UnitIdle(unit)) {
@@ -607,7 +607,7 @@ int AiPlanAttack(AiForce* force)
 */
 void AiSendExplorers(void)
 {
-	AiExplorationRequest* request;
+	AiExplorationRequest *request;
 	int requestcount;
 	int requestid;
 	int centerx;
@@ -620,9 +620,9 @@ void AiSendExplorers(void)
 	int trycount;
 	int outtrycount;
 
-	Unit** unit;
-	UnitType* type;
-	Unit* bestunit;
+	CUnit **unit;
+	UnitType *type;
+	CUnit *bestunit;
 	int distance;
 	int bestdistance;
 	int flyeronly;

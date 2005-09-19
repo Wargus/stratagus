@@ -217,7 +217,7 @@ struct _NumberDesc_ {
 struct _UnitDesc_ {
 	EUnit e;       /// which unit;
 	union {
-		Unit** AUnit; /// Adress of the unit.
+		CUnit **AUnit; /// Adress of the unit.
 	} D;
 };
 
@@ -285,14 +285,14 @@ extern NumberDesc* CclParseNumberDesc(lua_State* l); /// Parse a number descript
 extern UnitDesc* CclParseUnitDesc(lua_State* l);     /// Parse a unit description.
 StringDesc* CclParseStringDesc(lua_State* l);        /// Parse a string description.
 
-StringDesc* NewStringDesc(const char* s);            /// Create a StringDesc with const string.
-extern int EvalNumber(const NumberDesc* numberdesc); /// Evaluate the number.
-extern Unit* EvalUnit(const UnitDesc* unitdesc);     /// Evaluate the unit.
-char* EvalString(const StringDesc* s);               /// Evaluate the string.
+StringDesc *NewStringDesc(const char *s);            /// Create a StringDesc with const string.
+extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.
+extern CUnit *EvalUnit(const UnitDesc *unitdesc);    /// Evaluate the unit.
+char *EvalString(const StringDesc *s);               /// Evaluate the string.
 
-void FreeNumberDesc(NumberDesc* number);  /// Free number description content. (no pointer itself).
-void FreeUnitDesc(UnitDesc* unitdesc);    /// Free unit description content. (no pointer itself).
-void FreeStringDesc(StringDesc* s);       /// Frre string description content. (no pointer itself).
+void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (no pointer itself).
+void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).
+void FreeStringDesc(StringDesc *s);       /// Frre string description content. (no pointer itself).
 
 
 //@}

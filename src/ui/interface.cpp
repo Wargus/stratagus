@@ -141,7 +141,7 @@ static void UiUnselectAll(void)
 */
 static void UiCenterOnGroup(unsigned group)
 {
-	Unit** units;
+	CUnit **units;
 	int n;
 	int x;
 	int y;
@@ -179,7 +179,7 @@ static void UiSelectGroup(unsigned group)
 */
 static void UiAddGroupToSelection(unsigned group)
 {
-	Unit** units;
+	CUnit **units;
 	int n;
 
 	if (!(n = GetNumberUnitsOfGroup(group))) {
@@ -543,9 +543,9 @@ static void UiToggleTerrain(void)
 */
 static void UiFindIdleWorker(void)
 {
-	Unit* unit;
+	CUnit *unit;
 	// FIXME: static variable, is not needed.
-	static Unit* LastIdleWorker = NoUnitP;
+	static CUnit *LastIdleWorker = NoUnitP;
 
 	unit = FindIdleWorker(ThisPlayer, LastIdleWorker);
 	if (unit != NoUnitP) {

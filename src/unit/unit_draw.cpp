@@ -85,7 +85,7 @@ static inline max(int a, int b) { return a > b ? a : b; }
 ** Decoration: health, mana.
 */
 typedef struct {
-	char* File;       /// File containing the graphics data
+	char *File;       /// File containing the graphics data
 	int HotX;         /// X drawing position (relative)
 	int HotY;         /// Y drawing position (relative)
 	int Width;        /// width of the decoration
@@ -100,8 +100,8 @@ typedef struct {
 **	Structure grouping all Sprites for decoration.
 */
 typedef struct {
-	char** Name;             /// Name of the sprite.
-	Decoration* SpriteArray; /// Sprite to display variable.
+	char **Name;             /// Name of the sprite.
+	Decoration *SpriteArray; /// Sprite to display variable.
 	int SpriteNumber;        /// Size of SpriteArray (same as size of SriteName).
 } DecoSpriteType;
 
@@ -140,7 +140,7 @@ DrawDecoFunc DrawStaticSprite;
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
-const Viewport* CurrentViewport;  /// FIXME: quick hack for split screen
+const Viewport *CurrentViewport;  /// FIXME: quick hack for split screen
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -149,11 +149,11 @@ const Viewport* CurrentViewport;  /// FIXME: quick hack for split screen
 **
 **  @param unit  Pointer to unit.
 */
-void DrawUnitSelection(const Unit* unit)
+void DrawUnitSelection(const CUnit *unit)
 {
 	int x;
 	int y;
-	UnitType* type;
+	UnitType *type;
 	Uint32 color;
 
 	type = unit->Type;
@@ -308,12 +308,10 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1,
 **
 **  @return              Index of the sprite. -1 if not found.
 */
-int GetSpriteIndex(const char* SpriteName)
+int GetSpriteIndex(const char *SpriteName)
 {
-	int i;
-
 	Assert(SpriteName);
-	for (i = 0; i < DecoSprite.SpriteNumber; i++) {
+	for (int i = 0; i < DecoSprite.SpriteNumber; ++i) {
 		if (!strcmp(SpriteName, DecoSprite.Name[i])) {
 			return i;
 		}
@@ -326,13 +324,13 @@ int GetSpriteIndex(const char* SpriteName)
 **
 **  @param l    Lua_state
 */
-static int CclDefineSprites(lua_State* l)
+static int CclDefineSprites(lua_State *l)
 {
 	Decoration deco;      // temp decoration to stock arguments.
-	const char* name;     // name of the current sprite.
+	const char *name;     // name of the current sprite.
 	int args;             // number of arguments.
 	int i;                // iterator on argument.
-	const char* key;      // Current key of the lua table.
+	const char *key;      // Current key of the lua table.
 	int index;            // Index of the Sprite.
 
 	args = lua_gettop(l);
@@ -402,7 +400,7 @@ static int CclDefineSprites(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclManaSprite(lua_State* l)
+static int CclManaSprite(lua_State *l)
 {
 	char buffer[1024]; // lua equivalent.
 
@@ -425,7 +423,7 @@ static int CclManaSprite(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclHealthSprite(lua_State* l)
+static int CclHealthSprite(lua_State *l)
 {
 	char buffer[1024]; // lua equivalent.
 
@@ -454,9 +452,9 @@ static int CclHealthSprite(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowHealthDot(lua_State* l)
+static int CclShowHealthDot(lua_State *l)
 {
-	const char* lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true, CenterX = true,"
+	const char *lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"sprite\", {\"sprite-health\"}}})";
 
 	LuaCheckArgs(l, 0);
@@ -476,9 +474,9 @@ static int CclShowHealthDot(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowHealthHorizontal(lua_State* l)
+static int CclShowHealthHorizontal(lua_State *l)
 {
-	const char* lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true, CenterX = true,"
+	const char *lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Offset = {0, -7},"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1}}})";
 
@@ -499,9 +497,9 @@ static int CclShowHealthHorizontal(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowHealthVertical(lua_State* l)
+static int CclShowHealthVertical(lua_State *l)
 {
-	const char* lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true,"
+	const char *lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true,"
 		"Offset = {-7, 0},"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})";
 
@@ -520,7 +518,7 @@ static int CclShowHealthVertical(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowHealthBar(lua_State* l)
+static int CclShowHealthBar(lua_State *l)
 {
 	return CclShowHealthVertical(l);
 }
@@ -537,7 +535,7 @@ static int CclShowHealthBar(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowManaDot(lua_State* l)
+static int CclShowManaDot(lua_State *l)
 {
 	char lua_equiv[] = "DefineDecorations({Index = \"Mana\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
@@ -574,7 +572,7 @@ static int CclShowManaDot(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowManaHorizontal(lua_State* l)
+static int CclShowManaHorizontal(lua_State *l)
 {
 	char lua_equiv[] = "DefineDecorations({Index = \"Mana\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
@@ -610,7 +608,7 @@ static int CclShowManaHorizontal(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowManaVertical(lua_State* l)
+static int CclShowManaVertical(lua_State *l)
 {
 	char lua_equiv[] = "DefineDecorations({Index = \"Mana\", HideNeutral = true"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
@@ -643,7 +641,7 @@ static int CclShowManaVertical(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowManaBar(lua_State* l)
+static int CclShowManaBar(lua_State *l)
 {
 	return CclShowManaVertical(l);
 }
@@ -653,12 +651,10 @@ static int CclShowManaBar(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowEnergySelected(lua_State* l)
+static int CclShowEnergySelected(lua_State *l)
 {
-	int i;
-
 	LuaCheckArgs(l, 0);
-	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
+	for (int i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		UnitTypeVar.DecoVar[i].ShowOnlySelected = true;
 	}
 	return 0;
@@ -669,12 +665,10 @@ static int CclShowEnergySelected(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowFull(lua_State* l)
+static int CclShowFull(lua_State *l)
 {
-	int i;
-
 	LuaCheckArgs(l, 0);
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (int i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		UnitTypeVar.DecoVar[i].ShowWhenMax = 1;
 	}
 	return 0;
@@ -685,12 +679,10 @@ static int CclShowFull(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclShowNoFull(lua_State* l)
+static int CclShowNoFull(lua_State *l)
 {
-	int i;
-
 	LuaCheckArgs(l, 0);
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (int i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		UnitTypeVar.DecoVar[i].ShowWhenMax = 0;
 	}
 	return 0;
@@ -701,7 +693,7 @@ static int CclShowNoFull(lua_State* l)
 **
 **  @param l  Lua state
 */
-static int CclDecorationOnTop(lua_State* l)
+static int CclDecorationOnTop(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	// FIXME: not implemented
@@ -748,10 +740,9 @@ void DecorationCclRegister(void)
 */
 void LoadDecorations(void)
 {
-	int i;             // iterator on sprite decoration.
-	Decoration* deco;  // current decoration
+	Decoration *deco;  // current decoration
 
-	for (i = 0; i < DecoSprite.SpriteNumber; i++) {
+	for (int i = 0; i < DecoSprite.SpriteNumber; ++i) {
 		deco = &DecoSprite.SpriteArray[i];
 		ShowLoadProgress("Decorations `%s'", deco->File);
 		deco->Sprite = NewGraphic(deco->File, deco->Width, deco->Height);
@@ -764,10 +755,9 @@ void LoadDecorations(void)
 */
 void CleanDecorations(void)
 {
-	int i;             // iterator on sprite decoration.
-	Decoration* deco;  // current decoration
+	Decoration *deco;  // current decoration
 
-	for (i = 0; i < DecoSprite.SpriteNumber; i++) {
+	for (int i = 0; i < DecoSprite.SpriteNumber; ++i) {
 		deco = &DecoSprite.SpriteArray[i];
 		free(DecoSprite.Name[i]);
 		free(deco->File);
@@ -788,7 +778,7 @@ void CleanDecorations(void)
 **  @param Deco    More data arguments
 **  @todo fix color configuration.
 */
-void DrawBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
+void DrawBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 {
 	int height;
 	int width;
@@ -860,7 +850,7 @@ void DrawBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 **  @param Deco    More data arguments
 **  @todo fix font/color configuration.
 */
-void PrintValue(int x, int y, const Unit* unit, const DecoVarType* Deco)
+void PrintValue(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 {
 	int font;  // font to display the value.
 
@@ -883,11 +873,11 @@ void PrintValue(int x, int y, const Unit* unit, const DecoVarType* Deco)
 **  @param Deco    More data arguments
 **  @todo fix sprite configuration.
 */
-void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
+void DrawSpriteBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 {
 	int n;                   // frame of the sprite to show.
-	Graphic* sprite;         // the sprite to show.
-	Decoration* decosprite;  // Info on the sprite.
+	Graphic *sprite;         // the sprite to show.
+	Decoration *decosprite;  // Info on the sprite.
 
 	Assert(unit);
 	Assert(Deco);
@@ -921,10 +911,10 @@ void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 **
 **  @todo fix sprite configuration configuration.
 */
-void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
+void DrawStaticSprite(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 {
-	Graphic* sprite;         // the sprite to show.
-	Decoration* decosprite;  // Info on the sprite.
+	Graphic *sprite;         // the sprite to show.
+	Decoration *decosprite;  // Info on the sprite.
 
 	decosprite = &DecoSprite.SpriteArray[(int) Deco->Data.StaticSprite.NSprite];
 	sprite = decosprite->Sprite;
@@ -940,7 +930,7 @@ void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
 }
 
 
-extern void UpdateUnitVariables(const Unit* unit);
+extern void UpdateUnitVariables(const CUnit *unit);
 
 
 /**
@@ -951,7 +941,7 @@ extern void UpdateUnitVariables(const Unit* unit);
 **  @param x     Screen X position of the unit.
 **  @param y     Screen Y position of the unit.
 */
-static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
+static void DrawDecoration(const CUnit *unit, const UnitType *type, int x, int y)
 {
 	int i;
 
@@ -1021,7 +1011,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const Unit* unit, const UnitType* type, int frame,
+void DrawShadow(const CUnit *unit, const UnitType *type, int frame,
 	int x, int y)
 {
 	if (!type) {
@@ -1073,9 +1063,9 @@ void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 **  @param x      Resulting screen X cordinate.
 **  @param y      Resulting screen Y cordinate.
 */
-static void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y)
+static void GetOrderPosition(const CUnit *unit, const Order *order, int *x, int *y)
 {
-	Unit* goal;
+	CUnit *goal;
 
 	// FIXME: n0body: Check for goal gone?
 	if ((goal = order->Goal) && (!goal->Removed)) {
@@ -1112,7 +1102,7 @@ static void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* 
 **  @param y1     Y pixel coordinate.
 **  @param order  Order to display.
 */
-static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
+static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const Order *order)
 {
 	int x2;
 	int y2;
@@ -1242,7 +1232,7 @@ static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order
 **
 **  @param unit  Pointer to the unit.
 */
-void ShowOrder(const Unit* unit)
+void ShowOrder(const CUnit *unit)
 {
 	int x1;
 	int y1;
@@ -1279,9 +1269,9 @@ void ShowOrder(const Unit* unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const Unit* unit, const UnitType* type, int x, int y)
+static void DrawInformations(const CUnit *unit, const UnitType *type, int x, int y)
 {
-	const UnitStats* stats;
+	const UnitStats *stats;
 	int r;
 
 #if 0 && DEBUG // This is for showing vis counts and refs.
@@ -1344,7 +1334,7 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 **  @param x         X position.
 **  @param y         Y position.
 */
-void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite,
+void DrawUnitPlayerColor(const UnitType *type, Graphic *sprite,
 	int player, int frame, int x, int y)
 {
 	int f;
@@ -1401,9 +1391,9 @@ void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite,
 **  @param x      X position.
 **  @param y      Y position.
 */
-static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
+static void DrawConstructionShadow(const CUnit *unit, int frame, int x, int y)
 {
-	ConstructionFrame* cframe;
+	ConstructionFrame *cframe;
 
 	cframe = unit->Data.Built.Frame;
 	if (cframe->File == ConstructionFileConstruction) {
@@ -1474,8 +1464,8 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 **  @param x       X position.
 **  @param y       Y position.
 */
-static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
-	const UnitType* type, int frame, int x, int y)
+static void DrawConstruction(const CUnit *unit, const ConstructionFrame *cframe,
+	const UnitType *type, int frame, int x, int y)
 {
 	int player;
 
@@ -1510,17 +1500,17 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 **
 **  @param unit  Pointer to the unit.
 */
-void DrawUnit(const Unit* unit)
+void DrawUnit(const CUnit *unit)
 {
 	int x;
 	int y;
 	int frame;
 	int state;
 	int constructed;
-	Graphic* sprite;
-	ResourceInfo* resinfo;
-	ConstructionFrame* cframe;
-	UnitType* type;
+	Graphic *sprite;
+	ResourceInfo *resinfo;
+	ConstructionFrame *cframe;
+	UnitType *type;
 
 	if (unit->Type->Revealer) { // Revealers are not drawn
 		return;
@@ -1634,16 +1624,16 @@ void DrawUnit(const Unit* unit)
 **
 **  @return -1 for v1 < v2, 1 for v2 < v1
 */
-static int DrawLevelCompare(const void* v1, const void* v2) {
+static int DrawLevelCompare(const void *v1, const void *v2) {
 
-	const Unit* c1;
-	const Unit* c2;
+	const CUnit *c1;
+	const CUnit *c2;
 	int drawlevel1;
 	int drawlevel2;
 	int diffpos;
 
-	c1 = *(Unit**)v1;
-	c2 = *(Unit**)v2;
+	c1 = *(CUnit **)v1;
+	c2 = *(CUnit **)v2;
 
 	if (c1->Orders[0].Action == UnitActionDie && c1->Type->CorpseType) {
 		drawlevel1 = c1->Type->CorpseType->DrawLevel;
@@ -1673,7 +1663,7 @@ static int DrawLevelCompare(const void* v1, const void* v2) {
 **  @param table  Table of units to return in sorted order 
 **
 */
-int FindAndSortUnits(const Viewport* vp, Unit** table)
+int FindAndSortUnits(const Viewport *vp, CUnit **table)
 {
 	int i;
 	int n;
@@ -1691,7 +1681,7 @@ int FindAndSortUnits(const Viewport* vp, Unit** table)
 	}
 
 	if (n) {
-		qsort((void*)table, n, sizeof(Unit*), DrawLevelCompare);
+		qsort((void *)table, n, sizeof(CUnit *), DrawLevelCompare);
 	}
 
 	return n;

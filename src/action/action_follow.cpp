@@ -58,9 +58,9 @@
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionFollow(Unit* unit)
+void HandleActionFollow(CUnit *unit)
 {
-	Unit* goal;
+	CUnit *goal;
 
 	//
 	// Reached target
@@ -131,7 +131,7 @@ void HandleActionFollow(Unit* unit)
 			if ((goal = unit->Orders[0].Goal) &&
 					goal->Type->Teleporter && goal->Goal &&
 					MapDistanceBetweenUnits(unit, goal) <= 1) {
-				Unit* dest;
+				CUnit *dest;
 
 				// Teleport the unit
 				RemoveUnit(unit, NULL);

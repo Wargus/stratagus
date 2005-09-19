@@ -74,23 +74,23 @@ typedef struct _log_entry_ LogEntry;
 struct _log_entry_ {
 	unsigned long GameCycle;
 	int UnitNumber;
-	char* UnitIdent;
-	char* Action;
+	char *UnitIdent;
+	char *Action;
 	int Flush;
 	int PosX;
 	int PosY;
 	int DestUnitNumber;
-	char* Value;
+	char *Value;
 	int Num;
 	unsigned SyncRandSeed;
-	LogEntry* Next;
+	LogEntry *Next;
 };
 
 /**
 ** Multiplayer Player definition
 */
 typedef struct _multiplayer_player_ {
-	char* Name;
+	char *Name;
 	int Race;
 	int Team;
 	int Type;
@@ -100,12 +100,12 @@ typedef struct _multiplayer_player_ {
 ** Full replay structure (definition + logs)
 */
 typedef struct _full_replay_ {
-	char* Comment1;
-	char* Comment2;
-	char* Comment3;
-	char* Date;
-	char* Map;
-	char* MapPath;
+	char *Comment1;
+	char *Comment2;
+	char *Comment3;
+	char *Date;
+	char *Map;
+	char *MapPath;
 	unsigned MapId;
 
 	int Type;
@@ -122,7 +122,7 @@ typedef struct _full_replay_ {
 	int Opponents;
 	int Engine[3];
 	int Network[3];
-	LogEntry* Commands;
+	LogEntry *Commands;
 } FullReplay;
 
 //----------------------------------------------------------------------------
@@ -138,13 +138,13 @@ int CommandLogDisabled;            /// True if command log is off
 ReplayType ReplayGameType;         /// Replay game type
 static int DisabledLog;            /// Disabled log for replay
 static int DisabledShowTips;       /// Disabled show tips
-static CLFile* LogFile;            /// Replay log file
+static CLFile *LogFile;            /// Replay log file
 static unsigned long NextLogCycle; /// Next log cycle number
 static int InitReplay;             /// Initialize replay
-static FullReplay* CurrentReplay;
-static LogEntry* ReplayStep;
+static FullReplay *CurrentReplay;
+static LogEntry *ReplayStep;
 
-static void AppendLog(LogEntry* log, CLFile* dest);
+static void AppendLog(LogEntry* log, CLFile *dest);
 
 //----------------------------------------------------------------------------
 // Log commands
@@ -155,12 +155,12 @@ static void AppendLog(LogEntry* log, CLFile* dest);
 **
 ** @return A new FullReplay structure
 */
-static FullReplay* StartReplay(void)
+static FullReplay *StartReplay(void)
 {
-	FullReplay* replay;
-	char* s;
+	FullReplay *replay;
+	char *s;
 	time_t now;
-	char* s1;
+	char *s1;
 
 	replay = (FullReplay*)calloc(1, sizeof(FullReplay));
 
@@ -259,10 +259,10 @@ static void ApplyReplaySettings(void)
 **
 **  @param replay  Pointer to the replay to be freed
 */
-static void DeleteReplay(FullReplay* replay)
+static void DeleteReplay(FullReplay *replay)
 {
-	LogEntry* log;
-	LogEntry* next;
+	LogEntry *log;
+	LogEntry *next;
 	int i;
 
 #define cond_free(x) { if (x) { free(x); } }
@@ -293,7 +293,7 @@ static void DeleteReplay(FullReplay* replay)
 	free(replay);
 }
 
-static void PrintLogCommand(LogEntry* log, CLFile* dest)
+static void PrintLogCommand(LogEntry *log, CLFile *dest)
 {
 	dest->printf("Log( { ");
 	dest->printf("GameCycle = %lu, ", log->GameCycle);
@@ -325,9 +325,9 @@ static void PrintLogCommand(LogEntry* log, CLFile* dest)
 **
 **  @param dest  The file to output to
 */
-static void SaveFullLog(CLFile* dest)
+static void SaveFullLog(CLFile *dest)
 {
-	LogEntry* log;
+	LogEntry *log;
 	int i;
 
 	dest->printf("ReplayLog( {\n");
@@ -415,10 +415,10 @@ static void AppendLog(LogEntry *log, CLFile *dest)
 ** @param value     optional command argument (unit-type,...).
 ** @param num       optional number argument
 */
-void CommandLog(const char* action, const Unit* unit, int flush,
-	int x, int y, const Unit* dest, const char* value, int num)
+void CommandLog(const char *action, const CUnit *unit, int flush,
+	int x, int y, const CUnit *dest, const char *value, int num)
 {
-	LogEntry* log;
+	LogEntry *log;
 
 	if (CommandLogDisabled) { // No log wanted
 		return;
@@ -514,11 +514,11 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 /**
 ** Parse log
 */
-static int CclLog(lua_State* l)
+static int CclLog(lua_State *l)
 {
-	LogEntry* log;
-	LogEntry** last;
-	const char* value;
+	LogEntry *log;
+	LogEntry **last;
+	const char *value;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -579,10 +579,10 @@ static int CclLog(lua_State* l)
 /**
 ** Parse replay-log
 */
-static int CclReplayLog(lua_State* l)
+static int CclReplayLog(lua_State *l)
 {
-	FullReplay* replay;
-	const char* value;
+	FullReplay *replay;
+	const char *value;
 	int j;
 
 	LuaCheckArgs(l, 1);
@@ -710,7 +710,7 @@ static int CclReplayLog(lua_State* l)
 **
 **  @param file  file to save to.
 */
-void SaveReplayList(CLFile* file)
+void SaveReplayList(CLFile *file)
 {
 	SaveFullLog(file);
 }
@@ -720,7 +720,7 @@ void SaveReplayList(CLFile* file)
 **
 **  @param name  name of file to load.
 */
-int LoadReplay(char* name)
+int LoadReplay(char *name)
 {
 	CleanReplayLog();
 	ReplayGameType = ReplaySinglePlayer;
@@ -791,13 +791,13 @@ void CleanReplayLog(void)
 static void DoNextReplay(void)
 {
 	int unit;
-	const char* action;
+	const char *action;
 	int flags;
 	int posx;
 	int posy;
-	const char* val;
+	const char *val;
 	int num;
-	Unit* dunit;
+	CUnit *dunit;
 
 	Assert(ReplayStep != 0);
 
@@ -996,7 +996,7 @@ void MultiPlayerReplayEachCycle(void)
 **
 ** @param unit pointer to unit.
 */
-void SendCommandStopUnit(Unit* unit)
+void SendCommandStopUnit(CUnit *unit)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("stop", unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
@@ -1012,7 +1012,7 @@ void SendCommandStopUnit(Unit* unit)
 ** @param unit     pointer to unit.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandStandGround(Unit* unit, int flush)
+void SendCommandStandGround(CUnit *unit, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("stand-ground", unit, flush, -1, -1, NoUnitP, NULL, -1);
@@ -1029,7 +1029,7 @@ void SendCommandStandGround(Unit* unit, int flush)
 ** @param dest    follow this unit.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandFollow(Unit* unit, Unit* dest, int flush)
+void SendCommandFollow(CUnit *unit, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("follow", unit, flush, -1, -1, dest, NULL, -1);
@@ -1047,7 +1047,7 @@ void SendCommandFollow(Unit* unit, Unit* dest, int flush)
 ** @param y       Y map tile position to move to.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandMove(Unit* unit, int x, int y, int flush)
+void SendCommandMove(CUnit *unit, int x, int y, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("move", unit, flush, x, y, NoUnitP, NULL, -1);
@@ -1066,7 +1066,7 @@ void SendCommandMove(Unit* unit, int x, int y, int flush)
 ** @param dest    Unit to be repaired.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
+void SendCommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("repair", unit, flush, x, y, dest, NULL, -1);
@@ -1082,7 +1082,7 @@ void SendCommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 ** @param unit      pointer to unit.
 ** @param on        1 for auto repair on, 0 for off.
 */
-void SendCommandAutoRepair(Unit* unit, int on)
+void SendCommandAutoRepair(CUnit *unit, int on)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("auto-repair", unit, FlushCommands, on, -1, NoUnitP,
@@ -1103,7 +1103,7 @@ void SendCommandAutoRepair(Unit* unit, int on)
 ** @param attack   or !=NoUnitP unit to be attacked.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
+void SendCommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("attack", unit, flush, x, y, attack, NULL, -1);
@@ -1121,7 +1121,7 @@ void SendCommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 ** @param y        Y map tile position to fire on.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttackGround(Unit* unit, int x, int y, int flush)
+void SendCommandAttackGround(CUnit *unit, int x, int y, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("attack-ground", unit, flush, x, y, NoUnitP, NULL, -1);
@@ -1139,7 +1139,7 @@ void SendCommandAttackGround(Unit* unit, int x, int y, int flush)
 ** @param y        Y map tile position to patrol between.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandPatrol(Unit* unit, int x, int y, int flush)
+void SendCommandPatrol(CUnit *unit, int x, int y, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("patrol", unit, flush, x, y, NoUnitP, NULL, -1);
@@ -1158,7 +1158,7 @@ void SendCommandPatrol(Unit* unit, int x, int y, int flush)
 ** @param dest     Destination to be boarded.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandBoard(Unit* unit, int x, int y, Unit* dest, int flush)
+void SendCommandBoard(CUnit *unit, int x, int y, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("board", unit, flush, x, y, dest, NULL, -1);
@@ -1177,7 +1177,7 @@ void SendCommandBoard(Unit* unit, int x, int y, Unit* dest, int flush)
 ** @param what    Passagier to be unloaded.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
+void SendCommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("unload", unit, flush, x, y, what, NULL, -1);
@@ -1196,8 +1196,8 @@ void SendCommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandBuildBuilding(Unit* unit, int x, int y,
-	UnitType* what, int flush)
+void SendCommandBuildBuilding(CUnit *unit, int x, int y,
+	UnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("build", unit, flush, x, y, NoUnitP, what->Ident, -1);
@@ -1212,7 +1212,7 @@ void SendCommandBuildBuilding(Unit* unit, int x, int y,
 **
 **  @param unit  pointer to unit.
 */
-void SendCommandDismiss(Unit* unit)
+void SendCommandDismiss(CUnit *unit)
 {
 	// FIXME: currently unit and worker are same?
 	if (!IsNetworkGame()) {
@@ -1232,7 +1232,7 @@ void SendCommandDismiss(Unit* unit)
 ** @param y        Y map tile position where to harvest.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResourceLoc(Unit* unit, int x, int y, int flush)
+void SendCommandResourceLoc(CUnit *unit, int x, int y, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("resource-loc", unit, flush, x, y, NoUnitP, NULL, -1);
@@ -1249,7 +1249,7 @@ void SendCommandResourceLoc(Unit* unit, int x, int y, int flush)
 ** @param dest    pointer to destination (oil-platform,gold mine).
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandResource(Unit* unit, Unit* dest, int flush)
+void SendCommandResource(CUnit *unit, CUnit *dest, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("resource", unit, flush, -1, -1, dest, NULL, -1);
@@ -1266,7 +1266,7 @@ void SendCommandResource(Unit* unit, Unit* dest, int flush)
 ** @param goal    pointer to destination of the goods. (NULL=search best)
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandReturnGoods(Unit* unit, Unit* goal, int flush)
+void SendCommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("return", unit, flush, -1, -1, goal, NULL, -1);
@@ -1283,7 +1283,7 @@ void SendCommandReturnGoods(Unit* unit, Unit* goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(Unit* unit, UnitType* what, int flush)
+void SendCommandTrainUnit(CUnit *unit, UnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("train", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
@@ -1300,7 +1300,7 @@ void SendCommandTrainUnit(Unit* unit, UnitType* what, int flush)
 ** @param slot    Slot of training queue to cancel.
 ** @param type    Unit-type of unit to cancel.
 */
-void SendCommandCancelTraining(Unit* unit, int slot, const UnitType* type)
+void SendCommandCancelTraining(CUnit *unit, int slot, const UnitType *type)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
@@ -1319,7 +1319,7 @@ void SendCommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(Unit* unit, UnitType* what, int flush)
+void SendCommandUpgradeTo(CUnit *unit, UnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("upgrade-to", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
@@ -1334,7 +1334,7 @@ void SendCommandUpgradeTo(Unit* unit, UnitType* what, int flush)
 **
 ** @param unit  Pointer to unit.
 */
-void SendCommandCancelUpgradeTo(Unit* unit)
+void SendCommandCancelUpgradeTo(CUnit *unit)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-upgrade-to", unit, FlushCommands,
@@ -1353,7 +1353,7 @@ void SendCommandCancelUpgradeTo(Unit* unit)
 ** @param what     research-type of the research.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResearch(Unit* unit, Upgrade* what, int flush)
+void SendCommandResearch(CUnit *unit, Upgrade *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("research", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
@@ -1369,7 +1369,7 @@ void SendCommandResearch(Unit* unit, Upgrade* what, int flush)
 **
 ** @param unit pointer to unit.
 */
-void SendCommandCancelResearch(Unit* unit)
+void SendCommandCancelResearch(CUnit *unit)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-research", unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
@@ -1390,7 +1390,7 @@ void SendCommandCancelResearch(Unit* unit)
 ** @param spellid   Spell type id.
 ** @param flush     Flag flush all pending commands.
 */
-void SendCommandSpellCast(Unit* unit, int x, int y, Unit* dest, int spellid,
+void SendCommandSpellCast(CUnit *unit, int x, int y, CUnit *dest, int spellid,
 	int flush)
 {
 	if (!IsNetworkGame()) {
@@ -1409,7 +1409,7 @@ void SendCommandSpellCast(Unit* unit, int x, int y, Unit* dest, int spellid,
 ** @param spellid   Spell type id.
 ** @param on        1 for auto cast on, 0 for off.
 */
-void SendCommandAutoSpellCast(Unit* unit, int spellid, int on)
+void SendCommandAutoSpellCast(CUnit *unit, int spellid, int on)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("auto-spell-cast", unit, FlushCommands, on, -1, NoUnitP,
@@ -1510,8 +1510,8 @@ void NetworkCclRegister(void)
 void ParseCommand(unsigned char msgnr, UnitRef unum,
 	unsigned short x, unsigned short y, UnitRef dstnr)
 {
-	Unit* unit;
-	Unit* dest;
+	CUnit *unit;
+	CUnit *dest;
 	int id;
 	int status;
 

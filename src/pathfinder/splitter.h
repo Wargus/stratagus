@@ -37,7 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 
 /*----------------------------------------------------------------------------
 --  Constants
@@ -104,9 +104,9 @@ extern int ZoneSetContains(ZoneSet* a,int zone);
 
 extern void ZoneSetDebug(ZoneSet* set);
 
-extern void ZoneSetAddUnitZones(ZoneSet* set, const struct _unit_* unit);
+extern void ZoneSetAddUnitZones(ZoneSet* set, const CUnit *unit);
 
-extern void ZoneSetAddGoalZones(ZoneSet* set, const struct _unit_* unit,
+extern void ZoneSetAddGoalZones(ZoneSet* set, const CUnit *unit,
 	int gx, int gy, int gw, int gh, int minrange, int maxrange);
 
 /**

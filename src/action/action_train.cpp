@@ -64,7 +64,7 @@
 **
 **  @return  1 if the the unit can do it, 0 otherwise.
 */
-static int CanHandleOrder(Unit* unit, Order* order)
+static int CanHandleOrder(CUnit *unit, Order *order)
 {
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
@@ -91,11 +91,11 @@ static int CanHandleOrder(Unit* unit, Order* order)
 **
 **  @param unit  Unit that trains.
 */
-void HandleActionTrain(Unit* unit)
+void HandleActionTrain(CUnit *unit)
 {
-	Unit* nunit;
-	const UnitType* type;
-	Player* player;
+	CUnit *nunit;
+	const UnitType *type;
+	Player *player;
 	int food;
 
 	//

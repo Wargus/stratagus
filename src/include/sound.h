@@ -46,7 +46,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 struct _missile_;
 
 /*----------------------------------------------------------------------------
@@ -131,9 +131,9 @@ extern char* CurrentMusicFile;
 **  @param unit              the unit speaking
 **  @param unit_voice_group  the sound to play
 */
-extern void PlayUnitSound(const struct _unit_* unit,
+extern void PlayUnitSound(const CUnit *unit,
 	UnitVoiceGroup unit_voice_group);
-extern void PlayUnitSoundId(const struct _unit_* unit, SoundId id);
+extern void PlayUnitSoundId(const CUnit *unit, SoundId id);
 
 /**
 **  Ask to the sound server to play a sound associated to a missile.
