@@ -73,10 +73,10 @@
 **
 **  @return      TRUE if reached, otherwise FALSE.
 */
-static int MoveToResource(Unit* unit)
+static int MoveToResource(CUnit *unit)
 {
-	Unit* goal;
-	ResourceInfo* resinfo;
+	CUnit *goal;
+	ResourceInfo *resinfo;
 	int x;
 	int y;
 
@@ -146,10 +146,10 @@ static int MoveToResource(Unit* unit)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-static int StartGathering(Unit* unit)
+static int StartGathering(CUnit *unit)
 {
-	Unit* goal;
-	ResourceInfo* resinfo;
+	CUnit *goal;
+	ResourceInfo *resinfo;
 
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 	Assert(!unit->IX);
@@ -246,7 +246,7 @@ static int StartGathering(Unit* unit)
 **
 **  @param unit  Unit to animate
 */
-static void AnimateActionHarvest(Unit* unit)
+static void AnimateActionHarvest(CUnit *unit)
 {
 	Assert(unit->Type->Animations->Harvest[unit->CurrentResource]);
 	UnitShowAnimation(unit, unit->Type->Animations->Harvest[unit->CurrentResource]);
@@ -259,10 +259,11 @@ static void AnimateActionHarvest(Unit* unit)
 **  @param unit    pointer to harvester unit.
 **  @param source  pointer to resource unit.
 */
-static void LoseResource(Unit* unit, const Unit* source)
+static void LoseResource(CUnit *unit, const CUnit *source)
 {
-	Unit* depot;
-	ResourceInfo* resinfo;
+	CUnit *depot;
+	ResourceInfo *resinfo;
+
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
 	Assert((unit->Container && !resinfo->HarvestFromOutside) ||
@@ -326,11 +327,11 @@ static void LoseResource(Unit* unit, const Unit* source)
 **
 **  @return      non-zero if ready, otherwise zero.
 */
-static int GatherResource(Unit* unit)
+static int GatherResource(CUnit *unit)
 {
-	Unit* source;
-	Unit* uins;
-	ResourceInfo* resinfo;
+	CUnit *source;
+	CUnit *uins;
+	ResourceInfo *resinfo;
 	int i;
 	int addload;
 
@@ -471,11 +472,11 @@ static int GatherResource(Unit* unit)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-static int StopGathering(Unit* unit)
+static int StopGathering(CUnit *unit)
 {
-	Unit* depot;
-	Unit* source;
-	ResourceInfo* resinfo;
+	CUnit *depot;
+	CUnit *source;
+	ResourceInfo *resinfo;
 
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
@@ -544,10 +545,10 @@ static int StopGathering(Unit* unit)
 **
 **  @return      TRUE if reached, otherwise FALSE.
 */
-static int MoveToDepot(Unit* unit)
+static int MoveToDepot(CUnit *unit)
 {
-	Unit* goal;
-	ResourceInfo* resinfo;
+	CUnit *goal;
+	ResourceInfo *resinfo;
 
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
@@ -620,11 +621,11 @@ static int MoveToDepot(Unit* unit)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-static int WaitInDepot(Unit* unit)
+static int WaitInDepot(CUnit *unit)
 {
-	const Unit* depot;
-	Unit* goal;
-	ResourceInfo* resinfo;
+	const CUnit *depot;
+	CUnit *goal;
+	ResourceInfo *resinfo;
 	int x;
 	int y;
 
@@ -678,7 +679,7 @@ static int WaitInDepot(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-void ResourceGiveUp(Unit* unit)
+void ResourceGiveUp(CUnit *unit)
 {
 	DebugPrint("Unit %d gave up on resource gathering.\n" _C_ unit->Slot);
 	if (unit->Orders[0].Goal) {
@@ -703,7 +704,7 @@ void ResourceGiveUp(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionResource(Unit* unit)
+void HandleActionResource(CUnit *unit)
 {
 	int ret;
 	int newres;

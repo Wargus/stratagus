@@ -204,7 +204,7 @@ void CleanButtons(void)
 **  @todo FIXME : add IconDisabled when needed.
 **  @todo FIXME : Should show the rally action for training unit ? (NewOrder)
 */
-static int GetButtonStatus(const ButtonAction* button)
+static int GetButtonStatus(const ButtonAction *button)
 {
 	int res;
 	int action;
@@ -321,7 +321,7 @@ static int GetButtonStatus(const ButtonAction* button)
 void CButtonPanel::Draw(void)
 {
 	Player *player;
-	const ButtonAction* buttons;
+	const ButtonAction *buttons;
 	char buf[8];
 
 	//
@@ -429,7 +429,7 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 **  @todo FIXME : better check. (dependancy, resource, ...)
 **  @todo FIXME : make difference with impossible and not yet researched.
 */
-static int IsButtonAllowed(const Unit *unit, const ButtonAction *buttonaction)
+static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 {
 	int res;
 
@@ -588,7 +588,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 **
 **  @todo FIXME : Remove Hack for cancel button.
 */
-static ButtonAction *UpdateButtonPanelSingleUnit(const Unit *unit)
+static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 {
 	int allow;
 	char unit_ident[128];
@@ -598,7 +598,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const Unit *unit)
 
 	Assert(unit);
 
-	res = (ButtonAction*)calloc(UI.ButtonPanel.NumButtons, sizeof (*res));
+	res = (ButtonAction *)calloc(UI.ButtonPanel.NumButtons, sizeof(*res));
 	for (z = 0; z < UI.ButtonPanel.NumButtons; ++z) {
 		res[z].Pos = -1;
 	}
@@ -655,7 +655,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const Unit *unit)
 */
 void CButtonPanel::Update(void)
 {
-	Unit *unit;
+	CUnit *unit;
 	int sameType;   // 1 if all selected units are same type, 0 else.
 
 	// Default is no button.

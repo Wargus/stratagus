@@ -101,10 +101,10 @@ enum _mode_buttons_ {
 	StartButton
 };
 
-char** EditorUnitTypes;  /// Sorted editor unit-type table
+char **EditorUnitTypes;  /// Sorted editor unit-type table
 int MaxUnitIndex;        /// Max unit icon draw index
 
-static char** ShownUnitTypes;       /// Shown editor unit-type table
+static char **ShownUnitTypes;       /// Shown editor unit-type table
 static int MaxShownUnits;           /// Max unit icon draw index
 static char ShowUnitsToSelect;      /// Show units in unit list
 static char ShowBuildingsToSelect;  /// Show buildings in unit list
@@ -188,7 +188,7 @@ int GetTileNumber(int basic, int random, int filler)
 */
 void EditTile(int x, int y, int tile)
 {
-	MapField* mf;
+	MapField *mf;
 
 	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
@@ -291,9 +291,9 @@ void EditTiles(int x, int y, int tile, int size)
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditUnitInternal(int x, int y, UnitType* type, Player* player)
+static void EditUnitInternal(int x, int y, UnitType *type, Player *player)
 {
-	Unit* unit;
+	CUnit *unit;
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	unit = MakeUnitAndPlace(x, y, type, player);
@@ -316,7 +316,7 @@ static void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 **
 **  @todo  FIXME: Check if the player has already a start-point.
 */
-static void EditUnit(int x, int y, UnitType* type, Player* player)
+static void EditUnit(int x, int y, UnitType *type, Player *player)
 {
 	int mx;
 	int my;
@@ -373,8 +373,8 @@ static int CalculateUnitIcons(void)
 static void CalculateMaxIconSize(void)
 {
 	int i;
-	const UnitType* type;
-	const Icon* icon;
+	const UnitType *type;
+	const Icon *icon;
 
 	IconWidth = 0;
 	IconHeight = 0;
@@ -399,10 +399,10 @@ static void RecalculateShownUnits(void)
 {
 	int i;
 	int n;
-	const UnitType* type;
+	const UnitType *type;
 
 	if (!ShownUnitTypes) {
-		ShownUnitTypes = (char**)malloc(sizeof(char*) * MaxUnitIndex);
+		ShownUnitTypes = (char **)malloc(sizeof(char *) * MaxUnitIndex);
 	}
 
 	for (n = i = 0; i < MaxUnitIndex; ++i) {
@@ -699,7 +699,7 @@ static void DrawUnitIcons(void)
 **  @param y        Y display position
 **  @param flags    State of the icon (::IconActive,::IconClicked,...)
 */
-static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
+static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flags)
 {
 	Uint32 color;
 
@@ -740,7 +740,7 @@ static void DrawEditorPanel(void)
 {
 	int x;
 	int y;
-	Icon* icon;
+	Icon *icon;
 
 	x = UI.InfoPanel.X + 4;
 	y = UI.InfoPanel.Y + 4;
@@ -994,7 +994,7 @@ static void DrawEditorInfo(void)
 **
 **  @param unit  Unit pointer.
 */
-static void ShowUnitInfo(const Unit *unit)
+static void ShowUnitInfo(const CUnit *unit)
 {
 	char buf[256];
 	int i;
@@ -1449,7 +1449,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case KeyCodeDelete: // Delete
 			if (UnitUnderCursor) {
-				Unit* unit;
+				CUnit *unit;
 
 				RemoveUnit(unit = UnitUnderCursor, NULL);
 				UnitLost(unit);
@@ -1913,7 +1913,7 @@ static void EditorCallbackExit(void)
 static void CreateEditor(void)
 {
 	int i;
-	char* file;
+	char *file;
 	char buf[PATH_MAX];
 	CLFile clf;
 
@@ -2019,7 +2019,7 @@ static void CreateEditor(void)
 **         At least two players, one human slot, every player a startpoint
 **         ...
 */
-int EditorSaveMap(const char* file)
+int EditorSaveMap(const char *file)
 {
 	if (SaveStratagusMap(file, &TheMap, TerrainEditable) == -1) {
 		ErrorMenu("Cannot save map");

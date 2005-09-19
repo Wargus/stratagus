@@ -73,7 +73,7 @@
 **
 **  @todo manage correctly unit with no animation attack.
 */
-void AnimateActionAttack(Unit* unit)
+void AnimateActionAttack(CUnit *unit)
 {
 	//  No animation.
 	//  So direct fire missile.
@@ -98,9 +98,9 @@ void AnimateActionAttack(Unit* unit)
 **
 **  @return      1 if order have changed, 0 else.
 */
-static int CheckForDeadGoal(Unit* unit)
+static int CheckForDeadGoal(CUnit *unit)
 {
-	Unit* goal; // unit->Order[0].Goal
+	CUnit *goal; // unit->Order[0].Goal
 
 	goal = unit->Orders[0].Goal;
 	// Position or valid target, it is ok.
@@ -141,10 +141,10 @@ static int CheckForDeadGoal(Unit* unit)
 **
 **  @return      1 if order(action) have changed, 0 else (if goal change retrun 0).
 */
-static int CheckForTargetInRange(Unit* unit)
+static int CheckForTargetInRange(CUnit *unit)
 {
-	Unit* goal;
-	Unit* temp;
+	CUnit *goal;
+	CUnit *temp;
 	int wall;
 
 	//
@@ -214,9 +214,9 @@ static int CheckForTargetInRange(Unit* unit)
 **
 **  @param unit  Unit that is attacking and moving
 */
-static void MoveToTarget(Unit* unit)
+static void MoveToTarget(CUnit *unit)
 {
-	Unit* goal;
+	CUnit *goal;
 	int err;
 
 	Assert(unit);
@@ -311,10 +311,10 @@ static void MoveToTarget(Unit* unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-static void AttackTarget(Unit* unit)
+static void AttackTarget(CUnit *unit)
 {
-	Unit* goal; // unit->Order[0].Goal
-	Unit* temp;
+	CUnit *goal; // unit->Order[0].Goal
+	CUnit *temp;
 
 	Assert(unit);
 	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
@@ -464,7 +464,7 @@ static void AttackTarget(Unit* unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-void HandleActionAttack(Unit* unit)
+void HandleActionAttack(CUnit *unit)
 {
 	int dist;          // dist between unit and unit->Orders[0].Goal.
 

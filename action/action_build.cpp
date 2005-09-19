@@ -60,10 +60,10 @@
 **
 **  @param unit  The building under construction.
 */
-static void UpdateConstructionFrame(Unit* unit)
+static void UpdateConstructionFrame(CUnit *unit)
 {
-	ConstructionFrame* cframe;
-	ConstructionFrame* tmp;
+	ConstructionFrame *cframe;
+	ConstructionFrame *tmp;
 	int percent;
 
 	percent = unit->Data.Built.Progress /
@@ -89,7 +89,7 @@ static void UpdateConstructionFrame(Unit* unit)
 /**
 **  Move to build location
 */
-static void MoveToLocation(Unit* unit)
+static void MoveToLocation(CUnit *unit)
 {
 	// First entry
 	if (!unit->SubAction) {
@@ -141,12 +141,12 @@ static void MoveToLocation(Unit* unit)
 /**
 **  Check if the unit can build
 */
-static Unit* CheckCanBuild(Unit* unit)
+static CUnit *CheckCanBuild(CUnit *unit)
 {
 	int x;
 	int y;
-	UnitType* type;
-	Unit* ontop;
+	UnitType *type;
+	CUnit *ontop;
 
 	if (unit->Wait) {
 		// FIXME: show still animation while we wait?
@@ -231,14 +231,14 @@ static Unit* CheckCanBuild(Unit* unit)
 /**
 **  Start building
 */
-static void StartBuilding(Unit* unit, Unit* ontop)
+static void StartBuilding(CUnit *unit, CUnit *ontop)
 {
 	int x;
 	int y;
-	UnitType* type;
-	Unit* build;
-	BuildRestriction* b;
-	const UnitStats* stats;
+	UnitType *type;
+	CUnit *build;
+	BuildRestriction *b;
+	const UnitStats *stats;
 
 	x = unit->Orders[0].X;
 	y = unit->Orders[0].Y;
@@ -328,9 +328,9 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 **
 **  @param unit  worker which build.
 */
-static void BuildBuilding(Unit* unit)
+static void BuildBuilding(CUnit *unit)
 {
-	Unit* goal;
+	CUnit *goal;
 	int hp;
 	int animlength;
 
@@ -391,9 +391,9 @@ static void BuildBuilding(Unit* unit)
 **
 **  @param unit  Unit that builds a building.
 */
-void HandleActionBuild(Unit* unit)
+void HandleActionBuild(CUnit *unit)
 {
-	Unit* ontop;
+	CUnit *ontop;
 
 	if (unit->SubAction <= 10) {
 		MoveToLocation(unit);
@@ -413,10 +413,10 @@ void HandleActionBuild(Unit* unit)
 **
 **  @param unit  Unit that is built.
 */
-void HandleActionBuilt(Unit* unit)
+void HandleActionBuilt(CUnit *unit)
 {
-	Unit* worker;
-	UnitType* type;
+	CUnit *worker;
+	UnitType *type;
 	int n;
 	int progress;
 

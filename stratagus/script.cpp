@@ -79,21 +79,21 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-lua_State* Lua;                       /// Structure to work with lua files.
+lua_State *Lua;                       /// Structure to work with lua files.
 
-char* CclStartFile;                   /// CCL start file
-char* GameName;                       /// Game Preferences
+char *CclStartFile;                   /// CCL start file
+char *GameName;                       /// Game Preferences
 int CclInConfigFile;                  /// True while config file parsing
 int SaveGameLoading;                  /// If a Saved Game is Loading
-const char* CurrentLuaFile;                 /// Lua file currently being interpreted
+const char *CurrentLuaFile;                 /// Lua file currently being interpreted
 
-char* Tips[MAX_TIPS + 1];             /// Array of tips
+char *Tips[MAX_TIPS + 1];             /// Array of tips
 bool ShowTips;                        /// Show tips at start of level
 int CurrentTip;                       /// Current tip to display
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
-NumberDesc* Damage;                   /// Damage calculation for missile.
+NumberDesc *Damage;                   /// Damage calculation for missile.
 
 static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
@@ -112,7 +112,7 @@ typedef struct {
 	UStrIntType type;
 } UStrInt;
 /// Get component for unit variable.
-extern UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t);
+extern UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t);
 
 /**
 **  FIXME: docu
@@ -141,7 +141,7 @@ static void laction(int i)
 **  @param pname Source of the error.
 **  @param msg   error message to print.
 */
-static void l_message(const char* pname, const char* msg)
+static void l_message(const char *pname, const char *msg)
 {
 	if (pname) {
 		fprintf(stderr, "%s: ", pname);
@@ -160,7 +160,7 @@ static void l_message(const char* pname, const char* msg)
 */
 static int report(int status)
 {
-	const char* msg;
+	const char *msg;
 
 	if (status) {
 		msg = lua_tostring(Lua, -1);
@@ -205,13 +205,13 @@ int LuaCall(int narg, int clear)
 **
 **  @return      0 in success, else exit.
 */
-int LuaLoadFile(const char* file)
+int LuaLoadFile(const char *file)
 {
 	int status;
 	int size;
 	int read;
 	int location;
-	char* buf;
+	char *buf;
 	CLFile fp;
 	const char *PreviousLuaFile;
 
@@ -249,7 +249,7 @@ int LuaLoadFile(const char* file)
 	return status;
 }
 
-static int CclGetCurrentLuaPath(lua_State* l)
+static int CclGetCurrentLuaPath(lua_State *l)
 {
 	char *path;
 	char *seperator;
@@ -273,7 +273,7 @@ static int CclGetCurrentLuaPath(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSavePreferences(lua_State* l)
+static int CclSavePreferences(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	SavePreferences();
@@ -287,7 +287,7 @@ static int CclSavePreferences(lua_State* l)
 **
 **  @return 0 in success, else exit.
 */
-static int CclLoad(lua_State* l)
+static int CclLoad(lua_State *l)
 {
 	char buf[1024];
 
@@ -304,9 +304,9 @@ static int CclLoad(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSaveGame(lua_State* l)
+static int CclSaveGame(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	char buf[1024];
 
 	LuaCheckArgs(l, 1);
@@ -353,7 +353,7 @@ static int CclSaveGame(lua_State* l)
 **
 **  @return    char* from lua.
 */
-const char* LuaToString(lua_State* l, int narg)
+const char *LuaToString(lua_State *l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TSTRING);
 	return lua_tostring(l, narg);
@@ -368,7 +368,7 @@ const char* LuaToString(lua_State* l, int narg)
 **
 **  @return    C number from lua.
 */
-int LuaToNumber(lua_State* l, int narg)
+int LuaToNumber(lua_State *l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TNUMBER);
 	return static_cast<int>(lua_tonumber(l, narg));
@@ -383,7 +383,7 @@ int LuaToNumber(lua_State* l, int narg)
 **
 **  @return    1 for true, 0 for false from lua.
 */
-bool LuaToBoolean(lua_State* l, int narg)
+bool LuaToBoolean(lua_State *l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TBOOLEAN);
 	return lua_toboolean(l, narg) != 0;
@@ -413,7 +413,7 @@ void CclGarbageCollect(int fast)
 **  @param l       lua_state.
 **  @param binop   Where to stock info (must be malloced)
 */
-static void ParseBinOp(lua_State* l, BinOp* binop)
+static void ParseBinOp(lua_State *l, BinOp *binop)
 {
 	Assert(l);
 	Assert(binop);
@@ -437,9 +437,9 @@ static void ParseBinOp(lua_State* l, BinOp* binop)
 **
 **  @todo better check for error (restrict param).
 */
-static Unit** Str2UnitRef(lua_State* l, const char *s)
+static CUnit **Str2UnitRef(lua_State *l, const char *s)
 {
-	Unit** res; // Result.
+	CUnit **res; // Result.
 
 	Assert(l);
 	Assert(s);
@@ -464,11 +464,11 @@ static Unit** Str2UnitRef(lua_State* l, const char *s)
 **
 **  @return unit referernce definition.
 */
-UnitDesc* CclParseUnitDesc(lua_State* l)
+UnitDesc *CclParseUnitDesc(lua_State *l)
 {
-	UnitDesc* res;  // Result
+	UnitDesc *res;  // Result
 
-	res = (UnitDesc*)calloc(1, sizeof(*res));
+	res = (UnitDesc *)calloc(1, sizeof(*res));
 	if (lua_isstring(l, -1)) {
 		res->e = EUnit_Ref;
 		res->D.AUnit = Str2UnitRef(l, LuaToString(l, -1));
@@ -489,7 +489,7 @@ UnitDesc* CclParseUnitDesc(lua_State* l)
 **
 **  @return handle of the function.
 */
-static int ParseLuaFunction(lua_State* l, const char* tablename, int* counter)
+static int ParseLuaFunction(lua_State *l, const char *tablename, int *counter)
 {
 	lua_pushstring(l, tablename);
 	lua_gettable(l, LUA_GLOBALSINDEX);
@@ -539,10 +539,10 @@ static int CallLuaNumberFunction(unsigned int handler)
 **
 **  @return  lua function result.
 */
-static char* CallLuaStringFunction(unsigned int handler)
+static char *CallLuaStringFunction(unsigned int handler)
 {
 	int narg;
-	char* res;
+	char *res;
 
 	narg = lua_gettop(Lua);
 	lua_pushstring(Lua, "_stringfunction_");
@@ -564,13 +564,13 @@ static char* CallLuaStringFunction(unsigned int handler)
 **
 **  @return     number.
 */
-NumberDesc* CclParseNumberDesc(lua_State* l)
+NumberDesc *CclParseNumberDesc(lua_State *l)
 {
-	NumberDesc* res;      // Result.
+	NumberDesc *res;      // Result.
 	int nargs;            // Size of table.
-	const char* key;      // Key.
+	const char *key;      // Key.
 
-	res = (NumberDesc*)calloc(1, sizeof (*res));
+	res = (NumberDesc *)calloc(1, sizeof(*res));
 	if (lua_isnumber(l, -1)) {
 		res->e = ENumber_Dir;
 		res->D.Val = LuaToNumber(l, -1);
@@ -702,9 +702,9 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 **
 **  @return the new StringDesc.
 */
-StringDesc* NewStringDesc(const char* s)
+StringDesc *NewStringDesc(const char *s)
 {
-	StringDesc* res;
+	StringDesc *res;
 
 	if (!s) {
 		return NULL;
@@ -722,10 +722,10 @@ StringDesc* NewStringDesc(const char* s)
 **
 **  @return the enum number.
 */
-static ES_GameInfo StringToGameInfo(const char* s)
+static ES_GameInfo StringToGameInfo(const char *s)
 {
 	int i;
-	const char* sgameinfo[] = {"Tips", "Objectives", NULL};
+	const char *sgameinfo[] = {"Tips", "Objectives", NULL};
 
 	for (i = 0; sgameinfo[i]; ++i) {
 		if (!strcmp(s, sgameinfo[i])) {
@@ -743,13 +743,13 @@ static ES_GameInfo StringToGameInfo(const char* s)
 **
 **  @return     String description.
 */
-StringDesc* CclParseStringDesc(lua_State* l)
+StringDesc *CclParseStringDesc(lua_State *l)
 {
-	StringDesc* res;      // Result.
+	StringDesc *res;      // Result.
 	int nargs;            // Size of table.
-	const char* key;      // Key.
+	const char *key;      // Key.
 
-	res = (StringDesc*)calloc(1, sizeof (*res));
+	res = (StringDesc *)calloc(1, sizeof(*res));
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
 		res->D.Val = strdup(LuaToString(l, -1));
@@ -867,7 +867,7 @@ StringDesc* CclParseStringDesc(lua_State* l)
 **
 **  @return the result unit.
 */
-Unit* EvalUnit(const UnitDesc* unitdesc)
+CUnit *EvalUnit(const UnitDesc *unitdesc)
 {
 	Assert(unitdesc);
 
@@ -892,11 +892,11 @@ Unit* EvalUnit(const UnitDesc* unitdesc)
 **
 **  @todo Manage better the error (div/0, unit==NULL, ...).
 */
-int EvalNumber(const NumberDesc* number)
+int EvalNumber(const NumberDesc *number)
 {
-	Unit* unit;
-	char* s;
-	char* s2;
+	CUnit *unit;
+	char *s;
+	char *s2;
 	int a;
 	int b;
 
@@ -995,13 +995,13 @@ int EvalNumber(const NumberDesc* number)
 **
 **  @todo Manage better the error.
 */
-char* EvalString(const StringDesc* s)
+char *EvalString(const StringDesc *s)
 {
-	char* res;   // Result string.
+	char *res;   // Result string.
 	int i;       // Iterator.
-	char* tmp1;  // Temporary string.
-	char* tmp2;  // Temporary string.
-	const Unit* unit;  // Temporary unit
+	char *tmp1;  // Temporary string.
+	char *tmp2;  // Temporary string.
+	const CUnit *unit;  // Temporary unit
 
 	Assert(s);
 	switch (s->e) {
@@ -1134,7 +1134,7 @@ char* EvalString(const StringDesc* s)
 **  @param unitdesc  struct to free
 **
 */
-void FreeUnitDesc(UnitDesc* unitdesc)
+void FreeUnitDesc(UnitDesc *unitdesc)
 {
 #if 0 // Nothing to free mow.
 	if (!unitdesc) {
@@ -1149,7 +1149,7 @@ void FreeUnitDesc(UnitDesc* unitdesc)
 **  @param number  struct to free
 **
 */
-void FreeNumberDesc(NumberDesc* number)
+void FreeNumberDesc(NumberDesc *number)
 {
 	if (number == 0) {
 		return;
@@ -1201,7 +1201,7 @@ void FreeNumberDesc(NumberDesc* number)
 **  @param s  struct to free
 **
 */
-void FreeStringDesc(StringDesc* s)
+void FreeStringDesc(StringDesc *s)
 {
 	int i; // iterator.
 
@@ -1277,7 +1277,7 @@ void FreeStringDesc(StringDesc* s)
 **  @return the lua table {"UnitVar", {Unit = s, Variable = arg1,
 **                                 Component = "Value" or arg2, Loc = [012]}
 */
-static int AliasUnitVar(lua_State* l, const char* s)
+static int AliasUnitVar(lua_State *l, const char *s)
 {
 	int nargs; // number of args in lua.
 
@@ -1338,7 +1338,7 @@ static int AliasUnitVar(lua_State* l, const char* s)
 **
 **  @return   equivalent lua table.
 */
-static int CclUnitAttackerVar(lua_State* l)
+static int CclUnitAttackerVar(lua_State *l)
 {
 	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
 		LuaError(l, "Bad number of arg for AttackerVar()\n");
@@ -1354,7 +1354,7 @@ static int CclUnitAttackerVar(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclUnitDefenderVar(lua_State* l)
+static int CclUnitDefenderVar(lua_State *l)
 {
 	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
 		LuaError(l, "Bad number of arg for DefenderVar()\n");
@@ -1370,7 +1370,7 @@ static int CclUnitDefenderVar(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclActiveUnitVar(lua_State* l)
+static int CclActiveUnitVar(lua_State *l)
 {
 	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
 		LuaError(l, "Bad number of arg for ActiveUnitVar()\n");
@@ -1387,7 +1387,7 @@ static int CclActiveUnitVar(lua_State* l)
 **
 **  @return the lua table {s, {arg1, arg2, ..., argn}} or {s, arg1}
 */
-static int Alias(lua_State* l, const char* s)
+static int Alias(lua_State *l, const char *s)
 {
 	int i;     // iterator on argument.
 	int narg;  // number of argument
@@ -1421,7 +1421,7 @@ static int Alias(lua_State* l, const char* s)
 **
 **  @return   equivalent lua table.
 */
-static int CclAdd(lua_State* l)
+static int CclAdd(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "Add");
@@ -1435,7 +1435,7 @@ static int CclAdd(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclSub(lua_State* l)
+static int CclSub(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "Sub");
@@ -1448,7 +1448,7 @@ static int CclSub(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclMul(lua_State* l)
+static int CclMul(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "Mul");
@@ -1461,7 +1461,7 @@ static int CclMul(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclDiv(lua_State* l)
+static int CclDiv(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "Div");
@@ -1474,7 +1474,7 @@ static int CclDiv(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclMin(lua_State* l)
+static int CclMin(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "Min");
@@ -1487,7 +1487,7 @@ static int CclMin(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclMax(lua_State* l)
+static int CclMax(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "Max");
@@ -1500,7 +1500,7 @@ static int CclMax(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclRand(lua_State* l)
+static int CclRand(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "Rand");
@@ -1513,7 +1513,7 @@ static int CclRand(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclGreaterThan(lua_State* l)
+static int CclGreaterThan(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "GreaterThan");
@@ -1526,7 +1526,7 @@ static int CclGreaterThan(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclGreaterThanOrEq(lua_State* l)
+static int CclGreaterThanOrEq(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "GreaterThanOrEq");
@@ -1539,7 +1539,7 @@ static int CclGreaterThanOrEq(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclLessThan(lua_State* l)
+static int CclLessThan(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "LessThan");
@@ -1552,7 +1552,7 @@ static int CclLessThan(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclLessThanOrEq(lua_State* l)
+static int CclLessThanOrEq(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "LessThanOrEq");
@@ -1565,7 +1565,7 @@ static int CclLessThanOrEq(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclEqual(lua_State* l)
+static int CclEqual(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "Equal");
@@ -1578,7 +1578,7 @@ static int CclEqual(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclNotEqual(lua_State* l)
+static int CclNotEqual(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "NotEqual");
@@ -1594,7 +1594,7 @@ static int CclNotEqual(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclConcat(lua_State* l)
+static int CclConcat(lua_State *l)
 {
 	if (lua_gettop(l) < 1) { // FIXME do extra job for 1.
 		LuaError(l, "Bad number of arg for Concat()\n");
@@ -1610,7 +1610,7 @@ static int CclConcat(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclString(lua_State* l)
+static int CclString(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "String");
@@ -1623,7 +1623,7 @@ static int CclString(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclInverseVideo(lua_State* l)
+static int CclInverseVideo(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "InverseVideo");
@@ -1636,7 +1636,7 @@ static int CclInverseVideo(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclUnitName(lua_State* l)
+static int CclUnitName(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitName");
@@ -1649,7 +1649,7 @@ static int CclUnitName(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclIf(lua_State* l)
+static int CclIf(lua_State *l)
 {
 	if (lua_gettop(l) != 2 && lua_gettop(l) != 3) {
 		LuaError(l, "Bad number of arg for If()\n");
@@ -1665,7 +1665,7 @@ static int CclIf(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclSubString(lua_State* l)
+static int CclSubString(lua_State *l)
 {
 	if (lua_gettop(l) != 2 && lua_gettop(l) != 3) {
 		LuaError(l, "Bad number of arg for SubString()\n");
@@ -1681,7 +1681,7 @@ static int CclSubString(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclLine(lua_State* l)
+static int CclLine(lua_State *l)
 {
 	if (lua_gettop(l) < 2 || lua_gettop(l) > 4) {
 		LuaError(l, "Bad number of arg for Line()\n");
@@ -1697,7 +1697,7 @@ static int CclLine(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclGameInfo(lua_State* l)
+static int CclGameInfo(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "GameInfo");
@@ -1711,7 +1711,7 @@ static int CclGameInfo(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclVideoTextLength(lua_State* l)
+static int CclVideoTextLength(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	lua_newtable (l);
@@ -1740,7 +1740,7 @@ static int CclVideoTextLength(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclStringFind(lua_State* l)
+static int CclStringFind(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "StringFind");
@@ -1797,7 +1797,7 @@ static void AliasRegister()
 **
 **  @return   Current libray path.
 */
-static int CclStratagusLibraryPath(lua_State* l)
+static int CclStratagusLibraryPath(lua_State *l)
 {
 	lua_pushstring(l, StratagusLibPath);
 	return 1;
@@ -1806,11 +1806,11 @@ static int CclStratagusLibraryPath(lua_State* l)
 /**
 ** Return a table with the files found in the subdirectory.
 */
-static int CclListDirectory(lua_State* l)
+static int CclListDirectory(lua_State *l)
 {
 	char directory[256];
 	const char *userdir;
-	FileList* flp;
+	FileList *flp;
 	int n;
 	int i;
 
@@ -1846,7 +1846,7 @@ static int CclListDirectory(lua_State* l)
 **
 **  @return   Current game cycle.
 */
-static int CclGameCycle(lua_State* l)
+static int CclGameCycle(lua_State *l)
 {
 	lua_pushnumber(l, GameCycle);
 	return 1;
@@ -1859,9 +1859,9 @@ static int CclGameCycle(lua_State* l)
 **
 **  @return   Old game name.
 */
-static int CclSetGameName(lua_State* l)
+static int CclSetGameName(lua_State *l)
 {
-	char* old;
+	char *old;
 	int args;
 
 	args = lua_gettop(l);
@@ -1891,7 +1891,7 @@ static int CclSetGameName(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetGameCycle(lua_State* l)
+static int CclSetGameCycle(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	GameCycle = LuaToNumber(l, 1);
@@ -1903,7 +1903,7 @@ static int CclSetGameCycle(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetGamePaused(lua_State* l)
+static int CclSetGamePaused(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (!lua_isnumber(l, 1) && !lua_isboolean(l, 1)) {
@@ -1922,7 +1922,7 @@ static int CclSetGamePaused(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetVideoSyncSpeed(lua_State* l)
+static int CclSetVideoSyncSpeed(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	VideoSyncSpeed = LuaToNumber(l, 1);
@@ -1934,9 +1934,9 @@ static int CclSetVideoSyncSpeed(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetLocalPlayerName(lua_State* l)
+static int CclSetLocalPlayerName(lua_State *l)
 {
-	const char* str;
+	const char *str;
 
 	LuaCheckArgs(l, 1);
 	str = LuaToString(l, 1);
@@ -1953,7 +1953,7 @@ static int CclSetLocalPlayerName(lua_State* l)
 **
 **  @return 0.
 */
-static int ScriptSetUseHPForXp(lua_State* l)
+static int ScriptSetUseHPForXp(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UseHPForXp = LuaToBoolean(l, 1);
@@ -1965,7 +1965,7 @@ static int ScriptSetUseHPForXp(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclNoRandomPlacementMultiplayer(lua_State* l)
+static int CclNoRandomPlacementMultiplayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	NoRandomPlacementMultiplayer = 1;
@@ -1977,7 +1977,7 @@ static int CclNoRandomPlacementMultiplayer(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetDamageFormula(lua_State* l)
+static int CclSetDamageFormula(lua_State *l)
 {
 	Assert(l);
 	if (Damage) {
@@ -1995,7 +1995,7 @@ static int CclSetDamageFormula(lua_State* l)
 **
 **  @return   The old mode.
 */
-static int CclSetGodMode(lua_State* l)
+static int CclSetGodMode(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	GodMode = LuaToBoolean(l, 1);
@@ -2009,7 +2009,7 @@ static int CclSetGodMode(lua_State* l)
 **
 **  @return      The old state of tips displayed.
 */
-static int CclSetShowTips(lua_State* l)
+static int CclSetShowTips(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	ShowTips = LuaToBoolean(l, 1);
@@ -2023,7 +2023,7 @@ static int CclSetShowTips(lua_State* l)
 **
 **  @return     The old tip number.
 */
-static int CclSetCurrentTip(lua_State* l)
+static int CclSetCurrentTip(lua_State *l)
 {
 	int old;
 
@@ -2046,10 +2046,10 @@ static int CclSetCurrentTip(lua_State* l)
 **  @todo  FIXME: Memory for tips is never freed.
 **         FIXME: Make Tips dynamic.
 */
-static int CclAddTip(lua_State* l)
+static int CclAddTip(lua_State *l)
 {
 	int i;
-	const char* str;
+	const char *str;
 
 	LuaCheckArgs(l, 1);
 	str = LuaToString(l, 1);
@@ -2072,10 +2072,10 @@ static int CclAddTip(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSpeedResourcesHarvest(lua_State* l)
+static int CclSetSpeedResourcesHarvest(lua_State *l)
 {
 	int i;
-	const char* resource;
+	const char *resource;
 
 	LuaCheckArgs(l, 2);
 	resource = LuaToString(l, 1);
@@ -2095,10 +2095,10 @@ static int CclSetSpeedResourcesHarvest(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSpeedResourcesReturn(lua_State* l)
+static int CclSetSpeedResourcesReturn(lua_State *l)
 {
 	int i;
-	const char* resource;
+	const char *resource;
 
 	LuaCheckArgs(l, 2);
 	resource = LuaToString(l, 1);
@@ -2118,7 +2118,7 @@ static int CclSetSpeedResourcesReturn(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSpeedBuild(lua_State* l)
+static int CclSetSpeedBuild(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedBuild = LuaToNumber(l, 1);
@@ -2132,7 +2132,7 @@ static int CclSetSpeedBuild(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSpeedTrain(lua_State* l)
+static int CclSetSpeedTrain(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedTrain = LuaToNumber(l, 1);
@@ -2146,7 +2146,7 @@ static int CclSetSpeedTrain(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSpeedUpgrade(lua_State* l)
+static int CclSetSpeedUpgrade(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedUpgrade = LuaToNumber(l, 1);
@@ -2160,7 +2160,7 @@ static int CclSetSpeedUpgrade(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSpeedResearch(lua_State* l)
+static int CclSetSpeedResearch(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedResearch = LuaToNumber(l, 1);
@@ -2174,7 +2174,7 @@ static int CclSetSpeedResearch(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSpeeds(lua_State* l)
+static int CclSetSpeeds(lua_State *l)
 {
 	int i;
 	int s;
@@ -2196,7 +2196,7 @@ static int CclSetSpeeds(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultResources(lua_State* l)
+static int CclDefineDefaultResources(lua_State *l)
 {
 	int i;
 	int args;
@@ -2213,7 +2213,7 @@ static int CclDefineDefaultResources(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultResourcesLow(lua_State* l)
+static int CclDefineDefaultResourcesLow(lua_State *l)
 {
 	int i;
 	int args;
@@ -2230,7 +2230,7 @@ static int CclDefineDefaultResourcesLow(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultResourcesMedium(lua_State* l)
+static int CclDefineDefaultResourcesMedium(lua_State *l)
 {
 	int i;
 	int args;
@@ -2245,7 +2245,7 @@ static int CclDefineDefaultResourcesMedium(lua_State* l)
 /**
 **  Define default resources for a new player with high resources.
 */
-static int CclDefineDefaultResourcesHigh(lua_State* l)
+static int CclDefineDefaultResourcesHigh(lua_State *l)
 {
 	int i;
 	int args;
@@ -2262,7 +2262,7 @@ static int CclDefineDefaultResourcesHigh(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultIncomes(lua_State* l)
+static int CclDefineDefaultIncomes(lua_State *l)
 {
 	int i;
 	int args;
@@ -2279,7 +2279,7 @@ static int CclDefineDefaultIncomes(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultActions(lua_State* l)
+static int CclDefineDefaultActions(lua_State *l)
 {
 	int i;
 	int args;
@@ -2300,7 +2300,7 @@ static int CclDefineDefaultActions(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultResourceNames(lua_State* l)
+static int CclDefineDefaultResourceNames(lua_State *l)
 {
 	int i;
 	int args;
@@ -2321,11 +2321,11 @@ static int CclDefineDefaultResourceNames(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDefaultResourceAmounts(lua_State* l)
+static int CclDefineDefaultResourceAmounts(lua_State *l)
 {
 	int i;
 	int j;
-	const char* value;
+	const char *value;
 	int args;
 
 	args = lua_gettop(l);
@@ -2353,9 +2353,9 @@ static int CclDefineDefaultResourceAmounts(lua_State* l)
 **
 **  @param l  Lua state.
 */
-int CclUnits(lua_State* l)
+int CclUnits(lua_State *l)
 {
-	Unit** slot;
+	CUnit **slot;
 	int freeslots;
 	int destroyed;
 	int nullrefs;
@@ -2392,9 +2392,9 @@ int CclUnits(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclGetCompileFeature(lua_State* l)
+static int CclGetCompileFeature(lua_State *l)
 {
-	const char* str;
+	const char *str;
 
 	LuaCheckArgs(l, 1);
 
@@ -2415,7 +2415,7 @@ static int CclGetCompileFeature(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSyncRand(lua_State* l)
+static int CclSyncRand(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
@@ -2432,9 +2432,9 @@ static int CclSyncRand(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclLoadMap(lua_State* l)
+static int CclLoadMap(lua_State *l)
 {
-	const char* name;
+	const char *name;
 
 	LuaCheckArgs(l, 1);
 	name = LuaToString(l, 1);
@@ -2457,7 +2457,7 @@ static int CclLoadMap(lua_State* l)
 **
 **  @param command  Zero terminated command string.
 */
-int CclCommand(const char* command)
+int CclCommand(const char *command)
 {
 	int status;
 
@@ -2569,7 +2569,7 @@ void InitCcl(void)
 */
 void SavePreferences(void)
 {
-	FILE* fd;
+	FILE *fd;
 	char buf[PATH_MAX];
 	int i;
 
@@ -2694,7 +2694,7 @@ void SavePreferences(void)
 */
 void LoadCcl(void)
 {
-	char* file;
+	char *file;
 	char buf[PATH_MAX];
 
 	//
@@ -2718,7 +2718,7 @@ void LoadCcl(void)
 **
 **  @param file  Save file.
 */
-void SaveCcl(CLFile* file)
+void SaveCcl(CLFile *file)
 {
 }
 

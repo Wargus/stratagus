@@ -43,7 +43,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 
 /**
 **  Result codes of the pathfinder.
@@ -97,18 +97,18 @@ extern unsigned char* CreateMatrix(void);
 	/// Allocate a new matrix and initialize
 extern unsigned char* MakeMatrix(void);
 	/// Get next element of the way to goal.
-extern int NewPath(struct _unit_* unit);
+extern int NewPath(CUnit *unit);
 	/// Return distance to unit.
-extern int UnitReachable(const struct _unit_* unit, const struct _unit_* dst, int range);
+extern int UnitReachable(const CUnit *unit, const CUnit *dst, int range);
 	/// Can the unit 'src' reach the place x,y
-extern int PlaceReachable(const struct _unit_* src, int x, int y, int w, int h,
+extern int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
 	int minrange, int maxrange);
 
 //
 // in astar.c
 //
 	/// Returns the next element of the path
-extern int NextPathElement(struct _unit_*unit, int* xdp, int* ydp);
+extern int NextPathElement(CUnit *unit, int* xdp, int* ydp);
 
 	/// Init the a* data structures
 extern void InitAStar(void);
@@ -117,7 +117,7 @@ extern void InitAStar(void);
 extern void FreeAStar(void);
 
 	/// Find and a* path for a unit
-extern int AStarFindPath(const struct _unit_* unit, int gx, int gy, int gw, int gh,
+extern int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh,
 	int minrange, int maxrange, char* path);
 //
 // in ccl_pathfinder.c

@@ -53,12 +53,12 @@
 **
 **  @param unit  Unit pointer to place in cache.
 */
-void UnitCacheInsert(Unit* unit)
+void UnitCacheInsert(CUnit *unit)
 {
 	int i;
 	int j;
-	MapField* mf;
-	UnitListItem* listitem;
+	MapField *mf;
+	UnitListItem *listitem;
 
 	Assert(!unit->Removed);
 
@@ -84,12 +84,12 @@ void UnitCacheInsert(Unit* unit)
 **
 **  @param unit  Unit pointer to remove from cache.
 */
-void UnitCacheRemove(Unit* unit)
+void UnitCacheRemove(CUnit *unit)
 {
 	int i;
 	int j;
-	MapField* mf;
-	UnitListItem* listitem;
+	MapField *mf;
+	UnitListItem *listitem;
 
 	Assert(!unit->Removed);
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
@@ -125,12 +125,12 @@ void UnitCacheRemove(Unit* unit)
 **
 **  @return       Returns the number of units found
 */
-int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
+int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 {
 	int i;
 	int j;
 	int n;
-	UnitListItem* listitem;
+	UnitListItem *listitem;
 
 	// Optimize small searches.
 	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
@@ -191,9 +191,9 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 **
 **  @return       Returns the number of units found
 */
-int UnitCacheOnTile(int x, int y, Unit** table)
+int UnitCacheOnTile(int x, int y, CUnit **table)
 {
-	UnitListItem* listitem;
+	UnitListItem *listitem;
 	int n;
 
 	//

@@ -48,7 +48,7 @@
 #include "actions.h"
 #include "player.h"
 
-static int AiMakeUnit(UnitType* type);
+static int AiMakeUnit(UnitType *type);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -67,18 +67,18 @@ static int AiMakeUnit(UnitType* type);
 **
 **  @return       A bit field of the missing costs.
 */
-static int AiCheckCosts(const int* costs)
+static int AiCheckCosts(const int *costs)
 {
 	int i;
 	int j;
 	int k;
 	int err;
-	const int* resources;
-	const int* reserve;
-	int* used;
+	const int *resources;
+	const int *reserve;
+	int *used;
 	int nunits;
-	Unit** units;
-	const int* building_costs;
+	CUnit **units;
+	const int *building_costs;
 
 
 	// FIXME: the used costs shouldn't be calculated here
@@ -127,10 +127,10 @@ static int AiCheckCosts(const int* costs)
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-static int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
+static int AiCheckSupply(const PlayerAi *pai, const UnitType *type)
 {
 	int remaining;
-	const AiBuildQueue* queue;
+	const AiBuildQueue *queue;
 
 	//
 	// Count food supplies under construction.
@@ -169,7 +169,7 @@ static int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 **
 **  @return      A bit field of the missing costs.
 */
-static int AiCheckUnitTypeCosts(const UnitType* type)
+static int AiCheckUnitTypeCosts(const UnitType *type)
 {
 	return AiCheckCosts(type->Stats[AiPlayer->Player->Index].Costs);
 }
@@ -182,17 +182,17 @@ static int AiCheckUnitTypeCosts(const UnitType* type)
 **
 **  @return      Number of enemy units.
 */
-int EnemyUnitsInDistance(const Unit* unit, unsigned range)
+int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 {
-	const Unit* dest;
-	const UnitType* type;
-	Unit* table[UnitMax];
+	const CUnit *dest;
+	const UnitType *type;
+	CUnit *table[UnitMax];
 	unsigned x;
 	unsigned y;
 	unsigned n;
 	unsigned i;
 	int e;
-	const Player* player;
+	const Player *player;
 
 	//
 	// Select all units in range.
@@ -242,10 +242,10 @@ int EnemyUnitsInDistance(const Unit* unit, unsigned range)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const UnitType* type, UnitType* building)
+static int AiBuildBuilding(const UnitType *type, UnitType *building)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int nunits;
 	int i;
 	int num;
@@ -299,8 +299,8 @@ static void AiRequestSupply(void)
 	int i;
 	int n;
 	int c;
-	UnitType* type;
-	AiBuildQueue* queue;
+	UnitType *type;
+	AiBuildQueue *queue;
 	int counter[UnitTypeMax];
 
 	Assert(AiHelpers.UnitLimit);
@@ -352,10 +352,10 @@ static void AiRequestSupply(void)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiTrainUnit(const UnitType* type, UnitType* what)
+static int AiTrainUnit(const UnitType *type, UnitType *what)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int nunits;
 	int i;
 	int num;
@@ -391,14 +391,14 @@ static int AiTrainUnit(const UnitType* type, UnitType* what)
 **
 **  @param type  The unittype we wan't to build
 */
-int AiCountUnitBuilders(UnitType* type)
+int AiCountUnitBuilders(UnitType *type)
 {
 	int result;
 	int i;
 	int n;
-	const int* unit_count;
-	AiUnitTypeTable* const* tablep;
-	const AiUnitTypeTable* table;
+	const int *unit_count;
+	AiUnitTypeTable *const *tablep;
+	const AiUnitTypeTable *table;
 
 	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0) {
 		DebugPrint("Can't build `%s' now\n" _C_ type->Ident);
@@ -445,13 +445,13 @@ int AiCountUnitBuilders(UnitType* type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(UnitType* type)
+static int AiMakeUnit(UnitType *type)
 {
 	int i;
 	int n;
-	const int* unit_count;
-	AiUnitTypeTable* const* tablep;
-	const AiUnitTypeTable* table;
+	const int *unit_count;
+	AiUnitTypeTable *const *tablep;
+	const AiUnitTypeTable *table;
 
 	int usableTypes[UnitTypeMax + 1];
 	int usableTypesCount;
@@ -517,10 +517,10 @@ static int AiMakeUnit(UnitType* type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiResearchUpgrade(const UnitType* type, Upgrade* what)
+static int AiResearchUpgrade(const UnitType *type, Upgrade *what)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int nunits;
 	int i;
 	int num;
@@ -554,13 +554,13 @@ static int AiResearchUpgrade(const UnitType* type, Upgrade* what)
 **
 **  @param upgrade  Upgrade to research
 */
-void AiAddResearchRequest(Upgrade* upgrade)
+void AiAddResearchRequest(Upgrade *upgrade)
 {
 	int i;
 	int n;
-	const int* unit_count;
-	AiUnitTypeTable* const* tablep;
-	const AiUnitTypeTable* table;
+	const int *unit_count;
+	AiUnitTypeTable *const *tablep;
+	const AiUnitTypeTable *table;
 
 	//
 	// Check if resources are available.
@@ -611,10 +611,10 @@ void AiAddResearchRequest(Upgrade* upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiUpgradeTo(const UnitType* type, UnitType* what)
+static int AiUpgradeTo(const UnitType *type, UnitType *what)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int nunits;
 	int i;
 	int num;
@@ -648,13 +648,13 @@ static int AiUpgradeTo(const UnitType* type, UnitType* what)
 **
 **  @param type  FIXME: docu
 */
-void AiAddUpgradeToRequest(UnitType* type)
+void AiAddUpgradeToRequest(UnitType *type)
 {
 	int i;
 	int n;
-	const int* unit_count;
-	AiUnitTypeTable* const* tablep;
-	const AiUnitTypeTable* table;
+	const int *unit_count;
+	AiUnitTypeTable *const *tablep;
+	const AiUnitTypeTable *table;
 
 	//
 	// Check if resources are available.
@@ -765,16 +765,16 @@ static void AiCheckingWork(void)
 **
 **  @return          1 if the worker was assigned, 0 otherwise.
 */
-static int AiAssignHarvester(Unit* unit, int resource)
+static int AiAssignHarvester(CUnit *unit, int resource)
 {
-	ResourceInfo* resinfo;
+	ResourceInfo *resinfo;
 	// These will hold the coordinates of the forest.
 	int forestx;
 	int foresty;
 	std::vector<UnitType *>::iterator i;
 	int exploremask;
 	//  This will hold the resulting gather destination.
-	Unit* dest;
+	CUnit *dest;
 
 	// It can't.
 	if (unit->Removed) {
@@ -836,9 +836,9 @@ static int AiAssignHarvester(Unit* unit, int resource)
 */
 static void AiCollectResources(void)
 {
-	Unit* units_with_resource[UnitMax][MaxCosts]; // Worker with resource
-	Unit* units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
-	Unit* units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
+	CUnit *units_with_resource[UnitMax][MaxCosts]; // Worker with resource
+	CUnit *units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
+	CUnit *units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];
 	int num_units_assigned[MaxCosts];
 	int num_units_unassigned[MaxCosts];
@@ -849,8 +849,8 @@ static void AiCollectResources(void)
 	int j;
 	int k;
 	int n;
-	Unit** units;
-	Unit* unit;
+	CUnit **units;
+	CUnit *unit;
 	int percent[MaxCosts];
 	int percent_total;
 
@@ -1072,11 +1072,11 @@ static void AiCollectResources(void)
 **
 **  @return          True if can repair, false if can't repair..
 */
-static int AiRepairBuilding(const UnitType* type, Unit* building)
+static int AiRepairBuilding(const UnitType *type, CUnit *building)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
-	Unit* unit_temp;
+	CUnit *table[UnitMax];
+	CUnit *unit;
+	CUnit *unit_temp;
 	int distance[UnitMax];
 	int rX;
 	int rY;
@@ -1172,14 +1172,14 @@ static int AiRepairBuilding(const UnitType* type, Unit* building)
 **
 **  @return      True if made, false if can't be made.
 */
-static int AiRepairUnit(Unit* unit)
+static int AiRepairUnit(CUnit *unit)
 {
 	int i;
 	int n;
-	const UnitType* type;
-	const int* unit_count;
-	AiUnitTypeTable* const* tablep;
-	const AiUnitTypeTable* table;
+	const UnitType *type;
+	const int *unit_count;
+	AiUnitTypeTable *const *tablep;
+	const AiUnitTypeTable *table;
 
 	n = AiHelpers.RepairCount;
 	tablep = AiHelpers.Repair;
@@ -1220,7 +1220,7 @@ static void AiCheckRepair(void)
 	int k;
 	int n;
 	int repair_flag;
-	Unit* unit;
+	CUnit *unit;
 
 	n = AiPlayer->Player->TotalNumUnits;
 	k = 0;
@@ -1282,9 +1282,9 @@ static void AiCheckRepair(void)
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(UnitType* type, int count)
+void AiAddUnitTypeRequest(UnitType *type, int count)
 {
-	AiBuildQueue** queue;
+	AiBuildQueue **queue;
 
 	//
 	// Find end of the list.
@@ -1292,7 +1292,7 @@ void AiAddUnitTypeRequest(UnitType* type, int count)
 	for (queue = &AiPlayer->UnitTypeBuilt; *queue; queue = &(*queue)->Next) {
 	}
 
-	*queue = (AiBuildQueue*)malloc(sizeof (*AiPlayer->UnitTypeBuilt));
+	*queue = (AiBuildQueue *)malloc(sizeof(*AiPlayer->UnitTypeBuilt));
 	(*queue)->Next = NULL;
 	(*queue)->Type = type;
 	(*queue)->Want = count;
@@ -1308,10 +1308,10 @@ void AiAddUnitTypeRequest(UnitType* type, int count)
 */
 void AiExplore(int x, int y, int mask)
 {
-	AiExplorationRequest* req;
+	AiExplorationRequest *req;
 
 	// Alloc a new struct,
-	req = (AiExplorationRequest*)malloc(sizeof(AiExplorationRequest));
+	req = (AiExplorationRequest *)malloc(sizeof(AiExplorationRequest));
 
 	// Link into the exploration requests list
 	req->X = x;

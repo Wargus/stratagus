@@ -44,7 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 struct _unit_type_;
 struct _upgrade_;
 struct _player_;
@@ -105,8 +105,8 @@ typedef struct _ai_unit_ AiUnit;
 **  Ai unit in a force.
 */
 struct _ai_unit_ {
-	AiUnit*        Next; /// next unit
-	struct _unit_* Unit; /// unit self
+	AiUnit *Next; /// next unit
+	CUnit  *Unit; /// unit self
 };
 
 /**
@@ -170,9 +170,9 @@ struct _ai_exploration_request_ {
 typedef struct _ai_transport_request_ AiTransportRequest;
 
 struct _ai_transport_request_ {
-	struct _unit_*      Unit;
+	CUnit              *Unit;
 	struct _order_      Order;
-	AiTransportRequest* Next;
+	AiTransportRequest *Next;
 };
 
 /**
@@ -307,7 +307,7 @@ extern int AiFindAvailableUnitTypeEquiv(const struct _unit_type_* i,
 // Buildings
 //
 	/// Find nice building place
-extern int AiFindBuildingPlace(const struct _unit_* worker,
+extern int AiFindBuildingPlace(const CUnit *worker,
 	const struct _unit_type_* type, int* dx, int* dy);
 
 //
@@ -316,7 +316,7 @@ extern int AiFindBuildingPlace(const struct _unit_* worker,
 	/// Cleanup units in force
 extern void AiCleanForces(void);
 	/// Assign a new unit to a force
-extern void AiAssignToForce(Unit* unit);
+extern void AiAssignToForce(CUnit *unit);
 	/// Assign a free units to a force
 extern void AiAssignFreeUnitsToForce(void);
 	/// Attack with force at position

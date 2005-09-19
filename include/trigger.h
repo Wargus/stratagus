@@ -37,6 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CUnit;
 struct _unit_type_;
 struct lua_State;
 class CLFile;
@@ -52,19 +53,19 @@ typedef struct _timer_ {
 	unsigned long LastUpdate;   /// GameCycle of last update
 } Timer;
 
-#define ANY_UNIT ((const UnitType*)0)
-#define ALL_UNITS ((const UnitType*)-1)
-#define ALL_FOODUNITS ((const UnitType*)-2)
-#define ALL_BUILDINGS ((const UnitType*)-3)
+#define ANY_UNIT ((const UnitType *)0)
+#define ALL_UNITS ((const UnitType *)-1)
+#define ALL_FOODUNITS ((const UnitType *)-2)
+#define ALL_BUILDINGS ((const UnitType *)-3)
 
 
 /**
 **  Data to referer game info when game running.
 */
 typedef struct {
-	Unit* Attacker;  /// Unit which send the missile.
-	Unit* Defender;  /// Unit which is hit by missile.
-	Unit* Active;    /// Unit which is selected or else under cursor unit.
+	CUnit *Attacker;  /// Unit which send the missile.
+	CUnit *Defender;  /// Unit which is hit by missile.
+	CUnit *Active;    /// Unit which is selected or else under cursor unit.
 } TriggerDataType;
 
 /*----------------------------------------------------------------------------
@@ -81,8 +82,8 @@ extern TriggerDataType TriggerData;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern int TriggerGetPlayer(struct lua_State* l);/// get player number.
-extern const struct _unit_type_* TriggerGetUnitType(struct lua_State* l); /// get the unit-type
+extern int TriggerGetPlayer(struct lua_State *l);/// get player number.
+extern const struct _unit_type_ *TriggerGetUnitType(struct lua_State *l); /// get the unit-type
 extern void TriggersEachCycle(void);    /// test triggers
 
 extern void TriggerCclRegister(void);   /// Register ccl features

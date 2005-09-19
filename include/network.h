@@ -54,7 +54,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 struct _unit_type_;
 
 /**
@@ -213,14 +213,14 @@ extern void NetworkRecover(void);   /// Recover network
 extern void NetworkCommands(void);  /// Get all network commands
 extern void NetworkChatMessage(const char* msg);  /// Send chat message
 	/// Send network command.
-extern void NetworkSendCommand(int command, const struct _unit_* unit, int x,
-	int y, const struct _unit_* dest, const struct _unit_type_* type,
+extern void NetworkSendCommand(int command, const CUnit *unit, int x,
+	int y, const CUnit *dest, const struct _unit_type_* type,
 	int status);
 	/// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 	int arg3, int arg4, int status);
 	/// Send Selections to Team
-extern void NetworkSendSelection(struct _unit_** units, int count);
+extern void NetworkSendSelection(CUnit **units, int count);
 	/// Register ccl functions related to network
 extern void NetworkCclRegister(void);
 //@}

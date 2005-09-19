@@ -59,7 +59,7 @@
 **
 **  @return        True if enabled.
 */
-int ButtonCheckTrue(const Unit* unit, const ButtonAction* button)
+int ButtonCheckTrue(const CUnit *unit, const ButtonAction *button)
 {
 	return 1;
 }
@@ -73,7 +73,7 @@ int ButtonCheckTrue(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckFalse(const Unit* unit, const ButtonAction* button)
+int ButtonCheckFalse(const CUnit *unit, const ButtonAction *button)
 {
 	return 0;
 }
@@ -86,7 +86,7 @@ int ButtonCheckFalse(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUpgrade(const CUnit *unit, const ButtonAction *button)
 {
 	return UpgradeIdentAllowed(unit->Player, button->AllowStr) == 'R';
 }
@@ -99,14 +99,14 @@ int ButtonCheckUpgrade(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 {
-	char* buf;
-	const char* s;
-	Player* player;
+	char *buf;
+	const char *s;
+	Player *player;
 
 	player = unit->Player;
-	buf = (char*)malloc(strlen(button->AllowStr) + 1);
+	buf = (char *)malloc(strlen(button->AllowStr) + 1);
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (HaveUnitTypeByIdent(player, s)) {
@@ -126,14 +126,14 @@ int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 {
-	char* buf;
-	const char* s;
-	Player* player;
+	char *buf;
+	const char *s;
+	Player *player;
 
 	player = unit->Player;
-	buf = (char*)malloc(strlen(button->AllowStr) + 1);
+	buf = (char *)malloc(strlen(button->AllowStr) + 1);
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!HaveUnitTypeByIdent(player, s)) {
@@ -155,7 +155,7 @@ int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-int ButtonCheckNetwork(const Unit* unit, const ButtonAction* button)
+int ButtonCheckNetwork(const CUnit *unit, const ButtonAction *button)
 {
 	return IsNetworkGame();
 }
@@ -170,7 +170,7 @@ int ButtonCheckNetwork(const Unit* unit, const ButtonAction* button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-int ButtonCheckNoNetwork(const Unit* unit, const ButtonAction* button)
+int ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 {
 	return !IsNetworkGame();
 }
@@ -184,7 +184,7 @@ int ButtonCheckNoNetwork(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckNoWork(const Unit* unit, const ButtonAction* button)
+int ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 {
 	return
 		unit->Orders[0].Action != UnitActionTrain &&
@@ -200,7 +200,7 @@ int ButtonCheckNoWork(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckNoResearch(const Unit* unit, const ButtonAction* button)
+int ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
 {
 	return
 		unit->Orders[0].Action != UnitActionUpgradeTo &&
@@ -216,7 +216,7 @@ int ButtonCheckNoResearch(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
+int ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
 {
 	if (unit->Orders[0].Action != UnitActionStill) {
 		return 0;
@@ -232,7 +232,7 @@ int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckAttack(const Unit* unit, const ButtonAction* button)
+int ButtonCheckAttack(const CUnit *unit, const ButtonAction *button)
 {
 	return unit->Type->CanAttack;
 }
@@ -245,7 +245,7 @@ int ButtonCheckAttack(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
+int ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
 {
 	// don't show any if working
 	if (!ButtonCheckNoWork(unit, button)) {
@@ -272,8 +272,8 @@ int ButtonCheckResearch(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckSingleResearch(const Unit* unit,
-	const ButtonAction* button)
+int ButtonCheckSingleResearch(const CUnit *unit,
+	const ButtonAction *button)
 {
 	if (ButtonCheckResearch(unit, button)) {
 		if (!unit->Player->UpgradeTimers.Upgrades[

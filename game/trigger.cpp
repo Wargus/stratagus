@@ -74,9 +74,9 @@ TriggerDataType TriggerData;
 **
 **  @return   The player number, -1 matches any.
 */
-int TriggerGetPlayer(lua_State* l)
+int TriggerGetPlayer(lua_State *l)
 {
-	const char* player;
+	const char *player;
 	int ret;
 
 	if (lua_isnumber(l, -1)) {
@@ -104,9 +104,9 @@ int TriggerGetPlayer(lua_State* l)
 **
 **  @return   The unit-type pointer.
 */
-const UnitType* TriggerGetUnitType(lua_State* l)
+const UnitType *TriggerGetUnitType(lua_State *l)
 {
-	const char* unit;
+	const char *unit;
 
 	unit = LuaToString(l, -1);
 	if (!strcmp(unit, "any")) {
@@ -159,7 +159,7 @@ typedef int (*CompareFunction)(int, int);
 **
 **  @return    Function pointer to the compare function
 */
-static CompareFunction GetCompareFunction(const char* op)
+static CompareFunction GetCompareFunction(const char *op)
 {
 	if (op[0] == '=') {
 		if ((op[1] == '=' && op[2] == '\0') || (op[1] == '\0')) {
@@ -186,16 +186,16 @@ static CompareFunction GetCompareFunction(const char* op)
 /**
 **  Return the number of units of a giver unit-type and player at a location.
 */
-static int CclGetNumUnitsAt(lua_State* l)
+static int CclGetNumUnitsAt(lua_State *l)
 {
 	int plynr;
 	int x1;
 	int y1;
 	int x2;
 	int y2;
-	const UnitType* unittype;
-	Unit* table[UnitMax];
-	Unit* unit;
+	const UnitType *unittype;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int an;
 	int j;
 	int s;
@@ -260,16 +260,16 @@ static int CclGetNumUnitsAt(lua_State* l)
 /**
 **  Player has the quantity of unit-type near to unit-type.
 */
-static int CclIfNearUnit(lua_State* l)
+static int CclIfNearUnit(lua_State *l)
 {
 	int plynr;
 	int q;
 	int n;
 	int i;
-	const UnitType* unittype;
-	const UnitType* ut2;
-	const char* op;
-	Unit* table[UnitMax];
+	const UnitType *unittype;
+	const UnitType *ut2;
+	const char *op;
+	CUnit *table[UnitMax];
 	CompareFunction compare;
 
 	LuaCheckArgs(l, 5);
@@ -294,8 +294,8 @@ static int CclIfNearUnit(lua_State* l)
 	//
 	n = FindUnitsByType(ut2, table);
 	for (i = 0; i < n; ++i) {
-		Unit* unit;
-		Unit* around[UnitMax];
+		CUnit *unit;
+		CUnit *around[UnitMax];
 		int an;
 		int j;
 		int s;
@@ -354,16 +354,16 @@ static int CclIfNearUnit(lua_State* l)
 /**
 ** Player has the quantity of rescued unit-type near to unit-type.
 */
-static int CclIfRescuedNearUnit(lua_State* l)
+static int CclIfRescuedNearUnit(lua_State *l)
 {
 	int plynr;
 	int q;
 	int n;
 	int i;
-	const UnitType* unittype;
-	const UnitType* ut2;
-	const char* op;
-	Unit* table[UnitMax];
+	const UnitType *unittype;
+	const UnitType *ut2;
+	const char *op;
+	CUnit *table[UnitMax];
 	CompareFunction compare;
 
 	LuaCheckArgs(l, 5);
@@ -388,8 +388,8 @@ static int CclIfRescuedNearUnit(lua_State* l)
 	//
 	n = FindUnitsByType(ut2, table);
 	for (i = 0; i < n; ++i) {
-		Unit* unit;
-		Unit* around[UnitMax];
+		CUnit *unit;
+		CUnit *around[UnitMax];
 		int an;
 		int j;
 		int s;
@@ -450,7 +450,7 @@ static int CclIfRescuedNearUnit(lua_State* l)
 /**
 **  Returns the number of opponents of a given player.
 */
-static int CclGetNumOpponents(lua_State* l)
+static int CclGetNumOpponents(lua_State *l)
 {
 	int plynr;
 	int n;
@@ -476,7 +476,7 @@ static int CclGetNumOpponents(lua_State* l)
 /**
 **  Check the timer value
 */
-static int CclGetTimer(lua_State* l)
+static int CclGetTimer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
@@ -495,7 +495,7 @@ static int CclGetTimer(lua_State* l)
 /**
 **  Action condition player wins.
 */
-static int CclActionVictory(lua_State* l)
+static int CclActionVictory(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
@@ -508,7 +508,7 @@ static int CclActionVictory(lua_State* l)
 /**
 **  Action condition player lose.
 */
-static int CclActionDefeat(lua_State* l)
+static int CclActionDefeat(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
@@ -521,7 +521,7 @@ static int CclActionDefeat(lua_State* l)
 /**
 **  Action condition player draw.
 */
-static int CclActionDraw(lua_State* l)
+static int CclActionDraw(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
@@ -534,7 +534,7 @@ static int CclActionDraw(lua_State* l)
 /**
 **  Action set timer
 */
-static int CclActionSetTimer(lua_State* l)
+static int CclActionSetTimer(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 
@@ -549,7 +549,7 @@ static int CclActionSetTimer(lua_State* l)
 /**
 **  Action start timer
 */
-static int CclActionStartTimer(lua_State* l)
+static int CclActionStartTimer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
@@ -561,7 +561,7 @@ static int CclActionStartTimer(lua_State* l)
 /**
 **  Action stop timer
 */
-static int CclActionStopTimer(lua_State* l)
+static int CclActionStopTimer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
@@ -572,7 +572,7 @@ static int CclActionStopTimer(lua_State* l)
 /**
 **  Action wait
 */
-static int CclActionWait(lua_State* l)
+static int CclActionWait(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
@@ -584,7 +584,7 @@ static int CclActionWait(lua_State* l)
 /**
 **  Add a trigger.
 */
-static int CclAddTrigger(lua_State* l)
+static int CclAddTrigger(lua_State *l)
 {
 	int i;
 
@@ -633,7 +633,7 @@ static int CclAddTrigger(lua_State* l)
 /**
 **  Set the trigger values
 */
-static int CclSetTriggers(lua_State* l)
+static int CclSetTriggers(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
 	Trigger = LuaToNumber(l, 1);
@@ -646,14 +646,13 @@ static int CclSetTriggers(lua_State* l)
 /**
 **  Set the active triggers
 */
-static int CclSetActiveTriggers(lua_State* l)
+static int CclSetActiveTriggers(lua_State *l)
 {
 	int args;
-	int j;
 
 	args = lua_gettop(l);
 	ActiveTriggers = new bool[args];
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 	}
 
@@ -798,7 +797,7 @@ void TriggerCclRegister(void)
 **
 **  @param file  Open file to print to
 */
-void SaveTriggers(CLFile* file)
+void SaveTriggers(CLFile *file)
 {
 	int i;
 	int triggers;

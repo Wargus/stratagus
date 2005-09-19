@@ -68,15 +68,15 @@
   -- Variables
   ----------------------------------------------------------------------------*/
 
-Unit* UnitSlots[MAX_UNIT_SLOTS];          /// All possible units
+CUnit *UnitSlots[MAX_UNIT_SLOTS];          /// All possible units
 unsigned int UnitSlotFree;                /// First free unit slot
-Unit* ReleasedHead;                       /// List of released units.
-Unit* ReleasedTail;                       /// List tail of released units.
+CUnit *ReleasedHead;                       /// List of released units.
+CUnit *ReleasedTail;                       /// List tail of released units.
 
 static Order* ReleasedOrderHead;          /// List of released Orders.
 static Order* ReleasedOrderTail;          /// List tail of released orders.
 
-Unit* Units[MAX_UNIT_SLOTS];              /// Array of used slots
+CUnit *Units[MAX_UNIT_SLOTS];              /// Array of used slots
 int NumUnits;                             /// Number of slots used
 
 int XpDamage;                             /// Hit point regeneration for all units
@@ -92,7 +92,7 @@ static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound pla
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static void RemoveUnitFromContainer(Unit* unit);
+static void RemoveUnitFromContainer(CUnit *unit);
 
 /**
 **  Initial memory allocation for units.
@@ -111,7 +111,7 @@ void InitUnitsMemory(void)
 **
 **  @param unit The unit
 */
-void RefsIncrease(Unit* unit)
+void RefsIncrease(CUnit *unit)
 {
 	RefsAssert(unit->Refs && !unit->Destroyed);
 	if (!SaveGameLoading) {
@@ -124,7 +124,7 @@ void RefsIncrease(Unit* unit)
 **
 **  @param unit The unit
 */
-void RefsDecrease(Unit* unit)
+void RefsDecrease(CUnit *unit)
 {
 	RefsAssert(unit->Refs);
 	if (!SaveGameLoading) {
@@ -146,9 +146,9 @@ void RefsDecrease(Unit* unit)
 **
 **  @param unit Pointer to unit.
 */
-void ReleaseUnit(Unit* unit)
+void ReleaseUnit(CUnit *unit)
 {
-	Unit* temp;
+	CUnit *temp;
 
 	Assert(unit->Type); // already free.
 	Assert(unit->OrderCount == 1);
@@ -225,10 +225,10 @@ void ReleaseUnit(Unit* unit)
 **
 **  @return  Pointer to memory allocated for new unit, memory is zero'd
 */
-static Unit* AllocUnit(void)
+static CUnit *AllocUnit(void)
 {
-	Unit* unit;
-	Unit** slot;
+	CUnit *unit;
+	CUnit **slot;
 	//
 	// Game unit limit reached.
 	//
@@ -260,7 +260,7 @@ static Unit* AllocUnit(void)
 		}
 		slot = UnitSlots + UnitSlotFree;
 		UnitSlotFree++;
-		*slot = unit = (Unit*)calloc(1, sizeof(*unit));
+		*slot = unit = (CUnit *)calloc(1, sizeof(*unit));
 	}
 	unit->Slot = slot - UnitSlots; // back index
 	return unit;
@@ -272,7 +272,7 @@ static Unit* AllocUnit(void)
 **  @param unit    Unit pointer (allocated zero filled)
 **  @param type    Unit-type
 */
-void InitUnit(Unit* unit, UnitType* type)
+void InitUnit(CUnit *unit, UnitType* type)
 {
 	int i;
 
@@ -363,7 +363,7 @@ void InitUnit(Unit* unit, UnitType* type)
 **  @param player  player which have the unit.
 **
 */
-void AssignUnitToPlayer(Unit* unit, Player* player)
+void AssignUnitToPlayer(CUnit *unit, Player* player)
 {
 	UnitType* type;  // type of unit.
 
@@ -422,9 +422,9 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 **
 **  @return          Pointer to created unit.
 */
-Unit* MakeUnit(UnitType* type, Player* player)
+CUnit *MakeUnit(UnitType *type, Player *player)
 {
-	Unit* unit;
+	CUnit *unit;
 
 	unit = AllocUnit();
 	if (unit == NoUnitP) {
@@ -463,10 +463,10 @@ Unit* MakeUnit(UnitType* type, Player* player)
 **  @param f         Function to (un)mark for normal vision.
 **  @param f2        Function to (un)mark for cloaking vision.
 */
-static void MapMarkUnitSightRec(const Unit* unit, int x, int y, int width, int height,
-	MapMarkerFunc* f, MapMarkerFunc* f2)
+static void MapMarkUnitSightRec(const CUnit *unit, int x, int y, int width, int height,
+	MapMarkerFunc *f, MapMarkerFunc *f2)
 {
-	Unit* unit_inside; // iterator on units inside unit.
+	CUnit *unit_inside; // iterator on units inside unit.
 	int i;             // number of units inside to process.
 
 	Assert(unit);
@@ -490,13 +490,13 @@ static void MapMarkUnitSightRec(const Unit* unit, int x, int y, int width, int h
 **
 **  @return        Container of container of ... of unit. It is not null.
 */
-static Unit* GetFirstContainer(const Unit* unit)
+static CUnit *GetFirstContainer(const CUnit *unit)
 {
 	Assert(unit);
 	while (unit->Container) {
 		unit = unit->Container;
 	}
-	return (Unit *) unit;
+	return (CUnit *)unit;
 }
 
 /**
@@ -506,9 +506,9 @@ static Unit* GetFirstContainer(const Unit* unit)
 **  @param unit    unit to unmark its vision.
 **  @see MapUnmarkUnitSight.
 */
-void MapMarkUnitSight(Unit* unit)
+void MapMarkUnitSight(CUnit *unit)
 {
-	Unit* container;  // First container of the unit.
+	CUnit *container;  // First container of the unit.
 
 	Assert(unit);
 
@@ -539,9 +539,9 @@ void MapMarkUnitSight(Unit* unit)
 **  @param unit    unit to unmark its vision.
 **  @see MapMarkUnitSight.
 */
-void MapUnmarkUnitSight(Unit* unit)
+void MapUnmarkUnitSight(CUnit *unit)
 {
-	Unit* container;  // First container of the unit.
+	CUnit *container;  // First container of the unit.
 
 	Assert(unit);
 	Assert(unit->Type);
@@ -577,9 +577,9 @@ void MapUnmarkUnitSight(Unit* unit)
 **  FIXME @todo manage differently unit inside with option.
 **  (no vision, min, host value, own value, bonus value, ...)
 */
-void UpdateUnitSightRange(Unit* unit)
+void UpdateUnitSightRange(CUnit *unit)
 {
-	Unit* unit_inside; // iterator on units inside unit.
+	CUnit *unit_inside; // iterator on units inside unit.
 	int i;             // number of units inside to process.
 
 #if 0 // which is the better ? caller check ?
@@ -609,7 +609,7 @@ void UpdateUnitSightRange(Unit* unit)
 **
 **  @param unit    unit to mark.
 */
-void MarkUnitFieldFlags(const Unit* unit)
+void MarkUnitFieldFlags(const CUnit *unit)
 {
 	UnitType* type; // Type of the unit.
 	unsigned flags; //
@@ -643,7 +643,7 @@ void MarkUnitFieldFlags(const Unit* unit)
 **
 **  @param unit    unit to mark.
 */
-void UnmarkUnitFieldFlags(const Unit* unit)
+void UnmarkUnitFieldFlags(const CUnit *unit)
 {
 	UnitType* type; // Type of the unit.
 	unsigned flags; //
@@ -678,7 +678,7 @@ void UnmarkUnitFieldFlags(const Unit* unit)
 **  @param unit    Pointer to unit.
 **  @param host    Pointer to container.
 */
-void AddUnitInContainer(Unit* unit, Unit* host)
+void AddUnitInContainer(CUnit *unit, CUnit *host)
 {
 	Assert(host && unit->Container == 0);
 	unit->Container = host;
@@ -699,9 +699,9 @@ void AddUnitInContainer(Unit* unit, Unit* host)
 **
 **  @param unit    Pointer to unit.
 */
-static void RemoveUnitFromContainer(Unit* unit)
+static void RemoveUnitFromContainer(CUnit *unit)
 {
-	Unit* host;  // transporter which contain unit.
+	CUnit *host;  // transporter which contain unit.
 
 	host = unit->Container;
 	Assert(unit->Container);
@@ -731,9 +731,9 @@ static void RemoveUnitFromContainer(Unit* unit)
 **  and after UnitCacheInsert(unit), MapMarkUnitSight(unit)
 **  are often necessary. Check Flag also for Pathfinder.
 */
-static void UnitInXY(Unit* unit, int x, int y)
+static void UnitInXY(CUnit *unit, int x, int y)
 {
-	Unit* unit_inside;      // iterator on units inside unit.
+	CUnit *unit_inside;      // iterator on units inside unit.
 	int i;                  // number of units inside to process.
 
 	Assert(unit);
@@ -755,7 +755,7 @@ static void UnitInXY(Unit* unit, int x, int y)
 **  @param y       Y map tile position.
 **
 */
-void MoveUnitToXY(Unit* unit, int x, int y)
+void MoveUnitToXY(CUnit *unit, int x, int y)
 {
 	Assert(unit);
 
@@ -781,7 +781,7 @@ void MoveUnitToXY(Unit* unit, int x, int y)
 **  @param x       X map tile position.
 **  @param y       Y map tile position.
 */
-void PlaceUnit(Unit* unit, int x, int y)
+void PlaceUnit(CUnit *unit, int x, int y)
 {
 	Assert(unit->Removed);
 
@@ -815,9 +815,9 @@ void PlaceUnit(Unit* unit, int x, int y)
 **
 **  @return          Pointer to created unit.
 */
-Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
+CUnit *MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 {
-	Unit* unit;
+	CUnit *unit;
 
 	unit = MakeUnit(type, player);
 
@@ -838,7 +838,7 @@ Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 **  @param unit    Pointer to unit.
 **  @param host    Pointer to housing unit.
 */
-void RemoveUnit(Unit* unit, Unit* host)
+void RemoveUnit(CUnit *unit, CUnit *host)
 {
 	if (unit->Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
@@ -884,9 +884,9 @@ void RemoveUnit(Unit* unit, Unit* host)
 **
 **  @note Also called by ChangeUnitOwner
 */
-void UnitLost(Unit* unit)
+void UnitLost(CUnit *unit)
 {
-	Unit* temp;
+	CUnit *temp;
 	BuildRestriction* b;
 	const UnitType* type;
 	Player* player;
@@ -997,7 +997,7 @@ void UnitLost(Unit* unit)
 **
 **  @param unit  The unit that will have all its orders cleared
 */
-void UnitClearOrders(Unit* unit)
+void UnitClearOrders(CUnit *unit)
 {
 	int i;
 
@@ -1029,7 +1029,7 @@ void UnitClearOrders(Unit* unit)
 **  @param unit     New unit pointer.
 **  @param upgrade  True unit was upgraded.
 */
-void UpdateForNewUnit(const Unit* unit, int upgrade)
+void UpdateForNewUnit(const CUnit *unit, int upgrade)
 {
 	const UnitType* type;
 	Player* player;
@@ -1065,7 +1065,7 @@ void UpdateForNewUnit(const Unit* unit, int upgrade)
 **  @param dx    Out: nearest point X tile map postion to (tx,ty).
 **  @param dy    Out: nearest point Y tile map postion to (tx,ty).
 */
-void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
+void NearestOfUnit(const CUnit *unit, int tx, int ty, int *dx, int *dy)
 {
 	int x;
 	int y;
@@ -1095,7 +1095,7 @@ void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 **
 **  @param unit    The unit to work on
 */
-static void UnitFillSeenValues(Unit* unit)
+static void UnitFillSeenValues(CUnit *unit)
 {
 	// Seen values are undefined for visible units.
 	unit->Seen.Y = unit->Y;
@@ -1119,7 +1119,7 @@ static void UnitFillSeenValues(Unit* unit)
 **  @param unit    The unit that goes under fog.
 **  @param player  The player the unit goes out of fog for.
 */
-void UnitGoesUnderFog(Unit* unit, const Player* player)
+void UnitGoesUnderFog(CUnit *unit, const Player* player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (player->Type == PlayerPerson && !unit->Destroyed) {
@@ -1160,7 +1160,7 @@ void UnitGoesUnderFog(Unit* unit, const Player* player)
 **  not get an decrease the first time it's seen, so we have to
 **  keep track of what player saw what units, with SeenByPlayer.
 */
-void UnitGoesOutOfFog(Unit* unit, const Player* player)
+void UnitGoesOutOfFog(CUnit *unit, const Player* player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (unit->Seen.ByPlayer & (1 << (player->Index))) {
@@ -1186,8 +1186,8 @@ void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 {
 	int p;
 	int n;
-	Unit* units[UnitMax];
-	Unit* unit;
+	CUnit *units[UnitMax];
+	CUnit *unit;
 
 	n = UnitCacheOnTile(x, y,units);
 	while (n) {
@@ -1223,8 +1223,8 @@ void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 {
 	int p;
 	int n;
-	Unit* units[UnitMax];
-	Unit* unit;
+	CUnit *units[UnitMax];
+	CUnit *unit;
 
 	n = UnitCacheOnTile(x, y, units);
 	while (n) {
@@ -1262,7 +1262,7 @@ void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 **
 **  @param unit    pointer to the unit to check if seen
 */
-void UnitCountSeen(Unit* unit)
+void UnitCountSeen(CUnit *unit)
 {
 	int x;
 	int y;
@@ -1333,7 +1333,7 @@ void UnitCountSeen(Unit* unit)
 **  @param unit    The unit to check.
 **  @param player  The player to check.
 */
-int UnitVisible(const Unit* unit, const Player* player)
+int UnitVisible(const CUnit *unit, const Player* player)
 {
 	int p;
 	int cp;
@@ -1362,7 +1362,7 @@ int UnitVisible(const Unit* unit, const Player* player)
 **
 **  @return        True if visible, false otherwise.
 */
-int UnitVisibleAsGoal(const Unit* unit, const Player* player)
+int UnitVisibleAsGoal(const CUnit *unit, const Player* player)
 {
 	//
 	// Invisibility
@@ -1391,7 +1391,7 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 **
 **  @return        True if visible, false otherwise.
 */
-int UnitVisibleOnMap(const Unit* unit, const Player* player)
+int UnitVisibleOnMap(const CUnit *unit, const Player* player)
 {
 	//
 	// Invisible units.
@@ -1415,7 +1415,7 @@ int UnitVisibleOnMap(const Unit* unit, const Player* player)
 **
 **  @return      True if visible, false otherwise.
 */
-int UnitVisibleOnMinimap(const Unit* unit)
+int UnitVisibleOnMinimap(const CUnit *unit)
 {
 	//
 	// Invisible units.
@@ -1449,7 +1449,7 @@ int UnitVisibleOnMinimap(const Unit* unit)
 **
 **  @return      True if visible, false otherwise.
 */
-int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
+int UnitVisibleInViewport(const CUnit *unit, const Viewport* vp)
 {
 	//
 	// Check if it's at least inside the damn viewport.
@@ -1495,7 +1495,7 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 **
 **  @return      True if visible, false otherwise.
 */
-int UnitVisibleOnScreen(const Unit* unit)
+int UnitVisibleOnScreen(const CUnit *unit)
 {
 	const Viewport* vp;
 
@@ -1518,7 +1518,7 @@ int UnitVisibleOnScreen(const Unit* unit)
 **
 **  @return      sx,sy,ex,ey defining area in Map
 */
-void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
+void GetUnitMapArea(const CUnit *unit, int* sx, int* sy, int* ex, int* ey)
 {
 	*sx = unit->X - (unit->IX < 0);
 	*ex = *sx + unit->Type->TileWidth - !unit->IX;
@@ -1532,10 +1532,10 @@ void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 **  @param unit       Unit which should be consigned.
 **  @param newplayer  New owning player.
 */
-void ChangeUnitOwner(Unit* unit, Player* newplayer)
+void ChangeUnitOwner(CUnit *unit, Player* newplayer)
 {
 	int i;
-	Unit* uins;
+	CUnit *uins;
 	Player* oldplayer;
 
 	oldplayer = unit->Player;
@@ -1602,14 +1602,14 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 */
 static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int i;
 	int n;
 
 	// NOTE: table is changed.
 	n = oldplayer->TotalNumUnits;
-	memcpy(table, oldplayer->Units, n * sizeof(Unit*));
+	memcpy(table, oldplayer->Units, n * sizeof(CUnit *));
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
 		// Don't save the unit again(can happen when inside a town hall)
@@ -1630,9 +1630,9 @@ static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 void RescueUnits(void)
 {
 	Player* p;
-	Unit* unit;
-	Unit* table[UnitMax];
-	Unit* around[UnitMax];
+	CUnit *unit;
+	CUnit *table[UnitMax];
+	CUnit *around[UnitMax];
 	int n;
 	int i;
 	int j;
@@ -1654,7 +1654,7 @@ void RescueUnits(void)
 			NoRescueCheck = 0;
 			// NOTE: table is changed.
 			l = p->TotalNumUnits;
-			memcpy(table, p->Units, l * sizeof(Unit*));
+			memcpy(table, p->Units, l * sizeof(CUnit *));
 			for (j = 0; j < l; ++j) {
 				unit = table[j];
 				// Do not rescue removed units. Units inside something are
@@ -1762,7 +1762,7 @@ int DirectionToHeading(int delta_x, int delta_y)
 /**
 **  Update sprite frame for new heading.
 */
-void UnitUpdateHeading(Unit* unit)
+void UnitUpdateHeading(CUnit *unit)
 {
 	int dir;
 	int nextdir;
@@ -1798,7 +1798,7 @@ void UnitUpdateHeading(Unit* unit)
 **  @param dx    X map tile delta direction.
 **  @param dy    Y map tile delta direction.
 */
-void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
+void UnitHeadingFromDeltaXY(CUnit *unit, int dx, int dy)
 {
 	unit->Direction = DirectionToHeading(dx, dy);
 	UnitUpdateHeading(unit);
@@ -1816,7 +1816,7 @@ void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
 **  @param addx       Tile size in x.
 **  @param addy       Tile size in y.
 */
-void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
+void DropOutOnSide(CUnit *unit, int heading, int addx, int addy)
 {
 	int x;
 	int y;
@@ -1897,7 +1897,7 @@ found:
 **  @param addx    Tile size in x.
 **  @param addy    Tile size in y.
 */
-void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
+void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 {
 	int x;
 	int y;
@@ -1986,9 +1986,9 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 **
 **  @param source    All units inside source are dropped out.
 */
-void DropOutAll(const Unit* source)
+void DropOutAll(const CUnit *source)
 {
-	Unit* unit;
+	CUnit *unit;
 	int i;
 
 	unit = source->UnitInside;
@@ -2015,7 +2015,7 @@ void DropOutAll(const Unit* source)
 **
 **  @return        the BuildingRestrictionDetails
 */
-BuildRestriction* OnTopDetails(const Unit* unit, const UnitType* parent)
+BuildRestriction* OnTopDetails(const CUnit *unit, const UnitType* parent)
 {
 	int w;
 	BuildRestriction* b;
@@ -2053,10 +2053,10 @@ BuildRestriction* OnTopDetails(const Unit* unit, const UnitType* parent)
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
 */
-Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
+CUnit *CanBuildHere(const CUnit *unit, const UnitType* type, int x, int y)
 {
-	Unit* table[UnitMax];
-	Unit* ontoptarget;
+	CUnit *table[UnitMax];
+	CUnit *ontoptarget;
 	BuildRestriction* b;
 	int n;
 	int i;
@@ -2214,9 +2214,9 @@ Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 			if (b == NULL) {
 				// We passed a full ruleset return
 				if (unit == NULL) {
-					return ontoptarget ? ontoptarget : (Unit*)1;
+					return ontoptarget ? ontoptarget : (CUnit *)1;
 				} else {
-					return ontoptarget ? ontoptarget : (Unit*)unit;
+					return ontoptarget ? ontoptarget : (CUnit *)unit;
 				}
 			}
 			++w;
@@ -2225,9 +2225,9 @@ Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 	}
 
 	if (unit == NULL) {
-		return (Unit*)1;
+		return (CUnit *)1;
 	} else {
-		return (Unit*)unit;
+		return (CUnit *)unit;
 	}
 }
 
@@ -2260,14 +2260,14 @@ int CanBuildOn(int x, int y, int mask)
 **  @return      OnTop, parent unit, builder on true, NULL false.
 **
 */
-Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int real)
+CUnit *CanBuildUnitType(const CUnit *unit, const UnitType* type, int x, int y, int real)
 {
 	int w;
 	int h;
 	int j;
 	int testmask;
 	Player* player;
-	Unit* ontop;
+	CUnit *ontop;
 
 	// Terrain Flags don't matter if building on top of a unit.
 	ontop = CanBuildHere(unit, type, x, y);
@@ -2340,7 +2340,7 @@ Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int
 **  @param x       OUT: Map X position of tile.
 **  @param y       OUT: Map Y position of tile.
 */
-int FindWoodInSight(const Unit* unit, int* x, int* y)
+int FindWoodInSight(const CUnit *unit, int* x, int* y)
 {
 	return FindTerrainType(UnitMovementMask(unit), 0, MapFieldForest, 9999,
 		unit->Player, unit->X, unit->Y, x, y);
@@ -2480,7 +2480,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 **
 **  @return            NoUnitP or resource unit
 */
-Unit* UnitFindResource(const Unit* unit, int x, int y, int range, int resource)
+CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2500,9 +2500,9 @@ Unit* UnitFindResource(const Unit* unit, int x, int y, int range, int resource)
 	int n;
 	unsigned char* m;
 	unsigned char* matrix;
-	const Unit* destu;
-	Unit* mine;
-	Unit* bestmine;
+	const CUnit *destu;
+	CUnit *mine;
+	CUnit *bestmine;
 	int destx;
 	int desty;
 	int bestd;
@@ -2624,7 +2624,7 @@ Unit* UnitFindResource(const Unit* unit, int x, int y, int range, int resource)
 **
 **  @return            NoUnitP or deposit unit
 */
-Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
+CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2644,7 +2644,7 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 	int nodes_searched;
 	unsigned char* m;
 	unsigned char* matrix;
-	Unit* depot;
+	CUnit *depot;
 	int destx;
 	int desty;
 	int cdist;
@@ -2741,11 +2741,11 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 **
 **  @return NoUnitP or next idle worker
 */
-Unit* FindIdleWorker(const Player* player, const Unit* last)
+CUnit *FindIdleWorker(const Player* player, const CUnit *last)
 {
-	Unit* unit;
-	Unit** units;
-	Unit* FirstUnitFound;
+	CUnit *unit;
+	CUnit **units;
+	CUnit *FirstUnitFound;
 	int nunits;
 	int i;
 	int SelectNextUnit;
@@ -2804,12 +2804,12 @@ Unit* FindIdleWorker(const Player* player, const Unit* last)
 **
 **  @return       An unit on x, y position.
 */
-Unit* UnitOnScreen(Unit* ounit, int x, int y)
+CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 {
-	Unit** table;
-	Unit* unit;
-	Unit* nunit;
-	Unit* funit; // first possible unit
+	CUnit **table;
+	CUnit *unit;
+	CUnit *nunit;
+	CUnit *funit; // first possible unit
 	UnitType* type;
 	int flag; // flag take next unit
 	int gx;
@@ -2872,7 +2872,7 @@ Unit* UnitOnScreen(Unit* ounit, int x, int y)
 **
 **  @param unit    Unit to be destroyed.
 */
-void LetUnitDie(Unit* unit)
+void LetUnitDie(CUnit *unit)
 {
 	UnitType* type;
 
@@ -2964,9 +2964,9 @@ void LetUnitDie(Unit* unit)
 **
 **  @param source  container.
 */
-void DestroyAllInside(Unit* source)
+void DestroyAllInside(CUnit *source)
 {
-	Unit* unit;
+	CUnit *unit;
 	int i;
 
 	// No Corpses, we are inside something, and we can't be seen
@@ -2994,10 +2994,10 @@ void DestroyAllInside(Unit* source)
 **  @param target      Unit that is hit.
 **  @param damage      How many damage to take.
 */
-void HitUnit(Unit* attacker, Unit* target, int damage)
+void HitUnit(CUnit *attacker, CUnit *target, int damage)
 {
 	UnitType* type;
-	Unit* goal;
+	CUnit *goal;
 	unsigned long lastattack;
 
 	if (!damage) { // Can now happen by splash damage
@@ -3274,7 +3274,7 @@ int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y2)
 **
 **  @return        The distance between in tiles.
 */
-int MapDistanceToUnit(int x, int y, const Unit* dest)
+int MapDistanceToUnit(int x, int y, const CUnit *dest)
 {
 	return MapDistanceToType(x, y, dest->Type, dest->X, dest->Y);
 }
@@ -3287,7 +3287,7 @@ int MapDistanceToUnit(int x, int y, const Unit* dest)
 **
 **  @return       The distance between in tiles.
 */
-int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
+int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst)
 {
 	return MapDistanceBetweenTypes(src->Type, src->X, src->Y,
 		dst->Type, dst->X, dst->Y);
@@ -3361,7 +3361,7 @@ int ViewPointDistance(int x, int y)
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
-int ViewPointDistanceToUnit(const Unit* dest)
+int ViewPointDistanceToUnit(const CUnit *dest)
 {
 	const Viewport* vp;
 
@@ -3414,7 +3414,7 @@ int CanTarget(const UnitType* source, const UnitType* dest)
 **
 **  @return 1 if transporter can transport unit, 0 else.
 */
-int CanTransport(const Unit* transporter, const Unit* unit)
+int CanTransport(const CUnit *transporter, const CUnit *unit)
 {
 	int i;
 
@@ -3457,7 +3457,7 @@ int CanTransport(const Unit* transporter, const Unit* unit)
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
-char* UnitReference(const Unit* unit)
+char* UnitReference(const CUnit *unit)
 {
 	char* ref;
 
@@ -3599,10 +3599,10 @@ void SaveOrder(const Order* order, CLFile* file)
 **  @param unit    Unit pointer to be saved.
 **  @param file    Output file.
 */
-void SaveUnit(const Unit* unit, CLFile* file)
+void SaveUnit(const CUnit *unit, CLFile* file)
 {
 	char* ref;
-	Unit* uins;
+	CUnit *uins;
 	int i;
 
 	file->printf("\nUnit(%d, ", UnitNumber(unit));
@@ -3864,8 +3864,8 @@ void SaveUnit(const Unit* unit, CLFile* file)
 */
 void SaveUnits(CLFile* file)
 {
-	Unit** table;
-	Unit* unit;
+	CUnit **table;
+	CUnit *unit;
 
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: units $Id$\n\n");
@@ -3901,8 +3901,8 @@ void InitUnits(void)
 */
 void CleanUnits(void)
 {
-	Unit** table;
-	Unit* unit;
+	CUnit **table;
+	CUnit *unit;
 	Order* order;
 
 	//

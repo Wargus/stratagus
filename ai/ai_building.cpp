@@ -68,7 +68,7 @@
 **
 **  @note          Can be faster written.
 */
-static int AiCheckSurrounding(const Unit* worker, const UnitType* type, int x, int y, int flag)
+static int AiCheckSurrounding(const CUnit *worker, const UnitType *type, int x, int y, int flag)
 {
 	static int dirs[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
 	int surrounding[1024]; // Max criconference for building
@@ -150,8 +150,8 @@ static int AiCheckSurrounding(const Unit* worker, const UnitType* type, int x, i
 **
 **  @return        True if place found, false if no found.
 */
-static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
-	int ox, int oy, int* dx, int* dy, int flag)
+static int AiFindBuildingPlace2(const CUnit *worker, const UnitType *type,
+	int ox, int oy, int *dx, int *dy, int flag)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -170,10 +170,10 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 	int ep;
 	int i;
 	int w;
-	unsigned char* m;
-	unsigned char* matrix;
+	unsigned char *m;
+	unsigned char *matrix;
 
-	points = (struct p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
+	points = (struct p *)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof (*points);
 
 	x = ox;
@@ -291,7 +291,7 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 **  @todo          FIXME: This is slow really slow, using
 **                 two flood fills, is not a perfect solution.
 */
-static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, int* dy)
+static int AiFindHallPlace(const CUnit *worker, const UnitType *type, int *dx, int *dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -310,17 +310,17 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 	int ep;
 	int i;
 	int w;
-	unsigned char* m;
-	unsigned char* morg;
-	unsigned char* matrix;
-	Unit* mine;
+	unsigned char *m;
+	unsigned char *morg;
+	unsigned char *matrix;
+	CUnit *mine;
 	int destx;
 	int desty;
 
 	destx = x = worker->X;
 	desty = y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (struct p*)malloc(size * sizeof (*points));
+	points = (struct p *)malloc(size * sizeof(*points));
 
 	//
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -362,7 +362,7 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 					int miny;
 					int maxy;
 					int nunits;
-					Unit* units[UnitMax];
+					CUnit *units[UnitMax];
 
 					buildings = 0;
 
@@ -458,8 +458,8 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 **  @todo          FIXME: This is slow really slow, using two flood
 **                 fills, is not a perfect solution.
 */
-static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* dx,
-	int* dy)
+static int AiFindLumberMillPlace(const CUnit *worker, const UnitType *type, int *dx,
+	int *dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -478,14 +478,14 @@ static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* 
 	int ep;
 	int i;
 	int w;
-	unsigned char* m;
-	unsigned char* morg;
-	unsigned char* matrix;
+	unsigned char *m;
+	unsigned char *morg;
+	unsigned char *matrix;
 
 	x = worker->X;
 	y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (struct p*)malloc(size * sizeof (*points));
+	points = (struct p *)malloc(size * sizeof(*points));
 
 	//
 	// Make movement matrix.
@@ -571,9 +571,8 @@ static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* 
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-int AiFindBuildingPlace(const Unit* worker, const UnitType* type, int* dx, int* dy)
+int AiFindBuildingPlace(const CUnit *worker, const UnitType *type, int *dx, int *dy)
 {
-
 	//
 	// Find a good place for a new hall
 	//

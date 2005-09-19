@@ -87,7 +87,7 @@
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
+static int FindUnloadPosition(int x, int y, int *resx, int *resy, int mask)
 {
 	int i;
 	int n;
@@ -144,7 +144,7 @@ static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-int UnloadUnit(Unit* unit)
+int UnloadUnit(CUnit *unit)
 {
 	int x;
 	int y;
@@ -168,7 +168,7 @@ int UnloadUnit(Unit* unit)
 **
 **  @return       1 if a location was found, 0 otherwise
 */
-static int ClosestFreeCoast(int x, int y, int* resx, int* resy)
+static int ClosestFreeCoast(int x, int y, int *resx, int *resy)
 {
 	int i;
 	int addx;
@@ -246,7 +246,7 @@ static int ClosestFreeCoast(int x, int y, int* resx, int* resy)
 **  @return              1 if a location was found, 0 otherwise
 **
 */
-static int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* resy)
+static int ClosestFreeDropZone(CUnit *transporter, int x, int y, int *resx, int *resy)
 {
 	// Type (land/fly/naval) of the transporter
 	int transporterType;
@@ -295,7 +295,7 @@ static int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* 
 **
 **  @return      -1 if unreachable, True if reached, False otherwise.
 */
-static int MoveToDropZone(Unit* unit)
+static int MoveToDropZone(CUnit *unit)
 {
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -315,11 +315,11 @@ static int MoveToDropZone(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-static void LeaveTransporter(Unit* unit)
+static void LeaveTransporter(CUnit *unit)
 {
 	int i;
 	int stillonboard;
-	Unit* goal;
+	CUnit *goal;
 
 	stillonboard = 0;
 	goal = unit->Orders[0].Goal;
@@ -380,7 +380,7 @@ static void LeaveTransporter(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionUnload(Unit* unit)
+void HandleActionUnload(CUnit *unit)
 {
 	int i;
 	int x;

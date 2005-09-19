@@ -85,7 +85,7 @@ int KeyScrollState = ScrollNone;
 	/// variable set when we are scrolling via mouse
 int MouseScrollState = ScrollNone;
 
-EventCallback* Callbacks;    /// Current callbacks
+EventCallback *Callbacks;    /// Current callbacks
 EventCallback GameCallbacks; /// Game callbacks
 EventCallback MenuCallbacks; /// Menu callbacks
 
@@ -104,7 +104,7 @@ EventCallback MenuCallbacks; /// Menu callbacks
 */
 void DoScrollArea(int state, int fast)
 {
-	Viewport* vp;
+	Viewport *vp;
 	int stepx;
 	int stepy;
 	static int remx = 0; // FIXME: docu
@@ -167,10 +167,10 @@ void DoScrollArea(int state, int fast)
 **
 **  @param vp  Viewport pointer.
 */
-static void DrawMapViewport(Viewport* vp)
+static void DrawMapViewport(Viewport *vp)
 {
-	Unit* table[UnitMax];
-	Missile* missiletable[MAX_MISSILES * 9];
+	CUnit *table[UnitMax];
+	Missile *missiletable[MAX_MISSILES * 9];
 	int nunits;
 	int nmissiles;
 	int i;
@@ -242,8 +242,8 @@ static void DrawMapViewport(Viewport* vp)
 */
 void DrawMapArea(void)
 {
-	Viewport* vp;
-	const Viewport* evp;
+	Viewport *vp;
+	const Viewport *evp;
 
 	// Draw all map viewports
 	evp = UI.Viewports + UI.NumViewports;

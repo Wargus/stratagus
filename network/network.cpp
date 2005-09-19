@@ -304,7 +304,7 @@ static int NumNCQs;                        /// Number of NCQs in use
 ** @param len   Buffer length.
 **
 */
-void NetworkBroadcast(const void* buf, int len)
+void NetworkBroadcast(const void *buf, int len)
 {
 	int i;
 
@@ -329,7 +329,7 @@ void NetworkBroadcast(const void* buf, int len)
 **
 ** @param ncq Outgoing network queue start.
 */
-static void NetworkSendPacket(const NetworkCommandQueue* ncq)
+static void NetworkSendPacket(const NetworkCommandQueue *ncq)
 {
 	NetworkPacket packet;
 	int i;
@@ -515,7 +515,7 @@ void InitNetwork2(void)
 **
 **  @return  NetworkCommandQueue
 */
-static NetworkCommandQueue* AllocNCQ(void)
+static NetworkCommandQueue *AllocNCQ(void)
 {
 	Assert(NumNCQs != MAX_NCQS);
 	return &NCQs[NumNCQs++];
@@ -526,7 +526,7 @@ static NetworkCommandQueue* AllocNCQ(void)
 **
 **  @param ncq  NetworkCommandQueue to free
 */
-static void FreeNCQ(NetworkCommandQueue* ncq)
+static void FreeNCQ(NetworkCommandQueue *ncq)
 {
 	NCQs[ncq - NCQs] = NCQs[--NumNCQs];
 }
@@ -551,11 +551,11 @@ static void FreeNCQ(NetworkCommandQueue* ncq)
 ** @warning
 ** Destination and unit-type shares the same network slot.
 */
-void NetworkSendCommand(int command, const Unit* unit, int x, int y,
-	const Unit* dest, const UnitType* type, int status)
+void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
+	const CUnit *dest, const UnitType *type, int status)
 {
-	NetworkCommandQueue* ncq;
-	NetworkCommandQueue* check;
+	NetworkCommandQueue *ncq;
+	NetworkCommandQueue *check;
 
 	// Check for duplicate command in queue
 	check = (NetworkCommandQueue*)CommandsIn->first->next;
@@ -612,8 +612,8 @@ void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 	int arg4, int status)
 {
-	NetworkCommandQueue* ncq;
-	NetworkExtendedCommand* nec;
+	NetworkCommandQueue *ncq;
+	NetworkExtendedCommand *nec;
 
 	ncq = AllocNCQ();
 	dl_insert_first(CommandsIn, ncq->List);
@@ -639,11 +639,11 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 **  @param count  Number of units to send
 **
 */
-void NetworkSendSelection(Unit** units, int count)
+void NetworkSendSelection(CUnit **units, int count)
 {
 	static NetworkPacket packet;
-	NetworkSelectionHeader* header;
-	NetworkSelection* selection;
+	NetworkSelectionHeader *header;
+	NetworkSelection *selection;
 	int unitcount;
 	int ref;
 	int i;
@@ -713,13 +713,13 @@ void NetworkSendSelection(Unit** units, int count)
 **  @param packet  Network Packet to Process
 **  @param player  Player number
 */
-static void NetworkProcessSelection(NetworkPacket* packet, int player)
+static void NetworkProcessSelection(NetworkPacket *packet, int player)
 {
 	int i;
 	int j;
-	Unit* units[UnitMax];
-	NetworkSelectionHeader* header;
-	NetworkSelection* selection;
+	CUnit *units[UnitMax];
+	NetworkSelectionHeader *header;
+	NetworkSelection *selection;
 	int adjust;
 	int count;
 	int unitcount;
@@ -779,7 +779,7 @@ static void NetworkRemovePlayer(int player)
 void NetworkEvent(void)
 {
 	char buf[1024];
-	NetworkPacket* packet;
+	NetworkPacket *packet;
 	int player;
 	int i;
 	int commands;
@@ -1012,11 +1012,11 @@ void NetworkQuit(void)
 **
 ** @param msg Text message to send.
 */
-void NetworkChatMessage(const char* msg)
+void NetworkChatMessage(const char *msg)
 {
-	NetworkCommandQueue* ncq;
-	NetworkChat* ncm;
-	const char* cp;
+	NetworkCommandQueue *ncq;
+	NetworkChat *ncm;
+	const char *cp;
 	int n;
 
 	if (IsNetworkGame()) {
@@ -1046,7 +1046,7 @@ void NetworkChatMessage(const char* msg)
 **
 ** @param ncq Network command from queue
 */
-static void ParseNetworkCommand(const NetworkCommandQueue* ncq)
+static void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 {
 	int ply;
 
@@ -1139,8 +1139,8 @@ static void NetworkResendCommands(void)
 */
 static void NetworkSendCommands(void)
 {
-	NetworkCommandQueue* incommand;
-	NetworkCommandQueue* ncq;
+	NetworkCommandQueue *incommand;
+	NetworkCommandQueue *ncq;
 	int numcommands;
 
 	//
@@ -1198,7 +1198,7 @@ static void NetworkSendCommands(void)
 */
 static void NetworkExecCommands(void)
 {
-	NetworkCommandQueue* ncq;
+	NetworkCommandQueue *ncq;
 	int i;
 	int c;
 
@@ -1233,7 +1233,7 @@ static void NetworkExecCommands(void)
 */
 static void NetworkSyncCommands(void)
 {
-	const NetworkCommandQueue* ncq;
+	const NetworkCommandQueue *ncq;
 	int i;
 	unsigned long n;
 

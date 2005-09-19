@@ -68,7 +68,7 @@
 **
 **  @return 0 if unit cannot move.
 */
-int CanMove(const Unit* unit)
+int CanMove(const CUnit *unit)
 {
 	Assert(unit);
 	Assert(unit->Type);
@@ -84,7 +84,7 @@ int CanMove(const Unit* unit)
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-int DoActionMove(Unit* unit)
+int DoActionMove(CUnit *unit)
 {
 	int xd;     // X movement in tile.
 	int yd;     // Y movement in tile.
@@ -184,9 +184,9 @@ int DoActionMove(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionMove(Unit* unit)
+void HandleActionMove(CUnit *unit)
 {
-	Unit* goal;
+	CUnit *goal;
 
 	Assert(unit);
 	Assert(CanMove(unit));

@@ -43,7 +43,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 struct _unit_type_;
 struct _player_;
 struct lua_State;
@@ -122,8 +122,8 @@ public:
 */
 class SpellActionType {
 protected:
-	typedef int SpellFunc(struct _unit_* caster, const SpellType* spell,
-		struct _unit_* target, int x, int y);
+	typedef int SpellFunc(CUnit *caster, const SpellType* spell,
+		CUnit *target, int x, int y);
 
 public:
 	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
@@ -253,7 +253,7 @@ typedef struct {
 	TargetType which_sort_of_target;  /// for identify what sort of target.
 	int X;                            /// x coord.
 	int Y;                            /// y coord.
-	struct _unit_* unit;              /// Unit target.
+	CUnit *unit;                      /// Unit target.
 } Target;
 
 /*
@@ -388,15 +388,15 @@ extern void CleanSpells(void);
 extern int SpellIsAvailable(const struct _player_* player, int SpellId);
 
 	/// returns != 0 if spell can be casted (enough mana, valid target)
-extern int CanCastSpell(const struct _unit_* caster, const SpellType* spell,
-	const struct _unit_* target, int x, int y);
+extern int CanCastSpell(const CUnit *caster, const SpellType* spell,
+	const CUnit *target, int x, int y);
 
 	/// cast spell on target unit or place at x,y
-extern int SpellCast(struct _unit_* caster, const SpellType* spell,
-	struct _unit_* target, int x, int y);
+extern int SpellCast(CUnit *caster, const SpellType* spell,
+	CUnit *target, int x, int y);
 
 	/// auto cast the spell if possible
-extern int AutoCastSpell(struct _unit_* caster, const SpellType* spell);
+extern int AutoCastSpell(CUnit *caster, const SpellType* spell);
 
 	/// return spell type by ident string
 extern SpellType* SpellTypeByIdent(const char* Ident);

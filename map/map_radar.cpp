@@ -60,13 +60,10 @@
 **
 **  @return        0 jammed or not radar visible, >0 radar visible.
 */
-unsigned char UnitVisibleOnRadar(const Player* pradar, const Unit* punit)
+unsigned char UnitVisibleOnRadar(const Player *pradar, const CUnit *punit)
 {
-	int i;
-	int j;
-
-	for (i = punit->X; i < punit->X + punit->Type->TileWidth; ++i) {
-		for (j = punit->Y; j < punit->Y + punit->Type->TileHeight; ++j) {
+	for (int i = punit->X; i < punit->X + punit->Type->TileWidth; ++i) {
+		for (int j = punit->Y; j < punit->Y + punit->Type->TileHeight; ++j) {
 			if (IsTileRadarVisible(pradar, punit->Player, i, j) != 0) {
 				return 1;
 			}
@@ -87,12 +84,12 @@ unsigned char UnitVisibleOnRadar(const Player* pradar, const Unit* punit)
 **
 **  @return        0 jammed or not radar visible, >0 radar visible.
 */
-unsigned char IsTileRadarVisible(const Player* pradar, const Player* punit, int x, int y)
+unsigned char IsTileRadarVisible(const Player *pradar, const Player *punit, int x, int y)
 {
 	int i;
 	unsigned char radarvision;
-	unsigned char* radar;
-	unsigned char* jamming;
+	unsigned char *radar;
+	unsigned char *jamming;
 
 	jamming = TheMap.Fields[y * TheMap.Info.MapWidth + x].RadarJammer;
 	if (jamming[punit->Index]) {
@@ -130,7 +127,7 @@ unsigned char IsTileRadarVisible(const Player* pradar, const Player* punit, int 
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapMarkTileRadar(const Player* player, int x, int y)
+void MapMarkTileRadar(const Player *player, int x, int y)
 {
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
@@ -146,9 +143,9 @@ void MapMarkTileRadar(const Player* player, int x, int y)
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapUnmarkTileRadar(const Player* player, int x, int y)
+void MapUnmarkTileRadar(const Player *player, int x, int y)
 {
-	unsigned char* v;
+	unsigned char *v;
 
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
@@ -167,7 +164,7 @@ void MapUnmarkTileRadar(const Player* player, int x, int y)
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapMarkTileRadarJammer(const Player* player, int x, int y)
+void MapMarkTileRadarJammer(const Player *player, int x, int y)
 {
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
@@ -183,9 +180,9 @@ void MapMarkTileRadarJammer(const Player* player, int x, int y)
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapUnmarkTileRadarJammer(const Player* player, int x, int y)
+void MapUnmarkTileRadarJammer(const Player *player, int x, int y)
 {
-	unsigned char* v;
+	unsigned char *v;
 
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);

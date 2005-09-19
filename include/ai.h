@@ -39,7 +39,7 @@
 
 struct _player_;
 class CLFile;
-struct _unit_;
+class CUnit;
 struct _unit_type_;
 struct _upgrade_;
 
@@ -68,30 +68,29 @@ extern void AiCclRegister(void);      /// Register ccl features
 --------------------------------------------------------*/
 
 	/// Called if AI unit is attacked
-extern void AiHelpMe(const struct _unit_* attacker, struct _unit_* defender);
+extern void AiHelpMe(const CUnit *attacker, CUnit *defender);
 	/// Called if AI unit is killed
-extern void AiUnitKilled(struct _unit_* unit);
+extern void AiUnitKilled(CUnit *unit);
 	/// Called if AI needs more farms
-extern void AiNeedMoreSupply(const struct _unit_* unit,
+extern void AiNeedMoreSupply(const CUnit *unit,
 	const struct _unit_type_* what);
 	/// Called if AI unit has completed work
-extern void AiWorkComplete(struct _unit_* unit, struct _unit_* what);
+extern void AiWorkComplete(CUnit *unit, CUnit *what);
 	/// Called if AI unit can't build
-extern void AiCanNotBuild(struct _unit_* unit,
+extern void AiCanNotBuild(CUnit *unit,
 	const struct _unit_type_* what);
 	/// Called if AI unit can't reach building place
-extern void AiCanNotReach(struct _unit_* unit,
+extern void AiCanNotReach(CUnit *unit,
 	const struct _unit_type_* what);
 	/// Called if an AI unit can't move
-extern void AiCanNotMove(struct _unit_* unit);
+extern void AiCanNotMove(CUnit *unit);
 	/// Called if AI unit has completed training
-extern void AiTrainingComplete(struct _unit_* unit,
-	struct _unit_* what);
+extern void AiTrainingComplete(CUnit *unit, CUnit *what);
 	/// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(struct _unit_* unit,
+extern void AiUpgradeToComplete(CUnit *unit,
 	const struct _unit_type_* what);
 	/// Called if AI unit has completed research
-extern void AiResearchComplete(struct _unit_* unit,
+extern void AiResearchComplete(CUnit *unit,
 	const struct _upgrade_* what);
 
 //@}
