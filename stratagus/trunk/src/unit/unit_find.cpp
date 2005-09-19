@@ -110,7 +110,7 @@ CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 **
 **  @return       Returns the number of units found.
 */
-int FindUnitsByType(const UnitType *type, CUnit **table)
+int FindUnitsByType(const CUnitType *type, CUnit **table)
 {
 	CUnit *unit;
 	int i;
@@ -134,7 +134,7 @@ int FindUnitsByType(const UnitType *type, CUnit **table)
 **
 **  @return        Returns the number of units found.
 */
-int FindPlayerUnitsByType(const Player *player, const UnitType *type,
+int FindPlayerUnitsByType(const Player *player, const CUnitType *type,
 	CUnit **table)
 {
 	CUnit *unit;
@@ -202,7 +202,7 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 	CUnit *table[UnitMax];
 	CUnit *unit;
 	CUnit *best;
-	const UnitType *type;
+	const CUnitType *type;
 	int n;
 	int i;
 
@@ -326,8 +326,8 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 	int bad[32][32];
 	CUnit *table[UnitMax];
 	CUnit *dest;
-	const UnitType *dtype;
-	const UnitType *type;
+	const CUnitType *dtype;
+	const CUnitType *type;
 	const Player *player;
 	int xx;
 	int yy;
@@ -592,8 +592,8 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 {
 	CUnit *dest;
-	const UnitType *type;
-	const UnitType *dtype;
+	const CUnitType *type;
+	const CUnitType *dtype;
 	CUnit *table[UnitMax];
 	int x;
 	int y;
@@ -718,7 +718,7 @@ CUnit *AttackUnitsInRange(const CUnit *unit)
 CUnit *AttackUnitsInReactRange(const CUnit *unit)
 {
 	int range;
-	const UnitType *type;
+	const CUnitType *type;
 
 	type = unit->Type;
 	Assert(unit->Type->CanAttack);

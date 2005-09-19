@@ -109,7 +109,7 @@ void DoRightButton(int sx, int sy)
 	int y;                  // coordinate in tile.
 	CUnit *dest;             // unit under the cursor if any.
 	CUnit *unit;             // one of the selected unit.
-	UnitType* type;
+	CUnitType* type;
 	int action;             // default action for unit.
 	int acknowledged;       // to play sound
 	int flush;              // append command to old command.

@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct lua_State;
 class CLFile;
 
@@ -53,10 +53,10 @@ typedef struct _timer_ {
 	unsigned long LastUpdate;   /// GameCycle of last update
 } Timer;
 
-#define ANY_UNIT ((const UnitType *)0)
-#define ALL_UNITS ((const UnitType *)-1)
-#define ALL_FOODUNITS ((const UnitType *)-2)
-#define ALL_BUILDINGS ((const UnitType *)-3)
+#define ANY_UNIT ((const CUnitType *)0)
+#define ALL_UNITS ((const CUnitType *)-1)
+#define ALL_FOODUNITS ((const CUnitType *)-2)
+#define ALL_BUILDINGS ((const CUnitType *)-3)
 
 
 /**
@@ -83,7 +83,7 @@ extern TriggerDataType TriggerData;
 ----------------------------------------------------------------------------*/
 
 extern int TriggerGetPlayer(struct lua_State *l);/// get player number.
-extern const struct _unit_type_ *TriggerGetUnitType(struct lua_State *l); /// get the unit-type
+extern const CUnitType *TriggerGetUnitType(struct lua_State *l); /// get the unit-type
 extern void TriggersEachCycle(void);    /// test triggers
 
 extern void TriggerCclRegister(void);   /// Register ccl features

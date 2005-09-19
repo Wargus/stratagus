@@ -94,7 +94,7 @@ static int CanHandleOrder(CUnit *unit, Order *order)
 void HandleActionTrain(CUnit *unit)
 {
 	CUnit *nunit;
-	const UnitType *type;
+	const CUnitType *type;
 	Player *player;
 	int food;
 

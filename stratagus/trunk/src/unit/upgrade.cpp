@@ -197,7 +197,7 @@ void SaveUpgrades(CLFile *file)
 	//
 	//  Save the allow
 	//
-	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		file->printf("DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
 			if (p) {
@@ -516,7 +516,7 @@ void UpgradesCclRegister(void)
 */
 int UnitTypeIdByIdent(const char *ident)
 {
-	const UnitType *type;
+	const CUnitType *type;
 
 	if ((type = UnitTypeByIdent(ident))) {
 		return type->Slot;
@@ -554,7 +554,7 @@ int UpgradeIdByIdent(const char *ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-static void ConvertUnitTypeTo(Player *player, const UnitType *src, UnitType *dst)
+static void ConvertUnitTypeTo(Player *player, const CUnitType *src, CUnitType *dst)
 {
 	CUnit *unit;
 	int i;

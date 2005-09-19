@@ -40,7 +40,7 @@
 struct _player_;
 class CLFile;
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct _upgrade_;
 
 /*----------------------------------------------------------------------------
@@ -73,22 +73,22 @@ extern void AiHelpMe(const CUnit *attacker, CUnit *defender);
 extern void AiUnitKilled(CUnit *unit);
 	/// Called if AI needs more farms
 extern void AiNeedMoreSupply(const CUnit *unit,
-	const struct _unit_type_* what);
+	const CUnitType *what);
 	/// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit *what);
 	/// Called if AI unit can't build
 extern void AiCanNotBuild(CUnit *unit,
-	const struct _unit_type_* what);
+	const CUnitType *what);
 	/// Called if AI unit can't reach building place
 extern void AiCanNotReach(CUnit *unit,
-	const struct _unit_type_* what);
+	const CUnitType *what);
 	/// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit *unit);
 	/// Called if AI unit has completed training
 extern void AiTrainingComplete(CUnit *unit, CUnit *what);
 	/// Called if AI unit has completed upgrade to
 extern void AiUpgradeToComplete(CUnit *unit,
-	const struct _unit_type_* what);
+	const CUnitType *what);
 	/// Called if AI unit has completed research
 extern void AiResearchComplete(CUnit *unit,
 	const struct _upgrade_* what);

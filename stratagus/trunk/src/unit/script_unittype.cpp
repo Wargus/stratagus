@@ -246,12 +246,12 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 **
 **  @param l  Lua state.
 */
-static int CclDefineUnitType(lua_State* l)
+static int CclDefineUnitType(lua_State *l)
 {
-	const char* value;
-	UnitType* type;
-	ResourceInfo* res;
-	const char* str;
+	const char *value;
+	CUnitType *type;
+	ResourceInfo *res;
+	const char *str;
 	int i;
 	int redefine;
 	int subargs;
@@ -1027,11 +1027,11 @@ static int CclDefineUnitType(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineUnitStats(lua_State* l)
+static int CclDefineUnitStats(lua_State *l)
 {
-	const char* value;
-	UnitType* type;
-	UnitStats* stats;
+	const char *value;
+	CUnitType *type;
+	UnitStats *stats;
 	int i;
 	int args;
 	int j;
@@ -1118,9 +1118,9 @@ static int CclDefineUnitStats(lua_State* l)
 **
 **  @param l  Lua state.
 */
-UnitType* CclGetUnitType(lua_State* l)
+CUnitType *CclGetUnitType(lua_State *l)
 {
-	const char* str;
+	const char *str;
 
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
@@ -1128,9 +1128,9 @@ UnitType* CclGetUnitType(lua_State* l)
 		return UnitTypeByIdent(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData* data;
-		data = (LuaUserData*)lua_touserdata(l, -1);
+		data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
-			return (UnitType*)data->Data;
+			return (CUnitType *)data->Data;
 		}
 	}
 	LuaError(l, "CclGetUnitType: not a unit-type");
@@ -1144,11 +1144,11 @@ UnitType* CclGetUnitType(lua_State* l)
 **
 **  @return   Unit-type structure.
 */
-static int CclUnitType(lua_State* l)
+static int CclUnitType(lua_State *l)
 {
-	const char* str;
-	UnitType* type;
-	LuaUserData* data;
+	const char *str;
+	CUnitType *type;
+	LuaUserData *data;
 
 	LuaCheckArgs(l, 1);
 
@@ -1167,13 +1167,13 @@ static int CclUnitType(lua_State* l)
 **
 **  @return   An array of all unit-type structures.
 */
-static int CclUnitTypeArray(lua_State* l)
+static int CclUnitTypeArray(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
 	lua_newtable(l);
 
-	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		LuaUserData *data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
 		data->Data = UnitTypes[i];
@@ -1189,9 +1189,9 @@ static int CclUnitTypeArray(lua_State* l)
 **
 **  @return   The identifier of the unit-type.
 */
-static int CclGetUnitTypeIdent(lua_State* l)
+static int CclGetUnitTypeIdent(lua_State *l)
 {
-	const UnitType* type;
+	const CUnitType *type;
 
 	LuaCheckArgs(l, 1);
 
@@ -1211,9 +1211,9 @@ static int CclGetUnitTypeIdent(lua_State* l)
 **
 **  @return   The name of the unit-type.
 */
-static int CclGetUnitTypeName(lua_State* l)
+static int CclGetUnitTypeName(lua_State *l)
 {
-	const UnitType* type;
+	const CUnitType *type;
 
 	LuaCheckArgs(l, 1);
 
@@ -1229,9 +1229,9 @@ static int CclGetUnitTypeName(lua_State* l)
 **
 **  @return   The name of the unit-type.
 */
-static int CclSetUnitTypeName(lua_State* l)
+static int CclSetUnitTypeName(lua_State *l)
 {
-	UnitType* type;
+	CUnitType *type;
 
 	LuaCheckArgs(l, 2);
 
@@ -1250,7 +1250,7 @@ static int CclSetUnitTypeName(lua_State* l)
 /**
 **  Add a label
 */
-static void AddLabel(lua_State* l, Animation* anim, char* label)
+static void AddLabel(lua_State *l, Animation *anim, char *label)
 {
 	if (NumLabels == MAX_LABELS) {
 		LuaError(l, "Too many labels: %s" _C_ label);
@@ -1642,7 +1642,7 @@ static int CclDefineBoolFlags(lua_State* l)
 		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = strdup(str);
 	}
 	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
-		for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
 			UnitTypes[i]->BoolFlag = (unsigned char*)realloc(UnitTypes[i]->BoolFlag,
 				UnitTypeVar.NumberBoolFlag * sizeof(UnitTypes[i]->BoolFlag));
 			UnitTypes[i]->CanTargetFlag = (unsigned char*)realloc(UnitTypes[i]->CanTargetFlag,
@@ -1816,7 +1816,7 @@ static int CclDefineDecorations(lua_State* l)
 void UpdateUnitVariables(const CUnit *unit)
 {
 	int i;
-	const UnitType *type; // unit->Type.
+	const CUnitType *type; // unit->Type.
 
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values

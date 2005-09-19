@@ -68,7 +68,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 	CUnit *table[UnitMax];
 	CUnit *unit;
 	CUnit *best;
-	const UnitType *type;
+	const CUnitType *type;
 	int n;
 	int i;
 
@@ -621,7 +621,7 @@ void AiSendExplorers(void)
 	int outtrycount;
 
 	CUnit **unit;
-	UnitType *type;
+	CUnitType *type;
 	CUnit *bestunit;
 	int distance;
 	int bestdistance;

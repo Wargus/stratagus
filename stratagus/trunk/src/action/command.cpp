@@ -646,7 +646,7 @@ void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 **  @param flush  if true, flush command queue.
 */
 void CommandBuildBuilding(CUnit *unit, int x, int y,
-	UnitType *what, int flush)
+	CUnitType *what, int flush)
 {
 	Order *order;
 
@@ -851,7 +851,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-void CommandTrainUnit(CUnit *unit, UnitType *type, int flush)
+void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 {
 	Order *order;
 
@@ -896,7 +896,7 @@ void CommandTrainUnit(CUnit *unit, UnitType *type, int flush)
 **  @param slot  slot number to cancel.
 **  @param type  Unit-type to cancel.
 */
-void CommandCancelTraining(CUnit *unit, int slot, const UnitType *type)
+void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 {
 	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
 		type ? type->Ident : "-any-");
@@ -960,7 +960,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const UnitType *type)
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit *unit, UnitType *type, int flush)
+void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 {
 	Order *order;
 
@@ -999,7 +999,7 @@ void CommandUpgradeTo(CUnit *unit, UnitType *type, int flush)
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
 */
-void CommandTransformIntoType(CUnit *unit, UnitType *type)
+void CommandTransformIntoType(CUnit *unit, CUnitType *type)
 {
 	Order *order;
 

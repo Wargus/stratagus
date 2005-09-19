@@ -153,7 +153,7 @@ void DrawUnitSelection(const CUnit *unit)
 {
 	int x;
 	int y;
-	UnitType *type;
+	CUnitType *type;
 	Uint32 color;
 
 	type = unit->Type;
@@ -941,7 +941,7 @@ extern void UpdateUnitVariables(const CUnit *unit);
 **  @param x     Screen X position of the unit.
 **  @param y     Screen Y position of the unit.
 */
-static void DrawDecoration(const CUnit *unit, const UnitType *type, int x, int y)
+static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int y)
 {
 	int i;
 
@@ -1011,7 +1011,7 @@ static void DrawDecoration(const CUnit *unit, const UnitType *type, int x, int y
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const CUnit *unit, const UnitType *type, int frame,
+void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 	int x, int y)
 {
 	if (!type) {
@@ -1269,7 +1269,7 @@ void ShowOrder(const CUnit *unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-static void DrawInformations(const CUnit *unit, const UnitType *type, int x, int y)
+static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, int y)
 {
 	const UnitStats *stats;
 	int r;
@@ -1334,7 +1334,7 @@ static void DrawInformations(const CUnit *unit, const UnitType *type, int x, int
 **  @param x         X position.
 **  @param y         Y position.
 */
-void DrawUnitPlayerColor(const UnitType *type, Graphic *sprite,
+void DrawUnitPlayerColor(const CUnitType *type, Graphic *sprite,
 	int player, int frame, int x, int y)
 {
 	int f;
@@ -1465,7 +1465,7 @@ static void DrawConstructionShadow(const CUnit *unit, int frame, int x, int y)
 **  @param y       Y position.
 */
 static void DrawConstruction(const CUnit *unit, const ConstructionFrame *cframe,
-	const UnitType *type, int frame, int x, int y)
+	const CUnitType *type, int frame, int x, int y)
 {
 	int player;
 
@@ -1510,7 +1510,7 @@ void DrawUnit(const CUnit *unit)
 	Graphic *sprite;
 	ResourceInfo *resinfo;
 	ConstructionFrame *cframe;
-	UnitType *type;
+	CUnitType *type;
 
 	if (unit->Type->Revealer) { // Revealers are not drawn
 		return;

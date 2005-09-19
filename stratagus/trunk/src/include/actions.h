@@ -45,7 +45,7 @@ enum _diplomacy_ {
 }; /// Diplomacy states for CommandDiplomacy
 
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct _upgrade_;
 class SpellType;
 struct _order_;
@@ -100,7 +100,7 @@ extern void CommandUnload(CUnit *unit, int x, int y,
 	CUnit* what, int flush);
 	/// Prepare command build
 extern void CommandBuildBuilding(CUnit *, int x, int y,
-	struct _unit_type_*, int);
+	CUnitType *, int);
 	/// Prepare command dismiss
 extern void CommandDismiss(CUnit *unit);
 	/// Prepare command resource location
@@ -112,16 +112,16 @@ extern void CommandResource(CUnit *unit, CUnit *dest,
 extern void CommandReturnGoods(CUnit *unit, CUnit *goal,
 	int flush);
 	/// Prepare command train
-extern void CommandTrainUnit(CUnit *unit, struct _unit_type_* what,
+extern void CommandTrainUnit(CUnit *unit, CUnitType *what,
 	int flush);
 	/// Prepare command cancel training
 extern void CommandCancelTraining(CUnit *unit, int slot,
-	const struct _unit_type_* type);
+	const CUnitType *type);
 	/// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit *unit, struct _unit_type_* what,
+extern void CommandUpgradeTo(CUnit *unit, CUnitType *what,
 	int flush);
 	/// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit *unit, struct _unit_type_* type);
+extern void CommandTransformIntoType(CUnit *unit, CUnitType *type);
 	/// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit *unit);
 	/// Prepare command research

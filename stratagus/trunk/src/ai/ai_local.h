@@ -45,7 +45,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct _upgrade_;
 struct _player_;
 
@@ -79,7 +79,7 @@ struct _ai_type_{
 */
 typedef struct _ai_unittype_table_ {
 	int                 Count;    /// elements in table
-	struct _unit_type_* Table[1]; /// the table
+	CUnitType          *Table[1]; /// the table
 } AiUnitTypeTable;
 
 /**
@@ -91,9 +91,9 @@ typedef struct _ai_unit_type_ AiUnitType;
 **  Ai unit-type in a force.
 */
 struct _ai_unit_type_ {
-	AiUnitType*         Next; /// next unit-type
+	AiUnitType         *Next; /// next unit-type
 	int                 Want; /// number of this unit-type wanted
-	struct _unit_type_* Type; /// unit-type self
+	CUnitType          *Type; /// unit-type self
 };
 
 /**
@@ -152,10 +152,10 @@ typedef struct _ai_build_queue_ AiBuildQueue;
 **  List of orders for the resource manager to handle
 */
 struct _ai_build_queue_ {
-	AiBuildQueue*       Next; /// next request
+	AiBuildQueue       *Next; /// next request
 	int                 Want; /// requested number
 	int                 Made; /// built number
-	struct _unit_type_* Type; /// unit-type
+	CUnitType          *Type; /// unit-type
 };
 
 typedef struct _ai_exploration_request_ AiExplorationRequest;
@@ -206,7 +206,7 @@ typedef struct _player_ai_ {
 	int                   UnitTypeRequestsCount;    /// unit-types to build/train request,priority list
 	AiUnitTypeTable*      UnitTypeRequests;         /// number of elements in UpgradeRequests
 	int                   UpgradeToRequestsCount;   /// Upgrade to unit-type requested and priority list
-	struct _unit_type_**  UpgradeToRequests;        /// number of elements in ResearchRequests
+	CUnitType           **UpgradeToRequests;        /// number of elements in ResearchRequests
 	int                   ResearchRequestsCount;    /// Upgrades requested and priority list
 	struct _upgrade_**    ResearchRequests;         /// What the resource manager should build
 	AiBuildQueue*         UnitTypeBuilt;          /// Last building checked for repair in this turn
@@ -284,9 +284,9 @@ extern PlayerAi* AiPlayer; /// Current AI player
 // Resource manager
 //
 	/// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(struct _unit_type_* type, int count);
+extern void AiAddUnitTypeRequest(CUnitType *type, int count);
 	/// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(struct _unit_type_* type);
+extern void AiAddUpgradeToRequest(CUnitType *type);
 	/// Add research request to resource manager
 extern void AiAddResearchRequest(struct _upgrade_* upgrade);
 	/// Periodic called resource manager handler
@@ -294,13 +294,13 @@ extern void AiResourceManager(void);
 	/// Ask the ai to explore around x,y
 extern void AiExplore(int x, int y, int exploreMask);
 	/// Make two unittypes be considered equals
-extern void AiNewUnitTypeEquiv(struct _unit_type_* a, struct _unit_type_* b);
+extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
 	/// Remove any equivalence between unittypes
 extern void AiResetUnitTypeEquiv(void);
 	/// Finds all equivalents units to a given one
-extern int AiFindUnitTypeEquiv(const struct _unit_type_* i, int* result);
+extern int AiFindUnitTypeEquiv(const CUnitType *i, int *result);
 	/// Finds all available equivalents units to a given one, in the prefered order
-extern int AiFindAvailableUnitTypeEquiv(const struct _unit_type_* i,
+extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i,
 	int* result);
 
 //
@@ -308,7 +308,7 @@ extern int AiFindAvailableUnitTypeEquiv(const struct _unit_type_* i,
 //
 	/// Find nice building place
 extern int AiFindBuildingPlace(const CUnit *worker,
-	const struct _unit_type_* type, int* dx, int* dy);
+	const CUnitType *type, int* dx, int* dy);
 
 //
 // Forces

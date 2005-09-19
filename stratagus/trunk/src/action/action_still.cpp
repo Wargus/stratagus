@@ -94,7 +94,7 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 */
 void ActionStillGeneric(CUnit *unit, int ground)
 {
-	const UnitType *type;
+	const CUnitType *type;
 	CUnit *temp;
 	CUnit *goal;
 	int i;

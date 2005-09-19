@@ -44,7 +44,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct _player_;
 struct lua_State;
 class SpellType;
@@ -188,7 +188,7 @@ public:
 	SpawnPortal() : PortalType(0) {};
 	virtual SpellFunc Cast;
 
-	struct _unit_type_* PortalType;   /// The unit type spawned
+	CUnitType *PortalType;   /// The unit type spawned
 };
 
 class AdjustVariable : public SpellActionType {
@@ -217,7 +217,7 @@ public:
 	Polymorph() : SpellActionType(1), NewForm(NULL), PlayerNeutral(0) {};
 	virtual SpellFunc Cast;
 
-	struct _unit_type_* NewForm;/// The new form
+	CUnitType *NewForm;         /// The new form
 	int PlayerNeutral;          /// Convert the unit to the neutral player.
 	// TODO: temporary polymorphs would be awesome, but hard to implement
 };
@@ -227,7 +227,7 @@ public:
 	Summon() : SpellActionType(1), UnitType(NULL), TTL(0), RequireCorpse(0) {} ;
 	virtual SpellFunc Cast;
 
-	struct _unit_type_* UnitType;/// Type of unit to be summoned.
+	CUnitType *UnitType;    /// Type of unit to be summoned.
 	int TTL;                /// Time to live for summoned unit. 0 means infinite
 	int RequireCorpse;      /// Corpse consumed while summoning.
 };
