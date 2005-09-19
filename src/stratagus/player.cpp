@@ -59,8 +59,8 @@
 ----------------------------------------------------------------------------*/
 
 int NumPlayers;                  /// How many player slots used
-Player Players[PlayerMax];       /// All players in play
-Player* ThisPlayer;              /// Player on this computer
+CPlayer Players[PlayerMax];       /// All players in play
+CPlayer *ThisPlayer;              /// Player on this computer
 PlayerRace PlayerRaces;          /// Player races
 
 int NoRescueCheck;               /// Disable rescue check
@@ -68,10 +68,10 @@ int NoRescueCheck;               /// Disable rescue check
 /**
 **  Colors used for minimap.
 */
-SDL_Color* PlayerColorsRGB[PlayerMax];
-Uint32* PlayerColors[PlayerMax];
+SDL_Color *PlayerColorsRGB[PlayerMax];
+Uint32 *PlayerColors[PlayerMax];
 
-char* PlayerColorNames[PlayerMax];
+char *PlayerColorNames[PlayerMax];
 
 /**
 **  Which indexes to replace with player color
@@ -300,7 +300,7 @@ void CreatePlayer(int type)
 {
 	int team;
 	int i;
-	Player* player;
+	CPlayer *player;
 
 	if (NumPlayers == PlayerMax) { // already done for bigmaps!
 		return;
@@ -351,20 +351,20 @@ void CreatePlayer(int type)
 		case PlayerNobody:
 		default:
 			team = 0;
-			PlayerSetName(player, "Neutral");
+			player->SetName("Neutral");
 			break;
 		case PlayerComputer:
 			team = 1;
-			PlayerSetName(player, "Computer");
+			player->SetName("Computer");
 			break;
 		case PlayerPerson:
 			team = 2 + NumPlayers;
-			PlayerSetName(player, "Person");
+			player->SetName("Person");
 			break;
 		case PlayerRescuePassive:
 		case PlayerRescueActive:
 			// FIXME: correct for multiplayer games?
-			PlayerSetName(player, "Computer");
+			player->SetName("Computer");
 			team = 2 + NumPlayers;
 			break;
 	}
@@ -462,12 +462,12 @@ void CreatePlayer(int type)
 **  @param player  Pointer to player.
 **  @param side    New side (Race).
 */
-void PlayerSetSide(Player* player, int side)
+void CPlayer::SetSide(int side)
 {
 	Assert(side >= 0 && side < PlayerRaces.Count);
 	Assert(PlayerRaces.Name[side]);
 
-	player->Race = side;
+	Race = side;
 }
 
 /**
@@ -476,12 +476,12 @@ void PlayerSetSide(Player* player, int side)
 **  @param player  Pointer to player.
 **  @param name    New name.
 */
-void PlayerSetName(Player* player, const char* name)
+void CPlayer::SetName(const char *name)
 {
-	if (player->Name) {
-		free(player->Name);
+	if (Name) {
+		free(Name);
 	}
-	player->Name = strdup(name);
+	Name = strdup(name);
 }
 
 /*----------------------------------------------------------------------------
@@ -495,9 +495,9 @@ void PlayerSetName(Player* player, const char* name)
 **  @param resource  Resource to change.
 **  @param value     How many of this resource.
 */
-void PlayerSetResource(Player* player, int resource, int value)
+void CPlayer::SetResource(int resource, int value)
 {
-	player->Resources[resource] = value;
+	Resources[resource] = value;
 }
 
 /**
@@ -510,37 +510,37 @@ void PlayerSetResource(Player* player, int resource, int value)
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int PlayerCheckLimits(const Player *player, const CUnitType *type)
+int CPlayer::CheckLimits(const CUnitType *type) const
 {
 	//
 	//  Check game limits.
 	//
 	if (NumUnits < UnitMax) {
-		if (type->Building && player->NumBuildings >= player->BuildingLimit) {
-			NotifyPlayer(player, NotifyYellow, -1, -1, "Building Limit Reached");
+		if (type->Building && NumBuildings >= BuildingLimit) {
+			Notify(NotifyYellow, -1, -1, "Building Limit Reached");
 			return -1;
 		}
-		if (!type->Building && (player->TotalNumUnits - player->NumBuildings) >= player->UnitLimit) {
-			NotifyPlayer(player, NotifyYellow, -1, -1, "Unit Limit Reached");
+		if (!type->Building && (TotalNumUnits - NumBuildings) >= UnitLimit) {
+			Notify(NotifyYellow, -1, -1, "Unit Limit Reached");
 			return -2;
 		}
-		if (player->Demand + type->Demand > player->Supply && type->Demand) {
-			NotifyPlayer(player, NotifyYellow, -1, -1, "Insufficient Supply, increase Supply.");
+		if (Demand + type->Demand > Supply && type->Demand) {
+			Notify(NotifyYellow, -1, -1, "Insufficient Supply, increase Supply.");
 			return -3;
 		}
-		if (player->TotalNumUnits >= player->TotalUnitLimit) {
-			NotifyPlayer(player, NotifyYellow, -1, -1, "Total Unit Limit Reached");
+		if (TotalNumUnits >= TotalUnitLimit) {
+			Notify(NotifyYellow, -1, -1, "Total Unit Limit Reached");
 			return -4;
 		}
-		if (player->UnitTypesCount[type->Slot] >=  player->Allow.Units[type->Slot]) {
-			NotifyPlayer(player, NotifyYellow, -1, -1, "Limit of %d Reached for this unit type",
-					player->Allow.Units[type->Slot]);
+		if (UnitTypesCount[type->Slot] >=  Allow.Units[type->Slot]) {
+			Notify(NotifyYellow, -1, -1, "Limit of %d Reached for this unit type",
+				Allow.Units[type->Slot]);
 			return -6;
 		}
 		return 1;
 	} else {
-		NotifyPlayer(player, NotifyYellow, -1, -1, "Cannot create more units.");
-		if (player->AiEnabled) {
+		Notify(NotifyYellow, -1, -1, "Cannot create more units.");
+		if (AiEnabled) {
 			// AiNoMoreUnits(player, type);
 		}
 		return -5;
@@ -557,15 +557,15 @@ int PlayerCheckLimits(const Player *player, const CUnitType *type)
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int PlayerCheckCosts(const Player* player, const int* costs)
+int CPlayer::CheckCosts(const int *costs) const
 {
 	int i;
 	int err;
 
 	err = 0;
 	for (i = 1; i < MaxCosts; ++i) {
-		if (player->Resources[i] < costs[i]) {
-			NotifyPlayer(player, NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
+		if (Resources[i] < costs[i]) {
+			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
 				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
 
 			err |= 1 << i;
@@ -583,9 +583,9 @@ int PlayerCheckCosts(const Player* player, const int* costs)
 **
 **  @return        False if all enough, otherwise a bit mask.
 */
-int PlayerCheckUnitType(const Player *player, const CUnitType *type)
+int CPlayer::CheckUnitType(const CUnitType *type) const
 {
-	return PlayerCheckCosts(player, type->Stats[player->Index].Costs);
+	return CheckCosts(type->Stats[Index].Costs);
 }
 
 /**
@@ -594,12 +594,10 @@ int PlayerCheckUnitType(const Player *player, const CUnitType *type)
 **  @param player  Pointer to player.
 **  @param costs   How many costs.
 */
-void PlayerAddCosts(Player* player, const int* costs)
+void CPlayer::AddCosts(const int *costs)
 {
-	int i;
-
-	for (i = 1; i < MaxCosts; ++i) {
-		player->Resources[i] += costs[i];
+	for (int i = 1; i < MaxCosts; ++i) {
+		Resources[i] += costs[i];
 	}
 }
 
@@ -609,10 +607,10 @@ void PlayerAddCosts(Player* player, const int* costs)
 **  @param player  Pointer of player, to which the resources are added.
 **  @param type    Type of unit.
 */
-void PlayerAddUnitType(Player *player, const CUnitType *type)
+void CPlayer::AddUnitType(const CUnitType *type)
 {
 	// FIXME: a player could make money by upgrading and than cancel
-	PlayerAddCosts(player, type->Stats[player->Index].Costs);
+	AddCosts(type->Stats[Index].Costs);
 }
 
 /**
@@ -622,12 +620,10 @@ void PlayerAddUnitType(Player *player, const CUnitType *type)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
+void CPlayer::AddCostsFactor(const int *costs, int factor)
 {
-	int i;
-
-	for (i = 1; i < MaxCosts; ++i) {
-		player->Resources[i] += costs[i] * factor / 100;
+	for (int i = 1; i < MaxCosts; ++i) {
+		Resources[i] += costs[i] * factor / 100;
 	}
 }
 
@@ -637,12 +633,10 @@ void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 **  @param player  Pointer to player.
 **  @param costs   How many costs.
 */
-void PlayerSubCosts(Player* player, const int* costs)
+void CPlayer::SubCosts(const int *costs)
 {
-	int i;
-
-	for (i = 1; i < MaxCosts; ++i) {
-		player->Resources[i] -= costs[i];
+	for (int i = 1; i < MaxCosts; ++i) {
+		Resources[i] -= costs[i];
 	}
 }
 
@@ -652,9 +646,9 @@ void PlayerSubCosts(Player* player, const int* costs)
 **  @param player  Pointer of player, from which the resources are removed.
 **  @param type    Type of unit.
 */
-void PlayerSubUnitType(Player *player, const CUnitType *type)
+void CPlayer::SubUnitType(const CUnitType *type)
 {
-	PlayerSubCosts(player, type->Stats[player->Index].Costs);
+	SubCosts(type->Stats[Index].Costs);
 }
 
 /**
@@ -664,12 +658,10 @@ void PlayerSubUnitType(Player *player, const CUnitType *type)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
+void CPlayer::SubCostsFactor(const int *costs, int factor)
 {
-	int i;
-
-	for (i = 1; i < MaxCosts; ++i) {
-		player->Resources[i] -= costs[i] * 100 / factor;
+	for (int i = 1; i < MaxCosts; ++i) {
+		Resources[i] -= costs[i] * 100 / factor;
 	}
 }
 
@@ -681,9 +673,9 @@ void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 **
 **  @return        How many exists, false otherwise.
 */
-int HaveUnitTypeByType(const Player *player, const CUnitType *type)
+int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 {
-	return player->UnitTypesCount[type->Slot];
+	return UnitTypesCount[type->Slot];
 }
 
 /**
@@ -696,9 +688,9 @@ int HaveUnitTypeByType(const Player *player, const CUnitType *type)
 **
 **  @note This function should not be used during run time.
 */
-int HaveUnitTypeByIdent(const Player* player, const char* ident)
+int CPlayer::HaveUnitTypeByIdent(const char *ident) const
 {
-	return player->UnitTypesCount[UnitTypeByIdent(ident)->Slot];
+	return UnitTypesCount[UnitTypeByIdent(ident)->Slot];
 }
 
 /**
@@ -706,9 +698,7 @@ int HaveUnitTypeByIdent(const Player* player, const char* ident)
 */
 void PlayersInitAi(void)
 {
-	int player;
-
-	for (player = 0; player < NumPlayers; ++player) {
+	for (int player = 0; player < NumPlayers; ++player) {
 		if (Players[player].AiEnabled) {
 			AiInit(&Players[player]);
 		}
@@ -720,9 +710,7 @@ void PlayersInitAi(void)
 */
 void PlayersEachCycle(void)
 {
-	int player;
-
-	for (player = 0; player < NumPlayers; ++player) {
+	for (int player = 0; player < NumPlayers; ++player) {
 		if (Players[player].AiEnabled) {
 			AiEachCycle(&Players[player]);
 		}
@@ -762,7 +750,7 @@ void PlayersEachSecond(int player)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-void GraphicPlayerPixels(Player* player, const Graphic* sprite)
+void GraphicPlayerPixels(CPlayer *player, const Graphic *sprite)
 {
 	Assert(PlayerColorIndexCount);
 
@@ -784,9 +772,7 @@ void GraphicPlayerPixels(Player* player, const Graphic* sprite)
 */
 void SetPlayersPalette(void)
 {
-	int i;
-
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		free(Players[i].UnitColors.Colors);
 		Players[i].UnitColors.Colors = (SDL_Color*)malloc(PlayerColorIndexCount * sizeof(SDL_Color));
 		memcpy(Players[i].UnitColors.Colors, PlayerColorsRGB[i],
@@ -801,7 +787,7 @@ void DebugPlayers(void)
 {
 #ifdef DEBUG
 	int i;
-	const char* playertype;
+	const char *playertype;
 
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
@@ -843,14 +829,13 @@ void DebugPlayers(void)
 **  @note The parameter type, isn't yet used.
 **  @todo FIXME: We must also notfiy allied players.
 */
-void NotifyPlayer(const Player* player,
-	int type, int x, int y, const char* fmt, ...)
+void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 {
 	char temp[128];
 	va_list va;
 
 	// Notify me, and my TEAM members
-	if (player != ThisPlayer && !PlayersTeamed(ThisPlayer->Index, player->Index)) {
+	if (this != ThisPlayer && !PlayersTeamed(ThisPlayer->Index, Index)) {
 		return;
 	}
 
@@ -862,10 +847,10 @@ void NotifyPlayer(const Player* player,
 	if (x != -1) {
 		UI.Minimap.AddEvent(x, y);
 	}
-	if (player == ThisPlayer) {
+	if (this == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);
 	} else {
-		SetMessageEvent(x, y, "(%s): %s", player->Name, temp);
+		SetMessageEvent(x, y, "(%s): %s", Name, temp);
 	}
 
 }

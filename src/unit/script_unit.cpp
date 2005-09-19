@@ -541,7 +541,7 @@ static int CclUnit(lua_State *l)
 	CUnit *unit;
 	CUnitType *type;
 	CUnitType *seentype;
-	Player *player;
+	CPlayer *player;
 	int slot;
 	int i;
 	const char *s;

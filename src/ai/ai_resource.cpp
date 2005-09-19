@@ -192,7 +192,7 @@ int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 	unsigned n;
 	unsigned i;
 	int e;
-	const Player *player;
+	const CPlayer *player;
 
 	//
 	// Select all units in range.
@@ -732,7 +732,7 @@ static void AiCheckingWork(void)
 			//
 			// Check limits, AI should be broken if reached.
 			//
-			if (PlayerCheckLimits(AiPlayer->Player, type) < 0) {
+			if (AiPlayer->Player->CheckLimits(type) < 0) {
 				continue;
 			}
 			//

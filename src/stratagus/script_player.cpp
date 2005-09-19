@@ -61,7 +61,7 @@
 **
 **  @return   The player pointer
 */
-static Player *CclGetPlayer(lua_State *l)
+static CPlayer *CclGetPlayer(lua_State *l)
 {
 	return &Players[(int)LuaToNumber(l, -1)];
 }
@@ -74,7 +74,7 @@ static Player *CclGetPlayer(lua_State *l)
 static int CclPlayer(lua_State *l)
 {
 	const char *value;
-	Player *player;
+	CPlayer *player;
 	int i;
 	int args;
 	int j;
@@ -727,7 +727,7 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 */
 static int CclGetPlayerData(lua_State *l)
 {
-	Player *p;
+	CPlayer *p;
 	const char *data;
 
 	if (lua_gettop(l) < 2) {
@@ -836,7 +836,7 @@ static int CclGetPlayerData(lua_State *l)
 */
 static int CclSetPlayerData(lua_State *l)
 {
-	Player *p;
+	CPlayer *p;
 	const char *data;
 
 	if (lua_gettop(l) < 3) {
@@ -931,7 +931,7 @@ static int CclSetPlayerData(lua_State *l)
 */
 static int CclSetAiType(lua_State *l)
 {
-	Player *p;
+	CPlayer *p;
 
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");

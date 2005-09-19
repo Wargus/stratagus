@@ -1973,9 +1973,9 @@ static int GetPieUnderCursor(void)
 void DrawPieMenu(void)
 {
 	int i;
-	const ButtonAction* buttons;
+	const ButtonAction *buttons;
 	Viewport* vp;
-	Player* player;
+	CPlayer *player;
 	char buf[2] = "?";
 
 	if (CursorState != CursorStatePieMenu)

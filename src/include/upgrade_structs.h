@@ -51,6 +51,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CUnitType;
+
 /**
 **  Indices into costs/resource/income array.
 */
@@ -164,7 +166,7 @@ typedef struct _upgrade_modifier_ {
 	char ChangeUpgrades[UpgradeMax];    /// allow/forbid upgrades
 	char ApplyTo[UnitTypeMax];          /// which unit types are affected
 
-	struct _unit_type_* ConvertTo;      /// convert to this unit-type.
+	CUnitType *ConvertTo;      /// convert to this unit-type.
 
 } UpgradeModifier;
 

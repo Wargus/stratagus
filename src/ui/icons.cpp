@@ -170,7 +170,7 @@ Icon *IconByIdent(const char *ident)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 */
-void DrawIcon(const Player *player, Icon *icon, int x, int y)
+void DrawIcon(const CPlayer *player, Icon *icon, int x, int y)
 {
 	icon->G->DrawPlayerColorFrameClip(player->Index, icon->Frame, x, y);
 }
@@ -186,7 +186,7 @@ void DrawIcon(const Player *player, Icon *icon, int x, int y)
 **  @param y       Y display pixel position
 **  @param text    Optional text to display
 */
-void DrawUnitIcon(const Player *player, ButtonStyle *style, Icon *icon,
+void DrawUnitIcon(const CPlayer *player, ButtonStyle *style, Icon *icon,
 	unsigned flags, int x, int y, const char *text)
 {
 	ButtonStyle s;

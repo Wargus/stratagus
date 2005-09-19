@@ -38,17 +38,15 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _player_ player.h
+**  @class Player player.h
 **
 **  \#include "player.h"
-**
-**  typedef struct _player_ Player;
 **
 **  This structure contains all informations about a player in game.
 **
 **  The player structure members:
 **
-**  Player::Player
+**  CPlayer::Player
 **
 **    This is the unique slot number. It is not possible that two
 **    players have the same slot number at the same time. The slot
@@ -61,12 +59,12 @@
 **
 **    @note Should call this member Slot?
 **
-**  Player::Name
+**  CPlayer::Name
 **
 **    Name of the player used for displays and network game.
 **    It is restricted to 15 characters plus final zero.
 **
-**  Player::Type
+**  CPlayer::Type
 **
 **    Type of the player. This field is setup from the level (map).
 **    We support currently #PlayerNeutral,
@@ -74,55 +72,55 @@
 **    #PlayerRescuePassive and #PlayerRescueActive.
 **    @see #PlayerTypes.
 **
-**  Player::RaceName
+**  CPlayer::RaceName
 **
 **    Name of the race to which the player belongs, used to select
 **    the user interface and the AI.
 **    We have 'orc', 'human', 'alliance' or 'mythical'. Should
 **    only be used during configuration and not during runtime.
 **
-**  Player::Race
+**  CPlayer::Race
 **
 **    Race number of the player. This field is setup from the level
 **    map. This number is mapped with #PlayerRaces to the symbolic
-**    name Player::RaceName.
+**    name CPlayer::RaceName.
 **
-**  Player::AiName
+**  CPlayer::AiName
 **
 **    AI name for computer. This field is setup
 **    from the map. Used to select the AI for the computer
 **    player.
 **
-**  Player::Team
+**  CPlayer::Team
 **
 **    Team of player. Selected during network game setup. All players
 **    of the same team are allied and enemy to all other teams.
 **    @note It is planned to show the team on the map.
 **
-**  Player::Enemy
+**  CPlayer::Enemy
 **
 **    A bit field which contains the enemies of this player.
-**    If Player::Enemy & (1<<Player::Player) != 0 its an enemy.
-**    Setup during startup using the Player::Team, can later be
-**    changed with diplomacy. Player::Enemy and Player::Allied
+**    If CPlayer::Enemy & (1<<CPlayer::Player) != 0 its an enemy.
+**    Setup during startup using the CPlayer::Team, can later be
+**    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
 **    are combined, if none bit is set, the player is neutral.
 **    @note You can be allied to a player, which sees you as enemy.
 **
-**  Player::Allied
+**  CPlayer::Allied
 **
 **    A bit field which contains the allies of this player.
-**    If Player::Allied & (1<<Player::Player) != 0 its an allied.
+**    If CPlayer::Allied & (1<<CPlayer::Player) != 0 its an allied.
 **    Setup during startup using the Player:Team, can later be
-**    changed with diplomacy. Player::Enemy and Player::Allied
+**    changed with diplomacy. CPlayer::Enemy and CPlayer::Allied
 **    are combined, if none bit is set, the player is neutral.
 **    @note You can be allied to a player, which sees you as enemy.
 **
-**  Player::SharedVision
+**  CPlayer::SharedVision
 **
 **    A bit field which contains shared vision for this player.
 **    Shared vision only works when it's activated both ways. Really.
 **
-**  Player::StartX Player::StartY
+**  CPlayer::StartX CPlayer::StartY
 **
 **    The tile map coordinates of the player start position. 0,0 is
 **    the upper left on the map. This members are setup from the
@@ -130,36 +128,36 @@
 **    Ignored if game starts with level settings. Used to place
 **    the initial workers if you play with 1 or 3 workers.
 **
-**  Player::Resources[::MaxCosts]
+**  CPlayer::Resources[::MaxCosts]
 **
 **    How many resources the player owns. Needed for building
 **    units and structures.
 **    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
-**  Player::Incomes[::MaxCosts]
+**  CPlayer::Incomes[::MaxCosts]
 **
 **    Income of the resources, when they are delivered at a store.
 **    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
-**  Player::LastResources[::MaxCosts]
+**  CPlayer::LastResources[::MaxCosts]
 **
 **    Keeps track of resources in time (used for calculating
-**    Player::Revenue, see below)
+**    CPlayer::Revenue, see below)
 **
-**  Player::Revenue[::MaxCosts]
+**  CPlayer::Revenue[::MaxCosts]
 **
 **    Production of resources per minute (or estimates)
 **    Used just as information (statistics) for the player...
 **
-**  Player::UnitTypesCount[::UnitTypeMax]
+**  CPlayer::UnitTypesCount[::UnitTypeMax]
 **
 **    Total count for each different unit type. Used by the AI and
 **    for dependencies checks. The addition of all counts should
-**    be Player::TotalNumUnits.
+**    be CPlayer::TotalNumUnits.
 **    @note Should not use the maximum number of unit-types here,
 **    only the real number of unit-types used.
 **
-**  Player::AiEnabled
+**  CPlayer::AiEnabled
 **
 **    If the player is controlled by the computer and this flag is
 **    true, than the player is handled by the AI on this local
@@ -168,90 +166,90 @@
 **    @note Currently the AI is calculated parallel on all computers
 **    in a network play. It is planned to change this.
 **
-**  Player::Ai
+**  CPlayer::Ai
 **
 **    AI structure pointer. Please look at #PlayerAi for more
 **    informations.
 **
-**  Player::Units
+**  CPlayer::Units
 **
-**    A table of all (Player::TotalNumUnits) units of the player.
+**    A table of all (CPlayer::TotalNumUnits) units of the player.
 **
-**  Player::TotalNumUnits
+**  CPlayer::TotalNumUnits
 **
-**    Total number of units (incl. buildings) in the Player::Units
+**    Total number of units (incl. buildings) in the CPlayer::Units
 **    table.
 **
-**  Player::Demand
+**  CPlayer::Demand
 **
 **    Total unit demand, used to demand limit.
-**    A player can only build up to Player::Food units and not more
-**    than Player::FoodUnitLimit units.
+**    A player can only build up to CPlayer::Food units and not more
+**    than CPlayer::FoodUnitLimit units.
 **
-**    @note that Player::NumFoodUnits > Player::Food, when enough
+**    @note that CPlayer::NumFoodUnits > CPlayer::Food, when enough
 **    farms are destroyed.
 **
-**  Player::NumBuildings
+**  CPlayer::NumBuildings
 **
 **    Total number buildings, units that don't need food.
 **
-**  Player::Food
+**  CPlayer::Food
 **
 **    Number of food available/produced. Player can't train more
-**    Player::NumFoodUnits than this.
+**    CPlayer::NumFoodUnits than this.
 **    @note that all limits are always checked.
 **
-**  Player::FoodUnitLimit
+**  CPlayer::FoodUnitLimit
 **
 **    Number of food units allowed. Player can't train more
-**    Player::NumFoodUnits than this.
+**    CPlayer::NumFoodUnits than this.
 **    @note that all limits are always checked.
 **
-**  Player::BuildingLimit
+**  CPlayer::BuildingLimit
 **
 **    Number of buildings allowed.  Player can't build more
-**    Player::NumBuildings than this.
+**    CPlayer::NumBuildings than this.
 **    @note that all limits are always checked.
 **
-**  Player::TotalUnitLimit
+**  CPlayer::TotalUnitLimit
 **
 **    Number of total units allowed. Player can't have more
-**    Player::NumFoodUnits+Player::NumBuildings=Player::TotalNumUnits
+**    CPlayer::NumFoodUnits+CPlayer::NumBuildings=CPlayer::TotalNumUnits
 **    this.
 **    @note that all limits are always checked.
 **
-**  Player::Score
+**  CPlayer::Score
 **
 **    Total number of points. You can get points for killing units,
 **    destroying buildings ...
 **
-**  Player::TotalUnits
+**  CPlayer::TotalUnits
 **
 **    Total number of units made.
 **
-**  Player::TotalBuildings
+**  CPlayer::TotalBuildings
 **
 **    Total number of buildings made.
 **
-**  Player::TotalResources[::MaxCosts]
+**  CPlayer::TotalResources[::MaxCosts]
 **
 **    Total number of resources collected.
 **    @see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
-**  Player::TotalRazings
+**  CPlayer::TotalRazings
 **
 **    Total number of buildings destroyed.
 **
-**  Player::TotalKills
+**  CPlayer::TotalKills
 **
 **    Total number of kills.
 **
-**  Player::Color
+**  CPlayer::Color
 **
 **    Color of units of this player on the minimap. Index number
 **    into the global palette.
 **
-**  Player::UnitColors
+**  CPlayer::UnitColors
 **
 **    Unit colors of this player. Contains the hardware dependent
 **    pixel values for the player colors (palette index #208-#211).
@@ -260,7 +258,7 @@
 **    (#208 is brightest shade, #211 is darkest shade) .... these
 **    numbers are NOT red=#208, blue=#209, etc
 **
-**  Player::Allow
+**  CPlayer::Allow
 **
 **    Contains which unit-types and upgrades are allowed for the
 **    player. Possible values are:
@@ -271,7 +269,7 @@
 **    @li  `E' -- enabled, allowed by level but currently forbidden
 **    @see _allow_
 **
-**  Player::UpgradeTimers
+**  CPlayer::UpgradeTimers
 **
 **    Timer for the upgrades. One timer for all possible upgrades.
 **    Initial 0 counted up by the upgrade action, until it reaches
@@ -293,7 +291,6 @@
 
 class CUnit;
 class CUnitType;
-struct _player_;
 struct _player_ai_;
 class CLFile;
 
@@ -301,15 +298,12 @@ class CLFile;
 --  Player type
 ----------------------------------------------------------------------------*/
 
-#ifndef __STRUCT_PLAYER__
-#define __STRUCT_PLAYER__    /// protect duplicate player typedef
-typedef struct _player_ Player;    /// player typedef
-#endif
-
 	///  Player structure
-struct _player_ {
-	int   Index;       /// player as number
-	char* Name;         /// name of non computer
+class CPlayer
+{
+public:
+	int   Index;        /// player as number
+	char *Name;         /// name of non computer
 
 	int   Type;         /// type of player (human,computer,...)
 	int   Race;         /// race of player (orc,human,...)
@@ -352,7 +346,6 @@ struct _player_ {
 	int    TotalRazings;
 	int    TotalKills;      /// How many unit killed
 
-// Display video
 	Uint32 Color;  /// color of units on minimap
 
 	struct _unit_colors_ UnitColors;  /// Unit colors for new units
@@ -360,6 +353,44 @@ struct _player_ {
 	// Upgrades/Allows:
 	struct _allow_ Allow;                  /// Allowed for player
 	struct _upgrade_timers_ UpgradeTimers; /// Timer for the upgrades
+
+
+	/// Change player side
+	void SetSide(int side);
+	/// Change player name
+	void SetName(const char *name);
+
+	/// Set a resource of the player
+	void SetResource(int resource, int value);
+
+	/// Check if the unit-type didn't break any unit limits and supply/demand
+	int CheckLimits(const CUnitType *type) const;
+
+	/// Check if enough resources are available for costs
+	int CheckCosts(const int *costs) const;
+	/// Check if enough resources are available for a new unit-type
+	int CheckUnitType(const CUnitType *type) const;
+
+	/// Add costs to the resources
+	void AddCosts(const int *costs);
+	/// Add costs for an unit-type to the resources
+	void AddUnitType(const CUnitType *type);
+	/// Add a factor of costs to the resources
+	void AddCostsFactor(const int *costs, int factor);
+	/// Remove costs from the resources
+	void SubCosts(const int *costs);
+	/// Remove costs for an unit-type from the resources
+	void SubUnitType(const CUnitType *type);
+	/// Remove a factor of costs from the resources
+	void SubCostsFactor(const int *costs, int factor);
+
+	/// Does the player have units of that type
+	int HaveUnitTypeByType(const CUnitType *type) const;
+	/// Does the player have units of that type
+	int HaveUnitTypeByIdent(const char *ident) const;
+
+	/// Notify player about a problem
+	void Notify(int type, int x, int y, const char *fmt, ...) const;
 };
 
 /**
@@ -393,7 +424,7 @@ enum PlayerRacesOld {
 **
 **  #PlayerComputer
 **
-**    This player is controlled by the computer. Player::AiNum
+**    This player is controlled by the computer. CPlayer::AiNum
 **    selects the AI strategy.
 **
 **  #PlayerPerson
@@ -412,7 +443,7 @@ enum PlayerRacesOld {
 **
 **  #PlayerRescueActive
 **
-**    This player is controlled by the computer. Player::AiNum
+**    This player is controlled by the computer. CPlayer::AiNum
 **    selects the AI strategy. Until it is rescued it plays like
 **    an ally. The first person which reaches units of this player,
 **    can rescue them. If the city center is rescued, than all units
@@ -443,12 +474,12 @@ enum _notify_type_ {
 ----------------------------------------------------------------------------*/
 
 extern int NumPlayers;             /// How many player slots used
-extern Player Players[PlayerMax];  /// All players
-extern Player* ThisPlayer;         /// Player on local computer
+extern CPlayer Players[PlayerMax];  /// All players
+extern CPlayer *ThisPlayer;         /// Player on local computer
 extern int NoRescueCheck;          /// Disable rescue check
-extern SDL_Color* PlayerColorsRGB[PlayerMax]; /// Player colors
-extern Uint32* PlayerColors[PlayerMax];       /// Player colors
-extern char* PlayerColorNames[PlayerMax];  /// Player color names
+extern SDL_Color *PlayerColorsRGB[PlayerMax]; /// Player colors
+extern Uint32 *PlayerColors[PlayerMax];       /// Player colors
+extern char *PlayerColorNames[PlayerMax];  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races
 
@@ -472,47 +503,6 @@ extern void SavePlayers(CLFile *file);
 	/// Create a new player
 extern void CreatePlayer(int type);
 
-	/// Change player side
-extern void PlayerSetSide(struct _player_* player, int side);
-	/// Change player name
-extern void PlayerSetName(struct _player_* player, const char* name);
-
-	/// Set a resource of the player
-extern void PlayerSetResource(Player* player, int resource, int value);
-
-	/// Check if the unit-type didn't break any unit limits and supply/demand
-extern int PlayerCheckLimits(const struct _player_* player,
-	const CUnitType *type);
-
-	/// Check if enough resources are available for costs
-extern int PlayerCheckCosts(const struct _player_* player, const int* costs);
-	/// Check if enough resources are available for a new unit-type
-extern int PlayerCheckUnitType(const struct _player_* player,
-	const CUnitType *type);
-
-	/// Add costs to the resources
-extern void PlayerAddCosts(struct _player_* player, const int* costs);
-	/// Add costs for an unit-type to the resources
-extern void PlayerAddUnitType(struct _player_* player,
-	const CUnitType *type);
-	/// Add a factor of costs to the resources
-extern void PlayerAddCostsFactor(struct _player_* player, const int* costs,
-	int factor);
-	/// Remove costs from the resources
-extern void PlayerSubCosts(struct _player_* player, const int* costs);
-	/// Remove costs for an unit-type from the resources
-extern void PlayerSubUnitType(struct _player_* player,
-	const CUnitType *type);
-	/// Remove a factor of costs from the resources
-extern void PlayerSubCostsFactor(struct _player_* player, const int* costs,
-	int factor);
-
-	/// Has the player units of that type
-extern int HaveUnitTypeByType(const struct _player_* player,
-	const CUnitType *type);
-	/// Has the player units of that type
-extern int HaveUnitTypeByIdent(const struct _player_* player,
-	const char* ident);
 
 	/// Initialize the computer opponent AI
 extern void PlayersInitAi(void);
@@ -523,16 +513,11 @@ extern void PlayersEachSecond(int player);
 
 #ifndef USE_OPENGL
 	/// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(struct _player_* player,
-	const Graphic* sprite);
+extern void GraphicPlayerPixels(CPlayer *player, const Graphic *sprite);
 #endif
 
 	/// Output debug informations for players
 extern void DebugPlayers(void);
-
-	/// Notify player about a problem
-extern void NotifyPlayer(const struct _player_* player, int type, int x,
-	int y, const char* fmt, ...);
 
 	/// register ccl features
 extern void PlayerCclRegister(void);

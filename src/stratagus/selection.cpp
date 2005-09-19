@@ -204,7 +204,7 @@ void ChangeSelectedUnits(CUnit **units,int count)
 **  @param adjust  0 = reset, 1 = remove units, 2 = add units
 **  @param count   the number of units to be adjusted
 */
-void ChangeTeamSelectedUnits(Player *player, CUnit **units, int adjust, int count)
+void ChangeTeamSelectedUnits(CPlayer *player, CUnit **units, int adjust, int count)
 {
 	int i;
 	int n;
@@ -381,7 +381,7 @@ int SelectUnitsByType(CUnit *base)
 {
 	CUnit *unit;
 	CUnit *table[UnitMax];
-	const UnitType *type;
+	const CUnitType *type;
 	int r;
 	int i;
 	const Viewport *vp;
@@ -479,7 +479,7 @@ int ToggleUnitsByType(CUnit *base)
 {
 	CUnit *unit;
 	CUnit *table[UnitMax];
-	const UnitType *type;
+	const CUnitType *type;
 	int r;
 	int i;
 
@@ -666,7 +666,7 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 		int sprite_x;
 		int sprite_y;
 		CUnit *unit;
-		const UnitType *type;
+		const CUnitType *type;
 
 		unit = table[i];
 		type = unit->Type;
@@ -764,7 +764,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 {
 	CUnit *unit;
 	CUnit *table[UnitMax];
-	UnitType *type;
+	CUnitType *type;
 	int r;
 	int n;
 	int i;

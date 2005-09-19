@@ -62,7 +62,7 @@
 */
 int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 {
-	Player *player;
+	CPlayer *player;
 	CUnitType *oldtype;
 	const UnitStats *newstats;
 	int x;
@@ -160,7 +160,7 @@ void HandleActionTransformInto(CUnit *unit)
 */
 void HandleActionUpgradeTo(CUnit *unit)
 {
-	Player *player;
+	CPlayer *player;
 	CUnitType *newtype;
 	const UnitStats *newstats;
 
@@ -194,7 +194,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 	unit->SubAction = unit->State = 0;
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		NotifyPlayer(player, NotifyGreen, unit->X, unit->Y,
+		player->Notify(NotifyGreen, unit->X, unit->Y,
 			"Upgrade to %s canceled", newtype->Name);
 		return ;
 	}
@@ -202,7 +202,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 	if (player->AiEnabled) {
 		AiUpgradeToComplete(unit, newtype);
 	}
-	NotifyPlayer(player, NotifyGreen, unit->X, unit->Y,
+	player->Notify(NotifyGreen, unit->X, unit->Y,
 		"Upgrade to %s complete", unit->Type->Name);
 }
 

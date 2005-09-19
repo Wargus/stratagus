@@ -61,7 +61,7 @@ void AiCheckMagic(void)
 	int n;
 	CUnit **units;
 	CUnit *unit;
-	const Player *player;
+	const CPlayer *player;
 #ifdef DEBUG
 	int success;
 #endif

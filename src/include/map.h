@@ -171,7 +171,7 @@
 ----------------------------------------------------------------------------*/
 
 class Graphic;
-struct _player_;
+class CPlayer;
 class CLFile;
 class CUnit;
 class CUnitType;
@@ -310,10 +310,10 @@ extern int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 // in map_fog.c
 //
 /// Function to (un)mark the vision table.
-typedef void MapMarkerFunc(const struct _player_* player, int x, int y);
+typedef void MapMarkerFunc(const CPlayer *player, int x, int y);
 
 	/// Filter map flags through fog
-extern int MapFogFilterFlags(struct _player_* player, int x, int y, int mask);
+extern int MapFogFilterFlags(CPlayer *player, int x, int y, int mask);
 	/// Mark a tile for normal sight
 extern MapMarkerFunc MapMarkTileSight;
 	/// Unmark a tile for normal sight
@@ -324,10 +324,10 @@ extern MapMarkerFunc MapMarkTileDetectCloak;
 extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 	/// Mark sight changes
-extern void MapSight(const struct _player_* player, int x, int y, int w,
+extern void MapSight(const CPlayer *player, int x, int y, int w,
 	int h, int range, MapMarkerFunc* marker);
 	/// Find if a tile is visible (With shared vision)
-extern unsigned char IsTileVisible(const struct _player_* player, int x,
+extern unsigned char IsTileVisible(const CPlayer *player, int x,
 	int y);
 	/// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x, int y);
@@ -350,17 +350,17 @@ extern void FreeVisionTable(void);
 //
 
 	/// Check if a unit is visible on radar
-extern unsigned char UnitVisibleOnRadar(const struct _player_* pradar, const CUnit *punit);
+extern unsigned char UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit);
 	/// Check if a tile is visible on radar
-extern unsigned char IsTileRadarVisible(const struct _player_* pradar, const struct _player_* punit, int x, int y);
+extern unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y);
 	/// Mark a tile as radar visible, or incrase radar vision
-extern void MapMarkTileRadar(const struct _player_* player, int x, int y);
+extern void MapMarkTileRadar(const CPlayer *player, int x, int y);
 	/// Unmark a tile as radar visible, decrease is visible by other radar
-extern void MapUnmarkTileRadar(const struct _player_* player, int x, int y);
+extern void MapUnmarkTileRadar(const CPlayer *player, int x, int y);
 	/// Mark a tile as radar jammed, or incrase radar jamming'ness
-extern void MapMarkTileRadarJammer(const struct _player_* player, int x, int y);
+extern void MapMarkTileRadarJammer(const CPlayer *player, int x, int y);
 	/// Unmark a tile as jammed, decrease is jamming'ness
-extern void MapUnmarkTileRadarJammer(const struct _player_* player, int x, int y);
+extern void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y);
 
 //
 // in map_wall.c

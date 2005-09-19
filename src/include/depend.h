@@ -95,7 +95,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _player_;
+class CPlayer;
 class CUnitType;
 struct _upgrade_;
 
@@ -132,11 +132,10 @@ extern void CleanDependencies();
 
 
 	/// Add a new dependency
-extern void AddDependency(const char* target, const char* required, int count,
+extern void AddDependency(const char *target, const char *required, int count,
 	int or_flag);
 	/// Check a dependency by identifier
-extern int CheckDependByIdent(const struct _player_* player,
-	const char* target);
+extern int CheckDependByIdent(const CPlayer *player, const char *target);
 
 //@}
 
