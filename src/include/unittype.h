@@ -44,11 +44,9 @@ class Mng;
 #endif
 
 /**
-**  @struct _unit_type_ unittype.h
+**  @class CUnitType unittype.h
 **
 **  \#include "unittype.h"
-**
-**  typedef struct _unit_type_ UnitType;
 **
 **  This structure contains the informations that are shared between all
 **  units of the same type and determins if an unit is a building,
@@ -738,13 +736,13 @@ struct _building_restrictions_ {
 		struct {
 			int OffsetX;         /// offset from the main building to place this
 			int OffsetY;         /// offset from the main building to place this
-			char* ParentName;    /// building that is unit is an addon too.
-			struct _unit_type_* Parent;    /// building that is unit is an addon too.
+			char *ParentName;    /// building that is unit is an addon too.
+			CUnitType *Parent;    /// building that is unit is an addon too.
 		} AddOn;
 
 		struct {
-			struct _unit_type_* Parent;
-			char* ParentName;    /// building that is unit is an addon too.
+			CUnitType *Parent;
+			char *ParentName;    /// building that is unit is an addon too.
 			int ReplaceOnDie;    /// recreate the parent on destruction
 			int ReplaceOnBuild;  /// remove the parent, or just build over it.
 		} OnTop;
@@ -753,8 +751,8 @@ struct _building_restrictions_ {
 			int Distance;        /// distance to build (circle)
 			DistanceTypeType DistanceType;
 			int Except;          /// all except this building type.
-			char* RestrictTypeName; 
-			struct _unit_type_* RestrictType; 
+			char *RestrictTypeName; 
+			CUnitType *RestrictType; 
 		} Distance;
 
 		int Direction;           /// Direction mask up,down,left,right,up-left...
@@ -764,7 +762,7 @@ struct _building_restrictions_ {
 			int Mask;            /// Tile mask required
 		} Tiles;
 	} Data;
-	BuildRestriction* Next;
+	BuildRestriction *Next;
 };
 
 
@@ -772,12 +770,13 @@ struct _building_restrictions_ {
 ** Base structure of unit-type
 ** @todo n0body: AutoBuildRate not implemented.
 */
-typedef struct _unit_type_ {
-	char* Ident;                    /// Identifier
-	char* Name;                     /// Pretty name shown from the engine
+class CUnitType {
+public:
+	char *Ident;                    /// Identifier
+	char *Name;                     /// Pretty name shown from the engine
 	int Slot;                       /// Type as number
-	char* File;                     /// Sprite files
-	char* ShadowFile;               /// Shadow file
+	char *File;                     /// Sprite files
+	char *ShadowFile;               /// Shadow file
 
 	int Width;                      /// Sprite width
 	int Height;                     /// Sprite height
@@ -789,15 +788,15 @@ typedef struct _unit_type_ {
 	int ShadowOffsetX;              /// Shadow horizontal offset
 	int ShadowOffsetY;              /// Shadow vertical offset
 
-	struct _animations_* Animations;/// Animation scripts
+	struct _animations_ *Animations;/// Animation scripts
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
 #ifdef USE_MNG
 	struct _portrait_ {
-		char** Files;
+		char **Files;
 		int Num;
-		Mng** Mngs;
+		Mng **Mngs;
 		int CurrMng;
 		int NumIterations;
 	} Portrait;
@@ -805,12 +804,12 @@ typedef struct _unit_type_ {
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
 
-	char* CorpseName;               /// Corpse type name
-	struct _unit_type_* CorpseType; /// Corpse unit-type
+	char *CorpseName;               /// Corpse type name
+	CUnitType *CorpseType;          /// Corpse unit-type
 	int CorpseScript;               /// Corpse script start
 
 	// this is taken from the UDTA section
-	struct _construction_* Construction; /// What is shown in construction phase
+	struct _construction_ *Construction; /// What is shown in construction phase
 
 	int _Costs[MaxCosts];           /// How many resources needed
 	int RepairHP;                   /// Amount of HP per repair
@@ -828,12 +827,12 @@ typedef struct _unit_type_ {
 	int BurnPercent;                /// Burning percent.
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
-	char* CanCastSpell;             /// Unit is able to use spells.
-	char* AutoCastActive;           /// Default value for autocast.
+	char *CanCastSpell;             /// Unit is able to use spells.
+	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.
 	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
-	char* CanTransport;             /// Can transport units with this flag.
+	char *CanTransport;             /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int StartingResources;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
@@ -875,7 +874,7 @@ typedef struct _unit_type_ {
 	unsigned CanHarvest : 1;        /// Resource can be harvested.
 	unsigned Harvester : 1;         /// unit is a resource harvester.
 	unsigned char* BoolFlag;        /// User defined flag. Used for (dis)allow target.
-	VariableType* Variable;         /// Array of user defined variables.
+	VariableType *Variable;         /// Array of user defined variables.
 	unsigned char* CanTargetFlag;   /// Flag needed to target with missile.
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
@@ -886,8 +885,8 @@ typedef struct _unit_type_ {
 
 	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
-	ResourceInfo* ResInfo[MaxCosts];    /// Resource information.
-	BuildRestriction** BuildingRules;   /// Rules list for building a building.
+	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
+	BuildRestriction **BuildingRules;   /// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	UnitSound Sound;                /// Sounds for events
@@ -907,7 +906,7 @@ typedef struct _unit_type_ {
 
 	Graphic *Sprite;                /// Sprite images
 	Graphic *ShadowSprite;          /// Shadow sprite image
-} UnitType;
+};
 
 	/// @todo ARI: should be dynamic (lua..).
 	/// How many unit-types are currently supported
@@ -917,20 +916,20 @@ typedef struct _unit_type_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<UnitType *> UnitTypes;   /// All unit-types
+extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
 
 /// @todo this hardcoded unit-types must be removed!!
-extern UnitType*UnitTypeHumanWall;          /// Human wall
-extern UnitType*UnitTypeOrcWall;            /// Orc wall
+extern CUnitType *UnitTypeHumanWall;          /// Human wall
+extern CUnitType *UnitTypeOrcWall;            /// Orc wall
 
 /**
 **  Variable info for unit and unittype.
 */
 extern struct _UnitTypeVar_{
-	char** BoolFlagName;                /// Array of name of user defined bool flag.
+	char **BoolFlagName;                /// Array of name of user defined bool flag.
 	int NumberBoolFlag;                 /// Number of user defined bool flag.
 
-	char** VariableName;                /// Array of names of user defined variables.
+	char **VariableName;                /// Array of names of user defined variables.
 	VariableType *Variable;             /// Array of user defined variables (default value for unittype).
 // EventType* Event;                   /// Array of functions sets to call when en event occurs.
 	int NumberVariable;                 /// Number of defined variables.
@@ -943,28 +942,28 @@ extern struct _UnitTypeVar_{
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern UnitType* CclGetUnitType(struct lua_State* l);  /// Access unit-type object
+extern CUnitType *CclGetUnitType(struct lua_State *l);  /// Access unit-type object
 extern void UnitTypeCclRegister(void);          /// Register ccl features
 
 extern void UpdateStats(int reset_to_default);  /// Update unit stats
-extern UnitType* UnitTypeByIdent(const char*);  /// Get unit-type by ident
+extern CUnitType *UnitTypeByIdent(const char *);  /// Get unit-type by ident
 extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 
 extern void SaveUnitTypes(CLFile *file);            /// Save the unit-type table
-extern UnitType* NewUnitTypeSlot(char*);            /// Allocate an empty unit-type slot
+extern CUnitType *NewUnitTypeSlot(char *);            /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
-extern void DrawUnitType(const UnitType *type, Graphic *sprite, int player,
+extern void DrawUnitType(const CUnitType *type, Graphic *sprite, int player,
 	int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table
-extern void LoadUnitTypeSprite(UnitType* unittype); /// Load the sprite for a unittype
+extern void LoadUnitTypeSprite(CUnitType *unittype); /// Load the sprite for a unittype
 extern void LoadUnitTypes(void);                    /// Load the unit-type data
 extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 
 // in script_unittype.c
 
 	/// Parse User Variables field.
-extern void DefineVariableField(struct lua_State* l, struct _variable_type_* var, int lua_index);
+extern void DefineVariableField(struct lua_State *l, struct _variable_type_ *var, int lua_index);
 
 	/// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(const CUnit *unit);

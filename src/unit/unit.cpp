@@ -272,7 +272,7 @@ static CUnit *AllocUnit(void)
 **  @param unit    Unit pointer (allocated zero filled)
 **  @param type    Unit-type
 */
-void InitUnit(CUnit *unit, UnitType* type)
+void InitUnit(CUnit *unit, CUnitType* type)
 {
 	int i;
 
@@ -365,7 +365,7 @@ void InitUnit(CUnit *unit, UnitType* type)
 */
 void AssignUnitToPlayer(CUnit *unit, Player* player)
 {
-	UnitType* type;  // type of unit.
+	CUnitType* type;  // type of unit.
 
 	Assert(player);
 	type = unit->Type;
@@ -422,7 +422,7 @@ void AssignUnitToPlayer(CUnit *unit, Player* player)
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnit(UnitType *type, Player *player)
+CUnit *MakeUnit(CUnitType *type, Player *player)
 {
 	CUnit *unit;
 
@@ -611,7 +611,7 @@ void UpdateUnitSightRange(CUnit *unit)
 */
 void MarkUnitFieldFlags(const CUnit *unit)
 {
-	UnitType* type; // Type of the unit.
+	CUnitType* type; // Type of the unit.
 	unsigned flags; //
 	int h;          // Tile height of the unit.
 	int w;          // Tile width of the unit.
@@ -645,7 +645,7 @@ void MarkUnitFieldFlags(const CUnit *unit)
 */
 void UnmarkUnitFieldFlags(const CUnit *unit)
 {
-	UnitType* type; // Type of the unit.
+	CUnitType* type; // Type of the unit.
 	unsigned flags; //
 	int h;          // Tile height of the unit.
 	int w;          // Tile width of the unit.
@@ -815,7 +815,7 @@ void PlaceUnit(CUnit *unit, int x, int y)
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
+CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, Player *player)
 {
 	CUnit *unit;
 
@@ -887,9 +887,9 @@ void RemoveUnit(CUnit *unit, CUnit *host)
 void UnitLost(CUnit *unit)
 {
 	CUnit *temp;
-	BuildRestriction* b;
-	const UnitType* type;
-	Player* player;
+	BuildRestriction *b;
+	const CUnitType *type;
+	Player *player;
 	int i;
 
 	Assert(unit);
@@ -1031,8 +1031,8 @@ void UnitClearOrders(CUnit *unit)
 */
 void UpdateForNewUnit(const CUnit *unit, int upgrade)
 {
-	const UnitType* type;
-	Player* player;
+	const CUnitType *type;
+	Player *player;
 	int u;
 
 	player = unit->Player;
@@ -2015,10 +2015,10 @@ void DropOutAll(const CUnit *source)
 **
 **  @return        the BuildingRestrictionDetails
 */
-BuildRestriction* OnTopDetails(const CUnit *unit, const UnitType* parent)
+BuildRestriction* OnTopDetails(const CUnit *unit, const CUnitType *parent)
 {
 	int w;
-	BuildRestriction* b;
+	BuildRestriction *b;
 
 	if (unit->Type->BuildingRules) {
 		w = 0;
@@ -2053,11 +2053,11 @@ BuildRestriction* OnTopDetails(const CUnit *unit, const UnitType* parent)
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
 */
-CUnit *CanBuildHere(const CUnit *unit, const UnitType* type, int x, int y)
+CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 {
 	CUnit *table[UnitMax];
 	CUnit *ontoptarget;
-	BuildRestriction* b;
+	BuildRestriction *b;
 	int n;
 	int i;
 	int w;
@@ -2260,13 +2260,13 @@ int CanBuildOn(int x, int y, int mask)
 **  @return      OnTop, parent unit, builder on true, NULL false.
 **
 */
-CUnit *CanBuildUnitType(const CUnit *unit, const UnitType* type, int x, int y, int real)
+CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real)
 {
 	int w;
 	int h;
 	int j;
 	int testmask;
-	Player* player;
+	Player *player;
 	CUnit *ontop;
 
 	// Terrain Flags don't matter if building on top of a unit.
@@ -2810,7 +2810,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 	CUnit *unit;
 	CUnit *nunit;
 	CUnit *funit; // first possible unit
-	UnitType* type;
+	CUnitType *type;
 	int flag; // flag take next unit
 	int gx;
 	int gy;
@@ -2874,7 +2874,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 */
 void LetUnitDie(CUnit *unit)
 {
-	UnitType* type;
+	CUnitType *type;
 
 	unit->Moving = 0;
 	unit->TTL = 0;
@@ -2996,7 +2996,7 @@ void DestroyAllInside(CUnit *source)
 */
 void HitUnit(CUnit *attacker, CUnit *target, int damage)
 {
-	UnitType* type;
+	CUnitType *type;
 	CUnit *goal;
 	unsigned long lastattack;
 
@@ -3239,7 +3239,7 @@ int MapDistance(int x1, int y1, int x2, int y2)
 **
 **  @return        The distance between in tiles.
 */
-int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y2)
+int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2)
 {
 	int dx;
 	int dy;
@@ -3305,7 +3305,7 @@ int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst)
 **
 **  @return        The distance between the types.
 */
-int MapDistanceBetweenTypes(const UnitType* src, int x1, int y1, const UnitType* dst, int x2, int y2)
+int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1, const CUnitType *dst, int x2, int y2)
 {
 	int dx;
 	int dy;
@@ -3380,7 +3380,7 @@ int ViewPointDistanceToUnit(const CUnit *dest)
 **
 **  @return 0 if attacker can't target the unit, else a positive number.
 */
-int CanTarget(const UnitType* source, const UnitType* dest)
+int CanTarget(const CUnitType *source, const CUnitType *dest)
 {
 	int i;
 

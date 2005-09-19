@@ -96,7 +96,7 @@
 ----------------------------------------------------------------------------*/
 
 struct _player_;
-struct _unit_type_;
+class CUnitType;
 struct _upgrade_;
 
 	/// Dependency rule typedef
@@ -113,7 +113,7 @@ struct _depend_rule_ {
 	unsigned char Count;  /// how many required
 	char          Type;   /// an unit-type or upgrade
 	union {
-		struct _unit_type_* UnitType;  /// unit-type pointer
+		CUnitType *UnitType;  /// unit-type pointer
 		struct _upgrade_*  Upgrade;    /// upgrade pointer
 	} Kind;                  /// required object
 	DependRule* Rule;        /// requirements, and rule

@@ -535,16 +535,16 @@ static void CclParseMove(lua_State* l, CUnit *unit)
 **  @todo  Verify that vision table is always correct (transporter)
 **  @todo (PlaceUnit() and host-info).
 */
-static int CclUnit(lua_State* l)
+static int CclUnit(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	CUnit *unit;
-	UnitType* type;
-	UnitType* seentype;
-	Player* player;
+	CUnitType *type;
+	CUnitType *seentype;
+	Player *player;
 	int slot;
 	int i;
-	const char* s;
+	const char *s;
 	int args;
 	int j;
 
@@ -936,7 +936,7 @@ static int CclMoveUnit(lua_State* l)
 */
 static int CclCreateUnit(lua_State* l)
 {
-	UnitType* unittype;
+	CUnitType *unittype;
 	CUnit *unit;
 	int heading;
 	int playerno;
@@ -1016,7 +1016,7 @@ static int CclSetResourcesHeld(lua_State* l)
 **
 **  OrderUnit(player, unit-type, sloc, dloc, order)
 */
-static int CclOrderUnit(lua_State* l)
+static int CclOrderUnit(lua_State *l)
 {
 	int plynr;
 	int x1;
@@ -1027,7 +1027,7 @@ static int CclOrderUnit(lua_State* l)
 	int dy1;
 	int dx2;
 	int dy2;
-	const UnitType* unittype;
+	const CUnitType *unittype;
 	CUnit *table[UnitMax];
 	CUnit *unit;
 	int an;
@@ -1118,11 +1118,11 @@ static int CclOrderUnit(lua_State* l)
 **
 **  @return   Returns true if a unit was killed.
 */
-static int CclKillUnit(lua_State* l)
+static int CclKillUnit(lua_State *l)
 {
 	int j;
 	int plynr;
-	const UnitType* unittype;
+	const CUnitType *unittype;
 	CUnit *unit;
 	CUnit **table;
 
@@ -1163,7 +1163,7 @@ static int CclKillUnit(lua_State* l)
 **
 **  @return   Returns the number of units killed.
 */
-static int CclKillUnitAt(lua_State* l)
+static int CclKillUnitAt(lua_State *l)
 {
 	int plynr;
 	int q;
@@ -1171,7 +1171,7 @@ static int CclKillUnitAt(lua_State* l)
 	int y1;
 	int x2;
 	int y2;
-	const UnitType* unittype;
+	const CUnitType *unittype;
 	CUnit *table[UnitMax];
 	CUnit *unit;
 	int an;

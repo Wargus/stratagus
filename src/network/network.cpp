@@ -552,7 +552,7 @@ static void FreeNCQ(NetworkCommandQueue *ncq)
 ** Destination and unit-type shares the same network slot.
 */
 void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
-	const CUnit *dest, const UnitType *type, int status)
+	const CUnit *dest, const CUnitType *type, int status)
 {
 	NetworkCommandQueue *ncq;
 	NetworkCommandQueue *check;

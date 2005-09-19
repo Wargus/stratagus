@@ -510,7 +510,7 @@ void PlayerSetResource(Player* player, int resource, int value)
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int PlayerCheckLimits(const Player* player, const UnitType* type)
+int PlayerCheckLimits(const Player *player, const CUnitType *type)
 {
 	//
 	//  Check game limits.
@@ -583,7 +583,7 @@ int PlayerCheckCosts(const Player* player, const int* costs)
 **
 **  @return        False if all enough, otherwise a bit mask.
 */
-int PlayerCheckUnitType(const Player* player, const UnitType* type)
+int PlayerCheckUnitType(const Player *player, const CUnitType *type)
 {
 	return PlayerCheckCosts(player, type->Stats[player->Index].Costs);
 }
@@ -609,7 +609,7 @@ void PlayerAddCosts(Player* player, const int* costs)
 **  @param player  Pointer of player, to which the resources are added.
 **  @param type    Type of unit.
 */
-void PlayerAddUnitType(Player* player, const UnitType* type)
+void PlayerAddUnitType(Player *player, const CUnitType *type)
 {
 	// FIXME: a player could make money by upgrading and than cancel
 	PlayerAddCosts(player, type->Stats[player->Index].Costs);
@@ -652,7 +652,7 @@ void PlayerSubCosts(Player* player, const int* costs)
 **  @param player  Pointer of player, from which the resources are removed.
 **  @param type    Type of unit.
 */
-void PlayerSubUnitType(Player* player, const UnitType* type)
+void PlayerSubUnitType(Player *player, const CUnitType *type)
 {
 	PlayerSubCosts(player, type->Stats[player->Index].Costs);
 }
@@ -681,7 +681,7 @@ void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 **
 **  @return        How many exists, false otherwise.
 */
-int HaveUnitTypeByType(const Player* player, const UnitType* type)
+int HaveUnitTypeByType(const Player *player, const CUnitType *type)
 {
 	return player->UnitTypesCount[type->Slot];
 }

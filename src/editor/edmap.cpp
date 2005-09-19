@@ -659,7 +659,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 	int z;
 	int tw;
 	int th;
-	UnitType* type;
+	CUnitType *type;
 	CUnit *unit;
 
 	mx = TheMap.Info.MapWidth;

@@ -197,7 +197,7 @@ int SpawnPortal::Cast(CUnit *caster, const SpellType* spell,
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal;
-	UnitType* ptype;
+	CUnitType *ptype;
 
 	ptype = this->PortalType;
 
@@ -565,7 +565,7 @@ int Polymorph::Cast(CUnit *caster, const SpellType* spell,
 {
 	int i;
 	int j;
-	UnitType* type;
+	CUnitType *type;
 
 	if (!target) {
 		return 0;
@@ -697,7 +697,7 @@ int Summon::Cast(CUnit *caster, const SpellType* spell,
 	int n;
 	CUnit *table[UnitMax];
 	CUnit *unit;
-	struct _unit_type_* unittype;
+	CUnitType *unittype;
 
 	unittype = this->UnitType;
 	ttl = this->TTL;

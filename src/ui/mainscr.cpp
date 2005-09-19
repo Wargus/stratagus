@@ -617,10 +617,10 @@ static void DrawUnitInfo(CUnit *unit)
 {
 	int i; // iterator on panel. And some other things.
 	int j; // iterator on panel content.
-	ContentType* content;      // content of current panel.
+	ContentType *content;      // content of current panel.
 	int index;  // Index of the Panel.
-	UnitType* type;
-	const UnitStats* stats;
+	CUnitType *type;
+	const UnitStats *stats;
 	int x;
 	int y;
 	CUnit *uins;

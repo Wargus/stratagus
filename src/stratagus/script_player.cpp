@@ -761,7 +761,7 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushnumber(l, p->Resources[i]);
 		return 1;
 	} else if (!strcmp(data, "UnitTypesCount")) {
-		UnitType* type;
+		CUnitType *type;
 
 		LuaCheckArgs(l, 3);
 		type = CclGetUnitType(l);

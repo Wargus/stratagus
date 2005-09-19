@@ -75,7 +75,7 @@ void AiResetUnitTypeEquiv(void)
 **  @param a  the first unittype
 **  @param b  the second unittype
 */
-void AiNewUnitTypeEquiv(UnitType *a, UnitType *b)
+void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b)
 {
 	int find;
 	int replace;
@@ -108,7 +108,7 @@ void AiNewUnitTypeEquiv(UnitType *a, UnitType *b)
 **
 **  @return          the number of unittype found
 */
-int AiFindUnitTypeEquiv(const UnitType *unittype, int *result)
+int AiFindUnitTypeEquiv(const CUnitType *unittype, int *result)
 {
 	int i;
 	int search;
@@ -137,7 +137,7 @@ int AiFindUnitTypeEquiv(const UnitType *unittype, int *result)
 **
 **  @return             the number of unittype found
 */
-int AiFindAvailableUnitTypeEquiv(const UnitType *unittype, int *usableTypes)
+int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 {
 	int usableTypesCount;
 	int i;
@@ -278,7 +278,7 @@ void AiCleanForces(void)
 **
 **  @return       True if it fits, false otherwise.
 */
-static int AiCheckBelongsToForce(int force, const UnitType *type)
+static int AiCheckBelongsToForce(int force, const CUnitType *type)
 {
 	AiUnit *aiunit;
 	AiUnitType *aitype;
@@ -436,9 +436,9 @@ void AiAttackWithForce(int force)
 	// Move the force to a free position so it can be used for a new
 	// attacking party
 	if (force < AI_MAX_FORCES) {
-		AiUnitType* aiut;
-		AiUnitType* temp;
-		AiUnitType** aiut2;
+		AiUnitType *aiut;
+		AiUnitType *temp;
+		AiUnitType **aiut2;
 
 		f = AI_MAX_FORCES;
 		while (AiPlayer->Force[f].Attacking) {

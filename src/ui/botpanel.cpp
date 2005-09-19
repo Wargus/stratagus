@@ -700,7 +700,7 @@ void CButtonPanel::Update(void)
 void CButtonPanel::DoClicked(int button)
 {
 	int i;
-	UnitType *type;
+	CUnitType *type;
 
 	Assert(0 <= button && button < UI.ButtonPanel.NumButtons);
 	// no buttons

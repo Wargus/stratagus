@@ -60,10 +60,10 @@
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-int TransformUnitIntoType(CUnit *unit, UnitType *newtype)
+int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 {
 	Player *player;
-	UnitType *oldtype;
+	CUnitType *oldtype;
 	const UnitStats *newstats;
 	int x;
 	int y;
@@ -161,7 +161,7 @@ void HandleActionTransformInto(CUnit *unit)
 void HandleActionUpgradeTo(CUnit *unit)
 {
 	Player *player;
-	UnitType *newtype;
+	CUnitType *newtype;
 	const UnitStats *newstats;
 
 	Assert(unit);

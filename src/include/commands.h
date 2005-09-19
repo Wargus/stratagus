@@ -50,7 +50,7 @@ typedef enum _replay_type_ {
 } ReplayType;            /// Replay types
 
 class CLFile;
-struct _unit_type_;
+class CUnitType;
 struct _upgrade_;
 
 /*----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ extern void SendCommandUnload(CUnit *unit, int x, int y,
 	CUnit *what, int flush);
 	/// Send build building command
 extern void SendCommandBuildBuilding(CUnit *unit, int x, int y,
-	struct _unit_type_* what, int flush);
+	CUnitType *what, int flush);
 	/// Send cancel building command
 extern void SendCommandDismiss(CUnit *unit);
 	/// Send harvest location command
@@ -130,13 +130,13 @@ extern void SendCommandReturnGoods(CUnit *unit, CUnit *dest,
 	int flush);
 	/// Send train command
 extern void SendCommandTrainUnit(CUnit *unit,
-	struct _unit_type_* what, int flush);
+	CUnitType *what, int flush);
 	/// Send cancel training command
 extern void SendCommandCancelTraining(CUnit *unit, int slot,
-	const struct _unit_type_* type);
+	const CUnitType *type);
 	/// Send upgrade to command
 extern void SendCommandUpgradeTo(CUnit *unit,
-	struct _unit_type_* what, int flush);
+	CUnitType *what, int flush);
 	/// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit *unit);
 	/// Send research command

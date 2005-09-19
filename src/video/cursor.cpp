@@ -89,7 +89,7 @@ int CursorStartScrMapY;
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-UnitType *CursorBuilding;           /// building cursor
+CUnitType *CursorBuilding;           /// building cursor
 
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
