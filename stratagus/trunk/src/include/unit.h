@@ -38,13 +38,11 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _unit_ unit.h
+**  @class CUnit unit.h
 **
 **  \#include "unit.h"
 **
-**  typedef struct _unit_ Unit;
-**
-**  Everything belonging to an unit. FIXME: rearrange for less memory.
+**  Everything belonging to a unit. FIXME: rearrange for less memory.
 **
 **  This structure contains all informations about an unit in game.
 **  An unit could be everything, a man, a vehicle, a ship or a building.
@@ -364,7 +362,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-typedef struct _unit_ Unit;            /// unit itself
+class CUnit;
 struct _unit_type_;
 struct _unit_stats_;
 struct _new_animation;
@@ -430,7 +428,7 @@ typedef struct _order_ {
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
 
-	Unit*     Goal;         /// goal of the order (if any)
+	CUnit    *Goal;         /// goal of the order (if any)
 	int       X;            /// or X tile coordinate of destination
 	int       Y;            /// or Y tile coordinate of destination
 	struct _unit_type_* Type;/// Unit-type argument
@@ -486,32 +484,33 @@ enum _directions_ {
 	/// A linked list element.
 typedef struct _unit_list_item_ UnitListItem;
 struct _unit_list_item_ {
-	struct _unit_* Unit; /// Points to the unit it links
-	UnitListItem* Prev;  /// Previous item.
-	UnitListItem* Next;  /// Next item.
+	CUnit        *Unit;  /// Points to the unit it links
+	UnitListItem *Prev;  /// Previous item.
+	UnitListItem *Next;  /// Next item.
 };
 
 #define NextDirection 32        /// Next direction N->NE->E...
 #define UnitNotSeen 0x7fffffff  /// Unit not seen, used by Unit::SeenFrame
 
 	/// The big unit structure
-struct _unit_ {
+class CUnit {
+public:
 	// @note int is faster than shorts
-	int    Refs;         /// Reference counter
-	int    Slot;         /// Assigned slot number
-	Unit** UnitSlot;     /// Slot pointer of Units
-	Unit** PlayerSlot;   /// Slot pointer of Player->Units
+	int     Refs;         /// Reference counter
+	int     Slot;         /// Assigned slot number
+	CUnit **UnitSlot;     /// Slot pointer of Units
+	CUnit **PlayerSlot;   /// Slot pointer of Player->Units
 
-	Unit*         Next;          /// Generic link pointer (on map)
-	UnitListItem* CacheLinks;    /// Link nodes for unit cache
+	CUnit        *Next;          /// Generic link pointer (on map)
+	UnitListItem *CacheLinks;    /// Link nodes for unit cache
 	unsigned      CacheLock : 1; /// Used to lock unit out of the cache.
 
-	int   InsideCount;   /// Number of units inside.
-	int   BoardCount;    /// Number of units transported inside.
-	Unit* UnitInside;    /// Pointer to one of the units inside.
-	Unit* Container;     /// Pointer to the unit containing it (or 0)
-	Unit* NextContained; /// Next unit in the container.
-	Unit* PrevContained; /// Previous unit in the container.
+	int    InsideCount;   /// Number of units inside.
+	int    BoardCount;    /// Number of units transported inside.
+	CUnit *UnitInside;    /// Pointer to one of the units inside.
+	CUnit *Container;     /// Pointer to the unit containing it (or 0)
+	CUnit *NextContained; /// Next unit in the container.
+	CUnit *PrevContained; /// Previous unit in the container.
 
 	int X; /// Map position X
 	int Y; /// Map position Y
@@ -605,7 +604,7 @@ struct _unit_ {
 		char Path[MAX_PATH_LENGTH]; /// directions of stored path
 	} Move; /// ActionMove,...
 	struct _order_built_ {
-		Unit* Worker;               /// Worker building this unit
+		CUnit *Worker;              /// Worker building this unit
 		int Progress;               /// Progress counter, in 1/100 cycles.
 		int Cancel;                 /// Cancel construction
 		struct _construction_frame_* Frame; /// Construction frame
@@ -634,10 +633,10 @@ struct _unit_ {
 	} Train; /// Train units action
 	} Data; /// Storage room for different commands
 
-	Unit* Goal; /// Generic goal pointer
+	CUnit *Goal; /// Generic goal pointer
 };
 
-#define NoUnitP (Unit*)0         /// return value: for no unit found
+#define NoUnitP (CUnit *)0         /// return value: for no unit found
 #define InfiniteDistance INT_MAX /// the distance is unreachable
 
 #define FlushCommands 1          /// Flush commands in queue
@@ -694,11 +693,11 @@ struct _unit_ {
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern Unit* UnitSlots[MAX_UNIT_SLOTS]; /// All possible units
-extern unsigned int UnitSlotFree;       /// First free unit slot
+extern CUnit *UnitSlots[MAX_UNIT_SLOTS]; /// All possible units
+extern unsigned int UnitSlotFree;        /// First free unit slot
 
-extern Unit* Units[MAX_UNIT_SLOTS]; /// Units used
-extern int NumUnits;                /// Number of units used
+extern CUnit *Units[MAX_UNIT_SLOTS]; /// Units used
+extern int NumUnits;                 /// Number of units used
 
 // in unit_draw.c
 /// @todo could be moved into the user interface ?
@@ -712,17 +711,17 @@ extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled
 extern const Viewport* CurrentViewport; /// CurrentViewport
-extern void DrawUnitSelection(const Unit*);
+extern void DrawUnitSelection(const CUnit *);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
 extern int MaxSelectable;                  /// How many units could be selected
 
-extern Unit** Selected;                    /// currently selected units
-extern Unit** TeamSelected[PlayerMax];     /// teams currently selected units
-extern int    NumSelected;                 /// how many units selected
-extern int    TeamNumSelected[PlayerMax];  /// Number of Units a team member has selected
+extern CUnit **Selected;                    /// currently selected units
+extern CUnit **TeamSelected[PlayerMax];     /// teams currently selected units
+extern int     NumSelected;                 /// how many units selected
+extern int     TeamNumSelected[PlayerMax];  /// Number of Units a team member has selected
 
-extern Unit* ReleasedHead;                 /// Head of the released unit list.
-extern Unit* ReleasedTail;                 /// Tail of the released unit list.
+extern CUnit *ReleasedHead;                 /// Head of the released unit list.
+extern CUnit *ReleasedTail;                 /// Tail of the released unit list.
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -731,133 +730,133 @@ extern Unit* ReleasedTail;                 /// Tail of the released unit list.
 	/// Prepare unit memory allocator
 extern void InitUnitsMemory(void);
 	/// Increase an unit's reference count
-extern void RefsIncrease(Unit* unit);
+extern void RefsIncrease(CUnit *unit);
 	/// Decrease an unit's reference count
-extern void RefsDecrease(Unit* unit);
+extern void RefsDecrease(CUnit *unit);
 	///  Mark the field with the FieldFlags.
-void MarkUnitFieldFlags(const Unit* unit);
+void MarkUnitFieldFlags(const CUnit *unit);
 	///  Unmark the field with the FieldFlags.
-void UnmarkUnitFieldFlags(const Unit* unit);
+void UnmarkUnitFieldFlags(const CUnit *unit);
 	/// Update unit->CurrentSightRange.
-void UpdateUnitSightRange(Unit* unit);
+void UpdateUnitSightRange(CUnit *unit);
 	/// Release an unit
-extern void ReleaseUnit(Unit* unit);
+extern void ReleaseUnit(CUnit *unit);
 	/// Initialize unit structure with default values
-extern void InitUnit(Unit* unit, struct _unit_type_* type);
+extern void InitUnit(CUnit *unit, struct _unit_type_ *type);
 	/// Assign unit to player
-extern void AssignUnitToPlayer(Unit* unit, Player* player);
+extern void AssignUnitToPlayer(CUnit *unit, Player *player);
 	/// Create a new unit
-extern Unit* MakeUnit(struct _unit_type_* type,Player* player);
+extern CUnit *MakeUnit(struct _unit_type_* type, Player *player);
 	/// Place an unit on map
-extern void PlaceUnit(Unit* unit, int x, int y);
+extern void PlaceUnit(CUnit *unit, int x, int y);
 	/// Create a new unit and place on map
-extern Unit* MakeUnitAndPlace(int x, int y, struct _unit_type_* type,Player* player);
+extern CUnit *MakeUnitAndPlace(int x, int y, struct _unit_type_ *type, Player *player);
 	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
-extern void MoveUnitToXY(Unit* unit, int x, int y);
+extern void MoveUnitToXY(CUnit *unit, int x, int y);
 	/// Add an unit inside a container. Only deal with list stuff.
-extern void AddUnitInContainer(Unit* unit, Unit* host);
+extern void AddUnitInContainer(CUnit *unit, CUnit *host);
 	/// Remove unit from map/groups/...
-extern void RemoveUnit(Unit* unit, Unit* host);
+extern void RemoveUnit(CUnit *unit, CUnit *host);
 	/// Handle the loose of an unit (food,...)
-extern void UnitLost(Unit* unit);
+extern void UnitLost(CUnit *unit);
 	/// Remove the Orders of a Unit
-extern void UnitClearOrders(Unit* unit);
+extern void UnitClearOrders(CUnit *unit);
 	/// @todo more docu
-extern void UpdateForNewUnit(const Unit* unit, int upgrade);
+extern void UpdateForNewUnit(const CUnit *unit, int upgrade);
 	/// @todo more docu
-extern void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy);
+extern void NearestOfUnit(const CUnit *unit, int tx, int ty, int *dx, int *dy);
 
 	/// Call when an Unit goes under fog.
-extern void UnitGoesUnderFog(Unit* unit, const Player* player);
+extern void UnitGoesUnderFog(CUnit *unit, const Player *player);
 	/// Call when an Unit goes out of fog.
-extern void UnitGoesOutOfFog(Unit* unit, const Player* player);
+extern void UnitGoesOutOfFog(CUnit *unit, const Player *player);
 	/// Marks an unit as seen
-extern void UnitsOnTileMarkSeen(const Player* player, int x, int y, int p);
+extern void UnitsOnTileMarkSeen(const Player *player, int x, int y, int p);
 	/// Unmarks an unit as seen
-extern void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int p);
+extern void UnitsOnTileUnmarkSeen(const Player *player, int x, int y, int p);
 	/// Does a recount for VisCount
-extern void UnitCountSeen(Unit* unit);
+extern void UnitCountSeen(CUnit *unit);
 
 	/// Returns true, if unit is directly seen by an allied unit.
-extern int UnitVisible(const Unit* unit, const Player* player);
+extern int UnitVisible(const CUnit *unit, const Player *player);
 	/// Returns true, if unit is visible as a goal.
-extern int UnitVisibleAsGoal(const Unit* unit, const Player* player);
+extern int UnitVisibleAsGoal(const CUnit *unit, const Player *player);
 	/// Returns true, if unit is Visible for game logic on the map.
-extern int UnitVisibleOnMap(const Unit* unit, const Player* player);
+extern int UnitVisibleOnMap(const CUnit *unit, const Player *player);
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
-extern int UnitVisibleOnMinimap(const Unit* unit);
+extern int UnitVisibleOnMinimap(const CUnit *unit);
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
-extern int UnitVisibleInViewport(const Unit* unit, const Viewport* vp);
+extern int UnitVisibleInViewport(const CUnit *unit, const Viewport *vp);
 
 	/// @todo more docu
-extern void GetUnitMapArea(const Unit* unit, int *sx, int *sy,
+extern void GetUnitMapArea(const CUnit *unit, int *sx, int *sy,
 	int *ex, int *ey);
 	/// Check for rescue each second
 extern void RescueUnits(void);
 	/// Change owner of unit
-extern void ChangeUnitOwner(Unit* unit, Player* newplayer);
+extern void ChangeUnitOwner(CUnit *unit, Player *newplayer);
 
 	/// Convert direction (dx,dy) to heading (0-255)
 extern int DirectionToHeading(int, int);
 	/// Update frame from heading
-extern void UnitUpdateHeading(Unit* unit);
+extern void UnitUpdateHeading(CUnit *unit);
 	/// Heading and frame from delta direction x,y
-extern void UnitHeadingFromDeltaXY(Unit* unit, int x, int y);
+extern void UnitHeadingFromDeltaXY(CUnit *unit, int x, int y);
 
 	/// @todo more docu
-extern void DropOutOnSide(Unit* unit, int heading, int addx, int addy);
+extern void DropOutOnSide(CUnit *unit, int heading, int addx, int addy);
 	/// @todo more docu
-extern void DropOutNearest(Unit* unit, int x, int y, int addx, int addy);
+extern void DropOutNearest(CUnit *unit, int x, int y, int addx, int addy);
 	/// Drop out all units in the unit
-extern void DropOutAll(const Unit* unit);
+extern void DropOutAll(const CUnit *unit);
 
 	/// Return the rule used to build this building.
-extern struct _building_restrictions_* OnTopDetails(const Unit* unit, const struct _unit_type_* parent);
+extern struct _building_restrictions_ *OnTopDetails(const CUnit *unit, const struct _unit_type_ *parent);
 	/// @todo more docu
-extern Unit* CanBuildHere(const Unit* unit, const struct _unit_type_* type, int x, int y);
+extern CUnit *CanBuildHere(const CUnit *unit, const struct _unit_type_ *type, int x, int y);
 	/// @todo more docu
 extern int CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
-extern Unit* CanBuildUnitType(const Unit* unit,const struct _unit_type_* type, int x, int y, int real);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const struct _unit_type_ *type, int x, int y, int real);
 
 	/// Find resource
-extern Unit* UnitFindResource(const Unit* unit, int x, int y, int range, int resource);
+extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource);
 	/// Find nearest deposit
-extern Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource);
+extern CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource);
 	/// Find the next idle worker
-extern Unit* FindIdleWorker(const Player* player,const Unit* last);
+extern CUnit *FindIdleWorker(const Player *player, const CUnit *last);
 
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-		const Player *player, int x, int y, int* px, int* py);
+		const Player *player, int x, int y, int *px, int *py);
 	/// Find the nearest piece of wood in sight range
-extern int FindWoodInSight(const Unit* unit, int* x, int* y);
+extern int FindWoodInSight(const CUnit *unit, int *x, int *y);
 
 	/// @todo more docu
-extern Unit* UnitOnScreen(Unit* unit, int x, int y);
+extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
 
 	/// Let an unit die
-extern void LetUnitDie(Unit* unit);
+extern void LetUnitDie(CUnit *unit);
 	/// Destory all units inside another unit
-extern void DestroyAllInside(Unit* source);
+extern void DestroyAllInside(CUnit *source);
 	/// Hit unit with damage, if destroyed give attacker the points
-extern void HitUnit(Unit* attacker, Unit* target, int damage);
+extern void HitUnit(CUnit *attacker, CUnit *target, int damage);
 
 	/// Returns the map distance between two points
 extern int MapDistance(int x1, int y1, int x2, int y2);
 	/// Returns the map distance between two points with unit-type
-extern int MapDistanceToType(int x1, int y1,const struct _unit_type_* type, int x2, int y2);
+extern int MapDistanceToType(int x1, int y1, const struct _unit_type_ *type, int x2, int y2);
 	/// Returns the map distance to unit
-extern int MapDistanceToUnit(int x, int y,const Unit* dest);
+extern int MapDistanceToUnit(int x, int y, const CUnit *dest);
 	/// Returns the map diestance between to unittype as locations
-extern int MapDistanceBetweenTypes(const struct _unit_type_* src, int x1, int y1, const struct _unit_type_* dst, int x2, int y2);
+extern int MapDistanceBetweenTypes(const struct _unit_type_ *src, int x1, int y1, const struct _unit_type_ *dst, int x2, int y2);
 	/// Returns the map distance between two units
-extern int MapDistanceBetweenUnits(const Unit* src,const Unit* dst);
+extern int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst);
 
 	/// Calculate the distance from current view point to coordinate
 extern int ViewPointDistance(int x, int y);
 	/// Calculate the distance from current view point to unit
-extern int ViewPointDistanceToUnit(const Unit* dest);
+extern int ViewPointDistanceToUnit(const CUnit *dest);
 
 	/// Return true, if unit is an enemy of the player
 #define IsEnemy(player, dest) \
@@ -870,19 +869,19 @@ extern int ViewPointDistanceToUnit(const Unit* dest);
 	(((player)->SharedVision & (1 << (dest)->Player->Index)) && \
 		((dest)->Player->SharedVision & (1 << (player)->Player)))
 	/// Can this unit-type attack the other (destination)
-extern int CanTarget(const struct _unit_type_* type, const struct _unit_type_* dest);
+extern int CanTarget(const struct _unit_type_ *type, const struct _unit_type_ *dest);
 	/// Can transporter transport the other unit
-extern int CanTransport(const Unit* transporter, const Unit* unit);
+extern int CanTransport(const CUnit *transporter, const CUnit *unit);
 
 	/// Check if unit can move.
-extern int CanMove(const Unit*);
+extern int CanMove(const CUnit *);
 
 	/// Generate a unit reference, a printable unique string for unit
-extern char* UnitReference(const Unit*);
+extern char *UnitReference(const CUnit *);
 	/// Save an order
-extern void SaveOrder(const Order* order, CLFile *file);
+extern void SaveOrder(const Order *order, CLFile *file);
 	/// save unit-structure
-extern void SaveUnit(const Unit* unit, CLFile *file);
+extern void SaveUnit(const CUnit *unit, CLFile *file);
 	/// save all units
 extern void SaveUnits(CLFile *file);
 
@@ -893,13 +892,13 @@ extern void CleanUnits(void);
 
 // in unitcache.c
 	/// Insert new unit into cache
-extern void UnitCacheInsert(Unit* unit);
+extern void UnitCacheInsert(CUnit *unit);
 	/// Remove unit from cache
-extern void UnitCacheRemove(Unit* unit);
+extern void UnitCacheRemove(CUnit *unit);
 	/// Select units in range
-extern int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table);
+extern int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table);
 	/// Select units on tile
-extern int UnitCacheOnTile(int x, int y, Unit** table);
+extern int UnitCacheOnTile(int x, int y, CUnit **table);
 	/// Initialize unit-cache
 extern void InitUnitCache(void);
 
@@ -926,38 +925,38 @@ extern void LoadDecorations(void);
 extern void CleanDecorations(void);
 
 	/// Draw unit's shadow
-extern void DrawShadow(const Unit* unit, const struct _unit_type_* type,
+extern void DrawShadow(const CUnit *unit, const struct _unit_type_ *type,
 	int frame, int x, int y);
 	/// Draw A single Unit
-extern void DrawUnit(const Unit* unit);
+extern void DrawUnit(const CUnit *unit);
 	/// Draw all units visible on map in viewport
-extern int FindAndSortUnits(const Viewport* vp, Unit** table);
+extern int FindAndSortUnits(const Viewport *vp, CUnit **table);
 	/// Show an unit's orders.
-extern void ShowOrder(const Unit* unit);
+extern void ShowOrder(const CUnit *unit);
 
 // in unit_find.c
 	/// Select unit on X,Y of type naval,fly,land
-extern Unit* UnitCacheOnXY(int x, int y, unsigned type);
+extern CUnit *UnitCacheOnXY(int x, int y, unsigned type);
 	/// Find all units of this type
-extern int FindUnitsByType(const struct _unit_type_* type, Unit** table);
+extern int FindUnitsByType(const struct _unit_type_ *type, CUnit **table);
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const Player*, const struct _unit_type_*, Unit**);
+extern int FindPlayerUnitsByType(const Player *, const struct _unit_type_ *, CUnit **);
 	/// Return any unit on that map tile
-extern Unit* UnitOnMapTile(int tx, int ty);
+extern CUnit *UnitOnMapTile(int tx, int ty);
 	/// Return possible attack target on that map area
-extern Unit* TargetOnMap(const Unit* unit, int x1, int y1, int x2, int y2);
+extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
-extern Unit* ResourceOnMap(int tx, int ty, int resource);
+extern CUnit *ResourceOnMap(int tx, int ty, int resource);
 	/// Return resource deposit, if on map tile
-extern Unit* ResourceDepositOnMap(int tx, int ty, int resource);
+extern CUnit *ResourceDepositOnMap(int tx, int ty, int resource);
 
 	/// Find best enemy in numeric range to attack
-extern Unit* AttackUnitsInDistance(const Unit* unit, int range);
+extern CUnit *AttackUnitsInDistance(const CUnit *unit, int range);
 	/// Find best enemy in attack range to attack
-extern Unit* AttackUnitsInRange(const Unit* unit);
+extern CUnit *AttackUnitsInRange(const CUnit *unit);
 	/// Find best enemy in reaction range to attack
-extern Unit* AttackUnitsInReactRange(const Unit* unit);
+extern CUnit *AttackUnitsInReactRange(const CUnit *unit);
 
 // in groups.c
 
@@ -972,16 +971,16 @@ extern void CleanGroups(void);
 	/// Get the number of units in a particular group
 extern int GetNumberUnitsOfGroup(int num);
 	/// Get the array of units of a particular group
-extern Unit** GetUnitsOfGroup(int num);
+extern CUnit **GetUnitsOfGroup(int num);
 
 	/// Remove all units from a group
 extern void ClearGroup(int num);
 	/// Add the array of units to the group
-extern void AddToGroup(Unit** units, int nunits, int num);
+extern void AddToGroup(CUnit **units, int nunits, int num);
 	/// Set the contents of a particular group with an array of units
-extern void SetGroup(Unit** units, int nunits, int num);
+extern void SetGroup(CUnit **units, int nunits, int num);
 	/// Remove a unit from a group
-extern void RemoveUnitFromGroups(Unit* unit);
+extern void RemoveUnitFromGroups(CUnit *unit);
 	/// Register CCL group features
 extern void GroupCclRegister(void);
 
@@ -997,27 +996,27 @@ extern void RestoreSelection(void);
 	/// Clear current selection
 extern void UnSelectAll(void);
 	/// Select group as selection
-extern void ChangeSelectedUnits(Unit** units, int num_units);
+extern void ChangeSelectedUnits(CUnit **units, int num_units);
 	/// Changed TeamUnit Selection
-extern void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count);
+extern void ChangeTeamSelectedUnits(Player *player, CUnit **units, int adjust, int count);
 	/// Add a unit to selection
-extern int SelectUnit(Unit* unit);
+extern int SelectUnit(CUnit *unit);
 	/// Select one unit as selection
-extern void SelectSingleUnit(Unit* unit);
+extern void SelectSingleUnit(CUnit *unit);
 	/// Remove a unit from selection
-extern void UnSelectUnit(Unit* unit);
+extern void UnSelectUnit(CUnit *unit);
 	/// Add a unit to selected if not already selected, remove it otherwise
-extern int ToggleSelectUnit(Unit* unit);
+extern int ToggleSelectUnit(CUnit *unit);
 	/// Select units from the same type (if selectable by rectangle)
-extern int SelectUnitsByType(Unit* base);
+extern int SelectUnitsByType(CUnit *base);
 	/// Toggle units from the same type (if selectable by rectangle)
-extern int ToggleUnitsByType(Unit* base);
+extern int ToggleUnitsByType(CUnit *base);
 	/// Select the units belonging to a particular group
 extern int SelectGroup(int group_number);
 	/// Add the units from the same group as the one in parameter
-extern int AddGroupFromUnitToSelection(Unit* unit);
+extern int AddGroupFromUnitToSelection(CUnit *unit);
 	/// Select the units from the same group as the one in parameter
-extern int SelectGroupFromUnit(Unit* unit);
+extern int SelectGroupFromUnit(CUnit *unit);
 	/// Select the units in the selection rectangle
 extern int SelectUnitsInRectangle(int tx, int ty, int w, int h);
 	/// Select ground units in the selection rectangle
@@ -1043,7 +1042,7 @@ extern void SelectionCclRegister(void);
 // in ccl_unit.c
 
 	/// Parse order
-extern void CclParseOrder(struct lua_State* l, Order* order);
+extern void CclParseOrder(struct lua_State *l, Order *order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
 

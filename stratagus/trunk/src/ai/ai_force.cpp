@@ -64,9 +64,7 @@ int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 */
 void AiResetUnitTypeEquiv(void)
 {
-	int i;
-
-	for (i = 0; i <= UnitTypeMax; ++i) {
+	for (int i = 0; i <= UnitTypeMax; ++i) {
 		UnitTypeEquivs[i] = i;
 	}
 }
@@ -77,7 +75,7 @@ void AiResetUnitTypeEquiv(void)
 **  @param a  the first unittype
 **  @param b  the second unittype
 */
-void AiNewUnitTypeEquiv(UnitType* a, UnitType* b)
+void AiNewUnitTypeEquiv(UnitType *a, UnitType *b)
 {
 	int find;
 	int replace;
@@ -110,7 +108,7 @@ void AiNewUnitTypeEquiv(UnitType* a, UnitType* b)
 **
 **  @return          the number of unittype found
 */
-int AiFindUnitTypeEquiv(const UnitType* unittype, int* result)
+int AiFindUnitTypeEquiv(const UnitType *unittype, int *result)
 {
 	int i;
 	int search;
@@ -139,7 +137,7 @@ int AiFindUnitTypeEquiv(const UnitType* unittype, int* result)
 **
 **  @return             the number of unittype found
 */
-int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTypes)
+int AiFindAvailableUnitTypeEquiv(const UnitType *unittype, int *usableTypes)
 {
 	int usableTypesCount;
 	int i;
@@ -193,9 +191,9 @@ int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTypes)
 */
 static void AiCleanForce(int force)
 {
-	AiUnit** prev;
-	AiUnit* aiunit;
-	const AiUnitType* aitype;
+	AiUnit **prev;
+	AiUnit *aiunit;
+	const AiUnitType *aitype;
 	int counter[UnitTypeMax + 1];
 
 	//
@@ -264,12 +262,10 @@ static void AiCleanForce(int force)
 */
 void AiCleanForces(void)
 {
-	int force;
-
 	//
 	// Release all killed units.
 	//
-	for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
+	for (int force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
 		AiCleanForce(force);
 	}
 }
@@ -282,10 +278,10 @@ void AiCleanForces(void)
 **
 **  @return       True if it fits, false otherwise.
 */
-static int AiCheckBelongsToForce(int force, const UnitType* type)
+static int AiCheckBelongsToForce(int force, const UnitType *type)
 {
-	AiUnit* aiunit;
-	AiUnitType* aitype;
+	AiUnit *aiunit;
+	AiUnitType *aitype;
 	int counter[UnitTypeMax + 1];
 	int flag;
 
@@ -326,14 +322,12 @@ static int AiCheckBelongsToForce(int force, const UnitType* type)
 **
 **  @param unit  Unit to assign to force.
 */
-void AiAssignToForce(Unit* unit)
+void AiAssignToForce(CUnit *unit)
 {
-	int force;
-
 	//
 	// Check to which force it belongs
 	//
-	for (force = 0; force < AI_MAX_FORCES; ++force) {
+	for (int force = 0; force < AI_MAX_FORCES; ++force) {
 		// No troops for attacking force
 		if (!AiPlayer->Force[force].Defending &&
 				AiPlayer->Force[force].Attacking) {
@@ -358,9 +352,9 @@ void AiAssignToForce(Unit* unit)
 */
 void AiAssignFreeUnitsToForce(void)
 {
-	const AiUnit* aiunit;
-	Unit* table[UnitMax];
-	Unit* unit;
+	const AiUnit *aiunit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int n;
 	int f;
 	int i;
@@ -405,7 +399,7 @@ void AiAssignFreeUnitsToForce(void)
 */
 void AiAttackWithForceAt(int force, int x, int y)
 {
-	const AiUnit* aiunit;
+	const AiUnit *aiunit;
 
 	AiCleanForce(force);
 
@@ -433,8 +427,8 @@ void AiAttackWithForceAt(int force, int x, int y)
 */
 void AiAttackWithForce(int force)
 {
-	const AiUnit* aiunit;
-	const Unit* enemy;
+	const AiUnit *aiunit;
+	const CUnit *enemy;
 	int x;
 	int y;
 	int f;
@@ -527,12 +521,12 @@ void AiAttackWithForce(int force)
 **
 ** @param force Force pointer.
 */
-static void AiForceAttacks(AiForce* force)
+static void AiForceAttacks(AiForce *force)
 {
-	const AiUnit* aiunit;
+	const AiUnit *aiunit;
 	int x;
 	int y;
-	const Unit* unit;
+	const CUnit *unit;
 
 	if (!(aiunit = force->Units)) {
 		force->Attacking = 0;
@@ -609,14 +603,12 @@ static void AiForceAttacks(AiForce* force)
 */
 void AiForceManager(void)
 {
-	int force;
-
 	//
 	//  Look if our defenders still have enemies in range.
 	//
-	for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
+	for (int force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
 		if (AiPlayer->Force[force].Defending) {
-			const AiUnit* aiunit;
+			const AiUnit *aiunit;
 
 			AiCleanForce(force);
 			//

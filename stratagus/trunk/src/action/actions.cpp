@@ -72,7 +72,7 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 **  @param unit    Unit to rotate
 **  @param rotate  Number of frames to rotate (>0 clockwise, <0 counterclockwise)
 */
-static void UnitRotate(Unit* unit, int rotate)
+static void UnitRotate(CUnit *unit, int rotate)
 {
 	unit->Direction += rotate * 256 / unit->Type->NumDirections;
 	UnitUpdateHeading(unit);
@@ -86,7 +86,7 @@ static void UnitRotate(Unit* unit, int rotate)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowAnimation(Unit* unit, const Animation* anim) 
+int UnitShowAnimation(CUnit *unit, const Animation *anim) 
 {
 	return UnitShowAnimationScaled(unit, anim, 8);
 }
@@ -100,7 +100,7 @@ int UnitShowAnimation(Unit* unit, const Animation* anim)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowAnimationScaled(Unit* unit, const Animation* anim, int scale)
+int UnitShowAnimationScaled(CUnit *unit, const Animation *anim, int scale)
 {
 	int move;
 
@@ -244,7 +244,7 @@ int UnitShowAnimationScaled(Unit* unit, const Animation* anim, int scale)
 **
 **  @param unit  Unit pointer for none action.
 */
-static void HandleActionNone(Unit* unit)
+static void HandleActionNone(CUnit *unit)
 {
 	DebugPrint("FIXME: Should not happen!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
@@ -256,7 +256,7 @@ static void HandleActionNone(Unit* unit)
 **
 **  @param unit  Unit pointer for not written action.
 */
-static void HandleActionNotWritten(Unit* unit)
+static void HandleActionNotWritten(CUnit *unit)
 {
 	DebugPrint("FIXME: Not written!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
@@ -268,7 +268,7 @@ static void HandleActionNotWritten(Unit* unit)
 **
 **  @note can move function into unit structure.
 */
-static void (*HandleActionTable[256])(Unit*) = {
+static void (*HandleActionTable[256])(CUnit *) = {
 	HandleActionNone,
 	HandleActionStill,
 	HandleActionStandGround,
@@ -378,7 +378,7 @@ static void (*HandleActionTable[256])(Unit*) = {
 **
 **  @param unit  the unit to operate on
 */
-static void HandleRegenerations(Unit* unit)
+static void HandleRegenerations(CUnit *unit)
 {
 	int f;
 
@@ -406,7 +406,7 @@ static void HandleRegenerations(Unit* unit)
 **  @param unit    The unit that the decay is handled for
 **  @param amount  The amount of time to make up for.(in cycles)
 */
-static void HandleBuffs(Unit* unit, int amount)
+static void HandleBuffs(CUnit *unit, int amount)
 {
 	int deadunit;
 	int i;        // iterator for variables.
@@ -454,7 +454,7 @@ static void HandleBuffs(Unit* unit, int amount)
 **
 **  @param unit  Pointer to handled unit.
 */
-static void HandleUnitAction(Unit* unit)
+static void HandleUnitAction(CUnit *unit)
 {
 	int z;
 
@@ -536,8 +536,8 @@ static void HandleUnitAction(Unit* unit)
 */
 void UnitActions(void)
 {
-	Unit* table[UnitMax];
-	Unit* unit;
+	CUnit *table[UnitMax];
+	CUnit *unit;
 	int blinkthiscycle;
 	int buffsthiscycle;
 	int regenthiscycle;
@@ -547,7 +547,7 @@ void UnitActions(void)
 	buffsthiscycle = regenthiscycle = blinkthiscycle =
 		!(GameCycle % CYCLES_PER_SECOND);
 
-	memcpy(table, Units, NumUnits * sizeof(Unit*));
+	memcpy(table, Units, NumUnits * sizeof(CUnit *));
 	tabsize = NumUnits;
 
 	//

@@ -439,7 +439,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 /**
 **  Draw an unit on the minimap.
 */
-static void DrawUnitOn(Unit *unit, int red_phase)
+static void DrawUnitOn(CUnit *unit, int red_phase)
 {
 	UnitType *type;
 	int mx;

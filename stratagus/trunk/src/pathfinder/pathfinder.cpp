@@ -72,9 +72,9 @@
 **  88:     Marks the possible goal fields.
 **  98:     Marks map border, for faster limits checks.
 */
-unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];  /// Path matrix
+unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
 #ifndef MAP_REGIONS
-static unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
+static unsigned int LocalMatrix[MaxMapWidth * MaxMapHeight];
 #endif
 
 /*----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ static unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
 **    98          98
 **    98 98 98 98 98
 */
-static void InitMatrix(unsigned char* matrix)
+static void InitMatrix(unsigned char *matrix)
 {
 	unsigned i;
 	unsigned w;
@@ -128,7 +128,7 @@ static void InitLocalMatrix(void)
 /**
 **  Create empty movement matrix.
 */
-unsigned char* CreateMatrix(void)
+unsigned char *CreateMatrix(void)
 {
 	InitMatrix(Matrix);
 	return Matrix;
@@ -137,11 +137,11 @@ unsigned char* CreateMatrix(void)
 /**
 **  Allocate a new matrix and initialize
 */
-unsigned char* MakeMatrix(void)
+unsigned char *MakeMatrix(void)
 {
-	unsigned char* matrix;
+	unsigned char *matrix;
 
-	matrix = (unsigned char*)malloc((TheMap.Info.MapWidth + 2) * (TheMap.Info.MapHeight + 3) + 2);
+	matrix = (unsigned char *)malloc((TheMap.Info.MapWidth + 2) * (TheMap.Info.MapHeight + 3) + 2);
 	InitMatrix(matrix);
 
 	return matrix;
@@ -160,7 +160,7 @@ unsigned char* MakeMatrix(void)
 **
 **  @returns        depth, -1 unreachable
 */
-static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned int* matrix)
+static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned int *matrix)
 {
 	int cx[4];
 	int cy[4];
@@ -282,7 +282,7 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 **  @param matrix   Matrix for calculation.
 **
 */
-static void FillMatrix(const Unit* unit, unsigned int* matrix)
+static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 {
 	struct p {
 		unsigned short X;
@@ -301,7 +301,7 @@ static void FillMatrix(const Unit* unit, unsigned int* matrix)
 	int j;
 	int depth;
 	int size;
-	unsigned int* m;
+	unsigned int *m;
 
 	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight) * sizeof(*points);
 	points = (struct p*)malloc(size);
@@ -389,7 +389,7 @@ static void FillMatrix(const Unit* unit, unsigned int* matrix)
 **
 **  @return         Distance to place.
 */
-int PlaceReachable(const Unit* src, int x, int y, int w, int h, int minrange, int range)
+int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, int range)
 {
 	int depth;
 	static unsigned long LastGameCycle;
@@ -428,14 +428,14 @@ int PlaceReachable(const Unit* src, int x, int y, int w, int h, int minrange, in
 **
 **  @return  Distance to place.
 */
-int UnitReachable(const Unit* src, const Unit* dst, int range)
+int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 {
 	int depth;
 
 	//
 	//  Find a path to the goal.
 	//
-	depth=PlaceReachable(src, dst->X, dst->Y, dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
+	depth = PlaceReachable(src, dst->X, dst->Y, dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
 	if (depth <= 0) {
 		return 0;
 	}
@@ -460,7 +460,7 @@ int UnitReachable(const Unit* src, const Unit* dst, int range)
 **  @return         >0 remaining path length, 0 wait for path, -1
 **                  reached goal, -2 can't reach the goal.
 */
-int NewPath(Unit* unit)
+int NewPath(CUnit *unit)
 {
 	int i;
 	int gw;
@@ -469,7 +469,7 @@ int NewPath(Unit* unit)
 	int gy;
 	int minrange;
 	int maxrange;
-	char* path;
+	char *path;
 
 	if (unit->Orders[0].Goal) {
 		gw = unit->Orders[0].Goal->Type->TileWidth;

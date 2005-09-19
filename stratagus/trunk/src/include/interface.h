@@ -43,7 +43,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 struct _event_callback_;
 
 /*----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ enum _button_cmd_ {
 
 	/// typedef for action of button
 typedef struct _button_action_ ButtonAction;
-typedef int (*ButtonCheckFunc)(const struct _unit_*, const ButtonAction*);
+typedef int (*ButtonCheckFunc)(const CUnit *, const ButtonAction *);
 
 	/// Action of button
 struct _button_action_ {
@@ -251,7 +251,7 @@ extern int MouseScrollState;
 	/// current key state
 extern enum _key_state_ KeyState;
 	/// pointer to unit under the cursor
-extern struct _unit_* UnitUnderCursor;
+extern CUnit *UnitUnderCursor;
 	/// button area under the cursor
 extern int ButtonAreaUnderCursor;
 	/// button number under the cursor
@@ -397,43 +397,43 @@ extern int HandleMouseScrollArea(int x, int y);
 // in button_checks.c
 //
 	/// Check is always true
-extern int ButtonCheckTrue(const struct _unit_* unit,
+extern int ButtonCheckTrue(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check is always false
-extern int ButtonCheckFalse(const struct _unit_* unit,
+extern int ButtonCheckFalse(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if allowed upgrade is ready
-extern int ButtonCheckUpgrade(const struct _unit_* unit,
+extern int ButtonCheckUpgrade(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if allowed units exists
-extern int ButtonCheckUnitsOr(const struct _unit_* unit,
+extern int ButtonCheckUnitsOr(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if allowed units exists
-extern int ButtonCheckUnitsAnd(const struct _unit_* unit,
+extern int ButtonCheckUnitsAnd(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if have network play
-extern int ButtonCheckNetwork(const struct _unit_* unit,
+extern int ButtonCheckNetwork(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if don't have network play
-extern int ButtonCheckNoNetwork(const struct _unit_* unit,
+extern int ButtonCheckNoNetwork(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if unit isn't working (train,upgrade,research)
-extern int ButtonCheckNoWork(const struct _unit_* unit,
+extern int ButtonCheckNoWork(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if unit isn't researching or upgrading
-extern int ButtonCheckNoResearch(const struct _unit_* unit,
+extern int ButtonCheckNoResearch(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if all requirements for an attack to are meet
-extern int ButtonCheckAttack(const struct _unit_* unit,
+extern int ButtonCheckAttack(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if all requirements for an upgrade to are meet
-extern int ButtonCheckUpgradeTo(const struct _unit_* unit,
+extern int ButtonCheckUpgradeTo(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if all requirements for a research are meet
-extern int ButtonCheckResearch(const struct _unit_* unit,
+extern int ButtonCheckResearch(const CUnit *unit,
 	const ButtonAction* button);
 	/// Check if all requirements for a single research are meet
-extern int ButtonCheckSingleResearch(const struct _unit_* unit,
+extern int ButtonCheckSingleResearch(const CUnit *unit,
 	const ButtonAction* button);
 
 //

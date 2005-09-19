@@ -58,7 +58,7 @@
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-static int MoveToTransporter(Unit* unit)
+static int MoveToTransporter(CUnit *unit)
 {
 	int i;
 	int x;
@@ -84,9 +84,9 @@ static int MoveToTransporter(Unit* unit)
 **
 **  @return      True if ship arrived/present, False otherwise.
 */
-static int WaitForTransporter(Unit* unit)
+static int WaitForTransporter(CUnit *unit)
 {
-	Unit* trans;
+	CUnit *trans;
 
 	if (unit->Wait) {
 		unit->Wait--;
@@ -136,9 +136,9 @@ static int WaitForTransporter(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-static void EnterTransporter(Unit* unit)
+static void EnterTransporter(CUnit *unit)
 {
-	Unit* transporter;
+	CUnit *transporter;
 
 	unit->Orders[0].Action = UnitActionStill;
 	unit->SubAction = 0;
@@ -184,10 +184,10 @@ static void EnterTransporter(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionBoard(Unit* unit)
+void HandleActionBoard(CUnit *unit)
 {
 	int i;
-	Unit* goal;
+	CUnit *goal;
 
 	switch (unit->SubAction) {
 		//

@@ -52,7 +52,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_;
+class CUnit;
 struct _button_action_;
 class CLFile;
 
@@ -171,7 +171,7 @@ struct _viewport_ {
 	int MapWidth;               /// Width in map tiles
 	int MapHeight;              /// Height in map tiles
 
-	struct _unit_* Unit;        /// Bound to this unit
+	CUnit *Unit;                /// Bound to this unit
 };
 
 /**
@@ -215,8 +215,7 @@ typedef struct {
 
 
 struct _content_type_;
-struct _unit_;
-typedef void FDrawData(const struct _unit_* unit, struct _content_type_* content, int defaultfont);
+typedef void FDrawData(const CUnit *unit, struct _content_type_ *content, int defaultfont);
 
 /**
 **  Infos to display the contents of panel.

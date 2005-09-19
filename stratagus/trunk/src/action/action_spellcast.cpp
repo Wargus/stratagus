@@ -68,7 +68,7 @@
 **
 **  @param unit  Unit, for that spell cast/attack animation is played.
 */
-void AnimateActionSpellCast(Unit* unit)
+void AnimateActionSpellCast(CUnit *unit)
 {
 	int flags;
 
@@ -90,10 +90,10 @@ void AnimateActionSpellCast(Unit* unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-static void SpellMoveToTarget(Unit* unit)
+static void SpellMoveToTarget(CUnit *unit)
 {
 	SpellType* spell;
-	Unit* goal;
+	CUnit *goal;
 	int err;
 
 	// Unit can't move
@@ -159,10 +159,10 @@ static void SpellMoveToTarget(Unit* unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-void HandleActionSpellCast(Unit* unit)
+void HandleActionSpellCast(CUnit *unit)
 {
 	int flags;
-	const SpellType* spell;
+	const SpellType *spell;
 
 	switch (unit->SubAction) {
 		case 0:

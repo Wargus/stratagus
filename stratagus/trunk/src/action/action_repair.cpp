@@ -60,9 +60,9 @@
 **  @param unit  unit repairing
 **  @param goal  unit being repaired
 */
-static void RepairUnit(Unit* unit, Unit* goal)
+static void RepairUnit(CUnit *unit, CUnit *goal)
 {
-	Player* player;
+	Player *player;
 	int i;
 	int animlength;
 	int hp;
@@ -134,7 +134,7 @@ static void RepairUnit(Unit* unit, Unit* goal)
 **
 **  @param unit  Unit, for that the repair animation is played.
 */
-static int AnimateActionRepair(Unit* unit)
+static int AnimateActionRepair(CUnit *unit)
 {
 	UnitShowAnimation(unit, unit->Type->Animations->Repair);
 	return 0;
@@ -145,9 +145,9 @@ static int AnimateActionRepair(Unit* unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-void HandleActionRepair(Unit* unit)
+void HandleActionRepair(CUnit *unit)
 {
-	Unit* goal;
+	CUnit *goal;
 	int err;
 
 	switch (unit->SubAction) {

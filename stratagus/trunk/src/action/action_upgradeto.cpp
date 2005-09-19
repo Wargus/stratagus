@@ -60,15 +60,15 @@
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-int TransformUnitIntoType(Unit* unit, UnitType* newtype)
+int TransformUnitIntoType(CUnit *unit, UnitType *newtype)
 {
-	Player* player;
-	UnitType* oldtype;
-	const UnitStats* newstats;
+	Player *player;
+	UnitType *oldtype;
+	const UnitStats *newstats;
 	int x;
 	int y;
 	int i;
-	Unit* container;
+	CUnit *container;
 
 	Assert(unit);
 	Assert(newtype);
@@ -146,7 +146,7 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionTransformInto(Unit* unit)
+void HandleActionTransformInto(CUnit *unit)
 {
 	// What to do if an error occurs ?
 	TransformUnitIntoType(unit, unit->CriticalOrder.Type);
@@ -158,11 +158,11 @@ void HandleActionTransformInto(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-void HandleActionUpgradeTo(Unit* unit)
+void HandleActionUpgradeTo(CUnit *unit)
 {
-	Player* player;
-	UnitType* newtype;
-	const UnitStats* newstats;
+	Player *player;
+	UnitType *newtype;
+	const UnitStats *newstats;
 
 	Assert(unit);
 

@@ -59,13 +59,13 @@
 int NumSelected;                 /// Number of selected units
 int TeamNumSelected[PlayerMax];  /// How many units selected
 int MaxSelectable;               /// Maximum number of selected units
-Unit** Selected;                 /// All selected units
-Unit** TeamSelected[PlayerMax];  /// teams currently selected units
+CUnit **Selected;                 /// All selected units
+CUnit **TeamSelected[PlayerMax];  /// teams currently selected units
 
 static int _NumSelected;                 /// save of NumSelected
 static int _TeamNumSelected[PlayerMax];  /// save of TeamNumSelected
-static Unit** _Selected;                 /// save of Selected
-static Unit** _TeamSelected[PlayerMax];  /// save of TeamSelected
+static CUnit **_Selected;                 /// save of Selected
+static CUnit **_TeamSelected[PlayerMax];  /// save of TeamSelected
 
 static unsigned GroupId;         /// Unique group # for automatic groups
 
@@ -121,7 +121,7 @@ void RestoreSelection(void)
 */
 void UnSelectAll(void)
 {
-	Unit* unit;
+	CUnit *unit;
 
 	while (!++GroupId) { // Advance group id, but keep non zero
 	}
@@ -139,7 +139,7 @@ void UnSelectAll(void)
 **
 **  @param unit  suicide unit.
 */
-static void HandleSuicideClick(Unit* unit)
+static void HandleSuicideClick(CUnit *unit)
 {
 	static int NumClicks = 0;
 
@@ -166,9 +166,9 @@ static void HandleSuicideClick(Unit* unit)
 **  @param units  Array of units to be selected.
 **  @param count  Number of units in array to be selected.
 */
-void ChangeSelectedUnits(Unit** units,int count)
+void ChangeSelectedUnits(CUnit **units,int count)
 {
-	Unit* unit;
+	CUnit *unit;
 	int i;
 	int n;
 
@@ -204,11 +204,11 @@ void ChangeSelectedUnits(Unit** units,int count)
 **  @param adjust  0 = reset, 1 = remove units, 2 = add units
 **  @param count   the number of units to be adjusted
 */
-void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count)
+void ChangeTeamSelectedUnits(Player *player, CUnit **units, int adjust, int count)
 {
 	int i;
 	int n;
-	Unit* unit;
+	CUnit *unit;
 
 	switch (adjust) {
 		case 0:
@@ -254,7 +254,7 @@ void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count
 **               (if NumSelected == MaxSelectable or
 **                unit is already selected or unselectable)
 */
-int SelectUnit(Unit* unit)
+int SelectUnit(CUnit *unit)
 {
 	if (unit->Type->Revealer) { // Revealers cannot be selected
 		DebugPrint("Selecting revealer?\n");
@@ -291,7 +291,7 @@ int SelectUnit(Unit* unit)
 **
 **  @param unit  Pointer to unit to be selected.
 */
-void SelectSingleUnit(Unit* unit)
+void SelectSingleUnit(CUnit *unit)
 {
 	ChangeSelectedUnits(&unit, 1);
 }
@@ -301,7 +301,7 @@ void SelectSingleUnit(Unit* unit)
 **
 **  @param unit  Pointer to unit to be unselected.
 */
-void UnSelectUnit(Unit* unit)
+void UnSelectUnit(CUnit *unit)
 {
 	int i;
 	int j;
@@ -353,7 +353,7 @@ void UnSelectUnit(Unit* unit)
 **  @param unit  Pointer to unit to be toggled.
 **  @return      0 if unselected, 1 otherwise
 */
-int ToggleSelectUnit(Unit* unit)
+int ToggleSelectUnit(CUnit *unit)
 {
 	if (unit->Selected) {
 		UnSelectUnit(unit);
@@ -377,14 +377,14 @@ int ToggleSelectUnit(Unit* unit)
 **
 **  FIXME: should always select the nearest 9 units to the base!
 */
-int SelectUnitsByType(Unit* base)
+int SelectUnitsByType(CUnit *base)
 {
-	Unit* unit;
-	Unit* table[UnitMax];
-	const UnitType* type;
+	CUnit *unit;
+	CUnit *table[UnitMax];
+	const UnitType *type;
 	int r;
 	int i;
-	const Viewport* vp;
+	const Viewport *vp;
 
 	Assert(UI.MouseViewport);
 
@@ -475,11 +475,11 @@ int SelectUnitsByType(Unit* base)
 **  FIXME: toggle not written
 **  FIXME: should always select the nearest 9 units to the base!
 */
-int ToggleUnitsByType(Unit* base)
+int ToggleUnitsByType(CUnit *base)
 {
-	Unit* unit;
-	Unit* table[UnitMax];
-	const UnitType* type;
+	CUnit *unit;
+	CUnit *table[UnitMax];
+	const UnitType *type;
 	int r;
 	int i;
 
@@ -566,7 +566,7 @@ int SelectGroup(int group_number)
 **  @return      0 if the unit doesn't belong to a group,
 **               or the number of units in the group.
 */
-int AddGroupFromUnitToSelection(Unit* unit)
+int AddGroupFromUnitToSelection(CUnit *unit)
 {
 	int i;
 	int group;
@@ -596,7 +596,7 @@ int AddGroupFromUnitToSelection(Unit* unit)
 **  @return      0 if the unit doesn't belong to a group,
 **               or the number of units in the group.
 */
-int SelectGroupFromUnit(Unit* unit)
+int SelectGroupFromUnit(CUnit *unit)
 {
 	if (!unit->LastGroup) { // belongs to no group
 		return 0;
@@ -616,9 +616,9 @@ int SelectGroupFromUnit(Unit* unit)
 **
 **  @return           the number of units found.
 */
-static int SelectOrganicUnitsInTable(Unit** table, int num_units)
+static int SelectOrganicUnitsInTable(CUnit **table, int num_units)
 {
-	Unit* unit;
+	CUnit *unit;
 	int n;
 	int i;
 
@@ -657,7 +657,7 @@ static int SelectOrganicUnitsInTable(Unit** table, int num_units)
 **  @return           number of units found
 */
 static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
-	Unit** table, int num_units)
+	CUnit **table, int num_units)
 {
 	int n;
 	int i;
@@ -665,8 +665,8 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 	for (i = n = 0; i < num_units; ++i) {
 		int sprite_x;
 		int sprite_y;
-		Unit* unit;
-		const UnitType* type;
+		CUnit *unit;
+		const UnitType *type;
 
 		unit = table[i];
 		type = unit->Type;
@@ -703,7 +703,7 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 */
 int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 {
-	Unit* table[UnitMax];
+	CUnit *table[UnitMax];
 	int toggle_num;
 	int n;
 	int i;
@@ -762,9 +762,9 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 */
 int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 {
-	Unit* unit;
-	Unit* table[UnitMax];
-	UnitType* type;
+	CUnit *unit;
+	CUnit *table[UnitMax];
+	UnitType *type;
 	int r;
 	int n;
 	int i;
@@ -858,8 +858,8 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 */
 int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	Unit* unit;
-	Unit* table[UnitMax];
+	CUnit *unit;
+	CUnit *table[UnitMax];
 	int r;
 	int n;
 	int i;
@@ -913,8 +913,8 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	Unit* unit;
-	Unit* table[UnitMax];
+	CUnit *unit;
+	CUnit *table[UnitMax];
 	int r;
 	int n;
 	int i;
@@ -968,8 +968,8 @@ int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	Unit* unit;
-	Unit* table[UnitMax];
+	CUnit *unit;
+	CUnit *table[UnitMax];
 	int r;
 	int n;
 	int i;
@@ -1042,8 +1042,8 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
-	Unit* unit;
-	Unit* table[UnitMax];
+	CUnit *unit;
+	CUnit *table[UnitMax];
 	int r;
 	int n;
 	int i;
@@ -1113,13 +1113,13 @@ void InitSelections(void)
 
 	// This could have been initialized already when loading a game
 	if (!Selected) {
-		Selected = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
-		_Selected = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
+		Selected = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
+		_Selected = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		if (!TeamSelected[i]) {
-			TeamSelected[i] = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
-			_TeamSelected[i] = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
+			TeamSelected[i] = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
+			_TeamSelected[i] = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
 		}
 	}
 }
@@ -1129,10 +1129,10 @@ void InitSelections(void)
 **
 **  @param file  Output file.
 */
-void SaveSelections(CLFile* file)
+void SaveSelections(CLFile *file)
 {
 	int i;
-	char* ref;
+	char *ref;
 
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: selection $Id$\n\n");
@@ -1178,7 +1178,7 @@ void CleanSelections(void)
 **
 **  @param l  Lua state.
 */
-static int CclSetGroupId(lua_State* l)
+static int CclSetGroupId(lua_State *l)
 {
 	int old;
 
@@ -1195,7 +1195,7 @@ static int CclSetGroupId(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSelection(lua_State* l)
+static int CclSelection(lua_State *l)
 {
 	int i;
 	int args;

@@ -60,9 +60,9 @@
 **
 **  @param unit  Pointer of researching unit.
 */
-void HandleActionResearch(Unit* unit)
+void HandleActionResearch(CUnit *unit)
 {
-	const Upgrade* upgrade;
+	const Upgrade *upgrade;
 
 	if (!unit->SubAction) { // first entry
 		upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1.Upgrade;

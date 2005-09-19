@@ -59,9 +59,9 @@
 **
 **  @param l  Lua state.
 */
-static int CclStratagusMap(lua_State* l)
+static int CclStratagusMap(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 	int subargs;
@@ -234,7 +234,7 @@ static int CclStratagusMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclRevealMap(lua_State* l)
+static int CclRevealMap(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	if (CclInConfigFile) {
@@ -251,7 +251,7 @@ static int CclRevealMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclCenterMap(lua_State* l)
+static int CclCenterMap(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	ViewportCenterViewpoint(UI.SelectedViewport,
@@ -265,7 +265,7 @@ static int CclCenterMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetStartView(lua_State* l)
+static int CclSetStartView(lua_State *l)
 {
 	int p;
 
@@ -282,10 +282,10 @@ static int CclSetStartView(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclShowMapLocation(lua_State* l)
+static int CclShowMapLocation(lua_State *l)
 {
-	Unit* target;
-	const char* unitname;
+	CUnit *target;
+	const char *unitname;
 
 	// Put a unit on map, use its properties, except for
 	// what is listed below
@@ -313,7 +313,7 @@ static int CclShowMapLocation(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetDefaultMap(lua_State* l)
+static int CclSetDefaultMap(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	strncpy(DefaultMap, LuaToString(l, 1), sizeof(DefaultMap) - 1);
@@ -325,7 +325,7 @@ static int CclSetDefaultMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetFogOfWar(lua_State* l)
+static int CclSetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	TheMap.NoFogOfWar = !LuaToBoolean(l, 1);
@@ -340,7 +340,7 @@ static int CclSetFogOfWar(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetMinimapTerrain(lua_State* l)
+static int CclSetMinimapTerrain(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UI.Minimap.WithTerrain = LuaToBoolean(l, 1);
@@ -352,7 +352,7 @@ static int CclSetMinimapTerrain(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetFogOfWarOpacity(lua_State* l)
+static int CclSetFogOfWarOpacity(lua_State *l)
 {
 	int i;
 
@@ -379,7 +379,7 @@ static int CclSetFogOfWarOpacity(lua_State* l)
 **
 **  @return   Old speed
 */
-static int CclSetForestRegeneration(lua_State* l)
+static int CclSetForestRegeneration(lua_State *l)
 {
 	int i;
 	int old;
@@ -407,9 +407,9 @@ static int CclSetForestRegeneration(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetFogOfWarGraphics(lua_State* l)
+static int CclSetFogOfWarGraphics(lua_State *l)
 {
-	const char* FogGraphicFile;
+	const char *FogGraphicFile;
 
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
@@ -426,7 +426,7 @@ static int CclSetFogOfWarGraphics(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetTile(lua_State* l)
+static int CclSetTile(lua_State *l)
 {
 	int tile;
 	int w;
@@ -452,9 +452,9 @@ static int CclSetTile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefinePlayerTypes(lua_State* l)
+static int CclDefinePlayerTypes(lua_State *l)
 {
-	const char* type;
+	const char *type;
 	int numplayers;
 	int i;
 
@@ -494,7 +494,7 @@ static int CclDefinePlayerTypes(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclLoadTileModels(lua_State* l)
+static int CclLoadTileModels(lua_State *l)
 {
 	char buf[1024];
 

@@ -173,7 +173,7 @@
 class Graphic;
 struct _player_;
 class CLFile;
-struct _unit_;
+class CUnit;
 struct _unit_type_;
 struct _unit_list_item_;
 
@@ -350,7 +350,7 @@ extern void FreeVisionTable(void);
 //
 
 	/// Check if a unit is visible on radar
-extern unsigned char UnitVisibleOnRadar(const struct _player_* pradar, const struct _unit_* punit);
+extern unsigned char UnitVisibleOnRadar(const struct _player_* pradar, const CUnit *punit);
 	/// Check if a tile is visible on radar
 extern unsigned char IsTileRadarVisible(const struct _player_* pradar, const struct _player_* punit, int x, int y);
 	/// Mark a tile as radar visible, or incrase radar vision
@@ -430,7 +430,7 @@ extern int CheckedCanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
 extern int UnitTypeCanBeAt(const struct _unit_type_* type, int x, int y);
 	/// Returns true, if the unit can enter the field
-extern int UnitCanBeAt(const struct _unit_* unit, int x, int y);
+extern int UnitCanBeAt(const CUnit *unit, int x, int y);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
@@ -452,9 +452,9 @@ extern void RegenerateForest(void);
 // in unit.c
 
 /// Mark on vision table the Sight of the unit.
-void MapMarkUnitSight(struct _unit_* unit);
+void MapMarkUnitSight(CUnit *unit);
 /// Unmark on vision table the Sight of the unit.
-void MapUnmarkUnitSight(struct _unit_* unit);
+void MapUnmarkUnitSight(CUnit *unit);
 
 /*----------------------------------------------------------------------------
 --  Defines

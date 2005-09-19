@@ -50,7 +50,6 @@ typedef enum _replay_type_ {
 } ReplayType;            /// Replay types
 
 class CLFile;
-struct _unit_;
 struct _unit_type_;
 struct _upgrade_;
 
@@ -66,8 +65,8 @@ extern ReplayType ReplayGameType;  /// Replay game type
 ----------------------------------------------------------------------------*/
 
 	/// Log commands into file
-void CommandLog(const char* action, const struct _unit_* unit, int flush,
-	int x, int y, const struct _unit_* dest, const char* value, int num);
+void CommandLog(const char* action, const CUnit *unit, int flush,
+	int x, int y, const CUnit * dest, const char* value, int num);
 	/// Replay user commands from log each cycle, single player games
 extern void SinglePlayerReplayEachCycle(void);
 	/// Replay user commands from log each cycle, multiplayer games
@@ -88,68 +87,68 @@ extern void SaveReplayList(CLFile *file);
 */
 
 	/// Send stop command
-extern void SendCommandStopUnit(struct _unit_* unit);
+extern void SendCommandStopUnit(CUnit *unit);
 	/// Send stand ground command
-extern void SendCommandStandGround(struct _unit_* unit, int flush);
+extern void SendCommandStandGround(CUnit *unit, int flush);
 	/// Send follow command
-extern void SendCommandFollow(struct _unit_* unit, struct _unit_* dest,
+extern void SendCommandFollow(CUnit *unit, CUnit *dest,
 	int flush);
 	/// Send move command
-extern void SendCommandMove(struct _unit_* unit, int x, int y, int flush);
+extern void SendCommandMove(CUnit *unit, int x, int y, int flush);
 	/// Send repair command
-extern void SendCommandRepair(struct _unit_* unit, int x, int y,
-	struct _unit_* dest, int flush);
+extern void SendCommandRepair(CUnit *unit, int x, int y,
+	CUnit *dest, int flush);
 	/// Send auto repair command
-extern void SendCommandAutoRepair(struct _unit_* unit, int on);
+extern void SendCommandAutoRepair(CUnit *unit, int on);
 	/// Send attack command
-extern void SendCommandAttack(struct _unit_* unit, int x, int y,
-	struct _unit_* dest, int flush);
+extern void SendCommandAttack(CUnit *unit, int x, int y,
+	CUnit *dest, int flush);
 	/// Send attack ground command
-extern void SendCommandAttackGround(struct _unit_* unit, int x, int y,
+extern void SendCommandAttackGround(CUnit *unit, int x, int y,
 	int flush);
 	/// Send patrol command
-extern void SendCommandPatrol(struct _unit_* unit, int x, int y, int flush);
+extern void SendCommandPatrol(CUnit *unit, int x, int y, int flush);
 	/// Send board command
-extern void SendCommandBoard(struct _unit_* unit, int x, int y,
-	struct _unit_* dest, int flush);
+extern void SendCommandBoard(CUnit *unit, int x, int y,
+	CUnit *dest, int flush);
 	/// Send unload command
-extern void SendCommandUnload(struct _unit_* unit, int x, int y,
-	struct _unit_* what, int flush);
+extern void SendCommandUnload(CUnit *unit, int x, int y,
+	CUnit *what, int flush);
 	/// Send build building command
-extern void SendCommandBuildBuilding(struct _unit_* unit, int x, int y,
+extern void SendCommandBuildBuilding(CUnit *unit, int x, int y,
 	struct _unit_type_* what, int flush);
 	/// Send cancel building command
-extern void SendCommandDismiss(struct _unit_* unit);
+extern void SendCommandDismiss(CUnit *unit);
 	/// Send harvest location command
-extern void SendCommandResourceLoc(struct _unit_* unit, int x, int y,
+extern void SendCommandResourceLoc(CUnit *unit, int x, int y,
 	int flush);
 	/// Send harvest command
-extern void SendCommandResource(struct _unit_* unit, struct _unit_* dest,
+extern void SendCommandResource(CUnit *unit, CUnit *dest,
 	int flush);
 	/// Send return goods command
-extern void SendCommandReturnGoods(struct _unit_* unit, struct _unit_* dest,
+extern void SendCommandReturnGoods(CUnit *unit, CUnit *dest,
 	int flush);
 	/// Send train command
-extern void SendCommandTrainUnit(struct _unit_* unit,
+extern void SendCommandTrainUnit(CUnit *unit,
 	struct _unit_type_* what, int flush);
 	/// Send cancel training command
-extern void SendCommandCancelTraining(struct _unit_* unit, int slot,
+extern void SendCommandCancelTraining(CUnit *unit, int slot,
 	const struct _unit_type_* type);
 	/// Send upgrade to command
-extern void SendCommandUpgradeTo(struct _unit_* unit,
+extern void SendCommandUpgradeTo(CUnit *unit,
 	struct _unit_type_* what, int flush);
 	/// Send cancel upgrade to command
-extern void SendCommandCancelUpgradeTo(struct _unit_* unit);
+extern void SendCommandCancelUpgradeTo(CUnit *unit);
 	/// Send research command
-extern void SendCommandResearch(struct _unit_* unit, struct _upgrade_* what,
+extern void SendCommandResearch(CUnit *unit, struct _upgrade_* what,
 	int flush);
 	/// Send cancel research command
-extern void SendCommandCancelResearch(struct _unit_* unit);
+extern void SendCommandCancelResearch(CUnit *unit);
 	/// Send spell cast command
-extern void SendCommandSpellCast(struct _unit_* unit, int x, int y,
-	struct _unit_* dest, int spellid, int flush);
+extern void SendCommandSpellCast(CUnit *unit, int x, int y,
+	CUnit *dest, int spellid, int flush);
 	/// Send auto spell cast command
-extern void SendCommandAutoSpellCast(struct _unit_* unit, int spellid,
+extern void SendCommandAutoSpellCast(CUnit *unit, int spellid,
 	int on);
 	/// Send diplomacy command
 extern void SendCommandDiplomacy(int player, int state, int opponent);

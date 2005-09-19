@@ -52,9 +52,9 @@
 **  Defines a group of units.
 */
 typedef struct _unit_group_ {
-	Unit** Units;                       /// Units in the group
-	int    NumUnits;                    /// How many units in the group
-} UnitGroup;                            /// group of units
+	CUnit **Units;                       /// Units in the group
+	int     NumUnits;                    /// How many units in the group
+} UnitGroup;                             /// group of units
 
 UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 
@@ -69,11 +69,9 @@ UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 */
 void InitGroups(void)
 {
-	int i;
-
-	for (i = 0; i < NUM_GROUPS; ++i) {
+	for (int i = 0; i < NUM_GROUPS; ++i) {
 		if (!Groups[i].Units) {
-			Groups[i].Units = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
+			Groups[i].Units = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
 		}
 	}
 }
@@ -83,11 +81,11 @@ void InitGroups(void)
 **
 **  @param file  Output file.
 */
-void SaveGroups(CLFile* file)
+void SaveGroups(CLFile *file)
 {
 	int i;
 	int g;
-	char* ref;
+	char *ref;
 
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: groups $Id$\n\n");
@@ -108,9 +106,7 @@ void SaveGroups(CLFile* file)
 */
 void CleanGroups(void)
 {
-	int i;
-
-	for (i = 0; i < NUM_GROUPS; ++i) {
+	for (int i = 0; i < NUM_GROUPS; ++i) {
 		if (Groups[i].Units) {
 			free(Groups[i].Units);
 		}
@@ -137,7 +133,7 @@ int GetNumberUnitsOfGroup(int num)
 **
 **  @return     Returns an array of all units in the group.
 */
-Unit** GetUnitsOfGroup(int num)
+CUnit **GetUnitsOfGroup(int num)
 {
 	return Groups[num].Units;
 }
@@ -149,7 +145,7 @@ Unit** GetUnitsOfGroup(int num)
 */
 void ClearGroup(int num)
 {
-	UnitGroup* group;
+	UnitGroup *group;
 	int i;
 
 	group = &Groups[num];
@@ -167,9 +163,9 @@ void ClearGroup(int num)
 **  @param nunits  Number of units in array.
 **  @param num     Group number for storage.
 */
-void AddToGroup(Unit** units, int nunits, int num)
+void AddToGroup(CUnit **units, int nunits, int num)
 {
-	UnitGroup* group;
+	UnitGroup *group;
 	int i;
 
 	Assert(num <= NUM_GROUPS);
@@ -201,7 +197,7 @@ void AddToGroup(Unit** units, int nunits, int num)
 **  @param nunits  Number of units in array.
 **  @param num     Group number for storage.
 */
-void SetGroup(Unit** units, int nunits, int num)
+void SetGroup(CUnit **units, int nunits, int num)
 {
 	Assert(num <= NUM_GROUPS && nunits <= MaxSelectable);
 
@@ -214,9 +210,9 @@ void SetGroup(Unit** units, int nunits, int num)
 **
 **  @param unit  Unit to remove from group.
 */
-void RemoveUnitFromGroups(Unit* unit)
+void RemoveUnitFromGroups(CUnit *unit)
 {
-	UnitGroup* group;
+	UnitGroup *group;
 	int num;
 	int i;
 
@@ -249,10 +245,10 @@ void RemoveUnitFromGroups(Unit* unit)
 **
 **  @param l  Lua state.
 */
-static int CclGroup(lua_State* l)
+static int CclGroup(lua_State *l)
 {
 	int i;
-	UnitGroup* grp;
+	UnitGroup *grp;
 	int args;
 	int j;
 

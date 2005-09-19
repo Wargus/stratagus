@@ -49,7 +49,7 @@
 **
 **  @param unit  Action handled for this unit pointer.
 */
-void HandleActionStandGround(Unit* unit)
+void HandleActionStandGround(CUnit *unit)
 {
 	ActionStillGeneric(unit, 1);
 }

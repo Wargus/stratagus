@@ -65,9 +65,9 @@
 **
 **  @todo FIXME : find the better unit (most damaged, ...).
 */
-static Unit* UnitToRepairInRange(Unit* unit, int range)
+static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 {
-	Unit* table[UnitMax]; // all unit in range.
+	CUnit *table[UnitMax]; // all unit in range.
 	int n;                // number of unit in range.
 	int i;                // iterator on unit.
 
@@ -92,11 +92,11 @@ static Unit* UnitToRepairInRange(Unit* unit, int range)
 **  @param unit    Unit pointer for action.
 **  @param ground  Flag: true if unit is standing ground.
 */
-void ActionStillGeneric(Unit* unit, int ground)
+void ActionStillGeneric(CUnit *unit, int ground)
 {
-	const UnitType* type;
-	Unit* temp;
-	Unit* goal;
+	const UnitType *type;
+	CUnit *temp;
+	CUnit *goal;
 	int i;
 
 	Assert(unit->Orders[0].Action == UnitActionStill ||
@@ -198,7 +198,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 
 	// Auto Repair
 	if (unit->AutoRepair && type->Variable[AUTOREPAIRRANGE_INDEX].Value) {
-		Unit* repairedUnit; // Unit to repare
+		CUnit* repairedUnit; // Unit to repare
 
 		repairedUnit = UnitToRepairInRange(unit, type->Variable[AUTOREPAIRRANGE_INDEX].Value);
 		if (repairedUnit != NULL) {
@@ -276,7 +276,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 **
 **  @param unit  Unit pointer for still action.
 */
-void HandleActionStill(Unit* unit)
+void HandleActionStill(CUnit *unit)
 {
 	ActionStillGeneric(unit, 0);
 }

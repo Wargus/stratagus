@@ -103,7 +103,7 @@ GameSound GameSounds
 **  @param volume       FIXME: docu
 **  @param stereo       FIXME: docu
 */
-static void InsertSoundRequest(const Unit* unit, unsigned id,
+static void InsertSoundRequest(const CUnit *unit, unsigned id,
 	unsigned short power, SoundId sound,
 	unsigned char selection, unsigned char volume, char stereo)
 {
@@ -143,7 +143,7 @@ static void InsertSoundRequest(const Unit* unit, unsigned id,
 **
 **  @todo FIXME: The work completed sounds only supports two races.
 */
-static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
+static SoundId ChooseUnitVoiceSoundId(const CUnit *unit, UnitVoiceGroup voice)
 {
 	switch (voice) {
 		case VoiceAcknowledging:
@@ -173,7 +173,7 @@ static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 /**
 **  Calculate the stereo value for a unit
 */
-static char CalculateStereo(const Unit* unit)
+static char CalculateStereo(const CUnit *unit)
 {
 	int stereo;
 
@@ -197,7 +197,7 @@ static char CalculateStereo(const Unit* unit)
 **  @param unit   Sound initiator, unit speaking
 **  @param voice  Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
+void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 {
 	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
 		ChooseUnitVoiceSoundId(unit, voice),
@@ -212,7 +212,7 @@ void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 **  @param unit  Sound initiator, unit speaking
 **  @param id    Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSoundId(const Unit* unit, SoundId id)
+void PlayUnitSoundId(const CUnit *unit, SoundId id)
 {
 	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
 		id, 0, 0, CalculateStereo(unit));
@@ -224,7 +224,7 @@ void PlayUnitSoundId(const Unit* unit, SoundId id)
 **  @param missile  Sound initiator, missile exploding
 **  @param sound    Sound to be generated
 */
-void PlayMissileSound(const Missile* missile, SoundId sound)
+void PlayMissileSound(const Missile *missile, SoundId sound)
 {
 	int stereo;
 

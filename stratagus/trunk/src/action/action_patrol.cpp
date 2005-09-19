@@ -58,9 +58,9 @@
 **
 **  @param unit  Patroling unit pointer.
 */
-void HandleActionPatrol(Unit* unit)
+void HandleActionPatrol(CUnit *unit)
 {
-	const Unit* goal;
+	const CUnit *goal;
 
 	if (!unit->SubAction) { // first entry.
 		NewResetPath(unit);

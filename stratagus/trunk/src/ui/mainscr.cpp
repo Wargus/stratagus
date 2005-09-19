@@ -113,7 +113,7 @@ void DrawMenuButtonArea(void)
 **  @param x     Screen X postion of icon
 **  @param y     Screen Y postion of icon
 */
-static void UiDrawLifeBar(const Unit* unit, int x, int y)
+static void UiDrawLifeBar(const CUnit *unit, int x, int y)
 {
 	int f;
 	Uint32 color;
@@ -146,7 +146,7 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 **  @param x     Screen X postion of icon
 **  @param y     Screen Y postion of icon
 */
-static void UiDrawManaBar(const Unit* unit, int x, int y)
+static void UiDrawManaBar(const CUnit *unit, int x, int y)
 {
 	int f;
 
@@ -170,7 +170,7 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 **
 **  @return            0 if we can't show the content, else 1.
 */
-static int CanShowContent(const ConditionPanel* condition, const Unit* unit)
+static int CanShowContent(const ConditionPanel* condition, const CUnit *unit)
 {
 	int i; // iterator on variables and flags.
 
@@ -224,7 +224,7 @@ typedef struct {
 **
 **  @return       Value corresponding
 */
-UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t)
+UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 {
 	UStrInt val;    // result.
 	VariableType* var;
@@ -293,7 +293,7 @@ UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t)
 **
 **  @return      The desired unit.
 */
-const Unit* GetUnitRef(const Unit* unit, EnumUnit e)
+const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 {
 	Assert(unit);
 	switch (e) {
@@ -325,7 +325,7 @@ const Unit* GetUnitRef(const Unit* unit, EnumUnit e)
 **  @param content      extra data.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
+void DrawSimpleText(const CUnit *unit, ContentType* content, int defaultfont)
 {
 	char* text;             // Optional text to display.
 	int font;               // Font to use.
@@ -406,7 +406,7 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
+void DrawFormattedText(const CUnit *unit, ContentType* content, int defaultfont)
 {
 	const char* text;
 	int font;
@@ -448,7 +448,7 @@ void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-void DrawFormattedText2(const Unit* unit, ContentType* content, int defaultfont)
+void DrawFormattedText2(const CUnit *unit, ContentType* content, int defaultfont)
 {
 	const char* text;
 	int font;
@@ -495,7 +495,7 @@ void DrawFormattedText2(const Unit* unit, ContentType* content, int defaultfont)
 **  @param content      extra data.
 **  @param defaultfont  unused.
 */
-void DrawPanelIcon(const Unit* unit, ContentType* content, int defaultfont)
+void DrawPanelIcon(const CUnit *unit, ContentType* content, int defaultfont)
 {
 	int x;
 	int y;
@@ -520,7 +520,7 @@ void DrawPanelIcon(const Unit* unit, ContentType* content, int defaultfont)
 **
 **  @todo Color and percent value Parametrisation.
 */
-void DrawLifeBar(const Unit* unit, ContentType* content, int defaultfont)
+void DrawLifeBar(const CUnit *unit, ContentType* content, int defaultfont)
 {
 	int x;         // X coordinate of the bar.
 	int y;         // Y coordinate of the bar.
@@ -565,7 +565,7 @@ void DrawLifeBar(const Unit* unit, ContentType* content, int defaultfont)
 **
 **  @todo Color and percent value Parametrisation.
 */
-void DrawCompleteBar(const Unit* unit, ContentType* content, int defaultfont)
+void DrawCompleteBar(const CUnit *unit, ContentType* content, int defaultfont)
 {
 	int x;         // X coordinate of the bar.
 	int y;         // Y coordinate of the bar.
@@ -613,7 +613,7 @@ void DrawCompleteBar(const Unit* unit, ContentType* content, int defaultfont)
 **
 **  @param unit  Pointer to unit.
 */
-static void DrawUnitInfo(Unit* unit)
+static void DrawUnitInfo(CUnit *unit)
 {
 	int i; // iterator on panel. And some other things.
 	int j; // iterator on panel content.
@@ -623,7 +623,7 @@ static void DrawUnitInfo(Unit* unit)
 	const UnitStats* stats;
 	int x;
 	int y;
-	Unit* uins;
+	CUnit *uins;
 
 	Assert(unit);
 	UpdateUnitVariables(unit);

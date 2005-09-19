@@ -159,10 +159,10 @@
 
 int AiSleepCycles; /// Ai sleeps # cycles
 
-AiType* AiTypes; /// List of all AI types.
+AiType *AiTypes; /// List of all AI types.
 AiHelper AiHelpers; /// AI helper variables
 
-PlayerAi* AiPlayer; /// Current AI player
+PlayerAi *AiPlayer; /// Current AI player
 
 /*----------------------------------------------------------------------------
 -- Lowlevel functions
@@ -173,7 +173,7 @@ PlayerAi* AiPlayer; /// Current AI player
 */
 static void AiExecuteScript(void)
 {
-	PlayerAi* pai;
+	PlayerAi *pai;
 
 	pai = AiPlayer;
 	if (pai->Script) {
@@ -193,8 +193,8 @@ static void AiCheckUnits(void)
 {
 	int counter[UnitTypeMax];
 	int attacking[UnitTypeMax];
-	const AiBuildQueue* queue;
-	const int* unit_types_count;
+	const AiBuildQueue *queue;
+	const int *unit_types_count;
 	int i;
 	int j;
 	int n;
@@ -336,8 +336,8 @@ static void AiCheckUnits(void)
 **  @param n        Number of elements in table
 **  @param table    unit-type table.
 */
-static void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n,
-	AiUnitTypeTable* const* table)
+static void SaveAiHelperTable(CLFile *file, const char *name, int upgrade, int n,
+	AiUnitTypeTable *const *table)
 {
 	int t;
 	int i;
@@ -388,8 +388,8 @@ static void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n
 **  @param n      Number of elements in table
 **  @param table  unit-type table.
 */
-static void SaveAiEquivTable(CLFile* file, const char* name, int n,
-	AiUnitTypeTable* const* table)
+static void SaveAiEquivTable(CLFile *file, const char *name, int n,
+	AiUnitTypeTable *const *table)
 {
 	int i;
 	int j;
@@ -425,8 +425,8 @@ static void SaveAiEquivTable(CLFile* file, const char* name, int n,
 **  @param n      Number of elements in table
 **  @param table  unit-type table.
 */
-static void SaveAiCostTable(CLFile* file, const char* name, int n,
-	AiUnitTypeTable* const* table)
+static void SaveAiCostTable(CLFile *file, const char *name, int n,
+	AiUnitTypeTable *const *table)
 {
 	int t;
 	int i;
@@ -469,8 +469,8 @@ static void SaveAiCostTable(CLFile* file, const char* name, int n,
 **  @param n      Number of elements in table
 **  @param table  unit-type table.
 */
-static void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
-	AiUnitTypeTable* const* table)
+static void SaveAiUnitLimitTable(CLFile *file, const char *name, int n,
+	AiUnitTypeTable *const *table)
 {
 	int t;
 	int i;
@@ -510,7 +510,7 @@ static void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
 **  @param file  Output file.
 **  @todo manage correctly ","
 */
-static void SaveAiHelper(CLFile* file)
+static void SaveAiHelper(CLFile *file)
 {
 	file->printf("DefineAiHelper(");
 	//
@@ -1121,10 +1121,10 @@ static void AiReduceMadeInBuilt(const PlayerAi* pai, const UnitType* type)
 **  @param attacker  Pointer to attacker unit.
 **  @param defender  Pointer to unit that is being attacked.
 */
-void AiHelpMe(const Unit* attacker, Unit* defender)
+void AiHelpMe(const CUnit *attacker, CUnit *defender)
 {
-	PlayerAi* pai;
-	AiUnit* aiunit;
+	PlayerAi *pai;
+	AiUnit *aiunit;
 	int force;
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
@@ -1184,7 +1184,7 @@ void AiHelpMe(const Unit* attacker, Unit* defender)
 **
 **  @param unit  Pointer to unit.
 */
-void AiUnitKilled(Unit* unit)
+void AiUnitKilled(CUnit *unit)
 {
 	DebugPrint("%d: %d(%s) killed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident);
@@ -1224,7 +1224,7 @@ void AiUnitKilled(Unit* unit)
 **  @param unit  Pointer to unit that builds the building.
 **  @param what  Pointer to unit building that was built.
 */
-void AiWorkComplete(Unit* unit, Unit* what)
+void AiWorkComplete(CUnit *unit, CUnit *what)
 {
 	if (unit) {
 		DebugPrint("%d: %d(%s) build %s at %d,%d completed\n" _C_
@@ -1246,7 +1246,7 @@ void AiWorkComplete(Unit* unit, Unit* what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(Unit* unit, const UnitType* what)
+void AiCanNotBuild(CUnit *unit, const UnitType *what)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1263,7 +1263,7 @@ void AiCanNotBuild(Unit* unit, const UnitType* what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotReach(Unit* unit, const UnitType* what)
+void AiCanNotReach(CUnit *unit, const UnitType *what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1273,7 +1273,7 @@ void AiCanNotReach(Unit* unit, const UnitType* what)
 /**
 **  FIXME: docu
 */
-static void AiMoveUnitInTheWay(Unit* unit)
+static void AiMoveUnitInTheWay(CUnit *unit)
 {
 	static int dirs[8][2] = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
 	int ux0;
@@ -1287,10 +1287,10 @@ static void AiMoveUnitInTheWay(Unit* unit)
 	int x;
 	int y;
 	int trycount,i;
-	Unit* blocker;
-	UnitType* unittype;
-	UnitType* blockertype;
-	Unit* movableunits[16];
+	CUnit *blocker;
+	UnitType *unittype;
+	UnitType *blockertype;
+	CUnit *movableunits[16];
 	int movablepos[16][2];
 	int movablenb;
 
@@ -1407,12 +1407,12 @@ static void AiMoveUnitInTheWay(Unit* unit)
 ** Return : 0 if nothing available
 ** 1 if exists (unit may still be null if no one ready)
 */
-static int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
-	int x, int y, unsigned unitType, Unit** bestunit)
+static int FindTransporterOnZone(int waterzone, ZoneSet *destzones,
+	int x, int y, unsigned unitType, CUnit **bestunit)
 {
 	static ZoneSet TransporterZones = {0};
-	Unit** allunits;
-	Unit* unit;
+	CUnit **allunits;
+	CUnit *unit;
 	int i;
 	int unitdst;
 	int unitok;
@@ -1498,7 +1498,7 @@ static int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
 /**
 **  FIXME: docu
 */
-static void HelpWithTransporter(Unit* unit, Unit* transporter,
+static void HelpWithTransporter(CUnit *unit, CUnit *transporter,
 	int transporterzone, int destzone)
 {
 	int x;
@@ -1525,10 +1525,10 @@ static void HelpWithTransporter(Unit* unit, Unit* transporter,
 **
 **  @param unit  Pointer to unit what builds the building.
 */
-void AiCanNotMove(Unit* unit)
+void AiCanNotMove(CUnit *unit)
 {
 #ifdef MAP_REGIONS
-	AiTransportRequest* aitr;
+	AiTransportRequest *aitr;
 #endif
 	int gx;
 	int gy;
@@ -1591,12 +1591,12 @@ void AiCanNotMove(Unit* unit)
 /**
 **  FIXME: docu
 */
-static void HandleTransportRequests(AiTransportRequest* aitr)
+static void HandleTransportRequests(AiTransportRequest *aitr)
 {
 	static ZoneSet UnitZones = {0};
 	static ZoneSet DestZones = {0};
 
-	Unit* transporter;
+	CUnit *transporter;
 	int zonepath[MaxZoneNumber];
 	int zonepathlen;
 	int gx;
@@ -1674,7 +1674,7 @@ static void HandleTransportRequests(AiTransportRequest* aitr)
 **  @param unit  Point to unit.
 **  @param what  Pointer to unit-type.
 */
-void AiNeedMoreSupply(const Unit* unit, const UnitType* what)
+void AiNeedMoreSupply(const CUnit *unit, const UnitType *what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1687,7 +1687,7 @@ void AiNeedMoreSupply(const Unit* unit, const UnitType* what)
 **  @param unit  Pointer to unit making.
 **  @param what  Pointer to new ready trained unit.
 */
-void AiTrainingComplete(Unit* unit, Unit* what)
+void AiTrainingComplete(CUnit *unit, CUnit *what)
 {
 	DebugPrint("%d: %d(%s) training %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1708,7 +1708,7 @@ void AiTrainingComplete(Unit* unit, Unit* what)
 **  @param unit Pointer to unit working.
 **  @param what Pointer to the new unit-type.
 */
-void AiUpgradeToComplete(Unit* unit, const UnitType* what)
+void AiUpgradeToComplete(CUnit *unit, const UnitType *what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1723,7 +1723,7 @@ void AiUpgradeToComplete(Unit* unit, const UnitType* what)
 **  @param unit  Pointer to unit working.
 **  @param what  Pointer to the new upgrade.
 */
-void AiResearchComplete(Unit* unit, const Upgrade* what)
+void AiResearchComplete(CUnit *unit, const Upgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1739,10 +1739,10 @@ void AiResearchComplete(Unit* unit, const Upgrade* what)
 **
 **  @param player  The player structure pointer.
 */
-void AiEachCycle(Player* player)
+void AiEachCycle(Player *player)
 {
-	AiTransportRequest* aitr;
-	AiTransportRequest* next;
+	AiTransportRequest *aitr;
+	AiTransportRequest *next;
 
 	AiPlayer = player->Ai;
 
@@ -1770,7 +1770,7 @@ void AiEachCycle(Player* player)
 **
 **  @param player  The player structure pointer.
 */
-void AiEachSecond(Player* player)
+void AiEachSecond(Player *player)
 {
 	AiPlayer = player->Ai;
 #ifdef DEBUG

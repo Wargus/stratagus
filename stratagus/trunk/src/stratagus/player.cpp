@@ -312,7 +312,7 @@ void CreatePlayer(int type)
 	//  FIXME: brutal way, as we won't need UnitMax for this player...
 	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
-	if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
+	if (!(player->Units = (CUnit **)calloc(UnitMax, sizeof(CUnit *)))) {
 		DebugPrint("Not enough memory to create player %d.\n" _C_ NumPlayers);
 		return;
 	}
