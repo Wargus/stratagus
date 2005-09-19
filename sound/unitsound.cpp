@@ -92,7 +92,7 @@ static void MapAnimSounds2(Animation* anim)
 /**
 **  Map animation sounds for a unit type
 */
-static void MapAnimSounds(UnitType* type)
+static void MapAnimSounds(CUnitType *type)
 {
 	int i;
 
@@ -122,14 +122,14 @@ static void MapAnimSounds(UnitType* type)
 */
 void MapUnitSounds(void)
 {
-	UnitType* type;
+	CUnitType *type;
 	int j;
 
 	if (SoundEnabled()) {
 		//
 		// Parse all units sounds.
 		//
-		for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 			type = UnitTypes[i];
 
 			MapAnimSounds(type);

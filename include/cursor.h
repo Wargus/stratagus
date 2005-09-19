@@ -122,7 +122,7 @@
 ----------------------------------------------------------------------------*/
 
 class Graphic;
-struct _unit_type_;
+class CUnitType;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -165,15 +165,15 @@ typedef enum _cursor_states_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CursorType* Cursors;          /// cursor-types description
+extern CursorType *Cursors;          /// cursor-types description
 extern int CursorMax;                /// Number of cursor.
 
 extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
-extern struct _unit_type_* CursorBuilding;  /// building cursor
+extern CUnitType *CursorBuilding;  /// building cursor
 
-extern CursorType* GameCursor;  /// cursor-type
+extern CursorType *GameCursor;  /// cursor-type
 extern int CursorX;             /// cursor position on screen X
 extern int CursorY;             /// cursor position on screen Y
 extern int CursorStartX;        /// rectangle started on screen X
@@ -188,10 +188,10 @@ extern int SubScrollY;          /// pixels the mouse moved while scrolling
 ----------------------------------------------------------------------------*/
 
 	/// Load all cursors
-extern void LoadCursors(const char* racename);
+extern void LoadCursors(const char *racename);
 
 	/// Cursor-type by identifier
-extern CursorType* CursorTypeByIdent(const char* ident);
+extern CursorType *CursorTypeByIdent(const char *ident);
 
 	/// Draw any cursor
 extern void DrawCursor(void);

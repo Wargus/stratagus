@@ -657,7 +657,7 @@ static int CclDefineSpell(lua_State* l)
 		DebugPrint("Redefining spell-type `%s'\n" _C_ identname);
 	} else {
 		spell = new SpellType(SpellTypeTable.size(), identname);
-		for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
 			if (UnitTypes[i]->CanCastSpell) {
 				UnitTypes[i]->CanCastSpell = (char *)realloc(UnitTypes[i]->CanCastSpell,
 					SpellTypeTable.size() * sizeof(UnitTypes[i]->CanCastSpell));

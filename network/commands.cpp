@@ -1197,7 +1197,7 @@ void SendCommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 ** @param flush   Flag flush all pending commands.
 */
 void SendCommandBuildBuilding(CUnit *unit, int x, int y,
-	UnitType *what, int flush)
+	CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("build", unit, flush, x, y, NoUnitP, what->Ident, -1);
@@ -1283,7 +1283,7 @@ void SendCommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(CUnit *unit, UnitType *what, int flush)
+void SendCommandTrainUnit(CUnit *unit, CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("train", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
@@ -1300,7 +1300,7 @@ void SendCommandTrainUnit(CUnit *unit, UnitType *what, int flush)
 ** @param slot    Slot of training queue to cancel.
 ** @param type    Unit-type of unit to cancel.
 */
-void SendCommandCancelTraining(CUnit *unit, int slot, const UnitType *type)
+void SendCommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
@@ -1319,7 +1319,7 @@ void SendCommandCancelTraining(CUnit *unit, int slot, const UnitType *type)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(CUnit *unit, UnitType *what, int flush)
+void SendCommandUpgradeTo(CUnit *unit, CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("upgrade-to", unit, flush, -1, -1, NoUnitP, what->Ident, -1);

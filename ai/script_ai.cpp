@@ -81,11 +81,11 @@ static void AiHelperSetupTable(int* count, AiUnitTypeTable*** table, int n)
 **  @param tablep  Pointer to table with elements.
 **  @param base    Base type to insert into table.
 */
-static void AiHelperInsert(AiUnitTypeTable** tablep, UnitType* base)
+static void AiHelperInsert(AiUnitTypeTable **tablep, CUnitType *base)
 {
 	int i;
 	int n;
-	AiUnitTypeTable* table;
+	AiUnitTypeTable *table;
 
 	//
 	// New unit-type
@@ -109,7 +109,7 @@ static void AiHelperInsert(AiUnitTypeTable** tablep, UnitType* base)
 	//
 	// Append new base unit-type to units.
 	//
-	table = *tablep = (AiUnitTypeTable*)realloc(table, sizeof(AiUnitTypeTable) + sizeof(UnitType*) * n);
+	table = *tablep = (AiUnitTypeTable*)realloc(table, sizeof(AiUnitTypeTable) + sizeof(CUnitType *) * n);
 	table->Count = n + 1;
 	table->Table[n] = base;
 }
@@ -130,13 +130,13 @@ static void PrintAiHelperTable(void)
 **
 **  @todo  FIXME: the first unit could be a list see ../doc/ccl/ai.html
 */
-static int CclDefineAiHelper(lua_State* l)
+static int CclDefineAiHelper(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	int what;
-	UnitType* base;
-	UnitType* type;
-	Upgrade* upgrade;
+	CUnitType *base;
+	CUnitType *type;
+	Upgrade *upgrade;
 	int cost;
 	int args;
 	int j;
@@ -369,7 +369,7 @@ static int CclDefineAi(lua_State* l)
 **  @param type   Unit-type to be appended.
 **  @param count  How many unit-types to build.
 */
-static void InsertUnitTypeRequests(UnitType* type, int count)
+static void InsertUnitTypeRequests(CUnitType *type, int count)
 {
 	int n;
 
@@ -391,7 +391,7 @@ static void InsertUnitTypeRequests(UnitType* type, int count)
 **
 **  @param type  Unit-type to be found.
 */
-static AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
+static AiUnitTypeTable* FindInUnitTypeRequests(const CUnitType *type)
 {
 	int i;
 	int n;
@@ -410,7 +410,7 @@ static AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
 **
 **  @param type  Unit-type to be found.
 */
-static int FindInUpgradeToRequests(const UnitType* type)
+static int FindInUpgradeToRequests(const CUnitType *type)
 {
 	int i;
 	int n;
@@ -429,16 +429,16 @@ static int FindInUpgradeToRequests(const UnitType* type)
 **
 **  @param type  Unit-type to be appended.
 */
-static void InsertUpgradeToRequests(UnitType* type)
+static void InsertUpgradeToRequests(CUnitType *type)
 {
 	int n;
 
 	if (AiPlayer->UpgradeToRequests) {
 		n = AiPlayer->UpgradeToRequestsCount;
-		AiPlayer->UpgradeToRequests = (UnitType**)realloc(AiPlayer->UpgradeToRequests,
+		AiPlayer->UpgradeToRequests = (CUnitType **)realloc(AiPlayer->UpgradeToRequests,
 			(n + 1) * sizeof(*AiPlayer->UpgradeToRequests));
 	} else {
-		AiPlayer->UpgradeToRequests = (UnitType**)malloc(sizeof(*AiPlayer->UpgradeToRequests));
+		AiPlayer->UpgradeToRequests = (CUnitType **)malloc(sizeof(*AiPlayer->UpgradeToRequests));
 		n = 0;
 	}
 	AiPlayer->UpgradeToRequests[n] = type;
@@ -584,10 +584,10 @@ static int CclAiNeed(lua_State* l)
 **
 **  @return   Number of return values
 */
-static int CclAiSet(lua_State* l)
+static int CclAiSet(lua_State *l)
 {
-	AiUnitTypeTable* autt;
-	UnitType* type;
+	AiUnitTypeTable *autt;
+	CUnitType *type;
 
 	LuaCheckArgs(l, 2);
 	lua_pushvalue(l, 1);
@@ -614,7 +614,7 @@ static int CclAiSet(lua_State* l)
 static int CclAiWait(lua_State* l)
 {
 	const AiUnitTypeTable* autt;
-	const UnitType* type;
+	const CUnitType *type;
 	const int* unit_types_count;
 	int j;
 	int n;
@@ -678,11 +678,11 @@ static int CclAiWait(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiForce(lua_State* l)
+static int CclAiForce(lua_State *l)
 {
-	AiUnitType** prev;
-	AiUnitType* aiut;
-	UnitType* type;
+	AiUnitType **prev;
+	AiUnitType *aiut;
+	CUnitType *type;
 	int count;
 	int force;
 	int args;
@@ -901,9 +901,9 @@ static int CclAiResearch(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiUpgradeTo(lua_State* l)
+static int CclAiUpgradeTo(lua_State *l)
 {
-	UnitType* type;
+	CUnitType *type;
 
 	LuaCheckArgs(l, 1);
 	type = CclGetUnitType(l);
@@ -1416,7 +1416,7 @@ static int CclDefineAiPlayer(lua_State* l)
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
 			if (subargs) {
-				ai->UpgradeToRequests = (UnitType**)malloc(subargs * sizeof(UnitType*));
+				ai->UpgradeToRequests = (CUnitType **)malloc(subargs * sizeof(CUnitType *));
 			}
 			for (k = 0; k < subargs; ++k) {
 				const char* ident;

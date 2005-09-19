@@ -55,7 +55,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 
 /**
 **  Network message types.
@@ -214,7 +214,7 @@ extern void NetworkCommands(void);  /// Get all network commands
 extern void NetworkChatMessage(const char* msg);  /// Send chat message
 	/// Send network command.
 extern void NetworkSendCommand(int command, const CUnit *unit, int x,
-	int y, const CUnit *dest, const struct _unit_type_* type,
+	int y, const CUnit *dest, const CUnitType *type,
 	int status);
 	/// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,

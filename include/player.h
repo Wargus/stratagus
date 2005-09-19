@@ -292,7 +292,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct _player_;
 struct _player_ai_;
 class CLFile;
@@ -482,19 +482,19 @@ extern void PlayerSetResource(Player* player, int resource, int value);
 
 	/// Check if the unit-type didn't break any unit limits and supply/demand
 extern int PlayerCheckLimits(const struct _player_* player,
-	const struct _unit_type_* type);
+	const CUnitType *type);
 
 	/// Check if enough resources are available for costs
 extern int PlayerCheckCosts(const struct _player_* player, const int* costs);
 	/// Check if enough resources are available for a new unit-type
 extern int PlayerCheckUnitType(const struct _player_* player,
-	const struct _unit_type_* type);
+	const CUnitType *type);
 
 	/// Add costs to the resources
 extern void PlayerAddCosts(struct _player_* player, const int* costs);
 	/// Add costs for an unit-type to the resources
 extern void PlayerAddUnitType(struct _player_* player,
-	const struct _unit_type_* type);
+	const CUnitType *type);
 	/// Add a factor of costs to the resources
 extern void PlayerAddCostsFactor(struct _player_* player, const int* costs,
 	int factor);
@@ -502,14 +502,14 @@ extern void PlayerAddCostsFactor(struct _player_* player, const int* costs,
 extern void PlayerSubCosts(struct _player_* player, const int* costs);
 	/// Remove costs for an unit-type from the resources
 extern void PlayerSubUnitType(struct _player_* player,
-	const struct _unit_type_* type);
+	const CUnitType *type);
 	/// Remove a factor of costs from the resources
 extern void PlayerSubCostsFactor(struct _player_* player, const int* costs,
 	int factor);
 
 	/// Has the player units of that type
 extern int HaveUnitTypeByType(const struct _player_* player,
-	const struct _unit_type_* type);
+	const CUnitType *type);
 	/// Has the player units of that type
 extern int HaveUnitTypeByIdent(const struct _player_* player,
 	const char* ident);

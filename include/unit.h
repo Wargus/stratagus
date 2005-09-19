@@ -363,7 +363,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct _unit_stats_;
 struct _new_animation;
 class SpellType;
@@ -428,10 +428,10 @@ typedef struct _order_ {
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
 
-	CUnit    *Goal;         /// goal of the order (if any)
-	int       X;            /// or X tile coordinate of destination
-	int       Y;            /// or Y tile coordinate of destination
-	struct _unit_type_* Type;/// Unit-type argument
+	CUnit     *Goal;        /// goal of the order (if any)
+	int        X;           /// or X tile coordinate of destination
+	int        Y;           /// or Y tile coordinate of destination
+	CUnitType *Type;        /// Unit-type argument
 
 	union {
 		struct {
@@ -515,7 +515,7 @@ public:
 	int X; /// Map position X
 	int Y; /// Map position Y
 
-	struct _unit_type_*  Type;    /// Pointer to unit-type (peon,...)
+	CUnitType *Type;              /// Pointer to unit-type (peon,...)
 	struct _player_* Player;      /// Owner of this unit
 	struct _unit_stats_* Stats;   /// Current unit stats
 	int        CurrentSightRange; /// Unit's Current Sight Range
@@ -546,7 +546,7 @@ public:
 	struct _seen_stuff_ {
 		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player
 		int                 Frame;                   /// last seen frame/stage of buildings
-		struct _unit_type_* Type;                    /// Pointer to last seen unit-type
+		CUnitType          *Type;                    /// Pointer to last seen unit-type
 		int                 X;                       /// Last unit->X Seen
 		int                 Y;                       /// Last unit->Y Seen
 		signed char         IX;                      /// Seen X image displacement to map position
@@ -742,15 +742,15 @@ void UpdateUnitSightRange(CUnit *unit);
 	/// Release an unit
 extern void ReleaseUnit(CUnit *unit);
 	/// Initialize unit structure with default values
-extern void InitUnit(CUnit *unit, struct _unit_type_ *type);
+extern void InitUnit(CUnit *unit, CUnitType *type);
 	/// Assign unit to player
 extern void AssignUnitToPlayer(CUnit *unit, Player *player);
 	/// Create a new unit
-extern CUnit *MakeUnit(struct _unit_type_* type, Player *player);
+extern CUnit *MakeUnit(CUnitType *type, Player *player);
 	/// Place an unit on map
 extern void PlaceUnit(CUnit *unit, int x, int y);
 	/// Create a new unit and place on map
-extern CUnit *MakeUnitAndPlace(int x, int y, struct _unit_type_ *type, Player *player);
+extern CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, Player *player);
 	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
 extern void MoveUnitToXY(CUnit *unit, int x, int y);
 	/// Add an unit inside a container. Only deal with list stuff.
@@ -811,13 +811,13 @@ extern void DropOutNearest(CUnit *unit, int x, int y, int addx, int addy);
 extern void DropOutAll(const CUnit *unit);
 
 	/// Return the rule used to build this building.
-extern struct _building_restrictions_ *OnTopDetails(const CUnit *unit, const struct _unit_type_ *parent);
+extern struct _building_restrictions_ *OnTopDetails(const CUnit *unit, const CUnitType *parent);
 	/// @todo more docu
-extern CUnit *CanBuildHere(const CUnit *unit, const struct _unit_type_ *type, int x, int y);
+extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y);
 	/// @todo more docu
 extern int CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
-extern CUnit *CanBuildUnitType(const CUnit *unit, const struct _unit_type_ *type, int x, int y, int real);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
 
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource);
@@ -845,11 +845,11 @@ extern void HitUnit(CUnit *attacker, CUnit *target, int damage);
 	/// Returns the map distance between two points
 extern int MapDistance(int x1, int y1, int x2, int y2);
 	/// Returns the map distance between two points with unit-type
-extern int MapDistanceToType(int x1, int y1, const struct _unit_type_ *type, int x2, int y2);
+extern int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2);
 	/// Returns the map distance to unit
 extern int MapDistanceToUnit(int x, int y, const CUnit *dest);
 	/// Returns the map diestance between to unittype as locations
-extern int MapDistanceBetweenTypes(const struct _unit_type_ *src, int x1, int y1, const struct _unit_type_ *dst, int x2, int y2);
+extern int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1, const CUnitType *dst, int x2, int y2);
 	/// Returns the map distance between two units
 extern int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst);
 
@@ -869,7 +869,7 @@ extern int ViewPointDistanceToUnit(const CUnit *dest);
 	(((player)->SharedVision & (1 << (dest)->Player->Index)) && \
 		((dest)->Player->SharedVision & (1 << (player)->Player)))
 	/// Can this unit-type attack the other (destination)
-extern int CanTarget(const struct _unit_type_ *type, const struct _unit_type_ *dest);
+extern int CanTarget(const CUnitType *type, const CUnitType *dest);
 	/// Can transporter transport the other unit
 extern int CanTransport(const CUnit *transporter, const CUnit *unit);
 
@@ -925,7 +925,7 @@ extern void LoadDecorations(void);
 extern void CleanDecorations(void);
 
 	/// Draw unit's shadow
-extern void DrawShadow(const CUnit *unit, const struct _unit_type_ *type,
+extern void DrawShadow(const CUnit *unit, const CUnitType *type,
 	int frame, int x, int y);
 	/// Draw A single Unit
 extern void DrawUnit(const CUnit *unit);
@@ -938,9 +938,9 @@ extern void ShowOrder(const CUnit *unit);
 	/// Select unit on X,Y of type naval,fly,land
 extern CUnit *UnitCacheOnXY(int x, int y, unsigned type);
 	/// Find all units of this type
-extern int FindUnitsByType(const struct _unit_type_ *type, CUnit **table);
+extern int FindUnitsByType(const CUnitType *type, CUnit **table);
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const Player *, const struct _unit_type_ *, CUnit **);
+extern int FindPlayerUnitsByType(const Player *, const CUnitType *, CUnit **);
 	/// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(int tx, int ty);
 	/// Return possible attack target on that map area

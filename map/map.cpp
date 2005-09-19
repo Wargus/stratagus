@@ -312,7 +312,7 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 **
 **  @return      True if could be entered, false otherwise.
 */
-int UnitTypeCanBeAt(const UnitType *type, int x, int y)
+int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 {
 	int addx;  // iterator
 	int addy;  // iterator

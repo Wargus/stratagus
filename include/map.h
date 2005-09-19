@@ -174,7 +174,7 @@ class Graphic;
 struct _player_;
 class CLFile;
 class CUnit;
-struct _unit_type_;
+class CUnitType;
 struct _unit_list_item_;
 
 /*----------------------------------------------------------------------------
@@ -428,7 +428,7 @@ extern int RockOnMap(int x, int y);
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
-extern int UnitTypeCanBeAt(const struct _unit_type_* type, int x, int y);
+extern int UnitTypeCanBeAt(const CUnitType *type, int x, int y);
 	/// Returns true, if the unit can enter the field
 extern int UnitCanBeAt(const CUnit *unit, int x, int y);
 

@@ -145,7 +145,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 {
 	int x;
 	int y;
-	UnitType *type;
+	CUnitType *type;
 	CUnit *ontop;
 
 	if (unit->Wait) {
@@ -235,7 +235,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 {
 	int x;
 	int y;
-	UnitType *type;
+	CUnitType *type;
 	CUnit *build;
 	BuildRestriction *b;
 	const UnitStats *stats;
@@ -416,7 +416,7 @@ void HandleActionBuild(CUnit *unit)
 void HandleActionBuilt(CUnit *unit)
 {
 	CUnit *worker;
-	UnitType *type;
+	CUnitType *type;
 	int n;
 	int progress;
 

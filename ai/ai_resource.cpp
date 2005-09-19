@@ -48,7 +48,7 @@
 #include "actions.h"
 #include "player.h"
 
-static int AiMakeUnit(UnitType *type);
+static int AiMakeUnit(CUnitType *type);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -127,7 +127,7 @@ static int AiCheckCosts(const int *costs)
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-static int AiCheckSupply(const PlayerAi *pai, const UnitType *type)
+static int AiCheckSupply(const PlayerAi *pai, const CUnitType *type)
 {
 	int remaining;
 	const AiBuildQueue *queue;
@@ -169,7 +169,7 @@ static int AiCheckSupply(const PlayerAi *pai, const UnitType *type)
 **
 **  @return      A bit field of the missing costs.
 */
-static int AiCheckUnitTypeCosts(const UnitType *type)
+static int AiCheckUnitTypeCosts(const CUnitType *type)
 {
 	return AiCheckCosts(type->Stats[AiPlayer->Player->Index].Costs);
 }
@@ -185,7 +185,7 @@ static int AiCheckUnitTypeCosts(const UnitType *type)
 int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 {
 	const CUnit *dest;
-	const UnitType *type;
+	const CUnitType *type;
 	CUnit *table[UnitMax];
 	unsigned x;
 	unsigned y;
@@ -242,7 +242,7 @@ int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const UnitType *type, UnitType *building)
+static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
@@ -299,7 +299,7 @@ static void AiRequestSupply(void)
 	int i;
 	int n;
 	int c;
-	UnitType *type;
+	CUnitType *type;
 	AiBuildQueue *queue;
 	int counter[UnitTypeMax];
 
@@ -352,7 +352,7 @@ static void AiRequestSupply(void)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiTrainUnit(const UnitType *type, UnitType *what)
+static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
@@ -391,7 +391,7 @@ static int AiTrainUnit(const UnitType *type, UnitType *what)
 **
 **  @param type  The unittype we wan't to build
 */
-int AiCountUnitBuilders(UnitType *type)
+int AiCountUnitBuilders(CUnitType *type)
 {
 	int result;
 	int i;
@@ -445,7 +445,7 @@ int AiCountUnitBuilders(UnitType *type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(UnitType *type)
+static int AiMakeUnit(CUnitType *type)
 {
 	int i;
 	int n;
@@ -517,7 +517,7 @@ static int AiMakeUnit(UnitType *type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiResearchUpgrade(const UnitType *type, Upgrade *what)
+static int AiResearchUpgrade(const CUnitType *type, Upgrade *what)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
@@ -611,7 +611,7 @@ void AiAddResearchRequest(Upgrade *upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiUpgradeTo(const UnitType *type, UnitType *what)
+static int AiUpgradeTo(const CUnitType *type, CUnitType *what)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
@@ -648,7 +648,7 @@ static int AiUpgradeTo(const UnitType *type, UnitType *what)
 **
 **  @param type  FIXME: docu
 */
-void AiAddUpgradeToRequest(UnitType *type)
+void AiAddUpgradeToRequest(CUnitType *type)
 {
 	int i;
 	int n;
@@ -701,7 +701,7 @@ void AiAddUpgradeToRequest(UnitType *type)
 static void AiCheckingWork(void)
 {
 	int c;
-	UnitType *type;
+	CUnitType *type;
 	AiBuildQueue *queue;
 
 	// Suppy has the highest priority
@@ -771,7 +771,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	// These will hold the coordinates of the forest.
 	int forestx;
 	int foresty;
-	std::vector<UnitType *>::iterator i;
+	std::vector<CUnitType *>::iterator i;
 	int exploremask;
 	//  This will hold the resulting gather destination.
 	CUnit *dest;
@@ -1072,7 +1072,7 @@ static void AiCollectResources(void)
 **
 **  @return          True if can repair, false if can't repair..
 */
-static int AiRepairBuilding(const UnitType *type, CUnit *building)
+static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
@@ -1176,7 +1176,7 @@ static int AiRepairUnit(CUnit *unit)
 {
 	int i;
 	int n;
-	const UnitType *type;
+	const CUnitType *type;
 	const int *unit_count;
 	AiUnitTypeTable *const *tablep;
 	const AiUnitTypeTable *table;
@@ -1282,7 +1282,7 @@ static void AiCheckRepair(void)
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(UnitType *type, int count)
+void AiAddUnitTypeRequest(CUnitType *type, int count)
 {
 	AiBuildQueue **queue;
 

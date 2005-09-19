@@ -441,7 +441,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 */
 static void DrawUnitOn(CUnit *unit, int red_phase)
 {
-	UnitType *type;
+	CUnitType *type;
 	int mx;
 	int my;
 	int w;

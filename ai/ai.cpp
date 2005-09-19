@@ -1003,10 +1003,10 @@ void CleanAi(void)
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilt2(PlayerAi* pai, const UnitType* type)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType *type)
 {
-	AiBuildQueue** queue;
-	AiBuildQueue* next;
+	AiBuildQueue **queue;
+	AiBuildQueue *next;
 
 	//
 	//  Search the unit-type order.
@@ -1031,7 +1031,7 @@ static int AiRemoveFromBuilt2(PlayerAi* pai, const UnitType* type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiRemoveFromBuilt(PlayerAi* pai, const UnitType* type)
+static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType *type)
 {
 	int i;
 	int equivalents[UnitTypeMax + 1];
@@ -1067,9 +1067,9 @@ static void AiRemoveFromBuilt(PlayerAi* pai, const UnitType* type)
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static int AiReduceMadeInBuilt2(const PlayerAi* pai, const UnitType* type)
+static int AiReduceMadeInBuilt2(const PlayerAi *pai, const CUnitType *type)
 {
-	AiBuildQueue* queue;
+	AiBuildQueue *queue;
 	//
 	//  Search the unit-type order.
 	//
@@ -1088,7 +1088,7 @@ static int AiReduceMadeInBuilt2(const PlayerAi* pai, const UnitType* type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiReduceMadeInBuilt(const PlayerAi* pai, const UnitType* type)
+static void AiReduceMadeInBuilt(const PlayerAi *pai, const CUnitType *type)
 {
 	int i;
 	int equivs[UnitTypeMax + 1];
@@ -1246,7 +1246,7 @@ void AiWorkComplete(CUnit *unit, CUnit *what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(CUnit *unit, const UnitType *what)
+void AiCanNotBuild(CUnit *unit, const CUnitType *what)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1263,7 +1263,7 @@ void AiCanNotBuild(CUnit *unit, const UnitType *what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotReach(CUnit *unit, const UnitType *what)
+void AiCanNotReach(CUnit *unit, const CUnitType *what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1288,8 +1288,8 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 	int y;
 	int trycount,i;
 	CUnit *blocker;
-	UnitType *unittype;
-	UnitType *blockertype;
+	CUnitType *unittype;
+	CUnitType *blockertype;
 	CUnit *movableunits[16];
 	int movablepos[16][2];
 	int movablenb;
@@ -1674,7 +1674,7 @@ static void HandleTransportRequests(AiTransportRequest *aitr)
 **  @param unit  Point to unit.
 **  @param what  Pointer to unit-type.
 */
-void AiNeedMoreSupply(const CUnit *unit, const UnitType *what)
+void AiNeedMoreSupply(const CUnit *unit, const CUnitType *what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1708,7 +1708,7 @@ void AiTrainingComplete(CUnit *unit, CUnit *what)
 **  @param unit Pointer to unit working.
 **  @param what Pointer to the new unit-type.
 */
-void AiUpgradeToComplete(CUnit *unit, const UnitType *what)
+void AiUpgradeToComplete(CUnit *unit, const CUnitType *what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_

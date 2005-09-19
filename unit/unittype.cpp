@@ -65,16 +65,16 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<UnitType *> UnitTypes;   /// unit-types definition
-std::map<std::string, UnitType *> UnitTypeMap;
+std::vector<CUnitType *> UnitTypes;   /// unit-types definition
+std::map<std::string, CUnitType *> UnitTypeMap;
 
 /**
 **  Next unit type are used hardcoded in the source.
 **
 **  @todo find a way to make it configurable!
 */
-UnitType* UnitTypeHumanWall;       /// Human wall
-UnitType* UnitTypeOrcWall;         /// Orc wall
+CUnitType* UnitTypeHumanWall;       /// Human wall
+CUnitType* UnitTypeOrcWall;         /// Orc wall
 
 /**
 **  Default resources for a new player.
@@ -126,7 +126,7 @@ int DefaultResourceAmounts[MaxCosts];
 */
 void UpdateStats(int reset)
 {
-	UnitType* type;
+	CUnitType* type;
 	UnitStats* stats;
 	int player;
 	unsigned i;
@@ -134,7 +134,7 @@ void UpdateStats(int reset)
 	//
 	//  Update players stats
 	//
-	for (std::vector<UnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
+	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
 		type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
@@ -286,7 +286,7 @@ void SaveUnitTypes(CLFile* file)
 	file->printf("--- MODULE: unittypes $Id$\n\n");
 
 	// Save all stats
-	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		file->printf("\n");
 		for (j = 0; j < PlayerMax; ++j) {
 			if (Players[j].Type != PlayerNobody) {
@@ -303,7 +303,7 @@ void SaveUnitTypes(CLFile* file)
 **
 **  @return       Unit-type pointer.
 */
-UnitType *UnitTypeByIdent(const char *ident)
+CUnitType *UnitTypeByIdent(const char *ident)
 {
 	return UnitTypeMap[ident];
 }
@@ -315,11 +315,11 @@ UnitType *UnitTypeByIdent(const char *ident)
 **
 **  @return       New allocated (zeroed) unit-type pointer.
 */
-UnitType *NewUnitTypeSlot(char *ident)
+CUnitType *NewUnitTypeSlot(char *ident)
 {
-	UnitType *type;
+	CUnitType *type;
 
-	type = new UnitType;
+	type = new CUnitType;
 	if (!type) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
@@ -351,7 +351,7 @@ UnitType *NewUnitTypeSlot(char *ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
+void DrawUnitType(const CUnitType* type, Graphic* sprite, int player, int frame,
 	int x, int y)
 {
 	// FIXME: move this calculation to high level.
@@ -382,7 +382,7 @@ void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
 /**
 **  Get the still animation frame
 */
-static int GetStillFrame(UnitType* type)
+static int GetStillFrame(CUnitType* type)
 {
 	Animation* anim;
 
@@ -404,7 +404,7 @@ static int GetStillFrame(UnitType* type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		Assert(UnitTypes[i]->Slot == (int)i);
 
 		//  Add idents to hash.
@@ -429,7 +429,7 @@ void InitUnitTypes(int reset_player_stats)
 **
 **  @param type  type of unit to load
 */
-void LoadUnitTypeSprite(UnitType* type)
+void LoadUnitTypeSprite(CUnitType* type)
 {
 	ResourceInfo* resinfo;
 	int i;
@@ -493,9 +493,9 @@ void LoadUnitTypeSprite(UnitType* type)
 */
 void LoadUnitTypes(void)
 {
-	UnitType* type;
+	CUnitType* type;
 
-	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
 
 		//
@@ -585,7 +585,7 @@ static void CleanAnimation(Animation* anim)
 */
 void CleanUnitTypes(void)
 {
-	UnitType *type;
+	CUnitType *type;
 	int j;
 	int res;
 
@@ -600,7 +600,7 @@ void CleanUnitTypes(void)
 
 	// Clean all unit-types
 
-	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
 
 		Assert(type->Ident);
