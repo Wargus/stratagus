@@ -639,6 +639,7 @@ enum {
 
 struct _decovartype_;
 class CUnit;
+class CUnitType;
 
 typedef void DrawDecoFunc(int x, int y, const CUnit *unit,
 	const struct _decovartype_* Deco);
