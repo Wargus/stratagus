@@ -65,7 +65,7 @@ void HandleActionReturnGoods(CUnit *unit)
 			(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
 				unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
 		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
-		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y, "No Resources to Return.");
+		unit->Player->Notify(NotifyYellow, unit->X, unit->Y, "No Resources to Return.");
 
 		if (unit->Orders[0].Goal) { // Depot (if not destroyed)
 			RefsDecrease(unit->Orders[0].Goal);

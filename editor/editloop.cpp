@@ -291,7 +291,7 @@ void EditTiles(int x, int y, int tile, int size)
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditUnitInternal(int x, int y, CUnitType *type, Player *player)
+static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 
@@ -316,7 +316,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, Player *player)
 **
 **  @todo  FIXME: Check if the player has already a start-point.
 */
-static void EditUnit(int x, int y, CUnitType *type, Player *player)
+static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
 	int mx;
 	int my;

@@ -37,7 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _player_;
+class CPlayer;
 class CLFile;
 class CUnit;
 class CUnitType;
@@ -53,11 +53,11 @@ extern int AiSleepCycles;  /// Ai sleeps # cycles
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachCycle(struct _player_* player);   /// Called each game cycle
-extern void AiEachSecond(struct _player_* player);  /// Called each second
+extern void AiEachCycle(CPlayer *player);   /// Called each game cycle
+extern void AiEachSecond(CPlayer *player);  /// Called each second
 
 extern void InitAiModule(void);       /// Init AI global structures
-extern void AiInit(struct _player_* player);   /// Init AI for this player
+extern void AiInit(CPlayer *player);   /// Init AI for this player
 extern void CleanAi(void);            /// Cleanup the AI module
 extern void SaveAi(CLFile *file);     /// Save the AI state
 

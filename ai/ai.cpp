@@ -787,13 +787,13 @@ void SaveAi(CLFile* file)
 **
 **  @param player  The player structure pointer.
 */
-void AiInit(Player* player)
+void AiInit(CPlayer *player)
 {
-	PlayerAi* pai;
-	AiType* ait;
-	char* ainame;
+	PlayerAi *pai;
+	AiType *ait;
+	char *ainame;
 
-	pai = (PlayerAi*)calloc(1, sizeof (PlayerAi));
+	pai = (PlayerAi *)calloc(1, sizeof (PlayerAi));
 	if (!pai) {
 		fprintf(stderr, "Out of memory.\n");
 		exit(0);
@@ -875,20 +875,20 @@ void CleanAi(void)
 {
 	int i;
 	int p;
-	PlayerAi* pai;
-	void* temp;
-	AiType* aitype;
-	AiBuildQueue* queue;
-	AiExplorationRequest* request;
+	PlayerAi *pai;
+	void *temp;
+	AiType *aitype;
+	AiBuildQueue *queue;
+	AiExplorationRequest *request;
 
 	for (p = 0; p < PlayerMax; ++p) {
-		if ((pai = (PlayerAi*)Players[p].Ai)) {
+		if ((pai = (PlayerAi *)Players[p].Ai)) {
 			//
 			//  Free forces
 			//
 			for (i = 0; i < AI_MAX_ATTACKING_FORCES; ++i) {
-				AiUnitType* aut;
-				AiUnit* aiunit;
+				AiUnitType *aut;
+				AiUnit *aiunit;
 
 				for (aut = pai->Force[i].UnitTypes; aut; aut = (AiUnitType*)temp) {
 					temp = aut->Next;
@@ -1739,7 +1739,7 @@ void AiResearchComplete(CUnit *unit, const Upgrade *what)
 **
 **  @param player  The player structure pointer.
 */
-void AiEachCycle(Player *player)
+void AiEachCycle(CPlayer *player)
 {
 	AiTransportRequest *aitr;
 	AiTransportRequest *next;
@@ -1770,7 +1770,7 @@ void AiEachCycle(Player *player)
 **
 **  @param player  The player structure pointer.
 */
-void AiEachSecond(Player *player)
+void AiEachSecond(CPlayer *player)
 {
 	AiPlayer = player->Ai;
 #ifdef DEBUG

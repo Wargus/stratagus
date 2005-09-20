@@ -107,7 +107,7 @@
 ----------------------------------------------------------------------------*/
 
 class Graphic;
-struct _player_;
+class CPlayer;
 struct _button_style_;
 
 	/// Icon: rectangle image used in menus
@@ -134,9 +134,9 @@ extern void CleanIcons(void);  /// Cleanup icons
 	/// Name -> icon
 extern Icon *IconByIdent(const char *ident);
 	/// Draw icon
-extern void DrawIcon(const struct _player_ *player, Icon *icon, int x, int y);
+extern void DrawIcon(const CPlayer *player, Icon *icon, int x, int y);
 	/// Draw icon of an unit
-extern void DrawUnitIcon(const struct _player_ *player,
+extern void DrawUnitIcon(const CPlayer *player,
 	struct _button_style_ *style, Icon *icon, unsigned flags, int x, int y,
 	const char *text);
 

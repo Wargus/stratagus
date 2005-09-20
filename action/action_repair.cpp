@@ -62,7 +62,7 @@
 */
 static void RepairUnit(CUnit *unit, CUnit *goal)
 {
-	Player *player;
+	CPlayer *player;
 	int i;
 	int animlength;
 	int hp;
@@ -83,7 +83,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 			if (player->Resources[i] < goal->Type->RepairCosts[i]) {
 				snprintf(buf, 100, "We need more %s for repair!",
 					DefaultResourceNames[i]);
-				NotifyPlayer(player, NotifyYellow, unit->X, unit->Y, buf);
+				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
 				if (player->AiEnabled) {
 					// FIXME: call back to AI?
 					RefsDecrease(goal);
@@ -101,7 +101,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		//
 		// Subtract the resources
 		//
-		PlayerSubCosts(player, goal->Type->RepairCosts);
+		player->SubCosts(goal->Type->RepairCosts);
 
 		goal->Variable[HP_INDEX].Value += goal->Type->RepairHP;
 		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {

@@ -47,7 +47,7 @@
 class CUnit;
 class CUnitType;
 struct _upgrade_;
-struct _player_;
+class CPlayer;
 
 /**
 **  Ai Type typedef
@@ -179,7 +179,7 @@ struct _ai_transport_request_ {
 **  AI variables.
 */
 typedef struct _player_ai_ {
-	struct _player_* Player; /// Engine player structure
+	CPlayer *Player;         /// Engine player structure
 	struct _ai_type_* AiType;/// AI type of this player AI
 	// controller
 	char*               Script;          /// Script executed

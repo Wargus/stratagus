@@ -115,7 +115,7 @@ static void MoveToLocation(CUnit *unit)
 				return;
 			}
 
-			NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 				"You cannot reach building place");
 			if (unit->Player->AiEnabled) {
 				AiCanNotReach(unit, unit->Orders[0].Type);
@@ -173,7 +173,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			return NULL;
 		}
 
-		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			"You cannot build %s here",type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
@@ -191,9 +191,9 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	//
 	// Check if enough resources for the building.
 	//
-	if (PlayerCheckUnitType(unit->Player, type)) {
+	if (unit->Player->CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
-		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			"Not enough resources to build %s", type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
@@ -210,8 +210,8 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	//
 	// Check if hiting any limits for the building.
 	//
-	if (PlayerCheckLimits(unit->Player, type) < 0) {
-		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+	if (unit->Player->CheckLimits(type) < 0) {
+		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			"Can't build more units %s", type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
@@ -244,7 +244,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	y = unit->Orders[0].Y;
 	type = unit->Orders[0].Type;
 
-	PlayerSubUnitType(unit->Player, type);
+	unit->Player->SubUnitType(type);
 
 	build = MakeUnit(type, unit->Player);
 	
@@ -252,7 +252,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	if (build == NoUnitP) {
 		unit->Orders[0].Action = UnitActionStill;
 
-		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			"Unable to create building %s",type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
@@ -457,8 +457,7 @@ void HandleActionBuilt(CUnit *unit)
 		}
 
 		// Player gets back 75% of the original cost for a building.
-		PlayerAddCostsFactor(unit->Player, unit->Stats->Costs,
-			CancelBuildingCostsFactor);
+		unit->Player->AddCostsFactor(unit->Stats->Costs, CancelBuildingCostsFactor);
 		// Cancel building
 		LetUnitDie(unit);
 		return;
@@ -511,7 +510,7 @@ void HandleActionBuilt(CUnit *unit)
 			}
 		}
 
-		NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
+		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
 			"New %s done", type->Name);
 		if (unit->Player == ThisPlayer) {
 			if (unit->Type->Sound.Ready.Sound) {
