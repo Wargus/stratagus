@@ -111,17 +111,33 @@ class CPlayer;
 struct _button_style_;
 
 	/// Icon: rectangle image used in menus
-typedef struct _icon_ {
+class CIcon {
+public:
+
+	CIcon(const char *ident, int frame,
+		const char *file, int width, int height);
+	~CIcon();
+
+	/// Draw icon
+	void DrawIcon(const CPlayer *player, int x, int y) const;
+	/// Draw icon of an unit
+	void DrawUnitIcon(const CPlayer *player,
+		struct _button_style_ *style, unsigned flags, int x, int y,
+		const char *text) const;
+
+
+
 	char *Ident;              /// Icon identifier
 	Graphic *G;               /// Graphic data
 	int Frame;                /// Frame number in graphic
-} Icon;
+} ;
 
 	/// Icon reference (used in config tables)
-typedef struct _icon_config_ {
+class IconConfig {
+public:
 	char *Name;          /// config icon name
-	struct _icon_ *Icon; /// icon pointer to use to run time
-} IconConfig;
+	CIcon *Icon; /// icon pointer to use to run time
+};
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -132,13 +148,7 @@ extern void LoadIcons(void);   /// Load icons
 extern void CleanIcons(void);  /// Cleanup icons
 
 	/// Name -> icon
-extern Icon *IconByIdent(const char *ident);
-	/// Draw icon
-extern void DrawIcon(const CPlayer *player, Icon *icon, int x, int y);
-	/// Draw icon of an unit
-extern void DrawUnitIcon(const CPlayer *player,
-	struct _button_style_ *style, Icon *icon, unsigned flags, int x, int y,
-	const char *text);
+extern CIcon *IconByIdent(const char *ident);
 
 	/// Register CCL features
 extern void IconCclRegister(void);

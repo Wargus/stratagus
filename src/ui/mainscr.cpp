@@ -506,7 +506,7 @@ void DrawPanelIcon(const CUnit *unit, ContentType* content, int defaultfont)
 	y = content->PosY;
 	unit = GetUnitRef(unit, content->Data.Icon.UnitRef);
 	if (unit && unit->Type->Icon.Icon) {
-		DrawIcon(unit->Player, unit->Type->Icon.Icon, x, y);
+		unit->Type->Icon.Icon->DrawIcon(unit->Player, x, y);
 	}
 }
 
@@ -664,7 +664,7 @@ static void DrawUnitInfo(CUnit *unit)
 	if (UI.SingleSelectedButton) {
 		x = UI.SingleSelectedButton->X;
 		y = UI.SingleSelectedButton->Y;
-		DrawUnitIcon(unit->Player, UI.SingleSelectedButton->Style, type->Icon.Icon,
+		type->Icon.Icon->DrawUnitIcon(unit->Player, UI.SingleSelectedButton->Style,
 			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 				(IconActive | (MouseButtons & LeftButton)) : 0,
 			x, y, NULL);
@@ -685,8 +685,8 @@ static void DrawUnitInfo(CUnit *unit)
 						UI.SingleTrainingFont, UI.SingleTrainingText);
 				}
 				if (UI.SingleTrainingButton) {
-					DrawUnitIcon(unit->Player, UI.SingleTrainingButton->Style,
-						unit->Orders[0].Type->Icon.Icon,
+					unit->Orders[0].Type->Icon.Icon->DrawUnitIcon(unit->Player,
+						UI.SingleTrainingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaTraining &&
 							ButtonUnderCursor == 0) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0,
@@ -701,8 +701,8 @@ static void DrawUnitInfo(CUnit *unit)
 					for (i = 0; i < unit->OrderCount &&
 							i < UI.NumTrainingButtons; ++i) {
 						if (unit->Orders[i].Action == UnitActionTrain) {
-							DrawUnitIcon(unit->Player, UI.TrainingButtons[i].Style,
-								unit->Orders[i].Type->Icon.Icon,
+							unit->Orders[i].Type->Icon.Icon->DrawUnitIcon(unit->Player,
+								 UI.TrainingButtons[i].Style,
 								(ButtonAreaUnderCursor == ButtonAreaTraining &&
 									ButtonUnderCursor == i) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0,
@@ -719,8 +719,8 @@ static void DrawUnitInfo(CUnit *unit)
 		//
 		if (unit->Orders[0].Action == UnitActionUpgradeTo) {
 			if (UI.UpgradingButton) {
-				DrawUnitIcon(unit->Player, UI.UpgradingButton->Style,
-					unit->Orders[0].Type->Icon.Icon,
+				unit->Orders[0].Type->Icon.Icon->DrawUnitIcon(unit->Player,
+					UI.UpgradingButton->Style,
 					(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
@@ -734,8 +734,8 @@ static void DrawUnitInfo(CUnit *unit)
 		//
 		if (unit->Orders[0].Action == UnitActionResearch) {
 			if (UI.ResearchingButton) {
-				DrawUnitIcon(unit->Player, UI.ResearchingButton->Style,
-					unit->Data.Research.Upgrade->Icon.Icon,
+				unit->Data.Research.Upgrade->Icon.Icon->DrawUnitIcon(unit->Player,
+					UI.ResearchingButton->Style,
 					(ButtonAreaUnderCursor == ButtonAreaResearching &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
@@ -754,8 +754,7 @@ static void DrawUnitInfo(CUnit *unit)
 		uins = unit->UnitInside;
 		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
 			if (uins->Boarded && j < UI.NumTransportingButtons) {
-				DrawUnitIcon(unit->Player, UI.TransportingButtons[j].Style,
-					uins->Type->Icon.Icon,
+				uins->Type->Icon.Icon->DrawUnitIcon(unit->Player, UI.TransportingButtons[j].Style,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, NULL);
@@ -1299,8 +1298,8 @@ void CInfoPanel::Draw(void)
 			DrawInfoPanelBackground(0);
 			for (i = 0; i < (NumSelected > UI.NumSelectedButtons ?
 					UI.NumSelectedButtons : NumSelected); ++i) {
-				DrawUnitIcon(ThisPlayer, UI.SelectedButtons[i].Style,
-					Selected[i]->Type->Icon.Icon,
+				Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer,
+					UI.SelectedButtons[i].Style,
 					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, NULL);

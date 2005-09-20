@@ -57,13 +57,29 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::vector<Icon *> AllIcons;          /// Vector of all icons.
-static std::map<std::string, Icon *> Icons;   /// Map of ident to icon.
+static std::vector<CIcon *> AllIcons;          /// Vector of all icons.
+static std::map<std::string, CIcon *> Icons;   /// Map of ident to icon.
 
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+CIcon::CIcon(const char *ident, int frame,
+	const char *file, int width, int height) : G(NULL), Frame(frame)
+{
+	this->Ident = new char[strlen(ident) + 1];
+	strcpy(this->Ident, ident);
+	if (file) {
+		this->G = NewGraphic(file, width, height);
+	}
+}
+
+CIcon::~CIcon()
+{
+	delete[] this->Ident;
+	FreeGraphic(this->G);
+}
 
 /**
 **  Add an icon definition.
@@ -77,7 +93,7 @@ static std::map<std::string, Icon *> Icons;   /// Map of ident to icon.
 static void AddIcon(const char *ident, int frame, int width,
 	int height, const char *file)
 {
-	Icon *icon = Icons[ident];
+	CIcon *icon = Icons[ident];
 	if (icon) {
 		// Redefine icon
 		if (file) {
@@ -88,15 +104,7 @@ static void AddIcon(const char *ident, int frame, int width,
 		}
 		icon->Frame = frame;
 	} else {
-		icon = new Icon;
-		icon->Ident = new char[strlen(ident) + 1];
-		strcpy(icon->Ident, ident);
-		if (file) {
-			icon->G = NewGraphic(file, width, height);
-		} else {
-			icon->G = NULL;
-		}
-		icon->Frame = frame;
+		icon = new CIcon(ident, frame, file, width, height);
 
 		Icons[ident] = icon;
 		AllIcons.push_back(icon);
@@ -117,8 +125,8 @@ void InitIcons(void)
 */
 void LoadIcons(void)
 {
-	for (std::vector<Icon *>::size_type i = 0; i < AllIcons.size(); ++i) {
-		Icon *icon = AllIcons[i];
+	for (std::vector<CIcon *>::size_type i = 0; i < AllIcons.size(); ++i) {
+		CIcon *icon = AllIcons[i];
 		icon->G->Load();
 		ShowLoadProgress("Icons %s", icon->G->File);
 		if (icon->Frame >= icon->G->NumFrames) {
@@ -134,14 +142,11 @@ void LoadIcons(void)
 */
 void CleanIcons(void)
 {
-	while (AllIcons.size()) {
-		Icon *icon = AllIcons.back();
-		AllIcons.pop_back();
-		delete[] icon->Ident;
-		FreeGraphic(icon->G);
-		delete icon;
+	for (std::vector<CIcon *>::iterator i = AllIcons.begin();
+		i != AllIcons.end();
+		++i) {
+		delete *i;
 	}
-
 	AllIcons.clear();
 	Icons.clear();
 }
@@ -153,9 +158,9 @@ void CleanIcons(void)
 **
 **  @return       Icon pointer or NULL if not found.
 */
-Icon *IconByIdent(const char *ident)
+CIcon *IconByIdent(const char *ident)
 {
-	Icon *icon = Icons[ident];
+	CIcon *icon = Icons[ident];
 	if (!icon) {
 		DebugPrint("Icon %s not found\n" _C_ ident);
 	}
@@ -170,9 +175,9 @@ Icon *IconByIdent(const char *ident)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 */
-void DrawIcon(const CPlayer *player, Icon *icon, int x, int y)
+void CIcon::DrawIcon(const CPlayer *player, int x, int y) const
 {
-	icon->G->DrawPlayerColorFrameClip(player->Index, icon->Frame, x, y);
+	this->G->DrawPlayerColorFrameClip(player->Index, this->Frame, x, y);
 }
 
 /**
@@ -186,16 +191,16 @@ void DrawIcon(const CPlayer *player, Icon *icon, int x, int y)
 **  @param y       Y display pixel position
 **  @param text    Optional text to display
 */
-void DrawUnitIcon(const CPlayer *player, ButtonStyle *style, Icon *icon,
-	unsigned flags, int x, int y, const char *text)
+void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
+	unsigned flags, int x, int y, const char *text) const
 {
 	ButtonStyle s;
 
 	memcpy(&s, style, sizeof(ButtonStyle));
 	s.Default.Sprite = s.Hover.Sprite = s.Selected.Sprite =
-		s.Clicked.Sprite = s.Disabled.Sprite = icon->G;
+		s.Clicked.Sprite = s.Disabled.Sprite = this->G;
 	s.Default.Frame = s.Hover.Frame = s.Selected.Frame =
-		s.Clicked.Frame = s.Disabled.Frame = icon->Frame;
+		s.Clicked.Frame = s.Disabled.Frame = this->Frame;
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
 		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
