@@ -103,7 +103,7 @@ static int WaitForTransporter(CUnit *unit)
 
 	if (!UnitVisibleAsGoal(trans, unit->Player)) {
 		DebugPrint("Transporter Gone\n");
-		RefsDecrease(trans);
+		trans->RefsDecrease();
 		unit->Orders[0].Goal = NoUnitP;
 		unit->Wait = 6;
 		return 0;
@@ -146,12 +146,12 @@ static void EnterTransporter(CUnit *unit)
 	transporter = unit->Orders[0].Goal;
 	if (!UnitVisibleAsGoal(transporter, unit->Player)) {
 		DebugPrint("Transporter gone\n");
-		RefsDecrease(transporter);
+		transporter->RefsDecrease();
 		unit->Orders[0].Goal = NoUnitP;
 		return;
 	}
 
-	RefsDecrease(transporter);
+	transporter->RefsDecrease();
 	unit->Orders[0].Goal = NoUnitP;
 
 	//
@@ -159,7 +159,7 @@ static void EnterTransporter(CUnit *unit)
 	//
 
 	if (transporter->BoardCount < transporter->Type->MaxOnBoard) {
-		RemoveUnit(unit, transporter);
+		unit->Remove(transporter);
 		transporter->BoardCount++;
 		unit->Boarded = 1;
 		if (!unit->Player->AiEnabled) {
@@ -225,7 +225,7 @@ void HandleActionBoard(CUnit *unit)
 						if (++unit->SubAction == 200) {
 							unit->Orders[0].Action = UnitActionStill;
 							if ((goal = unit->Orders[0].Goal)) {
-								RefsDecrease(goal);
+								goal->RefsDecrease();
 								unit->Orders[0].Goal = NoUnitP;
 							}
 							unit->SubAction = 0;

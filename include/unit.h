@@ -634,6 +634,32 @@ public:
 	} Data; /// Storage room for different commands
 
 	CUnit *Goal; /// Generic goal pointer
+
+
+	inline bool IsIdle() { return Orders[0].Action == UnitActionStill && OrderCount == 1; }
+
+	/// Increase an unit's reference count
+	void RefsIncrease();
+	/// Decrease an unit's reference count
+	void RefsDecrease();
+
+	/// Initialize unit structure with default values
+	void Init(CUnitType *type);
+	/// Assign unit to player
+	void AssignToPlayer(CPlayer *player);
+
+	/// Place an unit on map
+	void Place(int x, int y);
+
+	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
+	void MoveToXY(int x, int y);
+	/// Add an unit inside a container. Only deal with list stuff.
+	void AddInContainer(CUnit *host);
+
+	/// Remove unit from map/groups/...
+	void Remove(CUnit *host);
+	/// Release an unit
+	void Release();
 };
 
 #define NoUnitP (CUnit *)0         /// return value: for no unit found
@@ -655,11 +681,6 @@ public:
 **  Returns unit number (unique to this unit)
 */
 #define UnitNumber(unit) ((unit)->Slot)
-
-/**
-**  Check if a unit is idle.
-*/
-#define UnitIdle(unit) ((unit->Orders[0].Action == UnitActionStill) && (unit->OrderCount == 1))
 
 /**
 **  Return the unit type movement mask.
@@ -729,35 +750,17 @@ extern CUnit *ReleasedTail;                 /// Tail of the released unit list.
 
 	/// Prepare unit memory allocator
 extern void InitUnitsMemory(void);
-	/// Increase an unit's reference count
-extern void RefsIncrease(CUnit *unit);
-	/// Decrease an unit's reference count
-extern void RefsDecrease(CUnit *unit);
 	///  Mark the field with the FieldFlags.
 void MarkUnitFieldFlags(const CUnit *unit);
 	///  Unmark the field with the FieldFlags.
 void UnmarkUnitFieldFlags(const CUnit *unit);
 	/// Update unit->CurrentSightRange.
 void UpdateUnitSightRange(CUnit *unit);
-	/// Release an unit
-extern void ReleaseUnit(CUnit *unit);
-	/// Initialize unit structure with default values
-extern void InitUnit(CUnit *unit, CUnitType *type);
-	/// Assign unit to player
-extern void AssignUnitToPlayer(CUnit *unit, CPlayer *player);
 	/// Create a new unit
 extern CUnit *MakeUnit(CUnitType *type, CPlayer *player);
-	/// Place an unit on map
-extern void PlaceUnit(CUnit *unit, int x, int y);
 	/// Create a new unit and place on map
 extern CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player);
-	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
-extern void MoveUnitToXY(CUnit *unit, int x, int y);
-	/// Add an unit inside a container. Only deal with list stuff.
-extern void AddUnitInContainer(CUnit *unit, CUnit *host);
-	/// Remove unit from map/groups/...
-extern void RemoveUnit(CUnit *unit, CUnit *host);
-	/// Handle the loose of an unit (food,...)
+	/// Handle the loss of an unit (food,...)
 extern void UnitLost(CUnit *unit);
 	/// Remove the Orders of a Unit
 extern void UnitClearOrders(CUnit *unit);

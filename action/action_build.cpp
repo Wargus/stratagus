@@ -270,10 +270,10 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		Assert(b);
 		if (b->Data.OnTop.ReplaceOnBuild) {
 			build->ResourcesHeld = ontop->ResourcesHeld; // We capture the value of what is beneath.
-			RemoveUnit(ontop, NULL); // Destroy building beneath
+			ontop->Remove(NULL); // Destroy building beneath
 			UnitLost(ontop);
 			UnitClearOrders(ontop);
-			ReleaseUnit(ontop);
+			ontop->Release();
 		}
 	}
 
@@ -281,7 +281,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	build->Orders[0].Action = UnitActionBuilt;
 	
 	// Must place after previous for map flags
-	PlaceUnit(build, x, y);
+	build->Place(x, y);
 	if (!type->BuilderOutside) {
 		build->CurrentSightRange = 1;
 	}
@@ -300,7 +300,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	if (!type->BuilderOutside) {
 		// Place the builder inside the building
 		build->Data.Built.Worker = unit;
-		RemoveUnit(unit, build);
+		unit->Remove(build);
 		build->CurrentSightRange = 0;
 		unit->X = x;
 		unit->Y = y;
@@ -316,7 +316,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
 		UnitUpdateHeading(unit);
 		unit->Data.Build.Cycles = 0;
-		RefsIncrease(build);
+		build->RefsIncrease();
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
 	}
@@ -343,7 +343,7 @@ static void BuildBuilding(CUnit *unit)
 	Assert(goal);
 
 	if (goal->Orders[0].Action == UnitActionDie) {
-		RefsDecrease(goal);
+		goal->RefsDecrease();
 		unit->Orders[0].Goal = NULL;
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = unit->State = 0;
@@ -376,7 +376,7 @@ static void BuildBuilding(CUnit *unit)
 	// Building is gone or finished
 	//
 	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
-		RefsDecrease(goal);
+		goal->RefsDecrease();
 		unit->Orders[0].Goal = NULL;
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = unit->State = 0;
@@ -531,10 +531,10 @@ void HandleActionBuilt(CUnit *unit)
 		if (unit->Type == UnitTypeOrcWall ||
 				unit->Type == UnitTypeHumanWall) {
 			MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
-			RemoveUnit(unit, NULL);
+			unit->Remove(NULL);
 			UnitLost(unit);
 			UnitClearOrders(unit);
-			ReleaseUnit(unit);
+			unit->Release();
 			return;
 		}
 

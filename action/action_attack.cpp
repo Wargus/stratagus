@@ -114,7 +114,7 @@ static int CheckForDeadGoal(CUnit *unit)
 	unit->Orders[0].MinRange = 0;
 	unit->Orders[0].Range = 0;
 
-	RefsDecrease(goal);
+	goal->RefsDecrease();
 	unit->Orders[0].Goal = NoUnitP;
 
 	//
@@ -168,7 +168,7 @@ static int CheckForTargetInRange(CUnit *unit)
 				Assert(!unit->Orders[0].Goal);
 				unit->SavedOrder = unit->Orders[0];
 			}
-			RefsIncrease(goal);
+			goal->RefsIncrease();
 			unit->Orders[0].Goal = goal;
 			unit->Orders[0].MinRange = unit->Type->MinAttackRange;
 			unit->Orders[0].Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
@@ -183,8 +183,8 @@ static int CheckForTargetInRange(CUnit *unit)
 	} else if (goal && (unit->SubAction & WEAK_TARGET)) {
 		temp = AttackUnitsInReactRange(unit);
 		if (temp && temp->Type->Priority > goal->Type->Priority) {
-			RefsDecrease(goal);
-			RefsIncrease(temp);
+			goal->RefsDecrease();
+			temp->RefsIncrease();
 			if (unit->SavedOrder.Action == UnitActionStill) {
 				// Save current command to come back.
 				unit->SavedOrder = unit->Orders[0];
@@ -296,7 +296,7 @@ static void MoveToTarget(CUnit *unit)
 	//
 	unit->State = unit->SubAction = 0;
 	if (unit->Orders[0].Goal) {
-		RefsDecrease(unit->Orders->Goal);
+		unit->Orders->Goal->RefsDecrease();
 	}
 	unit->Orders[0] = unit->SavedOrder;
 	NewResetPath(unit);
@@ -375,7 +375,7 @@ static void AttackTarget(CUnit *unit)
 			unit->SavedOrder = unit->Orders[0];
 		}
 
-		RefsIncrease(goal);
+		goal->RefsIncrease();
 		unit->Orders[0].Goal = goal;
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
 		unit->Orders[0].MinRange = unit->Type->MinAttackRange;
@@ -390,8 +390,8 @@ static void AttackTarget(CUnit *unit)
 	} else if (goal && (unit->SubAction & WEAK_TARGET)) {
 		temp = AttackUnitsInReactRange(unit);
 		if (temp && temp->Type->Priority > goal->Type->Priority) {
-			RefsDecrease(goal);
-			RefsIncrease(temp);
+			goal->RefsDecrease();
+			temp->RefsIncrease();
 
 			if (unit->SavedOrder.Action == UnitActionStill) {
 				// Save current order to come back or to continue it.
@@ -508,7 +508,7 @@ void HandleActionAttack(CUnit *unit)
 			if (!CanMove(unit)) {
 				// Release order.
 				if (unit->Orders[0].Goal) {
-					RefsDecrease(unit->Orders[0].Goal);
+					unit->Orders[0].Goal->RefsDecrease();
 				}
 				unit->Orders[0] = unit->SavedOrder;
 				unit->SavedOrder.Action = UnitActionStill;

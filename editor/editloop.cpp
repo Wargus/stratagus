@@ -1449,12 +1449,12 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case KeyCodeDelete: // Delete
 			if (UnitUnderCursor) {
-				CUnit *unit;
+				CUnit *unit = UnitUnderCursor;
 
-				RemoveUnit(unit = UnitUnderCursor, NULL);
+				unit->Remove(NULL);
 				UnitLost(unit);
 				UnitClearOrders(unit);
-				ReleaseUnit(unit);
+				unit->Release();
 				UI.StatusLine.Set("Unit deleted");
 			}
 			break;

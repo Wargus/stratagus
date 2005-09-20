@@ -111,11 +111,11 @@ void InitUnitsMemory(void)
 **
 **  @param unit The unit
 */
-void RefsIncrease(CUnit *unit)
+void CUnit::RefsIncrease()
 {
-	RefsAssert(unit->Refs && !unit->Destroyed);
+	RefsAssert(Refs && !Destroyed);
 	if (!SaveGameLoading) {
-		++unit->Refs;
+		++Refs;
 	}
 }
 
@@ -124,17 +124,17 @@ void RefsIncrease(CUnit *unit)
 **
 **  @param unit The unit
 */
-void RefsDecrease(CUnit *unit)
+void CUnit::RefsDecrease()
 {
-	RefsAssert(unit->Refs);
+	RefsAssert(Refs);
 	if (!SaveGameLoading) {
-		if (unit->Destroyed) {
-			if (!--unit->Refs) {
-				ReleaseUnit(unit);
+		if (Destroyed) {
+			if (!--Refs) {
+				Release();
 			}
 		} else {
-			--unit->Refs;
-			RefsAssert(unit->Refs);
+			--Refs;
+			RefsAssert(Refs);
 		}
 	}
 }
@@ -146,76 +146,76 @@ void RefsDecrease(CUnit *unit)
 **
 **  @param unit Pointer to unit.
 */
-void ReleaseUnit(CUnit *unit)
+void CUnit::Release()
 {
 	CUnit *temp;
 
-	Assert(unit->Type); // already free.
-	Assert(unit->OrderCount == 1);
-	Assert(!unit->Orders[0].Goal);
+	Assert(Type); // already free.
+	Assert(OrderCount == 1);
+	Assert(!Orders[0].Goal);
 
 	//
 	// First release, remove from lists/tables.
 	//
-	if (!unit->Destroyed) {
-		DebugPrint("First release %d\n" _C_ unit->Slot);
+	if (!Destroyed) {
+		DebugPrint("First release %d\n" _C_ Slot);
 
 		//
 		// Are more references remaining?
 		//
-		unit->Destroyed = 1; // mark as destroyed
+		Destroyed = 1; // mark as destroyed
 
-		if (unit->Container) {
-			MapUnmarkUnitSight(unit);
-			RemoveUnitFromContainer(unit);
+		if (Container) {
+			MapUnmarkUnitSight(this);
+			RemoveUnitFromContainer(this);
 		}
 
-		if (--unit->Refs > 0) {
+		if (--Refs > 0) {
 			return;
 		}
 	}
 
-	RefsAssert(!unit->Refs);
+	RefsAssert(!Refs);
 
 	//
 	// No more references remaining, but the network could have an order
 	// on the way. We must wait a little time before we could free the
 	// memory.
 	//
-	RemoveUnit(unit, NULL);
+	Remove(NULL);
 
 	//
 	// Remove the unit from the global units table.
 	//
-	Assert(*unit->UnitSlot == unit);
+	Assert(*UnitSlot == this);
 	temp = Units[--NumUnits];
-	temp->UnitSlot = unit->UnitSlot;
-	*unit->UnitSlot = temp;
+	temp->UnitSlot = UnitSlot;
+	*UnitSlot = temp;
 	Units[NumUnits] = NULL;
 
 	if (ReleasedHead) {
-		ReleasedTail->Next = unit;
-		ReleasedTail = unit;
-		unit->Next = 0;
+		ReleasedTail->Next = this;
+		ReleasedTail = this;
+		Next = 0;
 	} else {
-		ReleasedHead = ReleasedTail = unit;
-		unit->Next = 0;
+		ReleasedHead = ReleasedTail = this;
+		Next = 0;
 	}
-	unit->Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
-	unit->Type = 0;  // for debugging.
-	free(unit->CacheLinks);
+	Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
+	Type = 0;  // for debugging.
+	free(CacheLinks);
 
 	if (ReleasedOrderHead) {
-		ReleasedOrderTail->Arg1.Order = unit->Orders;
-		ReleasedOrderTail = unit->Orders;
-		unit->Orders->Arg1.Order = NULL;
+		ReleasedOrderTail->Arg1.Order = Orders;
+		ReleasedOrderTail = Orders;
+		Orders->Arg1.Order = NULL;
 	} else {
-		ReleasedOrderHead = ReleasedOrderTail = unit->Orders;
-		unit->Orders->Arg1.Order = NULL;
+		ReleasedOrderHead = ReleasedOrderTail = Orders;
+		Orders->Arg1.Order = NULL;
 	}
-	unit->Orders->X = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
-	unit->Orders->Y = unit->TotalOrders; // store order count for when reused
-	unit->Orders = NULL;
+	Orders->X = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
+	Orders->Y = TotalOrders; // store order count for when reused
+	Orders = NULL;
 }
 
 /**
@@ -272,88 +272,88 @@ static CUnit *AllocUnit(void)
 **  @param unit    Unit pointer (allocated zero filled)
 **  @param type    Unit-type
 */
-void InitUnit(CUnit *unit, CUnitType* type)
+void CUnit::Init(CUnitType* type)
 {
 	int i;
 
 	Assert(type);
 
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
-	unit->Refs = 1;
+	Refs = 1;
 
 	//
 	//  Build all unit table
 	//
-	unit->UnitSlot = &Units[NumUnits]; // back pointer
-	Units[NumUnits++] = unit;
+	UnitSlot = &Units[NumUnits]; // back pointer
+	Units[NumUnits++] = this;
 
 	//
 	//  Initialise unit structure (must be zero filled!)
 	//
-	unit->Type = type;
-	unit->CacheLinks = (UnitListItem*)calloc(type->TileWidth * type->TileHeight, sizeof(UnitListItem));
+	Type = type;
+	CacheLinks = (UnitListItem*)calloc(type->TileWidth * type->TileHeight, sizeof(UnitListItem));
 	for (i = 0; i < type->TileWidth * type->TileHeight; ++i) {
-		unit->CacheLinks[i].Unit = unit;
+		CacheLinks[i].Unit = this;
 	}
 
-	unit->Seen.Frame = UnitNotSeen; // Unit isn't yet seen
+	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
 	// On Load, Some units don't have Still animation, eg Deadbody
-	if (unit->Type->Animations && !unit->Type->Animations->Still) {
-		unit->Frame = type->StillFrame;
+	if (Type->Animations && !Type->Animations->Still) {
+		Frame = type->StillFrame;
 	}
 
 	if (UnitTypeVar.NumberVariable) {
-		Assert(!unit->Variable);
-		unit->Variable = (VariableType*)malloc(UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
-		memcpy(unit->Variable, unit->Type->Variable,
-			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+		Assert(!Variable);
+		Variable = (VariableType *)malloc(UnitTypeVar.NumberVariable * sizeof(*Variable));
+		memcpy(Variable, Type->Variable,
+			UnitTypeVar.NumberVariable * sizeof(*Variable));
 	}
 
 	if (type->NumDirections > 1 && type->Sprite && type->Sprite->NumFrames > 5) {
-		unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
-		UnitUpdateHeading(unit);
+		Direction = (MyRand() >> 8) & 0xFF; // random heading
+		UnitUpdateHeading(this);
 	}
 
 	if (type->CanCastSpell) {
-		unit->AutoCastSpell = (char*)malloc(SpellTypeTable.size());
-		if (unit->Type->AutoCastActive) {
-			memcpy(unit->AutoCastSpell, unit->Type->AutoCastActive, SpellTypeTable.size());
+		AutoCastSpell = (char *)malloc(SpellTypeTable.size());
+		if (Type->AutoCastActive) {
+			memcpy(AutoCastSpell, Type->AutoCastActive, SpellTypeTable.size());
 		} else {
-			memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
+			memset(AutoCastSpell, 0, SpellTypeTable.size());
 		}
 	}
-	unit->Active = 1;
+	Active = 1;
 
-	unit->Removed = 1;
+	Removed = 1;
 
-	unit->Rs = MyRand() % 100; // used for fancy buildings and others
+	Rs = MyRand() % 100; // used for fancy buildings and others
 
 	// Init Orders and Default to Still/None
 	if (ReleasedOrderHead && (unsigned)ReleasedOrderHead->X < GameCycle) {
-		unit->Orders = ReleasedOrderHead;
-		unit->TotalOrders = ReleasedOrderHead->Y;
+		Orders = ReleasedOrderHead;
+		TotalOrders = ReleasedOrderHead->Y;
 		ReleasedOrderHead = ReleasedOrderHead->Arg1.Order;
 	} else {
 		// No Available Orders in Memory, create new ones
-		unit->TotalOrders = DEFAULT_START_ORDERS;
-		unit->Orders = (Order*)calloc(unit->TotalOrders, sizeof(Order));
+		TotalOrders = DEFAULT_START_ORDERS;
+		Orders = (Order *)calloc(TotalOrders, sizeof(Order));
 	}
 
 
-	unit->OrderCount = 1; // No orders
-	unit->Orders[0].Action = UnitActionStill;
-	unit->Orders[0].X = unit->Orders[0].Y = -1;
-	Assert(!unit->Orders[0].Goal);
-	unit->NewOrder.Action = UnitActionStill;
-	unit->NewOrder.X = unit->NewOrder.Y = -1;
-	Assert(!unit->NewOrder.Goal);
-	unit->SavedOrder.Action = UnitActionStill;
-	unit->SavedOrder.X = unit->SavedOrder.Y = -1;
-	Assert(!unit->SavedOrder.Goal);
-	unit->CriticalOrder.Action = UnitActionStill;
-	unit->CriticalOrder.X = unit->CriticalOrder.Y = -1;
-	Assert(!unit->CriticalOrder.Goal);
+	OrderCount = 1; // No orders
+	Orders[0].Action = UnitActionStill;
+	Orders[0].X = Orders[0].Y = -1;
+	Assert(!Orders[0].Goal);
+	NewOrder.Action = UnitActionStill;
+	NewOrder.X = NewOrder.Y = -1;
+	Assert(!NewOrder.Goal);
+	SavedOrder.Action = UnitActionStill;
+	SavedOrder.X = SavedOrder.Y = -1;
+	Assert(!SavedOrder.Goal);
+	CriticalOrder.Action = UnitActionStill;
+	CriticalOrder.X = CriticalOrder.Y = -1;
+	Assert(!CriticalOrder.Goal);
 }
 
 /**
@@ -363,18 +363,18 @@ void InitUnit(CUnit *unit, CUnitType* type)
 **  @param player  player which have the unit.
 **
 */
-void AssignUnitToPlayer(CUnit *unit, CPlayer *player)
+void CUnit::AssignToPlayer(CPlayer *player)
 {
 	CUnitType *type;  // type of unit.
 
 	Assert(player);
-	type = unit->Type;
+	type = Type;
 
 	//
 	// Build player unit table
 	//
-	if (!type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
-		unit->PlayerSlot = player->Units + player->TotalNumUnits++;
+	if (!type->Vanishes && Orders[0].Action != UnitActionDie) {
+		PlayerSlot = player->Units + player->TotalNumUnits++;
 		if (!SaveGameLoading) {
 			// If unit is dieing, it's already been lost by all players
 			// don't count again
@@ -387,7 +387,7 @@ void AssignUnitToPlayer(CUnit *unit, CPlayer *player)
 				player->TotalUnits++;
 			}
 		}
-		*unit->PlayerSlot = unit;
+		*PlayerSlot = this;
 
 		player->UnitTypesCount[type->Slot]++;
 		player->Demand += type->Demand; // food needed
@@ -395,21 +395,21 @@ void AssignUnitToPlayer(CUnit *unit, CPlayer *player)
 
 
 	// Don't Add the building if it's dieing, used to load a save game
-	if (type->Building && unit->Orders[0].Action != UnitActionDie) {
+	if (type->Building && Orders[0].Action != UnitActionDie) {
 		// FIXME: support more races
 		if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
 			player->NumBuildings++;
 		}
 	}
-	unit->Player = player;
-	unit->Stats = &type->Stats[unit->Player->Index];
-	unit->Colors = &player->UnitColors;
+	Player = player;
+	Stats = &type->Stats[Player->Index];
+	Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.NumberVariable) {
-			Assert(unit->Variable);
-			Assert(unit->Stats->Variables);
-			memcpy(unit->Variable, unit->Stats->Variables,
-				UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+			Assert(Variable);
+			Assert(Stats->Variables);
+			memcpy(Variable, Stats->Variables,
+				UnitTypeVar.NumberVariable * sizeof(*Variable));
 		}
 	}
 }
@@ -431,11 +431,11 @@ CUnit *MakeUnit(CUnitType *type, CPlayer *player)
 		return NoUnitP;
 	}
 
-	InitUnit(unit, type);
+	unit->Init(type);
 
 	// Only Assign if a Player was specified
 	if (player) {
-		AssignUnitToPlayer(unit, player);
+		unit->AssignToPlayer(player);
 	}
 
 	if (type->Building) {
@@ -678,19 +678,19 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 **  @param unit    Pointer to unit.
 **  @param host    Pointer to container.
 */
-void AddUnitInContainer(CUnit *unit, CUnit *host)
+void CUnit::AddInContainer(CUnit *host)
 {
-	Assert(host && unit->Container == 0);
-	unit->Container = host;
+	Assert(host && Container == 0);
+	Container = host;
 	if (host->InsideCount == 0) {
-		unit->NextContained = unit->PrevContained = unit;
+		NextContained = PrevContained = this;
 	} else {
-		unit->NextContained = host->UnitInside;
-		unit->PrevContained = host->UnitInside->PrevContained;
-		host->UnitInside->PrevContained->NextContained = unit;
-		host->UnitInside->PrevContained = unit;
+		NextContained = host->UnitInside;
+		PrevContained = host->UnitInside->PrevContained;
+		host->UnitInside->PrevContained->NextContained = this;
+		host->UnitInside->PrevContained = this;
 	}
-	host->UnitInside = unit;
+	host->UnitInside = this;
 	host->InsideCount++;
 }
 
@@ -755,23 +755,21 @@ static void UnitInXY(CUnit *unit, int x, int y)
 **  @param y       Y map tile position.
 **
 */
-void MoveUnitToXY(CUnit *unit, int x, int y)
+void CUnit::MoveToXY(int x, int y)
 {
-	Assert(unit);
+	MapUnmarkUnitSight(this);
+	UnitCacheRemove(this);
+	UnmarkUnitFieldFlags(this);
 
-	MapUnmarkUnitSight(unit);
-	UnitCacheRemove(unit);
-	UnmarkUnitFieldFlags(unit);
-
-	Assert(UnitCanBeAt(unit, x, y));
+	Assert(UnitCanBeAt(this, x, y));
 	// Move the unit.
-	UnitInXY(unit, x, y);
+	UnitInXY(this, x, y);
 
-	UnitCacheInsert(unit);
-	MarkUnitFieldFlags(unit);
+	UnitCacheInsert(this);
+	MarkUnitFieldFlags(this);
 	//  Recalculate the seen count.
-	UnitCountSeen(unit);
-	MapMarkUnitSight(unit);
+	UnitCountSeen(this);
+	MapMarkUnitSight(this);
 }
 
 /**
@@ -781,28 +779,28 @@ void MoveUnitToXY(CUnit *unit, int x, int y)
 **  @param x       X map tile position.
 **  @param y       Y map tile position.
 */
-void PlaceUnit(CUnit *unit, int x, int y)
+void CUnit::Place(int x, int y)
 {
-	Assert(unit->Removed);
+	Assert(Removed);
 
-	if (unit->Container) {
-		MapUnmarkUnitSight(unit);
-		RemoveUnitFromContainer(unit);
+	if (Container) {
+		MapUnmarkUnitSight(this);
+		RemoveUnitFromContainer(this);
 	}
-	unit->Next = 0;
+	Next = 0;
 	if (!SaveGameLoading) {
-		UpdateUnitSightRange(unit);
+		UpdateUnitSightRange(this);
 	}
-	unit->Removed = 0;
-	UnitInXY(unit, x, y);
+	Removed = 0;
+	UnitInXY(this, x, y);
 	// Pathfinding info.
-	MarkUnitFieldFlags(unit);
+	MarkUnitFieldFlags(this);
 	// Tha cache list.
-	UnitCacheInsert(unit);
+	UnitCacheInsert(this);
 	//  Calculate the seen count.
-	UnitCountSeen(unit);
+	UnitCountSeen(this);
 	// Vision
-	MapMarkUnitSight(unit);
+	MapMarkUnitSight(this);
 }
 
 /**
@@ -822,7 +820,7 @@ CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player)
 	unit = MakeUnit(type, player);
 
 	if (unit != NoUnitP) {
-		PlaceUnit(unit, x, y);
+		unit->Place(x, y);
 	}
 
 	return unit;
@@ -838,41 +836,41 @@ CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player)
 **  @param unit    Pointer to unit.
 **  @param host    Pointer to housing unit.
 */
-void RemoveUnit(CUnit *unit, CUnit *host)
+void CUnit::Remove(CUnit *host)
 {
-	if (unit->Removed) { // could happen!
+	if (Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
-		DebugPrint("unit '%s(%d)' already removed\n" _C_ unit->Type->Ident _C_ unit->Slot);
+		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident _C_ Slot);
 		return;
 	}
-	UnitCacheRemove(unit);
-	MapUnmarkUnitSight(unit);
-	UnmarkUnitFieldFlags(unit);
+	UnitCacheRemove(this);
+	MapUnmarkUnitSight(this);
+	UnmarkUnitFieldFlags(this);
 	if (host) {
-		AddUnitInContainer(unit, host);
-		UpdateUnitSightRange(unit);
-		UnitInXY(unit, host->X, host->Y);
-		MapMarkUnitSight(unit);
-		unit->Next = host; // What is it role ?
+		AddInContainer(host);
+		UpdateUnitSightRange(this);
+		UnitInXY(this, host->X, host->Y);
+		MapMarkUnitSight(this);
+		Next = host; // What is it role ?
 	}
 
-	unit->Removed = 1;
+	Removed = 1;
 
 	//  Remove unit from the current selection
-	if (unit->Selected) {
+	if (Selected) {
 		if (NumSelected == 1) { //  Remove building cursor
 			CancelBuildingMode();
 		}
-		UnSelectUnit(unit);
+		UnSelectUnit(this);
 		SelectionChanged();
 	}
 	// Remove unit from team selections
-	if (!unit->Selected && unit->TeamSelected) {
-		UnSelectUnit(unit);
+	if (!Selected && TeamSelected) {
+		UnSelectUnit(this);
 	}
 
 	// Unit is seen as under cursor
-	if (unit == UnitUnderCursor) {
+	if (this == UnitUnderCursor) {
 		UnitUnderCursor = NULL;
 	}
 }
@@ -1006,17 +1004,17 @@ void UnitClearOrders(CUnit *unit)
 	//
 	for (i = unit->OrderCount; i-- > 0;) {
 		if (unit->Orders[i].Goal) {
-			RefsDecrease(unit->Orders[i].Goal);
+			unit->Orders[i].Goal->RefsDecrease();
 			unit->Orders[i].Goal = NoUnitP;
 		}
 		unit->OrderCount = 1;
 	}
 	if (unit->NewOrder.Goal) {
-		RefsDecrease(unit->NewOrder.Goal);
+		unit->NewOrder.Goal->RefsDecrease();
 		unit->NewOrder.Goal = NoUnitP;
 	}
 	if (unit->SavedOrder.Goal) {
-		RefsDecrease(unit->SavedOrder.Goal);
+		unit->SavedOrder.Goal->RefsDecrease();
 		unit->SavedOrder.Goal = NoUnitP;
 	}
 	unit->Orders[0].Action = UnitActionStill;
@@ -1123,7 +1121,7 @@ void UnitGoesUnderFog(CUnit *unit, const CPlayer* player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (player->Type == PlayerPerson && !unit->Destroyed) {
-			RefsIncrease(unit);
+			unit->RefsIncrease();
 		}
 		//
 		// Icky yucky icky Seen.Destroyed trickery.
@@ -1166,7 +1164,7 @@ void UnitGoesOutOfFog(CUnit *unit, const CPlayer* player)
 		if (unit->Seen.ByPlayer & (1 << (player->Index))) {
 			if ((player->Type == PlayerPerson) &&
 					(!(   unit->Seen.Destroyed & (1 << player->Index)   )) ) {
-				RefsDecrease(unit);
+				unit->RefsDecrease();
 			}
 		} else {
 			unit->Seen.ByPlayer |= (1 << (player->Index));
@@ -1885,7 +1883,7 @@ startn:
 	}
 
 found:
-	PlaceUnit(unit, x, y);
+	unit->Place(x, y);
 }
 
 /**
@@ -1974,7 +1972,7 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 			}
 		}
 		if (bestd != 99999) {
-			PlaceUnit(unit, bestx, besty);
+			unit->Place(bestx, besty);
 			return;
 		}
 		++addy;
@@ -2887,7 +2885,7 @@ void LetUnitDie(CUnit *unit)
 		DebugPrint("Killing a removed unit?\n");
 		UnitLost(unit);
 		UnitClearOrders(unit);
-		ReleaseUnit(unit);
+		unit->Release();
 		return;
 	}
 
@@ -2905,10 +2903,10 @@ void LetUnitDie(CUnit *unit)
 
 	// Handle Teleporter Destination Removal
 	if (type->Teleporter && unit->Goal) {
-		RemoveUnit(unit->Goal, NULL);
+		unit->Goal->Remove(NULL);
 		UnitLost(unit->Goal);
 		UnitClearOrders(unit->Goal);
-		ReleaseUnit(unit->Goal);
+		unit->Goal->Release();
 		unit->Goal = NULL;
 	}
 
@@ -2927,7 +2925,7 @@ void LetUnitDie(CUnit *unit)
 		// FIXME: destroy or unload : do a flag.
 		DestroyAllInside(unit);
 	}
-	RemoveUnit(unit, NULL);
+	unit->Remove(NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 
@@ -2978,7 +2976,7 @@ void DestroyAllInside(CUnit *source)
 		}
 		UnitLost(unit);
 		UnitClearOrders(unit);
-		ReleaseUnit(unit);
+		unit->Release();
 	}
 }
 
@@ -3143,7 +3141,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 				0, 0);
 			missile->SourceUnit = target;
 			target->Burning = 1;
-			RefsIncrease(target);
+			target->RefsIncrease();
 		}
 	}
 

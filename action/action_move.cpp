@@ -135,7 +135,7 @@ int DoActionMove(CUnit *unit)
 
 		x = unit->X + xd;
 		y = unit->Y + yd;
-		MoveUnitToXY(unit, x, y);
+		unit->MoveToXY(x, y);
 
 		// Remove unit from the current selection
 		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, x, y)) {
@@ -214,7 +214,7 @@ void HandleActionMove(CUnit *unit)
 			unit->SubAction = 0;
 			// Release target, if any.
 			if ((goal = unit->Orders[0].Goal)) {
-				RefsDecrease(goal);
+				goal->RefsDecrease();
 				unit->Orders[0].Goal = NoUnitP;
 			}
 			unit->Orders[0].Action = UnitActionStill;
@@ -235,7 +235,7 @@ void HandleActionMove(CUnit *unit)
 		unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 		unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 		unit->Orders[0].Goal = NoUnitP;
-		RefsDecrease(goal);
+		goal->RefsDecrease();
 		NewResetPath(unit);
 	}
 }

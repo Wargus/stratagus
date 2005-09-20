@@ -146,7 +146,7 @@ static void SpellMoveToTarget(CUnit *unit)
 			unit->State = unit->SubAction = 0;
 
 			if (unit->Orders[0].Goal) { // Release references
-				RefsDecrease(unit->Orders->Goal);
+				unit->Orders->Goal->RefsDecrease();
 				unit->Orders[0].Goal = NoUnitP;
 			}
 		}
@@ -192,7 +192,7 @@ void HandleActionSpellCast(CUnit *unit)
 				unit->Orders[0].Action = UnitActionStill;
 				unit->SubAction = 0;
 				if (unit->Orders[0].Goal) {
-					RefsDecrease(unit->Orders->Goal);
+					unit->Orders->Goal->RefsDecrease();
 					unit->Orders[0].Goal = NoUnitP;
 				}
 				return;
@@ -231,7 +231,7 @@ void HandleActionSpellCast(CUnit *unit)
 				unit->Orders[0].Action = UnitActionStill;
 				unit->SubAction = 0;
 				if (unit->Orders[0].Goal) {
-					RefsDecrease(unit->Orders->Goal);
+					unit->Orders->Goal->RefsDecrease();
 					unit->Orders[0].Goal = NoUnitP;
 				}
 			}
