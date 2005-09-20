@@ -784,8 +784,8 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x - 2, y);
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x + w / 2, y);
 //			} else {
-				MenuButtonG->DrawFrame(MBUTTON_S_HCONT, x - 2, y);
-				MenuButtonG->DrawFrame(MBUTTON_S_HCONT, x + w / 2, y);
+				MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
+				MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x + w / 2, y);
 //			}
 			PopClipping();
 			if (mi->D.HSlider.cflags & MI_CFLAGS_LEFT) {
