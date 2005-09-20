@@ -832,7 +832,7 @@ static void DoNextReplay(void)
 			// return;
 		}
 #else
-		NotifyPlayer(ThisPlayer, NotifyYellow, -1, -1, "Replay got out of sync !");
+		ThisPlayer->Notify(NotifyYellow, -1, -1, "Replay got out of sync !");
 		ReplayStep = 0;
 		NextLogCycle = ~0UL;
 		return;
