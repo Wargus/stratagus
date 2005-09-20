@@ -366,7 +366,7 @@ void CButtonPanel::Draw(void)
 		//
 		// Draw main Icon.
 		//
-		DrawUnitIcon(player, UI.ButtonPanel.Buttons[i].Style, buttons[i].Icon.Icon,
+		buttons[i].Icon.Icon->DrawUnitIcon(player, UI.ButtonPanel.Buttons[i].Style,
 			GetButtonStatus(&buttons[i]),
 			UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y, buf);
 

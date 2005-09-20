@@ -374,7 +374,7 @@ static void CalculateMaxIconSize(void)
 {
 	int i;
 	const CUnitType *type;
-	const Icon *icon;
+	const CIcon *icon;
 
 	IconWidth = 0;
 	IconHeight = 0;
@@ -592,7 +592,7 @@ static void DrawUnitIcons(void)
 	int i;
 	int j;
 	int percent;
-	Icon *icon;
+	CIcon *icon;
 
 	//
 	// Draw the unit selection buttons.
@@ -672,7 +672,7 @@ static void DrawUnitIcons(void)
 				break;
 			}
 			icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
-			DrawIcon(Players + SelectedPlayer, icon, x, y);
+			icon->DrawIcon(Players + SelectedPlayer, x, y);
 
 			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
 			if (i == SelectedUnitIndex) {
@@ -740,7 +740,7 @@ static void DrawEditorPanel(void)
 {
 	int x;
 	int y;
-	Icon *icon;
+	CIcon *icon;
 
 	x = UI.InfoPanel.X + 4;
 	y = UI.InfoPanel.Y + 4;
@@ -751,14 +751,14 @@ static void DrawEditorPanel(void)
 	icon = IconByIdent(EditorSelectIcon);
 	Assert(icon);
 	// FIXME: wrong button style
-	DrawUnitIcon(Players, UI.SingleSelectedButton->Style, icon,
+	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
 			(EditorState == EditorSelecting ? IconSelected : 0),
 		x, y, NULL);
 	icon = IconByIdent(EditorUnitsIcon);
 	Assert(icon);
 	// FIXME: wrong button style
-	DrawUnitIcon(Players, UI.SingleSelectedButton->Style, icon,
+	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == UnitButton ? IconActive : 0) |
 			(EditorState == EditorEditUnit ? IconSelected : 0),
 		x + UNIT_ICON_X, y + UNIT_ICON_Y, NULL);
@@ -772,7 +772,7 @@ static void DrawEditorPanel(void)
 	if (EditorStartUnit) {
 		icon = UnitTypeByIdent(EditorStartUnit)->Icon.Icon;
 		Assert(icon);
-		DrawUnitIcon(Players, UI.SingleSelectedButton->Style, icon,
+		icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 			(ButtonUnderCursor == StartButton ? IconActive : 0) |
 				(EditorState == EditorSetStartLocation ? IconSelected : 0),
 			x + START_ICON_X, y + START_ICON_Y, NULL);

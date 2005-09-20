@@ -2006,7 +2006,7 @@ void DrawPieMenu(void)
 			x = CursorStartX - ICON_SIZE_X / 2 + UI.PieX[i];
 			y = CursorStartY - ICON_SIZE_Y / 2 + UI.PieY[i];
 			// Draw icon
-			DrawIcon(player, buttons[i].Icon.Icon, x, y);
+			buttons[i].Icon.Icon->DrawIcon(player, x, y);
 
 			// Tutorial show command key in icons
 			if (UI.ButtonPanel.ShowCommandKey) {
