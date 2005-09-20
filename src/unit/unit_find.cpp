@@ -210,7 +210,7 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
-		if (!UnitVisibleAsGoal(unit, source->Player)) {
+		if (!unit->IsVisibleAsGoal(source->Player)) {
 			continue;
 		}
 		type = unit->Type;
@@ -386,7 +386,7 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 	for (i = 0; i < n; ++i) {
 		dest = table[i];
 		dtype = dest->Type;
-		if (!UnitVisibleAsGoal(dest, u->Player)) {
+		if (!dest->IsVisibleAsGoal(u->Player)) {
 			table[i] = 0;
 			continue;
 		}
@@ -634,7 +634,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 	for (i = 0; i < n; ++i) {
 		dest = table[i];
 
-		if (!UnitVisibleAsGoal(dest, unit->Player)) {
+		if (!dest->IsVisibleAsGoal(unit->Player)) {
 			continue;
 		}
 

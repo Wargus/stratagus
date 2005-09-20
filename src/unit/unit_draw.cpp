@@ -1318,7 +1318,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit->Orders[0].Action != UnitActionDie && UnitVisible(unit, ThisPlayer)) {
+	if (unit->Orders[0].Action != UnitActionDie && unit->IsVisible(ThisPlayer)) {
 		DrawDecoration(unit, type, x, y);
 	}
 }
@@ -1517,9 +1517,9 @@ void DrawUnit(const CUnit *unit)
 	}
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
-	Assert(ReplayRevealMap || unit->Type->VisibleUnderFog || UnitVisible(unit, ThisPlayer));
+	Assert(ReplayRevealMap || unit->Type->VisibleUnderFog || unit->IsVisible(ThisPlayer));
 
-	if (ReplayRevealMap || UnitVisible(unit, ThisPlayer)) {
+	if (ReplayRevealMap || unit->IsVisible(ThisPlayer)) {
 		type = unit->Type;
 		frame = unit->Frame;
 		y = unit->IY;
@@ -1553,7 +1553,7 @@ void DrawUnit(const CUnit *unit)
 	}
 #endif
 
-	if ((!UnitVisible(unit, ThisPlayer)) && frame == UnitNotSeen) {
+	if (!unit->IsVisible(ThisPlayer) && frame == UnitNotSeen) {
 		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
 			unit->Slot _C_ GameCycle);
 		return;
@@ -1675,7 +1675,7 @@ int FindAndSortUnits(const Viewport *vp, CUnit **table)
 		vp->MapY + vp->MapHeight + 1, table);
 
 	for (i = 0; i < n; i++) {
-		if (!UnitVisibleInViewport(table[i], vp)) {
+		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
 		}
 	}

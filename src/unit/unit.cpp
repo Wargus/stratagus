@@ -1200,7 +1200,7 @@ void UnitsOnTileMarkSeen(const CPlayer* player, int x, int y, int cloak)
 		//
 		for (p = 0; p < PlayerMax; ++p) {
 			if (PlayersShareVision(player->Index, p) || (p == player->Index)) {
-				if (!UnitVisible(unit, Players + p)) {
+				if (!unit->IsVisible(Players + p)) {
 					UnitGoesOutOfFog(unit, Players + p);
 				}
 			}
@@ -1244,7 +1244,7 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
 		if (!unit->VisCount[p]) {
 			for (p = 0; p < PlayerMax; ++p) {
 				if (PlayersShareVision(player->Index, p) || p == player->Index) {
-					if (!UnitVisible(unit, Players + p)) {
+					if (!unit->IsVisible(Players + p)) {
 						UnitGoesUnderFog(unit, Players + p);
 					}
 				}
@@ -1279,7 +1279,7 @@ void UnitCountSeen(CUnit *unit)
 	//
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Type != PlayerNobody) {
-			oldv[p] = UnitVisible(unit, &Players[p]);
+			oldv[p] = unit->IsVisible(&Players[p]);
 		}
 	}
 
@@ -1311,7 +1311,7 @@ void UnitCountSeen(CUnit *unit)
 	//
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Type != PlayerNobody) {
-			newv = UnitVisible(unit, Players + p);
+			newv = unit->IsVisible(Players + p);
 			if ((!oldv[p]) &&  (newv)) {
 				UnitGoesOutOfFog(unit, Players + p);
 			}
@@ -1328,55 +1328,51 @@ void UnitCountSeen(CUnit *unit)
 **
 **  @note This understands shared vision, and should be used all around.
 **
-**  @param unit    The unit to check.
 **  @param player  The player to check.
 */
-int UnitVisible(const CUnit *unit, const CPlayer* player)
+bool CUnit::IsVisible(const CPlayer *player) const
 {
-	int p;
 	int cp;
 
 	// Current player.
 	cp = player->Index;
-	if (unit->VisCount[cp]) {
-		return 1;
+	if (VisCount[cp]) {
+		return true;
 	}
-	for (p = 0; p < PlayerMax; ++p) {
+	for (int p = 0; p < PlayerMax; ++p) {
 		if (PlayersShareVision(p, cp)) {
-			if (unit->VisCount[p]) {
-				return 1;
+			if (VisCount[p]) {
+				return true;
 			}
 		}
 	}
-	return 0;
+	return false;
 }
 
 /**
 **  Returns true, if unit is visible as an action goal for a player
 **  on the map.
 **
-**  @param unit    Unit to be checked.
 **  @param player  Player to check for.
 **
 **  @return        True if visible, false otherwise.
 */
-int UnitVisibleAsGoal(const CUnit *unit, const CPlayer* player)
+bool CUnit::IsVisibleAsGoal(const CPlayer *player) const
 {
 	//
 	// Invisibility
 	//
-	if (unit->Variable[INVISIBLE_INDEX].Value && (player != unit->Player) &&
-			(!PlayersShareVision(player->Index, unit->Player->Index))) {
-		return 0;
+	if (Variable[INVISIBLE_INDEX].Value && (player != Player) &&
+			(!PlayersShareVision(player->Index, Player->Index))) {
+		return false;
 	}
-	if (UnitVisible(unit, player) || player->Type == PlayerComputer ||
-			UnitVisibleOnRadar(player, unit)) {
-		return !unit->Removed && !unit->Destroyed &&
-			unit->Orders->Action != UnitActionDie;
+	if (IsVisible(player) || player->Type == PlayerComputer ||
+			UnitVisibleOnRadar(player, this)) {
+		return !Removed && !Destroyed && Orders->Action != UnitActionDie;
 	} else {
-		return unit->Type->VisibleUnderFog &&
-			(unit->Seen.ByPlayer & (1 << player->Index)) &&
-			!(unit->Seen.Destroyed & (1 << player->Index));
+		return Type->VisibleUnderFog &&
+			(Seen.ByPlayer & (1 << player->Index)) &&
+			!(Seen.Destroyed & (1 << player->Index));
 	}
 }
 
@@ -1384,23 +1380,22 @@ int UnitVisibleAsGoal(const CUnit *unit, const CPlayer* player)
 **  Returns true, if unit is visible for this player on the map.
 **  The unit has to be out of fog of war and alive
 **
-**  @param unit    Unit to be checked.
 **  @param player  Player to check for.
 **
 **  @return        True if visible, false otherwise.
 */
-int UnitVisibleOnMap(const CUnit *unit, const CPlayer* player)
+bool CUnit::IsVisibleOnMap(const CPlayer *player) const
 {
 	//
 	// Invisible units.
 	//
-	if (unit->Variable[INVISIBLE_INDEX].Value && player != unit->Player &&
-			!PlayersShareVision(player->Index, unit->Player->Index)) {
-		return 0;
+	if (Variable[INVISIBLE_INDEX].Value && player != Player &&
+			!PlayersShareVision(player->Index, Player->Index)) {
+		return false;
 	}
 
-	return !unit->Removed && !unit->Destroyed &&
-		unit->Orders->Action != UnitActionDie && UnitVisible(unit, player);
+	return !Removed && !Destroyed &&
+		Orders->Action != UnitActionDie && IsVisible(player);
 }
 
 /**
@@ -1409,31 +1404,26 @@ int UnitVisibleOnMap(const CUnit *unit, const CPlayer* player)
 **  @warning This is for ::ThisPlayer only.
 **  @todo radar support
 **
-**  @param unit  Unit to be checked.
-**
 **  @return      True if visible, false otherwise.
 */
-int UnitVisibleOnMinimap(const CUnit *unit)
+bool CUnit::IsVisibleOnMinimap() const
 {
 	//
 	// Invisible units.
 	//
-	if (unit->Variable[INVISIBLE_INDEX].Value && (ThisPlayer != unit->Player) &&
-			(!PlayersShareVision(ThisPlayer->Index, unit->Player->Index))) {
-		return 0;
+	if (Variable[INVISIBLE_INDEX].Value && (ThisPlayer != Player) &&
+			(!PlayersShareVision(ThisPlayer->Index, Player->Index))) {
+		return false;
 	}
-	if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap ||
-		UnitVisibleOnRadar(ThisPlayer, unit)) {
-		return (!unit->Removed) &&
-				(!unit->Destroyed) &&
-				(unit->Orders->Action != UnitActionDie);
+	if (IsVisible(ThisPlayer) || ReplayRevealMap ||
+			UnitVisibleOnRadar(ThisPlayer, this)) {
+		return !Removed && !Destroyed && (Orders->Action != UnitActionDie);
 	} else {
-		if (!unit->Type->VisibleUnderFog) {
-			return 0;
+		if (!Type->VisibleUnderFog) {
+			return false;
 		}
-		return ((unit->Seen.ByPlayer & (1 << ThisPlayer->Index)) &&
-			unit->Seen.State != 3 &&
-			!(unit->Seen.Destroyed & (1 << ThisPlayer->Index)));
+		return (Seen.ByPlayer & (1 << ThisPlayer->Index)) &&
+			Seen.State != 3 && !(Seen.Destroyed & (1 << ThisPlayer->Index));
 	}
 }
 
@@ -1443,45 +1433,44 @@ int UnitVisibleOnMinimap(const CUnit *unit)
 **  @warning This is only true for ::ThisPlayer
 **
 **  @param vp    Viewport pointer.
-**  @param unit  Unit to be checked.
 **
 **  @return      True if visible, false otherwise.
 */
-int UnitVisibleInViewport(const CUnit *unit, const Viewport* vp)
+bool CUnit::IsVisibleInViewport(const Viewport *vp) const
 {
 	//
 	// Check if it's at least inside the damn viewport.
 	//
-	if ((unit->X + unit->Type->TileWidth < vp->MapX) ||
-			(unit->X > vp->MapX + vp->MapWidth) ||
-			(unit->Y + unit->Type->TileHeight < vp->MapY) ||
-			(unit->Y > vp->MapY + vp->MapHeight)) {
-		return 0;
+	if ((X + Type->TileWidth < vp->MapX) ||
+			(X > vp->MapX + vp->MapWidth) ||
+			(Y + Type->TileHeight < vp->MapY) ||
+			(Y > vp->MapY + vp->MapHeight)) {
+		return false;
 	}
 
 	if (!ThisPlayer) {
 		//FIXME: ARI: Added here for early game setup state by
 		// MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
 		// so don't show anything until first real map-draw.
-		DebugPrint("Fix ME ThisPlayer not set yet?!\n");
-		return 0;
+		DebugPrint("FIXME: ThisPlayer not set yet?!\n");
+		return false;
 	}
 
 	// Those are never ever visible.
-	if (unit->Variable[INVISIBLE_INDEX].Value && ThisPlayer != unit->Player &&
-			!PlayersShareVision(ThisPlayer->Index, unit->Player->Index)) {
-		return 0;
+	if (Variable[INVISIBLE_INDEX].Value && ThisPlayer != Player &&
+			!PlayersShareVision(ThisPlayer->Index, Player->Index)) {
+		return false;
 	}
 
-	if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
-		return !unit->Destroyed;
+	if (IsVisible(ThisPlayer) || ReplayRevealMap) {
+		return !Destroyed;
 	} else {
 		// Unit has to be 'discovered'
 		// Destroyed units ARE visible under fog of war, if we haven't seen them like that.
-		if (!unit->Destroyed || !(unit->Seen.Destroyed & (1 << ThisPlayer->Index))) {
-			return (unit->Type->VisibleUnderFog && (unit->Seen.ByPlayer & (1 << ThisPlayer->Index)));
+		if (!Destroyed || !(Seen.Destroyed & (1 << ThisPlayer->Index))) {
+			return (Type->VisibleUnderFog && (Seen.ByPlayer & (1 << ThisPlayer->Index)));
 		} else {
-			return 0;
+			return false;
 		}
 	}
 }
@@ -1493,22 +1482,19 @@ int UnitVisibleInViewport(const CUnit *unit, const Viewport* vp)
 **
 **  @return      True if visible, false otherwise.
 */
-int UnitVisibleOnScreen(const CUnit *unit)
+bool CUnit::IsVisibleOnScreen() const
 {
-	const Viewport* vp;
-
-	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-		if (UnitVisibleInViewport(unit, vp)) {
-			return 1;
+	for (Viewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+		if (IsVisibleInViewport(vp)) {
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 /**
 **  Get area of map tiles covered by unit, including its displacement.
 **
-**  @param unit  Unit to be checked and set.
 **  @param sx    Out: Top left X tile map postion.
 **  @param sy    Out: Top left Y tile map postion.
 **  @param ex    Out: Bottom right X tile map postion.
@@ -1516,27 +1502,26 @@ int UnitVisibleOnScreen(const CUnit *unit)
 **
 **  @return      sx,sy,ex,ey defining area in Map
 */
-void GetUnitMapArea(const CUnit *unit, int* sx, int* sy, int* ex, int* ey)
+void CUnit::GetMapArea(int *sx, int *sy, int *ex, int *ey) const
 {
-	*sx = unit->X - (unit->IX < 0);
-	*ex = *sx + unit->Type->TileWidth - !unit->IX;
-	*sy = unit->Y - (unit->IY < 0);
-	*ey = *sy + unit->Type->TileHeight - !unit->IY;
+	*sx = X - (IX < 0);
+	*ex = *sx + Type->TileWidth - !IX;
+	*sy = Y - (IY < 0);
+	*ey = *sy + Type->TileHeight - !IY;
 }
 
 /**
 **  Change the unit's owner
 **
-**  @param unit       Unit which should be consigned.
 **  @param newplayer  New owning player.
 */
-void ChangeUnitOwner(CUnit *unit, CPlayer *newplayer)
+void CUnit::ChangeOwner(CPlayer *newplayer)
 {
 	int i;
 	CUnit *uins;
 	CPlayer *oldplayer;
 
-	oldplayer = unit->Player;
+	oldplayer = Player;
 
 	// This shouldn't happen
 	if (oldplayer == newplayer) {
@@ -1545,15 +1530,15 @@ void ChangeUnitOwner(CUnit *unit, CPlayer *newplayer)
 	}
 
 	// Rescue all units in buildings/transporters.
-	uins = unit->UnitInside;
-	for (i = unit->InsideCount; i; --i, uins = uins->NextContained) {
-		ChangeUnitOwner(uins, newplayer);
+	uins = UnitInside;
+	for (i = InsideCount; i; --i, uins = uins->NextContained) {
+		uins->ChangeOwner(newplayer);
 	}
 
 	//
 	//  Must change food/gold and other.
 	//
-	UnitLost(unit);
+	UnitLost(this);
 
 	//
 	//  Now the new side!
@@ -1561,35 +1546,35 @@ void ChangeUnitOwner(CUnit *unit, CPlayer *newplayer)
 
 	// Insert into new player table.
 
-	unit->PlayerSlot = newplayer->Units + newplayer->TotalNumUnits++;
-	if (unit->Type->Building) {
+	PlayerSlot = newplayer->Units + newplayer->TotalNumUnits++;
+	if (Type->Building) {
 		newplayer->TotalBuildings++;
 	}
 	else {
 		newplayer->TotalUnits++;
 	}
-	*unit->PlayerSlot = unit;
+	*PlayerSlot = this;
 
-	MapUnmarkUnitSight(unit);
-	unit->Player = newplayer;
-	unit->Stats = &unit->Type->Stats[newplayer->Index];
-	UpdateUnitSightRange(unit);
-	MapMarkUnitSight(unit);
+	MapUnmarkUnitSight(this);
+	Player = newplayer;
+	Stats = &Type->Stats[newplayer->Index];
+	UpdateUnitSightRange(this);
+	MapMarkUnitSight(this);
 
 	//
 	//  Must change food/gold and other.
 	//
-	if (unit->Type->GivesResource) {
+	if (Type->GivesResource) {
 		DebugPrint("Resource transfer not supported\n");
 	}
-	newplayer->Demand += unit->Type->Demand;
-	newplayer->Supply += unit->Type->Supply;
-	if (unit->Type->Building) {
+	newplayer->Demand += Type->Demand;
+	newplayer->Supply += Type->Supply;
+	if (Type->Building) {
 		newplayer->NumBuildings++;
 	}
-	newplayer->UnitTypesCount[unit->Type->Slot]++;
+	newplayer->UnitTypesCount[Type->Slot]++;
 
-	UpdateForNewUnit(unit, 1);
+	UpdateForNewUnit(this, 1);
 }
 
 /**
@@ -1614,7 +1599,7 @@ static void ChangePlayerOwner(CPlayer *oldplayer, CPlayer *newplayer)
 		if (unit->Player == newplayer) {
 			continue;
 		}
-		ChangeUnitOwner(unit, newplayer);
+		unit->ChangeOwner(newplayer);
 		unit->Blink = 5;
 		unit->RescuedFrom = oldplayer;
 	}
@@ -1687,7 +1672,7 @@ void RescueUnits(void)
 							break;
 						}
 						unit->RescuedFrom = unit->Player;
-						ChangeUnitOwner(unit, around[i]->Player);
+						unit->ChangeOwner(around[i]->Player);
 						unit->Blink = 5;
 						PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound,
 							MaxSampleVolume);
@@ -2821,7 +2806,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 	}
 	for (table = Units; table < Units + NumUnits; ++table) {
 		unit = *table;
-		if (!UnitVisibleAsGoal(unit, ThisPlayer) && !ReplayRevealMap) {
+		if (!unit->IsVisibleAsGoal(ThisPlayer) && !ReplayRevealMap) {
 			continue;
 		}
 		type = unit->Type;
@@ -3100,11 +3085,11 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			type->Building && target->Variable[HP_INDEX].Value <= damage * 3 &&
 			IsEnemy(attacker->Player, target) &&
 			attacker->Type->RepairRange) {
-		ChangeUnitOwner(target, attacker->Player);
+		target->ChangeOwner(attacker->Player);
 		CommandStopUnit(attacker); // Attacker shouldn't continue attack!
 	}
 
-	if ((UnitVisibleOnMap(target, ThisPlayer) || ReplayRevealMap) && DamageMissile) {
+	if ((target->IsVisibleOnMap(ThisPlayer) || ReplayRevealMap) && DamageMissile) {
 		MakeLocalMissile(MissileTypeByIdent(DamageMissile),
 				target->X * TileSizeX + target->Type->TileWidth * TileSizeX / 2,
 				target->Y * TileSizeY + target->Type->TileHeight * TileSizeY / 2,

@@ -190,7 +190,7 @@ int MapFogFilterFlags(CPlayer *player, int x, int y, int mask)
 	fogmask = -1;
 	unitcount = 0;
 	while (unitcount < nunits) {
-		if (!UnitVisibleAsGoal(table[unitcount], player)) {
+		if (!table[unitcount]->IsVisibleAsGoal(player)) {
 			fogmask &= ~table[unitcount]->Type->FieldFlags;
 		}
 		++unitcount;

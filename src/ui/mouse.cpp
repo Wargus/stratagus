@@ -824,7 +824,7 @@ void UIHandleMouseMove(int x, int y)
 	}
 
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
-	if (UnitUnderCursor && !UnitVisibleAsGoal(UnitUnderCursor, ThisPlayer) &&
+	if (UnitUnderCursor && !UnitUnderCursor->IsVisibleAsGoal(ThisPlayer) &&
 			!ReplayRevealMap) {
 		UnitUnderCursor = NULL;
 	}
@@ -863,7 +863,7 @@ void UIHandleMouseMove(int x, int y)
 		//  Map
 		//
 		if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration &&
-				(UnitVisible(UnitUnderCursor, ThisPlayer) || ReplayRevealMap)) {
+				(UnitUnderCursor->IsVisible(ThisPlayer) || ReplayRevealMap)) {
 			GameCursor = UI.Glass.Cursor;
 		}
 

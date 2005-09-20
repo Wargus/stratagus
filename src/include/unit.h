@@ -655,11 +655,29 @@ public:
 	void MoveToXY(int x, int y);
 	/// Add an unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit *host);
+	/// Change owner of unit
+	void ChangeOwner(CPlayer *newplayer);
 
 	/// Remove unit from map/groups/...
 	void Remove(CUnit *host);
 	/// Release an unit
 	void Release();
+
+	/// Returns true, if unit is directly seen by an allied unit.
+	bool IsVisible(const CPlayer *player) const;
+	/// Returns true, if unit is visible as a goal.
+	bool IsVisibleAsGoal(const CPlayer *player) const;
+	/// Returns true, if unit is Visible for game logic on the map.
+	bool IsVisibleOnMap(const CPlayer *player) const;
+	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
+	bool IsVisibleOnMinimap() const;
+	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
+	bool IsVisibleInViewport(const Viewport *vp) const;
+	/// Returns true, if unit is visible on current map view (any viewport).
+	bool IsVisibleOnScreen() const;
+
+	/// @todo more docu
+	void GetMapArea(int *sx, int *sy, int *ex, int *ey) const;
 };
 
 #define NoUnitP (CUnit *)0         /// return value: for no unit found
@@ -780,24 +798,8 @@ extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int p);
 	/// Does a recount for VisCount
 extern void UnitCountSeen(CUnit *unit);
 
-	/// Returns true, if unit is directly seen by an allied unit.
-extern int UnitVisible(const CUnit *unit, const CPlayer *player);
-	/// Returns true, if unit is visible as a goal.
-extern int UnitVisibleAsGoal(const CUnit *unit, const CPlayer *player);
-	/// Returns true, if unit is Visible for game logic on the map.
-extern int UnitVisibleOnMap(const CUnit *unit, const CPlayer *player);
-	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
-extern int UnitVisibleOnMinimap(const CUnit *unit);
-	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
-extern int UnitVisibleInViewport(const CUnit *unit, const Viewport *vp);
-
-	/// @todo more docu
-extern void GetUnitMapArea(const CUnit *unit, int *sx, int *sy,
-	int *ex, int *ey);
 	/// Check for rescue each second
 extern void RescueUnits(void);
-	/// Change owner of unit
-extern void ChangeUnitOwner(CUnit *unit, CPlayer *newplayer);
 
 	/// Convert direction (dx,dy) to heading (0-255)
 extern int DirectionToHeading(int, int);

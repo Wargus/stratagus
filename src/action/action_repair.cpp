@@ -173,7 +173,7 @@ void HandleActionRepair(CUnit *unit)
 				//
 				// Check if goal is correct unit.
 				if (goal) {
-					if (!UnitVisibleAsGoal(goal, unit->Player)) {
+					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair target gone.\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;
@@ -231,7 +231,7 @@ void HandleActionRepair(CUnit *unit)
 				// Check if goal is correct unit.
 				// FIXME: should I do a function for this?
 				if (goal) {
-					if (!UnitVisibleAsGoal(goal, unit->Player)) {
+					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair goal is gone\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;

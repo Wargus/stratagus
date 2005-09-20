@@ -79,7 +79,7 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 		if (PlayersTeamed(table[i]->Player->Index, unit->Player->Index) &&
 				table[i]->Type->RepairHP &&
 				table[i]->Variable[HP_INDEX].Value < table[i]->Variable[HP_INDEX].Max &&
-				UnitVisibleAsGoal(table[i], unit->Player)) {
+				table[i]->IsVisibleAsGoal(unit->Player)) {
 			return table[i];
 		}
 	}
