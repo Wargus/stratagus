@@ -586,7 +586,7 @@ static int CclUnit(lua_State *l)
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
 			unit = UnitSlots[slot];
-			InitUnit(unit, type);
+			unit->Init(type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
@@ -775,7 +775,7 @@ static int CclUnit(lua_State *l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				slot = strtol(value + 1, NULL, 16);
-				AddUnitInContainer(UnitSlots[slot], unit);
+				UnitSlots[slot]->AddInContainer(unit);
 				Assert(UnitSlots[slot]);
 				//++UnitSlots[slot]->Refs;
 			}
@@ -793,7 +793,7 @@ static int CclUnit(lua_State *l)
 			CclParseOrders(l, unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
-			AssignUnitToPlayer (unit, player);
+			unit->AssignToPlayer (player);
 			if (unit->Orders[0].Action == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
@@ -861,7 +861,7 @@ static int CclUnit(lua_State *l)
 	// have orders for those units.  They should appear here as if
 	// they were just created.
 	if (!unit->Player) {
-		AssignUnitToPlayer(unit, player);
+		unit->AssignToPlayer(player);
 		UpdateForNewUnit(unit, 0);
 	}
 
@@ -873,7 +873,7 @@ static int CclUnit(lua_State *l)
 	// Place on map
 	if (!unit->Removed) {
 		unit->Removed = 1;
-		PlaceUnit(unit, unit->X, unit->Y);
+		unit->Place(unit->X, unit->Y);
 	}
 
 	// Fix Colors for rescued units.
@@ -915,7 +915,7 @@ static int CclMoveUnit(lua_State* l)
 	heading = SyncRand() % 256;
 	mask = UnitMovementMask(unit);
 	if (CheckedCanMoveToMask(ix, iy, mask)) {
-		PlaceUnit(unit, ix, iy);
+		unit->Place(ix, iy);
 	} else {
 		unit->X = ix;
 		unit->Y = iy;
@@ -975,7 +975,7 @@ static int CclCreateUnit(lua_State* l)
 	} else {
 		mask = UnitMovementMask(unit);
 		if (CheckedCanMoveToMask(ix, iy, mask)) {
-			PlaceUnit(unit, ix, iy);
+			unit->Place(ix, iy);
 		} else {
 			unit->X = ix;
 			unit->Y = iy;

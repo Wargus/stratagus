@@ -154,7 +154,7 @@ int UnloadUnit(CUnit *unit)
 		return 0;
 	}
 	unit->Boarded = 0;
-	PlaceUnit(unit, x, y);
+	unit->Place(x, y);
 	return 1;
 }
 
@@ -331,10 +331,10 @@ static void LeaveTransporter(CUnit *unit)
 		unit->Orders[0].Goal = NoUnitP;
 		if (goal->Destroyed) {
 			DebugPrint("destroyed unit unloading?\n");
-			RefsDecrease(goal);
+			goal->RefsDecrease();
 			return;
 		}
-		RefsDecrease(goal);
+		goal->RefsDecrease();
 		goal->X = unit->X;
 		goal->Y = unit->Y;
 		// Try to unload the unit. If it doesn't work there is no problem.

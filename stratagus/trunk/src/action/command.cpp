@@ -63,7 +63,7 @@
 static void ReleaseOrder(Order *order)
 {
 	if (order->Goal) {
-		RefsDecrease(order->Goal);
+		order->Goal->RefsDecrease();
 		order->Goal = NoUnitP;
 	}
 }
@@ -208,7 +208,7 @@ void CommandAnyOrder(CUnit *unit, Order *cpyorder, int flush)
 
 	*order = *cpyorder;
 	if (order->Goal) {
-		RefsIncrease(order->Goal);
+		order->Goal->RefsIncrease();
 	}
 	ClearSavedAction(unit);
 }
@@ -309,7 +309,7 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 		} else {
 			order->X = order->Y = -1;
 			order->Goal = dest;
-			RefsIncrease(dest);
+			dest->RefsIncrease();
 			order->Range = 1;
 		}
 	}
@@ -390,7 +390,7 @@ void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 			} else {
 				order->X = order->Y = -1;
 				order->Goal = dest;
-				RefsIncrease(dest);
+				dest->RefsIncrease();
 				order->Range = unit->Type->RepairRange;
 			}
 		} else {
@@ -459,7 +459,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 				// Removed, Dying handled by action routine.
 				order->X = order->Y = -1;
 				order->Goal = attack;
-				RefsIncrease(attack);
+				attack->RefsIncrease();
 				order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				order->MinRange = unit->Type->MinAttackRange;
 			}
@@ -592,7 +592,7 @@ void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 		order->Action = UnitActionBoard;
 		order->X = order->Y = -1;
 		order->Goal = dest;
-		RefsIncrease(dest);
+		dest->RefsIncrease();
 		order->Range = 1;
 	}
 	ClearSavedAction(unit);
@@ -630,7 +630,7 @@ void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 		//
 		if (what && !what->Destroyed) {
 			order->Goal = what;
-			RefsIncrease(what);
+			what->RefsIncrease();
 		}
 	}
 	ClearSavedAction(unit);
@@ -794,7 +794,7 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 		order->Action = UnitActionResource;
 		order->X = order->Y = -1;
 		order->Goal = dest;
-		RefsIncrease(dest);
+		dest->RefsIncrease();
 		order->Range = 1;
 	}
 	ClearSavedAction(unit);
@@ -837,7 +837,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 		//
 		if (goal && !goal->Destroyed) {
 			order->Goal = goal;
-			RefsIncrease(goal);
+			goal->RefsIncrease();
 		}
 		order->Range = 1;
 	}
@@ -1185,7 +1185,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 			} else {
 				order->X = order->Y = -1;
 				order->Goal = dest;
-				RefsIncrease(dest);
+				dest->RefsIncrease();
 			}
 		} else {
 			order->X = x;

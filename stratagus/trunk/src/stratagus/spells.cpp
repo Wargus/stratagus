@@ -204,13 +204,13 @@ int SpawnPortal::Cast(CUnit *caster, const SpellType *spell,
 	DebugPrint("Spawning a portal exit.\n");
 	portal = caster->Goal;
 	if (portal) {
-		MoveUnitToXY(portal, x, y);
+		portal->MoveToXY(x, y);
 	} else {
 		portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerNumNeutral]);
 	}
 	//  Goal is used to link to destination circle of power
 	caster->Goal = portal;
-	RefsIncrease(portal);
+	portal->RefsIncrease();
 	//FIXME: setting destination circle of power should use mana
 	return 0;
 }
@@ -328,7 +328,7 @@ int AreaBombardment::Cast(CUnit *caster, const SpellType *spell,
 			// FIXME: not correct -- blizzard should continue even if mage is
 			//    destroyed (though it will be quite short time...)
 			mis->SourceUnit = caster;
-			RefsIncrease(caster);
+			caster->RefsIncrease();
 		}
 	}
 	return 1;
@@ -401,10 +401,10 @@ int SpawnMissile::Cast(CUnit *caster, const SpellType *spell,
 	missile->Damage = this->Damage;
 	if (missile->Damage != 0) {
 		missile->SourceUnit = caster;
-		RefsIncrease(caster);
+		caster->RefsIncrease();
 	}
 	if ((missile->TargetUnit = target)) {
-		RefsIncrease(target);
+		target->RefsIncrease();
 	}
 	return 1;
 }
@@ -595,11 +595,11 @@ int Polymorph::Cast(CUnit *caster, const SpellType *spell,
 	}
 
 	// as said somewhere else -- no corpses :)
-	RemoveUnit(target, NULL);
+	target->Remove(NULL);
 	for (i = 0; i < type->TileWidth; ++i) {
 		for (j = 0; j < type->TileHeight; ++j) {
 			if (!UnitTypeCanBeAt(type, x + i, y + j)) {
-				PlaceUnit(target, target->X, target->Y);
+				target->Place(target->X, target->Y);
 				return 0;
 			}
 		}
@@ -612,7 +612,7 @@ int Polymorph::Cast(CUnit *caster, const SpellType *spell,
 	}
 	UnitLost(target);
 	UnitClearOrders(target);
-	ReleaseUnit(target);
+	target->Release();
 	return 1;
 }
 
@@ -641,7 +641,7 @@ int Capture::Cast(CUnit *caster, const SpellType *spell,
 				HitUnit(caster, target, this->Damage);
 				if (this->SacrificeEnable) {
 					// No corpse.
-					RemoveUnit(caster, NULL);
+					caster->Remove(NULL);
 					UnitLost(caster);
 					UnitClearOrders(caster);
 				}
@@ -668,7 +668,7 @@ int Capture::Cast(CUnit *caster, const SpellType *spell,
 	ChangeUnitOwner(target, caster->Player);
 	if (this->SacrificeEnable) {
 		// No corpse.
-		RemoveUnit(caster, NULL);
+		caster->Remove(NULL);
 		UnitLost(caster);
 		UnitClearOrders(caster);
 	} else {
@@ -714,7 +714,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 				//
 				x = unit->X;
 				y = unit->Y;
-				ReleaseUnit(unit);
+				unit->Release();
 				cansummon = 1;
 				break;
 			}

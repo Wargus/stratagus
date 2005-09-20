@@ -86,7 +86,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
 				if (player->AiEnabled) {
 					// FIXME: call back to AI?
-					RefsDecrease(goal);
+					goal->RefsDecrease();
 					unit->Orders[0].Goal = NULL;
 					unit->Orders[0].Action = UnitActionStill;
 					unit->State = unit->SubAction = 0;
@@ -177,7 +177,7 @@ void HandleActionRepair(CUnit *unit)
 						DebugPrint("repair target gone.\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;
-						RefsDecrease(goal);
+						goal->RefsDecrease();
 						// FIXME: should I clear this here?
 						unit->Orders[0].Goal = goal = NULL;
 						NewResetPath(unit);
@@ -200,7 +200,7 @@ void HandleActionRepair(CUnit *unit)
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 				} else if (err < 0) {
 					if (goal) { // release reference
-						RefsDecrease(goal);
+						goal->RefsDecrease();
 						unit->Orders[0].Goal = NoUnitP;
 					}
 					unit->Orders[0].Action = UnitActionStill;
@@ -235,7 +235,7 @@ void HandleActionRepair(CUnit *unit)
 						DebugPrint("repair goal is gone\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;
-						RefsDecrease(goal);
+						goal->RefsDecrease();
 						// FIXME: should I clear this here?
 						unit->Orders[0].Goal = goal = NULL;
 						NewResetPath(unit);
@@ -256,7 +256,7 @@ void HandleActionRepair(CUnit *unit)
 				//
 				if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
 					if (goal) { // release reference
-						RefsDecrease(goal);
+						goal->RefsDecrease();
 						unit->Orders[0].Goal = NULL;
 					}
 					unit->Orders[0].Action = UnitActionStill;

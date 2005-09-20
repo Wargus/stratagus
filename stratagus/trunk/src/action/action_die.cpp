@@ -71,7 +71,7 @@ void HandleActionDie(CUnit *unit)
 	//
 	if (!unit->Anim.Unbreakable) {
 		if (!unit->Type->CorpseType) {
-			ReleaseUnit(unit);
+			unit->Release();
 			return;
 		}
 

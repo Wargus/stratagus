@@ -68,7 +68,7 @@ void HandleActionReturnGoods(CUnit *unit)
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y, "No Resources to Return.");
 
 		if (unit->Orders[0].Goal) { // Depot (if not destroyed)
-			RefsDecrease(unit->Orders[0].Goal);
+			unit->Orders[0].Goal->RefsDecrease();
 		}
 		memset(unit->Orders, 0, sizeof(*unit->Orders));
 		unit->Orders[0].Action = UnitActionStill;
@@ -86,7 +86,7 @@ void HandleActionReturnGoods(CUnit *unit)
 			return;
 		}
 		unit->Orders[0].Goal = destu;
-		RefsIncrease(destu);
+		destu->RefsIncrease();
 	}
 
 	unit->Orders[0].Action = UnitActionResource;

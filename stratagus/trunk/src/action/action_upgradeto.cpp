@@ -85,9 +85,9 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 		MapUnmarkUnitSight(unit);
 	} else {
 		SaveSelection();
-		RemoveUnit(unit, NULL);
+		unit->Remove(NULL);
 		if (!UnitTypeCanBeAt(newtype, x, y)) {
-			PlaceUnit(unit, unit->X, unit->Y);
+			unit->Place(unit->X, unit->Y);
 			RestoreSelection();
 			// FIXME unit is not modified, try later ?
 			return 0;
@@ -126,7 +126,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	//  Update Possible sight range change
 	UpdateUnitSightRange(unit);
 	if (!container) {
-		PlaceUnit(unit, x, y);
+		unit->Place(x, y);
 		RestoreSelection();
 	} else {
 		MapMarkUnitSight(unit);

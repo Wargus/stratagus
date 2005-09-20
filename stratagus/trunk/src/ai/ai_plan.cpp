@@ -547,7 +547,7 @@ int AiPlanAttack(AiForce *force)
 			CUnit *unit;
 
 			unit = AiPlayer->Player->Units[i];
-			if (unit->Type->CanTransport && UnitIdle(unit)) {
+			if (unit->Type->CanTransport && unit->IsIdle()) {
 				DebugPrint("Assign any transporter\n");
 				AiMarkWaterTransporter(unit, watermatrix);
 				// FIXME: can be the wrong transporter.
@@ -588,7 +588,7 @@ int AiPlanAttack(AiForce *force)
 			aiunit->Next = force->Units;
 			force->Units = aiunit;
 			aiunit->Unit = transporter;
-			RefsIncrease(transporter);
+			transporter->RefsIncrease();
 		}
 
 		DebugPrint("Can attack\n");
@@ -688,7 +688,7 @@ void AiSendExplorers(void)
 		for (i = AiPlayer->Player->TotalNumUnits; i > 0; ++unit) {
 			--i;
 
-			if (!UnitIdle((*unit))) {
+			if (!(*unit)->IsIdle()) {
 				continue;
 			}
 

@@ -332,10 +332,10 @@ static void FreeMissile(Missile *missile)
 	// Release all unit references.
 	//
 	if ((unit = missile->SourceUnit)) {
-		RefsDecrease(unit);
+		unit->RefsDecrease();
 	}
 	if ((unit = missile->TargetUnit)) {
-		RefsDecrease(unit);
+		unit->RefsDecrease();
 	}
 
 	//
@@ -536,10 +536,10 @@ void FireMissile(CUnit *unit)
 	//
 	if (goal) {
 		missile->TargetUnit = goal;
-		RefsIncrease(goal);
+		goal->RefsIncrease();
 	}
 	missile->SourceUnit = unit;
-	RefsIncrease(unit);
+	unit->RefsIncrease();
 }
 
 /**
@@ -1010,7 +1010,7 @@ void MissileHit(Missile *missile)
 			//
 			goal = missile->TargetUnit;
 			if (goal->Destroyed) {  // Destroyed
-				RefsDecrease(goal);
+				goal->RefsDecrease();
 				missile->TargetUnit = NoUnitP;
 				return;
 			}

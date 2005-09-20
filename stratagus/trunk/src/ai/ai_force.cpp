@@ -202,12 +202,12 @@ static void AiCleanForce(int force)
 	prev = &AiPlayer->Force[force].Units;
 	while ((aiunit = *prev)) {
 		if (aiunit->Unit->Destroyed) {
-			RefsDecrease(aiunit->Unit);
+			aiunit->Unit->RefsDecrease();
 			*prev = aiunit->Next;
 			free(aiunit);
 			continue;
 		} else if (aiunit->Unit->Orders[0].Action == UnitActionDie) {
-			RefsDecrease(aiunit->Unit);
+			aiunit->Unit->RefsDecrease();
 			*prev = aiunit->Next;
 			free(aiunit);
 			continue;
@@ -247,7 +247,7 @@ static void AiCleanForce(int force)
 		while ((aiunit = *prev)) {
 			if (counter[aiunit->Unit->Type->Slot] > 0) {
 				counter[UnitTypeEquivs[aiunit->Unit->Type->Slot]]--;
-				RefsDecrease(aiunit->Unit);
+				aiunit->Unit->RefsDecrease();
 				*prev = aiunit->Next;
 				free(aiunit);
 				continue;
@@ -341,7 +341,7 @@ void AiAssignToForce(CUnit *unit)
 			aiunit->Next = AiPlayer->Force[force].Units;
 			AiPlayer->Force[force].Units = aiunit;
 			aiunit->Unit = unit;
-			RefsIncrease(unit);
+			unit->RefsIncrease();
 			break;
 		}
 	}
@@ -536,7 +536,7 @@ static void AiForceAttacks(AiForce *force)
 	unit = NULL;
 	while (aiunit) {
 		// Still some action
-		if (!UnitIdle(aiunit->Unit)) {
+		if (!aiunit->Unit->IsIdle()) {
 			unit = aiunit->Unit;
 			break;
 		}
@@ -547,7 +547,7 @@ static void AiForceAttacks(AiForce *force)
 		// FIXME: may not be a good goal
 		aiunit = force->Units;
 		while (aiunit) {
-			if (UnitIdle(aiunit->Unit)) {
+			if (aiunit->Unit->IsIdle()) {
 				if (unit->Orders[0].Goal) {
 					x = unit->Orders[0].Goal->X;
 					y = unit->Orders[0].Goal->Y;
