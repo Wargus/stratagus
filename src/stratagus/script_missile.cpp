@@ -266,12 +266,12 @@ static int CclMissile(lua_State* l)
 			Assert(missile);
 			value = LuaToString(l, j + 1);
 			missile->SourceUnit = UnitSlots[strtol(value + 1, 0, 16)];
-			RefsIncrease(missile->SourceUnit);
+			missile->SourceUnit->RefsIncrease();
 		} else if (!strcmp(value, "target")) {
 			Assert(missile);
 			value = LuaToString(l, j + 1);
 			missile->TargetUnit = UnitSlots[strtol(value + 1, 0, 16)];
-			RefsIncrease(missile->TargetUnit);
+			missile->TargetUnit->RefsIncrease();
 		} else if (!strcmp(value, "damage")) {
 			Assert(missile);
 			missile->Damage = LuaToNumber(l, j + 1);

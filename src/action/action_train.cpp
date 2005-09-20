@@ -6,7 +6,7 @@
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
-//           Stratagus - A free fantasy real time strategy game engine
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name action_train.cpp - The building train action. */
 //
@@ -185,14 +185,14 @@ void HandleActionTrain(CUnit *unit)
 				nunit->Orders[0] = unit->NewOrder;
 				nunit->Orders[0].Action = UnitActionMove;
 				if (nunit->Orders[0].Goal) {
-					RefsIncrease(nunit->Orders->Goal);
+					nunit->Orders->Goal->RefsIncrease();
 				}
 			} else {
 				if (unit->NewOrder.Goal) {
 					if (unit->NewOrder.Goal->Destroyed) {
 						// FIXME: perhaps we should use another goal?
 						DebugPrint("Destroyed unit in train unit\n");
-						RefsDecrease(unit->NewOrder.Goal);
+						unit->NewOrder.Goal->RefsDecrease();
 						unit->NewOrder.Goal = NoUnitP;
 						unit->NewOrder.Action = UnitActionStill;
 					}
@@ -204,7 +204,7 @@ void HandleActionTrain(CUnit *unit)
 				// FIXME: Pending command uses any references?
 				//
 				if (nunit->Orders[0].Goal) {
-					RefsIncrease(nunit->Orders->Goal);
+					nunit->Orders->Goal->RefsIncrease();
 				}
 			}
 

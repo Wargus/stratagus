@@ -234,16 +234,16 @@ void ActionStillGeneric(CUnit *unit, int ground)
 			//
 			temp = unit->Orders[0].Goal;
 			if (temp && temp->Orders[0].Action == UnitActionDie) {
-				RefsDecrease(temp);
+				temp->RefsDecrease();
 				unit->Orders[0].Goal = temp = NoUnitP;
 			}
 			if (!unit->SubAction || temp != goal) {
 				// New target.
 				if (temp) {
-					RefsDecrease(temp);
+					temp->RefsDecrease();
 				}
 				unit->Orders[0].Goal = goal;
-				RefsIncrease(goal);
+				goal->RefsIncrease();
 				unit->State = 0;
 				unit->SubAction = 1; // Mark attacking.
 				UnitHeadingFromDeltaXY(unit,
@@ -256,7 +256,7 @@ void ActionStillGeneric(CUnit *unit, int ground)
 
 	if (unit->SubAction) { // was attacking.
 		if ((temp = unit->Orders[0].Goal)) {
-			RefsDecrease(temp);
+			temp->RefsDecrease();
 			unit->Orders[0].Goal = NoUnitP;
 		}
 		unit->SubAction = unit->State = 0; // No attacking, restart

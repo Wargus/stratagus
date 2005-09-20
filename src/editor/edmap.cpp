@@ -721,10 +721,10 @@ static void EditorDestroyAllUnits(void)
 
 	while (NumUnits != 0) {
 		unit = Units[0];
-		RemoveUnit(unit, NULL);
+		unit->Remove(NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
-		ReleaseUnit(unit);
+		unit->Release();
 	}
 }
 

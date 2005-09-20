@@ -370,7 +370,7 @@ static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
-		if (UnitIdle(unit)) {
+		if (unit->IsIdle()) {
 			table[num++] = unit;
 		}
 	}
@@ -533,7 +533,7 @@ static int AiResearchUpgrade(const CUnitType *type, Upgrade *what)
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
-		if (UnitIdle(unit)) {
+		if (unit->IsIdle()) {
 			table[num++] = unit;
 		}
 	}
@@ -627,7 +627,7 @@ static int AiUpgradeTo(const CUnitType *type, CUnitType *what)
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
-		if (UnitIdle(unit)) {
+		if (unit->IsIdle()) {
 			table[num++] = unit;
 		}
 	}
@@ -898,7 +898,7 @@ static void AiCollectResources(void)
 		//
 		// Ignore busy units. ( building, fighting, ... )
 		//
-		if (!UnitIdle(unit)) {
+		if (!unit->IsIdle()) {
 			continue;
 		}
 

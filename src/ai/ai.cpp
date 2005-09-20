@@ -1319,7 +1319,7 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 			continue;
 		}
 
-		if (!UnitIdle(blocker)) {
+		if (!blocker->IsIdle()) {
 			continue;
 		}
 
@@ -1451,7 +1451,7 @@ static int FindTransporterOnZone(int waterzone, ZoneSet *destzones,
 			continue;
 		}
 
-		unitok = UnitIdle(unit);
+		unitok = unit->IsIdle();
 		unitX = unit->X;
 		unitY = unit->Y;
 
@@ -1506,7 +1506,7 @@ static void HelpWithTransporter(CUnit *unit, CUnit *transporter,
 
 	// Order temp;
 
-	if (UnitIdle(transporter)) {
+	if (transporter->IsIdle()) {
 		CommandFollow(transporter, unit, FlushCommands);
 		ZoneFindConnexion(destzone, transporterzone, unit->X, unit->Y, &x, &y);
 		CommandUnload(transporter, x, y ,NoUnitP, 0);
@@ -1754,9 +1754,9 @@ void AiEachCycle(CPlayer *player)
 		HandleTransportRequests(aitr);
 #endif // MAP_REGIONS
 
-		RefsDecrease(aitr->Unit);
+		aitr->Unit->RefsDecrease();
 		if (aitr->Order.Goal) {
-			RefsDecrease(aitr->Order.Goal);
+			aitr->Order.Goal->RefsDecrease();
 		}
 		free(aitr);
 

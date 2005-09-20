@@ -493,7 +493,7 @@ static void HandleUnitAction(CUnit *unit)
 				}
 				// Still shouldn't have a reference unless attacking
 				Assert(!(unit->Orders[0].Action == UnitActionStill && !unit->SubAction));
-				RefsDecrease(unit->Orders->Goal);
+				unit->Orders->Goal->RefsDecrease();
 			}
 			if (unit->CurrentResource) {
 				if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&

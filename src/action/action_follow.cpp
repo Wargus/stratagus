@@ -70,7 +70,7 @@ void HandleActionFollow(CUnit *unit)
 		if (!goal || !UnitVisibleAsGoal(goal, unit->Player)) {
 			DebugPrint("Goal gone\n");
 			if (goal) {
-				RefsDecrease(goal);
+				goal->RefsDecrease();
 			}
 			unit->Orders[0].Goal = NoUnitP;
 			unit->SubAction = 0;
@@ -134,7 +134,7 @@ void HandleActionFollow(CUnit *unit)
 				CUnit *dest;
 
 				// Teleport the unit
-				RemoveUnit(unit, NULL);
+				unit->Remove(NULL);
 				unit->X = goal->Goal->X;
 				unit->Y = goal->Goal->Y;
 				DropOutOnSide(unit, unit->Direction, 1, 1);
@@ -171,7 +171,7 @@ void HandleActionFollow(CUnit *unit)
 							if (dest->NewOrder.Goal->Destroyed) {
 								// FIXME: perhaps we should use another dest?
 								DebugPrint("Destroyed unit in teleport unit\n");
-								RefsDecrease(dest);
+								dest->RefsDecrease();
 								dest->NewOrder.Goal = NoUnitP;
 								dest->NewOrder.Action = UnitActionStill;
 							}
@@ -183,7 +183,7 @@ void HandleActionFollow(CUnit *unit)
 						// FIXME: Pending command uses any references?
 						//
 						if (unit->Orders[0].Goal) {
-							RefsIncrease(unit->Orders->Goal);
+							unit->Orders->Goal->RefsIncrease();
 						}
 					}
 				}
@@ -215,7 +215,7 @@ void HandleActionFollow(CUnit *unit)
 		unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 		unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 		unit->Orders[0].Goal = NoUnitP;
-		RefsDecrease(goal);
+		goal->RefsDecrease();
 		goal = NoUnitP;
 		NewResetPath(unit);
 	}
