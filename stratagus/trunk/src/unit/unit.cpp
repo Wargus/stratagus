@@ -363,9 +363,9 @@ void InitUnit(CUnit *unit, CUnitType* type)
 **  @param player  player which have the unit.
 **
 */
-void AssignUnitToPlayer(CUnit *unit, Player* player)
+void AssignUnitToPlayer(CUnit *unit, CPlayer *player)
 {
-	CUnitType* type;  // type of unit.
+	CUnitType *type;  // type of unit.
 
 	Assert(player);
 	type = unit->Type;
@@ -422,7 +422,7 @@ void AssignUnitToPlayer(CUnit *unit, Player* player)
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnit(CUnitType *type, Player *player)
+CUnit *MakeUnit(CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 
@@ -815,7 +815,7 @@ void PlaceUnit(CUnit *unit, int x, int y)
 **
 **  @return          Pointer to created unit.
 */
-CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, Player *player)
+CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 
@@ -889,7 +889,7 @@ void UnitLost(CUnit *unit)
 	CUnit *temp;
 	BuildRestriction *b;
 	const CUnitType *type;
-	Player *player;
+	CPlayer *player;
 	int i;
 
 	Assert(unit);
@@ -1032,7 +1032,7 @@ void UnitClearOrders(CUnit *unit)
 void UpdateForNewUnit(const CUnit *unit, int upgrade)
 {
 	const CUnitType *type;
-	Player *player;
+	CPlayer *player;
 	int u;
 
 	player = unit->Player;
@@ -1119,7 +1119,7 @@ static void UnitFillSeenValues(CUnit *unit)
 **  @param unit    The unit that goes under fog.
 **  @param player  The player the unit goes out of fog for.
 */
-void UnitGoesUnderFog(CUnit *unit, const Player* player)
+void UnitGoesUnderFog(CUnit *unit, const CPlayer* player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (player->Type == PlayerPerson && !unit->Destroyed) {
@@ -1160,7 +1160,7 @@ void UnitGoesUnderFog(CUnit *unit, const Player* player)
 **  not get an decrease the first time it's seen, so we have to
 **  keep track of what player saw what units, with SeenByPlayer.
 */
-void UnitGoesOutOfFog(CUnit *unit, const Player* player)
+void UnitGoesOutOfFog(CUnit *unit, const CPlayer* player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (unit->Seen.ByPlayer & (1 << (player->Index))) {
@@ -1182,7 +1182,7 @@ void UnitGoesOutOfFog(CUnit *unit, const Player* player)
 **  @param y       y location to check
 **  @param cloak   If we mark cloaked units too.
 */
-void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
+void UnitsOnTileMarkSeen(const CPlayer* player, int x, int y, int cloak)
 {
 	int p;
 	int n;
@@ -1219,7 +1219,7 @@ void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 **  @param y         y location to check if building is on, and mark as seen
 **  @param cloak     If this is for cloaked units.
 */
-void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
+void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
 {
 	int p;
 	int n;
@@ -1333,7 +1333,7 @@ void UnitCountSeen(CUnit *unit)
 **  @param unit    The unit to check.
 **  @param player  The player to check.
 */
-int UnitVisible(const CUnit *unit, const Player* player)
+int UnitVisible(const CUnit *unit, const CPlayer* player)
 {
 	int p;
 	int cp;
@@ -1362,7 +1362,7 @@ int UnitVisible(const CUnit *unit, const Player* player)
 **
 **  @return        True if visible, false otherwise.
 */
-int UnitVisibleAsGoal(const CUnit *unit, const Player* player)
+int UnitVisibleAsGoal(const CUnit *unit, const CPlayer* player)
 {
 	//
 	// Invisibility
@@ -1391,7 +1391,7 @@ int UnitVisibleAsGoal(const CUnit *unit, const Player* player)
 **
 **  @return        True if visible, false otherwise.
 */
-int UnitVisibleOnMap(const CUnit *unit, const Player* player)
+int UnitVisibleOnMap(const CUnit *unit, const CPlayer* player)
 {
 	//
 	// Invisible units.
@@ -1532,11 +1532,11 @@ void GetUnitMapArea(const CUnit *unit, int* sx, int* sy, int* ex, int* ey)
 **  @param unit       Unit which should be consigned.
 **  @param newplayer  New owning player.
 */
-void ChangeUnitOwner(CUnit *unit, Player* newplayer)
+void ChangeUnitOwner(CUnit *unit, CPlayer *newplayer)
 {
 	int i;
 	CUnit *uins;
-	Player* oldplayer;
+	CPlayer *oldplayer;
 
 	oldplayer = unit->Player;
 
@@ -1600,7 +1600,7 @@ void ChangeUnitOwner(CUnit *unit, Player* newplayer)
 **  @param oldplayer    Old owning player.
 **  @param newplayer    New owning player.
 */
-static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
+static void ChangePlayerOwner(CPlayer *oldplayer, CPlayer *newplayer)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
@@ -1629,7 +1629,7 @@ static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 */
 void RescueUnits(void)
 {
-	Player* p;
+	CPlayer *p;
 	CUnit *unit;
 	CUnit *table[UnitMax];
 	CUnit *around[UnitMax];
@@ -2266,7 +2266,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 	int h;
 	int j;
 	int testmask;
-	Player *player;
+	CPlayer *player;
 	CUnit *ontop;
 
 	// Terrain Flags don't matter if building on top of a unit.
@@ -2370,7 +2370,7 @@ int FindWoodInSight(const CUnit *unit, int* x, int* y)
 **  @return            True if wood was found.
 */
 int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-	const Player* player, int x, int y, int* px, int* py)
+	const CPlayer* player, int x, int y, int* px, int* py)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2741,7 +2741,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 **
 **  @return NoUnitP or next idle worker
 */
-CUnit *FindIdleWorker(const Player* player, const CUnit *last)
+CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 {
 	CUnit *unit;
 	CUnit **units;
@@ -3058,7 +3058,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 				}
 			}
 		}
-		NotifyPlayer(target->Player, NotifyRed, target->X, target->Y,
+		target->Player->Notify(NotifyRed, target->X, target->Y,
 			"%s attacked", target->Type->Name);
 		if (target->Player->AiEnabled) {
 			AiHelpMe(attacker, target);

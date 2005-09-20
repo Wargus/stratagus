@@ -103,13 +103,13 @@ int ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 {
 	char *buf;
 	const char *s;
-	Player *player;
+	CPlayer *player;
 
 	player = unit->Player;
 	buf = (char *)malloc(strlen(button->AllowStr) + 1);
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
-		if (HaveUnitTypeByIdent(player, s)) {
+		if (player->HaveUnitTypeByIdent(s)) {
 			free(buf);
 			return 1;
 		}
@@ -130,13 +130,13 @@ int ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 {
 	char *buf;
 	const char *s;
-	Player *player;
+	CPlayer *player;
 
 	player = unit->Player;
 	buf = (char *)malloc(strlen(button->AllowStr) + 1);
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
-		if (!HaveUnitTypeByIdent(player, s)) {
+		if (!player->HaveUnitTypeByIdent(s)) {
 			free(buf);
 			return 0;
 		}

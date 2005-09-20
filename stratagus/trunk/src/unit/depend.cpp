@@ -189,11 +189,11 @@ void AddDependency(const char* target, const char* required, int count,
 **
 **  @return        True if available, false otherwise.
 */
-int CheckDependByIdent(const Player* player, const char* target)
+int CheckDependByIdent(const CPlayer *player, const char *target)
 {
 	DependRule rule;
-	const DependRule* node;
-	const DependRule* temp;
+	const DependRule *node;
+	const DependRule *temp;
 	int i;
 
 	//
@@ -245,7 +245,7 @@ int CheckDependByIdent(const Player* player, const char* target)
 		while (temp) {
 			switch (temp->Type) {
 				case DependRuleUnitType:
-					i = HaveUnitTypeByType(player, temp->Kind.UnitType);
+					i = player->HaveUnitTypeByType(temp->Kind.UnitType);
 					if (temp->Count ? i < temp->Count : i) {
 						goto try_or;
 					}

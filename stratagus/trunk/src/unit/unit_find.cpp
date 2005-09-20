@@ -134,7 +134,7 @@ int FindUnitsByType(const CUnitType *type, CUnit **table)
 **
 **  @return        Returns the number of units found.
 */
-int FindPlayerUnitsByType(const Player *player, const CUnitType *type,
+int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 	CUnit **table)
 {
 	CUnit *unit;
@@ -328,7 +328,7 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 	CUnit *dest;
 	const CUnitType *dtype;
 	const CUnitType *type;
-	const Player *player;
+	const CPlayer *player;
 	int xx;
 	int yy;
 	int best_x;
@@ -603,7 +603,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 	int attackrange;
 	int cost;
 	int best_cost;
-	const Player *player;
+	const CPlayer *player;
 	CUnit *best_unit;
 
 	// if necessary, take possible damage on allied units into account...

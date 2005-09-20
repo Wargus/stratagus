@@ -109,7 +109,7 @@ static Order *GetNextOrder(CUnit *unit, int flush)
 		// Realloc failed, fail gracefully
 		if (!unit->Orders) {
 			unit->Orders = old_orders;
-			NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 				"Unable to add order to list");
 			return NULL;
 		}
@@ -863,8 +863,8 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 		// Check if enough resources remains? (NETWORK!)
 		// FIXME: wrong if append to message queue!!!
 		//
-		if (PlayerCheckLimits(unit->Player, type) < 0 ||
-				PlayerCheckUnitType(unit->Player, type)) {
+		if (unit->Player->CheckLimits(type) < 0 ||
+				unit->Player->CheckUnitType(type)) {
 			return;
 		}
 
@@ -884,7 +884,7 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 		order->Type = type;
 		order->X = order->Y = -1;
 		// FIXME: if you give quick an other order, the resources are lost!
-		PlayerSubUnitType(unit->Player, type);
+		unit->Player->SubUnitType(type);
 	}
 	ClearSavedAction(unit);
 }
@@ -910,7 +910,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 	if (slot == -1) {
 		// Cancel All training
 		while (unit->Orders[0].Action == UnitActionTrain) {
-			PlayerAddCostsFactor(unit->Player,
+			unit->Player->AddCostsFactor(
 				unit->Orders[0].Type->Stats[unit->Player->Index].Costs,
 				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
@@ -934,7 +934,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 
 		DebugPrint("Cancel training\n");
 
-		PlayerAddCostsFactor(unit->Player,
+		unit->Player->AddCostsFactor(
 			unit->Orders[slot].Type->Stats[unit->Player->Index].Costs,
 			CancelTrainingCostsFactor);
 
@@ -971,7 +971,7 @@ void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 		//
 		// Check if enough resources remains? (NETWORK!)
 		//
-		if (PlayerCheckUnitType(unit->Player, type)) {
+		if (unit->Player->CheckUnitType(type)) {
 			return;
 		}
 
@@ -984,7 +984,7 @@ void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 		memset(order, 0, sizeof(*order));
 
 		// FIXME: if you give quick an other order, the resources are lost!
-		PlayerSubUnitType(unit->Player, type);
+		unit->Player->SubUnitType(type);
 
 		order->Action = UnitActionUpgradeTo;
 		order->X = order->Y = -1;
@@ -1026,7 +1026,7 @@ void CommandCancelUpgradeTo(CUnit *unit)
 	//
 	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
 
-		PlayerAddCostsFactor(unit->Player,
+		unit->Player->AddCostsFactor(
 			unit->Orders[0].Type->Stats[unit->Player->Index].Costs,
 			CancelUpgradeCostsFactor);
 
@@ -1065,7 +1065,7 @@ void CommandResearch(CUnit *unit, Upgrade *what, int flush)
 		//
 		// Check if enough resources remains? (NETWORK!)
 		//
-		if (PlayerCheckCosts(unit->Player, what->Costs)) {
+		if (unit->Player->CheckCosts(what->Costs)) {
 			return;
 		}
 
@@ -1078,7 +1078,7 @@ void CommandResearch(CUnit *unit, Upgrade *what, int flush)
 				// Cancel current research
 				upgrade = unit->Data.Research.Upgrade;
 				unit->Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
-				PlayerAddCostsFactor(unit->Player,upgrade->Costs,
+				unit->Player->AddCostsFactor(upgrade->Costs,
 					CancelResearchCostsFactor);
 				unit->SubAction = 0;
 			}
@@ -1090,7 +1090,7 @@ void CommandResearch(CUnit *unit, Upgrade *what, int flush)
 		memset(order, 0, sizeof(*order));
 
 		// FIXME: if you give quick an other order, the resources are lost!
-		PlayerSubCosts(unit->Player, what->Costs);
+		unit->Player->SubCosts(what->Costs);
 
 		order->Action = UnitActionResearch;
 		order->X = order->Y = -1;
@@ -1117,7 +1117,7 @@ void CommandCancelResearch(CUnit *unit)
 		upgrade = unit->Data.Research.Upgrade;
 		unit->Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
 
-		PlayerAddCostsFactor(unit->Player,upgrade->Costs,
+		unit->Player->AddCostsFactor(upgrade->Costs,
 			CancelResearchCostsFactor);
 		memset(unit->Orders, 0, sizeof(*unit->Orders));
 

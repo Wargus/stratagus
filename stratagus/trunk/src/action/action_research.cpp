@@ -99,7 +99,7 @@ void HandleActionResearch(CUnit *unit)
 	if (unit->Player->UpgradeTimers.Upgrades[upgrade->ID] >=
 			upgrade->Costs[TimeCost]) {
 
-		NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
+		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
 			"%s: complete", unit->Type->Name);
 		if (unit->Player->AiEnabled) {
 			AiResearchComplete(unit, upgrade);

@@ -838,7 +838,7 @@ static int GameStatsDrawFunc(int frame)
 	int dodraw;
 	int done;
 	const int stats_pause = 30;  // Wait one second between each stat
-	Player* p;
+	CPlayer *p;
 	int i;
 	int c;
 	char buf[50];

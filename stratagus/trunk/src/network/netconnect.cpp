@@ -626,9 +626,9 @@ void NetworkConnectSetupGame(void)
 {
 	int i;
 
-	PlayerSetName(ThisPlayer, LocalPlayerName);
+	ThisPlayer->SetName(LocalPlayerName);
 	for (i = 0; i < HostsCount; ++i) {
-		PlayerSetName(&Players[Hosts[i].PlyNr], Hosts[i].PlyName);
+		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
 }
 

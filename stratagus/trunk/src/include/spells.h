@@ -45,7 +45,7 @@
 
 class CUnit;
 class CUnitType;
-struct _player_;
+class CPlayer;
 struct lua_State;
 class SpellType;
 
@@ -265,8 +265,8 @@ typedef struct {
 class ConditionInfoVariable {
 public:
 	ConditionInfoVariable() : Enable(0), MinValue(0), MaxValue(0),
-							MinMax(0), MinValuePercent(0), MaxValuePercent(0),
-							ConditionApplyOnCaster(0) {};
+		MinMax(0), MinValuePercent(0), MaxValuePercent(0),
+		ConditionApplyOnCaster(0) {};
 
 	char Enable;                /// Target is 'user defined variable'.
 
@@ -299,7 +299,7 @@ public:
 	char Alliance;          /// Target is allied. (neutral is neither allied, nor opponent)
 	char Opponent;          /// Target is opponent. (neutral is neither allied, nor opponent)
 	char TargetSelf;        /// Target is the same as the caster.
-	char* BoolFlag;         /// User defined boolean flag.
+	char *BoolFlag;         /// User defined boolean flag.
 
 	ConditionInfoVariable* Variable;
 	//
@@ -337,8 +337,8 @@ public:
 	~SpellType();
 
 	// Identification stuff
-	char* Ident;    /// Spell unique identifier (spell-holy-vision)
-	char* Name;     /// Spell name shown by the engine
+	char *Ident;    /// Spell unique identifier (spell-holy-vision)
+	char *Name;     /// Spell name shown by the engine
 	int Slot;       /// Spell numeric identifier
 
 	// Spell Specifications
@@ -354,8 +354,8 @@ public:
 	ConditionInfo *Condition;   /// Conditions to cast the spell. (generic (no test for each target))
 
 	// Autocast informations. No AICast means the AI use AutoCast.
-	AutoCastInfo* AutoCast;     /// AutoCast information for your own units
-	AutoCastInfo* AICast;       /// AutoCast information for ai. More detalied.
+	AutoCastInfo *AutoCast;     /// AutoCast information for your own units
+	AutoCastInfo *AICast;       /// AutoCast information for ai. More detalied.
 
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
@@ -368,7 +368,7 @@ public:
 /**
 **  Define the names and effects of all available spells.
 */
-extern std::vector<SpellType*> SpellTypeTable;
+extern std::vector<SpellType *> SpellTypeTable;
 
 
 /*----------------------------------------------------------------------------
@@ -385,24 +385,24 @@ extern void InitSpells(void);
 extern void CleanSpells(void);
 
 	/// return 1 if spell is availible, 0 if not (must upgrade)
-extern int SpellIsAvailable(const struct _player_* player, int SpellId);
+extern int SpellIsAvailable(const CPlayer *player, int SpellId);
 
 	/// returns != 0 if spell can be casted (enough mana, valid target)
-extern int CanCastSpell(const CUnit *caster, const SpellType* spell,
+extern int CanCastSpell(const CUnit *caster, const SpellType *spell,
 	const CUnit *target, int x, int y);
 
 	/// cast spell on target unit or place at x,y
-extern int SpellCast(CUnit *caster, const SpellType* spell,
+extern int SpellCast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y);
 
 	/// auto cast the spell if possible
-extern int AutoCastSpell(CUnit *caster, const SpellType* spell);
+extern int AutoCastSpell(CUnit *caster, const SpellType *spell);
 
 	/// return spell type by ident string
-extern SpellType* SpellTypeByIdent(const char* Ident);
+extern SpellType *SpellTypeByIdent(const char *ident);
 
 	/// return 0, 1, 2 for true, only, false.
-extern char Ccl2Condition(struct lua_State* l, const char* value);
+extern char Ccl2Condition(struct lua_State *l, const char *value);
 
 //@}
 

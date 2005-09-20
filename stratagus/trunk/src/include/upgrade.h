@@ -54,7 +54,7 @@ class CLFile;
 ----------------------------------------------------------------------------*/
 
 	 /// upgrade of identifier
-extern Upgrade* UpgradeByIdent(const char* ident);
+extern Upgrade* UpgradeByIdent(const char *ident);
 
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
@@ -73,21 +73,21 @@ extern void UpgradesCclRegister(void);
 // AllowStruct and UpgradeTimers will be static in the player so will be
 // load/saved with the player struct
 
-extern int UnitTypeIdByIdent(const char* sid);
-extern int UpgradeIdByIdent(const char* sid);
+extern int UnitTypeIdByIdent(const char *sid);
+extern int UpgradeIdByIdent(const char *sid);
 
 /*----------------------------------------------------------------------------
 --  Upgrades
 ----------------------------------------------------------------------------*/
 
 	/// Upgrade will be acquired
-extern void UpgradeAcquire(Player* player, const Upgrade* upgrade);
+extern void UpgradeAcquire(CPlayer *player, const Upgrade *upgrade);
 
 /// for now it will be empty?
 /// perhaps acquired upgrade can be lost if (for example) a building is lost
 /// (lumber mill? stronghold?)
 /// this function will apply all modifiers in reverse way
-extern void UpgradeLost(Player* player, int id);
+extern void UpgradeLost(CPlayer *player, int id);
 
 /*----------------------------------------------------------------------------
 --  Allow(s)
@@ -96,13 +96,13 @@ extern void UpgradeLost(Player* player, int id);
 // all the following functions are just map handlers, no specific notes
 // id -- unit type id, af -- `A'llow/`F'orbid
 
-extern int UnitIdAllowed(const Player* player, int id);
+extern int UnitIdAllowed(const CPlayer *player, int id);
 
-extern char UpgradeIdAllowed(const Player* player, int id);
-extern char UpgradeIdentAllowed(const Player* player, const char* sid);
+extern char UpgradeIdAllowed(const CPlayer *player, int id);
+extern char UpgradeIdentAllowed(const CPlayer *player, const char *sid);
 
 	/// Check if the upgrade is researched.
-extern int UpgradeIdentAvailable(const Player* player, const char* ident);
+extern int UpgradeIdentAvailable(const CPlayer *player, const char *ident);
 
 //@}
 

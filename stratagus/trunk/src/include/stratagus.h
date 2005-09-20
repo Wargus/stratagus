@@ -91,11 +91,6 @@
 
 // This is needed to have recursive forward references
 
-#if !defined(__STRUCT_PLAYER__) && !defined(DOXYGEN)
-#define __STRUCT_PLAYER__
-typedef struct _player_ Player;
-#endif
-
 #if !defined(__STRUCT_VIEWPORT__) && !defined(DOXYGEN)
 #define __STRUCT_VIEWPORT__
 typedef struct _viewport_ Viewport;

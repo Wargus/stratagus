@@ -822,9 +822,9 @@ static void DoNextReplay(void)
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info
-			NotifyPlayer(ThisPlayer, NotifyYellow, -1, -1, "No sync info for this replay !");
+			ThisPlayer->Notify(NotifyYellow, -1, -1, "No sync info for this replay !");
 		} else {
-			NotifyPlayer(ThisPlayer, NotifyYellow, -1, -1, "Replay got out of sync (%lu) !", GameCycle);
+			ThisPlayer->Notify(NotifyYellow, -1, -1, "Replay got out of sync (%lu) !", GameCycle);
 			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
 			Assert(0);
 			// ReplayStep = 0;
@@ -934,7 +934,7 @@ static void ReplayEachCycle(void)
 		int i;
 		for (i = 0; i < PlayerMax; ++i) {
 			if (CurrentReplay->Players[i].Name) {
-				PlayerSetName(&Players[i], CurrentReplay->Players[i].Name);
+				Players[i].SetName(CurrentReplay->Players[i].Name);
 			}
 		}
 		ReplayStep = CurrentReplay->Commands;

@@ -95,7 +95,7 @@ void HandleActionTrain(CUnit *unit)
 {
 	CUnit *nunit;
 	const CUnitType *type;
-	Player *player;
+	CPlayer *player;
 	int food;
 
 	//
@@ -132,7 +132,7 @@ void HandleActionTrain(CUnit *unit)
 		//
 		// Check if enough supply available.
 		//
-		food = PlayerCheckLimits(player, unit->Orders[0].Type);
+		food = player->CheckLimits(unit->Orders[0].Type);
 		if (food < 0) {
 			if (food == -3 && unit->Player->AiEnabled) {
 				AiNeedMoreSupply(unit, unit->Orders[0].Type);
@@ -166,7 +166,7 @@ void HandleActionTrain(CUnit *unit)
 				nunit->TTL = GameCycle + type->DecayRate * 6 * CYCLES_PER_SECOND;
 			}
 
-			NotifyPlayer(player, NotifyYellow, nunit->X, nunit->Y,
+			player->Notify(NotifyYellow, nunit->X, nunit->Y,
 				"New %s ready", nunit->Type->Name);
 			if (player == ThisPlayer) {
 				PlayUnitSound(nunit, VoiceReady);
@@ -213,7 +213,7 @@ void HandleActionTrain(CUnit *unit)
 			}
 			return;
 		} else {
-			NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,
+			player->Notify(NotifyYellow, unit->X, unit->Y,
 				"Unable to Train %s", unit->Orders[0].Type->Name);
 		}
 	}

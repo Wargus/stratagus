@@ -320,7 +320,7 @@ static int GetButtonStatus(const ButtonAction *button)
 */
 void CButtonPanel::Draw(void)
 {
-	Player *player;
+	CPlayer *player;
 	const ButtonAction *buttons;
 	char buf[8];
 
@@ -867,7 +867,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonBuild:
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
-			if (!PlayerCheckUnitType(Selected[0]->Player, type)) {
+			if (!Selected[0]->Player->CheckUnitType(type)) {
 				UI.StatusLine.Set("Select Location");
 				ClearCosts();
 				CursorBuilding = type;
@@ -886,10 +886,10 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: this can be correct written, with a little more code.
 			if (Selected[0]->Orders[0].Action == UnitActionTrain &&
 					!EnableTrainingQueue) {
-				NotifyPlayer(Selected[0]->Player, NotifyYellow, Selected[0]->X,
+				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->X,
 					Selected[0]->Y, "Unit training queue is full");
-			} else if (PlayerCheckLimits(Selected[0]->Player, type) >= 0 &&
-					!PlayerCheckUnitType(Selected[0]->Player, type)) {
+			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
+					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
 				SendCommandTrainUnit(Selected[0], type,
 					!(KeyModifiers & ModifierShift));
@@ -901,7 +901,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
-			if (!PlayerCheckUnitType(Selected[0]->Player, type)) {
+			if (!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
 				SendCommandUpgradeTo(Selected[0],type,
 					!(KeyModifiers & ModifierShift));
@@ -911,7 +911,7 @@ void CButtonPanel::DoClicked(int button)
 			break;
 		case ButtonResearch:
 			i = CurrentButtons[button].Value;
-			if (!PlayerCheckCosts(Selected[0]->Player, AllUpgrades[i]->Costs)) {
+			if (!Selected[0]->Player->CheckCosts(AllUpgrades[i]->Costs)) {
 				//PlayerSubCosts(player,Upgrades[i].Costs);
 				SendCommandResearch(Selected[0], AllUpgrades[i],
 					!(KeyModifiers & ModifierShift));

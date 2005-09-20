@@ -63,8 +63,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-static void AllowUnitId(Player *player, int id, int units);
-static void AllowUpgradeId(Player *player, int id, char af);
+static void AllowUnitId(CPlayer *player, int id, int units);
+static void AllowUpgradeId(CPlayer *player, int id, char af);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -554,7 +554,7 @@ int UpgradeIdByIdent(const char *ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-static void ConvertUnitTypeTo(Player *player, const CUnitType *src, CUnitType *dst)
+static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *dst)
 {
 	CUnit *unit;
 	int i;
@@ -598,7 +598,7 @@ static void ConvertUnitTypeTo(Player *player, const CUnitType *src, CUnitType *d
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void ApplyUpgradeModifier(Player *player, const UpgradeModifier *um)
+static void ApplyUpgradeModifier(CPlayer *player, const UpgradeModifier *um)
 {
 	int z;                      // iterator on upgrade or unittype.
 	int j;                      // iterator on cost or variable.
@@ -718,7 +718,7 @@ static void ApplyUpgradeModifier(Player *player, const UpgradeModifier *um)
 **  @param player   Player researching the upgrade.
 **  @param upgrade  Upgrade ready researched.
 */
-void UpgradeAcquire(Player *player, const Upgrade *upgrade)
+void UpgradeAcquire(CPlayer *player, const Upgrade *upgrade)
 {
 	int z;
 	int id;
@@ -769,7 +769,7 @@ void UpgradeLost(Player* player, int id)
 **  @param id      unit type id
 **  @param units   maximum amount of units allowed
 */
-static void AllowUnitId(Player *player, int id, int units)
+static void AllowUnitId(CPlayer *player, int id, int units)
 {
 	player->Allow.Units[id] = units;
 }
@@ -781,7 +781,7 @@ static void AllowUnitId(Player *player, int id, int units)
 **  @param id      upgrade id
 **  @param af      `A'llow/`F'orbid/`R'eseached
 */
-static void AllowUpgradeId(Player *player, int id, char af)
+static void AllowUpgradeId(CPlayer *player, int id, char af)
 {
 	Assert(af == 'A' || af == 'F' || af == 'R');
 	player->Allow.Upgrades[id] = af;
@@ -795,7 +795,7 @@ static void AllowUpgradeId(Player *player, int id, char af)
 **
 **  @return the allow state of the unit.
 */
-int UnitIdAllowed(const Player *player, int id)
+int UnitIdAllowed(const CPlayer *player, int id)
 {
 	Assert(id >= 0 && id < UnitTypeMax);
 	return player->Allow.Units[id];
@@ -809,7 +809,7 @@ int UnitIdAllowed(const Player *player, int id)
 **
 **  @return the allow state of the upgrade.
 */
-char UpgradeIdAllowed(const Player *player, int id)
+char UpgradeIdAllowed(const CPlayer *player, int id)
 {
 	Assert(id >= 0 && id < UpgradeMax);
 	return player->Allow.Upgrades[id];
@@ -825,7 +825,7 @@ char UpgradeIdAllowed(const Player *player, int id)
 **
 **  @note This function shouldn't be used during runtime, it is only for setup.
 */
-char UpgradeIdentAllowed(const Player *player, const char *ident)
+char UpgradeIdentAllowed(const CPlayer *player, const char *ident)
 {
 	int id;
 
@@ -846,7 +846,7 @@ char UpgradeIdentAllowed(const Player *player, const char *ident)
 **  @param player  Player pointer.
 **  @param ident   Upgrade ident.
 */
-int UpgradeIdentAvailable(const Player *player, const char *ident)
+int UpgradeIdentAvailable(const CPlayer *player, const char *ident)
 {
 	int allow;
 

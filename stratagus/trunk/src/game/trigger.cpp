@@ -104,7 +104,7 @@ int TriggerGetPlayer(lua_State *l)
 **
 **  @return   The unit-type pointer.
 */
-const UnitType *TriggerGetUnitType(lua_State *l)
+const CUnitType *TriggerGetUnitType(lua_State *l)
 {
 	const char *unit;
 
@@ -193,7 +193,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	int y1;
 	int x2;
 	int y2;
-	const UnitType *unittype;
+	const CUnitType *unittype;
 	CUnit *table[UnitMax];
 	CUnit *unit;
 	int an;
@@ -266,8 +266,8 @@ static int CclIfNearUnit(lua_State *l)
 	int q;
 	int n;
 	int i;
-	const UnitType *unittype;
-	const UnitType *ut2;
+	const CUnitType *unittype;
+	const CUnitType *ut2;
 	const char *op;
 	CUnit *table[UnitMax];
 	CompareFunction compare;
@@ -360,8 +360,8 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	int q;
 	int n;
 	int i;
-	const UnitType *unittype;
-	const UnitType *ut2;
+	const CUnitType *unittype;
+	const CUnitType *ut2;
 	const char *op;
 	CUnit *table[UnitMax];
 	CompareFunction compare;

@@ -516,7 +516,7 @@ public:
 	int Y; /// Map position Y
 
 	CUnitType *Type;              /// Pointer to unit-type (peon,...)
-	struct _player_* Player;      /// Owner of this unit
+	CPlayer *Player;              /// Owner of this unit
 	struct _unit_stats_* Stats;   /// Current unit stats
 	int        CurrentSightRange; /// Unit's Current Sight Range
 
@@ -539,10 +539,10 @@ public:
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
-	struct _player_* RescuedFrom;/// The original owner of a rescued unit.
+	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 							     /// NULL if the unit was not rescued.
 	/* Seen stuff. */
-	char VisCount[PlayerMax]; /// Unit visibility counts
+	char VisCount[PlayerMax];    /// Unit visibility counts
 	struct _seen_stuff_ {
 		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player
 		int                 Frame;                   /// last seen frame/stage of buildings
@@ -744,13 +744,13 @@ extern void ReleaseUnit(CUnit *unit);
 	/// Initialize unit structure with default values
 extern void InitUnit(CUnit *unit, CUnitType *type);
 	/// Assign unit to player
-extern void AssignUnitToPlayer(CUnit *unit, Player *player);
+extern void AssignUnitToPlayer(CUnit *unit, CPlayer *player);
 	/// Create a new unit
-extern CUnit *MakeUnit(CUnitType *type, Player *player);
+extern CUnit *MakeUnit(CUnitType *type, CPlayer *player);
 	/// Place an unit on map
 extern void PlaceUnit(CUnit *unit, int x, int y);
 	/// Create a new unit and place on map
-extern CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, Player *player);
+extern CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player);
 	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
 extern void MoveUnitToXY(CUnit *unit, int x, int y);
 	/// Add an unit inside a container. Only deal with list stuff.
@@ -767,22 +767,22 @@ extern void UpdateForNewUnit(const CUnit *unit, int upgrade);
 extern void NearestOfUnit(const CUnit *unit, int tx, int ty, int *dx, int *dy);
 
 	/// Call when an Unit goes under fog.
-extern void UnitGoesUnderFog(CUnit *unit, const Player *player);
+extern void UnitGoesUnderFog(CUnit *unit, const CPlayer *player);
 	/// Call when an Unit goes out of fog.
-extern void UnitGoesOutOfFog(CUnit *unit, const Player *player);
+extern void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player);
 	/// Marks an unit as seen
-extern void UnitsOnTileMarkSeen(const Player *player, int x, int y, int p);
+extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int p);
 	/// Unmarks an unit as seen
-extern void UnitsOnTileUnmarkSeen(const Player *player, int x, int y, int p);
+extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int p);
 	/// Does a recount for VisCount
 extern void UnitCountSeen(CUnit *unit);
 
 	/// Returns true, if unit is directly seen by an allied unit.
-extern int UnitVisible(const CUnit *unit, const Player *player);
+extern int UnitVisible(const CUnit *unit, const CPlayer *player);
 	/// Returns true, if unit is visible as a goal.
-extern int UnitVisibleAsGoal(const CUnit *unit, const Player *player);
+extern int UnitVisibleAsGoal(const CUnit *unit, const CPlayer *player);
 	/// Returns true, if unit is Visible for game logic on the map.
-extern int UnitVisibleOnMap(const CUnit *unit, const Player *player);
+extern int UnitVisibleOnMap(const CUnit *unit, const CPlayer *player);
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
 extern int UnitVisibleOnMinimap(const CUnit *unit);
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
@@ -794,7 +794,7 @@ extern void GetUnitMapArea(const CUnit *unit, int *sx, int *sy,
 	/// Check for rescue each second
 extern void RescueUnits(void);
 	/// Change owner of unit
-extern void ChangeUnitOwner(CUnit *unit, Player *newplayer);
+extern void ChangeUnitOwner(CUnit *unit, CPlayer *newplayer);
 
 	/// Convert direction (dx,dy) to heading (0-255)
 extern int DirectionToHeading(int, int);
@@ -824,11 +824,11 @@ extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int r
 	/// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource);
 	/// Find the next idle worker
-extern CUnit *FindIdleWorker(const Player *player, const CUnit *last);
+extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-		const Player *player, int x, int y, int *px, int *py);
+		const CPlayer *player, int x, int y, int *px, int *py);
 	/// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const CUnit *unit, int *x, int *y);
 
@@ -940,7 +940,7 @@ extern CUnit *UnitCacheOnXY(int x, int y, unsigned type);
 	/// Find all units of this type
 extern int FindUnitsByType(const CUnitType *type, CUnit **table);
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const Player *, const CUnitType *, CUnit **);
+extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **);
 	/// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(int tx, int ty);
 	/// Return possible attack target on that map area
@@ -998,7 +998,7 @@ extern void UnSelectAll(void);
 	/// Select group as selection
 extern void ChangeSelectedUnits(CUnit **units, int num_units);
 	/// Changed TeamUnit Selection
-extern void ChangeTeamSelectedUnits(Player *player, CUnit **units, int adjust, int count);
+extern void ChangeTeamSelectedUnits(CPlayer *player, CUnit **units, int adjust, int count);
 	/// Add a unit to selection
 extern int SelectUnit(CUnit *unit);
 	/// Select one unit as selection

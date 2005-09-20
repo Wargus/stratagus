@@ -113,7 +113,7 @@ std::vector<SpellType*> SpellTypeTable;
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Demolish::Cast(CUnit *caster, const SpellType* spell,
+int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	int xmin;
@@ -192,7 +192,7 @@ int Demolish::Cast(CUnit *caster, const SpellType* spell,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int SpawnPortal::Cast(CUnit *caster, const SpellType* spell,
+int SpawnPortal::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	// FIXME: vladi: cop should be placed only on explored land
@@ -226,7 +226,7 @@ int SpawnPortal::Cast(CUnit *caster, const SpellType* spell,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int AreaAdjustVitals::Cast(CUnit *caster, const SpellType* spell,
+int AreaAdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	CUnit *units[UnitMax];
@@ -282,7 +282,7 @@ int AreaAdjustVitals::Cast(CUnit *caster, const SpellType* spell,
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-int AreaBombardment::Cast(CUnit *caster, const SpellType* spell,
+int AreaBombardment::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	int fields;
@@ -345,8 +345,8 @@ int AreaBombardment::Cast(CUnit *caster, const SpellType* spell,
 ** @param resx         pointer to X coord of the result
 ** @param resy         pointer to Y coord of the result
 */
-static void EvaluateMissileLocation(const SpellActionMissileLocation* location,
-	CUnit *caster, CUnit *target, int x, int y, int* resx, int* resy)
+static void EvaluateMissileLocation(const SpellActionMissileLocation *location,
+	CUnit *caster, CUnit *target, int x, int y, int *resx, int *resy)
 {
 	if (location->Base == LocBaseCaster) {
 		*resx = caster->X * TileSizeX + TileSizeX / 2;
@@ -381,10 +381,10 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int SpawnMissile::Cast(CUnit *caster, const SpellType* spell,
+int SpawnMissile::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
-	struct _missile_* missile;
+	struct _missile_ *missile;
 	int sx;
 	int sy;
 	int dx;
@@ -420,7 +420,7 @@ int SpawnMissile::Cast(CUnit *caster, const SpellType* spell,
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-int AdjustVariable::Cast(CUnit *caster, const SpellType* spell,
+int AdjustVariable::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	int i;
@@ -478,7 +478,7 @@ int AdjustVariable::Cast(CUnit *caster, const SpellType* spell,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int AdjustVitals::Cast(CUnit *caster, const SpellType* spell,
+int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	int castcount;
@@ -560,7 +560,7 @@ int AdjustVitals::Cast(CUnit *caster, const SpellType* spell,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Polymorph::Cast(CUnit *caster, const SpellType* spell,
+int Polymorph::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	int i;
@@ -617,7 +617,7 @@ int Polymorph::Cast(CUnit *caster, const SpellType* spell,
 }
 
 /**
-** Cast capture.
+**  Cast capture.
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
@@ -627,7 +627,7 @@ int Polymorph::Cast(CUnit *caster, const SpellType* spell,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Capture::Cast(CUnit *caster, const SpellType* spell,
+int Capture::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	if (!target || caster->Player == target->Player) {
@@ -679,7 +679,7 @@ int Capture::Cast(CUnit *caster, const SpellType* spell,
 }
 
 /**
-** Cast summon spell.
+**  Cast summon spell.
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
@@ -689,7 +689,7 @@ int Capture::Cast(CUnit *caster, const SpellType* spell,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int Summon::Cast(CUnit *caster, const SpellType* spell,
+int Summon::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
 	int ttl;
@@ -821,8 +821,8 @@ static Target* NewTargetPosition(int x, int y)
 **
 **  @return            1 if passed, 0 otherwise.
 */
-static int PassCondition(const CUnit *caster, const SpellType* spell, const CUnit *target,
-	int x, int y, const ConditionInfo* condition)
+static int PassCondition(const CUnit *caster, const SpellType *spell, const CUnit *target,
+	int x, int y, const ConditionInfo *condition)
 {
 	int i;
 
@@ -920,7 +920,7 @@ static int PassCondition(const CUnit *caster, const SpellType* spell, const CUni
 **  @todo FIXME: should be global (for AI) ???
 **  @todo FIXME: write for position target.
 */
-static Target* SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType* spell)
+static Target *SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType *spell)
 {
 	CUnit *table[UnitMax];
 	int x;
@@ -1048,7 +1048,7 @@ void InitSpells(void)
 **
 **  @return       spell-type struct pointer.
 */
-SpellType* SpellTypeByIdent(const char* ident)
+SpellType* SpellTypeByIdent(const char *ident)
 {
 	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
 		if (strcmp((*i)->Ident, ident) == 0) {
@@ -1069,7 +1069,7 @@ SpellType* SpellTypeByIdent(const char* ident)
 **
 **  @return          0 if spell is not available, else no null.
 */
-int SpellIsAvailable(const Player* player, int spellid)
+int SpellIsAvailable(const CPlayer *player, int spellid)
 {
 	int dependencyId;
 
@@ -1090,7 +1090,7 @@ int SpellIsAvailable(const Player* player, int spellid)
 **  @return          =!0 if spell should/can casted, 0 if not
 **  @note caster must know the spell, and spell must be researched.
 */
-int CanCastSpell(const CUnit *caster, const SpellType* spell,
+int CanCastSpell(const CUnit *caster, const SpellType *spell,
 	const CUnit *target, int x, int y)
 {
 	if (spell->Target == TargetUnit && target == NULL) {
@@ -1107,9 +1107,9 @@ int CanCastSpell(const CUnit *caster, const SpellType* spell,
 **
 **  @return          1 if spell is casted, 0 if not.
 */
-int AutoCastSpell(CUnit *caster, const SpellType* spell)
+int AutoCastSpell(CUnit *caster, const SpellType *spell)
 {
-	Target* target;
+	Target *target;
 
 	//  Check for mana, trivial optimization.
 	if (!SpellIsAvailable(caster->Player, spell->Slot)
@@ -1140,7 +1140,7 @@ int AutoCastSpell(CUnit *caster, const SpellType* spell)
 **
 ** @return          !=0 if spell should/can continue or 0 to stop
 */
-int SpellCast(CUnit *caster, const SpellType* spell, CUnit *target,
+int SpellCast(CUnit *caster, const SpellType *spell, CUnit *target,
 	int x, int y)
 {
 	int cont;             // Should we recast the spell.
