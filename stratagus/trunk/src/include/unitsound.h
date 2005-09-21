@@ -48,10 +48,16 @@
 /**
 **  Sound definition
 */
-typedef struct _sound_config_ {
+class SoundConfig {
+public:
+	SoundConfig() : Name(NULL), Sound(NULL) {};
+	SoundConfig(const char *name) : Name(strdup(name)), Sound(NULL) {};
+
+	~SoundConfig() {/*free(Name);*/};
+
 	char*   Name;   /// config sound name
 	SoundId Sound;  /// identifier send to sound server
-} SoundConfig;
+};
 
 /**
 **  The sounds of the units.
