@@ -343,9 +343,9 @@ static int CclDefineBurningBuilding(lua_State* l)
 	int subargs;
 	int k;
 
-	for (std::vector<BurningBuildingFrame*>::iterator ptr = BurningBuildingFrames.begin();
-		ptr != BurningBuildingFrames.end(); ++ptr) {
-		delete (*ptr);
+	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
+			i != BurningBuildingFrames.end(); ++i) {
+		delete *i;
 	}
 	BurningBuildingFrames.clear();
 
