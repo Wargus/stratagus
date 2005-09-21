@@ -209,7 +209,7 @@ static void DrawMapViewport(Viewport *vp)
 				DrawUnit(table[i]);
 				++i;
 			} else {
-				DrawMissile(missiletable[j]);
+				missiletable[j]->DrawMissile();
 				++j;
 			}
 		}
@@ -217,7 +217,7 @@ static void DrawMapViewport(Viewport *vp)
 			DrawUnit(table[i]);
 		}
 		for (; j < nmissiles; ++j) {
-			DrawMissile(missiletable[j]);
+			missiletable[j]->DrawMissile();
 		}
 		DrawMapFogOfWar(vp);
 		//

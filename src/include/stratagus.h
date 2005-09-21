@@ -96,10 +96,7 @@
 typedef struct _viewport_ Viewport;
 #endif
 
-#if !defined(__STRUCT_MISSILETYPE__) && !defined(DOXYGEN)
-#define __STRUCT_MISSILETYPE__
-typedef struct _missile_type_ MissileType;
-#endif
+class MissileType;
 
 /*============================================================================
 ==  Debug definitions

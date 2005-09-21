@@ -288,7 +288,7 @@ int AreaBombardment::Cast(CUnit *caster, const SpellType *spell,
 	int fields;
 	int shards;
 	int damage;
-	struct _missile_* mis;
+	::Missile *mis;
 	int offsetx;
 	int offsety;
 	int dx;
@@ -384,7 +384,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation *location,
 int SpawnMissile::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
-	struct _missile_ *missile;
+	::Missile *missile;
 	int sx;
 	int sy;
 	int dx;
