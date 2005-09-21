@@ -73,16 +73,16 @@ GameSound GameSounds
 #ifndef laterUSE_CCL
 // FIXME: Removing this crashes?
 ={
-	SoundConfig("placement error"),
-	SoundConfig("placement success"),
-	SoundConfig("click"),
-	SoundConfig("transport docking"),
-	SoundConfig("building construction"),
-	{ SoundConfig("basic human voices work complete"),
-		SoundConfig("basic orc voices work complete"),
+	{"placement error", NULL},
+	{"placement success", NULL},
+	{"click", NULL},
+	{"transport docking", NULL},
+	{"building construction", NULL},
+	{ {"basic human voices work complete", NULL},
+		{"basic orc voices work complete", NULL},
 	},
-	{ SoundConfig("rescue (human) UNUSED"),
-		SoundConfig("rescue (orc) UNUSED"),
+	{ {"rescue (human) UNUSED", NULL},
+		{"rescue (orc) UNUSED", NULL},
 	},
 }
 #endif
