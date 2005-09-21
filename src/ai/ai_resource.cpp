@@ -218,7 +218,7 @@ int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 			continue;
 		}
 
-		if (!IsEnemy(player, dest)) { // a friend or neutral
+		if (!player->IsEnemy(dest)) { // a friend or neutral
 			continue;
 		}
 		//

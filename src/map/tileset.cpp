@@ -38,9 +38,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "script.h"
 #include "stratagus.h"
 #include "tileset.h"
+#include "script.h"
 #include "map.h"
 #include "iolib.h"
 #include "video.h"

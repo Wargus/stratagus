@@ -356,7 +356,6 @@
 ----------------------------------------------------------------------------*/
 
 #include "SDL.h"
-#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -366,6 +365,7 @@ class CUnit;
 class CUnitType;
 struct _unit_stats_;
 struct _new_animation;
+class CPlayer;
 class SpellType;
 struct _unit_colors_;
 struct _construction_frame_;
@@ -678,6 +678,13 @@ public:
 
 	/// @todo more docu
 	void GetMapArea(int *sx, int *sy, int *ex, int *ey) const;
+
+	bool IsEnemy(const CPlayer *x) const;
+	bool IsEnemy(const CUnit *x) const;
+	bool IsAllied(const CPlayer *x) const;
+	bool IsAllied(const CUnit *x) const;
+	bool IsSharedVision(const CPlayer *x) const;
+	bool IsSharedVision(const CUnit *x) const;
 };
 
 #define NoUnitP (CUnit *)0         /// return value: for no unit found
@@ -863,16 +870,6 @@ extern int ViewPointDistance(int x, int y);
 	/// Calculate the distance from current view point to unit
 extern int ViewPointDistanceToUnit(const CUnit *dest);
 
-	/// Return true, if unit is an enemy of the player
-#define IsEnemy(player, dest) \
-	((player)->Enemy & (1 << (dest)->Player->Index))
-	/// Return true, if unit is allied of the player
-#define IsAllied(player, dest) \
-	((player)->Allied & (1 << (dest)->Player->Index))
-	/// Return true, if unit is shared vision with the player
-#define IsSharedVision(player, dest) \
-	(((player)->SharedVision & (1 << (dest)->Player->Index)) && \
-		((dest)->Player->SharedVision & (1 << (player)->Player)))
 	/// Can this unit-type attack the other (destination)
 extern int CanTarget(const CUnitType *type, const CUnitType *dest);
 	/// Can transporter transport the other unit

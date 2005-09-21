@@ -284,14 +284,14 @@ void DoRightButton(int sx, int sy)
 			if (type->RepairRange && dest &&
 					dest->Type->RepairHP &&
 					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
-					(dest->Player == unit->Player || IsAllied(dest->Player, dest))) {
+					(dest->Player == unit->Player || dest->IsAllied(dest))) {
 				dest->Blink = 4;
 				SendCommandRepair(unit, x, y, dest, flush);
 				continue;
 			}
 			// Follow another unit
 			if (UnitUnderCursor && dest && dest != unit &&
-					(dest->Player == unit->Player || IsAllied(unit->Player, dest))) {
+					(dest->Player == unit->Player || unit->IsAllied(dest))) {
 				dest->Blink = 4;
 				SendCommandFollow(unit, dest, flush);
 				continue;
@@ -306,7 +306,7 @@ void DoRightButton(int sx, int sy)
 		//
 		if (action == MouseActionSpellCast || action == MouseActionAttack) {
 			if (dest) {
-				if (IsEnemy(unit->Player, dest)) {
+				if (unit->IsEnemy(dest)) {
 					dest->Blink = 4;
 					if (action == MouseActionSpellCast) {
 						// This is for demolition squads and such
@@ -337,7 +337,7 @@ void DoRightButton(int sx, int sy)
 					}
 				}
 
-				if ((dest->Player == unit->Player || IsAllied(unit->Player, dest)) &&
+				if ((dest->Player == unit->Player || unit->IsAllied(dest)) &&
 						dest != unit) {
 					dest->Blink = 4;
 					SendCommandFollow(unit, dest, flush);
@@ -368,7 +368,7 @@ void DoRightButton(int sx, int sy)
 		// FIXME: attack/follow/board ...
 		if ((action == MouseActionMove || action == MouseActionSail) &&
 				(dest && dest != unit) &&
-				(dest->Player == unit->Player|| IsAllied(unit->Player, dest))) {
+				(dest->Player == unit->Player|| unit->IsAllied(dest))) {
 			dest->Blink = 4;
 			SendCommandFollow(unit, dest, flush);
 			continue;
@@ -836,7 +836,7 @@ void UIHandleMouseMove(int x, int y)
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			GameCursor = UI.YellowHair.Cursor;
 			if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
-				if (IsAllied(ThisPlayer, UnitUnderCursor)) {
+				if (ThisPlayer->IsAllied(UnitUnderCursor)) {
 					GameCursor = UI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
 					GameCursor = UI.RedHair.Cursor;
@@ -903,7 +903,7 @@ static int SendRepair(int sx, int sy)
 	// Check if the dest is repairable!
 	if ((dest = UnitUnderCursor) && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
 			dest->Type->RepairHP &&
-			(dest->Player == ThisPlayer || IsAllied(ThisPlayer, dest))) {
+			(dest->Player == ThisPlayer || ThisPlayer->IsAllied(dest))) {
 		for (i = 0; i < NumSelected; ++i) {
 			unit = Selected[i];
 			if (unit->Type->RepairRange) {

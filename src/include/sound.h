@@ -59,7 +59,9 @@ class Missile;
 /**
 **  Global game sounds, not associated to any unit-type
 */
-typedef struct _game_sound_ {
+class GameSound
+{
+public:
 	SoundConfig PlacementError;    /// used by ui
 	SoundConfig PlacementSuccess;  /// used by ui
 	SoundConfig Click;             /// used by ui
@@ -71,7 +73,7 @@ typedef struct _game_sound_ {
 	SoundConfig WorkComplete[MAX_RACES];  /// building ready
 
 	SoundConfig Rescue[MAX_RACES];  /// rescue units
-} GameSound;
+};
 
 typedef enum _play_section_type_ {
 	PlaySectionUnknown = -1,  /// Unknown

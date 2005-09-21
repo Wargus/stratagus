@@ -46,6 +46,7 @@
 #include "settings.h"
 #include "iolib.h"
 #include "font.h"
+#include "video.h"
 #include "movie.h"
 
 /*----------------------------------------------------------------------------

@@ -840,4 +840,54 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 
 }
 
+/**
+**  Check if the player is an enemy
+*/
+bool CPlayer::IsEnemy(const CPlayer *x) const
+{
+	return (Enemy & (1 << x->Index)) != 0;
+}
+
+/**
+**  Check if the unit is an enemy
+*/
+bool CPlayer::IsEnemy(const CUnit *x) const
+{
+	return IsEnemy(x->Player);
+}
+
+/**
+**  Check if the player is an ally
+*/
+bool CPlayer::IsAllied(const CPlayer *x) const
+{
+	return (Allied & (1 << x->Index)) != 0;
+}
+
+/**
+**  Check if the unit is an ally
+*/
+bool CPlayer::IsAllied(const CUnit *x) const
+{
+	return IsAllied(x->Player);
+}
+
+/**
+**  Check if the player shares vision
+*/
+bool CPlayer::IsSharedVision(const CPlayer *x) const
+{
+	return (SharedVision & (1 << x->Index)) != 0 &&
+		(x->SharedVision & (1 << Index)) != 0;
+}
+
+/**
+**  Check if the unit shares vision
+*/
+bool CPlayer::IsSharedVision(const CUnit *x) const
+{
+	return IsSharedVision(x->Player);
+}
+
+
 //@}

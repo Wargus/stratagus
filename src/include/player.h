@@ -391,6 +391,13 @@ public:
 
 	/// Notify player about a problem
 	void Notify(int type, int x, int y, const char *fmt, ...) const;
+
+	bool IsEnemy(const CPlayer *x) const;
+	bool IsEnemy(const CUnit *x) const;
+	bool IsAllied(const CPlayer *x) const;
+	bool IsAllied(const CUnit *x) const;
+	bool IsSharedVision(const CPlayer *x) const;
+	bool IsSharedVision(const CUnit *x) const;
 };
 
 /**
