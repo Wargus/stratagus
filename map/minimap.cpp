@@ -453,7 +453,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 	int bpp;
 #endif
 
-	if (EditorRunning || ReplayRevealMap || UnitVisible(unit, ThisPlayer)) {
+	if (EditorRunning || ReplayRevealMap || unit->IsVisible(ThisPlayer)) {
 		type = unit->Type;
 	} else {
 		type = unit->Seen.Type;
@@ -622,7 +622,7 @@ void CMinimap::Update(void)
 	// FIXME: We should rewrite this completely
 	//
 	for (n = 0; n < NumUnits; ++n) {
-		if (UnitVisibleOnMinimap(Units[n])) {
+		if (Units[n]->IsVisibleOnMinimap()) {
 			DrawUnitOn(Units[n], red_phase);
 		}
 	}

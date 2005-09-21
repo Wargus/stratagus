@@ -810,12 +810,12 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!UnitVisibleInViewport(unit, UI.SelectedViewport)) {
+		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
 			continue;
 		}
 		type = unit->Type;
 		// Buildings are visible but not selectable
-		if (type->Building && !UnitVisibleOnMap(unit, ThisPlayer)) {
+		if (type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
 			continue;
 		}
 		if ((type->GivesResource && !unit->Removed)) { // no built resources.
@@ -830,11 +830,11 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!UnitVisibleInViewport(unit, UI.SelectedViewport)) {
+		if (!unit->IsVisibleInViewport(UI.SelectedViewport)) {
 			continue;
 		}
 		// Buildings are visible but not selectable
-		if (unit->Type->Building && !UnitVisibleOnMap(unit, ThisPlayer)) {
+		if (unit->Type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
 			continue;
 		}
 		if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {

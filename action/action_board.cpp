@@ -101,7 +101,7 @@ static int WaitForTransporter(CUnit *unit)
 		return 0;
 	}
 
-	if (!UnitVisibleAsGoal(trans, unit->Player)) {
+	if (!trans->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Transporter Gone\n");
 		trans->RefsDecrease();
 		unit->Orders[0].Goal = NoUnitP;
@@ -144,7 +144,7 @@ static void EnterTransporter(CUnit *unit)
 	unit->SubAction = 0;
 
 	transporter = unit->Orders[0].Goal;
-	if (!UnitVisibleAsGoal(transporter, unit->Player)) {
+	if (!transporter->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Transporter gone\n");
 		transporter->RefsDecrease();
 		unit->Orders[0].Goal = NoUnitP;
