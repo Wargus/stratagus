@@ -1350,7 +1350,7 @@ void CInfoPanel::Draw(void)
 	//  Nothing selected
 
 	DrawInfoPanelBackground(0);
-	if (UnitUnderCursor && UnitVisible(UnitUnderCursor, ThisPlayer)) {
+	if (UnitUnderCursor && UnitUnderCursor->IsVisible(ThisPlayer)) {
 		// FIXME: not correct for enemies units
 		DrawUnitInfo(UnitUnderCursor);
 	} else {

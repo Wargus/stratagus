@@ -130,7 +130,7 @@ static int MoveToResource(CUnit *unit)
 			default:
 				// Goal gone or something.
 				if (unit->Anim.Unbreakable ||
-						UnitVisibleAsGoal(goal, unit->Player)) {
+						goal->IsVisibleAsGoal(unit->Player)) {
 					return 0;
 				}
 				break;
@@ -178,7 +178,7 @@ static int StartGathering(CUnit *unit)
 	//
 	// Target is dead, stop getting resources.
 	//
-	if (!UnitVisibleAsGoal(goal, unit->Player)) {
+	if (!goal->IsVisibleAsGoal(unit->Player)) {
 		goal->RefsDecrease();
 		// Find an alternative, but don't look too far.
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
@@ -401,7 +401,7 @@ static int GatherResource(CUnit *unit)
 			//
 			// Target is not dead, getting resources.
 			//
-			if (UnitVisibleAsGoal(source, unit->Player)) {
+			if (source->IsVisibleAsGoal(unit->Player)) {
 				// Don't load more that there is.
 				if (addload > source->ResourcesHeld) {
 					addload = source->ResourcesHeld;
@@ -415,7 +415,7 @@ static int GatherResource(CUnit *unit)
 			// End of resource: destroy the resource.
 			// FIXME: implement depleted resources.
 			//
-			if ((!UnitVisibleAsGoal(source, unit->Player)) || (source->ResourcesHeld == 0)) {
+			if ((!source->IsVisibleAsGoal(unit->Player)) || (source->ResourcesHeld == 0)) {
 				if (unit->Anim.Unbreakable) {
 					return 0;
 				}
@@ -433,7 +433,7 @@ static int GatherResource(CUnit *unit)
 
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
-				if (UnitVisibleAsGoal(source, unit->Player)) {
+				if (source->IsVisibleAsGoal(unit->Player)) {
 					LetUnitDie(source);
 					// FIXME: make the workers inside look for a new resource.
 				}
@@ -561,7 +561,7 @@ static int MoveToDepot(CUnit *unit)
 		case PF_REACHED:
 			break;
 		default:
-			if (unit->Anim.Unbreakable || UnitVisibleAsGoal(goal, unit->Player)) {
+			if (unit->Anim.Unbreakable || goal->IsVisibleAsGoal(unit->Player)) {
 				return 0;
 			}
 			break;
@@ -570,7 +570,7 @@ static int MoveToDepot(CUnit *unit)
 	//
 	// Target is dead, stop getting resources.
 	//
-	if (!UnitVisibleAsGoal(goal, unit->Player)) {
+	if (!goal->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Destroyed depot\n");
 		goal->RefsDecrease();
 		unit->Orders[0].Goal = NoUnitP;

@@ -665,7 +665,7 @@ int Capture::Cast(CUnit *caster, const SpellType *spell,
 		caster->Variable[KILL_INDEX].Max++;
 		caster->Variable[KILL_INDEX].Enable = 1;
 	}
-	ChangeUnitOwner(target, caster->Player);
+	target->ChangeOwner(caster->Player);
 	if (this->SacrificeEnable) {
 		// No corpse.
 		caster->Remove(NULL);
