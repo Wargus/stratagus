@@ -646,14 +646,13 @@ static int MissileDrawLevelCompare(const void *v1, const void *v2)
 int FindAndSortMissiles(const Viewport *vp, Missile **table)
 {
 	int nmissiles;
+	std::vector<Missile *>::const_iterator i;
 
 	//
 	// Loop through global missiles, then through locals.
 	//
 	nmissiles = 0;
-	for (std::vector<Missile*>::const_iterator i = GlobalMissiles.begin();
-		i != GlobalMissiles.end();
-		++i) {
+	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		if ((*i)->Delay || (*i)->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -663,9 +662,7 @@ int FindAndSortMissiles(const Viewport *vp, Missile **table)
 		}
 	}
 
-	for (std::vector<Missile*>::const_iterator i = LocalMissiles.begin();
-		i != LocalMissiles.end();
-		++i) {
+	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
 		if ((*i)->Delay || (*i)->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -1233,13 +1230,15 @@ void Missile::SaveMissile(CLFile *file) const
 */
 void SaveMissiles(CLFile *file)
 {
+	std::vector<Missile *>::const_iterator i;
+
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: missiles $Id$\n\n");
 
-	for (std::vector<Missile*>::const_iterator i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
+	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		(*i)->SaveMissile(file);
 	}
-	for (std::vector<Missile*>::const_iterator i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
+	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
 		(*i)->SaveMissile(file);
 	}
 }
@@ -1320,11 +1319,13 @@ void InitMissiles(void)
 */
 void CleanMissiles(void)
 {
-	for (std::vector<Missile*>::const_iterator i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
+	std::vector<Missile*>::const_iterator i;
+
+	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		delete *i;
 	}
 	GlobalMissiles.clear();
-	for (std::vector<Missile*>::const_iterator i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
+	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
 		delete *i;
 	}
 	LocalMissiles.clear();
@@ -1800,13 +1801,13 @@ void MissileDeathCoil::Action()
 			}
 			// calculate organic enemy count
 			for (i = 0; i < n; ++i) {
-				ec += (IsEnemy(source->Player, table[i])
+				ec += (source->IsEnemy(table[i])
 				/*&& table[i]->Type->Organic != 0*/);
 			}
 			if (ec > 0)  {
 				// yes organic enemies found
 				for (i = 0; i < n; ++i) {
-					if (IsEnemy(source->Player, table[i])/* && table[i]->Type->Organic != 0*/) {
+					if (source->IsEnemy(table[i])/* && table[i]->Type->Organic != 0*/) {
 						// disperse damage between them
 						// NOTE: 1 is the minimal damage
 						HitUnit(source, table[i], this->Damage / ec);
