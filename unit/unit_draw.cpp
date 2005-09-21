@@ -170,7 +170,7 @@ void DrawUnitSelection(const CUnit *unit)
 				(unit->Player == ThisPlayer ||
 					PlayersTeamed(ThisPlayer->Index, unit->Player->Index))) {
 			color = ColorGreen;
-		} else if (IsEnemy(ThisPlayer, unit)) {
+		} else if (ThisPlayer->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
 			int i;
@@ -965,14 +965,14 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 		max = unit->Variable[Deco->Index].Max;
 		Assert(value <= max);
 
-		if (!((value == 0 && !Deco->ShowWhenNull) || (value == max && !Deco->ShowWhenMax)
-			|| (Deco->HideHalf && value != 0 && value != max)
-			|| (!Deco->ShowIfNotEnable && !unit->Variable[Deco->Index].Enable)
-			|| (Deco->ShowOnlySelected && !unit->Selected)
-			|| (unit->Player->Type == PlayerNeutral && Deco->HideNeutral)
-			|| (IsEnemy(ThisPlayer, unit) && !Deco->ShowOpponent)
-			|| (IsAllied(ThisPlayer, unit) && (unit->Player != ThisPlayer) && Deco->HideAllied)
-			|| max == 0)) {
+		if (!((value == 0 && !Deco->ShowWhenNull) || (value == max && !Deco->ShowWhenMax) ||
+				(Deco->HideHalf && value != 0 && value != max) ||
+				(!Deco->ShowIfNotEnable && !unit->Variable[Deco->Index].Enable) ||
+				(Deco->ShowOnlySelected && !unit->Selected) ||
+				(unit->Player->Type == PlayerNeutral && Deco->HideNeutral) ||
+				(ThisPlayer->IsEnemy(unit) && !Deco->ShowOpponent) ||
+				(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && Deco->HideAllied) ||
+				max == 0)) {
 			Deco->f(
 				x + Deco->OffsetX + Deco->OffsetXPercent * unit->Type->TileWidth * TileSizeX / 100,
 				y + Deco->OffsetY + Deco->OffsetYPercent * unit->Type->TileHeight * TileSizeY / 100,

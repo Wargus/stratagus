@@ -1662,7 +1662,7 @@ void RescueUnits(void)
 				//
 				for (i = 0; i < n; ++i) {
 					if (around[i]->Type->CanAttack &&
-							IsAllied(unit->Player, around[i])) {
+							unit->IsAllied(around[i])) {
 						//
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
@@ -2545,7 +2545,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 						mine->Type->CanHarvest &&
 						(mine->Player->Index == PlayerMax - 1 ||
 							mine->Player == unit->Player ||
-							IsAllied(unit->Player, mine))) {
+							unit->IsAllied(mine))) {
 					if (destu) {
 						n = (abs(destx - x) > abs(desty - y)) ? abs(destx - x) : abs(desty - y);
 						if (n < bestd) {
@@ -2680,7 +2680,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 				// Look if there is a deposit
 				//
 				if ((depot = ResourceDepositOnMap(x, y, resource)) &&
-						((IsAllied(unit->Player, depot)) ||
+						((unit->IsAllied(depot)) ||
 							(unit->Player == depot->Player))) {
 					free(points);
 					return depot;
@@ -3051,7 +3051,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	if (target->Variable[HP_INDEX].Value <= damage) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
-		if (attacker && IsEnemy(target->Player, attacker)) {
+		if (attacker && target->IsEnemy(attacker)) {
 			attacker->Player->Score += target->Type->Points;
 			if (type->Building) {
 				attacker->Player->TotalRazings++;
@@ -3072,7 +3072,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		return;
 	}
 	target->Variable[HP_INDEX].Value -= damage;
-	if (UseHPForXp && attacker && IsEnemy(target->Player, attacker)) {
+	if (UseHPForXp && attacker && target->IsEnemy(attacker)) {
 		attacker->Variable[XP_INDEX].Value += damage;
 		attacker->Variable[XP_INDEX].Max += damage;
 	}
@@ -3083,7 +3083,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	// Still possible to destroy building if not careful (too many attackers)
 	if (EnableBuildingCapture && attacker &&
 			type->Building && target->Variable[HP_INDEX].Value <= damage * 3 &&
-			IsEnemy(attacker->Player, target) &&
+			attacker->IsEnemy(target) &&
 			attacker->Type->RepairRange) {
 		target->ChangeOwner(attacker->Player);
 		CommandStopUnit(attacker); // Attacker shouldn't continue attack!
@@ -3431,6 +3431,55 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 		}
 	}
 	return 1;
+}
+
+/**
+**  Check if the player is an enemy
+*/
+bool CUnit::IsEnemy(const CPlayer *x) const
+{
+	return (Player->Enemy & (1 << x->Index)) != 0;
+}
+
+/**
+**  Check if the unit is an enemy
+*/
+bool CUnit::IsEnemy(const CUnit *x) const
+{
+	return IsEnemy(x->Player);
+}
+
+/**
+**  Check if the player is an ally
+*/
+bool CUnit::IsAllied(const CPlayer *x) const
+{
+	return (Player->Allied & (1 << x->Index)) != 0;
+}
+
+/**
+**  Check if the unit is an ally
+*/
+bool CUnit::IsAllied(const CUnit *x) const
+{
+	return IsAllied(x->Player);
+}
+
+/**
+**  Check if the player shares vision
+*/
+bool CUnit::IsSharedVision(const CPlayer *x) const
+{
+	return (Player->SharedVision & (1 << x->Index)) != 0 &&
+		(x->SharedVision & (1 << Player->Index)) != 0;
+}
+
+/**
+**  Check if the unit shares vision
+*/
+bool CUnit::IsSharedVision(const CUnit *x) const
+{
+	return IsSharedVision(x->Player);
 }
 
 /*----------------------------------------------------------------------------

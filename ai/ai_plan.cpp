@@ -93,7 +93,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 		if (!CanTarget(source->Type, unit->Type)) {
 			continue;
 		}
-		if (!IsEnemy(source->Player, unit)) { // a friend or neutral
+		if (!source->Player->IsEnemy(unit)) { // a friend or neutral
 			continue;
 		}
 		//

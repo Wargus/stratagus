@@ -178,10 +178,10 @@ static int CanShowContent(const ConditionPanel* condition, const CUnit *unit)
 	if (!condition) {
 		return 1;
 	}
-	if ((condition->ShowOnlySelected && !unit->Selected)
-		|| (unit->Player->Type == PlayerNeutral && condition->HideNeutral)
-		|| (IsEnemy(ThisPlayer, unit) && !condition->ShowOpponent)
-		|| (IsAllied(ThisPlayer, unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
+	if ((condition->ShowOnlySelected && !unit->Selected) ||
+			(unit->Player->Type == PlayerNeutral && condition->HideNeutral) ||
+			(ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent) ||
+			(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
 		return 0;
 	}
 	if (condition->BoolFlags) {
