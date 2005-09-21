@@ -577,7 +577,7 @@ int Polymorph::Cast(CUnit *caster, const SpellType *spell,
 	y = y - type->TileHeight / 2;
 
 	caster->Player->Score += target->Type->Points;
-	if (IsEnemy(caster->Player, target)) {
+	if (caster->IsEnemy(target)) {
 		if (target->Type->Building) {
 			caster->Player->TotalRazings++;
 		} else {
@@ -649,7 +649,7 @@ int Capture::Cast(CUnit *caster, const SpellType *spell,
 			}
 		}
 	caster->Player->Score += target->Type->Points;
-	if (IsEnemy(caster->Player, target)) {
+	if (caster->IsEnemy(target)) {
 		if (target->Type->Building) {
 			caster->Player->TotalRazings++;
 		} else {
@@ -891,13 +891,13 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^
 				// own units could be not allied ?
-				(IsAllied(caster->Player, target) || target->Player == caster->Player)) {
+				(caster->IsAllied(target) || target->Player == caster->Player)) {
 			return 0;
 		}
 	}
 	if (condition->Opponent != CONDITION_TRUE) {
 		if ((condition->Opponent == CONDITION_ONLY) ^
-				(IsEnemy(caster->Player, target) && 1)) {
+				(caster->IsEnemy(target) && 1)) {
 			return 0;
 		}
 	}
@@ -954,7 +954,7 @@ static Target *SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType 
 	//
 	combat = 0;
 	for (i = 0; i < nunits; ++i) {
-		if (IsEnemy(caster->Player, table[i]) && !table[i]->Type->Coward) {
+		if (caster->IsEnemy(table[i]) && !table[i]->Type->Coward) {
 			combat = 1;
 		}
 	}

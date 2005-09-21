@@ -43,6 +43,7 @@
 #include "unit.h"
 #include "unittype.h"
 #include "script.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

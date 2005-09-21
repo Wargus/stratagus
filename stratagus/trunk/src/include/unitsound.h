@@ -48,7 +48,8 @@
 /**
 **  Sound definition
 */
-class SoundConfig {
+class SoundConfig
+{
 public:
 	SoundConfig() : Name(NULL), Sound(NULL) {};
 	SoundConfig(const char *name) : Name(strdup(name)), Sound(NULL) {};

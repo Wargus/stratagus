@@ -397,7 +397,7 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 			continue;
 		}
 
-		if (!IsEnemy(player, dest)) { // a friend or neutral
+		if (!player->IsEnemy(dest)) { // a friend or neutral
 			table[i] = 0;
 
 			// Calc a negative cost
@@ -638,7 +638,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 			continue;
 		}
 
-		if (!IsEnemy(player, dest)) { // a friend or neutral
+		if (!player->IsEnemy(dest)) { // a friend or neutral
 			continue;
 		}
 
