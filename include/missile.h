@@ -339,16 +339,6 @@ class CLFile;
 --  Missile-type
 ----------------------------------------------------------------------------*/
 
-#ifndef __STRUCT_MISSILETYPE__
-#define __STRUCT_MISSILETYPE__  /// protect duplicate missile typedef
-
-/**
-**  Missile-type typedef
-*/
-typedef struct _missile_type_ MissileType;
-
-#endif
-
 #define MAX_MISSILES 2048        /// maximum number of missiles
 #define MAX_LOCAL_MISSILES 4096  /// maximum number of local missiles
 
@@ -393,7 +383,22 @@ enum _missile_class_ {
 };
 
 	/// Base structure of missile-types
-struct _missile_type_ {
+class MissileType {
+public:
+	MissileType() : Ident(NULL), Transparency(0), Width(0), Height(0),
+					DrawLevel(0), SpriteFrames(0), NumDirections(0),
+					FiredSound(), ImpactSound(),
+					Flip(false), CanHitOwner(false), FriendlyFire(false),
+					Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
+					Range(0), SplashFactor(0), ImpactName(NULL), ImpactMissile(NULL),
+					SmokeName(NULL), SmokeMissile(NULL), G(NULL) {};
+	~MissileType();
+	/// load the graphics for a missile type
+	void LoadMissileSprite();
+	void Init(void);
+	void MissileType::DrawMissileType(int frame, int x, int y) const;
+
+
 	char* Ident;          /// missile name
 	int   Transparency;   /// missile transparency possible value is 50 (later 25 and 75)
 	int   Width;          /// missile width in pixels
@@ -402,7 +407,7 @@ struct _missile_type_ {
 	int   SpriteFrames;   /// number of sprite frames in graphic
 	int   NumDirections;  /// number of directions missile can face
 
-	/// @todo FireSound defined but not used!
+	/// @todo FiredSound defined but not used!
 	SoundConfig FiredSound;   /// fired sound
 	SoundConfig ImpactSound;  /// impact sound for this missile-type
 
@@ -431,14 +436,19 @@ struct _missile_type_ {
 --  Missile
 ----------------------------------------------------------------------------*/
 
-/**
-**  Missile typedef.
-*/
-typedef struct _missile_ Missile;
-typedef void FuncController(Missile*);
-
 	/// Missile on the map
-struct _missile_ {
+class Missile {
+protected:
+	Missile();
+public:
+
+	static Missile *Init(MissileType *mtype, int sx, int sy, int dx, int dy);
+
+	virtual void Action() = 0;
+
+	void DrawMissile() const;
+	void SaveMissile(CLFile *file) const;
+
 	int SourceX;  /// Missile Source X
 	int SourceY;  /// Missile Source Y
 	int X;        /// missile pixel position
@@ -465,25 +475,82 @@ struct _missile_ {
 	int TotalStep;    /// Total step.
 
 	unsigned  Local:1;      /// missile is a local missile
-	Missile** MissileSlot;  /// pointer to missile slot
+	unsigned int Slot;      /// unique number for draw level.
+
+
+	static unsigned int Count; /// slot number generator.
 };
 
-typedef struct _burning_building_frame_ {
+class MissileNone : public Missile {
+public:
+	virtual void Action();
+};
+class MissilePointToPoint : public Missile {
+public:
+	virtual void Action();
+};
+class MissilePointToPointWithHit : public Missile {
+public:
+	virtual void Action();
+};
+class MissilePointToPointCycleOnce : public Missile {
+public:
+	virtual void Action();
+};
+class MissilePointToPointBounce : public Missile {
+public:
+	virtual void Action();
+};
+class MissileStay : public Missile {
+public:
+	virtual void Action();
+};
+class MissileCycleOnce : public Missile {
+public:
+	virtual void Action();
+};
+class MissileFire : public Missile {
+public:
+	virtual void Action();
+};
+class MissileHit : public Missile {
+public:
+	virtual void Action();
+};
+class MissileParabolic : public Missile {
+public:
+	virtual void Action();
+};
+class MissileLandMine : public Missile {
+public:
+	virtual void Action();
+};
+class MissileWhirlwind : public Missile {
+public:
+	virtual void Action();
+};
+class MissileFlameShield : public Missile {
+public:
+	virtual void Action();
+};
+class MissileDeathCoil : public Missile {
+public:
+	virtual void Action();
+};
+
+class BurningBuildingFrame {
+public:
+	BurningBuildingFrame() : Percent(0), Missile(NULL) {};
+
 	int          Percent;  /// HP percent
 	MissileType* Missile;  /// Missile to draw
-	struct _burning_building_frame_* Next;  /// Next pointer
-} BurningBuildingFrame;
+} ;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern MissileType** MissileTypes;  /// All missile-types
-extern int NumMissileTypes;        /// Number of missile-types
-
-extern const char* MissileClassNames[];  /// Missile class names
-
-extern BurningBuildingFrame* BurningBuildingFrames;  /// Burning building frames
+extern std::vector<BurningBuildingFrame*> BurningBuildingFrames;  /// Burning building frames
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -496,8 +563,6 @@ extern void MissileCclRegister(void);
 
 // In missile.c
 
-	/// load the graphics for a missile type
-extern void LoadMissileSprite(MissileType* mtype);
 	/// load all missile sprites
 extern void LoadMissileSprites();
 	/// allocate an empty missile-type slot
@@ -513,8 +578,6 @@ extern Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx,
 	/// fire a missile
 extern void FireMissile(CUnit *unit);
 
-	/// Draw all missiles
-extern void DrawMissile(const Missile* missile);
 extern int FindAndSortMissiles(const struct _viewport_* vp, Missile** table);
 
 	/// handle all missiles
@@ -537,20 +600,7 @@ extern void InitMissiles(void);
 	/// Clean missiles
 extern void CleanMissiles(void);
 
-FuncController MissileActionNone;
-FuncController MissileActionPointToPoint;
-FuncController MissileActionPointToPointWithHit;
-FuncController MissileActionPointToPointCycleOnce;
-FuncController MissileActionPointToPointBounce;
-FuncController MissileActionStay;
-FuncController MissileActionCycleOnce;
-FuncController MissileActionFire;
-FuncController MissileActionHit;
-FuncController MissileActionParabolic;
-FuncController MissileActionLandMine;
-FuncController MissileActionWhirlwind;
-FuncController MissileActionFlameShield;
-FuncController MissileActionDeathCoil;
+
 
 //@}
 

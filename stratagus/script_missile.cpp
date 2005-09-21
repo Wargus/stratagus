@@ -51,6 +51,27 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+/**
+**  Missile class names, used to load/save the missiles.
+*/
+static const char *MissileClassNames[] = {
+	"missile-class-none",
+	"missile-class-point-to-point",
+	"missile-class-point-to-point-with-hit",
+	"missile-class-point-to-point-cycle-once",
+	"missile-class-point-to-point-bounce",
+	"missile-class-stay",
+	"missile-class-cycle-once",
+	"missile-class-fire",
+	"missile-class-hit",
+	"missile-class-parabolic",
+	"missile-class-land-mine",
+	"missile-class-whirlwind",
+	"missile-class-flame-shield",
+	"missile-class-death-coil",
+	NULL
+};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -316,23 +337,17 @@ static int CclMissile(lua_State* l)
 static int CclDefineBurningBuilding(lua_State* l)
 {
 	const char* value;
-	BurningBuildingFrame** frame;
 	BurningBuildingFrame* ptr;
-	BurningBuildingFrame* next;
 	int args;
 	int j;
 	int subargs;
 	int k;
 
-	ptr = BurningBuildingFrames;
-	while (ptr) {
-		next = ptr->Next;
-		free(ptr);
-		ptr = next;
+	for (std::vector<BurningBuildingFrame*>::iterator ptr = BurningBuildingFrames.begin();
+		ptr != BurningBuildingFrames.end(); ++ptr) {
+		delete (*ptr);
 	}
-	BurningBuildingFrames = NULL;
-
-	frame = &BurningBuildingFrames;
+	BurningBuildingFrames.clear();
 
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
@@ -340,7 +355,7 @@ static int CclDefineBurningBuilding(lua_State* l)
 			LuaError(l, "incorrect argument");
 		}
 
-		*frame = (BurningBuildingFrame*)calloc(1, sizeof(BurningBuildingFrame));
+		ptr = new BurningBuildingFrame;
 		subargs = luaL_getn(l, j + 1);
 		for (k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
@@ -350,15 +365,15 @@ static int CclDefineBurningBuilding(lua_State* l)
 
 			if (!strcmp(value, "percent")) {
 				lua_rawgeti(l, j + 1, k + 1);
-				(*frame)->Percent = LuaToNumber(l, -1);
+				ptr->Percent = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "missile")) {
 				lua_rawgeti(l, j + 1, k + 1);
-				(*frame)->Missile = MissileTypeByIdent(LuaToString(l, -1));
+				ptr->Missile = MissileTypeByIdent(LuaToString(l, -1));
 				lua_pop(l, 1);
 			}
 		}
-		frame = &((*frame)->Next);
+		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), ptr);
 	}
 	return 0;
 }

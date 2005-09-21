@@ -47,7 +47,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _missile_;
+class Missile;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -141,7 +141,7 @@ extern void PlayUnitSoundId(const CUnit *unit, SoundId id);
 **  @param missile  the missile (origin of the sound)
 **  @param sound    the sound to play
 */
-extern void PlayMissileSound(const struct _missile_* missile, SoundId sound);
+extern void PlayMissileSound(const Missile* missile, SoundId sound);
 
 /**
 **  Ask to the sound server to play a sound: low level call.
