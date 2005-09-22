@@ -53,13 +53,11 @@
 ** Bitmask, denoting a postion left/right/above/below clip rectangle
 ** (mainly used by VideoDrawLineClip)
 */
-typedef enum {
-   ClipCodeInside = 0, /// Clipping inside rectangle
-   ClipCodeAbove  = 1, /// Clipping above rectangle
-   ClipCodeBelow  = 2, /// Clipping below rectangle
-   ClipCodeLeft   = 4, /// Clipping left rectangle
-   ClipCodeRight  = 8 /// Clipping right rectangle
-} ClipCode;
+#define ClipCodeInside 0 /// Clipping inside rectangle
+#define ClipCodeAbove  1 /// Clipping above rectangle
+#define ClipCodeBelow  2 /// Clipping below rectangle
+#define ClipCodeLeft   4 /// Clipping left rectangle
+#define ClipCodeRight  8 /// Clipping right rectangle
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -1289,9 +1287,9 @@ void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 **  @param x  pixel's x position (not restricted to screen width)
 **  @param y  pixel's y position (not restricted to screen height)
 */
-static ClipCode ClipCodeLine(int x, int y)
+static int ClipCodeLine(int x, int y)
 {
-	ClipCode result;
+	int result;
 
 	if (y < ClipY1) {
 		result = ClipCodeAbove;
@@ -1317,7 +1315,7 @@ static ClipCode ClipCodeLine(int x, int y)
 **  @param code1  ClipCode of one point of line
 **  @param code2  ClipCode of second point of line
 */
-static ClipCode LineIsUnclippedOnSameSide(int code1, int code2)
+static int LineIsUnclippedOnSameSide(int code1, int code2)
 {
 	return code1 & code2;
 }
@@ -1329,7 +1327,7 @@ static ClipCode LineIsUnclippedOnSameSide(int code1, int code2)
 **  @param code1  ClipCode of one point of line
 **  @param code2  ClipCode of second point of line
 */
-static ClipCode LineIsUnclipped(int code1, int code2)
+static int LineIsUnclipped(int code1, int code2)
 {
 	return code1 | code2;
 }
@@ -1348,8 +1346,8 @@ static ClipCode LineIsUnclipped(int code1, int code2)
 */
 void CVideo::DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 {
-	ClipCode code1;
-	ClipCode code2;
+	int code1;
+	int code2;
 	int temp;
 
 	// Make sure coordinates or on/in clipped rectangle
