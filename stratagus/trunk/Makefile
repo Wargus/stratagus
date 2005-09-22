@@ -74,7 +74,7 @@ make-objdir:
 	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
 
 %.o: $(@D)../%.cpp
-	$(CXX) -c $(CFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(subst $(OBJDIR)/../,,$<) -o $@
 
 help:
 	@-echo "make cycle			clean,depend,tags,all"
