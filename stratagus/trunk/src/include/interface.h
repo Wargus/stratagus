@@ -124,58 +124,12 @@ enum _key_state_ {
 	KeyStateInput         /// keys -> line editor
 };                        /// current keyboard state
 
-	/// additional keycodes
-enum _key_codes_ {
-	KeyCodeUp = 0x101,  /// internal keycode: cursor up key
-	KeyCodeDown,      /// internal keycode: cursor down key
-	KeyCodeLeft,      /// internal keycode: cursor left key
-	KeyCodeRight,     /// internal keycode: cursor right key
-	KeyCodePause,     /// internal keycode: game pause key
-
-	KeyCodeF1,        /// internal keycode: F1 function keys
-	KeyCodeF2,        /// internal keycode: F2 function keys
-	KeyCodeF3,        /// internal keycode: F3 function keys
-	KeyCodeF4,        /// internal keycode: F4 function keys
-	KeyCodeF5,        /// internal keycode: F5 function keys
-	KeyCodeF6,        /// internal keycode: F6 function keys
-	KeyCodeF7,        /// internal keycode: F7 function keys
-	KeyCodeF8,        /// internal keycode: F8 function keys
-	KeyCodeF9,        /// internal keycode: F9 function keys
-	KeyCodeF10,       /// internal keycode: F10 function keys
-	KeyCodeF11,       /// internal keycode: F11 function keys
-	KeyCodeF12,       /// internal keycode: F12 function keys
-
-	KeyCodeKP0,       /// internal keycode: keypad 0
-	KeyCodeKP1,       /// internal keycode: keypad 1
-	KeyCodeKP2,       /// internal keycode: keypad 2
-	KeyCodeKP3,       /// internal keycode: keypad 3
-	KeyCodeKP4,       /// internal keycode: keypad 4
-	KeyCodeKP5,       /// internal keycode: keypad 5
-	KeyCodeKP6,       /// internal keycode: keypad 6
-	KeyCodeKP7,       /// internal keycode: keypad 7
-	KeyCodeKP8,       /// internal keycode: keypad 8
-	KeyCodeKP9,       /// internal keycode: keypad 9
-	KeyCodeKPPlus,    /// internal keycode: keypad +
-	KeyCodeKPMinus,   /// internal keycode: keypad -
-	KeyCodeKPPeriod,  /// internal keycode: keypad .
-
-	KeyCodeShift,     /// internal keycode: shift modifier
-	KeyCodeControl,   /// internal keycode: ctrl modifier
-	KeyCodeAlt,       /// internal keycode: alt modifier
-	KeyCodeSuper,     /// internal keycode: super modifier
-	KeyCodeHyper,     /// internal keycode: hyper modifier
-
-	KeyCodePrint,     /// internal keycode: print screen
-	KeyCodeDelete,    /// internal keycode: delete
-};
-
 	/// Key modifier
 #define ModifierShift 1        /// any shift key pressed
 #define ModifierControl 2      /// any control key pressed
 #define ModifierAlt 4          /// any alt key pressed
 #define ModifierSuper 8        /// super key (reserved for WM)
-#define ModifierHyper 16       /// any hyper key pressed
-#define ModifierDoublePress 32 /// key double pressed
+#define ModifierDoublePress 16 /// key double pressed
 
 #define MouseDoubleShift 8   /// shift for double click button
 #define MouseDragShift   16  /// shift for drag button

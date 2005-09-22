@@ -66,8 +66,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static int SavedMapPositionX[4];     /// Saved map position X
-static int SavedMapPositionY[4];     /// Saved map position Y
+static int SavedMapPositionX[3];     /// Saved map position X
+static int SavedMapPositionY[3];     /// Saved map position Y
 static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
@@ -591,25 +591,26 @@ static void UiTrackUnit(void)
 */
 static int CommandKey(int key)
 {
-	char* ptr;
+	char *ptr;
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
 	if ((ptr = strchr(UiGroupKeys, key))) {
 		key = '0' + ptr - UiGroupKeys;
 		if (key > '9') {
-			key = '`';
+			key = SDLK_BACKQUOTE;
 		}
 	}
 
 	switch (key) {
 		// Return enters chat/input mode.
-		case '\r':
+		case SDLK_RETURN:
+		case SDLK_KP_ENTER: // RETURN
 			UiBeginInput();
 			return 1;
 
 		// Unselect everything
-		case '^':
-		case '`':
+		case SDLK_CARET:
+		case SDLK_BACKQUOTE:
 			UiUnselectAll();
 			break;
 
@@ -637,32 +638,31 @@ static int CommandKey(int key)
 			}
 			break;
 
-		case 'p' & 0x1F:
-		case 'p': // If pause-key didn't work
-		case 'P': // CTRL-P, ALT-P Toggle pause
+		case 'p': // CTRL+P, ALT+P Toggle pause
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-		case KeyCodePause:
+			// FALL THROUGH (CTRL+P, ALT+P)
+		case SDLK_PAUSE:
 			UiTogglePause();
 			break;
 
-		case KeyCodeF1:
+		case SDLK_F1:
 			UiEnterHelpMenu();
 			break;
 
-		case KeyCodeF2:
-		case KeyCodeF3:
-		case KeyCodeF4: // Set/Goto place
+		case SDLK_F2:
+		case SDLK_F3:
+		case SDLK_F4: // Set/Goto place
 			if (KeyModifiers & ModifierShift) {
-				UiSaveMapPosition(key - KeyCodeF1);
+				UiSaveMapPosition(key - SDLK_F2);
 			} else {
-				UiRecallMapPosition(key - KeyCodeF1);
+				UiRecallMapPosition(key - SDLK_F2);
 			}
 			break;
 
-		case 'm':
-		case 'M': // ALT+M, F10 Game menu
+		case 'm': // CTRL+M Turn music on / off
+		          // ALT+M, F10 Game menu
 			if (KeyModifiers & ModifierControl) {
 				UiToggleMusic();
 				SavePreferences();
@@ -671,110 +671,90 @@ static int CommandKey(int key)
 			if (!(KeyModifiers & ModifierAlt)) {
 				break;
 			}
-
-		case KeyCodeF5: // Options menu
-			if (KeyState != KeyStateInput) {
-				UiEnterOptionsMenu();
-			}
-			break;
-
-		case KeyCodeF7: // Sound Options menu
-			if (KeyState != KeyStateInput) {
-				UiEnterSoundOptionsMenu();
-			}
-			break;
-
-		case KeyCodeF8: // Speed Options menu
-			if (KeyState != KeyStateInput) {
-				UiEnterSpeedOptionsMenu();
-			}
-			break;
-
-		case KeyCodeF9: // Preferences menu
-			if (KeyState != KeyStateInput) {
-				UiEnterPreferencesOptionsMenu();
-			}
-			break;
-
-		case KeyCodeF10: // Game Options menu
+			// FALL THROUGH (ALT+M)
+		case SDLK_F10: // Game Options menu
 			if (KeyState != KeyStateInput) {
 				UiEnterMenu();
 			}
 			break;
 
-		case '+': // + Faster
-		case '=': // plus is shift-equals.
-		case KeyCodeKPPlus:
+		case SDLK_F5: // Options menu
+			if (KeyState != KeyStateInput) {
+				UiEnterOptionsMenu();
+			}
+			break;
+
+		case SDLK_F7: // Sound Options menu
+			if (KeyState != KeyStateInput) {
+				UiEnterSoundOptionsMenu();
+			}
+			break;
+
+		case SDLK_F8: // Speed Options menu
+			if (KeyState != KeyStateInput) {
+				UiEnterSpeedOptionsMenu();
+			}
+			break;
+
+		case SDLK_F9: // Preferences menu
+			if (KeyState != KeyStateInput) {
+				UiEnterPreferencesOptionsMenu();
+			}
+			break;
+
+		case SDLK_EQUALS: // plus is shift-equals.
+		case SDLK_KP_PLUS:
 			UiIncreaseGameSpeed();
 			break;
 
-		case '-': // - Slower
-		case KeyCodeKPMinus:
+		case SDLK_MINUS: // - Slower
+		case SDLK_KP_MINUS:
 			UiDecreaseGameSpeed();
 			break;
 
-		case 'l' & 0x1F:
-		case 'l': // ALT l F12 load game menu
-		case 'L':
-#ifdef DEBUG
-			if (KeyModifiers & ModifierControl) {// Ctrl + L - load - all debug
-				LoadAll();
-				SetMessage("All loaded");
-				break;
-			}
-#endif
+		case 'l': // ALT+L, F12 load game menu
 			if (!(KeyModifiers & ModifierAlt)) {
 				break;
 			}
-		case KeyCodeF12:
+			// FALL THROUGH (ALT+L)
+		case SDLK_F12:
 			UiEnterLoadGameMenu();
 			break;
 
-		case 's' & 0x1F: // Ctrl + S - Turn sound on / off
-			UiToggleSound();
-			SavePreferences();
-			break;
-
-		case 's': // ALT s F11 save game menu
-		case 'S':
+		case 's': // ALT+S, F11 save game menu
+		          // CTRL+S - Turn sound on / off
 			if (KeyModifiers & ModifierControl) {
 				UiToggleSound();
+				SavePreferences();
 				break;
 			}
 			if (!(KeyModifiers & ModifierAlt)) {
 				break;
 			}
 			// FALL THROUGH (ALT+S)
-		case KeyCodeF11:
+		case SDLK_F11:
 			UiEnterSaveGameMenu();
 			break;
 
-		case 't' & 0x1F:
-		case 't':
-		case 'T': // ALT-T, CTRL-T Track unit
+		case 't': // ALT+T, CTRL+T Track unit
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiTrackUnit();
 			break;
 
-		case 'b' & 0x1F:
-		case 'b':
-		case 'B': // ALT+B, CTRL+B Toggle big map
+		case 'b': // ALT+B, CTRL+B Toggle big map
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiToggleBigMap();
 			break;
 
-		case 'c': // CTRL+C,ALT+C, C center on units
-		case 'C':
+		case 'c': // ALT+C, CTRL+C C center on units
 			UiCenterOnSelected();
 			break;
 
-		case 'f' & 0x1F:
-		case 'f':
-		case 'F': // ALT+F, CTRL+F toggle fullscreen
+		case 'f': // ALT+F, CTRL+F toggle fullscreen
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -782,29 +762,25 @@ static int CommandKey(int key)
 			SavePreferences();
 			break;
 
-		case 'g' & 0x1F:
-		case 'g':
-		case 'G': // ALT+G, CTRL+G grab mouse pointer
+		case 'g': // ALT+G, CTRL+G grab mouse pointer
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiToggleGrabMouse();
 			break;
 
-		case 'h' & 0x1F:
-		case 'h':
-		case 'H': // ALT+H, CTRL+H Help menu
+		case 'h': // ALT+H, CTRL+H Help menu
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiEnterHelpMenu();
 			break;
 
-		case ' ': // center on last action
+		case SDLK_SPACE: // center on last action
 			CenterOnMessage();
 			break;
 
-		case '\t': // TAB toggles minimap.
+		case SDLK_TAB: // TAB toggles minimap.
 					// FIXME: more...
 					// FIXME: shift+TAB
 			if (KeyModifiers & ModifierAlt) {
@@ -813,27 +789,21 @@ static int CommandKey(int key)
 			UiToggleTerrain();
 			break;
 
-		case 'x' & 0x1F:
-		case 'x':
-		case 'X': // ALT+X, CTRL+X: Exit game
+		case 'x': // ALT+X, CTRL+X: Exit game
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiExitConfirmMenu();
 			break;
 
-		case 'q' & 0x1F:
-		case 'q':
-		case 'Q': // ALT+Q, CTRL+Q: Quit level
+		case 'q': // ALT+Q, CTRL+Q: Quit level
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			UiQuitToMenuConfirmMenu();
 			break;
 
-		case 'r' & 0x1F:
-		case 'r':
-		case 'R': // ALT+R, CTRL+R: Restart scenario
+		case 'r': // ALT+R, CTRL+R: Restart scenario
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
@@ -841,16 +811,15 @@ static int CommandKey(int key)
 			break;
 
 		case 'i':
-		case 'I':
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			// FALL THROUGH
-		case '.': // ., ALT+I, CTRL+I: Find idle worker
+		case SDLK_PERIOD: // ., ALT+I, CTRL+I: Find idle worker
 			UiFindIdleWorker();
 			break;
 
-		case 'v': // ALT+v CTRL+V: Viewport
+		case 'v': // ALT+V, CTRL+V: Viewport
 			if (KeyModifiers & ModifierControl) {
 				CycleViewportMode(-1);
 			} else {
@@ -858,20 +827,20 @@ static int CommandKey(int key)
 			}
 			break;
 
-		case KeyCodeUp:
-		case KeyCodeKP8:
+		case SDLK_UP:
+		case SDLK_KP8:
 			KeyScrollState |= ScrollUp;
 			break;
-		case KeyCodeDown:
-		case KeyCodeKP2:
+		case SDLK_DOWN:
+		case SDLK_KP2:
 			KeyScrollState |= ScrollDown;
 			break;
-		case KeyCodeLeft:
-		case KeyCodeKP4:
+		case SDLK_LEFT:
+		case SDLK_KP4:
 			KeyScrollState |= ScrollLeft;
 			break;
-		case KeyCodeRight:
-		case KeyCodeKP6:
+		case SDLK_RIGHT:
+		case SDLK_KP6:
 			KeyScrollState |= ScrollRight;
 			break;
 
@@ -936,12 +905,13 @@ static int InputKey(int key)
 {
 	char ChatMessage[sizeof(Input) + 40];
 	int i;
-	char* namestart;
-	char* p;
-	char* q;
+	char *namestart;
+	char *p;
+	char *q;
 
 	switch (key) {
-		case '\r':
+		case SDLK_RETURN:
+		case SDLK_KP_ENTER: // RETURN
 			// Replace ~~ with ~
 			for (p = q = Input; *p;) {
 				if (*p == '~') {
@@ -968,9 +938,9 @@ static int InputKey(int key)
 
 			// Check for Replay and ffw x
 #ifdef DEBUG
-			if (strncmp(Input,"ffw ",4) == 0) {
+			if (strncmp(Input, "ffw ", 4) == 0) {
 #else
-			if (strncmp(Input,"ffw ",4) == 0 && ReplayGameType != ReplayNone) {
+			if (strncmp(Input, "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
 #endif
 				FastForwardCycle = atoi(&Input[4]);
 			}
@@ -995,11 +965,12 @@ static int InputKey(int key)
 				NetworkChatMessage(ChatMessage);
 			}
 			// FALL THROUGH
-		case '\033':
+		case SDLK_ESCAPE:
 			KeyState = KeyStateCommand;
 			UI.StatusLine.Clear();
 			return 1;
-		case '\b':
+
+		case SDLK_BACKSPACE:
 			if (InputIndex) {
 				if (Input[InputIndex - 1] == '~') {
 					Input[--InputIndex] = '\0';
@@ -1008,7 +979,8 @@ static int InputKey(int key)
 				ShowInput();
 			}
 			return 1;
-		case '\t':
+
+		case SDLK_TAB:
 			namestart = strrchr(Input, ' ');
 			if (namestart) {
 				++namestart;
@@ -1033,6 +1005,7 @@ static int InputKey(int key)
 				}
 			}
 			return 1;
+
 		default:
 			if (key >= ' ' && key <= 256) {
 				if ((key == '~' && InputIndex < (int)sizeof(Input) - 2) ||
@@ -1083,26 +1056,30 @@ static void Screenshot(void)
 int HandleKeyModifiersDown(unsigned key, unsigned keychar)
 {
 	switch (key) {
-		case KeyCodeShift:
+		case SDLK_LSHIFT:
+		case SDLK_RSHIFT:
 			KeyModifiers |= ModifierShift;
 			return 1;
-		case KeyCodeControl:
+		case SDLK_LCTRL:
+		case SDLK_RCTRL:
 			KeyModifiers |= ModifierControl;
 			return 1;
-		case KeyCodeAlt:
+		case SDLK_LALT:
+		case SDLK_RALT:
+		case SDLK_LMETA:
+		case SDLK_RMETA:
 			KeyModifiers |= ModifierAlt;
 			// maxy: disabled
 			if (InterfaceState == IfaceStateNormal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
 			return 1;
-		case KeyCodeSuper:
+		case SDLK_LSUPER:
+		case SDLK_RSUPER:
 			KeyModifiers |= ModifierSuper;
 			return 1;
-		case KeyCodeHyper:
-			KeyModifiers |= ModifierHyper;
-			return 1;
-		case KeyCodePrint:
+		case SDLK_SYSREQ:
+		case SDLK_PRINT:
 			Screenshot();
 			if (GameRunning) {
 				SetMessage("Screenshot made.");
@@ -1125,24 +1102,27 @@ int HandleKeyModifiersDown(unsigned key, unsigned keychar)
 int HandleKeyModifiersUp(unsigned key, unsigned keychar)
 {
 	switch (key) {
-		case KeyCodeShift:
+		case SDLK_LSHIFT:
+		case SDLK_RSHIFT:
 			KeyModifiers &= ~ModifierShift;
 			return 1;
-		case KeyCodeControl:
+		case SDLK_LCTRL:
+		case SDLK_RCTRL:
 			KeyModifiers &= ~ModifierControl;
 			return 1;
-		case KeyCodeAlt:
+		case SDLK_LALT:
+		case SDLK_RALT:
+		case SDLK_LMETA:
+		case SDLK_RMETA:
 			KeyModifiers &= ~ModifierAlt;
 			// maxy: disabled
 			if (InterfaceState == IfaceStateNormal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
 			return 1;
-		case KeyCodeSuper:
+		case SDLK_LSUPER:
+		case SDLK_RSUPER:
 			KeyModifiers &= ~ModifierSuper;
-			return 1;
-		case KeyCodeHyper:
-			KeyModifiers &= ~ModifierHyper;
 			return 1;
 	}
 	return 0;
@@ -1168,7 +1148,7 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 	} else {
 		// If no modifier look if button bound
 		if (!(KeyModifiers & (ModifierControl | ModifierAlt |
-				ModifierSuper | ModifierHyper))) {
+				ModifierSuper))) {
 			if (!GameObserve && !GamePaused) {
 				if (UI.ButtonPanel.DoKey(key)) {
 					return;
@@ -1192,20 +1172,20 @@ void HandleKeyUp(unsigned key, unsigned keychar)
 	}
 
 	switch (key) {
-		case KeyCodeUp:
-		case KeyCodeKP8:
+		case SDLK_UP:
+		case SDLK_KP8:
 			KeyScrollState &= ~ScrollUp;
 			break;
-		case KeyCodeDown:
-		case KeyCodeKP2:
+		case SDLK_DOWN:
+		case SDLK_KP2:
 			KeyScrollState &= ~ScrollDown;
 			break;
-		case KeyCodeLeft:
-		case KeyCodeKP4:
+		case SDLK_LEFT:
+		case SDLK_KP4:
 			KeyScrollState &= ~ScrollLeft;
 			break;
-		case KeyCodeRight:
-		case KeyCodeKP6:
+		case SDLK_RIGHT:
+		case SDLK_KP6:
 			KeyScrollState &= ~ScrollRight;
 			break;
 		default:

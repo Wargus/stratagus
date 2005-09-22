@@ -83,11 +83,11 @@ static const char *MissileClassNames[] = {
 */
 static int CclDefineMissileType(lua_State* l)
 {
-	const char* value;
-	const char* str;
-	MissileType* mtype;
+	const char *value;
+	const char *str;
+	MissileType *mtype;
 	unsigned i;
-	char* file;
+	char *file;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
