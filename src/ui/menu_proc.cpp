@@ -2430,9 +2430,9 @@ MenuStack* Menus;             /// FIXME : docu
 */
 static void PushMenu(void)
 {
-	MenuStack* menu;
+	MenuStack *menu;
 
-	menu = (MenuStack*)malloc(sizeof(MenuStack));
+	menu = new MenuStack;
 	menu->Menu = CurrentMenu;
 	menu->CurSel = MenuButtonCurSel;
 	menu->Next = Menus;
@@ -2444,7 +2444,7 @@ static void PushMenu(void)
 */
 static void PopMenu(void)
 {
-	MenuStack* menu;
+	MenuStack *menu;
 
 	if (Menus && Menus->Menu == CurrentMenu) {
 		if (CurrentMenu->ExitFunc) {
@@ -2458,7 +2458,7 @@ static void PopMenu(void)
 		MenuButtonCurSel = Menus->CurSel;
 		menu = Menus;
 		Menus = Menus->Next;
-		free(menu);
+		delete menu;
 		if (Menus) {
 			CurrentMenu = Menus->Menu;
 		}
