@@ -274,7 +274,7 @@ extern bool LuaToBoolean(lua_State* l, int narg);
 extern void CclGarbageCollect(int fast);  /// Perform garbage collection
 extern void InitCcl(void);                /// Initialise ccl
 extern void LoadCcl(void);                /// Load ccl config file
-extern void SaveCcl(CLFile* file);        /// Save CCL module
+extern void SaveCcl(CFile *file);        /// Save CCL module
 extern void SavePreferences(void);        /// Save user preferences
 extern int CclCommand(const char* command);/// Execute a ccl command
 extern void CleanCclCredits();            /// Free Ccl Credits Memory

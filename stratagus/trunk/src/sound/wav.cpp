@@ -54,7 +54,7 @@
 **  Private wav data structure to handle wav streaming.
 */
 typedef struct _wav_data_ {
-	CLFile* WavFile;      /// Wav file handle
+	CFile* WavFile;      /// Wav file handle
 	int ChunkRem;         /// Bytes remaining in chunk
 } WavData;
 
@@ -196,12 +196,12 @@ Sample* LoadWav(const char* name, int flags)
 {
 	Sample* sample;
 	WavData* data;
-	CLFile *f;
+	CFile *f;
 	WavChunk chunk;
 	WavFMT wavfmt;
 	unsigned int t;
 
-	f = new CLFile;
+	f = new CFile;
 	if (f->open(name,CL_OPEN_READ) == -1) {
 		printf("Can't open file `%s'\n", name);
 		delete f;

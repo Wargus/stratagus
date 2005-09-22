@@ -336,7 +336,7 @@ static void AiCheckUnits(void)
 **  @param n        Number of elements in table
 **  @param table    unit-type table.
 */
-static void SaveAiHelperTable(CLFile *file, const char *name, int upgrade, int n,
+static void SaveAiHelperTable(CFile *file, const char *name, int upgrade, int n,
 	AiUnitTypeTable *const *table)
 {
 	int t;
@@ -388,7 +388,7 @@ static void SaveAiHelperTable(CLFile *file, const char *name, int upgrade, int n
 **  @param n      Number of elements in table
 **  @param table  unit-type table.
 */
-static void SaveAiEquivTable(CLFile *file, const char *name, int n,
+static void SaveAiEquivTable(CFile *file, const char *name, int n,
 	AiUnitTypeTable *const *table)
 {
 	int i;
@@ -425,7 +425,7 @@ static void SaveAiEquivTable(CLFile *file, const char *name, int n,
 **  @param n      Number of elements in table
 **  @param table  unit-type table.
 */
-static void SaveAiCostTable(CLFile *file, const char *name, int n,
+static void SaveAiCostTable(CFile *file, const char *name, int n,
 	AiUnitTypeTable *const *table)
 {
 	int t;
@@ -469,7 +469,7 @@ static void SaveAiCostTable(CLFile *file, const char *name, int n,
 **  @param n      Number of elements in table
 **  @param table  unit-type table.
 */
-static void SaveAiUnitLimitTable(CLFile *file, const char *name, int n,
+static void SaveAiUnitLimitTable(CFile *file, const char *name, int n,
 	AiUnitTypeTable *const *table)
 {
 	int t;
@@ -510,7 +510,7 @@ static void SaveAiUnitLimitTable(CLFile *file, const char *name, int n,
 **  @param file  Output file.
 **  @todo manage correctly ","
 */
-static void SaveAiHelper(CLFile *file)
+static void SaveAiHelper(CFile *file)
 {
 	file->printf("DefineAiHelper(");
 	//
@@ -559,7 +559,7 @@ static void SaveAiHelper(CLFile *file)
 **  @param file    Output file.
 **  @param aitype  AI type to save.
 */
-static void SaveAiType(CLFile *file, const AiType *aitype)
+static void SaveAiType(CFile *file, const AiType *aitype)
 {
 	return;
 	if (aitype->Next) {
@@ -576,7 +576,7 @@ static void SaveAiType(CLFile *file, const AiType *aitype)
 **
 **  @param file  Output file.
 */
-static void SaveAiTypes(CLFile* file)
+static void SaveAiTypes(CFile *file)
 {
 	SaveAiType(file, AiTypes);
 
@@ -592,10 +592,10 @@ static void SaveAiTypes(CLFile* file)
 **  @param plynr  Player number.
 **  @param ai     Player AI.
 */
-static void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
+static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 {
 	int i;
-	const AiBuildQueue* queue;
+	const AiBuildQueue *queue;
 
 	file->printf("DefineAiPlayer(%d,\n", plynr);
 	file->printf("  \"ai-type\", \"%s\",\n",ai->AiType->Name);
@@ -752,11 +752,9 @@ static void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
 **
 **  @param file  Output file.
 */
-static void SaveAiPlayers(CLFile* file)
+static void SaveAiPlayers(CFile *file)
 {
-	int p;
-
-	for (p = 0; p < PlayerMax; ++p) {
+	for (int p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Ai) {
 			SaveAiPlayer(file, p, Players[p].Ai);
 		}
@@ -768,7 +766,7 @@ static void SaveAiPlayers(CLFile* file)
 **
 **  @param file  Output file.
 */
-void SaveAi(CLFile* file)
+void SaveAi(CFile *file)
 {
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: AI $Id$\n\n");

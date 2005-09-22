@@ -333,7 +333,7 @@
 class Graphic;
 class CUnit;
 struct _viewport_;
-class CLFile;
+class CFile;
 
 /*----------------------------------------------------------------------------
 --  Missile-type
@@ -454,7 +454,7 @@ public:
 	virtual void Action() = 0;
 
 	void DrawMissile() const;
-	void SaveMissile(CLFile *file) const;
+	void SaveMissile(CFile *file) const;
 
 	int SourceX;  /// Missile Source X
 	int SourceY;  /// Missile Source Y
@@ -596,7 +596,7 @@ extern int ViewPointDistanceToMissile(const Missile* missile);
 extern MissileType* MissileBurningBuilding(int percent);
 
 	/// Save missiles
-extern void SaveMissiles(CLFile *file);
+extern void SaveMissiles(CFile *file);
 
 	/// Initialize missile-types
 extern void InitMissileTypes(void);

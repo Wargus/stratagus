@@ -43,7 +43,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CLFile;
+class CFile;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -59,7 +59,7 @@ extern Upgrade* UpgradeByIdent(const char *ident);
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
 	/// save the upgrades
-extern void SaveUpgrades(CLFile *);
+extern void SaveUpgrades(CFile *);
 	/// cleanup upgrade module
 extern void CleanUpgrades(void);
 

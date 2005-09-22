@@ -62,9 +62,9 @@
 static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	png_size_t check;
-	CLFile *f;
+	CFile *f;
 
-	f = (CLFile*)png_get_io_ptr(png_ptr);
+	f = (CFile*)png_get_io_ptr(png_ptr);
 	check = (png_size_t)f->read(data,
 		(size_t)length);
 	if (check != length) {
@@ -82,7 +82,7 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 */
 int LoadGraphicPNG(Graphic* g)
 {
-	CLFile fp;
+	CFile fp;
 	SDL_Surface* volatile surface;
 	png_structp png_ptr;
 	png_infop info_ptr;

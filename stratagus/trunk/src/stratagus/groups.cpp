@@ -82,7 +82,7 @@ void InitGroups(void)
 **
 **  @param file  Output file.
 */
-void SaveGroups(CLFile *file)
+void SaveGroups(CFile *file)
 {
 	int i;
 	int g;

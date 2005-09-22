@@ -37,7 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CLFile;
+class CFile;
 
 /**
 **  Possible outcomes of the game.
@@ -149,7 +149,7 @@ extern void PlayCampaign(const char* name);
 extern char* NextChapter(void);
 
 extern void CampaignCclRegister(void);   /// Register ccl features
-extern void SaveCampaign(CLFile *file);  /// Save the campaign module
+extern void SaveCampaign(CFile *file);  /// Save the campaign module
 extern void CleanCampaign(void);         /// Cleanup the campaign module
 
 //@}

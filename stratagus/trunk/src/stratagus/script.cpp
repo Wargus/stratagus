@@ -212,7 +212,7 @@ int LuaLoadFile(const char *file)
 	int read;
 	int location;
 	char *buf;
-	CLFile fp;
+	CFile fp;
 	const char *PreviousLuaFile;
 
 	PreviousLuaFile = CurrentLuaFile;
@@ -2718,7 +2718,7 @@ void LoadCcl(void)
 **
 **  @param file  Save file.
 */
-void SaveCcl(CLFile *file)
+void SaveCcl(CFile *file)
 {
 }
 

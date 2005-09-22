@@ -55,8 +55,8 @@
 **  Private flac data structure to handle flac streaming.
 */
 typedef struct _flac_data_ {
-	FLAC__StreamDecoder* FlacStream;  /// Decoder stream
-	CLFile* FlacFile;                 /// File handle
+	FLAC__StreamDecoder *FlacStream;  /// Decoder stream
+	CFile *FlacFile;                 /// File handle
 } FlacData;
 
 /*----------------------------------------------------------------------------
@@ -303,15 +303,15 @@ static const SampleType FlacSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample* LoadFlac(const char* name, int flags)
+Sample* LoadFlac(const char *name, int flags)
 {
-	Sample* sample;
-	FlacData* data;
-	CLFile *f;
+	Sample *sample;
+	FlacData *data;
+	CFile *f;
 	unsigned int magic[1];
 	FLAC__StreamDecoder* stream;
 
-	f = new CLFile;
+	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
 		delete f;

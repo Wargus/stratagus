@@ -49,7 +49,7 @@ typedef enum _replay_type_ {
 	ReplayMultiPlayer,   /// Multi player replay
 } ReplayType;            /// Replay types
 
-class CLFile;
+class CFile;
 class CUnitType;
 struct _upgrade_;
 
@@ -78,7 +78,7 @@ extern void EndReplayLog(void);
 	/// Clean replay
 extern void CleanReplayLog(void);
 	/// Save the replay list to file
-extern void SaveReplayList(CLFile *file);
+extern void SaveReplayList(CFile *file);
 
 /*
 **  The send command functions sends a command, if needed over the

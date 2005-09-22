@@ -180,7 +180,7 @@ static int TheoraProcessData(OggData* data)
 int PlayMovie(const char* name)
 {
 	OggData data;
-	CLFile f;
+	CFile f;
 	SDL_Rect rect;
 	SDL_Overlay* yuv_overlay;
 	Sample* sample;

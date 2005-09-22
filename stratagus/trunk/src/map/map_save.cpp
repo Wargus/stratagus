@@ -61,7 +61,7 @@
 **
 ** @param file Output file.
 */
-void SaveMap(CLFile* file)
+void SaveMap(CFile *file)
 {
 	int w;
 	int h;

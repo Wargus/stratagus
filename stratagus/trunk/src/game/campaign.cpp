@@ -549,10 +549,10 @@ void CampaignCclRegister(void)
 /**
 **  Save the campaign module.
 */
-void SaveCampaign(CLFile* file)
+void SaveCampaign(CFile *file)
 {
-	CampaignChapter* ch;
-	ChapterPictureText* text;
+	CampaignChapter *ch;
+	ChapterPictureText *text;
 	int i;
 
 	file->printf("\n--- -----------------------------------------\n");
