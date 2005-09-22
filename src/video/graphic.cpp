@@ -42,6 +42,7 @@
 
 #include <string>
 #include <map>
+#include <list>
 
 #include "video.h"
 #include "map.h"
@@ -57,8 +58,7 @@
 static std::map<std::string, Graphic *> GraphicHash;
 
 #ifdef USE_OPENGL
-static Graphic** Graphics;
-static int NumGraphics;
+static std::list<Graphic *> Graphics;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -258,7 +258,7 @@ void Graphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 **  @param y       y coordinate on the screen
 */
 void Graphic::DrawPlayerColorFrameClip(int player, unsigned frame,
-	int x, int y) const
+	int x, int y)
 {
 #ifndef USE_OPENGL
 	GraphicPlayerPixels(&Players[player], this);
@@ -450,7 +450,7 @@ void Graphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
 **  @param y       y coordinate on the screen
 */
 void Graphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
-	int x, int y) const
+	int x, int y)
 {
 #ifndef USE_OPENGL
 	GraphicPlayerPixels(&Players[player], this);
@@ -474,23 +474,40 @@ void Graphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 **  @param w     Width of a frame (optional)
 **  @param h     Height of a frame (optional)
 **
-**  @return      New graphic object (malloced).
+**  @return      New graphic object
 */
 Graphic *NewGraphic(const char *file, int w, int h)
 {
 	Graphic *g = GraphicHash[file];
 	if (!g) {
-		g = (Graphic *)calloc(1, sizeof(Graphic));
+		g = new Graphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
-		g->File = strdup(file);
-		g->HashFile = strdup(g->File);
+		// FIXME: use a constructor for this
+		g->File = new char[strlen(file) + 1];
+		strcpy(g->File, file);
+		g->HashFile = new char[strlen(g->File) + 1];
+		strcpy(g->HashFile, g->File);
+		g->Surface = NULL;
+#ifndef USE_OPENGL
+		g->SurfaceFlip = NULL;
+#endif
 		g->Width = w;
 		g->Height = h;
 		g->NumFrames = 1;
+		g->GraphicWidth = 0;
+		g->GraphicHeight = 0;
 		g->Refs = 1;
+#ifdef USE_OPENGL
+		g->TextureWidth = 0.f;
+		g->TextureHeight = 0.f;
+		g->Textures = NULL;
+		for (int i = 0; i < PlayerMax; ++i) {
+			g->PlayerColorTextures[i] = NULL;
+		}
+#endif
 		GraphicHash[g->HashFile] = g;
 	} else {
 		++g->Refs;
@@ -507,22 +524,37 @@ Graphic *NewGraphic(const char *file, int w, int h)
 **  @param w     Width of a frame (optional)
 **  @param h     Height of a frame (optional)
 **
-**  @return      New graphic object (malloced).
+**  @return      New graphic object
 */
 Graphic *ForceNewGraphic(const char *file, int w, int h)
 {
-	Graphic *g = (Graphic *)calloc(1, sizeof(Graphic));
+	Graphic *g = new Graphic;
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	g->File = strdup(file);
-	g->HashFile = (char *)malloc(strlen(file) + 2 * sizeof(g->File) + 3);
+	g->File = new char[strlen(file) + 1];
+	strcpy(g->File, file);
+	g->HashFile = new char[strlen(file) + 2 * sizeof(g->File) + 3];
 	sprintf(g->HashFile, "%s%p", g->File, g->File);
+	g->Surface = NULL;
+#ifndef USE_OPENGL
+	g->SurfaceFlip = NULL;
+#endif
 	g->Width = w;
 	g->Height = h;
 	g->NumFrames = 1;
+	g->GraphicWidth = 0;
+	g->GraphicHeight = 0;
 	g->Refs = 1;
+#ifdef USE_OPENGL
+	g->TextureWidth = 0.f;
+	g->TextureHeight = 0.f;
+	g->Textures = NULL;
+	for (int i = 0; i < PlayerMax; ++i) {
+		g->PlayerColorTextures[i] = NULL;
+	}
+#endif
 	GraphicHash[g->HashFile] = g;
 
 	return g;
@@ -564,14 +596,7 @@ void Graphic::Load()
 
 #ifdef USE_OPENGL
 	MakeTexture(this);
-
-	++NumGraphics;
-	Graphics = (Graphic **)realloc(Graphics, NumGraphics * sizeof(*Graphics));
-	if (!Graphics) {
-		fprintf(stderr, "Out of memory\n");
-		exit(1);
-	}
-	Graphics[NumGraphics - 1] = this;
+	Graphics.push_back(this);
 #endif
 }
 
@@ -599,7 +624,7 @@ void FreeGraphic(Graphic *g)
 #ifdef USE_OPENGL
 		if (g->Textures) {
 			glDeleteTextures(g->NumTextures, g->Textures);
-			free(g->Textures);
+			delete[] g->Textures;
 		}
 		for (i = 0; i < PlayerMax; ++i) {
 			if (g->PlayerColorTextures[i]) {
@@ -607,12 +632,7 @@ void FreeGraphic(Graphic *g)
 			}
 		}
 
-		for (i = 0; i < NumGraphics; ++i) {
-			if (Graphics[i] == g) {
-				Graphics[i] = Graphics[--NumGraphics];
-				break;
-			}
-		}
+		Graphics.remove(g);
 #endif
 
 		if (g->Surface) {
@@ -622,7 +642,7 @@ void FreeGraphic(Graphic *g)
 				pixels = NULL;
 			}
 			SDL_FreeSurface(g->Surface);
-			free(pixels);
+			delete[] pixels;
 		}
 #ifndef USE_OPENGL
 		if (g->SurfaceFlip) {
@@ -632,15 +652,15 @@ void FreeGraphic(Graphic *g)
 				pixels = NULL;
 			}
 			SDL_FreeSurface(g->SurfaceFlip);
-			free(pixels);
+			delete[] pixels;
 		}
 #endif
 		Assert(g->File);
 
 		GraphicHash.erase(g->HashFile);
-		free(g->File);
-		free(g->HashFile);
-		free(g);
+		delete[] g->File;
+		delete[] g->HashFile;
+		delete g;
 	}
 }
 
@@ -650,17 +670,18 @@ void FreeGraphic(Graphic *g)
 */
 void ReloadGraphics(void)
 {
-	for (int i = 0; i < NumGraphics; ++i) {
-		if (Graphics[i]->Textures) {
-			free(Graphics[i]->Textures);
-			Graphics[i]->Textures = NULL;
-			MakeTexture(Graphics[i]);
+	std::list<Graphic *>::iterator i;
+	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
+		if ((*i)->Textures) {
+			delete[] (*i)->Textures;
+			(*i)->Textures = NULL;
+			MakeTexture(*i);
 		}
 		for (int j = 0; j < PlayerMax; ++j) {
-			if (Graphics[i]->PlayerColorTextures[j]) {
-				free(Graphics[i]->PlayerColorTextures[j]);
-				Graphics[i]->PlayerColorTextures[j] = NULL;
-				MakePlayerColorTexture(Graphics[j], j);
+			if ((*i)->PlayerColorTextures[j]) {
+				delete[] (*i)->PlayerColorTextures[j];
+				(*i)->PlayerColorTextures[j] = NULL;
+				MakePlayerColorTexture(*i, j);
 			}
 		}
 	}
@@ -775,7 +796,7 @@ static void MakeTextures2(Graphic *g, GLuint texture, UnitColors *colors,
 		GLMaxTextureSize : g->GraphicHeight - oh;
 	w = PowerOf2(maxw);
 	h = PowerOf2(maxh);
-	tex = (unsigned char *)malloc(w * h * 4);
+	tex = new unsigned char[w * h * 4];
 	if (g->Surface->flags & SDL_SRCALPHA) {
 		alpha = f->alpha;
 	} else {
@@ -857,7 +878,7 @@ static void MakeTextures2(Graphic *g, GLuint texture, UnitColors *colors,
 	}
 #endif
 	SDL_UnlockSurface(g->Surface);
-	free(tex);
+	delete[] tex;
 }
 
 /**
@@ -870,7 +891,6 @@ static void MakeTextures2(Graphic *g, GLuint texture, UnitColors *colors,
 static void MakeTextures(Graphic *g, int player, UnitColors *colors)
 {
 	int i;
-	int j;
 	int tw;
 	int th;
 	GLuint *textures;
@@ -888,14 +908,14 @@ static void MakeTextures(Graphic *g, int player, UnitColors *colors)
 		tw = tw;
 	}
 	if (!colors) {
-		textures = g->Textures = (GLuint *)malloc(g->NumTextures * sizeof(*g->Textures));
+		textures = g->Textures = new GLuint[g->NumTextures];
 		glGenTextures(g->NumTextures, g->Textures);
 	} else {
-		textures = g->PlayerColorTextures[player] = (GLuint *)malloc(g->NumTextures * sizeof(GLuint));
+		textures = g->PlayerColorTextures[player] = new GLuint[g->NumTextures];
 		glGenTextures(g->NumTextures, g->PlayerColorTextures[player]);
 	}
 
-	for (j = 0; j < th; ++j) {
+	for (int j = 0; j < th; ++j) {
 		for (i = 0; i < tw; ++i) {
 			MakeTextures2(g, textures[j * tw + i], colors, GLMaxTextureSize * i, GLMaxTextureSize * j);
 		}
@@ -960,7 +980,7 @@ void Graphic::Resize(int w, int h)
 		SDL_LockSurface(Surface);
 
 		pixels = (unsigned char *)Surface->pixels;
-		data = (unsigned char *)malloc(w * h);
+		data = new unsigned char[w * h];
 		x = 0;
 
 		for (i = 0; i < h; ++i) {
@@ -989,7 +1009,7 @@ void Graphic::Resize(int w, int h)
 		SDL_LockSurface(Surface);
 
 		pixels = (unsigned char*)Surface->pixels;
-		data = (unsigned char*)malloc(w * h * bpp);
+		data = new unsigned char[w * h * bpp];
 		x = 0;
 
 		for (i = 0; i < h; ++i) {
@@ -1047,7 +1067,7 @@ void Graphic::Resize(int w, int h)
 
 #ifdef USE_OPENGL
 	glDeleteTextures(NumTextures, Textures);
-	free(Textures);
+	delete[] Textures;
 	Textures = NULL;
 	MakeTexture(this);
 #endif
@@ -1113,7 +1133,7 @@ void Graphic::MakeShadow()
 #ifdef USE_OPENGL
 	if (Textures) {
 		glDeleteTextures(NumTextures, Textures);
-		free(Textures);
+		delete[] Textures;
 		Textures = NULL;
 	}
 	MakeTexture(this);
