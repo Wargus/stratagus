@@ -187,7 +187,7 @@ void CleanUpgrades(void)
 **
 **  @param file  Output file.
 */
-void SaveUpgrades(CLFile *file)
+void SaveUpgrades(CFile *file)
 {
 	int p;
 

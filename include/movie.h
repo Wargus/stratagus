@@ -56,7 +56,7 @@
 **  Ogg data structure to handle vorbis/theora streaming.
 */
 typedef struct _ogg_data_ {
-	CLFile* File;      /// Ogg file handle
+	CFile *File;      /// Ogg file handle
 	ogg_sync_state sync;
 	ogg_page page;
 
@@ -87,9 +87,9 @@ typedef struct _ogg_data_ {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern int OggInit(CLFile *f, OggData *data);
+extern int OggInit(CFile *f, OggData *data);
 extern void OggFree(OggData *data);
-extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CLFile *f);
+extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f);
 
 extern int VorbisProcessData(OggData *data, char *buffer);
 

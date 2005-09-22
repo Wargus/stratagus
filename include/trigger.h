@@ -40,7 +40,7 @@
 class CUnit;
 class CUnitType;
 struct lua_State;
-class CLFile;
+class CFile;
 
 /**
 **  Timer structure
@@ -87,7 +87,7 @@ extern const CUnitType *TriggerGetUnitType(struct lua_State *l); /// get the uni
 extern void TriggersEachCycle(void);    /// test triggers
 
 extern void TriggerCclRegister(void);   /// Register ccl features
-extern void SaveTriggers(CLFile *file); /// Save the trigger module
+extern void SaveTriggers(CFile *file); /// Save the trigger module
 extern void InitTriggers(void);         /// Setup triggers
 extern void CleanTriggers(void);        /// Cleanup the trigger module
 

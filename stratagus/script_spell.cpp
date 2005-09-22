@@ -781,7 +781,7 @@ void SpellCclRegister(void)
 **  @param file File pointer to save to
 ** @param action Pointer to action to save.
 */
-static void SaveSpellAction(CLFile* file, SpellActionType* action)
+static void SaveSpellAction(CFile* file, SpellActionType* action)
 {
 	SpellActionMissileLocation* loc;
 
@@ -878,7 +878,7 @@ static void SaveSpellAction(CLFile* file, SpellActionType* action)
 **  @param file       File pointer to save to
 **  @param condition  Pointer to condition to save.
 */
-static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
+static void SaveSpellCondition(CFile* file, ConditionInfo* condition)
 {
 	char condstrings[3][10] = {
 		"true", /// CONDITION_TRUE
@@ -918,7 +918,7 @@ static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 ** @param file The file to save to.
 ** @param autocast Auocastinfo to save.
 */
-void SaveSpellAutoCast(CLFile* file, AutoCastInfo* autocast)
+void SaveSpellAutoCast(CFile* file, AutoCastInfo* autocast)
 {
 	char condstrings[3][10] = {
 		"true", /// CONDITION_TRUE

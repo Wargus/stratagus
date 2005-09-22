@@ -223,12 +223,12 @@ static char* SaveGlobal(lua_State *l, int is_root)
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-void SaveGame(const char* filename)
+void SaveGame(const char *filename)
 {
 	time_t now;
-	CLFile file;
-	char* s;
-	char* s1;
+	CFile file;
+	char *s;
+	char *s1;
 
 	if (file.open(filename, CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
 		fprintf(stderr, "Can't save to `%s'\n", filename);

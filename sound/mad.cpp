@@ -58,7 +58,7 @@
 */
 typedef struct _mp3_data_ {
 	struct mad_decoder MadDecoder;           /// Mad decoder handle
-	CLFile* MadFile;                         /// File handle
+	CFile *MadFile;                         /// File handle
 	unsigned char Buffer[MAD_INBUF_SIZE];    /// Input buffer
 	int BufferLen;                           /// Length of filled buffer
 } MadData;
@@ -402,14 +402,14 @@ static const SampleType Mp3SampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample* LoadMp3(const char* name, int flags)
+Sample* LoadMp3(const char *name, int flags)
 {
-	CLFile *f;
+	CFile *f;
 	unsigned char magic[2];
-	Sample* sample;
+	Sample *sample;
 	MadData *data;
 
-	f = new CLFile;
+	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
 		delete f;

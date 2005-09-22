@@ -1030,7 +1030,7 @@ static int InputKey(int key)
 */
 static void Screenshot(void)
 {
-	CLFile fd;
+	CFile fd;
 	char filename[30];
 	int i;
 

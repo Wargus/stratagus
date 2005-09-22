@@ -250,7 +250,7 @@ Animations *AnimationsByIdent(const char *ident)
 **  @param file   Output file.
 */
 static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
-	CLFile* file)
+	CFile* file)
 {
 	int j;
 
@@ -278,7 +278,7 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 **
 **  @param file  Output file.
 */
-void SaveUnitTypes(CLFile* file)
+void SaveUnitTypes(CFile* file)
 {
 	int j;
 

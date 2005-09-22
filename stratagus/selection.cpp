@@ -1129,7 +1129,7 @@ void InitSelections(void)
 **
 **  @param file  Output file.
 */
-void SaveSelections(CLFile *file)
+void SaveSelections(CFile *file)
 {
 	int i;
 	char *ref;

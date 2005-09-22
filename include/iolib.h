@@ -61,30 +61,15 @@ typedef struct _filelist_ {
 } FileList;
 
 
-#if 0 && !defined(USE_ZLIB) && !defined(USE_BZ2LIB)
-
-// FIXME: This is broken, should write a CLopen for plain files
-// FIXME: but we can avoid it anyway.
-// use plain file routines directly
-
-#define CLFile                        FILE
-#define CLopen(file, whatever)        fopen(file, "rwb")
-#define CLread(file, buf, len)        fread(buf, 1, len, file)
-#define CLseek(file, offset, whence)  fseek(file, offset, whence)
-#define CLflush(file)                 fflush(file)
-#define CLclose(file)                 fclose(file)
-
-#else  // !USE_ZLIB && !USE_BZ2LIB
-
 /**
 **  Defines a library file
 **
 **  @todo  zip archive support
 */
-class CLFile {
+class CFile {
 public:
-	CLFile();
-	~CLFile();
+	CFile();
+	~CFile();
 
 	int open(const char *name, long flags);
 	int close();
@@ -95,7 +80,7 @@ public:
 	int printf(char *format, ...);
 
 private:
-	int   cl_type;   /// type of CLFile
+	int   cl_type;   /// type of CFile
 	FILE* cl_plain;  /// standard file pointer
 #ifdef USE_ZLIB
 	gzFile cl_gz;    /// gzip file pointer
@@ -120,8 +105,6 @@ enum {
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-#endif // USE_ZLIB || USE_BZ2LIB
 
 	/// Build libary path name
 extern char* LibraryFileName(const char* file, char* buffer);

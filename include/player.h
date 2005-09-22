@@ -292,7 +292,7 @@
 class CUnit;
 class CUnitType;
 struct _player_ai_;
-class CLFile;
+class CFile;
 
 /*----------------------------------------------------------------------------
 --  Player type
@@ -505,7 +505,7 @@ extern void InitPlayers(void);
 	/// Clean up players
 extern void CleanPlayers(void);
 	/// Save players
-extern void SavePlayers(CLFile *file);
+extern void SavePlayers(CFile *file);
 
 	/// Create a new player
 extern void CreatePlayer(int type);
