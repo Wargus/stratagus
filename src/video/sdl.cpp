@@ -302,168 +302,6 @@ void Invalidate(void)
 }
 
 /**
-**  Convert SDL keysym into internal keycode.
-**
-**  @param code     SDL keysym structure pointer.
-**  @param keychar  Internal keycode.
-**
-**  @return         ASCII code or internal keycode.
-*/
-static int Sdl2InternalKeycode(const SDL_keysym *code, int *keychar)
-{
-	int icode;
-
-	//
-	//  Convert SDL keycodes into internal keycodes.
-	//
-	*keychar = 0;
-	switch ((icode = code->sym)) {
-		case SDLK_ESCAPE:
-			*keychar = icode = '\033';
-			break;
-		case SDLK_RETURN:
-		case SDLK_KP_ENTER:
-			*keychar = icode = '\r';
-			break;
-		case SDLK_BACKSPACE:
-			*keychar = icode = '\b';
-			break;
-		case SDLK_TAB:
-			*keychar = icode = '\t';
-			break;
-		case SDLK_UP:
-			icode = KeyCodeUp;
-			break;
-		case SDLK_DOWN:
-			icode = KeyCodeDown;
-			break;
-		case SDLK_LEFT:
-			icode = KeyCodeLeft;
-			break;
-		case SDLK_RIGHT:
-			icode = KeyCodeRight;
-			break;
-		case SDLK_PAUSE:
-			icode = KeyCodePause;
-			break;
-		case SDLK_F1:
-			icode = KeyCodeF1;
-			break;
-		case SDLK_F2:
-			icode = KeyCodeF2;
-			break;
-		case SDLK_F3:
-			icode = KeyCodeF3;
-			break;
-		case SDLK_F4:
-			icode = KeyCodeF4;
-			break;
-		case SDLK_F5:
-			icode = KeyCodeF5;
-			break;
-		case SDLK_F6:
-			icode = KeyCodeF6;
-			break;
-		case SDLK_F7:
-			icode = KeyCodeF7;
-			break;
-		case SDLK_F8:
-			icode = KeyCodeF8;
-			break;
-		case SDLK_F9:
-			icode = KeyCodeF9;
-			break;
-		case SDLK_F10:
-			icode = KeyCodeF10;
-			break;
-		case SDLK_F11:
-			icode = KeyCodeF11;
-			break;
-		case SDLK_F12:
-			icode = KeyCodeF12;
-			break;
-		case SDLK_KP0:
-			icode = KeyCodeKP0;
-			break;
-		case SDLK_KP1:
-			icode = KeyCodeKP1;
-			break;
-		case SDLK_KP2:
-			icode = KeyCodeKP2;
-			break;
-		case SDLK_KP3:
-			icode = KeyCodeKP3;
-			break;
-		case SDLK_KP4:
-			icode = KeyCodeKP4;
-			break;
-		case SDLK_KP5:
-			icode = KeyCodeKP5;
-			break;
-		case SDLK_KP6:
-			icode = KeyCodeKP6;
-			break;
-		case SDLK_KP7:
-			icode = KeyCodeKP7;
-			break;
-		case SDLK_KP8:
-			icode = KeyCodeKP8;
-			break;
-		case SDLK_KP9:
-			icode = KeyCodeKP9;
-			break;
-		case SDLK_KP_PLUS:
-			icode = KeyCodeKPPlus;
-			break;
-		case SDLK_KP_MINUS:
-			icode = KeyCodeKPMinus;
-			break;
-		case SDLK_KP_PERIOD:
-			icode = KeyCodeKPPeriod;
-			break;
-		case SDLK_SYSREQ:
-		case SDLK_PRINT:
-			icode = KeyCodePrint;
-			break;
-		case SDLK_DELETE:
-			icode = KeyCodeDelete;
-			break;
-
-			// We need these because if you only hit a modifier key,
-			// the *ots from SDL don't report correct modifiers
-		case SDLK_LSHIFT:
-		case SDLK_RSHIFT:
-			icode = KeyCodeShift;
-			break;
-		case SDLK_LCTRL:
-		case SDLK_RCTRL:
-			icode = KeyCodeControl;
-			break;
-		case SDLK_LALT:
-		case SDLK_RALT:
-		case SDLK_LMETA:
-		case SDLK_RMETA:
-			icode = KeyCodeAlt;
-			break;
-		case SDLK_LSUPER:
-		case SDLK_RSUPER:
-			icode = KeyCodeSuper;
-			break;
-		default:
-			if ((code->unicode & 0xFF80) == 0) {
-				*keychar = code->unicode & 0x7F;
-			} else {
-				// An international character..
-				// let's asume latin 1 for now
-				*keychar = code->unicode & 0xFF;
-			}
-			break;
-	}
-
-	return icode;
-}
-
-/**
 **  Handle keyboard key press!
 **
 **  @param callbacks  Callback funktion for key down.
@@ -472,11 +310,7 @@ static int Sdl2InternalKeycode(const SDL_keysym *code, int *keychar)
 static void SdlHandleKeyPress(const EventCallback *callbacks,
 	const SDL_keysym *code)
 {
-	int icode;
-	int keychar;
-
-	icode = Sdl2InternalKeycode(code, &keychar);
-	InputKeyButtonPress(callbacks, SDL_GetTicks(), icode, keychar);
+	InputKeyButtonPress(callbacks, SDL_GetTicks(), code->sym, code->unicode);
 }
 
 /**
@@ -488,11 +322,7 @@ static void SdlHandleKeyPress(const EventCallback *callbacks,
 static void SdlHandleKeyRelease(const EventCallback *callbacks,
 	const SDL_keysym *code)
 {
-	int icode;
-	int keychar;
-
-	icode = Sdl2InternalKeycode(code, &keychar);
-	InputKeyButtonRelease(callbacks, SDL_GetTicks(), icode, keychar);
+	InputKeyButtonRelease(callbacks, SDL_GetTicks(), code->sym, code->unicode);
 }
 
 /**

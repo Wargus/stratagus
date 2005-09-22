@@ -386,12 +386,19 @@ enum _missile_class_ {
 class MissileType {
 public:
 	MissileType() : Ident(NULL), Transparency(0), Width(0), Height(0),
-					DrawLevel(0), SpriteFrames(0), NumDirections(0),
-					FiredSound(), ImpactSound(),
-					Flip(false), CanHitOwner(false), FriendlyFire(false),
-					Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
-					Range(0), SplashFactor(0), ImpactName(NULL), ImpactMissile(NULL),
-					SmokeName(NULL), SmokeMissile(NULL), G(NULL) {};
+		DrawLevel(0), SpriteFrames(0), NumDirections(0),
+		FiredSound(), /*ImpactSound(),*/
+		Flip(false), CanHitOwner(false), FriendlyFire(false),
+		Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
+		Range(0), SplashFactor(0), ImpactName(NULL), ImpactMissile(NULL),
+		SmokeName(NULL), SmokeMissile(NULL), G(NULL)
+	{
+		// FIXME: remove this
+		FiredSound.Name = NULL;
+		FiredSound.Sound = NULL;
+		ImpactSound.Name = NULL;
+		ImpactSound.Sound = NULL;
+	};
 	~MissileType();
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
