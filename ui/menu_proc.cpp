@@ -1265,9 +1265,9 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 		return;
 	}
 
-	if (KeyCodeKP0 <= key && key <= KeyCodeKP9) {
-		key = keychar = '0' + key - KeyCodeKP0;
-	} else if (key == KeyCodeKPPeriod) {
+	if (SDLK_KP0 <= key && key <= SDLK_KP9) {
+		key = keychar = '0' + key - SDLK_KP0;
+	} else if (key == SDLK_KP_PERIOD) {
 		key = keychar = '.';
 	}
 
@@ -1280,26 +1280,27 @@ inkey:
 				// FIXME ARI: ISO->WC2 Translation here!
 				key = 0;
 			}
-			switch(key) {
-				case '\b': case '\177':
+			switch (key) {
+				case SDLK_BACKSPACE:
 					if (mi->D.Input.nch > 0) {
+						if (mi->D.Input.buffer[mi->D.Input.nch - 1] == '~') {
+							--mi->D.Input.nch;
+						}
 						strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
 					}
 					break;
-				case 9:
+				case SDLK_TAB:
 					goto normkey;
-				case '~': // ~ are quotes
-					return; // Just ignore them
-				case KeyCodeDelete:
+				case SDLK_DELETE:
 					mi->D.Input.nch = 0;
 					strcpy(mi->D.Input.buffer, "~!_");
 					break;
 				default:
-					if (KeyModifiers&ModifierAlt) {
+					if (KeyModifiers & ModifierAlt) {
 						if (key == 'x' || key == 'X') {
 							goto normkey;
 						}
-					} else if (KeyModifiers&ModifierControl) {
+					} else if (KeyModifiers & ModifierControl) {
 						if (key == 'v' || key == 'V') {
 							PasteFromClipboard(mi);
 						} else if (key == 'u' || key == 'U') {
@@ -1307,9 +1308,13 @@ inkey:
 							strcpy(mi->D.Input.buffer, "~!_");
 						}
 					} else if (key >= 32 && key < 0x100) {
-						if (mi->D.Input.nch < mi->D.Input.maxch &&
-							VideoTextLength(mi->Font, mi->D.Input.buffer) + 8 < mi->D.Input.xsize) {
+						if ((keychar == '~' && mi->D.Input.nch < mi->D.Input.maxch - 1) ||
+								mi->D.Input.nch < mi->D.Input.maxch &&
+									VideoTextLength(mi->Font, mi->D.Input.buffer) + 8 < mi->D.Input.xsize) {
 							mi->D.Input.buffer[mi->D.Input.nch++] = keychar;
+							if (keychar == '~') {
+								mi->D.Input.buffer[mi->D.Input.nch++] = keychar;
+							}
 							strcpy(mi->D.Input.buffer + mi->D.Input.nch, "~!_");
 						}
 					}
@@ -1348,7 +1353,8 @@ normkey:
 		}
 	}
 	switch (key) {
-		case 10: case 13: // RETURN
+		case SDLK_RETURN:
+		case SDLK_KP_ENTER: // RETURN
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
 				switch (mi->MiType) {
@@ -1386,13 +1392,14 @@ normkey:
 				}
 			}
 			break;
-		case KeyCodeUp: case KeyCodeDown:
+		case SDLK_UP:
+		case SDLK_DOWN:
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
 				if (!(mi->Flags & MI_FLAGS_CLICKED)) {
 					switch (mi->MiType) {
 						case MiTypePulldown:
-							if (key == KeyCodeDown) {
+							if (key == SDLK_DOWN) {
 								if (mi->D.Pulldown.curopt + 1 < mi->D.Pulldown.noptions) {
 									mi->D.Pulldown.curopt++;
 								} else {
@@ -1412,7 +1419,7 @@ normkey:
 							}
 							break;
 						case MiTypeListbox:
-							if (key == KeyCodeDown) {
+							if (key == SDLK_DOWN) {
 								if (mi->D.Listbox.curopt < mi->D.Listbox.noptions - 1) {
 									mi->D.Listbox.curopt++;
 									if (mi->D.Listbox.curopt >= mi->D.Listbox.startline + mi->D.Listbox.nlines) {
@@ -1441,7 +1448,7 @@ normkey:
 							}
 							break;
 						case MiTypeVslider:
-							if (key == KeyCodeDown) {
+							if (key == SDLK_DOWN) {
 								mi->D.VSlider.cflags |= MI_CFLAGS_DOWN;
 								// Update listbox
 								if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
@@ -1473,14 +1480,14 @@ normkey:
 				}
 			}
 			break;
-		case KeyCodeLeft:
-		case KeyCodeRight:
+		case SDLK_LEFT:
+		case SDLK_RIGHT:
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
 				if (!(mi->Flags & MI_FLAGS_CLICKED)) {
 					switch (mi->MiType) {
 						case MiTypeHslider:
-							if (key == KeyCodeLeft) {
+							if (key == SDLK_LEFT) {
 								mi->D.HSlider.percent -= 10;
 								if (mi->D.HSlider.percent < 0) {
 									mi->D.HSlider.percent = 0;
@@ -1503,7 +1510,7 @@ normkey:
 				}
 			}
 			break;
-		case 9: // TAB // FIXME: Add Shift-TAB
+		case SDLK_TAB: // TAB // FIXME: Add Shift-TAB
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
@@ -1580,11 +1587,11 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 	}
 
 	menu = CurrentMenu;
-	if (key == KeyCodeUp || key == KeyCodeDown) {
+	if (key == SDLK_UP || key == SDLK_DOWN) {
 		if (MenuButtonCurSel != -1) {
 			mi = menu->Items + MenuButtonCurSel;
 			if (mi->MiType == MiTypeVslider) {
-				if (key == KeyCodeDown) {
+				if (key == SDLK_DOWN) {
 					mi->D.VSlider.cflags &= ~MI_CFLAGS_DOWN;
 				} else {
 					mi->D.VSlider.cflags &= ~MI_CFLAGS_UP;
@@ -1617,7 +1624,7 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 		if (mi->MiType == MiTypeInput) {
 			MenuHandleKeyDown(key, keychar);
 		} else if (mi->MiType == MiTypeVslider || mi->MiType == MiTypeListbox) {
-			if (key == KeyCodeDown || key == KeyCodeUp) {
+			if (key == SDLK_DOWN || key == SDLK_UP) {
 				MenuHandleKeyDown(key, keychar);
 			}
 		}

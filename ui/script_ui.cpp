@@ -2867,7 +2867,7 @@ static int scm2hotkey(lua_State* l, const char* value)
 	} else if (value[0] == 'f' && len > 1 && len < 4) {
 		f = atoi(value + 1);
 		if (f > 0 && f < 13) {
-			key = KeyCodeF1 + f - 1; // if key-order in include/interface.h is linear
+			key = SDLK_F1 + f - 1; // if key-order in include/interface.h is linear
 		} else {
 			LuaError(l, "Unknown key: %s" _C_ value);
 		}

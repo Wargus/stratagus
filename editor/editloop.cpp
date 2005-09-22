@@ -1380,25 +1380,25 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	}
 
 	switch (key) {
-		case 'f' & 0x1F:
-		case 'f':
-		case 'F': // ALT+F, CTRL+F toggle fullscreen
+		case 'f': // ALT+F, CTRL+F toggle fullscreen
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			ToggleFullScreen();
 			break;
 
-		case 's': // ALT s F11 save map menu
-		case 'S':
-		case KeyCodeF11:
+		case 's': // ALT+S, CTRL+S, F11 save map menu
+		case SDLK_F11:
+			if (key == 's' && !(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				break;
+			}
 			if (EditorSaveMenu() != -1) {
 				UI.StatusLine.Set("Map saved");
 			}
 			InterfaceState = IfaceStateNormal;
 			break;
 
-		case KeyCodeF12:
+		case SDLK_F12:
 			EditorLoadMenu();
 			InterfaceState = IfaceStateNormal;
 			break;
@@ -1411,15 +1411,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
-		case 'r':
-		case 'R': // CTRL+R Randomize map
+		case 'r': // CTRL+R Randomize map
 			if (KeyModifiers & ModifierControl) {
 				EditorCreateRandomMap();
 			}
 			break;
 
-		case 'm':
-		case 'M': // CTRL+M Mirror edit
+		case 'm': // CTRL+M Mirror edit
 			if (KeyModifiers & ModifierControl)  {
 				++MirrorEdit;
 				if (MirrorEdit == 3) {
@@ -1439,15 +1437,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
-		case 'x' & 0x1F:
-		case 'x':
-		case 'X': // ALT+X, CTRL+X: Exit editor
+		case 'x': // ALT+X, CTRL+X: Exit editor
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
 			Exit(0);
 
-		case KeyCodeDelete: // Delete
+		case SDLK_DELETE: // Delete
 			if (UnitUnderCursor) {
 				CUnit *unit = UnitUnderCursor;
 
@@ -1459,24 +1455,24 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
-		case KeyCodeF10:
+		case SDLK_F10:
 			ProcessMenu("menu-editor", 1);
 			break;
 
-		case KeyCodeUp: // Keyboard scrolling
-		case KeyCodeKP8:
+		case SDLK_UP: // Keyboard scrolling
+		case SDLK_KP8:
 			KeyScrollState |= ScrollUp;
 			break;
-		case KeyCodeDown:
-		case KeyCodeKP2:
+		case SDLK_DOWN:
+		case SDLK_KP2:
 			KeyScrollState |= ScrollDown;
 			break;
-		case KeyCodeLeft:
-		case KeyCodeKP4:
+		case SDLK_LEFT:
+		case SDLK_KP4:
 			KeyScrollState |= ScrollLeft;
 			break;
-		case KeyCodeRight:
-		case KeyCodeKP6:
+		case SDLK_RIGHT:
+		case SDLK_KP6:
 			KeyScrollState |= ScrollRight;
 			break;
 
@@ -1499,20 +1495,20 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 	}
 
 	switch (key) {
-		case KeyCodeUp: // Keyboard scrolling
-		case KeyCodeKP8:
+		case SDLK_UP: // Keyboard scrolling
+		case SDLK_KP8:
 			KeyScrollState &= ~ScrollUp;
 			break;
-		case KeyCodeDown:
-		case KeyCodeKP2:
+		case SDLK_DOWN:
+		case SDLK_KP2:
 			KeyScrollState &= ~ScrollDown;
 			break;
-		case KeyCodeLeft:
-		case KeyCodeKP4:
+		case SDLK_LEFT:
+		case SDLK_KP4:
 			KeyScrollState &= ~ScrollLeft;
 			break;
-		case KeyCodeRight:
-		case KeyCodeKP6:
+		case SDLK_RIGHT:
+		case SDLK_KP6:
 			KeyScrollState &= ~ScrollRight;
 			break;
 		default:
