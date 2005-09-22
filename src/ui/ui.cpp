@@ -225,7 +225,7 @@ void LoadUserInterface(void)
 **  @param file  Save file handle
 **  @param ui    User interface to save
 */
-static void SaveViewports(CLFile* file, const CUserInterface* ui)
+static void SaveViewports(CFile* file, const CUserInterface* ui)
 {
 	int i;
 	const Viewport* vp;
@@ -245,7 +245,7 @@ static void SaveViewports(CLFile* file, const CUserInterface* ui)
 **
 **  @param file  Save file handle
 */
-void SaveUserInterface(CLFile* file)
+void SaveUserInterface(CFile* file)
 {
 	SaveViewports(file, &UI);
 }

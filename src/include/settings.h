@@ -37,7 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CLFile;
+class CFile;
 struct _world_map_;
 struct _campaign_chapter_;
 
@@ -176,7 +176,7 @@ extern void CreditsCclRegister(void);
 	/// Register CCL functions for objectives
 extern void ObjectivesCclRegister(void);
 	/// Save the objectives
-extern void SaveObjectives(CLFile *file);
+extern void SaveObjectives(CFile *file);
 	/// Create a game
 extern void CreateGame(const char* filename, struct _world_map_* map);
 	/// Init Setting to default values

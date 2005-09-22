@@ -1189,7 +1189,7 @@ MissileType *MissileBurningBuilding(int percent)
 **  @param missile  Missile object to save.
 **  @param file     Output file.
 */
-void Missile::SaveMissile(CLFile *file) const
+void Missile::SaveMissile(CFile *file) const
 {
 	char *s1;
 
@@ -1228,7 +1228,7 @@ void Missile::SaveMissile(CLFile *file) const
 **
 **  @param file  Output file.
 */
-void SaveMissiles(CLFile *file)
+void SaveMissiles(CFile *file)
 {
 	std::vector<Missile *>::const_iterator i;
 

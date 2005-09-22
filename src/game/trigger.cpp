@@ -797,7 +797,7 @@ void TriggerCclRegister(void)
 **
 **  @param file  Open file to print to
 */
-void SaveTriggers(CLFile *file)
+void SaveTriggers(CFile *file)
 {
 	int i;
 	int triggers;

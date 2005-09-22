@@ -55,10 +55,10 @@
 
 typedef struct _mikmod_data_ {
 	MODULE* MikModModule;
-	CLFile *MikModFile;
+	CFile *MikModFile;
 } MikModData;
 
-static CLFile *CurrentFile;
+static CFile *CurrentFile;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -231,7 +231,7 @@ Sample* LoadMikMod(const char* name, int flags)
 	MikMod_Init("");
 
 	strcpy(s, name);
-	data->MikModFile = new CLFile;
+	data->MikModFile = new CFile;
 	if (data->MikModFile->open(name, CL_OPEN_READ) == -1) {
 		MikMod_Exit();
 		delete data->MikModFile;

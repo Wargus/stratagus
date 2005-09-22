@@ -3504,7 +3504,7 @@ char* UnitReference(const CUnit *unit)
 **  @param order    Order who should be saved.
 **  @param file     Output file.
 */
-void SaveOrder(const Order* order, CLFile* file)
+void SaveOrder(const Order* order, CFile* file)
 {
 	char* ref;
 
@@ -3631,7 +3631,7 @@ void SaveOrder(const Order* order, CLFile* file)
 **  @param unit    Unit pointer to be saved.
 **  @param file    Output file.
 */
-void SaveUnit(const CUnit *unit, CLFile* file)
+void SaveUnit(const CUnit *unit, CFile* file)
 {
 	char* ref;
 	CUnit *uins;
@@ -3894,7 +3894,7 @@ void SaveUnit(const CUnit *unit, CLFile* file)
 **
 **  @param file    Output file.
 */
-void SaveUnits(CLFile* file)
+void SaveUnits(CFile* file)
 {
 	CUnit **table;
 	CUnit *unit;

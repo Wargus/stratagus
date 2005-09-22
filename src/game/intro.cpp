@@ -382,7 +382,7 @@ void ShowIntro(const Intro* intro)
 	int l;
 	int y;
 	int c;
-	CLFile file;
+	CFile file;
 	char buf[1024];
 	int stage;
 	TextLines* scrolling_text;
@@ -1512,13 +1512,11 @@ void ObjectivesCclRegister(void)
 **
 **  @param file  Output file.
 */
-void SaveObjectives(CLFile* file)
+void SaveObjectives(CFile *file)
 {
-	int i;
-
 	if (GameIntro.Objectives[0]) {
 		file->printf("SetObjectives(");
-		for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
+		for (int i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
 			if (i) {
 				file->printf(",");
 			}

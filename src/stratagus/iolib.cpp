@@ -64,12 +64,12 @@
 ----------------------------------------------------------------------------*/
 
 
-CLFile::CLFile()
+CFile::CFile()
 {
 	cl_type = CLF_TYPE_INVALID;
 }
 
-CLFile::~CLFile()
+CFile::~CFile()
 {
 	if (cl_type != CLF_TYPE_INVALID) {
 		DebugPrint("File wasn't closed\n");
@@ -89,7 +89,7 @@ CLFile::~CLFile()
 **  @param offset  Seek position
 **  @param whence  How to seek
 */
-static int gzseek(CLFile *file, unsigned offset, int whence)
+static int gzseek(CFile *file, unsigned offset, int whence)
 {
 	char buf[32];
 
@@ -136,7 +136,7 @@ static void bzseek(BZFILE *file, unsigned offset, int whence)
 **
 **  @return File Pointer
 */
-int CLFile::open(const char *name, long openflags)
+int CFile::open(const char *name, long openflags)
 {
 	char buf[512];
 	char openstring[5];
@@ -231,7 +231,7 @@ int CLFile::open(const char *name, long openflags)
 /**
 **  CLclose Library file close
 */
-int CLFile::close()
+int CFile::close()
 {
 	int tp;
 	int ret;
@@ -266,7 +266,7 @@ int CLFile::close()
 **  @param buf  Pointer to read the data to.
 **  @param len  number of bytes to read.
 */
-int CLFile::read(void *buf, size_t len)
+int CFile::read(void *buf, size_t len)
 {
 	int ret;
 
@@ -292,7 +292,7 @@ int CLFile::read(void *buf, size_t len)
 	return ret;
 }
 
-void CLFile::flush()
+void CFile::flush()
 {
 	if (cl_type != CLF_TYPE_INVALID) {
 		if (cl_type == CLF_TYPE_PLAIN) {
@@ -320,7 +320,7 @@ void CLFile::flush()
 **  @param format  String Format.
 **  @param ...     Parameter List.
 */
-int CLFile::printf(char *format, ...)
+int CFile::printf(char *format, ...)
 {
 	int n;
 	int size;
@@ -385,7 +385,7 @@ int CLFile::printf(char *format, ...)
 **  @param offset  Seek position
 **  @param whence  How to seek
 */
-int CLFile::seek(long offset, int whence)
+int CFile::seek(long offset, int whence)
 {
 	int tp;
 	int ret;
@@ -416,7 +416,7 @@ int CLFile::seek(long offset, int whence)
 /**
 **  CLtell Library file tell
 */
-long CLFile::tell()
+long CFile::tell()
 {
 	int tp;
 	int ret;

@@ -1911,7 +1911,7 @@ static void CreateEditor(void)
 	int i;
 	char *file;
 	char buf[PATH_MAX];
-	CLFile clf;
+	CFile clf;
 
 	//
 	// Load and evaluate the editor configuration file

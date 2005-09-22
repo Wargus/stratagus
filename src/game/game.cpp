@@ -91,10 +91,10 @@ static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 **  @param mapname   map filename
 **  @param map       map loaded
 */
-static void LoadStratagusMap(const char* mapname, WorldMap* map)
+static void LoadStratagusMap(const char *mapname, WorldMap *map)
 {
 	char mapfull[PATH_MAX];
-	CLFile file;
+	CFile file;
 
 	if (file.open(mapname, CL_OPEN_READ) == -1) {
 		strcpy(mapfull, StratagusLibPath);

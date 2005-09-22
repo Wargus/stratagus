@@ -54,7 +54,7 @@
 
 class CUnit;
 struct _button_action_;
-class CLFile;
+class CFile;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -518,24 +518,24 @@ extern char* UiGroupKeys;               /// Up to 11 keys used for group selecti
 ----------------------------------------------------------------------------*/
 
 	/// Initialize the ui
-extern void InitUserInterface(const char* race_name);
+extern void InitUserInterface(const char *race_name);
 	/// Load ui graphics
 extern void LoadUserInterface(void);
 	/// Save the ui state
-extern void SaveUserInterface(CLFile *file);
+extern void SaveUserInterface(CFile *file);
 	/// Clean up the Panel.
-extern void CleanPanel(InfoPanel* panel);
+extern void CleanPanel(InfoPanel *panel);
 	/// Clean up a ui
-extern void CleanUI(CUserInterface* ui);
+extern void CleanUI(CUserInterface *ui);
 	/// Clean up the ui module
 extern void CleanUserInterface(void);
 	/// Register ccl features
 extern void UserInterfaceCclRegister(void);
 
 	/// Find a button style
-extern ButtonStyle* FindButtonStyle(const char* style);
+extern ButtonStyle *FindButtonStyle(const char *style);
 	/// Find a checkbox style
-extern CheckboxStyle* FindCheckboxStyle(const char* style);
+extern CheckboxStyle *FindCheckboxStyle(const char *style);
 
 	/// Called if the mouse is moved in Normal interface state
 extern void UIHandleMouseMove(int x, int y);

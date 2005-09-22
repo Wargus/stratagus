@@ -138,13 +138,13 @@ int CommandLogDisabled;            /// True if command log is off
 ReplayType ReplayGameType;         /// Replay game type
 static int DisabledLog;            /// Disabled log for replay
 static int DisabledShowTips;       /// Disabled show tips
-static CLFile *LogFile;            /// Replay log file
+static CFile *LogFile;            /// Replay log file
 static unsigned long NextLogCycle; /// Next log cycle number
 static int InitReplay;             /// Initialize replay
 static FullReplay *CurrentReplay;
 static LogEntry *ReplayStep;
 
-static void AppendLog(LogEntry* log, CLFile *dest);
+static void AppendLog(LogEntry *log, CFile *dest);
 
 //----------------------------------------------------------------------------
 // Log commands
@@ -293,7 +293,7 @@ static void DeleteReplay(FullReplay *replay)
 	free(replay);
 }
 
-static void PrintLogCommand(LogEntry *log, CLFile *dest)
+static void PrintLogCommand(LogEntry *log, CFile *dest)
 {
 	dest->printf("Log( { ");
 	dest->printf("GameCycle = %lu, ", log->GameCycle);
@@ -325,7 +325,7 @@ static void PrintLogCommand(LogEntry *log, CLFile *dest)
 **
 **  @param dest  The file to output to
 */
-static void SaveFullLog(CLFile *dest)
+static void SaveFullLog(CFile *dest)
 {
 	LogEntry *log;
 	int i;
@@ -379,7 +379,7 @@ static void SaveFullLog(CLFile *dest)
 **  @param log   Pointer the replay log entry to be added
 **  @param dest  The file to output to
 */
-static void AppendLog(LogEntry *log, CLFile *dest)
+static void AppendLog(LogEntry *log, CFile *dest)
 {
 	LogEntry **last;
 
@@ -447,7 +447,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 #endif
 
 		sprintf(buf, "%s/log_of_stratagus_%d.log", buf, ThisPlayer->Index);
-		LogFile = new CLFile;
+		LogFile = new CFile;
 		if (LogFile->open(buf, CL_OPEN_WRITE) == -1) {
 			// don't retry for each command
 			CommandLogDisabled = 0;
@@ -710,7 +710,7 @@ static int CclReplayLog(lua_State *l)
 **
 **  @param file  file to save to.
 */
-void SaveReplayList(CLFile *file)
+void SaveReplayList(CFile *file)
 {
 	SaveFullLog(file);
 }

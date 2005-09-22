@@ -62,7 +62,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CLFile *f)
+int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f)
 {
 	char *buf;
 	int bytes;
@@ -132,7 +132,7 @@ int VorbisProcessData(OggData *data, char *buffer)
 	return len;
 }
 
-int OggInit(CLFile *f, OggData *data)
+int OggInit(CFile *f, OggData *data)
 {
 	ogg_packet packet;
 	int num_vorbis;
@@ -393,10 +393,10 @@ Sample* LoadVorbis(const char* name,int flags)
 {
 	Sample* sample;
 	OggData* data;
-	CLFile *f;
+	CFile *f;
 	vorbis_info* info;
 
-	f = new CLFile;
+	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
 		delete f;
