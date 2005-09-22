@@ -10,7 +10,7 @@
 //
 /**@name depend.cpp - The units/upgrade dependencies */
 //
-//      (c) Copyright 2000-2004 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 2000-2005 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@
 ----------------------------------------------------------------------------*/
 
 	/// All dependencies hash
-static DependRule* DependHash[101];
+static DependRule *DependHash[101];
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -66,12 +66,12 @@ static DependRule* DependHash[101];
 **  @param count     Amount of the required needed.
 **  @param or_flag   Start of or rule.
 */
-void AddDependency(const char* target, const char* required, int count,
+void AddDependency(const char *target, const char *required, int count,
 	int or_flag)
 {
 	DependRule rule;
-	DependRule* node;
-	DependRule* temp;
+	DependRule *node;
+	DependRule *temp;
 	int hash;
 
 	//
@@ -99,7 +99,7 @@ void AddDependency(const char* target, const char* required, int count,
 		while (node->Type != rule.Type ||
 				node->Kind.Upgrade != rule.Kind.Upgrade) {
 			if (!node->Next) {  // end of list
-				temp = (DependRule*)malloc(sizeof(DependRule));
+				temp = new DependRule;
 				temp->Next = NULL;
 				temp->Rule = NULL;
 				temp->Type = rule.Type;
@@ -111,7 +111,7 @@ void AddDependency(const char* target, const char* required, int count,
 			node = node->Next;
 		}
 	} else {  // create new slow
-		node = (DependRule*)malloc(sizeof(DependRule));
+		node = new DependRule;
 		node->Next = NULL;
 		node->Rule = NULL;
 		node->Type = rule.Type;
@@ -127,7 +127,7 @@ void AddDependency(const char* target, const char* required, int count,
 		count = 255;
 	}
 
-	temp = (DependRule*)malloc(sizeof(DependRule));
+	temp = new DependRule;
 	temp->Rule = NULL;
 	temp->Next = NULL;
 	temp->Count = count;
@@ -145,7 +145,7 @@ void AddDependency(const char* target, const char* required, int count,
 	} else {
 		DebugPrint("dependency required `%s' should be unit-type or upgrade\n" _C_
 			required);
-		free(temp);
+		delete temp;
 		return;
 	}
 
@@ -281,10 +281,10 @@ void InitDependencies(void)
 void CleanDependencies(void)
 {
 	unsigned u;
-	DependRule* node;
-	DependRule* rule;
-	DependRule* temp;
-	DependRule* next;
+	DependRule *node;
+	DependRule *rule;
+	DependRule *temp;
+	DependRule *next;
 
 	// Free all dependencies
 
@@ -300,16 +300,16 @@ void CleanDependencies(void)
 					while (temp) {
 						next = temp;
 						temp = temp->Rule;
-						free(next);
+						delete next;
 					}
 				}
 				temp = rule;
 				rule = rule->Next;
-				free(temp);
+				delete temp;
 			}
 			temp = node;
 			node = node->Next;
-			free(temp);
+			delete temp;
 		}
 		DependHash[u] = NULL;
 	}
@@ -324,12 +324,12 @@ void CleanDependencies(void)
 **
 **  @param l  Lua state.
 */
-static int CclDefineDependency(lua_State* l)
+static int CclDefineDependency(lua_State *l)
 {
-	const char* target;
-	const char* required;
+	const char *target;
+	const char *required;
 	int count;
-	const char* value;
+	const char *value;
 	int or_flag;
 	int args;
 	int j;
@@ -390,7 +390,7 @@ static int CclDefineDependency(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclGetDependency(lua_State* l)
+static int CclGetDependency(lua_State *l)
 {
 	DebugPrint("FIXME: write this %p\n" _C_ l);
 
@@ -404,7 +404,7 @@ static int CclGetDependency(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclCheckDependency(lua_State* l)
+static int CclCheckDependency(lua_State *l)
 {
 	DebugPrint("FIXME: write this %p\n" _C_ l);
 
