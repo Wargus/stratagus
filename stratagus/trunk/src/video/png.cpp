@@ -64,7 +64,7 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 	png_size_t check;
 	CFile *f;
 
-	f = (CFile*)png_get_io_ptr(png_ptr);
+	f = (CFile *)png_get_io_ptr(png_ptr);
 	check = (png_size_t)f->read(data,
 		(size_t)length);
 	if (check != length) {
@@ -80,10 +80,10 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 **
 **  @return   0 for success, -1 for error.
 */
-int LoadGraphicPNG(Graphic* g)
+int LoadGraphicPNG(Graphic *g)
 {
 	CFile fp;
-	SDL_Surface* volatile surface;
+	SDL_Surface *volatile surface;
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_uint_32 width;
@@ -95,12 +95,12 @@ int LoadGraphicPNG(Graphic* g)
 	Uint32 Gmask;
 	Uint32 Bmask;
 	Uint32 Amask;
-	SDL_Palette* palette;
-	png_bytep* volatile row_pointers;
+	SDL_Palette *palette;
+	png_bytep *volatile row_pointers;
 	int row;
 	int i;
 	volatile int ckey;
-	png_color_16* transv;
+	png_color_16 *transv;
 	char name[PATH_MAX];
 	int ret;
 
@@ -177,7 +177,7 @@ int LoadGraphicPNG(Graphic* g)
 	 entries exist, use full alpha channel */
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
 		int num_trans;
-		Uint8* trans;
+		Uint8 *trans;
 
 		png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
 			&transv);
@@ -255,7 +255,7 @@ int LoadGraphicPNG(Graphic* g)
 	}
 
 	/* Create the array of pointers to image data */
-	row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
+	row_pointers = new png_bytep[height];
 	if (row_pointers == NULL) {
 		fprintf(stderr, "Out of memory");
 		SDL_FreeSurface(surface);
@@ -301,7 +301,7 @@ done:   /* Clean up and return */
 	png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0,
 		(png_infopp)0);
 	if (row_pointers) {
-		free(row_pointers);
+		delete[] row_pointers;
 	}
 	fp.close();
 	return ret;
@@ -312,18 +312,17 @@ done:   /* Clean up and return */
 **
 **  @param name  PNG filename to save.
 */
-void SaveScreenshotPNG(const char* name)
+void SaveScreenshotPNG(const char *name)
 {
-	FILE* fp;
+	FILE *fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
-	unsigned char* row;
+	unsigned char *row;
 	int i;
+	int j;
 	int bpp;
 #ifdef USE_OPENGL
-	GLvoid* pixels;
-#else
-	int j;
+	GLvoid *pixels;
 #endif
 
 	bpp = TheScreen->format->BytesPerPixel;
@@ -364,12 +363,12 @@ void SaveScreenshotPNG(const char* name)
 
 	Video.LockScreen();
 
-	row = (unsigned char*)malloc(Video.Width * 3);
+	row = new unsigned char[Video.Width * 3];
 
 	png_write_info(png_ptr, info_ptr);
 
 #ifdef USE_OPENGL
-	pixels = malloc(Video.Width * Video.Height * 3);
+	pixels = new unsigned char[Video.Width * Video.Height * 3];
 	if (!pixels) {
 		fprintf(stderr, "Out of memory\n");
 		exit(1);
@@ -378,11 +377,10 @@ void SaveScreenshotPNG(const char* name)
 	glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE,
 		pixels);
 	for (i = 0; i < Video.Height; ++i) {
-		int j;
-		unsigned char* src;
-		unsigned char* dst;
+		unsigned char *src;
+		unsigned char *dst;
 
-		src = (unsigned char*)pixels + (Video.Height - 1 - i) * Video.Width * 3;
+		src = (unsigned char *)pixels + (Video.Height - 1 - i) * Video.Width * 3;
 		dst = row;
 
 		// Convert bgr to rgb
@@ -395,14 +393,14 @@ void SaveScreenshotPNG(const char* name)
 		}
 		png_write_row(png_ptr, row);
 	}
-	free(pixels);
+	delete[] pixels;
 #else
 	for (i = 0; i < Video.Height; ++i) {
 		switch (Video.Depth) {
 			case 15: {
 				Uint16 c;
 				for (j = 0; j < Video.Width; ++j) {
-					c = ((Uint16*)TheScreen->pixels)[j + i * Video.Width];
+					c = ((Uint16 *)TheScreen->pixels)[j + i * Video.Width];
 					row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
 					row[j * 3 + 1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
 					row[j * 3 + 2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
@@ -412,7 +410,7 @@ void SaveScreenshotPNG(const char* name)
 			case 16: {
 				Uint16 c;
 				for (j = 0; j < Video.Width; ++j) {
-					c = ((Uint16*)TheScreen->pixels)[j + i * Video.Width];
+					c = ((Uint16 *)TheScreen->pixels)[j + i * Video.Width];
 					row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
 					row[j * 3 + 1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
 					row[j * 3 + 2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
@@ -422,15 +420,15 @@ void SaveScreenshotPNG(const char* name)
 			case 24: {
 				Uint8 c;
 				for (j = 0; j < Video.Width; ++j) {
-					c = ((Uint8*)TheScreen->pixels)[j * bpp + i * Video.Width * 3];
-					memcpy(row, (char*)TheScreen->pixels + i * Video.Width, Video.Width * 3);
+					c = ((Uint8 *)TheScreen->pixels)[j * bpp + i * Video.Width * 3];
+					memcpy(row, (char *)TheScreen->pixels + i * Video.Width, Video.Width * 3);
 				}
 				break;
 			}
 			case 32: {
 				Uint32 c;
 				for (j = 0; j < Video.Width; ++j) {
-					c = ((Uint32*)TheScreen->pixels)[j + i * Video.Width];
+					c = ((Uint32 *)TheScreen->pixels)[j + i * Video.Width];
 					row[j * 3 + 0] = ((c >> 0) & 0xff);
 					row[j * 3 + 1] = ((c >> 8) & 0xff);
 					row[j * 3 + 2] = ((c >> 16) & 0xff);
@@ -449,7 +447,7 @@ void SaveScreenshotPNG(const char* name)
 	/* clean up after the write, and free any memory allocated */
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 
-	free(row);
+	delete[] row;
 
 	fclose(fp);
 }
