@@ -10,7 +10,7 @@
 //
 /**@name sound.h - The sound header file. */
 //
-//      (c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2005 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -115,11 +115,11 @@ extern GameSound GameSounds;  /// Game sound configuration
 extern int PlayingMusic;   /// flag true if playing music
 extern int CallbackMusic;  /// flag true callback ccl if stops
 
-extern PlaySection* PlaySections;  /// Play sections
+extern PlaySection *PlaySections;  /// Play sections
 extern int NumPlaySections;  /// Number of play sections
 extern PlaySectionType CurrentPlaySection;  /// Current play section type
 
-extern char* CurrentMusicFile;
+extern char *CurrentMusicFile;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -143,7 +143,7 @@ extern void PlayUnitSoundId(const CUnit *unit, SoundId id);
 **  @param missile  the missile (origin of the sound)
 **  @param sound    the sound to play
 */
-extern void PlayMissileSound(const Missile* missile, SoundId sound);
+extern void PlayMissileSound(const Missile *missile, SoundId sound);
 
 /**
 **  Ask to the sound server to play a sound: low level call.
@@ -166,9 +166,9 @@ extern void InitSoundClient(void);
 extern void PlaySectionMusic(PlaySectionType section);
 
 	/// Play a sample file
-extern void PlaySoundFile(const char* name);
+extern void PlaySoundFile(const char *name);
 	/// Play a music file
-extern int PlayMusic(const char* name);
+extern int PlayMusic(const char *name);
 	/// Stop music playing
 extern void StopMusic(void);
 

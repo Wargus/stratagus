@@ -59,7 +59,7 @@ public:
 	void DrawFrameClip(unsigned frame, int x, int y) const;
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y) const;
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
@@ -69,7 +69,7 @@ public:
 	void DrawFrameClipX(unsigned frame, int x, int y) const;
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y) const;
+	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 
 
 	void Load();

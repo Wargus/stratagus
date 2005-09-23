@@ -62,11 +62,11 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-Sample* MusicSample;  /// Music samples
+Sample *MusicSample;  /// Music samples
 
-char* CurrentMusicFile;
+char *CurrentMusicFile;
 
-PlaySection* PlaySections;          /// Play Sections
+PlaySection *PlaySections;          /// Play Sections
 int NumPlaySections;                /// Number of Play Sections
 PlaySectionType CurrentPlaySection; /// Current Play Section
 
@@ -195,19 +195,18 @@ void PlaySectionMusic(PlaySectionType section)
 **
 ** @return 1 if music is playing, 0 if not.
 */
-int PlayMusic(const char* name)
+int PlayMusic(const char *name)
 {
 	char buffer[PATH_MAX];
-	Sample* sample;
+	Sample *sample;
 
 	if (MusicOff) {
 		return 0;
 	}
 
-	if (CurrentMusicFile) {
-		free(CurrentMusicFile);
-	}
-	CurrentMusicFile = strdup(name);
+	delete[] CurrentMusicFile;
+	CurrentMusicFile = new char[strlen(name) + 1];
+	strcpy(CurrentMusicFile, name);
 
 	name = LibraryFileName(name, buffer);
 
@@ -282,7 +281,7 @@ int PlayMusic(const char* name)
 **
 ** @param name Name of sound file
 */
-void PlaySoundFile(const char* name)
+void PlaySoundFile(const char *name)
 {
 	SoundId id;
 	if (SoundIdForName("dynamic-sound")) {
