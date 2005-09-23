@@ -294,17 +294,8 @@ extern int ReplayRevealMap;
 //
 // in map_draw.c
 //
-	/// Draw the map background
-extern void DrawMapBackgroundInViewport(const Viewport* vp);
 	/// Build tables for map
 extern void InitMap(void);
-
-	/// Denote wether area in map is overlapping with viewport on screen
-extern int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
-	int ex, int ey);
-	/// Check if any part of an area is visible in viewport
-extern int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
-	int ex, int ey);
 
 //
 // in map_fog.c
@@ -334,8 +325,6 @@ extern void MapUpdateFogOfWar(int x, int y);
 	/// Update fog of war
 extern void UpdateFogOfWarChange(void);
 
-	/// Draw the map fog of war
-extern void DrawMapFogOfWar(Viewport* vp);
 	/// Build tables for fog of war
 extern void InitMapFogOfWar(void);
 	/// Cleanup memory for fog of war tables

@@ -104,7 +104,7 @@ EventCallback MenuCallbacks; /// Menu callbacks
 */
 void DoScrollArea(int state, int fast)
 {
-	Viewport *vp;
+	CViewport *vp;
 	int stepx;
 	int stepy;
 	static int remx = 0; // FIXME: docu
@@ -155,83 +155,10 @@ void DoScrollArea(int state, int fast)
 	if (state & ScrollLeft) {
 		stepx = -stepx;
 	}
-	ViewportSetViewpoint(vp, vp->MapX, vp->MapY,
-		vp->OffsetX + stepx, vp->OffsetY + stepy);
+	vp->Set(vp->MapX, vp->MapY, vp->OffsetX + stepx, vp->OffsetY + stepy);
 
 	// This recalulates some values
 	HandleMouseMove(CursorX, CursorY);
-}
-
-/**
-**  Draw a map viewport.
-**
-**  @param vp  Viewport pointer.
-*/
-static void DrawMapViewport(Viewport *vp)
-{
-	CUnit *table[UnitMax];
-	Missile *missiletable[MAX_MISSILES * 9];
-	int nunits;
-	int nmissiles;
-	int i;
-	int j;
-
-	Assert(vp);
-	if (InterfaceState == IfaceStateNormal) {
-		//
-		// A unit is tracked, center viewport on this unit.
-		//
-		if (vp->Unit) {
-			if (vp->Unit->Destroyed ||
-					vp->Unit->Orders[0].Action == UnitActionDie) {
-				vp->Unit = NoUnitP;
-			} else {
-				ViewportCenterViewpoint(vp, vp->Unit->X, vp->Unit->Y,
-					vp->Unit->IX + TileSizeX / 2, vp->Unit->IY + TileSizeY / 2);
-			}
-		}
-
-		PushClipping();
-		SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
-		DrawMapBackgroundInViewport(vp);
-
-		//
-		// We find and sort units after draw level.
-		//
-		nunits = FindAndSortUnits(vp, table);
-		nmissiles = FindAndSortMissiles(vp, missiletable);
-
-		i = 0;
-		j = 0;
-		CurrentViewport = vp;
-		while (i < nunits && j < nmissiles) {
-			if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
-				DrawUnit(table[i]);
-				++i;
-			} else {
-				missiletable[j]->DrawMissile();
-				++j;
-			}
-		}
-		for (; i < nunits; ++i) {
-			DrawUnit(table[i]);
-		}
-		for (; j < nmissiles; ++j) {
-			missiletable[j]->DrawMissile();
-		}
-		DrawMapFogOfWar(vp);
-		//
-		// Draw orders of selected units.
-		// Drawn here so that they are shown even when the unit is out of the screen.
-		//
-		if (ShowOrders == SHOW_ORDERS_ALWAYS ||
-				((ShowOrdersCount >= GameCycle || (KeyModifiers & ModifierShift)))) {
-			for (i = 0; i < NumSelected; ++i) {
-				ShowOrder(Selected[i]);
-			}
-		}
-		PopClipping();
-	}
 }
 
 /**
@@ -242,15 +169,29 @@ static void DrawMapViewport(Viewport *vp)
 */
 void DrawMapArea(void)
 {
-	Viewport *vp;
-	const Viewport *evp;
+	CViewport *vp;
+	const CViewport *evp;
 
-	// Draw all map viewports
-	evp = UI.Viewports + UI.NumViewports;
-	for (vp = UI.Viewports; vp < evp; ++vp) {
-		DrawMapViewport(vp);
+	if (InterfaceState == IfaceStateNormal) {
+		// Draw all map viewports
+		evp = UI.Viewports + UI.NumViewports;
+		for (vp = UI.Viewports; vp < evp; ++vp) {
+			//
+			// A unit is tracked, center viewport on this unit.
+			//
+			if (vp->Unit) {
+				if (vp->Unit->Destroyed ||
+						vp->Unit->Orders[0].Action == UnitActionDie) {
+					vp->Unit = NoUnitP;
+				} else {
+					vp->Center(vp->Unit->X, vp->Unit->Y,
+						vp->Unit->IX + TileSizeX / 2, vp->Unit->IY + TileSizeY / 2);
+				}
+			}
+	
+			vp->Draw();
+		}
 	}
-
 	// if we a single viewport, no need to denote the "selected" one
 	if (UI.NumViewports == 1) {
 		return;

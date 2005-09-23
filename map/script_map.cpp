@@ -254,7 +254,7 @@ static int CclRevealMap(lua_State *l)
 static int CclCenterMap(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	ViewportCenterViewpoint(UI.SelectedViewport,
+	UI.SelectedViewport->Center(
 		LuaToNumber(l, 1), LuaToNumber(l, 2), TileSizeX / 2, TileSizeY / 2);
 
 	return 0;

@@ -680,7 +680,7 @@ void CreateGame(const char* filename, WorldMap* map)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	ViewportCenterViewpoint(UI.SelectedViewport,
+	UI.SelectedViewport->Center(
 		ThisPlayer->StartX, ThisPlayer->StartY, TileSizeX / 2, TileSizeY / 2);
 
 	//

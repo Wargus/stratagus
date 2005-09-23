@@ -1436,7 +1436,7 @@ bool CUnit::IsVisibleOnMinimap() const
 **
 **  @return      True if visible, false otherwise.
 */
-bool CUnit::IsVisibleInViewport(const Viewport *vp) const
+bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 {
 	//
 	// Check if it's at least inside the damn viewport.
@@ -1484,7 +1484,7 @@ bool CUnit::IsVisibleInViewport(const Viewport *vp) const
 */
 bool CUnit::IsVisibleOnScreen() const
 {
-	for (Viewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (IsVisibleInViewport(vp)) {
 			return true;
 		}
@@ -3327,7 +3327,7 @@ int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1, const CUnitTyp
 */
 int ViewPointDistance(int x, int y)
 {
-	const Viewport *vp;
+	const CViewport *vp;
 
 	// first compute the view point coordinate
 	vp = UI.SelectedViewport;
@@ -3346,7 +3346,7 @@ int ViewPointDistance(int x, int y)
 */
 int ViewPointDistanceToUnit(const CUnit *dest)
 {
-	const Viewport* vp;
+	const CViewport* vp;
 
 	// first compute the view point coordinate
 	vp = UI.SelectedViewport;

@@ -45,6 +45,8 @@
 #include "player.h"
 #include "pathfinder.h"
 #include "ui.h"
+#include "missile.h"
+#include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -59,27 +61,8 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Denote whether area in map is overlapping with the viewport.
-**
-**  @param vp  Viewport pointer.
-**  @param sx  X map tile position of area in map to be checked.
-**  @param sy  Y map tile position of area in map to be checked.
-**  @param ex  X map tile position of area in map to be checked.
-**  @param ey  Y map tile position of area in map to be checked.
-**
-**  @return    True if overlapping, false otherwise.
-*/
-int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
-	int ex, int ey)
-{
-	return sx >= vp->MapX && sy >= vp->MapY &&
-		ex < vp->MapX + vp->MapWidth && ey < vp->MapY + vp->MapHeight;
-}
-
-/**
 **  Check if any part of an area is visible in a viewport.
 **
-**  @param vp  Viewport pointer.
 **  @param sx  X map tile position of area in map to be checked.
 **  @param sy  Y map tile position of area in map to be checked.
 **  @param ex  X map tile position of area in map to be checked.
@@ -87,11 +70,10 @@ int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 **
 **  @return    True if any part of area is visible, false otherwise
 */
-int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
-	int ex, int ey)
+int CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const
 {
-	if (ex < vp->MapX || ey < vp->MapY ||
-			sx >= vp->MapX + vp->MapWidth || sy >= vp->MapY + vp->MapHeight) {
+	if (ex < this->MapX || ey < this->MapY ||
+			sx >= this->MapX + this->MapWidth || sy >= this->MapY + this->MapHeight) {
 		return 0;
 	}
 	return 1;
@@ -100,80 +82,73 @@ int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 /**
 **  Convert viewport x coordinate to map tile x coordinate.
 **
-**  @param vp  Viewport pointer.
 **  @param x   X coordinate into this viewport (in pixels, relative
 **             to origin of Stratagus's window - not the viewport
 **             itself!).
 **
 **  @return    X map tile coordinate.
 */
-int Viewport2MapX(const Viewport* vp, int x)
+int CViewport::Viewport2MapX(int x) const
 {
 	int r;
 
-	r = (x - vp->X + vp->MapX * TileSizeX + vp->OffsetX) / TileSizeX;
+	r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
 	return r < TheMap.Info.MapWidth ? r : TheMap.Info.MapWidth - 1;
 }
 
 /**
 **  Convert viewport y coordinate to map tile y coordinate.
 **
-**  @param vp  Viewport pointer.
 **  @param y   Y coordinate into this viewport (in pixels, relative
 **             to origin of Stratagus's window - not the viewport
 **             itself!).
 **
 **  @return    Y map tile coordinate.
 */
-int Viewport2MapY(const Viewport* vp, int y)
+int CViewport::Viewport2MapY(int y) const
 {
 	int r;
 
-	r = (y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY) / TileSizeY;
+	r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
 	return r < TheMap.Info.MapHeight ? r : TheMap.Info.MapHeight - 1;
 }
 
 /**
 **  Convert a map tile X coordinate into a viewport x pixel coordinate.
 **
-**  @param vp  Viewport pointer.
 **  @param x   The map tile's X coordinate.
 **
 **  @return    X screen coordinate in pixels (relative
 **             to origin of Stratagus's window).
 */
-int Map2ViewportX(const Viewport* vp, int x)
+int CViewport::Map2ViewportX(int x) const
 {
-	return vp->X + (x - vp->MapX) * TileSizeX - vp->OffsetX;
+	return this->X + (x - this->MapX) * TileSizeX - this->OffsetX;
 }
 
 /**
 **  Convert a map tile Y coordinate into a viewport y pixel coordinate.
 **
-**  @param vp  Viewport pointer.
 **  @param y   The map tile's Y coordinate.
 **
 **  @return    Y screen coordinate in pixels (relative
 **             to origin of Stratagus's window).
 */
-int Map2ViewportY(const Viewport* vp, int y)
+int CViewport::Map2ViewportY(int y) const
 {
-	return vp->Y + (y - vp->MapY) * TileSizeY - vp->OffsetY;
+	return this->Y + (y - this->MapY) * TileSizeY - this->OffsetY;
 }
 
 /**
 **  Change viewpoint of map viewport v to x,y.
 **
-**  @param vp       Viewport pointer.
 **  @param x        X map tile position.
 **  @param y        Y map tile position.
 **  @param offsetx  X offset in tile.
 **  @param offsety  Y offset in tile.
 */
-void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
+void CViewport::Set(int x, int y, int offsetx, int offsety)
 {
-	Assert(vp);
-
 	x = x * TileSizeX + offsetx;
 	y = y * TileSizeY + offsety;
 	if (x < 0) {
@@ -182,40 +157,37 @@ void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 	if (y < 0) {
 		y = 0;
 	}
-	if (x > TheMap.Info.MapWidth * TileSizeX - (vp->EndX - vp->X) - 1) {
-		x = TheMap.Info.MapWidth * TileSizeX - (vp->EndX - vp->X) - 1;
+	if (x > TheMap.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1) {
+		x = TheMap.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1;
 	}
-	if (y > TheMap.Info.MapHeight * TileSizeY - (vp->EndY - vp->Y) - 1) {
-		y = TheMap.Info.MapHeight * TileSizeY - (vp->EndY - vp->Y) - 1;
+	if (y > TheMap.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1) {
+		y = TheMap.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1;
 	}
-	vp->MapX = x / TileSizeX;
-	vp->MapY = y / TileSizeY;
-	vp->OffsetX = x % TileSizeX;
-	vp->OffsetY = y % TileSizeY;
-	vp->MapWidth = ((vp->EndX - vp->X) + vp->OffsetX - 1) / TileSizeX + 1;
-	vp->MapHeight = ((vp->EndY - vp->Y) + vp->OffsetY - 1) / TileSizeY + 1;
+	this->MapX = x / TileSizeX;
+	this->MapY = y / TileSizeY;
+	this->OffsetX = x % TileSizeX;
+	this->OffsetY = y % TileSizeY;
+	this->MapWidth = ((this->EndX - this->X) + this->OffsetX - 1) / TileSizeX + 1;
+	this->MapHeight = ((this->EndY - this->Y) + this->OffsetY - 1) / TileSizeY + 1;
 }
 
 /**
 **  Center map viewport v on map tile (x,y).
 **
-**  @param vp  Viewport pointer.
 **  @param x   X map tile position.
 **  @param y   Y map tile position.
 **  @param offsetx  X offset in tile.
 **  @param offsety  Y offset in tile.
 */
-void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
+void CViewport::Center(int x, int y, int offsetx, int offsety)
 {
-	x = x * TileSizeX + offsetx - (vp->EndX - vp->X) / 2;
-	y = y * TileSizeY + offsety - (vp->EndY - vp->Y) / 2;
-	ViewportSetViewpoint(vp, x / TileSizeX, y / TileSizeY, x % TileSizeX, y % TileSizeY);
+	x = x * TileSizeX + offsetx - (this->EndX - this->X) / 2;
+	y = y * TileSizeY + offsety - (this->EndY - this->Y) / 2;
+	this->Set(x / TileSizeX, y / TileSizeY, x % TileSizeX, y % TileSizeY);
 }
 
 /**
 **  Draw the map backgrounds.
-**
-**  @param vp  Viewport pointer.
 **
 ** StephanR: variables explained below for screen:<PRE>
 ** *---------------------------------------*
@@ -239,7 +211,7 @@ void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offset
 ** (in pixels)
 ** </PRE>
 */
-void DrawMapBackgroundInViewport(const Viewport* vp)
+void CViewport::DrawMapBackgroundInViewport() const
 {
 	int sx;
 	int sy;
@@ -248,14 +220,14 @@ void DrawMapBackgroundInViewport(const Viewport* vp)
 	int dy;
 	int ey;
 
-	ex = vp->EndX;
-	sy = vp->MapY * TheMap.Info.MapWidth;
-	dy = vp->Y - vp->OffsetY;
-	ey = vp->EndY;
+	ex = this->EndX;
+	sy = this->MapY * TheMap.Info.MapWidth;
+	dy = this->Y - this->OffsetY;
+	ey = this->EndY;
 
 	while (dy <= ey) {
-		sx = vp->MapX + sy;
-		dx = vp->X - vp->OffsetX;
+		sx = this->MapX + sy;
+		dx = this->X - this->OffsetX;
 		while (dx <= ex) {
 			if (ReplayRevealMap) {
 				TheMap.TileGraphic->DrawFrameClip(TheMap.Fields[sx].Tile, dx, dy);
@@ -269,6 +241,60 @@ void DrawMapBackgroundInViewport(const Viewport* vp)
 		sy += TheMap.Info.MapWidth;
 		dy += TileSizeY;
 	}
+}
+
+/**
+**  Draw a map viewport.
+*/
+void CViewport::Draw() const
+{
+	CUnit *table[UnitMax];
+	Missile *missiletable[MAX_MISSILES * 9];
+	int nunits;
+	int nmissiles;
+	int i;
+	int j;
+
+	PushClipping();
+	SetClipping(this->X, this->Y, this->EndX, this->EndY);
+	this->DrawMapBackgroundInViewport();
+
+	//
+	// We find and sort units after draw level.
+	//
+	nunits = FindAndSortUnits(this, table);
+	nmissiles = FindAndSortMissiles(this, missiletable);
+
+	i = 0;
+	j = 0;
+	CurrentViewport = this;
+	while (i < nunits && j < nmissiles) {
+		if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
+			DrawUnit(table[i]);
+			++i;
+		} else {
+			missiletable[j]->DrawMissile();
+			++j;
+		}
+	}
+	for (; i < nunits; ++i) {
+		DrawUnit(table[i]);
+	}
+	for (; j < nmissiles; ++j) {
+		missiletable[j]->DrawMissile();
+	}
+	this->DrawMapFogOfWar();
+	//
+	// Draw orders of selected units.
+	// Drawn here so that they are shown even when the unit is out of the screen.
+	//
+	if (ShowOrders == SHOW_ORDERS_ALWAYS ||
+			((ShowOrdersCount >= GameCycle || (KeyModifiers & ModifierShift)))) {
+		for (i = 0; i < NumSelected; ++i) {
+			ShowOrder(Selected[i]);
+		}
+	}
+	PopClipping();
 }
 
 /**
