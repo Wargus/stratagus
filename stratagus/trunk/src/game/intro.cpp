@@ -60,26 +60,26 @@
 /**
 **  Linked list struct used to split text up into lines
 */
-typedef struct TextLines {
-	char* Text;              /// Line of text
-	struct TextLines* Next;  /// Pointer to next line
-} TextLines;
+struct TextLines {
+	char *Text;       /// Line of text
+	TextLines *Next;  /// Pointer to next line
+};
 
 /**
 **  Player ranks
 */
-typedef struct PlayerRanks {
-	char** Ranks;  /// Array of ranks
-	int* Scores;   /// Array of scores
-} PlayerRanks;
+struct PlayerRanks {
+	char **Ranks;  /// Array of ranks
+	int *Scores;   /// Array of scores
+};
 
 /**
 **  Linked list of TextLines
 */
-typedef struct ChapterTextLines {
-	struct TextLines* Text;         /// TextLines struct
-	struct ChapterTextLines* Next;  /// Pointer to next TextLines
-} ChapterTextLines;
+struct ChapterTextLines {
+	TextLines *Text;         /// TextLines struct
+	ChapterTextLines *Next;  /// Pointer to next TextLines
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -230,23 +230,24 @@ static void InitContinueButton(int x, int y)
 **  @param w      Maximum width of a line.
 **  @param lines  Pointer to linked list structure.
 */
-static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
+static void SplitTextIntoLines(const char *text, int w, TextLines **lines)
 {
 	int l;
-	char* s;
-	char* str;
-	char* s1;
-	TextLines** ptr;
+	char *s;
+	char *str;
+	char *s1;
+	TextLines **ptr;
 
 	l = 0;
-	s = str = strdup(text);
+	s = str = new char[strlen(text) + 1];
+	strcpy(str, text);
 	ptr = lines;
 
 	// Convert \r, \r\n, and \n\r to \n
 	s1 = s;
 	while (s1) {
-		char* x1;
-		char* x2;
+		char *x1;
+		char *x2;
 
 		if ((s1 = strpbrk(s1, "\n\r"))) {
 			if ((s1[0] == '\n' && s1[1] == '\r') ||
@@ -261,7 +262,7 @@ static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 	}
 
 	for (;;) {
-		char* space;
+		char *space;
 
 		if ((s1 = strchr(s, '\n'))) {
 			*s1 = '\0';
@@ -283,8 +284,9 @@ static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 			*space = '\0';
 		}
 
-		*ptr = (TextLines*)malloc(sizeof(TextLines));
-		(*ptr)->Text = strdup(s);
+		*ptr = new TextLines;
+		(*ptr)->Text = new char[strlen(s) + 1];
+		strcpy((*ptr)->Text, s);
 		(*ptr)->Next = NULL;
 		ptr = &((*ptr)->Next);
 
@@ -296,7 +298,7 @@ static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 		s = str + l;
 	}
 
-	free(str);
+	delete[] str;
 }
 
 /**
@@ -304,14 +306,14 @@ static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 **
 **  @param lines  Address of the pointer to free
 */
-static void FreeTextLines(TextLines** lines)
+static void FreeTextLines(TextLines **lines)
 {
-	TextLines* ptr;
+	TextLines *ptr;
 
 	while (*lines) {
 		ptr = (*lines)->Next;
-		free((*lines)->Text);
-		free(*lines);
+		delete[] (*lines)->Text;
+		delete *lines;
 		*lines = ptr;
 	}
 }
@@ -328,11 +330,11 @@ static void FreeTextLines(TextLines** lines)
 **
 **  @return       1 if there is more to scroll, 0 if it is done
 */
-static int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
+static int ScrollText(int x, int y, int w, int h, int i, TextLines *lines)
 {
 	int miny;
 	int endy;
-	TextLines* ptr;
+	TextLines *ptr;
 	int scrolling;
 
 	scrolling = 1;
@@ -372,11 +374,11 @@ static int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
 **
 **  @param intro  Intro struct
 */
-void ShowIntro(const Intro* intro)
+void ShowIntro(const Intro *intro)
 {
 	EventCallback callbacks;
-	Graphic* background;
-	char* text;
+	Graphic *background;
+	char *text;
 	int line;
 	int i;
 	int l;
@@ -385,8 +387,8 @@ void ShowIntro(const Intro* intro)
 	CFile file;
 	char buf[1024];
 	int stage;
-	TextLines* scrolling_text;
-	TextLines* objectives_text[MAX_OBJECTIVES];
+	TextLines *scrolling_text;
+	TextLines *objectives_text[MAX_OBJECTIVES];
 	int old_video_sync;
 	int soundfree;
 	int soundout;
@@ -421,14 +423,15 @@ void ShowIntro(const Intro* intro)
 		ExitFatal(-1);
 	}
 	l = 0;
-	text = (char*)malloc(8192);
+	text = new char[8192];
 	while ((i = file.read(text + l, 8192)) == 8192) {
 		l += 8192;
-		text = (char*)realloc(text, l + 8192);
+		char *newtext = new char[l + 8192];
+		memcpy(newtext, text, l);
+		delete[] text;
+		text = newtext;
 	}
 	text[l + i] = '\0';
-	l += i + 1;
-	text = (char*)realloc(text, l);
 	file.close();
 
 	CallbackMusicOff();
@@ -500,7 +503,7 @@ void ShowIntro(const Intro* intro)
 		VideoDrawText(372 * Video.Width / 640, y, LargeFont, "Objectives:");
 		y += 30;
 		for (i = 0; i < MAX_OBJECTIVES && objectives_text[i]; ++i) {
-			TextLines* ptr;
+			TextLines *ptr;
 
 			ptr = objectives_text[i];
 			while (ptr) {
@@ -536,7 +539,7 @@ void ShowIntro(const Intro* intro)
 		}
 	}
 
-	free(text);
+	delete[] text;
 	FreeGraphic(background);
 
 	Video.ClearScreen();
@@ -556,15 +559,15 @@ void ShowIntro(const Intro* intro)
 **
 **  @param credits  Credits structure
 */
-void ShowCredits(Credits* credits)
+void ShowCredits(Credits *credits)
 {
 	EventCallback callbacks;
-	Graphic* background;
+	Graphic *background;
 	int line;
 	int x;
 	int y;
 	int scrolling;
-	TextLines* scrolling_credits;
+	TextLines *scrolling_credits;
 	int old_video_sync;
 
 	Video.ClearScreen();
@@ -664,13 +667,13 @@ void ShowCredits(Credits* credits)
 /**
 **  Draw text
 */
-static void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
+static void PictureDrawText(CampaignChapter *chapter, ChapterTextLines *chlines)
 {
-	ChapterPictureText* text;
-	TextLines* lines;
+	ChapterPictureText *text;
+	TextLines *lines;
 	int x;
 	int y;
-	int (*draw)(int, int, unsigned, const char*);
+	int (*draw)(int, int, unsigned, const char *);
 
 	text = chapter->Data.Picture.Text;
 	while (text) {
@@ -697,17 +700,17 @@ static void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 **
 **  @param chapter  Pointer to CampaignChapter to show
 */
-void ShowPicture(CampaignChapter* chapter)
+void ShowPicture(CampaignChapter *chapter)
 {
 	EventCallback callbacks;
-	Graphic* background;
+	Graphic *background;
 	int old_video_sync;
 	int max;
 	int i;
 	int j;
-	ChapterTextLines* lines;
-	ChapterTextLines** linesptr;
-	ChapterPictureText* text;
+	ChapterTextLines *lines;
+	ChapterTextLines **linesptr;
+	ChapterPictureText *text;
 
 	UseContinueButton = 0;
 
@@ -732,7 +735,9 @@ void ShowPicture(CampaignChapter* chapter)
 	text = chapter->Data.Picture.Text;
 	linesptr = &lines;
 	while (text) {
-		*linesptr = (ChapterTextLines*)calloc(sizeof(ChapterTextLines), 1);
+		*linesptr = new ChapterTextLines;
+		(*linesptr)->Text = NULL;
+		(*linesptr)->Next = NULL;
 		SplitTextIntoLines(text->Text, text->Width, &(*linesptr)->Text);
 		linesptr = &((*linesptr)->Next);
 		text = text->Next;
@@ -802,7 +807,7 @@ void ShowPicture(CampaignChapter* chapter)
 	FreeGraphic(background);
 
 	while (lines) {
-		ChapterTextLines* ptr;
+		ChapterTextLines *ptr;
 
 		ptr = lines->Next;
 		FreeTextLines(&lines->Text);
@@ -820,7 +825,7 @@ void ShowPicture(CampaignChapter* chapter)
 /**
 **  Draw a box with the text inside
 */
-static void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
+static void DrawStatBox(int x, int y, char *text, Uint32 color, int percent)
 {
 	Video.FillRectangleClip(ColorBlack, x, y, 80, 24);
 	Video.DrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);
@@ -884,7 +889,7 @@ static int GameStatsDrawFunc(int frame)
 
 
 	if (dodraw >= 1) {
-		char* outcome;
+		char *outcome;
 
 		VideoDrawTextCentered(x + 106, y + top_offset, LargeFont, "Outcome");
 		if (GameResult == GameVictory) {
@@ -897,9 +902,9 @@ static int GameStatsDrawFunc(int frame)
 	}
 
 	if (dodraw >= 2) {
-		char* rank;
-		char** ranks;
-		int* scores;
+		char *rank;
+		char **ranks;
+		int *scores;
 
 		ranks = NULL;
 		scores = NULL;
@@ -1185,7 +1190,7 @@ static int GameStatsDrawFunc(int frame)
 void ShowStats(void)
 {
 	EventCallback callbacks;
-	Graphic* g;
+	Graphic *g;
 	int done;
 	int old_video_sync;
 	int frame;
@@ -1258,11 +1263,11 @@ void ShowStats(void)
 void CleanCclCredits(void)
 {
 	if (GameCredits.Background) {
-		free(GameCredits.Background);
+		delete[] GameCredits.Background;
 		GameCredits.Background = NULL;
 	}
 	if (GameCredits.Names) {
-		free(GameCredits.Names);
+		delete[] GameCredits.Names;
 		GameCredits.Names = NULL;
 	}
 }
@@ -1274,38 +1279,40 @@ void CleanCclCredits(void)
 **
 **  @todo  'comment and 'title are only parsed, but not used.
 */
-static int CclCredits(lua_State* l)
+static int CclCredits(lua_State *l)
 {
-	const char* value;
-	const char* n;
+	const char *value;
+	const char *n;
 	int nlen;
 	int len;
 	int args;
 	int j;
 
-	if (GameCredits.Background) {
-		free(GameCredits.Background);
-	}
+	delete[] GameCredits.Background;
 	GameCredits.Background = NULL;
-	if (GameCredits.Names) {
-		free(GameCredits.Names);
-		GameCredits.Names = (char*)malloc(1);
-		GameCredits.Names[0] = '\0';
-	}
-	len = 0;
+	delete[] GameCredits.Names;
+	GameCredits.Names = NULL;
 
+	len = 0;
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		value = LuaToString(l, j + 1);
 		++j;
 		if (!strcmp(value, "background")) {
-			GameCredits.Background = strdup(LuaToString(l, j + 1));
+			const char *bg = LuaToString(l, j + 1);
+			GameCredits.Background = new char[strlen(bg) + 1];
+			strcpy(GameCredits.Background, bg);
 		} else if (!strcmp(value, "name") ||
 				!strcmp(value, "title") ||
 				!strcmp(value, "comment")) {
 			n = LuaToString(l, j + 1);
 			nlen = strlen(n);
-			GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
+			char *tmp = new char[len + nlen + 2];
+			if (GameCredits.Names) {
+				strcpy(tmp, GameCredits.Names);
+				delete[] GameCredits.Names;
+			}
+			GameCredits.Names = tmp;
 			if (len != 0) {
 				GameCredits.Names[len++] = '\n';
 			}
@@ -1334,10 +1341,10 @@ void CreditsCclRegister(void)
 **  specifying where in the list it should be added.  If no number is
 **  given it is added at the end.
 */
-static int CclAddObjective(lua_State* l)
+static int CclAddObjective(lua_State *l)
 {
 	int i;
-	const char* obj;
+	const char *obj;
 	int args;
 	int j;
 
@@ -1373,7 +1380,8 @@ static int CclAddObjective(lua_State* l)
 		for (; i > num; --i) {
 			GameIntro.Objectives[i] = GameIntro.Objectives[i - 1];
 		}
-		GameIntro.Objectives[num] = strdup(obj);
+		GameIntro.Objectives[num] = new char[strlen(obj) + 1];
+		strcpy(GameIntro.Objectives[num], obj);
 	} else {
 		// Add objective to the end of the list
 		i = 0;
@@ -1383,7 +1391,8 @@ static int CclAddObjective(lua_State* l)
 		if (i == MAX_OBJECTIVES) {
 			LuaError(l, "Too many objectives: %s" _C_ obj);
 		}
-		GameIntro.Objectives[i] = strdup(obj);
+		GameIntro.Objectives[i] = new char[strlen(obj) + 1];
+		strcpy(GameIntro.Objectives[i], obj);
 	}
 
 	return 0;
@@ -1392,7 +1401,7 @@ static int CclAddObjective(lua_State* l)
 /**
 **  Parse the remove objective ccl function
 */
-static int CclRemoveObjective(lua_State* l)
+static int CclRemoveObjective(lua_State *l)
 {
 	int num;
 
@@ -1406,7 +1415,7 @@ static int CclRemoveObjective(lua_State* l)
 		LuaError(l, "remove-objective: No objective at location: %d" _C_ num);
 	}
 
-	free(GameIntro.Objectives[num]);
+	delete[] GameIntro.Objectives[num];
 
 	if (num == MAX_OBJECTIVES - 1) {
 		GameIntro.Objectives[num] = NULL;
@@ -1421,21 +1430,22 @@ static int CclRemoveObjective(lua_State* l)
 /**
 **  Set the objectives
 */
-static int CclSetObjectives(lua_State* l)
+static int CclSetObjectives(lua_State *l)
 {
-	int i;
 	int args;
 	int j;
 
 	// Clean old objectives
-	for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
-		free(GameIntro.Objectives[i]);
+	for (int i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
+		delete[] GameIntro.Objectives[i];
 		GameIntro.Objectives[i] = NULL;
 	}
 
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
-		GameIntro.Objectives[j] = strdup(LuaToString(l, j + 1));
+		const char *str = LuaToString(l, j + 1);
+		GameIntro.Objectives[j] = new char[strlen(str) + 1];
+		strcpy(GameIntro.Objectives[j], str);
 	}
 
 	return 0;
@@ -1444,10 +1454,10 @@ static int CclSetObjectives(lua_State* l)
 /**
 **  Parse the define-ranks ccl function
 */
-static int CclDefineRanks(lua_State* l)
+static int CclDefineRanks(lua_State *l)
 {
-	PlayerRanks* rank;
-	const char* race;
+	PlayerRanks *rank;
+	const char *race;
 	int i;
 	int j;
 	int len;
@@ -1468,18 +1478,18 @@ static int CclDefineRanks(lua_State* l)
 
 	if (rank->Ranks) {
 		for (i = 0; rank->Ranks[i]; ++i) {
-			free(rank->Ranks[i]);
+			delete[] rank->Ranks[i];
 		}
-		free(rank->Ranks);
-		free(rank->Scores);
+		delete[] rank->Ranks;
+		delete[] rank->Scores;
 	}
 
 	args = luaL_getn(l, 2);
 	len = args / 2;
 
-	rank->Ranks = (char**)malloc((len + 1) * sizeof(char*));
+	rank->Ranks = new char *[len + 1];
 	rank->Ranks[len] = NULL;
-	rank->Scores = (int*)malloc(len * sizeof(int));
+	rank->Scores = new int[len];
 
 	i = 0;
 	for (j = 0; j < args; ++j) {
@@ -1488,7 +1498,9 @@ static int CclDefineRanks(lua_State* l)
 		lua_pop(l, 1);
 		++j;
 		lua_rawgeti(l, 2, j + 1);
-		rank->Ranks[i] = strdup(LuaToString(l, -1));
+		const char *str = LuaToString(l, -1);
+		rank->Ranks[i] = new char[strlen(str) + 1];
+		strcpy(rank->Ranks[i], str);
 		lua_pop(l, 1);
 		++i;
 	}

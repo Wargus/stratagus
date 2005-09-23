@@ -175,7 +175,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-extern void beos_init(int argc, char** argv);
+extern void beos_init(int argc, char **argv);
 
 #endif
 
@@ -186,9 +186,9 @@ extern void beos_init(int argc, char** argv);
 #include <getopt.h>
 #endif
 #if defined(_MSC_VER) || defined(__MINGW32__)
-extern char* optarg;
+extern char *optarg;
 extern int optind;
-extern int getopt(int argc, char* const* argv, const char* opt);
+extern int getopt(int argc, char *const *argv, const char *opt);
 #endif
 
 #ifdef MAC_BUNDLE
@@ -221,24 +221,24 @@ extern int getopt(int argc, char* const* argv, const char* opt);
 #include "pathfinder.h"
 
 #ifdef DEBUG
-extern int CclUnits(lua_State* l);
+extern int CclUnits(lua_State *l);
 #endif
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-TitleScreen** TitleScreens;          /// Title screens to show at startup
-char* MenuMusic;                     /// File for menu music
-char* StratagusLibPath;              /// Path for data directory
+TitleScreen **TitleScreens;          /// Title screens to show at startup
+char *MenuMusic;                     /// File for menu music
+char *StratagusLibPath;              /// Path for data directory
 char LocalPlayerName[16];            /// Name of local player
 
 	/// Name, Version, Copyright
 char NameLine[] =
 	"Stratagus V" VERSION ", (c) 1998-2005 by The Stratagus Project.";
 
-static char* MapName;                /// Filename of the map to load
-char* CompileOptions;                /// Compile options.
+static char *MapName;                /// Filename of the map to load
+char *CompileOptions;                /// Compile options.
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
@@ -360,8 +360,8 @@ static void ShowTitleScreens(void)
 		}
 
 		if (PlayMovie(TitleScreens[i]->File)) {
-			TitleScreenLabel** labels;
-			Graphic* g;
+			TitleScreenLabel **labels;
+			Graphic *g;
 #ifdef USE_MNG
 			Mng *mng = new Mng;
 
@@ -426,11 +426,11 @@ static void ShowTitleScreens(void)
 **
 **  @param fmt  printf format string.
 */
-void ShowLoadProgress(const char* fmt, ...)
+void ShowLoadProgress(const char *fmt, ...)
 {
 	va_list va;
 	char temp[4096];
-	char* s;
+	char *s;
 
 	va_start(va, fmt);
 	vsnprintf(temp, sizeof(temp), fmt, va);
@@ -485,7 +485,7 @@ void PreMenuSetup(void)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-void MenuLoop(const char* filename, WorldMap* map)
+void MenuLoop(const char *filename, WorldMap *map)
 {
 	for (;;) {
 		//
@@ -614,7 +614,7 @@ static void PrintHeader(void)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-static int main1(int argc, char** argv)
+static int main1(int argc, char **argv)
 {
 	PrintHeader();
 	printf(
@@ -738,9 +738,9 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-	char* p;
+	char *p;
 
 	CompileOptions =
 #ifdef DEBUG
@@ -805,10 +805,10 @@ int main(int argc, char** argv)
 		CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
 	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,
 		 kCFURLPOSIXPathStyle);
-	const char* pathPtr = CFStringGetCStringPtr(macPath,
+	const char *pathPtr = CFStringGetCStringPtr(macPath,
 		CFStringGetSystemEncoding());
 	Assert(pathPtr);
-	StratagusLibPath = malloc(strlen(pathPtr) + 1);
+	StratagusLibPath = new char[strlen(pathPtr) + 1];
 	strcpy(StratagusLibPath, pathPtr);
 #endif
 	CclStartFile = "scripts/stratagus.lua";
