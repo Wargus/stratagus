@@ -159,7 +159,7 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 {
 	int w;
 	int h;
-	const Viewport *vp;
+	const CViewport *vp;
 
 	//
 	//  Clip to map window.
@@ -211,15 +211,15 @@ static void DrawBuildingCursor(void)
 	int w0;
 	int h;
 	int mask;
-	const Viewport* vp;
+	const CViewport* vp;
 	CUnit *ontop;
 
 	// Align to grid
 	vp = UI.MouseViewport;
 	x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
 	y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
-	mx = Viewport2MapX(vp, x);
-	my = Viewport2MapY(vp, y);
+	mx = vp->Viewport2MapX(x);
+	my = vp->Viewport2MapY(y);
 	ontop = NULL;
 
 	//

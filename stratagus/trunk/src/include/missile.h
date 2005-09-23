@@ -332,7 +332,7 @@
 
 class Graphic;
 class CUnit;
-struct _viewport_;
+class CViewport;
 class CFile;
 
 /*----------------------------------------------------------------------------
@@ -585,7 +585,7 @@ extern Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx,
 	/// fire a missile
 extern void FireMissile(CUnit *unit);
 
-extern int FindAndSortMissiles(const struct _viewport_* vp, Missile** table);
+extern int FindAndSortMissiles(const CViewport* vp, Missile** table);
 
 	/// handle all missiles
 extern void MissileActions(void);

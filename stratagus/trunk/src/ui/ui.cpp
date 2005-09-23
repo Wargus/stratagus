@@ -75,8 +75,8 @@ CUserInterface** UI_Table;
 -- Functions
 ----------------------------------------------------------------------------*/
 
-static void ClipViewport(Viewport* vp, int ClipX, int ClipY);
-static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
+static void ClipViewport(CViewport* vp, int ClipX, int ClipY);
+static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps);
 
 
 /**
@@ -94,7 +94,7 @@ void InitUserInterface(const char* race_name)
 	int best;
 	int num_vps;
 	ViewportModeType vp_mode;
-	Viewport vps[MAX_NUM_VIEWPORTS];
+	CViewport vps[MAX_NUM_VIEWPORTS];
 
 	// select the correct slot
 	best = 0;
@@ -228,7 +228,7 @@ void LoadUserInterface(void)
 static void SaveViewports(CFile* file, const CUserInterface* ui)
 {
 	int i;
-	const Viewport* vp;
+	const CViewport* vp;
 
 	// FIXME: don't save the number
 	file->printf("DefineViewports(\"mode\", %d", ui->ViewportMode);
@@ -449,9 +449,9 @@ void CleanUserInterface(void)
 **  @note This functions only works with rectangular viewports, when
 **  we support shaped map window, this must be rewritten.
 */
-Viewport* GetViewport(int x, int y)
+CViewport* GetViewport(int x, int y)
 {
-	Viewport* vp;
+	CViewport* vp;
 
 	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (x >= vp->X && x <= vp->EndX && y >= vp->Y && y <= vp->EndY) {
@@ -462,52 +462,24 @@ Viewport* GetViewport(int x, int y)
 }
 
 /**
-**  Takes coordinates of a map tile and computes the number of the map
-**  viewport (if any) inside which the tile is displayed.
-**
-**  @param tx  x coordinate of the map tile
-**  @param ty  y coordinate of the map tile
-**
-**  @return viewport pointer (index into UI.Viewports) or NULL
-**   if this map tile is not displayed in any of
-**   the viewports.
-**
-**  @note If the tile (tx,ty) is currently displayed in more
-**  than one viewports (may well happen) this function
-**  returns the first one it finds.
-*/
-Viewport* MapTileGetViewport(int tx, int ty)
-{
-	Viewport* vp;
-
-	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-		if (tx >= vp->MapX && tx < vp->MapX + vp->MapWidth &&
-				ty >= vp->MapY && ty < vp->MapY + vp->MapHeight) {
-			return vp;
-		}
-	}
-	return NULL;
-}
-
-/**
 **  Takes an array of new Viewports which are supposed to have their
-**  pixel geometry (Viewport::[XY] and Viewport::End[XY]) already
+**  pixel geometry (CViewport::[XY] and CViewport::End[XY]) already
 **  computed. Using this information as well as old viewport's
-**  parameters fills in new viewports' Viewport::Map* parameters.
+**  parameters fills in new viewports' CViewport::Map* parameters.
 **  Then it replaces the old viewports with the new ones and finishes
 **  the set-up of the new mode.
 **
 **  @param new_vps  The array of the new viewports
 **  @param num_vps  The number of elements in the new_vps[] array.
 */
-static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
+static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 {
 	int i;
 
 	if (UI.NumViewports < num_vps) {
 		//  Compute location of the viewport using oldviewport
 		for (i = 0; i < num_vps; ++i) {
-			const Viewport* vp;
+			const CViewport* vp;
 
 			new_vps[i].MapX = 0;
 			new_vps[i].MapY = 0;
@@ -531,14 +503,14 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 
 	// Affect the old viewport.
 	for (i = 0; i < num_vps; ++i) {
-		Viewport* vp;
+		CViewport* vp;
 
 		vp = UI.Viewports + i;
 		vp->X = new_vps[i].X;
 		vp->EndX = new_vps[i].EndX;
 		vp->Y = new_vps[i].Y;
 		vp->EndY = new_vps[i].EndY;
-		ViewportSetViewpoint(vp, new_vps[i].MapX, new_vps[i].MapY, new_vps[i].OffsetX, new_vps[i].OffsetY);
+		vp->Set(new_vps[i].MapX, new_vps[i].MapY, new_vps[i].OffsetX, new_vps[i].OffsetY);
 	}
 	UI.NumViewports = num_vps;
 
@@ -552,8 +524,8 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 }
 
 /**
-**  Takes a viewport which is supposed to have its Viewport::[XY]
-**  correctly filled-in and computes Viewport::End[XY] attributes
+**  Takes a viewport which is supposed to have its CViewport::[XY]
+**  correctly filled-in and computes CViewport::End[XY] attributes
 **  according to clipping information passed in other two arguments.
 **
 **  @param vp     The viewport.
@@ -567,7 +539,7 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 **  However, they can be smaller according to the place
 **  the viewport vp takes in context of current ViewportMode.
 */
-static void ClipViewport(Viewport* vp, int ClipX, int ClipY)
+static void ClipViewport(CViewport* vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	vp->EndX = vp->X + TheMap.Info.MapWidth * TileSizeX - 1;
@@ -597,7 +569,7 @@ static void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 */
 static void SetViewportModeSingle(void)
 {
-	Viewport new_vps[MAX_NUM_VIEWPORTS];
+	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
 	DebugPrint("Single viewport set\n");
 
@@ -620,7 +592,7 @@ static void SetViewportModeSingle(void)
 */
 static void SetViewportModeSplitHoriz(void)
 {
-	Viewport new_vps[MAX_NUM_VIEWPORTS];
+	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
 	DebugPrint("Two horizontal viewports set\n");
 
@@ -649,7 +621,7 @@ static void SetViewportModeSplitHoriz(void)
 */
 static void SetViewportModeSplitHoriz3(void)
 {
-	Viewport new_vps[MAX_NUM_VIEWPORTS];
+	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
 	DebugPrint("Horizontal 3-way viewport division set\n");
 
@@ -683,7 +655,7 @@ static void SetViewportModeSplitHoriz3(void)
 */
 static void SetViewportModeSplitVert(void)
 {
-	Viewport new_vps[MAX_NUM_VIEWPORTS];
+	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
 	DebugPrint("Two vertical viewports set\n");
 
@@ -712,7 +684,7 @@ static void SetViewportModeSplitVert(void)
 */
 static void SetViewportModeQuad(void)
 {
-	Viewport new_vps[MAX_NUM_VIEWPORTS];
+	CViewport new_vps[MAX_NUM_VIEWPORTS];
 
 	DebugPrint("Four viewports set\n");
 

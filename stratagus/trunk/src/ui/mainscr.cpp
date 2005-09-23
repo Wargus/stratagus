@@ -1130,7 +1130,7 @@ void CenterOnMessage(void)
 	if (MessagesEventCount == 0) {
 		return;
 	}
-	ViewportCenterViewpoint(UI.SelectedViewport,
+	UI.SelectedViewport->Center(
 		MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex],
 		TileSizeX / 2, TileSizeY / 2);
 	SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
