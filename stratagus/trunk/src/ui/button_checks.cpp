@@ -106,15 +106,15 @@ int ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 	CPlayer *player;
 
 	player = unit->Player;
-	buf = (char *)malloc(strlen(button->AllowStr) + 1);
+	buf = new char[strlen(button->AllowStr) + 1];
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (player->HaveUnitTypeByIdent(s)) {
-			free(buf);
+			delete[] buf;
 			return 1;
 		}
 	}
-	free(buf);
+	delete[] buf;
 	return 0;
 }
 
@@ -133,15 +133,15 @@ int ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 	CPlayer *player;
 
 	player = unit->Player;
-	buf = (char *)malloc(strlen(button->AllowStr) + 1);
+	buf = new char[strlen(button->AllowStr) + 1];
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!player->HaveUnitTypeByIdent(s)) {
-			free(buf);
+			delete[] buf;
 			return 0;
 		}
 	}
-	free(buf);
+	delete[] buf;
 	return 1;
 }
 
