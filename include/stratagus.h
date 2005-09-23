@@ -303,9 +303,6 @@ extern void ShowLoadProgress(const char* fmt,...);
 	/// How many resources the player gets back if canceling upgrade
 #define CancelUpgradeCostsFactor   100
 
-	/// How near a depot could be built to a resource
-#define RESOURCE_DISTANCE  3
-
 extern char* CompileOptions;
 //@}
 
