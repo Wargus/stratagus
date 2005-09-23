@@ -52,12 +52,12 @@
 /**
 **  Defines a group of units.
 */
-typedef struct _unit_group_ {
+struct UnitGroup {
 	CUnit **Units;                       /// Units in the group
 	int     NumUnits;                    /// How many units in the group
-} UnitGroup;                             /// group of units
+};                                       /// group of units
 
-UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
+static UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -72,7 +72,7 @@ void InitGroups(void)
 {
 	for (int i = 0; i < NUM_GROUPS; ++i) {
 		if (!Groups[i].Units) {
-			Groups[i].Units = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
+			Groups[i].Units = new CUnit *[MaxSelectable];
 		}
 	}
 }
@@ -108,10 +108,9 @@ void SaveGroups(CFile *file)
 void CleanGroups(void)
 {
 	for (int i = 0; i < NUM_GROUPS; ++i) {
-		if (Groups[i].Units) {
-			free(Groups[i].Units);
-		}
-		memset(&Groups[i], 0, sizeof(Groups[i]));
+		delete[] Groups[i].Units;
+		Groups[i].Units = NULL;
+		Groups[i].NumUnits = 0;
 	}
 }
 
@@ -183,8 +182,8 @@ void AddToGroup(CUnit **units, int nunits, int num)
 		// or enemy units and my units. Exceptions is when there is only
 		// one unit in the group, then we can group a buildings.
 		if (PlayersTeamed(ThisPlayer->Index, units[i]->Player->Index) &&
-			(units[i]->Type->SelectableByRectangle ||
-			 (nunits == 1 && group->NumUnits == 0))) {
+				(units[i]->Type->SelectableByRectangle ||
+					(nunits == 1 && group->NumUnits == 0))) {
 			group->Units[group->NumUnits++] = units[i];
 			units[i]->GroupId |= (1 << num);
 		}
@@ -261,7 +260,7 @@ static int CclGroup(lua_State *l)
 	i = 0;
 	args = luaL_getn(l, 3);
 	for (j = 0; j < args; ++j) {
-		const char* str;
+		const char *str;
 
 		lua_rawgeti(l, 3, j + 1);
 		str = LuaToString(l, -1);
