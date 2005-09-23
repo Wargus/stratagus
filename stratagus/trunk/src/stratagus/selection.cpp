@@ -1109,17 +1109,15 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 */
 void InitSelections(void)
 {
-	int i;
-
 	// This could have been initialized already when loading a game
 	if (!Selected) {
-		Selected = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
-		_Selected = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
+		Selected = new CUnit *[MaxSelectable];
+		_Selected = new CUnit *[MaxSelectable];
 	}
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (!TeamSelected[i]) {
-			TeamSelected[i] = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
-			_TeamSelected[i] = (CUnit **)malloc(MaxSelectable * sizeof(CUnit *));
+			TeamSelected[i] = new CUnit *[MaxSelectable];
+			_TeamSelected[i] = new CUnit *[MaxSelectable];
 		}
 	}
 }
@@ -1131,16 +1129,13 @@ void InitSelections(void)
 */
 void SaveSelections(CFile *file)
 {
-	int i;
-	char *ref;
-
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: selection $Id$\n\n");
 
 	file->printf("SetGroupId(%d)\n", GroupId);
 	file->printf("Selection(%d, {", NumSelected);
-	for (i = 0; i < NumSelected; ++i) {
-		ref = UnitReference(Selected[i]);
+	for (int i = 0; i < NumSelected; ++i) {
+		char *ref = UnitReference(Selected[i]);
 		file->printf("\"%s\", ", ref);
 		free(ref);
 	}
@@ -1152,23 +1147,21 @@ void SaveSelections(CFile *file)
 */
 void CleanSelections(void)
 {
-	int i;
-
 	GroupId = 0;
 	NumSelected = 0;
-	free(Selected);
-	free(_Selected);
+	delete[] Selected;
 	Selected = NULL;
+	delete[] _Selected;
 	_Selected = NULL;
 
-	for (i = 0; i < PlayerMax; ++i) {
-		free(TeamSelected[i]);
-		free(_TeamSelected[i]);
+	for (int i = 0; i < PlayerMax; ++i) {
+		delete[] TeamSelected[i];
+		TeamSelected[i] = NULL;
+		delete[] _TeamSelected[i];
+		_TeamSelected[i] = NULL;
+		TeamNumSelected[i] = 0;
+		_TeamNumSelected[i] = 0;
 	}
-	memset(TeamSelected, 0, PlayerMax * sizeof(*TeamSelected));
-	memset(_TeamSelected, 0, PlayerMax * sizeof(*_TeamSelected));
-	memset(TeamNumSelected, 0, PlayerMax * sizeof(*TeamNumSelected));
-	memset(_TeamNumSelected, 0, PlayerMax * sizeof(*_TeamNumSelected));
 }
 
 // ----------------------------------------------------------------------------
