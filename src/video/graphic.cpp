@@ -610,7 +610,7 @@ void FreeGraphic(Graphic *g)
 #ifdef USE_OPENGL
 	int i;
 #endif
-	void *pixels;
+	unsigned char *pixels;
 
 	if (!g) {
 		return;
@@ -637,7 +637,7 @@ void FreeGraphic(Graphic *g)
 
 		if (g->Surface) {
 			if (g->Surface->flags & SDL_PREALLOC) {
-				pixels = g->Surface->pixels;
+				pixels = (unsigned char *)g->Surface->pixels;
 			} else {
 				pixels = NULL;
 			}
@@ -647,7 +647,7 @@ void FreeGraphic(Graphic *g)
 #ifndef USE_OPENGL
 		if (g->SurfaceFlip) {
 			if (g->SurfaceFlip->flags & SDL_PREALLOC) {
-				pixels = g->SurfaceFlip->pixels;
+				pixels = (unsigned char *)g->SurfaceFlip->pixels;
 			} else {
 				pixels = NULL;
 			}
