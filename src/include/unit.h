@@ -374,6 +374,7 @@ struct _upgrade_;
 struct _building_restrictions_;
 class CFile;
 struct lua_State;
+class CViewport;
 
 /**
 **  Unit references over network, or for memory saving.
@@ -672,7 +673,7 @@ public:
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
 	bool IsVisibleOnMinimap() const;
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
-	bool IsVisibleInViewport(const Viewport *vp) const;
+	bool IsVisibleInViewport(const CViewport *vp) const;
 	/// Returns true, if unit is visible on current map view (any viewport).
 	bool IsVisibleOnScreen() const;
 
@@ -756,7 +757,7 @@ extern int XpDamage;                    /// unit XP adds more damage to attacks
 extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled
-extern const Viewport* CurrentViewport; /// CurrentViewport
+extern const CViewport* CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const CUnit *);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
 extern int MaxSelectable;                  /// How many units could be selected
@@ -932,7 +933,7 @@ extern void DrawShadow(const CUnit *unit, const CUnitType *type,
 	/// Draw A single Unit
 extern void DrawUnit(const CUnit *unit);
 	/// Draw all units visible on map in viewport
-extern int FindAndSortUnits(const Viewport *vp, CUnit **table);
+extern int FindAndSortUnits(const CViewport *vp, CUnit **table);
 	/// Show an unit's orders.
 extern void ShowOrder(const CUnit *unit);
 

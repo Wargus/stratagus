@@ -508,7 +508,7 @@ static void GetMissileMapArea(const Missile *missile, int *sx, int *sy,
 **
 **  @return         Returns true if visible, false otherwise.
 */
-static int MissileVisibleInViewport(const Viewport *vp, const Missile *missile)
+static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 {
 	int min_x;
 	int max_x;
@@ -518,7 +518,7 @@ static int MissileVisibleInViewport(const Viewport *vp, const Missile *missile)
 	int y;
 
 	GetMissileMapArea(missile, &min_x, &min_y, &max_x, &max_y);
-	if (!AnyMapAreaVisibleInViewport(vp, min_x, min_y, max_x, max_y)) {
+	if (!vp->AnyMapAreaVisibleInViewport(min_x, min_y, max_x, max_y)) {
 		return 0;
 	}
 
@@ -588,7 +588,7 @@ void Missile::DrawMissile() const
 {
 	int x;
 	int y;
-	const Viewport *vp;
+	const CViewport *vp;
 
 	Assert(this->Type);
 	Assert(CurrentViewport);
@@ -643,7 +643,7 @@ static int MissileDrawLevelCompare(const void *v1, const void *v2)
 **
 **  @return       number of missiles, (size of table).
 */
-int FindAndSortMissiles(const Viewport *vp, Missile **table)
+int FindAndSortMissiles(const CViewport *vp, Missile **table)
 {
 	int nmissiles;
 	std::vector<Missile *>::const_iterator i;

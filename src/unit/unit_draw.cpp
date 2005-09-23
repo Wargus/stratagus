@@ -140,7 +140,7 @@ DrawDecoFunc DrawStaticSprite;
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
-const Viewport *CurrentViewport;  /// FIXME: quick hack for split screen
+const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -196,10 +196,10 @@ void DrawUnitSelection(const CUnit *unit)
 		return;
 	}
 
-	x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
+	x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
 		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
 		(type->Width - type->Sprite->Width) / 2;
-	y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
+	y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
 		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
 		(type->Height - type->Sprite->Height) / 2;
 	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
@@ -1070,21 +1070,21 @@ static void GetOrderPosition(const CUnit *unit, const Order *order, int *x, int 
 	// FIXME: n0body: Check for goal gone?
 	if ((goal = order->Goal) && (!goal->Removed)) {
 		// Order has a goal, get it's location.
-		*x = Map2ViewportX(CurrentViewport, goal->X) + goal->IX +
+		*x = CurrentViewport->Map2ViewportX(goal->X) + goal->IX +
 			goal->Type->TileWidth * TileSizeX / 2;
-		*y = Map2ViewportY(CurrentViewport, goal->Y) + goal->IY +
+		*y = CurrentViewport->Map2ViewportY(goal->Y) + goal->IY +
 			goal->Type->TileHeight * TileSizeY / 2;
 	} else {
 		if (order->X >= 0 && order->Y >= 0) {
 			// Order is for a location, show that.
-			*x = Map2ViewportX(CurrentViewport, order->X) + TileSizeX / 2;
-			*y = Map2ViewportY(CurrentViewport, order->Y) + TileSizeY / 2;
+			*x = CurrentViewport->Map2ViewportX(order->X) + TileSizeX / 2;
+			*y = CurrentViewport->Map2ViewportY(order->Y) + TileSizeY / 2;
 		} else {
 			// Some orders ignore x,y (like StandStill).
 			// Use the unit's position instead.
-			*x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
+			*x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
 				unit->Type->TileWidth * TileSizeX / 2;
-			*y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
+			*y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
 				unit->Type->TileHeight * TileSizeY / 2;
 		}
 		if (order->Action == UnitActionBuild) {
@@ -1135,9 +1135,9 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const Order *orde
 		case UnitActionPatrol:
 			Video.DrawLineClip(ColorGreen, x1, y1, x2, y2);
 			e_color = color = ColorBlue;
-			x1 = Map2ViewportX(CurrentViewport,
+			x1 = CurrentViewport->Map2ViewportX(
 				order->Arg1.Patrol.X) + TileSizeX / 2;
-			y1 = Map2ViewportY(CurrentViewport,
+			y1 = CurrentViewport->Map2ViewportY(
 				order->Arg1.Patrol.Y) + TileSizeY / 2;
 			dest = 1;
 			break;
@@ -1148,8 +1148,8 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const Order *orde
 			break;
 
 		case UnitActionAttackGround:
-			x2 = Map2ViewportX(CurrentViewport, order->X) + TileSizeX / 2;
-			y2 = Map2ViewportY(CurrentViewport, order->Y) + TileSizeY / 2;
+			x2 = CurrentViewport->Map2ViewportX(order->X) + TileSizeX / 2;
+			y2 = CurrentViewport->Map2ViewportY(order->Y) + TileSizeY / 2;
 			// FALL THROUGH
 		case UnitActionAttack:
 			if (unit->SubAction & 2) { // Show weak targets.
@@ -1242,9 +1242,9 @@ void ShowOrder(const CUnit *unit)
 		return;
 	}
 
-	x1 = Map2ViewportX(CurrentViewport,
+	x1 = CurrentViewport->Map2ViewportX(
 		unit->X) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
-	y1 = Map2ViewportY(CurrentViewport,
+	y1 = CurrentViewport->Map2ViewportY(
 		unit->Y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
 
 	ShowSingleOrder(unit, x1, y1, unit->Orders);
@@ -1524,8 +1524,8 @@ void DrawUnit(const CUnit *unit)
 		frame = unit->Frame;
 		y = unit->IY;
 		x = unit->IX;
-		x += Map2ViewportX(CurrentViewport, unit->X);
-		y += Map2ViewportY(CurrentViewport, unit->Y);
+		x += CurrentViewport->Map2ViewportX(unit->X);
+		y += CurrentViewport->Map2ViewportY(unit->Y);
 		state = (unit->Orders[0].Action == UnitActionBuilt) |
 			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 		constructed = unit->Constructed;
@@ -1538,8 +1538,8 @@ void DrawUnit(const CUnit *unit)
 	} else {
 		y = unit->Seen.IY;
 		x = unit->Seen.IX;
-		x += Map2ViewportX(CurrentViewport, unit->Seen.X);
-		y += Map2ViewportY(CurrentViewport, unit->Seen.Y);
+		x += CurrentViewport->Map2ViewportX(unit->Seen.X);
+		y += CurrentViewport->Map2ViewportY(unit->Seen.Y);
 		frame = unit->Seen.Frame;
 		type = unit->Seen.Type;
 		constructed = unit->Seen.Constructed;
@@ -1663,7 +1663,7 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 **  @param table  Table of units to return in sorted order 
 **
 */
-int FindAndSortUnits(const Viewport *vp, CUnit **table)
+int FindAndSortUnits(const CViewport *vp, CUnit **table)
 {
 	int i;
 	int n;

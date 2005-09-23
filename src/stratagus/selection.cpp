@@ -384,7 +384,7 @@ int SelectUnitsByType(CUnit *base)
 	const CUnitType *type;
 	int r;
 	int i;
-	const Viewport *vp;
+	const CViewport *vp;
 
 	Assert(UI.MouseViewport);
 

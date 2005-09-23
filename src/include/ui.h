@@ -127,18 +127,13 @@ typedef struct _button_ {
 
 #define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
 
-#if !defined(__STRUCT_VIEWPORT__)
-#define __STRUCT_VIEWPORT__         /// protect duplicate viewport typedef
-typedef struct _viewport_ Viewport; /// Viewport typedef
-#endif
-
 /**
 **  A map viewport.
 **
 **  A part of the map displayed on sceen.
 **
-**  Viewport::X Viewport::Y
-**  Viewport::EndX Viewport::EndY
+**  CViewport::X CViewport::Y
+**  CViewport::EndX CViewport::EndY
 **
 **    upper left corner of this viewport is located at pixel
 **    coordinates (X, Y) with respect to upper left corner of
@@ -146,19 +141,46 @@ typedef struct _viewport_ Viewport; /// Viewport typedef
 **    viewport is (EndX, EndY) pixels away from the UL corner of
 **    stratagus's window.
 **
-**  Viewport::MapX Viewport::MapY
-**  Viewport::MapWidth Viewport::MapHeight
+**  CViewport::MapX CViewport::MapY
+**  CViewport::MapWidth CViewport::MapHeight
 **
 **    Tile coordinates of UL corner of this viewport with respect to
 **    UL corner of the whole map.
 **
-**  Viewport::Unit
+**  CViewport::Unit
 **
 **    Viewport is bound to an unit. If the unit moves the viewport
 **    changes the position together with the unit.
 **    @todo binding to a group.
 */
-struct _viewport_ {
+class CViewport {
+public:
+	CViewport() : Unit(NULL) {};
+
+	/// Convert screen X pixel to map tile
+	int Viewport2MapX(int x) const;
+	/// Convert screen Y pixel to map tile
+	int Viewport2MapY(int y) const;
+	/// Convert map tile to screen X pixel
+	int Map2ViewportX(int x) const;
+	/// Convert map tile to screen Y pixel
+	int Map2ViewportY(int y) const;
+
+	/// Set the current map view to x,y(upper,left corner)
+	void Set(int x, int y, int offsetx, int offsety);
+	/// Center map on point in viewport
+	void Center(int x, int y, int offsetx, int offsety);
+protected:
+	/// Draw the map background
+	void DrawMapBackgroundInViewport() const;
+	/// Draw the map fog of war
+	void DrawMapFogOfWar() const;
+public:
+	/// Draw the full Viewport.
+	void Draw() const;
+	/// Check if any part of an area is visible in viewport
+	int AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const;
+
 	int X;                      /// Screen pixel left corner x coordinate
 	int Y;                      /// Screen pixel upper corner y coordinate
 	int EndX;                   /// Screen pixel right x coordinate
@@ -431,12 +453,12 @@ public:
 
 	// Map area
 	ViewportModeType ViewportMode;      /// Current viewport mode
-	Viewport*    MouseViewport;         /// Viewport containing mouse
-	Viewport*    SelectedViewport;      /// Current selected active viewport
+	CViewport*    MouseViewport;        /// Viewport containing mouse
+	CViewport*    SelectedViewport;     /// Current selected active viewport
 	int          NumViewports;          /// # Viewports currently used
-	Viewport     Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
+	CViewport     Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	// Map* attributes of Viewport are unused here:
-	Viewport     MapArea;               /// geometry of the whole map area
+	CViewport     MapArea;               /// geometry of the whole map area
 
 	/// Menu buttons
 	Button MenuButton;                  /// menu button
@@ -550,27 +572,11 @@ extern void RestrictCursorToViewport(void);
 extern void RestrictCursorToMinimap(void);
 
 	/// Get viewport for screen pixel position
-extern Viewport* GetViewport(int x, int y);
-	/// Get viewport for tile map position
-extern Viewport* MapTileGetViewport(int, int);
+extern CViewport* GetViewport(int x, int y);
 	/// Cycle through all available viewport modes
 extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
-
-	/// Convert screen X pixel to map tile
-extern int Viewport2MapX(const Viewport* vp, int x);
-	/// Convert screen Y pixel to map tile
-extern int Viewport2MapY(const Viewport* vp, int y);
-	/// Convert map tile to screen X pixel
-extern int Map2ViewportX(const Viewport* vp, int x);
-	/// Convert map tile to screen Y pixel
-extern int Map2ViewportY(const Viewport* vp, int y);
-
-	/// Set the current map view to x,y(upper,left corner)
-extern void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety);
-	/// Center map on point in viewport
-extern void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety);
 
 extern FDrawData DrawSimpleText;
 extern FDrawData DrawFormattedText;

@@ -628,10 +628,8 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 /**
 **  Draw the map fog of war.
-**
-**  @param vp  Viewport pointer.
 */
-void DrawMapFogOfWar(Viewport *vp)
+void CViewport::DrawMapFogOfWar() const
 {
 	int sx;
 	int sy;
@@ -649,19 +647,19 @@ void DrawMapFogOfWar(Viewport *vp)
 	}
 	p = ThisPlayer->Index;
 
-	sx = vp->MapX - 1;
+	sx = this->MapX - 1;
 	if (sx < 0) {
 		sx = 0;
 	}
-	ex = vp->MapX + vp->MapWidth + 1;
+	ex = this->MapX + this->MapWidth + 1;
 	if (ex > TheMap.Info.MapWidth) {
 		ex = TheMap.Info.MapWidth;
 	}
-	my = vp->MapY - 1;
+	my = this->MapY - 1;
 	if (my < 0) {
 		my = 0;
 	}
-	ey = vp->MapY + vp->MapHeight + 1;
+	ey = this->MapY + this->MapHeight + 1;
 	if (ey > TheMap.Info.MapHeight) {
 		ey = TheMap.Info.MapHeight;
 	}
@@ -672,17 +670,17 @@ void DrawMapFogOfWar(Viewport *vp)
 			VisibleTable[my * TheMap.Info.MapWidth + mx] = IsTileVisible(ThisPlayer, mx, my);
 		}
 	}
-	ex = vp->EndX;
-	sy = vp->MapY * TheMap.Info.MapWidth;
-	dy = vp->Y - vp->OffsetY;
-	ey = vp->EndY;
+	ex = this->EndX;
+	sy = this->MapY * TheMap.Info.MapWidth;
+	dy = this->Y - this->OffsetY;
+	ey = this->EndY;
 
 	while (dy <= ey) {
-		sx = vp->MapX + sy;
-		dx = vp->X - vp->OffsetX;
+		sx = this->MapX + sy;
+		dx = this->X - this->OffsetX;
 		while (dx <= ex) {
-			mx = (dx - vp->X + vp->OffsetX) / TileSizeX + vp->MapX;
-			my = (dy - vp->Y + vp->OffsetY) / TileSizeY + vp->MapY;
+			mx = (dx - this->X + this->OffsetX) / TileSizeX + this->MapX;
+			my = (dy - this->Y + this->OffsetY) / TileSizeY + this->MapY;
 			if (VisibleTable[my * TheMap.Info.MapWidth + mx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {

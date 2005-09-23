@@ -843,10 +843,10 @@ static void DrawMapCursor(void)
 	// Draw map cursor
 	//
 	if (UI.MouseViewport && !CursorBuilding) {
-		x = Viewport2MapX(UI.MouseViewport, CursorX);
-		y = Viewport2MapY(UI.MouseViewport, CursorY);
-		x = Map2ViewportX(UI.MouseViewport, x);
-		y = Map2ViewportY(UI.MouseViewport, y);
+		x = UI.MouseViewport->Viewport2MapX(CursorX);
+		y = UI.MouseViewport->Viewport2MapY(CursorY);
+		x = UI.MouseViewport->Map2ViewportX(x);
+		y = UI.MouseViewport->Map2ViewportY(y);
 		if (EditorState == EditorEditTile) {
 			int i;
 			int j;
@@ -907,8 +907,8 @@ static void DrawStartLocations(void)
 
 	for (i = 0; i < PlayerMax; i++) {
 		if (TheMap.Info.PlayerType[i] != PlayerNobody && TheMap.Info.PlayerType[i] != PlayerNeutral) {
-			x = Map2ViewportX(CurrentViewport, Players[i].StartX);
-			y = Map2ViewportY(CurrentViewport, Players[i].StartY);
+			x = CurrentViewport->Map2ViewportX(Players[i].StartX);
+			y = CurrentViewport->Map2ViewportY(Players[i].StartY);
 			if (type) {
 				DrawUnitType(type, type->Sprite, i, 0, x, y);
 			} else {
@@ -1135,7 +1135,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	//
 	if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			ViewportSetViewpoint(UI.SelectedViewport,
+			UI.SelectedViewport->Set(
 				UI.Minimap.Screen2MapX(CursorX) -
 					UI.SelectedViewport->MapWidth / 2,
 				UI.Minimap.Screen2MapY(CursorY) -
@@ -1320,7 +1320,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on map area
 	//
 	if (CursorOn == CursorOnMap) {
-		Viewport* vp;
+		CViewport* vp;
 
 		vp = GetViewport(CursorX, CursorY);
 		Assert(vp);
@@ -1331,19 +1331,19 @@ static void EditorCallbackButtonDown(unsigned button)
 
 		if (MouseButtons & LeftButton) {
 			if (EditorState == EditorEditTile) {
-				EditTiles(Viewport2MapX(UI.MouseViewport, CursorX),
-					Viewport2MapY(UI.MouseViewport, CursorY), TileCursor,
+				EditTiles(UI.MouseViewport->Viewport2MapX(CursorX),
+					UI.MouseViewport->Viewport2MapY(CursorY), TileCursor,
 					TileCursorSize);
 			}
 			if (!UnitPlacedThisPress) {
 				if (EditorState == EditorEditUnit && CursorBuilding) {
 					if (CanBuildUnitType(NULL, CursorBuilding,
-							Viewport2MapX(UI.MouseViewport, CursorX),
-							Viewport2MapY(UI.MouseViewport, CursorY), 1)) {
+							UI.MouseViewport->Viewport2MapX(CursorX),
+							UI.MouseViewport->Viewport2MapY(CursorY), 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess.Sound,
 							MaxSampleVolume);
-						EditUnit(Viewport2MapX(UI.MouseViewport,CursorX),
-							Viewport2MapY(UI.MouseViewport, CursorY),
+						EditUnit(UI.MouseViewport->Viewport2MapX(CursorX),
+							UI.MouseViewport->Viewport2MapY(CursorY),
 							CursorBuilding, Players + SelectedPlayer);
 						UnitPlacedThisPress = 1;
 						UI.StatusLine.Clear();
@@ -1355,8 +1355,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				}
 			}
 			if (EditorState == EditorSetStartLocation) {
-				Players[SelectedPlayer].StartX = Viewport2MapX(UI.MouseViewport, CursorX);
-				Players[SelectedPlayer].StartY = Viewport2MapY(UI.MouseViewport, CursorY);
+				Players[SelectedPlayer].StartX = UI.MouseViewport->Viewport2MapX(CursorX);
+				Players[SelectedPlayer].StartY = UI.MouseViewport->Viewport2MapY(CursorY);
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1577,15 +1577,15 @@ static void EditorCallbackMouse(int x, int y)
 		}
 		UI.MouseWarpX = CursorStartX;
 		UI.MouseWarpY = CursorStartY;
-		ViewportSetViewpoint(UI.MouseViewport, xo, yo, TileSizeX / 2, TileSizeY / 2);
+		UI.MouseViewport->Set(xo, yo, TileSizeX / 2, TileSizeY / 2);
 		return;
 	}
 
 	// Automatically unpress when map tile has changed
-	if (LastMapX != Viewport2MapX(UI.SelectedViewport, CursorX) ||
-		LastMapY != Viewport2MapY(UI.SelectedViewport, CursorY)) {
-		LastMapX = Viewport2MapX(UI.SelectedViewport, CursorX);
-		LastMapY = Viewport2MapY(UI.SelectedViewport, CursorY);
+	if (LastMapX != UI.SelectedViewport->Viewport2MapX(CursorX) ||
+		LastMapY != UI.SelectedViewport->Viewport2MapY(CursorY)) {
+		LastMapX = UI.SelectedViewport->Viewport2MapX(CursorX);
+		LastMapY = UI.SelectedViewport->Viewport2MapY(CursorY);
 		UnitPlacedThisPress = 0;
 	}
 	//
@@ -1599,21 +1599,21 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		if (!(FrameCounter % SpeedMouseScroll)) {
 			if (CursorX <= UI.SelectedViewport->X) {
-				ViewportSetViewpoint(UI.SelectedViewport,
+				UI.SelectedViewport->Set(
 					UI.SelectedViewport->MapX - 1,
 					UI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
 			} else if (CursorX >= UI.SelectedViewport->EndX) {
-				ViewportSetViewpoint(UI.SelectedViewport,
+				UI.SelectedViewport->Set(
 					UI.SelectedViewport->MapX + 1,
 					UI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
 			}
 
 			if (CursorY <= UI.SelectedViewport->Y) {
-				ViewportSetViewpoint(UI.SelectedViewport,
+				UI.SelectedViewport->Set(
 					UI.SelectedViewport->MapX,
 					UI.SelectedViewport->MapY - 1, TileSizeX / 2, TileSizeY / 2);
 			} else if (CursorY >= UI.SelectedViewport->EndY) {
-				ViewportSetViewpoint(UI.SelectedViewport,
+				UI.SelectedViewport->Set(
 					UI.SelectedViewport->MapX,
 					UI.SelectedViewport->MapY + 1, TileSizeX / 2, TileSizeY / 2);
 
@@ -1626,16 +1626,16 @@ static void EditorCallbackMouse(int x, int y)
 		RestrictCursorToViewport();
 
 		if (EditorState == EditorEditTile) {
-			EditTiles(Viewport2MapX(UI.SelectedViewport, CursorX),
-				Viewport2MapY(UI.SelectedViewport, CursorY), TileCursor,
+			EditTiles(UI.SelectedViewport->Viewport2MapX(CursorX),
+				UI.SelectedViewport->Viewport2MapY(CursorY), TileCursor,
 				TileCursorSize);
 		} else if (EditorState == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, CursorBuilding,
-					Viewport2MapX(UI.SelectedViewport, CursorX),
-					Viewport2MapY(UI.SelectedViewport, CursorY), 1)) {
-					EditUnit(Viewport2MapX(UI.SelectedViewport, CursorX),
-						Viewport2MapY(UI.SelectedViewport, CursorY),
+					UI.SelectedViewport->Viewport2MapX(CursorX),
+					UI.SelectedViewport->Viewport2MapY(CursorY), 1)) {
+					EditUnit(UI.SelectedViewport->Viewport2MapX(CursorX),
+						UI.SelectedViewport->Viewport2MapY(CursorY),
 						CursorBuilding, Players + SelectedPlayer);
 					UnitPlacedThisPress = 1;
 					UI.StatusLine.Clear();
@@ -1651,7 +1651,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
-		ViewportSetViewpoint(UI.SelectedViewport,
+		UI.SelectedViewport->Set(
 			UI.Minimap.Screen2MapX(CursorX)
 				- UI.SelectedViewport->MapWidth / 2,
 			UI.Minimap.Screen2MapY(CursorY)
@@ -1859,7 +1859,7 @@ static void EditorCallbackMouse(int x, int y)
 	UnitUnderCursor = NULL;
 	if (x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
 			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		Viewport* vp;
+		CViewport* vp;
 
 		vp = GetViewport(x, y);
 		Assert(vp);

@@ -613,7 +613,7 @@ static void HandleMouseOn(int x, int y)
 	//
 	if (!on_ui && x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
 			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		Viewport* vp;
+		CViewport* vp;
 
 		vp = GetViewport(x, y);
 		Assert(vp);
@@ -760,7 +760,7 @@ void UIHandleMouseMove(int x, int y)
 
 		UI.MouseWarpX = CursorStartX;
 		UI.MouseWarpY = CursorStartY;
-		ViewportSetViewpoint(UI.MouseViewport, xo, yo, 0, 0);
+		UI.MouseViewport->Set(xo, yo, 0, 0);
 		return;
 	}
 
@@ -791,7 +791,7 @@ void UIHandleMouseMove(int x, int y)
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap &&
 			(MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
-		ViewportCenterViewpoint(UI.SelectedViewport,
+		UI.SelectedViewport->Center(
 			UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
 			TileSizeX / 2, TileSizeY / 2);
 		return;
@@ -807,11 +807,11 @@ void UIHandleMouseMove(int x, int y)
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
 	if (CursorOn == CursorOnMap) {
-		const Viewport* vp;
+		const CViewport* vp;
 
 		vp = UI.MouseViewport;
-		if (IsMapFieldExplored(ThisPlayer, Viewport2MapX(vp, x),
-				Viewport2MapY(vp, y)) || ReplayRevealMap) {
+		if (IsMapFieldExplored(ThisPlayer, vp->Viewport2MapX(x),
+				vp->Viewport2MapY(y)) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
@@ -846,7 +846,7 @@ void UIHandleMouseMove(int x, int y)
 				//
 				//  Minimap move viewpoint
 				//
-				ViewportCenterViewpoint(UI.SelectedViewport,
+				UI.SelectedViewport->Center(
 					UI.Minimap.Screen2MapX(CursorX),
 					UI.Minimap.Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 			}
@@ -874,7 +874,7 @@ void UIHandleMouseMove(int x, int y)
 		//
 		//  Minimap move viewpoint
 		//
-		ViewportCenterViewpoint(UI.SelectedViewport,
+		UI.SelectedViewport->Center(
 			UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
 			TileSizeX / 2, TileSizeY / 2);
 		CursorStartX = CursorX;
@@ -1347,7 +1347,7 @@ static void UISelectStateButtonDown(unsigned button)
 		UI.ButtonPanel.Update();
 
 		if (MouseButtons & LeftButton) {
-			const Viewport* vp;
+			const CViewport* vp;
 
 			vp = UI.MouseViewport;
 			if (ClickMissile) {
@@ -1390,7 +1390,7 @@ static void UISelectStateButtonDown(unsigned button)
 			}
 			SendCommand(sx, sy);
 		} else {
-			ViewportCenterViewpoint(UI.SelectedViewport, mx, my, TileSizeX / 2, TileSizeY / 2);
+			UI.SelectedViewport->Center(mx, my, TileSizeX / 2, TileSizeY / 2);
 		}
 		return;
 	}
@@ -1502,8 +1502,8 @@ void UIHandleButtonDown(unsigned button)
 				int j;
 				int explored;
 
-				x = Viewport2MapX(UI.MouseViewport, CursorX);
-				y = Viewport2MapY(UI.MouseViewport, CursorY);
+				x = UI.MouseViewport->Viewport2MapX(CursorX);
+				y = UI.MouseViewport->Viewport2MapY(CursorY);
 				// FIXME: error messages
 
 				explored = 1;
@@ -1567,8 +1567,8 @@ void UIHandleButtonDown(unsigned button)
 				int x;
 				int y;
 
-				x = Viewport2MapX(UI.MouseViewport, CursorX);
-				y = Viewport2MapY(UI.MouseViewport, CursorY);
+				x = UI.MouseViewport->Viewport2MapX(CursorX);
+				y = UI.MouseViewport->Viewport2MapY(CursorY);
 
 				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y)) &&
 						!UnitUnderCursor->Type->Decoration) {
@@ -1590,7 +1590,7 @@ void UIHandleButtonDown(unsigned button)
 	//
 	} else if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			ViewportCenterViewpoint(UI.SelectedViewport,
+			UI.SelectedViewport->Center(
 				UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
 				TileSizeX / 2, TileSizeY / 2);
 		} else if (MouseButtons & RightButton) {
@@ -1638,7 +1638,7 @@ void UIHandleButtonDown(unsigned button)
 				//
 				if (ButtonUnderCursor == 0 && NumSelected == 1) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					ViewportCenterViewpoint(UI.SelectedViewport, Selected[0]->X,
+					UI.SelectedViewport->Center(Selected[0]->X,
 						Selected[0]->Y, Selected[0]->IX + TileSizeX / 2,
 						Selected[0]->IY + TileSizeY / 2);
 				}
@@ -1854,8 +1854,8 @@ void UIHandleButtonUp(unsigned button)
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
 			if (IsMapFieldVisible(ThisPlayer,
-					Viewport2MapX(UI.MouseViewport, CursorX),
-					Viewport2MapY(UI.MouseViewport, CursorY)) || ReplayRevealMap) {
+					UI.MouseViewport->Viewport2MapX(CursorX),
+					UI.MouseViewport->Viewport2MapY(CursorY)) || ReplayRevealMap) {
 				unit = UnitOnScreen(unit,
 					CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
 					CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
@@ -1974,7 +1974,7 @@ void DrawPieMenu(void)
 {
 	int i;
 	const ButtonAction *buttons;
-	Viewport* vp;
+	CViewport* vp;
 	CPlayer *player;
 	char buf[2] = "?";
 
