@@ -53,26 +53,26 @@
 /**
 **  Private wav data structure to handle wav streaming.
 */
-typedef struct _wav_data_ {
-	CFile* WavFile;      /// Wav file handle
+struct WavData {
+	CFile *WavFile;       /// Wav file handle
 	int ChunkRem;         /// Bytes remaining in chunk
-} WavData;
+};
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int WavStreamRead(Sample* sample, void* buf, int len)
+static int WavStreamRead(Sample *sample, void *buf, int len)
 {
-	WavData* data;
+	WavData *data;
 	WavChunk chunk;
-	unsigned char* sndbuf;
+	unsigned char *sndbuf;
 	int comp; // number of compressed bytes actually read
 	int i;
 	int read;
 	int bufrem;
 
-	data = (WavData*)sample->User;
+	data = (WavData *)sample->User;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -116,7 +116,7 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 
 		read >>= 1;
 		for (i = 0; i < read; ++i) {
-			((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
+			((unsigned short *)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
 		}
 
 		sample->Len += comp;
@@ -133,16 +133,16 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 	return len;
 }
 
-static void WavStreamFree(Sample* sample)
+static void WavStreamFree(Sample *sample)
 {
-	WavData* data;
+	WavData *data;
 
-	data = (WavData*)sample->User;
+	data = (WavData *)sample->User;
 
 	data->WavFile->close();
 	delete data->WavFile;
-	free(data);
-	free(sample);
+	delete data;
+	delete sample;
 }
 
 /**
@@ -153,7 +153,7 @@ static const SampleType WavStreamSampleType = {
 	WavStreamFree,
 };
 
-static int WavRead(Sample* sample, void* buf, int len)
+static int WavRead(Sample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -166,11 +166,11 @@ static int WavRead(Sample* sample, void* buf, int len)
 	return len;
 }
 
-static void WavFree(Sample* sample)
+static void WavFree(Sample *sample)
 {
-	free(sample->User);
-	free(sample->Buffer);
-	free(sample);
+	delete (WavData *)sample->User;
+	delete[] sample->Buffer;
+	delete sample;
 }
 
 /**
@@ -192,10 +192,10 @@ static const SampleType WavSampleType = {
 **
 **  @todo         Add ADPCM loading support!
 */
-Sample* LoadWav(const char* name, int flags)
+Sample *LoadWav(const char *name, int flags)
 {
-	Sample* sample;
-	WavData* data;
+	Sample *sample;
+	WavData *data;
 	CFile *f;
 	WavChunk chunk;
 	WavFMT wavfmt;
@@ -293,13 +293,13 @@ Sample* LoadWav(const char* name, int flags)
 	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 ||
 		wavfmt.Frequency == 11025);
 
-	data = (WavData*)malloc(sizeof(WavData));
+	data = new WavData;
 	data->WavFile = f;
 
 	//
 	//  Read sample
 	//
-	sample = (Sample*)malloc(sizeof(Sample));
+	sample = new Sample;
 	sample->Channels = wavfmt.Channels;
 	sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
 	sample->Frequency = wavfmt.Frequency;
@@ -310,7 +310,7 @@ Sample* LoadWav(const char* name, int flags)
 
 	if (flags & PlayAudioStream) {
 		data->ChunkRem = 0;
-		sample->Buffer = (unsigned char*)malloc(SOUND_BUFFER_SIZE);
+		sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
 		sample->Type = &WavStreamSampleType;
 	} else {
 		int comp; // number of compressed bytes actually read
@@ -352,8 +352,11 @@ Sample* LoadWav(const char* name, int flags)
 			}
 			rem -= read;
 
-			sample->Buffer = (unsigned char*)realloc(sample->Buffer, sample->Len + read);
-			Assert(sample->Buffer);
+			unsigned char *b = new unsigned char[sample->Len + read];
+			Assert(b);
+			memcpy(b, sample->Buffer, sample->Len);
+			delete[] sample->Buffer;
+			sample->Buffer = b;
 
 			comp = data->WavFile->read(sndbuf, read);
 			Assert(comp == read);
@@ -361,7 +364,8 @@ Sample* LoadWav(const char* name, int flags)
 			if (sample->SampleSize == 16) {
 				read >>= 1;
 				for (i = 0; i < read; ++i) {
-					((unsigned short*)(sample->Buffer + sample->Pos + sample->Len))[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
+					((unsigned short*)(sample->Buffer + sample->Pos + sample->Len))[i] =
+						ConvertLE16(((unsigned short*)sndbuf)[i]);
 				}
 			} else {
 				memcpy((sample->Buffer + sample->Pos + sample->Len), sndbuf, comp);
