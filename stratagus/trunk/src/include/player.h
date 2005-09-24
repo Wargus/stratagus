@@ -291,7 +291,7 @@
 
 class CUnit;
 class CUnitType;
-struct _player_ai_;
+class PlayerAi;
 class CFile;
 
 /*----------------------------------------------------------------------------
@@ -327,7 +327,7 @@ public:
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
 
 	int   AiEnabled;       /// handle AI on local computer
-	struct _player_ai_* Ai; /// Ai structure pointer
+	PlayerAi *Ai;          /// Ai structure pointer
 
 	CUnit **Units;         /// units of this player
 	int    TotalNumUnits;  /// total # units for units' list

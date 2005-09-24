@@ -204,12 +204,12 @@ static void AiCleanForce(int force)
 		if (aiunit->Unit->Destroyed) {
 			aiunit->Unit->RefsDecrease();
 			*prev = aiunit->Next;
-			free(aiunit);
+			delete aiunit;
 			continue;
 		} else if (aiunit->Unit->Orders[0].Action == UnitActionDie) {
 			aiunit->Unit->RefsDecrease();
 			*prev = aiunit->Next;
-			free(aiunit);
+			delete aiunit;
 			continue;
 		}
 		prev = &aiunit->Next;
@@ -249,7 +249,7 @@ static void AiCleanForce(int force)
 				counter[UnitTypeEquivs[aiunit->Unit->Type->Slot]]--;
 				aiunit->Unit->RefsDecrease();
 				*prev = aiunit->Next;
-				free(aiunit);
+				delete aiunit;
 				continue;
 			}
 			prev = &aiunit->Next;
@@ -335,9 +335,9 @@ void AiAssignToForce(CUnit *unit)
 		}
 
 		if (AiCheckBelongsToForce(force, unit->Type)) {
-			AiUnit* aiunit;
+			AiUnit *aiunit;
 
-			aiunit = (AiUnit*)malloc(sizeof (*aiunit));
+			aiunit = new AiUnit;
 			aiunit->Next = AiPlayer->Force[force].Units;
 			AiPlayer->Force[force].Units = aiunit;
 			aiunit->Unit = unit;
@@ -452,7 +452,7 @@ void AiAttackWithForce(int force)
 		if (f != AI_MAX_ATTACKING_FORCES) {
 			for (aiut = AiPlayer->Force[f].UnitTypes; aiut; aiut = temp) {
 				temp = aiut->Next;
-				free(aiut);
+				delete aiut;
 			}
 
 			AiPlayer->Force[f] = AiPlayer->Force[force];
@@ -460,7 +460,7 @@ void AiAttackWithForce(int force)
 			aiut = AiPlayer->Force[force].UnitTypes;
 			aiut2 = &AiPlayer->Force[force].UnitTypes;
 			while (aiut) {
-				*aiut2 = (AiUnitType*)malloc(sizeof(**aiut2));
+				*aiut2 = new AiUnitType;
 				(*aiut2)->Next = NULL;
 				(*aiut2)->Want = aiut->Want;
 				(*aiut2)->Type = aiut->Type;

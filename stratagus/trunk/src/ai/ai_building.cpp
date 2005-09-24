@@ -173,8 +173,8 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	unsigned char *m;
 	unsigned char *matrix;
 
-	points = (struct p *)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
-	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof (*points);
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
+	points = new p[size];
 
 	x = ox;
 	y = oy;
@@ -185,7 +185,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 		(/*!flag || */AiCheckSurrounding(worker, type, x, y, flag))) {
 		*dx = x;
 		*dy = y;
-		free(points);
+		delete[] points;
 		return 1;
 	}
 	//
@@ -235,7 +235,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 					(/*!flag ||*/ AiCheckSurrounding(worker, type, x, y, flag))) {
 					*dx = x;
 					*dy = y;
-					free(points);
+					delete[] points;
 					return 1;
 				}
 
@@ -265,7 +265,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 		ep = wp;
 	}
 
-	free(points);
+	delete[] points;
 
 	return 0;
 }
@@ -320,7 +320,7 @@ static int AiFindHallPlace(const CUnit *worker, const CUnitType *type, int *dx, 
 	destx = x = worker->X;
 	desty = y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (struct p *)malloc(size * sizeof(*points));
+	points = new p[size];
 
 	//
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -408,8 +408,8 @@ static int AiFindHallPlace(const CUnit *worker, const CUnitType *type, int *dx, 
 					}
 					if (j == nunits) {
 						if (AiFindBuildingPlace2(worker, type, x, y, dx, dy, 0)) {
-							free(morg);
-							free(points);
+							delete[] morg;
+							delete[] points;
 							return 1;
 						}
 					}
@@ -440,8 +440,8 @@ static int AiFindHallPlace(const CUnit *worker, const CUnitType *type, int *dx, 
 		ep = wp;
 	}
 
-	free(morg);
-	free(points);
+	delete[] morg;
+	delete[] points;
 	return 0;
 }
 
@@ -485,7 +485,7 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, int
 	x = worker->X;
 	y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (struct p *)malloc(size * sizeof(*points));
+	points = new p[size];
 
 	//
 	// Make movement matrix.
@@ -521,8 +521,8 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, int
 				//
 				if (ForestOnMap(x, y)) {
 					if (AiFindBuildingPlace2(worker, type, x, y, dx, dy, 1)) {
-						free(morg);
-						free(points);
+						delete[] morg;
+						delete[] points;
 						return 1;
 					}
 				}
@@ -553,8 +553,8 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, int
 		ep = wp;
 	}
 
-	free(morg);
-	free(points);
+	delete[] morg;
+	delete[] points;
 	return 0;
 }
 

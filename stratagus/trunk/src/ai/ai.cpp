@@ -157,9 +157,9 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-int AiSleepCycles; /// Ai sleeps # cycles
+int AiSleepCycles;  /// Ai sleeps # cycles
 
-AiType *AiTypes; /// List of all AI types.
+CAiType *AiTypes;   /// List of all AI types.
 AiHelper AiHelpers; /// AI helper variables
 
 PlayerAi *AiPlayer; /// Current AI player
@@ -226,23 +226,23 @@ static void AiCheckUnits(void)
 	//
 	//  Look if some unit-types are missing.
 	//
-	n = AiPlayer->UnitTypeRequestsCount;
+	n = AiPlayer->UnitTypeRequests.size();
 	for (i = 0; i < n; ++i) {
-		t = AiPlayer->UnitTypeRequests[i].Table[0]->Slot;
+		t = AiPlayer->UnitTypeRequests[i].Type->Slot;
 		x = AiPlayer->UnitTypeRequests[i].Count;
 
 		//
 		// Add equivalent units
 		//
 		e = unit_types_count[t];
-		if (t < AiHelpers.EquivCount && AiHelpers.Equiv[t]) {
-			for (j = 0; j < AiHelpers.Equiv[t]->Count; ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t]->Table[j]->Slot];
+		if (t < (int)AiHelpers.Equiv.size()) {
+			for (j = 0; j < (int)AiHelpers.Equiv[t].size(); ++j) {
+				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
 			}
 		}
 
 		if (x > e + counter[t]) {  // Request it.
-			AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
+			AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Type,
 				x - e - counter[t]);
 			counter[t] += x - e - counter[t];
 		}
@@ -253,7 +253,7 @@ static void AiCheckUnits(void)
 	// Look through the forces what is missing.
 	//
 	for (i = AI_MAX_FORCES; i < AI_MAX_ATTACKING_FORCES; ++i) {
-		const AiUnit* unit;
+		const AiUnit *unit;
 
 		for (unit = AiPlayer->Force[i].Units; unit; unit = unit->Next) {
 			attacking[unit->Unit->Type->Slot]++;
@@ -264,7 +264,7 @@ static void AiCheckUnits(void)
 	// create missing units
 	//
 	for (i = 0; i < AI_MAX_FORCES; ++i) {
-		const AiUnitType* aiut;
+		const AiUnitType *aiut;
 
 		// No troops for attacking force
 		if (!AiPlayer->Force[i].Defending &&
@@ -288,7 +288,7 @@ static void AiCheckUnits(void)
 	//
 	//  Look if some upgrade-to are missing.
 	//
-	n = AiPlayer->UpgradeToRequestsCount;
+	n = AiPlayer->UpgradeToRequests.size();
 	for (i = 0; i < n; ++i) {
 		t = AiPlayer->UpgradeToRequests[i]->Slot;
 		x = 1;
@@ -297,9 +297,9 @@ static void AiCheckUnits(void)
 		//  Add equivalent units
 		//
 		e = unit_types_count[t];
-		if (t < AiHelpers.EquivCount && AiHelpers.Equiv[t]) {
-			for (j = 0; j < AiHelpers.Equiv[t]->Count; ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t]->Table[j]->Slot];
+		if (t < (int)AiHelpers.Equiv.size()) {
+			for (j = 0; j < (int)AiHelpers.Equiv[t].size(); ++j) {
+				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
 			}
 		}
 
@@ -313,7 +313,7 @@ static void AiCheckUnits(void)
 	//
 	//  Look if some researches are missing.
 	//
-	n = AiPlayer->ResearchRequestsCount;
+	n = (int)AiPlayer->ResearchRequests.size();
 	for (i = 0; i < n; ++i) {
 		if (UpgradeIdAllowed(AiPlayer->Player,
 				AiPlayer->ResearchRequests[i]->ID) == 'A') {
@@ -559,7 +559,7 @@ static void SaveAiHelper(CFile *file)
 **  @param file    Output file.
 **  @param aitype  AI type to save.
 */
-static void SaveAiType(CFile *file, const AiType *aitype)
+static void SaveAiType(CFile *file, const CAiType *aitype)
 {
 	return;
 	if (aitype->Next) {
@@ -598,7 +598,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	const AiBuildQueue *queue;
 
 	file->printf("DefineAiPlayer(%d,\n", plynr);
-	file->printf("  \"ai-type\", \"%s\",\n",ai->AiType->Name);
+	file->printf("  \"ai-type\", \"%s\",\n", ai->AiType->Name);
 
 	file->printf("  \"script\", \"%s\",\n", ai->Script);
 	file->printf("  \"script-debug\", %s,\n", ai->ScriptDebug ? "true" : "false");
@@ -695,7 +695,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	}
 	file->printf("  \"last-exploration-cycle\", %lu,\n", ai->LastExplorationGameCycle);
 	if (ai->TransportRequests) {
-		AiTransportRequest* ptr;
+		AiTransportRequest *ptr;
 
 		file->printf("  \"transport\", {");
 		ptr = ai->TransportRequests;
@@ -709,20 +709,20 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	}
 	file->printf("  \"last-can-not-move-cycle\", %lu,\n", ai->LastCanNotMoveGameCycle);
 	file->printf("  \"unit-type\", {");
-	for (i = 0; i < ai->UnitTypeRequestsCount; ++i) {
-		file->printf("\"%s\", ", ai->UnitTypeRequests[i].Table[0]->Ident);
+	for (i = 0; i < (int)ai->UnitTypeRequests.size(); ++i) {
+		file->printf("\"%s\", ", ai->UnitTypeRequests[i].Type->Ident);
 		file->printf("%d, ", ai->UnitTypeRequests[i].Count);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"upgrade\", {");
-	for (i = 0; i < ai->UpgradeToRequestsCount; ++i) {
+	for (i = 0; i < (int)ai->UpgradeToRequests.size(); ++i) {
 		file->printf("\"%s\", ", ai->UpgradeToRequests[i]->Ident);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"research\", {");
-	for (i = 0; i < ai->ResearchRequestsCount; ++i) {
+	for (i = 0; i < (int)ai->ResearchRequests.size(); ++i) {
 		file->printf("\"%s\", ", ai->ResearchRequests[i]->Ident);
 	}
 	file->printf("},\n");
@@ -788,14 +788,17 @@ void SaveAi(CFile *file)
 void AiInit(CPlayer *player)
 {
 	PlayerAi *pai;
-	AiType *ait;
+	CAiType *ait;
 	char *ainame;
 
-	pai = (PlayerAi *)calloc(1, sizeof (PlayerAi));
+	pai = new PlayerAi;
 	if (!pai) {
 		fprintf(stderr, "Out of memory.\n");
 		exit(0);
 	}
+	// FIXME: use constructor
+	memset(pai, 0, sizeof(*pai));
+
 	pai->Player = player;
 	ait = AiTypes;
 
@@ -875,7 +878,7 @@ void CleanAi(void)
 	int p;
 	PlayerAi *pai;
 	void *temp;
-	AiType *aitype;
+	CAiType *aitype;
 	AiBuildQueue *queue;
 	AiExplorationRequest *request;
 
@@ -888,34 +891,22 @@ void CleanAi(void)
 				AiUnitType *aut;
 				AiUnit *aiunit;
 
-				for (aut = pai->Force[i].UnitTypes; aut; aut = (AiUnitType*)temp) {
+				for (aut = pai->Force[i].UnitTypes; aut; aut = (AiUnitType *)temp) {
 					temp = aut->Next;
-					free(aut);
+					delete aut;
 				}
-				for (aiunit = pai->Force[i].Units; aiunit; aiunit = (AiUnit*)temp) {
+				for (aiunit = pai->Force[i].Units; aiunit; aiunit = (AiUnit *)temp) {
 					temp = aiunit->Next;
-					free(aiunit);
+					delete aiunit;
 				}
 			}
 
 			//
-			//  Free UnitTypeRequests
-			//
-			free(pai->UnitTypeRequests);
-			//
-			//  Free UpgradeToRequests
-			//
-			free(pai->UpgradeToRequests);
-			//
-			//  Free ResearchRequests
-			//
-			free(pai->ResearchRequests);
-			//
 			//  Free UnitTypeBuilt
 			//
-			for (queue = pai->UnitTypeBuilt; queue; queue = (AiBuildQueue*)temp) {
+			for (queue = pai->UnitTypeBuilt; queue; queue = (AiBuildQueue *)temp) {
 				temp = queue->Next;
-				free(queue);
+				delete queue;
 			}
 
 			//
@@ -923,11 +914,11 @@ void CleanAi(void)
 			//
 			while (pai->FirstExplorationRequest) {
 				request = pai->FirstExplorationRequest->Next;
-				free(pai->FirstExplorationRequest);
+				delete pai->FirstExplorationRequest;
 				pai->FirstExplorationRequest = request;
 			}
 
-			free(pai);
+			delete pai;
 			Players[p].Ai = NULL;
 		}
 	}
@@ -935,57 +926,28 @@ void CleanAi(void)
 	//
 	//  Free AiTypes.
 	//
-	for (aitype = AiTypes; aitype; aitype = (AiType*)temp) {
-		free(aitype->Name);
-		free(aitype->Race);
-		free(aitype->Class);
-		free(aitype->Script);
-		free(aitype->FunctionName);
+	for (aitype = AiTypes; aitype; aitype = (CAiType *)temp) {
+		delete aitype->Name;
+		delete[] aitype->Race;
+		delete[] aitype->Class;
+		delete[] aitype->Script;
+		delete[] aitype->FunctionName;
 
 		temp = aitype->Next;
-		free(aitype);
+		delete aitype;
 	}
 	AiTypes = NULL;
 
 	//
 	//  Free AiHelpers.
 	//
-	for (i = 0; i < AiHelpers.TrainCount; ++i) {
-		free(AiHelpers.Train[i]);
-	}
-	free(AiHelpers.Train);
-
-	for (i = 0; i < AiHelpers.BuildCount; ++i) {
-		free(AiHelpers.Build[i]);
-	}
-	free(AiHelpers.Build);
-
-	for (i = 0; i < AiHelpers.UpgradeCount; ++i) {
-		free(AiHelpers.Upgrade[i]);
-	}
-	free(AiHelpers.Upgrade);
-
-	for (i = 0; i < AiHelpers.ResearchCount; ++i) {
-		free(AiHelpers.Research[i]);
-	}
-	free(AiHelpers.Research);
-
-	for (i = 0; i < AiHelpers.RepairCount; ++i) {
-		free(AiHelpers.Repair[i]);
-	}
-	free(AiHelpers.Repair);
-
-	for (i = 0; i < AiHelpers.UnitLimitCount; ++i) {
-		free(AiHelpers.UnitLimit[i]);
-	}
-	free(AiHelpers.UnitLimit);
-
-	for (i = 0; i < AiHelpers.EquivCount; ++i) {
-		free(AiHelpers.Equiv[i]);
-	}
-	free(AiHelpers.Equiv);
-
-	memset(&AiHelpers, 0, sizeof (AiHelpers));
+	AiHelpers.Train.clear();
+	AiHelpers.Build.clear();
+	AiHelpers.Upgrade.clear();
+	AiHelpers.Research.clear();
+	AiHelpers.Repair.clear();
+	AiHelpers.UnitLimit.clear();
+	AiHelpers.Equiv.clear();
 
 	AiResetUnitTypeEquiv();
 }
@@ -1015,7 +977,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType *type)
 			--next->Made;
 			if (!--next->Want) {
 				*queue = next->Next;
-				free(next);
+				delete next;
 			}
 			return 1;
 		}
@@ -1100,7 +1062,7 @@ static void AiReduceMadeInBuilt(const PlayerAi *pai, const CUnitType *type)
 	//
 	equivnb = AiFindUnitTypeEquiv(type, equivs);
 
-	for (i = 0; i < AiHelpers.Equiv[type->Slot]->Count; ++i) {
+	for (i = 0; i < (int)AiHelpers.Equiv[type->Slot].size(); ++i) {
 		if (AiReduceMadeInBuilt2(pai, UnitTypes[equivs[i]])) {
 			return;
 		}
@@ -1572,7 +1534,7 @@ void AiCanNotMove(CUnit *unit)
 		aitr = aitr->Next;
 	}
 
-	aitr = (AiTransportRequest*)malloc(sizeof(AiTransportRequest));
+	aitr = new AiTransportRequest;
 	aitr->Next = AiPlayer->TransportRequests;
 	aitr->Unit = unit;
 	aitr->Order = unit->Orders[0];
@@ -1756,7 +1718,7 @@ void AiEachCycle(CPlayer *player)
 		if (aitr->Order.Goal) {
 			aitr->Order.Goal->RefsDecrease();
 		}
-		free(aitr);
+		delete aitr;
 
 		aitr = next;
 	}

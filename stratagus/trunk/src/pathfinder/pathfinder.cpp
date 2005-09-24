@@ -141,7 +141,7 @@ unsigned char *MakeMatrix(void)
 {
 	unsigned char *matrix;
 
-	matrix = (unsigned char *)malloc((TheMap.Info.MapWidth + 2) * (TheMap.Info.MapHeight + 3) + 2);
+	matrix = new unsigned char[(TheMap.Info.MapWidth + 2) * (TheMap.Info.MapHeight + 3) + 2];
 	InitMatrix(matrix);
 
 	return matrix;
