@@ -95,6 +95,7 @@ void InitUserInterface(const char* race_name)
 	int num_vps;
 	ViewportModeType vp_mode;
 	CViewport vps[MAX_NUM_VIEWPORTS];
+	bool show_command_key;
 
 	// select the correct slot
 	best = 0;
@@ -125,6 +126,7 @@ void InitUserInterface(const char* race_name)
 		vps[i].MapX = UI.Viewports[i].MapX;
 		vps[i].MapY = UI.Viewports[i].MapY;
 	}
+	show_command_key = UI.ButtonPanel.ShowCommandKey;
 
 	UI = *UI_Table[best];
 
@@ -153,6 +155,7 @@ void InitUserInterface(const char* race_name)
 	} else {
 		SetViewportMode(VIEWPORT_SINGLE);
 	}
+	UI.ButtonPanel.ShowCommandKey = show_command_key;
 
 	UI.CompletedBarColor = Video.MapRGB(TheScreen->format,
 		UI.CompletedBarColorRGB.r,
