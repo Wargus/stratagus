@@ -145,7 +145,7 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 		VideoDrawText(x, y,	font, text);
 	}
 	SetDefaultTextColors(oldnc, oldrc);
-	free(text);
+	delete[] text;
 }
 
 /**
@@ -1749,10 +1749,10 @@ static void MenuHandleMouseMove(int x, int y)
 									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
-							free(tmp);
+							delete[] tmp;
 							continue;
 						}
-						free(tmp);
+						delete[] tmp;
 						break;
 					case MiTypeCheckbox:
 						xs = menu->X + mi->XOfs;

@@ -1529,7 +1529,7 @@ static void SaveConfirmInit(Menu* menu)
 static void SaveConfirmExit(Menu* menu)
 {
 	FreeStringDesc(menu->Items[2].D.Text.text);
-	free(menu->Items[2].D.Text.text);
+	delete menu->Items[2].D.Text.text;
 	menu->Items[2].D.Text.text = NULL;
 }
 
@@ -1595,7 +1595,7 @@ static void DeleteConfirmInit(Menu* menu)
 static void DeleteConfirmExit(Menu* menu)
 {
 	FreeStringDesc(menu->Items[2].D.Text.text);
-	free(menu->Items[2].D.Text.text);
+	delete menu->Items[2].D.Text.text;
 	menu->Items[2].D.Text.text = NULL;
 }
 
@@ -2042,17 +2042,17 @@ static void DiplomacyInit(Menu* menu)
 	for (i = 0; i <= PlayerMax - 2; ++i) {
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 			menu->Items[4 * j + 4].D.Text.text = NewStringDesc(Players[i].Name);
-			if (ThisPlayer->Allied&(1<<Players[i].Index)) {
+			if (ThisPlayer->Allied & (1 << Players[i].Index)) {
 				menu->Items[4 * j + 5].D.Checkbox.Checked = 1;
 			} else {
 				menu->Items[4 * j + 5].D.Checkbox.Checked = 0;
 			}
-			if (ThisPlayer->Enemy&(1<<Players[i].Index)) {
+			if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
 				menu->Items[4 * j + 6].D.Checkbox.Checked = 1;
 			} else {
 				menu->Items[4 * j + 6].D.Checkbox.Checked = 0;
 			}
-			if (ThisPlayer->SharedVision&(1<<Players[i].Index)) {
+			if (ThisPlayer->SharedVision & (1 << Players[i].Index)) {
 				menu->Items[4 * j + 7].D.Checkbox.Checked = 1;
 			} else {
 				menu->Items[4 * j + 7].D.Checkbox.Checked = 0;
@@ -2088,7 +2088,7 @@ static void DiplomacyExit(Menu* menu)
 
 	for (i = 0; i <= PlayerMax - 3; ++i) {
 		FreeStringDesc(menu->Items[4 * i + 4].D.Text.text);
-		free(menu->Items[4 * i + 4].D.Text.text);
+		delete menu->Items[4 * i + 4].D.Text.text;
 		menu->Items[4 * i + 4].D.Text.text = NULL;
 	}
 }
@@ -2912,8 +2912,8 @@ static void NetConnectingExit(Menu* menu)
 {
 	FreeStringDesc(menu->Items[1].D.Text.text);
 	FreeStringDesc(menu->Items[2].D.Text.text);
-	free(menu->Items[1].D.Text.text);
-	free(menu->Items[2].D.Text.text);
+	delete menu->Items[1].D.Text.text;
+	delete menu->Items[2].D.Text.text;
 	menu->Items[1].D.Text.text = NULL;
 	menu->Items[2].D.Text.text = NULL;
 }
@@ -4593,7 +4593,7 @@ static void EditorMapPropertiesMenu(void)
 
 	ProcessMenu("menu-editor-map-properties", 1);
 	FreeStringDesc(menu->Items[4].D.Text.text);
-	free(menu->Items[4].D.Text.text);
+	delete menu->Items[4].D.Text.text;
 	menu->Items[4].D.Text.text = NULL;
 }
 
@@ -4784,7 +4784,7 @@ void EditorEditResource(void)
 	menu->Items[1].D.Input.maxch = 6;
 	ProcessMenu("menu-editor-edit-resource", 1);
 	FreeStringDesc(menu->Items[0].D.Text.text);
-	free(menu->Items[0].D.Text.text);
+	delete menu->Items[0].D.Text.text;
 	menu->Items[0].D.Text.text = NULL;
 }
 
@@ -4833,7 +4833,7 @@ static void EditorEditResourceOk(void)
 	}
 	ProcessMenu("menu-editor-error", 1);
 	FreeStringDesc(menu->Items[1].D.Text.text);
-	free(menu->Items[1].D.Text.text);
+	delete menu->Items[1].D.Text.text;
 	menu->Items[1].D.Text.text = NULL;
 }
 
@@ -5047,7 +5047,7 @@ static void EditorSaveConfirmInit(Menu* menu)
 static void EditorSaveConfirmOk(void)
 {
 	FreeStringDesc(CurrentMenu->Items[2].D.Text.text);
-	free(CurrentMenu->Items[2].D.Text.text);
+	delete CurrentMenu->Items[2].D.Text.text;
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorEndMenu();
 }
@@ -5252,7 +5252,7 @@ static void NetErrorMenu(char *error)
 	menu->Items[1].D.Text.text = NewStringDesc(error);
 	ProcessMenu("menu-net-error", 1);
 	FreeStringDesc(menu->Items[1].D.Text.text);
-	free(menu->Items[1].D.Text.text);
+	delete menu->Items[1].D.Text.text;
 	menu->Items[1].D.Text.text = NULL;
 }
 
@@ -5275,7 +5275,7 @@ void ErrorMenu(char *error)
 	menu->Items[1].D.Text.text = NewStringDesc(error);
 	ProcessMenu("menu-net-error", 1);
 	FreeStringDesc(menu->Items[1].D.Text.text);
-	free(menu->Items[1].D.Text.text);
+	delete menu->Items[1].D.Text.text;
 	menu->Items[1].D.Text.text = NULL;
 	menu->X = oldx;
 	menu->Y = oldy;
@@ -5503,7 +5503,7 @@ static void MultiMetaServerGameSetupExit(Menu* menu)
 	for (j = 4; j <= numparam * nummenu; ++j) {
 		for (i = 0; i < numparam; ++i) {
 			FreeStringDesc(menu->Items[i + j].D.Text.text);
-			free(menu->Items[i + j].D.Text.text);
+			delete menu->Items[i + j].D.Text.text;
 			menu->Items[i + j].D.Text.text = NULL;
 		}
 	}
@@ -5514,12 +5514,12 @@ static void MultiMetaServerGameSetupExit(Menu* menu)
 /**
 **  Action taken when a player select an online game
 */
-static void SelectGameServer(Menuitem* mi)
+static void SelectGameServer(Menuitem *mi)
 {
 	char server_host_buffer[64];
 	char *port;
 	int j;
-	char* tmp;
+	char *tmp;
 
 	j = mi - mi->Menu->Items;
 	mi->Menu->Items[j].D.Checkbox.Checked = 0;
@@ -5527,7 +5527,7 @@ static void SelectGameServer(Menuitem* mi)
 
 	tmp = EvalString(mi->Menu->Items[j - 4].D.Text.text);
 	strcpy(server_host_buffer, tmp);
-	free(tmp);
+	delete[] tmp;
 
 	// Launch join directly
 	if ((port = strchr(server_host_buffer, ':')) != NULL) {

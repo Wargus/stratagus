@@ -130,11 +130,11 @@ long isqrt(long num)
 **
 **  @return   Allocated combined string (must be freed).
 */
-char* strdcat(const char* l, const char* r)
+char *strdcat(const char *l, const char *r)
 {
-	char* res;
+	char *res;
 
-	res = (char*)malloc(strlen(l) + strlen(r) + 1);
+	res = new char[strlen(l) + strlen(r) + 1];
 	if (res) {
 		strcpy(res, l);
 		strcat(res, r);
@@ -151,11 +151,11 @@ char* strdcat(const char* l, const char* r)
 **
 **  @return   Allocated combined string (must be freeded).
 */
-char* strdcat3(const char* l, const char* m, const char* r)
+char *strdcat3(const char *l, const char *m, const char *r)
 {
-	char* res;
+	char *res;
 
-	res = (char*)malloc(strlen(l) + strlen(m) + strlen(r) + 1);
+	res = new char[strlen(l) + strlen(m) + strlen(r) + 1];
 	if (res) {
 		strcpy(res, l);
 		strcat(res, m);

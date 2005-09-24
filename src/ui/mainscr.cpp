@@ -358,7 +358,7 @@ void DrawSimpleText(const CUnit *unit, ContentType* content, int defaultfont)
 			VideoDrawText(x, y, font, text);
 		}
 		x += VideoTextLength(font, text);
-		free(text);
+		delete[] text;
 	}
 	if (content->Data.SimpleText.ShowName) {
 		VideoDrawTextCentered(x, y, font, unit->Type->Name);
