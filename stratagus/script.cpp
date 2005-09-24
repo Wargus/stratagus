@@ -255,8 +255,9 @@ static int CclGetCurrentLuaPath(lua_State *l)
 	char *seperator;
 
 	LuaCheckArgs(l, 0);
-	path = strdup(CurrentLuaFile);
+	path = new char[strlen(CurrentLuaFile) + 1];
 	Assert(path);
+	strcpy(path, CurrentLuaFile);
 	seperator = strrchr(path, '/');
 	if (seperator) {
 		*seperator = 0;
@@ -264,7 +265,7 @@ static int CclGetCurrentLuaPath(lua_State *l)
 	} else {
 		lua_pushstring(l, "");
 	}
-	free(path);
+	delete[] path;
 	return 1;
 }
 
@@ -468,7 +469,7 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 {
 	UnitDesc *res;  // Result
 
-	res = (UnitDesc *)calloc(1, sizeof(*res));
+	res = new UnitDesc;
 	if (lua_isstring(l, -1)) {
 		res->e = EUnit_Ref;
 		res->D.AUnit = Str2UnitRef(l, LuaToString(l, -1));
@@ -552,7 +553,9 @@ static char *CallLuaStringFunction(unsigned int handler)
 	if (lua_gettop(Lua) - narg != 2) {
 		LuaError(Lua, "Function must return one value.");
 	}
-	res = strdup(LuaToString(Lua, -1));
+	const char *str = LuaToString(Lua, -1);
+	res = new char[strlen(str) + 1];
+	strcpy(res, str);
 	lua_pop(Lua, 2);
 	return res;
 }
@@ -570,7 +573,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 	int nargs;            // Size of table.
 	const char *key;      // Key.
 
-	res = (NumberDesc *)calloc(1, sizeof(*res));
+	res = new NumberDesc;
 	if (lua_isnumber(l, -1)) {
 		res->e = ENumber_Dir;
 		res->D.Val = LuaToNumber(l, -1);
@@ -709,9 +712,10 @@ StringDesc *NewStringDesc(const char *s)
 	if (!s) {
 		return NULL;
 	}
-	res = (StringDesc*)calloc(1, sizeof (*res));
+	res = new StringDesc;
 	res->e = EString_Dir;
-	res->D.Val = strdup(s);
+	res->D.Val = new char[strlen(s) + 1];
+	strcpy(res->D.Val, s);
 	return res;
 }
 
@@ -749,10 +753,12 @@ StringDesc *CclParseStringDesc(lua_State *l)
 	int nargs;            // Size of table.
 	const char *key;      // Key.
 
-	res = (StringDesc *)calloc(1, sizeof(*res));
+	res = new StringDesc;
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
-		res->D.Val = strdup(LuaToString(l, -1));
+		const char *str = LuaToString(l, -1);
+		res->D.Val = new char[strlen(str) + 1];
+		strcpy(res->D.Val, str);
 	} else if (lua_isfunction(l, -1)) {
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
@@ -773,8 +779,8 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			if (res->D.Concat.n < 1) {
 				LuaError(l, "Bad number of args in Concat\n");
 			}
-			res->D.Concat.Strings = (StringDesc**)calloc(res->D.Concat.n, sizeof(*res->D.Concat.Strings));
-			for (i = 0; i < res->D.Concat.n; i++) {
+			res->D.Concat.Strings = new StringDesc *[res->D.Concat.n];
+			for (i = 0; i < res->D.Concat.n; ++i) {
 				lua_rawgeti(l, -1, 1 + i);
 				res->D.Concat.Strings[i] = CclParseStringDesc(l);
 			}
@@ -959,25 +965,25 @@ int EvalNumber(const NumberDesc *number)
 			unit = EvalUnit(number->D.UnitStat.Unit);
 			if (unit != NULL) {
 				return GetComponent(unit, number->D.UnitStat.Index,
-									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
+					number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
-			if (number->D.VideoTextLength.String != NULL
-				&& (s = EvalString(number->D.VideoTextLength.String)) != NULL) {
+			if (number->D.VideoTextLength.String != NULL &&
+					(s = EvalString(number->D.VideoTextLength.String)) != NULL) {
 				a = VideoTextLength(number->D.VideoTextLength.Font, s);
-				free(s);
+				delete s;
 				return a;
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_StringFind : // strchr(s, c) - s
-			if (number->D.StringFind.String != NULL
-				&& (s = EvalString(number->D.StringFind.String)) != NULL) {
+			if (number->D.StringFind.String != NULL &&
+					(s = EvalString(number->D.StringFind.String)) != NULL) {
 				s2 = strchr(s, number->D.StringFind.C);
 				a = s2 ? s2 - s : -1;
-				free(s);
+				delete s;
 				return a;
 			} else { // ERROR.
 				return 0;
@@ -1002,43 +1008,49 @@ char *EvalString(const StringDesc *s)
 	char *tmp1;  // Temporary string.
 	char *tmp2;  // Temporary string.
 	const CUnit *unit;  // Temporary unit
+	char *str;
 
 	Assert(s);
 	switch (s->e) {
 		case EString_Lua :     // a lua function.
 			return CallLuaStringFunction(s->D.Index);
 		case EString_Dir :     // directly a string.
-			return strdup(s->D.Val);
+			str = new char[strlen(s->D.Val) + 1];
+			strcpy(str, s->D.Val);
+			return str;
 		case EString_Concat :     // a + b -> "ab"
 			tmp1 = EvalString(s->D.Concat.Strings[0]);
 			if (!tmp1) {
-				tmp1 = strdup("");
+				tmp1 = new char[1];
+				tmp1[0] = '\0';
 			}
 			res = tmp1;
 			for (i = 1; i < s->D.Concat.n; i++) {
 				tmp2 = EvalString(s->D.Concat.Strings[i]);
 				if (tmp2) {
 					res = strdcat(tmp1, tmp2);
-					free(tmp1);
-					free(tmp2);
+					delete[] tmp1;
+					delete[] tmp2;
 					tmp1 = res;
 				}
 			}
 			return res;
 		case EString_String :     // 42 -> "42".
-			res = (char*)malloc(10); // Should be enought ?
+			res = new char[10]; // Should be enough ?
 			sprintf(res, "%d", EvalNumber(s->D.Number));
 			return res;
 		case EString_InverseVideo : // "a" -> "~<a~>"
 			tmp1 = EvalString(s->D.String);
 			// FIXME replace existing "~<" by "~>" in tmp1.
 			res = strdcat3("~<", tmp1, "~>");
-			free(tmp1);
+			delete[] tmp1;
 			return res;
 		case EString_UnitName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
-				return strdup(unit->Type->Name);
+				str = new char[strlen(unit->Type->Name) + 1];
+				strcpy(str, unit->Type->Name);
+				return str;
 			} else { // ERROR.
 				return NULL;
 			}
@@ -1048,37 +1060,46 @@ char *EvalString(const StringDesc *s)
 			} else if (s->D.If.False) {
 				return EvalString(s->D.If.False);
 			} else {
-				return strdup("");
+				str = new char[1];
+				str[0] = '\0';
+				return str;
 			}
 		case EString_SubString : // substring(s, begin, end)
-			if (s->D.SubString.String != NULL
-				&& (tmp1 = EvalString(s->D.SubString.String)) != NULL) {
+			if (s->D.SubString.String != NULL &&
+					(tmp1 = EvalString(s->D.SubString.String)) != NULL) {
 				int begin;
 				int end;
 
 				begin = EvalNumber(s->D.SubString.Begin);
 				if ((unsigned) begin > strlen(tmp1) && begin > 0) {
-					free(tmp1);
-					return strdup("");
+					delete[] tmp1;
+					str = new char[1];
+					str[0] = '\0';
+					return str;
 				}
-				res = strdup(tmp1 + begin);
-				free(tmp1);
+				res = new char[strlen(tmp1 + begin) + 1];
+				strcpy(res, tmp1 + begin);
+				delete[] tmp1;
 				if (s->D.SubString.End) {
 					end = EvalNumber(s->D.SubString.End);
 				} else {
 					end = -1;
 				}
-				if ((unsigned) end < strlen(res) && end >= 0) {
+				if ((unsigned)end < strlen(res) && end >= 0) {
 					res[end] = '\0';
 				}
 				return res;
 			} else { // ERROR.
-				return strdup("");
+				str = new char[1];
+				str[0] = '\0';
+				return str;
 			}
 		case EString_Line : // line n of the string
 			if (s->D.Line.String == NULL ||
-				(tmp1 = EvalString(s->D.Line.String)) == NULL) {
-				return  strdup(""); // ERROR.
+					(tmp1 = EvalString(s->D.Line.String)) == NULL) {
+				str = new char[1];
+				str[0] = '\0';
+				return str; // ERROR.
 			} else {
 				int line;
 				int maxlen;
@@ -1086,8 +1107,10 @@ char *EvalString(const StringDesc *s)
 
 				line = EvalNumber(s->D.Line.Line);
 				if (line <= 0) {
-					free(tmp1);
-					return strdup("");
+					delete[] tmp1;
+					str = new char[1];
+					str[0] = '\0';
+					return str;
 				}
 				if (s->D.Line.MaxLen) {
 					maxlen = EvalNumber(s->D.Line.MaxLen);
@@ -1099,27 +1122,35 @@ char *EvalString(const StringDesc *s)
 				}
 				font = s->D.Line.Font;
 				res = GetLineFont(line, tmp1, maxlen, font);
-				free(tmp1);
+				delete[] tmp1;
 				if (!res) { // ERROR.
-					res = strdup("");
+					str = new char[1];
+					str[0] = '\0';
+					res = str;
 				}
 				return res;
 			}
 		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
 			switch (s->D.GameInfoType) {
 				case ES_GameInfo_Tips :
-					return strdup(Tips[CurrentTip]);
+					str = new char[strlen(Tips[CurrentTip]) + 1];
+					strcpy(str, Tips[CurrentTip]);
+					return str;
 				case ES_GameInfo_Objectives :
 					res = GameIntro.Objectives[0];
 					if (!res) {
-						return strdup("");
+						str = new char[1];
+						str[0] = '\0';
+						return str;
 					}
-					res = strdup(res);
+					str = new char[strlen(res) + 1];
+					strcpy(str, res);
+					res = str;
 					for (i = 1; GameIntro.Objectives[i]; ++i) {
 						tmp1 = strdcat(res, "\n");
-						free(res);
+						delete[] res;
 						res = strdcat(tmp1, GameIntro.Objectives[i]);
-						free(tmp1);
+						delete[] tmp1;
 					}
 					return res;
 			}
@@ -1173,24 +1204,24 @@ void FreeNumberDesc(NumberDesc *number)
 		case ENumber_Eq  :     // a == b ? 1 : 0
 			FreeNumberDesc(number->D.BinOp.Left);
 			FreeNumberDesc(number->D.BinOp.Right);
-			free(number->D.BinOp.Left);
-			free(number->D.BinOp.Right);
+			delete number->D.BinOp.Left;
+			delete number->D.BinOp.Right;
 			break;
 		case ENumber_Rand :    // random(a) [0..a-1]
 			FreeNumberDesc(number->D.N);
-			free(number->D.N);
+			delete number->D.N;
 			break;
 		case ENumber_UnitStat : // property of unit.
 			FreeUnitDesc(number->D.UnitStat.Unit);
-			free(number->D.UnitStat.Unit);
+			delete number->D.UnitStat.Unit;
 			break;
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
 			FreeStringDesc(number->D.VideoTextLength.String);
-			free(number->D.VideoTextLength.String);
+			delete number->D.VideoTextLength.String;
 			break;
 		case ENumber_StringFind : // strchr(s, c) - s.
 			FreeStringDesc(number->D.StringFind.String);
-			free(number->D.StringFind.String);
+			delete number->D.StringFind.String;
 			break;
 	}
 }
@@ -1213,51 +1244,51 @@ void FreeStringDesc(StringDesc *s)
 			// FIXME: when lua table should be freed ?
 			break;
 		case EString_Dir :     // directly a string.
-			free(s->D.Val);
+			delete[] s->D.Val;
 			break;
 		case EString_Concat :  // "a" + "b" -> "ab"
 			for (i = 0; i < s->D.Concat.n; i++) {
 				FreeStringDesc(s->D.Concat.Strings[i]);
-				free(s->D.Concat.Strings[i]);
+				delete s->D.Concat.Strings[i];
 			}
-			free(s->D.Concat.Strings);
+			delete[] s->D.Concat.Strings;
 
 			break;
 		case EString_String : // 42 -> "42"
 			FreeNumberDesc(s->D.Number);
-			free(s->D.Number);
+			delete s->D.Number;
 			break;
 		case EString_InverseVideo : // "a" -> "~<a~>"
 			FreeStringDesc(s->D.String);
-			free(s->D.String);
+			delete s->D.String;
 			break;
 		case EString_UnitName : // Name of the UnitType
 			FreeUnitDesc(s->D.Unit);
-			free(s->D.Unit);
+			delete s->D.Unit;
 			break;
 		case EString_If : // cond ? True : False;
 			FreeNumberDesc(s->D.If.Cond);
-			free(s->D.If.Cond);
+			delete s->D.If.Cond;
 			FreeStringDesc(s->D.If.True);
-			free(s->D.If.True);
+			delete s->D.If.True;
 			FreeStringDesc(s->D.If.False);
-			free(s->D.If.False);
+			delete s->D.If.False;
 			break;
 		case EString_SubString : // substring(s, begin, end)
 			FreeStringDesc(s->D.SubString.String);
-			free(s->D.SubString.String);
+			delete s->D.SubString.String;
 			FreeNumberDesc(s->D.SubString.Begin);
-			free(s->D.SubString.Begin);
+			delete s->D.SubString.Begin;
 			FreeNumberDesc(s->D.SubString.End);
-			free(s->D.SubString.End);
+			delete s->D.SubString.End;
 			break;
 		case EString_Line : // line n of the string
 			FreeStringDesc(s->D.Line.String);
-			free(s->D.Line.String);
+			delete s->D.Line.String;
 			FreeNumberDesc(s->D.Line.Line);
-			free(s->D.Line.Line);
+			delete s->D.Line.Line;
 			FreeNumberDesc(s->D.Line.MaxLen);
-			free(s->D.Line.MaxLen);
+			delete s->D.Line.MaxLen;
 			break;
 		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
 			break;
@@ -1856,34 +1887,27 @@ static int CclGameCycle(lua_State *l)
 **  Return of game name.
 **
 **  @param l  Lua state.
-**
-**  @return   Old game name.
 */
 static int CclSetGameName(lua_State *l)
 {
-	char *old;
 	int args;
 
 	args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
-	old = NULL;
-	if (GameName) {
-		old = strdup(GameName);
-	}
 	if (args == 1 && !lua_isnil(l, 1)) {
 		if (GameName) {
-			free(GameName);
+			delete[] GameName;
 			GameName = NULL;
 		}
 
-		GameName = strdup(lua_tostring(l, 1));
+		const char *str = lua_tostring(l, 1);
+		GameName = new char[strlen(str) + 1];
+		strcpy(GameName, str);
 	}
 
-	lua_pushstring(l, old);
-	free(old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -1982,7 +2006,7 @@ static int CclSetDamageFormula(lua_State *l)
 	Assert(l);
 	if (Damage) {
 		FreeNumberDesc(Damage);
-		free(Damage);
+		delete Damage;
 	}
 	Damage = CclParseNumberDesc(l);
 	return 0;
@@ -2058,7 +2082,8 @@ static int CclAddTip(lua_State *l)
 			break;
 		}
 		if (Tips[i] == NULL) {
-			Tips[i] = strdup(str);
+			Tips[i] = new char[strlen(str) + 1];
+			strcpy(Tips[i], str);
 			break;
 		}
 	}
@@ -2285,12 +2310,14 @@ static int CclDefineDefaultActions(lua_State *l)
 	int args;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		free(DefaultActions[i]);
+		delete[] DefaultActions[i];
 		DefaultActions[i] = NULL;
 	}
 	args = lua_gettop(l);
 	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultActions[i] = strdup(LuaToString(l, i + 1));
+		const char *str = LuaToString(l, i + 1);
+		DefaultActions[i] = new char[strlen(str) + 1];
+		strcpy(DefaultActions[i], str);
 	}
 	return 0;
 }
@@ -2306,12 +2333,14 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	int args;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		free(DefaultResourceNames[i]);
+		delete[] DefaultResourceNames[i];
 		DefaultResourceNames[i] = NULL;
 	}
 	args = lua_gettop(l);
 	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResourceNames[i] = strdup(LuaToString(l, i + 1));
+		const char *str = LuaToString(l, i + 1);
+		DefaultResourceNames[i] = new char[strlen(str) + 1];
+		strcpy(DefaultResourceNames[i], str);
 	}
 	return 0;
 }

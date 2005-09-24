@@ -249,12 +249,13 @@ public:
 ** *******************
 */
 
-typedef struct {
+class Target {
+public:
 	TargetType which_sort_of_target;  /// for identify what sort of target.
 	int X;                            /// x coord.
 	int Y;                            /// y coord.
 	CUnit *unit;                      /// Unit target.
-} Target;
+};
 
 /*
 ** *******************
