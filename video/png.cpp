@@ -321,9 +321,6 @@ void SaveScreenshotPNG(const char *name)
 	int i;
 	int j;
 	int bpp;
-#ifdef USE_OPENGL
-	GLvoid *pixels;
-#endif
 
 	bpp = TheScreen->format->BytesPerPixel;
 
@@ -368,7 +365,7 @@ void SaveScreenshotPNG(const char *name)
 	png_write_info(png_ptr, info_ptr);
 
 #ifdef USE_OPENGL
-	pixels = new unsigned char[Video.Width * Video.Height * 3];
+	unsigned char *pixels = new unsigned char[Video.Width * Video.Height * 3];
 	if (!pixels) {
 		fprintf(stderr, "Out of memory\n");
 		exit(1);
@@ -380,7 +377,7 @@ void SaveScreenshotPNG(const char *name)
 		unsigned char *src;
 		unsigned char *dst;
 
-		src = (unsigned char *)pixels + (Video.Height - 1 - i) * Video.Width * 3;
+		src = pixels + (Video.Height - 1 - i) * Video.Width * 3;
 		dst = row;
 
 		// Convert bgr to rgb
