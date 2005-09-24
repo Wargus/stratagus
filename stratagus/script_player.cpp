@@ -857,7 +857,7 @@ static int CclSetPlayerData(lua_State *l)
 		racename = LuaToString(l, 3);
 		p->Race = 0;
 		for (i = 0; i < PlayerRaces.Count; ++i) {
-			if(!strcmp(racename, PlayerRaces.Name[i])) {
+			if (!strcmp(racename, PlayerRaces.Name[i])) {
 				p->Race = i;
 				break;
 			}

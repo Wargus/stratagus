@@ -144,8 +144,8 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 		return;
 	}
 
-	points = (struct p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
-	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof(*points);
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
+	points = new p[size];
 
 	//
 	// Make movement matrix.
@@ -203,7 +203,7 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 		ep = wp;
 	}
 
-	free(points);
+	delete[] points;
 }
 
 /**
@@ -246,8 +246,8 @@ static int AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int *
 	unsigned char state;
 	unsigned char *m;
 
-	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2;
-	points = (struct p *)malloc(size * sizeof(*points));
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
+	points = new p[size];
 
 	x = unit->X;
 	y = unit->Y;
@@ -300,7 +300,7 @@ static int AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int *
 						*dx = x;
 						*dy = y;
 						*ds = state;
-						free(points);
+						delete[] points;
 						return 1;
 					}
 
@@ -357,7 +357,7 @@ static int AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int *
 		}
 		ep = wp;
 	}
-	free(points);
+	delete[] points;
 	return 0;
 }
 
@@ -411,7 +411,7 @@ int AiFindWall(AiForce *force)
 	x = unit->X;
 	y = unit->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (struct p *)malloc(size * sizeof(*points));
+	points = new p[size];
 
 	destx = -1;
 	desty = -1;
@@ -476,7 +476,7 @@ int AiFindWall(AiForce *force)
 		}
 		ep = wp;
 	}
-	free(points);
+	delete[] points;
 
 	if (destx != -1) {
 		force->State = 0;
@@ -584,7 +584,7 @@ int AiPlanAttack(AiForce *force)
 		AiUnit* aiunit;
 
 		if (transporter) {
-			aiunit = (AiUnit*)malloc(sizeof (*aiunit));
+			aiunit = new AiUnit;
 			aiunit->Next = force->Units;
 			force->Units = aiunit;
 			aiunit->Unit = transporter;
@@ -733,7 +733,7 @@ void AiSendExplorers(void)
 	// Remove all requests
 	while (AiPlayer->FirstExplorationRequest) {
 		request = AiPlayer->FirstExplorationRequest->Next;
-		free(AiPlayer->FirstExplorationRequest);
+		delete AiPlayer->FirstExplorationRequest;
 		AiPlayer->FirstExplorationRequest = request;
 	}
 }

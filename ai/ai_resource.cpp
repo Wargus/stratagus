@@ -303,8 +303,6 @@ static void AiRequestSupply(void)
 	AiBuildQueue *queue;
 	int counter[UnitTypeMax];
 
-	Assert(AiHelpers.UnitLimit);
-
 	//
 	// Count the already made build requests.
 	//
@@ -316,9 +314,9 @@ static void AiRequestSupply(void)
 	//
 	// Check if we can build this?
 	//
-	n = AiHelpers.UnitLimit[0]->Count;
+	n = AiHelpers.UnitLimit[0].size();
 	for (i = 0; i < n; ++i) {
-		type = AiHelpers.UnitLimit[0]->Table[i];
+		type = AiHelpers.UnitLimit[0][i];
 		if (counter[type->Slot]) { // Already ordered.
 			return;
 		}
@@ -331,7 +329,7 @@ static void AiRequestSupply(void)
 			return;
 		} else {
 			if (AiMakeUnit(type)) {
-				queue = (AiBuildQueue*)malloc(sizeof (*AiPlayer->UnitTypeBuilt));
+				queue = new AiBuildQueue;
 				queue->Next = AiPlayer->UnitTypeBuilt;
 				queue->Type = type;
 				queue->Want = 1;
@@ -397,8 +395,8 @@ int AiCountUnitBuilders(CUnitType *type)
 	int i;
 	int n;
 	const int *unit_count;
-	AiUnitTypeTable *const *tablep;
-	const AiUnitTypeTable *table;
+	std::vector<std::vector<CUnitType *> > *tablep;
+	const std::vector<CUnitType *> *table;
 
 	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0) {
 		DebugPrint("Can't build `%s' now\n" _C_ type->Ident);
@@ -408,30 +406,29 @@ int AiCountUnitBuilders(CUnitType *type)
 	// Check if we have a place for building or an unit to build.
 	//
 	if (type->Building) {
-		n = AiHelpers.BuildCount;
-		tablep = AiHelpers.Build;
+		n = AiHelpers.Build.size();
+		tablep = &AiHelpers.Build;
 	} else {
-		n = AiHelpers.TrainCount;
-		tablep = AiHelpers.Train;
+		n = AiHelpers.Train.size();
+		tablep = &AiHelpers.Train;
 	}
 	if (type->Slot > n) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
-	table = tablep[type->Slot];
-	if (!table) { // Oops not known.
+	table = &(*tablep)[type->Slot];
+	if (!table->size()) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
-	n = table->Count;
 
 	unit_count = AiPlayer->Player->UnitTypesCount;
 	result = 0;
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < (int)table->size(); ++i) {
 		//
 		// The type for builder/trainer is available
 		//
-		result += unit_count[table->Table[i]->Slot];
+		result += unit_count[(*table)[i]->Slot];
 	}
 	return result;
 }
@@ -450,8 +447,8 @@ static int AiMakeUnit(CUnitType *type)
 	int i;
 	int n;
 	const int *unit_count;
-	AiUnitTypeTable *const *tablep;
-	const AiUnitTypeTable *table;
+	std::vector<std::vector<CUnitType *> > *tablep;
+	std::vector<CUnitType *> *table;
 
 	int usableTypes[UnitTypeMax + 1];
 	int usableTypesCount;
@@ -469,35 +466,34 @@ static int AiMakeUnit(CUnitType *type)
 		// Check if we have a place for building or an unit to build.
 		//
 		if (type->Building) {
-			n = AiHelpers.BuildCount;
-			tablep = AiHelpers.Build;
+			n = AiHelpers.Build.size();
+			tablep = &AiHelpers.Build;
 		} else {
-			n = AiHelpers.TrainCount;
-			tablep = AiHelpers.Train;
+			n = AiHelpers.Train.size();
+			tablep = &AiHelpers.Train;
 		}
 		if (type->Slot > n) { // Oops not known.
 			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 			continue;
 		}
-		table = tablep[type->Slot];
-		if (!table) { // Oops not known.
+		table = &(*tablep)[type->Slot];
+		if (!table->size()) { // Oops not known.
 			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 			continue;
 		}
-		n = table->Count;
 
 		unit_count = AiPlayer->Player->UnitTypesCount;
-		for (i = 0; i < n; ++i) {
+		for (i = 0; i < (int)table->size(); ++i) {
 			//
 			// The type for builder/trainer is available
 			//
-			if (unit_count[table->Table[i]->Slot]) {
+			if (unit_count[(*table)[i]->Slot]) {
 				if (type->Building) {
-					if (AiBuildBuilding(table->Table[i], type)) {
+					if (AiBuildBuilding((*table)[i], type)) {
 						return 1;
 					}
 				} else {
-					if (AiTrainUnit(table->Table[i], type)) {
+					if (AiTrainUnit((*table)[i], type)) {
 						return 1;
 					}
 				}
@@ -559,8 +555,8 @@ void AiAddResearchRequest(Upgrade *upgrade)
 	int i;
 	int n;
 	const int *unit_count;
-	AiUnitTypeTable *const *tablep;
-	const AiUnitTypeTable *table;
+	std::vector<std::vector<CUnitType *> > *tablep;
+	std::vector<CUnitType *> *table;
 
 	//
 	// Check if resources are available.
@@ -572,27 +568,26 @@ void AiAddResearchRequest(Upgrade *upgrade)
 	//
 	// Check if we have a place for the upgrade to research
 	//
-	n = AiHelpers.ResearchCount;
-	tablep = AiHelpers.Research;
+	n = AiHelpers.Research.size();
+	tablep = &AiHelpers.Research;
 
 	if (upgrade->ID > n) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
 		return;
 	}
-	table = tablep[upgrade->ID];
-	if (!table) { // Oops not known.
+	table = &(*tablep)[upgrade->ID];
+	if (!table->size()) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
 		return;
 	}
-	n = table->Count;
 
 	unit_count = AiPlayer->Player->UnitTypesCount;
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < (int)table->size(); ++i) {
 		//
 		// The type is available
 		//
-		if (unit_count[table->Table[i]->Slot]) {
-			if (AiResearchUpgrade(table->Table[i], upgrade)) {
+		if (unit_count[(*table)[i]->Slot]) {
+			if (AiResearchUpgrade((*table)[i], upgrade)) {
 				return;
 			}
 		}
@@ -653,8 +648,8 @@ void AiAddUpgradeToRequest(CUnitType *type)
 	int i;
 	int n;
 	const int *unit_count;
-	AiUnitTypeTable *const *tablep;
-	const AiUnitTypeTable *table;
+	std::vector<std::vector<CUnitType *> > *tablep;
+	std::vector<CUnitType *> *table;
 
 	//
 	// Check if resources are available.
@@ -666,27 +661,26 @@ void AiAddUpgradeToRequest(CUnitType *type)
 	//
 	// Check if we have a place for the upgrade to.
 	//
-	n = AiHelpers.UpgradeCount;
-	tablep = AiHelpers.Upgrade;
+	n = AiHelpers.Upgrade.size();
+	tablep = &AiHelpers.Upgrade;
 
 	if (type->Slot > n) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return;
 	}
-	table = tablep[type->Slot];
-	if (!table) { // Oops not known.
+	table = &(*tablep)[type->Slot];
+	if (!table->size()) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return;
 	}
-	n = table->Count;
 
 	unit_count = AiPlayer->Player->UnitTypesCount;
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < (int)table->size(); ++i) {
 		//
 		// The type is available
 		//
-		if (unit_count[table->Table[i]->Slot]) {
-			if (AiUpgradeTo(table->Table[i], type)) {
+		if (unit_count[(*table)[i]->Slot]) {
+			if (AiUpgradeTo((*table)[i], type)) {
 				return;
 			}
 		}
@@ -1178,30 +1172,29 @@ static int AiRepairUnit(CUnit *unit)
 	int n;
 	const CUnitType *type;
 	const int *unit_count;
-	AiUnitTypeTable *const *tablep;
-	const AiUnitTypeTable *table;
+	std::vector<std::vector<CUnitType *> > *tablep;
+	std::vector<CUnitType *> *table;
 
-	n = AiHelpers.RepairCount;
-	tablep = AiHelpers.Repair;
+	n = AiHelpers.Repair.size();
+	tablep = &AiHelpers.Repair;
 	type = unit->Type;
 	if (type->Slot > n) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
-	table = tablep[type->Slot];
-	if (!table) { // Oops not known.
+	table = &(*tablep)[type->Slot];
+	if (!table->size()) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
 
-	n = table->Count;
 	unit_count = AiPlayer->Player->UnitTypesCount;
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < (int)table->size(); ++i) {
 		//
 		// The type is available
 		//
-		if (unit_count[table->Table[i]->Slot]) {
-			if (AiRepairBuilding(table->Table[i], unit)) {
+		if (unit_count[(*table)[i]->Slot]) {
+			if (AiRepairBuilding((*table)[i], unit)) {
 				return 1;
 			}
 		}
@@ -1292,7 +1285,7 @@ void AiAddUnitTypeRequest(CUnitType *type, int count)
 	for (queue = &AiPlayer->UnitTypeBuilt; *queue; queue = &(*queue)->Next) {
 	}
 
-	*queue = (AiBuildQueue *)malloc(sizeof(*AiPlayer->UnitTypeBuilt));
+	*queue = new AiBuildQueue;
 	(*queue)->Next = NULL;
 	(*queue)->Type = type;
 	(*queue)->Want = count;
@@ -1311,7 +1304,7 @@ void AiExplore(int x, int y, int mask)
 	AiExplorationRequest *req;
 
 	// Alloc a new struct,
-	req = (AiExplorationRequest *)malloc(sizeof(AiExplorationRequest));
+	req = new AiExplorationRequest;
 
 	// Link into the exploration requests list
 	req->X = x;
