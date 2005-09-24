@@ -94,7 +94,7 @@
 
 static Socket MasterSocket;
 
-SessionPool* Pool;
+SessionPool *Pool;
 ServerStruct Server;
 
 /*----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ ServerStruct Server;
 **  @param session  Session to send the message to
 **  @param msg      Message to send
 */
-void Send(Session* session, char* msg)
+void Send(Session *session, char *msg)
 {
 	NetSendTCP(session->Socket, msg, strlen(msg));
 }
@@ -146,14 +146,14 @@ int ServerInit(int port)
    		return -4;
 	}
 
-	if (!(Pool = calloc(1, sizeof(SessionPool)))) {
+	if (!(Pool = (SessionPool *)calloc(1, sizeof(SessionPool)))) {
 		fprintf(stderr, "Out of memory\n");
 		NetCloseTCP(MasterSocket);
 		NetExit();
 		return -5;
 	}
 
-	if (!(Pool->SocketSet = NetAllocSocketSet())) {
+	if (!(Pool->SocketSet = new SocketSet())) {
 		NetCloseTCP(MasterSocket);
 		NetExit();
 		return -6;
@@ -183,7 +183,7 @@ void ServerQuit(void)
 			free(ptr);
 		}
 
-		NetFreeSocketSet(Pool->SocketSet);
+		delete Pool->SocketSet;
 		free(Pool);
 	}
 
@@ -195,7 +195,7 @@ void ServerQuit(void)
 **
 **  @param session  This is the session we are checking.
 */
-static int IdleSeconds(Session* session)
+static int IdleSeconds(Session *session)
 {
 	return (int)(time(0) - session->Idle);
 }
@@ -205,11 +205,11 @@ static int IdleSeconds(Session* session)
 **
 **  @param session  Reference to the session to be killed.
 */
-static int KillSession(Session* session)
+static int KillSession(Session *session)
 {
 	DebugPrint("Closing connection from '%s'\n" _C_ session->AddrData.IPStr);
 	NetCloseTCP(session->Socket);
-	NetDelSocket(Pool->SocketSet, session->Socket);
+	Pool->SocketSet->DelSocket(session->Socket);
 	UNLINK(Pool->First, session, Pool->Last, Pool->Count);
 	free(session);
 	return 0;
@@ -220,7 +220,7 @@ static int KillSession(Session* session)
 */
 static void AcceptConnections(void)
 {
-	Session* new_session;
+	Session *new_session;
 	Socket new_socket;
 
 	while ((new_socket = NetAcceptTCP(MasterSocket)) != (Socket)-1) {
@@ -231,7 +231,7 @@ static void AcceptConnections(void)
 			break;
 		}
 
-		new_session = calloc(1, sizeof(Session));
+		new_session = (Session *)calloc(1, sizeof(Session));
 		if (!new_session) {
 			fprintf(stderr, "ERROR: %s\n", strerror(errno));
 			break;
@@ -247,7 +247,7 @@ static void AcceptConnections(void)
 		DebugPrint("New connection from '%s'\n" _C_ new_session->AddrData.IPStr);
 
 		LINK(Pool->First, new_session, Pool->Last, Pool->Count);
-		NetAddSocket(Pool->SocketSet, new_socket);
+		Pool->SocketSet->AddSocket(new_socket);
 	}
 
 }
@@ -257,8 +257,8 @@ static void AcceptConnections(void)
 */
 static void KickIdlers(void)
 {
-	Session* session;
-	Session* next;
+	Session *session;
+	Session *next;
 
 	for (session = Pool->First; session; ) {
 		next = session->Next;
@@ -275,8 +275,8 @@ static void KickIdlers(void)
 */
 static int ReadData(void)
 {
-	Session* session;
-	Session* next;
+	Session *session;
+	Session *next;
 	int result;
 
 	result = NetSocketSetReady(Pool->SocketSet, 0);
