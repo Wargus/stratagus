@@ -317,7 +317,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 
 				default:
 					p = text;
-					while (*p && *p!='~') {
+					while (*p && *p !='~') {
 						++p;
 					}
 					if (!*p) {
@@ -338,7 +338,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 			}
 		}
 
-		c = *text - 32;
+		c = *(unsigned char *)text - 32;
 		Assert(c >= 0);
 
 		ipr = fp->G->GraphicWidth / fp->Width;
