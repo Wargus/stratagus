@@ -56,12 +56,12 @@
 /**
 **  Private mp3 data structure to handle mp3 streaming.
 */
-typedef struct _mp3_data_ {
+struct MadData {
 	struct mad_decoder MadDecoder;           /// Mad decoder handle
-	CFile *MadFile;                         /// File handle
+	CFile *MadFile;                          /// File handle
 	unsigned char Buffer[MAD_INBUF_SIZE];    /// Input buffer
 	int BufferLen;                           /// Length of filled buffer
-} MadData;
+};
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -75,14 +75,14 @@ typedef struct _mp3_data_ {
 **
 **  @return        MAP_FLOW_STOP if eof, MAD_FLOW_CONTINUE otherwise.
 */
-static enum mad_flow MAD_read(void* user, struct mad_stream* stream)
+static enum mad_flow MAD_read(void *user, struct mad_stream *stream)
 {
 	Sample *sample;
 	MadData *data;
 	int i;
 
-	sample = (Sample*)user;
-	data = (MadData*)sample->User;
+	sample = (Sample *)user;
+	data = (MadData *)sample->User;
 
 	if (stream->next_frame) {
 		memmove(data->Buffer, stream->next_frame, data->BufferLen =
@@ -109,18 +109,18 @@ static enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 **  @param header  MAD header.
 **  @param pcm     MAD pcm data struture.
 */
-static enum mad_flow MAD_write(void* user,
-	struct mad_header const* header, struct mad_pcm* pcm)
+static enum mad_flow MAD_write(void *user,
+	struct mad_header const *header, struct mad_pcm *pcm)
 {
-	Sample* sample;
+	Sample *sample;
 	int i;
 	int j;
 	int n;
-	short* buf;
+	short *buf;
 	int s;
 	int comp;
 
-	sample = (Sample*)user;
+	sample = (Sample *)user;
 
 	n = pcm->length;
 
@@ -132,7 +132,7 @@ static enum mad_flow MAD_write(void* user,
 
 	comp = n * pcm->channels * 2;
 
-	buf = (short*)(sample->Buffer + sample->Pos + sample->Len);
+	buf = (short *)(sample->Buffer + sample->Pos + sample->Len);
 
 	for (i = 0; i < n; ++i) {
 		for (j = 0; j < sample->Channels; ++j) {
@@ -162,8 +162,8 @@ static enum mad_flow MAD_write(void* user,
 **  possible MAD_ERROR_* errors can be found in the mad.h (or
 **  libmad/stream.h) header file.
 */
-static enum mad_flow MAD_error(void* user,
-	struct mad_stream* stream, struct mad_frame* frame)
+static enum mad_flow MAD_error(void *user,
+	struct mad_stream *stream, struct mad_frame *frame)
 {
 	fprintf(stderr, "decoding error 0x%04x (%s)\n",
 		stream->error, mad_stream_errorstr(stream));
@@ -182,14 +182,14 @@ static enum mad_flow MAD_error(void* user,
 **
 **  @return        Number of bytes read
 */
-static int MadRead(Sample *sample, unsigned char* buf, int len)
+static int MadRead(Sample *sample, unsigned char *buf, int len)
 {
 	struct mad_decoder *decoder;
-	struct mad_stream* stream;
-	struct mad_frame* frame;
-	struct mad_synth* synth;
+	struct mad_stream *stream;
+	struct mad_frame *frame;
+	struct mad_synth *synth;
 
-	decoder = &((MadData*)sample->User)->MadDecoder;
+	decoder = &((MadData *)sample->User)->MadDecoder;
 
 	DebugPrint("%p %p %d\n" _C_ decoder _C_ buf _C_ len);
 
@@ -274,9 +274,9 @@ static int MadRead(Sample *sample, unsigned char* buf, int len)
 **
 **  @return        Number of bytes read
 */
-static int Mp3ReadStream(Sample* sample, void* buf, int len)
+static int Mp3ReadStream(Sample *sample, void *buf, int len)
 {
-	MadData* data;
+	MadData *data;
 	int i;
 	int n;
 	int divide;
@@ -284,7 +284,7 @@ static int Mp3ReadStream(Sample* sample, void* buf, int len)
 
 	DebugPrint("%p %d\n" _C_ buf _C_ len);
 
-	data = (MadData*)sample->User;
+	data = (MadData *)sample->User;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -322,26 +322,24 @@ static int Mp3ReadStream(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void Mp3FreeStream(Sample* sample)
+static void Mp3FreeStream(Sample *sample)
 {
-	MadData* data;
+	MadData *data;
 
-	data = (MadData*)sample->User;
+	data = (MadData *)sample->User;
 
 	// release the decoder
 	mad_synth_finish(data->MadDecoder.sync->synth);
 	mad_frame_finish(&data->MadDecoder.sync->frame);
 	mad_stream_finish(&data->MadDecoder.sync->stream);
 
-// free(data->MadDecoder.sync);
+// delete data->MadDecoder.sync;
 	mad_decoder_finish(&data->MadDecoder);
 
 	data->MadFile->close();
 	delete data->MadFile;
-
-	free(data->Buffer);
-	free(data);
-	free(sample);
+	delete data;
+	delete sample;
 }
 
 /**
@@ -361,7 +359,7 @@ static const SampleType Mp3StreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-static int Mp3Read(Sample* sample, void* buf, int len)
+static int Mp3Read(Sample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -379,11 +377,11 @@ static int Mp3Read(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void Mp3Free(Sample* sample)
+static void Mp3Free(Sample *sample)
 {
-	free(sample->User);
-	free(sample->Buffer);
-	free(sample);
+	delete (MadData *)sample->User;
+	delete[] sample->Buffer;
+	delete sample;
 }
 
 /**
@@ -402,7 +400,7 @@ static const SampleType Mp3SampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample* LoadMp3(const char *name, int flags)
+Sample *LoadMp3(const char *name, int flags)
 {
 	CFile *f;
 	unsigned char magic[2];
@@ -425,11 +423,11 @@ Sample* LoadMp3(const char *name, int flags)
 
 	f->seek(0, SEEK_SET);
 
-	data = (MadData*)malloc(sizeof(MadData));
+	data = new MadData;
 	data->MadFile = f;
 	data->BufferLen = 0;
 
-	sample = (Sample*)malloc(sizeof(Sample));
+	sample = new Sample;
 	sample->User = data;
 	sample->Len = 0;
 	sample->Pos = 0;
@@ -458,7 +456,8 @@ Sample* LoadMp3(const char *name, int flags)
 		MadRead(sample, sample->Buffer, SOUND_BUFFER_SIZE);
 #endif
 	} else {
-		sample->Buffer = (unsigned char*)malloc(55000000);
+		// FIXME: surely there's a better way to do this
+		sample->Buffer = new unsigned char[55000000];
 		Assert(sample->Buffer);
 
 		// configure input, output, and error functions
