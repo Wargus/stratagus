@@ -56,18 +56,18 @@
 #define MAX_LOC_IP 10
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
-typedef const char* setsockopttype;
-typedef char* recvfrombuftype;
-typedef char* recvbuftype;
-typedef const char* sendtobuftype;
-typedef const char* sendbuftype;
+typedef const char *setsockopttype;
+typedef char *recvfrombuftype;
+typedef char *recvbuftype;
+typedef const char *sendtobuftype;
+typedef const char *sendbuftype;
 typedef int socklen_t;
 #else
-typedef const void* setsockopttype;
-typedef void* recvfrombuftype;
-typedef void* recvbuftype;
-typedef const void* sendtobuftype;
-typedef const void* sendbuftype;
+typedef const void *setsockopttype;
+typedef void *recvfrombuftype;
+typedef void *recvbuftype;
+typedef const void *sendtobuftype;
+typedef const void *sendbuftype;
 #endif
 
 //----------------------------------------------------------------------------
@@ -196,18 +196,14 @@ void NetCloseTCP(Socket sockfd)
 #ifdef USE_WINSOCK
 int NetSetNonBlocking(Socket sockfd)
 {
-	unsigned long opt;
-
-	opt = 1;
+	unsigned long opt = 1;
 	return ioctlsocket(sockfd, FIONBIO, &opt);
 }
 #else
 int NetSetNonBlocking(Socket sockfd)
 {
-	int flags;
-
-	flags = fcntl(sockfd, F_GETFL, 0);
-	return fcntl(sockfd, F_SETFL,flags | O_NONBLOCK);
+	int flags = fcntl(sockfd, F_GETFL, 0);
+	return fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 }
 #endif
 
@@ -216,7 +212,7 @@ int NetSetNonBlocking(Socket sockfd)
 **
 **  @param host  Host name (f.e. 192.168.0.0 or stratagus.net)
 */
-unsigned long NetResolveHost(const char* host)
+unsigned long NetResolveHost(const char *host)
 {
 	unsigned long addr;
 
@@ -255,7 +251,7 @@ int NetSocketAddr(const Socket sock)
 {
 	INTERFACE_INFO localAddr[MAX_LOC_IP];  // Assume there will be no more than MAX_LOC_IP interfaces
 	DWORD bytesReturned;
-	SOCKADDR_IN* pAddrInet;
+	SOCKADDR_IN *pAddrInet;
 	u_long SetFlags;
 	int i;
 	int nif;
@@ -299,11 +295,11 @@ int NetSocketAddr(const Socket sock)
 int NetSocketAddr(const Socket sock)
 {
 	char buf[4096];
-	char* cp;
-	char* cplim;
+	char *cp;
+	char *cplim;
 	struct ifconf ifc;
 	struct ifreq ifreq;
-	struct ifreq* ifr;
+	struct ifreq *ifr;
 	struct sockaddr_in *sap;
 	struct sockaddr_in sa;
 	int i;
@@ -322,7 +318,7 @@ int NetSocketAddr(const Socket sock)
 		cplim = buf + ifc.ifc_len; // skip over if's with big ifr_addr's
 		for (cp = buf; cp < cplim;
 				cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
-			ifr = (struct ifreq*)cp;
+			ifr = (struct ifreq *)cp;
 			ifreq = *ifr;
 			if (ioctl(sock, SIOCGIFFLAGS, (char*)&ifreq) < 0) {
 				DebugPrint("%s: SIOCGIFFLAGS - errno %d\n" _C_
@@ -448,7 +444,7 @@ Socket NetOpenTCP(int port)
 		opt = 1;
 		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));
 
-		if (bind(sockfd,(struct sockaddr*)&sock_addr, sizeof(sock_addr)) < 0) {
+		if (bind(sockfd,(struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
 			NetCloseTCP(sockfd);
 			return (Socket)-1;
@@ -490,7 +486,7 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(port);
 
-	if (connect(sockfd, (struct sockaddr*)&sa, sizeof(sa)) < 0) {
+	if (connect(sockfd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {
 		fprintf(stderr, "connect to %d.%d.%d.%d:%d failed\n",
 			NIPQUAD(ntohl(addr)), port);
 		return -1;
@@ -542,18 +538,18 @@ int NetSocketReady(Socket sockfd, int timeout)
 **
 **  @return 1 if data is available, 0 if not, -1 if failure.
 */
-int NetSocketSetReady(SocketSet* set, int timeout)
+int NetSocketSetReady(SocketSet *set, int timeout)
 {
 	int retval;
 	struct timeval tv;
 	fd_set mask;
-	int i;
+	std::vector<Socket>::size_type i;
 
 	// Check the file descriptors for available data
 	do {
 		// Set up the mask of file descriptors
 		FD_ZERO(&mask);
-		for (i = 0; i < set->NumSockets; ++i) {
+		for (i = 0; i < set->Sockets.size(); ++i) {
 			FD_SET(set->Sockets[i], &mask);
 		}
 
@@ -569,7 +565,7 @@ int NetSocketSetReady(SocketSet* set, int timeout)
 	} while (retval == -1 && errno == EINTR);
 #endif
 
-	for (i = 0; i < set->NumSockets; ++i) {
+	for (i = 0; i < set->Sockets.size(); ++i) {
 		set->SocketReady[i] = FD_ISSET(set->Sockets[i], &mask);
 	}
 
@@ -584,11 +580,11 @@ int NetSocketSetReady(SocketSet* set, int timeout)
 **
 **  @return        Non-zero if socket is ready
 */
-int NetSocketSetSocketReady(SocketSet* set, Socket socket)
+int NetSocketSetSocketReady(SocketSet *set, Socket socket)
 {
-	int i;
+	std::vector<Socket>::size_type i;
 
-	for (i = 0; i < set->NumSockets; ++i) {
+	for (i = 0; i < set->Sockets.size(); ++i) {
 		if (set->Sockets[i] == socket) {
 			return set->SocketReady[i];
 		}
@@ -606,14 +602,14 @@ int NetSocketSetSocketReady(SocketSet* set, Socket socket)
 **
 **  @return Number of bytes placed in buffer, or -1 if failure.
 */
-int NetRecvUDP(Socket sockfd, void* buf, int len)
+int NetRecvUDP(Socket sockfd, void *buf, int len)
 {
 	socklen_t n;
 	int l;
 	struct sockaddr_in sock_addr;
 
 	n = sizeof(struct sockaddr_in);
-	if ((l = recvfrom(sockfd, (recvfrombuftype)buf, len, 0, (struct sockaddr*)&sock_addr, &n)) < 0) {
+	if ((l = recvfrom(sockfd, (recvfrombuftype)buf, len, 0, (struct sockaddr *)&sock_addr, &n)) < 0) {
 		PrintFunction();
 		fprintf(stdout, "Could not read from UDP socket\n");
 		return -1;
@@ -637,7 +633,7 @@ int NetRecvUDP(Socket sockfd, void* buf, int len)
 **
 **  @return Number of bytes placed in buffer or -1 if failure.
 */
-int NetRecvTCP(Socket sockfd, void* buf, int len)
+int NetRecvTCP(Socket sockfd, void *buf, int len)
 {
 	int ret;
 
@@ -670,8 +666,8 @@ int NetRecvTCP(Socket sockfd, void* buf, int len)
 **
 **  @return Number of bytes sent.
 */
-int NetSendUDP(Socket sockfd,unsigned long host, int port,
-	const void* buf, int len)
+int NetSendUDP(Socket sockfd, unsigned long host, int port,
+	const void *buf, int len)
 {
 	int n;
 	struct sockaddr_in sock_addr;
@@ -683,7 +679,7 @@ int NetSendUDP(Socket sockfd,unsigned long host, int port,
 
 	// if (MyRand() % 7) { return 0; }
 
-	return sendto(sockfd, (sendtobuftype)buf, len, 0, (struct sockaddr*)&sock_addr, n);
+	return sendto(sockfd, (sendtobuftype)buf, len, 0, (struct sockaddr *)&sock_addr, n);
 }
 
 /**
@@ -695,7 +691,7 @@ int NetSendUDP(Socket sockfd,unsigned long host, int port,
 **
 **  @return Number of bytes sent.
 */
-int NetSendTCP(Socket sockfd, const void* buf, int len)
+int NetSendTCP(Socket sockfd, const void *buf, int len)
 {
 	return send(sockfd, (sendbuftype)buf, len, 0);
 }
@@ -732,82 +728,44 @@ Socket NetAcceptTCP(Socket sockfd)
 }
 
 /**
-**  Allocate a socket set
-*/
-SocketSet* NetAllocSocketSet(void)
-{
-	SocketSet* set;
-
-	set = (SocketSet*)calloc(1, sizeof(*set));
-	set->MaxSockets = 5;
-	set->Sockets = (Socket*)calloc(set->MaxSockets, sizeof(*set->Sockets));
-	set->SocketReady = (int*)calloc(set->MaxSockets, sizeof(*set->SocketReady));
-
-	return set;
-}
-
-/**
 **  Add a socket to a socket set
 **
-**  @param set     Socket set
 **  @param socket  Socket to add to the socket set
 */
-void NetAddSocket(SocketSet* set, Socket socket)
+void SocketSet::AddSocket(Socket socket)
 {
-	if (set->NumSockets == set->MaxSockets) {
-		set->MaxSockets += 5;
-		set->Sockets = (Socket*)realloc(set->Sockets,
-			set->MaxSockets * sizeof(*set->Sockets));
-		set->SocketReady = (int*)realloc(set->SocketReady,
-			set->MaxSockets * sizeof(*set->SocketReady));
-	}
-	set->Sockets[set->NumSockets] = socket;
-	set->SocketReady[set->NumSockets] = 0;
-	set->NumSockets++;
-	if (socket > set->MaxSockFD) {
-		set->MaxSockFD = socket;
+	Sockets.push_back(socket);
+	SocketReady.push_back(0);
+	if (socket > MaxSockFD) {
+		MaxSockFD = socket;
 	}
 }
 
 /**
 **  Delete a socket from a socket set
 **
-**  @param set     Socket set
 **  @param socket  Socket to delete from the socket set
 */
-void NetDelSocket(SocketSet* set, Socket socket)
+void SocketSet::DelSocket(Socket socket)
 {
-	int i;
+	std::vector<Socket>::iterator i;
+	std::vector<int>::iterator j;
 
-	for (i = 0; i < set->NumSockets; ++i) {
-		if (set->Sockets[i] == socket) {
+	for (i = Sockets.begin(), j = SocketReady.begin(); i != Sockets.end(); ++i, ++j) {
+		if (*i == socket) {
+			Sockets.erase(i);
+			SocketReady.erase(j);
 			break;
 		}
 	}
-	for (; i < set->NumSockets - 1; ++i) {
-		set->Sockets[i] = set->Sockets[i + 1];
-	}
-	set->NumSockets--;
-	if (socket == set->MaxSockFD) {
-		set->MaxSockFD = 0;
-		for (i = 0; i < set->NumSockets; ++i) {
-			if (set->Sockets[i] > set->MaxSockFD) {
-				set->MaxSockFD = set->Sockets[i];
+	if (socket == MaxSockFD) {
+		MaxSockFD = 0;
+		for (i = Sockets.begin(); i != Sockets.end(); ++i) {
+			if (*i > MaxSockFD) {
+				MaxSockFD = *i;
 			}
 		}
 	}
-}
-
-/**
-**  Free a socket set
-**
-**  @param set  Socket set to free
-*/
-void NetFreeSocketSet(SocketSet* set)
-{
-	free(set->Sockets);
-	free(set->SocketReady);
-	free(set);
 }
 
 //@}
