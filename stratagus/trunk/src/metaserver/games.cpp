@@ -56,12 +56,12 @@ int GameID;
 /**
 **  Create a game
 */
-void CreateGame(Session* session, char* description, char* map,
-	char* players, char* ip, char* port, char* password)
+void CreateGame(Session *session, char *description, char *map,
+	char *players, char *ip, char *port, char *password)
 {
-	GameData* game;
+	GameData *game;
 
-	game = malloc(sizeof(*game));
+	game = (GameData *)malloc(sizeof(*game));
 
 	strcpy(game->IP, ip);
 	strcpy(game->Port, port);
@@ -96,9 +96,9 @@ void CreateGame(Session* session, char* description, char* map,
 /**
 **  Cancel a game
 */
-int CancelGame(Session* session)
+int CancelGame(Session *session)
 {
-	GameData* game;
+	GameData *game;
 	int i;
 
 	game = session->GameData;
@@ -128,7 +128,7 @@ int CancelGame(Session* session)
 /**
 **  Start a game
 */
-int StartGame(Session* session)
+int StartGame(Session *session)
 {
 	if (session->GameData->Sessions[0] != session) {
 		return -1; // Not the host
@@ -141,9 +141,9 @@ int StartGame(Session* session)
 /**
 **  Join a game
 */
-int JoinGame(Session* session, int id, char* password)
+int JoinGame(Session *session, int id, char *password)
 {
-	GameData* game;
+	GameData *game;
 
 	if (session->GameData) {
 		return -1; // Already in a game
@@ -177,9 +177,9 @@ int JoinGame(Session* session, int id, char* password)
 /**
 **  Leave a game
 */
-int PartGame(Session* session)
+int PartGame(Session *session)
 {
-	GameData* game;
+	GameData *game;
 	int i;
 
 	game = session->GameData;
@@ -212,7 +212,7 @@ int PartGame(Session* session)
 	return 0;
 }
 
-static int MatchGameType(Session* session, GameData* game)
+static int MatchGameType(Session *session, GameData *game)
 {
 	return (!*game->GameName || !strcmp(session->UserData.GameName, game->GameName)) &&
 		(!*game->Version || !strcmp(session->UserData.Version, game->Version));
@@ -221,9 +221,9 @@ static int MatchGameType(Session* session, GameData* game)
 /**
 **  List games
 */
-void ListGames(Session* session)
+void ListGames(Session *session)
 {
-	GameData* game;
+	GameData *game;
 	char buf[1024];
 
 	game = Games;
