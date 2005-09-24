@@ -96,7 +96,7 @@ void SaveGroups(CFile *file)
 		for (i = 0; i < Groups[g].NumUnits; ++i) {
 			ref = UnitReference(Groups[g].Units[i]);
 			file->printf("\"%s\", ", ref);
-			free(ref);
+			delete[] ref;
 		}
 		file->printf("})\n");
 	}

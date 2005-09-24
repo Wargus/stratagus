@@ -3489,11 +3489,9 @@ bool CUnit::IsSharedVision(const CUnit *x) const
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
-char* UnitReference(const CUnit *unit)
+char *UnitReference(const CUnit *unit)
 {
-	char* ref;
-
-	ref = (char*)malloc(10);
+	char* ref = new char[10];
 	sprintf(ref, "U%04X", UnitNumber(unit));
 	return ref;
 }
@@ -3593,7 +3591,7 @@ void SaveOrder(const Order* order, CFile* file)
 			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
 		file->printf(" \"goal\", \"%s\",", ref = UnitReference(order->Goal));
-		free(ref);
+		delete[] ref;
 	}
 	file->printf(" \"tile\", {%d, %d},", order->X, order->Y);
 	if (order->Type) {
@@ -3778,7 +3776,7 @@ void SaveUnit(const CUnit *unit, CFile* file)
 		uins = unit->UnitInside->PrevContained;
 		for (i = unit->InsideCount; i; --i, uins = uins->PrevContained) {
 			file->printf("\"%s\"", ref = UnitReference(uins));
-			free(ref);
+			delete[] ref;
 			if (i > 1) {
 				file->printf(", ");
 			}
@@ -3834,7 +3832,7 @@ void SaveUnit(const CUnit *unit, CFile* file)
 				if (unit->Data.Built.Worker) {
 					file->printf("\"worker\", \"%s\", ",
 					ref = UnitReference(unit->Data.Built.Worker));
-					free(ref);
+					delete[] ref;
 				}
 				file->printf("\"progress\", %d, \"frame\", %d,",
 					unit->Data.Built.Progress, frame);

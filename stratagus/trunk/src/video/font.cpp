@@ -39,6 +39,9 @@
 #include <string.h>
 
 #include "stratagus.h"
+
+#include <vector>
+
 #include "video.h"
 #include "font.h"
 #include "script.h"
@@ -52,24 +55,29 @@
 #define NumFontColors 9
 
 	/// Font color mapping
-typedef struct _font_color_mapping_ {
+class FontColorMapping {
+public:
+	FontColorMapping() : ColorName(NULL), Index(0) {}
+
 	char *ColorName;                        /// Font color name
 	SDL_Color Color[NumFontColors];         /// Array of colors
-} FontColorMapping;
+	int Index;                              /// Index in FontColorMappings
+};
 
 static FontColorMapping *FontColor;         /// Current font color
 
-static FontColorMapping *FontColorMappings; /// Font color mappings
-static int NumFontColorMappings;            /// Number of font color mappings
+static std::vector<FontColorMapping> FontColorMappings; /// Font color mappings
 
 	/// Font mapping
-typedef struct _font_mapping_ {
+class FontMapping {
+public:
+	FontMapping() : Ident(NULL), Font(0) {}
+
 	char *Ident;                            /// Font name
 	int Font;                               /// Ident number
-	struct _font_mapping_ *Next;            /// Next pointer
-} FontMapping;
+};
 
-static FontMapping *FontMappings;           /// Font mappings
+static std::vector<FontMapping> FontMappings;/// Font mappings
 
 /**
 **  Fonts table
@@ -130,9 +138,10 @@ static void VideoDrawChar(const Graphic *g,
 */
 static FontColorMapping *GetFontColorMapping(char *color)
 {
-	for (int i = 0; i < NumFontColorMappings; ++i) {
-		if (!strcmp(FontColorMappings[i].ColorName, color)) {
-			return &FontColorMappings[i];
+	std::vector<FontColorMapping>::iterator i;
+	for (i = FontColorMappings.begin(); i != FontColorMappings.end(); ++i) {
+		if (!strcmp((*i).ColorName, color)) {
+			return &(*i);
 		}
 	}
 	fprintf(stderr, "Font color mapping not found: '%s'\n", color);
@@ -281,7 +290,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 #ifndef USE_OPENGL
 	g = fp->G;
 #else
-	g = FontColorGraphics[font][FontColor - FontColorMappings];
+	g = FontColorGraphics[font][FontColor->Index];
 #endif
 	for (rev = NULL, widths = 0; *text; ++text) {
 		if (*text == '~') {
@@ -295,7 +304,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 					rev = FontColor;
 					FontColor = ReverseTextColor;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor - FontColorMappings];
+					g = FontColorGraphics[font][FontColor->Index];
 #endif
 					++text;
 					break;
@@ -303,7 +312,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 					LastTextColor = FontColor;
 					FontColor = ReverseTextColor;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor - FontColorMappings];
+					g = FontColorGraphics[font][FontColor->Index];
 #endif
 					continue;
 				case '>':
@@ -311,7 +320,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 					LastTextColor = FontColor;
 					FontColor = rev;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor - FontColorMappings];
+					g = FontColorGraphics[font][FontColor->Index];
 #endif
 					continue;
 
@@ -331,7 +340,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 					LastTextColor = FontColor;
 					FontColor = GetFontColorMapping(color);
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor - FontColorMappings];
+					g = FontColorGraphics[font][FontColor->Index];
 #endif
 					delete[] color;
 					continue;
@@ -354,7 +363,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 		if (rev) {
 			FontColor = rev;
 #ifdef USE_OPENGL
-			g = FontColorGraphics[font][FontColor - FontColorMappings];
+			g = FontColorGraphics[font][FontColor->Index];
 #endif
 			rev = NULL;
 		}
@@ -720,14 +729,15 @@ static void FontMeasureWidths(ColorFont *fp)
 static void MakeFontColorTextures(Graphic *g, int font)
 {
 	SDL_Surface *s;
+	std::vector<FontColorMapping>::size_type i;
 
 	if (FontColorGraphics[font]) {
 		return;
 	}
 
-	FontColorGraphics[font] = new Graphic *[NumFontColorMappings];
+	FontColorGraphics[font] = new Graphic *[FontColorMappings.size()];
 	s = g->Surface;
-	for (int i = 0; i < NumFontColorMappings; ++i) {
+	for (i = 0; i < (int)FontColorMappings.size(); ++i) {
 		FontColorGraphics[font][i] = new Graphic;
 		memcpy(FontColorGraphics[font][i], g, sizeof(Graphic));
 		FontColorGraphics[font][i]->Textures = NULL;
@@ -767,7 +777,7 @@ void ReloadFonts(void)
 {
 	for (unsigned i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 		if (Fonts[i].G) {
-			for (int j = 0; j < NumFontColorMappings; ++j) {
+			for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
 				delete FontColorGraphics[i][j];
 			}
 			delete[] FontColorGraphics[i];
@@ -787,14 +797,12 @@ void ReloadFonts(void)
 */
 int FontByIdent(const char *ident)
 {
-	FontMapping *fm;
+	std::vector<FontMapping>::iterator i;
 
-	fm = FontMappings;
-	while (fm) {
-		if (!strcmp(fm->Ident, ident)) {
-			return fm->Font;
+	for (i = FontMappings.begin(); i != FontMappings.end(); ++i) {
+		if (!strcmp((*i).Ident, ident)) {
+			return (*i).Font;
 		}
-		fm = fm->Next;
 	}
 	fprintf(stderr, "Font not found: '%s'", ident);
 	ExitFatal(1);
@@ -810,18 +818,12 @@ int FontByIdent(const char *ident)
 */
 const char *FontName(int font)
 {
-	FontMapping *fm;
-
-	fm = FontMappings;
-	while (fm) {
-		if (fm->Font == font) {
-			return fm->Ident;
-		}
-		fm = fm->Next;
+	if (font >= (int)FontMappings.size()) {
+		fprintf(stderr, "Font not found: %d", font);
+		ExitFatal(1);
 	}
-	fprintf(stderr, "Font not found: %d", font);
-	ExitFatal(1);
-	return NULL;
+
+	return FontMappings[font].Ident;
 }
 
 /*----------------------------------------------------------------------------
@@ -838,8 +840,9 @@ static int CclDefineFont(lua_State *l)
 	int w;
 	int h;
 	const char *file;
-	FontMapping **fm;
 	const char *str;
+	std::vector<FontMapping>::iterator it;
+
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -853,21 +856,19 @@ static int CclDefineFont(lua_State *l)
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			str = LuaToString(l, -1);
-			fm = &FontMappings;
 			i = 0;
-			while (*fm) {
-				if (!strcmp((*fm)->Ident, str)) {
+			for (it = FontMappings.begin(); it != FontMappings.end(); ++it) {
+				if (!strcmp((*it).Ident, str)) {
 					break;
 				}
-				fm = &(*fm)->Next;
 				++i;
 			}
-			if (!*fm) {
-				*fm = new FontMapping;
-				(*fm)->Ident = new char[strlen(str) + 1];
-				strcpy((*fm)->Ident, str);
-				(*fm)->Font = i;
-				(*fm)->Next = NULL;
+			if (it == FontMappings.end()) {
+				FontMapping f;
+				f.Ident = new char[strlen(str) + 1];
+				strcpy(f.Ident, str);
+				f.Font = i;
+				FontMappings.push_back(f);
 			}
 		} else if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
@@ -913,24 +914,25 @@ static int CclDefineFontColor(lua_State *l)
 	strcpy(color, str);
 	fcm = NULL;
 
-	if (!NumFontColorMappings) {
-		FontColorMappings = (FontColorMapping *)calloc(sizeof(*FontColorMappings), 1);
-		fcm = FontColorMappings;
-		++NumFontColorMappings;
+	if (!FontColorMappings.size()) {
+		FontColorMapping f;
+		FontColorMappings.push_back(f);
+		fcm = &FontColorMappings[0];
 	} else {
-		for (i = 0; i < NumFontColorMappings; ++i) {
-			fcm = &FontColorMappings[i];
+		std::vector<FontColorMapping>::iterator it;
+		for (it = FontColorMappings.begin(); it != FontColorMappings.end(); ++it) {
+			fcm = &(*it);
 			if (!strcmp(fcm->ColorName, color)) {
 				fprintf(stderr, "Warning: Redefining color '%s'\n", color);
 				delete[] fcm->ColorName;
 				break;
 			}
 		}
-		if (i == NumFontColorMappings) {
-			++NumFontColorMappings;
-			FontColorMappings = (FontColorMapping *)realloc(FontColorMappings,
-				NumFontColorMappings * sizeof(FontColorMapping));
-			fcm = &FontColorMappings[NumFontColorMappings - 1];
+		if (it == FontColorMappings.end()) {
+			FontColorMapping f;
+			FontColorMappings.push_back(f);
+			fcm = &FontColorMappings[FontColorMappings.size() - 1];
+			fcm->Index = FontColorMappings.size() - 1;
 		}
 	}
 	fcm->ColorName = color;
@@ -976,7 +978,7 @@ void CleanFonts(void)
 		Fonts[i].G = NULL;
 
 #ifdef USE_OPENGL
-		for (int j = 0; j < NumFontColorMappings; ++j) {
+		for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
 			if (!FontColorGraphics[i]) {
 				break;
 			}
@@ -989,12 +991,10 @@ void CleanFonts(void)
 #endif
 	}
 
-	for (i = 0; i < NumFontColorMappings; ++i) {
+	for (i = 0; i < (int)FontColorMappings.size(); ++i) {
 		delete[] FontColorMappings[i].ColorName;
 	}
-	free(FontColorMappings);
-	FontColorMappings = NULL;
-	NumFontColorMappings = 0;
+	FontColorMappings.clear();
 }
 
 /**
