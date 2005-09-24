@@ -164,7 +164,7 @@ typedef struct _event_callback_ {
 class CVideo
 {
 public:
-	CVideo() : Width(640), Height(480), Depth(0), FullScreen(false) {}
+	CVideo() : Width(0), Height(0), Depth(0), FullScreen(false) {}
 
 	void LockScreen();
 	void UnlockScreen();
