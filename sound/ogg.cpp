@@ -117,7 +117,7 @@ int VorbisProcessData(OggData *data, char *buffer)
 							val = -32768;
 						}
 
-						*(Sint16*)(buffer + len
+						*(Sint16 *)(buffer + len
 						  + (j * 2 * data->vinfo.channels) + i * 2) = (Sint16)val;
 					}
 				}
@@ -298,12 +298,12 @@ void OggFree(OggData *data)
 	ogg_sync_clear(&data->sync);
 }
 
-static int VorbisStreamRead(Sample* sample, void* buf, int len)
+static int VorbisStreamRead(Sample *sample, void *buf, int len)
 {
-	OggData* data;
+	OggData *data;
 	int bytes;
 
-	data = (OggData*)sample->User;
+	data = (OggData *)sample->User;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -311,7 +311,7 @@ static int VorbisStreamRead(Sample* sample, void* buf, int len)
 	}
 
 	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
-		bytes = VorbisProcessData(data, (char*)sample->Buffer + sample->Pos + sample->Len);
+		bytes = VorbisProcessData(data, (char *)sample->Buffer + sample->Pos + sample->Len);
 		if (bytes > 0) {
 			sample->Len += bytes;
 		} else {
@@ -330,19 +330,19 @@ static int VorbisStreamRead(Sample* sample, void* buf, int len)
 	return len;
 }
 
-static void VorbisStreamFree(Sample* sample)
+static void VorbisStreamFree(Sample *sample)
 {
-	OggData* data;
+	OggData *data;
 
-	data = (OggData*)sample->User;
+	data = (OggData *)sample->User;
 
 	data->File->close();
 	delete data->File;
 	OggFree(data);
 
-	free(data);
-	free(sample->Buffer);
-	free(sample);
+	delete data;
+	delete[] sample->Buffer;
+	delete sample;
 }
 
 /**
@@ -353,7 +353,7 @@ static const SampleType VorbisStreamSampleType = {
 	VorbisStreamFree,
 };
 
-static int VorbisRead(Sample* sample, void* buf, int len)
+static int VorbisRead(Sample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -366,11 +366,11 @@ static int VorbisRead(Sample* sample, void* buf, int len)
 	return len;
 }
 
-static void VorbisFree(Sample* sample)
+static void VorbisFree(Sample *sample)
 {
-	free(sample->User);
-	free(sample->Buffer);
-	free(sample);
+	delete (OggData *)sample->User;
+	delete[] sample->Buffer;
+	delete sample;
 }
 
 /**
@@ -389,12 +389,12 @@ static const SampleType VorbisSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample* LoadVorbis(const char* name,int flags)
+Sample *LoadVorbis(const char *name,int flags)
 {
-	Sample* sample;
-	OggData* data;
+	Sample *sample;
+	OggData *data;
 	CFile *f;
-	vorbis_info* info;
+	vorbis_info *info;
 
 	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
@@ -403,10 +403,11 @@ Sample* LoadVorbis(const char* name,int flags)
 		return NULL;
 	}
 
-	data = (OggData*)calloc(1, sizeof(OggData));
+	data = new OggData;
+	memset(data, 0, sizeof(*data));
 
 	if (OggInit(f, data) || !data->audio) {
-		free(data);
+		delete data;
 		f->close();
 		delete f;
 		return NULL;
@@ -414,21 +415,21 @@ Sample* LoadVorbis(const char* name,int flags)
 
 	info = &data->vinfo;
 
-	sample = (Sample*)malloc(sizeof(Sample));
+	sample = new Sample;
 	sample->Channels = info->channels;
 	sample->SampleSize = 16;
 	sample->Frequency = info->rate;
 
 	sample->Len = 0;
 	sample->Pos = 0;
-	sample->Buffer = (unsigned char*)malloc(SOUND_BUFFER_SIZE);
+	sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
 	sample->User = data;
 	data->File = f;
 
 	if (flags & PlayAudioStream) {
 		sample->Type = &VorbisStreamSampleType;
 	} else {
-		unsigned char* buf;
+		unsigned char *buf;
 		int pos;
 		int ret;
 		int total;
@@ -441,7 +442,7 @@ Sample* LoadVorbis(const char* name,int flags)
 		ogg_sync_init(&sync);
 		for (i = 0; ; ++i) {
 			f->seek(-1 * i * 4096, SEEK_END);
-			buf = (unsigned char*)ogg_sync_buffer(&sync, 4096);
+			buf = (unsigned char *)ogg_sync_buffer(&sync, 4096);
 			f->read(buf, 8192);
 			ogg_sync_wrote(&sync, 8192);
 			if (ogg_sync_pageout(&sync, &pg) == 1 && ogg_page_eos(&pg)) {
@@ -451,14 +452,14 @@ Sample* LoadVorbis(const char* name,int flags)
 		}
 		f->seek(pos, SEEK_SET);
 
-		buf = (unsigned char*)malloc(total);
+		buf = new unsigned char[total];
 		pos = 0;
 
 		while ((ret = VorbisStreamRead(sample, buf + pos, 8192))) {
 			pos += ret;
 		}
 
-		free(sample->Buffer);
+		delete[] sample->Buffer;
 		sample->Len = total;
 		sample->Pos = 0;
 		sample->Buffer = buf;

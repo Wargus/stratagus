@@ -10,7 +10,7 @@
 //
 /**@name movie.h - The movie header file. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer
+//      (c) Copyright 2002-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@
 /**
 **  Ogg data structure to handle vorbis/theora streaming.
 */
-typedef struct _ogg_data_ {
+struct OggData {
 	CFile *File;      /// Ogg file handle
 	ogg_sync_state sync;
 	ogg_page page;
@@ -77,7 +77,7 @@ typedef struct _ogg_data_ {
 #ifdef USE_THEORA
 	int video : 1;
 #endif
-} OggData;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -83,7 +83,7 @@ CDModes CDMode; /// CD mode
 
 #if defined (USE_SDLCD)
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 static int InitCD(void)
 {
@@ -100,7 +100,7 @@ static int InitCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int PlayCDTrack(int track)
 {
@@ -120,7 +120,7 @@ void ResumeCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void PauseCD(void)
 {
@@ -130,7 +130,7 @@ void PauseCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int IsAudioTrack(int track)
 {
@@ -139,7 +139,7 @@ int IsAudioTrack(int track)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int IsCDPlaying(void)
 {
@@ -151,7 +151,7 @@ int IsCDPlaying(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int GetCDVolume(void)
 {
@@ -159,7 +159,7 @@ int GetCDVolume(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void SetCDVolume(int vol)
 {
@@ -167,7 +167,7 @@ void SetCDVolume(int vol)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void QuitCD(void)
 {
@@ -182,7 +182,7 @@ void QuitCD(void)
 }
 #elif defined(USE_LIBCDA)
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 static int InitCD(void)
 {
@@ -197,7 +197,7 @@ static int InitCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int PlayCDTrack(int track)
 {
@@ -206,7 +206,7 @@ int PlayCDTrack(int track)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void ResumeCD(void)
 {
@@ -214,7 +214,7 @@ void ResumeCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void PauseCD(void)
 {
@@ -224,7 +224,7 @@ void PauseCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int IsAudioTrack(int track)
 {
@@ -232,7 +232,7 @@ int IsAudioTrack(int track)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int IsCDPlaying(void)
 {
@@ -244,7 +244,7 @@ int IsCDPlaying(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int GetCDVolume(void)
 {
@@ -255,7 +255,7 @@ int GetCDVolume(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void SetCDVolume(int vol)
 {
@@ -263,7 +263,7 @@ void SetCDVolume(int vol)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void QuitCD(void)
 {
@@ -279,7 +279,7 @@ void QuitCD(void)
 }
 #elif defined(USE_CDDA)
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 static int InitCD(void)
 {
@@ -303,7 +303,7 @@ static int InitCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int PlayCDTrack(int track)
 {
@@ -317,7 +317,7 @@ int PlayCDTrack(int track)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void ResumeCD(void)
 {
@@ -325,7 +325,7 @@ void ResumeCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void PauseCD(void)
 {
@@ -335,7 +335,7 @@ void PauseCD(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int IsAudioTrack(track)
 {
@@ -343,7 +343,7 @@ int IsAudioTrack(track)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int IsCDPlaying(void)
 {
@@ -351,7 +351,7 @@ int IsCDPlaying(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 int GetCDVolume(void)
 {
@@ -359,7 +359,7 @@ int GetCDVolume(void)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void SetCDVolume(int vol)
 {
@@ -367,7 +367,7 @@ void SetCDVolume(int vol)
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void QuitCD(void)
 {
@@ -376,9 +376,9 @@ void QuitCD(void)
 #endif
 
 /**
-**   Check cdrom.
+**  Check cdrom.
 **
-**   Perodic called from the main loop.
+**  Perodic called from the main loop.
 */
 int CDRomCheck(void* unused)
 {
@@ -391,9 +391,9 @@ int CDRomCheck(void* unused)
 }
 
 /**
-** Play CDRom
+**  Play CDRom
 **
-** @param name name of play mode, CDModeAll, CDModeRandom, CDModeDefined
+**  @param name  Name of play mode, CDModeAll, CDModeRandom, CDModeDefined
 */
 int PlayCDRom(int name)
 {

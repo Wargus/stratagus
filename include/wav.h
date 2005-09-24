@@ -68,7 +68,7 @@
 /**
 **  Wav format
 */
-typedef struct __wav_fmt__ {
+struct WavFMT {
 	unsigned int   FMTchunk;
 	unsigned int   FMTlength;
 	unsigned short Encoding;       /// 1 = PCM
@@ -77,16 +77,15 @@ typedef struct __wav_fmt__ {
 	unsigned int   ByteRate;       /// Average bytes per second
 	unsigned short SampleSize;     /// Bytes per sample block
 	unsigned short BitsPerSample;  /// One of 8, 12, 16
-} WavFMT;
+};
 
 /**
 **  General chunk found in the WAV file
 */
-typedef struct __wav_chunk__ {
+struct WavChunk {
 	unsigned int  Magic;
 	unsigned int  Length;
-	unsigned char Data[0];
-} WavChunk;
+};
 
 //@}
 

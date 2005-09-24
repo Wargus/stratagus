@@ -52,8 +52,8 @@
 typedef struct _cdda_data {
 	int PosInCd;                      /// Offset on CD to read from
 	struct cdrom_read_audio Readdata; /// Structure for IOCTL
-	char* PointerInBuffer;            /// Position in buffer
-	char* Buffer;                     /// Buffer start
+	char *PointerInBuffer;            /// Position in buffer
+	char *Buffer;                     /// Buffer start
 } CddaData;
 
 #define FRAME_SIZE 2352
@@ -72,12 +72,12 @@ typedef struct _cdda_data {
 **
 ** @return Number of bytes read
 */
-static int CDRead(Sample* sample, void* buf, int len)
+static int CDRead(Sample *sample, void *buf, int len)
 {
-	CddaData* data;
+	CddaData *data;
 	int n;
 
-	data = (CddaData*)sample->User;
+	data = (CddaData *)sample->User;
 
 	data->Readdata.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + data->PosInCd / FRAME_SIZE;
 	data->Readdata.addr_format = CDROM_LBA;
@@ -116,9 +116,11 @@ static int CDRead(Sample* sample, void* buf, int len)
 **
 ** @param sample Sample to free
 */
-static void CDFree(Sample* sample)
+static void CDFree(Sample *sample)
 {
-	free(sample);
+	delete[] ((CddaData *)sample->User)->Buffer;
+	delete (CddaData *)sample->User;
+	delete sample;
 }
 
 /**
@@ -130,29 +132,29 @@ static const SampleType CDStreamSampleType = {
 };
 
 /**
-** Load CD.
+**  Load CD.
 **
-** @param name   Unused.
-** @param flags  Unused.
+**  @param name   Unused.
+**  @param flags  Unused.
 **
-** @return Returns the loaded sample.
+**  @return Returns the loaded sample.
 **
 */
-Sample* LoadCD(const char* name, int flags)
+Sample *LoadCD(const char* name, int flags)
 {
 	Sample* sample;
 	CddaData* data;
 
-	sample = malloc(sizeof(*sample));
+	sample = new Sample;
 	sample->Channels = 2;
 	sample->SampleSize = 16;
 	sample->Frequency = 44100;
 	sample->Type = &CDStreamSampleType;
 	sample->Length = 0;
 
-	data = malloc(sizeof(CddaData));
+	data = new CddaData;
 	data->PosInCd = 0;
-	data->Buffer = malloc(CDDA_BUFFER_SIZE);
+	data->Buffer = new char[CDDA_BUFFER_SIZE];
 	data->PointerInBuffer = data->Buffer;
 	sample->User = data;
 
