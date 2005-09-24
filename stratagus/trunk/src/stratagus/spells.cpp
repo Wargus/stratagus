@@ -769,7 +769,7 @@ static Target *NewTarget(TargetType t, const CUnit *unit, int x, int y)
 {
 	Target *target;
 
-	target = (Target *)malloc(sizeof(*target));
+	target = new Target;
 
 	target->which_sort_of_target = t;
 	target->unit = (CUnit *)unit;
@@ -1124,7 +1124,7 @@ int AutoCastSpell(CUnit *caster, const SpellType *spell)
 		// FIXME: SpellType* of CommandSpellCast must be const.
 		CommandSpellCast(caster, target->X, target->Y, target->unit,
 			(SpellType*)spell, FlushCommands);
-		free(target);
+		delete target;
 	}
 	return 1;
 }

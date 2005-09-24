@@ -81,16 +81,17 @@
 ** else a string that could be executed in lua to restore lua state
 ** @todo do the output prettier (adjust indentation, newline)
 */
-static char* SaveGlobal(lua_State *l, int is_root)
+static char *SaveGlobal(lua_State *l, int is_root)
 {
 	int type_key;
 	int type_value;
-	const char* sep;
-	const char* key;
-	char* value;
-	char* res;
+	const char *sep;
+	const char *key;
+	const char *str;
+	char *value;
+	char *res;
 	int first;
-	char* tmp;
+	char *tmp;
 	int b;
 
 //	Assert(!is_root || !lua_gettop(l));
@@ -107,20 +108,20 @@ static char* SaveGlobal(lua_State *l, int is_root)
 		type_key = lua_type(l, -2);
 		type_value = lua_type(l, -1);
 		key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
-		if (!strcmp(key, "_G") || (is_root
-			&& (!strcmp(key, "assert") || !strcmp(key, "gcinfo") || !strcmp(key, "getfenv")
-			|| !strcmp(key, "unpack") || !strcmp(key, "tostring") || !strcmp(key, "tonumber")
-			|| !strcmp(key, "setmetatable") || !strcmp(key, "require") || !strcmp(key, "pcall")
-			|| !strcmp(key, "rawequal") || !strcmp(key, "collectgarbage") || !strcmp(key, "type")
-			|| !strcmp(key, "getmetatable") || !strcmp(key, "next") || !strcmp(key, "print")
-			|| !strcmp(key, "xpcall") || !strcmp(key, "rawset") || !strcmp(key, "setfenv")
-			|| !strcmp(key, "rawget") || !strcmp(key, "newproxy") || !strcmp(key, "ipairs")
-			|| !strcmp(key, "loadstring") || !strcmp(key, "dofile") || !strcmp(key, "_TRACEBACK")
-			|| !strcmp(key, "_VERSION") || !strcmp(key, "pairs") || !strcmp(key, "__pow")
-			|| !strcmp(key, "error") || !strcmp(key, "loadfile") || !strcmp(key, "arg")
-			|| !strcmp(key, "_LOADED") || !strcmp(key, "loadlib") || !strcmp(key, "string")
-			|| !strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug")
-			|| !strcmp(key, "coroutine")
+		if (!strcmp(key, "_G") || (is_root &&
+				(!strcmp(key, "assert") || !strcmp(key, "gcinfo") || !strcmp(key, "getfenv") ||
+				!strcmp(key, "unpack") || !strcmp(key, "tostring") || !strcmp(key, "tonumber") ||
+				!strcmp(key, "setmetatable") || !strcmp(key, "require") || !strcmp(key, "pcall") ||
+				!strcmp(key, "rawequal") || !strcmp(key, "collectgarbage") || !strcmp(key, "type") ||
+				!strcmp(key, "getmetatable") || !strcmp(key, "next") || !strcmp(key, "print") ||
+				!strcmp(key, "xpcall") || !strcmp(key, "rawset") || !strcmp(key, "setfenv") ||
+				!strcmp(key, "rawget") || !strcmp(key, "newproxy") || !strcmp(key, "ipairs") ||
+				!strcmp(key, "loadstring") || !strcmp(key, "dofile") || !strcmp(key, "_TRACEBACK") ||
+				!strcmp(key, "_VERSION") || !strcmp(key, "pairs") || !strcmp(key, "__pow") ||
+				!strcmp(key, "error") || !strcmp(key, "loadfile") || !strcmp(key, "arg") ||
+				!strcmp(key, "_LOADED") || !strcmp(key, "loadlib") || !strcmp(key, "string") ||
+				!strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug") ||
+				!strcmp(key, "coroutine")
 		// other string to protected ?
 		))) {
 			lua_pop(l, 1); // pop the value
@@ -128,14 +129,18 @@ static char* SaveGlobal(lua_State *l, int is_root)
 		}
 		switch (type_value) {
 			case LUA_TNIL:
-				value = strdup("nil");
+				value = new char[strlen("nil") + 1];
+				strcpy(value, "nil");
 				break;
 			case LUA_TNUMBER:
-				value = strdup(lua_tostring(l, -1)); // let lua do the conversion
+				str = lua_tostring(l, -1);
+				value = new char[strlen(str) + 1]; // let lua do the conversion
+				strcpy(value, str);
 				break;
 			case LUA_TBOOLEAN:
 				b = lua_toboolean(l, -1);
-				value = strdup(b ? "true" : "false"); // let lua do the conversion
+				value = new char[6];
+				value = strcpy(value, (b ? "true" : "false"));
 				break;
 			case LUA_TSTRING:
 				value = strdcat3("\"", lua_tostring(l, -1), "\"");
@@ -146,7 +151,7 @@ static char* SaveGlobal(lua_State *l, int is_root)
 				value = NULL;
 				if (tmp != NULL) {
 					value = strdcat3("{", tmp, "}");
-					free(tmp);
+					delete[] tmp;
 				}
 				break;
 			case LUA_TFUNCTION:
@@ -171,7 +176,7 @@ static char* SaveGlobal(lua_State *l, int is_root)
 
 			for (i = 0; key[i]; ++i) {
 				if (!isalnum(key[i]) && key[i] != '_') {
-					free(value);
+					delete[] value;
 					value = NULL;
 					break;
 				}
@@ -191,7 +196,7 @@ static char* SaveGlobal(lua_State *l, int is_root)
 			first = 0;
 			if (type_key == LUA_TSTRING) {
 				res = strdcat3(key, "=", value);
-				free(value);
+				delete[] value;
 			} else {
 				res = value;
 			}
@@ -199,17 +204,17 @@ static char* SaveGlobal(lua_State *l, int is_root)
 			if (type_key == LUA_TSTRING) {
 				tmp = value;
 				value = strdcat3(key, "=", value);
-				free(tmp);
+				delete[] tmp;
 				tmp = res;
 				res = strdcat3(res, sep, value);
-				free(tmp);
+				delete[] tmp;
 			} else {
 				res = strdcat3(res, sep, value);
 			}
 		}
 		tmp = res;
 		res = strdcat3("", res, "\n");
-		free(tmp);
+		delete[] tmp;
 	}
 	lua_pop(l, 1); // pop the table
 //	Assert(!is_root || !lua_gettop(l));
@@ -282,6 +287,7 @@ void SaveGame(const char *filename)
 	s = SaveGlobal(Lua, 1);
 	if (s != NULL) {
 		file.printf("-- Lua state\n\n %s\n", s);
+		delete[] s;
 	}
 	file.close();
 }
