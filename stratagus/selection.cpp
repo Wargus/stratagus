@@ -1137,7 +1137,7 @@ void SaveSelections(CFile *file)
 	for (int i = 0; i < NumSelected; ++i) {
 		char *ref = UnitReference(Selected[i]);
 		file->printf("\"%s\", ", ref);
-		free(ref);
+		delete[] ref;
 	}
 	file->printf("})\n");
 }

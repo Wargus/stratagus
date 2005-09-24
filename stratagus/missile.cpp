@@ -1202,11 +1202,11 @@ void Missile::SaveMissile(CFile *file) const
 
 	if (this->SourceUnit) {
 		file->printf(" \"source\", \"%s\",", s1 = UnitReference(this->SourceUnit));
-		free(s1);
+		delete[] s1;
 	}
 	if (this->TargetUnit) {
 		file->printf(" \"target\", \"%s\",", s1 = UnitReference(this->TargetUnit));
-		free(s1);
+		delete[] s1;
 	}
 
 	file->printf(" \"damage\", %d,", this->Damage);
