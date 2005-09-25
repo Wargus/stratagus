@@ -1605,6 +1605,8 @@ static int CclDefineVariables(lua_State* l)
 			for (int x = 0; x < i; ++x) {
 				t[x] = UnitTypeVar.Variable[x];
 			}
+			delete[] UnitTypeVar.Variable;
+			UnitTypeVar.Variable = t;
 			UnitTypeVar.NumberVariable++;
 		} else {
 			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
