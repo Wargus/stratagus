@@ -808,8 +808,7 @@ int main(int argc, char **argv)
 	const char *pathPtr = CFStringGetCStringPtr(macPath,
 		CFStringGetSystemEncoding());
 	Assert(pathPtr);
-	StratagusLibPath = new char[strlen(pathPtr) + 1];
-	strcpy(StratagusLibPath, pathPtr);
+	StratagusLibPath = new_strdup(pathPtr);
 #endif
 	CclStartFile = "scripts/stratagus.lua";
 	EditorStartFile = "scripts/editor.lua";

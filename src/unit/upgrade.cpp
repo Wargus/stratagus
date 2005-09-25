@@ -106,16 +106,14 @@ static Upgrade *AddUpgrade(const char *ident, const char *icon,
 		delete[] upgrade->Icon.Name;
 	} else {
 		upgrade = new Upgrade;
-		upgrade->Ident = new char[strlen(ident) + 1];
-		strcpy(upgrade->Ident, ident);
+		upgrade->Ident = new_strdup(ident);
 		upgrade->ID = AllUpgrades.size();
 		Upgrades[ident] = upgrade;
 		AllUpgrades.push_back(upgrade);
 	}
 
 	if (icon) {
-		upgrade->Icon.Name = new char[strlen(icon) + 1];
-		strcpy(upgrade->Icon.Name, icon);
+		upgrade->Icon.Name = new_strdup(icon);
 	} else {  // automatically generated icon-name
 		upgrade->Icon.Name = new char[strlen(ident) + 5 - 8 + 1];
 		strcpy(upgrade->Icon.Name, "icon-");

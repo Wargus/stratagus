@@ -87,7 +87,6 @@ static char *SaveGlobal(lua_State *l, int is_root)
 	int type_value;
 	const char *sep;
 	const char *key;
-	const char *str;
 	char *value;
 	char *res;
 	int first;
@@ -129,18 +128,14 @@ static char *SaveGlobal(lua_State *l, int is_root)
 		}
 		switch (type_value) {
 			case LUA_TNIL:
-				value = new char[strlen("nil") + 1];
-				strcpy(value, "nil");
+				value = new_strdup("nil");
 				break;
 			case LUA_TNUMBER:
-				str = lua_tostring(l, -1);
-				value = new char[strlen(str) + 1]; // let lua do the conversion
-				strcpy(value, str);
+				value = new_strdup(lua_tostring(l, -1)); // let lua do the conversion
 				break;
 			case LUA_TBOOLEAN:
 				b = lua_toboolean(l, -1);
-				value = new char[6];
-				value = strcpy(value, (b ? "true" : "false"));
+				value = new_strdup(b ? "true" : "false");
 				break;
 			case LUA_TSTRING:
 				value = strdcat3("\"", lua_tostring(l, -1), "\"");

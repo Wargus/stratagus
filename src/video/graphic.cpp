@@ -486,10 +486,8 @@ Graphic *NewGraphic(const char *file, int w, int h)
 			ExitFatal(-1);
 		}
 		// FIXME: use a constructor for this
-		g->File = new char[strlen(file) + 1];
-		strcpy(g->File, file);
-		g->HashFile = new char[strlen(g->File) + 1];
-		strcpy(g->HashFile, g->File);
+		g->File = new_strdup(file);
+		g->HashFile = new_strdup(g->File);
 		g->Surface = NULL;
 #ifndef USE_OPENGL
 		g->SurfaceFlip = NULL;
@@ -533,8 +531,7 @@ Graphic *ForceNewGraphic(const char *file, int w, int h)
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	g->File = new char[strlen(file) + 1];
-	strcpy(g->File, file);
+	g->File = new_strdup(file);
 	g->HashFile = new char[strlen(file) + 2 * sizeof(g->File) + 3];
 	sprintf(g->HashFile, "%s%p", g->File, g->File);
 	g->Surface = NULL;

@@ -106,8 +106,7 @@ int ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 	CPlayer *player;
 
 	player = unit->Player;
-	buf = new char[strlen(button->AllowStr) + 1];
-	strcpy(buf, button->AllowStr);
+	buf = new_strdup(button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
@@ -133,8 +132,7 @@ int ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 	CPlayer *player;
 
 	player = unit->Player;
-	buf = new char[strlen(button->AllowStr) + 1];
-	strcpy(buf, button->AllowStr);
+	buf = new_strdup(button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;

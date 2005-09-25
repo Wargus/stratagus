@@ -255,9 +255,8 @@ static int CclGetCurrentLuaPath(lua_State *l)
 	char *seperator;
 
 	LuaCheckArgs(l, 0);
-	path = new char[strlen(CurrentLuaFile) + 1];
+	path = new_strdup(CurrentLuaFile);
 	Assert(path);
-	strcpy(path, CurrentLuaFile);
 	seperator = strrchr(path, '/');
 	if (seperator) {
 		*seperator = 0;
@@ -553,9 +552,7 @@ static char *CallLuaStringFunction(unsigned int handler)
 	if (lua_gettop(Lua) - narg != 2) {
 		LuaError(Lua, "Function must return one value.");
 	}
-	const char *str = LuaToString(Lua, -1);
-	res = new char[strlen(str) + 1];
-	strcpy(res, str);
+	res = new_strdup(LuaToString(Lua, -1));
 	lua_pop(Lua, 2);
 	return res;
 }
@@ -714,8 +711,7 @@ StringDesc *NewStringDesc(const char *s)
 	}
 	res = new StringDesc;
 	res->e = EString_Dir;
-	res->D.Val = new char[strlen(s) + 1];
-	strcpy(res->D.Val, s);
+	res->D.Val = new_strdup(s);
 	return res;
 }
 
@@ -756,9 +752,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 	res = new StringDesc;
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
-		const char *str = LuaToString(l, -1);
-		res->D.Val = new char[strlen(str) + 1];
-		strcpy(res->D.Val, str);
+		res->D.Val = new_strdup(LuaToString(l, -1));
 	} else if (lua_isfunction(l, -1)) {
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
@@ -1015,9 +1009,7 @@ char *EvalString(const StringDesc *s)
 		case EString_Lua :     // a lua function.
 			return CallLuaStringFunction(s->D.Index);
 		case EString_Dir :     // directly a string.
-			str = new char[strlen(s->D.Val) + 1];
-			strcpy(str, s->D.Val);
-			return str;
+			return new_strdup(s->D.Val);
 		case EString_Concat :     // a + b -> "ab"
 			tmp1 = EvalString(s->D.Concat.Strings[0]);
 			if (!tmp1) {
@@ -1048,9 +1040,7 @@ char *EvalString(const StringDesc *s)
 		case EString_UnitName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
-				str = new char[strlen(unit->Type->Name) + 1];
-				strcpy(str, unit->Type->Name);
-				return str;
+				return new_strdup(unit->Type->Name);
 			} else { // ERROR.
 				return NULL;
 			}
@@ -1077,8 +1067,7 @@ char *EvalString(const StringDesc *s)
 					str[0] = '\0';
 					return str;
 				}
-				res = new char[strlen(tmp1 + begin) + 1];
-				strcpy(res, tmp1 + begin);
+				res = new_strdup(tmp1 + begin);
 				delete[] tmp1;
 				if (s->D.SubString.End) {
 					end = EvalNumber(s->D.SubString.End);
@@ -1133,9 +1122,7 @@ char *EvalString(const StringDesc *s)
 		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
 			switch (s->D.GameInfoType) {
 				case ES_GameInfo_Tips :
-					str = new char[strlen(Tips[CurrentTip]) + 1];
-					strcpy(str, Tips[CurrentTip]);
-					return str;
+					return new_strdup(Tips[CurrentTip]);
 				case ES_GameInfo_Objectives :
 					res = GameIntro.Objectives[0];
 					if (!res) {
@@ -1143,9 +1130,7 @@ char *EvalString(const StringDesc *s)
 						str[0] = '\0';
 						return str;
 					}
-					str = new char[strlen(res) + 1];
-					strcpy(str, res);
-					res = str;
+					res = new_strdup(res);
 					for (i = 1; GameIntro.Objectives[i]; ++i) {
 						tmp1 = strdcat(res, "\n");
 						delete[] res;
@@ -1901,10 +1886,7 @@ static int CclSetGameName(lua_State *l)
 			delete[] GameName;
 			GameName = NULL;
 		}
-
-		const char *str = lua_tostring(l, 1);
-		GameName = new char[strlen(str) + 1];
-		strcpy(GameName, str);
+		GameName = new_strdup(lua_tostring(l, 1));
 	}
 
 	return 0;
@@ -2082,8 +2064,7 @@ static int CclAddTip(lua_State *l)
 			break;
 		}
 		if (Tips[i] == NULL) {
-			Tips[i] = new char[strlen(str) + 1];
-			strcpy(Tips[i], str);
+			Tips[i] = new_strdup(str);
 			break;
 		}
 	}
@@ -2315,9 +2296,7 @@ static int CclDefineDefaultActions(lua_State *l)
 	}
 	args = lua_gettop(l);
 	for (i = 0; i < MaxCosts && i < args; ++i) {
-		const char *str = LuaToString(l, i + 1);
-		DefaultActions[i] = new char[strlen(str) + 1];
-		strcpy(DefaultActions[i], str);
+		DefaultActions[i] = new_strdup(LuaToString(l, i + 1));
 	}
 	return 0;
 }
@@ -2338,9 +2317,7 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	}
 	args = lua_gettop(l);
 	for (i = 0; i < MaxCosts && i < args; ++i) {
-		const char *str = LuaToString(l, i + 1);
-		DefaultResourceNames[i] = new char[strlen(str) + 1];
-		strcpy(DefaultResourceNames[i], str);
+		DefaultResourceNames[i] = new_strdup(LuaToString(l, i + 1));
 	}
 	return 0;
 }

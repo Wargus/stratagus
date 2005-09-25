@@ -211,7 +211,6 @@ static int CclDefineAiHelper(lua_State *l)
 static int CclDefineAi(lua_State *l)
 {
 	const char *value;
-	const char *str;
 	CAiType *aitype;
 #ifdef DEBUG
 	const CAiType *ait;
@@ -229,9 +228,7 @@ static int CclDefineAi(lua_State *l)
 	//
 	// AI Name
 	//
-	str = LuaToString(l, 1);
-	aitype->Name = new char[strlen(str) + 1];
-	strcpy(aitype->Name, str);
+	aitype->Name = new_strdup(LuaToString(l, 1));
 
 #ifdef DEBUG
 	for (ait = AiTypes->Next; ait; ait = ait->Next) {
@@ -246,8 +243,7 @@ static int CclDefineAi(lua_State *l)
 	//
 	value = LuaToString(l, 2);
 	if (*value != '*') {
-		aitype->Race = new char[strlen(value) + 1];
-		strcpy(aitype->Race, value);
+		aitype->Race = new_strdup(value);
 	} else {
 		aitype->Race = NULL;
 	}
@@ -255,9 +251,7 @@ static int CclDefineAi(lua_State *l)
 	//
 	// AI Class
 	//
-	str = LuaToString(l, 3);
-	aitype->Class = new char[strlen(str) + 1];
-	strcpy(aitype->Class, str);
+	aitype->Class = new_strdup(LuaToString(l, 3));
 
 	//
 	// AI Script
@@ -293,9 +287,7 @@ static int CclDefineAi(lua_State *l)
 	lua_call(l, 1, 1);
 	lua_pushstring(l, "name");
 	lua_gettable(l, -2);
-	str = LuaToString(l, -1);
-	aitype->FunctionName = new char[strlen(str) + 1];
-	strcpy(aitype->FunctionName, str);
+	aitype->FunctionName = new_strdup(LuaToString(l, -2));
 	lua_pop(l, 2); // FIXME : check if this value is correct.
 	// We can have opcode of this function with string.dump(function)
 	// Problems are for sub functions...
@@ -1000,7 +992,6 @@ static int DefaultResourceNumber(const char* name)
 static int CclDefineAiPlayer(lua_State *l)
 {
 	const char *value;
-	const char *str;
 	int i;
 	PlayerAi *ai;
 	int args;
@@ -1046,9 +1037,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			ai->AiType = ait;
 			ai->Script = ait->Script;
 		} else if (!strcmp(value, "script")) {
-			str = LuaToString(l, j + 1);
-			ai->Script = new char[strlen(str) + 1];
-			strcpy(ai->Script, str);
+			ai->Script = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "script-debug")) {
 			ai->ScriptDebug = LuaToBoolean(l, j + 1);
 		} else if (!strcmp(value, "sleep-cycles")) {

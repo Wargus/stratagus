@@ -592,9 +592,7 @@ char *GetLineFont(int line, char *s, int maxlen, int font)
 			++res;
 		}
 	}
-	char *str = new char[strlen(res) + 1];
-	strcpy(str, res);
-	res = str;
+	res = new_strdup(res);
 	tmp = strchrlen(res, '\n', maxlen, font);
 	if (tmp) {
 		*tmp = '\0';
@@ -867,8 +865,7 @@ static int CclDefineFont(lua_State *l)
 			}
 			if (it == FontMappings.end()) {
 				FontMapping f;
-				f.Ident = new char[strlen(str) + 1];
-				strcpy(f.Ident, str);
+				f.Ident = new_strdup(str);
 				f.Font = i;
 				FontMappings.push_back(f);
 			}
@@ -908,12 +905,9 @@ static int CclDefineFontColor(lua_State *l)
 	int i;
 	int args;
 	FontColorMapping *fcm;
-	const char *str;
 
 	LuaCheckArgs(l, 2);
-	str = LuaToString(l, 1);
-	color = new char[strlen(str) + 1];
-	strcpy(color, str);
+	color = new_strdup(LuaToString(l, 1));
 	fcm = NULL;
 
 	if (!FontColorMappings.size()) {
