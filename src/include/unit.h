@@ -483,8 +483,10 @@ enum _directions_ {
 
 
 	/// A linked list element.
-typedef struct _unit_list_item_ UnitListItem;
-struct _unit_list_item_ {
+class UnitListItem {
+public:
+	UnitListItem() : Unit(NULL), Prev(NULL), Next(NULL) {}
+
 	CUnit        *Unit;  /// Points to the unit it links
 	UnitListItem *Prev;  /// Previous item.
 	UnitListItem *Next;  /// Next item.

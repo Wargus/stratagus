@@ -114,9 +114,9 @@ static int CclStratagusMap(lua_State *l)
 					lua_pop(l, 1);
 
 					free(TheMap.Fields);
-					TheMap.Fields = (MapField*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight,
-						sizeof(*TheMap.Fields));
-					TheMap.Visible[0] = (unsigned*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
+					TheMap.Fields = new MapField[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
+					TheMap.Visible[0] = new unsigned[TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2];
+					memset(TheMap.Visible[0], 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2 * sizeof(unsigned));
 					InitUnitCache();
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {

@@ -175,7 +175,7 @@ class CPlayer;
 class CFile;
 class CUnit;
 class CUnitType;
-struct _unit_list_item_;
+class UnitListItem;
 
 /*----------------------------------------------------------------------------
 --  Map
@@ -195,7 +195,17 @@ struct _unit_list_item_;
 ----------------------------------------------------------------------------*/
 
 	/// Describes a field of the map
-typedef struct _map_field_ {
+class MapField {
+public:
+	MapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0),
+		UnitCache(NULL)
+	{
+		memset(Visible, 0, sizeof(Visible));
+		memset(VisCloak, 0, sizeof(VisCloak));
+		memset(Radar, 0, sizeof(Radar));
+		memset(RadarJammer, 0, sizeof(RadarJammer));
+	}
+
 	unsigned short Tile;      /// graphic tile number
 	unsigned short SeenTile;  /// last seen tile (FOW)
 	unsigned short Flags;     /// field flags
@@ -207,8 +217,8 @@ typedef struct _map_field_ {
 	unsigned char VisCloak[PlayerMax]; /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];    /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming Capabilities.
-	struct _unit_list_item_* UnitCache;/// A unit on the map field
-} MapField;
+	UnitListItem *UnitCache;           /// A unit on the map field
+} ;
 
 // Not used until now:
 #define MapFieldSpeedMask 0x0007  /// Move faster on this tile
