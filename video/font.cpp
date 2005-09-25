@@ -592,7 +592,9 @@ char *GetLineFont(int line, char *s, int maxlen, int font)
 			++res;
 		}
 	}
-	res = strdup(res);
+	char *str = new char[strlen(res) + 1];
+	strcpy(str, res);
+	res = str;
 	tmp = strchrlen(res, '\n', maxlen, font);
 	if (tmp) {
 		*tmp = '\0';
