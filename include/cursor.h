@@ -38,17 +38,13 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _cursor_type_ cursor.h
+**  @class CursorType cursor.h
 **
 **  \#include "cursor.h"
-**
-**  typedef struct _cursor_type_ CursorType;
 **
 **  This structure contains all informations about a cursor.
 **  The cursor changes depending of the current user input state.
 **  A cursor can have transparent areas and color cycle animated.
-**
-**  In the future it is planned to support animated cursors.
 **
 **  The cursor-type structure members:
 **
@@ -64,19 +60,11 @@
 **    "mythical", ...). If NULL, this cursor could be used by any
 **    race.
 **
-**  CursorType::File
-**
-**    File containing the image graphics of the cursor.
-**
 **  CursorType::HotX CursorType::HotY
 **
 **    Hot spot of the cursor in pixels. Relative to the sprite origin
 **    (0,0). The hot spot of a cursor is the point to which Stratagus
 **    refers in tracking the cursor's position.
-**
-**  CursorType::Width CursorType::Height
-**
-**    Size of the cursor in pixels.
 **
 **  CursorType::SpriteFrame
 **
@@ -91,20 +79,18 @@
 **    @note  This is the first time that for timing ms are used! I would
 **           change it to display frames.
 **
-**  CursorType::Graphic
+**  CursorType::G
 **
 **    Contains the sprite of the cursor, loaded from CursorType::File.
 **    This can be a multicolor image with alpha or transparency.
 */
 
 /**
-**  @struct _cursor_config_ cursor.h
+**  @class CursorConfig cursor.h
 **
 **  \#include "cursor.h"
 **
-**  typedef struct _cursor_config_ CursorConfig;
-**
-**  This structure contains all informations to reference/use a cursor.
+**  This structure contains all information to reference/use a cursor.
 **  It is normally used in other config structures.
 **
 **  CursorConfig::Name
@@ -118,6 +104,12 @@
 */
 
 /*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include <vector>
+
+/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
@@ -128,16 +120,17 @@ class CUnitType;
 --  Definitions
 ----------------------------------------------------------------------------*/
 
-	/// Cursor-type typedef
-typedef struct _cursor_type_ CursorType;
-
 	/// Private type which specifies the cursor-type
-struct _cursor_type_ {
-	char*       Ident;  /// Identifier to reference it
-	char*       Race;   /// Race name
+class CursorType {
+public:
+	CursorType() : Ident(NULL), Race(NULL), HotX(0), HotY(0),
+		SpriteFrame(0), FrameRate(0), G(NULL) {}
 
-	int HotX;    /// Hot point x
-	int HotY;    /// Hot point y
+	char *Ident;  /// Identifier to reference it
+	char *Race;   /// Race name
+
+	int HotX;     /// Hot point x
+	int HotY;     /// Hot point y
 
 	int SpriteFrame;  /// Current displayed cursor frame
 	int FrameRate;    /// Rate of changing the frames
@@ -148,30 +141,32 @@ struct _cursor_type_ {
 };
 
 	/// Cursor config reference
-typedef struct _cursor_config_ {
-	char*       Name;    /// Config cursor-type name
-	CursorType* Cursor;  /// Cursor-type pointer
-} CursorConfig;
+class CursorConfig {
+public:
+	CursorConfig() : Name(NULL), Cursor(NULL) {}
+
+	char       *Name;    /// Config cursor-type name
+	CursorType *Cursor;  /// Cursor-type pointer
+};
 
 	/// Cursor state
-typedef enum _cursor_states_ {
+enum CursorStates {
 	CursorStatePoint,      /// Normal cursor
 	CursorStateSelect,     /// Select position
 	CursorStateRectangle,  /// Rectangle selecting
 	CursorStatePieMenu,    /// Displaying Pie Menu
-} CursorStates;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CursorType *Cursors;          /// cursor-types description
-extern int CursorMax;                /// Number of cursor.
+extern std::vector<CursorType> Cursors;/// cursor-types description
 
 extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
-extern CUnitType *CursorBuilding;  /// building cursor
+extern CUnitType *CursorBuilding; /// building cursor
 
 extern CursorType *GameCursor;  /// cursor-type
 extern int CursorX;             /// cursor position on screen X
