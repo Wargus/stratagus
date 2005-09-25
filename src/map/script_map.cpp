@@ -113,7 +113,7 @@ static int CclStratagusMap(lua_State *l)
 					lua_pop(l, 1);
 					lua_pop(l, 1);
 
-					free(TheMap.Fields);
+					delete[] TheMap.Fields;
 					TheMap.Fields = new MapField[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
 					TheMap.Visible[0] = new unsigned[TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2];
 					memset(TheMap.Visible[0], 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2 * sizeof(unsigned));

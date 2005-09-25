@@ -53,25 +53,37 @@
 **  @param tileset  Tileset to be extended.
 **  @param tiles    Number of tiles.
 */
-static void ExtendTilesetTables(Tileset* tileset, int tiles)
+static void ExtendTilesetTables(CTileset *tileset, int oldtiles, int newtiles)
 {
-	tileset->Table = (unsigned short*)realloc(tileset->Table, tiles * sizeof(*tileset->Table));
-	if (!tileset->Table) {
+	unsigned short *newtable;
+	TileInfo *newtileinfo;
+
+	newtable = new unsigned short[oldtiles + newtiles];
+	if (!newtable) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->FlagsTable =
-		(unsigned short*)realloc(tileset->FlagsTable, tiles * sizeof(*tileset->FlagsTable));
-	if (!tileset->FlagsTable) {
+	memcpy(newtable, tileset->Table, oldtiles * sizeof(short));
+	delete[] tileset->Table;
+	tileset->Table = newtable;
+
+	newtable = new unsigned short[oldtiles + newtiles];
+	if (!newtable) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->Tiles = (TileInfo*)realloc(tileset->Tiles,
-		tiles * sizeof(*tileset->Tiles));
-	if (!tileset->Tiles) {
+	memcpy(newtable, tileset->FlagsTable, oldtiles * sizeof(short));
+	delete[] tileset->FlagsTable;
+	tileset->FlagsTable = newtable;
+
+	newtileinfo = new TileInfo[oldtiles + newtiles];
+	if (!newtileinfo) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
+	memcpy(newtileinfo, tileset->Tiles, oldtiles * sizeof(TileInfo));
+	delete[] tileset->Tiles;
+	tileset->Tiles = newtileinfo;
 }
 
 /**
@@ -80,23 +92,26 @@ static void ExtendTilesetTables(Tileset* tileset, int tiles)
 **  @param l        Lua state.
 **  @param tileset  Tileset currently parsed.
 */
-static int TilesetParseName(lua_State* l, Tileset* tileset)
+static int TilesetParseName(lua_State *l, CTileset *tileset)
 {
-	char* ident;
+	char *ident;
 	int i;
 	
-	ident = strdup(LuaToString(l, -1));
+	ident = new_strdup(LuaToString(l, -1));
 	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
 		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
-			free(ident);
+			delete[] ident;
 			return i;
 		}
 	}
 
 	// Can't find it, then we add another solid terrain type.
-	tileset->SolidTerrainTypes = (SolidTerrainInfo*)realloc(tileset->SolidTerrainTypes,
-		++tileset->NumTerrainTypes * sizeof(*tileset->SolidTerrainTypes));
-	tileset->SolidTerrainTypes[i].TerrainName = ident;
+	SolidTerrainInfo *s = new SolidTerrainInfo[tileset->NumTerrainTypes + 1];
+	memcpy(s, tileset->SolidTerrainTypes, tileset->NumTerrainTypes * sizeof(SolidTerrainInfo));
+	delete[] tileset->SolidTerrainTypes;
+	tileset->SolidTerrainTypes = s;
+	tileset->SolidTerrainTypes[tileset->NumTerrainTypes].TerrainName = ident;
+	++tileset->NumTerrainTypes;
 	
 	return i;
 }
@@ -109,10 +124,10 @@ static int TilesetParseName(lua_State* l, Tileset* tileset)
 **  @param j     pointer for the location in the array. in and out
 **
 */
-static void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
+static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 {
 	int flags;
-	const char* value;
+	const char *value;
 
 	//
 	//  Parse the list: flags of the slot
@@ -180,9 +195,9 @@ static void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 **  @param l        Lua state.
 **  @param tileset  Tileset to be filled.
 */
-static void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
+static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 {
-	const char* value;
+	const char *value;
 	int i;
 	int args;
 	int j;
@@ -284,7 +299,7 @@ static void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 **  @param tileset  Tileset to be filled.
 **  @param index    Current table index.
 */
-static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
+static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 {
 	int i;
 	int f;
@@ -292,7 +307,7 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	int basic_name;
 	int j;
 
-	ExtendTilesetTables(tileset, index + 16);
+	ExtendTilesetTables(tileset, index, 16);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -316,7 +331,7 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 
 	// hack for sc tilesets, remove when fixed
 	if (len > 16) {
-		ExtendTilesetTables(tileset, index + len);
+		ExtendTilesetTables(tileset, index, len);
 	}
 
 	for (i = 0; i < len; ++i) {
@@ -349,7 +364,7 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 **  @param tileset  Tileset to be filled.
 **  @param index    Current table index.
 */
-static int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
+static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 {
 	int i;
 	int len;
@@ -361,7 +376,7 @@ static int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 	int args;
 
 	new_index = index + 256;
-	ExtendTilesetTables(tileset, new_index);
+	ExtendTilesetTables(tileset, index, 256);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -426,36 +441,35 @@ static int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 **  @param tileset  Tileset to be filled.
 **  @param t        FIXME: docu
 */
-static void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
+static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 {
-	const char* value;
+	const char *value;
 	int index;
 	int args;
 	int j;
 
 	index = 0;
-	tileset->Table = (unsigned short*)malloc(16 * sizeof(*tileset->Table));
+	tileset->Table = new unsigned short[16];
 	if (!tileset->Table) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->FlagsTable =
-		(unsigned short*)malloc(16 * sizeof(*tileset->FlagsTable));
+	tileset->FlagsTable = new unsigned short[16];
 	if (!tileset->FlagsTable) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->Tiles = (TileInfo*)malloc(16 * sizeof(TileInfo));
+	tileset->Tiles = new TileInfo[16];
 	if (!tileset->Tiles) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->SolidTerrainTypes = (SolidTerrainInfo*)malloc(sizeof(SolidTerrainInfo));
+	tileset->SolidTerrainTypes = new SolidTerrainInfo;
 	if (!tileset->SolidTerrainTypes) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->SolidTerrainTypes[0].TerrainName = strdup("unused");
+	tileset->SolidTerrainTypes[0].TerrainName = new_strdup("unused");
 	tileset->NumTerrainTypes = 1;
 
 	//
@@ -501,18 +515,18 @@ static void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 **
 **  @param l  Lua state.
 */
-static int CclDefineTileset(lua_State* l)
+static int CclDefineTileset(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
-	free(TheMap.Tileset.Name);
-	free(TheMap.Tileset.ImageFile);
-	free(TheMap.Tileset.Table);
-	free(TheMap.Tileset.Tiles);
-	free(TheMap.Tileset.TileTypeTable);
-	memset(&TheMap.Tileset, 0, sizeof(Tileset));
+	delete[] TheMap.Tileset.Name;
+	delete[] TheMap.Tileset.ImageFile;
+	delete[] TheMap.Tileset.Table;
+	delete[] TheMap.Tileset.Tiles;
+	delete[] TheMap.Tileset.TileTypeTable;
+	memset(&TheMap.Tileset, 0, sizeof(CTileset));
 
 	TheMap.Tileset.TileSizeX = 32;
 	TheMap.Tileset.TileSizeY = 32;
@@ -526,9 +540,9 @@ static int CclDefineTileset(lua_State* l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			TheMap.Tileset.Name = strdup(LuaToString(l, j));
+			TheMap.Tileset.Name = new_strdup(LuaToString(l, j));
 		} else if (!strcmp(value, "image")) {
-			TheMap.Tileset.ImageFile = strdup(LuaToString(l, j));
+			TheMap.Tileset.ImageFile = new_strdup(LuaToString(l, j));
 		} else if (!strcmp(value, "size")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
@@ -559,13 +573,13 @@ static int CclDefineTileset(lua_State* l)
 ** trees and rocks. This function will be deleted when removing 
 ** support of walls and alike in the tileset.
 */
-static int CclBuildTilesetTables(lua_State* l)
+static int CclBuildTilesetTables(lua_State *l)
 {
 	int n;
 	int tile;
 	int solid;
 	int mixed;
-	const unsigned short* table;
+	const unsigned short *table;
 	int i;
 
 	LuaCheckArgs(l, 0);
@@ -573,11 +587,12 @@ static int CclBuildTilesetTables(lua_State* l)
 	//  Calculate number of tiles in graphic tile
 	n = TheMap.Tileset.NumTiles;
 
-	TheMap.Tileset.MixedLookupTable = (int*)calloc(n, sizeof(int));
+	TheMap.Tileset.MixedLookupTable = new int[n];
+	memset(TheMap.Tileset.MixedLookupTable, 0, n * sizeof(int));
 
 	//  Build the TileTypeTable
-	TheMap.Tileset.TileTypeTable =
-		(unsigned char*)calloc(n, sizeof(*TheMap.Tileset.TileTypeTable));
+	TheMap.Tileset.TileTypeTable = new unsigned char[n];
+	memset(TheMap.Tileset.TileTypeTable, 0, n * sizeof(unsigned char));
 
 	table = TheMap.Tileset.Table;
 	for (i = 0; i < n; ++i) {
@@ -913,7 +928,7 @@ static int CclBuildTilesetTables(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetTileFlags(lua_State* l)
+static int CclSetTileFlags(lua_State *l)
 {
 	int j;
 	int tilenumber;

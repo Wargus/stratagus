@@ -64,14 +64,17 @@
 //----------------------------------------------------------------------------
 
 /**
-** LogEntry typedef
+**  LogEntry structure.
 */
-typedef struct _log_entry_ LogEntry;
+class LogEntry {
+public:
+	LogEntry() : GameCycle(0), UnitIdent(NULL), Action(NULL),
+		Flush(0), PosX(0), PosY(0), DestUnitNumber(0), Value(NULL),
+		Num(0), SyncRandSeed(0), Next(NULL)
+	{
+		UnitNumber = 0;
+	}
 
-/**
-** LogEntry structure.
-*/
-struct _log_entry_ {
 	unsigned long GameCycle;
 	int UnitNumber;
 	char *UnitIdent;
@@ -87,19 +90,31 @@ struct _log_entry_ {
 };
 
 /**
-** Multiplayer Player definition
+**  Multiplayer Player definition
 */
-typedef struct _multiplayer_player_ {
+class MPPlayer {
+public:
 	char *Name;
 	int Race;
 	int Team;
 	int Type;
-} MPPlayer;
+};
 
 /**
 ** Full replay structure (definition + logs)
 */
-typedef struct _full_replay_ {
+class FullReplay {
+public:
+	FullReplay() :
+		Comment1(NULL), Comment2(NULL), Comment3(NULL), Date(NULL), Map(NULL),
+		MapPath(NULL), MapId(0), Type(0), Race(0), LocalPlayer(0),
+		Resource(0), NumUnits(0), TileSet(0), NoFow(false), RevealMap(0),
+		GameType(0), Opponents(0), Commands(NULL)
+	{
+		memset(Players, 0, sizeof(Players));
+		memset(Engine, 0, sizeof(Engine));
+		memset(Network, 0, sizeof(Network));
+	}
 	char *Comment1;
 	char *Comment2;
 	char *Comment3;
@@ -123,7 +138,7 @@ typedef struct _full_replay_ {
 	int Engine[3];
 	int Network[3];
 	LogEntry *Commands;
-} FullReplay;
+};
 
 //----------------------------------------------------------------------------
 // Constants
@@ -162,7 +177,7 @@ static FullReplay *StartReplay(void)
 	time_t now;
 	char *s1;
 
-	replay = (FullReplay *)calloc(1, sizeof(FullReplay));
+	replay = new FullReplay;
 
 	time(&now);
 	s = ctime(&now);
@@ -282,11 +297,11 @@ static void DeleteReplay(FullReplay *replay)
 		delete[] log->Action;
 		delete[] log->Value;
 		next = log->Next;
-		free(log);
+		delete log;
 		log = next;
 	}
 
-	free(replay);
+	delete replay;
 }
 
 static void PrintLogCommand(LogEntry *log, CFile *dest)
@@ -467,7 +482,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		return;
 	}
 
-	log = (LogEntry*)malloc(sizeof(LogEntry));
+	log = new LogEntry;
 
 	//
 	// Frame, unit, (type-ident only to be better readable).
@@ -523,7 +538,7 @@ static int CclLog(lua_State *l)
 
 	Assert(CurrentReplay);
 
-	log = (LogEntry*)calloc(1, sizeof(LogEntry));
+	log = new LogEntry;
 	log->UnitNumber = -1;
 	log->PosX = -1;
 	log->PosY = -1;
@@ -588,7 +603,7 @@ static int CclReplayLog(lua_State *l)
 
 	Assert(CurrentReplay == NULL);
 
-	replay = (FullReplay*)calloc(1, sizeof(FullReplay));
+	replay = new FullReplay;
 
 	lua_pushnil(l);
 	while (lua_next(l, 1) != 0) {

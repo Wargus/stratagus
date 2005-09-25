@@ -64,11 +64,10 @@ char CurrentMapPath[1024];                   /// Path of the current map
 char DefaultMap[1024] = "maps/default.smp";  /// Default map path
 int RestartScenario;                         /// Restart the scenario
 int QuitToMenu;                              /// Quit to menu
-Campaign* Campaigns;                         /// Campaigns
-int NumCampaigns;                            /// Number of campaigns
+std::vector<Campaign *> Campaigns;           /// Campaigns
 
-static Campaign* CurrentCampaign;        /// Playing this campaign
-static CampaignChapter* CurrentChapter;  /// Playing this chapter of campaign
+static Campaign *CurrentCampaign;        /// Playing this campaign
+static CampaignChapter *CurrentChapter;  /// Playing this chapter of campaign
 static int SkipCurrentChapter = 1;       /// Skip the current chapter when
                                          /// looking for the next one
 
@@ -81,7 +80,7 @@ static int SkipCurrentChapter = 1;       /// Skip the current chapter when
 **
 **  @return  The filename of the next level
 */
-char* NextChapter(void)
+char *NextChapter(void)
 {
 	if (RestartScenario) {
 		RestartScenario = 0;
@@ -138,17 +137,17 @@ char* NextChapter(void)
 **
 **  @note  ::CurrentMapPath contains the filename of first level.
 */
-void PlayCampaign(const char* name)
+void PlayCampaign(const char *name)
 {
-	char* filename;
+	char *filename;
 	int i;
 
 	//
 	// Find the campaign.
 	//
-	for (i = 0; i < NumCampaigns; ++i) {
-		if (!strcmp(Campaigns[i].Ident, name)) {
-			CurrentCampaign = Campaigns + i;
+	for (i = 0; i < (int)Campaigns.size(); ++i) {
+		if (!strcmp(Campaigns[i]->Ident, name)) {
+			CurrentCampaign = Campaigns[i];
 		}
 	}
 	if (!CurrentCampaign) {
@@ -161,7 +160,7 @@ void PlayCampaign(const char* name)
 		LuaLoadFile(filename);
 	}
 
-	GameIntro.Objectives[0] = strdup(DefaultObjective);
+	GameIntro.Objectives[0] = new_strdup(DefaultObjective);
 
 	CurrentChapter = CurrentCampaign->Chapters;
 	SkipCurrentChapter = 0;
@@ -183,13 +182,18 @@ void PlayCampaign(const char* name)
 **  @param l        Lua state.
 **  @param chapter  Chapter.
 */
-static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
+static void ParseShowPicture(lua_State *l, CampaignChapter *chapter)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
 	chapter->Type = ChapterShowPicture;
+	chapter->Data.Picture.Image = NULL;
+	chapter->Data.Picture.FadeIn = 0;
+	chapter->Data.Picture.FadeOut = 0;
+	chapter->Data.Picture.DisplayTime = 30;
+	chapter->Data.Picture.Text = NULL;
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -203,7 +207,7 @@ static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 
 		if (!strcmp(value, "image")) {
 			lua_rawgeti(l, -1, j + 1);
-			chapter->Data.Picture.Image = strdup(LuaToString(l, -1));
+			chapter->Data.Picture.Image = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "fade-in")) {
 			lua_rawgeti(l, -1, j + 1);
@@ -218,7 +222,7 @@ static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 			chapter->Data.Picture.DisplayTime = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "text")) {
-			ChapterPictureText** text;
+			ChapterPictureText **text;
 			int subargs;
 			int k;
 
@@ -231,7 +235,7 @@ static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 			while (*text) {
 				text = &((*text)->Next);
 			}
-			*text = (ChapterPictureText*)calloc(sizeof(ChapterPictureText), 1);
+			*text = new ChapterPictureText;
 
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -274,7 +278,7 @@ static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "text")) {
 					lua_rawgeti(l, -1, k + 1);
-					(*text)->Text = strdup(LuaToString(l, -1));
+					(*text)->Text = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				}
 			}
@@ -288,32 +292,32 @@ static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 **
 **  @param chapters  Chapters to be freed.
 */
-static void FreeChapters(CampaignChapter** chapters)
+static void FreeChapters(CampaignChapter **chapters)
 {
-	CampaignChapter* ch;
-	CampaignChapter* chptr;
-	ChapterPictureText* text;
-	ChapterPictureText* textptr;
+	CampaignChapter *ch;
+	CampaignChapter *chptr;
+	ChapterPictureText *text;
+	ChapterPictureText *textptr;
 
 	ch = *chapters;
 	while (ch) {
 		if (ch->Type == ChapterShowPicture) {
-			free(ch->Data.Picture.Image);
+			delete[] ch->Data.Picture.Image;
 			text = ch->Data.Picture.Text;
 			while (text) {
-				free(text->Text);
+				delete[] text->Text;
 				textptr = text;
 				text = text->Next;
-				free(textptr);
+				delete textptr;
 			}
 		} else if (ch->Type == ChapterPlayLevel) {
-			free(ch->Data.Level.Name);
+			delete[] ch->Data.Level.Name;
 		} else if (ch->Type == ChapterPlayMovie) {
-			free(ch->Data.Movie.File);
+			delete[] ch->Data.Movie.File;
 		}
 		chptr = ch;
 		ch = ch->Next;
-		free(chptr);
+		delete chptr;
 	}
 	*chapters = NULL;
 }
@@ -325,13 +329,13 @@ static void FreeChapters(CampaignChapter** chapters)
 **
 **  @note FIXME: play-video, defeat, draw are missing.
 */
-static int CclDefineCampaign(lua_State* l)
+static int CclDefineCampaign(lua_State *l)
 {
-	char* ident;
-	const char* value;
-	Campaign* campaign;
-	CampaignChapter* chapter;
-	CampaignChapter** tail;
+	char *ident;
+	const char *value;
+	Campaign *campaign;
+	CampaignChapter *chapter;
+	CampaignChapter **tail;
 	int i;
 	int args;
 	int j;
@@ -344,38 +348,40 @@ static int CclDefineCampaign(lua_State* l)
 	//
 	// Campaign name
 	//
-	ident = strdup(LuaToString(l, j + 1));
+	ident = new_strdup(LuaToString(l, j + 1));
 	++j;
 	campaign = NULL;
 
-	if (Campaigns) {
-		for (i = 0; i < NumCampaigns; ++i) {
-			if (!strcmp(Campaigns[i].Ident, ident)) {
-				if (!strcmp(ident, "current") && Campaigns[i].Chapters) {
-					FreeChapters(&Campaigns[i].Chapters);
-				} else if (Campaigns[i].Chapters) {
+	if (!Campaigns.empty()) {
+		for (i = 0; i < (int)Campaigns.size(); ++i) {
+			if (!strcmp(Campaigns[i]->Ident, ident)) {
+				if (!strcmp(ident, "current") && Campaigns[i]->Chapters) {
+					FreeChapters(&Campaigns[i]->Chapters);
+				} else if (Campaigns[i]->Chapters) {
 					// Redefining campaigns causes problems if a campaign is
 					// playing.
 					return 0;
 				}
-				campaign = Campaigns + i;
-				free(campaign->Ident);
-				free(campaign->Name);
-				free(campaign->File);
+				campaign = Campaigns[i];
+				delete[] campaign->Ident;
+				campaign->Ident = NULL;
+				delete[] campaign->Name;
+				campaign->Name = NULL;
+				campaign->Players = 0;
+				delete[] campaign->File;
+				campaign->File = NULL;
 				break;
 			}
 		}
-		if (i == NumCampaigns) {
-			Campaigns = (Campaign*)realloc(Campaigns, sizeof(Campaign) * (NumCampaigns + 1));
-			campaign = Campaigns + NumCampaigns;
-			++NumCampaigns;
+		if (i == (int)Campaigns.size()) {
+			campaign = new Campaign;
+			Campaigns.push_back(campaign);
 		}
 	} else {
-		campaign = Campaigns = (Campaign*)malloc(sizeof(Campaign));
-		++NumCampaigns;
+		campaign = new Campaign;
+		Campaigns.push_back(campaign);
 	}
 
-	memset(campaign, 0, sizeof(Campaign));
 	campaign->Ident = ident;
 	campaign->Players = 1;
 	tail = &campaign->Chapters;
@@ -388,9 +394,9 @@ static int CclDefineCampaign(lua_State* l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			campaign->Name = strdup(LuaToString(l, j + 1));
+			campaign->Name = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "file")) {
-			campaign->File = strdup(LuaToString(l, j + 1));
+			campaign->File = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "players")) {
 			campaign->Players = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "campaign")) {
@@ -407,7 +413,7 @@ static int CclDefineCampaign(lua_State* l)
 				lua_pop(l, 1);
 				++k;
 
-				chapter = (CampaignChapter*)calloc(sizeof(CampaignChapter), 1);
+				chapter = new CampaignChapter;
 				chapter->Next = *tail;
 				*tail = chapter;
 				tail = &chapter->Next;
@@ -418,13 +424,14 @@ static int CclDefineCampaign(lua_State* l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "play-movie")) {
 					chapter->Type = ChapterPlayMovie;
+					chapter->Data.Movie.Flags = 0;
 					lua_rawgeti(l, j + 1, k + 1);
-					chapter->Data.Movie.File = strdup(LuaToString(l, -1));
+					chapter->Data.Movie.File = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "play-level")) {
 					chapter->Type = ChapterPlayLevel;
 					lua_rawgeti(l, j + 1, k + 1);
-					chapter->Data.Level.Name = strdup(LuaToString(l, -1));
+					chapter->Data.Level.Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -443,14 +450,14 @@ static int CclDefineCampaign(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetCurrentChapter(lua_State* l)
+static int CclSetCurrentChapter(lua_State *l)
 {
 	int i;
 
 	LuaCheckArgs(l, 1);
-	for (i = 0; i < NumCampaigns; ++i) {
-		if (!strcmp(Campaigns[i].Ident, "current")) {
-			CurrentCampaign = Campaigns + i;
+	for (i = 0; i < (int)Campaigns.size(); ++i) {
+		if (!strcmp(Campaigns[i]->Ident, "current")) {
+			CurrentCampaign = Campaigns[i];
 			break;
 		}
 	}
@@ -473,9 +480,9 @@ static int CclSetCurrentChapter(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclBriefing(lua_State* l)
+static int CclBriefing(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	int voice;
 	int objective;
 	int args;
@@ -496,37 +503,27 @@ static int CclBriefing(lua_State* l)
 				LuaError(l, "Unsupported briefing type: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "title")) {
-			if (GameIntro.Title) {
-				free(GameIntro.Title);
-			}
-			GameIntro.Title = strdup(LuaToString(l, j + 1));
+			delete[] GameIntro.Title;
+			GameIntro.Title = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "background")) {
-			if (GameIntro.Background) {
-				free(GameIntro.Background);
-			}
-			GameIntro.Background = strdup(LuaToString(l, j + 1));
+			delete[] GameIntro.Background;
+			GameIntro.Background = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "text")) {
-			if (GameIntro.TextFile) {
-				free(GameIntro.TextFile);
-			}
-			GameIntro.TextFile = strdup(LuaToString(l, j + 1));
+			delete[] GameIntro.TextFile;
+			GameIntro.TextFile = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "voice")) {
 			if (voice == MAX_BRIEFING_VOICES) {
 				LuaError(l, "too many voices");
 			}
-			if (GameIntro.VoiceFile[voice]) {
-				free(GameIntro.VoiceFile[voice]);
-			}
-			GameIntro.VoiceFile[voice] = strdup(LuaToString(l, j + 1));
+			delete[] GameIntro.VoiceFile[voice];
+			GameIntro.VoiceFile[voice] = new_strdup(LuaToString(l, j + 1));
 			++voice;
 		} else if (!strcmp(value, "objective")) {
 			if (objective == MAX_OBJECTIVES) {
 				LuaError(l, "too many objectives");
 			}
-			if (GameIntro.Objectives[objective]) {
-				free(GameIntro.Objectives[objective]);
-			}
-			GameIntro.Objectives[objective] = strdup(LuaToString(l, j + 1));
+			delete[] GameIntro.Objectives[objective];
+			GameIntro.Objectives[objective] = new_strdup(LuaToString(l, j + 1));
 			++objective;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -630,22 +627,14 @@ void CleanCampaign(void)
 	// FIXME: Can't clean campaign needed for continue.
 	DebugPrint("FIXME: Cleaning campaign not written\n");
 
-	if (GameIntro.Title) {
-		free(GameIntro.Title);
-	}
-	if (GameIntro.Background) {
-		free(GameIntro.Background);
-	}
-	if (GameIntro.TextFile) {
-		free(GameIntro.TextFile);
-	}
+	delete[] GameIntro.Title;
+	delete[] GameIntro.Background;
+	delete[] GameIntro.TextFile;
 	for (i = 0; i < MAX_BRIEFING_VOICES; ++i) {
-		free(GameIntro.VoiceFile[i]);
+		delete[] GameIntro.VoiceFile[i];
 	}
 	for (i = 0; i < MAX_OBJECTIVES; ++i) {
-		if (GameIntro.Objectives[i]) {
-			free(GameIntro.Objectives[i]);
-		}
+		delete[] GameIntro.Objectives[i];
 	}
 	memset(&GameIntro, 0, sizeof(GameIntro));
 }

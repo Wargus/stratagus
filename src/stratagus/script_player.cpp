@@ -91,10 +91,11 @@ static int CclPlayer(lua_State *l)
 		NumPlayers = i + 1;
 	}
 	player->Index = i;
-	if (!(player->Units = (CUnit **)calloc(UnitMax, sizeof(CUnit *)))) {
+	if (!(player->Units = new CUnit *[UnitMax])) {
 		DebugPrint("Not enough memory to create player %d.\n" _C_ i);
 		return 0;
 	}
+	memset(player->Units, 0, UnitMax * sizeof(CUnit));
 
 	//
 	//  Parse the list: (still everything could be changed!)
@@ -104,7 +105,7 @@ static int CclPlayer(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			player->Name = strdup(LuaToString(l, j + 1));
+			player->Name = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (!strcmp(value, "neutral")) {
@@ -612,12 +613,12 @@ static int CclDefineRaceNames(lua_State *l)
 				if (!strcmp(value, "name")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
-					PlayerRaces.Name[i] = strdup(LuaToString(l, -1));
+					PlayerRaces.Name[i] = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "display")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
-					PlayerRaces.Display[i] = strdup(LuaToString(l, -1));
+					PlayerRaces.Display[i] = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "visible")) {
 					PlayerRaces.Visible[i] = 1;
@@ -653,8 +654,8 @@ static int CclDefinePlayerColors(lua_State *l)
 	args = luaL_getn(l, 1);
 	for (i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
-		free(PlayerColorNames[i / 2]);
-		PlayerColorNames[i / 2] = strdup(LuaToString(l, -1));
+		delete[] PlayerColorNames[i / 2];
+		PlayerColorNames[i / 2] = new_strdup(LuaToString(l, -1));
 		lua_pop(l, 1);
 		++i;
 		lua_rawgeti(l, 1, i + 1);
@@ -850,8 +851,8 @@ static int CclSetPlayerData(lua_State *l)
 	data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		free(p->Name);
-		p->Name = strdup(LuaToString(l, 3));
+		delete[] p->Name;
+		p->Name = new_strdup(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		int i;
 		const char* racename;

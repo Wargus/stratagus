@@ -809,7 +809,7 @@ void ShowPicture(CampaignChapter *chapter)
 
 		ptr = lines->Next;
 		FreeTextLines(&lines->Text);
-		free(lines);
+		delete lines;
 		lines = ptr;
 	}
 
