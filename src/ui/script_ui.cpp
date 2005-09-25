@@ -221,11 +221,11 @@ static int CclSetTitleScreens(lua_State* l)
 
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
-			free(TitleScreens[i]->File);
-			free(TitleScreens[i]->Music);
+			delete[] TitleScreens[i]->File;
+			delete[] TitleScreens[i]->Music;
 			if (TitleScreens[i]->Labels) {
 				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
-					free(TitleScreens[i]->Labels[j]->Text);
+					delete[] TitleScreens[i]->Labels[j]->Text;
 					free(TitleScreens[i]->Labels[j]);
 				}
 				free(TitleScreens[i]->Labels);
@@ -237,21 +237,22 @@ static int CclSetTitleScreens(lua_State* l)
 	}
 
 	args = lua_gettop(l);
-	TitleScreens = (TitleScreen **)calloc(args + 1, sizeof(*TitleScreens));
+	TitleScreens = new TitleScreen *[args + 1];
+	memset(TitleScreens, 0, (args + 1) * sizeof(TitleScreen *));
 
 	for (j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		TitleScreens[j] = (TitleScreen *)calloc(1, sizeof(**TitleScreens));
+		TitleScreens[j] = new TitleScreen;
 		TitleScreens[j]->Iterations = 1;
 		lua_pushnil(l);
 		while (lua_next(l, j + 1)) {
 			value = LuaToString(l, -2);
 			if (!strcmp(value, "Image")) {
-				TitleScreens[j]->File = strdup(LuaToString(l, -1));
+				TitleScreens[j]->File = new_strdup(LuaToString(l, -1));
 			} else if (!strcmp(value, "Music")) {
-				TitleScreens[j]->Music = strdup(LuaToString(l, -1));
+				TitleScreens[j]->Music = new_strdup(LuaToString(l, -1));
 			} else if (!strcmp(value, "Timeout")) {
 				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Iterations")) {
@@ -261,18 +262,19 @@ static int CclSetTitleScreens(lua_State* l)
 					LuaError(l, "incorrect argument");
 				}
 				subargs = luaL_getn(l, -1);
-				TitleScreens[j]->Labels = (TitleScreenLabel **)calloc(subargs + 1, sizeof(*TitleScreens[j]->Labels));
+				TitleScreens[j]->Labels = new TitleScreenLabel *[subargs + 1];
+				memset(TitleScreens[j]->Labels, 0, (subargs + 1) * sizeof(TitleScreenLabel *));
 				for (k = 0; k < subargs; ++k) {
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					TitleScreens[j]->Labels[k] = (TitleScreenLabel *)calloc(1, sizeof(**TitleScreens[j]->Labels));
+					TitleScreens[j]->Labels[k] = new TitleScreenLabel;
 					lua_pushnil(l);
 					while (lua_next(l, -2)) {
 						value = LuaToString(l, -2);
 						if (!strcmp(value, "Text")) {
-							TitleScreens[j]->Labels[k]->Text = strdup(LuaToString(l, -1));
+							TitleScreens[j]->Labels[k]->Text = new_strdup(LuaToString(l, -1));
 						} else if (!strcmp(value, "Font")) {
 							TitleScreens[j]->Labels[k]->Font = FontByIdent(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {
@@ -676,7 +678,7 @@ static void CclParseSelected(lua_State* l, CUserInterface* ui)
 				++k;
 				if (!strcmp(value, "icon")) {
 					lua_rawgeti(l, -1, k + 1);
-					ui->SingleSelectedButton = (Button *)calloc(1, sizeof(Button));
+					ui->SingleSelectedButton = new Button;
 					CclParseIcon(l, ui->SingleSelectedButton);
 					lua_pop(l, 1);
 				} else {
@@ -703,8 +705,7 @@ static void CclParseSelected(lua_State* l, CUserInterface* ui)
 						LuaError(l, "incorrect argument");
 					}
 					ui->NumSelectedButtons = luaL_getn(l, -1);
-					ui->SelectedButtons = (Button *)calloc(ui->NumSelectedButtons,
-						sizeof(Button));
+					ui->SelectedButtons = new Button[ui->NumSelectedButtons];
 					for (i = 0; i < ui->NumSelectedButtons; ++i) {
 						lua_rawgeti(l, -1, i + 1);
 						CclParseIcon(l, &ui->SelectedButtons[i]);
@@ -774,7 +775,7 @@ static void CclParseTraining(lua_State* l, CUserInterface* ui)
 					ui->SingleTrainingTextY = text.Y;
 				} else if (!strcmp(value, "icon")) {
 					lua_rawgeti(l, -1, k + 1);
-					ui->SingleTrainingButton = (Button *)calloc(1, sizeof(Button));
+					ui->SingleTrainingButton = new Button;
 					CclParseIcon(l, ui->SingleTrainingButton);
 					lua_pop(l, 1);
 				} else {
@@ -809,8 +810,7 @@ static void CclParseTraining(lua_State* l, CUserInterface* ui)
 						LuaError(l, "incorrect argument");
 					}
 					ui->NumTrainingButtons = luaL_getn(l, -1);
-					ui->TrainingButtons = (Button *)calloc(ui->NumTrainingButtons,
-						sizeof(Button));
+					ui->TrainingButtons = new Button[ui->NumTrainingButtons];
 					for (i = 0; i < ui->NumTrainingButtons; ++i) {
 						lua_rawgeti(l, -1, i + 1);
 						CclParseIcon(l, &ui->TrainingButtons[i]);
@@ -851,7 +851,7 @@ static void CclParseUpgrading(lua_State* l, CUserInterface* ui)
 		++j;
 		if (!strcmp(value, "icon")) {
 			lua_rawgeti(l, -1, j + 1);
-			ui->UpgradingButton = (Button *)calloc(1, sizeof(Button));
+			ui->UpgradingButton = new Button;
 			CclParseIcon(l, ui->UpgradingButton);
 			lua_pop(l, 1);
 		} else {
@@ -866,9 +866,9 @@ static void CclParseUpgrading(lua_State* l, CUserInterface* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI that is updated.
 */
-static void CclParseResearching(lua_State* l, CUserInterface* ui)
+static void CclParseResearching(lua_State *l, CUserInterface *ui)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
@@ -883,7 +883,7 @@ static void CclParseResearching(lua_State* l, CUserInterface* ui)
 		++j;
 		if (!strcmp(value, "icon")) {
 			lua_rawgeti(l, -1, j + 1);
-			ui->ResearchingButton = (Button *)calloc(1, sizeof(Button));
+			ui->ResearchingButton = new Button;
 			CclParseIcon(l, ui->ResearchingButton);
 			lua_pop(l, 1);
 		} else {
@@ -898,9 +898,9 @@ static void CclParseResearching(lua_State* l, CUserInterface* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseTransporting(lua_State* l, CUserInterface* ui)
+static void CclParseTransporting(lua_State *l, CUserInterface *ui)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
@@ -921,8 +921,7 @@ static void CclParseTransporting(lua_State* l, CUserInterface* ui)
 				LuaError(l, "incorrect argument");
 			}
 			ui->NumTransportingButtons = luaL_getn(l, -1);
-			ui->TransportingButtons = (Button *)calloc(ui->NumTransportingButtons,
-				sizeof(Button));
+			ui->TransportingButtons = new Button[ui->NumTransportingButtons];
 			for (i = 0; i < ui->NumTransportingButtons; ++i) {
 				lua_rawgeti(l, -1, i + 1);
 				CclParseIcon(l, &ui->TransportingButtons[i]);
@@ -941,7 +940,7 @@ static void CclParseTransporting(lua_State* l, CUserInterface* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseButtonIcons(lua_State* l, CUserInterface* ui)
+static void CclParseButtonIcons(lua_State *l, CUserInterface *ui)
 {
 	int i;
 
@@ -962,11 +961,9 @@ static void CclParseButtonIcons(lua_State* l, CUserInterface* ui)
 **
 **  @return index of the panel.
 */
-static int GetIndexPanel(lua_State* l, const char *name)
+static int GetIndexPanel(lua_State *l, const char *name)
 {
-	int i;  // iterator.
-
-	for (i = 0; i < NbAllPanels; i++) {
+	for (int i = 0; i < NbAllPanels; i++) {
 		if (!strcmp(name, AllPanels[i].Name)) {
 			return i;
 		}
@@ -980,15 +977,15 @@ static int GetIndexPanel(lua_State* l, const char *name)
 **
 **  @param l  Lua state.
 */
-static int CclDefineUI(lua_State* l)
+static int CclDefineUI(lua_State *l)
 {
-	const char* value;
-	char* str;
+	const char *value;
+	char *str;
 	int x;
 	int y;
 	int i;
-	CUserInterface* ui;
-	CUserInterface** v;
+	CUserInterface *ui;
+	CUserInterface **v;
 	int args;
 	int subargs;
 	int j;
@@ -998,7 +995,7 @@ static int CclDefineUI(lua_State* l)
 	args = lua_gettop(l);
 
 	// Get identifier
-	str = strdup(LuaToString(l, j + 1));
+	str = new_strdup(LuaToString(l, j + 1));
 	++j;
 	x = LuaToNumber(l, j + 1);
 	++j;
@@ -1070,9 +1067,9 @@ static int CclDefineUI(lua_State* l)
 		value = LuaToString(l, j + 1);
 		++j;
 		if (!strcmp(value, "normal-font-color")) {
-			ui->NormalFontColor = strdup(LuaToString(l, j + 1));
+			ui->NormalFontColor = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "reverse-font-color")) {
-			ui->ReverseFontColor = strdup(LuaToString(l, j + 1));
+			ui->ReverseFontColor = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "filler")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -1522,7 +1519,7 @@ static int CclDefineUI(lua_State* l)
 						button->Y = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "Caption")) {
-						button->Text = strdup(LuaToString(l, -1));
+						button->Text = new_strdup(LuaToString(l, -1));
 					} else if (!strcmp(value, "Style")) {
 						button->Style = FindButtonStyle(LuaToString(l, -1));
 						if (!button->Style) {
@@ -1603,35 +1600,35 @@ static int CclDefineUI(lua_State* l)
 			while (lua_next(l, j + 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "Point")) {
-					ui->Point.Name = strdup(LuaToString(l, -1));
+					ui->Point.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Glass")) {
-					ui->Glass.Name = strdup(LuaToString(l, -1));
+					ui->Glass.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Cross")) {
-					ui->Cross.Name = strdup(LuaToString(l, -1));
+					ui->Cross.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Yellow")) {
-					ui->YellowHair.Name = strdup(LuaToString(l, -1));
+					ui->YellowHair.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Green")) {
-					ui->GreenHair.Name = strdup(LuaToString(l, -1));
+					ui->GreenHair.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Red")) {
-					ui->RedHair.Name = strdup(LuaToString(l, -1));
+					ui->RedHair.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Scroll")) {
-					ui->Scroll.Name = strdup(LuaToString(l, -1));
+					ui->Scroll.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowE")) {
-					ui->ArrowE.Name = strdup(LuaToString(l, -1));
+					ui->ArrowE.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowNE")) {
-					ui->ArrowNE.Name = strdup(LuaToString(l, -1));
+					ui->ArrowNE.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowN")) {
-					ui->ArrowN.Name = strdup(LuaToString(l, -1));
+					ui->ArrowN.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowNW")) {
-					ui->ArrowNW.Name = strdup(LuaToString(l, -1));
+					ui->ArrowNW.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowW")) {
-					ui->ArrowW.Name = strdup(LuaToString(l, -1));
+					ui->ArrowW.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowSW")) {
-					ui->ArrowSW.Name = strdup(LuaToString(l, -1));
+					ui->ArrowSW.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowS")) {
-					ui->ArrowS.Name = strdup(LuaToString(l, -1));
+					ui->ArrowS.Name = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ArrowSE")) {
-					ui->ArrowSE.Name = strdup(LuaToString(l, -1));
+					ui->ArrowSE.Name = new_strdup(LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -1649,9 +1646,9 @@ static int CclDefineUI(lua_State* l)
 				while (*menupanel) {
 					menupanel = &(*menupanel)->Next;
 				}
-				*menupanel = (MenuPanel *)calloc(1, sizeof(**menupanel));
+				*menupanel = new MenuPanel;
 				lua_rawgeti(l, j + 1, k + 1);
-				(*menupanel)->Ident = strdup(LuaToString(l, -1));
+				(*menupanel)->Ident = new_strdup(LuaToString(l, -1));
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);

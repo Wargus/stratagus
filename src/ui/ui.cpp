@@ -318,9 +318,9 @@ void CleanUI(CUserInterface* ui)
 	MenuPanel* menupanel;
 	MenuPanel* tmp;
 
-	free(ui->Name);
-	free(ui->NormalFontColor);
-	free(ui->ReverseFontColor);
+	delete[] ui->Name;
+	delete[] ui->NormalFontColor;
+	delete[] ui->ReverseFontColor;
 
 	// Filler
 	for (i = 0; i < ui->NumFillers; ++i) {
@@ -338,13 +338,13 @@ void CleanUI(CUserInterface* ui)
 	// Info Panel
 	FreeGraphic(ui->InfoPanel.G);
 	free(ui->PanelIndex);
-	free(ui->SingleSelectedButton);
-	free(ui->SelectedButtons);
-	free(ui->SingleTrainingButton);
-	free(ui->TrainingButtons);
-	free(ui->UpgradingButton);
-	free(ui->ResearchingButton);
-	free(ui->TransportingButtons);
+	delete ui->SingleSelectedButton;
+	delete[] ui->SelectedButtons;
+	delete ui->SingleTrainingButton;
+	delete[] ui->TrainingButtons;
+	delete ui->UpgradingButton;
+	delete ui->ResearchingButton;
+	delete[] ui->TransportingButtons;
 
 	// Button Panel
 	FreeGraphic(ui->ButtonPanel.G);
@@ -353,27 +353,27 @@ void CleanUI(CUserInterface* ui)
 	FreeGraphic(ui->PieMenuBackgroundG);
 
 	// Buttons
-	free(ui->MenuButton.Text);
-	free(ui->NetworkMenuButton.Text);
-	free(ui->NetworkDiplomacyButton.Text);
-	free(ui->ButtonPanel.Buttons);
+	delete[] ui->MenuButton.Text;
+	delete[] ui->NetworkMenuButton.Text;
+	delete[] ui->NetworkDiplomacyButton.Text;
+	delete[] ui->ButtonPanel.Buttons;
 
 	// Cursors
-	free(ui->Point.Name);
-	free(ui->Glass.Name);
-	free(ui->Cross.Name);
-	free(ui->YellowHair.Name);
-	free(ui->GreenHair.Name);
-	free(ui->RedHair.Name);
-	free(ui->Scroll.Name);
-	free(ui->ArrowE.Name);
-	free(ui->ArrowNE.Name);
-	free(ui->ArrowN.Name);
-	free(ui->ArrowNW.Name);
-	free(ui->ArrowW.Name);
-	free(ui->ArrowSW.Name);
-	free(ui->ArrowS.Name);
-	free(ui->ArrowSE.Name);
+	delete[] ui->Point.Name;
+	delete[] ui->Glass.Name;
+	delete[] ui->Cross.Name;
+	delete[] ui->YellowHair.Name;
+	delete[] ui->GreenHair.Name;
+	delete[] ui->RedHair.Name;
+	delete[] ui->Scroll.Name;
+	delete[] ui->ArrowE.Name;
+	delete[] ui->ArrowNE.Name;
+	delete[] ui->ArrowN.Name;
+	delete[] ui->ArrowNW.Name;
+	delete[] ui->ArrowW.Name;
+	delete[] ui->ArrowSW.Name;
+	delete[] ui->ArrowS.Name;
+	delete[] ui->ArrowSE.Name;
 
 	// Menu Panels
 	menupanel = ui->MenuPanels;
@@ -381,8 +381,8 @@ void CleanUI(CUserInterface* ui)
 		tmp = menupanel;
 		menupanel = menupanel->Next;
 		FreeGraphic(tmp->G);
-		free(tmp->Ident);
-		free(tmp);
+		delete[] tmp->Ident;
+		delete tmp;
 	}
 
 	// Backgrounds
@@ -421,18 +421,18 @@ void CleanUserInterface(void)
 	// Free Title screen.
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
-			free(TitleScreens[i]->File);
-			free(TitleScreens[i]->Music);
+			delete[] TitleScreens[i]->File;
+			delete[] TitleScreens[i]->Music;
 			if (TitleScreens[i]->Labels) {
 				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
-					free(TitleScreens[i]->Labels[j]->Text);
-					free (TitleScreens[i]->Labels[j]);
+					delete[] TitleScreens[i]->Labels[j]->Text;
+					delete TitleScreens[i]->Labels[j];
 				}
-				free(TitleScreens[i]->Labels);
+				delete[] TitleScreens[i]->Labels;
 			}
-			free(TitleScreens[i]);
+			delete TitleScreens[i];
 		}
-		free(TitleScreens);
+		delete[] TitleScreens;
 		TitleScreens = NULL;
 	}
 

@@ -245,28 +245,35 @@ enum {
 	TitleFlagCenter = 1 << 0,  /// Center Text
 };
 
-typedef struct _title_screen_label_ {
-	char* Text;
+class TitleScreenLabel {
+public:
+	TitleScreenLabel() : Text(NULL), Font(0), Xofs(0), Yofs(0), Flags(0) {}
+
+	char *Text;
 	int Font;
 	int Xofs;
 	int Yofs;
 	int Flags;
-} TitleScreenLabel;
+};
 
-typedef struct _title_screen_ {
-	char* File;
-	char* Music;
+class TitleScreen {
+public:
+	TitleScreen() : File(NULL), Music(NULL), Timeout(0), Iterations(0),
+		Labels(NULL) {}
+
+	char *File;
+	char *Music;
 	int Timeout;
 	int Iterations;
-	TitleScreenLabel** Labels;
-} TitleScreen;
+	TitleScreenLabel **Labels;
+};
 
-extern TitleScreen** TitleScreens;          /// File for title screen
-extern char* GameName;                      /// Name of the game
-extern char* MenuMusic;                     /// File for menu music
-extern char* ClickMissile;                  /// Missile to show when you click
-extern char* DamageMissile;                 /// Missile to show damage caused
-extern char* StratagusLibPath;              /// Location of stratagus data
+extern TitleScreen **TitleScreens;          /// File for title screen
+extern char *GameName;                      /// Name of the game
+extern char *MenuMusic;                     /// File for menu music
+extern char *ClickMissile;                  /// Missile to show when you click
+extern char *DamageMissile;                 /// Missile to show damage caused
+extern char *StratagusLibPath;              /// Location of stratagus data
 
 extern int SpeedBuild;                      /// Speed factor for building
 extern int SpeedTrain;                      /// Speed factor for training
@@ -278,8 +285,8 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
-extern void LoadGame(char* filename);       /// Load saved game back
-extern void SaveGame(const char* filename); /// Save game for later load
+extern void LoadGame(char *filename);       /// Load saved game back
+extern void SaveGame(const char *filename); /// Save game for later load
 extern int SaveGameLoading;                 /// Save game is in progress of loading
 
 extern void LoadAll(void);                  /// Load all data back
@@ -295,7 +302,7 @@ extern void DrawMapArea(void);              /// Draw the map area
 extern void GameMainLoop(void);             /// Game main loop
 
 	/// Show load progress
-extern void ShowLoadProgress(const char* fmt,...);
+extern void ShowLoadProgress(const char *fmt,...);
 
 /*============================================================================
 ==  Misc
@@ -312,7 +319,7 @@ extern void ShowLoadProgress(const char* fmt,...);
 	/// How many resources the player gets back if canceling upgrade
 #define CancelUpgradeCostsFactor   100
 
-extern char* CompileOptions;
+extern char *CompileOptions;
 //@}
 
 #endif // !__STRATAGUS_H__
