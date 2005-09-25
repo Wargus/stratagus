@@ -1332,11 +1332,11 @@ static void GameMenuReturn(void)
 /**
 **  Init callback for save game menu
 */
-static void SaveGameInit(Menu* menu)
+static void SaveGameInit(Menu *menu)
 {
-	char* buf;
+	char *buf;
 
-	buf = (char*)malloc(64);
+	buf = new char[64];
 	strcpy(buf, "~!_");
 	menu->Items[1].D.Input.buffer = buf;
 	menu->Items[1].D.Input.nch = 0;
@@ -1353,7 +1353,7 @@ static void SaveGameInit(Menu* menu)
 */
 static void SaveGameExit(Menu* menu)
 {
-	free(menu->Items[1].D.Input.buffer);
+	delete[] menu->Items[1].D.Input.buffer;
 	menu->Items[1].D.Input.buffer = NULL;
 	LBExit(menu->Items + 2);
 }
@@ -2370,11 +2370,11 @@ static void SaveReplay(void)
 /**
 **  Save replay menu init callback
 */
-static void SaveReplayInit(Menu* menu)
+static void SaveReplayInit(Menu *menu)
 {
-	char* buf;
+	char *buf;
 
-	buf = (char*)malloc(32);
+	buf = new char[32];
 	strcpy(buf, "~!_");
 	menu->Items[1].D.Input.buffer = buf;
 	menu->Items[1].D.Input.nch = 0;
@@ -2384,9 +2384,9 @@ static void SaveReplayInit(Menu* menu)
 /**
 **  Save replay menu exit callback
 */
-static void SaveReplayExit(Menu* menu)
+static void SaveReplayExit(Menu *menu)
 {
-	free(menu->Items[1].D.Input.buffer);
+	delete[] menu->Items[1].D.Input.buffer;
 	menu->Items[1].D.Input.buffer = NULL;
 }
 
@@ -2440,7 +2440,7 @@ static void SaveReplayOk(void)
 	sprintf(ptr, "log_of_stratagus_%d.log", ThisPlayer->Index);
 
 	stat(TempPathBuf, &s);
-	buf = (char*)malloc(s.st_size);
+	buf = new char[s.st_size];
 	fd = fopen(TempPathBuf, "rb");
 	fread(buf, s.st_size, 1, fd);
 	fclose(fd);
@@ -2454,13 +2454,13 @@ static void SaveReplayOk(void)
 	fd = fopen(TempPathBuf, "wb");
 	if (!fd) {
 		ErrorMenu("Cannot write to file");
-		free(buf);
+		delete[] buf;
 		return;
 	}
 	fwrite(buf, s.st_size, 1, fd);
 	fclose(fd);
 
-	free(buf);
+	delete[] buf;
 	CloseMenu();
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
@@ -2841,10 +2841,10 @@ static void JoinNetGameMenu(void)
 		server_host_buffer[24] = 0;
 		if (NetworkPort != NetworkDefaultPort) {
 			strcat(server_host_buffer, ":");
-			port = (char*)malloc(10);
+			port = new char[10];
 			sprintf(port, "%d", NetworkPort);
 			strcat(server_host_buffer, port);
-			free(port);
+			delete[] port;
 		}
 	} else {
 		server_host_buffer[0] = '\0';
