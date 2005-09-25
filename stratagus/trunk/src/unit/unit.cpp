@@ -2379,7 +2379,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	desty = y;
 	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
 		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
-	points = (struct p*)malloc(size * sizeof(*points));
+	points = new p[size];
 
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
@@ -2415,7 +2415,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				if (rvresult ? CanMoveToMask(x, y, resmask) : !CanMoveToMask(x, y, resmask)) {
 					*px = x;
 					*py = y;
-					free(points);
+					delete[] points;
 					return 1;
 				}
 				if (CanMoveToMask(x, y, movemask)) { // reachable
@@ -2445,7 +2445,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		// Continue with next set.
 		ep = wp;
 	}
-	free(points);
+	delete[] points;
 	return 0;
 }
 
@@ -2495,7 +2495,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	desty = y;
 	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
 		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
-	points = (struct p*)malloc(size * sizeof(*points));
+	points = new p[size];
 
 	// Find the nearest gold depot
 	if ((destu = FindDeposit(unit, x, y,range,resource))) {
@@ -2554,7 +2554,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 						}
 						*m = 99;
 					} else { // no goal take the first
-						free(points);
+						delete[] points;
 						return mine;
 					}
 				}
@@ -2580,7 +2580,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 		}
 		// Take best of this frame, if any.
 		if (bestd != 99999) {
-			free(points);
+			delete[] points;
 			return bestmine;
 		}
 		++cdist;
@@ -2590,7 +2590,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 		// Continue with next set.
 		ep = wp;
 	}
-	free(points);
+	delete[] points;
 	return NoUnitP;
 }
 
@@ -2638,7 +2638,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 	desty = y;
 	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
 		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
-	points = (struct p*)malloc(size * sizeof(*points));
+	points = new p[size];
 
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
@@ -2682,7 +2682,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 				if ((depot = ResourceDepositOnMap(x, y, resource)) &&
 						((unit->IsAllied(depot)) ||
 							(unit->Player == depot->Player))) {
-					free(points);
+					delete[] points;
 					return depot;
 				}
 				if (CanMoveToMask(x, y, mask)) { // reachable
@@ -2712,7 +2712,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 		// Continue with next set.
 		ep = wp;
 	}
-	free(points);
+	delete[] points;
 	return NoUnitP;
 }
 
