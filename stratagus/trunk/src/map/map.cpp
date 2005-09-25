@@ -392,16 +392,17 @@ void FreeMapInfo(MapInfo *info)
 void CreateMap(int width, int height) 
 {
 	if (!TheMap.Fields) {
-		TheMap.Fields = (MapField*)calloc(width * height, sizeof(*TheMap.Fields));
+		TheMap.Fields = new MapField[width * height];
 		if (!TheMap.Fields) {
-			perror("calloc()");
+			perror("new");
 			ExitFatal(-1);
 		}
-		TheMap.Visible[0] = (unsigned*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
+		TheMap.Visible[0] = new unsigned[TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2];
 		if (!TheMap.Visible[0]) {
-			perror("calloc()");
+			perror("new");
 			ExitFatal(-1);
 		}
+		memset(TheMap.Visible[0], 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2 * sizeof(unsigned));
 		InitUnitCache();
 	} else { 
 		DebugPrint("Warning: Fields already allocated\n");
@@ -413,8 +414,8 @@ void CreateMap(int width, int height)
 */
 void CleanMap(void)
 {
-	free(TheMap.Fields);
-	free(TheMap.Visible[0]);
+	delete[] TheMap.Fields;
+	delete[] TheMap.Visible[0];
 
 	// Tileset freed by Tileset?
 

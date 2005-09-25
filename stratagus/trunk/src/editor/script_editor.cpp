@@ -73,20 +73,20 @@ static int CclDefineEditorUnitTypes(lua_State* l)
 
 	if ((cp = EditorUnitTypes)) { // Free all old names
 		while (*cp) {
-			free(*cp++);
+			delete[] *cp++;
 		}
-		free(EditorUnitTypes);
+		delete[] EditorUnitTypes;
 	}
 
 	//
 	// Get new table.
 	//
 	args = luaL_getn(l, 1);
-	EditorUnitTypes = cp = (char**)malloc((args + 1) * sizeof(char*));
+	EditorUnitTypes = cp = new char *[args + 1];
 	MaxUnitIndex = args;
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, 1, j + 1);
-		*cp++ = strdup(LuaToString(l, -1));
+		*cp++ = new_strdup(LuaToString(l, -1));
 		lua_pop(l, 1);
 	}
 	*cp = NULL;
@@ -102,8 +102,8 @@ static int CclDefineEditorUnitTypes(lua_State* l)
 static int CclSetEditorSelectIcon(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	free(EditorSelectIcon);
-	EditorSelectIcon = strdup(LuaToString(l, 1));
+	delete[] EditorSelectIcon;
+	EditorSelectIcon = new_strdup(LuaToString(l, 1));
 	return 0;
 }
 
@@ -115,8 +115,8 @@ static int CclSetEditorSelectIcon(lua_State* l)
 static int CclSetEditorUnitsIcon(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	free(EditorUnitsIcon);
-	EditorUnitsIcon = strdup(LuaToString(l, 1));
+	delete[] EditorUnitsIcon;
+	EditorUnitsIcon = new_strdup(LuaToString(l, 1));
 	return 0;
 }
 
@@ -130,8 +130,8 @@ static int CclSetEditorStartUnit(lua_State* l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	free(EditorStartUnit);
-	EditorStartUnit = strdup(LuaToString(l, 1));
+	delete[] EditorStartUnit;
+	EditorStartUnit = new_strdup(LuaToString(l, 1));
 	return 0;
 }
 

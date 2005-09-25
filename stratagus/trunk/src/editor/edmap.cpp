@@ -285,7 +285,7 @@ find_solid:
 	} else {
 		char *marks;
 
-		marks = (char *)malloc(TheMap.Tileset.NumTerrainTypes);
+		marks = new char[TheMap.Tileset.NumTerrainTypes];
 		memset(marks, 0, TheMap.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		marks[type2] = type2;
@@ -335,7 +335,7 @@ find_solid:
 			}
 		}
 
-		free(marks);
+		delete[] marks;
 	}
 
 	//
@@ -368,12 +368,12 @@ find_solid:
 		//
 		// Find the best tile path.
 		//
-		marks = (char*)malloc(TheMap.Tileset.NumTerrainTypes);
+		marks = new char[TheMap.Tileset.NumTerrainTypes];
 		memset(marks, 0, TheMap.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
 			DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
-			free(marks);
+			delete[] marks;
 			goto find_solid;
 		}
 		if (type1 == TheMap.Tileset.Tiles[i].MixTerrain) {
@@ -383,7 +383,7 @@ find_solid:
 			type1 ^= type2;
 		}
 
-		free(marks);
+		delete[] marks;
 	}
 
 	base = i;
