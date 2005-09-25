@@ -66,9 +66,8 @@ Sample *MusicSample;  /// Music samples
 
 char *CurrentMusicFile;
 
-PlaySection *PlaySections;          /// Play Sections
-int NumPlaySections;                /// Number of Play Sections
-PlaySectionType CurrentPlaySection; /// Current Play Section
+std::vector<PlaySection> PlaySections; /// Play Sections
+PlaySectionType CurrentPlaySection;    /// Current Play Section
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -107,7 +106,7 @@ void PlaySectionMusic(PlaySectionType section)
 	int found;
 	int numfiles;
 
-	if (NumPlaySections == 0) {
+	if (PlaySections.empty()) {
 		return;
 	}
 
@@ -123,7 +122,7 @@ void PlaySectionMusic(PlaySectionType section)
 		}
 	}
 
-	for (i = 0; i < NumPlaySections; ++i) {
+	for (i = 0; i < (int)PlaySections.size(); ++i) {
 		if (PlaySections[i].Type == section && (!PlaySections[i].Race ||
 				!(strcmp(PlaySections[i].Race, PlayerRaces.Name[ThisPlayer->Race])))) {
 			break;

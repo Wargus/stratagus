@@ -143,8 +143,8 @@ typedef struct _sound_ {
 	unsigned char Range;        /// Range is a multiplier for DistanceSilent
 	unsigned char Number;       /// single, group, or table of sounds.
 	union {
-		Sample* OneSound;       /// if it's only a simple sound
-		Sample** OneGroup;      /// when it's a simple group
+		Sample *OneSound;       /// if it's only a simple sound
+		Sample **OneGroup;      /// when it's a simple group
 		struct _two_groups_* TwoGroups; /// when it's a double group
 	} Sound;
 } Sound;
@@ -152,13 +152,13 @@ typedef struct _sound_ {
 /**
 **  Sound unique identifier
 */
-typedef Sound* ServerSoundId;
+typedef Sound *ServerSoundId;
 
 /**
 **  Origin of a sound
 */
 typedef struct _origin_ {
-	const void* Base;   /// pointer on a Unit
+	const void *Base;   /// pointer on a Unit
 	unsigned Id;        /// unique identifier (if the pointer has been shared)
 } Origin;
 
