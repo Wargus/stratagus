@@ -300,8 +300,7 @@ int Mng::Load(const char *name)
 
 	LibraryFileName(name, buf);
 
-	this->name = new char[strlen(buf) + 1];
-	strcpy(this->name, buf);
+	this->name = new_strdup(buf);
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
 	if (handle == MNG_NULL) {
 		return -1;

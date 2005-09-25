@@ -205,8 +205,7 @@ int PlayMusic(const char *name)
 	}
 
 	delete[] CurrentMusicFile;
-	CurrentMusicFile = new char[strlen(name) + 1];
-	strcpy(CurrentMusicFile, name);
+	CurrentMusicFile = new_strdup(name);
 
 	name = LibraryFileName(name, buffer);
 

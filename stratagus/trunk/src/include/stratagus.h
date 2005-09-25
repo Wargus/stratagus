@@ -150,6 +150,15 @@ class MissileType;
 ==  Definitions
 ============================================================================*/
 
+#include <string.h>
+
+inline char *new_strdup(const char *str)
+{
+	char *newstr = new char[strlen(str) + 1];
+	strcpy(newstr, str);
+	return newstr;
+}
+
 /*----------------------------------------------------------------------------
 --  General
 ----------------------------------------------------------------------------*/

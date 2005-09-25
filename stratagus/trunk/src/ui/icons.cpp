@@ -68,8 +68,7 @@ static std::map<std::string, CIcon *> Icons;   /// Map of ident to icon.
 CIcon::CIcon(const char *ident, int frame,
 	const char *file, int width, int height) : G(NULL), Frame(frame)
 {
-	this->Ident = new char[strlen(ident) + 1];
-	strcpy(this->Ident, ident);
+	this->Ident = new_strdup(ident);
 	if (file) {
 		this->G = NewGraphic(file, width, height);
 	}

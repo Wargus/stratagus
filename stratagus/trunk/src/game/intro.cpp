@@ -239,8 +239,7 @@ static void SplitTextIntoLines(const char *text, int w, TextLines **lines)
 	TextLines **ptr;
 
 	l = 0;
-	s = str = new char[strlen(text) + 1];
-	strcpy(str, text);
+	s = str = new_strdup(text);
 	ptr = lines;
 
 	// Convert \r, \r\n, and \n\r to \n
@@ -285,8 +284,7 @@ static void SplitTextIntoLines(const char *text, int w, TextLines **lines)
 		}
 
 		*ptr = new TextLines;
-		(*ptr)->Text = new char[strlen(s) + 1];
-		strcpy((*ptr)->Text, s);
+		(*ptr)->Text = new_strdup(s);
 		(*ptr)->Next = NULL;
 		ptr = &((*ptr)->Next);
 
@@ -1299,9 +1297,7 @@ static int CclCredits(lua_State *l)
 		value = LuaToString(l, j + 1);
 		++j;
 		if (!strcmp(value, "background")) {
-			const char *bg = LuaToString(l, j + 1);
-			GameCredits.Background = new char[strlen(bg) + 1];
-			strcpy(GameCredits.Background, bg);
+			GameCredits.Background = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "name") ||
 				!strcmp(value, "title") ||
 				!strcmp(value, "comment")) {
@@ -1380,8 +1376,7 @@ static int CclAddObjective(lua_State *l)
 		for (; i > num; --i) {
 			GameIntro.Objectives[i] = GameIntro.Objectives[i - 1];
 		}
-		GameIntro.Objectives[num] = new char[strlen(obj) + 1];
-		strcpy(GameIntro.Objectives[num], obj);
+		GameIntro.Objectives[num] = new_strdup(obj);
 	} else {
 		// Add objective to the end of the list
 		i = 0;
@@ -1391,8 +1386,7 @@ static int CclAddObjective(lua_State *l)
 		if (i == MAX_OBJECTIVES) {
 			LuaError(l, "Too many objectives: %s" _C_ obj);
 		}
-		GameIntro.Objectives[i] = new char[strlen(obj) + 1];
-		strcpy(GameIntro.Objectives[i], obj);
+		GameIntro.Objectives[i] = new_strdup(obj);
 	}
 
 	return 0;
@@ -1443,9 +1437,7 @@ static int CclSetObjectives(lua_State *l)
 
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
-		const char *str = LuaToString(l, j + 1);
-		GameIntro.Objectives[j] = new char[strlen(str) + 1];
-		strcpy(GameIntro.Objectives[j], str);
+		GameIntro.Objectives[j] = new_strdup(LuaToString(l, j + 1));
 	}
 
 	return 0;
@@ -1498,9 +1490,7 @@ static int CclDefineRanks(lua_State *l)
 		lua_pop(l, 1);
 		++j;
 		lua_rawgeti(l, 2, j + 1);
-		const char *str = LuaToString(l, -1);
-		rank->Ranks[i] = new char[strlen(str) + 1];
-		strcpy(rank->Ranks[i], str);
+		rank->Ranks[i] = new_strdup(LuaToString(l, -1));
 		lua_pop(l, 1);
 		++i;
 	}
