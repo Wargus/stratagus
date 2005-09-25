@@ -120,8 +120,8 @@ typedef int MenuButtonId;
 #define MAX_GAME_SPEED 250
 
 struct _button_style_;
-struct _map_info_;
-struct _world_map_;
+class MapInfo;
+class WorldMap;
 class Graphic;
 struct _menuitem_;
 
@@ -244,7 +244,7 @@ typedef struct _menuitem_ {
 	int XOfs;
 	int YOfs;
 	unsigned Flags;
-	unsigned char *Id;
+	char *Id;
 	int Font;
 	unsigned int LuaHandle;
 	struct _menu_* Menu;  /// backpointer for speedups

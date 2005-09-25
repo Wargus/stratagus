@@ -1287,11 +1287,11 @@ void InitMissileTypes(void)
 
 MissileType::~MissileType()
 {
-	free(this->Ident);
-	free(this->FiredSound.Name);
-	free(this->ImpactSound.Name);
-	free(this->ImpactName);
-	free(this->SmokeName);
+	delete[] this->Ident;
+	delete[] this->FiredSound.Name;
+	delete[] this->ImpactSound.Name;
+	delete[] this->ImpactName;
+	delete[] this->SmokeName;
 	FreeGraphic(this->G);
 }
 

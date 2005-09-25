@@ -112,10 +112,10 @@ void CleanPlayers(void)
 
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Name) {
-			free(Players[p].Name);
+			delete[] Players[p].Name;
 		}
 		if (Players[p].Units) {
-			free(Players[p].Units);
+			delete[] Players[p].Units;
 		}
 	}
 	ThisPlayer = NULL;
@@ -123,8 +123,8 @@ void CleanPlayers(void)
 	NumPlayers = 0;
 
 	for (p = 0; p < PlayerRaces.Count; ++p) {
-		free(PlayerRaces.Name[p]);
-		free(PlayerRaces.Display[p]);
+		delete[] PlayerRaces.Name[p];
+		delete[] PlayerRaces.Display[p];
 	}
 	PlayerRaces.Count = 0;
 
@@ -312,10 +312,11 @@ void CreatePlayer(int type)
 	//  FIXME: brutal way, as we won't need UnitMax for this player...
 	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
-	if (!(player->Units = (CUnit **)calloc(UnitMax, sizeof(CUnit *)))) {
+	if (!(player->Units = new CUnit *[UnitMax])) {
 		DebugPrint("Not enough memory to create player %d.\n" _C_ NumPlayers);
 		return;
 	}
+	memset(player->Units, 0, UnitMax * sizeof(CUnit *));
 
 	//
 	//  Take first slot for person on this computer,
@@ -476,10 +477,8 @@ void CPlayer::SetSide(int side)
 */
 void CPlayer::SetName(const char *name)
 {
-	if (Name) {
-		free(Name);
-	}
-	Name = strdup(name);
+	delete[] Name;
+	Name = new_strdup(name);
 }
 
 /*----------------------------------------------------------------------------
@@ -759,8 +758,8 @@ void GraphicPlayerPixels(CPlayer *player, const Graphic *sprite)
 void SetPlayersPalette(void)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		free(Players[i].UnitColors.Colors);
-		Players[i].UnitColors.Colors = (SDL_Color*)malloc(PlayerColorIndexCount * sizeof(SDL_Color));
+		delete[] Players[i].UnitColors.Colors;
+		Players[i].UnitColors.Colors = new SDL_Color[PlayerColorIndexCount];
 		memcpy(Players[i].UnitColors.Colors, PlayerColorsRGB[i],
 			sizeof(SDL_Color) * PlayerColorIndexCount);
 	}

@@ -380,8 +380,8 @@ void PreprocessMap(void)
 void FreeMapInfo(MapInfo *info)
 {
 	if (info) {
-		free(info->Description);
-		free(info->Filename);
+		delete[] info->Description;
+		delete[] info->Filename;
 		memset(info, 0, sizeof(MapInfo));
 	}
 }
@@ -768,8 +768,8 @@ void RegenerateForest(void)
 void LoadStratagusMapInfo(const char *mapname) 
 {
 	// Set the default map setup by replacing .smp with .sms
-	free(TheMap.Info.Filename);
-	TheMap.Info.Filename = strdup(mapname);
+	delete[] TheMap.Info.Filename;
+	TheMap.Info.Filename = new_strdup(mapname);
 	memcpy(strstr(TheMap.Info.Filename, ".smp"), ".sms", 4);
 	
 	LuaLoadFile(mapname);

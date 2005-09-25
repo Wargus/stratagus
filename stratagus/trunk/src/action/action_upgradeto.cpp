@@ -103,7 +103,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	//  adjust Variables with percent.
 	newstats = &newtype->Stats[player->Index];
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		if (unit->Variable[i].Max) {
 			unit->Variable[i].Value = newstats->Variables[i].Max *
 				unit->Variable[i].Value / unit->Variable[i].Max;
@@ -119,7 +119,8 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	unit->Stats = &newtype->Stats[player->Index];
 
 	if (newtype->CanCastSpell && !unit->AutoCastSpell) {
-		unit->AutoCastSpell = (char*)calloc(SpellTypeTable.size(), sizeof(*unit->AutoCastSpell));
+		unit->AutoCastSpell = new char[SpellTypeTable.size()];
+		memset(unit->AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));
 	}
 
 	UpdateForNewUnit(unit, 1);

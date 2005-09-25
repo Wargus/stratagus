@@ -63,7 +63,7 @@ int NumAnimations;
 
 std::map<std::string, Animations *> AnimationMap;/// Animation map
 
-struct _UnitTypeVar_ UnitTypeVar;    /// Variables for UnitType and unit.
+CUnitTypeVar UnitTypeVar;    /// Variables for UnitType and unit.
 
 #define MAX_LABELS 20
 #define MAX_LABEL_LENGTH 256
@@ -129,7 +129,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 	Assert(!(args & 1)); // must be even
 
 	for (i = 0; i < args; ++i) {
-		*b = (BuildRestriction*)calloc(1, sizeof(BuildRestriction));
+		*b = (BuildRestriction *)calloc(1, sizeof(BuildRestriction));
 		lua_rawgeti(l, -1, i + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
@@ -268,7 +268,7 @@ static int CclDefineUnitType(lua_State *l)
 	if (type) {
 		redefine = 1;
 	} else {
-		type = NewUnitTypeSlot(strdup(str));
+		type = NewUnitTypeSlot(new_strdup(str));
 		redefine = 0;
 	}
 
@@ -282,9 +282,9 @@ static int CclDefineUnitType(lua_State *l)
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			if (redefine) {
-				free(type->Name);
+				delete[] type->Name;
 			}
-			type->Name = strdup(LuaToString(l, -1));
+			type->Name = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -298,10 +298,10 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(value, "file")) {
 					if (redefine) {
-						free(type->File);
+						delete[] type->File;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->File = strdup(LuaToString(l, -1));
+					type->File = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -332,10 +332,10 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(value, "file")) {
 					if (redefine) {
-						free(type->ShadowFile);
+						delete[] type->ShadowFile;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->ShadowFile = strdup(LuaToString(l, -1));
+					type->ShadowFile = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -384,9 +384,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Icon")) {
 			if (redefine) {
-				free(type->Icon.Name);
+				delete[] type->Icon.Name;
 			}
-			type->Icon.Name = strdup(LuaToString(l, -1));
+			type->Icon.Name = new_strdup(LuaToString(l, -1));
 			type->Icon.Icon = NULL;
 #ifdef USE_MNG
 		} else if (!strcmp(value, "Portrait")) {
@@ -395,11 +395,12 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			subargs = luaL_getn(l, -1);
 			type->Portrait.Num = subargs;
-			type->Portrait.Files = (char**)malloc(type->Portrait.Num * sizeof(*type->Portrait.Files));
-			type->Portrait.Mngs = (Mng**)calloc(type->Portrait.Num, sizeof(*type->Portrait.Mngs));
+			type->Portrait.Files = new char *[type->Portrait.Num * sizeof(char *)];
+			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
+			memset(type->Portrait.Mngs, 0, type->Portrait.Num * sizeof(Mng *));
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				type->Portrait.Files[k] = strdup(LuaToString(l, -1));
+				type->Portrait.Files[k] = new_strdup(LuaToString(l, -1));
 				lua_pop(l, 1);
 			}
 #endif
@@ -499,7 +500,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "PersonReactionRange")) {
 			type->ReactRangePerson = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Missile")) {
-			type->Missile.Name = strdup(LuaToString(l, -1));
+			type->Missile.Name = new_strdup(LuaToString(l, -1));
 			type->Missile.Missile = NULL;
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
@@ -523,10 +524,10 @@ static int CclDefineUnitType(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			if (redefine) {
-				free(type->CorpseName);
+				delete[] type->CorpseName;
 			}
 			lua_rawgeti(l, -1, 1);
-			type->CorpseName = strdup(LuaToString(l, -1));
+			type->CorpseName = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
 			type->CorpseType = NULL;
 			lua_rawgeti(l, -1, 2);
@@ -534,7 +535,7 @@ static int CclDefineUnitType(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
-			type->Explosion.Name = strdup(LuaToString(l, -1));
+			type->Explosion.Name = new_strdup(LuaToString(l, -1));
 			type->Explosion.Missile = NULL;
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);
@@ -643,7 +644,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				free(type->BuildingRules);
 			}
-			type->BuildingRules = (BuildRestriction**)malloc((subargs + 1) * sizeof(BuildRestriction*));
+			type->BuildingRules = (BuildRestriction **)malloc((subargs + 1) * sizeof(BuildRestriction*));
 			type->BuildingRules[subargs] = NULL;
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
@@ -687,7 +688,8 @@ static int CclDefineUnitType(lua_State *l)
 				type->MaxOnBoard = 1;
 			}
 			if (!type->CanTransport) {
-				type->CanTransport = (char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTransport));
+				type->CanTransport = new char[UnitTypeVar.NumberBoolFlag];
+				memset(type->CanTransport, 0, UnitTypeVar.NumberBoolFlag * sizeof(char));
 			}
 			// FIXME : add flag for kill/unload units inside.
 			subargs = luaL_getn(l, -1);
@@ -721,7 +723,7 @@ static int CclDefineUnitType(lua_State *l)
 			args = luaL_getn(l, -1);
 			for (j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				res = (ResourceInfo*)calloc(1, sizeof(ResourceInfo));
+				res = new ResourceInfo;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
@@ -767,11 +769,11 @@ static int CclDefineUnitType(lua_State *l)
 						--k;
 					} else if (!strcmp(value, "file-when-empty")) {
 						lua_rawgeti(l, -1, k + 1);
-						res->FileWhenEmpty = strdup(LuaToString(l, -1));
+						res->FileWhenEmpty = new_strdup(LuaToString(l, -1));
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
 						lua_rawgeti(l, -1, k + 1);
-						res->FileWhenLoaded = strdup(LuaToString(l, -1));
+						res->FileWhenLoaded = new_strdup(LuaToString(l, -1));
 						lua_pop(l, 1);
 					} else {
 					   printf("\n%s\n",type->Name);
@@ -812,11 +814,12 @@ static int CclDefineUnitType(lua_State *l)
 			// have been defined. FIXME: MaxSpellType=500 or something?
 			//
 			if (!type->CanCastSpell) {
-				type->CanCastSpell = (char*)calloc(SpellTypeTable.size(), sizeof(char));
+				type->CanCastSpell = new char[SpellTypeTable.size()];
+				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {
-				free(type->CanCastSpell);
+				delete[] type->CanCastSpell;
 				type->CanCastSpell = NULL;
 
 			}
@@ -841,11 +844,12 @@ static int CclDefineUnitType(lua_State *l)
 			// have been defined.
 			//
 			if (!type->AutoCastActive) {
-				type->AutoCastActive = (char*)calloc(SpellTypeTable.size(), sizeof(char));
+				type->AutoCastActive = new char[SpellTypeTable.size()];
+				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {
-				free(type->AutoCastActive);
+				delete[] type->AutoCastActive;
 				type->AutoCastActive = NULL;
 
 			}
@@ -911,31 +915,31 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(value, "selected")) {
 					if (redefine) {
-						free(type->Sound.Selected.Name);
+						delete[] type->Sound.Selected.Name;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Selected.Name = strdup(LuaToString(l, -1));
+					type->Sound.Selected.Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "acknowledge")) {
 					if (redefine) {
-						free(type->Sound.Acknowledgement.Name);
+						delete[] type->Sound.Acknowledgement.Name;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Acknowledgement.Name = strdup(LuaToString(l, -1));
+					type->Sound.Acknowledgement.Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "ready")) {
 					if (redefine) {
-						free(type->Sound.Ready.Name);
+						delete[] type->Sound.Ready.Name;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Ready.Name = strdup(LuaToString(l, -1));
+					type->Sound.Ready.Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "repair")) {
 					if (redefine) {
-						free(type->Sound.Repair.Name);
+						delete[] type->Sound.Repair.Name;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Repair.Name = strdup(LuaToString(l, -1));
+					type->Sound.Repair.Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "harvest")) {
 					int res;
@@ -954,24 +958,24 @@ static int CclDefineUnitType(lua_State *l)
 						LuaError(l, "Resource not found: %s" _C_ value);
 					}
 					if (redefine) {
-						free(type->Sound.Harvest[res].Name);
+						delete[] type->Sound.Harvest[res].Name;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Harvest[res].Name = strdup(LuaToString(l, -1));
+					type->Sound.Harvest[res].Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "help")) {
 					if (redefine) {
-						free(type->Sound.Help.Name);
+						delete[] type->Sound.Help.Name;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Help.Name = strdup(LuaToString(l, -1));
+					type->Sound.Help.Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "dead")) {
 					if (redefine) {
-						free(type->Sound.Dead.Name);
+						delete[] type->Sound.Dead.Name;
 					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Dead.Name = strdup(LuaToString(l, -1));
+					type->Sound.Dead.Name = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
@@ -1049,7 +1053,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 	stats = &type->Stats[i];
 	if (!stats->Variables) {
-		stats->Variables = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
+		stats->Variables = (VariableType *)calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
 	}
 
 	//
@@ -1238,8 +1242,8 @@ static int CclSetUnitTypeName(lua_State *l)
 	lua_pushvalue(l, 1);
 	type = CclGetUnitType(l);
 	lua_pop(l, 1);
-	free(type->Name);
-	type->Name = strdup(LuaToString(l, 2));
+	delete[] type->Name;
+	type->Name = new_strdup(LuaToString(l, 2));
 
 	lua_pushvalue(l, 2);
 	return 1;
@@ -1310,7 +1314,7 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 	char* op1;
 	char* op2;
 
-	op1 = strdup(str);
+	op1 = new_strdup(str);
 	op2 = strchr(op1, ' ');
 	if (op2) {
 		while (*op2 == ' ') {
@@ -1337,7 +1341,7 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 		anim->D.RandomWait.MaxWait = atoi(op2);
 	} else if (!strcmp(op1, "sound")) {
 		anim->Type = AnimationSound;
-		anim->D.Sound.Name = strdup(op2);
+		anim->D.Sound.Name = new_strdup(op2);
 	} else if (!strcmp(op1, "random-sound")) {
 		int count;
 		char* next;
@@ -1352,12 +1356,12 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 				}
 			}
 			++count;
-			anim->D.RandomSound.Name = (char**)realloc(anim->D.RandomSound.Name, count * sizeof(char*));
-			anim->D.RandomSound.Name[count - 1] = strdup(op2);
+			anim->D.RandomSound.Name = (char **)realloc(anim->D.RandomSound.Name, count * sizeof(char*));
+			anim->D.RandomSound.Name[count - 1] = new_strdup(op2);
 			op2 = next;
 		}
 		anim->D.RandomSound.NumSounds = count;
-		anim->D.RandomSound.Sound = (SoundId*)calloc(count, sizeof(SoundId));
+		anim->D.RandomSound.Sound = (SoundId *)calloc(count, sizeof(SoundId));
 	} else if (!strcmp(op1, "attack")) {
 		anim->Type = AnimationAttack;
 	} else if (!strcmp(op1, "rotate")) {
@@ -1402,7 +1406,7 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 		LuaError(l, "Unknown animation: %s" _C_ op1);
 	}
 
-	free(op1);
+	delete[] op1;
 }
 
 /**
@@ -1420,7 +1424,7 @@ static Animation* ParseAnimation(lua_State* l, int idx)
 		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, idx);
-	anim = (Animation*)calloc(args + 1, sizeof(*anim));
+	anim = (Animation *)calloc(args + 1, sizeof(*anim));
 	tail = NULL;
 	NumLabels = NumLabelsLater = 0;
 
@@ -1480,7 +1484,7 @@ static int CclDefineAnimations(lua_State* l)
 	name = LuaToString(l, 1);
 	anims = AnimationsByIdent(name);
 	if (!anims) {
-		anims = (Animations*)calloc(1, sizeof(*anims));
+		anims = (Animations *)calloc(1, sizeof(*anims));
 		AnimationMap[name] = anims;
 	}
 
@@ -1591,12 +1595,16 @@ static int CclDefineVariables(lua_State* l)
 		i = GetVariableIndex(str);
 		if (i == -1) { // new variable.
 			i = UnitTypeVar.NumberVariable;
-			UnitTypeVar.VariableName = (char**)realloc(UnitTypeVar.VariableName,
-				(i + 1) * sizeof(*UnitTypeVar.VariableName));
-			UnitTypeVar.VariableName[i] = strdup(str);
-			UnitTypeVar.Variable = (VariableType*)realloc(UnitTypeVar.Variable,
-				(i + 1) * sizeof(*UnitTypeVar.Variable));
-			memset(UnitTypeVar.Variable + i, 0, sizeof (*UnitTypeVar.Variable));
+			char **v = new char *[i + 1];
+			memcpy(v, UnitTypeVar.VariableName, i * sizeof(char *));
+			delete[] UnitTypeVar.VariableName;
+			UnitTypeVar.VariableName = v;
+			UnitTypeVar.VariableName[i] = new_strdup(str);
+
+			VariableType *t = new VariableType[i + 1];
+			for (int x = 0; x < i; ++x) {
+				t[x] = UnitTypeVar.Variable[x];
+			}
 			UnitTypeVar.NumberVariable++;
 		} else {
 			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
@@ -1637,18 +1645,27 @@ static int CclDefineBoolFlags(lua_State* l)
 			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ UnitTypeVar.BoolFlagName[i]);
 			continue;
 		}
-		UnitTypeVar.BoolFlagName = (char**)realloc(UnitTypeVar.BoolFlagName,
-			(UnitTypeVar.NumberBoolFlag + 1) * sizeof(*UnitTypeVar.BoolFlagName));
-		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = strdup(str);
+		char **b = new char *[UnitTypeVar.NumberBoolFlag + 1];
+		memcpy(b, UnitTypeVar.BoolFlagName, UnitTypeVar.NumberBoolFlag * sizeof(char *));
+		delete[] UnitTypeVar.BoolFlagName;
+		UnitTypeVar.BoolFlagName = b;
+		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = new_strdup(str);
 	}
 	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-			UnitTypes[i]->BoolFlag = (unsigned char*)realloc(UnitTypes[i]->BoolFlag,
-				UnitTypeVar.NumberBoolFlag * sizeof(UnitTypes[i]->BoolFlag));
-			UnitTypes[i]->CanTargetFlag = (unsigned char*)realloc(UnitTypes[i]->CanTargetFlag,
-				UnitTypeVar.NumberBoolFlag * sizeof(UnitTypes[i]->CanTargetFlag));
+			unsigned char *b;
+
+			b = new unsigned char[UnitTypeVar.NumberBoolFlag];
+			memcpy(b, UnitTypes[i]->BoolFlag, old * sizeof(char *));
+			delete[] UnitTypes[i]->BoolFlag;
+			UnitTypes[i]->BoolFlag = b;
 			memset(UnitTypes[i]->BoolFlag + old, 0,
 				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->BoolFlag));
+
+			b = new unsigned char[UnitTypeVar.NumberBoolFlag];
+			memcpy(b, UnitTypes[i]->CanTargetFlag, old * sizeof(char *));
+			delete[] UnitTypes[i]->CanTargetFlag;
+			UnitTypes[i]->CanTargetFlag = b;
 			memset(UnitTypes[i]->CanTargetFlag + old, 0,
 				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->CanTargetFlag));
 		}
@@ -1797,7 +1814,7 @@ static int CclDefineDecorations(lua_State* l)
 		}
 		if (j == UnitTypeVar.NumberDeco) {
 			UnitTypeVar.NumberDeco++;
-			UnitTypeVar.DecoVar = (DecoVarType*)realloc(UnitTypeVar.DecoVar,
+			UnitTypeVar.DecoVar = (DecoVarType *)realloc(UnitTypeVar.DecoVar,
 				UnitTypeVar.NumberDeco * sizeof(*UnitTypeVar.DecoVar));
 		}
 		UnitTypeVar.DecoVar[j] = decovar;
@@ -1983,11 +2000,11 @@ void InitDefinedVariables()
 	int i; // iterator for var and boolflag.
 
 	// Variables.
-	UnitTypeVar.VariableName = (char**)calloc(NVARALREADYDEFINED, sizeof(*UnitTypeVar.VariableName));
-	for (i = 0; i < NVARALREADYDEFINED; i++) {
-		UnitTypeVar.VariableName[i] = strdup(var[i]);
+	UnitTypeVar.VariableName = new char *[NVARALREADYDEFINED];
+	for (i = 0; i < NVARALREADYDEFINED; ++i) {
+		UnitTypeVar.VariableName[i] = new_strdup(var[i]);
 	}
-	UnitTypeVar.Variable = (VariableType*)calloc(i, sizeof(*UnitTypeVar.Variable));
+	UnitTypeVar.Variable = new VariableType[i];
 	UnitTypeVar.NumberVariable = i;
 
 	// Boolflags.

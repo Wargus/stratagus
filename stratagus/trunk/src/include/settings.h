@@ -38,8 +38,8 @@
 ----------------------------------------------------------------------------*/
 
 class CFile;
-struct _world_map_;
-struct _campaign_chapter_;
+class WorldMap;
+class CampaignChapter;
 
 /*----------------------------------------------------------------------------
 --  Settings  __WIP__
@@ -54,7 +54,8 @@ struct _campaign_chapter_;
 **  simplifies load/save/reinitialization, etc...
 **
 */
-typedef struct _settings_ {
+class Settings {
+public:
 	int NetGameType;   /// Multiplayer or single player
 
 //  Individual presets:
@@ -73,7 +74,7 @@ typedef struct _settings_ {
 	int GameType;    /// Game type (melee, free for all,...)
 	bool NoFogOfWar; /// No fog of war
 	int RevealMap;   /// Reveal map
-} Settings;
+};
 
 #define SettingsPresetMapDefault  -1  /// Special: Use map supplied
 
@@ -164,11 +165,11 @@ extern Credits  GameCredits;   /// Game credits
 ----------------------------------------------------------------------------*/
 
 	/// Show level intro
-extern void ShowIntro(const Intro* intro);
+extern void ShowIntro(const Intro *intro);
 	/// Show game credits
-extern void ShowCredits(Credits* credits);
+extern void ShowCredits(Credits *credits);
 	/// Show picture
-extern void ShowPicture(struct _campaign_chapter_* chapter);
+extern void ShowPicture(CampaignChapter *chapter);
 	/// Show stats
 extern void ShowStats();
 	/// Register CCL functions for credits
@@ -178,7 +179,7 @@ extern void ObjectivesCclRegister(void);
 	/// Save the objectives
 extern void SaveObjectives(CFile *file);
 	/// Create a game
-extern void CreateGame(const char* filename, struct _world_map_* map);
+extern void CreateGame(const char *filename, WorldMap *map);
 	/// Init Setting to default values
 extern void InitSettings(void);
 

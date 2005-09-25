@@ -156,7 +156,7 @@
 **  WorldMap::Info
 **
 **    Descriptive information of the map.
-**    @see ::_map_info_
+**    @see ::MapInfo
 **    @todo This structure contains duplicate informations of the map.
 */
 
@@ -247,34 +247,36 @@ public:
 /**
 **  Get info about a map.
 */
-typedef struct _map_info_ {
-	char*  Description;     /// Map description
-	char*  Filename;        /// Map filename
-	int MapWidth;    /// Map width
-	int MapHeight;   /// Map height
+class MapInfo {
+public:
+	char *Description;     /// Map description
+	char *Filename;        /// Map filename
+	int MapWidth;          /// Map width
+	int MapHeight;         /// Map height
 	int PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
-	unsigned int MapUID;  /// Unique Map ID (hash)
-} MapInfo;
+	unsigned int MapUID;   /// Unique Map ID (hash)
+};
 
 /*----------------------------------------------------------------------------
 --  Map itself
 ----------------------------------------------------------------------------*/
 
 	/// Describes the wold map
-typedef struct _world_map_ {
-	MapField* Fields;              /// fields on map
-	unsigned* Visible[PlayerMax];  /// visible bit-field
+class WorldMap {
+public:
+	MapField *Fields;              /// fields on map
+	unsigned *Visible[PlayerMax];  /// visible bit-field
 
 	bool NoFogOfWar;          /// fog of war disabled
 
-	struct _tileset_ Tileset; /// tileset data
+	CTileset Tileset;          /// tileset data
 	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels
 	Graphic *TileGraphic;     /// graphic for all the tiles
 	Graphic *FogGraphic;      /// graphic for fog of war
 
 	MapInfo Info;             /// descriptive information
-} WorldMap;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -284,9 +286,9 @@ extern WorldMap TheMap;  /// The current map
 extern char CurrentMapPath[]; /// Path to the current map
 
 	/// Vision Table to see where to locate goals and vision
-extern unsigned char* VisionTable[3];
+extern unsigned char *VisionTable[3];
 	/// Companion table for fast lookups
-extern int* VisionLookup;
+extern int *VisionLookup;
 
 	/// Contrast of fog of war
 extern int FogOfWarOpacity;
@@ -326,7 +328,7 @@ extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 	/// Mark sight changes
 extern void MapSight(const CPlayer *player, int x, int y, int w,
-	int h, int range, MapMarkerFunc* marker);
+	int h, int range, MapMarkerFunc *marker);
 	/// Find if a tile is visible (With shared vision)
 extern unsigned char IsTileVisible(const CPlayer *player, int x,
 	int y);
@@ -390,14 +392,14 @@ extern void CreateMap(int width, int height);
 	/// Save the map
 extern void SaveMap(CFile *file);
 	/// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const char* filename, WorldMap* map, int writeTerrain);
+extern int SaveStratagusMap(const char *filename, WorldMap *map, int writeTerrain);
 	/// Clean the map
 extern void CleanMap(void);
 
 	/// Load map presentation
-extern void LoadStratagusMapInfo(const char* mapname);
+extern void LoadStratagusMapInfo(const char *mapname);
 	/// Release info for a map
-extern void FreeMapInfo(MapInfo* info);
+extern void FreeMapInfo(MapInfo *info);
 
 	/// Mark a tile as seen by the player
 extern void MapMarkSeenTile(int x, int y);
