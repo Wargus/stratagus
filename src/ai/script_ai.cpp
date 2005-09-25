@@ -287,7 +287,7 @@ static int CclDefineAi(lua_State *l)
 	lua_call(l, 1, 1);
 	lua_pushstring(l, "name");
 	lua_gettable(l, -2);
-	aitype->FunctionName = new_strdup(LuaToString(l, -2));
+	aitype->FunctionName = new_strdup(LuaToString(l, -1));
 	lua_pop(l, 2); // FIXME : check if this value is correct.
 	// We can have opcode of this function with string.dump(function)
 	// Problems are for sub functions...
