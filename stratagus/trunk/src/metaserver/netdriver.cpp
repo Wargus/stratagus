@@ -109,7 +109,7 @@ ServerStruct Server;
 */
 void Send(Session *session, char *msg)
 {
-	NetSendTCP(session->Socket, msg, strlen(msg));
+	NetSendTCP(session->Sock, msg, strlen(msg));
 }
 
 /**
@@ -146,14 +146,14 @@ int ServerInit(int port)
    		return -4;
 	}
 
-	if (!(Pool = (SessionPool *)calloc(1, sizeof(SessionPool)))) {
+	if (!(Pool = new SessionPool)) {
 		fprintf(stderr, "Out of memory\n");
 		NetCloseTCP(MasterSocket);
 		NetExit();
 		return -5;
 	}
 
-	if (!(Pool->SocketSet = new SocketSet())) {
+	if (!(Pool->Sockets = new SocketSet)) {
 		NetCloseTCP(MasterSocket);
 		NetExit();
 		return -6;
@@ -179,12 +179,12 @@ void ServerQuit(void)
 		while (Pool->First) {
 			ptr = Pool->First;
 			UNLINK(Pool->First, Pool->First, Pool->Last, Pool->Count);
-			NetCloseTCP(ptr->Socket);
-			free(ptr);
+			NetCloseTCP(ptr->Sock);
+			delete ptr;
 		}
 
-		delete Pool->SocketSet;
-		free(Pool);
+		delete Pool->Sockets;
+		delete Pool;
 	}
 
 	NetExit();
@@ -208,10 +208,10 @@ static int IdleSeconds(Session *session)
 static int KillSession(Session *session)
 {
 	DebugPrint("Closing connection from '%s'\n" _C_ session->AddrData.IPStr);
-	NetCloseTCP(session->Socket);
-	Pool->SocketSet->DelSocket(session->Socket);
+	NetCloseTCP(session->Sock);
+	Pool->Sockets->DelSocket(session->Sock);
 	UNLINK(Pool->First, session, Pool->Last, Pool->Count);
-	free(session);
+	delete session;
 	return 0;
 }
 
@@ -231,13 +231,13 @@ static void AcceptConnections(void)
 			break;
 		}
 
-		new_session = (Session *)calloc(1, sizeof(Session));
+		new_session = new Session;
 		if (!new_session) {
 			fprintf(stderr, "ERROR: %s\n", strerror(errno));
 			break;
 		}
 
-		new_session->Socket = new_socket;
+		new_session->Sock = new_socket;
 		new_session->Idle = time(0);
 
 		new_session->AddrData.Host = NetLastHost;
@@ -247,7 +247,7 @@ static void AcceptConnections(void)
 		DebugPrint("New connection from '%s'\n" _C_ new_session->AddrData.IPStr);
 
 		LINK(Pool->First, new_session, Pool->Last, Pool->Count);
-		Pool->SocketSet->AddSocket(new_socket);
+		Pool->Sockets->AddSocket(new_socket);
 	}
 
 }
@@ -279,7 +279,7 @@ static int ReadData(void)
 	Session *next;
 	int result;
 
-	result = NetSocketSetReady(Pool->SocketSet, 0);
+	result = NetSocketSetReady(Pool->Sockets, 0);
 	if (result == 0) {
 		// No sockets ready
 		return 0;
@@ -292,13 +292,13 @@ static int ReadData(void)
 	// ready sockets
 	for (session = Pool->First; session; ) {
 		next = session->Next;
-		if (NetSocketSetSocketReady(Pool->SocketSet, session->Socket)) {
+		if (NetSocketSetSocketReady(Pool->Sockets, session->Sock)) {
 			int clen;
 
 			// socket ready
 			session->Idle = time(0);
 			clen = strlen(session->Buffer);
-			result = NetRecvTCP(session->Socket, session->Buffer + clen,
+			result = NetRecvTCP(session->Sock, session->Buffer + clen,
 				sizeof(session->Buffer) - clen);
 			if (result < 0) {
 				KillSession(session);
