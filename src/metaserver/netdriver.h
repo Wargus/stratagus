@@ -59,17 +59,21 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _game_data_;
+class GameData;
 
 /**
 ** Global server variables.
 */
-typedef struct _server_struct_ {
+class ServerStruct {
+public:
+	ServerStruct() : Port(0), MaxConnections(0), IdleTimeout(0),
+		PollingDelay(0) {}
+
 	int Port;
  	int MaxConnections;
 	int IdleTimeout;
 	int PollingDelay;
-} ServerStruct;
+};
 
 extern ServerStruct Server;
 
@@ -78,14 +82,27 @@ extern ServerStruct Server;
 **
 **  One per connection.
 */
-typedef struct _session_ {
-	struct _session_* Next;
-	struct _session_* Prev;
+class Session {
+public:
+	Session() : Next(NULL), Prev(NULL), Idle(0), Sock(0), Game(NULL)
+	{
+		Buffer[0] = '\0';
+		AddrData.Host = 0;
+		AddrData.IPStr[0] = '\0';
+		AddrData.Port = 0;
+		UserData.Name[0] = '\0';
+		UserData.GameName[0] = '\0';
+		UserData.Version[0] = '\0';
+		UserData.LoggedIn = 0;
+	}
+
+	Session *Next;
+	Session *Prev;
 
 	char Buffer[1024];
 	time_t Idle;
 
-	Socket Socket;
+	Socket Sock;
 
 	struct {
 		unsigned long Host;
@@ -100,28 +117,31 @@ typedef struct _session_ {
 		int LoggedIn;
 	} UserData;               /// Specific user data.
 
-	struct _game_data_* GameData;
-} Session;
+	GameData *Game;
+};
 
 /**
 **  Global session tracking.
 */
-typedef struct _session_pool_ {
-	Session* First;
-	Session* Last;
+class SessionPool {
+public:
+	SessionPool() : First(NULL), Last(NULL), Count(0), Sockets(NULL) {}
+
+	Session *First;
+	Session *Last;
 	int Count;
 
-	SocketSet* SocketSet;
-} SessionPool;
+	SocketSet *Sockets;
+};
 
 	/// external reference to session tracking.
-extern SessionPool* Pool;
+extern SessionPool *Pool;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void Send(Session* session, char* msg);
+extern void Send(Session *session, char *msg);
 
 extern int ServerInit(int port);
 extern void ServerQuit(void);

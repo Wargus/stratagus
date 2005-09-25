@@ -46,7 +46,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static GameData* Games;
+static GameData *Games;
 int GameID;
 
 /*----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ void CreateGame(Session *session, char *description, char *map,
 {
 	GameData *game;
 
-	game = (GameData *)malloc(sizeof(*game));
+	game = new GameData;
 
 	strcpy(game->IP, ip);
 	strcpy(game->Port, port);
@@ -90,7 +90,7 @@ void CreateGame(Session *session, char *description, char *map,
 	game->Prev = NULL;
 	Games = game;
 
-	session->GameData = game;
+	session->Game = game;
 }
 
 /**
@@ -101,7 +101,7 @@ int CancelGame(Session *session)
 	GameData *game;
 	int i;
 
-	game = session->GameData;
+	game = session->Game;
 
 	if (game->Sessions[0] != session) {
 		return -1; // Not the host
@@ -118,10 +118,10 @@ int CancelGame(Session *session)
 	}
 
 	for (i = 0; i < game->NumSessions; ++i) {
-		game->Sessions[i]->GameData = NULL;
+		game->Sessions[i]->Game = NULL;
 	}
 
-	free(game);
+	delete game;
 	return 0;
 }
 
@@ -130,11 +130,11 @@ int CancelGame(Session *session)
 */
 int StartGame(Session *session)
 {
-	if (session->GameData->Sessions[0] != session) {
+	if (session->Game->Sessions[0] != session) {
 		return -1; // Not the host
 	}
 
-	session->GameData->Started = 1;
+	session->Game->Started = 1;
 	return 0;
 }
 
@@ -145,7 +145,7 @@ int JoinGame(Session *session, int id, char *password)
 {
 	GameData *game;
 
-	if (session->GameData) {
+	if (session->Game) {
 		return -1; // Already in a game
 	}
 
@@ -169,7 +169,7 @@ int JoinGame(Session *session, int id, char *password)
 		return -4; // Game full
 	}
 	game->Sessions[game->NumSessions++] = session;
-	session->GameData = game;
+	session->Game = game;
 
 	return 0;
 }
@@ -182,7 +182,7 @@ int PartGame(Session *session)
 	GameData *game;
 	int i;
 
-	game = session->GameData;
+	game = session->Game;
 
 	if (!game) {
 		return -1; // Not in a game
@@ -207,7 +207,7 @@ int PartGame(Session *session)
 		}
 	}
 
-	session->GameData = NULL;
+	session->Game = NULL;
 
 	return 0;
 }

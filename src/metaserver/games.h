@@ -45,10 +45,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _session_;
+class Session;
 
-typedef struct _game_data_
+class GameData
 {
+public:
 	char IP[16];
 	char Port[6];
 	char Password[MAX_GAME_PASSWORD_LENGTH + 1];
@@ -57,17 +58,17 @@ typedef struct _game_data_
 	int OpenSlots;
 	int MaxSlots;
 
-	char* GameName;
-	char* Version;
+	char *GameName;
+	char *Version;
 
-	struct _session_* Sessions[16];
+	Session *Sessions[16];
 	int NumSessions;
 	int ID;
 	int Started;
 
-	struct _game_data_* Next;
-	struct _game_data_* Prev;
-} GameData;
+	GameData *Next;
+	GameData *Prev;
+};
 
 extern int GameID;
 
@@ -75,13 +76,13 @@ extern int GameID;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void CreateGame(struct _session_* session, char* description, char* map,
-	char* players, char* ip, char* port, char* password);
-extern int CancelGame(struct _session_* session);
-extern int StartGame(struct _session_* session);
-extern int JoinGame(struct _session_* session, int id, char* password);
-extern int PartGame(struct _session_* session);
-extern void ListGames(struct _session_* session);
+extern void CreateGame(Session *session, char *description, char *map,
+	char *players, char *ip, char *port, char *password);
+extern int CancelGame(Session *session);
+extern int StartGame(Session *session);
+extern int JoinGame(Session *session, int id, char *password);
+extern int PartGame(Session *session);
+extern void ListGames(Session *session);
 
 //@}
 
