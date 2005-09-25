@@ -116,7 +116,7 @@
 		} \
 	} while (0)
 
-static int Parse1Arg(char* buf, char** arg1)
+static int Parse1Arg(char *buf, char **arg1)
 {
 	SkipSpaces(buf);
 
@@ -126,7 +126,7 @@ static int Parse1Arg(char* buf, char** arg1)
 	return 0;
 }
 
-static int Parse1or2Args(char* buf, char** arg1, char** arg2)
+static int Parse1or2Args(char *buf, char **arg1, char **arg2)
 {
 	SkipSpaces(buf);
 
@@ -136,8 +136,8 @@ static int Parse1or2Args(char* buf, char** arg1, char** arg2)
 	return 0;
 }
 
-static int Parse4Args(char* buf, char** arg1, char** arg2, char** arg3,
-	char** arg4)
+static int Parse4Args(char *buf, char **arg1, char **arg2, char **arg3,
+	char **arg4)
 {
 	SkipSpaces(buf);
 
@@ -156,8 +156,9 @@ static int Parse4Args(char* buf, char** arg1, char** arg2, char** arg3,
 	return 0;
 }
 
-static int Parse5Args(char* buf, char** arg1, char** arg2, char** arg3,
-	char** arg4, char** arg5)
+#if 0 // not used
+static int Parse5Args(char *buf, char **arg1, char **arg2, char **arg3,
+	char **arg4, char **arg5)
 {
 	SkipSpaces(buf);
 
@@ -178,9 +179,10 @@ static int Parse5Args(char* buf, char** arg1, char** arg2, char** arg3,
 
 	return 0;
 }
+#endif
 
-static int Parse5or6Args(char* buf, char** arg1, char** arg2, char** arg3,
-	char** arg4, char** arg5, char** arg6)
+static int Parse5or6Args(char *buf, char **arg1, char **arg2, char **arg3,
+	char **arg4, char **arg5, char **arg6)
 {
 	SkipSpaces(buf);
 
@@ -205,12 +207,12 @@ static int Parse5or6Args(char* buf, char** arg1, char** arg2, char** arg3,
 /**
 **  Parse USER
 */
-static void ParseUser(Session* session, char* buf)
+static void ParseUser(Session *session, char *buf)
 {
-	char* username;
-	char* password;
-	char* gamename;
-	char* gamever;
+	char *username;
+	char *password;
+	char *gamename;
+	char *gamever;
 	char pw[MAX_PASSWORD_LENGTH + 1];
 
 	if (Parse4Args(buf, &username, &password, &gamename, &gamever)) {
@@ -249,12 +251,12 @@ static void ParseUser(Session* session, char* buf)
 /**
 **  Parse REGISTER
 */
-static void ParseRegister(Session* session, char* buf)
+static void ParseRegister(Session *session, char *buf)
 {
-	char* username;
-	char* password;
-	char* gamename;
-	char* gamever;
+	char *username;
+	char *password;
+	char *gamename;
+	char *gamever;
 	char pw[MAX_PASSWORD_LENGTH + 1];
 
 	if (Parse4Args(buf, &username, &password, &gamename, &gamever)) {
@@ -288,14 +290,14 @@ static void ParseRegister(Session* session, char* buf)
 /**
 **  Parse CREATEGAME
 */
-static void ParseCreateGame(Session* session, char* buf)
+static void ParseCreateGame(Session *session, char *buf)
 {
-	char* description;
-	char* map;
-	char* players;
-	char* ip;
-	char* port;
-	char* password;
+	char *description;
+	char *map;
+	char *players;
+	char *ip;
+	char *port;
+	char *password;
 	int players_int;
 	int port_int;
 
@@ -326,7 +328,7 @@ static void ParseCreateGame(Session* session, char* buf)
 /**
 **  Parse CANCELGAME
 */
-static void ParseCancelGame(Session* session, char* buf)
+static void ParseCancelGame(Session *session, char *buf)
 {
 	// No args
 	while (*buf == ' ') ++buf;
@@ -347,7 +349,7 @@ static void ParseCancelGame(Session* session, char* buf)
 /**
 **  Parse STARTGAME
 */
-static void ParseStartGame(Session* session, char* buf)
+static void ParseStartGame(Session *session, char *buf)
 {
 	// No args
 	while (*buf == ' ') ++buf;
@@ -368,7 +370,7 @@ static void ParseStartGame(Session* session, char* buf)
 /**
 **  Parse LISTGAMES
 */
-static void ParseListGames(Session* session, char* buf)
+static void ParseListGames(Session *session, char *buf)
 {
 	// No args
 	while (*buf == ' ') ++buf;
@@ -385,10 +387,10 @@ static void ParseListGames(Session* session, char* buf)
 /**
 **  Parse JOINGAME
 */
-static void ParseJoinGame(Session* session, char* buf)
+static void ParseJoinGame(Session *session, char *buf)
 {
-	char* id;
-	char* password;
+	char *id;
+	char *password;
 	int ret;
 
 	if (Parse1or2Args(buf, &id, &password)) {
@@ -422,7 +424,7 @@ static void ParseJoinGame(Session* session, char* buf)
 /**
 **  Parse PARTGAME
 */
-static void ParsePartGame(Session* session, char* buf)
+static void ParsePartGame(Session *session, char *buf)
 {
 	int ret;
 
@@ -449,9 +451,9 @@ static void ParsePartGame(Session* session, char* buf)
 /**
 **  Parse ENDGAME
 */
-static void ParseEndGame(Session* session, char* buf)
+static void ParseEndGame(Session *session, char *buf)
 {
-	char* result;
+	char *result;
 
 	Parse1Arg(buf, &result);
 
@@ -461,7 +463,7 @@ static void ParseEndGame(Session* session, char* buf)
 /**
 **  Parse MSG
 */
-static void ParseMsg(Session* session, char* buf)
+static void ParseMsg(Session *session, char *buf)
 {
 }
 
@@ -470,9 +472,9 @@ static void ParseMsg(Session* session, char* buf)
 **
 **  @param session  Current session.
 */
-static void ParseBuffer(Session* session)
+static void ParseBuffer(Session *session)
 {
-	char* buf;
+	char *buf;
 
 	if (!session || session->Buffer[0] == '\0') {
 		return;
@@ -520,9 +522,9 @@ static void ParseBuffer(Session* session)
 */
 int UpdateParser(void)
 {
-	Session* session;
+	Session *session;
 	int len;
-	char* next;
+	char *next;
 
 	if (!Pool || !Pool->First) {
 		// No connections
