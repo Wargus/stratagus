@@ -369,19 +369,19 @@ static int CclProcessMenu(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineCursor(lua_State* l)
+static int CclDefineCursor(lua_State *l)
 {
-	const char* value;
-	const char* name;
-	const char* race;
-	const char* file;
+	const char *value;
+	const char *name;
+	const char *race;
+	const char *file;
 	int hotx;
 	int hoty;
 	int w;
 	int h;
 	int rate;
 	int i;
-	CursorType* ct;
+	CursorType *ct;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -437,8 +437,8 @@ static int CclDefineCursor(lua_State* l)
 	//
 	ct = NULL;
 	i = 0;
-	if (Cursors) {
-		for (; i < CursorMax; ++i) {
+	if (Cursors.size()) {
+		for (; i < (int)Cursors.size(); ++i) {
 			//
 			//  Race not same, not found.
 			//
@@ -459,12 +459,11 @@ static int CclDefineCursor(lua_State* l)
 	//  Not found, make a new slot.
 	//
 	if (!ct) {
-		CursorMax++;
-		Cursors = (CursorType*)realloc(Cursors, CursorMax * sizeof(CursorType));
-		memset(&Cursors[i], 0, sizeof(CursorType));
-		ct = &Cursors[i];
-		ct->Ident = strdup(name);
-		ct->Race = race ? strdup(race) : NULL;
+		CursorType c;
+		Cursors.push_back(c);
+		ct = &Cursors.back();
+		ct->Ident = new_strdup(name);
+		ct->Race = race ? new_strdup(race) : NULL;
 	}
 
 	ct->G = NewGraphic(file, w, h);

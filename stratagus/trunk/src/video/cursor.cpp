@@ -57,16 +57,11 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Cursor-type type definition
-*/
-int CursorMax; /// Number of cursor.
-
-/**
 **  Define cursor-types.
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-CursorType *Cursors;
+std::vector<CursorType> Cursors;
 
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
@@ -106,20 +101,19 @@ CursorType *GameCursor;             /// current shown cursor-type
 */
 void LoadCursors(const char *race)
 {
-	//
-	//  Load the graphics
-	//
-	for (int i = 0; i < CursorMax; ++i) {
+	std::vector<CursorType>::iterator i;
+
+	for (i = Cursors.begin(); i != Cursors.end(); ++i) {
 		//
 		//  Only load cursors of this race or universal cursors.
 		//
-		if (Cursors[i].Race && strcmp(Cursors[i].Race, race)) {
+		if ((*i).Race && strcmp((*i).Race, race)) {
 			continue;
 		}
 
-		if (Cursors[i].G && !Cursors[i].G->Loaded()) {
-			ShowLoadProgress("Cursor %s", Cursors[i].G->File);
-			Cursors[i].G->Load();
+		if ((*i).G && !(*i).G->Loaded()) {
+			ShowLoadProgress("Cursor %s", (*i).G->File);
+			(*i).G->Load();
 		}
 	}
 }
@@ -135,12 +129,14 @@ void LoadCursors(const char *race)
 */
 CursorType *CursorTypeByIdent(const char *ident)
 {
-	for (int i = 0; i < CursorMax; ++i) {
-		if (strcmp(Cursors[i].Ident, ident)) {
+	std::vector<CursorType>::iterator i;
+
+	for (i = Cursors.begin(); i != Cursors.end(); ++i) {
+		if (strcmp((*i).Ident, ident)) {
 			continue;
 		}
-		if (!Cursors[i].Race || Cursors[i].G->Loaded()) {
-			return Cursors + i;
+		if (!(*i).Race || (*i).G->Loaded()) {
+			return &(*i);
 		}
 	}
 	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident);
@@ -340,14 +336,14 @@ void InitVideoCursors(void)
 */
 void CleanCursors(void)
 {
-	for (int i = 0; i < CursorMax; ++i) {
-		FreeGraphic(Cursors[i].G);
-		free(Cursors[i].Ident);
-		free(Cursors[i].Race);
+	std::vector<CursorType>::iterator i;
+
+	for (i = Cursors.begin(); i != Cursors.end(); ++i) {
+		FreeGraphic((*i).G);
+		delete[] (*i).Ident;
+		delete[] (*i).Race;
 	}
-	free(Cursors);
-	Cursors = NULL;
-	CursorMax = 0;
+	Cursors.clear();
 
 	CursorBuilding = NULL;
 	GameCursor = NULL;
