@@ -1105,7 +1105,7 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 	// NOTE: missiles[??] could be modified!!! Yes (freed)
 	//
 	for (std::vector<Missile *>::iterator i = missiles.begin();
-		i != missiles.end();) {
+			i != missiles.end();) {
 
 		if ((*i)->Delay) {
 			(*i)->Delay--;

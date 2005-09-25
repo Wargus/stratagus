@@ -447,7 +447,9 @@ public:
 class Missile {
 protected:
 	Missile();
+
 public:
+	virtual ~Missile() {};
 
 	static Missile *Init(MissileType *mtype, int sx, int sy, int dx, int dy);
 
@@ -462,7 +464,7 @@ public:
 	int Y;        /// missile pixel position
 	int DX;       /// missile pixel destination
 	int DY;       /// missile pixel destination
-	MissileType* Type;  /// missile-type pointer
+	MissileType *Type;  /// missile-type pointer
 	int SpriteFrame;  /// sprite frame counter
 	int State;        /// state
 	int AnimWait;     /// Animation wait.
