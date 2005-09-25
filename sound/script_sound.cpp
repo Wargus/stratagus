@@ -62,16 +62,16 @@
 **
 **  @param l  Lua state.
 */
-static int CclSoundForName(lua_State* l)
+static int CclSoundForName(lua_State *l)
 {
 	SoundId id;
-	const char* sound_name;
-	LuaUserData* data;
+	const char *sound_name;
+	LuaUserData *data;
 
 	sound_name = LuaToString(l, -1);
 	id = SoundIdForName(sound_name);
 
-	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -84,9 +84,9 @@ static int CclSoundForName(lua_State* l)
 **
 **  @return   The C sound id.
 */
-static SoundId CclGetSoundId(lua_State* l)
+static SoundId CclGetSoundId(lua_State *l)
 {
-	LuaUserData* data;
+	LuaUserData *data;
 	int pop;
 
 	pop = 0;
@@ -95,7 +95,7 @@ static SoundId CclGetSoundId(lua_State* l)
 		pop = 1;
 	}
 	if (lua_isuserdata(l, -1)) {
-		data = (LuaUserData*)lua_touserdata(l, -1);
+		data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaSoundType) {
 			if (pop) {
 				lua_pop(l, 1);
@@ -118,15 +118,15 @@ static SoundId CclGetSoundId(lua_State* l)
 **
 **  @return   the sound id of the created sound
 */
-static int CclMakeSound(lua_State* l)
+static int CclMakeSound(lua_State *l)
 {
 	SoundId id;
-	const char* c_name;
-	const char* c_file;
-	char** c_files;
+	const char *c_name;
+	const char *c_file;
+	char **c_files;
 	int args;
 	int j;
-	LuaUserData* data;
+	LuaUserData *data;
 
 	LuaCheckArgs(l, 2);
 
@@ -138,23 +138,23 @@ static int CclMakeSound(lua_State* l)
 	} else if (lua_istable(l, 2)) {
 		// several files
 		args = luaL_getn(l, 2);
-		c_files = (char**)malloc(args * sizeof(char*));
+		c_files = new char *[args];
 		for (j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
-			c_files[j] = strdup(LuaToString(l, -1));
+			c_files[j] = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
 		}
 		// FIXME: check size before casting
-		id = MakeSound(c_name, (const char**)c_files, (unsigned char)args);
+		id = MakeSound(c_name, (const char **)c_files, (unsigned char)args);
 		for (j = 0; j < args; ++j) {
-			free(c_files[j]);
+			delete[] c_files[j];
 		}
-		free(c_files);
+		delete[] c_files;
 	} else {
 		LuaError(l, "string or table expected");
 		return 0;
 	}
-	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -168,13 +168,13 @@ static int CclMakeSound(lua_State* l)
 **
 **  @return   The sound id of the created sound
 */
-static int CclMakeSoundGroup(lua_State* l)
+static int CclMakeSoundGroup(lua_State *l)
 {
 	SoundId id;
-	const char* c_name;
+	const char *c_name;
 	SoundId first;
 	SoundId second;
-	LuaUserData* data;
+	LuaUserData *data;
 
 	LuaCheckArgs(l, 3);
 
@@ -185,7 +185,7 @@ static int CclMakeSoundGroup(lua_State* l)
 	lua_pop(l, 1);
 	second = CclGetSoundId(l);
 	id = MakeSoundGroup(c_name, first, second);
-	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -199,9 +199,9 @@ static int CclMakeSoundGroup(lua_State* l)
 **
 **  @return   the sound object
 */
-static int CclMapSound(lua_State* l)
+static int CclMapSound(lua_State *l)
 {
-	const char* sound_name;
+	const char *sound_name;
 
 	LuaCheckArgs(l, 2);
 	sound_name = LuaToString(l, 1);
@@ -215,7 +215,7 @@ static int CclMapSound(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclPlaySound(lua_State* l)
+static int CclPlaySound(lua_State *l)
 {
 	SoundId id;
 
@@ -232,14 +232,14 @@ static int CclPlaySound(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineGameSounds(lua_State* l)
+static int CclDefineGameSounds(lua_State *l)
 {
 	//FIXME: should allow to define ALL the game sounds
-	const char* value;
+	const char *value;
 	int i;
 	int args;
 	int j;
-	LuaUserData* data;
+	LuaUserData *data;
 
 	args = lua_gettop(l);
 	data = NULL;
@@ -250,19 +250,19 @@ static int CclDefineGameSounds(lua_State* l)
 		// let's handle now the different cases
 		if (!strcmp(value, "click")) {
 			if (!lua_isuserdata(l, j + 1) ||
-					(data = (LuaUserData*)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.Click.Sound = data->Data;
 		} else if (!strcmp(value, "placement-error")) {
 			if (!lua_isuserdata(l, j + 1) ||
-					(data = (LuaUserData*)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.PlacementError.Sound = data->Data;
 		} else if (!strcmp(value, "placement-success")) {
 			if (!lua_isuserdata(l, j + 1) ||
-					(data = (LuaUserData*)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.PlacementSuccess.Sound = data->Data;
@@ -283,7 +283,7 @@ static int CclDefineGameSounds(lua_State* l)
 			}
 			lua_rawgeti(l, j + 1, 2);
 			if (!lua_isuserdata(l, -1) ||
-					(data = (LuaUserData*)lua_touserdata(l, -1))->Type != LuaSoundType) {
+					(data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
@@ -305,7 +305,7 @@ static int CclDefineGameSounds(lua_State* l)
 			}
 			lua_rawgeti(l, j + 1, 2);
 			if (!lua_isuserdata(l, -1) ||
-					(data = (LuaUserData*)lua_touserdata(l, -1))->Type != LuaSoundType) {
+					(data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
@@ -322,7 +322,7 @@ static int CclDefineGameSounds(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSoundVolume(lua_State* l)
+static int CclSetSoundVolume(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
@@ -335,7 +335,7 @@ static int CclSetSoundVolume(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetMusicVolume(lua_State* l)
+static int CclSetMusicVolume(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
@@ -348,11 +348,11 @@ static int CclSetMusicVolume(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetCdMode(lua_State* l)
+static int CclSetCdMode(lua_State *l)
 {
 #ifdef USE_CDAUDIO
 	CDModes cdmode;
-	const char* mode;
+	const char *mode;
 
 	LuaCheckArgs(l, 1);
 	mode = LuaToString(l, 1);
@@ -380,17 +380,17 @@ static int CclSetCdMode(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefinePlaySections(lua_State* l)
+static int CclDefinePlaySections(lua_State *l)
 {
-	const char* value;
-	PlaySection* p;
+	const char *value;
+	PlaySection *p;
 	int args;
 	int j;
 	int subargs;
 	int k;
 
 	++NumPlaySections;
-	PlaySections = (PlaySection*)realloc(PlaySections, NumPlaySections * sizeof(PlaySection));
+	PlaySections = (PlaySection *)realloc(PlaySections, NumPlaySections * sizeof(PlaySection));
 	p = PlaySections + NumPlaySections - 1;
 	memset(p, 0, sizeof(PlaySection));
 
@@ -485,11 +485,11 @@ static int CclDefinePlaySections(lua_State* l)
 						LuaError(l, "incorrect argument");
 					}
 					subsubargs = luaL_getn(l, -1);
-					p->Files = (char**)malloc((subsubargs + 1) * sizeof(char*));
+					p->Files = new char *[subsubargs + 1];
 					p->Files[subsubargs] = NULL;
 					for (subk = 0; subk < subsubargs; ++subk) {
 						lua_rawgeti(l, -1, subk + 1);
-						p->Files[subk] = strdup(LuaToString(l, -1));
+						p->Files[subk] = new_strdup(LuaToString(l, -1));
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -509,7 +509,7 @@ static int CclDefinePlaySections(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSoundOff(lua_State* l)
+static int CclSoundOff(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	SoundOff = 1;
@@ -523,7 +523,7 @@ static int CclSoundOff(lua_State* l)
 **
 **  @return   true if and only if the sound is REALLY turned on
 */
-static int CclSoundOn(lua_State* l)
+static int CclSoundOn(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
@@ -541,7 +541,7 @@ static int CclSoundOn(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclMusicOff(lua_State* l)
+static int CclMusicOff(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	StopMusic();
@@ -556,7 +556,7 @@ static int CclMusicOff(lua_State* l)
 **
 **  @return   true if and only if the sound is REALLY turned on
 */
-static int CclMusicOn(lua_State* l)
+static int CclMusicOn(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	MusicOff = 0;
@@ -568,7 +568,7 @@ static int CclMusicOn(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetGlobalSoundRange(lua_State* l)
+static int CclSetGlobalSoundRange(lua_State *l)
 {
 	int d;
 
@@ -587,7 +587,7 @@ static int CclSetGlobalSoundRange(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSoundRange(lua_State* l) {
+static int CclSetSoundRange(lua_State *l) {
 	unsigned char theRange;
 	int tmp;
 	SoundId id;
@@ -613,7 +613,7 @@ static int CclSetSoundRange(lua_State* l) {
 **
 **  @param l  Lua state.
 */
-static int CclPlayMusic(lua_State* l)
+static int CclPlayMusic(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	PlayMusic(LuaToString(l, 1));
@@ -625,7 +625,7 @@ static int CclPlayMusic(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclPlayFile(lua_State* l)
+static int CclPlayFile(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	PlaySoundFile(LuaToString(l, 1));
@@ -637,7 +637,7 @@ static int CclPlayFile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclStopMusic(lua_State* l)
+static int CclStopMusic(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	StopMusic();
