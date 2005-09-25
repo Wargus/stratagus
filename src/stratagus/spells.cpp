@@ -1206,7 +1206,7 @@ SpellType::SpellType(int slot, const char *identname) :
 	DependencyId(-1), Condition(NULL),
 	AutoCast(NULL), AICast(NULL)
 {
-	Ident = strdup(identname);
+	Ident = new_strdup(identname);
 	SoundWhenCast.Name = NULL;
 	SoundWhenCast.Sound = NULL;
 }
@@ -1216,8 +1216,8 @@ SpellType::SpellType(int slot, const char *identname) :
 */
 SpellType::~SpellType()
 {
-	free(Ident);
-	free(Name);
+	delete[] Ident;
+	delete[] Name;
 	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
 		delete *act;
 	}
@@ -1230,7 +1230,7 @@ SpellType::~SpellType()
 	delete AutoCast;
 	delete AICast;
 
-	free(SoundWhenCast.Name);
+	delete[] SoundWhenCast.Name;
 }
 
 
