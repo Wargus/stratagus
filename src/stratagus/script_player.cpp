@@ -710,10 +710,12 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 	PlayerColorIndexCount = LuaToNumber(l, 2);
 
 	for (i = 0; i < PlayerMax; ++i) {
-		free(PlayerColorsRGB[i]);
-		PlayerColorsRGB[i] = (SDL_Color*)calloc(PlayerColorIndexCount, sizeof(*PlayerColorsRGB[i]));
-		free(PlayerColors[i]);
-		PlayerColors[i] = (Uint32*)calloc(PlayerColorIndexCount, sizeof(*PlayerColors[i]));
+		delete[] PlayerColorsRGB[i];
+		PlayerColorsRGB[i] = new SDL_Color[PlayerColorIndexCount];
+		memset(PlayerColorsRGB[i], 0, PlayerColorIndexCount * sizeof(SDL_Color));
+		delete[] PlayerColors[i];
+		PlayerColors[i] = new Uint32[PlayerColorIndexCount];
+		memset(PlayerColorsRGB[i], 0, PlayerColorIndexCount * sizeof(Uint32));
 	}
 	return 0;
 }
