@@ -552,7 +552,7 @@ public:
 	BurningBuildingFrame() : Percent(0), Missile(NULL) {};
 
 	int          Percent;  /// HP percent
-	MissileType* Missile;  /// Missile to draw
+	MissileType *Missile;  /// Missile to draw
 } ;
 
 /*----------------------------------------------------------------------------
@@ -575,27 +575,27 @@ extern void MissileCclRegister(void);
 	/// load all missile sprites
 extern void LoadMissileSprites();
 	/// allocate an empty missile-type slot
-extern MissileType* NewMissileTypeSlot(char* ident);
+extern MissileType *NewMissileTypeSlot(char *ident);
 	/// Get missile-type by ident
-extern MissileType* MissileTypeByIdent(const char* ident);
+extern MissileType *MissileTypeByIdent(const char *ident);
 	/// create a missile
-extern Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx,
+extern Missile *MakeMissile(MissileType *mtype, int sx, int sy, int dx,
 	int dy);
 	/// create a local missile
-extern Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx,
+extern Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx,
 	int dy);
 	/// fire a missile
 extern void FireMissile(CUnit *unit);
 
-extern int FindAndSortMissiles(const CViewport* vp, Missile** table);
+extern int FindAndSortMissiles(const CViewport *vp, Missile **table);
 
 	/// handle all missiles
 extern void MissileActions(void);
 	/// distance from view point to missile
-extern int ViewPointDistanceToMissile(const Missile* missile);
+extern int ViewPointDistanceToMissile(const Missile *missile);
 
 	/// Get the burning building missile based on hp percent
-extern MissileType* MissileBurningBuilding(int percent);
+extern MissileType *MissileBurningBuilding(int percent);
 
 	/// Save missiles
 extern void SaveMissiles(CFile *file);

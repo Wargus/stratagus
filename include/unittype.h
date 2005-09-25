@@ -535,12 +535,26 @@ struct _animations_;
 **
 **  @todo Move this to missle.h?
 */
-typedef struct _missile_config_ {
+class MissileConfig {
+public:
 	char*        Name;              /// Config missile name
 	MissileType* Missile;           /// Identifier to use to run time
-} MissileConfig;
+};
 
-typedef struct _resource_info_ {
+class ResourceInfo {
+public:
+	ResourceInfo() : FileWhenLoaded(NULL), FileWhenEmpty(NULL),
+		HarvestFromOutside(0), WaitAtResource(0), ResourceStep(0),
+		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
+		TerrainHarvester(0), LoseResources(0),
+		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
+	{
+#ifdef USE_OPENGL
+		memset(PlayerColorSpriteWhenLoaded, 0, sizeof(*PlayerColorSpriteWhenLoaded));
+		memset(PlayerColorSpriteWhenEmpty, 0, sizeof(*PlayerColorSpriteWhenEmpty));
+#endif
+	}
+
 	char*    FileWhenLoaded;        /// Change the graphic when the unit is loaded.
 	char*    FileWhenEmpty;         /// Change the graphic when the unit is empty.
 	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
@@ -559,7 +573,7 @@ typedef struct _resource_info_ {
 	Graphic *PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
 	Graphic *PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
 #endif
-} ResourceInfo;
+};
 
 /**
 **  User defined variable type.
@@ -567,12 +581,15 @@ typedef struct _resource_info_ {
 **  It is used to define variables and use it after
 **  to manage magic, energy, shield or other stuff.
 */
-typedef struct _variable_type_ {
+class VariableType {
+public:
+	VariableType() : Max(0), Value(0), Increase(0), Enable(0) {}
+
 	int Max;           /// Maximum for the variable. (Assume min is 0.)
 	int Value;         /// Current (or initial) value of the variable (or initial value).
 	char Increase;     /// Number to increase(decrease) Value by second.
 	char Enable;       /// True if the unit doesn't have this variable. (f.e shield)
-} VariableType;
+};
 
 // Index for boolflag aready defined
 enum {
@@ -926,7 +943,8 @@ extern CUnitType *UnitTypeOrcWall;            /// Orc wall
 /**
 **  Variable info for unit and unittype.
 */
-extern struct _UnitTypeVar_{
+class CUnitTypeVar {
+public:
 	char **BoolFlagName;                /// Array of name of user defined bool flag.
 	int NumberBoolFlag;                 /// Number of user defined bool flag.
 
@@ -937,7 +955,9 @@ extern struct _UnitTypeVar_{
 
 	DecoVarType *DecoVar;               /// Array to describe how showing variable.
 	int NumberDeco;                     /// Size of DecoVar.
-} UnitTypeVar;
+};
+
+extern CUnitTypeVar UnitTypeVar;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -964,7 +984,7 @@ extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 // in script_unittype.c
 
 	/// Parse User Variables field.
-extern void DefineVariableField(struct lua_State *l, struct _variable_type_ *var, int lua_index);
+extern void DefineVariableField(struct lua_State *l, VariableType *var, int lua_index);
 
 	/// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(const CUnit *unit);

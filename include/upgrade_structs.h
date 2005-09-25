@@ -52,6 +52,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnitType;
+class VariableType;
 
 /**
 **  Indices into costs/resource/income array.
@@ -127,10 +128,11 @@ extern int DefaultResourceAmounts[MaxCosts];
 /**
 **  This are the current stats of an unit. Upgraded or downgraded.
 */
-typedef struct _unit_stats_ {
-	struct _variable_type_* Variables;  /// userdefined variable.
+class UnitStats {
+public:
+	VariableType *Variables;        /// userdefined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
-} UnitStats;
+};
 
 /**
 **  The main useable upgrades.

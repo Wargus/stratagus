@@ -31,8 +31,8 @@
 //@{
 
 /*----------------------------------------------------------------------------
-  -- Includes
-  ----------------------------------------------------------------------------*/
+--  Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -305,7 +305,7 @@ void CUnit::Init(CUnitType* type)
 
 	if (UnitTypeVar.NumberVariable) {
 		Assert(!Variable);
-		Variable = (VariableType *)malloc(UnitTypeVar.NumberVariable * sizeof(*Variable));
+		Variable = new VariableType[UnitTypeVar.NumberVariable];
 		memcpy(Variable, Type->Variable,
 			UnitTypeVar.NumberVariable * sizeof(*Variable));
 	}
@@ -316,7 +316,7 @@ void CUnit::Init(CUnitType* type)
 	}
 
 	if (type->CanCastSpell) {
-		AutoCastSpell = (char *)malloc(SpellTypeTable.size());
+		AutoCastSpell = new char[SpellTypeTable.size()];
 		if (Type->AutoCastActive) {
 			memcpy(AutoCastSpell, Type->AutoCastActive, SpellTypeTable.size());
 		} else {

@@ -33,6 +33,8 @@
 
 //@{
 
+#include <vector>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -42,71 +44,77 @@ class CFile;
 /**
 **  Possible outcomes of the game.
 */
-typedef enum _game_results_ {
+typedef enum GameResults {
 	GameNoResult,  /// Game has no result
 	GameVictory,   /// Game was won
 	GameDefeat,    /// Game was lost
 	GameDraw,      /// Game was draw
-} GameResults;     /// Game results
+};                 /// Game results
 
 /**
 **  Type of the chapters.
 */
-typedef enum _chapter_types_ {
+enum ChapterTypes {
 	ChapterPlayMovie,    /// Play a movie
 	ChapterShowPicture,  /// Show a picture
 	ChapterPlayLevel,    /// Play a level
 	ChapterDefeat,       /// Levels played on defeat
 	ChapterDraw,         /// Levels played on draw
 	ChapterEnd,          /// End chapter (NOT SUPPORTED)
-} ChapterTypes;
-
-/**
-**  Campaign chapter.
-*/
-typedef struct _campaign_chapter_ CampaignChapter;
+};
 
 /**
 **  Picture text alignment
 */
-typedef enum _picture_text_alignment_ {
+enum PictureTextAlignment {
 	PictureTextAlignLeft,    /// Left align
 	PictureTextAlignCenter,  /// Center align
-} PictureTextAlignment;
+};
 
 /**
 **  Campaign picture text
 */
-typedef struct _chapter_picture_text_ {
+class ChapterPictureText {
+public:
+	ChapterPictureText() : Font(0), X(0), Y(0), Width(0), Height(0),
+		Align(PictureTextAlignLeft), Text(NULL), Next(NULL) {}
+
 	int                  Font;            /// Font
 	int                  X;               /// X position
 	int                  Y;               /// Y position
 	int                  Width;           /// Width
 	int                  Height;          /// Height
 	PictureTextAlignment Align;           /// Alignment
-	char*                Text;            /// Text
-	struct _chapter_picture_text_* Next;  /// Next
-} ChapterPictureText;
+	char                *Text;            /// Text
+	ChapterPictureText  *Next;            /// Next
+};
 
 /**
 **  Campaign chapter structure.
 */
-struct _campaign_chapter_ {
-	CampaignChapter* Next;   /// Next campaign chapter
+class CampaignChapter {
+public:
+	CampaignChapter() :
+		Next(NULL), Type(ChapterPlayLevel), Result(GameNoResult)
+	{
+		Data.Level.Name = NULL;
+	}
+
+	CampaignChapter *Next;   /// Next campaign chapter
 	ChapterTypes     Type;   /// Type of the chapter (level,...)
 	union {
 		struct {
-			char* Name;      /// Chapter name
+			char *Name;      /// Chapter name
 		} Level;             /// Data for a level
 		struct {
-			char* Image;               /// File name of image
+			char *Image;               /// File name of image
 			int   FadeIn;              /// Number of cycles to fade in
 			int   FadeOut;             /// Number of cycles to fade out
 			int   DisplayTime;         /// Number of cycles to display image
-			ChapterPictureText* Text;  /// Linked list of text data
+			ChapterPictureText *Text;  /// Linked list of text data
 		} Picture;                     /// Data for a picture
 		struct {
-			char* File;      /// File name of video
+			char *File;      /// File name of video
 			int Flags;       /// Playback flags
 		} Movie;             /// Data for a movie
 	} Data;                  /// Data of the different chapter types
@@ -116,15 +124,18 @@ struct _campaign_chapter_ {
 /**
 **  Campaign structure.
 */
-typedef struct _campaign_ {
-	char* Ident;    /// Unique identifier
-	char* Name;     /// Campaign name
+class Campaign {
+public:
+	Campaign() : Ident(NULL), Name(NULL), Players(0), File(NULL), Chapters(NULL) {}
+
+	char *Ident;    /// Unique identifier
+	char *Name;     /// Campaign name
 	int   Players;  /// Campaign for X players
 
-	char* File;     /// File containing the campaign
+	char *File;     /// File containing the campaign
 
-	CampaignChapter* Chapters;  /// Campaign chapters
-} Campaign;
+	CampaignChapter *Chapters;  /// Campaign chapters
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -136,17 +147,16 @@ extern int QuitToMenu;           /// Quit to menu
 extern char DefaultMap[1024];    /// Default map path
 extern char DefaultObjective[];  /// The default scenario objective
 
-extern Campaign* Campaigns;      /// Campaigns
-extern int NumCampaigns;         /// Number of campaigns
+extern std::vector<Campaign *> Campaigns;/// Campaigns
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 	/// Play a campaign
-extern void PlayCampaign(const char* name);
+extern void PlayCampaign(const char *name);
 	/// Next chapter of a campaign
-extern char* NextChapter(void);
+extern char *NextChapter(void);
 
 extern void CampaignCclRegister(void);   /// Register ccl features
 extern void SaveCampaign(CFile *file);  /// Save the campaign module

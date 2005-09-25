@@ -958,8 +958,8 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 
 	flags = mi->Flags;
 	rb = mi->D.Input.button;
-	x = mx+mi->XOfs;
-	y = my+mi->YOfs;
+	x = mx + mi->XOfs;
+	y = my + mi->YOfs;
 	w = mi->D.Input.xsize;
 	h = mi->D.Input.ysize;
 
@@ -1004,15 +1004,15 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 		text = mi->D.Input.buffer;
 		if (text) {
 			if (mi->D.Input.iflags & MI_IFLAGS_PASSWORD) {
-				char* p;
-				p = text = strdup(text);
+				char *p;
+				p = text = new_strdup(text);
 				while (*p && strcmp(p, "~!_")) {
 					*p++ = '*';
 				}
 			}
 			VideoDrawText(x + 2, y + 2, mi->Font, text);
 			if (mi->D.Input.iflags & MI_IFLAGS_PASSWORD) {
-				free(text);
+				delete[] text;
 			}
 		}
 		if (flags & MI_FLAGS_SELECTED) {

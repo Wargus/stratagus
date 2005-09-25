@@ -600,24 +600,24 @@ static int flqcmp(const void* v1, const void* v2)
 **
 **  @return the number of entries added to FileList.
 */
-int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp)
+int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *), FileList **flp)
 {
 #ifndef _MSC_VER
 	DIR* dirp;
-	struct dirent* dp;
+	struct dirent *dp;
 #endif
 	struct stat st;
 #ifdef _MSC_VER
 	struct _finddata_t fileinfo;
 	long hFile;
 #endif
-	FileList* nfl;
-	FileList* fl = NULL;
+	FileList *nfl;
+	FileList *fl = NULL;
 	int n;
 	int isdir = 0; // silence gcc..
-	char* np;
+	char *np;
 	char buffer[PATH_MAX];
-	char* filename;
+	char *filename;
 
 	strcpy(buffer, dirname);
 	n = strlen(buffer);
@@ -656,13 +656,13 @@ int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), File
 				isdir = S_ISDIR(st.st_mode);
 				if (isdir || S_ISREG(st.st_mode)) {
 					if (n) {
-						nfl = (FileList*)realloc(fl, sizeof(FileList) * (n + 1));
+						nfl = (FileList *)realloc(fl, sizeof(FileList) * (n + 1));
 						if (nfl) {
 							fl = nfl;
 							nfl = fl + n;
 						}
 					} else {
-						fl = nfl = (FileList*)malloc(sizeof(FileList));
+						fl = nfl = (FileList *)malloc(sizeof(FileList));
 					}
 					if (nfl) {
 						memset(nfl, 0, sizeof(*nfl));
@@ -678,7 +678,7 @@ int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), File
 									free(fl);
 									fl = NULL;
 								} else {
-									fl = (FileList*)realloc(fl, sizeof(FileList) * n);
+									fl = (FileList *)realloc(fl, sizeof(FileList) * n);
 								}
 								continue;
 							}
@@ -698,7 +698,7 @@ int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), File
 	if (n == 0) {
 		fl = NULL;
 	} else {
-		qsort((char*)fl, n, sizeof(FileList), flqcmp);
+		qsort((char *)fl, n, sizeof(FileList), flqcmp);
 	}
 	*flp = fl;
 	return n;

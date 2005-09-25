@@ -47,6 +47,8 @@
 #endif
 #undef DrawIcon
 
+class MapInfo;
+
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
@@ -54,11 +56,12 @@
 /**
 **  FileList struct used by directory access routine
 */
-typedef struct _filelist_ {
-	char* name;                /// Name of the file
+class FileList {
+public:
+	char *name;                /// Name of the file
 	int   type;                /// Type of the file
-	struct _map_info_* xdata;  /// Extra data attached by high level
-} FileList;
+	MapInfo *xdata;  /// Extra data attached by high level
+};
 
 
 /**
@@ -81,12 +84,12 @@ public:
 
 private:
 	int   cl_type;   /// type of CFile
-	FILE* cl_plain;  /// standard file pointer
+	FILE *cl_plain;  /// standard file pointer
 #ifdef USE_ZLIB
 	gzFile cl_gz;    /// gzip file pointer
 #endif // !USE_ZLIB
 #ifdef USE_BZ2LIB
-	BZFILE* cl_bz;   /// bzip2 file pointer
+	BZFILE *cl_bz;   /// bzip2 file pointer
 #endif // !USE_BZ2LIB
 };
 
@@ -107,10 +110,10 @@ enum {
 ----------------------------------------------------------------------------*/
 
 	/// Build libary path name
-extern char* LibraryFileName(const char* file, char* buffer);
+extern char *LibraryFileName(const char *file, char *buffer);
 
 	/// Read the contents of a directory
-extern int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp);
+extern int ReadDataDirectory(const char *dirname, int (*filter)(char*, FileList *), FileList **flp);
 
 //@}
 

@@ -102,7 +102,7 @@ static int CclDefineMissileType(lua_State* l)
 	if (mtype) {
 		DebugPrint("Redefining missile-type `%s'\n" _C_ str);
 	} else {
-		mtype = NewMissileTypeSlot(strdup(str));  // str consumed!
+		mtype = NewMissileTypeSlot(new_strdup(str));  // str consumed!
 	}
 
 	mtype->NumDirections = 1;
@@ -118,7 +118,7 @@ static int CclDefineMissileType(lua_State* l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "File")) {
-			file = strdup(LuaToString(l, -1));
+			file = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -138,11 +138,11 @@ static int CclDefineMissileType(lua_State* l)
 		} else if (!strcmp(value, "transparency")) {
 			mtype->Transparency = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "FiredSound")) {
-			free(mtype->FiredSound.Name);
-			mtype->FiredSound.Name = strdup(LuaToString(l, -1));
+			delete[] mtype->FiredSound.Name;
+			mtype->FiredSound.Name = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "ImpactSound")) {
-			free(mtype->ImpactSound.Name);
-			mtype->ImpactSound.Name = strdup(LuaToString(l, -1));
+			delete[] mtype->ImpactSound.Name;
+			mtype->ImpactSound.Name = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Class")) {
 			value = LuaToString(l, -1);
 			for (i = 0; MissileClassNames[i]; ++i) {
@@ -167,11 +167,11 @@ static int CclDefineMissileType(lua_State* l)
 		} else if (!strcmp(value, "Range")) {
 			mtype->Range = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ImpactMissile")) {
-			free(mtype->ImpactName);
-			mtype->ImpactName = strdup(LuaToString(l, -1));
+			delete[] mtype->ImpactName;
+			mtype->ImpactName = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "SmokeMissile")) {
-			free(mtype->SmokeName);
-			mtype->SmokeName = strdup(LuaToString(l, -1));
+			delete[] mtype->SmokeName;
+			mtype->SmokeName = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "CanHitOwner")) {
 			mtype->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {

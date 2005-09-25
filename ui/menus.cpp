@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <errno.h>
@@ -435,13 +435,13 @@ static MapInfo* DuplicateMapInfo(const MapInfo *orig)
 
 	Assert(orig);
 
-	dest = (MapInfo*)malloc(sizeof(MapInfo));
+	dest = new MapInfo;
 	memcpy(dest, orig, sizeof(MapInfo));
 	if (orig->Description) {
-		dest->Description = strdup(orig->Description);
+		dest->Description = new_strdup(orig->Description);
 	}
 	if (orig->Filename) {
-		dest->Filename = strdup(orig->Filename);
+		dest->Filename = new_strdup(orig->Filename);
 	}
 
 	return dest;
@@ -463,9 +463,9 @@ static void FreeMapInfos(FileList *fl, int n)
 	for (i = 0; i < n; i++) {
 		if (fl[i].xdata) {
 			FreeMapInfo(fl[i].xdata);
-			free(fl[i].xdata);
+			delete fl[i].xdata;
 		}
-		free(fl[i].name);
+		delete[] fl[i].name;
 		memset(fl, 0, sizeof(*fl));
 	}
 }
@@ -541,7 +541,7 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	}
 
 	if (strcasestr(filename, ".smp")) {
-		MapInfo* info;
+		MapInfo *info;
 
 		info = DuplicateMapInfo(&TheMap.Info);
 		FreeMapInfo(&TheMap.Info);
@@ -554,23 +554,23 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 			// We don't strdup string attributs of info. (like DuplicateMapInfo dooe)
 			// because we don't free the these in original.
 			TheMap.Info = *info;
-			free(info);
+			delete info;
 			return 0;
 		}
 		fl->type = 1;
-		fl->name = strdup(filename);
+		fl->name = new_strdup(filename);
 		fl->xdata = DuplicateMapInfo(&TheMap.Info);
 		// Restore TheMap.Info
 		// We don't strdup string attributs of info. (like DuplicateMapInfo dooe)
 		// because we don't free the these in original.
 		TheMap.Info = *info;
-		free(info);
+		delete info;
 	} else if (strcasestr(filename, ".log")) {
 		fl->type = 1;
-		fl->name = strdup(filename);
+		fl->name = new_strdup(filename);
 	} else if (strcasestr(filename, ".sav")) {
 		fl->type = type;
-		fl->name = strdup(filename);
+		fl->name = new_strdup(filename);
 	} else {
 		DebugPrint("file '%s' unsupported with this extension\n" _C_ filename);
 		return 0;
@@ -792,9 +792,9 @@ static void EditorSaveLBAction(Menuitem* mi, int i)
 **
 **  @param mi  Listbox to free.
 */
-static void LBExit(Menuitem* mi)
+static void LBExit(Menuitem *mi)
 {
-	FileList* fl;
+	FileList *fl;
 
 	Assert(mi->MiType == MiTypeListbox);
 
@@ -803,7 +803,7 @@ static void LBExit(Menuitem* mi)
 	}
 	fl = (FileList*)mi->D.Listbox.options;
 	FreeMapInfos(fl, mi->D.Listbox.noptions);
-	free(fl);
+	delete fl;
 	mi->D.Listbox.options = NULL;
 	mi->D.Listbox.noptions = 0;
 	mi[1].Flags |= MI_FLAGS_DISABLED;
@@ -1419,15 +1419,13 @@ static void SaveGameOk(void)
 */
 static void CreateSaveDir(void)
 {
-	if (SaveDir) {
-		free(SaveDir);
-	}
+	delete[] SaveDir;
 
 #ifdef USE_WIN32
 	strcpy(TempPathBuf, GameName);
 	mkdir(TempPathBuf);
 	strcat(TempPathBuf, "/save");
-	SaveDir=strdup(TempPathBuf);
+	SaveDir = new_strdup(TempPathBuf);
 	mkdir(SaveDir);
 #else
 	strcpy(TempPathBuf, getenv("HOME"));
@@ -1439,7 +1437,7 @@ static void CreateSaveDir(void)
 	mkdir(TempPathBuf, 0777);
 	strcat(TempPathBuf, "/save");
 	mkdir(TempPathBuf, 0777);
-	SaveDir = strdup(TempPathBuf);
+	SaveDir = new_strdup(TempPathBuf);
 #endif
 }
 
@@ -2685,12 +2683,12 @@ static void CampaignGameMenu(void)
 	Menu* menu;
 
 	menu = FindMenu("menu-campaign-select");
-	DebugPrint("%d campaigns available\n" _C_ NumCampaigns);
+	DebugPrint("%d campaigns available\n" _C_ (int)Campaigns.size());
 #ifdef DEBUG
-	for (i = 0; i < NumCampaigns; ++i) {
+	for (i = 0; i < (int)Campaigns.size(); ++i) {
 		DebugPrint("Campaign %d: %16.16s: %s\n" _C_ i _C_
-			Campaigns[i].Ident _C_
-			Campaigns[i].Name);
+			Campaigns[i]->Ident _C_
+			Campaigns[i]->Name);
 	}
 #endif
 
@@ -2718,7 +2716,7 @@ static void StartCampaignFromMenu(int number)
 	// See CustomGameStart() for info...
 #endif
 
-	PlayCampaign(Campaigns[number].Ident);
+	PlayCampaign(Campaigns[number]->Ident);
 	GuiGameStarted = 1;
 
 	// FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
@@ -2883,10 +2881,8 @@ static void JoinNetGameMenu(void)
 		return;
 	}
 
-	if (NetworkArg) {
-		free(NetworkArg);
-	}
-	NetworkArg = strdup(server_host_buffer);
+	delete[] NetworkArg;
+	NetworkArg = new_strdup(server_host_buffer);
 
 	// Here we really go...
 	ProcessMenu("menu-net-connecting", 1);
@@ -3311,11 +3307,11 @@ static void CustomGameStart(void)
 
 	for (i = 0; i < MAX_OBJECTIVES; i++) {
 		if (GameIntro.Objectives[i]) {
-			free(GameIntro.Objectives[i]);
+			delete[] GameIntro.Objectives[i];
 			GameIntro.Objectives[i] = NULL;
 		}
 	}
-	GameIntro.Objectives[0] = strdup(DefaultObjective);
+	GameIntro.Objectives[0] = new_strdup(DefaultObjective);
 
 	GuiGameStarted = 1;
 	CloseMenu();
@@ -4260,7 +4256,7 @@ static void EditorNewMap(void)
 	}
 
 	description[strlen(description) - 3] = '\0';
-	TheMap.Info.Description = strdup(description);
+	TheMap.Info.Description = new_strdup(description);
 	TheMap.Info.MapWidth = atoi(width);
 	TheMap.Info.MapHeight = atoi(height);
 
@@ -4616,8 +4612,8 @@ static void EditorMapPropertiesOk(void)
 
 	description = menu->Items[2].D.Input.buffer;
 	description[strlen(description)-3] = '\0';
-	free(TheMap.Info.Description);
-	TheMap.Info.Description = strdup(description);
+	delete[] TheMap.Info.Description;
+	TheMap.Info.Description = new_strdup(description);
 
 	#if 0
 	// MAPTODO
@@ -4625,10 +4621,10 @@ static void EditorMapPropertiesOk(void)
 	old = TheMap.Info.MapTerrain;
 	if (old != menu->Items[6].D.Pulldown.curopt) {
 		TheMap.Info.MapTerrain = menu->Items[6].D.Pulldown.curopt;
-		free(TheMap.Info.MapTerrainName);
-		TheMap.Info.MapTerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
-		free(TheMap.TerrainName);
-		TheMap.TerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
+		delete[] TheMap.Info.MapTerrainName;
+		TheMap.Info.MapTerrainName = new_strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
+		delete[] TheMap.TerrainName;
+		TheMap.TerrainName = new_strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
 		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
 
 		LoadTileset();
@@ -5058,7 +5054,7 @@ static void EditorSaveConfirmOk(void)
 static void EditorSaveConfirmCancel(void)
 {
 	FreeStringDesc(CurrentMenu->Items[2].D.Text.text);
-	free(CurrentMenu->Items[2].D.Text.text);
+	delete[] CurrentMenu->Items[2].D.Text.text;
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorCancelled = 1;
 	EditorEndMenu();
@@ -5191,10 +5187,10 @@ static void ReplayGameOk(void)
 		LoadReplay(ScenSelectPath);
 
 		for (i = 0; i < MAX_OBJECTIVES; i++) {
-			free(GameIntro.Objectives[i]);
+			delete[] GameIntro.Objectives[i];
 			GameIntro.Objectives[i] = NULL;
 		}
-		GameIntro.Objectives[0] = strdup(DefaultObjective);
+		GameIntro.Objectives[0] = new_strdup(DefaultObjective);
 
 		GuiGameStarted = 1;
 		CloseMenu();
@@ -5300,14 +5296,12 @@ static void InitPlayerRaces(Menuitem* mi)
 	}
 	++n;
 	// Reallocate pulldown options.
-	if (mi->D.Pulldown.options) {
-		free(mi->D.Pulldown.options);
-	}
-	mi->D.Pulldown.options = (char**)malloc(n * sizeof(unsigned char*));
-	mi->D.Pulldown.options[0] = strdup("Map Default");
+	delete[] mi->D.Pulldown.options;
+	mi->D.Pulldown.options = new char *[n];
+	mi->D.Pulldown.options[0] = new_strdup("Map Default");
 	for (i = 0, n = 1; i < PlayerRaces.Count; ++i) {
 		if (PlayerRaces.Visible[i]) {
-			mi->D.Pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
+			mi->D.Pulldown.options[n++] = new_strdup(PlayerRaces.Display[i]);
 		}
 	}
 	mi->D.Pulldown.noptions = n;
@@ -5325,16 +5319,16 @@ static void InitTilesets(Menuitem* mi, int mapdefault)
 
 	// Reallocate pulldown options.
 	if (mi->D.Pulldown.options) {
-		free(mi->D.Pulldown.options);
+		delete[] mi->D.Pulldown.options;
 	}
 	n = NumTilesets + (mapdefault ? 1 : 0);
-	mi->D.Pulldown.options = malloc(n * sizeof(unsigned char*));
+	mi->D.Pulldown.options = new char *[n];
 	n = 0;
 	if (mapdefault) {
-		mi->D.Pulldown.options[n++] = strdup("Map Default");
+		mi->D.Pulldown.options[n++] = new_strdup("Map Default");
 	}
 	for (i = 0; i < NumTilesets; ++i) {
-		mi->D.Pulldown.options[n++] = strdup(Tilesets[i]->Name);
+		mi->D.Pulldown.options[n++] = new_strdup(Tilesets[i]->Name);
 	}
 	mi->D.Pulldown.noptions = n;
 	mi->D.Pulldown.defopt = 0;
@@ -5548,10 +5542,8 @@ static void SelectGameServer(Menuitem *mi)
 		return;
 	}
 
-	if (NetworkArg) {
-		free(NetworkArg);
-	}
-	NetworkArg = strdup(server_host_buffer);
+	delete[] NetworkArg;
+	NetworkArg = new_strdup(server_host_buffer);
 
 	// Here we really go...
 	ProcessMenu("menu-net-connecting", 1);
@@ -5658,11 +5650,11 @@ void UpdateMenuItemButton(Menuitem* items)
 		//
 		// Campaign : FIXME make it more configurable (not only 4 campaign)
 		//
-		(handler == CampaignGameMenu && NumCampaigns < 1) ||
-		(handler == CampaignMenu1 && NumCampaigns < 1) ||
-		(handler == CampaignMenu2 && NumCampaigns < 2) ||
-		(handler == CampaignMenu3 && NumCampaigns < 3) ||
-		(handler == CampaignMenu4 && NumCampaigns < 4) ||
+		(handler == CampaignGameMenu && (int)Campaigns.size() < 1) ||
+		(handler == CampaignMenu1 && (int)Campaigns.size() < 1) ||
+		(handler == CampaignMenu2 && (int)Campaigns.size() < 2) ||
+		(handler == CampaignMenu3 && (int)Campaigns.size() < 3) ||
+		(handler == CampaignMenu4 && (int)Campaigns.size() < 4) ||
 		(handler == SelectCampaignMenu && 1 /*FIXME : not implemented */) ||
 		//
 		// Folder
@@ -5718,16 +5710,16 @@ void UpdateMenuItemButton(Menuitem* items)
 	//  Text modification.
 	//
 	if (handler == ReplayGameOk || handler == ScenSelectOk || handler == EditorLoadOk) {
-		free(items->D.Button.Text);
-		items->D.Button.Text = strdup(ScenSelectPathName[0] ? "Open" : "Ok");
+		delete[] items->D.Button.Text;
+		items->D.Button.Text = new_strdup(ScenSelectPathName[0] ? "Open" : "Ok");
 	} else if (handler == EditorSaveOk) {
-		free(items->D.Button.Text);
-		items->D.Button.Text = strdup(ScenSelectPathName[0] ? "Open" : "Save");
+		delete[] items->D.Button.Text;
+		items->D.Button.Text = new_strdup(ScenSelectPathName[0] ? "Open" : "Save");
 	}
 	if (handler == EditorMainLoadFolder || handler == ReplayGameFolder ||
 			handler == ScenSelectFolder || handler == EditorSaveFolder) {
-		free(items->D.Button.Text);
-		items->D.Button.Text = strdup(ScenSelectDisplayPath);
+		delete[] items->D.Button.Text;
+		items->D.Button.Text = new_strdup(ScenSelectDisplayPath);
 	}
 
 	{
@@ -5738,9 +5730,9 @@ void UpdateMenuItemButton(Menuitem* items)
 		// Campaign name.
 		for (i = 0; i < 4; ++i) {
 			if (handler == campaignhandler[i]) {
-				free(items->D.Button.Text);
+				delete[] items->D.Button.Text;
 				items->D.Button.Text =
-					strdup(i < NumCampaigns ? Campaigns[i].Name : "Not available");
+					new_strdup(i < (int)Campaigns.size() ? Campaigns[i]->Name : "Not available");
 				if ((s = strchr(items->D.Button.Text, '!'))) {
 					items->D.Button.HotKey = tolower(s[1]);
 				}

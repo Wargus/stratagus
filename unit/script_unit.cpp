@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <string.h>
@@ -841,7 +841,7 @@ static int CclUnit(lua_State *l)
 			s = LuaToString(l, j + 1);
 			Assert(SpellTypeByIdent(s));
 			if (!unit->AutoCastSpell) {
-				unit->AutoCastSpell = (char*)malloc(SpellTypeTable.size());
+				unit->AutoCastSpell = new char[SpellTypeTable.size()];
 				memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
 			}
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;

@@ -363,13 +363,13 @@
 
 class CUnit;
 class CUnitType;
-struct _unit_stats_;
+class UnitStats;
 struct _new_animation;
 class CPlayer;
 class SpellType;
 struct _unit_colors_;
 struct _construction_frame_;
-struct _variable_type_;
+class VariableType;
 struct _upgrade_;
 struct _building_restrictions_;
 class CFile;
@@ -519,8 +519,8 @@ public:
 	int Y; /// Map position Y
 
 	CUnitType *Type;              /// Pointer to unit-type (peon,...)
-	CPlayer *Player;              /// Owner of this unit
-	struct _unit_stats_* Stats;   /// Current unit stats
+	CPlayer   *Player;            /// Owner of this unit
+	UnitStats *Stats;             /// Current unit stats
 	int        CurrentSightRange; /// Unit's Current Sight Range
 
 // DISPLAY:
@@ -560,7 +560,7 @@ public:
 		struct _construction_frame_* CFrame;         /// Seen construction frame
 	} Seen;
 
-	struct _variable_type_* Variable; /// array of User Defined variables.
+	VariableType *Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  /// time to live
 

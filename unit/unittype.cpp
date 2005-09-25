@@ -327,9 +327,11 @@ CUnitType *NewUnitTypeSlot(char *ident)
 	memset(type, 0, sizeof(*type));
 	type->Slot = UnitTypes.size();
 	type->Ident = ident;
-	type->BoolFlag = (unsigned char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->BoolFlag));
-	type->CanTargetFlag = (unsigned char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTargetFlag));
-	type->Variable = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof(*type->Variable));
+	type->BoolFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
+	memset(type->BoolFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
+	type->CanTargetFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
+	memset(type->CanTargetFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
+	type->Variable = new VariableType[UnitTypeVar.NumberVariable];
 	memcpy(type->Variable, UnitTypeVar.Variable,
 		UnitTypeVar.NumberVariable * sizeof(*type->Variable));
 
@@ -567,10 +569,10 @@ static void CleanAnimation(Animation* anim)
 	ptr = anim;
 	while (ptr->Type) {
 		if (ptr->Type == AnimationSound) {
-			free(ptr->D.Sound.Name);
+			delete[] ptr->D.Sound.Name;
 		} else if (ptr->Type == AnimationRandomSound) {
 			for (i = 0; i < ptr->D.RandomSound.NumSounds; ++i) {
-				free(ptr->D.RandomSound.Name[i]);
+				delete[] ptr->D.RandomSound.Name[i];
 			}
 			free(ptr->D.RandomSound.Name);
 			free(ptr->D.RandomSound.Sound);
@@ -604,24 +606,24 @@ void CleanUnitTypes(void)
 		type = UnitTypes[i];
 
 		Assert(type->Ident);
-		free(type->Ident);
+		delete[] type->Ident;
 		Assert(type->Name);
-		free(type->Name);
+		delete[] type->Name;
 
-		free(type->Variable);
-		free(type->BoolFlag);
-		free(type->CanTargetFlag);
-		free(type->CanTransport);
+		delete[] type->Variable;
+		delete[] type->BoolFlag;
+		delete[] type->CanTargetFlag;
+		delete[] type->CanTransport;
 
 		for (j = 0; j < PlayerMax; j++) {
-			free(type->Stats[j].Variables);
+			delete[] type->Stats[j].Variables;
 		}
 
 		// Free Building Restrictions if there are any
 		if (type->BuildingRules) {
 			int x;
-			BuildRestriction* b;
-			BuildRestriction* f;
+			BuildRestriction *b;
+			BuildRestriction *f;
 
 			x = 0;
 			while (type->BuildingRules[x] != NULL) {
@@ -642,28 +644,14 @@ void CleanUnitTypes(void)
 			}
 			free(type->BuildingRules);
 		}
-		if (type->File) {
-			free(type->File);
-		}
-		if (type->ShadowFile) {
-			free(type->ShadowFile);
-		}
-		if (type->Icon.Name) {
-			free(type->Icon.Name);
-		}
-		if (type->Missile.Name) {
-			free(type->Missile.Name);
-		}
-		if (type->Explosion.Name) {
-			free(type->Explosion.Name);
-		}
-		if (type->CorpseName) {
-			free(type->CorpseName);
-		}
-		if (type->CanCastSpell) {
-			free(type->CanCastSpell);
-		}
-		free(type->AutoCastActive);
+		delete[] type->File;
+		delete[] type->ShadowFile;
+		delete[] type->Icon.Name;
+		delete[] type->Missile.Name;
+		delete[] type->Explosion.Name;
+		delete[] type->CorpseName;
+		delete[] type->CanCastSpell;
+		delete[] type->AutoCastActive;
 
 		for (res = 0; res < MaxCosts; ++res) {
 			if (type->ResInfo[res]) {
@@ -674,51 +662,37 @@ void CleanUnitTypes(void)
 					FreeGraphic(type->ResInfo[res]->SpriteWhenEmpty);
 				}
 				if (type->ResInfo[res]->FileWhenEmpty) {
-					free(type->ResInfo[res]->FileWhenEmpty);
+					delete[] type->ResInfo[res]->FileWhenEmpty;
 				}
 				if (type->ResInfo[res]->FileWhenLoaded) {
-					free(type->ResInfo[res]->FileWhenLoaded);
+					delete[] type->ResInfo[res]->FileWhenLoaded;
 				}
-				free(type->ResInfo[res]);
+				delete type->ResInfo[res];
 			}
 		}
 
 		//
 		// FIXME: Sounds can't be freed, they still stuck in sound hash.
 		//
-		if (type->Sound.Selected.Name) {
-			free(type->Sound.Selected.Name);
-		}
-		if (type->Sound.Acknowledgement.Name) {
-			free(type->Sound.Acknowledgement.Name);
-		}
-		if (type->Sound.Ready.Name) {
-			free(type->Sound.Ready.Name);
-		}
-		if (type->Sound.Repair.Name) {
-			free(type->Sound.Repair.Name);
-		}
+		delete[] type->Sound.Selected.Name;
+		delete[] type->Sound.Acknowledgement.Name;
+		delete[] type->Sound.Ready.Name;
+		delete[] type->Sound.Repair.Name;
 		for (j = 0; j < MaxCosts; ++j) {
-			if (type->Sound.Harvest[j].Name) {
-				free(type->Sound.Harvest[j].Name);
-			}
+			delete[] type->Sound.Harvest[j].Name;
 		}
-		if (type->Sound.Help.Name) {
-			free(type->Sound.Help.Name);
-		}
-		if (type->Sound.Dead.Name) {
-			free(type->Sound.Dead.Name);
-		}
+		delete[] type->Sound.Help.Name;
+		delete[] type->Sound.Dead.Name;
 
 		FreeGraphic(type->Sprite);
 #ifdef USE_MNG
 		if (type->Portrait.Num) {
 			for (j = 0; j < type->Portrait.Num; ++j) {
 				delete type->Portrait.Mngs[j];
-				free(type->Portrait.Files[j]);
+				delete[] type->Portrait.Files[j];
 			}
-			free(type->Portrait.Mngs);
-			free(type->Portrait.Files);
+			delete[] type->Portrait.Mngs;
+			delete[] type->Portrait.Files;
 		}
 #endif
 
@@ -728,14 +702,14 @@ void CleanUnitTypes(void)
 	UnitTypeMap.clear();
 
 	for (j = 0; j < UnitTypeVar.NumberBoolFlag; ++j) { // User defined flags
-		free(UnitTypeVar.BoolFlagName[j]);
+		delete[] UnitTypeVar.BoolFlagName[j];
 	}
 	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
-		free(UnitTypeVar.VariableName[j]);
+		delete[] UnitTypeVar.VariableName[j];
 	}
-	free(UnitTypeVar.BoolFlagName);
-	free(UnitTypeVar.VariableName);
-	free(UnitTypeVar.Variable);
+	delete[] UnitTypeVar.BoolFlagName;
+	delete[] UnitTypeVar.VariableName;
+	delete[] UnitTypeVar.Variable;
 	free(UnitTypeVar.DecoVar);
 	memset(&UnitTypeVar, 0, sizeof (UnitTypeVar));
 

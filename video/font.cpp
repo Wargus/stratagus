@@ -980,7 +980,7 @@ void CleanFonts(void)
 			}
 			glDeleteTextures(FontColorGraphics[i][j]->NumFrames,
 				FontColorGraphics[i][j]->Textures);
-			free(FontColorGraphics[i][j]->Textures);
+			delete[] FontColorGraphics[i][j]->Textures;
 		}
 		delete[] FontColorGraphics[i];
 		FontColorGraphics[i] = NULL;

@@ -225,7 +225,7 @@ extern int TileSizeY; /// Size of a tile in Y
 **  @todo I think this can be removed, we can use the flags?
 **  I'm not sure, if we have seen and real time to considere.
 */
-typedef enum _tile_type_ {
+enum TileType {
 	TileTypeUnknown,    /// Unknown tile type
 	TileTypeWood,       /// Any wood tile
 	TileTypeRock,       /// Any rock tile
@@ -233,38 +233,39 @@ typedef enum _tile_type_ {
 	TileTypeHumanWall,  /// Any human wall tile
 	TileTypeOrcWall,    /// Any orc wall tile
 	TileTypeWater,      /// Any water tile
-} TileType;
+};
 
 	/// Single tile definition
-typedef struct _tile_info_ {
+struct TileInfo {
 	unsigned char BaseTerrain; /// Basic terrain of the tile
 	unsigned char MixTerrain;  /// Terrain mixed with this
-} TileInfo;
+};
 
 	/// Definition for a terrain type
-typedef struct _solid_terrain_info_ {
-	char* TerrainName;  /// Name of the terrain
+struct SolidTerrainInfo {
+	char *TerrainName;  /// Name of the terrain
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
-} SolidTerrainInfo;
+};
 
 	/// Tileset definition
-typedef struct _tileset_ {
-	char* Name;      /// Nice name to display
-	char* ImageFile; /// File containing image data
+class CTileset {
+public:
+	char *Name;      /// Nice name to display
+	char *ImageFile; /// File containing image data
 
 	int NumTiles;               /// Number of tiles in the tables
 	int TileSizeX;              /// Size of a tile in X
 	int TileSizeY;              /// Size of a tile in Y
-	unsigned short* Table;      /// Pud to internal conversion table
-	unsigned short* FlagsTable; /// Flag table for editor
+	unsigned short *Table;      /// Pud to internal conversion table
+	unsigned short *FlagsTable; /// Flag table for editor
 
-	TileInfo* Tiles; /// Tile descriptions
+	TileInfo *Tiles; /// Tile descriptions
 
 	// TODO: currently hardcoded
-	unsigned char* TileTypeTable;   /// For fast lookup of tile type
+	unsigned char *TileTypeTable;   /// For fast lookup of tile type
 
 	int NumTerrainTypes;                 /// Number of different terrain types
-	SolidTerrainInfo* SolidTerrainTypes; /// Information about solid terrains.
+	SolidTerrainInfo *SolidTerrainTypes; /// Information about solid terrains.
 
 	unsigned TopOneTree;     /// Tile for one tree top
 	unsigned MidOneTree;     /// Tile for one tree middle
@@ -272,7 +273,7 @@ typedef struct _tileset_ {
 	int RemovedTree;         /// Tile placed where trees are gone
 	unsigned GrowingTree[2]; /// Growing tree tiles
 	int WoodTable[20];       /// Table for tree removable
-	int* MixedLookupTable;   /// Lookup for what part of tile used
+	int *MixedLookupTable;   /// Lookup for what part of tile used
 	unsigned TopOneRock;     /// Tile for one rock top
 	unsigned MidOneRock;     /// Tile for one rock middle
 	unsigned BotOneRock;     /// Tile for one rock bottom
@@ -281,7 +282,7 @@ typedef struct _tileset_ {
 
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
-} Tileset;
+};
 
 /*----------------------------------------------------------------------------
 --  Functions
