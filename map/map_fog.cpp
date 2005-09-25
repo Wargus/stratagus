@@ -776,7 +776,7 @@ void InitMapFogOfWar(void)
 	AlphaFogG.NumFrames = 1;
 #endif
 
-	VisibleTable = (unsigned char*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(*VisibleTable));
+	VisibleTable = new unsigned char[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
 }
 
 /**
@@ -784,10 +784,8 @@ void InitMapFogOfWar(void)
 */
 void CleanMapFogOfWar(void)
 {
-	if (VisibleTable) {
-		free(VisibleTable);
-		VisibleTable = NULL;
-	}
+	delete[] VisibleTable;
+	VisibleTable = NULL;
 
 	FreeGraphic(TheMap.FogGraphic);
 	TheMap.FogGraphic = NULL;
@@ -823,13 +821,13 @@ void InitVisionTable(void)
 	int repeat;
 
 	// Initialize Visiontable to large size, can't be more entries than tiles.
-	VisionTable[0] = (unsigned char*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
-	VisionTable[1] = (unsigned char*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
-	VisionTable[2] = (unsigned char*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	VisionTable[0] = (unsigned char *)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	VisionTable[1] = (unsigned char *)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	VisionTable[2] = (unsigned char *)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
 
-	VisionLookup = (int*)malloc((MaxMapWidth + 2) * sizeof(int));
+	VisionLookup = new int[MaxMapWidth + 2];
 #ifndef SQUAREVISION
-	visionlist = (int*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	visionlist = new int[MaxMapWidth * MaxMapWidth];
 	//*2 as diagonal distance is longer
 
 	maxsize = MaxMapWidth;
@@ -904,7 +902,7 @@ void InitVisionTable(void)
 		++i;
 	}
 
-	free(visionlist);
+	delete[] visionlist;
 #else
 	// Find maximum distance in corner of map.
 	maxsize = MaxMapWidth;
@@ -968,9 +966,7 @@ void FreeVisionTable(void)
 		free(VisionTable[2]);
 		VisionTable[2] = NULL;
 	}
-	if (VisionLookup) {
-		free(VisionLookup);
-		VisionLookup = NULL;
-	}
+	delete[] VisionLookup;
+	VisionLookup = NULL;
 }
 //@}

@@ -402,7 +402,7 @@ static void RecalculateShownUnits(void)
 	const CUnitType *type;
 
 	if (!ShownUnitTypes) {
-		ShownUnitTypes = (char **)malloc(sizeof(char *) * MaxUnitIndex);
+		ShownUnitTypes = new char *[MaxUnitIndex];
 	}
 
 	for (n = i = 0; i < MaxUnitIndex; ++i) {
@@ -1947,8 +1947,9 @@ static void CreateEditor(void)
 			}
 		}
 
-		TheMap.Fields = (MapField*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(MapField));
-		TheMap.Visible[0] = (unsigned*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
+		TheMap.Fields = new MapField[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
+		TheMap.Visible[0] = new unsigned[TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2];
+		memset(TheMap.Visible[0], 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2 * sizeof(unsigned));
 		InitUnitCache();
 
 		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {
@@ -1983,7 +1984,7 @@ static void CreateEditor(void)
 
 	if (!EditorUnitTypes) {
 		// Build empty editor unit-type tables.
-		EditorUnitTypes = (char**)malloc(sizeof(char*) * 2);
+		EditorUnitTypes = new char *[2];
 		MaxUnitIndex = 0;
 	}
 

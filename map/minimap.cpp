@@ -150,8 +150,10 @@ void CMinimap::Create(void)
 	//
 	// FIXME: this needs to be recalculated during map load - the map size
 	// might have changed!
-	Minimap2MapX = (int *)calloc(sizeof(int), W * H);
-	Minimap2MapY = (int *)calloc(sizeof(int), W * H);
+	Minimap2MapX = new int[W * H];
+	memset(Minimap2MapX, 0, W * H * sizeof(int));
+	Minimap2MapY = new int[W * H];
+	memset(Minimap2MapY, 0, W * H * sizeof(int));
 	for (n = XOffset; n < W - XOffset; ++n) {
 		Minimap2MapX[n] = ((n - XOffset) * MINIMAP_FAC) / MinimapScaleX;
 	}
@@ -177,8 +179,9 @@ void CMinimap::Create(void)
 	}
 	for (MinimapTextureHeight = 1; MinimapTextureHeight < H; MinimapTextureHeight <<= 1) {
 	}
-	MinimapTerrainSurface = (unsigned char *)malloc(MinimapTextureWidth * MinimapTextureHeight * 4);
-	MinimapSurface = (unsigned char *)calloc(MinimapTextureWidth * MinimapTextureHeight * 4, sizeof(*MinimapSurface));
+	MinimapTerrainSurface = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
+	MinimapSurface = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
+	memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
 	CreateMinimapTexture();
 #endif
 
@@ -722,7 +725,7 @@ void CMinimap::Destroy(void)
 #ifndef USE_OPENGL
 	SDL_FreeSurface(MinimapTerrainSurface);
 #else
-	free(MinimapTerrainSurface);
+	delete[] MinimapTerrainSurface;
 #endif
 	MinimapTerrainSurface = NULL;
 	if (MinimapSurface) {
@@ -730,13 +733,13 @@ void CMinimap::Destroy(void)
 		SDL_FreeSurface(MinimapSurface);
 #else
 		glDeleteTextures(1, &MinimapTexture);
-		free(MinimapSurface);
+		delete[] MinimapSurface;
 #endif
 		MinimapSurface = NULL;
 	}
-	free(Minimap2MapX);
+	delete[] Minimap2MapX;
 	Minimap2MapX = NULL;
-	free(Minimap2MapY);
+	delete[] Minimap2MapY;
 	Minimap2MapY = NULL;
 }
 
