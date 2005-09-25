@@ -37,6 +37,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
+
 #include "unit.h"
 #include "unitsound.h"
 #include "sound_id.h"
@@ -75,7 +77,7 @@ public:
 	SoundConfig Rescue[MAX_RACES];  /// rescue units
 };
 
-typedef enum _play_section_type_ {
+enum PlaySectionType {
 	PlaySectionUnknown = -1,  /// Unknown
 	PlaySectionGame,          /// Game
 	PlaySectionBriefing,      /// Briefing
@@ -83,21 +85,26 @@ typedef enum _play_section_type_ {
 	PlaySectionStatsVictory,  /// Stats Victory
 	PlaySectionStatsDefeat,   /// Stats Defeat
 	PlaySectionMainMenu,      /// Main menu
-} PlaySectionType;
+};
 
-typedef enum _play_section_order_ {
+enum PlaySectionOrder {
 	PlaySectionOrderAll,     /// Sequential order
 	PlaySectionOrderRandom,  /// Random order
-} PlaySectionOrder;
+};
 
-typedef struct _play_section_ {
-	char*            Race;       /// Race, NULL if for all races
+class PlaySection {
+public:
+	PlaySection() : Race(NULL), Type(PlaySectionUnknown),
+		CDTracks(0), CDOrder(PlaySectionOrderAll),
+		Files(NULL), FileOrder(PlaySectionOrderAll) {}
+
+	char            *Race;       /// Race, NULL if for all races
 	PlaySectionType  Type;       /// Type
 	unsigned long    CDTracks;   /// Bit field of cd tracks. 32 enough?
 	PlaySectionOrder CDOrder;    /// CD order
-	char**           Files;      /// Files
+	char           **Files;      /// Files
 	PlaySectionOrder FileOrder;  /// File order
-} PlaySection;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -115,8 +122,7 @@ extern GameSound GameSounds;  /// Game sound configuration
 extern int PlayingMusic;   /// flag true if playing music
 extern int CallbackMusic;  /// flag true callback ccl if stops
 
-extern PlaySection *PlaySections;  /// Play sections
-extern int NumPlaySections;  /// Number of play sections
+extern std::vector<PlaySection> PlaySections;  /// Play sections
 extern PlaySectionType CurrentPlaySection;  /// Current play section type
 
 extern char *CurrentMusicFile;

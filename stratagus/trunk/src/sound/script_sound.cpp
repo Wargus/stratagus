@@ -388,11 +388,11 @@ static int CclDefinePlaySections(lua_State *l)
 	int j;
 	int subargs;
 	int k;
+	PlaySection s;
 
-	++NumPlaySections;
-	PlaySections = (PlaySection *)realloc(PlaySections, NumPlaySections * sizeof(PlaySection));
-	p = PlaySections + NumPlaySections - 1;
-	memset(p, 0, sizeof(PlaySection));
+	// FIXME: PlaySections is never cleared!
+	PlaySections.push_back(s);
+	p = &PlaySections.back();
 
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
