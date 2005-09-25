@@ -675,10 +675,8 @@ static int CclDefineSpell(lua_State* l)
 		value = LuaToString(l, i + 1);
 		++i;
 		if (!strcmp(value, "showname")) {
-			if (spell->Name) {
-					free(spell->Name);
-			}
-			spell->Name = strdup(LuaToString(l, i + 1));
+			delete[] spell->Name;
+			spell->Name = new_strdup(LuaToString(l, i + 1));
 		} else if (!strcmp(value, "manacost")) {
 			spell->ManaCost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "range")) {
@@ -742,15 +740,13 @@ static int CclDefineSpell(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "sound-when-cast")) {
 			//  Free the old name, get the new one
-			if (spell->SoundWhenCast.Name) {
-				free(spell->SoundWhenCast.Name);
-			}
-			spell->SoundWhenCast.Name = strdup(LuaToString(l, i + 1));
+			delete[] spell->SoundWhenCast.Name;
+			spell->SoundWhenCast.Name = new_strdup(LuaToString(l, i + 1));
 			spell->SoundWhenCast.Sound = SoundIdForName(spell->SoundWhenCast.Name);
 			//  Check for sound.
 			if (!spell->SoundWhenCast.Sound) {
-				free(spell->SoundWhenCast.Name);
-				spell->SoundWhenCast.Name = 0;
+				delete[] spell->SoundWhenCast.Name;
+				spell->SoundWhenCast.Name = NULL;
 			}
 		} else if (!strcmp(value, "depend-upgrade")) {
 			value = LuaToString(l, i + 1);
