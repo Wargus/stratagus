@@ -270,7 +270,7 @@ void CViewport::Draw() const
 	CurrentViewport = this;
 	while (i < nunits && j < nmissiles) {
 		if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
-			DrawUnit(table[i]);
+			table[i]->Draw();
 			++i;
 		} else {
 			missiletable[j]->DrawMissile();
@@ -278,7 +278,7 @@ void CViewport::Draw() const
 		}
 	}
 	for (; i < nunits; ++i) {
-		DrawUnit(table[i]);
+		table[i]->Draw();
 	}
 	for (; j < nmissiles; ++j) {
 		missiletable[j]->DrawMissile();
