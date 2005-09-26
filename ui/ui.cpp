@@ -263,8 +263,8 @@ static void CleanConditionPanel(ConditionPanel* condition)
 	if (!condition) {
 		return;
 	}
-	free(condition->BoolFlags);
-	free(condition->Variables);
+	delete[] condition->BoolFlags;
+	delete[] condition->Variables;
 	free(condition);
 }
 

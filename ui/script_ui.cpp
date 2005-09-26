@@ -945,7 +945,7 @@ static void CclParseButtonIcons(lua_State *l, CUserInterface *ui)
 	int i;
 
 	ui->ButtonPanel.NumButtons = luaL_getn(l, -1);
-	ui->ButtonPanel.Buttons = (Button *)calloc(ui->ButtonPanel.NumButtons, sizeof(Button));
+	ui->ButtonPanel.Buttons = new Button[ui->ButtonPanel.NumButtons];
 	for (i = 0; i < ui->ButtonPanel.NumButtons; ++i) {
 		lua_rawgeti(l, -1, i + 1);
 		CclParseIcon(l, &ui->ButtonPanel.Buttons[i]);
@@ -1744,7 +1744,7 @@ static ConditionPanel *ParseConditionPanel(lua_State* l)
 
 	Assert(lua_istable(l, -1));
 
-	condition = (ConditionPanel *)calloc(1, sizeof(*condition));
+	condition = new ConditionPanel;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		key = LuaToString(l, -2);
 		if (!strcmp(key, "ShowOnlySelected")) {
@@ -1756,12 +1756,11 @@ static ConditionPanel *ParseConditionPanel(lua_State* l)
 			} else if (!strcmp(key, "ShowOpponent")) {
 				condition->ShowOpponent = LuaToBoolean(l, -1);
 		} else {
-			for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
+			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
 				if (!strcmp(key, UnitTypeVar.BoolFlagName[i])) {
 					if (!condition->BoolFlags) {
-						condition->BoolFlags = (char *)calloc(UnitTypeVar.NumberBoolFlag,
-							sizeof(*condition->BoolFlags));
-						}
+						condition->BoolFlags = new char[UnitTypeVar.NumberBoolFlag];
+					}
 					condition->BoolFlags[i] = Ccl2Condition(l, LuaToString(l, -1));
 					break;
 				}
@@ -1772,8 +1771,7 @@ static ConditionPanel *ParseConditionPanel(lua_State* l)
 			i = GetVariableIndex(key);
 			if (i != -1) {
 				if (!condition->Variables) {
-					condition->Variables = (char *)calloc(UnitTypeVar.NumberVariable,
-							sizeof(*condition->Variables));
+					condition->Variables = new char[UnitTypeVar.NumberVariable];
 				}
 				condition->Variables[i] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
@@ -2402,7 +2400,7 @@ static int CclDefineButtonStyle(lua_State *l)
 	style = LuaToString(l, 1);
 	bp = (ButtonStyle **)hash_find(ButtonStyleHash, (char*)style);
 	if (!bp) {
-		b = (ButtonStyle *)calloc(1, sizeof(*b));
+		b = new ButtonStyle;
 		*(ButtonStyle **)hash_add(ButtonStyleHash, style) = b;
 		// Set to bogus value to see if it was set later
 		b->Default.TextX = b->Hover.TextX = b->Selected.TextX =
@@ -2529,7 +2527,7 @@ static int CclDefineCheckboxStyle(lua_State *l)
 	style = LuaToString(l, 1);
 	cp = (CheckboxStyle**)hash_find(CheckboxStyleHash, (char*)style);
 	if (!cp) {
-		c = (CheckboxStyle *)calloc(1, sizeof(*c));
+		c = new CheckboxStyle;
 		*(CheckboxStyle **)hash_add(CheckboxStyleHash, style) = c;
 		// Set to bogus value to see if it was set later
 		c->Default.TextX = c->Hover.TextX = c->Selected.TextX =

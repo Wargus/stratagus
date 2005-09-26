@@ -60,15 +60,23 @@ class CFile;
 --  Definitions
 ----------------------------------------------------------------------------*/
 
-typedef enum _text_alignment_ {
+enum TextAlignment {
 	TextAlignUndefined,
 	TextAlignCenter,
 	TextAlignLeft,
 	TextAlignRight,
-} TextAlignment;
+};
 
-typedef struct _button_style_properties_ {
-	Graphic* Sprite;
+class ButtonStyleProperties {
+public:
+	ButtonStyleProperties() : Sprite(NULL), Frame(0), BorderColor(0),
+		BorderSize(0), TextAlign(TextAlignUndefined),
+		TextX(0), TextY(0), TextNormalColor(NULL), TextReverseColor(NULL)
+	{
+		BorderColorRGB.r = BorderColorRGB.g = BorderColorRGB.b = 0;
+	}
+
+	Graphic *Sprite;
 	int Frame;
 	SDL_Color BorderColorRGB;
 	Uint32 BorderColor;
@@ -76,16 +84,21 @@ typedef struct _button_style_properties_ {
 	TextAlignment TextAlign;        /// Text alignment
 	int TextX;                      /// Text X location
 	int TextY;                      /// Text Y location
-	char* TextNormalColor;          /// Normal text color
-	char* TextReverseColor;         /// Reverse text color
-} ButtonStyleProperties;
+	char *TextNormalColor;          /// Normal text color
+	char *TextReverseColor;         /// Reverse text color
+} ;
 
-typedef struct _button_style_ {
+class ButtonStyle {
+public:
+	ButtonStyle() : Width(0), Height(0), Font(0),
+		TextNormalColor(NULL), TextReverseColor(NULL),
+		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
+
 	int Width;                      /// Button width
 	int Height;                     /// Button height
 	int Font;                       /// Font
-	char* TextNormalColor;          /// Normal text color
-	char* TextReverseColor;         /// Reverse text color
+	char *TextNormalColor;          /// Normal text color
+	char *TextReverseColor;         /// Reverse text color
 	TextAlignment TextAlign;        /// Text alignment
 	int TextX;                      /// Text X location
 	int TextY;                      /// Text Y location
@@ -94,14 +107,19 @@ typedef struct _button_style_ {
 	ButtonStyleProperties Selected; /// Selected button properties
 	ButtonStyleProperties Clicked;  /// Clicked button properties
 	ButtonStyleProperties Disabled; /// Disabled button properties
-} ButtonStyle;
+};
 
-typedef struct _checkbox_style_ {
+class CheckboxStyle {
+public:
+	CheckboxStyle() : Width(0), Height(0), Font(0),
+		TextNormalColor(NULL), TextReverseColor(NULL),
+		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
+
 	int Width;                      /// Checkbox width
 	int Height;                     /// Checkbox height
 	int Font;                       /// Font
-	char* TextNormalColor;          /// Normal text color
-	char* TextReverseColor;         /// Reverse text color
+	char *TextNormalColor;          /// Normal text color
+	char *TextReverseColor;         /// Reverse text color
 	TextAlignment TextAlign;        /// Text alignment
 	int TextX;                      /// Text X location
 	int TextY;                      /// Text Y location
@@ -115,7 +133,7 @@ typedef struct _checkbox_style_ {
 	ButtonStyleProperties CheckedSelected; /// Checked selected checkbox properties
 	ButtonStyleProperties CheckedClicked;  /// Checked clicked checkbox properties
 	ButtonStyleProperties CheckedDisabled; /// Checked disabled checkbox properties
-} CheckboxStyle;
+};
 
 	/// buttons on screen themselves
 class Button {
@@ -204,14 +222,14 @@ public:
 **
 **  @todo this should be later user configurable
 */
-typedef enum {
+enum ViewportModeType {
 	VIEWPORT_SINGLE,                /// Old single viewport
 	VIEWPORT_SPLIT_HORIZ,           /// Two viewports split horizontal
 	VIEWPORT_SPLIT_HORIZ3,          /// Three viewports split horiontal
 	VIEWPORT_SPLIT_VERT,            /// Two viewports split vertical
 	VIEWPORT_QUAD,                  /// Four viewports split symmetric
 	NUM_VIEWPORT_MODES,             /// Number of different viewports.
-} ViewportModeType;
+};
 
 #define ScPanel "sc-panel"          /// hack for transparency
 
@@ -230,25 +248,30 @@ public:
 /**
 **  Condition to show panel content.
 */
-typedef struct {
+class ConditionPanel {
+public:
+	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
+		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
+		Variables(NULL) {}
+
 	bool ShowOnlySelected;      /// if true, show only for selected unit.
 
 	bool HideNeutral;           /// if true, don't show for neutral unit.
 	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent;          /// if true, show for opponent unit.
 
-	char* BoolFlags;            /// array of condition about user flags.
-	char* Variables;            /// array of variable to verify (enable and max > 0)
-} ConditionPanel;
+	char *BoolFlags;            /// array of condition about user flags.
+	char *Variables;            /// array of variable to verify (enable and max > 0)
+} ;
 
-
-struct _content_type_;
-typedef void FDrawData(const CUnit *unit, struct _content_type_ *content, int defaultfont);
+class ContentType;
+typedef void FDrawData(const CUnit *unit, ContentType *content, int defaultfont);
 
 /**
 **  Infos to display the contents of panel.
 */
-typedef struct _content_type_ {
+class ContentType {
+public:
 	int PosX;             /// X coordinate where to display.
 	int PosY;             /// Y coordinate where to display.
 
@@ -306,27 +329,27 @@ typedef struct _content_type_ {
 
 // FIXME : Complete this.
 
-	ConditionPanel* Condition; /// Condition to show the content; if NULL, no condition.
-} ContentType;
+	ConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
+};
 
 /**
 **  Info for the panel.
 */
-typedef struct {
-	char* Name;            /// Ident of the panel.
+class InfoPanel {
+public:
+	char *Name;            /// Ident of the panel.
 	int PosX;              /// X coordinate of the panel.
 	int PosY;              /// Y coordinate of the panel.
 	int DefaultFont;       /// Default font for content.
 
-	ContentType* Contents; /// Array of contents to display.
+	ContentType *Contents; /// Array of contents to display.
 	int NContents;         /// Number of content.
 
-	ConditionPanel* Condition; /// Condition to show the panel; if NULL, no condition.
-
-} InfoPanel;
+	ConditionPanel *Condition; /// Condition to show the panel; if NULL, no condition.
+};
 
 extern int NbAllPanels;       /// Number of panel
-extern InfoPanel* AllPanels;  /// Array of panels.
+extern InfoPanel *AllPanels;  /// Array of panels.
 
 
 class CButtonPanel
@@ -519,25 +542,25 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern CUserInterface UI;                           /// The user interface
-extern CUserInterface** UI_Table;                   /// All available user interfaces
+extern CUserInterface **UI_Table;                   /// All available user interfaces
 
 	/// Hash table of all the button styles
-typedef hashtable(ButtonStyle*, 128) _ButtonStyleHash;
+typedef hashtable(ButtonStyle *, 128) _ButtonStyleHash;
 extern _ButtonStyleHash ButtonStyleHash;
 
 	/// Hash table of all the checkbox styles
-typedef hashtable(CheckboxStyle*,128) _CheckboxStyleHash;
+typedef hashtable(CheckboxStyle *,128) _CheckboxStyleHash;
 extern _CheckboxStyleHash CheckboxStyleHash;
 
 extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
-extern struct _button_action_* CurrentButtons;    /// Current Selected Buttons
+extern struct _button_action_ * CurrentButtons;    /// Current Selected Buttons
 extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 
 extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;            /// Mouse Scrolling Speed, in Frames
 
 extern char DefaultGroupKeys[];    /// Default group keys
-extern char* UiGroupKeys;               /// Up to 11 keys used for group selection
+extern char *UiGroupKeys;               /// Up to 11 keys used for group selection
 
 // only exported to save them
 
@@ -578,7 +601,7 @@ extern void RestrictCursorToViewport(void);
 extern void RestrictCursorToMinimap(void);
 
 	/// Get viewport for screen pixel position
-extern CViewport* GetViewport(int x, int y);
+extern CViewport *GetViewport(int x, int y);
 	/// Cycle through all available viewport modes
 extern void CycleViewportMode(int);
 	/// Select viewport mode
@@ -591,7 +614,7 @@ extern FDrawData DrawPanelIcon;
 extern FDrawData DrawLifeBar;
 extern FDrawData DrawCompleteBar;
 
-extern int AddHandler(struct lua_State* l);
+extern int AddHandler(struct lua_State *l);
 extern void CallHandler(unsigned int handle, int value);
 
 

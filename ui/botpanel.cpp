@@ -541,7 +541,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 	ButtonAction *res;
 	int allow;         // button is available for at least 1 unit.
 
-	res = (ButtonAction*)calloc(UI.ButtonPanel.NumButtons, sizeof (*res));
+	res = (ButtonAction *)calloc(UI.ButtonPanel.NumButtons, sizeof(*res));
 	for (z = 0; z < UI.ButtonPanel.NumButtons; ++z) {
 		res[z].Pos = -1;
 	}

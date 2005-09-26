@@ -1053,7 +1053,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 	stats = &type->Stats[i];
 	if (!stats->Variables) {
-		stats->Variables = (VariableType *)calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
+		stats->Variables = new VariableType[UnitTypeVar.NumberVariable];
 	}
 
 	//
