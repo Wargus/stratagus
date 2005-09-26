@@ -118,11 +118,9 @@
 */
 
 /**
-**  @struct _world_map_ map.h
+**  @class WorldMap map.h
 **
 **  \#include "map.h"
-**
-**  typedef struct _world_map_ WorldMap;
 **
 **  This structure contains all informations about a stratagus world.
 **  A world is a rectangle of any size. In the future it is planned to

@@ -119,7 +119,7 @@ typedef int MenuButtonId;
 #define MIN_GAME_SPEED 50
 #define MAX_GAME_SPEED 250
 
-struct _button_style_;
+class ButtonStyle;
 class MapInfo;
 class WorldMap;
 class Graphic;
@@ -156,7 +156,7 @@ typedef struct _menuitem_text_ {
 } MenuitemText;
 typedef struct _menuitem_button_ {
 	char* Text;
-	struct _button_style_* Style;
+	ButtonStyle *Style;
 	MenuitemButtonHandlerType Handler;
 	unsigned HotKey;
 } MenuitemButton;
@@ -228,7 +228,7 @@ typedef struct _menuitem_input_ {
 typedef struct _menuitem_checkbox_ {
 	char* Text;
 	unsigned int Checked : 1;
-	struct _checkbox_style_* Style;
+	CheckboxStyle *Style;
 	MenuitemCheckboxActionType Action;
 } MenuitemCheckbox;
 
@@ -337,20 +337,20 @@ extern void InitMenuFuncHash(void);
 	/// Set-up menus for a specific race
 extern void InitMenus(int race);
 	/// Update menu item state. (disabled, ...)
-extern void UpdateMenuItemButton(Menuitem* items);
+extern void UpdateMenuItemButton(Menuitem *items);
 	/// Draw menu
-extern void DrawMenu(Menu* menu);
+extern void DrawMenu(Menu *menu);
 	/// Draw menu button
-extern void DrawMenuButton(struct _button_style_* style, unsigned flags,
-	int x, int y, const char* text);
+extern void DrawMenuButton(ButtonStyle *style, unsigned flags,
+	int x, int y, const char *text);
 	/// Set menu backgound and draw it
 extern void MenusSetBackground(void);
 	/// Draw and process a menu
-extern void ProcessMenu(const char* menu_id, int loop);
+extern void ProcessMenu(const char *menu_id, int loop);
 	/// End the current menu
 extern void CloseMenu(void);
 	/// Find a menu by id
-extern Menu* FindMenu(const char* menu_id);
+extern Menu* FindMenu(const char *menu_id);
 
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);
@@ -398,10 +398,10 @@ extern void EditorLoadMenu(void);
 extern void SetupEditor(void);
 
 	/// Error menu
-extern void ErrorMenu(char*);
+extern void ErrorMenu(char *);
 
 	/// Menu Loop
-extern void MenuLoop(const char* filename, struct _world_map_* map);
+extern void MenuLoop(const char *filename, WorldMap *map);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);

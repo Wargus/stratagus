@@ -157,16 +157,16 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 **  @param y      Y display position
 **  @param text   text to print on button
 */
-void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
-	const char* text)
+void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
+	const char *text)
 {
-	char* nc;
-	char* rc;
-	char* oldnc;
-	char* oldrc;
+	char *nc;
+	char *rc;
+	char *oldnc;
+	char *oldrc;
 	int i;
-	ButtonStyleProperties* p;
-	ButtonStyleProperties* pimage;
+	ButtonStyleProperties *p;
+	ButtonStyleProperties *pimage;
 
 	if (flags & MI_FLAGS_DISABLED) {
 		p = &style->Disabled;
