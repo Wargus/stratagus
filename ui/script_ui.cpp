@@ -226,7 +226,7 @@ static int CclSetTitleScreens(lua_State* l)
 			if (TitleScreens[i]->Labels) {
 				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
 					delete[] TitleScreens[i]->Labels[j]->Text;
-					free(TitleScreens[i]->Labels[j]);
+					delete TitleScreens[i]->Labels[j];
 				}
 				free(TitleScreens[i]->Labels);
 			}
@@ -2363,10 +2363,10 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 				LuaError(l, "Invalid text alignment: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "TextNormalColor")) {
-			free(p->TextNormalColor);
+			delete[] p->TextNormalColor;
 			p->TextNormalColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
-			free(p->TextReverseColor);
+			delete[] p->TextReverseColor;
 			p->TextReverseColor = new_strdup(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2425,10 +2425,10 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (!strcmp(value, "Font")) {
 			b->Font = FontByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
-			free(b->TextNormalColor);
+			delete[] b->TextNormalColor;
 			b->TextNormalColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
-			free(b->TextReverseColor);
+			delete[] b->TextReverseColor;
 			b->TextReverseColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextPos")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
@@ -2554,10 +2554,10 @@ static int CclDefineCheckboxStyle(lua_State *l)
 		} else if (!strcmp(value, "Font")) {
 			c->Font = FontByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
-			free(c->TextNormalColor);
+			delete[] c->TextNormalColor;
 			c->TextNormalColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
-			free(c->TextReverseColor);
+			delete[] c->TextReverseColor;
 			c->TextReverseColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextPos")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
