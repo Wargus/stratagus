@@ -574,7 +574,7 @@ static void CclParseInfoText(lua_State* l, InfoText* text)
 		++j;
 		if (!strcmp(value, "text")) {
 			lua_rawgeti(l, -1, j + 1);
-			text->Text = strdup(LuaToString(l, -1));
+			text->Text = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "font")) {
 			lua_rawgeti(l, -1, j + 1);
@@ -1805,7 +1805,7 @@ static int CclDefinePanelContents(lua_State* l)
 		for (lua_pushnil(l); lua_next(l, i + 1); lua_pop(l, 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Ident")) {
-				infopanel.Name = strdup(LuaToString(l, -1));
+				infopanel.Name = new_strdup(LuaToString(l, -1));
 			} else if (!strcmp(key, "Pos")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // X
@@ -1884,7 +1884,7 @@ static int CclDefinePanelContents(lua_State* l)
 								for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 									key = LuaToString(l, -2);
 									if (!strcmp(key, "Format")) {
-										content->Data.FormattedText.Format = strdup(LuaToString(l, -1));
+										content->Data.FormattedText.Format = new_strdup(LuaToString(l, -1));
 									} else if (!strcmp(key, "Font")) {
 										content->Data.FormattedText.Font = FontByIdent(LuaToString(l, -1));
 									} else if (!strcmp(key, "Variable")) {
@@ -1910,7 +1910,7 @@ static int CclDefinePanelContents(lua_State* l)
 								for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 									key = LuaToString(l, -2);
 										if (!strcmp(key, "Format")) {
-											content->Data.FormattedText2.Format = strdup(LuaToString(l, -1));
+											content->Data.FormattedText2.Format = new_strdup(LuaToString(l, -1));
 										} else if (!strcmp(key, "Font")) {
 											content->Data.FormattedText2.Font = FontByIdent(LuaToString(l, -1));
 										} else if (!strcmp(key, "Variable")) {
@@ -2364,10 +2364,10 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 			}
 		} else if (!strcmp(value, "TextNormalColor")) {
 			free(p->TextNormalColor);
-			p->TextNormalColor = strdup(LuaToString(l, -1));
+			p->TextNormalColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
 			free(p->TextReverseColor);
-			p->TextReverseColor = strdup(LuaToString(l, -1));
+			p->TextReverseColor = new_strdup(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -2426,10 +2426,10 @@ static int CclDefineButtonStyle(lua_State *l)
 			b->Font = FontByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
 			free(b->TextNormalColor);
-			b->TextNormalColor = strdup(LuaToString(l, -1));
+			b->TextNormalColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
 			free(b->TextReverseColor);
-			b->TextReverseColor = strdup(LuaToString(l, -1));
+			b->TextReverseColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextPos")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -2525,7 +2525,7 @@ static int CclDefineCheckboxStyle(lua_State *l)
 	}
 
 	style = LuaToString(l, 1);
-	cp = (CheckboxStyle**)hash_find(CheckboxStyleHash, (char*)style);
+	cp = (CheckboxStyle **)hash_find(CheckboxStyleHash, (char*)style);
 	if (!cp) {
 		c = new CheckboxStyle;
 		*(CheckboxStyle **)hash_add(CheckboxStyleHash, style) = c;
@@ -2555,10 +2555,10 @@ static int CclDefineCheckboxStyle(lua_State *l)
 			c->Font = FontByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
 			free(c->TextNormalColor);
-			c->TextNormalColor = strdup(LuaToString(l, -1));
+			c->TextNormalColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextReverseColor")) {
 			free(c->TextReverseColor);
-			c->TextReverseColor = strdup(LuaToString(l, -1));
+			c->TextReverseColor = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextPos")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -2730,13 +2730,13 @@ static void FreeMenu(Menu *menu)
 **
 **  @param l  Lua state.
 */
-static int CclDefineMenu(lua_State* l)
+static int CclDefineMenu(lua_State *l)
 {
-	const char* value;
-	Menu* menu;
+	const char *value;
+	Menu *menu;
 	Menu item;
-	const char* name;
-	void** func;
+	const char *name;
+	void **func;
 	int args;
 	int j;
 
@@ -2774,7 +2774,7 @@ static int CclDefineMenu(lua_State* l)
 			name = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "panel")) {
 			if (strcmp(LuaToString(l, j + 1), "none")) {
-				item.Panel = strdup(LuaToString(l, j + 1));
+				item.Panel = new_strdup(LuaToString(l, j + 1));
 			}
 		} else if (!strcmp(value, "background")) {
 			item.BackgroundG = NewGraphic(LuaToString(l, j + 1), 0, 0);
@@ -2843,7 +2843,7 @@ static int CclDefineMenu(lua_State* l)
 **
 **  @return  The value of the hotkey as an integer.
 */
-static int scm2hotkey(lua_State* l, const char* value)
+static int scm2hotkey(lua_State *l, const char *value)
 {
 	int len;
 	int key;
@@ -2879,7 +2879,7 @@ static int scm2hotkey(lua_State* l, const char* value)
 **
 **  @return  The value of the slider as an integer.
 */
-static int scm2style(lua_State* l, const char* value)
+static int scm2style(lua_State *l, const char *value)
 {
 	int id;
 
@@ -2897,13 +2897,12 @@ static int scm2style(lua_State* l, const char* value)
 /**
 **  Parse menu item text
 */
-static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemText(lua_State *l, Menuitem *item, int j)
 {
-	const char* value;
+	const char *value;
 	int subargs;
 	int k;
-	char* s1;
-	void** func;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -2943,7 +2942,7 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Text.action = (MenuitemTextActionType)*func;
 				} else {
@@ -2958,14 +2957,12 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "color-normal")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			s1 = strdup(LuaToString(l, -1));
+			item->D.Text.normalcolor = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
-			item->D.Text.normalcolor = s1;
 		} else if (!strcmp(value, "color-reverse")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			s1 = strdup(LuaToString(l, -1));
+			item->D.Text.reversecolor = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
-			item->D.Text.reversecolor = s1;
 		} else {
 			LuaError(l, "Unsupported property: %s" _C_ value);
 		}
@@ -2976,7 +2973,7 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 **  Add a Lua handler
 **  FIXME: when should these be freed?
 */
-int AddHandler(lua_State* l)
+int AddHandler(lua_State *l)
 {
 	lua_pushstring(l, "_handlers_");
 	lua_gettable(l, LUA_GLOBALSINDEX);
@@ -3011,13 +3008,12 @@ void CallHandler(unsigned int handle, int value)
 /**
 **  Parse menu item button
 */
-static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemButton(lua_State *l, Menuitem *item, int j)
 {
 	int subargs;
 	int k;
-	const char* value;
-	char* s1;
-	void** func;
+	const char *value;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3037,8 +3033,7 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
-				s1 = strdup(lua_tostring(l, -1));
-				item->D.Button.Text = s1;
+				item->D.Button.Text = new_strdup(lua_tostring(l, -1));
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);
@@ -3090,13 +3085,13 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item pulldown
 */
-static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemPulldown(lua_State *l, Menuitem *item, int j)
 {
 	int subargs;
 	int k;
-	const char* value;
-	char* s1;
-	void** func;
+	const char *value;
+	char *s1;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3201,12 +3196,12 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item listbox
 */
-static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemListbox(lua_State *l, Menuitem *item, int j)
 {
 	int subargs;
 	int k;
-	const char* value;
-	void** func;
+	const char *value;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3323,12 +3318,12 @@ static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item vslider
 */
-static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemVSlider(lua_State *l, Menuitem *item, int j)
 {
 	int subargs;
 	int k;
-	const char* value;
-	void** func;
+	const char *value;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3449,12 +3444,12 @@ static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item hslider
 */
-static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemHSlider(lua_State *l, Menuitem *item, int j)
 {
 	int subargs;
 	int k;
-	const char* value;
-	void** func;
+	const char *value;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3575,10 +3570,10 @@ static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item drawfunc
 */
-static void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemDrawFunc(lua_State *l, Menuitem *item, int j)
 {
-	const char* value;
-	void** func;
+	const char *value;
+	void **func;
 
 	if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3587,7 +3582,7 @@ static void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
 
 	if (lua_isstring(l, j + 1)) {
 		value = lua_tostring(l, j + 1);
-		func = (void**)hash_find(MenuFuncHash, value);
+		func = (void **)hash_find(MenuFuncHash, value);
 		if (func != NULL) {
 			item->D.DrawFunc.draw = (MenuitemDrawfuncDrawType)*func;
 		} else {
@@ -3601,13 +3596,12 @@ static void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item input
 */
-static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemInput(lua_State *l, Menuitem *item, int j)
 {
 	int subargs;
 	int k;
-	const char* value;
-	char* s1;
-	void** func;
+	const char *value;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3665,14 +3659,12 @@ static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "color-normal")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			s1 = strdup(LuaToString(l, -1));
+			item->D.Input.normalcolor = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
-			item->D.Input.normalcolor = s1;
 		} else if (!strcmp(value, "color-reverse")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			s1 = strdup(LuaToString(l, -1));
+			item->D.Input.reversecolor = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
-			item->D.Input.reversecolor = s1;
 		} else if (!strcmp(value, "password")) {
 			item->D.Input.iflags = 1;
 			--k;
@@ -3685,13 +3677,12 @@ static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item checkbox
 */
-static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemCheckbox(lua_State *l, Menuitem *item, int j)
 {
 	int subargs;
 	int k;
-	const char* value;
-	char* s1;
-	void** func;
+	const char *value;
+	void **func;
 
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
@@ -3745,9 +3736,8 @@ static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
 			}
 		} else if (!strcmp(value, "text")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			s1 = strdup(LuaToString(l, -1));
+			item->D.Checkbox.Text = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
-			item->D.Checkbox.Text = s1;
 		} else {
 			LuaError(l, "Unsupported property: %s" _C_ value);
 		}
@@ -3935,12 +3925,12 @@ static int CclDefineMenuGraphics(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineButton(lua_State* l)
+static int CclDefineButton(lua_State *l)
 {
 	char buf[64];
-	const char* value;
-	char* s1;
-	const char* s2;
+	const char *value;
+	char *s1;
+	const char *s2;
 	ButtonAction ba;
 
 	LuaCheckArgs(l, 1);
@@ -4012,9 +4002,9 @@ static int CclDefineButton(lua_State* l)
 			}
 			if (lua_isnumber(l, -1)) {
 				sprintf(buf, "%ld", (long int)lua_tonumber(l, -1));
-				s1 = strdup(buf);
+				s1 = new_strdup(buf);
 			} else {
-				s1 = strdup(lua_tostring(l, -1));
+				s1 = new_strdup(lua_tostring(l, -1));
 			}
 			ba.ValueStr = s1;
 		} else if (!strcmp(value, "Allowed")) {
@@ -4055,7 +4045,7 @@ static int CclDefineButton(lua_State* l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			s1 = strdup("");
+			s1 = new_strdup("");
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
@@ -4071,7 +4061,7 @@ static int CclDefineButton(lua_State* l)
 		} else if (!strcmp(value, "Key")) {
 			ba.Key = *LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
-			ba.Hint = strdup(LuaToString(l, -1));
+			ba.Hint = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "ForUnit")) {
 			int subargs;
 			int k;
@@ -4080,7 +4070,7 @@ static int CclDefineButton(lua_State* l)
 				LuaError(l, "incorrect argument");
 			}
 			// FIXME: ba.UnitMask shouldn't be a string
-			s1 = strdup(",");
+			s1 = new_strdup(",");
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
@@ -4093,7 +4083,7 @@ static int CclDefineButton(lua_State* l)
 			ba.UnitMask = s1;
 			if (!strncmp(ba.UnitMask, ",*,", 3)) {
 				free(ba.UnitMask);
-				ba.UnitMask = strdup("*");
+				ba.UnitMask = new_strdup("*");
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -4102,10 +4092,10 @@ static int CclDefineButton(lua_State* l)
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
-	free(ba.ValueStr);
-	free(ba.AllowStr);
-	free(ba.Hint);
-	free(ba.UnitMask);
+	delete[] ba.ValueStr;
+	delete[] ba.AllowStr;
+	delete[] ba.Hint;
+	delete[] ba.UnitMask;
 
 	return 0;
 }
@@ -4139,7 +4129,7 @@ void SelectedUnitChanged(void)
 **
 **  @param l  Lua state.
 */
-static int CclSetDoubleClickDelay(lua_State* l)
+static int CclSetDoubleClickDelay(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	DoubleClickDelay = LuaToNumber(l, 1);
@@ -4151,7 +4141,7 @@ static int CclSetDoubleClickDelay(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetHoldClickDelay(lua_State* l)
+static int CclSetHoldClickDelay(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	HoldClickDelay = LuaToNumber(l, 1);
@@ -4163,9 +4153,9 @@ static int CclSetHoldClickDelay(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetSelectionStyle(lua_State* l)
+static int CclSetSelectionStyle(lua_State *l)
 {
-	const char* style;
+	const char *style;
 
 	LuaCheckArgs(l, 1);
 
@@ -4192,7 +4182,7 @@ static int CclSetSelectionStyle(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetShowSightRange(lua_State* l)
+static int CclSetShowSightRange(lua_State *l)
 {
 	int args;
 
@@ -4233,7 +4223,7 @@ static int CclSetShowSightRange(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetShowReactionRange(lua_State* l)
+static int CclSetShowReactionRange(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (!lua_isboolean(l, 1) && !lua_isstring(l, 1)) {
@@ -4267,7 +4257,7 @@ static int CclSetShowReactionRange(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetShowAttackRange(lua_State* l)
+static int CclSetShowAttackRange(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	ShowAttackRange = LuaToBoolean(l, 1);
@@ -4279,7 +4269,7 @@ static int CclSetShowAttackRange(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetShowOrders(lua_State* l)
+static int CclSetShowOrders(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (!lua_isboolean(l, 1) && !lua_isnumber(l, 1)) {
@@ -4303,7 +4293,7 @@ static int CclSetShowOrders(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAddMessage(lua_State* l)
+static int CclAddMessage(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SetMessage("%s", LuaToString(l, 1));
@@ -4315,7 +4305,7 @@ static int CclAddMessage(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclResetKeystrokeHelp(lua_State* l)
+static int CclResetKeystrokeHelp(lua_State *l)
 {
 	int n;
 
@@ -4323,7 +4313,7 @@ static int CclResetKeystrokeHelp(lua_State* l)
 
 	n = nKeyStrokeHelps * 2;
 	while (n--) {
-		free(KeyStrokeHelps[n]);
+		delete[] KeyStrokeHelps[n];
 	}
 	free(KeyStrokeHelps);
 	KeyStrokeHelps = NULL;
@@ -4337,7 +4327,7 @@ static int CclResetKeystrokeHelp(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetGroupKeys(lua_State* l)
+static int CclSetGroupKeys(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (UiGroupKeys != DefaultGroupKeys) {
@@ -4352,7 +4342,7 @@ static int CclSetGroupKeys(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclPresentMap(lua_State* l)
+static int CclPresentMap(lua_State *l)
 {
 	LuaCheckArgs(l, 5);
 
@@ -4370,7 +4360,7 @@ static int CclPresentMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineMapSetup(lua_State* l)
+static int CclDefineMapSetup(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	delete[] TheMap.Info.Filename;
@@ -4384,16 +4374,16 @@ static int CclDefineMapSetup(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAddKeystrokeHelp(lua_State* l)
+static int CclAddKeystrokeHelp(lua_State *l)
 {
-	char* s1;
-	char* s2;
+	char *s1;
+	char *s2;
 	int n;
 
 	LuaCheckArgs(l, 2);
 
-	s1 = strdup(LuaToString(l, 1));
-	s2 = strdup(LuaToString(l, 2));
+	s1 = new_strdup(LuaToString(l, 1));
+	s2 = new_strdup(LuaToString(l, 2));
 
 	n = nKeyStrokeHelps;
 	if (!n) {

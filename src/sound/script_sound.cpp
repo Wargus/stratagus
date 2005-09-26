@@ -399,7 +399,7 @@ static int CclDefinePlaySections(lua_State *l)
 		value = LuaToString(l, j + 1);
 		++j;
 		if (!strcmp(value, "race")) {
-			p->Race = strdup(LuaToString(l, j + 1));
+			p->Race = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (!strcmp(value, "game")) {
