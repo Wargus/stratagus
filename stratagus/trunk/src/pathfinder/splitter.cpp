@@ -255,8 +255,8 @@ void RegionFree(RegionId regid)
 	}
 	Regions[regid].TileCount = 0;
 	if (Regions[regid].ConnectionsNumber) {
-		free(Regions[regid].Connections);
-		free(Regions[regid].ConnectionsCount);
+		delete[] Regions[regid].Connections;
+		delete[] Regions[regid].ConnectionsCount;
 	}
 	Regions[regid].Connections = 0;
 	Regions[regid].ConnectionsCount = 0;
@@ -264,7 +264,7 @@ void RegionFree(RegionId regid)
 	cur = Regions[regid].FirstSegment;
 	while (cur) {
 		next = cur->Next;
-		free(cur);
+		delete cur;
 		cur = next;
 	}
 	Regions[regid].FirstSegment = 0;
@@ -313,8 +313,8 @@ void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 	int i;
 	int* tempptr;
 
-	newregions = (RegionDefinition**)malloc(nbarea * sizeof(RegionDefinition*));
-	newregionsid = (RegionId*)malloc(nbarea * sizeof(RegionId));
+	newregions = new RegionDefinition *[nbarea];
+	newregionsid = new RegionId[nbarea];
 
 	oldsegs = Regions[reg].FirstSegment;
 
@@ -374,13 +374,13 @@ void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 
 	while (oldsegs) {
 		seg = oldsegs->Next;
-		free(oldsegs);
+		delete oldsegs;
 		oldsegs = seg;
 	}
 
 	if (!updateConnections) {
-		free(newregions);
-		free(newregionsid);
+		delete[] newregions;
+		delete[] newregionsid;
 		return;
 	}
 
@@ -388,8 +388,8 @@ void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 		RegionRescanAdjacents(newregionsid[i]);
 	}
 
-	free(newregions);
-	free(newregionsid);
+	delete[] newregions;
+	delete[] newregionsid;
 }
 
 /**
@@ -1066,7 +1066,7 @@ static void RefreshZones(void)
 	int zoneid;
 
 	Assert(RegionCount);
-	regions_stack = (int*)malloc(RegionCount * sizeof(int));
+	regions_stack = new int[RegionCount];
 
 	for (i = 0; i < RegionMax; ++i) {
 		Regions[i].Zone = -1;
@@ -1081,7 +1081,7 @@ static void RefreshZones(void)
 		}
 
 		if (i == RegionMax) {
-			free(regions_stack);
+			delete[] regions_stack;
 			return;
 		}
 
@@ -1111,7 +1111,7 @@ static void RefreshZones(void)
 	} while (1);
 
 	// Should never get here, but just in case
-	free(regions_stack);
+	delete[] regions_stack;
 }
 
 /**
@@ -1122,7 +1122,7 @@ static void AllocateMapping(void)
 	int total;
 
 	total = TheMap.Info.MapWidth * TheMap.Info.MapHeight;
-	RegionMappingStorage = (RegionId*)malloc(sizeof(RegionId) * total);
+	RegionMappingStorage = new RegionId[total];
 	NextFreeRegion = 0;
 	RegionCount = 0;
 	RegionMax = 0;
