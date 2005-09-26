@@ -1696,10 +1696,10 @@ static int CclDefineDecorations(lua_State* l)
 		char ShowWhenNull;
 		char HideHalf;
 		char ShowWhenMax;
-		char ShowOnlySelected;
-		char HideNeutral;
-		char HideAllied;
-		char ShowOpponent;
+		bool ShowOnlySelected;
+		bool HideNeutral;
+		bool HideAllied;
+		bool ShowOpponent;
 	} tmp;
 
 	nargs = lua_gettop(l);

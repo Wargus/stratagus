@@ -715,9 +715,9 @@ void CleanUnitTypes(void)
 	delete[] UnitTypeVar.Variable;
 	UnitTypeVar.Variable = NULL;
 	UnitTypeVar.NumberVariable = 0;
-	for (std::vector<CDecoVar *>::iterator i = UnitTypeVar.DecoVar.begin();
-		i < UnitTypeVar.DecoVar.end(); ++i) {
-		delete (*i);
+	for (std::vector<CDecoVar *>::iterator it = UnitTypeVar.DecoVar.begin();
+		it != UnitTypeVar.DecoVar.end(); ++it) {
+		delete (*it);
 	}
 	UnitTypeVar.DecoVar.clear();
 
