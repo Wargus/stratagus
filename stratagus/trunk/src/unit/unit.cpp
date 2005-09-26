@@ -3933,14 +3933,14 @@ void CleanUnits(void)
 {
 	CUnit **table;
 	CUnit *unit;
-	Order* order;
+	Order *order;
 
 	//
 	//  Free memory for all units in unit table.
 	//
 	for (table = Units; table < &Units[NumUnits]; ++table) {
-		free((*table)->AutoCastSpell);
-		free((*table)->Variable);
+		delete[] (*table)->AutoCastSpell;
+		delete[] (*table)->Variable;
 		free((*table)->Orders);
 		free((*table)->CacheLinks);
 		free(*table);

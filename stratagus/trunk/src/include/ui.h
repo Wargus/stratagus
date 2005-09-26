@@ -275,11 +275,11 @@ public:
 	int PosX;             /// X coordinate where to display.
 	int PosY;             /// Y coordinate where to display.
 
-	FDrawData* DrawData;  /// Tell how show the variable Index.
+	FDrawData *DrawData;  /// Tell how show the variable Index.
 
 	union {
 		struct {
-			StringDesc* Text;            /// Text to display.
+			StringDesc *Text;            /// Text to display.
 			int Font;                    /// Font to use.
 			char Centered;               /// if true, center the display.
 			int Index;                   /// Index of the variable to show, -1 if not.
@@ -288,14 +288,14 @@ public:
 			char Stat;                   /// true to special display.(value or value + diff)
 		} SimpleText;   /// Show simple text followed by variable value.
 		struct {
-			char* Format;                /// Text to display
+			char *Format;                /// Text to display
 			int Font;                    /// Font to use.
 			int Index;                   /// Index of the variable to show.
 			EnumVariable Component;      /// Component of the variable.
 			char Centered;               /// if true, center the display.
 		} FormattedText;   /// Show formatted text with variable value.
 		struct {
-			char* Format;                /// Text to display
+			char *Format;                /// Text to display
 			int Font;                    /// Font to use.
 			int Index1;                  /// Index of the variable1 to show.
 			EnumVariable Component1;     /// Component of the variable1.
@@ -311,8 +311,8 @@ public:
 			int Width;           /// Width of the bar.
 			int Height;          /// Height of the bar.
 #if 0 // FIXME : something for color and value parametrisation (not implemented)
-			Color* colors;       /// array of color to show (depend of value)
-			int* values;         /// list of percentage to change color.
+			Color *colors;       /// array of color to show (depend of value)
+			int *values;         /// list of percentage to change color.
 #endif
 		} LifeBar;      /// Show bar which change color depend of value.
 		struct {
@@ -553,7 +553,7 @@ typedef hashtable(CheckboxStyle *,128) _CheckboxStyleHash;
 extern _CheckboxStyleHash CheckboxStyleHash;
 
 extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
-extern struct _button_action_ * CurrentButtons;    /// Current Selected Buttons
+extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 
 extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
