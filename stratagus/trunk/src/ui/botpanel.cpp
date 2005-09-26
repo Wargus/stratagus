@@ -106,7 +106,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 	char buf[2048];
 	ButtonAction *ba;
 
-	ba = (ButtonAction *)malloc(sizeof(ButtonAction));
+	ba = new ButtonAction;
 	Assert(ba);
 
 	ba->Pos = pos;
@@ -541,7 +541,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 	ButtonAction *res;
 	int allow;         // button is available for at least 1 unit.
 
-	res = (ButtonAction *)calloc(UI.ButtonPanel.NumButtons, sizeof(*res));
+	res = new ButtonAction[UI.ButtonPanel.NumButtons];
 	for (z = 0; z < UI.ButtonPanel.NumButtons; ++z) {
 		res[z].Pos = -1;
 	}
@@ -598,7 +598,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 
 	Assert(unit);
 
-	res = (ButtonAction *)calloc(UI.ButtonPanel.NumButtons, sizeof(*res));
+	res = new ButtonAction[UI.ButtonPanel.NumButtons];
 	for (z = 0; z < UI.ButtonPanel.NumButtons; ++z) {
 		res[z].Pos = -1;
 	}
