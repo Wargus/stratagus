@@ -201,7 +201,7 @@ static int CclDefineConstruction(lua_State *l)
 			if (!strcmp((*cop)->Ident, str)) {
 				// Redefine
 				construction = *cop;
-				free(construction->Ident);
+				delete[] construction->Ident;
 				break;
 			}
 		}
