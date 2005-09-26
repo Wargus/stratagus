@@ -708,10 +708,18 @@ void CleanUnitTypes(void)
 		delete[] UnitTypeVar.VariableName[j];
 	}
 	delete[] UnitTypeVar.BoolFlagName;
+	UnitTypeVar.BoolFlagName = NULL;
+	UnitTypeVar.NumberBoolFlag = 0;
 	delete[] UnitTypeVar.VariableName;
+	UnitTypeVar.VariableName = NULL;
 	delete[] UnitTypeVar.Variable;
-	free(UnitTypeVar.DecoVar);
-	memset(&UnitTypeVar, 0, sizeof (UnitTypeVar));
+	UnitTypeVar.Variable = NULL;
+	UnitTypeVar.NumberVariable = 0;
+	for (std::vector<CDecoVar *>::iterator i = UnitTypeVar.DecoVar.begin();
+		i < UnitTypeVar.DecoVar.end(); ++i) {
+		delete (*i);
+	}
+	UnitTypeVar.DecoVar.clear();
 
 	//
 	// Clean hardcoded unit types.

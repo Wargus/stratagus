@@ -654,12 +654,9 @@ enum {
 	NVARALREADYDEFINED,
 };
 
-struct _decovartype_;
 class CUnit;
 class CUnitType;
 
-typedef void DrawDecoFunc(int x, int y, const CUnit *unit,
-	const struct _decovartype_* Deco);
 
 /**
 **  Decoration for userdefined variable.
@@ -667,7 +664,15 @@ typedef void DrawDecoFunc(int x, int y, const CUnit *unit,
 **    It is used to show variables graphicly.
 **  @todo add more stuff in this struct.
 */
-typedef struct _decovartype_ {
+class CDecoVar {
+public:
+
+	CDecoVar() {};
+	virtual ~CDecoVar() {};
+
+	/// function to draw the decorations.
+	virtual void Draw(int x, int y, const CUnit *unit) const = 0;
+
 	int Index;                  /// Index of the variable. @see DefineVariables
 
 	int OffsetX;                /// Offset in X coord.
@@ -688,40 +693,60 @@ typedef struct _decovartype_ {
 	bool HideNeutral;           /// if true, don't show for neutral unit.
 	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent;          /// if true, show for opponent unit.
+};
 
-	DrawDecoFunc* f;            /// function to draw the decorations.
-	union {
-		struct {
-			char IsVertical;            /// if true, vertical bar, else horizontal.
-			char SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
-			int Height;                 /// Height of the bar.
-			int Width;                  /// Width of the bar.
-			char ShowFullBackground;    /// if true, show background like value equal to max.
-			char BorderSize;            /// Size of the border, 0 for no border.
+class CDecoVarBar : public CDecoVar
+{
+public:
+	/// function to draw the decorations.
+	virtual void Draw(int x, int y, const CUnit *unit) const;
+
+	char IsVertical;            /// if true, vertical bar, else horizontal.
+	char SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
+	int Height;                 /// Height of the bar.
+	int Width;                  /// Width of the bar.
+	char ShowFullBackground;    /// if true, show background like value equal to max.
+	char BorderSize;            /// Size of the border, 0 for no border.
 // FIXME color depend of percent (red, Orange, Yellow, Green...)
-			Uint32 Color;               /// Color of bar.
-			Uint32 BColor;              /// Color of background.
-		} Bar; /// Use for Horizontal and vertical Bar.
+	Uint32 Color;               /// Color of bar.
+	Uint32 BColor;              /// Color of background.
+};
 
-		struct {
-			int Font;                   /// Font to use to display value.
+class CDecoVarText : public CDecoVar
+{
+public:
+	CDecoVarText() : Font(-1) {};
+	/// function to draw the decorations.
+	virtual void Draw(int x, int y, const CUnit *unit) const;
+
+	int Font;                   /// Font to use to display value.
 // FIXME : Add Color, format
-		} Text; /// Use for info text.
+};
 
-		struct {
-			char NSprite;                /// Index of nuber. (@see DefineSprites and @see GetSpriteIndex)
+/// Sprite contains frame from full (left)to empty state (right).
+class CDecoVarSpriteBar : public CDecoVar
+{
+public:
+	CDecoVarSpriteBar() : NSprite(-1) {};
+	/// function to draw the decorations.
+	virtual void Draw(int x, int y, const CUnit *unit) const;
+
+	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 // FIXME Sprite info. better way ?
-		} SpriteBar; /// Use for extra info for sprite. Sprite contains frame from full (left)to empty state (right).
+};
 
-		struct {
+/// use to show specific frame in a sprite.
+class CDecoVarStaticSprite : public CDecoVar
+{
+public:
+	CDecoVarStaticSprite() : NSprite(-1), n(0) {}
+	/// function to draw the decorations.
+	virtual void Draw(int x, int y, const CUnit *unit) const;
+
 // FIXME Sprite info. and Replace n with more appropriate var.
-			char NSprite;               /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
-			int n;                      /// identifiant in SpellSprite
-		} StaticSprite; /// use to show specific frame in a sprite.
-// FIXME : other method here.
-	} Data;         /// More Datas, depend of showing method
-
-} DecoVarType;
+	char NSprite;               /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
+	int n;                      /// identifiant in SpellSprite
+};
 
 typedef enum {
 	UnitTypeLand,               /// Unit lives on land
@@ -953,8 +978,7 @@ public:
 // EventType* Event;                   /// Array of functions sets to call when en event occurs.
 	int NumberVariable;                 /// Number of defined variables.
 
-	DecoVarType *DecoVar;               /// Array to describe how showing variable.
-	int NumberDeco;                     /// Size of DecoVar.
+	std::vector<CDecoVar *> DecoVar;    /// Array to describe how showing variable.
 };
 
 extern CUnitTypeVar UnitTypeVar;

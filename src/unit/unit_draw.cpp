@@ -132,11 +132,6 @@ void (*DrawSelection)(Uint32 color, int x1, int y1,
 --  Functions
 ----------------------------------------------------------------------------*/
 
-DrawDecoFunc DrawBar;
-DrawDecoFunc PrintValue;
-DrawDecoFunc DrawSpriteBar;
-DrawDecoFunc DrawStaticSprite;
-
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
@@ -654,8 +649,9 @@ static int CclShowManaBar(lua_State *l)
 static int CclShowEnergySelected(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	for (int i = 0; i < UnitTypeVar.NumberDeco; ++i) {
-		UnitTypeVar.DecoVar[i].ShowOnlySelected = true;
+	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
+		i < UnitTypeVar.DecoVar.end(); ++i) {
+		(*i)->ShowOnlySelected = true;
 	}
 	return 0;
 }
@@ -668,8 +664,9 @@ static int CclShowEnergySelected(lua_State *l)
 static int CclShowFull(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	for (int i = 0; i < UnitTypeVar.NumberDeco; ++i) {
-		UnitTypeVar.DecoVar[i].ShowWhenMax = 1;
+	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
+		i < UnitTypeVar.DecoVar.end(); ++i) {
+		(*i)->ShowWhenMax = 1;
 	}
 	return 0;
 }
@@ -682,8 +679,9 @@ static int CclShowFull(lua_State *l)
 static int CclShowNoFull(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	for (int i = 0; i < UnitTypeVar.NumberDeco; ++i) {
-		UnitTypeVar.DecoVar[i].ShowWhenMax = 0;
+	for (std::vector<CDecoVar *>::iterator i = UnitTypeVar.DecoVar.begin();
+		i < UnitTypeVar.DecoVar.end(); ++i) {
+		(*i)->ShowWhenMax = 0;
 	}
 	return 0;
 }
@@ -775,10 +773,9 @@ void CleanDecorations(void)
 **  @param x       X screen pixel position
 **  @param y       Y screen pixel position
 **  @param unit    Unit pointer
-**  @param Deco    More data arguments
 **  @todo fix color configuration.
 */
-void DrawBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
+void CDecoVarBar::Draw(int x, int y, const CUnit *unit) const
 {
 	int height;
 	int width;
@@ -790,43 +787,42 @@ void DrawBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 	int f;         // 100 * value / max.
 
 	Assert(unit);
-	Assert(Deco);
 	Assert(unit->Type);
-	Assert(unit->Variable[Deco->Index].Max);
-	height = Deco->Data.Bar.Height;
+	Assert(unit->Variable[this->Index].Max);
+	height = this->Height;
 	if (height == 0) { // Default value
 		height = unit->Type->BoxHeight; // Better size ? {,Box, Tile}
 	}
-	width = Deco->Data.Bar.Width;
+	width = this->Width;
 	if (width == 0) { // Default value
 		width = unit->Type->BoxWidth; // Better size ? {,Box, Tile}
 	}
-	if (Deco->Data.Bar.IsVertical)  { // Vertical
+	if (this->IsVertical)  { // Vertical
 		w = width;
-		h = unit->Variable[Deco->Index].Value * height / unit->Variable[Deco->Index].Max;
+		h = unit->Variable[this->Index].Value * height / unit->Variable[this->Index].Max;
 	} else {
-		w = unit->Variable[Deco->Index].Value * width / unit->Variable[Deco->Index].Max;
+		w = unit->Variable[this->Index].Value * width / unit->Variable[this->Index].Max;
 		h = height;
 	}
 
-	if (Deco->IsCenteredInX) {
+	if (this->IsCenteredInX) {
 		x -= w / 2;
 	}
-	if (Deco->IsCenteredInY) {
+	if (this->IsCenteredInY) {
 		y -= h / 2;
 	}
 
-	b = Deco->Data.Bar.BorderSize;
+	b = this->BorderSize;
 	// Could depend of (value / max)
-	f = unit->Variable[Deco->Index].Value * 100 / unit->Variable[Deco->Index].Max;
+	f = unit->Variable[this->Index].Value * 100 / unit->Variable[this->Index].Max;
 	bcolor = ColorBlack; // Deco->Data.Bar.BColor
 	color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);
 	// Deco->Data.Bar.Color
 	if (b) {
-		if (Deco->Data.Bar.ShowFullBackground) {
+		if (this->ShowFullBackground) {
 			Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + width, 2 * b + height);
 		} else {
-			if (Deco->Data.Bar.SEToNW) {
+			if (this->SEToNW) {
 				Video.FillRectangleClip(bcolor, x - b - w + width, y - b - h + height,
 					2 * b + w, 2 * b + h);
 			} else {
@@ -834,7 +830,7 @@ void DrawBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 			}
 		}
 	}
-	if (Deco->Data.Bar.SEToNW) {
+	if (this->SEToNW) {
 		Video.FillRectangleClip(color, x - w + width, y - h + height, w, h);
 	} else {
 		Video.FillRectangleClip(color, x, y, w, h);
@@ -847,21 +843,20 @@ void DrawBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 **  @param x       X screen pixel position
 **  @param y       Y screen pixel position
 **  @param unit    Unit pointer
-**  @param Deco    More data arguments
 **  @todo fix font/color configuration.
 */
-void PrintValue(int x, int y, const CUnit *unit, const DecoVarType *Deco)
+void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
 {
 	int font;  // font to display the value.
 
-	font = Deco->Data.Text.Font;
-	if (Deco->IsCenteredInX) {
+	font = this->Font;
+	if (this->IsCenteredInX) {
 		x -= 2; // VideoTextLength(GameFont, buf) / 2, with buf = str(Value)
 	}
-	if (Deco->IsCenteredInY) {
+	if (this->IsCenteredInY) {
 		y -= VideoTextHeight(font) / 2;
 	}
-	VideoDrawNumberClip(x, y, font, unit->Variable[Deco->Index].Value);
+	VideoDrawNumberClip(x, y, font, unit->Variable[this->Index].Value);
 }
 
 /**
@@ -870,32 +865,30 @@ void PrintValue(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 **  @param x       X screen pixel position
 **  @param y       Y screen pixel position
 **  @param unit    Unit pointer
-**  @param Deco    More data arguments
 **  @todo fix sprite configuration.
 */
-void DrawSpriteBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
+void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 {
 	int n;                   // frame of the sprite to show.
 	Graphic *sprite;         // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
 
 	Assert(unit);
-	Assert(Deco);
-	Assert(unit->Variable[Deco->Index].Max);
-	Assert(Deco->Data.SpriteBar.NSprite != -1);
+	Assert(unit->Variable[this->Index].Max);
+	Assert(this->NSprite != -1);
 
-	decosprite = &DecoSprite.SpriteArray[(int) Deco->Data.SpriteBar.NSprite];
+	decosprite = &DecoSprite.SpriteArray[(int) this->NSprite];
 	sprite = decosprite->Sprite;
 	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
 	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
 
 	n = sprite->NumFrames - 1;
-	n -= (n * unit->Variable[Deco->Index].Value) / unit->Variable[Deco->Index].Max;
+	n -= (n * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
 
-	if (Deco->IsCenteredInX) {
+	if (this->IsCenteredInX) {
 		x -= sprite->Width / 2;
 	}
-	if (Deco->IsCenteredInY) {
+	if (this->IsCenteredInY) {
 		y -= sprite->Height / 2;
 	}
 	sprite->DrawFrameClip(n, x, y);
@@ -907,26 +900,25 @@ void DrawSpriteBar(int x, int y, const CUnit *unit, const DecoVarType *Deco)
 **  @param x       X screen pixel position
 **  @param y       Y screen pixel position
 **  @param unit    Unit pointer
-**  @param Deco    More data arguments
 **
 **  @todo fix sprite configuration configuration.
 */
-void DrawStaticSprite(int x, int y, const CUnit *unit, const DecoVarType *Deco)
+void CDecoVarStaticSprite::Draw(int x, int y, const CUnit *unit) const
 {
 	Graphic *sprite;         // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
 
-	decosprite = &DecoSprite.SpriteArray[(int) Deco->Data.StaticSprite.NSprite];
+	decosprite = &DecoSprite.SpriteArray[(int) this->NSprite];
 	sprite = decosprite->Sprite;
 	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
 	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
-	if (Deco->IsCenteredInX) {
+	if (this->IsCenteredInX) {
 		x -= sprite->Width / 2;
 	}
-	if (Deco->IsCenteredInY) {
+	if (this->IsCenteredInY) {
 		y -= sprite->Height / 2;
 	}
-	sprite->DrawFrameClip(Deco->Data.StaticSprite.n, x, y);
+	sprite->DrawFrameClip(this->n, x, y);
 }
 
 
@@ -943,8 +935,6 @@ extern void UpdateUnitVariables(const CUnit *unit);
 */
 static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int y)
 {
-	int i;
-
 #ifdef REFS_DEBUG
 	//
 	// Show the number of references.
@@ -954,29 +944,27 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 
 	UpdateUnitVariables(unit);
 	// Now show decoration for each variable.
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
+		i < UnitTypeVar.DecoVar.end(); ++i) {
 		int value;
 		int max;
-		const DecoVarType* Deco;
 
-		Deco = &UnitTypeVar.DecoVar[i];
-		Assert(Deco->f);
-		value = unit->Variable[Deco->Index].Value;
-		max = unit->Variable[Deco->Index].Max;
+		value = unit->Variable[(*i)->Index].Value;
+		max = unit->Variable[(*i)->Index].Max;
 		Assert(value <= max);
 
-		if (!((value == 0 && !Deco->ShowWhenNull) || (value == max && !Deco->ShowWhenMax) ||
-				(Deco->HideHalf && value != 0 && value != max) ||
-				(!Deco->ShowIfNotEnable && !unit->Variable[Deco->Index].Enable) ||
-				(Deco->ShowOnlySelected && !unit->Selected) ||
-				(unit->Player->Type == PlayerNeutral && Deco->HideNeutral) ||
-				(ThisPlayer->IsEnemy(unit) && !Deco->ShowOpponent) ||
-				(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && Deco->HideAllied) ||
+		if (!((value == 0 && !(*i)->ShowWhenNull) || (value == max && !(*i)->ShowWhenMax) ||
+				((*i)->HideHalf && value != 0 && value != max) ||
+				(!(*i)->ShowIfNotEnable && !unit->Variable[(*i)->Index].Enable) ||
+				((*i)->ShowOnlySelected && !unit->Selected) ||
+				(unit->Player->Type == PlayerNeutral && (*i)->HideNeutral) ||
+				(ThisPlayer->IsEnemy(unit) && !(*i)->ShowOpponent) ||
+				(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && (*i)->HideAllied) ||
 				max == 0)) {
-			Deco->f(
-				x + Deco->OffsetX + Deco->OffsetXPercent * unit->Type->TileWidth * TileSizeX / 100,
-				y + Deco->OffsetY + Deco->OffsetYPercent * unit->Type->TileHeight * TileSizeY / 100,
-				unit, Deco);
+			(*i)->Draw(
+				x + (*i)->OffsetX + (*i)->OffsetXPercent * unit->Type->TileWidth * TileSizeX / 100,
+				y + (*i)->OffsetY + (*i)->OffsetYPercent * unit->Type->TileHeight * TileSizeY / 100,
+				unit);
 		}
 	}
 	//
