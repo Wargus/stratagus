@@ -106,38 +106,54 @@
 
 class Graphic;
 
-typedef enum {
+enum ConstructionFileType {
 	ConstructionFileConstruction,
 	ConstructionFileMain,
-} ConstructionFileType;
+};
 
 	/// Construction frame
-typedef struct _construction_frame_ {
-	int Percent;  /// Percent complete
-	ConstructionFileType File;  /// Graphic to use
-	int Frame;  /// Frame number
-	struct _construction_frame_* Next;  /// Next pointer
-} ConstructionFrame;
+class CConstructionFrame {
+public:
+	CConstructionFrame() : Percent(0), File(ConstructionFileConstruction),
+		Frame(0), Next(NULL) {}
+
+	int Percent;                    /// Percent complete
+	ConstructionFileType File;      /// Graphic to use
+	int Frame;                      /// Frame number
+	CConstructionFrame *Next; /// Next pointer
+};
 
 	/// Construction shown during construction of a building
-typedef struct _construction_ {
-	char*       Ident;  /// construction identifier
+class CConstruction {
+public:
+	CConstruction() : Ident(NULL), Frames(NULL), Sprite(NULL), Width(0),
+		Height(0), ShadowSprite(NULL), ShadowWidth(0), ShadowHeight(0)
+	{
+		File.File = NULL;
+		File.Width = 0;
+		File.Height = 0;
+		ShadowFile.File = NULL;
+		ShadowFile.Width = 0;
+		ShadowFile.Height = 0;
+	}
+
+	char *Ident;  /// construction identifier
 	struct {
-		char* File;    /// sprite file
+		char *File;    /// sprite file
 		int   Width;   /// sprite width
 		int   Height;  /// sprite height
 	} File, ShadowFile;
-	ConstructionFrame* Frames;  /// construction frames
+	CConstructionFrame *Frames;  /// construction frames
 
 // --- FILLED UP ---
 
-	Graphic*          Sprite;        /// construction sprite image
-	int               Width;         /// sprite width
-	int               Height;        /// sprite height
-	Graphic*          ShadowSprite;  /// construction shadow sprite image
-	int               ShadowWidth;   /// shadow sprite width
-	int               ShadowHeight;  /// shadow sprite height
-} Construction;
+	Graphic *Sprite;        /// construction sprite image
+	int      Width;         /// sprite width
+	int      Height;        /// sprite height
+	Graphic *ShadowSprite;  /// construction shadow sprite image
+	int      ShadowWidth;   /// shadow sprite width
+	int      ShadowHeight;  /// shadow sprite height
+};
 
 /*----------------------------------------------------------------------------
 --  Macros
@@ -160,9 +176,9 @@ extern void LoadConstructions(void);
 	/// Clean up the constructions module
 extern void CleanConstructions(void);
 	/// Get construction by wc number
-extern Construction* ConstructionByWcNum(int num);
+extern CConstruction *ConstructionByWcNum(int num);
 	/// Get construction by identifier
-extern Construction* ConstructionByIdent(const char* ident);
+extern CConstruction *ConstructionByIdent(const char *ident);
 
 	/// Register ccl features
 extern void ConstructionCclRegister(void);

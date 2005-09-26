@@ -527,7 +527,7 @@ class Mng;
 ----------------------------------------------------------------------------*/
 
 class Graphic;
-struct _construction_;
+class CConstruction;
 struct _animations_;
 
 /**
@@ -827,7 +827,7 @@ public:
 	int CorpseScript;               /// Corpse script start
 
 	// this is taken from the UDTA section
-	struct _construction_ *Construction; /// What is shown in construction phase
+	CConstruction *Construction;    /// What is shown in construction phase
 
 	int _Costs[MaxCosts];           /// How many resources needed
 	int RepairHP;                   /// Amount of HP per repair
