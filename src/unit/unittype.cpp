@@ -144,7 +144,7 @@ void UpdateStats(int reset)
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (!stats->Variables) {
-					stats->Variables = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof(*stats->Variables));
+					stats->Variables = new VariableType[UnitTypeVar.NumberVariable];
 				}
 				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
 					stats->Variables[i] = type->Variable[i];
