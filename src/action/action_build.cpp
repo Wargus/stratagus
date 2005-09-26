@@ -62,8 +62,8 @@
 */
 static void UpdateConstructionFrame(CUnit *unit)
 {
-	ConstructionFrame *cframe;
-	ConstructionFrame *tmp;
+	CConstructionFrame *cframe;
+	CConstructionFrame *tmp;
 	int percent;
 
 	percent = unit->Data.Built.Progress /

@@ -1393,7 +1393,7 @@ void DrawUnitPlayerColor(const CUnitType *type, Graphic *sprite,
 */
 static void DrawConstructionShadow(const CUnit *unit, int frame, int x, int y)
 {
-	ConstructionFrame *cframe;
+	CConstructionFrame *cframe;
 
 	cframe = unit->Data.Built.Frame;
 	if (cframe->File == ConstructionFileConstruction) {
@@ -1464,14 +1464,14 @@ static void DrawConstructionShadow(const CUnit *unit, int frame, int x, int y)
 **  @param x       X position.
 **  @param y       Y position.
 */
-static void DrawConstruction(const CUnit *unit, const ConstructionFrame *cframe,
+static void DrawConstruction(const CUnit *unit, const CConstructionFrame *cframe,
 	const CUnitType *type, int frame, int x, int y)
 {
 	int player;
 
 	player = unit->RescuedFrom ? unit->RescuedFrom->Index : unit->Player->Index;
 	if (cframe->File == ConstructionFileConstruction) {
-		const Construction* construction;
+		const CConstruction *construction;
 
 		construction = type->Construction;
 		x -= construction->Width / 2;
@@ -1509,7 +1509,7 @@ void DrawUnit(const CUnit *unit)
 	int constructed;
 	Graphic *sprite;
 	ResourceInfo *resinfo;
-	ConstructionFrame *cframe;
+	CConstructionFrame *cframe;
 	CUnitType *type;
 
 	if (unit->Type->Revealer) { // Revealers are not drawn

@@ -52,7 +52,7 @@
 /**
 **  Constructions.
 */
-static Construction** Constructions;
+static CConstruction **Constructions;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -73,8 +73,8 @@ void InitConstructions(void)
 */
 void LoadConstructions(void)
 {
-	const char* file;
-	Construction** cop;
+	const char *file;
+	CConstruction **cop;
 
 	if ((cop = Constructions)) {
 		while (*cop) {
@@ -112,36 +112,30 @@ void LoadConstructions(void)
 */
 void CleanConstructions(void)
 {
-	Construction** cop;
-	ConstructionFrame* cframe;
-	ConstructionFrame* tmp;
+	CConstruction **cop;
+	CConstructionFrame *cframe;
+	CConstructionFrame *tmp;
 
 	//
 	//  Free the construction table.
 	//
 	if ((cop = Constructions)) {
 		while (*cop) {
-			if ((*cop)->Ident) {
-				free((*cop)->Ident);
-			}
-			if ((*cop)->File.File) {
-				free((*cop)->File.File);
-			}
+			delete[] (*cop)->Ident;
+			delete[] (*cop)->File.File;
 			FreeGraphic((*cop)->Sprite);
-			if ((*cop)->ShadowFile.File) {
-				free((*cop)->ShadowFile.File);
-			}
+			delete[] (*cop)->ShadowFile.File;
 			FreeGraphic((*cop)->ShadowSprite);
 			cframe = (*cop)->Frames;
 			while (cframe) {
 				tmp = cframe->Next;
-				free(cframe);
+				delete cframe;
 				cframe = tmp;
 			}
-			free(*cop);
+			delete *cop;
 			++cop;
 		}
-		free(Constructions);
+		delete Constructions;
 		Constructions = NULL;
 	}
 }
@@ -153,9 +147,9 @@ void CleanConstructions(void)
 **
 **  @return       Construction structure pointer
 */
-Construction* ConstructionByIdent(const char* ident)
+CConstruction *ConstructionByIdent(const char *ident)
 {
-	Construction** cop;
+	CConstruction **cop;
 
 	if ((cop = Constructions)) {
 		while (*cop) {
@@ -178,12 +172,12 @@ Construction* ConstructionByIdent(const char* ident)
 **
 **  @note make this more flexible
 */
-static int CclDefineConstruction(lua_State* l)
+static int CclDefineConstruction(lua_State *l)
 {
-	const char* value;
-	char* str;
-	Construction* construction;
-	Construction** cop;
+	const char *value;
+	char *str;
+	CConstruction *construction;
+	CConstruction **cop;
 	int i;
 	int subargs;
 	int k;
@@ -195,11 +189,11 @@ static int CclDefineConstruction(lua_State* l)
 
 	// Slot identifier
 
-	str = strdup(LuaToString(l, 1));
+	str = new_strdup(LuaToString(l, 1));
 
 	if ((cop = Constructions) == NULL) {
-		Constructions = (Construction**)malloc(2 * sizeof(Construction*));
-		Constructions[0] = (Construction*)calloc(1, sizeof(Construction));
+		Constructions = new CConstruction *[2];
+		Constructions[0] = new CConstruction;
 		Constructions[1] = NULL;
 		construction = Constructions[0];
 	} else {
@@ -212,8 +206,11 @@ static int CclDefineConstruction(lua_State* l)
 			}
 		}
 		if (!*cop) {
-			Constructions = (Construction**)realloc(Constructions, (i + 2) * sizeof(Construction*));
-			Constructions[i] = (Construction*)calloc(1, sizeof(Construction));
+			CConstruction **c = new CConstruction *[i + 2];
+			memcpy(c, Constructions, i * sizeof(CConstruction *));
+			delete[] Constructions;
+			Constructions = c;
+			Constructions[i] = new CConstruction;
 			Constructions[i + 1] = NULL;
 			construction = Constructions[i];
 		}
@@ -231,7 +228,7 @@ static int CclDefineConstruction(lua_State* l)
 
 		if ((files = !strcmp(value, "Files")) ||
 				!strcmp(value, "ShadowFiles")) {
-			char* file;
+			char *file;
 			int w;
 			int h;
 
@@ -247,7 +244,7 @@ static int CclDefineConstruction(lua_State* l)
 				value = LuaToString(l, -2);
 
 				if (!strcmp(value, "File")) {
-					file = strdup(LuaToString(l, -1));
+					file = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Size")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
@@ -264,12 +261,12 @@ static int CclDefineConstruction(lua_State* l)
 				lua_pop(l, 1);
 			}
 			if (files) {
-				free(construction->File.File);
+				delete[] construction->File.File;
 				construction->File.File = file;
 				construction->File.Width = w;
 				construction->File.Height = h;
 			} else {
-				free(construction->ShadowFile.File);
+				delete[] construction->ShadowFile.File;
 				construction->ShadowFile.File = file;
 				construction->ShadowFile.Width = w;
 				construction->ShadowFile.Height = h;
@@ -280,7 +277,7 @@ static int CclDefineConstruction(lua_State* l)
 				int percent;
 				ConstructionFileType file;
 				int frame;
-				ConstructionFrame** cframe;
+				CConstructionFrame **cframe;
 
 				percent = 0;
 				file = ConstructionFileConstruction;
@@ -317,7 +314,7 @@ static int CclDefineConstruction(lua_State* l)
 				while (*cframe) {
 					cframe = &((*cframe)->Next);
 				}
-				(*cframe) = (ConstructionFrame*)malloc(sizeof(ConstructionFrame));
+				(*cframe) = new CConstructionFrame;
 				(*cframe)->Percent = percent;
 				(*cframe)->File = file;
 				(*cframe)->Frame = frame;
