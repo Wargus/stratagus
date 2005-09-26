@@ -52,7 +52,7 @@
 /**
 **  Constructions.
 */
-static CConstruction **Constructions;
+static std::vector<CConstruction *> Constructions;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -74,35 +74,31 @@ void InitConstructions(void)
 void LoadConstructions(void)
 {
 	const char *file;
-	CConstruction **cop;
+	std::vector<CConstruction *>::iterator i;
 
-	if ((cop = Constructions)) {
-		while (*cop) {
-			if (!(*cop)->Ident) {
-				continue;
-			}
-			file = (*cop)->File.File;
-			(*cop)->Width = (*cop)->File.Width;
-			(*cop)->Height = (*cop)->File.Height;
-			if (file && *file) {
-				ShowLoadProgress("Construction %s", file);
-				(*cop)->Sprite = NewGraphic(file,
-					(*cop)->Width, (*cop)->Height);
-				(*cop)->Sprite->Load();
-				(*cop)->Sprite->Flip();
-			}
-			file = (*cop)->ShadowFile.File;
-			(*cop)->ShadowWidth = (*cop)->ShadowFile.Width;
-			(*cop)->ShadowHeight = (*cop)->ShadowFile.Height;
-			if (file && *file) {
-				ShowLoadProgress("Construction %s", file);
-				(*cop)->ShadowSprite = ForceNewGraphic(file,
-					(*cop)->ShadowWidth, (*cop)->ShadowHeight);
-				(*cop)->ShadowSprite->Load();
-				(*cop)->ShadowSprite->Flip();
-				(*cop)->ShadowSprite->MakeShadow();
-			}
-			++cop;
+	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
+		if (!(*i)->Ident) {
+			continue;
+		}
+		file = (*i)->File.File;
+		(*i)->Width = (*i)->File.Width;
+		(*i)->Height = (*i)->File.Height;
+		if (file && *file) {
+			ShowLoadProgress("Construction %s", file);
+			(*i)->Sprite = NewGraphic(file, (*i)->Width, (*i)->Height);
+			(*i)->Sprite->Load();
+			(*i)->Sprite->Flip();
+		}
+		file = (*i)->ShadowFile.File;
+		(*i)->ShadowWidth = (*i)->ShadowFile.Width;
+		(*i)->ShadowHeight = (*i)->ShadowFile.Height;
+		if (file && *file) {
+			ShowLoadProgress("Construction %s", file);
+			(*i)->ShadowSprite = ForceNewGraphic(file,
+				(*i)->ShadowWidth, (*i)->ShadowHeight);
+			(*i)->ShadowSprite->Load();
+			(*i)->ShadowSprite->Flip();
+			(*i)->ShadowSprite->MakeShadow();
 		}
 	}
 }
@@ -112,32 +108,28 @@ void LoadConstructions(void)
 */
 void CleanConstructions(void)
 {
-	CConstruction **cop;
 	CConstructionFrame *cframe;
 	CConstructionFrame *tmp;
+	std::vector<CConstruction *>::iterator i;
 
 	//
 	//  Free the construction table.
 	//
-	if ((cop = Constructions)) {
-		while (*cop) {
-			delete[] (*cop)->Ident;
-			delete[] (*cop)->File.File;
-			FreeGraphic((*cop)->Sprite);
-			delete[] (*cop)->ShadowFile.File;
-			FreeGraphic((*cop)->ShadowSprite);
-			cframe = (*cop)->Frames;
-			while (cframe) {
-				tmp = cframe->Next;
-				delete cframe;
-				cframe = tmp;
-			}
-			delete *cop;
-			++cop;
+	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
+		delete[] (*i)->Ident;
+		delete[] (*i)->File.File;
+		FreeGraphic((*i)->Sprite);
+		delete[] (*i)->ShadowFile.File;
+		FreeGraphic((*i)->ShadowSprite);
+		cframe = (*i)->Frames;
+		while (cframe) {
+			tmp = cframe->Next;
+			delete cframe;
+			cframe = tmp;
 		}
-		delete Constructions;
-		Constructions = NULL;
+		delete *i;
 	}
+	Constructions.clear();
 }
 
 /**
@@ -149,14 +141,11 @@ void CleanConstructions(void)
 */
 CConstruction *ConstructionByIdent(const char *ident)
 {
-	CConstruction **cop;
+	std::vector<CConstruction *>::iterator i;
 
-	if ((cop = Constructions)) {
-		while (*cop) {
-			if ((*cop)->Ident && !strcmp(ident, (*cop)->Ident)) {
-				return *cop;
-			}
-			++cop;
+	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
+		if ((*i)->Ident && !strcmp(ident, (*i)->Ident)) {
+			return *i;
 		}
 	}
 	DebugPrint("Construction `%s' not found.\n" _C_ ident);
@@ -177,8 +166,7 @@ static int CclDefineConstruction(lua_State *l)
 	const char *value;
 	char *str;
 	CConstruction *construction;
-	CConstruction **cop;
-	int i;
+	std::vector<CConstruction *>::iterator i;
 	int subargs;
 	int k;
 
@@ -191,29 +179,17 @@ static int CclDefineConstruction(lua_State *l)
 
 	str = new_strdup(LuaToString(l, 1));
 
-	if ((cop = Constructions) == NULL) {
-		Constructions = new CConstruction *[2];
-		Constructions[0] = new CConstruction;
-		Constructions[1] = NULL;
-		construction = Constructions[0];
-	} else {
-		for (i = 0; *cop; ++i, ++cop) {
-			if (!strcmp((*cop)->Ident, str)) {
-				// Redefine
-				construction = *cop;
-				delete[] construction->Ident;
-				break;
-			}
+	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
+		if (!strcmp((*i)->Ident, str)) {
+			// Redefine
+			construction = *i;
+			delete[] construction->Ident;
+			break;
 		}
-		if (!*cop) {
-			CConstruction **c = new CConstruction *[i + 2];
-			memcpy(c, Constructions, i * sizeof(CConstruction *));
-			delete[] Constructions;
-			Constructions = c;
-			Constructions[i] = new CConstruction;
-			Constructions[i + 1] = NULL;
-			construction = Constructions[i];
-		}
+	}
+	if (i == Constructions.end()) {
+		construction = new CConstruction;
+		Constructions.push_back(construction);
 	}
 	construction->Ident = str;
 
