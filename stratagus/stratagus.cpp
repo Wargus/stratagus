@@ -856,7 +856,7 @@ int main(int argc, char **argv)
 				NetworkPort = atoi(optarg);
 				continue;
 			case 'n':
-				NetworkArg = strdup(optarg);
+				NetworkArg = new_strdup(optarg);
 				continue;
 			case 'N':
 				memset(LocalPlayerName, 0, sizeof(LocalPlayerName));

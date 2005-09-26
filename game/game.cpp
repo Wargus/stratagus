@@ -125,7 +125,7 @@ static void LoadStratagusMap(const char *mapname, WorldMap *map)
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
-	TheMap.Info.Filename = strdup(mapname);
+	TheMap.Info.Filename = new_strdup(mapname);
 }
 
 /**
@@ -511,7 +511,7 @@ void CreateGame(const char* filename, WorldMap* map)
 		InitNetwork2();
 	} else {
 		if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {
-		  ThisPlayer->Name = strdup(LocalPlayerName);
+		  ThisPlayer->Name = new_strdup(LocalPlayerName);
 		}
 	}
 
