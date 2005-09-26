@@ -118,12 +118,15 @@ typedef struct _checkbox_style_ {
 } CheckboxStyle;
 
 	/// buttons on screen themselves
-typedef struct _button_ {
+class Button {
+public:
+	Button() : X(0), Y(0), Text(NULL), Style(NULL) {}
+
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
-	char* Text;                     /// button text
-	ButtonStyle* Style;             /// button style
-} Button;
+	char *Text;                     /// button text
+	ButtonStyle *Style;             /// button style
+};
 
 #define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
 
@@ -215,11 +218,14 @@ typedef enum {
 /**
 **  Menu panels
 */
-typedef struct _menu_panel_ {
-	char*                Ident;     /// Unique identifier
-	Graphic*             G;         /// Graphic
-	struct _menu_panel_* Next;      /// Next pointer
-} MenuPanel;
+class MenuPanel {
+public:
+	MenuPanel() : Ident(NULL), G(NULL), Next(NULL) {}
+
+	char      *Ident;           /// Unique identifier
+	Graphic   *G;               /// Graphic
+	MenuPanel *Next;            /// Next pointer
+};
 
 /**
 **  Condition to show panel content.

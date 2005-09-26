@@ -303,9 +303,8 @@ static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 	int size;
 	unsigned int *m;
 
-	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight) * sizeof(*points);
-	points = (struct p*)malloc(size);
 	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight);
+	points = new p[size];
 
 	mask = UnitMovementMask(unit);
 	// Ignore all possible mobile units.
@@ -366,8 +365,7 @@ static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 		ep = wp;
 	}
 
-	free(points);
-	return;
+	delete[] points;
 }
 #endif
 

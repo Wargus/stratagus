@@ -64,7 +64,7 @@
 static Socket MetaServerFildes;  // This is a TCP socket.
 int MetaServerInUse;
 
-char* MasterHost;       /// Metaserver Address
+char *MasterHost;       /// Metaserver Address
 int MasterPort;         /// Metaserver Port
 
 /*----------------------------------------------------------------------------
@@ -76,12 +76,12 @@ int MasterPort;         /// Metaserver Port
 **
 **  @param l  Lua state.
 */
-int CclSetMetaServer(lua_State* l)
+int CclSetMetaServer(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 
-	free(MasterHost);
-	MasterHost = strdup(LuaToString(l, 1));	
+	delete[] MasterHost;
+	MasterHost = new_strdup(LuaToString(l, 1));	
 	MasterPort = LuaToNumber(l, 2);
 
 	return 0;
@@ -97,7 +97,7 @@ int CclSetMetaServer(lua_State* l)
 int MetaInit(void)
 {
 	int i;
-	char* reply;
+	char *reply;
 	int port_range_min;
 	int port_range_max;
 
@@ -125,10 +125,10 @@ int MetaInit(void)
 		return -1;
 	} else {
 		if (MetaServerOK(reply)) {
-			free(reply);
+			delete[] reply;
 			return 0;
 		} else {
-			free(reply);
+			delete[] reply;
 			return -1;
 		}
 	}
@@ -152,7 +152,7 @@ int MetaClose(void)
 **
 **  @return 1 OK, 0 Error.
 */
-int MetaServerOK(char* reply)
+int MetaServerOK(char *reply)
 {
 	return !strcmp("OK\r\n", reply) || !strcmp("OK\n", reply);
 }
@@ -166,16 +166,16 @@ int MetaServerOK(char* reply)
 **
 **  @returns -1 if error.
 */
-int GetMetaParameter(char* reply, int pos, char** value)
+int GetMetaParameter(char *reply, int pos, char **value)
 {
-	char* endline;
+	char *endline;
 
 	// Take Care for OK/ERR
 	*value = strchr(reply, '\n');
 	(*value)++;
 
 	while (pos-- && *value) {
-		(*value) = strchr((*value), '\n');
+		*value = strchr(*value, '\n');
 		if (*value) {
 			(*value)++;
 		}
@@ -197,7 +197,7 @@ int GetMetaParameter(char* reply, int pos, char** value)
 	}
 
 	*endline = '\0';
-	*value = strdup(*value);
+	*value = new_strdup(*value);
 	*endline = '\n';
 	return 0;
 }
@@ -212,21 +212,21 @@ int GetMetaParameter(char* reply, int pos, char** value)
 **
 **  @returns  -1 fail, length of command
 */
-int SendMetaCommand(char* command, char* format, ...)
+int SendMetaCommand(char *command, char *format, ...)
 {
 	int n;
 	int size;
 	int ret;
-	char* p;
-	char* s;
+	char *p;
+	char *s;
 	va_list ap;
 
 	size = strlen(GameName) + strlen(LocalPlayerName) + strlen(command) + 100;
 	ret = -1;
-	if ((p = (char*)malloc(size)) == NULL) {
+	if ((p = (char *)malloc(size)) == NULL) {
 		return -1;
 	}
-	if ((s = (char*)malloc(size)) == NULL) {
+	if ((s = (char *)malloc(size)) == NULL) {
 		return -1;
 	}
 
@@ -263,12 +263,12 @@ int SendMetaCommand(char* command, char* format, ...)
 		} else {              /* glibc 2.0 */
 			size *= 2;    /* twice the old size */
 		}
-		if ((p = (char*)realloc(p, size + 1)) == NULL) {
+		if ((p = (char *)realloc(p, size + 1)) == NULL) {
 			return -1;
 		}
 	}
 	// Allocate the correct size
-	if ((s = (char*)realloc(s, size + strlen(s) + 1)) == NULL ) {
+	if ((s = (char *)realloc(s, size + strlen(s) + 1)) == NULL ) {
 		free(p);
 		return -1;
 	}
@@ -288,10 +288,10 @@ int SendMetaCommand(char* command, char* format, ...)
 **
 **  @return error or number of bytes
 */
-int RecvMetaReply(char** reply)
+int RecvMetaReply(char **reply)
 {
 	int n;
-	char* p;
+	char *p;
 	char buf[1024];
 
 	if (NetSocketReady(MetaServerFildes, 5000) == -1) {
@@ -302,7 +302,7 @@ int RecvMetaReply(char** reply)
 
 	// FIXME: Allow for large packets
 	n = NetRecvTCP(MetaServerFildes, &buf, 1024);
-	if (!(p = (char*)malloc(n + 1))) {
+	if (!(p = new char[n + 1])) {
 		return -1;
 	}
 
