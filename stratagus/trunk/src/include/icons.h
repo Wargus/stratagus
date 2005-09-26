@@ -108,7 +108,7 @@
 
 class Graphic;
 class CPlayer;
-struct _button_style_;
+class ButtonStyle;
 
 	/// Icon: rectangle image used in menus
 class CIcon {
@@ -122,7 +122,7 @@ public:
 	void DrawIcon(const CPlayer *player, int x, int y) const;
 	/// Draw icon of an unit
 	void DrawUnitIcon(const CPlayer *player,
-		struct _button_style_ *style, unsigned flags, int x, int y,
+		ButtonStyle *style, unsigned flags, int x, int y,
 		const char *text) const;
 
 
