@@ -100,11 +100,11 @@ void InitButtons(void)
 **  FIXME: docu
 */
 int AddButton(int pos, int level, const char *icon_ident,
-	enum _button_cmd_ action, const char *value, const ButtonCheckFunc func,
+	ButtonCmd action, const char *value, const ButtonCheckFunc func,
 	const char *allow, int key, const char *hint, const char *umask)
 {
 	char buf[2048];
-	ButtonAction* ba;
+	ButtonAction *ba;
 
 	ba = (ButtonAction *)malloc(sizeof(ButtonAction));
 	Assert(ba);
@@ -179,11 +179,11 @@ void CleanButtons(void)
 	// Free the allocated buttons.
 	for (int z = 0; z < NumUnitButtons; ++z) {
 		Assert(UnitButtonTable[z]);
-		free(UnitButtonTable[z]->Icon.Name);
-		free(UnitButtonTable[z]->ValueStr);
-		free(UnitButtonTable[z]->AllowStr);
-		free(UnitButtonTable[z]->Hint);
-		free(UnitButtonTable[z]->UnitMask);
+		delete[] UnitButtonTable[z]->Icon.Name;
+		delete[] UnitButtonTable[z]->ValueStr;
+		delete[] UnitButtonTable[z]->AllowStr;
+		delete[] UnitButtonTable[z]->Hint;
+		delete[] UnitButtonTable[z]->UnitMask;
 		free(UnitButtonTable[z]);
 	}
 	NumUnitButtons = 0;
