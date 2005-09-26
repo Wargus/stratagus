@@ -3818,7 +3818,7 @@ void SaveUnit(const CUnit *unit, CFile* file)
 			break;
 		case UnitActionBuilt:
 			{
-				ConstructionFrame* cframe;
+				CConstructionFrame* cframe;
 				int frame;
 
 				cframe = unit->Type->Construction->Frames;

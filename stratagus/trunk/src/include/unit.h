@@ -368,7 +368,7 @@ struct _new_animation;
 class CPlayer;
 class SpellType;
 struct _unit_colors_;
-struct _construction_frame_;
+class CConstructionFrame;
 class VariableType;
 struct _upgrade_;
 struct _building_restrictions_;
@@ -557,7 +557,7 @@ public:
 		unsigned            Constructed : 1;         /// Unit seen construction
 		unsigned            State : 3;               /// Unit seen build/upgrade state
 		unsigned            Destroyed : PlayerMax;   /// Unit seen destroyed or not
-		struct _construction_frame_* CFrame;         /// Seen construction frame
+		CConstructionFrame  *CFrame;                  /// Seen construction frame
 	} Seen;
 
 	VariableType *Variable; /// array of User Defined variables.
@@ -610,7 +610,7 @@ public:
 		CUnit *Worker;              /// Worker building this unit
 		int Progress;               /// Progress counter, in 1/100 cycles.
 		int Cancel;                 /// Cancel construction
-		struct _construction_frame_* Frame; /// Construction frame
+		CConstructionFrame *Frame;   /// Construction frame
 	} Built; /// ActionBuilt,...
 	struct _order_build_ {
 		int Cycles;                 /// Cycles unit has been building for
