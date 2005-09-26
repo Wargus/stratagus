@@ -344,7 +344,7 @@ static int CclDefineSprites(lua_State *l)
 			if (!strcmp(key, "Name")) {
 				name = LuaToString(l, -1);
 			} else if (!strcmp(key, "File")) {
-				deco.File = strdup(LuaToString(l, -1));
+				deco.File = new_strdup(LuaToString(l, -1));
 			} else if (!strcmp(key, "Offset")) {
 				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 					LuaError(l, "incorrect argument");
@@ -374,9 +374,9 @@ static int CclDefineSprites(lua_State *l)
 		index = GetSpriteIndex(name);
 		if (index == -1) { // new sprite.
 			index = DecoSprite.SpriteNumber++;
-			DecoSprite.Name = (char**)realloc(DecoSprite.Name,
+			DecoSprite.Name = (char **)realloc(DecoSprite.Name,
 				DecoSprite.SpriteNumber * sizeof(*DecoSprite.Name));
-			DecoSprite.Name[index] = strdup(name);
+			DecoSprite.Name[index] = new_strdup(name);
 			DecoSprite.SpriteArray = (Decoration*)realloc(DecoSprite.SpriteArray,
 				DecoSprite.SpriteNumber * sizeof(*DecoSprite.SpriteArray));
 			memset(DecoSprite.SpriteArray + index, 0, sizeof(*DecoSprite.SpriteArray));

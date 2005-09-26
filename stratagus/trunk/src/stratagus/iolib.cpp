@@ -667,11 +667,11 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *), Fi
 					if (nfl) {
 						memset(nfl, 0, sizeof(*nfl));
 						if (isdir) {
-							nfl->name = strdup(np);
+							nfl->name = new_strdup(np);
 						} else {
 							nfl->type = -1;
 							if (filter == NULL) {
-								nfl->name = strdup(np);
+								nfl->name = new_strdup(np);
 								nfl->type = 1;
 							} else if ((*filter)(buffer, nfl) == 0) {
 								if (n == 0) {

@@ -116,7 +116,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 	//ba->Icon.Icon = IconByIdent(icon_ident);
 	ba->Action = action;
 	if (value) {
-		ba->ValueStr = strdup(value);
+		ba->ValueStr = new_strdup(value);
 		switch (action) {
 			case ButtonSpellCast:
 				ba->Value = SpellTypeByIdent(value)->Slot;
@@ -150,12 +150,12 @@ int AddButton(int pos, int level, const char *icon_ident,
 
 	ba->Allowed = func;
 	if (allow) {
-		ba->AllowStr = strdup(allow);
+		ba->AllowStr = new_strdup(allow);
 	} else {
 		ba->AllowStr = NULL;
 	}
 	ba->Key = key;
-	ba->Hint = strdup(hint);
+	ba->Hint = new_strdup(hint);
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
@@ -163,7 +163,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 	} else {
 		sprintf(buf, ",%s,", umask);
 	}
-	ba->UnitMask = strdup(buf);
+	ba->UnitMask = new_strdup(buf);
 	UnitButtonTable[NumUnitButtons++] = ba;
 	// FIXME: check if already initited
 	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end

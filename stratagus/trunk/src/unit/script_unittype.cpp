@@ -167,7 +167,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 						(*b)->Data.Distance.DistanceType = NotEqual;
 					}
 				} else if (!strcmp(value, "Type")) {
-					(*b)->Data.Distance.RestrictTypeName = strdup(LuaToString(l, -1));
+					(*b)->Data.Distance.RestrictTypeName = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "Except")) {
 					(*b)->Data.Distance.Except = LuaToBoolean(l, -1);
 				} else {
@@ -199,7 +199,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 				} else if (!strcmp(value, "OffsetY")) {
 					(*b)->Data.AddOn.OffsetY = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "Type")) {
-					(*b)->Data.AddOn.ParentName = strdup(LuaToString(l, -1));
+					(*b)->Data.AddOn.ParentName = new_strdup(LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
 				}
@@ -223,7 +223,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 			while (lua_next(l, -2)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "Type")) {
-					(*b)->Data.OnTop.ParentName = strdup(LuaToString(l, -1));
+					(*b)->Data.OnTop.ParentName = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ReplaceOnDie")) {
 					(*b)->Data.OnTop.ReplaceOnDie = LuaToBoolean(l, -1);
 				} else if (!strcmp(value, "ReplaceOnBuild")) {
