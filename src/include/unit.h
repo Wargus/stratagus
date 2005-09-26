@@ -651,6 +651,8 @@ public:
 	/// Assign unit to player
 	void AssignToPlayer(CPlayer *player);
 
+	/// Draw a single unit
+	void Draw() const;
 	/// Place an unit on map
 	void Place(int x, int y);
 
@@ -932,8 +934,6 @@ extern void CleanDecorations(void);
 	/// Draw unit's shadow
 extern void DrawShadow(const CUnit *unit, const CUnitType *type,
 	int frame, int x, int y);
-	/// Draw A single Unit
-extern void DrawUnit(const CUnit *unit);
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport *vp, CUnit **table);
 	/// Show an unit's orders.

@@ -1488,7 +1488,7 @@ static void DrawConstruction(const CUnit *unit, const CConstructionFrame *cframe
 **
 **  @param unit  Pointer to the unit.
 */
-void DrawUnit(const CUnit *unit)
+void CUnit::Draw() const
 {
 	int x;
 	int y;
@@ -1500,39 +1500,39 @@ void DrawUnit(const CUnit *unit)
 	CConstructionFrame *cframe;
 	CUnitType *type;
 
-	if (unit->Type->Revealer) { // Revealers are not drawn
+	if (this->Type->Revealer) { // Revealers are not drawn
 		return;
 	}
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
-	Assert(ReplayRevealMap || unit->Type->VisibleUnderFog || unit->IsVisible(ThisPlayer));
+	Assert(ReplayRevealMap || this->Type->VisibleUnderFog || this->IsVisible(ThisPlayer));
 
-	if (ReplayRevealMap || unit->IsVisible(ThisPlayer)) {
-		type = unit->Type;
-		frame = unit->Frame;
-		y = unit->IY;
-		x = unit->IX;
-		x += CurrentViewport->Map2ViewportX(unit->X);
-		y += CurrentViewport->Map2ViewportY(unit->Y);
-		state = (unit->Orders[0].Action == UnitActionBuilt) |
-			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
-		constructed = unit->Constructed;
+	if (ReplayRevealMap || this->IsVisible(ThisPlayer)) {
+		type = this->Type;
+		frame = this->Frame;
+		y = this->IY;
+		x = this->IX;
+		x += CurrentViewport->Map2ViewportX(this->X);
+		y += CurrentViewport->Map2ViewportY(this->Y);
+		state = (this->Orders[0].Action == UnitActionBuilt) |
+			((this->Orders[0].Action == UnitActionUpgradeTo) << 1);
+		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
 		if (state == 2) {
-			type = unit->Orders[0].Type;
+			type = this->Orders[0].Type;
 		}
 		// This is trash unless the unit is being built, and that's when we use it.
-		cframe = unit->Data.Built.Frame;
+		cframe = this->Data.Built.Frame;
 	} else {
-		y = unit->Seen.IY;
-		x = unit->Seen.IX;
-		x += CurrentViewport->Map2ViewportX(unit->Seen.X);
-		y += CurrentViewport->Map2ViewportY(unit->Seen.Y);
-		frame = unit->Seen.Frame;
-		type = unit->Seen.Type;
-		constructed = unit->Seen.Constructed;
-		state = unit->Seen.State;
-		cframe = unit->Seen.CFrame;
+		y = this->Seen.IY;
+		x = this->Seen.IX;
+		x += CurrentViewport->Map2ViewportX(this->Seen.X);
+		y += CurrentViewport->Map2ViewportY(this->Seen.Y);
+		frame = this->Seen.Frame;
+		type = this->Seen.Type;
+		constructed = this->Seen.Constructed;
+		state = this->Seen.State;
+		cframe = this->Seen.CFrame;
 	}
 
 #ifdef DYNAMIC_LOAD
@@ -1541,31 +1541,31 @@ void DrawUnit(const CUnit *unit)
 	}
 #endif
 
-	if (!unit->IsVisible(ThisPlayer) && frame == UnitNotSeen) {
+	if (!this->IsVisible(ThisPlayer) && frame == UnitNotSeen) {
 		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
-			unit->Slot _C_ GameCycle);
+			this->Slot _C_ GameCycle);
 		return;
 	}
 
 
 	if (state == 1 && constructed) {
-		DrawConstructionShadow(unit, frame, x, y);
+		DrawConstructionShadow(this, frame, x, y);
 	} else {
-		DrawShadow(unit, NULL, frame, x, y);
+		DrawShadow(this, NULL, frame, x, y);
 	}
 
 	//
 	// Show that the unit is selected
 	//
-	DrawUnitSelection(unit);
+	DrawUnitSelection(this);
 
 	//
 	// Adjust sprite for Harvesters.
 	//
 	sprite = type->Sprite;
-	if (type->Harvester && unit->CurrentResource) {
-		resinfo = type->ResInfo[unit->CurrentResource];
-		if (unit->ResourcesHeld) {
+	if (type->Harvester && this->CurrentResource) {
+		resinfo = type->ResInfo[this->CurrentResource];
+		if (this->ResourcesHeld) {
 			if (resinfo->SpriteWhenLoaded) {
 				sprite = resinfo->SpriteWhenLoaded;
 			}
@@ -1582,7 +1582,7 @@ void DrawUnit(const CUnit *unit)
 	//
 	if (state == 1) {
 		if (constructed) {
-			DrawConstruction(unit, cframe, type, frame,
+			DrawConstruction(this, cframe, type, frame,
 				x + (type->TileWidth * TileSizeX) / 2,
 				y + (type->TileHeight * TileSizeY) / 2);
 		}
@@ -1592,16 +1592,16 @@ void DrawUnit(const CUnit *unit)
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
 		DrawUnitType(type, sprite,
-			unit->RescuedFrom ? unit->RescuedFrom->Index : unit->Player->Index,
+			this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index,
 			frame < 0 ? -1 - 1 : 1, x, y);
 	} else {
 		DrawUnitType(type, sprite,
-			unit->RescuedFrom ? unit->RescuedFrom->Index : unit->Player->Index,
+			this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index,
 			frame, x, y);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.
-	DrawInformations(unit, type, x, y);
+	DrawInformations(this, type, x, y);
 }
 
 /**
