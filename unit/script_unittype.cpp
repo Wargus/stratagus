@@ -86,11 +86,6 @@ static int NumLabelsLater;
 
 int GetSpriteIndex(const char* SpriteName);
 
-DrawDecoFunc DrawBar;
-DrawDecoFunc PrintValue;
-DrawDecoFunc DrawSpriteBar;
-DrawDecoFunc DrawStaticSprite;
-
 /**
 **  Get the resource ID from a SCM object.
 **
@@ -1686,54 +1681,71 @@ static int CclDefineBoolFlags(lua_State* l)
 static int CclDefineDecorations(lua_State* l)
 {
 	int i;                  // iterator for arguments.
-	int j;                  // iterator for decoration
 	int nargs;              // number of arguments.
 	const char* key;        // key of lua table.
-	DecoVarType decovar;    // variable for transit.
+	CDecoVar *decovar;      // variable for transit.
+	struct {
+		int Index;
+		int OffsetX;
+		int OffsetY;
+		int OffsetXPercent;
+		int OffsetYPercent;
+		char IsCenteredInX;
+		char IsCenteredInY;
+		char ShowIfNotEnable;
+		char ShowWhenNull;
+		char HideHalf;
+		char ShowWhenMax;
+		char ShowOnlySelected;
+		char HideNeutral;
+		char HideAllied;
+		char ShowOpponent;
+	} tmp;
 
 	nargs = lua_gettop(l);
 	for (i = 0; i < nargs; i++) {
 		Assert(lua_istable(l, i + 1));
-		memset(&decovar, 0, sizeof(decovar));
+		decovar = NULL;
+		memset(&tmp, 0, sizeof(tmp));
 		lua_pushnil(l);
 		while (lua_next(l, i + 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Index")) {
-				decovar.Index = GetVariableIndex(LuaToString(l, -1));
+				tmp.Index = GetVariableIndex(LuaToString(l, -1));
 			} else if (!strcmp(key, "Offset")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // X
 				lua_rawgeti(l, -2, 2); // Y
-				decovar.OffsetX = LuaToNumber(l, -2);
-				decovar.OffsetY = LuaToNumber(l, -1);
+				tmp.OffsetX = LuaToNumber(l, -2);
+				tmp.OffsetY = LuaToNumber(l, -1);
 				lua_pop(l, 2); // Pop X and Y
 			} else if (!strcmp(key, "OffsetPercent")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // X
 				lua_rawgeti(l, -2, 2); // Y
-				decovar.OffsetXPercent = LuaToNumber(l, -2);
-				decovar.OffsetYPercent = LuaToNumber(l, -1);
+				tmp.OffsetXPercent = LuaToNumber(l, -2);
+				tmp.OffsetYPercent = LuaToNumber(l, -1);
 				lua_pop(l, 2); // Pop X and Y
 			} else if (!strcmp(key, "CenterX")) {
-				decovar.IsCenteredInX = LuaToBoolean(l, -1);
+				tmp.IsCenteredInX = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "CenterY")) {
-				decovar.IsCenteredInY = LuaToBoolean(l, -1);
+				tmp.IsCenteredInY = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowIfNotEnable")) {
-				decovar.ShowIfNotEnable = LuaToBoolean(l, -1);
+				tmp.ShowIfNotEnable = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowWhenNull")) {
-				decovar.ShowWhenNull = LuaToBoolean(l, -1);
+				tmp.ShowWhenNull = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "HideHalf")) {
-				decovar.HideHalf = LuaToBoolean(l, -1);
+				tmp.HideHalf = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowWhenMax")) {
-				decovar.ShowWhenMax = LuaToBoolean(l, -1);
+				tmp.ShowWhenMax = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowOnlySelected")) {
-				decovar.ShowOnlySelected = LuaToBoolean(l, -1);
+				tmp.ShowOnlySelected = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "HideNeutral")) {
-				decovar.HideNeutral = LuaToBoolean(l, -1);
+				tmp.HideNeutral = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "HideAllied")) {
-				decovar.HideAllied = LuaToBoolean(l, -1);
+				tmp.HideAllied = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowOpponent")) {
-				decovar.ShowOpponent = LuaToBoolean(l, -1);
+				tmp.ShowOpponent = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Method")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // MethodName
@@ -1741,65 +1753,68 @@ static int CclDefineDecorations(lua_State* l)
 				Assert(lua_istable(l, -1));
 				key = LuaToString(l, -2);
 				if (!strcmp(key, "bar")) {
-					decovar.f = DrawBar;
+					CDecoVarBar *decovarbar = new CDecoVarBar;
 					lua_pushnil(l);
 					while (lua_next(l, -2)) {
 						key = LuaToString(l, -2);
 						if (!strcmp(key, "Height")) {
-							decovar.Data.Bar.Height = LuaToNumber(l, -1);
+							decovarbar->Height = LuaToNumber(l, -1);
 						} else if (!strcmp(key, "Width")) {
-							decovar.Data.Bar.Width = LuaToNumber(l, -1);
+							decovarbar->Width = LuaToNumber(l, -1);
 						} else if (!strcmp(key, "Orientation")) {
 							key = LuaToString(l, -1);;
 							if (!strcmp(key, "horizontal")) {
-								decovar.Data.Bar.IsVertical = 0;
+								decovarbar->IsVertical = 0;
 							} else if (!strcmp(key, "vertical")) {
-								decovar.Data.Bar.IsVertical = 1;
+								decovarbar->IsVertical = 1;
 							} else { // Error
 								LuaError(l, "invalid Orientation '%s' for bar in DefineDecorations" _C_ key);
 							}
 						} else if (!strcmp(key, "SEToNW")) {
-							decovar.Data.Bar.SEToNW = LuaToBoolean(l, -1);
+							decovarbar->SEToNW = LuaToBoolean(l, -1);
 						} else if (!strcmp(key, "BorderSize")) {
-							decovar.Data.Bar.BorderSize = LuaToNumber(l, -1);
+							decovarbar->BorderSize = LuaToNumber(l, -1);
 						} else if (!strcmp(key, "ShowFullBackground")) {
-							decovar.Data.Bar.ShowFullBackground = LuaToBoolean(l, -1);
+							decovarbar->ShowFullBackground = LuaToBoolean(l, -1);
 #if 0 // FIXME Color configuration
 						} else if (!strcmp(key, "Color")) {
-							decovar.Data.Bar.Color = // FIXME
+							decovar->Color = // FIXME
 						} else if (!strcmp(key, "BColor")) {
-							decovar.Data.Bar.BColor = // FIXME
+							decovar->BColor = // FIXME
 #endif
 						} else {
 							LuaError(l, "'%s' invalid for Method bar" _C_ key);
 						}
 						lua_pop(l, 1); // Pop value
 					}
-
+					decovar = decovarbar;
 				} else if (!strcmp(key, "text")) {
-					decovar.f = PrintValue;
+					CDecoVarText *decovartext = new CDecoVarText;
 					lua_rawgeti(l, -1, 1);
 					// FontByIdent stop if not found.
-					decovar.Data.Text.Font = FontByIdent(LuaToString(l, -1));
+					decovartext->Font = FontByIdent(LuaToString(l, -1));
 					lua_pop(l, 1);
 // FIXME : More arguments ? color...
+					decovar = decovartext;
 				} else if (!strcmp(key, "sprite")) {
-					decovar.f = DrawSpriteBar;
+					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
 					lua_rawgeti(l, -1, 1);
-					decovar.Data.SpriteBar.NSprite = GetSpriteIndex(LuaToString(l, -1));
-					if (decovar.Data.SpriteBar.NSprite == -1) {
+					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1));
+					if (decovarspritebar->NSprite == -1) {
 						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_
 							LuaToString(l, -1));
 					}
 					lua_pop(l, 1);
 					// FIXME : More arguments ?
+					decovar = decovarspritebar;
 				} else if (!strcmp(key, "static-sprite")) {
-					decovar.f = DrawStaticSprite;
+					CDecoVarStaticSprite *decovarstaticsprite = new CDecoVarStaticSprite;
 					lua_rawgeti(l, -1, 1); // sprite
 					lua_rawgeti(l, -2, 2); // frame
-					decovar.Data.StaticSprite.NSprite = GetSpriteIndex(LuaToString(l, -2));
-					decovar.Data.StaticSprite.n = LuaToNumber(l, -1);
+					decovarstaticsprite->NSprite = GetSpriteIndex(LuaToString(l, -2));
+					decovarstaticsprite->n = LuaToNumber(l, -1);
 					lua_pop(l, 2);
+					decovar = decovarstaticsprite;
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
 				}
@@ -1809,17 +1824,22 @@ static int CclDefineDecorations(lua_State* l)
 			}
 			lua_pop(l, 1); // Pop the value
 		}
-		for (j = 0; j < UnitTypeVar.NumberDeco; j++) {
-			if (decovar.Index == UnitTypeVar.DecoVar[j].Index) {
-				break;
-			}
-		}
-		if (j == UnitTypeVar.NumberDeco) {
-			UnitTypeVar.NumberDeco++;
-			UnitTypeVar.DecoVar = (DecoVarType *)realloc(UnitTypeVar.DecoVar,
-				UnitTypeVar.NumberDeco * sizeof(*UnitTypeVar.DecoVar));
-		}
-		UnitTypeVar.DecoVar[j] = decovar;
+		decovar->Index = tmp.Index;
+		decovar->OffsetX = tmp.OffsetX;
+		decovar->OffsetY = tmp.OffsetY;
+		decovar->OffsetXPercent = tmp.OffsetXPercent;
+		decovar->OffsetYPercent = tmp.OffsetYPercent;
+		decovar->IsCenteredInX = tmp.IsCenteredInX;
+		decovar->IsCenteredInY = tmp.IsCenteredInY;
+		decovar->ShowIfNotEnable = tmp.ShowIfNotEnable;
+		decovar->ShowWhenNull = tmp.ShowWhenNull;
+		decovar->HideHalf = tmp.HideHalf;
+		decovar->ShowWhenMax = tmp.ShowWhenMax;
+		decovar->ShowOnlySelected = tmp.ShowOnlySelected;
+		decovar->HideNeutral = tmp.HideNeutral;
+		decovar->HideAllied = tmp.HideAllied;
+		decovar->ShowOpponent = tmp.ShowOpponent;
+		UnitTypeVar.DecoVar.push_back(decovar);
 	}
 	Assert(lua_gettop(l));
 	return 0;
