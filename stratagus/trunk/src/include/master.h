@@ -6,11 +6,11 @@
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
-//      Stratagus - A free fantasy real time strategy game engine
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name master.h - The master server headerfile. */
 //
-//      (c) Copyright 2003-2004 by Tom Zickel and Jimmy Salmon
+//      (c) Copyright 2003-2005 by Tom Zickel and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -52,15 +52,15 @@ struct lua_State;
 
 extern int MetaServerInUse;
 
-extern char* MasterHost;
+extern char *MasterHost;
 extern int MasterPort;
 
 extern int MetaInit(void);
 extern int MetaClose(void);
-extern int MetaServerOK(char* reply);
-extern int SendMetaCommand(char* command, char* format, ...);
-extern int RecvMetaReply(char** reply);
-extern int GetMetaParameter(char* reply, int pos, char** value);
+extern int MetaServerOK(char *reply);
+extern int SendMetaCommand(char *command, char *format, ...);
+extern int RecvMetaReply(char **reply);
+extern int GetMetaParameter(char *reply, int pos, char **value);
 extern int CclSetMetaServer(struct lua_State* l);
 //@}
 

@@ -48,18 +48,18 @@
 -- Declarations
 ----------------------------------------------------------------------------*/
 
-typedef struct _node_ {
+struct Node {
 	char Direction;     /// Direction for trace back
 	char InGoal;        /// is this point in the goal
 	int CostFromStart;  /// Real costs to reach this point
-} Node;
+};
 
-typedef struct _open_ {
+struct Open {
 	int X;     /// X coordinate
 	int Y;     /// Y coordinate
 	int O;     /// Offset into matrix
 	int Costs; /// complete costs to goal
-} Open;
+};
 
 /// heuristic cost fonction for a star
 #define AStarCosts(sx,sy,ex,ey) (abs(sx-ex)+abs(sy-ey))
@@ -77,9 +77,9 @@ const int Heading2X[9] = {  0,+1,+1,+1, 0,-1,-1,-1, 0 };
 const int Heading2Y[9] = { -1,-1, 0,+1,+1,+1, 0,-1, 0 };
 const int XY2Heading[3][3] = { {7,6,5},{0,0,4},{1,2,3}};
 /// cost matrix
-static Node* AStarMatrix;
+static Node *AStarMatrix;
 /// a list of close nodes, helps to speed up the matrix cleaning
-static int* CloseSet;
+static int *CloseSet;
 static int Threshold;
 static int OpenSetMaxSize;
 static int AStarMatrixSize;
@@ -99,7 +99,7 @@ int AStarUnknownTerrainCost = 2;
 */
 
 /// The set of Open nodes
-static Open* OpenSet;
+static Open *OpenSet;
 /// The size of the open node set
 static int OpenSetSize;
 
@@ -110,11 +110,12 @@ void InitAStar(void)
 {
 	if (!AStarMatrix) {
 		AStarMatrixSize = sizeof(Node) * TheMap.Info.MapWidth * TheMap.Info.MapHeight;
-		AStarMatrix = (Node*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(Node));
+		AStarMatrix = new Node[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
+		memset(AStarMatrix, 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(Node));
 		Threshold = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_CLOSE_SET_RATIO;
-		CloseSet = (int*)malloc(sizeof(int) * Threshold);
+		CloseSet = new int[Threshold];
 		OpenSetMaxSize = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_OPEN_SET_RATIO;
-		OpenSet = (Open*)malloc(sizeof(Open) * OpenSetMaxSize);
+		OpenSet = new Open[OpenSetMaxSize];
 	}
 }
 
@@ -124,10 +125,10 @@ void InitAStar(void)
 void FreeAStar(void)
 {
 	if (AStarMatrix) {
-		free(AStarMatrix);
+		delete[] AStarMatrix;
 		AStarMatrix = NULL;
-		free(CloseSet);
-		free(OpenSet);
+		delete[] CloseSet;
+		delete[] OpenSet;
 	}
 }
 
@@ -144,12 +145,10 @@ static void AStarPrepare(void)
 */
 static void AStarCleanUp(int num_in_close)
 {
-	int i;
-
 	if (num_in_close >= Threshold) {
 		AStarPrepare();
 	} else {
-		for (i = 0; i < num_in_close; ++i) {
+		for (int i = 0; i < num_in_close; ++i) {
 		  AStarMatrix[CloseSet[i]].CostFromStart = 0;
 		  AStarMatrix[CloseSet[i]].InGoal = 0;
 		}
@@ -191,7 +190,7 @@ static void AStarRemoveMinimum(int pos)
 			if (j < OpenSetSize - 1 && OpenSet[j].Costs >= OpenSet[j + 1].Costs) {
 				++j;
 			}
-			if(OpenSet[i].Costs > OpenSet[j].Costs) {
+			if (OpenSet[i].Costs > OpenSet[j].Costs) {
 				swap = OpenSet[i];
 				OpenSet[i] = OpenSet[j];
 				OpenSet[j] = swap;
@@ -272,9 +271,7 @@ static void AStarReplaceNode(int pos, int costs)
 */
 static int AStarFindNode(int eo)
 {
-	int i;
-
-	for (i = 0; i < OpenSetSize; ++i) {
+	for (int i = 0; i < OpenSetSize; ++i) {
 		if (OpenSet[i].O == eo) {
 			return i;
 		}

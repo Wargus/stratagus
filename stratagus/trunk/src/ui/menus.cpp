@@ -5394,16 +5394,16 @@ static void ShowMetaServerList(void)
 **            n commands, one for each online game.
 **  @todo: well, redo this :)
 */
-static void MultiMetaServerGameSetupInit(Menu* menu)
+static void MultiMetaServerGameSetupInit(Menu *menu)
 {
 	int i;
 	int j;
 	int k;
 	int numparams;
 	int nummenus;
-	char* parameter;
-	char* reply;
-	char* port;
+	char *parameter;
+	char *reply;
+	char *port;
 
 	SendMetaCommand("NumberOfGames", "");
 
@@ -5417,6 +5417,7 @@ static void MultiMetaServerGameSetupInit(Menu* menu)
 		for (i = 0; i < 3; ++i) {
 			GetMetaParameter(reply, 0, &parameter);
 			nummenus = atoi(parameter);
+			delete[] parameter;
 			if (nummenus == 0) {
 				RecvMetaReply(&reply);
 			}
@@ -5453,17 +5454,23 @@ static void MultiMetaServerGameSetupInit(Menu* menu)
 		} else {
 			GetMetaParameter(reply, 0, &parameter);       // Player Name
 			menu->Items[j].D.Text.text = NewStringDesc(parameter);
+			delete[] parameter;
 			GetMetaParameter(reply, 3, &parameter);       // IP
 			GetMetaParameter(reply, 4, &port);            // port
 			sprintf(parameter, "%s:%s", parameter, port); // IP:Port
 			menu->Items[j + 1].D.Text.text = NewStringDesc(parameter);
+			delete[] parameter;
+			delete[] port;
 			GetMetaParameter(reply, 6, &parameter);
 			menu->Items[j + 2].D.Text.text = NewStringDesc(parameter);
+			delete[] parameter;
 			GetMetaParameter(reply, 7, &parameter);
 			menu->Items[j + 3].D.Text.text = NewStringDesc(parameter);
+			delete[] parameter;
 			GetMetaParameter(reply, 8, &parameter);
 			menu->Items[j + 4].D.Text.text = NewStringDesc(parameter);
 			menu->Items[j + 5].D.Checkbox.Checked = 0;
+			delete[] parameter;
 		}
 		++k;
 	}
