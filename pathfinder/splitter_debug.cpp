@@ -107,7 +107,7 @@ static void RegionAssignColor(void)
 		do {
 			c++;
 			good = 1;
-			for (j = 0; j < Regions[i].ConnectionsNumber; j++) {
+			for (j = 0; j < (int)Regions[i].Connections.size(); j++) {
 				if (c == Regions[Regions[i].Connections[j]].Color) {
 					good = 0;
 					break;
@@ -186,7 +186,7 @@ void MapSplitterDebug(void)
 	total = 0;
 	for (i = 0; i < RegionMax; i++) {
 		printf("Region %3d connected to :", i);
-		for (j = 0; j < Regions[i].ConnectionsNumber; j++) {
+		for (j = 0; j < (int)Regions[i].Connections.size(); j++) {
 			printf(" %3d", Regions[i].Connections[j]);
 		}
 		printf("\n");
@@ -302,7 +302,7 @@ static void RegionDebugConnexion(RegionId reg)
 	// OK, compare to existing stats
 	for (i = 0; i < ConnectionNb; i++) {
 		found = 0;
-		for (j = 0; j < adef->ConnectionsNumber; j++) {
+		for (j = 0; j < adef->Connections.size(); j++) {
 			if (Connections[i] == adef->Connections[j]) {
 				found = 1;
 			}
@@ -312,7 +312,7 @@ static void RegionDebugConnexion(RegionId reg)
 		}
 	}
 
-	for (i = 0; i < adef->ConnectionsNumber; i++) {
+	for (i = 0; i < adef->Connections.size(); i++) {
 		found = 0;
 		for (j = 0; j < ConnectionNb; j++) {
 			if (adef->Connections[i] == Connections[j]) {

@@ -52,7 +52,6 @@ typedef struct _region_definition_{
 
 	long SumX, SumY;        /// May limit map to ~512x512
 
-	int ConnectionsNumber;
 	std::vector<int> Connections;
 	std::vector<int> ConnectionsCount;
 

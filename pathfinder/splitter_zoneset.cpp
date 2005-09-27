@@ -325,7 +325,7 @@ static void ZoneSetAddZoneAdjacents(ZoneSet * dst, int zone)
 
 	for (i = 0; i < RegionMax; i++) {
 		if (Regions[i].Zone == zone) {
-			for (j = 0; j < Regions[i].ConnectionsNumber; j++) {
+			for (j = 0; j < (int)Regions[i].Connections.size(); j++) {
 				other = Regions[i].Connections[j];
 				adj = Regions[other].Zone;
 				if (adj != -1 && adj != zone) {

@@ -549,20 +549,16 @@ void RegionSetConnection(RegionId rega, RegionId regb, int value)
 
 	adef = Regions + rega;
 
-	for (j = 0; j < adef->ConnectionsNumber; j++) {
+	for (j = 0; j < (int)adef->Connections.size(); j++) {
 		if (adef->Connections[j] == regb) {
 			if (value) {
-					adef->ConnectionsCount[j] = value;
+				adef->ConnectionsCount[j] = value;
 			} else {
 				// Remove
 				ZoneNeedRefresh = 1;
 
-				adef->ConnectionsNumber--;
-				adef->Connections[j] = adef->Connections[adef->ConnectionsNumber];
-				adef->ConnectionsCount[j] = adef->ConnectionsCount[adef->ConnectionsNumber];
-
-				adef->Connections.resize(adef->ConnectionsNumber);
-				adef->ConnectionsCount.resize(adef->ConnectionsNumber);
+				adef->Connections.erase(adef->Connections.begin() + j);
+				adef->ConnectionsCount.erase(adef->ConnectionsCount.begin() + j);
 			}
 			return;
 		}
@@ -574,12 +570,8 @@ void RegionSetConnection(RegionId rega, RegionId regb, int value)
 
 	ZoneNeedRefresh = 1;
 
-	adef->ConnectionsNumber++;
-	adef->Connections.resize(adef->ConnectionsNumber);
-	adef->ConnectionsCount.resize(adef->ConnectionsNumber);
-
-	adef->Connections[adef->ConnectionsNumber - 1] = regb;
-	adef->ConnectionsCount[adef->ConnectionsNumber - 1] = value;
+	adef->Connections.push_back(regb);
+	adef->ConnectionsCount.push_back(value);
 }
 
 /**
@@ -598,17 +590,14 @@ void RegionAddConnection(RegionId rega, RegionId regb,int value)
 
 	adef = Regions + rega;
 
-	for (j = 0; j < adef->ConnectionsNumber; j++) {
+	for (j = 0; j < (int)adef->Connections.size(); j++) {
 		if (adef->Connections[j] == regb) {
 			adef->ConnectionsCount[j] += value;
 			if (!adef->ConnectionsCount[j]) {
 				ZoneNeedRefresh = 1;
 
-				adef->ConnectionsNumber--;
-				adef->Connections[j] = adef->Connections[adef->ConnectionsNumber];
-				adef->ConnectionsCount[j] = adef->ConnectionsCount[adef->ConnectionsNumber];
-				adef->Connections.resize(adef->ConnectionsNumber + 1);
-				adef->ConnectionsCount.resize(adef->ConnectionsNumber + 1);
+				adef->Connections.erase(adef->Connections.begin() + j);
+				adef->ConnectionsCount.erase(adef->ConnectionsCount.begin() + j);
 			}
 			return;
 		}
@@ -616,13 +605,10 @@ void RegionAddConnection(RegionId rega, RegionId regb,int value)
 
 	Assert(value > 0);
 
-	adef->Connections.resize(adef->ConnectionsNumber + 1);
-	adef->ConnectionsCount.resize(adef->ConnectionsNumber + 1);
-	adef->Connections[adef->ConnectionsNumber] = regb;
-	adef->ConnectionsCount[adef->ConnectionsNumber] = value;
-	adef->ConnectionsNumber++;
-
 	ZoneNeedRefresh = 1;
+
+	adef->Connections.push_back(regb);
+	adef->ConnectionsCount.push_back(value);
 }
 
 /**
@@ -784,7 +770,7 @@ void RegionRescanAdjacents(RegionId regid)
 	}
 
 	// Broke connections with other cells.
-	for (i = 0; i < adef->ConnectionsNumber; i++) {
+	for (i = 0; i < (int)adef->Connections.size(); i++) {
 		adjreg = adef->Connections[i];
 		// Not connected anymore to it, remove.
 		if (Connected[adjreg] != LastId) {
@@ -793,12 +779,11 @@ void RegionRescanAdjacents(RegionId regid)
 	}
 
 	// Set connections for region
-	if (adef->ConnectionsNumber) {
+	if (!adef->Connections.empty()) {
 		adef->Connections.clear();
 		adef->ConnectionsCount.clear();
 	}
 
-	adef->ConnectionsNumber = 0;
 	for (i = 0; i < ConnectionNumber; i++) {
 		adjreg = Connections[i];
 		RegionSetConnection(regid, adjreg, ConnectionsCount[adjreg]);
