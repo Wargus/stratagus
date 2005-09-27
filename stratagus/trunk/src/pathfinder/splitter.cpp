@@ -217,7 +217,6 @@ RegionId NewRegion(int iswater)
 
 	Regions[result].TileCount = 0;
 	Regions[result].IsWater = iswater;
-	Regions[result].ConnectionsNumber = 0;
 	Regions[result].FirstSegment = 0;
 	Regions[result].LastSegment = 0;
 	Regions[result].NeedConnectTest = 0;
@@ -252,7 +251,7 @@ void RegionFree(RegionId regid)
 		NextFreeRegion = regid;
 	}
 	Regions[regid].TileCount = 0;
-	if (Regions[regid].ConnectionsNumber) {
+	if (!Regions[regid].Connections.empty()) {
 		Regions[regid].Connections.clear();
 		Regions[regid].ConnectionsCount.clear();
 	}
@@ -427,7 +426,7 @@ void RegionJoin(RegionId a, RegionId b)
 	Regions[a].MaxY = (Regions[a].MaxY > Regions[b].MaxY) ? Regions[a].MaxY : Regions[b].MaxY;
 
 	// Update connections : a receive all that b has
-	while (Regions[b].ConnectionsNumber) {
+	while (!Regions[b].Connections.empty()) {
 		if (Regions[b].Connections[0] != a) {
 			RegionAddBidirConnection(a, Regions[b].Connections[0], Regions[b].ConnectionsCount[0]);
 		}
@@ -922,7 +921,6 @@ void InitaliseMapping(void)
 
 	for (i = 0; i < MaxRegionNumber; ++i) {
 		Regions[i].TileCount = 0;
-		Regions[i].ConnectionsNumber = 0;
 		Regions[i].FirstSegment = 0;
 		Regions[i].LastSegment = 0;
 	}
@@ -1004,7 +1002,7 @@ void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int* rslty)
 	bestdst = -1;
 	for (i = 0; i < RegionMax; ++i) {
 		if (Regions[i].Zone == a) {
-			for (j = 0; j < Regions[i].ConnectionsNumber; ++j) {
+			for (j = 0; j < (int)Regions[i].Connections.size(); ++j) {
 				oppregion = Regions[i].Connections[j];
 				oppzone = Regions[oppregion].Zone;
 				if (oppzone != b) {
@@ -1087,7 +1085,7 @@ static void RefreshZones(void)
 
 		while (stack_ptr < stack_size) {
 			regid = regions_stack[stack_ptr++];
-			for (j = 0; j < Regions[regid].ConnectionsNumber; ++j) {
+			for (j = 0; j < (int)Regions[regid].Connections.size(); ++j) {
 				adjid = Regions[regid].Connections[j];
 				if (Regions[adjid].Zone != -1) {
 					continue;
@@ -1192,7 +1190,7 @@ void MapSplitterEachCycle(void)
 	for (i = 0; i < RegionMax; ++i) {
 		// Try to complete this region
 		if (Regions[i].Dirty && Regions[i].TileCount && Regions[i].TileCount < 1024) {
-			for (k = 0; k < Regions[i].ConnectionsNumber; ++k) {
+			for (k = 0; k < (int)Regions[i].Connections.size(); ++k) {
 				j = Regions[i].Connections[k];
 
 
