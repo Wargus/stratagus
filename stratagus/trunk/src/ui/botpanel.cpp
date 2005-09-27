@@ -184,12 +184,12 @@ void CleanButtons(void)
 		delete[] UnitButtonTable[z]->AllowStr;
 		delete[] UnitButtonTable[z]->Hint;
 		delete[] UnitButtonTable[z]->UnitMask;
-		free(UnitButtonTable[z]);
+		delete UnitButtonTable[z];
 	}
 	NumUnitButtons = 0;
 
 	CurrentButtonLevel = 0;
-	free(CurrentButtons);
+	delete[] CurrentButtons;
 	CurrentButtons = NULL;
 }
 
@@ -659,7 +659,7 @@ void CButtonPanel::Update(void)
 	int sameType;   // 1 if all selected units are same type, 0 else.
 
 	// Default is no button.
-	free(CurrentButtons);
+	delete[] CurrentButtons;
 	CurrentButtons = NULL;
 
 	if (!NumSelected) {
