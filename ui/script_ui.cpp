@@ -55,11 +55,11 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-char* ClickMissile;              /// FIXME:docu
-char* DamageMissile;             /// FIXME:docu
+char *ClickMissile;              /// FIXME:docu
+char *DamageMissile;             /// FIXME:docu
 
 typedef struct _info_text_ {
-	char* Text;                  /// FIXME:docu
+	char *Text;                  /// FIXME:docu
 	int Font;                    /// FIXME:docu
 	int X;                       /// FIXME:docu
 	int Y;                       /// FIXME:docu
@@ -68,8 +68,7 @@ typedef struct _info_text_ {
 _ButtonStyleHash ButtonStyleHash;
 _CheckboxStyleHash CheckboxStyleHash;
 
-int NbAllPanels = 0; /// Number of panel
-InfoPanel* AllPanels = 0; /// Array of panels.
+std::vector<InfoPanel> AllPanels; /// Array of panels.
 
 static int HandleCount = 1;     /// Lua handler count
 
@@ -228,11 +227,11 @@ static int CclSetTitleScreens(lua_State* l)
 					delete[] TitleScreens[i]->Labels[j]->Text;
 					delete TitleScreens[i]->Labels[j];
 				}
-				free(TitleScreens[i]->Labels);
+				delete[] TitleScreens[i]->Labels;
 			}
-			free(TitleScreens[i]);
+			delete TitleScreens[i];
 		}
-		free(TitleScreens);
+		delete[] TitleScreens;
 		TitleScreens = NULL;
 	}
 
@@ -963,7 +962,7 @@ static void CclParseButtonIcons(lua_State *l, CUserInterface *ui)
 */
 static int GetIndexPanel(lua_State *l, const char *name)
 {
-	for (int i = 0; i < NbAllPanels; i++) {
+	for (int i = 0; i < (int)AllPanels.size(); ++i) {
 		if (!strcmp(name, AllPanels[i].Name)) {
 			return i;
 		}
@@ -2027,24 +2026,22 @@ static int CclDefinePanelContents(lua_State* l)
 				LuaError(l, "'%s' invalid for DefinePanels" _C_ key);
 			}
 		}
-		for (j = 0; j < infopanel.NContents; j++) { // Default value for invalid value.
+		for (j = 0; j < infopanel.NContents; ++j) { // Default value for invalid value.
 			content = infopanel.Contents + j;
 			content->PosX += infopanel.PosX;
 			content->PosY += infopanel.PosY;
 		}
-		for (j = 0; j < NbAllPanels; j++) {
+		for (j = 0; j < (int)AllPanels.size(); ++j) {
 			if (!strcmp(infopanel.Name, AllPanels[j].Name)) {
 				DebugPrint("Redefinition of Panel '%s'" _C_ infopanel.Name);
 				CleanPanel(&AllPanels[j]);
+				AllPanels[j] = infopanel;
 				break;
 			}
 		}
-		if (j == NbAllPanels) {
-			NbAllPanels++;
-			AllPanels = (InfoPanel *)realloc(AllPanels,
-				NbAllPanels * sizeof(*AllPanels));
+		if (j == (int)AllPanels.size()) {
+			AllPanels.push_back(infopanel);
 		}
-		AllPanels[j] = infopanel;
 	}
 	return 0;
 }
@@ -4082,7 +4079,7 @@ static int CclDefineButton(lua_State *l)
 			}
 			ba.UnitMask = s1;
 			if (!strncmp(ba.UnitMask, ",*,", 3)) {
-				free(ba.UnitMask);
+				delete[] ba.UnitMask;
 				ba.UnitMask = new_strdup("*");
 			}
 		} else {
@@ -4307,17 +4304,14 @@ static int CclAddMessage(lua_State *l)
 */
 static int CclResetKeystrokeHelp(lua_State *l)
 {
-	int n;
-
 	LuaCheckArgs(l, 0);
 
-	n = nKeyStrokeHelps * 2;
-	while (n--) {
-		delete[] KeyStrokeHelps[n];
+	std::vector<KeyStrokeHelp>::iterator i;
+	for (i = KeyStrokeHelps.begin(); i != KeyStrokeHelps.end(); ++i) {
+		delete[] (*i).Key;
+		delete[] (*i).Help;
 	}
-	free(KeyStrokeHelps);
-	KeyStrokeHelps = NULL;
-	nKeyStrokeHelps = 0;
+	KeyStrokeHelps.clear();
 
 	return 0;
 }
@@ -4376,29 +4370,14 @@ static int CclDefineMapSetup(lua_State *l)
 */
 static int CclAddKeystrokeHelp(lua_State *l)
 {
-	char *s1;
-	char *s2;
-	int n;
+	KeyStrokeHelp h;
 
 	LuaCheckArgs(l, 2);
 
-	s1 = new_strdup(LuaToString(l, 1));
-	s2 = new_strdup(LuaToString(l, 2));
+	h.Key = new_strdup(LuaToString(l, 1));
+	h.Help = new_strdup(LuaToString(l, 2));
 
-	n = nKeyStrokeHelps;
-	if (!n) {
-		n = 1;
-		KeyStrokeHelps = (char **)malloc(2 * sizeof(char*));
-	} else {
-		++n;
-		KeyStrokeHelps = (char **)realloc(KeyStrokeHelps, n * 2 * sizeof(char*));
-	}
-	if (KeyStrokeHelps) {
-		nKeyStrokeHelps = n;
-		--n;
-		KeyStrokeHelps[n * 2] = s1;
-		KeyStrokeHelps[n * 2 + 1] = s2;
-	}
+	KeyStrokeHelps.push_back(h);
 
 	return 0;
 }
