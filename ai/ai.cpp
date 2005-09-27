@@ -927,7 +927,7 @@ void CleanAi(void)
 	//  Free AiTypes.
 	//
 	for (aitype = AiTypes; aitype; aitype = (CAiType *)temp) {
-		delete aitype->Name;
+		delete[] aitype->Name;
 		delete[] aitype->Race;
 		delete[] aitype->Class;
 		delete[] aitype->Script;
