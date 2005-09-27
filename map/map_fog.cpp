@@ -821,9 +821,9 @@ void InitVisionTable(void)
 	int repeat;
 
 	// Initialize Visiontable to large size, can't be more entries than tiles.
-	VisionTable[0] = (unsigned char *)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
-	VisionTable[1] = (unsigned char *)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
-	VisionTable[2] = (unsigned char *)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	VisionTable[0] = new unsigned char[MaxMapWidth * MaxMapWidth];
+	VisionTable[1] = new unsigned char[MaxMapWidth * MaxMapWidth];
+	VisionTable[2] = new unsigned char[MaxMapWidth * MaxMapWidth];
 
 	VisionLookup = new int[MaxMapWidth + 2];
 #ifndef SQUAREVISION
@@ -940,11 +940,6 @@ void InitVisionTable(void)
 		VisionTable[2][VisionTablePosition] = 1;
 		i++;
 	}
-
-	// Update Size of VisionTable to what was used.
-	realloc(VisionTable[0], (VisionTablePosition + 2) * sizeof(int));
-	realloc(VisionTable[1], (VisionTablePosition + 2) * sizeof(int));
-	realloc(VisionTable[2], (VisionTablePosition + 2) * sizeof(int));
 #endif
 }
 
@@ -954,18 +949,12 @@ void InitVisionTable(void)
 void FreeVisionTable(void)
 {
 	// Free Vision Data
-	if (VisionTable[0]) {
-		free(VisionTable[0]);
-		VisionTable[0] = NULL;
-	}
-	if (VisionTable[1]) {
-		free(VisionTable[1]);
-		VisionTable[1] = NULL;
-	}
-	if (VisionTable[2]) {
-		free(VisionTable[2]);
-		VisionTable[2] = NULL;
-	}
+	delete[] VisionTable[0];
+	VisionTable[0] = NULL;
+	delete[] VisionTable[1];
+	VisionTable[1] = NULL;
+	delete[] VisionTable[2];
+	VisionTable[2] = NULL;
 	delete[] VisionLookup;
 	VisionLookup = NULL;
 }
