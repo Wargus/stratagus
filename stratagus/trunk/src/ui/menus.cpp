@@ -404,8 +404,7 @@ char MenuMapFullPath[1024];              /// Selected map path+name
 static char *SaveDir;                    /// Save game directory
 static char TempPathBuf[PATH_MAX];       /// Temporary buffer for paths
 
-int nKeyStrokeHelps;                     /// Number of keystroke help lines
-char** KeyStrokeHelps;                   /// Array of keystroke help lines
+std::vector<KeyStrokeHelp> KeyStrokeHelps; /// Array of keystroke help lines
 
 /// FIXME: -> ccl...
 static char *mgptsoptions[] = {
@@ -3134,13 +3133,13 @@ static void KeystrokeHelpVSAction(Menuitem* mi)
 {
 	int j;
 
-	j = ((mi->D.VSlider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
-	if ((mi->D.VSlider.cflags & MI_CFLAGS_DOWN) && j < nKeyStrokeHelps - 11) {
+	j = ((mi->D.VSlider.percent + 1) * (KeyStrokeHelps.size() - 11)) / 100;
+	if ((mi->D.VSlider.cflags & MI_CFLAGS_DOWN) && j < KeyStrokeHelps.size() - 11) {
 		++j;
 	} else if ((mi->D.VSlider.cflags & MI_CFLAGS_UP) && j > 0) {
 		--j;
 	}
-	mi->D.VSlider.percent = j * 100 / (nKeyStrokeHelps - 11);
+	mi->D.VSlider.percent = j * 100 / (KeyStrokeHelps.size() - 11);
 }
 
 /**
@@ -3151,12 +3150,12 @@ static void KeystrokeHelpDrawFunc(Menuitem* mi)
 	int i;
 	int j;
 
-	j = ((mi[-2].D.VSlider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
+	j = ((mi[-2].D.VSlider.percent + 1) * (KeyStrokeHelps.size() - 11)) / 100;
 	for (i = 0; i < 11; ++i) {
 		VideoDrawText(mi->Menu->X + mi->XOfs, mi->Menu->Y + mi->YOfs + (i * 20),
-			mi->Font, KeyStrokeHelps[j * 2]);
+			mi->Font, KeyStrokeHelps[j].Key);
 		VideoDrawText(mi->Menu->X + mi->XOfs + 80, mi->Menu->Y + mi->YOfs + (i * 20),
-			mi->Font, KeyStrokeHelps[j * 2 + 1]);
+			mi->Font, KeyStrokeHelps[j].Help);
 		++j;
 	}
 }

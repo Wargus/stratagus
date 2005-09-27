@@ -409,12 +409,10 @@ void CleanUserInterface(void)
 		UI_Table = NULL;
 	}
 
-	for (i = 0; i < NbAllPanels; i++) {
+	for (i = 0; i < (int)AllPanels.size(); ++i) {
 		CleanPanel(&AllPanels[i]);
 	}
-	free(AllPanels);
-	AllPanels = NULL;
-	NbAllPanels = 0;
+	AllPanels.clear();
 
 	// Free Title screen.
 	if (TitleScreens) {
