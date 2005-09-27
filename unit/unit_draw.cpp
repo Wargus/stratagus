@@ -39,6 +39,9 @@
 #include <string.h>
 
 #include "stratagus.h"
+
+#include <vector>
+
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
@@ -82,9 +85,13 @@ static inline max(int a, int b) { return a > b ? a : b; }
 ----------------------------------------------------------------------------*/
 
 /**
-** Decoration: health, mana.
+**  Decoration: health, mana.
 */
-typedef struct {
+class Decoration {
+public:
+	Decoration() : File(NULL), HotX(0), HotY(0), Width(0), Height(0),
+		Sprite(NULL) {}
+
 	char *File;       /// File containing the graphics data
 	int HotX;         /// X drawing position (relative)
 	int HotY;         /// Y drawing position (relative)
@@ -92,18 +99,18 @@ typedef struct {
 	int Height;       /// height of the decoration
 
 // --- FILLED UP ---
-	Graphic* Sprite;  /// loaded sprite images
-} Decoration;
+	Graphic *Sprite;  /// loaded sprite images
+};
 
 
 /**
 **	Structure grouping all Sprites for decoration.
 */
-typedef struct {
-	char **Name;             /// Name of the sprite.
-	Decoration *SpriteArray; /// Sprite to display variable.
-	int SpriteNumber;        /// Size of SpriteArray (same as size of SriteName).
-} DecoSpriteType;
+class DecoSpriteType {
+public:
+	std::vector<char *> Name;            /// Name of the sprite.
+	std::vector<Decoration> SpriteArray; /// Sprite to display variable.
+};
 
 static DecoSpriteType DecoSprite; /// All sprite's infos.
 
@@ -306,7 +313,7 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1,
 int GetSpriteIndex(const char *SpriteName)
 {
 	Assert(SpriteName);
-	for (int i = 0; i < DecoSprite.SpriteNumber; ++i) {
+	for (int i = 0; i < (int)DecoSprite.Name.size(); ++i) {
 		if (!strcmp(SpriteName, DecoSprite.Name[i])) {
 			return i;
 		}
@@ -321,7 +328,6 @@ int GetSpriteIndex(const char *SpriteName)
 */
 static int CclDefineSprites(lua_State *l)
 {
-	Decoration deco;      // temp decoration to stock arguments.
 	const char *name;     // name of the current sprite.
 	int args;             // number of arguments.
 	int i;                // iterator on argument.
@@ -330,10 +336,10 @@ static int CclDefineSprites(lua_State *l)
 
 	args = lua_gettop(l);
 	for (i = 0; i < args; ++i) {
-		lua_pushnil(l);
+		Decoration deco;
 
+		lua_pushnil(l);
 		name = 0;
-		memset(&deco, 0, sizeof(deco));
 		while (lua_next(l, i + 1)) {
 			key = LuaToString(l, -2); // key name
 			if (!strcmp(key, "Name")) {
@@ -368,19 +374,16 @@ static int CclDefineSprites(lua_State *l)
 		}
 		index = GetSpriteIndex(name);
 		if (index == -1) { // new sprite.
-			index = DecoSprite.SpriteNumber++;
-			DecoSprite.Name = (char **)realloc(DecoSprite.Name,
-				DecoSprite.SpriteNumber * sizeof(*DecoSprite.Name));
-			DecoSprite.Name[index] = new_strdup(name);
-			DecoSprite.SpriteArray = (Decoration*)realloc(DecoSprite.SpriteArray,
-				DecoSprite.SpriteNumber * sizeof(*DecoSprite.SpriteArray));
-			memset(DecoSprite.SpriteArray + index, 0, sizeof(*DecoSprite.SpriteArray));
+			index = DecoSprite.SpriteArray.size();
+			DecoSprite.Name.push_back(new_strdup(name));
+			DecoSprite.SpriteArray.push_back(deco);
+		} else {
+			delete[] DecoSprite.SpriteArray[index].File;
+			DecoSprite.SpriteArray[index] = deco;
 		}
-		free(DecoSprite.SpriteArray[index].File);
-		memcpy(DecoSprite.SpriteArray + index, &deco, sizeof(*DecoSprite.SpriteArray));
 		// Now verify validity.
-		if (DecoSprite.SpriteArray[index].File == 0) {
-			LuaError(l, "CclDefineSprites requires the Filen flag for sprite.");
+		if (DecoSprite.SpriteArray[index].File == NULL) {
+			LuaError(l, "CclDefineSprites requires the File flag for sprite.");
 		}
 		// FIXME check if file is valid with good size ?
 	}
@@ -738,13 +741,11 @@ void DecorationCclRegister(void)
 */
 void LoadDecorations(void)
 {
-	Decoration *deco;  // current decoration
-
-	for (int i = 0; i < DecoSprite.SpriteNumber; ++i) {
-		deco = &DecoSprite.SpriteArray[i];
-		ShowLoadProgress("Decorations `%s'", deco->File);
-		deco->Sprite = NewGraphic(deco->File, deco->Width, deco->Height);
-		deco->Sprite->Load();
+	std::vector<Decoration>::iterator i;
+	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
+		ShowLoadProgress("Decorations `%s'", (*i).File);
+		(*i).Sprite = NewGraphic((*i).File, (*i).Width, (*i).Height);
+		(*i).Sprite->Load();
 	}
 }
 
@@ -753,18 +754,14 @@ void LoadDecorations(void)
 */
 void CleanDecorations(void)
 {
-	Decoration *deco;  // current decoration
-
-	for (int i = 0; i < DecoSprite.SpriteNumber; ++i) {
-		deco = &DecoSprite.SpriteArray[i];
-		free(DecoSprite.Name[i]);
-		free(deco->File);
-		FreeGraphic(deco->Sprite);
+	for (int i = 0; i < (int)DecoSprite.SpriteArray.size(); ++i) {
+		delete[] DecoSprite.Name[i];
+		delete[] DecoSprite.SpriteArray[i].File;
+		FreeGraphic(DecoSprite.SpriteArray[i].Sprite);
 	}
 
-	free(DecoSprite.SpriteArray);
-	free(DecoSprite.Name);
-	memset(&DecoSprite, 0, sizeof(DecoSprite));
+	DecoSprite.Name.clear();
+	DecoSprite.SpriteArray.clear();
 }
 
 /**
@@ -877,7 +874,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 	Assert(unit->Variable[this->Index].Max);
 	Assert(this->NSprite != -1);
 
-	decosprite = &DecoSprite.SpriteArray[(int) this->NSprite];
+	decosprite = &DecoSprite.SpriteArray[(int)this->NSprite];
 	sprite = decosprite->Sprite;
 	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
 	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
@@ -908,7 +905,7 @@ void CDecoVarStaticSprite::Draw(int x, int y, const CUnit *unit) const
 	Graphic *sprite;         // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
 
-	decosprite = &DecoSprite.SpriteArray[(int) this->NSprite];
+	decosprite = &DecoSprite.SpriteArray[(int)this->NSprite];
 	sprite = decosprite->Sprite;
 	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
 	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
