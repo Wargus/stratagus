@@ -37,12 +37,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <string>
+#include <vector>
+#include <map>
+
 #include "ui.h"
 #include "util.h"
 #include "script.h"
-
-#include <string>
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Defines/Declarations
@@ -307,10 +308,17 @@ extern Menu* CurrentMenu;                     /// Current menu
 extern Graphic *MenuButtonGraphics[];/// Menu button graphics
 extern Graphic *MenuButtonG;         /// Current menu button graphics
 
-extern char MenuMapFullPath[1024];  /// Full path to currently selected map
+extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 
-extern int nKeyStrokeHelps;    /// Number of loaded keystroke helps
-extern char** KeyStrokeHelps;  /// Keystroke help pairs
+class KeyStrokeHelp {
+public:
+	KeyStrokeHelp() : Key(NULL), Help(NULL) {}
+
+	char *Key;
+	char *Help;
+};
+
+extern std::vector<KeyStrokeHelp> KeyStrokeHelps; /// Keystroke help pairs
 
 #define MENUS_MAXMENU 128  /// @todo wrong place, docu
 #define MENUS_MAXFUNC 128  /// @todo wrong place, docu

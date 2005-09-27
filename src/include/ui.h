@@ -40,6 +40,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
+
 #include "util.h"
 #include "video.h"
 #include "upgrade_structs.h"
@@ -337,6 +339,9 @@ public:
 */
 class InfoPanel {
 public:
+	InfoPanel() : Name(NULL), PosX(0), PosY(0), DefaultFont(0),
+		Contents(NULL), NContents(0), Condition(NULL) {}
+
 	char *Name;            /// Ident of the panel.
 	int PosX;              /// X coordinate of the panel.
 	int PosY;              /// Y coordinate of the panel.
@@ -348,8 +353,7 @@ public:
 	ConditionPanel *Condition; /// Condition to show the panel; if NULL, no condition.
 };
 
-extern int NbAllPanels;       /// Number of panel
-extern InfoPanel *AllPanels;  /// Array of panels.
+extern std::vector<InfoPanel> AllPanels;  /// Array of panels.
 
 
 class CButtonPanel
