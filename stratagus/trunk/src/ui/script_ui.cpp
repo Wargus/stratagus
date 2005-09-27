@@ -4048,8 +4048,11 @@ static int CclDefineButton(lua_State *l)
 				lua_rawgeti(l, -1, k + 1);
 				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
-				s1 = (char *)realloc(s1, strlen(s1) + strlen(s2) + 2);
-				strcat(s1, s2);
+				char *news1 = new char[strlen(s1) + strlen(s2) + 2];
+				strcpy(news1, s1);
+				strcat(news1, s2);
+				delete[] s1;
+				s1 = news1;
 				if (k != subargs - 1) {
 					strcat(s1, ",");
 				}
@@ -4073,9 +4076,12 @@ static int CclDefineButton(lua_State *l)
 				lua_rawgeti(l, -1, k + 1);
 				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
-				s1 = (char *)realloc(s1, strlen(s1) + strlen(s2) + 2);
-				strcat(s1, s2);
-				strcat(s1, ",");
+				char *news1 = new char[strlen(s1) + strlen(s2) + 2];
+				strcpy(news1, s1);
+				strcat(news1, s2);
+				strcat(news1, ",");
+				delete[] s1;
+				s1 = news1;
 			}
 			ba.UnitMask = s1;
 			if (!strncmp(ba.UnitMask, ",*,", 3)) {
