@@ -1073,24 +1073,20 @@ static int CclDefineUI(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			ui->NumFillers++;
-			ui->Filler = (Graphic **)realloc(ui->Filler, ui->NumFillers * sizeof(*ui->Filler));
-			ui->FillerX = (int *)realloc(ui->FillerX, ui->NumFillers * sizeof(*ui->FillerX));
-			ui->FillerY = (int *)realloc(ui->FillerY, ui->NumFillers * sizeof(*ui->FillerY));
 			lua_pushnil(l);
 			while (lua_next(l, j + 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "File")) {
-					ui->Filler[ui->NumFillers - 1] = NewGraphic(LuaToString(l, -1), 0, 0);
+					ui->Filler.push_back(NewGraphic(LuaToString(l, -1), 0, 0));
 				} else if (!strcmp(value, "Pos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					ui->FillerX[ui->NumFillers - 1] = LuaToNumber(l, -1);
+					ui->FillerX.push_back(LuaToNumber(l, -1));
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					ui->FillerY[ui->NumFillers - 1] = LuaToNumber(l, -1);
+					ui->FillerY.push_back(LuaToNumber(l, -1));
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2738,8 +2734,10 @@ static int CclDefineMenu(lua_State *l)
 	int j;
 
 	name = NULL;
-	UI.Offset640X = (Video.Width - 640) / 2;
-	UI.Offset480Y = (Video.Height - 480) / 2;
+	if (Video.Width) {
+		UI.Offset640X = (Video.Width - 640) / 2;
+		UI.Offset480Y = (Video.Height - 480) / 2;
+	}
 
 	//
 	// Parse the arguments, already the new tagged format.

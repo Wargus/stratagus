@@ -422,10 +422,9 @@ public:
 	char *ReverseFontColor;             /// Color for reverse text displayed
 
 	// Fillers
-	Graphic **Filler;                   /// Filler graphics
-	int *FillerX;                       /// Filler X positions
-	int *FillerY;                       /// Filler Y positions
-	int  NumFillers;                    /// Number of fillers
+	std::vector<Graphic *> Filler;      /// Filler graphics
+	std::vector<int> FillerX;           /// Filler X positions
+	std::vector<int> FillerY;           /// Filler Y positions
 
 	struct {
 		Graphic *G;                     /// icon graphic
