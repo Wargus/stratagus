@@ -3134,7 +3134,7 @@ static void KeystrokeHelpVSAction(Menuitem* mi)
 	int j;
 
 	j = ((mi->D.VSlider.percent + 1) * (KeyStrokeHelps.size() - 11)) / 100;
-	if ((mi->D.VSlider.cflags & MI_CFLAGS_DOWN) && j < KeyStrokeHelps.size() - 11) {
+	if ((mi->D.VSlider.cflags & MI_CFLAGS_DOWN) && j < (int)KeyStrokeHelps.size() - 11) {
 		++j;
 	} else if ((mi->D.VSlider.cflags & MI_CFLAGS_UP) && j > 0) {
 		--j;
