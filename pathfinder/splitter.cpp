@@ -217,8 +217,6 @@ RegionId NewRegion(int iswater)
 
 	Regions[result].TileCount = 0;
 	Regions[result].IsWater = iswater;
-	Regions[result].Connections = 0;
-	Regions[result].ConnectionsCount = 0;
 	Regions[result].ConnectionsNumber = 0;
 	Regions[result].FirstSegment = 0;
 	Regions[result].LastSegment = 0;
@@ -255,11 +253,9 @@ void RegionFree(RegionId regid)
 	}
 	Regions[regid].TileCount = 0;
 	if (Regions[regid].ConnectionsNumber) {
-		delete[] Regions[regid].Connections;
-		delete[] Regions[regid].ConnectionsCount;
+		Regions[regid].Connections.clear();
+		Regions[regid].ConnectionsCount.clear();
 	}
-	Regions[regid].Connections = 0;
-	Regions[regid].ConnectionsCount = 0;
 
 	cur = Regions[regid].FirstSegment;
 	while (cur) {
@@ -926,8 +922,6 @@ void InitaliseMapping(void)
 
 	for (i = 0; i < MaxRegionNumber; ++i) {
 		Regions[i].TileCount = 0;
-		Regions[i].Connections = 0;
-		Regions[i].ConnectionsCount = 0;
 		Regions[i].ConnectionsNumber = 0;
 		Regions[i].FirstSegment = 0;
 		Regions[i].LastSegment = 0;
@@ -1252,7 +1246,7 @@ void MapSplitterEachCycle(void)
 **
 ** @return Distance to place.
 */
-int PlaceReachable(const Unit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
+int PlaceReachable(const CUnit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
 {
 	static ZoneSet source = {0};
 	static ZoneSet dest = {0};

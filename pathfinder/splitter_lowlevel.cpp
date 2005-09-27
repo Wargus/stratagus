@@ -794,12 +794,10 @@ void RegionRescanAdjacents(RegionId regid)
 
 	// Set connections for region
 	if (adef->ConnectionsNumber) {
-		delete[] adef->Connections;
-		delete[] adef->ConnectionsCount;
+		adef->Connections.clear();
+		adef->ConnectionsCount.clear();
 	}
 
-	adef->Connections = 0;
-	adef->ConnectionsCount = 0;
 	adef->ConnectionsNumber = 0;
 	for (i = 0; i < ConnectionNumber; i++) {
 		adjreg = Connections[i];

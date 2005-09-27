@@ -1538,9 +1538,9 @@ void AiCanNotMove(CUnit *unit)
 	aitr->Next = AiPlayer->TransportRequests;
 	aitr->Unit = unit;
 	aitr->Order = unit->Orders[0];
-	RefsIncrease(unit);
+	unit->RefsIncrease();
 	if (aitr->Order.Goal) {
-		RefsIncrease(aitr->Order.Goal);
+		aitr->Order.Goal->RefsIncrease();
 	}
 	AiPlayer->TransportRequests = aitr;
 	return;
