@@ -632,11 +632,11 @@ void CleanUnitTypes(void)
 					f = b;
 					b = b->Next;
 					if (f->RestrictType == RestrictAddOn) {
-						free(f->Data.AddOn.ParentName);
+						delete[] f->Data.AddOn.ParentName;
 					} else if (f->RestrictType == RestrictOnTop) {
-						free(f->Data.OnTop.ParentName);
+						delete[] f->Data.OnTop.ParentName;
 					} else if (f->RestrictType == RestrictDistance) {
-						free(f->Data.Distance.RestrictTypeName);
+						delete[] f->Data.Distance.RestrictTypeName;
 					}
 					free(f);
 				}

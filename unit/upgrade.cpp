@@ -174,7 +174,7 @@ void CleanUpgrades(void)
 	//  Free the upgrade modifiers.
 	//
 	for (int i = 0; i < NumUpgradeModifiers; ++i) {
-		free(UpgradeModifiers[i]->Modifier.Variables);
+		delete[] UpgradeModifiers[i]->Modifier.Variables;
 		free(UpgradeModifiers[i]);
 	}
 	NumUpgradeModifiers = 0;
