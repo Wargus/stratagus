@@ -113,7 +113,6 @@ class ButtonStyle;
 	/// Icon: rectangle image used in menus
 class CIcon {
 public:
-
 	CIcon(const char *ident, int frame,
 		const char *file, int width, int height);
 	~CIcon();
@@ -125,12 +124,10 @@ public:
 		ButtonStyle *style, unsigned flags, int x, int y,
 		const char *text) const;
 
-
-
 	char *Ident;              /// Icon identifier
 	Graphic *G;               /// Graphic data
 	int Frame;                /// Frame number in graphic
-} ;
+};
 
 	/// Icon reference (used in config tables)
 class IconConfig {

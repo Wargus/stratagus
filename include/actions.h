@@ -49,7 +49,7 @@ class CUnitType;
 class CUpgrade;
 class SpellType;
 struct _order_;
-struct _animation_;
+class CAnimation;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -198,9 +198,9 @@ extern void HandleActionSpellCast(CUnit *unit);
 ----------------------------------------------------------------------------*/
 
 	/// Handle the animation of a unit
-extern int UnitShowAnimationScaled(CUnit *unit, const struct _animation_ *anim, int scale);
+extern int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale);
 	/// Handle the animation of a unit
-extern int UnitShowAnimation(CUnit *unit, const struct _animation_ *anim);
+extern int UnitShowAnimation(CUnit *unit, const CAnimation *anim);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions(void);
 	/// Unload an unit.

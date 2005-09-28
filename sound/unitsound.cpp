@@ -73,7 +73,7 @@ void LoadUnitSounds(void)
 /**
 **  Map animation sounds
 */
-static void MapAnimSounds2(Animation* anim)
+static void MapAnimSounds2(CAnimation *anim)
 {
 	int i;
 
