@@ -642,7 +642,7 @@ void CleanUnitTypes(void)
 				}
 				++x;
 			}
-			free(type->BuildingRules);
+			delete[] type->BuildingRules;
 		}
 		delete[] type->File;
 		delete[] type->ShadowFile;

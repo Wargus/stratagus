@@ -637,9 +637,9 @@ static int CclDefineUnitType(lua_State *l)
 					}
 					++x;
 				}
-				free(type->BuildingRules);
+				delete[] type->BuildingRules;
 			}
-			type->BuildingRules = (BuildRestriction **)malloc((subargs + 1) * sizeof(BuildRestriction*));
+			type->BuildingRules = new BuildRestriction *[subargs + 1];
 			type->BuildingRules[subargs] = NULL;
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
