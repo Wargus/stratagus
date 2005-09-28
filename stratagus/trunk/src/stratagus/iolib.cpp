@@ -328,31 +328,38 @@ int CFile::printf(char *format, ...)
 	int tp;
 	char *p;
 	va_list ap;
+	char *newp;
+	int oldsize;
 
 	size = 500;
 	ret = -1;
-	if ((p = (char*)malloc(size)) == NULL) {
+	if ((p = new char[size]) == NULL) {
 		return -1;
 	}
 	while (1) {
-		/* Try to print in the allocated space. */
+		// Try to print in the allocated space.
 		va_start(ap, format);
 		n = vsnprintf(p, size, format, ap);
 		va_end(ap);
-		/* If that worked, string was processed. */
+		// If that worked, string was processed.
 		if (n > -1 && n < size) {
 			break;
 		}
-		/* Else try again with more space. */
-		if (n > -1) { /* glibc 2.1 */
-			size = n + 1; /* precisely what is needed */
+		// Else try again with more space.
+		oldsize = size;
+		if (n > -1) { // glibc 2.1
+			size = n + 1; // precisely what is needed
 		} else {    /* glibc 2.0 */
 			DebugPrint("Something could be wrong in CLprintf.\n");
-			size *= 2;  /* twice the old size */
+			size *= 2;  // twice the old size
 		}
-		if ((p = (char*)realloc(p, size)) == NULL) {
+		if ((newp = new char[size]) == NULL) {
+			delete[] p;
 			return -1;
 		}
+		memcpy(newp, p, oldsize);
+		delete[] p;
+		p = newp;
 	}
 
 	// Allocate the correct size
@@ -375,7 +382,7 @@ int CFile::printf(char *format, ...)
 	} else {
 		errno = EBADF;
 	}
-	free(p);
+	delete[] p;
 	return ret;
 }
 
