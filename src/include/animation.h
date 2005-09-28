@@ -40,7 +40,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-typedef enum _animation_type_ {
+typedef enum AnimationType {
 	AnimationNone,
 	AnimationFrame,
 	AnimationExactFrame,
@@ -56,9 +56,10 @@ typedef enum _animation_type_ {
 	AnimationLabel,
 	AnimationGoto,
 	AnimationRandomGoto,
-} AnimationType;
+};
 
-typedef struct _animation_ {
+class CAnimation {
+public:
 	AnimationType Type;
 	union {
 		struct {
@@ -72,12 +73,12 @@ typedef struct _animation_ {
 			int MaxWait;
 		} RandomWait;
 		struct {
-			char* Name;
+			char *Name;
 			SoundId Sound;
 		} Sound;
 		struct {
-			char** Name;
-			SoundId* Sound;
+			char **Name;
+			SoundId *Sound;
 			int NumSounds;
 		} RandomSound;
 		struct {
@@ -90,38 +91,46 @@ typedef struct _animation_ {
 			int Begin;
 		} Unbreakable;
 		struct {
-			struct _animation_* Goto;
+			CAnimation *Goto;
 		} Goto;
 		struct {
 			int Random;
-			struct _animation_* Goto;
+			CAnimation *Goto;
 		} RandomGoto;
 	} D;
-	struct _animation_* Next;
-} Animation;
+	CAnimation *Next;
+};
 
-typedef struct _animations_ {
-	Animation* Start;
-	Animation* Still;
-	Animation* Death;
-	Animation* Attack;
-	Animation* Move;
-	Animation* Repair;
-	Animation* Train;
-	Animation* Research;
-	Animation* Upgrade;
-	Animation* Build;
-	Animation* Harvest[MaxCosts];
-} Animations;
+class CAnimations {
+public:
+	CAnimations() : Start(NULL), Still(NULL), Death(NULL), Attack(NULL),
+		Move(NULL), Repair(NULL), Train(NULL), Research(NULL),
+		Upgrade(NULL), Build(NULL)
+	{
+		memset(Harvest, 0, sizeof(Harvest));
+	}
+
+	CAnimation *Start;
+	CAnimation *Still;
+	CAnimation *Death;
+	CAnimation *Attack;
+	CAnimation *Move;
+	CAnimation *Repair;
+	CAnimation *Train;
+	CAnimation *Research;
+	CAnimation *Upgrade;
+	CAnimation *Build;
+	CAnimation *Harvest[MaxCosts];
+};
 
 
 #define ANIMATIONS_MAXANIM 1024
 
-extern Animation* AnimationsArray[ANIMATIONS_MAXANIM];
+extern CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
 extern int NumAnimations;
 
 	/// Hash table of all the animations
-extern std::map<std::string, Animations *> AnimationMap;
+extern std::map<std::string, CAnimations *> AnimationMap;
 
 
 /*----------------------------------------------------------------------------
@@ -129,7 +138,7 @@ extern std::map<std::string, Animations *> AnimationMap;
 ----------------------------------------------------------------------------*/
 
 	/// Get the animations structure by ident
-extern Animations* AnimationsByIdent(const char* ident);
+extern CAnimations *AnimationsByIdent(const char *ident);
 
 
 //@}

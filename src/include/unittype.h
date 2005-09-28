@@ -528,7 +528,7 @@ class Mng;
 
 class Graphic;
 class CConstruction;
-struct _animations_;
+class CAnimations;
 class MissileType;
 
 /**
@@ -538,6 +538,8 @@ class MissileType;
 */
 class MissileConfig {
 public:
+	MissileConfig() : Name(NULL), Missile(NULL) {}
+
 	char *Name;              /// Config missile name
 	MissileType *Missile;    /// Identifier to use to run time
 };
@@ -551,13 +553,13 @@ public:
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{
 #ifdef USE_OPENGL
-		memset(PlayerColorSpriteWhenLoaded, 0, sizeof(*PlayerColorSpriteWhenLoaded));
-		memset(PlayerColorSpriteWhenEmpty, 0, sizeof(*PlayerColorSpriteWhenEmpty));
+		memset(PlayerColorSpriteWhenLoaded, 0, sizeof(PlayerColorSpriteWhenLoaded));
+		memset(PlayerColorSpriteWhenEmpty, 0, sizeof(PlayerColorSpriteWhenEmpty));
 #endif
 	}
 
-	char*    FileWhenLoaded;        /// Change the graphic when the unit is loaded.
-	char*    FileWhenEmpty;         /// Change the graphic when the unit is empty.
+	char    *FileWhenLoaded;        /// Change the graphic when the unit is loaded.
+	char    *FileWhenEmpty;         /// Change the graphic when the unit is empty.
 	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
 	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
 	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
@@ -765,14 +767,14 @@ typedef enum {
 
 typedef struct _building_restrictions_ BuildRestriction;
 
-typedef enum {
+enum DistanceTypeType {
 	Equal,
 	NotEqual,
 	LessThan,
 	LessThanEqual,
 	GreaterThan,
 	GreaterThanEqual,
-} DistanceTypeType;
+};
 
 struct _building_restrictions_ {
 	RestrictTypeType RestrictType;
@@ -832,7 +834,7 @@ public:
 	int ShadowOffsetX;              /// Shadow horizontal offset
 	int ShadowOffsetY;              /// Shadow vertical offset
 
-	struct _animations_ *Animations;/// Animation scripts
+	CAnimations *Animations;        /// Animation scripts
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
@@ -971,6 +973,9 @@ extern CUnitType *UnitTypeOrcWall;            /// Orc wall
 */
 class CUnitTypeVar {
 public:
+	CUnitTypeVar() : BoolFlagName(NULL), NumberBoolFlag(0),
+		VariableName(NULL), Variable(NULL), NumberVariable(0) {}
+
 	char **BoolFlagName;                /// Array of name of user defined bool flag.
 	int NumberBoolFlag;                 /// Number of user defined bool flag.
 

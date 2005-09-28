@@ -236,7 +236,7 @@ void UpdateStats(int reset)
 **
 **  @return  Pointer to the animation structure.
 */
-Animations *AnimationsByIdent(const char *ident)
+CAnimations *AnimationsByIdent(const char *ident)
 {
 	return AnimationMap[ident];
 }
@@ -386,7 +386,7 @@ void DrawUnitType(const CUnitType* type, Graphic* sprite, int player, int frame,
 */
 static int GetStillFrame(CUnitType* type)
 {
-	Animation* anim;
+	CAnimation* anim;
 
 	anim = type->Animations->Still;
 	while (anim) {
@@ -561,10 +561,10 @@ void LoadUnitTypes(void)
 /**
 **  Clean animation
 */
-static void CleanAnimation(Animation* anim)
+static void CleanAnimation(CAnimation *anim)
 {
 	int i;
-	Animation* ptr;
+	CAnimation *ptr;
 
 	ptr = anim;
 	while (ptr->Type) {

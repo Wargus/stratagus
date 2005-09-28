@@ -86,7 +86,7 @@ static void UnitRotate(CUnit *unit, int rotate)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowAnimation(CUnit *unit, const Animation *anim) 
+int UnitShowAnimation(CUnit *unit, const CAnimation *anim) 
 {
 	return UnitShowAnimationScaled(unit, anim, 8);
 }
@@ -100,7 +100,7 @@ int UnitShowAnimation(CUnit *unit, const Animation *anim)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowAnimationScaled(CUnit *unit, const Animation *anim, int scale)
+int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 {
 	int move;
 
