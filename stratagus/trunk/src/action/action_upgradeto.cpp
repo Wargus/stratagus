@@ -64,7 +64,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 {
 	CPlayer *player;
 	CUnitType *oldtype;
-	const UnitStats *newstats;
+	const CUnitStats *newstats;
 	int x;
 	int y;
 	int i;
@@ -163,7 +163,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 {
 	CPlayer *player;
 	CUnitType *newtype;
-	const UnitStats *newstats;
+	const CUnitStats *newstats;
 
 	Assert(unit);
 

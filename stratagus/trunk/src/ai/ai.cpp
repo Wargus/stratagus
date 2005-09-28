@@ -1683,7 +1683,7 @@ void AiUpgradeToComplete(CUnit *unit, const CUnitType *what)
 **  @param unit  Pointer to unit working.
 **  @param what  Pointer to the new upgrade.
 */
-void AiResearchComplete(CUnit *unit, const Upgrade *what)
+void AiResearchComplete(CUnit *unit, const CUpgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_

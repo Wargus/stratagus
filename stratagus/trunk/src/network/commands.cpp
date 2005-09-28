@@ -1364,7 +1364,7 @@ void SendCommandCancelUpgradeTo(CUnit *unit)
 ** @param what     research-type of the research.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResearch(CUnit *unit, Upgrade *what, int flush)
+void SendCommandResearch(CUnit *unit, CUpgrade *what, int flush)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("research", unit, flush, -1, -1, NoUnitP, what->Ident, -1);

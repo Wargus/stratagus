@@ -127,7 +127,7 @@ int DefaultResourceAmounts[MaxCosts];
 void UpdateStats(int reset)
 {
 	CUnitType* type;
-	UnitStats* stats;
+	CUnitStats* stats;
 	int player;
 	unsigned i;
 
@@ -249,7 +249,7 @@ Animations *AnimationsByIdent(const char *ident)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
+static void SaveUnitStats(const CUnitStats* stats, const char* ident, int plynr,
 	CFile* file)
 {
 	int j;

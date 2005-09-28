@@ -48,7 +48,7 @@
 
 class CUnit;
 class CUnitType;
-struct _upgrade_;
+class CUpgrade;
 class CPlayer;
 
 /**
@@ -200,7 +200,7 @@ public:
 	unsigned long         LastCanNotMoveGameCycle;  /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;     /// Upgrade to unit-type requested and priority list
-	std::vector<struct _upgrade_ *> ResearchRequests;/// Upgrades requested and priority list
+	std::vector<CUpgrade *> ResearchRequests;       /// Upgrades requested and priority list
 	AiBuildQueue         *UnitTypeBuilt;            /// What the resource manager should build
 	int                   LastRepairBuilding;       /// Last building checked for repair in this turn
 	unsigned              TriedRepairWorkers[UnitMax];/// No. workers that failed trying to repair a building
@@ -274,7 +274,7 @@ extern void AiAddUnitTypeRequest(CUnitType *type, int count);
 	/// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(CUnitType *type);
 	/// Add research request to resource manager
-extern void AiAddResearchRequest(struct _upgrade_ *upgrade);
+extern void AiAddResearchRequest(CUpgrade *upgrade);
 	/// Periodic called resource manager handler
 extern void AiResourceManager(void);
 	/// Ask the ai to explore around x,y

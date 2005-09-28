@@ -363,14 +363,14 @@
 
 class CUnit;
 class CUnitType;
-class UnitStats;
+class CUnitStats;
 struct _new_animation;
 class CPlayer;
 class SpellType;
 struct _unit_colors_;
 class CConstructionFrame;
 class VariableType;
-struct _upgrade_;
+class CUpgrade;
 struct _building_restrictions_;
 class CFile;
 struct lua_State;
@@ -441,8 +441,8 @@ typedef struct _order_ {
 		} Patrol;                     /// position.
 		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
 		SpellType *Spell;             /// spell when casting.
-		struct _upgrade_* Upgrade;    /// upgrade.
-		struct _order_* Order;        /// FIXME : seems to be a hack for free memory.
+		CUpgrade *Upgrade;            /// upgrade.
+		struct _order_ *Order;        /// FIXME : seems to be a hack for free memory.
 	} Arg1;             /// Extra command argument.
 } Order;
 
@@ -518,10 +518,10 @@ public:
 	int X; /// Map position X
 	int Y; /// Map position Y
 
-	CUnitType *Type;              /// Pointer to unit-type (peon,...)
-	CPlayer   *Player;            /// Owner of this unit
-	UnitStats *Stats;             /// Current unit stats
-	int        CurrentSightRange; /// Unit's Current Sight Range
+	CUnitType  *Type;              /// Pointer to unit-type (peon,...)
+	CPlayer    *Player;            /// Owner of this unit
+	CUnitStats *Stats;             /// Current unit stats
+	int         CurrentSightRange; /// Unit's Current Sight Range
 
 // DISPLAY:
 	struct _unit_colors_* Colors; /// Player colors
@@ -626,7 +626,7 @@ public:
 		int Cycles;                 /// Cycles unit has been repairing for
 	} Repair; /// Repairing unit
 	struct _order_research_ {
-		struct _upgrade_* Upgrade;  /// Upgrade researched
+		CUpgrade *Upgrade;          /// Upgrade researched
 	} Research; /// Research action
 	struct _order_upgradeto_ {
 		int Ticks; /// Ticks to complete

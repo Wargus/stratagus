@@ -86,7 +86,7 @@ static int CclDefineAiHelper(lua_State *l)
 	int what;
 	CUnitType *base;
 	CUnitType *type;
-	Upgrade *upgrade;
+	CUpgrade *upgrade;
 	int cost;
 	int args;
 	int j;
@@ -367,7 +367,7 @@ static void InsertUpgradeToRequests(CUnitType *type)
 **
 **  @param upgrade  Upgrade to be appended.
 */
-static void InsertResearchRequests(Upgrade *upgrade)
+static void InsertResearchRequests(CUpgrade *upgrade)
 {
 	AiPlayer->ResearchRequests.push_back(upgrade);
 }
@@ -786,7 +786,7 @@ static int CclAiSleep(lua_State* l)
 static int CclAiResearch(lua_State* l)
 {
 	const char* str;
-	Upgrade* upgrade;
+	CUpgrade* upgrade;
 
 	LuaCheckArgs(l, 1);
 	if ((str = LuaToString(l, 1))) {

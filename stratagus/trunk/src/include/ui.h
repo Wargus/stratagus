@@ -55,7 +55,6 @@
 ----------------------------------------------------------------------------*/
 
 class CUnit;
-struct _button_action_;
 class CFile;
 
 /*----------------------------------------------------------------------------
@@ -264,7 +263,7 @@ public:
 
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)
-} ;
+};
 
 class ContentType;
 typedef void FDrawData(const CUnit *unit, ContentType *content, int defaultfont);
@@ -359,6 +358,14 @@ extern std::vector<InfoPanel> AllPanels;  /// Array of panels.
 class CButtonPanel
 {
 public:
+	CButtonPanel() : G(NULL), X(0), Y(0), Buttons(NULL), NumButtons(0),
+		ShowCommandKey(false)
+	{
+		AutoCastBorderColorRGB.r = 0;
+		AutoCastBorderColorRGB.g = 0;
+		AutoCastBorderColorRGB.b = 0;
+	}
+
 	void Draw();
 	void Update();
 	void DoClicked(int button);
@@ -376,6 +383,8 @@ public:
 class CInfoPanel
 {
 public:
+	CInfoPanel() : G(NULL), X(0), Y(0) {}
+
 	void Draw();
 
 	Graphic *G;
@@ -386,6 +395,11 @@ public:
 class CStatusLine
 {
 public:
+	CStatusLine() : W(0), TextX(0), TextY(0), Font(0)
+	{
+		StatusLine[0] = '\0';
+	}
+
 	void Draw();
 	void Set(const char *status);
 	void Clear();
@@ -552,7 +566,7 @@ typedef hashtable(ButtonStyle *, 128) _ButtonStyleHash;
 extern _ButtonStyleHash ButtonStyleHash;
 
 	/// Hash table of all the checkbox styles
-typedef hashtable(CheckboxStyle *,128) _CheckboxStyleHash;
+typedef hashtable(CheckboxStyle *, 128) _CheckboxStyleHash;
 extern _CheckboxStyleHash CheckboxStyleHash;
 
 extern char RightButtonAttacks;         /// right button 0 move, 1 attack.

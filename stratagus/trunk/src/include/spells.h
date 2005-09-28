@@ -48,6 +48,7 @@ class CUnitType;
 class CPlayer;
 struct lua_State;
 class SpellType;
+class MissileType;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -157,7 +158,7 @@ public:
 	int Delay;                              /// Missile original delay.
 	SpellActionMissileLocation StartPoint;  /// Start point description.
 	SpellActionMissileLocation EndPoint;    /// Start point description.
-	MissileType* Missile;                   /// Missile fired on cast
+	MissileType *Missile;                   /// Missile fired on cast
 };
 
 class Demolish : public SpellActionType {
@@ -180,7 +181,7 @@ public:
 	int Damage;             /// Damage for every shard.
 	int StartOffsetX;       /// The offset of the missile start point to the hit location.
 	int StartOffsetY;       /// The offset of the missile start point to the hit location.
-	MissileType* Missile;   /// Missile fired on cast
+	MissileType *Missile;   /// Missile fired on cast
 };
 
 class SpawnPortal : public SpellActionType {
