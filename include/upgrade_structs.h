@@ -57,7 +57,7 @@ class VariableType;
 /**
 **  Indices into costs/resource/income array.
 */
-typedef enum _costs_ {
+enum CostType {
 	TimeCost,                               /// time in game cycles
 
 // standard
@@ -70,7 +70,7 @@ typedef enum _costs_ {
 	Cost6,                                  /// resource 6
 
 	MaxCosts                                /// how many different costs
-} CostType;
+};
 
 #define FoodCost MaxCosts
 #define ScoreCost (MaxCosts + 1)
@@ -113,12 +113,12 @@ extern int DefaultIncomes[MaxCosts];
 /**
 **  Default action for the resources.
 */
-extern char* DefaultActions[MaxCosts];
+extern char *DefaultActions[MaxCosts];
 
 /**
 **  Default names for the resources.
 */
-extern char* DefaultResourceNames[MaxCosts];
+extern char *DefaultResourceNames[MaxCosts];
 
 /**
 **  Default amounts for the resources.
@@ -126,24 +126,35 @@ extern char* DefaultResourceNames[MaxCosts];
 extern int DefaultResourceAmounts[MaxCosts];
 
 /**
-**  This are the current stats of an unit. Upgraded or downgraded.
+**  These are the current stats of a unit. Upgraded or downgraded.
 */
-class UnitStats {
+class CUnitStats {
 public:
-	VariableType *Variables;        /// userdefined variable.
+	CUnitStats() : Variables(NULL)
+	{
+		memset(Costs, 0, MaxCosts * sizeof(int));
+	}
+
+	VariableType *Variables;        /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 };
 
 /**
 **  The main useable upgrades.
 */
-typedef struct _upgrade_ {
-	char*       Ident;                      /// identifier
-	int         ID;                         /// numerical id
-	int         Costs[MaxCosts];            /// costs for the upgrade
+class CUpgrade {
+public:
+	CUpgrade() : Ident(NULL), ID(0)
+	{
+		memset(Costs, 0, MaxCosts * sizeof(int));
+	}
+
+	char *Ident;                      /// identifier
+	int   ID;                         /// numerical id
+	int   Costs[MaxCosts];            /// costs for the upgrade
 		// TODO: not used by buttons
-	IconConfig  Icon;                       /// icon to display to the user
-} Upgrade;
+	IconConfig Icon;                  /// icon to display to the user
+};
 
 /*----------------------------------------------------------------------------
 --  upgrades and modifiers
@@ -154,11 +165,18 @@ typedef struct _upgrade_ {
 **  This do the real action of an upgrade, an upgrade can have multiple
 **  modifiers.
 */
-typedef struct _upgrade_modifier_ {
+class CUpgradeModifier {
+public:
+	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL)
+	{
+		memset(ChangeUnits, 0, UnitTypeMax * sizeof(int));
+		memset(ChangeUpgrades, 0, UpgradeMax * sizeof(char));
+		memset(ApplyTo, 0, UnitTypeMax * sizeof(char));
+	}
 
 	int UpgradeId;                      /// used to filter required modifier
 
-	UnitStats Modifier;                 /// modifier of unit stats.
+	CUnitStats Modifier;                 /// modifier of unit stats.
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
@@ -170,7 +188,7 @@ typedef struct _upgrade_modifier_ {
 
 	CUnitType *ConvertTo;      /// convert to this unit-type.
 
-} UpgradeModifier;
+};
 
 /**
 **  Allow what a player can do. Every #Player has an own allow struct.
@@ -185,16 +203,26 @@ typedef struct _upgrade_modifier_ {
 **    @li `E' -- enabled, allowed by level but currently forbidden
 **    @li `X' -- fixed, acquired can't be disabled
 */
-typedef struct _allow_ {
+class CAllow {
+public:
+	CAllow() {
+		memset(Units, 0, UnitTypeMax * sizeof(int));
+		memset(Upgrades, 0, UpgradeMax * sizeof(char));
+	}
+
 	int  Units[UnitTypeMax];        /// maximum amount of units allowed
 	char Upgrades[UpgradeMax];      /// upgrades allowed/disallowed
-} Allow;
+};
 
 /**
 **  Upgrade timer used in the player structure.
 **  Every player has an own UpgradeTimers struct.
 */
-typedef struct _upgrade_timers_ {
+class CUpgradeTimers {
+public:
+	CUpgradeTimers() {
+		memset(Upgrades, 0, UpgradeMax * sizeof(int));
+	}
 
 	/**
 	**  all 0 at the beginning, all upgrade actions do increment values in
@@ -202,13 +230,13 @@ typedef struct _upgrade_timers_ {
 	*/
 	int Upgrades[UpgradeMax];       /// counter for each upgrade
 
-} UpgradeTimers;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<Upgrade *> AllUpgrades;  /// the main user usable upgrades
+extern std::vector<CUpgrade *> AllUpgrades;  /// the main user usable upgrades
 
 //@}
 

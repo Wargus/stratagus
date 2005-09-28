@@ -267,7 +267,7 @@
 **    @li  `R' -- acquired, perhaps other values
 **    @li  `Q' -- acquired but forbidden (does it make sense?:))
 **    @li  `E' -- enabled, allowed by level but currently forbidden
-**    @see _allow_
+**    @see CAllow
 **
 **  CPlayer::UpgradeTimers
 **
@@ -351,8 +351,8 @@ public:
 	struct _unit_colors_ UnitColors;  /// Unit colors for new units
 
 	// Upgrades/Allows:
-	struct _allow_ Allow;                  /// Allowed for player
-	struct _upgrade_timers_ UpgradeTimers; /// Timer for the upgrades
+	CAllow Allow;                 /// Allowed for player
+	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 
 	/// Change player side

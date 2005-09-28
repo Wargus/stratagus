@@ -311,8 +311,8 @@ static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>:
 **
 **  @return                damage inflicted to goal.
 */
-static int CalculateDamageStats(const UnitStats *attacker_stats,
-	const UnitStats *goal_stats, int bloodlust, int xp)
+static int CalculateDamageStats(const CUnitStats *attacker_stats,
+	const CUnitStats *goal_stats, int bloodlust, int xp)
 {
 	int damage;
 	int basic_damage;
@@ -868,7 +868,7 @@ static void MissileHitsGoal(const Missile *missile, CUnit *goal, int splash)
 */
 static void MissileHitsWall(const Missile *missile, int x, int y, int splash)
 {
-	UnitStats *stats; // stat of the wall.
+	CUnitStats *stats; // stat of the wall.
 
 	if (!WallOnMap(x, y)) {
 		return;

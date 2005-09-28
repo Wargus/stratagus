@@ -1030,7 +1030,7 @@ static int CclDefineUnitStats(lua_State *l)
 {
 	const char *value;
 	CUnitType *type;
-	UnitStats *stats;
+	CUnitStats *stats;
 	int i;
 	int args;
 	int j;

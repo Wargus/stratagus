@@ -513,7 +513,7 @@ static int AiMakeUnit(CUnitType *type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiResearchUpgrade(const CUnitType *type, Upgrade *what)
+static int AiResearchUpgrade(const CUnitType *type, CUpgrade *what)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
@@ -550,7 +550,7 @@ static int AiResearchUpgrade(const CUnitType *type, Upgrade *what)
 **
 **  @param upgrade  Upgrade to research
 */
-void AiAddResearchRequest(Upgrade *upgrade)
+void AiAddResearchRequest(CUpgrade *upgrade)
 {
 	int i;
 	int n;

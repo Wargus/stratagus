@@ -82,11 +82,7 @@ class ButtonAction {
 public:
 	ButtonAction() : Pos(0), Level(0), Action(ButtonMove), Value(0),
 		ValueStr(NULL), Allowed(NULL), AllowStr(NULL), UnitMask(NULL),
-		Key(0), Hint(NULL)
-	{
-		Icon.Name = NULL;
-		Icon.Icon = NULL;
-	}
+		Key(0), Hint(NULL) {}
 
 	int Pos;          /// button position in the grid
 	int Level;        /// requires button level

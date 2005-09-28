@@ -529,6 +529,7 @@ class Mng;
 class Graphic;
 class CConstruction;
 struct _animations_;
+class MissileType;
 
 /**
 **  Missile type definition (used in config tables)
@@ -537,8 +538,8 @@ struct _animations_;
 */
 class MissileConfig {
 public:
-	char*        Name;              /// Config missile name
-	MissileType* Missile;           /// Identifier to use to run time
+	char *Name;              /// Config missile name
+	MissileType *Missile;    /// Identifier to use to run time
 };
 
 class ResourceInfo {
@@ -945,7 +946,7 @@ public:
 	unsigned MovementMask;          /// Unit check this map flags for move
 
 	/// @todo This stats should? be moved into the player struct
-	UnitStats Stats[PlayerMax];     /// Unit status for each player
+	CUnitStats Stats[PlayerMax];     /// Unit status for each player
 
 	Graphic *Sprite;                /// Sprite images
 	Graphic *ShadowSprite;          /// Shadow sprite image

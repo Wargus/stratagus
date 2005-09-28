@@ -1784,14 +1784,14 @@ static ConditionPanel *ParseConditionPanel(lua_State* l)
 **  @param l  Lua state.
 **  @return   0.
 */
-static int CclDefinePanelContents(lua_State* l)
+static int CclDefinePanelContents(lua_State *l)
 {
 	int i;                  // iterator for arguments.
 	int j;                  // iterator for contents and panels.
 	int nargs;              // number of arguments.
-	const char* key;        // key of lua table.
+	const char *key;        // key of lua table.
 	InfoPanel infopanel;    // variable for transit.
-	ContentType* content;   // content of the panel.
+	ContentType *content;   // content of the panel.
 
 	nargs = lua_gettop(l);
 	for (i = 0; i < nargs; i++) {
@@ -2047,10 +2047,10 @@ static int CclDefinePanelContents(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineViewports(lua_State* l)
+static int CclDefineViewports(lua_State *l)
 {
-	const char* value;
-	CUserInterface* ui;
+	const char *value;
+	CUserInterface *ui;
 	int i;
 	int args;
 	int j;
@@ -2095,7 +2095,7 @@ static int CclDefineViewports(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetMouseScroll(lua_State* l)
+static int CclSetMouseScroll(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UI.MouseScroll = LuaToBoolean(l, 1);
@@ -2107,7 +2107,7 @@ static int CclSetMouseScroll(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetMouseScrollSpeed(lua_State* l)
+static int CclSetMouseScrollSpeed(lua_State *l)
 {
 	int speed;
 
@@ -2126,7 +2126,7 @@ static int CclSetMouseScrollSpeed(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetGrabMouse(lua_State* l)
+static int CclSetGrabMouse(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (!lua_isboolean(l, 1)) {
@@ -2145,7 +2145,7 @@ static int CclSetGrabMouse(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetLeaveStops(lua_State* l)
+static int CclSetLeaveStops(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	LeaveStops = LuaToBoolean(l, 1);
@@ -2157,7 +2157,7 @@ static int CclSetLeaveStops(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetKeyScroll(lua_State* l)
+static int CclSetKeyScroll(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UI.KeyScroll = LuaToBoolean(l, 1);
@@ -2169,7 +2169,7 @@ static int CclSetKeyScroll(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetKeyScrollSpeed(lua_State* l)
+static int CclSetKeyScrollSpeed(lua_State *l)
 {
 	int speed;
 
@@ -2188,7 +2188,7 @@ static int CclSetKeyScrollSpeed(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetShowCommandKey(lua_State* l)
+static int CclSetShowCommandKey(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UI.ButtonPanel.ShowCommandKey = LuaToBoolean(l, 1);
@@ -2201,7 +2201,7 @@ static int CclSetShowCommandKey(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclRightButtonAttacks(lua_State* l)
+static int CclRightButtonAttacks(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	RightButtonAttacks = 1;
@@ -2213,7 +2213,7 @@ static int CclRightButtonAttacks(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclRightButtonMoves(lua_State* l)
+static int CclRightButtonMoves(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	RightButtonAttacks = 0;
@@ -2225,7 +2225,7 @@ static int CclRightButtonMoves(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetFancyBuildings(lua_State* l)
+static int CclSetFancyBuildings(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	FancyBuildings = LuaToBoolean(l, 1);
@@ -2239,11 +2239,11 @@ static int CclSetFancyBuildings(lua_State* l)
 **
 **  @return       Button style, NULL if not found.
 */
-ButtonStyle* FindButtonStyle(const char* style)
+ButtonStyle* FindButtonStyle(const char *style)
 {
-	ButtonStyle** s;
+	ButtonStyle **s;
 
-	s = (ButtonStyle**)hash_find(ButtonStyleHash, style);
+	s = (ButtonStyle **)hash_find(ButtonStyleHash, style);
 	if (!s) {
 		return NULL;
 	} else {
@@ -2781,7 +2781,7 @@ static int CclDefineMenu(lua_State *l)
 */
 		} else if (!strcmp(value, "init")) {
 			value = LuaToString(l, j + 1);
-			func = (void**)hash_find(MenuFuncHash, value);
+			func = (void **)hash_find(MenuFuncHash, value);
 			if (func != NULL) {
 				item.InitFunc = (InitFuncType)*func;
 			} else {
@@ -2789,7 +2789,7 @@ static int CclDefineMenu(lua_State *l)
 			}
 		} else if (!strcmp(value, "exit")) {
 			value = LuaToString(l, j + 1);
-			func = (void**)hash_find(MenuFuncHash, value);
+			func = (void **)hash_find(MenuFuncHash, value);
 			if (func != NULL) {
 				item.ExitFunc = (ExitFuncType)*func;
 			} else {
@@ -2797,7 +2797,7 @@ static int CclDefineMenu(lua_State *l)
 			}
 		} else if (!strcmp(value, "netaction")) {
 			value = LuaToString(l, j + 1);
-			func = (void**)hash_find(MenuFuncHash, value);
+			func = (void **)hash_find(MenuFuncHash, value);
 			if (func != NULL) {
 				item.NetAction = (NetActionType)*func;
 			} else {
@@ -3048,7 +3048,7 @@ static void ParseMenuItemButton(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Button.Handler = (MenuitemButtonHandlerType)*func;
 				} else {
@@ -3144,7 +3144,7 @@ static void ParseMenuItemPulldown(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Pulldown.action = (MenuitemPulldownActionType)*func;
 				} else {
@@ -3228,7 +3228,7 @@ static void ParseMenuItemListbox(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Listbox.action = (MenuitemListboxActionType)*func;
 				} else {
@@ -3250,7 +3250,7 @@ static void ParseMenuItemListbox(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Listbox.handler = (MenuitemListboxHandlerType)*func;
 				} else {
@@ -3270,7 +3270,7 @@ static void ParseMenuItemListbox(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Listbox.retrieveopt = (MenuitemListboxRetrieveType)(*func);
 				} else {
@@ -3382,7 +3382,7 @@ static void ParseMenuItemVSlider(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.VSlider.action = (MenuitemVSliderActionType)*func;
 				} else {
@@ -3404,7 +3404,7 @@ static void ParseMenuItemVSlider(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.VSlider.handler = (MenuitemVSliderHandlerType)*func;
 				} else {
@@ -3508,7 +3508,7 @@ static void ParseMenuItemHSlider(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.HSlider.action = (MenuitemHSliderActionType)*func;
 				} else {
@@ -3530,7 +3530,7 @@ static void ParseMenuItemHSlider(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.HSlider.handler = (MenuitemHSliderHandlerType)*func;
 				} else {
@@ -3628,7 +3628,7 @@ static void ParseMenuItemInput(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Input.action = (MenuitemInputActionType)*func;
 				} else {
@@ -3706,7 +3706,7 @@ static void ParseMenuItemCheckbox(lua_State *l, Menuitem *item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				func = (void**)hash_find(MenuFuncHash, value);
+				func = (void **)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Checkbox.Action = (MenuitemCheckboxActionType)*func;
 				} else {
@@ -4232,7 +4232,7 @@ static int CclSetShowReactionRange(lua_State *l)
 	}
 
 	if (lua_isstring(l, 1)) {
-		const char* flag;
+		const char *flag;
 
 		flag = lua_tostring(l, 1);
 		if (!strcmp(flag, "rectangle")) {

@@ -70,16 +70,16 @@ static void AllowUpgradeId(CPlayer *player, int id, char af);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<Upgrade *> AllUpgrades;           /// The main user useable upgrades
+std::vector<CUpgrade *> AllUpgrades;           /// The main user useable upgrades
 
 	/// How many upgrades modifiers supported
 #define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
 	/// Upgrades modifiers
-static UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+static CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 	/// Number of upgrades modifiers used
 static int NumUpgradeModifiers;
 
-std::map<std::string, Upgrade *> Upgrades;
+std::map<std::string, CUpgrade *> Upgrades;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -96,16 +96,16 @@ std::map<std::string, Upgrade *> Upgrades;
 **
 **  @return       upgrade id or -1 for error
 */
-static Upgrade *AddUpgrade(const char *ident, const char *icon,
+static CUpgrade *AddUpgrade(const char *ident, const char *icon,
 	const int *costs)
 {
-	Upgrade *upgrade = Upgrades[ident];
+	CUpgrade *upgrade = Upgrades[ident];
 
 	if (upgrade) {
 		DebugPrint("Already defined upgrade `%s'\n" _C_ ident);
 		delete[] upgrade->Icon.Name;
 	} else {
-		upgrade = new Upgrade;
+		upgrade = new CUpgrade;
 		upgrade->Ident = new_strdup(ident);
 		upgrade->ID = AllUpgrades.size();
 		Upgrades[ident] = upgrade;
@@ -133,9 +133,9 @@ static Upgrade *AddUpgrade(const char *ident, const char *icon,
 **  @param ident  The upgrade identifier.
 **  @return       Upgrade pointer or NULL if not found.
 */
-Upgrade *UpgradeByIdent(const char *ident)
+CUpgrade *UpgradeByIdent(const char *ident)
 {
-	Upgrade* upgrade = Upgrades[ident];
+	CUpgrade *upgrade = Upgrades[ident];
 	if (!upgrade) {
 		DebugPrint("Upgrade %s not found\n" _C_ ident);
 	}
@@ -148,7 +148,7 @@ Upgrade *UpgradeByIdent(const char *ident)
 void InitUpgrades(void)
 {
 	// Resolve the icons.
-	for (std::vector<Upgrade *>::size_type i = 0; i < AllUpgrades.size(); ++i) {
+	for (std::vector<CUpgrade *>::size_type i = 0; i < AllUpgrades.size(); ++i) {
 		AllUpgrades[i]->Icon.Icon = IconByIdent(AllUpgrades[i]->Icon.Name);
 	}
 }
@@ -162,7 +162,7 @@ void CleanUpgrades(void)
 	//  Free the upgrades.
 	//
 	while (AllUpgrades.size()) {
-		Upgrade *upgrade = AllUpgrades.back();
+		CUpgrade *upgrade = AllUpgrades.back();
 		AllUpgrades.pop_back();
 		delete[] upgrade->Ident;
 		delete[] upgrade->Icon.Name;
@@ -175,7 +175,7 @@ void CleanUpgrades(void)
 	//
 	for (int i = 0; i < NumUpgradeModifiers; ++i) {
 		delete[] UpgradeModifiers[i]->Modifier.Variables;
-		free(UpgradeModifiers[i]);
+		delete UpgradeModifiers[i];
 	}
 	NumUpgradeModifiers = 0;
 }
@@ -210,7 +210,7 @@ void SaveUpgrades(CFile *file)
 	//
 	//  Save the upgrades
 	//
-	for (std::vector<Upgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
+	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
 		file->printf("DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
 			file->printf("%c", Players[p].Allow.Upgrades[j]);
@@ -232,13 +232,13 @@ static int CclDefineModifier(lua_State *l)
 {
 	const char *key;
 	const char *value;
-	UpgradeModifier *um;
+	CUpgradeModifier *um;
 	int args;
 	int j;
 
 	args = lua_gettop(l);
 
-	um = (UpgradeModifier *)calloc(1, sizeof(*um));
+	um = new CUpgradeModifier;
 
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
@@ -532,7 +532,7 @@ int UnitTypeIdByIdent(const char *ident)
 */
 int UpgradeIdByIdent(const char *ident)
 {
-	const Upgrade *upgrade;
+	const CUpgrade *upgrade;
 
 	if ((upgrade = UpgradeByIdent(ident))) {
 		return upgrade->ID;
@@ -596,7 +596,7 @@ static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void ApplyUpgradeModifier(CPlayer *player, const UpgradeModifier *um)
+static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 {
 	int z;                      // iterator on upgrade or unittype.
 	int j;                      // iterator on cost or variable.
@@ -716,7 +716,7 @@ static void ApplyUpgradeModifier(CPlayer *player, const UpgradeModifier *um)
 **  @param player   Player researching the upgrade.
 **  @param upgrade  Upgrade ready researched.
 */
-void UpgradeAcquire(CPlayer *player, const Upgrade *upgrade)
+void UpgradeAcquire(CPlayer *player, const CUpgrade *upgrade)
 {
 	int z;
 	int id;

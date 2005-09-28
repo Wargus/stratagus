@@ -51,7 +51,7 @@ typedef enum _replay_type_ {
 
 class CFile;
 class CUnitType;
-struct _upgrade_;
+class CUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -140,8 +140,7 @@ extern void SendCommandUpgradeTo(CUnit *unit,
 	/// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit *unit);
 	/// Send research command
-extern void SendCommandResearch(CUnit *unit, struct _upgrade_* what,
-	int flush);
+extern void SendCommandResearch(CUnit *unit, CUpgrade *what, int flush);
 	/// Send cancel research command
 extern void SendCommandCancelResearch(CUnit *unit);
 	/// Send spell cast command

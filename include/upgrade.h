@@ -54,7 +54,7 @@ class CFile;
 ----------------------------------------------------------------------------*/
 
 	 /// upgrade of identifier
-extern Upgrade* UpgradeByIdent(const char *ident);
+extern CUpgrade *UpgradeByIdent(const char *ident);
 
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
@@ -81,7 +81,7 @@ extern int UpgradeIdByIdent(const char *sid);
 ----------------------------------------------------------------------------*/
 
 	/// Upgrade will be acquired
-extern void UpgradeAcquire(CPlayer *player, const Upgrade *upgrade);
+extern void UpgradeAcquire(CPlayer *player, const CUpgrade *upgrade);
 
 /// for now it will be empty?
 /// perhaps acquired upgrade can be lost if (for example) a building is lost

@@ -1054,7 +1054,7 @@ void CommandCancelUpgradeTo(CUnit *unit)
 **  @param what   what to research.
 **  @param flush  if true, flush command queue.
 */
-void CommandResearch(CUnit *unit, Upgrade *what, int flush)
+void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 {
 	Order *order;
 
@@ -1073,7 +1073,7 @@ void CommandResearch(CUnit *unit, Upgrade *what, int flush)
 			DebugPrint("FIXME: must support order queing!!");
 		} else {
 			if (unit->Orders[0].Action == UnitActionResearch) {
-				const Upgrade* upgrade;
+				const CUpgrade *upgrade;
 
 				// Cancel current research
 				upgrade = unit->Data.Research.Upgrade;
@@ -1112,7 +1112,7 @@ void CommandCancelResearch(CUnit *unit)
 	// Check if unit is still researching? (NETWORK!)
 	//
 	if (unit->Orders[0].Action == UnitActionResearch) {
-		const Upgrade* upgrade;
+		const CUpgrade *upgrade;
 
 		upgrade = unit->Data.Research.Upgrade;
 		unit->Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
