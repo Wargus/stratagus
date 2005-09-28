@@ -36,9 +36,7 @@
 #include "SDL.h"
 
 #ifdef USE_OPENGL
-#define DrawIcon WinDrawIcon
 #include "SDL_opengl.h"
-#undef DrawIcon
 #endif
 
 class Graphic {
