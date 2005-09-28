@@ -388,7 +388,7 @@ void CButtonPanel::Draw(void)
 void UpdateStatusLineForButton(const ButtonAction *button)
 {
 	int v;  // button->Value.
-	const UnitStats *stats;
+	const CUnitStats *stats;
 
 	Assert(button);
 	UI.StatusLine.Set(button->Hint);

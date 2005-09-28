@@ -97,7 +97,7 @@
 
 class CPlayer;
 class CUnitType;
-struct _upgrade_;
+class CUpgrade;
 
 	/// Dependency rule typedef
 typedef struct _depend_rule_ DependRule;
@@ -114,9 +114,9 @@ struct _depend_rule_ {
 	char          Type;   /// an unit-type or upgrade
 	union {
 		CUnitType *UnitType;  /// unit-type pointer
-		struct _upgrade_*  Upgrade;    /// upgrade pointer
-	} Kind;                  /// required object
-	DependRule* Rule;        /// requirements, and rule
+		CUpgrade  *Upgrade;   /// upgrade pointer
+	} Kind;                   /// required object
+	DependRule* Rule;         /// requirements, and rule
 };
 
 /*----------------------------------------------------------------------------

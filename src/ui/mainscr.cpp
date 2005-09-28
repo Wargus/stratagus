@@ -362,7 +362,7 @@ void DrawSimpleText(const CUnit *unit, ContentType* content, int defaultfont)
 	}
 	if (content->Data.SimpleText.ShowName) {
 		VideoDrawTextCentered(x, y, font, unit->Type->Name);
-		return ;
+		return;
 	}
 	if (index != -1) {
 		if (!content->Data.SimpleText.Stat) {
@@ -620,17 +620,17 @@ static void DrawUnitInfo(CUnit *unit)
 	ContentType *content;      // content of current panel.
 	int index;  // Index of the Panel.
 	CUnitType *type;
-	const UnitStats *stats;
+	const CUnitStats *stats;
 	int x;
 	int y;
 	CUnit *uins;
 
 	Assert(unit);
 	UpdateUnitVariables(unit);
-	for (i = 0; i < UI.NumberPanel; i++) {
+	for (i = 0; i < UI.NumberPanel; ++i) {
 		index = UI.PanelIndex[i];
 		if (CanShowContent(AllPanels[index].Condition, unit)) {
-			for (j = 0; j < AllPanels[index].NContents; j++) {
+			for (j = 0; j < AllPanels[index].NContents; ++j) {
 				content = AllPanels[index].Contents + j;
 				if (CanShowContent(content->Condition, unit) && content->DrawData) {
 					content->DrawData(unit, content, AllPanels[index].DefaultFont);

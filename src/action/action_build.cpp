@@ -238,7 +238,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	CUnitType *type;
 	CUnit *build;
 	BuildRestriction *b;
-	const UnitStats *stats;
+	const CUnitStats *stats;
 
 	x = unit->Orders[0].X;
 	y = unit->Orders[0].Y;

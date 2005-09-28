@@ -135,8 +135,10 @@ public:
 	/// Icon reference (used in config tables)
 class IconConfig {
 public:
+	IconConfig() : Name(NULL), Icon(NULL) {}
+
 	char *Name;          /// config icon name
-	CIcon *Icon; /// icon pointer to use to run time
+	CIcon *Icon;         /// icon pointer to use to run time
 };
 
 /*----------------------------------------------------------------------------

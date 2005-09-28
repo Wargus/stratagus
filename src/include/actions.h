@@ -46,7 +46,7 @@ enum _diplomacy_ {
 
 class CUnit;
 class CUnitType;
-struct _upgrade_;
+class CUpgrade;
 class SpellType;
 struct _order_;
 struct _animation_;
@@ -125,8 +125,7 @@ extern void CommandTransformIntoType(CUnit *unit, CUnitType *type);
 	/// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit *unit);
 	/// Prepare command research
-extern void CommandResearch(CUnit *unit, struct _upgrade_* what,
-	int flush);
+extern void CommandResearch(CUnit *unit, CUpgrade *what, int flush);
 	/// Prepare command cancel research
 extern void CommandCancelResearch(CUnit *unit);
 	/// Prepare command spellcast

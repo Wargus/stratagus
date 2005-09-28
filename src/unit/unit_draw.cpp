@@ -1256,7 +1256,7 @@ void ShowOrder(const CUnit *unit)
 */
 static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, int y)
 {
-	const UnitStats *stats;
+	const CUnitStats *stats;
 	int r;
 
 #if 0 && DEBUG // This is for showing vis counts and refs.

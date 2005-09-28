@@ -62,7 +62,7 @@
 */
 void HandleActionResearch(CUnit *unit)
 {
-	const Upgrade *upgrade;
+	const CUpgrade *upgrade;
 
 	if (!unit->SubAction) { // first entry
 		upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1.Upgrade;

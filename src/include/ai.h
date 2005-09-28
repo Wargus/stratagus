@@ -41,7 +41,7 @@ class CPlayer;
 class CFile;
 class CUnit;
 class CUnitType;
-struct _upgrade_;
+class CUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -90,8 +90,7 @@ extern void AiTrainingComplete(CUnit *unit, CUnit *what);
 extern void AiUpgradeToComplete(CUnit *unit,
 	const CUnitType *what);
 	/// Called if AI unit has completed research
-extern void AiResearchComplete(CUnit *unit,
-	const struct _upgrade_* what);
+extern void AiResearchComplete(CUnit *unit, const CUpgrade *what);
 
 //@}
 
