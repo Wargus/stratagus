@@ -216,17 +216,21 @@ int SendMetaCommand(char *command, char *format, ...)
 {
 	int n;
 	int size;
+	int oldsize;
 	int ret;
 	char *p;
+	char *newp;
 	char *s;
 	va_list ap;
 
-	size = strlen(GameName) + strlen(LocalPlayerName) + strlen(command) + 100;
+	oldsize = size = strlen(GameName) + strlen(LocalPlayerName) +
+		strlen(command) + 100;
 	ret = -1;
-	if ((p = (char *)malloc(size)) == NULL) {
+	if ((p = new char[size]) == NULL) {
 		return -1;
 	}
-	if ((s = (char *)malloc(size)) == NULL) {
+	if ((s = new char[size]) == NULL) {
+		delete[] p;
 		return -1;
 	}
 
@@ -263,21 +267,30 @@ int SendMetaCommand(char *command, char *format, ...)
 		} else {              /* glibc 2.0 */
 			size *= 2;    /* twice the old size */
 		}
-		if ((p = (char *)realloc(p, size + 1)) == NULL) {
+		if ((newp = new char[size + 1]) == NULL) {
+			delete[] p;
+			delete[] s;
 			return -1;
 		}
+		memcpy(newp, p, size * sizeof(char));
+		delete[] p;
+		p = newp;
+		oldsize = size;
 	}
-	// Allocate the correct size
-	if ((s = (char *)realloc(s, size + strlen(s) + 1)) == NULL ) {
-		free(p);
+	if ((newp = new char[strlen(s) + size + 2]) == NULL) {
+		delete[] s;
+		delete[] p;
 		return -1;
 	}
+	strcpy(newp, s);
+	delete[] s;
+	s = newp;
 	strcat(s, p);
 	strcat(s, "\n");
 	size = strlen(s);
 	ret = NetSendTCP(MetaServerFildes, s, size);
-	free(p);
-	free(s);
+	delete[] p;
+	delete[] s;
 	return ret;
 }
 
