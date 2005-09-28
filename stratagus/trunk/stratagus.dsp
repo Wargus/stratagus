@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libbz2.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib mikmod.lib libFLAC_static.lib libmad.lib theora_static.lib libmng.lib /nologo /stack:0x2000000 /subsystem:windows /debug /machine:I386 /nodefaultlib:"MSVCRT" /libpath:"lib"
-# SUBTRACT LINK32 /pdb:none
+# SUBTRACT LINK32 /profile
 
 !ENDIF 
 
