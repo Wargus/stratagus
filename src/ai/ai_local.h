@@ -164,8 +164,8 @@ public:
 */
 class AiTransportRequest {
 public:
-	CUnit              *Unit;
-	struct _order_      Order;
+	CUnit *Unit;
+	COrder Order;
 	AiTransportRequest *Next;
 };
 

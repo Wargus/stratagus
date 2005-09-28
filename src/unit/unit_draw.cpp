@@ -1048,7 +1048,7 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 **  @param x      Resulting screen X cordinate.
 **  @param y      Resulting screen Y cordinate.
 */
-static void GetOrderPosition(const CUnit *unit, const Order *order, int *x, int *y)
+static void GetOrderPosition(const CUnit *unit, const COrder *order, int *x, int *y)
 {
 	CUnit *goal;
 
@@ -1087,7 +1087,7 @@ static void GetOrderPosition(const CUnit *unit, const Order *order, int *x, int 
 **  @param y1     Y pixel coordinate.
 **  @param order  Order to display.
 */
-static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const Order *order)
+static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *order)
 {
 	int x2;
 	int y2;

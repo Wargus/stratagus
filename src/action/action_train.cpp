@@ -64,7 +64,7 @@
 **
 **  @return  1 if the the unit can do it, 0 otherwise.
 */
-static int CanHandleOrder(CUnit *unit, Order *order)
+static int CanHandleOrder(CUnit *unit, COrder *order)
 {
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
