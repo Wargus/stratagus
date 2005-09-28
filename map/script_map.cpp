@@ -87,8 +87,7 @@ static int CclStratagusMap(lua_State *l)
 		} else if (!strcmp(value, "uid")) {
 			TheMap.Info.MapUID = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "description")) {
-			value = LuaToString(l, j + 1);
-			TheMap.Info.Description = new_strdup(value);
+			TheMap.Info.Description = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -126,7 +125,7 @@ static int CclStratagusMap(lua_State *l)
 					TheMap.NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(value, "filename")) {
-					 lua_rawgeti(l, j + 1, k + 1);
+					lua_rawgeti(l, j + 1, k + 1);
 					TheMap.Info.Filename = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "map-fields")) {
