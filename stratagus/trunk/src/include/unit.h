@@ -364,7 +364,6 @@
 class CUnit;
 class CUnitType;
 class CUnitStats;
-struct _new_animation;
 class CPlayer;
 class SpellType;
 struct _unit_colors_;
@@ -375,6 +374,7 @@ struct _building_restrictions_;
 class CFile;
 struct lua_State;
 class CViewport;
+class CAnimation;
 
 /**
 **  Unit references over network, or for memory saving.
@@ -576,9 +576,9 @@ public:
 	unsigned Moving : 1;    /// The unit is moving
 	unsigned ReCast : 1;    /// Recast again next cycle
 
-	struct _unit_anim_ {
-		const struct _animation_* Anim;         /// Anim
-		const struct _animation_* CurrAnim;     /// CurrAnim
+	struct _unit_anim_ { 
+		const CAnimation *Anim;                     /// Anim
+		const CAnimation *CurrAnim;                 /// CurrAnim
 		int Wait;                                   /// Wait
 		int Unbreakable;                            /// Unbreakable
 	} Anim;

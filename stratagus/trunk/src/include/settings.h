@@ -101,7 +101,7 @@ public:
 /**
 **  GameType settings
 */
-enum _game_types_ {
+enum GameTypes {
 	SettingsGameTypeMapDefault = SettingsPresetMapDefault,
 	SettingsGameTypeMelee = 0,
 	SettingsGameTypeFreeForAll,
@@ -128,27 +128,36 @@ enum _game_types_ {
 #define MAX_BRIEFING_VOICES 20  /// How many intro voices supported
 #define MAX_OBJECTIVES 9  /// How many objectives supported
 
-typedef struct _intro_ {
-	char* Title;                           /// Intro title
-	char* Background;                      /// Background picture
-	char* TextFile;                        /// Intro text file
-	char* VoiceFile[MAX_BRIEFING_VOICES];  /// Intro voice file
-	char* Objectives[MAX_OBJECTIVES];      /// Objectives text
-} Intro;  /// Intro definition
+class Intro {
+public:
+	Intro() : Title(NULL), Background(NULL), TextFile(NULL) {
+		memset(VoiceFile, 0, sizeof(VoiceFile));
+		memset(Objectives, 0, sizeof(Objectives));
+	}
+
+	char *Title;                           /// Intro title
+	char *Background;                      /// Background picture
+	char *TextFile;                        /// Intro text file
+	char *VoiceFile[MAX_BRIEFING_VOICES];  /// Intro voice file
+	char *Objectives[MAX_OBJECTIVES];      /// Objectives text
+};  /// Intro definition
 
 
 // ----------------------------------------------------------------------------
 
-typedef struct _credits_ {
-	char* Background;  /// Background picture
-	char* Names;       /// Names
-} Credits;
+class Credits {
+public:
+	Credits() : Background(NULL), Names(NULL) {}
+
+	char *Background;  /// Background picture
+	char *Names;       /// Names
+};
 
 // ----------------------------------------------------------------------------
 
 #define MAX_TIPS 50    /// How many tips supported
 
-extern char* Tips[MAX_TIPS + 1];  /// Array of tips
+extern char *Tips[MAX_TIPS + 1];  /// Array of tips
 extern bool  ShowTips;            /// Show tips at start of level
 extern int   CurrentTip;          /// Current tip to display
 

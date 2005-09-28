@@ -405,12 +405,19 @@ public:
 **  Mapped with #PlayerRaces to a symbolic name.
 */
 #define MAX_RACES 8
-typedef struct _player_race_ {
+class PlayerRace {
+public:
+	PlayerRace() : Count(0) {
+		memset(Visible, 0, sizeof(Visible));
+		memset(Name, 0, sizeof(Name));
+		memset(Display, 0, sizeof(Display));
+	}
+
 	char  Visible[MAX_RACES];  /// race should be visible in pulldown
-	char* Name[MAX_RACES];     /// race names
-	char* Display[MAX_RACES];  /// text to display in pulldown
+	char *Name[MAX_RACES];     /// race names
+	char *Display[MAX_RACES];  /// text to display in pulldown
 	int   Count;               /// number of races
-} PlayerRace;
+};
 
 
 enum PlayerRacesOld {
@@ -470,7 +477,7 @@ enum PlayerTypes {
 /**
 **  Notify types. Noties are send to the player.
 */
-enum _notify_type_ {
+enum NotifyType {
 	NotifyRed,     /// Red alram
 	NotifyYellow,  /// Yellow alarm
 	NotifyGreen,   /// Green alarm

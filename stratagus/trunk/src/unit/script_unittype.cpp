@@ -58,10 +58,10 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-Animation* AnimationsArray[ANIMATIONS_MAXANIM];
+CAnimation* AnimationsArray[ANIMATIONS_MAXANIM];
 int NumAnimations;
 
-std::map<std::string, Animations *> AnimationMap;/// Animation map
+std::map<std::string, CAnimations *> AnimationMap;/// Animation map
 
 CUnitTypeVar UnitTypeVar;    /// Variables for UnitType and unit.
 
@@ -69,13 +69,13 @@ CUnitTypeVar UnitTypeVar;    /// Variables for UnitType and unit.
 #define MAX_LABEL_LENGTH 256
 
 static struct {
-	Animation* Anim;
+	CAnimation *Anim;
 	char Name[MAX_LABEL_LENGTH];
 } Labels[MAX_LABELS];
 static int NumLabels;
 
 static struct {
-	Animation** Anim;
+	CAnimation **Anim;
 	char Name[MAX_LABEL_LENGTH];
 } LabelsLater[MAX_LABELS];
 static int NumLabelsLater;
@@ -1249,7 +1249,7 @@ static int CclSetUnitTypeName(lua_State *l)
 /**
 **  Add a label
 */
-static void AddLabel(lua_State *l, Animation *anim, char *label)
+static void AddLabel(lua_State *l, CAnimation *anim, char *label)
 {
 	if (NumLabels == MAX_LABELS) {
 		LuaError(l, "Too many labels: %s" _C_ label);
@@ -1262,11 +1262,9 @@ static void AddLabel(lua_State *l, Animation *anim, char *label)
 /**
 **  Find a label
 */
-static Animation* FindLabel(lua_State* l, char* label)
+static CAnimation *FindLabel(lua_State *l, char* label)
 {
-	int i;
-
-	for (i = 0; i < NumLabels; ++i) {
+	for (int i = 0; i < NumLabels; ++i) {
 		if (!strcmp(Labels[i].Name, label)) {
 			return Labels[i].Anim;
 		}
@@ -1278,7 +1276,7 @@ static Animation* FindLabel(lua_State* l, char* label)
 /**
 **  Find a label later
 */
-static void FindLabelLater(lua_State* l, Animation** anim, char* label)
+static void FindLabelLater(lua_State *l, CAnimation **anim, char *label)
 {
 	if (NumLabelsLater == MAX_LABELS) {
 		LuaError(l, "Too many gotos: %s" _C_ label);
@@ -1291,11 +1289,9 @@ static void FindLabelLater(lua_State* l, Animation** anim, char* label)
 /**
 **  Fix labels
 */
-static void FixLabels(lua_State* l)
+static void FixLabels(lua_State *l)
 {
-	int i;
-
-	for (i = 0; i < NumLabelsLater; ++i) {
+	for (int i = 0; i < NumLabelsLater; ++i) {
 		*LabelsLater[i].Anim = FindLabel(l, LabelsLater[i].Name);
 	}
 }
@@ -1303,11 +1299,11 @@ static void FixLabels(lua_State* l)
 /**
 **  Parse an animation frame
 */
-static void ParseAnimationFrame(lua_State* l, const char* str,
-	Animation* anim)
+static void ParseAnimationFrame(lua_State *l, const char *str,
+	CAnimation *anim)
 {
-	char* op1;
-	char* op2;
+	char *op1;
+	char *op2;
 
 	op1 = new_strdup(str);
 	op2 = strchr(op1, ' ');
@@ -1407,19 +1403,19 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 /**
 **  Parse an animation
 */
-static Animation* ParseAnimation(lua_State* l, int idx)
+static CAnimation *ParseAnimation(lua_State *l, int idx)
 {
-	Animation* anim;
-	Animation* tail;
+	CAnimation *anim;
+	CAnimation *tail;
 	int args;
 	int j;
-	const char* str;
+	const char *str;
 
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, idx);
-	anim = (Animation *)calloc(args + 1, sizeof(*anim));
+	anim = (CAnimation *)calloc(args + 1, sizeof(*anim));
 	tail = NULL;
 	NumLabels = NumLabelsLater = 0;
 
@@ -1446,11 +1442,9 @@ static Animation* ParseAnimation(lua_State* l, int idx)
 /**
 **  Find the index of a resource
 */
-static int ResourceIndex(lua_State* l, const char* resource)
+static int ResourceIndex(lua_State *l, const char *resource)
 {
-	int res;
-
-	for (res = 0; res < MaxCosts; ++res) {
+	for (int res = 0; res < MaxCosts; ++res) {
 		if (!strcmp(resource, DefaultResourceNames[res])) {
 			return res;
 		}
@@ -1464,11 +1458,11 @@ static int ResourceIndex(lua_State* l, const char* resource)
 **
 **  @param l  Lua state.
 */
-static int CclDefineAnimations(lua_State* l)
+static int CclDefineAnimations(lua_State *l)
 {
-	const char* name;
-	const char* value;
-	Animations* anims;
+	const char *name;
+	const char *value;
+	CAnimations *anims;
 	int res;
 
 	LuaCheckArgs(l, 2);
@@ -1479,7 +1473,7 @@ static int CclDefineAnimations(lua_State* l)
 	name = LuaToString(l, 1);
 	anims = AnimationsByIdent(name);
 	if (!anims) {
-		anims = (Animations *)calloc(1, sizeof(*anims));
+		anims = new CAnimations;
 		AnimationMap[name] = anims;
 	}
 
@@ -1528,7 +1522,7 @@ static int CclDefineAnimations(lua_State* l)
 **
 **  @internal Use to not duplicate code.
 */
-void DefineVariableField(lua_State* l, VariableType* var, int lua_index)
+void DefineVariableField(lua_State *l, VariableType *var, int lua_index)
 {
 	if (lua_index < 0) { // relative index
 		--lua_index;
@@ -1560,11 +1554,9 @@ void DefineVariableField(lua_State* l, VariableType* var, int lua_index)
 **
 **  @return         Index of the variable, -1 if not found.
 */
-int GetVariableIndex(const char* varname)
+int GetVariableIndex(const char *varname)
 {
-	int i;
-
-	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+	for (int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		if (!strcmp(varname, UnitTypeVar.VariableName[i])) {
 			return i;
 		}
@@ -1577,7 +1569,7 @@ int GetVariableIndex(const char* varname)
 **
 **  @param l  Lua state.
 */
-static int CclDefineVariables(lua_State* l)
+static int CclDefineVariables(lua_State *l)
 {
 	const char *str;
 	int i;
@@ -1620,9 +1612,9 @@ static int CclDefineVariables(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineBoolFlags(lua_State* l)
+static int CclDefineBoolFlags(lua_State *l)
 {
-	const char* str;    // Name of the bool flags to define.
+	const char *str;    // Name of the bool flags to define.
 	int i;              // iterator for flags.
 	int j;              // iterator for arguments.
 	int args;           // number of arguments.
@@ -1678,11 +1670,11 @@ static int CclDefineBoolFlags(lua_State* l)
 **  @todo modify Assert with luastate with User Error.
 **  @todo continue to add configuration.
 */
-static int CclDefineDecorations(lua_State* l)
+static int CclDefineDecorations(lua_State *l)
 {
 	int i;                  // iterator for arguments.
 	int nargs;              // number of arguments.
-	const char* key;        // key of lua table.
+	const char *key;        // key of lua table.
 	CDecoVar *decovar;      // variable for transit.
 	struct {
 		int Index;
@@ -2005,14 +1997,14 @@ void UpdateUnitVariables(const CUnit *unit)
 */
 void InitDefinedVariables()
 {
-	const char* var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
+	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
 		"Xp", "Kill", "Supply", "Demand", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
 		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
 		"UnholyArmor", "Slot"
 		}; // names of the variable.
-	const char* boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
+	const char *boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
 		"\"VisibleUnderFog\", \"PermanentCloack\", \"DetectCloak\", \"AttackFromTransporter\","
 		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
