@@ -69,13 +69,13 @@ CUserInterface UI;
 /**
 **  The available user interfaces.
 */
-CUserInterface** UI_Table;
+CUserInterface **UI_Table;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-static void ClipViewport(CViewport* vp, int ClipX, int ClipY);
+static void ClipViewport(CViewport *vp, int ClipX, int ClipY);
 static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps);
 
 
@@ -88,7 +88,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps);
 **
 **  @param race_name  The race identifier, to select the interface.
 */
-void InitUserInterface(const char* race_name)
+void InitUserInterface(const char *race_name)
 {
 	int i;
 	int best;
@@ -170,12 +170,12 @@ void InitUserInterface(const char* race_name)
 void LoadUserInterface(void)
 {
 	int i;
-	MenuPanel* menupanel;
+	MenuPanel *menupanel;
 
 	//
 	//  Load graphics
 	//
-	for (i = 0; i < UI.NumFillers; ++i) {
+	for (i = 0; i < (int)UI.Filler.size(); ++i) {
 		UI.Filler[i]->Load();
 	}
 
@@ -228,10 +228,10 @@ void LoadUserInterface(void)
 **  @param file  Save file handle
 **  @param ui    User interface to save
 */
-static void SaveViewports(CFile* file, const CUserInterface* ui)
+static void SaveViewports(CFile *file, const CUserInterface *ui)
 {
 	int i;
-	const CViewport* vp;
+	const CViewport *vp;
 
 	// FIXME: don't save the number
 	file->printf("DefineViewports(\"mode\", %d", ui->ViewportMode);
@@ -248,7 +248,7 @@ static void SaveViewports(CFile* file, const CUserInterface* ui)
 **
 **  @param file  Save file handle
 */
-void SaveUserInterface(CFile* file)
+void SaveUserInterface(CFile *file)
 {
 	SaveViewports(file, &UI);
 }
@@ -310,23 +310,23 @@ void CleanPanel(InfoPanel *panel)
 /**
 **  Clean up a user interface.
 */
-void CleanUI(CUserInterface* ui)
+void CleanUI(CUserInterface *ui)
 {
 	int i;
-	MenuPanel* menupanel;
-	MenuPanel* tmp;
+	MenuPanel *menupanel;
+	MenuPanel *tmp;
 
 	delete[] ui->Name;
 	delete[] ui->NormalFontColor;
 	delete[] ui->ReverseFontColor;
 
 	// Filler
-	for (i = 0; i < ui->NumFillers; ++i) {
+	for (i = 0; i < (int)ui->Filler.size(); ++i) {
 		FreeGraphic(ui->Filler[i]);
 	}
-	free(ui->FillerX);
-	free(ui->FillerY);
-	free(ui->Filler);
+	ui->FillerX.clear();
+	ui->FillerY.clear();
+	ui->Filler.clear();
 
 	// Resource Icons
 	for (i = 0; i < MaxCosts + 2; ++i) {
@@ -448,9 +448,9 @@ void CleanUserInterface(void)
 **  @note This functions only works with rectangular viewports, when
 **  we support shaped map window, this must be rewritten.
 */
-CViewport* GetViewport(int x, int y)
+CViewport *GetViewport(int x, int y)
 {
-	CViewport* vp;
+	CViewport *vp;
 
 	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (x >= vp->X && x <= vp->EndX && y >= vp->Y && y <= vp->EndY) {
@@ -478,7 +478,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	if (UI.NumViewports < num_vps) {
 		//  Compute location of the viewport using oldviewport
 		for (i = 0; i < num_vps; ++i) {
-			const CViewport* vp;
+			const CViewport *vp;
 
 			new_vps[i].MapX = 0;
 			new_vps[i].MapY = 0;
@@ -502,7 +502,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 
 	// Affect the old viewport.
 	for (i = 0; i < num_vps; ++i) {
-		CViewport* vp;
+		CViewport *vp;
 
 		vp = UI.Viewports + i;
 		vp->X = new_vps[i].X;
@@ -538,7 +538,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 **  However, they can be smaller according to the place
 **  the viewport vp takes in context of current ViewportMode.
 */
-static void ClipViewport(CViewport* vp, int ClipX, int ClipY)
+static void ClipViewport(CViewport *vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	vp->EndX = vp->X + TheMap.Info.MapWidth * TileSizeX - 1;

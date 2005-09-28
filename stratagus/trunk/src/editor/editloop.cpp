@@ -1022,7 +1022,7 @@ void EditorUpdateDisplay(void)
 	//
 	// Fillers
 	//
-	for (i = 0; i < UI.NumFillers; ++i) {
+	for (i = 0; i < (int)UI.Filler.size(); ++i) {
 		UI.Filler[i]->DrawSub(0, 0,
 			UI.Filler[i]->Width,
 			UI.Filler[i]->Height,
