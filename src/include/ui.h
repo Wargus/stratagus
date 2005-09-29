@@ -41,6 +41,8 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
+#include <string>
+#include <map>
 
 #include "util.h"
 #include "video.h"
@@ -563,12 +565,10 @@ extern CUserInterface UI;                           /// The user interface
 extern CUserInterface **UI_Table;                   /// All available user interfaces
 
 	/// Hash table of all the button styles
-typedef hashtable(ButtonStyle *, 128) _ButtonStyleHash;
-extern _ButtonStyleHash ButtonStyleHash;
+extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 
 	/// Hash table of all the checkbox styles
-typedef hashtable(CheckboxStyle *, 128) _CheckboxStyleHash;
-extern _CheckboxStyleHash CheckboxStyleHash;
+extern std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
 
 extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
 extern ButtonAction *CurrentButtons;    /// Current Selected Buttons

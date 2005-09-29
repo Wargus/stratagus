@@ -65,8 +65,8 @@ typedef struct _info_text_ {
 	int Y;                       /// FIXME:docu
 } InfoText;                      /// FIXME:docu
 
-_ButtonStyleHash ButtonStyleHash;
-_CheckboxStyleHash CheckboxStyleHash;
+std::map<std::string, ButtonStyle *> ButtonStyleHash;
+std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
 
 std::vector<InfoPanel> AllPanels; /// Array of panels.
 
@@ -2241,16 +2241,9 @@ static int CclSetFancyBuildings(lua_State *l)
 **
 **  @return       Button style, NULL if not found.
 */
-ButtonStyle* FindButtonStyle(const char *style)
+ButtonStyle *FindButtonStyle(const char *style)
 {
-	ButtonStyle **s;
-
-	s = (ButtonStyle **)hash_find(ButtonStyleHash, style);
-	if (!s) {
-		return NULL;
-	} else {
-		return *s;
-	}
+	return ButtonStyleHash[style];
 }
 
 /**
@@ -2262,14 +2255,7 @@ ButtonStyle* FindButtonStyle(const char *style)
 */
 CheckboxStyle *FindCheckboxStyle(const char *style)
 {
-	CheckboxStyle **s;
-
-	s = (CheckboxStyle **)hash_find(CheckboxStyleHash, style);
-	if (!s) {
-		return NULL;
-	} else {
-		return *s;
-	}
+	return CheckboxStyleHash[style];
 }
 
 /**
@@ -2385,7 +2371,6 @@ static int CclDefineButtonStyle(lua_State *l)
 	const char *style;
 	const char *value;
 	ButtonStyle *b;
-	ButtonStyle **bp;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -2393,15 +2378,12 @@ static int CclDefineButtonStyle(lua_State *l)
 	}
 
 	style = LuaToString(l, 1);
-	bp = (ButtonStyle **)hash_find(ButtonStyleHash, (char*)style);
-	if (!bp) {
-		b = new ButtonStyle;
-		*(ButtonStyle **)hash_add(ButtonStyleHash, style) = b;
+	b = ButtonStyleHash[style];
+	if (!b) {
+		b = ButtonStyleHash[style] = new ButtonStyle;
 		// Set to bogus value to see if it was set later
 		b->Default.TextX = b->Hover.TextX = b->Selected.TextX =
 			b->Clicked.TextX = b->Disabled.TextX = 0xFFFFFF;
-	} else {
-		b = *bp;
 	}
 
 	lua_pushnil(l);
@@ -2512,7 +2494,6 @@ static int CclDefineCheckboxStyle(lua_State *l)
 	const char *style;
 	const char *value;
 	CheckboxStyle *c;
-	CheckboxStyle **cp;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -2520,17 +2501,14 @@ static int CclDefineCheckboxStyle(lua_State *l)
 	}
 
 	style = LuaToString(l, 1);
-	cp = (CheckboxStyle **)hash_find(CheckboxStyleHash, (char*)style);
-	if (!cp) {
-		c = new CheckboxStyle;
-		*(CheckboxStyle **)hash_add(CheckboxStyleHash, style) = c;
+	c = CheckboxStyleHash[style];
+	if (!c) {
+		c = CheckboxStyleHash[style] = new CheckboxStyle;
 		// Set to bogus value to see if it was set later
 		c->Default.TextX = c->Hover.TextX = c->Selected.TextX =
 			c->Clicked.TextX = c->Disabled.TextX =
 			c->Checked.TextX = c->CheckedHover.TextX = c->CheckedSelected.TextX =
 			c->CheckedClicked.TextX = c->CheckedDisabled.TextX = 0xFFFFFF;
-	} else {
-		c = *cp;
 	}
 
 	lua_pushnil(l);
