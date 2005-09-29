@@ -49,19 +49,11 @@
 
 #define USE_WINSOCK
 
-#ifdef __MINGW32__
-#define DrawIcon WinDrawIcon
-#endif
-
 #include <winsock2.h>
 
 #include <windows.h>
 #include <winsock.h>
 //#include <ws2tcpip.h>
-
-#ifdef __MINGW32__
-#undef DrawIcon
-#endif
 
 // MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
 #define SIO_GET_INTERFACE_LIST 0x4004747F
