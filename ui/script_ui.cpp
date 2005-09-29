@@ -1755,6 +1755,7 @@ static ConditionPanel *ParseConditionPanel(lua_State* l)
 				if (!strcmp(key, UnitTypeVar.BoolFlagName[i])) {
 					if (!condition->BoolFlags) {
 						condition->BoolFlags = new char[UnitTypeVar.NumberBoolFlag];
+						memset(condition->BoolFlags, 0, UnitTypeVar.NumberBoolFlag * sizeof(char));
 					}
 					condition->BoolFlags[i] = Ccl2Condition(l, LuaToString(l, -1));
 					break;
@@ -1767,6 +1768,7 @@ static ConditionPanel *ParseConditionPanel(lua_State* l)
 			if (i != -1) {
 				if (!condition->Variables) {
 					condition->Variables = new char[UnitTypeVar.NumberVariable];
+					memset(condition->Variables, 0, UnitTypeVar.NumberVariable * sizeof(char));
 				}
 				condition->Variables[i] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
