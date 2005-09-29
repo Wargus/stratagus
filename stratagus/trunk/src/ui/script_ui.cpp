@@ -941,15 +941,17 @@ static void CclParseTransporting(lua_State *l, CUserInterface *ui)
 */
 static void CclParseButtonIcons(lua_State *l, CUserInterface *ui)
 {
-	int i;
+	int args;
 
-	ui->ButtonPanel.NumButtons = luaL_getn(l, -1);
-	ui->ButtonPanel.Buttons = new Button[ui->ButtonPanel.NumButtons];
-	for (i = 0; i < ui->ButtonPanel.NumButtons; ++i) {
+	args = luaL_getn(l, -1);
+	for (int i = 0; i < args; ++i) {
+		Button b;
 		lua_rawgeti(l, -1, i + 1);
-		CclParseIcon(l, &ui->ButtonPanel.Buttons[i]);
+		CclParseIcon(l, &b);
 		lua_pop(l, 1);
+		ui->ButtonPanel.Buttons.push_back(b);
 	}
+	Assert(args == (int)ui->ButtonPanel.Buttons.size());
 }
 
 /**
