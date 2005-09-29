@@ -361,8 +361,7 @@ extern std::vector<InfoPanel> AllPanels;  /// Array of panels.
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(NULL), X(0), Y(0), Buttons(NULL), NumButtons(0),
-		ShowCommandKey(false)
+	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(false)
 	{
 		AutoCastBorderColorRGB.r = 0;
 		AutoCastBorderColorRGB.g = 0;
@@ -377,8 +376,7 @@ public:
 	Graphic *G;
 	int X;
 	int Y;
-	Button *Buttons;
-	int NumButtons;
+	std::vector<Button> Buttons;
 	SDL_Color AutoCastBorderColorRGB;
 	bool ShowCommandKey;
 };

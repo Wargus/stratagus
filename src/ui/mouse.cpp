@@ -507,7 +507,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	for (i = 0; i < UI.ButtonPanel.NumButtons; ++i) {
+	for (i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
 		if (OnButton(x, y, &UI.ButtonPanel.Buttons[i])) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
 			if (CurrentButtons && CurrentButtons[i].Pos != -1) {
@@ -1998,7 +1998,7 @@ void DrawPieMenu(void)
 	}
 	player = Selected[0]->Player;
 
-	for (i = 0; i < UI.ButtonPanel.NumButtons && i < 8; ++i) {
+	for (i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 8; ++i) {
 		if (buttons[i].Pos != -1) {
 			int x;
 			int y;

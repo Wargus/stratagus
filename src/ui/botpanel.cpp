@@ -344,7 +344,7 @@ void CButtonPanel::Draw(void)
 	//
 	//  Draw all buttons.
 	//
-	for (int i = 0; i < UI.ButtonPanel.NumButtons; ++i) {
+	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
 		if (buttons[i].Pos == -1) {
 			continue;
 		}
@@ -541,8 +541,8 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 	ButtonAction *res;
 	int allow;         // button is available for at least 1 unit.
 
-	res = new ButtonAction[UI.ButtonPanel.NumButtons];
-	for (z = 0; z < UI.ButtonPanel.NumButtons; ++z) {
+	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
+	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
 
@@ -567,7 +567,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 			}
 		}
 		Assert(1 <= UnitButtonTable[z]->Pos);
-		Assert(UnitButtonTable[z]->Pos <= UI.ButtonPanel.NumButtons);
+		Assert(UnitButtonTable[z]->Pos <= (int)UI.ButtonPanel.Buttons.size());
 
 		// is button allowed after all?
 		if (allow) {
@@ -598,8 +598,8 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 
 	Assert(unit);
 
-	res = new ButtonAction[UI.ButtonPanel.NumButtons];
-	for (z = 0; z < UI.ButtonPanel.NumButtons; ++z) {
+	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
+	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
 
@@ -623,7 +623,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 		int pos; // keep position, modified if alt-buttons required
 
 		buttonaction = UnitButtonTable[z];
-		Assert(0 < buttonaction->Pos && buttonaction->Pos <= UI.ButtonPanel.NumButtons);
+		Assert(0 < buttonaction->Pos && buttonaction->Pos <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
 		if (buttonaction->Level != CurrentButtonLevel) {
@@ -702,7 +702,7 @@ void CButtonPanel::DoClicked(int button)
 	int i;
 	CUnitType *type;
 
-	Assert(0 <= button && button < UI.ButtonPanel.NumButtons);
+	Assert(0 <= button && button < (int)UI.ButtonPanel.Buttons.size());
 	// no buttons
 	if (!CurrentButtons) {
 		return;
@@ -938,7 +938,7 @@ int CButtonPanel::DoKey(int key)
 			key = tolower(key);
 		}
 
-		for (int i = 0; i < UI.ButtonPanel.NumButtons; ++i) {
+		for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
 			if (CurrentButtons[i].Pos != -1 && key == CurrentButtons[i].Key) {
 				UI.ButtonPanel.DoClicked(i);
 				return 1;

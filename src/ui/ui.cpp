@@ -354,7 +354,7 @@ void CleanUI(CUserInterface *ui)
 	delete[] ui->MenuButton.Text;
 	delete[] ui->NetworkMenuButton.Text;
 	delete[] ui->NetworkDiplomacyButton.Text;
-	delete[] ui->ButtonPanel.Buttons;
+	ui->ButtonPanel.Buttons.clear();
 
 	// Cursors
 	delete[] ui->Point.Name;
