@@ -37,7 +37,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#define DrawIcon WinDrawIcon
 #ifdef USE_ZLIB
 #include <zlib.h>
 #endif
@@ -45,7 +44,6 @@
 #ifdef USE_BZ2LIB
 #include <bzlib.h>
 #endif
-#undef DrawIcon
 
 class MapInfo;
 

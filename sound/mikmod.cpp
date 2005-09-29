@@ -45,9 +45,7 @@
 #include "sound_server.h"
 #include "iolib.h"
 
-#define DrawIcon WinDrawIcon
 #include <mikmod.h>
-#undef DrawIcon
 
 /*----------------------------------------------------------------------------
 --  Declarations

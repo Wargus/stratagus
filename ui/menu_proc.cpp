@@ -28,7 +28,6 @@
 //
 //      $Id$
 
-
 //@{
 
 /*----------------------------------------------------------------------------
@@ -45,9 +44,7 @@
 #ifdef _MSC_VER
 #undef NOUSER
 #endif
-#define DrawIcon WinDrawIcon
 #include <windows.h>
-#undef DrawIcon
 #endif
 
 #include "video.h"
