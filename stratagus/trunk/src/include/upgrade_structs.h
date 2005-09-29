@@ -132,7 +132,7 @@ class CUnitStats {
 public:
 	CUnitStats() : Variables(NULL)
 	{
-		memset(Costs, 0, MaxCosts * sizeof(int));
+		memset(Costs, 0, sizeof(Costs));
 	}
 
 	VariableType *Variables;        /// user defined variable.
@@ -146,8 +146,9 @@ class CUpgrade {
 public:
 	CUpgrade() : Ident(NULL), ID(0)
 	{
-		memset(Costs, 0, MaxCosts * sizeof(int));
+		memset(Costs, 0, sizeof(Costs));
 	}
+	~CUpgrade() { delete[] Ident; }
 
 	char *Ident;                      /// identifier
 	int   ID;                         /// numerical id
@@ -169,9 +170,9 @@ class CUpgradeModifier {
 public:
 	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL)
 	{
-		memset(ChangeUnits, 0, UnitTypeMax * sizeof(int));
-		memset(ChangeUpgrades, 0, UpgradeMax * sizeof(char));
-		memset(ApplyTo, 0, UnitTypeMax * sizeof(char));
+		memset(ChangeUnits, 0, sizeof(ChangeUnits));
+		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
+		memset(ApplyTo, 0, sizeof(ApplyTo));
 	}
 
 	int UpgradeId;                      /// used to filter required modifier
@@ -186,7 +187,7 @@ public:
 	char ChangeUpgrades[UpgradeMax];    /// allow/forbid upgrades
 	char ApplyTo[UnitTypeMax];          /// which unit types are affected
 
-	CUnitType *ConvertTo;      /// convert to this unit-type.
+	CUnitType *ConvertTo;               /// convert to this unit-type.
 
 };
 
@@ -206,8 +207,8 @@ public:
 class CAllow {
 public:
 	CAllow() {
-		memset(Units, 0, UnitTypeMax * sizeof(int));
-		memset(Upgrades, 0, UpgradeMax * sizeof(char));
+		memset(Units, 0, sizeof(Units));
+		memset(Upgrades, 0, sizeof(Upgrades));
 	}
 
 	int  Units[UnitTypeMax];        /// maximum amount of units allowed

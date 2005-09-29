@@ -60,7 +60,7 @@
 **
 **  @param order  Pointer to order.
 */
-static void ReleaseOrder(Order *order)
+static void ReleaseOrder(COrder *order)
 {
 	if (order->Goal) {
 		order->Goal->RefsDecrease();
@@ -95,9 +95,9 @@ static void ReleaseOrders(CUnit *unit)
 **
 **  @return       Pointer to next free order slot.
 */
-static Order *GetNextOrder(CUnit *unit, int flush)
+static COrder *GetNextOrder(CUnit *unit, int flush)
 {
-	Order *old_orders;
+	COrder *old_orders;
 
 	if (flush) {
 		// empty command queue
@@ -105,7 +105,7 @@ static Order *GetNextOrder(CUnit *unit, int flush)
 	} else if (unit->OrderCount == unit->TotalOrders) {
 		// Expand Order Queue if filled
 		old_orders = unit->Orders;
-		unit->Orders = (Order *)realloc(unit->Orders, sizeof(Order) * unit->TotalOrders * 2);
+		unit->Orders = (COrder *)realloc(unit->Orders, sizeof(COrder) * unit->TotalOrders * 2);
 		// Realloc failed, fail gracefully
 		if (!unit->Orders) {
 			unit->Orders = old_orders;
@@ -113,7 +113,7 @@ static Order *GetNextOrder(CUnit *unit, int flush)
 				"Unable to add order to list");
 			return NULL;
 		}
-		memset(&unit->Orders[unit->TotalOrders], 0, sizeof(Order) * unit->TotalOrders);
+		memset(&unit->Orders[unit->TotalOrders], 0, sizeof(COrder) * unit->TotalOrders);
 		unit->TotalOrders *= 2;
 	}
 
@@ -176,7 +176,7 @@ static void ClearSavedAction(CUnit *unit)
 */
 void CommandStopUnit(CUnit *unit)
 {
-	Order *order;
+	COrder *order;
 
 	// Ignore that the unit could be removed.
 
@@ -198,9 +198,9 @@ void CommandStopUnit(CUnit *unit)
 **  @param cpyorder  pointer to valid order
 **  @param flush     if true, flush command queue.
 */
-void CommandAnyOrder(CUnit *unit, Order *cpyorder, int flush)
+void CommandAnyOrder(CUnit *unit, COrder *cpyorder, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	if (!(order = GetNextOrder(unit, flush))) {
 		return;
@@ -223,7 +223,7 @@ void CommandAnyOrder(CUnit *unit, Order *cpyorder, int flush)
 */
 void CommandMoveOrder(CUnit *unit, int src, int dst)
 {
-	Order tmp;
+	COrder tmp;
 	int i;
 
 	Assert(src != 0 && dst != 0 && src < unit->OrderCount && dst < unit->OrderCount);
@@ -256,7 +256,7 @@ void CommandMoveOrder(CUnit *unit, int src, int dst)
 */
 void CommandStandGround(CUnit *unit, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	// Ignore that the unit could be removed.
 
@@ -282,7 +282,7 @@ void CommandStandGround(CUnit *unit, int flush)
 */
 void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -326,7 +326,7 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 */
 void CommandMove(CUnit *unit, int x, int y, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
@@ -362,7 +362,7 @@ void CommandMove(CUnit *unit, int x, int y, int flush)
 */
 void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	//  Check if unit is still valid? (NETWORK!)
@@ -428,7 +428,7 @@ void CommandAutoRepair(CUnit *unit, int on)
 */
 void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
@@ -489,7 +489,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 */
 void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
@@ -529,7 +529,7 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 */
 void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
@@ -565,7 +565,7 @@ void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 */
 void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -609,7 +609,7 @@ void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 */
 void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -648,7 +648,7 @@ void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 void CommandBuildBuilding(CUnit *unit, int x, int y,
 	CUnitType *what, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -714,7 +714,7 @@ void CommandDismiss(CUnit *unit)
 */
 void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 {
-	Order *order;
+	COrder *order;
 	int nx;
 	int ny;
 
@@ -767,7 +767,7 @@ void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 */
 void CommandResource(CUnit *unit, CUnit *dest, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
@@ -809,7 +809,7 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 */
 void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
@@ -853,7 +853,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 */
 void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -962,7 +962,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 */
 void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
@@ -1001,7 +1001,7 @@ void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 */
 void CommandTransformIntoType(CUnit *unit, CUnitType *type)
 {
-	Order *order;
+	COrder *order;
 
 	Assert(unit->CriticalOrder.Action == UnitActionStill);
 	order = &unit->CriticalOrder;
@@ -1056,7 +1056,7 @@ void CommandCancelUpgradeTo(CUnit *unit)
 */
 void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
@@ -1149,7 +1149,7 @@ void CommandCancelResearch(CUnit *unit)
 void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 	SpellType *spell, int flush)
 {
-	Order *order;
+	COrder *order;
 
 	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 

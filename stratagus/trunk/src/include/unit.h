@@ -421,7 +421,8 @@ typedef enum _unit_action_ {
 /**
 **  Unit order structure.
 */
-typedef struct _order_ {
+class COrder {
+public:
 	unsigned char Action;   /// global action
 	unsigned char Flags;    /// Order flags (unused)
 	int           Range;    /// How far away
@@ -429,9 +430,9 @@ typedef struct _order_ {
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
 
-	CUnit     *Goal;        /// goal of the order (if any)
-	int        X;           /// or X tile coordinate of destination
-	int        Y;           /// or Y tile coordinate of destination
+	CUnit *Goal;            /// goal of the order (if any)
+	int X;                  /// or X tile coordinate of destination
+	int Y;                  /// or Y tile coordinate of destination
 	CUnitType *Type;        /// Unit-type argument
 
 	union {
@@ -442,14 +443,14 @@ typedef struct _order_ {
 		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
 		SpellType *Spell;             /// spell when casting.
 		CUpgrade *Upgrade;            /// upgrade.
-		struct _order_ *Order;        /// FIXME : seems to be a hack for free memory.
+		COrder *Order;                /// FIXME : seems to be a hack for free memory.
 	} Arg1;             /// Extra command argument.
-} Order;
+};
 
 /**
 **  Voice groups for an unit
 */
-typedef enum _unit_voice_group_ {
+enum UnitVoiceGroup {
 	VoiceSelected,          /// If selected
 	VoiceAcknowledging,     /// Acknowledge command
 	VoiceReady,             /// Command completed
@@ -460,7 +461,7 @@ typedef enum _unit_voice_group_ {
 	VoiceDocking,           /// only for transport reaching coast
 	VoiceRepairing,         /// repairing
 	VoiceHarvesting,        /// harvesting
-} UnitVoiceGroup;
+};
 
 /**
 **  Unit/Missile headings.
@@ -592,11 +593,11 @@ public:
 	char OrderCount;            /// how many orders in queue
 	char OrderFlush;            /// cancel current order, take next
 	int  TotalOrders;           /// Total Number of orders available
-	Order* Orders;              /// orders to process
-	Order SavedOrder;           /// order to continue after current
-	Order NewOrder;             /// order for new trained units
-	Order CriticalOrder;        /// order to do as possible in breakable animation.
-	char* AutoCastSpell;        /// spells to auto cast
+	COrder *Orders;              /// orders to process
+	COrder SavedOrder;           /// order to continue after current
+	COrder NewOrder;             /// order for new trained units
+	COrder CriticalOrder;        /// order to do as possible in breakable animation.
+	char *AutoCastSpell;        /// spells to auto cast
 	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 
 	union _order_data_ {
@@ -886,7 +887,7 @@ extern int CanMove(const CUnit *);
 	/// Generate a unit reference, a printable unique string for unit
 extern char *UnitReference(const CUnit *);
 	/// Save an order
-extern void SaveOrder(const Order *order, CFile *file);
+extern void SaveOrder(const COrder *order, CFile *file);
 	/// save unit-structure
 extern void SaveUnit(const CUnit *unit, CFile *file);
 	/// save all units
@@ -1047,7 +1048,7 @@ extern void SelectionCclRegister(void);
 // in ccl_unit.c
 
 	/// Parse order
-extern void CclParseOrder(struct lua_State *l, Order *order);
+extern void CclParseOrder(struct lua_State *l, COrder *order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
 

@@ -164,8 +164,6 @@ void CleanUpgrades(void)
 	while (AllUpgrades.size()) {
 		CUpgrade *upgrade = AllUpgrades.back();
 		AllUpgrades.pop_back();
-		delete[] upgrade->Ident;
-		delete[] upgrade->Icon.Name;
 		delete upgrade;
 	}
 	Upgrades.clear();
