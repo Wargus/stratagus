@@ -2494,7 +2494,7 @@ static void TipsMenu(void)
 static void TipsCycleNextTip(void)
 {
 	++CurrentTip;
-	if (CurrentTip >= Tips.size()) {
+	if (CurrentTip >= (int)Tips.size()) {
 		CurrentTip = 0;
 	}
 }
