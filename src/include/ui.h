@@ -458,8 +458,7 @@ public:
 
 	Button* SingleSelectedButton;       /// Button for single selected unit
 
-	Button* SelectedButtons;            /// Selected buttons
-	int     NumSelectedButtons;         /// Number of selected buttons
+	std::vector<Button> SelectedButtons;/// Selected buttons
 	int     MaxSelectedFont;            /// Font type to use
 	int     MaxSelectedTextX;           /// position to place '+#' text
 	int     MaxSelectedTextY;           /// if > maximum units selected
@@ -470,8 +469,7 @@ public:
 	int     SingleTrainingTextX;        /// X text position single training
 	int     SingleTrainingTextY;        /// Y text position single training
 
-	Button* TrainingButtons;            /// Training buttons
-	int     NumTrainingButtons;         /// Number of training buttons
+	std::vector<Button> TrainingButtons;/// Training buttons
 	char*   TrainingText;               /// Multiple Training Text
 	int     TrainingFont;               /// Multiple Training Font
 	int     TrainingTextX;              /// Multiple Training X Text position
@@ -481,8 +479,7 @@ public:
 
 	Button* ResearchingButton;          /// Button info for researching
 
-	Button* TransportingButtons;        /// Button info for transporting
-	int     NumTransportingButtons;     /// Number of transporting buttons
+	std::vector<Button> TransportingButtons;/// Button info for transporting
 
 	// Completed bar
 	SDL_Color CompletedBarColorRGB;     /// color for completed bar

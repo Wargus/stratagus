@@ -697,18 +697,18 @@ static void CclParseSelected(lua_State* l, CUserInterface* ui)
 				lua_pop(l, 1);
 				++k;
 				if (!strcmp(value, "icons")) {
-					int i;
-
+					int subsubargs;
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					ui->NumSelectedButtons = luaL_getn(l, -1);
-					ui->SelectedButtons = new Button[ui->NumSelectedButtons];
-					for (i = 0; i < ui->NumSelectedButtons; ++i) {
+					subsubargs = luaL_getn(l, -1);
+					for (int i = 0; i < subsubargs; ++i) {
+						Button b;
 						lua_rawgeti(l, -1, i + 1);
-						CclParseIcon(l, &ui->SelectedButtons[i]);
+						CclParseIcon(l, &b);
 						lua_pop(l, 1);
+						ui->SelectedButtons.push_back(b);
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "max-text")) {
@@ -802,18 +802,19 @@ static void CclParseTraining(lua_State* l, CUserInterface* ui)
 					ui->TrainingTextX = text.X;
 					ui->TrainingTextY = text.Y;
 				} else if (!strcmp(value, "icons")) {
-					int i;
+					int subsubargs;
 
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					ui->NumTrainingButtons = luaL_getn(l, -1);
-					ui->TrainingButtons = new Button[ui->NumTrainingButtons];
-					for (i = 0; i < ui->NumTrainingButtons; ++i) {
+					subsubargs = luaL_getn(l, -1);
+					for (int i = 0; i < subsubargs; ++i) {
+						Button b;
 						lua_rawgeti(l, -1, i + 1);
-						CclParseIcon(l, &ui->TrainingButtons[i]);
+						CclParseIcon(l, &b);
 						lua_pop(l, 1);
+						ui->TrainingButtons.push_back(b);
 					}
 					lua_pop(l, 1);
 				} else {
@@ -913,18 +914,18 @@ static void CclParseTransporting(lua_State *l, CUserInterface *ui)
 		lua_pop(l, 1);
 		++j;
 		if (!strcmp(value, "icons")) {
-			int i;
-
+			int subargs;
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			ui->NumTransportingButtons = luaL_getn(l, -1);
-			ui->TransportingButtons = new Button[ui->NumTransportingButtons];
-			for (i = 0; i < ui->NumTransportingButtons; ++i) {
+			subargs = luaL_getn(l, -1);
+			for (int i = 0; i < subargs; ++i) {
+				Button b;
 				lua_rawgeti(l, -1, i + 1);
-				CclParseIcon(l, &ui->TransportingButtons[i]);
+				CclParseIcon(l, &b);
 				lua_pop(l, 1);
+				ui->TransportingButtons.push_back(b);
 			}
 			lua_pop(l, 1);
 		} else {
@@ -951,7 +952,6 @@ static void CclParseButtonIcons(lua_State *l, CUserInterface *ui)
 		lua_pop(l, 1);
 		ui->ButtonPanel.Buttons.push_back(b);
 	}
-	Assert(args == (int)ui->ButtonPanel.Buttons.size());
 }
 
 /**
@@ -1245,17 +1245,21 @@ static int CclDefineUI(lua_State *l)
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "panels")) {
+					ui->NumberPanel++;
+					char *newp = new char[ui->NumberPanel];
+					if (ui->PanelIndex) {
+						memcpy(newp, ui->PanelIndex, (ui->NumberPanel - 1) * sizeof(char));
+						delete[] ui->PanelIndex;
+					}
+					ui->PanelIndex = newp;
+
 					lua_rawgeti(l, j + 1, k + 1);
 					if (lua_isstring(l, -1)) {
-						ui->NumberPanel++;
-						ui->PanelIndex = (char *)realloc(ui->PanelIndex, ui->NumberPanel * sizeof(*ui->PanelIndex));
 						ui->PanelIndex[ui->NumberPanel - 1] = GetIndexPanel(l, LuaToString(l, -1));
 					} else {
 						Assert(lua_istable(l, -1));
 						for (i = 0; i < luaL_getn(l, -1); i++) {
 							lua_rawgeti(l, -1, i + 1);
-							ui->NumberPanel++;
-							ui->PanelIndex = (char *)realloc(ui->PanelIndex, ui->NumberPanel * sizeof(*ui->PanelIndex));
 							ui->PanelIndex[ui->NumberPanel - 1] = GetIndexPanel(l, LuaToString(l, -1));
 							lua_pop(l, 1);
 						}

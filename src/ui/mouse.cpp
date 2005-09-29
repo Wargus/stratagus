@@ -519,8 +519,8 @@ static void HandleMouseOn(int x, int y)
 	}
 	if (NumSelected == 1 && Selected[0]->Type->CanTransport &&
 			Selected[0]->BoardCount) {
-		i = Selected[0]->BoardCount < UI.NumTransportingButtons ?
-			Selected[0]->BoardCount - 1 : UI.NumTransportingButtons - 1;
+		i = Selected[0]->BoardCount < (int)UI.TransportingButtons.size() ?
+			Selected[0]->BoardCount - 1 : (int)UI.TransportingButtons.size() - 1;
 		for (; i >= 0; --i) {
 			if (OnButton(x, y, &UI.TransportingButtons[i])) {
 				ButtonAreaUnderCursor = ButtonAreaTransporting;
@@ -540,8 +540,8 @@ static void HandleMouseOn(int x, int y)
 					return;
 				}
 			} else {
-				i = Selected[0]->OrderCount < UI.NumTrainingButtons ?
-					Selected[0]->OrderCount - 1 : UI.NumTrainingButtons - 1;
+				i = Selected[0]->OrderCount < (int)UI.TrainingButtons.size() ?
+					Selected[0]->OrderCount - 1 : UI.TrainingButtons.size() - 1;
 				for (; i >= 0; --i) {
 					if (Selected[0]->Orders[i].Action == UnitActionTrain &&
 							OnButton(x, y, &UI.TrainingButtons[i])) {
@@ -576,8 +576,8 @@ static void HandleMouseOn(int x, int y)
 			return;
 		}
 	} else {
-		i = NumSelected > UI.NumSelectedButtons ?
-			UI.NumSelectedButtons - 1 : NumSelected - 1;
+		i = NumSelected > (int)UI.SelectedButtons.size() ?
+			UI.SelectedButtons.size() - 1 : NumSelected - 1;
 		for (; i >= 0; --i) {
 			if (OnButton(x, y, &UI.SelectedButtons[i])) {
 				ButtonAreaUnderCursor = ButtonAreaSelected;
