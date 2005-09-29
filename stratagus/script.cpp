@@ -87,7 +87,7 @@ int CclInConfigFile;                  /// True while config file parsing
 int SaveGameLoading;                  /// If a Saved Game is Loading
 const char *CurrentLuaFile;                 /// Lua file currently being interpreted
 
-char *Tips[MAX_TIPS + 1];             /// Array of tips
+std::vector<char *> Tips;             /// Array of tips
 bool ShowTips;                        /// Show tips at start of level
 int CurrentTip;                       /// Current tip to display
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
@@ -2031,17 +2031,12 @@ static int CclSetShowTips(lua_State *l)
 */
 static int CclSetCurrentTip(lua_State *l)
 {
-	int old;
-
 	LuaCheckArgs(l, 1);
-	old = CurrentTip;
 	CurrentTip = LuaToNumber(l, 1);
-	if (CurrentTip >= MAX_TIPS || Tips[CurrentTip] == NULL) {
+	if (CurrentTip >= Tips.size()) {
 		CurrentTip = 0;
 	}
-
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -2050,27 +2045,21 @@ static int CclSetCurrentTip(lua_State *l)
 **  @param l  Lua state.
 **
 **  @todo  FIXME: Memory for tips is never freed.
-**         FIXME: Make Tips dynamic.
 */
 static int CclAddTip(lua_State *l)
 {
-	int i;
 	const char *str;
 
 	LuaCheckArgs(l, 1);
 	str = LuaToString(l, 1);
-	for (i = 0; i < MAX_TIPS; ++i) {
-		if (Tips[i] && !strcmp(str, Tips[i])) {
-			break;
-		}
-		if (Tips[i] == NULL) {
-			Tips[i] = new_strdup(str);
+	for (int i = 0; i < (int)Tips.size(); ++i) {
+		if (!strcmp(str, Tips[i])) {
 			break;
 		}
 	}
+	Tips.push_back(new_strdup(str));
 
-	lua_pushstring(l, str);
-	return 1;
+	return 0;
 }
 
 /**

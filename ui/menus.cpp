@@ -2494,7 +2494,7 @@ static void TipsMenu(void)
 static void TipsCycleNextTip(void)
 {
 	++CurrentTip;
-	if (Tips[CurrentTip] == NULL) {
+	if (CurrentTip >= Tips.size()) {
 		CurrentTip = 0;
 	}
 }
@@ -2507,23 +2507,21 @@ static void TipsCyclePreviousTip(void)
 	if (CurrentTip != 0) {
 		--CurrentTip;
 	} else {
-		while (Tips[CurrentTip + 1] != NULL) {
-			++CurrentTip;
-		}
+		CurrentTip = Tips.size() - 1;
 	}
 }
 
 /**
 **  Tips menu init callback
 */
-static void TipsInit(Menu* menu)
+static void TipsInit(Menu *menu)
 {
 }
 
 /**
 **  Tips menu exit callback
 */
-static void TipsExit(Menu* menu)
+static void TipsExit(Menu *menu)
 {
 	TipsCycleNextTip();
 	SavePreferences();
@@ -2532,7 +2530,7 @@ static void TipsExit(Menu* menu)
 /**
 **  Show tips at startup gem callback
 */
-static void TipsShowTipsCheckbox(Menuitem* mi)
+static void TipsShowTipsCheckbox(Menuitem *mi)
 {
 	if (mi->Menu->Items[1].D.Checkbox.Checked) {
 		ShowTips = true;
@@ -2544,7 +2542,7 @@ static void TipsShowTipsCheckbox(Menuitem* mi)
 /**
 **  Show tips at startup text callback
 */
-static void TipsShowTipsText(Menuitem* mi)
+static void TipsShowTipsText(Menuitem *mi)
 {
 	if (!mi->Menu->Items[1].D.Checkbox.Checked) {
 		ShowTips = true;
