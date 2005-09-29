@@ -2033,7 +2033,7 @@ static int CclSetCurrentTip(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	CurrentTip = LuaToNumber(l, 1);
-	if (CurrentTip >= Tips.size()) {
+	if (CurrentTip >= (int)Tips.size()) {
 		CurrentTip = 0;
 	}
 	return 0;
