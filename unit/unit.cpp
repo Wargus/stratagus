@@ -73,8 +73,8 @@ unsigned int UnitSlotFree;                /// First free unit slot
 CUnit *ReleasedHead;                       /// List of released units.
 CUnit *ReleasedTail;                       /// List tail of released units.
 
-static Order* ReleasedOrderHead;          /// List of released Orders.
-static Order* ReleasedOrderTail;          /// List tail of released orders.
+static COrder *ReleasedOrderHead;          /// List of released Orders.
+static COrder *ReleasedOrderTail;          /// List tail of released orders.
 
 CUnit *Units[MAX_UNIT_SLOTS];              /// Array of used slots
 int NumUnits;                             /// Number of slots used
@@ -337,7 +337,7 @@ void CUnit::Init(CUnitType* type)
 	} else {
 		// No Available Orders in Memory, create new ones
 		TotalOrders = DEFAULT_START_ORDERS;
-		Orders = (Order *)calloc(TotalOrders, sizeof(Order));
+		Orders = (COrder *)calloc(TotalOrders, sizeof(COrder));
 	}
 
 
@@ -3502,9 +3502,9 @@ char *UnitReference(const CUnit *unit)
 **  @param order    Order who should be saved.
 **  @param file     Output file.
 */
-void SaveOrder(const Order* order, CFile* file)
+void SaveOrder(const COrder *order, CFile *file)
 {
-	char* ref;
+	char *ref;
 
 	file->printf("{");
 	switch (order->Action) {
@@ -3933,7 +3933,7 @@ void CleanUnits(void)
 {
 	CUnit **table;
 	CUnit *unit;
-	Order *order;
+	COrder *order;
 
 	//
 	//  Free memory for all units in unit table.

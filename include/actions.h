@@ -48,7 +48,7 @@ class CUnit;
 class CUnitType;
 class CUpgrade;
 class SpellType;
-struct _order_;
+class COrder;
 class CAnimation;
 
 /*----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ extern void CommandDiplomacy(int player, int state, int opponent);
 	/// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 	/// Send any command
-extern void CommandAnyOrder(CUnit *unit, struct _order_ *order, int flush);
+extern void CommandAnyOrder(CUnit *unit, COrder *order, int flush);
 	/// Move an order in command queue
 extern void CommandMoveOrder(CUnit *unit, int src, int dst);
 
