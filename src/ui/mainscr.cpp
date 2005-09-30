@@ -1297,7 +1297,7 @@ void CInfoPanel::Draw(void)
 			//
 			DrawInfoPanelBackground(0);
 			for (i = 0; i < (NumSelected > (int)UI.SelectedButtons.size() ?
-					UI.SelectedButtons.size() : NumSelected); ++i) {
+					(int)UI.SelectedButtons.size() : NumSelected); ++i) {
 				Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer,
 					UI.SelectedButtons[i].Style,
 					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
@@ -1311,7 +1311,7 @@ void CInfoPanel::Draw(void)
 					UI.StatusLine.Set(Selected[i]->Type->Name);
 				}
 			}
-			if (NumSelected > UI.SelectedButtons.size()) {
+			if (NumSelected > (int)UI.SelectedButtons.size()) {
 				char buf[5];
 
 				sprintf(buf, "+%d", NumSelected - UI.SelectedButtons.size());
