@@ -579,7 +579,7 @@ static void CleanAnimation(CAnimation *anim)
 		}
 		++ptr;
 	}
-	free(anim);
+	delete anim;
 }
 
 /**

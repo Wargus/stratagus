@@ -1415,7 +1415,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, idx);
-	anim = (CAnimation *)calloc(args + 1, sizeof(*anim));
+	anim = new CAnimation;
 	tail = NULL;
 	NumLabels = NumLabelsLater = 0;
 
