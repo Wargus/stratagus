@@ -58,7 +58,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CAnimation* AnimationsArray[ANIMATIONS_MAXANIM];
+CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
 int NumAnimations;
 
 std::map<std::string, CAnimations *> AnimationMap;/// Animation map
@@ -84,7 +84,7 @@ static int NumLabelsLater;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int GetSpriteIndex(const char* SpriteName);
+int GetSpriteIndex(const char *SpriteName);
 
 /**
 **  Get the resource ID from a SCM object.
@@ -93,10 +93,10 @@ int GetSpriteIndex(const char* SpriteName);
 **
 **  @return   the resource id
 */
-unsigned CclGetResourceByName(lua_State* l)
+unsigned CclGetResourceByName(lua_State *l)
 {
 	int i;
-	const char* value;
+	const char *value;
 
 	value = LuaToString(l, -1);
 	for (i = 0; i < MaxCosts; ++i) {
@@ -114,9 +114,9 @@ unsigned CclGetResourceByName(lua_State* l)
 **  @param l  Lua state.
 **  @param b  BuildingRestriction to fill in
 */
-static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
+static void ParseBuildingRules(lua_State *l, BuildRestriction **b)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int i;
 
@@ -617,8 +617,8 @@ static int CclDefineUnitType(lua_State *l)
 			// Free any old restrictions if they are redefined
 			if (type->BuildingRules) {
 				int x;
-				BuildRestriction* b;
-				BuildRestriction* f;
+				BuildRestriction *b;
+				BuildRestriction *f;
 
 				x = 0;
 				while (type->BuildingRules[x] != NULL) {
@@ -938,7 +938,7 @@ static int CclDefineUnitType(lua_State *l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "harvest")) {
 					int res;
-					const char* name;
+					const char *name;
 
 					lua_rawgeti(l, -1, k + 1);
 					name = LuaToString(l, -1 );
@@ -1126,7 +1126,7 @@ CUnitType *CclGetUnitType(lua_State *l)
 		str = LuaToString(l, -1);
 		return UnitTypeByIdent(str);
 	} else if (lua_isuserdata(l, -1)) {
-		LuaUserData* data;
+		LuaUserData *data;
 		data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
 			return (CUnitType *)data->Data;
@@ -1262,7 +1262,7 @@ static void AddLabel(lua_State *l, CAnimation *anim, char *label)
 /**
 **  Find a label
 */
-static CAnimation *FindLabel(lua_State *l, char* label)
+static CAnimation *FindLabel(lua_State *l, char *label)
 {
 	for (int i = 0; i < NumLabels; ++i) {
 		if (!strcmp(Labels[i].Name, label)) {
@@ -1335,7 +1335,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 		anim->D.Sound.Name = new_strdup(op2);
 	} else if (!strcmp(op1, "random-sound")) {
 		int count;
-		char* next;
+		char *next;
 
 		anim->Type = AnimationRandomSound;
 		count = 0;
@@ -1380,7 +1380,7 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 		anim->Type = AnimationGoto;
 		FindLabelLater(l, &anim->D.Goto.Goto, op2);
 	} else if (!strcmp(op1, "random-goto")) {
-		char* label;
+		char *label;
 
 		anim->Type = AnimationRandomGoto;
 		label = strchr(op2, ' ');
@@ -1415,7 +1415,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, idx);
-	anim = new CAnimation;
+	anim = new CAnimation[args + 1];
 	tail = NULL;
 	NumLabels = NumLabelsLater = 0;
 
