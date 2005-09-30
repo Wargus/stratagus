@@ -142,6 +142,7 @@ public:
 class Button {
 public:
 	Button() : X(0), Y(0), Text(NULL), Style(NULL) {}
+	~Button() { delete[] Text; }
 
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
