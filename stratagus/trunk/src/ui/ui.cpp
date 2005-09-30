@@ -344,28 +344,6 @@ void CleanUI(CUserInterface *ui)
 	// Pie Menu
 	FreeGraphic(ui->PieMenuBackgroundG);
 
-	// Buttons
-	delete[] ui->MenuButton.Text;
-	delete[] ui->NetworkMenuButton.Text;
-	delete[] ui->NetworkDiplomacyButton.Text;
-
-	// Cursors
-	delete[] ui->Point.Name;
-	delete[] ui->Glass.Name;
-	delete[] ui->Cross.Name;
-	delete[] ui->YellowHair.Name;
-	delete[] ui->GreenHair.Name;
-	delete[] ui->RedHair.Name;
-	delete[] ui->Scroll.Name;
-	delete[] ui->ArrowE.Name;
-	delete[] ui->ArrowNE.Name;
-	delete[] ui->ArrowN.Name;
-	delete[] ui->ArrowNW.Name;
-	delete[] ui->ArrowW.Name;
-	delete[] ui->ArrowSW.Name;
-	delete[] ui->ArrowS.Name;
-	delete[] ui->ArrowSE.Name;
-
 	// Menu Panels
 	menupanel = ui->MenuPanels;
 	while (menupanel) {

@@ -144,6 +144,7 @@ public:
 class CursorConfig {
 public:
 	CursorConfig() : Name(NULL), Cursor(NULL) {}
+	~CursorConfig() { delete[] Name; }
 
 	char       *Name;    /// Config cursor-type name
 	CursorType *Cursor;  /// Cursor-type pointer

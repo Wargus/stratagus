@@ -603,7 +603,7 @@ static void CclParseInfoText(lua_State* l, InfoText* text)
 **  @param l     Lua state.
 **  @param icon  Pointer to the Button information that is returned.
 */
-static void CclParseIcon(lua_State* l, Button* icon)
+static void CclParseIcon(lua_State *l, Button *icon)
 {
 	const char* value;
 	int args;
@@ -1245,20 +1245,26 @@ static int CclDefineUI(lua_State *l)
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "panels")) {
-					ui->NumberPanel++;
-					char *newp = new char[ui->NumberPanel];
-					if (ui->PanelIndex) {
-						memcpy(newp, ui->PanelIndex, (ui->NumberPanel - 1) * sizeof(char));
-						delete[] ui->PanelIndex;
-					}
-					ui->PanelIndex = newp;
-
 					lua_rawgeti(l, j + 1, k + 1);
 					if (lua_isstring(l, -1)) {
+						ui->NumberPanel++;
+						char *newp = new char[ui->NumberPanel];
+						if (ui->PanelIndex) {
+							memcpy(newp, ui->PanelIndex, (ui->NumberPanel - 1) * sizeof(char));
+							delete[] ui->PanelIndex;
+						}
+						ui->PanelIndex = newp;
 						ui->PanelIndex[ui->NumberPanel - 1] = GetIndexPanel(l, LuaToString(l, -1));
 					} else {
 						Assert(lua_istable(l, -1));
 						for (i = 0; i < luaL_getn(l, -1); i++) {
+							ui->NumberPanel++;
+							char *newp = new char[ui->NumberPanel];
+							if (ui->PanelIndex) {
+								memcpy(newp, ui->PanelIndex, (ui->NumberPanel - 1) * sizeof(char));
+								delete[] ui->PanelIndex;
+							}
+							ui->PanelIndex = newp;
 							lua_rawgeti(l, -1, i + 1);
 							ui->PanelIndex[ui->NumberPanel - 1] = GetIndexPanel(l, LuaToString(l, -1));
 							lua_pop(l, 1);
