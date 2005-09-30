@@ -99,7 +99,7 @@ public:
 	int Height;       /// height of the decoration
 
 // --- FILLED UP ---
-	Graphic *Sprite;  /// loaded sprite images
+	CGraphic *Sprite;  /// loaded sprite images
 };
 
 
@@ -744,7 +744,7 @@ void LoadDecorations(void)
 	std::vector<Decoration>::iterator i;
 	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
 		ShowLoadProgress("Decorations `%s'", (*i).File);
-		(*i).Sprite = NewGraphic((*i).File, (*i).Width, (*i).Height);
+		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
 		(*i).Sprite->Load();
 	}
 }
@@ -757,7 +757,7 @@ void CleanDecorations(void)
 	for (int i = 0; i < (int)DecoSprite.SpriteArray.size(); ++i) {
 		delete[] DecoSprite.Name[i];
 		delete[] DecoSprite.SpriteArray[i].File;
-		FreeGraphic(DecoSprite.SpriteArray[i].Sprite);
+		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);
 	}
 
 	DecoSprite.Name.clear();
@@ -867,7 +867,7 @@ void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
 void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 {
 	int n;                   // frame of the sprite to show.
-	Graphic *sprite;         // the sprite to show.
+	CGraphic *sprite;         // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
 
 	Assert(unit);
@@ -902,7 +902,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 */
 void CDecoVarStaticSprite::Draw(int x, int y, const CUnit *unit) const
 {
-	Graphic *sprite;         // the sprite to show.
+	CGraphic *sprite;         // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
 
 	decosprite = &DecoSprite.SpriteArray[(int)this->NSprite];
@@ -1319,7 +1319,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 **  @param x         X position.
 **  @param y         Y position.
 */
-void DrawUnitPlayerColor(const CUnitType *type, Graphic *sprite,
+void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 	int player, int frame, int x, int y)
 {
 	int f;
@@ -1492,7 +1492,7 @@ void CUnit::Draw() const
 	int frame;
 	int state;
 	int constructed;
-	Graphic *sprite;
+	CGraphic *sprite;
 	ResourceInfo *resinfo;
 	CConstructionFrame *cframe;
 	CUnitType *type;

@@ -467,7 +467,7 @@ static int CclDefineCursor(lua_State *l)
 		ct->Race = race ? new_strdup(race) : NULL;
 	}
 
-	ct->G = NewGraphic(file, w, h);
+	ct->G = CGraphic::New(file, w, h);
 	ct->HotX = hotx;
 	ct->HotY = hoty;
 	ct->FrameRate = rate;
@@ -1079,7 +1079,7 @@ static int CclDefineUI(lua_State *l)
 			while (lua_next(l, j + 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "File")) {
-					ui->Filler.push_back(NewGraphic(LuaToString(l, -1), 0, 0));
+					ui->Filler.push_back(CGraphic::New(LuaToString(l, -1)));
 				} else if (!strcmp(value, "Pos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
@@ -1173,7 +1173,7 @@ static int CclDefineUI(lua_State *l)
 					lua_pop(l, 1);
 				}
 				if (file) {
-					ui->Resources[res].G = NewGraphic(file, w, h);
+					ui->Resources[res].G = CGraphic::New(file, w, h);
 					delete[] file;
 				}
 				lua_pop(l, 1);
@@ -1240,7 +1240,7 @@ static int CclDefineUI(lua_State *l)
 						}
 					}
 					if (file) {
-						ui->InfoPanel.G = NewGraphic(file, w, h);
+						ui->InfoPanel.G = CGraphic::New(file, w, h);
 						delete[] file;
 					}
 					lua_pop(l, 1);
@@ -1352,7 +1352,7 @@ static int CclDefineUI(lua_State *l)
 						++subk;
 						if (!strcmp(value, "file")) {
 							lua_rawgeti(l, -1, subk + 1);
-							ui->ButtonPanel.G = NewGraphic(LuaToString(l, -1), 0, 0);
+							ui->ButtonPanel.G = CGraphic::New(LuaToString(l, -1));
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "pos")) {
 							lua_rawgeti(l, -1, subk + 1);
@@ -1410,7 +1410,7 @@ static int CclDefineUI(lua_State *l)
 				++k;
 				if (!strcmp(value, "file")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					ui->PieMenuBackgroundG = NewGraphic(LuaToString(l, -1), 0, 0);
+					ui->PieMenuBackgroundG = CGraphic::New(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "radius")) {
 					// Position of the pies in a piemenu
@@ -1659,14 +1659,14 @@ static int CclDefineUI(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
-				(*menupanel)->G = NewGraphic(LuaToString(l, -1), 0, 0);
+				(*menupanel)->G = CGraphic::New(LuaToString(l, -1));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "victory-background")) {
 			// Backgrounds
-			ui->VictoryBackgroundG = NewGraphic(LuaToString(l, j + 1), 0, 0);
+			ui->VictoryBackgroundG = CGraphic::New(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "defeat-background")) {
-			ui->DefeatBackgroundG = NewGraphic(LuaToString(l, j + 1), 0, 0);
+			ui->DefeatBackgroundG = CGraphic::New(LuaToString(l, j + 1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -2368,7 +2368,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 	}
 
 	if (file) {
-		p->Sprite = NewGraphic(file, w, h);
+		p->Sprite = CGraphic::New(file, w, h);
 		delete[] file;
 	}
 }
@@ -2679,7 +2679,7 @@ static void FreeMenu(Menu *menu)
 		return;
 	}
 	delete[] menu->Panel;
-	FreeGraphic(menu->BackgroundG);
+	CGraphic::Free(menu->BackgroundG);
 	for (i = 0; i < menu->NumItems; ++i) {
 		switch (menu->Items[i].MiType) {
 			case MiTypeText:
@@ -2764,7 +2764,7 @@ static int CclDefineMenu(lua_State *l)
 				item.Panel = new_strdup(LuaToString(l, j + 1));
 			}
 		} else if (!strcmp(value, "background")) {
-			item.BackgroundG = NewGraphic(LuaToString(l, j + 1), 0, 0);
+			item.BackgroundG = CGraphic::New(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "default")) {
 			item.DefSel = LuaToNumber(l, j + 1);
 /*
@@ -3899,7 +3899,7 @@ static int CclDefineMenuGraphics(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 		}
-		MenuButtonGraphics[i] = NewGraphic(file, w, h);
+		MenuButtonGraphics[i] = CGraphic::New(file, w, h);
 		delete[] file;
 		++i;
 		lua_pop(l, 1);

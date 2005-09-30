@@ -1292,7 +1292,7 @@ MissileType::~MissileType()
 	delete[] this->ImpactSound.Name;
 	delete[] this->ImpactName;
 	delete[] this->SmokeName;
-	FreeGraphic(this->G);
+	CGraphic::Free(this->G);
 }
 
 /**

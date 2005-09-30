@@ -93,7 +93,7 @@ static char *DefaultNormalColorIndex;      /// Default normal color index
 static char *DefaultReverseColorIndex;     /// Default reverse color index
 
 #ifdef USE_OPENGL
-static Graphic **FontColorGraphics[MaxFonts];   /// Font color graphics
+static CGraphic **FontColorGraphics[MaxFonts];   /// Font color graphics
 #endif
 
 /*----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ static Graphic **FontColorGraphics[MaxFonts];   /// Font color graphics
 **  @param y   Y screen position
 */
 #ifndef USE_OPENGL
-static void VideoDrawChar(const Graphic *g,
+static void VideoDrawChar(const CGraphic *g,
 	int gx, int gy, int w, int h, int x, int y)
 {
 	SDL_Rect srect = {gx, gy, w, h};
@@ -122,7 +122,7 @@ static void VideoDrawChar(const Graphic *g,
 	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
 }
 #else
-static void VideoDrawChar(const Graphic *g,
+static void VideoDrawChar(const CGraphic *g,
 	int gx, int gy, int w, int h, int x, int y)
 {
 	g->DrawSub(gx, gy, w, h, x, y);
@@ -239,7 +239,7 @@ int VideoTextHeight(unsigned font)
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-static void VideoDrawCharClip(const Graphic *g, int gx, int gy, int w, int h,
+static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 	int x, int y)
 {
 	int ox;
@@ -275,10 +275,10 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 	FontColorMapping *rev;
 	char *color;
 	const char *p;
-	void (*DrawChar)(const Graphic *, int, int, int, int, int, int);
+	void (*DrawChar)(const CGraphic *, int, int, int, int, int, int);
 	int ipr;
 	int c;
-	Graphic *g;
+	CGraphic *g;
 
 	if (clip) {
 		DrawChar = VideoDrawCharClip;
@@ -726,7 +726,7 @@ static void FontMeasureWidths(ColorFont *fp)
 **  @param font  Font number
 */
 #ifdef USE_OPENGL
-static void MakeFontColorTextures(Graphic *g, int font)
+static void MakeFontColorTextures(CGraphic *g, int font)
 {
 	SDL_Surface *s;
 	std::vector<FontColorMapping>::size_type i;
@@ -735,11 +735,11 @@ static void MakeFontColorTextures(Graphic *g, int font)
 		return;
 	}
 
-	FontColorGraphics[font] = new Graphic *[FontColorMappings.size()];
+	FontColorGraphics[font] = new CGraphic *[FontColorMappings.size()];
 	s = g->Surface;
 	for (i = 0; i < (int)FontColorMappings.size(); ++i) {
-		FontColorGraphics[font][i] = new Graphic;
-		memcpy(FontColorGraphics[font][i], g, sizeof(Graphic));
+		FontColorGraphics[font][i] = new CGraphic;
+		memcpy(FontColorGraphics[font][i], g, sizeof(CGraphic));
 		FontColorGraphics[font][i]->Textures = NULL;
 		SDL_LockSurface(s);
 		for (int j = 0; j < NumFontColors; ++j) {
@@ -889,7 +889,7 @@ static int CclDefineFont(lua_State *l)
 	if (i == -1 || !w || !h || !file) {
 		LuaError(l, "missing argument");
 	}
-	Fonts[i].G = NewGraphic(file, 0, 0);
+	Fonts[i].G = CGraphic::New(file);
 	Fonts[i].Width = w;
 	Fonts[i].Height = h;
 
@@ -970,7 +970,7 @@ void CleanFonts(void)
 	int i;
 
 	for (i = 0; i < (int)(sizeof(Fonts) / sizeof(*Fonts)); ++i) {
-		FreeGraphic(Fonts[i].G);
+		CGraphic::Free(Fonts[i].G);
 		Fonts[i].G = NULL;
 
 #ifdef USE_OPENGL

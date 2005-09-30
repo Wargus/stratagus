@@ -353,7 +353,7 @@ CUnitType *NewUnitTypeSlot(char *ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType *type, Graphic *sprite, int player, int frame,
+void DrawUnitType(const CUnitType *type, CGraphic *sprite, int player, int frame,
 	int x, int y)
 {
 	// FIXME: move this calculation to high level.
@@ -437,7 +437,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 	int i;
 
 	if (type->ShadowFile) {
-		type->ShadowSprite = ForceNewGraphic(type->ShadowFile, type->ShadowWidth,
+		type->ShadowSprite = CGraphic::ForceNew(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
 		type->ShadowSprite->Load();
 		if (type->Flip) {
@@ -450,7 +450,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 		for (i = 0; i < MaxCosts; ++i) {
 			if ((resinfo = type->ResInfo[i])) {
 				if (resinfo->FileWhenLoaded) {
-					resinfo->SpriteWhenLoaded = NewGraphic(resinfo->FileWhenLoaded,
+					resinfo->SpriteWhenLoaded = CGraphic::New(resinfo->FileWhenLoaded,
 						type->Width, type->Height);
 					resinfo->SpriteWhenLoaded->Load();
 					if (type->Flip) {
@@ -458,7 +458,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 					}
 				}
 				if (resinfo->FileWhenEmpty) {
-					resinfo->SpriteWhenEmpty = NewGraphic(resinfo->FileWhenEmpty,
+					resinfo->SpriteWhenEmpty = CGraphic::New(resinfo->FileWhenEmpty,
 						type->Width, type->Height);
 					resinfo->SpriteWhenEmpty->Load();
 					if (type->Flip) {
@@ -470,7 +470,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 	}
 
 	if (type->File) {
-		type->Sprite = NewGraphic(type->File, type->Width, type->Height);
+		type->Sprite = CGraphic::New(type->File, type->Width, type->Height);
 		type->Sprite->Load();
 		if (type->Flip) {
 			type->Sprite->Flip();
@@ -656,10 +656,10 @@ void CleanUnitTypes(void)
 		for (res = 0; res < MaxCosts; ++res) {
 			if (type->ResInfo[res]) {
 				if (type->ResInfo[res]->SpriteWhenLoaded) {
-					FreeGraphic(type->ResInfo[res]->SpriteWhenLoaded);
+					CGraphic::Free(type->ResInfo[res]->SpriteWhenLoaded);
 				}
 				if (type->ResInfo[res]->SpriteWhenEmpty) {
-					FreeGraphic(type->ResInfo[res]->SpriteWhenEmpty);
+					CGraphic::Free(type->ResInfo[res]->SpriteWhenEmpty);
 				}
 				if (type->ResInfo[res]->FileWhenEmpty) {
 					delete[] type->ResInfo[res]->FileWhenEmpty;
@@ -684,7 +684,7 @@ void CleanUnitTypes(void)
 		delete[] type->Sound.Help.Name;
 		delete[] type->Sound.Dead.Name;
 
-		FreeGraphic(type->Sprite);
+		CGraphic::Free(type->Sprite);
 #ifdef USE_MNG
 		if (type->Portrait.Num) {
 			for (j = 0; j < type->Portrait.Num; ++j) {

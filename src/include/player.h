@@ -527,7 +527,7 @@ extern void PlayersEachSecond(int player);
 
 #ifndef USE_OPENGL
 	/// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(CPlayer *player, const Graphic *sprite);
+extern void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite);
 #endif
 
 	/// Output debug informations for players

@@ -443,7 +443,7 @@ static inline int OnButton(int x, int y, Button* button)
 **
 **  @return    True if mouse is on the graphic, False otherwise.
 */
-static inline int OnGraphic(int x, int y, Graphic* g, int gx, int gy)
+static inline int OnGraphic(int x, int y, CGraphic* g, int gx, int gy)
 {
 	x -= gx;
 	y -= gy;

@@ -113,7 +113,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Graphic;
+class CGraphic;
 class CUnitType;
 
 /*----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ public:
 
 // --- FILLED UP ---
 
-	Graphic *G; /// Cursor sprite image
+	CGraphic *G; /// Cursor sprite image
 };
 
 	/// Cursor config reference

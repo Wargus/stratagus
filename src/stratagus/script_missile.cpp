@@ -184,7 +184,7 @@ static int CclDefineMissileType(lua_State* l)
 	}
 
 	if (file) {
-		mtype->G = NewGraphic(file, mtype->Width, mtype->Height);
+		mtype->G = CGraphic::New(file, mtype->Width, mtype->Height);
 	}
 
 	return 0;

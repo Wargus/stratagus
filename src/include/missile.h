@@ -330,7 +330,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Graphic;
+class CGraphic;
 class CUnit;
 class CViewport;
 class CFile;
@@ -435,7 +435,7 @@ public:
 	MissileType* SmokeMissile;   /// Trailling missile
 
 // --- FILLED UP ---
-	Graphic *G;         /// missile graphic
+	CGraphic *G;         /// missile graphic
 };
 
 /*----------------------------------------------------------------------------

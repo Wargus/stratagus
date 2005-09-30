@@ -339,7 +339,7 @@ void CleanCursors(void)
 	std::vector<CursorType>::iterator i;
 
 	for (i = Cursors.begin(); i != Cursors.end(); ++i) {
-		FreeGraphic((*i).G);
+		CGraphic::Free((*i).G);
 		delete[] (*i).Ident;
 		delete[] (*i).Race;
 	}

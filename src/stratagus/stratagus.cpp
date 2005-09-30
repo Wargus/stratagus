@@ -361,7 +361,7 @@ static void ShowTitleScreens(void)
 
 		if (PlayMovie(TitleScreens[i]->File)) {
 			TitleScreenLabel **labels;
-			Graphic *g;
+			CGraphic *g;
 #ifdef USE_MNG
 			Mng *mng = new Mng;
 
@@ -372,7 +372,7 @@ static void ShowTitleScreens(void)
 			g = NULL;
 			if (!mng) {
 #endif
-				g = NewGraphic(TitleScreens[i]->File, 0, 0);
+				g = CGraphic::New(TitleScreens[i]->File);
 				g->Load();
 				g->Resize(Video.Width, Video.Height);
 #ifdef USE_MNG
@@ -413,7 +413,7 @@ static void ShowTitleScreens(void)
 #ifdef USE_MNG
 			delete mng;
 #endif
-			FreeGraphic(g);
+			CGraphic::Free(g);
 		}
 
 		Video.ClearScreen();

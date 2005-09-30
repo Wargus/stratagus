@@ -55,10 +55,10 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::map<std::string, Graphic *> GraphicHash;
+static std::map<std::string, CGraphic *> GraphicHash;
 
 #ifdef USE_OPENGL
-static std::list<Graphic *> Graphics;
+static std::list<CGraphic *> Graphics;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ static std::list<Graphic *> Graphics;
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void Graphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
+void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 {
 #ifndef USE_OPENGL
 	SDL_Rect srect = {gx, gy, w, h};
@@ -97,7 +97,7 @@ void Graphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void Graphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
+void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 {
 	int oldx = x;
 	int oldy = y;
@@ -116,7 +116,7 @@ void Graphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
-void Graphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
+void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 	unsigned char alpha) const
 {
 #ifndef USE_OPENGL
@@ -143,7 +143,7 @@ void Graphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
-void Graphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
+void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 	unsigned char alpha) const
 {
 	int oldx = x;
@@ -159,7 +159,7 @@ void Graphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void Graphic::DrawFrame(unsigned frame, int x, int y) const
+void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 {
 #ifndef USE_OPENGL
 	DrawSub((frame % (Surface->w / Width)) * Width,
@@ -178,7 +178,7 @@ void Graphic::DrawFrame(unsigned frame, int x, int y) const
 }
 
 #ifdef USE_OPENGL
-void Graphic::DoDrawFrameClip(GLuint *textures,
+void CGraphic::DoDrawFrameClip(GLuint *textures,
 	unsigned frame, int x, int y) const
 {
 	int ox;
@@ -209,7 +209,7 @@ void Graphic::DoDrawFrameClip(GLuint *textures,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void Graphic::DrawFrameClip(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
 {
 #ifndef USE_OPENGL
 	DrawSubClip((frame % (Surface->w / Width)) * Width,
@@ -220,7 +220,7 @@ void Graphic::DrawFrameClip(unsigned frame, int x, int y) const
 #endif
 }
 
-void Graphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 {
 #ifndef USE_OPENGL
 	DrawSubTrans((frame % (Surface->w / Width)) * Width,
@@ -234,7 +234,7 @@ void Graphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 #endif
 }
 
-void Graphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 {
 #ifndef USE_OPENGL
 	DrawSubClipTrans((frame % (Surface->w / Width)) * Width,
@@ -257,7 +257,7 @@ void Graphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void Graphic::DrawPlayerColorFrameClip(int player, unsigned frame,
+void CGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	int x, int y)
 {
 #ifndef USE_OPENGL
@@ -280,7 +280,7 @@ void Graphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void Graphic::DrawFrameX(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 {
 #ifndef USE_OPENGL
 	SDL_Rect srect;
@@ -309,7 +309,7 @@ void Graphic::DrawFrameX(unsigned frame, int x, int y) const
 }
 
 #ifdef USE_OPENGL
-void Graphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
+void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 	int x, int y) const
 {
 	int ox;
@@ -348,7 +348,7 @@ void Graphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void Graphic::DrawFrameClipX(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
 {
 #ifndef USE_OPENGL
 	SDL_Rect srect;
@@ -377,7 +377,7 @@ void Graphic::DrawFrameClipX(unsigned frame, int x, int y) const
 #endif
 }
 
-void Graphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 {
 #ifndef USE_OPENGL
 	SDL_Rect srect;
@@ -405,7 +405,7 @@ void Graphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 #endif
 }
 
-void Graphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
 {
 #ifndef USE_OPENGL
 	SDL_Rect srect;
@@ -449,7 +449,7 @@ void Graphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void Graphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
+void CGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 	int x, int y)
 {
 #ifndef USE_OPENGL
@@ -476,11 +476,15 @@ void Graphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 **
 **  @return      New graphic object
 */
-Graphic *NewGraphic(const char *file, int w, int h)
+CGraphic *CGraphic::New(const char *file, int w, int h)
 {
-	Graphic *g = GraphicHash[file];
+	if (!file) {
+		return new CGraphic;
+	}
+
+	CGraphic *g = GraphicHash[file];
 	if (!g) {
-		g = new Graphic;
+		g = new CGraphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -488,24 +492,8 @@ Graphic *NewGraphic(const char *file, int w, int h)
 		// FIXME: use a constructor for this
 		g->File = new_strdup(file);
 		g->HashFile = new_strdup(g->File);
-		g->Surface = NULL;
-#ifndef USE_OPENGL
-		g->SurfaceFlip = NULL;
-#endif
 		g->Width = w;
 		g->Height = h;
-		g->NumFrames = 1;
-		g->GraphicWidth = 0;
-		g->GraphicHeight = 0;
-		g->Refs = 1;
-#ifdef USE_OPENGL
-		g->TextureWidth = 0.f;
-		g->TextureHeight = 0.f;
-		g->Textures = NULL;
-		for (int i = 0; i < PlayerMax; ++i) {
-			g->PlayerColorTextures[i] = NULL;
-		}
-#endif
 		GraphicHash[g->HashFile] = g;
 	} else {
 		++g->Refs;
@@ -524,9 +512,9 @@ Graphic *NewGraphic(const char *file, int w, int h)
 **
 **  @return      New graphic object
 */
-Graphic *ForceNewGraphic(const char *file, int w, int h)
+CGraphic *CGraphic::ForceNew(const char *file, int w, int h)
 {
-	Graphic *g = new Graphic;
+	CGraphic *g = new CGraphic;
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
@@ -534,24 +522,8 @@ Graphic *ForceNewGraphic(const char *file, int w, int h)
 	g->File = new_strdup(file);
 	g->HashFile = new char[strlen(file) + 2 * sizeof(g->File) + 3];
 	sprintf(g->HashFile, "%s%p", g->File, g->File);
-	g->Surface = NULL;
-#ifndef USE_OPENGL
-	g->SurfaceFlip = NULL;
-#endif
 	g->Width = w;
 	g->Height = h;
-	g->NumFrames = 1;
-	g->GraphicWidth = 0;
-	g->GraphicHeight = 0;
-	g->Refs = 1;
-#ifdef USE_OPENGL
-	g->TextureWidth = 0.f;
-	g->TextureHeight = 0.f;
-	g->Textures = NULL;
-	for (int i = 0; i < PlayerMax; ++i) {
-		g->PlayerColorTextures[i] = NULL;
-	}
-#endif
 	GraphicHash[g->HashFile] = g;
 
 	return g;
@@ -560,7 +532,7 @@ Graphic *ForceNewGraphic(const char *file, int w, int h)
 /**
 **  Load a graphic
 */
-void Graphic::Load()
+void CGraphic::Load()
 {
 	if (Surface) {
 		return;
@@ -602,7 +574,7 @@ void Graphic::Load()
 **
 **  @param g  Pointer to the graphic
 */
-void FreeGraphic(Graphic *g)
+void CGraphic::Free(CGraphic *g)
 {
 #ifdef USE_OPENGL
 	int i;
@@ -652,9 +624,10 @@ void FreeGraphic(Graphic *g)
 			delete[] pixels;
 		}
 #endif
-		Assert(g->File);
 
-		GraphicHash.erase(g->HashFile);
+		if (g->HashFile) {
+			GraphicHash.erase(g->HashFile);
+		}
 		delete[] g->File;
 		delete[] g->HashFile;
 		delete g;
@@ -667,7 +640,7 @@ void FreeGraphic(Graphic *g)
 */
 void ReloadGraphics(void)
 {
-	std::list<Graphic *>::iterator i;
+	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
 		if ((*i)->Textures) {
 			delete[] (*i)->Textures;
@@ -688,7 +661,7 @@ void ReloadGraphics(void)
 /**
 **  Flip graphic and store in graphic->SurfaceFlip
 */
-void Graphic::Flip()
+void CGraphic::Flip()
 {
 #ifdef USE_OPENGL
 	return;
@@ -758,7 +731,7 @@ static int PowerOf2(int x)
 **  @param width   Graphic width.
 **  @param height  Graphic height.
 */
-static void MakeTextures2(Graphic *g, GLuint texture, UnitColors *colors,
+static void MakeTextures2(CGraphic *g, GLuint texture, UnitColors *colors,
 	int ow, int oh)
 {
 	int i;
@@ -885,7 +858,7 @@ static void MakeTextures2(Graphic *g, GLuint texture, UnitColors *colors,
 **  @param width   Graphic width.
 **  @param height  Graphic height.
 */
-static void MakeTextures(Graphic *g, int player, UnitColors *colors)
+static void MakeTextures(CGraphic *g, int player, UnitColors *colors)
 {
 	int i;
 	int tw;
@@ -924,7 +897,7 @@ static void MakeTextures(Graphic *g, int player, UnitColors *colors)
 **
 **  @param g  The graphic object.
 */
-void MakeTexture(Graphic *g)
+void MakeTexture(CGraphic *g)
 {
 	if (g->Textures) {
 		return;
@@ -939,7 +912,7 @@ void MakeTexture(Graphic *g)
 **  @param g       The graphic to texture with player colors.
 **  @param player  Player number to make textures for.
 */
-void MakePlayerColorTexture(Graphic *g, int player)
+void MakePlayerColorTexture(CGraphic *g, int player)
 {
 	if (g->PlayerColorTextures[player]) {
 		return;
@@ -955,7 +928,7 @@ void MakePlayerColorTexture(Graphic *g, int player)
 **  @param w  New width of graphic.
 **  @param h  New height of graphic.
 */
-void Graphic::Resize(int w, int h)
+void CGraphic::Resize(int w, int h)
 {
 	int i;
 	int j;
@@ -1078,7 +1051,7 @@ void Graphic::Resize(int w, int h)
 **
 **  @return   True if the pixel is transparent, False otherwise
 */
-int Graphic::TransparentPixel(int x, int y)
+int CGraphic::TransparentPixel(int x, int y)
 {
 	unsigned char *p;
 	int bpp;
@@ -1111,7 +1084,7 @@ int Graphic::TransparentPixel(int x, int y)
 **
 **  @todo FIXME: 32bpp
 */
-void Graphic::MakeShadow()
+void CGraphic::MakeShadow()
 {
 	SDL_Color colors[256];
 

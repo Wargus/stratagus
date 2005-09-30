@@ -526,7 +526,7 @@ class Mng;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Graphic;
+class CGraphic;
 class CConstruction;
 class CAnimations;
 class MissileType;
@@ -570,11 +570,11 @@ public:
 	unsigned TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
 	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
 	//  Runtime info:
-	Graphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
-	Graphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
+	CGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
+	CGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 #ifdef USE_OPENGL
-	Graphic *PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
-	Graphic *PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
+	CGraphic *PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
+	CGraphic *PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
 #endif
 };
 
@@ -950,8 +950,8 @@ public:
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player
 
-	Graphic *Sprite;                /// Sprite images
-	Graphic *ShadowSprite;          /// Shadow sprite image
+	CGraphic *Sprite;                /// Sprite images
+	CGraphic *ShadowSprite;          /// Shadow sprite image
 };
 
 	/// @todo ARI: should be dynamic (lua..).
@@ -1003,7 +1003,7 @@ extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 extern void SaveUnitTypes(CFile *file);            /// Save the unit-type table
 extern CUnitType *NewUnitTypeSlot(char *);            /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
-extern void DrawUnitType(const CUnitType *type, Graphic *sprite, int player,
+extern void DrawUnitType(const CUnitType *type, CGraphic *sprite, int player,
 	int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table
