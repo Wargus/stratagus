@@ -323,17 +323,10 @@ extern std::vector<KeyStrokeHelp> KeyStrokeHelps; /// Keystroke help pairs
 #define MENUS_MAXMENU 128  /// @todo wrong place, docu
 #define MENUS_MAXFUNC 128  /// @todo wrong place, docu
 
-#ifdef DOXYGEN  // no real code, only for document
-
-#else
-
 	/// Hash table of all the menus
 extern std::map<std::string, Menu *> MenuMap;
 	/// Hash table of all the menu functions
-typedef hashtable(void*, MENUS_MAXFUNC) _MenuFuncHash;
-extern _MenuFuncHash MenuFuncHash;
-
-#endif
+extern std::map<std::string, void *> MenuFuncHash;
 
 /*----------------------------------------------------------------------------
 --  Functions
