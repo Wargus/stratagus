@@ -214,6 +214,7 @@ int LuaLoadFile(const char *file)
 	char *buf;
 	CFile fp;
 	const char *PreviousLuaFile;
+	int oldsize;
 
 	PreviousLuaFile = CurrentLuaFile;
 	CurrentLuaFile = file;
@@ -225,16 +226,20 @@ int LuaLoadFile(const char *file)
 	}
 
 	size = 10000;
-	buf = (char*)malloc(size);
+	buf = new char[size];
 	location = 0;
 	while ((read = fp.read(&buf[location], size - location))) {
 		location += read;
+		oldsize = size;
 		size = size * 2;
-		buf = (char*)realloc(buf, size);
-		if (!buf) {
+		char *newb = new char[size];
+		if (!newb) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
+		memcpy(newb, buf, size);
+		delete[] buf;
+		buf = newb;
 	}
 	fp.close();
 
@@ -243,7 +248,7 @@ int LuaLoadFile(const char *file)
 	} else {
 		report(status);
 	}
-	free(buf);
+	delete[] buf;
 	CurrentLuaFile = PreviousLuaFile;
 
 	return status;

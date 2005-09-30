@@ -376,7 +376,7 @@ void CleanUserInterface(void)
 		for (i = 0; UI_Table[i]; ++i) {
 			CleanUI(UI_Table[i]);
 		}
-		free(UI_Table);
+		delete[] UI_Table;
 		UI_Table = NULL;
 	}
 

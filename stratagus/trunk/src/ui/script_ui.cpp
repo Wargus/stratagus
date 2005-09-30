@@ -1019,9 +1019,9 @@ static int CclDefineUI(lua_State *l)
 	}
 	if (!ui) {
 		ui = (CUserInterface *)calloc(1, sizeof(CUserInterface));
-		v = (CUserInterface **)malloc(sizeof(CUserInterface*) * (i + 2));
+		v = new CUserInterface *[i + 2];
 		memcpy(v, UI_Table, i * sizeof(CUserInterface*));
-		free(UI_Table);
+		delete[] UI_Table;
 		UI_Table = v;
 		UI_Table[i] = ui;
 		UI_Table[i + 1] = NULL;
@@ -2706,7 +2706,7 @@ static void FreeMenu(Menu *menu)
 		}
 		delete[] menu->Items[i].Id;
 	}
-	free(menu->Items);
+	delete[] menu->Items;
 	memset(menu, 0, sizeof(*menu));
 }
 
@@ -3824,11 +3824,12 @@ static int CclDefineMenuItem(lua_State *l)
 	}
 
 	if ((menu = MenuMap[name])) {
+		Menuitem *newitems = new Menuitem[menu->NumItems + 1];
 		if (menu->Items) {
-			menu->Items = (Menuitem *)realloc(menu->Items, sizeof(Menuitem) * (menu->NumItems + 1));
-		} else {
-			menu->Items = (Menuitem *)malloc(sizeof(Menuitem));
+			memcpy(newitems, menu->Items, menu->NumItems * sizeof(Menuitem));
+			delete[] menu->Items;
 		}
+		menu->Items = newitems;
 		item->Menu = menu;
 		memcpy(menu->Items + menu->NumItems, item, sizeof(Menuitem));
 		menu->NumItems++;
