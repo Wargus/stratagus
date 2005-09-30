@@ -324,9 +324,6 @@ void CleanUI(CUserInterface *ui)
 	for (i = 0; i < (int)ui->Filler.size(); ++i) {
 		FreeGraphic(ui->Filler[i]);
 	}
-	ui->FillerX.clear();
-	ui->FillerY.clear();
-	ui->Filler.clear();
 
 	// Resource Icons
 	for (i = 0; i < MaxCosts + 2; ++i) {
@@ -335,14 +332,11 @@ void CleanUI(CUserInterface *ui)
 
 	// Info Panel
 	FreeGraphic(ui->InfoPanel.G);
-	free(ui->PanelIndex);
+	delete[] ui->PanelIndex;
 	delete ui->SingleSelectedButton;
-	delete[] ui->SelectedButtons;
 	delete ui->SingleTrainingButton;
-	delete[] ui->TrainingButtons;
 	delete ui->UpgradingButton;
 	delete ui->ResearchingButton;
-	delete[] ui->TransportingButtons;
 
 	// Button Panel
 	FreeGraphic(ui->ButtonPanel.G);
@@ -354,7 +348,6 @@ void CleanUI(CUserInterface *ui)
 	delete[] ui->MenuButton.Text;
 	delete[] ui->NetworkMenuButton.Text;
 	delete[] ui->NetworkDiplomacyButton.Text;
-	ui->ButtonPanel.Buttons.clear();
 
 	// Cursors
 	delete[] ui->Point.Name;

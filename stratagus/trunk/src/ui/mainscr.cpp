@@ -697,9 +697,9 @@ static void DrawUnitInfo(CUnit *unit)
 					VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
 						UI.TrainingFont, UI.TrainingText);
 				}
-				if (UI.TrainingButtons) {
+				if (!UI.TrainingButtons.empty()) {
 					for (i = 0; i < unit->OrderCount &&
-							i < UI.NumTrainingButtons; ++i) {
+							i < (int)UI.TrainingButtons.size(); ++i) {
 						if (unit->Orders[i].Action == UnitActionTrain) {
 							unit->Orders[i].Type->Icon.Icon->DrawUnitIcon(unit->Player,
 								 UI.TrainingButtons[i].Style,
@@ -753,7 +753,7 @@ static void DrawUnitInfo(CUnit *unit)
 
 		uins = unit->UnitInside;
 		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
-			if (uins->Boarded && j < UI.NumTransportingButtons) {
+			if (uins->Boarded && j < (int)UI.TransportingButtons.size()) {
 				uins->Type->Icon.Icon->DrawUnitIcon(unit->Player, UI.TransportingButtons[j].Style,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
@@ -1296,8 +1296,8 @@ void CInfoPanel::Draw(void)
 			//  If there are more units selected draw their pictures and a health bar
 			//
 			DrawInfoPanelBackground(0);
-			for (i = 0; i < (NumSelected > UI.NumSelectedButtons ?
-					UI.NumSelectedButtons : NumSelected); ++i) {
+			for (i = 0; i < (NumSelected > (int)UI.SelectedButtons.size() ?
+					UI.SelectedButtons.size() : NumSelected); ++i) {
 				Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer,
 					UI.SelectedButtons[i].Style,
 					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
@@ -1311,10 +1311,10 @@ void CInfoPanel::Draw(void)
 					UI.StatusLine.Set(Selected[i]->Type->Name);
 				}
 			}
-			if (NumSelected > UI.NumSelectedButtons) {
+			if (NumSelected > UI.SelectedButtons.size()) {
 				char buf[5];
 
-				sprintf(buf, "+%d", NumSelected - UI.NumSelectedButtons);
+				sprintf(buf, "+%d", NumSelected - UI.SelectedButtons.size());
 				VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
 					UI.MaxSelectedFont, buf);
 			}
