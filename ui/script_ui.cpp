@@ -2678,7 +2678,7 @@ static void FreeMenu(Menu *menu)
 	if (menu == NULL) {
 		return;
 	}
-	free(menu->Panel);
+	delete[] menu->Panel;
 	FreeGraphic(menu->BackgroundG);
 	for (i = 0; i < menu->NumItems; ++i) {
 		switch (menu->Items[i].MiType) {

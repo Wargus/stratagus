@@ -60,6 +60,8 @@ typedef enum AnimationType {
 
 class CAnimation {
 public:
+	CAnimation() : Type(AnimationNone) {}
+
 	AnimationType Type;
 	union {
 		struct {
