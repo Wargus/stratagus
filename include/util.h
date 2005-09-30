@@ -58,69 +58,13 @@ extern long isqrt(long num);
 ----------------------------------------------------------------------------*/
 
 	/// strdup + strcat
-extern char* strdcat(const char* l, const char* r);
+extern char *strdcat(const char *l, const char *r);
 	/// strdup + strcat + strcat
-extern char* strdcat3(const char* l, const char* m, const char* r);
+extern char *strdcat3(const char *l, const char *m, const char *r);
 
 #if !defined(HAVE_STRCASESTR)
 	/// case insensitive strstr
-extern char* strcasestr(const char* str, const char* substr);
+extern char *strcasestr(const char *str, const char *substr);
 #endif // !HAVE_STRCASESTR
-
-/*----------------------------------------------------------------------------
---  Hash
-----------------------------------------------------------------------------*/
-
-// Basic Defines - Used by Hash
-#define NELEM(x)    ((int)(sizeof(x)/sizeof(*(x))))
-
-// Begin hash specific functions
-struct hash_st
-{
-	int nelem;
-	int hashsize;
-	int maxdepth;
-	int middepth;
-};
-
-extern void* _hash_get(const Uint8* id, void* table, int size, int usize);
-extern const void* _hash_find(const Uint8* id, const void* table, int size, int usize);
-extern void  _hash_del(const Uint8* id, void* table, int size, int usize);
-extern void  _hash_stat(void* table, int size, struct hash_st* stat_buffer);
-
-#ifdef __GNUC__  // { GNU feature
-
-#define hash_get(tab, id)  (typeof((tab).table[0]->user)*) \
-	_hash_get((Uint8*)id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
-
-#define hash_find(tab, id)  (typeof((tab).table[0]->user)*) \
-	_hash_find((Uint8*)id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
-
-#else // }{ GNU feature
-
-#define hash_get(tab, id)  _hash_get((Uint8*)id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
-
-#define hash_find(tab, id)  _hash_find((Uint8*)id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
-
-#endif // } !GNU feature
-
-#define hash_del(tab, id) \
-	_hash_del((Uint8*)id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
-
-#define hash_name(tab, sym) (((Uint8*)sym) + sizeof((tab).table[0]->user) + 1)
-
-#define hash_stat(tab, st) _hash_stat((tab).table, NELEM((tab).table), st)
-
-#define hash_add(tab, id) hash_get(tab, (Uint8*)id)
-
-#define hashtable(type, size) struct \
-{ \
-	struct { \
-		void* left; \
-		void* right; \
-		type user; \
-		Uint8 name[2]; \
-	} *table[size]; \
-}
 
 #endif /* __UTIL_H__ */
