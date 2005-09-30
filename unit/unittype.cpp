@@ -73,8 +73,8 @@ std::map<std::string, CUnitType *> UnitTypeMap;
 **
 **  @todo find a way to make it configurable!
 */
-CUnitType* UnitTypeHumanWall;       /// Human wall
-CUnitType* UnitTypeOrcWall;         /// Orc wall
+CUnitType *UnitTypeHumanWall;       /// Human wall
+CUnitType *UnitTypeOrcWall;         /// Orc wall
 
 /**
 **  Default resources for a new player.
@@ -104,12 +104,12 @@ int DefaultIncomes[MaxCosts];
 /**
 **  Default action for the resources.
 */
-char* DefaultActions[MaxCosts];
+char *DefaultActions[MaxCosts];
 
 /**
 **  Default names for the resources.
 */
-char* DefaultResourceNames[MaxCosts];
+char *DefaultResourceNames[MaxCosts];
 
 /**
 **  Default amounts for the resources.
@@ -126,8 +126,8 @@ int DefaultResourceAmounts[MaxCosts];
 */
 void UpdateStats(int reset)
 {
-	CUnitType* type;
-	CUnitStats* stats;
+	CUnitType *type;
+	CUnitStats *stats;
 	int player;
 	unsigned i;
 
@@ -249,8 +249,8 @@ CAnimations *AnimationsByIdent(const char *ident)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static void SaveUnitStats(const CUnitStats* stats, const char* ident, int plynr,
-	CFile* file)
+static void SaveUnitStats(const CUnitStats *stats, const char *ident, int plynr,
+	CFile *file)
 {
 	int j;
 
@@ -278,7 +278,7 @@ static void SaveUnitStats(const CUnitStats* stats, const char* ident, int plynr,
 **
 **  @param file  Output file.
 */
-void SaveUnitTypes(CFile* file)
+void SaveUnitTypes(CFile *file)
 {
 	int j;
 
@@ -353,7 +353,7 @@ CUnitType *NewUnitTypeSlot(char *ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType* type, Graphic* sprite, int player, int frame,
+void DrawUnitType(const CUnitType *type, Graphic *sprite, int player, int frame,
 	int x, int y)
 {
 	// FIXME: move this calculation to high level.
@@ -384,9 +384,9 @@ void DrawUnitType(const CUnitType* type, Graphic* sprite, int player, int frame,
 /**
 **  Get the still animation frame
 */
-static int GetStillFrame(CUnitType* type)
+static int GetStillFrame(CUnitType *type)
 {
-	CAnimation* anim;
+	CAnimation *anim;
 
 	anim = type->Animations->Still;
 	while (anim) {
@@ -431,9 +431,9 @@ void InitUnitTypes(int reset_player_stats)
 **
 **  @param type  type of unit to load
 */
-void LoadUnitTypeSprite(CUnitType* type)
+void LoadUnitTypeSprite(CUnitType *type)
 {
-	ResourceInfo* resinfo;
+	ResourceInfo *resinfo;
 	int i;
 
 	if (type->ShadowFile) {
@@ -495,7 +495,7 @@ void LoadUnitTypeSprite(CUnitType* type)
 */
 void LoadUnitTypes(void)
 {
-	CUnitType* type;
+	CUnitType *type;
 
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
@@ -526,7 +526,7 @@ void LoadUnitTypes(void)
 		// Lookup BuildingTypes
 		if (type->BuildingRules) {
 			int x;
-			BuildRestriction* b;
+			BuildRestriction *b;
 
 			x = 0;
 			while (type->BuildingRules[x] != NULL) {
@@ -567,7 +567,7 @@ static void CleanAnimation(CAnimation *anim)
 	CAnimation *ptr;
 
 	ptr = anim;
-	while (ptr->Type) {
+	while (ptr->Type != AnimationNone) {
 		if (ptr->Type == AnimationSound) {
 			delete[] ptr->D.Sound.Name;
 		} else if (ptr->Type == AnimationRandomSound) {
@@ -579,7 +579,7 @@ static void CleanAnimation(CAnimation *anim)
 		}
 		++ptr;
 	}
-	delete anim;
+	delete[] anim;
 }
 
 /**
