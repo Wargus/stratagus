@@ -375,10 +375,10 @@ static void MultiGamePlayerSelectorsUpdate(int initial);
 	/// Hash table of all the menus
 std::map<std::string, Menu *> MenuMap;
 	/// Hash table of all the menu functions
-_MenuFuncHash MenuFuncHash;
+std::map<std::string, void *> MenuFuncHash;
 
-#define HASHADD(x,y) { \
-	*(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
+#define HASHADD(x, y) { \
+	MenuFuncHash[y] = (void *)x; \
 }
 
 	/// Game started
