@@ -228,7 +228,12 @@ int LuaLoadFile(const char *file)
 	size = 10000;
 	buf = new char[size];
 	location = 0;
-	while ((read = fp.read(&buf[location], size - location))) {
+	for (;;) {
+		read = fp.read(&buf[location], size - location);
+		if (read != size - location) {
+			location += read;
+			break;
+		}
 		location += read;
 		oldsize = size;
 		size = size * 2;
@@ -237,7 +242,7 @@ int LuaLoadFile(const char *file)
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
-		memcpy(newb, buf, size);
+		memcpy(newb, buf, oldsize);
 		delete[] buf;
 		buf = newb;
 	}
