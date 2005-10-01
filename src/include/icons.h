@@ -38,39 +38,35 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _icon_ icons.h
+**  @class CIcon icons.h
 **
 **  \#include "icons.h"
-**
-**  typedef struct _icon_ Icon;
 **
 **  This structure contains all informations about an icon.
 **
 **  The icon structure members:
 **
-**  Icon::Ident
+**  CIcon::Ident
 **
 **    Unique identifier of the icon, used to reference it in config
 **    files and during startup.  Don't use this in game, use instead
 **    the pointer to this structure.
 **
-**  Icon::Sprite
+**  CIcon::G
 **
-**    Sprite image containing the loaded graphics. Loaded by
+**    Graphic image containing the loaded graphics. Loaded by
 **    LoadIcons(). All icons belonging to the same icon file shares
 **    this structure.
 **
-**  Icon::Frame
+**  CIcon::Frame
 **
-**    Frame number in the sprite to display.
+**    Frame number in the graphic to display.
 */
 
 /**
-**  @struct _icon_config_ icons.h
+**  @class IconConfig icons.h
 **
 **  \#include "icons.h"
-**
-**  typedef struct _icon_config_ IconConfig;
 **
 **  This structure contains all configuration informations about an icon.
 **
@@ -79,17 +75,11 @@
 **    Unique identifier of the icon, used to reference icons in config
 **    files and during startup.  The name is resolved during game
 **    start and the pointer placed in the next field.
-**    @see Icon::Ident
+**    @see CIcon::Ident
 **
 **  IconConfig::Icon
 **
 **    Pointer to an icon. This pointer is resolved during game start.
-**
-**    Example how this can be used in C initializers:
-**
-**    @code
-**      { "icon-peasant" },
-**    @endcode
 */
 
 /*----------------------------------------------------------------------------
@@ -113,9 +103,10 @@ class ButtonStyle;
 	/// Icon: rectangle image used in menus
 class CIcon {
 public:
-	CIcon(const char *ident, int frame,
-		const char *file, int width, int height);
+	CIcon(const char *ident);
 	~CIcon();
+
+	static CIcon *New(const char *ident);
 
 	/// Draw icon
 	void DrawIcon(const CPlayer *player, int x, int y) const;
@@ -124,9 +115,13 @@ public:
 		ButtonStyle *style, unsigned flags, int x, int y,
 		const char *text) const;
 
-	char *Ident;              /// Icon identifier
-	CGraphic *G;               /// Graphic data
+	inline const char *GetIdent() { return this->Ident; }
+	void SetIdent(const char *ident);
+
+	CGraphic *G;              /// Graphic data
 	int Frame;                /// Frame number in graphic
+private:
+	char *Ident;              /// Icon identifier
 };
 
 	/// Icon reference (used in config tables)

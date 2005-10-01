@@ -65,15 +65,17 @@ static std::map<std::string, CIcon *> Icons;   /// Map of ident to icon.
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CIcon::CIcon(const char *ident, int frame,
-	const char *file, int width, int height) : G(NULL), Frame(frame)
+/**
+**  CIcon constructor
+*/
+CIcon::CIcon(const char *ident) : G(NULL), Frame(0)
 {
-	this->Ident = new_strdup(ident);
-	if (file) {
-		this->G = CGraphic::New(file, width, height);
-	}
+	Ident = new_strdup(ident);
 }
 
+/**
+**  CIcon destructor
+*/
 CIcon::~CIcon()
 {
 	delete[] this->Ident;
@@ -81,32 +83,20 @@ CIcon::~CIcon()
 }
 
 /**
-**  Add an icon definition.
+**  Create a new icon
 **
-**  @param ident    Icon identifier.
-**  @param width    Icon width.
-**  @param height   Icon height.
-**  @param frame    Frame number in graphic.
-**  @param file     Graphic file containing the icons.
+**  @param ident  Icon identifier
 */
-static void AddIcon(const char *ident, int frame, int width,
-	int height, const char *file)
+CIcon *CIcon::New(const char *ident)
 {
 	CIcon *icon = Icons[ident];
 	if (icon) {
-		// Redefine icon
-		if (file) {
-			if (icon->G) {
-				CGraphic::Free(icon->G);
-			}
-			icon->G = CGraphic::New(file, width, height);
-		}
-		icon->Frame = frame;
+		return icon;
 	} else {
-		icon = new CIcon(ident, frame, file, width, height);
-
+		icon = new CIcon(ident);
 		Icons[ident] = icon;
 		AllIcons.push_back(icon);
+		return icon;
 	}
 }
 
@@ -130,7 +120,7 @@ void LoadIcons(void)
 		ShowLoadProgress("Icons %s", icon->G->File);
 		if (icon->Frame >= icon->G->NumFrames) {
 			DebugPrint("Invalid icon frame: %s - %d\n" _C_
-				icon->Ident _C_ icon->Frame);
+				icon->GetIdent() _C_ icon->Frame);
 			icon->Frame = 0;
 		}
 	}
@@ -209,6 +199,19 @@ void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 }
 
 /**
+**  Set an icon's ident
+**
+**  @param ident  New ident for icon
+*/
+void CIcon::SetIdent(const char *ident)
+{
+	Icons[this->Ident] = NULL;
+	delete[] this->Ident;
+	this->Ident = new_strdup(ident);
+	Icons[this->Ident] = this;
+}
+
+/**
 **  Parse icon definition.
 **
 **  @param l  Lua state.
@@ -257,7 +260,12 @@ static int CclDefineIcon(lua_State *l)
 	Assert(ident);
 	Assert(!filename || (width && height));
 
-	AddIcon(ident, frame, width, height, filename);
+	CIcon *icon = CIcon::New(ident);
+	icon->Frame = frame;
+	if (filename) {
+		CGraphic::Free(icon->G);
+		icon->G = CGraphic::New(filename, width, height);
+	}
 
 	return 0;
 }
