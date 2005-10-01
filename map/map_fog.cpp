@@ -74,7 +74,7 @@ static unsigned char *VisibleTable;
 
 #ifndef USE_OPENGL
 static SDL_Surface *OnlyFogSurface;
-static Graphic AlphaFogG;
+static CGraphic *AlphaFogG;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -612,7 +612,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 #ifdef USE_OPENGL
 			TheMap.TileGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
 #else
-			AlphaFogG.DrawFrameClip(tile, dx, dy);
+			AlphaFogG->DrawFrameClip(tile, dx, dy);
 #endif
 		}
 	} else {
@@ -737,7 +737,7 @@ void InitMapFogOfWar(void)
 		int j;
 		Uint32 c;
 		unsigned char a;
-		SDL_PixelFormat* f;
+		SDL_PixelFormat *f;
 
 		// Copy the top row to a new surface
 		f = TheMap.FogGraphic->Surface->format;
@@ -746,8 +746,8 @@ void InitMapFogOfWar(void)
 		SDL_LockSurface(s);
 		SDL_LockSurface(TheMap.FogGraphic->Surface);
 		for (i = 0; i < s->h; ++i) {
-			memcpy((Uint8*)s->pixels + i * s->pitch,
-				(Uint8*)TheMap.FogGraphic->Surface->pixels + i * TheMap.FogGraphic->Surface->pitch,
+			memcpy((Uint8 *)s->pixels + i * s->pitch,
+				(Uint8 *)TheMap.FogGraphic->Surface->pixels + i * TheMap.FogGraphic->Surface->pitch,
 				TheMap.FogGraphic->Surface->w * f->BytesPerPixel);
 		}
 		SDL_UnlockSurface(s);
@@ -757,23 +757,24 @@ void InitMapFogOfWar(void)
 		SDL_LockSurface(s);
 		for (j = 0; j < s->h; ++j) {
 			for (i = 0; i < s->w; ++i) {
-				c = *(Uint32*)&((Uint8*)s->pixels)[i * 4 + j * s->pitch];
+				c = *(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch];
 				Video.GetRGBA(c, s->format, &r, &g, &b, &a);
 				if (a) {
 					c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
-					*(Uint32*)&((Uint8*)s->pixels)[i * 4 + j * s->pitch] = c;
+					*(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch] = c;
 				}
 
 			}
 		}
 		SDL_UnlockSurface(s);
 	}
-	AlphaFogG.Surface = s;
-	AlphaFogG.Width = TileSizeX;
-	AlphaFogG.Height = TileSizeY;
-	AlphaFogG.GraphicWidth = s->w;
-	AlphaFogG.GraphicHeight = s->h;
-	AlphaFogG.NumFrames = 1;
+	AlphaFogG = CGraphic::New(NULL);
+	AlphaFogG->Surface = s;
+	AlphaFogG->Width = TileSizeX;
+	AlphaFogG->Height = TileSizeY;
+	AlphaFogG->GraphicWidth = s->w;
+	AlphaFogG->GraphicHeight = s->h;
+	AlphaFogG->NumFrames = 1;
 #endif
 
 	VisibleTable = new unsigned char[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
@@ -787,7 +788,7 @@ void CleanMapFogOfWar(void)
 	delete[] VisibleTable;
 	VisibleTable = NULL;
 
-	FreeGraphic(TheMap.FogGraphic);
+	CGraphic::Free(TheMap.FogGraphic);
 	TheMap.FogGraphic = NULL;
 
 #ifndef USE_OPENGL
@@ -795,10 +796,7 @@ void CleanMapFogOfWar(void)
 		SDL_FreeSurface(OnlyFogSurface);
 		OnlyFogSurface = NULL;
 	}
-	if (AlphaFogG.Surface) {
-		SDL_FreeSurface(AlphaFogG.Surface);
-		AlphaFogG.Surface = NULL;
-	}
+	CGraphic::Free(AlphaFogG);
 #endif
 }
 

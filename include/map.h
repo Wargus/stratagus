@@ -168,7 +168,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Graphic;
+class CGraphic;
 class CPlayer;
 class CFile;
 class CUnit;
@@ -270,8 +270,8 @@ public:
 
 	CTileset Tileset;          /// tileset data
 	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels
-	Graphic *TileGraphic;     /// graphic for all the tiles
-	Graphic *FogGraphic;      /// graphic for fog of war
+	CGraphic *TileGraphic;     /// graphic for all the tiles
+	CGraphic *FogGraphic;      /// graphic for fog of war
 
 	MapInfo Info;             /// descriptive information
 };

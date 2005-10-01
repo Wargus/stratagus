@@ -79,7 +79,7 @@ public:
 		BorderColorRGB.r = BorderColorRGB.g = BorderColorRGB.b = 0;
 	}
 
-	Graphic *Sprite;
+	CGraphic *Sprite;
 	int Frame;
 	SDL_Color BorderColorRGB;
 	Uint32 BorderColor;
@@ -246,7 +246,7 @@ public:
 	MenuPanel() : Ident(NULL), G(NULL), Next(NULL) {}
 
 	char      *Ident;           /// Unique identifier
-	Graphic   *G;               /// Graphic
+	CGraphic   *G;              /// Graphic
 	MenuPanel *Next;            /// Next pointer
 };
 
@@ -374,7 +374,7 @@ public:
 	void DoClicked(int button);
 	int DoKey(int key);
 
-	Graphic *G;
+	CGraphic *G;
 	int X;
 	int Y;
 	std::vector<Button> Buttons;
@@ -389,7 +389,7 @@ public:
 
 	void Draw();
 
-	Graphic *G;
+	CGraphic *G;
 	int X;
 	int Y;
 };
@@ -438,12 +438,12 @@ public:
 	char *ReverseFontColor;             /// Color for reverse text displayed
 
 	// Fillers
-	std::vector<Graphic *> Filler;      /// Filler graphics
+	std::vector<CGraphic *> Filler;      /// Filler graphics
 	std::vector<int> FillerX;           /// Filler X positions
 	std::vector<int> FillerY;           /// Filler Y positions
 
 	struct {
-		Graphic *G;                     /// icon graphic
+		CGraphic *G;                     /// icon graphic
 		int IconFrame;                  /// icon frame
 		int IconX;                      /// icon X position
 		int IconY;                      /// icon Y position
@@ -491,7 +491,7 @@ public:
 	CButtonPanel  ButtonPanel;
 
 	// Pie Menu
-	Graphic *PieMenuBackgroundG;        /// Optional background image for the piemenu
+	CGraphic *PieMenuBackgroundG;        /// Optional background image for the piemenu
 	int PieMouseButton;/// Which mouse button pops up the piemenu. Deactivate with the NoButton value.
 	int PieX[8];                        /// X position of the pies
 	int PieY[8];                        /// Y position of the pies
@@ -549,8 +549,8 @@ public:
 
 	MenuPanel *MenuPanels;              /// Menu panels
 
-	Graphic *VictoryBackgroundG;        /// Victory background graphic
-	Graphic *DefeatBackgroundG;         /// Defeat background graphic
+	CGraphic *VictoryBackgroundG;        /// Victory background graphic
+	CGraphic *DefeatBackgroundG;         /// Defeat background graphic
 };
 
 /*----------------------------------------------------------------------------

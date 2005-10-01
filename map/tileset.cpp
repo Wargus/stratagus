@@ -75,8 +75,8 @@ void LoadTileset(void)
 	TileSizeY = TheMap.Tileset.TileSizeY;
 
 	ShowLoadProgress("Tileset `%s'", TheMap.Tileset.ImageFile);
-	//TheMap.TileGraphic = NewGraphic(TheMap.Tileset.ImageFile, 0, 0);
-	TheMap.TileGraphic = NewGraphic(TheMap.Tileset.ImageFile, TileSizeX, TileSizeY);
+	//TheMap.TileGraphic = CGraphic::New(TheMap.Tileset.ImageFile);
+	TheMap.TileGraphic = CGraphic::New(TheMap.Tileset.ImageFile, TileSizeX, TileSizeY);
 	TheMap.TileGraphic->Load();
 }
 
@@ -105,7 +105,7 @@ void CleanTilesets(void)
 	//
 	// Should this be done by the map?
 	//
-	FreeGraphic(TheMap.TileGraphic);
+	CGraphic::Free(TheMap.TileGraphic);
 	TheMap.TileGraphic = NULL;
 }
 

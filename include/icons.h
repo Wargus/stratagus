@@ -106,7 +106,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Graphic;
+class CGraphic;
 class CPlayer;
 class ButtonStyle;
 
@@ -125,7 +125,7 @@ public:
 		const char *text) const;
 
 	char *Ident;              /// Icon identifier
-	Graphic *G;               /// Graphic data
+	CGraphic *G;               /// Graphic data
 	int Frame;                /// Frame number in graphic
 };
 

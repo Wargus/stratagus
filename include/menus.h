@@ -123,7 +123,7 @@ typedef int MenuButtonId;
 class ButtonStyle;
 class MapInfo;
 class WorldMap;
-class Graphic;
+class CGraphic;
 struct _menuitem_;
 
 /*----------------------------------------------------------------------------
@@ -290,7 +290,7 @@ typedef struct _menu_ {
 	int       Width;      /// menu area width
 	int       Height;     /// menu area height
 	char*     Panel;      /// optional background panel
-	Graphic*  BackgroundG;/// optional background image behind the menu panel
+	CGraphic*  BackgroundG;/// optional background image behind the menu panel
 	int       DefSel;     /// initial selected item number (or -1)
 	int       NumItems;   /// number of items to follow
 	Menuitem* Items;      /// buttons, etc
@@ -305,8 +305,8 @@ typedef struct _menu_ {
 
 extern int GuiGameStarted;                    /// Game Started?
 extern Menu* CurrentMenu;                     /// Current menu
-extern Graphic *MenuButtonGraphics[];/// Menu button graphics
-extern Graphic *MenuButtonG;         /// Current menu button graphics
+extern CGraphic *MenuButtonGraphics[];/// Menu button graphics
+extern CGraphic *MenuButtonG;         /// Current menu button graphics
 
 extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 

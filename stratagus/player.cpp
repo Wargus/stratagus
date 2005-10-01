@@ -735,7 +735,7 @@ void PlayersEachSecond(int player)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-void GraphicPlayerPixels(CPlayer *player, const Graphic *sprite)
+void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite)
 {
 	Assert(PlayerColorIndexCount);
 

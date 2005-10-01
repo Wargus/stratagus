@@ -70,14 +70,14 @@ CIcon::CIcon(const char *ident, int frame,
 {
 	this->Ident = new_strdup(ident);
 	if (file) {
-		this->G = NewGraphic(file, width, height);
+		this->G = CGraphic::New(file, width, height);
 	}
 }
 
 CIcon::~CIcon()
 {
 	delete[] this->Ident;
-	FreeGraphic(this->G);
+	CGraphic::Free(this->G);
 }
 
 /**
@@ -97,9 +97,9 @@ static void AddIcon(const char *ident, int frame, int width,
 		// Redefine icon
 		if (file) {
 			if (icon->G) {
-				FreeGraphic(icon->G);
+				CGraphic::Free(icon->G);
 			}
-			icon->G = NewGraphic(file, width, height);
+			icon->G = CGraphic::New(file, width, height);
 		}
 		icon->Frame = frame;
 	} else {

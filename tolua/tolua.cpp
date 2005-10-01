@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Mon Sep 19 11:53:26 2005.
+** Generated automatically by tolua++-1.0.6 on Fri Sep 30 19:04:12 2005.
 */
 
 #ifndef __cplusplus
@@ -28,6 +28,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CInfoPanel");
+ tolua_usertype(tolua_S,"CGraphic");
 }
 
 /* get function: X of class  CMinimap */
@@ -544,6 +545,65 @@ static int tolua_set_CVideo_FullScreen(lua_State* tolua_S)
  return 0;
 }
 
+/* method: New of class  CGraphic */
+static int tolua_stratagus_CGraphic_New00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CGraphic",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* file = ((const char*)  tolua_tostring(tolua_S,2,0));
+  int w = ((int)  tolua_tonumber(tolua_S,3,0));
+  int h = ((int)  tolua_tonumber(tolua_S,4,0));
+ {
+  CGraphic* tolua_ret = (CGraphic*)  CGraphic::New(file,w,h);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CGraphic");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: Free of class  CGraphic */
+static int tolua_stratagus_CGraphic_Free00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CGraphic",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CGraphic* tolua_var_1 = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+ {
+  CGraphic::Free(tolua_var_1);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Free'.",&tolua_err);
+ return 0;
+#endif
+}
+
 /* Open function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 {
@@ -585,6 +645,11 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"Height",tolua_get_CVideo_Height,tolua_set_CVideo_Height);
  tolua_variable(tolua_S,"Depth",tolua_get_CVideo_Depth,tolua_set_CVideo_Depth);
  tolua_variable(tolua_S,"FullScreen",tolua_get_CVideo_FullScreen,tolua_set_CVideo_FullScreen);
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CGraphic","CGraphic","",NULL);
+ tolua_beginmodule(tolua_S,"CGraphic");
+ tolua_function(tolua_S,"New",tolua_stratagus_CGraphic_New00);
+ tolua_function(tolua_S,"Free",tolua_stratagus_CGraphic_Free00);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;

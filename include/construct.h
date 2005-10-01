@@ -104,8 +104,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Graphic;
-
 enum ConstructionFileType {
 	ConstructionFileConstruction,
 	ConstructionFileMain,
@@ -147,10 +145,10 @@ public:
 
 // --- FILLED UP ---
 
-	Graphic *Sprite;        /// construction sprite image
+	CGraphic *Sprite;       /// construction sprite image
 	int      Width;         /// sprite width
 	int      Height;        /// sprite height
-	Graphic *ShadowSprite;  /// construction shadow sprite image
+	CGraphic *ShadowSprite; /// construction shadow sprite image
 	int      ShadowWidth;   /// shadow sprite width
 	int      ShadowHeight;  /// shadow sprite height
 };

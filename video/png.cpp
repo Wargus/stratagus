@@ -80,7 +80,7 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 **
 **  @return   0 for success, -1 for error.
 */
-int LoadGraphicPNG(Graphic *g)
+int LoadGraphicPNG(CGraphic *g)
 {
 	CFile fp;
 	SDL_Surface *volatile surface;

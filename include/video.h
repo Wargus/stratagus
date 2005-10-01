@@ -39,7 +39,24 @@
 #include "SDL_opengl.h"
 #endif
 
-class Graphic {
+class CGraphic {
+private:
+	CGraphic() : File(NULL), HashFile(NULL), Surface(NULL),
+		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
+		Refs(1)
+	{
+#ifndef USE_OPENGL
+		SurfaceFlip = NULL;
+#else
+		TextureWidth = 0.f;
+		TextureHeight = 0.f;
+		Textures = NULL;
+		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
+		NumTextures = 0;
+#endif
+	}
+	~CGraphic() {}
+
 public:
 	// Draw
 	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
@@ -69,6 +86,11 @@ public:
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 
+
+	static CGraphic *New(const char *file, int w = 0, int h = 0);
+	static CGraphic *ForceNew(const char *file, int w = 0, int h = 0);
+
+	static void Free(CGraphic *g);
 
 	void Load();
 	void Flip();
@@ -302,13 +324,13 @@ extern void InitVideo(void);
 extern int VideoValidResolution(int w, int h);
 
 	/// Load graphic from PNG file
-extern int LoadGraphicPNG(Graphic *g);
+extern int LoadGraphicPNG(CGraphic *g);
 
 #ifdef USE_OPENGL
 	/// Make an OpenGL texture
-extern void MakeTexture(Graphic *graphic);
+extern void MakeTexture(CGraphic *graphic);
 	/// Make an OpenGL texture of the player color pixels only.
-extern void MakePlayerColorTexture(Graphic *graphic, int player);
+extern void MakePlayerColorTexture(CGraphic *graphic, int player);
 #endif
 
 #ifdef USE_OPENGL
@@ -318,15 +340,6 @@ extern void ReloadGraphics(void);
 
 	/// Initializes video synchronization.
 extern void SetVideoSync(void);
-
-	/// Make graphic
-extern Graphic *NewGraphic(const char *file, int w, int h);
-
-	/// Make graphic
-extern Graphic *ForceNewGraphic(const char *file, int w, int h);
-
-	/// Free Graphic taking into account the number of uses.
-extern void FreeGraphic(Graphic *g);
 
 	/// Init line draw
 extern void InitLineDraw(void);
@@ -381,7 +394,7 @@ extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
 #ifdef USE_OPENGL
-void DrawTexture(const Graphic *g, GLuint *textures, int sx, int sy,
+void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 	int ex, int ey, int x, int y, int flip);
 #endif
 

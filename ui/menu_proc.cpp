@@ -70,12 +70,12 @@
 /**
 **  Menu button graphics
 */
-Graphic* MenuButtonGraphics[MAX_RACES];
+CGraphic* MenuButtonGraphics[MAX_RACES];
 
 /**
 **  Current menu button graphics
 */
-Graphic* MenuButtonG;
+CGraphic* MenuButtonG;
 
 /**
 **  Current menu
@@ -2656,7 +2656,7 @@ void InitMenus(int race)
 		MenuCallbacks.NetworkEvent = NetworkEvent;
 	} else {
 		// free previous sprites for different race
-		FreeGraphic(MenuButtonG);
+		CGraphic::Free(MenuButtonG);
 	}
 	last_race = race;
 	MenuButtonG = MenuButtonGraphics[race];

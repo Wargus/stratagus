@@ -375,7 +375,7 @@ static int ScrollText(int x, int y, int w, int h, int i, TextLines *lines)
 void ShowIntro(const Intro *intro)
 {
 	EventCallback callbacks;
-	Graphic *background;
+	CGraphic *background;
 	char *text;
 	int line;
 	int i;
@@ -411,7 +411,7 @@ void ShowIntro(const Intro *intro)
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	background = NewGraphic(intro->Background, 0, 0);
+	background = CGraphic::New(intro->Background);
 	background->Load();
 	background->Resize(Video.Width, Video.Height);
 
@@ -538,7 +538,7 @@ void ShowIntro(const Intro *intro)
 	}
 
 	delete[] text;
-	FreeGraphic(background);
+	CGraphic::Free(background);
 
 	Video.ClearScreen();
 
@@ -560,7 +560,7 @@ void ShowIntro(const Intro *intro)
 void ShowCredits(Credits *credits)
 {
 	EventCallback callbacks;
-	Graphic *background;
+	CGraphic *background;
 	int line;
 	int x;
 	int y;
@@ -585,7 +585,7 @@ void ShowCredits(Credits *credits)
 
 	background = NULL;
 	if (credits->Background) {
-		background = NewGraphic(credits->Background, 0, 0);
+		background = CGraphic::New(credits->Background);
 		background->Load();
 		background->Resize(Video.Width, Video.Height);
 	}
@@ -648,7 +648,7 @@ void ShowCredits(Credits *credits)
 		FreeTextLines(&scrolling_credits);
 	}
 
-	FreeGraphic(background);
+	CGraphic::Free(background);
 
 	Video.ClearScreen();
 
@@ -701,7 +701,7 @@ static void PictureDrawText(CampaignChapter *chapter, ChapterTextLines *chlines)
 void ShowPicture(CampaignChapter *chapter)
 {
 	EventCallback callbacks;
-	Graphic *background;
+	CGraphic *background;
 	int old_video_sync;
 	int max;
 	int i;
@@ -725,7 +725,7 @@ void ShowPicture(CampaignChapter *chapter)
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	background = NewGraphic(chapter->Data.Picture.Image, 0, 0);
+	background = CGraphic::New(chapter->Data.Picture.Image);
 	background->Load();
 	background->Resize(Video.Width, Video.Height);
 	IntroNoEvent = 1;
@@ -802,7 +802,7 @@ void ShowPicture(CampaignChapter *chapter)
 		--i;
 	}
 
-	FreeGraphic(background);
+	CGraphic::Free(background);
 
 	while (lines) {
 		ChapterTextLines *ptr;
@@ -1188,7 +1188,7 @@ static int GameStatsDrawFunc(int frame)
 void ShowStats(void)
 {
 	EventCallback callbacks;
-	Graphic *g;
+	CGraphic *g;
 	int done;
 	int old_video_sync;
 	int frame;
