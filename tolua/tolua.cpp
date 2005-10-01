@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Fri Sep 30 19:04:12 2005.
+** Generated automatically by tolua++-1.0.6 on Sat Oct  1 09:33:27 2005.
 */
 
 #ifndef __cplusplus
@@ -25,10 +25,11 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"CVideo");
+ tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CInfoPanel");
- tolua_usertype(tolua_S,"CGraphic");
+ tolua_usertype(tolua_S,"CIcon");
 }
 
 /* get function: X of class  CMinimap */
@@ -441,6 +442,113 @@ static int tolua_set_UI(lua_State* tolua_S)
  return 0;
 }
 
+/* method: New of class  CIcon */
+static int tolua_stratagus_CIcon_New00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CIcon",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  CIcon* tolua_ret = (CIcon*)  CIcon::New(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CIcon");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* get function: Ident of class  CIcon */
+static int tolua_get_CIcon_Ident(lua_State* tolua_S)
+{
+  CIcon* self = (CIcon*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
+#endif
+ tolua_pushstring(tolua_S,(const char*)self->GetIdent());
+ return 1;
+}
+
+/* set function: Ident of class  CIcon */
+static int tolua_set_CIcon_Ident(lua_State* tolua_S)
+{
+  CIcon* self = (CIcon*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
+ if (!tolua_isstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetIdent(((char*)  tolua_tostring(tolua_S,2,0))
+)
+;
+ return 0;
+}
+
+/* get function: G of class  CIcon */
+static int tolua_get_CIcon_G_ptr(lua_State* tolua_S)
+{
+  CIcon* self = (CIcon*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->G,"CGraphic");
+ return 1;
+}
+
+/* set function: G of class  CIcon */
+static int tolua_set_CIcon_G_ptr(lua_State* tolua_S)
+{
+  CIcon* self = (CIcon*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->G = ((CGraphic*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Frame of class  CIcon */
+static int tolua_get_CIcon_Frame(lua_State* tolua_S)
+{
+  CIcon* self = (CIcon*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Frame'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Frame);
+ return 1;
+}
+
+/* set function: Frame of class  CIcon */
+static int tolua_set_CIcon_Frame(lua_State* tolua_S)
+{
+  CIcon* self = (CIcon*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Frame'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Frame = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
 /* get function: Width of class  CVideo */
 static int tolua_get_CVideo_Width(lua_State* tolua_S)
 {
@@ -639,6 +747,13 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"Minimap",tolua_get_CUserInterface_Minimap,tolua_set_CUserInterface_Minimap);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"UI",tolua_get_UI,tolua_set_UI);
+ tolua_cclass(tolua_S,"CIcon","CIcon","",NULL);
+ tolua_beginmodule(tolua_S,"CIcon");
+ tolua_function(tolua_S,"New",tolua_stratagus_CIcon_New00);
+ tolua_variable(tolua_S,"Ident",tolua_get_CIcon_Ident,tolua_set_CIcon_Ident);
+ tolua_variable(tolua_S,"G",tolua_get_CIcon_G_ptr,tolua_set_CIcon_G_ptr);
+ tolua_variable(tolua_S,"Frame",tolua_get_CIcon_Frame,tolua_set_CIcon_Frame);
+ tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CVideo","CVideo","",NULL);
  tolua_beginmodule(tolua_S,"CVideo");
  tolua_variable(tolua_S,"Width",tolua_get_CVideo_Width,tolua_set_CVideo_Width);
