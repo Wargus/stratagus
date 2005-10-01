@@ -70,7 +70,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Graphic;
+class CGraphic;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -85,7 +85,7 @@ public:
 
 // --- FILLED UP ---
 
-	Graphic *G;  /// Graphic object used to draw
+	CGraphic *G;  /// Graphic object used to draw
 };
 
 /**

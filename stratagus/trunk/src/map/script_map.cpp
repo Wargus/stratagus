@@ -413,9 +413,9 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
 	if (TheMap.FogGraphic) {
-		FreeGraphic(TheMap.FogGraphic);
+		CGraphic::Free(TheMap.FogGraphic);
 	}
-	TheMap.FogGraphic = NewGraphic(FogGraphicFile, TileSizeX, TileSizeY);
+	TheMap.FogGraphic = CGraphic::New(FogGraphicFile, TileSizeX, TileSizeY);
 
 	return 0;
 }

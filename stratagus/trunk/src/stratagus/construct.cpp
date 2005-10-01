@@ -85,7 +85,7 @@ void LoadConstructions(void)
 		(*i)->Height = (*i)->File.Height;
 		if (file && *file) {
 			ShowLoadProgress("Construction %s", file);
-			(*i)->Sprite = NewGraphic(file, (*i)->Width, (*i)->Height);
+			(*i)->Sprite = CGraphic::New(file, (*i)->Width, (*i)->Height);
 			(*i)->Sprite->Load();
 			(*i)->Sprite->Flip();
 		}
@@ -94,7 +94,7 @@ void LoadConstructions(void)
 		(*i)->ShadowHeight = (*i)->ShadowFile.Height;
 		if (file && *file) {
 			ShowLoadProgress("Construction %s", file);
-			(*i)->ShadowSprite = ForceNewGraphic(file,
+			(*i)->ShadowSprite = CGraphic::ForceNew(file,
 				(*i)->ShadowWidth, (*i)->ShadowHeight);
 			(*i)->ShadowSprite->Load();
 			(*i)->ShadowSprite->Flip();
@@ -118,9 +118,9 @@ void CleanConstructions(void)
 	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
 		delete[] (*i)->Ident;
 		delete[] (*i)->File.File;
-		FreeGraphic((*i)->Sprite);
+		CGraphic::Free((*i)->Sprite);
 		delete[] (*i)->ShadowFile.File;
-		FreeGraphic((*i)->ShadowSprite);
+		CGraphic::Free((*i)->ShadowSprite);
 		cframe = (*i)->Frames;
 		while (cframe) {
 			tmp = cframe->Next;

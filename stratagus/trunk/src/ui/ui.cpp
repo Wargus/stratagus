@@ -322,16 +322,16 @@ void CleanUI(CUserInterface *ui)
 
 	// Filler
 	for (i = 0; i < (int)ui->Filler.size(); ++i) {
-		FreeGraphic(ui->Filler[i]);
+		CGraphic::Free(ui->Filler[i]);
 	}
 
 	// Resource Icons
 	for (i = 0; i < MaxCosts + 2; ++i) {
-		FreeGraphic(ui->Resources[i].G);
+		CGraphic::Free(ui->Resources[i].G);
 	}
 
 	// Info Panel
-	FreeGraphic(ui->InfoPanel.G);
+	CGraphic::Free(ui->InfoPanel.G);
 	delete[] ui->PanelIndex;
 	delete ui->SingleSelectedButton;
 	delete ui->SingleTrainingButton;
@@ -339,24 +339,24 @@ void CleanUI(CUserInterface *ui)
 	delete ui->ResearchingButton;
 
 	// Button Panel
-	FreeGraphic(ui->ButtonPanel.G);
+	CGraphic::Free(ui->ButtonPanel.G);
 
 	// Pie Menu
-	FreeGraphic(ui->PieMenuBackgroundG);
+	CGraphic::Free(ui->PieMenuBackgroundG);
 
 	// Menu Panels
 	menupanel = ui->MenuPanels;
 	while (menupanel) {
 		tmp = menupanel;
 		menupanel = menupanel->Next;
-		FreeGraphic(tmp->G);
+		CGraphic::Free(tmp->G);
 		delete[] tmp->Ident;
 		delete tmp;
 	}
 
 	// Backgrounds
-	FreeGraphic(ui->VictoryBackgroundG);
-	FreeGraphic(ui->DefeatBackgroundG);
+	CGraphic::Free(ui->VictoryBackgroundG);
+	CGraphic::Free(ui->DefeatBackgroundG);
 
 	free(ui);
 }
