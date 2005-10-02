@@ -885,7 +885,7 @@ void CUnit::Remove(CUnit *host)
 void UnitLost(CUnit *unit)
 {
 	CUnit *temp;
-	BuildRestriction *b;
+	CBuildRestrictionOnTop *b;
 	const CUnitType *type;
 	CPlayer *player;
 	int i;
@@ -976,8 +976,8 @@ void UnitLost(CUnit *unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
-		if (b->Data.OnTop.ReplaceOnDie && (unit->Type->GivesResource && unit->ResourcesHeld != 0)) {
-			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Data.OnTop.Parent, &Players[PlayerNumNeutral]);
+		if (b->ReplaceOnDie && (unit->Type->GivesResource && unit->ResourcesHeld != 0)) {
+			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -1998,31 +1998,148 @@ void DropOutAll(const CUnit *source)
 **
 **  @return        the BuildingRestrictionDetails
 */
-BuildRestriction* OnTopDetails(const CUnit *unit, const CUnitType *parent)
+CBuildRestrictionOnTop* OnTopDetails(const CUnit *unit, const CUnitType *parent)
 {
-	int w;
-	BuildRestriction *b;
+	CBuildRestrictionOnTop *b;
 
-	if (unit->Type->BuildingRules) {
-		w = 0;
-		while (unit->Type->BuildingRules[w] != NULL) {
-			b = unit->Type->BuildingRules[w];
-			while (b != NULL) {
-				if (b->RestrictType == RestrictOnTop) {
-					if (parent && parent == b->Data.OnTop.Parent) {
-						return b;
-					} else if (!parent) {
-						// Guess this is right
-						return b;
-					}
-				}
-				b = b->Next;
-			}
-		++w;
+	for (std::vector<CBuildRestriction *>::iterator i = unit->Type->BuildingRules.begin();
+		i != unit->Type->BuildingRules.end(); ++i) {
+		b = dynamic_cast<CBuildRestrictionOnTop*> (*i);
+		if (!b) {
+			continue;
+		}
+		if (!parent) {
+			// Guess this is right
+			return b;
+		}
+		if (parent == b->Parent) {
+			return b;
 		}
 	}
 	return NULL;
 }
+
+// Run Distance Checking
+bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+{
+	CUnit *table[UnitMax];
+	int n;
+	int i;
+	int x1;
+	int x2;
+	int y1;
+	int y2;
+	int distance;
+
+	if (this->DistanceType == LessThanEqual ||
+		this->DistanceType == GreaterThan ||
+		this->DistanceType == Equal ||
+		this->DistanceType == NotEqual) {
+		x1 = x - this->Distance > 0 ? x - this->Distance : 0;
+		y1 = y - this->Distance > 0 ? y - this->Distance : 0;
+		x2 = x + type->TileWidth + this->Distance < TheMap.Info.MapWidth ?
+			x + type->TileWidth + this->Distance : TheMap.Info.MapWidth;
+		y2 = y + type->TileHeight + this->Distance < TheMap.Info.MapHeight ?
+			y + type->TileHeight + this->Distance : TheMap.Info.MapHeight;
+		distance = this->Distance;
+	} else if (this->DistanceType == LessThan ||
+			this->DistanceType == GreaterThanEqual) {
+		x1 = x - this->Distance - 1 > 0 ? x - this->Distance - 1 : 0;
+		y1 = y - this->Distance - 1 > 0 ? y - this->Distance - 1 : 0;
+		x2 = x + type->TileWidth + this->Distance + 1 < TheMap.Info.MapWidth ?
+			x + type->TileWidth + this->Distance + 1 : TheMap.Info.MapWidth;
+		y2 = y + type->TileHeight + this->Distance + 1 < TheMap.Info.MapHeight ?
+			y + type->TileHeight + this->Distance + 1 : TheMap.Info.MapHeight;
+		distance = this->Distance - 1;
+	}
+	n = UnitCacheSelect(x1, y1, x2, y2, table);
+
+	switch (this->DistanceType) {
+		case GreaterThan :
+		case GreaterThanEqual :
+			for (i = 0; i < n; ++i) {
+				if (this->RestrictType == table[i]->Type &&
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
+					return false;
+				}
+			}
+			return true;
+		case LessThan :
+		case LessThanEqual :
+			for (i = 0; i < n; ++i) {
+				if (this->RestrictType == table[i]->Type &&
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
+					return true;
+				}
+			}
+			return false;
+		case Equal :
+			for (i = 0; i < n; ++i) {
+				if (this->RestrictType == table[i]->Type &&
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) == distance) {
+					return true;
+				}
+			}
+			return false;
+		case NotEqual :
+			for (i = 0; i < n; ++i) {
+				if (this->RestrictType == table[i]->Type &&
+					MapDistanceBetweenTypes(type, x, y, table[i]->Type, table[i]->X, table[i]->Y) == distance) {
+					return false;
+				}
+			}
+			return true;
+	}
+	return false;
+}
+
+// Check AddOn Restriction
+bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+{
+	CUnit *table[UnitMax];
+	int n;
+	int i;
+	int x1;
+	int y1;
+
+	x1 = x - this->OffsetX < 0 ? -1 : x - this->OffsetX;
+	x1 = x1 >= TheMap.Info.MapWidth ? -1 : x1;
+	y1 = y - this->OffsetY < 0 ? -1 : y - this->OffsetY;
+	y1 = y1 >= TheMap.Info.MapHeight ? -1 : y1;
+	if (!(x1 == -1 || y1 == -1)) {
+		n = UnitCacheOnTile(x1, y1, table);
+		for (i = 0; i < n; ++i) {
+			if (table[i]->Type == this->Parent &&
+				table[i]->X == x1 && table[i]->Y == y1) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+// Check AddOn Restriction
+bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+{
+	CUnit *table[UnitMax];
+	int n;
+	int i;
+
+	n = UnitCacheOnTile(x, y, table);
+	for (i = 0; i < n; ++i) {
+		if (table[i]->Type == this->Parent &&
+			table[i]->X == x && table[i]->Y == y &&
+			table[i]->Orders[0].Action != UnitActionBuilt &&
+			!table[i]->Destroyed &&
+			table[i]->Orders[0].Action != UnitActionDie) {
+			ontoptarget = table[i];
+			return true;
+		}
+	}
+	return false;
+}
+
 
 /**
 **  Can build unit here.
@@ -2038,18 +2155,9 @@ BuildRestriction* OnTopDetails(const CUnit *unit, const CUnitType *parent)
 */
 CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 {
-	CUnit *table[UnitMax];
 	CUnit *ontoptarget;
-	BuildRestriction *b;
-	int n;
-	int i;
 	int w;
 	int h;
-	int x1;
-	int x2;
-	int y1;
-	int y2;
-	int distance;
 	int success;
 
 	//
@@ -2081,136 +2189,21 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		}
 	}
 
-
-	// Keep gcc happy
-	distance = 0;
-	x1 = 0;
-	x2 = 0;
-	y1 = 0;
-	y2 = 0;
 	ontoptarget = NULL;
-	
-	if (type->BuildingRules) {
-		w = 0;
-		while (type->BuildingRules[w] != NULL) {
-			b = type->BuildingRules[w];
-			success = 1;
-			while (b != NULL) {
-				// Run Distance Checking
-				if (b->RestrictType == RestrictDistance) {
-					if (b->Data.Distance.DistanceType == LessThanEqual ||
-							b->Data.Distance.DistanceType == GreaterThan ||
-							b->Data.Distance.DistanceType == Equal ||
-							b->Data.Distance.DistanceType == NotEqual) {
-						x1 = x - b->Data.Distance.Distance > 0 ? x - b->Data.Distance.Distance : 0;
-						y1 = y - b->Data.Distance.Distance > 0 ? y - b->Data.Distance.Distance : 0;
-						x2 = x + type->TileWidth + b->Data.Distance.Distance < TheMap.Info.MapWidth ?
-							x + type->TileWidth + b->Data.Distance.Distance : TheMap.Info.MapWidth;
-						y2 = y + type->TileHeight + b->Data.Distance.Distance < TheMap.Info.MapHeight ?
-							y + type->TileHeight + b->Data.Distance.Distance : TheMap.Info.MapHeight;
-						distance = b->Data.Distance.Distance;
-					} else if (b->Data.Distance.DistanceType == LessThan ||
-							b->Data.Distance.DistanceType == GreaterThanEqual) {
-						x1 = x - b->Data.Distance.Distance - 1 > 0 ? x - b->Data.Distance.Distance - 1 : 0;
-						y1 = y - b->Data.Distance.Distance - 1 > 0 ? y - b->Data.Distance.Distance - 1 : 0;
-						x2 = x + type->TileWidth + b->Data.Distance.Distance + 1 < TheMap.Info.MapWidth ?
-							x + type->TileWidth + b->Data.Distance.Distance + 1 : TheMap.Info.MapWidth;
-						y2 = y + type->TileHeight + b->Data.Distance.Distance + 1 < TheMap.Info.MapHeight ?
-							y + type->TileHeight + b->Data.Distance.Distance + 1 : TheMap.Info.MapHeight;
-						distance = b->Data.Distance.Distance - 1;
-					}
-					n = UnitCacheSelect(x1, y1, x2, y2, table);
-				
-					// These type find success, not lose it
-					if (b->Data.Distance.DistanceType == LessThanEqual ||
-						b->Data.Distance.DistanceType == LessThan ||
-						b->Data.Distance.DistanceType == Equal) {
-						success = 0;
-					}
-					for (i = 0; i < n; ++i) {
-						if (table[i]->Type == b->Data.Distance.RestrictType) {
-							if ((b->Data.Distance.DistanceType == GreaterThan ||
-								b->Data.Distance.DistanceType == GreaterThanEqual) &&
-								MapDistanceBetweenTypes(type, x, y, 
-									table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
-								// True on failure
-								success = 0;
-							} else if ((b->Data.Distance.DistanceType == LessThanEqual ||
-								b->Data.Distance.DistanceType == LessThan) &&
-								MapDistanceBetweenTypes(type, x, y,
-									table[i]->Type, table[i]->X, table[i]->Y) <= distance) {
-								success = 1;
-								break;
-							} else if (b->Data.Distance.DistanceType == Equal &&
-								MapDistanceBetweenTypes(type, x, y,
-									table[i]->Type, table[i]->X, table[i]->Y) == distance) {
-								success = 1;
-								break;
-							} else if (b->Data.Distance.DistanceType == NotEqual &&
-								MapDistanceBetweenTypes(type, x, y,
-									table[i]->Type, table[i]->X, table[i]->Y) == distance) {
-								success = 0;
-							}
-						}
-					}
-				}
-				// Check AddOn Restriction
-				if (b->RestrictType == RestrictAddOn) {
-					success = 0;
-					x1 = x - b->Data.AddOn.OffsetX < 0 ? -1 : x - b->Data.AddOn.OffsetX;
-					x1 = x1 >= TheMap.Info.MapWidth ? -1 : x1;
-					y1 = y - b->Data.AddOn.OffsetY < 0 ? -1 : y - b->Data.AddOn.OffsetY;
-					y1 = y1 >= TheMap.Info.MapHeight ? -1 : y1;
-					if (!(x1 == -1 || y1 == -1)) {
-						n = UnitCacheOnTile(x1, y1, table);
-						for (i = 0; i < n; ++i) {
-							if (table[i]->Type == b->Data.AddOn.Parent &&
-								table[i]->X == x1 && table[i]->Y == y1) {
-								success = 1;
-								break;
-							}
-						}
-					}
-				}
-				// Check Build On Top
-				if (b->RestrictType == RestrictOnTop) {
-					success = 0;
-					n = UnitCacheOnTile(x, y, table);
-					for (i = 0; i < n; ++i) {
-						if (table[i]->Type == b->Data.OnTop.Parent &&
-							table[i]->X == x && table[i]->Y == y &&
-							table[i]->Orders[0].Action != UnitActionBuilt &&
-							!table[i]->Destroyed &&
-							table[i]->Orders[0].Action != UnitActionDie) {
-							success = 1;
-							ontoptarget = table[i];
-						}
-					}
-				}
-				// All checks processed, did we really have success
-				if (success) {
-					b = b->Next;
-				} else {
-					break;
-				}
-			}
-			if (b == NULL) {
-				// We passed a full ruleset return
-				if (unit == NULL) {
-					return ontoptarget ? ontoptarget : (CUnit *)1;
-				} else {
-					return ontoptarget ? ontoptarget : (CUnit *)unit;
-				}
-			}
-			++w;
-		}
-		return NULL;
-	}
+	for (std::vector<CBuildRestriction *>::const_iterator ib = type->BuildingRules.begin();
+		ib != type->BuildingRules.end(); ++ib) {
+		const CBuildRestriction *b = *ib;
 
+		// All checks processed, did we really have success
+		if (!b->Check(type, x, y, ontoptarget)) {
+			return NULL;
+		}
+	}
+	// We passed a full ruleset return
 	if (unit == NULL) {
-		return (CUnit *)1;
+		return ontoptarget ? ontoptarget : (CUnit *)1;
 	} else {
-		return (CUnit *)unit;
+		return ontoptarget ? ontoptarget : (CUnit *)unit;
 	}
 }
 
@@ -2254,7 +2247,10 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 
 	// Terrain Flags don't matter if building on top of a unit.
 	ontop = CanBuildHere(unit, type, x, y);
-	if (unit != NULL && ontop != unit) {
+	if (ontop == NULL) {
+		return NULL;
+	}
+	if (ontop != (CUnit *) 1 && ontop != unit) {
 		return ontop;
 	}
 
@@ -2309,7 +2305,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 	//
 	// We can build here: check distance to gold mine/oil patch!
 	//
-	return CanBuildHere(unit, type, x, y);
+	return ontop;
 }
 
 /*----------------------------------------------------------------------------

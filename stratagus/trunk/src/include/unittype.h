@@ -531,6 +531,8 @@ class CConstruction;
 class CAnimations;
 class MissileType;
 
+CUnitType *UnitTypeByIdent(const char*);
+
 /**
 **  Missile type definition (used in config tables)
 **
@@ -757,16 +759,6 @@ typedef enum {
 	UnitTypeNaval,              /// Unit lives on water
 } UnitTypeType;
 
-typedef enum {
-	RestrictAddOn,          /// We are refereing to the following restriction
-	RestrictOnTop,
-	RestrictDistance,
-	RestrictDirection,
-	RestrictTiles,
-} RestrictTypeType;
-
-typedef struct _building_restrictions_ BuildRestriction;
-
 enum DistanceTypeType {
 	Equal,
 	NotEqual,
@@ -776,41 +768,53 @@ enum DistanceTypeType {
 	GreaterThanEqual,
 };
 
-struct _building_restrictions_ {
-	RestrictTypeType RestrictType;
-	union {
-		struct {
-			int OffsetX;         /// offset from the main building to place this
-			int OffsetY;         /// offset from the main building to place this
-			char *ParentName;    /// building that is unit is an addon too.
-			CUnitType *Parent;    /// building that is unit is an addon too.
-		} AddOn;
 
-		struct {
-			CUnitType *Parent;
-			char *ParentName;    /// building that is unit is an addon too.
-			int ReplaceOnDie;    /// recreate the parent on destruction
-			int ReplaceOnBuild;  /// remove the parent, or just build over it.
-		} OnTop;
-		
-		struct {
-			int Distance;        /// distance to build (circle)
-			DistanceTypeType DistanceType;
-			int Except;          /// all except this building type.
-			char *RestrictTypeName; 
-			CUnitType *RestrictType; 
-		} Distance;
+class CBuildRestriction {
+public:
 
-		int Direction;           /// Direction mask up,down,left,right,up-left...
-
-		struct {
-			int Number;          /// All tiles, or just 1-n,  0 is all as you don't have a rule otherwise
-			int Mask;            /// Tile mask required
-		} Tiles;
-	} Data;
-	BuildRestriction *Next;
+	virtual ~CBuildRestriction() {} ;
+	virtual void Init() {};
+	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const = 0;
 };
 
+class CBuildRestrictionAddOn : public CBuildRestriction {
+public:
+	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), ParentName(NULL), Parent(NULL) {};
+	virtual ~CBuildRestrictionAddOn() {delete[] this->ParentName;};
+	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
+	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+
+	int OffsetX;         /// offset from the main building to place this
+	int OffsetY;         /// offset from the main building to place this
+	char *ParentName;    /// building that is unit is an addon too.
+	CUnitType *Parent;   /// building that is unit is an addon too.
+};
+
+class CBuildRestrictionOnTop : public CBuildRestriction {
+public:
+	CBuildRestrictionOnTop() : ParentName(NULL), Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
+	virtual ~CBuildRestrictionOnTop() {delete[] this->ParentName;};
+	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
+	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+
+	char *ParentName;    /// building that is unit is an addon too.
+	CUnitType *Parent;   /// building that is unit is an addon too.
+	int ReplaceOnDie;    /// recreate the parent on destruction
+	int ReplaceOnBuild;  /// remove the parent, or just build over it.
+};
+
+class CBuildRestrictionDistance : public CBuildRestriction {
+public:
+	CBuildRestrictionDistance() : Distance(0), RestrictTypeName(NULL), RestrictType(NULL) {};
+	virtual ~CBuildRestrictionDistance() {delete [] this->RestrictTypeName;};
+	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
+	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+
+	int Distance;        /// distance to build (circle)
+	DistanceTypeType DistanceType;
+	char *RestrictTypeName;
+	CUnitType *RestrictType;
+};
 
 /**
 ** Base structure of unit-type
@@ -932,7 +936,7 @@ public:
 	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
-	BuildRestriction **BuildingRules;   /// Rules list for building a building.
+	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	UnitSound Sound;                /// Sounds for events

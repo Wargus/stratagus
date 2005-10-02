@@ -370,7 +370,7 @@ struct _unit_colors_;
 class CConstructionFrame;
 class VariableType;
 class CUpgrade;
-struct _building_restrictions_;
+class CBuildRestrictionOnTop;
 class CFile;
 struct lua_State;
 class CViewport;
@@ -829,7 +829,7 @@ extern void DropOutNearest(CUnit *unit, int x, int y, int addx, int addy);
 extern void DropOutAll(const CUnit *unit);
 
 	/// Return the rule used to build this building.
-extern struct _building_restrictions_ *OnTopDetails(const CUnit *unit, const CUnitType *parent);
+extern CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent);
 	/// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y);
 	/// @todo more docu
