@@ -237,7 +237,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	int y;
 	CUnitType *type;
 	CUnit *build;
-	BuildRestriction *b;
 	const CUnitStats *stats;
 
 	x = unit->Orders[0].X;
@@ -266,9 +265,11 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 
 	// Building on top of something, may remove what is beneath it
 	if (ontop != unit) {
-		b = OnTopDetails(build, ontop->Type);
+		CBuildRestrictionOnTop *b;
+
+		b = static_cast<CBuildRestrictionOnTop *> (OnTopDetails(build, ontop->Type));
 		Assert(b);
-		if (b->Data.OnTop.ReplaceOnBuild) {
+		if (b->ReplaceOnBuild) {
 			build->ResourcesHeld = ontop->ResourcesHeld; // We capture the value of what is beneath.
 			ontop->Remove(NULL); // Destroy building beneath
 			UnitLost(ontop);
