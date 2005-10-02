@@ -6,9 +6,18 @@ $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
 $#endif
 
+$[
+mt = { __index = function(t, key) return CIcon:Get(key) end }
+Icons = {}
+setmetatable(Icons, mt)
 
+mt = { __index = function(t, key) return CUpgrade:Get(key) end }
+Upgrades = {}
+setmetatable(Upgrades, mt)
+$]
 
 $pfile "minimap.pkg"
 $pfile "ui.pkg"
 $pfile "video.pkg"
+$pfile "upgrade.pkg"
 
