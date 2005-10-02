@@ -58,23 +58,13 @@ void UnitCacheInsert(CUnit *unit)
 	int i;
 	int j;
 	MapField *mf;
-	UnitListItem *listitem;
 
 	Assert(!unit->Removed);
 
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
 		mf = TheMap.Fields + (i + unit->Y) * TheMap.Info.MapWidth + unit->X;
-		listitem = unit->CacheLinks + i * unit->Type->TileWidth;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
-			Assert(!listitem->Next && !listitem->Prev);
-
-			listitem->Next = mf->UnitCache;
-			if (mf->UnitCache) {
-				mf->UnitCache->Prev = listitem;
-			}
-			mf->UnitCache = listitem;
-			++mf;
-			++listitem;
+			mf[j].UnitCache.push_back(unit);
 		}
 	}
 }
@@ -89,27 +79,17 @@ void UnitCacheRemove(CUnit *unit)
 	int i;
 	int j;
 	MapField *mf;
-	UnitListItem *listitem;
 
 	Assert(!unit->Removed);
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
-		listitem = unit->CacheLinks + i * unit->Type->TileWidth;
+		mf = TheMap.Fields + (i + unit->Y) * TheMap.Info.MapWidth + unit->X;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
-			if (listitem->Next) {
-				listitem->Next->Prev = listitem->Prev;
+			for (std::vector<CUnit *>::iterator k = mf[j].UnitCache.begin(); k != mf[j].UnitCache.end(); ++k) {
+				if (*k == unit) {
+					mf[j].UnitCache.erase(k);
+					break;
+				}
 			}
-			if (listitem->Prev) {
-				listitem->Prev->Next = listitem->Next;
-			} else {
-				// item is head of the list.
-				mf = TheMap.Fields + (i + unit->Y) * TheMap.Info.MapWidth + j + unit->X;
-				Assert(mf->UnitCache == listitem);
-				mf->UnitCache = listitem->Next;
-				Assert(!mf->UnitCache || !mf->UnitCache->Prev);
-			}
-
-			listitem->Next = listitem->Prev = NULL;
-			++listitem;
 		}
 	}
 }
@@ -130,7 +110,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 	int i;
 	int j;
 	int n;
-	UnitListItem *listitem;
+	MapField *mf;
 
 	// Optimize small searches.
 	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
@@ -156,17 +136,18 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 	n = 0;
 	for (i = y1; i < y2; ++i) {
 		for (j = x1; j < x2; ++j) {
-			listitem = TheMap.Fields[i * TheMap.Info.MapWidth + j].UnitCache;
-			for (; listitem; listitem = listitem->Next) {
+			mf = &TheMap.Fields[i * TheMap.Info.MapWidth + j];
+			for (std::vector<CUnit *>::iterator k = mf->UnitCache.begin();
+				k != mf->UnitCache.end(); ++k) {
 				//
 				// To avoid getting a unit in multiple times we use a cache lock.
 				// It should only be used in here, unless you somehow want the unit
 				// to be out of cache.
 				//
-				if (!listitem->Unit->CacheLock && !listitem->Unit->Type->Revealer) {
-					listitem->Unit->CacheLock = 1;
-					Assert(!listitem->Unit->Removed);
-					table[n++] = listitem->Unit;
+				if (!(*k)->CacheLock && !(*k)->Type->Revealer) {
+					Assert(!(*k)->Removed);
+					(*k)->CacheLock = 1;
+					table[n++] = *k;
 				}
 			}
 		}
@@ -193,20 +174,19 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 */
 int UnitCacheOnTile(int x, int y, CUnit **table)
 {
-	UnitListItem *listitem;
 	int n;
+	MapField *mf;
 
+	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
 	//
 	// Unlike in UnitCacheSelect, there's no way an unit can show up twice,
 	// so there is no need for Cache Locks.
 	//
 	n = 0;
-	listitem = TheMap.Fields[y * TheMap.Info.MapWidth + x].UnitCache;
-	for (; listitem; listitem = listitem->Next) {
-		if (!listitem->Unit->CacheLock) {
-			Assert(!listitem->Unit->Removed);
-			table[n++] = listitem->Unit;
-		}
+	for (std::vector<CUnit *>::iterator i = mf->UnitCache.begin();
+		i != mf->UnitCache.end(); ++i) {
+			Assert(!(*i)->Removed);
+			table[n++] = *i;
 	}
 
 	return n;
