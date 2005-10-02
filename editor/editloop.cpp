@@ -294,9 +294,28 @@ void EditTiles(int x, int y, int tile, int size)
 static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
+	CBuildRestrictionOnTop *b;
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	unit = MakeUnitAndPlace(x, y, type, player);
+	b = OnTopDetails(unit, NULL);
+	if (b && b->ReplaceOnBuild) {
+		int n;
+		CUnit **table;
+
+		n = UnitCacheOnTile(x, y, table);
+		while (n--) {
+			if (table[n]->Type == b->Parent) {
+				unit->ResourcesHeld = table[n]->ResourcesHeld; // We capture the value of what is beneath.
+				table[n]->Remove(NULL); // Destroy building beneath
+				UnitLost(table[n]);
+				UnitClearOrders(table[n]);
+				table[n]->Release();
+				break;
+			}
+		}
+
+	}
 	if (unit != NoUnitP) {
 		if (type->GivesResource) {
 			unit->ResourcesHeld = DefaultResourceAmounts[type->GivesResource];

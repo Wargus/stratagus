@@ -524,25 +524,9 @@ void LoadUnitTypes(void)
 
 		//
 		// Lookup BuildingTypes
-		if (type->BuildingRules) {
-			int x;
-			BuildRestriction *b;
-
-			x = 0;
-			while (type->BuildingRules[x] != NULL) {
-				b = type->BuildingRules[x];
-				while (b != NULL) {
-					if (b->RestrictType == RestrictAddOn) {
-						b->Data.AddOn.Parent = UnitTypeByIdent(b->Data.AddOn.ParentName);
-					} else if (b->RestrictType == RestrictOnTop) {
-						b->Data.OnTop.Parent = UnitTypeByIdent(b->Data.OnTop.ParentName);
-					} else if (b->RestrictType == RestrictDistance) {
-						b->Data.Distance.RestrictType = UnitTypeByIdent(b->Data.Distance.RestrictTypeName);
-					}
-					b = b->Next;
-				}
-				++x;
-			}
+		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
+			b < type->BuildingRules.end(); ++b) {
+			(*b)->Init();
 		}
 
 		//
@@ -620,30 +604,11 @@ void CleanUnitTypes(void)
 		}
 
 		// Free Building Restrictions if there are any
-		if (type->BuildingRules) {
-			int x;
-			BuildRestriction *b;
-			BuildRestriction *f;
-
-			x = 0;
-			while (type->BuildingRules[x] != NULL) {
-				b = type->BuildingRules[x];
-				while (b != NULL) {
-					f = b;
-					b = b->Next;
-					if (f->RestrictType == RestrictAddOn) {
-						delete[] f->Data.AddOn.ParentName;
-					} else if (f->RestrictType == RestrictOnTop) {
-						delete[] f->Data.OnTop.ParentName;
-					} else if (f->RestrictType == RestrictDistance) {
-						delete[] f->Data.Distance.RestrictTypeName;
-					}
-					free(f);
-				}
-				++x;
-			}
-			delete[] type->BuildingRules;
+		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
+			b != type->BuildingRules.end(); ++b) {
+			delete *b;
 		}
+		type->BuildingRules.clear();
 		delete[] type->File;
 		delete[] type->ShadowFile;
 		delete[] type->Icon.Name;

@@ -114,7 +114,7 @@ unsigned CclGetResourceByName(lua_State *l)
 **  @param l  Lua state.
 **  @param b  BuildingRestriction to fill in
 */
-static void ParseBuildingRules(lua_State *l, BuildRestriction **b)
+static void ParseBuildingRules(lua_State* l, std::vector<CBuildRestriction* > &blist)
 {
 	const char *value;
 	int args;
@@ -124,7 +124,6 @@ static void ParseBuildingRules(lua_State *l, BuildRestriction **b)
 	Assert(!(args & 1)); // must be even
 
 	for (i = 0; i < args; ++i) {
-		*b = (BuildRestriction *)calloc(1, sizeof(BuildRestriction));
 		lua_rawgeti(l, -1, i + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
@@ -134,105 +133,76 @@ static void ParseBuildingRules(lua_State *l, BuildRestriction **b)
 			LuaError(l, "incorrect argument");
 		}
 		if (!strcmp(value, "distance")) {
-			(*b)->RestrictType = RestrictDistance;
-			lua_pushnil(l);
-			while (lua_next(l, -2)) {
+			CBuildRestrictionDistance *b = new CBuildRestrictionDistance;
+
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "Distance")) {
-					(*b)->Data.Distance.Distance = LuaToNumber(l, -1);
+					b->Distance = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "DistanceType")) {
 					value = LuaToString(l, -1);
 					if (value[0] == '=') {
 						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							(*b)->Data.Distance.DistanceType = Equal;
+							b->DistanceType = Equal;
 						}
 					} else if (value[0] == '>') {
 						if (value[1] == '=' && value[2] == '\0') {
-							(*b)->Data.Distance.DistanceType = GreaterThanEqual;
+							b->DistanceType = GreaterThanEqual;
 						} else if (value[1] == '\0') {
-							(*b)->Data.Distance.DistanceType = GreaterThan;
+							b->DistanceType = GreaterThan;
 						}
 					} else if (value[0] == '<') {
 						if (value[1] == '=' && value[2] == '\0') {
-							(*b)->Data.Distance.DistanceType = LessThanEqual;
+							b->DistanceType = LessThanEqual;
 						} else if (value[1] == '\0') {
-							(*b)->Data.Distance.DistanceType = LessThan;
+							b->DistanceType = LessThan;
 						}
 					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						(*b)->Data.Distance.DistanceType = NotEqual;
+						b->DistanceType = NotEqual;
 					}
 				} else if (!strcmp(value, "Type")) {
-					(*b)->Data.Distance.RestrictTypeName = new_strdup(LuaToString(l, -1));
-				} else if (!strcmp(value, "Except")) {
-					(*b)->Data.Distance.Except = LuaToBoolean(l, -1);
+					b->RestrictTypeName = new_strdup(LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported BuildingRules distance tag: %s" _C_ value);
 				}
-				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "tile")) {
-			(*b)->RestrictType = RestrictTiles;
-			lua_pushnil(l);
-			while (lua_next(l, -2)) {
-				value = LuaToString(l, -2);
-				if (!strcmp(value, "NumberOnMask")) {
-					(*b)->Data.Tiles.Number = LuaToNumber(l, -1);
-				} else if (!strcmp(value, "Mask")) {
-					(*b)->Data.Tiles.Mask = LuaToNumber(l, -1);
-				} else {
-					LuaError(l, "Unsupported BuildingRules tile tag: %s" _C_ value);
-				}
-				lua_pop(l, 1);
-			}
+			blist.push_back(b);
 		} else if (!strcmp(value, "addon")) {
-			(*b)->RestrictType = RestrictAddOn;
-			lua_pushnil(l);
-			while (lua_next(l, -2)) {
+			CBuildRestrictionAddOn *b = new CBuildRestrictionAddOn;
+
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "OffsetX")) {
-					(*b)->Data.AddOn.OffsetX = LuaToNumber(l, -1);
+					b->OffsetX = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "OffsetY")) {
-					(*b)->Data.AddOn.OffsetY = LuaToNumber(l, -1);
+					b->OffsetY = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "Type")) {
-					(*b)->Data.AddOn.ParentName = new_strdup(LuaToString(l, -1));
+					b->ParentName = new_strdup(LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
 				}
-				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "direction")) {
-			(*b)->RestrictType = RestrictDirection;
-			lua_pushnil(l);
-			while (lua_next(l, -2)) {
-				value = LuaToString(l, -2);
-				if (!strcmp(value, "Direction")) {
-					(*b)->Data.Direction = LuaToNumber(l, -1);
-				} else {
-					LuaError(l, "Unsupported BuildingRules direction tag: %s" _C_ value);
-				}
-				lua_pop(l, 1);
-			}
+			blist.push_back(b);
 		} else if (!strcmp(value, "ontop")) {
-			(*b)->RestrictType = RestrictOnTop;
-			lua_pushnil(l);
-			while (lua_next(l, -2)) {
+			CBuildRestrictionOnTop *b = new CBuildRestrictionOnTop;
+
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "Type")) {
-					(*b)->Data.OnTop.ParentName = new_strdup(LuaToString(l, -1));
+					b->ParentName = new_strdup(LuaToString(l, -1));
 				} else if (!strcmp(value, "ReplaceOnDie")) {
-					(*b)->Data.OnTop.ReplaceOnDie = LuaToBoolean(l, -1);
+					b->ReplaceOnDie = LuaToBoolean(l, -1);
 				} else if (!strcmp(value, "ReplaceOnBuild")) {
-					(*b)->Data.OnTop.ReplaceOnBuild = LuaToBoolean(l, -1);
+					b->ReplaceOnBuild = LuaToBoolean(l, -1);
 				} else {
 					LuaError(l, "Unsupported BuildingRules ontop tag: %s" _C_ value);
 				}
-				lua_pop(l, 1);
 			}
+			blist.push_back(b);
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
-		b = &((*b)->Next);
 	}
 }
 
@@ -615,38 +585,17 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			subargs = luaL_getn(l, -1);
 			// Free any old restrictions if they are redefined
-			if (type->BuildingRules) {
-				int x;
-				BuildRestriction *b;
-				BuildRestriction *f;
-
-				x = 0;
-				while (type->BuildingRules[x] != NULL) {
-					b = type->BuildingRules[x];
-					while (b != NULL) {
-						f = b;
-						b = b->Next;
-						if (f->RestrictType == RestrictAddOn) {
-							delete[] f->Data.AddOn.ParentName;
-						} else if (f->RestrictType == RestrictOnTop) {
-							delete[] f->Data.OnTop.ParentName;
-						} else if (f->RestrictType == RestrictDistance) {
-							delete[] f->Data.Distance.RestrictTypeName;
-						}
-						free(f);
-					}
-					++x;
-				}
-				delete[] type->BuildingRules;
+			for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
+				b != type->BuildingRules.end(); ++b) {
+				delete *b;
 			}
-			type->BuildingRules = new BuildRestriction *[subargs + 1];
-			type->BuildingRules[subargs] = NULL;
+			type->BuildingRules.clear();
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
-				ParseBuildingRules(l, &type->BuildingRules[k]);
+				ParseBuildingRules(l, type->BuildingRules);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "BuilderOutside")) {
