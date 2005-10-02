@@ -85,45 +85,48 @@ std::map<std::string, CUpgrade *> Upgrades;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+CUpgrade::CUpgrade(const char *ident) :
+	ID(0)
+{
+	Ident = new_strdup(ident);
+	memset(this->Costs, 0, sizeof(this->Costs));
+}
+
+CUpgrade::~CUpgrade()
+{
+	delete[] Ident;
+}
+
 /**
-**  Add an upgrade. If the ident didn't exist a new upgrade is created,
-**  if the ident is alreay used, the old value is overwritten.
+**  Create a new upgrade
 **
-**  @param ident  upgrade identifier.
-**  @param icon   icon displayed for this upgrade,
-**                NULL for generated name (icon-<em>ident</em>).
-**  @param costs  costs to upgrade.
-**
-**  @return       upgrade id or -1 for error
+**  @param ident  Upgrade identifier
 */
-static CUpgrade *AddUpgrade(const char *ident, const char *icon,
-	const int *costs)
+CUpgrade *CUpgrade::New(const char *ident)
 {
 	CUpgrade *upgrade = Upgrades[ident];
-
 	if (upgrade) {
-		DebugPrint("Already defined upgrade `%s'\n" _C_ ident);
-		delete[] upgrade->Icon.Name;
+		return upgrade;
 	} else {
-		upgrade = new CUpgrade;
-		upgrade->Ident = new_strdup(ident);
-		upgrade->ID = AllUpgrades.size();
+		upgrade = new CUpgrade(ident);
 		Upgrades[ident] = upgrade;
+		upgrade->ID = AllUpgrades.size();
 		AllUpgrades.push_back(upgrade);
+		return upgrade;
 	}
+}
 
-	if (icon) {
-		upgrade->Icon.Name = new_strdup(icon);
-	} else {  // automatically generated icon-name
-		upgrade->Icon.Name = new char[strlen(ident) + 5 - 8 + 1];
-		strcpy(upgrade->Icon.Name, "icon-");
-		strcpy(upgrade->Icon.Name + 5, ident + 8);
+/**
+**  Get an upgrade
+**
+**  @param ident  Upgrade identifier
+*/
+CUpgrade *CUpgrade::Get(const char *ident)
+{
+	CUpgrade *upgrade = Upgrades[ident];
+	if (!upgrade) {
+		DebugPrint("upgrade not found: %s" _C_ ident);
 	}
-
-	for (int i = 0; i < MaxCosts; ++i) {
-		upgrade->Costs[i] = costs[i];
-	}
-
 	return upgrade;
 }
 
@@ -148,8 +151,11 @@ CUpgrade *UpgradeByIdent(const char *ident)
 void InitUpgrades(void)
 {
 	// Resolve the icons.
-	for (std::vector<CUpgrade *>::size_type i = 0; i < AllUpgrades.size(); ++i) {
-		AllUpgrades[i]->Icon.Icon = IconByIdent(AllUpgrades[i]->Icon.Name);
+	std::vector<CUpgrade *>::iterator i;
+	for (i = AllUpgrades.begin(); i != AllUpgrades.end(); ++i) {
+		if ((*i)->Icon.Name) {
+			(*i)->Icon.Icon = IconByIdent((*i)->Icon.Name);
+		}
 	}
 }
 
@@ -176,6 +182,18 @@ void CleanUpgrades(void)
 		delete UpgradeModifiers[i];
 	}
 	NumUpgradeModifiers = 0;
+}
+
+/**
+**  Set upgrade icon
+**
+**  @param name  Name of the icon
+*/
+void CUpgrade::SetIcon(CIcon *icon)
+{
+//	delete[] this->Icon.Name;
+//	this->Icon.Name = new_strdup(name);
+	this->Icon.Icon = icon;
 }
 
 /**
@@ -403,7 +421,11 @@ static int CclDefineUpgrade(lua_State *l)
 		}
 	}
 
-	AddUpgrade(ident, icon, costs);
+	CUpgrade *upgrade = CUpgrade::New(ident);
+	memcpy(upgrade->Costs, costs, sizeof(upgrade->Costs));
+	if (icon) {
+		upgrade->SetIcon(IconByIdent(icon));
+	}
 
 	return 0;
 }
