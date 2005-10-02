@@ -58,7 +58,7 @@
 ----------------------------------------------------------------------------*/
 
 static std::vector<CIcon *> AllIcons;          /// Vector of all icons.
-static std::map<std::string, CIcon *> Icons;   /// Map of ident to icon.
+std::map<std::string, CIcon *> Icons;          /// Map of ident to icon.
 
 
 /*----------------------------------------------------------------------------
@@ -98,6 +98,20 @@ CIcon *CIcon::New(const char *ident)
 		AllIcons.push_back(icon);
 		return icon;
 	}
+}
+
+/**
+**  Get an icon
+**
+**  @param ident  Icon identifier
+*/
+CIcon *CIcon::Get(const char *ident)
+{
+	CIcon *icon = Icons[ident];
+	if (!icon) {
+		DebugPrint("icon not found: %s" _C_ ident);
+	}
+	return icon;
 }
 
 /**

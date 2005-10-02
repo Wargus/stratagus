@@ -144,11 +144,14 @@ public:
 */
 class CUpgrade {
 public:
-	CUpgrade() : Ident(NULL), ID(0)
-	{
-		memset(Costs, 0, sizeof(Costs));
-	}
-	~CUpgrade() { delete[] Ident; }
+	CUpgrade(const char *ident);
+	~CUpgrade();
+
+	static CUpgrade *New(const char *ident);
+	static CUpgrade *Get(const char *ident);
+
+	inline char *GetIcon() { return this->Icon.Name; }
+	void SetIcon(CIcon *icon);
 
 	char *Ident;                      /// identifier
 	int   ID;                         /// numerical id

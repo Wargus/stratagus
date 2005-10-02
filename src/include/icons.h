@@ -33,6 +33,9 @@
 
 //@{
 
+#include <string>
+#include <map>
+
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -107,6 +110,7 @@ public:
 	~CIcon();
 
 	static CIcon *New(const char *ident);
+	static CIcon *Get(const char *ident);
 
 	/// Draw icon
 	void DrawIcon(const CPlayer *player, int x, int y) const;
@@ -132,6 +136,8 @@ public:
 	char *Name;          /// config icon name
 	CIcon *Icon;         /// icon pointer to use to run time
 };
+
+extern std::map<std::string, CIcon *> Icons;
 
 /*----------------------------------------------------------------------------
 --  Functions

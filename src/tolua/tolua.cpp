@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Sat Oct  1 09:33:27 2005.
+** Generated automatically by tolua++-1.0.6 on Sun Oct  2 09:17:15 2005.
 */
 
 #ifndef __cplusplus
@@ -26,6 +26,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"CGraphic");
+ tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CInfoPanel");
@@ -470,6 +471,34 @@ static int tolua_stratagus_CIcon_New00(lua_State* tolua_S)
 #endif
 }
 
+/* method: Get of class  CIcon */
+static int tolua_stratagus_CIcon_Get00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CIcon",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  CIcon* tolua_ret = (CIcon*)  CIcon::Get(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CIcon");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
+ return 0;
+#endif
+}
+
 /* get function: Ident of class  CIcon */
 static int tolua_get_CIcon_Ident(lua_State* tolua_S)
 {
@@ -712,6 +741,137 @@ static int tolua_stratagus_CGraphic_Free00(lua_State* tolua_S)
 #endif
 }
 
+/* method: New of class  CUpgrade */
+static int tolua_stratagus_CUpgrade_New00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CUpgrade",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::New(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: Get of class  CUpgrade */
+static int tolua_stratagus_CUpgrade_Get00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CUpgrade",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::Get(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* get function: Costs of class  CUpgrade */
+static int tolua_get_stratagus_CUpgrade_Costs(lua_State* tolua_S)
+{
+ int tolua_index;
+  CUpgrade* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CUpgrade*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Costs[tolua_index]);
+ return 1;
+}
+
+/* set function: Costs of class  CUpgrade */
+static int tolua_set_stratagus_CUpgrade_Costs(lua_State* tolua_S)
+{
+ int tolua_index;
+  CUpgrade* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CUpgrade*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->Costs[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+
+/* get function: Icon of class  CUpgrade */
+static int tolua_get_CUpgrade_Icon_ptr(lua_State* tolua_S)
+{
+  CUpgrade* self = (CUpgrade*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Icon'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->GetIcon(),"CIcon");
+ return 1;
+}
+
+/* set function: Icon of class  CUpgrade */
+static int tolua_set_CUpgrade_Icon_ptr(lua_State* tolua_S)
+{
+  CUpgrade* self = (CUpgrade*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Icon'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CIcon",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetIcon(((CIcon*)  tolua_tousertype(tolua_S,2,0))
+)
+;
+ return 0;
+}
+
 /* Open function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 {
@@ -719,6 +879,30 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_reg_types(tolua_S);
  tolua_module(tolua_S,NULL,1);
  tolua_beginmodule(tolua_S,NULL);
+
+ { /* begin embedded lua code */
+ int top;
+ top = lua_gettop(tolua_S);
+ static unsigned char B[] = {
+  10,109,116, 32, 61, 32,123, 32, 95, 95,105,110,100,101,120,
+  32, 61, 32,102,117,110, 99,116,105,111,110, 40,116, 44, 32,
+ 107,101,121, 41, 32,114,101,116,117,114,110, 32, 67, 73, 99,
+ 111,110, 58, 71,101,116, 40,107,101,121, 41, 32,101,110,100,
+  32,125, 10, 73, 99,111,110,115, 32, 61, 32,123,125, 10,115,
+ 101,116,109,101,116, 97,116, 97, 98,108,101, 40, 73, 99,111,
+ 110,115, 44, 32,109,116, 41, 10,109,116, 32, 61, 32,123, 32,
+  95, 95,105,110,100,101,120, 32, 61, 32,102,117,110, 99,116,
+ 105,111,110, 40,116, 44, 32,107,101,121, 41, 32,114,101,116,
+ 117,114,110, 32, 67, 85,112,103,114, 97,100,101, 58, 71,101,
+ 116, 40,107,101,121, 41, 32,101,110,100, 32,125, 10, 85,112,
+ 103,114, 97,100,101,115, 32, 61, 32,123,125, 10,115,101,116,
+ 109,101,116, 97,116, 97, 98,108,101, 40, 85,112,103,114, 97,
+ 100,101,115, 44, 32,109,116, 41,32
+ };
+ lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 1");
+ lua_settop(tolua_S, top);
+ } /* end of embedded lua code */
+
  tolua_cclass(tolua_S,"CMinimap","CMinimap","",NULL);
  tolua_beginmodule(tolua_S,"CMinimap");
  tolua_variable(tolua_S,"X",tolua_get_CMinimap_X,tolua_set_CMinimap_X);
@@ -750,6 +934,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_cclass(tolua_S,"CIcon","CIcon","",NULL);
  tolua_beginmodule(tolua_S,"CIcon");
  tolua_function(tolua_S,"New",tolua_stratagus_CIcon_New00);
+ tolua_function(tolua_S,"Get",tolua_stratagus_CIcon_Get00);
  tolua_variable(tolua_S,"Ident",tolua_get_CIcon_Ident,tolua_set_CIcon_Ident);
  tolua_variable(tolua_S,"G",tolua_get_CIcon_G_ptr,tolua_set_CIcon_G_ptr);
  tolua_variable(tolua_S,"Frame",tolua_get_CIcon_Frame,tolua_set_CIcon_Frame);
@@ -765,6 +950,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_beginmodule(tolua_S,"CGraphic");
  tolua_function(tolua_S,"New",tolua_stratagus_CGraphic_New00);
  tolua_function(tolua_S,"Free",tolua_stratagus_CGraphic_Free00);
+ tolua_endmodule(tolua_S);
+ tolua_constant(tolua_S,"MaxCosts",MaxCosts);
+ tolua_cclass(tolua_S,"CUpgrade","CUpgrade","",NULL);
+ tolua_beginmodule(tolua_S,"CUpgrade");
+ tolua_function(tolua_S,"New",tolua_stratagus_CUpgrade_New00);
+ tolua_function(tolua_S,"Get",tolua_stratagus_CUpgrade_Get00);
+ tolua_array(tolua_S,"Costs",tolua_get_stratagus_CUpgrade_Costs,tolua_set_stratagus_CUpgrade_Costs);
+ tolua_variable(tolua_S,"Icon",tolua_get_CUpgrade_Icon_ptr,tolua_set_CUpgrade_Icon_ptr);
  tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;
