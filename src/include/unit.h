@@ -355,6 +355,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
 #include "SDL.h"
 
 /*----------------------------------------------------------------------------
@@ -482,17 +483,6 @@ enum _directions_ {
 	LookingNW = 7 * 32,      /// Unit looking north west
 };
 
-
-	/// A linked list element.
-class UnitListItem {
-public:
-	UnitListItem() : Unit(NULL), Prev(NULL), Next(NULL) {}
-
-	CUnit        *Unit;  /// Points to the unit it links
-	UnitListItem *Prev;  /// Previous item.
-	UnitListItem *Next;  /// Next item.
-};
-
 #define NextDirection 32        /// Next direction N->NE->E...
 #define UnitNotSeen 0x7fffffff  /// Unit not seen, used by Unit::SeenFrame
 
@@ -506,7 +496,6 @@ public:
 	CUnit **PlayerSlot;   /// Slot pointer of Player->Units
 
 	CUnit        *Next;          /// Generic link pointer (on map)
-	UnitListItem *CacheLinks;    /// Link nodes for unit cache
 	unsigned      CacheLock : 1; /// Used to lock unit out of the cache.
 
 	int    InsideCount;   /// Number of units inside.

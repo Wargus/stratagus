@@ -173,7 +173,6 @@ class CPlayer;
 class CFile;
 class CUnit;
 class CUnitType;
-class UnitListItem;
 
 /*----------------------------------------------------------------------------
 --  Map
@@ -196,7 +195,7 @@ class UnitListItem;
 class MapField {
 public:
 	MapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0),
-		UnitCache(NULL)
+		UnitCache()
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -215,7 +214,7 @@ public:
 	unsigned char VisCloak[PlayerMax]; /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];    /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming Capabilities.
-	UnitListItem *UnitCache;           /// A unit on the map field
+	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
 } ;
 
 // Not used until now:
