@@ -203,7 +203,6 @@ void CUnit::Release()
 	}
 	Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 	Type = 0;  // for debugging.
-	free(CacheLinks);
 
 	if (ReleasedOrderHead) {
 		ReleasedOrderTail->Arg1.Order = Orders;
@@ -274,8 +273,6 @@ static CUnit *AllocUnit(void)
 */
 void CUnit::Init(CUnitType* type)
 {
-	int i;
-
 	Assert(type);
 
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
@@ -291,10 +288,6 @@ void CUnit::Init(CUnitType* type)
 	//  Initialise unit structure (must be zero filled!)
 	//
 	Type = type;
-	CacheLinks = (UnitListItem*)calloc(type->TileWidth * type->TileHeight, sizeof(UnitListItem));
-	for (i = 0; i < type->TileWidth * type->TileHeight; ++i) {
-		CacheLinks[i].Unit = this;
-	}
 
 	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
@@ -3938,7 +3931,6 @@ void CleanUnits(void)
 		delete[] (*table)->AutoCastSpell;
 		delete[] (*table)->Variable;
 		free((*table)->Orders);
-		free((*table)->CacheLinks);
 		free(*table);
 		*table = NULL;
 	}
