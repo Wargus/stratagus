@@ -115,9 +115,8 @@ public:
 	/// Draw icon
 	void DrawIcon(const CPlayer *player, int x, int y) const;
 	/// Draw icon of an unit
-	void DrawUnitIcon(const CPlayer *player,
-		ButtonStyle *style, unsigned flags, int x, int y,
-		const char *text) const;
+	void DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
+		unsigned flags, int x, int y, const char *text) const;
 
 	inline const char *GetIdent() { return this->Ident; }
 	void SetIdent(const char *ident);

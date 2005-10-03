@@ -150,14 +150,13 @@ public:
 	static CUpgrade *New(const char *ident);
 	static CUpgrade *Get(const char *ident);
 
-	inline char *GetIcon() { return this->Icon.Name; }
 	void SetIcon(CIcon *icon);
 
 	char *Ident;                      /// identifier
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
 		// TODO: not used by buttons
-	IconConfig Icon;                  /// icon to display to the user
+	CIcon *Icon;                      /// icon to display to the user
 };
 
 /*----------------------------------------------------------------------------

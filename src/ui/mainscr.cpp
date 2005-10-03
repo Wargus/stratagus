@@ -734,7 +734,7 @@ static void DrawUnitInfo(CUnit *unit)
 		//
 		if (unit->Orders[0].Action == UnitActionResearch) {
 			if (UI.ResearchingButton) {
-				unit->Data.Research.Upgrade->Icon.Icon->DrawUnitIcon(unit->Player,
+				unit->Data.Research.Upgrade->Icon->DrawUnitIcon(unit->Player,
 					UI.ResearchingButton->Style,
 					(ButtonAreaUnderCursor == ButtonAreaResearching &&
 						ButtonUnderCursor == 0) ?
