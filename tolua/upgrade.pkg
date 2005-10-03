@@ -1,0 +1,13 @@
+#define MaxCosts 7
+
+class CUpgrade
+{
+  static CUpgrade *New(const char *ident);
+  static CUpgrade *Get(const char *ident);
+
+//  int *GetCosts();
+//  void SetCosts(const int costs[MaxCosts]);
+  int Costs[MaxCosts];
+  tolua_property__s CIcon *Icon;
+};
+
