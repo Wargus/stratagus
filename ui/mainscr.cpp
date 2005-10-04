@@ -322,10 +322,9 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 **  Draw text with variable.
 **
 **  @param unit         unit with variable to show.
-**  @param content      extra data.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-void DrawSimpleText(const CUnit *unit, ContentType* content, int defaultfont)
+void CContentTypeText::Draw(const CUnit *unit, int defaultfont) const
 {
 	char* text;             // Optional text to display.
 	int font;               // Font to use.
@@ -337,22 +336,21 @@ void DrawSimpleText(const CUnit *unit, ContentType* content, int defaultfont)
 	int diff;               // Max - value of the variable.
 	char buf[64];           // string to stock number conversion.
 
-	Assert(content);
-	x = content->PosX;
-	y = content->PosY;
-	font = content->Data.SimpleText.Font;
+	x = this->PosX;
+	y = this->PosY;
+	font = this->Font;
 	if (font == -1) {
 		font = defaultfont;
 	}
 	Assert(font != -1);
-	index = content->Data.SimpleText.Index;
+	index = this->Index;
 
 	Assert(unit || index == -1);
 	Assert(index == -1 || (0 <= index && index < UnitTypeVar.NumberVariable));
 
-	if (content->Data.SimpleText.Text) {
-		text = EvalString(content->Data.SimpleText.Text);
-		if (content->Data.SimpleText.Centered) {
+	if (this->Text) {
+		text = EvalString(this->Text);
+		if (this->Centered) {
 			VideoDrawTextCentered(x, y, font, text);
 		} else {
 			VideoDrawText(x, y, font, text);
@@ -360,13 +358,13 @@ void DrawSimpleText(const CUnit *unit, ContentType* content, int defaultfont)
 		x += VideoTextLength(font, text);
 		delete[] text;
 	}
-	if (content->Data.SimpleText.ShowName) {
+	if (this->ShowName) {
 		VideoDrawTextCentered(x, y, font, unit->Type->Name);
 		return;
 	}
 	if (index != -1) {
-		if (!content->Data.SimpleText.Stat) {
-			component = content->Data.SimpleText.Component;
+		if (!this->Stat) {
+			component = this->Component;
 			switch (component) {
 			case VariableValue:
 			case VariableMax:
@@ -399,14 +397,13 @@ void DrawSimpleText(const CUnit *unit, ContentType* content, int defaultfont)
 **  Draw formatted text with variable value.
 **
 **  @param unit         unit with variable to show.
-**  @param content      extra data.
 **  @param defaultfont  default font if no specific font in extra data.
 **
 **  @note text is limited to 256 chars. (enough?)
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void DrawFormattedText(const CUnit *unit, ContentType* content, int defaultfont)
+void CContentTypeFormattedText::Draw(const CUnit *unit, int defaultfont) const
 {
 	const char* text;
 	int font;
@@ -414,26 +411,25 @@ void DrawFormattedText(const CUnit *unit, ContentType* content, int defaultfont)
 	char buf[256];
 	UStrInt usi1;
 
-	Assert(content);
 	Assert(unit);
-	text = content->Data.FormattedText.Format;
-	font = content->Data.FormattedText.Font;
+	text = this->Format;
+	font = this->Font;
 	if (font == -1) {
 		font = defaultfont;
 	}
 	Assert(font != -1);
-	index = content->Data.FormattedText.Index;
+	index = this->Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	usi1 = GetComponent(unit, index, content->Data.FormattedText.Component, 0);
+	usi1 = GetComponent(unit, index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
 		sprintf(buf, text, usi1.s);
 	} else {
 		sprintf(buf, text, usi1.i);
 	}
-	if (content->Data.FormattedText.Centered) {
-		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
+	if (this->Centered) {
+		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
 	} else {
-		VideoDrawText(content->PosX, content->PosY, font, buf);
+		VideoDrawText(this->PosX, this->PosY, font, buf);
 	}
 }
 
@@ -441,14 +437,13 @@ void DrawFormattedText(const CUnit *unit, ContentType* content, int defaultfont)
 **  Draw formatted text with variable value.
 **
 **  @param unit         unit with variable to show.
-**  @param content      extra data.
 **  @param defaultfont  default font if no specific font in extra data.
 **
 **  @note text is limited to 256 chars. (enough?)
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-void DrawFormattedText2(const CUnit *unit, ContentType* content, int defaultfont)
+void CContentTypeFormattedText2::Draw(const CUnit *unit, int defaultfont) const
 {
 	const char* text;
 	int font;
@@ -456,18 +451,17 @@ void DrawFormattedText2(const CUnit *unit, ContentType* content, int defaultfont
 	char buf[256];
 	UStrInt usi1, usi2;
 
-	Assert(content);
 	Assert(unit);
-	text = content->Data.FormattedText2.Format;
-	font = content->Data.FormattedText2.Font;
+	text = this->Format;
+	font = this->Font;
 	if (font == -1) {
 		font = defaultfont;
 	}
 	Assert(font != -1);
-	index1 = content->Data.FormattedText2.Index1;
-	index2 = content->Data.FormattedText2.Index2;
-	usi1 = GetComponent(unit, index1, content->Data.FormattedText2.Component1, 0);
-	usi2 = GetComponent(unit, index2, content->Data.FormattedText2.Component2, 0);
+	index1 = this->Index1;
+	index2 = this->Index2;
+	usi1 = GetComponent(unit, index1, this->Component1, 0);
+	usi2 = GetComponent(unit, index2, this->Component2, 0);
 	if (usi1.type == USTRINT_STR) {
 		if (usi2.type == USTRINT_STR) {
 			sprintf(buf, text, usi1.s, usi2.s);
@@ -481,10 +475,10 @@ void DrawFormattedText2(const CUnit *unit, ContentType* content, int defaultfont
 			sprintf(buf, text, usi1.i, usi2.i);
 		}
 	}
-	if (content->Data.FormattedText2.Centered) {
-		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
+	if (this->Centered) {
+		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
 	} else {
-		VideoDrawText(content->PosX, content->PosY, font, buf);
+		VideoDrawText(this->PosX, this->PosY, font, buf);
 	}
 }
 
@@ -492,19 +486,17 @@ void DrawFormattedText2(const CUnit *unit, ContentType* content, int defaultfont
 **  Draw icon for unit.
 **
 **  @param unit         unit with icon to show.
-**  @param content      extra data.
 **  @param defaultfont  unused.
 */
-void DrawPanelIcon(const CUnit *unit, ContentType* content, int defaultfont)
+void CContentTypeIcon::Draw(const CUnit *unit, int defaultfont) const
 {
 	int x;
 	int y;
 
-	Assert(content);
 	Assert(unit);
-	x = content->PosX;
-	y = content->PosY;
-	unit = GetUnitRef(unit, content->Data.Icon.UnitRef);
+	x = this->PosX;
+	y = this->PosY;
+	unit = GetUnitRef(unit, this->UnitRef);
 	if (unit && unit->Type->Icon.Icon) {
 		unit->Type->Icon.Icon->DrawIcon(unit->Player, x, y);
 	}
@@ -515,12 +507,11 @@ void DrawPanelIcon(const CUnit *unit, ContentType* content, int defaultfont)
 **  Placed under icons on top-panel.
 **
 **  @param unit         Pointer to unit.
-**  @param content      FIXME: docu
 **  @param defaultfont  FIXME: docu
 **
 **  @todo Color and percent value Parametrisation.
 */
-void DrawLifeBar(const CUnit *unit, ContentType* content, int defaultfont)
+void CContentTypeLifeBar::Draw(const CUnit *unit, int defaultfont) const
 {
 	int x;         // X coordinate of the bar.
 	int y;         // Y coordinate of the bar.
@@ -528,11 +519,10 @@ void DrawLifeBar(const CUnit *unit, ContentType* content, int defaultfont)
 	int f;         // percent of value/Max
 	Uint32 color;  // Color of bar.
 
-	Assert(content);
 	Assert(unit);
-	x = content->PosX;
-	y = content->PosY;
-	index = content->Data.LifeBar.Index;
+	x = this->PosX;
+	y = this->PosY;
+	index = this->Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
 	if (!unit->Variable[index].Max) {
 		return;
@@ -549,10 +539,10 @@ void DrawLifeBar(const CUnit *unit, ContentType* content, int defaultfont)
 	}
 	// Border
 	Video.FillRectangleClip(ColorBlack, x - 1, y - 1,
-		content->Data.LifeBar.Width + 2, content->Data.LifeBar.Height + 2);
+		this->Width + 2, this->Height + 2);
 
 	Video.FillRectangleClip(color, x, y,
-		(f * content->Data.LifeBar.Width) / 100, content->Data.LifeBar.Height);
+		(f * this->Width) / 100, this->Height);
 }
 
 /**
@@ -560,12 +550,11 @@ void DrawLifeBar(const CUnit *unit, ContentType* content, int defaultfont)
 **  Placed under icons on top-panel.
 **
 **  @param unit         Pointer to unit.
-**  @param content      FIXME: docu
 **  @param defaultfont  FIXME: docu
 **
 **  @todo Color and percent value Parametrisation.
 */
-void DrawCompleteBar(const CUnit *unit, ContentType* content, int defaultfont)
+void CContentTypeCompleteBar::Draw(const CUnit *unit, int defaultfont) const
 {
 	int x;         // X coordinate of the bar.
 	int y;         // Y coordinate of the bar.
@@ -574,21 +563,20 @@ void DrawCompleteBar(const CUnit *unit, ContentType* content, int defaultfont)
 	int w;         // Width of the bar.
 	int h;         // Height of the bar.
 
-	Assert(content);
 	Assert(unit);
-	x = content->PosX;
-	y = content->PosY;
-	w = content->Data.CompleteBar.Width;
-	h = content->Data.CompleteBar.Height;
+	x = this->PosX;
+	y = this->PosY;
+	w = this->Width;
+	h = this->Height;
 	Assert(w > 0);
 	Assert(h > 4);
-	index = content->Data.CompleteBar.Index;
+	index = this->Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
 	if (!unit->Variable[index].Max) {
 		return;
 	}
 	f = (100 * unit->Variable[index].Value) / unit->Variable[index].Max;
-	if (!content->Data.CompleteBar.Border) {
+	if (!this->Border) {
 		Video.FillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
 		if (UI.CompletedBarShadow) {
 			// Shadow
@@ -616,8 +604,6 @@ void DrawCompleteBar(const CUnit *unit, ContentType* content, int defaultfont)
 static void DrawUnitInfo(CUnit *unit)
 {
 	int i; // iterator on panel. And some other things.
-	int j; // iterator on panel content.
-	ContentType *content;      // content of current panel.
 	int index;  // Index of the Panel.
 	CUnitType *type;
 	const CUnitStats *stats;
@@ -629,11 +615,11 @@ static void DrawUnitInfo(CUnit *unit)
 	UpdateUnitVariables(unit);
 	for (i = 0; i < UI.NumberPanel; ++i) {
 		index = UI.PanelIndex[i];
-		if (CanShowContent(AllPanels[index].Condition, unit)) {
-			for (j = 0; j < AllPanels[index].NContents; ++j) {
-				content = AllPanels[index].Contents + j;
-				if (CanShowContent(content->Condition, unit) && content->DrawData) {
-					content->DrawData(unit, content, AllPanels[index].DefaultFont);
+		if (CanShowContent(AllPanels[index]->Condition, unit)) {
+			for (std::vector<CContentType *>::const_iterator content = AllPanels[index]->Contents.begin();
+				 content != AllPanels[index]->Contents.end(); ++content) {
+				if (CanShowContent((*content)->Condition, unit)) {
+					(*content)->Draw(unit, AllPanels[index]->DefaultFont);
 				}
 			}
 		}
