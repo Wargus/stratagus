@@ -258,6 +258,10 @@ public:
 	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
 		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
 		Variables(NULL) {}
+	~ConditionPanel() {
+		delete[] BoolFlags;
+		delete[] Variables;
+	};
 
 	bool ShowOnlySelected;      /// if true, show only for selected unit.
 
@@ -269,94 +273,153 @@ public:
 	char *Variables;            /// array of variable to verify (enable and max > 0)
 };
 
-class ContentType;
-typedef void FDrawData(const CUnit *unit, ContentType *content, int defaultfont);
-
 /**
 **  Infos to display the contents of panel.
 */
-class ContentType {
+class CContentType {
 public:
+	CContentType() : PosX(0), PosY(0), Condition(NULL) {};
+	virtual ~CContentType() { delete Condition; };
+
+	virtual void Draw(const CUnit *unit, int defaultfont) const = 0;  /// Tell how show the variable Index.
+
 	int PosX;             /// X coordinate where to display.
 	int PosY;             /// Y coordinate where to display.
-
-	FDrawData *DrawData;  /// Tell how show the variable Index.
-
-	union {
-		struct {
-			StringDesc *Text;            /// Text to display.
-			int Font;                    /// Font to use.
-			char Centered;               /// if true, center the display.
-			int Index;                   /// Index of the variable to show, -1 if not.
-			EnumVariable Component;      /// Component of the variable.
-			char ShowName;               /// If true, Show name's unit.
-			char Stat;                   /// true to special display.(value or value + diff)
-		} SimpleText;   /// Show simple text followed by variable value.
-		struct {
-			char *Format;                /// Text to display
-			int Font;                    /// Font to use.
-			int Index;                   /// Index of the variable to show.
-			EnumVariable Component;      /// Component of the variable.
-			char Centered;               /// if true, center the display.
-		} FormattedText;   /// Show formatted text with variable value.
-		struct {
-			char *Format;                /// Text to display
-			int Font;                    /// Font to use.
-			int Index1;                  /// Index of the variable1 to show.
-			EnumVariable Component1;     /// Component of the variable1.
-			int Index2;                  /// Index of the variable to show.
-			EnumVariable Component2;     /// Component of the variable.
-			char Centered;               /// if true, center the display.
-		} FormattedText2;   /// Show formatted text with 2 variable value.
-		struct {
-			EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
-		} Icon;         /// Show icon of the unit
-		struct {
-			int Index;           /// Index of the variable to show, -1 if not.
-			int Width;           /// Width of the bar.
-			int Height;          /// Height of the bar.
-#if 0 // FIXME : something for color and value parametrisation (not implemented)
-			Color *colors;       /// array of color to show (depend of value)
-			int *values;         /// list of percentage to change color.
-#endif
-		} LifeBar;      /// Show bar which change color depend of value.
-		struct {
-			int Index;           /// Index of the variable to show, -1 if not.
-			int Width;           /// Width of the bar.
-			int Height;          /// Height of the bar.
-			char Border;         /// True for additional border.
-#if 0 // FIXME : something for color parametrisations (not implemented)
-// take UI.CompletedBar color for the moment.
-			Color colors;        /// Color to show (depend of value)
-#endif
-		} CompleteBar;  /// Show bar.
-	} Data;
-
-// FIXME : Complete this.
 
 	ConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
 };
 
 /**
+**  Show simple text followed by variable value.
+*/
+class CContentTypeText : public CContentType {
+public:
+	CContentTypeText() : Text(NULL), Font(-1), Centered(0), Index(-1), Component(VariableValue), ShowName(0), Stat(0) {};
+	virtual ~CContentTypeText() {
+		FreeStringDesc(Text);
+		delete Text;
+	};
+	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	StringDesc *Text;            /// Text to display.
+	int Font;                    /// Font to use.
+	char Centered;               /// if true, center the display.
+	int Index;                   /// Index of the variable to show, -1 if not.
+	EnumVariable Component;      /// Component of the variable.
+	char ShowName;               /// If true, Show name's unit.
+	char Stat;                   /// true to special display.(value or value + diff)
+};
+
+/**
+**  Show formatted text with variable value.
+*/
+class CContentTypeFormattedText : public CContentType {
+public:
+	CContentTypeFormattedText() : Format(NULL), Font(-1), Centered(0), Index(-1), Component(VariableValue) {};
+	virtual ~CContentTypeFormattedText() { delete [] Format;};
+	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	char *Format;                /// Text to display
+	int Font;                    /// Font to use.
+	char Centered;               /// if true, center the display.
+	int Index;                   /// Index of the variable to show.
+	EnumVariable Component;      /// Component of the variable.
+};
+
+/**
+**  Show formatted text with variable value.
+*/
+class CContentTypeFormattedText2 : public CContentType {
+public:
+	CContentTypeFormattedText2() : Format(NULL), Font(-1), Centered(0),
+									Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {};
+	virtual ~CContentTypeFormattedText2() { delete [] Format;};
+	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	char *Format;                /// Text to display
+	int Font;                    /// Font to use.
+	char Centered;               /// if true, center the display.
+	int Index1;                  /// Index of the variable1 to show.
+	EnumVariable Component1;     /// Component of the variable1.
+	int Index2;                  /// Index of the variable to show.
+	EnumVariable Component2;     /// Component of the variable.
+};
+
+/**
+**  Show icon of the unit
+*/
+class CContentTypeIcon : public CContentType {
+public:
+	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
+};
+
+/**
+**  Show bar which change color depend of value.
+*/
+class CContentTypeLifeBar : public CContentType {
+public:
+	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {};
+	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	int Index;           /// Index of the variable to show, -1 if not.
+	int Width;           /// Width of the bar.
+	int Height;          /// Height of the bar.
+#if 0 // FIXME : something for color and value parametrisation (not implemented)
+	Color *colors;       /// array of color to show (depend of value)
+	int *values;         /// list of percentage to change color.
+#endif
+};
+
+/**
+**  Show bar.
+*/
+class CContentTypeCompleteBar : public CContentType {
+public:
+	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0) {};
+	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	int Index;           /// Index of the variable to show, -1 if not.
+	int Width;           /// Width of the bar.
+	int Height;          /// Height of the bar.
+	char Border;         /// True for additional border.
+#if 0 // FIXME : something for color parametrisations (not implemented)
+// take UI.CompletedBar color for the moment.
+	Color colors;        /// Color to show (depend of value)
+#endif
+
+};
+
+/**
 **  Info for the panel.
 */
-class InfoPanel {
+class CUnitInfoPanel {
 public:
-	InfoPanel() : Name(NULL), PosX(0), PosY(0), DefaultFont(0),
-		Contents(NULL), NContents(0), Condition(NULL) {}
+	CUnitInfoPanel() : Name(NULL), PosX(0), PosY(0), DefaultFont(0),
+		Contents(), Condition(NULL) {};
+	~CUnitInfoPanel() {
+		delete[] Name;
+		for (std::vector<CContentType *>::iterator content = Contents.begin();
+			content != Contents.end(); ++content) {
+			delete *content;
+		}
+		Contents.clear();
+		delete Condition;
+	};
+
 
 	char *Name;            /// Ident of the panel.
 	int PosX;              /// X coordinate of the panel.
 	int PosY;              /// Y coordinate of the panel.
 	int DefaultFont;       /// Default font for content.
 
-	ContentType *Contents; /// Array of contents to display.
-	int NContents;         /// Number of content.
+	std::vector<CContentType *>Contents; /// Array of contents to display.
 
 	ConditionPanel *Condition; /// Condition to show the panel; if NULL, no condition.
 };
 
-extern std::vector<InfoPanel> AllPanels;  /// Array of panels.
+extern std::vector<CUnitInfoPanel *> AllPanels;  /// Array of panels.
 
 
 class CButtonPanel
@@ -588,8 +651,6 @@ extern void InitUserInterface(const char *race_name);
 extern void LoadUserInterface(void);
 	/// Save the ui state
 extern void SaveUserInterface(CFile *file);
-	/// Clean up the Panel.
-extern void CleanPanel(InfoPanel *panel);
 	/// Clean up a ui
 extern void CleanUI(CUserInterface *ui);
 	/// Clean up the ui module
@@ -620,13 +681,6 @@ extern CViewport *GetViewport(int x, int y);
 extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
-
-extern FDrawData DrawSimpleText;
-extern FDrawData DrawFormattedText;
-extern FDrawData DrawFormattedText2;
-extern FDrawData DrawPanelIcon;
-extern FDrawData DrawLifeBar;
-extern FDrawData DrawCompleteBar;
 
 extern int AddHandler(struct lua_State *l);
 extern void CallHandler(unsigned int handle, int value);

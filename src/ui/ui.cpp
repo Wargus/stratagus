@@ -254,60 +254,6 @@ void SaveUserInterface(CFile *file)
 }
 
 /**
-**  Clean Condition Panel.
-**
-**  @param condition condition panel to free.
-*/
-static void CleanConditionPanel(ConditionPanel *condition)
-{
-	if (!condition) {
-		return;
-	}
-	delete[] condition->BoolFlags;
-	delete[] condition->Variables;
-	delete condition;
-}
-
-/**
-**  Clean Condition Panel.
-**
-**  @param content  content panel to free.
-*/
-static void CleanContent(ContentType *content)
-{
-	if (!content) {
-		return;
-	}
-	CleanConditionPanel(content->Condition);
-	if (content->DrawData == DrawSimpleText) {
-		FreeStringDesc(content->Data.SimpleText.Text);
-		delete content->Data.SimpleText.Text;
-	} else if (content->DrawData == DrawFormattedText) {
-		delete[] content->Data.FormattedText.Format;
-	} else if (content->DrawData == DrawFormattedText2) {
-		delete[] content->Data.FormattedText2.Format;
-	}
-}
-
-/**
-**  Clean Panel.
-**
-**  @param panel  panel to free.
-*/
-void CleanPanel(InfoPanel *panel)
-{
-	if (!panel) {
-		return;
-	}
-	delete[] panel->Name;
-	CleanConditionPanel(panel->Condition);
-	for (int i = 0; i < panel->NContents; i++) {
-		CleanContent(&panel->Contents[i]);
-	}
-	free(panel->Contents);
-}
-
-/**
 **  Clean up a user interface.
 */
 void CleanUI(CUserInterface *ui)
@@ -380,8 +326,9 @@ void CleanUserInterface(void)
 		UI_Table = NULL;
 	}
 
-	for (i = 0; i < (int)AllPanels.size(); ++i) {
-		CleanPanel(&AllPanels[i]);
+	for (std::vector<CUnitInfoPanel *>::iterator panel = AllPanels.begin();
+		panel != AllPanels.end(); ++panel) {
+		delete *panel;
 	}
 	AllPanels.clear();
 
