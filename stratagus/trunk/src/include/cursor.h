@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class CursorType cursor.h
+**  @class CCursor cursor.h
 **
 **  \#include "cursor.h"
 **
@@ -48,30 +48,30 @@
 **
 **  The cursor-type structure members:
 **
-**  CursorType::Ident
+**  CCursor::Ident
 **
 **    Unique identifier of the cursor, used to reference it in config
 **    files and during startup. Don't use this in game, use instead
 **    the pointer to this structure.
 **
-**  CursorType::Race
+**  CCursor::Race
 **
 **    Owning Race of this cursor ("human", "orc", "alliance",
 **    "mythical", ...). If NULL, this cursor could be used by any
 **    race.
 **
-**  CursorType::HotX CursorType::HotY
+**  CCursor::HotX CCursor::HotY
 **
 **    Hot spot of the cursor in pixels. Relative to the sprite origin
 **    (0,0). The hot spot of a cursor is the point to which Stratagus
 **    refers in tracking the cursor's position.
 **
-**  CursorType::SpriteFrame
+**  CCursor::SpriteFrame
 **
 **    Current displayed cursor frame.
-**    From 0 to CursorType::Graphic::NumFrames.
+**    From 0 to CCursor::G::NumFrames.
 **
-**  CursorType::FrameRate
+**  CCursor::FrameRate
 **
 **    Rate of changing the frames. The "rate" tells the engine how
 **    many milliseconds to hold each frame of the animation.
@@ -79,9 +79,9 @@
 **    @note  This is the first time that for timing ms are used! I would
 **           change it to display frames.
 **
-**  CursorType::G
+**  CCursor::G
 **
-**    Contains the sprite of the cursor, loaded from CursorType::File.
+**    Contains the sprite of the cursor, loaded from CCursor::File.
 **    This can be a multicolor image with alpha or transparency.
 */
 
@@ -96,7 +96,7 @@
 **  CursorConfig::Name
 **
 **    Name to reference this cursor-type. Used while initialization.
-**    (See CursorType::Ident)
+**    (See CCursor::Ident)
 **
 **  CursorConfig::Cursor
 **
@@ -121,9 +121,9 @@ class CUnitType;
 ----------------------------------------------------------------------------*/
 
 	/// Private type which specifies the cursor-type
-class CursorType {
+class CCursor {
 public:
-	CursorType() : Ident(NULL), Race(NULL), HotX(0), HotY(0),
+	CCursor() : Ident(NULL), Race(NULL), HotX(0), HotY(0),
 		SpriteFrame(0), FrameRate(0), G(NULL) {}
 
 	char *Ident;  /// Identifier to reference it
@@ -146,8 +146,8 @@ public:
 	CursorConfig() : Name(NULL), Cursor(NULL) {}
 	~CursorConfig() { delete[] Name; }
 
-	char       *Name;    /// Config cursor-type name
-	CursorType *Cursor;  /// Cursor-type pointer
+	char *Name;       /// Config cursor-type name
+	CCursor *Cursor;  /// Cursor-type pointer
 };
 
 	/// Cursor state
@@ -162,14 +162,14 @@ enum CursorStates {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CursorType> Cursors;/// cursor-types description
+extern std::vector<CCursor> AllCursors;/// cursor-types description
 
 extern CursorStates CursorState;  /// current cursor state (point,...)
 extern int CursorAction;          /// action for selection
 extern int CursorValue;           /// value for action (spell type f.e.)
 extern CUnitType *CursorBuilding; /// building cursor
 
-extern CursorType *GameCursor;  /// cursor-type
+extern CCursor *GameCursor;     /// cursor-type
 extern int CursorX;             /// cursor position on screen X
 extern int CursorY;             /// cursor position on screen Y
 extern int CursorStartX;        /// rectangle started on screen X
@@ -186,8 +186,8 @@ extern int SubScrollY;          /// pixels the mouse moved while scrolling
 	/// Load all cursors
 extern void LoadCursors(const char *racename);
 
-	/// Cursor-type by identifier
-extern CursorType *CursorTypeByIdent(const char *ident);
+	/// Cursor by identifier
+extern CCursor *CursorByIdent(const char *ident);
 
 	/// Draw any cursor
 extern void DrawCursor(void);

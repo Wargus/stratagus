@@ -382,7 +382,7 @@ static int CclDefineCursor(lua_State *l)
 	int h;
 	int rate;
 	int i;
-	CursorType *ct;
+	CCursor *ct;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -438,20 +438,20 @@ static int CclDefineCursor(lua_State *l)
 	//
 	ct = NULL;
 	i = 0;
-	if (Cursors.size()) {
-		for (; i < (int)Cursors.size(); ++i) {
+	if (AllCursors.size()) {
+		for (; i < (int)AllCursors.size(); ++i) {
 			//
 			//  Race not same, not found.
 			//
-			if (Cursors[i].Race && race) {
-				if (strcmp(Cursors[i].Race, race)) {
+			if (AllCursors[i].Race && race) {
+				if (strcmp(AllCursors[i].Race, race)) {
 					continue;
 				}
-			} else if (Cursors[i].Race != race) {
+			} else if (AllCursors[i].Race != race) {
 				continue;
 			}
-			if (!strcmp(Cursors[i].Ident, name)) {
-				ct = &Cursors[i];
+			if (!strcmp(AllCursors[i].Ident, name)) {
+				ct = &AllCursors[i];
 				break;
 			}
 		}
@@ -460,9 +460,9 @@ static int CclDefineCursor(lua_State *l)
 	//  Not found, make a new slot.
 	//
 	if (!ct) {
-		CursorType c;
-		Cursors.push_back(c);
-		ct = &Cursors.back();
+		CCursor c;
+		AllCursors.push_back(c);
+		ct = &AllCursors.back();
 		ct->Ident = new_strdup(name);
 		ct->Race = race ? new_strdup(race) : NULL;
 	}
@@ -483,7 +483,7 @@ static int CclDefineCursor(lua_State *l)
 static int CclSetGameCursor(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	GameCursor = CursorTypeByIdent(LuaToString(l, 1));
+	GameCursor = CursorByIdent(LuaToString(l, 1));
 	return 0;
 }
 
