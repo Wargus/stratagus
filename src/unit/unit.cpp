@@ -107,9 +107,7 @@ void InitUnitsMemory(void)
 }
 
 /**
-**  Increase an unit's reference count.
-**
-**  @param unit The unit
+**  Increase a unit's reference count.
 */
 void CUnit::RefsIncrease()
 {
@@ -120,9 +118,7 @@ void CUnit::RefsIncrease()
 }
 
 /**
-**  Decrease an unit's reference count.
-**
-**  @param unit The unit
+**  Decrease a unit's reference count.
 */
 void CUnit::RefsDecrease()
 {
@@ -143,8 +139,6 @@ void CUnit::RefsDecrease()
 **  Release an unit.
 **
 **  The unit is only released, if all references are dropped.
-**
-**  @param unit Pointer to unit.
 */
 void CUnit::Release()
 {
@@ -268,7 +262,6 @@ static CUnit *AllocUnit(void)
 /**
 **  Initialize the unit slot with default values.
 **
-**  @param unit    Unit pointer (allocated zero filled)
 **  @param type    Unit-type
 */
 void CUnit::Init(CUnitType* type)
@@ -352,9 +345,7 @@ void CUnit::Init(CUnitType* type)
 /**
 **  Assigns a unit to a player, adjusting buildings, food and totals
 **
-**  @param unit    unit assigned to player.
 **  @param player  player which have the unit.
-**
 */
 void CUnit::AssignToPlayer(CPlayer *player)
 {
@@ -668,8 +659,7 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 /**
 **  Add unit to a container. It only updates linked list stuff.
 **
-**  @param unit    Pointer to unit.
-**  @param host    Pointer to container.
+**  @param host  Pointer to container.
 */
 void CUnit::AddInContainer(CUnit *host)
 {
@@ -740,12 +730,11 @@ static void UnitInXY(CUnit *unit, int x, int y)
 }
 
 /**
-**  Move an unit (with units inside) to tile (x, y).
+**  Move a unit (with units inside) to tile (x, y).
 **  (Do stuff with vision, cachelist and pathfinding).
 **
-**  @param unit    unit to move.
-**  @param x       X map tile position.
-**  @param y       Y map tile position.
+**  @param x  X map tile position.
+**  @param y  Y map tile position.
 **
 */
 void CUnit::MoveToXY(int x, int y)
@@ -768,9 +757,8 @@ void CUnit::MoveToXY(int x, int y)
 /**
 **  Place unit on map.
 **
-**  @param unit    Unit to be placed.
-**  @param x       X map tile position.
-**  @param y       Y map tile position.
+**  @param x  X map tile position.
+**  @param y  Y map tile position.
 */
 void CUnit::Place(int x, int y)
 {
@@ -826,8 +814,7 @@ CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player)
 **  Update panels.
 **  Update map.
 **
-**  @param unit    Pointer to unit.
-**  @param host    Pointer to housing unit.
+**  @param host  Pointer to housing unit.
 */
 void CUnit::Remove(CUnit *host)
 {
@@ -1425,9 +1412,9 @@ bool CUnit::IsVisibleOnMinimap() const
 **
 **  @warning This is only true for ::ThisPlayer
 **
-**  @param vp    Viewport pointer.
+**  @param vp  Viewport pointer.
 **
-**  @return      True if visible, false otherwise.
+**  @return    True if visible, false otherwise.
 */
 bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 {
@@ -3424,6 +3411,8 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 
 /**
 **  Check if the player is an enemy
+**
+**  @param x  Player to check
 */
 bool CUnit::IsEnemy(const CPlayer *x) const
 {
@@ -3432,6 +3421,8 @@ bool CUnit::IsEnemy(const CPlayer *x) const
 
 /**
 **  Check if the unit is an enemy
+**
+**  @param x  Unit to check
 */
 bool CUnit::IsEnemy(const CUnit *x) const
 {
@@ -3440,6 +3431,8 @@ bool CUnit::IsEnemy(const CUnit *x) const
 
 /**
 **  Check if the player is an ally
+**
+**  @param x  Player to check
 */
 bool CUnit::IsAllied(const CPlayer *x) const
 {
@@ -3448,6 +3441,8 @@ bool CUnit::IsAllied(const CPlayer *x) const
 
 /**
 **  Check if the unit is an ally
+**
+**  @param x  Unit to check
 */
 bool CUnit::IsAllied(const CUnit *x) const
 {
@@ -3456,6 +3451,8 @@ bool CUnit::IsAllied(const CUnit *x) const
 
 /**
 **  Check if the player shares vision
+**
+**  @param x  Player to check
 */
 bool CUnit::IsSharedVision(const CPlayer *x) const
 {
@@ -3465,6 +3462,8 @@ bool CUnit::IsSharedVision(const CPlayer *x) const
 
 /**
 **  Check if the unit shares vision
+**
+**  @param x  Unit to check
 */
 bool CUnit::IsSharedVision(const CUnit *x) const
 {

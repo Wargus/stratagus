@@ -50,8 +50,9 @@
 /**
 **  Extend tables of the tileset.
 **
-**  @param tileset  Tileset to be extended.
-**  @param tiles    Number of tiles.
+**  @param tileset   Tileset to be extended.
+**  @param oldtiles  Number of old tiles.
+**  @param newtiles  Number of new tiles.
 */
 static void ExtendTilesetTables(CTileset *tileset, int oldtiles, int newtiles)
 {

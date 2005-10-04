@@ -87,8 +87,6 @@ extern NumberDesc *Damage;                   /// Damage calculation for missile.
 
 /**
 **  Load the graphics for a missile type
-**
-**  @param mtype  Type of missile to Load
 */
 void MissileType::LoadMissileSprite()
 {
@@ -275,7 +273,8 @@ Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 /**
 **  Free a missile.
 **
-**  @param missile  Missile pointer.
+**  @param missiles  Missile pointer.
+**  @param i         FIXME: docu
 */
 static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>::size_type i)
 {
@@ -539,7 +538,6 @@ static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 /**
 **  Draw missile.
 **
-**  @param mtype  Missile type
 **  @param frame  Animation frame
 **  @param x      Screen pixel X position
 **  @param y      Screen pixel Y position
@@ -585,8 +583,6 @@ void MissileType::DrawMissileType(int frame, int x, int y) const
 
 /**
 **  Draw missile.
-**
-**  @param missile  Missile to draw.
 */
 void Missile::DrawMissile() const
 {
@@ -623,6 +619,7 @@ void Missile::DrawMissile() const
 **
 **  @param v1  adress of a missile pointer.
 **  @param v2  adress of a missile pointer.
+**
 **  @return    -1 if v1 < v2, 1 else.
 */
 static int MissileDrawLevelCompare(const void *v1, const void *v2)
@@ -721,6 +718,7 @@ static void MissileNewHeadingFromXY(Missile *missile, int dx, int dy)
 **  Init the move.
 **
 **  @param missile  missile to initialise for movement.
+**
 **  @return         1 if goal is reached, 0 else.
 */
 static int MissileInitMove(Missile *missile)
@@ -1190,8 +1188,7 @@ MissileType *MissileBurningBuilding(int percent)
 /**
 **  Save the state of a missile to file.
 **
-**  @param missile  Missile object to save.
-**  @param file     Output file.
+**  @param file  Output file.
 */
 void Missile::SaveMissile(CFile *file) const
 {
@@ -1352,8 +1349,6 @@ void CleanMissiles(void)
 
 /**
 **  Missile does nothing
-**
-**  @param missile  pointer to missile
 */
 void MissileNone::Action()
 {
@@ -1363,8 +1358,6 @@ void MissileNone::Action()
 
 /**
 **  Missile flies from x,y to x1,y1 animation on the way
-**
-**  @param missile  pointer to missile
 */
 void MissilePointToPoint::Action()
 {
@@ -1380,8 +1373,6 @@ void MissilePointToPoint::Action()
 /**
 **  Missile flies from x,y to x1,y1 showing the first frame
 **  and then shows a hit animation.
-**
-**  @param missile  pointer to missile
 */
 void MissilePointToPointWithHit::Action()
 {
@@ -1396,8 +1387,6 @@ void MissilePointToPointWithHit::Action()
 
 /**
 **  Missile flies from x,y to x1,y1 and stays there for a moment
-**
-**  @param missile  pointer to missile
 */
 void MissilePointToPointCycleOnce::Action()
 {
@@ -1412,8 +1401,6 @@ void MissilePointToPointCycleOnce::Action()
 
 /**
 **  Missile don't move, than disappears
-**
-**  @param missile  pointer to missile
 */
 void MissileStay::Action()
 {
@@ -1426,8 +1413,6 @@ void MissileStay::Action()
 
 /**
 **  Missile flies from x,y to x1,y1 than bounces NumBounces times
-**
-**  @param missile  pointer to missile
 */
 void MissilePointToPointBounce::Action()
 {
@@ -1462,8 +1447,6 @@ void MissilePointToPointBounce::Action()
 /**
 **  Missile doesn't move, it will just cycle once and vanish.
 **  Used for ui missiles (cross shown when you give and order)
-**
-**  @param missile  pointer to missile
 */
 void MissileCycleOnce::Action()
 {
@@ -1489,8 +1472,6 @@ void MissileCycleOnce::Action()
 
 /**
 **  Missile don't move, than checks the source unit for HP.
-**
-**  @param missile  pointer to missile
 */
 void MissileFire::Action()
 {
@@ -1526,8 +1507,6 @@ void MissileFire::Action()
 
 /**
 **  Missile shows hit points?
-**
-**  @param missile  pointer to missile
 */
 void MissileHit::Action()
 {
@@ -1540,8 +1519,6 @@ void MissileHit::Action()
 
 /**
 **  Missile flies from x,y to x1,y1 using a parabolic path
-**
-**  @param missile  pointer to missile
 */
 void MissileParabolic::Action()
 {
@@ -1556,8 +1533,6 @@ void MissileParabolic::Action()
 
 /**
 **  FlameShield controller
-**
-**  @param missile  Controlled missile
 */
 void MissileFlameShield::Action()
 {
@@ -1631,8 +1606,6 @@ void MissileFlameShield::Action()
 **  Land mine controller.
 **  @todo start-finish-start cyclic animation.(anim scripts!)
 **  @todo missile should dissapear for a while.
-**
-**  @param missile  Controlled missile
 */
 void MissileLandMine::Action()
 {
@@ -1666,8 +1639,6 @@ void MissileLandMine::Action()
 
 /**
 **  Whirlwind controller
-**
-**  @param missile  Controlled missile
 **
 **  @todo do it more configurable.
 */
@@ -1755,8 +1726,6 @@ void MissileWhirlwind::Action()
 
 /**
 **  Death-Coil class. Damages organic units and gives to the caster.
-**
-**  @param missile  Controlled missile
 **
 **  @todo  do it configurable.
 */

@@ -174,7 +174,6 @@ CIcon *IconByIdent(const char *ident)
 **  Draw icon on x,y.
 **
 **  @param player  Player pointer used for icon colors
-**  @param icon    Icon identifier
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 */
@@ -188,7 +187,6 @@ void CIcon::DrawIcon(const CPlayer *player, int x, int y) const
 **
 **  @param player  Player pointer used for icon colors
 **  @param style   Button style
-**  @param icon    Icon
 **  @param flags   State of icon (clicked, mouse over...)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
