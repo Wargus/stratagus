@@ -277,12 +277,12 @@ Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 **
 **  @param missile  Missile pointer.
 */
-static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>::iterator &i)
+static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>::size_type i)
 {
 	Missile *missile;
 	CUnit *unit;
 
-	missile = *i;
+	missile = missiles[i];
 	//
 	// Release all unit references.
 	//
@@ -292,9 +292,13 @@ static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>:
 	if ((unit = missile->TargetUnit)) {
 		unit->RefsDecrease();
 	}
+	for (std::vector<Missile*>::iterator j = missiles.begin(); j != missiles.end(); ++j) {
+		if (*j == missile) {
+			missiles.erase(j);
+			break;
+		}
+	}
 	delete missile;
-
-	i = missiles.erase(i);
 }
 
 /**
@@ -1104,33 +1108,33 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 	//
 	// NOTE: missiles[??] could be modified!!! Yes (freed)
 	//
-	for (std::vector<Missile *>::iterator i = missiles.begin();
-			i != missiles.end();) {
+	for (std::vector<Missile *>::size_type i = 0;
+			i != missiles.size();) {
 
-		if ((*i)->Delay) {
-			(*i)->Delay--;
+		if (missiles[i]->Delay) {
+			missiles[i]->Delay--;
 			++i;
 			continue;  // delay start of missile
 		}
 
-		if ((*i)->TTL > 0) {
-			(*i)->TTL--;  // overall time to live if specified
+		if (missiles[i]->TTL > 0) {
+			missiles[i]->TTL--;  // overall time to live if specified
 		}
 
-		if (!(*i)->TTL) {
+		if (!missiles[i]->TTL) {
 			FreeMissile(missiles, i);
 			continue;
 		}
 
-		Assert((*i)->Wait);
-		if (--(*i)->Wait) {  // wait until time is over
+		Assert(missiles[i]->Wait);
+		if (--missiles[i]->Wait) {  // wait until time is over
 			++i;
 			continue;
 		}
 
-		(*i)->Action();
+		missiles[i]->Action();
 
-		if (!(*i)->TTL) {
+		if (!missiles[i]->TTL) {
 			FreeMissile(missiles, i);
 			continue;
 		}
