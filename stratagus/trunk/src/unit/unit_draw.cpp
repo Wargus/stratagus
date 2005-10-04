@@ -1482,8 +1482,6 @@ static void DrawConstruction(const CUnit *unit, const CConstructionFrame *cframe
 
 /**
 **  Draw unit on map.
-**
-**  @param unit  Pointer to the unit.
 */
 void CUnit::Draw() const
 {
