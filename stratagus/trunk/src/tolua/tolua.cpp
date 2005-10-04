@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Mon Oct  3 19:27:02 2005.
+** Generated automatically by tolua++-1.0.6 on Tue Oct  4 18:35:50 2005.
 */
 
 #ifndef __cplusplus
@@ -682,6 +682,26 @@ static int tolua_set_CVideo_FullScreen(lua_State* tolua_S)
  return 0;
 }
 
+/* get function: Video */
+static int tolua_get_Video(lua_State* tolua_S)
+{
+ tolua_pushusertype(tolua_S,(void*)&Video,"CVideo");
+ return 1;
+}
+
+/* set function: Video */
+static int tolua_set_Video(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,2,"CVideo",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  Video = *((CVideo*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+
 /* method: New of class  CGraphic */
 static int tolua_stratagus_CGraphic_New00(lua_State* tolua_S)
 {
@@ -945,6 +965,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"Depth",tolua_get_CVideo_Depth,tolua_set_CVideo_Depth);
  tolua_variable(tolua_S,"FullScreen",tolua_get_CVideo_FullScreen,tolua_set_CVideo_FullScreen);
  tolua_endmodule(tolua_S);
+ tolua_variable(tolua_S,"Video",tolua_get_Video,tolua_set_Video);
  tolua_cclass(tolua_S,"CGraphic","CGraphic","",NULL);
  tolua_beginmodule(tolua_S,"CGraphic");
  tolua_function(tolua_S,"New",tolua_stratagus_CGraphic_New00);
