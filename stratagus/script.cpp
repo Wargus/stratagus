@@ -2604,7 +2604,8 @@ void SavePreferences(void)
 	fprintf(fd, "--- -----------------------------------------\n");
 	fprintf(fd, "--- $Id$\n");
 
-	fprintf(fd, "SetVideoResolution(%d, %d)\n", Video.Width, Video.Height);
+	fprintf(fd, "Video.Width = %d\n", Video.Width);
+	fprintf(fd, "Video.Height = %d\n", Video.Height);
 
 	fclose(fd);
 
@@ -2628,7 +2629,7 @@ void SavePreferences(void)
 	fprintf(fd, "--- -----------------------------------------\n");
 	fprintf(fd, "--- $Id$\n");
 
-	fprintf(fd, "SetVideoFullScreen(%s)\n", Video.FullScreen ? "true" : "false");
+	fprintf(fd, "Video.FullScreen = %s\n", Video.FullScreen ? "true" : "false");
 	fprintf(fd, "SetLocalPlayerName(\"%s\")\n", LocalPlayerName);
 
 	// Game options
