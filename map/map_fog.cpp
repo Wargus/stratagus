@@ -797,6 +797,7 @@ void CleanMapFogOfWar(void)
 		OnlyFogSurface = NULL;
 	}
 	CGraphic::Free(AlphaFogG);
+	AlphaFogG = NULL;
 #endif
 }
 
