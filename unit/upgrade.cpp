@@ -150,13 +150,6 @@ CUpgrade *UpgradeByIdent(const char *ident)
 */
 void InitUpgrades(void)
 {
-	// Resolve the icons.
-	std::vector<CUpgrade *>::iterator i;
-	for (i = AllUpgrades.begin(); i != AllUpgrades.end(); ++i) {
-		if ((*i)->Icon.Name) {
-			(*i)->Icon.Icon = IconByIdent((*i)->Icon.Name);
-		}
-	}
 }
 
 /**
@@ -182,18 +175,6 @@ void CleanUpgrades(void)
 		delete UpgradeModifiers[i];
 	}
 	NumUpgradeModifiers = 0;
-}
-
-/**
-**  Set upgrade icon
-**
-**  @param name  Name of the icon
-*/
-void CUpgrade::SetIcon(CIcon *icon)
-{
-//	delete[] this->Icon.Name;
-//	this->Icon.Name = new_strdup(name);
-	this->Icon.Icon = icon;
 }
 
 /**
@@ -424,7 +405,7 @@ static int CclDefineUpgrade(lua_State *l)
 	CUpgrade *upgrade = CUpgrade::New(ident);
 	memcpy(upgrade->Costs, costs, sizeof(upgrade->Costs));
 	if (icon) {
-		upgrade->SetIcon(IconByIdent(icon));
+		upgrade->Icon = IconByIdent(icon);
 	}
 
 	return 0;

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Sun Oct  2 09:17:15 2005.
+** Generated automatically by tolua++-1.0.6 on Mon Oct  3 19:27:02 2005.
 */
 
 #ifndef __cplusplus
@@ -852,7 +852,7 @@ static int tolua_get_CUpgrade_Icon_ptr(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Icon'",NULL);
 #endif
- tolua_pushusertype(tolua_S,(void*)self->GetIcon(),"CIcon");
+ tolua_pushusertype(tolua_S,(void*)self->Icon,"CIcon");
  return 1;
 }
 
@@ -866,8 +866,7 @@ static int tolua_set_CUpgrade_Icon_ptr(lua_State* tolua_S)
  if (!tolua_isusertype(tolua_S,2,"CIcon",0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->SetIcon(((CIcon*)  tolua_tousertype(tolua_S,2,0))
-)
+  self->Icon = ((CIcon*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }

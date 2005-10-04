@@ -301,7 +301,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 	b = OnTopDetails(unit, NULL);
 	if (b && b->ReplaceOnBuild) {
 		int n;
-		CUnit **table;
+		CUnit *table[UnitMax];
 
 		n = UnitCacheOnTile(x, y, table);
 		while (n--) {

@@ -198,22 +198,22 @@ void LoadUserInterface(void)
 	//
 	//  Resolve cursors
 	//
-	UI.Point.Cursor = CursorTypeByIdent(UI.Point.Name);
-	UI.Glass.Cursor = CursorTypeByIdent(UI.Glass.Name);
-	UI.Cross.Cursor = CursorTypeByIdent(UI.Cross.Name);
-	UI.YellowHair.Cursor = CursorTypeByIdent(UI.YellowHair.Name);
-	UI.GreenHair.Cursor = CursorTypeByIdent(UI.GreenHair.Name);
-	UI.RedHair.Cursor = CursorTypeByIdent(UI.RedHair.Name);
-	UI.Scroll.Cursor = CursorTypeByIdent(UI.Scroll.Name);
+	UI.Point.Cursor = CursorByIdent(UI.Point.Name);
+	UI.Glass.Cursor = CursorByIdent(UI.Glass.Name);
+	UI.Cross.Cursor = CursorByIdent(UI.Cross.Name);
+	UI.YellowHair.Cursor = CursorByIdent(UI.YellowHair.Name);
+	UI.GreenHair.Cursor = CursorByIdent(UI.GreenHair.Name);
+	UI.RedHair.Cursor = CursorByIdent(UI.RedHair.Name);
+	UI.Scroll.Cursor = CursorByIdent(UI.Scroll.Name);
 
-	UI.ArrowE.Cursor = CursorTypeByIdent(UI.ArrowE.Name);
-	UI.ArrowNE.Cursor = CursorTypeByIdent(UI.ArrowNE.Name);
-	UI.ArrowN.Cursor = CursorTypeByIdent(UI.ArrowN.Name);
-	UI.ArrowNW.Cursor = CursorTypeByIdent(UI.ArrowNW.Name);
-	UI.ArrowW.Cursor = CursorTypeByIdent(UI.ArrowW.Name);
-	UI.ArrowSW.Cursor = CursorTypeByIdent(UI.ArrowSW.Name);
-	UI.ArrowS.Cursor = CursorTypeByIdent(UI.ArrowS.Name);
-	UI.ArrowSE.Cursor = CursorTypeByIdent(UI.ArrowSE.Name);
+	UI.ArrowE.Cursor = CursorByIdent(UI.ArrowE.Name);
+	UI.ArrowNE.Cursor = CursorByIdent(UI.ArrowNE.Name);
+	UI.ArrowN.Cursor = CursorByIdent(UI.ArrowN.Name);
+	UI.ArrowNW.Cursor = CursorByIdent(UI.ArrowNW.Name);
+	UI.ArrowW.Cursor = CursorByIdent(UI.ArrowW.Name);
+	UI.ArrowSW.Cursor = CursorByIdent(UI.ArrowSW.Name);
+	UI.ArrowS.Cursor = CursorByIdent(UI.ArrowS.Name);
+	UI.ArrowSE.Cursor = CursorByIdent(UI.ArrowSE.Name);
 
 	menupanel = UI.MenuPanels;
 	while (menupanel) {

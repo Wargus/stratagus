@@ -61,7 +61,7 @@
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-std::vector<CursorType> Cursors;
+std::vector<CCursor> AllCursors;
 
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
@@ -88,7 +88,7 @@ CUnitType *CursorBuilding;           /// building cursor
 
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-CursorType *GameCursor;             /// current shown cursor-type
+CCursor *GameCursor;                 /// current shown cursor-type
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -101,9 +101,9 @@ CursorType *GameCursor;             /// current shown cursor-type
 */
 void LoadCursors(const char *race)
 {
-	std::vector<CursorType>::iterator i;
+	std::vector<CCursor>::iterator i;
 
-	for (i = Cursors.begin(); i != Cursors.end(); ++i) {
+	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		//
 		//  Only load cursors of this race or universal cursors.
 		//
@@ -119,19 +119,19 @@ void LoadCursors(const char *race)
 }
 
 /**
-**  Find the cursor-type of this identifier.
+**  Find the cursor of this identifier.
 **
 **  @param ident  Identifier for the cursor (from config files).
 **
-**  @return       Returns the matching cursor-type.
+**  @return       Returns the matching cursor.
 **
 **  @note If we have more cursors, we should add hash to find them faster.
 */
-CursorType *CursorTypeByIdent(const char *ident)
+CCursor *CursorByIdent(const char *ident)
 {
-	std::vector<CursorType>::iterator i;
+	std::vector<CCursor>::iterator i;
 
-	for (i = Cursors.begin(); i != Cursors.end(); ++i) {
+	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		if (strcmp((*i).Ident, ident)) {
 			continue;
 		}
@@ -336,14 +336,14 @@ void InitVideoCursors(void)
 */
 void CleanCursors(void)
 {
-	std::vector<CursorType>::iterator i;
+	std::vector<CCursor>::iterator i;
 
-	for (i = Cursors.begin(); i != Cursors.end(); ++i) {
+	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CGraphic::Free((*i).G);
 		delete[] (*i).Ident;
 		delete[] (*i).Race;
 	}
-	Cursors.clear();
+	AllCursors.clear();
 
 	CursorBuilding = NULL;
 	GameCursor = NULL;
