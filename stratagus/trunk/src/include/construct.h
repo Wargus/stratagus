@@ -38,11 +38,9 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _construction_ construct.h
+**  @class CConstruction construct.h
 **
 **  \#include "construct.h"
-**
-**  typedef struct _construction_ Construction;
 **
 **  Each building perhaps also units can have its own construction
 **    frames. This construction frames are currently not animated,
@@ -51,7 +49,7 @@
 **
 **  The construction structure members:
 **
-**  Construction::Ident
+**  CConstruction::Ident
 **
 **    Unique identifier of the construction, used to reference it in
 **    the config files and during startup. As convention they start
@@ -59,39 +57,37 @@
 **    @note Don't use this member in game, use instead the pointer
 **      to this structure. See ConstructionByIdent().
 **
-**  Construction::File
+**  CConstruction::File
 **
 **    Path file name of the sprite file.
 **
-**  Construction::ShadowFile
+**  CConstruction::ShadowFile
 **
 **    Path file name of shadow sprite file.
 **
-**  Construction::Nr
+**  CConstruction::Frames
 **
-**    Slot number of the construction, used for saving. This should
-**    be removed, if we use symbol identifiers.
-**    @todo can now be removed
+**    Frames of the construction sequence.
 **
-**  Construction::Width Construction::Height
+**  CConstruction::Sprite
+**
+**    Sprite image.
+**
+**  CConstruction::Width CConstruction::Height
 **
 **    Size of a sprite frame in pixels. All frames of a sprite have
 **    the same size. Also all sprites (tilesets) must have the same
 **    size.
 **
-**  Construction::ShadowWidth Construction::ShadowHeight
+**  CConstruction::ShadowSprite
+**
+**    Shadow sprite image.
+**
+**  CConstruction::ShadowWidth CConstruction::ShadowHeight
 **
 **    Size of a shadow sprite frame in pixels. All frames of a sprite
 **    have the same size. Also all sprites (tilesets) must have the
 **    same size.
-**
-**  Construction::Sprite
-**
-**    Sprite image.
-**
-**  Construction::ShadowSprite
-**
-**    Shadow sprite image.
 **
 **    @todo
 **      Need ::TilesetByName, ...
@@ -118,7 +114,7 @@ public:
 	int Percent;                    /// Percent complete
 	ConstructionFileType File;      /// Graphic to use
 	int Frame;                      /// Frame number
-	CConstructionFrame *Next; /// Next pointer
+	CConstructionFrame *Next;       /// Next pointer
 };
 
 	/// Construction shown during construction of a building
