@@ -65,7 +65,19 @@ public:
 **
 **  Played for the various events.
 */
-typedef struct _unit_sound_ {
+class CUnitSound {
+public:
+	CUnitSound() {
+		// FIXME: this should be done in SoundConfig's constructor
+		memset(&Selected, 0, sizeof(Selected));
+		memset(&Acknowledgement, 0, sizeof(Acknowledgement));
+		memset(&Ready, 0, sizeof(Ready));
+		memset(&Repair, 0, sizeof(Repair));
+		memset(Harvest, 0, sizeof(Harvest));
+		memset(&Help, 0, sizeof(Help));
+		memset(&Dead, 0, sizeof(Dead));
+	}
+
 	SoundConfig Selected;           /// selected by user
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Ready;              /// unit training... ready
@@ -73,7 +85,7 @@ typedef struct _unit_sound_ {
 	SoundConfig Harvest[MaxCosts];  /// unit harvesting
 	SoundConfig Help;               /// unit is attacked
 	SoundConfig Dead;               /// unit is killed
-} UnitSound;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables

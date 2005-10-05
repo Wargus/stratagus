@@ -324,7 +324,6 @@ CUnitType *NewUnitTypeSlot(char *ident)
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	memset(type, 0, sizeof(*type));
 	type->Slot = UnitTypes.size();
 	type->Ident = ident;
 	type->BoolFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
