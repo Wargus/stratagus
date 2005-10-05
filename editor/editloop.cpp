@@ -1041,11 +1041,11 @@ void EditorUpdateDisplay(void)
 	//
 	// Fillers
 	//
-	for (i = 0; i < (int)UI.Filler.size(); ++i) {
-		UI.Filler[i]->DrawSub(0, 0,
-			UI.Filler[i]->Width,
-			UI.Filler[i]->Height,
-			UI.FillerX[i], UI.FillerY[i]);
+	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
+		UI.Fillers[i].G->DrawSub(0, 0,
+			UI.Fillers[i].G->Width,
+			UI.Fillers[i].G->Height,
+			UI.Fillers[i].X, UI.Fillers[i].Y);
 	}
 
 	if (CursorOn == CursorOnMap) {

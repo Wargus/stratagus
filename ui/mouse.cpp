@@ -601,8 +601,8 @@ static void HandleMouseOn(int x, int y)
 	//  On UI graphic
 	//
 	on_ui = 0;
-	for (i = 0; i < (int)UI.Filler.size(); ++i) {
-		if (OnGraphic(x, y, UI.Filler[i], UI.FillerX[i], UI.FillerY[i])) {
+	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
+		if (OnGraphic(x, y, UI.Fillers[i].G, UI.Fillers[i].X, UI.Fillers[i].Y)) {
 			on_ui = 1;
 			break;
 		}

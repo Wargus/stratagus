@@ -422,6 +422,16 @@ public:
 extern std::vector<CUnitInfoPanel *> AllPanels;  /// Array of panels.
 
 
+class CFiller
+{
+public:
+	CFiller() : G(NULL), X(0), Y(0) {}
+
+	CGraphic *G;         /// Graphic
+	int X;               /// X coordinate
+	int Y;               /// Y coordinate
+};
+
 class CButtonPanel
 {
 public:
@@ -501,9 +511,7 @@ public:
 	char *ReverseFontColor;             /// Color for reverse text displayed
 
 	// Fillers
-	std::vector<CGraphic *> Filler;      /// Filler graphics
-	std::vector<int> FillerX;           /// Filler X positions
-	std::vector<int> FillerY;           /// Filler Y positions
+	std::vector<CFiller> Fillers;       /// Filler graphics
 
 	struct {
 		CGraphic *G;                     /// icon graphic

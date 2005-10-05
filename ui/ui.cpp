@@ -175,8 +175,8 @@ void LoadUserInterface(void)
 	//
 	//  Load graphics
 	//
-	for (i = 0; i < (int)UI.Filler.size(); ++i) {
-		UI.Filler[i]->Load();
+	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
+		UI.Fillers[i].G->Load();
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
@@ -267,8 +267,8 @@ void CleanUI(CUserInterface *ui)
 	delete[] ui->ReverseFontColor;
 
 	// Filler
-	for (i = 0; i < (int)ui->Filler.size(); ++i) {
-		CGraphic::Free(ui->Filler[i]);
+	for (i = 0; i < (int)ui->Fillers.size(); ++i) {
+		CGraphic::Free(ui->Fillers[i].G);
 	}
 
 	// Resource Icons
