@@ -45,13 +45,25 @@ class CFile;
 /**
 **  Timer structure
 */
-typedef struct _timer_ {
-	char Init;                  /// timer is initialized
-	char Running;               /// timer is running
-	char Increasing;            /// increasing or decreasing
+class CTimer {
+public:
+	CTimer() : Init(false), Running(false), Increasing(false), Cycles(0),
+		LastUpdate(0) {}
+
+	void Reset() {
+		Init = false;
+		Running = false;
+		Increasing = false;
+		Cycles = 0;
+		LastUpdate = 0;
+	}
+
+	bool Init;                  /// timer is initialized
+	bool Running;               /// timer is running
+	bool Increasing;            /// increasing or decreasing
 	long Cycles;                /// current value in game cycles
 	unsigned long LastUpdate;   /// GameCycle of last update
-} Timer;
+};
 
 #define ANY_UNIT ((const CUnitType *)0)
 #define ALL_UNITS ((const CUnitType *)-1)
@@ -72,7 +84,7 @@ typedef struct {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern Timer GameTimer; /// the game timer
+extern CTimer GameTimer; /// the game timer
 
 /// Some data accessible for script during the game.
 extern TriggerDataType TriggerData;
