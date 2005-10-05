@@ -822,6 +822,43 @@ public:
 */
 class CUnitType {
 public:
+	CUnitType() : Ident(NULL), Name(NULL), Slot(0),
+		File(NULL), ShadowFile(NULL),
+		Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
+		ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
+		Animations(NULL), StillFrame(0),
+		CorpseName(NULL), CorpseType(NULL), CorpseScript(0),
+		Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
+		BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
+		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
+		BurnPercent(0), BurnDamageRate(0), RepairRange(0),
+		CanCastSpell(NULL), AutoCastActive(NULL), AutoBuildRate(0),
+		RandomMovementProbability(0), ClicksToExplode(0),
+		CanTransport(NULL), MaxOnBoard(0), StartingResources(0),
+		UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
+		MouseAction(0), Points(0), CanTarget(0),
+		Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
+		ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
+		PermanentCloak(0), DetectCloak(0), Coward(0), AttackFromTransporter(0),
+		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
+		BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
+		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
+		SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
+		Indestructible(0), Teleporter(0),
+		GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
+		Sprite(NULL), ShadowSprite(NULL)
+	{
+#ifdef USE_MNG
+		memset(&Portrait, 0, sizeof(Portrait));
+#endif
+		memset(_Costs, 0, sizeof(_Costs));
+		memset(RepairCosts, 0, sizeof(RepairCosts));
+		memset(CanStore, 0, sizeof(CanStore));
+		memset(ResInfo, 0, sizeof(ResInfo));
+		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
+		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
+	}
+
 	char *Ident;                    /// Identifier
 	char *Name;                     /// Pretty name shown from the engine
 	int Slot;                       /// Type as number
@@ -923,9 +960,9 @@ public:
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
 	unsigned CanHarvest : 1;        /// Resource can be harvested.
 	unsigned Harvester : 1;         /// unit is a resource harvester.
-	unsigned char* BoolFlag;        /// User defined flag. Used for (dis)allow target.
+	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
 	VariableType *Variable;         /// Array of user defined variables.
-	unsigned char* CanTargetFlag;   /// Flag needed to target with missile.
+	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
 	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
@@ -939,7 +976,7 @@ public:
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
-	UnitSound Sound;                /// Sounds for events
+	CUnitSound Sound;               /// Sounds for events
 
 	int Supply;                     /// Food supply
 	int Demand;                     /// Food demand
