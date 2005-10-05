@@ -48,13 +48,13 @@ class Mng;
 **
 **  \#include "unittype.h"
 **
-**  This structure contains the informations that are shared between all
-**  units of the same type and determins if an unit is a building,
+**  This class contains the information that is shared between all
+**  units of the same type and determins if a unit is a building,
 **  a person, ...
 **
-**  The unit-type structure members:
+**  The unit-type class members:
 **
-**  UnitType::Ident
+**  CUnitType::Ident
 **
 **    Unique identifier of the unit-type, used to reference it in
 **    config files and during startup. As convention they start with
@@ -62,74 +62,74 @@ class Mng;
 **  @note Don't use this member in game, use instead the pointer
 **  to this structure. See UnitTypeByIdent().
 **
-**  UnitType::Name
+**  CUnitType::Name
 **
 **    Pretty name shown by the engine. The name should be shorter
 **    than 17 characters and no word can be longer than 8 characters.
 **
-**  UnitType::File
+**  CUnitType::File
 **
 **    Path file name of the sprite file.
 **
-**  UnitType::SpriteFile
+**  CUnitType::SpriteFile
 **
 **    Path file name of shadow sprite file.
 **
-**  UnitType::DrawLevel
+**  CUnitType::DrawLevel
 **
 **    The Level/Order to draw this type of unit in. 0-255 usually.
 **
-**  UnitType::Width UnitType::Height
+**  CUnitType::Width CUnitType::Height
 **
 **    Size of a sprite frame in pixels. All frames of a sprite have
 **    the same size. Also all sprites (tilesets) must have the same
 **    size.
 **
-**  UnitType::ShadowWidth UnitType::ShadowHeight
+**  CUnitType::ShadowWidth CUnitType::ShadowHeight
 **
 **    Size of a shadow sprite frame in pixels. All frames of a sprite
 **    have the same size. Also all sprites (tilesets) must have the
 **    same size.
 **
-**  UnitType::ShadowOffset
+**  CUnitType::ShadowOffset
 **
 **    Vertical offset to draw the shadow in pixels.
 **
-**  UnitType::Animations
+**  CUnitType::Animations
 **
 **    Animation scripts for the different actions. Currently the
 **    animations still, move, attack and die are supported.
 **  @see Animations @see _animations_
 **  @see Animation @see _animation_
 **
-**  UnitType::Icon
+**  CUnitType::Icon
 **
 **    Icon to display for this unit-type. Contains configuration and
 **    run time variable.
 **  @note This icon can be used for training, but isn't used.
 **
-**  UnitType::Missile
+**  CUnitType::Missile
 **
 **    Configuration and run time variable of the missile weapon.
 **  @note It is planned to support more than one weapons.
 **  And the sound of the missile should be used as fire sound.
 **
-**  UnitType::Explosion
+**  CUnitType::Explosion
 **
 **    Configuration and run time variable of the missile explosion.
 **    This is the explosion that happens if unit is set to
 **    ExplodeWhenKilled
 **
-**  UnitType::CorpseName
+**  CUnitType::CorpseName
 **
 **    Corpse unit-type name, should only be used during setup.
 **
-**  UnitType::CorpseType
+**  CUnitType::CorpseType
 **
 **    Corpse unit-type pointer, only this should be used during run
 **    time. Many unit-types can share the same corpse.
 **
-**  UnitType::CorpseScript
+**  CUnitType::CorpseScript
 **
 **    Index into corpse animation script. Used if unit-types share
 **    the same corpse but have different animations.
@@ -137,102 +137,102 @@ class Mng;
 **
 **  @todo continue this documentation
 **
-**  UnitType::Construction
+**  CUnitType::Construction
 **
 **    What is shown in construction phase.
 **
-**  UnitType::SightRange
+**  CUnitType::SightRange
 **
 **    Sight range
 **
-**  UnitType::_HitPoints
+**  CUnitType::_HitPoints
 **
 **    Maximum hit points
 **
 **
-**  UnitType::_Costs[::MaxCosts]
+**  CUnitType::_Costs[::MaxCosts]
 **
 **    How many resources needed
 **
-**  UnitType::RepairHP
+**  CUnitType::RepairHP
 **
 **    The HP given to a unit each cycle it's repaired.
 **    If zero, unit cannot be repaired
 **
-**    UnitType::RepairCosts[::MaxCosts]
+**    CUnitType::RepairCosts[::MaxCosts]
 **
 **    Costs per repair cycle to fix a unit.
 **
-**  UnitType::TileWidth
+**  CUnitType::TileWidth
 **
 **    Tile size on map width
 **
-**  UnitType::TileHeight
+**  CUnitType::TileHeight
 **
 **    Tile size on map height
 **
-**  UnitType::BoxWidth
+**  CUnitType::BoxWidth
 **
 **    Selected box size width
 **
-**  UnitType::BoxHeight
+**  CUnitType::BoxHeight
 **
 **    Selected box size height
 **
-**  UnitType::NumDirections
+**  CUnitType::NumDirections
 **
 **    Number of directions the unit can face
 **
-**  UnitType::MinAttackRange
+**  CUnitType::MinAttackRange
 **
 **    Minimal attack range
 **
-**  UnitType::ReactRangeComputer
+**  CUnitType::ReactRangeComputer
 **
 **    Reacts on enemy for computer
 **
-**  UnitType::ReactRangePerson
+**  CUnitType::ReactRangePerson
 **
 **    Reacts on enemy for person player
 **
-**  UnitType::Priority
+**  CUnitType::Priority
 **
 **    Priority value / AI Treatment
 **
-**  UnitType::BurnPercent
+**  CUnitType::BurnPercent
 **
 **    The burning limit in percents. If the unit has lees than
 **    this it will start to burn.
 **
-**  UnitType::BurnDamageRate
+**  CUnitType::BurnDamageRate
 **
 **    Burn rate in HP per second
 **
-**  UnitType::UnitType
+**  CUnitType::UnitType
 **
 **    Land / fly / naval
 **
 **  @note original only visual effect, we do more with this!
 **
-**  UnitType::DecayRate
+**  CUnitType::DecayRate
 **
 **    Decay rate in 1/6 seconds
 **
-**  UnitType::AnnoyComputerFactor
+**  CUnitType::AnnoyComputerFactor
 **
 **    How much this annoys the computer
 **
 **  @todo not used
 **
-**  UnitType::MouseAction
+**  CUnitType::MouseAction
 **
 **    Right click action
 **
-**  UnitType::Points
+**  CUnitType::Points
 **
 **    How many points you get for unit. Used in the final score table.
 **
-**  UnitType::CanTarget
+**  CUnitType::CanTarget
 **
 **    Which units can it attack
 **
@@ -242,118 +242,118 @@ class Mng;
 **    has active sight even when Removed. It's used for Reveal map
 **    type of spells.
 **
-**  UnitType::LandUnit
+**  CUnitType::LandUnit
 **
 **    Land animated
 **
-**  UnitType::AirUnit
+**  CUnitType::AirUnit
 **
 **    Air animated
 **
-**  UnitType::SeaUnit
+**  CUnitType::SeaUnit
 **
 **    Sea animated
 **
-**  UnitType::ExplodeWhenKilled
+**  CUnitType::ExplodeWhenKilled
 **
 **    Death explosion animated
 **
-**  UnitType::RandomMovementProbability
+**  CUnitType::RandomMovementProbability
 **
 **    When the unit is idle this is the probability that it will
 **    take a step in a random direction, in percents.
 **
-**  UnitType::ClicksToExplode
+**  CUnitType::ClicksToExplode
 **
 **    If this is non-zero, then after that many clicks the unit will
 **    commit suicide. Doesn't work with resource workers/resources.
 **
-**  UnitType::Building
+**  CUnitType::Building
 **
 **    Unit is a Building
 **
-**  UnitType::VisibleUnderFog
+**  CUnitType::VisibleUnderFog
 **
 **    Unit is visible under fog of war.
 **
-**  UnitType::PermanentCloak
+**  CUnitType::PermanentCloak
 **
 **    Unit is permanently cloaked.
 **
-**  UnitType::DetectCloak
+**  CUnitType::DetectCloak
 **
 **    These units can detect Cloaked units.
 **
-**  UnitType::Coward
+**  CUnitType::Coward
 **
 **    Unit is a coward, and acts defensively. it will not attack
 **    at will and auto-casters will not buff it(bloodlust).
 **
-**  UnitType::Transporter
+**  CUnitType::Transporter
 **
 **    Can transport units
 **
-**  UnitType::AttackFromTransporter
+**  CUnitType::AttackFromTransporter
 **
 **    Units inside this transporter can attack with missiles.
 **
-**  UnitType::MaxOnBoard
+**  CUnitType::MaxOnBoard
 **
 **    Maximum units on board (for transporters), and resources
 **
-**  UnitType::StartingResources
+**  CUnitType::StartingResources
 **    Amount of Resources a unit has when It's Built
 **
-**  UnitType::GivesResource
+**  CUnitType::GivesResource
 **
 **    This equals to the resource Id of the resource given
 **    or 0 (TimeCost) for other buildings.
 **
-**  UnitType::CanHarvest
+**  CUnitType::CanHarvest
 **
 **    Resource can be harvested. It's false for things like
 **    oil patches.
 **  @todo crappy name.
 **
-**  UnitType::Harvester
+**  CUnitType::Harvester
 **
 **    Unit is a resource worker. Faster than examining ResInfo
 **
-**  UnitType::ResInfo[::MaxCosts]
+**  CUnitType::ResInfo[::MaxCosts]
 **
 **    Information about resource harvesting. If NULL, it can't
 **    harvest it.
 **
-**  UnitType::NeutralMinimapColorRGB
+**  CUnitType::NeutralMinimapColorRGB
 **
 **    Says what color a unit will have when it's neutral and
 **    is displayed on the minimap.
 **
-**  UnitType::CanStore[::MaxCosts]
+**  CUnitType::CanStore[::MaxCosts]
 **
 **    What resource types we can store here.
 **
-**  UnitType::Vanishes
+**  CUnitType::Vanishes
 **
 **    Corpes & destroyed places
 **
-**  UnitType::GroundAttack
+**  CUnitType::GroundAttack
 **
 **    Can do command ground attack
 **
-**  UnitType::ShoreBuilding
+**  CUnitType::ShoreBuilding
 **
 **    Building must be build on coast
 **
-**  UnitType::CanCastSpell
+**  CUnitType::CanCastSpell
 **
 **    Unit is able to use spells
 **
-**  UnitType::CanAttack
+**  CUnitType::CanAttack
 **
 **    Unit is able to attack.
 **
-**  UnitType::RepairRange
+**  CUnitType::RepairRange
 **
 **    Unit can repair buildings. It will use the actack animation.
 **    It will heal 4 points for every repair cycle, and cost 1 of
@@ -362,7 +362,7 @@ class Mng;
 **    If units have a repair range, they can repair, and this is the
 **    distance.
 **
-**  UnitType::BuilderOutside
+**  CUnitType::BuilderOutside
 **
 **    Only valid for buildings. When building the worker will
 **    remain outside inside the building.
@@ -370,85 +370,83 @@ class Mng;
 **  @warning Workers that can build buildings with the
 **  @warning BuilderOutside flag must have the CanRepair flag.
 **
-**  UnitType::BuilderLost
+**  CUnitType::BuilderLost
 **
 **    Only valid for buildings without the BuilderOutside flag.
 **    The worker is lost when the building is completed.
 **
-**  UnitType::SelectableByRectangle
+**  CUnitType::SelectableByRectangle
 **
 **    Selectable with mouse rectangle
 **
-**    UnitType::Teleporter
+**    CUnitType::Teleporter
 **
 **    Can teleport other units.
 **
-**  UnitType::Sound
+**  CUnitType::Sound
 **
 **    Sounds for events
 **
-**  UnitType::Weapon
+**  CUnitType::Weapon
 **
 **    Currently sound for weapon
 **
 **  @todo temporary solution
 **
-**  UnitType::Supply
+**  CUnitType::Supply
 **
 **    How much food does this unit supply.
 **
-**  UnitType::Demand
+**  CUnitType::Demand
 **
 **    Food demand
 **
-**  UnitType::ImproveIncomes[::MaxCosts]
+**  CUnitType::ImproveIncomes[::MaxCosts]
 **
 **    Gives the player an improved income.
 **
-**  UnitType::FieldFlags
+**  CUnitType::FieldFlags
 **
-**    Flags that are set, if an unit enters a map field or cleared, if
-**    an unit leaves a map field.
+**    Flags that are set, if a unit enters a map field or cleared, if
+**    a unit leaves a map field.
 **
-**  UnitType::MovementMask
+**  CUnitType::MovementMask
 **
 **    Movement mask, this value is and'ed to the map field flags, to
-**    see if an unit can enter or placed on the map field.
+**    see if a unit can enter or placed on the map field.
 **
-**  UnitType::Stats[::PlayerMax]
+**  CUnitType::Stats[::PlayerMax]
 **
 **    Unit status for each player
 **  @todo This stats should? be moved into the player struct
 **
-**  UnitType::Type
+**  CUnitType::Type
 **
 **    Type as number
 **  @todo Should us a general name f.e. Slot here?
 **
-**  UnitType::Sprite
+**  CUnitType::Sprite
 **
 **    Sprite images
 **
-**  UnitType::ShadowSprite
+**  CUnitType::ShadowSprite
 **
 **    Shadow sprite images
 **
-**  UnitType::PlayerColorSprite
+**  CUnitType::PlayerColorSprite
 **
 **    Sprite images of the player colors.  This image is drawn
-**    over UnitType::Sprite.  Used with OpenGL only.
+**    over CUnitType::Sprite.  Used with OpenGL only.
 **
 **
 */
 /**
 **
-**  @struct _resource_info_ unittype.h
+**  @class ResourceInfo unittype.h
 **
 ** \#include "unittype.h"
 **
-**  typedef struct _resource_info_ ResourceInfo;
-**
-**    This struct contains information about how a unit will harvest a resource.
+**    This class contains information about how a unit will harvest a resource.
 **
 **  ResourceInfo::FileWhenLoaded
 **
@@ -531,7 +529,7 @@ class CConstruction;
 class CAnimations;
 class MissileType;
 
-CUnitType *UnitTypeByIdent(const char*);
+CUnitType *UnitTypeByIdent(const char *);
 
 /**
 **  Missile type definition (used in config tables)

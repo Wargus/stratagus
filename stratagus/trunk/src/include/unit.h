@@ -44,20 +44,20 @@
 **
 **  Everything belonging to a unit. FIXME: rearrange for less memory.
 **
-**  This structure contains all informations about an unit in game.
-**  An unit could be everything, a man, a vehicle, a ship or a building.
-**  Currently only a tile, an unit or a missile could be placed on the map.
+**  This class contains all information about a unit in game.
+**  A unit could be anything: a man, a vehicle, a ship, or a building.
+**  Currently only a tile, a unit, or a missile could be placed on the map.
 **
 **  The unit structure members:
 **
-**  Unit::Refs
+**  CUnit::Refs
 **
 **  The reference counter of the unit. If the pointer to the unit
 **  is stored the counter must be incremented and if this reference
 **  is destroyed the counter must be decremented. Alternative it
 **  would be possible to implement a garbage collector for this.
 **
-**  Unit::Slot
+**  CUnit::Slot
 **
 **  This is the unique slot number. It is not possible that two
 **  units have the same slot number at the same time. The slot
@@ -66,7 +66,7 @@
 **  Maximal 65535 (=#MAX_UNIT_SLOTS) simultaneous units are
 **  supported.
 **
-**  Unit::UnitSlot
+**  CUnit::UnitSlot
 **
 **  This is the pointer into #Units[], where the unit pointer is
 **  stored.  #Units[] is a table of all units currently active in
@@ -74,86 +74,86 @@
 **  the unit pointer from #Units[], it didn't must be searched in
 **  the table.
 **
-**  Unit::PlayerSlot
+**  CUnit::PlayerSlot
 **
 **  A pointer into Player::Units[], where the unit pointer is
 **  stored. Player::Units[] is a table of all units currently
 **  belonging to a player. This pointer is only needed to speed
 **  up, the remove of the unit pointer from Player::Units[].
 **
-**  Unit::Next
+**  CUnit::Next
 **
 **  A generic link pointer. This member is currently used, if an
 **  unit is on the map, to link all units on the same map field
 **  together. This also links corpses and stuff. Also, this is
 **  used in memory management to link unused units.
 **
-**  Unit::Container
+**  CUnit::Container
 **
 **  Pointer to the unit containing it, or NoUnitP if the unit is
 **  free. This points to the transporter for units on board, or to
 **  the building for peasants inside(when they are mining).
 **
-**  Unit::UnitInside
+**  CUnit::UnitInside
 **
 **  Pointer to the last unit added inside. Order doesn't really
 **  matter. All units inside are kept in a circular linked list.
 **  This is NoUnitP if there are no units inside. Multiple levels
 **  of inclusion are allowed, though not very usefull right now
 **
-**  Unit::NextContained, Unit::PrevContained
+**  CUnit::NextContained, CUnit::PrevContained
 **
 **  The next and previous element in the curent container. Bogus
 **  values allowed for units not contained.
 **
-**  Unit::InsideCount
+**  CUnit::InsideCount
 **
 **  The number of units inside the container.
 **
-**  Unit::BoardCount
+**  CUnit::BoardCount
 **
 **  The number of units transported inside the container. This
 **  does not include for instance stuff like harvesters returning
 **  cargo.
 **
-**  Unit::X Unit::Y
+**  CUnit::X CUnit::Y
 **
 **  The tile map coordinates of the unit. 0,0 is the upper left on
 **  the map. To convert the map coordinates into pixels, they
 **  must be multiplicated with the #TileSizeX and #TileSizeY.
-**  To get the pixel coordinates of an unit, calculate
-**  Unit::X*#TileSize+Unit::IX , Unit::Y*#TileSizeY+Unit::IY.
+**  To get the pixel coordinates of a unit, calculate
+**  CUnit::X*#TileSize+CUnit::IX , CUnit::Y*#TileSizeY+CUnit::IY.
 **
-**  Unit::Type
+**  CUnit::Type
 **
 **  Pointer to the unit-type (::UnitType). The unit-type contains
 **  all informations that all units of the same type shares.
 **  (Animations, Name, Stats, ...)
 **
-**  Unit::SeenType
+**  CUnit::SeenType
 **  Pointer to the unit-type that this unit was, when last seen.
 **  Currently only used by buildings.
 **
-**  Unit::Player
+**  CUnit::Player
 **
 **  Pointer to the owner of this unit (::Player). An unit could
 **  only be owned by one player.
 **
-**  Unit::Stats
+**  CUnit::Stats
 **
-**  Pointer to the current status (::UnitStats) of an unit. The
+**  Pointer to the current status (::UnitStats) of a unit. The
 **  units of the same player and the same type could share the same
 **  stats. The status contains all values which could be different
 **  for each player. This f.e. the upgradeable abilities of an
-**  unit.  (Unit::Stats::SightRange, Unit::Stats::Armor,
-**  Unit::Stats::HitPoints, ...)
+**  unit.  (CUnit::Stats::SightRange, CUnit::Stats::Armor,
+**  CUnit::Stats::HitPoints, ...)
 **
-**  Unit::CurrentSightRange
+**  CUnit::CurrentSightRange
 **
 **  Current sight range of a unit, this changes when a unit enters
 **  a transporter or building or exits one of these.
 **
-**  Unit::Colors
+**  CUnit::Colors
 **
 **  Player colors of the unit. Contains the hardware dependent
 **  pixel values for the player colors (palette index #208-#211).
@@ -162,25 +162,25 @@
 **  (#208 is brightest shade, #211 is darkest shade) .... these
 **  numbers are NOT red=#208, blue=#209, etc
 **
-**  Unit::IX Unit::IY
+**  CUnit::IX CUnit::IY
 **
 **  Coordinate displacement in pixels or coordinates inside a tile.
 **  Currently only !=0, if the unit is moving from one tile to
 **  another (0-32 and for ships/flyers 0-64).
 **
-**  Unit::Frame
+**  CUnit::Frame
 **
 **  Current graphic image of the animation sequence. The high bit
 **  (128) is used to flip this image horizontal (x direction).
 **  This also limits the number of different frames/image to 126.
 **
-**  Unit::SeenFrame
+**  CUnit::SeenFrame
 **
-**  Graphic image (see Unit::Frame) what the player on this
+**  Graphic image (see CUnit::Frame) what the player on this
 **  computer has last seen. If UnitNotSeen the player haven't seen
 **  this unit yet.
 **
-**  Unit::Direction
+**  CUnit::Direction
 **
 **  Contains the binary angle (0-255) in which the direction the
 **  unit looks. 0, 32, 64, 128, 160, 192, 224, 256 corresponds to
@@ -189,15 +189,15 @@
 **  north-west, north. Currently only 8 directions are used, this
 **  is more for the future.
 **
-**  Unit::Attacked
+**  CUnit::Attacked
 **
 **  Last cycle the unit was attacked. 0 means never.
 **
-**  Unit::Burning
+**  CUnit::Burning
 **
 **  If Burning is non-zero, the unit is burning.
 **
-**  Unit::VisCount[PlayerMax]
+**  CUnit::VisCount[PlayerMax]
 **
 **              Used to keep track of visible units on the map, it counts the
 **              Number of seen tiles for each player. This is only modified
@@ -205,125 +205,125 @@
 **              We keep track of visilibty for each player, and combine with
 **              Shared vision ONLY when querying and such.
 **
-**  Unit::SeenByPlayer
+**  CUnit::SeenByPlayer
 **
 **              This is a bitmask of 1 and 0 values. SeenByPlayer & (1<<p) is 0
 **              If p never saw the unit and 1 if it did. This is important for
 **              keeping track of dead units under fog. We only keep track of units
 **              that are visible under fog with this.
 **
-**  Unit::Destroyed
+**  CUnit::Destroyed
 **
 ** @todo docu.
 **  If you need more informations, please send me an email or write it self.
 **
-**  Unit::Removed
+**  CUnit::Removed
 **
 **  This flag means the unit is not active on map. This flag
 **  have workers set if they are inside a building, units that are
 **  on board of a transporter.
 **
-**  Unit::Selected
+**  CUnit::Selected
 **
 **  Unit is selected. (So you can give it orders)
 **
-**  Unit::Constructed
+**  CUnit::Constructed
 **  Set when a building is under construction, and still using the
 **  generic building animation.
 **
-**  Unit::SeenConstructed
+**  CUnit::SeenConstructed
 **  Last seen state of construction.  Used to draw correct building
-**  frame. See Unit::Constructed for more information.
+**  frame. See CUnit::Constructed for more information.
 **
-**  Unit::SeenState
+**  CUnit::SeenState
 **  The Seen State of the building.
 **  01 The building in being built when last seen.
 **  10 The building was been upgraded when last seen.
 **
-**  Unit::Boarded
+**  CUnit::Boarded
 **
 **  This is 1 if the unit is on board a transporter.
 **
 **
-**  Unit::XP
+**  CUnit::XP
 **
 **  Number of XP of the unit.
 **
-**  Unit::Kills
+**  CUnit::Kills
 **
 **  How many units have been killed by the unit.
 **
-**  Unit::GroupId
+**  CUnit::GroupId
 **
 **  Number of the group to that the unit belongs. This is the main
-**  group showed on map, an unit can belong to many groups.
+**  group showed on map, a unit can belong to many groups.
 **
-**  Unit::LastGroup
+**  CUnit::LastGroup
 **
 **  Automatic group number, to reselect the same units. When the
 **  user selects more than one unit all units is given the next
 **  same number. (Used for ALT-CLICK)
 **
-**  Unit::Value
+**  CUnit::Value
 **
 **  This values hold the amount of resources in a resource or in
 **  in a harvester.
 **  @todo continue documentation
 **
-**  Unit::SubAction
+**  CUnit::SubAction
 **
 **  This is an action private variable, it is zero on the first
 **  entry of an action. Must be set to zero, if an action finishes.
 **  It should only be used inside of actions.
 **
-**  Unit::Wait
+**  CUnit::Wait
 **
 **  The unit is forced too wait for that many cycles. Be carefull,
 **  setting this to 0 will lock the unit.
 **
-**  Unit::State
+**  CUnit::State
 **
 **  Animation state, currently position in the animation script.
 **  0 if an animation has just started, it should only be changed
 **  inside of actions.
 **
-**  Unit::Reset
+**  CUnit::Reset
 **
 **  @todo continue documentation
 **
-**  Unit::Blink
+**  CUnit::Blink
 **
 **
-**  Unit::Moving
+**  CUnit::Moving
 **
 **
-**  Unit::RescuedFrom
+**  CUnit::RescuedFrom
 **
-**  Pointer to the original owner of an unit. It will be NULL if
+**  Pointer to the original owner of a unit. It will be NULL if
 **  the unit was not rescued.
 **
-**  Unit::OrderCount
+**  CUnit::OrderCount
 **
 **  The number of the orders unit to process. An unit has atleast
-**  one order. Unit::OrderCount should be a number at least 1.
-**  The orders are in Unit::Orders[].
+**  one order. CUnit::OrderCount should be a number at least 1.
+**  The orders are in CUnit::Orders[].
 **
-**  Unit::OrderFlush
+**  CUnit::OrderFlush
 **
 **  A flag, which tells the unit to stop with the current order
 **  and immediately start with the next order.
 **
-**  Unit::TotalOrders
+**  CUnit::TotalOrders
 **
 **  The number of Orders allocated for this unit to use.
 **  Default is 4, but is dynamically updated if more orders are
 **  given.
 **
-**  Unit::Orders
+**  CUnit::Orders
 **
 **  Contains all orders of the unit. Slot 0 is always used.
 **
-**  Unit::SavedOrder
+**  CUnit::SavedOrder
 **
 **  This order is executed, if the current order is finished.
 **  This is used for attacking units, to return to the old
@@ -331,18 +331,18 @@
 **  killing some enemies. Any new order given to the unit,
 **  clears this saved order.
 **
-**  Unit::NewOrder
+**  CUnit::NewOrder
 **
 **  This field is only used by buildings and this order is
 **  assigned to any by this building new trained unit.
 **  This is can be used to set the exit or gathering point of a
 **  building.
 **
-**  Unit::Data
+**  CUnit::Data
 **
 **  @todo continue documentation
 **
-**  Unit::Goal
+**  CUnit::Goal
 **
 **  Generic goal pointer. Used by teleporters to point to circle of power.
 **
@@ -449,7 +449,7 @@ public:
 };
 
 /**
-**  Voice groups for an unit
+**  Voice groups for a unit
 */
 enum UnitVoiceGroup {
 	VoiceSelected,          /// If selected
@@ -484,7 +484,7 @@ enum _directions_ {
 };
 
 #define NextDirection 32        /// Next direction N->NE->E...
-#define UnitNotSeen 0x7fffffff  /// Unit not seen, used by Unit::SeenFrame
+#define UnitNotSeen 0x7fffffff  /// Unit not seen, used by CUnit::SeenFrame
 
 	/// The big unit structure
 class CUnit {
@@ -631,9 +631,9 @@ public:
 
 	inline bool IsIdle() { return Orders[0].Action == UnitActionStill && OrderCount == 1; }
 
-	/// Increase an unit's reference count
+	/// Increase a unit's reference count
 	void RefsIncrease();
-	/// Decrease an unit's reference count
+	/// Decrease a unit's reference count
 	void RefsDecrease();
 
 	/// Initialize unit structure with default values
@@ -643,19 +643,19 @@ public:
 
 	/// Draw a single unit
 	void Draw() const;
-	/// Place an unit on map
+	/// Place a unit on map
 	void Place(int x, int y);
 
 	/// Move unit to tile(x, y). (Do special stuff : vision, cachelist, pathfinding)
 	void MoveToXY(int x, int y);
-	/// Add an unit inside a container. Only deal with list stuff.
+	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit *host);
 	/// Change owner of unit
 	void ChangeOwner(CPlayer *newplayer);
 
 	/// Remove unit from map/groups/...
 	void Remove(CUnit *host);
-	/// Release an unit
+	/// Release a unit
 	void Release();
 
 	/// Returns true, if unit is directly seen by an allied unit.
@@ -780,7 +780,7 @@ void UpdateUnitSightRange(CUnit *unit);
 extern CUnit *MakeUnit(CUnitType *type, CPlayer *player);
 	/// Create a new unit and place on map
 extern CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player);
-	/// Handle the loss of an unit (food,...)
+	/// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit *unit);
 	/// Remove the Orders of a Unit
 extern void UnitClearOrders(CUnit *unit);
@@ -793,9 +793,9 @@ extern void NearestOfUnit(const CUnit *unit, int tx, int ty, int *dx, int *dy);
 extern void UnitGoesUnderFog(CUnit *unit, const CPlayer *player);
 	/// Call when an Unit goes out of fog.
 extern void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player);
-	/// Marks an unit as seen
+	/// Marks a unit as seen
 extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int p);
-	/// Unmarks an unit as seen
+	/// Unmarks a unit as seen
 extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int p);
 	/// Does a recount for VisCount
 extern void UnitCountSeen(CUnit *unit);
@@ -842,7 +842,7 @@ extern int FindWoodInSight(const CUnit *unit, int *x, int *y);
 	/// @todo more docu
 extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
 
-	/// Let an unit die
+	/// Let a unit die
 extern void LetUnitDie(CUnit *unit);
 	/// Destory all units inside another unit
 extern void DestroyAllInside(CUnit *source);
@@ -926,7 +926,7 @@ extern void DrawShadow(const CUnit *unit, const CUnitType *type,
 	int frame, int x, int y);
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport *vp, CUnit **table);
-	/// Show an unit's orders.
+	/// Show a unit's orders.
 extern void ShowOrder(const CUnit *unit);
 
 // in unit_find.c
