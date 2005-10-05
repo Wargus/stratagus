@@ -71,7 +71,7 @@ class Mng;
 **
 **    Path file name of the sprite file.
 **
-**  CUnitType::SpriteFile
+**  CUnitType::ShadowFile
 **
 **    Path file name of shadow sprite file.
 **
@@ -91,7 +91,7 @@ class Mng;
 **    have the same size. Also all sprites (tilesets) must have the
 **    same size.
 **
-**  CUnitType::ShadowOffset
+**  CUnitType::ShadowOffsetX CUnitType::ShadowOffsetY
 **
 **    Vertical offset to draw the shadow in pixels.
 **
@@ -99,8 +99,8 @@ class Mng;
 **
 **    Animation scripts for the different actions. Currently the
 **    animations still, move, attack and die are supported.
-**  @see Animations @see _animations_
-**  @see Animation @see _animation_
+**  @see CAnimations
+**  @see CAnimation
 **
 **  CUnitType::Icon
 **
@@ -814,10 +814,8 @@ public:
 	CUnitType *RestrictType;
 };
 
-/**
-** Base structure of unit-type
-** @todo n0body: AutoBuildRate not implemented.
-*/
+	/// Base structure of unit-type
+	/// @todo n0body: AutoBuildRate not implemented.
 class CUnitType {
 public:
 	CUnitType() : Ident(NULL), Name(NULL), Slot(0),
