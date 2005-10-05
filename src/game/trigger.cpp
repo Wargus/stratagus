@@ -53,7 +53,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-Timer GameTimer; /// The game timer
+CTimer GameTimer;               /// The game timer
 static unsigned long WaitFrame; /// Frame to wait for
 static int Trigger;
 static int WaitTrigger;
@@ -539,8 +539,8 @@ static int CclActionSetTimer(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	GameTimer.Cycles = LuaToNumber(l, 1);
-	GameTimer.Increasing = LuaToNumber(l, 2);
-	GameTimer.Init = 1;
+	GameTimer.Increasing = LuaToBoolean(l, 2);
+	GameTimer.Init = true;
 	GameTimer.LastUpdate = GameCycle;
 
 	return 0;
@@ -553,8 +553,8 @@ static int CclActionStartTimer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	GameTimer.Running = 1;
-	GameTimer.Init = 1;
+	GameTimer.Running = true;
+	GameTimer.Init = true;
 	return 0;
 }
 
@@ -565,7 +565,7 @@ static int CclActionStopTimer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	GameTimer.Running = 0;
+	GameTimer.Running = false;
 	return 0;
 }
 
@@ -824,8 +824,8 @@ void SaveTriggers(CFile *file)
 	file->printf("SetTriggers(%d, %d, %d)\n", Trigger, WaitTrigger, WaitFrame);
 
 	if (GameTimer.Init) {
-		file->printf("ActionSetTimer(%ld, %d)\n",
-			GameTimer.Cycles, GameTimer.Increasing);
+		file->printf("ActionSetTimer(%ld, %s)\n",
+			GameTimer.Cycles, (GameTimer.Increasing ? "true" : "false"));
 		if (GameTimer.Running) {
 			file->printf("ActionStartTimer()\n");
 		}
@@ -868,7 +868,7 @@ void CleanTriggers(void)
 	delete[] ActiveTriggers;
 	ActiveTriggers = NULL;
 
-	memset(&GameTimer, 0, sizeof(GameTimer));
+	GameTimer.Reset();
 }
 
 //@}
