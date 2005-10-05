@@ -52,12 +52,12 @@
 /**
 **  Defines a group of units.
 */
-struct UnitGroup {
+struct CUnitGroup {
 	CUnit **Units;                       /// Units in the group
-	int     NumUnits;                    /// How many units in the group
+	int NumUnits;                        /// How many units in the group
 };                                       /// group of units
 
-static UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
+static CUnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -145,7 +145,7 @@ CUnit **GetUnitsOfGroup(int num)
 */
 void ClearGroup(int num)
 {
-	UnitGroup *group;
+	CUnitGroup *group;
 	int i;
 
 	group = &Groups[num];
@@ -165,7 +165,7 @@ void ClearGroup(int num)
 */
 void AddToGroup(CUnit **units, int nunits, int num)
 {
-	UnitGroup *group;
+	CUnitGroup *group;
 	int i;
 
 	Assert(num <= NUM_GROUPS);
@@ -212,7 +212,7 @@ void SetGroup(CUnit **units, int nunits, int num)
 */
 void RemoveUnitFromGroups(CUnit *unit)
 {
-	UnitGroup *group;
+	CUnitGroup *group;
 	int num;
 	int i;
 
@@ -248,7 +248,7 @@ void RemoveUnitFromGroups(CUnit *unit)
 static int CclGroup(lua_State *l)
 {
 	int i;
-	UnitGroup *grp;
+	CUnitGroup *grp;
 	int args;
 	int j;
 

@@ -38,16 +38,13 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _missile_type_ missile.h
+**  @class MissileType missile.h
 **
 **  \#include "missile.h"
 **
-**  typedef struct _missile_type_ MissileType;
-**
 **  This structure defines the base type information of all missiles. It
 **  contains all information that all missiles of the same type shares.
-**  The fields are filled from the configuration files (CCL). See
-**  (define-missile-type).
+**  The fields are filled from the configuration files.
 **
 **
 **  The missile-type structure members:
@@ -58,18 +55,6 @@
 **    config files and during startup.
 **    @note Don't use this member in game, use instead the pointer
 **    to this structure. See MissileTypeByIdent().
-**
-**  MissileType::File
-**
-**    File containing the image (sprite) graphics of the missile.
-**    The file can contain multiple sprite frames.  The sprite frames
-**    for the different directions are placed in the row.
-**    The different animations steps are placed in the column. But
-**    the correct order depends on MissileType::Class (
-**    ::_missile_class_, ...). Missiles like fire have no directions,
-**    missiles like arrows have a direction.
-**    @note Note that only 8 directions are currently supported and
-**    only 5 are stored in the image (N NW W SW S) and 4 are mirrored.
 **
 **  MissileType::DrawLevel
 **
@@ -195,16 +180,23 @@
 **  MissileType::Sprite
 **
 **    Missile sprite image loaded from MissileType::File
+**
+**  MissileType::G
+**
+**    File containing the image (sprite) graphics of the missile.
+**    The file can contain multiple sprite frames.  The sprite frames
+**    for the different directions are placed in the row.
+**    The different animations steps are placed in the column. But
+**    the correct order depends on MissileType::Class. Missiles like fire
+**    have no directions, missiles like arrows have a direction.
 */
 
 /**
-**  @struct _missile_ missile.h
+**  @class Missile missile.h
 **
 **  \#include "missile.h"
 **
-**  typedef struct _missile_ Missile;
-**
-**  This structure contains all informations about a missile in game.
+**  This structure contains all information about a missile in game.
 **  A missile could have different effects, based on its missile-type.
 **  Missiles could be saved and stored with CCL. See (missile).
 **  Currently only a tile, an unit or a missile could be placed on the map.
@@ -215,10 +207,9 @@
 **  Missile::X Missile::Y
 **
 **    Missile current map position in pixels.  To convert a map tile
-**    position to pixel position use: (mapx*::TileSizeX+::TileSizeX/2)
-**    and (mapy*::TileSizeY+::TileSizeY/2)
-**    @note ::TileSizeX%2==0 && ::TileSizeY%2==0 and ::TileSizeX,
-**    ::TileSizeY are currently fixed 32 pixels.
+**    position to pixel position use: (mapx * ::TileSizeX + ::TileSizeX / 2)
+**    and (mapy * ::TileSizeY + ::TileSizeY / 2)
+**    @note ::TileSizeX % 2 == 0 && ::TileSizeY % 2 == 0
 **
 **  Missile::SourceX Missile::SourceY
 **
@@ -405,34 +396,34 @@ public:
 	void MissileType::DrawMissileType(int frame, int x, int y) const;
 
 
-	char* Ident;          /// missile name
-	int   Transparency;   /// missile transparency possible value is 50 (later 25 and 75)
-	int   Width;          /// missile width in pixels
-	int   Height;         /// missile height in pixels
-	int   DrawLevel;      /// Level to draw missile at
-	int   SpriteFrames;   /// number of sprite frames in graphic
-	int   NumDirections;  /// number of directions missile can face
+	char *Ident;               /// missile name
+	int Transparency;          /// missile transparency
+	int Width;                 /// missile width in pixels
+	int Height;                /// missile height in pixels
+	int DrawLevel;             /// Level to draw missile at
+	int SpriteFrames;          /// number of sprite frames in graphic
+	int NumDirections;         /// number of directions missile can face
 
 	/// @todo FiredSound defined but not used!
-	SoundConfig FiredSound;   /// fired sound
-	SoundConfig ImpactSound;  /// impact sound for this missile-type
+	SoundConfig FiredSound;    /// fired sound
+	SoundConfig ImpactSound;   /// impact sound for this missile-type
 
-	bool Flip;                /// flip image when facing left
-	bool CanHitOwner;         /// missile can hit the owner
-	bool FriendlyFire;        /// missile can't hit own units
+	bool Flip;                 /// flip image when facing left
+	bool CanHitOwner;          /// missile can hit the owner
+	bool FriendlyFire;         /// missile can't hit own units
 
-	MissileClass Class;       /// missile class
-	int          NumBounces;  /// number of bounces
-	int          StartDelay;  /// missile start delay
-	int          Sleep;       /// missile sleep
-	int          Speed;       /// missile speed
+	MissileClass Class;        /// missile class
+	int NumBounces;            /// number of bounces
+	int StartDelay;            /// missile start delay
+	int Sleep;                 /// missile sleep
+	int Speed;                 /// missile speed
 
-	int          Range;          /// missile damage range
-	int          SplashFactor;   /// missile splash divisor
-	char*        ImpactName;     /// impact missile-type name
-	MissileType* ImpactMissile;  /// missile produces an impact
-	char*        SmokeName;      /// impact missile-type name
-	MissileType* SmokeMissile;   /// Trailling missile
+	int Range;                 /// missile damage range
+	int SplashFactor;          /// missile splash divisor
+	char *ImpactName;          /// impact missile-type name
+	MissileType *ImpactMissile;/// missile produces an impact
+	char *SmokeName;           /// impact missile-type name
+	MissileType *SmokeMissile; /// Trailling missile
 
 // --- FILLED UP ---
 	CGraphic *G;         /// missile graphic

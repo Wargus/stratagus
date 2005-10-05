@@ -88,7 +88,7 @@ static int MinimapScaleY;                  /// Minimap scale to fit into window
 
 #define MAX_MINIMAP_EVENTS 8
 
-struct _minimap_events_ {
+struct MinimapEvent {
 	int X;
 	int Y;
 	int Size;

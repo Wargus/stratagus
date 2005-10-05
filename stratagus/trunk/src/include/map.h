@@ -42,14 +42,12 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _map_field_ map.h
+**  @class MapField map.h
 **
 **  \#include "map.h"
 **
-**  typedef struct _map_field_ MapField;
-**
-**  This structure contains all informations about a field on map.
-**  It contains it look, properties and content.
+**  This structure contains all information about a field on map.
+**  It contains its look, properties and content.
 **
 **  The map-field structure members:
 **

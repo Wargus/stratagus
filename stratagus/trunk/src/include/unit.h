@@ -122,7 +122,7 @@
 **  the map. To convert the map coordinates into pixels, they
 **  must be multiplicated with the #TileSizeX and #TileSizeY.
 **  To get the pixel coordinates of a unit, calculate
-**  CUnit::X*#TileSize+CUnit::IX , CUnit::Y*#TileSizeY+CUnit::IY.
+**  CUnit::X*#TileSizeX+CUnit::IX , CUnit::Y*#TileSizeY+CUnit::IY.
 **
 **  CUnit::Type
 **
