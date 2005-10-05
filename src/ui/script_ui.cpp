@@ -1072,6 +1072,7 @@ static int CclDefineUI(lua_State *l)
 		} else if (!strcmp(value, "reverse-font-color")) {
 			ui->ReverseFontColor = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "filler")) {
+			CFiller f;
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -1079,22 +1080,23 @@ static int CclDefineUI(lua_State *l)
 			while (lua_next(l, j + 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "File")) {
-					ui->Filler.push_back(CGraphic::New(LuaToString(l, -1)));
+					f.G = CGraphic::New(LuaToString(l, -1));
 				} else if (!strcmp(value, "Pos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					ui->FillerX.push_back(LuaToNumber(l, -1));
+					f.X = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					ui->FillerY.push_back(LuaToNumber(l, -1));
+					f.Y = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 				lua_pop(l, 1);
 			}
+			ui->Fillers.push_back(f);
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
