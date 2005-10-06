@@ -579,26 +579,6 @@ char* LibraryFileName(const char* file, char* buffer)
 }
 
 /**
-**  Compare two directory structures.
-**
-**  @param v1  First structure
-**  @param v2  Second structure
-**
-**  @return    v1-v2
-*/
-static int flqcmp(const void* v1, const void* v2)
-{
-	const FileList* c1 = (FileList *)v1;
-	const FileList* c2 = (FileList *)v2;
-
-	if (c1->type == c2->type) {
-		return strcmp(c1->name, c2->name);
-	} else {
-		return c2->type - c1->type;
-	}
-}
-
-/**
 **  Generate a list of files within a specified directory
 **
 **  @param dirname  Directory to read.
@@ -607,7 +587,8 @@ static int flqcmp(const void* v1, const void* v2)
 **
 **  @return the number of entries added to FileList.
 */
-int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *), FileList **flp)
+int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
+	std::vector<FileList> &fl)
 {
 #ifndef _MSC_VER
 	DIR* dirp;
@@ -618,8 +599,6 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *), Fi
 	struct _finddata_t fileinfo;
 	long hFile;
 #endif
-	FileList *nfl;
-	FileList *fl = NULL;
 	int n;
 	int isdir = 0; // silence gcc..
 	char *np;
@@ -633,7 +612,6 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *), Fi
 		buffer[n] = 0;
 	}
 	np = buffer + n;
-	n = 0;
 
 #ifndef _MSC_VER
 	dirp = opendir(dirname);
@@ -662,36 +640,31 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *), Fi
 			if (stat(buffer, &st) == 0) {
 				isdir = S_ISDIR(st.st_mode);
 				if (isdir || S_ISREG(st.st_mode)) {
-					if (n) {
-						nfl = (FileList *)realloc(fl, sizeof(FileList) * (n + 1));
-						if (nfl) {
-							fl = nfl;
-							nfl = fl + n;
-						}
+					FileList nfl;
+					int i;
+					if (isdir) {
+						nfl.name = new_strdup(np);
 					} else {
-						fl = nfl = (FileList *)malloc(sizeof(FileList));
+						nfl.type = -1;
+						if (filter == NULL) {
+							nfl.name = new_strdup(np);
+							nfl.type = 1;
+						} else if ((*filter)(buffer, &nfl) == 0) {
+							continue;
+						}
 					}
-					if (nfl) {
-						memset(nfl, 0, sizeof(*nfl));
-						if (isdir) {
-							nfl->name = new_strdup(np);
+					for (i = 0; i < (int)fl.size(); ++i) {
+						if (nfl.type == fl[i].type) {
+							if (strcmp(nfl.name, fl[i].name) < 0) {
+								break;
+							}
 						} else {
-							nfl->type = -1;
-							if (filter == NULL) {
-								nfl->name = new_strdup(np);
-								nfl->type = 1;
-							} else if ((*filter)(buffer, nfl) == 0) {
-								if (n == 0) {
-									free(fl);
-									fl = NULL;
-								} else {
-									fl = (FileList *)realloc(fl, sizeof(FileList) * n);
-								}
-								continue;
+							if (fl[i].type - nfl.type > 0) {
+								break;
 							}
 						}
 					}
-					++n;
+					fl.insert(fl.begin() + i, nfl);
 				}
 			}
 #ifndef _MSC_VER
@@ -702,13 +675,7 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *), Fi
 		_findclose(hFile);
 #endif
 	}
-	if (n == 0) {
-		fl = NULL;
-	} else {
-		qsort((char *)fl, n, sizeof(FileList), flqcmp);
-	}
-	*flp = fl;
-	return n;
+	return fl.size();
 }
 
 //@}

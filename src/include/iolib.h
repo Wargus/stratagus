@@ -37,6 +37,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
+
 #ifdef USE_ZLIB
 #include <zlib.h>
 #endif
@@ -56,9 +58,11 @@ class MapInfo;
 */
 class FileList {
 public:
-	char *name;                /// Name of the file
-	int   type;                /// Type of the file
-	MapInfo *xdata;  /// Extra data attached by high level
+	FileList() : name(NULL), type(0), xdata(NULL) {}
+
+	char *name;              /// Name of the file
+	int type;                /// Type of the file
+	MapInfo *xdata;          /// Extra data attached by high level
 };
 
 
@@ -111,7 +115,8 @@ enum {
 extern char *LibraryFileName(const char *file, char *buffer);
 
 	/// Read the contents of a directory
-extern int ReadDataDirectory(const char *dirname, int (*filter)(char*, FileList *), FileList **flp);
+extern int ReadDataDirectory(const char *dirname, int (*filter)(char*, FileList *),
+	std::vector<FileList> &flp);
 
 //@}
 
