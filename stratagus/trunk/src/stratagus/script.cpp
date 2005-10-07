@@ -1830,13 +1830,13 @@ static int CclStratagusLibraryPath(lua_State *l)
 }
 
 /**
-** Return a table with the files found in the subdirectory.
+**  Return a table with the files found in the subdirectory.
 */
 static int CclListDirectory(lua_State *l)
 {
 	char directory[256];
 	const char *userdir;
-	FileList *flp;
+	std::vector<FileList> flp;
 	int n;
 	int i;
 
@@ -1854,13 +1854,13 @@ static int CclListDirectory(lua_State *l)
 	sprintf(directory, "%s/%s", StratagusLibPath, userdir);
 	lua_pop(l, 1);
 	lua_newtable(l);
-	n = ReadDataDirectory(directory, NULL, &flp);
+	n = ReadDataDirectory(directory, NULL, flp);
 	for (i = 0; i < n; i++) {
 		lua_pushnumber(l, i);
 		lua_pushstring(l, flp[i].name);
 		lua_settable(l, 1);
+		delete[] flp[i].name;
 	}
-	free(flp);
 
 	return 1;
 }
