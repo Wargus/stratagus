@@ -452,7 +452,7 @@ static MapInfo* DuplicateMapInfo(const MapInfo *orig)
 **  @param fl  File list to free.
 **  @param n   Size of file list.
 */
-static void FreeMapInfos(FileList *fl, int n)
+static void FreeMapInfos(std::vector<FileList> *fl, int n)
 {
 	int i;
 
@@ -460,12 +460,13 @@ static void FreeMapInfos(FileList *fl, int n)
 	Assert(0 <= n);
 
 	for (i = 0; i < n; i++) {
-		if (fl[i].xdata) {
-			FreeMapInfo(fl[i].xdata);
-			delete fl[i].xdata;
+		if ((*fl)[i].xdata) {
+			FreeMapInfo((*fl)[i].xdata);
+			delete (*fl)[i].xdata;
+			(*fl)[i].xdata = NULL;
 		}
-		delete[] fl[i].name;
-		memset(fl, 0, sizeof(*fl));
+		delete[] (*fl)[i].name;
+		(*fl)[i].name = NULL;
 	}
 }
 
@@ -649,9 +650,9 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 **
 **  @return string to display in listbox.
 */
-static char* LBRetrieve(const Menuitem* mi, int i)
+static char *LBRetrieve(const Menuitem *mi, int i)
 {
-	FileList* fl;
+	std::vector<FileList> *fl;
 	static char buffer[1024];
 
 	Assert(mi->MiType == MiTypeListbox);
@@ -660,13 +661,14 @@ static char* LBRetrieve(const Menuitem* mi, int i)
 	if (i >= mi->D.Listbox.noptions) {
 		return NULL;
 	}
-	fl = (FileList*)mi->D.Listbox.options;
-	if (fl[i].type) {
+	fl = (std::vector<FileList> *)mi->D.Listbox.options;
+	if ((*fl)[i].type) {
 		strcpy(buffer, "   ");
 	} else {
 		strcpy(buffer, "\260 ");
 	}
-	strcat(buffer, fl[i].name);
+	int len = (*fl).size();
+	strcat(buffer, (*fl)[i].name);
 	return buffer;
 }
 
@@ -678,10 +680,10 @@ static char* LBRetrieve(const Menuitem* mi, int i)
 **
 **  @return string to display in listbox.
 */
-static char* LBRetrieveAndInfo(const Menuitem* mi, int i)
+static char *LBRetrieveAndInfo(const Menuitem *mi, int i)
 {
-	FileList* fl;
-	MapInfo* info;
+	std::vector<FileList> *fl;
+	MapInfo *info;
 
 	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
@@ -689,9 +691,9 @@ static char* LBRetrieveAndInfo(const Menuitem* mi, int i)
 	if (i >= mi->D.Listbox.noptions) {
 		return NULL;
 	}
-	fl = (FileList*)mi->D.Listbox.options;
-	info = fl[i].xdata;
-	if (fl[i].type && i == mi->D.Listbox.curopt && info) {
+	fl = (std::vector<FileList> *)mi->D.Listbox.options;
+	info = (*fl)[i].xdata;
+	if ((*fl)[i].type && i == mi->D.Listbox.curopt && info) {
 		static char buffer[1024];
 		int j;
 		int n;
@@ -732,9 +734,9 @@ static char* LBRetrieveAndInfo(const Menuitem* mi, int i)
 **
 **  @return 0 if nothing selected, 1 for file, 2 for directory.
 */
-static int PathLBAction(const Menuitem* mi, int i)
+static int PathLBAction(const Menuitem *mi, int i)
 {
-	FileList *fl;
+	std::vector<FileList> *fl;
 
 	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
@@ -745,22 +747,22 @@ static int PathLBAction(const Menuitem* mi, int i)
 	if (i >= mi->D.Listbox.noptions) {
 		return 0;
 	}
-	fl = (FileList*)mi->D.Listbox.options;
-	if (fl[i].type) {
-		Assert(strlen(fl[i].name) < sizeof(ScenSelectFileName));
-		strcpy(ScenSelectFileName, fl[i].name);
+	fl = (std::vector<FileList> *)mi->D.Listbox.options;
+	if ((*fl)[i].type) {
+		Assert(strlen((*fl)[i].name) < sizeof(ScenSelectFileName));
+		strcpy(ScenSelectFileName, (*fl)[i].name);
 		SelectedFileExist = 1;
 		return 1;
 	} else {
-		Assert(strlen(fl[i].name) < sizeof(ScenSelectPathName));
-		strcpy(ScenSelectPathName, fl[i].name);
+		Assert(strlen((*fl)[i].name) < sizeof(ScenSelectPathName));
+		strcpy(ScenSelectPathName, (*fl)[i].name);
 		return 2;
 	}
 }
 /**
 ** Save game listbox action callback
 */
-static void SaveGameLBAction(Menuitem* mi, int i)
+static void SaveGameLBAction(Menuitem *mi, int i)
 {
 	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
@@ -772,7 +774,7 @@ static void SaveGameLBAction(Menuitem* mi, int i)
 /**
 **  Editor save listbox action callback
 */
-static void EditorSaveLBAction(Menuitem* mi, int i)
+static void EditorSaveLBAction(Menuitem *mi, int i)
 {
 	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
@@ -793,14 +795,14 @@ static void EditorSaveLBAction(Menuitem* mi, int i)
 */
 static void LBExit(Menuitem *mi)
 {
-	FileList *fl;
+	std::vector<FileList> *fl;
 
 	Assert(mi->MiType == MiTypeListbox);
 
 	if (!mi->D.Listbox.noptions) {
 		return ;
 	}
-	fl = (FileList*)mi->D.Listbox.options;
+	fl = (std::vector<FileList> *)mi->D.Listbox.options;
 	FreeMapInfos(fl, mi->D.Listbox.noptions);
 	delete fl;
 	mi->D.Listbox.options = NULL;
@@ -815,7 +817,7 @@ static void LBExit(Menuitem *mi)
 **  @param path    Path
 **  @param filter  Filter
 */
-static void LBInit(Menuitem* mi, const char* path, int (*filter)(char*, FileList*))
+static void LBInit(Menuitem *mi, const char *path, int (*filter)(char *, FileList *))
 {
 	int noptions;
 
@@ -824,8 +826,9 @@ static void LBInit(Menuitem* mi, const char* path, int (*filter)(char*, FileList
 
 	LBExit(mi);
 
+	mi->D.Listbox.options = (void *)new std::vector<FileList>;
 	mi->D.Listbox.noptions = ReadDataDirectory(path, filter,
-		(FileList **) & (mi->D.Listbox.options));
+		*(std::vector<FileList> *)mi->D.Listbox.options);
 
 	noptions = mi->D.Listbox.noptions;
 	mi->D.Listbox.startline = 0;
@@ -847,37 +850,37 @@ static void LBInit(Menuitem* mi, const char* path, int (*filter)(char*, FileList
 }
 
 /**
-** Init callback for listbox in save game menu
+**  Init callback for listbox in save game menu
 */
-static void SaveGameLBInit(Menuitem* mi)
+static void SaveGameLBInit(Menuitem *mi)
 {
 	LBInit(mi, SaveDir, SaveGameRDFilter);
 }
 /**
-** Init callback for listbox in load game menu
+**  Init callback for listbox in load game menu
 */
-static void LoadGameLBInit(Menuitem* mi)
+static void LoadGameLBInit(Menuitem *mi)
 {
 	LBInit(mi, SaveDir, SaveGameRDFilter);
 }
 /**
 **  Scenario select listbox init callback
 */
-static void ScenSelectLBInit(Menuitem* mi)
+static void ScenSelectLBInit(Menuitem *mi)
 {
 	LBInit(mi, ScenSelectPath, ScenSelectRDFilter);
 }
 /**
 ** Editor main load listbox init callback
 */
-static void EditorMainLoadLBInit(Menuitem* mi)
+static void EditorMainLoadLBInit(Menuitem *mi)
 {
 	LBInit(mi, ScenSelectPath, EditorMainLoadRDFilter);
 }
 /**
 ** Editor save listbox init callback
 */
-static void EditorSaveLBInit(Menuitem* mi)
+static void EditorSaveLBInit(Menuitem *mi)
 {
 	LBInit(mi, ScenSelectPath, EditorSaveRDFilter);
 	sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
@@ -886,7 +889,7 @@ static void EditorSaveLBInit(Menuitem* mi)
 /**
 ** Replay game listbox init callback
 */
-static void ReplayGameLBInit(Menuitem* mi)
+static void ReplayGameLBInit(Menuitem *mi)
 {
 	LBInit(mi, ScenSelectPath, ReplayGameRDFilter);
 }
