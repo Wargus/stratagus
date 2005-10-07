@@ -1,6 +1,7 @@
 $#include "stratagus.h"
 $#include "ui.h"
 $#include "minimap.h"
+$#include "player.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
@@ -16,8 +17,12 @@ Upgrades = {}
 setmetatable(Upgrades, mt)
 $]
 
+#define MaxCosts 7
+#define PlayerMax 16
+
 $pfile "minimap.pkg"
 $pfile "ui.pkg"
 $pfile "video.pkg"
 $pfile "upgrade.pkg"
+$pfile "player.pkg"
 
