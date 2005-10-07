@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Fri Oct  7 18:13:54 2005.
+** Generated automatically by tolua++-1.0.6 on Fri Oct  7 18:21:06 2005.
 */
 
 #ifndef __cplusplus
@@ -1051,30 +1051,6 @@ static int tolua_get_stratagus_CPlayer_Revenue(lua_State* tolua_S)
  return 1;
 }
 
-/* set function: Revenue of class  CPlayer */
-static int tolua_set_stratagus_CPlayer_Revenue(lua_State* tolua_S)
-{
- int tolua_index;
-  CPlayer* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (CPlayer*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
- tolua_Error tolua_err;
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=MaxCosts)
- tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
-  self->Revenue[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
- return 0;
-}
-
 /* get function: TotalNumUnits of class  CPlayer */
 static int tolua_get_CPlayer_TotalNumUnits(lua_State* tolua_S)
 {
@@ -1573,7 +1549,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"Name",tolua_get_CPlayer_Name,tolua_set_CPlayer_Name);
  tolua_array(tolua_S,"Resources",tolua_get_stratagus_CPlayer_Resources,tolua_set_stratagus_CPlayer_Resources);
  tolua_array(tolua_S,"Incomes",tolua_get_stratagus_CPlayer_Incomes,tolua_set_stratagus_CPlayer_Incomes);
- tolua_array(tolua_S,"Revenue",tolua_get_stratagus_CPlayer_Revenue,tolua_set_stratagus_CPlayer_Revenue);
+ tolua_array(tolua_S,"Revenue",tolua_get_stratagus_CPlayer_Revenue,NULL);
  tolua_variable(tolua_S,"TotalNumUnits",tolua_get_CPlayer_TotalNumUnits,tolua_set_CPlayer_TotalNumUnits);
  tolua_variable(tolua_S,"NumBuildings",tolua_get_CPlayer_NumBuildings,tolua_set_CPlayer_NumBuildings);
  tolua_variable(tolua_S,"Supply",tolua_get_CPlayer_Supply,tolua_set_CPlayer_Supply);
