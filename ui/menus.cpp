@@ -667,7 +667,7 @@ static char *LBRetrieve(const Menuitem *mi, int i)
 	} else {
 		strcpy(buffer, "\260 ");
 	}
-	int len = (*fl).size();
+
 	strcat(buffer, (*fl)[i].name);
 	return buffer;
 }
