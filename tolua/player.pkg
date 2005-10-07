@@ -4,7 +4,7 @@ class CPlayer
 
 	int Resources[MaxCosts];
 	int Incomes[MaxCosts];
-	int Revenue[MaxCosts];
+	const int Revenue[MaxCosts];
 
 	int TotalNumUnits;
 	int NumBuildings;
