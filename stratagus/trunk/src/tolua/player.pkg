@@ -1,0 +1,27 @@
+class CPlayer
+{
+	char *Name;
+
+	int Resources[MaxCosts];
+	int Incomes[MaxCosts];
+	int Revenue[MaxCosts];
+
+	int TotalNumUnits;
+	int NumBuildings;
+	int Supply;
+	int Demand;
+
+	int UnitLimit;
+	int BuildingLimit;
+	int TotalUnitLimit;
+
+	int Score;
+	int TotalUnits;
+	int TotalBuildings;
+	int TotalResources[MaxCosts];
+	int TotalRazings;
+	int TotalKills;
+};
+
+extern CPlayer Players[PlayerMax];
+
