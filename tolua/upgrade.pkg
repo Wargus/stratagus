@@ -1,5 +1,3 @@
-#define MaxCosts 7
-
 class CUpgrade
 {
   static CUpgrade *New(const char *ident);
