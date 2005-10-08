@@ -2703,7 +2703,6 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 {
 	CUnit *unit;
-	CUnit **units;
 	CUnit *FirstUnitFound;
 	int nunits;
 	int i;
@@ -2717,10 +2716,9 @@ CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 	}
 
 	nunits = player->TotalNumUnits;
-	units = player->Units;
 
 	for (i = 0; i < nunits; ++i) {
-		unit = units[i];
+		unit = player->Units[i];
 		if (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed) {
 			if (unit->Orders[0].Action == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
