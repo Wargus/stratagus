@@ -1296,7 +1296,12 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 				}
 			}
 			++count;
-			anim->D.RandomSound.Name = (char **)realloc(anim->D.RandomSound.Name, count * sizeof(char*));
+			char **newname = new char *[count];
+			if (anim->D.RandomSound.Name) {
+				memcpy(newname, anim->D.RandomSound.Name, (count - 1) * sizeof(char *));
+				delete[] anim->D.RandomSound.Name;
+			}
+			anim->D.RandomSound.Name = newname;
 			anim->D.RandomSound.Name[count - 1] = new_strdup(op2);
 			op2 = next;
 		}
