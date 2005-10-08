@@ -21,6 +21,7 @@ $]
 
 #define MaxCosts 7
 #define PlayerMax 16
+#define UnitMax 2048
 
 $pfile "minimap.pkg"
 $pfile "ui.pkg"

@@ -6,6 +6,7 @@ class CPlayer
 	int Incomes[MaxCosts];
 	const int Revenue[MaxCosts];
 
+	CUnit *Units[UnitMax];
 	int TotalNumUnits;
 	int NumBuildings;
 	int Supply;
