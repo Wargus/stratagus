@@ -7,9 +7,9 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---	upgrade.ccl	-	Define the elites dependencies and upgrades.
+--	upgrade.lua	-	Define the elites dependencies and upgrades.
 --
---	(c) Copyright 2001-2004 by Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001-2005 by Lutz Sammer, Crestez Leonard and Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -29,18 +29,26 @@
 
 --	- upgrades
 
-DefineUpgrade("upgrade-expl", "icon", "icon-expl",
-	"costs", {100, 250, 300, 0, 0, 0, 0})
-DefineUpgrade("upgrade-expl2", "icon", "icon-expl2",
-	"costs", {150, 350, 400, 0, 0, 0, 0})
-DefineUpgrade("upgrade-tdril", "icon", "icon-tdril",
-	"costs", {100, 250, 220, 0, 0, 0, 0})
-DefineUpgrade("upgrade-ddril", "icon", "icon-ddril",
-	"costs", {150, 350, 350, 0, 0, 0, 0})
-DefineUpgrade("upgrade-pdril", "icon", "icon-pdril",
-	"costs", {200, 450, 450, 0, 0, 0, 0})
-DefineUpgrade("upgrade-void", "icon", "icon-void",
-	"costs", {2000, 0, 0, 0, 0, 0, 0})
+function DefineUpgrade(name, icon, costs)
+   u = CUpgrade:New(name)
+   u.Icon = Icons[icon]
+   for j = 1,table.getn(costs) do
+      u.Costs[j - 1] = costs[j]
+   end
+end
+
+DefineUpgrade("upgrade-expl", "icon-expl",
+	{100, 250, 300, 0, 0, 0, 0})
+DefineUpgrade("upgrade-expl2", "icon-expl2",
+	{150, 350, 400, 0, 0, 0, 0})
+DefineUpgrade("upgrade-tdril", "icon-tdril",
+	{100, 250, 220, 0, 0, 0, 0})
+DefineUpgrade("upgrade-ddril", "icon-ddril",
+	{150, 350, 350, 0, 0, 0, 0})
+DefineUpgrade("upgrade-pdril", "icon-pdril",
+	{200, 450, 450, 0, 0, 0, 0})
+DefineUpgrade("upgrade-void", "icon-void",
+	{2000, 0, 0, 0, 0, 0, 0})
 
 
 DefineModifier("upgrade-expl2",
