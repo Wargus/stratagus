@@ -91,11 +91,7 @@ static int CclPlayer(lua_State *l)
 		NumPlayers = i + 1;
 	}
 	player->Index = i;
-	if (!(player->Units = new CUnit *[UnitMax])) {
-		DebugPrint("Not enough memory to create player %d.\n" _C_ i);
-		return 0;
-	}
-	memset(player->Units, 0, UnitMax * sizeof(CUnit));
+	memset(player->Units, 0, sizeof(player->Units));
 
 	//
 	//  Parse the list: (still everything could be changed!)
