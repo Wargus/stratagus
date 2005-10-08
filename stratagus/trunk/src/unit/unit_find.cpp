@@ -138,17 +138,15 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 	CUnit **table)
 {
 	CUnit *unit;
-	CUnit **units;
 	int num;
 	int nunits;
 	int typecount;
 	int i;
 
 	nunits = player->TotalNumUnits;
-	units = player->Units;
 	typecount = player->UnitTypesCount[type->Slot];
 	for (num = 0, i = 0; i < nunits && typecount; ++i) {
-		unit = units[i];
+		unit = player->Units[i];
 		if (unit->Type == type) {
 			if (!UnitUnusable(unit)) {
 				table[num++] = unit;

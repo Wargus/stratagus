@@ -329,7 +329,7 @@ public:
 	int   AiEnabled;       /// handle AI on local computer
 	PlayerAi *Ai;          /// Ai structure pointer
 
-	CUnit **Units;         /// units of this player
+	CUnit *Units[UnitMax]; /// units of this player
 	int    TotalNumUnits;  /// total # units for units' list
 	int    NumBuildings;   /// # buildings
 	int    Supply;         /// supply available/produced
