@@ -1011,14 +1011,14 @@ static int CclDefineUI(lua_State *l)
 			if (UI_Table[i]->Width == x && UI_Table[i]->Height == y &&
 					!strcmp(UI_Table[i]->Name, str)) {
 				CleanUI(UI_Table[i]);
-				ui = (CUserInterface *)calloc(1, sizeof(CUserInterface));
+				ui = new CUserInterface;
 				UI_Table[i] = ui;
 				break;
 			}
 		}
 	}
 	if (!ui) {
-		ui = (CUserInterface *)calloc(1, sizeof(CUserInterface));
+		ui = new CUserInterface;
 		v = new CUserInterface *[i + 2];
 		memcpy(v, UI_Table, i * sizeof(CUserInterface*));
 		delete[] UI_Table;
