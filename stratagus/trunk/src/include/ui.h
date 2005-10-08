@@ -493,6 +493,30 @@ private:
 */
 class CUserInterface {
 public:
+	CUserInterface() : Name(NULL), Width(0), Height(0),
+		MouseScroll(false), KeyScroll(false),
+		MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
+		MouseWarpX(0), MouseWarpY(0),
+		NormalFontColor(NULL), ReverseFontColor(NULL),
+		PanelIndex(NULL), NumberPanel(0), SingleSelectedButton(NULL),
+		MaxSelectedFont(0), MaxSelectedTextX(0), MaxSelectedTextY(0),
+		SingleTrainingButton(NULL), SingleTrainingText(NULL),
+		SingleTrainingFont(0), SingleTrainingTextX(0), SingleTrainingTextY(0),
+		TrainingText(NULL), TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
+		UpgradingButton(NULL), ResearchingButton(NULL),
+		CompletedBarColor(0), CompletedBarShadow(0),
+		PieMenuBackgroundG(NULL), PieMouseButton(0),
+		ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
+		SelectedViewport(NULL), NumViewports(0),
+		ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
+		MenuPanels(NULL), VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
+	{
+		memset(Resources, 0, sizeof(Resources));
+		memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
+		memset(PieX, 0, sizeof(PieX));
+		memset(PieY, 0, sizeof(PieY));
+	}
+
 	char *Name;                         /// interface name to select
 	int Width;                          /// useable for this width
 	int Height;                         /// useable for this height
@@ -514,7 +538,7 @@ public:
 	std::vector<CFiller> Fillers;       /// Filler graphics
 
 	struct {
-		CGraphic *G;                     /// icon graphic
+		CGraphic *G;                    /// icon graphic
 		int IconFrame;                  /// icon frame
 		int IconX;                      /// icon X position
 		int IconY;                      /// icon Y position
@@ -524,39 +548,39 @@ public:
                                         /// +2 for food and score
 
 	// Info panel
-	CInfoPanel InfoPanel;
-	char*   PanelIndex;                 /// Index of the InfoPanel.
-	char    NumberPanel;                /// Number of Panel.
+	CInfoPanel InfoPanel;               /// Info panel
+	char *PanelIndex;                   /// Index of the InfoPanel.
+	char NumberPanel;                   /// Number of Panel.
 
-	Button* SingleSelectedButton;       /// Button for single selected unit
+	Button *SingleSelectedButton;       /// Button for single selected unit
 
 	std::vector<Button> SelectedButtons;/// Selected buttons
-	int     MaxSelectedFont;            /// Font type to use
-	int     MaxSelectedTextX;           /// position to place '+#' text
-	int     MaxSelectedTextY;           /// if > maximum units selected
+	int MaxSelectedFont;                /// Font type to use
+	int MaxSelectedTextX;               /// position to place '+#' text
+	int MaxSelectedTextY;               /// if > maximum units selected
 
-	Button* SingleTrainingButton;       /// Button for single training
-	char*   SingleTrainingText;         /// Text for single training
-	int     SingleTrainingFont;         /// Font for single traning
-	int     SingleTrainingTextX;        /// X text position single training
-	int     SingleTrainingTextY;        /// Y text position single training
+	Button *SingleTrainingButton;       /// Button for single training
+	char *SingleTrainingText;           /// Text for single training
+	int SingleTrainingFont;             /// Font for single traning
+	int SingleTrainingTextX;            /// X text position single training
+	int SingleTrainingTextY;            /// Y text position single training
 
 	std::vector<Button> TrainingButtons;/// Training buttons
-	char*   TrainingText;               /// Multiple Training Text
-	int     TrainingFont;               /// Multiple Training Font
-	int     TrainingTextX;              /// Multiple Training X Text position
-	int     TrainingTextY;              /// Multiple Training Y Text position
+	char *TrainingText;                 /// Multiple Training Text
+	int TrainingFont;                   /// Multiple Training Font
+	int TrainingTextX;                  /// Multiple Training X Text position
+	int TrainingTextY;                  /// Multiple Training Y Text position
 
-	Button* UpgradingButton;            /// Button info for upgrade
+	Button *UpgradingButton;            /// Button info for upgrade
 
-	Button* ResearchingButton;          /// Button info for researching
+	Button *ResearchingButton;          /// Button info for researching
 
 	std::vector<Button> TransportingButtons;/// Button info for transporting
 
 	// Completed bar
 	SDL_Color CompletedBarColorRGB;     /// color for completed bar
-	Uint32    CompletedBarColor;        /// color for completed bar
-	int       CompletedBarShadow;       /// should complete bar have shadow
+	Uint32 CompletedBarColor;           /// color for completed bar
+	int CompletedBarShadow;             /// should complete bar have shadow
 
 	// Button panel
 	CButtonPanel  ButtonPanel;
@@ -569,24 +593,24 @@ public:
 
 	// Map area
 	ViewportModeType ViewportMode;      /// Current viewport mode
-	CViewport*    MouseViewport;        /// Viewport containing mouse
-	CViewport*    SelectedViewport;     /// Current selected active viewport
-	int          NumViewports;          /// # Viewports currently used
-	CViewport     Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
+	CViewport *MouseViewport;           /// Viewport containing mouse
+	CViewport *SelectedViewport;        /// Current selected active viewport
+	int NumViewports;                   /// # Viewports currently used
+	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	// Map* attributes of Viewport are unused here:
-	CViewport     MapArea;               /// geometry of the whole map area
+	CViewport MapArea;                  /// geometry of the whole map area
 
-	/// Menu buttons
+	// Menu buttons
 	Button MenuButton;                  /// menu button
 	Button NetworkMenuButton;           /// network menu button
 	Button NetworkDiplomacyButton;      /// network diplomacy button
 
 	// The minimap
-	CMinimap Minimap;
-	Uint32        ViewportCursorColor;  /// minimap cursor color
+	CMinimap Minimap;                   /// minimap
+	Uint32 ViewportCursorColor;         /// minimap cursor color
 
 	// The status line
-	CStatusLine   StatusLine;
+	CStatusLine StatusLine;             /// status line
 
 	// Offsets for 640x480 center used by menus
 	int Offset640X;                     /// Offset for 640x480 X position
@@ -620,8 +644,8 @@ public:
 
 	MenuPanel *MenuPanels;              /// Menu panels
 
-	CGraphic *VictoryBackgroundG;        /// Victory background graphic
-	CGraphic *DefeatBackgroundG;         /// Defeat background graphic
+	CGraphic *VictoryBackgroundG;       /// Victory background graphic
+	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
 };
 
 /*----------------------------------------------------------------------------
@@ -644,7 +668,7 @@ extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;            /// Mouse Scrolling Speed, in Frames
 
-extern char DefaultGroupKeys[];    /// Default group keys
+extern char DefaultGroupKeys[];         /// Default group keys
 extern char *UiGroupKeys;               /// Up to 11 keys used for group selection
 
 // only exported to save them
