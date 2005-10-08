@@ -1,0 +1,12 @@
+class CUnitType
+{
+	char *Ident;
+	char *Name;
+
+	int MinAttackRange;
+	int ClicksToExplode;
+
+	int Supply;
+	int Demand;
+};
+
