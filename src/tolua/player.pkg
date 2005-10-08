@@ -24,4 +24,5 @@ class CPlayer
 };
 
 extern CPlayer Players[PlayerMax];
+extern CPlayer *ThisPlayer;
 

@@ -1,0 +1,9 @@
+class CUnit
+{
+	int X;
+	int Y;
+
+	CUnitType *Type;
+	CPlayer *Player;
+};
+
