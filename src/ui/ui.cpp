@@ -304,7 +304,7 @@ void CleanUI(CUserInterface *ui)
 	CGraphic::Free(ui->VictoryBackgroundG);
 	CGraphic::Free(ui->DefeatBackgroundG);
 
-	free(ui);
+	delete ui;
 }
 
 /**
