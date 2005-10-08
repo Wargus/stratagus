@@ -37,3 +37,9 @@ DefineRaceNames(
 		"display", "Neutral"}
 	)
 
+function DefineIcon(arg)
+    icon = CIcon:New(arg.Name)
+    icon.G = CGraphic:New(arg.File, arg.Size[1], arg.Size[2])
+    icon.Frame = arg.Frame
+end
+
