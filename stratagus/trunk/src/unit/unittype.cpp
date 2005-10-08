@@ -557,7 +557,7 @@ static void CleanAnimation(CAnimation *anim)
 			for (i = 0; i < ptr->D.RandomSound.NumSounds; ++i) {
 				delete[] ptr->D.RandomSound.Name[i];
 			}
-			free(ptr->D.RandomSound.Name);
+			delete[] ptr->D.RandomSound.Name;
 			free(ptr->D.RandomSound.Sound);
 		}
 		++ptr;
