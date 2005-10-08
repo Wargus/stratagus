@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Fri Oct  7 18:21:06 2005.
+** Generated automatically by tolua++-1.0.6 on Fri Oct  7 20:27:22 2005.
 */
 
 #ifndef __cplusplus
@@ -17,6 +17,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 #include "ui.h"
 #include "minimap.h"
 #include "player.h"
+#include "unittype.h"
+#include "unit.h"
 #ifdef _MSC_VER
 #pragma warning(disable:4800)
 #endif
@@ -40,6 +42,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"CPlayer");
+ tolua_usertype(tolua_S,"CUnit");
+ tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CButtonPanel");
@@ -1451,6 +1455,286 @@ static int tolua_set_stratagus_Players(lua_State* tolua_S)
  return 0;
 }
 
+/* get function: ThisPlayer */
+static int tolua_get_ThisPlayer_ptr(lua_State* tolua_S)
+{
+ tolua_pushusertype(tolua_S,(void*)ThisPlayer,"CPlayer");
+ return 1;
+}
+
+/* set function: ThisPlayer */
+static int tolua_set_ThisPlayer_ptr(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,2,"CPlayer",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  ThisPlayer = ((CPlayer*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Ident of class  CUnitType */
+static int tolua_get_CUnitType_Ident(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
+#endif
+ tolua_pushstring(tolua_S,(const char*)self->Ident);
+ return 1;
+}
+
+/* set function: Ident of class  CUnitType */
+static int tolua_set_CUnitType_Ident(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
+ if (!tolua_isstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Ident = ((char*)  tolua_tostring(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Name of class  CUnitType */
+static int tolua_get_CUnitType_Name(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
+#endif
+ tolua_pushstring(tolua_S,(const char*)self->Name);
+ return 1;
+}
+
+/* set function: Name of class  CUnitType */
+static int tolua_set_CUnitType_Name(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
+ if (!tolua_isstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Name = ((char*)  tolua_tostring(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: MinAttackRange of class  CUnitType */
+static int tolua_get_CUnitType_MinAttackRange(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MinAttackRange'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MinAttackRange);
+ return 1;
+}
+
+/* set function: MinAttackRange of class  CUnitType */
+static int tolua_set_CUnitType_MinAttackRange(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MinAttackRange'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MinAttackRange = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: ClicksToExplode of class  CUnitType */
+static int tolua_get_CUnitType_ClicksToExplode(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ClicksToExplode'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->ClicksToExplode);
+ return 1;
+}
+
+/* set function: ClicksToExplode of class  CUnitType */
+static int tolua_set_CUnitType_ClicksToExplode(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ClicksToExplode'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ClicksToExplode = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Supply of class  CUnitType */
+static int tolua_get_CUnitType_Supply(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Supply'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Supply);
+ return 1;
+}
+
+/* set function: Supply of class  CUnitType */
+static int tolua_set_CUnitType_Supply(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Supply'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Supply = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Demand of class  CUnitType */
+static int tolua_get_CUnitType_Demand(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Demand'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Demand);
+ return 1;
+}
+
+/* set function: Demand of class  CUnitType */
+static int tolua_set_CUnitType_Demand(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Demand'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Demand = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: X of class  CUnit */
+static int tolua_get_CUnit_X(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'X'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->X);
+ return 1;
+}
+
+/* set function: X of class  CUnit */
+static int tolua_set_CUnit_X(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'X'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->X = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Y of class  CUnit */
+static int tolua_get_CUnit_Y(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Y'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Y);
+ return 1;
+}
+
+/* set function: Y of class  CUnit */
+static int tolua_set_CUnit_Y(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Y'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Y = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Type of class  CUnit */
+static int tolua_get_CUnit_Type_ptr(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Type'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->Type,"CUnitType");
+ return 1;
+}
+
+/* set function: Type of class  CUnit */
+static int tolua_set_CUnit_Type_ptr(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Type'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CUnitType",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Type = ((CUnitType*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: Player of class  CUnit */
+static int tolua_get_CUnit_Player_ptr(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Player'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->Player,"CPlayer");
+ return 1;
+}
+
+/* set function: Player of class  CUnit */
+static int tolua_set_CUnit_Player_ptr(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Player'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CPlayer",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Player = ((CPlayer*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+
 /* Open function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 {
@@ -1565,6 +1849,23 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"TotalKills",tolua_get_CPlayer_TotalKills,tolua_set_CPlayer_TotalKills);
  tolua_endmodule(tolua_S);
  tolua_array(tolua_S,"Players",tolua_get_stratagus_Players,tolua_set_stratagus_Players);
+ tolua_variable(tolua_S,"ThisPlayer",tolua_get_ThisPlayer_ptr,tolua_set_ThisPlayer_ptr);
+ tolua_cclass(tolua_S,"CUnitType","CUnitType","",NULL);
+ tolua_beginmodule(tolua_S,"CUnitType");
+ tolua_variable(tolua_S,"Ident",tolua_get_CUnitType_Ident,tolua_set_CUnitType_Ident);
+ tolua_variable(tolua_S,"Name",tolua_get_CUnitType_Name,tolua_set_CUnitType_Name);
+ tolua_variable(tolua_S,"MinAttackRange",tolua_get_CUnitType_MinAttackRange,tolua_set_CUnitType_MinAttackRange);
+ tolua_variable(tolua_S,"ClicksToExplode",tolua_get_CUnitType_ClicksToExplode,tolua_set_CUnitType_ClicksToExplode);
+ tolua_variable(tolua_S,"Supply",tolua_get_CUnitType_Supply,tolua_set_CUnitType_Supply);
+ tolua_variable(tolua_S,"Demand",tolua_get_CUnitType_Demand,tolua_set_CUnitType_Demand);
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CUnit","CUnit","",NULL);
+ tolua_beginmodule(tolua_S,"CUnit");
+ tolua_variable(tolua_S,"X",tolua_get_CUnit_X,tolua_set_CUnit_X);
+ tolua_variable(tolua_S,"Y",tolua_get_CUnit_Y,tolua_set_CUnit_Y);
+ tolua_variable(tolua_S,"Type",tolua_get_CUnit_Type_ptr,tolua_set_CUnit_Type_ptr);
+ tolua_variable(tolua_S,"Player",tolua_get_CUnit_Player_ptr,tolua_set_CUnit_Player_ptr);
+ tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;
 }

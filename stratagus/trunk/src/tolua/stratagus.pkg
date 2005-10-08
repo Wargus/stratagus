@@ -2,6 +2,8 @@ $#include "stratagus.h"
 $#include "ui.h"
 $#include "minimap.h"
 $#include "player.h"
+$#include "unittype.h"
+$#include "unit.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
@@ -25,4 +27,6 @@ $pfile "ui.pkg"
 $pfile "video.pkg"
 $pfile "upgrade.pkg"
 $pfile "player.pkg"
+$pfile "unittype.pkg"
+$pfile "unit.pkg"
 
