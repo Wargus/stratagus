@@ -224,70 +224,10 @@ void CIcon::SetIdent(const char *ident)
 }
 
 /**
-**  Parse icon definition.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineIcon(lua_State *l)
-{
-	const char *value;
-	const char *ident;
-	const char *filename;
-	int width;
-	int height;
-	int frame;
-
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	width = height = frame = 0;
-	ident = filename = NULL;
-
-	lua_pushnil(l);
-	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
-		if (!strcmp(value, "Name")) {
-			ident = LuaToString(l, -1);
-		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "File")) {
-			filename = LuaToString(l, -1);
-		} else if (!strcmp(value, "Frame")) {
-			frame = LuaToNumber(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-		lua_pop(l, 1);
-	}
-
-	Assert(ident);
-	Assert(!filename || (width && height));
-
-	CIcon *icon = CIcon::New(ident);
-	icon->Frame = frame;
-	if (filename) {
-		CGraphic::Free(icon->G);
-		icon->G = CGraphic::New(filename, width, height);
-	}
-
-	return 0;
-}
-
-/**
 **  Register CCL features for icons.
 */
 void IconCclRegister(void)
 {
-	lua_register(Lua, "DefineIcon", CclDefineIcon);
 }
 
 //@}
