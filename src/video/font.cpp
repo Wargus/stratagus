@@ -84,7 +84,7 @@ static std::vector<FontMapping> FontMappings;/// Font mappings
 **
 **  Define the font files, sizes.
 */
-static ColorFont Fonts[MaxFonts];
+static CFont Fonts[MaxFonts];
 
 static FontColorMapping *LastTextColor;    /// Last text color
 static FontColorMapping *DefaultTextColor; /// Default text color
@@ -271,7 +271,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 {
 	int w;
 	int widths;
-	const ColorFont *fp;
+	const CFont *fp;
 	FontColorMapping *rev;
 	char *color;
 	const char *p;
@@ -677,7 +677,7 @@ int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number)
 **
 **  @param fp  Font to calculate
 */
-static void FontMeasureWidths(ColorFont *fp)
+static void FontMeasureWidths(CFont *fp)
 {
 	// FIXME: todo.. can this be optimized?
 	int y;
