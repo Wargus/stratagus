@@ -49,7 +49,6 @@
 <a href="#DefineAllow">DefineAllow</a>
 <a href="#DefineDependency">DefineDependency</a>
 <a href="#DefineModifier">DefineModifier</a>
-<a href="#DefineUpgrade">DefineUpgrade</a>
 <a href="#GetDependency">GetDependency</a>
 <hr>
 <h2>Intro - Introduction to research functions and variables</h2>
@@ -266,35 +265,6 @@ DefineModifier("upgrade-sword1",
   {"apply-to", "unit-footman"}, {"apply-to", "unit-knight"}, {"apply-to", "unit-paladin"},
   {"apply-to", "unit-dwarves"}, {"apply-to", "unit-arthor-literios"}, {"apply-to", "unit-wise-man"},
   {"apply-to", "unit-man-of-light"}, {"apply-to", "unit-knight-rider"})
-</pre>
-
-<a name="DefineUpgrade"></a>
-<h3>DefineUpgrade("name", "icon", "icon-name", "costs", { costs, ... })</h3>
-
-Define an upgrade, how it is shown and how much it costs.
-
-
-<dl>
-<dt>name</dt>
-<dd>Name of the upgrade, used in buttons (define-button) and
-<a href="#DefineModifier">DefineModifier()</a>.
-</dd>
-<dt>"icon", "icon-name"</dt>
-<dd>Name of the upgrade icon, shown in buttons or during the research of the
-upgrade.
-<dt>"costs", {time, resource1, resource2, resource3, resource4, resource5, resource6}</dt>
-<dd>This are the costs for the upgrade. The costs (resource1-resource6) could
-be redefined, the default is: "costs", {time, gold, wood, oil, ore, stone, coal}.
-</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- This is the default definition of the first sword upgrade. The icon
--- "icon-sword1" is shown in buttons and during the upgrade. The upgrade costs
--- 200 frame cycles to research and 800 gold from the store.
-DefineUpgrade("upgrade-sword1", "icon", "icon-sword2",
-  "costs", {   200,   800,     0,     0,     0,     0,     0})
 </pre>
 
 <a name="GetDependency"></a>
