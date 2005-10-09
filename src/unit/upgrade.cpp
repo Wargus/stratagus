@@ -349,69 +349,6 @@ static int CclDefineModifier(lua_State *l)
 }
 
 /**
-**  Define a new upgrade.
-**
-**  @param l  List defining the upgrade.
-*/
-static int CclDefineUpgrade(lua_State *l)
-{
-	const char *value;
-	const char *icon;
-	const char *ident;
-	int costs[MaxCosts];
-	int n;
-	int j;
-	int args;
-	int k;
-
-	args = lua_gettop(l);
-	k = 0;
-
-	// Identifier
-	ident = LuaToString(l, k + 1);
-	++k;
-
-	icon = NULL;
-	memset(costs, 0, sizeof(costs));
-
-	for (; k < args; ++k) {
-		value = LuaToString(l, k + 1);
-		++k;
-		if (!strcmp(value, "icon")) {
-			// Icon
-			icon = LuaToString(l, k + 1);
-		} else if (!strcmp(value, "costs")) {
-			// Costs
-			if (!lua_istable(l, k + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			n = luaL_getn(l, k + 1);
-			if (n > MaxCosts) {
-				LuaError(l, "%s: Wrong vector length" _C_ ident);
-			}
-			for (j = 0; j < n; ++j) {
-				lua_rawgeti(l, k + 1, j + 1);
-				costs[j] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
-			while (j < MaxCosts) {
-				costs[j++] = 0;
-			}
-		} else {
-			LuaError(l, "%s: Wrong tag `%s'" _C_ ident _C_ value);
-		}
-	}
-
-	CUpgrade *upgrade = CUpgrade::New(ident);
-	memcpy(upgrade->Costs, costs, sizeof(upgrade->Costs));
-	if (icon) {
-		upgrade->Icon = IconByIdent(icon);
-	}
-
-	return 0;
-}
-
-/**
 **  Define which units are allowed and how much.
 */
 static int CclDefineUnitAllow(lua_State *l)
@@ -495,7 +432,6 @@ static int CclDefineAllow(lua_State *l)
 void UpgradesCclRegister(void)
 {
 	lua_register(Lua, "DefineModifier", CclDefineModifier);
-	lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
 	lua_register(Lua, "DefineAllow", CclDefineAllow);
 	lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
 }
