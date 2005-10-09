@@ -38,30 +38,28 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class ColorFont font.h
+**  @class CFont font.h
 **
 **  \#include "font.h"
-**
-**  typedef struct _color_font_ ColorFont;
 **
 **  Defines the fonts used in the Stratagus engine. We support
 **  proportional multicolor fonts of 9 colors.
 **  (Currently the fonts aren't packed)
 **
-**  ColorFont::Width
+**  CFont::Width
 **
 **    Maximal width of a character in pixels.
 **
-**  ColorFont::Height
+**  CFont::Height
 **
 **    Height of all characters in pixels.
 **
-**  ColorFont::CharWidth[]
+**  CFont::CharWidth[]
 **
 **    The width of each font glyph in pixels. The index 0 is the
 **    width of the SPACE (' ', 0x20).
 **
-**  ColorFont::G
+**  CFont::G
 **
 **    Contains the graphics of the font, Only 9 colors are supported.
 */
@@ -77,8 +75,13 @@ class CGraphic;
 ----------------------------------------------------------------------------*/
 
 	/// Color font definition
-class ColorFont {
+class CFont {
 public:
+	CFont() : Width(0), Height(0), G(NULL)
+	{
+		memset(CharWidth, 0, sizeof(CharWidth));
+	}
+
 	int  Width;           /// Max width of characters in file
 	int  Height;          /// Max height of characters in file
 	char CharWidth[208];  /// Real font width (starting with ' ')
