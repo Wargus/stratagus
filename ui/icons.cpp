@@ -86,6 +86,8 @@ CIcon::~CIcon()
 **  Create a new icon
 **
 **  @param ident  Icon identifier
+**
+**  @return       New icon
 */
 CIcon *CIcon::New(const char *ident)
 {
@@ -104,6 +106,8 @@ CIcon *CIcon::New(const char *ident)
 **  Get an icon
 **
 **  @param ident  Icon identifier
+**
+**  @return       The icon
 */
 CIcon *CIcon::Get(const char *ident)
 {
@@ -145,9 +149,8 @@ void LoadIcons(void)
 */
 void CleanIcons(void)
 {
-	for (std::vector<CIcon *>::iterator i = AllIcons.begin();
-		i != AllIcons.end();
-		++i) {
+	std::vector<CIcon *>::iterator i;
+	for (i = AllIcons.begin(); i != AllIcons.end(); ++i) {
 		delete *i;
 	}
 	AllIcons.clear();

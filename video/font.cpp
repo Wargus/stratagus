@@ -828,66 +828,51 @@ const char *FontName(CFont *font)
 	return s;
 }
 
+/**
+**  Create a new font
+**
+**  @param ident  Font identifier
+**  @param g      Graphic
+**
+**  @return       New font
+*/
+CFont *CFont::New(const char *ident, CGraphic *g)
+{
+	CFont *font = Fonts[ident];
+	if (font) {
+		if (font->G != g) {
+			CGraphic::Free(font->G);
+		}
+		font->G = g;
+	} else {
+		font = new CFont;
+		font->G = g;
+		AllFonts.push_back(font);
+		Fonts[ident] = font;
+		FontNames[font] = ident;
+	}
+	return font;
+}
+
+/**
+**  Get a font
+**
+**  @param ident  Font identifier
+**
+**  @return       The font
+*/
+CFont *CFont::Get(const char *ident)
+{
+	CFont *font = Fonts[ident];
+	if (!font) {
+		DebugPrint("font not found: %s" _C_ ident);
+	}
+	return font;
+}
+
 /*----------------------------------------------------------------------------
 --  CCL
 ----------------------------------------------------------------------------*/
-
-/**
-**  Define the used fonts.
-*/
-static int CclDefineFont(lua_State *l)
-{
-	const char *value;
-	int i;
-	int w;
-	int h;
-	const char *file;
-	const char *str;
-	CFont *font;
-
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	i = -1;
-	w = h = 0;
-	file = NULL;
-	lua_pushnil(l);
-	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
-		if (!strcmp(value, "Name")) {
-			str = LuaToString(l, -1);
-			i = 0;
-			if (!(font = Fonts[str])) {
-				font = new CFont;
-				AllFonts.push_back(font);
-				Fonts[str] = font;
-				FontNames[font] = str;
-			}
-		} else if (!strcmp(value, "File")) {
-			file = LuaToString(l, -1);
-		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			w = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			h = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-		lua_pop(l, 1);
-	}
-	if (i == -1 || !w || !h || !file) {
-		LuaError(l, "missing argument");
-	}
-	font->G = CGraphic::New(file, w, h);
-
-	return 0;
-}
 
 /**
 **  Define a font color.
@@ -951,7 +936,6 @@ static int CclDefineFontColor(lua_State *l)
 */
 void FontsCclRegister(void)
 {
-	lua_register(Lua, "DefineFont", CclDefineFont);
 	lua_register(Lua, "DefineFontColor", CclDefineFontColor);
 }
 
