@@ -201,7 +201,7 @@ struct _NumberDesc_ {
 		} UnitStat;
 		struct {
 			StringDesc* String; /// String.
-			int Font;           /// Font.
+			CFont *Font;        /// Font.
 		} VideoTextLength;
 		struct {
 			StringDesc* String; /// String.
@@ -250,7 +250,7 @@ struct _StringDesc_ {
 			StringDesc* String;  /// Original string.
 			NumberDesc* Line;    /// Line number.
 			NumberDesc* MaxLen;  /// Max lenght of line.
-			int Font;    /// Font to consider (else (-1) consider just char).
+			CFont *Font;         /// Font to consider (else (-1) consider just char).
 		} Line; /// For specific line.
 		ES_GameInfo GameInfoType;
 	} D;

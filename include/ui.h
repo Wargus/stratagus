@@ -99,7 +99,7 @@ public:
 
 	int Width;                      /// Button width
 	int Height;                     /// Button height
-	int Font;                       /// Font
+	CFont *Font;                    /// Font
 	char *TextNormalColor;          /// Normal text color
 	char *TextReverseColor;         /// Reverse text color
 	TextAlignment TextAlign;        /// Text alignment
@@ -120,7 +120,7 @@ public:
 
 	int Width;                      /// Checkbox width
 	int Height;                     /// Checkbox height
-	int Font;                       /// Font
+	CFont *Font;                    /// Font
 	char *TextNormalColor;          /// Normal text color
 	char *TextReverseColor;         /// Reverse text color
 	TextAlignment TextAlign;        /// Text alignment
@@ -281,7 +281,8 @@ public:
 	CContentType() : PosX(0), PosY(0), Condition(NULL) {};
 	virtual ~CContentType() { delete Condition; };
 
-	virtual void Draw(const CUnit *unit, int defaultfont) const = 0;  /// Tell how show the variable Index.
+		/// Tell how show the variable Index.
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const = 0;
 
 	int PosX;             /// X coordinate where to display.
 	int PosY;             /// Y coordinate where to display.
@@ -294,15 +295,17 @@ public:
 */
 class CContentTypeText : public CContentType {
 public:
-	CContentTypeText() : Text(NULL), Font(-1), Centered(0), Index(-1), Component(VariableValue), ShowName(0), Stat(0) {};
+	CContentTypeText() : Text(NULL), Font(NULL), Centered(0), Index(-1),
+		Component(VariableValue), ShowName(0), Stat(0) {};
 	virtual ~CContentTypeText() {
 		FreeStringDesc(Text);
 		delete Text;
 	};
-	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
 	StringDesc *Text;            /// Text to display.
-	int Font;                    /// Font to use.
+	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
 	int Index;                   /// Index of the variable to show, -1 if not.
 	EnumVariable Component;      /// Component of the variable.
@@ -315,12 +318,14 @@ public:
 */
 class CContentTypeFormattedText : public CContentType {
 public:
-	CContentTypeFormattedText() : Format(NULL), Font(-1), Centered(0), Index(-1), Component(VariableValue) {};
+	CContentTypeFormattedText() : Format(NULL), Font(NULL), Centered(0),
+		Index(-1), Component(VariableValue) {};
 	virtual ~CContentTypeFormattedText() { delete [] Format;};
-	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
 	char *Format;                /// Text to display
-	int Font;                    /// Font to use.
+	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
 	int Index;                   /// Index of the variable to show.
 	EnumVariable Component;      /// Component of the variable.
@@ -331,13 +336,14 @@ public:
 */
 class CContentTypeFormattedText2 : public CContentType {
 public:
-	CContentTypeFormattedText2() : Format(NULL), Font(-1), Centered(0),
-									Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {};
+	CContentTypeFormattedText2() : Format(NULL), Font(NULL), Centered(0),
+		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {};
 	virtual ~CContentTypeFormattedText2() { delete [] Format;};
-	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
 	char *Format;                /// Text to display
-	int Font;                    /// Font to use.
+	CFont *Font;                 /// Font to use.
 	char Centered;               /// if true, center the display.
 	int Index1;                  /// Index of the variable1 to show.
 	EnumVariable Component1;     /// Component of the variable1.
@@ -350,7 +356,7 @@ public:
 */
 class CContentTypeIcon : public CContentType {
 public:
-	virtual void Draw(const CUnit *unit, int defaultfont) const;
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
 	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
 };
@@ -361,7 +367,8 @@ public:
 class CContentTypeLifeBar : public CContentType {
 public:
 	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {};
-	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
 	int Index;           /// Index of the variable to show, -1 if not.
 	int Width;           /// Width of the bar.
@@ -378,7 +385,8 @@ public:
 class CContentTypeCompleteBar : public CContentType {
 public:
 	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0) {};
-	virtual void Draw(const CUnit *unit, int defaultfont) const;
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
 	int Index;           /// Index of the variable to show, -1 if not.
 	int Width;           /// Width of the bar.
@@ -412,7 +420,7 @@ public:
 	char *Name;            /// Ident of the panel.
 	int PosX;              /// X coordinate of the panel.
 	int PosY;              /// Y coordinate of the panel.
-	int DefaultFont;       /// Default font for content.
+	CFont *DefaultFont;    /// Default font for content.
 
 	std::vector<CContentType *>Contents; /// Array of contents to display.
 
@@ -482,7 +490,7 @@ public:
 	int W;
 	int TextX;
 	int TextY;
-	int Font;
+	CFont *Font;
 
 private:
 	char StatusLine[256];
@@ -555,19 +563,19 @@ public:
 	Button *SingleSelectedButton;       /// Button for single selected unit
 
 	std::vector<Button> SelectedButtons;/// Selected buttons
-	int MaxSelectedFont;                /// Font type to use
+	CFont *MaxSelectedFont;             /// Font type to use
 	int MaxSelectedTextX;               /// position to place '+#' text
 	int MaxSelectedTextY;               /// if > maximum units selected
 
 	Button *SingleTrainingButton;       /// Button for single training
 	char *SingleTrainingText;           /// Text for single training
-	int SingleTrainingFont;             /// Font for single traning
+	CFont *SingleTrainingFont;          /// Font for single traning
 	int SingleTrainingTextX;            /// X text position single training
 	int SingleTrainingTextY;            /// Y text position single training
 
 	std::vector<Button> TrainingButtons;/// Training buttons
 	char *TrainingText;                 /// Multiple Training Text
-	int TrainingFont;                   /// Multiple Training Font
+	CFont *TrainingFont;                /// Multiple Training Font
 	int TrainingTextX;                  /// Multiple Training X Text position
 	int TrainingTextY;                  /// Multiple Training Y Text position
 

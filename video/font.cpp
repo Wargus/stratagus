@@ -40,7 +40,9 @@
 
 #include "stratagus.h"
 
+#include <string>
 #include <vector>
+#include <map>
 
 #include "video.h"
 #include "font.h"
@@ -68,23 +70,15 @@ static FontColorMapping *FontColor;         /// Current font color
 
 static std::vector<FontColorMapping> FontColorMappings; /// Font color mappings
 
-	/// Font mapping
-class FontMapping {
-public:
-	FontMapping() : Ident(NULL), Font(0) {}
-
-	char *Ident;                            /// Font name
-	int Font;                               /// Ident number
-};
-
-static std::vector<FontMapping> FontMappings;/// Font mappings
+static std::map<std::string, CFont *> Fonts;    /// Font mappings
+static std::map<CFont *, std::string> FontNames;/// Font name mappings
 
 /**
 **  Fonts table
 **
 **  Define the font files, sizes.
 */
-static CFont Fonts[MaxFonts];
+static std::vector<CFont *> AllFonts;
 
 static FontColorMapping *LastTextColor;    /// Last text color
 static FontColorMapping *DefaultTextColor; /// Default text color
@@ -95,6 +89,12 @@ static char *DefaultReverseColorIndex;     /// Default reverse color index
 #ifdef USE_OPENGL
 static CGraphic **FontColorGraphics[MaxFonts];   /// Font color graphics
 #endif
+
+CFont *SmallFont;       /// Small font used in stats
+CFont *GameFont;        /// Normal font used in game
+CFont *LargeFont;       /// Large font used in menus
+CFont *SmallTitleFont;  /// Small font used in episoden titles
+CFont *LargeTitleFont;  /// Large font used in episoden titles
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -183,14 +183,14 @@ void GetDefaultTextColors(char **normalp, char **reversep)
 **
 **  @return      The length in pixels of the text.
 */
-int VideoTextLength(unsigned font, const char *text)
+int VideoTextLength(CFont *font, const char *text)
 {
 	int width;
 	const char *s;
 	const char *widths;
 	int isformat;
 
-	widths = Fonts[font].CharWidth;
+	widths = font->CharWidth;
 	isformat = 0;
 	for (width = 0, s = text; *s; ++s) {
 		if (*s == '~') {
@@ -223,9 +223,9 @@ int VideoTextLength(unsigned font, const char *text)
 **
 **  @return      The height of the font.
 */
-int VideoTextHeight(unsigned font)
+int VideoTextHeight(CFont *font)
 {
-	return Fonts[font].Height;
+	return font->G->Height;
 }
 
 /**
@@ -266,12 +266,11 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 **
 **  @return      The length of the printed text.
 */
-static int DoDrawText(int x, int y, unsigned font, const char *text,
+static int DoDrawText(int x, int y, CFont *font, const char *text,
 	int clip)
 {
 	int w;
 	int widths;
-	const CFont *fp;
 	FontColorMapping *rev;
 	char *color;
 	const char *p;
@@ -286,9 +285,8 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 		DrawChar = VideoDrawChar;
 	}
 
-	fp = Fonts + font;
 #ifndef USE_OPENGL
-	g = fp->G;
+	g = font->G;
 #else
 	g = FontColorGraphics[font][FontColor->Index];
 #endif
@@ -350,14 +348,14 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 		c = *(unsigned char *)text - 32;
 		Assert(c >= 0);
 
-		ipr = fp->G->GraphicWidth / fp->Width;
-		if (c >= 0 && c < ipr * fp->G->GraphicHeight / fp->Height) {
-			w = fp->CharWidth[c];
-			DrawChar(g, (c % ipr) * fp->Width, (c / ipr) * fp->Height,
-				w, fp->Height, x + widths, y);
+		ipr = font->G->GraphicWidth / font->G->Width;
+		if (c >= 0 && c < ipr * font->G->GraphicHeight / font->G->Height) {
+			w = font->CharWidth[c];
+			DrawChar(g, (c % ipr) * font->G->Width, (c / ipr) * font->G->Height,
+				w, font->G->Height, x + widths, y);
 		} else {
-			w = fp->CharWidth[0];
-			DrawChar(g, 0, 0, w, fp->Height, x + widths, y);
+			w = font->CharWidth[0];
+			DrawChar(g, 0, 0, w, font->G->Height, x + widths, y);
 		}
 		widths += w + 1;
 		if (rev) {
@@ -389,7 +387,7 @@ static int DoDrawText(int x, int y, unsigned font, const char *text,
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawText(int x, int y, unsigned font, const char *text)
+int VideoDrawText(int x, int y, CFont *font, const char *text)
 {
 	return DoDrawText(x, y, font, text, 0);
 }
@@ -406,7 +404,7 @@ int VideoDrawText(int x, int y, unsigned font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawTextClip(int x, int y, unsigned font, const char *text)
+int VideoDrawTextClip(int x, int y, CFont *font, const char *text)
 {
 	return DoDrawText(x, y, font, text, 1);
 }
@@ -423,7 +421,7 @@ int VideoDrawTextClip(int x, int y, unsigned font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawReverseText(int x, int y, unsigned font, const char *text)
+int VideoDrawReverseText(int x, int y, CFont *font, const char *text)
 {
 	int w;
 
@@ -446,7 +444,7 @@ int VideoDrawReverseText(int x, int y, unsigned font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawReverseTextClip(int x, int y, unsigned font, const char *text)
+int VideoDrawReverseTextClip(int x, int y, CFont *font, const char *text)
 {
 	int w;
 
@@ -469,7 +467,7 @@ int VideoDrawReverseTextClip(int x, int y, unsigned font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawTextCentered(int x, int y, unsigned font, const char *text)
+int VideoDrawTextCentered(int x, int y, CFont *font, const char *text)
 {
 	int dx;
 
@@ -513,20 +511,19 @@ static void FormatNumber(int number, char *buf)
 **
 **  @return computed value.
 */
-static char *strchrlen(char *s, char c, int maxlen, int font)
+static char *strchrlen(char *s, char c, int maxlen, CFont *font)
 {
 	char *res;
 
 	Assert(s);
 	Assert(0 <= maxlen);
-	Assert(font == -1 || 0 <= font);
 
 	res = strchr(s, c);
 
 	if (!maxlen) {
 		return res;
 	}
-	if (font == -1 &&
+	if (!font &&
 			(s + maxlen < res || (!res && strlen(s) >= (unsigned)maxlen))) {
 		c = s[maxlen];
 		s[maxlen] = '\0';
@@ -536,8 +533,8 @@ static char *strchrlen(char *s, char c, int maxlen, int font)
 			fprintf(stderr, "line too long: \"%s\"\n", s);
 			res = s + maxlen;
 		}
-	} else if (font != -1) {
-		char* end;
+	} else if (font) {
+		char *end;
 
 		if (!res) {
 			res = s + strlen(s);
@@ -571,7 +568,7 @@ static char *strchrlen(char *s, char c, int maxlen, int font)
 **
 **  @return computed value.
 */
-char *GetLineFont(int line, char *s, int maxlen, int font)
+char *GetLineFont(int line, char *s, int maxlen, CFont *font)
 {
 	int i;
 	char *res;
@@ -580,7 +577,6 @@ char *GetLineFont(int line, char *s, int maxlen, int font)
 	Assert(0 < line);
 	Assert(s);
 	Assert(0 <= maxlen);
-	Assert(font == -1 || 0 <= font);
 
 	res = s;
 	for (i = 1; i < line; ++i) {
@@ -610,7 +606,7 @@ char *GetLineFont(int line, char *s, int maxlen, int font)
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawNumber(int x, int y, unsigned font, int number)
+int VideoDrawNumber(int x, int y, CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -628,7 +624,7 @@ int VideoDrawNumber(int x, int y, unsigned font, int number)
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawNumberClip(int x, int y, unsigned font, int number)
+int VideoDrawNumberClip(int x, int y, CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -646,7 +642,7 @@ int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
+int VideoDrawReverseNumber(int x, int y, CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -664,7 +660,7 @@ int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number)
+int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -688,23 +684,23 @@ static void FontMeasureWidths(CFont *fp)
 	int ipr;
 
 	memset(fp->CharWidth, 0, sizeof(fp->CharWidth));
-	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
+	fp->CharWidth[0] = fp->G->Width / 2;  // a reasonable value for SPACE
 	ckey = fp->G->Surface->format->colorkey;
-	ipr = fp->G->Surface->w / fp->Width;
+	ipr = fp->G->Surface->w / fp->G->Width;
 
 	SDL_LockSurface(fp->G->Surface);
 	for (y = 1; y < 207; ++y) {
 		sp = (const unsigned char*)fp->G->Surface->pixels +
-			(y / ipr) * fp->G->Surface->pitch * fp->Height +
-			(y % ipr) * fp->Width - 1;
-		gp = sp + fp->G->Surface->pitch * fp->Height;
+			(y / ipr) * fp->G->Surface->pitch * fp->G->Height +
+			(y % ipr) * fp->G->Width - 1;
+		gp = sp + fp->G->Surface->pitch * fp->G->Height;
 		// Bail out if no letters left
 		if (gp >= ((const unsigned char*)fp->G->Surface->pixels +
-				fp->G->Surface->pitch * fp->G->Height)) {
+				fp->G->Surface->pitch * fp->G->GraphicHeight)) {
 			break;
 		}
 		while (sp < gp) {
-			lp = sp + fp->Width;
+			lp = sp + fp->G->Width;
 			for (; sp < lp; --lp) {
 				if (*lp != ckey) {
 					if (lp - sp > fp->CharWidth[y]) {  // max width
@@ -756,17 +752,25 @@ static void MakeFontColorTextures(CGraphic *g, int font)
 */
 void LoadFonts(void)
 {
-	for (unsigned i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
-		if (Fonts[i].G) {
-			ShowLoadProgress("Fonts %s", Fonts[i].G->File);
-			DebugPrint("Font %s\n" _C_ Fonts[i].G->File);
-			Fonts[i].G->Load();
-			FontMeasureWidths(Fonts + i);
+	std::vector<CFont>::size_type i;
+	for (i = 0; i < AllFonts.size(); ++i) {
+		if (AllFonts[i]->G) {
+			ShowLoadProgress("Fonts %s", AllFonts[i]->G->File);
+			DebugPrint("Font %s\n" _C_ AllFonts[i]->G->File);
+			AllFonts[i]->G->Load();
+			FontMeasureWidths(AllFonts[i]);
 #ifdef USE_OPENGL
-			MakeFontColorTextures(Fonts[i].G, i);
+			MakeFontColorTextures(AllFonts[i]->G, i);
 #endif
 		}
 	}
+
+	// TODO: remove this
+	SmallFont = FontByIdent("small");
+	GameFont = FontByIdent("game");
+	LargeFont = FontByIdent("large");
+	SmallTitleFont = FontByIdent("small-title");
+	LargeTitleFont = FontByIdent("large-title");
 }
 
 #ifdef USE_OPENGL
@@ -775,14 +779,15 @@ void LoadFonts(void)
 */
 void ReloadFonts(void)
 {
-	for (unsigned i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
-		if (Fonts[i].G) {
+	std::vector<CFont>::size_type i;
+	for (i = 0; i < AllFonts.size(); ++i) {
+		if (AllFonts[i]->G) {
 			for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
 				delete FontColorGraphics[i][j];
 			}
 			delete[] FontColorGraphics[i];
 			FontColorGraphics[i] = NULL;
-			MakeFontColorTextures(Fonts[i].G, i);
+			MakeFontColorTextures(AllFonts[i].G, i);
 		}
 	}
 }
@@ -795,18 +800,14 @@ void ReloadFonts(void)
 **
 **  @return       Integer as font identifier.
 */
-int FontByIdent(const char *ident)
+CFont *FontByIdent(const char *ident)
 {
-	std::vector<FontMapping>::iterator i;
-
-	for (i = FontMappings.begin(); i != FontMappings.end(); ++i) {
-		if (!strcmp((*i).Ident, ident)) {
-			return (*i).Font;
-		}
+	CFont *font = Fonts[ident];
+	if (!font) {
+		fprintf(stderr, "Font not found: '%s'", ident);
+		ExitFatal(1);
 	}
-	fprintf(stderr, "Font not found: '%s'", ident);
-	ExitFatal(1);
-	return 0;
+	return font;
 }
 
 /**
@@ -816,14 +817,15 @@ int FontByIdent(const char *ident)
 **
 **  @return      Name of the font.
 */
-const char *FontName(int font)
+const char *FontName(CFont *font)
 {
-	if (font >= (int)FontMappings.size()) {
+	const char *s = FontNames[font].c_str();
+	if (!*s) {
 		fprintf(stderr, "Font not found: %d", font);
 		ExitFatal(1);
 	}
 
-	return FontMappings[font].Ident;
+	return s;
 }
 
 /*----------------------------------------------------------------------------
@@ -841,8 +843,7 @@ static int CclDefineFont(lua_State *l)
 	int h;
 	const char *file;
 	const char *str;
-	std::vector<FontMapping>::iterator it;
-
+	CFont *font;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -857,17 +858,11 @@ static int CclDefineFont(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			str = LuaToString(l, -1);
 			i = 0;
-			for (it = FontMappings.begin(); it != FontMappings.end(); ++it) {
-				if (!strcmp((*it).Ident, str)) {
-					break;
-				}
-				++i;
-			}
-			if (it == FontMappings.end()) {
-				FontMapping f;
-				f.Ident = new_strdup(str);
-				f.Font = i;
-				FontMappings.push_back(f);
+			if (!(font = Fonts[str])) {
+				font = new CFont;
+				AllFonts.push_back(font);
+				Fonts[str] = font;
+				FontNames[font] = str;
 			}
 		} else if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
@@ -889,9 +884,7 @@ static int CclDefineFont(lua_State *l)
 	if (i == -1 || !w || !h || !file) {
 		LuaError(l, "missing argument");
 	}
-	Fonts[i].G = CGraphic::New(file);
-	Fonts[i].Width = w;
-	Fonts[i].Height = h;
+	font->G = CGraphic::New(file, w, h);
 
 	return 0;
 }
@@ -969,9 +962,10 @@ void CleanFonts(void)
 {
 	int i;
 
-	for (i = 0; i < (int)(sizeof(Fonts) / sizeof(*Fonts)); ++i) {
-		CGraphic::Free(Fonts[i].G);
-		Fonts[i].G = NULL;
+	for (i = 0; i < (int)AllFonts.size(); ++i) {
+		CGraphic::Free(AllFonts[i]->G);
+		AllFonts[i]->G = NULL;
+		delete AllFonts[i];
 
 #ifdef USE_OPENGL
 		for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
@@ -986,11 +980,20 @@ void CleanFonts(void)
 		FontColorGraphics[i] = NULL;
 #endif
 	}
+	AllFonts.clear();
+	Fonts.clear();
+	FontNames.clear();
 
 	for (i = 0; i < (int)FontColorMappings.size(); ++i) {
 		delete[] FontColorMappings[i].ColorName;
 	}
 	FontColorMappings.clear();
+
+	SmallFont = NULL;
+	GameFont = NULL;
+	LargeFont = NULL;
+	SmallTitleFont = NULL;
+	LargeTitleFont = NULL;
 }
 
 /**
@@ -1000,9 +1003,9 @@ void CleanFonts(void)
 **
 **  @return      True if loaded, false otherwise.
 */
-int IsFontLoaded(unsigned font)
+int IsFontLoaded(CFont *font)
 {
-	return Fonts[font].G && Fonts[font].G->Loaded();
+	return font && font->G && font->G->Loaded();
 }
 
 //@}

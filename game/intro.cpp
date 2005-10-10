@@ -671,7 +671,7 @@ static void PictureDrawText(CampaignChapter *chapter, ChapterTextLines *chlines)
 	TextLines *lines;
 	int x;
 	int y;
-	int (*draw)(int, int, unsigned, const char *);
+	int (*draw)(int, int, CFont *, const char *);
 
 	text = chapter->Data.Picture.Text;
 	while (text) {
@@ -846,7 +846,7 @@ static int GameStatsDrawFunc(int frame)
 	int c;
 	char buf[50];
 	int line_spacing;
-	int names_font;
+	CFont *names_font;
 	int top_offset;
 	int bottom_offset;
 	int description_offset;

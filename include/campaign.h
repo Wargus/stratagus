@@ -40,6 +40,7 @@
 ----------------------------------------------------------------------------*/
 
 class CFile;
+class CFont;
 
 /**
 **  Possible outcomes of the game.
@@ -79,14 +80,14 @@ public:
 	ChapterPictureText() : Font(0), X(0), Y(0), Width(0), Height(0),
 		Align(PictureTextAlignLeft), Text(NULL), Next(NULL) {}
 
-	int                  Font;            /// Font
-	int                  X;               /// X position
-	int                  Y;               /// Y position
-	int                  Width;           /// Width
-	int                  Height;          /// Height
-	PictureTextAlignment Align;           /// Alignment
-	char                *Text;            /// Text
-	ChapterPictureText  *Next;            /// Next
+	CFont *Font;                     /// Font
+	int X;                           /// X position
+	int Y;                           /// Y position
+	int Width;                       /// Width
+	int Height;                      /// Height
+	PictureTextAlignment Align;      /// Alignment
+	char *Text;                      /// Text
+	ChapterPictureText *Next;        /// Next
 };
 
 /**

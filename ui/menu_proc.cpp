@@ -110,7 +110,7 @@ Menu *FindMenu(const char *menu_id)
 **  @param font   Font to use.
 **  @param flag   flag of text.
 */
-static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int flag)
+static void DrawMenuText(const MenuitemText* mit, int x, int y, CFont *font, int flag)
 {
 	char* oldnc;
 	char* oldrc;

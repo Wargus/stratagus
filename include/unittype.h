@@ -718,11 +718,11 @@ public:
 class CDecoVarText : public CDecoVar
 {
 public:
-	CDecoVarText() : Font(-1) {};
+	CDecoVarText() : Font(NULL) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnit *unit) const;
 
-	int Font;                   /// Font to use to display value.
+	CFont *Font;                   /// Font to use to display value.
 // FIXME : Add Color, format
 };
 

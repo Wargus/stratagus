@@ -60,7 +60,7 @@ char *DamageMissile;             /// FIXME:docu
 
 typedef struct _info_text_ {
 	char *Text;                  /// FIXME:docu
-	int Font;                    /// FIXME:docu
+	CFont *Font;                 /// FIXME:docu
 	int X;                       /// FIXME:docu
 	int Y;                       /// FIXME:docu
 } InfoText;                      /// FIXME:docu
@@ -554,9 +554,9 @@ static MenuButtonId scm2buttonid(lua_State* l, const char* value)
 **  @param l     Lua state.
 **  @param text  Pointer to decoded text structure, returns data
 */
-static void CclParseInfoText(lua_State* l, InfoText* text)
+static void CclParseInfoText(lua_State *l, InfoText *text)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
