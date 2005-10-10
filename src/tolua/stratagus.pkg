@@ -4,6 +4,8 @@ $#include "minimap.h"
 $#include "player.h"
 $#include "unittype.h"
 $#include "unit.h"
+$#include "video.h"
+$#include "font.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
@@ -17,6 +19,10 @@ setmetatable(Icons, mt)
 mt = { __index = function(t, key) return CUpgrade:Get(key) end }
 Upgrades = {}
 setmetatable(Upgrades, mt)
+
+mt = { __index = function(t, key) return CFont:Get(key) end }
+Fonts = {}
+setmetatable(Fonts, mt)
 $]
 
 #define MaxCosts 7
@@ -26,6 +32,7 @@ $]
 $pfile "minimap.pkg"
 $pfile "ui.pkg"
 $pfile "video.pkg"
+$pfile "font.pkg"
 $pfile "upgrade.pkg"
 $pfile "player.pkg"
 $pfile "unittype.pkg"
