@@ -672,7 +672,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					lua_pushnil(l);
 				} else if (!strcmp(key, "Font")) {
 					res->D.VideoTextLength.Font = FontByIdent(LuaToString(l, -1));
-					if (res->D.VideoTextLength.Font == -1) {
+					if (!res->D.VideoTextLength.Font) {
 						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
 					}
 				} else {
@@ -839,11 +839,11 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				lua_rawgeti(l, -1, 3); // Lenght.
 				res->D.Line.MaxLen = CclParseNumberDesc(l);
 			}
-			res->D.Line.Font = -1;
+			res->D.Line.Font = NULL;
 			if (luaL_getn(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
 				res->D.Line.Font = FontByIdent(LuaToString(l, -1));
-				if (res->D.Line.Font == -1) {
+				if (!res->D.Line.Font) {
 					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
 				}
 				lua_pop(l, 1); // font name.
@@ -1102,7 +1102,7 @@ char *EvalString(const StringDesc *s)
 			} else {
 				int line;
 				int maxlen;
-				int font;
+				CFont *font;
 
 				line = EvalNumber(s->D.Line.Line);
 				if (line <= 0) {

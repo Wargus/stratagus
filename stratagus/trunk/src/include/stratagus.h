@@ -233,6 +233,8 @@ extern char NameLine[];
 --  stratagus.c
 ----------------------------------------------------------------------------*/
 
+class CFont;
+
 enum {
 	TitleFlagCenter = 1 << 0,  /// Center Text
 };
@@ -242,7 +244,7 @@ public:
 	TitleScreenLabel() : Text(NULL), Font(0), Xofs(0), Yofs(0), Flags(0) {}
 
 	char *Text;
-	int Font;
+	CFont *Font;
 	int Xofs;
 	int Yofs;
 	int Flags;

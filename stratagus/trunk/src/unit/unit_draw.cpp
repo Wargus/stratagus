@@ -844,16 +844,13 @@ void CDecoVarBar::Draw(int x, int y, const CUnit *unit) const
 */
 void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
 {
-	int font;  // font to display the value.
-
-	font = this->Font;
 	if (this->IsCenteredInX) {
 		x -= 2; // VideoTextLength(GameFont, buf) / 2, with buf = str(Value)
 	}
 	if (this->IsCenteredInY) {
-		y -= VideoTextHeight(font) / 2;
+		y -= VideoTextHeight(this->Font) / 2;
 	}
-	VideoDrawNumberClip(x, y, font, unit->Variable[this->Index].Value);
+	VideoDrawNumberClip(x, y, this->Font, unit->Variable[this->Index].Value);
 }
 
 /**

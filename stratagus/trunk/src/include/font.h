@@ -4,8 +4,8 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________                            ______________________
-//                        T H E   W A R   B  E G I N S
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name font.h - The font headerfile. */
@@ -77,13 +77,11 @@ class CGraphic;
 	/// Color font definition
 class CFont {
 public:
-	CFont() : Width(0), Height(0), G(NULL)
+	CFont() : G(NULL)
 	{
 		memset(CharWidth, 0, sizeof(CharWidth));
 	}
 
-	int  Width;           /// Max width of characters in file
-	int  Height;          /// Max height of characters in file
 	char CharWidth[208];  /// Real font width (starting with ' ')
 
 // --- FILLED UP ---
@@ -95,13 +93,11 @@ public:
 **  Font selector for the font functions.
 **  @todo should be removed
 */
-enum {
-	SmallFont,       /// Small font used in stats
-	GameFont,        /// Normal font used in game
-	LargeFont,       /// Large font used in menus
-	SmallTitleFont,  /// Small font used in episoden titles
-	LargeTitleFont,  /// Large font used in episoden titles
-};
+extern CFont *SmallFont;       /// Small font used in stats
+extern CFont *GameFont;        /// Normal font used in game
+extern CFont *LargeFont;       /// Large font used in menus
+extern CFont *SmallTitleFont;  /// Small font used in episoden titles
+extern CFont *LargeTitleFont;  /// Large font used in episoden titles
 
 #define MaxFonts 15  /// Number of fonts supported
 
@@ -127,29 +123,29 @@ extern void SetDefaultTextColors(char *normal, char *reverse);
 	/// Get the default text colors for normal and reverse text
 extern void GetDefaultTextColors(char **normalp, char **reversep);
 	/// Returns the pixel length of a text
-extern int VideoTextLength(unsigned font, const char *text);
+extern int VideoTextLength(CFont *font, const char *text);
 	/// Returns the height of the font
-extern int VideoTextHeight(unsigned font);
+extern int VideoTextHeight(CFont *font);
 	///  Return the 'line' line of the string 's'.
-extern char *GetLineFont(int line, char *s, int maxlen, int font);
+extern char *GetLineFont(int line, char *s, int maxlen, CFont *font);
 	/// Draw text unclipped
-extern int VideoDrawText(int x, int y, unsigned font, const char *text);
+extern int VideoDrawText(int x, int y, CFont *font, const char *text);
 	/// Draw text unclipped
-extern int VideoDrawTextClip(int x, int y, unsigned font, const char *text);
+extern int VideoDrawTextClip(int x, int y, CFont *font, const char *text);
 	/// Draw reverse text unclipped
-extern int VideoDrawReverseText(int x, int y, unsigned font, const char *text);
+extern int VideoDrawReverseText(int x, int y, CFont *font, const char *text);
 	/// Draw reverse text clipped
-extern int VideoDrawReverseTextClip(int x, int y, unsigned font, const char *text);
+extern int VideoDrawReverseTextClip(int x, int y, CFont *font, const char *text);
 	/// Draw text centered and unclipped
-extern int VideoDrawTextCentered(int x, int y, unsigned font, const char *text);
+extern int VideoDrawTextCentered(int x, int y, CFont *font, const char *text);
 	/// Draw number unclipped
-extern int VideoDrawNumber(int x, int y, unsigned font, int number);
+extern int VideoDrawNumber(int x, int y, CFont *font, int number);
 	/// Draw number clipped
-extern int VideoDrawNumberClip(int x, int y, unsigned font, int number);
+extern int VideoDrawNumberClip(int x, int y, CFont *font, int number);
 	/// Draw reverse number unclipped
-extern int VideoDrawReverseNumber(int x, int y, unsigned font, int number);
+extern int VideoDrawReverseNumber(int x, int y, CFont *font, int number);
 	/// Draw reverse number clipped
-extern int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number);
+extern int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number);
 
 	/// Load and initialize the fonts
 extern void LoadFonts(void);
@@ -162,11 +158,11 @@ extern void FontsCclRegister(void);
 	/// Cleanup the font module
 extern void CleanFonts(void);
 	/// Check if font is loaded
-extern int IsFontLoaded(unsigned font);
+extern int IsFontLoaded(CFont *font);
 	/// Find font by identifier
-extern int FontByIdent(const char *ident);
+extern CFont *FontByIdent(const char *ident);
 	// Find the name of a font.
-extern const char *FontName(int font);
+extern const char *FontName(CFont *font);
 
 //@}
 
