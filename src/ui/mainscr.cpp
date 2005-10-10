@@ -324,10 +324,10 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 **  @param unit         unit with variable to show.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-void CContentTypeText::Draw(const CUnit *unit, int defaultfont) const
+void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	char* text;             // Optional text to display.
-	int font;               // Font to use.
+	CFont *font;            // Font to use.
 	int index;              // Index of optionnal variable.
 	int x;                  // X coordinate to display.
 	int y;                  // Y coordinate to display.
@@ -339,10 +339,10 @@ void CContentTypeText::Draw(const CUnit *unit, int defaultfont) const
 	x = this->PosX;
 	y = this->PosY;
 	font = this->Font;
-	if (font == -1) {
+	if (!font) {
 		font = defaultfont;
 	}
-	Assert(font != -1);
+	Assert(font);
 	index = this->Index;
 
 	Assert(unit || index == -1);
@@ -403,10 +403,10 @@ void CContentTypeText::Draw(const CUnit *unit, int defaultfont) const
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText::Draw(const CUnit *unit, int defaultfont) const
+void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	const char* text;
-	int font;
+	CFont *font;
 	int index;
 	char buf[256];
 	UStrInt usi1;
@@ -414,10 +414,10 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, int defaultfont) const
 	Assert(unit);
 	text = this->Format;
 	font = this->Font;
-	if (font == -1) {
+	if (!font) {
 		font = defaultfont;
 	}
-	Assert(font != -1);
+	Assert(font);
 	index = this->Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
 	usi1 = GetComponent(unit, index, this->Component, 0);
@@ -443,10 +443,10 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, int defaultfont) const
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-void CContentTypeFormattedText2::Draw(const CUnit *unit, int defaultfont) const
+void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	const char* text;
-	int font;
+	CFont *font;
 	int index1, index2;
 	char buf[256];
 	UStrInt usi1, usi2;
@@ -454,10 +454,10 @@ void CContentTypeFormattedText2::Draw(const CUnit *unit, int defaultfont) const
 	Assert(unit);
 	text = this->Format;
 	font = this->Font;
-	if (font == -1) {
+	if (!font) {
 		font = defaultfont;
 	}
-	Assert(font != -1);
+	Assert(font);
 	index1 = this->Index1;
 	index2 = this->Index2;
 	usi1 = GetComponent(unit, index1, this->Component1, 0);
@@ -488,7 +488,7 @@ void CContentTypeFormattedText2::Draw(const CUnit *unit, int defaultfont) const
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-void CContentTypeIcon::Draw(const CUnit *unit, int defaultfont) const
+void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	int x;
 	int y;
@@ -511,7 +511,7 @@ void CContentTypeIcon::Draw(const CUnit *unit, int defaultfont) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeLifeBar::Draw(const CUnit *unit, int defaultfont) const
+void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	int x;         // X coordinate of the bar.
 	int y;         // Y coordinate of the bar.
@@ -554,7 +554,7 @@ void CContentTypeLifeBar::Draw(const CUnit *unit, int defaultfont) const
 **
 **  @todo Color and percent value Parametrisation.
 */
-void CContentTypeCompleteBar::Draw(const CUnit *unit, int defaultfont) const
+void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	int x;         // X coordinate of the bar.
 	int y;         // Y coordinate of the bar.
