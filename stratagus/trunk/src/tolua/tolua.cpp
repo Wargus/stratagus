@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Fri Oct  7 20:47:45 2005.
+** Generated automatically by tolua++-1.0.6 on Mon Oct 10 18:54:26 2005.
 */
 
 #ifndef __cplusplus
@@ -19,6 +19,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 #include "player.h"
 #include "unittype.h"
 #include "unit.h"
+#include "video.h"
+#include "font.h"
 #ifdef _MSC_VER
 #pragma warning(disable:4800)
 #endif
@@ -41,10 +43,11 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"CGraphic");
+ tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CInfoPanel");
@@ -775,6 +778,64 @@ static int tolua_stratagus_CGraphic_Free00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Free'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: New of class  CFont */
+static int tolua_stratagus_CFont_New00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CFont",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,3,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  CGraphic* g = ((CGraphic*)  tolua_tousertype(tolua_S,3,0));
+ {
+  CFont* tolua_ret = (CFont*)  CFont::New(ident,g);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFont");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: Get of class  CFont */
+static int tolua_stratagus_CFont_Get00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CFont",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  CFont* tolua_ret = (CFont*)  CFont::Get(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFont");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1808,7 +1869,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  116, 40,107,101,121, 41, 32,101,110,100, 32,125, 10, 85,112,
  103,114, 97,100,101,115, 32, 61, 32,123,125, 10,115,101,116,
  109,101,116, 97,116, 97, 98,108,101, 40, 85,112,103,114, 97,
- 100,101,115, 44, 32,109,116, 41,32
+ 100,101,115, 44, 32,109,116, 41, 10,109,116, 32, 61, 32,123,
+  32, 95, 95,105,110,100,101,120, 32, 61, 32,102,117,110, 99,
+ 116,105,111,110, 40,116, 44, 32,107,101,121, 41, 32,114,101,
+ 116,117,114,110, 32, 67, 70,111,110,116, 58, 71,101,116, 40,
+ 107,101,121, 41, 32,101,110,100, 32,125, 10, 70,111,110,116,
+ 115, 32, 61, 32,123,125, 10,115,101,116,109,101,116, 97,116,
+  97, 98,108,101, 40, 70,111,110,116,115, 44, 32,109,116, 41,
+ 32
  };
  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 1");
  lua_settop(tolua_S, top);
@@ -1865,6 +1933,11 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_beginmodule(tolua_S,"CGraphic");
  tolua_function(tolua_S,"New",tolua_stratagus_CGraphic_New00);
  tolua_function(tolua_S,"Free",tolua_stratagus_CGraphic_Free00);
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CFont","CFont","",NULL);
+ tolua_beginmodule(tolua_S,"CFont");
+ tolua_function(tolua_S,"New",tolua_stratagus_CFont_New00);
+ tolua_function(tolua_S,"Get",tolua_stratagus_CFont_Get00);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CUpgrade","CUpgrade","",NULL);
  tolua_beginmodule(tolua_S,"CUpgrade");

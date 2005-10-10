@@ -76,11 +76,15 @@ class CGraphic;
 
 	/// Color font definition
 class CFont {
-public:
+private:
 	CFont() : G(NULL)
 	{
 		memset(CharWidth, 0, sizeof(CharWidth));
 	}
+
+public:
+	static CFont *New(const char *ident, CGraphic *g);
+	static CFont *Get(const char *ident);
 
 	char CharWidth[208];  /// Real font width (starting with ' ')
 
