@@ -157,8 +157,6 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-//extern const char ConstructionType[];  /// Construction type
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -169,8 +167,6 @@ extern void InitConstructions(void);
 extern void LoadConstructions(void);
 	/// Clean up the constructions module
 extern void CleanConstructions(void);
-	/// Get construction by wc number
-extern CConstruction *ConstructionByWcNum(int num);
 	/// Get construction by identifier
 extern CConstruction *ConstructionByIdent(const char *ident);
 
