@@ -821,7 +821,7 @@ const char *FontName(CFont *font)
 {
 	const char *s = FontNames[font].c_str();
 	if (!*s) {
-		fprintf(stderr, "Font not found: %d", font);
+		fprintf(stderr, "Font not found.");
 		ExitFatal(1);
 	}
 
