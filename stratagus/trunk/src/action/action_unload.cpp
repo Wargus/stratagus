@@ -306,7 +306,7 @@ static int MoveToDropZone(CUnit *unit)
 			return 0;
 	}
 
-	Assert(unit->Orders[0].Action == UnitActionUnload);
+	Assert(unit->Orders[0]->Action == UnitActionUnload);
 	return 1;
 }
 
@@ -322,13 +322,13 @@ static void LeaveTransporter(CUnit *unit)
 	CUnit *goal;
 
 	stillonboard = 0;
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 	//
 	// Goal is the specific unit unit that you want to unload.
 	// This can be NULL, in case you want to unload everything.
 	//
 	if (goal) {
-		unit->Orders[0].Goal = NoUnitP;
+		unit->Orders[0]->Goal = NoUnitP;
 		if (goal->Destroyed) {
 			DebugPrint("destroyed unit unloading?\n");
 			goal->RefsDecrease();
@@ -364,13 +364,13 @@ static void LeaveTransporter(CUnit *unit)
 	if (stillonboard) {
 		// We tell it to unload at it's current position. This can't be done,
 		// so it will search for a piece of free coast nearby.
-		unit->Orders[0].Action = UnitActionUnload;
-		unit->Orders[0].Goal = NoUnitP;
-		unit->Orders[0].X = unit->X;
-		unit->Orders[0].Y = unit->Y;
+		unit->Orders[0]->Action = UnitActionUnload;
+		unit->Orders[0]->Goal = NoUnitP;
+		unit->Orders[0]->X = unit->X;
+		unit->Orders[0]->Y = unit->Y;
 		unit->SubAction = 0;
 	} else {
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = 0;
 	}
 }
@@ -394,28 +394,28 @@ void HandleActionUnload(CUnit *unit)
 		// Move the transporter
 		//
 		case 0:
-			if (!unit->Orders[0].Goal) {
-				if (!ClosestFreeDropZone(unit, unit->Orders[0].X, unit->Orders[0].Y,
+			if (!unit->Orders[0]->Goal) {
+				if (!ClosestFreeDropZone(unit, unit->Orders[0]->X, unit->Orders[0]->Y,
 						&x, &y)) {
 					// Sorry... I give up.
-					unit->Orders[0].Action = UnitActionStill;
+					unit->Orders[0]->Action = UnitActionStill;
 					unit->SubAction = 0;
 					return;
 				}
-				unit->Orders[0].X = x;
-				unit->Orders[0].Y = y;
+				unit->Orders[0]->X = x;
+				unit->Orders[0]->Y = y;
 			}
 
 			NewResetPath(unit);
 			unit->SubAction = 1;
 		case 1:
 			// The Goal is the unit that we have to unload.
-			if (!unit->Orders[0].Goal) {
+			if (!unit->Orders[0]->Goal) {
 				// We have to unload everything
 				if ((i = MoveToDropZone(unit))) {
 					if (i == PF_REACHED) {
 						if (++unit->SubAction == 1) {
-							unit->Orders[0].Action = UnitActionStill;
+							unit->Orders[0]->Action = UnitActionStill;
 							unit->SubAction = 0;
 						}
 					} else {
@@ -430,7 +430,7 @@ void HandleActionUnload(CUnit *unit)
 		case 2:
 			// FIXME: show still animations ?
 			LeaveTransporter(unit);
-			if (CanMove(unit) && unit->Orders[0].Action != UnitActionStill) {
+			if (CanMove(unit) && unit->Orders[0]->Action != UnitActionStill) {
 				HandleActionUnload(unit);
 			}
 			break;

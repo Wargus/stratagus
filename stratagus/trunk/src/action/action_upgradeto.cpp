@@ -181,7 +181,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 	}
 
 	player = unit->Player;
-	newtype = unit->Orders[0].Type;
+	newtype = unit->Orders[0]->Type;
 	newstats = &newtype->Stats[player->Index];
 
 	// FIXME: Should count down here
@@ -191,7 +191,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 		return;
 	}
 
-	unit->Orders[0].Action = UnitActionStill;
+	unit->Orders[0]->Action = UnitActionStill;
 	unit->SubAction = unit->State = 0;
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {

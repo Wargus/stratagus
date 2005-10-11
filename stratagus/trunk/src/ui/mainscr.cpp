@@ -304,7 +304,7 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 		case UnitRefContainer :
 			return unit->Container;
 		case UnitRefWorker :
-			if (unit->Orders[0].Action == UnitActionBuilt) {
+			if (unit->Orders[0]->Action == UnitActionBuilt) {
 				return unit->Data.Built.Worker;
 			} else {
 				return 0;
@@ -664,14 +664,14 @@ static void DrawUnitInfo(CUnit *unit)
 		//
 		//  Building training units.
 		//
-		if (unit->Orders[0].Action == UnitActionTrain) {
-			if (unit->OrderCount == 1 || unit->Orders[1].Action != UnitActionTrain) {
+		if (unit->Orders[0]->Action == UnitActionTrain) {
+			if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
 				if (UI.SingleTrainingText) {
 					VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
 						UI.SingleTrainingFont, UI.SingleTrainingText);
 				}
 				if (UI.SingleTrainingButton) {
-					unit->Orders[0].Type->Icon.Icon->DrawUnitIcon(unit->Player,
+					unit->Orders[0]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
 						UI.SingleTrainingButton->Style,
 						(ButtonAreaUnderCursor == ButtonAreaTraining &&
 							ButtonUnderCursor == 0) ?
@@ -686,8 +686,8 @@ static void DrawUnitInfo(CUnit *unit)
 				if (!UI.TrainingButtons.empty()) {
 					for (i = 0; i < unit->OrderCount &&
 							i < (int)UI.TrainingButtons.size(); ++i) {
-						if (unit->Orders[i].Action == UnitActionTrain) {
-							unit->Orders[i].Type->Icon.Icon->DrawUnitIcon(unit->Player,
+						if (unit->Orders[i]->Action == UnitActionTrain) {
+							unit->Orders[i]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
 								 UI.TrainingButtons[i].Style,
 								(ButtonAreaUnderCursor == ButtonAreaTraining &&
 									ButtonUnderCursor == i) ?
@@ -703,9 +703,9 @@ static void DrawUnitInfo(CUnit *unit)
 		//
 		//  Building upgrading to better type.
 		//
-		if (unit->Orders[0].Action == UnitActionUpgradeTo) {
+		if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
 			if (UI.UpgradingButton) {
-				unit->Orders[0].Type->Icon.Icon->DrawUnitIcon(unit->Player,
+				unit->Orders[0]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
 					UI.UpgradingButton->Style,
 					(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 						ButtonUnderCursor == 0) ?
@@ -718,7 +718,7 @@ static void DrawUnitInfo(CUnit *unit)
 		//
 		//  Building research new technology.
 		//
-		if (unit->Orders[0].Action == UnitActionResearch) {
+		if (unit->Orders[0]->Action == UnitActionResearch) {
 			if (UI.ResearchingButton) {
 				unit->Data.Research.Upgrade->Icon->DrawUnitIcon(unit->Player,
 					UI.ResearchingButton->Style,
@@ -1311,10 +1311,10 @@ void CInfoPanel::Draw(void)
 					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index) ||
 					PlayersAllied(ThisPlayer->Index, Selected[0]->Player->Index) ||
 					ReplayRevealMap) {
-				if (Selected[0]->Orders[0].Action == UnitActionBuilt ||
-					Selected[0]->Orders[0].Action == UnitActionResearch ||
-					Selected[0]->Orders[0].Action == UnitActionUpgradeTo ||
-					Selected[0]->Orders[0].Action == UnitActionTrain) {
+				if (Selected[0]->Orders[0]->Action == UnitActionBuilt ||
+					Selected[0]->Orders[0]->Action == UnitActionResearch ||
+					Selected[0]->Orders[0]->Action == UnitActionUpgradeTo ||
+					Selected[0]->Orders[0]->Action == UnitActionTrain) {
 					i = 3;
 				} else if (Selected[0]->Stats->Variables[MANA_INDEX].Max) {
 					i = 2;

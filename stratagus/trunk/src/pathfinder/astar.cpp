@@ -768,8 +768,8 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 
 	// Goal has moved, need to recalculate path or no cached path
 	if( unit->Data.Move.Length <= 0 ||
-		( unit->Orders[0].Goal && (unit->Orders[0].Goal->X != unit->Orders[0].X
-			|| unit->Orders[0].Goal->Y != unit->Orders[0].Y)) ) {
+		( unit->Orders[0]->Goal && (unit->Orders[0]->Goal->X != unit->Orders[0]->X
+			|| unit->Orders[0]->Goal->Y != unit->Orders[0]->Y)) ) {
 		result=NewPath(unit);
 
 		if( result==PF_UNREACHABLE ) {
@@ -781,8 +781,8 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 		}
 		if( unit->Goal ) {
 			// Update Orders
-			unit->Orders[0].X=unit->Goal->X;
-			unit->Orders[0].Y=unit->Goal->Y;
+			unit->Orders[0]->X=unit->Goal->X;
+			unit->Orders[0]->Y=unit->Goal->Y;
 		}
 	}
 

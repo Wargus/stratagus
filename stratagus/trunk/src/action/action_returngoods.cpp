@@ -67,32 +67,33 @@ void HandleActionReturnGoods(CUnit *unit)
 		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y, "No Resources to Return.");
 
-		if (unit->Orders[0].Goal) { // Depot (if not destroyed)
-			unit->Orders[0].Goal->RefsDecrease();
+		if (unit->Orders[0]->Goal) { // Depot (if not destroyed)
+			unit->Orders[0]->Goal->RefsDecrease();
+			unit->Orders[0]->Goal = NULL;
 		}
-		memset(unit->Orders, 0, sizeof(*unit->Orders));
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Init();
+		unit->Orders[0]->Action = UnitActionStill;
 		return;
 	}
 
 	// If depot was destroyed search for another one.
-	if (!unit->Orders[0].Goal) {
+	if (!unit->Orders[0]->Goal) {
 		CUnit *destu;
 
 		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
 				unit->CurrentResource))) {
-			memset(unit->Orders, 0, sizeof(*unit->Orders));
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Init();
+			unit->Orders[0]->Action = UnitActionStill;
 			return;
 		}
-		unit->Orders[0].Goal = destu;
+		unit->Orders[0]->Goal = destu;
 		destu->RefsIncrease();
 	}
 
-	unit->Orders[0].Action = UnitActionResource;
+	unit->Orders[0]->Action = UnitActionResource;
 	// Somewhere on the way the loaded worker could have change Arg1
 	// Bummer, go get the closest resource to the depot
-	unit->Orders[0].Arg1.ResourcePos = -1;
+	unit->Orders[0]->Arg1.ResourcePos = -1;
 	NewResetPath(unit);
 	unit->SubAction = 70; // FIXME : Define value.
 }

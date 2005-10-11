@@ -70,7 +70,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 
 	player = unit->Player;
 
-	if (goal->Orders[0].Action != UnitActionBuilt) {
+	if (goal->Orders[0]->Action != UnitActionBuilt) {
 		//
 		// Calculate the repair costs.
 		//
@@ -87,8 +87,8 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 				if (player->AiEnabled) {
 					// FIXME: call back to AI?
 					goal->RefsDecrease();
-					unit->Orders[0].Goal = NULL;
-					unit->Orders[0].Action = UnitActionStill;
+					unit->Orders[0]->Goal = NULL;
+					unit->Orders[0]->Action = UnitActionStill;
 					unit->State = unit->SubAction = 0;
 					if (unit->Selected) { // update display for new action
 						SelectedUnitChanged();
@@ -166,7 +166,7 @@ void HandleActionRepair(CUnit *unit)
 				//
 				// No goal: if meeting damaged building repair it.
 				//
-				goal = unit->Orders[0].Goal;
+				goal = unit->Orders[0]->Goal;
 
 				//
 				// Target is dead, choose new one.
@@ -175,11 +175,11 @@ void HandleActionRepair(CUnit *unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair target gone.\n");
-						unit->Orders[0].X = goal->X;
-						unit->Orders[0].Y = goal->Y;
+						unit->Orders[0]->X = goal->X;
+						unit->Orders[0]->Y = goal->Y;
 						goal->RefsDecrease();
 						// FIXME: should I clear this here?
-						unit->Orders[0].Goal = goal = NULL;
+						unit->Orders[0]->Goal = goal = NULL;
 						NewResetPath(unit);
 					}
 				} else if (unit->Player->AiEnabled) {
@@ -201,9 +201,9 @@ void HandleActionRepair(CUnit *unit)
 				} else if (err < 0) {
 					if (goal) { // release reference
 						goal->RefsDecrease();
-						unit->Orders[0].Goal = NoUnitP;
+						unit->Orders[0]->Goal = NoUnitP;
 					}
-					unit->Orders[0].Action = UnitActionStill;
+					unit->Orders[0]->Action = UnitActionStill;
 					unit->State = unit->SubAction = 0;
 					if (unit->Selected) { // update display for new action
 						SelectedUnitChanged();
@@ -212,7 +212,7 @@ void HandleActionRepair(CUnit *unit)
 				}
 
 				// FIXME: Should be it already?
-				Assert(unit->Orders[0].Action == UnitActionRepair);
+				Assert(unit->Orders[0]->Action == UnitActionRepair);
 			}
 			break;
 
@@ -223,7 +223,7 @@ void HandleActionRepair(CUnit *unit)
 			AnimateActionRepair(unit);
 			unit->Data.Repair.Cycles++;
 			if (!unit->Anim.Unbreakable) {
-				goal = unit->Orders[0].Goal;
+				goal = unit->Orders[0]->Goal;
 
 				//
 				// Target is dead, choose new one.
@@ -233,17 +233,17 @@ void HandleActionRepair(CUnit *unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair goal is gone\n");
-						unit->Orders[0].X = goal->X;
-						unit->Orders[0].Y = goal->Y;
+						unit->Orders[0]->X = goal->X;
+						unit->Orders[0]->Y = goal->Y;
 						goal->RefsDecrease();
 						// FIXME: should I clear this here?
-						unit->Orders[0].Goal = goal = NULL;
+						unit->Orders[0]->Goal = goal = NULL;
 						NewResetPath(unit);
 					}
 				}
 				if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange) {
 					RepairUnit(unit, goal);
-					goal = unit->Orders[0].Goal;
+					goal = unit->Orders[0]->Goal;
 				} else if (goal && MapDistanceBetweenUnits(unit, goal) > unit->Type->RepairRange) {
 					// If goal has move, chase after it
 					unit->State = 0;
@@ -257,9 +257,9 @@ void HandleActionRepair(CUnit *unit)
 				if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
 					if (goal) { // release reference
 						goal->RefsDecrease();
-						unit->Orders[0].Goal = NULL;
+						unit->Orders[0]->Goal = NULL;
 					}
-					unit->Orders[0].Action = UnitActionStill;
+					unit->Orders[0]->Action = UnitActionStill;
 					unit->SubAction = unit->State = 0;
 					if (unit->Selected) { // update display for new action
 						SelectedUnitChanged();

@@ -204,20 +204,20 @@ void HandleActionMove(CUnit *unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit->Orders[0].Range <= TheMap.Info.MapWidth ||
-					unit->Orders[0].Range <= TheMap.Info.MapHeight) {
-				unit->Orders[0].Range++;
+			if (unit->Orders[0]->Range <= TheMap.Info.MapWidth ||
+					unit->Orders[0]->Range <= TheMap.Info.MapHeight) {
+				unit->Orders[0]->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
 			unit->SubAction = 0;
 			// Release target, if any.
-			if ((goal = unit->Orders[0].Goal)) {
+			if ((goal = unit->Orders[0]->Goal)) {
 				goal->RefsDecrease();
-				unit->Orders[0].Goal = NoUnitP;
+				unit->Orders[0]->Goal = NoUnitP;
 			}
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Action = UnitActionStill;
 			if (unit->Selected) { // update display for new action
 				SelectedUnitChanged();
 			}
@@ -230,11 +230,11 @@ void HandleActionMove(CUnit *unit)
 	//
 	// Target destroyed?
 	//
-	if ((goal = unit->Orders[0].Goal) && goal->Destroyed) {
+	if ((goal = unit->Orders[0]->Goal) && goal->Destroyed) {
 		DebugPrint("Goal dead\n");
-		unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
-		unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
-		unit->Orders[0].Goal = NoUnitP;
+		unit->Orders[0]->X = goal->X + goal->Type->TileWidth / 2;
+		unit->Orders[0]->Y = goal->Y + goal->Type->TileHeight / 2;
+		unit->Orders[0]->Goal = NoUnitP;
 		goal->RefsDecrease();
 		NewResetPath(unit);
 	}

@@ -424,8 +424,22 @@ typedef enum _unit_action_ {
 */
 class COrder {
 public:
+	COrder() : Action(UnitActionNone), Range(0), MinRange(0), Width(0), Height(0),
+				Goal(NULL), X(-1), Y(-1), Type(NULL) { memset(&Arg1, 0, sizeof(Arg1));};
+
+	void Init() {
+		Action = UnitActionNone;
+		Range = 0;
+		MinRange = 0;
+		Width = 0;
+		Height = 0;
+		Assert(!Goal);
+		X = -1; Y = -1;
+		Type = NULL;
+		memset(&Arg1, 0, sizeof(Arg1));
+	};
+
 	unsigned char Action;   /// global action
-	unsigned char Flags;    /// Order flags (unused)
 	int           Range;    /// How far away
 	unsigned int  MinRange; /// How far away minimum
 	unsigned char Width;    /// Goal Width (used when Goal is not)
@@ -444,7 +458,6 @@ public:
 		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
 		SpellType *Spell;             /// spell when casting.
 		CUpgrade *Upgrade;            /// upgrade.
-		COrder *Order;                /// FIXME : seems to be a hack for free memory.
 	} Arg1;             /// Extra command argument.
 };
 
@@ -581,8 +594,7 @@ public:
 
 	char OrderCount;            /// how many orders in queue
 	char OrderFlush;            /// cancel current order, take next
-	int  TotalOrders;           /// Total Number of orders available
-	COrder *Orders;              /// orders to process
+	std::vector<COrder *> Orders; /// orders to process
 	COrder SavedOrder;           /// order to continue after current
 	COrder NewOrder;             /// order for new trained units
 	COrder CriticalOrder;        /// order to do as possible in breakable animation.
@@ -629,7 +641,7 @@ public:
 	CUnit *Goal; /// Generic goal pointer
 
 
-	inline bool IsIdle() { return Orders[0].Action == UnitActionStill && OrderCount == 1; }
+	inline bool IsIdle() { return Orders[0]->Action == UnitActionStill && OrderCount == 1; }
 
 	/// Increase a unit's reference count
 	void RefsIncrease();
@@ -694,8 +706,8 @@ public:
 **  @todo look if correct used (UnitActionBuilt is no problem if attacked)?
 */
 #define UnitUnusable(unit) \
-	((unit)->Removed || (unit)->Orders[0].Action == UnitActionDie || \
-	  (unit)->Orders[0].Action == UnitActionBuilt || (unit)->Destroyed)
+	((unit)->Removed || (unit)->Orders[0]->Action == UnitActionDie || \
+	  (unit)->Orders[0]->Action == UnitActionBuilt || (unit)->Destroyed)
 
 /**
 **  Returns unit number (unique to this unit)

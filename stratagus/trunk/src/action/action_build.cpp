@@ -118,10 +118,10 @@ static void MoveToLocation(CUnit *unit)
 			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 				"You cannot reach building place");
 			if (unit->Player->AiEnabled) {
-				AiCanNotReach(unit, unit->Orders[0].Type);
+				AiCanNotReach(unit, unit->Orders[0]->Type);
 			}
 
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Action = UnitActionStill;
 			unit->SubAction = 0;
 			if (unit->Selected) { // update display for new action
 				SelectedUnitChanged();
@@ -154,9 +154,9 @@ static CUnit *CheckCanBuild(CUnit *unit)
 		return NULL;
 	}
 
-	x = unit->Orders[0].X;
-	y = unit->Orders[0].Y;
-	type = unit->Orders[0].Type;
+	x = unit->Orders[0]->X;
+	y = unit->Orders[0]->Y;
+	type = unit->Orders[0]->Type;
 
 	//
 	// Check if the building could be built there.
@@ -179,7 +179,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = 0;
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
@@ -199,7 +199,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = 0;
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
@@ -217,7 +217,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = 0;
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
@@ -239,9 +239,9 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	CUnit *build;
 	const CUnitStats *stats;
 
-	x = unit->Orders[0].X;
-	y = unit->Orders[0].Y;
-	type = unit->Orders[0].Type;
+	x = unit->Orders[0]->X;
+	y = unit->Orders[0]->Y;
+	type = unit->Orders[0]->Type;
 
 	unit->Player->SubUnitType(type);
 
@@ -249,7 +249,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	
 	// If unable to make unit, stop, and report message
 	if (build == NoUnitP) {
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Action = UnitActionStill;
 
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			"Unable to create building %s",type->Name);
@@ -279,7 +279,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	}
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
-	build->Orders[0].Action = UnitActionBuilt;
+	build->Orders[0]->Action = UnitActionBuilt;
 	
 	// Must place after previous for map flags
 	build->Place(x, y);
@@ -305,14 +305,14 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		build->CurrentSightRange = 0;
 		unit->X = x;
 		unit->Y = y;
-		unit->Orders[0].Action = UnitActionStill;
-		unit->Orders[0].Goal = NULL;
+		unit->Orders[0]->Action = UnitActionStill;
+		unit->Orders[0]->Goal = NULL;
 		unit->SubAction = 0;
 	} else {
-		unit->Orders[0].Goal = build;
-		unit->Orders[0].X = unit->Orders[0].Y = -1;
+		unit->Orders[0]->Goal = build;
+		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
 		// FIXME: Should have a BuildRange?
-		unit->Orders[0].Range = unit->Type->RepairRange;
+		unit->Orders[0]->Range = unit->Type->RepairRange;
 		unit->SubAction = 40;
 		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
 		UnitUpdateHeading(unit);
@@ -340,13 +340,13 @@ static void BuildBuilding(CUnit *unit)
 	if (unit->Anim.Unbreakable) {
 		return ;
 	}
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 	Assert(goal);
 
-	if (goal->Orders[0].Action == UnitActionDie) {
+	if (goal->Orders[0]->Action == UnitActionDie) {
 		goal->RefsDecrease();
-		unit->Orders[0].Goal = NULL;
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Goal = NULL;
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = unit->State = 0;
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
@@ -378,8 +378,8 @@ static void BuildBuilding(CUnit *unit)
 	//
 	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
 		goal->RefsDecrease();
-		unit->Orders[0].Goal = NULL;
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Goal = NULL;
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = unit->State = 0;
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
@@ -451,7 +451,7 @@ void HandleActionBuilt(CUnit *unit)
 		DebugPrint("%s canceled.\n" _C_ unit->Type->Name);
 		// Drop out unit
 		if ((worker = unit->Data.Built.Worker)) {
-			worker->Orders[0].Action = UnitActionStill;
+			worker->Orders[0]->Action = UnitActionStill;
 			unit->Data.Built.Worker = NoUnitP;
 			worker->SubAction = 0;
 			DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
@@ -473,7 +473,7 @@ void HandleActionBuilt(CUnit *unit)
 		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
 			unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
 		}
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Action = UnitActionStill;
 		// HACK: the building is ready now
 		unit->Player->UnitTypesCount[type->Slot]++;
 		unit->Constructed = 0;
@@ -490,7 +490,7 @@ void HandleActionBuilt(CUnit *unit)
 				LetUnitDie(worker);
 			// Drop out the worker.
 			} else {
-				worker->Orders[0].Action = UnitActionStill;
+				worker->Orders[0]->Action = UnitActionStill;
 				worker->SubAction = 0;
 				DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
 				//

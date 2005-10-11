@@ -189,7 +189,7 @@ void DrawUnitSelection(const CUnit *unit)
 			}
 		}
 	} else if (CursorBuilding && unit->Type->Building &&
-			unit->Orders[0].Action != UnitActionDie &&
+			unit->Orders[0]->Action != UnitActionDie &&
 			(unit->Player == ThisPlayer ||
 				PlayersTeamed(ThisPlayer->Index, unit->Player->Index))) {
 		// If building mark all own buildings
@@ -1004,7 +1004,7 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 	Assert(!unit || unit->Type == type);
 
 	// unit == NULL for the editor
-	if (unit && unit->Orders[0].Action == UnitActionDie) {
+	if (unit && unit->Orders[0]->Action == UnitActionDie) {
 		return;
 	}
 
@@ -1229,11 +1229,11 @@ void ShowOrder(const CUnit *unit)
 	y1 = CurrentViewport->Map2ViewportY(
 		unit->Y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
 
-	ShowSingleOrder(unit, x1, y1, unit->Orders);
+	ShowSingleOrder(unit, x1, y1, unit->Orders[0]);
 #if 1
 	for (i = 1; i < unit->OrderCount; ++i) {
-		GetOrderPosition(unit, unit->Orders + i - 1, &x1, &y1);
-		ShowSingleOrder(unit, x1, y1, unit->Orders + i);
+		GetOrderPosition(unit, unit->Orders[i - 1], &x1, &y1);
+		ShowSingleOrder(unit, x1, y1, unit->Orders[i]);
 	}
 #endif
 	if (!CanMove(unit)) {
@@ -1300,7 +1300,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit->Orders[0].Action != UnitActionDie && unit->IsVisible(ThisPlayer)) {
+	if (unit->Orders[0]->Action != UnitActionDie && unit->IsVisible(ThisPlayer)) {
 		DrawDecoration(unit, type, x, y);
 	}
 }
@@ -1506,12 +1506,12 @@ void CUnit::Draw() const
 		x = this->IX;
 		x += CurrentViewport->Map2ViewportX(this->X);
 		y += CurrentViewport->Map2ViewportY(this->Y);
-		state = (this->Orders[0].Action == UnitActionBuilt) |
-			((this->Orders[0].Action == UnitActionUpgradeTo) << 1);
+		state = (this->Orders[0]->Action == UnitActionBuilt) |
+			((this->Orders[0]->Action == UnitActionUpgradeTo) << 1);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
 		if (state == 2) {
-			type = this->Orders[0].Type;
+			type = this->Orders[0]->Type;
 		}
 		// This is trash unless the unit is being built, and that's when we use it.
 		cframe = this->Data.Built.Frame;
@@ -1615,12 +1615,12 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 	c1 = *(CUnit **)v1;
 	c2 = *(CUnit **)v2;
 
-	if (c1->Orders[0].Action == UnitActionDie && c1->Type->CorpseType) {
+	if (c1->Orders[0]->Action == UnitActionDie && c1->Type->CorpseType) {
 		drawlevel1 = c1->Type->CorpseType->DrawLevel;
 	} else {
 		drawlevel1 = c1->Type->DrawLevel;
 	}
-	if (c2->Orders[0].Action == UnitActionDie && c2->Type->CorpseType) {
+	if (c2->Orders[0]->Action == UnitActionDie && c2->Type->CorpseType) {
 		drawlevel2 = c2->Type->CorpseType->DrawLevel;
 	} else {
 		drawlevel2 = c2->Type->DrawLevel;
