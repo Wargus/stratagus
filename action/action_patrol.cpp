@@ -70,17 +70,17 @@ void HandleActionPatrol(CUnit *unit)
 	if (DoActionMove(unit) < 0) { // reached end-point or stop
 		int tmp;
 
-		Assert(unit->Orders[0].Action == UnitActionPatrol);
+		Assert(unit->Orders[0]->Action == UnitActionPatrol);
 
 		//
 		// Swap the points.
 		//
-		tmp = unit->Orders[0].Arg1.Patrol.X;
-		unit->Orders[0].Arg1.Patrol.X = unit->Orders[0].X;
-		unit->Orders[0].X = tmp;
-		tmp = unit->Orders[0].Arg1.Patrol.Y;
-		unit->Orders[0].Arg1.Patrol.Y = unit->Orders[0].Y;
-		unit->Orders[0].Y = tmp;
+		tmp = unit->Orders[0]->Arg1.Patrol.X;
+		unit->Orders[0]->Arg1.Patrol.X = unit->Orders[0]->X;
+		unit->Orders[0]->X = tmp;
+		tmp = unit->Orders[0]->Arg1.Patrol.Y;
+		unit->Orders[0]->Arg1.Patrol.Y = unit->Orders[0]->Y;
+		unit->Orders[0]->Y = tmp;
 
 		NewResetPath(unit);
 	}
@@ -97,9 +97,9 @@ void HandleActionPatrol(CUnit *unit)
 				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				// Save current command to come back.
-				unit->SavedOrder = unit->Orders[0];
-				unit->Orders[0].Action = UnitActionStill;
-				unit->Orders[0].Goal = NoUnitP;
+				unit->SavedOrder = *unit->Orders[0];
+				unit->Orders[0]->Action = UnitActionStill;
+				unit->Orders[0]->Goal = NoUnitP;
 				unit->SubAction = 0;
 			}
 		}

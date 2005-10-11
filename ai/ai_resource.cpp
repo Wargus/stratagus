@@ -91,9 +91,9 @@ static int AiCheckCosts(const int *costs)
 	units = AiPlayer->Player->Units;
 	for (i = 0; i < nunits; ++i) {
 		for (k = 0; k < units[i]->OrderCount; ++k) {
-			if (units[i]->Orders[k].Action == UnitActionBuild) {
+			if (units[i]->Orders[k]->Action == UnitActionBuild) {
 				building_costs =
-					units[i]->Orders[k].Type->Stats[AiPlayer->Player->Index].Costs;
+					units[i]->Orders[k]->Type->Stats[AiPlayer->Player->Index].Costs;
 				for (j = 1; j < MaxCosts; ++j) {
 					used[j] += building_costs[j];
 				}
@@ -214,7 +214,7 @@ int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 		// Those can't attack anyway.
 		//
 		if (dest->Removed || dest->Variable[INVISIBLE_INDEX].Value ||
-			dest->Orders[0].Action == UnitActionDie) {
+			dest->Orders[0]->Action == UnitActionDie) {
 			continue;
 		}
 
@@ -262,8 +262,8 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		for (x = 0; x < unit->OrderCount; ++x) {
-			if (unit->Orders[x].Action == UnitActionBuild
-				|| unit->Orders[x].Action == UnitActionRepair) {
+			if (unit->Orders[x]->Action == UnitActionBuild
+				|| unit->Orders[x]->Action == UnitActionRepair) {
 				break;
 			}
 		}
@@ -883,7 +883,7 @@ static void AiCollectResources(void)
 		//
 		// See if it's assigned already
 		//
-		if (unit->Orders[0].Action == UnitActionResource && unit->OrderCount == 1 && c) {
+		if (unit->Orders[0]->Action == UnitActionResource && unit->OrderCount == 1 && c) {
 			units_assigned[num_units_assigned[c]++][c] = unit;
 			total_harvester++;
 			continue;
@@ -1099,8 +1099,8 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (unit->Type->RepairRange &&
-			(unit->Orders[0].Action == UnitActionResource ||
-				unit->Orders[0].Action == UnitActionStill) && unit->OrderCount == 1) {
+			(unit->Orders[0]->Action == UnitActionResource ||
+				unit->Orders[0]->Action == UnitActionStill) && unit->OrderCount == 1) {
 			table[num++] = unit;
 		}
 	}
@@ -1233,8 +1233,8 @@ static void AiCheckRepair(void)
 		// Unit damaged?
 		// Don't repair attacked unit ( wait 5 sec before repairing )
 		if (unit->Type->RepairHP &&
-				unit->Orders[0].Action != UnitActionBuilt &&
-				unit->Orders[0].Action != UnitActionUpgradeTo &&
+				unit->Orders[0]->Action != UnitActionBuilt &&
+				unit->Orders[0]->Action != UnitActionUpgradeTo &&
 				unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max &&
 				unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 

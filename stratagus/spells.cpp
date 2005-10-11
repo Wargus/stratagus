@@ -152,7 +152,7 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	if (this->Damage) {
 		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
 		for (i = 0; i < n; ++i) {
-			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0].Action != UnitActionDie &&
+			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
 					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
 				// Don't hit flying units!
 				HitUnit(caster, table[i], this->Damage);
@@ -708,7 +708,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 		while (n) {
 			n--;
 			unit = table[n];
-			if (unit->Orders[0].Action == UnitActionDie && !unit->Type->Building) {
+			if (unit->Orders[0]->Action == UnitActionDie && !unit->Type->Building) {
 				//
 				//  Found a corpse. eliminate it and proceed to summoning.
 				//
@@ -830,7 +830,7 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 		return 0;
 	}
 	if (spell->Target == TargetUnit) { // Casting an unit spell without a target.
-		if ((!target) || target->Destroyed || target->Orders->Action == UnitActionDie) {
+		if ((!target) || target->Destroyed || target->Orders[0]->Action == UnitActionDie) {
 			return 0;
 		}
 	}

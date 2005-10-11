@@ -107,10 +107,10 @@ static void SpellMoveToTarget(CUnit *unit)
 
 	// when reached DoActionMove changes unit action
 	// FIXME: use return codes from pathfinder
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 
 	if (goal && MapDistanceBetweenUnits(unit, goal) <=
-			unit->Orders[0].Range) {
+			unit->Orders[0]->Range) {
 
 		// there is goal and it is in range
 		unit->State = 0;
@@ -119,14 +119,14 @@ static void SpellMoveToTarget(CUnit *unit)
 			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
-	} else if (!goal && MapDistanceToUnit(unit->Orders[0].X,
-			unit->Orders[0].Y, unit) <= unit->Orders[0].Range) {
+	} else if (!goal && MapDistanceToUnit(unit->Orders[0]->X,
+			unit->Orders[0]->Y, unit) <= unit->Orders[0]->Range) {
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit,
-			unit->Orders[0].X +
-				unit->Orders[0].Arg1.Spell->Range - unit->X,
-			unit->Orders[0].Y +
-				unit->Orders[0].Arg1.Spell->Range - unit->Y);
+			unit->Orders[0]->X +
+				unit->Orders[0]->Arg1.Spell->Range - unit->X,
+			unit->Orders[0]->Y +
+				unit->Orders[0]->Arg1.Spell->Range - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
 	} else if (err) {
@@ -135,19 +135,19 @@ static void SpellMoveToTarget(CUnit *unit)
 		// just as close as possible, since the spell is centered
 		// on the caster anyway.
 		//
-		if ((spell = unit->Orders[0].Arg1.Spell)->Target == TargetSelf) {
+		if ((spell = unit->Orders[0]->Arg1.Spell)->Target == TargetSelf) {
 			DebugPrint("Increase range for spellcast.");
-			unit->Orders->Range++;
+			unit->Orders[0]->Range++;
 		} else {
 			//
 			// goal/spot out of range -- give up
 			//
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Action = UnitActionStill;
 			unit->State = unit->SubAction = 0;
 
-			if (unit->Orders[0].Goal) { // Release references
-				unit->Orders->Goal->RefsDecrease();
-				unit->Orders[0].Goal = NoUnitP;
+			if (unit->Orders[0]->Goal) { // Release references
+				unit->Orders[0]->Goal->RefsDecrease();
+				unit->Orders[0]->Goal = NoUnitP;
 			}
 		}
 	}
@@ -169,9 +169,9 @@ void HandleActionSpellCast(CUnit *unit)
 			//
 			// Check if we can cast the spell.
 			//
-			spell = unit->Orders[0].Arg1.Spell;
-			if (!CanCastSpell(unit, spell, unit->Orders[0].Goal,
-					unit->Orders[0].X, unit->Orders[0].Y)) {
+			spell = unit->Orders[0]->Arg1.Spell;
+			if (!CanCastSpell(unit, spell, unit->Orders[0]->Goal,
+					unit->Orders[0]->X, unit->Orders[0]->Y)) {
 
 				//
 				// Notify player about this problem
@@ -189,11 +189,11 @@ void HandleActionSpellCast(CUnit *unit)
 				if (unit->Player->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
-				unit->Orders[0].Action = UnitActionStill;
+				unit->Orders[0]->Action = UnitActionStill;
 				unit->SubAction = 0;
-				if (unit->Orders[0].Goal) {
-					unit->Orders->Goal->RefsDecrease();
-					unit->Orders[0].Goal = NoUnitP;
+				if (unit->Orders[0]->Goal) {
+					unit->Orders[0]->Goal->RefsDecrease();
+					unit->Orders[0]->Goal = NoUnitP;
 				}
 				return;
 			}
@@ -203,7 +203,7 @@ void HandleActionSpellCast(CUnit *unit)
 			unit->SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
-			if ((spell = unit->Orders[0].Arg1.Spell)->Range != INFINITE_RANGE) {
+			if ((spell = unit->Orders[0]->Arg1.Spell)->Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
 			} else {
@@ -219,20 +219,20 @@ void HandleActionSpellCast(CUnit *unit)
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
-				if (unit->Orders[0].Goal && !unit->Orders->Goal->IsVisibleAsGoal(unit->Player)) {
+				if (unit->Orders[0]->Goal && !unit->Orders[0]->Goal->IsVisibleAsGoal(unit->Player)) {
 					unit->ReCast = 0;
 				} else {
-					spell = unit->Orders[0].Arg1.Spell;
-					unit->ReCast = SpellCast(unit, spell, unit->Orders[0].Goal,
-						unit->Orders[0].X, unit->Orders[0].Y);
+					spell = unit->Orders[0]->Arg1.Spell;
+					unit->ReCast = SpellCast(unit, spell, unit->Orders[0]->Goal,
+						unit->Orders[0]->X, unit->Orders[0]->Y);
 				}
 			}
-			if (!unit->ReCast && unit->Orders[0].Action != UnitActionDie) {
-				unit->Orders[0].Action = UnitActionStill;
+			if (!unit->ReCast && unit->Orders[0]->Action != UnitActionDie) {
+				unit->Orders[0]->Action = UnitActionStill;
 				unit->SubAction = 0;
-				if (unit->Orders[0].Goal) {
-					unit->Orders->Goal->RefsDecrease();
-					unit->Orders[0].Goal = NoUnitP;
+				if (unit->Orders[0]->Goal) {
+					unit->Orders[0]->Goal->RefsDecrease();
+					unit->Orders[0]->Goal = NoUnitP;
 				}
 			}
 			break;

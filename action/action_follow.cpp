@@ -66,15 +66,15 @@ void HandleActionFollow(CUnit *unit)
 	// Reached target
 	//
 	if (unit->SubAction == 128) {
-		goal = unit->Orders[0].Goal;
+		goal = unit->Orders[0]->Goal;
 		if (!goal || !goal->IsVisibleAsGoal(unit->Player)) {
 			DebugPrint("Goal gone\n");
 			if (goal) {
 				goal->RefsDecrease();
 			}
-			unit->Orders[0].Goal = NoUnitP;
+			unit->Orders[0]->Goal = NoUnitP;
 			unit->SubAction = 0;
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Action = UnitActionStill;
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
 			}
@@ -84,7 +84,7 @@ void HandleActionFollow(CUnit *unit)
 		// Two posibilities, both broken. maybe we should change the animation system?
 		// FIXME: Unit doesn't decrease range
 #if 0
-		if ((goal->X == unit->Orders[0].X && goal->Y == unit->Orders[0].Y) || unit->State) {
+		if ((goal->X == unit->Orders[0]->X && goal->Y == unit->Orders[0]->Y) || unit->State) {
 			UnitShowAnimation(unit, unit->Type->Animations->Still);
 			//
 			// Sea and air units are floating up/down.
@@ -96,10 +96,10 @@ void HandleActionFollow(CUnit *unit)
 		}
 #else
 		// FIXME: Unit doesn't animate.
-		if ((goal->X == unit->Orders[0].X && goal->Y == unit->Orders[0].Y)) {
+		if ((goal->X == unit->Orders[0]->X && goal->Y == unit->Orders[0]->Y)) {
 			unit->Wait = 10;
-			if (unit->Orders[0].Range > 1) {
-				unit->Orders[0].Range = 1;
+			if (unit->Orders[0]->Range > 1) {
+				unit->Orders[0]->Range = 1;
 				unit->SubAction = 0;
 			}
 			return;
@@ -119,16 +119,16 @@ void HandleActionFollow(CUnit *unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit->Orders[0].Range <= TheMap.Info.MapWidth ||
-					unit->Orders[0].Range <= TheMap.Info.MapHeight) {
-				unit->Orders[0].Range++;
+			if (unit->Orders[0]->Range <= TheMap.Info.MapWidth ||
+					unit->Orders[0]->Range <= TheMap.Info.MapHeight) {
+				unit->Orders[0]->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
-			if ((goal = unit->Orders[0].Goal) &&
+			if ((goal = unit->Orders[0]->Goal) &&
 					goal->Type->Teleporter && goal->Goal &&
 					MapDistanceBetweenUnits(unit, goal) <= 1) {
 				CUnit *dest;
@@ -149,7 +149,7 @@ void HandleActionFollow(CUnit *unit)
 					unit->Y * TileSizeY + TileSizeY / 2);
 #endif
 				unit->SubAction = 0;
-				unit->Orders[0].Action = UnitActionStill;
+				unit->Orders[0]->Action = UnitActionStill;
 
 				//
 				// FIXME: we must check if the units supports the new order.
@@ -164,8 +164,8 @@ void HandleActionFollow(CUnit *unit)
 							(dest->NewOrder.Action == UnitActionBoard &&
 								unit->Type->UnitType != UnitTypeLand)) {
 						DebugPrint("Wrong order for unit\n");
-						unit->Orders->Action = UnitActionStill;
-						unit->Orders->Goal = NoUnitP;
+						unit->Orders[0]->Action = UnitActionStill;
+						unit->Orders[0]->Goal = NoUnitP;
 					} else {
 						if (dest->NewOrder.Goal) {
 							if (dest->NewOrder.Goal->Destroyed) {
@@ -177,29 +177,29 @@ void HandleActionFollow(CUnit *unit)
 							}
 						}
 
-						unit->Orders[0] = dest->NewOrder;
+						*unit->Orders[0] = dest->NewOrder;
 
 						//
 						// FIXME: Pending command uses any references?
 						//
-						if (unit->Orders[0].Goal) {
-							unit->Orders->Goal->RefsIncrease();
+						if (unit->Orders[0]->Goal) {
+							unit->Orders[0]->Goal->RefsIncrease();
 						}
 					}
 				}
 				return;
 			}
 
-			if (!(goal = unit->Orders[0].Goal)) { // goal has died
+			if (!(goal = unit->Orders[0]->Goal)) { // goal has died
 				unit->SubAction = 0;
-				unit->Orders[0].Action = UnitActionStill;
+				unit->Orders[0]->Action = UnitActionStill;
 				if (IsOnlySelected(unit)) { // update display for new action
 					SelectedUnitChanged();
 				}
 				return;
 			}
-			unit->Orders[0].X = goal->X;
-			unit->Orders[0].Y = goal->Y;
+			unit->Orders[0]->X = goal->X;
+			unit->Orders[0]->Y = goal->Y;
 			unit->SubAction = 128;
 
 			// FALL THROUGH
@@ -210,11 +210,11 @@ void HandleActionFollow(CUnit *unit)
 	//
 	// Target destroyed?
 	//
-	if ((goal = unit->Orders[0].Goal) && !goal->IsVisibleAsGoal(unit->Player)) {
+	if ((goal = unit->Orders[0]->Goal) && !goal->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Goal gone\n");
-		unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
-		unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
-		unit->Orders[0].Goal = NoUnitP;
+		unit->Orders[0]->X = goal->X + goal->Type->TileWidth / 2;
+		unit->Orders[0]->Y = goal->Y + goal->Type->TileHeight / 2;
+		unit->Orders[0]->Goal = NoUnitP;
 		goal->RefsDecrease();
 		goal = NoUnitP;
 		NewResetPath(unit);
@@ -228,16 +228,16 @@ void HandleActionFollow(CUnit *unit)
 		//  better goal if moving nearer to enemy.
 		//
 		if (unit->Type->CanAttack &&
-				(!goal || goal->Orders[0].Action == UnitActionAttack ||
-					goal->Orders[0].Action == UnitActionStill)) {
+				(!goal || goal->Orders[0]->Action == UnitActionAttack ||
+					goal->Orders[0]->Action == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				// Save current command to come back.
-				unit->SavedOrder = unit->Orders[0];
+				unit->SavedOrder = *unit->Orders[0];
 				// This stops the follow command and the attack is executed
-				unit->Orders[0].Action = UnitActionStill;
-				unit->Orders[0].Goal = NoUnitP;
+				unit->Orders[0]->Action = UnitActionStill;
+				unit->Orders[0]->Goal = NoUnitP;
 				unit->SubAction = 0;
 			}
 		}

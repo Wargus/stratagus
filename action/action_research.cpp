@@ -65,7 +65,7 @@ void HandleActionResearch(CUnit *unit)
 	const CUpgrade *upgrade;
 
 	if (!unit->SubAction) { // first entry
-		upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1.Upgrade;
+		upgrade = unit->Data.Research.Upgrade = unit->Orders[0]->Arg1.Upgrade;
 #if 0
 		// FIXME: I want to support both, but with network we need this check
 		//  but if want combined upgrades this is worse
@@ -77,7 +77,7 @@ void HandleActionResearch(CUnit *unit)
 			DebugPrint("Two researches running\n");
 			PlayerAddCosts(unit->Player, upgrade->Costs);
 
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Action = UnitActionStill;
 			unit->SubAction = 0;
 			return;
 		}
@@ -106,7 +106,7 @@ void HandleActionResearch(CUnit *unit)
 		}
 		UpgradeAcquire(unit->Player, upgrade);
 
-		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = 0;
 
 		// Upgrade can change all

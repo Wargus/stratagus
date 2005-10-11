@@ -181,7 +181,7 @@ void DrawMapArea(void)
 			//
 			if (vp->Unit) {
 				if (vp->Unit->Destroyed ||
-						vp->Unit->Orders[0].Action == UnitActionDie) {
+						vp->Unit->Orders[0]->Action == UnitActionDie) {
 					vp->Unit = NoUnitP;
 				} else {
 					vp->Center(vp->Unit->X, vp->Unit->Y,

@@ -79,7 +79,9 @@ static void ReleaseOrders(CUnit *unit)
 
 	if ((n = unit->OrderCount) > 1) {
 		while (--n) {
-			ReleaseOrder(&unit->Orders[n]);
+			ReleaseOrder(unit->Orders[n]);
+			delete unit->Orders[n];
+			unit->Orders.pop_back();
 		}
 		unit->OrderCount = 1;
 	}
@@ -97,27 +99,13 @@ static void ReleaseOrders(CUnit *unit)
 */
 static COrder *GetNextOrder(CUnit *unit, int flush)
 {
-	COrder *old_orders;
-
 	if (flush) {
 		// empty command queue
 		ReleaseOrders(unit);
-	} else if (unit->OrderCount == unit->TotalOrders) {
-		// Expand Order Queue if filled
-		old_orders = unit->Orders;
-		unit->Orders = (COrder *)realloc(unit->Orders, sizeof(COrder) * unit->TotalOrders * 2);
-		// Realloc failed, fail gracefully
-		if (!unit->Orders) {
-			unit->Orders = old_orders;
-			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-				"Unable to add order to list");
-			return NULL;
-		}
-		memset(&unit->Orders[unit->TotalOrders], 0, sizeof(COrder) * unit->TotalOrders);
-		unit->TotalOrders *= 2;
 	}
+	unit->Orders.push_back(new COrder);
 
-	return &unit->Orders[(int)unit->OrderCount++];
+	return unit->Orders[(int)unit->OrderCount++];
 }
 
 /**
@@ -131,6 +119,9 @@ static void RemoveOrder(CUnit *unit, int order)
 	int i;
 	
 	Assert(0 <= order && order < unit->OrderCount);
+	if (order != 0) {
+		delete unit->Orders[order];
+	}
 	i = order;
 	while (i < unit->OrderCount - 1) {
 		unit->Orders[i] = unit->Orders[i + 1];
@@ -138,12 +129,12 @@ static void RemoveOrder(CUnit *unit, int order)
 	}
 
 	if (unit->OrderCount > 1) {
+		unit->Orders.pop_back();
 		--unit->OrderCount;
 	} else {
 		Assert(i == 0);
-		memset(unit->Orders + i, 0, sizeof(*unit->Orders));
-		unit->Orders[i].Action = UnitActionStill;
-		unit->Orders[i].X = unit->Orders[i].Y = -1;
+		unit->Orders[0]->Init();
+		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = 0;
 	}
 }
@@ -160,9 +151,8 @@ static void ClearSavedAction(CUnit *unit)
 {
 	ReleaseOrder(&unit->SavedOrder);
 
-	memset(&unit->SavedOrder, 0, sizeof(unit->SavedOrder));
+	unit->SavedOrder.Init();
 	unit->SavedOrder.Action = UnitActionStill; // clear saved action
-	unit->SavedOrder.X = unit->SavedOrder.Y = -1;
 }
 
 /*----------------------------------------------------------------------------
@@ -182,10 +172,9 @@ void CommandStopUnit(CUnit *unit)
 
 	order = GetNextOrder(unit, FlushCommands); // Flush them.
 	Assert(order);
-	memset(order, 0, sizeof(*order));
+	order->Init();
 
 	order->Action = UnitActionStill;
-	order->X = order->Y = -1;
 	ReleaseOrder(&unit->SavedOrder);
 	ReleaseOrder(&unit->NewOrder);
 	unit->SavedOrder = unit->NewOrder = *order;
@@ -223,7 +212,7 @@ void CommandAnyOrder(CUnit *unit, COrder *cpyorder, int flush)
 */
 void CommandMoveOrder(CUnit *unit, int src, int dst)
 {
-	COrder tmp;
+	COrder *tmp;
 	int i;
 
 	Assert(src != 0 && dst != 0 && src < unit->OrderCount && dst < unit->OrderCount);
@@ -267,9 +256,8 @@ void CommandStandGround(CUnit *unit, int flush)
 	} else if (!(order = GetNextOrder(unit, flush))) {
 		return;
 	}
-	memset(order, 0, sizeof(*order));
+	order->Init();
 	order->Action = UnitActionStandGround;
-	order->X = order->Y = -1;
 	ClearSavedAction(unit);
 }
 
@@ -287,7 +275,7 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -295,7 +283,7 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionFollow;
 		//
@@ -307,7 +295,6 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 			order->X = dest->X + dest->Type->TileWidth / 2;
 			order->Y = dest->Y + dest->Type->TileHeight / 2;
 		} else {
-			order->X = order->Y = -1;
 			order->Goal = dest;
 			dest->RefsIncrease();
 			order->Range = 1;
@@ -333,7 +320,7 @@ void CommandMove(CUnit *unit, int x, int y, int flush)
 	//
 	//  Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -341,10 +328,9 @@ void CommandMove(CUnit *unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionMove;
-		order->Goal = NoUnitP;
 		order->X = x;
 		order->Y = y;
 	}
@@ -367,7 +353,7 @@ void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 	//
 	//  Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -375,7 +361,7 @@ void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionRepair;
 		//
@@ -388,7 +374,6 @@ void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 				order->X = dest->X + dest->Type->TileWidth / 2;
 				order->Y = dest->Y + dest->Type->TileHeight / 2;
 			} else {
-				order->X = order->Y = -1;
 				order->Goal = dest;
 				dest->RefsIncrease();
 				order->Range = unit->Type->RepairRange;
@@ -412,7 +397,7 @@ void CommandAutoRepair(CUnit *unit, int on)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		unit->AutoRepair = on;
 	}
 }
@@ -435,7 +420,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (!unit->Type->CanAttack) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -443,7 +428,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionAttack;
 		if (attack) {
@@ -457,7 +442,6 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 				order->Y = attack->Y + attack->Type->TileHeight / 2;
 			} else {
 				// Removed, Dying handled by action routine.
-				order->X = order->Y = -1;
 				order->Goal = attack;
 				attack->RefsIncrease();
 				order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
@@ -472,8 +456,6 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 		} else {
 			order->X = x;
 			order->Y = y;
-			order->Range = 0;
-			order->Goal = NoUnitP;
 		}
 	}
 	ClearSavedAction(unit);
@@ -496,7 +478,7 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -504,7 +486,7 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionAttackGround;
 		order->X = x;
@@ -536,7 +518,7 @@ void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -544,7 +526,7 @@ void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionPatrol;
 		order->X = x;
@@ -570,7 +552,7 @@ void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		//
 		// Destination could be killed.
 		// Should be handled in action, but is not possible!
@@ -587,10 +569,9 @@ void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionBoard;
-		order->X = order->Y = -1;
 		order->Goal = dest;
 		dest->RefsIncrease();
 		order->Range = 1;
@@ -614,11 +595,11 @@ void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionUnload;
 		order->X = x;
@@ -653,7 +634,7 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -661,7 +642,7 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionBuild;
 		order->X = x;
@@ -695,7 +676,7 @@ void CommandDismiss(CUnit *unit)
 	//
 	// Check if building is still under construction? (NETWORK!)
 	//
-	if (unit->Orders[0].Action == UnitActionBuilt) {
+	if (unit->Orders[0]->Action == UnitActionBuilt) {
 		unit->Data.Built.Cancel = 1;
 	} else {
 		DebugPrint("Suicide unit ... \n");
@@ -721,7 +702,7 @@ void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -729,7 +710,7 @@ void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionResource;
 
@@ -772,7 +753,7 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie &&
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie &&
 			!dest->Destroyed) {
 		// FIXME: more races, could happen with many orders in queue.
 		if (!unit->Type->Building && !unit->Type->Harvester) {
@@ -789,10 +770,8 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
-
+		order->Init();
 		order->Action = UnitActionResource;
-		order->X = order->Y = -1;
 		order->Goal = dest;
 		dest->RefsIncrease();
 		order->Range = 1;
@@ -814,7 +793,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		// FIXME: more races, could happen with many orders in queue.
 		if (!unit->Type->Building && !unit->Type->Harvester && !unit->ResourcesHeld) {
 			ClearSavedAction(unit);
@@ -828,10 +807,9 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionReturnGoods;
-		order->X = order->Y = -1;
 		//
 		// Destination could be killed. NETWORK!
 		//
@@ -858,7 +836,7 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		//
 		// Check if enough resources remains? (NETWORK!)
 		// FIXME: wrong if append to message queue!!!
@@ -871,18 +849,17 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 		//
 		// Not already training?
 		//
-		if (!EnableTrainingQueue && unit->Orders[0].Action == UnitActionTrain) {
+		if (!EnableTrainingQueue && unit->Orders[0]->Action == UnitActionTrain) {
 			DebugPrint("Unit queue full!\n");
 			return;
 		}
 		if (!(order = GetNextOrder(unit, 0))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionTrain;
 		order->Type = type;
-		order->X = order->Y = -1;
 		// FIXME: if you give quick an other order, the resources are lost!
 		unit->Player->SubUnitType(type);
 	}
@@ -909,9 +886,9 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 
 	if (slot == -1) {
 		// Cancel All training
-		while (unit->Orders[0].Action == UnitActionTrain) {
+		while (unit->Orders[0]->Action == UnitActionTrain) {
 			unit->Player->AddCostsFactor(
-				unit->Orders[0].Type->Stats[unit->Player->Index].Costs,
+				unit->Orders[0]->Type->Stats[unit->Player->Index].Costs,
 				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
 		}
@@ -922,12 +899,12 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 	} else if (unit->OrderCount < slot) {
 		// Order has moved
 		return;
-	} else if (unit->Orders[slot].Action != UnitActionTrain) {
+	} else if (unit->Orders[slot]->Action != UnitActionTrain) {
 		// Order has moved, we are not training
 		return;
-	} else if (unit->Orders[slot].Action == UnitActionTrain) {
+	} else if (unit->Orders[slot]->Action == UnitActionTrain) {
 		// Still training this order, same unit?
-		if (type && unit->Orders[slot].Type != type) {
+		if (type && unit->Orders[slot]->Type != type) {
 			// Different unit being trained
 			return;
 		}
@@ -935,7 +912,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 		DebugPrint("Cancel training\n");
 
 		unit->Player->AddCostsFactor(
-			unit->Orders[slot].Type->Stats[unit->Player->Index].Costs,
+			unit->Orders[slot]->Type->Stats[unit->Player->Index].Costs,
 			CancelTrainingCostsFactor);
 
 	
@@ -967,7 +944,7 @@ void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		//
 		// Check if enough resources remains? (NETWORK!)
 		//
@@ -981,13 +958,12 @@ void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		// FIXME: if you give quick an other order, the resources are lost!
 		unit->Player->SubUnitType(type);
 
 		order->Action = UnitActionUpgradeTo;
-		order->X = order->Y = -1;
 		order->Type = type;
 	}
 	ClearSavedAction(unit);
@@ -1005,10 +981,9 @@ void CommandTransformIntoType(CUnit *unit, CUnitType *type)
 
 	Assert(unit->CriticalOrder.Action == UnitActionStill);
 	order = &unit->CriticalOrder;
-	memset(order, 0, sizeof(*order));
+	order->Init();
 
 	order->Action = UnitActionTransformInto;
-	order->X = order->Y = -1;
 	order->Type = type;
 }
 
@@ -1024,16 +999,15 @@ void CommandCancelUpgradeTo(CUnit *unit)
 	//
 	// Check if unit is still upgrading? (NETWORK!)
 	//
-	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
+	if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
 
 		unit->Player->AddCostsFactor(
-			unit->Orders[0].Type->Stats[unit->Player->Index].Costs,
+			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs,
 			CancelUpgradeCostsFactor);
 
-		memset(unit->Orders, 0, sizeof(*unit->Orders));
+		unit->Orders[0]->Init();
 
-		unit->Orders[0].Action = UnitActionStill;
-		unit->Orders[0].X = unit->Orders[0].Y = -1;
+		unit->Orders[0]->Action = UnitActionStill;
 
 		unit->SubAction = 0;
 
@@ -1061,7 +1035,7 @@ void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		//
 		// Check if enough resources remains? (NETWORK!)
 		//
@@ -1072,7 +1046,7 @@ void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 		if (!flush) {
 			DebugPrint("FIXME: must support order queing!!");
 		} else {
-			if (unit->Orders[0].Action == UnitActionResearch) {
+			if (unit->Orders[0]->Action == UnitActionResearch) {
 				const CUpgrade *upgrade;
 
 				// Cancel current research
@@ -1087,7 +1061,7 @@ void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		// FIXME: if you give quick an other order, the resources are lost!
 		unit->Player->SubCosts(what->Costs);
@@ -1111,7 +1085,7 @@ void CommandCancelResearch(CUnit *unit)
 	//
 	// Check if unit is still researching? (NETWORK!)
 	//
-	if (unit->Orders[0].Action == UnitActionResearch) {
+	if (unit->Orders[0]->Action == UnitActionResearch) {
 		const CUpgrade *upgrade;
 
 		upgrade = unit->Data.Research.Upgrade;
@@ -1119,10 +1093,9 @@ void CommandCancelResearch(CUnit *unit)
 
 		unit->Player->AddCostsFactor(upgrade->Costs,
 			CancelResearchCostsFactor);
-		memset(unit->Orders, 0, sizeof(*unit->Orders));
+		unit->Orders[0]->Init();
 
-		unit->Orders[0].Action = UnitActionStill;
-		unit->Orders[0].X = unit->Orders[0].Y = -1;
+		unit->Orders[0]->Action = UnitActionStill;
 
 		unit->SubAction = 0;
 
@@ -1160,13 +1133,13 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		// FIXME: should I check here, if there is still enough mana?
 
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
-		memset(order, 0, sizeof(*order));
+		order->Init();
 
 		order->Action = UnitActionSpellCast;
 		order->Range = spell->Range;
@@ -1183,7 +1156,6 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;
 				order->Range <<= 2;
 			} else {
-				order->X = order->Y = -1;
 				order->Goal = dest;
 				dest->RefsIncrease();
 			}
@@ -1209,7 +1181,7 @@ void CommandAutoSpellCast(CUnit *unit, int spellid, int on)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 		unit->AutoCastSpell[spellid] = on;
 	}
 }

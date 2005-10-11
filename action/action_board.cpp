@@ -69,11 +69,11 @@ static int MoveToTransporter(CUnit *unit)
 	i = DoActionMove(unit);
 	// We have to reset a lot, or else they will circle each other and stuff.
 	if (x != unit->X || y != unit->Y) {
-		unit->Orders[0].Range = 1;
+		unit->Orders[0]->Range = 1;
 		NewResetPath(unit);
 	}
 	// New code has this as default.
-	Assert(unit->Orders[0].Action == UnitActionBoard);
+	Assert(unit->Orders[0]->Action == UnitActionBoard);
 	return i;
 }
 
@@ -93,7 +93,7 @@ static int WaitForTransporter(CUnit *unit)
 		return 0;
 	}
 
-	trans = unit->Orders[0].Goal;
+	trans = unit->Orders[0]->Goal;
 
 	if (!trans || !CanTransport(trans, unit)) {
 		// FIXME: destination destroyed??
@@ -104,7 +104,7 @@ static int WaitForTransporter(CUnit *unit)
 	if (!trans->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Transporter Gone\n");
 		trans->RefsDecrease();
-		unit->Orders[0].Goal = NoUnitP;
+		unit->Orders[0]->Goal = NoUnitP;
 		unit->Wait = 6;
 		return 0;
 	}
@@ -124,7 +124,7 @@ static int WaitForTransporter(CUnit *unit)
 	// it's there. This is why we reset the search. The transporter
 	// should be a lot closer now, so it's not as bad as it seems.
 	unit->SubAction = 0;
-	unit->Orders[0].Range = 1;
+	unit->Orders[0]->Range = 1;
 	// Uhh wait a bit.
 	unit->Wait = 10;
 
@@ -140,19 +140,19 @@ static void EnterTransporter(CUnit *unit)
 {
 	CUnit *transporter;
 
-	unit->Orders[0].Action = UnitActionStill;
+	unit->Orders[0]->Action = UnitActionStill;
 	unit->SubAction = 0;
 
-	transporter = unit->Orders[0].Goal;
+	transporter = unit->Orders[0]->Goal;
 	if (!transporter->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Transporter gone\n");
 		transporter->RefsDecrease();
-		unit->Orders[0].Goal = NoUnitP;
+		unit->Orders[0]->Goal = NoUnitP;
 		return;
 	}
 
 	transporter->RefsDecrease();
-	unit->Orders[0].Goal = NoUnitP;
+	unit->Orders[0]->Goal = NoUnitP;
 
 	//
 	// Place the unit inside the transporter.
@@ -166,7 +166,7 @@ static void EnterTransporter(CUnit *unit)
 			// Don't make anything funny after going out of the transporter.
 			// FIXME: This is probably wrong, but it works for me (n0b0dy)
 			unit->OrderCount = 1;
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Action = UnitActionStill;
 		}
 
 		if (IsOnlySelected(transporter)) {
@@ -223,19 +223,19 @@ void HandleActionBoard(CUnit *unit)
 				if ((i = MoveToTransporter(unit))) {
 					if (i == PF_UNREACHABLE) {
 						if (++unit->SubAction == 200) {
-							unit->Orders[0].Action = UnitActionStill;
-							if ((goal = unit->Orders[0].Goal)) {
+							unit->Orders[0]->Action = UnitActionStill;
+							if ((goal = unit->Orders[0]->Goal)) {
 								goal->RefsDecrease();
-								unit->Orders[0].Goal = NoUnitP;
+								unit->Orders[0]->Goal = NoUnitP;
 							}
 							unit->SubAction = 0;
 						} else {
 							//
 							// Try with a bigger range.
 							//
-							if (unit->Orders[0].Range <= TheMap.Info.MapWidth ||
-									unit->Orders[0].Range <= TheMap.Info.MapHeight) {
-								unit->Orders[0].Range++;
+							if (unit->Orders[0]->Range <= TheMap.Info.MapWidth ||
+									unit->Orders[0]->Range <= TheMap.Info.MapHeight) {
+								unit->Orders[0]->Range++;
 								unit->SubAction--;
 							}
 						}

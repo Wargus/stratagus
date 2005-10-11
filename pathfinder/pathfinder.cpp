@@ -458,23 +458,23 @@ int NewPath(CUnit *unit)
 	int maxrange;
 	char *path;
 
-	if (unit->Orders[0].Goal) {
-		gw = unit->Orders[0].Goal->Type->TileWidth;
-		gh = unit->Orders[0].Goal->Type->TileHeight;
-		gx = unit->Orders[0].Goal->X;
-		gy = unit->Orders[0].Goal->Y;
-		maxrange = unit->Orders[0].Range;
-		minrange = unit->Orders[0].MinRange;
+	if (unit->Orders[0]->Goal) {
+		gw = unit->Orders[0]->Goal->Type->TileWidth;
+		gh = unit->Orders[0]->Goal->Type->TileHeight;
+		gx = unit->Orders[0]->Goal->X;
+		gy = unit->Orders[0]->Goal->Y;
+		maxrange = unit->Orders[0]->Range;
+		minrange = unit->Orders[0]->MinRange;
 	} else {
 		// Take care of non square goals :)
 		// If goal is non square, range states a non-existant goal rather
 		// than a tile.
-		gw = unit->Orders[0].Width;
-		gh = unit->Orders[0].Height;
-		maxrange = unit->Orders[0].Range;
-		minrange = unit->Orders[0].MinRange;
-		gx = unit->Orders[0].X;
-		gy = unit->Orders[0].Y;
+		gw = unit->Orders[0]->Width;
+		gh = unit->Orders[0]->Height;
+		maxrange = unit->Orders[0]->Range;
+		minrange = unit->Orders[0]->MinRange;
+		gx = unit->Orders[0]->X;
+		gy = unit->Orders[0]->Y;
 	}
 	path = unit->Data.Move.Path;
 	i = AStarFindPath(unit,gx,gy,gw,gh,minrange,maxrange,path);

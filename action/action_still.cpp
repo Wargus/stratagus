@@ -99,8 +99,8 @@ void ActionStillGeneric(CUnit *unit, int ground)
 	CUnit *goal;
 	int i;
 
-	Assert(unit->Orders[0].Action == UnitActionStill ||
-		unit->Orders[0].Action == UnitActionStandGround);
+	Assert(unit->Orders[0]->Action == UnitActionStill ||
+		unit->Orders[0]->Action == UnitActionStandGround);
 
 	//
 	// If unit is not bunkered and removed, wait
@@ -171,12 +171,12 @@ void ActionStillGeneric(CUnit *unit, int ground)
 			UnmarkUnitFieldFlags(unit);
 			if (UnitCanBeAt(unit, x, y)) {
 				// FIXME: Don't use pathfinder for this, costs too much cpu.
-				unit->Orders[0].Action = UnitActionMove;
-				Assert(!unit->Orders[0].Goal);
-				unit->Orders[0].Goal = NoUnitP;
-				unit->Orders[0].Range = 0;
-				unit->Orders[0].X = x;
-				unit->Orders[0].Y = y;
+				unit->Orders[0]->Action = UnitActionMove;
+				Assert(!unit->Orders[0]->Goal);
+				unit->Orders[0]->Goal = NoUnitP;
+				unit->Orders[0]->Range = 0;
+				unit->Orders[0]->X = x;
+				unit->Orders[0]->Y = y;
 				unit->State = 0;
 			}
 			MarkUnitFieldFlags(unit);
@@ -232,17 +232,17 @@ void ActionStillGeneric(CUnit *unit, int ground)
 			//
 			// Old goal unavailable.
 			//
-			temp = unit->Orders[0].Goal;
-			if (temp && temp->Orders[0].Action == UnitActionDie) {
+			temp = unit->Orders[0]->Goal;
+			if (temp && temp->Orders[0]->Action == UnitActionDie) {
 				temp->RefsDecrease();
-				unit->Orders[0].Goal = temp = NoUnitP;
+				unit->Orders[0]->Goal = temp = NoUnitP;
 			}
 			if (!unit->SubAction || temp != goal) {
 				// New target.
 				if (temp) {
 					temp->RefsDecrease();
 				}
-				unit->Orders[0].Goal = goal;
+				unit->Orders[0]->Goal = goal;
 				goal->RefsIncrease();
 				unit->State = 0;
 				unit->SubAction = 1; // Mark attacking.
@@ -255,13 +255,13 @@ void ActionStillGeneric(CUnit *unit, int ground)
 	}
 
 	if (unit->SubAction) { // was attacking.
-		if ((temp = unit->Orders[0].Goal)) {
+		if ((temp = unit->Orders[0]->Goal)) {
 			temp->RefsDecrease();
-			unit->Orders[0].Goal = NoUnitP;
+			unit->Orders[0]->Goal = NoUnitP;
 		}
 		unit->SubAction = unit->State = 0; // No attacking, restart
 	}
-	Assert(!unit->Orders[0].Goal);
+	Assert(!unit->Orders[0]->Goal);
 
 	//
 	// Sea and air units are floating up/down.
