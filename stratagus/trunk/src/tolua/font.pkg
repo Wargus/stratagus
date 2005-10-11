@@ -1,0 +1,6 @@
+class CFont
+{
+	static CFont *New(const char *ident, CGraphic *g);
+	static CFont *Get(const char *ident);
+};
+
