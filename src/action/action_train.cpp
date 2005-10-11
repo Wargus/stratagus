@@ -118,13 +118,13 @@ void HandleActionTrain(CUnit *unit)
 	unit->Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
 	if (unit->Data.Train.Ticks >=
-			unit->Orders[0].Type->Stats[player->Index].Costs[TimeCost]) {
+			unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost]) {
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
 			unit->Data.Train.Ticks =
-				unit->Orders[0].Type->Stats[player->Index].Costs[TimeCost];
+				unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -132,19 +132,19 @@ void HandleActionTrain(CUnit *unit)
 		//
 		// Check if enough supply available.
 		//
-		food = player->CheckLimits(unit->Orders[0].Type);
+		food = player->CheckLimits(unit->Orders[0]->Type);
 		if (food < 0) {
 			if (food == -3 && unit->Player->AiEnabled) {
-				AiNeedMoreSupply(unit, unit->Orders[0].Type);
+				AiNeedMoreSupply(unit, unit->Orders[0]->Type);
 			}
 
 			unit->Data.Train.Ticks =
-				unit->Orders[0].Type->Stats[player->Index].Costs[TimeCost];
+				unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
-		nunit = MakeUnit(unit->Orders[0].Type, player);
+		nunit = MakeUnit(unit->Orders[0]->Type, player);
 		if (nunit != NoUnitP) {
 			nunit->X = unit->X;
 			nunit->Y = unit->Y;
@@ -175,17 +175,17 @@ void HandleActionTrain(CUnit *unit)
 				AiTrainingComplete(unit, nunit);
 			}
 
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders[0]->Action = UnitActionStill;
 			unit->SubAction = 0;
 
 			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
 				DebugPrint("Wrong order for unit\n");
 
 				// Tell the unit to move instead of trying any funny stuff.
-				nunit->Orders[0] = unit->NewOrder;
-				nunit->Orders[0].Action = UnitActionMove;
-				if (nunit->Orders[0].Goal) {
-					nunit->Orders->Goal->RefsIncrease();
+				*nunit->Orders[0] = unit->NewOrder;
+				nunit->Orders[0]->Action = UnitActionMove;
+				if (nunit->Orders[0]->Goal) {
+					nunit->Orders[0]->Goal->RefsIncrease();
 				}
 			} else {
 				if (unit->NewOrder.Goal) {
@@ -198,13 +198,13 @@ void HandleActionTrain(CUnit *unit)
 					}
 				}
 
-				nunit->Orders[0] = unit->NewOrder;
+				*nunit->Orders[0] = unit->NewOrder;
 
 				//
 				// FIXME: Pending command uses any references?
 				//
-				if (nunit->Orders[0].Goal) {
-					nunit->Orders->Goal->RefsIncrease();
+				if (nunit->Orders[0]->Goal) {
+					nunit->Orders[0]->Goal->RefsIncrease();
 				}
 			}
 
@@ -214,7 +214,7 @@ void HandleActionTrain(CUnit *unit)
 			return;
 		} else {
 			player->Notify(NotifyYellow, unit->X, unit->Y,
-				"Unable to Train %s", unit->Orders[0].Type->Name);
+				"Unable to Train %s", unit->Orders[0]->Type->Name);
 		}
 	}
 

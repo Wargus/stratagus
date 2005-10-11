@@ -1152,7 +1152,7 @@ void AiUnitKilled(CUnit *unit)
 	Assert(unit->Player->Type != PlayerPerson);
 
 	// FIXME: must handle all orders...
-	switch (unit->Orders[0].Action) {
+	switch (unit->Orders[0]->Action) {
 		case UnitActionStill:
 		case UnitActionAttack:
 		case UnitActionMove:
@@ -1165,15 +1165,15 @@ void AiUnitKilled(CUnit *unit)
 		case UnitActionBuild:
 			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 				unit->Player->Index _C_ UnitNumber(unit) _C_
-				unit->Type->Ident _C_ unit->Orders[0].Type->Ident);
-			if (!unit->Orders[0].Goal) {
-				AiReduceMadeInBuilt(unit->Player->Ai, unit->Orders[0].Type);
+				unit->Type->Ident _C_ unit->Orders[0]->Type->Ident);
+			if (!unit->Orders[0]->Goal) {
+				AiReduceMadeInBuilt(unit->Player->Ai, unit->Orders[0]->Type);
 			}
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
 				unit->Player->Index _C_ UnitNumber(unit) _C_
-				unit->Type->Ident _C_ unit->Orders[0].Action);
+				unit->Type->Ident _C_ unit->Orders[0]->Action);
 			break;
 	}
 }
@@ -1377,23 +1377,23 @@ void AiCanNotMove(CUnit *unit)
 
 	AiPlayer = unit->Player->Ai;
 
-	if (unit->Orders[0].Goal) {
-		gw = unit->Orders[0].Goal->Type->TileWidth;
-		gh = unit->Orders[0].Goal->Type->TileHeight;
-		gx = unit->Orders[0].Goal->X;
-		gy = unit->Orders[0].Goal->Y;
-		maxrange = unit->Orders[0].Range;
-		minrange = unit->Orders[0].MinRange;
+	if (unit->Orders[0]->Goal) {
+		gw = unit->Orders[0]->Goal->Type->TileWidth;
+		gh = unit->Orders[0]->Goal->Type->TileHeight;
+		gx = unit->Orders[0]->Goal->X;
+		gy = unit->Orders[0]->Goal->Y;
+		maxrange = unit->Orders[0]->Range;
+		minrange = unit->Orders[0]->MinRange;
 	} else {
 		// Take care of non square goals :)
 		// If goal is non square, range states a non-existant goal rather
 		// than a tile.
-		gw = unit->Orders[0].Width;
-		gh = unit->Orders[0].Height;
-		maxrange = unit->Orders[0].Range;
-		minrange = unit->Orders[0].MinRange;
-		gx = unit->Orders[0].X;
-		gy = unit->Orders[0].Y;
+		gw = unit->Orders[0]->Width;
+		gh = unit->Orders[0]->Height;
+		maxrange = unit->Orders[0]->Range;
+		minrange = unit->Orders[0]->MinRange;
+		gx = unit->Orders[0]->X;
+		gy = unit->Orders[0]->Y;
 	}
 
 	if (PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange) ||

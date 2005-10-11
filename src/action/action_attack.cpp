@@ -102,26 +102,26 @@ static int CheckForDeadGoal(CUnit *unit)
 {
 	CUnit *goal; // unit->Order[0].Goal
 
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 	// Position or valid target, it is ok.
 	if (!goal || goal->IsVisibleAsGoal(unit->Player)) {
 		return 0;
 	}
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
-	unit->Orders[0].X = goal->X;
-	unit->Orders[0].Y = goal->Y;
-	unit->Orders[0].MinRange = 0;
-	unit->Orders[0].Range = 0;
+	unit->Orders[0]->X = goal->X;
+	unit->Orders[0]->Y = goal->Y;
+	unit->Orders[0]->MinRange = 0;
+	unit->Orders[0]->Range = 0;
 
 	goal->RefsDecrease();
-	unit->Orders[0].Goal = NoUnitP;
+	unit->Orders[0]->Goal = NoUnitP;
 
 	//
 	// If we have a saved order continue this saved order.
 	//
 	if (unit->SavedOrder.Action != UnitActionStill) {
-		unit->Orders[0] = unit->SavedOrder;
+		*unit->Orders[0] = unit->SavedOrder;
 		unit->SavedOrder.Action = UnitActionStill;
 		unit->SavedOrder.Goal = NoUnitP;
 		// Restart order state.
@@ -153,26 +153,26 @@ static int CheckForTargetInRange(CUnit *unit)
 	if (CheckForDeadGoal(unit)) {
 		return 1;
 	}
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 
 	//
 	// No goal: if meeting enemy attack it.
 	//
 	wall = 0;
-	if (!goal && !(wall = WallOnMap(unit->Orders[0].X, unit->Orders[0].Y)) &&
-			unit->Orders[0].Action != UnitActionAttackGround) {
+	if (!goal && !(wall = WallOnMap(unit->Orders[0]->X, unit->Orders[0]->Y)) &&
+			unit->Orders[0]->Action != UnitActionAttackGround) {
 		goal = AttackUnitsInReactRange(unit);
 		if (goal) {
 			if (unit->SavedOrder.Action == UnitActionStill) {
 				// Save current command to continue it later.
-				Assert(!unit->Orders[0].Goal);
-				unit->SavedOrder = unit->Orders[0];
+				Assert(!unit->Orders[0]->Goal);
+				unit->SavedOrder = *unit->Orders[0];
 			}
 			goal->RefsIncrease();
-			unit->Orders[0].Goal = goal;
-			unit->Orders[0].MinRange = unit->Type->MinAttackRange;
-			unit->Orders[0].Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
-			unit->Orders[0].X = unit->Orders[0].Y = -1;
+			unit->Orders[0]->Goal = goal;
+			unit->Orders[0]->MinRange = unit->Type->MinAttackRange;
+			unit->Orders[0]->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
+			unit->Orders[0]->X = unit->Orders[0]->Y = -1;
 			unit->SubAction |= WEAK_TARGET; // weak target
 			NewResetPath(unit);
 		}
@@ -187,7 +187,7 @@ static int CheckForTargetInRange(CUnit *unit)
 			temp->RefsIncrease();
 			if (unit->SavedOrder.Action == UnitActionStill) {
 				// Save current command to come back.
-				unit->SavedOrder = unit->Orders[0];
+				unit->SavedOrder = *unit->Orders[0];
 				if ((goal = unit->SavedOrder.Goal)) {
 					unit->SavedOrder.X = goal->X + goal->Type->TileWidth / 2;
 					unit->SavedOrder.Y = goal->Y + goal->Type->TileHeight / 2;
@@ -196,15 +196,15 @@ static int CheckForTargetInRange(CUnit *unit)
 					unit->SavedOrder.Goal = NoUnitP;
 				}
 			}
-			unit->Orders[0].Goal = goal = temp;
-			unit->Orders[0].X = unit->Orders[0].Y = -1;
+			unit->Orders[0]->Goal = goal = temp;
+			unit->Orders[0]->X = unit->Orders[0]->Y = -1;
 			NewResetPath(unit);
 		}
 	}
 
 	Assert(!unit->Type->Vanishes && !unit->Destroyed && !unit->Removed);
-	Assert(unit->Orders[0].Action == UnitActionAttack ||
-		unit->Orders[0].Action == UnitActionAttackGround);
+	Assert(unit->Orders[0]->Action == UnitActionAttack ||
+		unit->Orders[0]->Action == UnitActionAttackGround);
 
 	return 0;
 }
@@ -221,10 +221,10 @@ static void MoveToTarget(CUnit *unit)
 
 	Assert(unit);
 	Assert(!unit->Type->Vanishes && !unit->Destroyed && !unit->Removed);
-	Assert(unit->Orders[0].Action == UnitActionAttack ||
-		unit->Orders[0].Action == UnitActionAttackGround);
+	Assert(unit->Orders[0]->Action == UnitActionAttack ||
+		unit->Orders[0]->Action == UnitActionAttackGround);
 	Assert(CanMove(unit));
-	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
+	Assert(unit->Orders[0]->Goal || (unit->Orders[0]->X != -1 && unit->Orders[0]->Y != -1));
 
 	err = DoActionMove(unit);
 
@@ -237,7 +237,7 @@ static void MoveToTarget(CUnit *unit)
 	if (CheckForTargetInRange(unit)) {
 		return;
 	}
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 	if (err >= 0) {
 		//
 		// Nothing to do, we're on the way moving.
@@ -261,14 +261,14 @@ static void MoveToTarget(CUnit *unit)
 		//
 		// Attacking wall or ground.
 		//
-		if (!goal && (WallOnMap(unit->Orders[0].X, unit->Orders[0].Y) ||
-					unit->Orders[0].Action == UnitActionAttackGround) &&
-				MapDistanceToUnit(unit->Orders[0].X, unit->Orders[0].Y, unit) <=
+		if (!goal && (WallOnMap(unit->Orders[0]->X, unit->Orders[0]->Y) ||
+					unit->Orders[0]->Action == UnitActionAttackGround) &&
+				MapDistanceToUnit(unit->Orders[0]->X, unit->Orders[0]->Y, unit) <=
 					unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached wall or ground, now attacking it
 			unit->State = 0;
-			UnitHeadingFromDeltaXY(unit, unit->Orders[0].X - unit->X,
-				unit->Orders[0].Y - unit->Y);
+			UnitHeadingFromDeltaXY(unit, unit->Orders[0]->X - unit->X,
+				unit->Orders[0]->Y - unit->Y);
 			unit->SubAction &= WEAK_TARGET;
 			unit->SubAction |= ATTACK_TARGET;
 			return;
@@ -283,10 +283,10 @@ static void MoveToTarget(CUnit *unit)
 			//
 			// When attack-moving we have to allow a bigger range
 			//
-			if (unit->Orders[0].Range < TheMap.Info.MapWidth ||
-					unit->Orders[0].Range < TheMap.Info.MapHeight) {
+			if (unit->Orders[0]->Range < TheMap.Info.MapWidth ||
+					unit->Orders[0]->Range < TheMap.Info.MapHeight) {
 				// Try again with more range
-				unit->Orders[0].Range++;
+				unit->Orders[0]->Range++;
 				return;
 			}
 		}
@@ -295,10 +295,10 @@ static void MoveToTarget(CUnit *unit)
 	// Return to old task?
 	//
 	unit->State = unit->SubAction = 0;
-	if (unit->Orders[0].Goal) {
-		unit->Orders->Goal->RefsDecrease();
+	if (unit->Orders[0]->Goal) {
+		unit->Orders[0]->Goal->RefsDecrease();
 	}
-	unit->Orders[0] = unit->SavedOrder;
+	*unit->Orders[0] = unit->SavedOrder;
 	NewResetPath(unit);
 
 	// Must finish, if saved command finishes
@@ -317,7 +317,7 @@ static void AttackTarget(CUnit *unit)
 	CUnit *temp;
 
 	Assert(unit);
-	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
+	Assert(unit->Orders[0]->Goal || (unit->Orders[0]->X != -1 && unit->Orders[0]->Y != -1));
 
 	AnimateActionAttack(unit);
 	if (unit->Anim.Unbreakable) {
@@ -326,9 +326,9 @@ static void AttackTarget(CUnit *unit)
 	//
 	// Goal is "weak" or a wall.
 	//
-	goal = unit->Orders[0].Goal;
-	if (!goal && (WallOnMap(unit->Orders[0].X, unit->Orders[0].Y) ||
-			unit->Orders[0].Action == UnitActionAttackGround)) {
+	goal = unit->Orders[0]->Goal;
+	if (!goal && (WallOnMap(unit->Orders[0]->X, unit->Orders[0]->Y) ||
+			unit->Orders[0]->Action == UnitActionAttackGround)) {
 		return;
 	}
 
@@ -338,7 +338,7 @@ static void AttackTarget(CUnit *unit)
 	if (CheckForDeadGoal(unit)) {
 		return;
 	}
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 
 	//
 	// No target choose one.
@@ -353,8 +353,8 @@ static void AttackTarget(CUnit *unit)
 			// Return to old task ?
 			if (unit->SavedOrder.Action != UnitActionStill) {
 				unit->SubAction = 0;
-				Assert(unit->Orders[0].Goal == NoUnitP);
-				unit->Orders[0] = unit->SavedOrder;
+				Assert(unit->Orders[0]->Goal == NoUnitP);
+				*unit->Orders[0] = unit->SavedOrder;
 				NewResetPath(unit);
 				// Must finish, if saved command finishes
 				unit->SavedOrder.Action = UnitActionStill;
@@ -371,15 +371,15 @@ static void AttackTarget(CUnit *unit)
 		// Save current command to come back.
 		//
 		if (unit->SavedOrder.Action == UnitActionStill) {
-			Assert(unit->Orders[0].Goal == NULL);
-			unit->SavedOrder = unit->Orders[0];
+			Assert(unit->Orders[0]->Goal == NULL);
+			unit->SavedOrder = *unit->Orders[0];
 		}
 
 		goal->RefsIncrease();
-		unit->Orders[0].Goal = goal;
-		unit->Orders[0].X = unit->Orders[0].Y = -1;
-		unit->Orders[0].MinRange = unit->Type->MinAttackRange;
-		unit->Orders[0].Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
+		unit->Orders[0]->Goal = goal;
+		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
+		unit->Orders[0]->MinRange = unit->Type->MinAttackRange;
+		unit->Orders[0]->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 		NewResetPath(unit);
 		unit->SubAction |= WEAK_TARGET;
 
@@ -395,7 +395,7 @@ static void AttackTarget(CUnit *unit)
 
 			if (unit->SavedOrder.Action == UnitActionStill) {
 				// Save current order to come back or to continue it.
-				unit->SavedOrder = unit->Orders[0];
+				unit->SavedOrder = *unit->Orders[0];
 				if ((goal = unit->SavedOrder.Goal)) {
 					DebugPrint("Have goal to come back %d\n" _C_
 						UnitNumber(goal));
@@ -406,9 +406,9 @@ static void AttackTarget(CUnit *unit)
 					unit->SavedOrder.Goal = NoUnitP;
 				}
 			}
-			unit->Orders[0].Goal = goal = temp;
-			unit->Orders[0].X = unit->Orders[0].Y = -1;
-			unit->Orders[0].MinRange = unit->Type->MinAttackRange;
+			unit->Orders[0]->Goal = goal = temp;
+			unit->Orders[0]->X = unit->Orders[0]->Y = -1;
+			unit->Orders[0]->MinRange = unit->Type->MinAttackRange;
 			unit->SubAction = MOVE_TO_TARGET;
 			NewResetPath(unit);
 		}
@@ -420,7 +420,7 @@ static void AttackTarget(CUnit *unit)
 	if (MapDistanceBetweenUnits(unit, goal) > unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		if (unit->SavedOrder.Action == UnitActionStill) {
 			// Save current order to come back or to continue it.
-			unit->SavedOrder = unit->Orders[0];
+			unit->SavedOrder = *unit->Orders[0];
 			if ((temp = unit->SavedOrder.Goal)) {
 				DebugPrint("Have goal to come back %d\n" _C_
 					UnitNumber(temp));
@@ -466,11 +466,11 @@ static void AttackTarget(CUnit *unit)
 */
 void HandleActionAttack(CUnit *unit)
 {
-	int dist;          // dist between unit and unit->Orders[0].Goal.
+	int dist;          // dist between unit and unit->Orders[0]->Goal.
 
-	Assert(unit->Orders[0].Action == UnitActionAttackGround ||
-		unit->Orders[0].Action == UnitActionAttack);
-	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
+	Assert(unit->Orders[0]->Action == UnitActionAttackGround ||
+		unit->Orders[0]->Action == UnitActionAttack);
+	Assert(unit->Orders[0]->Goal || (unit->Orders[0]->X != -1 && unit->Orders[0]->Y != -1));
 
 	switch (unit->SubAction) {
 		//
@@ -482,12 +482,12 @@ void HandleActionAttack(CUnit *unit)
 				return;
 			}
 			// Can we already attack ?
-			if (unit->Orders[0].Goal) {
-				dist = MapDistanceBetweenUnits(unit, unit->Orders[0].Goal);
+			if (unit->Orders[0]->Goal) {
+				dist = MapDistanceBetweenUnits(unit, unit->Orders[0]->Goal);
 				if (unit->Type->MinAttackRange < dist && dist <= unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 					UnitHeadingFromDeltaXY(unit,
-						unit->Orders[0].Goal->X + (unit->Orders[0].Goal->Type->TileWidth - 1) / 2 - unit->X,
-						unit->Orders[0].Goal->Y + (unit->Orders[0].Goal->Type->TileHeight - 1) / 2 - unit->Y);
+						unit->Orders[0]->Goal->X + (unit->Orders[0]->Goal->Type->TileWidth - 1) / 2 - unit->X,
+						unit->Orders[0]->Goal->Y + (unit->Orders[0]->Goal->Type->TileHeight - 1) / 2 - unit->Y);
 					unit->SubAction = ATTACK_TARGET;
 					AttackTarget(unit);
 					return;
@@ -507,10 +507,10 @@ void HandleActionAttack(CUnit *unit)
 		case MOVE_TO_TARGET + WEAK_TARGET:
 			if (!CanMove(unit)) {
 				// Release order.
-				if (unit->Orders[0].Goal) {
-					unit->Orders[0].Goal->RefsDecrease();
+				if (unit->Orders[0]->Goal) {
+					unit->Orders[0]->Goal->RefsDecrease();
 				}
-				unit->Orders[0] = unit->SavedOrder;
+				*unit->Orders[0] = unit->SavedOrder;
 				unit->SavedOrder.Action = UnitActionStill;
 				unit->SavedOrder.Goal = NoUnitP;
 				unit->State = 0;

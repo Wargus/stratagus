@@ -82,7 +82,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 		// Invisible and not Visible
 		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
 				//(!UnitVisible(unit, source->Player)) ||
-				unit->Orders[0].Action == UnitActionDie) {
+				unit->Orders[0]->Action == UnitActionDie) {
 			continue;
 		}
 		type = unit->Type;

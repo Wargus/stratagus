@@ -531,7 +531,7 @@ static void HandleMouseOn(int x, int y)
 		}
 	}
 	if (NumSelected == 1) {
-		if (Selected[0]->Orders[0].Action == UnitActionTrain) {
+		if (Selected[0]->Orders[0]->Action == UnitActionTrain) {
 			if (Selected[0]->OrderCount == 1) {
 				if (OnButton(x, y, UI.SingleTrainingButton)) {
 					ButtonAreaUnderCursor = ButtonAreaTraining;
@@ -543,7 +543,7 @@ static void HandleMouseOn(int x, int y)
 				i = Selected[0]->OrderCount < (int)UI.TrainingButtons.size() ?
 					Selected[0]->OrderCount - 1 : UI.TrainingButtons.size() - 1;
 				for (; i >= 0; --i) {
-					if (Selected[0]->Orders[i].Action == UnitActionTrain &&
+					if (Selected[0]->Orders[i]->Action == UnitActionTrain &&
 							OnButton(x, y, &UI.TrainingButtons[i])) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
 						ButtonUnderCursor = i;
@@ -552,14 +552,14 @@ static void HandleMouseOn(int x, int y)
 					}
 				}
 			}
-		} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo) {
+		} else if (Selected[0]->Orders[0]->Action == UnitActionUpgradeTo) {
 			if (OnButton(x, y, UI.UpgradingButton)) {
 				ButtonAreaUnderCursor = ButtonAreaUpgrading;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
 				return;
 			}
-		} else if (Selected[0]->Orders[0].Action == UnitActionResearch) {
+		} else if (Selected[0]->Orders[0]->Action == UnitActionResearch) {
 			if (OnButton(x, y, UI.ResearchingButton)) {
 				ButtonAreaUnderCursor = ButtonAreaResearching;
 				ButtonUnderCursor = 0;
@@ -1649,13 +1649,13 @@ void UIHandleButtonDown(unsigned button)
 				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
 					if (ButtonUnderCursor < Selected[0]->OrderCount &&
-						Selected[0]->Orders[ButtonUnderCursor].Action == UnitActionTrain) {
+						Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 						DebugPrint("Cancel slot %d %s\n" _C_
 							ButtonUnderCursor _C_
-							Selected[0]->Orders[ButtonUnderCursor].Type->Ident);
+							Selected[0]->Orders[ButtonUnderCursor]->Type->Ident);
 						SendCommandCancelTraining(Selected[0],
 							ButtonUnderCursor,
-							Selected[0]->Orders[ButtonUnderCursor].Type);
+							Selected[0]->Orders[ButtonUnderCursor]->Type);
 					}
 				}
 			//
@@ -1911,7 +1911,7 @@ void UIHandleButtonUp(unsigned button)
 			//
 			if (NumSelected == 1) {
 printf("Race = %d\n", Selected[0]->Player->Race);
-				if (Selected[0]->Orders[0].Action == UnitActionBuilt) {
+				if (Selected[0]->Orders[0]->Action == UnitActionBuilt) {
 					PlayUnitSound(Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning

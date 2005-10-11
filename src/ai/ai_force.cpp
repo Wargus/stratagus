@@ -206,7 +206,7 @@ static void AiCleanForce(int force)
 			*prev = aiunit->Next;
 			delete aiunit;
 			continue;
-		} else if (aiunit->Unit->Orders[0].Action == UnitActionDie) {
+		} else if (aiunit->Unit->Orders[0]->Action == UnitActionDie) {
 			aiunit->Unit->RefsDecrease();
 			*prev = aiunit->Next;
 			delete aiunit;
@@ -548,12 +548,12 @@ static void AiForceAttacks(AiForce *force)
 		aiunit = force->Units;
 		while (aiunit) {
 			if (aiunit->Unit->IsIdle()) {
-				if (unit->Orders[0].Goal) {
-					x = unit->Orders[0].Goal->X;
-					y = unit->Orders[0].Goal->Y;
-				} else if (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1) {
-					x = unit->Orders[0].X;
-					y = unit->Orders[0].Y;
+				if (unit->Orders[0]->Goal) {
+					x = unit->Orders[0]->Goal->X;
+					y = unit->Orders[0]->Goal->Y;
+				} else if (unit->Orders[0]->X != -1 && unit->Orders[0]->Y != -1) {
+					x = unit->Orders[0]->X;
+					y = unit->Orders[0]->Y;
 				} else {
 					x = unit->X;
 					y = unit->Y;

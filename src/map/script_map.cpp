@@ -293,7 +293,7 @@ static int CclShowMapLocation(lua_State *l)
 	unitname = LuaToString(l, 5);
 	target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
 	if (target != NoUnitP) {
-		target->Orders[0].Action = UnitActionStill;
+		target->Orders[0]->Action = UnitActionStill;
 		target->Variable[HP_INDEX].Value = 0;
 		target->X = LuaToNumber(l, 1);
 		target->Y = LuaToNumber(l, 2);

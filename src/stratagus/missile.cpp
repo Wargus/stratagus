@@ -386,7 +386,7 @@ void FireMissile(CUnit *unit)
 	//
 	// Goal dead?
 	//
-	goal = unit->Orders[0].Goal;
+	goal = unit->Orders[0]->Goal;
 	if (goal) {
 
 		// Better let the caller/action handle this.
@@ -395,7 +395,7 @@ void FireMissile(CUnit *unit)
 			DebugPrint("destroyed unit\n");
 			return;
 		}
-		if (goal->Removed || goal->Orders[0].Action == UnitActionDie) {
+		if (goal->Removed || goal->Orders[0]->Action == UnitActionDie) {
 			return;
 		}
 
@@ -409,8 +409,8 @@ void FireMissile(CUnit *unit)
 	if (unit->Type->Missile.Missile->Class == MissileClassNone) {
 		// No goal, take target coordinates
 		if (!goal) {
-			dx = unit->Orders[0].X;
-			dy = unit->Orders[0].Y;
+			dx = unit->Orders[0]->X;
+			dy = unit->Orders[0]->Y;
 			if (WallOnMap(dx, dy)) {
 				if (HumanWallOnMap(dx, dy)) {
 					HitWall(dx, dy,
@@ -461,8 +461,8 @@ void FireMissile(CUnit *unit)
 			NearestOfUnit(goal, unit->X, unit->Y, &dx, &dy);
 		}
 	} else {
-		dx = unit->Orders[0].X;
-		dy = unit->Orders[0].Y;
+		dx = unit->Orders[0]->X;
+		dy = unit->Orders[0]->Y;
 		// FIXME: Can this be too near??
 	}
 
@@ -847,7 +847,7 @@ static void MissileHitsGoal(const Missile *missile, CUnit *goal, int splash)
 		return;
 	}
 
-	if (goal->Orders[0].Action != UnitActionDie) {
+	if (goal->Orders[0]->Action != UnitActionDie) {
 		if (missile->Damage) {  // direct damage, spells mostly
 			HitUnit(missile->SourceUnit, goal, missile->Damage / splash);
 		} else {
@@ -1479,7 +1479,7 @@ void MissileFire::Action()
 
 	unit = this->SourceUnit;
 	this->Wait = this->Type->Sleep;
-	if (unit->Destroyed || unit->Orders[0].Action == UnitActionDie) {
+	if (unit->Destroyed || unit->Orders[0]->Action == UnitActionDie) {
 		this->TTL = 0;
 		return;
 	}
@@ -1575,7 +1575,7 @@ void MissileFlameShield::Action()
 	uh = unit->Type->TileHeight;
 	this->X = ux * TileSizeX + ix + uw * TileSizeX / 2 + dx - 16;
 	this->Y = uy * TileSizeY + iy + uh * TileSizeY / 2 + dy - 32;
-	if (unit->Orders[0].Action == UnitActionDie) {
+	if (unit->Orders[0]->Action == UnitActionDie) {
 		this->TTL = i;
 	}
 
@@ -1596,7 +1596,7 @@ void MissileFlameShield::Action()
 			// cannot hit target unit
 			continue;
 		}
-		if (table[i]->Orders[0].Action != UnitActionDie) {
+		if (table[i]->Orders[0]->Action != UnitActionDie) {
 			HitUnit(this->SourceUnit, table[i], this->Damage);
 		}
 	}
@@ -1621,7 +1621,7 @@ void MissileLandMine::Action()
 	n = UnitCacheOnTile(x, y, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type->UnitType != UnitTypeFly &&
-				table[i]->Orders[0].Action != UnitActionDie &&
+				table[i]->Orders[0]->Action != UnitActionDie &&
 				!(table[i] == this->SourceUnit && !this->Type->CanHitOwner)) {
 			DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);
 			MissileHit(this);
@@ -1675,7 +1675,7 @@ void MissileWhirlwind::Action()
 	if (!(this->TTL % 4)) {
 		n = SelectUnitsOnTile(x, y, table);
 		for (i = 0; i < n; ++i) {
-			if (table[i]->Orders[0].Action != UnitActionDie) {
+			if (table[i]->Orders[0]->Action != UnitActionDie) {
 				// should be missile damage ?
 				HitUnit(this->SourceUnit, table[i], WHIRLWIND_DAMAGE1);
 			}
@@ -1688,7 +1688,7 @@ void MissileWhirlwind::Action()
 		// we should parameter this
 		n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 		for (i = 0; i < n; ++i) {
-			if ((table[i]->X != x || table[i]->Y != y) && table[i]->Orders[0].Action != UnitActionDie) {
+			if ((table[i]->X != x || table[i]->Y != y) && table[i]->Orders[0]->Action != UnitActionDie) {
 				// should be in missile
 				HitUnit(this->SourceUnit, table[i], WHIRLWIND_DAMAGE2);
 			}
@@ -1748,9 +1748,9 @@ void MissileDeathCoil::Action()
 		// Target unit still exists and casted on a special target
 		//
 		if (this->TargetUnit && !this->TargetUnit->Destroyed &&
-			this->TargetUnit->Orders[0].Action == UnitActionDie)  {
+			this->TargetUnit->Orders[0]->Action == UnitActionDie)  {
 			HitUnit(source, this->TargetUnit, this->Damage);
-			if (source->Orders[0].Action != UnitActionDie) {
+			if (source->Orders[0]->Action != UnitActionDie) {
 				source->Variable[HP_INDEX].Value += this->Damage;
 				if (source->Variable[HP_INDEX].Value > source->Variable[HP_INDEX].Max) {
 					source->Variable[HP_INDEX].Value = source->Variable[HP_INDEX].Max;
@@ -1786,7 +1786,7 @@ void MissileDeathCoil::Action()
 						HitUnit(source, table[i], this->Damage / ec);
 					}
 				}
-				if (source->Orders[0].Action != UnitActionDie) {
+				if (source->Orders[0]->Action != UnitActionDie) {
 					source->Variable[HP_INDEX].Value += this->Damage;
 					if (source->Variable[HP_INDEX].Value > source->Variable[HP_INDEX].Max) {
 						source->Variable[HP_INDEX].Value = source->Variable[HP_INDEX].Max;

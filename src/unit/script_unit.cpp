@@ -192,12 +192,6 @@ void CclParseOrder(lua_State *l, COrder *order)
 			order->Action = UnitActionReturnGoods;
 		} else if (!strcmp(value, "action-transform-into")) {
 			order->Action = UnitActionTransformInto;
-		} else if (!strcmp(value, "flags")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Flags = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-
 		} else if (!strcmp(value, "range")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -300,9 +294,16 @@ void CclParseOrder(lua_State *l, COrder *order)
 */
 static void CclParseOrders(lua_State *l, CUnit *unit)
 {
-	for (int j = 0; j < unit->TotalOrders; ++j) {
+	for (std::vector<COrder *>::iterator order = unit->Orders.begin();
+			order != unit->Orders.end();
+			++order) {
+		delete *order;
+	}
+	unit->Orders.clear();
+	for (int j = 0; j < unit->OrderCount; ++j) {
 		lua_rawgeti(l, -1, j + 1);
-		CclParseOrder(l, &unit->Orders[j]);
+		unit->Orders.push_back(new COrder);
+		CclParseOrder(l, unit->Orders[j]);
 		lua_pop(l, 1);
 	}
 }
@@ -580,7 +581,7 @@ static int CclUnit(lua_State *l)
 			// be put on player's unit list!  However, this state is not
 			// easily detected from this place.  It seems that it is
 			// characterized by
-			// unit->Orders[0].Action==UnitActionDie so we have to wait
+			// unit->Orders[0]->Action==UnitActionDie so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
 			unit = UnitSlots[slot];
@@ -781,18 +782,13 @@ static int CclUnit(lua_State *l)
 			unit->OrderCount = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "order-flush")) {
 			unit->OrderFlush = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "order-total")) {
-			unit->TotalOrders = LuaToNumber(l, j + 1);
-			free(unit->Orders);
-			// Allocate the space for orders
-			unit->Orders = (COrder *)calloc(unit->TotalOrders, sizeof(COrder));
 		} else if (!strcmp(value, "orders")) {
 			lua_pushvalue(l, j + 1);
 			CclParseOrders(l, unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
 			unit->AssignToPlayer (player);
-			if (unit->Orders[0].Action == UnitActionBuilt) {
+			if (unit->Orders[0]->Action == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;

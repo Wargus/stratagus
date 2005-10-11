@@ -177,7 +177,7 @@ void ChangeSelectedUnits(CUnit **units,int count)
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
 		!units[0]->Type->IsNotSelectable) {
 		HandleSuicideClick(units[0]);
-		if (units[0]->Orders[0].Action == UnitActionDie) {
+		if (units[0]->Orders[0]->Action == UnitActionDie) {
 			NetworkSendSelection(units, count);
 			return ;
 		}
@@ -404,7 +404,7 @@ int SelectUnitsByType(CUnit *base)
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
-	if (base->Removed || base->Orders[0].Action == UnitActionDie) {
+	if (base->Removed || base->Orders[0]->Action == UnitActionDie) {
 		return 0;
 	}
 
@@ -496,7 +496,7 @@ int ToggleUnitsByType(CUnit *base)
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
-	if (base->Removed || base->Orders[0].Action == UnitActionDie) {
+	if (base->Removed || base->Orders[0]->Action == UnitActionDie) {
 		return 0;
 	}
 	// if unit isn't belonging to the player, or is a static unit
@@ -798,7 +798,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 			continue;
 		}
 		// FIXME: Can we get this?
-		if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+		if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 			SelectSingleUnit(unit);
 			return 1;
 		}
@@ -837,7 +837,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 		if (unit->Type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
 			continue;
 		}
-		if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+		if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
 			SelectSingleUnit(unit);
 			return 1;
 		}
