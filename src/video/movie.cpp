@@ -183,7 +183,7 @@ int PlayMovie(const char* name)
 	CFile f;
 	SDL_Rect rect;
 	SDL_Overlay* yuv_overlay;
-	Sample* sample;
+	CSample* sample;
 	EventCallback callbacks;
 	unsigned int start_ticks;
 	int need_data;

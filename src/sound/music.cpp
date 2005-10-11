@@ -62,7 +62,7 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-Sample *MusicSample;  /// Music samples
+CSample *MusicSample;  /// Music samples
 
 char *CurrentMusicFile;
 
@@ -197,7 +197,7 @@ void PlaySectionMusic(PlaySectionType section)
 int PlayMusic(const char *name)
 {
 	char buffer[PATH_MAX];
-	Sample *sample;
+	CSample *sample;
 
 	if (MusicOff) {
 		return 0;

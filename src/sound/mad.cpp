@@ -77,11 +77,11 @@ struct MadData {
 */
 static enum mad_flow MAD_read(void *user, struct mad_stream *stream)
 {
-	Sample *sample;
+	CSample *sample;
 	MadData *data;
 	int i;
 
-	sample = (Sample *)user;
+	sample = (CSample *)user;
 	data = (MadData *)sample->User;
 
 	if (stream->next_frame) {
@@ -112,7 +112,7 @@ static enum mad_flow MAD_read(void *user, struct mad_stream *stream)
 static enum mad_flow MAD_write(void *user,
 	struct mad_header const *header, struct mad_pcm *pcm)
 {
-	Sample *sample;
+	CSample *sample;
 	int i;
 	int j;
 	int n;
@@ -120,7 +120,7 @@ static enum mad_flow MAD_write(void *user,
 	int s;
 	int comp;
 
-	sample = (Sample *)user;
+	sample = (CSample *)user;
 
 	n = pcm->length;
 
@@ -182,7 +182,7 @@ static enum mad_flow MAD_error(void *user,
 **
 **  @return        Number of bytes read
 */
-static int MadRead(Sample *sample, unsigned char *buf, int len)
+static int MadRead(CSample *sample, unsigned char *buf, int len)
 {
 	struct mad_decoder *decoder;
 	struct mad_stream *stream;
@@ -274,7 +274,7 @@ static int MadRead(Sample *sample, unsigned char *buf, int len)
 **
 **  @return        Number of bytes read
 */
-static int Mp3ReadStream(Sample *sample, void *buf, int len)
+static int Mp3ReadStream(CSample *sample, void *buf, int len)
 {
 	MadData *data;
 	int i;
@@ -322,7 +322,7 @@ static int Mp3ReadStream(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void Mp3FreeStream(Sample *sample)
+static void Mp3FreeStream(CSample *sample)
 {
 	MadData *data;
 
@@ -359,7 +359,7 @@ static const SampleType Mp3StreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-static int Mp3Read(Sample *sample, void *buf, int len)
+static int Mp3Read(CSample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -377,7 +377,7 @@ static int Mp3Read(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void Mp3Free(Sample *sample)
+static void Mp3Free(CSample *sample)
 {
 	delete (MadData *)sample->User;
 	delete[] sample->Buffer;
@@ -400,11 +400,11 @@ static const SampleType Mp3SampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample *LoadMp3(const char *name, int flags)
+CSample *LoadMp3(const char *name, int flags)
 {
 	CFile *f;
 	unsigned char magic[2];
-	Sample *sample;
+	CSample *sample;
 	MadData *data;
 
 	f = new CFile;
@@ -427,7 +427,7 @@ Sample *LoadMp3(const char *name, int flags)
 	data->MadFile = f;
 	data->BufferLen = 0;
 
-	sample = new Sample;
+	sample = new CSample;
 	sample->User = data;
 	sample->Len = 0;
 	sample->Pos = 0;

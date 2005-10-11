@@ -307,7 +307,7 @@ static int InitCD(void)
 */
 int PlayCDTrack(int track)
 {
-	Sample* sample;
+	CSample* sample;
 
 	sample = LoadCD(NULL, track);
 	CDTrack = track;
