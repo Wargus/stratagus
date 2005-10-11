@@ -622,7 +622,7 @@ void CreateGame(const char* filename, WorldMap* map)
 	PreprocessMap();   // Adjust map for use
 
 	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]); // Setup the user interface
-	LoadUserInterface(); // Load the user interface grafics
+	UI.Load(); // Load the user interface grafics
 
 	//
 	// Sound part

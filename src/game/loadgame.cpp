@@ -169,7 +169,7 @@ void LoadModules(void)
 	LoadFonts();
 	LoadIcons();
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
-	LoadUserInterface();
+	UI.Load();
 #if 0
 	LoadPlayers();
 #endif
