@@ -108,25 +108,12 @@ static int CclAStar(lua_State* l)
 	return 0;
 }
 
-#ifdef MAP_REGIONS
-void MapSplitterDebug(void);
-
-static int CclDebugRegions(lua_State* l)
-{
-	MapSplitterDebug();
-	return 0;
-}
-#endif // MAP_REGIONS
-
 /**
 **  Register CCL features for pathfinder.
 */
 void PathfinderCclRegister(void)
 {
 	lua_register(Lua, "AStar", CclAStar);
-#ifdef MAP_REGIONS
-	lua_register(Lua, "DebugRegions", CclDebugRegions);
-#endif // MAP_REGIONS
 }
 
 //@}

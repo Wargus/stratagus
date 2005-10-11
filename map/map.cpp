@@ -49,10 +49,6 @@
 #include "pathfinder.h"
 #include "ui.h"
 #include "editor.h"
-#if defined(MAP_REGIONS)
-#include "pathfinder.h"
-#endif
-
 #include "script.h"
 
 /*----------------------------------------------------------------------------
@@ -600,9 +596,6 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 			mf->Tile = removedtile;
 			mf->Flags &= ~flags;
 			mf->Value = 0;
-#ifdef MAP_REGIONS
-			MapSplitterTilesCleared(x, y, x, y);
-#endif
 			UI.Minimap.UpdateXY(x, y);
 		}
 	} else if (seen && TheMap.Tileset.MixedLookupTable[mf->SeenTile] ==
@@ -678,9 +671,6 @@ void MapClearTile(unsigned short type, unsigned x, unsigned y)
 	mf->Value = 0;
 
 	UI.Minimap.UpdateXY(x, y);
-#ifdef MAP_REGIONS
-	MapSplitterTilesCleared(x, y, x, y);
-#endif
 	MapFixNeighbors(type, 0, x, y);
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {

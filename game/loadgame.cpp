@@ -111,9 +111,6 @@ void CleanModules(void)
 	CleanCclCredits();
 	CleanSpells();
 	FreeVisionTable();
-#ifdef MAP_REGIONS
-	MapSplitterClean();
-#endif
 	FreeAStar();
 	InitDefinedVariables(); // internal script. should be to a better place, don't find for restart.
 }
@@ -239,10 +236,6 @@ void LoadGame(char* filename)
 
 	InitModules();
 	LoadModules();
-
-#ifdef MAP_REGIONS
-	MapSplitterInit();
-#endif
 
 	GameCycle = game_cycle;
 	SyncRandSeed = syncrand;

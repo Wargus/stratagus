@@ -688,9 +688,6 @@ void CreateGame(const char* filename, WorldMap* map)
 	//
 	// FIXME: must be done after map is loaded
 	InitAStar();
-#ifdef MAP_REGIONS
-	MapSplitterInit();
-#endif
 	//
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.
