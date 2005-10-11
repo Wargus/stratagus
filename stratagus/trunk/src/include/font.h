@@ -46,14 +46,6 @@
 **  proportional multicolor fonts of 9 colors.
 **  (Currently the fonts aren't packed)
 **
-**  CFont::Width
-**
-**    Maximal width of a character in pixels.
-**
-**  CFont::Height
-**
-**    Height of all characters in pixels.
-**
 **  CFont::CharWidth[]
 **
 **    The width of each font glyph in pixels. The index 0 is the
