@@ -298,7 +298,7 @@ void OggFree(OggData *data)
 	ogg_sync_clear(&data->sync);
 }
 
-static int VorbisStreamRead(Sample *sample, void *buf, int len)
+static int VorbisStreamRead(CSample *sample, void *buf, int len)
 {
 	OggData *data;
 	int bytes;
@@ -330,7 +330,7 @@ static int VorbisStreamRead(Sample *sample, void *buf, int len)
 	return len;
 }
 
-static void VorbisStreamFree(Sample *sample)
+static void VorbisStreamFree(CSample *sample)
 {
 	OggData *data;
 
@@ -353,7 +353,7 @@ static const SampleType VorbisStreamSampleType = {
 	VorbisStreamFree,
 };
 
-static int VorbisRead(Sample *sample, void *buf, int len)
+static int VorbisRead(CSample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -366,7 +366,7 @@ static int VorbisRead(Sample *sample, void *buf, int len)
 	return len;
 }
 
-static void VorbisFree(Sample *sample)
+static void VorbisFree(CSample *sample)
 {
 	delete (OggData *)sample->User;
 	delete[] sample->Buffer;
@@ -389,9 +389,9 @@ static const SampleType VorbisSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample *LoadVorbis(const char *name,int flags)
+CSample *LoadVorbis(const char *name,int flags)
 {
-	Sample *sample;
+	CSample *sample;
 	OggData *data;
 	CFile *f;
 	vorbis_info *info;
@@ -415,7 +415,7 @@ Sample *LoadVorbis(const char *name,int flags)
 
 	info = &data->vinfo;
 
-	sample = new Sample;
+	sample = new CSample;
 	sample->Channels = info->channels;
 	sample->SampleSize = 16;
 	sample->Frequency = info->rate;

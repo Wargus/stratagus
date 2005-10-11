@@ -62,7 +62,7 @@ struct WavData {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int WavStreamRead(Sample *sample, void *buf, int len)
+static int WavStreamRead(CSample *sample, void *buf, int len)
 {
 	WavData *data;
 	WavChunk chunk;
@@ -133,7 +133,7 @@ static int WavStreamRead(Sample *sample, void *buf, int len)
 	return len;
 }
 
-static void WavStreamFree(Sample *sample)
+static void WavStreamFree(CSample *sample)
 {
 	WavData *data;
 
@@ -153,7 +153,7 @@ static const SampleType WavStreamSampleType = {
 	WavStreamFree,
 };
 
-static int WavRead(Sample *sample, void *buf, int len)
+static int WavRead(CSample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -166,7 +166,7 @@ static int WavRead(Sample *sample, void *buf, int len)
 	return len;
 }
 
-static void WavFree(Sample *sample)
+static void WavFree(CSample *sample)
 {
 	delete (WavData *)sample->User;
 	delete[] sample->Buffer;
@@ -192,9 +192,9 @@ static const SampleType WavSampleType = {
 **
 **  @todo         Add ADPCM loading support!
 */
-Sample *LoadWav(const char *name, int flags)
+CSample *LoadWav(const char *name, int flags)
 {
-	Sample *sample;
+	CSample *sample;
 	WavData *data;
 	CFile *f;
 	WavChunk chunk;
@@ -299,7 +299,7 @@ Sample *LoadWav(const char *name, int flags)
 	//
 	//  Read sample
 	//
-	sample = new Sample;
+	sample = new CSample;
 	sample->Channels = wavfmt.Channels;
 	sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
 	sample->Frequency = wavfmt.Frequency;

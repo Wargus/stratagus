@@ -90,11 +90,11 @@ static FLAC__StreamDecoderReadStatus FLAC_read_callback(
 	const FLAC__StreamDecoder *stream, FLAC__byte buffer[],
 	unsigned int *bytes, void *user)
 {
-	Sample *sample;
+	CSample *sample;
 	FlacData *data;
 	unsigned int i;
 
-	sample = (Sample *)user;
+	sample = (CSample *)user;
 	data = (FlacData *)sample->User;
 
 	if ((i = data->FlacFile->read(buffer, *bytes)) != *bytes) {
@@ -116,10 +116,10 @@ static FLAC__StreamDecoderReadStatus FLAC_read_callback(
 static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
 	const FLAC__StreamMetadata *metadata, void *user)
 {
-	Sample *sample;
+	CSample *sample;
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
-		sample = (Sample *)user;
+		sample = (CSample *)user;
 
 		sample->Channels = metadata->data.stream_info.channels;
 		sample->Frequency = metadata->data.stream_info.sample_rate;
@@ -146,14 +146,14 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	const FLAC__StreamDecoder *stream, const FLAC__Frame *frame,
 	const FLAC__int32 *const buffer[], void *user)
 {
-	Sample *sample;
+	CSample *sample;
 	FlacData *data;
 	unsigned int i;
 	int j;
 	char *buf;
 	int ssize;
 
-	sample = (Sample *)user;
+	sample = (CSample *)user;
 	data = (FlacData *)sample->User;
 
 	Assert(sample->Buffer);
@@ -195,7 +195,7 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 **
 **  @return        Number of bytes read
 */
-static int FlacStreamRead(Sample *sample, void *buf, int len)
+static int FlacStreamRead(CSample *sample, void *buf, int len)
 {
 	FlacData *data;
 
@@ -228,7 +228,7 @@ static int FlacStreamRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void FlacStreamFree(Sample *sample)
+static void FlacStreamFree(CSample *sample)
 {
 	FlacData *data;
 
@@ -260,7 +260,7 @@ static const SampleType FlacStreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-static int FlacRead(Sample *sample, void *buf, int len)
+static int FlacRead(CSample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -280,7 +280,7 @@ static int FlacRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void FlacFree(Sample *sample)
+static void FlacFree(CSample *sample)
 {
 	delete (FlacData *)sample->User;
 	delete[] sample->Buffer;
@@ -303,9 +303,9 @@ static const SampleType FlacSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-Sample *LoadFlac(const char *name, int flags)
+CSample *LoadFlac(const char *name, int flags)
 {
-	Sample *sample;
+	CSample *sample;
 	FlacData *data;
 	CFile *f;
 	unsigned int magic[1];
@@ -338,7 +338,7 @@ Sample *LoadFlac(const char *name, int flags)
 	data->FlacFile = f;
 	data->FlacStream = stream;
 
-	sample = new Sample;
+	sample = new CSample;
 	sample->Len = 0;
 	sample->Pos = 0;
 	sample->User = data;
