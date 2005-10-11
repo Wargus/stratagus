@@ -612,14 +612,6 @@ void MarkUnitFieldFlags(const CUnit *unit)
 			TheMap.Fields[x + w + (y + h) * TheMap.Info.MapWidth].Flags |= flags;
 		}
 	}
-#ifdef MAP_REGIONS
-	// Update map splitting.
-	if (!CanMove(unit) && (flags &
-		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
-		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))) {
-		MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
-	}
-#endif
 }
 
 /**
@@ -646,14 +638,6 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 			TheMap.Fields[x + w + (y + h) * TheMap.Info.MapWidth].Flags &= ~flags;
 		}
 	}
-#ifdef MAP_REGIONS
-	// Update map splitting.
-	if (!CanMove(unit) && (flags &
-			(MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
-			MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))) {
-		MapSplitterTilesCleared(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
-	}
-#endif
 }
 
 /**

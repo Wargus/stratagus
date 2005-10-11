@@ -773,9 +773,6 @@ int main(int argc, char **argv)
 #ifdef USE_MIKMOD
 		"MIKMOD "
 #endif
-#ifdef MAP_REGIONS
-		"MAP-REGIONS "
-#endif
 #ifdef USE_OPENGL
 		"OPENGL "
 #endif

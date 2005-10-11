@@ -546,13 +546,6 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 	int num_in_close;
 	int mask;
 
-#ifdef MAP_REGIONS
-	// Abort in few cycle lot of astar invocations
-	if (! PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange)) {
-		return PF_UNREACHABLE;
-	}
-#endif
-
 	if (abs(gx - unit->X) <= 1 && abs(gy - unit->Y) <= 1 && maxrange == 0) {
 		// Simplest case, move to adj cell
 		if (gx == unit->X && gy == unit->Y) {

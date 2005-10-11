@@ -337,22 +337,6 @@ SOURCE=.\src\pathfinder\pathfinder.cpp
 
 SOURCE=.\src\pathfinder\script_pathfinder.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=.\src\pathfinder\splitter.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\pathfinder\splitter_debug.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\pathfinder\splitter_lowlevel.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\pathfinder\splitter_zoneset.cpp
-# End Source File
 # End Group
 # Begin Group "sound"
 
@@ -838,14 +822,6 @@ SOURCE=.\src\ai\ai_local.h
 # Begin Source File
 
 SOURCE=.\src\video\intern_video.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\pathfinder\splitter.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\pathfinder\splitter_local.h
 # End Source File
 # Begin Source File
 

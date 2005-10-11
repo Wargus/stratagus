@@ -127,8 +127,4 @@ extern void PathfinderCclRegister(void);
 
 //@}
 
-#ifdef MAP_REGIONS
-#include "../pathfinder/splitter.h"
-#endif /* MAP_REGIONS */
-
 #endif // !__PATH_FINDER_H__

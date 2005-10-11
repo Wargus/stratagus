@@ -325,9 +325,6 @@ void GameMainLoop(void)
 			++GameCycle;
 			MultiPlayerReplayEachCycle();
 			NetworkCommands(); // Get network commands
-#ifdef MAP_REGIONS
-			MapSplitterEachCycle();
-#endif // MAP_REGIONS
 			UnitActions();      // handle units
 			MissileActions();   // handle missiles
 			PlayersEachCycle(); // handle players

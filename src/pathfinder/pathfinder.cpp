@@ -73,9 +73,7 @@
 **  98:     Marks map border, for faster limits checks.
 */
 unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
-#ifndef MAP_REGIONS
 static unsigned int LocalMatrix[MaxMapWidth * MaxMapHeight];
-#endif
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -118,12 +116,10 @@ static void InitMatrix(unsigned char *matrix)
 	memset(matrix + i, 98, w + 1);  // +1 for ships!
 }
 
-#ifndef MAP_REGIONS
 static void InitLocalMatrix(void)
 {
 	memset(LocalMatrix, 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(int)); // initialize matrix
 }
-#endif
 
 /**
 **  Create empty movement matrix.
@@ -147,7 +143,6 @@ unsigned char *MakeMatrix(void)
 	return matrix;
 }
 
-#ifndef MAP_REGIONS
 /**
 **  Mark place in matrix.
 **
@@ -269,9 +264,7 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 	}
 	return 0;
 }
-#endif
 
-#ifndef MAP_REGIONS
 /**
 **  Flood fill an area for a matrix.
 **
@@ -367,13 +360,11 @@ static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 
 	delete[] points;
 }
-#endif
 
 /*----------------------------------------------------------------------------
 --  PATH-FINDER USE
 ----------------------------------------------------------------------------*/
 
-#ifndef MAP_REGIONS
 /**
 **  Can the unit 'src' reach the place x,y.
 **
@@ -414,8 +405,6 @@ int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, i
 
 	return depth;
 }
-
-#endif
 
 /**
 **  Can the unit 'src' reach the unit 'dst'.
