@@ -8,11 +8,10 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sound_server.cpp - The sound server
-**                                      (hardware layer and so on) */
+/**@name sound_server.cpp - The sound server (hardware layer and so on) */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi,
-//                                 and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -203,7 +202,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 **
 **  @todo          Can mix faster if signed 8 bit buffers are used.
 */
-static int MixSampleToStereo32(Sample *sample, int index, unsigned char volume,
+static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 	char stereo, int *buffer, int size)
 {
 	int local_volume;
@@ -402,7 +401,7 @@ static unsigned char ComputeVolume(SoundRequest *sr)
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static Sample *SimpleChooseSample(ServerSoundId sound)
+static CSample *SimpleChooseSample(ServerSoundId sound)
 {
 	if (sound->Number == ONE_SOUND) {
 		return sound->Sound.OneSound;
@@ -417,10 +416,10 @@ static Sample *SimpleChooseSample(ServerSoundId sound)
 **  Choose a sample from a SoundRequest. Take into account selection and sound
 **  groups.
 */
-static Sample *ChooseSample(SoundRequest *sr)
+static CSample *ChooseSample(SoundRequest *sr)
 {
 	ServerSoundId theSound;
-	Sample *result;
+	CSample *result;
 
 	result = NO_SOUND;
 
@@ -616,9 +615,9 @@ static void ClipMixToStereo16(const int* mix, int size, short* output)
 **
 **  @todo  Add streaming, cashing support.
 */
-static Sample *LoadSample(const char *name)
+static CSample *LoadSample(const char *name)
 {
-	Sample *sample;
+	CSample *sample;
 	char buf[PATH_MAX];
 
 	LibraryFileName(name, buf);
@@ -672,7 +671,7 @@ SoundId RegisterSound(const char *files[], unsigned number)
 
 	id = new Sound;
 	if (number > 1) { // load a sound group
-		id->Sound.OneGroup = new Sample *[number];
+		id->Sound.OneGroup = new CSample *[number];
 		for (i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {

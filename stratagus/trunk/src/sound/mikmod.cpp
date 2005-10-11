@@ -100,7 +100,7 @@ static MREADER MReader = { Seek, Tell, Read, Get, Eof };
 **
 **  @return        Number of bytes read
 */
-static int MikModStreamRead(Sample *sample, void *buf, int len)
+static int MikModStreamRead(CSample *sample, void *buf, int len)
 {
 	MikModData *data;
 	int read;
@@ -135,7 +135,7 @@ static int MikModStreamRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void MikModStreamFree(Sample *sample)
+static void MikModStreamFree(CSample *sample)
 {
 	MikModData *data;
 	data = (MikModData *)sample->User;
@@ -169,7 +169,7 @@ static const SampleType MikModStreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-static int MikModRead(Sample *sample, void *buf, int len)
+static int MikModRead(CSample *sample, void *buf, int len)
 {
 	if (sample->Len < len) {
 		len = sample->Len;
@@ -187,7 +187,7 @@ static int MikModRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-static void MikModFree(Sample *sample)
+static void MikModFree(CSample *sample)
 {
 	delete (MikModData *)sample->User;
 	delete[] sample->Buffer;
@@ -211,9 +211,9 @@ static const SampleType MikModSampleType = {
 **  @return       Returns the loaded sample.
 **
 */
-Sample *LoadMikMod(const char *name, int flags)
+CSample *LoadMikMod(const char *name, int flags)
 {
-	Sample *sample;
+	CSample *sample;
 	MikModData *data;
 	char s[256];
 	static int registered = 0;
@@ -247,7 +247,7 @@ Sample *LoadMikMod(const char *name, int flags)
 		return NULL;
 	}
 
-	sample = new Sample;
+	sample = new CSample;
 	sample->Channels = 2;
 	sample->SampleSize = 16;
 	sample->Frequency = 44100;

@@ -72,7 +72,7 @@ typedef struct _cdda_data {
 **
 ** @return Number of bytes read
 */
-static int CDRead(Sample *sample, void *buf, int len)
+static int CDRead(CSample *sample, void *buf, int len)
 {
 	CddaData *data;
 	int n;
@@ -116,7 +116,7 @@ static int CDRead(Sample *sample, void *buf, int len)
 **
 ** @param sample Sample to free
 */
-static void CDFree(Sample *sample)
+static void CDFree(CSample *sample)
 {
 	delete[] ((CddaData *)sample->User)->Buffer;
 	delete (CddaData *)sample->User;
@@ -140,9 +140,9 @@ static const SampleType CDStreamSampleType = {
 **  @return Returns the loaded sample.
 **
 */
-Sample *LoadCD(const char* name, int flags)
+CSample *LoadCD(const char* name, int flags)
 {
-	Sample* sample;
+	CSample* sample;
 	CddaData* data;
 
 	sample = new Sample;

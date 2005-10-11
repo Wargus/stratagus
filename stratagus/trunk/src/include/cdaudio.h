@@ -10,7 +10,7 @@
 //
 /**@name cdaudio.h - cd audio header file. */
 //
-//      (c) Copyright 2003-2004 by Nehal Mistry
+//      (c) Copyright 2003-2005 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ extern struct cdrom_tocentry CDtocentry[64];  /// TOC track header struct
 
 #ifdef USE_CDDA
 	/// Load a cd track
-extern Sample* LoadCD(const char* name, int flags);
+extern CSample *LoadCD(const char *name, int flags);
 #endif
 
 	/// Play CDMode 'name'
