@@ -524,6 +524,10 @@ public:
 		memset(PieX, 0, sizeof(PieX));
 		memset(PieY, 0, sizeof(PieY));
 	}
+	~CUserInterface();
+
+	void Load();
+
 
 	char *Name;                         /// interface name to select
 	int Width;                          /// useable for this width
@@ -661,7 +665,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern CUserInterface UI;                           /// The user interface
-extern CUserInterface **UI_Table;                   /// All available user interfaces
+extern std::vector<CUserInterface *> UI_Table;      /// All available user interfaces
 
 	/// Hash table of all the button styles
 extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
@@ -687,12 +691,8 @@ extern char *UiGroupKeys;               /// Up to 11 keys used for group selecti
 
 	/// Initialize the ui
 extern void InitUserInterface(const char *race_name);
-	/// Load ui graphics
-extern void LoadUserInterface(void);
 	/// Save the ui state
 extern void SaveUserInterface(CFile *file);
-	/// Clean up a ui
-extern void CleanUI(CUserInterface *ui);
 	/// Clean up the ui module
 extern void CleanUserInterface(void);
 	/// Register ccl features

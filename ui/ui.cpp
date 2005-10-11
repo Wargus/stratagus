@@ -69,7 +69,7 @@ CUserInterface UI;
 /**
 **  The available user interfaces.
 */
-CUserInterface **UI_Table;
+std::vector<CUserInterface *> UI_Table;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -99,7 +99,7 @@ void InitUserInterface(const char *race_name)
 
 	// select the correct slot
 	best = 0;
-	for (i = 0; UI_Table[i]; ++i) {
+	for (i = 0; i < (int) UI_Table.size(); ++i) {
 		if (!strcmp(race_name, UI_Table[i]->Name)) {
 			// perfect
 			if (Video.Width == UI_Table[i]->Width &&
@@ -165,9 +165,22 @@ void InitUserInterface(const char *race_name)
 }
 
 /**
+**  Load Cursor.
+*/
+void CursorConfig::Load()
+{
+	Assert(Name);
+	Assert(!Cursor);
+
+	Cursor = CursorByIdent(Name);
+
+	Assert(!strcmp(Name, Cursor->Ident));
+}
+
+/**
 **  Load the user interface graphics.
 */
-void LoadUserInterface(void)
+void CUserInterface::Load(void)
 {
 	int i;
 	MenuPanel *menupanel;
@@ -175,47 +188,47 @@ void LoadUserInterface(void)
 	//
 	//  Load graphics
 	//
-	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
-		UI.Fillers[i].G->Load();
+	for (i = 0; i < (int)Fillers.size(); ++i) {
+		Fillers[i].G->Load();
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
-		if (UI.Resources[i].G) {
-			UI.Resources[i].G->Load();
+		if (Resources[i].G) {
+			Resources[i].G->Load();
 		}
 	}
 
-	if (UI.InfoPanel.G) {
-		UI.InfoPanel.G->Load();
+	if (InfoPanel.G) {
+		InfoPanel.G->Load();
 	}
-	if (UI.ButtonPanel.G) {
-		UI.ButtonPanel.G->Load();
+	if (ButtonPanel.G) {
+		ButtonPanel.G->Load();
 	}
-	if (UI.PieMenuBackgroundG) {
-		UI.PieMenuBackgroundG->Load();
+	if (PieMenuBackgroundG) {
+		PieMenuBackgroundG->Load();
 	}
 
 	//
 	//  Resolve cursors
 	//
-	UI.Point.Cursor = CursorByIdent(UI.Point.Name);
-	UI.Glass.Cursor = CursorByIdent(UI.Glass.Name);
-	UI.Cross.Cursor = CursorByIdent(UI.Cross.Name);
-	UI.YellowHair.Cursor = CursorByIdent(UI.YellowHair.Name);
-	UI.GreenHair.Cursor = CursorByIdent(UI.GreenHair.Name);
-	UI.RedHair.Cursor = CursorByIdent(UI.RedHair.Name);
-	UI.Scroll.Cursor = CursorByIdent(UI.Scroll.Name);
+	Point.Load();
+	Glass.Load();
+	Cross.Load();
+	YellowHair.Load();
+	GreenHair.Load();
+	RedHair.Load();
+	Scroll.Load();
 
-	UI.ArrowE.Cursor = CursorByIdent(UI.ArrowE.Name);
-	UI.ArrowNE.Cursor = CursorByIdent(UI.ArrowNE.Name);
-	UI.ArrowN.Cursor = CursorByIdent(UI.ArrowN.Name);
-	UI.ArrowNW.Cursor = CursorByIdent(UI.ArrowNW.Name);
-	UI.ArrowW.Cursor = CursorByIdent(UI.ArrowW.Name);
-	UI.ArrowSW.Cursor = CursorByIdent(UI.ArrowSW.Name);
-	UI.ArrowS.Cursor = CursorByIdent(UI.ArrowS.Name);
-	UI.ArrowSE.Cursor = CursorByIdent(UI.ArrowSE.Name);
+	ArrowE.Load();
+	ArrowNE.Load();
+	ArrowN.Load();
+	ArrowNW.Load();
+	ArrowW.Load();
+	ArrowSW.Load();
+	ArrowS.Load();
+	ArrowSE.Load();
 
-	menupanel = UI.MenuPanels;
+	menupanel = MenuPanels;
 	while (menupanel) {
 		menupanel->G->Load();
 		menupanel = menupanel->Next;
@@ -256,42 +269,42 @@ void SaveUserInterface(CFile *file)
 /**
 **  Clean up a user interface.
 */
-void CleanUI(CUserInterface *ui)
+CUserInterface::~CUserInterface()
 {
 	int i;
 	MenuPanel *menupanel;
 	MenuPanel *tmp;
 
-	delete[] ui->Name;
-	delete[] ui->NormalFontColor;
-	delete[] ui->ReverseFontColor;
+	delete[] Name;
+	delete[] NormalFontColor;
+	delete[] ReverseFontColor;
 
 	// Filler
-	for (i = 0; i < (int)ui->Fillers.size(); ++i) {
-		CGraphic::Free(ui->Fillers[i].G);
+	for (i = 0; i < (int) Fillers.size(); ++i) {
+		CGraphic::Free(Fillers[i].G);
 	}
 
 	// Resource Icons
 	for (i = 0; i < MaxCosts + 2; ++i) {
-		CGraphic::Free(ui->Resources[i].G);
+		CGraphic::Free(Resources[i].G);
 	}
 
 	// Info Panel
-	CGraphic::Free(ui->InfoPanel.G);
-	delete[] ui->PanelIndex;
-	delete ui->SingleSelectedButton;
-	delete ui->SingleTrainingButton;
-	delete ui->UpgradingButton;
-	delete ui->ResearchingButton;
+	CGraphic::Free(InfoPanel.G);
+	delete[] PanelIndex;
+	delete SingleSelectedButton;
+	delete SingleTrainingButton;
+	delete UpgradingButton;
+	delete ResearchingButton;
 
 	// Button Panel
-	CGraphic::Free(ui->ButtonPanel.G);
+	CGraphic::Free(ButtonPanel.G);
 
 	// Pie Menu
-	CGraphic::Free(ui->PieMenuBackgroundG);
+	CGraphic::Free(PieMenuBackgroundG);
 
 	// Menu Panels
-	menupanel = ui->MenuPanels;
+	menupanel = MenuPanels;
 	while (menupanel) {
 		tmp = menupanel;
 		menupanel = menupanel->Next;
@@ -301,10 +314,8 @@ void CleanUI(CUserInterface *ui)
 	}
 
 	// Backgrounds
-	CGraphic::Free(ui->VictoryBackgroundG);
-	CGraphic::Free(ui->DefeatBackgroundG);
-
-	delete ui;
+	CGraphic::Free(VictoryBackgroundG);
+	CGraphic::Free(DefeatBackgroundG);
 }
 
 /**
@@ -318,13 +329,10 @@ void CleanUserInterface(void)
 	//
 	// Free the available user interfaces.
 	//
-	if (UI_Table) {
-		for (i = 0; UI_Table[i]; ++i) {
-			CleanUI(UI_Table[i]);
-		}
-		delete[] UI_Table;
-		UI_Table = NULL;
+	for (i = 0; i < (int) UI_Table.size(); ++i) {
+		delete UI_Table[i];
 	}
+	UI_Table.clear();
 
 	for (std::vector<CUnitInfoPanel *>::iterator panel = AllPanels.begin();
 		panel != AllPanels.end(); ++panel) {
@@ -349,8 +357,7 @@ void CleanUserInterface(void)
 		delete[] TitleScreens;
 		TitleScreens = NULL;
 	}
-
-	memset(&UI, 0, sizeof(UI));
+	UI = CUserInterface();
 }
 
 /**

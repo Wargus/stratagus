@@ -474,7 +474,7 @@ void PreMenuSetup(void)
 	InitSettings();
 
 	InitUserInterface(PlayerRaces.Name[0]);
-	LoadUserInterface();
+	UI.Load();
 }
 
 /**

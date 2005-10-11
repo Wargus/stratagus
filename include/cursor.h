@@ -146,6 +146,8 @@ public:
 	CursorConfig() : Name(NULL), Cursor(NULL) {}
 	~CursorConfig() { delete[] Name; }
 
+	void Load();
+
 	char *Name;       /// Config cursor-type name
 	CCursor *Cursor;  /// Cursor-type pointer
 };
