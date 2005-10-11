@@ -583,7 +583,7 @@ char* LibraryFileName(const char* file, char* buffer)
 **
 **  @param dirname  Directory to read.
 **  @param filter   Optional xdata-filter function.
-**  @param flp      Filelist pointer.
+**  @param fl       Filelist pointer.
 **
 **  @return the number of entries added to FileList.
 */
