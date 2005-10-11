@@ -42,9 +42,6 @@
 #include "ui.h"
 #include "player.h"
 #include "unittype.h"
-#if defined(MAP_REGIONS)
-#include "pathfinder.h"
-#endif
 
 /*----------------------------------------------------------------------------
 -- Declarations
@@ -306,9 +303,6 @@ void MapRemoveWall(unsigned x, unsigned y)
 		UI.Minimap.UpdateSeenXY(x, y);
 		MapMarkSeenTile(x, y);
 	}
-#ifdef MAP_REGIONS
-	MapSplitterTilesCleared(x, y, x, y);
-#endif
 }
 
 /**
@@ -347,9 +341,6 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 		UI.Minimap.UpdateSeenXY(x, y);
 		MapMarkSeenTile(x, y);
 	}
-#ifdef MAP_REGIONS
-	MapSplitterTilesOccuped(x, y, x, y);
-#endif
 }
 
 /**
