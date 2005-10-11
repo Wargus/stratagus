@@ -27,26 +27,11 @@
 --
 --	$Id$
 
-DefineFont({
-	Name = "small",
-	File = "general/small.png",
-	Size = {7, 6}})
-DefineFont({
-	Name = "game",
-	File = "general/game.png",
-	Size = {14, 14}})
-DefineFont({
-	Name = "large",
-	File = "general/large.png",
-	Size = {20, 20}})
-DefineFont({
-	Name = "small-title",
-	File = "general/large.png",
-	Size = {20, 20}})
-DefineFont({
-	Name = "large-title",
-	File = "general/large.png",
-	Size = {20, 20}})
+CFont:New("small", CGraphic:New("general/small.png", 7, 6))
+CFont:New("game", CGraphic:New("general/game.png", 14, 14))
+CFont:New("large", CGraphic:New("general/large.png", 20, 20))
+CFont:New("small-title", CGraphic:New("general/large.png", 20, 20))
+CFont:New("large-title", CGraphic:New("general/large.png", 20, 20))
 
 --	FIXME: only yellow, white, and grey are correct.
 
