@@ -49,7 +49,6 @@
 <a href="#DefineButtonStyle">DefineButtonStyle</a>
 <a href="#DefineCheckboxStyle">DefineCheckboxStyle</a>
 <a href="#DefineCursor">DefineCursor</a>
-<a href="#DefineFont">DefineFont</a>
 <a href="#DefineFontColors">DefineFontColors</a>
 <a href="#DefineMenu">DefineMenu</a>
 <a href="#DefineMenuGraphics">DefineMenuGraphics</a>
@@ -413,43 +412,6 @@ DefineCursor({
   File = "ui/cursors/small_green_cross.png",
   HotSpot = {8,  8},
   Size = {18, 18}})
-</pre>
-
-<a name="DefineFont"></a>
-<h3>DefineFont({tag = value, ...})</h3>
-
-Define a font.
-
-<dl>
-<dt>Name = "name-font"</dt>
-<dd>Type of font.  Supported types are:
-<dl>
-<dt>"game"</dt>
-<dt>"small"</dt>
-<dt>"large"</dt>
-<dt>"small-title"</dt>
-<dt>"large-title"</dt>
-<dt>"user1"</dt>
-<dt>"user2"</dt>
-<dt>"user3"</dt>
-<dt>"user4"</dt>
-<dt>"user5"</dt>
-</dl>
-</dd>
-<dt>File = "file"</dt>
-<dd>File name for font file.<br>
-Note : Currently only multicolor bitmap fonts supported.
-</dd>
-<dt>Size = {width, height}</dt>
-<dd>Font size width and height.</dd>
-</dl>
-Note: All flags are needed.
-<h4>Example</h4>
-<pre>
-DefineFont({
-  Name = "game",
-  File = "graphics/ui/fonts/game.png",
-  Size = {13, 14}})
 </pre>
 
 <a name="DefineFontColor"></a>
