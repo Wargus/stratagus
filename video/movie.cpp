@@ -233,7 +233,7 @@ int PlayMovie(const char* name)
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");
-			SoundFree(sample);
+			sample->Free();
 			SDL_FreeYUVOverlay(yuv_overlay);
 			OggFree(&data);
 			f.close();

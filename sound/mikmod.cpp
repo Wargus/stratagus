@@ -58,6 +58,24 @@ struct MikModData {
 
 static CFile *CurrentFile;
 
+class CSampleMikMod : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	MikModData Data;
+};
+
+class CSampleMikModStream : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	MikModData Data;
+};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -94,113 +112,82 @@ static MREADER MReader = { Seek, Tell, Read, Get, Eof };
 /**
 **  Type member function to read from the module
 **
-**  @param sample  Sample reading from
 **  @param buf     Buffer to write data to
 **  @param len     Length of the buffer
 **
 **  @return        Number of bytes read
 */
-static int MikModStreamRead(CSample *sample, void *buf, int len)
+int CSampleMikModStream::Read(void *buf, int len)
 {
-	MikModData *data;
 	int read;
-
-	data = (MikModData *)sample->User;
 
 	// fill up the buffer
 	read = 0;
-	while (sample->Len < SOUND_BUFFER_SIZE / 2 && Player_Active()) {
-		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
-		sample->Pos = 0;
-		CurrentFile = data->MikModFile;
-		read = VC_WriteBytes((SBYTE*)sample->Buffer + sample->Pos,
-			SOUND_BUFFER_SIZE - (sample->Pos + sample->Len));
-		sample->Len += read;
+	while (this->Len < SOUND_BUFFER_SIZE / 2 && Player_Active()) {
+		memcpy(this->Buffer, this->Buffer + this->Pos, this->Len);
+		this->Pos = 0;
+		CurrentFile = this->Data.MikModFile;
+		read = VC_WriteBytes((SBYTE*)this->Buffer + this->Pos,
+			SOUND_BUFFER_SIZE - (this->Pos + this->Len));
+		this->Len += read;
 	}
 
-	if (sample->Len < len) {
+	if (this->Len < len) {
 		// EOF
-		len = sample->Len;
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Len -= len;
-	sample->Pos += len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Len -= len;
+	this->Pos += len;
 
 	return len;
 }
 
 /**
 **  Type member function to free sample
-**
-**  @param sample  Sample to free
 */
-static void MikModStreamFree(CSample *sample)
+void CSampleMikModStream::Free()
 {
-	MikModData *data;
-	data = (MikModData *)sample->User;
-
-	CurrentFile = data->MikModFile;
+	CurrentFile = this->Data.MikModFile;
 
 	Player_Stop();
-	Player_Free(data->MikModModule);
+	Player_Free(this->Data.MikModModule);
 	MikMod_Exit();
-	data->MikModFile->close();
-	delete data->MikModFile;
-	delete data;
-	delete[] sample->Buffer;
-	delete sample;
+	this->Data.MikModFile->close();
+	delete this->Data.MikModFile;
+	delete[] this->Buffer;
 }
-
-/**
-**  MikMod object type structure.
-*/
-static const SampleType MikModStreamSampleType = {
-	MikModStreamRead,
-	MikModStreamFree,
-};
 
 /**
 **  Type member function to read from the module
 **
-**  @param sample  Sample reading from
 **  @param buf     Buffer to write data to
 **  @param len     Length of the buffer
 **
 **  @return        Number of bytes read
 */
-static int MikModRead(CSample *sample, void *buf, int len)
+int CSampleMikMod::Read(void *buf, int len)
 {
-	if (sample->Len < len) {
-		len = sample->Len;
+	if (this->Len < len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 }
 
 /**
 **  Type member function to free sample
-**
-**  @param sample  Sample to free
 */
-static void MikModFree(CSample *sample)
+void CSampleMikMod::Free()
 {
-	delete (MikModData *)sample->User;
-	delete[] sample->Buffer;
-	delete sample;
+	delete[] this->Buffer;
 }
 
-/**
-**  MikMod object type structure.
-*/
-static const SampleType MikModSampleType = {
-	MikModRead,
-	MikModFree,
-};
 
 /**
 **  Load MikMod.
@@ -209,16 +196,15 @@ static const SampleType MikModSampleType = {
 **  @param flags  Unused.
 **
 **  @return       Returns the loaded sample.
-**
 */
 CSample *LoadMikMod(const char *name, int flags)
 {
 	CSample *sample;
 	MikModData *data;
+	MODULE *module;
+	CFile *f;
 	char s[256];
 	static int registered = 0;
-
-	data = new MikModData;
 
 	md_mode |= DMODE_STEREO | DMODE_INTERP | DMODE_SURROUND | DMODE_HQMIXER;
 	MikMod_RegisterDriver(&drv_nos);
@@ -229,35 +215,39 @@ CSample *LoadMikMod(const char *name, int flags)
 	MikMod_Init("");
 
 	strcpy(s, name);
-	data->MikModFile = new CFile;
-	if (data->MikModFile->open(name, CL_OPEN_READ) == -1) {
+	f = new CFile;
+	if (f->open(name, CL_OPEN_READ) == -1) {
 		MikMod_Exit();
-		delete data->MikModFile;
-		delete data;
+		delete f;
 		return NULL;
 	}
-	CurrentFile = data->MikModFile;
+	CurrentFile = f;
 
-	data->MikModModule = Player_LoadGeneric(&MReader, 64, 0);
-	if (!data->MikModModule) {
+	module = Player_LoadGeneric(&MReader, 64, 0);
+	if (!module) {
 		MikMod_Exit();
-		data->MikModFile->close();
-		delete data->MikModFile;
-		delete data;
+		f->close();
+		delete f;
 		return NULL;
 	}
 
-	sample = new CSample;
+	if (flags & PlayAudioStream) {
+		sample = new CSampleMikModStream;
+		data = &((CSampleMikModStream *)sample)->Data;
+	} else {
+		sample = new CSampleMikMod;
+		data = &((CSampleMikMod *)sample)->Data;
+	}
+	data->MikModFile = f;
+	data->MikModModule = module;
 	sample->Channels = 2;
 	sample->SampleSize = 16;
 	sample->Frequency = 44100;
 	sample->Pos = 0;
-	sample->User = data;
 
 	if (flags & PlayAudioStream) {
 		sample->Len = 0;
 		sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
-		sample->Type = &MikModStreamSampleType;
 
 		Player_Start(data->MikModModule);
 	} else {
@@ -267,7 +257,6 @@ CSample *LoadMikMod(const char *name, int flags)
 		// FIXME: need to find the correct length
 		sample->Len = 55000000;
 		sample->Buffer = new unsigned char[sample->Len];
-		sample->Type = &MikModSampleType;
 
 		pos = 0;
 		Player_Start(data->MikModModule);

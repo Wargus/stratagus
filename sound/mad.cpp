@@ -63,6 +63,29 @@ struct MadData {
 	int BufferLen;                           /// Length of filled buffer
 };
 
+class CSampleMad : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	MadData Data;
+};
+
+class CSampleMadStream : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	MadData Data;
+};
+
+struct MadUserData {
+	CSample *Sample;
+	MadData *Data;
+};
+
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
@@ -81,8 +104,8 @@ static enum mad_flow MAD_read(void *user, struct mad_stream *stream)
 	MadData *data;
 	int i;
 
-	sample = (CSample *)user;
-	data = (MadData *)sample->User;
+	sample = ((MadUserData *)user)->Sample;
+	data = ((MadUserData *)user)->Data;
 
 	if (stream->next_frame) {
 		memmove(data->Buffer, stream->next_frame, data->BufferLen =
@@ -120,7 +143,7 @@ static enum mad_flow MAD_write(void *user,
 	int s;
 	int comp;
 
-	sample = (CSample *)user;
+	sample = ((MadUserData *)user)->Sample;
 
 	n = pcm->length;
 
@@ -177,19 +200,20 @@ static enum mad_flow MAD_error(void *user,
 **  Read one frame from mad decoder.
 **
 **  @param sample  Sample
+**  @param data    Mad data
 **  @param buf     Buffer to write data to
 **  @param len     Length of the buffer
 **
 **  @return        Number of bytes read
 */
-static int MadRead(CSample *sample, unsigned char *buf, int len)
+static int MadRead(CSample *sample, MadData *data, unsigned char *buf, int len)
 {
 	struct mad_decoder *decoder;
 	struct mad_stream *stream;
 	struct mad_frame *frame;
 	struct mad_synth *synth;
 
-	decoder = &((MadData *)sample->User)->MadDecoder;
+	decoder = &data->MadDecoder;
 
 	DebugPrint("%p %p %d\n" _C_ decoder _C_ buf _C_ len);
 
@@ -198,12 +222,13 @@ static int MadRead(CSample *sample, unsigned char *buf, int len)
 	synth = &decoder->sync->synth;
 	DebugPrint("Error: %d\n" _C_ stream->error);
 
-	MAD_read(sample, stream);
+	MadUserData d = { sample, data };
+	MAD_read(&d, stream);
 
 	if (mad_frame_decode(frame, stream) == -1) {
 		Assert(0);
 	}
-	mad_synth_frame (synth, frame);
+	mad_synth_frame(synth, frame);
 
 	decoder->output_func(decoder->cb_data, &frame->header, &synth->pcm);
 
@@ -268,15 +293,13 @@ static int MadRead(CSample *sample, unsigned char *buf, int len)
 /**
 **  Type member function to read from the mp3 file
 **
-**  @param sample  Sample reading from
-**  @param buf     Buffer to write data to
-**  @param len     Length of the buffer
+**  @param buf  Buffer to write data to
+**  @param len  Length of the buffer
 **
-**  @return        Number of bytes read
+**  @return     Number of bytes read
 */
-static int Mp3ReadStream(CSample *sample, void *buf, int len)
+int CSampleMadStream::Read(void *buf, int len)
 {
-	MadData *data;
 	int i;
 	int n;
 	int divide;
@@ -284,34 +307,32 @@ static int Mp3ReadStream(CSample *sample, void *buf, int len)
 
 	DebugPrint("%p %d\n" _C_ buf _C_ len);
 
-	data = (MadData *)sample->User;
-
-	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
-		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
-		sample->Pos = 0;
+	if (this->Pos > SOUND_BUFFER_SIZE / 2) {
+		memcpy(this->Buffer, this->Buffer + this->Pos, this->Len);
+		this->Pos = 0;
 	}
 
-	divide = 176400 / (sample->Frequency * 2 * sample->Channels);
+	divide = 176400 / (this->Frequency * 2 * this->Channels);
 
-	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
+	while (this->Len < SOUND_BUFFER_SIZE / 4) {
 		// not enough in buffer, read more
-		n = (SOUND_BUFFER_SIZE - sample->Len) / divide;
+		n = (SOUND_BUFFER_SIZE - this->Len) / divide;
 
-		i = MadRead(sample, sndbuf, n);
+		i = MadRead(this, &this->Data, sndbuf, n);
 		if (i <= 0) {
 			break;
 		}
 
-		sample->Len += i;
+		this->Len += i;
 	}
 
-	if (sample->Len < len) {
-		len = sample->Len;
+	if (this->Len < len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 
@@ -319,78 +340,50 @@ static int Mp3ReadStream(CSample *sample, void *buf, int len)
 
 /**
 **  Type member function to free an mp3 file
-**
-**  @param sample  Sample to free
 */
-static void Mp3FreeStream(CSample *sample)
+void CSampleMadStream::Free()
 {
-	MadData *data;
-
-	data = (MadData *)sample->User;
-
 	// release the decoder
-	mad_synth_finish(data->MadDecoder.sync->synth);
-	mad_frame_finish(&data->MadDecoder.sync->frame);
-	mad_stream_finish(&data->MadDecoder.sync->stream);
+	mad_synth_finish(this->Data.MadDecoder.sync->synth);
+	mad_frame_finish(&this->Data.MadDecoder.sync->frame);
+	mad_stream_finish(&this->Data.MadDecoder.sync->stream);
 
-// delete data->MadDecoder.sync;
-	mad_decoder_finish(&data->MadDecoder);
+// delete this->Data.MadDecoder.sync;
+	mad_decoder_finish(&this->Data.MadDecoder);
 
-	data->MadFile->close();
-	delete data->MadFile;
-	delete data;
-	delete sample;
+	this->Data.MadFile->close();
+	delete this->Data.MadFile;
 }
-
-/**
-**  Mp3 object type structure.
-*/
-static const SampleType Mp3StreamSampleType = {
-	Mp3ReadStream,
-	Mp3FreeStream,
-};
 
 /**
 **  Type member function to read from the mp3 file
 **
-**  @param sample  Sample reading from
-**  @param buf     Buffer to write data to
-**  @param len     Length of the buffer
+**  @param buf  Buffer to write data to
+**  @param len  Length of the buffer
 **
-**  @return        Number of bytes read
+**  @return     Number of bytes read
 */
-static int Mp3Read(CSample *sample, void *buf, int len)
+int CSampleMad::Read(void *buf, int len)
 {
-	if (len > sample->Len) {
-		len = sample->Len;
+	if (len > this->Len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 }
 
 /**
 **  Type member function to free an mp3 file
-**
-**  @param sample  Sample to free
 */
-static void Mp3Free(CSample *sample)
+void CSampleMad::Free()
 {
-	delete (MadData *)sample->User;
-	delete[] sample->Buffer;
-	delete sample;
+	delete[] this->Buffer;
 }
 
-/**
-**  Mp3 object type structure.
-*/
-static const SampleType Mp3SampleType = {
-	Mp3Read,
-	Mp3Free,
-};
 
 /**
 **  Load mp3.
@@ -423,12 +416,15 @@ CSample *LoadMp3(const char *name, int flags)
 
 	f->seek(0, SEEK_SET);
 
-	data = new MadData;
+	if (0 && flags & PlayAudioStream) {
+		sample = new CSampleMadStream;
+		data = &((CSampleMadStream *)sample)->Data;
+	} else {
+		sample = new CSampleMad;
+		data = &((CSampleMad *)sample)->Data;
+	}
 	data->MadFile = f;
 	data->BufferLen = 0;
-
-	sample = new CSample;
-	sample->User = data;
 	sample->Len = 0;
 	sample->Pos = 0;
 	sample->SampleSize = 0;
@@ -437,8 +433,6 @@ CSample *LoadMp3(const char *name, int flags)
 	if (0 && flags & PlayAudioStream) {
 #if 0
 		sample->SampleSize = 0;
-
-		sample->Type = &Mp3StreamSampleType;
 
 		// configure input, output, and error functions
 		mad_decoder_init(&data->MadDecoder, sample,
@@ -453,7 +447,7 @@ CSample *LoadMp3(const char *name, int flags)
 		mad_stream_options(&data->MadDecoder.sync->stream,
 			data->MadDecoder.options);
 
-		MadRead(sample, sample->Buffer, SOUND_BUFFER_SIZE);
+		MadRead(sample, &sample->Data, sample->Buffer, SOUND_BUFFER_SIZE);
 #endif
 	} else {
 		// FIXME: surely there's a better way to do this
@@ -462,7 +456,8 @@ CSample *LoadMp3(const char *name, int flags)
 
 		// configure input, output, and error functions
 
-		mad_decoder_init(&data->MadDecoder, sample,
+		MadUserData d = { sample, data };
+		mad_decoder_init(&data->MadDecoder, &d,
 			MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
 			MAD_error, NULL /* message */);
 
@@ -472,8 +467,6 @@ CSample *LoadMp3(const char *name, int flags)
 		mad_decoder_finish(&data->MadDecoder);
 		f->close();
 		delete f;
-
-		sample->Type = &Mp3SampleType;
 
 		DebugPrint(" %d\n" _C_ sample->Len);
 	}

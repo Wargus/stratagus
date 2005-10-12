@@ -143,7 +143,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 	int div;
 
 	if (PlayingMusic) {
-		Assert(MusicSample && MusicSample->Type);
+		Assert(MusicSample);
 
 		len = size * sizeof(*buf);
 		tmp = new char[len];
@@ -152,7 +152,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 		div = 176400 / (MusicSample->Frequency * (MusicSample->SampleSize / 8)
 				* MusicSample->Channels);
 
-		size = MusicSample->Type->Read(MusicSample, tmp, len / div);
+		size = MusicSample->Read(tmp, len / div);
 
 		n = ConvertToStereo32((char*)(tmp), (char*)buf, MusicSample->Frequency,
 			MusicSample->SampleSize / 8, MusicSample->Channels, size);
@@ -168,7 +168,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 
 		if (n < len) { // End reached
 			PlayingMusic = 0;
-			SoundFree(MusicSample);
+			MusicSample->Free();
 			MusicSample = NULL;
 
 			// we are inside the SDL callback!
@@ -669,7 +669,7 @@ SoundId RegisterSound(const char *files[], unsigned number)
 	unsigned i;
 	ServerSoundId id;
 
-	id = new Sound;
+	id = new CSound;
 	if (number > 1) { // load a sound group
 		id->Sound.OneGroup = new CSample *[number];
 		for (i = 0; i < number; ++i) {
@@ -708,11 +708,11 @@ SoundId RegisterTwoGroups(SoundId first, SoundId second)
 	if (first == NO_SOUND || second == NO_SOUND) {
 		return NO_SOUND;
 	}
-	id = new Sound;
+	id = new CSound;
 	id->Number = TWO_GROUPS;
 	id->Sound.TwoGroups = new TwoGroups;
-	id->Sound.TwoGroups->First = (Sound *)first;
-	id->Sound.TwoGroups->Second = (Sound *)second;
+	id->Sound.TwoGroups->First = (CSound *)first;
+	id->Sound.TwoGroups->Second = (CSound *)second;
 	id->Range = MAX_SOUND_RANGE;
 
 	return (SoundId)id;

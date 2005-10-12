@@ -58,6 +58,24 @@
 --  Declaration
 ----------------------------------------------------------------------------*/
 
+class CSampleVorbis : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	OggData Data;
+};
+
+class CSampleVorbisStream : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	OggData Data;
+};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -298,12 +316,10 @@ void OggFree(OggData *data)
 	ogg_sync_clear(&data->sync);
 }
 
-static int VorbisStreamRead(CSample *sample, void *buf, int len)
-{
-	OggData *data;
-	int bytes;
 
-	data = (OggData *)sample->User;
+int VorbisStreamRead(CSample *sample, OggData *data, void *buf, int len)
+{
+	int bytes;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -330,56 +346,38 @@ static int VorbisStreamRead(CSample *sample, void *buf, int len)
 	return len;
 }
 
-static void VorbisStreamFree(CSample *sample)
+int CSampleVorbisStream::Read(void *buf, int len)
 {
-	OggData *data;
-
-	data = (OggData *)sample->User;
-
-	data->File->close();
-	delete data->File;
-	OggFree(data);
-
-	delete data;
-	delete[] sample->Buffer;
-	delete sample;
+	return VorbisStreamRead(this, &this->Data, buf, len);
 }
 
-/**
-** Ogg stream type structure.
-*/
-static const SampleType VorbisStreamSampleType = {
-	VorbisStreamRead,
-	VorbisStreamFree,
-};
-
-static int VorbisRead(CSample *sample, void *buf, int len)
+void CSampleVorbisStream::Free()
 {
-	if (len > sample->Len) {
-		len = sample->Len;
+	this->Data.File->close();
+	delete this->Data.File;
+	OggFree(&this->Data);
+
+	delete[] this->Buffer;
+}
+
+int CSampleVorbis::Read(void *buf, int len)
+{
+	if (len > this->Len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 }
 
-static void VorbisFree(CSample *sample)
+void CSampleVorbis::Free()
 {
-	delete (OggData *)sample->User;
-	delete[] sample->Buffer;
-	delete sample;
+	delete[] this->Buffer;
 }
 
-/**
-** Ogg stream type structure.
-*/
-static const SampleType VorbisSampleType = {
-	VorbisRead,
-	VorbisFree,
-};
 
 /**
 **  Load vorbis.
@@ -389,7 +387,7 @@ static const SampleType VorbisSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-CSample *LoadVorbis(const char *name,int flags)
+CSample *LoadVorbis(const char *name, int flags)
 {
 	CSample *sample;
 	OggData *data;
@@ -403,11 +401,17 @@ CSample *LoadVorbis(const char *name,int flags)
 		return NULL;
 	}
 
-	data = new OggData;
+	if (flags & PlayAudioStream) {
+		sample = new CSampleVorbisStream;
+		data = &((CSampleVorbisStream *)sample)->Data;
+	} else {
+		sample = new CSampleVorbis;
+		data = &((CSampleVorbis *)sample)->Data;
+	}
 	memset(data, 0, sizeof(*data));
 
 	if (OggInit(f, data) || !data->audio) {
-		delete data;
+		delete sample;
 		f->close();
 		delete f;
 		return NULL;
@@ -415,19 +419,16 @@ CSample *LoadVorbis(const char *name,int flags)
 
 	info = &data->vinfo;
 
-	sample = new CSample;
 	sample->Channels = info->channels;
 	sample->SampleSize = 16;
 	sample->Frequency = info->rate;
 
 	sample->Len = 0;
 	sample->Pos = 0;
-	sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
-	sample->User = data;
 	data->File = f;
 
 	if (flags & PlayAudioStream) {
-		sample->Type = &VorbisStreamSampleType;
+		sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
 	} else {
 		unsigned char *buf;
 		int pos;
@@ -452,18 +453,16 @@ CSample *LoadVorbis(const char *name,int flags)
 		}
 		f->seek(pos, SEEK_SET);
 
-		buf = new unsigned char[total];
+		sample->Buffer = new unsigned char[total];
 		pos = 0;
 
-		while ((ret = VorbisStreamRead(sample, buf + pos, 8192))) {
+		while ((ret = VorbisStreamRead(sample, &((CSampleVorbis *)sample)->Data,
+				sample->Buffer + pos, 8192))) {
 			pos += ret;
 		}
 
-		delete[] sample->Buffer;
 		sample->Len = total;
 		sample->Pos = 0;
-		sample->Buffer = buf;
-		sample->Type = &VorbisSampleType;
 
 		f->close();
 		delete f;
