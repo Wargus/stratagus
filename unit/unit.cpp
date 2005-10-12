@@ -3737,7 +3737,7 @@ void SaveUnit(const CUnit *unit, CFile* file)
 		}
 		file->printf("},\n  ");
 	}
-	assert((unsigned int) unit->OrderCount == unit->Orders.size());
+	Assert((unsigned int)unit->OrderCount == unit->Orders.size());
 	file->printf("\"order-count\", %d,\n  ", unit->OrderCount);
 	file->printf("\"order-flush\", %d,\n  ", unit->OrderFlush);
 	file->printf("\"orders\", {");
