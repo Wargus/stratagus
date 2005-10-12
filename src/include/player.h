@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class Player player.h
+**  @class CPlayer player.h
 **
 **  \#include "player.h"
 **
