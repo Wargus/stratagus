@@ -168,7 +168,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 
 		if (n < len) { // End reached
 			PlayingMusic = 0;
-			MusicSample->Free();
+			delete MusicSample;
 			MusicSample = NULL;
 
 			// we are inside the SDL callback!

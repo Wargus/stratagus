@@ -61,8 +61,8 @@ struct WavData {
 class CSampleWav : public CSample
 {
 public:
+	~CSampleWav();
 	int Read(void *buf, int len);
-	void Free();
 
 	WavData Data;
 };
@@ -70,8 +70,8 @@ public:
 class CSampleWavStream : public CSample
 {
 public:
+	~CSampleWavStream();
 	int Read(void *buf, int len);
-	void Free();
 
 	WavData Data;
 };
@@ -148,7 +148,7 @@ int CSampleWavStream::Read(void *buf, int len)
 	return len;
 }
 
-void CSampleWavStream::Free()
+CSampleWavStream::~CSampleWavStream()
 {
 	this->Data.WavFile->close();
 	delete this->Data.WavFile;
@@ -168,7 +168,7 @@ int CSampleWav::Read(void *buf, int len)
 	return len;
 }
 
-void CSampleWav::Free()
+CSampleWav::~CSampleWav()
 {
 	delete[] this->Buffer;
 }

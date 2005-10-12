@@ -66,8 +66,8 @@ struct MadData {
 class CSampleMad : public CSample
 {
 public:
+	~CSampleMad();
 	int Read(void *buf, int len);
-	void Free();
 
 	MadData Data;
 };
@@ -75,8 +75,8 @@ public:
 class CSampleMadStream : public CSample
 {
 public:
+	~CSampleMadStream();
 	int Read(void *buf, int len);
-	void Free();
 
 	MadData Data;
 };
@@ -341,7 +341,7 @@ int CSampleMadStream::Read(void *buf, int len)
 /**
 **  Type member function to free an mp3 file
 */
-void CSampleMadStream::Free()
+CSampleMadStream::~CSampleMadStream()
 {
 	// release the decoder
 	mad_synth_finish(this->Data.MadDecoder.sync->synth);
@@ -379,7 +379,7 @@ int CSampleMad::Read(void *buf, int len)
 /**
 **  Type member function to free an mp3 file
 */
-void CSampleMad::Free()
+CSampleMad::~CSampleMad()
 {
 	delete[] this->Buffer;
 }

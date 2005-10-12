@@ -61,7 +61,6 @@ public:
 	virtual ~CSample() {}
 
 	virtual int Read(void *buf, int len) = 0;
-	virtual void Free() = 0;
 
 	unsigned char Channels;       /// mono or stereo
 	unsigned char SampleSize;     /// sample size in bits
