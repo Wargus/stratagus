@@ -84,7 +84,7 @@ void StopMusic(void)
 		PlayingMusic = 0; // Callback!
 		if (MusicSample) {
 			SDL_LockAudio();
-			MusicSample->Free();
+			delete MusicSample;
 			MusicSample = NULL;
 			SDL_UnlockAudio();
 			return;
@@ -222,7 +222,7 @@ int PlayMusic(const char *name)
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
 			DebugPrint("Not supported music format\n");
-			sample->Free();
+			delete sample;
 			return 0;
 		}
 		StopMusic();
