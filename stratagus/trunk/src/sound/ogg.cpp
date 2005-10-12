@@ -61,8 +61,8 @@
 class CSampleVorbis : public CSample
 {
 public:
+	~CSampleVorbis();
 	int Read(void *buf, int len);
-	void Free();
 
 	OggData Data;
 };
@@ -70,8 +70,8 @@ public:
 class CSampleVorbisStream : public CSample
 {
 public:
+	~CSampleVorbisStream();
 	int Read(void *buf, int len);
-	void Free();
 
 	OggData Data;
 };
@@ -351,7 +351,7 @@ int CSampleVorbisStream::Read(void *buf, int len)
 	return VorbisStreamRead(this, &this->Data, buf, len);
 }
 
-void CSampleVorbisStream::Free()
+CSampleVorbisStream::~CSampleVorbisStream()
 {
 	this->Data.File->close();
 	delete this->Data.File;
@@ -373,7 +373,7 @@ int CSampleVorbis::Read(void *buf, int len)
 	return len;
 }
 
-void CSampleVorbis::Free()
+CSampleVorbis::~CSampleVorbis()
 {
 	delete[] this->Buffer;
 }

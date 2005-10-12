@@ -62,8 +62,8 @@ struct FlacData {
 class CSampleFlac : public CSample
 {
 public:
+	~CSampleFlac();
 	int Read(void *buf, int len);
-	void Free();
 
 	FlacData Data;
 };
@@ -71,8 +71,8 @@ public:
 class CSampleFlacStream : public CSample
 {
 public:
+	~CSampleFlacStream();
 	int Read(void *buf, int len);
-	void Free();
 
 	FlacData Data;
 };
@@ -245,7 +245,7 @@ int CSampleFlacStream::Read(void *buf, int len)
 /**
 **  Type member function to free an flac file
 */
-void CSampleFlacStream::Free()
+CSampleFlacStream::~CSampleFlacStream()
 {
 	this->Data.FlacFile->close();
 	delete this->Data.FlacFile;
@@ -278,7 +278,7 @@ int CSampleFlac::Read(void *buf, int len)
 /**
 **  Type member function to free an flac file
 */
-void CSampleFlac::Free()
+CSampleFlac::~CSampleFlac()
 {
 	delete[] this->Buffer;
 }

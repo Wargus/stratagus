@@ -61,8 +61,8 @@ static CFile *CurrentFile;
 class CSampleMikMod : public CSample
 {
 public:
+	~CSampleMikMod();
 	int Read(void *buf, int len);
-	void Free();
 
 	MikModData Data;
 };
@@ -70,8 +70,8 @@ public:
 class CSampleMikModStream : public CSample
 {
 public:
+	~CSampleMikModStream();
 	int Read(void *buf, int len);
-	void Free();
 
 	MikModData Data;
 };
@@ -147,7 +147,7 @@ int CSampleMikModStream::Read(void *buf, int len)
 /**
 **  Type member function to free sample
 */
-void CSampleMikModStream::Free()
+CSampleMikModStream::~CSampleMikModStream()
 {
 	CurrentFile = this->Data.MikModFile;
 
@@ -183,7 +183,7 @@ int CSampleMikMod::Read(void *buf, int len)
 /**
 **  Type member function to free sample
 */
-void CSampleMikMod::Free()
+CSampleMikMod::~CSampleMikMod()
 {
 	delete[] this->Buffer;
 }
