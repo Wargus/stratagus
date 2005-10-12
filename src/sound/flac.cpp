@@ -59,6 +59,29 @@ struct FlacData {
 	CFile *FlacFile;                  /// File handle
 };
 
+class CSampleFlac : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	FlacData Data;
+};
+
+class CSampleFlacStream : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	FlacData Data;
+};
+
+struct FlacUserData {
+	CSample *Sample;
+	FlacData *Data;
+};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -94,8 +117,8 @@ static FLAC__StreamDecoderReadStatus FLAC_read_callback(
 	FlacData *data;
 	unsigned int i;
 
-	sample = (CSample *)user;
-	data = (FlacData *)sample->User;
+	sample = ((FlacUserData *)user)->Sample;
+	data = ((FlacUserData *)user)->Data;
 
 	if ((i = data->FlacFile->read(buffer, *bytes)) != *bytes) {
 		*bytes = i;
@@ -119,7 +142,7 @@ static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
 	CSample *sample;
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
-		sample = (CSample *)user;
+		sample = ((FlacUserData *)user)->Sample;
 
 		sample->Channels = metadata->data.stream_info.channels;
 		sample->Frequency = metadata->data.stream_info.sample_rate;
@@ -153,8 +176,8 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	char *buf;
 	int ssize;
 
-	sample = (CSample *)user;
-	data = (FlacData *)sample->User;
+	sample = ((FlacUserData *)user)->Sample;
+	data = ((FlacUserData *)user)->Data;
 
 	Assert(sample->Buffer);
 	Assert(frame->header.bits_per_sample == sample->SampleSize);
@@ -186,114 +209,80 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
+
 /**
 **  Type member function to read from the flac file
 **
-**  @param sample  Sample reading from
 **  @param buf     Buffer to write data to
 **  @param len     Length of the buffer
 **
 **  @return        Number of bytes read
 */
-static int FlacStreamRead(CSample *sample, void *buf, int len)
+int CSampleFlacStream::Read(void *buf, int len)
 {
-	FlacData *data;
-
-	data = (FlacData *)sample->User;
-
-	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
-		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
-		sample->Pos = 0;
+	if (this->Pos > SOUND_BUFFER_SIZE / 2) {
+		memcpy(this->Buffer, this->Buffer + this->Pos, this->Len);
+		this->Pos = 0;
 	}
 
-	while (sample->Len < SOUND_BUFFER_SIZE / 4 &&
-			FLAC__stream_decoder_get_state(data->FlacStream) != FLAC__STREAM_DECODER_END_OF_STREAM) {
+	while (this->Len < SOUND_BUFFER_SIZE / 4 &&
+			FLAC__stream_decoder_get_state(this->Data.FlacStream) != FLAC__STREAM_DECODER_END_OF_STREAM) {
 		// need to read new data
-		FLAC__stream_decoder_process_single(data->FlacStream);
+		FLAC__stream_decoder_process_single(this->Data.FlacStream);
 	}
 
-	if (sample->Len < len) {
-		len = sample->Len;
+	if (this->Len < len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 }
 
 /**
 **  Type member function to free an flac file
-**
-**  @param sample  Sample to free
 */
-static void FlacStreamFree(CSample *sample)
+void CSampleFlacStream::Free()
 {
-	FlacData *data;
-
-	data = (FlacData *)sample->User;
-
-	data->FlacFile->close();
-	delete data->FlacFile;
-	FLAC__stream_decoder_finish(data->FlacStream);
-	FLAC__stream_decoder_delete(data->FlacStream);
-	delete data;
-	delete[] sample->Buffer;
-	delete sample;
+	this->Data.FlacFile->close();
+	delete this->Data.FlacFile;
+	FLAC__stream_decoder_finish(this->Data.FlacStream);
+	FLAC__stream_decoder_delete(this->Data.FlacStream);
+	delete[] this->Buffer;
 }
-
-/**
-**  Flac stream type structure.
-*/
-static const SampleType FlacStreamSampleType = {
-	FlacStreamRead,
-	FlacStreamFree,
-};
 
 /**
 **  Type member function to read from the flac file
 **
-**  @param sample  Sample reading from
 **  @param buf     Buffer to write data to
 **  @param len     Length of the buffer
 **
 **  @return        Number of bytes read
 */
-static int FlacRead(CSample *sample, void *buf, int len)
+int CSampleFlac::Read(void *buf, int len)
 {
-	if (len > sample->Len) {
-		len = sample->Len;
+	if (len > this->Len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 /**
 **  Type member function to free an flac file
-**
-**  @param sample  Sample to free
 */
-static void FlacFree(CSample *sample)
+void CSampleFlac::Free()
 {
-	delete (FlacData *)sample->User;
-	delete[] sample->Buffer;
-	delete sample;
+	delete[] this->Buffer;
 }
 
-/**
-**  Flac object type structure.
-*/
-static const SampleType FlacSampleType = {
-	FlacRead,
-	FlacFree,
-};
 
 /**
 **  Load flac.
@@ -334,31 +323,32 @@ CSample *LoadFlac(const char *name, int flags)
 		return NULL;
 	}
 
-	data = new FlacData;
+	if (flags & PlayAudioStream) {
+		sample = new CSampleFlacStream;
+		data = &((CSampleFlacStream *)sample)->Data;
+	} else {
+		sample = new CSampleFlac;
+		data = &((CSampleFlac *)sample)->Data;
+	}
 	data->FlacFile = f;
 	data->FlacStream = stream;
-
-	sample = new CSample;
 	sample->Len = 0;
 	sample->Pos = 0;
-	sample->User = data;
 
 	FLAC__stream_decoder_set_read_callback(stream, FLAC_read_callback);
 	FLAC__stream_decoder_set_write_callback(stream, FLAC_write_callback);
 	FLAC__stream_decoder_set_metadata_callback(stream, FLAC_metadata_callback);
 	FLAC__stream_decoder_set_error_callback(stream, FLAC_error_callback);
-	FLAC__stream_decoder_set_client_data(stream, sample);
+	FlacUserData d = { sample, data };
+	FLAC__stream_decoder_set_client_data(stream, &d);
 	FLAC__stream_decoder_init(stream);
 
 	if (flags & PlayAudioStream) {
 		sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
-		sample->Type = &FlacStreamSampleType;
-
 		FLAC__stream_decoder_process_until_end_of_metadata(stream);
 	} else {
 		// Buffer will be new'ed from metadata callback
 		sample->Buffer = NULL;
-		sample->Type = &FlacSampleType;
 
 		Assert(FLAC__stream_decoder_get_state(stream) ==
 			FLAC__STREAM_DECODER_SEARCH_FOR_METADATA);

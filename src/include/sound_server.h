@@ -51,40 +51,15 @@
 
 #define SOUND_BUFFER_SIZE 65536
 
-class CSample;
-
-/**
-**  General sound object type.
-**
-**  @todo This is the planned new sample handling,
-**         which supports streaming, decompressing on demand, caching.
-*/
-typedef struct _sample_type_ {
-	/**
-	**  Read next samples from object.
-	**
-	**  @param o    pointer to object.
-	**  @param buf  buffer to fill.
-	**  @param len  length of buffer.
-	**
-	**  @return     Number of bytes filled.
-	*/
-	int (*Read)(CSample *o, void *buf, int len);
-	/**
-	** Free the sample object.
-	**
-	**  @param o  pointer to object.
-	*/
-	void (*Free) (CSample *o);
-} SampleType;
+class CSound;
 
 /**
 **  RAW samples.
 */
 class CSample {
 public:
-	const SampleType *Type;       /// Object type dependend
-	void *User;                   /// Object user data
+	virtual int Read(void *buf, int len) = 0;
+	virtual void Free() = 0;
 
 	unsigned char Channels;       /// mono or stereo
 	unsigned char SampleSize;     /// sample size in bits
@@ -96,19 +71,13 @@ public:
 	int Len;                      /// length of filled buffer
 };
 
-	/// Free a sample object.
-#define SoundFree(o) ((o)->Type->Free)((o))
-	/// Save (NULL) free a sample object.
-#define SoundSaveFree(o) \
-	do { if ((o)) ((o)->Type->Free)((o)); } while (0)
-
 /**
 **  Sound double group: a sound that groups two sounds, used to implement
 **  the annoyed/selected sound system of WC
 */
 typedef struct _two_groups_ {
-	struct _sound_ *First;  /// first group: selected sound
-	struct _sound_ *Second; /// second group: annoyed sound
+	CSound *First;                /// first group: selected sound
+	CSound *Second;               /// second group: annoyed sound
 } TwoGroups;
 
 /**
@@ -133,7 +102,8 @@ typedef struct _two_groups_ {
 /**
 **  Sound definition.
 */
-typedef struct _sound_ {
+class CSound {
+public:
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
@@ -145,12 +115,12 @@ typedef struct _sound_ {
 		CSample **OneGroup;      /// when it's a simple group
 		struct _two_groups_* TwoGroups; /// when it's a double group
 	} Sound;
-} Sound;
+};
 
 /**
 **  Sound unique identifier
 */
-typedef Sound *ServerSoundId;
+typedef CSound *ServerSoundId;
 
 /**
 **  Origin of a sound

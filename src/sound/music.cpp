@@ -84,7 +84,7 @@ void StopMusic(void)
 		PlayingMusic = 0; // Callback!
 		if (MusicSample) {
 			SDL_LockAudio();
-			SoundFree(MusicSample);
+			MusicSample->Free();
 			MusicSample = NULL;
 			SDL_UnlockAudio();
 			return;
@@ -222,7 +222,7 @@ int PlayMusic(const char *name)
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
 			DebugPrint("Not supported music format\n");
-			SoundFree(sample);
+			sample->Free();
 			return 0;
 		}
 		StopMusic();
@@ -236,7 +236,7 @@ int PlayMusic(const char *name)
 // if (sample->Channels != 2 || sample->SampleSize != 16
 // || sample->Frequency != SoundFrequency) {
 // DebugPrint("Not supported music format\n");
-// SoundFree(sample);
+// sample->Free();
 // return;
 // }
 		StopMusic();
@@ -251,7 +251,7 @@ int PlayMusic(const char *name)
 		if (sample->Channels != 2 || sample->SampleSize != 16
 			|| sample->Frequency != SoundFrequency) {
 			DebugPrint("Not supported music format\n");
-			SoundFree(sample);
+			sample->Free();
 			return;
 		}
 */
