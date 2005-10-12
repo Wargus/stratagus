@@ -727,9 +727,11 @@ static int PowerOf2(int x)
 /**
 **  Make an OpenGL texture or textures out of a graphic object.
 **
-**  @param g       The graphic object.
-**  @param width   Graphic width.
-**  @param height  Graphic height.
+**  @param g        The graphic object.
+**  @param texture  Texture.
+**  @param colors   Unit colors.
+**  @param ow       Offset width.
+**  @param oh       Offset height.
 */
 static void MakeTextures2(CGraphic *g, GLuint texture, UnitColors *colors,
 	int ow, int oh)
@@ -855,8 +857,8 @@ static void MakeTextures2(CGraphic *g, GLuint texture, UnitColors *colors,
 **  Make an OpenGL texture or textures out of a graphic object.
 **
 **  @param g       The graphic object.
-**  @param width   Graphic width.
-**  @param height  Graphic height.
+**  @param player  Player number.
+**  @param colors  Unit colors.
 */
 static void MakeTextures(CGraphic *g, int player, UnitColors *colors)
 {

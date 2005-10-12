@@ -70,7 +70,7 @@ int InitSdlSound(int freq, int size)
 		wanted.format = AUDIO_S16SYS;
 	}
 	wanted.channels = 2;
-	wanted.samples = 2048;
+	wanted.samples = 3072;
 	wanted.callback = FillAudio;
 	wanted.userdata = NULL;
 

@@ -58,13 +58,30 @@ struct WavData {
 	int ChunkRem;         /// Bytes remaining in chunk
 };
 
+class CSampleWav : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	WavData Data;
+};
+
+class CSampleWavStream : public CSample
+{
+public:
+	int Read(void *buf, int len);
+	void Free();
+
+	WavData Data;
+};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int WavStreamRead(CSample *sample, void *buf, int len)
+int CSampleWavStream::Read(void *buf, int len)
 {
-	WavData *data;
 	WavChunk chunk;
 	unsigned char *sndbuf;
 	int comp; // number of compressed bytes actually read
@@ -72,114 +89,89 @@ static int WavStreamRead(CSample *sample, void *buf, int len)
 	int read;
 	int bufrem;
 
-	data = (WavData *)sample->User;
-
-	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
-		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
-		sample->Pos = 0;
+	if (this->Pos > SOUND_BUFFER_SIZE / 2) {
+		memcpy(this->Buffer, this->Buffer + this->Pos, this->Len);
+		this->Pos = 0;
 	}
 
-	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
-		if (!data->ChunkRem) {
+	while (this->Len < SOUND_BUFFER_SIZE / 4) {
+		if (!this->Data.ChunkRem) {
 			// read next chunk
-			comp = data->WavFile->read(&chunk, sizeof(chunk));
+			comp = this->Data.WavFile->read(&chunk, sizeof(chunk));
 
 			if (!comp) {
 				// EOF
-				data->ChunkRem = 0;
+				this->Data.ChunkRem = 0;
 				break;
 			}
 
 			chunk.Magic = ConvertLE32(chunk.Magic);
 			chunk.Length = ConvertLE32(chunk.Length);
 			if (chunk.Magic != DATA) {
-				data->WavFile->seek(chunk.Length, SEEK_CUR);
+				this->Data.WavFile->seek(chunk.Length, SEEK_CUR);
 				continue;
 			}
-			data->ChunkRem = chunk.Length;
+			this->Data.ChunkRem = chunk.Length;
 		}
 
-		bufrem = SOUND_BUFFER_SIZE - (sample->Pos + sample->Len);
-		if (data->ChunkRem > bufrem) {
+		bufrem = SOUND_BUFFER_SIZE - (this->Pos + this->Len);
+		if (this->Data.ChunkRem > bufrem) {
 			read = bufrem;
 		} else {
-			read = data->ChunkRem;
+			read = this->Data.ChunkRem;
 		}
-		data->ChunkRem -= read;
+		this->Data.ChunkRem -= read;
 
-		sndbuf = sample->Buffer + sample->Pos + sample->Len;
+		sndbuf = this->Buffer + this->Pos + this->Len;
 
-		comp = data->WavFile->read(sndbuf, read);
+		comp = this->Data.WavFile->read(sndbuf, read);
 		if (!comp) {
 			break;
 		}
 
 		read >>= 1;
 		for (i = 0; i < read; ++i) {
-			((unsigned short *)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
+			((unsigned short *)sndbuf)[i] = ConvertLE16(((unsigned short *)sndbuf)[i]);
 		}
 
-		sample->Len += comp;
+		this->Len += comp;
 	}
 
-	if (sample->Len < len) {
-		len = sample->Len;
+	if (this->Len < len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 }
 
-static void WavStreamFree(CSample *sample)
+void CSampleWavStream::Free()
 {
-	WavData *data;
-
-	data = (WavData *)sample->User;
-
-	data->WavFile->close();
-	delete data->WavFile;
-	delete data;
-	delete sample;
+	this->Data.WavFile->close();
+	delete this->Data.WavFile;
+	delete[] this->Buffer;
 }
 
-/**
-**  wav stream type structure.
-*/
-static const SampleType WavStreamSampleType = {
-	WavStreamRead,
-	WavStreamFree,
-};
-
-static int WavRead(CSample *sample, void *buf, int len)
+int CSampleWav::Read(void *buf, int len)
 {
-	if (len > sample->Len) {
-		len = sample->Len;
+	if (len > this->Len) {
+		len = this->Len;
 	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
+	memcpy(buf, this->Buffer + this->Pos, len);
+	this->Pos += len;
+	this->Len -= len;
 
 	return len;
 }
 
-static void WavFree(CSample *sample)
+void CSampleWav::Free()
 {
-	delete (WavData *)sample->User;
-	delete[] sample->Buffer;
-	delete sample;
+	delete[] this->Buffer;
 }
-
-/**
-**   wav stream type structure.
-*/
-static const SampleType WavSampleType = {
-	WavRead,
-	WavFree,
-};
 
 
 /**
@@ -202,7 +194,7 @@ CSample *LoadWav(const char *name, int flags)
 	unsigned int t;
 
 	f = new CFile;
-	if (f->open(name,CL_OPEN_READ) == -1) {
+	if (f->open(name, CL_OPEN_READ) == -1) {
 		printf("Can't open file `%s'\n", name);
 		delete f;
 		return NULL;
@@ -293,25 +285,28 @@ CSample *LoadWav(const char *name, int flags)
 	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 ||
 		wavfmt.Frequency == 11025);
 
-	data = new WavData;
-	data->WavFile = f;
-
 	//
 	//  Read sample
 	//
-	sample = new CSample;
+	if (flags & PlayAudioStream) {
+		sample = new CSampleWavStream;
+		((CSampleWavStream *)sample)->Data.WavFile = f;
+		data = &((CSampleWavStream *)sample)->Data;
+	} else {
+		sample = new CSampleWav;
+		((CSampleWav *)sample)->Data.WavFile = f;
+		data = &((CSampleWav *)sample)->Data;
+	}
 	sample->Channels = wavfmt.Channels;
 	sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
 	sample->Frequency = wavfmt.Frequency;
 	sample->BitsPerSample = wavfmt.BitsPerSample;
 	sample->Len = 0;
 	sample->Pos = 0;
-	sample->User = data;
 
 	if (flags & PlayAudioStream) {
 		data->ChunkRem = 0;
 		sample->Buffer = new unsigned char[SOUND_BUFFER_SIZE];
-		sample->Type = &WavStreamSampleType;
 	} else {
 		int comp; // number of compressed bytes actually read
 		int i;
@@ -319,8 +314,6 @@ CSample *LoadWav(const char *name, int flags)
 		int read;
 		int bufrem;
 		char sndbuf[SOUND_BUFFER_SIZE];
-
-		sample->Type = &WavSampleType;
 
 		sample->Buffer = NULL;
 		read = 0;
@@ -364,8 +357,8 @@ CSample *LoadWav(const char *name, int flags)
 			if (sample->SampleSize == 16) {
 				read >>= 1;
 				for (i = 0; i < read; ++i) {
-					((unsigned short*)(sample->Buffer + sample->Pos + sample->Len))[i] =
-						ConvertLE16(((unsigned short*)sndbuf)[i]);
+					((unsigned short *)(sample->Buffer + sample->Pos + sample->Len))[i] =
+						ConvertLE16(((unsigned short *)sndbuf)[i]);
 				}
 			} else {
 				memcpy((sample->Buffer + sample->Pos + sample->Len), sndbuf, comp);

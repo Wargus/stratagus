@@ -758,6 +758,9 @@ int main(int argc, char **argv)
 #ifdef USE_LIBCDA
 		"LIBCDA "
 #endif
+#ifdef USE_CDDA
+		"CDDA "
+#endif
 #ifdef USE_FLAC
 		"FLAC "
 #endif

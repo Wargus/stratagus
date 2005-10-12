@@ -258,7 +258,8 @@ Mng::~Mng()
 /**
 **  Display a MNG
 **
-**  @param mng  Mng file to display
+**  @param x  X coordinate
+**  @param y  Y coordinate
 */
 void Mng::Draw(int x, int y)
 {
@@ -329,8 +330,6 @@ int Mng::Load(const char *name)
 
 /**
 **  Reset a MNG
-**
-**  @param mng  Mng file to reset
 */
 void Mng::Reset()
 {
