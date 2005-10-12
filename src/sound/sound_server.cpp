@@ -287,11 +287,11 @@ int NextFreeChannel;
 /**
 **  Selection handling
 */
-typedef struct _selection_handling_ {
-	Origin Source;         // origin of the sound
-	ServerSoundId Sound;   // last sound played by this unit
-	unsigned char HowMany; // number of sound played in this group
-} SelectionHandling;
+struct SelectionHandling {
+	Origin Source;         /// origin of the sound
+	CSound *Sound;         /// last sound played by this unit
+	unsigned char HowMany; /// number of sound played in this group
+};
 
 /// FIXME: docu
 SelectionHandling SelectionHandler;
@@ -394,14 +394,14 @@ static unsigned char ComputeVolume(SoundRequest *sr)
 		}
 	} else {
 		// map distance to volume
-		return VolumeForDistance(sr->Power, ((ServerSoundId)(sr->Sound))->Range);
+		return VolumeForDistance(sr->Power, sr->Sound->Range);
 	}
 }
 
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static CSample *SimpleChooseSample(ServerSoundId sound)
+static CSample *SimpleChooseSample(CSound *sound)
 {
 	if (sound->Number == ONE_SOUND) {
 		return sound->Sound.OneSound;
@@ -418,13 +418,13 @@ static CSample *SimpleChooseSample(ServerSoundId sound)
 */
 static CSample *ChooseSample(SoundRequest *sr)
 {
-	ServerSoundId theSound;
+	CSound *theSound;
 	CSample *result;
 
 	result = NO_SOUND;
 
 	if (sr->Sound != NO_SOUND) {
-		theSound = (ServerSoundId)(sr->Sound);
+		theSound = sr->Sound;
 		if (theSound->Number == TWO_GROUPS) {
 			// handle a special sound (selection)
 			if (SelectionHandler.Source.Base == sr->Source.Base &&
@@ -434,7 +434,7 @@ static CSample *ChooseSample(SoundRequest *sr)
 					SelectionHandler.HowMany++;
 					if (SelectionHandler.HowMany >= 3) {
 						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->Second;
+						SelectionHandler.Sound = theSound->Sound.TwoGroups->Second;
 					}
 				} else {
 					//FIXME: checks for error
@@ -444,12 +444,12 @@ static CSample *ChooseSample(SoundRequest *sr)
 						SelectionHandler.HowMany++;
 						if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
 							SelectionHandler.HowMany = 0;
-							SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->First;
+							SelectionHandler.Sound = theSound->Sound.TwoGroups->First;
 						}
 					} else {
 						result = SelectionHandler.Sound->Sound.OneSound;
 						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->First;
+						SelectionHandler.Sound = theSound->Sound.TwoGroups->First;
 					}
 				}
 			} else {
@@ -664,10 +664,10 @@ static CSample *LoadSample(const char *name)
 **  @todo FIXME: Must handle the errors better.
 **  FIXME: Support for more sample files (ogg/flac/mp3).
 */
-SoundId RegisterSound(const char *files[], unsigned number)
+CSound *RegisterSound(const char *files[], unsigned number)
 {
 	unsigned i;
-	ServerSoundId id;
+	CSound *id;
 
 	id = new CSound;
 	if (number > 1) { // load a sound group
@@ -690,7 +690,7 @@ SoundId RegisterSound(const char *files[], unsigned number)
 		id->Number = ONE_SOUND;
 	}
 	id->Range = MAX_SOUND_RANGE;
-	return (SoundId)id;
+	return id;
 }
 
 /**
@@ -701,9 +701,9 @@ SoundId RegisterSound(const char *files[], unsigned number)
 **
 **  @return        the special sound unique identifier
 */
-SoundId RegisterTwoGroups(SoundId first, SoundId second)
+CSound *RegisterTwoGroups(CSound *first, CSound *second)
 {
-	ServerSoundId id;
+	CSound *id;
 
 	if (first == NO_SOUND || second == NO_SOUND) {
 		return NO_SOUND;
@@ -711,11 +711,11 @@ SoundId RegisterTwoGroups(SoundId first, SoundId second)
 	id = new CSound;
 	id->Number = TWO_GROUPS;
 	id->Sound.TwoGroups = new TwoGroups;
-	id->Sound.TwoGroups->First = (CSound *)first;
-	id->Sound.TwoGroups->Second = (CSound *)second;
+	id->Sound.TwoGroups->First = first;
+	id->Sound.TwoGroups->Second = second;
 	id->Range = MAX_SOUND_RANGE;
 
-	return (SoundId)id;
+	return id;
 }
 
 /**
@@ -724,10 +724,10 @@ SoundId RegisterTwoGroups(SoundId first, SoundId second)
 **  @param sound  the id of the sound to modify.
 **  @param range  the new range for this sound.
 */
-void SetSoundRange(SoundId sound, unsigned char range)
+void SetSoundRange(CSound *sound, unsigned char range)
 {
 	if (sound != NO_SOUND) {
-		((ServerSoundId) sound)->Range = range;
+		sound->Range = range;
 	}
 }
 

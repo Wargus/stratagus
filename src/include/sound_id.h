@@ -37,13 +37,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**  Sound referencing.
-**
-**  Client side representation of the sound id.
-**  Passed to the sound server API.
-*/
-typedef void* SoundId;  /// sound identifier
+class CSound;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -54,14 +48,14 @@ typedef void* SoundId;  /// sound identifier
 ----------------------------------------------------------------------------*/
 
 	/// Make a sound bound to identifier
-extern SoundId MakeSound(const char* sound_name, const char* file[], int nb);
+extern CSound *MakeSound(const char *sound_name, const char *file[], int nb);
 	/// Get the sound id bound to an identifier
-extern SoundId SoundIdForName(const char* sound_name);
+extern CSound *SoundForName(const char *sound_name);
 	/// Map sound to identifier
-extern void MapSound(const char* sound_name, const SoundId id);
+extern void MapSound(const char *sound_name, CSound *id);
 	/// Make a sound group bound to identifier
-extern SoundId MakeSoundGroup(const char* name, SoundId first,
-	SoundId second);
+extern CSound *MakeSoundGroup(const char *name, CSound *first,
+	CSound *second);
 
 //@}
 

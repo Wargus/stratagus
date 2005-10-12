@@ -64,12 +64,12 @@
 */
 static int CclSoundForName(lua_State *l)
 {
-	SoundId id;
+	CSound *id;
 	const char *sound_name;
 	LuaUserData *data;
 
 	sound_name = LuaToString(l, -1);
-	id = SoundIdForName(sound_name);
+	id = SoundForName(sound_name);
 
 	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
@@ -84,7 +84,7 @@ static int CclSoundForName(lua_State *l)
 **
 **  @return   The C sound id.
 */
-static SoundId CclGetSoundId(lua_State *l)
+static CSound *CclGetSound(lua_State *l)
 {
 	LuaUserData *data;
 	int pop;
@@ -100,10 +100,10 @@ static SoundId CclGetSoundId(lua_State *l)
 			if (pop) {
 				lua_pop(l, 1);
 			}
-			return data->Data;
+			return (CSound *)data->Data;
 		}
 	}
-	LuaError(l, "CclGetSoundId: not a sound");
+	LuaError(l, "CclGetSound: not a sound");
 	return NULL;
 }
 
@@ -120,7 +120,7 @@ static SoundId CclGetSoundId(lua_State *l)
 */
 static int CclMakeSound(lua_State *l)
 {
-	SoundId id;
+	CSound *id;
 	const char *c_name;
 	const char *c_file;
 	char **c_files;
@@ -170,10 +170,10 @@ static int CclMakeSound(lua_State *l)
 */
 static int CclMakeSoundGroup(lua_State *l)
 {
-	SoundId id;
+	CSound *id;
 	const char *c_name;
-	SoundId first;
-	SoundId second;
+	CSound *first;
+	CSound *second;
 	LuaUserData *data;
 
 	LuaCheckArgs(l, 3);
@@ -181,9 +181,9 @@ static int CclMakeSoundGroup(lua_State *l)
 	c_name = LuaToString(l, 1);
 
 	lua_pushvalue(l, 2);
-	first = CclGetSoundId(l);
+	first = CclGetSound(l);
 	lua_pop(l, 1);
-	second = CclGetSoundId(l);
+	second = CclGetSound(l);
 	id = MakeSoundGroup(c_name, first, second);
 	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
@@ -205,7 +205,7 @@ static int CclMapSound(lua_State *l)
 
 	LuaCheckArgs(l, 2);
 	sound_name = LuaToString(l, 1);
-	MapSound(sound_name, CclGetSoundId(l));
+	MapSound(sound_name, CclGetSound(l));
 	lua_pushvalue(l, 2);
 	return 1;
 }
@@ -217,11 +217,11 @@ static int CclMapSound(lua_State *l)
 */
 static int CclPlaySound(lua_State *l)
 {
-	SoundId id;
+	CSound *id;
 
 	LuaCheckArgs(l, 1);
 
-	id = CclGetSoundId(l);
+	id = CclGetSound(l);
 	PlayGameSound(id, MaxSampleVolume);
 	return 0;
 }
@@ -253,19 +253,19 @@ static int CclDefineGameSounds(lua_State *l)
 					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.Click.Sound = data->Data;
+			GameSounds.Click.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "placement-error")) {
 			if (!lua_isuserdata(l, j + 1) ||
 					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.PlacementError.Sound = data->Data;
+			GameSounds.PlacementError.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "placement-success")) {
 			if (!lua_isuserdata(l, j + 1) ||
 					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.PlacementSuccess.Sound = data->Data;
+			GameSounds.PlacementSuccess.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "work-complete")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -287,7 +287,7 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.WorkComplete[i].Sound = data->Data;
+			GameSounds.WorkComplete[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "rescue")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -309,7 +309,7 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.Rescue[i].Sound = data->Data;
+			GameSounds.Rescue[i].Sound = (CSound *)data->Data;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -590,7 +590,7 @@ static int CclSetGlobalSoundRange(lua_State *l)
 static int CclSetSoundRange(lua_State *l) {
 	unsigned char theRange;
 	int tmp;
-	SoundId id;
+	CSound *id;
 
 	LuaCheckArgs(l, 2);
 
@@ -603,7 +603,7 @@ static int CclSetSoundRange(lua_State *l) {
 		theRange = (unsigned char)tmp;
 	}
 	lua_pushvalue(l, 1);
-	id = CclGetSoundId(l);
+	id = CclGetSound(l);
 	SetSoundRange(id, theRange);
 	return 1;
 }
