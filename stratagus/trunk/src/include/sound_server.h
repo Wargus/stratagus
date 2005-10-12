@@ -58,7 +58,7 @@ class CSound;
 */
 class CSample {
 public:
-	virtual ~CSample();
+	virtual ~CSample() {}
 
 	virtual int Read(void *buf, int len) = 0;
 	virtual void Free() = 0;
