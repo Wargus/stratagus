@@ -353,8 +353,10 @@ int CSampleVorbisStream::Read(void *buf, int len)
 
 CSampleVorbisStream::~CSampleVorbisStream()
 {
-	this->Data.File->close();
-	delete this->Data.File;
+	if (this->Data.File) {
+		this->Data.File->close();
+		delete this->Data.File;
+	}
 	OggFree(&this->Data);
 
 	delete[] this->Buffer;
