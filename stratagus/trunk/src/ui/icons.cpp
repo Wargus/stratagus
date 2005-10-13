@@ -44,11 +44,9 @@
 #include <vector>
 #include <map>
 
-#include "map.h"
 #include "video.h"
 #include "icons.h"
 #include "player.h"
-#include "script.h"
 #include "ui.h"
 #include "menus.h"
 

@@ -49,7 +49,6 @@
 #include "interface.h"
 #include "cursor.h"
 #include "ui.h"
-#include "map.h"
 #include "menus.h"
 #include "script.h"
 #include "tileset.h"

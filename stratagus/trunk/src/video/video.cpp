@@ -90,7 +90,6 @@
 #include <vector>
 
 #include "video.h"
-#include "map.h"
 #include "ui.h"
 #include "cursor.h"
 #include "iolib.h"
