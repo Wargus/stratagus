@@ -6,7 +6,7 @@
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
-//        Stratagus - A free fantasy real time strategy game engine
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name unitsound.cpp - The unit sounds. */
 //
@@ -79,10 +79,10 @@ static void MapAnimSounds2(CAnimation *anim)
 
 	while (anim) {
 		if (anim->Type == AnimationSound) {
-			anim->D.Sound.Sound = SoundIdForName(anim->D.Sound.Name);
+			anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name);
 		} else if (anim->Type == AnimationRandomSound) {
 			for (i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
-				anim->D.RandomSound.Sound[i] = SoundIdForName(anim->D.RandomSound.Name[i]);
+				anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i]);
 			}
 		}
 		anim = anim->Next;
@@ -136,11 +136,11 @@ void MapUnitSounds(void)
 
 			if (type->Sound.Selected.Name) {
 				type->Sound.Selected.Sound =
-					SoundIdForName(type->Sound.Selected.Name);
+					SoundForName(type->Sound.Selected.Name);
 			}
 			if (type->Sound.Acknowledgement.Name) {
 				type->Sound.Acknowledgement.Sound =
-					SoundIdForName(type->Sound.Acknowledgement.Name);
+					SoundForName(type->Sound.Acknowledgement.Name);
 				/*
 				// Acknowledge sounds have infinite range
 				SetSoundRange(type->Sound.Acknowledgement.Sound,
@@ -149,31 +149,31 @@ void MapUnitSounds(void)
 			}
 			if (type->Sound.Ready.Name) {
 				type->Sound.Ready.Sound =
-					SoundIdForName(type->Sound.Ready.Name);
+					SoundForName(type->Sound.Ready.Name);
 				// Ready sounds have infinite range
 				SetSoundRange(type->Sound.Ready.Sound,
 					INFINITE_SOUND_RANGE);
 			}
 			if (type->Sound.Repair.Name) {
 				type->Sound.Repair.Sound =
-					SoundIdForName(type->Sound.Repair.Name);
+					SoundForName(type->Sound.Repair.Name);
 			}
 			for (j = 0; j < MaxCosts; ++j) {
 				if (type->Sound.Harvest[j].Name) {
 					type->Sound.Harvest[j].Sound =
-						SoundIdForName(type->Sound.Harvest[j].Name);
+						SoundForName(type->Sound.Harvest[j].Name);
 				}
 			}
 			if (type->Sound.Help.Name) {
 				type->Sound.Help.Sound =
-					SoundIdForName(type->Sound.Help.Name);
+					SoundForName(type->Sound.Help.Name);
 				// Help sounds have infinite range
 				SetSoundRange(type->Sound.Help.Sound,
 					INFINITE_SOUND_RANGE);
 			}
 			if (type->Sound.Dead.Name) {
 				type->Sound.Dead.Sound =
-					SoundIdForName(type->Sound.Dead.Name);
+					SoundForName(type->Sound.Dead.Name);
 			}
 		}
 	}

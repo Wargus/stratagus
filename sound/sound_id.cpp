@@ -51,7 +51,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::map<std::string, SoundId> SoundIdMap;
+static std::map<std::string, CSound *> SoundMap;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -64,9 +64,9 @@ static std::map<std::string, SoundId> SoundIdMap;
 **  @param name  Name of the sound (now freed by caller!).
 **  @param id    Sound identifier.
 */
-void MapSound(const char *name, const SoundId id)
+void MapSound(const char *name, CSound *id)
 {
-	SoundIdMap[name] = id;
+	SoundMap[name] = id;
 }
 
 /**
@@ -76,11 +76,11 @@ void MapSound(const char *name, const SoundId id)
 **
 **  @return      Sound identifier for this name.
 */
-SoundId SoundIdForName(const char *name)
+CSound *SoundForName(const char *name)
 {
 	Assert(name);
 
-	SoundId result = SoundIdMap[name];
+	CSound *result = SoundMap[name];
 	if (!result) {
 		DebugPrint("Can't find sound `%s' in sound table\n" _C_ name);
 	}
@@ -99,13 +99,13 @@ SoundId SoundIdForName(const char *name)
 **
 **  @return      the sound id of the created group
 */
-SoundId MakeSound(const char *name, const char *file[], int nb)
+CSound *MakeSound(const char *name, const char *file[], int nb)
 {
-	SoundId sound;
+	CSound *sound;
 
 	Assert(nb <= 255);
 
-	if ((sound = SoundIdMap[name])) {
+	if ((sound = SoundMap[name])) {
 		DebugPrint("re-register sound `%s'\n" _C_ name);
 		return sound;
 	}
@@ -129,11 +129,11 @@ SoundId MakeSound(const char *name, const char *file[], int nb)
 **
 **  @return        Registered sound identifier.
 */
-SoundId MakeSoundGroup(const char *name, SoundId first, SoundId second)
+CSound *MakeSoundGroup(const char *name, CSound *first, CSound *second)
 {
-	SoundId sound;
+	CSound *sound;
 
-	if ((sound = SoundIdMap[name])) {
+	if ((sound = SoundMap[name])) {
 		DebugPrint("re-register sound `%s'\n" _C_ name);
 		return sound;
 	}

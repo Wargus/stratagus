@@ -104,7 +104,7 @@ GameSound GameSounds
 **  @param stereo       FIXME: docu
 */
 static void InsertSoundRequest(const CUnit *unit, unsigned id,
-	unsigned short power, SoundId sound,
+	unsigned short power, CSound *sound,
 	unsigned char selection, unsigned char volume, char stereo)
 {
 	SDL_LockAudio();
@@ -134,7 +134,7 @@ static void InsertSoundRequest(const CUnit *unit, unsigned id,
 }
 
 /**
-**  Maps a UnitVoiceGroup to a SoundId.
+**  Maps a UnitVoiceGroup to a CSound*.
 **
 **  @param unit    Sound initiator
 **  @param voice   Type of sound wanted
@@ -143,7 +143,7 @@ static void InsertSoundRequest(const CUnit *unit, unsigned id,
 **
 **  @todo FIXME: The work completed sounds only supports two races.
 */
-static SoundId ChooseUnitVoiceSoundId(const CUnit *unit, UnitVoiceGroup voice)
+static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 {
 	switch (voice) {
 		case VoiceAcknowledging:
@@ -200,7 +200,7 @@ static char CalculateStereo(const CUnit *unit)
 void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 {
 	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
-		ChooseUnitVoiceSoundId(unit, voice),
+		ChooseUnitVoiceSound(unit, voice),
 		(voice == VoiceSelected || voice == VoiceBuilding), 0, CalculateStereo(unit));
 }
 
@@ -212,7 +212,7 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 **  @param unit  Sound initiator, unit speaking
 **  @param id    Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSoundId(const CUnit *unit, SoundId id)
+void PlayUnitSound(const CUnit *unit, CSound *id)
 {
 	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
 		id, 0, 0, CalculateStereo(unit));
@@ -224,7 +224,7 @@ void PlayUnitSoundId(const CUnit *unit, SoundId id)
 **  @param missile  Sound initiator, missile exploding
 **  @param sound    Sound to be generated
 */
-void PlayMissileSound(const Missile *missile, SoundId sound)
+void PlayMissileSound(const Missile *missile, CSound *sound)
 {
 	int stereo;
 
@@ -244,7 +244,7 @@ void PlayMissileSound(const Missile *missile, SoundId sound)
 /**
 **  FIXME: docu
 */
-void PlayGameSound(SoundId sound, unsigned char volume)
+void PlayGameSound(CSound *sound, unsigned char volume)
 {
 	InsertSoundRequest(NULL, 0, volume, sound, 0, 1, 0);
 }
@@ -306,34 +306,34 @@ void InitSoundClient(void)
 
 	if (!GameSounds.PlacementError.Sound) {
 		GameSounds.PlacementError.Sound =
-			SoundIdForName(GameSounds.PlacementError.Name);
+			SoundForName(GameSounds.PlacementError.Name);
 	}
 	if (!GameSounds.PlacementSuccess.Sound) {
 		GameSounds.PlacementSuccess.Sound =
-			SoundIdForName(GameSounds.PlacementSuccess.Name);
+			SoundForName(GameSounds.PlacementSuccess.Name);
 	}
 	if (!GameSounds.Click.Sound) {
-		GameSounds.Click.Sound = SoundIdForName(GameSounds.Click.Name);
+		GameSounds.Click.Sound = SoundForName(GameSounds.Click.Name);
 	}
 	if (!GameSounds.Docking.Sound) {
 		GameSounds.Docking.Sound =
-			SoundIdForName(GameSounds.Docking.Name);
+			SoundForName(GameSounds.Docking.Name);
 	}
 	if (!GameSounds.BuildingConstruction.Sound) {
 		GameSounds.BuildingConstruction.Sound =
-			SoundIdForName(GameSounds.BuildingConstruction.Name);
+			SoundForName(GameSounds.BuildingConstruction.Name);
 	}
 	for (i = 0; i < PlayerRaces.Count; ++i) {
 		if (!GameSounds.WorkComplete[i].Sound &&
 				GameSounds.WorkComplete[i].Name) {
 			GameSounds.WorkComplete[i].Sound =
-				SoundIdForName(GameSounds.WorkComplete[i].Name);
+				SoundForName(GameSounds.WorkComplete[i].Name);
 		}
 	}
 	for (i = 0; i < PlayerRaces.Count; ++i) {
 		if (!GameSounds.Rescue[i].Sound && GameSounds.Rescue[i].Name) {
 			GameSounds.Rescue[i].Sound =
-				SoundIdForName(GameSounds.Rescue[i].Name);
+				SoundForName(GameSounds.Rescue[i].Name);
 		}
 	}
 }

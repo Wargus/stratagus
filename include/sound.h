@@ -141,7 +141,7 @@ extern char *CurrentMusicFile;
 */
 extern void PlayUnitSound(const CUnit *unit,
 	UnitVoiceGroup unit_voice_group);
-extern void PlayUnitSoundId(const CUnit *unit, SoundId id);
+extern void PlayUnitSound(const CUnit *unit, CSound *id);
 
 /**
 **  Ask to the sound server to play a sound associated to a missile.
@@ -149,7 +149,7 @@ extern void PlayUnitSoundId(const CUnit *unit, SoundId id);
 **  @param missile  the missile (origin of the sound)
 **  @param sound    the sound to play
 */
-extern void PlayMissileSound(const Missile *missile, SoundId sound);
+extern void PlayMissileSound(const Missile *missile, CSound *sound);
 
 /**
 **  Ask to the sound server to play a sound: low level call.
@@ -157,7 +157,7 @@ extern void PlayMissileSound(const Missile *missile, SoundId sound);
 **  @param sound   the sound to play.
 **  @param volume  volume of the sound
 */
-extern void PlayGameSound(SoundId sound, unsigned char volume);
+extern void PlayGameSound(CSound *sound, unsigned char volume);
 
 	/// Set global volume
 extern void SetGlobalVolume(int volume);

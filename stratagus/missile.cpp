@@ -1253,10 +1253,10 @@ void MissileType::Init(void)
 	// Resolve impact missiles and sounds.
 	//
 	if (this->FiredSound.Name) {
-		this->FiredSound.Sound = SoundIdForName(this->FiredSound.Name);
+		this->FiredSound.Sound = SoundForName(this->FiredSound.Name);
 	}
 	if (this->ImpactSound.Name) {
-		this->ImpactSound.Sound = SoundIdForName(this->ImpactSound.Name);
+		this->ImpactSound.Sound = SoundForName(this->ImpactSound.Name);
 	}
 	if (this->ImpactName) {
 		this->ImpactMissile = MissileTypeByIdent(this->ImpactName);

@@ -746,7 +746,7 @@ static int CclDefineSpell(lua_State* l)
 			//  Free the old name, get the new one
 			delete[] spell->SoundWhenCast.Name;
 			spell->SoundWhenCast.Name = new_strdup(LuaToString(l, i + 1));
-			spell->SoundWhenCast.Sound = SoundIdForName(spell->SoundWhenCast.Name);
+			spell->SoundWhenCast.Sound = SoundForName(spell->SoundWhenCast.Name);
 			//  Check for sound.
 			if (!spell->SoundWhenCast.Sound) {
 				delete[] spell->SoundWhenCast.Name;

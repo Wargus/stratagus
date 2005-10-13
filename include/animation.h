@@ -76,11 +76,11 @@ public:
 		} RandomWait;
 		struct {
 			char *Name;
-			SoundId Sound;
+			CSound *Sound;
 		} Sound;
 		struct {
 			char **Name;
-			SoundId *Sound;
+			CSound **Sound;
 			int NumSounds;
 		} RandomSound;
 		struct {
