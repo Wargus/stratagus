@@ -154,14 +154,14 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 
 			case AnimationSound:
 				if (unit->IsVisible(ThisPlayer) || ReplayRevealMap) {
-					PlayUnitSoundId(unit, unit->Anim.Anim->D.Sound.Sound);
+					PlayUnitSound(unit, unit->Anim.Anim->D.Sound.Sound);
 				}
 				break;
 			case AnimationRandomSound:
 				if (unit->IsVisible(ThisPlayer) || ReplayRevealMap) {
 					int sound;
 					sound = SyncRand() % unit->Anim.Anim->D.RandomSound.NumSounds;
-					PlayUnitSoundId(unit, unit->Anim.Anim->D.RandomSound.Sound[sound]);
+					PlayUnitSound(unit, unit->Anim.Anim->D.RandomSound.Sound[sound]);
 				}
 				break;
 

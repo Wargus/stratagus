@@ -139,8 +139,8 @@ void HandleActionFollow(CUnit *unit)
 				unit->Y = goal->Goal->Y;
 				DropOutOnSide(unit, unit->Direction, 1, 1);
 #if 0
-				// FIXME: SoundIdForName() should be called once
-				PlayGameSound(SoundIdForName("invisibility"), MaxSampleVolume);
+				// FIXME: SoundForName() should be called once
+				PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
 				// FIXME: MissileTypeByIdent() should be called once
 				MakeMissile(MissileTypeByIdent("missile-normal-spell"),
 					unit->X * TileSizeX + TileSizeX / 2,

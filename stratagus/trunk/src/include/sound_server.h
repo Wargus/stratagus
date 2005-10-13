@@ -119,11 +119,6 @@ public:
 };
 
 /**
-**  Sound unique identifier
-*/
-typedef CSound *ServerSoundId;
-
-/**
 **  Origin of a sound
 */
 typedef struct _origin_ {
@@ -137,7 +132,7 @@ typedef struct _origin_ {
 typedef struct _sound_request {
 	Origin Source;          /// origin of sound
 	unsigned short Power;   /// Volume or Distance
-	SoundId Sound;          /// which sound
+	CSound *Sound;          /// which sound
 	unsigned Used : 1;      /// flag for used/unused
 	unsigned Selection : 1; /// is it a selection sound?
 	unsigned IsVolume : 1;  /// how to interpret power (as a
@@ -158,7 +153,7 @@ typedef struct _sound_channel_
 	CSample *Sample;       /// sample to play
 	Origin Source;         /// unit playing
 	unsigned char Volume;  /// Volume of this channel
-	SoundId Sound;         /// The sound currently played
+	CSound *Sound;         /// The sound currently played
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 } SoundChannel;
 
@@ -220,7 +215,7 @@ extern int ConvertToStereo32(const char *in, char *out, int frequency,
 	int bitrate, int channels, int bytes);
 
 	/// Register a sound (can be a simple sound or a group)
-extern SoundId RegisterSound(const char *file[], unsigned number);
+extern CSound *RegisterSound(const char *file[], unsigned number);
 
 	/**
 	**  @brief Create a special sound group with two sounds
@@ -230,10 +225,10 @@ extern SoundId RegisterSound(const char *file[], unsigned number);
 	**  @param second   second part of the group
 	**  @return         the special sound unique identifier
 	*/
-extern SoundId RegisterTwoGroups(const SoundId first, const SoundId second);
+extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
 
 	/// Modify the range of a given sound.
-extern void SetSoundRange(SoundId sound, unsigned char range);
+extern void SetSoundRange(CSound *sound, unsigned char range);
 
 	/// Free a channel and unregister its source
 extern void FreeOneChannel(int channel);

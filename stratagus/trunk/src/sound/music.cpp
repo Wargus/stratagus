@@ -281,8 +281,8 @@ int PlayMusic(const char *name)
 */
 void PlaySoundFile(const char *name)
 {
-	SoundId id;
-	if (SoundIdForName("dynamic-sound")) {
+	CSound *id;
+	if (SoundForName("dynamic-sound")) {
 		id = RegisterSound(&name, 1);
 	} else {
 		id = MakeSound("dynamic-sound", &name, 1);

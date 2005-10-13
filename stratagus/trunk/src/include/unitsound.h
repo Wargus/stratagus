@@ -56,8 +56,8 @@ public:
 
 //	~SoundConfig() {/*free(Name);*/};
 
-	char*   Name;   /// config sound name
-	SoundId Sound;  /// identifier send to sound server
+	char *Name;     /// config sound name
+	CSound *Sound;  /// identifier send to sound server
 };
 
 /**
@@ -102,7 +102,7 @@ public:
 extern void LoadUnitSounds(void);
 
 /**
-**  Performs the mapping between sound names and SoundId for each unit type.
+**  Performs the mapping between sound names and CSound* for each unit type.
 **  Set ranges for some sounds (infinite range for acknowledge and help sounds).
 */
 extern void MapUnitSounds(void);
