@@ -87,7 +87,7 @@ static char *DefaultNormalColorIndex;      /// Default normal color index
 static char *DefaultReverseColorIndex;     /// Default reverse color index
 
 #ifdef USE_OPENGL
-static CGraphic **FontColorGraphics[MaxFonts];   /// Font color graphics
+static std::map<CFont *, CGraphic **> FontColorGraphics;/// Font color graphics
 #endif
 
 CFont *SmallFont;       /// Small font used in stats
@@ -722,26 +722,35 @@ static void FontMeasureWidths(CFont *fp)
 **  @param font  Font number
 */
 #ifdef USE_OPENGL
-static void MakeFontColorTextures(CGraphic *g, int font)
+static void MakeFontColorTextures(CFont *font)
 {
 	SDL_Surface *s;
 	std::vector<FontColorMapping>::size_type i;
+	CGraphic *g;
+	CGraphic *newg;
 
 	if (FontColorGraphics[font]) {
 		return;
 	}
 
+	g = font->G;
 	FontColorGraphics[font] = new CGraphic *[FontColorMappings.size()];
 	s = g->Surface;
 	for (i = 0; i < (int)FontColorMappings.size(); ++i) {
-		FontColorGraphics[font][i] = new CGraphic;
-		memcpy(FontColorGraphics[font][i], g, sizeof(CGraphic));
-		FontColorGraphics[font][i]->Textures = NULL;
+		newg = FontColorGraphics[font][i] = CGraphic::New(NULL);
+		newg->Width = g->Width;
+		newg->Height = g->Height;
+		newg->NumFrames = g->NumFrames;
+		newg->GraphicWidth = g->GraphicWidth;
+		newg->GraphicHeight = g->GraphicHeight;
+		newg->Surface = g->Surface;
+
 		SDL_LockSurface(s);
 		for (int j = 0; j < NumFontColors; ++j) {
 			s->format->palette->colors[j] = FontColorMappings[i].Color[j];
 		}
 		SDL_UnlockSurface(s);
+
 		MakeTexture(FontColorGraphics[font][i]);
 	}
 }
@@ -760,7 +769,7 @@ void LoadFonts(void)
 			AllFonts[i]->G->Load();
 			FontMeasureWidths(AllFonts[i]);
 #ifdef USE_OPENGL
-			MakeFontColorTextures(AllFonts[i]->G, i);
+			MakeFontColorTextures(AllFonts[i]);
 #endif
 		}
 	}
@@ -783,11 +792,11 @@ void ReloadFonts(void)
 	for (i = 0; i < AllFonts.size(); ++i) {
 		if (AllFonts[i]->G) {
 			for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
-				delete FontColorGraphics[i][j];
+				CGraphic::Free(FontColorGraphics[AllFonts[i]][j]);
 			}
-			delete[] FontColorGraphics[i];
-			FontColorGraphics[i] = NULL;
-			MakeFontColorTextures(AllFonts[i].G, i);
+			delete[] FontColorGraphics[AllFonts[i]];
+			FontColorGraphics[AllFonts[i]] = NULL;
+			MakeFontColorTextures(AllFonts[i]);
 		}
 	}
 }
@@ -947,23 +956,27 @@ void CleanFonts(void)
 	int i;
 
 	for (i = 0; i < (int)AllFonts.size(); ++i) {
-		CGraphic::Free(AllFonts[i]->G);
-		AllFonts[i]->G = NULL;
-		delete AllFonts[i];
+		CFont *font = AllFonts[i];
 
 #ifdef USE_OPENGL
 		for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
-			if (!FontColorGraphics[i]) {
+			if (!FontColorGraphics[font]) {
 				break;
 			}
-			glDeleteTextures(FontColorGraphics[i][j]->NumFrames,
-				FontColorGraphics[i][j]->Textures);
-			delete[] FontColorGraphics[i][j]->Textures;
+			glDeleteTextures(FontColorGraphics[font][j]->NumFrames,
+				FontColorGraphics[font][j]->Textures);
+			delete[] FontColorGraphics[font][j]->Textures;
 		}
-		delete[] FontColorGraphics[i];
-		FontColorGraphics[i] = NULL;
+		delete[] FontColorGraphics[font];
 #endif
+
+		CGraphic::Free(font->G);
+		AllFonts[i]->G = NULL;
+		delete font;
 	}
+#ifdef USE_OPENGL
+	FontColorGraphics.clear();
+#endif
 	AllFonts.clear();
 	Fonts.clear();
 	FontNames.clear();
