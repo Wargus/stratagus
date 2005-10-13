@@ -46,7 +46,6 @@
 #include "unit.h"
 #include "unittype.h"
 #include "map.h"
-#include "editor.h"
 
 /**
 **  Insert new unit into cache.
