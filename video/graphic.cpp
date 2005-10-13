@@ -45,7 +45,6 @@
 #include <list>
 
 #include "video.h"
-#include "map.h"
 #include "player.h"
 #include "intern_video.h"
 #include "iocompat.h"
@@ -586,7 +585,7 @@ void CGraphic::Free(CGraphic *g)
 	}
 
 	Assert(g->Refs);
-	
+
 	--g->Refs;
 	if (!g->Refs) {
 		// No more uses of this graphic

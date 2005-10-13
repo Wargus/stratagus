@@ -64,7 +64,6 @@
 
 #include "video.h"
 #include "font.h"
-#include "map.h"
 #include "interface.h"
 #include "network.h"
 #include "ui.h"
