@@ -58,6 +58,8 @@ class CSound;
 */
 class CSample {
 public:
+	CSample() : Channels(0), SampleSize(0), Frequency(0), BitsPerSample(0),
+		Buffer(NULL), Pos(0), Len(0) {}
 	virtual ~CSample() {}
 
 	virtual int Read(void *buf, int len) = 0;
