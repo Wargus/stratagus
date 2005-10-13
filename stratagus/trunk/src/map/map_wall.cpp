@@ -209,19 +209,19 @@ void MapFixWallTile(int x, int y)
 	//
 	tile = 0;
 	if ((y - 1) < 0 || (TheMap.Fields[x + (y - 1) * TheMap.Info.MapWidth].
-			Flags & t) == t) {
+			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 0;
 	}
 	if ((x + 1) >= TheMap.Info.MapWidth || (TheMap.Fields[x + 1 + y * TheMap.Info.MapWidth].
-			Flags & t) == t) {
+			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 1;
 	}
 	if ((y + 1) >= TheMap.Info.MapHeight || (TheMap.Fields[x + (y + 1) * TheMap.Info.MapWidth].
-			Flags & t) == t) {
+			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 2;
 	}
 	if ((x - 1) < 0 || (TheMap.Fields[x - 1 + y * TheMap.Info.MapWidth].
-			Flags & t) == t) {
+			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 3;
 	}
 
