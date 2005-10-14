@@ -54,42 +54,30 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#define NumFontColors 9
-
-	/// Font color mapping
-class FontColorMapping {
-public:
-	FontColorMapping() : ColorName(NULL), Index(0) {}
-
-	char *ColorName;                        /// Font color name
-	SDL_Color Color[NumFontColors];         /// Array of colors
-	int Index;                              /// Index in FontColorMappings
-};
-
-static FontColorMapping *FontColor;         /// Current font color
-
-static std::vector<FontColorMapping> FontColorMappings; /// Font color mappings
-
+static std::vector<CFont *> AllFonts;           /// Vector of all fonts
 static std::map<std::string, CFont *> Fonts;    /// Font mappings
 static std::map<CFont *, std::string> FontNames;/// Font name mappings
 
-/**
-**  Fonts table
-**
-**  Define the font files, sizes.
-*/
-static std::vector<CFont *> AllFonts;
+static std::vector<CFontColor *> AllFontColors; /// Vector of all font colors.
+std::map<std::string, CFontColor *> FontColors; /// Map of ident to font color.
 
-static FontColorMapping *LastTextColor;    /// Last text color
-static FontColorMapping *DefaultTextColor; /// Default text color
-static FontColorMapping *ReverseTextColor; /// Reverse text color
+static CFontColor *FontColor;                   /// Current font color
+
+static CFontColor *LastTextColor;          /// Last text color
+static CFontColor *DefaultTextColor;       /// Default text color
+static CFontColor *ReverseTextColor;       /// Reverse text color
 static char *DefaultNormalColorIndex;      /// Default normal color index
 static char *DefaultReverseColorIndex;     /// Default reverse color index
 
 #ifdef USE_OPENGL
-static std::map<CFont *, CGraphic **> FontColorGraphics;/// Font color graphics
+/**
+**  Font color graphics
+**  Usage: FontColorGraphics[CFont *font][CFontColor *color]
+*/
+static std::map<CFont *, std::map<CFontColor *, CGraphic *> > FontColorGraphics;
 #endif
 
+// FIXME: remove these
 CFont *SmallFont;       /// Small font used in stats
 CFont *GameFont;        /// Normal font used in game
 CFont *LargeFont;       /// Large font used in menus
@@ -118,7 +106,7 @@ static void VideoDrawChar(const CGraphic *g,
 	SDL_Rect srect = {gx, gy, w, h};
 	SDL_Rect drect = {x, y};
 
-	SDL_SetColors(g->Surface, FontColor->Color, 0, NumFontColors);
+	SDL_SetColors(g->Surface, FontColor->Colors, 0, MaxFontColors);
 	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
 }
 #else
@@ -130,26 +118,6 @@ static void VideoDrawChar(const CGraphic *g,
 #endif
 
 /**
-**  Find the relevant font color for a color string eg. "blue"
-**
-**  @param color  The text color to find "blue"
-**
-**  @return       Pointer to the information about this color.
-*/
-static FontColorMapping *GetFontColorMapping(char *color)
-{
-	std::vector<FontColorMapping>::iterator i;
-	for (i = FontColorMappings.begin(); i != FontColorMappings.end(); ++i) {
-		if (!strcmp((*i).ColorName, color)) {
-			return &(*i);
-		}
-	}
-	fprintf(stderr, "Font color mapping not found: '%s'\n", color);
-	ExitFatal(1);
-	return NULL;
-}
-
-/**
 **  Set the default text colors.
 **
 **  @param normal   Normal text color.
@@ -159,8 +127,8 @@ void SetDefaultTextColors(char *normal, char *reverse)
 {
 	DefaultNormalColorIndex = normal;
 	DefaultReverseColorIndex = reverse;
-	LastTextColor = DefaultTextColor = FontColor = GetFontColorMapping(normal);
-	ReverseTextColor = GetFontColorMapping(reverse);
+	LastTextColor = DefaultTextColor = FontColor = CFontColor::Get(normal);
+	ReverseTextColor = CFontColor::Get(reverse);
 }
 
 /**
@@ -176,29 +144,26 @@ void GetDefaultTextColors(char **normalp, char **reversep)
 }
 
 /**
-**  Returns the pixel length of a text.
+**  Returns the pixel width of text.
 **
-**  @param font  Font number.
-**  @param text  Text to calculate the length of.
+**  @param text  Text to calculate the width of.
 **
-**  @return      The length in pixels of the text.
+**  @return      The width in pixels of the text.
 */
-int VideoTextLength(CFont *font, const char *text)
+int CFont::Width(const char *text)
 {
 	int width;
 	const char *s;
-	const char *widths;
-	int isformat;
+	bool isformat;
 
-	widths = font->CharWidth;
-	isformat = 0;
+	isformat = false;
 	for (width = 0, s = text; *s; ++s) {
 		if (*s == '~') {
 			if (!*++s) {  // bad formatted string
 				break;
 			}
 			if (*s == '<' || *s == '>') {
-				isformat = 0;
+				isformat = false;
 				continue;
 			}
 			if (*s == '!') {
@@ -210,22 +175,10 @@ int VideoTextLength(CFont *font, const char *text)
 			}
 		}
 		if (!isformat) {
-			width += widths[*s - 32] + 1;
+			width += this->CharWidth[*s - 32] + 1;
 		}
 	}
 	return width;
-}
-
-/**
-**  Returns the height of the font.
-**
-**  @param font  Font number.
-**
-**  @return      The height of the font.
-*/
-int VideoTextHeight(CFont *font)
-{
-	return font->G->Height;
 }
 
 /**
@@ -271,7 +224,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 {
 	int w;
 	int widths;
-	FontColorMapping *rev;
+	CFontColor *rev;
 	char *color;
 	const char *p;
 	void (*DrawChar)(const CGraphic *, int, int, int, int, int, int);
@@ -288,7 +241,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 #ifndef USE_OPENGL
 	g = font->G;
 #else
-	g = FontColorGraphics[font][FontColor->Index];
+	g = FontColorGraphics[font][FontColor];
 #endif
 	for (rev = NULL, widths = 0; *text; ++text) {
 		if (*text == '~') {
@@ -302,7 +255,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 					rev = FontColor;
 					FontColor = ReverseTextColor;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor->Index];
+					g = FontColorGraphics[font][FontColor];
 #endif
 					++text;
 					break;
@@ -310,7 +263,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 					LastTextColor = FontColor;
 					FontColor = ReverseTextColor;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor->Index];
+					g = FontColorGraphics[font][FontColor];
 #endif
 					continue;
 				case '>':
@@ -318,7 +271,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 					LastTextColor = FontColor;
 					FontColor = rev;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor->Index];
+					g = FontColorGraphics[font][FontColor];
 #endif
 					continue;
 
@@ -336,9 +289,9 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 					color[p - text] = '\0';
 					text = p;
 					LastTextColor = FontColor;
-					FontColor = GetFontColorMapping(color);
+					FontColor = CFontColor::Get(color);
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor->Index];
+					g = FontColorGraphics[font][FontColor];
 #endif
 					delete[] color;
 					continue;
@@ -361,7 +314,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 		if (rev) {
 			FontColor = rev;
 #ifdef USE_OPENGL
-			g = FontColorGraphics[font][FontColor->Index];
+			g = FontColorGraphics[font][FontColor];
 #endif
 			rev = NULL;
 		}
@@ -373,12 +326,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 /**
 **  Draw text with font at x,y unclipped.
 **
-**  ~    is special prefix.
-**  ~~   is the ~ character self.
-**  ~!   print next character reverse.
-**  ~n   0123456789abcdef print text in color 1-16.
-**  ~<   start reverse.
-**  ~>   switch back to last used color.
+**  @see DoDrawText
 **
 **  @param x     X screen position
 **  @param y     Y screen position
@@ -395,7 +343,7 @@ int VideoDrawText(int x, int y, CFont *font, const char *text)
 /**
 **  Draw text with font at x,y clipped.
 **
-**  See VideoDrawText.
+**  @see DoDrawText.
 **
 **  @param x     X screen position
 **  @param y     Y screen position
@@ -412,7 +360,7 @@ int VideoDrawTextClip(int x, int y, CFont *font, const char *text)
 /**
 **  Draw reverse text with font at x,y unclipped.
 **
-**  @see VideoDrawText for full description.
+**  @see DoDrawText for full description.
 **
 **  @param x     X screen position
 **  @param y     Y screen position
@@ -435,7 +383,7 @@ int VideoDrawReverseText(int x, int y, CFont *font, const char *text)
 /**
 **  Draw reverse text with font at x,y clipped.
 **
-**  @see VideoDrawText for full description.
+**  @see DoDrawText for full description.
 **
 **  @param x     X screen position
 **  @param y     Y screen position
@@ -458,7 +406,7 @@ int VideoDrawReverseTextClip(int x, int y, CFont *font, const char *text)
 /**
 **  Draw text with font at x,y centered.
 **
-**  @see VideoDrawText for full description.
+**  @see DoDrawText for full description.
 **
 **  @param x     X screen position
 **  @param y     Y screen position
@@ -471,7 +419,7 @@ int VideoDrawTextCentered(int x, int y, CFont *font, const char *text)
 {
 	int dx;
 
-	dx = VideoTextLength(font, text);
+	dx = font->Width(text);
 	VideoDrawText(x - dx / 2, y, font, text);
 
 	return dx / 2;
@@ -507,7 +455,7 @@ static void FormatNumber(int number, char *buf)
 **  @param s       original string.
 **  @param c       charrater to find.
 **  @param maxlen  size limit of the search. (0 means unlimited).
-**  @param font    if specified use VideoTextLength instead of strlen.
+**  @param font    if specified use font->Width() instead of strlen.
 **
 **  @return computed value.
 */
@@ -542,7 +490,7 @@ static char *strchrlen(char *s, char c, int maxlen, CFont *font)
 		end = res;
 		c = *end;
 		*end = '\0';
-		while (VideoTextLength(font, s) > maxlen) {
+		while (font->Width(s) > maxlen) {
 			res = strrchr(s, ' ');
 			*end = c;
 			end = res;
@@ -564,7 +512,7 @@ static char *strchrlen(char *s, char c, int maxlen, CFont *font)
 **  @param line    line number.
 **  @param s       multiline string.
 **  @param maxlen  max length of the string.
-**  @param font    if specified use VideoTextLength instead of strlen.
+**  @param font    if specified use font->Width() instead of strlen.
 **
 **  @return computed value.
 */
@@ -725,19 +673,19 @@ static void FontMeasureWidths(CFont *fp)
 static void MakeFontColorTextures(CFont *font)
 {
 	SDL_Surface *s;
-	std::vector<FontColorMapping>::size_type i;
 	CGraphic *g;
 	CGraphic *newg;
 
-	if (FontColorGraphics[font]) {
+	if (!FontColorGraphics[font].empty()) {
+		// already loaded
 		return;
 	}
 
 	g = font->G;
-	FontColorGraphics[font] = new CGraphic *[FontColorMappings.size()];
 	s = g->Surface;
-	for (i = 0; i < (int)FontColorMappings.size(); ++i) {
-		newg = FontColorGraphics[font][i] = CGraphic::New(NULL);
+	for (int i = 0; i < (int)AllFontColors.size(); ++i) {
+		CFontColor *fc = AllFontColors[i];
+		newg = FontColorGraphics[font][fc] = new CGraphic;
 		newg->Width = g->Width;
 		newg->Height = g->Height;
 		newg->NumFrames = g->NumFrames;
@@ -746,12 +694,12 @@ static void MakeFontColorTextures(CFont *font)
 		newg->Surface = g->Surface;
 
 		SDL_LockSurface(s);
-		for (int j = 0; j < NumFontColors; ++j) {
-			s->format->palette->colors[j] = FontColorMappings[i].Color[j];
+		for (int j = 0; j < MaxFontColors; ++j) {
+			s->format->palette->colors[j] = fc->Colors[j];
 		}
 		SDL_UnlockSurface(s);
 
-		MakeTexture(FontColorGraphics[font][i]);
+		MakeTexture(newg);
 	}
 }
 #endif
@@ -761,12 +709,12 @@ static void MakeFontColorTextures(CFont *font)
 */
 void LoadFonts(void)
 {
-	std::vector<CFont>::size_type i;
-	for (i = 0; i < AllFonts.size(); ++i) {
-		if (AllFonts[i]->G) {
-			ShowLoadProgress("Fonts %s", AllFonts[i]->G->File);
-			DebugPrint("Font %s\n" _C_ AllFonts[i]->G->File);
-			AllFonts[i]->G->Load();
+	CGraphic *g;
+
+	for (int i = 0; i < (int)AllFonts.size(); ++i) {
+		if ((g = AllFonts[i]->G)) {
+			ShowLoadProgress("Fonts %s", g->File);
+			g->Load();
 			FontMeasureWidths(AllFonts[i]);
 #ifdef USE_OPENGL
 			MakeFontColorTextures(AllFonts[i]);
@@ -788,15 +736,14 @@ void LoadFonts(void)
 */
 void ReloadFonts(void)
 {
-	std::vector<CFont>::size_type i;
-	for (i = 0; i < AllFonts.size(); ++i) {
-		if (AllFonts[i]->G) {
-			for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
-				CGraphic::Free(FontColorGraphics[AllFonts[i]][j]);
+	for (int i = 0; i < (int)AllFonts.size(); ++i) {
+		CFont *font = AllFonts[i];
+		if (font->G) {
+			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+				CGraphic::Free(FontColorGraphics[font][AllFontColors[j]]);
 			}
-			delete[] FontColorGraphics[AllFonts[i]];
-			FontColorGraphics[AllFonts[i]] = NULL;
-			MakeFontColorTextures(AllFonts[i]);
+			FontColorGraphics[font].clear();
+			MakeFontColorTextures(font);
 		}
 	}
 }
@@ -879,6 +826,60 @@ CFont *CFont::Get(const char *ident)
 	return font;
 }
 
+/**
+**  CFontColor constructor
+*/
+CFontColor::CFontColor(const char *ident)
+{
+	Ident = new_strdup(ident);
+	memset(Colors, 0, sizeof(Colors));
+}
+
+/**
+**  CFontColor destructor
+*/
+CFontColor::~CFontColor()
+{
+	delete[] this->Ident;
+}
+
+/**
+**  Create a new font color
+**
+**  @param ident  Font color identifier
+**
+**  @return       New font color
+*/
+CFontColor *CFontColor::New(const char *ident)
+{
+	CFontColor *fc = FontColors[ident];
+	if (fc) {
+		return fc;
+	} else {
+		fc = new CFontColor(ident);
+		FontColors[ident] = fc;
+		AllFontColors.push_back(fc);
+		return fc;
+	}
+}
+
+/**
+**  Get a font color
+**
+**  @param ident  Font color identifier
+**
+**  @return       The font color
+*/
+CFontColor *CFontColor::Get(const char *ident)
+{
+	CFontColor *fc = FontColors[ident];
+	if (!fc) {
+		DebugPrint("font color not found: %s" _C_ ident);
+	}
+	return fc;
+}
+
+
 /*----------------------------------------------------------------------------
 --  CCL
 ----------------------------------------------------------------------------*/
@@ -888,53 +889,34 @@ CFont *CFont::Get(const char *ident)
 */
 static int CclDefineFontColor(lua_State *l)
 {
-	char *color;
+	const char *ident;
 	int i;
 	int args;
-	FontColorMapping *fcm;
+	CFontColor *fc;
+	unsigned char r, g, b;
 
 	LuaCheckArgs(l, 2);
-	color = new_strdup(LuaToString(l, 1));
-	fcm = NULL;
+	ident = LuaToString(l, 1);
 
-	if (!FontColorMappings.size()) {
-		FontColorMapping f;
-		FontColorMappings.push_back(f);
-		fcm = &FontColorMappings[0];
+	if ((fc = FontColors[ident])) {
+		fprintf(stderr, "Warning: Redefining color '%s'\n", ident);
 	} else {
-		std::vector<FontColorMapping>::iterator it;
-		for (it = FontColorMappings.begin(); it != FontColorMappings.end(); ++it) {
-			fcm = &(*it);
-			if (!strcmp(fcm->ColorName, color)) {
-				fprintf(stderr, "Warning: Redefining color '%s'\n", color);
-				delete[] fcm->ColorName;
-				break;
-			}
-		}
-		if (it == FontColorMappings.end()) {
-			FontColorMapping f;
-			FontColorMappings.push_back(f);
-			fcm = &FontColorMappings[FontColorMappings.size() - 1];
-			fcm->Index = FontColorMappings.size() - 1;
-		}
+		fc = CFontColor::New(ident);
 	}
-	fcm->ColorName = color;
 
 	args = luaL_getn(l, 2) / 3;
-	Assert(args <= NumFontColors);
+	Assert(args <= MaxFontColors);
 	for (i = 0; i < args; ++i) {
 		lua_rawgeti(l, 2, i * 3 + 1);
-		fcm->Color[i].r = LuaToNumber(l, -1);
+		r = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, 2, i * 3 + 2);
-		fcm->Color[i].g = LuaToNumber(l, -1);
+		g = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, 2, i * 3 + 3);
-		fcm->Color[i].b = LuaToNumber(l, -1);
+		b = LuaToNumber(l, -1);
 		lua_pop(l, 1);
-	}
-	for (; i < NumFontColors; ++i) {
-		fcm->Color[i].r = fcm->Color[i].g = fcm->Color[i].b = 0;
+		fc->Colors[i] = CColor(r, g, b);
 	}
 
 	return 0;
@@ -949,7 +931,7 @@ void FontsCclRegister(void)
 }
 
 /**
-**  Cleanup the font module.
+**  Clean up the font module.
 */
 void CleanFonts(void)
 {
@@ -959,19 +941,18 @@ void CleanFonts(void)
 		CFont *font = AllFonts[i];
 
 #ifdef USE_OPENGL
-		for (int j = 0; j < (int)FontColorMappings.size(); ++j) {
-			if (!FontColorGraphics[font]) {
-				break;
+		if (!FontColorGraphics[font].empty()) {
+			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+				glDeleteTextures(g->NumTextures, g->Textures);
+				delete[] g->Textures;
+				delete g;
 			}
-			glDeleteTextures(FontColorGraphics[font][j]->NumFrames,
-				FontColorGraphics[font][j]->Textures);
-			delete[] FontColorGraphics[font][j]->Textures;
+			FontColorGraphics[font].clear();
 		}
-		delete[] FontColorGraphics[font];
 #endif
 
 		CGraphic::Free(font->G);
-		AllFonts[i]->G = NULL;
 		delete font;
 	}
 #ifdef USE_OPENGL
@@ -981,28 +962,17 @@ void CleanFonts(void)
 	Fonts.clear();
 	FontNames.clear();
 
-	for (i = 0; i < (int)FontColorMappings.size(); ++i) {
-		delete[] FontColorMappings[i].ColorName;
+	for (i = 0; i < (int)AllFontColors.size(); ++i) {
+		delete AllFontColors[i];
 	}
-	FontColorMappings.clear();
+	AllFontColors.clear();
+	FontColors.clear();
 
 	SmallFont = NULL;
 	GameFont = NULL;
 	LargeFont = NULL;
 	SmallTitleFont = NULL;
 	LargeTitleFont = NULL;
-}
-
-/**
-**  Check if font is already loaded.
-**
-**  @param font  Font number
-**
-**  @return      True if loaded, false otherwise.
-*/
-int IsFontLoaded(CFont *font)
-{
-	return font && font->G && font->G->Loaded();
 }
 
 //@}

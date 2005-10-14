@@ -732,7 +732,7 @@ static int PowerOf2(int x)
 **  @param ow       Offset width.
 **  @param oh       Offset height.
 */
-static void MakeTextures2(CGraphic *g, GLuint texture, UnitColors *colors,
+static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	int ow, int oh)
 {
 	int i;
@@ -859,7 +859,7 @@ static void MakeTextures2(CGraphic *g, GLuint texture, UnitColors *colors,
 **  @param player  Player number.
 **  @param colors  Unit colors.
 */
-static void MakeTextures(CGraphic *g, int player, UnitColors *colors)
+static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 {
 	int i;
 	int tw;

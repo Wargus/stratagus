@@ -976,7 +976,7 @@ int EvalNumber(const NumberDesc *number)
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
 			if (number->D.VideoTextLength.String != NULL &&
 					(s = EvalString(number->D.VideoTextLength.String)) != NULL) {
-				a = VideoTextLength(number->D.VideoTextLength.Font, s);
+				a = number->D.VideoTextLength.Font->Width(s);
 				delete s;
 				return a;
 			} else { // ERROR.

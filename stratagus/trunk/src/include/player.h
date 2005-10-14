@@ -346,9 +346,9 @@ public:
 	int    TotalRazings;
 	int    TotalKills;      /// How many unit killed
 
-	Uint32 Color;  /// color of units on minimap
+	Uint32 Color;           /// color of units on minimap
 
-	struct _unit_colors_ UnitColors;  /// Unit colors for new units
+	CUnitColors UnitColors; /// Unit colors for new units
 
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player

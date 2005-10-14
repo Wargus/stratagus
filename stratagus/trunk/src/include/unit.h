@@ -367,7 +367,7 @@ class CUnitType;
 class CUnitStats;
 class CPlayer;
 class SpellType;
-struct _unit_colors_;
+class CUnitColors;
 class CConstructionFrame;
 class VariableType;
 class CUpgrade;
@@ -527,7 +527,7 @@ public:
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 // DISPLAY:
-	struct _unit_colors_* Colors; /// Player colors
+	CUnitColors *Colors;    /// Player colors
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position
 	int         Frame;      /// Image frame: <0 is mirrored

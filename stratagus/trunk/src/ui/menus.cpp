@@ -3380,14 +3380,14 @@ static void GameDrawFunc(Menuitem* mi)
 
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
-	l = VideoTextLength(GameFont, "Scenario:");
+	l = GameFont->Width("Scenario:");
 	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380, GameFont, "Scenario:");
 	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380 + 24 , GameFont, ScenSelectFileName);
 	if (TheMap.Info.Description) {
 		VideoDrawText(UI.Offset640X + 16 + l + 8, UI.Offset480Y + 380, GameFont, TheMap.Info.Description);
 	}
 	sprintf(buffer, " (%d x %d)", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-	VideoDrawText(UI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), UI.Offset480Y + 380 + 24, GameFont, buffer);
+	VideoDrawText(UI.Offset640X + 16 + l + 8 + GameFont->Width(ScenSelectFileName), UI.Offset480Y + 380 + 24, GameFont, buffer);
 
 #if 0
 	for (n = j = 0; j < PlayerMax; j++) {
