@@ -879,57 +879,6 @@ CFontColor *CFontColor::Get(const char *ident)
 	return fc;
 }
 
-
-/*----------------------------------------------------------------------------
---  CCL
-----------------------------------------------------------------------------*/
-
-/**
-**  Define a font color.
-*/
-static int CclDefineFontColor(lua_State *l)
-{
-	const char *ident;
-	int i;
-	int args;
-	CFontColor *fc;
-	unsigned char r, g, b;
-
-	LuaCheckArgs(l, 2);
-	ident = LuaToString(l, 1);
-
-	if ((fc = FontColors[ident])) {
-		fprintf(stderr, "Warning: Redefining color '%s'\n", ident);
-	} else {
-		fc = CFontColor::New(ident);
-	}
-
-	args = luaL_getn(l, 2) / 3;
-	Assert(args <= MaxFontColors);
-	for (i = 0; i < args; ++i) {
-		lua_rawgeti(l, 2, i * 3 + 1);
-		r = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-		lua_rawgeti(l, 2, i * 3 + 2);
-		g = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-		lua_rawgeti(l, 2, i * 3 + 3);
-		b = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-		fc->Colors[i] = CColor(r, g, b);
-	}
-
-	return 0;
-}
-
-/**
-**  Register CCL features for fonts.
-*/
-void FontsCclRegister(void)
-{
-	lua_register(Lua, "DefineFontColor", CclDefineFontColor);
-}
-
 /**
 **  Clean up the font module.
 */

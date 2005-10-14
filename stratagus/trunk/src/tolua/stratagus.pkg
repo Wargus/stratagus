@@ -23,6 +23,10 @@ setmetatable(Upgrades, mt)
 mt = { __index = function(t, key) return CFont:Get(key) end }
 Fonts = {}
 setmetatable(Fonts, mt)
+
+mt = { __index = function(t, key) return CFontColor:Get(key) end }
+Fonts = {}
+setmetatable(FontColors, mt)
 $]
 
 #define MaxCosts 7
