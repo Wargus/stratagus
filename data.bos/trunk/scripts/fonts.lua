@@ -35,6 +35,13 @@ CFont:New("large-title", CGraphic:New("general/large.png", 20, 20))
 
 --	FIXME: only yellow, white, and grey are correct.
 
+function DefineFontColor(id, t)
+  fc = CFontColor:New(id)
+  for i = 0,(table.getn(t) / 3 - 1) do
+    fc.Colors[i] = CColor(t[i * 3 + 1], t[i * 3 + 2], t[i * 3 + 3])
+  end
+end
+
 DefineFontColor("black",
   {    0,   0,   0,	-- 0
       40,  40,  60,	-- 228
