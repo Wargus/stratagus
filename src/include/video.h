@@ -98,7 +98,7 @@ public:
 	int TransparentPixel(int x, int y);
 	void MakeShadow();
 
-	inline bool Loaded() { return Surface != NULL; }
+	inline bool IsLoaded() { return Surface != NULL; }
 
 
 	char *File;                /// Filename
@@ -119,6 +119,11 @@ public:
 	GLuint *Textures;          /// Texture names
 	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
 	int NumTextures;
+#endif
+
+#ifdef USE_OPENGL
+	friend void MakeFontColorTextures(CFont *font);
+	friend void CleanFonts(void);
 #endif
 };
 
@@ -148,9 +153,30 @@ public:
 };
 #endif
 
-typedef struct _unit_colors_ {
+	/// A platform independent color
+class CColor {
+public:
+	CColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0,
+		unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
+
+		/// Cast to a SDL_Color
+	operator SDL_Color() const {
+		SDL_Color c = { R, G, B, A };
+		return c;
+	};
+
+	unsigned char R;       /// Red
+	unsigned char G;       /// Green
+	unsigned char B;       /// Blue
+	unsigned char A;       /// Alpha
+};
+
+class CUnitColors {
+public:
+	CUnitColors() : Colors(NULL) {}
+
 	SDL_Color *Colors;
-} UnitColors;
+};
 
 /**
 **  Event call back.

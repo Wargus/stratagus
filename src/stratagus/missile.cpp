@@ -90,7 +90,7 @@ extern NumberDesc *Damage;                   /// Damage calculation for missile.
 */
 void MissileType::LoadMissileSprite()
 {
-	if (this->G && !this->G->Loaded()) {
+	if (this->G && !this->G->IsLoaded()) {
 		this->G->Load();
 		if (this->Flip) {
 			this->G->Flip();
@@ -545,7 +545,7 @@ static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 void MissileType::DrawMissileType(int frame, int x, int y) const
 {
 #ifdef DYNAMIC_LOAD
-	if (!GraphicLoaded(this->G)) {
+	if (!this->G->IsLoaded()) {
 		LoadMissileSprite(this);
 	}
 #endif

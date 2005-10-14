@@ -120,7 +120,7 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, CFont *font, int
 	int l;
 
 	text = EvalString(mit->text);
-	l = VideoTextLength(font, text);
+	l = font->Width(text);
 	GetDefaultTextColors(&oldnc, &oldrc);
 	if (mit->normalcolor || mit->reversecolor) {
 		nc = mit->normalcolor ? mit->normalcolor : oldnc;
@@ -131,7 +131,7 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, CFont *font, int
 		rc = oldrc;
 	}
 	if (flag & MI_FLAGS_ACTIVE && mit->action) {
-		Video.DrawRectangle(ColorGray, x - 4, y - 4, l + 5, VideoTextHeight(font) + 5);
+		Video.DrawRectangle(ColorGray, x - 4, y - 4, l + 5, font->Height() + 5);
 		SetDefaultTextColors(nc, rc);
 	}
 	if (mit->Align == TextAlignCenter) {
@@ -215,7 +215,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 		} else if (p->TextAlign == TextAlignLeft) {
 			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
 		} else {
-			VideoDrawText(x + p->TextX - VideoTextLength(style->Font, text), y + p->TextY,
+			VideoDrawText(x + p->TextX - style->Font->Width(text), y + p->TextY,
 				style->Font, text);
 		}
 
@@ -263,7 +263,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 		}
 		VideoDraw(MenuButtonG, rb + 1, x + w - 1 - 8, y);
 		if (text) {
-			VideoDrawTextCentered(x + w / 2, y + (h - VideoTextHeight(font)) / 2,
+			VideoDrawTextCentered(x + w / 2, y + (h - font->Height()) / 2,
 				font, text);
 		}
 		if (flags & MI_FLAGS_SELECTED) {
@@ -898,7 +898,7 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
 		} else if (p->TextAlign == TextAlignLeft) {
 			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
 		} else {
-			VideoDrawText(x + p->TextX - VideoTextLength(style->Font, text), y + p->TextY,
+			VideoDrawText(x + p->TextX - style->Font->Width(text), y + p->TextY,
 				style->Font, text);
 		}
 
@@ -1041,7 +1041,7 @@ void DrawMenu(Menu* menu)
 	}
 
 	if (menu->BackgroundG) {
-		if (!menu->BackgroundG->Loaded()) {
+		if (!menu->BackgroundG->IsLoaded()) {
 			menu->BackgroundG->Load();
 			menu->BackgroundG->Resize(Video.Width, Video.Height);
 		}
@@ -1222,7 +1222,7 @@ static void PasteFromClipboard(Menuitem* mi)
 	}
 #endif
 	for (i = 0; mi->D.Input.nch < mi->D.Input.maxch && clipboard[i] &&
-			VideoTextLength(mi->Font, mi->D.Input.buffer) + 8 < mi->D.Input.xsize; ++i) {
+			mi->Font->Width(mi->D.Input.buffer) + 8 < mi->D.Input.xsize; ++i) {
 		if (clipboard[i] >= 32 && clipboard[i] != '~') {
 			mi->D.Input.buffer[mi->D.Input.nch] = clipboard[i];
 			++mi->D.Input.nch;
@@ -1307,7 +1307,7 @@ inkey:
 					} else if (key >= 32 && key < 0x100) {
 						if ((keychar == '~' && mi->D.Input.nch < mi->D.Input.maxch - 1) ||
 								mi->D.Input.nch < mi->D.Input.maxch &&
-									VideoTextLength(mi->Font, mi->D.Input.buffer) + 8 < mi->D.Input.xsize) {
+									mi->Font->Width(mi->D.Input.buffer) + 8 < mi->D.Input.xsize) {
 							mi->D.Input.buffer[mi->D.Input.nch++] = keychar;
 							if (keychar == '~') {
 								mi->D.Input.buffer[mi->D.Input.nch++] = keychar;
@@ -1739,8 +1739,8 @@ static void MenuHandleMouseMove(int x, int y)
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
 						tmp = EvalString(mi->D.Text.text);
-						if (x < xs - 4 || x > xs + VideoTextLength(mi->Font, tmp) + 5 ||
-								y < ys - 4 || y > ys + VideoTextHeight(mi->Font) + 5) {
+						if (x < xs - 4 || x > xs + mi->Font->Width(tmp) + 5 ||
+								y < ys - 4 || y > ys + mi->Font->Height() + 5) {
 							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
 								if (mi->Flags & MI_FLAGS_ACTIVE) {
 									mi->Flags &= ~MI_FLAGS_ACTIVE;
@@ -1755,8 +1755,8 @@ static void MenuHandleMouseMove(int x, int y)
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
 						if ((!mi->D.Checkbox.Text || x < xs - 1 || x > xs +
-								VideoTextLength(GameFont, mi->D.Checkbox.Text) + 28 ||
-								y < ys - 2 ||  y > ys + VideoTextHeight(GameFont) + 9) &&
+								GameFont->Width(mi->D.Checkbox.Text) + 28 ||
+								y < ys - 2 ||  y > ys + GameFont->Height() + 9) &&
 								(x < xs ||  x > xs + mi->D.Checkbox.Style->Width || y < ys ||
 								y > ys + mi->D.Checkbox.Style->Height)) {
 							if (!(mi->Flags & MI_FLAGS_CLICKED)) {

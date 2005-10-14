@@ -395,12 +395,13 @@ static void ShowTitleScreens(void)
 				}
 #endif
 				labels = TitleScreens[i]->Labels;
-				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
+				if (labels && labels[0] && labels[0]->Font &&
+						labels[0]->Font->IsLoaded()) {
 					for (j = 0; labels[j]; ++j) {
 						x = labels[j]->Xofs * Video.Width / 640;
 						y = labels[j]->Yofs * Video.Width / 640;
 						if (labels[j]->Flags & TitleFlagCenter) {
-							x -= VideoTextLength(labels[j]->Font, labels[j]->Text) / 2;
+							x -= labels[j]->Font->Width(labels[j]->Text) / 2;
 						}
 						VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
 					}
@@ -436,7 +437,7 @@ void ShowLoadProgress(const char *fmt, ...)
 	vsnprintf(temp, sizeof(temp), fmt, va);
 	va_end(va);
 
-	if (Video.Depth && IsFontLoaded(GameFont)) {
+	if (Video.Depth && GameFont && GameFont->IsLoaded()) {
 		// Remove non printable chars
 		for (s = temp; *s; ++s) {
 			if (*s < 32) {

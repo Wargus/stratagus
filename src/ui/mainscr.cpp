@@ -355,7 +355,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 		} else {
 			VideoDrawText(x, y, font, text);
 		}
-		x += VideoTextLength(font, text);
+		x += font->Width(text);
 		delete[] text;
 	}
 	if (this->ShowName) {
@@ -772,7 +772,7 @@ static void DrawUnitInfo(CUnit *unit)
 				VideoDrawText(x + 20, y + 8 + 61, GameFont, "Production");
 			}
 			sprintf(buf, "%s:", DefaultResourceNames[i]);
-			VideoDrawText(x + 78 - VideoTextLength(GameFont, buf),
+			VideoDrawText(x + 78 - GameFont->Width(buf),
 				y + 8 + vpos, GameFont, buf);
 			VideoDrawNumber(x + 78, y + 8 + vpos, GameFont, DefaultIncomes[i]);
 			// Incomes have been upgraded
@@ -910,7 +910,7 @@ void UpdateMessages(void)
 	// Scroll/remove old message line
 	if (MessagesFrameTimeout < FrameCounter) {
 		++MessagesScrollY;
-		if (MessagesScrollY == VideoTextHeight(GameFont) + 1) {
+		if (MessagesScrollY == GameFont->Height() + 1) {
 			MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT - MessagesScrollY;
 			MessagesScrollY = 0;
 			ShiftMessages();
@@ -935,7 +935,7 @@ void DrawMessages(void)
 				Video.Height - 1);
 		}
 		VideoDrawTextClip(UI.MapArea.X + 8,
-			UI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1) - MessagesScrollY,
+			UI.MapArea.Y + 8 + z * (GameFont->Height() + 1) - MessagesScrollY,
 			GameFont, Messages[z]);
 		if (z == 0) {
 			PopClipping();
@@ -991,8 +991,7 @@ static void AddMessage(const char* msg)
 		next = ptr = message + strlen(message);
 	}
 
-	while (VideoTextLength(GameFont, message) + 8 >=
-			UI.MapArea.EndX - UI.MapArea.X) {
+	while (GameFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
 		while (1) {
 			--ptr;
 			if (*ptr == ' ') {
@@ -1006,8 +1005,7 @@ static void AddMessage(const char* msg)
 		// No space found, wrap in the middle of a word
 		if (ptr == message) {
 			ptr = next - 1;
-			while (VideoTextLength(GameFont, message) + 8 >=
-					UI.MapArea.EndX - UI.MapArea.X) {
+			while (GameFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
 				*--ptr = '\0';
 			}
 			next = ptr + 1;

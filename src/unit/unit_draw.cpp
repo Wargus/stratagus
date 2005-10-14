@@ -845,10 +845,10 @@ void CDecoVarBar::Draw(int x, int y, const CUnit *unit) const
 void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
 {
 	if (this->IsCenteredInX) {
-		x -= 2; // VideoTextLength(GameFont, buf) / 2, with buf = str(Value)
+		x -= 2; // GameFont->Width(buf) / 2, with buf = str(Value)
 	}
 	if (this->IsCenteredInY) {
-		y -= VideoTextHeight(this->Font) / 2;
+		y -= this->Font->Height() / 2;
 	}
 	VideoDrawNumberClip(x, y, this->Font, unit->Variable[this->Index].Value);
 }
@@ -974,9 +974,9 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 		}
 		buf[0] = num + '0';
 		buf[1] = '\0';
-		f = VideoTextLength(GameFont, buf);
+		f = GameFont->Width(buf);
 		x += (type->TileWidth * TileSizeX + type->BoxWidth) / 2 - f;
-		f = VideoTextHeight(GameFont);
+		f = GameFont->Height();
 		y += (type->TileHeight * TileSizeY + type->BoxHeight) / 2 - f;
 		VideoDrawNumberClip(x, y, GameFont, num);
 	}

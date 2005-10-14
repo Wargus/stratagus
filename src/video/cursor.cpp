@@ -111,7 +111,7 @@ void LoadCursors(const char *race)
 			continue;
 		}
 
-		if ((*i).G && !(*i).G->Loaded()) {
+		if ((*i).G && !(*i).G->IsLoaded()) {
 			ShowLoadProgress("Cursor %s", (*i).G->File);
 			(*i).G->Load();
 		}
@@ -135,7 +135,7 @@ CCursor *CursorByIdent(const char *ident)
 		if (strcmp((*i).Ident, ident)) {
 			continue;
 		}
-		if (!(*i).Race || (*i).G->Loaded()) {
+		if (!(*i).Race || (*i).G->IsLoaded()) {
 			return &(*i);
 		}
 	}
@@ -222,7 +222,7 @@ static void DrawBuildingCursor(void)
 	//  Draw building
 	//
 #ifdef DYNAMIC_LOAD
-	if (!GraphicLoaded(CursorBuilding->G)) {
+	if (!CursorBuilding->G->IsLoaded()) {
 		LoadUnitTypeSprite(CursorBuilding);
 	}
 #endif
