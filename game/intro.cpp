@@ -268,7 +268,7 @@ static void SplitTextIntoLines(const char *text, int w, TextLines **lines)
 		}
 		space = NULL;
 		for (;;) {
-			if (VideoTextLength(LargeFont, s) < w) {
+			if (LargeFont->Width(s) < w) {
 				break;
 			}
 			s1 = strrchr(s, ' ');

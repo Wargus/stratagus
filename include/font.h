@@ -56,6 +56,8 @@
 **    Contains the graphics of the font, Only 9 colors are supported.
 */
 
+#include "video.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -66,11 +68,10 @@ class CGraphic;
 --  Definitions
 ----------------------------------------------------------------------------*/
 
-	/// Color font definition
+	/// Font definition
 class CFont {
 private:
-	CFont() : G(NULL)
-	{
+	CFont() : G(NULL) {
 		memset(CharWidth, 0, sizeof(CharWidth));
 	}
 
@@ -78,11 +79,27 @@ public:
 	static CFont *New(const char *ident, CGraphic *g);
 	static CFont *Get(const char *ident);
 
+	inline int Height() { return G->Height; }
+	int Width(const char *text);
+	inline bool IsLoaded() { return G && G->IsLoaded(); }
+
 	char CharWidth[208];  /// Real font width (starting with ' ')
+	CGraphic *G;          /// Graphic object used to draw
+};
 
-// --- FILLED UP ---
+#define MaxFontColors 9
 
-	CGraphic *G;  /// Graphic object used to draw
+	/// Font color definition
+class CFontColor {
+public:
+	CFontColor(const char *ident);
+	~CFontColor();
+
+	static CFontColor *New(const char *ident);
+	static CFontColor *Get(const char *ident);
+
+	char *Ident;
+	SDL_Color Colors[MaxFontColors];
 };
 
 /**
@@ -118,10 +135,6 @@ extern CFont *LargeTitleFont;  /// Large font used in episoden titles
 extern void SetDefaultTextColors(char *normal, char *reverse);
 	/// Get the default text colors for normal and reverse text
 extern void GetDefaultTextColors(char **normalp, char **reversep);
-	/// Returns the pixel length of a text
-extern int VideoTextLength(CFont *font, const char *text);
-	/// Returns the height of the font
-extern int VideoTextHeight(CFont *font);
 	///  Return the 'line' line of the string 's'.
 extern char *GetLineFont(int line, char *s, int maxlen, CFont *font);
 	/// Draw text unclipped
@@ -153,8 +166,6 @@ extern void ReloadFonts(void);
 extern void FontsCclRegister(void);
 	/// Cleanup the font module
 extern void CleanFonts(void);
-	/// Check if font is loaded
-extern int IsFontLoaded(CFont *font);
 	/// Find font by identifier
 extern CFont *FontByIdent(const char *ident);
 	// Find the name of a font.
