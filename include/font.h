@@ -162,8 +162,6 @@ extern void LoadFonts(void);
 	/// Reload OpenGL fonts
 extern void ReloadFonts(void);
 #endif
-	/// Register ccl features
-extern void FontsCclRegister(void);
 	/// Cleanup the font module
 extern void CleanFonts(void);
 	/// Find font by identifier

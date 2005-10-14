@@ -2553,7 +2553,6 @@ void InitCcl(void)
 	GroupCclRegister();
 	UnitCclRegister();
 	SoundCclRegister();
-	FontsCclRegister();
 	UserInterfaceCclRegister();
 	AiCclRegister();
 	CampaignCclRegister();

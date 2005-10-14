@@ -2,5 +2,19 @@ class CFont
 {
 	static CFont *New(const char *ident, CGraphic *g);
 	static CFont *Get(const char *ident);
+
+	int Height();
+	int Width(const char *text);
+};
+
+
+#define MaxFontColors 9
+
+class CFontColor
+{
+	static CFontColor *New(const char *ident);
+	static CFontColor *Get(const char *ident);
+
+	CColor Colors[MaxFontColors];
 };
 

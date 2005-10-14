@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Mon Oct 10 18:54:26 2005.
+** Generated automatically by tolua++-1.0.6 on Fri Oct 14 12:49:15 2005.
 */
 
 #ifndef __cplusplus
@@ -34,6 +34,13 @@ static int tolua_collect_CPlayer (lua_State* tolua_S)
  delete self;
  return 0;
 }
+
+static int tolua_collect_CColor (lua_State* tolua_S)
+{
+ CColor* self = (CColor*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
 #endif
 
 
@@ -42,12 +49,14 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"CVideo");
+ tolua_usertype(tolua_S,"CUnit");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"CPlayer");
- tolua_usertype(tolua_S,"CUnit");
  tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CPlayer");
+ tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CInfoPanel");
@@ -782,6 +791,178 @@ static int tolua_stratagus_CGraphic_Free00(lua_State* tolua_S)
 #endif
 }
 
+/* method: new of class  CColor */
+static int tolua_stratagus_CColor_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CColor",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned char r = ((unsigned char)  tolua_tonumber(tolua_S,2,0));
+  unsigned char g = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
+  unsigned char b = ((unsigned char)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a = ((unsigned char)  tolua_tonumber(tolua_S,5,0));
+ {
+  CColor* tolua_ret = (CColor*)  new CColor(r,g,b,a);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CColor");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: new_local of class  CColor */
+static int tolua_stratagus_CColor_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CColor",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned char r = ((unsigned char)  tolua_tonumber(tolua_S,2,0));
+  unsigned char g = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
+  unsigned char b = ((unsigned char)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a = ((unsigned char)  tolua_tonumber(tolua_S,5,0));
+ {
+  CColor* tolua_ret = (CColor*)  new CColor(r,g,b,a);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"CColor");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* get function: R of class  CColor */
+static int tolua_get_CColor_unsigned_R(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'R'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->R);
+ return 1;
+}
+
+/* set function: R of class  CColor */
+static int tolua_set_CColor_unsigned_R(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'R'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->R = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: G of class  CColor */
+static int tolua_get_CColor_unsigned_G(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->G);
+ return 1;
+}
+
+/* set function: G of class  CColor */
+static int tolua_set_CColor_unsigned_G(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->G = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: B of class  CColor */
+static int tolua_get_CColor_unsigned_B(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'B'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->B);
+ return 1;
+}
+
+/* set function: B of class  CColor */
+static int tolua_set_CColor_unsigned_B(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'B'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->B = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: A of class  CColor */
+static int tolua_get_CColor_unsigned_A(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'A'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->A);
+ return 1;
+}
+
+/* set function: A of class  CColor */
+static int tolua_set_CColor_unsigned_A(lua_State* tolua_S)
+{
+  CColor* self = (CColor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'A'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->A = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
 /* method: New of class  CFont */
 static int tolua_stratagus_CFont_New00(lua_State* tolua_S)
 {
@@ -838,6 +1019,172 @@ static int tolua_stratagus_CFont_Get00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
  return 0;
 #endif
+}
+
+/* method: Height of class  CFont */
+static int tolua_stratagus_CFont_Height00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"CFont",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CFont* self = (CFont*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Height'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->Height();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Height'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: Width of class  CFont */
+static int tolua_stratagus_CFont_Width00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"CFont",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CFont* self = (CFont*)  tolua_tousertype(tolua_S,1,0);
+  const char* text = ((const char*)  tolua_tostring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Width'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->Width(text);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Width'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: New of class  CFontColor */
+static int tolua_stratagus_CFontColor_New00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CFontColor",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  CFontColor* tolua_ret = (CFontColor*)  CFontColor::New(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFontColor");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: Get of class  CFontColor */
+static int tolua_stratagus_CFontColor_Get00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CFontColor",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  CFontColor* tolua_ret = (CFontColor*)  CFontColor::Get(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFontColor");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* get function: Colors of class  CFontColor */
+static int tolua_get_stratagus_CFontColor_Colors(lua_State* tolua_S)
+{
+ int tolua_index;
+  CFontColor* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CFontColor*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxFontColors)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->Colors[tolua_index],"CColor");
+ return 1;
+}
+
+/* set function: Colors of class  CFontColor */
+static int tolua_set_stratagus_CFontColor_Colors(lua_State* tolua_S)
+{
+ int tolua_index;
+  CFontColor* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CFontColor*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxFontColors)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->Colors[tolua_index] = *((CColor*)  tolua_tousertype(tolua_S,3,0));
+ return 0;
 }
 
 /* method: New of class  CUpgrade */
@@ -1876,7 +2223,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  107,101,121, 41, 32,101,110,100, 32,125, 10, 70,111,110,116,
  115, 32, 61, 32,123,125, 10,115,101,116,109,101,116, 97,116,
   97, 98,108,101, 40, 70,111,110,116,115, 44, 32,109,116, 41,
- 32
+  10,109,116, 32, 61, 32,123, 32, 95, 95,105,110,100,101,120,
+  32, 61, 32,102,117,110, 99,116,105,111,110, 40,116, 44, 32,
+ 107,101,121, 41, 32,114,101,116,117,114,110, 32, 67, 70,111,
+ 110,116, 67,111,108,111,114, 58, 71,101,116, 40,107,101,121,
+  41, 32,101,110,100, 32,125, 10, 70,111,110,116,115, 32, 61,
+  32,123,125, 10,115,101,116,109,101,116, 97,116, 97, 98,108,
+ 101, 40, 70,111,110,116, 67,111,108,111,114,115, 44, 32,109,
+ 116, 41,32
  };
  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 1");
  lua_settop(tolua_S, top);
@@ -1934,10 +2288,33 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"New",tolua_stratagus_CGraphic_New00);
  tolua_function(tolua_S,"Free",tolua_stratagus_CGraphic_Free00);
  tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"CColor","CColor","",tolua_collect_CColor);
+#else
+ tolua_cclass(tolua_S,"CColor","CColor","",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"CColor");
+ tolua_function(tolua_S,"new",tolua_stratagus_CColor_new00);
+ tolua_function(tolua_S,"new_local",tolua_stratagus_CColor_new00_local);
+ tolua_function(tolua_S,".call",tolua_stratagus_CColor_new00_local);
+ tolua_variable(tolua_S,"R",tolua_get_CColor_unsigned_R,tolua_set_CColor_unsigned_R);
+ tolua_variable(tolua_S,"G",tolua_get_CColor_unsigned_G,tolua_set_CColor_unsigned_G);
+ tolua_variable(tolua_S,"B",tolua_get_CColor_unsigned_B,tolua_set_CColor_unsigned_B);
+ tolua_variable(tolua_S,"A",tolua_get_CColor_unsigned_A,tolua_set_CColor_unsigned_A);
+ tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CFont","CFont","",NULL);
  tolua_beginmodule(tolua_S,"CFont");
  tolua_function(tolua_S,"New",tolua_stratagus_CFont_New00);
  tolua_function(tolua_S,"Get",tolua_stratagus_CFont_Get00);
+ tolua_function(tolua_S,"Height",tolua_stratagus_CFont_Height00);
+ tolua_function(tolua_S,"Width",tolua_stratagus_CFont_Width00);
+ tolua_endmodule(tolua_S);
+ tolua_constant(tolua_S,"MaxFontColors",MaxFontColors);
+ tolua_cclass(tolua_S,"CFontColor","CFontColor","",NULL);
+ tolua_beginmodule(tolua_S,"CFontColor");
+ tolua_function(tolua_S,"New",tolua_stratagus_CFontColor_New00);
+ tolua_function(tolua_S,"Get",tolua_stratagus_CFontColor_Get00);
+ tolua_array(tolua_S,"Colors",tolua_get_stratagus_CFontColor_Colors,tolua_set_stratagus_CFontColor_Colors);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CUpgrade","CUpgrade","",NULL);
  tolua_beginmodule(tolua_S,"CUpgrade");
