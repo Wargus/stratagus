@@ -1647,7 +1647,7 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 				if (!GameObserve && !GamePaused &&
-					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
+					ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor < Selected[0]->OrderCount &&
 						Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 						DebugPrint("Cancel slot %d %s\n" _C_
@@ -1663,7 +1663,7 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 				if (!GameObserve && !GamePaused &&
-					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
+					ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel upgrade %s\n" _C_
 							Selected[0]->Type->Ident);
@@ -1675,7 +1675,7 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 				if (!GameObserve && !GamePaused &&
-					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
+					ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel research %s\n" _C_
 							Selected[0]->Type->Ident);
@@ -1690,7 +1690,7 @@ void UIHandleButtonDown(unsigned button)
 				//  for transporter
 				//
 				if (!GameObserve && !GamePaused &&
-					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
+					ThisPlayer->IsTeamed(Selected[0])) {
 					if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 						uins = Selected[0]->UnitInside;
 						for (i = ButtonUnderCursor; i; uins = uins->NextContained) {
@@ -1706,7 +1706,7 @@ void UIHandleButtonDown(unsigned button)
 				}
 			} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 				if (!GameObserve && !GamePaused &&
-					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
+					ThisPlayer->IsTeamed(Selected[0])) {
 					UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				}
 			}
@@ -1879,11 +1879,11 @@ void UIHandleButtonUp(unsigned button)
 					// Don't allow to select own and enemy units.
 					// Don't allow mixing buildings
 				} else if (KeyModifiers & ModifierShift &&
-						(unit->Player == ThisPlayer || PlayersTeamed(ThisPlayer->Index, unit->Player->Index)) &&
+						(unit->Player == ThisPlayer || ThisPlayer->IsTeamed(unit)) &&
 						!unit->Type->Building &&
 						(NumSelected != 1 || !Selected[0]->Type->Building) &&
 						(NumSelected != 1 || Selected[0]->Player == ThisPlayer ||
-						PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index))) {
+						ThisPlayer->IsTeamed(Selected[0]))) {
 					num = ToggleSelectUnit(unit);
 					if (!num) {
 						SelectionChanged();
@@ -1916,7 +1916,7 @@ printf("Race = %d\n", Selected[0]->Player->Race);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
-				} else if (Selected[0]->Player == ThisPlayer || PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index) ||
+				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(Selected[0]) ||
 						Selected[0]->Player->Type == PlayerNeutral) {
 					PlayUnitSound(Selected[0], VoiceSelected);
 				} else {

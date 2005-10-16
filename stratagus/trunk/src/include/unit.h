@@ -692,6 +692,8 @@ public:
 	bool IsAllied(const CUnit *x) const;
 	bool IsSharedVision(const CPlayer *x) const;
 	bool IsSharedVision(const CUnit *x) const;
+	bool IsTeamed(const CPlayer *x) const;
+	bool IsTeamed(const CUnit *x) const;
 };
 
 #define NoUnitP (CUnit *)0         /// return value: for no unit found
