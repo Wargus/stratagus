@@ -10,8 +10,8 @@
 //
 /**@name map.h - The map headerfile. */
 //
-//      (c) Copyright 1998-2005 by Vladi Shabanski, Lutz Sammer,
-//                              and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Vladi Shabanski, Lutz Sammer, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,9 +31,6 @@
 
 #ifndef __MAP_H__
 #define __MAP_H__
-
-#include "iocompat.h"
-#include "tileset.h"
 
 //@{
 
@@ -91,6 +88,10 @@
 **    Note: We want to add support for more unit-types like under
 **      ground units.
 **
+**  CMapField::Cost
+**
+**    Unit cost to move in this tile.
+**
 **  CMapField::Value
 **
 **    Extra value for each tile. This currently only used for
@@ -103,16 +104,24 @@
 **    field is not explored, 1 explored, n-1 unit see it. Currently
 **    no more than 253 units can see a field.
 **
-**  CMapField::Here CMapField::Here::Units
+**  CMapField::VisCloak[]
 **
-**    Contains a list of all units currently on this field.
+**    Visiblity for cloaking.
+**
+**  CMapField::Radar[]
+**
+**    Visiblity for radar.
+**
+**  CMapField::RadarJammer[]
+**
+**    Jamming capabilities.
+**
+**  CMapField::UnitCache
+**
+**    Contains a vector of all units currently on this field.
 **    Note: currently units are only inserted at the insert point.
 **    This means units of the size of 2x2 fields are inserted at the
 **    top and right most map coordinate.
-**
-**  CMapField::Region
-**
-**    Number of the region to that the tile belongs.
 */
 
 /**
@@ -120,14 +129,14 @@
 **
 **  \#include "map.h"
 **
-**  This class contains all information about a stratagus map.
+**  This class contains all information about a Stratagus map.
 **  A map is a rectangle of any size.
 **
 **  The map class members:
 **
 **  CMap::Fields
 **
-**    An array CMap::Width * CMap::Height of all fields
+**    An array CMap::Info::Width * CMap::Info::Height of all fields
 **    belonging to this map.
 **
 **  CMap::NoFogOfWar
@@ -136,29 +145,32 @@
 **
 **  CMap::Tileset
 **
-**    Tileset data for the map. See ::Tileset. This contains all
+**    Tileset data for the map. See ::CTileset. This contains all
 **    information about the tile.
 **
-**  CMap::Tiles
+**  CMap::TileModelsFileName[]
 **
-**    Pointer into the tile graphic data. Used to find fast the start
-**    of different tiles.
+**    Lua filename that loads all tilemodels
 **
-**  CMap::TileData
+**  CMap::TileGraphic
 **
-**    Tiles graphic for the map, loaded from CMap::Tileset::File.
+**    Graphic for all the tiles
+**
+**  CMap::FogGraphic
+**
+**    Graphic for fog of war
 **
 **  CMap::Info
 **
-**    Descriptive information of the map.
-**    @see ::CMapInfo
-**    @todo This structure contains duplicate informations of the map.
+**    Descriptive information of the map. See ::CMapInfo.
 */
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Includes
 ----------------------------------------------------------------------------*/
 
+#include "iocompat.h"
+#include "tileset.h"
 #include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
@@ -210,7 +222,7 @@ public:
 	unsigned char Visible[PlayerMax];  /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax]; /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];    /// Visiblity for radar.
-	unsigned char RadarJammer[PlayerMax]; /// Jamming Capabilities.
+	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
 	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
 };
 
@@ -256,7 +268,7 @@ public:
 --  Map itself
 ----------------------------------------------------------------------------*/
 
-	/// Describes the wold map
+	/// Describes the world map
 class CMap {
 public:
 	CMapField *Fields;              /// fields on map
