@@ -77,7 +77,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
 		// unusable unit ?
-		// if (UnitUnusable(unit)) can't attack constructions
+		// if (unit->IsUnusable()) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
 		// Invisible and not Visible
 		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
@@ -150,7 +150,7 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 	//
 	// Make movement matrix.
 	//
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
@@ -253,7 +253,7 @@ static int AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int *
 	y = unit->Y;
 
 	w = Map.Info.MapWidth + 2;
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
@@ -426,7 +426,7 @@ int AiFindWall(AiForce *force)
 	matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 
 	//
 	// Pop a point from stack, push all neighbors which could be entered.

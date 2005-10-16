@@ -436,7 +436,7 @@ int SelectUnitsByType(CUnit *base)
 		if (!CanSelectMultipleUnits(unit->Player) || unit->Type != type) {
 			continue;
 		}
-		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
 		if (unit == base) {  // no need to have the same unit twice :)
@@ -518,7 +518,7 @@ int ToggleUnitsByType(CUnit *base)
 		if (!CanSelectMultipleUnits(unit->Player) || unit->Type != type) {
 			continue;
 		}
-		if (UnitUnusable(unit)) { // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) { // guess SelectUnits doesn't check this
 			continue;
 		}
 		if (unit == base) { // no need to have the same unit twice
@@ -627,7 +627,7 @@ static int SelectOrganicUnitsInTable(CUnit **table, int num_units)
 		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
 			continue;
 		}
-		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
 		if (unit->TeamSelected) { // Somebody else onteam has this unit
@@ -881,7 +881,7 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
 			continue;
 		}
-		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
 		if (unit->Type->UnitType == UnitTypeFly) {
@@ -936,7 +936,7 @@ int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
 			continue;
 		}
-		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
 		if (unit->Type->UnitType != UnitTypeFly) {
@@ -1006,7 +1006,7 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 			!unit->Type->SelectableByRectangle) {
 			continue;
 		}
-		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
 		if (unit->Type->UnitType == UnitTypeFly) {
@@ -1080,7 +1080,7 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 			!unit->Type->SelectableByRectangle) {
 			continue;
 		}
-		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
 		if (unit->Type->UnitType != UnitTypeFly) {

@@ -315,7 +315,7 @@ int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 	int mask;  // movement mask of the unit.
 
 	Assert(type);
-	mask = TypeMovementMask(type);
+	mask = type->MovementMask;
 	for (addx = 0; addx < type->TileWidth; addx++) {
 		for (addy = 0; addy < type->TileHeight; addy++) {
 			if (!CheckedCanMoveToMask(x + addx, y + addy, mask)) {

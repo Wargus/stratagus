@@ -150,7 +150,7 @@ int UnloadUnit(CUnit *unit)
 	int y;
 
 	Assert(unit->Removed);
-	if (!FindUnloadPosition(unit->X, unit->Y, &x, &y, UnitMovementMask(unit))) {
+	if (!FindUnloadPosition(unit->X, unit->Y, &x, &y, unit->Type->MovementMask)) {
 		return 0;
 	}
 	unit->Boarded = 0;

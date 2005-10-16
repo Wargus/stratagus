@@ -558,11 +558,11 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 		return 1;
 	}
 
-	OpenSetSize=0;
-	num_in_close=0;
-	mask=UnitMovementMask(unit);
-	x=unit->X;
-	y=unit->Y;
+	OpenSetSize = 0;
+	num_in_close = 0;
+	mask = unit->Type->MovementMask;
+	x = unit->X;
+	y = unit->Y;
 
 	// if goal is not directory reachable, punch out
 	if( !AStarMarkGoal(unit, gx, gy, gw, gh, minrange, maxrange, mask, &num_in_close) ) {

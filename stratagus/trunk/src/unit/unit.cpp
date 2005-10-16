@@ -486,7 +486,7 @@ void MapMarkUnitSight(CUnit *unit)
 		MapMarkTileSight, MapMarkTileDetectCloak);
 
 	// Never mark radar, except if the top unit, and unit is usable
-	if (unit == container && !UnitUnusable(unit)) {
+	if (unit == container && !unit->IsUnusable()) {
 		if (unit->Stats->Variables[RADAR_INDEX].Value) {
 			MapMarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Stats->Variables[RADAR_INDEX].Value);
@@ -519,7 +519,7 @@ void MapUnmarkUnitSight(CUnit *unit)
 		MapUnmarkTileSight, MapUnmarkTileDetectCloak);
 
 	// Never mark radar, except if the top unit?
-	if (unit == container && !UnitUnusable(unit)) {
+	if (unit == container && !unit->IsUnusable()) {
 		if (unit->Stats->Variables[RADAR_INDEX].Value) {
 			MapUnmarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Stats->Variables[RADAR_INDEX].Value);
@@ -1761,7 +1761,7 @@ void DropOutOnSide(CUnit *unit, int heading, int addx, int addy)
 	}
 
 
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 
 	if (heading < LookingNE || heading > LookingNW) {
 		x += addx - 1;
@@ -1848,7 +1848,7 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 	}
 
 	Assert(x != -1 && y != -1);
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 
 	bestd = 99999;
 #ifdef DEBUG
@@ -2266,7 +2266,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 */
 int FindWoodInSight(const CUnit *unit, int* x, int* y)
 {
-	return FindTerrainType(UnitMovementMask(unit), 0, MapFieldForest, 9999,
+	return FindTerrainType(unit->Type->MovementMask, 0, MapFieldForest, 9999,
 		unit->Player, unit->X, unit->Y, x, y);
 }
 
@@ -2448,7 +2448,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	//  Unit movement mask
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 	//  Ignore all units along the way. Might seem wierd, but otherwise
 	//  peasants would lock at a mine with a lot of workers.
 	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit);
@@ -2586,7 +2586,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	//  Unit movement mask
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 	//  Ignore all units along the way. Might seem wierd, but otherwise
 	//  peasants would lock at a mine with a lot of workers.
 	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit | MapFieldBuilding);
@@ -3452,6 +3452,16 @@ bool CUnit::IsTeamed(const CPlayer *x) const
 bool CUnit::IsTeamed(const CUnit *x) const
 {
 	return this->IsTeamed(x->Player);
+}
+
+/**
+**  Check if the unit is unusable (for attacking...)
+**  @todo look if correct used (UnitActionBuilt is no problem if attacked)?
+*/
+bool CUnit::IsUnusable() const
+{
+	return this->Removed || this->Orders[0]->Action == UnitActionDie ||
+		this->Orders[0]->Action == UnitActionBuilt || this->Destroyed;
 }
 
 /*----------------------------------------------------------------------------
