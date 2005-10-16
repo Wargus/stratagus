@@ -61,7 +61,7 @@ void UnitCacheInsert(CUnit *unit)
 	Assert(!unit->Removed);
 
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
-		mf = TheMap.Fields + (i + unit->Y) * TheMap.Info.MapWidth + unit->X;
+		mf = Map.Fields + (i + unit->Y) * Map.Info.MapWidth + unit->X;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			mf[j].UnitCache.push_back(unit);
 		}
@@ -81,7 +81,7 @@ void UnitCacheRemove(CUnit *unit)
 
 	Assert(!unit->Removed);
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
-		mf = TheMap.Fields + (i + unit->Y) * TheMap.Info.MapWidth + unit->X;
+		mf = Map.Fields + (i + unit->Y) * Map.Info.MapWidth + unit->X;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			for (std::vector<CUnit *>::iterator k = mf[j].UnitCache.begin(); k != mf[j].UnitCache.end(); ++k) {
 				if (*k == unit) {
@@ -125,17 +125,17 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 	if (y1 < 0) {
 		y1 = 0;
 	}
-	if (x2 > TheMap.Info.MapWidth) {
-		x2 = TheMap.Info.MapWidth;
+	if (x2 > Map.Info.MapWidth) {
+		x2 = Map.Info.MapWidth;
 	}
-	if (y2 > TheMap.Info.MapHeight) {
-		y2 = TheMap.Info.MapHeight;
+	if (y2 > Map.Info.MapHeight) {
+		y2 = Map.Info.MapHeight;
 	}
 
 	n = 0;
 	for (i = y1; i < y2; ++i) {
 		for (j = x1; j < x2; ++j) {
-			mf = &TheMap.Fields[i * TheMap.Info.MapWidth + j];
+			mf = &Map.Fields[i * Map.Info.MapWidth + j];
 			for (std::vector<CUnit *>::iterator k = mf->UnitCache.begin();
 				k != mf->UnitCache.end(); ++k) {
 				//
@@ -176,7 +176,7 @@ int UnitCacheOnTile(int x, int y, CUnit **table)
 	int n;
 	MapField *mf;
 
-	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
+	mf = &Map.Fields[y * Map.Info.MapWidth + x];
 	//
 	// Unlike in UnitCacheSelect, there's no way an unit can show up twice,
 	// so there is no need for Cache Locks.

@@ -85,9 +85,9 @@ static int CclStratagusMap(lua_State *l)
 				fprintf(stderr, "Warning not saved with this version.\n");
 			}
 		} else if (!strcmp(value, "uid")) {
-			TheMap.Info.MapUID = LuaToNumber(l, j + 1);
+			Map.Info.MapUID = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "description")) {
-			TheMap.Info.Description = new_strdup(LuaToString(l, j + 1));
+			Map.Info.Description = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -105,28 +105,28 @@ static int CclStratagusMap(lua_State *l)
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					TheMap.Info.MapWidth = LuaToNumber(l, -1);
+					Map.Info.MapWidth = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					TheMap.Info.MapHeight = LuaToNumber(l, -1);
+					Map.Info.MapHeight = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_pop(l, 1);
 
-					delete[] TheMap.Fields;
-					TheMap.Fields = new MapField[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
-					TheMap.Visible[0] = new unsigned[TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2];
-					memset(TheMap.Visible[0], 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2 * sizeof(unsigned));
+					delete[] Map.Fields;
+					Map.Fields = new MapField[Map.Info.MapWidth * Map.Info.MapHeight];
+					Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
+					memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
 					InitUnitCache();
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
-					TheMap.NoFogOfWar = false;
+					Map.NoFogOfWar = false;
 					--k;
 				} else if (!strcmp(value, "no-fog-of-war")) {
-					TheMap.NoFogOfWar = true;
+					Map.NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(value, "filename")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					TheMap.Info.Filename = new_strdup(LuaToString(l, -1));
+					Map.Info.Filename = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "map-fields")) {
 					int i;
@@ -139,7 +139,7 @@ static int CclStratagusMap(lua_State *l)
 					}
 
 					subsubargs = luaL_getn(l, -1);
-					if (subsubargs != TheMap.Info.MapWidth * TheMap.Info.MapHeight) {
+					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
 						fprintf(stderr, "Wrong tile table length: %d\n", subsubargs);
 					}
 					i = 0;
@@ -155,17 +155,17 @@ static int CclStratagusMap(lua_State *l)
 						j2 = 0;
 
 						lua_rawgeti(l, -1, j2 + 1);
-						TheMap.Fields[i].Tile = LuaToNumber(l, -1);
+						Map.Fields[i].Tile = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						++j2;
 						lua_rawgeti(l, -1, j2 + 1);
-						TheMap.Fields[i].SeenTile = LuaToNumber(l, -1);
+						Map.Fields[i].SeenTile = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						++j2;
 						for (; j2 < args2; ++j2) {
 							lua_rawgeti(l, -1, j2 + 1);
 							if (lua_isnumber(l, -1)) {
-								TheMap.Fields[i].Value = LuaToNumber(l, -1);
+								Map.Fields[i].Value = LuaToNumber(l, -1);
 								lua_pop(l, 1);
 								continue;
 							}
@@ -174,38 +174,38 @@ static int CclStratagusMap(lua_State *l)
 							if (!strcmp(value, "explored")) {
 								++j2;
 								lua_rawgeti(l, -1, j2 + 1);
-								TheMap.Fields[i].Visible[(int)LuaToNumber(l, -1)] = 1;
+								Map.Fields[i].Visible[(int)LuaToNumber(l, -1)] = 1;
 								lua_pop(l, 1);
 							} else if (!strcmp(value, "human")) {
-								TheMap.Fields[i].Flags |= MapFieldHuman;
+								Map.Fields[i].Flags |= MapFieldHuman;
 
 							} else if (!strcmp(value, "land")) {
-								TheMap.Fields[i].Flags |= MapFieldLandAllowed;
+								Map.Fields[i].Flags |= MapFieldLandAllowed;
 							} else if (!strcmp(value, "coast")) {
-								TheMap.Fields[i].Flags |= MapFieldCoastAllowed;
+								Map.Fields[i].Flags |= MapFieldCoastAllowed;
 							} else if (!strcmp(value, "water")) {
-								TheMap.Fields[i].Flags |= MapFieldWaterAllowed;
+								Map.Fields[i].Flags |= MapFieldWaterAllowed;
 
 							} else if (!strcmp(value, "mud")) {
-								TheMap.Fields[i].Flags |= MapFieldNoBuilding;
+								Map.Fields[i].Flags |= MapFieldNoBuilding;
 							} else if (!strcmp(value, "block")) {
-								TheMap.Fields[i].Flags |= MapFieldUnpassable;
+								Map.Fields[i].Flags |= MapFieldUnpassable;
 
 							} else if (!strcmp(value, "wall")) {
-								TheMap.Fields[i].Flags |= MapFieldWall;
+								Map.Fields[i].Flags |= MapFieldWall;
 							} else if (!strcmp(value, "rock")) {
-								TheMap.Fields[i].Flags |= MapFieldRocks;
+								Map.Fields[i].Flags |= MapFieldRocks;
 							} else if (!strcmp(value, "wood")) {
-								TheMap.Fields[i].Flags |= MapFieldForest;
+								Map.Fields[i].Flags |= MapFieldForest;
 
 							} else if (!strcmp(value, "ground")) {
-								TheMap.Fields[i].Flags |= MapFieldLandUnit;
+								Map.Fields[i].Flags |= MapFieldLandUnit;
 							} else if (!strcmp(value, "air")) {
-								TheMap.Fields[i].Flags |= MapFieldAirUnit;
+								Map.Fields[i].Flags |= MapFieldAirUnit;
 							} else if (!strcmp(value, "sea")) {
-								TheMap.Fields[i].Flags |= MapFieldSeaUnit;
+								Map.Fields[i].Flags |= MapFieldSeaUnit;
 							} else if (!strcmp(value, "building")) {
-								TheMap.Fields[i].Flags |= MapFieldBuilding;
+								Map.Fields[i].Flags |= MapFieldBuilding;
 
 							} else {
 							   LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -327,7 +327,7 @@ static int CclSetDefaultMap(lua_State *l)
 static int CclSetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	TheMap.NoFogOfWar = !LuaToBoolean(l, 1);
+	Map.NoFogOfWar = !LuaToBoolean(l, 1);
 	if (!CclInConfigFile) {
 		UpdateFogOfWarChange();
 	}
@@ -412,10 +412,10 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
-	if (TheMap.FogGraphic) {
-		CGraphic::Free(TheMap.FogGraphic);
+	if (Map.FogGraphic) {
+		CGraphic::Free(Map.FogGraphic);
 	}
-	TheMap.FogGraphic = CGraphic::New(FogGraphicFile, TileSizeX, TileSizeY);
+	Map.FogGraphic = CGraphic::New(FogGraphicFile, TileSizeX, TileSizeY);
 
 	return 0;
 }
@@ -437,11 +437,11 @@ static int CclSetTile(lua_State *l)
 	w = LuaToNumber(l, 2);
 	h = LuaToNumber(l, 3);
 
-	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = TheMap.Tileset.Table[tile];
-	TheMap.Fields[w + h * TheMap.Info.MapWidth].Value = 0;
-	TheMap.Fields[w + h * TheMap.Info.MapWidth].Flags = TheMap.Tileset.FlagsTable[tile];
-	TheMap.Fields[w + h * TheMap.Info.MapWidth].Cost = 
-		1 << (TheMap.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
+	Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
+	Map.Fields[w + h * Map.Info.MapWidth].Value = 0;
+	Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
+	Map.Fields[w + h * Map.Info.MapWidth].Cost = 
+		1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
 
 	return 0;
 }
@@ -465,26 +465,26 @@ static int CclDefinePlayerTypes(lua_State *l)
 	for (i = 0; i < numplayers && i < PlayerMax; i++) {
 		type = LuaToString(l, i + 1);
 		if (!strcmp(type, "neutral")) {
-			TheMap.Info.PlayerType[i] = PlayerNeutral;
+			Map.Info.PlayerType[i] = PlayerNeutral;
 		} else if (!strcmp(type, "nobody")) {
-			TheMap.Info.PlayerType[i] = PlayerNobody;
+			Map.Info.PlayerType[i] = PlayerNobody;
 		} else if (!strcmp(type, "computer")) {
-			TheMap.Info.PlayerType[i] = PlayerComputer;
+			Map.Info.PlayerType[i] = PlayerComputer;
 		} else if (!strcmp(type, "person")) {
-			TheMap.Info.PlayerType[i] = PlayerPerson;
+			Map.Info.PlayerType[i] = PlayerPerson;
 		} else if (!strcmp(type, "rescue-passive")) {
-			TheMap.Info.PlayerType[i] = PlayerRescuePassive;
+			Map.Info.PlayerType[i] = PlayerRescuePassive;
 		} else if (!strcmp(type, "rescue-active")) {
-			TheMap.Info.PlayerType[i] = PlayerRescueActive;
+			Map.Info.PlayerType[i] = PlayerRescueActive;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
 	for (i = numplayers; i < PlayerMax - 1; i++) {
-		TheMap.Info.PlayerType[i] = PlayerNobody;
+		Map.Info.PlayerType[i] = PlayerNobody;
 	}
 	if (numplayers < PlayerMax)
-		TheMap.Info.PlayerType[PlayerMax-1] = PlayerNeutral;
+		Map.Info.PlayerType[PlayerMax-1] = PlayerNeutral;
 	return 0;
 }
 
@@ -500,8 +500,8 @@ static int CclLoadTileModels(lua_State *l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	strcpy(TheMap.TileModelsFileName, LuaToString(l, 1));  
-	LibraryFileName(TheMap.TileModelsFileName, buf);
+	strcpy(Map.TileModelsFileName, LuaToString(l, 1));  
+	LibraryFileName(Map.TileModelsFileName, buf);
 	if (LuaLoadFile(buf) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
 	}

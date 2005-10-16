@@ -591,7 +591,7 @@ void MarkUnitFieldFlags(const CUnit *unit)
 	flags = type->FieldFlags;
 	for (h = type->TileHeight; h--;) {
 		for (w = type->TileWidth; w--;) {
-			TheMap.Fields[x + w + (y + h) * TheMap.Info.MapWidth].Flags |= flags;
+			Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags |= flags;
 		}
 	}
 }
@@ -617,7 +617,7 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 	flags = type->FieldFlags;
 	for (h = type->TileHeight; h--;) {
 		for (w = type->TileWidth; w--;) {
-			TheMap.Fields[x + w + (y + h) * TheMap.Info.MapWidth].Flags &= ~flags;
+			Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags &= ~flags;
 		}
 	}
 }
@@ -1239,12 +1239,12 @@ void UnitCountSeen(CUnit *unit)
 			for (x = 0; x < unit->Type->TileWidth; ++x) {
 				for (y = 0; y < unit->Type->TileHeight; ++y) {
 					if (unit->Type->PermanentCloak) {
-						if (TheMap.Fields[(unit->Y + y) * TheMap.Info.MapWidth + unit->X + x].VisCloak[p]) {
+						if (Map.Fields[(unit->Y + y) * Map.Info.MapWidth + unit->X + x].VisCloak[p]) {
 							newv++;
 						}
 					} else {
 						//  Icky ugly code trick. With NoFogOfWar we haveto be > 0;
-						if (TheMap.Fields[(unit->Y + y) * TheMap.Info.MapWidth + unit->X + x].Visible[p] > 1 - (TheMap.NoFogOfWar ? 1 : 0)) {
+						if (Map.Fields[(unit->Y + y) * Map.Info.MapWidth + unit->X + x].Visible[p] > 1 - (Map.NoFogOfWar ? 1 : 0)) {
 							newv++;
 						}
 					}
@@ -1986,19 +1986,19 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 		this->DistanceType == NotEqual) {
 		x1 = x - this->Distance > 0 ? x - this->Distance : 0;
 		y1 = y - this->Distance > 0 ? y - this->Distance : 0;
-		x2 = x + type->TileWidth + this->Distance < TheMap.Info.MapWidth ?
-			x + type->TileWidth + this->Distance : TheMap.Info.MapWidth;
-		y2 = y + type->TileHeight + this->Distance < TheMap.Info.MapHeight ?
-			y + type->TileHeight + this->Distance : TheMap.Info.MapHeight;
+		x2 = x + type->TileWidth + this->Distance < Map.Info.MapWidth ?
+			x + type->TileWidth + this->Distance : Map.Info.MapWidth;
+		y2 = y + type->TileHeight + this->Distance < Map.Info.MapHeight ?
+			y + type->TileHeight + this->Distance : Map.Info.MapHeight;
 		distance = this->Distance;
 	} else if (this->DistanceType == LessThan ||
 			this->DistanceType == GreaterThanEqual) {
 		x1 = x - this->Distance - 1 > 0 ? x - this->Distance - 1 : 0;
 		y1 = y - this->Distance - 1 > 0 ? y - this->Distance - 1 : 0;
-		x2 = x + type->TileWidth + this->Distance + 1 < TheMap.Info.MapWidth ?
-			x + type->TileWidth + this->Distance + 1 : TheMap.Info.MapWidth;
-		y2 = y + type->TileHeight + this->Distance + 1 < TheMap.Info.MapHeight ?
-			y + type->TileHeight + this->Distance + 1 : TheMap.Info.MapHeight;
+		x2 = x + type->TileWidth + this->Distance + 1 < Map.Info.MapWidth ?
+			x + type->TileWidth + this->Distance + 1 : Map.Info.MapWidth;
+		y2 = y + type->TileHeight + this->Distance + 1 < Map.Info.MapHeight ?
+			y + type->TileHeight + this->Distance + 1 : Map.Info.MapHeight;
 		distance = this->Distance - 1;
 	}
 	n = UnitCacheSelect(x1, y1, x2, y2, table);
@@ -2052,9 +2052,9 @@ bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&
 	int y1;
 
 	x1 = x - this->OffsetX < 0 ? -1 : x - this->OffsetX;
-	x1 = x1 >= TheMap.Info.MapWidth ? -1 : x1;
+	x1 = x1 >= Map.Info.MapWidth ? -1 : x1;
 	y1 = y - this->OffsetY < 0 ? -1 : y - this->OffsetY;
-	y1 = y1 >= TheMap.Info.MapHeight ? -1 : y1;
+	y1 = y1 >= Map.Info.MapHeight ? -1 : y1;
 	if (!(x1 == -1 || y1 == -1)) {
 		n = UnitCacheOnTile(x1, y1, table);
 		for (i = 0; i < n; ++i) {
@@ -2112,10 +2112,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 	//
 	//  Can't build outside the map
 	//
-	if (x + type->TileWidth > TheMap.Info.MapWidth) {
+	if (x + type->TileWidth > Map.Info.MapWidth) {
 		return NULL;
 	}
-	if (y + type->TileHeight > TheMap.Info.MapHeight) {
+	if (y + type->TileHeight > Map.Info.MapHeight) {
 		return NULL;
 	}
 
@@ -2126,7 +2126,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		// Need at least one coast tile
 		for (h = type->TileHeight; h--;) {
 			for (w = type->TileWidth; w--;) {
-				if (TheMap.Fields[x + w + (y + h) * TheMap.Info.MapWidth].Flags &
+				if (Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags &
 						MapFieldCoastAllowed) {
 					h = w = 0;
 					success = 1;
@@ -2167,10 +2167,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 */
 int CanBuildOn(int x, int y, int mask)
 {
-	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
+	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		return 0;
 	}
-	return (TheMap.Fields[x + y * TheMap.Info.MapWidth].Flags & mask) ? 0 : 1;
+	return (Map.Fields[x + y * Map.Info.MapWidth].Flags & mask) ? 0 : 1;
 }
 
 /**
@@ -2211,8 +2211,8 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 		j = unit->Type->FieldFlags;
 		for (h = unit->Type->TileHeight; h > 0; --h) {
 			for (w = unit->Type->TileWidth; w > 0; --w) {
-				TheMap.Fields[(unit->X + w - 1) + 
-						(unit->Y - 1 + h) * TheMap.Info.MapWidth].Flags &= ~j;
+				Map.Fields[(unit->X + w - 1) + 
+						(unit->Y - 1 + h) * Map.Info.MapWidth].Flags &= ~j;
 			}
 		}
 	}
@@ -2232,7 +2232,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 			}
 			if (!CanBuildOn(x + w, y + h, testmask)) {
 				if (unit) {
-					TheMap.Fields[unit->X + unit->Y * TheMap.Info.MapWidth].Flags |= j;
+					Map.Fields[unit->X + unit->Y * Map.Info.MapWidth].Flags |= j;
 				}
 				return NULL;
 			}
@@ -2245,8 +2245,8 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 		j = unit->Type->FieldFlags;
 		for (h = unit->Type->TileHeight; h > 0; --h) {
 			for (w = unit->Type->TileWidth; w > 0; --w) {
-				TheMap.Fields[(unit->X + w - 1) + 
-						(unit->Y - 1 + h) * TheMap.Info.MapWidth].Flags |= j;
+				Map.Fields[(unit->X + w - 1) + 
+						(unit->Y - 1 + h) * Map.Info.MapWidth].Flags |= j;
 			}
 		}
 	}
@@ -2322,13 +2322,13 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 
 	destx = x;
 	desty = y;
-	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
-		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
+	size = (Map.Info.MapWidth * Map.Info.MapHeight / 4 < range * range * 5) ?
+		Map.Info.MapWidth * Map.Info.MapHeight / 4 : range * range * 5;
 	points = new p[size];
 
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
-	w = TheMap.Info.MapWidth + 2;
+	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	points[0].X = x;
 	points[0].Y = y;
@@ -2348,7 +2348,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				//  Make sure we don't leave the map.
-				if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
+				if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 					continue;
 				}
 				m = matrix + x + y * w;
@@ -2438,8 +2438,8 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 
 	destx = x;
 	desty = y;
-	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
-		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
+	size = (Map.Info.MapWidth * Map.Info.MapHeight / 4 < range * range * 5) ?
+		Map.Info.MapWidth * Map.Info.MapHeight / 4 : range * range * 5;
 	points = new p[size];
 
 	// Find the nearest gold depot
@@ -2449,7 +2449,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	bestd = 99999;
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
-	w = TheMap.Info.MapWidth + 2;
+	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	//  Unit movement mask
 	mask = UnitMovementMask(unit);
@@ -2581,13 +2581,13 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 
 	destx = x;
 	desty = y;
-	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
-		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
+	size = (Map.Info.MapWidth * Map.Info.MapHeight / 4 < range * range * 5) ?
+		Map.Info.MapWidth * Map.Info.MapHeight / 4 : range * range * 5;
 	points = new p[size];
 
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
-	w = TheMap.Info.MapWidth + 2;
+	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	//  Unit movement mask
 	mask = UnitMovementMask(unit);
@@ -2613,7 +2613,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 				y = ry + yoffset[i];
 				++nodes_searched;
 				//  Make sure we don't leave the map.
-				if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
+				if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 					continue;
 				}
 				m = matrix + x + y * w;
@@ -3121,14 +3121,14 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		x = target->X + (x * 5) / d + (SyncRand() & 3);
 		if (x < 0) {
 			x = 0;
-		} else if (x >= TheMap.Info.MapWidth) {
-			x = TheMap.Info.MapWidth - 1;
+		} else if (x >= Map.Info.MapWidth) {
+			x = Map.Info.MapWidth - 1;
 		}
 		y = target->Y + (y * 5) / d + (SyncRand() & 3);
 		if (y < 0) {
 			y = 0;
-		} else if (y >= TheMap.Info.MapHeight) {
-			y = TheMap.Info.MapHeight - 1;
+		} else if (y >= Map.Info.MapHeight) {
+			y = Map.Info.MapHeight - 1;
 		}
 		CommandStopUnit(target);
 		CommandMove(target, x, y, 0);

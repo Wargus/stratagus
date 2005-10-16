@@ -496,10 +496,10 @@ static void GetMissileMapArea(const Missile *missile, int *sx, int *sy,
 	int *ex, int *ey)
 {
 #define Bound(x, y) (x) < 0 ? 0 : ((x) > (y) ? (y) : (x))
-	*sx = Bound(missile->X / TileSizeX, TheMap.Info.MapWidth - 1);
-	*sy = Bound(missile->Y / TileSizeY, TheMap.Info.MapHeight - 1);
-	*ex = Bound((missile->X + missile->Type->Width) / TileSizeX, TheMap.Info.MapWidth - 1);
-	*ey = Bound((missile->Y + missile->Type->Height) / TileSizeY, TheMap.Info.MapHeight - 1);
+	*sx = Bound(missile->X / TileSizeX, Map.Info.MapWidth - 1);
+	*sy = Bound(missile->Y / TileSizeY, Map.Info.MapHeight - 1);
+	*ex = Bound((missile->X + missile->Type->Width) / TileSizeX, Map.Info.MapWidth - 1);
+	*ey = Bound((missile->Y + missile->Type->Height) / TileSizeY, Map.Info.MapHeight - 1);
 #undef Bound
 }
 
@@ -927,7 +927,7 @@ void MissileHit(Missile *missile)
 	x /= TileSizeX;
 	y /= TileSizeY;
 
-	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
+	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		// FIXME: this should handled by caller?
 		DebugPrint("Missile gone outside of map!\n");
 		return;  // outside the map.
@@ -984,7 +984,7 @@ void MissileHit(Missile *missile)
 	y -= missile->Type->Range;
 	for (i = missile->Type->Range * 2; --i;) {
 		for (n = missile->Type->Range * 2; --n;) {
-			if (x + i >= 0 && x + i < TheMap.Info.MapWidth && y + n >= 0 && y + n < TheMap.Info.MapHeight) {
+			if (x + i >= 0 && x + i < Map.Info.MapWidth && y + n >= 0 && y + n < Map.Info.MapHeight) {
 				if (i == 0 && n == 0) {
 					MissileHitsWall(missile, x + i, y + n, 1);
 				} else {
@@ -1713,7 +1713,7 @@ void MissileWhirlwind::Action()
 			// find new destination in the map
 			nx = x + SyncRand() % 5 - 2;
 			ny = y + SyncRand() % 5 - 2;
-		} while (nx < 0 && ny < 0 && nx >= TheMap.Info.MapWidth && ny >= TheMap.Info.MapHeight);
+		} while (nx < 0 && ny < 0 && nx >= Map.Info.MapWidth && ny >= Map.Info.MapHeight);
 		this->DX = nx * TileSizeX + TileSizeX / 2;
 		this->DY = ny * TileSizeY + TileSizeY / 2;
 		this->SourceX = this->X;

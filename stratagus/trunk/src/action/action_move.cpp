@@ -159,7 +159,7 @@ int DoActionMove(CUnit *unit)
 	}
 
 	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
-			TheMap.Fields[unit->X + unit->Y*TheMap.Info.MapWidth].Cost);
+			Map.Fields[unit->X + unit->Y*Map.Info.MapWidth].Cost);
 
 	unit->IX += xd * move;
 	unit->IY += yd * move;
@@ -204,8 +204,8 @@ void HandleActionMove(CUnit *unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit->Orders[0]->Range <= TheMap.Info.MapWidth ||
-					unit->Orders[0]->Range <= TheMap.Info.MapHeight) {
+			if (unit->Orders[0]->Range <= Map.Info.MapWidth ||
+					unit->Orders[0]->Range <= Map.Info.MapHeight) {
 				unit->Orders[0]->Range++;
 				break;
 			}

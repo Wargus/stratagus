@@ -486,7 +486,7 @@ void PreMenuSetup(void)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-void MenuLoop(const char *filename, WorldMap *map)
+void MenuLoop(const char *filename, CMap *map)
 {
 	for (;;) {
 		//
@@ -660,7 +660,7 @@ static int main1(int argc, char **argv)
 	InitUnitsMemory();  // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
-	MenuLoop(MapName, &TheMap);  // Enter the menu loop
+	MenuLoop(MapName, &Map);  // Enter the menu loop
 
 	return 0;
 }

@@ -93,7 +93,7 @@ int CViewport::Viewport2MapX(int x) const
 	int r;
 
 	r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
-	return r < TheMap.Info.MapWidth ? r : TheMap.Info.MapWidth - 1;
+	return r < Map.Info.MapWidth ? r : Map.Info.MapWidth - 1;
 }
 
 /**
@@ -110,7 +110,7 @@ int CViewport::Viewport2MapY(int y) const
 	int r;
 
 	r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
-	return r < TheMap.Info.MapHeight ? r : TheMap.Info.MapHeight - 1;
+	return r < Map.Info.MapHeight ? r : Map.Info.MapHeight - 1;
 }
 
 /**
@@ -157,11 +157,11 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 	if (y < 0) {
 		y = 0;
 	}
-	if (x > TheMap.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1) {
-		x = TheMap.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1;
+	if (x > Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1) {
+		x = Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1;
 	}
-	if (y > TheMap.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1) {
-		y = TheMap.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1;
+	if (y > Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1) {
+		y = Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1;
 	}
 	this->MapX = x / TileSizeX;
 	this->MapY = y / TileSizeY;
@@ -221,7 +221,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int ey;
 
 	ex = this->EndX;
-	sy = this->MapY * TheMap.Info.MapWidth;
+	sy = this->MapY * Map.Info.MapWidth;
 	dy = this->Y - this->OffsetY;
 	ey = this->EndY;
 
@@ -230,15 +230,15 @@ void CViewport::DrawMapBackgroundInViewport() const
 		dx = this->X - this->OffsetX;
 		while (dx <= ex) {
 			if (ReplayRevealMap) {
-				TheMap.TileGraphic->DrawFrameClip(TheMap.Fields[sx].Tile, dx, dy);
+				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].Tile, dx, dy);
 			} else {
-				TheMap.TileGraphic->DrawFrameClip(TheMap.Fields[sx].SeenTile, dx, dy);
+				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].SeenTile, dx, dy);
 			}
 
 			++sx;
 			dx += TileSizeX;
 		}
-		sy += TheMap.Info.MapWidth;
+		sy += Map.Info.MapWidth;
 		dy += TileSizeY;
 	}
 }

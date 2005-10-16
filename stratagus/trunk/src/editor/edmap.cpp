@@ -100,16 +100,16 @@ static unsigned QuadFromTile(int x, int y)
 	//
 	// find the abstact tile number
 	//
-	tile = TheMap.Fields[y * TheMap.Info.MapWidth + x].Tile;
-	for (i = 0; i < TheMap.Tileset.NumTiles; ++i) {
-		if (tile == TheMap.Tileset.Table[i]) {
+	tile = Map.Fields[y * Map.Info.MapWidth + x].Tile;
+	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
+		if (tile == Map.Tileset.Table[i]) {
 			break;
 		}
 	}
-	Assert(i != TheMap.Tileset.NumTiles);
+	Assert(i != Map.Tileset.NumTiles);
 
-	base = TheMap.Tileset.Tiles[i].BaseTerrain;
-	mix = TheMap.Tileset.Tiles[i].MixTerrain;
+	base = Map.Tileset.Tiles[i].BaseTerrain;
+	mix = Map.Tileset.Tiles[i].MixTerrain;
 
 	if (!mix) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
@@ -173,24 +173,24 @@ static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 	// Find any mixed tile
 	//
 	l = INT_MAX;
-	for (i = 0; i < TheMap.Tileset.NumTiles;) {
+	for (i = 0; i < Map.Tileset.NumTiles;) {
 		// goal found.
-		if (base == TheMap.Tileset.Tiles[i].BaseTerrain &&
-				goal == TheMap.Tileset.Tiles[i].MixTerrain) {
+		if (base == Map.Tileset.Tiles[i].BaseTerrain &&
+				goal == Map.Tileset.Tiles[i].MixTerrain) {
 			*tile = i;
 			return length;
 		}
 		// goal found.
-		if (goal == TheMap.Tileset.Tiles[i].BaseTerrain &&
-				base == TheMap.Tileset.Tiles[i].MixTerrain) {
+		if (goal == Map.Tileset.Tiles[i].BaseTerrain &&
+				base == Map.Tileset.Tiles[i].MixTerrain) {
 			*tile = i;
 			return length;
 		}
 
 		// possible path found
-		if (base == TheMap.Tileset.Tiles[i].BaseTerrain &&
-				TheMap.Tileset.Tiles[i].MixTerrain) {
-			j = TheMap.Tileset.Tiles[i].MixTerrain;
+		if (base == Map.Tileset.Tiles[i].BaseTerrain &&
+				Map.Tileset.Tiles[i].MixTerrain) {
+			j = Map.Tileset.Tiles[i].MixTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
 				n = FindTilePath(j, goal, length + 1, marks, &n);
@@ -201,9 +201,9 @@ static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 				}
 			}
 		// possible path found
-		} else if (TheMap.Tileset.Tiles[i].BaseTerrain &&
-				base == TheMap.Tileset.Tiles[i].MixTerrain) {
-			j = TheMap.Tileset.Tiles[i].BaseTerrain;
+		} else if (Map.Tileset.Tiles[i].BaseTerrain &&
+				base == Map.Tileset.Tiles[i].MixTerrain) {
+			j = Map.Tileset.Tiles[i].BaseTerrain;
 			if (!marks[j]) {
 				marks[j] = j;
 				n = FindTilePath(j, goal, length + 1, marks, &n);
@@ -215,7 +215,7 @@ static int FindTilePath(int base, int goal, int length, char *marks, int *tile)
 			}
 		}
 		// Advance solid or mixed.
-		if (!TheMap.Tileset.Tiles[i].MixTerrain) {
+		if (!Map.Tileset.Tiles[i].MixTerrain) {
 			i += 16;
 		} else {
 			i += 256;
@@ -267,26 +267,26 @@ find_solid:
 			//
 			// Find the solid tile
 			//
-			for (i = 0; i < TheMap.Tileset.NumTiles;) {
-				if (type1 == TheMap.Tileset.Tiles[i].BaseTerrain &&
-						!TheMap.Tileset.Tiles[i].MixTerrain) {
+			for (i = 0; i < Map.Tileset.NumTiles;) {
+				if (type1 == Map.Tileset.Tiles[i].BaseTerrain &&
+						!Map.Tileset.Tiles[i].MixTerrain) {
 					break;
 				}
 				// Advance solid or mixed.
-				if (!TheMap.Tileset.Tiles[i].MixTerrain) {
+				if (!Map.Tileset.Tiles[i].MixTerrain) {
 					i += 16;
 				} else {
 					i += 256;
 				}
 			}
-			Assert(i < TheMap.Tileset.NumTiles);
+			Assert(i < Map.Tileset.NumTiles);
 			return i;
 		}
 	} else {
 		char *marks;
 
-		marks = new char[TheMap.Tileset.NumTerrainTypes];
-		memset(marks, 0, TheMap.Tileset.NumTerrainTypes);
+		marks = new char[Map.Tileset.NumTerrainTypes];
+		memset(marks, 0, Map.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		marks[type2] = type2;
 
@@ -341,13 +341,13 @@ find_solid:
 	//
 	// Need a mixed tile
 	//
-	for (i = 0; i < TheMap.Tileset.NumTiles;) {
-		if (type1 == TheMap.Tileset.Tiles[i].BaseTerrain &&
-				type2 == TheMap.Tileset.Tiles[i].MixTerrain) {
+	for (i = 0; i < Map.Tileset.NumTiles;) {
+		if (type1 == Map.Tileset.Tiles[i].BaseTerrain &&
+				type2 == Map.Tileset.Tiles[i].MixTerrain) {
 			break;
 		}
-		if (type2 == TheMap.Tileset.Tiles[i].BaseTerrain &&
-				type1 == TheMap.Tileset.Tiles[i].MixTerrain) {
+		if (type2 == Map.Tileset.Tiles[i].BaseTerrain &&
+				type1 == Map.Tileset.Tiles[i].MixTerrain) {
 			// Other mixed
 			type1 ^= type2;
 			type2 ^= type1;
@@ -355,28 +355,28 @@ find_solid:
 			break;
 		}
 		// Advance solid or mixed.
-		if (!TheMap.Tileset.Tiles[i].MixTerrain) {
+		if (!Map.Tileset.Tiles[i].MixTerrain) {
 			i += 16;
 		} else {
 			i += 256;
 		}
 	}
 
-	if (i >= TheMap.Tileset.NumTiles) {
+	if (i >= Map.Tileset.NumTiles) {
 		char* marks;
 
 		//
 		// Find the best tile path.
 		//
-		marks = new char[TheMap.Tileset.NumTerrainTypes];
-		memset(marks, 0, TheMap.Tileset.NumTerrainTypes);
+		marks = new char[Map.Tileset.NumTerrainTypes];
+		memset(marks, 0, Map.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
 			DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
 			delete[] marks;
 			goto find_solid;
 		}
-		if (type1 == TheMap.Tileset.Tiles[i].MixTerrain) {
+		if (type1 == Map.Tileset.Tiles[i].MixTerrain) {
 			// Other mixed
 			type1 ^= type2;
 			type2 ^= type1;
@@ -418,11 +418,11 @@ void ChangeTile(int x, int y, int tile)
 {
 	MapField *mf;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
-	Assert(tile >= 0 && tile < TheMap.Tileset.NumTiles);
+	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
+	Assert(tile >= 0 && tile < Map.Tileset.NumTiles);
 
-	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
-	mf->Tile = mf->SeenTile = TheMap.Tileset.Table[tile];
+	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf->Tile = mf->SeenTile = Map.Tileset.Table[tile];
 }
 
 #define DIR_UP     8 /// Go up allowed
@@ -442,19 +442,19 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 {
 	MapField *mf;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
+	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
 	ChangeTile(x, y, tile);
 
 	//
 	// Change the flags
 	//
-	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
+	mf = &Map.Fields[y * Map.Info.MapWidth + x];
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= TheMap.Tileset.FlagsTable[tile];
+	mf->Flags |= Map.Tileset.FlagsTable[tile];
 
 	UI.Minimap.UpdateSeenXY(x, y);
 	UI.Minimap.UpdateXY(x, y);
@@ -486,7 +486,7 @@ static void EditorTileChanged2(int x, int y, int d)
 	//
 	// Special case 1) Walls.
 	//
-	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
+	mf = &Map.Fields[y * Map.Info.MapWidth + x];
 	if (mf->Flags & MapFieldWall) {
 		MapSetWall(x, y, mf->Flags & MapFieldHuman);
 		return;
@@ -509,7 +509,7 @@ static void EditorTileChanged2(int x, int y, int d)
 			EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
 		}
 	}
-	if (d & DIR_DOWN && y < TheMap.Info.MapHeight - 1) {
+	if (d & DIR_DOWN && y < Map.Info.MapHeight - 1) {
 		//
 		// Insert into the top the new tile.
 		//
@@ -531,7 +531,7 @@ static void EditorTileChanged2(int x, int y, int d)
 			EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
 		}
 	}
-	if (d & DIR_RIGHT && x < TheMap.Info.MapWidth - 1) {
+	if (d & DIR_RIGHT && x < Map.Info.MapWidth - 1) {
 		//
 		// Insert into the right the new tile.
 		//
@@ -587,14 +587,14 @@ static void TileFill(int x, int y, int tile, int size)
 	if (ix < 0) {
 		ix = 0;
 	}
-	if (ax >= TheMap.Info.MapWidth) {
-		ax = TheMap.Info.MapWidth - 1;
+	if (ax >= Map.Info.MapWidth) {
+		ax = Map.Info.MapWidth - 1;
 	}
 	if (iy < 0) {
 		iy = 0;
 	}
-	if (ay >= TheMap.Info.MapHeight) {
-		ay = TheMap.Info.MapHeight - 1;
+	if (ay >= Map.Info.MapHeight) {
+		ay = Map.Info.MapHeight - 1;
 	}
 
 	for (x = ix; x <= ax; ++x) {
@@ -626,8 +626,8 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 	int ry;
 	int rz;
 
-	mx = TheMap.Info.MapWidth;
-	my = TheMap.Info.MapHeight;
+	mx = Map.Info.MapWidth;
+	my = Map.Info.MapHeight;
 
 	for (i = 0; i < count; ++i) {
 		rx = rand() % (mx / 2);
@@ -662,8 +662,8 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 	CUnitType *type;
 	CUnit *unit;
 
-	mx = TheMap.Info.MapWidth;
-	my = TheMap.Info.MapHeight;
+	mx = Map.Info.MapWidth;
+	my = Map.Info.MapHeight;
 	type = UnitTypeByIdent(unit_type);
 	tw = type->TileWidth;
 	th = type->TileHeight;
@@ -735,7 +735,7 @@ void EditorCreateRandomMap(void)
 {
 	int mz;
 
-	mz = TheMap.Info.MapWidth > TheMap.Info.MapHeight ? TheMap.Info.MapWidth : TheMap.Info.MapHeight;
+	mz = Map.Info.MapWidth > Map.Info.MapHeight ? Map.Info.MapWidth : Map.Info.MapHeight;
 
 	// make water-base
 	TileFill(0, 0, WATER_TILE, mz * 3);
