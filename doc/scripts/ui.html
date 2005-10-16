@@ -49,7 +49,6 @@
 <a href="#DefineButtonStyle">DefineButtonStyle</a>
 <a href="#DefineCheckboxStyle">DefineCheckboxStyle</a>
 <a href="#DefineCursor">DefineCursor</a>
-<a href="#DefineFontColors">DefineFontColors</a>
 <a href="#DefineMenu">DefineMenu</a>
 <a href="#DefineMenuGraphics">DefineMenuGraphics</a>
 <a href="#DefineMenuItem">DefineMenuItem</a>
@@ -412,45 +411,6 @@ DefineCursor({
   File = "ui/cursors/small_green_cross.png",
   HotSpot = {8,  8},
   Size = {18, 18}})
-</pre>
-
-<a name="DefineFontColor"></a>
-<h3>DefineFontColor("color-name", {r1, g1, b1, ..., r7, g7, b7})</h3>
-
-Define the font colors.<br>
-FIXME: write something here if you understand it... where are those colors used?
-What's the relation with the palette?
-
-<dl>
-<dt>"color-name"</dt>
-<dd>Name of the color.</dd>
-<dt>r#, g#, b#</dt>
-<dd>the color in rgb format.
-The colors are:
-<table>
-<tr><td>#0   </td><td>is background color</td></tr>
-<tr><td>#1   </td><td>is the light font color</td></tr>
-<tr><td>#2   </td><td>is the middle (main) font color</td></tr>
-<tr><td>#3   </td><td>is the dark font color</td></tr>
-<tr><td>#4   </td><td>is the font/shadow antialias color</td></tr>
-<tr><td>#5   </td><td>is the dark shadow color</td></tr>
-<tr><td>#6   </td><td>is the light shadow color</td></tr>
-<tr><td>#255 </td><td>is transparent</td></tr>
-</table>
-</dd>
-</ul>
-</dl>
-
-<h4>Example</h4>
-<pre>
-DefineFontColor("yellow",
-  {  252, 248, 240,	-- 246
-     244, 224,  32,	-- 200
-     208, 192,  28,	-- 199
-     168, 140,  16,	-- 197
-      92,  48,   0,	-- 192
-       0,   0,   0,	-- 239
-     108, 108, 108})	-- 104
 </pre>
 
 <a name="DefineMenu"></a>
