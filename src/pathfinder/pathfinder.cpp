@@ -299,7 +299,7 @@ static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 	size = 4 * (Map.Info.MapWidth + Map.Info.MapHeight);
 	points = new p[size];
 
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 	// Ignore all possible mobile units.
 	// FIXME: bad? mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
 

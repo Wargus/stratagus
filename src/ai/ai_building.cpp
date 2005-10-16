@@ -194,7 +194,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	matrix = CreateMatrix();
 	w = Map.Info.MapWidth + 2;
 
-	mask = UnitMovementMask(worker);
+	mask = worker->Type->MovementMask;
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 
@@ -335,7 +335,7 @@ static int AiFindHallPlace(const CUnit *worker, const CUnitType *type, int *dx, 
 	matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
-	mask = UnitMovementMask(worker);
+	mask = worker->Type->MovementMask;
 
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
@@ -500,7 +500,7 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, int
 	matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 
-	mask = UnitMovementMask(worker);
+	mask = worker->Type->MovementMask;
 
 	//
 	// Pop a point from stack, push all neightbors which could be entered.

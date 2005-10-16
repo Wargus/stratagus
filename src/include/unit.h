@@ -694,6 +694,8 @@ public:
 	bool IsSharedVision(const CUnit *x) const;
 	bool IsTeamed(const CPlayer *x) const;
 	bool IsTeamed(const CUnit *x) const;
+
+	bool IsUnusable() const;
 };
 
 #define NoUnitP (CUnit *)0         /// return value: for no unit found
@@ -704,35 +706,9 @@ public:
 #define MAX_UNIT_SLOTS 65535     /// Maximal number of used slots
 
 /**
-**  Returns true, if unit is unusable. (for attacking,...)
-**  @todo look if correct used (UnitActionBuilt is no problem if attacked)?
-*/
-#define UnitUnusable(unit) \
-	((unit)->Removed || (unit)->Orders[0]->Action == UnitActionDie || \
-	  (unit)->Orders[0]->Action == UnitActionBuilt || (unit)->Destroyed)
-
-/**
 **  Returns unit number (unique to this unit)
 */
 #define UnitNumber(unit) ((unit)->Slot)
-
-/**
-**  Return the unit type movement mask.
-**
-**  @param type Unit type pointer.
-**
-**  @return Movement mask of unit type.
-*/
-#define TypeMovementMask(type) ((type)->MovementMask)
-
-/**
-**  Return units movement mask.
-**
-**  @param unit Unit pointer.
-**
-**  @return Movement mask of unit.
-*/
-#define UnitMovementMask(unit) ((unit)->Type->MovementMask)
 
 /**
 ** How many groups supported

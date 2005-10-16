@@ -907,7 +907,7 @@ static int CclMoveUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	heading = SyncRand() % 256;
-	mask = UnitMovementMask(unit);
+	mask = unit->Type->MovementMask;
 	if (CheckedCanMoveToMask(ix, iy, mask)) {
 		unit->Place(ix, iy);
 	} else {
@@ -967,7 +967,7 @@ static int CclCreateUnit(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		mask = UnitMovementMask(unit);
+		mask = unit->Type->MovementMask;
 		if (CheckedCanMoveToMask(ix, iy, mask)) {
 			unit->Place(ix, iy);
 		} else {

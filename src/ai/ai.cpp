@@ -1275,7 +1275,7 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 	for (i = 0; i < NumUnits; ++i) {
 		blocker = Units[i];
 
-		if (UnitUnusable(blocker)) {
+		if (blocker->IsUnusable()) {
 			continue;
 		}
 

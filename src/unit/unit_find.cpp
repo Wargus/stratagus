@@ -118,7 +118,7 @@ int FindUnitsByType(const CUnitType *type, CUnit **table)
 
 	for (num = i = 0; i < NumUnits; ++i) {
 		unit = Units[i];
-		if (unit->Type == type && !UnitUnusable(unit)) {
+		if (unit->Type == type && !unit->IsUnusable()) {
 			table[num++] = unit;
 		}
 	}
@@ -148,7 +148,7 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 	for (num = 0, i = 0; i < nunits && typecount; ++i) {
 		unit = player->Units[i];
 		if (unit->Type == type) {
-			if (!UnitUnusable(unit)) {
+			if (!unit->IsUnusable()) {
 				table[num++] = unit;
 			}
 			--typecount;
@@ -251,7 +251,7 @@ CUnit *ResourceOnMap(int tx, int ty, int resource)
 
 	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
-		if (UnitUnusable(table[i]) || !table[i]->Type->CanHarvest ||
+		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvest ||
 				table[i]->ResourcesHeld == 0) {
 			continue;
 		}
@@ -279,7 +279,7 @@ CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
 
 	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
-		if (UnitUnusable(table[i])) {
+		if (table[i]->IsUnusable()) {
 			continue;
 		}
 		if (table[i]->Type->CanStore[resource]) {
