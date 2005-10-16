@@ -86,7 +86,7 @@ static int MoveToResource(CUnit *unit)
 		y = unit->Orders[0]->Y;
 		// Wood gone, look somewhere else.
 		if ((!ForestOnMap(x, y)) && (!unit->IX) && (!unit->IY)) {
-			if (!FindTerrainType(UnitMovementMask(unit), MapFieldForest, 0, 16,
+			if (!FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 16,
 					unit->Player, unit->Orders[0]->X, unit->Orders[0]->Y, &x, &y)) {
 				// no wood in range
 				return -1;
@@ -98,7 +98,7 @@ static int MoveToResource(CUnit *unit)
 		}
 		switch (DoActionMove(unit)) {
 			case PF_UNREACHABLE:
-				if (FindTerrainType(UnitMovementMask(unit), MapFieldForest, 0, 9999,
+				if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 9999,
 						unit->Player, unit->X, unit->Y, &x, &y)) {
 					unit->Orders[0]->X = x;
 					unit->Orders[0]->Y = y;
@@ -644,7 +644,7 @@ static int WaitInDepot(CUnit *unit)
 	}
 	// Range hardcoded. don't stray too far though
 	if (resinfo->TerrainHarvester) {
-		if (FindTerrainType(UnitMovementMask(unit), MapFieldForest, 0, 10,
+		if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 10,
 				unit->Player, x, y, &x, &y)) {
 			DropOutNearest(unit, x, y, depot->Type->TileWidth, depot->Type->TileHeight);
 			unit->Orders[0]->X = x;

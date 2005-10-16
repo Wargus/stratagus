@@ -781,7 +781,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 		//
 		// Code for terrain harvesters. Search for piece of terrain to mine.
 		//
-		if (FindTerrainType(UnitMovementMask(unit), MapFieldForest, 0, 1000,
+		if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 1000,
 				unit->Player, unit->X, unit->Y, &forestx, &foresty)) {
 			CommandResourceLoc(unit, forestx, foresty, FlushCommands);
 			return 1;
