@@ -82,6 +82,7 @@ static int IconHeight;                      /// Icon height in panels
 
 char EditorMapLoaded;  /// Map loaded in editor
 int TerrainEditable = 1;  /// Is the terrain editable ?  Defaults to yes.
+int EditorWriteCompressedMaps = 1;
 
 EditorStateType EditorState;                /// Current editor state.
 EditorRunningType EditorRunning;  /// Running State of editor.
