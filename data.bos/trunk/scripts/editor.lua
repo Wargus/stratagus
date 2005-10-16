@@ -74,6 +74,7 @@ DefineEditorUnitTypes({
    "unit-rtank",
    "unit-tank",
    "unit-artil",
+   "unit-chopper",
 
    "unit-gold-mine",
    "unit-tree",
