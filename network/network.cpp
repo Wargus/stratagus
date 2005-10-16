@@ -948,7 +948,7 @@ void NetworkEvent(void)
 				// Fall through!
 			default:
 				if (UnitSlots[ntohs(nc->Unit)]->Player->Index == player ||
-					PlayersTeamed(player, UnitSlots[ntohs(nc->Unit)]->Player->Index)) {
+						Players[player].IsTeamed(UnitSlots[ntohs(nc->Unit)])) {
 					allowed = 1;
 				} else {
 					allowed = 0;

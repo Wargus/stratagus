@@ -398,6 +398,8 @@ public:
 	bool IsAllied(const CUnit *x) const;
 	bool IsSharedVision(const CPlayer *x) const;
 	bool IsSharedVision(const CUnit *x) const;
+	bool IsTeamed(const CPlayer *x) const;
+	bool IsTeamed(const CUnit *x) const;
 };
 
 /**
@@ -536,18 +538,9 @@ extern void DebugPlayers(void);
 	/// register ccl features
 extern void PlayerCclRegister(void);
 
-	/// Two players share vision
-#define PlayersShareVision(a, b) \
-	((Players[a].SharedVision & (1 << (b))) && (Players[b].SharedVision & (1 << (a))))
-	/// Players are on the same team (FIXME: use team)
-#define PlayersTeamed(a, b) \
-	(Players[a].Team == Players[b].Team)
-	/// Players are allied together
-#define PlayersAllied(a, b) \
-	((Players[a].Allied & (1 << (b))) && (Players[b].Allied & (1 << (a))))
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) \
-	((player) == ThisPlayer || PlayersTeamed(ThisPlayer->Index, (player)->Index))
+	((player) == ThisPlayer || ThisPlayer->IsTeamed((player)))
 
 //@}
 

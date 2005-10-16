@@ -65,15 +65,15 @@
 #include "construct.h"
 
 /*----------------------------------------------------------------------------
-  -- Variables
-  ----------------------------------------------------------------------------*/
+--  Variables
+----------------------------------------------------------------------------*/
 
-CUnit *UnitSlots[MAX_UNIT_SLOTS];          /// All possible units
+CUnit *UnitSlots[MAX_UNIT_SLOTS];         /// All possible units
 unsigned int UnitSlotFree;                /// First free unit slot
-CUnit *ReleasedHead;                       /// List of released units.
-CUnit *ReleasedTail;                       /// List tail of released units.
+CUnit *ReleasedHead;                      /// List of released units.
+CUnit *ReleasedTail;                      /// List tail of released units.
 
-CUnit *Units[MAX_UNIT_SLOTS];              /// Array of used slots
+CUnit *Units[MAX_UNIT_SLOTS];             /// Array of used slots
 int NumUnits;                             /// Number of slots used
 
 int XpDamage;                             /// Hit point regeneration for all units
@@ -1148,7 +1148,7 @@ void UnitsOnTileMarkSeen(const CPlayer* player, int x, int y, int cloak)
 		//  It will be able to see the unit after the Unit->VisCount ++
 		//
 		for (p = 0; p < PlayerMax; ++p) {
-			if (PlayersShareVision(player->Index, p) || (p == player->Index)) {
+			if (player->IsSharedVision(&Players[p]) || (p == player->Index)) {
 				if (!unit->IsVisible(Players + p)) {
 					UnitGoesOutOfFog(unit, Players + p);
 				}
@@ -1192,7 +1192,7 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
 		//
 		if (!unit->VisCount[p]) {
 			for (p = 0; p < PlayerMax; ++p) {
-				if (PlayersShareVision(player->Index, p) || p == player->Index) {
+				if (player->IsSharedVision(&Players[p]) || p == player->Index) {
 					if (!unit->IsVisible(Players + p)) {
 						UnitGoesUnderFog(unit, Players + p);
 					}
@@ -1281,15 +1281,11 @@ void UnitCountSeen(CUnit *unit)
 */
 bool CUnit::IsVisible(const CPlayer *player) const
 {
-	int cp;
-
-	// Current player.
-	cp = player->Index;
-	if (VisCount[cp]) {
+	if (VisCount[player->Index]) {
 		return true;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (PlayersShareVision(p, cp)) {
+		if (player->IsSharedVision(&Players[p])) {
 			if (VisCount[p]) {
 				return true;
 			}
@@ -1312,7 +1308,7 @@ bool CUnit::IsVisibleAsGoal(const CPlayer *player) const
 	// Invisibility
 	//
 	if (Variable[INVISIBLE_INDEX].Value && (player != Player) &&
-			(!PlayersShareVision(player->Index, Player->Index))) {
+			(!player->IsSharedVision(Player))) {
 		return false;
 	}
 	if (IsVisible(player) || player->Type == PlayerComputer ||
@@ -1339,7 +1335,7 @@ bool CUnit::IsVisibleOnMap(const CPlayer *player) const
 	// Invisible units.
 	//
 	if (Variable[INVISIBLE_INDEX].Value && player != Player &&
-			!PlayersShareVision(player->Index, Player->Index)) {
+			!player->IsSharedVision(Player)) {
 		return false;
 	}
 
@@ -1361,7 +1357,7 @@ bool CUnit::IsVisibleOnMinimap() const
 	// Invisible units.
 	//
 	if (Variable[INVISIBLE_INDEX].Value && (ThisPlayer != Player) &&
-			(!PlayersShareVision(ThisPlayer->Index, Player->Index))) {
+			(!ThisPlayer->IsSharedVision(Player))) {
 		return false;
 	}
 	if (IsVisible(ThisPlayer) || ReplayRevealMap ||
@@ -1407,7 +1403,7 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 
 	// Those are never ever visible.
 	if (Variable[INVISIBLE_INDEX].Value && ThisPlayer != Player &&
-			!PlayersShareVision(ThisPlayer->Index, Player->Index)) {
+			!ThisPlayer->IsSharedVision(Player)) {
 		return false;
 	}
 
@@ -3362,7 +3358,7 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 	}
 	// Can transport only allied unit.
 	// FIXME : should be parametrable.
-	if (!PlayersTeamed(transporter->Player->Index, unit->Player->Index)) {
+	if (!transporter->IsTeamed(unit)) {
 		return 0;
 	}
 	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
@@ -3383,7 +3379,7 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 */
 bool CUnit::IsEnemy(const CPlayer *x) const
 {
-	return (Player->Enemy & (1 << x->Index)) != 0;
+	return (this->Player->Enemy & (1 << x->Index)) != 0;
 }
 
 /**
@@ -3403,7 +3399,7 @@ bool CUnit::IsEnemy(const CUnit *x) const
 */
 bool CUnit::IsAllied(const CPlayer *x) const
 {
-	return (Player->Allied & (1 << x->Index)) != 0;
+	return (this->Player->Allied & (1 << x->Index)) != 0;
 }
 
 /**
@@ -3423,8 +3419,8 @@ bool CUnit::IsAllied(const CUnit *x) const
 */
 bool CUnit::IsSharedVision(const CPlayer *x) const
 {
-	return (Player->SharedVision & (1 << x->Index)) != 0 &&
-		(x->SharedVision & (1 << Player->Index)) != 0;
+	return (this->Player->SharedVision & (1 << x->Index)) != 0 &&
+		(x->SharedVision & (1 << this->Player->Index)) != 0;
 }
 
 /**
@@ -3435,6 +3431,27 @@ bool CUnit::IsSharedVision(const CPlayer *x) const
 bool CUnit::IsSharedVision(const CUnit *x) const
 {
 	return IsSharedVision(x->Player);
+}
+
+/**
+**  Check if the player is on the same team
+**
+**  @param x  Player to check
+*/
+bool CUnit::IsTeamed(const CPlayer *x) const
+{
+	return (this->Player->SharedVision & (1 << x->Index)) != 0 &&
+		(x->SharedVision & (1 << this->Player->Index)) != 0;
+}
+
+/**
+**  Check if the unit is on the same team
+**
+**  @param x  Unit to check
+*/
+bool CUnit::IsTeamed(const CUnit *x) const
+{
+	return this->IsTeamed(x->Player);
 }
 
 /*----------------------------------------------------------------------------

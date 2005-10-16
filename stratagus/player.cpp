@@ -458,7 +458,7 @@ void CPlayer::SetSide(int side)
 	Assert(side >= 0 && side < PlayerRaces.Count);
 	Assert(PlayerRaces.Name[side]);
 
-	Race = side;
+	this->Race = side;
 }
 
 /**
@@ -468,8 +468,8 @@ void CPlayer::SetSide(int side)
 */
 void CPlayer::SetName(const char *name)
 {
-	delete[] Name;
-	Name = new_strdup(name);
+	delete[] this->Name;
+	this->Name = new_strdup(name);
 }
 
 /*----------------------------------------------------------------------------
@@ -484,7 +484,7 @@ void CPlayer::SetName(const char *name)
 */
 void CPlayer::SetResource(int resource, int value)
 {
-	Resources[resource] = value;
+	this->Resources[resource] = value;
 }
 
 /**
@@ -502,25 +502,25 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 	//  Check game limits.
 	//
 	if (NumUnits < UnitMax) {
-		if (type->Building && NumBuildings >= BuildingLimit) {
+		if (type->Building && this->NumBuildings >= this->BuildingLimit) {
 			Notify(NotifyYellow, -1, -1, "Building Limit Reached");
 			return -1;
 		}
-		if (!type->Building && (TotalNumUnits - NumBuildings) >= UnitLimit) {
+		if (!type->Building && (this->TotalNumUnits - this->NumBuildings) >= this->UnitLimit) {
 			Notify(NotifyYellow, -1, -1, "Unit Limit Reached");
 			return -2;
 		}
-		if (Demand + type->Demand > Supply && type->Demand) {
+		if (this->Demand + type->Demand > this->Supply && type->Demand) {
 			Notify(NotifyYellow, -1, -1, "Insufficient Supply, increase Supply.");
 			return -3;
 		}
-		if (TotalNumUnits >= TotalUnitLimit) {
+		if (this->TotalNumUnits >= this->TotalUnitLimit) {
 			Notify(NotifyYellow, -1, -1, "Total Unit Limit Reached");
 			return -4;
 		}
-		if (UnitTypesCount[type->Slot] >=  Allow.Units[type->Slot]) {
-			Notify(NotifyYellow, -1, -1, "Limit of %d Reached for this unit type",
-				Allow.Units[type->Slot]);
+		if (this->UnitTypesCount[type->Slot] >=  this->Allow.Units[type->Slot]) {
+			Notify(NotifyYellow, -1, -1, "Limit of %d reached for this unit type",
+				this->Allow.Units[type->Slot]);
 			return -6;
 		}
 		return 1;
@@ -549,7 +549,7 @@ int CPlayer::CheckCosts(const int *costs) const
 
 	err = 0;
 	for (i = 1; i < MaxCosts; ++i) {
-		if (Resources[i] < costs[i]) {
+		if (this->Resources[i] < costs[i]) {
 			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
 				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
 
@@ -569,7 +569,7 @@ int CPlayer::CheckCosts(const int *costs) const
 */
 int CPlayer::CheckUnitType(const CUnitType *type) const
 {
-	return CheckCosts(type->Stats[Index].Costs);
+	return this->CheckCosts(type->Stats[this->Index].Costs);
 }
 
 /**
@@ -580,7 +580,7 @@ int CPlayer::CheckUnitType(const CUnitType *type) const
 void CPlayer::AddCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		Resources[i] += costs[i];
+		this->Resources[i] += costs[i];
 	}
 }
 
@@ -592,7 +592,7 @@ void CPlayer::AddCosts(const int *costs)
 void CPlayer::AddUnitType(const CUnitType *type)
 {
 	// FIXME: a player could make money by upgrading and than cancel
-	AddCosts(type->Stats[Index].Costs);
+	AddCosts(type->Stats[this->Index].Costs);
 }
 
 /**
@@ -604,7 +604,7 @@ void CPlayer::AddUnitType(const CUnitType *type)
 void CPlayer::AddCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		Resources[i] += costs[i] * factor / 100;
+		this->Resources[i] += costs[i] * factor / 100;
 	}
 }
 
@@ -616,7 +616,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 void CPlayer::SubCosts(const int *costs)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		Resources[i] -= costs[i];
+		this->Resources[i] -= costs[i];
 	}
 }
 
@@ -627,7 +627,7 @@ void CPlayer::SubCosts(const int *costs)
 */
 void CPlayer::SubUnitType(const CUnitType *type)
 {
-	SubCosts(type->Stats[Index].Costs);
+	this->SubCosts(type->Stats[this->Index].Costs);
 }
 
 /**
@@ -639,7 +639,7 @@ void CPlayer::SubUnitType(const CUnitType *type)
 void CPlayer::SubCostsFactor(const int *costs, int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
-		Resources[i] -= costs[i] * 100 / factor;
+		this->Resources[i] -= costs[i] * 100 / factor;
 	}
 }
 
@@ -652,7 +652,7 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 */
 int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 {
-	return UnitTypesCount[type->Slot];
+	return this->UnitTypesCount[type->Slot];
 }
 
 /**
@@ -666,7 +666,7 @@ int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 */
 int CPlayer::HaveUnitTypeByIdent(const char *ident) const
 {
-	return UnitTypesCount[UnitTypeByIdent(ident)->Slot];
+	return this->UnitTypesCount[UnitTypeByIdent(ident)->Slot];
 }
 
 /**
@@ -810,7 +810,7 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 	va_list va;
 
 	// Notify me, and my TEAM members
-	if (this != ThisPlayer && !PlayersTeamed(ThisPlayer->Index, Index)) {
+	if (this != ThisPlayer && !this->IsTeamed(ThisPlayer)) {
 		return;
 	}
 
@@ -835,7 +835,7 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 */
 bool CPlayer::IsEnemy(const CPlayer *x) const
 {
-	return (Enemy & (1 << x->Index)) != 0;
+	return (this->Enemy & (1 << x->Index)) != 0;
 }
 
 /**
@@ -843,7 +843,7 @@ bool CPlayer::IsEnemy(const CPlayer *x) const
 */
 bool CPlayer::IsEnemy(const CUnit *x) const
 {
-	return IsEnemy(x->Player);
+	return this->IsEnemy(x->Player);
 }
 
 /**
@@ -851,7 +851,7 @@ bool CPlayer::IsEnemy(const CUnit *x) const
 */
 bool CPlayer::IsAllied(const CPlayer *x) const
 {
-	return (Allied & (1 << x->Index)) != 0;
+	return (this->Allied & (1 << x->Index)) != 0;
 }
 
 /**
@@ -859,7 +859,7 @@ bool CPlayer::IsAllied(const CPlayer *x) const
 */
 bool CPlayer::IsAllied(const CUnit *x) const
 {
-	return IsAllied(x->Player);
+	return this->IsAllied(x->Player);
 }
 
 /**
@@ -867,8 +867,8 @@ bool CPlayer::IsAllied(const CUnit *x) const
 */
 bool CPlayer::IsSharedVision(const CPlayer *x) const
 {
-	return (SharedVision & (1 << x->Index)) != 0 &&
-		(x->SharedVision & (1 << Index)) != 0;
+	return (this->SharedVision & (1 << x->Index)) != 0 &&
+		(x->SharedVision & (1 << this->Index)) != 0;
 }
 
 /**
@@ -876,8 +876,23 @@ bool CPlayer::IsSharedVision(const CPlayer *x) const
 */
 bool CPlayer::IsSharedVision(const CUnit *x) const
 {
-	return IsSharedVision(x->Player);
+	return this->IsSharedVision(x->Player);
 }
 
+/**
+**  Check if the player is teamed
+*/
+bool CPlayer::IsTeamed(const CPlayer *x) const
+{
+	return this->Team == x->Team;
+}
+
+/**
+**  Check if the unit is teamed
+*/
+bool CPlayer::IsTeamed(const CUnit *x) const
+{
+	return this->IsTeamed(x->Player);
+}
 
 //@}
