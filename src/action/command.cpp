@@ -1243,13 +1243,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 	//
 	// Compute Before and after.
 	//
-	before = PlayersShareVision(player, opponent);
+	before = Players[player].IsSharedVision(&Players[opponent]);
 	if (state == false) {
 		Players[player].SharedVision &= ~(1 << opponent);
 	} else {
 		Players[player].SharedVision |= (1 << opponent);
 	}
-	after = PlayersShareVision(player, opponent);
+	after = Players[player].IsSharedVision(&Players[opponent]);
 
 	if (before && !after) {
 		//

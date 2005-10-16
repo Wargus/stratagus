@@ -1306,8 +1306,8 @@ void CInfoPanel::Draw(void)
 		} else {
 			// FIXME: not correct for enemy's units
 			if (Selected[0]->Player == ThisPlayer ||
-					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index) ||
-					PlayersAllied(ThisPlayer->Index, Selected[0]->Player->Index) ||
+					ThisPlayer->IsTeamed(Selected[0]) ||
+					ThisPlayer->IsAllied(Selected[0]) ||
 					ReplayRevealMap) {
 				if (Selected[0]->Orders[0]->Action == UnitActionBuilt ||
 					Selected[0]->Orders[0]->Action == UnitActionResearch ||

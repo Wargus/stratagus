@@ -668,8 +668,7 @@ void CButtonPanel::Update(void)
 
 	unit = Selected[0];
 	// foreign unit
-	if (unit->Player != ThisPlayer &&
-			!PlayersTeamed(ThisPlayer->Index, unit->Player->Index)) {
+	if (unit->Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
 		return;
 	}
 
@@ -712,7 +711,7 @@ void CButtonPanel::DoClicked(int button)
 	//  or Not Teamed
 	//
 	if (CurrentButtons[button].Pos == -1 ||
-			!PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
+			!ThisPlayer->IsTeamed(Selected[0])) {
 		return;
 	}
 

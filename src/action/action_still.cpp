@@ -76,7 +76,7 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 		unit->Y + unit->Type->TileHeight + range,
 		table);
 	for (i = 0; i < n; ++i) {
-		if (PlayersTeamed(table[i]->Player->Index, unit->Player->Index) &&
+		if (table[i]->IsTeamed(unit) &&
 				table[i]->Type->RepairHP &&
 				table[i]->Variable[HP_INDEX].Value < table[i]->Variable[HP_INDEX].Max &&
 				table[i]->IsVisibleAsGoal(unit->Player)) {
