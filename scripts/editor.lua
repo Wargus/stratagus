@@ -99,5 +99,6 @@ DefineEditorUnitTypes({
    "unit-crystal-field11",   
    "unit-crystal-field12",
    "unit-crystal-field13",
+   "unit-antharus"
 })
 
