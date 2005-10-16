@@ -49,6 +49,7 @@ extern EditorRunningType EditorRunning;
 
 extern char EditorMapLoaded;  /// Map loaded in editor
 extern int TerrainEditable;  /// Is the terrain editable ?
+extern int EditorWriteCompressedMaps;
 
 	/// Current editor state type.
 typedef enum _editor_state_type_ {

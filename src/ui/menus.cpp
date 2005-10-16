@@ -4923,7 +4923,11 @@ int EditorSaveMenu(void)
 	ProcessMenu("menu-editor-save", 1);
 
 	if (!EditorCancelled) {
-		sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
+		if (EditorWriteCompressedMaps && !strstr(path, ".gz")) {
+			sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
+		} else {
+			sprintf(path, "%s/%s", ScenSelectPath, ScenSelectFileName);
+		}
 		if (EditorSaveMap(path) == -1) {
 			ret = -1;
 		} else {
