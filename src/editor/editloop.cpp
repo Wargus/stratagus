@@ -188,7 +188,7 @@ int GetTileNumber(int basic, int random, int filler)
 */
 void EditTile(int x, int y, int tile)
 {
-	MapField *mf;
+	CMapField *mf;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
@@ -1966,7 +1966,7 @@ static void CreateEditor(void)
 			}
 		}
 
-		Map.Fields = new MapField[Map.Info.MapWidth * Map.Info.MapHeight];
+		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
 		memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
 		InitUnitCache();

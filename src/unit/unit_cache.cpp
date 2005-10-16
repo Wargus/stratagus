@@ -56,7 +56,7 @@ void UnitCacheInsert(CUnit *unit)
 {
 	int i;
 	int j;
-	MapField *mf;
+	CMapField *mf;
 
 	Assert(!unit->Removed);
 
@@ -77,7 +77,7 @@ void UnitCacheRemove(CUnit *unit)
 {
 	int i;
 	int j;
-	MapField *mf;
+	CMapField *mf;
 
 	Assert(!unit->Removed);
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
@@ -109,7 +109,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 	int i;
 	int j;
 	int n;
-	MapField *mf;
+	CMapField *mf;
 
 	// Optimize small searches.
 	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
@@ -174,7 +174,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 int UnitCacheOnTile(int x, int y, CUnit **table)
 {
 	int n;
-	MapField *mf;
+	CMapField *mf;
 
 	mf = &Map.Fields[y * Map.Info.MapWidth + x];
 	//

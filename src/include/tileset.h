@@ -77,7 +77,7 @@
 **  CTileset::FlagsTable
 **
 **      Table of the tile flags used by the editor.
-**      @see MapField::Flags
+**      @see CMapField::Flags
 **
 **  CTileset::BasicNameTable
 **

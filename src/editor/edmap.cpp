@@ -416,7 +416,7 @@ find_solid:
 */
 void ChangeTile(int x, int y, int tile)
 {
-	MapField *mf;
+	CMapField *mf;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 	Assert(tile >= 0 && tile < Map.Tileset.NumTiles);
@@ -440,7 +440,7 @@ void ChangeTile(int x, int y, int tile)
 */
 static void EditorChangeTile(int x, int y, int tile, int d)
 {
-	MapField *mf;
+	CMapField *mf;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
@@ -475,7 +475,7 @@ static void EditorTileChanged2(int x, int y, int d)
 	unsigned q2;
 	unsigned u;
 	int tile;
-	MapField *mf;
+	CMapField *mf;
 
 	quad = QuadFromTile(x, y);
 

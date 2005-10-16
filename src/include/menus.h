@@ -121,7 +121,7 @@ typedef int MenuButtonId;
 #define MAX_GAME_SPEED 250
 
 class ButtonStyle;
-class MapInfo;
+class CMapInfo;
 class CMap;
 class CGraphic;
 struct _menuitem_;

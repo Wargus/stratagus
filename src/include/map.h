@@ -42,28 +42,28 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class MapField map.h
+**  @class CMapField map.h
 **
 **  \#include "map.h"
 **
-**  This structure contains all information about a field on map.
+**  This class contains all information about a field on map.
 **  It contains its look, properties and content.
 **
-**  The map-field structure members:
+**  The map-field class members:
 **
-**  MapField::Tile
+**  CMapField::Tile
 **
 **    Tile is number defining the graphic image display for the
 **    map-field. 65535 different tiles are supported. A tile is
 **    currently 32x32 pixels. In the future is planned to support
 **    animated tiles.
 **
-**  MapField::SeenTile
+**  CMapField::SeenTile
 **
 **    This is the tile number, that the player sitting on the computer
 **    currently knows. Idea: Can be uses for illusions.
 **
-**  MapField::Flags
+**  CMapField::Flags
 **
 **    Contains special information of that tile. What units are
 **    on this field, what units could be placed on this field.
@@ -91,26 +91,26 @@
 **    Note: We want to add support for more unit-types like under
 **      ground units.
 **
-**  MapField::Value
+**  CMapField::Value
 **
 **    Extra value for each tile. This currently only used for
 **    walls, contains the remaining hit points of the wall and
 **    for forest, contains the frames until they grow.
 **
-**  MapField::Visible[]
+**  CMapField::Visible[]
 **
 **    Counter how many units of the player can see this field. 0 the
 **    field is not explored, 1 explored, n-1 unit see it. Currently
 **    no more than 253 units can see a field.
 **
-**  MapField::Here MapField::Here::Units
+**  CMapField::Here CMapField::Here::Units
 **
 **    Contains a list of all units currently on this field.
 **    Note: currently units are only inserted at the insert point.
 **    This means units of the size of 2x2 fields are inserted at the
 **    top and right most map coordinate.
 **
-**  MapField::Region
+**  CMapField::Region
 **
 **    Number of the region to that the tile belongs.
 */
@@ -151,7 +151,7 @@
 **  CMap::Info
 **
 **    Descriptive information of the map.
-**    @see ::MapInfo
+**    @see ::CMapInfo
 **    @todo This structure contains duplicate informations of the map.
 */
 
@@ -189,9 +189,9 @@ class CUnitType;
 ----------------------------------------------------------------------------*/
 
 	/// Describes a field of the map
-class MapField {
+class CMapField {
 public:
-	MapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0),
+	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0),
 		UnitCache()
 	{
 		memset(Visible, 0, sizeof(Visible));
@@ -212,7 +212,7 @@ public:
 	unsigned char Radar[PlayerMax];    /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming Capabilities.
 	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
-} ;
+};
 
 // Not used until now:
 #define MapFieldSpeedMask 0x0007  /// Move faster on this tile
@@ -241,7 +241,7 @@ public:
 /**
 **  Get info about a map.
 */
-class MapInfo {
+class CMapInfo {
 public:
 	char *Description;     /// Map description
 	char *Filename;        /// Map filename
@@ -259,17 +259,17 @@ public:
 	/// Describes the wold map
 class CMap {
 public:
-	MapField *Fields;              /// fields on map
+	CMapField *Fields;              /// fields on map
 	unsigned *Visible[PlayerMax];  /// visible bit-field
 
-	bool NoFogOfWar;          /// fog of war disabled
+	bool NoFogOfWar;           /// fog of war disabled
 
 	CTileset Tileset;          /// tileset data
 	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     /// graphic for all the tiles
 	CGraphic *FogGraphic;      /// graphic for fog of war
 
-	MapInfo Info;             /// descriptive information
+	CMapInfo Info;             /// descriptive information
 };
 
 /*----------------------------------------------------------------------------
@@ -393,7 +393,7 @@ extern void CleanMap(void);
 	/// Load map presentation
 extern void LoadStratagusMapInfo(const char *mapname);
 	/// Release info for a map
-extern void FreeMapInfo(MapInfo *info);
+extern void FreeMapInfo(CMapInfo *info);
 
 	/// Mark a tile as seen by the player
 extern void MapMarkSeenTile(int x, int y);
@@ -401,7 +401,7 @@ extern void MapMarkSeenTile(int x, int y);
 extern void RevealMap(void);
 
 	/// Returns true, if the tile field is empty
-extern int IsMapFieldEmpty(int x, int y);
+extern int IsCMapFieldEmpty(int x, int y);
 	/// Returns true, if water on the map tile field
 extern int WaterOnMap(int x, int y);
 	/// Returns true, if coast on the map tile field
@@ -479,7 +479,7 @@ void MapUnmarkUnitSight(CUnit *unit);
 #define IsMapFieldExplored(player, x, y) \
 	(IsTileVisible((player), (x), (y)))
 
-	/// Check if a field for the user is visibile
+	/// Check if a field for the user is visible
 #define IsMapFieldVisible(player, x, y) \
 	(IsTileVisible((player), (x), (y)) > 1)
 

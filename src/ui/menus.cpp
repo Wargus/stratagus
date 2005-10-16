@@ -428,14 +428,14 @@ static char *mgptsoptions[] = {
 **
 **  @return copy of orig.
 */
-static MapInfo* DuplicateMapInfo(const MapInfo *orig)
+static CMapInfo *DuplicateMapInfo(const CMapInfo *orig)
 {
-	MapInfo* dest;
+	CMapInfo *dest;
 
 	Assert(orig);
 
-	dest = new MapInfo;
-	memcpy(dest, orig, sizeof(MapInfo));
+	dest = new CMapInfo;
+	memcpy(dest, orig, sizeof(CMapInfo));
 	if (orig->Description) {
 		dest->Description = new_strdup(orig->Description);
 	}
@@ -541,7 +541,7 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	}
 
 	if (strcasestr(filename, ".smp")) {
-		MapInfo *info;
+		CMapInfo *info;
 
 		info = DuplicateMapInfo(&Map.Info);
 		FreeMapInfo(&Map.Info);
@@ -683,7 +683,7 @@ static char *LBRetrieve(const Menuitem *mi, int i)
 static char *LBRetrieveAndInfo(const Menuitem *mi, int i)
 {
 	std::vector<FileList> *fl;
-	MapInfo *info;
+	CMapInfo *info;
 
 	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
