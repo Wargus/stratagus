@@ -98,7 +98,7 @@ void MapFixSeenWallTile(int x, int y)
 {
 	int t;
 	int tile;
-	MapField* mf;
+	CMapField *mf;
 
 	//  Outside of map or no wall.
 	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
@@ -191,7 +191,7 @@ void MapFixSeenWallNeighbors(int x, int y)
 void MapFixWallTile(int x, int y)
 {
 	int tile;
-	MapField* mf;
+	CMapField *mf;
 	int t;
 
 	//  Outside of map or no wall.
@@ -289,7 +289,7 @@ static void MapFixWallNeighbors(int x, int y)
 */
 void MapRemoveWall(unsigned x, unsigned y)
 {
-	MapField* mf;
+	CMapField *mf;
 
 	mf = Map.Fields + x + y * Map.Info.MapWidth;
 	// FIXME: support more walls of different races.
@@ -316,7 +316,7 @@ void MapRemoveWall(unsigned x, unsigned y)
 */
 void MapSetWall(unsigned x, unsigned y, int humanwall)
 {
-	MapField* mf;
+	CMapField *mf;
 
 	mf = Map.Fields + x + y * Map.Info.MapWidth;
 

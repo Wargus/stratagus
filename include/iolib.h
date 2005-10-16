@@ -47,7 +47,7 @@
 #include <bzlib.h>
 #endif
 
-class MapInfo;
+class CMapInfo;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -62,7 +62,7 @@ public:
 
 	char *name;              /// Name of the file
 	int type;                /// Type of the file
-	MapInfo *xdata;          /// Extra data attached by high level
+	CMapInfo *xdata;          /// Extra data attached by high level
 };
 
 
