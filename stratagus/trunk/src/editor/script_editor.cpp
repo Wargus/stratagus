@@ -136,6 +136,20 @@ static int CclSetEditorStartUnit(lua_State* l)
 }
 
 /**
+**  Defines if a .gz is automatically appended to map names
+**
+**  @param l  Lua state.
+*/
+static int CclSetWriteCompressedMaps(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+	EditorWriteCompressedMaps = LuaToNumber(l, 1);
+	return 0;
+}
+
+/**
 **  Allow/Disallow the stratagus editor to change the tiles in the map
 **
 **  @param l  Lua state.
@@ -159,6 +173,7 @@ void EditorCclRegister(void)
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
 	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
 	lua_register(Lua, "SetTerrainEditable", CclSetTerrainEditable);
+	lua_register(Lua, "SetWriteCompressedMaps", CclSetWriteCompressedMaps);
 }
 
 //@}
