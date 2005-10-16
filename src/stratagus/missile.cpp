@@ -169,7 +169,7 @@ Missile::Missile() :
 */
 Missile *Missile::Init(MissileType *mtype, int sx, int sy, int dx, int dy)
 {
-	Missile* missile;
+	Missile *missile;
 
 
 	switch (mtype->Class) {
@@ -1485,7 +1485,7 @@ void MissileFire::Action()
 	}
 	if (NextMissileFrame(this, 1, 0)) {
 		int f;
-		MissileType* fire;
+		MissileType *fire;
 
 		this->SpriteFrame = 0;
 		f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;

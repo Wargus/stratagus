@@ -46,7 +46,7 @@
 ----------------------------------------------------------------------------*/
 
 	/// FIXME: move function to here.
-extern void FillAudio(void* udata, Uint8* stream, int len);
+extern void FillAudio(void *udata, Uint8 *stream, int len);
 
 /**
 **  Initialize sound card hardware part with SDL.

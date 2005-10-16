@@ -254,7 +254,7 @@ static CUnit *AllocUnit(void)
 **
 **  @param type    Unit-type
 */
-void CUnit::Init(CUnitType* type)
+void CUnit::Init(CUnitType *type)
 {
 	Assert(type);
 
@@ -577,7 +577,7 @@ void UpdateUnitSightRange(CUnit *unit)
 */
 void MarkUnitFieldFlags(const CUnit *unit)
 {
-	CUnitType* type; // Type of the unit.
+	CUnitType *type; // Type of the unit.
 	unsigned flags; //
 	int h;          // Tile height of the unit.
 	int w;          // Tile width of the unit.
@@ -603,7 +603,7 @@ void MarkUnitFieldFlags(const CUnit *unit)
 */
 void UnmarkUnitFieldFlags(const CUnit *unit)
 {
-	CUnitType* type; // Type of the unit.
+	CUnitType *type; // Type of the unit.
 	unsigned flags; //
 	int h;          // Tile height of the unit.
 	int w;          // Tile width of the unit.
@@ -1066,7 +1066,7 @@ static void UnitFillSeenValues(CUnit *unit)
 **  @param unit    The unit that goes under fog.
 **  @param player  The player the unit goes out of fog for.
 */
-void UnitGoesUnderFog(CUnit *unit, const CPlayer* player)
+void UnitGoesUnderFog(CUnit *unit, const CPlayer *player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (player->Type == PlayerPerson && !unit->Destroyed) {
@@ -1107,7 +1107,7 @@ void UnitGoesUnderFog(CUnit *unit, const CPlayer* player)
 **  not get an decrease the first time it's seen, so we have to
 **  keep track of what player saw what units, with SeenByPlayer.
 */
-void UnitGoesOutOfFog(CUnit *unit, const CPlayer* player)
+void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (unit->Seen.ByPlayer & (1 << (player->Index))) {
@@ -1129,7 +1129,7 @@ void UnitGoesOutOfFog(CUnit *unit, const CPlayer* player)
 **  @param y       y location to check
 **  @param cloak   If we mark cloaked units too.
 */
-void UnitsOnTileMarkSeen(const CPlayer* player, int x, int y, int cloak)
+void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
 {
 	int p;
 	int n;
@@ -1943,7 +1943,7 @@ void DropOutAll(const CUnit *source)
 **
 **  @return        the BuildingRestrictionDetails
 */
-CBuildRestrictionOnTop* OnTopDetails(const CUnit *unit, const CUnitType *parent)
+CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 {
 	CBuildRestrictionOnTop *b;
 
@@ -2264,7 +2264,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 **  @param x       OUT: Map X position of tile.
 **  @param y       OUT: Map Y position of tile.
 */
-int FindWoodInSight(const CUnit *unit, int* x, int* y)
+int FindWoodInSight(const CUnit *unit, int *x, int *y)
 {
 	return FindTerrainType(unit->Type->MovementMask, 0, MapFieldForest, 9999,
 		unit->Player, unit->X, unit->Y, x, y);
@@ -2294,7 +2294,7 @@ int FindWoodInSight(const CUnit *unit, int* x, int* y)
 **  @return            True if wood was found.
 */
 int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-	const CPlayer* player, int x, int y, int* px, int* py)
+	const CPlayer *player, int x, int y, int *px, int *py)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2310,8 +2310,8 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	int ep;
 	int i;
 	int w;
-	unsigned char* m;
-	unsigned char* matrix;
+	unsigned char *m;
+	unsigned char *matrix;
 	int destx;
 	int desty;
 	int cdist;
@@ -2422,8 +2422,8 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	int i;
 	int w;
 	int n;
-	unsigned char* m;
-	unsigned char* matrix;
+	unsigned char *m;
+	unsigned char *matrix;
 	const CUnit *destu;
 	CUnit *mine;
 	CUnit *bestmine;
@@ -2566,8 +2566,8 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 	int i;
 	int w;
 	int nodes_searched;
-	unsigned char* m;
-	unsigned char* matrix;
+	unsigned char *m;
+	unsigned char *matrix;
 	CUnit *depot;
 	int destx;
 	int desty;
@@ -3053,8 +3053,8 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 
 	if (type->Building && !target->Burning) {
 		int f;
-		Missile* missile;
-		MissileType* fire;
+		Missile *missile;
+		MissileType *fire;
 
 		f = (100 * target->Variable[HP_INDEX].Value) / target->Variable[HP_INDEX].Max;
 		fire = MissileBurningBuilding(f);
@@ -3285,7 +3285,7 @@ int ViewPointDistance(int x, int y)
 */
 int ViewPointDistanceToUnit(const CUnit *dest)
 {
-	const CViewport* vp;
+	const CViewport *vp;
 
 	// first compute the view point coordinate
 	vp = UI.SelectedViewport;
@@ -3473,7 +3473,7 @@ bool CUnit::IsUnusable() const
 */
 char *UnitReference(const CUnit *unit)
 {
-	char* ref = new char[10];
+	char *ref = new char[10];
 	sprintf(ref, "U%04X", UnitNumber(unit));
 	return ref;
 }
@@ -3610,9 +3610,9 @@ void SaveOrder(const COrder *order, CFile *file)
 **  @param unit    Unit pointer to be saved.
 **  @param file    Output file.
 */
-void SaveUnit(const CUnit *unit, CFile* file)
+void SaveUnit(const CUnit *unit, CFile *file)
 {
-	char* ref;
+	char *ref;
 	CUnit *uins;
 	int i;
 
@@ -3799,7 +3799,7 @@ void SaveUnit(const CUnit *unit, CFile* file)
 			break;
 		case UnitActionBuilt:
 			{
-				CConstructionFrame* cframe;
+				CConstructionFrame *cframe;
 				int frame;
 
 				cframe = unit->Type->Construction->Frames;
@@ -3873,7 +3873,7 @@ void SaveUnit(const CUnit *unit, CFile* file)
 **
 **  @param file    Output file.
 */
-void SaveUnits(CFile* file)
+void SaveUnits(CFile *file)
 {
 	CUnit **table;
 	CUnit *unit;

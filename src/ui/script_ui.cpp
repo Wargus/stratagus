@@ -81,7 +81,7 @@ static int HandleCount = 1;     /// Lua handler count
 **
 **  @param l  Lua state.
 */
-static int CclSetMouseScrollSpeedDefault(lua_State* l)
+static int CclSetMouseScrollSpeedDefault(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UI.MouseScrollSpeedDefault = LuaToNumber(l, 1);
@@ -93,7 +93,7 @@ static int CclSetMouseScrollSpeedDefault(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetMouseScrollSpeedControl(lua_State* l)
+static int CclSetMouseScrollSpeedControl(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	UI.MouseScrollSpeedControl = LuaToNumber(l, 1);
@@ -105,7 +105,7 @@ static int CclSetMouseScrollSpeedControl(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetClickMissile(lua_State* l)
+static int CclSetClickMissile(lua_State *l)
 {
 	int args;
 
@@ -127,7 +127,7 @@ static int CclSetClickMissile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetDamageMissile(lua_State* l)
+static int CclSetDamageMissile(lua_State *l)
 {
 	int args;
 
@@ -149,7 +149,7 @@ static int CclSetDamageMissile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetVideoResolution(lua_State* l)
+static int CclSetVideoResolution(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (CclInConfigFile) {
@@ -167,7 +167,7 @@ static int CclSetVideoResolution(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclGetVideoResolution(lua_State* l)
+static int CclGetVideoResolution(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, Video.Width);
@@ -180,7 +180,7 @@ static int CclGetVideoResolution(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetVideoFullScreen(lua_State* l)
+static int CclSetVideoFullScreen(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	if (CclInConfigFile) {
@@ -197,7 +197,7 @@ static int CclSetVideoFullScreen(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclGetVideoFullScreen(lua_State* l)
+static int CclGetVideoFullScreen(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushboolean(l, Video.FullScreen);
@@ -209,9 +209,9 @@ static int CclGetVideoFullScreen(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetTitleScreens(lua_State* l)
+static int CclSetTitleScreens(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	int i;
 	int args;
 	int j;
@@ -480,7 +480,7 @@ static int CclDefineCursor(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclSetGameCursor(lua_State* l)
+static int CclSetGameCursor(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	GameCursor = CursorByIdent(LuaToString(l, 1));
@@ -493,7 +493,7 @@ static int CclSetGameCursor(lua_State* l)
 **  @param l      Lua state.
 **  @param value  Button type.
 */
-static MenuButtonId scm2buttonid(lua_State* l, const char* value)
+static MenuButtonId scm2buttonid(lua_State *l, const char *value)
 {
 	MenuButtonId id;
 
@@ -605,7 +605,7 @@ static void CclParseInfoText(lua_State *l, InfoText *text)
 */
 static void CclParseIcon(lua_State *l, Button *icon)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
@@ -646,9 +646,9 @@ static void CclParseIcon(lua_State *l, Button *icon)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI that is updated.
 */
-static void CclParseSelected(lua_State* l, CUserInterface* ui)
+static void CclParseSelected(lua_State *l, CUserInterface *ui)
 {
-	const char* value;
+	const char *value;
 	InfoText text;
 	int args;
 	int j;
@@ -735,9 +735,9 @@ static void CclParseSelected(lua_State* l, CUserInterface* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseTraining(lua_State* l, CUserInterface* ui)
+static void CclParseTraining(lua_State *l, CUserInterface *ui)
 {
-	const char* value;
+	const char *value;
 	InfoText text;
 	int args;
 	int j;
@@ -834,9 +834,9 @@ static void CclParseTraining(lua_State* l, CUserInterface* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseUpgrading(lua_State* l, CUserInterface* ui)
+static void CclParseUpgrading(lua_State *l, CUserInterface *ui)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
@@ -1423,7 +1423,7 @@ static int CclDefineUI(lua_State *l)
 						ui->PieY[pie]= (coeffY[pie] * radius) >> 8;
 					}
 				} else if (!strcmp(value, "mouse-button")) {
-					const char* button;
+					const char *button;
 
 					lua_rawgeti(l, j + 1, k + 1);
 					button = LuaToString(l, -1);
@@ -1487,7 +1487,7 @@ static int CclDefineUI(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				Button* button;
+				Button *button;
 
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -1680,18 +1680,19 @@ static int CclDefineUI(lua_State *l)
 **  @return  Corresponding value.
 **  @note    Stop on error.
 */
-EnumVariable Str2EnumVariable(lua_State* l, const char *s)
+EnumVariable Str2EnumVariable(lua_State *l, const char *s)
 {
 	static struct {
-		const char* s;
-		EnumVariable e;} list[] = {
-			{"Value", VariableValue},
-			{"Max", VariableMax},
-			{"Increase", VariableIncrease},
-			{"Diff", VariableDiff},
-			{"Percent", VariablePercent},
-			{"Name", VariableName},
-			{0, VariableValue}}; // List of possible values.
+		const char *s;
+		EnumVariable e;
+	} list[] = {
+		{"Value", VariableValue},
+		{"Max", VariableMax},
+		{"Increase", VariableIncrease},
+		{"Diff", VariableDiff},
+		{"Percent", VariablePercent},
+		{"Name", VariableName},
+		{0, VariableValue}}; // List of possible values.
 	int i; // Iterator.
 
 	for (i = 0; list[i].s; i++) {
@@ -1712,17 +1713,18 @@ EnumVariable Str2EnumVariable(lua_State* l, const char *s)
 **  @return  Corresponding value.
 **  @note    Stop on error.
 */
-static EnumUnit Str2EnumUnit(lua_State* l, const char *s)
+static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 {
 	static struct {
-		const char* s;
-		EnumUnit e;} list[] = {
-			{"ItSelf", UnitRefItSelf},
-			{"Inside", UnitRefInside},
-			{"Container", UnitRefContainer},
-			{"Worker", UnitRefWorker},
-			{"Goal", UnitRefGoal},
-			{0, UnitRefItSelf}}; // List of possible values.
+		const char *s;
+		EnumUnit e;
+	} list[] = {
+		{"ItSelf", UnitRefItSelf},
+		{"Inside", UnitRefInside},
+		{"Container", UnitRefContainer},
+		{"Worker", UnitRefWorker},
+		{"Goal", UnitRefGoal},
+		{0, UnitRefItSelf}}; // List of possible values.
 	int i; // Iterator.
 
 	for (i = 0; list[i].s; i++) {
@@ -1739,10 +1741,10 @@ static EnumUnit Str2EnumUnit(lua_State* l, const char *s)
 **
 **  @param l   Lua State.
 */
-static ConditionPanel *ParseConditionPanel(lua_State* l)
+static ConditionPanel *ParseConditionPanel(lua_State *l)
 {
 	ConditionPanel *condition; // Condition parsed
-	const char* key;           // key of lua table.
+	const char *key;           // key of lua table.
 	int i;                     // iterator for flags and variable.
 
 	Assert(lua_istable(l, -1));
@@ -4195,7 +4197,7 @@ static int CclSetShowSightRange(lua_State *l)
 
 	if (args == 1 && !lua_isnil(l, 1)) {
 		if (lua_isstring(l, 1)) {
-			const char* flag;
+			const char *flag;
 
 			flag = lua_tostring(l, 1);
 			if (!strcmp(flag, "rectangle")) {

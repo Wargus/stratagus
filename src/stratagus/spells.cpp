@@ -785,7 +785,7 @@ static Target *NewTarget(TargetType t, const CUnit *unit, int x, int y)
 **
 **  @return the new target.
 */
-static Target* NewTargetUnit(const CUnit *unit)
+static Target *NewTargetUnit(const CUnit *unit)
 {
 	return NewTarget(TargetUnit, unit, 0, 0);
 }
@@ -799,7 +799,7 @@ static Target* NewTargetUnit(const CUnit *unit)
 **
 **  @return the new target.
 */
-static Target* NewTargetPosition(int x, int y)
+static Target *NewTargetPosition(int x, int y)
 {
 	return NewTarget(TargetPosition, NULL, x, y);
 }
@@ -930,7 +930,7 @@ static Target *SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType 
 	int i;
 	int j;
 	int combat;
-	AutoCastInfo* autocast;
+	AutoCastInfo *autocast;
 
 	// Ai cast should be a lot better. Use autocast if not found.
 	if (caster->Player->AiEnabled && spell->AICast) {
@@ -1048,7 +1048,7 @@ void InitSpells(void)
 **
 **  @return       spell-type struct pointer.
 */
-SpellType* SpellTypeByIdent(const char *ident)
+SpellType *SpellTypeByIdent(const char *ident)
 {
 	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
 		if (strcmp((*i)->Ident, ident) == 0) {

@@ -70,17 +70,17 @@
 /**
 **  Menu button graphics
 */
-CGraphic* MenuButtonGraphics[MAX_RACES];
+CGraphic *MenuButtonGraphics[MAX_RACES];
 
 /**
 **  Current menu button graphics
 */
-CGraphic* MenuButtonG;
+CGraphic *MenuButtonG;
 
 /**
 **  Current menu
 */
-Menu* CurrentMenu;
+Menu *CurrentMenu;
 
 static int MenuButtonUnderCursor = -1;
 static int MenuButtonCurSel = -1;
@@ -110,13 +110,13 @@ Menu *FindMenu(const char *menu_id)
 **  @param font   Font to use.
 **  @param flag   flag of text.
 */
-static void DrawMenuText(const MenuitemText* mit, int x, int y, CFont *font, int flag)
+static void DrawMenuText(const MenuitemText *mit, int x, int y, CFont *font, int flag)
 {
-	char* oldnc;
-	char* oldrc;
-	char* nc;
-	char* rc;
-	char* text;
+	char *oldnc;
+	char *oldrc;
+	char *nc;
+	char *rc;
+	char *text;
 	int l;
 
 	text = EvalString(mit->text);
@@ -286,14 +286,14 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 ** @param mx    menu X display position (offset)
 ** @param my    menu Y display position (offset)
 */
-static void DrawPulldown(Menuitem* mi, int mx, int my)
+static void DrawPulldown(Menuitem *mi, int mx, int my)
 {
 	int i;
-	char* nc;
-	char* rc;
-	char* oldnc;
-	char* oldrc;
-	char* text;
+	char *nc;
+	char *rc;
+	char *oldnc;
+	char *oldrc;
+	char *text;
 	unsigned flags;
 	MenuButtonId rb;
 	MenuButtonId db;
@@ -531,15 +531,15 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 ** @param mx    menu X display position (offset)
 ** @param my    menu Y display position (offset)
 */
-static void DrawListbox(Menuitem* mi, int mx, int my)
+static void DrawListbox(Menuitem *mi, int mx, int my)
 {
 	int i;
 	int s;
-	char* nc;
-	char* rc;
-	char* oldnc;
-	char* oldrc;
-	char* text;
+	char *nc;
+	char *rc;
+	char *oldnc;
+	char *oldrc;
+	char *text;
 	MenuButtonId rb;
 	unsigned flags;
 	int w;
@@ -610,7 +610,7 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 ** @param mx    menu X display position (offset)
 ** @param my    menu Y display position (offset)
 */
-static void DrawVSlider(Menuitem* mi, int mx, int my)
+static void DrawVSlider(Menuitem *mi, int mx, int my)
 {
 	int p;
 	unsigned flags;
@@ -713,7 +713,7 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 ** @param mx    menu X display position (offset)
 ** @param my    menu Y display position (offset)
 */
-static void DrawHSlider(Menuitem* mi, int mx, int my)
+static void DrawHSlider(Menuitem *mi, int mx, int my)
 {
 	int p;
 	unsigned flags;
@@ -819,16 +819,16 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 **  @param y       Y display position
 **  @param text    text to print on button
 */
-static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
-	int x, int y, const char* text)
+static void DrawCheckbox(CheckboxStyle *style, unsigned flags, unsigned checked,
+	int x, int y, const char *text)
 {
-	char* nc;
-	char* rc;
-	char* oldnc;
-	char* oldrc;
+	char *nc;
+	char *rc;
+	char *oldnc;
+	char *oldrc;
 	int i;
-	ButtonStyleProperties* p;
-	ButtonStyleProperties* pimage;
+	ButtonStyleProperties *p;
+	ButtonStyleProperties *pimage;
 
 	if (flags & MI_FLAGS_DISABLED) {
 		p = checked ? &style->CheckedDisabled : &style->Disabled;
@@ -938,13 +938,13 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
 ** @param mx    menu X display position (offset)
 ** @param my    menu Y display position (offset)
 */
-static void DrawInput(Menuitem* mi, int mx, int my)
+static void DrawInput(Menuitem *mi, int mx, int my)
 {
-	char* nc;
-	char* rc;
-	char* oldnc;
-	char* oldrc;
-	char* text;
+	char *nc;
+	char *rc;
+	char *oldnc;
+	char *oldrc;
+	char *text;
 	unsigned flags;
 	MenuButtonId rb;
 	int w;
@@ -1029,12 +1029,12 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 **
 **  @param menu    The menu number to display (NULL allowed)
 */
-void DrawMenu(Menu* menu)
+void DrawMenu(Menu *menu)
 {
 	int i;
 	int n;
-	Menuitem* mi;
-	Menuitem* mip;
+	Menuitem *mi;
+	Menuitem *mip;
 
 	if (menu == NULL) {
 		return;
@@ -1151,15 +1151,15 @@ void DrawMenu(Menu* menu)
 /**
 ** Paste text from the clipboard
 */
-static void PasteFromClipboard(Menuitem* mi)
+static void PasteFromClipboard(Menuitem *mi)
 {
 #if defined(USE_WIN32) || defined(_XLIB_H_)
 	int i;
-	unsigned char* clipboard;
+	unsigned char *clipboard;
 #ifdef USE_WIN32
 	HGLOBAL handle;
 #elif defined(_XLIB_H_)
-	Display* display;
+	Display *display;
 	Window window;
 	Atom rettype;
 	unsigned long nitem;
@@ -1253,8 +1253,8 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
 	int i;
 	int n;
-	Menuitem* mi;
-	Menu* menu;
+	Menuitem *mi;
+	Menu *menu;
 
 	HandleKeyModifiersDown(key, keychar);
 
@@ -1574,8 +1574,8 @@ normkey:
 */
 static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 {
-	Menuitem* mi;
-	Menu* menu;
+	Menuitem *mi;
+	Menu *menu;
 
 	HandleKeyModifiersUp(key, keychar);
 
@@ -1606,8 +1606,8 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 */
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
-	Menuitem* mi;
-	Menu* menu;
+	Menuitem *mi;
+	Menu *menu;
 
 	HandleKeyModifiersDown(key, keychar);
 
@@ -1643,11 +1643,11 @@ static void MenuHandleMouseMove(int x, int y)
 	int n;
 	int xs;
 	int ys;
-	Menuitem* mi;
-	Menu* menu;
+	Menuitem *mi;
+	Menu *menu;
 	int ox;
 	int oy;
-	char* tmp;
+	char *tmp;
 
 	ox = CursorX;
 	oy = CursorY; // Old position for rel movement.
@@ -2007,7 +2007,7 @@ static void MenuHandleMouseMove(int x, int y)
 						if (MouseButtons & LeftButton
 								&& mi->Flags & MI_FLAGS_SELECTED) {
 							if (mi->D.Input.buffer && *mi->D.Input.buffer) {
-								char* s;
+								char *s;
 
 								j = strtol(mi->D.Input.buffer, &s, 0);
 								if ((!*s || s[0] == '~') && (j != 0 || *mi->D.Input.buffer == '0')) {
@@ -2042,8 +2042,8 @@ static void MenuHandleMouseMove(int x, int y)
 */
 static void MenuHandleButtonDown(unsigned b)
 {
-	Menuitem* mi;
-	Menu* menu;
+	Menuitem *mi;
+	Menu *menu;
 
 	if (CurrentMenu == NULL) {
 		return;
@@ -2294,8 +2294,8 @@ static void MenuHandleButtonUp(unsigned b)
 {
 	int i;
 	int n;
-	Menuitem* mi;
-	Menu* menu;
+	Menuitem *mi;
+	Menu *menu;
 	int redraw_flag;
 
 	if (CurrentMenu == NULL) {
@@ -2420,7 +2420,7 @@ typedef struct _menu_stack_ {
 	struct _menu_stack_* Next;
 } MenuStack;
 
-MenuStack* Menus;             /// FIXME : docu
+MenuStack *Menus;             /// FIXME : docu
 
 /**
 ** Push the current menu onto the stack.
@@ -2489,13 +2489,13 @@ void CloseMenu(void)
 **
 ** @todo FIXME: This function is called from the event handler!!
 */
-void ProcessMenu(const char* menu_id, int loop)
+void ProcessMenu(const char *menu_id, int loop)
 {
 	int i;
 	int oldncr;
-	Menuitem* mi;
-	Menu* menu;
-	Menu* CurrentMenuSave;
+	Menuitem *mi;
+	Menu *menu;
+	Menu *CurrentMenuSave;
 	int MenuButtonUnderCursorSave;
 	int MenuButtonCurSelSave;
 
