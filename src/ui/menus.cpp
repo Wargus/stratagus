@@ -543,27 +543,27 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	if (strcasestr(filename, ".smp")) {
 		MapInfo *info;
 
-		info = DuplicateMapInfo(&TheMap.Info);
-		FreeMapInfo(&TheMap.Info);
+		info = DuplicateMapInfo(&Map.Info);
+		FreeMapInfo(&Map.Info);
 		LoadStratagusMapInfo(pathbuf);
 
-		if ((width != -1 && TheMap.Info.MapWidth != width) ||
-			(height != -1 && TheMap.Info.MapHeight != height)) {
-			FreeMapInfo(&TheMap.Info);
-			// Restore TheMap.Info
+		if ((width != -1 && Map.Info.MapWidth != width) ||
+			(height != -1 && Map.Info.MapHeight != height)) {
+			FreeMapInfo(&Map.Info);
+			// Restore Map.Info
 			// We don't strdup string attributs of info. (like DuplicateMapInfo dooe)
 			// because we don't free the these in original.
-			TheMap.Info = *info;
+			Map.Info = *info;
 			delete info;
 			return 0;
 		}
 		fl->type = 1;
 		fl->name = new_strdup(filename);
-		fl->xdata = DuplicateMapInfo(&TheMap.Info);
-		// Restore TheMap.Info
+		fl->xdata = DuplicateMapInfo(&Map.Info);
+		// Restore Map.Info
 		// We don't strdup string attributs of info. (like DuplicateMapInfo dooe)
 		// because we don't free the these in original.
-		TheMap.Info = *info;
+		Map.Info = *info;
 		delete info;
 	} else if (strcasestr(filename, ".log")) {
 		fl->type = 1;
@@ -1933,12 +1933,12 @@ static void SetCdPower(Menuitem* mi)
 */
 static void SetFogOfWar(Menuitem* mi)
 {
-	if (!TheMap.NoFogOfWar) {
-		TheMap.NoFogOfWar = true;
+	if (!Map.NoFogOfWar) {
+		Map.NoFogOfWar = true;
 		UpdateFogOfWarChange();
 		CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow off", -1);
 	} else {
-		TheMap.NoFogOfWar = false;
+		Map.NoFogOfWar = false;
 		UpdateFogOfWarChange();
 		CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow on", -1);
 	}
@@ -2204,7 +2204,7 @@ void PreferencesMenu(void)
 */
 static void PreferencesInit(Menu* menu)
 {
-	if (!TheMap.NoFogOfWar) {
+	if (!Map.NoFogOfWar) {
 		menu->Items[1].D.Checkbox.Checked = 1;
 	} else {
 		menu->Items[1].D.Checkbox.Checked = 0;
@@ -2628,7 +2628,7 @@ static void ScenSelectMenu(void)
 
 	menu = FindMenu("menu-custom-game");
 	for (n = j = 0; j < PlayerMax; ++j) {
-		t = TheMap.Info.PlayerType[j];
+		t = Map.Info.PlayerType[j];
 		if (t == PlayerPerson || t == PlayerComputer) {
 			n++;
 		}
@@ -3357,7 +3357,7 @@ static void GameSetupInit(Menu* menu)
 
 	custom_menu = FindMenu("menu-custom-game");
 	for (n = j = 0; j < PlayerMax; ++j) {
-		t = TheMap.Info.PlayerType[j];
+		t = Map.Info.PlayerType[j];
 		if (t == PlayerPerson || t == PlayerComputer) {
 			++n;
 		}
@@ -3383,10 +3383,10 @@ static void GameDrawFunc(Menuitem* mi)
 	l = GameFont->Width("Scenario:");
 	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380, GameFont, "Scenario:");
 	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380 + 24 , GameFont, ScenSelectFileName);
-	if (TheMap.Info.Description) {
-		VideoDrawText(UI.Offset640X + 16 + l + 8, UI.Offset480Y + 380, GameFont, TheMap.Info.Description);
+	if (Map.Info.Description) {
+		VideoDrawText(UI.Offset640X + 16 + l + 8, UI.Offset480Y + 380, GameFont, Map.Info.Description);
 	}
-	sprintf(buffer, " (%d x %d)", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
+	sprintf(buffer, " (%d x %d)", Map.Info.MapWidth, Map.Info.MapHeight);
 	VideoDrawText(UI.Offset640X + 16 + l + 8 + GameFont->Width(ScenSelectFileName), UI.Offset480Y + 380 + 24, GameFont, buffer);
 
 #if 0
@@ -3511,25 +3511,25 @@ static void MultiGameFWSAction(Menuitem* mi, int i)
 		DebugPrint("Update fow %d\n" _C_ i);
 		switch (i) {
 			case 0:
-				TheMap.NoFogOfWar = false;
+				Map.NoFogOfWar = false;
 				FlagRevealMap = 0;
 				GameSettings.NoFogOfWar = false;
 				GameSettings.RevealMap = 0;
 				break;
 			case 1:
-				TheMap.NoFogOfWar = true;
+				Map.NoFogOfWar = true;
 				FlagRevealMap = 0;
 				GameSettings.NoFogOfWar = true;
 				GameSettings.RevealMap = 0;
 				break;
 			case 2:
-				TheMap.NoFogOfWar = false;
+				Map.NoFogOfWar = false;
 				FlagRevealMap = 1;
 				GameSettings.NoFogOfWar = false;
 				GameSettings.RevealMap = 1;
 				break;
 			case 3:
-				TheMap.NoFogOfWar = true;
+				Map.NoFogOfWar = true;
 				FlagRevealMap = 1;
 				GameSettings.NoFogOfWar = true;
 				GameSettings.RevealMap = 1;
@@ -3619,10 +3619,10 @@ static void NetworkGamePrepareGameSettings(void)
 
 	// Make a list of the available player slots.
 	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			num[h++] = i;
 		}
-		if (TheMap.Info.PlayerType[i] == PlayerComputer) {
+		if (Map.Info.PlayerType[i] == PlayerComputer) {
 			comp[c++] = i; // available computer player slots
 		}
 	}
@@ -3696,10 +3696,10 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 
 	// Calculate available slots from map info
 	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
 		}
-		if (TheMap.Info.PlayerType[i] == PlayerComputer) {
+		if (Map.Info.PlayerType[i] == PlayerComputer) {
 			c++; // available computer player slots
 		}
 	}
@@ -3817,10 +3817,10 @@ static void MultiClientUpdate(int initial)
 
 	//  Calculate available slots from map info
 	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
 		}
-		if (TheMap.Info.PlayerType[i] == PlayerComputer) {
+		if (Map.Info.PlayerType[i] == PlayerComputer) {
 			c++; // available computer player slots
 		}
 	}
@@ -3897,7 +3897,7 @@ static void MultiGameSetupInit(Menu* menu)
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
 	// Calculate available slots from map info
 	for (h = i = 0; i < PlayerMax; i++) {
-		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			++h; // available interactive player slots
 		}
 	}
@@ -4122,7 +4122,7 @@ int NetClientSelectScenario(void)
 		ScenSelectPath[0] = 0;
 	}
 
-	FreeMapInfo(&TheMap.Info);
+	FreeMapInfo(&Map.Info);
 	LoadStratagusMapInfo(MenuMapFullPath);
 	return 0;
 }
@@ -4256,9 +4256,9 @@ static void EditorNewMap(void)
 	}
 
 	description[strlen(description) - 3] = '\0';
-	TheMap.Info.Description = new_strdup(description);
-	TheMap.Info.MapWidth = atoi(width);
-	TheMap.Info.MapHeight = atoi(height);
+	Map.Info.Description = new_strdup(description);
+	Map.Info.MapWidth = atoi(width);
+	Map.Info.MapHeight = atoi(height);
 
 	Video.ClearScreen();
 
@@ -4340,7 +4340,7 @@ static void EditorNewOk(void)
 	else {
 		char tilemodel[PATH_MAX];
 
-		sprintf(TheMap.TileModelsFileName, "scripts/tilesets/%s.lua",
+		sprintf(Map.TileModelsFileName, "scripts/tilesets/%s.lua",
 				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
 		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath,
 				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
@@ -4574,12 +4574,12 @@ static void EditorMapPropertiesMenu(void)
 	menu = FindMenu("menu-editor-map-properties");
 
 	menu->Items[2].D.Input.buffer = description;
-	strcpy(description, TheMap.Info.Description);
+	strcpy(description, Map.Info.Description);
 	strcat(description, "~!_");
 	menu->Items[2].D.Input.nch = strlen(description) - 3;
 	menu->Items[2].D.Input.maxch = 31;
 
-	sprintf(size, "%d x %d", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
+	sprintf(size, "%d x %d", Map.Info.MapWidth, Map.Info.MapHeight);
 	menu->Items[4].D.Text.text = NewStringDesc(size);
 	menu->Items[6].D.Pulldown.defopt = 0;
 
@@ -4612,20 +4612,20 @@ static void EditorMapPropertiesOk(void)
 
 	description = menu->Items[2].D.Input.buffer;
 	description[strlen(description)-3] = '\0';
-	delete[] TheMap.Info.Description;
-	TheMap.Info.Description = new_strdup(description);
+	delete[] Map.Info.Description;
+	Map.Info.Description = new_strdup(description);
 
 	#if 0
 	// MAPTODO
 	// Change the terrain
-	old = TheMap.Info.MapTerrain;
+	old = Map.Info.MapTerrain;
 	if (old != menu->Items[6].D.Pulldown.curopt) {
-		TheMap.Info.MapTerrain = menu->Items[6].D.Pulldown.curopt;
-		delete[] TheMap.Info.MapTerrainName;
-		TheMap.Info.MapTerrainName = new_strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
-		delete[] TheMap.TerrainName;
-		TheMap.TerrainName = new_strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
-		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
+		Map.Info.MapTerrain = menu->Items[6].D.Pulldown.curopt;
+		delete[] Map.Info.MapTerrainName;
+		Map.Info.MapTerrainName = new_strdup(TilesetWcNames[Map.Info.MapTerrain]);
+		delete[] Map.TerrainName;
+		Map.TerrainName = new_strdup(TilesetWcNames[Map.Info.MapTerrain]);
+		Map.Tileset = Tilesets[Map.Info.MapTerrain];
 
 		LoadTileset();
 		SetPlayersPalette();
@@ -4731,8 +4731,8 @@ static void EditorPlayerPropertiesMenu(void)
 #define OIL_POSITION 106
 
 	for (i = 0; i < PlayerMax; ++i) {
-		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = TheMap.Info.PlayerSide[i];
-		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info.PlayerType[i]];
+		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = Map.Info.PlayerSide[i];
+		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[Map.Info.PlayerType[i]];
 		PlayerSetAiToMenu(Players[i].AiName, &menu->Items[AI_POSITION + i].D.Pulldown);
 		sprintf(gold[i], "%d~!_", Players[i].Resources[GoldCost]);
 		sprintf(lumber[i], "%d~!_", Players[i].Resources[WoodCost]);
@@ -4751,8 +4751,8 @@ static void EditorPlayerPropertiesMenu(void)
 	ProcessMenu("menu-editor-player-properties", 1);
 
 	for (i = 0; i < PlayerMax; ++i) {
-		TheMap.Info.PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
-		TheMap.Info.PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
+		Map.Info.PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
+		Map.Info.PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
 		strcpy(Players[i].AiName, 
 				PlayerGetAiFromMenu(&menu->Items[AI_POSITION + i].D.Pulldown));
 		Players[i].Resources[GoldCost] = atoi(gold[i]);
@@ -5589,7 +5589,7 @@ static void ChangeGameServer(void)
 	freespots = 0;
 	players = 0;
 	for (i = 0; i < PlayerMax - 1; ++i) {
-		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			++players;
 		}
 		if (ServerSetupState.CompOpt[i] == 0) {
@@ -5690,7 +5690,7 @@ void UpdateMenuItemButton(Menuitem* items)
 
 		// Calculate available slots from map info
 		for (i = 1; i < PlayerMax; i++) {
-			if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+			if (Map.Info.PlayerType[i] == PlayerPerson) {
 				if (Hosts[i].PlyNr) {
 					plyrs = 1;
 					if (!ServerSetupState.Ready[i]) {

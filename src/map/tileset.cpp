@@ -64,20 +64,20 @@ int TileSizeY = 32;
 ----------------------------------------------------------------------------*/
 
 /**
-** Load tileset and setup ::TheMap for this tileset.
+** Load tileset and setup ::Map for this tileset.
 **
-** @see TheMap @see TheMap.Tileset.
+** @see Map @see Map.Tileset.
 */
 void LoadTileset(void)
 {
 	//  Load and prepare the tileset
-	TileSizeX = TheMap.Tileset.TileSizeX;
-	TileSizeY = TheMap.Tileset.TileSizeY;
+	TileSizeX = Map.Tileset.TileSizeX;
+	TileSizeY = Map.Tileset.TileSizeY;
 
-	ShowLoadProgress("Tileset `%s'", TheMap.Tileset.ImageFile);
-	//TheMap.TileGraphic = CGraphic::New(TheMap.Tileset.ImageFile);
-	TheMap.TileGraphic = CGraphic::New(TheMap.Tileset.ImageFile, TileSizeX, TileSizeY);
-	TheMap.TileGraphic->Load();
+	ShowLoadProgress("Tileset `%s'", Map.Tileset.ImageFile);
+	//Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile);
+	Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile, TileSizeX, TileSizeY);
+	Map.TileGraphic->Load();
 }
 
 
@@ -89,24 +89,24 @@ void LoadTileset(void)
 void CleanTilesets(void)
 {
 	// Free the tileset data
-	delete[] TheMap.Tileset.Name;
-	delete[] TheMap.Tileset.ImageFile;
-	delete[] TheMap.Tileset.Table;
-	delete[] TheMap.Tileset.FlagsTable;
-	delete[] TheMap.Tileset.Tiles;
-	delete[] TheMap.Tileset.MixedLookupTable;
-	delete[] TheMap.Tileset.TileTypeTable;
-	if (TheMap.Tileset.SolidTerrainTypes) {
-		delete[] TheMap.Tileset.SolidTerrainTypes[0].TerrainName;
+	delete[] Map.Tileset.Name;
+	delete[] Map.Tileset.ImageFile;
+	delete[] Map.Tileset.Table;
+	delete[] Map.Tileset.FlagsTable;
+	delete[] Map.Tileset.Tiles;
+	delete[] Map.Tileset.MixedLookupTable;
+	delete[] Map.Tileset.TileTypeTable;
+	if (Map.Tileset.SolidTerrainTypes) {
+		delete[] Map.Tileset.SolidTerrainTypes[0].TerrainName;
 	}
-	delete TheMap.Tileset.SolidTerrainTypes;
-	memset(&TheMap.Tileset, 0, sizeof(CTileset));
+	delete Map.Tileset.SolidTerrainTypes;
+	memset(&Map.Tileset, 0, sizeof(CTileset));
 
 	//
 	// Should this be done by the map?
 	//
-	CGraphic::Free(TheMap.TileGraphic);
-	TheMap.TileGraphic = NULL;
+	CGraphic::Free(Map.TileGraphic);
+	Map.TileGraphic = NULL;
 }
 
 //@}

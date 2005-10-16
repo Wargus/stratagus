@@ -283,8 +283,8 @@ static void MoveToTarget(CUnit *unit)
 			//
 			// When attack-moving we have to allow a bigger range
 			//
-			if (unit->Orders[0]->Range < TheMap.Info.MapWidth ||
-					unit->Orders[0]->Range < TheMap.Info.MapHeight) {
+			if (unit->Orders[0]->Range < Map.Info.MapWidth ||
+					unit->Orders[0]->Range < Map.Info.MapHeight) {
 				// Try again with more range
 				unit->Orders[0]->Range++;
 				return;

@@ -1888,9 +1888,9 @@ void UpdateUnitVariables(const CUnit *unit)
 
 	// Position
 	unit->Variable[POSX_INDEX].Value = unit->X;
-	unit->Variable[POSX_INDEX].Max = TheMap.Info.MapWidth;
+	unit->Variable[POSX_INDEX].Max = Map.Info.MapWidth;
 	unit->Variable[POSY_INDEX].Value = unit->Y;
-	unit->Variable[POSY_INDEX].Max = TheMap.Info.MapHeight;
+	unit->Variable[POSY_INDEX].Max = Map.Info.MapHeight;
 
 	// RadarRange
 	unit->Variable[RADAR_INDEX].Value = unit->Stats->Variables[RADAR_INDEX].Value;

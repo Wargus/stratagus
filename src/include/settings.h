@@ -40,7 +40,7 @@
 ----------------------------------------------------------------------------*/
 
 class CFile;
-class WorldMap;
+class CMap;
 class CampaignChapter;
 
 /*----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ extern void ObjectivesCclRegister(void);
 	/// Save the objectives
 extern void SaveObjectives(CFile *file);
 	/// Create a game
-extern void CreateGame(const char *filename, WorldMap *map);
+extern void CreateGame(const char *filename, CMap *map);
 	/// Init Setting to default values
 extern void InitSettings(void);
 

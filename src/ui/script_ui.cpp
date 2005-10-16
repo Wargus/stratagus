@@ -4344,11 +4344,11 @@ static int CclPresentMap(lua_State *l)
 {
 	LuaCheckArgs(l, 5);
 
-	TheMap.Info.Description = new_strdup(LuaToString(l, 1));
+	Map.Info.Description = new_strdup(LuaToString(l, 1));
 	// Number of players in LuaToNumber(l, 3); // Not used yet.
-	TheMap.Info.MapWidth = LuaToNumber(l, 3);
-	TheMap.Info.MapHeight = LuaToNumber(l, 4);
-	TheMap.Info.MapUID = LuaToNumber(l, 5);
+	Map.Info.MapWidth = LuaToNumber(l, 3);
+	Map.Info.MapHeight = LuaToNumber(l, 4);
+	Map.Info.MapUID = LuaToNumber(l, 5);
 
 	return 0;
 }
@@ -4361,8 +4361,8 @@ static int CclPresentMap(lua_State *l)
 static int CclDefineMapSetup(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	delete[] TheMap.Info.Filename;
-	TheMap.Info.Filename = new_strdup(LuaToString(l, 1));
+	delete[] Map.Info.Filename;
+	Map.Info.Filename = new_strdup(LuaToString(l, 1));
 
 	return 0;
 }

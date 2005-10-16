@@ -137,14 +137,14 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 
 	x = unit->X;
 	y = unit->Y;
-	w = TheMap.Info.MapWidth + 2;
+	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	if (matrix[x + y * w]) { // already marked
 		DebugPrint("Done\n");
 		return;
 	}
 
-	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
+	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
 	//
@@ -246,13 +246,13 @@ static int AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int *
 	unsigned char state;
 	unsigned char *m;
 
-	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
+	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
 	x = unit->X;
 	y = unit->Y;
 
-	w = TheMap.Info.MapWidth + 2;
+	w = Map.Info.MapWidth + 2;
 	mask = UnitMovementMask(unit);
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
@@ -410,14 +410,14 @@ int AiFindWall(AiForce *force)
 
 	x = unit->X;
 	y = unit->Y;
-	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
+	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
 
 	destx = -1;
 	desty = -1;
 
 	matrix = CreateMatrix();
-	w = TheMap.Info.MapWidth + 2;
+	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
 
 	points[0].X = x;
@@ -666,7 +666,7 @@ void AiSendExplorers(void)
 			x = centerx + SyncRand() % (2 * ray + 1) - ray;
 			y = centery + SyncRand() % (2 * ray + 1) - ray;
 
-			if (x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight) {
+			if (x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight) {
 				targetok = !IsMapFieldExplored(AiPlayer->Player, x, y);
 			}
 

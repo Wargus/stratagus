@@ -2635,7 +2635,7 @@ void SavePreferences(void)
 	fprintf(fd, "SetShowTips(%s)\n", ShowTips ? "true" : "false");
 	fprintf(fd, "SetCurrentTip(%d)\n", CurrentTip);
 
-	fprintf(fd, "SetFogOfWar(%s)\n", !TheMap.NoFogOfWar ? "true" : "false");
+	fprintf(fd, "SetFogOfWar(%s)\n", !Map.NoFogOfWar ? "true" : "false");
 	fprintf(fd, "SetShowCommandKey(%s)\n", UI.ButtonPanel.ShowCommandKey ? "true" : "false");
 
 	fprintf(fd, "SetGroupKeys(\"");

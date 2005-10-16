@@ -353,7 +353,7 @@ void NetworkServerStartGame(void)
 
 	// Make a list of the available player slots.
 	for (h = i = 0; i < PlayerMax; ++i) {
-		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerPerson) {
 			rev[i] = h;
 			num[h++] = i;
 			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_
@@ -363,7 +363,7 @@ void NetworkServerStartGame(void)
 	// Make a list of the available computer slots.
 	n = h;
 	for (i = 0; i < PlayerMax; ++i) {
-		if (TheMap.Info.PlayerType[i] == PlayerComputer) {
+		if (Map.Info.PlayerType[i] == PlayerComputer) {
 			rev[i] = n++;
 			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_
 				i _C_ rev[i]);
@@ -371,8 +371,8 @@ void NetworkServerStartGame(void)
 	}
 	// Make a list of the remaining slots.
 	for (i = 0; i < PlayerMax; ++i) {
-		if (TheMap.Info.PlayerType[i] != PlayerPerson &&
-				TheMap.Info.PlayerType[i] != PlayerComputer) {
+		if (Map.Info.PlayerType[i] != PlayerPerson &&
+				Map.Info.PlayerType[i] != PlayerComputer) {
 			rev[i] = n++;
 			// PlayerNobody - not available to anything..
 		}
@@ -435,7 +435,7 @@ void NetworkServerStartGame(void)
 	j = h;
 	if (NoRandomPlacementMultiplayer == 1) {
 		for (i = 0; i < PlayerMax; ++i) {
-			if (TheMap.Info.PlayerType[i] != PlayerComputer) {
+			if (Map.Info.PlayerType[i] != PlayerComputer) {
 				org[i] = Hosts[i].PlyNr;
 			}
 		}
@@ -506,7 +506,7 @@ void NetworkServerStartGame(void)
 	message.Type = MessageInitReply;
 	message.SubType = ICMConfig;
 	message.HostsCount = NetPlayers;
-	message.MapUID = htonl(TheMap.Info.MapUID);
+	message.MapUID = htonl(Map.Info.MapUID);
 	for (i = 0; i < NetPlayers; ++i) {
 		message.u.Hosts[i].Host = Hosts[i].Host;
 		message.u.Hosts[i].Port = Hosts[i].Port;
@@ -519,7 +519,7 @@ void NetworkServerStartGame(void)
 	statemsg.SubType = ICMState;
 	statemsg.HostsCount = NetPlayers;
 	statemsg.u.State = ServerSetupState;
-	statemsg.MapUID = htonl(TheMap.Info.MapUID);
+	statemsg.MapUID = htonl(Map.Info.MapUID);
 
 	msg = (InitMessage*)buf;
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ HostsCount);
@@ -705,7 +705,7 @@ changed:
 				message.Type = MessageInitHello;
 				message.SubType = ICMState;
 				message.u.State = LocalSetupState;
-				message.MapUID = htonl(TheMap.Info.MapUID);
+				message.MapUID = htonl(Map.Info.MapUID);
 				NetworkSendRateLimitedClientMessage(&message, 450);
 			} else {
 				NetLocalState = ccs_unreachable;
@@ -728,7 +728,7 @@ changed:
 			if (NetStateMsgCnt < 20) { // 20 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMMap; // ICMMapAck..
-				message.MapUID = htonl(TheMap.Info.MapUID);
+				message.MapUID = htonl(Map.Info.MapUID);
 				NetworkSendRateLimitedClientMessage(&message, 650);
 			} else {
 				NetLocalState = ccs_unreachable;
@@ -739,7 +739,7 @@ changed:
 			if (NetStateMsgCnt < 20) { // 20 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMMapUidMismatch;
-				message.MapUID = htonl(TheMap.Info.MapUID); // MAP Uid doesn't match
+				message.MapUID = htonl(Map.Info.MapUID); // MAP Uid doesn't match
 				NetworkSendRateLimitedClientMessage(&message, 650);
 			} else {
 				NetLocalState = ccs_unreachable;
@@ -960,10 +960,10 @@ static void ClientParseConnected(const InitMessage* msg)
 				NetLocalState = ccs_badmap;
 				break;
 			}
-			if (ntohl(msg->MapUID) != TheMap.Info.MapUID) {
+			if (ntohl(msg->MapUID) != Map.Info.MapUID) {
 				NetLocalState = ccs_badmap;
 				fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
-					(unsigned int)TheMap.Info.MapUID,
+					(unsigned int)Map.Info.MapUID,
 					(unsigned int)ntohl(msg->MapUID));
 				break;
 			}
@@ -1337,7 +1337,7 @@ static void ServerParseWaiting(const int h)
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
 			strncpy(message.u.MapPath, CurrentMapPath, 256);
-			message.MapUID = htonl(TheMap.Info.MapUID);
+			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
 				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
@@ -1371,7 +1371,7 @@ static void ServerParseWaiting(const int h)
 			message.Type = MessageInitReply;
 			message.SubType = ICMState; // Send new state info to the client
 			message.u.State = ServerSetupState;
-			message.MapUID = htonl(TheMap.Info.MapUID);
+			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
 				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
@@ -1412,7 +1412,7 @@ static void ServerParseMap(const int h)
 			message.Type = MessageInitReply;
 			message.SubType = ICMState; // Send State info to the client
 			message.u.State = ServerSetupState;
-			message.MapUID = htonl(TheMap.Info.MapUID);
+			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
 				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
@@ -1469,7 +1469,7 @@ static void ServerParseState(const int h, const InitMessage* msg)
 			message.Type = MessageInitReply;
 			message.SubType = ICMState; // Send new state info to the client
 			message.u.State = ServerSetupState;
-			message.MapUID = htonl(TheMap.Info.MapUID);
+			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
 				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));

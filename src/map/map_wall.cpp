@@ -80,8 +80,8 @@ static int MapIsSeenTileWall(int x, int y, int walltype)
 {
 	int t;
 
-	t = TheMap.Tileset.TileTypeTable[
-		TheMap.Fields[x + y * TheMap.Info.MapWidth].SeenTile];
+	t = Map.Tileset.TileTypeTable[
+		Map.Fields[x + y * Map.Info.MapWidth].SeenTile];
 	if (walltype == -1) {
 		return t == TileTypeHumanWall || t == TileTypeOrcWall;
 	}
@@ -101,11 +101,11 @@ void MapFixSeenWallTile(int x, int y)
 	MapField* mf;
 
 	//  Outside of map or no wall.
-	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
+	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		return;
 	}
-	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
-	t = TheMap.Tileset.TileTypeTable[mf->SeenTile];
+	mf = Map.Fields + x + y * Map.Info.MapWidth;
+	t = Map.Tileset.TileTypeTable[mf->SeenTile];
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
 	}
@@ -117,10 +117,10 @@ void MapFixSeenWallTile(int x, int y)
 	if ((y - 1) < 0 || MapIsSeenTileWall(x, y - 1, t)) {
 		tile |= 1 << 0;
 	}
-	if ((x + 1) >= TheMap.Info.MapWidth || MapIsSeenTileWall(x + 1, y, t)) {
+	if ((x + 1) >= Map.Info.MapWidth || MapIsSeenTileWall(x + 1, y, t)) {
 		tile |= 1 << 1;
 	}
-	if ((y + 1) >= TheMap.Info.MapHeight || MapIsSeenTileWall(x, y + 1, t)) {
+	if ((y + 1) >= Map.Info.MapHeight || MapIsSeenTileWall(x, y + 1, t)) {
 		tile |= 1 << 2;
 	}
 	if ((x - 1) < 0 || MapIsSeenTileWall(x - 1, y, t)) {
@@ -128,35 +128,35 @@ void MapFixSeenWallTile(int x, int y)
 	}
 
 	if (t == TileTypeHumanWall) {
-		tile = TheMap.Tileset.HumanWallTable[tile];
+		tile = Map.Tileset.HumanWallTable[tile];
 		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->Variable[HP_INDEX].Max / 2) {
-			while (TheMap.Tileset.Table[tile]) { // Skip good tiles
+			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset.Table[tile]) { // Skip separator
+			while (!Map.Tileset.Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	} else {
-		tile = TheMap.Tileset.OrcWallTable[tile];
+		tile = Map.Tileset.OrcWallTable[tile];
 		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->Variable[HP_INDEX].Max / 2) {
-			while (TheMap.Tileset.Table[tile]) { // Skip good tiles
+			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset.Table[tile]) { // Skip separator
+			while (!Map.Tileset.Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	}
 	if (mf->Value == 0) {
-		while (TheMap.Tileset.Table[tile]) { // Skip good tiles
+		while (Map.Tileset.Table[tile]) { // Skip good tiles
 			++tile;
 		}
-		while (!TheMap.Tileset.Table[tile]) { // Skip separator
+		while (!Map.Tileset.Table[tile]) { // Skip separator
 			++tile;
 		}
 	}
-	tile = TheMap.Tileset.Table[tile];
+	tile = Map.Tileset.Table[tile];
 
 	if (mf->SeenTile != tile) { // Already there!
 		mf->SeenTile = tile;
@@ -195,10 +195,10 @@ void MapFixWallTile(int x, int y)
 	int t;
 
 	//  Outside of map or no wall.
-	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
+	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		return;
 	}
-	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
+	mf = Map.Fields + x + y * Map.Info.MapWidth;
 	if (!(mf->Flags & MapFieldWall)) {
 		return;
 	}
@@ -208,53 +208,53 @@ void MapFixWallTile(int x, int y)
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
 	tile = 0;
-	if ((y - 1) < 0 || (TheMap.Fields[x + (y - 1) * TheMap.Info.MapWidth].
+	if ((y - 1) < 0 || (Map.Fields[x + (y - 1) * Map.Info.MapWidth].
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 0;
 	}
-	if ((x + 1) >= TheMap.Info.MapWidth || (TheMap.Fields[x + 1 + y * TheMap.Info.MapWidth].
+	if ((x + 1) >= Map.Info.MapWidth || (Map.Fields[x + 1 + y * Map.Info.MapWidth].
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 1;
 	}
-	if ((y + 1) >= TheMap.Info.MapHeight || (TheMap.Fields[x + (y + 1) * TheMap.Info.MapWidth].
+	if ((y + 1) >= Map.Info.MapHeight || (Map.Fields[x + (y + 1) * Map.Info.MapWidth].
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 2;
 	}
-	if ((x - 1) < 0 || (TheMap.Fields[x - 1 + y * TheMap.Info.MapWidth].
+	if ((x - 1) < 0 || (Map.Fields[x - 1 + y * Map.Info.MapWidth].
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 3;
 	}
 
 	if (t & MapFieldHuman) {
-		tile = TheMap.Tileset.HumanWallTable[tile];
+		tile = Map.Tileset.HumanWallTable[tile];
 		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->Variable[HP_INDEX].Max / 2) {
-			while (TheMap.Tileset.Table[tile]) { // Skip good tiles
+			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset.Table[tile]) { // Skip separator
+			while (!Map.Tileset.Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	} else {
-		tile = TheMap.Tileset.OrcWallTable[tile];
+		tile = Map.Tileset.OrcWallTable[tile];
 		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->Variable[HP_INDEX].Max / 2) {
-			while (TheMap.Tileset.Table[tile]) { // Skip good tiles
+			while (Map.Tileset.Table[tile]) { // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset.Table[tile]) { // Skip separator
+			while (!Map.Tileset.Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	}
 	if (mf->Value == 0) {
-		while (TheMap.Tileset.Table[tile]) { // Skip good tiles
+		while (Map.Tileset.Table[tile]) { // Skip good tiles
 			++tile;
 		}
-		while (!TheMap.Tileset.Table[tile]) { // Skip separator
+		while (!Map.Tileset.Table[tile]) { // Skip separator
 			++tile;
 		}
 	}
-	tile = TheMap.Tileset.Table[tile];
+	tile = Map.Tileset.Table[tile];
 
 	if (mf->Tile != tile) {
 		mf->Tile = tile;
@@ -291,7 +291,7 @@ void MapRemoveWall(unsigned x, unsigned y)
 {
 	MapField* mf;
 
-	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
+	mf = Map.Fields + x + y * Map.Info.MapWidth;
 	// FIXME: support more walls of different races.
 	mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
@@ -318,17 +318,17 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 {
 	MapField* mf;
 
-	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
+	mf = Map.Fields + x + y * Map.Info.MapWidth;
 
 	// FIXME: support more walls of different races.
 	if (humanwall) {
 		// FIXME: Set random walls
-		mf->Tile = TheMap.Tileset.Table[TheMap.Tileset.HumanWallTable[0]];
+		mf->Tile = Map.Tileset.Table[Map.Tileset.HumanWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
 		mf->Value = UnitTypeHumanWall->Variable[HP_INDEX].Max;
 	} else {
 		// FIXME: Set random walls
-		mf->Tile = TheMap.Tileset.Table[TheMap.Tileset.OrcWallTable[0]];
+		mf->Tile = Map.Tileset.Table[Map.Tileset.OrcWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable;
 		mf->Value = UnitTypeOrcWall->Variable[HP_INDEX].Max;
 	}
@@ -354,12 +354,12 @@ void HitWall(unsigned x, unsigned y, unsigned damage)
 {
 	unsigned v;
 
-	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Value;
+	v = Map.Fields[x + y * Map.Info.MapWidth].Value;
 	if (v <= damage) {
-		TheMap.Fields[x + y * TheMap.Info.MapWidth].Value = 0;
+		Map.Fields[x + y * Map.Info.MapWidth].Value = 0;
 		MapRemoveWall(x, y);
 	} else {
-		TheMap.Fields[x + y * TheMap.Info.MapWidth].Value = v - damage;
+		Map.Fields[x + y * Map.Info.MapWidth].Value = v - damage;
 		MapFixWallTile(x, y);
 	}
 }
