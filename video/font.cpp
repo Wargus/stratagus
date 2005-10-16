@@ -666,7 +666,6 @@ static void FontMeasureWidths(CFont *fp)
 /**
 **  Make font bitmap.
 **
-**  @param g     Font graphic
 **  @param font  Font number
 */
 #ifdef USE_OPENGL
