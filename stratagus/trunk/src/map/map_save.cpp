@@ -88,7 +88,7 @@ void SaveMap(CFile *file)
 	for (h = 0; h < Map.Info.MapHeight; ++h) {
 		file->printf("  -- %d\n", h);
 		for (w = 0; w < Map.Info.MapWidth; ++w) {
-			MapField* mf;
+			CMapField *mf;
 
 			mf = &Map.Fields[h * Map.Info.MapWidth + w];
 			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);

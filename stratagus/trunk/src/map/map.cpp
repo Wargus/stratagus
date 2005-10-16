@@ -74,7 +74,7 @@ void MapMarkSeenTile(int x, int y)
 {
 	int tile;
 	int seentile;
-	MapField *mf;
+	CMapField *mf;
 
 	mf = Map.Fields + x + y * Map.Info.MapWidth;
 	//
@@ -348,7 +348,7 @@ void PreprocessMap(void)
 {
 	int ix;
 	int iy;
-	MapField *mf;
+	CMapField *mf;
 
 	for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
@@ -371,14 +371,14 @@ void PreprocessMap(void)
 /**
 **  Release info about a map.
 **
-**  @param info  MapInfo pointer.
+**  @param info  CMapInfo pointer.
 */
-void FreeMapInfo(MapInfo *info)
+void FreeMapInfo(CMapInfo *info)
 {
 	if (info) {
 		delete[] info->Description;
 		delete[] info->Filename;
-		memset(info, 0, sizeof(MapInfo));
+		memset(info, 0, sizeof(CMapInfo));
 	}
 }
 
@@ -388,7 +388,7 @@ void FreeMapInfo(MapInfo *info)
 void CreateMap(int width, int height) 
 {
 	if (!Map.Fields) {
-		Map.Fields = new MapField[width * height];
+		Map.Fields = new CMapField[width * height];
 		if (!Map.Fields) {
 			perror("new");
 			ExitFatal(-1);
@@ -469,7 +469,7 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 	int *lookuptable;
 	int removedtile;
 	int flags;
-	MapField *mf;
+	CMapField *mf;
 
 
 	//  Outside of map or no wood.
@@ -646,7 +646,7 @@ void MapFixNeighbors(unsigned short type, int seen, int x, int y)
 */
 void MapClearTile(unsigned short type, unsigned x, unsigned y)
 {
-	MapField *mf;
+	CMapField *mf;
 	int removedtile;
 	int flags;
 
@@ -687,8 +687,8 @@ void MapClearTile(unsigned short type, unsigned x, unsigned y)
 */
 static void RegenerateForestTile(int x, int y)
 {
-	MapField *mf;
-	MapField *tmp;
+	CMapField *mf;
+	CMapField *tmp;
 
 	mf = Map.Fields + x + y * Map.Info.MapWidth;
 	if (mf->Tile != Map.Tileset.RemovedTree) {
