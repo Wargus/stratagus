@@ -91,7 +91,7 @@ static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 **  @param mapname   map filename
 **  @param map       map loaded
 */
-static void LoadStratagusMap(const char *mapname, WorldMap *map)
+static void LoadStratagusMap(const char *mapname, CMap *map)
 {
 	char mapfull[PATH_MAX];
 	CFile file;
@@ -121,11 +121,11 @@ static void LoadStratagusMap(const char *mapname, WorldMap *map)
 		ExitFatal(-1);
 	}
 #endif
-	if (!TheMap.Info.MapWidth || !TheMap.Info.MapHeight) {
+	if (!Map.Info.MapWidth || !Map.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
-	TheMap.Info.Filename = new_strdup(mapname);
+	Map.Info.Filename = new_strdup(mapname);
 }
 
 /**
@@ -135,7 +135,7 @@ static void LoadStratagusMap(const char *mapname, WorldMap *map)
 **  @param map       map to save
 **  @param writeTerrain   write the tiles map in the .sms
 */
-int SaveStratagusMap(const char* mapname, WorldMap* map, int writeTerrain)
+int SaveStratagusMap(const char* mapname, CMap* map, int writeTerrain)
 {
 	gzFile f;
 	int i, j;
@@ -262,7 +262,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map, int writeTerrain)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-static void LoadMap(const char *filename, WorldMap *map)
+static void LoadMap(const char *filename, CMap *map)
 {
 	const char *tmp;
 
@@ -281,13 +281,13 @@ static void LoadMap(const char *filename, WorldMap *map)
 		}
 #endif
 		if (!strcmp(tmp, ".smp")) {
-			if (!TheMap.Info.Filename) {
+			if (!Map.Info.Filename) {
 				// The map info hasn't been loaded yet => do it now
 				LoadStratagusMapInfo(filename);
 			}
-			Assert(TheMap.Info.Filename);
-			CreateMap(TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-			LoadStratagusMap(TheMap.Info.Filename, map);
+			Assert(Map.Info.Filename);
+			CreateMap(Map.Info.MapWidth, Map.Info.MapHeight);
+			LoadStratagusMap(Map.Info.Filename, map);
 			return;
 		}
 	}
@@ -326,7 +326,7 @@ static void GameTypeTopVsBottom(void)
 	int top;
 	int middle;
 
-	middle = TheMap.Info.MapHeight / 2;
+	middle = Map.Info.MapHeight / 2;
 	for (i = 0; i < PlayerMax - 1; ++i) {
 		top = Players[i].StartY <= middle;
 		for (j = 0; j < PlayerMax - 1; ++j) {
@@ -353,7 +353,7 @@ static void GameTypeLeftVsRight(void)
 	int left;
 	int middle;
 
-	middle = TheMap.Info.MapWidth / 2;
+	middle = Map.Info.MapWidth / 2;
 	for (i = 0; i < PlayerMax - 1; ++i) {
 		left = Players[i].StartX <= middle;
 		for (j = 0; j < PlayerMax - 1; ++j) {
@@ -435,7 +435,7 @@ static void GameTypeManTeamVsMachine(void)
 **
 **  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
-void CreateGame(const char* filename, WorldMap* map)
+void CreateGame(const char* filename, CMap* map)
 {
 	int i;
 	int j;
@@ -449,7 +449,7 @@ void CreateGame(const char* filename, WorldMap* map)
 	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 	
-	if (!TheMap.Info.Filename && filename) {
+	if (!Map.Info.Filename && filename) {
 		char path[PATH_MAX];
 		
 		Assert(filename);
@@ -463,7 +463,7 @@ void CreateGame(const char* filename, WorldMap* map)
 		int p;
 		int aiopps;
 
-		p = TheMap.Info.PlayerType[i];
+		p = Map.Info.PlayerType[i];
 		aiopps = 0;
 		// Single player games only:
 		// ARI: FIXME: convert to a preset array to share with network game code
@@ -718,7 +718,7 @@ void InitSettings(void)
 	int i;
 
 	if (RestartScenario) {
-		TheMap.NoFogOfWar = GameSettings.NoFogOfWar;
+		Map.NoFogOfWar = GameSettings.NoFogOfWar;
 		FlagRevealMap = GameSettings.RevealMap;
 		return;
 	}

@@ -116,40 +116,39 @@
 */
 
 /**
-**  @class WorldMap map.h
+**  @class CMap map.h
 **
 **  \#include "map.h"
 **
-**  This structure contains all informations about a stratagus world.
-**  A world is a rectangle of any size. In the future it is planned to
-**  support multiple worlds.
+**  This class contains all information about a stratagus map.
+**  A map is a rectangle of any size.
 **
-**  The world-map structure members:
+**  The map class members:
 **
-**  WorldMap::Fields
+**  CMap::Fields
 **
-**    An array WorldMap::Width*WorldMap::Height of all fields
+**    An array CMap::Width * CMap::Height of all fields
 **    belonging to this map.
 **
-**  WorldMap::NoFogOfWar
+**  CMap::NoFogOfWar
 **
 **    Flag if true, the fog of war is disabled.
 **
-**  WorldMap::Tileset
+**  CMap::Tileset
 **
 **    Tileset data for the map. See ::Tileset. This contains all
 **    information about the tile.
 **
-**  WorldMap::Tiles
+**  CMap::Tiles
 **
 **    Pointer into the tile graphic data. Used to find fast the start
 **    of different tiles.
 **
-**  WorldMap::TileData
+**  CMap::TileData
 **
-**    Tiles graphic for the map, loaded from WorldMap::Tileset::File.
+**    Tiles graphic for the map, loaded from CMap::Tileset::File.
 **
-**  WorldMap::Info
+**  CMap::Info
 **
 **    Descriptive information of the map.
 **    @see ::MapInfo
@@ -258,7 +257,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 	/// Describes the wold map
-class WorldMap {
+class CMap {
 public:
 	MapField *Fields;              /// fields on map
 	unsigned *Visible[PlayerMax];  /// visible bit-field
@@ -277,7 +276,7 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern WorldMap TheMap;  /// The current map
+extern CMap Map;  /// The current map
 extern char CurrentMapPath[]; /// Path to the current map
 
 	/// Vision Table to see where to locate goals and vision
@@ -387,7 +386,7 @@ extern void CreateMap(int width, int height);
 	/// Save the map
 extern void SaveMap(CFile *file);
 	/// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const char *filename, WorldMap *map, int writeTerrain);
+extern int SaveStratagusMap(const char *filename, CMap *map, int writeTerrain);
 	/// Clean the map
 extern void CleanMap(void);
 
@@ -458,7 +457,7 @@ void MapUnmarkUnitSight(CUnit *unit);
 
 	/// Can a unit with 'mask' enter the field
 #define CanMoveToMask(x, y, mask) \
-	!(TheMap.Fields[(x) + (y) * TheMap.Info.MapWidth].Flags & (mask))
+	!(Map.Fields[(x) + (y) * Map.Info.MapWidth].Flags & (mask))
 
 #define MapMarkSight(player, x, y, w, h, range) \
 	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileSight)

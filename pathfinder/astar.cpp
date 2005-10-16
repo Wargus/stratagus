@@ -109,12 +109,12 @@ static int OpenSetSize;
 void InitAStar(void)
 {
 	if (!AStarMatrix) {
-		AStarMatrixSize = sizeof(Node) * TheMap.Info.MapWidth * TheMap.Info.MapHeight;
-		AStarMatrix = new Node[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
-		memset(AStarMatrix, 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(Node));
-		Threshold = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_CLOSE_SET_RATIO;
+		AStarMatrixSize = sizeof(Node) * Map.Info.MapWidth * Map.Info.MapHeight;
+		AStarMatrix = new Node[Map.Info.MapWidth * Map.Info.MapHeight];
+		memset(AStarMatrix, 0, Map.Info.MapWidth * Map.Info.MapHeight * sizeof(Node));
+		Threshold = Map.Info.MapWidth * Map.Info.MapHeight / MAX_CLOSE_SET_RATIO;
 		CloseSet = new int[Threshold];
-		OpenSetMaxSize = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_OPEN_SET_RATIO;
+		OpenSetMaxSize = Map.Info.MapWidth * Map.Info.MapHeight / MAX_OPEN_SET_RATIO;
 		OpenSet = new Open[OpenSetMaxSize];
 	}
 }
@@ -308,14 +308,14 @@ static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask, int current_c
 		return 0;
 	}
 	// Out of bound.
-	if (TheMap.Info.MapWidth <= ex + unit->Type->TileWidth
-		|| TheMap.Info.MapHeight <= ey + unit->Type->TileHeight) {
+	if (Map.Info.MapWidth <= ex + unit->Type->TileWidth
+		|| Map.Info.MapHeight <= ey + unit->Type->TileHeight) {
 		return -1;
 	}
 	// verify each tile of the unit.
 	for (i = ex; i < ex + unit->Type->TileWidth; i++) {
 		for (j = ey; j < ey + unit->Type->TileHeight; j++) {
-			flag = TheMap.Fields[i + j * TheMap.Info.MapWidth].Flags & mask;
+			flag = Map.Fields[i + j * Map.Info.MapWidth].Flags & mask;
 			if(flag && (AStarKnowUnknown || IsMapFieldExplored(unit->Player, i, j)) ) {
 				if(flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
@@ -343,7 +343,7 @@ static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask, int current_c
 				cost += AStarUnknownTerrainCost;
 			}
 			// Add tile movement cost
-			cost += TheMap.Fields[i + j * TheMap.Info.MapWidth].Cost;
+			cost += Map.Fields[i + j * Map.Info.MapWidth].Cost;
 		}
 	}
 	return cost;
@@ -371,7 +371,7 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 
 	if (minrange == 0 && maxrange == 0 && gw == 0 && gh == 0) {
 		if (CostMoveTo(unit, gx, gy, mask, AStarFixedUnitCrossingCost) >= 0) {
-			AStarMatrix[gx + gy * TheMap.Info.MapWidth].InGoal = 1;
+			AStarMatrix[gx + gy * Map.Info.MapWidth].InGoal = 1;
 			return 1;
 		} else {
 			return 0;
@@ -380,15 +380,15 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 
 	for (x = gx; x < gx + gw && !minrange; ++x) {
 		for (y = gy; y < gy + gh; ++y) {
-			if (x < 0 || x >= TheMap.Info.MapWidth || y < 0 || y >= TheMap.Info.MapHeight) {
+			if (x < 0 || x >= Map.Info.MapWidth || y < 0 || y >= Map.Info.MapHeight) {
 				continue;
 			}
 			if (CostMoveTo(unit, x, y, mask, AStarFixedUnitCrossingCost) >= 0) {
-				AStarMatrix[y * TheMap.Info.MapWidth + x].InGoal = 1;
+				AStarMatrix[y * Map.Info.MapWidth + x].InGoal = 1;
 				goal_reachable = 1;
 			}
 			if (*num_in_close < Threshold) {
-				CloseSet[(*num_in_close)++] = y * TheMap.Info.MapWidth + x;
+				CloseSet[(*num_in_close)++] = y * Map.Info.MapWidth + x;
 			}
 		}
 	}
@@ -403,19 +403,19 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 	for (range = minrange; range <= maxrange; ++range) {
 		// Mark Top and Bottom of Goal
 		for (x = gx; x <= gx + gw; ++x) {
-			if (x >= 0 && x < TheMap.Info.MapWidth) {
+			if (x >= 0 && x < Map.Info.MapWidth) {
 				if (gy - range >= 0 && CostMoveTo(unit, x, gy - range, mask, AStarFixedUnitCrossingCost) >= 0) {
-					AStarMatrix[(gy - range) * TheMap.Info.MapWidth + x].InGoal = 1;
+					AStarMatrix[(gy - range) * Map.Info.MapWidth + x].InGoal = 1;
 					goal_reachable = 1;
 					if (*num_in_close < Threshold) {
-						CloseSet[(*num_in_close)++] = (gy - range) * TheMap.Info.MapWidth + x;
+						CloseSet[(*num_in_close)++] = (gy - range) * Map.Info.MapWidth + x;
 					}
 				}
-				if (gy + range + gh < TheMap.Info.MapHeight &&
+				if (gy + range + gh < Map.Info.MapHeight &&
 						CostMoveTo(unit, x, gy + gh + range, mask, AStarFixedUnitCrossingCost) >= 0) {
-					AStarMatrix[(gy + range + gh) * TheMap.Info.MapWidth + x].InGoal = 1;
+					AStarMatrix[(gy + range + gh) * Map.Info.MapWidth + x].InGoal = 1;
 					if (*num_in_close < Threshold) {
-						CloseSet[(*num_in_close)++] = (gy + range + gh) * TheMap.Info.MapWidth + x;
+						CloseSet[(*num_in_close)++] = (gy + range + gh) * Map.Info.MapWidth + x;
 					}
 					goal_reachable = 1;
 				}
@@ -423,19 +423,19 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 		}
 
 		for (y = gy; y <= gy + gh; ++y) {
-			if (y >= 0 && y < TheMap.Info.MapHeight) {
+			if (y >= 0 && y < Map.Info.MapHeight) {
 				if (gx - range >= 0 && CostMoveTo(unit, gx - range, y, mask, AStarFixedUnitCrossingCost) >= 0) {
-					AStarMatrix[y * TheMap.Info.MapWidth + gx - range].InGoal = 1;
+					AStarMatrix[y * Map.Info.MapWidth + gx - range].InGoal = 1;
 					if (*num_in_close < Threshold) {
-						CloseSet[(*num_in_close)++] = y * TheMap.Info.MapWidth + gx - range;
+						CloseSet[(*num_in_close)++] = y * Map.Info.MapWidth + gx - range;
 					}
 					goal_reachable = 1;
 				}
-				if (gx + gw + range < TheMap.Info.MapWidth &&
+				if (gx + gw + range < Map.Info.MapWidth &&
 						CostMoveTo(unit, gx + gw + range, y, mask, AStarFixedUnitCrossingCost) >= 0) {
-					AStarMatrix[y * TheMap.Info.MapWidth + gx + gw + range].InGoal = 1;
+					AStarMatrix[y * Map.Info.MapWidth + gx + gw + range].InGoal = 1;
 					if (*num_in_close < Threshold) {
-						CloseSet[(*num_in_close)++] = y * TheMap.Info.MapWidth + gx + gw + range;
+						CloseSet[(*num_in_close)++] = y * Map.Info.MapWidth + gx + gw + range;
 					}
 					goal_reachable = 1;
 				}
@@ -479,10 +479,10 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 						} else {
 							filler = -1;
 						}
-						if (cx[quad] >= 0 && cx[quad] < TheMap.Info.MapWidth && cy[quad]+filler >= 0 &&
-							cy[quad]+filler < TheMap.Info.MapHeight &&
+						if (cx[quad] >= 0 && cx[quad] < Map.Info.MapWidth && cy[quad]+filler >= 0 &&
+							cy[quad]+filler < Map.Info.MapHeight &&
 							CostMoveTo(unit, cx[quad], cy[quad] + filler, mask, AStarFixedUnitCrossingCost) >= 0) {
-							eo = (cy[quad] + filler) * TheMap.Info.MapWidth + cx[quad];
+							eo = (cy[quad] + filler) * Map.Info.MapWidth + cx[quad];
 							AStarMatrix[eo].InGoal = 1;
 							if (*num_in_close < Threshold) {
 								CloseSet[(*num_in_close)++] = eo;
@@ -505,10 +505,10 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 				// Mark Actually Goal curve change
 				quad = 0;
 				while (quad < 4) {
-					if (cx[quad] >= 0 && cx[quad] < TheMap.Info.MapWidth && cy[quad] >= 0 &&
-						cy[quad] < TheMap.Info.MapHeight &&
+					if (cx[quad] >= 0 && cx[quad] < Map.Info.MapWidth && cy[quad] >= 0 &&
+						cy[quad] < Map.Info.MapHeight &&
 						CostMoveTo(unit, cx[quad], cy[quad], mask, AStarFixedUnitCrossingCost) >= 0) {
-						eo = cy[quad] * TheMap.Info.MapWidth + cx[quad];
+						eo = cy[quad] * Map.Info.MapWidth + cx[quad];
 						AStarMatrix[eo].InGoal = 1;
 						if (*num_in_close < Threshold) {
 							CloseSet[(*num_in_close)++] = eo;
@@ -570,7 +570,7 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 		return PF_UNREACHABLE;
 	}
 
-	eo = y * TheMap.Info.MapWidth + x;
+	eo = y * Map.Info.MapWidth + x;
 	// it is quite important to start from 1 rather than 0, because we use
 	// 0 as a way to represent nodes that we have not visited yet.
 	AStarMatrix[eo].CostFromStart=1;
@@ -590,7 +590,7 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 		return PF_REACHED;
 	}
 
-	counter=TheMap.Info.MapWidth*TheMap.Info.MapHeight;
+	counter=Map.Info.MapWidth*Map.Info.MapHeight;
 
 	while( 1 ) {
 		//
@@ -628,8 +628,8 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 		// Generate successors of this node.
 
 		// Node that this node was generated from.
-		px=x-Heading2X[(int)AStarMatrix[x+TheMap.Info.MapWidth*y].Direction];
-		py=y-Heading2Y[(int)AStarMatrix[x+TheMap.Info.MapWidth*y].Direction];
+		px=x-Heading2X[(int)AStarMatrix[x+Map.Info.MapWidth*y].Direction];
+		py=y-Heading2Y[(int)AStarMatrix[x+Map.Info.MapWidth*y].Direction];
 
 		for( i=0; i<8; ++i ) {
 			ex=x+Heading2X[i];
@@ -644,10 +644,10 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 			//
 			// Outside the map or can't be entered.
 			//
-			if( ex<0 || ex>=TheMap.Info.MapWidth ) {
+			if( ex<0 || ex>=Map.Info.MapWidth ) {
 				continue;
 			}
-			if( ey<0 || ey>=TheMap.Info.MapHeight ) {
+			if( ey<0 || ey>=Map.Info.MapHeight ) {
 				continue;
 			}
 			// if the point is "move to"-able an
@@ -661,7 +661,7 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 
 			// Add a cost for walking to make paths more realistic for the user.
 			new_cost+=abs(Heading2X[i])+abs(Heading2Y[i])+1;
-			eo=ey*TheMap.Info.MapWidth+ex;
+			eo=ey*Map.Info.MapWidth+ex;
 			new_cost+=AStarMatrix[o].CostFromStart;
 			if( AStarMatrix[eo].CostFromStart==0 ) {
 				// we are sure the current node has not been already visited
@@ -709,7 +709,7 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 	gy=ey;
 	i=0;
 	while( ex!=x || ey!=y ) {
-		eo=ey*TheMap.Info.MapWidth+ex;
+		eo=ey*Map.Info.MapWidth+ex;
 		i=AStarMatrix[eo].Direction;
 		ex-=Heading2X[i];
 		ey-=Heading2Y[i];
@@ -728,7 +728,7 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 
 	// Now we have the length, calculate the cached path.
 	while( (ex!=x || ey!=y) && path!=NULL ) {
-		eo=ey*TheMap.Info.MapWidth+ex;
+		eo=ey*Map.Info.MapWidth+ex;
 		i=AStarMatrix[eo].Direction;
 		ex-=Heading2X[i];
 		ey-=Heading2Y[i];
@@ -740,9 +740,9 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 
 	// let's clean up the matrix now
 	AStarCleanUp(num_in_close);
-	if ((TheMap.Info.MapWidth*TheMap.Info.MapHeight) - counter > 500) {
+	if ((Map.Info.MapWidth*Map.Info.MapHeight) - counter > 500) {
 		DebugPrint("%s:%d Visited %d tiles\n" _C_ unit->Type->Name _C_ UnitNumber(unit) 
-			_C_ (TheMap.Info.MapWidth*TheMap.Info.MapHeight) - counter);
+			_C_ (Map.Info.MapWidth*Map.Info.MapHeight) - counter);
 	}
 	return path_length;
 }

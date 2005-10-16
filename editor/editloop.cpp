@@ -150,7 +150,7 @@ int GetTileNumber(int basic, int random, int filler)
 	tile = 16 + basic * 16;
 	if (random) {
 		for (n = i = 0; i < 16; ++i) {
-			if (!TheMap.Tileset.Table[tile + i]) {
+			if (!Map.Tileset.Table[tile + i]) {
 				if (!filler) {
 					break;
 				}
@@ -161,16 +161,16 @@ int GetTileNumber(int basic, int random, int filler)
 		n = MyRand() % n;
 		i = -1;
 		do {
-			while (++i < 16 && !TheMap.Tileset.Table[tile + i]) {
+			while (++i < 16 && !Map.Tileset.Table[tile + i]) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
 		return tile + i;
 	}
 	if (filler) {
-		for (i = 0; i < 16 && TheMap.Tileset.Table[tile + i]; ++i) {
+		for (i = 0; i < 16 && Map.Tileset.Table[tile + i]; ++i) {
 		}
-		for (; i < 16 && !TheMap.Tileset.Table[tile + i]; ++i) {
+		for (; i < 16 && !Map.Tileset.Table[tile + i]; ++i) {
 		}
 		if (i != 16) {
 			return tile + i;
@@ -190,19 +190,19 @@ void EditTile(int x, int y, int tile)
 {
 	MapField *mf;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
+	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
 	ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
 
 	//
 	// Change the flags
 	//
-	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
+	mf = &Map.Fields[y * Map.Info.MapWidth + x];
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= TheMap.Tileset.FlagsTable[16 + tile * 16];
+	mf->Flags |= Map.Tileset.FlagsTable[16 + tile * 16];
 
 	UI.Minimap.UpdateSeenXY(x, y);
 	UI.Minimap.UpdateXY(x, y);
@@ -230,15 +230,15 @@ void EditTilesInternal(int x, int y, int tile, int size)
 	if (x < 0) {
 		x = 0;
 	}
-	if (ex > TheMap.Info.MapWidth) {
-		ex = TheMap.Info.MapWidth;
+	if (ex > Map.Info.MapWidth) {
+		ex = Map.Info.MapWidth;
 	}
 	ey = y + size;
 	if (y < 0) {
 		y = 0;
 	}
-	if (ey > TheMap.Info.MapHeight) {
-		ey = TheMap.Info.MapHeight;
+	if (ey > Map.Info.MapHeight) {
+		ey = Map.Info.MapHeight;
 	}
 	while (y < ey) {
 		for (i = x; i < ex; ++i) {
@@ -261,8 +261,8 @@ void EditTiles(int x, int y, int tile, int size)
 	int mx;
 	int my;
 
-	mx = TheMap.Info.MapWidth;
-	my = TheMap.Info.MapHeight;
+	mx = Map.Info.MapWidth;
+	my = Map.Info.MapHeight;
 
 	EditTilesInternal(x, y, tile, size);
 
@@ -340,8 +340,8 @@ static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 	int mx;
 	int my;
 
-	mx = TheMap.Info.MapWidth;
-	my = TheMap.Info.MapHeight;
+	mx = Map.Info.MapWidth;
+	my = Map.Info.MapHeight;
 
 	EditUnitInternal(x, y, type, player);
 
@@ -516,11 +516,11 @@ static void DrawTileIcons(void)
 	while (y < UI.ButtonPanel.Y + 100) {
 		x = UI.ButtonPanel.X + 4;
 		while (x < UI.ButtonPanel.X + 144) {
-			if (!TheMap.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
+			if (!Map.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
 				y = UI.ButtonPanel.Y + 100;
 				break;
 			}
-			TheMap.TileGraphic->DrawFrameClip(TheMap.Tileset.Table[0x10 + i * 16], x, y);
+			Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[0x10 + i * 16], x, y);
 			Video.DrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
@@ -553,14 +553,14 @@ static void DrawPlayers(void)
 		if (i == PlayerMax / 2) {
 			y += 20;
 		}
-		if (i == CursorPlayer && TheMap.Info.PlayerType[i] != PlayerNobody) {
+		if (i == CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
 		}
 		Video.DrawRectangle(
-			i == CursorPlayer && TheMap.Info.PlayerType[i] != PlayerNobody ?
+			i == CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody ?
 				ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
-		if (TheMap.Info.PlayerType[i] != PlayerNobody) {
+		if (Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.FillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
 				17, 17);
 		}
@@ -575,10 +575,10 @@ static void DrawPlayers(void)
 	y += 18 * 1 + 4;
 	if (SelectedPlayer != -1) {
 		i = sprintf(buf,"Plyr %d %s ", SelectedPlayer,
-				PlayerRaces.Name[TheMap. Info.PlayerSide[SelectedPlayer]]);
+				PlayerRaces.Name[Map. Info.PlayerSide[SelectedPlayer]]);
 		// Players[SelectedPlayer].RaceName);
 
-		switch (TheMap.Info.PlayerType[SelectedPlayer]) {
+		switch (Map.Info.PlayerType[SelectedPlayer]) {
 			case PlayerNeutral:
 				strcat(buf, "Neutral");
 				break;
@@ -745,7 +745,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 
 	x += 4;
 	y += 4;
-	TheMap.TileGraphic->DrawFrameClip(TheMap.Tileset.Table[tilenum], x, y);
+	Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
 		Video.DrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
@@ -887,8 +887,8 @@ static void DrawMapCursor(void)
 					if (tx >= UI.MouseViewport->EndX) {
 						break;
 					}
-					TheMap.TileGraphic->DrawFrameClip(
-						TheMap.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
+					Map.TileGraphic->DrawFrameClip(
+						Map.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
 				}
 			}
 			Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
@@ -925,7 +925,7 @@ static void DrawStartLocations(void)
 	}
 
 	for (i = 0; i < PlayerMax; i++) {
-		if (TheMap.Info.PlayerType[i] != PlayerNobody && TheMap.Info.PlayerType[i] != PlayerNeutral) {
+		if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
 			x = CurrentViewport->Map2ViewportX(Players[i].StartX);
 			y = CurrentViewport->Map2ViewportY(Players[i].StartY);
 			if (type) {
@@ -967,9 +967,9 @@ static void DrawEditorInfo(void)
 	//
 	// Flags info
 	//
-	flags = TheMap.Fields[x + y * TheMap.Info.MapWidth].Flags;
+	flags = Map.Fields[x + y * Map.Info.MapWidth].Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-		TheMap.Fields[x + y * TheMap.Info.MapWidth].Value, flags,
+		Map.Fields[x + y * Map.Info.MapWidth].Value, flags,
 		flags & MapFieldUnpassable   ? 'u' : '-',
 		flags & MapFieldNoBuilding   ? 'n' : '-',
 		flags & MapFieldHuman        ? 'h' : '-',
@@ -988,20 +988,20 @@ static void DrawEditorInfo(void)
 	//
 	// Tile info
 	//
-	tile = TheMap.Fields[x + y * TheMap.Info.MapWidth].Tile;
+	tile = Map.Fields[x + y * Map.Info.MapWidth].Tile;
 
-	for (i = 0; i < TheMap.Tileset.NumTiles; ++i) {
-		if (tile == TheMap.Tileset.Table[i]) {
+	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
+		if (tile == Map.Tileset.Table[i]) {
 			break;
 		}
 	}
 
-	Assert(i != TheMap.Tileset.NumTiles);
+	Assert(i != Map.Tileset.NumTiles);
 
 	sprintf(buf, "%d %s %s", tile,
-		TheMap.Tileset.SolidTerrainTypes[TheMap.Tileset.Tiles[i].BaseTerrain].TerrainName,
-		TheMap.Tileset.Tiles[i].MixTerrain
-			? TheMap.Tileset.SolidTerrainTypes[TheMap.Tileset.Tiles[i].MixTerrain].TerrainName
+		Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].BaseTerrain].TerrainName,
+		Map.Tileset.Tiles[i].MixTerrain
+			? Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].MixTerrain].TerrainName
 			: "");
 
 	VideoDrawText(UI.ResourceX + 252, UI.ResourceY + 2, GameFont, buf);
@@ -1210,7 +1210,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				TileToolDecoration ^= 1;
 				return;
 		}
-		if (TheMap.Tileset.Tiles[16 + (ButtonUnderCursor - 100) * 16].BaseTerrain) {
+		if (Map.Tileset.Tiles[16 + (ButtonUnderCursor - 100) * 16].BaseTerrain) {
 			TileCursor = ButtonUnderCursor - 100;
 		}
 		return;
@@ -1220,7 +1220,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
 		// Cursor on player icons
 		if (CursorPlayer != -1) {
-			if (TheMap.Info.PlayerType[CursorPlayer] != PlayerNobody) {
+			if (Map.Info.PlayerType[CursorPlayer] != PlayerNobody) {
 				SelectedPlayer = CursorPlayer;
 				ThisPlayer = Players + SelectedPlayer;
 			}
@@ -1714,7 +1714,7 @@ static void EditorCallbackMouse(int x, int y)
 				by += 20;
 			}
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
-				if (TheMap.Info.PlayerType[i] != PlayerNobody) {
+				if (Map.Info.PlayerType[i] != PlayerNobody) {
 					sprintf(buf,"Select player #%d",i);
 					UI.StatusLine.Set(buf);
 				} else {
@@ -1785,7 +1785,7 @@ static void EditorCallbackMouse(int x, int y)
 		while (by < UI.ButtonPanel.Y + 100) {
 			bx = UI.ButtonPanel.X + 4;
 			while (bx < UI.ButtonPanel.X + 144) {
-				if (!TheMap.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
+				if (!Map.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
 					by = UI.ButtonPanel.Y + 100;
 					break;
 				}
@@ -1794,8 +1794,8 @@ static void EditorCallbackMouse(int x, int y)
 					int j;
 
 					// FIXME: i is wrong, must find the solid type
-					j = TheMap.Tileset.Tiles[i * 16 + 16].BaseTerrain;
-					//MAPTODO UI.StatusLine.Set(TheMap.Tileset.SolidTerrainTypes[j].TerrainName);
+					j = Map.Tileset.Tiles[i * 16 + 16].BaseTerrain;
+					//MAPTODO UI.StatusLine.Set(Map.Tileset.SolidTerrainTypes[j].TerrainName);
 					ButtonUnderCursor = i + 100;
 					CursorOn = CursorOnButton;
 					return;
@@ -1947,40 +1947,40 @@ static void CreateEditor(void)
 	ThisPlayer = &Players[0];
 
 	FlagRevealMap = 1; // editor without fog and all visible
-	TheMap.NoFogOfWar = true;
+	Map.NoFogOfWar = true;
 
 	if (!*CurrentMapPath) { // new map!
 		InitUnitTypes(1);
 		//
-		// Inititialize TheMap / Players.
+		// Inititialize Map / Players.
 		//
 		InitPlayers();
 		for (i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
-				TheMap.Info.PlayerType[i] = PlayerNeutral;
-				TheMap.Info.PlayerSide[i] = Players[i].Race = 0;
+				Map.Info.PlayerType[i] = PlayerNeutral;
+				Map.Info.PlayerSide[i] = Players[i].Race = 0;
 			} else {
 				CreatePlayer(PlayerNobody);
-				TheMap.Info.PlayerType[i] = PlayerNobody;
+				Map.Info.PlayerType[i] = PlayerNobody;
 			}
 		}
 
-		TheMap.Fields = new MapField[TheMap.Info.MapWidth * TheMap.Info.MapHeight];
-		TheMap.Visible[0] = new unsigned[TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2];
-		memset(TheMap.Visible[0], 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2 * sizeof(unsigned));
+		Map.Fields = new MapField[Map.Info.MapWidth * Map.Info.MapHeight];
+		Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
+		memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
 		InitUnitCache();
 
-		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {
-			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
-			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile =
-				TheMap.Tileset.Table[0x50];
-			TheMap.Fields[i].Flags = TheMap.Tileset.FlagsTable[0x50];
+		for (i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+			Map.Fields[i].Tile = Map.Fields[i].SeenTile = 0;
+			Map.Fields[i].Tile = Map.Fields[i].SeenTile =
+				Map.Tileset.Table[0x50];
+			Map.Fields[i].Flags = Map.Tileset.FlagsTable[0x50];
 		}
 		GameSettings.Resources = SettingsResourcesMapDefault;
-		CreateGame(NULL, &TheMap);
+		CreateGame(NULL, &Map);
 	} else {
-		CreateGame(CurrentMapPath, &TheMap);
+		CreateGame(CurrentMapPath, &Map);
 	}
 
 	ReplayRevealMap = 1;
@@ -1991,7 +1991,7 @@ static void CreateEditor(void)
 	// Place the start points, which the loader discarded.
 	//
 	for (i = 0; i < PlayerMax; ++i) {
-		if (TheMap.Info.PlayerType[i] != PlayerNobody) {
+		if (Map.Info.PlayerType[i] != PlayerNobody) {
 			// Set SelectedPlayer to a valid player
 			if (SelectedPlayer == PlayerNumNeutral) {
 				SelectedPlayer = i;
@@ -2037,7 +2037,7 @@ static void CreateEditor(void)
 */
 int EditorSaveMap(const char *file)
 {
-	if (SaveStratagusMap(file, &TheMap, TerrainEditable) == -1) {
+	if (SaveStratagusMap(file, &Map, TerrainEditable) == -1) {
 		ErrorMenu("Cannot save map");
 		InterfaceState = IfaceStateNormal;
 		EditorUpdateDisplay();

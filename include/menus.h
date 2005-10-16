@@ -122,7 +122,7 @@ typedef int MenuButtonId;
 
 class ButtonStyle;
 class MapInfo;
-class WorldMap;
+class CMap;
 class CGraphic;
 struct _menuitem_;
 
@@ -402,7 +402,7 @@ extern void SetupEditor(void);
 extern void ErrorMenu(char *);
 
 	/// Menu Loop
-extern void MenuLoop(const char *filename, WorldMap *map);
+extern void MenuLoop(const char *filename, CMap *map);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);

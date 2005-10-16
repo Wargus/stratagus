@@ -70,27 +70,27 @@ void SaveMap(CFile *file)
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: map $Id$\n");
 
-	file->printf("LoadTileModels(\"%s\")\n\n", TheMap.TileModelsFileName);
+	file->printf("LoadTileModels(\"%s\")\n\n", Map.TileModelsFileName);
 	
 	file->printf("StratagusMap(\n");
 
 	file->printf("  \"version\", \"" StratagusFormatString "\",\n",
 		StratagusFormatArgs(StratagusVersion));
-	file->printf("  \"description\", \"%s\",\n", TheMap.Info.Description);
+	file->printf("  \"description\", \"%s\",\n", Map.Info.Description);
 
 	file->printf("  \"the-map\", {\n");
 
-	file->printf("  \"size\", {%d, %d},\n", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-	file->printf("  \"%s\",\n", TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
-	file->printf("  \"filename\", \"%s\",\n", TheMap.Info.Filename);
+	file->printf("  \"size\", {%d, %d},\n", Map.Info.MapWidth, Map.Info.MapHeight);
+	file->printf("  \"%s\",\n", Map.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
+	file->printf("  \"filename\", \"%s\",\n", Map.Info.Filename);
 
 	file->printf("  \"map-fields\", {\n");
-	for (h = 0; h < TheMap.Info.MapHeight; ++h) {
+	for (h = 0; h < Map.Info.MapHeight; ++h) {
 		file->printf("  -- %d\n", h);
-		for (w = 0; w < TheMap.Info.MapWidth; ++w) {
+		for (w = 0; w < Map.Info.MapWidth; ++w) {
 			MapField* mf;
 
-			mf = &TheMap.Fields[h * TheMap.Info.MapWidth + w];
+			mf = &Map.Fields[h * Map.Info.MapWidth + w];
 			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
 			if (mf->Value) {
 				file->printf(" %d,", mf->Value);

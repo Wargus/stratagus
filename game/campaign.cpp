@@ -172,7 +172,7 @@ void PlayCampaign(const char *name)
 	SkipCurrentChapter = 1;
 	GameResult = GameNoResult;
 
-	FreeMapInfo(&TheMap.Info);
+	FreeMapInfo(&Map.Info);
 	strcpy(CurrentMapPath, filename);
 }
 

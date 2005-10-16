@@ -233,8 +233,8 @@ void HandleActionBoard(CUnit *unit)
 							//
 							// Try with a bigger range.
 							//
-							if (unit->Orders[0]->Range <= TheMap.Info.MapWidth ||
-									unit->Orders[0]->Range <= TheMap.Info.MapHeight) {
+							if (unit->Orders[0]->Range <= Map.Info.MapWidth ||
+									unit->Orders[0]->Range <= Map.Info.MapHeight) {
 								unit->Orders[0]->Range++;
 								unit->SubAction--;
 							}

@@ -129,16 +129,16 @@ void CMinimap::Create(void)
 {
 	int n;
 
-	if (TheMap.Info.MapWidth > TheMap.Info.MapHeight) { // Scale to biggest value.
-		n = TheMap.Info.MapWidth;
+	if (Map.Info.MapWidth > Map.Info.MapHeight) { // Scale to biggest value.
+		n = Map.Info.MapWidth;
 	} else {
-		n = TheMap.Info.MapHeight;
+		n = Map.Info.MapHeight;
 	}
 	MinimapScaleX = (W * MINIMAP_FAC + n - 1) / n;
 	MinimapScaleY = (H * MINIMAP_FAC + n - 1) / n;
 
-	XOffset = (W - (TheMap.Info.MapWidth * MinimapScaleX) / MINIMAP_FAC) / 2;
-	YOffset = (H - (TheMap.Info.MapHeight * MinimapScaleY) / MINIMAP_FAC) / 2;
+	XOffset = (W - (Map.Info.MapWidth * MinimapScaleX) / MINIMAP_FAC) / 2;
+	YOffset = (H - (Map.Info.MapHeight * MinimapScaleY) / MINIMAP_FAC) / 2;
 
 	DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
 		MinimapScaleX / MINIMAP_FAC _C_ MinimapScaleY / MINIMAP_FAC _C_
@@ -158,18 +158,18 @@ void CMinimap::Create(void)
 		Minimap2MapX[n] = ((n - XOffset) * MINIMAP_FAC) / MinimapScaleX;
 	}
 	for (n = YOffset; n < H - YOffset; ++n) {
-		Minimap2MapY[n] = (((n - YOffset) * MINIMAP_FAC) / MinimapScaleY) * TheMap.Info.MapWidth;
+		Minimap2MapY[n] = (((n - YOffset) * MINIMAP_FAC) / MinimapScaleY) * Map.Info.MapWidth;
 	}
-	for (n = 0; n < TheMap.Info.MapWidth; ++n) {
+	for (n = 0; n < Map.Info.MapWidth; ++n) {
 		Map2MinimapX[n] = (n * MinimapScaleX) / MINIMAP_FAC;
 	}
-	for (n = 0; n < TheMap.Info.MapHeight; ++n) {
+	for (n = 0; n < Map.Info.MapHeight; ++n) {
 		Map2MinimapY[n] = (n * MinimapScaleY) / MINIMAP_FAC;
 	}
 
 	// Palette updated from UpdateMinimapTerrain()
 #ifndef USE_OPENGL
-	SDL_PixelFormat *f = TheMap.TileGraphic->Surface->format;
+	SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
 	MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
 		W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 	MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
@@ -222,23 +222,23 @@ void CMinimap::UpdateTerrain(void)
 	if (!(scaley = (MinimapScaleY / MINIMAP_FAC))) {
 		scaley = 1;
 	}
-	bpp = TheMap.TileGraphic->Surface->format->BytesPerPixel;
+	bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
 #ifndef USE_OPENGL
 	if (bpp == 1) {
 		SDL_SetPalette(MinimapTerrainSurface, SDL_LOGPAL,
-			TheMap.TileGraphic->Surface->format->palette->colors, 0, 256);
+			Map.TileGraphic->Surface->format->palette->colors, 0, 256);
 		SDL_SetPalette(MinimapSurface, SDL_LOGPAL,
-			TheMap.TileGraphic->Surface->format->palette->colors, 0, 256);
+			Map.TileGraphic->Surface->format->palette->colors, 0, 256);
 	}
 #endif
 
-	tilepitch = TheMap.TileGraphic->Surface->w / TileSizeX;
+	tilepitch = Map.TileGraphic->Surface->w / TileSizeX;
 
 #ifndef USE_OPENGL
 	SDL_LockSurface(MinimapTerrainSurface);
 #endif
-	SDL_LockSurface(TheMap.TileGraphic->Surface);
+	SDL_LockSurface(Map.TileGraphic->Surface);
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
@@ -249,7 +249,7 @@ void CMinimap::UpdateTerrain(void)
 			Uint32 c;
 #endif
 
-			tile = TheMap.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
+			tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
 
 			xofs = TileSizeX * (tile % tilepitch);
 			yofs = TileSizeY * (tile / tilepitch);
@@ -257,42 +257,42 @@ void CMinimap::UpdateTerrain(void)
 #ifndef USE_OPENGL
 			if (bpp == 1) {
 				((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
-					((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+					((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch];
+						Map.TileGraphic->Surface->pitch];
 			} else if (bpp == 3) {
 				unsigned char* d;
 				unsigned char* s;
 
 				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-				s = &((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch];
+						Map.TileGraphic->Surface->pitch];
 				*d++ = *s++;
 				*d++ = *s++;
 				*d++ = *s++;
 			} else {
 				*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
-					*(Uint32 *)&((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+					*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch];
+						Map.TileGraphic->Surface->pitch];
 			}
 #else
 			if (bpp == 1) {
 				SDL_Color color;
 
-				color = TheMap.TileGraphic->Surface->format->palette->colors[
-					((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+				color = Map.TileGraphic->Surface->format->palette->colors[
+					((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch]];
+						Map.TileGraphic->Surface->pitch]];
 				c = Video.MapRGB(0, color.r, color.g, color.b);
 			} else {
 				SDL_PixelFormat* f;
 
-				f = TheMap.TileGraphic->Surface->format;
-				c = *(Uint32 *)&((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+				f = Map.TileGraphic->Surface->format;
+				c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
 					(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-					TheMap.TileGraphic->Surface->pitch];
+					Map.TileGraphic->Surface->pitch];
 				c = Video.MapRGB(0,
 					((c & f->Rmask) >> f->Rshift),
 					((c & f->Gmask) >> f->Gshift),
@@ -306,7 +306,7 @@ void CMinimap::UpdateTerrain(void)
 #ifndef USE_OPENGL
 	SDL_UnlockSurface(MinimapTerrainSurface);
 #endif
-	SDL_UnlockSurface(TheMap.TileGraphic->Surface);
+	SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
 /**
@@ -341,8 +341,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 		scaley = 1;
 	}
 
-	tilepitch = TheMap.TileGraphic->Surface->w / TileSizeX;
-	bpp = TheMap.TileGraphic->Surface->format->BytesPerPixel;
+	tilepitch = Map.TileGraphic->Surface->w / TileSizeX;
+	bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -350,9 +350,9 @@ void CMinimap::UpdateXY(int tx, int ty)
 #ifndef USE_OPENGL
 	SDL_LockSurface(MinimapTerrainSurface);
 #endif
-	SDL_LockSurface(TheMap.TileGraphic->Surface);
+	SDL_LockSurface(Map.TileGraphic->Surface);
 
-	ty *= TheMap.Info.MapWidth;
+	ty *= Map.Info.MapWidth;
 	for (my = YOffset; my < H - YOffset; ++my) {
 		y = Minimap2MapY[my];
 		if (y < ty) {
@@ -376,9 +376,9 @@ void CMinimap::UpdateXY(int tx, int ty)
 				break;
 			}
 
-			tile = TheMap.Fields[x + y].SeenTile;
+			tile = Map.Fields[x + y].SeenTile;
 			if (!tile) {
-				tile = TheMap.Fields[x + y].Tile;
+				tile = Map.Fields[x + y].Tile;
 			}
 
 			xofs = TileSizeX * (tile % tilepitch);
@@ -387,42 +387,42 @@ void CMinimap::UpdateXY(int tx, int ty)
 #ifndef USE_OPENGL
 			if (bpp == 1) {
 				((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
-					((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+					((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch];
+						Map.TileGraphic->Surface->pitch];
 			} else if (bpp == 3) {
 				unsigned char* d;
 				unsigned char* s;
 
 				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-				s = &((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch];
+						Map.TileGraphic->Surface->pitch];
 				*d++ = *s++;
 				*d++ = *s++;
 				*d++ = *s++;
 			} else {
 				*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
-					*(Uint32 *)&((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+					*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch];
+						Map.TileGraphic->Surface->pitch];
 			}
 #else
 			if (bpp == 1) {
 				SDL_Color color;
 
-				color = TheMap.TileGraphic->Surface->format->palette->colors[
-					((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+				color = Map.TileGraphic->Surface->format->palette->colors[
+					((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						TheMap.TileGraphic->Surface->pitch]];
+						Map.TileGraphic->Surface->pitch]];
 				c = Video.MapRGB(0, color.r, color.g, color.b);
 			} else {
 				SDL_PixelFormat* f;
 
-				f = TheMap.TileGraphic->Surface->format;
-				c = *(Uint32 *)&((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
+				f = Map.TileGraphic->Surface->format;
+				c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
 					(xofs + 7 + (mx % scalex) * 8) * 4 + (yofs + 6 + (my % scaley) * 8) *
-					TheMap.TileGraphic->Surface->pitch];
+					Map.TileGraphic->Surface->pitch];
 				c = Video.MapRGB(0,
 					((c & f->Rmask) >> f->Rshift),
 					((c & f->Gmask) >> f->Gshift),
@@ -436,7 +436,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 #ifndef USE_OPENGL
 	SDL_UnlockSurface(MinimapTerrainSurface);
 #endif
-	SDL_UnlockSurface(TheMap.TileGraphic->Surface);
+	SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
 /**
@@ -568,7 +568,7 @@ void CMinimap::Update(void)
 			if (ReplayRevealMap) {
 				visiontype = 2;
 			} else {
-				visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Info.MapWidth);
+				visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 			}
 
 			if (WithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {
@@ -696,7 +696,7 @@ int CMinimap::Screen2MapX(int x)
 	if (tx < 0) {
 		return 0;
 	}
-	return tx < TheMap.Info.MapWidth ? tx : TheMap.Info.MapWidth - 1;
+	return tx < Map.Info.MapWidth ? tx : Map.Info.MapWidth - 1;
 }
 
 /**
@@ -714,7 +714,7 @@ int CMinimap::Screen2MapY(int y)
 	if (ty < 0) {
 		return 0;
 	}
-	return ty < TheMap.Info.MapHeight ? ty : TheMap.Info.MapHeight - 1;
+	return ty < Map.Info.MapHeight ? ty : Map.Info.MapHeight - 1;
 }
 
 /**

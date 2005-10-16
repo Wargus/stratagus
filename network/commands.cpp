@@ -208,8 +208,8 @@ static FullReplay *StartReplay(void)
 	}
 
 	replay->Date = new_strdup(s);
-	replay->Map = new_strdup(TheMap.Info.Description);
-	replay->MapId = (signed int)TheMap.Info.MapUID;
+	replay->Map = new_strdup(Map.Info.Description);
+	replay->MapId = (signed int)Map.Info.MapUID;
 	replay->MapPath = new_strdup(CurrentMapPath);
 	replay->Resource = GameSettings.Resources;
 	replay->NumUnits = GameSettings.NumUnits;
@@ -259,7 +259,7 @@ static void ApplyReplaySettings(void)
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
 	GameSettings.Terrain = CurrentReplay->TileSet;
-	TheMap.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
+	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
 	GameSettings.GameType = CurrentReplay->GameType;
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
 	GameSettings.Opponents = CurrentReplay->Opponents;
