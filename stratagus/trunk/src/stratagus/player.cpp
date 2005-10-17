@@ -133,7 +133,7 @@ void CleanPlayers(void)
 **
 **  @note FIXME: Not completely saved.
 */
-void SavePlayers(CFile* file)
+void SavePlayers(CFile *file)
 {
 	int i;
 	int j;

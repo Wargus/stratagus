@@ -460,7 +460,7 @@ long CFile::tell()
 **              is replaced by the full filename witht he correct extension.
 **  @return 1 if the file has been found.
 **/
-static int FindFileWithExtension(char* file)
+static int FindFileWithExtension(char *file)
 {
 	char buf[PATH_MAX];
 
@@ -496,9 +496,9 @@ static int FindFileWithExtension(char* file)
 **
 **  @return Pointer to buffer.
 */
-char* LibraryFileName(const char* file, char* buffer)
+char *LibraryFileName(const char *file, char *buffer)
 {
-	char* s;
+	char *s;
 
 	// Absolute path or in current directory.
 	strcpy(buffer, file);
@@ -591,7 +591,7 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 	std::vector<FileList> &fl)
 {
 #ifndef _MSC_VER
-	DIR* dirp;
+	DIR *dirp;
 	struct dirent *dp;
 #endif
 	struct stat st;

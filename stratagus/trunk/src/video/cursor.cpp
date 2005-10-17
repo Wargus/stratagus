@@ -207,7 +207,7 @@ static void DrawBuildingCursor(void)
 	int w0;
 	int h;
 	int mask;
-	const CViewport* vp;
+	const CViewport *vp;
 	CUnit *ontop;
 
 	// Align to grid

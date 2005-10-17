@@ -59,7 +59,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern SDL_Surface* TheScreen;
+extern SDL_Surface *TheScreen;
 static int MovieStop;
 
 /*----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ static void MovieCallbackMouseExit(void)
 /**
 **  FIXME: docu
 */
-static int OutputTheora(OggData* data, SDL_Overlay* yuv_overlay, SDL_Rect* rect)
+static int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 {
 	int i;
 	yuv_buffer yuv;
@@ -150,7 +150,7 @@ static int OutputTheora(OggData* data, SDL_Overlay* yuv_overlay, SDL_Rect* rect)
 /**
 **  FIXME: docu
 */
-static int TheoraProcessData(OggData* data)
+static int TheoraProcessData(OggData *data)
 {
 	ogg_packet packet;
 
@@ -177,13 +177,13 @@ static int TheoraProcessData(OggData* data)
 **
 **  @return       Non-zero if file isn't a supported movie.
 */
-int PlayMovie(const char* name)
+int PlayMovie(const char *name)
 {
 	OggData data;
 	CFile f;
 	SDL_Rect rect;
-	SDL_Overlay* yuv_overlay;
-	CSample* sample;
+	SDL_Overlay *yuv_overlay;
+	CSample *sample;
 	EventCallback callbacks;
 	unsigned int start_ticks;
 	int need_data;
@@ -298,7 +298,7 @@ int PlayMovie(const char* name)
 /**
 **  FIXME: docu
 */
-int PlayMovie(const char* name)
+int PlayMovie(const char *name)
 {
 	if (strstr(name, ".ogg\0") || strstr(name, ".avi\0")) {
 		return 0;

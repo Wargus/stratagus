@@ -114,7 +114,7 @@ unsigned CclGetResourceByName(lua_State *l)
 **  @param l      Lua state.
 **  @param blist  BuildingRestriction to fill in
 */
-static void ParseBuildingRules(lua_State* l, std::vector<CBuildRestriction* > &blist)
+static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &blist)
 {
 	const char *value;
 	int args;

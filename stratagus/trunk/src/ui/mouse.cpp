@@ -107,9 +107,9 @@ void DoRightButton(int sx, int sy)
 	int i;
 	int x;                  // coordinate in tile.
 	int y;                  // coordinate in tile.
-	CUnit *dest;             // unit under the cursor if any.
-	CUnit *unit;             // one of the selected unit.
-	CUnitType* type;
+	CUnit *dest;            // unit under the cursor if any.
+	CUnit *unit;            // one of the selected unit.
+	CUnitType *type;
 	int action;             // default action for unit.
 	int acknowledged;       // to play sound
 	int flush;              // append command to old command.
@@ -426,7 +426,7 @@ void DoRightButton(int sx, int sy)
 **
 **  @return        True if mouse is on the button, False otherwise.
 */
-static inline int OnButton(int x, int y, Button* button)
+static inline int OnButton(int x, int y, Button *button)
 {
 	return x >= button->X && x < button->X + button->Style->Width &&
 		y >= button->Y && y < button->Y + button->Style->Height;
@@ -443,7 +443,7 @@ static inline int OnButton(int x, int y, Button* button)
 **
 **  @return    True if mouse is on the graphic, False otherwise.
 */
-static inline int OnGraphic(int x, int y, CGraphic* g, int gx, int gy)
+static inline int OnGraphic(int x, int y, CGraphic *g, int gx, int gy)
 {
 	x -= gx;
 	y -= gy;
@@ -613,7 +613,7 @@ static void HandleMouseOn(int x, int y)
 	//
 	if (!on_ui && x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
 			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		CViewport* vp;
+		CViewport *vp;
 
 		vp = GetViewport(x, y);
 		Assert(vp);
@@ -807,7 +807,7 @@ void UIHandleMouseMove(int x, int y)
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
 	if (CursorOn == CursorOnMap) {
-		const CViewport* vp;
+		const CViewport *vp;
 
 		vp = UI.MouseViewport;
 		if (IsMapFieldExplored(ThisPlayer, vp->Viewport2MapX(x),
@@ -1347,7 +1347,7 @@ static void UISelectStateButtonDown(unsigned button)
 		UI.ButtonPanel.Update();
 
 		if (MouseButtons & LeftButton) {
-			const CViewport* vp;
+			const CViewport *vp;
 
 			vp = UI.MouseViewport;
 			if (ClickMissile) {
@@ -1974,7 +1974,7 @@ void DrawPieMenu(void)
 {
 	int i;
 	const ButtonAction *buttons;
-	CViewport* vp;
+	CViewport *vp;
 	CPlayer *player;
 	char buf[2] = "?";
 
