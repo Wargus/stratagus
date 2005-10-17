@@ -25,7 +25,7 @@ Fonts = {}
 setmetatable(Fonts, mt)
 
 mt = { __index = function(t, key) return CFontColor:Get(key) end }
-Fonts = {}
+FontColors = {}
 setmetatable(FontColors, mt)
 $]
 
