@@ -1,12 +1,11 @@
---       _________ __                 __                               
---      /   _____//  |_____________ _/  |______     ____  __ __  ______
---      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
---      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
---     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
---             \/                  \/          \//_____/            \/ 
---  ______________________                           ______________________
---			  T H E   W A R   B E G I N S
---	   Stratagus - A free fantasy real time strategy game engine
+--            ____            
+--           / __ )____  _____
+--          / __  / __ \/ ___/
+--         / /_/ / /_/ (__  ) 
+--        /_____/\____/____/  
+--
+--  Invasion - Battle of Survival                  
+--   A GPL'd futuristic RTS game
 --
 --	unit-chopper.lua	-	Define the chopper unit.
 --
@@ -57,7 +56,7 @@ DefineIcon({
 	File = "units/chopper/ico_chopper.png"})
 
 DefineUnitType("unit-chopper", {
-	Name = "Rocket Tank",
+	Name = "Chopper",
 	Image = {"file", "units/chopper/unit_chopper.png", "size", {128,128}},
 	Shadow = {"file", "units/chopper/unit_chopper_s.png", "size", {128, 128}, "offset", {5,128}}, 
 	Animations = "animations-chopper", Icon = "icon-chopper",
@@ -83,8 +82,8 @@ DefineUnitType("unit-chopper", {
 DefineAllow("unit-chopper", "AAAAAAAAAAAAAAAA")
 
 DefineButton({
-	Pos = 9, Level = 0, Icon = "icon-chopper", Action = "train-unit",
-	Value = "unit-chopper", Key = "r", Hint = "BUILD ~!Chopper",
+	Pos = 7, Level = 0, Icon = "icon-chopper", Action = "train-unit",
+	Value = "unit-chopper", Key = "c", Hint = "BUILD ~!Chopper",
 	ForUnit = {"unit-vfac"}})
 
 DefineCommonButtons({"unit-chopper"})
