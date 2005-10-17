@@ -154,7 +154,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 
 		size = MusicSample->Read(tmp, len / div);
 
-		n = ConvertToStereo32((char*)(tmp), (char*)buf, MusicSample->Frequency,
+		n = ConvertToStereo32((char *)(tmp), (char *)buf, MusicSample->Frequency,
 			MusicSample->SampleSize / 8, MusicSample->Channels, size);
 
 		for (i = 0; i < n / (int)sizeof(*buf); ++i) {
@@ -231,15 +231,15 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 		size = (sample->Len - index) * div / 2;
 	}
 
-	size = ConvertToStereo32((char*)(sample->Buffer + index), (char*)buf, sample->Frequency,
+	size = ConvertToStereo32((char *)(sample->Buffer + index), (char *)buf, sample->Frequency,
 			sample->SampleSize / 8, sample->Channels,
 			size * 2 / div);
 
 	size /= 2;
 	for (i = 0; i < size; i += 2) {
 		// FIXME: why taking out '/ 2' leads to distortion
-		buffer[i] += ((short*)(buf))[i] * local_volume * left / 128 / MaxVolume / 2;
-		buffer[i + 1] += ((short*)(buf))[i + 1] * local_volume * right / 128 / MaxVolume / 2;
+		buffer[i] += ((short *)buf)[i] * local_volume * left / 128 / MaxVolume / 2;
+		buffer[i + 1] += ((short *)buf)[i + 1] * local_volume * right / 128 / MaxVolume / 2;
 	}
 
 	return 2 * size / div;
@@ -272,7 +272,7 @@ int ConvertToStereo32(const char *src, char *dest, int frequency,
 	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16,
 		2, 44100);
 
-	acvt.buf = (unsigned char*)dest;
+	acvt.buf = (unsigned char *)dest;
 	memcpy(dest, src, bytes);
 	acvt.len = bytes;
 
@@ -549,7 +549,7 @@ static void FillChannels(int free_channels, int *discarded, int *started)
 **
 **  @return        How many channels become free after mixing them.
 */
-static int MixChannelsToStereo32(int* buffer, int size)
+static int MixChannelsToStereo32(int *buffer, int size)
 {
 	int channel;
 	int i;
@@ -584,10 +584,10 @@ static int MixChannelsToStereo32(int* buffer, int size)
 **  @param size    number of samples in input.
 **  @param output  clipped 16 signed bit output buffer.
 */
-static void ClipMixToStereo16(const int* mix, int size, short* output)
+static void ClipMixToStereo16(const int *mix, int size, short *output)
 {
 	int s;
-	const int* end;
+	const int *end;
 
 	end = mix + size;
 	while (mix < end) {

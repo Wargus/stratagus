@@ -189,7 +189,7 @@ char *strcasestr(const char *a, const char *b)
 			++a;
 			x = 0;
 		} else {
-			return (char*)a;
+			return (char *)a;
 		}
 	}
 

@@ -379,7 +379,7 @@ static void InsertResearchRequests(CUpgrade *upgrade)
 **
 **  @param l  Lua state.
 */
-static int CclAiGetRace(lua_State* l)
+static int CclAiGetRace(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushstring(l, PlayerRaces.Name[AiPlayer->Player->Race]);
@@ -393,7 +393,7 @@ static int CclAiGetRace(lua_State* l)
 **
 **  @return   Number of return values
 */
-static int CclAiGetSleepCycles(lua_State* l)
+static int CclAiGetSleepCycles(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, AiSleepCycles);
@@ -409,7 +409,7 @@ static int CclAiGetSleepCycles(lua_State* l)
 **
 **  @return   Number of return values
 */
-static int CclAiDebug(lua_State* l)
+static int CclAiDebug(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	AiPlayer->ScriptDebug = LuaToBoolean(l, 1);
@@ -426,9 +426,9 @@ static int CclAiDebug(lua_State* l)
 **
 **  @return   Number of return values
 */
-static int CclAiDebugPlayer(lua_State* l)
+static int CclAiDebugPlayer(lua_State *l)
 {
-	const char* item;
+	const char *item;
 	int playerid;
 	int args;
 	int j;
@@ -446,7 +446,7 @@ static int CclAiDebugPlayer(lua_State* l)
 				if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
 					continue;
 				}
-				((PlayerAi*)Players[playerid].Ai)->ScriptDebug = 0;
+				((PlayerAi *)Players[playerid].Ai)->ScriptDebug = 0;
 			}
 		} else {
 			if (item && !strcmp(item, "self")) {
@@ -461,7 +461,7 @@ static int CclAiDebugPlayer(lua_State* l)
 			if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
 				continue;
 			}
-			((PlayerAi*)Players[playerid].Ai)->ScriptDebug = 1;
+			((PlayerAi *)Players[playerid].Ai)->ScriptDebug = 1;
 		}
 	}
 	return 0;
@@ -474,7 +474,7 @@ static int CclAiDebugPlayer(lua_State* l)
 **
 **  @return   Number of return values
 */
-static int CclAiNeed(lua_State* l)
+static int CclAiNeed(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	InsertUnitTypeRequests(CclGetUnitType(l), 1);
@@ -517,11 +517,11 @@ static int CclAiSet(lua_State *l)
 **
 **  @return   Number of return values
 */
-static int CclAiWait(lua_State* l)
+static int CclAiWait(lua_State *l)
 {
-	const AiRequestType* autt;
+	const AiRequestType *autt;
 	const CUnitType *type;
-	const int* unit_types_count;
+	const int *unit_types_count;
 	int j;
 	int n;
 
@@ -658,10 +658,10 @@ static int CclAiForce(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclAiForceRole(lua_State* l)
+static int CclAiForceRole(lua_State *l)
 {
 	int force;
-	const char* flag;
+	const char *flag;
 
 	LuaCheckArgs(l, 2);
 	force = LuaToNumber(l, 1);
@@ -686,7 +686,7 @@ static int CclAiForceRole(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiCheckForce(lua_State* l)
+static int CclAiCheckForce(lua_State *l)
 {
 	int force;
 
@@ -708,7 +708,7 @@ static int CclAiCheckForce(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiWaitForce(lua_State* l)
+static int CclAiWaitForce(lua_State *l)
 {
 	int force;
 
@@ -737,7 +737,7 @@ static int CclAiWaitForce(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiAttackWithForce(lua_State* l)
+static int CclAiAttackWithForce(lua_State *l)
 {
 	int force;
 
@@ -758,7 +758,7 @@ static int CclAiAttackWithForce(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiSleep(lua_State* l)
+static int CclAiSleep(lua_State *l)
 {
 	int i;
 
@@ -783,10 +783,10 @@ static int CclAiSleep(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiResearch(lua_State* l)
+static int CclAiResearch(lua_State *l)
 {
-	const char* str;
-	CUpgrade* upgrade;
+	const char *str;
+	CUpgrade *upgrade;
 
 	LuaCheckArgs(l, 1);
 	if ((str = LuaToString(l, 1))) {
@@ -826,7 +826,7 @@ static int CclAiUpgradeTo(lua_State *l)
 **
 **  @return  Player number of the AI.
 */
-static int CclAiPlayer(lua_State* l)
+static int CclAiPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, AiPlayer->Player->Index);
@@ -840,7 +840,7 @@ static int CclAiPlayer(lua_State* l)
 **
 **  @return     Old resource vector
 */
-static int CclAiSetReserve(lua_State* l)
+static int CclAiSetReserve(lua_State *l)
 {
 	int i;
 
@@ -868,7 +868,7 @@ static int CclAiSetReserve(lua_State* l)
 **
 **  @return     Old resource vector
 */
-static int CclAiSetCollect(lua_State* l)
+static int CclAiSetCollect(lua_State *l)
 {
 	int i;
 
@@ -895,12 +895,12 @@ static int CclAiSetCollect(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclAiDump(lua_State* l)
+static int CclAiDump(lua_State *l)
 {
 	int i;
 	int n;
-	const AiUnitType* aut;
-	const AiBuildQueue* queue;
+	const AiUnitType *aut;
+	const AiBuildQueue *queue;
 
 	LuaCheckArgs(l, 0);
 	//
@@ -970,7 +970,7 @@ static int CclAiDump(lua_State* l)
 **
 **  @return   The number of the resource in DefaultResourceNames
 */
-static int DefaultResourceNumber(const char* name)
+static int DefaultResourceNumber(const char *name)
 {
 	int i;
 
@@ -1081,7 +1081,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						LuaError(l, "Unsupported force tag: %s" _C_ value);
 					}
 				} else if (!strcmp(value, "types")) {
-					AiUnitType** queue;
+					AiUnitType **queue;
 					int subsubargs;
 					int subk;
 
@@ -1093,7 +1093,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					queue = &ai->Force[i].UnitTypes;
 					for (subk = 0; subk < subsubargs; ++subk) {
 						int num;
-						const char* ident;
+						const char *ident;
 
 						lua_rawgeti(l, -1, subk + 1);
 						num = LuaToNumber(l, -1);
@@ -1110,7 +1110,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "units")) {
-					AiUnit** queue;
+					AiUnit **queue;
 					int subsubargs;
 					int subk;
 
@@ -1122,7 +1122,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					queue = &ai->Force[i].Units;
 					for (subk = 0; subk < subsubargs; ++subk) {
 						int num;
-						const char* ident;
+						const char *ident;
 
 						lua_rawgeti(l, -1, subk + 1);
 						num = LuaToNumber(l, -1);
@@ -1145,7 +1145,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				const char* type;
+				const char *type;
 				int num;
 
 				lua_rawgeti(l, j + 1, k + 1);
@@ -1163,7 +1163,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				const char* type;
+				const char *type;
 				int num;
 
 				lua_rawgeti(l, j + 1, k + 1);
@@ -1181,7 +1181,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				const char* type;
+				const char *type;
 				int num;
 
 				lua_rawgeti(l, j + 1, k + 1);
@@ -1199,7 +1199,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				const char* type;
+				const char *type;
 				int num;
 
 				lua_rawgeti(l, j + 1, k + 1);
@@ -1217,7 +1217,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				const char* type;
+				const char *type;
 
 				lua_rawgeti(l, j + 1, k + 1);
 				type = LuaToString(l, -1);
@@ -1351,7 +1351,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			subargs = luaL_getn(l, j + 1);
 			queue = &ai->UnitTypeBuilt;
 			for (k = 0; k < subargs; ++k) {
-				const char* ident;
+				const char *ident;
 				int made;
 				int want;
 

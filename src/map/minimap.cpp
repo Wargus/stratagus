@@ -261,8 +261,8 @@ void CMinimap::UpdateTerrain(void)
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						Map.TileGraphic->Surface->pitch];
 			} else if (bpp == 3) {
-				unsigned char* d;
-				unsigned char* s;
+				unsigned char *d;
+				unsigned char *s;
 
 				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
@@ -287,7 +287,7 @@ void CMinimap::UpdateTerrain(void)
 						Map.TileGraphic->Surface->pitch]];
 				c = Video.MapRGB(0, color.r, color.g, color.b);
 			} else {
-				SDL_PixelFormat* f;
+				SDL_PixelFormat *f;
 
 				f = Map.TileGraphic->Surface->format;
 				c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
@@ -391,8 +391,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						Map.TileGraphic->Surface->pitch];
 			} else if (bpp == 3) {
-				unsigned char* d;
-				unsigned char* s;
+				unsigned char *d;
+				unsigned char *s;
 
 				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
@@ -417,7 +417,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 						Map.TileGraphic->Surface->pitch]];
 				c = Video.MapRGB(0, color.r, color.g, color.b);
 			} else {
-				SDL_PixelFormat* f;
+				SDL_PixelFormat *f;
 
 				f = Map.TileGraphic->Surface->format;
 				c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
@@ -577,8 +577,8 @@ void CMinimap::Update(void)
 					((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 						((Uint8*)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch];
 				} else if (bpp == 3) {
-					unsigned char* d;
-					unsigned char* s;
+					unsigned char *d;
+					unsigned char *s;
 
 					d = &((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch];
 					s = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];

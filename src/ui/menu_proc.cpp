@@ -575,7 +575,7 @@ static void DrawListbox(Menuitem *mi, int mx, int my)
 		if (!(flags & MI_FLAGS_DISABLED)) {
 			if (i < mi->D.Listbox.noptions) {
 				SetDefaultTextColors(nc, rc);
-				text = (char*)(*mi->D.Listbox.retrieveopt)(mi, i + s);
+				text = (char *)(*mi->D.Listbox.retrieveopt)(mi, i + s);
 				if (text) {
 					if (i + s == mi->D.Listbox.curopt) {
 						SetDefaultTextColors(rc, rc);
@@ -1177,7 +1177,7 @@ static void PasteFromClipboard(Menuitem *mi)
 		CloseClipboard();
 		return;
 	}
-	clipboard = (unsigned char*)GlobalLock(handle);
+	clipboard = (unsigned char *)GlobalLock(handle);
 	if (!clipboard) {
 		CloseClipboard();
 		return;
@@ -2415,9 +2415,9 @@ static void MenuHandleButtonUp(unsigned b)
 }
 
 typedef struct _menu_stack_ {
-	struct _menu_* Menu;
+	struct _menu_ *Menu;
 	int CurSel;
-	struct _menu_stack_* Next;
+	struct _menu_stack_ *Next;
 } MenuStack;
 
 MenuStack *Menus;             /// FIXME : docu

@@ -581,7 +581,7 @@ int AiPlanAttack(AiForce *force)
 	}
 
 	if (AiFindTarget(aiunit->Unit, watermatrix, &x, &y, &state)) {
-		AiUnit* aiunit;
+		AiUnit *aiunit;
 
 		if (transporter) {
 			aiunit = new AiUnit;

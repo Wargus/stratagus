@@ -123,7 +123,7 @@ public:
 */
 class SpellActionType {
 protected:
-	typedef int SpellFunc(CUnit *caster, const SpellType* spell,
+	typedef int SpellFunc(CUnit *caster, const SpellType *spell,
 		CUnit *target, int x, int y);
 
 public:
@@ -303,7 +303,7 @@ public:
 	char TargetSelf;        /// Target is the same as the caster.
 	char *BoolFlag;         /// User defined boolean flag.
 
-	ConditionInfoVariable* Variable;
+	ConditionInfoVariable *Variable;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
@@ -320,7 +320,7 @@ public:
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
 
-	ConditionInfo* Condition;    /// Conditions to cast the spell.
+	ConditionInfo *Condition;    /// Conditions to cast the spell.
 
 	/// Detalied generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
@@ -404,7 +404,7 @@ extern int AutoCastSpell(CUnit *caster, const SpellType *spell);
 extern SpellType *SpellTypeByIdent(const char *ident);
 
 	/// return 0, 1, 2 for true, only, false.
-extern char Ccl2Condition(struct lua_State *l, const char *value);
+extern char Ccl2Condition(lua_State *l, const char *value);
 
 //@}
 

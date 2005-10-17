@@ -50,9 +50,9 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-char* EditorSelectIcon;
-char* EditorUnitsIcon;
-char* EditorStartUnit;
+char *EditorSelectIcon;
+char *EditorUnitsIcon;
+char *EditorStartUnit;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -63,9 +63,9 @@ char* EditorStartUnit;
 **
 **  @param l  Lua state.
 */
-static int CclDefineEditorUnitTypes(lua_State* l)
+static int CclDefineEditorUnitTypes(lua_State *l)
 {
-	char** cp;
+	char **cp;
 	int args;
 	int j;
 
@@ -99,7 +99,7 @@ static int CclDefineEditorUnitTypes(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetEditorSelectIcon(lua_State* l)
+static int CclSetEditorSelectIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	delete[] EditorSelectIcon;
@@ -112,7 +112,7 @@ static int CclSetEditorSelectIcon(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetEditorUnitsIcon(lua_State* l)
+static int CclSetEditorUnitsIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	delete[] EditorUnitsIcon;
@@ -125,7 +125,7 @@ static int CclSetEditorUnitsIcon(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetEditorStartUnit(lua_State* l)
+static int CclSetEditorStartUnit(lua_State *l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -140,7 +140,7 @@ static int CclSetEditorStartUnit(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetWriteCompressedMaps(lua_State* l)
+static int CclSetWriteCompressedMaps(lua_State *l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -154,7 +154,7 @@ static int CclSetWriteCompressedMaps(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclSetTerrainEditable(lua_State* l)
+static int CclSetTerrainEditable(lua_State *l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");

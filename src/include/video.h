@@ -79,7 +79,7 @@ public:
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
 #ifdef USE_OPENGL
-	void DoDrawFrameClipX(GLuint* textures, unsigned frame, int x, int y) const;
+	void DoDrawFrameClipX(GLuint *textures, unsigned frame, int x, int y) const;
 #endif
 	void DrawFrameClipX(unsigned frame, int x, int y) const;
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
@@ -385,7 +385,7 @@ extern void SetClipping(int left, int top, int right, int bottom);
 extern void RealizeVideoMemory(void);
 
 	/// Save a screenshot to a PNG file
-extern void SaveScreenshotPNG(const char* name);
+extern void SaveScreenshotPNG(const char *name);
 
 	/// Process all system events. Returns if the time for a frame is over
 extern void WaitEventsOneFrame(const EventCallback *callbacks);

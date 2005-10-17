@@ -105,7 +105,7 @@ extern void PauseCD(void);
 	/// Close CD
 extern void QuitCD(void);
 	/// Check the cdrom status
-extern int CDRomCheck(void*);
+extern int CDRomCheck(void *);
 
 #else
 

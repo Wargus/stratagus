@@ -135,7 +135,7 @@ static void LoadStratagusMap(const char *mapname, CMap *map)
 **  @param map       map to save
 **  @param writeTerrain   write the tiles map in the .sms
 */
-int SaveStratagusMap(const char* mapname, CMap* map, int writeTerrain)
+int SaveStratagusMap(const char *mapname, CMap *map, int writeTerrain)
 {
 	gzFile f;
 	int i, j;
@@ -435,7 +435,7 @@ static void GameTypeManTeamVsMachine(void)
 **
 **  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
-void CreateGame(const char* filename, CMap* map)
+void CreateGame(const char *filename, CMap *map)
 {
 	int i;
 	int j;

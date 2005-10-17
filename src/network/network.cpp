@@ -558,7 +558,7 @@ void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
 	NetworkCommandQueue *check;
 
 	// Check for duplicate command in queue
-	check = (NetworkCommandQueue*)CommandsIn->first->next;
+	check = (NetworkCommandQueue *)CommandsIn->first->next;
 	while (check) {
 		if ((check->Type & 0x7F) == command &&
 			check->Data.Unit == htons(unit->Slot) &&
@@ -572,7 +572,7 @@ void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
 				return;
 			}
 		}
-		check = (NetworkCommandQueue*)check->List->next;
+		check = (NetworkCommandQueue *)check->List->next;
 	}
 
 	ncq = AllocNCQ();
@@ -619,7 +619,7 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 	dl_insert_first(CommandsIn, ncq->List);
 
 	ncq->Time = GameCycle;
-	nec=(NetworkExtendedCommand*)&ncq->Data;
+	nec=(NetworkExtendedCommand *)&ncq->Data;
 
 	ncq->Type = MessageExtendedCommand;
 	if (status) {
@@ -667,7 +667,7 @@ void NetworkSendSelection(CUnit **units, int count)
 	//
 	unitcount = 0;
 	while (unitcount < count) {
-		header = (NetworkSelectionHeader*)&(packet.Header);
+		header = (NetworkSelectionHeader *)&(packet.Header);
 		if (unitcount == 0) {
 			header->Add = 0;
 		} else {
@@ -678,7 +678,7 @@ void NetworkSendSelection(CUnit **units, int count)
 		nosent = 0;
 		for (i = 0; i < MaxNetworkCommands && unitcount < count; ++i) {
 			header->Type[i] = MessageSelection;
-			selection = (NetworkSelection*)&packet.Command[i];
+			selection = (NetworkSelection *)&packet.Command[i];
 			for (ref = 0; ref < 4 && unitcount < count; ++ref, ++unitcount) {
 				selection->Unit[ref] = htons(UnitNumber(units[unitcount]));
 				++nosent;
@@ -724,7 +724,7 @@ static void NetworkProcessSelection(NetworkPacket *packet, int player)
 	int count;
 	int unitcount;
 
-	header = (NetworkSelectionHeader*)&(packet->Header);
+	header = (NetworkSelectionHeader *)&(packet->Header);
 	//
 	// Create Unit Array
 	//
@@ -733,7 +733,7 @@ static void NetworkProcessSelection(NetworkPacket *packet, int player)
 	unitcount = 0;
 
 	for (i = 0; header->Type[i] == MessageSelection; ++i) {
-		selection = (NetworkSelection*)&(packet->Command[i]);
+		selection = (NetworkSelection *)&(packet->Command[i]);
 		for (j = 0; j < 4 && unitcount < count; ++j) {
 			units[unitcount++] = Units[ntohs(selection->Unit[j])];
 		}
@@ -803,7 +803,7 @@ void NetworkEvent(void)
 		return;
 	}
 
-	packet = (NetworkPacket*)buf;
+	packet = (NetworkPacket *)buf;
 #ifdef DEBUG
 	++NetworkReceivedPackets;
 #endif
@@ -854,7 +854,7 @@ void NetworkEvent(void)
 	// Parse the packet commands.
 	//
 	for (i = 0; i < commands; ++i) {
-		const NetworkCommand* nc;
+		const NetworkCommand *nc;
 
 		nc = &packet->Command[i];
 
@@ -888,7 +888,7 @@ void NetworkEvent(void)
 			// Check if a player quit this cycle
 			for (j = 0; j < HostsCount; ++j) {
 				for (c = 0; c < MaxNetworkCommands; ++c) {
-					NetworkCommandQueue* ncq;
+					NetworkCommandQueue *ncq;
 					int k;
 					ncq = &NetworkIn[n & 0xFF][Hosts[j].PlyNr][c];
 					if (ncq->Time && ncq->Type == MessageQuit) {
@@ -1035,7 +1035,7 @@ void NetworkChatMessage(const char *msg)
 		ncq = AllocNCQ();
 		dl_insert_first(MsgCommandsIn, ncq->List);
 		ncq->Type = MessageChatTerm;
-		ncm = (NetworkChat*)(&ncq->Data);
+		ncm = (NetworkChat *)(&ncq->Data);
 		ncm->Player = ThisPlayer->Index;
 		memcpy(ncm->Text, cp, n + 1); // see >= above :)
 	}
@@ -1065,12 +1065,12 @@ static void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 			return;
 		case MessageChat:
 		case MessageChatTerm: {
-			const NetworkChat* ncm;
+			const NetworkChat *ncm;
 
-			ncm = (NetworkChat*)(&ncq->Data);
+			ncm = (NetworkChat *)(&ncq->Data);
 			ply = ncm->Player;
 			if (NetMsgBufLen[ply] + sizeof(ncm->Text) < 128) {
-				memcpy(((char*)NetMsgBuf[ply]) + NetMsgBufLen[ply], ncm->Text,
+				memcpy(((char *)NetMsgBuf[ply]) + NetMsgBufLen[ply], ncm->Text,
 						sizeof(ncm->Text));
 			}
 			NetMsgBufLen[ply] += sizeof(ncm->Text);
@@ -1161,7 +1161,7 @@ static void NetworkSendCommands(void)
 		while ((!dl_empty(CommandsIn) || !dl_empty(MsgCommandsIn)) &&
 				numcommands < MaxNetworkCommands) {
 			if (!dl_empty(CommandsIn)) {
-				incommand = (NetworkCommandQueue*)CommandsIn->last;
+				incommand = (NetworkCommandQueue *)CommandsIn->last;
 #ifdef DEBUG
 				if (incommand->Type != MessageExtendedCommand) {
 					// FIXME: we can send destoyed units over network :(
@@ -1173,7 +1173,7 @@ static void NetworkSendCommands(void)
 #endif
 				dl_remove_last(CommandsIn);
 			} else {
-				incommand = (NetworkCommandQueue*)MsgCommandsIn->last;
+				incommand = (NetworkCommandQueue *)MsgCommandsIn->last;
 				dl_remove_last(MsgCommandsIn);
 			}
 			memcpy(&ncq[numcommands], incommand, sizeof(NetworkCommandQueue));
@@ -1300,7 +1300,7 @@ void NetworkRecover(void)
 			}
 			if (secs >= NetworkTimeout) {
 				NetworkCommand nc;
-				const NetworkCommandQueue* ncq;
+				const NetworkCommandQueue *ncq;
 				unsigned long n;
 				NetworkPacket np;
 

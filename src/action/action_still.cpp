@@ -198,7 +198,7 @@ void ActionStillGeneric(CUnit *unit, int ground)
 
 	// Auto Repair
 	if (unit->AutoRepair && type->Variable[AUTOREPAIRRANGE_INDEX].Value) {
-		CUnit* repairedUnit; // Unit to repare
+		CUnit *repairedUnit; // Unit to repare
 
 		repairedUnit = UnitToRepairInRange(unit, type->Variable[AUTOREPAIRRANGE_INDEX].Value);
 		if (repairedUnit != NULL) {

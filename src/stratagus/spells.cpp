@@ -916,7 +916,7 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 **  @param caster    Unit who would cast the spell.
 **  @param spell     Spell-type pointer.
 **
-**  @return          Target* choosen target or Null if spell can't be cast.
+**  @return          Target* chosen target or Null if spell can't be cast.
 **  @todo FIXME: should be global (for AI) ???
 **  @todo FIXME: write for position target.
 */
@@ -1123,7 +1123,7 @@ int AutoCastSpell(CUnit *caster, const SpellType *spell)
 		// Must move before ?
 		// FIXME: SpellType* of CommandSpellCast must be const.
 		CommandSpellCast(caster, target->X, target->Y, target->unit,
-			(SpellType*)spell, FlushCommands);
+			(SpellType *)spell, FlushCommands);
 		delete target;
 	}
 	return 1;

@@ -298,7 +298,7 @@ CSample *LoadFlac(const char *name, int flags)
 	FlacData *data;
 	CFile *f;
 	unsigned int magic[1];
-	FLAC__StreamDecoder* stream;
+	FLAC__StreamDecoder *stream;
 
 	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {

@@ -63,7 +63,7 @@
 // Variables
 //----------------------------------------------------------------------------
 
-char* NetworkArg;                      /// Network command line argument
+char *NetworkArg;                      /// Network command line argument
 int NetPlayers;                        /// How many network players
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 
@@ -107,7 +107,7 @@ static int NetworkServerPort = NetworkDefaultPort; /// Server network port to us
 ** @todo FIXME: we don't need to put the header into all messages.
 ** (header = msg->Stratagus ... )
 */
-static int NetworkSendICMessage(unsigned long host, int port, InitMessage* msg)
+static int NetworkSendICMessage(unsigned long host, int port, InitMessage *msg)
 {
 	msg->Stratagus = htonl(StratagusVersion);
 	msg->Version = htonl(NetworkProtocolVersion);
@@ -118,7 +118,7 @@ static int NetworkSendICMessage(unsigned long host, int port, InitMessage* msg)
 }
 
 #ifdef DEBUG
-static const char* ncconstatenames[] = {
+static const char *ncconstatenames[] = {
 	"ccs_unused",
 	"ccs_connecting",          // new client
 	"ccs_connected",           // has received slot info
@@ -139,7 +139,7 @@ static const char* ncconstatenames[] = {
 	"ccs_incompatiblenetwork", // incompatible network version
 };
 
-static const char* icmsgsubtypenames[] = {
+static const char *icmsgsubtypenames[] = {
 	"Hello",                   // Client Request
 	"Config",                  // Setup message configure clients
 
@@ -173,7 +173,7 @@ static const char* icmsgsubtypenames[] = {
 ** @param msg    The message to send
 ** @param msecs  microseconds to delay
 */
-static void NetworkSendRateLimitedClientMessage(InitMessage* msg, unsigned long msecs)
+static void NetworkSendRateLimitedClientMessage(InitMessage *msg, unsigned long msecs)
 {
 	unsigned long now;
 	int n;
@@ -206,7 +206,7 @@ static void NetworkSendRateLimitedClientMessage(InitMessage* msg, unsigned long 
 **
 ** @return True, if error; otherwise false.
 */
-int NetworkSetupServerAddress(const char* serveraddr)
+int NetworkSetupServerAddress(const char *serveraddr)
 {
 	unsigned long addr;
 
@@ -342,7 +342,7 @@ void NetworkServerStartGame(void)
 	int org[PlayerMax];
 	int rev[PlayerMax];
 	char buf[1024];
-	InitMessage* msg;
+	InitMessage *msg;
 	InitMessage message;
 	InitMessage statemsg;
 
@@ -521,7 +521,7 @@ void NetworkServerStartGame(void)
 	statemsg.u.State = ServerSetupState;
 	statemsg.MapUID = htonl(Map.Info.MapUID);
 
-	msg = (InitMessage*)buf;
+	msg = (InitMessage *)buf;
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ HostsCount);
 	//
 	// Send all clients host:ports to all clients.
@@ -840,7 +840,7 @@ void NetworkProcessServerRequest(void)
 **
 ** @param msg message received
 */
-static void ClientParseDisconnected(const InitMessage* msg)
+static void ClientParseDisconnected(const InitMessage *msg)
 {
 	DebugPrint("ccs_disconnected: Server sending GoodBye dups %d\n" _C_
 		msg->SubType);
@@ -852,7 +852,7 @@ static void ClientParseDisconnected(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseDetaching(const InitMessage* msg)
+static void ClientParseDetaching(const InitMessage *msg)
 {
 	switch(msg->SubType) {
 
@@ -872,7 +872,7 @@ static void ClientParseDetaching(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseConnecting(const InitMessage* msg)
+static void ClientParseConnecting(const InitMessage *msg)
 {
 	int i;
 
@@ -946,7 +946,7 @@ static void ClientParseConnecting(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseConnected(const InitMessage* msg)
+static void ClientParseConnected(const InitMessage *msg)
 {
 	int pathlen;
 
@@ -986,7 +986,7 @@ static void ClientParseConnected(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseMapInfo(const InitMessage* msg)
+static void ClientParseMapInfo(const InitMessage *msg)
 {
 	switch(msg->SubType) {
 
@@ -1008,7 +1008,7 @@ static void ClientParseMapInfo(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseSynced(const InitMessage* msg)
+static void ClientParseSynced(const InitMessage *msg)
 {
 	int i;
 
@@ -1072,7 +1072,7 @@ static void ClientParseSynced(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseAsync(const InitMessage* msg)
+static void ClientParseAsync(const InitMessage *msg)
 {
 	int i;
 
@@ -1108,7 +1108,7 @@ static void ClientParseAsync(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseGoAhead(const InitMessage* msg)
+static void ClientParseGoAhead(const InitMessage *msg)
 {
 	switch(msg->SubType) {
 
@@ -1133,7 +1133,7 @@ static void ClientParseGoAhead(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseStarted(const InitMessage* msg)
+static void ClientParseStarted(const InitMessage *msg)
 {
 	switch(msg->SubType) {
 
@@ -1152,7 +1152,7 @@ static void ClientParseStarted(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseAreYouThere(const InitMessage* msg)
+static void ClientParseAreYouThere(const InitMessage *msg)
 {
 	InitMessage message;
 
@@ -1166,7 +1166,7 @@ static void ClientParseAreYouThere(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseBadMap(const InitMessage* msg)
+static void ClientParseBadMap(const InitMessage *msg)
 {
 	int i;
 	InitMessage message;
@@ -1187,7 +1187,7 @@ static void ClientParseBadMap(const InitMessage* msg)
 ** @param h slot number of host msg originates from
 ** @param msg message received
 */
-static void ServerParseHello(int h, const InitMessage* msg)
+static void ServerParseHello(int h, const InitMessage *msg)
 {
 	int i, n;
 	InitMessage message;
@@ -1435,7 +1435,7 @@ static void ServerParseMap(const int h)
 ** @param h slot number of host msg originates from
 ** @param msg message received
 */
-static void ServerParseState(const int h, const InitMessage* msg)
+static void ServerParseState(const int h, const InitMessage *msg)
 {
 	int i;
 	int n;
@@ -1557,7 +1557,7 @@ static void ServerParseIAmHere(const int h)
 **
 ** @return 0 if the versions match, -1 otherwise
 */
-static int CheckVersions(const InitMessage* msg)
+static int CheckVersions(const InitMessage *msg)
 {
 	int n;
 	InitMessage message;
@@ -1606,7 +1606,7 @@ static int CheckVersions(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void NetworkParseMenuPacket(const InitMessage* msg)
+static void NetworkParseMenuPacket(const InitMessage *msg)
 {
 	DebugPrint("Received %s Init Message %d:%d from %d.%d.%d.%d:%d (%ld)\n" _C_
 		icmsgsubtypenames[msg->SubType] _C_ msg->Type _C_ msg->SubType _C_ NIPQUAD(ntohl(NetLastHost)) _C_
@@ -1740,9 +1740,9 @@ static void NetworkParseMenuPacket(const InitMessage* msg)
 **
 ** @return 1 if packet is an InitConfig message, 0 otherwise
 */
-int NetworkParseSetupEvent(const char* buf, int size)
+int NetworkParseSetupEvent(const char *buf, int size)
 {
-	const InitMessage* msg = (const InitMessage*)buf;
+	const InitMessage *msg = (const InitMessage *)buf;
 
 	if (msg->Type > MessageInitConfig || size != sizeof(*msg)) {
 		if (NetConnectRunning == 2 && NetLocalState == ccs_started) {

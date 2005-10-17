@@ -209,7 +209,7 @@ void LoadModules(void)
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-void LoadGame(char* filename)
+void LoadGame(char *filename)
 {
 	unsigned long game_cycle;
 	unsigned syncrand;

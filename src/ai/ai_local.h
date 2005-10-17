@@ -68,8 +68,8 @@ public:
 	unsigned char AllVisbile : 1;  /// Ai sees invisibile area
 #endif
 
-	char* Script; /// Main script
-	char* FunctionName; /// Name of the function
+	char *Script; /// Main script
+	char *FunctionName; /// Name of the function
 };
 
 /**

@@ -638,12 +638,12 @@ static void FontMeasureWidths(CFont *fp)
 
 	SDL_LockSurface(fp->G->Surface);
 	for (y = 1; y < 207; ++y) {
-		sp = (const unsigned char*)fp->G->Surface->pixels +
+		sp = (const unsigned char *)fp->G->Surface->pixels +
 			(y / ipr) * fp->G->Surface->pitch * fp->G->Height +
 			(y % ipr) * fp->G->Width - 1;
 		gp = sp + fp->G->Surface->pitch * fp->G->Height;
 		// Bail out if no letters left
-		if (gp >= ((const unsigned char*)fp->G->Surface->pixels +
+		if (gp >= ((const unsigned char *)fp->G->Surface->pixels +
 				fp->G->Surface->pitch * fp->G->GraphicHeight)) {
 			break;
 		}

@@ -61,15 +61,15 @@ typedef enum _editor_state_type_ {
 	/// Current editor state.
 extern EditorStateType EditorState;
 
-extern const char* EditorStartFile;  /// Editor CCL start file
-extern char** EditorUnitTypes;  /// Sorted editor unit-type table
+extern const char *EditorStartFile;  /// Editor CCL start file
+extern char **EditorUnitTypes;  /// Sorted editor unit-type table
 extern int MaxUnitIndex;  /// Max unit icon draw index
 
-extern char* EditorSelectIcon;  /// Editor's select icon
-extern char* EditorUnitsIcon;   /// Editor's units icon
-extern char* EditorSelectIcon;  ///< Editor's select icon
-extern char* EditorUnitsIcon;   ///< Editor's units icon
-extern char* EditorStartUnit;   ///< Unit used to display the start location
+extern char *EditorSelectIcon;  /// Editor's select icon
+extern char *EditorUnitsIcon;   /// Editor's units icon
+extern char *EditorSelectIcon;  ///< Editor's select icon
+extern char *EditorUnitsIcon;   ///< Editor's units icon
+extern char *EditorStartUnit;   ///< Unit used to display the start location
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -81,7 +81,7 @@ extern void EditorMainLoop(void);
 extern void EditorUpdateDisplay(void);
 
 	/// Save a map from editor
-extern int EditorSaveMap(const char* file);
+extern int EditorSaveMap(const char *file);
 
 	/// Register ccl features
 extern void EditorCclRegister(void);

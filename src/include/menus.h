@@ -130,39 +130,39 @@ struct _menuitem_;
 --  Menus
 ----------------------------------------------------------------------------*/
 
-typedef void (*MenuitemTextActionType)(struct _menuitem_*);
+typedef void (*MenuitemTextActionType)(struct _menuitem_ *);
 typedef void (*MenuitemButtonHandlerType)(void);
-typedef void (*MenuitemPulldownActionType)(struct _menuitem_*, int);
-typedef void (*MenuitemListboxActionType)(struct _menuitem_*, int);
-typedef void* (*MenuitemListboxRetrieveType)(struct _menuitem_*, int);
+typedef void (*MenuitemPulldownActionType)(struct _menuitem_ *, int);
+typedef void (*MenuitemListboxActionType)(struct _menuitem_ *, int);
+typedef void *(*MenuitemListboxRetrieveType)(struct _menuitem_ *, int);
 typedef void (*MenuitemListboxHandlerType)(void);
-typedef void (*MenuitemVSliderActionType)(struct _menuitem_*);
+typedef void (*MenuitemVSliderActionType)(struct _menuitem_ *);
 typedef void (*MenuitemVSliderHandlerType)(void);
-typedef void (*MenuitemHSliderActionType)(struct _menuitem_*);
+typedef void (*MenuitemHSliderActionType)(struct _menuitem_ *);
 typedef void (*MenuitemHSliderHandlerType)(void);
-typedef void (*MenuitemDrawfuncDrawType)(struct _menuitem_*);
-typedef void (*MenuitemInputActionType)(struct _menuitem_*, int);
-typedef void (*MenuitemCheckboxActionType)(struct _menuitem_*);
+typedef void (*MenuitemDrawfuncDrawType)(struct _menuitem_ *);
+typedef void (*MenuitemInputActionType)(struct _menuitem_ *, int);
+typedef void (*MenuitemCheckboxActionType)(struct _menuitem_ *);
 
 /**
 **  Menuitem definition.
 **  @todo docu.
 */
 typedef struct _menuitem_text_ {
-	StringDesc* text;
+	StringDesc *text;
 	TextAlignment Align;
-	char* normalcolor;
-	char* reversecolor;
+	char *normalcolor;
+	char *reversecolor;
 	MenuitemTextActionType action;
 } MenuitemText;
 typedef struct _menuitem_button_ {
-	char* Text;
+	char *Text;
 	ButtonStyle *Style;
 	MenuitemButtonHandlerType Handler;
 	unsigned HotKey;
 } MenuitemButton;
 typedef struct _menuitem_pulldown_ {
-	char** options;
+	char **options;
 	int xsize;
 	int ysize;
 	MenuButtonId button;
@@ -173,7 +173,7 @@ typedef struct _menuitem_pulldown_ {
 	int cursel;  /* used in popup state */
 } MenuitemPulldown;
 typedef struct _menuitem_listbox_ {
-	void* options;
+	void *options;
 	int xsize;
 	int ysize;
 	MenuButtonId button;
@@ -223,11 +223,11 @@ typedef struct _menuitem_input_ {
 	MenuitemInputActionType action;  /// for key
 	int nch;
 	int maxch;
-	char* normalcolor;
-	char* reversecolor;
+	char *normalcolor;
+	char *reversecolor;
 } MenuitemInput;
 typedef struct _menuitem_checkbox_ {
-	char* Text;
+	char *Text;
 	unsigned int Checked : 1;
 	CheckboxStyle *Style;
 	MenuitemCheckboxActionType Action;
@@ -248,7 +248,7 @@ typedef struct _menuitem_ {
 	char *Id;
 	CFont *Font;
 	unsigned int LuaHandle;
-	struct _menu_* Menu;  /// backpointer for speedups
+	struct _menu_ *Menu;  /// backpointer for speedups
 	union {
 		MenuitemText Text;
 		MenuitemButton Button;
@@ -276,24 +276,24 @@ typedef struct _menuitem_ {
 #define MI_STYLE_SC_VSLIDER 1
 #define MI_STYLE_SC_HSLIDER 2
 
-typedef void (*InitFuncType)(struct _menu_*);
-typedef void (*ExitFuncType)(struct _menu_*);
+typedef void (*InitFuncType)(struct _menu_ *);
+typedef void (*ExitFuncType)(struct _menu_ *);
 typedef void (*NetActionType)(void);
 
 /**
 **  Menu definition.
 */
 typedef struct _menu_ {
-	/// @todo char* Name; /// menu name
+	/// @todo char *Name; /// menu name
 	int       X;          /// menu area x pos
 	int       Y;          /// menu area y pos
 	int       Width;      /// menu area width
 	int       Height;     /// menu area height
-	char*     Panel;      /// optional background panel
-	CGraphic*  BackgroundG;/// optional background image behind the menu panel
+	char     *Panel;      /// optional background panel
+	CGraphic *BackgroundG;/// optional background image behind the menu panel
 	int       DefSel;     /// initial selected item number (or -1)
 	int       NumItems;   /// number of items to follow
-	Menuitem* Items;      /// buttons, etc
+	Menuitem *Items;      /// buttons, etc
 	InitFuncType InitFunc;  /// constructor
 	ExitFuncType ExitFunc;  /// destructor
 	NetActionType NetAction;/// network action callback
@@ -304,7 +304,7 @@ typedef struct _menu_ {
 ----------------------------------------------------------------------------*/
 
 extern int GuiGameStarted;                    /// Game Started?
-extern Menu* CurrentMenu;                     /// Current menu
+extern Menu *CurrentMenu;                     /// Current menu
 extern CGraphic *MenuButtonGraphics[];/// Menu button graphics
 extern CGraphic *MenuButtonG;         /// Current menu button graphics
 
@@ -351,7 +351,7 @@ extern void ProcessMenu(const char *menu_id, int loop);
 	/// End the current menu
 extern void CloseMenu(void);
 	/// Find a menu by id
-extern Menu* FindMenu(const char *menu_id);
+extern Menu *FindMenu(const char *menu_id);
 
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);

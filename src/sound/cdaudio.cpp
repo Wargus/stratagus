@@ -67,7 +67,7 @@ int CDTrack;      /// Current cd track
 int NumCDTracks;  /// Number of tracks on the cd
 
 #if defined(USE_SDLCD)
-static SDL_CD* CDRom;                  /// SDL cdrom device
+static SDL_CD *CDRom;                  /// SDL cdrom device
 #elif defined(USE_CDDA)
 int CDDrive;                           /// CDRom device
 struct cdrom_tocentry CDtocentry[64];  /// TOC track header struct
@@ -307,7 +307,7 @@ static int InitCD(void)
 */
 int PlayCDTrack(int track)
 {
-	CSample* sample;
+	CSample *sample;
 
 	sample = LoadCD(NULL, track);
 	CDTrack = track;
@@ -380,7 +380,7 @@ void QuitCD(void)
 **
 **  Perodic called from the main loop.
 */
-int CDRomCheck(void* unused)
+int CDRomCheck(void *unused)
 {
 	if (CDMode != CDModeOff && CDMode != CDModeStopped &&
 			!IsCDPlaying() && CDMode != CDModeDefined) {

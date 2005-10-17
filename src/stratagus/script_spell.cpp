@@ -59,9 +59,9 @@
 **  @note This is only here to avoid code duplication. You don't have
 **        any reason to USE this:)
 */
-static void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* location)
+static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *location)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
@@ -116,9 +116,9 @@ static void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* lo
 **
 **  @param l  Lua state.
 */
-static SpellActionType* CclSpellAction(lua_State* l)
+static SpellActionType *CclSpellAction(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
@@ -178,7 +178,7 @@ static SpellActionType* CclSpellAction(lua_State* l)
 		}
 		return spellaction;
 	} else if (!strcmp(value, "area-adjust-vitals")) {
-		AreaAdjustVitals* spellaction = new AreaAdjustVitals;
+		AreaAdjustVitals *spellaction = new AreaAdjustVitals;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -476,7 +476,7 @@ static SpellActionType* CclSpellAction(lua_State* l)
 **  @note This is a helper function to make CclSpellCondition shorter
 **        and easier to understand.
 */
-char Ccl2Condition(lua_State* l, const char* value)
+char Ccl2Condition(lua_State *l, const char *value)
 {
 	if (!strcmp(value, "true")) {
 		return CONDITION_TRUE;
@@ -498,9 +498,9 @@ char Ccl2Condition(lua_State* l, const char* value)
 **
 **  @note Conditions must be allocated. All data already in is LOST.
 */
-static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
+static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 {
-	const char* value;
+	const char *value;
 	int i;
 	int args;
 	int j;
@@ -601,9 +601,9 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 **
 **  @notes: autocast must be allocated. All data already in is LOST.
 */
-static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
+static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 {
-	const char* value;
+	const char *value;
 	int args;
 	int j;
 
@@ -642,11 +642,11 @@ static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 **
 **  @param l  Lua state.
 */
-static int CclDefineSpell(lua_State* l)
+static int CclDefineSpell(lua_State *l)
 {
-	const char* identname;
-	SpellType* spell;
-	const char* value;
+	const char *identname;
+	SpellType *spell;
+	const char *value;
 	int args;
 	int i;
 
@@ -781,9 +781,9 @@ void SpellCclRegister(void)
 **  @param file File pointer to save to
 ** @param action Pointer to action to save.
 */
-static void SaveSpellAction(CFile* file, SpellActionType* action)
+static void SaveSpellAction(CFile *file, SpellActionType *action)
 {
-	SpellActionMissileLocation* loc;
+	SpellActionMissileLocation *loc;
 
 	if (action->CastFunction == CastAreaBombardment) {
 		CLprintf(file, "(area-bombardment fields %d shards %d damage %d start-offset-x %d start-offset-y %d)",
@@ -878,7 +878,7 @@ static void SaveSpellAction(CFile* file, SpellActionType* action)
 **  @param file       File pointer to save to
 **  @param condition  Pointer to condition to save.
 */
-static void SaveSpellCondition(CFile* file, ConditionInfo* condition)
+static void SaveSpellCondition(CFile *file, ConditionInfo *condition)
 {
 	char condstrings[3][10] = {
 		"true", /// CONDITION_TRUE
@@ -918,7 +918,7 @@ static void SaveSpellCondition(CFile* file, ConditionInfo* condition)
 ** @param file The file to save to.
 ** @param autocast Auocastinfo to save.
 */
-void SaveSpellAutoCast(CFile* file, AutoCastInfo* autocast)
+void SaveSpellAutoCast(CFile *file, AutoCastInfo *autocast)
 {
 	char condstrings[3][10] = {
 		"true", /// CONDITION_TRUE

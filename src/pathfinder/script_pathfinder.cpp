@@ -59,9 +59,9 @@
 **
 **  @param l  Lua state.
 */
-static int CclAStar(lua_State* l)
+static int CclAStar(lua_State *l)
 {
-	const char* value;
+	const char *value;
 	int i;
 	int j;
 	int args;

@@ -744,7 +744,7 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.Name[p->Race]);
 		return 1;
 	} else if (!strcmp(data, "Resources")) {
-		const char* res;
+		const char *res;
 		int i;
 
 		LuaCheckArgs(l, 3);
@@ -800,7 +800,7 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushnumber(l, p->TotalBuildings);
 		return 1;
 	} else if (!strcmp(data, "TotalResources")) {
-		const char* res;
+		const char *res;
 		int i;
 
 		LuaCheckArgs(l, 3);
@@ -851,7 +851,7 @@ static int CclSetPlayerData(lua_State *l)
 		p->Name = new_strdup(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		int i;
-		const char* racename;
+		const char *racename;
 
 		racename = LuaToString(l, 3);
 		p->Race = 0;
@@ -865,7 +865,7 @@ static int CclSetPlayerData(lua_State *l)
 			LuaError(l, "invalid race name '%s'" _C_ racename);
 		}
 	} else if (!strcmp(data, "Resources")) {
-		const char* res;
+		const char *res;
 		int i;
 
 		LuaCheckArgs(l, 4);
@@ -898,7 +898,7 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "TotalBuildings")) {
 		p->TotalBuildings = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "TotalResources")) {
-		const char* res;
+		const char *res;
 		int i;
 
 		LuaCheckArgs(l, 3);

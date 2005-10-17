@@ -92,7 +92,7 @@ void AnimateActionSpellCast(CUnit *unit)
 */
 static void SpellMoveToTarget(CUnit *unit)
 {
-	SpellType* spell;
+	SpellType *spell;
 	CUnit *goal;
 	int err;
 

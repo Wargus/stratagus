@@ -81,7 +81,7 @@ static const char *MissileClassNames[] = {
 **
 **  @param l  Lua state.
 */
-static int CclDefineMissileType(lua_State* l)
+static int CclDefineMissileType(lua_State *l)
 {
 	const char *value;
 	const char *str;
@@ -195,17 +195,17 @@ static int CclDefineMissileType(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclMissile(lua_State* l)
+static int CclMissile(lua_State *l)
 {
-	const char* value;
-	MissileType* type;
+	const char *value;
+	MissileType *type;
 	int x;
 	int y;
 	int dx;
 	int dy;
 	int sx;
 	int sy;
-	Missile* missile;
+	Missile *missile;
 	int args;
 	int j;
 
@@ -334,10 +334,10 @@ static int CclMissile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineBurningBuilding(lua_State* l)
+static int CclDefineBurningBuilding(lua_State *l)
 {
-	const char* value;
-	BurningBuildingFrame* ptr;
+	const char *value;
+	BurningBuildingFrame *ptr;
 	int args;
 	int j;
 	int subargs;

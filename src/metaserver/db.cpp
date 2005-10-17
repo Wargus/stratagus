@@ -47,8 +47,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static char* dbfile = "metaserver.db";
-static sqlite3* DB;
+static char *dbfile = "metaserver.db";
+static sqlite3 *DB;
 
 #define SQLCreatePlayersTable \
 	"CREATE TABLE players (" \
@@ -110,7 +110,7 @@ static sqlite3* DB;
 /**
 **  Max id callback
 */
-static int DBMaxIDCallback(void* password, int argc, char** argv, char** colname)
+static int DBMaxIDCallback(void *password, int argc, char **argv, char **colname)
 {
 	Assert(argc == 1);
 	GameID = atoi(argv[0]);
@@ -124,9 +124,9 @@ static int DBMaxIDCallback(void* password, int argc, char** argv, char** colname
 */
 int DBInit(void)
 {
-	FILE* fd;
+	FILE *fd;
 	int doinit;
-	char* errmsg;
+	char *errmsg;
 
 	// Check if this is the first time running
 	doinit = 0;
@@ -173,10 +173,10 @@ void DBQuit(void)
 /**
 **  Find user callback
 */
-static int DBFindUserCallback(void* password, int argc, char** argv, char** colname)
+static int DBFindUserCallback(void *password, int argc, char **argv, char **colname)
 {
 	Assert(argc == 1);
-	strcpy((char*)password, argv[0]);
+	strcpy((char *)password, argv[0]);
 	return 0;
 }
 
@@ -188,10 +188,10 @@ static int DBFindUserCallback(void* password, int argc, char** argv, char** coln
 **
 **  @return          1 if user is found, 0 otherwise
 */
-int DBFindUser(char* username, char* password)
+int DBFindUser(char *username, char *password)
 {
 	char buf[1024];
-	char* errmsg;
+	char *errmsg;
 
 	password[0] = '\0';
 	if (strchr(username, '\'')) {
@@ -219,11 +219,11 @@ int DBFindUser(char* username, char* password)
 **
 **  @return          0 for success, non-zero otherwise
 */
-int DBAddUser(char* username, char* password)
+int DBAddUser(char *username, char *password)
 {
 	char buf[1024];
 	int t;
-	char* errmsg;
+	char *errmsg;
 
 	t = (int)time(0);
 	sprintf(buf, "INSERT INTO players VALUES('%s', '%s', %d, %d);",
@@ -243,11 +243,11 @@ int DBAddUser(char* username, char* password)
 **
 **  @return          0 for success, non-zero otherwise
 */
-int DBUpdateLoginDate(char* username)
+int DBUpdateLoginDate(char *username)
 {
 	char buf[1024];
 	int t;
-	char* errmsg;
+	char *errmsg;
 
 	t = (int)time(0);
 	sprintf(buf, "UPDATE players SET last_login_date = %d WHERE username = '%s'",
