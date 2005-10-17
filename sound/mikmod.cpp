@@ -127,7 +127,7 @@ int CSampleMikModStream::Read(void *buf, int len)
 		memcpy(this->Buffer, this->Buffer + this->Pos, this->Len);
 		this->Pos = 0;
 		CurrentFile = this->Data.MikModFile;
-		read = VC_WriteBytes((SBYTE*)this->Buffer + this->Pos,
+		read = VC_WriteBytes((SBYTE *)this->Buffer + this->Pos,
 			SOUND_BUFFER_SIZE - (this->Pos + this->Len));
 		this->Len += read;
 	}
@@ -261,7 +261,7 @@ CSample *LoadMikMod(const char *name, int flags)
 		pos = 0;
 		Player_Start(data->MikModModule);
 		while (Player_Active()) {
-			read = VC_WriteBytes((SBYTE*)sample->Buffer + pos,
+			read = VC_WriteBytes((SBYTE *)sample->Buffer + pos,
 				 sample->Len - pos);
 			pos += read;
 		}

@@ -363,7 +363,7 @@ find_solid:
 	}
 
 	if (i >= Map.Tileset.NumTiles) {
-		char* marks;
+		char *marks;
 
 		//
 		// Find the best tile path.

@@ -1340,7 +1340,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on map area
 	//
 	if (CursorOn == CursorOnMap) {
-		CViewport* vp;
+		CViewport *vp;
 
 		vp = GetViewport(CursorX, CursorY);
 		Assert(vp);
@@ -1879,7 +1879,7 @@ static void EditorCallbackMouse(int x, int y)
 	UnitUnderCursor = NULL;
 	if (x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
 			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		CViewport* vp;
+		CViewport *vp;
 
 		vp = GetViewport(x, y);
 		Assert(vp);

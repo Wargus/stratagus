@@ -305,7 +305,7 @@ extern void InputKeyTimeout(const struct _event_callback_ *callbacks,
 	/// Toggle pause mode
 extern void UiTogglePause(void);
 	/// Handle cheats
-extern int HandleCheats(const char* input);
+extern int HandleCheats(const char *input);
 
 //
 // Chaos pur.

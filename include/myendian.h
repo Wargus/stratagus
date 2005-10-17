@@ -59,13 +59,13 @@
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned short inline AccessLE16(unsigned char* p) {
+extern unsigned short inline AccessLE16(unsigned char *p) {
 	return p[0] + (p[1] << 8);
 }
 
 #else
 
-#define AccessLE16(p) SDL_SwapLE16(*((unsigned short*)(p)))
+#define AccessLE16(p) SDL_SwapLE16(*((unsigned short *)(p)))
 
 #endif
 
@@ -74,13 +74,13 @@ extern unsigned short inline AccessLE16(unsigned char* p) {
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned inline AccessLE32(unsigned char* p) {
+extern unsigned inline AccessLE32(unsigned char *p) {
 	return  p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
 }
 
 #else
 
-#define AccessLE32(p) SDL_SwapLE32(*((unsigned int*)(p)))
+#define AccessLE32(p) SDL_SwapLE32(*((unsigned int *)(p)))
 
 #endif
 
@@ -90,8 +90,8 @@ extern unsigned inline AccessLE32(unsigned char* p) {
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned short inline _FetchLE16(unsigned char** pp) {
-	unsigned char* p = *pp;
+extern unsigned short inline _FetchLE16(unsigned char **pp) {
+	unsigned char *p = *pp;
 	unsigned short i = p[0] + (p[1] << 8);
 	(*pp) += 2;
 	return i;
@@ -100,7 +100,7 @@ extern unsigned short inline _FetchLE16(unsigned char** pp) {
 
 #else
 
-#define FetchLE16(p) SDL_SwapLE16(*((unsigned short*)(p))); p += 2
+#define FetchLE16(p) SDL_SwapLE16(*((unsigned short *)(p))); p += 2
 
 #endif
 
@@ -110,8 +110,8 @@ extern unsigned short inline _FetchLE16(unsigned char** pp) {
 */
 #ifdef __ULTRA_SPARC__
 
-extern unsigned inline _FetchLE32(unsigned char** pp) {
-	unsigned char* p = *pp;
+extern unsigned inline _FetchLE32(unsigned char **pp) {
+	unsigned char *p = *pp;
 	unsigned int i = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
 	(*pp) += 4;
 	return i;
@@ -120,7 +120,7 @@ extern unsigned inline _FetchLE32(unsigned char** pp) {
 
 #else
 
-#define FetchLE32(p) SDL_SwapLE32(*((unsigned int*)(p))); p += 4
+#define FetchLE32(p) SDL_SwapLE32(*((unsigned int *)(p))); p += 4
 
 #endif
 
@@ -205,30 +205,30 @@ extern unsigned inline _FetchLE32(unsigned char** pp) {
 /**
 **  Access a 16 bit value in little endian and return it in native format.
 */
-#define AccessLE16(p) ConvertLE16(*((unsigned short*)(p)))
+#define AccessLE16(p) ConvertLE16(*((unsigned short *)(p)))
 
 /**
 **  Access a 32 bit value in little endian and return it in native format.
 */
-#define AccessLE32(p) ConvertLE32(*((unsigned int*)(p)))
+#define AccessLE32(p) ConvertLE32(*((unsigned int *)(p)))
 
 /**
 **  Fetch a 16 bit value in little endian with incrementing pointer
 **  and return it in native format.
 */
-#define FetchLE16(p) ConvertLE16(*((unsigned short*)(p))++)
+#define FetchLE16(p) ConvertLE16(*((unsigned short *)(p))++)
 
 /**
 **  Fetch a 32 bit value in little endian with incrementing pointer
 **  and return it in native format.
 */
-#define FetchLE32(p) ConvertLE32(*((unsigned int*)(p))++)
+#define FetchLE32(p) ConvertLE32(*((unsigned int *)(p))++)
 
 /**
 **  Fetch a 8 bit value with incrementing pointer
 **  and return it in native format.
 */
-#define FetchByte(p) (*((unsigned char*)(p))++)
+#define FetchByte(p) (*((unsigned char *)(p))++)
 
 //@}
 

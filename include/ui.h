@@ -722,7 +722,7 @@ extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
 
-extern int AddHandler(struct lua_State *l);
+extern int AddHandler(lua_State *l);
 extern void CallHandler(unsigned int handle, int value);
 
 

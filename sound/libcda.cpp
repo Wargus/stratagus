@@ -29,7 +29,7 @@
 static int fd = -1;
 
 static char _cd_error[256];
-const char* cd_error = _cd_error;
+const char *cd_error = _cd_error;
 
 
 static void copy_cd_error(void)
@@ -39,7 +39,7 @@ static void copy_cd_error(void)
 }
 
 
-static int get_tocentry(int track, struct cdrom_tocentry* e)
+static int get_tocentry(int track, struct cdrom_tocentry *e)
 {
 	memset(e, 0, sizeof(struct cdrom_tocentry));
 	e->cdte_track = track;
@@ -54,7 +54,7 @@ static int get_tocentry(int track, struct cdrom_tocentry* e)
 }
 
 
-static int get_subchnl(struct cdrom_subchnl* s)
+static int get_subchnl(struct cdrom_subchnl *s)
 {
 	memset(s, 0, sizeof(struct cdrom_subchnl));
 	s->cdsc_format = CDROM_MSF;
@@ -72,7 +72,7 @@ static int get_subchnl(struct cdrom_subchnl* s)
  */
 int cd_init(void)
 {
-	char* device;
+	char *device;
 
 	device = getenv("CDAUDIO");
 	if (!device) {
@@ -249,7 +249,7 @@ void cd_stop(void)
 /* cd_get_tracks:
  *  Get first and last tracks of CD.  Return zero on success.
  */
-int cd_get_tracks(int* first, int* last)
+int cd_get_tracks(int *first, int *last)
 {
 	struct cdrom_tochdr toc;
 
@@ -292,7 +292,7 @@ int cd_is_audio(int track)
 /* cd_get_volume:
  *  Return volumes of left and right channels.
  */
-void cd_get_volume(int* c0, int* c1)
+void cd_get_volume(int *c0, int *c1)
 {
 	struct cdrom_volctrl vol;
 
@@ -359,7 +359,7 @@ void cd_close(void)
 
 
 static char _cd_error[256];
-const char* cd_error = _cd_error;
+const char *cd_error = _cd_error;
 
 
 /* Hack. */
@@ -372,7 +372,7 @@ static char end_pos[20];
 
 static char ret[256];
 
-static int command(char* fmt, ...)
+static int command(char *fmt, ...)
 {
 	char buf[256];
 	va_list ap;
@@ -414,7 +414,7 @@ void cd_exit(void)
 
 #define startof(track) (MCI_MAKE_TMSF(track, 0, 0, 0))
 
-static char* lengthof(int track)
+static char *lengthof(int track)
 {
 	command("status cdaudio length track %u", track);
 	return ret;

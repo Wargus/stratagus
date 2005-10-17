@@ -93,9 +93,9 @@ extern const int XY2Heading[3][3];
 ----------------------------------------------------------------------------*/
 
 	/// Create a matrix for the old pathfinder
-extern unsigned char* CreateMatrix(void);
+extern unsigned char *CreateMatrix(void);
 	/// Allocate a new matrix and initialize
-extern unsigned char* MakeMatrix(void);
+extern unsigned char *MakeMatrix(void);
 	/// Get next element of the way to goal.
 extern int NewPath(CUnit *unit);
 	/// Return distance to unit.
@@ -108,7 +108,7 @@ extern int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
 // in astar.c
 //
 	/// Returns the next element of the path
-extern int NextPathElement(CUnit *unit, int* xdp, int* ydp);
+extern int NextPathElement(CUnit *unit, int *xdp, int *ydp);
 
 	/// Init the a* data structures
 extern void InitAStar(void);
@@ -118,7 +118,7 @@ extern void FreeAStar(void);
 
 	/// Find and a* path for a unit
 extern int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh,
-	int minrange, int maxrange, char* path);
+	int minrange, int maxrange, char *path);
 //
 // in ccl_pathfinder.c
 //

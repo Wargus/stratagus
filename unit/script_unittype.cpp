@@ -1102,7 +1102,7 @@ static int CclUnitType(lua_State *l)
 
 	str = LuaToString(l, 1);
 	type = UnitTypeByIdent(str);
-	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaUnitType;
 	data->Data = type;
 	return 1;
@@ -1122,7 +1122,7 @@ static int CclUnitTypeArray(lua_State *l)
 	lua_newtable(l);
 
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		LuaUserData *data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
+		LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
 		data->Data = UnitTypes[i];
 		lua_rawseti(l, 1, i + 1);

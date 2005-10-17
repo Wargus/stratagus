@@ -94,8 +94,8 @@ extern TriggerDataType TriggerData;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern int TriggerGetPlayer(struct lua_State *l);/// get player number.
-extern const CUnitType *TriggerGetUnitType(struct lua_State *l); /// get the unit-type
+extern int TriggerGetPlayer(lua_State *l);/// get player number.
+extern const CUnitType *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle(void);    /// test triggers
 
 extern void TriggerCclRegister(void);   /// Register ccl features

@@ -111,7 +111,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 
 	ba->Pos = pos;
 	ba->Level = level;
-	ba->Icon.Name = (char*)icon_ident;
+	ba->Icon.Name = (char *)icon_ident;
 	// FIXME: check if already initited
 	//ba->Icon.Icon = IconByIdent(icon_ident);
 	ba->Action = action;

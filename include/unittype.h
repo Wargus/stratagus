@@ -1018,7 +1018,7 @@ public:
 
 	char **VariableName;                /// Array of names of user defined variables.
 	VariableType *Variable;             /// Array of user defined variables (default value for unittype).
-// EventType* Event;                   /// Array of functions sets to call when en event occurs.
+//	EventType *Event;                   /// Array of functions sets to call when en event occurs.
 	int NumberVariable;                 /// Number of defined variables.
 
 	std::vector<CDecoVar *> DecoVar;    /// Array to describe how showing variable.
@@ -1030,7 +1030,7 @@ extern CUnitTypeVar UnitTypeVar;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CUnitType *CclGetUnitType(struct lua_State *l);  /// Access unit-type object
+extern CUnitType *CclGetUnitType(lua_State *l);  /// Access unit-type object
 extern void UnitTypeCclRegister(void);          /// Register ccl features
 
 extern void UpdateStats(int reset_to_default);  /// Update unit stats
@@ -1051,7 +1051,7 @@ extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 // in script_unittype.c
 
 	/// Parse User Variables field.
-extern void DefineVariableField(struct lua_State *l, VariableType *var, int lua_index);
+extern void DefineVariableField(lua_State *l, VariableType *var, int lua_index);
 
 	/// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(const CUnit *unit);

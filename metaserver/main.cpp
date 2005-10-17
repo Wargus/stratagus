@@ -54,9 +54,9 @@
 #include <getopt.h>
 #endif
 #if defined(_MSC_VER) || defined(__MINGW32__)
-extern char* optarg;
+extern char *optarg;
 extern int optopt;
-extern int getopt(int argc, char* const* argv, const char* opt);
+extern int getopt(int argc, char *const *argv, const char *opt);
 #endif
 
 /*----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ static void MainLoop(void)
 /**
 **  The main program: initialize, parse options and arguments.
 */
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	int status;
 	int i;

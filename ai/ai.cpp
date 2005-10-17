@@ -71,7 +71,7 @@
 ** Called to release all the memory for all AI structures.
 ** Must handle self which players contains AI structures.
 **
-** ::SaveAi(::FILE*)
+** ::SaveAi(::FILE *)
 **
 ** Save the AI structures of all players to file.
 ** Must handle self which players contains AI structures.
@@ -608,8 +608,8 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	//  All forces
 	//
 	for (i = 0; i < AI_MAX_ATTACKING_FORCES; ++i) {
-		const AiUnitType* aut;
-		const AiUnit* aiunit;
+		const AiUnitType *aut;
+		const AiUnit *aiunit;
 
 		file->printf("  \"force\", {%d, %s%s%s", i,
 			ai->Force[i].Completed ? "\"complete\"," : "\"recruit\",",
@@ -682,7 +682,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	//  Requests
 	//
 	if (ai->FirstExplorationRequest) {
-		AiExplorationRequest* ptr;
+		AiExplorationRequest *ptr;
 
 		file->printf("  \"exploration\", {");
 		ptr = ai->FirstExplorationRequest;
@@ -1414,7 +1414,7 @@ void AiNeedMoreSupply(const CUnit *unit, const CUnitType *what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 
-	((PlayerAi*)unit->Player->Ai)->NeedSupply = 1;
+	((PlayerAi *)unit->Player->Ai)->NeedSupply = 1;
 }
 
 /**

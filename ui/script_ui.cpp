@@ -1643,7 +1643,7 @@ static int CclDefineUI(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				MenuPanel** menupanel;
+				MenuPanel **menupanel;
 
 				menupanel = &ui->MenuPanels;
 				while (*menupanel) {

@@ -979,7 +979,7 @@ void CGraphic::Resize(int w, int h)
 
 		SDL_LockSurface(Surface);
 
-		pixels = (unsigned char*)Surface->pixels;
+		pixels = (unsigned char *)Surface->pixels;
 		data = new unsigned char[w * h * bpp];
 		x = 0;
 
