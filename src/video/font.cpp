@@ -618,49 +618,45 @@ int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number)
 
 /**
 **  Calculate the width of each character
-**
-**  @param fp  Font to calculate
 */
-static void FontMeasureWidths(CFont *fp)
+void CFont::MeasureWidths()
 {
 	// FIXME: todo.. can this be optimized?
-	int y;
 	const unsigned char *sp;
 	const unsigned char *lp;
 	const unsigned char *gp;
 	Uint32 ckey;
-	int ipr;
+	int ipr;  // images per row
 
-	memset(fp->CharWidth, 0, sizeof(fp->CharWidth));
-	fp->CharWidth[0] = fp->G->Width / 2;  // a reasonable value for SPACE
-	ckey = fp->G->Surface->format->colorkey;
-	ipr = fp->G->Surface->w / fp->G->Width;
+	this->CharWidth[0] = this->G->Width / 2;  // a reasonable value for SPACE
+	ckey = this->G->Surface->format->colorkey;
+	ipr = this->G->Surface->w / this->G->Width;
 
-	SDL_LockSurface(fp->G->Surface);
-	for (y = 1; y < 207; ++y) {
-		sp = (const unsigned char *)fp->G->Surface->pixels +
-			(y / ipr) * fp->G->Surface->pitch * fp->G->Height +
-			(y % ipr) * fp->G->Width - 1;
-		gp = sp + fp->G->Surface->pitch * fp->G->Height;
+	SDL_LockSurface(this->G->Surface);
+	for (int y = 1; y < 207; ++y) {
+		sp = (const unsigned char *)this->G->Surface->pixels +
+			(y / ipr) * this->G->Surface->pitch * this->G->Height +
+			(y % ipr) * this->G->Width - 1;
+		gp = sp + this->G->Surface->pitch * this->G->Height;
 		// Bail out if no letters left
-		if (gp >= ((const unsigned char *)fp->G->Surface->pixels +
-				fp->G->Surface->pitch * fp->G->GraphicHeight)) {
+		if (gp >= ((const unsigned char *)this->G->Surface->pixels +
+				this->G->Surface->pitch * this->G->GraphicHeight)) {
 			break;
 		}
 		while (sp < gp) {
-			lp = sp + fp->G->Width;
+			lp = sp + this->G->Width;
 			for (; sp < lp; --lp) {
 				if (*lp != ckey) {
-					if (lp - sp > fp->CharWidth[y]) {  // max width
-						fp->CharWidth[y] = lp - sp;
+					if (lp - sp > this->CharWidth[y]) {  // max width
+						this->CharWidth[y] = lp - sp;
 					}
 				}
 			}
-			sp += fp->G->Surface->pitch;
+			sp += this->G->Surface->pitch;
 		}
 
 	}
-	SDL_UnlockSurface(fp->G->Surface);
+	SDL_UnlockSurface(this->G->Surface);
 }
 
 /**
@@ -714,7 +710,7 @@ void LoadFonts(void)
 		if ((g = AllFonts[i]->G)) {
 			ShowLoadProgress("Fonts %s", g->File);
 			g->Load();
-			FontMeasureWidths(AllFonts[i]);
+			AllFonts[i]->MeasureWidths();
 #ifdef USE_OPENGL
 			MakeFontColorTextures(AllFonts[i]);
 #endif
