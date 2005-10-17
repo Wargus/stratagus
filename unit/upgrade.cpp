@@ -683,7 +683,7 @@ void UpgradeAcquire(CPlayer *player, const CUpgrade *upgrade)
 **  (lumber mill? stronghold?)
 **  this function will apply all modifiers in reverse way
 */
-void UpgradeLost(Player* player, int id)
+void UpgradeLost(Player *player, int id)
 {
 	player->UpgradeTimers.Upgrades[id] = 0;
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available

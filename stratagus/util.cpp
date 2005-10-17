@@ -173,7 +173,7 @@ char *strdcat3(const char *l, const char *m, const char *r)
 **
 **  @return   Pointer to first occurence of b or NULL if not found.
 */
-char* strcasestr(const char* a, const char* b)
+char *strcasestr(const char *a, const char *b)
 {
 	int x;
 
@@ -219,13 +219,13 @@ char* strcasestr(const char* a, const char* b)
 int opterr = 1;
 int optind = 1;
 int optopt;
-char* optarg;
+char *optarg;
 
-static void getopt_err(char* argv0, char* str, char opt)
+static void getopt_err(char *argv0, char *str, char opt)
 {
 	if (opterr) {
 		char errbuf[2];
-		char* x;
+		char *x;
 
 		errbuf[0] = opt;
 		errbuf[1] = '\n';
@@ -240,11 +240,11 @@ static void getopt_err(char* argv0, char* str, char opt)
 	}
 }
 
-int getopt(int argc, char* const* argv, const char* opts)
+int getopt(int argc, char *const *argv, const char *opts)
 {
 	static int sp = 1;
 	register int c;
-	register const char* cp;
+	register const char *cp;
 
 	optarg = NULL;
 

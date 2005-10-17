@@ -71,7 +71,7 @@ static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
 char DefaultGroupKeys[] = "0123456789`";/// Default group keys
-char* UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
+char *UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
 char GameRunning;                    /// Current running state
 char GamePaused;                     /// Current pause state
 char GameObserve;                    /// Observe mode
@@ -90,7 +90,7 @@ enum _key_state_ KeyState;           /// current key state
 */
 static void ShowInput(void)
 {
-	char* input;
+	char *input;
 
 	sprintf(InputStatusLine, "MESSAGE:%s~!_", Input);
 	input = InputStatusLine;
@@ -854,7 +854,7 @@ static int CommandKey(int key)
 **
 **  @return  1 if a cheat was handled, 0 otherwise
 */
-int HandleCheats(const char* input)
+int HandleCheats(const char *input)
 {
 	int ret;
 
@@ -1263,7 +1263,7 @@ int HandleMouseScrollArea(int x, int y)
 **  @param x  screen pixel X position.
 **  @param y  screen pixel Y position.
 */
-void HandleCursorMove(int* x, int* y)
+void HandleCursorMove(int *x, int *y)
 {
 	//
 	//  Reduce coordinates to window-size.
@@ -1347,7 +1347,7 @@ static unsigned LastMouseTicks;          /// Ticks of last mouse event
 **  @param ticks      Denotes time-stamp of video-system
 **  @param button     Mouse button pressed.
 */
-void InputMouseButtonPress(const EventCallback* callbacks,
+void InputMouseButtonPress(const EventCallback *callbacks,
 	unsigned ticks, unsigned button)
 {
 	//
@@ -1380,7 +1380,7 @@ void InputMouseButtonPress(const EventCallback* callbacks,
 **  @param ticks      Denotes time-stamp of video-system
 **  @param button     Mouse button released.
 */
-void InputMouseButtonRelease(const EventCallback* callbacks,
+void InputMouseButtonRelease(const EventCallback *callbacks,
 	unsigned ticks, unsigned button)
 {
 	unsigned mask;
@@ -1419,7 +1419,7 @@ void InputMouseButtonRelease(const EventCallback* callbacks,
 **  @param x          X movement
 **  @param y          Y movement
 */
-void InputMouseMove(const EventCallback* callbacks,
+void InputMouseMove(const EventCallback *callbacks,
 	unsigned ticks, int x, int y)
 {
 	// Don't reset the mouse state unless we really moved
@@ -1439,7 +1439,7 @@ void InputMouseMove(const EventCallback* callbacks,
 **  @param ticks      Denotes time-stamp of video-system
 **
 */
-void InputMouseExit(const EventCallback* callbacks, unsigned ticks)
+void InputMouseExit(const EventCallback *callbacks, unsigned ticks)
 {
 	// FIXME: should we do anything here with ticks? don't know, but conform others
 	// JOHNS: called by callback HandleMouseExit();
@@ -1452,7 +1452,7 @@ void InputMouseExit(const EventCallback* callbacks, unsigned ticks)
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-void InputMouseTimeout(const EventCallback* callbacks, unsigned ticks)
+void InputMouseTimeout(const EventCallback *callbacks, unsigned ticks)
 {
 	if (MouseButtons & (1 << LastMouseButton)) {
 		if (ticks > StartMouseTicks + DoubleClickDelay) {
@@ -1484,7 +1484,7 @@ static unsigned DoubleKey;                   /// last key pressed
 **  @param ikey       Key scancode.
 **  @param ikeychar   Character code.
 */
-void InputKeyButtonPress(const EventCallback* callbacks,
+void InputKeyButtonPress(const EventCallback *callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
 	if (!LastIKey && DoubleKey == ikey &&
@@ -1507,7 +1507,7 @@ void InputKeyButtonPress(const EventCallback* callbacks,
 **  @param ikey       Key scancode.
 **  @param ikeychar   Character code.
 */
-void InputKeyButtonRelease(const EventCallback* callbacks,
+void InputKeyButtonRelease(const EventCallback *callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
 	if (ikey == LastIKey) {
@@ -1523,7 +1523,7 @@ void InputKeyButtonRelease(const EventCallback* callbacks,
 **  @param callbacks  Callback structure for events.
 **  @param ticks      Denotes time-stamp of video-system
 */
-void InputKeyTimeout(const EventCallback* callbacks, unsigned ticks)
+void InputKeyTimeout(const EventCallback *callbacks, unsigned ticks)
 {
 	if (LastIKey && ticks > LastKeyTicks + HoldKeyDelay) {
 		LastKeyTicks = ticks - (HoldKeyDelay - HoldKeyAdditionalDelay);

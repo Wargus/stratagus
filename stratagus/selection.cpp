@@ -1203,7 +1203,7 @@ static int CclSelection(lua_State *l)
 	i = 0;
 	args = luaL_getn(l, 2);
 	for (j = 0; j < args; ++j) {
-		const char* str;
+		const char *str;
 
 		lua_rawgeti(l, 2, j + 1);
 		str = LuaToString(l, -1);

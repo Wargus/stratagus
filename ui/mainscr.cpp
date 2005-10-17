@@ -170,7 +170,7 @@ static void UiDrawManaBar(const CUnit *unit, int x, int y)
 **
 **  @return            0 if we can't show the content, else 1.
 */
-static int CanShowContent(const ConditionPanel* condition, const CUnit *unit)
+static int CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 {
 	int i; // iterator on variables and flags.
 
@@ -227,7 +227,7 @@ typedef struct {
 UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 {
 	UStrInt val;    // result.
-	VariableType* var;
+	VariableType *var;
 
 	Assert(unit);
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
@@ -326,7 +326,7 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 */
 void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	char* text;             // Optional text to display.
+	char *text;             // Optional text to display.
 	CFont *font;            // Font to use.
 	int index;              // Index of optionnal variable.
 	int x;                  // X coordinate to display.
@@ -405,7 +405,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 */
 void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	const char* text;
+	const char *text;
 	CFont *font;
 	int index;
 	char buf[256];
@@ -445,7 +445,7 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) cons
 */
 void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	const char* text;
+	const char *text;
 	CFont *font;
 	int index1, index2;
 	char buf[256];
@@ -951,11 +951,11 @@ void DrawMessages(void)
 **
 **  @param msg  Message to add.
 */
-static void AddMessage(const char* msg)
+static void AddMessage(const char *msg)
 {
-	char* ptr;
-	char* message;
-	char* next;
+	char *ptr;
+	char *message;
+	char *next;
 
 	if (!MessagesCount) {
 		MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
@@ -1027,7 +1027,7 @@ static void AddMessage(const char* msg)
 **
 **  @return     non-zero to skip this message
 */
-static int CheckRepeatMessage(const char* msg)
+static int CheckRepeatMessage(const char *msg)
 {
 	if (MessagesCount < 1) {
 		return 0;
@@ -1054,7 +1054,7 @@ static int CheckRepeatMessage(const char* msg)
 **
 **  @param fmt  To be displayed in text overlay.
 */
-void SetMessage(const char* fmt, ...)
+void SetMessage(const char *fmt, ...)
 {
 	char temp[512];
 	va_list va;
@@ -1078,7 +1078,7 @@ void SetMessage(const char* fmt, ...)
 **  @note FIXME: vladi: I know this can be just separated func w/o msg but
 **               it is handy to stick all in one call, someone?
 */
-void SetMessageEvent(int x, int y, const char* fmt, ...)
+void SetMessageEvent(int x, int y, const char *fmt, ...)
 {
 	char temp[128];
 	va_list va;
@@ -1225,7 +1225,7 @@ void DrawCosts(void)
 **  @param food   Food costs.
 **  @param costs  Resource costs, NULL pointer if all are zero.
 */
-void SetCosts(int mana, int food, const int* costs)
+void SetCosts(int mana, int food, const int *costs)
 {
 	CostsMana = mana;
 	if (costs) {
@@ -1340,8 +1340,8 @@ void CInfoPanel::Draw(void)
 	} else {
 		int x;
 		int y;
-		char* nc;
-		char* rc;
+		char *nc;
+		char *rc;
 		// FIXME: need some cool ideas for this.
 
 		x = UI.InfoPanel.X + 16;

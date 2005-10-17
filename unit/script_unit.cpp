@@ -348,7 +348,7 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 			--j;
 		} else if (!strcmp(value, "frame")) {
 			int frame;
-			CConstructionFrame* cframe;
+			CConstructionFrame *cframe;
 
 			lua_rawgeti(l, -1, j + 1);
 			frame = LuaToNumber(l, -1);
