@@ -83,6 +83,8 @@ public:
 	int Width(const char *text);
 	inline bool IsLoaded() { return G && G->IsLoaded(); }
 
+	void MeasureWidths();
+
 	char CharWidth[208];  /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
 };
