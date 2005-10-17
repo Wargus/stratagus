@@ -116,7 +116,7 @@ public:
 	union {
 		CSample *OneSound;       /// if it's only a simple sound
 		CSample **OneGroup;      /// when it's a simple group
-		struct _two_groups_* TwoGroups; /// when it's a double group
+		struct _two_groups_ *TwoGroups; /// when it's a double group
 	} Sound;
 };
 

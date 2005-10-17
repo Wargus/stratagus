@@ -62,7 +62,7 @@
 **  This is the unique slot number. It is not possible that two
 **  units have the same slot number at the same time. The slot
 **  numbers are reused.
-**  This field could be accessed by the macro UnitNumber(Unit*).
+**  This field could be accessed by the macro UnitNumber(Unit *).
 **  Maximal 65535 (=#MAX_UNIT_SLOTS) simultaneous units are
 **  supported.
 **
@@ -741,7 +741,7 @@ extern int XpDamage;                    /// unit XP adds more damage to attacks
 extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled
-extern const CViewport* CurrentViewport; /// CurrentViewport
+extern const CViewport *CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const CUnit *);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
 extern int MaxSelectable;                  /// How many units could be selected
@@ -1027,7 +1027,7 @@ extern void SelectionCclRegister(void);
 // in ccl_unit.c
 
 	/// Parse order
-extern void CclParseOrder(struct lua_State *l, COrder *order);
+extern void CclParseOrder(lua_State *l, COrder *order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
 

@@ -140,10 +140,10 @@ static const SampleType CDStreamSampleType = {
 **  @return Returns the loaded sample.
 **
 */
-CSample *LoadCD(const char* name, int flags)
+CSample *LoadCD(const char *name, int flags)
 {
-	CSample* sample;
-	CddaData* data;
+	CSample *sample;
+	CddaData *data;
 
 	sample = new Sample;
 	sample->Channels = 2;

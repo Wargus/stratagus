@@ -277,7 +277,7 @@ int NetSocketAddr(const Socket sock)
 			if ((SetFlags & IFF_LOOPBACK)) {
 				continue;
 			}
-			pAddrInet = (SOCKADDR_IN*)&localAddr[i].iiAddress;
+			pAddrInet = (SOCKADDR_IN *)&localAddr[i].iiAddress;
 			NetLocalAddrs[nif] = pAddrInet->sin_addr.s_addr;
 			++nif;
 			if (nif == MAX_LOC_IP) {
@@ -309,7 +309,7 @@ int NetSocketAddr(const Socket sock)
 	if (sock != (Socket)-1) {
 		ifc.ifc_len = sizeof(buf);
 		ifc.ifc_buf = buf;
-		if (ioctl(sock, SIOCGIFCONF, (char*)&ifc) < 0) {
+		if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
 			DebugPrint("SIOCGIFCONF - errno %d\n" _C_ errno);
 			return 0;
 		}
@@ -320,7 +320,7 @@ int NetSocketAddr(const Socket sock)
 				cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
 			ifr = (struct ifreq *)cp;
 			ifreq = *ifr;
-			if (ioctl(sock, SIOCGIFFLAGS, (char*)&ifreq) < 0) {
+			if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {
 				DebugPrint("%s: SIOCGIFFLAGS - errno %d\n" _C_
 					ifr->ifr_name _C_ errno);
 				continue;
@@ -336,11 +336,11 @@ int NetSocketAddr(const Socket sock)
 			if (ifreq.ifr_flags & IFF_LOOPBACK) {
 				continue;
 			}
-			sap = (struct sockaddr_in*)&ifr->ifr_addr;
+			sap = (struct sockaddr_in *)&ifr->ifr_addr;
 			sa = *sap;
 			NetLocalAddrs[nif] = sap->sin_addr.s_addr;
 			if (ifreq.ifr_flags & IFF_POINTOPOINT) {
-				if (ioctl(sock, SIOCGIFDSTADDR, (char*)&ifreq) < 0) {
+				if (ioctl(sock, SIOCGIFDSTADDR, (char *)&ifreq) < 0) {
 					DebugPrint("%s: SIOCGIFDSTADDR - errno %d\n" _C_
 						ifr->ifr_name _C_ errno);
 					// failed to obtain dst addr - ignore
@@ -405,7 +405,7 @@ Socket NetOpenUDP(int port)
 		sock_addr.sin_addr.s_addr = INADDR_ANY;
 		sock_addr.sin_port = htons(port);
 		// Bind the socket for listening
-		if (bind(sockfd, (struct sockaddr*)&sock_addr, sizeof(sock_addr)) < 0) {
+		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
 			NetCloseUDP(sockfd);
 			return (Socket)-1;
@@ -721,7 +721,7 @@ Socket NetAcceptTCP(Socket sockfd)
 	socklen_t len;
 
 	len = sizeof(struct sockaddr_in);
-	NetLastSocket = accept(sockfd, (struct sockaddr*)&sa, &len);
+	NetLastSocket = accept(sockfd, (struct sockaddr *)&sa, &len);
 	NetLastHost = sa.sin_addr.s_addr;
 	NetLastPort = sa.sin_port;
 	return NetLastSocket;

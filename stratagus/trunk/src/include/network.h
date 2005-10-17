@@ -211,7 +211,7 @@ extern void NetworkSync(void);   /// Hold in sync
 extern void NetworkQuit(void);   /// Quit game
 extern void NetworkRecover(void);   /// Recover network
 extern void NetworkCommands(void);  /// Get all network commands
-extern void NetworkChatMessage(const char* msg);  /// Send chat message
+extern void NetworkChatMessage(const char *msg);  /// Send chat message
 	/// Send network command.
 extern void NetworkSendCommand(int command, const CUnit *unit, int x,
 	int y, const CUnit *dest, const CUnitType *type,
@@ -241,34 +241,34 @@ extern void NetworkCclRegister(void);
 
 struct dl_node
 {
-	struct dl_node* next;
-	struct dl_node* prev;
+	struct dl_node *next;
+	struct dl_node *prev;
 };
 
 struct dl_head
 {
-	struct dl_node* first;
-	struct dl_node* null;
-	struct dl_node* last;
+	struct dl_node *first;
+	struct dl_node *null;
+	struct dl_node *last;
 };
 
-static inline struct dl_head* dl_init(struct dl_head* h)
+static inline struct dl_head *dl_init(struct dl_head *h)
 {
-	h->first = (struct dl_node*)&h->null;
+	h->first = (struct dl_node *)&h->null;
 	h->null = 0;
-	h->last = (struct dl_node*)&h->first;
+	h->last = (struct dl_node *)&h->first;
 	return h;
 }
 
-static inline struct dl_node* dl_remove(struct dl_node* n)
+static inline struct dl_node *dl_remove(struct dl_node *n)
 {
 	n->prev->next = n->next;
 	n->next->prev = n->prev;
 	return n;
 }
 
-static inline struct dl_node*
-dl_insert_after(struct dl_node* p, struct dl_node* n)
+static inline struct dl_node *
+dl_insert_after(struct dl_node *p, struct dl_node *n)
 {
 	n->next = p->next;
 	n->prev = p;

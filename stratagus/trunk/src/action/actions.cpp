@@ -607,7 +607,7 @@ void UnitActions(void)
 		// Dump the unit to find the network sync bugs.
 		//
 		{
-		static FILE* logf;
+		static FILE *logf;
 
 		if (!logf) {
 			time_t now;

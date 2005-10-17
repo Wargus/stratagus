@@ -61,7 +61,7 @@ extern int MetaServerOK(char *reply);
 extern int SendMetaCommand(char *command, char *format, ...);
 extern int RecvMetaReply(char **reply);
 extern int GetMetaParameter(char *reply, int pos, char **value);
-extern int CclSetMetaServer(struct lua_State* l);
+extern int CclSetMetaServer(lua_State *l);
 //@}
 
 #endif // !__MASTER_H__

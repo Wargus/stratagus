@@ -51,7 +51,7 @@ extern "C" {
 
 typedef struct _lua_user_data_ {
 	int Type;
-	void* Data;
+	void *Data;
 } LuaUserData;
 
 enum {
@@ -59,9 +59,9 @@ enum {
 	LuaSoundType,
 };
 
-extern lua_State* Lua;
+extern lua_State *Lua;
 
-extern int LuaLoadFile(const char* file);
+extern int LuaLoadFile(const char *file);
 extern int LuaCall(int narg, int clear);
 
 #define LuaError(l, args) \
@@ -179,8 +179,8 @@ typedef struct _StringDesc_ StringDesc;
 
 
 typedef struct _binop_ {
-	NumberDesc* Left;           /// Left operand.
-	NumberDesc* Right;          /// Right operand.
+	NumberDesc *Left;           /// Left operand.
+	NumberDesc *Right;          /// Right operand.
 } BinOp;  /// for Bin operand  a ?? b
 
 /**
@@ -191,20 +191,20 @@ struct _NumberDesc_ {
 	union {
 		unsigned int Index; /// index of the lua function.
 		int Val;       /// Direct value.
-		NumberDesc* N; /// Other number.
+		NumberDesc *N; /// Other number.
 		struct _binop_ BinOp;   /// For binary operand.
 		struct {
-			UnitDesc* Unit;            /// Which unit.
+			UnitDesc *Unit;            /// Which unit.
 			int Index;                 /// Which index variable.
 			EnumVariable Component;    /// Which component.
 			int Loc;                   /// Location of Variables[].
 		} UnitStat;
 		struct {
-			StringDesc* String; /// String.
+			StringDesc *String; /// String.
 			CFont *Font;        /// Font.
 		} VideoTextLength;
 		struct {
-			StringDesc* String; /// String.
+			StringDesc *String; /// String.
 			char C;             /// Char.
 		} StringFind;
 
@@ -230,26 +230,26 @@ struct _StringDesc_ {
 		unsigned int Index; /// index of the lua function.
 		char *Val;       /// Direct value.
 		struct {
-			StringDesc** Strings;  /// Array of operands.
+			StringDesc **Strings;  /// Array of operands.
 			int n;                 /// number of operand to concat
 		} Concat; /// for Concat two string.
-		NumberDesc* Number;  /// Number.
-		StringDesc* String;  /// String.
-		UnitDesc* Unit;      /// Unit desciption.
+		NumberDesc *Number;  /// Number.
+		StringDesc *String;  /// String.
+		UnitDesc *Unit;      /// Unit desciption.
 		struct {
-			NumberDesc* Cond;  /// Branch condition.
-			StringDesc* True;  /// String if Cond is true.
-			StringDesc* False; /// String if Cond is false.
+			NumberDesc *Cond;  /// Branch condition.
+			StringDesc *True;  /// String if Cond is true.
+			StringDesc *False; /// String if Cond is false.
 		} If; /// conditional string.
 		struct {
-			StringDesc* String;  /// Original string.
-			NumberDesc* Begin;   /// Begin of result string.
-			NumberDesc* End;     /// End of result string.
+			StringDesc *String;  /// Original string.
+			NumberDesc *Begin;   /// Begin of result string.
+			NumberDesc *End;     /// End of result string.
 		} SubString; /// For extract a substring
 		struct {
-			StringDesc* String;  /// Original string.
-			NumberDesc* Line;    /// Line number.
-			NumberDesc* MaxLen;  /// Max lenght of line.
+			StringDesc *String;  /// Original string.
+			NumberDesc *Line;    /// Line number.
+			NumberDesc *MaxLen;  /// Max lenght of line.
 			CFont *Font;         /// Font to consider (else (-1) consider just char).
 		} Line; /// For specific line.
 		ES_GameInfo GameInfoType;
@@ -260,30 +260,30 @@ struct _StringDesc_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char* CclStartFile;   /// CCL start file
+extern char *CclStartFile;   /// CCL start file
 extern int CclInConfigFile;  /// True while config file parsing
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern const char* LuaToString(lua_State* l, int narg);
-extern int LuaToNumber(lua_State* l, int narg);
-extern bool LuaToBoolean(lua_State* l, int narg);
+extern const char *LuaToString(lua_State *l, int narg);
+extern int LuaToNumber(lua_State *l, int narg);
+extern bool LuaToBoolean(lua_State *l, int narg);
 
 extern void CclGarbageCollect(int fast);  /// Perform garbage collection
 extern void InitCcl(void);                /// Initialise ccl
 extern void LoadCcl(void);                /// Load ccl config file
 extern void SaveCcl(CFile *file);        /// Save CCL module
 extern void SavePreferences(void);        /// Save user preferences
-extern int CclCommand(const char* command);/// Execute a ccl command
+extern int CclCommand(const char *command);/// Execute a ccl command
 extern void CleanCclCredits();            /// Free Ccl Credits Memory
 
 /// transform string in corresponding index.
-extern EnumVariable Str2EnumVariable(lua_State* l, const char *s);
-extern NumberDesc* CclParseNumberDesc(lua_State* l); /// Parse a number description.
-extern UnitDesc* CclParseUnitDesc(lua_State* l);     /// Parse a unit description.
-StringDesc* CclParseStringDesc(lua_State* l);        /// Parse a string description.
+extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
+extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
+extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
+StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
 StringDesc *NewStringDesc(const char *s);            /// Create a StringDesc with const string.
 extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.

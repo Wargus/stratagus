@@ -77,18 +77,18 @@ extern void CommandStopUnit(CUnit *unit);
 	/// Prepare command stand ground
 extern void CommandStandGround(CUnit *unit, int flush);
 	/// Prepare command follow
-extern void CommandFollow(CUnit *unit, CUnit* dest,
+extern void CommandFollow(CUnit *unit, CUnit *dest,
 	int flush);
 	/// Prepare command move
 extern void CommandMove(CUnit *unit, int x, int y, int flush);
 	/// Prepare command repair
 extern void CommandRepair(CUnit *unit, int x, int y,
-	CUnit* dest, int flush);
+	CUnit *dest, int flush);
 	/// Send auto repair command
 extern void CommandAutoRepair(CUnit *unit, int on);
 	/// Prepare command attack
 extern void CommandAttack(CUnit *unit, int x, int y,
-	CUnit* dest, int flush);
+	CUnit *dest, int flush);
 	/// Prepare command attack ground
 extern void CommandAttackGround(CUnit *unit, int x, int y, int flush);
 	/// Prepare command patrol
@@ -97,7 +97,7 @@ extern void CommandPatrolUnit(CUnit *unit, int x, int y, int flush);
 extern void CommandBoard(CUnit *unit, CUnit *dest, int flush);
 	/// Prepare command unload
 extern void CommandUnload(CUnit *unit, int x, int y,
-	CUnit* what, int flush);
+	CUnit *what, int flush);
 	/// Prepare command build
 extern void CommandBuildBuilding(CUnit *, int x, int y,
 	CUnitType *, int);

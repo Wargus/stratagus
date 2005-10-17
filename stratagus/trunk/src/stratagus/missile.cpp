@@ -671,7 +671,7 @@ int FindAndSortMissiles(const CViewport *vp, Missile **table)
 		table[nmissiles++] = *i;
 	}
 	if (nmissiles) {
-		qsort((void*)table, nmissiles, sizeof(Missile*), MissileDrawLevelCompare);
+		qsort((void *)table, nmissiles, sizeof(Missile *), MissileDrawLevelCompare);
 	}
 	return nmissiles;
 }
