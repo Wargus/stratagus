@@ -488,7 +488,7 @@ static void EditorTileChanged2(int x, int y, int d)
 	//
 	mf = &Map.Fields[y * Map.Info.MapWidth + x];
 	if (mf->Flags & MapFieldWall) {
-		MapSetWall(x, y, mf->Flags & MapFieldHuman);
+		Map.SetWall(x, y, mf->Flags & MapFieldHuman);
 		return;
 	}
 

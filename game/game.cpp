@@ -281,13 +281,13 @@ static void LoadMap(const char *filename, CMap *map)
 		}
 #endif
 		if (!strcmp(tmp, ".smp")) {
-			if (!Map.Info.Filename) {
+			if (!map->Info.Filename) {
 				// The map info hasn't been loaded yet => do it now
 				LoadStratagusMapInfo(filename);
 			}
-			Assert(Map.Info.Filename);
-			CreateMap(Map.Info.MapWidth, Map.Info.MapHeight);
-			LoadStratagusMap(Map.Info.Filename, map);
+			Assert(map->Info.Filename);
+			map->Create();
+			LoadStratagusMap(map->Info.Filename, map);
 			return;
 		}
 	}
@@ -525,7 +525,7 @@ void CreateGame(const char *filename, CMap *map)
 #endif
 
 	if (FlagRevealMap) {
-		RevealMap();
+		Map.Reveal();
 	}
 
 	if (GameSettings.Resources != SettingsResourcesMapDefault) {
@@ -617,8 +617,7 @@ void CreateGame(const char *filename, CMap *map)
 	InitSelections();
 
 	UI.Minimap.Create();   // create minimap for pud
-	InitMap();         // setup draw functions
-	InitMapFogOfWar(); // build tables for fog of war
+	Map.Init();
 	PreprocessMap();   // Adjust map for use
 
 	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]); // Setup the user interface

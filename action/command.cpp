@@ -447,7 +447,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 				order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				order->MinRange = unit->Type->MinAttackRange;
 			}
-		} else if (WallOnMap(x,y)) {
+		} else if (Map.WallOnMap(x,y)) {
 			// FIXME: look into action_attack.c about this ugly problem
 			order->X = x;
 			order->Y = y;
@@ -1261,13 +1261,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 				if (Map.Fields[i].Visible[player] && !Map.Fields[i].Visible[opponent]) {
 					Map.Fields[i].Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Index) {
-						MapMarkSeenTile(x, y);
+						Map.MarkSeenTile(x, y);
 					}
 				}
 				if (Map.Fields[i].Visible[opponent] && !Map.Fields[i].Visible[player]) {
 					Map.Fields[i].Visible[player] = 1;
 					if (player == ThisPlayer->Index) {
-						MapMarkSeenTile(x, y);
+						Map.MarkSeenTile(x, y);
 					}
 				}
 			}

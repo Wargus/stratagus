@@ -262,7 +262,7 @@ void MapFixWallTile(int x, int y)
 
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
 			UI.Minimap.UpdateSeenXY(x, y);
-			MapMarkSeenTile(x, y);
+			Map.MarkSeenTile(x, y);
 		}
 	}
 }
@@ -287,11 +287,12 @@ static void MapFixWallNeighbors(int x, int y)
 ** @param x  Map X position.
 ** @param y  Map Y position.
 */
-void MapRemoveWall(unsigned x, unsigned y)
+void CMap::RemoveWall(unsigned x, unsigned y)
 {
 	CMapField *mf;
 
-	mf = Map.Fields + x + y * Map.Info.MapWidth;
+	mf = this->Fields + x + y * this->Info.MapWidth;
+	mf->Value = 0;
 	// FIXME: support more walls of different races.
 	mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
@@ -301,7 +302,7 @@ void MapRemoveWall(unsigned x, unsigned y)
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UI.Minimap.UpdateSeenXY(x, y);
-		MapMarkSeenTile(x, y);
+		this->MarkSeenTile(x, y);
 	}
 }
 
@@ -314,21 +315,21 @@ void MapRemoveWall(unsigned x, unsigned y)
 **
 ** @todo FIXME: support for more races.
 */
-void MapSetWall(unsigned x, unsigned y, int humanwall)
+void CMap::SetWall(unsigned x, unsigned y, int humanwall)
 {
 	CMapField *mf;
 
-	mf = Map.Fields + x + y * Map.Info.MapWidth;
+	mf = this->Fields + x + y * this->Info.MapWidth;
 
 	// FIXME: support more walls of different races.
 	if (humanwall) {
 		// FIXME: Set random walls
-		mf->Tile = Map.Tileset.Table[Map.Tileset.HumanWallTable[0]];
+		mf->Tile = this->Tileset.Table[this->Tileset.HumanWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
 		mf->Value = UnitTypeHumanWall->Variable[HP_INDEX].Max;
 	} else {
 		// FIXME: Set random walls
-		mf->Tile = Map.Tileset.Table[Map.Tileset.OrcWallTable[0]];
+		mf->Tile = this->Tileset.Table[this->Tileset.OrcWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable;
 		mf->Value = UnitTypeOrcWall->Variable[HP_INDEX].Max;
 	}
@@ -339,7 +340,7 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UI.Minimap.UpdateSeenXY(x, y);
-		MapMarkSeenTile(x, y);
+		this->MarkSeenTile(x, y);
 	}
 }
 
@@ -350,16 +351,15 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 ** @param y       Map Y tile-position of wall.
 ** @param damage  Damage done to wall.
 */
-void HitWall(unsigned x, unsigned y, unsigned damage)
+void CMap::HitWall(unsigned x, unsigned y, unsigned damage)
 {
 	unsigned v;
 
-	v = Map.Fields[x + y * Map.Info.MapWidth].Value;
+	v = this->Fields[x + y * this->Info.MapWidth].Value;
 	if (v <= damage) {
-		Map.Fields[x + y * Map.Info.MapWidth].Value = 0;
-		MapRemoveWall(x, y);
+		RemoveWall(x, y);
 	} else {
-		Map.Fields[x + y * Map.Info.MapWidth].Value = v - damage;
+		this->Fields[x + y * this->Info.MapWidth].Value = v - damage;
 		MapFixWallTile(x, y);
 	}
 }

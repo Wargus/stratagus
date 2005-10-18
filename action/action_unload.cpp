@@ -178,7 +178,7 @@ static int ClosestFreeCoast(int x, int y, int *resx, int *resy)
 	int n;
 
 	addx = addy = 1;
-	if (CoastOnMap(x, y) &&
+	if (Map.CoastOnMap(x, y) &&
 			FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
 		*resx = x;
 		*resy = y;
@@ -190,7 +190,7 @@ static int ClosestFreeCoast(int x, int y, int *resx, int *resy)
 	while (n--) {
 		for (i = addy; i--; ++y) {
 			if (x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
+					Map.CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
 					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
 				*resx = x;
 				*resy = y;
@@ -200,7 +200,7 @@ static int ClosestFreeCoast(int x, int y, int *resx, int *resy)
 		++addx;
 		for (i = addx; i--; ++x) {
 			if (x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x ,y) &&
+					Map.CoastOnMap(x, y) && !UnitOnMapTile(x ,y) &&
 					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
 				*resx = x;
 				*resy = y;
@@ -210,7 +210,7 @@ static int ClosestFreeCoast(int x, int y, int *resx, int *resy)
 		++addy;
 		for (i = addy; i--; --y) {
 			if (x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
+					Map.CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
 					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
 				*resx = x;
 				*resy = y;
@@ -220,7 +220,7 @@ static int ClosestFreeCoast(int x, int y, int *resx, int *resy)
 		++addx;
 		for (i = addx; i--; --x) {
 			if (x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
+					Map.CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
 					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
 				*resx = x;
 				*resy = y;

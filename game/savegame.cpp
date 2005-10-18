@@ -267,7 +267,7 @@ void SaveGame(const char *filename)
 	SaveUnitTypes(&file);
 	SaveUpgrades(&file);
 	SavePlayers(&file);
-	SaveMap(&file);
+	Map.Save(&file);
 	SaveUnits(&file);
 	SaveUserInterface(&file);
 	SaveAi(&file);
