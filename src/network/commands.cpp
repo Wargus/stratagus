@@ -891,7 +891,7 @@ static void DoNextReplay(void)
 	} else if (!strcmp(action, "cancel-upgrade-to")) {
 		SendCommandCancelUpgradeTo(UnitSlots[unit]);
 	} else if (!strcmp(action, "research")) {
-		SendCommandResearch(UnitSlots[unit], UpgradeByIdent(val), flags);
+		SendCommandResearch(UnitSlots[unit], CUpgrade::Get(val), flags);
 	} else if (!strcmp(action, "cancel-research")) {
 		SendCommandCancelResearch(UnitSlots[unit]);
 	} else if (!strcmp(action, "spell-cast")) {

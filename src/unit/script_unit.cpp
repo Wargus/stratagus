@@ -270,7 +270,7 @@ void CclParseOrder(lua_State *l, COrder *order)
 		} else if (!strcmp(value, "upgrade")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.Upgrade = UpgradeByIdent(LuaToString(l, -1));
+			order->Arg1.Upgrade = CUpgrade::Get(LuaToString(l, -1));
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "mine")) {
@@ -419,7 +419,7 @@ static void CclParseResearch(lua_State *l, CUnit *unit)
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			unit->Data.Research.Upgrade = UpgradeByIdent(value);
+			unit->Data.Research.Upgrade = CUpgrade::Get(value);
 		}
 	}
 }

@@ -53,9 +53,6 @@ class CFile;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	 /// upgrade of identifier
-extern CUpgrade *UpgradeByIdent(const char *ident);
-
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
 	/// save the upgrades

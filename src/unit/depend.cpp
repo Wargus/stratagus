@@ -84,7 +84,7 @@ void AddDependency(const char *target, const char *required, int count,
 	} else if (!strncmp(target, "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Type = DependRuleUpgrade;
-		rule.Kind.Upgrade = UpgradeByIdent(target);
+		rule.Kind.Upgrade = CUpgrade::Get(target);
 	} else {
 		DebugPrint("dependency target `%s' should be unit-type or upgrade\n" _C_
 			target);
@@ -141,7 +141,7 @@ void AddDependency(const char *target, const char *required, int count,
 	} else if (!strncmp(required, "upgrade-", 8)) {
 		// required string refers to upgrade-XXX
 		temp->Type = DependRuleUpgrade;
-		temp->Kind.Upgrade = UpgradeByIdent(required);
+		temp->Kind.Upgrade = CUpgrade::Get(required);
 	} else {
 		DebugPrint("dependency required `%s' should be unit-type or upgrade\n" _C_
 			required);
@@ -208,7 +208,7 @@ int CheckDependByIdent(const CPlayer *player, const char *target)
 		rule.Type = DependRuleUnitType;
 	} else if (!strncmp(target, "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
-		rule.Kind.Upgrade = UpgradeByIdent(target);
+		rule.Kind.Upgrade = CUpgrade::Get(target);
 		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
 			return 0;
 		}

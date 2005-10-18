@@ -120,27 +120,14 @@ CUpgrade *CUpgrade::New(const char *ident)
 **  Get an upgrade
 **
 **  @param ident  Upgrade identifier
+**
+**  @return       Upgrade pointer or NULL if not found.
 */
 CUpgrade *CUpgrade::Get(const char *ident)
 {
 	CUpgrade *upgrade = Upgrades[ident];
 	if (!upgrade) {
 		DebugPrint("upgrade not found: %s" _C_ ident);
-	}
-	return upgrade;
-}
-
-/**
-**  Upgrade by identifier.
-**
-**  @param ident  The upgrade identifier.
-**  @return       Upgrade pointer or NULL if not found.
-*/
-CUpgrade *UpgradeByIdent(const char *ident)
-{
-	CUpgrade *upgrade = Upgrades[ident];
-	if (!upgrade) {
-		DebugPrint("Upgrade %s not found\n" _C_ ident);
 	}
 	return upgrade;
 }
@@ -471,7 +458,7 @@ int UpgradeIdByIdent(const char *ident)
 {
 	const CUpgrade *upgrade;
 
-	if ((upgrade = UpgradeByIdent(ident))) {
+	if ((upgrade = CUpgrade::Get(ident))) {
 		return upgrade->ID;
 	}
 	DebugPrint(" fix this %s\n" _C_ ident);
