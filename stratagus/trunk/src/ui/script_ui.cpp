@@ -3935,7 +3935,6 @@ static int CclDefineButton(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	memset(&ba, 0, sizeof(ba));
 	//
 	// Parse the arguments
 	//
