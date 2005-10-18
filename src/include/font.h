@@ -71,11 +71,14 @@ class CGraphic;
 	/// Font definition
 class CFont {
 private:
-	CFont() : G(NULL) {
+	CFont(const char *ident) : Ident(new_strdup(ident)), G(NULL) {
 		memset(CharWidth, 0, sizeof(CharWidth));
 	}
 
 public:
+	~CFont() {delete [] Ident;};
+
+
 	static CFont *New(const char *ident, CGraphic *g);
 	static CFont *Get(const char *ident);
 
@@ -85,6 +88,7 @@ public:
 
 	void MeasureWidths();
 
+	char *Ident;          /// Ident of the font.
 	char CharWidth[208];  /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
 };
@@ -166,10 +170,6 @@ extern void ReloadFonts(void);
 #endif
 	/// Cleanup the font module
 extern void CleanFonts(void);
-	/// Find font by identifier
-extern CFont *FontByIdent(const char *ident);
-	// Find the name of a font.
-extern const char *FontName(CFont *font);
 
 //@}
 
