@@ -641,7 +641,9 @@ public:
 	CUnit *Goal; /// Generic goal pointer
 
 
-	inline bool IsIdle() { return Orders[0]->Action == UnitActionStill && OrderCount == 1; }
+	inline bool IsIdle() const {
+		return Orders[0]->Action == UnitActionStill && OrderCount == 1;
+	}
 
 	/// Increase a unit's reference count
 	void RefsIncrease();
