@@ -375,7 +375,7 @@ void FreeMapInfo(CMapInfo *info)
 */
 void CMap::Create()
 {
-	assert(!this->Fields);
+	Assert(!this->Fields);
 
 	Map.Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	Map.Visible[0] = new unsigned[this->Info.MapWidth * this->Info.MapHeight / 2];
