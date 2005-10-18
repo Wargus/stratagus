@@ -268,7 +268,7 @@ void DoRightButton(int sx, int sy)
 						if (type->ResInfo[res] &&
 								type->ResInfo[res]->TerrainHarvester &&
 								IsMapFieldExplored(unit->Player, x, y) &&
-								ForestOnMap(x, y) &&
+								Map.ForestOnMap(x, y) &&
 								((unit->CurrentResource != res) ||
 									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
 							SendCommandResourceLoc(unit, x, y, flush);
@@ -324,14 +324,14 @@ void DoRightButton(int sx, int sy)
 					continue;
 				}
 
-				if (WallOnMap(x, y)) {
+				if (Map.WallOnMap(x, y)) {
 					if (unit->Player->Race == PlayerRaceHuman &&
-							OrcWallOnMap(x, y)) {
+							Map.OrcWallOnMap(x, y)) {
 						SendCommandAttack(unit, x, y, NoUnitP, flush);
 						continue;
 					}
 					if (unit->Player->Race == PlayerRaceOrc &&
-							HumanWallOnMap(x, y)) {
+							Map.HumanWallOnMap(x, y)) {
 						SendCommandAttack(unit, x, y, NoUnitP, flush);
 						continue;
 					}
@@ -406,7 +406,7 @@ void DoRightButton(int sx, int sy)
 				continue;
 			}
 			// FIXME: support harvesting more types of terrain.
-			if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
+			if (IsMapFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
 				SendCommandResourceLoc(unit, x, y, flush);
 				break;
 			}
@@ -1111,7 +1111,7 @@ static int SendResource(int sx, int sy)
 					if (unit->Type->ResInfo[res] &&
 							unit->Type->ResInfo[res]->TerrainHarvester &&
 							IsMapFieldExplored(unit->Player, x, y) &&
-							ForestOnMap(x, y) &&
+							Map.ForestOnMap(x, y) &&
 							Selected[i]->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
 							((unit->CurrentResource != res) ||
 								(unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity))) {
@@ -1133,7 +1133,7 @@ static int SendResource(int sx, int sy)
 				ret = 1;
 				continue;
 			}
-			if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
+			if (IsMapFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
 				SendCommandResourceLoc(unit, x, y, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;

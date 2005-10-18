@@ -519,7 +519,7 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, int
 				//
 				// Look if there is wood
 				//
-				if (ForestOnMap(x, y)) {
+				if (Map.ForestOnMap(x, y)) {
 					if (AiFindBuildingPlace2(worker, type, x, y, dx, dy, 1)) {
 						delete[] morg;
 						delete[] points;

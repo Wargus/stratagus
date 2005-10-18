@@ -239,7 +239,7 @@ static int CclRevealMap(lua_State *l)
 	if (CclInConfigFile) {
 		FlagRevealMap = 1;
 	} else {
-		RevealMap();
+		Map.Reveal();
 	}
 
 	return 0;
@@ -365,7 +365,7 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 	FogOfWarOpacity = i;
 
 	if (!CclInConfigFile) {
-		InitMapFogOfWar();
+		Map.Init();
 	}
 
 	return 0;
@@ -392,10 +392,6 @@ static int CclSetForestRegeneration(lua_State *l)
 	}
 	old = ForestRegeneration;
 	ForestRegeneration = i;
-
-	if (!CclInConfigFile) {
-		InitMapFogOfWar();
-	}
 
 	lua_pushnumber(l, old);
 	return 1;

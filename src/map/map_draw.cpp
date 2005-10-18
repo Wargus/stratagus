@@ -301,8 +301,9 @@ void CViewport::Draw() const
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
-void InitMap(void)
+void CMap::Init()
 {
+	InitFogOfWar();
 }
 
 //@}

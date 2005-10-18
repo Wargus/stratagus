@@ -531,7 +531,7 @@ void HandleActionBuilt(CUnit *unit)
 		// FIXME: Johns: hardcoded unit-type wall / more races!
 		if (unit->Type == UnitTypeOrcWall ||
 				unit->Type == UnitTypeHumanWall) {
-			MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
+			Map.SetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
 			unit->Remove(NULL);
 			UnitLost(unit);
 			UnitClearOrders(unit);

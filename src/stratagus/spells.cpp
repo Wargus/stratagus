@@ -170,11 +170,11 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 				// Not in circle range
 				continue;
 			} else if (n & MapFieldWall) {
-				MapRemoveWall(ix, iy);
+				Map.RemoveWall(ix, iy);
 			} else if (n & MapFieldRocks) {
-				MapClearTile(MapFieldRocks, ix, iy);
+				Map.ClearTile(MapFieldRocks, ix, iy);
 			} else if (n & MapFieldForest) {
-				MapClearTile(MapFieldForest, ix, iy);
+				Map.ClearTile(MapFieldForest, ix, iy);
 			}
 		}
 	}
