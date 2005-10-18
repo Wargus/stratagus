@@ -502,11 +502,7 @@ void LoadUnitTypes(void)
 		//
 		// Lookup icons.
 		//
-		type->Icon.Icon = IconByIdent(type->Icon.Name);
-		if (!type->Icon.Icon) {
-			printf("Can't find icon %s\n", type->Icon.Name);
-			ExitFatal(-1);
-		}
+		type->Icon.Load();
 		//
 		// Lookup missiles.
 		//
@@ -610,7 +606,6 @@ void CleanUnitTypes(void)
 		type->BuildingRules.clear();
 		delete[] type->File;
 		delete[] type->ShadowFile;
-		delete[] type->Icon.Name;
 		delete[] type->Missile.Name;
 		delete[] type->Explosion.Name;
 		delete[] type->CorpseName;

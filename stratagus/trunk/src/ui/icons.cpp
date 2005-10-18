@@ -117,6 +117,25 @@ CIcon *CIcon::Get(const char *ident)
 }
 
 /**
+**  Load the Icon
+**
+**
+*/
+void IconConfig::Load()
+{
+	Assert(Name);
+	Assert(!Icon);
+
+	Icon = CIcon::Get(Name);
+#if 0
+	if (!Icon) {
+		printf("Can't find icon %s\n", Name);
+		ExitFatal(-1);
+	}
+#endif
+};
+
+/**
 **  Init the icons.
 **
 **  Add the short name and icon aliases to hash table.
@@ -153,22 +172,6 @@ void CleanIcons(void)
 	}
 	AllIcons.clear();
 	Icons.clear();
-}
-
-/**
-**  Find the icon by identifier.
-**
-**  @param ident  The icon identifier.
-**
-**  @return       Icon pointer or NULL if not found.
-*/
-CIcon *IconByIdent(const char *ident)
-{
-	CIcon *icon = Icons[ident];
-	if (!icon) {
-		DebugPrint("Icon %s not found\n" _C_ ident);
-	}
-	return icon;
 }
 
 /**
@@ -209,19 +212,6 @@ void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 	}
 	// FIXME: player colors
 	DrawMenuButton(&s, flags, x, y, text);
-}
-
-/**
-**  Set an icon's ident
-**
-**  @param ident  New ident for icon
-*/
-void CIcon::SetIdent(const char *ident)
-{
-	Icons[this->Ident] = NULL;
-	delete[] this->Ident;
-	this->Ident = new_strdup(ident);
-	Icons[this->Ident] = this;
 }
 
 /**

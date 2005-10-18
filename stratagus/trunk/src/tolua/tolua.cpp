@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on Mon Oct 17 07:53:25 2005.
+** Generated automatically by tolua++-1.0.6 on 10/19/05 00:54:01.
 */
 
 #ifndef __cplusplus
@@ -538,22 +538,6 @@ static int tolua_get_CIcon_Ident(lua_State* tolua_S)
 #endif
  tolua_pushstring(tolua_S,(const char*)self->GetIdent());
  return 1;
-}
-
-/* set function: Ident of class  CIcon */
-static int tolua_set_CIcon_Ident(lua_State* tolua_S)
-{
-  CIcon* self = (CIcon*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
- if (!tolua_isstring(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->SetIdent(((char*)  tolua_tostring(tolua_S,2,0))
-)
-;
- return 0;
 }
 
 /* get function: G of class  CIcon */
@@ -2271,7 +2255,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_beginmodule(tolua_S,"CIcon");
  tolua_function(tolua_S,"New",tolua_stratagus_CIcon_New00);
  tolua_function(tolua_S,"Get",tolua_stratagus_CIcon_Get00);
- tolua_variable(tolua_S,"Ident",tolua_get_CIcon_Ident,tolua_set_CIcon_Ident);
+ tolua_variable(tolua_S,"Ident",tolua_get_CIcon_Ident,NULL);
  tolua_variable(tolua_S,"G",tolua_get_CIcon_G_ptr,tolua_set_CIcon_G_ptr);
  tolua_variable(tolua_S,"Frame",tolua_get_CIcon_Frame,tolua_set_CIcon_Frame);
  tolua_endmodule(tolua_S);
