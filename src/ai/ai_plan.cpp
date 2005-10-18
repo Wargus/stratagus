@@ -391,21 +391,20 @@ int AiFindWall(AiForce *force)
 	unsigned char *matrix;
 	int destx;
 	int desty;
-	AiUnit *aiunit;
+	CUnit *aiunit;
 	CUnit *unit;
 
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
-	aiunit = force->Units;
-	unit = aiunit->Unit;
-	while (aiunit) {
-		if (aiunit->Unit->Type->UnitType == UnitTypeLand) {
-			unit = aiunit->Unit;
-			if (aiunit->Unit->Type->Missile.Missile->Range == 1) {
+	unit = force->Units[0];
+	for (i = 0; i < (int)force->Units.size(); ++i) {
+		aiunit = force->Units[i];
+		if (aiunit->Type->UnitType == UnitTypeLand) {
+			unit = aiunit;
+			if (aiunit->Type->Missile.Missile->Range == 1) {
 				break;
 			}
 		}
-		aiunit = aiunit->Next;
 	}
 
 	x = unit->X;
@@ -480,14 +479,13 @@ int AiFindWall(AiForce *force)
 
 	if (destx != -1) {
 		force->State = 0;
-		aiunit = force->Units;
-		while (aiunit) {
-			if (aiunit->Unit->Type->CanAttack) {
-				CommandAttack(aiunit->Unit, destx, desty, NULL, FlushCommands);
+		for (i = 0; i < (int)force->Units.size(); ++i) {
+			aiunit = force->Units[i];
+			if (aiunit->Type->CanAttack) {
+				CommandAttack(aiunit, destx, desty, NULL, FlushCommands);
 			} else {
-				CommandMove(aiunit->Unit, destx, desty, FlushCommands);
+				CommandMove(aiunit, destx, desty, FlushCommands);
 			}
-			aiunit = aiunit->Next;
 		}
 		return 1;
 	}
@@ -511,7 +509,7 @@ int AiFindWall(AiForce *force)
 int AiPlanAttack(AiForce *force)
 {
 	unsigned char *watermatrix;
-	const AiUnit *aiunit;
+	const CUnit *aiunit;
 	int x;
 	int y;
 	int i;
@@ -527,15 +525,14 @@ int AiPlanAttack(AiForce *force)
 	// Transporter must be already assigned to the force.
 	// NOTE: finding free transportes was too much work for me.
 	//
-	aiunit = force->Units;
 	state = 1;
-	while (aiunit) {
-		if (aiunit->Unit->Type->CanTransport) {
-			DebugPrint("Transporter #%d\n" _C_ UnitNumber(aiunit->Unit));
-			AiMarkWaterTransporter(aiunit->Unit, watermatrix);
+	for (i = 0; i < (int)force->Units.size(); ++i) {
+		aiunit = force->Units[i];
+		if (aiunit->Type->CanTransport) {
+			DebugPrint("Transporter #%d\n" _C_ UnitNumber(aiunit));
+			AiMarkWaterTransporter(aiunit, watermatrix);
 			state = 0;
 		}
-		aiunit = aiunit->Next;
 	}
 
 	//
@@ -566,28 +563,21 @@ int AiPlanAttack(AiForce *force)
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	//
-	aiunit = force->Units;
-	while (aiunit) {
-		if (aiunit->Unit->Type->UnitType == UnitTypeLand) {
-			DebugPrint("Landunit %d\n" _C_ UnitNumber(aiunit->Unit));
+	for (i = 0; i < (int)force->Units.size(); ++i) {
+		aiunit = force->Units[i];
+		if (aiunit->Type->UnitType == UnitTypeLand) {
+			DebugPrint("Land unit %d\n" _C_ UnitNumber(aiunit));
 			break;
 		}
-		aiunit = aiunit->Next;
 	}
-
-	if (!aiunit) {
+	if (i == force->Units.size()) {
 		DebugPrint("No land unit in force\n");
 		return 0;
 	}
 
-	if (AiFindTarget(aiunit->Unit, watermatrix, &x, &y, &state)) {
-		AiUnit *aiunit;
-
+	if (AiFindTarget(aiunit, watermatrix, &x, &y, &state)) {
 		if (transporter) {
-			aiunit = new AiUnit;
-			aiunit->Next = force->Units;
-			force->Units = aiunit;
-			aiunit->Unit = transporter;
+			force->Units.insert(force->Units.begin(), transporter);
 			transporter->RefsIncrease();
 		}
 
@@ -628,13 +618,7 @@ void AiSendExplorers(void)
 	int flyeronly;
 
 	// Count requests...
-	request = AiPlayer->FirstExplorationRequest;
-	requestcount = 0;
-
-	while (request) {
-		++requestcount;
-		request = request->Next;
-	}
+	requestcount = AiPlayer->FirstExplorationRequest.size();
 
 	// Nothing => abort
 	if (!requestcount) {
@@ -648,12 +632,8 @@ void AiSendExplorers(void)
 
 		// Choose a request
 		requestid = SyncRand() % requestcount;
+		request = &AiPlayer->FirstExplorationRequest[requestid];
 
-		request = AiPlayer->FirstExplorationRequest;
-		while (requestid) {
-			request = request->Next;
-			--requestid;
-		}
 		// Choose a target, "near"
 		centerx = request->X;
 		centery = request->Y;
@@ -727,15 +707,11 @@ void AiSendExplorers(void)
 
 	if (bestunit) {
 		CommandMove(bestunit, x, y, FlushCommands);
-		AiPlayer->LastExplorationGameCycle=GameCycle;
+		AiPlayer->LastExplorationGameCycle = GameCycle;
 	}
 
 	// Remove all requests
-	while (AiPlayer->FirstExplorationRequest) {
-		request = AiPlayer->FirstExplorationRequest->Next;
-		delete AiPlayer->FirstExplorationRequest;
-		AiPlayer->FirstExplorationRequest = request;
-	}
+	AiPlayer->FirstExplorationRequest.clear();
 }
 
 //@}

@@ -56,19 +56,20 @@ class CPlayer;
 */
 class CAiType {
 public:
-	CAiType *Next;  /// Next ai type
+	CAiType() : Name(NULL), Race(NULL), Class(NULL), Script(NULL),
+		FunctionName(NULL) {}
 
-	char    *Name;  /// Name of this ai
-	char    *Race;  /// for this race
-	char    *Class; /// class of this ai
+	char *Name;     /// Name of this ai
+	char *Race;     /// for this race
+	char *Class;    /// class of this ai
 
-	// nice flags
 #if 0
+	// nice flags
 	unsigned char AllExplored : 1; /// Ai sees unexplored area
 	unsigned char AllVisbile : 1;  /// Ai sees invisibile area
 #endif
 
-	char *Script; /// Main script
+	char *Script;       /// Main script
 	char *FunctionName; /// Name of the function
 };
 
@@ -79,7 +80,7 @@ class AiRequestType {
 public:
 	AiRequestType() : Count(0), Type(NULL) {}
 
-	int        Count;    /// elements in table
+	int Count;           /// elements in table
 	CUnitType *Type;     /// the type
 };
 
@@ -88,24 +89,16 @@ public:
 */
 class AiUnitType {
 public:
-	AiUnitType *Next; /// next unit-type
-	int         Want; /// number of this unit-type wanted
-	CUnitType  *Type; /// unit-type self
-};
+	AiUnitType() : Want(0), Type(NULL) {}
 
-/**
-**  Ai unit in a force.
-*/
-class AiUnit {
-public:
-	AiUnit *Next; /// next unit
-	CUnit  *Unit; /// unit self
+	int Want;        /// number of this unit-type wanted
+	CUnitType *Type; /// unit-type self
 };
 
 /**
 **  Roles for forces
 */
-enum _ai_force_role_ {
+enum AiForceRole {
 	AiForceRoleAttack, /// Force should attack
 	AiForceRoleDefend, /// Force should defend
 };
@@ -118,13 +111,29 @@ enum _ai_force_role_ {
 */
 class AiForce {
 public:
-	char Completed;     /// Flag saying force is complete build
-	char Defending;     /// Flag saying force is defending
-	char Attacking;     /// Flag saying force is attacking
+	AiForce() : Completed(false), Defending(false), Attacking(false), Role(0),
+		UnitTypes(NULL), Units(NULL), State(0), GoalX(0), GoalY(0),
+		MustTransport(0) {}
+
+	void Reset() {
+		Completed = false;
+		Defending = false;
+		Attacking = false;
+		Role = 0;
+		UnitTypes.clear();
+		Units.clear();
+		State = 0;
+		GoalX = GoalY = 0;
+		MustTransport = 0;
+	}
+
+	bool Completed;     /// Flag saying force is complete build
+	bool Defending;     /// Flag saying force is defending
+	bool Attacking;     /// Flag saying force is attacking
 	char Role;          /// Role of the force
 
-	AiUnitType *UnitTypes; /// Count and types of unit-type
-	AiUnit     *Units;     /// Units in the force
+	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
+	std::vector<CUnit *> Units;        /// Units in the force
 
 	//
 	// If attacking
@@ -142,10 +151,11 @@ public:
 */
 class AiBuildQueue {
 public:
-	AiBuildQueue       *Next; /// next request
-	int                 Want; /// requested number
-	int                 Made; /// built number
-	CUnitType          *Type; /// unit-type
+	AiBuildQueue() : Want(0), Made(0), Type(NULL) {}
+
+	int Want;           /// requested number
+	int Made;           /// built number
+	CUnitType *Type;    /// unit-type
 };
 
 /**
@@ -153,10 +163,11 @@ public:
 */
 class AiExplorationRequest {
 public:
-	int                   X;    /// x pos on map
-	int                   Y;    /// y pos on map
-	int                   Mask; /// mask ( ex: MapFieldLandUnit )
-	AiExplorationRequest *Next; /// Next in linked list
+	AiExplorationRequest() : X(0), Y(0), Mask(0) {}
+
+	int X;              /// x pos on map
+	int Y;              /// y pos on map
+	int Mask;           /// mask ( ex: MapFieldLandUnit )
 };
 
 /**
@@ -164,9 +175,10 @@ public:
 */
 class AiTransportRequest {
 public:
+	AiTransportRequest() : Unit(NULL) {}
+
 	CUnit *Unit;
 	COrder Order;
-	AiTransportRequest *Next;
 };
 
 /**
@@ -174,12 +186,25 @@ public:
 */
 class PlayerAi {
 public:
-	CPlayer *Player;         /// Engine player structure
-	CAiType *AiType;/// AI type of this player AI
+	PlayerAi() : Player(NULL), AiType(NULL), Script(NULL), ScriptDebug(0),
+		SleepCycles(0), NeededMask(0), NeedSupply(false),
+		FirstExplorationRequest(NULL), LastExplorationGameCycle(0),
+		TransportRequests(NULL), LastCanNotMoveGameCycle(NULL),
+		LastRepairBuilding(0)
+	{
+		memset(Reserve, 0, sizeof(Reserve));
+		memset(Used, 0, sizeof(Used));
+		memset(Needed, 0, sizeof(Needed));
+		memset(Collect, 0, sizeof(Collect));
+		memset(TriedRepairWorkers, 0, sizeof(TriedRepairWorkers));
+	}
+
+	CPlayer *Player;               /// Engine player structure
+	CAiType *AiType;               /// AI type of this player AI
 	// controller
-	char             *Script;          /// Script executed
-	bool              ScriptDebug;     /// Flag script debuging on/off
-	unsigned long     SleepCycles;     /// Cycles to sleep
+	char *Script;                  /// Script executed
+	bool ScriptDebug;              /// Flag script debuging on/off
+	unsigned long SleepCycles;     /// Cycles to sleep
 
 	// forces
 #define AI_MAX_FORCES 10                    /// How many forces are supported
@@ -192,18 +217,18 @@ public:
 	int Needed[MaxCosts];  /// Needed resources
 	int Collect[MaxCosts]; /// Collect % of resources
 	int NeededMask;        /// Mask for needed resources
-	int NeedSupply;        /// Flag need food
+	bool NeedSupply;       /// Flag need food
 
-	AiExplorationRequest *FirstExplorationRequest;  /// Requests for exploration
-	unsigned long         LastExplorationGameCycle; /// When did the last explore occur?
-	AiTransportRequest   *TransportRequests;        /// Requests for transport
-	unsigned long         LastCanNotMoveGameCycle;  /// Last can not move cycle
+	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
+	unsigned long LastExplorationGameCycle;         /// When did the last explore occur?
+	std::vector<AiTransportRequest> TransportRequests;/// Requests for transport
+	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;     /// Upgrade to unit-type requested and priority list
 	std::vector<CUpgrade *> ResearchRequests;       /// Upgrades requested and priority list
-	AiBuildQueue         *UnitTypeBuilt;            /// What the resource manager should build
-	int                   LastRepairBuilding;       /// Last building checked for repair in this turn
-	unsigned              TriedRepairWorkers[UnitMax];/// No. workers that failed trying to repair a building
+	std::vector<AiBuildQueue> UnitTypeBuilt;        /// What the resource manager should build
+	int LastRepairBuilding;                         /// Last building checked for repair in this turn
+	unsigned TriedRepairWorkers[UnitMax];           /// No. workers that failed trying to repair a building
 };
 
 /**
@@ -256,7 +281,7 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CAiType *AiTypes;   /// List of all AI types
+extern std::vector<CAiType *> AiTypes;   /// List of all AI types
 extern AiHelper AiHelpers; /// AI helper variables
 
 extern int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
