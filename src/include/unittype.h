@@ -584,9 +584,9 @@ public:
 **  It is used to define variables and use it after
 **  to manage magic, energy, shield or other stuff.
 */
-class VariableType {
+class CVariable {
 public:
-	VariableType() : Max(0), Value(0), Increase(0), Enable(0) {}
+	CVariable() : Max(0), Value(0), Increase(0), Enable(0) {}
 
 	int Max;           /// Maximum for the variable. (Assume min is 0.)
 	int Value;         /// Current (or initial) value of the variable (or initial value).
@@ -957,7 +957,7 @@ public:
 	unsigned CanHarvest : 1;        /// Resource can be harvested.
 	unsigned Harvester : 1;         /// unit is a resource harvester.
 	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
-	VariableType *Variable;         /// Array of user defined variables.
+	CVariable *Variable;            /// Array of user defined variables.
 	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
@@ -1017,7 +1017,7 @@ public:
 	int NumberBoolFlag;                 /// Number of user defined bool flag.
 
 	char **VariableName;                /// Array of names of user defined variables.
-	VariableType *Variable;             /// Array of user defined variables (default value for unittype).
+	CVariable *Variable;                /// Array of user defined variables (default value for unittype).
 //	EventType *Event;                   /// Array of functions sets to call when en event occurs.
 	int NumberVariable;                 /// Number of defined variables.
 
@@ -1051,7 +1051,7 @@ extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 // in script_unittype.c
 
 	/// Parse User Variables field.
-extern void DefineVariableField(lua_State *l, VariableType *var, int lua_index);
+extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 
 	/// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(const CUnit *unit);

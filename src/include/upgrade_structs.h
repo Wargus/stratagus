@@ -52,7 +52,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnitType;
-class VariableType;
+class CVariable;
 
 /**
 **  Indices into costs/resource/income array.
@@ -135,7 +135,7 @@ public:
 		memset(Costs, 0, sizeof(Costs));
 	}
 
-	VariableType *Variables;        /// user defined variable.
+	CVariable *Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 };
 

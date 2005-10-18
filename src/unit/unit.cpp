@@ -281,7 +281,7 @@ void CUnit::Init(CUnitType *type)
 
 	if (UnitTypeVar.NumberVariable) {
 		Assert(!Variable);
-		Variable = new VariableType[UnitTypeVar.NumberVariable];
+		Variable = new CVariable[UnitTypeVar.NumberVariable];
 		memcpy(Variable, Type->Variable,
 			UnitTypeVar.NumberVariable * sizeof(*Variable));
 	}
