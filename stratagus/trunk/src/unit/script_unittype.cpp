@@ -997,7 +997,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 	stats = &type->Stats[i];
 	if (!stats->Variables) {
-		stats->Variables = new VariableType[UnitTypeVar.NumberVariable];
+		stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
 	}
 
 	//
@@ -1476,7 +1476,7 @@ static int CclDefineAnimations(lua_State *l)
 **
 **  @internal Use to not duplicate code.
 */
-void DefineVariableField(lua_State *l, VariableType *var, int lua_index)
+void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
 {
 	if (lua_index < 0) { // relative index
 		--lua_index;
@@ -1542,7 +1542,7 @@ static int CclDefineVariables(lua_State *l)
 			UnitTypeVar.VariableName = v;
 			UnitTypeVar.VariableName[i] = new_strdup(str);
 
-			VariableType *t = new VariableType[i + 1];
+			CVariable *t = new CVariable[i + 1];
 			for (int x = 0; x < i; ++x) {
 				t[x] = UnitTypeVar.Variable[x];
 			}
@@ -1972,7 +1972,7 @@ void InitDefinedVariables()
 	for (i = 0; i < NVARALREADYDEFINED; ++i) {
 		UnitTypeVar.VariableName[i] = new_strdup(var[i]);
 	}
-	UnitTypeVar.Variable = new VariableType[i];
+	UnitTypeVar.Variable = new CVariable[i];
 	UnitTypeVar.NumberVariable = i;
 
 	// Boolflags.

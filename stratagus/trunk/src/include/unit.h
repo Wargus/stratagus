@@ -369,7 +369,7 @@ class CPlayer;
 class SpellType;
 class CUnitColors;
 class CConstructionFrame;
-class VariableType;
+class CVariable;
 class CUpgrade;
 class CBuildRestrictionOnTop;
 class CFile;
@@ -563,7 +563,7 @@ public:
 		CConstructionFrame  *CFrame;                  /// Seen construction frame
 	} Seen;
 
-	VariableType *Variable; /// array of User Defined variables.
+	CVariable *Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  /// time to live
 
@@ -579,7 +579,7 @@ public:
 	unsigned Moving : 1;    /// The unit is moving
 	unsigned ReCast : 1;    /// Recast again next cycle
 
-	struct _unit_anim_ { 
+	struct _unit_anim_ {
 		const CAnimation *Anim;                     /// Anim
 		const CAnimation *CurrAnim;                 /// CurrAnim
 		int Wait;                                   /// Wait
