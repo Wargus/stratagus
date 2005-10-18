@@ -128,8 +128,8 @@ int DoActionMove(CUnit *unit)
 		//
 		// FIXME: This is an ugly hack
 		if (unit->Type->CanTransport &&
-				((WaterOnMap(x, y) && CoastOnMap(x + xd, y + yd)) ||
-				(CoastOnMap(x, y) && WaterOnMap(x + xd, y + yd)))) {
+				((Map.WaterOnMap(x, y) && Map.CoastOnMap(x + xd, y + yd)) ||
+				(Map.CoastOnMap(x, y) && Map.WaterOnMap(x + xd, y + yd)))) {
 			PlayUnitSound(unit, VoiceDocking);
 		}
 

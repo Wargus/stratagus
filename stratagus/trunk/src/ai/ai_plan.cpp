@@ -445,7 +445,7 @@ int AiFindWall(AiForce *force)
 				//
 				// Check for a wall
 				//
-				if (WallOnMap(x, y)) {
+				if (Map.WallOnMap(x, y)) {
 					DebugPrint("Wall found %d,%d\n" _C_ x _C_ y);
 					destx = x;
 					desty = y;

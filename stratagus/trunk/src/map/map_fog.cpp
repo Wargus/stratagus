@@ -222,7 +222,7 @@ void MapMarkTileSight(const CPlayer *player, int x, int y)
 			v = 2;
 			Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index] = v;
 			if (IsTileVisible(ThisPlayer, x, y) > 1) {
-				MapMarkSeenTile(x, y);
+				Map.MarkSeenTile(x, y);
 			}
 			return;
 		case 255:  // Overflow
@@ -268,7 +268,7 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 			}
 			// Check visible Tile, then deduct...
 			if (IsTileVisible(ThisPlayer, x, y) > 1) {
-				MapMarkSeenTile(x, y);
+				Map.MarkSeenTile(x, y);
 			}
 		default:  // seen -> seen
 			v--;
@@ -439,7 +439,7 @@ void UpdateFogOfWarChange(void)
 		for (y = 0; y < Map.Info.MapHeight; ++y) {
 			for (x = 0; x < Map.Info.MapWidth; ++x) {
 				if (IsMapFieldExplored(ThisPlayer, x, y)) {
-					MapMarkSeenTile(x, y);
+					Map.MarkSeenTile(x, y);
 				}
 			}
 		}
@@ -698,7 +698,7 @@ void CViewport::DrawMapFogOfWar() const
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
-void InitMapFogOfWar(void)
+void CMap::InitFogOfWar(void)
 {
 #ifndef USE_OPENGL
 	unsigned char r;
@@ -708,7 +708,7 @@ void InitMapFogOfWar(void)
 	SDL_Surface *s;
 #endif
 
-	Map.FogGraphic->Load();
+	this->FogGraphic->Load();
 
 #ifndef USE_OPENGL
 	//
@@ -729,8 +729,8 @@ void InitMapFogOfWar(void)
 	//
 	// Generate Alpha Fog surface.
 	//
-	if (Map.FogGraphic->Surface->format->BytesPerPixel == 1) {
-		s = SDL_DisplayFormat(Map.FogGraphic->Surface);
+	if (this->FogGraphic->Surface->format->BytesPerPixel == 1) {
+		s = SDL_DisplayFormat(this->FogGraphic->Surface);
 		SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 	} else {
 		int i;
@@ -740,18 +740,18 @@ void InitMapFogOfWar(void)
 		SDL_PixelFormat *f;
 
 		// Copy the top row to a new surface
-		f = Map.FogGraphic->Surface->format;
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, Map.FogGraphic->Surface->w, TileSizeY,
+		f = this->FogGraphic->Surface->format;
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, this->FogGraphic->Surface->w, TileSizeY,
 			f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 		SDL_LockSurface(s);
-		SDL_LockSurface(Map.FogGraphic->Surface);
+		SDL_LockSurface(this->FogGraphic->Surface);
 		for (i = 0; i < s->h; ++i) {
 			memcpy((Uint8 *)s->pixels + i * s->pitch,
-				(Uint8 *)Map.FogGraphic->Surface->pixels + i * Map.FogGraphic->Surface->pitch,
-				Map.FogGraphic->Surface->w * f->BytesPerPixel);
+				(Uint8 *)this->FogGraphic->Surface->pixels + i * this->FogGraphic->Surface->pitch,
+				this->FogGraphic->Surface->w * f->BytesPerPixel);
 		}
 		SDL_UnlockSurface(s);
-		SDL_UnlockSurface(Map.FogGraphic->Surface);
+		SDL_UnlockSurface(this->FogGraphic->Surface);
 
 		// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
 		SDL_LockSurface(s);
@@ -777,7 +777,7 @@ void InitMapFogOfWar(void)
 	AlphaFogG->NumFrames = 1;
 #endif
 
-	VisibleTable = new unsigned char[Map.Info.MapWidth * Map.Info.MapHeight];
+	VisibleTable = new unsigned char[this->Info.MapWidth * this->Info.MapHeight];
 }
 
 /**

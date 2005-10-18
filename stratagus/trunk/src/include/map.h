@@ -271,6 +271,79 @@ public:
 	/// Describes the world map
 class CMap {
 public:
+
+	/// Alocate and initialise map table.
+	void Create();
+	/// Build tables for map
+	void Init(void);
+	/// Clean the map
+	void Clean();
+	/// Remove wood/rock from the map.
+	void ClearTile(unsigned short type, unsigned x, unsigned y);
+
+
+	/// Mark a tile as seen by the player.
+	void MarkSeenTile(int x, int y);
+
+	/// Regenerate the forest.
+	void RegenerateForest(void);
+	/// Reveal the complete map, make everything known.
+	void Reveal(void);
+	/// Save the map.
+	void Save(CFile *file) const;
+
+//
+// Wall
+//
+	/// Wall is hit.
+	void HitWall(unsigned x, unsigned y, unsigned damage);
+	/// Set wall on field.
+	void RemoveWall(unsigned x, unsigned y);
+	/// Set wall on field.
+	void SetWall(unsigned x, unsigned y, int humanwall);
+
+	/// Returns true, if wall on the map tile field
+	bool WallOnMap(int x, int y) const;
+	/// Returns true, if human wall on the map tile field
+	bool HumanWallOnMap(int x, int y) const;
+	/// Returns true, if orc wall on the map tile field
+	bool OrcWallOnMap(int x, int y) const;
+
+
+//
+//  Tile type.
+//
+
+	/// Returns true, if water on the map tile field
+	bool WaterOnMap(int x, int y) const;
+	/// Returns true, if coast on the map tile field
+	bool CoastOnMap(int x, int y) const;
+
+	/// Returns true, if forest on the map tile field
+	bool ForestOnMap(int x, int y) const;
+
+	/// Returns true, if rock on the map tile field
+	bool RockOnMap(int x, int y) const;
+
+
+
+private:
+	/// Build tables for fog of war
+	void InitFogOfWar(void);
+
+
+	/// Check if the seen tile-type is wood
+	bool IsSeenTile(unsigned short type, int x, int y) const;
+	/// Correct the surrounding seen wood fields
+	void FixNeighbors(unsigned short type, int seen, int x, int y);
+	/// Correct the seen wood field, depending on the surrounding
+	void FixTile(unsigned short type, int seen, int x, int y);
+
+	/// Regenerate the forest.
+	void RegenerateForestTile(int x, int y);
+
+
+public:
 	CMapField *Fields;              /// fields on map
 	unsigned *Visible[PlayerMax];  /// visible bit-field
 
@@ -310,12 +383,6 @@ extern int ReplayRevealMap;
 ----------------------------------------------------------------------------*/
 
 //
-// in map_draw.c
-//
-	/// Build tables for map
-extern void InitMap(void);
-
-//
 // in map_fog.c
 //
 /// Function to (un)mark the vision table.
@@ -343,8 +410,6 @@ extern void MapUpdateFogOfWar(int x, int y);
 	/// Update fog of war
 extern void UpdateFogOfWarChange(void);
 
-	/// Build tables for fog of war
-extern void InitMapFogOfWar(void);
 	/// Cleanup memory for fog of war tables
 extern void CleanMapFogOfWar(void);
 	/// Builds Vision and Goal Tables
@@ -378,11 +443,6 @@ extern void MapFixSeenWallTile(int x, int y);
 extern void MapFixSeenWallNeighbors(int x, int y);
 	/// Correct the real wall field, depending on the surrounding
 extern void MapFixWallTile(int x, int y);
-	/// Remove wall on tile
-extern void MapRemoveWall(unsigned x, unsigned y);
-	/// Wall is hit
-extern void HitWall(unsigned x, unsigned y, unsigned damage);
-
 
 //
 // in ccl_map.c
@@ -393,44 +453,14 @@ extern void MapCclRegister(void);
 //
 // mixed sources
 //
-	/// Alocate and initialise map table
-extern void CreateMap(int width, int height);
-	/// Save the map
-extern void SaveMap(CFile *file);
 	/// Save a stratagus map (smp format)
 extern int SaveStratagusMap(const char *filename, CMap *map, int writeTerrain);
-	/// Clean the map
-extern void CleanMap(void);
+
 
 	/// Load map presentation
 extern void LoadStratagusMapInfo(const char *mapname);
 	/// Release info for a map
 extern void FreeMapInfo(CMapInfo *info);
-
-	/// Mark a tile as seen by the player
-extern void MapMarkSeenTile(int x, int y);
-	/// Reveal the complete map, make everything known
-extern void RevealMap(void);
-
-	/// Returns true, if the tile field is empty
-extern int IsCMapFieldEmpty(int x, int y);
-	/// Returns true, if water on the map tile field
-extern int WaterOnMap(int x, int y);
-	/// Returns true, if coast on the map tile field
-extern int CoastOnMap(int x, int y);
-
-	/// Returns true, if wall on the map tile field
-extern int WallOnMap(int x, int y);
-	/// Returns true, if human wall on the map tile field
-extern int HumanWallOnMap(int x, int y);
-	/// Returns true, if orc wall on the map tile field
-extern int OrcWallOnMap(int x, int y);
-
-	/// Returns true, if forest on the map tile field
-extern int ForestOnMap(int x, int y);
-
-	/// Returns true, if rock on the map tile field
-extern int RockOnMap(int x, int y);
 
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x, int y, int mask);
@@ -441,20 +471,6 @@ extern int UnitCanBeAt(const CUnit *unit, int x, int y);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
-
-	/// Set wall on field
-extern void MapSetWall(unsigned x, unsigned y, int humanwall);
-
-	/// Check if the seen tile-type is wood
-extern int MapIsSeenTile(unsigned short type, int x, int y);
-	/// Correct the seen wood field, depending on the surrounding
-extern void MapFixTile(unsigned short type, int seen, int x, int y);
-	/// Correct the surrounding seen wood fields
-extern void MapFixNeighbors(unsigned short type, int seen, int x, int y);
-	/// Remove wood from the map
-extern void MapClearTile(unsigned short type, unsigned x, unsigned y);
-	/// Regenerate the forest
-extern void RegenerateForest(void);
 
 // in unit.c
 

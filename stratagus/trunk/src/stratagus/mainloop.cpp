@@ -358,7 +358,7 @@ void GameMainLoop(void)
 				case 4:
 					break;
 				case 5: // forest grow
-					RegenerateForest();
+					Map.RegenerateForest();
 					break;
 				case 6: // overtaking units
 					RescueUnits();

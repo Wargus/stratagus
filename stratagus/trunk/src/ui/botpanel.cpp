@@ -727,7 +727,7 @@ void CButtonPanel::DoClicked(int button)
 			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->Orders[0]->Action == UnitActionStill &&
-					CoastOnMap(Selected[0]->X, Selected[0]->Y)) || !CanMove(Selected[0])) {
+					Map.CoastOnMap(Selected[0]->X, Selected[0]->Y)) || !CanMove(Selected[0])) {
 				SendCommandUnload(Selected[0],
 					Selected[0]->X, Selected[0]->Y, NoUnitP,
 					!(KeyModifiers & ModifierShift));

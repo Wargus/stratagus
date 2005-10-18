@@ -411,13 +411,13 @@ void FireMissile(CUnit *unit)
 		if (!goal) {
 			dx = unit->Orders[0]->X;
 			dy = unit->Orders[0]->Y;
-			if (WallOnMap(dx, dy)) {
-				if (HumanWallOnMap(dx, dy)) {
-					HitWall(dx, dy,
+			if (Map.WallOnMap(dx, dy)) {
+				if (Map.HumanWallOnMap(dx, dy)) {
+					Map.HitWall(dx, dy,
 						CalculateDamageStats(unit->Stats,
 							UnitTypeHumanWall->Stats, unit->Variable[BLOODLUST_INDEX].Value, unit->Variable[XP_INDEX].Value));
 				} else {
-					HitWall(dx, dy,
+					Map.HitWall(dx, dy,
 						CalculateDamageStats(unit->Stats,
 							UnitTypeOrcWall->Stats, unit->Variable[BLOODLUST_INDEX].Value, unit->Variable[XP_INDEX].Value));
 				}
@@ -872,22 +872,22 @@ static void MissileHitsWall(const Missile *missile, int x, int y, int splash)
 {
 	CUnitStats *stats; // stat of the wall.
 
-	if (!WallOnMap(x, y)) {
+	if (!Map.WallOnMap(x, y)) {
 		return;
 	}
 	if (missile->Damage) {  // direct damage, spells mostly
-		HitWall(x, y, missile->Damage / splash);
+		Map.HitWall(x, y, missile->Damage / splash);
 		return;
 	}
 
 	Assert(missile->SourceUnit != NULL);
-	if (HumanWallOnMap(x, y)) {
+	if (Map.HumanWallOnMap(x, y)) {
 		stats = UnitTypeHumanWall->Stats;
 	} else {
-		Assert(OrcWallOnMap(x, y));
+		Assert(Map.OrcWallOnMap(x, y));
 		stats = UnitTypeOrcWall->Stats;
 	}
-	HitWall(x, y, CalculateDamageStats(missile->SourceUnit->Stats, stats, 0, 0) / splash);
+	Map.HitWall(x, y, CalculateDamageStats(missile->SourceUnit->Stats, stats, 0, 0) / splash);
 
 }
 

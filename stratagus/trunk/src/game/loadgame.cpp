@@ -106,7 +106,7 @@ void CleanModules(void)
 	CleanMissileTypes();
 	CleanMissiles();
 	CleanTilesets();
-	CleanMap();
+	Map.Clean();
 	CleanReplayLog();
 	CleanCclCredits();
 	CleanSpells();
@@ -155,8 +155,7 @@ void InitModules(void)
 
 	InitAiModule();
 
-	InitMap();
-	InitMapFogOfWar(); // build tables for fog of war
+	Map.Init();
 }
 
 /**
