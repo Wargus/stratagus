@@ -176,7 +176,7 @@ void CMap::Reveal(void)
 bool CMap::WaterOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return Fields[tx + ty * Info.MapWidth].Flags & MapFieldWaterAllowed;
+	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldWaterAllowed) != 0;
 }
 
 /**
@@ -190,7 +190,7 @@ bool CMap::WaterOnMap(int tx, int ty) const
 bool CMap::CoastOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return Fields[tx + ty * Info.MapWidth].Flags & MapFieldCoastAllowed;
+	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldCoastAllowed) != 0;
 
 }
 
@@ -205,7 +205,7 @@ bool CMap::CoastOnMap(int tx, int ty) const
 bool CMap::WallOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return Fields[tx + ty * Info.MapWidth].Flags & MapFieldWall;
+	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldWall) != 0;
 
 }
 
@@ -251,7 +251,7 @@ bool CMap::ForestOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
 
-	return Fields[tx + ty * Info.MapWidth].Flags & MapFieldForest;
+	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldForest) != 0;
 }
 
 /**
@@ -266,7 +266,7 @@ bool CMap::RockOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
 
-	return Fields[tx + ty * Info.MapWidth].Flags & MapFieldRocks;
+	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldRocks) != 0;
 }
 
 /**
