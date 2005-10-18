@@ -144,7 +144,7 @@ void UpdateStats(int reset)
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (!stats->Variables) {
-					stats->Variables = new VariableType[UnitTypeVar.NumberVariable];
+					stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
 				}
 				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
 					stats->Variables[i] = type->Variable[i];
@@ -330,7 +330,7 @@ CUnitType *NewUnitTypeSlot(char *ident)
 	memset(type->BoolFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
 	type->CanTargetFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
 	memset(type->CanTargetFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
-	type->Variable = new VariableType[UnitTypeVar.NumberVariable];
+	type->Variable = new CVariable[UnitTypeVar.NumberVariable];
 	memcpy(type->Variable, UnitTypeVar.Variable,
 		UnitTypeVar.NumberVariable * sizeof(*type->Variable));
 

@@ -239,7 +239,7 @@ static int CclDefineModifier(lua_State *l)
 
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
-	um->Modifier.Variables = new VariableType[UnitTypeVar.NumberVariable];
+	um->Modifier.Variables = new CVariable[UnitTypeVar.NumberVariable];
 
 	um->UpgradeId = UpgradeIdByIdent(LuaToString(l, 1));
 
