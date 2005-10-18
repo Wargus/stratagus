@@ -265,7 +265,7 @@ static void DrawBuildingCursor(void)
 						mask & ((NumSelected && 
 							Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
 								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
-					IsMapFieldExplored(ThisPlayer, mx + w, my + h))  {
+					Map.IsFieldExplored(ThisPlayer, mx + w, my + h))  {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;

@@ -130,13 +130,13 @@ static int LookupSight(const CPlayer *player, int tx, int ty)
 **
 **  @return        0 unexplored, 1 explored, > 1 visible.
 */
-unsigned char IsTileVisible(const CPlayer *player, int x, int y)
+unsigned char CMap::IsTileVisible(const CPlayer *player, int x, int y) const
 {
 	int i;
 	unsigned char visiontype;
 	unsigned char *visible;
 
-	visible = Map.Fields[y * Map.Info.MapWidth + x].Visible;
+	visible = this->Fields[y * this->Info.MapWidth + x].Visible;
 	visiontype = visible[player->Index];
 
 	if (visiontype > 1) {
@@ -144,7 +144,7 @@ unsigned char IsTileVisible(const CPlayer *player, int x, int y)
 	}
 	if (!player->SharedVision) {
 		if (visiontype) {
-			return visiontype + (Map.NoFogOfWar ? 1 : 0);
+			return visiontype + (this->NoFogOfWar ? 1 : 0);
 		}
 		return 0;
 	}
@@ -159,7 +159,7 @@ unsigned char IsTileVisible(const CPlayer *player, int x, int y)
 		}
 	}
 	if (visiontype) {
-		return visiontype + (Map.NoFogOfWar ? 1 : 0);
+		return visiontype + (this->NoFogOfWar ? 1 : 0);
 	}
 	return 0;
 }
@@ -221,7 +221,7 @@ void MapMarkTileSight(const CPlayer *player, int x, int y)
 			}
 			v = 2;
 			Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index] = v;
-			if (IsTileVisible(ThisPlayer, x, y) > 1) {
+			if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
 				Map.MarkSeenTile(x, y);
 			}
 			return;
@@ -267,7 +267,7 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 				UnitsOnTileUnmarkSeen(player, x, y, 0);
 			}
 			// Check visible Tile, then deduct...
-			if (IsTileVisible(ThisPlayer, x, y) > 1) {
+			if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
 				Map.MarkSeenTile(x, y);
 			}
 		default:  // seen -> seen
@@ -438,7 +438,7 @@ void UpdateFogOfWarChange(void)
 		w = Map.Info.MapWidth;
 		for (y = 0; y < Map.Info.MapHeight; ++y) {
 			for (x = 0; x < Map.Info.MapWidth; ++x) {
-				if (IsMapFieldExplored(ThisPlayer, x, y)) {
+				if (Map.IsFieldExplored(ThisPlayer, x, y)) {
 					Map.MarkSeenTile(x, y);
 				}
 			}
@@ -667,7 +667,7 @@ void CViewport::DrawMapFogOfWar() const
 	// and 1 tile around viewport (for fog-of-war connection display)
 	for (; my < ey; ++my) {
 		for (mx = sx; mx < ex; ++mx) {
-			VisibleTable[my * Map.Info.MapWidth + mx] = IsTileVisible(ThisPlayer, mx, my);
+			VisibleTable[my * Map.Info.MapWidth + mx] = Map.IsTileVisible(ThisPlayer, mx, my);
 		}
 	}
 	ex = this->EndX;
@@ -783,13 +783,13 @@ void CMap::InitFogOfWar(void)
 /**
 **  Cleanup the fog of war.
 */
-void CleanMapFogOfWar(void)
+void CMap::CleanFogOfWar(void)
 {
 	delete[] VisibleTable;
 	VisibleTable = NULL;
 
 	CGraphic::Free(Map.FogGraphic);
-	Map.FogGraphic = NULL;
+	this->FogGraphic = NULL;
 
 #ifndef USE_OPENGL
 	if (OnlyFogSurface) {

@@ -400,7 +400,7 @@ void CMap::Clean(void)
 
 	UI.Minimap.Destroy();
 
-	CleanMapFogOfWar();
+	CleanFogOfWar();
 }
 
 
@@ -587,7 +587,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 		}
 	}
 
-	if (IsMapFieldVisible(ThisPlayer, x, y)) {
+	if (Map.IsFieldVisible(ThisPlayer, x, y)) {
 		UI.Minimap.UpdateSeenXY(x, y);
 		if (!seen) {
 			MarkSeenTile(x, y);
@@ -651,7 +651,7 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 	UI.Minimap.UpdateXY(x, y);
 	FixNeighbors(type, 0, x, y);
 
-	if (IsMapFieldVisible(ThisPlayer, x, y)) {
+	if (Map.IsFieldVisible(ThisPlayer, x, y)) {
 		UI.Minimap.UpdateSeenXY(x, y);
 		MarkSeenTile(x, y);
 	}
@@ -697,10 +697,10 @@ void CMap::RegenerateForestTile(int x, int y)
 				mf->Tile = this->Tileset.BotOneTree;
 				mf->Value = 0;
 				mf->Flags |= MapFieldForest | MapFieldUnpassable;
-				if (IsMapFieldVisible(ThisPlayer, x, y)) {
+				if (Map.IsFieldVisible(ThisPlayer, x, y)) {
 					MarkSeenTile(x, y);
 				}
-				if (IsMapFieldVisible(ThisPlayer, x, y - 1)) {
+				if (Map.IsFieldVisible(ThisPlayer, x, y - 1)) {
 					MarkSeenTile(x, y - 1);
 				}
 			}

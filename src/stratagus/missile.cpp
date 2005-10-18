@@ -527,7 +527,7 @@ static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 
 	for (x = min_x; x <= max_x; ++x) {
 		for (y = min_y; y <= max_y; ++y) {
-			if (ReplayRevealMap || IsMapFieldVisible(ThisPlayer, x, y)) {
+			if (ReplayRevealMap || Map.IsFieldVisible(ThisPlayer, x, y)) {
 				return 1;
 			}
 		}

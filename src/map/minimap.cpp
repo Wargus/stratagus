@@ -568,7 +568,7 @@ void CMinimap::Update(void)
 			if (ReplayRevealMap) {
 				visiontype = 2;
 			} else {
-				visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
+				visiontype = Map.IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 			}
 
 			if (WithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {

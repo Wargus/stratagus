@@ -2232,7 +2232,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 				}
 				return NULL;
 			}
-			if (player && !IsMapFieldExplored(player, x + w, y + h)) {
+			if (player && !Map.IsFieldExplored(player, x + w, y + h)) {
 				return NULL;
 			}
 		}
@@ -2349,7 +2349,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				}
 				m = matrix + x + y * w;
 				//  Check if visited or unexplored
-				if (*m || (player && !IsMapFieldExplored(player, x, y))) {
+				if (*m || (player && !Map.IsFieldExplored(player, x, y))) {
 					continue;
 				}
 				// Look if found what was required.
@@ -2475,7 +2475,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 					continue;
 				}
 
-				if (!IsMapFieldExplored(unit->Player, x, y)) { // Unknown.
+				if (!Map.IsFieldExplored(unit->Player, x, y)) { // Unknown.
 					continue;
 				}
 
@@ -2614,7 +2614,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 				}
 				m = matrix + x + y * w;
 				//  Check if visited or unexplored
-				if (*m || !IsMapFieldExplored(unit->Player, x, y)) {
+				if (*m || !Map.IsFieldExplored(unit->Player, x, y)) {
 					continue;
 				}
 				//

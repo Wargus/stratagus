@@ -316,7 +316,7 @@ static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask, int current_c
 	for (i = ex; i < ex + unit->Type->TileWidth; i++) {
 		for (j = ey; j < ey + unit->Type->TileHeight; j++) {
 			flag = Map.Fields[i + j * Map.Info.MapWidth].Flags & mask;
-			if(flag && (AStarKnowUnknown || IsMapFieldExplored(unit->Player, i, j)) ) {
+			if(flag && (AStarKnowUnknown || Map.IsFieldExplored(unit->Player, i, j)) ) {
 				if(flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
@@ -338,7 +338,7 @@ static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask, int current_c
 				}
 			}
 			// Add cost of crossing unknown tiles if required
-			if (!AStarKnowUnknown && !IsMapFieldExplored(unit->Player, i, j) ) {
+			if (!AStarKnowUnknown && !Map.IsFieldExplored(unit->Player, i, j) ) {
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
