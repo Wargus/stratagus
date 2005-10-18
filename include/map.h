@@ -281,7 +281,19 @@ public:
 	/// Remove wood/rock from the map.
 	void ClearTile(unsigned short type, unsigned x, unsigned y);
 
+	/// Find if a tile is visible (with shared vision).
+	unsigned char IsTileVisible(const CPlayer *player, int x, int y) const;
 
+	/// Check if a field for the user is explored.
+	bool IsFieldExplored(const CPlayer *player, int x, int y) const
+	{
+		return IsTileVisible(player, x, y) > 0;
+	};
+	/// Check if a field for the user is visible.
+	bool IsFieldVisible(const CPlayer *player, int x, int y) const
+	{
+		return IsTileVisible(player, x, y) > 1;
+	};
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(int x, int y);
 
@@ -330,7 +342,8 @@ public:
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar(void);
-
+	/// Cleanup memory for fog of war tables
+	void CleanFogOfWar(void);
 
 	/// Check if the seen tile-type is wood
 	bool IsSeenTile(unsigned short type, int x, int y) const;
@@ -402,16 +415,11 @@ extern MapMarkerFunc MapUnmarkTileDetectCloak;
 	/// Mark sight changes
 extern void MapSight(const CPlayer *player, int x, int y, int w,
 	int h, int range, MapMarkerFunc *marker);
-	/// Find if a tile is visible (With shared vision)
-extern unsigned char IsTileVisible(const CPlayer *player, int x,
-	int y);
 	/// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x, int y);
 	/// Update fog of war
 extern void UpdateFogOfWarChange(void);
 
-	/// Cleanup memory for fog of war tables
-extern void CleanMapFogOfWar(void);
 	/// Builds Vision and Goal Tables
 extern void InitVisionTable(void);
 	/// Cleans up Vision and Goal Tables
@@ -502,14 +510,6 @@ void MapUnmarkUnitSight(CUnit *unit);
 	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileRadarJammer)
 #define MapUnmarkRadarJammer(player, x, y, w, h, range) \
 	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileRadarJammer)
-
-	/// Check if a field for the user is explored
-#define IsMapFieldExplored(player, x, y) \
-	(IsTileVisible((player), (x), (y)))
-
-	/// Check if a field for the user is visible
-#define IsMapFieldVisible(player, x, y) \
-	(IsTileVisible((player), (x), (y)) > 1)
 
 //@}
 

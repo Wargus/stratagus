@@ -667,7 +667,7 @@ void AiSendExplorers(void)
 			y = centery + SyncRand() % (2 * ray + 1) - ray;
 
 			if (x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight) {
-				targetok = !IsMapFieldExplored(AiPlayer->Player, x, y);
+				targetok = !Map.IsFieldExplored(AiPlayer->Player, x, y);
 			}
 
 			ray = 3 * ray / 2;

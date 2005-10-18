@@ -138,7 +138,7 @@ int DoActionMove(CUnit *unit)
 		unit->MoveToXY(x, y);
 
 		// Remove unit from the current selection
-		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, x, y)) {
+		if (unit->Selected && !Map.IsFieldVisible(ThisPlayer, x, y)) {
 			if (NumSelected == 1) { //  Remove building cursor
 				CancelBuildingMode();
 			}

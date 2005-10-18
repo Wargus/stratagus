@@ -267,7 +267,7 @@ void DoRightButton(int sx, int sy)
 					for (res = 0; res < MaxCosts; ++res) {
 						if (type->ResInfo[res] &&
 								type->ResInfo[res]->TerrainHarvester &&
-								IsMapFieldExplored(unit->Player, x, y) &&
+								Map.IsFieldExplored(unit->Player, x, y) &&
 								Map.ForestOnMap(x, y) &&
 								((unit->CurrentResource != res) ||
 									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
@@ -406,7 +406,7 @@ void DoRightButton(int sx, int sy)
 				continue;
 			}
 			// FIXME: support harvesting more types of terrain.
-			if (IsMapFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
+			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
 				SendCommandResourceLoc(unit, x, y, flush);
 				break;
 			}
@@ -810,7 +810,7 @@ void UIHandleMouseMove(int x, int y)
 		const CViewport *vp;
 
 		vp = UI.MouseViewport;
-		if (IsMapFieldExplored(ThisPlayer, vp->Viewport2MapX(x),
+		if (Map.IsFieldExplored(ThisPlayer, vp->Viewport2MapX(x),
 				vp->Viewport2MapY(y)) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
@@ -818,7 +818,7 @@ void UIHandleMouseMove(int x, int y)
 	} else if (CursorOn == CursorOnMinimap) {
 		mx = UI.Minimap.Screen2MapX(x);
 		my = UI.Minimap.Screen2MapY(y);
-		if (IsMapFieldExplored(ThisPlayer, mx, my) || ReplayRevealMap) {
+		if (Map.IsFieldExplored(ThisPlayer, mx, my) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(mx, my);
 		}
 	}
@@ -1110,7 +1110,7 @@ static int SendResource(int sx, int sy)
 				for (res = 0; res < MaxCosts; ++res) {
 					if (unit->Type->ResInfo[res] &&
 							unit->Type->ResInfo[res]->TerrainHarvester &&
-							IsMapFieldExplored(unit->Player, x, y) &&
+							Map.IsFieldExplored(unit->Player, x, y) &&
 							Map.ForestOnMap(x, y) &&
 							Selected[i]->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
 							((unit->CurrentResource != res) ||
@@ -1133,7 +1133,7 @@ static int SendResource(int sx, int sy)
 				ret = 1;
 				continue;
 			}
-			if (IsMapFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
+			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
 				SendCommandResourceLoc(unit, x, y, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
@@ -1509,7 +1509,7 @@ void UIHandleButtonDown(unsigned button)
 				explored = 1;
 				for (j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
 					for (i = 0; i < Selected[0]->Type->TileWidth; ++i) {
-						if (!IsMapFieldExplored(ThisPlayer, x + i, y + j)) {
+						if (!Map.IsFieldExplored(ThisPlayer, x + i, y + j)) {
 							explored = 0;
 							break;
 						}
@@ -1853,7 +1853,7 @@ void UIHandleButtonUp(unsigned button)
 			//
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
-			if (IsMapFieldVisible(ThisPlayer,
+			if (Map.IsFieldVisible(ThisPlayer,
 					UI.MouseViewport->Viewport2MapX(CursorX),
 					UI.MouseViewport->Viewport2MapY(CursorY)) || ReplayRevealMap) {
 				unit = UnitOnScreen(unit,
