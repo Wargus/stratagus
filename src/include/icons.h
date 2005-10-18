@@ -119,7 +119,6 @@ public:
 		unsigned flags, int x, int y, const char *text) const;
 
 	inline const char *GetIdent() { return this->Ident; }
-	void SetIdent(const char *ident);
 
 	CGraphic *G;              /// Graphic data
 	int Frame;                /// Frame number in graphic
@@ -131,6 +130,22 @@ private:
 class IconConfig {
 public:
 	IconConfig() : Name(NULL), Icon(NULL) {}
+	~IconConfig()
+	{
+		delete [] Name;
+	};
+
+	IconConfig &operator = (const IconConfig &rhs)
+	{
+		if (this == &rhs) {
+			return *this;
+		}
+		Name = new_strdup(rhs.Name);
+		Icon = rhs.Icon;
+		return *this;
+	}
+
+	void Load();
 
 	char *Name;          /// config icon name
 	CIcon *Icon;         /// icon pointer to use to run time
@@ -145,9 +160,6 @@ extern std::map<std::string, CIcon *> Icons;
 extern void InitIcons(void);   /// Init icons
 extern void LoadIcons(void);   /// Load icons
 extern void CleanIcons(void);  /// Cleanup icons
-
-	/// Name -> icon
-extern CIcon *IconByIdent(const char *ident);
 
 	/// Register CCL features
 extern void IconCclRegister(void);
