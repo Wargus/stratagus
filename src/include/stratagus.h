@@ -48,24 +48,6 @@
 ==  Compiler repairs
 ============================================================================*/
 
-#ifdef __GNUC__  // {
-
-#if __GNUC__==2 && __GNUC_MINOR__==96
-#warning "GCC 2.96 is not supported and buggy, downgrade to 2.95 or upgrade to 3.2 or later"
-#endif
-
-#if __GNUC__==3 && __GNUC_MINOR__<2
-#warning "GCC versions before 3.2 are not supported, upgrade to 3.2 or later"
-#endif
-
-#if defined(__MINGW32__) && defined(DEBUG)
-// GDB + MINGW doesn't like free(0)
-#include <stdlib.h>
-#define free(x) do { void *__x; __x = (x); if (__x) { free(__x); } } while (0)
-#endif
-
-#endif  // } __GNUC__
-
 #ifdef _MSC_VER
 
 #define WIN32_LEAN_AND_MEAN
