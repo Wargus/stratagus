@@ -86,8 +86,7 @@ void InitButtons(void)
 {
 	// Resolve the icon names.
 	for (int z = 0; z < NumUnitButtons; ++z) {
-		UnitButtonTable[z]->Icon.Icon =
-			IconByIdent(UnitButtonTable[z]->Icon.Name);
+		UnitButtonTable[z]->Icon.Load();
 	}
 	CurrentButtons = NULL;
 }
@@ -113,7 +112,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 	ba->Level = level;
 	ba->Icon.Name = (char *)icon_ident;
 	// FIXME: check if already initited
-	//ba->Icon.Icon = IconByIdent(icon_ident);
+	//ba->Icon.Load();
 	ba->Action = action;
 	if (value) {
 		ba->ValueStr = new_strdup(value);
@@ -179,7 +178,6 @@ void CleanButtons(void)
 	// Free the allocated buttons.
 	for (int z = 0; z < NumUnitButtons; ++z) {
 		Assert(UnitButtonTable[z]);
-		delete[] UnitButtonTable[z]->Icon.Name;
 		delete[] UnitButtonTable[z]->ValueStr;
 		delete[] UnitButtonTable[z]->AllowStr;
 		delete[] UnitButtonTable[z]->Hint;

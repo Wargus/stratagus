@@ -25,7 +25,7 @@ class CIcon
 	static CIcon *New(const char *ident);
 	static CIcon *Get(const char *ident);
 
-	tolua_property__s char *Ident;
+	tolua_readonly tolua_property__s char *Ident;
 	CGraphic *G;
 	int Frame;
 };

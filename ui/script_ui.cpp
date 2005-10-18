@@ -4092,7 +4092,7 @@ static int CclDefineButton(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
-	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
+	AddButton(ba.Pos, ba.Level, new_strdup(ba.Icon.Name), ba.Action, ba.ValueStr,
 		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
 	delete[] ba.ValueStr;
 	delete[] ba.AllowStr;

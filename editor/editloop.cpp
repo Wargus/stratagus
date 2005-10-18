@@ -768,14 +768,14 @@ static void DrawEditorPanel(void)
 	//
 	// Select / Units / Tiles
 	//
-	icon = IconByIdent(EditorSelectIcon);
+	icon = CIcon::Get(EditorSelectIcon);
 	Assert(icon);
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
 			(EditorState == EditorSelecting ? IconSelected : 0),
 		x, y, NULL);
-	icon = IconByIdent(EditorUnitsIcon);
+	icon = CIcon::Get(EditorUnitsIcon);
 	Assert(icon);
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
