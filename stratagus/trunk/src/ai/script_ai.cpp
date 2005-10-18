@@ -154,7 +154,7 @@ static int CclDefineAiHelper(lua_State *l)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			if (what == 3) {
-				upgrade = UpgradeByIdent(value);
+				upgrade = CUpgrade::Get(value);
 				if (!upgrade) {
 					LuaError(l, "unknown upgrade: %s" _C_ value);
 				}
@@ -790,7 +790,7 @@ static int CclAiResearch(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	if ((str = LuaToString(l, 1))) {
-		upgrade = UpgradeByIdent(str);
+		upgrade = CUpgrade::Get(str);
 	} else {
 		LuaError(l, "Upgrade needed");
 		upgrade = 0;
@@ -1340,7 +1340,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_rawgeti(l, j + 1, k + 1);
 				ident = LuaToString(l, -1);
 				lua_pop(l, 1);
-				ai->ResearchRequests.push_back(UpgradeByIdent(ident));
+				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
 			}
 		} else if (!strcmp(value, "building")) {
 			AiBuildQueue **queue;
