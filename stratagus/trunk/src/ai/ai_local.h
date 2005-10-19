@@ -187,8 +187,7 @@ class PlayerAi {
 public:
 	PlayerAi() : Player(NULL), AiType(NULL), Script(NULL), ScriptDebug(0),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
-		FirstExplorationRequest(NULL), LastExplorationGameCycle(0),
-		TransportRequests(NULL), LastCanNotMoveGameCycle(NULL),
+		LastExplorationGameCycle(0), LastCanNotMoveGameCycle(NULL),
 		LastRepairBuilding(0)
 	{
 		memset(Reserve, 0, sizeof(Reserve));
