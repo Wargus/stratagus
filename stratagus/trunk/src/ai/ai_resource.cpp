@@ -131,12 +131,14 @@ static int AiCheckSupply(const PlayerAi *pai, const CUnitType *type)
 {
 	int remaining;
 	const AiBuildQueue *queue;
+	int i;
 
 	//
 	// Count food supplies under construction.
 	//
 	remaining = 0;
-	for (queue = pai->UnitTypeBuilt; queue; queue = queue->Next) {
+	for (i = 0; i < (int)pai->UnitTypeBuilt.size(); ++i) {
+		queue = &pai->UnitTypeBuilt[i];
 		if (queue->Type->Supply) {
 			remaining += queue->Made * queue->Type->Supply;
 		}
@@ -152,7 +154,8 @@ static int AiCheckSupply(const PlayerAi *pai, const CUnitType *type)
 	//
 	// Count what we train.
 	//
-	for (queue = pai->UnitTypeBuilt; queue; queue = queue->Next) {
+	for (i = 0; i < (int)pai->UnitTypeBuilt.size(); ++i) {
+		queue = &pai->UnitTypeBuilt[i];
 		if ((remaining -= queue->Made * queue->Type->Demand) < 0) {
 			return 0;
 		}
@@ -307,7 +310,8 @@ static void AiRequestSupply(void)
 	// Count the already made build requests.
 	//
 	memset(counter, 0, sizeof(counter));
-	for (queue = AiPlayer->UnitTypeBuilt; queue; queue = queue->Next) {
+	for (i = 0; i < (int)AiPlayer->UnitTypeBuilt.size(); ++i) {
+		queue = &AiPlayer->UnitTypeBuilt[i];
 		counter[queue->Type->Slot] += queue->Want;
 	}
 
@@ -329,12 +333,12 @@ static void AiRequestSupply(void)
 			return;
 		} else {
 			if (AiMakeUnit(type)) {
-				queue = new AiBuildQueue;
-				queue->Next = AiPlayer->UnitTypeBuilt;
-				queue->Type = type;
-				queue->Want = 1;
-				queue->Made = 1;
-				AiPlayer->UnitTypeBuilt = queue;
+				AiBuildQueue newqueue;
+				newqueue.Type = type;
+				newqueue.Want = 1;
+				newqueue.Made = 1;
+				AiPlayer->UnitTypeBuilt.insert(
+					AiPlayer->UnitTypeBuilt.begin(), newqueue);
 			}
 		}
 	}
@@ -700,15 +704,17 @@ static void AiCheckingWork(void)
 
 	// Suppy has the highest priority
 	if (AiPlayer->NeedSupply) {
-		if (!(AiPlayer->UnitTypeBuilt && AiPlayer->UnitTypeBuilt->Type->Supply)) {
-			AiPlayer->NeedSupply = 0;
+		if (!(!AiPlayer->UnitTypeBuilt.empty() &&
+				AiPlayer->UnitTypeBuilt[0].Type->Supply)) {
+			AiPlayer->NeedSupply = false;
 			AiRequestSupply();
 		}
 	}
 	//
 	// Look to the build requests, what can be done.
 	//
-	for (queue = AiPlayer->UnitTypeBuilt; queue; queue = queue->Next) {
+	for (int i = 0; i < (int)AiPlayer->UnitTypeBuilt.size(); ++i) {
+		queue = &AiPlayer->UnitTypeBuilt[i];
 		if (queue->Want > queue->Made) {
 			type = queue->Type;
 
@@ -720,7 +726,7 @@ static void AiCheckingWork(void)
 			// Check if we have enough food.
 			//
 			if (type->Demand && !AiCheckSupply(AiPlayer, type)) {
-				AiPlayer->NeedSupply = 1;
+				AiPlayer->NeedSupply = true;
 				AiRequestSupply();
 			}
 			//
@@ -1277,19 +1283,12 @@ static void AiCheckRepair(void)
 */
 void AiAddUnitTypeRequest(CUnitType *type, int count)
 {
-	AiBuildQueue **queue;
+	AiBuildQueue queue;
 
-	//
-	// Find end of the list.
-	//
-	for (queue = &AiPlayer->UnitTypeBuilt; *queue; queue = &(*queue)->Next) {
-	}
-
-	*queue = new AiBuildQueue;
-	(*queue)->Next = NULL;
-	(*queue)->Type = type;
-	(*queue)->Want = count;
-	(*queue)->Made = 0;
+	queue.Type = type;
+	queue.Want = count;
+	queue.Made = 0;
+	AiPlayer->UnitTypeBuilt.push_back(queue);
 }
 
 /**
@@ -1301,18 +1300,15 @@ void AiAddUnitTypeRequest(CUnitType *type, int count)
 */
 void AiExplore(int x, int y, int mask)
 {
-	AiExplorationRequest *req;
-
-	// Alloc a new struct,
-	req = new AiExplorationRequest;
+	AiExplorationRequest req;
 
 	// Link into the exploration requests list
-	req->X = x;
-	req->Y = y;
-	req->Mask = mask;
+	req.X = x;
+	req.Y = y;
+	req.Mask = mask;
 
-	req->Next = AiPlayer->FirstExplorationRequest;
-	AiPlayer->FirstExplorationRequest = req;
+	AiPlayer->FirstExplorationRequest.insert(
+		AiPlayer->FirstExplorationRequest.begin(), req);
 }
 
 /**
