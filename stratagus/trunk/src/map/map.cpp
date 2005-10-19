@@ -136,7 +136,9 @@ void CMap::Reveal(void)
 	for (x = 0; x < this->Info.MapWidth; ++x) {
 		for (y = 0; y < this->Info.MapHeight; ++y) {
 			for (p = 0; p < PlayerMax; ++p) {
-				this->Fields[x + y * this->Info.MapWidth].Visible[p] = 1;
+				if (!this->Fields[x + y * this->Info.MapWidth].Visible[p]) { 	                                 this->Fields[x + y * this->Info.MapWidth].Visible[p] = 1;
+					this->Fields[x + y * this->Info.MapWidth].Visible[p] = 1;
+				}
 			}
 			MarkSeenTile(x, y);
 		}
