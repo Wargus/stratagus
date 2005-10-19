@@ -290,7 +290,7 @@ static int AiCheckBelongsToForce(int force, const CUnitType *type)
 	//
 	// Count units in force.
 	//
-	for (i = 0; i < AiPlayer->Force[force].Units.size(); ++i) {
+	for (i = 0; i < (int)AiPlayer->Force[force].Units.size(); ++i) {
 		aiunit = AiPlayer->Force[force].Units[i];
 		counter[UnitTypeEquivs[aiunit->Type->Slot]]++;
 	}
