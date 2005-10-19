@@ -570,7 +570,7 @@ int AiPlanAttack(AiForce *force)
 			break;
 		}
 	}
-	if (i == force->Units.size()) {
+	if (i == (int)force->Units.size()) {
 		DebugPrint("No land unit in force\n");
 		return 0;
 	}

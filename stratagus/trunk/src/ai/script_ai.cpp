@@ -639,7 +639,7 @@ static int CclAiForce(lua_State *l)
 		//
 		// New type append it.
 		//
-		if (i == AiPlayer->Force[force].UnitTypes.size()) {
+		if (i == (int)AiPlayer->Force[force].UnitTypes.size()) {
 			AiUnitType newaiut;
 			newaiut.Want = count;
 			newaiut.Type = type;
@@ -1032,7 +1032,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					break;
 				}
 			}
-			if (k == AiTypes.size()) {
+			if (k == (int)AiTypes.size()) {
 				lua_pushfstring(l, "ai-type not found: %s", value);
 			}
 			ai->AiType = ait;
