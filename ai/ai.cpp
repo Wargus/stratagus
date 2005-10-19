@@ -254,7 +254,7 @@ static void AiCheckUnits(void)
 	//
 	for (i = AI_MAX_FORCES; i < AI_MAX_ATTACKING_FORCES; ++i) {
 
-		for (j = 0; j < AiPlayer->Force[i].Units.size(); ++j) {
+		for (j = 0; j < (int)AiPlayer->Force[i].Units.size(); ++j) {
 			const CUnit *unit = AiPlayer->Force[i].Units[j];
 			attacking[unit->Type->Slot]++;
 		}
@@ -269,7 +269,7 @@ static void AiCheckUnits(void)
 			continue;
 		}
 
-		for (j = 0; j < AiPlayer->Force[i].UnitTypes.size(); ++j) {
+		for (j = 0; j < (int)AiPlayer->Force[i].UnitTypes.size(); ++j) {
 			const AiUnitType *aiut = &AiPlayer->Force[i].UnitTypes[j];
 			t = aiut->Type->Slot;
 			x = aiut->Want;
@@ -776,6 +776,7 @@ void AiInit(CPlayer *player)
 	PlayerAi *pai;
 	CAiType *ait;
 	char *ainame;
+	int i;
 
 	pai = new PlayerAi;
 	if (!pai) {
@@ -801,7 +802,7 @@ void AiInit(CPlayer *player)
 		DebugPrint("AI: Look at the DefineAi() documentation.\n");
 		Exit(0);
 	}
-	for (int i = 0; i < (int)AiTypes.size(); ++i) {
+	for (i = 0; i < (int)AiTypes.size(); ++i) {
 		ait = AiTypes[i];
 		if (ait->Race && strcmp(ait->Race, PlayerRaces.Name[player->Race])) {
 			continue;
@@ -811,7 +812,7 @@ void AiInit(CPlayer *player)
 		}
 		break;
 	}
-	if (i == AiTypes.size()) {
+	if (i == (int)AiTypes.size()) {
 		DebugPrint("AI: Found no matching ai scripts at all!\n");
 		// FIXME: surely we can do something better than exit
 		exit(0);
