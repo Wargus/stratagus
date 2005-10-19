@@ -1013,8 +1013,6 @@ static int CclDefineAiPlayer(lua_State *l)
 	// Assert(!Players[i].Ai && Players[i].AiEnabled);
 
 	ai = Players[i].Ai = new PlayerAi;
-	// FIXME: use constructor
-	memset(ai, 0, sizeof(*ai));
 	ai->Player = &Players[i];
 
 	//
