@@ -56,7 +56,6 @@
 
 static std::vector<CFont *> AllFonts;           /// Vector of all fonts
 static std::map<std::string, CFont *> Fonts;    /// Font mappings
-static std::map<CFont *, std::string> FontNames;/// Font name mappings
 
 static std::vector<CFontColor *> AllFontColors; /// Vector of all font colors.
 std::map<std::string, CFontColor *> FontColors; /// Map of ident to font color.
@@ -718,11 +717,11 @@ void LoadFonts(void)
 	}
 
 	// TODO: remove this
-	SmallFont = FontByIdent("small");
-	GameFont = FontByIdent("game");
-	LargeFont = FontByIdent("large");
-	SmallTitleFont = FontByIdent("small-title");
-	LargeTitleFont = FontByIdent("large-title");
+	SmallFont = CFont::Get("small");
+	GameFont = CFont::Get("game");
+	LargeFont = CFont::Get("large");
+	SmallTitleFont = CFont::Get("small-title");
+	LargeTitleFont = CFont::Get("large-title");
 }
 
 #ifdef USE_OPENGL
@@ -745,41 +744,6 @@ void ReloadFonts(void)
 #endif
 
 /**
-**  Find font by identifier.
-**
-**  @param ident  Font identifier
-**
-**  @return       Integer as font identifier.
-*/
-CFont *FontByIdent(const char *ident)
-{
-	CFont *font = Fonts[ident];
-	if (!font) {
-		fprintf(stderr, "Font not found: '%s'", ident);
-		ExitFatal(1);
-	}
-	return font;
-}
-
-/**
-**  Find the name of a font.
-**
-**  @param font  Font identifier.
-**
-**  @return      Name of the font.
-*/
-const char *FontName(CFont *font)
-{
-	const char *s = FontNames[font].c_str();
-	if (!*s) {
-		fprintf(stderr, "Font not found.");
-		ExitFatal(1);
-	}
-
-	return s;
-}
-
-/**
 **  Create a new font
 **
 **  @param ident  Font identifier
@@ -796,11 +760,10 @@ CFont *CFont::New(const char *ident, CGraphic *g)
 		}
 		font->G = g;
 	} else {
-		font = new CFont;
+		font = new CFont(ident);
 		font->G = g;
 		AllFonts.push_back(font);
 		Fonts[ident] = font;
-		FontNames[font] = ident;
 	}
 	return font;
 }
@@ -904,7 +867,6 @@ void CleanFonts(void)
 #endif
 	AllFonts.clear();
 	Fonts.clear();
-	FontNames.clear();
 
 	for (i = 0; i < (int)AllFontColors.size(); ++i) {
 		delete AllFontColors[i];

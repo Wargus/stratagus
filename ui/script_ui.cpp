@@ -275,7 +275,7 @@ static int CclSetTitleScreens(lua_State *l)
 						if (!strcmp(value, "Text")) {
 							TitleScreens[j]->Labels[k]->Text = new_strdup(LuaToString(l, -1));
 						} else if (!strcmp(value, "Font")) {
-							TitleScreens[j]->Labels[k]->Font = FontByIdent(LuaToString(l, -1));
+							TitleScreens[j]->Labels[k]->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {
 							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 								LuaError(l, "incorrect argument");
@@ -577,7 +577,7 @@ static void CclParseInfoText(lua_State *l, InfoText *text)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "font")) {
 			lua_rawgeti(l, -1, j + 1);
-			text->Font = FontByIdent(LuaToString(l, -1));
+			text->Font = CFont::Get(LuaToString(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "pos")) {
 			lua_rawgeti(l, -1, j + 1);
@@ -1589,7 +1589,7 @@ static int CclDefineUI(lua_State *l)
 				} else if (!strcmp(value, "Width")) {
 					ui->StatusLine.W = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "Font")) {
-					ui->StatusLine.Font = FontByIdent(LuaToString(l, -1));
+					ui->StatusLine.Font = CFont::Get(LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -1828,7 +1828,7 @@ static CContentType *CclParseContent(lua_State *l)
 							contenttext->Text = CclParseStringDesc(l);
 							lua_pushnil(l); // ParseStringDesc eat token
 						} else if (!strcmp(key, "Font")) {
-							contenttext->Font = FontByIdent(LuaToString(l, -1));
+							contenttext->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(key, "Centered")) {
 							contenttext->Centered = LuaToBoolean(l, -1);
 						} else if (!strcmp(key, "Variable")) {
@@ -1857,7 +1857,7 @@ static CContentType *CclParseContent(lua_State *l)
 					if (!strcmp(key, "Format")) {
 						contentformattedtext->Format = new_strdup(LuaToString(l, -1));
 					} else if (!strcmp(key, "Font")) {
-						contentformattedtext->Font = FontByIdent(LuaToString(l, -1));
+						contentformattedtext->Font = CFont::Get(LuaToString(l, -1));
 					} else if (!strcmp(key, "Variable")) {
 						contentformattedtext->Index = GetVariableIndex(LuaToString(l, -1));
 						if (contentformattedtext->Index == -1) {
@@ -1881,7 +1881,7 @@ static CContentType *CclParseContent(lua_State *l)
 						if (!strcmp(key, "Format")) {
 							contentformattedtext2->Format = new_strdup(LuaToString(l, -1));
 						} else if (!strcmp(key, "Font")) {
-							contentformattedtext2->Font = FontByIdent(LuaToString(l, -1));
+							contentformattedtext2->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(key, "Variable")) {
 						contentformattedtext2->Index1 = GetVariableIndex(LuaToString(l, -1));
 						contentformattedtext2->Index2 = GetVariableIndex(LuaToString(l, -1));
@@ -2032,7 +2032,7 @@ static int CclDefinePanelContents(lua_State *l)
 				infopanel->PosY = LuaToNumber(l, -1);
 				lua_pop(l, 2); // Pop X and Y
 			} else if (!strcmp(key, "DefaultFont")) {
-				infopanel->DefaultFont = FontByIdent(LuaToString(l, -1));
+				infopanel->DefaultFont = CFont::Get(LuaToString(l, -1));
 			} else if (!strcmp(key, "Condition")) {
 				infopanel->Condition = ParseConditionPanel(l);
 			} else if (!strcmp(key, "Contents")) {
@@ -2421,7 +2421,7 @@ static int CclDefineButtonStyle(lua_State *l)
 			b->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Font")) {
-			b->Font = FontByIdent(LuaToString(l, -1));
+			b->Font = CFont::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
 			delete[] b->TextNormalColor;
 			b->TextNormalColor = new_strdup(LuaToString(l, -1));
@@ -2546,7 +2546,7 @@ static int CclDefineCheckboxStyle(lua_State *l)
 			c->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Font")) {
-			c->Font = FontByIdent(LuaToString(l, -1));
+			c->Font = CFont::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
 			delete[] c->TextNormalColor;
 			c->TextNormalColor = new_strdup(LuaToString(l, -1));
@@ -3803,7 +3803,7 @@ static int CclDefineMenuItem(lua_State *l)
 		} else if (!strcmp(value, "id")) {
 			item->Id = new_strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "font")) {
-			item->Font = FontByIdent(LuaToString(l, j + 1));
+			item->Font = CFont::Get(LuaToString(l, j + 1));
 /* Menu types */
 		} else if (!item->MiType) {
 			if (!strcmp(value, "text")) {

@@ -1737,8 +1737,8 @@ static int CclDefineDecorations(lua_State *l)
 				} else if (!strcmp(key, "text")) {
 					CDecoVarText *decovartext = new CDecoVarText;
 					lua_rawgeti(l, -1, 1);
-					// FontByIdent stop if not found.
-					decovartext->Font = FontByIdent(LuaToString(l, -1));
+
+					decovartext->Font = CFont::Get(LuaToString(l, -1));
 					lua_pop(l, 1);
 // FIXME : More arguments ? color...
 					decovar = decovartext;
