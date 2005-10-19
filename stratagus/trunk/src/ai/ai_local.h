@@ -112,8 +112,7 @@ enum AiForceRole {
 class AiForce {
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false), Role(0),
-		UnitTypes(NULL), Units(NULL), State(0), GoalX(0), GoalY(0),
-		MustTransport(0) {}
+		State(0), GoalX(0), GoalY(0), MustTransport(0) {}
 
 	void Reset() {
 		Completed = false;
