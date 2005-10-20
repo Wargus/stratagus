@@ -1423,8 +1423,6 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 /**
 **  Returns true, if unit is visible on current map view (any viewport).
 **
-**  @param unit  Unit to be checked.
-**
 **  @return      True if visible, false otherwise.
 */
 bool CUnit::IsVisibleOnScreen() const
