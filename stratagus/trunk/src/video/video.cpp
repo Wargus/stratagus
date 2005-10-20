@@ -50,7 +50,7 @@
 ** 640x480, 800x600, 1024x768, 1600x1200
 ** with colors 8,15,16,24,32 bit
 **
-** @see video.h @see video.c
+** @see video.h @see video.cpp
 **
 **
 **   @section VideoModuleHigh High Level - video dependent functions
@@ -63,7 +63,7 @@
 **   Win32 (Windows 95/98/2000), BeOs, MacOS
 **   (visit http://www.libsdl.org)
 **
-** @see sdl.c
+** @see sdl.cpp
 **
 **
 **   @section VideoModuleLow  Low Level - draw functions
@@ -73,8 +73,8 @@
 ** @note you might need to use Decorations (see above), to prevent
 ** drawing directly to screen in conflict with the video update.
 **
-**   @see linedraw.c
-**   @see sprite.c
+**   @see linedraw.cpp
+**   @see sprite.cpp
 */
 
 /*----------------------------------------------------------------------------
