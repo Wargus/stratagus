@@ -94,6 +94,8 @@ public:
 */
 class MPPlayer {
 public:
+	MPPlayer() : Name(NULL), Race(0), Team(0), Type(0) {}
+
 	char *Name;
 	int Race;
 	int Team;
@@ -111,7 +113,6 @@ public:
 		Resource(0), NumUnits(0), TileSet(0), NoFow(false), RevealMap(0),
 		GameType(0), Opponents(0), Commands(NULL)
 	{
-		memset(Players, 0, sizeof(Players));
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
 	}
