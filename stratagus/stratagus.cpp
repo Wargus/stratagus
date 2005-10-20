@@ -60,28 +60,28 @@
 **
 ** Handles the map. A map is made from tiles.
 **
-** @see map.h @see map.c @see tileset.h @see tileset.c
+** @see map.h @see map.cpp @see tileset.h @see tileset.cpp
 **
 ** @subsection Unit Unit
 **
 ** Handles units. Units are ships, flyers, buildings, creatures,
 ** machines.
 **
-** @see unit.h @see unit.c @see unittype.h @see unittype.c
+** @see unit.h @see unit.cpp @see unittype.h @see unittype.cpp
 **
 ** @subsection Missile Missile
 **
 ** Handles missiles. Missiles are all other sprites on map
 ** which are no unit.
 **
-** @see missile.h @see missile.c
+** @see missile.h @see missile.cpp
 **
 ** @subsection Player Player
 **
 ** Handles players, all units are owned by a player. A player
 ** could be controlled by a human or a computer.
 **
-** @see player.h @see player.c @see ::Player
+** @see player.h @see player.cpp @see ::CPlayer
 **
 ** @subsection Sound Sound
 **
@@ -94,11 +94,11 @@
 ** support.
 ** @todo Streaming support of ogg/mp3 files.
 **
-** @see sound.h @see sound.c
-** @see ccl_sound.c @see sound_id.c @see sound_server.c
-** @see unitsound.c
-** @see oss_audio.c @see sdl_audio.c
-** @see mad.c @see ogg.c @see flac.c @see wav.c
+** @see sound.h @see sound.cpp
+** @see script_sound.cpp @see sound_id.cpp @see sound_server.cpp
+** @see unitsound.cpp
+** @see sdl_audio.cpp
+** @see mad.cpp @see ogg.cpp @see flac.cpp @see wav.cpp
 **
 ** @subsection Video Video
 **
@@ -108,7 +108,7 @@
 ** See page @ref VideoModule for more information upon supported
 ** features and video platforms.
 **
-** @see video.h @see video.c
+** @see video.h @see video.cpp
 **
 ** @subsection Network Network
 **
@@ -118,11 +118,11 @@
 ** See page @ref NetworkModule for more information upon supported
 ** features and API.
 **
-** @see network.h @see network.c
+** @see network.h @see network.cpp
 **
 ** @subsection Pathfinder Pathfinder
 **
-** @see pathfinder.h @see pathfinder.c
+** @see pathfinder.h @see pathfinder.cpp
 **
 ** @subsection AI AI
 **
@@ -134,19 +134,19 @@
 ** See page @ref AiModule for more information upon supported
 ** features and API.
 **
-** @see new_ai.c ai_local.h
-** @see ai.h @see ai.c
+** @see ai_local.h
+** @see ai.h @see ai.cpp
 **
 ** @subsection CCL CCL
 **
 ** CCL is Craft Configuration Language, which is used to
 ** configure and customize Stratagus.
 **
-** @see script.h @see script.c
+** @see script.h @see script.cpp
 **
 ** @subsection Icon Icon
 **
-** @see icons.h @see icons.c
+** @see icons.h @see icons.cpp
 **
 ** @subsection Editor Editor
 **
@@ -156,7 +156,7 @@
 ** See page @ref EditorModule for more information upon supported
 ** features and API.
 **
-** @see editor.h @see editor.c
+** @see editor.h @see editor.cpp
 */
 
 /*----------------------------------------------------------------------------
