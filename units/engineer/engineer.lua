@@ -43,7 +43,7 @@ DefineAnimations("animations-engineer", {
         "frame 15", "move 2", "wait 2", "frame 15", "move 2", "wait 2", 
         "frame 15", "move 2", "wait 2", "frame 20", "move 2", "wait 2", 
         "frame 20", "move 2", "wait 2", "frame 20", "move 2", "wait 2", 
-        "frame 20", "move 2", "wait 2", "frame 20", "unbreakable end", "wait 2", },
+        "frame 20", "move 2", "wait 1", "unbreakable end", "wait 1", },
     Repair = {"unbreakable begin", "frame 25", "wait 8", "frame 30", "wait 2",
         "frame 35", "wait 2", "frame 40", "sound engineer-repair", "wait 8",
         "frame 35", "wait 3", "frame 30", "wait 2", "unbreakable end", "wait 1", },
