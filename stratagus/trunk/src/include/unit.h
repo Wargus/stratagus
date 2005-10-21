@@ -424,8 +424,11 @@ typedef enum _unit_action_ {
 */
 class COrder {
 public:
-	COrder() : Action(UnitActionNone), Range(0), MinRange(0), Width(0), Height(0),
-				Goal(NULL), X(-1), Y(-1), Type(NULL) { memset(&Arg1, 0, sizeof(Arg1));};
+	COrder() : Action(UnitActionNone), Range(0), MinRange(0), Width(0),
+		Height(0), Goal(NULL), X(-1), Y(-1), Type(NULL)
+	{
+		memset(&Arg1, 0, sizeof(Arg1));
+	};
 
 	void Init() {
 		Action = UnitActionNone;
@@ -440,7 +443,7 @@ public:
 	};
 
 	unsigned char Action;   /// global action
-	int           Range;    /// How far away
+	int Range;              /// How far away
 	unsigned int  MinRange; /// How far away minimum
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
@@ -502,6 +505,26 @@ enum _directions_ {
 	/// The big unit structure
 class CUnit {
 public:
+	CUnit() : Refs(0), Slot(0), UnitSlot(NULL), PlayerSlot(NULL),
+		Next(NULL), CacheLock(0), InsideCount(0), BoardCount(0),
+		UnitInside(NULL), Container(NULL), NextContained(NULL),
+		PrevContained(NULL), X(0), Y(0), Type(NULL), Player(NULL),
+		Stats(NULL), CurrentSightRange(0), Colors(NULL),
+		IX(0), IY(0), Frame(0), Direction(0), Attacked(0),
+		Burning(0), Destroyed(0), Removed(0), Selected(0),
+		TeamSelected(0), Constructed(0), Active(0), Boarded(0),
+		RescuedFrom(NULL), Variable(NULL), TTL(0), GroupId(0), LastGroup(0),
+		ResourcesHeld(0), SubAction(0), Wait(0), State(0), Blink(0),
+		Moving(0), ReCast(0), Rs(0), CurrentResource(0), OrderCount(0),
+		OrderFlush(0), AutoCastSpell(NULL), AutoRepair(0),
+		Goal(NULL)
+	{
+		memset(VisCount, 0, sizeof(VisCount));
+		memset(&Seen, 0, sizeof(Seen));
+		memset(&Anim, 0, sizeof(Anim));
+		memset(&Data, 0, sizeof(Data));
+	}
+
 	// @note int is faster than shorts
 	int     Refs;         /// Reference counter
 	int     Slot;         /// Assigned slot number

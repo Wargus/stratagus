@@ -243,7 +243,7 @@ static CUnit *AllocUnit(void)
 		}
 		slot = UnitSlots + UnitSlotFree;
 		UnitSlotFree++;
-		*slot = unit = (CUnit *)calloc(1, sizeof(*unit));
+		*slot = unit = new CUnit;
 	}
 	unit->Slot = slot - UnitSlots; // back index
 	return unit;
@@ -3923,7 +3923,7 @@ void CleanUnits(void)
 			delete *order;
 		}
 		(*table)->Orders.clear();
-		free(*table);
+		delete *table;
 		*table = NULL;
 	}
 
@@ -3932,7 +3932,7 @@ void CleanUnits(void)
 	//
 	while ((unit = ReleasedHead)) {
 		ReleasedHead = unit->Next;
-		free(unit);
+		delete unit;
 	}
 
 	InitUnitsMemory();

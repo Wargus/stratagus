@@ -1322,7 +1322,7 @@ static int CclSlotUsage(lua_State *l)
 	}
 	UnitSlotFree = LuaToNumber(l, 1);
 	for (i = 0; i < UnitSlotFree; i++) {
-		UnitSlots[i] = (CUnit *)calloc(1, sizeof(CUnit));
+		UnitSlots[i] = new CUnit;
 		UnitSlots[i]->Slot = i;
 	}
 	for (i = 2; i <= args; i++) {
