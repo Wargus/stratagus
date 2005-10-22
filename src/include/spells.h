@@ -10,7 +10,8 @@
 //
 /**@name spells.h - The Spells. */
 //
-//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and Joris DAUPHIN
+//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski,
+//                                 Joris DAUPHIN, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -57,19 +58,19 @@ class MissileType;
 /**
 **  Different targets.
 */
-typedef enum {
+enum TargetType {
 	TargetSelf,
 	TargetPosition,
 	TargetUnit
-}  TargetType;
+};
 
 /**
 **  Different targets.
 */
-typedef enum {
+enum LocBaseType {
 	LocBaseCaster,
 	LocBaseTarget
-}  LocBaseType;
+};
 
 /**
 **  This struct is used for defining a missile start/stop location.
@@ -80,7 +81,7 @@ typedef enum {
 class SpellActionMissileLocation {
 public:
 	SpellActionMissileLocation(LocBaseType base) : Base(base), AddX(0), AddY(0),
-								   AddRandX(0), AddRandY(0) {} ;
+		AddRandX(0), AddRandY(0) {} ;
 
 	LocBaseType Base;   /// The base for the location (caster/target)
 	int AddX;           /// Add to the X coordinate
@@ -92,11 +93,9 @@ public:
 class SpellActionTypeAdjustVariable {
 public:
 	SpellActionTypeAdjustVariable() : Enable(0), Value(0), Max(0), Increase(0),
-									ModifEnable(0), ModifValue(0),
-									ModifMax(0), ModifIncrease(0),
-									InvertEnable(0), AddValue(0),
-									AddMax(0), AddIncrease(0), IncreaseTime(0),
-									TargetIsCaster(0) {};
+		ModifEnable(0), ModifValue(0), ModifMax(0), ModifIncrease(0),
+		InvertEnable(0), AddValue(0), AddMax(0), AddIncrease(0), IncreaseTime(0),
+		TargetIsCaster(0) {};
 
 	int Enable;                 /// Value to affect to this field.
 	int Value;                  /// Value to affect to this field.
@@ -122,14 +121,13 @@ public:
 **  Spells are sub class of this one
 */
 class SpellActionType {
-protected:
-	typedef int SpellFunc(CUnit *caster, const SpellType *spell,
-		CUnit *target, int x, int y);
-
 public:
 	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
 	virtual ~SpellActionType() {};
-	virtual SpellFunc Cast = 0;
+
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y) = 0;
+
 	const int ModifyManaCaster;
 };
 
@@ -141,7 +139,8 @@ class AreaAdjustVitals : public SpellActionType
 {
 public:
 	AreaAdjustVitals() : HP(0), Mana(0) {};
-	virtual SpellFunc Cast;
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	int HP;         /// Target HP gain.(can be negative)
 	int Mana;       /// Target Mana gain.(can be negative)
@@ -150,8 +149,9 @@ public:
 class SpawnMissile : public SpellActionType {
 public:
 	SpawnMissile() : Damage(0), TTL(-1), Delay(0),
-					StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {};
-	virtual SpellFunc Cast;
+		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {};
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	int Damage;                             /// Missile damage.
 	int TTL;                                /// Missile TTL.
@@ -164,7 +164,8 @@ public:
 class Demolish : public SpellActionType {
 public:
 	Demolish() : Damage(0), Range(0) {};
-	virtual SpellFunc Cast;
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	int Damage; /// Damage for every unit in range.
 	int Range;  /// Range of the explosion.
@@ -173,8 +174,9 @@ public:
 class AreaBombardment : public SpellActionType {
 public:
 	AreaBombardment() : Fields(0), Shards(0), Damage(0),
-						StartOffsetX(0), StartOffsetY(0), Missile(NULL) {};
-	virtual SpellFunc Cast;
+		StartOffsetX(0), StartOffsetY(0), Missile(NULL) {};
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	int Fields;             /// The size of the affected square.
 	int Shards;             /// Number of shards thrown.
@@ -187,16 +189,18 @@ public:
 class SpawnPortal : public SpellActionType {
 public:
 	SpawnPortal() : PortalType(0) {};
-	virtual SpellFunc Cast;
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	CUnitType *PortalType;   /// The unit type spawned
 };
 
 class AdjustVariable : public SpellActionType {
 public:
-	AdjustVariable() : Var (NULL){};
-	~AdjustVariable() {delete [] (this->Var);};
-	virtual SpellFunc Cast;
+	AdjustVariable() : Var (NULL) {};
+	~AdjustVariable() { delete [] (this->Var); };
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	SpellActionTypeAdjustVariable *Var;
 };
@@ -204,7 +208,8 @@ public:
 class AdjustVitals : public SpellActionType {
 public:
 	AdjustVitals() : SpellActionType(1), HP(0), Mana(0), MaxMultiCast(0) {};
-	virtual SpellFunc Cast;
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	int HP;         /// Target HP gain.(can be negative)
 	int Mana;       /// Target Mana gain.(can be negative)
@@ -216,7 +221,8 @@ public:
 class Polymorph : public SpellActionType {
 public:
 	Polymorph() : SpellActionType(1), NewForm(NULL), PlayerNeutral(0) {};
-	virtual SpellFunc Cast;
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	CUnitType *NewForm;         /// The new form
 	int PlayerNeutral;          /// Convert the unit to the neutral player.
@@ -225,8 +231,9 @@ public:
 
 class Summon : public SpellActionType {
 public:
-	Summon() : SpellActionType(1), UnitType(NULL), TTL(0), RequireCorpse(0) {} ;
-	virtual SpellFunc Cast;
+	Summon() : SpellActionType(1), UnitType(NULL), TTL(0), RequireCorpse(0) {};
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	CUnitType *UnitType;    /// Type of unit to be summoned.
 	int TTL;                /// Time to live for summoned unit. 0 means infinite
@@ -236,7 +243,8 @@ public:
 class Capture : public SpellActionType {
 public:
 	Capture() : SacrificeEnable(0), Damage(0), DamagePercent(0) {};
-	virtual SpellFunc Cast;
+	virtual int Cast(CUnit *caster, const SpellType *spell,
+		CUnit *target, int x, int y);
 
 	char SacrificeEnable; /// true if the caster dies after casting.
 	int Damage;           /// damage the spell does if unable to caputre
@@ -252,10 +260,13 @@ public:
 
 class Target {
 public:
-	TargetType which_sort_of_target;  /// for identify what sort of target.
+	Target(TargetType type, CUnit *unit, int x, int y) :
+		Type(type), Unit(unit), X(x), Y(y) {}
+
+	TargetType Type;                  /// type of target.
+	CUnit *Unit;                      /// Unit target.
 	int X;                            /// x coord.
 	int Y;                            /// y coord.
-	CUnit *unit;                      /// Unit target.
 };
 
 /*
@@ -290,8 +301,11 @@ public:
 class ConditionInfo {
 public:
 	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
-					BoolFlag(NULL), Variable(NULL) {};
-	~ConditionInfo() { delete [] BoolFlag; delete [] Variable; };
+		BoolFlag(NULL), Variable(NULL) {};
+	~ConditionInfo() {
+		delete[] BoolFlag;
+		delete[] Variable;
+	};
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
 	//
@@ -316,7 +330,7 @@ public:
 class AutoCastInfo {
 public:
 	AutoCastInfo() : Range(0), Condition(0), Combat(0) {};
-	~AutoCastInfo() {delete Condition;};
+	~AutoCastInfo() { delete Condition; };
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
 
