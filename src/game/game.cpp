@@ -295,7 +295,8 @@ static void LoadMap(const char *filename, CMap *map)
 		}
 	}
 
-	printf("Unrecognized map format\n");
+	fprintf(stderr, "Unrecognized map format\n");
+	ExitFatal(-1);
 }
 
 /*----------------------------------------------------------------------------
