@@ -99,7 +99,7 @@ void InitUserInterface(const char *race_name)
 
 	// select the correct slot
 	best = 0;
-	for (i = 0; i < (int) UI_Table.size(); ++i) {
+	for (i = 0; i < (int)UI_Table.size(); ++i) {
 		if (!strcmp(race_name, UI_Table[i]->Name)) {
 			// perfect
 			if (Video.Width == UI_Table[i]->Width &&
@@ -275,12 +275,18 @@ CUserInterface::~CUserInterface()
 	MenuPanel *menupanel;
 	MenuPanel *tmp;
 
+	// FIXME: this is horrible!  rewrite this!
+	// We're only supposed to delete UI_Table[i], not UI
+	if (this == &UI) {
+		return;
+	}
+
 	delete[] Name;
 	delete[] NormalFontColor;
 	delete[] ReverseFontColor;
 
 	// Filler
-	for (i = 0; i < (int) Fillers.size(); ++i) {
+	for (i = 0; i < (int)Fillers.size(); ++i) {
 		CGraphic::Free(Fillers[i].G);
 	}
 
@@ -329,7 +335,7 @@ void CleanUserInterface(void)
 	//
 	// Free the available user interfaces.
 	//
-	for (i = 0; i < (int) UI_Table.size(); ++i) {
+	for (i = 0; i < (int)UI_Table.size(); ++i) {
 		delete UI_Table[i];
 	}
 	UI_Table.clear();
