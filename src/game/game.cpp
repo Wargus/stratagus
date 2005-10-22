@@ -106,12 +106,15 @@ static void LoadStratagusMap(const char *mapname, CMap *map)
 	}
 
 	if (LcmPreventRecurse) {
-		fprintf(stderr,"recursive use of load Stratagus map!\n");
+		fprintf(stderr, "recursive use of load Stratagus map!\n");
 		ExitFatal(-1);
 	}
 	InitPlayers();
 	LcmPreventRecurse = 1;
-	LuaLoadFile(mapfull);
+	if (LuaLoadFile(mapfull) == -1) {
+		fprintf(stderr, "Can't load lua file: %s\n", mapfull);
+		ExitFatal(-1);
+	}
 	LcmPreventRecurse = 0;
 
 #if 0
