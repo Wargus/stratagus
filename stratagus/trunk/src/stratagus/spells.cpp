@@ -11,7 +11,7 @@
 /**@name spells.cpp - The spell cast action. */
 //
 //      (c) Copyright 1998-2005 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon and Joris DAUPHIN
+//                                 Jimmy Salmon, and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -757,51 +757,29 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 // ****************************************************************************
 
 /**
-**  Target constructor.
-**
-**  @param t            Type of target (unit, position).
-**  @param unit         Unit target.
-**  @param x            x coord of the target.
-**  @param y            y coord of the target.
-**  @return             the new target.
-*/
-static Target *NewTarget(TargetType t, const CUnit *unit, int x, int y)
-{
-	Target *target;
-
-	target = new Target;
-
-	target->which_sort_of_target = t;
-	target->unit = (CUnit *)unit;
-	target->X = x;
-	target->Y = y;
-	return target;
-}
-
-/**
 **  Target constructor for unit.
 **
-**  @param unit     Target unit.
+**  @param unit  Target unit.
 **
 **  @return the new target.
 */
-static Target *NewTargetUnit(const CUnit *unit)
+static Target *NewTargetUnit(CUnit *unit)
 {
-	return NewTarget(TargetUnit, unit, 0, 0);
+	return new Target(TargetUnit, unit, 0, 0);
 }
 
 #if 0
 /**
 **  Target constructor for position.
 **
-**  @param x        x position.
-**  @param y        y position.
+**  @param x  X position.
+**  @param y  Y position.
 **
 **  @return the new target.
 */
 static Target *NewTargetPosition(int x, int y)
 {
-	return NewTarget(TargetPosition, NULL, x, y);
+	return new Target(TargetPosition, NULL, x, y);
 }
 #endif
 
@@ -920,7 +898,7 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 **  @todo FIXME: should be global (for AI) ???
 **  @todo FIXME: write for position target.
 */
-static Target *SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType *spell)
+static Target *SelectTargetUnitsOfAutoCast(CUnit *caster, const SpellType *spell)
 {
 	CUnit *table[UnitMax];
 	int x;
@@ -964,7 +942,7 @@ static Target *SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType 
 	//
 	if (autocast->Combat != CONDITION_TRUE) {
 		if ((autocast->Combat == CONDITION_ONLY) ^ (combat)) {
-			return 0;
+			return NULL;
 		}
 	}
 
@@ -972,9 +950,9 @@ static Target *SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType 
 		case TargetSelf :
 			if (PassCondition(caster, spell, caster, x, y, spell->Condition) &&
 					PassCondition(caster, spell, caster, x, y, autocast->Condition)) {
-					return NewTargetUnit(caster);
-				}
-			return 0;
+				return NewTargetUnit(caster);
+			}
+			return NULL;
 		case TargetPosition:
 			return 0;
 			//  Autocast with a position? That's hard
@@ -1022,7 +1000,7 @@ static Target *SelectTargetUnitsOfAutoCast(const CUnit *caster, const SpellType 
 			Assert(0);
 			return NULL;
 			break;
-		}
+	}
 	return NULL; // Can't spell the auto-cast.
 }
 
@@ -1122,7 +1100,7 @@ int AutoCastSpell(CUnit *caster, const SpellType *spell)
 	} else {
 		// Must move before ?
 		// FIXME: SpellType* of CommandSpellCast must be const.
-		CommandSpellCast(caster, target->X, target->Y, target->unit,
+		CommandSpellCast(caster, target->X, target->Y, target->Unit,
 			(SpellType *)spell, FlushCommands);
 		delete target;
 	}
