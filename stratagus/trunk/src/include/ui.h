@@ -243,11 +243,10 @@ enum ViewportModeType {
 */
 class MenuPanel {
 public:
-	MenuPanel() : Ident(NULL), G(NULL), Next(NULL) {}
+	MenuPanel() : Ident(NULL), G(NULL) {}
 
 	char      *Ident;           /// Unique identifier
 	CGraphic   *G;              /// Graphic
-	MenuPanel *Next;            /// Next pointer
 };
 
 /**
@@ -517,7 +516,7 @@ public:
 		ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
 		SelectedViewport(NULL), NumViewports(0),
 		ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
-		MenuPanels(NULL), VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
+		VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 	{
 		memset(Resources, 0, sizeof(Resources));
 		memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
@@ -654,7 +653,7 @@ public:
 /// SoundConfig PlacementSuccess;       /// played on placements success
 /// SoundConfig Click;                  /// click noice used often
 
-	MenuPanel *MenuPanels;              /// Menu panels
+	std::vector<MenuPanel *> MenuPanels;/// Menu panels
 
 	CGraphic *VictoryBackgroundG;       /// Victory background graphic
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic

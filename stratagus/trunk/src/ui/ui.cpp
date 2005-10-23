@@ -183,7 +183,7 @@ void CursorConfig::Load()
 void CUserInterface::Load(void)
 {
 	int i;
-	MenuPanel *menupanel;
+	std::vector<MenuPanel *>::iterator menupanel;
 
 	//
 	//  Load graphics
@@ -228,10 +228,8 @@ void CUserInterface::Load(void)
 	ArrowS.Load();
 	ArrowSE.Load();
 
-	menupanel = MenuPanels;
-	while (menupanel) {
-		menupanel->G->Load();
-		menupanel = menupanel->Next;
+	for (menupanel = MenuPanels.begin(); menupanel != MenuPanels.end(); ++menupanel) {
+		(*menupanel)->G->Load();
 	}
 }
 
@@ -272,8 +270,7 @@ void SaveUserInterface(CFile *file)
 CUserInterface::~CUserInterface()
 {
 	int i;
-	MenuPanel *menupanel;
-	MenuPanel *tmp;
+	std::vector<MenuPanel *>::iterator menupanel;
 
 	// FIXME: this is horrible!  rewrite this!
 	// We're only supposed to delete UI_Table[i], not UI
@@ -310,13 +307,10 @@ CUserInterface::~CUserInterface()
 	CGraphic::Free(PieMenuBackgroundG);
 
 	// Menu Panels
-	menupanel = MenuPanels;
-	while (menupanel) {
-		tmp = menupanel;
-		menupanel = menupanel->Next;
-		CGraphic::Free(tmp->G);
-		delete[] tmp->Ident;
-		delete tmp;
+	for (menupanel = MenuPanels.begin(); menupanel != MenuPanels.end(); ++menupanel) {
+		CGraphic::Free((*menupanel)->G);
+		delete[] (*menupanel)->Ident;
+		delete *menupanel;
 	}
 
 	// Backgrounds
