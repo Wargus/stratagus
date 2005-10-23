@@ -1073,19 +1073,15 @@ void DrawMenu(Menu *menu)
 		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 2);
 		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 3);
 	} else if (menu->Panel) {
-		MenuPanel *menupanel;
+		std::vector<MenuPanel *>::iterator menupanel;
 
-		menupanel = UI.MenuPanels;
-		while (menupanel) {
-			if (!strcmp(menupanel->Ident, menu->Panel)) {
+
+		for (menupanel = UI.MenuPanels.begin(); menupanel != UI.MenuPanels.end(); ++menupanel) {
+			if (!strcmp((*menupanel)->Ident, menu->Panel)) {
+				(*menupanel)->G->DrawSub(0, 0, (*menupanel)->G->Width, (*menupanel)->G->Height,
+					menu->X, menu->Y);
 				break;
 			}
-			menupanel = menupanel->Next;
-		}
-		if (menupanel) {
-			menupanel->G->DrawSub(0, 0,
-				menupanel->G->Width, menupanel->G->Height,
-				menu->X, menu->Y);
 		}
 	}
 
