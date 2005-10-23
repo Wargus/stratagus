@@ -275,15 +275,15 @@ static int class_newindex_event (lua_State* L)
 }
 
 static int class_call_event(lua_State* L) {
-	
+
 	if (lua_istable(L, 1)) {
 		lua_pushstring(L, ".call");
 		lua_rawget(L, 1);
 		if (lua_isfunction(L, -1)) {
-		
+
 			lua_insert(L, 1);
 			lua_call(L, lua_gettop(L)-1, 1);
-			
+
 			return 1;
 		};
 	};
@@ -477,7 +477,7 @@ TOLUA_API void tolua_classevents (lua_State* L)
 	lua_pushstring(L,"__call");
 	lua_pushcfunction(L,class_call_event);
 	lua_rawset(L,-3);
-	
+
 	lua_pushstring(L,"__gc");
 	lua_pushcfunction(L,class_gc_event);
 	lua_rawset(L,-3);
