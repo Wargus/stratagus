@@ -138,8 +138,8 @@ static void laction(int i)
 /**
 **  Print error message and exit.
 **
-**  @param pname Source of the error.
-**  @param msg   error message to print.
+**  @param pname  Source of the error.
+**  @param msg    error message to print.
 */
 static void l_message(const char *pname, const char *msg)
 {
@@ -151,7 +151,7 @@ static void l_message(const char *pname, const char *msg)
 }
 
 /**
-**  Check error status, and print eeror message and exit
+**  Check error status, and print error message and exit
 **  if status is different of 0.
 **
 **  @param status  status of the last lua call. (0: success)
@@ -295,7 +295,7 @@ static int CclSavePreferences(lua_State *l)
 **
 **  @param l  Lua state.
 **
-**  @return 0 in success, else exit.
+**  @return   0 in success, else exit.
 */
 static int CclLoad(lua_State *l)
 {
@@ -361,7 +361,7 @@ static int CclSaveGame(lua_State *l)
 **  @param l     Lua state.
 **  @param narg  Argument number.
 **
-**  @return    char* from lua.
+**  @return      char* from lua.
 */
 const char *LuaToString(lua_State *l, int narg)
 {
@@ -376,7 +376,7 @@ const char *LuaToString(lua_State *l, int narg)
 **  @param l     Lua state.
 **  @param narg  Argument number.
 **
-**  @return    C number from lua.
+**  @return      C number from lua.
 */
 int LuaToNumber(lua_State *l, int narg)
 {
@@ -385,13 +385,13 @@ int LuaToNumber(lua_State *l, int narg)
 }
 
 /**
-**  Convert lua boolean in 1 for true, 0 for false.
-**  It checks also type and exit in case of error.
+**  Convert lua boolean to bool.
+**  It also checks type and exits in case of error.
 **
 **  @param l     Lua state.
 **  @param narg  Argument number.
 **
-**  @return    1 for true, 0 for false from lua.
+**  @return      1 for true, 0 for false from lua.
 */
 bool LuaToBoolean(lua_State *l, int narg)
 {
@@ -420,7 +420,7 @@ void CclGarbageCollect(int fast)
 /**
 **  Parse binary operation with number.
 **
-**  @param l       lua_state.
+**  @param l       lua state.
 **  @param binop   Where to stock info (must be malloced)
 */
 static void ParseBinOp(lua_State *l, BinOp *binop)
@@ -470,9 +470,9 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 /**
 **  Return unit referernce definition.
 **
-**  @param l      lua state.
+**  @param l  lua state.
 **
-**  @return unit referernce definition.
+**  @return   unit referernce definition.
 */
 UnitDesc *CclParseUnitDesc(lua_State *l)
 {
@@ -547,7 +547,7 @@ static int CallLuaNumberFunction(unsigned int handler)
 **
 **  @param handler  handler of the lua function to call.
 **
-**  @return  lua function result.
+**  @return         lua function result.
 */
 static char *CallLuaStringFunction(unsigned int handler)
 {
@@ -570,15 +570,15 @@ static char *CallLuaStringFunction(unsigned int handler)
 /**
 **  Return number.
 **
-**  @param l    lua state.
+**  @param l  lua state.
 **
-**  @return     number.
+**  @return   number.
 */
 NumberDesc *CclParseNumberDesc(lua_State *l)
 {
-	NumberDesc *res;      // Result.
-	int nargs;            // Size of table.
-	const char *key;      // Key.
+	NumberDesc *res;
+	int nargs;
+	const char *key;
 
 	res = new NumberDesc;
 	if (lua_isnumber(l, -1)) {
@@ -708,9 +708,9 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 /**
 **  Create a StringDesc with const string.
 **
-**  @param s    direct value for the StringDesc
+**  @param s  direct value for the StringDesc
 **
-**  @return the new StringDesc.
+**  @return   the new StringDesc.
 */
 StringDesc *NewStringDesc(const char *s)
 {
@@ -728,9 +728,9 @@ StringDesc *NewStringDesc(const char *s)
 /**
 **  Convert the string in the gameinfo enum number.
 **
-**  @param s    string to convert to enum number.
+**  @param s  string to convert to enum number.
 **
-**  @return the enum number.
+**  @return   the enum number.
 */
 static ES_GameInfo StringToGameInfo(const char *s)
 {
@@ -749,9 +749,9 @@ static ES_GameInfo StringToGameInfo(const char *s)
 /**
 **  Return String description.
 **
-**  @param l    lua state.
+**  @param l  lua state.
 **
-**  @return     String description.
+**  @return   String description.
 */
 StringDesc *CclParseStringDesc(lua_State *l)
 {
@@ -875,7 +875,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 **
 **  @param unitdesc  struct with definition of the calculation.
 **
-**  @return the result unit.
+**  @return          the result unit.
 */
 CUnit *EvalUnit(const UnitDesc *unitdesc)
 {
@@ -898,7 +898,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 **
 **  @param number  struct with definition of the calculation.
 **
-**  @return the result number.
+**  @return        the result number.
 **
 **  @todo Manage better the error (div/0, unit==NULL, ...).
 */
@@ -1001,7 +1001,7 @@ int EvalNumber(const NumberDesc *number)
 **
 **  @param s  struct with definition of the calculation.
 **
-**  @return the result string.
+**  @return   the result string.
 **
 **  @todo Manage better the error.
 */
@@ -1155,10 +1155,9 @@ char *EvalString(const StringDesc *s)
 
 
 /**
-**  free the unit expression content. (not the pointer itself).
+**  Free the unit expression content. (not the pointer itself).
 **
 **  @param unitdesc  struct to free
-**
 */
 void FreeUnitDesc(UnitDesc *unitdesc)
 {
@@ -1170,10 +1169,9 @@ void FreeUnitDesc(UnitDesc *unitdesc)
 }
 
 /**
-**  free the number expression content. (not the pointer itself).
+**  Free the number expression content. (not the pointer itself).
 **
 **  @param number  struct to free
-**
 */
 void FreeNumberDesc(NumberDesc *number)
 {
@@ -1222,14 +1220,13 @@ void FreeNumberDesc(NumberDesc *number)
 }
 
 /**
-**  free the String expression content. (not the pointer itself).
+**  Free the String expression content. (not the pointer itself).
 **
 **  @param s  struct to free
-**
 */
 void FreeStringDesc(StringDesc *s)
 {
-	int i; // iterator.
+	int i;
 
 	if (s == 0) {
 		return;
@@ -1298,10 +1295,10 @@ void FreeStringDesc(StringDesc *s)
 **  Make alias for some unit Variable function.
 **
 **  @param l  lua State.
-**  @param s
+**  @param s  FIXME: docu
 **
-**  @return the lua table {"UnitVar", {Unit = s, Variable = arg1,
-**                                 Component = "Value" or arg2, Loc = [012]}
+**  @return   the lua table {"UnitVar", {Unit = s, Variable = arg1,
+**                           Component = "Value" or arg2, Loc = [012]}
 */
 static int AliasUnitVar(lua_State *l, const char *s)
 {
@@ -1409,7 +1406,7 @@ static int CclActiveUnitVar(lua_State *l)
 **  Make alias for some function.
 **
 **  @param l  lua State.
-**  @param s
+**  @param s  FIXME: docu
 **
 **  @return the lua table {s, {arg1, arg2, ..., argn}} or {s, arg1}
 */
