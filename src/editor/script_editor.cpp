@@ -149,7 +149,7 @@ static int CclSetTerrainEditable(lua_State *l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	Editor.TerrainEditable = LuaToNumber(l, 1);
+	Editor.TerrainEditable = LuaToBoolean(l, 1);
 	return 0;
 }
 
