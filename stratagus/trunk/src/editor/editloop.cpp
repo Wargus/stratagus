@@ -81,7 +81,6 @@ static int IconHeight;                      /// Icon height in panels
 
 
 char EditorMapLoaded;  /// Map loaded in editor
-int TerrainEditable = 1;  /// Is the terrain editable ?  Defaults to yes.
 int EditorWriteCompressedMaps = 1;
 
 EditorStateType EditorState;                /// Current editor state.
@@ -101,27 +100,6 @@ enum _mode_buttons_ {
 	TileButton,          /// Tile mode button
 	StartButton
 };
-
-char **EditorUnitTypes;  /// Sorted editor unit-type table
-int MaxUnitIndex;        /// Max unit icon draw index
-
-static char **ShownUnitTypes;       /// Shown editor unit-type table
-static int MaxShownUnits;           /// Max unit icon draw index
-static char ShowUnitsToSelect;      /// Show units in unit list
-static char ShowBuildingsToSelect;  /// Show buildings in unit list
-#if 0
-static char ShowHeroesToSelect;     /// Show heroes in unit list
-#endif
-static char ShowAirToSelect;        /// Show air units in unit list
-static char ShowLandToSelect;       /// Show land units in unit list
-static char ShowWaterToSelect;      /// Show water units in unit list
-
-static int UnitIndex;               /// Unit icon draw index
-static int CursorUnitIndex;         /// Unit icon under cursor
-static int SelectedUnitIndex;       /// Unit type to draw
-
-static int CursorPlayer;            /// Player under the cursor
-static int SelectedPlayer;          /// Player selected for draw
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -398,8 +376,8 @@ static void CalculateMaxIconSize(void)
 
 	IconWidth = 0;
 	IconHeight = 0;
-	for (i = 0; i < MaxUnitIndex; ++i) {
-		type = UnitTypeByIdent(EditorUnitTypes[i]);
+	for (i = 0; i < (int) Editor.UnitTypes.size(); ++i) {
+		type = UnitTypeByIdent(Editor.UnitTypes[i]);
 		Assert(type && type->Icon.Icon);
 		icon = type->Icon.Icon;
 		if (IconWidth < icon->G->Width) {
@@ -418,50 +396,45 @@ static void CalculateMaxIconSize(void)
 static void RecalculateShownUnits(void)
 {
 	int i;
-	int n;
 	const CUnitType *type;
 
-	if (!ShownUnitTypes) {
-		ShownUnitTypes = new char *[MaxUnitIndex];
-	}
+	Editor.ShownUnitTypes.clear();
 
-	for (n = i = 0; i < MaxUnitIndex; ++i) {
-		type = UnitTypeByIdent(EditorUnitTypes[i]);
+	for (i = 0; i < (int) Editor.UnitTypes.size(); ++i) {
+		type = UnitTypeByIdent(Editor.UnitTypes[i]);
 
-		if (type->Building && !ShowBuildingsToSelect) {
+		if (type->Building && !Editor.ShowBuildingsToSelect) {
 			continue;
 		}
-		if (!type->Building && !ShowUnitsToSelect) {
+		if (!type->Building && !Editor.ShowUnitsToSelect) {
 			continue;
 		}
 #if 0
-		if (type->Hero && !ShowHeroesToSelect) {
+		if (type->Hero && !Editor.ShowHeroesToSelect) {
 			continue;
 		}
 #endif
-		if (type->UnitType == UnitTypeLand && !ShowLandToSelect) {
+		if (type->UnitType == UnitTypeLand && !Editor.ShowLandToSelect) {
 			continue;
 		}
-		if (type->UnitType == UnitTypeNaval && !ShowWaterToSelect) {
+		if (type->UnitType == UnitTypeNaval && !Editor.ShowWaterToSelect) {
 			continue;
 		}
-		if (type->UnitType == UnitTypeFly && !ShowAirToSelect) {
+		if (type->UnitType == UnitTypeFly && !Editor.ShowAirToSelect) {
 			continue;
 		}
-
-		ShownUnitTypes[n++] = EditorUnitTypes[i];
+		Editor.ShownUnitTypes.push_back(type);
 	}
-	MaxShownUnits = n;
 
-	if (UnitIndex >= MaxShownUnits) {
+	if (Editor.UnitIndex >= (int) Editor.ShownUnitTypes.size()) {
 		int count;
 
 		count = CalculateUnitIcons();
-		UnitIndex = MaxShownUnits / count * count;
+		Editor.UnitIndex = Editor.ShownUnitTypes.size() / count * count;
 	}
 	// Quick & dirty make them invalid
-	CursorUnitIndex = -1;
-	SelectedUnitIndex = -1;
+	Editor.CursorUnitIndex = -1;
+	Editor.SelectedUnitIndex = -1;
 }
 
 /*----------------------------------------------------------------------------
@@ -554,18 +527,18 @@ static void DrawPlayers(void)
 		if (i == PlayerMax / 2) {
 			y += 20;
 		}
-		if (i == CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
+		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
 		}
 		Video.DrawRectangle(
-			i == CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody ?
+			i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody ?
 				ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
 		if (Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.FillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
 				17, 17);
 		}
-		if (i == SelectedPlayer) {
+		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
 		}
 		sprintf(buf, "%d", i);
@@ -574,12 +547,12 @@ static void DrawPlayers(void)
 	
 	x = UI.InfoPanel.X + 4;
 	y += 18 * 1 + 4;
-	if (SelectedPlayer != -1) {
-		i = sprintf(buf,"Plyr %d %s ", SelectedPlayer,
-				PlayerRaces.Name[Map. Info.PlayerSide[SelectedPlayer]]);
+	if (Editor.SelectedPlayer != -1) {
+		i = sprintf(buf,"Plyr %d %s ", Editor.SelectedPlayer,
+				PlayerRaces.Name[Map.Info.PlayerSide[Editor.SelectedPlayer]]);
 		// Players[SelectedPlayer].RaceName);
 
-		switch (Map.Info.PlayerType[SelectedPlayer]) {
+		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
 				strcat(buf, "Neutral");
 				break;
@@ -621,24 +594,24 @@ static void DrawUnitIcons(void)
 	y = UI.InfoPanel.Y + 140;
 
 	VideoDrawText(x + 28 * 0, y, GameFont, "Un");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowUnitsToSelect ? 2 : 0),
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowUnitsToSelect ? 2 : 0),
 		x + 28 * 0, y + 16);
 	VideoDrawText(x + 28 * 1, y, GameFont, "Bu");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowBuildingsToSelect ? 2 : 0),
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowBuildingsToSelect ? 2 : 0),
 		x + 28 * 1, y + 16);
 #if 0
 	VideoDrawText(x + 28 * 2, y, GameFont, "He");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0),
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowHeroesToSelect ? 2 : 0),
 		x + 28 * 2, y + 16);
 #endif
 	VideoDrawText(x + 28 * 3, y, GameFont, "La");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowLandToSelect ? 2 : 0),
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowLandToSelect ? 2 : 0),
 		x + 28 * 3, y + 16);
 	VideoDrawText(x + 28 * 4, y, GameFont, "Wa");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowWaterToSelect ? 2 : 0),
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowWaterToSelect ? 2 : 0),
 		x + 28 * 4, y + 16);
 	VideoDrawText(x + 28 * 5, y, GameFont, "Ai");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowAirToSelect ? 2 : 0),
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowAirToSelect ? 2 : 0),
 		x + 28 * 5, y + 16);
 
 	//
@@ -671,7 +644,7 @@ static void DrawUnitIcons(void)
 		MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW, x + j - 20, y);
 	}
 
-	percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
+	percent = Editor.UnitIndex * 100 / (Editor.ShownUnitTypes.size() ? Editor.ShownUnitTypes.size() : 1);
 	i = (percent * (j - 54)) / 100;
 	MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
@@ -679,27 +652,25 @@ static void DrawUnitIcons(void)
 	//  Draw the unit icons.
 	//
 	y = UI.ButtonPanel.Y + 24;
-	i = UnitIndex;
-	while (y < UI.ButtonPanel.Y + UI.ButtonPanel.G->Height
-			- IconHeight) {
-		if (i >= MaxShownUnits) {
+	i = Editor.UnitIndex;
+	while (y < UI.ButtonPanel.Y + UI.ButtonPanel.G->Height - IconHeight) {
+		if (i >= (int) Editor.ShownUnitTypes.size()) {
 			break;
 		}
 		x = UI.ButtonPanel.X + 10;
-		while (x < UI.ButtonPanel.X + UI.ButtonPanel.G->Width
-				- IconWidth) {
-			if (i >= MaxShownUnits) {
+		while (x < UI.ButtonPanel.X + UI.ButtonPanel.G->Width - IconWidth) {
+			if (i >= (int) Editor.ShownUnitTypes.size()) {
 				break;
 			}
-			icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
-			icon->DrawIcon(Players + SelectedPlayer, x, y);
+			icon = Editor.ShownUnitTypes[i]->Icon.Icon;
+			icon->DrawIcon(Players + Editor.SelectedPlayer, x, y);
 
 			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
-			if (i == SelectedUnitIndex) {
+			if (i == Editor.SelectedUnitIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 					icon->G->Width - 2, icon->G->Height - 2);
 			}
-			if (i == CursorUnitIndex) {
+			if (i == Editor.CursorUnitIndex) {
 				Video.DrawRectangleClip(ColorWhite,x - 1, y - 1,
 					icon->G->Width + 2, icon->G->Height + 2);
 			}
@@ -768,14 +739,14 @@ static void DrawEditorPanel(void)
 	//
 	// Select / Units / Tiles
 	//
-	icon = CIcon::Get(EditorSelectIcon);
+	icon = Editor.Select.Icon;
 	Assert(icon);
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
 			(EditorState == EditorSelecting ? IconSelected : 0),
 		x, y, NULL);
-	icon = CIcon::Get(EditorUnitsIcon);
+	icon = Editor.Units.Icon;
 	Assert(icon);
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
@@ -783,14 +754,14 @@ static void DrawEditorPanel(void)
 			(EditorState == EditorEditUnit ? IconSelected : 0),
 		x + UNIT_ICON_X, y + UNIT_ICON_Y, NULL);
 
-	if (TerrainEditable) {
+	if (Editor.TerrainEditable) {
 		DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
 			(ButtonUnderCursor == TileButton ? IconActive : 0) |
 				(EditorState == EditorEditTile ? IconSelected : 0));
 	}
 
-	if (EditorStartUnit) {
-		icon = UnitTypeByIdent(EditorStartUnit)->Icon.Icon;
+	if (Editor.StartUnit) {
+		icon = Editor.StartUnit->Icon.Icon;
 		Assert(icon);
 		icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 			(ButtonUnderCursor == StartButton ? IconActive : 0) |
@@ -806,8 +777,8 @@ static void DrawEditorPanel(void)
 			Video.DrawRectangleClip(ColorGray, x - 1, y - 1, IconHeight, IconHeight);
 		}
 		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
-		Video.DrawLineClip(PlayerColors[SelectedPlayer][0], x, y, x + IconHeight - 2, y + IconHeight - 2);
-		Video.DrawLineClip(PlayerColors[SelectedPlayer][0], x, y + IconHeight - 2, x + IconHeight - 2, y);
+		Video.DrawLineClip(PlayerColors[Editor.SelectedPlayer][0], x, y, x + IconHeight - 2, y + IconHeight - 2);
+		Video.DrawLineClip(PlayerColors[Editor.SelectedPlayer][0], x, y + IconHeight - 2, x + IconHeight - 2, y);
 		PopClipping();
 	}
 
@@ -847,13 +818,13 @@ static void DrawMapCursor(void)
 			case EditorEditTile:
 				break;
 			case EditorEditUnit:
-				if (SelectedUnitIndex != -1) {
-					CursorBuilding = UnitTypeByIdent(ShownUnitTypes[SelectedUnitIndex]);
+				if (Editor.SelectedUnitIndex != -1) {
+					CursorBuilding = const_cast<CUnitType *> (Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
 				}
 				break;
 			case EditorSetStartLocation:
-				if (EditorStartUnit) {
-					CursorBuilding = UnitTypeByIdent(EditorStartUnit);
+				if (Editor.StartUnit) {
+					CursorBuilding = const_cast<CUnitType *> (Editor.StartUnit);
 				}
 				break;
 		}
@@ -918,13 +889,9 @@ static void DrawStartLocations(void)
 {
 	int i;
 	int x, y;
-	CUnitType *type;
+	const CUnitType *type;
 
-	type = NULL;
-	if (EditorStartUnit) {
-		type = UnitTypeByIdent(EditorStartUnit);
-	}
-
+	type = Editor.StartUnit;
 	for (i = 0; i < PlayerMax; i++) {
 		if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
 			x = CurrentViewport->Map2ViewportX(Players[i].StartX);
@@ -1220,10 +1187,10 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on player area
 	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
 		// Cursor on player icons
-		if (CursorPlayer != -1) {
-			if (Map.Info.PlayerType[CursorPlayer] != PlayerNobody) {
-				SelectedPlayer = CursorPlayer;
-				ThisPlayer = Players + SelectedPlayer;
+		if (Editor.CursorPlayer != -1) {
+			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
+				Editor.SelectedPlayer = Editor.CursorPlayer;
+				ThisPlayer = Players + Editor.SelectedPlayer;
 			}
 			return;
 		}
@@ -1237,7 +1204,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		int j;
 		int count;
 
-		percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
+		percent = Editor.UnitIndex * 100 / (Editor.ShownUnitTypes.size() ? Editor.ShownUnitTypes.size() : 1);
 		j = (percent * (176 - 8 - 54)) / 100;
 		count = CalculateUnitIcons();
 
@@ -1246,10 +1213,10 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.ButtonPanel.X + 4 + 18 + j &&
 				UI.ButtonPanel.Y + 4 < CursorY &&
 				CursorY < UI.ButtonPanel.Y + 24) {
-			if (UnitIndex - count >= 0) {
-				UnitIndex -= count;
+			if (Editor.UnitIndex - count >= 0) {
+				Editor.UnitIndex -= count;
 			} else {
-				UnitIndex = 0;
+				Editor.UnitIndex = 0;
 			}
 			return;
 		}
@@ -1258,15 +1225,15 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.ButtonPanel.X + 176 - 4 &&
 				UI.ButtonPanel.Y + 4 < CursorY &&
 				CursorY < UI.ButtonPanel.Y + 24) {
-			if (UnitIndex + count <= MaxShownUnits) {
-				UnitIndex += count;
+			if (Editor.UnitIndex + count <= (int) Editor.ShownUnitTypes.size()) {
+				Editor.UnitIndex += count;
 			}
 			return;
 		}
 		// Cursor on unit icons
-		if (CursorUnitIndex != -1) {
-			SelectedUnitIndex = CursorUnitIndex;
-			CursorBuilding = UnitTypeByIdent(ShownUnitTypes[CursorUnitIndex]);
+		if (Editor.CursorUnitIndex != -1) {
+			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
+			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
 			return;
 		}
 		// Cursor on unit selection icons
@@ -1274,7 +1241,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.InfoPanel.X + 10 + 28 * 1 &&
 				UI.InfoPanel.Y + 140 < CursorY &&
 				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			ShowUnitsToSelect ^= 1;
+			Editor.ShowUnitsToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
@@ -1282,7 +1249,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.InfoPanel.X + 10 + 28 * 2 &&
 				UI.InfoPanel.Y + 140 < CursorY &&
 				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			ShowBuildingsToSelect ^= 1;
+			Editor.ShowBuildingsToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
@@ -1291,7 +1258,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.InfoPanel.X + 10 + 28 * 3 &&
 				UI.InfoPanel.Y + 140 < CursorY &&
 				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			ShowHeroesToSelect ^= 1;
+			Editor.ShowHeroesToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
@@ -1300,7 +1267,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.InfoPanel.X + 10 + 28 * 4 &&
 				UI.InfoPanel.Y + 140 < CursorY &&
 				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			ShowLandToSelect ^= 1;
+			Editor.ShowLandToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
@@ -1308,7 +1275,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.InfoPanel.X + 10 + 28 * 5 &&
 				UI.InfoPanel.Y + 140 < CursorY &&
 				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			ShowWaterToSelect ^= 1;
+			Editor.ShowWaterToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
@@ -1316,7 +1283,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorX < UI.InfoPanel.X + 10 + 28 * 6 &&
 				UI.InfoPanel.Y + 140 < CursorY &&
 				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			ShowAirToSelect ^= 1;
+			Editor.ShowAirToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
@@ -1364,7 +1331,7 @@ static void EditorCallbackButtonDown(unsigned button)
 							MaxSampleVolume);
 						EditUnit(UI.MouseViewport->Viewport2MapX(CursorX),
 							UI.MouseViewport->Viewport2MapY(CursorY),
-							CursorBuilding, Players + SelectedPlayer);
+							CursorBuilding, Players + Editor.SelectedPlayer);
 						UnitPlacedThisPress = 1;
 						UI.StatusLine.Clear();
 					} else {
@@ -1375,8 +1342,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				}
 			}
 			if (EditorState == EditorSetStartLocation) {
-				Players[SelectedPlayer].StartX = UI.MouseViewport->Viewport2MapX(CursorX);
-				Players[SelectedPlayer].StartY = UI.MouseViewport->Viewport2MapY(CursorY);
+				Players[Editor.SelectedPlayer].StartX = UI.MouseViewport->Viewport2MapX(CursorX);
+				Players[Editor.SelectedPlayer].StartY = UI.MouseViewport->Viewport2MapY(CursorY);
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1395,10 +1362,20 @@ static void EditorCallbackButtonDown(unsigned button)
 */
 static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
+	char *ptr;
+
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
 	}
 
+
+	// FIXME: don't handle unicode well. Should work on all latin keyboard.
+	if ((ptr = strchr(UiGroupKeys, key))) {
+		key = '0' + ptr - UiGroupKeys;
+		if (key > '9') {
+			key = SDLK_BACKQUOTE;
+		}
+	}
 	switch (key) {
 		case 'f': // ALT+F, CTRL+F toggle fullscreen
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
@@ -1433,7 +1410,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case 'r': // CTRL+R Randomize map
 			if (KeyModifiers & ModifierControl) {
-				EditorCreateRandomMap();
+				Editor.CreateRandomMap();
 			}
 			break;
 
@@ -1495,6 +1472,24 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_KP6:
 			KeyScrollState |= ScrollRight;
 			break;
+		case '0':
+			if (UnitUnderCursor) {
+				UnitUnderCursor->ChangeOwner(&Players[PlayerNumNeutral]);
+				UI.StatusLine.Set("Unit controler modified");
+			}
+			break;
+		case '1': case '2':
+		case '3': case '4': case '5':
+		case '6': case '7': case '8':
+		case '9':
+			if (UnitUnderCursor && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
+				UnitUnderCursor->ChangeOwner(&Players[(int) key - '1']);
+				UI.StatusLine.Set("Unit controler modified");
+			}
+			break;
+
+
+
 
 		default:
 			return;
@@ -1656,7 +1651,7 @@ static void EditorCallbackMouse(int x, int y)
 					UI.SelectedViewport->Viewport2MapY(CursorY), 1)) {
 					EditUnit(UI.SelectedViewport->Viewport2MapX(CursorX),
 						UI.SelectedViewport->Viewport2MapY(CursorY),
-						CursorBuilding, Players + SelectedPlayer);
+						CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = 1;
 					UI.StatusLine.Clear();
 				}
@@ -1684,8 +1679,8 @@ static void EditorCallbackMouse(int x, int y)
 	MouseScrollState = ScrollNone;
 	GameCursor = UI.Point.Cursor;
 	CursorOn = CursorOnUnknown;
-	CursorPlayer = -1;
-	CursorUnitIndex = -1;
+	Editor.CursorPlayer = -1;
+	Editor.CursorUnitIndex = -1;
 	ButtonUnderCursor = -1;
 
 	//
@@ -1721,7 +1716,7 @@ static void EditorCallbackMouse(int x, int y)
 				} else {
 					UI.StatusLine.Clear();
 				}
-				CursorPlayer = i;
+				Editor.CursorPlayer = i;
 #if 0
 				ButtonUnderCursor = i + 100;
 				CursorOn = CursorOnButton;
@@ -1731,25 +1726,24 @@ static void EditorCallbackMouse(int x, int y)
 			bx += 20;
 		}
 
-		i = UnitIndex;
+		i = Editor.UnitIndex;
 		by = UI.ButtonPanel.Y + 24;
-		while (by < UI.ButtonPanel.Y +
-				UI.ButtonPanel.G->Height - IconHeight) {
-			if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
+		while (by < UI.ButtonPanel.Y + UI.ButtonPanel.G->Height - IconHeight) {
+			if (i >= (int) Editor.ShownUnitTypes.size()) {
 				break;
 			}
 			bx = UI.ButtonPanel.X + 10;
 			while (bx < UI.ButtonPanel.X + 146) {
-				if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
+				if (i >= (int) Editor.ShownUnitTypes.size()) {
 					break;
 				}
 				if (bx < x && x < bx + IconWidth &&
 						by < y && y < by + IconHeight) {
 					sprintf(buf,"%s \"%s\"",
-						UnitTypeByIdent(ShownUnitTypes[i])->Ident,
-						UnitTypeByIdent(ShownUnitTypes[i])->Name);
+						Editor.ShownUnitTypes[i]->Ident,
+						Editor.ShownUnitTypes[i]->Name);
 					UI.StatusLine.Set(buf);
-					CursorUnitIndex = i;
+					Editor.CursorUnitIndex = i;
 #if 0
 					ButtonUnderCursor = i + 100;
 					CursorOn = CursorOnButton;
@@ -1926,7 +1920,7 @@ static void EditorCallbackExit(void)
 /**
 **  Create editor.
 */
-static void CreateEditor(void)
+void CEditor::Init(void)
 {
 	int i;
 	char *file;
@@ -1986,7 +1980,7 @@ static void CreateEditor(void)
 
 	ReplayRevealMap = 1;
 	FlagRevealMap = 0;
-	SelectedPlayer = PlayerNumNeutral;
+	Editor.SelectedPlayer = PlayerNumNeutral;
 
 	//
 	// Place the start points, which the loader discarded.
@@ -1994,35 +1988,23 @@ static void CreateEditor(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		if (Map.Info.PlayerType[i] != PlayerNobody) {
 			// Set SelectedPlayer to a valid player
-			if (SelectedPlayer == PlayerNumNeutral) {
-				SelectedPlayer = i;
+			if (Editor.SelectedPlayer == PlayerNumNeutral) {
+				Editor.SelectedPlayer = i;
 			}
-		} else if (Players[i].StartX | Players[i].StartY) {
-			DebugPrint("Player nobody has a start position\n");
 		}
 	}
 
-	if (!EditorUnitTypes) {
-		// Build empty editor unit-type tables.
-		EditorUnitTypes = new char *[2];
-		MaxUnitIndex = 0;
-	}
-
 	CalculateMaxIconSize();
-	ShowUnitsToSelect = 1; // Show all units as default
-	ShowBuildingsToSelect = 1;
-#if 0
-	ShowHeroesToSelect = 1;
-#endif
-	ShowAirToSelect = 1;
-	ShowLandToSelect = 1;
-	ShowWaterToSelect = 1;
+
+	if (StartUnitName) {
+		StartUnit = UnitTypeByIdent(StartUnitName);
+	}
+	Select.Icon = NULL;
+	Select.Load();
+	Units.Icon = NULL;
+	Units.Load();
 
 	RecalculateShownUnits();
-	UI.Minimap.Update();
-
-	ProcessMenu("menu-editor-tips", 1);
-	InterfaceState = IfaceStateNormal;
 }
 
 /**
@@ -2038,7 +2020,7 @@ static void CreateEditor(void)
 */
 int EditorSaveMap(const char *file)
 {
-	if (SaveStratagusMap(file, &Map, TerrainEditable) == -1) {
+	if (SaveStratagusMap(file, &Map, Editor.TerrainEditable) == -1) {
 		ErrorMenu("Cannot save map");
 		InterfaceState = IfaceStateNormal;
 		EditorUpdateDisplay();
@@ -2068,7 +2050,10 @@ void EditorMainLoop(void)
 		EditorMapLoaded = 0;
 		EditorRunning = EditorEditing;
 
-		CreateEditor();
+		Editor.Init();
+
+		ProcessMenu("menu-editor-tips", 1);
+		InterfaceState = IfaceStateNormal;
 
 		SetVideoSync();
 
