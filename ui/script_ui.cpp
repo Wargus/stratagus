@@ -1643,20 +1643,17 @@ static int CclDefineUI(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				MenuPanel **menupanel;
+				MenuPanel *menupanel;
 
-				menupanel = &ui->MenuPanels;
-				while (*menupanel) {
-					menupanel = &(*menupanel)->Next;
-				}
-				*menupanel = new MenuPanel;
+				menupanel = new MenuPanel;
 				lua_rawgeti(l, j + 1, k + 1);
-				(*menupanel)->Ident = new_strdup(LuaToString(l, -1));
+				menupanel->Ident = new_strdup(LuaToString(l, -1));
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
-				(*menupanel)->G = CGraphic::New(LuaToString(l, -1));
+				menupanel->G = CGraphic::New(LuaToString(l, -1));
 				lua_pop(l, 1);
+				ui->MenuPanels.push_back(menupanel);
 			}
 		} else if (!strcmp(value, "victory-background")) {
 			// Backgrounds
