@@ -731,7 +731,7 @@ static void EditorDestroyAllUnits(void)
 /**
 **  Create a random map
 */
-void EditorCreateRandomMap(void)
+void CEditor::CreateRandomMap(void) const
 {
 	int mz;
 

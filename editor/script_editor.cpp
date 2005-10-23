@@ -50,9 +50,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-char *EditorSelectIcon;
-char *EditorUnitsIcon;
-char *EditorStartUnit;
+CEditor Editor;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -63,34 +61,26 @@ char *EditorStartUnit;
 **
 **  @param l  Lua state.
 */
-static int CclDefineEditorUnitTypes(lua_State *l)
+static int CclDefineEditorUnitTypes(lua_State* l)
 {
-	char **cp;
 	int args;
 	int j;
 
 	LuaCheckArgs(l, 1);
-
-	if ((cp = EditorUnitTypes)) { // Free all old names
-		while (*cp) {
-			delete[] *cp++;
-		}
-		delete[] EditorUnitTypes;
+	for (std::vector<char *>::iterator name = Editor.UnitTypes.begin(); name != Editor.UnitTypes.end(); ++name) {
+		delete [] *name;
 	}
+	Editor.UnitTypes.clear();
 
 	//
 	// Get new table.
 	//
 	args = luaL_getn(l, 1);
-	EditorUnitTypes = cp = new char *[args + 1];
-	MaxUnitIndex = args;
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, 1, j + 1);
-		*cp++ = new_strdup(LuaToString(l, -1));
+		Editor.UnitTypes.push_back(new_strdup(LuaToString(l, -1)));
 		lua_pop(l, 1);
 	}
-	*cp = NULL;
-
 	return 0;
 }
 
@@ -102,8 +92,8 @@ static int CclDefineEditorUnitTypes(lua_State *l)
 static int CclSetEditorSelectIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	delete[] EditorSelectIcon;
-	EditorSelectIcon = new_strdup(LuaToString(l, 1));
+	delete[] Editor.Select.Name;
+	Editor.Select.Name = new_strdup(LuaToString(l, 1));
 	return 0;
 }
 
@@ -115,8 +105,8 @@ static int CclSetEditorSelectIcon(lua_State *l)
 static int CclSetEditorUnitsIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	delete[] EditorUnitsIcon;
-	EditorUnitsIcon = new_strdup(LuaToString(l, 1));
+	delete[] Editor.Units.Name;
+	Editor.Units.Name = new_strdup(LuaToString(l, 1));
 	return 0;
 }
 
@@ -130,8 +120,8 @@ static int CclSetEditorStartUnit(lua_State *l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	delete[] EditorStartUnit;
-	EditorStartUnit = new_strdup(LuaToString(l, 1));
+	delete[] Editor.StartUnitName;
+	Editor.StartUnitName = new_strdup(LuaToString(l, 1));
 	return 0;
 }
 
@@ -159,7 +149,7 @@ static int CclSetTerrainEditable(lua_State *l)
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	TerrainEditable = LuaToNumber(l, 1);
+	Editor.TerrainEditable = LuaToNumber(l, 1);
 	return 0;
 }
 

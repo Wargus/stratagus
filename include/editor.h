@@ -33,6 +33,12 @@
 
 //@{
 
+#include <vector>
+#include "player.h"
+
+class CUnitType;
+class IconConfig;
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -48,7 +54,6 @@ typedef enum _editor_running_state_ {
 extern EditorRunningType EditorRunning;
 
 extern char EditorMapLoaded;  /// Map loaded in editor
-extern int TerrainEditable;  /// Is the terrain editable ?
 extern int EditorWriteCompressedMaps;
 
 	/// Current editor state type.
@@ -62,14 +67,56 @@ typedef enum _editor_state_type_ {
 extern EditorStateType EditorState;
 
 extern const char *EditorStartFile;  /// Editor CCL start file
-extern char **EditorUnitTypes;  /// Sorted editor unit-type table
-extern int MaxUnitIndex;  /// Max unit icon draw index
 
-extern char *EditorSelectIcon;  /// Editor's select icon
-extern char *EditorUnitsIcon;   /// Editor's units icon
-extern char *EditorSelectIcon;  ///< Editor's select icon
-extern char *EditorUnitsIcon;   ///< Editor's units icon
-extern char *EditorStartUnit;   ///< Unit used to display the start location
+class CEditor {
+public:
+	CEditor() : TerrainEditable(true),
+				StartUnitName(NULL), StartUnit(NULL),
+				ShowUnitsToSelect(true), ShowBuildingsToSelect(true),
+				ShowAirToSelect(true), ShowLandToSelect(true), ShowWaterToSelect(true),
+
+				UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
+				CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral)
+
+				 {};
+	~CEditor() {
+		delete [] StartUnitName;
+	};
+
+	void Init();
+	/// Make random map
+	void CreateRandomMap() const;
+
+
+	std::vector<char*> UnitTypes;                   /// Sorted editor unit-type table.
+	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
+
+	bool TerrainEditable;        /// Is the terrain editable ?
+	IconConfig Select;           /// Editor's select icon.
+	IconConfig Units;            /// Editor's units icon.
+	char* StartUnitName;         /// name of the Unit used to display the start location.
+	const CUnitType *StartUnit;  /// Unit used to display the start location.
+
+	bool ShowUnitsToSelect;      /// Show units in unit list.
+	bool ShowBuildingsToSelect;  /// Show buildings in unit list.
+#if 0
+	bool ShowHeroesToSelect;     /// Show heroes in unit list.
+#endif
+	bool ShowAirToSelect;        /// Show air units in unit list.
+	bool ShowLandToSelect;       /// Show land units in unit list.
+	bool ShowWaterToSelect;      /// Show water units in unit list.
+
+	int UnitIndex;               /// Unit icon draw index.
+	int CursorUnitIndex;         /// Unit icon under cursor.
+	int SelectedUnitIndex;       /// Unit type to draw.
+
+	int CursorPlayer;            /// Player under the cursor.
+	int SelectedPlayer;          /// Player selected for draw.
+
+};
+
+extern CEditor Editor;
+
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -95,8 +142,7 @@ extern void EditTiles(int x, int y, int tile, int size);
 extern void ChangeTile(int x, int y, int tile);
 	/// Update surroundings for tile changes
 extern void EditorTileChanged(int x, int y);
-	/// Make random map
-extern void EditorCreateRandomMap(void);
+
 
 //@}
 
