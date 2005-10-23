@@ -734,7 +734,6 @@ void CUnit::Place(int x, int y)
 		MapUnmarkUnitSight(this);
 		RemoveUnitFromContainer(this);
 	}
-	Next = 0;
 	if (!SaveGameLoading) {
 		UpdateUnitSightRange(this);
 	}
@@ -797,7 +796,6 @@ void CUnit::Remove(CUnit *host)
 		UpdateUnitSightRange(this);
 		UnitInXY(this, host->X, host->Y);
 		MapMarkUnitSight(this);
-		Next = host; // What is it role ?
 	}
 
 	Removed = 1;
