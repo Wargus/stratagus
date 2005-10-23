@@ -44,12 +44,12 @@ class IconConfig;
 ----------------------------------------------------------------------------*/
 
 	/// Editor is running
-typedef enum _editor_running_state_ {
+enum EditorRunningType {
 	EditorNotRunning = 0,   /// Not Running
 	EditorStarted = 1,      /// Editor Enabled at all
 	EditorCommandLine = 2,  /// Called from Command Line
 	EditorEditing = 4       /// Editor is fully running
-} EditorRunningType;
+};
 
 extern EditorRunningType EditorRunning;
 
@@ -57,12 +57,12 @@ extern char EditorMapLoaded;  /// Map loaded in editor
 extern int EditorWriteCompressedMaps;
 
 	/// Current editor state type.
-typedef enum _editor_state_type_ {
+enum EditorStateType {
 	EditorSelecting,  ///< Select
 	EditorEditTile,   ///< Edit tiles
 	EditorEditUnit,   ///< Edit units
 	EditorSetStartLocation ///< Set the start location
-} EditorStateType;    ///< Current editor state
+};    ///< Current editor state
 	/// Current editor state.
 extern EditorStateType EditorState;
 
