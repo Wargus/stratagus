@@ -194,7 +194,7 @@ public:
 };
 
 /**
-**  Allow what a player can do. Every #Player has an own allow struct.
+**  Allow what a player can do. Every #CPlayer has an own allow struct.
 **
 **  This could allow/disallow units, actions or upgrades.
 **
