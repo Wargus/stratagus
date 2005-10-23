@@ -503,7 +503,7 @@ int AiFindWall(AiForce *force)
 **
 **  @todo         Perfect planning.
 **                Only works for water transporter!
-**  @fixme transporter are more selective now (flag with unittypeland).
+**  @todo transporter are more selective now (flag with unittypeland).
 **         We must manage it.
 */
 int AiPlanAttack(AiForce *force)
