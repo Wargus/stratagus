@@ -609,6 +609,7 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 	int w;          // Tile width of the unit.
 	int x;          // X tile of the unit.
 	int y;          // Y tile of the unit.
+	CUnit *table[UnitMax];
 
 	Assert(unit);
 	type = unit->Type;
@@ -618,6 +619,14 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 	for (h = type->TileHeight; h--;) {
 		for (w = type->TileWidth; w--;) {
 			Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags &= ~flags;
+
+			int n = UnitCacheOnTile(x + w, y + h, table);
+			while (n--) {
+				if (table[n] != unit && table[n]->Orders[0]->Action != UnitActionDie) {
+					Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags |=
+						table[n]->Type->FieldFlags;
+				}
+			}
 		}
 	}
 }
@@ -2200,13 +2209,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 	//
 	j = 0;
 	if (unit) {
-		j = unit->Type->FieldFlags;
-		for (h = unit->Type->TileHeight; h > 0; --h) {
-			for (w = unit->Type->TileWidth; w > 0; --w) {
-				Map.Fields[(unit->X + w - 1) + 
-						(unit->Y - 1 + h) * Map.Info.MapWidth].Flags &= ~j;
-			}
-		}
+		UnmarkUnitFieldFlags(unit);
 	}
 
 	player = NULL;
@@ -2224,23 +2227,20 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 			}
 			if (!CanBuildOn(x + w, y + h, testmask)) {
 				if (unit) {
-					Map.Fields[unit->X + unit->Y * Map.Info.MapWidth].Flags |= j;
+					MarkUnitFieldFlags(unit);
 				}
 				return NULL;
 			}
 			if (player && !Map.IsFieldExplored(player, x + w, y + h)) {
+				if (unit) {
+					MarkUnitFieldFlags(unit);
+				}
 				return NULL;
 			}
 		}
 	}
 	if (unit) {
-		j = unit->Type->FieldFlags;
-		for (h = unit->Type->TileHeight; h > 0; --h) {
-			for (w = unit->Type->TileWidth; w > 0; --w) {
-				Map.Fields[(unit->X + w - 1) + 
-						(unit->Y - 1 + h) * Map.Info.MapWidth].Flags |= j;
-			}
-		}
+		MarkUnitFieldFlags(unit);
 	}
 
 	//
