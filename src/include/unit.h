@@ -571,7 +571,7 @@ public:
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 							     /// NULL if the unit was not rescued.
 	/* Seen stuff. */
-	char VisCount[PlayerMax];    /// Unit visibility counts
+	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
 		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player
 		int                 Frame;                   /// last seen frame/stage of buildings
