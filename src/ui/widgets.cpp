@@ -77,6 +77,8 @@ void freeGuichan()
 	delete top;
 	delete gui;
 	delete input;
+
+	gui = NULL;
 }
 
 void handleInput(const SDL_Event *event) 

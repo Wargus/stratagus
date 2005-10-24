@@ -75,6 +75,9 @@
 #include "SDL_thread.h"
 #endif
 
+#include <guichan.hpp>
+extern gcn::Gui* gui;
+
 //----------------------------------------------------------------------------
 // Variables
 //----------------------------------------------------------------------------
@@ -257,7 +260,12 @@ void UpdateDisplay(void)
 
 	DrawPieMenu(); // draw pie menu only if needed
 	DrawMenu(CurrentMenu);
-
+	
+	if (gui) {
+		gui->logic();
+		gui->draw();
+	}
+	
 	if (CursorState != CursorStateRectangle) {
 		DrawCursor();
 	}
