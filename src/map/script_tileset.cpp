@@ -465,7 +465,7 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->SolidTerrainTypes = new SolidTerrainInfo;
+	tileset->SolidTerrainTypes = new SolidTerrainInfo[1];
 	if (!tileset->SolidTerrainTypes) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
