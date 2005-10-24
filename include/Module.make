@@ -33,6 +33,6 @@ MHDRS =  actions.h ai.h animation.h campaign.h cdaudio.h commands.h \
          network.h pathfinder.h player.h script.h script_sound.h settings.h \
          sound.h sound_id.h sound_server.h spells.h tileset.h trigger.h ui.h \
          unit.h unitsound.h unittype.h upgrade.h upgrade_structs.h util.h \
-         video.h wav.h
+         video.h wav.h widgets.h
 
 HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))
