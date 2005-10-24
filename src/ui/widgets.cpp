@@ -199,7 +199,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	}
     
 	if (hasFocus()) {
-		graphics->drawRectangle(Rectangle(0, 0, getWidth(), getHeight()));
+		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	} 
 }
 
