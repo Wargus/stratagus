@@ -63,6 +63,7 @@ def globSources(sourceDirs):
   return targetsources
 
 sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua")
+sourcesEngine.append(globSources("guichan guichan/sdl guichan/widgets"))
 sourcesMetaserver = globSources("metaserver")
 sourcesMetaserver.append("build/network/lowlevel.cpp")
 
@@ -168,10 +169,11 @@ else:
 
 # Stratagus build specifics
 env.Append(CPPPATH='src/include')
+env.Append(CPPPATH='src/guichan/include')
 BuildDir('build', 'src', duplicate = 0)
 if env['debug']:
     env.Append(CPPDEFINES = 'DEBUG')
-    env.Append(CCFLAGS = Split('-g -Wsign-compare -Werror -Wall'))
+    env.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
 else:
     env.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
 

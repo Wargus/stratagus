@@ -39,7 +39,9 @@
 #include "SDL_opengl.h"
 #endif
 
-class CGraphic {
+#include "guichan.hpp"
+
+class CGraphic : public gcn::Image {
 private:
 	CGraphic() : File(NULL), HashFile(NULL), Surface(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
@@ -100,6 +102,10 @@ public:
 
 	inline bool IsLoaded() { return Surface != NULL; }
 
+	//guichan
+	virtual void * _getData() const {return Surface;}
+	virtual int getWidth() const {return Width;}
+	virtual int getHeight() const {return Height;}
 
 	char *File;                /// Filename
 	char *HashFile;            /// Filename used in hash

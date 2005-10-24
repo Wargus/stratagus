@@ -69,7 +69,7 @@ class CGraphic;
 ----------------------------------------------------------------------------*/
 
 	/// Font definition
-class CFont {
+class CFont : public gcn::Font {
 private:
 	CFont(const char *ident) : Ident(new_strdup(ident)), G(NULL) {
 		memset(CharWidth, 0, sizeof(CharWidth));
@@ -82,10 +82,17 @@ public:
 	static CFont *New(const char *ident, CGraphic *g);
 	static CFont *Get(const char *ident);
 
-	inline int Height() { return G->Height; }
-	int Width(const char *text);
-	inline bool IsLoaded() { return G && G->IsLoaded(); }
+	inline int Height() const {return G->Height;}
+	int Width(const char *text) const;
+	inline bool IsLoaded() {return G && G->IsLoaded();}
 
+	virtual int getHeight() const {return Height();}
+	virtual int getWidth(const std::string &text) const
+		{return Width(text.c_str());}
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text, 
+		int x, int y);
+	void drawGlyph(gcn::Graphics *graphics, int gx, int gy, int w, int h, int x, int y);
+	
 	void MeasureWidths();
 
 	char *Ident;          /// Ident of the font.

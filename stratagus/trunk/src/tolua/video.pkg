@@ -15,6 +15,7 @@ class CGraphic
 public:
 	static CGraphic *New(const char *file, int w = 0, int h = 0);
 	static void Free(CGraphic *);
+	void Load();
 };
 
 class CColor {
