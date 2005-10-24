@@ -174,7 +174,7 @@ int CFont::Width(const char *text)
 			}
 		}
 		if (!isformat) {
-			width += this->CharWidth[*s - 32] + 1;
+			width += this->CharWidth[*(unsigned char *)s - 32] + 1;
 		}
 	}
 	return width;
