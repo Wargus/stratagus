@@ -71,6 +71,7 @@
 #include "sound.h"
 #include "interface.h"
 #include "minimap.h"
+#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -409,6 +410,8 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 		case SDL_QUIT:
 			Exit(0);
 	}
+
+	handleInput(event);
 }
 
 /**

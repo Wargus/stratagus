@@ -30,3 +30,70 @@ class CIcon
 	int Frame;
 };
 
+$using namespace gcn;
+
+class LuaActionListener
+{
+	LuaActionListener(lua_State *lua, lua_Object luaref);
+};
+
+class Widget 
+{
+	void addActionListener(LuaActionListener *actionListener);
+	void setFont(CFont *font);
+	static void setGlobalFont(CFont *font);
+};
+
+class ImageButton : public Widget
+{
+	ImageButton(char *caption, CGraphic *normalImage, CGraphic *pressedImage);
+};
+
+// FIXME (conflicts with stratagus Icon class)
+//class Icon : public Widget
+//{
+//	Icon(CGraphic *image);
+//};
+
+class Slider : public Widget
+{
+	Slider(double scaleStart, double scaleEnd);
+	double getValue();
+	void setWidth(int w);
+	void setHeight(int h);
+};
+
+class CheckBox : public Widget
+{
+	CheckBox(char *caption, bool marked = false);
+	bool isMarked();
+};
+
+class Label : public Widget
+{
+	Label(const std::string &caption);
+};
+
+class RadioButton : public Widget
+{
+	RadioButton(const std::string &caption, const std::string &group, bool marked=false);
+};
+
+// FIXME Combine with ScrollArea in our own widget
+//class TextBox : public Widget
+//{
+//	TextBox(const std::string &text);
+//};
+
+class TextField : public Widget
+{
+	TextField(const std::string &text);
+};
+
+class Container
+{
+	void add(Widget *widget, int x, int y);
+};
+
+extern Container *top;
+
