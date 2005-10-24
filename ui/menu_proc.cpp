@@ -2477,9 +2477,6 @@ void CloseMenu(void)
 	}
 }
 
-#include <guichan.hpp>
-extern gcn::Gui* gui;
-
 /**
 ** Process a menu.
 **
@@ -2595,8 +2592,6 @@ void ProcessMenu(const char *menu_id, int loop)
 
 			InterfaceState = IfaceStateNormal;
 			UpdateDisplay();
-			gui->logic();
-			gui->draw();
 			InterfaceState = IfaceStateMenu;
 
 			RealizeVideoMemory();
