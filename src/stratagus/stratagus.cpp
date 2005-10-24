@@ -219,6 +219,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "movie.h"
 #include "cdaudio.h"
 #include "pathfinder.h"
+#include "widgets.h"
 
 #ifdef DEBUG
 extern int CclUnits(lua_State *l);
@@ -488,6 +489,14 @@ void PreMenuSetup(void)
 */
 void MenuLoop(const char *filename, CMap *map)
 {
+	char buf[1024];
+
+	//FIXME move this higher up when switching to full guichan
+	initGuichan(Video.Width, Video.Height); 
+	// FIXME delete this when switching to full guichan GUI
+	LibraryFileName("scripts/guichan.lua", buf);
+	LuaLoadFile(buf);
+
 	for (;;) {
 		//
 		//  Clear screen
@@ -594,6 +603,9 @@ void MenuLoop(const char *filename, CMap *map)
 			DebugPrint("Next chapter %s\n" _C_ CurrentMapPath);
 		}
 	}
+
+	//FIXME move this at a better place when switching to full guichan
+	freeGuichan();
 }
 
 //----------------------------------------------------------------------------
