@@ -71,8 +71,7 @@ OBJ_ALL = $(OBJ)
 all:	all-src stratagus$(EXE)
 
 make-objdir:
-	@for i in $(MODULES); do \
-	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
+	mkdir -p $(dir $(OBJ))
 
 %.o: $(@D)../%.cpp
 	$(CXX) -c $(CFLAGS) $(subst $(OBJDIR)/../,,$<) -o $@
@@ -127,8 +126,9 @@ src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
 	cd src; windres -o $(OBJDIR)/stratagusrc.$(OE) stratagus.rc; cd ..
 
 clean::
+	$(RM) -rf $(dir $(OBJ))
 	for i in $(MODULES_ALL); do \
-	$(RM) -rf $$i/$(OBJDIR)/*.o $$i/*.doc; done
+	$(RM) -rf $$i/*.doc; done
 	$(RM) core gmon.out cscope.out *.doc 
 	@echo
 
