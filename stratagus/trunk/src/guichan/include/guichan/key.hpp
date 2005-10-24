@@ -59,6 +59,10 @@
 
 #include "guichan/platform.hpp"
 
+#ifdef DELETE
+#undef DELETE
+#endif
+
 namespace gcn
 {
     /**

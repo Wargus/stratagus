@@ -44,7 +44,8 @@ ARCH=@ARCH@
 OE=@OE@
 OBJDIR=@OBJDIR@
 
-IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
+IFLAGS=	-I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include \
+    $(XIFLAGS)
 
 CFLAGS=$(IFLAGS) @DEFS@ -I. \
     @PROFILE_CFLAGS@ @STRATAGUS_CFLAGS@ @EXTRA_CFLAGS@ \
