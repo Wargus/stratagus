@@ -147,8 +147,8 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		highlightColor.a = alpha;
 		shadowColor = faceColor + 0x303030;
 		shadowColor.a = alpha;
-		graphics->drawImage(normalImage, 0, 0, 0, 0, 
-				normalImage->getWidth(), normalImage->getHeight());
+		graphics->drawImage(pressedImage, 0, 0, 0, 0,
+				pressedImage->getWidth(), pressedImage->getHeight());
 	} else if (0 && hasMouse()) {
 		highlightColor = faceColor + 0x303030;
 		highlightColor.a = alpha;
@@ -159,7 +159,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		highlightColor.a = alpha;
 		shadowColor = faceColor - 0x303030;
 		shadowColor.a = alpha;
-		graphics->drawImage(normalImage, 0, 0, 0, 0, 
+		graphics->drawImage(normalImage, 0, 0, 0, 0,
 				normalImage->getWidth(), normalImage->getHeight());
 	}
 	graphics->setColor(faceColor);
