@@ -83,105 +83,19 @@ CFont *LargeFont;       /// Large font used in menus
 CFont *SmallTitleFont;  /// Small font used in episoden titles
 CFont *LargeTitleFont;  /// Large font used in episoden titles
 
-void CFont::drawGlyph(gcn::Graphics *graphics,
-	int gx, int gy, int w, int h, int x, int y)
-{
-	graphics->drawImage(G, gx, gy, x,
-			y, w, h);
-}
+
+/*----------------------------------------------------------------------------
+--  Guichan Functions
+----------------------------------------------------------------------------*/
+
 void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, 
-		int x, int y) 
+	int x, int y) 
 {
-	int w;
-	int widths;
-	CFontColor *rev;
-	char *color;
-	const char *p;
-	int ipr;
-	int c;
-	const char *text;
-
-	text = txt.c_str();
-	for (rev = NULL, widths = 0; *text; ++text) {
-		if (*text == '~') {
-			switch (*++text) {
-				case '\0':  // wrong formatted string.
-					DebugPrint("oops, format your ~\n");
-					//return widths;
-					return;
-				case '~':
-					break;
-				case '!':
-					rev = FontColor;
-					FontColor = ReverseTextColor;
-#ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
-					++text;
-					break;
-				case '<':
-					LastTextColor = FontColor;
-					FontColor = ReverseTextColor;
-#ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
-					continue;
-				case '>':
-					rev = LastTextColor;  // swap last and current color
-					LastTextColor = FontColor;
-					FontColor = rev;
-#ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
-					continue;
-
-				default:
-					p = text;
-					while (*p && *p !='~') {
-						++p;
-					}
-					if (!*p) {
-						DebugPrint("oops, format your ~\n");
-						return;//widths;
-					}
-					color = new char[p - text + 1];
-					memcpy(color, text, p - text);
-					color[p - text] = '\0';
-					text = p;
-					LastTextColor = FontColor;
-					FontColor = CFontColor::Get(color);
-#ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
-					delete[] color;
-					continue;
-			}
-		}
-
-		c = *(unsigned char *)text - 32;
-		Assert(c >= 0);
-
-		ipr = G->GraphicWidth / G->Width;
-		if (c >= 0 && c < ipr * G->GraphicHeight / G->Height) {
-			w = CharWidth[c];
-			drawGlyph(graphics, (c % ipr) * G->Width, (c / ipr) * G->Height,
-				w, G->Height, x + widths, y);
-		} else {
-			w = CharWidth[0];
-			drawGlyph(graphics, 0, 0, w, G->Height, x + widths, y);
-		}
-		widths += w + 1;
-		if (rev) {
-			FontColor = rev;
-#ifdef USE_OPENGL
-			g = FontColorGraphics[font][FontColor];
-#endif
-			rev = NULL;
-		}
-	}
-
-	//return widths;
-	return;
+	const gcn::ClipRectangle r = graphics->getCurrentClipArea();
+	PushClipping();
+	SetClipping(r.x, r.y, r.x + r.width, r.y + r.height);
+	VideoDrawText(x + r.xOffset, y + r.yOffset, this, txt.c_str());
+	PopClipping();
 }
 
 /*----------------------------------------------------------------------------

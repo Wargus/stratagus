@@ -91,7 +91,6 @@ public:
 		{return Width(text.c_str());}
 	virtual void drawString(gcn::Graphics *graphics, const std::string &text, 
 		int x, int y);
-	void drawGlyph(gcn::Graphics *graphics, int gx, int gy, int w, int h, int x, int y);
 	
 	void MeasureWidths();
 
