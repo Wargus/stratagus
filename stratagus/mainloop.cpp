@@ -75,8 +75,8 @@
 #include "SDL_thread.h"
 #endif
 
-#include <guichan.hpp>
-extern gcn::Gui* gui;
+#include <guichan.h>
+extern gcn::Gui *gui;
 
 //----------------------------------------------------------------------------
 // Variables
