@@ -52,8 +52,8 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "guichan/exception.hpp"
-#include "guichan/widgets/dropdown.hpp"
+#include "guichan/exception.h"
+#include "guichan/widgets/dropdown.h"
 
 namespace gcn
 {  

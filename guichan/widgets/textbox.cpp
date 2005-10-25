@@ -58,11 +58,11 @@
 
 #include <typeinfo>
 
-#include "guichan/basiccontainer.hpp"
-#include "guichan/keyinput.hpp"
-#include "guichan/mouseinput.hpp"
-#include "guichan/widgets/scrollarea.hpp"
-#include "guichan/widgets/textbox.hpp"
+#include "guichan/basiccontainer.h"
+#include "guichan/keyinput.h"
+#include "guichan/mouseinput.h"
+#include "guichan/widgets/scrollarea.h"
+#include "guichan/widgets/textbox.h"
 
 namespace gcn
 {

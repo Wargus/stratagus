@@ -56,9 +56,9 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/graphics.hpp"
-#include "guichan/exception.hpp"
-#include "guichan/font.hpp"
+#include "guichan/graphics.h"
+#include "guichan/exception.h"
+#include "guichan/font.h"
 
 namespace gcn
 {

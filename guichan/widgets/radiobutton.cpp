@@ -56,7 +56,7 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/widgets/radiobutton.hpp"
+#include "guichan/widgets/radiobutton.h"
 
 namespace gcn
 {
