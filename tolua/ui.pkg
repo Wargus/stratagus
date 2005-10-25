@@ -49,11 +49,10 @@ class ImageButton : public Widget
 	ImageButton(char *caption, CGraphic *normalImage, CGraphic *pressedImage);
 };
 
-// FIXME (conflicts with stratagus Icon class)
-//class Icon : public Widget
-//{
-//	Icon(CGraphic *image);
-//};
+class ImageWidget : public Widget
+{
+	ImageWidget(CGraphic *image);
+};
 
 class Slider : public Widget
 {
