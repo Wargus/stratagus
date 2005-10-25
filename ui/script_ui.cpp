@@ -2690,7 +2690,7 @@ static void FreeMenu(Menu *menu)
 		switch (menu->Items[i].MiType) {
 			case MiTypeText:
 				FreeStringDesc(menu->Items[i].D.Text.text);
-				delete[] menu->Items[i].D.Text.text;
+				delete menu->Items[i].D.Text.text;
 				delete[] menu->Items[i].D.Text.normalcolor;
 				delete[] menu->Items[i].D.Text.normalcolor;
 				break;

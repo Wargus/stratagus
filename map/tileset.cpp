@@ -99,7 +99,7 @@ void CleanTilesets(void)
 	if (Map.Tileset.SolidTerrainTypes) {
 		delete[] Map.Tileset.SolidTerrainTypes[0].TerrainName;
 	}
-	delete Map.Tileset.SolidTerrainTypes;
+	delete[] Map.Tileset.SolidTerrainTypes;
 	memset(&Map.Tileset, 0, sizeof(CTileset));
 
 	//
