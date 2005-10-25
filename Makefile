@@ -71,7 +71,7 @@ OBJ_ALL = $(OBJ)
 all:	all-src stratagus$(EXE)
 
 make-objdir:
-	mkdir -p $(dir $(OBJ))
+	@mkdir -p $(dir $(OBJ))
 
 %.o: $(@D)../%.cpp
 	$(CXX) -c $(CFLAGS) $(subst $(OBJDIR)/../,,$<) -o $@
