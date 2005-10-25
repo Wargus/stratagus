@@ -59,3 +59,9 @@ public:
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void adjustSize();
 };
+
+class ImageWidget : public gcn::Icon
+{
+public:
+	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+};
