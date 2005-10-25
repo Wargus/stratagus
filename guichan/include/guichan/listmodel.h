@@ -85,6 +85,8 @@ namespace gcn
          * @return an element as a string.
          */
         virtual std::string getElementAt(int i) = 0;
+
+        virtual ~ListModel() {}
     };
 }
 
