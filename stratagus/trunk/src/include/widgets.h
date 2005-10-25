@@ -28,8 +28,8 @@
 //
 //      $Id$
 
-#include <guichan.hpp>
-#include <guichan/sdl.hpp>
+#include <guichan.h>
+#include <guichan/gsdl.h>
 typedef int lua_Object; // from tolua++.h
 
 extern gcn::Container *top;

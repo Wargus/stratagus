@@ -39,7 +39,7 @@
 #include "SDL_opengl.h"
 #endif
 
-#include "guichan.hpp"
+#include "guichan.h"
 
 class CGraphic : public gcn::Image {
 private:
