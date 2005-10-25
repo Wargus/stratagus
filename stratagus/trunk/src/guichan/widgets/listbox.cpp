@@ -58,9 +58,9 @@
 
 #include <typeinfo>
 
-#include "guichan/basiccontainer.hpp"
-#include "guichan/widgets/listbox.hpp"
-#include "guichan/widgets/scrollarea.hpp"
+#include "guichan/basiccontainer.h"
+#include "guichan/widgets/listbox.h"
+#include "guichan/widgets/scrollarea.h"
 
 namespace gcn
 {

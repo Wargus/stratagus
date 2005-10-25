@@ -58,9 +58,9 @@
 
 #include <sstream>
 
-#include "guichan/exception.hpp"
-#include "guichan/imagefont.hpp"
-#include "guichan/image.hpp"
+#include "guichan/exception.h"
+#include "guichan/imagefont.h"
+#include "guichan/image.h"
 
 namespace gcn
 {

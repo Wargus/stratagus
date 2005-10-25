@@ -56,8 +56,8 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/image.hpp"
-#include "guichan/exception.hpp"
+#include "guichan/image.h"
+#include "guichan/exception.h"
 
 namespace gcn
 {

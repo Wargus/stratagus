@@ -56,8 +56,8 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/widgets/label.hpp"
-#include "guichan/exception.hpp"
+#include "guichan/widgets/label.h"
+#include "guichan/exception.h"
 
 namespace gcn
 {

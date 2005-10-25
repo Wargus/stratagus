@@ -56,9 +56,9 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/keyinput.hpp"
-#include "guichan/mouseinput.hpp"
-#include "guichan/widgets/textfield.hpp"
+#include "guichan/keyinput.h"
+#include "guichan/mouseinput.h"
+#include "guichan/widgets/textfield.h"
 
 namespace gcn
 {

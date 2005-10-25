@@ -56,10 +56,10 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/exception.hpp"
-#include "guichan/focushandler.hpp"
-#include "guichan/gui.hpp"
-#include "guichan/key.hpp"
+#include "guichan/exception.h"
+#include "guichan/focushandler.h"
+#include "guichan/gui.h"
+#include "guichan/key.h"
 
 namespace gcn
 {

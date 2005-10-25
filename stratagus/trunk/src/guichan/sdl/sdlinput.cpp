@@ -56,8 +56,8 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/sdl/sdlinput.hpp"
-#include "guichan/exception.hpp"
+#include "guichan/sdl/sdlinput.h"
+#include "guichan/exception.h"
 
 namespace gcn
 {

@@ -56,10 +56,10 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/exception.hpp"
-#include "guichan/font.hpp"
-#include "guichan/sdl/sdlgraphics.hpp"
-#include "guichan/sdl/sdlpixel.hpp"
+#include "guichan/exception.h"
+#include "guichan/font.h"
+#include "guichan/sdl/sdlgraphics.h"
+#include "guichan/sdl/sdlpixel.h"
 
 // For some reason an old version of MSVC did not like std::abs,
 // so we added this macro.
