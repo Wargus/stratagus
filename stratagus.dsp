@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "src\include" /I "include" /D "NDEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "src\include" /I "include" /I "src\guichan\include" /D "NDEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "src\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "src\include" /I "include" /I "src\guichan\include" /D "_DEBUG" /D "DEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -252,6 +252,166 @@ SOURCE=.\src\game\savegame.cpp
 # Begin Source File
 
 SOURCE=.\src\game\trigger.cpp
+# End Source File
+# End Group
+# Begin Group "guichan"
+
+# PROP Default_Filter ""
+# Begin Group "opengl"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\guichan\opengl\opengl.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\opengl\openglgraphics.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\opengl\openglimageloader.cpp
+# End Source File
+# End Group
+# Begin Group "sdl"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\guichan\sdl\gsdl.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\sdl\sdlgraphics.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\sdl\sdlimageloader.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\sdl\sdlinput.cpp
+# End Source File
+# End Group
+# Begin Group "widgets"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\button.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\checkbox.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\container.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\dropdown.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\icon.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\label.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\listbox.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\radiobutton.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\scrollarea.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\slider.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\textbox.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\textfield.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widgets\window.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\src\guichan\cliprectangle.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\color.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\defaultfont.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\exception.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\focushandler.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\gfont.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\graphics.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\gui.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\guichan.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\image.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\imagefont.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\key.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\keyinput.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\mouseinput.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\rectangle.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\widget.cpp
 # End Source File
 # End Group
 # Begin Group "map"
@@ -532,6 +692,10 @@ SOURCE=.\src\ui\script_ui.cpp
 # Begin Source File
 
 SOURCE=.\src\ui\ui.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ui\widgets.cpp
 # End Source File
 # End Group
 # Begin Group "unit"
@@ -815,9 +979,213 @@ SOURCE=.\src\include\video.h
 SOURCE=.\src\include\wav.h
 # End Source File
 # End Group
+# Begin Group "guichan."
+
+# PROP Default_Filter ""
+# Begin Group "opengl."
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\opengl\openglgraphics.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\opengl\openglimageloader.h
+# End Source File
+# End Group
+# Begin Group "sdl."
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\sdl\sdlgraphics.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\sdl\sdlimageloader.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\sdl\sdlinput.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\sdl\sdlpixel.h
+# End Source File
+# End Group
+# Begin Group "widgets."
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\button.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\checkbox.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\container.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\dropdown.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\icon.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\label.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\listbox.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\radiobutton.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\scrollarea.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\slider.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\textbox.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\textfield.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widgets\window.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\actionlistener.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\allegro.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\basiccontainer.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\cliprectangle.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\color.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\defaultfont.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\exception.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\focushandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\font.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\graphics.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\gsdl.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\gui.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\image.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\imagefont.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\imageloader.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\input.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\key.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\keyinput.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\keylistener.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\listmodel.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\mouseinput.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\mouselistener.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\opengl.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\platform.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\rectangle.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\widget.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan\x.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\src\ai\ai_local.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\guichan\include\guichan.h
 # End Source File
 # Begin Source File
 
