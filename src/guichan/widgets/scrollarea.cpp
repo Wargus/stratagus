@@ -56,8 +56,8 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/exception.hpp"
-#include "guichan/widgets/scrollarea.hpp"
+#include "guichan/exception.h"
+#include "guichan/widgets/scrollarea.h"
 
 namespace gcn
 {

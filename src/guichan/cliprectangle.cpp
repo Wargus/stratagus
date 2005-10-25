@@ -56,7 +56,7 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/cliprectangle.hpp"
+#include "guichan/cliprectangle.h"
 
 namespace gcn
 {

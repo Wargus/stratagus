@@ -70,8 +70,8 @@
 
 #include <string>
 
-#include "guichan/opengl/openglgraphics.hpp"
-#include "guichan/exception.hpp"
+#include "guichan/opengl/openglgraphics.h"
+#include "guichan/exception.h"
 
 
 namespace gcn

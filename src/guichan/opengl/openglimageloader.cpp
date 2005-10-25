@@ -67,8 +67,8 @@
 #include <GL/gl.h>
 #endif
 
-#include "guichan/opengl/openglimageloader.hpp"
-#include "guichan/exception.hpp"
+#include "guichan/opengl/openglimageloader.h"
+#include "guichan/exception.h"
 
 namespace gcn
 {

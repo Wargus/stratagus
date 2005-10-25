@@ -56,7 +56,7 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/widgets/checkbox.hpp"
+#include "guichan/widgets/checkbox.h"
 
 namespace gcn
 {

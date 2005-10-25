@@ -56,8 +56,8 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/defaultfont.hpp"
-#include "guichan/rectangle.hpp"
+#include "guichan/defaultfont.h"
+#include "guichan/rectangle.h"
 
 namespace gcn
 {  

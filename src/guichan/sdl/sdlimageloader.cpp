@@ -58,9 +58,9 @@
 #ifdef USE_SDL_IMAGE
 #include <SDL/SDL_image.h>
 
-#include "guichan/sdl/sdlimageloader.hpp"
-#include "guichan/exception.hpp"
-#include "guichan/sdl/sdlpixel.hpp"
+#include "guichan/sdl/sdlimageloader.h"
+#include "guichan/exception.h"
+#include "guichan/sdl/sdlpixel.h"
 
 namespace gcn
 {

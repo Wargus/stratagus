@@ -56,10 +56,10 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/basiccontainer.hpp"
-#include "guichan/exception.hpp"
-#include "guichan/focushandler.hpp"
-#include "guichan/widget.hpp"
+#include "guichan/basiccontainer.h"
+#include "guichan/exception.h"
+#include "guichan/focushandler.h"
+#include "guichan/widget.h"
 
 #include <iostream>
 

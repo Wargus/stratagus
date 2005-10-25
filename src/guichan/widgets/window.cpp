@@ -56,9 +56,9 @@
  * For comments regarding functions please see the header file. 
  */
 
-#include "guichan/widgets/window.hpp"
-#include "guichan/exception.hpp"
-#include "guichan/mouseinput.hpp"
+#include "guichan/widgets/window.h"
+#include "guichan/exception.h"
+#include "guichan/mouseinput.h"
 
 namespace gcn
 {
