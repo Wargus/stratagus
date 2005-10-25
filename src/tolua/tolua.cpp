@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Mon Oct 24 23:01:23 2005.
+** Generated automatically by tolua++-1.0.7 on Tue Oct 25 21:40:54 2005.
 */
 
 #ifndef __cplusplus
@@ -86,6 +86,13 @@ static int tolua_collect_Label (lua_State* tolua_S)
  return 0;
 }
 
+static int tolua_collect_ImageWidget (lua_State* tolua_S)
+{
+ ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_Slider (lua_State* tolua_S)
 {
  Slider* self = (Slider*) tolua_tousertype(tolua_S,1,0);
@@ -101,21 +108,22 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"CFontColor");
+ tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"CheckBox");
- tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
@@ -942,6 +950,66 @@ static int tolua_stratagus_ImageButton_new00_local(lua_State* tolua_S)
  {
   ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption,normalImage,pressedImage);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageButton");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  ImageWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageWidget_new00
+static int tolua_stratagus_ImageWidget_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageWidget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+ {
+  ImageWidget* tolua_ret = (ImageWidget*)  new ImageWidget(image);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ImageWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageWidget_new00_local
+static int tolua_stratagus_ImageWidget_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageWidget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+ {
+  ImageWidget* tolua_ret = (ImageWidget*)  new ImageWidget(image);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageWidget");
  }
  }
  return 1;
@@ -3381,6 +3449,16 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_ImageButton_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_ImageButton_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_ImageButton_new00_local);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"ImageWidget","ImageWidget","Widget",tolua_collect_ImageWidget);
+#else
+ tolua_cclass(tolua_S,"ImageWidget","ImageWidget","Widget",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"ImageWidget");
+  tolua_function(tolua_S,"new",tolua_stratagus_ImageWidget_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_ImageWidget_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_ImageWidget_new00_local);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"Slider","Slider","Widget",tolua_collect_Slider);
