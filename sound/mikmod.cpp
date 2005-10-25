@@ -212,17 +212,16 @@ CSample *LoadMikMod(const char *name, int flags)
 		MikMod_RegisterAllLoaders();
 		registered = 1;
 	}
-	MikMod_Init("");
 
 	strcpy(s, name);
 	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
-		MikMod_Exit();
 		delete f;
 		return NULL;
 	}
 	CurrentFile = f;
 
+	MikMod_Init("");
 	module = Player_LoadGeneric(&MReader, 64, 0);
 	if (!module) {
 		MikMod_Exit();
