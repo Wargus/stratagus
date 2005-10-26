@@ -94,7 +94,7 @@ namespace gcn
          * NOTE: There is generally no reason to call this function as
          *       it is called upon by the Image object when destroying an Image.
          *
-         * @param filename the file to be freed and removed.
+         * @param image the image to be freed and removed.
          * @throws Exception when image points to NULL.
          */
         virtual void free(Image* image) = 0;

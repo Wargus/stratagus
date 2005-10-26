@@ -104,7 +104,7 @@ namespace gcn
         /**
          * Sets the alignment for the caption.
          *
-         * @param alignemnt Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT
+         * @param alignment Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT
          * @see Graphics
          */
         virtual void setAlignment(unsigned int alignment);

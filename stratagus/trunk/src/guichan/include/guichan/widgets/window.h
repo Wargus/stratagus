@@ -111,7 +111,7 @@ namespace gcn
         /**
          * Sets the alignment for the caption.
          *
-         * @param alignemnt Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT.
+         * @param alignment Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT.
          */
         virtual void setAlignment(unsigned int alignment);
 
@@ -154,7 +154,7 @@ namespace gcn
         /**
          * Sets the title bar height.
          *
-         * @param title the title height value.
+         * @param height the title height value.
          */      
         virtual void setTitleBarHeight(unsigned int height);
 
