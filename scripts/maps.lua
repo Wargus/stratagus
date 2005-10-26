@@ -58,7 +58,7 @@ function RepeatMap(mapx, mapy, imgx, imgy)
 
    -- The terrain of image based maps shouldnt be editable by the stratagus 
    -- builtin editor and the editor shouldn't try to write the tiles map
-   SetTerrainEditable(0) 
+   SetTerrainEditable(false) 
 end
 
 
