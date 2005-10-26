@@ -118,6 +118,7 @@ namespace gcn
     /**
      * Puts a pixel on an SDL_Surface.
      *
+	 * @param surface an SDL_Surface to put the pixel on
      * @param x the x coordinate on the surface.
      * @param y the y coordinate on the surface.
      * @param color the color the pixel should be in.
@@ -184,6 +185,7 @@ namespace gcn
     /**
      * Puts a pixel on an SDL_Surface with alpha
      *
+	 * @param surface an SDL_Surface to put the pixel on
      * @param x the x coordinate on the surface.
      * @param y the y coordinate on the surface.
      * @param color the color the pixel should be in.

@@ -273,7 +273,7 @@ namespace gcn
          * Sets the Widget to be disabled or enabled. A disabled
          * Widget will never recieve mouse or key input.
          *
-         * @param disabled true if Widget is enabled.
+         * @param enabled true if Widget is enabled.
          */
         virtual void setEnabled(bool enabled);
 

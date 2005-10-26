@@ -101,7 +101,7 @@ namespace gcn
         /**
          * Sets the button pressed.
          *
-         * @param the button pressed.
+         * @param button the button pressed.
          */
         void setButton(int button);
 
