@@ -579,6 +579,12 @@ void CleanUnitTypes(void)
 	}
 	NumAnimations = 0;
 
+	std::map<std::string, CAnimations *>::iterator at;
+	for (at = AnimationMap.begin(); at != AnimationMap.end(); ++at) {
+		delete (*at).second;
+	}
+	AnimationMap.clear();
+
 	// Clean all unit-types
 
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
