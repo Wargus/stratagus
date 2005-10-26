@@ -10,7 +10,7 @@
 //
 /**@name widgets.cpp - The stratagus ui widgets. */
 //
-//      (c) Copyright 1998-2005 by François Beerten
+//      (c) Copyright 2005 by François Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,6 +28,12 @@
 //
 //      $Id$
 
+//@{
+
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "stratagus.h"
 #include "video.h"
 #include "font.h"
@@ -35,20 +41,31 @@
 #include "ui.h"
 #include "widgets.h"
 
+/*----------------------------------------------------------------------------
+-- Variables
+----------------------------------------------------------------------------*/
 
 // Guichan stuff we need
-gcn::Gui* gui; // A Gui object - binds it all together
-gcn::SDLInput* input;  // Input driver
+gcn::Gui *gui;         /// A Gui object - binds it all together
+gcn::SDLInput *input;  /// Input driver
 
 // All of the default widgets
-gcn::Container* top;  // A top container
+gcn::Container *top;  /// A top container
+
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
 /**
- * Initializes the GUI stuff
- */
+**  Initializes the GUI stuff
+**
+**  @param width   FIXME: docu
+**  @param height  FIXME: docu
+*/
 void initGuichan(int width, int height)
 {
-	gcn::SDLGraphics* graphics;       // Graphics driver
+	// FIXME: opengl
+	gcn::SDLGraphics *graphics;   // Graphics driver
 
 #if 0
 	// We want unicode
@@ -71,6 +88,9 @@ void initGuichan(int width, int height)
 	top->setOpaque(false);
 }
 
+/**
+**  FIXME: docu
+*/
 void freeGuichan() 
 {
 	// FIXME do a full cleanup
@@ -81,17 +101,32 @@ void freeGuichan()
 	gui = NULL;
 }
 
+/**
+**  FIXME: docu
+**
+**  @param event  FIXME: docu
+*/
 void handleInput(const SDL_Event *event) 
 {
-	if(input)
+	if (input) {
 		input->pushInput(*event);
+	}
 }
 
 
-using namespace gcn;
+/*----------------------------------------------------------------------------
+--  LuaActionListener
+----------------------------------------------------------------------------*/
 
-LuaActionListener::LuaActionListener(lua_State *l, lua_Object f):
-luastate(l)
+
+/**
+**  FIXME: docu
+**
+**  @param l  FIXME: docu
+**  @param f  FIXME: docu
+*/
+LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
+	luastate(l)
 {
 	if (!lua_isfunction(l, f)) {
 		LuaError(l, "Argument isnt a function");
@@ -101,7 +136,11 @@ luastate(l)
 	luaref = luaL_ref(l, LUA_REGISTRYINDEX);
 }
 
-
+/**
+**  FIXME: docu
+**
+**  @param eventId  FIXME: docu
+*/
 void LuaActionListener::action(const std::string &eventId) 
 {
 	int status;
@@ -122,10 +161,27 @@ void LuaActionListener::action(const std::string &eventId)
 	}
 }
 
-LuaActionListener::~LuaActionListener() {
+/**
+**  FIXME: docu
+*/
+LuaActionListener::~LuaActionListener()
+{
 	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }
 
+
+/*----------------------------------------------------------------------------
+--  ImageButton
+----------------------------------------------------------------------------*/
+
+
+/**
+**  FIXME: docu
+**
+**  @param caption  FIXME: docu
+**  @param a        FIXME: docu
+**  @param b        FIXME: docu
+*/
 ImageButton::ImageButton(char *caption, gcn::Image *a, gcn::Image *b) : Button(caption)
 {
 	setForegroundColor(0xffffff);
@@ -134,10 +190,15 @@ ImageButton::ImageButton(char *caption, gcn::Image *a, gcn::Image *b) : Button(c
 	adjustSize();
 }
 
+/**
+**  FIXME: docu
+**
+**  @param graphics  FIXME: docu
+*/
 void ImageButton::draw(gcn::Graphics *graphics) 
 {
-	Color faceColor = getBaseColor();
-	Color highlightColor, shadowColor;
+	gcn::Color faceColor = getBaseColor();
+	gcn::Color highlightColor, shadowColor;
 	int alpha = getBaseColor().a;
 
 	if (isPressed()) {
@@ -148,7 +209,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		shadowColor = faceColor + 0x303030;
 		shadowColor.a = alpha;
 		graphics->drawImage(pressedImage, 0, 0, 0, 0,
-				pressedImage->getWidth(), pressedImage->getHeight());
+			pressedImage->getWidth(), pressedImage->getHeight());
 	} else if (0 && hasMouse()) {
 		highlightColor = faceColor + 0x303030;
 		highlightColor.a = alpha;
@@ -160,7 +221,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		shadowColor = faceColor - 0x303030;
 		shadowColor.a = alpha;
 		graphics->drawImage(normalImage, 0, 0, 0, 0,
-				normalImage->getWidth(), normalImage->getHeight());
+			normalImage->getWidth(), normalImage->getHeight());
 	}
 	graphics->setColor(faceColor);
     
@@ -178,13 +239,13 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	int textY = getHeight() / 2 - getFont()->getHeight() / 2;
         
 	switch (getAlignment()) {
-	case Graphics::LEFT:
+	case gcn::Graphics::LEFT:
 		textX = 4;
 		break;
-	case Graphics::CENTER:
+	case gcn::Graphics::CENTER:
 		textX = getWidth() / 2;
 		break;
-	case Graphics::RIGHT:
+	case gcn::Graphics::RIGHT:
 		textX = getWidth() - 4;
 		break;
 	default:
@@ -203,10 +264,13 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	} 
 }
 
-
+/**
+**  FIXME: docu
+*/
 void ImageButton::adjustSize()
 {
 	setWidth(normalImage->getWidth());
 	setHeight(normalImage->getHeight());
 }
 
+//@}
