@@ -169,7 +169,7 @@ namespace gcn
          * Sets the row and the column the caret should be in in the text.
          *
          * @param row the row number.
-         * @param the column number.
+         * @param column the column number.
          */
         virtual void setCaretRowColumn(int row, int column);
 
@@ -237,7 +237,7 @@ namespace gcn
         /**
          * Draws the caret.
          *
-         * @param graphis a Graphics object to draw with.
+         * @param graphics a Graphics object to draw with.
          * @param x the x position.
          * @param y the y position.
          */

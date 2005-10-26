@@ -111,14 +111,14 @@ namespace gcn
          * representation.
          *
          * @param button an SDL mouse button.
-         * @param a Guichan button.     
+         * @return a Guichan button.     
          */
         int convertMouseButton(int button);
 
         /**
          * Converts an SDL keysym to a Key object.
          *
-         * @param ley an SDL keysym
+         * @param key an SDL keysym
          * @return a Key object.
          */
         Key convertKeyCharacter(SDL_keysym key);

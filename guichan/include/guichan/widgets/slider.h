@@ -145,7 +145,7 @@ namespace gcn
         /**
          * Draws the marker.
          *
-         * @param Graphics a graphics object to draw with.
+         * @param graphics a graphics object to draw with.
          */    
         virtual void drawMarker(gcn::Graphics* graphics);
         

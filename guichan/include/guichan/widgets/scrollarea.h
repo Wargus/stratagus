@@ -109,7 +109,7 @@ namespace gcn
         /**
          * Sets the content.
          *
-         * @param content the content of the ScrollArea.
+         * @param widget the content of the ScrollArea.
          */    
         virtual void setContent(Widget* widget);
 
