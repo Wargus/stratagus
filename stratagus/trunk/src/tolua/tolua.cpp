@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Thu Oct 27 21:03:47 2005.
+** Generated automatically by tolua++-1.0.7 on 10/27/05 22:12:30.
 */
 
 #ifndef __cplusplus
@@ -40,6 +40,13 @@ static int tolua_collect_TextField (lua_State* tolua_S)
 static int tolua_collect_LuaActionListener (lua_State* tolua_S)
 {
  LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_CColor (lua_State* tolua_S)
+{
+ CColor* self = (CColor*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -86,9 +93,9 @@ static int tolua_collect_RadioButton (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_CColor (lua_State* tolua_S)
+static int tolua_collect_Windows (lua_State* tolua_S)
 {
- CColor* self = (CColor*) tolua_tousertype(tolua_S,1,0);
+ Windows* self = (Windows*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -122,17 +129,18 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"DropDownWidget");
- tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"Windows");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"CheckBox");
@@ -1754,6 +1762,113 @@ static int tolua_stratagus_Container_add00(lua_State* tolua_S)
 #endif
  {
   Container* self = (Container*)  tolua_tousertype(tolua_S,1,0);
+  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+  int x = ((int)  tolua_tonumber(tolua_S,3,0));
+  int y = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
+#endif
+ {
+  self->add(widget,x,y);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  Windows */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_new00
+static int tolua_stratagus_Windows_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Windows",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string text = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  int width = ((int)  tolua_tonumber(tolua_S,3,0));
+  int height = ((int)  tolua_tonumber(tolua_S,4,0));
+ {
+  Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"Windows");
+ tolua_pushcppstring(tolua_S,(const char*)text);
+ }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  Windows */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_new00_local
+static int tolua_stratagus_Windows_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Windows",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string text = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  int width = ((int)  tolua_tonumber(tolua_S,3,0));
+  int height = ((int)  tolua_tonumber(tolua_S,4,0));
+ {
+  Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Windows");
+ tolua_pushcppstring(tolua_S,(const char*)text);
+ }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: add of class  Windows */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_add00
+static int tolua_stratagus_Windows_add00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Windows",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Windows* self = (Windows*)  tolua_tousertype(tolua_S,1,0);
   Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
   int x = ((int)  tolua_tonumber(tolua_S,3,0));
   int y = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -3802,6 +3917,17 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_cclass(tolua_S,"Container","Container","",NULL);
  tolua_beginmodule(tolua_S,"Container");
   tolua_function(tolua_S,"add",tolua_stratagus_Container_add00);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"Windows","Windows","Widget",tolua_collect_Windows);
+#else
+ tolua_cclass(tolua_S,"Windows","Windows","Widget",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"Windows");
+  tolua_function(tolua_S,"new",tolua_stratagus_Windows_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_Windows_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_Windows_new00_local);
+  tolua_function(tolua_S,"add",tolua_stratagus_Windows_add00);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"top",tolua_get_top_ptr,tolua_set_top_ptr);
  tolua_cclass(tolua_S,"CVideo","CVideo","",NULL);
