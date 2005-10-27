@@ -222,6 +222,7 @@ namespace gcn
     
         virtual void mouseRelease(int x, int y, int button);    
 
+        virtual void setFont(Font *font);
         
     protected:
         /**
