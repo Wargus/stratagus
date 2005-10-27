@@ -95,6 +95,14 @@ class ListBoxWidget : public Widget
 	void setList(lua_State *lua, lua_Object *lo);
 };
 
+class DropDownWidget : public Widget
+{
+	DropDownWidget();
+	void setList(lua_State *lua, lua_Object *lo);
+	int getSelected();
+	void setSelected(int selection);
+};
+
 class Container
 {
 	void add(Widget *widget, int x, int y);
