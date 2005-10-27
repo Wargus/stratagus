@@ -288,12 +288,13 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 	}
 }
 
-
-ListBoxWidget::ListBoxWidget()
+void ListBoxWidget::setList(lua_State *lua, lua_Object *lo) 
 {
+	listmodel.setList(lua, lo);
+	setListModel(&listmodel);
 }
 
-void ListBoxWidget::setList(lua_State *lua, lua_Object *lo) 
+void DropDownWidget::setList(lua_State *lua, lua_Object *lo) 
 {
 	listmodel.setList(lua, lo);
 	setListModel(&listmodel);
