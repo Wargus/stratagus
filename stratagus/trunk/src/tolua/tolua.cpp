@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Tue Oct 25 21:40:54 2005.
+** Generated automatically by tolua++-1.0.7 on Thu Oct 27 20:18:49 2005.
 */
 
 #ifndef __cplusplus
@@ -65,6 +65,13 @@ static int tolua_collect_CPlayer (lua_State* tolua_S)
  return 0;
 }
 
+static int tolua_collect_ListBoxWidget (lua_State* tolua_S)
+{
+ ListBoxWidget* self = (ListBoxWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_RadioButton (lua_State* tolua_S)
 {
  RadioButton* self = (RadioButton*) tolua_tousertype(tolua_S,1,0);
@@ -109,21 +116,22 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"LuaActionListener");
- tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
@@ -1470,6 +1478,96 @@ static int tolua_stratagus_TextField_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  ListBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ListBoxWidget_new00
+static int tolua_stratagus_ListBoxWidget_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ListBoxWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  ListBoxWidget* tolua_ret = (ListBoxWidget*)  new ListBoxWidget();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ListBoxWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ListBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ListBoxWidget_new00_local
+static int tolua_stratagus_ListBoxWidget_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ListBoxWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  ListBoxWidget* tolua_ret = (ListBoxWidget*)  new ListBoxWidget();
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ListBoxWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setList of class  ListBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ListBoxWidget_setList00
+static int tolua_stratagus_ListBoxWidget_setList00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ListBoxWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ListBoxWidget* self = (ListBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+  lua_State* lua =  tolua_S;
+  lua_Object lo = ((lua_Object)  tolua_tovalue(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setList'",NULL);
+#endif
+ {
+  self->setList(lua,&lo);
+ tolua_pushvalue(tolua_S,(int)lo);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setList'.",&tolua_err);
  return 0;
 #endif
 }
@@ -3513,6 +3611,17 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_TextField_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_TextField_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_TextField_new00_local);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"ListBoxWidget","ListBoxWidget","Widget",tolua_collect_ListBoxWidget);
+#else
+ tolua_cclass(tolua_S,"ListBoxWidget","ListBoxWidget","Widget",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"ListBoxWidget");
+  tolua_function(tolua_S,"new",tolua_stratagus_ListBoxWidget_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_ListBoxWidget_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_ListBoxWidget_new00_local);
+  tolua_function(tolua_S,"setList",tolua_stratagus_ListBoxWidget_setList00);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"Container","Container","",NULL);
  tolua_beginmodule(tolua_S,"Container");

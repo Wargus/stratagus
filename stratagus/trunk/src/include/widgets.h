@@ -65,3 +65,22 @@ class ImageWidget : public gcn::Icon
 public:
 	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
 };
+
+class LuaListModel : public gcn::ListModel
+{
+	std::vector<std::string> list;
+public:
+	LuaListModel() {}
+
+	void setList(lua_State *lua, lua_Object *lo); 
+	virtual int getNumberOfElements() {return list.size();}
+	virtual std::string getElementAt(int i) {return list[i];}
+};
+
+class ListBoxWidget : public gcn::ListBox
+{
+	LuaListModel listmodel;
+public:
+	ListBoxWidget();
+	void setList(lua_State *lua, lua_Object *lo);
+};
