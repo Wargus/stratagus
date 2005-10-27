@@ -108,5 +108,11 @@ class Container
 	void add(Widget *widget, int x, int y);
 };
 
+class Windows : public Widget
+{
+	Windows(const std::string &text, int width, int height);
+	void add(Widget *widget, int x, int y);
+};
+
 extern Container *top;
 

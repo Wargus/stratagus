@@ -66,13 +66,23 @@ public:
 	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
 };
 
+class Windows : public gcn::Window
+{
+public:
+	Windows(const std::string &text, int width, int height);
+	void add(gcn::Widget *widget, int x, int y);
+private:
+	gcn::ScrollArea scroll;   /// To use scroll bar.
+	gcn::Container container; /// data container.
+};
+
 class LuaListModel : public gcn::ListModel
 {
 	std::vector<std::string> list;
 public:
 	LuaListModel() {}
 
-	void setList(lua_State *lua, lua_Object *lo); 
+	void setList(lua_State *lua, lua_Object *lo);
 	virtual int getNumberOfElements() {return list.size();}
 	virtual std::string getElementAt(int i) {return list[i];}
 };
@@ -92,3 +102,4 @@ public:
 	DropDownWidget() {}
 	void setList(lua_State *lua, lua_Object *lo);
 };
+

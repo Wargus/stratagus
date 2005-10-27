@@ -211,7 +211,7 @@ char *strcasestr(const char *a, const char *b)
 **  an 'argument required' error.
 */
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 
 #include <io.h>
 #include <string.h>
