@@ -273,6 +273,27 @@ void ImageButton::adjustSize()
 	setHeight(normalImage->getHeight());
 }
 
+Windows::Windows(const std::string &title, int width, int height) : Window(title)
+{
+	container.setDimension(gcn::Rectangle(0, 0, width, height));
+	scroll.setDimension(gcn::Rectangle(0, 0, width, height));
+	this->setContent(&scroll);
+	scroll.setContent(&container);
+	this->resizeToContent();
+}
+
+
+void Windows::add(Widget *widget, int x, int y)
+{
+	container.add(widget, x, y);
+	if (x + widget->getWidth() > container.getWidth()) {
+		container.setWidth(x + widget->getWidth());
+	}
+	if (y + widget->getHeight() > container.getHeight()) {
+		container.setHeight(y + widget->getHeight());
+	}
+}
+
 void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 {
 	int args;
@@ -288,7 +309,7 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 	}
 }
 
-void ListBoxWidget::setList(lua_State *lua, lua_Object *lo) 
+void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
 	listmodel.setList(lua, lo);
 	setListModel(&listmodel);
