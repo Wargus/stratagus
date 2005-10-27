@@ -675,6 +675,12 @@ namespace gcn
         }
                 
         Widget::setForegroundColor(color);
+    }
+
+    void DropDown::setFont(Font *font) 
+    {
+        Widget::setFont(font);
+        mListBox->setFont(font);
     }     
 }
 
