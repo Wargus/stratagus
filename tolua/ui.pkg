@@ -89,6 +89,12 @@ class TextField : public Widget
 	TextField(const std::string &text);
 };
 
+class ListBoxWidget : public Widget
+{
+	ListBoxWidget();
+	void setList(lua_State *lua, lua_Object *lo);
+};
+
 class Container
 {
 	void add(Widget *widget, int x, int y);

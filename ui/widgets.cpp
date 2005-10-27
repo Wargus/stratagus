@@ -273,4 +273,30 @@ void ImageButton::adjustSize()
 	setHeight(normalImage->getHeight());
 }
 
+void LuaListModel::setList(lua_State *lua, lua_Object *lo)
+{
+	int args;
+	int j;
+
+	list.clear();
+
+	args = luaL_getn(lua, *lo);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(lua, *lo, j + 1);
+		list.push_back(std::string(LuaToString(lua, -1)));
+		lua_pop(lua, *lo);
+	}
+}
+
+
+ListBoxWidget::ListBoxWidget()
+{
+}
+
+void ListBoxWidget::setList(lua_State *lua, lua_Object *lo) 
+{
+	listmodel.setList(lua, lo);
+	setListModel(&listmodel);
+}
+
 //@}
