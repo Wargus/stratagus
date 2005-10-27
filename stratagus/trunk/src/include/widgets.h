@@ -81,6 +81,14 @@ class ListBoxWidget : public gcn::ListBox
 {
 	LuaListModel listmodel;
 public:
-	ListBoxWidget();
+	ListBoxWidget() {}
+	void setList(lua_State *lua, lua_Object *lo);
+};
+
+class DropDownWidget : public gcn::DropDown
+{
+	LuaListModel listmodel;
+public:
+	DropDownWidget() {}
 	void setList(lua_State *lua, lua_Object *lo);
 };
