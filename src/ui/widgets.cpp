@@ -239,17 +239,17 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	int textY = getHeight() / 2 - getFont()->getHeight() / 2;
         
 	switch (getAlignment()) {
-	case gcn::Graphics::LEFT:
-		textX = 4;
-		break;
-	case gcn::Graphics::CENTER:
-		textX = getWidth() / 2;
-		break;
-	case gcn::Graphics::RIGHT:
-		textX = getWidth() - 4;
-		break;
-	default:
-		throw GCN_EXCEPTION("Unknown alignment.");
+		case gcn::Graphics::LEFT:
+			textX = 4;
+			break;
+		case gcn::Graphics::CENTER:
+			textX = getWidth() / 2;
+			break;
+		case gcn::Graphics::RIGHT:
+			textX = getWidth() - 4;
+			break;
+		default:
+			throw GCN_EXCEPTION("Unknown alignment.");
 	}
 
 	graphics->setFont(getFont());       
@@ -273,6 +273,15 @@ void ImageButton::adjustSize()
 	setHeight(normalImage->getHeight());
 }
 
+
+/*----------------------------------------------------------------------------
+--  Windows
+----------------------------------------------------------------------------*/
+
+
+/**
+**  FIXME: docu
+*/
 Windows::Windows(const std::string &title, int width, int height) : Window(title)
 {
 	container.setDimension(gcn::Rectangle(0, 0, width, height));
@@ -282,7 +291,9 @@ Windows::Windows(const std::string &title, int width, int height) : Window(title
 	this->resizeToContent();
 }
 
-
+/**
+**  FIXME: docu
+*/
 void Windows::add(gcn::Widget *widget, int x, int y)
 {
 	container.add(widget, x, y);
@@ -294,6 +305,15 @@ void Windows::add(gcn::Widget *widget, int x, int y)
 	}
 }
 
+
+/*----------------------------------------------------------------------------
+--  LuaListModel
+----------------------------------------------------------------------------*/
+
+
+/**
+**  FIXME: docu
+*/
 void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 {
 	int args;
@@ -309,12 +329,30 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 	}
 }
 
+
+/*----------------------------------------------------------------------------
+--  ListBoxWidget
+----------------------------------------------------------------------------*/
+
+
+/**
+**  FIXME: docu
+*/
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
 	listmodel.setList(lua, lo);
 	setListModel(&listmodel);
 }
 
+
+/*----------------------------------------------------------------------------
+--  DropDownWidget
+----------------------------------------------------------------------------*/
+
+
+/**
+**  FIXME: docu
+*/
 void DropDownWidget::setList(lua_State *lua, lua_Object *lo) 
 {
 	listmodel.setList(lua, lo);
