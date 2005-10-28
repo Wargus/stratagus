@@ -283,7 +283,7 @@ Windows::Windows(const std::string &title, int width, int height) : Window(title
 }
 
 
-void Windows::add(Widget *widget, int x, int y)
+void Windows::add(gcn::Widget *widget, int x, int y)
 {
 	container.add(widget, x, y);
 	if (x + widget->getWidth() > container.getWidth()) {
