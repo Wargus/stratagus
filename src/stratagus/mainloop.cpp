@@ -76,7 +76,7 @@
 #endif
 
 #include <guichan.h>
-extern gcn::Gui *gui;
+void DrawGuichanWidgets();
 
 //----------------------------------------------------------------------------
 // Variables
@@ -260,11 +260,8 @@ void UpdateDisplay(void)
 
 	DrawPieMenu(); // draw pie menu only if needed
 	DrawMenu(CurrentMenu);
-	
-	if (gui) {
-		gui->logic();
-		gui->draw();
-	}
+
+	DrawGuichanWidgets();
 	
 	if (CursorState != CursorStateRectangle) {
 		DrawCursor();
