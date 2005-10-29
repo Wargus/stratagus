@@ -489,14 +489,6 @@ void PreMenuSetup(void)
 */
 void MenuLoop(const char *filename, CMap *map)
 {
-	char buf[1024];
-
-	//FIXME move this higher up when switching to full guichan
-	initGuichan(Video.Width, Video.Height); 
-	// FIXME delete this when switching to full guichan GUI
-	LibraryFileName("scripts/guichan.lua", buf);
-	LuaLoadFile(buf);
-
 	for (;;) {
 		//
 		//  Clear screen
@@ -603,9 +595,56 @@ void MenuLoop(const char *filename, CMap *map)
 			DebugPrint("Next chapter %s\n" _C_ CurrentMapPath);
 		}
 	}
+}
 
-	//FIXME move this at a better place when switching to full guichan
+/**
+**  Menu loop.
+**
+**  Show the menus, start game, return back.
+**
+**  @param filename  map filename
+**  @param map       map loaded
+*/
+void GuichanLoop(const char *filename, CMap *map)
+{
+	char buf[1024];
+
+	initGuichan(Video.Width, Video.Height);
+
+	//  Clear screen
+	Video.ClearScreen();
+	Invalidate();
+
+	ButtonUnderCursor = -1;
+	CursorState = CursorStatePoint;
+	GameCursor = UI.Point.Cursor;
+
+	// FIXME delete this when switching to full guichan GUI
+	LibraryFileName("scripts/guichan.lua", buf);
+
+	LuaLoadFile(buf);
+
 	freeGuichan();
+}
+
+void StartMap(const char *filename) 
+{
+	guichanActive = false;
+
+	//  Create the game.
+	DebugPrint("Creating game with map: %s\n" _C_ filename);
+	CreateGame(filename, &Map);
+
+	UI.StatusLine.Set(NameLine);
+	SetMessage("Do it! Do it now!");
+
+	//  Play the game.
+	GameMainLoop();
+
+	//  Clear screen
+	Video.ClearScreen();
+	Invalidate();
+	guichanActive = true;
 }
 
 //----------------------------------------------------------------------------
@@ -672,6 +711,7 @@ static int main1(int argc, char **argv)
 	InitUnitsMemory();  // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
+	GuichanLoop(MapName, &Map);
 	MenuLoop(MapName, &Map);  // Enter the menu loop
 
 	return 0;

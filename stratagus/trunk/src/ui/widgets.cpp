@@ -52,6 +52,8 @@ gcn::SDLInput *input;  /// Input driver
 // All of the default widgets
 gcn::Container *top;  /// A top container
 
+bool guichanActive = true;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -86,6 +88,8 @@ void initGuichan(int width, int height)
 	gui->setInput(input);	
 	gui->setTop(top);
 	top->setOpaque(false);
+
+	guichanActive = true;
 }
 
 /**
@@ -99,6 +103,7 @@ void freeGuichan()
 	delete input;
 
 	gui = NULL;
+	input = NULL;
 }
 
 /**
@@ -108,11 +113,18 @@ void freeGuichan()
 */
 void handleInput(const SDL_Event *event) 
 {
-	if (input) {
+	if (input && guichanActive) {
 		input->pushInput(*event);
 	}
 }
 
+void DrawGuichanWidgets() 
+{
+	if (gui && guichanActive) {
+		gui->logic();
+		gui->draw();
+	}
+}
 
 /*----------------------------------------------------------------------------
 --  LuaActionListener
@@ -357,6 +369,25 @@ void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 {
 	listmodel.setList(lua, lo);
 	setListModel(&listmodel);
+}
+
+/*----------------------------------------------------------------------------
+--  MenuScreen
+----------------------------------------------------------------------------*/
+
+
+void MenuScreen::run() 
+{
+	while (runLoop) {
+		UpdateDisplay();
+		RealizeVideoMemory();
+		WaitEventsOneFrame(&MenuCallbacks);
+	}
+}
+
+void MenuScreen::stop() 
+{
+	runLoop = false;
 }
 
 //@}

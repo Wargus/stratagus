@@ -106,6 +106,7 @@ class DropDownWidget : public Widget
 class Container
 {
 	void add(Widget *widget, int x, int y);
+	void clear();
 };
 
 class Windows : public Widget
@@ -115,4 +116,16 @@ class Windows : public Widget
 };
 
 extern Container *top;
+
+class MenuScreen
+{
+	MenuScreen() : runLoop(false) {}
+	void run();
+	void stop();
+};
+
+
+$void StartMap(const char *str);
+
+void StartMap(const char *str);
 
