@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Oct 29 22:44:33 2005.
+** Generated automatically by tolua++-1.0.7 on Sun Oct 30 00:06:12 2005.
 */
 
 #ifndef __cplusplus
@@ -1593,6 +1593,71 @@ static int tolua_stratagus_ListBoxWidget_setList00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setList'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setSelected of class  ListBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ListBoxWidget_setSelected00
+static int tolua_stratagus_ListBoxWidget_setSelected00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ListBoxWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ListBoxWidget* self = (ListBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+  int selected = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSelected'",NULL);
+#endif
+ {
+  self->setSelected(selected);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setSelected'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getSelected of class  ListBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ListBoxWidget_getSelected00
+static int tolua_stratagus_ListBoxWidget_getSelected00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ListBoxWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ListBoxWidget* self = (ListBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getSelected'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getSelected();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getSelected'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4121,6 +4186,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new_local",tolua_stratagus_ListBoxWidget_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_ListBoxWidget_new00_local);
   tolua_function(tolua_S,"setList",tolua_stratagus_ListBoxWidget_setList00);
+  tolua_function(tolua_S,"setSelected",tolua_stratagus_ListBoxWidget_setSelected00);
+  tolua_function(tolua_S,"getSelected",tolua_stratagus_ListBoxWidget_getSelected00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","Widget",tolua_collect_DropDownWidget);
