@@ -28,11 +28,15 @@
 //
 //      $Id$
 
+#ifndef __WIDGETS_H__
+#define __WIDGETS_H__
+
 #include <guichan.h>
 #include <guichan/gsdl.h>
 typedef int lua_Object; // from tolua++.h
 
 extern gcn::Container *top;
+extern bool guichanActive;
 
 void initGuichan(int w, int h);
 void freeGuichan();
@@ -102,4 +106,15 @@ public:
 	DropDownWidget() {}
 	void setList(lua_State *lua, lua_Object *lo);
 };
+
+class MenuScreen
+{
+	bool runLoop;
+public:
+	MenuScreen() : runLoop(true) {}
+	void run();
+	void stop();
+};
+
+#endif
 
