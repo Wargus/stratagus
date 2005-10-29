@@ -337,7 +337,7 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(lua, *lo, j + 1);
 		list.push_back(std::string(LuaToString(lua, -1)));
-		lua_pop(lua, *lo);
+		lua_pop(lua, 1);
 	}
 }
 
