@@ -117,11 +117,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 					Component = "Max"}} },
 	{ Pos = {16, 102}, More = {"Text", {Text = "Demand : ", Variable = "Demand",
 					Component = "Max"}} },
-	{ Pos = {16, 102}, More = {"FormattedText", {Format = "Demand : ~<%d~>",
-					Variable = "Demand", Component = "Max"}}
 -- FIXME COLOR when Demand >= Supply
-    }
-
   } },
 -- All own unit -----------------
   {
