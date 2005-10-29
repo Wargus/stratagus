@@ -29,6 +29,6 @@
 --  Define level 02 Map Presentation
 --
 
-DefinePlayerTypes("person","person")
+DefinePlayerTypes("person", "person", "nobody", "rescue-passive")
 PresentMap("Campaign_one_map_two", 2, 128, 128, -182366288)
 DefineMapSetup("campaigns/elites/level02.sms")
