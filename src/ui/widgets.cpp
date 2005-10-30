@@ -273,7 +273,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
     
 	if (hasFocus()) {
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
-	} 
+	}
 }
 
 /**
@@ -378,6 +378,7 @@ void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 
 void MenuScreen::run() 
 {
+	SetVideoSync();
 	while (runLoop) {
 		UpdateDisplay();
 		RealizeVideoMemory();
@@ -385,7 +386,7 @@ void MenuScreen::run()
 	}
 }
 
-void MenuScreen::stop() 
+void MenuScreen::stop()
 {
 	runLoop = false;
 }
