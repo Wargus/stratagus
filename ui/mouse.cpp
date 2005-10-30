@@ -730,6 +730,19 @@ void UIHandleMouseMove(int x, int y)
 	//  Selecting units.
 	//
 	if (CursorState == CursorStateRectangle) {
+		// Restrict cursor to viewport.
+		if (CursorX < UI.SelectedViewport->X) {
+			CursorX = UI.SelectedViewport->X;
+		} else if (CursorX >= UI.SelectedViewport->EndX) {
+			CursorX = UI.SelectedViewport->EndX - 1;
+		}
+		if (CursorY < UI.SelectedViewport->Y) {
+			CursorY = UI.SelectedViewport->Y;
+		} else if (CursorY >= UI.SelectedViewport->EndY) {
+			CursorY = UI.SelectedViewport->EndY - 1;
+		}
+		UI.MouseWarpX = CursorX;
+		UI.MouseWarpY = CursorY;
 		return;
 	}
 
