@@ -64,6 +64,7 @@ namespace gcn
     SDLInput::SDLInput()
     {
         mMouseInWindow = true;
+		mMouseDown = false;
     }
     
     bool SDLInput::isKeyQueueEmpty()
@@ -217,7 +218,14 @@ namespace gcn
     
         if (keysym.unicode < 255)
         {
-            value = (int)keysym.unicode;
+			if (keysym.unicode == 0)
+			{
+				value = keysym.sym;
+			}
+			else
+			{
+	            value = (int)keysym.unicode;
+			}
         }
 
         switch (keysym.sym)
