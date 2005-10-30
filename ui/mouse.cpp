@@ -142,7 +142,8 @@ void DoRightButton(int sx, int sy)
 	//
 	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
 		unit = Selected[0];
-		if (unit->Player->Index != PlayerNumNeutral || dest == NULL) {
+		if (unit->Player->Index != PlayerNumNeutral || dest == NULL ||
+			!(dest->Player == ThisPlayer || dest->IsTeamed(ThisPlayer))) {
 			return ;
 		}
 		// tell to go and harvest from a unit
