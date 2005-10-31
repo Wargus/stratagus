@@ -4,7 +4,7 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2001-2004 by Lutz Sammer
+----	(c) Copyright 2001-2005 by Lutz Sammer
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -29,17 +29,13 @@
 <h1>FAQ for Stratagus Version 2.1</h1>
 <hr>
 
-    <b>Q: gzseek already defined or undefined.</b><br>
-    A: You have an incompatible libpng version, install the latest version.<p>
-
     <b>Q: .depend:1: *** missing separator.  Stop.</b><br>
     A: The .depend file is broken, simply 'rm .depend' and 'make depend' 
     again. If the problem still occurs, you will need to 'make' without 
     making dependencies first.<p>
 
     <b>Q: Does Stratagus work with ALSA?</b><br>
-    A: Yes, if you compiled SDL with alsa support and you compiled stratagus
-    using SDL video mode.<p>
+    A: Yes, if you compiled SDL with ALSA support.<p>
 
     <b>Q: What ports does the Stratagus network protocol use?</b><br>
     A: Stratagus uses UDP with port 6660 by default, you may start stratagus 
@@ -48,25 +44,12 @@
     <b>Q: Does stratagus support internet/metaserver play?</b><br>
     A: Not yet, but this is a planned feature and may be added for 2.2<p>
 
-    <b>Q: I get only a black window after I have installed it on windows.
-    What have I done wrong?</b><br>
-    A: Install Stratagus to the C: drive. This has solved the problem for
-    everybody who has had this bug.<p>
-
     <b>Q: Stratagus runs really slow in large resolutions, what can I do?</b><br>
     A: Versions of Stratagus from 2.1 update the screen every frame, and are
     designed to be used with OpenGL support.  Using Software/SDL to update
     large screens is too slow and will cause the game to be slow. Use
     OpenGL if possible, or play in 640x480.<p>
 	
-    <b>Q: I have installed the windows version, when I start Stratagus I get
-    only the splash screen and the game stops, but consumes 100% CPU. What
-    have I done wrong?</b><br>
-    A: Please wait for a couple of minutes for the game to start. There are
-    some machines (Win98 and Win2000) that will still not start after some
-    time.  On all machines I have tested it, it works.  I have no idea where
-    the problem is, any help is welcome.<p>
-
     <b>Q: Can I use Stratagus to play Age of Empires, StarCraft, or any
     other commercial game?</b><br>
     </b>A: No.<p>
