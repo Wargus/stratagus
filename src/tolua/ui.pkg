@@ -56,6 +56,13 @@ class Widget
 	void setBaseColor(const Color &color);
 };
 
+$[
+Widget.setActionCallback = function(w, f) 
+  w.actioncb = LuaActionListener(f)
+  w:addActionListener(w.actioncb)
+end 
+$]
+
 class ImageButton : public Widget
 {
 	ImageButton(char *caption, CGraphic *normalImage, CGraphic *pressedImage);
@@ -136,8 +143,6 @@ class MenuScreen : Container
 	void stop();
 };
 
-
 $void StartMap(const char *str);
-
 void StartMap(const char *str);
 
