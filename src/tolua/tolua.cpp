@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Tue Nov  1 12:18:32 2005.
+** Generated automatically by tolua++-1.0.7 on Tue Nov  1 13:55:28 2005.
 */
 
 #ifndef __cplusplus
@@ -148,14 +148,14 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CFontColor");
- tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"Windows");
  tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"CIcon");
  tolua_usertype(tolua_S,"ImageButton");
- tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"MenuScreen");
@@ -2117,74 +2117,6 @@ static int tolua_stratagus_DropDownWidget_setSelected00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: add of class  Container */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Container_add00
-static int tolua_stratagus_Container_add00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"Container",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  Container* self = (Container*)  tolua_tousertype(tolua_S,1,0);
-  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
-  int x = ((int)  tolua_tonumber(tolua_S,3,0));
-  int y = ((int)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
-#endif
- {
-  self->add(widget,x,y);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: clear of class  Container */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Container_clear00
-static int tolua_stratagus_Container_clear00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"Container",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  Container* self = (Container*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'",NULL);
-#endif
- {
-  self->clear();
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'clear'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: new of class  Windows */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Windows_new00
 static int tolua_stratagus_Windows_new00(lua_State* tolua_S)
@@ -2292,27 +2224,71 @@ static int tolua_stratagus_Windows_add00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: top */
-#ifndef TOLUA_DISABLE_tolua_get_top_ptr
-static int tolua_get_top_ptr(lua_State* tolua_S)
-{
- tolua_pushusertype(tolua_S,(void*)top,"Container");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: top */
-#ifndef TOLUA_DISABLE_tolua_set_top_ptr
-static int tolua_set_top_ptr(lua_State* tolua_S)
+/* method: add of class  Container */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Container_add00
+static int tolua_stratagus_Container_add00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!tolua_isusertype(tolua_S,2,"Container",0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+ if (
+ !tolua_isusertype(tolua_S,1,"Container",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
 #endif
-  top = ((Container*)  tolua_tousertype(tolua_S,2,0))
-;
+ {
+  Container* self = (Container*)  tolua_tousertype(tolua_S,1,0);
+  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+  int x = ((int)  tolua_tonumber(tolua_S,3,0));
+  int y = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
+#endif
+ {
+  self->add(widget,x,y);
+ }
+ }
  return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: clear of class  Container */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Container_clear00
+static int tolua_stratagus_Container_clear00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Container",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Container* self = (Container*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'",NULL);
+#endif
+ {
+  self->clear();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'clear'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -4518,11 +4494,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"getSelected",tolua_stratagus_DropDownWidget_getSelected00);
   tolua_function(tolua_S,"setSelected",tolua_stratagus_DropDownWidget_setSelected00);
  tolua_endmodule(tolua_S);
- tolua_cclass(tolua_S,"Container","Container","",NULL);
- tolua_beginmodule(tolua_S,"Container");
-  tolua_function(tolua_S,"add",tolua_stratagus_Container_add00);
-  tolua_function(tolua_S,"clear",tolua_stratagus_Container_clear00);
- tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"Windows","Windows","Widget",tolua_collect_Windows);
 #else
@@ -4534,11 +4505,15 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_Windows_new00_local);
   tolua_function(tolua_S,"add",tolua_stratagus_Windows_add00);
  tolua_endmodule(tolua_S);
- tolua_variable(tolua_S,"top",tolua_get_top_ptr,tolua_set_top_ptr);
+ tolua_cclass(tolua_S,"Container","Container","",NULL);
+ tolua_beginmodule(tolua_S,"Container");
+  tolua_function(tolua_S,"add",tolua_stratagus_Container_add00);
+  tolua_function(tolua_S,"clear",tolua_stratagus_Container_clear00);
+ tolua_endmodule(tolua_S);
 #ifdef __cplusplus
- tolua_cclass(tolua_S,"MenuScreen","MenuScreen","",tolua_collect_MenuScreen);
+ tolua_cclass(tolua_S,"MenuScreen","MenuScreen","Container",tolua_collect_MenuScreen);
 #else
- tolua_cclass(tolua_S,"MenuScreen","MenuScreen","",NULL);
+ tolua_cclass(tolua_S,"MenuScreen","MenuScreen","Container",NULL);
 #endif
  tolua_beginmodule(tolua_S,"MenuScreen");
   tolua_function(tolua_S,"new",tolua_stratagus_MenuScreen_new00);

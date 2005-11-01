@@ -35,7 +35,6 @@
 #include <guichan/gsdl.h>
 typedef int lua_Object; // from tolua++.h
 
-extern gcn::Container *top;
 extern bool guichanActive;
 
 void initGuichan(int w, int h);
@@ -107,11 +106,12 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 };
 
-class MenuScreen
+class MenuScreen : public gcn::Container
 {
 	bool runLoop;
+	gcn::Widget *oldtop;
 public:
-	MenuScreen() : runLoop(true) {}
+	MenuScreen();
 	void run();
 	void stop();
 };
