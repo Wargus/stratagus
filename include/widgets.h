@@ -10,7 +10,7 @@
 //
 /**@name widgets.h - The widgets headerfile. */
 //
-//      (c) Copyright 1998-2005 by François Beerten
+//      (c) Copyright 2005 by François Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
