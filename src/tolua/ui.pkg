@@ -32,6 +32,15 @@ class CIcon
 
 $using namespace gcn;
 
+class Color
+{
+	Color(int r, int g, int b, int a = 255);
+	int r;
+	int g;
+	int b;
+	int a;
+};
+
 class LuaActionListener
 {
 	LuaActionListener(lua_State *lua, lua_Object luaref);
@@ -42,6 +51,9 @@ class Widget
 	void addActionListener(LuaActionListener *actionListener);
 	void setFont(CFont *font);
 	static void setGlobalFont(CFont *font);
+	void setForegroundColor(const Color &color);
+	void setBackgroundColor(const Color &color);
+	void setBaseColor(const Color &color);
 };
 
 class ImageButton : public Widget

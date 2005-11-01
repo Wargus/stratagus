@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Oct 30 00:06:12 2005.
+** Generated automatically by tolua++-1.0.7 on Tue Nov  1 12:18:32 2005.
 */
 
 #ifndef __cplusplus
@@ -31,6 +31,13 @@ void StartMap(const char *str);
 /* function to release collected object via destructor */
 #ifdef __cplusplus
 
+static int tolua_collect_MenuScreen (lua_State* tolua_S)
+{
+ MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_TextField (lua_State* tolua_S)
 {
  TextField* self = (TextField*) tolua_tousertype(tolua_S,1,0);
@@ -45,9 +52,9 @@ static int tolua_collect_LuaActionListener (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_MenuScreen (lua_State* tolua_S)
+static int tolua_collect_Color (lua_State* tolua_S)
 {
- MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ Color* self = (Color*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -136,7 +143,8 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"Color");
+ tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CFontColor");
@@ -156,7 +164,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"ListBoxWidget");
+ tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
@@ -771,6 +779,198 @@ static int tolua_set_CIcon_Frame(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  Color */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Color_new00
+static int tolua_stratagus_Color_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Color",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int r = ((int)  tolua_tonumber(tolua_S,2,0));
+  int g = ((int)  tolua_tonumber(tolua_S,3,0));
+  int b = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a = ((int)  tolua_tonumber(tolua_S,5,255));
+ {
+  Color* tolua_ret = (Color*)  new Color(r,g,b,a);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"Color");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  Color */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Color_new00_local
+static int tolua_stratagus_Color_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Color",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int r = ((int)  tolua_tonumber(tolua_S,2,0));
+  int g = ((int)  tolua_tonumber(tolua_S,3,0));
+  int b = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a = ((int)  tolua_tonumber(tolua_S,5,255));
+ {
+  Color* tolua_ret = (Color*)  new Color(r,g,b,a);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Color");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: r of class  Color */
+#ifndef TOLUA_DISABLE_tolua_get_Color_r
+static int tolua_get_Color_r(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'r'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->r);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: r of class  Color */
+#ifndef TOLUA_DISABLE_tolua_set_Color_r
+static int tolua_set_Color_r(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'r'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->r = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: g of class  Color */
+#ifndef TOLUA_DISABLE_tolua_get_Color_g
+static int tolua_get_Color_g(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'g'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->g);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: g of class  Color */
+#ifndef TOLUA_DISABLE_tolua_set_Color_g
+static int tolua_set_Color_g(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'g'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->g = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: b of class  Color */
+#ifndef TOLUA_DISABLE_tolua_get_Color_b
+static int tolua_get_Color_b(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'b'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->b);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: b of class  Color */
+#ifndef TOLUA_DISABLE_tolua_set_Color_b
+static int tolua_set_Color_b(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'b'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->b = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: a of class  Color */
+#ifndef TOLUA_DISABLE_tolua_get_Color_a
+static int tolua_get_Color_a(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'a'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->a);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: a of class  Color */
+#ifndef TOLUA_DISABLE_tolua_set_Color_a
+static int tolua_set_Color_a(lua_State* tolua_S)
+{
+  Color* self = (Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'a'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->a = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  LuaActionListener */
 #ifndef TOLUA_DISABLE_tolua_stratagus_LuaActionListener_new00
 static int tolua_stratagus_LuaActionListener_new00(lua_State* tolua_S)
@@ -921,6 +1121,105 @@ static int tolua_stratagus_Widget_setGlobalFont00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setGlobalFont'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setForegroundColor of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setForegroundColor00
+static int tolua_stratagus_Widget_setForegroundColor00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setForegroundColor'",NULL);
+#endif
+ {
+  self->setForegroundColor(*color);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setForegroundColor'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setBackgroundColor of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBackgroundColor00
+static int tolua_stratagus_Widget_setBackgroundColor00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBackgroundColor'",NULL);
+#endif
+ {
+  self->setBackgroundColor(*color);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setBackgroundColor'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setBaseColor of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBaseColor00
+static int tolua_stratagus_Widget_setBaseColor00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBaseColor'",NULL);
+#endif
+ {
+  self->setBaseColor(*color);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setBaseColor'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4087,6 +4386,20 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Frame",tolua_get_CIcon_Frame,tolua_set_CIcon_Frame);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
+ tolua_cclass(tolua_S,"Color","Color","",tolua_collect_Color);
+#else
+ tolua_cclass(tolua_S,"Color","Color","",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"Color");
+  tolua_function(tolua_S,"new",tolua_stratagus_Color_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_Color_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_Color_new00_local);
+  tolua_variable(tolua_S,"r",tolua_get_Color_r,tolua_set_Color_r);
+  tolua_variable(tolua_S,"g",tolua_get_Color_g,tolua_set_Color_g);
+  tolua_variable(tolua_S,"b",tolua_get_Color_b,tolua_set_Color_b);
+  tolua_variable(tolua_S,"a",tolua_get_Color_a,tolua_set_Color_a);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
  tolua_cclass(tolua_S,"LuaActionListener","LuaActionListener","",tolua_collect_LuaActionListener);
 #else
  tolua_cclass(tolua_S,"LuaActionListener","LuaActionListener","",NULL);
@@ -4101,6 +4414,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"addActionListener",tolua_stratagus_Widget_addActionListener00);
   tolua_function(tolua_S,"setFont",tolua_stratagus_Widget_setFont00);
   tolua_function(tolua_S,"setGlobalFont",tolua_stratagus_Widget_setGlobalFont00);
+  tolua_function(tolua_S,"setForegroundColor",tolua_stratagus_Widget_setForegroundColor00);
+  tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor00);
+  tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ImageButton","ImageButton","Widget",tolua_collect_ImageButton);
