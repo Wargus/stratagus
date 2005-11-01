@@ -285,7 +285,11 @@ void ImageButton::adjustSize()
 
 
 /**
-**  FIXME: docu
+**  Constructor.
+**
+**  @param title   Title  of the window.
+**  @param width   Width  of the window.
+**  @param height  Height of the window.
 */
 Windows::Windows(const std::string &title, int width, int height) : Window(title), blockwholewindow(true)
 {
@@ -297,7 +301,11 @@ Windows::Windows(const std::string &title, int width, int height) : Window(title
 }
 
 /**
-**  FIXME: docu
+**  Add a widget in the window.
+**
+**  @param widget  Widget to add.
+**  @param x       Position of the widget in the window.
+**  @param y       Position of the widget in the window.
 */
 void Windows::add(gcn::Widget *widget, int x, int y)
 {
@@ -344,8 +352,8 @@ void Windows::mouseMotion(int x, int y)
 		criticalx = getX();
 		criticaly = getY();
 	} else {
-	criticalx = getX() + mMouseXOffset;
-	criticaly = getY() + mMouseYOffset;
+		criticalx = getX() + mMouseXOffset;
+		criticaly = getY() + mMouseYOffset;
 	}
 
 
