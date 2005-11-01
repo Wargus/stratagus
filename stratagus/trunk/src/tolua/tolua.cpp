@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Tue Nov  1 13:55:28 2005.
+** Generated automatically by tolua++-1.0.7 on Tue Nov  1 16:02:37 2005.
 */
 
 #ifndef __cplusplus
@@ -4394,6 +4394,24 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor00);
   tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor00);
  tolua_endmodule(tolua_S);
+
+ { /* begin embedded lua code */
+  int top;
+  top = lua_gettop(tolua_S);
+  static unsigned char B[] = {
+  10, 87,105,100,103,101,116, 46,115,101,116, 65, 99,116,105,
+  111,110, 67, 97,108,108, 98, 97, 99,107, 32, 61, 32,102,117,
+  110, 99,116,105,111,110, 40,119, 44, 32,102, 41, 10,119, 46,
+   97, 99,116,105,111,110, 99, 98, 32, 61, 32, 76,117, 97, 65,
+   99,116,105,111,110, 76,105,115,116,101,110,101,114, 40,102,
+   41, 10,119, 58, 97,100,100, 65, 99,116,105,111,110, 76,105,
+  115,116,101,110,101,114, 40,119, 46, 97, 99,116,105,111,110,
+   99, 98, 41, 10,101,110,100, 32,32
+  };
+  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 2");
+  lua_settop(tolua_S, top);
+ } /* end of embedded lua code */
+
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ImageButton","ImageButton","Widget",tolua_collect_ImageButton);
 #else
