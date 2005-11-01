@@ -76,7 +76,8 @@ public:
 	void add(gcn::Widget *widget, int x, int y);
 private:
 	virtual void mouseMotion(int x, int y);
-
+	virtual void setBackgroundColor(const gcn::Color &color);
+	virtual void setBaseColor(const gcn::Color &color);
 private:
 	gcn::ScrollArea scroll;   /// To use scroll bar.
 	gcn::Container container; /// data container.
