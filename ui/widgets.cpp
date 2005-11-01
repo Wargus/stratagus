@@ -387,6 +387,28 @@ void Windows::mouseMotion(int x, int y)
 	CursorY = absy + mMouseYOffset;
 }
 
+/**
+**  Set background color of the window.
+**
+**  @param color  Color to set.
+*/
+void Windows::setBackgroundColor(const gcn::Color &color)
+{
+	Window::setBackgroundColor(color);
+	scroll.setBackgroundColor(color);
+}
+
+/**
+**  Set base color of the windows.
+**
+**  @param color  Color to set.
+*/
+void Windows::setBaseColor(const gcn::Color &color)
+{
+	Window::setBaseColor(color);
+	container.setBaseColor(color);
+}
+
 /*----------------------------------------------------------------------------
 --  LuaListModel
 ----------------------------------------------------------------------------*/
