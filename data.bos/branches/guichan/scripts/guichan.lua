@@ -27,7 +27,6 @@
 --
 --      $Id$
 
-
 -- Global usefull objects for menus  ----------
 dark = Color(8, 8, 38, 130)
 clear = Color(200, 200, 120)
@@ -42,6 +41,16 @@ normalImage = CGraphic:New("graphics/button.png", 200, 24)
 pressedImage = CGraphic:New("graphics/pressed.png", 200, 24)
 normalImage:Load() -- FIXME remove when immediatly loaded
 pressedImage:Load() -- idem
+
+local guichanadd = Container.add
+Container.add = function(self, widget, x, y)
+  -- ugly hack, should be done in some kind of constructor
+  if not self._addedWidgets then
+     self._addedWidgets = {}
+  end
+  self._addedWidgets[widget] = true
+  guichanadd(self, widget, x, y)
+end
 
 function BosMenu()
    local menu
@@ -113,56 +122,56 @@ end
 
 function RunWidgetsMenu(s)
   local menu
+  local b
   menu = BosMenu()
 
   b = Label("a label, sir.")
   b:setFont(CFont:Get("game"))
   menu:add(b, 20, 10)
 
-  br = RadioButton("Platoon", "dumgroup", true)
-  br:setActionCallback(function() print("one") end)
-  br:setBaseColor(dark)
-  br:setForegroundColor(clear)
-  br:setBackgroundColor(dark)
-  menu:add(br, 20, 50)
-  be = RadioButton("Army", "dumgroup")
-  be:setActionCallback(function() print("two") end)
-  be:setBaseColor(dark)
-  be:setForegroundColor(clear)
-  be:setBackgroundColor(dark)
-  menu:add(be, 100, 50)
+  b = RadioButton("Platoon", "dumgroup", true)
+  b:setActionCallback(function() print("one") end)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(dark)
+  menu:add(b, 20, 50)
+  b = RadioButton("Army", "dumgroup")
+  b:setActionCallback(function() print("two") end)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(dark)
+  menu:add(b, 150, 50)
 
-  bz = TextField("text widget")
-  bz:setActionCallback(function() print("field") end)
-  bz:setFont(CFont:Get("game"))
-  bz:setBaseColor(clear)
-  bz:setForegroundColor(clear)
-  bz:setBackgroundColor(dark)
-  menu:add(bz, 20, 100)
+  b = TextField("text widget")
+  b:setActionCallback(function() print("field") end)
+  b:setFont(CFont:Get("game"))
+  b:setBaseColor(clear)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(dark)
+  menu:add(b, 20, 100)
 
-  bf = Slider(0, 1)
-  bf:setActionCallback(function() print("slider") end)
-  menu:add(bf, 20, 150)
-  bf:setWidth(60)
-  bf:setHeight(20)
-  bf:setBaseColor(dark)
-  bf:setForegroundColor(clear)
-  bf:setBackgroundColor(clear)
-
+  b = Slider(0, 1)
+  b:setActionCallback(function() print("slider") end)
+  menu:add(b, 20, 150)
+  b:setWidth(60)
+  b:setHeight(20)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(clear)
 
   ik = CGraphic:New("units/assault/ico_assault.png")
   ik:Load()
-  bs = ImageWidget(ik)
-  menu:add(bs, 20, 250)
+  b = ImageWidget(ik)
+  menu:add(b, 20, 250)
 
-  bw = DropDownWidget()
-  bw:setFont(CFont:Get("game"))
-  bw:setList({"line1", "line2"})
-  bw:setActionCallback(function(s) print("dropdown ".. bw:getSelected()) end)
-  bw:setBaseColor(dark)
-  bw:setForegroundColor(clear)
-  bw:setBackgroundColor(dark)
-  menu:add(bw, 20, 350)
+  b = DropDownWidget()
+  b:setFont(CFont:Get("game"))
+  b:setList({"line1", "line2"})
+  b:setActionCallback(function(s) print("dropdown ".. b:getSelected()) end)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(dark)
+  menu:add(b, 20, 350)
 
   win = Windows("Test", 200, 200)
   win:setBaseColor(dark)
@@ -171,10 +180,6 @@ function RunWidgetsMenu(s)
   menu:add(win, 450, 40)
   win2 = Windows("", 50, 50)
   win:add(win2, 0, 0)
-
-  bv = ImageButton("Exit", normalImage, pressedImage)
-  bv:setActionCallback(function() menu:stop() end)
-  menu:add(bv, 400, 300)
 
   menu:run()
 end
