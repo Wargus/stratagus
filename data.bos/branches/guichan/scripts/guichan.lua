@@ -60,6 +60,14 @@ function BosMenu()
 
    menu:add(backgroundWidget, 0, 0)
 
+   function menu.addButton(self, caption, x, y, callback)
+      local b
+      b = ImageButton(caption, normalImage, pressedImage)
+      b:setActionCallback(callback)
+      self:add(b, x, y)
+      return b
+   end
+
    exitButton = ImageButton("Exit", normalImage, pressedImage)
    exitButton:setActionCallback(function() menu:stop() end)
    menu:add(exitButton, Video.Width / 2 - 100, Video.Height - 100)
@@ -110,12 +118,10 @@ function RunStartGameMenu(s)
   function startgamebutton(s)
     print("Starting map -------")
     StartMap("maps/" .. mapslist[bq:getSelected() + 1])
+    menu:stop()
   end
 
-  local bb
-  bb = ImageButton("Start", normalImage, pressedImage)
-  bb:setActionCallback(startgamebutton)
-  menu:add(bb, 100, 300)
+  menu:addButton("Start", 100, 300, startgamebutton)
 
   menu:run()
 end
@@ -159,9 +165,9 @@ function RunWidgetsMenu(s)
   b:setForegroundColor(clear)
   b:setBackgroundColor(clear)
 
-  ik = CGraphic:New("units/assault/ico_assault.png")
-  ik:Load()
-  b = ImageWidget(ik)
+  local ic = CGraphic:New("units/assault/ico_assault.png")
+  ic:Load()
+  b = ImageWidget(ic)
   menu:add(b, 20, 250)
 
   b = DropDownWidget()
@@ -181,23 +187,19 @@ function RunWidgetsMenu(s)
   win2 = Windows("", 50, 50)
   win:add(win2, 0, 0)
 
+  b = ImageButton("SubMenu", normalImage, pressedImage)
+  b:setActionCallback(RunSubMenu)
+  menu:add(b, 300, 250)
+
   menu:run()
 end
 
 function RunMainMenu(s)
-  menu = BosMenu() 
+  local b
+  local menu = BosMenu() 
 
-  sb = ImageButton("SubMenu", normalImage, pressedImage)
-  sb:setActionCallback(RunSubMenu)
-  menu:add(sb, 300, 250)
-
-  wb = ImageButton("WidgetsMenu", normalImage, pressedImage)
-  wb:setActionCallback(RunWidgetsMenu)
-  menu:add(wb, 300, 200)
-
-  sg = ImageButton("Start Game", normalImage, pressedImage)
-  sg:setActionCallback(RunStartGameMenu)
-  menu:add(sg, 300, 150)
+  menu:addButton("Start Game", 300, 150, RunStartGameMenu)
+  menu:addButton("Widgets Demo", 300, 200,RunWidgetsMenu)
 
   menu:run()
 end
