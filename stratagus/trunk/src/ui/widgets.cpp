@@ -49,9 +49,6 @@
 gcn::Gui *gui;         /// A Gui object - binds it all together
 gcn::SDLInput *input;  /// Input driver
 
-// All of the default widgets
-gcn::Container *top;  /// A top container
-
 bool guichanActive = true;
 
 /*----------------------------------------------------------------------------
@@ -81,13 +78,10 @@ void initGuichan(int width, int height)
 	graphics->setTarget(TheScreen);
 	input = new gcn::SDLInput();
 	
-	top = new gcn::Container();    
-	top->setDimension(gcn::Rectangle(0, 0, width, height));
 	gui = new gcn::Gui();
 	gui->setGraphics(graphics);
-	gui->setInput(input);	
-	gui->setTop(top);
-	top->setOpaque(false);
+	gui->setInput(input);
+	gui->setTop(NULL);
 
 	guichanActive = true;
 }
@@ -98,7 +92,6 @@ void initGuichan(int width, int height)
 void freeGuichan() 
 {
 	// FIXME do a full cleanup
-	delete top;
 	delete gui;
 	delete input;
 
@@ -374,7 +367,15 @@ void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 /*----------------------------------------------------------------------------
 --  MenuScreen
 ----------------------------------------------------------------------------*/
-
+MenuScreen::MenuScreen() : 
+Container(), 
+runLoop(true)
+{
+	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
+	setOpaque(false);
+	oldtop = gui->getTop();
+	gui->setTop(this);
+}
 
 void MenuScreen::run() 
 {
@@ -389,6 +390,7 @@ void MenuScreen::run()
 void MenuScreen::stop()
 {
 	runLoop = false;
+	gui->setTop(oldtop);
 }
 
 //@}
