@@ -385,12 +385,12 @@ void MenuScreen::run()
 		RealizeVideoMemory();
 		WaitEventsOneFrame(&MenuCallbacks);
 	}
+	gui->setTop(oldtop);
 }
 
 void MenuScreen::stop()
 {
 	runLoop = false;
-	gui->setTop(oldtop);
 }
 
 //@}
