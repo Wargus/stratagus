@@ -287,7 +287,7 @@ void ImageButton::adjustSize()
 /**
 **  FIXME: docu
 */
-Windows::Windows(const std::string &title, int width, int height) : Window(title)
+Windows::Windows(const std::string &title, int width, int height) : Window(title), blockwholewindow(true)
 {
 	container.setDimension(gcn::Rectangle(0, 0, width, height));
 	scroll.setDimension(gcn::Rectangle(0, 0, width, height));
@@ -310,6 +310,74 @@ void Windows::add(gcn::Widget *widget, int x, int y)
 	}
 }
 
+/**
+**  Move the window when it is dragged.
+**
+**  @param x   X coordinate of the mouse relative to the window.
+**  @param y   Y coordinate of the mouse relative to the widndow.
+**
+**  @note Once dragged, without release the mouse,
+**    if you go virtualy outside the container then go back,
+**    you have to wait the virtual cursor are in the container.
+**    It is because x, y argument refer to a virtual cursor :(
+**  @note An another thing is strange
+**    when the container is a "scrollable" ScrollArea with the cursor.
+**    The cursor can go outside the visual area.
+*/
+void Windows::mouseMotion(int x, int y)
+{
+	gcn::BasicContainer *bcontainer = getParent();
+	int diffx;
+	int diffy;
+	int criticalx;
+	int criticaly;
+	int absx;
+	int absy;
+
+	if (!mMouseDrag || !isMovable()) {
+		return;
+	}
+
+	diffx = x - mMouseXOffset;
+	diffy = y - mMouseYOffset;
+	if (blockwholewindow) {
+		criticalx = getX();
+		criticaly = getY();
+	} else {
+	criticalx = getX() + mMouseXOffset;
+	criticaly = getY() + mMouseYOffset;
+	}
+
+
+	if (criticalx + diffx < 0) {
+		diffx = -criticalx;
+	}
+	if (criticaly + diffy < 0) {
+		diffy = -criticaly;
+	}
+
+	if (blockwholewindow) {
+		criticalx = getX() + getWidth();
+		criticaly = getY() + getHeight();
+	}
+	if (criticalx + diffx >= bcontainer->getWidth()) {
+		diffx = bcontainer->getWidth() - criticalx;
+	}
+	if (criticaly + diffy >= bcontainer->getHeight()) {
+		diffy = bcontainer->getHeight() - criticaly;
+	}
+
+	// Place the window.
+	x = getX() + diffx;
+	y = getY() + diffy;
+	setPosition(x, y);
+
+	// Move the cursor.
+	// Usefull only when window reachs the limit.
+	getAbsolutePosition(absx, absy);
+	CursorX = absx + mMouseXOffset;
+	CursorY = absy + mMouseYOffset;
+}
 
 /*----------------------------------------------------------------------------
 --  LuaListModel

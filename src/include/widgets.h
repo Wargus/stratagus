@@ -75,8 +75,13 @@ public:
 	Windows(const std::string &text, int width, int height);
 	void add(gcn::Widget *widget, int x, int y);
 private:
+	virtual void mouseMotion(int x, int y);
+
+private:
 	gcn::ScrollArea scroll;   /// To use scroll bar.
 	gcn::Container container; /// data container.
+	bool blockwholewindow;    /// Manage condition limit of moveable windows. @see mouseMotion.
+                              /// @todo Method to set this variable. Maybe set the variable static.
 };
 
 class LuaListModel : public gcn::ListModel
