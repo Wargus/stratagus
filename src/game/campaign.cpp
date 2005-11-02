@@ -246,7 +246,7 @@ static void ParseShowPicture(lua_State *l, CampaignChapter *chapter)
 
 				if (!strcmp(value, "font")) {
 					lua_rawgeti(l, -1, k + 1);
-					(*text)->Font = CFont::Get(LuaToString(l, -1));
+					(*text)->FontIdent = new_strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "x")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -305,6 +305,7 @@ static void FreeChapters(CampaignChapter **chapters)
 			delete[] ch->Data.Picture.Image;
 			text = ch->Data.Picture.Text;
 			while (text) {
+				delete[] text->FontIdent;
 				delete[] text->Text;
 				textptr = text;
 				text = text->Next;
