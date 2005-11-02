@@ -733,6 +733,7 @@ void ShowPicture(CampaignChapter *chapter)
 	text = chapter->Data.Picture.Text;
 	linesptr = &lines;
 	while (text) {
+		text->Font = CFont::Get(text->FontIdent);
 		*linesptr = new ChapterTextLines;
 		(*linesptr)->Text = NULL;
 		(*linesptr)->Next = NULL;

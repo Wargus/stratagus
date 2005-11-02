@@ -80,6 +80,7 @@ public:
 	ChapterPictureText() : Font(0), X(0), Y(0), Width(0), Height(0),
 		Align(PictureTextAlignLeft), Text(NULL), Next(NULL) {}
 
+	char *FontIdent;                 /// Font ident
 	CFont *Font;                     /// Font
 	int X;                           /// X position
 	int Y;                           /// Y position
