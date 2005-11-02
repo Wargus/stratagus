@@ -577,7 +577,7 @@ void SaveCampaign(CFile *file)
 				ch->Data.Picture.DisplayTime);
 			for (text = ch->Data.Picture.Text; text; text = text->Next) {
 				file->printf("      \"text\", {\n");
-				file->printf("        \"font\", \"%s\",\n", text->Font->Ident);
+				file->printf("        \"font\", \"%s\",\n", text->FontIdent);
 				file->printf("        \"x\", %d,\n", text->X);
 				file->printf("        \"y\", %d,\n", text->Y);
 				file->printf("        \"width\", %d,\n", text->Width);
