@@ -379,9 +379,9 @@ void CMap::Create()
 {
 	Assert(!this->Fields);
 
-	Map.Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
-	Map.Visible[0] = new unsigned[this->Info.MapWidth * this->Info.MapHeight / 2];
-	memset(Map.Visible[0], 0, this->Info.MapWidth * this->Info.MapHeight / 2 * sizeof(unsigned));
+	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
+	this->Visible[0] = new unsigned[this->Info.MapWidth * this->Info.MapHeight / 2];
+	memset(this->Visible[0], 0, this->Info.MapWidth * this->Info.MapHeight / 2 * sizeof(unsigned));
 	InitUnitCache();
 }
 
