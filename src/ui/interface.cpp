@@ -1128,6 +1128,34 @@ int HandleKeyModifiersUp(unsigned key, unsigned keychar)
 }
 
 /**
+**  Check if a key is from the keypad and convert to ascii
+*/
+static bool IsKeyPad(unsigned key, unsigned *kp)
+{
+	if (key >= SDLK_KP0 && key <= SDLK_KP9) {
+		*kp = SDLK_0 + (key - SDLK_KP0);
+	} else if (key == SDLK_KP_PERIOD) {
+		*kp = SDLK_PERIOD;
+	} else if (key == SDLK_KP_DIVIDE) {
+		*kp = SDLK_SLASH;
+	} else if (key == SDLK_KP_MULTIPLY) {
+		*kp = SDLK_ASTERISK;
+	} else if (key == SDLK_KP_MINUS) {
+		*kp = SDLK_MINUS;
+	} else if (key == SDLK_KP_PLUS) {
+		*kp = SDLK_PLUS;
+	} else if (key == SDLK_KP_ENTER) {
+		*kp = SDLK_RETURN;
+	} else if (key == SDLK_KP_EQUALS) {
+		*kp = SDLK_EQUALS;
+	} else  {
+		*kp = SDLK_UNKNOWN;
+		return false;
+	}
+	return true;
+}
+
+/**
 **  Handle key down.
 **
 **  @param key      Key scancode.
@@ -1142,8 +1170,9 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 	// Handle All other keys
 
 	// Command line input: for message or cheat
-	if (KeyState == KeyStateInput && keychar) {
-		InputKey(keychar);
+	unsigned kp = 0;
+	if (KeyState == KeyStateInput && (keychar || IsKeyPad(key, &kp))) {
+		InputKey(kp ? kp : keychar);
 	} else {
 		// If no modifier look if button bound
 		if (!(KeyModifiers & (ModifierControl | ModifierAlt |
