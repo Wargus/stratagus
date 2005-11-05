@@ -732,7 +732,7 @@ void SaveReplayList(CFile *file)
 **
 **  @param name  name of file to load.
 */
-int LoadReplay(char *name)
+int LoadReplay(const char *name)
 {
 	CleanReplayLog();
 	ReplayGameType = ReplaySinglePlayer;
@@ -838,7 +838,7 @@ static void DoNextReplay(void)
 		} else {
 			ThisPlayer->Notify(NotifyYellow, -1, -1, "Replay got out of sync (%lu) !", GameCycle);
 			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
-			DebugPrint("OUT OF SYNC GameCycle %u \n" _C_ GameCycle);
+			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
 			Assert(0);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
