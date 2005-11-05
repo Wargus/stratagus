@@ -3284,6 +3284,7 @@ static void ScenSelectCancel(void)
 */
 static void GameCancel(void)
 {
+	FreeMapInfo(&Map.Info);
 	CloseMenu();
 }
 
@@ -3930,6 +3931,8 @@ static void MultiGameCancel(void)
 		SendMetaCommand("AbandonGame", "");
 	}
 
+	FreeMapInfo(&Map.Info);
+
 	NetPlayers = 0; // Make single player menus work again!
 	GameCancel();
 }
@@ -3994,6 +3997,7 @@ static void NetMultiPlayerDrawFunc(Menuitem *mi)
 static void MultiClientCancel(void)
 {
 	NetworkDetachFromServer();
+	FreeMapInfo(&Map.Info);
 	// GameCancel();
 }
 
