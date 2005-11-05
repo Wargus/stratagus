@@ -3436,8 +3436,7 @@ bool CUnit::IsSharedVision(const CUnit *x) const
 */
 bool CUnit::IsTeamed(const CPlayer *x) const
 {
-	return (this->Player->SharedVision & (1 << x->Index)) != 0 &&
-		(x->SharedVision & (1 << this->Player->Index)) != 0;
+	return (this->Player->Team == x->Team);
 }
 
 /**
