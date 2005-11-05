@@ -1372,63 +1372,32 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 **  @param x      X position.
 **  @param y      Y position.
 */
-static void DrawConstructionShadow(const CUnit *unit, int frame, int x, int y)
+static void DrawConstructionShadow(const CUnit *unit, const CConstructionFrame *cframe,
+	int frame, int x, int y)
 {
-	CConstructionFrame *cframe;
-
-	cframe = unit->Data.Built.Frame;
 	if (cframe->File == ConstructionFileConstruction) {
 		if (unit->Type->Construction->ShadowSprite) {
 			x -= (unit->Type->Construction->Width - unit->Type->TileWidth * TileSizeX) / 2;
-			y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
-// x += type->ShadowOffsetX;
-// y += type->ShadowOffsetY;
 			x += unit->Type->OffsetX;
+			y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
 			y += unit->Type->OffsetY;
-			if (unit->Type->Flip) {
-				if (frame < 0) {
-					unit->Type->Construction->ShadowSprite->DrawFrameClipX(
-						-frame - 1, x, y);
-				} else {
-					unit->Type->Construction->ShadowSprite->DrawFrameClip(
-						frame, x, y);
-				}
+			if (frame < 0) {
+				unit->Type->Construction->ShadowSprite->DrawFrameClipX(
+					-frame - 1, x, y);
 			} else {
-				int row;
-
-				row = unit->Type->NumDirections / 2 + 1;
-				if (frame < 0) {
-					frame = ((-frame - 1) / row) * unit->Type->NumDirections + unit->Type->NumDirections - (-frame - 1) % row;
-				} else {
-					frame = (frame / row) * unit->Type->NumDirections + frame % row;
-				}
-				unit->Type->Construction->ShadowSprite->DrawFrameClip(frame,
-					x, y);
+				unit->Type->Construction->ShadowSprite->DrawFrameClip(
+					frame, x, y);
 			}
 		}
 	} else {
 		if (unit->Type->ShadowSprite) {
 			x -= (unit->Type->ShadowWidth - unit->Type->TileWidth * TileSizeX) / 2;
+			x += unit->Type->ShadowOffsetX + unit->Type->OffsetX;
 			y -= (unit->Type->ShadowHeight - unit->Type->TileHeight * TileSizeY) / 2;
-			x += unit->Type->ShadowOffsetX;
-			y += unit->Type->ShadowOffsetY;
-			x += unit->Type->OffsetX;
-			y += unit->Type->OffsetY;
-			if (unit->Type->Flip) {
-				if (frame < 0) {
-					unit->Type->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
-				} else {
-					unit->Type->ShadowSprite->DrawFrameClip(frame, x, y);
-				}
+			y += unit->Type->ShadowOffsetY + unit->Type->OffsetY;
+			if (frame < 0) {
+				unit->Type->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
 			} else {
-				int row;
-
-				row = unit->Type->NumDirections / 2 + 1;
-				if (frame < 0) {
-					frame = ((-frame - 1) / row) * unit->Type->NumDirections + unit->Type->NumDirections - (-frame - 1) % row;
-				} else {
-					frame = (frame / row) * unit->Type->NumDirections + frame % row;
-				}
 				unit->Type->ShadowSprite->DrawFrameClip(frame, x, y);
 			}
 		}
@@ -1540,7 +1509,7 @@ void CUnit::Draw() const
 
 
 	if (state == 1 && constructed) {
-		DrawConstructionShadow(this, frame, x, y);
+		DrawConstructionShadow(this, cframe, frame, x, y);
 	} else {
 		DrawShadow(this, NULL, frame, x, y);
 	}
