@@ -329,7 +329,7 @@ static void PrintLogCommand(LogEntry *log, CFile *dest)
 	if (log->Num != -1) {
 		dest->printf("Num = %d, ", log->Num);
 	}
-	dest->printf("SyncRandSeed = %u } )\n", log->SyncRandSeed);
+	dest->printf("SyncRandSeed = %d } )\n", (signed)log->SyncRandSeed);
 }
 
 /**
@@ -570,7 +570,7 @@ static int CclLog(lua_State *l)
 		} else if (!strcmp(value, "Num")) {
 			log->Num = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SyncRandSeed")) {
-			log->SyncRandSeed = LuaToNumber(l, -1);
+			log->SyncRandSeed = (unsigned)LuaToNumber(l, -1);
 		} else {
 			LuaError(l, "Unsupported key: %s" _C_ value);
 		}
@@ -838,6 +838,7 @@ static void DoNextReplay(void)
 		} else {
 			ThisPlayer->Notify(NotifyYellow, -1, -1, "Replay got out of sync (%lu) !", GameCycle);
 			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
+			DebugPrint("OUT OF SYNC GameCycle %u \n" _C_ GameCycle);
 			Assert(0);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
