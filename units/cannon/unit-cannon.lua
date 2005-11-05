@@ -1,0 +1,100 @@
+--       _________ __                 __                               
+--      /   _____//  |_____________ _/  |______     ____  __ __  ______
+--      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+--      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+--     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+--             \/                  \/          \//_____/            \/ 
+--  ______________________                           ______________________
+--			  T H E   W A R   B E G I N S
+--	   Stratagus - A free fantasy real time strategy game engine
+--
+--	unit-cannon.lua	-	Define the cannon unit.
+--
+--	(c) Copyright 2004-2005 by François Beerten.
+--
+--      This program is free software; you can redistribute it and/or modify
+--      it under the terms of the GNU General Public License as published by
+--      the Free Software Foundation; either version 2 of the License, or
+--      (at your option) any later version.
+--  
+--      This program is distributed in the hope that it will be useful,
+--      but WITHOUT ANY WARRANTY; without even the implied warranty of
+--      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--      GNU General Public License for more details.
+--  
+--      You should have received a copy of the GNU General Public License
+--      along with this program; if not, write to the Free Software
+--      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+--
+--	$Id$
+
+DefineAnimations("animations-cannon", {
+    Still = {"frame 5", "wait 1", },
+    Attack = {"unbreakable begin", "frame 5", "wait 5", 
+              "frame 5", "sound bazoo-attack", "attack", "wait 1",
+              "frame 10", "wait 15",
+              "frame 5", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 10", "unbreakable end", "wait 50", },
+    })
+
+DefineIcon({
+	Name = "icon-cannon",
+	Size = {46, 38},
+	Frame = 0,
+	File = "units/cannon/cannon_i.png"})
+
+DefineIcon({
+	Name = "icon-cannon_b",
+	Size = {46, 38},
+	Frame = 10,
+	File = "units/cannon/cannon_i.png"})
+
+DefineConstruction("construction-cannon", {
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 0},
+		{Percent = 10, File = "main", Frame = 0},
+		{Percent = 20, File = "main", Frame = 1},
+		{Percent = 30, File = "main", Frame = 2},
+		{Percent = 40, File = "main", Frame = 3},
+		{Percent = 50, File = "main", Frame = 4},
+		{Percent = 60, File = "main", Frame = 5},
+		{Percent = 70, File = "main", Frame = 6},
+		{Percent = 80, File = "main", Frame = 7},
+		{Percent = 90, File = "main", Frame = 7}
+	}
+})
+
+DefineUnitType("unit-cannon", {
+	Name = "Cannon",
+	Image = {"file", "units/cannon/cannon.png", "size", {128, 128},},
+	Offset ={0, -20},
+	Shadow = {"file", "units/cannon/cannon_s.png", "size", {128, 128}},
+	Animations = "animations-cannon", Icon = "icon-cannon",
+	Costs = {"time", 130, "titanium", 250, "crystal", 50}, 
+	RepairHp = 2, RepairCosts = {"titanium", 2}, 
+        Construction = "construction-cannon",
+	Speed = 0, HitPoints = 160, DrawLevel = 25, TileSize  = {2, 2}, 
+        BoxSize = {64, 58},
+	SightRange = 6, ComputerReactionRange = 16, PersonReactionRange = 6, 
+        Armor = 10,
+	BasicDamage = 4, PiercingDamage = 0, MaxAttackRange = 26, 
+        Missile = "missile-none",
+	Priority = 20, AnnoyComputerFactor = 45, Points = 100,
+	ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
+	CanAttack = true, CanTargetLand = true, NumDirections = 8, Flip = false,
+	Corpse = {"build-dead-body2", 0}, Type = "land",
+	Building = true, BuilderOutside = true,
+	VisibleUnderFog = true,
+	Sounds = {"selected", "cannon-selected",}
+})
+
+
+DefineAllow("unit-cannon", "AAAAAAAAAAAAAAAA")
+
+DefineButton({
+	Pos = 3, Level = 3, Icon = "icon-cannon_b", Action = "build",
+	Value = "unit-cannon", Key = "c", Hint = "BUILD ~!cannon",
+	ForUnit = {"unit-engineer"}})
+-- DefineButton for the 'stop' and 'attack' actions are defined in buttons.lua.
+
+
