@@ -72,7 +72,7 @@ extern void SinglePlayerReplayEachCycle(void);
 	/// Replay user commands from log each cycle, multiplayer games
 extern void MultiPlayerReplayEachCycle(void);
 	/// Load replay
-extern int LoadReplay(char *);
+extern int LoadReplay(const char *);
 	/// End logging
 extern void EndReplayLog(void);
 	/// Clean replay
