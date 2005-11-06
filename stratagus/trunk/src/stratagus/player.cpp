@@ -117,13 +117,21 @@ void CleanPlayers(void)
 	memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 
+	NoRescueCheck = 0;
+}
+
+/**
+**  Clean up the PlayerRaces names.
+*/
+void CleanRaces(void)
+{
+	int p;
+
 	for (p = 0; p < PlayerRaces.Count; ++p) {
 		delete[] PlayerRaces.Name[p];
 		delete[] PlayerRaces.Display[p];
 	}
 	PlayerRaces.Count = 0;
-
-	NoRescueCheck = 0;
 }
 
 /**

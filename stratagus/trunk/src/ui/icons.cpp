@@ -124,7 +124,6 @@ CIcon *CIcon::Get(const char *ident)
 void IconConfig::Load()
 {
 	Assert(Name);
-	Assert(!Icon);
 
 	Icon = CIcon::Get(Name);
 #if 0
