@@ -68,7 +68,7 @@ function BosMenu()
       return b
    end
 
-   exitButton = ImageButton("Exit", normalImage, pressedImage)
+   exitButton = ImageButton("~!Exit", normalImage, pressedImage)
    exitButton:setActionCallback(function() menu:stop() end)
    menu:add(exitButton, Video.Width / 2 - 100, Video.Height - 100)
 
@@ -122,6 +122,22 @@ function RunStartGameMenu(s)
   end
 
   menu:addButton("Start", 100, 300, startgamebutton)
+
+  menu:run()
+end
+
+
+function RunReplayMenu(s)
+  local menu
+  menu = BosMenu()
+
+  function startreplaybutton(s)
+    print("Starting map -------")
+    StartReplay("/home/feb/.stratagus-2.2/bos/logs/log_of_stratagus_0.log")
+    menu:stop()
+  end
+
+  menu:addButton("~!Start", 100, 300, startreplaybutton)
 
   menu:run()
 end
@@ -194,12 +210,66 @@ function RunWidgetsMenu(s)
   menu:run()
 end
 
+function RunOptionsMenu(s)
+  local menu
+  menu = BosMenu()
+
+  menu:run()
+end
+
+function RunEditorMenu(s)
+
+  local menu
+  menu = BosMenu()
+
+  local mapslist
+  mapslist = {}
+  local u
+  u = 1
+  local fileslist = ListDirectory("maps/")
+  for i,f in fileslist do
+    if(string.find(f, "^C.*%.smp$")) then
+      print("Added smp file:" .. f .. "--" )
+      mapslist[u] = f
+      u = u + 1
+    end
+  end
+  print(mapslist)
+  print(mapslist[1])
+
+  local bq
+  bq = ListBoxWidget()
+  bq:setList(mapslist)
+  bq:setBaseColor(black)
+  bq:setForegroundColor(clear)
+  bq:setBackgroundColor(dark)
+  bq:setFont(CFont:Get("game"))
+  menu:add(bq, 300, 100)
+
+  function starteditorbutton(s)
+    print("Starting map -------")
+    StartEditor("test.smp")
+    menu:stop()
+  end
+
+  menu:addButton("Start Editor", 100, 300, starteditorbutton)
+
+  menu:run()
+end
+
 function RunMainMenu(s)
   local b
   local menu = BosMenu() 
 
-  menu:addButton("Start Game", 300, 150, RunStartGameMenu)
-  menu:addButton("Widgets Demo", 300, 200,RunWidgetsMenu)
+  menu:addButton("~!Start Game", 300, 140, RunStartGameMenu)
+  menu:addButton("~!Widgets Demo", 300, 180, RunWidgetsMenu)
+  menu:addButton("Start ~!Editor", 300, 220, RunEditorMenu)
+  menu:addButton("~!Options", 300, 260, RunOptionsMenu)
+  menu:addButton("~!MultiPlayer", 300, 300, RunOptionsMenu)
+  menu:addButton("~!Campaigns", 300, 340, RunOptionsMenu)
+  menu:addButton("~!Load Game", 300, 380, RunOptionsMenu)
+  menu:addButton("Show ~!Replay", 300, 420, RunReplayMenu)
+  menu:addButton("~!Credits", 300, 460, RunOptionsMenu)
 
   menu:run()
 end
