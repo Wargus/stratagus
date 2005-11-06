@@ -66,6 +66,8 @@ $]
 class ImageButton : public Widget
 {
 	ImageButton(char *caption, CGraphic *normalImage, CGraphic *pressedImage);
+	void setHotKey(const int key);
+	void setHotKey(const char *key);
 };
 
 class ImageWidget : public Widget

@@ -55,12 +55,20 @@ public:
 class ImageButton : public gcn::Button
 {
 public:
-	gcn::Image *normalImage;
-	gcn::Image *pressedImage;
 	ImageButton(char *caption, gcn::Image *normal = NULL, gcn::Image *pressed = NULL);
 
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void adjustSize();
+
+	virtual void keyPress(const gcn::Key &key);
+	virtual void keyRelease(const gcn::Key &key);
+
+	void setHotKey(const int key);
+	void setHotKey(const char *key);
+
+	gcn::Image *normalImage;
+	gcn::Image *pressedImage;
+	int hotKey;
 };
 
 class ImageWidget : public gcn::Icon
