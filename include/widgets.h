@@ -112,6 +112,9 @@ public:
 	void setSelected(int i);
 	int getSelected() const;
 	virtual void setBackgroundColor(const gcn::Color &color);
+	virtual void setFont(gcn::Font *font);
+private:
+	void ListBoxWidget::adjustSize();
 private:
 	LuaListModel lualistmodel;
 	gcn::ListBox listbox;

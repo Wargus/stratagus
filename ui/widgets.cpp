@@ -521,23 +521,9 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 */
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
-	int i;
-	int width;
-	gcn::ListModel *listmodel;
-
 	lualistmodel.setList(lua, lo);
 	listbox.setListModel(&lualistmodel);
-	width = listbox.getWidth();
-	Assert(listbox.getListModel());
-	listmodel = listbox.getListModel();
-	for (i = 0; i < listmodel->getNumberOfElements(); ++i) {
-		if (width < listbox.getFont()->getWidth(listmodel->getElementAt(i))) {
-			width = listbox.getFont()->getWidth(listmodel->getElementAt(i));
-		}
-	}
-	if (width != listbox.getWidth()) {
-		listbox.setWidth(width);
-	}
+	adjustSize();
 }
 
 /**
@@ -575,6 +561,39 @@ void ListBoxWidget::setBackgroundColor(const gcn::Color &color)
 	listbox.setBackgroundColor(color);
 }
 
+/**
+**  Set font of the ListBox.
+**
+**  @param font Font to set.
+*/
+void ListBoxWidget::setFont(gcn::Font *font)
+{
+	listbox.setFont(font);
+	listbox.setWidth(getWidth());
+	adjustSize();
+}
+
+/**
+**  Adjust size of the listBox.
+*/
+void ListBoxWidget::adjustSize()
+{
+	int i;
+	int width;
+	gcn::ListModel *listmodel;
+
+	width = listbox.getWidth();
+	Assert(listbox.getListModel());
+	listmodel = listbox.getListModel();
+	for (i = 0; i < listmodel->getNumberOfElements(); ++i) {
+		if (width < listbox.getFont()->getWidth(listmodel->getElementAt(i))) {
+			width = listbox.getFont()->getWidth(listmodel->getElementAt(i));
+		}
+	}
+	if (width != listbox.getWidth()) {
+		listbox.setWidth(width);
+	}
+}
 
 /*----------------------------------------------------------------------------
 --  DropDownWidget
