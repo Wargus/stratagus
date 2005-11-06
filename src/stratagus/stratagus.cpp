@@ -626,6 +626,33 @@ void GuichanLoop(const char *filename, CMap *map)
 	freeGuichan();
 }
 
+extern void CleanMissiles();
+extern void InitDefinedVariables();
+/**
+**  Cleanup game.
+**
+**  Call each module to clean up.
+**  Contrary to CleanModules, maps can be restarted
+**  without reloading all lua files.
+*/
+void CleanGame(void)
+{
+	EndReplayLog();
+	CleanMessages();
+
+	CleanPlayers();
+	CleanUnits();
+	CleanSelections();
+	CleanGroups();
+	CleanMissiles();
+	CleanTilesets();
+	Map.Clean();
+	CleanReplayLog();
+	FreeVisionTable();
+	FreeAStar();
+	InitDefinedVariables(); // internal script.
+}
+
 void StartMap(const char *filename) 
 {
 	guichanActive = false;
@@ -644,6 +671,45 @@ void StartMap(const char *filename)
 	Video.ClearScreen();
 	Invalidate();
 	guichanActive = true;
+
+	CleanGame();
+}
+
+void StartEditor(const char *filename) 
+{
+	guichanActive = false;
+	
+	strcpy(CurrentMapPath, DefaultMap);
+
+	Map.Info.Description = new_strdup(filename);
+	Map.Info.MapWidth = 64;
+	Map.Info.MapHeight = 64;
+	
+	// Run the editor.
+	EditorMainLoop();
+
+	// Clear screen
+	Video.ClearScreen();
+	Invalidate();
+	guichanActive = true;
+}
+
+void StartReplay(const char *filename)
+{
+	int i;
+
+	LoadReplay(filename);
+
+	// FIXME why is this needed ?
+	for (i = 0; i < MAX_OBJECTIVES; i++) {
+		delete[] GameIntro.Objectives[i];
+		GameIntro.Objectives[i] = NULL;
+	}
+	GameIntro.Objectives[0] = new_strdup(DefaultObjective);
+
+	//TODO ReplayRevealMap = 1
+
+	StartMap(CurrentMapPath);
 }
 
 //----------------------------------------------------------------------------

@@ -59,6 +59,7 @@
 ----------------------------------------------------------------------------*/
 
 int FogOfWarOpacity;                 /// Fog of war Opacity.
+CGraphic *CMap::FogGraphic;
 
 /**
 **  Mapping for fog of war tiles.
@@ -647,19 +648,19 @@ void CViewport::DrawMapFogOfWar() const
 	}
 	p = ThisPlayer->Index;
 
-	sx = this->MapX - 1;
+	sx = MapX - 1;
 	if (sx < 0) {
 		sx = 0;
 	}
-	ex = this->MapX + this->MapWidth + 1;
+	ex = MapX + MapWidth + 1;
 	if (ex > Map.Info.MapWidth) {
 		ex = Map.Info.MapWidth;
 	}
-	my = this->MapY - 1;
+	my = MapY - 1;
 	if (my < 0) {
 		my = 0;
 	}
-	ey = this->MapY + this->MapHeight + 1;
+	ey = MapY + MapHeight + 1;
 	if (ey > Map.Info.MapHeight) {
 		ey = Map.Info.MapHeight;
 	}
@@ -670,17 +671,17 @@ void CViewport::DrawMapFogOfWar() const
 			VisibleTable[my * Map.Info.MapWidth + mx] = Map.IsTileVisible(ThisPlayer, mx, my);
 		}
 	}
-	ex = this->EndX;
-	sy = this->MapY * Map.Info.MapWidth;
-	dy = this->Y - this->OffsetY;
-	ey = this->EndY;
+	ex = EndX;
+	sy = MapY * Map.Info.MapWidth;
+	dy = Y - OffsetY;
+	ey = EndY;
 
 	while (dy <= ey) {
-		sx = this->MapX + sy;
-		dx = this->X - this->OffsetX;
+		sx = MapX + sy;
+		dx = X - OffsetX;
 		while (dx <= ex) {
-			mx = (dx - this->X + this->OffsetX) / TileSizeX + this->MapX;
-			my = (dy - this->Y + this->OffsetY) / TileSizeY + this->MapY;
+			mx = (dx - X + OffsetX) / TileSizeX + MapX;
+			my = (dy - Y + OffsetY) / TileSizeY + MapY;
 			if (VisibleTable[my * Map.Info.MapWidth + mx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
@@ -708,7 +709,7 @@ void CMap::InitFogOfWar(void)
 	SDL_Surface *s;
 #endif
 
-	this->FogGraphic->Load();
+	FogGraphic->Load();
 
 #ifndef USE_OPENGL
 	//
@@ -729,8 +730,8 @@ void CMap::InitFogOfWar(void)
 	//
 	// Generate Alpha Fog surface.
 	//
-	if (this->FogGraphic->Surface->format->BytesPerPixel == 1) {
-		s = SDL_DisplayFormat(this->FogGraphic->Surface);
+	if (FogGraphic->Surface->format->BytesPerPixel == 1) {
+		s = SDL_DisplayFormat(FogGraphic->Surface);
 		SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 	} else {
 		int i;
@@ -740,18 +741,18 @@ void CMap::InitFogOfWar(void)
 		SDL_PixelFormat *f;
 
 		// Copy the top row to a new surface
-		f = this->FogGraphic->Surface->format;
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, this->FogGraphic->Surface->w, TileSizeY,
+		f = FogGraphic->Surface->format;
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, TileSizeY,
 			f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 		SDL_LockSurface(s);
-		SDL_LockSurface(this->FogGraphic->Surface);
+		SDL_LockSurface(FogGraphic->Surface);
 		for (i = 0; i < s->h; ++i) {
 			memcpy((Uint8 *)s->pixels + i * s->pitch,
-				(Uint8 *)this->FogGraphic->Surface->pixels + i * this->FogGraphic->Surface->pitch,
-				this->FogGraphic->Surface->w * f->BytesPerPixel);
+				(Uint8 *)FogGraphic->Surface->pixels + i * FogGraphic->Surface->pitch,
+				FogGraphic->Surface->w * f->BytesPerPixel);
 		}
 		SDL_UnlockSurface(s);
-		SDL_UnlockSurface(this->FogGraphic->Surface);
+		SDL_UnlockSurface(FogGraphic->Surface);
 
 		// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
 		SDL_LockSurface(s);
@@ -777,7 +778,7 @@ void CMap::InitFogOfWar(void)
 	AlphaFogG->NumFrames = 1;
 #endif
 
-	VisibleTable = new unsigned char[this->Info.MapWidth * this->Info.MapHeight];
+	VisibleTable = new unsigned char[Info.MapWidth * Info.MapHeight];
 }
 
 /**
@@ -789,7 +790,7 @@ void CMap::CleanFogOfWar(void)
 	VisibleTable = NULL;
 
 	CGraphic::Free(Map.FogGraphic);
-	this->FogGraphic = NULL;
+	FogGraphic = NULL;
 
 #ifndef USE_OPENGL
 	if (OnlyFogSurface) {

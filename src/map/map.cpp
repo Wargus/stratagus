@@ -401,8 +401,6 @@ void CMap::Clean(void)
 	ReplayRevealMap = 0;
 
 	UI.Minimap.Destroy();
-
-	CleanFogOfWar();
 }
 
 

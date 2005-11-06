@@ -278,6 +278,8 @@ public:
 	void Init(void);
 	/// Clean the map
 	void Clean();
+	/// Cleanup memory for fog of war tables
+	void CleanFogOfWar(void);
 	/// Remove wood/rock from the map.
 	void ClearTile(unsigned short type, unsigned x, unsigned y);
 
@@ -342,8 +344,6 @@ public:
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar(void);
-	/// Cleanup memory for fog of war tables
-	void CleanFogOfWar(void);
 
 	/// Check if the seen tile-type is wood
 	bool IsSeenTile(unsigned short type, int x, int y) const;
@@ -365,7 +365,7 @@ public:
 	CTileset Tileset;          /// tileset data
 	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     /// graphic for all the tiles
-	CGraphic *FogGraphic;      /// graphic for fog of war
+	static CGraphic *FogGraphic;      /// graphic for fog of war
 
 	CMapInfo Info;             /// descriptive information
 };
