@@ -344,6 +344,141 @@ void ImageButton::setHotKey(const char *key)
 
 
 /*----------------------------------------------------------------------------
+--  ImageCheckbox
+----------------------------------------------------------------------------*/
+
+
+/**
+**  FIXME: docu
+*/
+ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	mMouseDown(false)
+{
+}
+
+/**
+**  FIXME: docu
+*/
+ImageCheckBox::ImageCheckBox(const std::string &caption, bool marked) :
+	gcn::CheckBox(caption, marked),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	mMouseDown(false)
+{
+}
+
+/**
+**  FIXME: docu
+*/
+void ImageCheckBox::draw(gcn::Graphics *graphics)
+{
+	drawBox(graphics);
+
+	graphics->setFont(getFont());
+	graphics->setColor(getForegroundColor());
+
+	int width;
+	if (uncheckedNormalImage) {
+		width = uncheckedNormalImage->getWidth();
+		width += width / 2;
+	} else {
+		width = getHeight();
+		width += width / 2;
+	}
+
+	graphics->drawText(getCaption(), width - 2, 0);
+
+	if (hasFocus()) {
+		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()));
+	}
+}
+
+/**
+**  FIXME: docu
+*/
+void ImageCheckBox::drawBox(gcn::Graphics *graphics)
+{
+	gcn::Image *img = NULL;
+
+	if (mMarked) {
+		if (mMouseDown) {
+			img = checkedPressedImage;
+		} else {
+			img = checkedNormalImage;
+		}
+	} else {
+		if (mMouseDown) {
+			img = uncheckedPressedImage;
+		} else {
+			img = uncheckedNormalImage;
+		}
+	}
+
+	if (img) {
+		graphics->drawImage(img, 0, 0, 0, (getHeight() - img->getHeight()) / 2,
+			img->getWidth(), img->getHeight());
+	} else {
+		CheckBox::drawBox(graphics);
+	}
+}
+
+/**
+**  FIXME: docu
+*/
+void ImageCheckBox::mousePress(int x, int y, int button)
+{
+	if (button == gcn::MouseInput::LEFT && hasMouse()) {
+		mMouseDown = true;
+	}
+}
+
+/**
+**  FIXME: docu
+*/
+void ImageCheckBox::mouseRelease(int x, int y, int button)
+{
+	if (button == gcn::MouseInput::LEFT) {
+		mMouseDown = false;
+	}
+}
+
+/**
+**  FIXME: docu
+*/
+void ImageCheckBox::mouseClick(int x, int y, int button, int count)
+{
+	if (button == gcn::MouseInput::LEFT) {
+		toggle();
+	}
+}
+
+/**
+**  FIXME: docu
+*/
+void ImageCheckBox::adjustSize()
+{
+	int width, height;
+
+	height = getFont()->getHeight();
+	if (uncheckedNormalImage) {
+		width = uncheckedNormalImage->getWidth();
+		width += width / 2;
+		if (uncheckedNormalImage->getHeight() > height) {
+			height = uncheckedNormalImage->getHeight();
+		}
+	} else {
+		width = getFont()->getHeight();
+		width += width / 2;
+	}
+
+	setHeight(height);
+	setWidth(getFont()->getWidth(mCaption) + width);
+}
+
+
+/*----------------------------------------------------------------------------
 --  Windows
 ----------------------------------------------------------------------------*/
 
@@ -614,8 +749,7 @@ void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 --  MenuScreen
 ----------------------------------------------------------------------------*/
 MenuScreen::MenuScreen() : 
-Container(), 
-runLoop(true)
+	Container(), runLoop(true)
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
