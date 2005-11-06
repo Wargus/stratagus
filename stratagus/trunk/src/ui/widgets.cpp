@@ -506,10 +506,8 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 **
 **  @todo Size should be parametrable, maybe remove default construtor ?
 */
-ListBoxWidget::ListBoxWidget()
+ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 {
-	unsigned int width = 200; unsigned int height = 100;
-
 	setDimension(gcn::Rectangle(0, 0, width, height));
 	setContent(&listbox);
 	setBackgroundColor(gcn::Color(128, 128, 128));

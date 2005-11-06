@@ -107,7 +107,7 @@ public:
 class ListBoxWidget : public gcn::ScrollArea
 {
 public:
-	ListBoxWidget();
+	ListBoxWidget(unsigned int width, unsigned int height);
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
