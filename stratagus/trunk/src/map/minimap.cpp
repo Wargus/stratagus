@@ -549,7 +549,7 @@ void CMinimap::Update(void)
 	// Clear Minimap background if not transparent
 	if (!Transparent) {
 #ifndef USE_OPENGL
-		SDL_FillRect(MinimapSurface, NULL, 0);
+		SDL_FillRect(MinimapSurface, NULL, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
 #else
 		memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
 #endif
