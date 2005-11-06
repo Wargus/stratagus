@@ -97,7 +97,7 @@ function RunStartGameMenu(s)
   u = 1
   local fileslist = ListDirectory("maps/")
   for i,f in fileslist do
-    if(string.find(f, "^C.*%.smp$")) then
+    if(string.find(f, "^.*%.smp$")) then
       print("Added smp file:" .. f .. "--" )
       mapslist[u] = f
       u = u + 1
@@ -107,7 +107,7 @@ function RunStartGameMenu(s)
   print(mapslist[1])
 
   local bq
-  bq = ListBoxWidget()
+  bq = ListBoxWidget(300, 200)
   bq:setList(mapslist)
   bq:setBaseColor(black)
   bq:setForegroundColor(clear)
@@ -228,7 +228,7 @@ function RunEditorMenu(s)
   u = 1
   local fileslist = ListDirectory("maps/")
   for i,f in fileslist do
-    if(string.find(f, "^C.*%.smp$")) then
+    if(string.find(f, "^.*%.smp$")) then
       print("Added smp file:" .. f .. "--" )
       mapslist[u] = f
       u = u + 1
@@ -238,7 +238,7 @@ function RunEditorMenu(s)
   print(mapslist[1])
 
   local bq
-  bq = ListBoxWidget()
+  bq = ListBoxWidget(300, 200)
   bq:setList(mapslist)
   bq:setBaseColor(black)
   bq:setForegroundColor(clear)
