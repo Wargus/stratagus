@@ -96,12 +96,17 @@ public:
 	virtual std::string getElementAt(int i) {return list[i];}
 };
 
-class ListBoxWidget : public gcn::ListBox
+class ListBoxWidget : public gcn::ScrollArea
 {
-	LuaListModel listmodel;
 public:
-	ListBoxWidget() {}
+	ListBoxWidget();
 	void setList(lua_State *lua, lua_Object *lo);
+	void setSelected(int i);
+	int getSelected() const;
+	virtual void setBackgroundColor(const gcn::Color &color);
+private:
+	LuaListModel lualistmodel;
+	gcn::ListBox listbox;
 };
 
 class DropDownWidget : public gcn::DropDown
