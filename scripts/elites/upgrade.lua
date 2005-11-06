@@ -7,7 +7,7 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---	upgrade.lua	-	Define the elites dependencies and upgrades.
+--	upgrade.lua	-	Define the elites upgrades.
 --
 --	(c) Copyright 2001-2005 by Lutz Sammer, Crestez Leonard and Francois Beerten
 --
@@ -27,7 +27,6 @@
 --
 --	$Id$
 
---	- upgrades
 
 function DefineUpgrade(name, icon, costs)
    u = CUpgrade:New(name)
@@ -83,14 +82,4 @@ DefineAllow("upgrade-ddril", "AAAAAAAAAAAAAAAA")
 DefineAllow("upgrade-pdril", "AAAAAAAAAAAAAAAA")
 DefineAllow("upgrade-void", "AAAAAAAAAAAAAAAA")
 
--- DefineDependency("upgrade-void", {"upgrade-expl2", "upgrade-pdril"})
-DefineDependency("unit-bazoo", {"upgrade-expl2"})
-DefineDependency("unit-grenadier", {"upgrade-expl"})
--- DefineDependency("unit-expl2", {"upgrade-expl"})
--- DefineDependency("unit-ddril", {"upgrade-tdril"})
--- DefineDependency("unit-pdril", {"upgrade-ddril"})
-
-DefineDependency("unit-hosp", {"unit-vault", "unit-camp"})
-DefineDependency("unit-vfac", {"unit-vault", "unit-rfac"})
-DefineDependency("unit-msilo", {"unit-vault", "unit-rfac", "unit-dev-yard"})
 

@@ -7,9 +7,10 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---	upgrade.lua	-	Define the upgrades.
+--      dependency.lua     -       Define the dependencies.
 --
---	(c) Copyright 2001 - 2004 by Lutz Sammer and Crestez Leonard
+--      (c) Copyright 2001 - 2005 by Lutz Sammer, Crestez Leonard, 
+--      Francois Beerten and Loïs Taulelle
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -25,15 +26,8 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 --
---	$Id$
+--      $Id: upgrade.lua 198 2005-08-19 16:44:05Z gruiick $
 
 --   Stuff for the different races
-Load("scripts/elites/upgrade.lua")
 
-DefineAllow("unit-gold-mine", "AAAAAAAAAAAAAAAA")
-
-DefineAllow("unit-dead-body", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-1x1-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-2x2-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-3x3-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-4x4-place", "AAAAAAAAAAAAAAAA")
+Load("scripts/elites/dependency.lua")

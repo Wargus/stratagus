@@ -7,9 +7,10 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---	upgrade.lua	-	Define the upgrades.
+--      dependency.lua     -       Define the elites dependencies.
 --
---	(c) Copyright 2001 - 2004 by Lutz Sammer and Crestez Leonard
+--      (c) Copyright 2001-2005 by Lutz Sammer, Crestez Leonard, 
+--      Francois Beerten and Loïs Taulelle
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -25,15 +26,12 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 --
---	$Id$
+--      $Id: upgrade.lua 211 2005-10-08 09:19:27Z feb $
+--
 
---   Stuff for the different races
-Load("scripts/elites/upgrade.lua")
+DefineDependency("unit-bazoo", {"upgrade-expl2"})
+DefineDependency("unit-grenadier", {"upgrade-expl"})
+DefineDependency("unit-hosp", {"unit-vault", "unit-camp"})
+DefineDependency("unit-vfac", {"unit-vault", "unit-rfac"})
+DefineDependency("unit-msilo", {"unit-vault", "unit-rfac", "unit-dev-yard"})
 
-DefineAllow("unit-gold-mine", "AAAAAAAAAAAAAAAA")
-
-DefineAllow("unit-dead-body", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-1x1-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-2x2-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-3x3-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-4x4-place", "AAAAAAAAAAAAAAAA")
