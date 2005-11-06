@@ -35,7 +35,7 @@ DefineAnimations("animations-chopper", {
         "frame 10", "move 2", "wait 1", "frame 10", "move 2", "wait 1",
         "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 1",
         "frame 10", "move 2", "wait 1", "frame 10", "move 2", "wait 1",
-        "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 0",
+        "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 1",
         "frame 10", "move 2", "wait 1", "frame 10", "move 2", "wait 1",
         "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 1",
         "frame 10", "move 2", "wait 1", "frame 10", "move 2", "wait 1",
