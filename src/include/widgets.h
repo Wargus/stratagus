@@ -10,7 +10,7 @@
 //
 /**@name widgets.h - The widgets headerfile. */
 //
-//      (c) Copyright 2005 by François Beerten
+//      (c) Copyright 2005 by François Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -75,6 +75,32 @@ class ImageWidget : public gcn::Icon
 {
 public:
 	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+};
+
+class ImageCheckBox : public gcn::CheckBox
+{
+public:
+	ImageCheckBox();
+	ImageCheckBox(const std::string &caption, bool marked = false);
+
+	virtual void draw(gcn::Graphics *graphics);
+	virtual void drawBox(gcn::Graphics *graphics);
+
+	virtual void mousePress(int x, int y, int button);
+	virtual void mouseRelease(int x, int y, int button);
+	virtual void mouseClick(int x, int y, int button, int count);
+	virtual void adjustSize();
+
+	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
+	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
+	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
+	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
+
+	gcn::Image *uncheckedNormalImage;
+	gcn::Image *uncheckedPressedImage;
+	gcn::Image *checkedNormalImage;
+	gcn::Image *checkedPressedImage;
+	bool mMouseDown;
 };
 
 class Windows : public gcn::Window

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov  6 20:37:54 2005.
+** Generated automatically by tolua++-1.0.7 on Sun Nov  6 16:14:18 2005.
 */
 
 #ifndef __cplusplus
@@ -33,23 +33,9 @@ void StartReplay(const char *str);
 /* function to release collected object via destructor */
 #ifdef __cplusplus
 
-static int tolua_collect_MenuScreen (lua_State* tolua_S)
+static int tolua_collect_ListBoxWidget (lua_State* tolua_S)
 {
- MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_TextField (lua_State* tolua_S)
-{
- TextField* self = (TextField*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_LuaActionListener (lua_State* tolua_S)
-{
- LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
+ ListBoxWidget* self = (ListBoxWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -61,51 +47,9 @@ static int tolua_collect_Color (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_CColor (lua_State* tolua_S)
-{
- CColor* self = (CColor*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_CheckBox (lua_State* tolua_S)
-{
- CheckBox* self = (CheckBox*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_ImageButton (lua_State* tolua_S)
-{
- ImageButton* self = (ImageButton*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_CPlayer (lua_State* tolua_S)
-{
- CPlayer* self = (CPlayer*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_ListBoxWidget (lua_State* tolua_S)
-{
- ListBoxWidget* self = (ListBoxWidget*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
 static int tolua_collect_DropDownWidget (lua_State* tolua_S)
 {
  DropDownWidget* self = (DropDownWidget*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_RadioButton (lua_State* tolua_S)
-{
- RadioButton* self = (RadioButton*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -117,9 +61,23 @@ static int tolua_collect_Windows (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_Label (lua_State* tolua_S)
+static int tolua_collect_TextField (lua_State* tolua_S)
 {
- Label* self = (Label*) tolua_tousertype(tolua_S,1,0);
+ TextField* self = (TextField*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ImageCheckBox (lua_State* tolua_S)
+{
+ ImageCheckBox* self = (ImageCheckBox*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_CheckBox (lua_State* tolua_S)
+{
+ CheckBox* self = (CheckBox*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -127,6 +85,55 @@ static int tolua_collect_Label (lua_State* tolua_S)
 static int tolua_collect_ImageWidget (lua_State* tolua_S)
 {
  ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_CPlayer (lua_State* tolua_S)
+{
+ CPlayer* self = (CPlayer*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_Label (lua_State* tolua_S)
+{
+ Label* self = (Label*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_LuaActionListener (lua_State* tolua_S)
+{
+ LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_RadioButton (lua_State* tolua_S)
+{
+ RadioButton* self = (RadioButton*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_CColor (lua_State* tolua_S)
+{
+ CColor* self = (CColor*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_MenuScreen (lua_State* tolua_S)
+{
+ MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ImageButton (lua_State* tolua_S)
+{
+ ImageButton* self = (ImageButton*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -147,26 +154,27 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ListBoxWidget");
- tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"CFontColor");
+ tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"Container");
- tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CVideo");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
@@ -1586,18 +1594,14 @@ static int tolua_stratagus_CheckBox_new00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CheckBox",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
- !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
-  bool marked = ((bool)  tolua_toboolean(tolua_S,3,false));
  {
-  CheckBox* tolua_ret = (CheckBox*)  new CheckBox(caption,marked);
+  CheckBox* tolua_ret = (CheckBox*)  new CheckBox();
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CheckBox");
  }
  }
@@ -1618,18 +1622,14 @@ static int tolua_stratagus_CheckBox_new00_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CheckBox",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
- !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
-  bool marked = ((bool)  tolua_toboolean(tolua_S,3,false));
  {
-  CheckBox* tolua_ret = (CheckBox*)  new CheckBox(caption,marked);
+  CheckBox* tolua_ret = (CheckBox*)  new CheckBox();
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"CheckBox");
  }
  }
@@ -1639,6 +1639,62 @@ static int tolua_stratagus_CheckBox_new00_local(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  CheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CheckBox_new01
+static int tolua_stratagus_CheckBox_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CheckBox",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  bool marked = ((bool)  tolua_toboolean(tolua_S,3,false));
+ {
+  CheckBox* tolua_ret = (CheckBox*)  new CheckBox(caption,marked);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CheckBox");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_stratagus_CheckBox_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  CheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CheckBox_new01_local
+static int tolua_stratagus_CheckBox_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CheckBox",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  bool marked = ((bool)  tolua_toboolean(tolua_S,3,false));
+ {
+  CheckBox* tolua_ret = (CheckBox*)  new CheckBox(caption,marked);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"CheckBox");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_stratagus_CheckBox_new00_local(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -1669,6 +1725,250 @@ static int tolua_stratagus_CheckBox_isMarked00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'isMarked'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_new00
+static int tolua_stratagus_ImageCheckBox_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  ImageCheckBox* tolua_ret = (ImageCheckBox*)  new ImageCheckBox();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageCheckBox");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_new00_local
+static int tolua_stratagus_ImageCheckBox_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  ImageCheckBox* tolua_ret = (ImageCheckBox*)  new ImageCheckBox();
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageCheckBox");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_new01
+static int tolua_stratagus_ImageCheckBox_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  bool marked = ((bool)  tolua_toboolean(tolua_S,3,false));
+ {
+  ImageCheckBox* tolua_ret = (ImageCheckBox*)  new ImageCheckBox(caption,marked);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageCheckBox");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_stratagus_ImageCheckBox_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_new01_local
+static int tolua_stratagus_ImageCheckBox_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  bool marked = ((bool)  tolua_toboolean(tolua_S,3,false));
+ {
+  ImageCheckBox* tolua_ret = (ImageCheckBox*)  new ImageCheckBox(caption,marked);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageCheckBox");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_stratagus_ImageCheckBox_new00_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setUncheckedNormalImage of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_setUncheckedNormalImage00
+static int tolua_stratagus_ImageCheckBox_setUncheckedNormalImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageCheckBox* self = (ImageCheckBox*)  tolua_tousertype(tolua_S,1,0);
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setUncheckedNormalImage'",NULL);
+#endif
+ {
+  self->setUncheckedNormalImage(image);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setUncheckedNormalImage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setUncheckedPressedImage of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_setUncheckedPressedImage00
+static int tolua_stratagus_ImageCheckBox_setUncheckedPressedImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageCheckBox* self = (ImageCheckBox*)  tolua_tousertype(tolua_S,1,0);
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setUncheckedPressedImage'",NULL);
+#endif
+ {
+  self->setUncheckedPressedImage(image);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setUncheckedPressedImage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setCheckedNormalImage of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_setCheckedNormalImage00
+static int tolua_stratagus_ImageCheckBox_setCheckedNormalImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageCheckBox* self = (ImageCheckBox*)  tolua_tousertype(tolua_S,1,0);
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCheckedNormalImage'",NULL);
+#endif
+ {
+  self->setCheckedNormalImage(image);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setCheckedNormalImage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setCheckedPressedImage of class  ImageCheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageCheckBox_setCheckedPressedImage00
+static int tolua_stratagus_ImageCheckBox_setCheckedPressedImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageCheckBox",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageCheckBox* self = (ImageCheckBox*)  tolua_tousertype(tolua_S,1,0);
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCheckedPressedImage'",NULL);
+#endif
+ {
+  self->setCheckedPressedImage(image);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setCheckedPressedImage'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4583,7 +4883,27 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_CheckBox_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_CheckBox_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_CheckBox_new00_local);
+  tolua_function(tolua_S,"new",tolua_stratagus_CheckBox_new01);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_CheckBox_new01_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_CheckBox_new01_local);
   tolua_function(tolua_S,"isMarked",tolua_stratagus_CheckBox_isMarked00);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"ImageCheckBox","ImageCheckBox","CheckBox",tolua_collect_ImageCheckBox);
+#else
+ tolua_cclass(tolua_S,"ImageCheckBox","ImageCheckBox","CheckBox",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"ImageCheckBox");
+  tolua_function(tolua_S,"new",tolua_stratagus_ImageCheckBox_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_ImageCheckBox_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_ImageCheckBox_new00_local);
+  tolua_function(tolua_S,"new",tolua_stratagus_ImageCheckBox_new01);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_ImageCheckBox_new01_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_ImageCheckBox_new01_local);
+  tolua_function(tolua_S,"setUncheckedNormalImage",tolua_stratagus_ImageCheckBox_setUncheckedNormalImage00);
+  tolua_function(tolua_S,"setUncheckedPressedImage",tolua_stratagus_ImageCheckBox_setUncheckedPressedImage00);
+  tolua_function(tolua_S,"setCheckedNormalImage",tolua_stratagus_ImageCheckBox_setCheckedNormalImage00);
+  tolua_function(tolua_S,"setCheckedPressedImage",tolua_stratagus_ImageCheckBox_setCheckedPressedImage00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"Label","Label","Widget",tolua_collect_Label);
