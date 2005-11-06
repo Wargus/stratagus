@@ -85,8 +85,20 @@ class Slider : public Widget
 
 class CheckBox : public Widget
 {
-	CheckBox(char *caption, bool marked = false);
+	CheckBox();
+	CheckBox(const std::string &caption, bool marked = false);
 	bool isMarked();
+};
+
+class ImageCheckBox : public CheckBox
+{
+	ImageCheckBox();
+	ImageCheckBox(const std::string &caption, bool marked = false);
+
+	void setUncheckedNormalImage(CGraphic *image);
+	void setUncheckedPressedImage(CGraphic *image);
+	void setCheckedNormalImage(CGraphic *image);
+	void setCheckedPressedImage(CGraphic *image);
 };
 
 class Label : public Widget
