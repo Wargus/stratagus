@@ -45,13 +45,13 @@ DefineButton({
 	Action = "stop", Key = "s", Hint = "~!STOP",
 	ForUnit = {"unit-engineer", "unit-harvester", "unit-assault", "unit-grenadier",
 		"unit-bazoo", "unit-medic", "unit-apcs", "unit-gturret", "elites-group",
-    "unit-buggy"}})
+                "unit-buggy", "unit-cannon"}})
 
 DefineButton({
 	Pos = 3, Level = 0, Icon = "icon-attack",
 	Action = "attack", Key = "a", Hint = "~!ATTACK",
 	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo", "unit-apcs", "unit-gturret",
-		"elites-group", "unit-buggy"}})
+		"elites-group", "unit-buggy", "unit-cannon"}})
 
 DefineButton({
 	Pos = 4, Level = 0, Icon = "icon-patrol",
