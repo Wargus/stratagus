@@ -1,12 +1,11 @@
---       _________ __                 __                               
---      /   _____//  |_____________ _/  |______     ____  __ __  ______
---      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
---      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
---     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
---             \/                  \/          \//_____/            \/ 
---  ______________________                           ______________________
---			  T H E   W A R   B E G I N S
---	   Stratagus - A free fantasy real time strategy game engine
+--            ____            
+--           / __ )____  _____
+--          / __  / __ \/ ___/
+--         / /_/ / /_/ (__  ) 
+--        /_____/\____/____/  
+--
+--  Invasion - Battle of Survival                  
+--   A GPL'd futuristic RTS game
 --
 --	unit-cannon.lua	-	Define the cannon unit.
 --
@@ -46,7 +45,7 @@ DefineIcon({
 DefineIcon({
 	Name = "icon-cannon_b",
 	Size = {46, 38},
-	Frame = 10,
+	Frame = 0,
 	File = "units/cannon/cannon_i.png"})
 
 DefineConstruction("construction-cannon", {
