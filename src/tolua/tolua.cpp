@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov  6 12:46:35 2005.
+** Generated automatically by tolua++-1.0.7 on Sun Nov  6 20:37:54 2005.
 */
 
 #ifndef __cplusplus
@@ -1878,14 +1878,18 @@ static int tolua_stratagus_ListBoxWidget_new00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ListBoxWidget",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
+  unsigned int width = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+  unsigned int height = ((unsigned int)  tolua_tonumber(tolua_S,3,0));
  {
-  ListBoxWidget* tolua_ret = (ListBoxWidget*)  new ListBoxWidget();
+  ListBoxWidget* tolua_ret = (ListBoxWidget*)  new ListBoxWidget(width,height);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ListBoxWidget");
  }
  }
@@ -1906,14 +1910,18 @@ static int tolua_stratagus_ListBoxWidget_new00_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ListBoxWidget",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
+  unsigned int width = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+  unsigned int height = ((unsigned int)  tolua_tonumber(tolua_S,3,0));
  {
-  ListBoxWidget* tolua_ret = (ListBoxWidget*)  new ListBoxWidget();
+  ListBoxWidget* tolua_ret = (ListBoxWidget*)  new ListBoxWidget(width,height);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ListBoxWidget");
  }
  }
