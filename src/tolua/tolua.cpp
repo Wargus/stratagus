@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov  5 12:17:26 2005.
+** Generated automatically by tolua++-1.0.7 on Sun Nov  6 12:46:35 2005.
 */
 
 #ifndef __cplusplus
@@ -1292,6 +1292,67 @@ static int tolua_stratagus_ImageButton_new00_local(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setHotKey of class  ImageButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageButton_setHotKey00
+static int tolua_stratagus_ImageButton_setHotKey00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageButton",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageButton* self = (ImageButton*)  tolua_tousertype(tolua_S,1,0);
+  const int key = ((const int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setHotKey'",NULL);
+#endif
+ {
+  self->setHotKey(key);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setHotKey'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setHotKey of class  ImageButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageButton_setHotKey01
+static int tolua_stratagus_ImageButton_setHotKey01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageButton",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  ImageButton* self = (ImageButton*)  tolua_tousertype(tolua_S,1,0);
+  const char* key = ((const char*)  tolua_tostring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setHotKey'",NULL);
+#endif
+ {
+  self->setHotKey(key);
+ }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_stratagus_ImageButton_setHotKey00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -4479,6 +4540,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_ImageButton_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_ImageButton_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_ImageButton_new00_local);
+  tolua_function(tolua_S,"setHotKey",tolua_stratagus_ImageButton_setHotKey00);
+  tolua_function(tolua_S,"setHotKey",tolua_stratagus_ImageButton_setHotKey01);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ImageWidget","ImageWidget","Widget",tolua_collect_ImageWidget);
