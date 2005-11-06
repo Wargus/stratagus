@@ -437,14 +437,80 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 --  ListBoxWidget
 ----------------------------------------------------------------------------*/
 
+/**
+**  Constructor.
+**
+**  @todo Size should be parametrable, maybe remove default construtor ?
+*/
+ListBoxWidget::ListBoxWidget()
+{
+	unsigned int width = 200; unsigned int height = 100;
+
+	setDimension(gcn::Rectangle(0, 0, width, height));
+	setContent(&listbox);
+	setBackgroundColor(gcn::Color(128, 128, 128));
+}
+
 
 /**
 **  FIXME: docu
+**
+**  @todo Fix width of the scroll area (depend of v-scroll or not).
 */
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
-	listmodel.setList(lua, lo);
-	setListModel(&listmodel);
+	int i;
+	int width;
+	gcn::ListModel *listmodel;
+
+	lualistmodel.setList(lua, lo);
+	listbox.setListModel(&lualistmodel);
+	width = listbox.getWidth();
+	Assert(listbox.getListModel());
+	listmodel = listbox.getListModel();
+	for (i = 0; i < listmodel->getNumberOfElements(); ++i) {
+		if (width < listbox.getFont()->getWidth(listmodel->getElementAt(i))) {
+			width = listbox.getFont()->getWidth(listmodel->getElementAt(i));
+		}
+	}
+	if (width != listbox.getWidth()) {
+		listbox.setWidth(width);
+	}
+}
+
+/**
+** Sets the ListModel index of the selected element.
+**
+** @param selected the ListModel index of the selected element.
+**
+**  @see gcn::ListBox
+*/
+void ListBoxWidget::setSelected(int selected)
+{
+	listbox.setSelected(selected);
+}
+
+/**
+**  Gets the ListModel index of the selected element.
+**
+**  @return the ListModel index of the selected element.
+**
+**  @see gcn::ListBox
+*/
+int ListBoxWidget::getSelected() const
+{
+	return const_cast<gcn::ListBox &> (listbox).getSelected();
+}
+
+/**
+**  Set background color of the ListBoxWidget.
+**
+**  @param color  Color to set.
+*/
+void ListBoxWidget::setBackgroundColor(const gcn::Color &color)
+{
+	gcn::ScrollArea::setBackgroundColor(color);
+	listbox.setBackgroundColor(color);
 }
 
 
