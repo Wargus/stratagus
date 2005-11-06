@@ -112,7 +112,7 @@ class TextField : public Widget
 
 class ListBoxWidget : public Widget
 {
-	ListBoxWidget();
+	ListBoxWidget(unsigned int width, unsigned int height);
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected (int selected);
 	int getSelected();
