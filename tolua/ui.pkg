@@ -145,4 +145,7 @@ class MenuScreen : Container
 
 $void StartMap(const char *str);
 void StartMap(const char *str);
-
+$void StartEditor(const char *str);
+void StartEditor(const char *str);
+$void StartReplay(const char *str);
+void StartReplay(const char *str);

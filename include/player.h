@@ -513,6 +513,8 @@ extern int PlayerColorIndexCount;
 extern void InitPlayers(void);
 	/// Clean up players
 extern void CleanPlayers(void);
+	/// Clean up races
+extern void CleanRaces(void);
 	/// Save players
 extern void SavePlayers(CFile *file);
 
