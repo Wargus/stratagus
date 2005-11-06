@@ -82,9 +82,9 @@ DefineUnitType("unit-chopper", {
 DefineAllow("unit-chopper", "AAAAAAAAAAAAAAAA")
 
 DefineButton({
-	Pos = 7, Level = 0, Icon = "icon-chopper", Action = "train-unit",
+	Pos = 3, Level = 0, Icon = "icon-chopper", Action = "train-unit",
 	Value = "unit-chopper", Key = "c", Hint = "BUILD ~!Chopper",
-	ForUnit = {"unit-vfac"}})
+	ForUnit = {"unit-dev-yard"}})
 
 DefineCommonButtons({"unit-chopper"})
 
