@@ -517,7 +517,6 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 /**
 **  FIXME: docu
 **
-**  @todo Fix width of the scroll area (depend of v-scroll or not).
 */
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
@@ -575,6 +574,8 @@ void ListBoxWidget::setFont(gcn::Font *font)
 
 /**
 **  Adjust size of the listBox.
+**
+**  @todo Fix width of the scroll area (depend of v-scroll or not).
 */
 void ListBoxWidget::adjustSize()
 {
