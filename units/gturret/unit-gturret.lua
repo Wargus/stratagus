@@ -1,12 +1,11 @@
---       _________ __                 __                               
---      /   _____//  |_____________ _/  |______     ____  __ __  ______
---      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
---      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
---     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
---             \/                  \/          \//_____/            \/ 
---  ______________________                           ______________________
---			  T H E   W A R   B E G I N S
---	   Stratagus - A free fantasy real time strategy game engine
+--            ____            
+--           / __ )____  _____
+--          / __  / __ \/ ___/
+--         / /_/ / /_/ (__  ) 
+--        /_____/\____/____/  
+--
+--  Invasion - Battle of Survival                  
+--   A GPL'd futuristic RTS game
 --
 --	unit-gturret.lua	-	Define the gun turret unit.
 --
@@ -44,7 +43,7 @@ DefineIcon({
 DefineIcon({
 	Name = "icon-gturret_b",
 	Size = {46, 38},
-	Frame = 10,
+	Frame = 0,
 	File = "units/gturret/gturret_i.png"})
 
 DefineConstruction("construction-gturret", {
@@ -76,7 +75,7 @@ DefineUnitType("unit-gturret", {
 	ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
 	CanAttack = true, CanTargetLand = true, NumDirections = 8, Flip = false,
 	Corpse = {"build-dead-body2", 0}, Type = "land",
-	--[[MustBuildOnTop = "unit-plate1", --]] Building = true, BuilderOutside = true,
+	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {"selected", "gturret-selected",}
 })
