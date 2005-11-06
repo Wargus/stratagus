@@ -192,6 +192,7 @@ ImageButton::ImageButton(char *caption, gcn::Image *a, gcn::Image *b) : Button(c
 	setForegroundColor(0xffffff);
 	normalImage = a;
 	pressedImage = b;
+	hotKey = 0;
 	adjustSize();
 }
 
@@ -276,6 +277,69 @@ void ImageButton::adjustSize()
 {
 	setWidth(normalImage->getWidth());
 	setHeight(normalImage->getHeight());
+}
+
+static bool isHotKey(const gcn::Key &key, int hotKey)
+{
+	if (isascii(key.getValue())) {
+		return tolower(key.getValue()) == hotKey;
+	} else {
+		return key.getValue() == hotKey;
+	}
+}
+
+/**
+**  Key pressed callback
+**
+**  @param key  Key that is pressed
+*/
+void ImageButton::keyPress(const gcn::Key &key)
+{
+	Button::keyPress(key);
+	if (isHotKey(key, hotKey)) {
+		mKeyDown = true;
+	}
+}
+
+/**
+**  Key released callback
+**
+**  @param key  Key that is released
+*/
+void ImageButton::keyRelease(const gcn::Key &key)
+{
+	Button::keyRelease(key);
+	if (mKeyDown && isHotKey(key, hotKey)) {
+		mKeyDown = false;
+		generateAction();
+	}
+}
+
+/**
+**  Set the hot key
+**
+**  @param key  The hot key
+*/
+void ImageButton::setHotKey(const int key)
+{
+	if (isascii(key)) {
+		hotKey = tolower(key);
+	} else {
+		hotKey = key;
+	}
+}
+
+/**
+**  Set the hot key
+**
+**  @param key  The hot key
+*/
+void ImageButton::setHotKey(const char *key)
+{
+	Assert(key);
+	Assert(strlen(key) == 1);
+	Assert(isalnum(key[0]));
+	hotKey = tolower(key[0]);
 }
 
 
@@ -509,7 +573,7 @@ int ListBoxWidget::getSelected() const
 */
 void ListBoxWidget::setBackgroundColor(const gcn::Color &color)
 {
-	gcn::ScrollArea::setBackgroundColor(color);
+	ScrollArea::setBackgroundColor(color);
 	listbox.setBackgroundColor(color);
 }
 
