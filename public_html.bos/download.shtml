@@ -37,11 +37,16 @@ to download the stratagus engine too.
 <h2>Development version</h2>
 The game is still in development. You can get the latest version with <a href="http://subversion.tigris.org/">subversion</a>:
  <pre>svn co svn://bos.seul.org/svn/bos/data.bos/trunk data.bos</pre>
-<p>
-To start the game run :<br>
+
+<p>You'll need the latest development version of the stratagus engine:<br>
+ <pre>cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/stratagus co stratagus</pre>
+
+<p>To start the game run :<br>
  <pre>./stratagus -d path/to/data.bos</pre>
 
-Old development done before december 17th 2004 can be found in the 
+<p>See <a href="http://colabti.de/wiki/pmwiki/Bos/FAQ">bos FAQ</a> to get more informations.
+
+<p>Old development done before december 17th 2004 can be found in the 
 <a href="http://savannah.nongnu.org/cvs/?group=stratagus-bos">CVS repository</a>.
 
 
