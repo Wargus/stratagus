@@ -541,6 +541,12 @@ void HandleActionBuilt(CUnit *unit)
 
 		UpdateForNewUnit(unit, 0);
 
+		// Set the direction of the building if it supports them
+		if (unit->Type->NumDirections > 1) {
+			unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
+			UnitUpdateHeading(unit);
+		}
+
 		if (IsOnlySelected(unit)) {
 			SelectedUnitChanged();
 		} else if (unit->Player == ThisPlayer) {
