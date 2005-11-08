@@ -45,6 +45,7 @@ DefineUnitType("unit-tree04", {
 	Construction = "construction-tree",
 	Speed = 0, HitPoints = 50, DrawLevel = 25, 
 	TileSize  = {1, 1}, BoxSize = {32, 32},
+	NeutralMinimapColor = {10, 250, 10},	
 	SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
 	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
