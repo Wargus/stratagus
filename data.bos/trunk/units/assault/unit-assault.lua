@@ -75,7 +75,7 @@ DefineUnitType("unit-assault", {
 	Armor = 3, BasicDamage = 4, PiercingDamage = 0, Missile = "missile-none",
 	MaxAttackRange = 5, Priority = 60, Points = 50,
 	Corpse = {"unit-dead-body1", 0}, Type = "land", Demand = 0,
-	CanAttack = true, CanTargetLand = true,
+	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	LandUnit = true, organic = true, SelectableByRectangle = true,
 	Sounds = {
 		"selected", "assault-selected",
