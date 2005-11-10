@@ -68,7 +68,7 @@ DefineUnitType("unit-rtank", {
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
-	Demand = 0, CanAttack = true, CanTargetLand = true,
+	Demand = 0, CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	NumDirections = 8, MaxAttackRange = 7,
 	Sounds = {
 		"selected", "grenadier-selected",
