@@ -89,6 +89,9 @@ Intro GameIntro;              /// Game intro
 Credits GameCredits;          /// Game credits
 static PlayerRanks Ranks[PlayerMax];  /// Ranks
 
+static bool sound_done;
+static int sound_channel;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -368,6 +371,16 @@ static int ScrollText(int x, int y, int w, int h, int i, TextLines *lines)
 }
 
 /**
+**  Sound callback for ShowIntro
+*/
+static void ShowIntroSoundCallback(int channel)
+{
+	delete GetChannelSample(channel);
+	sound_channel = -1;
+	sound_done = true;
+}
+
+/**
 **  Show level intro.
 **
 **  @param intro  Intro struct
@@ -388,9 +401,6 @@ void ShowIntro(const Intro *intro)
 	TextLines *scrolling_text;
 	TextLines *objectives_text[MAX_OBJECTIVES];
 	int old_video_sync;
-	int soundfree;
-	int soundout;
-	int soundcount;
 
 	UseContinueButton = 1;
 	InitContinueButton(455 * Video.Width / 640, 440 * Video.Height / 480);
@@ -435,13 +445,13 @@ void ShowIntro(const Intro *intro)
 	CallbackMusicOff();
 	PlaySectionMusic(PlaySectionBriefing);
 
-	soundfree = -1;
-	soundout = -1;
-	soundcount = 0;
+	sound_done = false;
+	sound_channel = -1;
 	if (intro->VoiceFile[0]) {
-		soundfree = NextFreeChannel;
-		soundout = NextSoundRequestOut;
-		PlaySoundFile(intro->VoiceFile[0]);
+		sound_channel = PlaySoundFile(intro->VoiceFile[0]);
+		if (sound_channel != -1) {
+			SetChannelFinishedCallback(sound_channel, ShowIntroSoundCallback);
+		}
 	}
 
 	SplitTextIntoLines(text, 320, &scrolling_text);
@@ -459,20 +469,13 @@ void ShowIntro(const Intro *intro)
 	IntroNoEvent = 1;
 	c = 0;
 	while (1) {
-		// FIXME: move sound specific code to the sound files
-		if (soundfree != -1 && (!Channels[soundfree].Command) &&
-				stage < MAX_BRIEFING_VOICES && soundout != NextSoundRequestOut &&
-				intro->VoiceFile[stage]) {
-			// FIXME: is there a better way to do this?
-			if (soundcount == 15) {
-				soundfree = NextFreeChannel;
-				soundout = NextSoundRequestOut;
-				PlaySoundFile(intro->VoiceFile[stage]);
-				++stage;
-				soundcount = 0;
-			} else {
-				++soundcount;
+		if (sound_done && stage < MAX_BRIEFING_VOICES && intro->VoiceFile[stage]) {
+			sound_done = false;
+			sound_channel = PlaySoundFile(intro->VoiceFile[stage]);
+			if (sound_channel != -1) {
+				SetChannelFinishedCallback(sound_channel, ShowIntroSoundCallback);
 			}
+			++stage;
 		}
 
 		//
@@ -545,8 +548,8 @@ void ShowIntro(const Intro *intro)
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
 
-	if (soundfree != -1 && Channels[soundfree].Command) {
-		FreeOneChannel(soundfree);
+	if (!sound_done) {
+		StopChannel(sound_channel);
 	}
 
 	CallbackMusicOn();

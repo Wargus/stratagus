@@ -43,7 +43,7 @@
 #include <vector>
 
 #include "video.h"
-#include "sound_id.h"
+#include "sound.h"
 #include "unitsound.h"
 #include "editor.h"
 #include "unittype.h"

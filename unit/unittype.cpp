@@ -47,7 +47,7 @@
 #include "video.h"
 #include "tileset.h"
 #include "map.h"
-#include "sound_id.h"
+#include "sound.h"
 #include "unitsound.h"
 #include "construct.h"
 #include "unittype.h"

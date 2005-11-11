@@ -5,12 +5,12 @@
 ##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 ##             \/                  \/          \//_____/            \/
 ##  ______________________                           ______________________
-##			  T H E   W A R   B E G I N S
-##	   Stratagus - A free fantasy real time strategy game engine
+##                        T H E   W A R   B E G I N S
+##         Stratagus - A free fantasy real time strategy game engine
 ##
-##	Module.make	-	Module Makefile (included from Makefile).
+##      Module.make - Module Makefile (included from Makefile).
 ##
-##	(c) Copyright 2004 by The Stratagus Team
+##      (c) Copyright 2004-2005 by The Stratagus Team
 ##
 ##      This program is free software; you can redistribute it and/or modify
 ##      it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ MHDRS =  actions.h ai.h animation.h campaign.h cdaudio.h commands.h \
          interface.h iocompat.h iolib.h libcda.h map.h master.h menus.h \
          minimap.h missile.h movie.h myendian.h net_lowlevel.h netconnect.h \
          network.h pathfinder.h player.h script.h script_sound.h settings.h \
-         sound.h sound_id.h sound_server.h spells.h tileset.h trigger.h ui.h \
-         unit.h unitsound.h unittype.h upgrade.h upgrade_structs.h util.h \
-         video.h wav.h widgets.h
+         sound.h sound_server.h spells.h tileset.h trigger.h ui.h unit.h \
+         unitsound.h unittype.h upgrade.h upgrade_structs.h util.h video.h \
+         wav.h widgets.h
 
 HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))

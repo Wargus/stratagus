@@ -43,7 +43,7 @@
 #include <string>
 #include <map>
 
-#include "sound_id.h"
+#include "sound.h"
 #include "sound_server.h"
 #include "util.h"
 

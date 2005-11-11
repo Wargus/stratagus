@@ -40,7 +40,6 @@
 
 #include "stratagus.h"
 #include "video.h"
-#include "sound_id.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "unittype.h"
