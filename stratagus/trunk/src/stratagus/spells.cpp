@@ -57,7 +57,6 @@
 #include "upgrade.h"
 #include "spells.h"
 #include "sound.h"
-#include "sound_id.h"
 #include "missile.h"
 #include "map.h"
 #include "tileset.h"

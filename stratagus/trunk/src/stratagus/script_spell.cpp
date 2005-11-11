@@ -40,6 +40,7 @@
 #include "stratagus.h"
 #include "spells.h"
 #include "script_sound.h"
+#include "sound.h"
 #include "script.h"
 #include "missile.h"
 #include "unittype.h"

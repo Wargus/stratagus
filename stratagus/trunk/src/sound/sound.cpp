@@ -44,7 +44,7 @@
 #include "SDL.h"
 
 #include "video.h"
-#include "sound_id.h"
+#include "sound.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
@@ -88,49 +88,92 @@ GameSound GameSounds
 #endif
 	;
 
+/**
+**  Selection handling
+*/
+struct SelectionHandling {
+	Origin Source;         /// origin of the sound
+	CSound *Sound;         /// last sound played by this unit
+	unsigned char HowMany; /// number of sound played in this group
+};
+
+/// FIXME: docu
+SelectionHandling SelectionHandler;
+
+int ViewPointOffset;             /// Distance to Volume Mapping
+int DistanceSilent;              /// silent distance
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**  Helper function: insert a sound request in the server side sound FIFO.
-**
-**  @param unit         Pointer to unit.
-**  @param id           Unit identifier, for pointer reuse detection.
-**  @param power        How loud to play the sound.
-**  @param sound        FIXME: docu
-**  @param selection    FIXME: docu
-**  @param volume       FIXME: docu
-**  @param stereo       FIXME: docu
+**  "Randomly" choose a sample from a sound group.
 */
-static void InsertSoundRequest(const CUnit *unit, unsigned id,
-	unsigned short power, CSound *sound,
-	unsigned char selection, unsigned char volume, char stereo)
+static CSample *SimpleChooseSample(CSound *sound)
 {
-	SDL_LockAudio();
+	if (sound->Number == ONE_SOUND) {
+		return sound->Sound.OneSound;
+	} else {
+		//FIXME: check for errors
+		//FIXME: valid only in shared memory context (FrameCounter)
+		return sound->Sound.OneGroup[FrameCounter % sound->Number];
+	}
+}
 
-	//FIXME: valid only in a shared memory context...
-	if (!SoundOff && sound != NO_SOUND) {
-		if (SoundRequests[NextSoundRequestIn].Used) {
-			DebugPrint("sound FIFO is full\n");
-		} else {
-			SoundRequests[NextSoundRequestIn].Used = 1;
-			SoundRequests[NextSoundRequestIn].Source.Base = unit;
-			SoundRequests[NextSoundRequestIn].Source.Id = id;
-			SoundRequests[NextSoundRequestIn].Sound = sound;
-			SoundRequests[NextSoundRequestIn].Power = power;
-			SoundRequests[NextSoundRequestIn].Selection = selection ? 1 : 0;
-			SoundRequests[NextSoundRequestIn].IsVolume = volume ? 1 : 0;
-			SoundRequests[NextSoundRequestIn].Stereo = stereo;
+/**
+**  Choose the sample to play
+*/
+static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
+{
+	CSample *result = NULL;
 
-			++NextSoundRequestIn;
-			if (NextSoundRequestIn >= MAX_SOUND_REQUESTS) {
-				NextSoundRequestIn = 0;
+	if (!sound) {
+		return NULL;
+	}
+
+	if (sound->Number == TWO_GROUPS) {
+		// handle a special sound (selection)
+		if (SelectionHandler.Source.Base == source.Base &&
+				SelectionHandler.Source.Id == source.Id) {
+			if (SelectionHandler.Sound == sound->Sound.TwoGroups->First) {
+				result = SimpleChooseSample(SelectionHandler.Sound);
+				SelectionHandler.HowMany++;
+				if (SelectionHandler.HowMany >= 3) {
+					SelectionHandler.HowMany = 0;
+					SelectionHandler.Sound = sound->Sound.TwoGroups->Second;
+				}
+			} else {
+				//FIXME: checks for error
+				// check whether the second group is really a group
+				if (SelectionHandler.Sound->Number > 1) {
+					result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
+					SelectionHandler.HowMany++;
+					if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
+						SelectionHandler.HowMany = 0;
+						SelectionHandler.Sound = sound->Sound.TwoGroups->First;
+					}
+				} else {
+					result = SelectionHandler.Sound->Sound.OneSound;
+					SelectionHandler.HowMany = 0;
+					SelectionHandler.Sound = sound->Sound.TwoGroups->First;
+				}
 			}
+		} else {
+			SelectionHandler.Source = source;
+			SelectionHandler.Sound = sound->Sound.TwoGroups->First;
+			result = SimpleChooseSample(SelectionHandler.Sound);
+			SelectionHandler.HowMany = 1;
+		}
+	} else {
+		// normal sound/sound group handling
+		result = SimpleChooseSample(sound);
+		if (selection) {
+			SelectionHandler.Source = source;
 		}
 	}
 
-	SDL_UnlockAudio();
+	return result;
 }
 
 /**
@@ -139,9 +182,7 @@ static void InsertSoundRequest(const CUnit *unit, unsigned id,
 **  @param unit    Sound initiator
 **  @param voice   Type of sound wanted
 **
-**  @return Sound identifier
-**
-**  @todo FIXME: The work completed sounds only supports two races.
+**  @return        Sound identifier
 */
 static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 {
@@ -167,7 +208,61 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 		case VoiceHarvesting:
 			return unit->Type->Sound.Harvest[unit->CurrentResource].Sound;
 	}
-	return NULL;
+
+	return NO_SOUND;
+}
+
+/**
+**  Compute a suitable volume for something taking place at a given
+**  distance from the current view point.
+**
+**  @param d      distance
+**  @param range  range
+**
+**  @return       volume for given distance (0..??)
+*/
+static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
+{
+	int d_tmp;
+	int range_tmp;
+
+	// FIXME: THIS IS SLOW!!!!!!!
+	if (d <= ViewPointOffset || range == INFINITE_SOUND_RANGE) {
+		return MaxVolume;
+	} else {
+		if (range) {
+			d -= ViewPointOffset;
+			d_tmp = d * MAX_SOUND_RANGE;
+			range_tmp = DistanceSilent * range;
+			if (d_tmp > range_tmp) {
+				return 0;
+			} else {
+				return (unsigned char)((range_tmp - d_tmp) *
+					MAX_SOUND_RANGE / range_tmp);
+			}
+		} else {
+			return 0;
+		}
+	}
+}
+
+/**
+**  Calculate the volume associated with a request, either by clipping the
+**  range parameter of this request, or by mapping this range to a volume.
+*/
+static unsigned char CalculateVolume(bool isVolume, int power,
+	unsigned char range)
+{
+	if (isVolume) {
+		if (power > MaxVolume) {
+			return MaxVolume;
+		} else {
+			return (unsigned char)power;
+		}
+	} else {
+		// map distance to volume
+		return VolumeForDistance(power, range);
+	}
 }
 
 /**
@@ -199,9 +294,13 @@ static char CalculateStereo(const CUnit *unit)
 */
 void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 {
-	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
-		ChooseUnitVoiceSound(unit, voice),
-		(voice == VoiceSelected || voice == VoiceBuilding), 0, CalculateStereo(unit));
+	CSound *sound = ChooseUnitVoiceSound(unit, voice);
+	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
+	Origin source = {unit, unit->Slot};
+
+	int channel = PlaySample(ChooseSample(sound, selection, source));
+	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
+	SetChannelStereo(channel, CalculateStereo(unit));
 }
 
 /**
@@ -212,10 +311,12 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 **  @param unit  Sound initiator, unit speaking
 **  @param id    Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSound(const CUnit *unit, CSound *id)
+void PlayUnitSound(const CUnit *unit, CSound *sound)
 {
-	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
-		id, 0, 0, CalculateStereo(unit));
+	Origin source = {unit, unit->Slot};
+	int channel = PlaySample(ChooseSample(sound, false, source));
+	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
+	SetChannelStereo(channel, CalculateStereo(unit));
 }
 
 /**
@@ -237,8 +338,11 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 		stereo = 127;
 	}
 
-	InsertSoundRequest(NULL, 0, ViewPointDistanceToMissile(missile), sound,
-		0, 0, stereo);
+	Origin source = {NULL, 0};
+
+	int channel = PlaySample(ChooseSample(sound, false, source));
+	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range));
+	SetChannelStereo(channel, stereo);
 }
 
 /**
@@ -246,50 +350,90 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 */
 void PlayGameSound(CSound *sound, unsigned char volume)
 {
-	InsertSoundRequest(NULL, 0, volume, sound, 0, 1, 0);
+	Origin source = {NULL, 0};
+
+	int channel = PlaySample(ChooseSample(sound, false, source));
+	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
 }
 
 /**
-**  Ask to the sound server to set the global volume of the sound.
+**  Ask the sound server to change the range of a sound.
 **
-**  @param volume     the sound volume (positive number) 0-255
-**
-**  @see MaxVolume
+**  @param sound  the id of the sound to modify.
+**  @param range  the new range for this sound.
 */
-void SetGlobalVolume(int volume)
+void SetSoundRange(CSound *sound, unsigned char range)
 {
-	//FIXME: we use here the fact that we are in a shared memory context. This
-	// should send a message to the sound server
-	// silently discard out of range values
-	if (volume < 0) {
-		GlobalVolume = 0;
-	} else if (volume > MaxVolume) {
-		GlobalVolume = MaxVolume;
-	} else {
-		GlobalVolume = volume;
+	if (sound != NO_SOUND) {
+		sound->Range = range;
 	}
 }
 
 /**
-**  Ask to the sound server to set the volume of the music.
+**  Ask the sound server to register a sound (and currently to load it)
+**  and to return an unique identifier for it. The unique identifier is
+**  memory pointer of the server.
 **
-**  @param volume    the music volume (positive number) 0-255
+**  @param files   An array of wav files.
+**  @param number  Number of files belonging together.
 **
-**  @see MaxVolume
+**  @return        the sound unique identifier
+**
+**  @todo FIXME: Must handle the errors better.
+**  FIXME: Support for more sample files (ogg/flac/mp3).
 */
-void SetMusicVolume(int volume)
+CSound *RegisterSound(const char *files[], unsigned number)
 {
-	//FIXME: we use here the fact that we are in a shared memory context. This
-	// should send a message to the sound server
+	unsigned i;
+	CSound *id;
 
-	// silently discard out of range values
-	if (volume < 0) {
-		MusicVolume = 0;
-	} else if (volume > MaxVolume) {
-		MusicVolume = MaxVolume;
-	} else {
-		MusicVolume = volume;
+	id = new CSound;
+	if (number > 1) { // load a sound group
+		id->Sound.OneGroup = new CSample *[number];
+		for (i = 0; i < number; ++i) {
+			id->Sound.OneGroup[i] = LoadSample(files[i]);
+			if (!id->Sound.OneGroup[i]) {
+				delete[] id->Sound.OneGroup;
+				delete id;
+				return NO_SOUND;
+			}
+		}
+		id->Number = number;
+	} else { // load an unique sound
+		id->Sound.OneSound = LoadSample(files[0]);
+		if (!id->Sound.OneSound) {
+			delete id;
+			return NO_SOUND;
+		}
+		id->Number = ONE_SOUND;
 	}
+	id->Range = MAX_SOUND_RANGE;
+	return id;
+}
+
+/**
+**  Ask the sound server to put together two sounds to form a special sound.
+**
+**  @param first   first part of the group
+**  @param second  second part of the group
+**
+**  @return        the special sound unique identifier
+*/
+CSound *RegisterTwoGroups(CSound *first, CSound *second)
+{
+	CSound *id;
+
+	if (first == NO_SOUND || second == NO_SOUND) {
+		return NO_SOUND;
+	}
+	id = new CSound;
+	id->Number = TWO_GROUPS;
+	id->Sound.TwoGroups = new TwoGroups;
+	id->Sound.TwoGroups->First = first;
+	id->Sound.TwoGroups->Second = second;
+	id->Range = MAX_SOUND_RANGE;
+
+	return id;
 }
 
 /**

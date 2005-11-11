@@ -41,7 +41,7 @@
 
 #include "unit.h"
 #include "unitsound.h"
-#include "sound_id.h"
+#include "sound_server.h"
 #include "player.h"
 
 /*----------------------------------------------------------------------------
@@ -106,6 +106,63 @@ public:
 	PlaySectionOrder FileOrder;  /// File order
 };
 
+struct TwoGroups;
+
+/**
+**  Sound definition.
+*/
+class CSound {
+public:
+	/**
+	**  Range is a multiplier for ::DistanceSilent.
+	**  255 means infinite range of the sound.
+	*/
+	unsigned char Range;        /// Range is a multiplier for DistanceSilent
+	unsigned char Number;       /// single, group, or table of sounds.
+	union {
+		CSample *OneSound;       /// if it's only a simple sound
+		CSample **OneGroup;      /// when it's a simple group
+		TwoGroups *TwoGroups; /// when it's a double group
+	} Sound;
+};
+
+/**
+** A possible value for Number in the Sound struct: means a simple sound
+*/
+#define ONE_SOUND 0
+/**
+** A possible value for Number in the Sound struct: means a double group (for
+** selection/annoyed sounds)
+*/
+#define TWO_GROUPS 1
+
+/**
+** the range value that makes a sound volume distance independent
+*/
+#define INFINITE_SOUND_RANGE 255
+/**
+** the maximum range value
+*/
+#define MAX_SOUND_RANGE 254
+
+/**
+**  Sound double group: a sound that groups two sounds, used to implement
+**  the annoyed/selected sound system of WC
+*/
+struct TwoGroups {
+	CSound *First;                /// first group: selected sound
+	CSound *Second;               /// second group: annoyed sound
+};
+
+/**
+**  Origin of a sound
+*/
+struct Origin {
+	const void *Base;   /// pointer on a Unit
+	unsigned Id;        /// unique identifier (if the pointer has been shared)
+};
+
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -159,20 +216,22 @@ extern void PlayMissileSound(const Missile *missile, CSound *sound);
 */
 extern void PlayGameSound(CSound *sound, unsigned char volume);
 
-	/// Set global volume
-extern void SetGlobalVolume(int volume);
-	/// Set music volume
-extern void SetMusicVolume(int volume);
-
 /**
 **  Initialize client side of the sound layer.
 */
 extern void InitSoundClient(void);
 
+	/// Register a sound (can be a simple sound or a group)
+extern CSound *RegisterSound(const char *file[], unsigned number);
+
+	///  Create a special sound group with two sounds
+extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
+
+	/// Modify the range of a given sound.
+extern void SetSoundRange(CSound *sound, unsigned char range);
+
 extern void PlaySectionMusic(PlaySectionType section);
 
-	/// Play a sample file
-extern void PlaySoundFile(const char *name);
 	/// Play a music file
 extern int PlayMusic(const char *name);
 	/// Stop music playing
@@ -184,6 +243,16 @@ extern void StopMusic(void);
 	/// Turn music stopped callback off
 #define CallbackMusicOff() \
 	CallbackMusic = 0;
+
+	/// Make a sound bound to identifier
+extern CSound *MakeSound(const char *sound_name, const char *file[], int nb);
+	/// Get the sound id bound to an identifier
+extern CSound *SoundForName(const char *sound_name);
+	/// Map sound to identifier
+extern void MapSound(const char *sound_name, CSound *id);
+	/// Make a sound group bound to identifier
+extern CSound *MakeSoundGroup(const char *name, CSound *first, CSound *second);
+
 
 //@}
 

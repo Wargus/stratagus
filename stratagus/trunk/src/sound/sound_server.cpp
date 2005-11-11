@@ -51,14 +51,13 @@
 #include "SDL.h"
 
 #include "video.h"
-#include "sound_id.h"
+#include "sound.h"
+#include "sound_server.h"
 #include "unitsound.h"
 #include "tileset.h"
 #include "ui.h"
 #include "iolib.h"
 #include "iocompat.h"
-#include "sound_server.h"
-#include "sound.h"
 #include "cdaudio.h"
 #include "script.h"
 
@@ -76,23 +75,30 @@ static int SoundInitialized;     /// audio file descriptor
 int PlayingMusic;                /// flag true if playing music
 int CallbackMusic;               /// flag true callback ccl if stops
 
-#ifdef DEBUG
-unsigned AllocatedSoundMemory;   /// memory used by sound
-#endif
-
 int GlobalVolume = 128;          /// global sound volume
 int MusicVolume = 128;           /// music volume
-
-int DistanceSilent;              /// silent distance
-
-// the sound FIFO
-SoundRequest SoundRequests[MAX_SOUND_REQUESTS];
-int NextSoundRequestIn;
-int NextSoundRequestOut;
 
 static int MusicTerminated;
 
 SDL_mutex *MusicTerminatedMutex;
+
+
+	/// Channels for sound effects and unit speach
+struct SoundChannel {
+	CSample *Sample;       /// sample to play
+	unsigned char Volume;  /// Volume of this channel
+	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
+
+	bool Playing;          /// channel is currently playing
+	int Point;             /// point in sample if playing or next free channel
+
+	void (*FinishedCallback)(int channel); /// Callback for when a sample finishes playing
+};
+
+#define MaxChannels 32     /// How many channels are supported
+
+SoundChannel Channels[MaxChannels];
+int NextFreeChannel;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -100,7 +106,7 @@ SDL_mutex *MusicTerminatedMutex;
 
 /**
 **  Check if the playlist need to be advanced,
-**  and invoque music-stopped if necessary
+**  and invoke music-stopped if necessary
 */
 void PlayListAdvance(void)
 {
@@ -258,7 +264,7 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 **
 **  @return           Number of bytes written in 'dest'
 */
-int ConvertToStereo32(const char *src, char *dest, int frequency,
+static int ConvertToStereo32(const char *src, char *dest, int frequency,
 	int chansize, int channels, int bytes)
 {
 	SDL_AudioCVT acvt;
@@ -281,264 +287,56 @@ int ConvertToStereo32(const char *src, char *dest, int frequency,
 	return acvt.len_mult * bytes;
 }
 
-SoundChannel Channels[MaxChannels];
-int NextFreeChannel;
-
-/**
-**  Selection handling
-*/
-struct SelectionHandling {
-	Origin Source;         /// origin of the sound
-	CSound *Sound;         /// last sound played by this unit
-	unsigned char HowMany; /// number of sound played in this group
-};
-
-/// FIXME: docu
-SelectionHandling SelectionHandler;
-
-/**
-**  Distance to Volume Mapping
-*/
-static int ViewPointOffset;
-
 /**
 **  Number of free channels
 */
-static int HowManyFree(void)
+static int NumFreeChannels(void)
 {
-	int channel;
-	int nb;
+	int num = 0;
+	int channel = NextFreeChannel;
 
-	nb = 0;
-	channel = NextFreeChannel;
 	while (channel < MaxChannels) {
-		++nb;
+		++num;
 		channel = Channels[channel].Point;
 	}
-	return nb;
+
+	return num;
 }
 
 /**
-**  Check whether to discard or not a sound request
+**  Put a sound request in the next free channel.
 */
-static int KeepRequest(SoundRequest *sr)
+static int FillChannel(CSample *sample, unsigned char volume, char stereo)
 {
-	//FIXME: take fight flag into account
-	int channel;
-	const SoundChannel *theChannel;
-
-	if (sr->Sound == NO_SOUND) {
-		return 0;
-	}
-
-	// slow but working solution: we look for the source in the channels
-	theChannel = Channels;
-	for (channel = 0; channel < MaxChannels; ++channel) {
-		if (theChannel->Command == ChannelPlay &&
-				theChannel->Source.Base == sr->Source.Base &&
-				theChannel->Sound == sr->Sound &&
-				theChannel->Source.Id == sr->Source.Id) {
-			// FIXME: decision should take into account the sound
-			return 0;
-		}
-		++theChannel;
-	}
-
-	return 1;
-}
-
-/**
-**  Compute a suitable volume for something taking place at a given
-**  distance from the current view point.
-**
-**  @param d      distance
-**  @param range  range
-**
-**  @return       volume for given distance (0..??)
-*/
-static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
-{
-	int d_tmp;
-	int range_tmp;
-
-	// FIXME: THIS IS SLOW!!!!!!!
-	if (d <= ViewPointOffset || range == INFINITE_SOUND_RANGE) {
-		return MaxVolume;
-	} else {
-		if (range) {
-			d -= ViewPointOffset;
-			d_tmp = d * MAX_SOUND_RANGE;
-			range_tmp = DistanceSilent * range;
-			if (d_tmp > range_tmp) {
-				return 0;
-			} else {
-				return (unsigned char)((range_tmp - d_tmp) * MAX_SOUND_RANGE / range_tmp);
-			}
-		} else {
-			return 0;
-		}
-	}
-}
-
-/**
-**  Compute the volume associated with a request, either by clipping the Range
-**  parameter of this request, or by mapping this range to a volume.
-*/
-static unsigned char ComputeVolume(SoundRequest *sr)
-{
-	if (sr->IsVolume) {
-		if (sr->Power > MaxVolume) {
-			return MaxVolume;
-		} else {
-			return (unsigned char)sr->Power;
-		}
-	} else {
-		// map distance to volume
-		return VolumeForDistance(sr->Power, sr->Sound->Range);
-	}
-}
-
-/**
-**  "Randomly" choose a sample from a sound group.
-*/
-static CSample *SimpleChooseSample(CSound *sound)
-{
-	if (sound->Number == ONE_SOUND) {
-		return sound->Sound.OneSound;
-	} else {
-		//FIXME: check for errors
-		//FIXME: valid only in shared memory context (FrameCounter)
-		return sound->Sound.OneGroup[FrameCounter % sound->Number];
-	}
-}
-
-/**
-**  Choose a sample from a SoundRequest. Take into account selection and sound
-**  groups.
-*/
-static CSample *ChooseSample(SoundRequest *sr)
-{
-	CSound *theSound;
-	CSample *result;
-
-	result = NO_SOUND;
-
-	if (sr->Sound != NO_SOUND) {
-		theSound = sr->Sound;
-		if (theSound->Number == TWO_GROUPS) {
-			// handle a special sound (selection)
-			if (SelectionHandler.Source.Base == sr->Source.Base &&
-					SelectionHandler.Source.Id == sr->Source.Id) {
-				if (SelectionHandler.Sound == theSound->Sound.TwoGroups->First) {
-					result = SimpleChooseSample(SelectionHandler.Sound);
-					SelectionHandler.HowMany++;
-					if (SelectionHandler.HowMany >= 3) {
-						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = theSound->Sound.TwoGroups->Second;
-					}
-				} else {
-					//FIXME: checks for error
-					// check wether the second group is really a group
-					if (SelectionHandler.Sound->Number > 1) {
-						result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
-						SelectionHandler.HowMany++;
-						if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
-							SelectionHandler.HowMany = 0;
-							SelectionHandler.Sound = theSound->Sound.TwoGroups->First;
-						}
-					} else {
-						result = SelectionHandler.Sound->Sound.OneSound;
-						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = theSound->Sound.TwoGroups->First;
-					}
-				}
-			} else {
-				SelectionHandler.Source = sr->Source;
-				SelectionHandler.Sound = theSound->Sound.TwoGroups->First;
-				result = SimpleChooseSample(SelectionHandler.Sound);
-				SelectionHandler.HowMany = 1;
-			}
-		} else {
-			// normal sound/sound group handling
-			result = SimpleChooseSample(theSound);
-			if (sr->Selection) {
-				SelectionHandler.Source = sr->Source;
-			}
-		}
-	}
-	return result;
-}
-
-/**
-**  Free a channel and unregister its source
-*/
-void FreeOneChannel(int channel)
-{
-	Channels[channel].Command = ChannelFree;
-	Channels[channel].Point = NextFreeChannel;
-	NextFreeChannel = channel;
-}
-
-/**
-**  Put a sound request in the next free channel. While doing this, the
-**  function computes the volume of the source and chooses a sample.
-*/
-static int FillOneChannel(SoundRequest *sr)
-{
-	int next_free;
-	int old_free;
-
-	old_free = NextFreeChannel;
-
 	Assert(NextFreeChannel < MaxChannels);
 
-	next_free = Channels[NextFreeChannel].Point;
-	Channels[NextFreeChannel].Volume = ComputeVolume(sr);
-	if (Channels[NextFreeChannel].Volume) {
-		Channels[NextFreeChannel].Source = sr->Source;
-		Channels[NextFreeChannel].Point = 0;
-		Channels[NextFreeChannel].Command = ChannelPlay;
-		Channels[NextFreeChannel].Sound = sr->Sound;
-		Channels[NextFreeChannel].Sample = ChooseSample(sr);
-		Channels[NextFreeChannel].Stereo = sr->Stereo;
-		NextFreeChannel = next_free;
-	}
+	int old_free = NextFreeChannel;
+	int next_free = Channels[NextFreeChannel].Point;
+
+	Channels[NextFreeChannel].Volume = volume;
+	Channels[NextFreeChannel].Point = 0;
+	Channels[NextFreeChannel].Playing = true;
+	Channels[NextFreeChannel].Sample = sample;
+	Channels[NextFreeChannel].Stereo = stereo;
+	Channels[NextFreeChannel].FinishedCallback = NULL;
+
+	NextFreeChannel = next_free;
 
 	return old_free;
 }
 
 /**
-**  Get orders from the fifo and put them into channels. This function takes
-**  care of registering sound sources.
-**  FIXME: @todo: is this the correct place to do this?
+**  A channel is finished playing
 */
-static void FillChannels(int free_channels, int *discarded, int *started)
+static void ChannelFinished(int channel)
 {
-	int channel;
-	SoundRequest *sr;
-
-	sr = SoundRequests+NextSoundRequestOut;
-	*discarded = 0;
-	*started = 0;
-	while (free_channels && sr->Used) {
-		if (KeepRequest(sr)) {
-			channel = FillOneChannel(sr);
-			--free_channels;
-			sr->Used = 0;
-			++NextSoundRequestOut;
-			(*started)++;
-		} else {
-		  // Discarding request (for whatever reason)
-		  sr->Used = 0;
-		  ++NextSoundRequestOut;
-		  (*discarded)++;
-		}
-		if (NextSoundRequestOut >= MAX_SOUND_REQUESTS) {
-			Assert(1);
-			NextSoundRequestOut = 0;
-		}
-		sr = SoundRequests + NextSoundRequestOut;
+	if (Channels[channel].FinishedCallback) {
+		Channels[channel].FinishedCallback(channel);
 	}
+
+	Channels[channel].Playing = false;
+	Channels[channel].Point = NextFreeChannel;
+	NextFreeChannel = channel;
 }
 
 /**
@@ -557,8 +355,7 @@ static int MixChannelsToStereo32(int *buffer, int size)
 
 	new_free_channels = 0;
 	for (channel = 0; channel < MaxChannels; ++channel) {
-		if (Channels[channel].Command == ChannelPlay &&
-				Channels[channel].Sample) {
+		if (Channels[channel].Playing && Channels[channel].Sample) {
 			i = MixSampleToStereo32(Channels[channel].Sample,
 				Channels[channel].Point, Channels[channel].Volume,
 				Channels[channel].Stereo, buffer, size);
@@ -566,9 +363,7 @@ static int MixChannelsToStereo32(int *buffer, int size)
 			Assert(Channels[channel].Point <= Channels[channel].Sample->Len);
 
 			if (Channels[channel].Point == Channels[channel].Sample->Len) {
-				// free channel as soon as possible (before playing)
-				// useful in multithreading
-				FreeOneChannel(channel);
+				ChannelFinished(channel);
 				++new_free_channels;
 			}
 		}
@@ -607,15 +402,117 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Load one sample
+**  Set the channel volume
+**
+**  @param channel  Channel to set
+**  @param volume   New volume, <0 will not set the volume
+**
+**  @return         Current volume of the channel, -1 for error
+*/
+int SetChannelVolume(int channel, int volume)
+{
+	SDL_LockAudio();
+
+	if (channel < 0 || channel >= MaxChannels) {
+		return -1;
+	}
+
+	if (volume < 0) {
+		return Channels[channel].Volume;
+	}
+	if (volume > MaxVolume) {
+		volume = MaxVolume;
+	}
+	Channels[channel].Volume = volume;
+
+	SDL_UnlockAudio();
+
+	return volume;
+}
+
+/**
+**  Set the channel stereo
+**
+**  @param channel  Channel to set
+**  @param stereo   -128 to 127, out of range will not set the stereo
+**
+**  @return         Current stereo of the channel, -1 for error
+*/
+int SetChannelStereo(int channel, int stereo)
+{
+	SDL_LockAudio();
+
+	if (channel < 0 || channel >= MaxChannels) {
+		return -1;
+	}
+
+	if (stereo < -128 || stereo > 127) {
+		return Channels[channel].Stereo;
+	} 
+	if (stereo > 127) {
+		stereo = 127;
+	} else if (stereo < -128) {
+		stereo = -128;
+	}
+	Channels[channel].Stereo = stereo;
+
+	SDL_UnlockAudio();
+
+	return stereo;
+}
+
+/**
+**  Set the channel's callback for when a sound finishes playing
+**
+**  @param channel   Channel to set
+**  @param callback  Callback to call when the sound finishes
+*/
+void SetChannelFinishedCallback(int channel, void (*callback)(int channel))
+{
+	if (channel < 0 || channel >= MaxChannels) {
+		return;
+	}
+
+	Channels[channel].FinishedCallback = callback;
+}
+
+CSample *GetChannelSample(int channel)
+{
+	if (channel < 0 || channel >= MaxChannels) {
+		return NULL;
+	}
+
+	return Channels[channel].Sample;
+}
+
+/**
+**  Stop a channel
+**
+**  @param channel  Channel to stop
+*/
+void StopChannel(int channel)
+{
+	SDL_LockAudio();
+
+	if (channel >= 0 && channel < MaxChannels) {
+		if (Channels[channel].Playing) {
+			ChannelFinished(channel);
+		}
+	}
+
+	SDL_UnlockAudio();
+}
+
+/**
+**  Load a sample
 **
 **  @param name  File name of sample (short version).
 **
 **  @return      General sample loaded from file into memory.
 **
-**  @todo  Add streaming, cashing support.
+**  @todo  Add streaming, caching support.
 */
-static CSample *LoadSample(const char *name)
+CSample *LoadSample(const char *name)
 {
 	CSample *sample;
 	char buf[PATH_MAX];
@@ -652,84 +549,76 @@ static CSample *LoadSample(const char *name)
 }
 
 /**
-**  Ask the sound server to register a sound (and currently to load it)
-**  and to return an unique identifier for it. The unique identifier is
-**  memory pointer of the server.
+**  Play a sound sample
 **
-**  @param files   An array of wav files.
-**  @param number  Number of files belonging together.
+**  @param sample  Sample to play
 **
-**  @return        the sound unique identifier
-**
-**  @todo FIXME: Must handle the errors better.
-**  FIXME: Support for more sample files (ogg/flac/mp3).
+**  @return        Channel number, -1 for error
 */
-CSound *RegisterSound(const char *files[], unsigned number)
+int PlaySample(CSample *sample)
 {
-	unsigned i;
-	CSound *id;
+	int channel = -1;
 
-	id = new CSound;
-	if (number > 1) { // load a sound group
-		id->Sound.OneGroup = new CSample *[number];
-		for (i = 0; i < number; ++i) {
-			id->Sound.OneGroup[i] = LoadSample(files[i]);
-			if (!id->Sound.OneGroup[i]) {
-				delete[] id->Sound.OneGroup;
-				delete id;
-				return NO_SOUND;
-			}
-		}
-		id->Number = number;
-	} else { // load an unique sound
-		id->Sound.OneSound = LoadSample(files[0]);
-		if (!id->Sound.OneSound) {
-			delete id;
-			return NO_SOUND;
-		}
-		id->Number = ONE_SOUND;
+	SDL_LockAudio();
+
+	if (!SoundOff && sample && NextFreeChannel != MaxChannels) {
+		channel = FillChannel(sample, GlobalVolume, 0);
 	}
-	id->Range = MAX_SOUND_RANGE;
-	return id;
+
+	SDL_UnlockAudio();
+
+	return channel;
 }
 
 /**
-**  Ask the sound server to put together two sounds to form a special sound.
+**  Play a sound file
 **
-**  @param first   first part of the group
-**  @param second  second part of the group
+**  @param name  Filename of a sound to play
 **
-**  @return        the special sound unique identifier
+**  @return      Channel number the sound is playing on, -1 for error
 */
-CSound *RegisterTwoGroups(CSound *first, CSound *second)
+int PlaySoundFile(const char *name)
 {
-	CSound *id;
-
-	if (first == NO_SOUND || second == NO_SOUND) {
-		return NO_SOUND;
+	CSample *sample = LoadSample(name);
+	if (sample) {
+		return PlaySample(sample);
 	}
-	id = new CSound;
-	id->Number = TWO_GROUPS;
-	id->Sound.TwoGroups = new TwoGroups;
-	id->Sound.TwoGroups->First = first;
-	id->Sound.TwoGroups->Second = second;
-	id->Range = MAX_SOUND_RANGE;
+	return -1;
+}
 
-	return id;
+
+/**
+**  Set the global sound volume.
+**
+**  @param volume  the sound volume (positive number) 0-255
+*/
+void SetGlobalVolume(int volume)
+{
+	if (volume < 0) {
+		GlobalVolume = 0;
+	} else if (volume > MaxVolume) {
+		GlobalVolume = MaxVolume;
+	} else {
+		GlobalVolume = volume;
+	}
 }
 
 /**
-**  Ask the sound server to change the range of a sound.
+**  Set the music volume.
 **
-**  @param sound  the id of the sound to modify.
-**  @param range  the new range for this sound.
+**  @param volume  the music volume (positive number) 0-255
 */
-void SetSoundRange(CSound *sound, unsigned char range)
+void SetMusicVolume(int volume)
 {
-	if (sound != NO_SOUND) {
-		sound->Range = range;
+	if (volume < 0) {
+		MusicVolume = 0;
+	} else if (volume > MaxVolume) {
+		MusicVolume = MaxVolume;
+	} else {
+		MusicVolume = volume;
 	}
 }
+
 
 /**
 **  Mix into buffer.
@@ -737,15 +626,9 @@ void SetSoundRange(CSound *sound, unsigned char range)
 **  @param buffer   Buffer to be filled with samples. Buffer must be big enough.
 **  @param samples  Number of samples.
 */
-void MixIntoBuffer(void *buffer, int samples)
+static void MixIntoBuffer(void *buffer, int samples)
 {
 	int *mixer_buffer;
-	int free_channels;
-	int dummy1;
-	int dummy2;
-
-	free_channels = HowManyFree();
-	FillChannels(free_channels, &dummy1, &dummy2);
 
 	// Create empty mixer buffer
 	mixer_buffer = new int[samples];

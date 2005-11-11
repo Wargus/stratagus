@@ -50,7 +50,6 @@
 #include "font.h"
 #include "tileset.h"
 #include "map.h"
-#include "sound_id.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
