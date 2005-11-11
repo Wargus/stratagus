@@ -920,10 +920,6 @@ SOURCE=.\src\include\sound.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\sound_id.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\include\sound_server.h
 # End Source File
 # Begin Source File
