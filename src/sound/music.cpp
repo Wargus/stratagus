@@ -274,20 +274,4 @@ int PlayMusic(const char *name)
 	return 0;
 }
 
-/**
-** Play a sound file.
-**
-** @param name Name of sound file
-*/
-void PlaySoundFile(const char *name)
-{
-	CSound *id;
-	if (SoundForName("dynamic-sound")) {
-		id = RegisterSound(&name, 1);
-	} else {
-		id = MakeSound("dynamic-sound", &name, 1);
-	}
-	PlayGameSound(id, GlobalVolume);
-}
-
 //@}

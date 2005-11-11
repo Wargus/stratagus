@@ -42,7 +42,6 @@
 #include <stdlib.h>
 
 #include "script.h"
-#include "sound_id.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "cdaudio.h"
@@ -621,6 +620,14 @@ static int CclPlayMusic(lua_State *l)
 }
 
 /**
+**  Callback for when PlaySoundFile finishes
+*/
+static void PlaySoundFileFinished(int channel)
+{
+	delete GetChannelSample(channel);
+}
+
+/**
 **  Play a sound file.
 **
 **  @param l  Lua state.
@@ -628,7 +635,8 @@ static int CclPlayMusic(lua_State *l)
 static int CclPlayFile(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	PlaySoundFile(LuaToString(l, 1));
+	int channel = PlaySoundFile(LuaToString(l, 1));
+	SetChannelFinishedCallback(channel, PlaySoundFileFinished);
 	return 0;
 }
 

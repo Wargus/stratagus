@@ -35,23 +35,11 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "sound_id.h"
-
-/*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-	/**
-	**  Maximal volume value
-	*/
 #define MaxVolume 255
-
 #define SOUND_BUFFER_SIZE 65536
-
-class CSound;
 
 /**
 **  RAW samples.
@@ -75,91 +63,6 @@ public:
 };
 
 /**
-**  Sound double group: a sound that groups two sounds, used to implement
-**  the annoyed/selected sound system of WC
-*/
-typedef struct _two_groups_ {
-	CSound *First;                /// first group: selected sound
-	CSound *Second;               /// second group: annoyed sound
-} TwoGroups;
-
-/**
-** A possible value for Number in the Sound struct: means a simple sound
-*/
-#define ONE_SOUND 0
-/**
-** A possible value for Number in the Sound struct: means a double group (for
-** selection/annoyed sounds)
-*/
-#define TWO_GROUPS 1
-
-/**
-** the range value that makes a sound volume distance independent
-*/
-#define INFINITE_SOUND_RANGE 255
-/**
-** the maximum range value
-*/
-#define MAX_SOUND_RANGE 254
-
-/**
-**  Sound definition.
-*/
-class CSound {
-public:
-	/**
-	**  Range is a multiplier for ::DistanceSilent.
-	**  255 means infinite range of the sound.
-	*/
-	unsigned char Range;        /// Range is a multiplier for DistanceSilent
-	unsigned char Number;       /// single, group, or table of sounds.
-	union {
-		CSample *OneSound;       /// if it's only a simple sound
-		CSample **OneGroup;      /// when it's a simple group
-		struct _two_groups_ *TwoGroups; /// when it's a double group
-	} Sound;
-};
-
-/**
-**  Origin of a sound
-*/
-typedef struct _origin_ {
-	const void *Base;   /// pointer on a Unit
-	unsigned Id;        /// unique identifier (if the pointer has been shared)
-} Origin;
-
-/**
-**  sound request FIFO
-*/
-typedef struct _sound_request {
-	Origin Source;          /// origin of sound
-	unsigned short Power;   /// Volume or Distance
-	CSound *Sound;          /// which sound
-	unsigned Used : 1;      /// flag for used/unused
-	unsigned Selection : 1; /// is it a selection sound?
-	unsigned IsVolume : 1;  /// how to interpret power (as a
-							///volume or as a distance?)
-	char Stereo;            /// stereo location of sound (
-							///-128 left, 0 center, 127 right)
-} SoundRequest;
-
-#define MAX_SOUND_REQUESTS 64  /// maximal number of sound requests
-
-#define MaxChannels 32  /// How many channels are supported
-
-	/// Channels for sound effects and unit speach
-typedef struct _sound_channel_
-{
-	unsigned char Command; /// channel command
-	int Point;             /// point into sample
-	CSample *Sample;       /// sample to play
-	Origin Source;         /// unit playing
-	unsigned char Volume;  /// Volume of this channel
-	CSound *Sound;         /// The sound currently played
-	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
-} SoundChannel;
-
-/**
 **  Play audio flags.
 */
 enum _play_audio_flags_ {
@@ -178,28 +81,10 @@ extern int GlobalVolume;
 	/// music volume (from 0 to MaxVolume, acts as a multiplier)
 extern int MusicVolume;
 
+	/// Distance to Volume Mapping
+extern int ViewPointOffset;
 	/// global range control (max cut off distance for sound)
 extern int DistanceSilent;
-
-	/// FIFO for sound requests
-extern SoundRequest SoundRequests[MAX_SOUND_REQUESTS];
-	/// FIFO index in
-extern int NextSoundRequestIn;
-	/// FIFO index out
-extern int NextSoundRequestOut;
-
-#define ChannelFree 0   /// channel is free
-#define ChannelPlay 3   /// channel is playing
-
-	/// All possible sound channels
-extern SoundChannel Channels[MaxChannels];
-	/// Next free channel
-extern int NextFreeChannel;
-
-#ifdef DEBUG
-	/// allocated memory for sound samples
-extern unsigned AllocatedSoundMemory;
-#endif
 
 extern CSample *MusicSample;  /// Music samples
 
@@ -216,24 +101,24 @@ extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
 extern int ConvertToStereo32(const char *in, char *out, int frequency,
 	int bitrate, int channels, int bytes);
 
-	/// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const char *file[], unsigned number);
+	/// Set global volume
+extern void SetGlobalVolume(int volume);
+	/// Set music volume
+extern void SetMusicVolume(int volume);
 
-	/**
-	**  @brief Create a special sound group with two sounds
-	**
-	**  Ask the sound server to put together two sounds to form a special sound.
-	**  @param first    first part of the group
-	**  @param second   second part of the group
-	**  @return         the special sound unique identifier
-	*/
-extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
+extern int SetChannelVolume(int channel, int volume);
+extern int SetChannelStereo(int channel, int stereo);
+extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));
+extern CSample *GetChannelSample(int channel);
+extern void StopChannel(int channel);
 
-	/// Modify the range of a given sound.
-extern void SetSoundRange(CSound *sound, unsigned char range);
+	/// Load a sample
+extern CSample *LoadSample(const char *name);
 
-	/// Free a channel and unregister its source
-extern void FreeOneChannel(int channel);
+	/// Play a sample
+extern int PlaySample(CSample *sample);
+	/// Play a sound file
+extern int PlaySoundFile(const char *name);
 
 	/// Initialize the sound card.
 extern int InitSound(void);
@@ -247,11 +132,6 @@ extern int SoundEnabled(void);
 extern int InitSoundServer(void);
 	/// Start next song if necessary
 extern void PlayListAdvance(void);
-
-/** Ask the sound layer to write the content of its buffer to the sound
-**  device. To be used only in the unthreaded version.
-*/
-extern void WriteSound(void);
 
 	///  Cleanup sound.
 extern void QuitSound(void);
