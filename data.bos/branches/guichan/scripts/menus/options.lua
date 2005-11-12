@@ -135,12 +135,67 @@ function RunSoundOptionsMenu(s)
   menu:run()
 end
 
+function SetVideoSize(width, height)
+  Video.Width = width
+  Video.Height = height
+end
+
+function BuildVideoOptionsMenu(menu)
+  local b
+  local offx = (Video.Width - 352) / 2 + 100
+  local offy = (Video.Height - 352) / 2
+
+  b = Label("Video Options")
+  b:setFont(CFont:Get("large"))
+  b:adjustSize();
+  menu:addCentered(b, offx + 76, offy + 11)
+
+  b = menu:addRadioButton("640 x 480", "video", offx, offy + 36 * 1.5,
+    function() SetVideoSize(640, 480) menu:stop(1) end)
+  if Video.Width == 640 then
+    b:setMarked(true)
+  end
+  b = menu:addRadioButton("800 x 600", "video", offx, offy + 36 * 2.5,
+    function() SetVideoSize(800, 600) menu:stop(1) end)
+  if Video.Width == 800 then
+    b:setMarked(true)
+  end
+  b = menu:addRadioButton("1024 x 800", "video", offx, offy + 36 * 3.5,
+    function() SetVideoSize(1024, 800) menu:stop(1) end)
+  if Video.Width == 1024 then
+    b:setMarked(true)
+  end
+  b = menu:addRadioButton("1600 x 1200", "video", offx, offy + 36 * 4.5,
+    function() SetVideoSize(1600, 1200) menu:stop(1) end)
+  if Video.Width == 1600 then
+    b:setMarked(true)
+  end
+
+  fullscreen = menu:addCheckBox("Fullscreen", offx, offy + 36 * 5.5,
+    function() ToggleFullScreen() end)
+  b = Video.FullScreen 
+  if b == true then 
+    fullScreen:setMarked(true)
+  end
+end
+
+function RunVideoOptionsMenu(s)
+  local menu 
+  local continue = 1
+
+  while continue == 1 do
+    menu = BosMenu()
+    BuildVideoOptionsMenu(menu)
+    continue = menu:run()
+  end 
+end
 
 function RunOptionsMenu(s)
   local menu
   menu = BosMenu()
 
   menu:addButton("~!Sound", 300, 140, RunSoundOptionsMenu)
+  menu:addButton("~!Video", 300, 180, RunVideoOptionsMenu)
 
   menu:run()
 end

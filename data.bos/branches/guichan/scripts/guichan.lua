@@ -130,6 +130,17 @@ function BosMenu()
     return b
   end
 
+  function menu:addRadioButton(caption, group, x, y, callback)
+    local b
+    b = RadioButton(caption, group)
+    b:setBaseColor(dark)
+    b:setForegroundColor(clear)
+    b:setBackgroundColor(dark)
+    b:setActionCallback(callback)
+    self:add(b, x, y)
+    return b
+  end
+
   exitButton = menu:addButton("~!Exit", 
         Video.Width / 2 - 100, Video.Height - 100, 
         function() menu:stop() end)
