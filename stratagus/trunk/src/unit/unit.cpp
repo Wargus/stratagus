@@ -2873,6 +2873,9 @@ void LetUnitDie(CUnit *unit)
 	} else {
 		unit->CurrentSightRange = 0;
 	}
+
+	// If we have a corpse, or a death animation, we are put back on the map
+	// This enables us to be tracked.  Possibly for spells (eg raise dead)
 	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
 		unit->Removed = 0;
 		UnitCacheInsert(unit);
