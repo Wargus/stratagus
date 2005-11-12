@@ -2924,12 +2924,9 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	CUnit *goal;
 	unsigned long lastattack;
 
-	if (!damage) { // Can now happen by splash damage
-#ifdef DEBUG
-		if (!GodMode) {
-			DebugPrint("Warning no damage, try to fix by caller?\n");
-		}
-#endif
+	// Can now happen by splash damage
+	// Multiple places send x/y as damage, which may be zero
+	if (!damage) {
 		return;
 	}
 
