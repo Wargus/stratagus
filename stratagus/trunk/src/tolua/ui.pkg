@@ -54,6 +54,7 @@ class Widget
 	void setForegroundColor(const Color &color);
 	void setBackgroundColor(const Color &color);
 	void setBaseColor(const Color &color);
+	void setSize(int width, int height);
 };
 
 $[
@@ -62,6 +63,11 @@ Widget.setActionCallback = function(w, f)
   w:addActionListener(w.actioncb)
 end 
 $]
+
+class ButtonWidget : public Widget
+{
+	ButtonWidget(char *caption);
+};
 
 class ImageButton : public Widget
 {

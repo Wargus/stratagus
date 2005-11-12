@@ -52,6 +52,12 @@ public:
 	~LuaActionListener();
 };
 
+class ButtonWidget : public gcn::Button 
+{
+public:
+	ButtonWidget(char *caption) : Button(caption) {}
+}; 
+
 class ImageButton : public gcn::Button
 {
 public:
