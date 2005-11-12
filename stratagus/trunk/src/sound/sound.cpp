@@ -295,6 +295,10 @@ static char CalculateStereo(const CUnit *unit)
 void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 {
 	CSound *sound = ChooseUnitVoiceSound(unit, voice);
+	if (!sound) {
+		return;
+	}
+
 	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
 	Origin source = {unit, unit->Slot};
 
