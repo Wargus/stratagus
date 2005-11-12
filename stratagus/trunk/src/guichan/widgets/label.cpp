@@ -143,6 +143,11 @@ namespace gcn
             graphics->drawLine(i,height - i, width - i - 1, height - i); 
         }
     }
+
+    void Label::fontChanged()
+    {
+        adjustSize();
+    }
     
     void Label::adjustSize()
     {
