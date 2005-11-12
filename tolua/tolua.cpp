@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 12 10:48:53 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 12 11:35:47 2005.
 */
 
 #ifndef __cplusplus
@@ -1841,14 +1841,14 @@ static int tolua_stratagus_CheckBox_isMarked00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isusertype(tolua_S,1,"CheckBox",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,1,"const CheckBox",0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  CheckBox* self = (CheckBox*)  tolua_tousertype(tolua_S,1,0);
+  const CheckBox* self = (const CheckBox*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isMarked'",NULL);
 #endif
@@ -1861,6 +1861,136 @@ static int tolua_stratagus_CheckBox_isMarked00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'isMarked'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setMarked of class  CheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CheckBox_setMarked00
+static int tolua_stratagus_CheckBox_setMarked00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"CheckBox",0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CheckBox* self = (CheckBox*)  tolua_tousertype(tolua_S,1,0);
+  bool marked = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setMarked'",NULL);
+#endif
+ {
+  self->setMarked(marked);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setMarked'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getCaption of class  CheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CheckBox_getCaption00
+static int tolua_stratagus_CheckBox_getCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const CheckBox",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const CheckBox* self = (const CheckBox*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getCaption'",NULL);
+#endif
+ {
+  const std::string tolua_ret = (const std::string)  self->getCaption();
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setCaption of class  CheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CheckBox_setCaption00
+static int tolua_stratagus_CheckBox_setCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"CheckBox",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CheckBox* self = (CheckBox*)  tolua_tousertype(tolua_S,1,0);
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCaption'",NULL);
+#endif
+ {
+  self->setCaption(caption);
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: adjustSize of class  CheckBox */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CheckBox_adjustSize00
+static int tolua_stratagus_CheckBox_adjustSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"CheckBox",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CheckBox* self = (CheckBox*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'adjustSize'",NULL);
+#endif
+ {
+  self->adjustSize();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'adjustSize'.",&tolua_err);
  return 0;
 #endif
 }
@@ -2233,6 +2363,37 @@ static int tolua_stratagus_Label_setCaption00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: adjustSize of class  Label */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Label_adjustSize00
+static int tolua_stratagus_Label_adjustSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Label",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Label* self = (Label*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'adjustSize'",NULL);
+#endif
+ {
+  self->adjustSize();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'adjustSize'.",&tolua_err);
  return 0;
 #endif
 }
@@ -5101,6 +5262,10 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new_local",tolua_stratagus_CheckBox_new01_local);
   tolua_function(tolua_S,".call",tolua_stratagus_CheckBox_new01_local);
   tolua_function(tolua_S,"isMarked",tolua_stratagus_CheckBox_isMarked00);
+  tolua_function(tolua_S,"setMarked",tolua_stratagus_CheckBox_setMarked00);
+  tolua_function(tolua_S,"getCaption",tolua_stratagus_CheckBox_getCaption00);
+  tolua_function(tolua_S,"setCaption",tolua_stratagus_CheckBox_setCaption00);
+  tolua_function(tolua_S,"adjustSize",tolua_stratagus_CheckBox_adjustSize00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ImageCheckBox","ImageCheckBox","CheckBox",tolua_collect_ImageCheckBox);
@@ -5130,6 +5295,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_Label_new00_local);
   tolua_function(tolua_S,"getCaption",tolua_stratagus_Label_getCaption00);
   tolua_function(tolua_S,"setCaption",tolua_stratagus_Label_setCaption00);
+  tolua_function(tolua_S,"adjustSize",tolua_stratagus_Label_adjustSize00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"RadioButton","RadioButton","Widget",tolua_collect_RadioButton);

@@ -94,7 +94,12 @@ class CheckBox : public Widget
 {
 	CheckBox();
 	CheckBox(const std::string &caption, bool marked = false);
-	bool isMarked();
+
+	virtual bool isMarked() const;
+	virtual void setMarked(bool marked);
+	virtual const std::string &getCaption() const;
+	virtual void setCaption(const std::string &caption);
+	virtual void adjustSize();
 };
 
 class ImageCheckBox : public CheckBox
@@ -113,6 +118,7 @@ class Label : public Widget
 	Label(const std::string &caption);
 	const std::string &getCaption() const;
 	void setCaption(const std::string &caption);
+	virtual void adjustSize();
 };
 
 class RadioButton : public Widget
