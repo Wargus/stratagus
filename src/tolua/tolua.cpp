@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 12 11:52:17 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 12 22:56:18 2005.
 */
 
 #ifndef __cplusplus
@@ -1507,6 +1507,153 @@ static int tolua_stratagus_Widget_setGlobalFont00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: setForegroundColor of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setForegroundColor01
+static int tolua_stratagus_Widget_setForegroundColor01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setForegroundColor'",NULL);
+#endif
+ {
+  self->setForegroundColor(*color);
+ }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_stratagus_Widget_setForegroundColor00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setBackgroundColor of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBackgroundColor01
+static int tolua_stratagus_Widget_setBackgroundColor01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBackgroundColor'",NULL);
+#endif
+ {
+  self->setBackgroundColor(*color);
+ }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_stratagus_Widget_setBackgroundColor00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setBaseColor of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBaseColor01
+static int tolua_stratagus_Widget_setBaseColor01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBaseColor'",NULL);
+#endif
+ {
+  self->setBaseColor(*color);
+ }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_stratagus_Widget_setBaseColor00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setSize of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setSize01
+static int tolua_stratagus_Widget_setSize01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSize'",NULL);
+#endif
+ {
+  self->setSize(width,height);
+ }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_stratagus_Widget_setSize00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setBorderSize of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBorderSize00
+static int tolua_stratagus_Widget_setBorderSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBorderSize'",NULL);
+#endif
+ {
+  self->setBorderSize(width);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setBorderSize'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: setFont of class  Widget */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setFont00
 static int tolua_stratagus_Widget_setFont00(lua_State* tolua_S)
@@ -2766,6 +2913,71 @@ static int tolua_stratagus_RadioButton_new00_local(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: setMarked of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_setMarked00
+static int tolua_stratagus_RadioButton_setMarked00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"RadioButton",0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  RadioButton* self = (RadioButton*)  tolua_tousertype(tolua_S,1,0);
+  bool marked = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setMarked'",NULL);
+#endif
+ {
+  self->setMarked(marked);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setMarked'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: isMarked of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_isMarked00
+static int tolua_stratagus_RadioButton_isMarked00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"RadioButton",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  RadioButton* self = (RadioButton*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isMarked'",NULL);
+#endif
+ {
+  bool tolua_ret = (bool)  self->isMarked();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'isMarked'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  TextField */
 #ifndef TOLUA_DISABLE_tolua_stratagus_TextField_new00
 static int tolua_stratagus_TextField_new00(lua_State* tolua_S)
@@ -3396,10 +3608,11 @@ static int tolua_stratagus_MenuScreen_run00(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'run'",NULL);
 #endif
  {
-  self->run();
+  int tolua_ret = (int)  self->run();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
  }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'run'.",&tolua_err);
@@ -3416,18 +3629,20 @@ static int tolua_stratagus_MenuScreen_stop00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertype(tolua_S,1,"MenuScreen",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
+ !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
   MenuScreen* self = (MenuScreen*)  tolua_tousertype(tolua_S,1,0);
+  int result = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'stop'",NULL);
 #endif
  {
-  self->stop();
+  self->stop(result);
  }
  }
  return 0;
@@ -3664,6 +3879,32 @@ static int tolua_set_Video(lua_State* tolua_S)
   Video = *((CVideo*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ToggleFullScreen */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ToggleFullScreen00
+static int tolua_stratagus_ToggleFullScreen00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  ToggleFullScreen();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToggleFullScreen'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -5486,6 +5727,11 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setForegroundColor",tolua_stratagus_Widget_setForegroundColor00);
   tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor00);
   tolua_function(tolua_S,"setGlobalFont",tolua_stratagus_Widget_setGlobalFont00);
+  tolua_function(tolua_S,"setForegroundColor",tolua_stratagus_Widget_setForegroundColor01);
+  tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor01);
+  tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor01);
+  tolua_function(tolua_S,"setSize",tolua_stratagus_Widget_setSize01);
+  tolua_function(tolua_S,"setBorderSize",tolua_stratagus_Widget_setBorderSize00);
   tolua_function(tolua_S,"setFont",tolua_stratagus_Widget_setFont00);
   tolua_function(tolua_S,"addActionListener",tolua_stratagus_Widget_addActionListener00);
  tolua_endmodule(tolua_S);
@@ -5610,6 +5856,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_RadioButton_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_RadioButton_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_RadioButton_new00_local);
+  tolua_function(tolua_S,"setMarked",tolua_stratagus_RadioButton_setMarked00);
+  tolua_function(tolua_S,"isMarked",tolua_stratagus_RadioButton_isMarked00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"TextField","TextField","Widget",tolua_collect_TextField);
@@ -5686,6 +5934,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"FullScreen",tolua_get_CVideo_FullScreen,tolua_set_CVideo_FullScreen);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"Video",tolua_get_Video,tolua_set_Video);
+ tolua_function(tolua_S,"ToggleFullScreen",tolua_stratagus_ToggleFullScreen00);
  tolua_cclass(tolua_S,"CGraphic","CGraphic","",NULL);
  tolua_beginmodule(tolua_S,"CGraphic");
   tolua_function(tolua_S,"New",tolua_stratagus_CGraphic_New00);

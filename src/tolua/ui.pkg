@@ -64,6 +64,11 @@ class Widget
 	virtual void setBackgroundColor(const Color &color);
 
 	static void setGlobalFont(CFont *font);
+	void setForegroundColor(const Color &color);
+	void setBackgroundColor(const Color &color);
+	void setBaseColor(const Color &color);
+	void setSize(int width, int height);
+	void setBorderSize(int width);
 	virtual void setFont(CFont *font);
 
 	virtual void addActionListener(LuaActionListener *actionListener);
@@ -136,6 +141,8 @@ class Label : public Widget
 class RadioButton : public Widget
 {
 	RadioButton(const std::string &caption, const std::string &group, bool marked=false);
+	void setMarked(bool marked);
+	bool isMarked();
 };
 
 // FIXME Combine with ScrollArea in our own widget
@@ -180,8 +187,8 @@ class Container
 class MenuScreen : Container
 {
 	MenuScreen() : runLoop(false) {}
-	void run();
-	void stop();
+	int run();
+	void stop(int result = 0);
 };
 
 $void StartMap(const char *str);
