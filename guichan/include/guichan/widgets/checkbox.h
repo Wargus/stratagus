@@ -125,7 +125,7 @@ namespace gcn
          *
          * @param caption the CheckBox caption.
          */
-        virtual void setCaption(const std::string caption);
+        virtual void setCaption(const std::string &caption);
         
         /**
          * Adjusts the CheckBox size to fit the font size.
