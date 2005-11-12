@@ -137,6 +137,8 @@ end
 
 function SetVideoSize(width, height)
   Video:ResizeScreen(width, height)
+  bckground:Resize(Video.Width, Video.Height)
+  backgroundWidget = ImageWidget(bckground)
 end
 
 function BuildVideoOptionsMenu(menu)
