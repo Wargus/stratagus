@@ -42,6 +42,15 @@ pressedImage = CGraphic:New("graphics/pressed.png", 200, 24)
 normalImage:Load() -- FIXME remove when immediatly loaded
 pressedImage:Load() -- idem
 
+cbUncheckedNormalImage = CGraphic:New("general/checkbox-unchecked-normal.png")
+cbUncheckedPressedImage = CGraphic:New("general/checkbox-unchecked-pressed.png")
+cbCheckedNormalImage = CGraphic:New("general/checkbox-checked-normal.png")
+cbCheckedPressedImage = CGraphic:New("general/checkbox-checked-pressed.png")
+cbUncheckedNormalImage:Load()
+cbUncheckedPressedImage:Load()
+cbCheckedNormalImage:Load()
+cbCheckedPressedImage:Load()
+
 local guichanadd = Container.add
 Container.add = function(self, widget, x, y)
   -- ugly hack, should be done in some kind of constructor
@@ -53,26 +62,71 @@ Container.add = function(self, widget, x, y)
 end
 
 function BosMenu()
-   local menu
-   local exitButton
+  local menu
+  local exitButton
 
-   menu = MenuScreen()
+  menu = MenuScreen()
 
-   menu:add(backgroundWidget, 0, 0)
+  menu:add(backgroundWidget, 0, 0)
 
-   function menu.addButton(self, caption, x, y, callback)
-      local b
-      b = ImageButton(caption, normalImage, pressedImage)
-      b:setActionCallback(callback)
-      self:add(b, x, y)
-      return b
-   end
+  function menu:addButton(caption, x, y, callback)
+    local b
+    b = ButtonWidget(caption)
+    b:setActionCallback(callback)
+    b:setSize(200, 24)
+    b:setBackgroundColor(dark)
+    b:setBaseColor(dark)
+    self:add(b, x, y)
+    return b
+  end
 
-   exitButton = ImageButton("~!Exit", normalImage, pressedImage)
-   exitButton:setActionCallback(function() menu:stop() end)
-   menu:add(exitButton, Video.Width / 2 - 100, Video.Height - 100)
+  function menu:addBrowser(path, filter)
+    local mapslist = {}
+    local u = 1
+    local fileslist = ListDirectory(path)
+    local i
+    local f
+    for i,f in fileslist do
+      if(string.find(f, filter)) then
+        print("Added item:" .. f .. "--" )
+        mapslist[u] = f
+        u = u + 1
+      end
+    end
 
-   return menu
+    local bq
+    bq = ListBoxWidget(300, 200)
+    bq:setList(mapslist)
+    bq:setBaseColor(black)
+    bq:setForegroundColor(clear)
+    bq:setBackgroundColor(dark)
+    bq:setFont(CFont:Get("game"))
+    menu:add(bq, 300, 100)
+    
+    bq.itemslist = mapslist
+    bq.getSelectedItem = function(self)
+        return self.itemslist[self:getSelected() + 1]
+    end
+
+    return bq
+  end
+
+  function menu:addCheckBox(caption, x, y, callback)
+    local b
+    b = ImageCheckBox(caption)
+    b:setUncheckedNormalImage(cbUncheckedNormalImage)
+    b:setUncheckedPressedImage(cbUncheckedPressedImage)
+    b:setCheckedNormalImage(cbCheckedNormalImage)
+    b:setCheckedPressedImage(cbCheckedPressedImage)
+    b:setActionCallback(callback)
+    self:add(b, x, y)
+    return b
+  end
+
+  exitButton = menu:addButton("~!Exit", 
+        Video.Width / 2 - 100, Video.Height - 100, 
+        function() menu:stop() end)
+  return menu
 end
 
 -- Default configurations -------
@@ -91,37 +145,13 @@ function RunStartGameMenu(s)
   local menu
   menu = BosMenu()
 
-  local mapslist
-  mapslist = {}
-  local u
-  u = 1
-  local fileslist = ListDirectory("maps/")
-  for i,f in fileslist do
-    if(string.find(f, "^.*%.smp$")) then
-      print("Added smp file:" .. f .. "--" )
-      mapslist[u] = f
-      u = u + 1
-    end
-  end
-  print(mapslist)
-  print(mapslist[1])
-
-  local bq
-  bq = ListBoxWidget(300, 200)
-  bq:setList(mapslist)
-  bq:setBaseColor(black)
-  bq:setForegroundColor(clear)
-  bq:setBackgroundColor(dark)
-  bq:setFont(CFont:Get("game"))
-  menu:add(bq, 300, 100)
-
+  local browser = menu:addBrowser("maps/", "^.*%.smp$")
   function startgamebutton(s)
     print("Starting map -------")
-    StartMap("maps/" .. mapslist[bq:getSelected() + 1])
+    StartMap("maps/" .. browser:getSelectedItem())
     menu:stop()
   end
-
-  menu:addButton("Start", 100, 300, startgamebutton)
+  menu:addButton("Start", 100, 350, startgamebutton)
 
   menu:run()
 end
@@ -225,42 +255,145 @@ function RunWidgetsMenu(s)
   menu:run()
 end
 
+function RunSoundOptionsMenu(s)
+  local menu
+  local b
+
+  PlayMusic("music/The_Imperial_March.ogg")
+
+  menu = BosMenu()
+
+  b = Label("Sound Options")
+  b:setFont(CFont:Get("large"))
+  menu:add(b, 176, 11)
+
+  b = Label("Master Volume")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 16, 36 * 1)
+
+  b = Slider(0, 1)
+  b:setActionCallback(function() print("slider") end)
+  b:setWidth(198)
+  b:setHeight(18)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(clear)
+  menu:add(b, 32, 36 * 1.5)
+
+  b = Label("min")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 44, 36 * 2 + 6)
+  
+  b = Label("max")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 218, 36 * 2 + 6)
+
+  b = menu:addCheckBox("Enabled", 240, 36 * 1.5, function() print("checkbox1") end)
+  b:setFont(CFont:Get("large"))
+
+  b = Label("Music Volume")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 16, 36 * 3)
+
+  local musicslider = Slider(0, 255)
+  musicslider:setActionCallback(function() SetMusicVolume(musicslider:getValue()) end)
+  musicslider:setWidth(198)
+  musicslider:setHeight(18)
+  musicslider:setBaseColor(dark)
+  musicslider:setForegroundColor(clear)
+  musicslider:setBackgroundColor(clear)
+  menu:add(musicslider, 32, 36 * 3.5)
+
+  b = Label("min")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 44, 36 * 4 + 6)
+  
+  b = Label("max")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 218, 36 * 4 + 6)
+
+  b = menu:addCheckBox("Enabled", 240, 36 * 3.5, function() print("checkbox2") end)
+  b:setFont(CFont:Get("large"))
+
+  b = Label("CD Volume")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 16, 36 * 5)
+
+  b = Slider(0, 1)
+  b:setActionCallback(function() print("slider") end)
+  b:setWidth(198)
+  b:setHeight(18)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(clear)
+  menu:add(b, 32, 36 * 5.5)
+
+  b = Label("min")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 44, 36 * 6 + 6)
+  
+  b = Label("max")
+  b:setFont(CFont:Get("game"))
+  menu:add(b, 218, 36 * 6 + 6)
+
+  b = menu:addCheckBox("Enabled", 240, 36 * 5.5, function() print("checkbox3") end)
+  b:setFont(CFont:Get("large"))
+
+  menu:addButton("~!OK", 176 - (106 / 2), 352 - 11 - 27, function() end)
+
+  menu:run()
+end
+
+function RunCampaignsMenu(s)
+  local menu
+  local b
+
+  menu = BosMenu()
+
+  b = Label("Campaigns")
+  b:setFont(CFont:Get("large"))
+  menu:add(b, 176, 11)
+
+  local browser = menu:addBrowser("campaigns/", "^%a")
+  function startgamebutton(s)
+    print("Starting campaign")
+    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
+    menu:stop()
+  end
+  menu:addButton("Start", 100, 300, startgamebutton)
+
+  menu:run()
+end
+
+function RunLoadGameMenu(s)
+  local menu
+  local b
+
+  menu = BosMenu()
+
+  b = Label("Load Game")
+  b:setFont(CFont:Get("large"))
+  menu:add(b, 176, 11)
+
+  menu:addButton("~!OK", 176 - (106 / 2), 352 - 11 - 27, function() end)
+
+  menu:run()
+end
+
 function RunOptionsMenu(s)
   local menu
   menu = BosMenu()
+
+  menu:addButton("~!Sound", 300, 140, RunSoundOptionsMenu)
 
   menu:run()
 end
 
 function RunEditorMenu(s)
-
   local menu
   menu = BosMenu()
 
-  local mapslist
-  mapslist = {}
-  local u
-  u = 1
-  local fileslist = ListDirectory("maps/")
-  for i,f in fileslist do
-    if(string.find(f, "^.*%.smp$")) then
-      print("Added smp file:" .. f .. "--" )
-      mapslist[u] = f
-      u = u + 1
-    end
-  end
-  print(mapslist)
-  print(mapslist[1])
-
-  local bq
-  bq = ListBoxWidget(300, 200)
-  bq:setList(mapslist)
-  bq:setBaseColor(black)
-  bq:setForegroundColor(clear)
-  bq:setBackgroundColor(dark)
-  bq:setFont(CFont:Get("game"))
-  menu:add(bq, 300, 100)
-
+  local browser = menu:addBrowser("maps/", "^.*%.smp$")
   function starteditorbutton(s)
     print("Starting map -------")
     StartEditor("test.smp")
@@ -281,10 +414,10 @@ function RunMainMenu(s)
   menu:addButton("Start ~!Editor", 300, 220, RunEditorMenu)
   menu:addButton("~!Options", 300, 260, RunOptionsMenu)
   menu:addButton("~!MultiPlayer", 300, 300, RunOptionsMenu)
-  menu:addButton("~!Campaigns", 300, 340, RunOptionsMenu)
-  menu:addButton("~!Load Game", 300, 380, RunOptionsMenu)
+  menu:addButton("~!Campaigns", 300, 340, RunCampaignsMenu)
+  menu:addButton("~!Load Game", 300, 380, RunLoadGameMenu)
   menu:addButton("Show ~!Replay", 300, 420, RunReplayMenu)
-  menu:addButton("~!Credits", 300, 460, RunOptionsMenu)
+  menu:addButton("~!Credits", 300, 460, RunSubMenu)
 
   menu:run()
 end
