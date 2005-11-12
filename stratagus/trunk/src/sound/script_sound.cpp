@@ -321,12 +321,36 @@ static int CclDefineGameSounds(lua_State *l)
 **
 **  @param l  Lua state.
 */
+static int CclGetSoundVolume(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushnumber(l, GlobalVolume);
+	return 1;
+}
+
+/**
+**  Global volume support
+**
+**  @param l  Lua state.
+*/
 static int CclSetSoundVolume(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
 	SetGlobalVolume(LuaToNumber(l, 1));
 	return 0;
+}
+
+/**
+**  Music volume support
+**
+**  @param l  Lua state.
+*/
+static int CclGetMusicVolume(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushnumber(l, MusicVolume);
+	return 1;
 }
 
 /**
@@ -657,7 +681,9 @@ static int CclStopMusic(lua_State *l)
 */
 void SoundCclRegister(void)
 {
+	lua_register(Lua, "GetSoundVolume", CclGetSoundVolume);
 	lua_register(Lua, "SetSoundVolume", CclSetSoundVolume);
+	lua_register(Lua, "GetMusicVolume", CclGetMusicVolume);
 	lua_register(Lua, "SetMusicVolume", CclSetMusicVolume);
 	lua_register(Lua, "SetCdMode", CclSetCdMode);
 
