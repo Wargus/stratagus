@@ -108,7 +108,12 @@ namespace gcn
          * @return alignment of caption.
          */
         virtual unsigned int getAlignment();
-        
+
+        /**
+         * Called when the font has changed.
+         */
+        virtual void fontChanged();
+
         /**
          * Adjusts the Label size to fit the font size.
          */
