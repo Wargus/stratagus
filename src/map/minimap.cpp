@@ -466,9 +466,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 			type = unit->Type;
 		}
 	}
-	//
-	//  FIXME: We should force unittypes to have a certain color on the minimap.
-	//
+
 	if (unit->Player->Index == PlayerNumNeutral) {
 		color = Video.MapRGB(TheScreen->format,
 			type->NeutralMinimapColorRGB.r,
