@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 12 11:35:47 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 12 11:52:17 2005.
 */
 
 #ifndef __cplusplus
@@ -1049,15 +1049,15 @@ static int tolua_stratagus_LuaActionListener_new00_local(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: addActionListener of class  Widget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_addActionListener00
-static int tolua_stratagus_Widget_addActionListener00(lua_State* tolua_S)
+/* method: setWidth of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setWidth00
+static int tolua_stratagus_Widget_setWidth00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
  !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"LuaActionListener",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
@@ -1065,32 +1065,64 @@ static int tolua_stratagus_Widget_addActionListener00(lua_State* tolua_S)
 #endif
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  LuaActionListener* actionListener = ((LuaActionListener*)  tolua_tousertype(tolua_S,2,0));
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'addActionListener'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setWidth'",NULL);
 #endif
  {
-  self->addActionListener(actionListener);
+  self->setWidth(width);
  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'addActionListener'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setWidth'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: setFont of class  Widget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setFont00
-static int tolua_stratagus_Widget_setFont00(lua_State* tolua_S)
+/* method: getWidth of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_getWidth00
+static int tolua_stratagus_Widget_getWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Widget* self = (const Widget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getWidth'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getWidth();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getWidth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setHeight of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setHeight00
+static int tolua_stratagus_Widget_setHeight00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
  !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"CFont",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
@@ -1098,47 +1130,283 @@ static int tolua_stratagus_Widget_setFont00(lua_State* tolua_S)
 #endif
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  CFont* font = ((CFont*)  tolua_tousertype(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setFont'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setHeight'",NULL);
 #endif
  {
-  self->setFont(font);
+  self->setHeight(height);
  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setFont'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setHeight'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: setGlobalFont of class  Widget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setGlobalFont00
-static int tolua_stratagus_Widget_setGlobalFont00(lua_State* tolua_S)
+/* method: getHeight of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_getHeight00
+static int tolua_stratagus_Widget_getHeight00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isusertable(tolua_S,1,"Widget",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"CFont",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,1,"const Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Widget* self = (const Widget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getHeight'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getHeight();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setSize of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setSize00
+static int tolua_stratagus_Widget_setSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSize'",NULL);
+#endif
+ {
+  self->setSize(width,height);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setSize'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setX of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setX00
+static int tolua_stratagus_Widget_setX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  CFont* font = ((CFont*)  tolua_tousertype(tolua_S,2,0));
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setX'",NULL);
+#endif
  {
-  Widget::setGlobalFont(font);
+  self->setX(x);
  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setGlobalFont'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getX of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_getX00
+static int tolua_stratagus_Widget_getX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Widget* self = (const Widget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getX'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getX();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setY of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setY00
+static int tolua_stratagus_Widget_setY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  int y = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setY'",NULL);
+#endif
+ {
+  self->setY(y);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getY of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_getY00
+static int tolua_stratagus_Widget_getY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Widget* self = (const Widget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getY'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getY();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setPosition of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setPosition00
+static int tolua_stratagus_Widget_setPosition00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+  int y = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setPosition'",NULL);
+#endif
+ {
+  self->setPosition(x,y);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setPosition'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setBaseColor of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBaseColor00
+static int tolua_stratagus_Widget_setBaseColor00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBaseColor'",NULL);
+#endif
+ {
+  self->setBaseColor(*color);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setBaseColor'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1210,15 +1478,44 @@ static int tolua_stratagus_Widget_setBackgroundColor00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: setBaseColor of class  Widget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBaseColor00
-static int tolua_stratagus_Widget_setBaseColor00(lua_State* tolua_S)
+/* method: setGlobalFont of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setGlobalFont00
+static int tolua_stratagus_Widget_setGlobalFont00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CFont",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CFont* font = ((CFont*)  tolua_tousertype(tolua_S,2,0));
+ {
+  Widget::setGlobalFont(font);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setGlobalFont'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setFont of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setFont00
+static int tolua_stratagus_Widget_setFont00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
  !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"const Color",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CFont",0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
@@ -1226,53 +1523,51 @@ static int tolua_stratagus_Widget_setBaseColor00(lua_State* tolua_S)
 #endif
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+  CFont* font = ((CFont*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBaseColor'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setFont'",NULL);
 #endif
  {
-  self->setBaseColor(*color);
+  self->setFont(font);
  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setBaseColor'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setFont'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: setSize of class  Widget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setSize00
-static int tolua_stratagus_Widget_setSize00(lua_State* tolua_S)
+/* method: addActionListener of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_addActionListener00
+static int tolua_stratagus_Widget_addActionListener00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
  !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
+ !tolua_isusertype(tolua_S,2,"LuaActionListener",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  int width = ((int)  tolua_tonumber(tolua_S,2,0));
-  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+  LuaActionListener* actionListener = ((LuaActionListener*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSize'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'addActionListener'",NULL);
 #endif
  {
-  self->setSize(width,height);
+  self->addActionListener(actionListener);
  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setSize'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'addActionListener'.",&tolua_err);
  return 0;
 #endif
 }
@@ -5177,13 +5472,22 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"Widget","Widget","",NULL);
  tolua_beginmodule(tolua_S,"Widget");
-  tolua_function(tolua_S,"addActionListener",tolua_stratagus_Widget_addActionListener00);
-  tolua_function(tolua_S,"setFont",tolua_stratagus_Widget_setFont00);
-  tolua_function(tolua_S,"setGlobalFont",tolua_stratagus_Widget_setGlobalFont00);
+  tolua_function(tolua_S,"setWidth",tolua_stratagus_Widget_setWidth00);
+  tolua_function(tolua_S,"getWidth",tolua_stratagus_Widget_getWidth00);
+  tolua_function(tolua_S,"setHeight",tolua_stratagus_Widget_setHeight00);
+  tolua_function(tolua_S,"getHeight",tolua_stratagus_Widget_getHeight00);
+  tolua_function(tolua_S,"setSize",tolua_stratagus_Widget_setSize00);
+  tolua_function(tolua_S,"setX",tolua_stratagus_Widget_setX00);
+  tolua_function(tolua_S,"getX",tolua_stratagus_Widget_getX00);
+  tolua_function(tolua_S,"setY",tolua_stratagus_Widget_setY00);
+  tolua_function(tolua_S,"getY",tolua_stratagus_Widget_getY00);
+  tolua_function(tolua_S,"setPosition",tolua_stratagus_Widget_setPosition00);
+  tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor00);
   tolua_function(tolua_S,"setForegroundColor",tolua_stratagus_Widget_setForegroundColor00);
   tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor00);
-  tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor00);
-  tolua_function(tolua_S,"setSize",tolua_stratagus_Widget_setSize00);
+  tolua_function(tolua_S,"setGlobalFont",tolua_stratagus_Widget_setGlobalFont00);
+  tolua_function(tolua_S,"setFont",tolua_stratagus_Widget_setFont00);
+  tolua_function(tolua_S,"addActionListener",tolua_stratagus_Widget_addActionListener00);
  tolua_endmodule(tolua_S);
 
  { /* begin embedded lua code */
