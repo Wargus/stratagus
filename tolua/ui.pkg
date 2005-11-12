@@ -48,13 +48,25 @@ class LuaActionListener
 
 class Widget 
 {
-	void addActionListener(LuaActionListener *actionListener);
-	void setFont(CFont *font);
+	virtual void setWidth(int width);
+	virtual int getWidth() const;
+	virtual void setHeight(int height);
+	virtual int getHeight() const;
+	virtual void setSize(int width, int height);
+	virtual void setX(int x);
+	virtual int getX() const;
+	virtual void setY(int y);
+	virtual int getY() const;
+	virtual void setPosition(int x, int y);
+
+	virtual void setBaseColor(const Color &color);
+	virtual void setForegroundColor(const Color &color);
+	virtual void setBackgroundColor(const Color &color);
+
 	static void setGlobalFont(CFont *font);
-	void setForegroundColor(const Color &color);
-	void setBackgroundColor(const Color &color);
-	void setBaseColor(const Color &color);
-	void setSize(int width, int height);
+	virtual void setFont(CFont *font);
+
+	virtual void addActionListener(LuaActionListener *actionListener);
 };
 
 $[
