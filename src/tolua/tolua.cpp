@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov  6 16:14:18 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 12 10:43:31 2005.
 */
 
 #ifndef __cplusplus
@@ -61,6 +61,13 @@ static int tolua_collect_Windows (lua_State* tolua_S)
  return 0;
 }
 
+static int tolua_collect_ButtonWidget (lua_State* tolua_S)
+{
+ ButtonWidget* self = (ButtonWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_TextField (lua_State* tolua_S)
 {
  TextField* self = (TextField*) tolua_tousertype(tolua_S,1,0);
@@ -96,9 +103,9 @@ static int tolua_collect_CPlayer (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_Label (lua_State* tolua_S)
+static int tolua_collect_MenuScreen (lua_State* tolua_S)
 {
- Label* self = (Label*) tolua_tousertype(tolua_S,1,0);
+ MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -124,16 +131,16 @@ static int tolua_collect_CColor (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_MenuScreen (lua_State* tolua_S)
+static int tolua_collect_ImageButton (lua_State* tolua_S)
 {
- MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ ImageButton* self = (ImageButton*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
 
-static int tolua_collect_ImageButton (lua_State* tolua_S)
+static int tolua_collect_Label (lua_State* tolua_S)
 {
- ImageButton* self = (ImageButton*) tolua_tousertype(tolua_S,1,0);
+ Label* self = (Label*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -151,20 +158,21 @@ static int tolua_collect_Slider (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CMinimap");
- tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ListBoxWidget");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"DropDownWidget");
- tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"CFontColor");
- tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"Color");
+ tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CFontColor");
+ tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"Label");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"ButtonWidget");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"ImageCheckBox");
@@ -1230,6 +1238,101 @@ static int tolua_stratagus_Widget_setBaseColor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setBaseColor'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setSize of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setSize00
+static int tolua_stratagus_Widget_setSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSize'",NULL);
+#endif
+ {
+  self->setSize(width,height);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setSize'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  ButtonWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ButtonWidget_new00
+static int tolua_stratagus_ButtonWidget_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ButtonWidget",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
+ {
+  ButtonWidget* tolua_ret = (ButtonWidget*)  new ButtonWidget(caption);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ButtonWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ButtonWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ButtonWidget_new00_local
+static int tolua_stratagus_ButtonWidget_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ButtonWidget",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
+ {
+  ButtonWidget* tolua_ret = (ButtonWidget*)  new ButtonWidget(caption);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ButtonWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4820,6 +4923,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setForegroundColor",tolua_stratagus_Widget_setForegroundColor00);
   tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor00);
   tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor00);
+  tolua_function(tolua_S,"setSize",tolua_stratagus_Widget_setSize00);
  tolua_endmodule(tolua_S);
 
  { /* begin embedded lua code */
@@ -4839,6 +4943,16 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   lua_settop(tolua_S, top);
  } /* end of embedded lua code */
 
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"ButtonWidget","ButtonWidget","Widget",tolua_collect_ButtonWidget);
+#else
+ tolua_cclass(tolua_S,"ButtonWidget","ButtonWidget","Widget",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"ButtonWidget");
+  tolua_function(tolua_S,"new",tolua_stratagus_ButtonWidget_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_ButtonWidget_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_ButtonWidget_new00_local);
+ tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ImageButton","ImageButton","Widget",tolua_collect_ImageButton);
 #else
