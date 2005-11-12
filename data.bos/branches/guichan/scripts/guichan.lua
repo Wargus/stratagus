@@ -51,6 +51,9 @@ cbUncheckedPressedImage:Load()
 cbCheckedNormalImage:Load()
 cbCheckedPressedImage:Load()
 
+-- Store the widget in the container. This way we keep a refence
+-- to the widget until the container gets deleted.
+-- TODO: embed this in tolua++
 local guichanadd = Container.add
 Container.add = function(self, widget, x, y)
   -- ugly hack, should be done in some kind of constructor
