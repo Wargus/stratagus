@@ -98,9 +98,6 @@ extern CSample *LoadVorbis(const char *name, int flags); /// Load a vorbis file
 extern CSample *LoadMp3(const char *name, int flags);    /// Load a mp3 file
 extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
 
-extern int ConvertToStereo32(const char *in, char *out, int frequency,
-	int bitrate, int channels, int bytes);
-
 	/// Set global volume
 extern void SetGlobalVolume(int volume);
 	/// Set music volume
