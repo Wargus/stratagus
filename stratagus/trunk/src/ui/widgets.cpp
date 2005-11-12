@@ -757,8 +757,9 @@ MenuScreen::MenuScreen() :
 	gui->setTop(this);
 }
 
-void MenuScreen::run() 
+int MenuScreen::run() 
 {
+	loopResult = 0;
 	SetVideoSync();
 	while (runLoop) {
 		UpdateDisplay();
@@ -766,11 +767,13 @@ void MenuScreen::run()
 		WaitEventsOneFrame(&MenuCallbacks);
 	}
 	gui->setTop(oldtop);
+	return loopResult;
 }
 
-void MenuScreen::stop()
+void MenuScreen::stop(int result)
 {
 	runLoop = false;
+	loopResult = result;
 }
 
 //@}
