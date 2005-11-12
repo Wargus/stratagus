@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 12 22:56:18 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 12 23:21:18 2005.
 */
 
 #ifndef __cplusplus
@@ -3858,6 +3858,41 @@ static int tolua_set_CVideo_FullScreen(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: ResizeScreen of class  CVideo */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CVideo_ResizeScreen00
+static int tolua_stratagus_CVideo_ResizeScreen00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"CVideo",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CVideo* self = (CVideo*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeScreen'",NULL);
+#endif
+ {
+  self->ResizeScreen(width,height);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ResizeScreen'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Video */
 #ifndef TOLUA_DISABLE_tolua_get_Video
 static int tolua_get_Video(lua_State* tolua_S)
@@ -5932,6 +5967,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Height",tolua_get_CVideo_Height,tolua_set_CVideo_Height);
   tolua_variable(tolua_S,"Depth",tolua_get_CVideo_Depth,tolua_set_CVideo_Depth);
   tolua_variable(tolua_S,"FullScreen",tolua_get_CVideo_FullScreen,tolua_set_CVideo_FullScreen);
+  tolua_function(tolua_S,"ResizeScreen",tolua_stratagus_CVideo_ResizeScreen00);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"Video",tolua_get_Video,tolua_set_Video);
  tolua_function(tolua_S,"ToggleFullScreen",tolua_stratagus_ToggleFullScreen00);
