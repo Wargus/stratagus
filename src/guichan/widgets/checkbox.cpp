@@ -173,7 +173,7 @@ namespace gcn
         return mCaption;
     }
 
-    void CheckBox::setCaption(const std::string caption)
+    void CheckBox::setCaption(const std::string &caption)
     {
         mCaption = caption;
     }
