@@ -104,6 +104,9 @@ int NextFreeChannel;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+static int ConvertToStereo32(const char *src, char *dest, int frequency,
+	int chansize, int channels, int bytes);
+
 /**
 **  Check if the playlist need to be advanced,
 **  and invoke music-stopped if necessary
@@ -285,22 +288,6 @@ static int ConvertToStereo32(const char *src, char *dest, int frequency,
 	SDL_ConvertAudio(&acvt);
 
 	return acvt.len_mult * bytes;
-}
-
-/**
-**  Number of free channels
-*/
-static int NumFreeChannels(void)
-{
-	int num = 0;
-	int channel = NextFreeChannel;
-
-	while (channel < MaxChannels) {
-		++num;
-		channel = Channels[channel].Point;
-	}
-
-	return num;
 }
 
 /**
