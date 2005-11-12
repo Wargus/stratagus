@@ -144,11 +144,6 @@ namespace gcn
         }
     }
 
-    void Label::fontChanged()
-    {
-        adjustSize();
-    }
-    
     void Label::adjustSize()
     {
         setWidth(getFont()->getWidth(getCaption()));

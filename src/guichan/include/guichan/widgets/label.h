@@ -110,11 +110,6 @@ namespace gcn
         virtual unsigned int getAlignment();
 
         /**
-         * Called when the font has changed.
-         */
-        virtual void fontChanged();
-
-        /**
          * Adjusts the Label size to fit the font size.
          */
         virtual void adjustSize();
