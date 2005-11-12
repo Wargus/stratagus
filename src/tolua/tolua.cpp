@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 12 10:43:31 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 12 10:48:53 2005.
 */
 
 #ifndef __cplusplus
@@ -1623,6 +1623,39 @@ static int tolua_stratagus_Slider_getValue00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: setValue of class  Slider */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Slider_setValue00
+static int tolua_stratagus_Slider_setValue00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Slider",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Slider* self = (Slider*)  tolua_tousertype(tolua_S,1,0);
+  double value = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setValue'",NULL);
+#endif
+ {
+  self->setValue(value);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setValue'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: setWidth of class  Slider */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Slider_setWidth00
 static int tolua_stratagus_Slider_setWidth00(lua_State* tolua_S)
@@ -2134,6 +2167,72 @@ static int tolua_stratagus_Label_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getCaption of class  Label */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Label_getCaption00
+static int tolua_stratagus_Label_getCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const Label",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Label* self = (const Label*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getCaption'",NULL);
+#endif
+ {
+  const std::string tolua_ret = (const std::string)  self->getCaption();
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setCaption of class  Label */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Label_setCaption00
+static int tolua_stratagus_Label_setCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Label",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Label* self = (Label*)  tolua_tousertype(tolua_S,1,0);
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCaption'",NULL);
+#endif
+ {
+  self->setCaption(caption);
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4985,6 +5084,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new_local",tolua_stratagus_Slider_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_Slider_new00_local);
   tolua_function(tolua_S,"getValue",tolua_stratagus_Slider_getValue00);
+  tolua_function(tolua_S,"setValue",tolua_stratagus_Slider_setValue00);
   tolua_function(tolua_S,"setWidth",tolua_stratagus_Slider_setWidth00);
   tolua_function(tolua_S,"setHeight",tolua_stratagus_Slider_setHeight00);
  tolua_endmodule(tolua_S);
@@ -5028,6 +5128,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_Label_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_Label_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_Label_new00_local);
+  tolua_function(tolua_S,"getCaption",tolua_stratagus_Label_getCaption00);
+  tolua_function(tolua_S,"setCaption",tolua_stratagus_Label_setCaption00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"RadioButton","RadioButton","Widget",tolua_collect_RadioButton);

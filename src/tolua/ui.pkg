@@ -85,6 +85,7 @@ class Slider : public Widget
 {
 	Slider(double scaleStart, double scaleEnd);
 	double getValue();
+	void setValue(double value);
 	void setWidth(int w);
 	void setHeight(int h);
 };
@@ -110,6 +111,8 @@ class ImageCheckBox : public CheckBox
 class Label : public Widget
 {
 	Label(const std::string &caption);
+	const std::string &getCaption() const;
+	void setCaption(const std::string &caption);
 };
 
 class RadioButton : public Widget
