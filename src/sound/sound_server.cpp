@@ -411,21 +411,22 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 */
 int SetChannelVolume(int channel, int volume)
 {
-	SDL_LockAudio();
-
 	if (channel < 0 || channel >= MaxChannels) {
 		return -1;
 	}
 
 	if (volume < 0) {
-		return Channels[channel].Volume;
-	}
-	if (volume > MaxVolume) {
-		volume = MaxVolume;
-	}
-	Channels[channel].Volume = volume;
+		volume = Channels[channel].Volume;
+	} else {
+		SDL_LockAudio();
 
-	SDL_UnlockAudio();
+		if (volume > MaxVolume) {
+			volume = MaxVolume;
+		}
+		Channels[channel].Volume = volume;
+
+		SDL_UnlockAudio();
+	}
 
 	return volume;
 }
@@ -440,23 +441,24 @@ int SetChannelVolume(int channel, int volume)
 */
 int SetChannelStereo(int channel, int stereo)
 {
-	SDL_LockAudio();
-
 	if (channel < 0 || channel >= MaxChannels) {
 		return -1;
 	}
 
 	if (stereo < -128 || stereo > 127) {
-		return Channels[channel].Stereo;
-	} 
-	if (stereo > 127) {
-		stereo = 127;
-	} else if (stereo < -128) {
-		stereo = -128;
-	}
-	Channels[channel].Stereo = stereo;
+		stereo = Channels[channel].Stereo;
+	} else {
+		SDL_LockAudio();
 
-	SDL_UnlockAudio();
+		if (stereo > 127) {
+			stereo = 127;
+		} else if (stereo < -128) {
+			stereo = -128;
+		}
+		Channels[channel].Stereo = stereo;
+
+		SDL_UnlockAudio();
+	}
 
 	return stereo;
 }

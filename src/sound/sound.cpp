@@ -303,6 +303,9 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 	Origin source = {unit, unit->Slot};
 
 	int channel = PlaySample(ChooseSample(sound, selection, source));
+	if (channel == -1) {
+		return;
+	}
 	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
 	SetChannelStereo(channel, CalculateStereo(unit));
 }
@@ -312,13 +315,16 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 **  sound server may discard the sound if needed (e.g., when the same
 **  unit is already speaking).
 **
-**  @param unit  Sound initiator, unit speaking
-**  @param id    Type of sound wanted (Ready,Die,Yes,...)
+**  @param unit   Sound initiator, unit speaking
+**  @param sound  Sound to be generated
 */
 void PlayUnitSound(const CUnit *unit, CSound *sound)
 {
 	Origin source = {unit, unit->Slot};
 	int channel = PlaySample(ChooseSample(sound, false, source));
+	if (channel == -1) {
+		return;
+	}
 	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
 	SetChannelStereo(channel, CalculateStereo(unit));
 }
@@ -345,6 +351,9 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 	Origin source = {NULL, 0};
 
 	int channel = PlaySample(ChooseSample(sound, false, source));
+	if (channel == -1) {
+		return;
+	}
 	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range));
 	SetChannelStereo(channel, stereo);
 }
@@ -357,6 +366,9 @@ void PlayGameSound(CSound *sound, unsigned char volume)
 	Origin source = {NULL, 0};
 
 	int channel = PlaySample(ChooseSample(sound, false, source));
+	if (channel == -1) {
+		return;
+	}
 	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
 }
 
