@@ -5,6 +5,7 @@ public:
 	int Height;
 	int Depth;
 	bool FullScreen;
+	ResizeScreen(int width, int height);
 };
 
 CVideo Video;
