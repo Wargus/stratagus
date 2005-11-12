@@ -64,6 +64,10 @@ Container.add = function(self, widget, x, y)
   guichanadd(self, widget, x, y)
 end
 
+Container.addCentered = function(self, widget, x, y)
+  self.add(self, widget, x - widget:getWidth() / 2, y)
+end
+
 function BosMenu()
   local menu
   local exitButton
@@ -270,7 +274,7 @@ function RunSoundOptionsMenu(s)
   b = Label("Sound Options")
   b:setFont(CFont:Get("large"))
   b:adjustSize();
-  menu:add(b, offx + 176, offy + 11)
+  menu:addCentered(b, offx + 176, offy + 11)
 
   b = Label("Effects Volume")
   b:setFont(CFont:Get("game"))
@@ -290,12 +294,12 @@ function RunSoundOptionsMenu(s)
   b = Label("min")
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:add(b, offx + 44, offy + 36 * 2 + 6)
+  menu:addCentered(b, offx + 44, offy + 36 * 2 + 6)
   
   b = Label("max")
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:add(b, offx + 218, offy + 36 * 2 + 6)
+  menu:addCentered(b, offx + 218, offy + 36 * 2 + 6)
 
   b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 1.5,
     function() print("checkbox1") end)
@@ -320,12 +324,12 @@ function RunSoundOptionsMenu(s)
   b = Label("min")
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:add(b, offx + 44, offy + 36 * 4 + 6)
+  menu:addCentered(b, offx + 44, offy + 36 * 4 + 6)
   
   b = Label("max")
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:add(b, offx + 218, offy + 36 * 4 + 6)
+  menu:addCentered(b, offx + 218, offy + 36 * 4 + 6)
 
   b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 3.5,
     function() print("checkbox2") end)
@@ -349,19 +353,19 @@ function RunSoundOptionsMenu(s)
   b = Label("min")
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:add(b, offx + 44, offy + 36 * 6 + 6)
+  menu:addCentered(b, offx + 44, offy + 36 * 6 + 6)
   
   b = Label("max")
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:add(b, offx + 218, offy + 36 * 6 + 6)
+  menu:addCentered(b, offx + 218, offy + 36 * 6 + 6)
 
   b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 5.5,
     function() print("checkbox3") end)
   b:setFont(CFont:Get("large"))
   b:adjustSize();
 
-  menu:addButton("~!OK", offx + 176 - (106 / 2), offy + 352 - 11 - 27,
+  menu:addButton("~!OK", offx + 176 - (200 / 2), offy + 352 - 11 - 27,
     function() end)
 
   menu:run()
