@@ -163,11 +163,12 @@ public:
 class MenuScreen : public gcn::Container
 {
 	bool runLoop;
+	int loopResult;
 	gcn::Widget *oldtop;
 public:
 	MenuScreen();
-	void run();
-	void stop();
+	int run();
+	void stop(int result = 0);
 };
 
 #endif
