@@ -182,6 +182,7 @@ function RunWidgetsMenu(s)
 
   b = Label("a label, sir.")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, 20, 10)
 
   b = RadioButton("Platoon", "dumgroup", true)
@@ -268,10 +269,12 @@ function RunSoundOptionsMenu(s)
 
   b = Label("Sound Options")
   b:setFont(CFont:Get("large"))
+  b:adjustSize();
   menu:add(b, offx + 176, offy + 11)
 
   b = Label("Effects Volume")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 16, offy + 36 * 1)
 
   soundslider = Slider(0, 255)
@@ -286,18 +289,22 @@ function RunSoundOptionsMenu(s)
 
   b = Label("min")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 44, offy + 36 * 2 + 6)
   
   b = Label("max")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 218, offy + 36 * 2 + 6)
 
   b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 1.5,
     function() print("checkbox1") end)
   b:setFont(CFont:Get("large"))
+  b:adjustSize();
 
   b = Label("Music Volume")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 16, offy + 36 * 3)
 
   local musicslider = Slider(0, 255)
@@ -312,18 +319,22 @@ function RunSoundOptionsMenu(s)
 
   b = Label("min")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 44, offy + 36 * 4 + 6)
   
   b = Label("max")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 218, offy + 36 * 4 + 6)
 
   b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 3.5,
     function() print("checkbox2") end)
   b:setFont(CFont:Get("large"))
+  b:adjustSize();
 
   b = Label("CD Volume")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 16, offy + 36 * 5)
 
   b = Slider(0, 1)
@@ -337,15 +348,18 @@ function RunSoundOptionsMenu(s)
 
   b = Label("min")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 44, offy + 36 * 6 + 6)
   
   b = Label("max")
   b:setFont(CFont:Get("game"))
+  b:adjustSize();
   menu:add(b, offx + 218, offy + 36 * 6 + 6)
 
   b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 5.5,
     function() print("checkbox3") end)
   b:setFont(CFont:Get("large"))
+  b:adjustSize();
 
   menu:addButton("~!OK", offx + 176 - (106 / 2), offy + 352 - 11 - 27,
     function() end)
@@ -361,6 +375,7 @@ function RunCampaignsMenu(s)
 
   b = Label("Campaigns")
   b:setFont(CFont:Get("large"))
+  b:adjustSize();
   menu:add(b, 176, 11)
 
   local browser = menu:addBrowser("campaigns/", "^%a")
@@ -382,6 +397,7 @@ function RunLoadGameMenu(s)
 
   b = Label("Load Game")
   b:setFont(CFont:Get("large"))
+  b:adjustSize();
   menu:add(b, 176, 11)
 
   menu:addButton("~!OK", 176 - (106 / 2), 352 - 11 - 27, function() end)
