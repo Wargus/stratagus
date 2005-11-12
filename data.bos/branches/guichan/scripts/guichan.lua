@@ -332,21 +332,29 @@ end
 
 Load("scripts/menus/options.lua")
 
+function BuildMainMenu(menu)
+  local x = Video.Width / 2 - 100
+  local ystep = Video.Height / 20
+  menu:addButton("~!Start Game", x, ystep * 4, RunStartGameMenu)
+  menu:addButton("~!Widgets Demo", x, ystep * 5, RunWidgetsMenu)
+  menu:addButton("Start ~!Editor", x, ystep * 6, RunEditorMenu)
+  menu:addButton("~!Options", x, ystep * 7, function() RunOptionsMenu() menu:stop(1) end)
+  menu:addButton("~!MultiPlayer", x, ystep * 8, RunOptionsMenu)
+  menu:addButton("~!Campaigns", x, ystep * 9, RunCampaignsMenu)
+  menu:addButton("~!Load Game", x, ystep * 10, RunLoadGameMenu)
+  menu:addButton("Show ~!Replay", x, ystep * 11, RunReplayMenu)
+  menu:addButton("~!Credits", x, ystep * 12, RunSubMenu)
+end
+
 function RunMainMenu(s)
-  local b
-  local menu = BosMenu() 
+  local menu
+  local continue = 1
 
-  menu:addButton("~!Start Game", 300, 140, RunStartGameMenu)
-  menu:addButton("~!Widgets Demo", 300, 180, RunWidgetsMenu)
-  menu:addButton("Start ~!Editor", 300, 220, RunEditorMenu)
-  menu:addButton("~!Options", 300, 260, RunOptionsMenu)
-  menu:addButton("~!MultiPlayer", 300, 300, RunOptionsMenu)
-  menu:addButton("~!Campaigns", 300, 340, RunCampaignsMenu)
-  menu:addButton("~!Load Game", 300, 380, RunLoadGameMenu)
-  menu:addButton("Show ~!Replay", 300, 420, RunReplayMenu)
-  menu:addButton("~!Credits", 300, 460, RunSubMenu)
-
-  menu:run()
+  while continue == 1 do
+    menu = BosMenu() 
+    BuildMainMenu(menu)
+    continue = menu:run()
+  end
 end
 
 

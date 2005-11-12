@@ -136,8 +136,7 @@ function RunSoundOptionsMenu(s)
 end
 
 function SetVideoSize(width, height)
-  Video.Width = width
-  Video.Height = height
+  Video:ResizeScreen(width, height)
 end
 
 function BuildVideoOptionsMenu(menu)
@@ -190,13 +189,20 @@ function RunVideoOptionsMenu(s)
   end 
 end
 
+function BuildOptionsMenu(menu)
+  local x = Video.Width / 2 - 100
+  menu:addButton("~!Sound", x, 140, RunSoundOptionsMenu)
+  menu:addButton("~!Video", x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
+end
+
 function RunOptionsMenu(s)
   local menu
-  menu = BosMenu()
+  local continue = 1
 
-  menu:addButton("~!Sound", 300, 140, RunSoundOptionsMenu)
-  menu:addButton("~!Video", 300, 180, RunVideoOptionsMenu)
-
-  menu:run()
+  while continue == 1 do
+    menu = BosMenu() 
+    BuildOptionsMenu(menu)
+    continue = menu:run()
+  end
 end
 
