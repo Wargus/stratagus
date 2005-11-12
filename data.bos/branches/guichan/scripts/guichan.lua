@@ -259,8 +259,6 @@ function RunSoundOptionsMenu(s)
   local menu
   local b
 
-  PlayMusic("music/The_Imperial_March.ogg")
-
   menu = BosMenu()
 
   b = Label("Sound Options")
