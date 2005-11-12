@@ -47,6 +47,7 @@ opts.Add('CCFLAGS', 'C Compiler flags', Split(ccflags))
 opts.Add('CC', 'C Compiler')
 opts.Add('debug', 'Build with debugging options', 0)
 opts.Add('opengl', 'Build with opengl support', 0)
+opts.Add('profile', 'Build with profiling support', 0)
 env = Environment() # for an unknown reason Environment(options=opts) doesnt work well
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
@@ -176,6 +177,10 @@ if env['debug']:
     env.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
 else:
     env.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
+
+if env['profile']:
+    env.Append(CCFLAGS = Split('-pg'))
+    env.Append(LINKFLAGS = Split('-pg'))
 
 # Targets
 Default(env.Program('stratagus', sourcesEngine))
