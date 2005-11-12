@@ -31,7 +31,7 @@ DefineAnimations("animations-jet", {
     Still = {"frame 0", "wait 1", },
     Attack= {"unbreakable begin", 
         "frame 0", "wait 1", "attack", "sound assault-attack",
-        "frame 0", "wait 1", "frame 0","wait 10",
+        "frame 0", "wait 1", "frame 0","wait 15",
 	"unbreakable end", "wait 1", },
     Move = {"unbreakable begin", 
         "frame 5", "move 5", "wait 1", "frame 5", "move 4", "wait 1",
@@ -61,7 +61,7 @@ DefineUnitType("unit-jet", {
                   "offset", {5, 128}},
 	Animations = "animations-jet", Icon = "icon-jet",
 	Flip = false,
-	Costs = {"time", 100, "titanium", 100, "crystal", 150},
+	Costs = {"time", 100, "titanium", 200, "crystal", 500},
 	RepairHp = 1, RepairCosts = {"crystal", 6},
 	Speed = 60, HitPoints = 50, DrawLevel = 125, TileSize  = {3, 3}, 
 	BoxSize = {64, 64},
@@ -74,7 +74,7 @@ DefineUnitType("unit-jet", {
 	AirUnit = true, SelectableByRectangle = true, 
 	Demand = 0, 
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
-	NumDirections = 8, MaxAttackRange = 7,
+	NumDirections = 8, MaxAttackRange = 5,
 	Sounds = {
 		"selected", "grenadier-selected",
 		"acknowledge", "grenadier-acknowledge"
