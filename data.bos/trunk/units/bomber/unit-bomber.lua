@@ -62,7 +62,7 @@ DefineUnitType("unit-bomber", {
 	Shadow = {"file", "units/bomber/unit_bomber_s.png", "size", {128, 128}, "offset", {5, 128}},
 	Animations = "animations-bomber", Icon = "icon-bomber",
 	Flip = false,
-	Costs = {"time", 100, "titanium", 100, "crystal", 150},
+	Costs = {"time", 100, "titanium", 200, "crystal", 450},
 	RepairHp = 1, RepairCosts = {"crystal", 6},
 	Speed = 20, HitPoints = 50, DrawLevel = 125, TileSize  = {2, 2}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 50, PiercingDamage = 30,
