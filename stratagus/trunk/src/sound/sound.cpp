@@ -136,12 +136,12 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 		// handle a special sound (selection)
 		if (SelectionHandler.Source.Base == source.Base &&
 				SelectionHandler.Source.Id == source.Id) {
-			if (SelectionHandler.Sound == sound->Sound.TwoGroups->First) {
+			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
 				result = SimpleChooseSample(SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
 				if (SelectionHandler.HowMany >= 3) {
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups->Second;
+					SelectionHandler.Sound = sound->Sound.TwoGroups.Second;
 				}
 			} else {
 				//FIXME: checks for error
@@ -151,17 +151,17 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 					SelectionHandler.HowMany++;
 					if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
 						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = sound->Sound.TwoGroups->First;
+						SelectionHandler.Sound = sound->Sound.TwoGroups.First;
 					}
 				} else {
 					result = SelectionHandler.Sound->Sound.OneSound;
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups->First;
+					SelectionHandler.Sound = sound->Sound.TwoGroups.First;
 				}
 			}
 		} else {
 			SelectionHandler.Source = source;
-			SelectionHandler.Sound = sound->Sound.TwoGroups->First;
+			SelectionHandler.Sound = sound->Sound.TwoGroups.First;
 			result = SimpleChooseSample(SelectionHandler.Sound);
 			SelectionHandler.HowMany = 1;
 		}
@@ -428,9 +428,8 @@ CSound *RegisterTwoGroups(CSound *first, CSound *second)
 	}
 	id = new CSound;
 	id->Number = TWO_GROUPS;
-	id->Sound.TwoGroups = new TwoGroups;
-	id->Sound.TwoGroups->First = first;
-	id->Sound.TwoGroups->Second = second;
+	id->Sound.TwoGroups.First = first;
+	id->Sound.TwoGroups.Second = second;
 	id->Range = MAX_SOUND_RANGE;
 
 	return id;

@@ -106,7 +106,6 @@ public:
 	PlaySectionOrder FileOrder;  /// File order
 };
 
-struct TwoGroups;
 
 /**
 **  Sound definition.
@@ -122,7 +121,10 @@ public:
 	union {
 		CSample *OneSound;       /// if it's only a simple sound
 		CSample **OneGroup;      /// when it's a simple group
-		TwoGroups *TwoGroups; /// when it's a double group
+		struct {
+			CSound *First;       /// first group: selected sound
+			CSound *Second;      /// second group: annoyed sound
+		} TwoGroups;             /// when it's a double group
 	} Sound;
 };
 
@@ -144,15 +146,6 @@ public:
 ** the maximum range value
 */
 #define MAX_SOUND_RANGE 254
-
-/**
-**  Sound double group: a sound that groups two sounds, used to implement
-**  the annoyed/selected sound system of WC
-*/
-struct TwoGroups {
-	CSound *First;                /// first group: selected sound
-	CSound *Second;               /// second group: annoyed sound
-};
 
 /**
 **  Origin of a sound
