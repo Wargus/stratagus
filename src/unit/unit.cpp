@@ -144,6 +144,8 @@ void CUnit::Release()
 	Assert(Type); // already free.
 	Assert(OrderCount == 1);
 	Assert(!Orders[0]->Goal);
+	// Must be removed before here
+	Assert(Removed);
 
 	//
 	// First release, remove from lists/tables.
@@ -173,7 +175,6 @@ void CUnit::Release()
 	// on the way. We must wait a little time before we could free the
 	// memory.
 	//
-	Remove(NULL);
 
 	//
 	// Remove the unit from the global units table.
