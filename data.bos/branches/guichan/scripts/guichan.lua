@@ -152,8 +152,8 @@ function BosMenu(title)
   if title then
     local titlelabel = Label(title)
     titlelabel:setFont(CFont:Get("large"))
-    titlelabel:setSize(200, 30)
-    menu:add(titlelabel, Video.Width / 2 - 100, Video.Height/20)
+    titlelabel:adjustSize()
+    menu:addCentered(titlelabel, Video.Width / 2, Video.Height/20)
   end
 
   exitButton = menu:addButton("~!Exit", 
@@ -170,7 +170,7 @@ Widget:setGlobalFont(CFont:Get("large"))
 
 function RunSubMenu(s)
   local menu
-  menu = BosMenu()
+  menu = BosMenu("Empty sub menu")
   menu:run()
 end
 
@@ -211,7 +211,7 @@ end
 
 function RunReplayMenu(s)
   local menu
-  menu = BosMenu()
+  menu = BosMenu("Show a Replay")
 
   function startreplaybutton(s)
     print("Starting map -------")
@@ -313,12 +313,7 @@ function RunCampaignsMenu(s)
   local menu
   local b
 
-  menu = BosMenu()
-
-  b = Label("Campaigns")
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-  menu:add(b, 176, 11)
+  menu = BosMenu("List of Campaigns")
 
   local browser = menu:addBrowser("campaigns/", "^%a")
   function startgamebutton(s)
@@ -335,13 +330,7 @@ function RunLoadGameMenu(s)
   local menu
   local b
 
-  menu = BosMenu()
-
-  b = Label("Load Game")
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-  menu:add(b, 176, 11)
-
+  menu = BosMenu("Load Game")
   menu:addButton("~!OK", 176 - (106 / 2), 352 - 11 - 27, function() end)
 
   menu:run()
@@ -350,7 +339,7 @@ end
 
 function RunEditorMenu(s)
   local menu
-  menu = BosMenu()
+  menu = BosMenu("Editor")
 
   local browser = menu:addBrowser("maps/", "^.*%.smp$")
   function starteditorbutton(s)

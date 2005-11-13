@@ -33,12 +33,7 @@ function RunSoundOptionsMenu(s)
   local offx = (Video.Width - 352) / 2
   local offy = (Video.Height - 352) / 2
 
-  menu = BosMenu()
-
-  b = Label("Sound Options")
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 176, offy + 11)
+  menu = BosMenu("Sound Options")
 
   b = Label("Effects Volume")
   b:setFont(CFont:Get("game"))
@@ -146,11 +141,6 @@ function BuildVideoOptionsMenu(menu)
   local offx = (Video.Width - 352) / 2 + 100
   local offy = (Video.Height - 352) / 2
 
-  b = Label("Video Options")
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 76, offy + 11)
-
   b = menu:addRadioButton("640 x 480", "video", offx, offy + 36 * 1.5,
     function() SetVideoSize(640, 480) menu:stop(1) end)
   if Video.Width == 640 then
@@ -185,7 +175,7 @@ function RunVideoOptionsMenu(s)
   local continue = 1
 
   while continue == 1 do
-    menu = BosMenu()
+    menu = BosMenu("Video Options")
     BuildVideoOptionsMenu(menu)
     continue = menu:run()
   end 
@@ -202,7 +192,7 @@ function RunOptionsMenu(s)
   local continue = 1
 
   while continue == 1 do
-    menu = BosMenu() 
+    menu = BosMenu("Options") 
     BuildOptionsMenu(menu)
     continue = menu:run()
   end
