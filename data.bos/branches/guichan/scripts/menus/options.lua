@@ -40,9 +40,9 @@ function RunSoundOptionsMenu(s)
   b:adjustSize();
   menu:add(b, offx + 16, offy + 36 * 1)
 
-  soundslider = Slider(0, 255)
-  soundslider:setValue(GetSoundVolume())
-  soundslider:setActionCallback(function() SetSoundVolume(soundslider:getValue()) end)
+  local soundslider = Slider(0, 255)
+  soundslider:setValue(GetEffectsVolume())
+  soundslider:setActionCallback(function() SetEffectsVolume(soundslider:getValue()) end)
   soundslider:setWidth(198)
   soundslider:setHeight(18)
   soundslider:setBaseColor(dark)
@@ -60,10 +60,12 @@ function RunSoundOptionsMenu(s)
   b:adjustSize();
   menu:addCentered(b, offx + 218, offy + 36 * 2 + 6)
 
-  b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 1.5,
-    function() print("checkbox1") end)
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
+  local effectscheckbox = {}
+  effectscheckbox = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 1.5,
+    function() SetEffectsEnabled(effectscheckbox:isMarked()) end)
+  effectscheckbox:setFont(CFont:Get("large"))
+  effectscheckbox:setMarked(IsEffectsEnabled())
+  effectscheckbox:adjustSize();
 
   b = Label("Music Volume")
   b:setFont(CFont:Get("game"))
@@ -90,10 +92,12 @@ function RunSoundOptionsMenu(s)
   b:adjustSize();
   menu:addCentered(b, offx + 218, offy + 36 * 4 + 6)
 
-  b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 3.5,
-    function() print("checkbox2") end)
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
+  local musiccheckbox = {}
+  musiccheckbox = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 3.5,
+    function() SetMusicEnabled(musiccheckbox:isMarked()) end)
+  musiccheckbox:setFont(CFont:Get("large"))
+  musiccheckbox:setMarked(IsMusicEnabled())
+  musiccheckbox:adjustSize();
 
   b = Label("CD Volume")
   b:setFont(CFont:Get("game"))
@@ -125,7 +129,7 @@ function RunSoundOptionsMenu(s)
   b:adjustSize();
 
   menu:addButton("~!OK", offx + 176 - (200 / 2), offy + 352 - 11 - 27,
-    function() end)
+    function() SavePreferences(); menu:stop() end)
 
   menu:run()
 end
