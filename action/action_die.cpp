@@ -71,11 +71,11 @@ void HandleActionDie(CUnit *unit)
 	//
 	if (!unit->Anim.Unbreakable) {
 		if (!unit->Type->CorpseType) {
-			// We are in the cache if we just finished out death animation
+			// We may be in the cache if we just finished out death animation
 			// even though there is no corpse.
-			if (unit->Type->Animations && unit->Type->Animations->Death) {
-				UnitCacheRemove(unit);
-			}
+			// (unit->Type->Animations && unit->Type->Animations->Death)
+			// Remove us from the map to be safe
+			unit->Remove(NULL);
 			unit->Release();
 			return;
 		}
