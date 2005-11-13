@@ -199,7 +199,7 @@ int PlayMusic(const char *name)
 	char buffer[PATH_MAX];
 	CSample *sample;
 
-	if (MusicOff) {
+	if (!IsMusicEnabled()) {
 		return 0;
 	}
 

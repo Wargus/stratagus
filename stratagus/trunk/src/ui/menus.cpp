@@ -1294,10 +1294,6 @@ static void NameLineDrawFunc(Menuitem *mi)
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
 
-	if (!SoundEnabled() && !SoundOff) {
-		VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
-	}
-
 	VideoDrawTextCentered(Video.Width / 2, UI.Offset480Y + 440, GameFont, NameLine);
 	VideoDrawTextCentered(Video.Width / 2, UI.Offset480Y + 456, GameFont,
 		"Engine distributed under the terms of the GNU General Public License.");
@@ -1677,30 +1673,30 @@ static void SoundOptionsInit(Menu *menu)
 	}
 
 	// master volume slider
-	if (SoundOff || !SoundEnabled()) {
+	if (!IsEffectsEnabled() || !SoundEnabled()) {
 		menu->Items[2].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[2].Flags = 0;
-		menu->Items[2].D.HSlider.percent = (GlobalVolume * 100) / 255;
+		menu->Items[2].D.HSlider.percent = (GetEffectsVolume() * 100) / 255;
 	}
 
 	// master power
-	if (SoundOff || !SoundEnabled()) {
+	if (!IsEffectsEnabled() || !SoundEnabled()) {
 		menu->Items[5].D.Checkbox.Checked = 0;
 	} else {
 		menu->Items[5].D.Checkbox.Checked = 1;
 	}
 
 	// music volume slider
-	if (SoundOff || PlayingMusic != 1 || !SoundEnabled()) {
+	if (!IsMusicEnabled() || PlayingMusic != 1 || !SoundEnabled()) {
 		menu->Items[7].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[7].Flags = 0;
-		menu->Items[7].D.HSlider.percent = (MusicVolume * 100) / 255;
+		menu->Items[7].D.HSlider.percent = (GetMusicVolume() * 100) / 255;
 	}
 
 	// music power
-	if (SoundOff || !SoundEnabled()) {
+	if (!IsMusicEnabled() || !SoundEnabled()) {
 		menu->Items[10].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[10].Flags = 0;
@@ -1711,7 +1707,7 @@ static void SoundOptionsInit(Menu *menu)
 		menu->Items[10].Flags = MI_FLAGS_DISABLED;
 	}
 #endif
-	if (SoundOff || PlayingMusic != 1 || !SoundEnabled()) {
+	if (!IsMusicEnabled() || PlayingMusic != 1 || !SoundEnabled()) {
 		menu->Items[10].D.Checkbox.Checked = 0;
 	} else {
 		menu->Items[10].D.Checkbox.Checked = 1;
@@ -1877,7 +1873,7 @@ static void GlobalOptionsFullscreenCheckbox(Menuitem *mi)
 static void SetMasterPower(Menuitem *mi)
 {
 	if (SoundEnabled()) {
-		SoundOff ^= 1;
+		SetEffectsEnabled(!IsEffectsEnabled());
 		SoundOptionsInit(NULL);
 	}
 }
@@ -1887,6 +1883,10 @@ static void SetMasterPower(Menuitem *mi)
 */
 static void SetMusicPower(Menuitem *mi)
 {
+	if (SoundEnabled()) {
+		SetMusicEnabled(!IsMusicEnabled());
+	}
+#if 0
 	if (PlayingMusic) {
 		MusicOff = 1;
 		StopMusic();
@@ -1904,7 +1904,7 @@ static void SetMusicPower(Menuitem *mi)
 			}
 		}
 	}
-
+#endif
 	SoundOptionsInit(NULL);
 }
 
@@ -3199,7 +3199,7 @@ static void KeyboardScrollHSAction(Menuitem *mi)
 */
 static void MasterVolumeHSAction(Menuitem *mi)
 {
-	SetGlobalVolume((mi->D.HSlider.percent * 255) / 100);
+	SetEffectsVolume((mi->D.HSlider.percent * 255) / 100);
 }
 
 /**

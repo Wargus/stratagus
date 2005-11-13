@@ -76,11 +76,6 @@ enum _play_audio_flags_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-	/// sound volume (from 0 to MaxVolume, acts as a multiplier)
-extern int GlobalVolume;
-	/// music volume (from 0 to MaxVolume, acts as a multiplier)
-extern int MusicVolume;
-
 	/// Distance to Volume Mapping
 extern int ViewPointOffset;
 	/// global range control (max cut off distance for sound)
@@ -98,10 +93,23 @@ extern CSample *LoadVorbis(const char *name, int flags); /// Load a vorbis file
 extern CSample *LoadMp3(const char *name, int flags);    /// Load a mp3 file
 extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
 
-	/// Set global volume
-extern void SetGlobalVolume(int volume);
+	/// Get effects volume
+extern int GetEffectsVolume(void);
+	/// Set effects volume
+extern void SetEffectsVolume(int volume);
+	/// Get music volume
+extern int GetMusicVolume(void);
 	/// Set music volume
 extern void SetMusicVolume(int volume);
+
+	/// Set effects enabled
+extern void SetEffectsEnabled(bool enabled);
+	/// Check if effects are enabled
+extern bool IsEffectsEnabled(void);
+	/// Set music enabled
+extern void SetMusicEnabled(bool enabled);
+	/// Check if music is enabled
+extern bool IsMusicEnabled(void);
 
 extern int SetChannelVolume(int channel, int volume);
 extern int SetChannelStereo(int channel, int stereo);
@@ -123,7 +131,7 @@ extern int InitSound(void);
 extern int InitSdlSound(int freq, int size);
 
 	/// Check if sound is enabled
-extern int SoundEnabled(void);
+extern bool SoundEnabled(void);
 
 	/// Initialize the sound server.
 extern int InitSoundServer(void);
