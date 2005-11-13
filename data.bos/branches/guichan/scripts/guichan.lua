@@ -68,7 +68,7 @@ Container.addCentered = function(self, widget, x, y)
   self.add(self, widget, x - widget:getWidth() / 2, y)
 end
 
-function BosMenu()
+function BosMenu(title)
   local menu
   local exitButton
 
@@ -141,6 +141,21 @@ function BosMenu()
     return b
   end
 
+  function menu:writeText(text, x, y)
+    local label = Label(text)
+    label:setFont(CFont:Get("game"))
+    label:setSize(200, 30)
+    menu:add(label, x, y)
+    return label
+  end
+
+  if title then
+    local titlelabel = Label(title)
+    titlelabel:setFont(CFont:Get("large"))
+    titlelabel:setSize(200, 30)
+    menu:add(titlelabel, Video.Width / 2 - 100, Video.Height/20)
+  end
+
   exitButton = menu:addButton("~!Exit", 
         Video.Width / 2 - 100, Video.Height - 100, 
         function() menu:stop() end)
@@ -161,10 +176,28 @@ end
 
 function RunStartGameMenu(s)
   local menu
-  menu = BosMenu()
+  menu = BosMenu("Start Game")
 
+  menu:writeText("Players:", 20, 80)
+  players = menu:writeText("No map", 80, 80)
+  menu:writeText("Description:", 20, 120)
+  descr = menu:writeText("No map",40, 160)
+
+  local OldPresentMap = PresentMap
+  PresentMap = function(description, nplayers, w, h, id)
+      print(description)
+      players:setCaption(""..nplayers)
+      descr:setCaption(description)
+      OldPresentMap(description, nplayers, w, h, id)
+  end
+ 
   local browser = menu:addBrowser("maps/", "^.*%.smp$")
-  function startgamebutton(s)
+  local function cb(s)
+    print(browser:getSelectedItem())
+    Load("maps/" .. browser:getSelectedItem())
+  end
+  browser:setActionCallback(cb)
+  local function startgamebutton(s)
     print("Starting map -------")
     StartMap("maps/" .. browser:getSelectedItem())
     menu:stop()
@@ -172,6 +205,7 @@ function RunStartGameMenu(s)
   menu:addButton("Start", 100, 350, startgamebutton)
 
   menu:run()
+  PresentMap = OldPresentMap
 end
 
 
