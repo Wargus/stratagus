@@ -312,7 +312,7 @@ int PlayCDTrack(int track)
 	sample = LoadCD(NULL, track);
 	CDTrack = track;
 	MusicSample = sample;
-	PlayingMusic = 1;
+	PlayingMusic = true;
 	return 0;
 }
 

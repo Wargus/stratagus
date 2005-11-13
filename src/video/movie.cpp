@@ -240,7 +240,7 @@ int PlayMovie(const char *name)
 			return 0;
 		}
 		MusicSample = sample;
-		PlayingMusic = 1;
+		PlayingMusic = true;
 	}
 
 	callbacks.ButtonPressed = MovieCallbackButtonPressed;

@@ -81,7 +81,7 @@ PlaySectionType CurrentPlaySection;    /// Current Play Section
 void StopMusic(void)
 {
 	if (PlayingMusic) {
-		PlayingMusic = 0; // Callback!
+		PlayingMusic = true; // Callback!
 		if (MusicSample) {
 			SDL_LockAudio();
 			delete MusicSample;
@@ -213,7 +213,7 @@ int PlayMusic(const char *name)
 	if ((sample = LoadWav(name, PlayAudioStream))) {
 		StopMusic();
 		MusicSample = sample;
-		PlayingMusic = 1;
+		PlayingMusic = true;
 		return 1;
 	}
 
@@ -227,7 +227,7 @@ int PlayMusic(const char *name)
 		}
 		StopMusic();
 		MusicSample = sample;
-		PlayingMusic = 1;
+		PlayingMusic = true;
 		return 1;
 	}
 #endif
@@ -241,7 +241,7 @@ int PlayMusic(const char *name)
 // }
 		StopMusic();
 		MusicSample = sample;
-		PlayingMusic = 1;
+		PlayingMusic = true;
 		return 1;
 	}
 #endif
@@ -257,7 +257,7 @@ int PlayMusic(const char *name)
 */
 		StopMusic();
 		MusicSample = sample;
-		PlayingMusic = 1;
+		PlayingMusic = true;
 		return 1;
 	}
 #endif
@@ -265,7 +265,7 @@ int PlayMusic(const char *name)
 	if ((sample = LoadMikMod(name, PlayAudioStream))) {
 		StopMusic();
 		MusicSample = sample;
-		PlayingMusic = 1;
+		PlayingMusic = true;
 		return 1;
 	}
 #endif
