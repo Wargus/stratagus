@@ -145,6 +145,7 @@ public:
 	int getSelected() const;
 	virtual void setBackgroundColor(const gcn::Color &color);
 	virtual void setFont(gcn::Font *font);
+	virtual void addActionListener(gcn::ActionListener *actionListener);
 private:
 	void ListBoxWidget::adjustSize();
 private:

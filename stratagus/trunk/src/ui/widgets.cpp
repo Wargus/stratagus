@@ -731,6 +731,11 @@ void ListBoxWidget::adjustSize()
 	}
 }
 
+void ListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
+{
+	listbox.addActionListener(actionListener);
+}
+
 /*----------------------------------------------------------------------------
 --  DropDownWidget
 ----------------------------------------------------------------------------*/
