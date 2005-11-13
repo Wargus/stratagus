@@ -1,0 +1,12 @@
+extern int GetEffectsVolume(void);
+extern void SetEffectsVolume(int volume);
+extern int GetMusicVolume(void);
+extern void SetMusicVolume(int volume);
+
+extern void SetEffectsEnabled(bool enabled);
+extern bool IsEffectsEnabled(void);
+extern void SetMusicEnabled(bool enabled);
+extern bool IsMusicEnabled(void);
+
+extern int PlayMusic(const char *name);
+extern void StopMusic(void);

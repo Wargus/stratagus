@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 12 23:21:18 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 12 20:04:49 2005.
 */
 
 #ifndef __cplusplus
@@ -22,6 +22,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 #include "video.h"
 #include "font.h"
 #include "widgets.h"
+#include "sound.h"
+#include "sound_server.h"
 #ifdef _MSC_VER
 #pragma warning(disable:4800)
 #endif
@@ -5638,6 +5640,281 @@ static int tolua_set_CUnit_Player_ptr(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: GetEffectsVolume */
+#ifndef TOLUA_DISABLE_tolua_stratagus_GetEffectsVolume00
+static int tolua_stratagus_GetEffectsVolume00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  int tolua_ret = (int)  GetEffectsVolume();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetEffectsVolume'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetEffectsVolume */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetEffectsVolume00
+static int tolua_stratagus_SetEffectsVolume00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int volume = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  SetEffectsVolume(volume);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetEffectsVolume'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetMusicVolume */
+#ifndef TOLUA_DISABLE_tolua_stratagus_GetMusicVolume00
+static int tolua_stratagus_GetMusicVolume00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  int tolua_ret = (int)  GetMusicVolume();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMusicVolume'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetMusicVolume */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetMusicVolume00
+static int tolua_stratagus_SetMusicVolume00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int volume = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  SetMusicVolume(volume);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetMusicVolume'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetEffectsEnabled */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetEffectsEnabled00
+static int tolua_stratagus_SetEffectsEnabled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isboolean(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  bool enabled = ((bool)  tolua_toboolean(tolua_S,1,0));
+ {
+  SetEffectsEnabled(enabled);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetEffectsEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: IsEffectsEnabled */
+#ifndef TOLUA_DISABLE_tolua_stratagus_IsEffectsEnabled00
+static int tolua_stratagus_IsEffectsEnabled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  bool tolua_ret = (bool)  IsEffectsEnabled();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsEffectsEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetMusicEnabled */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetMusicEnabled00
+static int tolua_stratagus_SetMusicEnabled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isboolean(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  bool enabled = ((bool)  tolua_toboolean(tolua_S,1,0));
+ {
+  SetMusicEnabled(enabled);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetMusicEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: IsMusicEnabled */
+#ifndef TOLUA_DISABLE_tolua_stratagus_IsMusicEnabled00
+static int tolua_stratagus_IsMusicEnabled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  bool tolua_ret = (bool)  IsMusicEnabled();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsMusicEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: PlayMusic */
+#ifndef TOLUA_DISABLE_tolua_stratagus_PlayMusic00
+static int tolua_stratagus_PlayMusic00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* name = ((const char*)  tolua_tostring(tolua_S,1,0));
+ {
+  int tolua_ret = (int)  PlayMusic(name);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'PlayMusic'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StopMusic */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StopMusic00
+static int tolua_stratagus_StopMusic00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  StopMusic();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StopMusic'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 {
@@ -6056,6 +6333,16 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Type",tolua_get_CUnit_Type_ptr,tolua_set_CUnit_Type_ptr);
   tolua_variable(tolua_S,"Player",tolua_get_CUnit_Player_ptr,tolua_set_CUnit_Player_ptr);
  tolua_endmodule(tolua_S);
+ tolua_function(tolua_S,"GetEffectsVolume",tolua_stratagus_GetEffectsVolume00);
+ tolua_function(tolua_S,"SetEffectsVolume",tolua_stratagus_SetEffectsVolume00);
+ tolua_function(tolua_S,"GetMusicVolume",tolua_stratagus_GetMusicVolume00);
+ tolua_function(tolua_S,"SetMusicVolume",tolua_stratagus_SetMusicVolume00);
+ tolua_function(tolua_S,"SetEffectsEnabled",tolua_stratagus_SetEffectsEnabled00);
+ tolua_function(tolua_S,"IsEffectsEnabled",tolua_stratagus_IsEffectsEnabled00);
+ tolua_function(tolua_S,"SetMusicEnabled",tolua_stratagus_SetMusicEnabled00);
+ tolua_function(tolua_S,"IsMusicEnabled",tolua_stratagus_IsMusicEnabled00);
+ tolua_function(tolua_S,"PlayMusic",tolua_stratagus_PlayMusic00);
+ tolua_function(tolua_S,"StopMusic",tolua_stratagus_StopMusic00);
  tolua_endmodule(tolua_S);
  return 1;
 }

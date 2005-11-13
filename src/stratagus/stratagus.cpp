@@ -751,7 +751,8 @@ static int main1(int argc, char **argv)
 
 	// Setup sound card
 	if (InitSound()) {
-		SoundOff = 1;
+		SetEffectsEnabled(false);
+		SetMusicEnabled(false);
 	}
 
 #ifndef DEBUG           // For debug it's better not to have:

@@ -71,12 +71,15 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static int SoundInitialized;     /// audio file descriptor
+static bool SoundInitialized;    /// audio file descriptor
 int PlayingMusic;                /// flag true if playing music
 int CallbackMusic;               /// flag true callback ccl if stops
 
-int GlobalVolume = 128;          /// global sound volume
-int MusicVolume = 128;           /// music volume
+static int EffectsVolume = 128;         /// effects sound volume
+static int MusicVolume = 128;           /// music volume
+
+static bool MusicEnabled = true;
+static bool EffectsEnabled = true;
 
 static int MusicTerminated;
 
@@ -125,7 +128,7 @@ void PlayListAdvance(void)
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
 		if (!lua_isfunction(Lua, -1)) {
 			fprintf(stderr, "No MusicStopped function in Lua\n");
-			MusicOff = 1;
+			SetMusicEnabled(false);
 			StopMusic();
 		} else {
 			LuaCall(0, 1);
@@ -224,7 +227,7 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 	div = 176400 / (sample->Frequency * (sample->SampleSize / 8)
 			* sample->Channels);
 
-	local_volume = (int)volume * GlobalVolume / MaxVolume;
+	local_volume = (int)volume * EffectsVolume / MaxVolume;
 
 	if (stereo < 0) {
 		left = 128;
@@ -550,8 +553,8 @@ int PlaySample(CSample *sample)
 
 	SDL_LockAudio();
 
-	if (!SoundOff && sample && NextFreeChannel != MaxChannels) {
-		channel = FillChannel(sample, GlobalVolume, 0);
+	if (EffectsEnabled && sample && NextFreeChannel != MaxChannels) {
+		channel = FillChannel(sample, EffectsVolume, 0);
 	}
 
 	SDL_UnlockAudio();
@@ -581,15 +584,23 @@ int PlaySoundFile(const char *name)
 **
 **  @param volume  the sound volume (positive number) 0-255
 */
-void SetGlobalVolume(int volume)
+void SetEffectsVolume(int volume)
 {
 	if (volume < 0) {
-		GlobalVolume = 0;
+		EffectsVolume = 0;
 	} else if (volume > MaxVolume) {
-		GlobalVolume = MaxVolume;
+		EffectsVolume = MaxVolume;
 	} else {
-		GlobalVolume = volume;
+		EffectsVolume = volume;
 	}
+}
+
+/**
+**  Get effects volume
+*/
+int GetEffectsVolume(void)
+{
+	return EffectsVolume;
 }
 
 /**
@@ -608,6 +619,14 @@ void SetMusicVolume(int volume)
 	}
 }
 
+/**
+**  Get music volume
+*/
+int GetMusicVolume(void)
+{
+	return MusicVolume;
+}
+
 
 /**
 **  Mix into buffer.
@@ -624,10 +643,14 @@ static void MixIntoBuffer(void *buffer, int samples)
 	// FIXME: can save the memset here, if first channel sets the values
 	memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
 
-	// Add channels to mixer buffer
-	MixChannelsToStereo32(mixer_buffer, samples);
-	// Add music to mixer buffer
-	MixMusicToStereo32(mixer_buffer, samples);
+	if (EffectsEnabled) {
+		// Add channels to mixer buffer
+		MixChannelsToStereo32(mixer_buffer, samples);
+	}
+	if (MusicEnabled) {
+		// Add music to mixer buffer
+		MixMusicToStereo32(mixer_buffer, samples);
+	}
 
 	ClipMixToStereo16(mixer_buffer, samples, (short *)buffer);
 
@@ -645,11 +668,44 @@ static void MixIntoBuffer(void *buffer, int samples)
 */
 void FillAudio(void *udata, Uint8 *stream, int len)
 {
-	if (SoundOff) {
-		return;
-	}
 	len >>= 1;
 	MixIntoBuffer(stream, len);
+}
+
+/**
+**  Set effects enabled
+*/
+void SetEffectsEnabled(bool enabled)
+{
+	if (SoundEnabled()) {
+		EffectsEnabled = enabled;
+	}
+}
+
+/**
+**  Check if effects are enabled
+*/
+bool IsEffectsEnabled(void)
+{
+	return EffectsEnabled;
+}
+
+/**
+**  Set music enabled
+*/
+void SetMusicEnabled(bool enabled)
+{
+	if (SoundEnabled()) {
+		MusicEnabled = enabled;
+	}
+}
+
+/**
+**  Check if music is enabled
+*/
+bool IsMusicEnabled(void)
+{
+	return MusicEnabled;
 }
 
 /**
@@ -666,10 +722,10 @@ int InitSound(void)
 	// Open sound device, 8bit samples, stereo.
 	//
 	if (InitSdlSound(44100, 16)) {
-		SoundInitialized = 0;
+		SoundInitialized = false;
 		return 1;
 	}
-	SoundInitialized = 1;
+	SoundInitialized = true;
 
 	// ARI: The following must be done here to allow sound to work in
 	// pre-start menus!
@@ -684,7 +740,7 @@ int InitSound(void)
 /**
 **  Check if sound is enabled
 */
-int SoundEnabled(void)
+bool SoundEnabled(void)
 {
 	return SoundInitialized;
 }
@@ -712,7 +768,7 @@ int InitSoundServer(void)
 void QuitSound(void)
 {
 	SDL_CloseAudio();
-	SoundInitialized = 0;
+	SoundInitialized = false;
 }
 
 //@}

@@ -160,13 +160,6 @@ struct Origin {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/**
-**  Client side sound control. Can be used to turn on/off sound without
-**  really turning it off on the server side.
-*/
-extern int SoundOff;
-extern int MusicOff;  /// Music turned off
-
 extern GameSound GameSounds;  /// Game sound configuration
 
 extern int PlayingMusic;   /// flag true if playing music

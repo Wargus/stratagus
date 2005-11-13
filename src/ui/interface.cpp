@@ -231,12 +231,19 @@ static void UiAddToGroup(unsigned group)
 static void UiToggleSound(void)
 {
 	if (SoundEnabled()) {
-		SoundOff ^= 1;
+		if (IsEffectsEnabled()) {
+			SetEffectsEnabled(false);
+			SetMusicEnabled(false);
+		} else {
+			SetEffectsEnabled(true);
+			SetMusicEnabled(true);
+		}
 	}
-	if (SoundOff) {
-		UI.StatusLine.Set("Sound is off.");
-	} else {
+
+	if (IsEffectsEnabled()) {
 		UI.StatusLine.Set("Sound is on.");
+	} else {
+		UI.StatusLine.Set("Sound is off.");
 	}
 }
 
@@ -246,12 +253,12 @@ static void UiToggleSound(void)
 static void UiToggleMusic(void)
 {
 	static int vol;
-	if (MusicVolume) {
-		vol = MusicVolume;
-		MusicVolume = 0;
+	if (GetMusicVolume()) {
+		vol = GetMusicVolume();
+		SetMusicVolume(0);
 		UI.StatusLine.Set("Music is off.");
 	} else {
-		MusicVolume = vol;
+		SetMusicVolume(vol);
 		UI.StatusLine.Set("Music is on.");
 	}
 }
