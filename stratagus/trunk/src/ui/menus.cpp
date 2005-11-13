@@ -1688,7 +1688,7 @@ static void SoundOptionsInit(Menu *menu)
 	}
 
 	// music volume slider
-	if (!IsMusicEnabled() || PlayingMusic != 1 || !SoundEnabled()) {
+	if (!IsMusicEnabled() || !PlayingMusic || !SoundEnabled()) {
 		menu->Items[7].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[7].Flags = 0;
@@ -1707,7 +1707,7 @@ static void SoundOptionsInit(Menu *menu)
 		menu->Items[10].Flags = MI_FLAGS_DISABLED;
 	}
 #endif
-	if (!IsMusicEnabled() || PlayingMusic != 1 || !SoundEnabled()) {
+	if (!IsMusicEnabled() || !PlayingMusic || !SoundEnabled()) {
 		menu->Items[10].D.Checkbox.Checked = 0;
 	} else {
 		menu->Items[10].D.Checkbox.Checked = 1;
@@ -1886,25 +1886,6 @@ static void SetMusicPower(Menuitem *mi)
 	if (SoundEnabled()) {
 		SetMusicEnabled(!IsMusicEnabled());
 	}
-#if 0
-	if (PlayingMusic) {
-		MusicOff = 1;
-		StopMusic();
-	} else {
-		MusicOff = 0;
-		if (CallbackMusic) {
-			lua_pushstring(Lua, "MusicStopped");
-			lua_gettable(Lua, LUA_GLOBALSINDEX);
-			if (!lua_isfunction(Lua, -1)) {
-				fprintf(stderr, "No MusicStopped in Lua\n");
-				MusicOff = 1;
-				StopMusic();
-			} else {
-				LuaCall(0, 1);
-			}
-		}
-	}
-#endif
 	SoundOptionsInit(NULL);
 }
 

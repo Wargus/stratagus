@@ -162,8 +162,8 @@ struct Origin {
 
 extern GameSound GameSounds;  /// Game sound configuration
 
-extern int PlayingMusic;   /// flag true if playing music
-extern int CallbackMusic;  /// flag true callback ccl if stops
+extern bool PlayingMusic;   /// flag true if playing music
+extern bool CallbackMusic;  /// flag true callback ccl if stops
 
 extern std::vector<PlaySection> PlaySections;  /// Play sections
 extern PlaySectionType CurrentPlaySection;  /// Current play section type
@@ -225,10 +225,10 @@ extern void StopMusic(void);
 
 	/// Turn music stopped callback on
 #define CallbackMusicOn() \
-	CallbackMusic = 1;
+	CallbackMusic = true;
 	/// Turn music stopped callback off
 #define CallbackMusicOff() \
-	CallbackMusic = 0;
+	CallbackMusic = false;
 
 	/// Make a sound bound to identifier
 extern CSound *MakeSound(const char *sound_name, const char *file[], int nb);

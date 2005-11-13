@@ -71,9 +71,9 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static bool SoundInitialized;    /// audio file descriptor
-int PlayingMusic;                /// flag true if playing music
-int CallbackMusic;               /// flag true callback ccl if stops
+static bool SoundInitialized;    /// is sound initialized
+bool PlayingMusic;               /// flag true if playing music
+bool CallbackMusic;               /// flag true callback ccl if stops
 
 static int EffectsVolume = 128;         /// effects sound volume
 static int MusicVolume = 128;           /// music volume
@@ -81,7 +81,7 @@ static int MusicVolume = 128;           /// music volume
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
 
-static int MusicTerminated;
+static bool MusicTerminated;     /// music ended and we need a new file
 
 SDL_mutex *MusicTerminatedMutex;
 
@@ -112,18 +112,18 @@ static int ConvertToStereo32(const char *src, char *dest, int frequency,
 
 /**
 **  Check if the playlist need to be advanced,
-**  and invoke music-stopped if necessary
+**  and invoke MusicStopped if necessary
 */
 void PlayListAdvance(void)
 {
-	int proceed;
+	bool proceed;
 
 	SDL_LockMutex(MusicTerminatedMutex);
 	proceed = MusicTerminated;
-	MusicTerminated = 0;
+	MusicTerminated = false;
 	SDL_UnlockMutex(MusicTerminatedMutex);
 
-	if (proceed) {
+	if (proceed && MusicEnabled) {
 		lua_pushstring(Lua, "MusicStopped");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
 		if (!lua_isfunction(Lua, -1)) {
@@ -179,14 +179,14 @@ static void MixMusicToStereo32(int *buffer, int size)
 		delete[] buf;
 
 		if (n < len) { // End reached
-			PlayingMusic = 0;
+			PlayingMusic = false;
 			delete MusicSample;
 			MusicSample = NULL;
 
 			// we are inside the SDL callback!
 			if (CallbackMusic) {
 				SDL_LockMutex(MusicTerminatedMutex);
-				MusicTerminated = 1;
+				MusicTerminated = true;
 				SDL_UnlockMutex(MusicTerminatedMutex);
 			}
 		}
@@ -696,7 +696,18 @@ bool IsEffectsEnabled(void)
 void SetMusicEnabled(bool enabled)
 {
 	if (SoundEnabled()) {
-		MusicEnabled = enabled;
+		if (enabled) {
+			MusicEnabled = true;
+			if (!PlayingMusic) {
+				MusicTerminated = true;
+				PlayListAdvance();
+			}
+		} else {
+			MusicEnabled = false;
+			if (PlayingMusic) {
+				StopMusic();
+			}
+		}
 	}
 }
 
@@ -715,7 +726,7 @@ int InitSound(void)
 {
 	int dummy;
 
-	MusicTerminated = 0;
+	MusicTerminated = false;
 	MusicTerminatedMutex = SDL_CreateMutex();
 
 	//
