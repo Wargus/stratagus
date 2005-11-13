@@ -317,56 +317,6 @@ static int CclDefineGameSounds(lua_State *l)
 }
 
 /**
-**  Global volume support
-**
-**  @param l  Lua state.
-*/
-static int CclGetSoundVolume(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, GlobalVolume);
-	return 1;
-}
-
-/**
-**  Global volume support
-**
-**  @param l  Lua state.
-*/
-static int CclSetSoundVolume(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-
-	SetGlobalVolume(LuaToNumber(l, 1));
-	return 0;
-}
-
-/**
-**  Music volume support
-**
-**  @param l  Lua state.
-*/
-static int CclGetMusicVolume(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, MusicVolume);
-	return 1;
-}
-
-/**
-**  Music volume support
-**
-**  @param l  Lua state.
-*/
-static int CclSetMusicVolume(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-
-	SetMusicVolume(LuaToNumber(l, 1));
-	return 0;
-}
-
-/**
 **  Set cd mode
 **
 **  @param l  Lua state.
@@ -528,65 +478,6 @@ static int CclDefinePlaySections(lua_State *l)
 }
 
 /**
-**  Turn Off Sound (client side)
-**
-**  @param l  Lua state.
-*/
-static int CclSoundOff(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	SoundOff = 1;
-	return 0;
-}
-
-/**
-**  Turn On Sound (client side)
-**
-**  @param l  Lua state.
-**
-**  @return   true if and only if the sound is REALLY turned on
-*/
-static int CclSoundOn(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-
-	if (SoundEnabled() && !SoundOff) {
-		lua_pushboolean(l, 1);
-		return 1;
-	}
-	SoundOff = 0;
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
-**  Turn Off Music (client side)
-**
-**  @param l  Lua state.
-*/
-static int CclMusicOff(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	StopMusic();
-	MusicOff = 1;
-	return 0;
-}
-
-/**
-**  Turn On Music (client side)
-**
-**  @param l  Lua state.
-**
-**  @return   true if and only if the sound is REALLY turned on
-*/
-static int CclMusicOn(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	MusicOff = 0;
-	return 0;
-}
-
-/**
 **  Set the cut off distance.
 **
 **  @param l  Lua state.
@@ -632,18 +523,6 @@ static int CclSetSoundRange(lua_State *l) {
 }
 
 /**
-**  Play a music file.
-**
-**  @param l  Lua state.
-*/
-static int CclPlayMusic(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	PlayMusic(LuaToString(l, 1));
-	return 0;
-}
-
-/**
 **  Callback for when PlaySoundFile finishes
 */
 static void PlaySoundFileFinished(int channel)
@@ -665,34 +544,14 @@ static int CclPlayFile(lua_State *l)
 }
 
 /**
-**  Stop playing music.
-**
-**  @param l  Lua state.
-*/
-static int CclStopMusic(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	StopMusic();
-	return 0;
-}
-
-/**
 **  Register CCL features for sound.
 */
 void SoundCclRegister(void)
 {
-	lua_register(Lua, "GetSoundVolume", CclGetSoundVolume);
-	lua_register(Lua, "SetSoundVolume", CclSetSoundVolume);
-	lua_register(Lua, "GetMusicVolume", CclGetMusicVolume);
-	lua_register(Lua, "SetMusicVolume", CclSetMusicVolume);
 	lua_register(Lua, "SetCdMode", CclSetCdMode);
 
 	lua_register(Lua, "DefinePlaySections", CclDefinePlaySections);
 
-	lua_register(Lua, "SoundOff", CclSoundOff);
-	lua_register(Lua, "SoundOn", CclSoundOn);
-	lua_register(Lua, "MusicOff", CclMusicOff);
-	lua_register(Lua, "MusicOn", CclMusicOn);
 	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
 	lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
 	lua_register(Lua, "MapSound", CclMapSound);
@@ -701,10 +560,7 @@ void SoundCclRegister(void)
 	lua_register(Lua, "MakeSound", CclMakeSound);
 	lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
 	lua_register(Lua, "PlaySound", CclPlaySound);
-
-	lua_register(Lua, "PlayMusic", CclPlayMusic);
 	lua_register(Lua, "PlayFile", CclPlayFile);
-	lua_register(Lua, "StopMusic", CclStopMusic);
 }
 
 //@}

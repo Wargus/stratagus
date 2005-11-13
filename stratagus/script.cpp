@@ -2651,19 +2651,12 @@ void SavePreferences(void)
 	fprintf(fd, "SetKeyScrollSpeed(%d)\n", SpeedKeyScroll);
 
 	// Sound options
-	if (!SoundOff) {
-		fprintf(fd, "SoundOn()\n");
-	} else {
-		fprintf(fd, "SoundOff()\n");
-	}
+	fprintf(fd, "SetEffectsEnabled(%s)\n", IsEffectsEnabled() ? "true" : "false");
+	fprintf(fd, "SetEffectsVolume(%d)\n", GetEffectsVolume());
 
-	fprintf(fd, "SetSoundVolume(%d)\n", GlobalVolume);
-	if (!MusicOff) {
-		fprintf(fd, "MusicOn()\n");
-	} else {
-		fprintf(fd, "MusicOff()\n");
-	}
-	fprintf(fd, "SetMusicVolume(%d)\n", MusicVolume);
+	fprintf(fd, "SetMusicEnabled(%s)\n", IsMusicEnabled() ? "true" : "false");
+	fprintf(fd, "SetMusicVolume(%d)\n", GetMusicVolume());
+
 #ifdef USE_CDAUDIO
 	buf[0] = '\0';
 	switch (CDMode) {

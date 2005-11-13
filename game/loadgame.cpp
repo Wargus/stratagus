@@ -187,7 +187,8 @@ void LoadModules(void)
 	MapUnitSounds();
 	if (SoundEnabled()) {
 		if (InitSoundServer()) {
-			SoundOff = 1;
+			SetEffectsEnabled(false);
+			SetMusicEnabled(false);
 		} else {
 			InitSoundClient();
 		}
