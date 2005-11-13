@@ -81,7 +81,7 @@ PlaySectionType CurrentPlaySection;    /// Current Play Section
 void StopMusic(void)
 {
 	if (PlayingMusic) {
-		PlayingMusic = true; // Callback!
+		PlayingMusic = false; // Callback!
 		if (MusicSample) {
 			SDL_LockAudio();
 			delete MusicSample;
