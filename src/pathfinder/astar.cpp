@@ -741,8 +741,8 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 	// let's clean up the matrix now
 	AStarCleanUp(num_in_close);
 	if ((Map.Info.MapWidth*Map.Info.MapHeight) - counter > 500) {
-		DebugPrint("%s:%d Visited %d tiles\n" _C_ unit->Type->Name _C_ UnitNumber(unit) 
-			_C_ (Map.Info.MapWidth*Map.Info.MapHeight) - counter);
+		DebugPrint("%s:%d Visited %d tiles, length %d tiles\n" _C_ unit->Type->Name _C_ UnitNumber(unit) 
+			_C_ (Map.Info.MapWidth*Map.Info.MapHeight) - counter _C_ path_length);
 	}
 	return path_length;
 }
@@ -791,20 +791,36 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 	result=unit->Data.Move.Length;
 	unit->Data.Move.Length--;
 	if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
-		result=NewPath(unit);
-		if( result>0 ) {
-			*pxd=Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
-			*pyd=Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
-			if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
-				// There may be unit in the way, Astar may allow you to walk onto it.
-				result=PF_UNREACHABLE;
-				*pxd=0;
-				*pyd=0;
-			} else {
-				result=unit->Data.Move.Length;
-				unit->Data.Move.Length--;
+		// If obstructing unit is moving, wait for a bit.
+		if (unit->Data.Move.Fast) {
+			unit->Data.Move.Fast--;
+			DebugPrint("WAIT at %d\n" _C_ unit->Data.Move.Fast);
+			result = PF_WAIT;
+		} else {
+			unit->Data.Move.Fast = 10;
+			DebugPrint("SET WAIT to 10\n");
+			result = 0;
+		}
+		if (unit->Data.Move.Fast == 0 && result != 0) {
+			DebugPrint("WAIT expired\n");
+			result=NewPath(unit);
+			if( result>0 ) {
+				*pxd=Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
+				*pyd=Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
+				if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
+					// There may be unit in the way, Astar may allow you to walk onto it.
+					result=PF_UNREACHABLE;
+					*pxd=0;
+					*pyd=0;
+				} else {
+					result=unit->Data.Move.Length;
+					unit->Data.Move.Length--;
+				}
 			}
 		}
+	}
+	if (result != PF_WAIT) {
+		unit->Data.Move.Fast = 0;
 	}
 	return result;
 }
