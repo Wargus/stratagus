@@ -55,7 +55,6 @@
 ----------------------------------------------------------------------------*/
 
 char RightButtonAttacks;                   /// right button 0 move, 1 attack
-bool FancyBuildings;                       /// Mirror buildings 1 yes, 0 now.
 
 
 int SpeedKeyScroll = KEY_SCROLL_SPEED;     /// keyboard scroll speed

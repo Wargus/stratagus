@@ -757,8 +757,6 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "boarded")) {
 			unit->Boarded = 1;
 			--j;
-		} else if (!strcmp(value, "rs")) {
-			unit->Rs = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "units-boarded-count")) {
 			unit->BoardCount = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "units-contained")) {
