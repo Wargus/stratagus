@@ -307,8 +307,6 @@ void CUnit::Init(CUnitType *type)
 
 	Removed = 1;
 
-	Rs = MyRand() % 100; // used for fancy buildings and others
-
 	Assert(Orders.empty());
 
 	Orders.push_back(new COrder);
@@ -407,16 +405,6 @@ CUnit *MakeUnit(CUnitType *type, CPlayer *player)
 	if (player) {
 		unit->AssignToPlayer(player);
 	}
-
-	if (type->Building) {
-		//
-		//  fancy buildings: mirror buildings (but shadows not correct)
-		//
-		if (FancyBuildings && unit->Rs > 50) {
-			unit->Frame = -unit->Frame - 1;
-		}
-	}
-
 
 	return unit;
 }
@@ -3748,7 +3736,6 @@ void SaveUnit(const CUnit *unit, CFile *file)
 		file->printf(" \"auto-repair\",");
 	}
 
-	file->printf(" \"rs\", %d,", unit->Rs);
 	file->printf(" \"units-boarded-count\", %d,", unit->BoardCount);
 
 	if (unit->UnitInside) {
@@ -3939,7 +3926,6 @@ void CleanUnits(void)
 	InitUnitsMemory();
 
 	XpDamage = 0;
-	FancyBuildings = false;
 	HelpMeLastCycle = 0;
 }
 
