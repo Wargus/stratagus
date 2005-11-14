@@ -515,7 +515,7 @@ public:
 		TeamSelected(0), Constructed(0), Active(0), Boarded(0),
 		RescuedFrom(NULL), Variable(NULL), TTL(0), GroupId(0), LastGroup(0),
 		ResourcesHeld(0), SubAction(0), Wait(0), State(0), Blink(0),
-		Moving(0), ReCast(0), Rs(0), CurrentResource(0), OrderCount(0),
+		Moving(0), ReCast(0), CurrentResource(0), OrderCount(0),
 		OrderFlush(0), AutoCastSpell(NULL), AutoRepair(0),
 		Goal(NULL)
 	{
