@@ -76,9 +76,6 @@ ShowHealthDot()
 ShowManaDot()
 ShowNoFull()
 
---	Enable fancy building (random mirroring buildings)
-SetFancyBuildings(false)
-
 --	Enable show tips at the start of a level
 SetShowTips(true)
 
