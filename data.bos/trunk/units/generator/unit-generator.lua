@@ -35,23 +35,27 @@ DefineIcon({
 
 DefineConstruction("construction-gen", {
 	Constructions = {
-		{Percent = 0, File = "main", Frame = 9},
-		{Percent = 10, File = "main", Frame = 10},
-		{Percent = 20, File = "main", Frame = 11},
-		{Percent = 30, File = "main", Frame = 12},
-		{Percent = 40, File = "main", Frame = 13},
-		{Percent = 50, File = "main", Frame = 14},
-		{Percent = 60, File = "main", Frame = 15},
-		{Percent = 70, File = "main", Frame = 16},
-		{Percent = 80, File = "main", Frame = 17},
-		{Percent = 90, File = "main", Frame = 0}
+		{Percent = 0, File = "main", Frame = 32},
+		{Percent = 10, File = "main", Frame = 33},
+		{Percent = 30, File = "main", Frame = 34},
+		{Percent = 40, File = "main", Frame = 35},
+		{Percent = 50, File = "main", Frame = 36},
+		{Percent = 70, File = "main", Frame = 37},
+		{Percent = 80, File = "main", Frame = 38}
 	}
     })
 
 DefineAnimations("animations-gen", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
-        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
+        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2",
+        "frame 9", "wait 2", "frame 10", "wait 2", "frame 11", "wait 2",
+        "frame 12", "wait 2", "frame 13", "wait 2", "frame 14", "wait 2",
+        "frame 15", "wait 2", "frame 16", "wait 2", "frame 17", "wait 2",
+        "frame 18", "wait 2", "frame 19", "wait 2", "frame 20", "wait 2",
+        "frame 21", "wait 2", "frame 22", "wait 2", "frame 23", "wait 2",
+        "frame 24", "wait 2", "frame 25", "wait 2", "frame 26", "wait 2",
+        "frame 27", "wait 2", "wait 2", },
     })
 
 MakeSound("gen-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
