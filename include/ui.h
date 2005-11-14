@@ -674,7 +674,6 @@ extern std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
 
 extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
 extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
-extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 
 extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;            /// Mouse Scrolling Speed, in Frames

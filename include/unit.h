@@ -609,10 +609,6 @@ public:
 		int Unbreakable;                            /// Unbreakable
 	} Anim;
 
-	/** set to random 1..100 when MakeUnit()
-	** used for fancy buildings
-	*/
-	unsigned Rs : 8;
 	unsigned char CurrentResource;
 
 	char OrderCount;            /// how many orders in queue
