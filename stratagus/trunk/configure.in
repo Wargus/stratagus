@@ -267,13 +267,10 @@ dnl ----------------------------
 
 dnl --- CHECK FOR CDAUDIO ------
 AC_ARG_WITH(cdaudio,
-    [  --with-cdaudio=libcda,sdlcd,cdda,no
+    [  --with-cdaudio=libcda,sdlcd,no
 			  [Enable CD Audio support (default: no)]], CDAUDIO="$with_cdaudio")
 if test "$CDAUDIO" = "sdl"; then
     CDAUDIO_CFLAGS="`$SDLCONFIG --cflags`"
-    CDAUDIO_LIBS=""
-elif test "$CDAUDIO" = "cdda"; then
-    CDAUDIO_CFLAGS="-DUSE_CDDA"
     CDAUDIO_LIBS=""
 elif test "$CDAUDIO" = "libcda"; then
     CDAUDIO_CFLAGS="-DUSE_LIBCDA"
