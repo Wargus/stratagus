@@ -239,8 +239,7 @@ int PlayMovie(const char *name)
 			f.close();
 			return 0;
 		}
-		MusicSample = sample;
-		PlayingMusic = true;
+		PlayMusic(sample);
 	}
 
 	callbacks.ButtonPressed = MovieCallbackButtonPressed;

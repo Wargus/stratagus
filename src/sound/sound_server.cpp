@@ -63,9 +63,6 @@
 
 #include "util.h"
 
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -73,18 +70,12 @@
 
 static bool SoundInitialized;    /// is sound initialized
 bool PlayingMusic;               /// flag true if playing music
-bool CallbackMusic;               /// flag true callback ccl if stops
 
 static int EffectsVolume = 128;         /// effects sound volume
 static int MusicVolume = 128;           /// music volume
 
-static bool MusicEnabled = true;
-static bool EffectsEnabled = true;
-
-static bool MusicTerminated;     /// music ended and we need a new file
-
-SDL_mutex *MusicTerminatedMutex;
-
+static bool MusicEnabled;
+static bool EffectsEnabled;
 
 	/// Channels for sound effects and unit speach
 struct SoundChannel {
@@ -103,37 +94,52 @@ struct SoundChannel {
 SoundChannel Channels[MaxChannels];
 int NextFreeChannel;
 
+char *CurrentMusicFile;    /// Current music filename
+
+struct {
+	CSample *Sample;       /// Music sample
+	void (*FinishedCallback)(); /// Callback for when music finishes playing
+} MusicChannel;
+
+static void ChannelFinished(int channel);
+
 /*----------------------------------------------------------------------------
---  Functions
+--  Mixers
 ----------------------------------------------------------------------------*/
 
-static int ConvertToStereo32(const char *src, char *dest, int frequency,
-	int chansize, int channels, int bytes);
-
 /**
-**  Check if the playlist need to be advanced,
-**  and invoke MusicStopped if necessary
+**  Convert RAW sound data to 44100 hz, Stereo, 16 bits per channel
+**
+**  @param src        Source buffer
+**  @param dest       Destination buffer
+**  @param frequency  Frequency of source
+**  @param chansize   Bitrate in bytes per channel of source
+**  @param channels   Number of channels of source
+**  @param bytes      Number of compressed bytes to read
+**
+**  @return           Number of bytes written in 'dest'
 */
-void PlayListAdvance(void)
+static int ConvertToStereo32(const char *src, char *dest, int frequency,
+	int chansize, int channels, int bytes)
 {
-	bool proceed;
+	SDL_AudioCVT acvt;
+	Uint16 format;
 
-	SDL_LockMutex(MusicTerminatedMutex);
-	proceed = MusicTerminated;
-	MusicTerminated = false;
-	SDL_UnlockMutex(MusicTerminatedMutex);
-
-	if (proceed && MusicEnabled) {
-		lua_pushstring(Lua, "MusicStopped");
-		lua_gettable(Lua, LUA_GLOBALSINDEX);
-		if (!lua_isfunction(Lua, -1)) {
-			fprintf(stderr, "No MusicStopped function in Lua\n");
-			SetMusicEnabled(false);
-			StopMusic();
-		} else {
-			LuaCall(0, 1);
-		}
+	if (chansize == 1) {
+		format = AUDIO_U8;
+	} else {
+		format = AUDIO_S16;
 	}
+	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16,
+		2, 44100);
+
+	acvt.buf = (unsigned char *)dest;
+	memcpy(dest, src, bytes);
+	acvt.len = bytes;
+
+	SDL_ConvertAudio(&acvt);
+
+	return acvt.len_mult * bytes;
 }
 
 /**
@@ -155,19 +161,19 @@ static void MixMusicToStereo32(int *buffer, int size)
 	int div;
 
 	if (PlayingMusic) {
-		Assert(MusicSample);
+		Assert(MusicChannel.Sample);
 
 		len = size * sizeof(*buf);
 		tmp = new char[len];
 		buf = new short[len];
 
-		div = 176400 / (MusicSample->Frequency * (MusicSample->SampleSize / 8)
-				* MusicSample->Channels);
+		div = 176400 / (MusicChannel.Sample->Frequency * (MusicChannel.Sample->SampleSize / 8)
+				* MusicChannel.Sample->Channels);
 
-		size = MusicSample->Read(tmp, len / div);
+		size = MusicChannel.Sample->Read(tmp, len / div);
 
-		n = ConvertToStereo32((char *)(tmp), (char *)buf, MusicSample->Frequency,
-			MusicSample->SampleSize / 8, MusicSample->Channels, size);
+		n = ConvertToStereo32((char *)(tmp), (char *)buf, MusicChannel.Sample->Frequency,
+			MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
 
 		for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 			// Add to our samples
@@ -180,22 +186,15 @@ static void MixMusicToStereo32(int *buffer, int size)
 
 		if (n < len) { // End reached
 			PlayingMusic = false;
-			delete MusicSample;
-			MusicSample = NULL;
+			delete MusicChannel.Sample;
+			MusicChannel.Sample = NULL;
 
-			// we are inside the SDL callback!
-			if (CallbackMusic) {
-				SDL_LockMutex(MusicTerminatedMutex);
-				MusicTerminated = true;
-				SDL_UnlockMutex(MusicTerminatedMutex);
+			if (MusicChannel.FinishedCallback) {
+				MusicChannel.FinishedCallback();
 			}
 		}
 	}
 }
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
 
 /**
 **  Mix sample to buffer.
@@ -258,78 +257,6 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 }
 
 /**
-**  Convert RAW sound data to 44100 hz, Stereo, 16 bits per channel
-**
-**  // FIXME
-**  @param src        Source buffer
-**  @param dest       Destination buffer
-**  @param frequency  Frequency of source
-**  @param chansize   Bitrate in bytes per channel of source
-**  @param channels   Number of channels of source
-**  @param bytes      Number of compressed bytes to read
-**
-**  @return           Number of bytes written in 'dest'
-*/
-static int ConvertToStereo32(const char *src, char *dest, int frequency,
-	int chansize, int channels, int bytes)
-{
-	SDL_AudioCVT acvt;
-	Uint16 format;
-
-	if (chansize == 1) {
-		format = AUDIO_U8;
-	} else {
-		format = AUDIO_S16;
-	}
-	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16,
-		2, 44100);
-
-	acvt.buf = (unsigned char *)dest;
-	memcpy(dest, src, bytes);
-	acvt.len = bytes;
-
-	SDL_ConvertAudio(&acvt);
-
-	return acvt.len_mult * bytes;
-}
-
-/**
-**  Put a sound request in the next free channel.
-*/
-static int FillChannel(CSample *sample, unsigned char volume, char stereo)
-{
-	Assert(NextFreeChannel < MaxChannels);
-
-	int old_free = NextFreeChannel;
-	int next_free = Channels[NextFreeChannel].Point;
-
-	Channels[NextFreeChannel].Volume = volume;
-	Channels[NextFreeChannel].Point = 0;
-	Channels[NextFreeChannel].Playing = true;
-	Channels[NextFreeChannel].Sample = sample;
-	Channels[NextFreeChannel].Stereo = stereo;
-	Channels[NextFreeChannel].FinishedCallback = NULL;
-
-	NextFreeChannel = next_free;
-
-	return old_free;
-}
-
-/**
-**  A channel is finished playing
-*/
-static void ChannelFinished(int channel)
-{
-	if (Channels[channel].FinishedCallback) {
-		Channels[channel].FinishedCallback(channel);
-	}
-
-	Channels[channel].Playing = false;
-	Channels[channel].Point = NextFreeChannel;
-	NextFreeChannel = channel;
-}
-
-/**
 **  Mix channels to stereo 32 bit.
 **
 **  @param buffer  Buffer for mixed samples.
@@ -387,9 +314,92 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 	}
 }
 
+/**
+**  Mix into buffer.
+**
+**  @param buffer   Buffer to be filled with samples. Buffer must be big enough.
+**  @param samples  Number of samples.
+*/
+static void MixIntoBuffer(void *buffer, int samples)
+{
+	static int *mixer_buffer = NULL;
+	static int mixer_buffer_size = 0;
+
+	if (samples > mixer_buffer_size) {
+		delete[] mixer_buffer;
+		mixer_buffer = new int[samples];
+		mixer_buffer_size = samples;
+	}
+
+	// FIXME: can save the memset here, if first channel sets the values
+	memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
+
+	if (EffectsEnabled) {
+		// Add channels to mixer buffer
+		MixChannelsToStereo32(mixer_buffer, samples);
+	}
+	if (MusicEnabled) {
+		// Add music to mixer buffer
+		MixMusicToStereo32(mixer_buffer, samples);
+	}
+
+	ClipMixToStereo16(mixer_buffer, samples, (short *)buffer);
+}
+
+/**
+**  Fill buffer for the sound card.
+**
+**  @see SDL_OpenAudio
+**
+**  @param udata   the pointer stored in userdata field of SDL_AudioSpec.
+**  @param stream  pointer to buffer you want to fill with information.
+**  @param len     is length of audio buffer in bytes.
+*/
+static void FillAudio(void *udata, Uint8 *stream, int len)
+{
+	len >>= 1;
+	MixIntoBuffer(stream, len);
+}
+
 /*----------------------------------------------------------------------------
---  Other
+--  Effects
 ----------------------------------------------------------------------------*/
+
+/**
+**  A channel is finished playing
+*/
+static void ChannelFinished(int channel)
+{
+	if (Channels[channel].FinishedCallback) {
+		Channels[channel].FinishedCallback(channel);
+	}
+
+	Channels[channel].Playing = false;
+	Channels[channel].Point = NextFreeChannel;
+	NextFreeChannel = channel;
+}
+
+/**
+**  Put a sound request in the next free channel.
+*/
+static int FillChannel(CSample *sample, unsigned char volume, char stereo)
+{
+	Assert(NextFreeChannel < MaxChannels);
+
+	int old_free = NextFreeChannel;
+	int next_free = Channels[NextFreeChannel].Point;
+
+	Channels[NextFreeChannel].Volume = volume;
+	Channels[NextFreeChannel].Point = 0;
+	Channels[NextFreeChannel].Playing = true;
+	Channels[NextFreeChannel].Sample = sample;
+	Channels[NextFreeChannel].Stereo = stereo;
+	Channels[NextFreeChannel].FinishedCallback = NULL;
+
+	NextFreeChannel = next_free;
+
+	return old_free;
+}
 
 /**
 **  Set the channel volume
@@ -468,6 +478,9 @@ void SetChannelFinishedCallback(int channel, void (*callback)(int channel))
 	Channels[channel].FinishedCallback = callback;
 }
 
+/**
+**  Get the sample playing on a channel
+*/
 CSample *GetChannelSample(int channel)
 {
 	if (channel < 0 || channel >= MaxChannels) {
@@ -578,11 +591,10 @@ int PlaySoundFile(const char *name)
 	return -1;
 }
 
-
 /**
 **  Set the global sound volume.
 **
-**  @param volume  the sound volume (positive number) 0-255
+**  @param volume  the sound volume 0-255
 */
 void SetEffectsVolume(int volume)
 {
@@ -604,9 +616,135 @@ int GetEffectsVolume(void)
 }
 
 /**
+**  Set effects enabled
+*/
+void SetEffectsEnabled(bool enabled)
+{
+	if (SoundEnabled()) {
+		EffectsEnabled = enabled;
+	}
+}
+
+/**
+**  Check if effects are enabled
+*/
+bool IsEffectsEnabled(void)
+{
+	return SoundEnabled() && EffectsEnabled;
+}
+
+/*----------------------------------------------------------------------------
+--  Music
+----------------------------------------------------------------------------*/
+
+/**
+**  Set the music finished callback
+*/
+void SetMusicFinishedCallback(void (*callback)(void))
+{
+	MusicChannel.FinishedCallback = callback;
+}
+
+/**
+**  Play a music file.
+**
+**  @param sample  Music sample.
+**
+**  @return        0 if music is playing, -1 if not.
+*/
+int PlayMusic(CSample *sample)
+{
+	if (sample) {
+		StopMusic();
+		MusicChannel.Sample = sample;
+		PlayingMusic = true;
+		delete[] CurrentMusicFile;
+		CurrentMusicFile = NULL;
+		return 0;
+	} else {
+		DebugPrint("Could not play sample\n");
+		return -1;
+	}
+}
+
+/**
+**  Play a music file.
+**
+**  @param name  Name of music file, format is automatically detected.
+**
+**  @return      0 if music is playing, -1 if not.
+*/
+int PlayMusic(const char *file)
+{
+	char buffer[PATH_MAX];
+	CSample *sample;
+
+	if (!IsMusicEnabled()) {
+		return -1;
+	}
+
+	delete[] CurrentMusicFile;
+	CurrentMusicFile = NULL;
+
+	char *name = LibraryFileName(file, buffer);
+
+	DebugPrint("play music %s\n" _C_ name);
+
+	sample = LoadWav(name, PlayAudioStream);
+
+#ifdef USE_VORBIS
+	if (!sample) {
+		sample = LoadVorbis(name, PlayAudioStream);
+	}
+#endif
+#ifdef USE_MAD
+	if (!sample) {
+		sample = LoadMp3(name, PlayAudioStream);
+	}
+#endif
+#ifdef USE_FLAC
+	if (!sample) {
+		sample = LoadFlac(name, PlayAudioStream);
+	}
+#endif
+#ifdef USE_MIKMOD
+	if (!sample) {
+		sample = LoadMikMod(name, PlayAudioStream);
+	}
+#endif
+
+	if (sample) {
+		StopMusic();
+		MusicChannel.Sample = sample;
+		PlayingMusic = true;
+		CurrentMusicFile = new_strdup(file);
+		return 0;
+	} else {
+		DebugPrint("Could not play %s\n" _C_ file);
+		return -1;
+	}
+}
+
+/**
+**  Stop the current playing music.
+*/
+void StopMusic(void)
+{
+	if (PlayingMusic) {
+		PlayingMusic = false;
+		if (MusicChannel.Sample) {
+			SDL_LockAudio();
+			delete MusicChannel.Sample;
+			MusicChannel.Sample = NULL;
+			SDL_UnlockAudio();
+		}
+	}
+}
+
+/**
 **  Set the music volume.
 **
-**  @param volume  the music volume (positive number) 0-255
+**  @param volume  the music volume 0-255
 */
 void SetMusicVolume(int volume)
 {
@@ -627,72 +765,6 @@ int GetMusicVolume(void)
 	return MusicVolume;
 }
 
-
-/**
-**  Mix into buffer.
-**
-**  @param buffer   Buffer to be filled with samples. Buffer must be big enough.
-**  @param samples  Number of samples.
-*/
-static void MixIntoBuffer(void *buffer, int samples)
-{
-	static int *mixer_buffer = NULL;
-	static int mixer_buffer_size = 0;
-
-	if (samples > mixer_buffer_size) {
-		delete[] mixer_buffer;
-		mixer_buffer = new int[samples];
-		mixer_buffer_size = samples;
-	}
-
-	// FIXME: can save the memset here, if first channel sets the values
-	memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
-
-	if (EffectsEnabled) {
-		// Add channels to mixer buffer
-		MixChannelsToStereo32(mixer_buffer, samples);
-	}
-	if (MusicEnabled) {
-		// Add music to mixer buffer
-		MixMusicToStereo32(mixer_buffer, samples);
-	}
-
-	ClipMixToStereo16(mixer_buffer, samples, (short *)buffer);
-}
-
-/**
-**  Fill buffer for the sound card.
-**
-**  @see SDL_OpenAudio
-**
-**  @param udata   the pointer stored in userdata field of SDL_AudioSpec.
-**  @param stream  pointer to buffer you want to fill with information.
-**  @param len     is length of audio buffer in bytes.
-*/
-static void FillAudio(void *udata, Uint8 *stream, int len)
-{
-	len >>= 1;
-	MixIntoBuffer(stream, len);
-}
-
-/**
-**  Set effects enabled
-*/
-void SetEffectsEnabled(bool enabled)
-{
-	if (SoundEnabled()) {
-		EffectsEnabled = enabled;
-	}
-}
-
-/**
-**  Check if effects are enabled
-*/
-bool IsEffectsEnabled(void)
-{
-	return EffectsEnabled;
-}
-
 /**
 **  Set music enabled
 */
@@ -701,15 +773,9 @@ void SetMusicEnabled(bool enabled)
 	if (SoundEnabled()) {
 		if (enabled) {
 			MusicEnabled = true;
-			if (!PlayingMusic) {
-				MusicTerminated = true;
-				PlayListAdvance();
-			}
 		} else {
 			MusicEnabled = false;
-			if (PlayingMusic) {
-				StopMusic();
-			}
+			StopMusic();
 		}
 	}
 }
@@ -719,7 +785,19 @@ void SetMusicEnabled(bool enabled)
 */
 bool IsMusicEnabled(void)
 {
-	return MusicEnabled;
+	return SoundEnabled() && MusicEnabled;
+}
+
+/*----------------------------------------------------------------------------
+--  Init
+----------------------------------------------------------------------------*/
+
+/**
+**  Check if sound is enabled
+*/
+bool SoundEnabled(void)
+{
+	return SoundInitialized;
 }
 
 /**
@@ -760,14 +838,11 @@ static int InitSdlSound(int freq, int size)
 
 /**
 **  Initialize sound card.
+**
+**  @return  True if failure, false if everything ok.
 */
 int InitSound(void)
 {
-	int dummy;
-
-	MusicTerminated = false;
-	MusicTerminatedMutex = SDL_CreateMutex();
-
 	//
 	// Open sound device, 8bit samples, stereo.
 	//
@@ -776,37 +851,15 @@ int InitSound(void)
 		return 1;
 	}
 	SoundInitialized = true;
+	EffectsEnabled = true;
+	MusicEnabled = true;
 
 	// ARI: The following must be done here to allow sound to work in
 	// pre-start menus!
 	// initialize channels
-	for (dummy = 0; dummy < MaxChannels; ++dummy) {
-		Channels[dummy].Point = dummy + 1;
+	for (int i = 0; i < MaxChannels; ++i) {
+		Channels[i].Point = i + 1;
 	}
-
-	return 0;
-}
-
-/**
-**  Check if sound is enabled
-*/
-bool SoundEnabled(void)
-{
-	return SoundInitialized;
-}
-
-/**
-**  Initialize sound server structures (and thread)
-*/
-int InitSoundServer(void)
-{
-	int MapWidth;
-	int MapHeight;
-
-	MapWidth = (UI.MapArea.EndX - UI.MapArea.X + TileSizeX) / TileSizeX;
-	MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + TileSizeY) / TileSizeY;
-	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
-	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);
 
 	return 0;
 }

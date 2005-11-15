@@ -49,6 +49,7 @@
 #include "interface.h"
 #include "campaign.h"
 #include "util.h"
+#include "script.h"
 
 #include "cdaudio.h"
 
@@ -62,29 +63,49 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-CSample *MusicSample;  /// Music samples
-
-char *CurrentMusicFile;
-
 std::vector<PlaySection> PlaySections; /// Play Sections
 PlaySectionType CurrentPlaySection;    /// Current Play Section
+
+SDL_mutex *MusicFinishedMutex;         /// Mutex for MusicFinished
+static bool MusicFinished;             /// Music ended and we need a new file
+
+bool CallbackMusic;                    /// flag true callback ccl if stops
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**  Stop the current playing music.
+**  Callback for when music has finished
+**  Note: we are in the sdl audio thread
 */
-void StopMusic(void)
+static void MusicFinishedCallback(void)
 {
-	if (PlayingMusic) {
-		PlayingMusic = false; // Callback!
-		if (MusicSample) {
-			SDL_LockAudio();
-			delete MusicSample;
-			MusicSample = NULL;
-			SDL_UnlockAudio();
+	SDL_LockMutex(MusicFinishedMutex);
+	MusicFinished = true;
+	SDL_UnlockMutex(MusicFinishedMutex);
+}
+
+/**
+**  Check if music is finished and play the next song
+*/
+void CheckMusicFinished(bool force)
+{
+	bool proceed;
+
+	SDL_LockMutex(MusicFinishedMutex);
+	proceed = MusicFinished;
+	MusicFinished = false;
+	SDL_UnlockMutex(MusicFinishedMutex);
+
+	if ((proceed || force) && IsMusicEnabled() && CallbackMusic) {
+		lua_pushstring(Lua, "MusicStopped");
+		lua_gettable(Lua, LUA_GLOBALSINDEX);
+		if (!lua_isfunction(Lua, -1)) {
+			fprintf(stderr, "No MusicStopped function in Lua\n");
+			StopMusic();
+		} else {
+			LuaCall(0, 1);
 		}
 	}
 }
@@ -181,61 +202,13 @@ void PlaySectionMusic(PlaySectionType section)
 }
 
 /**
-**  Play a music file.
-**
-**  @param name  Name of music file, format is automatically detected.
-**
-**  @return      0 if music is playing, -1 if not.
+**  Init music
 */
-int PlayMusic(const char *name)
+void InitMusic(void)
 {
-	char buffer[PATH_MAX];
-	CSample *sample;
-
-	if (!IsMusicEnabled()) {
-		return -1;
-	}
-
-	delete[] CurrentMusicFile;
-	CurrentMusicFile = NULL;
-
-	name = LibraryFileName(name, buffer);
-
-	DebugPrint("play music %s\n" _C_ name);
-
-	sample = LoadWav(name, PlayAudioStream);
-
-#ifdef USE_VORBIS
-	if (!sample) {
-		sample = LoadVorbis(name, PlayAudioStream);
-	}
-#endif
-#ifdef USE_MAD
-	if (!sample) {
-		sample = LoadMp3(name, PlayAudioStream);
-	}
-#endif
-#ifdef USE_FLAC
-	if (!sample) {
-		sample = LoadFlac(name, PlayAudioStream);
-	}
-#endif
-#ifdef USE_MIKMOD
-	if (!sample) {
-		sample = LoadMikMod(name, PlayAudioStream);
-	}
-#endif
-
-	if (sample) {
-		StopMusic();
-		MusicSample = sample;
-		PlayingMusic = true;
-		CurrentMusicFile = new_strdup(name);
-		return 0;
-	} else {
-		DebugPrint("Could not play %s\n" _C_ name);
-		return -1;
-	}
+	MusicFinished = false;
+	MusicFinishedMutex = SDL_CreateMutex();
+	SetMusicFinishedCallback(MusicFinishedCallback);
 }
 
 //@}

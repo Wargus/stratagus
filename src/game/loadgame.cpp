@@ -186,12 +186,7 @@ void LoadModules(void)
 	LoadUnitSounds();
 	MapUnitSounds();
 	if (SoundEnabled()) {
-		if (InitSoundServer()) {
-			SetEffectsEnabled(false);
-			SetMusicEnabled(false);
-		} else {
-			InitSoundClient();
-		}
+		InitSoundClient();
 	}
 
 	SetPlayersPalette();
