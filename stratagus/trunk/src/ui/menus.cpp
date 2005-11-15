@@ -1721,7 +1721,7 @@ static void SoundOptionsInit(Menu *menu)
 #ifdef USE_CDAUDIO
 	menu->Items[15].Flags = 0; // cd power
 	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
-#if (!defined(USE_WIN32) && defined(USE_LIBCDA)) || defined(USE_CDDA)
+#if !defined(USE_WIN32) && defined(USE_LIBCDA)
 		int i = 0;
 		i = GetCDVolume();
 
