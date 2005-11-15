@@ -1721,13 +1721,6 @@ static void SoundOptionsInit(Menu *menu)
 #ifdef USE_CDAUDIO
 	menu->Items[15].Flags = 0; // cd power
 	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
-#if !defined(USE_WIN32) && defined(USE_LIBCDA)
-		int i = 0;
-		i = GetCDVolume();
-
-		menu->Items[12].Flags = 0;
-		menu->Items[12].D.HSlider.percent = (i * 100) / 255;
-#endif
 		menu->Items[15].D.Checkbox.Checked = 1;
 		menu->Items[16].Flags = 0;
 		menu->Items[17].Flags = 0;

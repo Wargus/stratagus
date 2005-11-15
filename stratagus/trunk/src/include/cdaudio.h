@@ -33,7 +33,7 @@
 
 //@{
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+#if defined(USE_SDLCD)
 
 #ifndef USE_CDAUDIO
 #define USE_CDAUDIO
@@ -45,8 +45,6 @@
 
 #if defined(USE_SDLCD)
 #include "SDL.h"
-#elif defined(USE_LIBCDA)
-#include "libcda.h"
 #endif
 
 /*----------------------------------------------------------------------------
