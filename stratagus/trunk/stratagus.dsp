@@ -507,10 +507,6 @@ SOURCE=.\src\sound\cdaudio.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\cdda.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\sound\flac.cpp
 # End Source File
 # Begin Source File
