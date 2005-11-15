@@ -63,11 +63,11 @@ for i,f in musiclist do
 end
 
 SetSelectionStyle("corners")
-SetShowSightRange(false)
-SetShowAttackRange(false)
-SetShowReactionRange(false)
+Preference.ShowSightRange = false
+Preference.ShowAttackRange = false
+Preference.ShowReactionRange = false
 
-SetShowOrders(2)
+Preference.ShowOrders = 2
 
 ManaSprite("general/mana2.png", 0, -1, 31, 4)
 HealthSprite("general/health2.png", 0, -4, 31, 4)
