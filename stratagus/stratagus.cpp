@@ -355,7 +355,7 @@ static void ShowTitleScreens(void)
 
 		if (TitleScreens[i]->Music) {
 			if (!strcmp(TitleScreens[i]->Music, "none") ||
-					!PlayMusic(TitleScreens[i]->Music)) {
+					PlayMusic(TitleScreens[i]->Music) == -1) {
 				StopMusic();
 			}
 		}
