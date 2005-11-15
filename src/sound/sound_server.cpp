@@ -221,7 +221,7 @@ static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
 	unsigned char left;
 	unsigned char right;
 	int i;
-	static int buf[SOUND_BUFFER_SIZE/2];
+	static int buf[SOUND_BUFFER_SIZE / 2];
 	int div;
 
 	div = 176400 / (sample->Frequency * (sample->SampleSize / 8)
@@ -636,10 +636,15 @@ int GetMusicVolume(void)
 */
 static void MixIntoBuffer(void *buffer, int samples)
 {
-	int *mixer_buffer;
+	static int *mixer_buffer = NULL;
+	static int mixer_buffer_size = 0;
 
-	// Create empty mixer buffer
-	mixer_buffer = new int[samples];
+	if (samples > mixer_buffer_size) {
+		delete[] mixer_buffer;
+		mixer_buffer = new int[samples];
+		mixer_buffer_size = samples;
+	}
+
 	// FIXME: can save the memset here, if first channel sets the values
 	memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
 
@@ -653,8 +658,6 @@ static void MixIntoBuffer(void *buffer, int samples)
 	}
 
 	ClipMixToStereo16(mixer_buffer, samples, (short *)buffer);
-
-	delete[] mixer_buffer;
 }
 
 /**
@@ -666,7 +669,7 @@ static void MixIntoBuffer(void *buffer, int samples)
 **  @param stream  pointer to buffer you want to fill with information.
 **  @param len     is length of audio buffer in bytes.
 */
-void FillAudio(void *udata, Uint8 *stream, int len)
+static void FillAudio(void *udata, Uint8 *stream, int len)
 {
 	len >>= 1;
 	MixIntoBuffer(stream, len);
@@ -720,6 +723,42 @@ bool IsMusicEnabled(void)
 }
 
 /**
+**  Initialize sound card hardware part with SDL.
+**
+**  @param freq  Sample frequency (44100,22050,11025 hz).
+**  @param size  Sample size (8bit, 16bit)
+**
+**  @return      True if failure, false if everything ok.
+*/
+static int InitSdlSound(int freq, int size)
+{
+	SDL_AudioSpec wanted;
+
+	wanted.freq = freq;
+	if (size == 8) {
+		wanted.format = AUDIO_U8;
+	} else if (size == 16) {
+		wanted.format = AUDIO_S16SYS;
+	} else {
+		DebugPrint("Unexpected sample size %d\n" _C_ size);
+		wanted.format = AUDIO_S16SYS;
+	}
+	wanted.channels = 2;
+	wanted.samples = 4096;
+	wanted.callback = FillAudio;
+	wanted.userdata = NULL;
+
+	//  Open the audio device, forcing the desired format
+	if (SDL_OpenAudio(&wanted, NULL) < 0) {
+		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+		return -1;
+	}
+	SDL_PauseAudio(0);
+
+	return 0;
+}
+
+/**
 **  Initialize sound card.
 */
 int InitSound(void)
@@ -766,7 +805,6 @@ int InitSoundServer(void)
 
 	MapWidth = (UI.MapArea.EndX - UI.MapArea.X + TileSizeX) / TileSizeX;
 	MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + TileSizeY) / TileSizeY;
-	// FIXME: Valid only in shared memory context!
 	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
 	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);
 
