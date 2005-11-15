@@ -74,9 +74,7 @@ PlaySectionType CurrentPlaySection;    /// Current Play Section
 ----------------------------------------------------------------------------*/
 
 /**
-** Stop the current playing music.
-**
-** @todo  FIXME: Stop the CD-PLAYER.
+**  Stop the current playing music.
 */
 void StopMusic(void)
 {
@@ -87,13 +85,12 @@ void StopMusic(void)
 			delete MusicSample;
 			MusicSample = NULL;
 			SDL_UnlockAudio();
-			return;
 		}
 	}
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void PlaySectionMusic(PlaySectionType section)
 {
@@ -184,15 +181,11 @@ void PlaySectionMusic(PlaySectionType section)
 }
 
 /**
-** Play a music file.
+**  Play a music file.
 **
-** Currently supported are .mod, .it, .s3m, .wav, .xm.
-** Optional .ogg, .mp3, .flac and cdrom.
+**  @param name  Name of music file, format is automatically detected.
 **
-** @param name Name of sound file, format is automatic detected.
-** Names starting with ':' control the cdrom.
-**
-** @return 1 if music is playing, 0 if not.
+**  @return      0 if music is playing, -1 if not.
 */
 int PlayMusic(const char *name)
 {
@@ -200,78 +193,49 @@ int PlayMusic(const char *name)
 	CSample *sample;
 
 	if (!IsMusicEnabled()) {
-		return 0;
+		return -1;
 	}
 
 	delete[] CurrentMusicFile;
-	CurrentMusicFile = new_strdup(name);
+	CurrentMusicFile = NULL;
 
 	name = LibraryFileName(name, buffer);
 
-	DebugPrint("attempting to play %s\n" _C_ name);
+	DebugPrint("play music %s\n" _C_ name);
 
-	if ((sample = LoadWav(name, PlayAudioStream))) {
-		StopMusic();
-		MusicSample = sample;
-		PlayingMusic = true;
-		return 1;
-	}
+	sample = LoadWav(name, PlayAudioStream);
 
 #ifdef USE_VORBIS
-	if ((sample = LoadVorbis(name, PlayAudioStream))) {
-		if ((sample->Channels != 1 && sample->Channels != 2) ||
-				sample->SampleSize != 16) {
-			DebugPrint("Not supported music format\n");
-			delete sample;
-			return 0;
-		}
-		StopMusic();
-		MusicSample = sample;
-		PlayingMusic = true;
-		return 1;
+	if (!sample) {
+		sample = LoadVorbis(name, PlayAudioStream);
 	}
 #endif
 #ifdef USE_MAD
-	if ((sample = LoadMp3(name, PlayAudioStream))) {
-// if (sample->Channels != 2 || sample->SampleSize != 16
-// || sample->Frequency != SoundFrequency) {
-// DebugPrint("Not supported music format\n");
-// sample->Free();
-// return;
-// }
-		StopMusic();
-		MusicSample = sample;
-		PlayingMusic = true;
-		return 1;
+	if (!sample) {
+		sample = LoadMp3(name, PlayAudioStream);
 	}
 #endif
 #ifdef USE_FLAC
-	if ((sample = LoadFlac(name, PlayAudioStream))) {
-/*
-		if (sample->Channels != 2 || sample->SampleSize != 16
-			|| sample->Frequency != SoundFrequency) {
-			DebugPrint("Not supported music format\n");
-			sample->Free();
-			return;
-		}
-*/
-		StopMusic();
-		MusicSample = sample;
-		PlayingMusic = true;
-		return 1;
+	if (!sample) {
+		sample = LoadFlac(name, PlayAudioStream);
 	}
 #endif
 #ifdef USE_MIKMOD
-	if ((sample = LoadMikMod(name, PlayAudioStream))) {
+	if (!sample) {
+		sample = LoadMikMod(name, PlayAudioStream);
+	}
+#endif
+
+	if (sample) {
 		StopMusic();
 		MusicSample = sample;
 		PlayingMusic = true;
-		return 1;
+		CurrentMusicFile = new_strdup(name);
+		return 0;
+	} else {
+		DebugPrint("Could not play %s\n" _C_ name);
+		return -1;
 	}
-#endif
-	DebugPrint("could not play %s\n" _C_ name);
-
-	return 0;
 }
 
 //@}
