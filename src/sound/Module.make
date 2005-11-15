@@ -28,6 +28,6 @@
 MODULE = src/sound
 MSRC =   script_sound.cpp cdaudio.cpp flac.cpp libcda.cpp mad.cpp mikmod.cpp \
          music.cpp ogg.cpp sound.cpp sound_id.cpp sound_server.cpp \
-         unitsound.cpp wav.cpp cdda.cpp
+         unitsound.cpp wav.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

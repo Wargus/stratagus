@@ -51,8 +51,6 @@
 #include "SDL.h"
 #elif defined(USE_LIBCDA)
 #include "libcda.h"
-#elif defined(USE_CDDA)
-#include "iocompat.h"
 #endif
 
 /*----------------------------------------------------------------------------
@@ -68,11 +66,6 @@ int NumCDTracks;  /// Number of tracks on the cd
 
 #if defined(USE_SDLCD)
 static SDL_CD *CDRom;                  /// SDL cdrom device
-#elif defined(USE_CDDA)
-int CDDrive;                           /// CDRom device
-struct cdrom_tocentry CDtocentry[64];  /// TOC track header struct
-static struct cdrom_tochdr CDchdr;     /// TOC header struct
-static struct cdrom_read_audio CDdata; /// struct for reading data
 #endif
 
 CDModes CDMode; /// CD mode
@@ -276,102 +269,6 @@ void QuitCD(void)
 		cd_exit();
 		CDMode = CDModeOff;
 	}
-}
-#elif defined(USE_CDDA)
-/**
-**  FIXME: docu
-*/
-static int InitCD(void)
-{
-	int i;
-
-	CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
-	ioctl(CDDrive, CDROMRESET);
-	ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
-	for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i) {
-		CDtocentry[i].cdte_format = CDROM_LBA;
-		CDtocentry[i].cdte_track = i;
-		ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
-	}
-	NumCDTracks = i - 1;
-
-	if (NumCDTracks == 0) {
-		CDMode = CDModeOff;
-		return -1;
-	}
-	return 0;
-}
-
-/**
-**  FIXME: docu
-*/
-int PlayCDTrack(int track)
-{
-	CSample *sample;
-
-	sample = LoadCD(NULL, track);
-	CDTrack = track;
-	MusicSample = sample;
-	PlayingMusic = true;
-	return 0;
-}
-
-/**
-**  FIXME: docu
-*/
-void ResumeCD(void)
-{
-	PlayCDRom(CDModeDefined);
-}
-
-/**
-**  FIXME: docu
-*/
-void PauseCD(void)
-{
-	StopMusic();
-	CDTrack = 0;
-	CDMode = CDModeStopped;
-}
-
-/**
-**  FIXME: docu
-*/
-int IsAudioTrack(track)
-{
-	return !(CDtocentry[track].cdte_ctrl & CDROM_DATA_TRACK);
-}
-
-/**
-**  FIXME: docu
-*/
-int IsCDPlaying(void)
-{
-	return PlayingMusic;
-}
-
-/**
-**  FIXME: docu
-*/
-int GetCDVolume(void)
-{
-	return MusicVolume;
-}
-
-/**
-**  FIXME: docu
-*/
-void SetCDVolume(int vol)
-{
-	MusicVolume = vol;
-}
-
-/**
-**  FIXME: docu
-*/
-void QuitCD(void)
-{
-	close(CDDrive);
 }
 #endif
 
