@@ -127,8 +127,6 @@ extern int PlaySoundFile(const char *name);
 
 	/// Initialize the sound card.
 extern int InitSound(void);
-	/// Initialize the sound card with SDL support.
-extern int InitSdlSound(int freq, int size);
 
 	/// Check if sound is enabled
 extern bool SoundEnabled(void);
