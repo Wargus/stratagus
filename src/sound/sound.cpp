@@ -125,7 +125,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 {
 	CSample *result = NULL;
 
-	if (!sound) {
+	if (!sound || !SoundEnabled()) {
 		return NULL;
 	}
 
