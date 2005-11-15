@@ -33,7 +33,7 @@
 
 //@{
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
 
 #ifndef USE_CDAUDIO
 #define USE_CDAUDIO
@@ -47,11 +47,6 @@
 #include "SDL.h"
 #elif defined(USE_LIBCDA)
 #include "libcda.h"
-#elif defined(USE_CDDA)
-#include <linux/cdrom.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include "iocompat.h"
 #endif
 
 /*----------------------------------------------------------------------------
@@ -74,19 +69,9 @@ extern CDModes CDMode;   /// CD mode
 extern int CDTrack;      /// Current track
 extern int NumCDTracks;  /// Number of tracks on CD
 
-#ifdef USE_CDDA
-extern int CDDrive;  /// CDRom device
-extern struct cdrom_tocentry CDtocentry[64];  /// TOC track header struct
-#endif
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-#ifdef USE_CDDA
-	/// Load a cd track
-extern CSample *LoadCD(const char *name, int flags);
-#endif
 
 	/// Play CDMode 'name'
 extern int PlayCDRom(int name);
