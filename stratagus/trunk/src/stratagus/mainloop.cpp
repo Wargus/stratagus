@@ -388,7 +388,7 @@ void GameMainLoop(void)
 					if (!(GameCycle % 4)) { // every 2nd second
 						SDL_CreateThread(CDRomCheck, NULL);
 					}
-#elif defined(USE_LIBCDA) || defined(USE_CDDA)
+#elif defined(USE_LIBCDA)
 					CDRomCheck(NULL);
 #endif
 					break;
