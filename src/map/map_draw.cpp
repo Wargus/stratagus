@@ -288,8 +288,8 @@ void CViewport::Draw() const
 	// Draw orders of selected units.
 	// Drawn here so that they are shown even when the unit is out of the screen.
 	//
-	if (ShowOrders == SHOW_ORDERS_ALWAYS ||
-			((ShowOrdersCount >= GameCycle || (KeyModifiers & ModifierShift)))) {
+	if (Preference.ShowOrders < 0 ||
+		(ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
 		for (i = 0; i < NumSelected; ++i) {
 			ShowOrder(Selected[i]);
 		}

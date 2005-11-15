@@ -415,7 +415,7 @@ void DoRightButton(int sx, int sy)
 
 		SendCommandMove(unit, x, y, flush);
 	}
-	ShowOrdersCount = GameCycle + ShowOrders * CYCLES_PER_SECOND;
+	ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 }
 
 /**
@@ -1281,7 +1281,7 @@ static void SendCommand(int sx, int sy)
 				break;
 			}
 		}
-		ShowOrdersCount = GameCycle + ShowOrders * CYCLES_PER_SECOND;
+		ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 	}
 }
 
@@ -1433,11 +1433,10 @@ static void UISelectStateButtonDown(unsigned button)
 */
 void UIHandleButtonDown(unsigned button)
 {
-	static int OldShowSightRange;
-	static int OldShowReactionRange;
-	static int OldShowAttackRange;
-	static int OldShowOrders;
-	static int OldValid;
+	static bool OldShowSightRange;
+	static bool OldShowReactionRange;
+	static bool OldShowAttackRange;
+	static bool OldValid = false;
 	CUnit *uins;
 	int i;
 
@@ -1448,23 +1447,20 @@ void UIHandleButtonDown(unsigned button)
 
 	if (LongSelected) {
 		if (!OldValid) {
-			OldShowOrders = ShowOrders;
-			OldShowSightRange = ShowSightRange;
-			OldShowAttackRange = ShowAttackRange;
-			OldShowReactionRange = ShowReactionRange;
-			OldValid = 1;
+			OldShowSightRange = Preference.ShowSightRange;
+			OldShowAttackRange = Preference.ShowAttackRange;
+			OldShowReactionRange = Preference.ShowReactionRange;
+			OldValid = true;
 
-			ShowOrders = 1;
-			ShowSightRange = 1;
-			ShowAttackRange = 1;
-			ShowReactionRange = 1;
+			Preference.ShowSightRange = true;
+			Preference.ShowAttackRange = true;
+			Preference.ShowReactionRange = true;
 		}
 	} else if (OldValid) {
-		ShowOrders = OldShowOrders;
-		ShowSightRange = OldShowSightRange;
-		ShowAttackRange = OldShowAttackRange;
-		ShowReactionRange = OldShowReactionRange;
-		OldValid = 0;
+		Preference.ShowSightRange = OldShowSightRange;
+		Preference.ShowAttackRange = OldShowAttackRange;
+		Preference.ShowReactionRange = OldShowReactionRange;
+		OldValid = false;
 	}
 
 	// select mode

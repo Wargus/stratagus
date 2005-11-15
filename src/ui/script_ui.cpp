@@ -72,6 +72,8 @@ std::vector<CUnitInfoPanel *> AllPanels; /// Array of panels.
 
 static int HandleCount = 1;     /// Lua handler count
 
+CPreference Preference;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -4165,117 +4167,6 @@ static int CclSetSelectionStyle(lua_State *l)
 }
 
 /**
-**  Set display of sight range.
-**
-**  @param l  Lua state.
-*/
-static int CclSetShowSightRange(lua_State *l)
-{
-	int args;
-
-	args = lua_gettop(l);
-	if (args > 1 || (args == 1 &&
-			(!lua_isnil(l, 1) && !lua_isboolean(l, 1) && !lua_isstring(l, 1)))) {
-		LuaError(l, "incorrect argument");
-	}
-
-	if (args == 1 && !lua_isnil(l, 1)) {
-		if (lua_isstring(l, 1)) {
-			const char *flag;
-
-			flag = lua_tostring(l, 1);
-			if (!strcmp(flag, "rectangle")) {
-				ShowSightRange = 1;
-			} else if (!strcmp(flag, "circle")) {
-				ShowSightRange = 2;
-			} else {
-				LuaError(l, "Unsupported selection style");
-			}
-		} else {
-			if (lua_toboolean(l, 1)) {
-				ShowSightRange = 3;
-			} else {
-				ShowSightRange = 0;
-			}
-		}
-	} else {
-		ShowSightRange = 0;
-	}
-
-	return 0;
-}
-
-/**
-**  Set display of reaction range.
-**
-**  @param l  Lua state.
-*/
-static int CclSetShowReactionRange(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_isboolean(l, 1) && !lua_isstring(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-
-	if (lua_isstring(l, 1)) {
-		const char *flag;
-
-		flag = lua_tostring(l, 1);
-		if (!strcmp(flag, "rectangle")) {
-			ShowReactionRange = 1;
-		} else if (!strcmp(flag, "circle")) {
-			ShowReactionRange = 2;
-		} else {
-			LuaError(l, "Unsupported selection style");
-		}
-	} else {
-		if (lua_toboolean(l, 1)) {
-			ShowReactionRange = 3;
-		} else {
-			ShowReactionRange = 0;
-		}
-	}
-
-	return 0;
-}
-
-/**
-**  Set display of attack range.
-**
-**  @param l  Lua state.
-*/
-static int CclSetShowAttackRange(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	ShowAttackRange = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
-**  Set display of orders.
-**
-**  @param l  Lua state.
-*/
-static int CclSetShowOrders(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_isboolean(l, 1) && !lua_isnumber(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-
-	if (lua_isboolean(l, 1)) {
-		ShowOrders = lua_toboolean(l, 1);
-		if (ShowOrders) {
-			ShowOrders = SHOW_ORDERS_ALWAYS;
-		}
-	} else {
-		ShowOrders = LuaToNumber(l, 1);
-	}
-
-	return 0;
-}
-
-/**
 **  Add a new message.
 **
 **  @param l  Lua state.
@@ -4434,10 +4325,6 @@ void UserInterfaceCclRegister(void)
 	// Look and feel of units
 	//
 	lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
-	lua_register(Lua, "SetShowSightRange", CclSetShowSightRange);
-	lua_register(Lua, "SetShowReactionRange", CclSetShowReactionRange);
-	lua_register(Lua, "SetShowAttackRange", CclSetShowAttackRange);
-	lua_register(Lua, "SetShowOrders", CclSetShowOrders);
 
 	//
 	// Keystroke helps
