@@ -142,9 +142,6 @@ extern int InitSound(void);
 	/// Check if sound is enabled
 extern bool SoundEnabled(void);
 
-	/// Start next song if necessary
-extern void MusicFinishedCallback(void);
-
 	///  Cleanup sound.
 extern void QuitSound(void);
 
