@@ -68,7 +68,6 @@
 #include "editor.h"
 #include "commands.h"
 #include "actions.h"
-#include "cdaudio.h"
 #include "net_lowlevel.h"
 #include "master.h"
 #include "construct.h"

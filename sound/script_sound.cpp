@@ -44,7 +44,6 @@
 #include "script.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
