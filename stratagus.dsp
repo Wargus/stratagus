@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "src\include" /I "include" /I "src\guichan\include" /D "NDEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "src\include" /I "include" /I "src\guichan\include" /D "NDEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "src\include" /I "include" /I "src\guichan\include" /D "_DEBUG" /D "DEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "src\include" /I "include" /I "src\guichan\include" /D "_DEBUG" /D "DEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -511,10 +511,6 @@ SOURCE=.\src\sound\flac.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\libcda.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\sound\mad.cpp
 # End Source File
 # Begin Source File
@@ -841,10 +837,6 @@ SOURCE=.\src\include\iocompat.h
 # Begin Source File
 
 SOURCE=.\src\include\iolib.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\libcda.h
 # End Source File
 # Begin Source File
 

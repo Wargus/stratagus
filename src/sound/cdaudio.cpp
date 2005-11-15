@@ -49,8 +49,6 @@
 
 #if defined(USE_SDLCD)
 #include "SDL.h"
-#elif defined(USE_LIBCDA)
-#include "libcda.h"
 #endif
 
 /*----------------------------------------------------------------------------
@@ -170,103 +168,6 @@ void QuitCD(void)
 	}
 	if (CDMode != CDModeStopped) {
 		SDL_CDClose(CDRom);
-		CDMode = CDModeOff;
-	}
-}
-#elif defined(USE_LIBCDA)
-/**
-**  FIXME: docu
-*/
-static int InitCD(void)
-{
-	if (cd_init()) {
-		return -1;
-	} else {
-		if (cd_get_tracks(NULL, &NumCDTracks)) {
-			return -1;
-		}
-		return 0;
-	}
-}
-
-/**
-**  FIXME: docu
-*/
-int PlayCDTrack(int track)
-{
-	CDTrack = track;
-	return cd_play(track);
-}
-
-/**
-**  FIXME: docu
-*/
-void ResumeCD(void)
-{
-	PlayCDRom(CDModeDefined);
-}
-
-/**
-**  FIXME: docu
-*/
-void PauseCD(void)
-{
-	cd_pause();
-	CDTrack = 0;
-	CDMode = CDModeStopped;
-}
-
-/**
-**  FIXME: docu
-*/
-int IsAudioTrack(int track)
-{
-	return cd_is_audio(track);
-}
-
-/**
-**  FIXME: docu
-*/
-int IsCDPlaying(void)
-{
-	if (cd_current_track()) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
-/**
-**  FIXME: docu
-*/
-int GetCDVolume(void)
-{
-	int vol;
-
-	cd_get_volume(&vol, &vol);
-	return vol;
-}
-
-/**
-**  FIXME: docu
-*/
-void SetCDVolume(int vol)
-{
-	cd_set_volume(vol, vol);
-}
-
-/**
-**  FIXME: docu
-*/
-void QuitCD(void)
-{
-	if (CDMode != CDModeOff && CDMode != CDModeStopped) {
-		cd_stop();
-		CDMode = CDModeStopped;
-	}
-	if (CDMode == CDModeStopped) {
-		cd_close();
-		cd_exit();
 		CDMode = CDModeOff;
 	}
 }
