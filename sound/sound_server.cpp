@@ -37,31 +37,16 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include "stratagus.h"
-
 #include <stdlib.h>
 #include <string.h>
-#ifndef _MSC_VER
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#endif
-#include <limits.h>
+
+#include "stratagus.h"
 
 #include "SDL.h"
 
-#include "video.h"
-#include "sound.h"
 #include "sound_server.h"
-#include "unitsound.h"
-#include "tileset.h"
-#include "ui.h"
 #include "iolib.h"
 #include "iocompat.h"
-#include "cdaudio.h"
-#include "script.h"
-
-#include "util.h"
 
 
 /*----------------------------------------------------------------------------
