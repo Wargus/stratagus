@@ -503,10 +503,6 @@ SOURCE=.\src\pathfinder\script_pathfinder.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\sound\cdaudio.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\sound\flac.cpp
 # End Source File
 # Begin Source File
@@ -793,10 +789,6 @@ SOURCE=.\src\include\animation.h
 # Begin Source File
 
 SOURCE=.\src\include\campaign.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\cdaudio.h
 # End Source File
 # Begin Source File
 
