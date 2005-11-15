@@ -168,8 +168,6 @@ extern bool CallbackMusic;  /// flag true callback ccl if stops
 extern std::vector<PlaySection> PlaySections;  /// Play sections
 extern PlaySectionType CurrentPlaySection;  /// Current play section type
 
-extern char *CurrentMusicFile;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -206,6 +204,8 @@ extern void PlayGameSound(CSound *sound, unsigned char volume);
 **  Initialize client side of the sound layer.
 */
 extern void InitSoundClient(void);
+	/// Initialize music
+extern void InitMusic(void);
 
 	/// Register a sound (can be a simple sound or a group)
 extern CSound *RegisterSound(const char *file[], unsigned number);
@@ -217,11 +217,8 @@ extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
 extern void SetSoundRange(CSound *sound, unsigned char range);
 
 extern void PlaySectionMusic(PlaySectionType section);
-
-	/// Play a music file
-extern int PlayMusic(const char *name);
-	/// Stop music playing
-extern void StopMusic(void);
+	/// Check if music is finished and play the next song
+extern void CheckMusicFinished(bool force = false);
 
 	/// Turn music stopped callback on
 #define CallbackMusicOn() \

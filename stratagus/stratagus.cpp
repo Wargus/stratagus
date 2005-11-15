@@ -750,9 +750,8 @@ static int main1(int argc, char **argv)
 	InitVideo();
 
 	// Setup sound card
-	if (InitSound()) {
-		SetEffectsEnabled(false);
-		SetMusicEnabled(false);
+	if (!InitSound()) {
+		InitMusic();
 	}
 
 #ifndef DEBUG           // For debug it's better not to have:

@@ -2585,7 +2585,7 @@ void ProcessMenu(const char *menu_id, int loop)
 
 	if (loop) {
 		while (CurrentMenu != NULL) {
-			PlayListAdvance();
+			CheckMusicFinished();
 			if (!(FrameCounter % ((VideoSyncSpeed * CYCLES_PER_SECOND) / 50))) {
 				PlaySectionMusic(PlaySectionUnknown);
 			}

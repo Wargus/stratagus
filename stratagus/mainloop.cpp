@@ -403,7 +403,7 @@ void GameMainLoop(void)
 		TriggersEachCycle();  // handle triggers
 		UpdateMessages();     // update messages
 
-		PlayListAdvance();    // Check for next song
+		CheckMusicFinished(); // Check for next song
 
 		//
 		// Map scrolling

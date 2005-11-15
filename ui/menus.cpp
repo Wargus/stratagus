@@ -1697,9 +1697,9 @@ static void SoundOptionsInit(Menu *menu)
 
 	// music power
 	if (!IsMusicEnabled() || !SoundEnabled()) {
-		menu->Items[10].Flags = MI_FLAGS_DISABLED;
+		menu->Items[10].D.Checkbox.Checked = 0;
 	} else {
-		menu->Items[10].Flags = 0;
+		menu->Items[10].D.Checkbox.Checked = 1;
 	}
 #ifdef USE_CDAUDIO
 	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
@@ -1885,8 +1885,11 @@ static void SetMusicPower(Menuitem *mi)
 {
 	if (SoundEnabled()) {
 		SetMusicEnabled(!IsMusicEnabled());
+		if (IsMusicEnabled()) {
+			CheckMusicFinished(true);
+		}
+		SoundOptionsInit(NULL);
 	}
-	SoundOptionsInit(NULL);
 }
 
 /**

@@ -2073,7 +2073,7 @@ void EditorMainLoop(void)
 		TileCursorSize = 1;
 
 		while (EditorRunning) {
-			PlayListAdvance();
+			CheckMusicFinished();
 
 			UI.Minimap.Update();
 

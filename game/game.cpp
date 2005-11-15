@@ -633,12 +633,7 @@ void CreateGame(const char *filename, CMap *map)
 	LoadUnitSounds();
 	MapUnitSounds();
 	if (SoundEnabled()) {
-		if (InitSoundServer()) {
-			SetEffectsEnabled(false);
-			SetMusicEnabled(false);
-		} else {
-			InitSoundClient();
-		}
+		InitSoundClient();
 	}
 
 	//

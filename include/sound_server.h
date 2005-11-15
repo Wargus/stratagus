@@ -81,7 +81,8 @@ extern int ViewPointOffset;
 	/// global range control (max cut off distance for sound)
 extern int DistanceSilent;
 
-extern CSample *MusicSample;  /// Music samples
+	/// Current music file
+extern char *CurrentMusicFile;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -125,16 +126,24 @@ extern int PlaySample(CSample *sample);
 	/// Play a sound file
 extern int PlaySoundFile(const char *name);
 
+	/// Set the music finished callback
+void SetMusicFinishedCallback(void (*callback)(void));
+
+	/// Play a music file
+extern int PlayMusic(CSample *sample);
+	/// Play a music file
+extern int PlayMusic(const char *file);
+	/// Stop music playing
+extern void StopMusic(void);
+
 	/// Initialize the sound card.
 extern int InitSound(void);
 
 	/// Check if sound is enabled
 extern bool SoundEnabled(void);
 
-	/// Initialize the sound server.
-extern int InitSoundServer(void);
 	/// Start next song if necessary
-extern void PlayListAdvance(void);
+extern void MusicFinishedCallback(void);
 
 	///  Cleanup sound.
 extern void QuitSound(void);
