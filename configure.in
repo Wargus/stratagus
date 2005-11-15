@@ -265,21 +265,6 @@ AC_SUBST(FLAC_CFLAGS)
 AC_SUBST(FLAC_LIBS)
 dnl ----------------------------
 
-dnl --- CHECK FOR CDAUDIO ------
-AC_ARG_WITH(cdaudio,
-    [  --with-cdaudio=sdlcd,no
-			  [Enable CD Audio support (default: no)]], CDAUDIO="$with_cdaudio")
-if test "$CDAUDIO" = "sdl"; then
-    CDAUDIO_CFLAGS="`$SDLCONFIG --cflags`"
-    CDAUDIO_LIBS=""
-else
-    CDAUDIO_CFLAGS=""
-    CDAUDIO_LIBS=""
-fi
-AC_SUBST(CDAUDIO_CFLAGS)
-AC_SUBST(CDAUDIO_LIBS)
-dnl ----------------------------
-
 dnl ---- CHECK FOR LUA ---------
 AC_ARG_WITH(lua, 
     [  --with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")

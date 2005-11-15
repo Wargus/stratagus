@@ -217,7 +217,6 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "campaign.h"
 #include "editor.h"
 #include "movie.h"
-#include "cdaudio.h"
 #include "pathfinder.h"
 #include "widgets.h"
 
@@ -791,7 +790,6 @@ void Exit(int err)
 {
 	StopMusic();
 	QuitSound();
-	QuitCD();
 	NetworkQuit();
 
 	ExitNetwork1();
@@ -817,7 +815,6 @@ void Exit(int err)
 */
 void ExitFatal(int err)
 {
-	QuitCD();
 	exit(err);
 }
 
@@ -869,9 +866,6 @@ int main(int argc, char **argv)
 #endif
 #ifdef USE_BZ2LIB
 		"BZ2LIB "
-#endif
-#ifdef USE_SDLCD
-		"SDL-CD "
 #endif
 #ifdef USE_FLAC
 		"FLAC "

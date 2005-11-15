@@ -65,15 +65,9 @@
 #include "campaign.h"
 #include "settings.h"
 #include "commands.h"
-#include "cdaudio.h"
 #include "pathfinder.h"
 #include "editor.h"
 #include "sound.h"
-
-#ifdef USE_SDLCD
-#include "SDL.h"
-#include "SDL_thread.h"
-#endif
 
 #include <guichan.h>
 void DrawGuichanWidgets();
@@ -379,17 +373,9 @@ void GameMainLoop(void)
 
 			//
 			// Work todo each realtime second.
-			// Check cd-rom (every 2nd second)
 			// FIXME: Not called while pause or in the user interface.
 			//
 			switch (GameCycle % ((CYCLES_PER_SECOND * VideoSyncSpeed / 100) + 1)) {
-				case 0: // Check cd-rom
-#if defined(USE_SDLCD)
-					if (!(GameCycle % 4)) { // every 2nd second
-						SDL_CreateThread(CDRomCheck, NULL);
-					}
-#endif
-					break;
 				case 10:
 					if (!(GameCycle % 2)) {
 						PlaySectionMusic(PlaySectionUnknown);

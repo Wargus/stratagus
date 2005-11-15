@@ -70,7 +70,6 @@
 #include "master.h"
 #include "netconnect.h"
 #include "network.h"
-#include "cdaudio.h"
 #include "spells.h"
 #include "actions.h"
 
