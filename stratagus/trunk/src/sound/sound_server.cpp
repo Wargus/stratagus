@@ -81,7 +81,7 @@ int NextFreeChannel;
 
 char *CurrentMusicFile;    /// Current music filename
 
-struct {
+static struct {
 	CSample *Sample;       /// Music sample
 	void (*FinishedCallback)(); /// Callback for when music finishes playing
 } MusicChannel;
