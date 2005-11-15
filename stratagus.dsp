@@ -539,10 +539,6 @@ SOURCE=.\src\sound\script_sound.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\sdl_audio.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\sound\sound.cpp
 # End Source File
 # Begin Source File
