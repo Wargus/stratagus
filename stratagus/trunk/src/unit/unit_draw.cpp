@@ -114,10 +114,6 @@ public:
 
 static DecoSpriteType DecoSprite; /// All sprite's infos.
 
-int ShowSightRange;               /// Flag: show right range
-int ShowReactionRange;            /// Flag: show reaction range
-int ShowAttackRange;              /// Flag: show attack range
-int ShowOrders;                   /// Flag: show orders of unit on map
 unsigned long ShowOrdersCount;    /// Show orders for some time
 
 
@@ -1270,7 +1266,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 	// For debug draw sight, react and attack range!
 	//
 	if (NumSelected == 1 && unit->Selected) {
-		if (ShowSightRange) {
+		if (Preference.ShowSightRange) {
 			// Radius -1 so you can see all ranges
 			Video.DrawCircleClip(ColorGreen,
 				x + type->TileWidth * TileSizeX / 2,
@@ -1278,7 +1274,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 				((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * TileSizeX) - 1);
 		}
 		if (type->CanAttack) {
-			if (ShowReactionRange) {
+			if (Preference.ShowReactionRange) {
 				r = (unit->Player->Type == PlayerPerson) ?
 					type->ReactRangePerson : type->ReactRangeComputer;
 				if (r) {
@@ -1288,7 +1284,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 						(r + (type->TileWidth - 1)) * TileSizeX);
 				}
 			}
-			if (ShowAttackRange && stats->Variables[ATTACKRANGE_INDEX].Max) {
+			if (Preference.ShowAttackRange && stats->Variables[ATTACKRANGE_INDEX].Max) {
 				// Radius + 1 so you can see all ranges
 				Video.DrawCircleClip(ColorRed,
 					x + type->TileWidth * TileSizeX / 2,
