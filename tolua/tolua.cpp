@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 12 20:04:49 2005.
+** Generated automatically by tolua++-1.0.7 on 11/15/05 19:57:23.
 */
 
 #ifndef __cplusplus
@@ -159,35 +159,36 @@ static int tolua_collect_Slider (lua_State* tolua_S)
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
- tolua_usertype(tolua_S,"CMinimap");
- tolua_usertype(tolua_S,"ListBoxWidget");
- tolua_usertype(tolua_S,"LuaActionListener");
- tolua_usertype(tolua_S,"Color");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"DropDownWidget");
- tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"CFontColor");
- tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"Container");
- tolua_usertype(tolua_S,"CInfoPanel");
- tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"CVideo");
- tolua_usertype(tolua_S,"TextField");
- tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"MenuScreen");
- tolua_usertype(tolua_S,"CGraphic");
+ tolua_usertype(tolua_S,"CFontColor");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"CIcon");
+ tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CheckBox");
- tolua_usertype(tolua_S,"ImageWidget");
+ tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"ImageButton");
- tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"ListBoxWidget");
+ tolua_usertype(tolua_S,"Color");
+ tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CInfoPanel");
+ tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"ButtonWidget");
+ tolua_usertype(tolua_S,"CVideo");
+ tolua_usertype(tolua_S,"ImageCheckBox");
+ tolua_usertype(tolua_S,"CGraphic");
+ tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"RadioButton");
+ tolua_usertype(tolua_S,"Label");
+ tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Slider");
 }
@@ -5640,6 +5641,150 @@ static int tolua_set_CUnit_Player_ptr(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: ShowSightRange of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_get_CPreference_ShowSightRange
+static int tolua_get_CPreference_ShowSightRange(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowSightRange'",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)self->ShowSightRange);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: ShowSightRange of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_set_CPreference_ShowSightRange
+static int tolua_set_CPreference_ShowSightRange(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowSightRange'",NULL);
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ShowSightRange = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: ShowReactionRange of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_get_CPreference_ShowReactionRange
+static int tolua_get_CPreference_ShowReactionRange(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowReactionRange'",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)self->ShowReactionRange);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: ShowReactionRange of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_set_CPreference_ShowReactionRange
+static int tolua_set_CPreference_ShowReactionRange(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowReactionRange'",NULL);
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ShowReactionRange = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: ShowAttackRange of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_get_CPreference_ShowAttackRange
+static int tolua_get_CPreference_ShowAttackRange(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowAttackRange'",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)self->ShowAttackRange);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: ShowAttackRange of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_set_CPreference_ShowAttackRange
+static int tolua_set_CPreference_ShowAttackRange(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowAttackRange'",NULL);
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ShowAttackRange = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: ShowOrders of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_get_CPreference_unsigned_ShowOrders
+static int tolua_get_CPreference_unsigned_ShowOrders(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowOrders'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->ShowOrders);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: ShowOrders of class  CPreference */
+#ifndef TOLUA_DISABLE_tolua_set_CPreference_unsigned_ShowOrders
+static int tolua_set_CPreference_unsigned_ShowOrders(lua_State* tolua_S)
+{
+  CPreference* self = (CPreference*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowOrders'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ShowOrders = ((unsigned int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Preference */
+#ifndef TOLUA_DISABLE_tolua_get_Preference
+static int tolua_get_Preference(lua_State* tolua_S)
+{
+ tolua_pushusertype(tolua_S,(void*)&Preference,"CPreference");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Preference */
+#ifndef TOLUA_DISABLE_tolua_set_Preference
+static int tolua_set_Preference(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,2,"CPreference",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  Preference = *((CPreference*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: GetEffectsVolume */
 #ifndef TOLUA_DISABLE_tolua_stratagus_GetEffectsVolume00
 static int tolua_stratagus_GetEffectsVolume00(lua_State* tolua_S)
@@ -6333,6 +6478,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Type",tolua_get_CUnit_Type_ptr,tolua_set_CUnit_Type_ptr);
   tolua_variable(tolua_S,"Player",tolua_get_CUnit_Player_ptr,tolua_set_CUnit_Player_ptr);
  tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CPreference","CPreference","",NULL);
+ tolua_beginmodule(tolua_S,"CPreference");
+  tolua_variable(tolua_S,"ShowSightRange",tolua_get_CPreference_ShowSightRange,tolua_set_CPreference_ShowSightRange);
+  tolua_variable(tolua_S,"ShowReactionRange",tolua_get_CPreference_ShowReactionRange,tolua_set_CPreference_ShowReactionRange);
+  tolua_variable(tolua_S,"ShowAttackRange",tolua_get_CPreference_ShowAttackRange,tolua_set_CPreference_ShowAttackRange);
+  tolua_variable(tolua_S,"ShowOrders",tolua_get_CPreference_unsigned_ShowOrders,tolua_set_CPreference_unsigned_ShowOrders);
+ tolua_endmodule(tolua_S);
+ tolua_variable(tolua_S,"Preference",tolua_get_Preference,tolua_set_Preference);
  tolua_function(tolua_S,"GetEffectsVolume",tolua_stratagus_GetEffectsVolume00);
  tolua_function(tolua_S,"SetEffectsVolume",tolua_stratagus_SetEffectsVolume00);
  tolua_function(tolua_S,"GetMusicVolume",tolua_stratagus_GetMusicVolume00);

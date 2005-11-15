@@ -737,9 +737,20 @@ public:
 #define NUM_GROUPS 10
 
 /**
-** Always show unit orders
+**  User preference.
 */
-#define SHOW_ORDERS_ALWAYS -1
+class CPreference {
+public:
+	CPreference() : ShowSightRange(false), ShowReactionRange(false),
+		ShowAttackRange(false), ShowOrders(0) {};
+public:
+	bool ShowSightRange;     /// Show right range.
+	bool ShowReactionRange;  /// Show reaction range.
+	bool ShowAttackRange;    /// Show attack range.
+	int ShowOrders;          /// How many second show orders of unit on map.
+};
+
+extern CPreference Preference;
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -753,10 +764,6 @@ extern int NumUnits;                 /// Number of units used
 
 // in unit_draw.c
 /// @todo could be moved into the user interface ?
-extern int ShowSightRange;              /// Flag: show right range
-extern int ShowReactionRange;           /// Flag: show reaction range
-extern int ShowAttackRange;             /// Flag: show attack range
-extern int ShowOrders;                  /// Flag: show orders of unit on map
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
 extern int XpDamage;                    /// unit XP adds more damage to attacks
 extern bool EnableTrainingQueue;        /// Config: training queues enabled
