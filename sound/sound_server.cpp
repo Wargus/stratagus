@@ -146,7 +146,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 	char *tmp;
 	int div;
 
-	if (PlayingMusic) {
+	if (MusicPlaying) {
 		Assert(MusicChannel.Sample);
 
 		len = size * sizeof(*buf);
@@ -171,7 +171,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 		delete[] buf;
 
 		if (n < len) { // End reached
-			PlayingMusic = false;
+			MusicPlaying = false;
 			delete MusicChannel.Sample;
 			MusicChannel.Sample = NULL;
 
@@ -643,7 +643,7 @@ int PlayMusic(CSample *sample)
 	if (sample) {
 		StopMusic();
 		MusicChannel.Sample = sample;
-		PlayingMusic = true;
+		MusicPlaying = true;
 		delete[] CurrentMusicFile;
 		CurrentMusicFile = NULL;
 		return 0;
@@ -702,7 +702,7 @@ int PlayMusic(const char *file)
 	if (sample) {
 		StopMusic();
 		MusicChannel.Sample = sample;
-		PlayingMusic = true;
+		MusicPlaying = true;
 		CurrentMusicFile = new_strdup(file);
 		return 0;
 	} else {
@@ -716,8 +716,8 @@ int PlayMusic(const char *file)
 */
 void StopMusic(void)
 {
-	if (PlayingMusic) {
-		PlayingMusic = false;
+	if (MusicPlaying) {
+		MusicPlaying = false;
 		if (MusicChannel.Sample) {
 			SDL_LockAudio();
 			delete MusicChannel.Sample;

@@ -1687,7 +1687,7 @@ static void SoundOptionsInit(Menu *menu)
 	}
 
 	// music volume slider
-	if (!IsMusicEnabled() || !PlayingMusic || !SoundEnabled()) {
+	if (!IsMusicEnabled() || !IsMusicPlaying() || !SoundEnabled()) {
 		menu->Items[7].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[7].Flags = 0;
@@ -1706,7 +1706,7 @@ static void SoundOptionsInit(Menu *menu)
 		menu->Items[10].Flags = MI_FLAGS_DISABLED;
 	}
 #endif
-	if (!IsMusicEnabled() || !PlayingMusic || !SoundEnabled()) {
+	if (!IsMusicEnabled() || !IsMusicPlaying() || !SoundEnabled()) {
 		menu->Items[10].D.Checkbox.Checked = 0;
 	} else {
 		menu->Items[10].D.Checkbox.Checked = 1;
