@@ -113,10 +113,6 @@ void CheckMusicFinished(bool force)
 */
 void PlaySectionMusic(PlaySectionType section)
 {
-#ifdef USE_CDAUDIO
-	int track;
-	int newtrack;
-#endif
 	int i;
 	int j;
 	int found;
@@ -146,40 +142,7 @@ void PlaySectionMusic(PlaySectionType section)
 	}
 	CurrentPlaySection = PlaySections[i].Type;
 
-#ifdef USE_CDAUDIO
-	if (CDMode == CDModeDefined) {
-		track = CDTrack;
-		newtrack = 0;
-		if ((1 << track) & PlaySections[i].CDTracks) {
-			newtrack = 0;
-		} else {
-			if (!((1 << CDTrack) & PlaySections[i].CDTracks)) {
-				CDTrack = 0;
-			}
-			if (PlaySections[i].CDOrder == PlaySectionOrderAll) {
-				for (j = CDTrack + 1; j != CDTrack; ++j) {
-					if ((1 << j) & PlaySections[i].CDTracks) {
-						newtrack = j;
-						break;
-					} else if (j == 31) {
-						j = 0;
-					}
-				}
-			} else if (PlaySections[i].CDOrder == PlaySectionOrderRandom) {
-					do {
-					newtrack = MyRand() % NumCDTracks;
-				} while (!((1 << newtrack) & PlaySections[i].CDTracks) ||
-					(!IsAudioTrack(newtrack)));
-			}
-		}
-		if (newtrack) {
-			PlayCDTrack(newtrack);
-			CDTrack = newtrack;
-		}
-	} else if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
-#else
 	if (PlaySections[i].Files) {
-#endif
 		found = 0;
 		numfiles = 0;
 		for (j = 0; PlaySections[i].Files[j] && !found; ++j) {
