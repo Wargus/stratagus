@@ -10,7 +10,7 @@
 //
 /**@name music.cpp - Background music support */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer, Nehal Mistry
+//      (c) Copyright 2002-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -61,13 +61,13 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<PlaySection> PlaySections; /// Play Sections
-PlaySectionType CurrentPlaySection;    /// Current Play Section
+std::vector<PlaySection> PlaySections;    /// Play Sections
+static PlaySectionType CurrentPlaySection;/// Current Play Section
 
-SDL_mutex *MusicFinishedMutex;         /// Mutex for MusicFinished
-static bool MusicFinished;             /// Music ended and we need a new file
+static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
+static bool MusicFinished;                /// Music ended and we need a new file
 
-bool CallbackMusic;                    /// flag true callback ccl if stops
+bool CallbackMusic;                       /// flag true callback ccl if stops
 
 /*----------------------------------------------------------------------------
 -- Functions

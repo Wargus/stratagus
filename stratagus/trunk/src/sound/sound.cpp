@@ -97,7 +97,7 @@ struct SelectionHandling {
 /// FIXME: docu
 SelectionHandling SelectionHandler;
 
-int ViewPointOffset;             /// Distance to Volume Mapping
+static int ViewPointOffset;      /// Distance to Volume Mapping
 int DistanceSilent;              /// silent distance
 
 /*----------------------------------------------------------------------------
