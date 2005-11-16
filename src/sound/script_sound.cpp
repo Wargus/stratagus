@@ -316,38 +316,6 @@ static int CclDefineGameSounds(lua_State *l)
 }
 
 /**
-**  Set cd mode
-**
-**  @param l  Lua state.
-*/
-static int CclSetCdMode(lua_State *l)
-{
-#ifdef USE_CDAUDIO
-	CDModes cdmode;
-	const char *mode;
-
-	LuaCheckArgs(l, 1);
-	mode = LuaToString(l, 1);
-
-	if (!strcmp(mode, "all")) {
-		cdmode = CDModeAll;
-	} else if (!strcmp(mode, "random")) {
-		cdmode = CDModeRandom;
-	} else if (!strcmp(mode, "defined")) {
-		cdmode = CDModeDefined;
-	} else if (!strcmp(mode, "off")) {
-		cdmode = CDModeOff;
-	} else {
-		cdmode = CDModeOff;
-		LuaError(l, "Unsupported tag: %s" _C_ mode);
-	}
-
-	PlayCDRom(cdmode);
-#endif
-	return 0;
-}
-
-/**
 **  Define play sections
 **
 **  @param l  Lua state.
@@ -386,46 +354,6 @@ static int CclDefinePlaySections(lua_State *l)
 				p->Type = PlaySectionMainMenu;
 			} else {
 				LuaError(l, "Unsupported tag: %s" _C_ value);
-			}
-		} else if (!strcmp(value, "cd")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				if (!strcmp(value, "order")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					value = LuaToString(l, -1);
-					lua_pop(l, 1);
-					if (!strcmp(value, "all")) {
-						p->CDOrder = PlaySectionOrderAll;
-					} else if (!strcmp(value, "random")) {
-						p->CDOrder = PlaySectionOrderRandom;
-					} else {
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				} else if (!strcmp(value, "tracks")) {
-					int subsubargs;
-					int subk;
-
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					subsubargs = luaL_getn(l, -1);
-					for (subk = 0; subk < subsubargs; ++subk) {
-						lua_rawgeti(l, -1, subk + 1);
-						p->CDTracks |= (1 << (int)LuaToNumber(l, -1));
-						lua_pop(l, 1);
-					}
-					lua_pop(l, 1);
-				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
 			}
 		} else if (!strcmp(value, "no-cd")) {
 			if (!lua_istable(l, j + 1)) {
@@ -547,8 +475,6 @@ static int CclPlayFile(lua_State *l)
 */
 void SoundCclRegister(void)
 {
-	lua_register(Lua, "SetCdMode", CclSetCdMode);
-
 	lua_register(Lua, "DefinePlaySections", CclDefinePlaySections);
 
 	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);

@@ -211,10 +211,6 @@ static void MasterVolumeHSAction(Menuitem *mi);
 static void SetMasterPower(Menuitem *mi);
 static void MusicVolumeHSAction(Menuitem *mi);
 static void SetMusicPower(Menuitem *mi);
-static void CdVolumeHSAction(Menuitem *mi);
-static void SetCdPower(Menuitem *mi);
-static void SetCdModeDefined(Menuitem *mi);
-static void SetCdModeRandom(Menuitem *mi);
 
 // Preferences
 static void PreferencesInit(Menu *menu);
@@ -1125,10 +1121,6 @@ void InitMenuFuncHash(void)
 	HASHADD(SetMasterPower,"set-master-power");
 	HASHADD(MusicVolumeHSAction,"music-volume-hs-action");
 	HASHADD(SetMusicPower,"set-music-power");
-	HASHADD(CdVolumeHSAction,"cd-volume-hs-action");
-	HASHADD(SetCdPower,"set-cd-power");
-	HASHADD(SetCdModeDefined,"set-cd-mode-defined");
-	HASHADD(SetCdModeRandom,"set-cd-mode-random");
 
 // Preferences
 	HASHADD(PreferencesInit,"preferences-init");
@@ -1700,39 +1692,11 @@ static void SoundOptionsInit(Menu *menu)
 	} else {
 		menu->Items[10].D.Checkbox.Checked = 1;
 	}
-#ifdef USE_CDAUDIO
-	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
-		menu->Items[7].Flags = MI_FLAGS_DISABLED;
-		menu->Items[10].Flags = MI_FLAGS_DISABLED;
-	}
-#endif
 	if (!IsMusicEnabled() || !IsMusicPlaying() || !SoundEnabled()) {
 		menu->Items[10].D.Checkbox.Checked = 0;
 	} else {
 		menu->Items[10].D.Checkbox.Checked = 1;
 	}
-
-	menu->Items[12].Flags = MI_FLAGS_DISABLED; // cd volume slider
-	menu->Items[15].Flags = MI_FLAGS_DISABLED; // cd power
-	menu->Items[15].D.Checkbox.Checked = 0;
-	menu->Items[16].Flags = MI_FLAGS_DISABLED; // all tracks button
-	menu->Items[17].Flags = MI_FLAGS_DISABLED; // random tracks button
-#ifdef USE_CDAUDIO
-	menu->Items[15].Flags = 0; // cd power
-	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
-		menu->Items[15].D.Checkbox.Checked = 1;
-		menu->Items[16].Flags = 0;
-		menu->Items[17].Flags = 0;
-
-		if (CDMode == CDModeDefined) {
-			menu->Items[16].D.Checkbox.Checked = 1;
-			menu->Items[17].D.Checkbox.Checked = 0;
-		} else if (CDMode == CDModeRandom) {
-			menu->Items[16].D.Checkbox.Checked = 0;
-			menu->Items[17].D.Checkbox.Checked = 1;
-		}
-	}
-#endif // cd
 }
 
 /**
@@ -1885,23 +1849,6 @@ static void SetMusicPower(Menuitem *mi)
 }
 
 /**
-** CD volume gem callback
-*/
-static void SetCdPower(Menuitem *mi)
-{
-#ifdef USE_CDAUDIO
-	// Start Playing CD
-	if (CDMode == CDModeOff || CDMode == CDModeStopped) {
-		ResumeCD();
-	} else {
-	// Stop Playing CD
-		PauseCD();
-	}
-#endif
-	SoundOptionsInit(NULL);
-}
-
-/**
 ** Toggle the fog of war handling.
 ** Used in the preference menu.
 **
@@ -1929,28 +1876,6 @@ static void SetFogOfWar(Menuitem *mi)
 static void SetCommandKey(Menuitem *mi)
 {
 	UI.ButtonPanel.ShowCommandKey = !UI.ButtonPanel.ShowCommandKey;
-}
-
-/**
-** CD play all tracks gem callback
-*/
-static void SetCdModeDefined(Menuitem *mi)
-{
-#ifdef USE_CDAUDIO
-	CDMode = CDModeDefined;
-#endif
-	SoundOptionsInit(NULL);
-}
-
-/**
-** CD play random tracks gem callback
-*/
-static void SetCdModeRandom(Menuitem *mi)
-{
-#ifdef USE_CDAUDIO
-	CDMode = CDModeRandom;
-#endif
-	SoundOptionsInit(NULL);
 }
 
 /**
@@ -3185,23 +3110,6 @@ static void MusicVolumeHSAction(Menuitem *mi)
 {
 	SetMusicVolume((mi->D.HSlider.percent * 255) / 100);
 }
-
-#ifdef USE_CDAUDIO
-/**
-** CD volume horizontal slider action callback
-*/
-static void CdVolumeHSAction(Menuitem *mi)
-{
-	SetCDVolume((mi->D.HSlider.percent * 255) / 100);
-}
-#else
-/**
-** CD volume horizontal slider action callback
-*/
-static void CdVolumeHSAction(Menuitem *mi)
-{
-}
-#endif
 
 /**
 ** Scenario select ok button
