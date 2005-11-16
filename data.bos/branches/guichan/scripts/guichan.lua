@@ -337,6 +337,135 @@ function RunLoadGameMenu(s)
 end
 
 
+function RunCreditsMenu(s)
+  local menu
+  local b
+
+  local credits
+  credits = {
+     "Graphics:",
+     "  Tina Petersen Jensen",
+     "  Soeren Soendergaard Jensen",
+     "  TimberDragon",
+     "  Frank Loeffler",
+     "  Francois Beerten",
+     "",
+     "Scripting:",
+     "  Francois Beerten",
+     "  Lois Taulelle",
+     "",
+     "Maps and campaigns:",
+     "  Lois Taulelle",
+     "  Francois Beerten",
+     "",
+     "Sound:",
+     "  Tina Petersen",
+     "  Brian Pedersen",
+     " ",
+     "powered by STRATAGUS",
+     "Stratagus Programmers:",
+     "  Andreas 'Ari' Arens",
+     "  Lutz 'Johns' Sammer",
+     "  Edgar 'Froese' Toernig",
+     "  Jimmy Salmon",
+     "  Nehal Mistry",
+     "  Russell Smith",
+     "  Francois Beerten",
+     "  Mark Pazolli",
+     "  Valery Shchedrin",
+     "  Iftikhar Rathore",
+     "  Charles K Hardin",
+     "  Fabrice Rossi",
+     "  DigiCat",
+     "  Josh Cogliati",
+     "  Patrick Mullen",
+     "  Vladi Belperchinov-Shabanski",
+     "  Cris Daniluk",
+     "  Patrice Fortier",
+     "  FT Rathore",
+     "  Trent Piepho",
+     "  Jon Gabrielson",
+     "  Lukas Hejtmanek",
+     "  Steinar Hamre",
+     "  Ian Farmer",
+     "  Sebastian Drews",
+     "  Jarek Sobieszek",
+     "  Anthony Towns",
+     "  Stefan Dirsch",
+     "  Al Koskelin",
+     "  George J. Carrette",
+     "  Dirk 'Guardian' Richartz",
+     "  Michael O'Reilly",
+     "  Dan Hensley",
+     "  Sean McMillian",
+     "  Mike Earl",
+     "  Ian Turner",
+     "  David Slimp",
+     "  Iuri Fiedoruk",
+     "  Luke Mauldin",
+     "  Nathan Adams",
+     "  Stephan Rasenberger",
+     "  Dave Reed",
+     "  Josef Spillner",
+     "  James Dessart",
+     "  Jan Uerpmann",
+     "  Aaron Berger",
+     "  Latimerius",
+     "  Antonis Chaniotis",
+     "  Samuel Hays",
+     "  David Martinez Moreno",
+     "  Flavio Silvestrow",
+     "  Daniel Burrows",
+     "  Dave Turner",
+     "  Ben Hines",
+     "  Kachalov Anton",
+     "Patches",
+     "  Martin Renold",
+     "  Martin Hajduch",
+     "  Jeff Binder",
+     "  Ludovic",
+     "  Juan Pablo",
+     "  Phil Hannent",
+     "  Alexander MacLean",
+     "",
+     "Stratagus Media Project Graphics",
+      -- land construction site-summer-01.png; big_fire.png; explosion.png; green_cross.png; winter, big fire
+     "  Paolo D'Inca", 
+     "  Rick Elliot", -- cursor arrows
+     "  Chris Hopp", -- small_fire.png
+     "",
+     "",
+     "patches, bug reports, ideas."
+  }
+
+  menu = BosMenu("Battle of Survival Credits")
+  local t
+  local step = 20
+  local starty = Video.Height/20*2
+  local x = 30
+  y = starty
+  for l,t in credits do
+    menu:writeText(t, x, y)
+    y = y + step
+    if y > (Video.Height - 120) then
+       y = starty
+       x = x + 200
+    end
+  end
+
+  menu:run()
+end
+
+function RunMultiPlayerMenu(s)
+  local menu
+  local b
+
+  menu = BosMenu("MultiPlayer")
+  menu:writeText("Coming soon ...", Video.Width/2 - 100, Video.Height/3)
+
+  menu:run()
+end
+
 function RunEditorMenu(s)
   local menu
   menu = BosMenu("Editor")
@@ -359,14 +488,14 @@ function BuildMainMenu(menu)
   local x = Video.Width / 2 - 100
   local ystep = Video.Height / 20
   menu:addButton("~!Start Game", x, ystep * 4, RunStartGameMenu)
-  menu:addButton("~!Widgets Demo", x, ystep * 5, RunWidgetsMenu)
-  menu:addButton("Start ~!Editor", x, ystep * 6, RunEditorMenu)
-  menu:addButton("~!Options", x, ystep * 7, function() RunOptionsMenu() menu:stop(1) end)
-  menu:addButton("~!MultiPlayer", x, ystep * 8, RunOptionsMenu)
-  menu:addButton("~!Campaigns", x, ystep * 9, RunCampaignsMenu)
-  menu:addButton("~!Load Game", x, ystep * 10, RunLoadGameMenu)
-  menu:addButton("Show ~!Replay", x, ystep * 11, RunReplayMenu)
-  menu:addButton("~!Credits", x, ystep * 12, RunSubMenu)
+  menu:addButton("Start ~!Editor", x, ystep * 5, RunEditorMenu)
+  menu:addButton("~!Options", x, ystep * 6, function() RunOptionsMenu() menu:stop(1) end)
+  menu:addButton("~!MultiPlayer", x, ystep * 7, RunMultiPlayerMenu)
+  menu:addButton("~!Campaigns", x, ystep * 8, RunCampaignsMenu)
+  menu:addButton("~!Load Game", x, ystep * 9, RunLoadGameMenu)
+  menu:addButton("Show ~!Replay", x, ystep * 10, RunReplayMenu)
+  menu:addButton("~!Credits", x, ystep * 11, RunCreditsMenu)
+  menu:addButton("~!Widgets Demo", x, ystep * 12, RunWidgetsMenu)
 end
 
 function RunMainMenu(s)
