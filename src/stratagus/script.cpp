@@ -2656,30 +2656,6 @@ void SavePreferences(void)
 	fprintf(fd, "SetMusicEnabled(%s)\n", IsMusicEnabled() ? "true" : "false");
 	fprintf(fd, "SetMusicVolume(%d)\n", GetMusicVolume());
 
-#ifdef USE_CDAUDIO
-	buf[0] = '\0';
-	switch (CDMode) {
-		case CDModeAll:
-			strcpy(buf, "all");
-			break;
-		case CDModeRandom:
-			strcpy(buf, "random");
-			break;
-		case CDModeDefined:
-			strcpy(buf, "defined");
-			break;
-		case CDModeStopped:
-		case CDModeOff:
-			strcpy(buf, "off");
-			break;
-		default:
-			break;
-	}
-	if (buf[0]) {
-		fprintf(fd, "SetCdMode(\"%s\")\n", buf);
-	}
-#endif
-
 	fclose(fd);
 }
 
