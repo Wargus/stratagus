@@ -54,10 +54,10 @@
 ----------------------------------------------------------------------------*/
 
 static bool SoundInitialized;    /// is sound initialized
-bool PlayingMusic;               /// flag true if playing music
+static bool MusicPlaying;        /// flag true if playing music
 
-static int EffectsVolume = 128;         /// effects sound volume
-static int MusicVolume = 128;           /// music volume
+static int EffectsVolume = 128;  /// effects sound volume
+static int MusicVolume = 128;    /// music volume
 
 static bool MusicEnabled;
 static bool EffectsEnabled;
@@ -76,9 +76,10 @@ struct SoundChannel {
 
 #define MaxChannels 32     /// How many channels are supported
 
-SoundChannel Channels[MaxChannels];
-int NextFreeChannel;
+static SoundChannel Channels[MaxChannels];
+static int NextFreeChannel;
 
+// FIXME: move out of sound_server.cpp
 char *CurrentMusicFile;    /// Current music filename
 
 static struct {
@@ -771,6 +772,14 @@ void SetMusicEnabled(bool enabled)
 bool IsMusicEnabled(void)
 {
 	return SoundEnabled() && MusicEnabled;
+}
+
+/**
+**  Check if music is playing
+*/
+bool IsMusicPlaying(void)
+{
+	return MusicPlaying;
 }
 
 /*----------------------------------------------------------------------------

@@ -10,7 +10,7 @@
 //
 /**@name sound.h - The sound header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -162,63 +162,49 @@ struct Origin {
 
 extern GameSound GameSounds;  /// Game sound configuration
 
-extern bool PlayingMusic;   /// flag true if playing music
 extern bool CallbackMusic;  /// flag true callback ccl if stops
 
 extern std::vector<PlaySection> PlaySections;  /// Play sections
-extern PlaySectionType CurrentPlaySection;  /// Current play section type
+
+	/// global range control (max cut off distance for sound)
+extern int DistanceSilent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Ask to the sound server to play a sound attached to an unit. The
-**  sound server may discard the sound if needed (e.g., when the same
-**  Unit is already speaking).
-**
-**  @param unit              the unit speaking
-**  @param unit_voice_group  the sound to play
-*/
-extern void PlayUnitSound(const CUnit *unit,
-	UnitVoiceGroup unit_voice_group);
-extern void PlayUnitSound(const CUnit *unit, CSound *id);
-
-/**
-**  Ask to the sound server to play a sound associated to a missile.
-**
-**  @param missile  the missile (origin of the sound)
-**  @param sound    the sound to play
-*/
+	/// Play a unit sound
+extern void PlayUnitSound(const CUnit *unit, UnitVoiceGroup unit_voice_group);
+	/// Play a unit sound
+extern void PlayUnitSound(const CUnit *unit, CSound *sound);
+	/// Play a missile sound
 extern void PlayMissileSound(const Missile *missile, CSound *sound);
-
-/**
-**  Ask to the sound server to play a sound: low level call.
-**
-**  @param sound   the sound to play.
-**  @param volume  volume of the sound
-*/
+	/// Play a game sound
 extern void PlayGameSound(CSound *sound, unsigned char volume);
-
-/**
-**  Initialize client side of the sound layer.
-*/
-extern void InitSoundClient(void);
-	/// Initialize music
-extern void InitMusic(void);
-
-	/// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const char *file[], unsigned number);
-
-	///  Create a special sound group with two sounds
-extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
 
 	/// Modify the range of a given sound.
 extern void SetSoundRange(CSound *sound, unsigned char range);
 
-extern void PlaySectionMusic(PlaySectionType section);
+	/// Register a sound (can be a simple sound or a group)
+extern CSound *RegisterSound(const char *files[], unsigned number);
+
+	///  Create a special sound group with two sounds
+extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
+
+	/// Initialize client side of the sound layer.
+extern void InitSoundClient(void);
+
+
+// music.cpp
+
 	/// Check if music is finished and play the next song
 extern void CheckMusicFinished(bool force = false);
+
+	/// Play a music section
+extern void PlaySectionMusic(PlaySectionType section);
+
+	/// Initialize music
+extern void InitMusic(void);
 
 	/// Turn music stopped callback on
 #define CallbackMusicOn() \
@@ -227,12 +213,15 @@ extern void CheckMusicFinished(bool force = false);
 #define CallbackMusicOff() \
 	CallbackMusic = false;
 
-	/// Make a sound bound to identifier
-extern CSound *MakeSound(const char *sound_name, const char *file[], int nb);
-	/// Get the sound id bound to an identifier
-extern CSound *SoundForName(const char *sound_name);
+
+// sound_id.cpp
+
 	/// Map sound to identifier
 extern void MapSound(const char *sound_name, CSound *id);
+	/// Get the sound id bound to an identifier
+extern CSound *SoundForName(const char *sound_name);
+	/// Make a sound bound to identifier
+extern CSound *MakeSound(const char *sound_name, const char *file[], int nb);
 	/// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const char *name, CSound *first, CSound *second);
 

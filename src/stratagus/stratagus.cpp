@@ -517,13 +517,13 @@ void MenuLoop(const char *filename, CMap *map)
 			NetPlayers = 0;
 
 			// Start new music for menus
-			if (PlayingMusic && MenuMusic != NULL &&
+			if (IsMusicPlaying() && MenuMusic != NULL &&
 					strcmp(CurrentMusicFile, MenuMusic)) {
 				StopMusic();
 			}
 			PlaySectionMusic(PlaySectionMainMenu);
 
-			if (!PlayingMusic && MenuMusic) {
+			if (!IsMusicPlaying() && MenuMusic) {
 				PlayMusic(MenuMusic);
 			}
 
