@@ -99,35 +99,6 @@ function RunSoundOptionsMenu(s)
   musiccheckbox:setMarked(IsMusicEnabled())
   musiccheckbox:adjustSize();
 
-  b = Label("CD Volume")
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:add(b, offx + 16, offy + 36 * 5)
-
-  b = Slider(0, 1)
-  b:setActionCallback(function() print("slider") end)
-  b:setWidth(198)
-  b:setHeight(18)
-  b:setBaseColor(dark)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(clear)
-  menu:add(b, offx + 32, offy + 36 * 5.5)
-
-  b = Label("min")
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 44, offy + 36 * 6 + 6)
-  
-  b = Label("max")
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 218, offy + 36 * 6 + 6)
-
-  b = menu:addCheckBox("Enabled", offx + 240, offy + 36 * 5.5,
-    function() print("checkbox3") end)
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-
   menu:addButton("~!OK", offx + 176 - (200 / 2), offy + 352 - 11 - 27,
     function() SavePreferences(); menu:stop() end)
 

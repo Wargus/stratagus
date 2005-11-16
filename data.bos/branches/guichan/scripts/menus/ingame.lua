@@ -202,7 +202,7 @@ DefineMenuItem("pos", { 176, 11}, "font", "large",
   "text", {"caption", "Sound Options", "align", "center"},
   "menu", "menu-sound-options")
 DefineMenuItem("pos", { 16, 36 * 1}, "font", "game",
-  "text", {"caption", "Master Volume", "align", "left"},
+  "text", {"caption", "Effects Volume", "align", "left"},
   "menu", "menu-sound-options")
 DefineMenuItem("pos", { 32, 36 * 1.5}, "font", "small",
   "hslider", {"size", {198, 18},
@@ -242,41 +242,6 @@ DefineMenuItem("pos", { 240, 36 * 3.5}, "font", "large",
     "state", "unchecked",
     "func", "set-music-power",
     "style", "square"},
-  "menu", "menu-sound-options")
-DefineMenuItem("pos", { 16, 36 * 5}, "font", "game",
-  "text", {"caption", "CD Volume", "align", "left"},
-  "menu", "menu-sound-options")
-DefineMenuItem("pos", { 32, 36 * 5.5}, "font", "small",
-  "hslider", {"size", {198, 18},
-    "func", "cd-volume-hs-action",
-    "handler", "scen-select-ok"},
-  "menu", "menu-sound-options")
-DefineMenuItem("pos", { 44, (36 * 6) + 6}, "font", "small",
-  "text", {"caption", "min", "align", "center"},
-  "menu", "menu-sound-options")
-DefineMenuItem("pos", { 218, (36 * 6) + 6}, "font", "small",
-  "text", {"caption", "max", "align", "center"},
-  "menu", "menu-sound-options")
-DefineMenuItem("pos", { 240, 36 * 5.5}, "font", "large",
-  "checkbox", {
-    "text", "Enabled",
-    "state", "unchecked",
-    "func", "set-cd-power",
-    "style", "square"},
-  "menu", "menu-sound-options")
-DefineMenuItem("pos", { 32, 36 * 6.5}, "font", "large",
-  "checkbox", {
-    "text", "Defined Tracks",
-    "state", "unchecked",
-    "func", "set-cd-mode-defined",
-    "style", "round"},
-  "menu", "menu-sound-options")
-DefineMenuItem("pos", { 170, 36 * 6.5}, "font", "large",
-  "checkbox", {
-    "text", "Random Tracks",
-    "state", "unchecked",
-    "func", "set-cd-mode-random",
-    "style", "round"},
   "menu", "menu-sound-options")
 DefineMenuItem("pos", { 176 - (106 / 2), 352 - 11 - 27}, "font", "large",
   "button", {
