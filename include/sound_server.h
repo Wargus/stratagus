@@ -76,11 +76,6 @@ enum _play_audio_flags_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-	/// Distance to Volume Mapping
-extern int ViewPointOffset;
-	/// global range control (max cut off distance for sound)
-extern int DistanceSilent;
-
 	/// Current music file
 extern char *CurrentMusicFile;
 
@@ -94,54 +89,56 @@ extern CSample *LoadVorbis(const char *name, int flags); /// Load a vorbis file
 extern CSample *LoadMp3(const char *name, int flags);    /// Load a mp3 file
 extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
 
-	/// Get effects volume
-extern int GetEffectsVolume(void);
-	/// Set effects volume
-extern void SetEffectsVolume(int volume);
-	/// Get music volume
-extern int GetMusicVolume(void);
-	/// Set music volume
-extern void SetMusicVolume(int volume);
-
-	/// Set effects enabled
-extern void SetEffectsEnabled(bool enabled);
-	/// Check if effects are enabled
-extern bool IsEffectsEnabled(void);
-	/// Set music enabled
-extern void SetMusicEnabled(bool enabled);
-	/// Check if music is enabled
-extern bool IsMusicEnabled(void);
-
+	/// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);
+	/// Set the channel stereo
 extern int SetChannelStereo(int channel, int stereo);
+	/// Set the channel's callback for when a sound finishes playing
 extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel));
+	/// Get the sample playing on a channel
 extern CSample *GetChannelSample(int channel);
+	/// Stop a channel
 extern void StopChannel(int channel);
 
 	/// Load a sample
 extern CSample *LoadSample(const char *name);
-
 	/// Play a sample
 extern int PlaySample(CSample *sample);
 	/// Play a sound file
 extern int PlaySoundFile(const char *name);
 
+	/// Set effects volume
+extern void SetEffectsVolume(int volume);
+	/// Get effects volume
+extern int GetEffectsVolume(void);
+	/// Set effects enabled
+extern void SetEffectsEnabled(bool enabled);
+	/// Check if effects are enabled
+extern bool IsEffectsEnabled(void);
+
 	/// Set the music finished callback
 void SetMusicFinishedCallback(void (*callback)(void));
-
 	/// Play a music file
 extern int PlayMusic(CSample *sample);
 	/// Play a music file
 extern int PlayMusic(const char *file);
 	/// Stop music playing
 extern void StopMusic(void);
-
-	/// Initialize the sound card.
-extern int InitSound(void);
+	/// Set music volume
+extern void SetMusicVolume(int volume);
+	/// Get music volume
+extern int GetMusicVolume(void);
+	/// Set music enabled
+extern void SetMusicEnabled(bool enabled);
+	/// Check if music is enabled
+extern bool IsMusicEnabled(void);
+	/// Check if music is playing
+extern bool IsMusicPlaying(void);
 
 	/// Check if sound is enabled
 extern bool SoundEnabled(void);
-
+	/// Initialize the sound card.
+extern int InitSound(void);
 	///  Cleanup sound.
 extern void QuitSound(void);
 
