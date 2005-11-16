@@ -95,13 +95,10 @@ enum PlaySectionOrder {
 class PlaySection {
 public:
 	PlaySection() : Race(NULL), Type(PlaySectionUnknown),
-		CDTracks(0), CDOrder(PlaySectionOrderAll),
 		Files(NULL), FileOrder(PlaySectionOrderAll) {}
 
 	char            *Race;       /// Race, NULL if for all races
 	PlaySectionType  Type;       /// Type
-	unsigned long    CDTracks;   /// Bit field of cd tracks. 32 enough?
-	PlaySectionOrder CDOrder;    /// CD order
 	char           **Files;      /// Files
 	PlaySectionOrder FileOrder;  /// File order
 };
