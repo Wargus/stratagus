@@ -42,9 +42,6 @@ function MusicStopped()
   end
 end
 
--- No cd music
-SetCdMode("off")
-
 ------------------------------------------------------------------------------
 --	Define sounds later used
 --
