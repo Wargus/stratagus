@@ -29,9 +29,9 @@
 
 CFont:New("small", CGraphic:New("general/small.png", 7, 6))
 CFont:New("game", CGraphic:New("general/game.png", 14, 14))
-CFont:New("large", CGraphic:New("general/large.png", 20, 20))
-CFont:New("small-title", CGraphic:New("general/large.png", 20, 20))
-CFont:New("large-title", CGraphic:New("general/large.png", 20, 20))
+CFont:New("large", CGraphic:New("general/large.png", 17, 17))
+CFont:New("small-title", CGraphic:New("general/large.png", 17, 17))
+CFont:New("large-title", CGraphic:New("general/large.png", 17, 17))
 
 --	FIXME: only yellow, white, and grey are correct.
 
