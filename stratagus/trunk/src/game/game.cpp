@@ -620,12 +620,12 @@ void CreateGame(const char *filename, CMap *map)
 
 	InitSelections();
 
-	UI.Minimap.Create();   // create minimap for pud
-	Map.Init();
-	PreprocessMap();   // Adjust map for use
+	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]);
+	UI.Load();
 
-	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]); // Setup the user interface
-	UI.Load(); // Load the user interface grafics
+	UI.Minimap.Create();
+	Map.Init();
+	PreprocessMap();
 
 	//
 	// Sound part
