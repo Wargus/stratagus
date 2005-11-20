@@ -30,6 +30,20 @@ class CIcon
 	int Frame;
 };
 
+extern void SetMouseScroll(bool enabled);
+extern void SetMouseScrollSpeed(int speed);
+extern void SetKeyScroll(bool enabled);
+extern void SetKeyScrollSpeed(int speed);
+extern void SetGrabMouse(bool enabled);
+extern void SetLeaveStops(bool enabled);
+extern void SetDoubleClickDelay(int delay);
+extern void SetHoldClickDelay(int delay);
+
+
+//
+//  Guichan
+//
+
 $using namespace gcn;
 
 class Color

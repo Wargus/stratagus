@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on 11/20/05 19:32:49.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 20 13:40:54 2005.
 */
 
 #ifndef __cplusplus
@@ -813,6 +813,230 @@ static int tolua_set_CIcon_Frame(lua_State* tolua_S)
   self->Frame = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetMouseScroll */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetMouseScroll00
+static int tolua_stratagus_SetMouseScroll00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isboolean(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  bool enabled = ((bool)  tolua_toboolean(tolua_S,1,0));
+ {
+  SetMouseScroll(enabled);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetMouseScroll'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetMouseScrollSpeed */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetMouseScrollSpeed00
+static int tolua_stratagus_SetMouseScrollSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int speed = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  SetMouseScrollSpeed(speed);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetMouseScrollSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetKeyScroll */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetKeyScroll00
+static int tolua_stratagus_SetKeyScroll00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isboolean(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  bool enabled = ((bool)  tolua_toboolean(tolua_S,1,0));
+ {
+  SetKeyScroll(enabled);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetKeyScroll'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetKeyScrollSpeed */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetKeyScrollSpeed00
+static int tolua_stratagus_SetKeyScrollSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int speed = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  SetKeyScrollSpeed(speed);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetKeyScrollSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetGrabMouse */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetGrabMouse00
+static int tolua_stratagus_SetGrabMouse00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isboolean(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  bool enabled = ((bool)  tolua_toboolean(tolua_S,1,0));
+ {
+  SetGrabMouse(enabled);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetGrabMouse'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetLeaveStops */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetLeaveStops00
+static int tolua_stratagus_SetLeaveStops00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isboolean(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  bool enabled = ((bool)  tolua_toboolean(tolua_S,1,0));
+ {
+  SetLeaveStops(enabled);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetLeaveStops'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetDoubleClickDelay */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetDoubleClickDelay00
+static int tolua_stratagus_SetDoubleClickDelay00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int delay = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  SetDoubleClickDelay(delay);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetDoubleClickDelay'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetHoldClickDelay */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetHoldClickDelay00
+static int tolua_stratagus_SetHoldClickDelay00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int delay = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  SetHoldClickDelay(delay);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetHoldClickDelay'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -7080,6 +7304,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"G",tolua_get_CIcon_G_ptr,tolua_set_CIcon_G_ptr);
   tolua_variable(tolua_S,"Frame",tolua_get_CIcon_Frame,tolua_set_CIcon_Frame);
  tolua_endmodule(tolua_S);
+ tolua_function(tolua_S,"SetMouseScroll",tolua_stratagus_SetMouseScroll00);
+ tolua_function(tolua_S,"SetMouseScrollSpeed",tolua_stratagus_SetMouseScrollSpeed00);
+ tolua_function(tolua_S,"SetKeyScroll",tolua_stratagus_SetKeyScroll00);
+ tolua_function(tolua_S,"SetKeyScrollSpeed",tolua_stratagus_SetKeyScrollSpeed00);
+ tolua_function(tolua_S,"SetGrabMouse",tolua_stratagus_SetGrabMouse00);
+ tolua_function(tolua_S,"SetLeaveStops",tolua_stratagus_SetLeaveStops00);
+ tolua_function(tolua_S,"SetDoubleClickDelay",tolua_stratagus_SetDoubleClickDelay00);
+ tolua_function(tolua_S,"SetHoldClickDelay",tolua_stratagus_SetHoldClickDelay00);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"Color","Color","",tolua_collect_Color);
 #else

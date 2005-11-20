@@ -687,4 +687,102 @@ void CycleViewportMode(int step)
 	SetViewportMode((ViewportModeType)new_mode);
 }
 
+/**
+**  Enable/disable scrolling with the mouse
+**
+**  @param enabled  True to enable mouse scrolling, false to disable
+*/
+void SetMouseScroll(bool enabled)
+{
+	UI.MouseScroll = enabled;
+}
+
+/**
+**  Set speed of mouse scrolling
+**
+**  @param speed  Mouse scroll speed
+*/
+void SetMouseScrollSpeed(int speed)
+{
+	if (speed == 0) {
+		SetMouseScroll(false);
+	} else {
+		SetMouseScroll(true);
+		if (speed < 1 || speed > FRAMES_PER_SECOND) {
+			SpeedMouseScroll = MOUSE_SCROLL_SPEED;
+		} else {
+			SpeedMouseScroll = speed;
+		}
+	}
+}
+
+/**
+**  Enable/disable scrolling with the keyboard
+**
+**  @param enabled  True to enable keyboard scrolling, false to disable
+*/
+void SetKeyScroll(bool enabled)
+{
+	UI.KeyScroll = enabled;
+}
+
+/**
+**  Set speed of keyboard scrolling
+**
+**  @param speed  Keyboard scroll speed
+*/
+void SetKeyScrollSpeed(int speed)
+{
+	if (speed == 0) {
+		SetKeyScroll(false);
+	} else {
+		SetKeyScroll(true);
+		if (speed < 1 || speed > FRAMES_PER_SECOND) {
+			SpeedKeyScroll = KEY_SCROLL_SPEED;
+		} else {
+			SpeedKeyScroll = speed;
+		}
+	}
+}
+
+/**
+**  Enable/disable grabbing the mouse
+**
+**  @param enabled  True to enable mouse grabbing, false to disable
+*/
+void SetGrabMouse(bool enabled)
+{
+	ToggleGrabMouse(enabled ? 1 : -1);
+}
+
+/**
+**  Enable/disable leaving the window stops scrolling
+**
+**  @param enabled  True to stop scrolling, false to disable
+*/
+void SetLeaveStops(bool enabled)
+{
+	LeaveStops = enabled;
+}
+
+/**
+**  Set double click delay
+**
+**  @param delay  Double click delay
+*/
+void SetDoubleClickDelay(int delay)
+{
+	DoubleClickDelay = delay;
+}
+
+/**
+**  Set hold click delay
+**
+**  @param delay  Hold click delay
+*/
+void SetHoldClickDelay(int delay)
+{
+	HoldClickDelay = delay;
+}
+
 //@}
