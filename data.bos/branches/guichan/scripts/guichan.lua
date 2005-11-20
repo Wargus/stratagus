@@ -37,11 +37,6 @@ bckground:Load()
 bckground:Resize(Video.Width, Video.Height)
 backgroundWidget = ImageWidget(bckground)
 
-normalImage = CGraphic:New("graphics/button.png", 200, 24)
-pressedImage = CGraphic:New("graphics/pressed.png", 200, 24)
-normalImage:Load() -- FIXME remove when immediatly loaded
-pressedImage:Load() -- idem
-
 -- Store the widget in the container. This way we keep a refence
 -- to the widget until the container gets deleted.
 -- TODO: embed this in tolua++
@@ -219,25 +214,19 @@ function RunWidgetsMenu(s)
   local b
   menu = BosMenu()
 
-  b = Label("a label, sir.")
-  b:setFont(CFont:Get("game"))
+  local normalImage = CGraphic:New("graphics/button.png", 200, 24)
+  local pressedImage = CGraphic:New("graphics/pressed.png", 200, 24)
+  normalImage:Load() -- FIXME remove when immediatly loaded
+  pressedImage:Load() -- idem
+
+  b = Label("Translucent widgets")
+  b:setFont(CFont:Get("large"))
   b:adjustSize();
   menu:add(b, 20, 10)
 
-  b = RadioButton("Platoon", "dumgroup", true)
-  b:setActionCallback(function() print("one") end)
-  b:setBaseColor(dark)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(dark)
-  menu:add(b, 20, 50)
-  b = RadioButton("Army", "dumgroup")
-  b:setActionCallback(function() print("two") end)
-  b:setBaseColor(dark)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(dark)
-  menu:add(b, 150, 50)
+  menu:addButton("SubMenu", 30, 50, RunSubMenu)
 
-  b = TextField("text widget")
+  b = TextField("text input")
   b:setActionCallback(function() print("field") end)
   b:setFont(CFont:Get("game"))
   b:setBaseColor(clear)
@@ -247,12 +236,27 @@ function RunWidgetsMenu(s)
 
   b = Slider(0, 1)
   b:setActionCallback(function() print("slider") end)
-  menu:add(b, 20, 150)
+  menu:add(b, 20, 140)
   b:setWidth(60)
   b:setHeight(20)
   b:setBaseColor(dark)
   b:setForegroundColor(clear)
   b:setBackgroundColor(clear)
+
+  b = RadioButton("Platoon", "dumgroup", true)
+  b:setActionCallback(function() print("one") end)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(dark)
+  menu:add(b, 20, 180)
+  b = RadioButton("Army", "dumgroup")
+  b:setActionCallback(function() print("two") end)
+  b:setBaseColor(dark)
+  b:setForegroundColor(clear)
+  b:setBackgroundColor(dark)
+  menu:add(b, 150, 180)
+
+  menu:addCheckBox("CheckBox", 20, 210, function(s) print("checked ?") end)
 
   local ic = CGraphic:New("units/assault/ico_assault.png")
   ic:Load()
@@ -298,7 +302,7 @@ function RunWidgetsMenu(s)
   cb = CGraphic:New("ui/widgets/checkbox-checked-pressed.png")
   cb:Load()
   b:setCheckedPressedImage(cb)
-  menu:add(b, 330, 80)
+  menu:add(b, 330, 210)
 
   bs = ImageSlider(0,1)
   local wimg = CGraphic:New("ui/widgets/undef_square.png")
