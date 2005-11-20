@@ -688,6 +688,14 @@ void CycleViewportMode(int step)
 }
 
 /**
+**  Check if mouse scrolling is enabled
+*/
+bool GetMouseScroll(void)
+{
+	return UI.MouseScroll;
+}
+
+/**
 **  Enable/disable scrolling with the mouse
 **
 **  @param enabled  True to enable mouse scrolling, false to disable
@@ -695,6 +703,14 @@ void CycleViewportMode(int step)
 void SetMouseScroll(bool enabled)
 {
 	UI.MouseScroll = enabled;
+}
+
+/**
+**  Get speed of mouse scrolling
+*/
+int GetMouseScrollSpeed(void)
+{
+	return SpeedMouseScroll;
 }
 
 /**
@@ -717,6 +733,14 @@ void SetMouseScrollSpeed(int speed)
 }
 
 /**
+**  Check if keyboard scrolling is enabled
+*/
+bool GetKeyScroll()
+{
+	return UI.KeyScroll;
+}
+
+/**
 **  Enable/disable scrolling with the keyboard
 **
 **  @param enabled  True to enable keyboard scrolling, false to disable
@@ -724,6 +748,14 @@ void SetMouseScrollSpeed(int speed)
 void SetKeyScroll(bool enabled)
 {
 	UI.KeyScroll = enabled;
+}
+
+/**
+**  Get speed of keyboard scrolling
+*/
+int GetKeyScrollSpeed(void)
+{
+	return SpeedKeyScroll;
 }
 
 /**
@@ -746,6 +778,14 @@ void SetKeyScrollSpeed(int speed)
 }
 
 /**
+**  Check if mouse grabbing is enabled
+*/
+bool GetGrabMouse(void)
+{
+	return SdlGetGrabMouse();
+}
+
+/**
 **  Enable/disable grabbing the mouse
 **
 **  @param enabled  True to enable mouse grabbing, false to disable
@@ -756,6 +796,14 @@ void SetGrabMouse(bool enabled)
 }
 
 /**
+**  Check if scrolling stops when leaving the window
+*/
+bool GetLeaveStops(void)
+{
+	return LeaveStops;
+}
+
+/**
 **  Enable/disable leaving the window stops scrolling
 **
 **  @param enabled  True to stop scrolling, false to disable
@@ -763,26 +811,6 @@ void SetGrabMouse(bool enabled)
 void SetLeaveStops(bool enabled)
 {
 	LeaveStops = enabled;
-}
-
-/**
-**  Set double click delay
-**
-**  @param delay  Double click delay
-*/
-void SetDoubleClickDelay(int delay)
-{
-	DoubleClickDelay = delay;
-}
-
-/**
-**  Set hold click delay
-**
-**  @param delay  Hold click delay
-*/
-void SetHoldClickDelay(int delay)
-{
-	HoldClickDelay = delay;
 }
 
 //@}

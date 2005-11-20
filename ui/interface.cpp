@@ -1566,4 +1566,40 @@ void InputKeyTimeout(const EventCallback *callbacks, unsigned ticks)
 	}
 }
 
+/**
+**  Get double click delay
+*/
+int GetDoubleClickDelay(void)
+{
+	return DoubleClickDelay;
+}
+
+/**
+**  Set double click delay
+**
+**  @param delay  Double click delay
+*/
+void SetDoubleClickDelay(int delay)
+{
+	DoubleClickDelay = delay;
+}
+
+/**
+**  Get hold click delay
+*/
+int GetHoldClickDelay(void)
+{
+	return HoldClickDelay;
+}
+
+/**
+**  Set hold click delay
+**
+**  @param delay  Hold click delay
+*/
+void SetHoldClickDelay(int delay)
+{
+	HoldClickDelay = delay;
+}
+
 //@}
