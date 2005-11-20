@@ -42,15 +42,6 @@ pressedImage = CGraphic:New("graphics/pressed.png", 200, 24)
 normalImage:Load() -- FIXME remove when immediatly loaded
 pressedImage:Load() -- idem
 
-cbUncheckedNormalImage = CGraphic:New("general/checkbox-unchecked-normal.png")
-cbUncheckedPressedImage = CGraphic:New("general/checkbox-unchecked-pressed.png")
-cbCheckedNormalImage = CGraphic:New("general/checkbox-checked-normal.png")
-cbCheckedPressedImage = CGraphic:New("general/checkbox-checked-pressed.png")
-cbUncheckedNormalImage:Load()
-cbUncheckedPressedImage:Load()
-cbCheckedNormalImage:Load()
-cbCheckedPressedImage:Load()
-
 -- Store the widget in the container. This way we keep a refence
 -- to the widget until the container gets deleted.
 -- TODO: embed this in tolua++
@@ -120,11 +111,10 @@ function BosMenu(title)
 
   function menu:addCheckBox(caption, x, y, callback)
     local b
-    b = ImageCheckBox(caption)
-    b:setUncheckedNormalImage(cbUncheckedNormalImage)
-    b:setUncheckedPressedImage(cbUncheckedPressedImage)
-    b:setCheckedNormalImage(cbCheckedNormalImage)
-    b:setCheckedPressedImage(cbCheckedPressedImage)
+    b = CheckBox(caption)
+    b:setBaseColor(clear)
+    b:setForegroundColor(clear)
+    b:setBackgroundColor(dark)
     b:setActionCallback(callback)
     self:add(b, x, y)
     return b
@@ -278,32 +268,46 @@ function RunWidgetsMenu(s)
   b:setBackgroundColor(dark)
   menu:add(b, 20, 350)
 
-  b = ImageCheckBox("ImageCheckBox")
-  local cb = CGraphic:New("general/checkbox-unchecked-normal.png")
-  cb:Load()
-  b:setUncheckedNormalImage(cb)
-  cb = CGraphic:New("general/checkbox-unchecked-pressed.png")
-  cb:Load()
-  b:setUncheckedPressedImage(cb)
-  cb = CGraphic:New("general/checkbox-checked-normal.png")
-  cb:Load()
-  b:setCheckedNormalImage(cb)
-  cb = CGraphic:New("general/checkbox-checked-pressed.png")
-  cb:Load()
-  b:setCheckedPressedImage(cb)
-  menu:add(b, 20, 400)
-
-  win = Windows("Test", 200, 200)
+  win = Windows("Test", 70, 70)
   win:setBaseColor(dark)
   win:setForegroundColor(dark)
   win:setBackgroundColor(dark)
-  menu:add(win, 450, 40)
+  menu:add(win, 40, 450)
   win2 = Windows("", 50, 50)
   win:add(win2, 0, 0)
 
+  b = Label("Image based widgets")
+  b:setFont(CFont:Get("large"))
+  b:adjustSize();
+  menu:add(b, 330, 10)
+
   b = ImageButton("SubMenu", normalImage, pressedImage)
   b:setActionCallback(RunSubMenu)
-  menu:add(b, 300, 250)
+  menu:add(b, 330, 50)
+
+  b = ImageCheckBox("ImageCheckBox")
+  local cb = CGraphic:New("ui/widgets/checkbox-unchecked-normal.png")
+  cb:Load()
+  b:setUncheckedNormalImage(cb)
+  cb = CGraphic:New("ui/widgets/checkbox-unchecked-pressed.png")
+  cb:Load()
+  b:setUncheckedPressedImage(cb)
+  cb = CGraphic:New("ui/widgets/checkbox-checked-normal.png")
+  cb:Load()
+  b:setCheckedNormalImage(cb)
+  cb = CGraphic:New("ui/widgets/checkbox-checked-pressed.png")
+  cb:Load()
+  b:setCheckedPressedImage(cb)
+  menu:add(b, 330, 80)
+
+  b = ImageSlider()
+  local wimg = CGraphic:New("ui/widgets/checkbox-unchecked-normal.png")
+  wimg:Load()
+  b:setMarkerImage(wimg)
+  wimg = CGraphic:New("ui/widgets/checkbox-unchecked-pressed.png")
+  wimg:Load()
+  b:setBackgroundImage(wimg)
+  menu:add(b, 330, 130)
 
   menu:run()
 end
@@ -435,6 +439,7 @@ function RunCreditsMenu(s)
      "  Chris Hopp", -- small_fire.png
      "",
      "",
+     "The Bos and the Stratagus Team thanks all the people who have contributed",
      "patches, bug reports, ideas."
   }
 
