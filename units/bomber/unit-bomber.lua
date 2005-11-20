@@ -84,7 +84,7 @@ DefineAllow("unit-bomber", "AAAAAAAAAAAAAAAA")
 
 DefineButton({
 	Pos = 2, Level = 0, Icon = "icon-bomber", Action = "train-unit",
-	Value = "unit-bomber", Key = "r", Hint = "BUILD ~!bomber",
+	Value = "unit-bomber", Key = "b", Hint = "BUILD ~!BOMBER",
 	ForUnit = {"unit-dev-yard"}})
 
 DefineCommonButtons({"unit-bomber"})
