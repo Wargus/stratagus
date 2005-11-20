@@ -236,7 +236,7 @@ static int CclStratagusMap(lua_State *l)
 static int CclRevealMap(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	if (CclInConfigFile) {
+	if (CclInConfigFile || !Map.Fields) {
 		FlagRevealMap = 1;
 	} else {
 		Map.Reveal();
@@ -328,7 +328,7 @@ static int CclSetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	Map.NoFogOfWar = !LuaToBoolean(l, 1);
-	if (!CclInConfigFile) {
+	if (!CclInConfigFile && Map.Fields) {
 		UpdateFogOfWarChange();
 	}
 	return 0;
