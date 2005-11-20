@@ -409,6 +409,8 @@ extern void PopClipping(void);
 	/// Returns the ticks in ms since start
 extern unsigned long GetTicks(void);
 
+	/// Check if the mouse is grabbed
+extern bool SdlGetGrabMouse(void);
 	/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 
