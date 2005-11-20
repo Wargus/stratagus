@@ -231,7 +231,7 @@ namespace gcn
         return mCaption;
     }
 
-    void RadioButton::setCaption(const std::string caption)
+    void RadioButton::setCaption(const std::string &caption)
     {
         mCaption = caption;
     }
