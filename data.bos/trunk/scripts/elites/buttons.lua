@@ -85,24 +85,24 @@ DefineButton({
 
 DefineButton({
 	Pos = 6, Level = 0, Icon = "icon-return-goods-peasant",
-	Action = "return-goods", Key = "g", Hint = "RETURN WITH ~!RESOURCES",
+	Action = "return-goods", Key = "g", Hint = "~!GO BACK WITH RESOURCES",
 	ForUnit = {"unit-engineer", "unit-harvester"}})
 
 -- build basic/advanced structs -----------------------------------------------
 
 DefineButton({
 	Pos = 7, Level = 0, Icon = "icon-build-lvl1", Action = "button",
-	Value = 1, Key = "b", Hint = "~!BUILD",
+	Value = 1, Key = "b", Hint = "~!BUILD STRUCTURES",
 	ForUnit = {"unit-engineer"}})
 
 DefineButton({
 	Pos = 8, Level = 0, Icon = "icon-build-lvl2", Action = "button",
-	Value = 2, Key = "u", Hint = "~!BUILD Level 2",
+	Value = 2, Key = "u", Hint = "BUILD ~!UNIT STRUCTURES",
 	ForUnit = {"unit-engineer"}})
 
 DefineButton({
 	Pos = 9, Level = 0, Icon = "icon-build-lvl3", Action = "button",
-	Value = 3, Key = "d", Hint = "~!BUILD Level 3",
+	Value = 3, Key = "d", Hint = "BUILD ~!DEFENSIVE STRUCTURES",
 	ForUnit = {"unit-engineer"}})
 
 -- simple buildings elites -----------------------------------------------------

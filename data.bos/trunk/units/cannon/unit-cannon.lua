@@ -93,7 +93,7 @@ DefineAllow("unit-cannon", "AAAAAAAAAAAAAAAA")
 
 DefineButton({
 	Pos = 3, Level = 3, Icon = "icon-cannon_b", Action = "build",
-	Value = "unit-cannon", Key = "c", Hint = "BUILD ~!cannon",
+	Value = "unit-cannon", Key = "c", Hint = "BUILD ~!CANNON",
 	ForUnit = {"unit-engineer"}})
 -- DefineButton for the 'stop' and 'attack' actions are defined in buttons.lua.
 

@@ -83,7 +83,7 @@ DefineAllow("unit-chopper", "AAAAAAAAAAAAAAAA")
 
 DefineButton({
 	Pos = 3, Level = 0, Icon = "icon-chopper", Action = "train-unit",
-	Value = "unit-chopper", Key = "c", Hint = "BUILD ~!Chopper",
+	Value = "unit-chopper", Key = "c", Hint = "BUILD ~!CHOPPER",
 	ForUnit = {"unit-dev-yard"}})
 
 DefineCommonButtons({"unit-chopper"})
