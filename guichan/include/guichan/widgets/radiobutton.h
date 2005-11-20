@@ -130,7 +130,7 @@ namespace gcn
          *
          * @param caption the RadioButton caption.
          */
-        virtual void setCaption(const std::string caption);
+        virtual void setCaption(const std::string &caption);
 
         /**
          * Sets the group the RadioButton should belong to.
