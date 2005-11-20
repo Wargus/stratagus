@@ -35,3 +35,4 @@ DefineDependency("unit-hosp", {"unit-vault", "unit-camp"})
 DefineDependency("unit-vfac", {"unit-vault", "unit-rfac"})
 DefineDependency("unit-msilo", {"unit-vault", "unit-rfac", "unit-dev-yard"})
 
+DefineDependency("upgrade-expl2", {"upgrade-expl"})
