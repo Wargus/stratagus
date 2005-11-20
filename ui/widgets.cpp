@@ -551,6 +551,64 @@ void ImageSlider::setBackgroundImage(gcn::Image *image)
 	backgroundImage = image;
 }
 
+/*----------------------------------------------------------------------------
+--  ScrollingWidget
+----------------------------------------------------------------------------*/
+
+/**
+**  Constructor.
+**
+**  @param width   Width  of the widget.
+**  @param height  Height of the widget.
+*/
+ScrollingWidget::ScrollingWidget(int width, int height) :
+	gcn::ScrollArea(NULL, gcn::ScrollArea::SHOW_NEVER, gcn::ScrollArea::SHOW_NEVER),
+	speedY(1), finished(false)
+{
+	container.setDimension(gcn::Rectangle(0, 0, width, height));
+	setContent(&container);
+	setDimension(gcn::Rectangle(0, 0, width, height));
+}
+
+/**
+**  Add a widget in the window.
+**
+**  @param widget  Widget to add.
+**  @param x       Position of the widget in the window.
+**  @param y       Position of the widget in the window.
+*/
+void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
+{
+	container.add(widget, x, y);
+	if (x + widget->getWidth() > container.getWidth()) {
+		container.setWidth(x + widget->getWidth());
+	}
+	if (y + widget->getHeight() > container.getHeight()) {
+		container.setHeight(y + widget->getHeight());
+	}
+}
+
+/**
+**  Scrolling the content when possible.
+*/
+void ScrollingWidget::logic()
+{
+	if (speedY - container.getY() < container.getHeight() - getHeight()) {
+		container.setY(container.getY() - speedY);
+	} else if (!finished){
+		finished = true;
+		generateAction();
+	}
+}
+
+/**
+**  Restart animation to the beginning.
+*/
+void ScrollingWidget::restart()
+{
+	container.setY(0);
+	finished = (container.getHeight() == getHeight());
+}
 
 /*----------------------------------------------------------------------------
 --  Windows

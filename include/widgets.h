@@ -125,6 +125,21 @@ public:
 	gcn::Image *backgroundImage;
 };
 
+
+class ScrollingWidget : public gcn::ScrollArea
+{
+public:
+	ScrollingWidget(int width, int height);
+	void add(gcn::Widget *widget, int x, int y);
+	void restart();
+private:
+	virtual void logic();
+private:
+	gcn::Container container; /// Data container
+	int speedY;               /// vertical speed of the container (positive number: go up).
+	bool finished;            /// True while scrolling ends.
+};
+
 class Windows : public gcn::Window
 {
 public:
