@@ -290,6 +290,15 @@ function RunWidgetsMenu(s)
   win2 = Windows("", 50, 50)
   win:add(win2, 0, 0)
 
+  local sw = ScrollingWidget(200, 50)
+  menu:add(sw, 20, 380)
+  sw:setBackgroundColor(dark)
+  sw:setActionCallback(function() sw:restart() end)
+  for i,f in {"Jarod", "was", "here", " ", ":)"} do
+    sw:add(Label(f), 0, 20 * i + 50)
+  end
+
+
   b = Label("Image based widgets")
   b:setFont(CFont:Get("large"))
   b:adjustSize();
@@ -391,6 +400,7 @@ function RunCreditsMenu(s)
      "  Nehal Mistry",
      "  Russell Smith",
      "  Francois Beerten",
+     "  Joris Dauphin",
      "  Mark Pazolli",
      "  Valery Shchedrin",
      "  Iftikhar Rathore",
@@ -460,18 +470,13 @@ function RunCreditsMenu(s)
   }
 
   menu = BosMenu("Battle of Survival Credits")
-  local t
-  local step = 20
-  local starty = Video.Height/20*2
-  local x = 30
-  y = starty
-  for l,t in credits do
-    menu:writeText(t, x, y)
-    y = y + step
-    if y > (Video.Height - 120) then
-       y = starty
-       x = x + 200
-    end
+
+  local sw = ScrollingWidget(Video.Width / 20 * 18, Video.Height * 14 / 20)
+  menu:add(sw, Video.Width / 20, Video.Height / 20 * 2)
+  sw:setBackgroundColor(dark)
+  sw:setActionCallback(function() sw:restart() end)
+  for i,f in credits do
+    sw:add(Label(f), 50, 20 * i + 50)
   end
 
   menu:run()
