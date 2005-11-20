@@ -111,6 +111,7 @@ function BosMenu(title)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
     b:setActionCallback(callback)
+    b:setFont(CFont:Get("game"))
     self:add(b, x, y)
     return b
   end
@@ -168,6 +169,10 @@ function RunStartGameMenu(s)
   menu:writeText("Description:", 20, 120)
   descr = menu:writeText("No map",40, 160)
 
+  local fow = menu:addCheckBox("Fog of war", 25, 200, function() end)
+  fow:setMarked(true)
+  local revealmap = menu:addCheckBox("Reveal map", 25, 230, function() end)
+  
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
       print(description)
@@ -182,8 +187,13 @@ function RunStartGameMenu(s)
     Load("maps/" .. browser:getSelectedItem())
   end
   browser:setActionCallback(cb)
+
   local function startgamebutton(s)
     print("Starting map -------")
+    SetFogOfWar(fow:isMarked())
+    if revealmap:isMarked() == true then
+       RevealMap()
+    end
     StartMap("maps/" .. browser:getSelectedItem())
     menu:stop()
   end
