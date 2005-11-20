@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 19 19:48:52 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 19 20:12:54 2005.
 */
 
 #ifndef __cplusplus
@@ -1739,20 +1739,21 @@ static int tolua_stratagus_ButtonWidget_new00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ButtonWidget",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   ButtonWidget* tolua_ret = (ButtonWidget*)  new ButtonWidget(caption);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ButtonWidget");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -1769,23 +1770,121 @@ static int tolua_stratagus_ButtonWidget_new00_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ButtonWidget",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   ButtonWidget* tolua_ret = (ButtonWidget*)  new ButtonWidget(caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ButtonWidget");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setCaption of class  ButtonWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ButtonWidget_setCaption00
+static int tolua_stratagus_ButtonWidget_setCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ButtonWidget",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ButtonWidget* self = (ButtonWidget*)  tolua_tousertype(tolua_S,1,0);
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCaption'",NULL);
+#endif
+ {
+  self->setCaption(caption);
+ tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getCaption of class  ButtonWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ButtonWidget_getCaption00
+static int tolua_stratagus_ButtonWidget_getCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const ButtonWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const ButtonWidget* self = (const ButtonWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getCaption'",NULL);
+#endif
+ {
+  const std::string tolua_ret = (const std::string)  self->getCaption();
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: adjustSize of class  ButtonWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ButtonWidget_adjustSize00
+static int tolua_stratagus_ButtonWidget_adjustSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ButtonWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ButtonWidget* self = (ButtonWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'adjustSize'",NULL);
+#endif
+ {
+  self->adjustSize();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'adjustSize'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1799,7 +1898,7 @@ static int tolua_stratagus_ImageButton_new00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ImageButton",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isusertype(tolua_S,3,"CGraphic",0,&tolua_err) ||
  !tolua_isusertype(tolua_S,4,"CGraphic",0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,5,&tolua_err)
@@ -1808,15 +1907,16 @@ static int tolua_stratagus_ImageButton_new00(lua_State* tolua_S)
  else
 #endif
  {
-  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
   CGraphic* normalImage = ((CGraphic*)  tolua_tousertype(tolua_S,3,0));
   CGraphic* pressedImage = ((CGraphic*)  tolua_tousertype(tolua_S,4,0));
  {
   ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption,normalImage,pressedImage);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageButton");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -1833,7 +1933,7 @@ static int tolua_stratagus_ImageButton_new00_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ImageButton",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isusertype(tolua_S,3,"CGraphic",0,&tolua_err) ||
  !tolua_isusertype(tolua_S,4,"CGraphic",0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,5,&tolua_err)
@@ -1842,15 +1942,16 @@ static int tolua_stratagus_ImageButton_new00_local(lua_State* tolua_S)
  else
 #endif
  {
-  char* caption = ((char*)  tolua_tostring(tolua_S,2,0));
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
   CGraphic* normalImage = ((CGraphic*)  tolua_tousertype(tolua_S,3,0));
   CGraphic* pressedImage = ((CGraphic*)  tolua_tousertype(tolua_S,4,0));
  {
   ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption,normalImage,pressedImage);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageButton");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -3448,6 +3549,38 @@ static int tolua_stratagus_RadioButton_new00_local(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: isMarked of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_isMarked00
+static int tolua_stratagus_RadioButton_isMarked00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"RadioButton",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  RadioButton* self = (RadioButton*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isMarked'",NULL);
+#endif
+ {
+  bool tolua_ret = (bool)  self->isMarked();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'isMarked'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: setMarked of class  RadioButton */
 #ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_setMarked00
 static int tolua_stratagus_RadioButton_setMarked00(lua_State* tolua_S)
@@ -3481,9 +3614,141 @@ static int tolua_stratagus_RadioButton_setMarked00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: isMarked of class  RadioButton */
-#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_isMarked00
-static int tolua_stratagus_RadioButton_isMarked00(lua_State* tolua_S)
+/* method: getCaption of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_getCaption00
+static int tolua_stratagus_RadioButton_getCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const RadioButton",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const RadioButton* self = (const RadioButton*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getCaption'",NULL);
+#endif
+ {
+  const std::string tolua_ret = (const std::string)  self->getCaption();
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setCaption of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_setCaption00
+static int tolua_stratagus_RadioButton_setCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"RadioButton",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  RadioButton* self = (RadioButton*)  tolua_tousertype(tolua_S,1,0);
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCaption'",NULL);
+#endif
+ {
+  self->setCaption(caption);
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setGroup of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_setGroup00
+static int tolua_stratagus_RadioButton_setGroup00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"RadioButton",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  RadioButton* self = (RadioButton*)  tolua_tousertype(tolua_S,1,0);
+  const std::string group = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setGroup'",NULL);
+#endif
+ {
+  self->setGroup(group);
+ tolua_pushcppstring(tolua_S,(const char*)group);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setGroup'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getGroup of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_getGroup00
+static int tolua_stratagus_RadioButton_getGroup00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const RadioButton",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const RadioButton* self = (const RadioButton*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getGroup'",NULL);
+#endif
+ {
+  const std::string tolua_ret = (const std::string)  self->getGroup();
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getGroup'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: adjustSize of class  RadioButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_RadioButton_adjustSize00
+static int tolua_stratagus_RadioButton_adjustSize00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -3497,17 +3762,16 @@ static int tolua_stratagus_RadioButton_isMarked00(lua_State* tolua_S)
  {
   RadioButton* self = (RadioButton*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isMarked'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'adjustSize'",NULL);
 #endif
  {
-  bool tolua_ret = (bool)  self->isMarked();
- tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  self->adjustSize();
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'isMarked'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'adjustSize'.",&tolua_err);
  return 0;
 #endif
 }
@@ -6751,6 +7015,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_ButtonWidget_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_ButtonWidget_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_ButtonWidget_new00_local);
+  tolua_function(tolua_S,"setCaption",tolua_stratagus_ButtonWidget_setCaption00);
+  tolua_function(tolua_S,"getCaption",tolua_stratagus_ButtonWidget_getCaption00);
+  tolua_function(tolua_S,"adjustSize",tolua_stratagus_ButtonWidget_adjustSize00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ImageButton","ImageButton","Widget",tolua_collect_ImageButton);
@@ -6874,8 +7141,13 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_RadioButton_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_RadioButton_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_RadioButton_new00_local);
-  tolua_function(tolua_S,"setMarked",tolua_stratagus_RadioButton_setMarked00);
   tolua_function(tolua_S,"isMarked",tolua_stratagus_RadioButton_isMarked00);
+  tolua_function(tolua_S,"setMarked",tolua_stratagus_RadioButton_setMarked00);
+  tolua_function(tolua_S,"getCaption",tolua_stratagus_RadioButton_getCaption00);
+  tolua_function(tolua_S,"setCaption",tolua_stratagus_RadioButton_setCaption00);
+  tolua_function(tolua_S,"setGroup",tolua_stratagus_RadioButton_setGroup00);
+  tolua_function(tolua_S,"getGroup",tolua_stratagus_RadioButton_getGroup00);
+  tolua_function(tolua_S,"adjustSize",tolua_stratagus_RadioButton_adjustSize00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"TextField","TextField","Widget",tolua_collect_TextField);
