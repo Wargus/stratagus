@@ -3076,11 +3076,7 @@ static void GameSpeedHSAction(Menuitem *mi)
 */
 static void MouseScrollHSAction(Menuitem *mi)
 {
-	UI.MouseScroll = true;
-	SpeedMouseScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
-	if (mi->D.HSlider.percent == 0) {
-		UI.MouseScroll = false;
-	}
+	SetMouseScrollSpeed(10 - (mi->D.HSlider.percent * 9) / 100);
 }
 
 /**
@@ -3088,11 +3084,7 @@ static void MouseScrollHSAction(Menuitem *mi)
 */
 static void KeyboardScrollHSAction(Menuitem *mi)
 {
-	UI.KeyScroll = true;
-	SpeedKeyScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
-	if (mi->D.HSlider.percent == 0) {
-		UI.KeyScroll = false;
-	}
+	SetKeyScrollSpeed(10 - (mi->D.HSlider.percent * 9) / 100);
 }
 
 /**

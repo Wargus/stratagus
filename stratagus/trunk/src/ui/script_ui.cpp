@@ -2113,99 +2113,6 @@ static int CclDefineViewports(lua_State *l)
 }
 
 /**
-**  Enable/disable scrolling with the mouse.
-**
-**  @param l  Lua state.
-*/
-static int CclSetMouseScroll(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UI.MouseScroll = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
-**  Set speed of mouse scrolling
-**
-**  @param l  Lua state.
-*/
-static int CclSetMouseScrollSpeed(lua_State *l)
-{
-	int speed;
-
-	LuaCheckArgs(l, 1);
-	speed = LuaToNumber(l, 1);
-	if (speed < 1 || speed > FRAMES_PER_SECOND) {
-		SpeedMouseScroll = MOUSE_SCROLL_SPEED;
-	} else {
-		SpeedMouseScroll = speed;
-	}
-	return 0;
-}
-
-/**
-**  Enable/disable grabbing the mouse.
-**
-**  @param l  Lua state.
-*/
-static int CclSetGrabMouse(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_isboolean(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	if (lua_toboolean(l, 1)) {
-		ToggleGrabMouse(1);
-	} else {
-		ToggleGrabMouse(-1);
-	}
-	return 0;
-}
-
-/**
-**  Enable/disable leaving the window stops scrolling.
-**
-**  @param l  Lua state.
-*/
-static int CclSetLeaveStops(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	LeaveStops = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
-**  Enable/disable scrolling with the keyboard.
-**
-**  @param l  Lua state.
-*/
-static int CclSetKeyScroll(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UI.KeyScroll = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
-**  Set speed of keyboard scrolling
-**
-**  @param l  Lua state.
-*/
-static int CclSetKeyScrollSpeed(lua_State *l)
-{
-	int speed;
-
-	LuaCheckArgs(l, 1);
-	speed = LuaToNumber(l, 1);
-	if (speed < 1 || speed > FRAMES_PER_SECOND) {
-		SpeedKeyScroll = KEY_SCROLL_SPEED;
-	} else {
-		SpeedKeyScroll = speed;
-	}
-	return 0;
-}
-
-/**
 **  Enable/disable display of command keys in panels.
 **
 **  @param l  Lua state.
@@ -4114,30 +4021,6 @@ void SelectedUnitChanged(void)
 }
 
 /**
-**  Set double-click delay.
-**
-**  @param l  Lua state.
-*/
-static int CclSetDoubleClickDelay(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	DoubleClickDelay = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set hold-click delay.
-**
-**  @param l  Lua state.
-*/
-static int CclSetHoldClickDelay(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	HoldClickDelay = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
 **  Set selection style.
 **
 **  @param l  Lua state.
@@ -4292,13 +4175,6 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "DefinePanelContents", CclDefinePanelContents);
 	lua_register(Lua, "DefineViewports", CclDefineViewports);
 
-	lua_register(Lua, "SetGrabMouse", CclSetGrabMouse);
-	lua_register(Lua, "SetLeaveStops", CclSetLeaveStops);
-	lua_register(Lua, "SetKeyScroll", CclSetKeyScroll);
-	lua_register(Lua, "SetKeyScrollSpeed", CclSetKeyScrollSpeed);
-	lua_register(Lua, "SetMouseScroll", CclSetMouseScroll);
-	lua_register(Lua, "SetMouseScrollSpeed", CclSetMouseScrollSpeed);
-
 	lua_register(Lua, "SetShowCommandKey", CclSetShowCommandKey);
 	lua_register(Lua, "RightButtonAttacks", CclRightButtonAttacks);
 	lua_register(Lua, "RightButtonMoves", CclRightButtonMoves);
@@ -4314,12 +4190,6 @@ void UserInterfaceCclRegister(void)
 
 	lua_register(Lua, "PresentMap", CclPresentMap);
 	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
-
-	//
-	// Correct named functions
-	//
-	lua_register(Lua, "SetDoubleClickDelay", CclSetDoubleClickDelay);
-	lua_register(Lua, "SetHoldClickDelay", CclSetHoldClickDelay);
 
 	//
 	// Look and feel of units
