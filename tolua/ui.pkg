@@ -83,12 +83,15 @@ $]
 
 class ButtonWidget : public Widget
 {
-	ButtonWidget(char *caption);
+	ButtonWidget(const std::string &caption);
+	virtual void setCaption(const std::string &caption);
+	virtual const std::string &getCaption() const;
+	virtual void adjustSize();
 };
 
 class ImageButton : public Widget
 {
-	ImageButton(char *caption, CGraphic *normalImage, CGraphic *pressedImage);
+	ImageButton(const std::string &caption, CGraphic *normalImage, CGraphic *pressedImage);
 	void setHotKey(const int key);
 	void setHotKey(const char *key);
 };
@@ -160,9 +163,14 @@ class Label : public Widget
 
 class RadioButton : public Widget
 {
-	RadioButton(const std::string &caption, const std::string &group, bool marked=false);
-	void setMarked(bool marked);
-	bool isMarked();
+	RadioButton(const std::string &caption, const std::string &group, bool marked = false);
+	virtual bool isMarked();
+	virtual void setMarked(bool marked);
+	virtual const std::string &getCaption() const;
+	virtual void setCaption(const std::string &caption);
+	virtual void setGroup(const std::string &group);
+	virtual const std::string &getGroup() const;
+	virtual void adjustSize();
 };
 
 // FIXME Combine with ScrollArea in our own widget
