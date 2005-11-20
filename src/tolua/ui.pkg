@@ -98,15 +98,6 @@ class ImageWidget : public Widget
 	ImageWidget(CGraphic *image);
 };
 
-class Slider : public Widget
-{
-	Slider(double scaleStart, double scaleEnd);
-	double getValue();
-	void setValue(double value);
-	void setWidth(int w);
-	void setHeight(int h);
-};
-
 class CheckBox : public Widget
 {
 	CheckBox();
@@ -128,6 +119,35 @@ class ImageCheckBox : public CheckBox
 	void setUncheckedPressedImage(CGraphic *image);
 	void setCheckedNormalImage(CGraphic *image);
 	void setCheckedPressedImage(CGraphic *image);
+};
+
+class Slider : public Widget
+{
+	Slider(double scaleEnd = 1.0);
+	Slider(double scaleStart, double scaleEnd);
+	virtual void setScale(double scaleStart, double scaleEnd);
+	virtual double getScaleStart() const;
+	virtual void setScaleStart(double scaleStart);
+	virtual double getScaleEnd() const;
+	virtual void setScaleEnd(double scaleEnd);
+	virtual double getValue();
+	virtual void setValue(double value);
+	virtual void setMarkerLength(int length);
+	virtual int getMarkerLength() const;
+	virtual void setOrientation(unsigned int orientation);
+	virtual unsigned int getOrientation() const;
+	virtual void setStepLength(double length);
+	virtual double getStepLength() const;
+
+	enum { HORIZONTAL = 0, VERTICAL };
+};
+
+class ImageSlider : public Slider
+{
+	ImageSlider(double scaleEnd = 1.0);
+	ImageSlider(double scaleStart, double scaleEnd);
+	void setMarkerImage(CGraphic *image);
+	void setBackgroundImage(CGraphic *image);
 };
 
 class Label : public Widget

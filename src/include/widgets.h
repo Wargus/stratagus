@@ -109,6 +109,22 @@ public:
 	bool mMouseDown;
 };
 
+class ImageSlider : public gcn::Slider
+{
+public:
+	ImageSlider(double scaleEnd = 1.0);
+	ImageSlider(double scaleStart, double scaleEnd);
+
+	virtual void drawMarker(gcn::Graphics* graphics);
+	virtual void draw(gcn::Graphics* graphics);
+
+	void setMarkerImage(gcn::Image *image);
+	void setBackgroundImage(gcn::Image *image);
+
+	gcn::Image *markerImage;
+	gcn::Image *backgroundImage;
+};
+
 class Windows : public gcn::Window
 {
 public:

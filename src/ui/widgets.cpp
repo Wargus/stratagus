@@ -479,6 +479,79 @@ void ImageCheckBox::adjustSize()
 
 
 /*----------------------------------------------------------------------------
+--  ImageSlider
+----------------------------------------------------------------------------*/
+
+
+/**
+**  FIXME: docu
+*/
+ImageSlider::ImageSlider(double scaleEnd) :
+	Slider(scaleEnd), markerImage(NULL), backgroundImage(NULL)
+{
+}
+
+/**
+**  FIXME: docu
+*/
+ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
+	Slider(scaleStart, scaleEnd), markerImage(NULL), backgroundImage(NULL)
+{
+}
+
+/**
+**  Draw the image slider marker
+*/
+void ImageSlider::drawMarker(gcn::Graphics *graphics)
+{
+	if (markerImage) {
+		if (getOrientation() == HORIZONTAL) {
+			int v = getMarkerPosition();
+			graphics->drawImage(markerImage, 0, 0, v, 0,
+				markerImage->getWidth(), markerImage->getHeight());
+		} else {
+			int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
+			graphics->drawImage(markerImage, 0, 0, 0, v,
+				markerImage->getWidth(), markerImage->getHeight());
+		}
+	} else {
+		Slider::drawMarker(graphics);
+	}
+}
+
+/**
+**  Draw the image slider
+*/
+void ImageSlider::draw(gcn::Graphics *graphics)
+{
+	if (backgroundImage) {
+		graphics->drawImage(backgroundImage, 0, 0, 0, 0,
+			backgroundImage->getWidth(), backgroundImage->getHeight());
+		drawMarker(graphics);
+	} else {
+		Slider::draw(graphics);
+	}
+}
+
+/**
+**  Set the marker image
+*/
+void ImageSlider::setMarkerImage(gcn::Image *image)
+{
+	markerImage = image;
+	setMarkerLength(image->getWidth());
+}
+
+/**
+**  Set the background image
+*/
+void ImageSlider::setBackgroundImage(gcn::Image *image)
+{
+	backgroundImage = image;
+}
+
+
+/*----------------------------------------------------------------------------
 --  Windows
 ----------------------------------------------------------------------------*/
 
