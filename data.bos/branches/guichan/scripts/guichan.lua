@@ -471,8 +471,8 @@ function RunCreditsMenu(s)
 
   menu = BosMenu("Battle of Survival Credits")
 
-  local sw = ScrollingWidget(Video.Width / 20 * 18, Video.Height * 14 / 20)
-  menu:add(sw, Video.Width / 20, Video.Height / 20 * 2)
+  local sw = ScrollingWidget(400, Video.Height * 12 / 20)
+  menu:add(sw, Video.Width / 2 - 200, Video.Height / 20 * 3)
   sw:setBackgroundColor(dark)
   sw:setActionCallback(function() sw:restart() end)
   for i,f in credits do
