@@ -720,22 +720,30 @@ extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
 
+	/// Check if mouse scrolling is enabled
+extern bool GetMouseScroll(void);
 	/// Enable/disable scrolling with the mouse
 extern void SetMouseScroll(bool enabled);
+	/// Get speed of mouse scrolling
+extern int GetMouseScrollSpeed(void);
 	/// Set speed of mouse scrolling
 extern void SetMouseScrollSpeed(int speed);
+	/// Check if keyboard scrolling is enabled
+extern bool GetKeyScroll(void);
 	/// Enable/disable scrolling with the keyboard
 extern void SetKeyScroll(bool enabled);
+	/// Get speed of keyboard scrolling
+extern int GetKeyScrollSpeed(void);
 	/// Set speed of keyboard scrolling
 extern void SetKeyScrollSpeed(int speed);
+	/// Check if mouse grabbing is enabled
+extern bool GetGrabMouse(void);
 	/// Enable/disable grabbing the mouse
 extern void SetGrabMouse(bool enabled);
+	/// Check if scrolling stops when leaving the window
+extern bool GetLeaveStops(void);
 	/// Enable/disable leaving the window stops scrolling
 extern void SetLeaveStops(bool enabled);
-	/// Set double click delay
-extern void SetDoubleClickDelay(int delay);
-	/// Set hold click delay
-extern void SetHoldClickDelay(int delay);
 
 extern int AddHandler(lua_State *l);
 extern void CallHandler(unsigned int handle, int value);

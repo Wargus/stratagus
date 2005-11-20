@@ -588,21 +588,26 @@ void SdlUnlockScreen(void)
 }
 
 /**
+**  Check if the mouse is grabbed
+*/
+bool SdlGetGrabMouse(void)
+{
+	return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
+}
+
+/**
 **  Toggle grab mouse.
 **
 **  @param mode  Wanted mode, 1 grab, -1 not grab, 0 toggle.
 */
 void ToggleGrabMouse(int mode)
 {
-	static int grabbed;
+	bool grabbed = SdlGetGrabMouse();
 
 	if (mode <= 0 && grabbed) {
 		SDL_WM_GrabInput(SDL_GRAB_OFF);
-		grabbed = 0;
 	} else if (mode >= 0 && !grabbed) {
-		if (SDL_WM_GrabInput(SDL_GRAB_ON) == SDL_GRAB_ON) {
-			grabbed = 1;
-		}
+		SDL_WM_GrabInput(SDL_GRAB_ON);
 	}
 }
 

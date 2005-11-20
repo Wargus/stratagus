@@ -302,6 +302,15 @@ extern void InputKeyButtonRelease(const struct _event_callback_ *callbacks,
 extern void InputKeyTimeout(const struct _event_callback_ *callbacks,
 	unsigned ticks);
 
+	/// Get double click delay
+extern int GetDoubleClickDelay(void);
+	/// Set double click delay
+extern void SetDoubleClickDelay(int delay);
+	/// Get hold click delay
+extern int GetHoldClickDelay(void);
+	/// Set hold click delay
+extern void SetHoldClickDelay(int delay);
+
 	/// Toggle pause mode
 extern void UiTogglePause(void);
 	/// Handle cheats
