@@ -187,7 +187,8 @@ LuaActionListener::~LuaActionListener()
 **  @param a        FIXME: docu
 **  @param b        FIXME: docu
 */
-ImageButton::ImageButton(char *caption, gcn::Image *a, gcn::Image *b) : Button(caption)
+ImageButton::ImageButton(const std::string &caption, gcn::Image *a, gcn::Image *b) :
+	Button(caption)
 {
 	setForegroundColor(0xffffff);
 	normalImage = a;

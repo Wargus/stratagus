@@ -55,13 +55,13 @@ public:
 class ButtonWidget : public gcn::Button 
 {
 public:
-	ButtonWidget(char *caption) : Button(caption) {}
+	ButtonWidget(const std::string &caption) : Button(caption) {}
 }; 
 
 class ImageButton : public gcn::Button
 {
 public:
-	ImageButton(char *caption, gcn::Image *normal = NULL, gcn::Image *pressed = NULL);
+	ImageButton(const std::string &caption, gcn::Image *normal = NULL, gcn::Image *pressed = NULL);
 
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void adjustSize();
