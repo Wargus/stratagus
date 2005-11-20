@@ -566,6 +566,7 @@ ScrollingWidget::ScrollingWidget(int width, int height) :
 	speedY(1), finished(false)
 {
 	container.setDimension(gcn::Rectangle(0, 0, width, height));
+	container.setOpaque(false);
 	setContent(&container);
 	setDimension(gcn::Rectangle(0, 0, width, height));
 }
