@@ -51,9 +51,11 @@ gcn::SDLInput *input;  /// Input driver
 
 bool guichanActive = true;
 
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
 
 /**
 **  Initializes the GUI stuff
@@ -111,6 +113,9 @@ void handleInput(const SDL_Event *event)
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 void DrawGuichanWidgets() 
 {
 	if (gui && guichanActive) {
@@ -119,13 +124,14 @@ void DrawGuichanWidgets()
 	}
 }
 
+
 /*----------------------------------------------------------------------------
 --  LuaActionListener
 ----------------------------------------------------------------------------*/
 
 
 /**
-**  FIXME: docu
+**  LuaActionListener constructor
 **
 **  @param l  FIXME: docu
 **  @param f  FIXME: docu
@@ -167,7 +173,7 @@ void LuaActionListener::action(const std::string &eventId)
 }
 
 /**
-**  FIXME: docu
+**  LuaActionListener destructor
 */
 LuaActionListener::~LuaActionListener()
 {
@@ -181,7 +187,7 @@ LuaActionListener::~LuaActionListener()
 
 
 /**
-**  FIXME: docu
+**  ImageButton constructor
 **
 **  @param caption  FIXME: docu
 **  @param a        FIXME: docu
@@ -198,7 +204,7 @@ ImageButton::ImageButton(const std::string &caption, gcn::Image *a, gcn::Image *
 }
 
 /**
-**  FIXME: docu
+**  Draw the image button
 **
 **  @param graphics  FIXME: docu
 */
@@ -350,7 +356,7 @@ void ImageButton::setHotKey(const char *key)
 
 
 /**
-**  FIXME: docu
+**  Image checkbox constructor
 */
 ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
 	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
@@ -360,7 +366,7 @@ ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
 }
 
 /**
-**  FIXME: docu
+**  Image checkbox constructor
 */
 ImageCheckBox::ImageCheckBox(const std::string &caption, bool marked) :
 	gcn::CheckBox(caption, marked),
@@ -371,7 +377,7 @@ ImageCheckBox::ImageCheckBox(const std::string &caption, bool marked) :
 }
 
 /**
-**  FIXME: docu
+**  Draw the image checkbox
 */
 void ImageCheckBox::draw(gcn::Graphics *graphics)
 {
@@ -397,7 +403,7 @@ void ImageCheckBox::draw(gcn::Graphics *graphics)
 }
 
 /**
-**  FIXME: docu
+**  Draw the checkbox (not the caption)
 */
 void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 {
@@ -426,7 +432,7 @@ void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 }
 
 /**
-**  FIXME: docu
+**  Mouse button pressed callback
 */
 void ImageCheckBox::mousePress(int x, int y, int button)
 {
@@ -436,7 +442,7 @@ void ImageCheckBox::mousePress(int x, int y, int button)
 }
 
 /**
-**  FIXME: docu
+**  Mouse button released callback
 */
 void ImageCheckBox::mouseRelease(int x, int y, int button)
 {
@@ -446,7 +452,7 @@ void ImageCheckBox::mouseRelease(int x, int y, int button)
 }
 
 /**
-**  FIXME: docu
+**  Mouse clicked callback
 */
 void ImageCheckBox::mouseClick(int x, int y, int button, int count)
 {
@@ -456,7 +462,7 @@ void ImageCheckBox::mouseClick(int x, int y, int button, int count)
 }
 
 /**
-**  FIXME: docu
+**  Adjusts the CheckBox size to fit the font size
 */
 void ImageCheckBox::adjustSize()
 {
@@ -485,7 +491,7 @@ void ImageCheckBox::adjustSize()
 
 
 /**
-**  FIXME: docu
+**  Image slider constructor
 */
 ImageSlider::ImageSlider(double scaleEnd) :
 	Slider(scaleEnd), markerImage(NULL), backgroundImage(NULL)
@@ -493,7 +499,7 @@ ImageSlider::ImageSlider(double scaleEnd) :
 }
 
 /**
-**  FIXME: docu
+**  Image slider constructor
 */
 ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
 	Slider(scaleStart, scaleEnd), markerImage(NULL), backgroundImage(NULL)
@@ -551,14 +557,16 @@ void ImageSlider::setBackgroundImage(gcn::Image *image)
 	backgroundImage = image;
 }
 
+
 /*----------------------------------------------------------------------------
 --  ScrollingWidget
 ----------------------------------------------------------------------------*/
 
+
 /**
-**  Constructor.
+**  ScrollingWidget constructor.
 **
-**  @param width   Width  of the widget.
+**  @param width   Width of the widget.
 **  @param height  Height of the widget.
 */
 ScrollingWidget::ScrollingWidget(int width, int height) :
@@ -611,19 +619,21 @@ void ScrollingWidget::restart()
 	finished = (container.getHeight() == getHeight());
 }
 
+
 /*----------------------------------------------------------------------------
 --  Windows
 ----------------------------------------------------------------------------*/
 
 
 /**
-**  Constructor.
+**  Windows constructor.
 **
-**  @param title   Title  of the window.
-**  @param width   Width  of the window.
+**  @param title   Title of the window.
+**  @param width   Width of the window.
 **  @param height  Height of the window.
 */
-Windows::Windows(const std::string &title, int width, int height) : Window(title), blockwholewindow(true)
+Windows::Windows(const std::string &title, int width, int height) :
+	Window(title), blockwholewindow(true)
 {
 	container.setDimension(gcn::Rectangle(0, 0, width, height));
 	scroll.setDimension(gcn::Rectangle(0, 0, width, height));
@@ -741,6 +751,7 @@ void Windows::setBaseColor(const gcn::Color &color)
 	container.setBaseColor(color);
 }
 
+
 /*----------------------------------------------------------------------------
 --  LuaListModel
 ----------------------------------------------------------------------------*/
@@ -769,10 +780,11 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 --  ListBoxWidget
 ----------------------------------------------------------------------------*/
 
+
 /**
-**  Constructor.
+**  ListBoxWidget constructor.
 **
-**  @todo Size should be parametrable, maybe remove default construtor ?
+**  @todo  Size should be parametrable, maybe remove default constructor?
 */
 ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 {
@@ -784,7 +796,6 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 
 /**
 **  FIXME: docu
-**
 */
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
@@ -794,9 +805,9 @@ void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 }
 
 /**
-** Sets the ListModel index of the selected element.
+**  Sets the ListModel index of the selected element.
 **
-** @param selected the ListModel index of the selected element.
+**  @param selected  The ListModel index of the selected element.
 **
 **  @see gcn::ListBox
 */
@@ -808,7 +819,7 @@ void ListBoxWidget::setSelected(int selected)
 /**
 **  Gets the ListModel index of the selected element.
 **
-**  @return the ListModel index of the selected element.
+**  @return  The ListModel index of the selected element.
 **
 **  @see gcn::ListBox
 */
@@ -831,7 +842,7 @@ void ListBoxWidget::setBackgroundColor(const gcn::Color &color)
 /**
 **  Set font of the ListBox.
 **
-**  @param font Font to set.
+**  @param font  Font to set.
 */
 void ListBoxWidget::setFont(gcn::Font *font)
 {
@@ -864,10 +875,14 @@ void ListBoxWidget::adjustSize()
 	}
 }
 
+/**
+**  Add an action listener
+*/
 void ListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 {
 	listbox.addActionListener(actionListener);
 }
+
 
 /*----------------------------------------------------------------------------
 --  DropDownWidget
@@ -883,9 +898,15 @@ void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 	setListModel(&listmodel);
 }
 
+
 /*----------------------------------------------------------------------------
 --  MenuScreen
 ----------------------------------------------------------------------------*/
+
+
+/**
+**  MenuScreen constructor
+*/
 MenuScreen::MenuScreen() : 
 	Container(), runLoop(true)
 {
@@ -895,6 +916,9 @@ MenuScreen::MenuScreen() :
 	gui->setTop(this);
 }
 
+/**
+**  Run the menu.  Loops until stop is called.
+*/
 int MenuScreen::run() 
 {
 	loopResult = 0;
@@ -908,6 +932,9 @@ int MenuScreen::run()
 	return loopResult;
 }
 
+/**
+**  Stop the menu from running
+*/
 void MenuScreen::stop(int result)
 {
 	runLoop = false;
