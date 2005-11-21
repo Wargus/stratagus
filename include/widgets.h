@@ -61,13 +61,17 @@ public:
 class ImageButton : public gcn::Button
 {
 public:
-	ImageButton(const std::string &caption, gcn::Image *normal = NULL, gcn::Image *pressed = NULL);
+	ImageButton();
+	ImageButton(const std::string &caption);
 
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void adjustSize();
 
 	virtual void keyPress(const gcn::Key &key);
 	virtual void keyRelease(const gcn::Key &key);
+
+	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
+	void setPressedImage(gcn::Image *image) { pressedImage = image; }
 
 	void setHotKey(const int key);
 	void setHotKey(const char *key);
