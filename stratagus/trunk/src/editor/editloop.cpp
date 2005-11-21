@@ -1879,7 +1879,7 @@ static void EditorCallbackMouse(int x, int y)
 		Assert(vp);
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
-			DebugPrint("active viewport changed to %d.\n" _C_
+			DebugPrint("active viewport changed to %ld.\n" _C_
 				UI.Viewports - vp);
 		}
 		CursorOn = CursorOnMap;
