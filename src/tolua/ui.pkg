@@ -113,7 +113,11 @@ class ButtonWidget : public Widget
 
 class ImageButton : public Widget
 {
-	ImageButton(const std::string &caption, CGraphic *normalImage, CGraphic *pressedImage);
+	ImageButton();
+	ImageButton(const std::string &caption);
+
+	void setNormalImage(CGraphic *image);
+	void setPressedImage(CGraphic *image);
 	void setHotKey(const int key);
 	void setHotKey(const char *key);
 };
