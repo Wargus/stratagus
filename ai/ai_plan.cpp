@@ -516,7 +516,7 @@ int AiPlanAttack(AiForce *force)
 	int state;
 	CUnit *transporter;
 
-	DebugPrint("Planning for force #%d of player #%d\n" _C_
+	DebugPrint("Planning for force #%lu of player #%d\n" _C_
 		force - AiPlayer->Force _C_ AiPlayer->Player->Index);
 
 	watermatrix = CreateMatrix();
