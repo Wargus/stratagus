@@ -1298,7 +1298,7 @@ void CInfoPanel::Draw(void)
 			if (NumSelected > (int)UI.SelectedButtons.size()) {
 				char buf[5];
 
-				sprintf(buf, "+%lu", NumSelected - UI.SelectedButtons.size());
+				sprintf(buf, "+%ud", NumSelected - UI.SelectedButtons.size());
 				VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
 					UI.MaxSelectedFont, buf);
 			}
