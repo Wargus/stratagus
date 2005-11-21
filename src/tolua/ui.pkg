@@ -80,6 +80,8 @@ class Widget
 	virtual void setY(int y);
 	virtual int getY() const;
 	virtual void setPosition(int x, int y);
+	virtual void setEnabled(bool enabled);
+	virtual bool isEnabled() const;
 
 	virtual void setBaseColor(const Color &color);
 	virtual void setForegroundColor(const Color &color);
@@ -118,6 +120,7 @@ class ImageButton : public Widget
 
 	void setNormalImage(CGraphic *image);
 	void setPressedImage(CGraphic *image);
+	void setDisabledImage(CGraphic *image);
 	void setHotKey(const int key);
 	void setHotKey(const char *key);
 };

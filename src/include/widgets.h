@@ -72,12 +72,14 @@ public:
 
 	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
 	void setPressedImage(gcn::Image *image) { pressedImage = image; }
+	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
 
 	void setHotKey(const int key);
 	void setHotKey(const char *key);
 
 	gcn::Image *normalImage;
 	gcn::Image *pressedImage;
+	gcn::Image *disabledImage;
 	int hotKey;
 };
 
