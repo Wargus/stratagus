@@ -190,7 +190,8 @@ LuaActionListener::~LuaActionListener()
 **  ImageButton constructor
 */
 ImageButton::ImageButton() :
-	Button(), normalImage(NULL), pressedImage(NULL), hotKey(0)
+	Button(), normalImage(NULL), pressedImage(NULL),
+	disabledImage(NULL), hotKey(0)
 {
 	setForegroundColor(0xffffff);
 }
@@ -201,7 +202,8 @@ ImageButton::ImageButton() :
 **  @param caption  Caption text
 */
 ImageButton::ImageButton(const std::string &caption) :
-	Button(caption), normalImage(NULL), pressedImage(NULL), hotKey(0)
+	Button(caption), normalImage(NULL), pressedImage(NULL),
+	disabledImage(NULL), hotKey(0)
 {
 	setForegroundColor(0xffffff);
 }
@@ -220,7 +222,9 @@ void ImageButton::draw(gcn::Graphics *graphics)
 
 	gcn::Image *img;
 
-	if (isPressed()) {
+	if (!isEnabled()) {
+		img = disabledImage ? disabledImage : normalImage;
+	} else if (isPressed()) {
 		img = pressedImage ? pressedImage : normalImage;
 	} else if (0 && hasMouse()) {
 		// FIXME: add mouse-over image

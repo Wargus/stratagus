@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov 20 21:10:15 2005.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 20 21:53:29 2005.
 */
 
 #ifndef __cplusplus
@@ -1838,6 +1838,71 @@ static int tolua_stratagus_Widget_setPosition00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: setEnabled of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setEnabled00
+static int tolua_stratagus_Widget_setEnabled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  bool enabled = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setEnabled'",NULL);
+#endif
+ {
+  self->setEnabled(enabled);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: isEnabled of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_isEnabled00
+static int tolua_stratagus_Widget_isEnabled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Widget* self = (const Widget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isEnabled'",NULL);
+#endif
+ {
+  bool tolua_ret = (bool)  self->isEnabled();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'isEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: setBaseColor of class  Widget */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setBaseColor00
 static int tolua_stratagus_Widget_setBaseColor00(lua_State* tolua_S)
@@ -2507,6 +2572,39 @@ static int tolua_stratagus_ImageButton_setPressedImage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setPressedImage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setDisabledImage of class  ImageButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageButton_setDisabledImage00
+static int tolua_stratagus_ImageButton_setDisabledImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageButton",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageButton* self = (ImageButton*)  tolua_tousertype(tolua_S,1,0);
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setDisabledImage'",NULL);
+#endif
+ {
+  self->setDisabledImage(image);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setDisabledImage'.",&tolua_err);
  return 0;
 #endif
 }
@@ -7676,6 +7774,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setY",tolua_stratagus_Widget_setY00);
   tolua_function(tolua_S,"getY",tolua_stratagus_Widget_getY00);
   tolua_function(tolua_S,"setPosition",tolua_stratagus_Widget_setPosition00);
+  tolua_function(tolua_S,"setEnabled",tolua_stratagus_Widget_setEnabled00);
+  tolua_function(tolua_S,"isEnabled",tolua_stratagus_Widget_isEnabled00);
   tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor00);
   tolua_function(tolua_S,"setForegroundColor",tolua_stratagus_Widget_setForegroundColor00);
   tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor00);
@@ -7733,6 +7833,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_ImageButton_new01_local);
   tolua_function(tolua_S,"setNormalImage",tolua_stratagus_ImageButton_setNormalImage00);
   tolua_function(tolua_S,"setPressedImage",tolua_stratagus_ImageButton_setPressedImage00);
+  tolua_function(tolua_S,"setDisabledImage",tolua_stratagus_ImageButton_setDisabledImage00);
   tolua_function(tolua_S,"setHotKey",tolua_stratagus_ImageButton_setHotKey00);
   tolua_function(tolua_S,"setHotKey",tolua_stratagus_ImageButton_setHotKey01);
  tolua_endmodule(tolua_S);
