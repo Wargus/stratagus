@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov 20 14:08:46 2005.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 20 21:10:15 2005.
 */
 
 #ifndef __cplusplus
@@ -2346,25 +2346,18 @@ static int tolua_stratagus_ImageButton_new00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ImageButton",0,&tolua_err) ||
- !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
- !tolua_isusertype(tolua_S,3,"CGraphic",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,4,"CGraphic",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,5,&tolua_err)
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  CGraphic* normalImage = ((CGraphic*)  tolua_tousertype(tolua_S,3,0));
-  CGraphic* pressedImage = ((CGraphic*)  tolua_tousertype(tolua_S,4,0));
  {
-  ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption,normalImage,pressedImage);
+  ImageButton* tolua_ret = (ImageButton*)  new ImageButton();
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageButton");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -2381,28 +2374,139 @@ static int tolua_stratagus_ImageButton_new00_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"ImageButton",0,&tolua_err) ||
- !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
- !tolua_isusertype(tolua_S,3,"CGraphic",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,4,"CGraphic",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,5,&tolua_err)
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  CGraphic* normalImage = ((CGraphic*)  tolua_tousertype(tolua_S,3,0));
-  CGraphic* pressedImage = ((CGraphic*)  tolua_tousertype(tolua_S,4,0));
  {
-  ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption,normalImage,pressedImage);
+  ImageButton* tolua_ret = (ImageButton*)  new ImageButton();
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageButton");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  ImageButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageButton_new01
+static int tolua_stratagus_ImageButton_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageButton",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+ {
+  ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageButton");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_stratagus_ImageButton_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ImageButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageButton_new01_local
+static int tolua_stratagus_ImageButton_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ImageButton",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+ {
+  ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageButton");
  tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
  return 2;
+tolua_lerror:
+ return tolua_stratagus_ImageButton_new00_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setNormalImage of class  ImageButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageButton_setNormalImage00
+static int tolua_stratagus_ImageButton_setNormalImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageButton",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageButton* self = (ImageButton*)  tolua_tousertype(tolua_S,1,0);
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setNormalImage'",NULL);
+#endif
+ {
+  self->setNormalImage(image);
+ }
+ }
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setNormalImage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setPressedImage of class  ImageButton */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ImageButton_setPressedImage00
+static int tolua_stratagus_ImageButton_setPressedImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ImageButton",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ImageButton* self = (ImageButton*)  tolua_tousertype(tolua_S,1,0);
+  CGraphic* image = ((CGraphic*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setPressedImage'",NULL);
+#endif
+ {
+  self->setPressedImage(image);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setPressedImage'.",&tolua_err);
  return 0;
 #endif
 }
@@ -7624,6 +7728,11 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_ImageButton_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_ImageButton_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_ImageButton_new00_local);
+  tolua_function(tolua_S,"new",tolua_stratagus_ImageButton_new01);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_ImageButton_new01_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_ImageButton_new01_local);
+  tolua_function(tolua_S,"setNormalImage",tolua_stratagus_ImageButton_setNormalImage00);
+  tolua_function(tolua_S,"setPressedImage",tolua_stratagus_ImageButton_setPressedImage00);
   tolua_function(tolua_S,"setHotKey",tolua_stratagus_ImageButton_setHotKey00);
   tolua_function(tolua_S,"setHotKey",tolua_stratagus_ImageButton_setHotKey01);
  tolua_endmodule(tolua_S);

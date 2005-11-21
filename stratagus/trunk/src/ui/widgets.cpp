@@ -188,64 +188,49 @@ LuaActionListener::~LuaActionListener()
 
 /**
 **  ImageButton constructor
-**
-**  @param caption  FIXME: docu
-**  @param a        FIXME: docu
-**  @param b        FIXME: docu
 */
-ImageButton::ImageButton(const std::string &caption, gcn::Image *a, gcn::Image *b) :
-	Button(caption)
+ImageButton::ImageButton() :
+	Button(), normalImage(NULL), pressedImage(NULL), hotKey(0)
 {
 	setForegroundColor(0xffffff);
-	normalImage = a;
-	pressedImage = b;
-	hotKey = 0;
-	adjustSize();
+}
+
+/**
+**  ImageButton constructor
+**
+**  @param caption  Caption text
+*/
+ImageButton::ImageButton(const std::string &caption) :
+	Button(caption), normalImage(NULL), pressedImage(NULL), hotKey(0)
+{
+	setForegroundColor(0xffffff);
 }
 
 /**
 **  Draw the image button
 **
-**  @param graphics  FIXME: docu
+**  @param graphics  Graphics object to draw with
 */
 void ImageButton::draw(gcn::Graphics *graphics) 
 {
-	gcn::Color faceColor = getBaseColor();
-	gcn::Color highlightColor, shadowColor;
-	int alpha = getBaseColor().a;
+	if (!normalImage) {
+		Button::draw(graphics);
+		return;
+	}
+
+	gcn::Image *img;
 
 	if (isPressed()) {
-		faceColor = faceColor - 0x303030;
-		faceColor.a = alpha;
-		highlightColor = faceColor - 0x303030;
-		highlightColor.a = alpha;
-		shadowColor = faceColor + 0x303030;
-		shadowColor.a = alpha;
-		graphics->drawImage(pressedImage, 0, 0, 0, 0,
-			pressedImage->getWidth(), pressedImage->getHeight());
+		img = pressedImage ? pressedImage : normalImage;
 	} else if (0 && hasMouse()) {
-		highlightColor = faceColor + 0x303030;
-		highlightColor.a = alpha;
-		shadowColor = faceColor - 0x303030;
-		shadowColor.a = alpha;
+		// FIXME: add mouse-over image
+		img = NULL;
 	} else {
-		highlightColor = faceColor + 0x303030;
-		highlightColor.a = alpha;
-		shadowColor = faceColor - 0x303030;
-		shadowColor.a = alpha;
-		graphics->drawImage(normalImage, 0, 0, 0, 0,
-			normalImage->getWidth(), normalImage->getHeight());
+		img = normalImage;
 	}
-	graphics->setColor(faceColor);
+	graphics->drawImage(img, 0, 0, 0, 0,
+		img->getWidth(), img->getHeight());
     
-	graphics->setColor(highlightColor);
-	graphics->drawLine(0, 0, getWidth() - 1, 0);
-	graphics->drawLine(0, 1, 0, getHeight() - 1);
-    
-	graphics->setColor(shadowColor);
-	graphics->drawLine(getWidth() - 1, 1, getWidth() - 1, getHeight() - 1);
-	graphics->drawLine(1, getHeight() - 1, getWidth() - 1, getHeight() - 1);
-
 	graphics->setColor(getForegroundColor());
 
 	int textX;
@@ -278,14 +263,21 @@ void ImageButton::draw(gcn::Graphics *graphics)
 }
 
 /**
-**  FIXME: docu
+**  Automatically adjust the size of an image button
 */
 void ImageButton::adjustSize()
 {
-	setWidth(normalImage->getWidth());
-	setHeight(normalImage->getHeight());
+	if (normalImage) {
+		setWidth(normalImage->getWidth());
+		setHeight(normalImage->getHeight());
+	} else {
+		Button::adjustSize();
+	}
 }
 
+/**
+**  Check if a key is a hotkey
+*/
 static bool isHotKey(const gcn::Key &key, int hotKey)
 {
 	if (isascii(key.getValue())) {
