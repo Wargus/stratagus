@@ -621,7 +621,7 @@ static void HandleMouseOn(int x, int y)
 		// viewport changed
 		if (UI.MouseViewport != vp) {
 			UI.MouseViewport = vp;
-			DebugPrint("current viewport changed to %d.\n" _C_
+			DebugPrint("current viewport changed to %ld.\n" _C_
 				vp - UI.Viewports);
 		}
 
@@ -1497,7 +1497,7 @@ void UIHandleButtonDown(unsigned button)
 		if ((MouseButtons & LeftButton) &&
 				UI.SelectedViewport != UI.MouseViewport) {
 			UI.SelectedViewport = UI.MouseViewport;
-			DebugPrint("selected viewport changed to %d.\n" _C_
+			DebugPrint("selected viewport changed to %ld.\n" _C_
 				UI.SelectedViewport - UI.Viewports);
 		}
 
