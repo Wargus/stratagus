@@ -304,7 +304,9 @@ function RunWidgetsMenu(s)
   b:adjustSize();
   menu:add(b, 330, 10)
 
-  b = ImageButton("SubMenu", normalImage, pressedImage)
+  b = ImageButton("SubMenu")
+  b:setNormalImage(normalImage)
+  b:setPressedImage(pressedImage)
   b:setActionCallback(RunSubMenu)
   menu:add(b, 330, 50)
 
