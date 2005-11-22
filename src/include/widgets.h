@@ -52,6 +52,12 @@ public:
 	~LuaActionListener();
 };
 
+class ImageWidget : public gcn::Icon
+{
+public:
+	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+};
+
 class ButtonWidget : public gcn::Button 
 {
 public:
@@ -83,10 +89,31 @@ public:
 	int hotKey;
 };
 
-class ImageWidget : public gcn::Icon
+class ImageRadioButton : public gcn::RadioButton
 {
 public:
-	ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+	ImageRadioButton();
+	ImageRadioButton(const std::string &caption, const std::string &group,
+		bool marked);
+
+	virtual void drawBox(gcn::Graphics *graphics);
+	virtual void draw(gcn::Graphics *graphics);
+
+	virtual void mousePress(int x, int y, int button);
+	virtual void mouseRelease(int x, int y, int button);
+	virtual void mouseClick(int x, int y, int button, int count);
+	virtual void adjustSize();
+
+	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
+	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
+	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
+	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
+
+	gcn::Image *uncheckedNormalImage;
+	gcn::Image *uncheckedPressedImage;
+	gcn::Image *checkedNormalImage;
+	gcn::Image *checkedPressedImage;
+	bool mMouseDown;
 };
 
 class ImageCheckBox : public gcn::CheckBox

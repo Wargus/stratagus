@@ -347,6 +347,143 @@ void ImageButton::setHotKey(const char *key)
 
 
 /*----------------------------------------------------------------------------
+--  ImageRadioButton
+----------------------------------------------------------------------------*/
+
+
+/**
+**  ImageRadioButton constructor
+*/
+ImageRadioButton::ImageRadioButton() : gcn::RadioButton(),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	mMouseDown(false)
+{
+}
+
+/**
+**  ImageRadioButton constructor
+*/
+ImageRadioButton::ImageRadioButton(const std::string &caption,
+		const std::string &group, bool marked) :
+	gcn::RadioButton(caption, group, marked),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	mMouseDown(false)
+{
+}
+
+/**
+**  Draw the image radio button (not the caption)
+*/
+void ImageRadioButton::drawBox(gcn::Graphics *graphics)
+{
+	gcn::Image *img = NULL;
+
+	if (isMarked()) {
+		if (mMouseDown) {
+			img = checkedPressedImage;
+		} else {
+			img = checkedNormalImage;
+		}
+	} else {
+		if (mMouseDown) {
+			img = uncheckedPressedImage;
+		} else {
+			img = uncheckedNormalImage;
+		}
+	}
+
+	if (img) {
+		graphics->drawImage(img, 0, 0, 0, (getHeight() - img->getHeight()) / 2,
+			img->getWidth(), img->getHeight());
+	} else {
+		RadioButton::drawBox(graphics);
+	}
+}
+
+/**
+**  Draw the image radio button
+*/
+void ImageRadioButton::draw(gcn::Graphics *graphics)
+{
+	drawBox(graphics);
+
+	graphics->setFont(getFont());
+	graphics->setColor(getForegroundColor());
+
+	int width;
+	if (uncheckedNormalImage) {
+		width = uncheckedNormalImage->getWidth();
+		width += width / 2;
+	} else {
+		width = getHeight();
+		width += width / 2;
+	}
+
+	graphics->drawText(getCaption(), width - 2, 0);
+
+	if (hasFocus()) {
+		graphics->drawRectangle(gcn::Rectangle(width - 4, 0, getWidth() - width + 3, getHeight()));
+	}
+}
+
+/**
+**  Mouse button pressed callback
+*/
+void ImageRadioButton::mousePress(int x, int y, int button)
+{
+	if (button == gcn::MouseInput::LEFT && hasMouse()) {
+		mMouseDown = true;
+	}
+}
+
+/**
+**  Mouse button released callback
+*/
+void ImageRadioButton::mouseRelease(int x, int y, int button)
+{
+	if (button == gcn::MouseInput::LEFT) {
+		mMouseDown = false;
+	}
+}
+
+/**
+**  Mouse clicked callback
+*/
+void ImageRadioButton::mouseClick(int x, int y, int button, int count)
+{
+	if (button == gcn::MouseInput::LEFT) {
+        setMarked(true);
+        generateAction();
+	}
+}
+
+/**
+**  Adjusts the size to fit the image and font size
+*/
+void ImageRadioButton::adjustSize()
+{
+	int width, height;
+
+	height = getFont()->getHeight();
+	if (uncheckedNormalImage) {
+		width = uncheckedNormalImage->getWidth();
+		width += width / 2;
+		if (uncheckedNormalImage->getHeight() > height) {
+			height = uncheckedNormalImage->getHeight();
+		}
+	} else {
+		width = getFont()->getHeight();
+		width += width / 2;
+	}
+
+	setHeight(height);
+	setWidth(getFont()->getWidth(mCaption) + width);
+}
+
+
+/*----------------------------------------------------------------------------
 --  ImageCheckbox
 ----------------------------------------------------------------------------*/
 
@@ -458,7 +595,7 @@ void ImageCheckBox::mouseClick(int x, int y, int button, int count)
 }
 
 /**
-**  Adjusts the CheckBox size to fit the font size
+**  Adjusts the size to fit the image and font size
 */
 void ImageCheckBox::adjustSize()
 {
