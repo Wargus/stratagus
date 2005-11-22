@@ -105,6 +105,11 @@ Widget.setActionCallback = function(w, f)
 end 
 $]
 
+class ImageWidget : public Widget
+{
+	ImageWidget(CGraphic *image);
+};
+
 class ButtonWidget : public Widget
 {
 	ButtonWidget(const std::string &caption);
@@ -125,9 +130,29 @@ class ImageButton : public Widget
 	void setHotKey(const char *key);
 };
 
-class ImageWidget : public Widget
+class RadioButton : public Widget
 {
-	ImageWidget(CGraphic *image);
+	RadioButton();
+	RadioButton(const std::string &caption, const std::string &group, bool marked = false);
+
+	virtual bool isMarked();
+	virtual void setMarked(bool marked);
+	virtual const std::string &getCaption() const;
+	virtual void setCaption(const std::string &caption);
+	virtual void setGroup(const std::string &group);
+	virtual const std::string &getGroup() const;
+	virtual void adjustSize();
+};
+
+class ImageRadioButton : public RadioButton
+{
+	ImageRadioButton();
+	ImageRadioButton(const std::string &caption, const std::string &group, bool marked = false);
+
+	void setUncheckedNormalImage(CGraphic *image);
+	void setUncheckedPressedImage(CGraphic *image);
+	void setCheckedNormalImage(CGraphic *image);
+	void setCheckedPressedImage(CGraphic *image);
 };
 
 class CheckBox : public Widget
@@ -187,18 +212,6 @@ class Label : public Widget
 	Label(const std::string &caption);
 	const std::string &getCaption() const;
 	void setCaption(const std::string &caption);
-	virtual void adjustSize();
-};
-
-class RadioButton : public Widget
-{
-	RadioButton(const std::string &caption, const std::string &group, bool marked = false);
-	virtual bool isMarked();
-	virtual void setMarked(bool marked);
-	virtual const std::string &getCaption() const;
-	virtual void setCaption(const std::string &caption);
-	virtual void setGroup(const std::string &group);
-	virtual const std::string &getGroup() const;
 	virtual void adjustSize();
 };
 
