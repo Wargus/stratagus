@@ -84,20 +84,4 @@ DefineUnitType("unit-gen", {
 		"dead", "gen-dead"}
 	})
 
-DefineAnimations("animations-elitebuild2", {
-    Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
-        "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
-        "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
-    })
-
-DefineUnitType("build-dead-body2", {
-	Name = "GeneratorCrater",
-	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
-	Animations = "animations-elitebuild2", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10,
-	TileSize = {2, 2}, BoxSize = {60, 60}, SightRange = 1,
-	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, Type = "land", Building = true, Vanishes = true
-	})
-
 DefineAllow("unit-gen", "AAAAAAAAAAAAAAAA")
