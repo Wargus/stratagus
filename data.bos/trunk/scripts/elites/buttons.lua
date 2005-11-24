@@ -196,7 +196,7 @@ DefineButton({
 DefineButton({
 	Pos = 2, Level = 0, Icon = "icon-harvester",
 	Action = "train-unit", Value = "unit-harvester",
-	Allowed = "check-no-research", Key = "h", Hint = "BUILD MINERAL ~!HARVESTER",
+	Key = "h", Hint = "BUILD MINERAL ~!HARVESTER",
 	ForUnit = {"unit-vfac"}})
 
 
