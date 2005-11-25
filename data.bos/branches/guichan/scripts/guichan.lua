@@ -127,6 +127,17 @@ function BosMenu(title)
     return b
   end
 
+  function menu:addDropDown(list, x, y, callback)
+    local dd = DropDownWidget()
+    dd:setFont(CFont:Get("game"))
+    dd:setList(list)
+    dd:setActionCallback(function(s) callback(dd, s) end)
+    dd:setBaseColor(dark)
+    dd:setForegroundColor(clear)
+    dd:setBackgroundColor(dark)
+    self:add(dd, x, y)
+  end
+
   function menu:writeText(text, x, y)
     local label = Label(text)
     label:setFont(CFont:Get("game"))
@@ -160,6 +171,10 @@ function RunSubMenu(s)
   menu:run()
 end
 
+difficulty = 5
+mapresources = 5
+startingresources = 5
+
 function RunStartGameMenu(s)
   local menu
   menu = BosMenu("Start Game")
@@ -173,6 +188,17 @@ function RunStartGameMenu(s)
   fow:setMarked(true)
   local revealmap = menu:addCheckBox("Reveal map", 25, 230, function() end)
   
+  menu:writeText("Difficulty:", 20, Video.Height*11/20)
+  menu:addDropDown({"easy", "normal", "hard"}, 120, Video.Height*11/20 + 7,
+      function(dd) difficulty = (5 - dd:getSelected()*2) end)
+  menu:writeText("Map richness:", 20, Video.Height*12/20)
+  menu:addDropDown({"high", "normal", "low"}, 140, Video.Height*12/20 + 7,
+      function(dd) mapresources = (5 - dd:getSelected()*2) end)
+  menu:writeText("Starting resources:", 20, Video.Height*13/20)
+  menu:addDropDown({"high", "normal", "low"}, 170, Video.Height*13/20 + 7,
+      function(dd) startingresources = (5 - dd:getSelected()*2) end)
+
+
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
       print(description)
@@ -197,7 +223,7 @@ function RunStartGameMenu(s)
     StartMap("maps/" .. browser:getSelectedItem())
     menu:stop()
   end
-  menu:addButton("Start", 100, 350, startgamebutton)
+  menu:addButton("Start", 20, Video.Height - 100, startgamebutton)
 
   menu:run()
   PresentMap = OldPresentMap
