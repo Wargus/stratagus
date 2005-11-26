@@ -65,12 +65,12 @@ MakeSound("dev-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
 
 DefineUnitType("unit-vault", {
 	Name = "Vault",
-	Image = {"file", "units/vault/vault.png", "size", {200, 200}},
-	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {200, 200}},
+	Image = {"file", "units/vault/vault.png", "size", {256, 256}},
+	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {256, 256}},
 	Animations = "animations-vault", Icon = "icon-vault",
 	Costs = {"time", 150, "titanium", 1000, "crystal", 1000},
 	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-vault",
-	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {5, 4}, BoxSize = {164, 132},
+	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {6, 6}, BoxSize = {196, 164},
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
 	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
