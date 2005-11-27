@@ -622,7 +622,7 @@ static void HandleMouseOn(int x, int y)
 		if (UI.MouseViewport != vp) {
 			UI.MouseViewport = vp;
 			DebugPrint("current viewport changed to %ld.\n" _C_
-				vp - UI.Viewports);
+				static_cast<long int>(vp - UI.Viewports));
 		}
 
 		// Note cursor on map can be in scroll area
@@ -1498,7 +1498,7 @@ void UIHandleButtonDown(unsigned button)
 				UI.SelectedViewport != UI.MouseViewport) {
 			UI.SelectedViewport = UI.MouseViewport;
 			DebugPrint("selected viewport changed to %ld.\n" _C_
-				UI.SelectedViewport - UI.Viewports);
+				static_cast<long int>(UI.SelectedViewport - UI.Viewports));
 		}
 
 		// to redraw the cursor immediately (and avoid up to 1 sec delay
