@@ -32,7 +32,7 @@ DefineAnimations("animations-cannon", {
     Attack = {"unbreakable begin", "frame 5", "wait 5", 
               "frame 5", "sound bazoo-attack", "attack", "wait 1",
               "frame 10", "wait 15",
-              "frame 5", "unbreakable end", "wait 1", },
+              "frame 5", "wait 20", "frame 5", "unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 10", "unbreakable end", "wait 50", },
     })
 
@@ -63,6 +63,13 @@ DefineConstruction("construction-cannon", {
 	}
 })
 
+DefineMissileType("missile-cannon", {
+	File = "units/cannon/weapon.png",
+	Size = {128, 128}, Frames = 8, NumDirections = 1,
+	ImpactSound = "rocket-impact", DrawLevel = 150,
+	Class = "missile-class-point-to-point", Sleep = 1, 
+	Speed = 20, Range = 3})
+
 DefineUnitType("unit-cannon", {
 	Name = "Cannon",
 	Image = {"file", "units/cannon/cannon.png", "size", {128, 128},},
@@ -76,8 +83,8 @@ DefineUnitType("unit-cannon", {
         BoxSize = {64, 58},
 	SightRange = 6, ComputerReactionRange = 16, PersonReactionRange = 6, 
         Armor = 10,
-	BasicDamage = 4, PiercingDamage = 0, MaxAttackRange = 26, 
-        Missile = "missile-none",
+	BasicDamage = 6, PiercingDamage = 6, MaxAttackRange = 26, 
+        Missile = "missile-cannon",
 	Priority = 20, AnnoyComputerFactor = 45, Points = 100,
 	ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
