@@ -113,41 +113,6 @@ DefineButton({
         ForUnit = {"unit-engineer"}})
         
 DefineButton({
-	Pos = 2, Level = 1, Icon = "icon-gen_b", Action = "build",
-	Value = "unit-gen", Key = "g", Hint = "BUILD ~!GENERATOR",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
-	Pos = 1, Level = 2, Icon = "icon-camp_b", Action = "build",
-	Value = "unit-camp", Key = "c", Hint = "BUILD TRAINING ~!CAMP",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
-	Pos = 7, Level = 2, Icon = "icon-dev_b", Action = "build",
-	Value = "unit-dev-yard", Key = "d", Hint = "BUILD ~!DEVELOPMENT YARD",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
-	Pos = 6, Level = 1, Icon = "icon-rfac_b", Action = "build",
-	Value = "unit-rfac", Key = "f", Hint = "BUILD RESEARCH ~!FACILITY",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
-	Pos = 2, Level = 2, Icon = "icon-hosp_b", Action = "build",
-	Value = "unit-hosp", Key = "h", Hint = "BUILD ~!HOSPITAL",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
-	Pos = 3, Level = 2, Icon = "icon-vfac_b", Action = "build",
-	Value = "unit-vfac", Key = "v", Hint = "BUILD ~!VEHICLE FACTORY",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
-	Pos = 4, Level = 3, Icon = "icon-msilo_b", Action = "build",
-	Value = "unit-msilo", Key = "m", Hint = "BUILD ~!MISSILE SILO",
-	ForUnit = {"unit-engineer"}})
-
-DefineButton({
 	Pos = 9, Level = 1, Icon = "icon-cancel", Action = "button",
 	Value = 0, Key = "\027", Hint = "~<ESC~> CANCEL",
 	ForUnit = {"unit-engineer"}})

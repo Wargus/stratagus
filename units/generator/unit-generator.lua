@@ -85,3 +85,9 @@ DefineUnitType("unit-gen", {
 	})
 
 DefineAllow("unit-gen", "AAAAAAAAAAAAAAAA")
+
+DefineButton({
+	Pos = 2, Level = 1, Icon = "icon-gen_b", Action = "build",
+	Value = "unit-gen", Key = "g", Hint = "BUILD ~!GENERATOR",
+	ForUnit = {"unit-engineer"}})
+

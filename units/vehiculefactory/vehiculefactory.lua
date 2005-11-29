@@ -98,3 +98,7 @@ DefineUnitType("build-dead-body6", {
 
 DefineAllow("unit-vfac", "AAAAAAAAAAAAAAAA")
 
+DefineButton({
+	Pos = 3, Level = 2, Icon = "icon-vfac_b", Action = "build",
+	Value = "unit-vfac", Key = "v", Hint = "BUILD ~!VEHICLE FACTORY",
+	ForUnit = {"unit-engineer"}})

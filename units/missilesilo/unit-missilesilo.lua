@@ -89,3 +89,8 @@ DefineUnitType("build-dead-msilo", {
 
 DefineAllow("unit-msilo", "AAAAAAAAAAAAAAAA")
 
+DefineButton({
+	Pos = 4, Level = 3, Icon = "icon-msilo_b", Action = "build",
+	Value = "unit-msilo", Key = "m", Hint = "BUILD ~!MISSILE SILO",
+	ForUnit = {"unit-engineer"}})
+

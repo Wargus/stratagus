@@ -99,4 +99,9 @@ DefineUnitType("build-dead-body4", {
 
 DefineAllow("unit-rfac", "AAAAAAAAAAAAAAAA")
 
+DefineButton({
+	Pos = 6, Level = 1, Icon = "icon-rfac_b", Action = "build",
+	Value = "unit-rfac", Key = "f", Hint = "BUILD RESEARCH ~!FACILITY",
+	ForUnit = {"unit-engineer"}})
+
 
