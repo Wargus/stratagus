@@ -92,7 +92,7 @@ DefineButton({
 
 DefineButton({
 	Pos = 7, Level = 0, Icon = "icon-build-lvl1", Action = "button",
-	Value = 1, Key = "b", Hint = "~!BUILD STRUCTURES",
+	Value = 1, Key = "b", Hint = "BUILD ~!BASIC STRUCTURES",
 	ForUnit = {"unit-engineer"}})
 
 DefineButton({
@@ -109,7 +109,7 @@ DefineButton({
 
 DefineButton({
         Pos = 1, Level = 1, Icon = "icon-vault", Action = "build",
-        Value = "unit-vault", Key = "a", Hint = "BUILD V~!AULT",
+        Value = "unit-vault", Key = "v", Hint = "BUILD ~!VAULT",
         ForUnit = {"unit-engineer"}})
         
 DefineButton({
