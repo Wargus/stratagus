@@ -101,4 +101,9 @@ DefineUnitType("build-dead-camp", {
 
 DefineAllow("unit-camp", "AAAAAAAAAAAAAAAA")
 
+DefineButton({
+	Pos = 1, Level = 2, Icon = "icon-camp_b", Action = "build",
+	Value = "unit-camp", Key = "c", Hint = "BUILD TRAINING ~!CAMP",
+	ForUnit = {"unit-engineer"}})
+
 

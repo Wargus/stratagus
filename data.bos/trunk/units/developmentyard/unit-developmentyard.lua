@@ -91,3 +91,8 @@ DefineUnitType("build-dead-body1", {
 
 DefineAllow("unit-dev-yard", "AAAAAAAAAAAAAAAA")
 
+DefineButton({
+	Pos = 7, Level = 2, Icon = "icon-dev_b", Action = "build",
+	Value = "unit-dev-yard", Key = "d", Hint = "BUILD ~!DEVELOPMENT YARD",
+	ForUnit = {"unit-engineer"}})
+

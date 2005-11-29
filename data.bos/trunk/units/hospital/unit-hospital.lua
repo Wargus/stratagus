@@ -95,3 +95,7 @@ DefineUnitType("build-dead-body5", {
 
 DefineAllow("unit-hosp", "AAAAAAAAAAAAAAAA")
 
+DefineButton({
+	Pos = 2, Level = 2, Icon = "icon-hosp_b", Action = "build",
+	Value = "unit-hosp", Key = "h", Hint = "BUILD ~!HOSPITAL",
+	ForUnit = {"unit-engineer"}})
