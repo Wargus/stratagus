@@ -1256,11 +1256,12 @@ static int CclGetUnitVariable(lua_State *l)
 	const CUnit *unit;
 	int index;
 
-	lua_pushvalue(l, 1);
 	LuaCheckArgs(l, 2);
+
+	lua_pushvalue(l, 1);
+	unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
-	unit = CclGetUnit(l);
 	index = GetVariableIndex(LuaToString(l, 2));
 	if (index == -1) {
 		LuaError(l, "Bad variable name '%s'\n" _C_ LuaToString(l, 2));
