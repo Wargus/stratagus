@@ -27,6 +27,99 @@
 --
 --      $Id$
 
+
+function RunSpeedOptionsMenu(s)
+  local menu
+  local b
+  local offx = (Video.Width - 256) / 2
+  local offy = (Video.Height - 288) / 2
+  local speed
+
+  menu = BosMenu("Speed Options")
+
+  b = Label("Game Speed")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:add(b, offx + 16, offy + 36 * 1)
+
+  local gamespeedslider = Slider(50, 250)
+  gamespeedslider:setValue(0) --FIXME
+  gamespeedslider:setActionCallback(function() fixme(gamespeedslider:getValue()) end)
+  gamespeedslider:setWidth(198)
+  gamespeedslider:setHeight(18)
+  gamespeedslider:setBaseColor(dark)
+  gamespeedslider:setForegroundColor(clear)
+  gamespeedslider:setBackgroundColor(clear)
+  menu:add(gamespeedslider, offx + 32, offy + 36 * 1.5)
+
+  b = Label("slow")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:addCentered(b, offx + 34, offy + 36 * 2 + 6)
+  
+  b = Label("fast")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:addCentered(b, offx + 230, offy + 36 * 2 + 6)
+
+  b = Label("Mouse Scroll")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:add(b, offx + 16, offy + 36 * 3)
+
+  local mousescrollslider = Slider(0, 10)
+  if (GetMouseScroll()) then speed = GetMouseScrollSpeed() else speed = 0 end
+  mousescrollslider:setValue(10 - speed)
+  mousescrollslider:setActionCallback(function() SetMouseScrollSpeed(10 - mousescrollslider:getValue()) end)
+  mousescrollslider:setWidth(198)
+  mousescrollslider:setHeight(18)
+  mousescrollslider:setBaseColor(dark)
+  mousescrollslider:setForegroundColor(clear)
+  mousescrollslider:setBackgroundColor(clear)
+  menu:add(mousescrollslider, offx + 32, offy + 36 * 3.5)
+
+  b = Label("off")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:addCentered(b, offx + 34, offy + 36 * 4 + 6)
+  
+  b = Label("fast")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:addCentered(b, offx + 230, offy + 36 * 4 + 6)
+
+  b = Label("Keyboard Scroll")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:add(b, offx + 16, offy + 36 * 5)
+
+  local keyboardscrollslider = Slider(0, 10)
+  if (GetKeyScroll()) then speed = GetKeyScrollSpeed() else speed = 0 end
+  keyboardscrollslider:setValue(10 - speed)
+  keyboardscrollslider:setActionCallback(function() SetKeyScrollSpeed(10 - keyboardscrollslider:getValue()) end)
+  keyboardscrollslider:setWidth(198)
+  keyboardscrollslider:setHeight(18)
+  keyboardscrollslider:setBaseColor(dark)
+  keyboardscrollslider:setForegroundColor(clear)
+  keyboardscrollslider:setBackgroundColor(clear)
+  menu:add(keyboardscrollslider, offx + 32, offy + 36 * 5.5)
+
+  b = Label("off")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:addCentered(b, offx + 34, offy + 36 * 6 + 6)
+  
+  b = Label("fast")
+  b:setFont(CFont:Get("game"))
+  b:adjustSize();
+  menu:addCentered(b, offx + 230, offy + 36 * 6 + 6)
+
+  menu:addButton("~!OK", offx + 128 - (200 / 2), offy + 245,
+    function() SavePreferences(); menu:stop() end)
+
+  menu:run()
+end
+
 function RunSoundOptionsMenu(s)
   local menu
   local b
@@ -158,8 +251,9 @@ end
 
 function BuildOptionsMenu(menu)
   local x = Video.Width / 2 - 100
-  menu:addButton("~!Sound", x, 140, RunSoundOptionsMenu)
-  menu:addButton("~!Video", x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
+  menu:addButton("Sound", x, 140, RunSoundOptionsMenu)
+  menu:addButton("Video", x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
+  menu:addButton("Speed", x, 220, RunSpeedOptionsMenu)
 end
 
 function RunOptionsMenu(s)
