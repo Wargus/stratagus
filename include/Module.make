@@ -31,7 +31,8 @@ MHDRS =  actions.h ai.h animation.h campaign.h commands.h construct.h \
          iocompat.h iolib.h map.h master.h menus.h minimap.h missile.h \
          movie.h myendian.h net_lowlevel.h netconnect.h network.h \
          pathfinder.h player.h script.h script_sound.h settings.h sound.h \
-         sound_server.h spells.h tileset.h trigger.h ui.h unit.h unitsound.h \
-         unittype.h upgrade.h upgrade_structs.h util.h video.h wav.h widgets.h
+         sound_server.h spells.h tileset.h translate.h trigger.h ui.h unit.h 
+         unitsound.h unittype.h upgrade.h upgrade_structs.h util.h video.h \
+         wav.h widgets.h
 
 HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))
