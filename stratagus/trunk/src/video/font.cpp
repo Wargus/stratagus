@@ -713,14 +713,14 @@ void CFont::MeasureWidths()
 	Uint32 ckey;
 	int ipr;  // images per row
 
-	this->CharWidth = new char[this->G->GraphicWidth / this->G->Width *
-		this->G->GraphicHeight / this->G->Height];
+	int maxy = this->G->GraphicWidth / this->G->Width * this->G->GraphicHeight / this->G->Height;
+	this->CharWidth = new char[maxy];
+	memset(this->CharWidth, 0, maxy);
 	this->CharWidth[0] = this->G->Width / 2;  // a reasonable value for SPACE
 	ckey = this->G->Surface->format->colorkey;
 	ipr = this->G->Surface->w / this->G->Width;
 
 	SDL_LockSurface(this->G->Surface);
-	int maxy = this->G->GraphicWidth / this->G->Width * this->G->GraphicHeight / this->G->Height;
 	for (int y = 1; y < maxy; ++y) {
 		sp = (const unsigned char *)this->G->Surface->pixels +
 			(y / ipr) * this->G->Surface->pitch * this->G->Height +
