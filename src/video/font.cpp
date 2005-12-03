@@ -166,6 +166,58 @@ void GetDefaultTextColors(char **normalp, char **reversep)
 }
 
 /**
+**  Get the next utf8 character from a string
+*/
+static bool GetUTF8(const char *&text, int &utf8)
+{
+	// end of string
+	if (!*text) {
+		return false;
+	}
+
+	int count;
+	char c = *text++;
+
+	// ascii
+	if (!(c & 0x80)) {
+		utf8 = c;
+		return true;
+	}
+
+	if ((c & 0xE0) == 0xC0) {
+		utf8 = (c & 0x1F);
+		count = 1;
+	} else if ((c & 0xF0) == 0xE0) {
+		utf8 = (c & 0x0F);
+		count = 2;
+	} else if ((c & 0xF8) == 0xF0) {
+		utf8 = (c & 0x07);
+		count = 3;
+	} else if ((c & 0xFC) == 0xF8) {
+		utf8 = (c & 0x03);
+		count = 4;
+	} else if (( c & 0xFE) == 0xFC) {
+		utf8 = (c & 0x01);
+		count = 5;
+	} else {
+		DebugPrint("Invalid utf8\n");
+		return false;
+	}
+
+	while (count--) {
+		c = *text++;
+		if ((c & 0xC0) != 0x80) {
+			DebugPrint("Invalid utf8\n");
+			return false;
+		}
+		utf8 <<= 6;
+		utf8 |= (c & 0x3F);
+	}
+
+	return true;
+}
+
+/**
 **  Returns the pixel width of text.
 **
 **  @param text  Text to calculate the width of.
@@ -175,29 +227,32 @@ void GetDefaultTextColors(char **normalp, char **reversep)
 int CFont::Width(const char *text) const
 {
 	int width;
-	const char *s;
 	bool isformat;
+	int utf8;
 
 	isformat = false;
-	for (width = 0, s = text; *s; ++s) {
-		if (*s == '~') {
-			if (!*++s) {  // bad formatted string
+	width = 0;
+	while (GetUTF8(text, utf8)) {
+		if (utf8 == '~') {
+			if (!*text) {  // bad formatted string
 				break;
 			}
-			if (*s == '<' || *s == '>') {
+			if (*text == '<' || *text == '>') {
 				isformat = false;
+				++text;
 				continue;
 			}
-			if (*s == '!') {
+			if (*text == '!') {
+				++text;
 				continue;
 			}
-			if (*s != '~') { // ~~ -> ~
+			if (*text != '~') { // ~~ -> ~
 				isformat = !isformat;
 				continue;
 			}
 		}
 		if (!isformat) {
-			width += this->CharWidth[*(unsigned char *)s - 32] + 1;
+			width += this->CharWidth[utf8 - 32] + 1;
 		}
 	}
 	return width;
@@ -253,6 +308,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 	int ipr;
 	int c;
 	CGraphic *g;
+	int utf8;
 
 	if (clip) {
 		DrawChar = VideoDrawCharClip;
@@ -265,9 +321,11 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 #else
 	g = FontColorGraphics[font][FontColor];
 #endif
-	for (rev = NULL, widths = 0; *text; ++text) {
-		if (*text == '~') {
-			switch (*++text) {
+	rev = NULL;
+	widths = 0;
+	while (GetUTF8(text, utf8)) {
+		if (utf8 == '~') {
+			switch (*text) {
 				case '\0':  // wrong formatted string.
 					DebugPrint("oops, format your ~\n");
 					return widths;
@@ -280,6 +338,9 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 					g = FontColorGraphics[font][FontColor];
 #endif
 					++text;
+					if (!GetUTF8(text, utf8)) {
+						continue;
+					}
 					break;
 				case '<':
 					LastTextColor = FontColor;
@@ -287,6 +348,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 #ifdef USE_OPENGL
 					g = FontColorGraphics[font][FontColor];
 #endif
+					++text;
 					continue;
 				case '>':
 					rev = LastTextColor;  // swap last and current color
@@ -295,6 +357,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 #ifdef USE_OPENGL
 					g = FontColorGraphics[font][FontColor];
 #endif
+					++text;
 					continue;
 
 				default:
@@ -309,7 +372,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 					color = new char[p - text + 1];
 					memcpy(color, text, p - text);
 					color[p - text] = '\0';
-					text = p;
+					text = p + 1;
 					LastTextColor = FontColor;
 					FontColor = CFontColor::Get(color);
 #ifdef USE_OPENGL
@@ -320,7 +383,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 			}
 		}
 
-		c = *(unsigned char *)text - 32;
+		c = utf8 - 32;
 		Assert(c >= 0);
 
 		ipr = font->G->GraphicWidth / font->G->Width;
@@ -650,12 +713,15 @@ void CFont::MeasureWidths()
 	Uint32 ckey;
 	int ipr;  // images per row
 
+	this->CharWidth = new char[this->G->GraphicWidth / this->G->Width *
+		this->G->GraphicHeight / this->G->Height];
 	this->CharWidth[0] = this->G->Width / 2;  // a reasonable value for SPACE
 	ckey = this->G->Surface->format->colorkey;
 	ipr = this->G->Surface->w / this->G->Width;
 
 	SDL_LockSurface(this->G->Surface);
-	for (int y = 1; y < 207; ++y) {
+	int maxy = this->G->GraphicWidth / this->G->Width * this->G->GraphicHeight / this->G->Height;
+	for (int y = 1; y < maxy; ++y) {
 		sp = (const unsigned char *)this->G->Surface->pixels +
 			(y / ipr) * this->G->Surface->pitch * this->G->Height +
 			(y % ipr) * this->G->Width - 1;

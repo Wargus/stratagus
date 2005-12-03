@@ -572,7 +572,7 @@ void MenuLoop(const char *filename, CMap *map)
 			CreateGame(filename, map);
 
 			UI.StatusLine.Set(NameLine);
-			SetMessage("Do it! Do it now!");
+			SetMessage(_("Do it! Do it now!"));
 			//
 			//  Play the game.
 			//
@@ -803,7 +803,7 @@ void Exit(int err)
 	lua_close(Lua);
 #endif
 
-	fprintf(stdout, "Thanks for playing Stratagus.\n");
+	fprintf(stdout, _("Thanks for playing Stratagus.\n"));
 	exit(err);
 }
 

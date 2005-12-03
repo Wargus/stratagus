@@ -46,3 +46,6 @@ $pfile "unittype.pkg"
 $pfile "unit.pkg"
 $pfile "sound.pkg"
 
+extern void AddTranslation(const char *str1, const char *str2);
+extern void LoadPO(const char *file);
+

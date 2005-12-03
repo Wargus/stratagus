@@ -26,8 +26,9 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/stratagus
-MSRC =   script.cpp script_player.cpp stratagus.cpp construct.cpp groups.cpp iolib.cpp \
-         mainloop.cpp player.cpp selection.cpp spells.cpp script_spell.cpp util.cpp \
-         script_missile.cpp missile.cpp
+MSRC =   construct.cpp groups.cpp iolib.cpp mainloop.cpp missile.cpp \
+         player.cpp script.cpp script_missile.cpp script_player.cpp \
+         script_spell.cpp selection.cpp spells.cpp stratagus.cpp translate.cpp \
+         util.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
