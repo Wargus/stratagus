@@ -103,7 +103,7 @@ void LoadPO(const char *file)
 
 	// skip 0xEF utf8 intro if found
 	char c = fgetc(fd);
-	if (c == 0xEF) {
+	if (c == (char)0xEF) {
 		fgetc(fd);
 		fgetc(fd);
 	} else {
