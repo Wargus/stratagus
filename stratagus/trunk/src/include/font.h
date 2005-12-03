@@ -71,12 +71,11 @@ class CGraphic;
 	/// Font definition
 class CFont : public gcn::Font {
 private:
-	CFont(const char *ident) : Ident(new_strdup(ident)), G(NULL) {
-		memset(CharWidth, 0, sizeof(CharWidth));
-	}
+	CFont(const char *ident) : Ident(new_strdup(ident)), CharWidth(NULL),
+		G(NULL) {}
 
 public:
-	~CFont() {delete [] Ident;};
+	~CFont() {delete[] Ident; delete[] CharWidth;};
 
 
 	static CFont *New(const char *ident, CGraphic *g);
@@ -95,7 +94,7 @@ public:
 	void MeasureWidths();
 
 	char *Ident;          /// Ident of the font.
-	char CharWidth[208];  /// Real font width (starting with ' ')
+	char *CharWidth;      /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
 };
 

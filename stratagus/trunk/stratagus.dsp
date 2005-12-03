@@ -603,6 +603,10 @@ SOURCE=.\src\stratagus\stratagus.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\stratagus\translate.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\stratagus\util.cpp
 # End Source File
 # End Group
@@ -912,6 +916,10 @@ SOURCE=.\src\include\tileset.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\include\translate.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\include\trigger.h
 # End Source File
 # Begin Source File
@@ -949,6 +957,10 @@ SOURCE=.\src\include\video.h
 # Begin Source File
 
 SOURCE=.\src\include\wav.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\include\widgets.h
 # End Source File
 # End Group
 # Begin Group "guichan."
