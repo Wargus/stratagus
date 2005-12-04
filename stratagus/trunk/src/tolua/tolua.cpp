@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Thu Dec  1 21:29:32 2005.
+** Generated automatically by tolua++-1.0.7 on Sat Dec  3 18:54:41 2005.
 */
 
 #ifndef __cplusplus
@@ -7942,6 +7942,35 @@ static int tolua_stratagus_StopMusic00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: Translate */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Translate00
+static int tolua_stratagus_Translate00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+ {
+  const char* tolua_ret = (const char*)  Translate(str);
+ tolua_pushstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Translate'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: AddTranslation */
 #ifndef TOLUA_DISABLE_tolua_stratagus_AddTranslation00
 static int tolua_stratagus_AddTranslation00(lua_State* tolua_S)
@@ -7995,6 +8024,35 @@ static int tolua_stratagus_LoadPO00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'LoadPO'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: Translate */
+#ifndef TOLUA_DISABLE_tolua_stratagus__00
+static int tolua_stratagus__00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+ {
+  const char* tolua_ret = (const char*)  Translate(str);
+ tolua_pushstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function '_'.",&tolua_err);
  return 0;
 #endif
 }
@@ -8529,8 +8587,10 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"IsMusicEnabled",tolua_stratagus_IsMusicEnabled00);
  tolua_function(tolua_S,"PlayMusic",tolua_stratagus_PlayMusic00);
  tolua_function(tolua_S,"StopMusic",tolua_stratagus_StopMusic00);
+ tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
  tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
  tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
+ tolua_function(tolua_S,"_",tolua_stratagus__00);
  tolua_endmodule(tolua_S);
  return 1;
 }
