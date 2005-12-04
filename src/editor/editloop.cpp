@@ -1335,7 +1335,7 @@ static void EditorCallbackButtonDown(unsigned button)
 						UnitPlacedThisPress = 1;
 						UI.StatusLine.Clear();
 					} else {
-						UI.StatusLine.Set("Unit can't be placed here.");
+						UI.StatusLine.Set(_("Unit can't be placed here."));
 						PlayGameSound(GameSounds.PlacementError.Sound,
 							MaxSampleVolume);
 					}
@@ -1390,7 +1390,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				break;
 			}
 			if (EditorSaveMenu() != -1) {
-				UI.StatusLine.Set("Map saved");
+				UI.StatusLine.Set(_("Map saved"));
 			}
 			InterfaceState = IfaceStateNormal;
 			break;
@@ -1422,13 +1422,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				}
 				switch (MirrorEdit) {
 					case 1:
-						UI.StatusLine.Set("Mirror editing enabled: 2-side");
+						UI.StatusLine.Set(_("Mirror editing enabled: 2-side"));
 						break;
 					case 2:
-						UI.StatusLine.Set("Mirror editing enabled: 4-side");
+						UI.StatusLine.Set(_("Mirror editing enabled: 4-side"));
 						break;
 					default:
-						UI.StatusLine.Set("Mirror editing disabled");
+						UI.StatusLine.Set(_("Mirror editing disabled"));
 						break;
 				  }
 			}
@@ -1448,7 +1448,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				UnitLost(unit);
 				UnitClearOrders(unit);
 				unit->Release();
-				UI.StatusLine.Set("Unit deleted");
+				UI.StatusLine.Set(_("Unit deleted"));
 			}
 			break;
 
@@ -1475,7 +1475,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case '0':
 			if (UnitUnderCursor) {
 				UnitUnderCursor->ChangeOwner(&Players[PlayerNumNeutral]);
-				UI.StatusLine.Set("Unit controler modified");
+				UI.StatusLine.Set(_("Unit owner modified"));
 			}
 			break;
 		case '1': case '2':
@@ -1484,7 +1484,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case '9':
 			if (UnitUnderCursor && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(&Players[(int) key - '1']);
-				UI.StatusLine.Set("Unit controler modified");
+				UI.StatusLine.Set(_("Unit owner modified"));
 			}
 			break;
 
@@ -1813,7 +1813,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set("Select mode");
+		UI.StatusLine.Set(_("Select mode"));
 		return;
 	}
 	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorX &&
@@ -1823,7 +1823,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set("Unit mode");
+		UI.StatusLine.Set(_("Unit mode"));
 		return;
 	}
 	if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorX &&
@@ -1833,7 +1833,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = TileButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set("Tile mode");
+		UI.StatusLine.Set(_("Tile mode"));
 		return;
 	}
 	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorX &&
@@ -1843,7 +1843,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set("Set start location mode");
+		UI.StatusLine.Set(_("Set start location mode"));
 		return;
 	}
 	if (UI.MenuButton.X != -1) {

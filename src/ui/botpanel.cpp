@@ -802,7 +802,7 @@ void CButtonPanel::DoClicked(int button)
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
 			UI.ButtonPanel.Update();
-			UI.StatusLine.Set("Select Target");
+			UI.StatusLine.Set(_("Select Target"));
 			break;
 		case ButtonReturn:
 			for (i = 0; i < NumSelected; ++i) {

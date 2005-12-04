@@ -1395,7 +1395,7 @@ static void SaveGameOk(void)
 
 		if (access(TempPathBuf,F_OK)) {
 			SaveGame(TempPathBuf);
-			SetMessage("Saved game to: %s", TempPathBuf);
+			SetMessage(_("Saved game to: %s"), TempPathBuf);
 			CloseMenu();
 		} else {
 			ProcessMenu("menu-save-confirm", 0);
@@ -1482,7 +1482,7 @@ static void LoadGameOk(void)
 	SaveGameLoading = 1;
 	LoadGame(TempPathBuf);
 	Callbacks = &GameCallbacks;
-	SetMessage("Loaded game: %s", TempPathBuf);
+	SetMessage(_("Loaded game: %s"), TempPathBuf);
 	GuiGameStarted = 1;
 	GameMenuReturn();
 	SelectedFileExist = 0;
@@ -1538,7 +1538,7 @@ static void SaveConfirmOk(void)
 		strcat(TempPathBuf, ".sav");
 	}
 	SaveGame(TempPathBuf);
-	SetMessage("Saved game to: %s", TempPathBuf);
+	SetMessage(_("Saved game to: %s"), TempPathBuf);
 	GameMenuReturn();
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
