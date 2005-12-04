@@ -769,7 +769,7 @@ static void DrawUnitInfo(CUnit *unit)
 	for (i = 1; i < MaxCosts; ++i) {
 		if (type->CanStore[i]) {
 			if (vpos == 77) {
-				VideoDrawText(x + 20, y + 8 + 61, GameFont, "Production");
+				VideoDrawText(x + 20, y + 8 + 61, GameFont, _("Production"));
 			}
 			sprintf(buf, "%s:", DefaultResourceNames[i]);
 			VideoDrawText(x + 78 - GameFont->Width(buf),
@@ -1043,7 +1043,7 @@ static int CheckRepeatMessage(const char *msg)
 		n = MessagesSameCount;
 		MessagesSameCount = 0;
 		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
-		sprintf(temp, "Last message repeated ~<%d~> times", n + 1);
+		sprintf(temp, _("Last message repeated ~<%d~> times"), n + 1);
 		AddMessage(temp);
 	}
 	return 0;
@@ -1117,7 +1117,7 @@ void CenterOnMessage(void)
 	UI.SelectedViewport->Center(
 		MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex],
 		TileSizeX / 2, TileSizeY / 2);
-	SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
+	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }
 
