@@ -196,7 +196,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
 		player->Notify(NotifyGreen, unit->X, unit->Y,
-			"Upgrade to %s canceled", newtype->Name);
+			_("Upgrade to %s canceled"), newtype->Name);
 		return ;
 	}
 	//  Warn AI.
@@ -204,7 +204,7 @@ void HandleActionUpgradeTo(CUnit *unit)
 		AiUpgradeToComplete(unit, newtype);
 	}
 	player->Notify(NotifyGreen, unit->X, unit->Y,
-		"Upgrade to %s complete", unit->Type->Name);
+		_("Upgrade to %s complete"), unit->Type->Name);
 }
 
 //@}

@@ -100,7 +100,7 @@ void HandleActionResearch(CUnit *unit)
 			upgrade->Costs[TimeCost]) {
 
 		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
-			"%s: complete", unit->Type->Name);
+			_("%s: complete"), unit->Type->Name);
 		if (unit->Player->AiEnabled) {
 			AiResearchComplete(unit, upgrade);
 		}

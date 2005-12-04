@@ -81,7 +81,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		//
 		for (i = 1; i < MaxCosts; ++i) {
 			if (player->Resources[i] < goal->Type->RepairCosts[i]) {
-				snprintf(buf, 100, "We need more %s for repair!",
+				snprintf(buf, 100, _("We need more %s for repair!"),
 					DefaultResourceNames[i]);
 				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
 				if (player->AiEnabled) {

@@ -167,7 +167,7 @@ void HandleActionTrain(CUnit *unit)
 			}
 
 			player->Notify(NotifyYellow, nunit->X, nunit->Y,
-				"New %s ready", nunit->Type->Name);
+				_("New %s ready"), nunit->Type->Name);
 			if (player == ThisPlayer) {
 				PlayUnitSound(nunit, VoiceReady);
 			}
@@ -214,7 +214,7 @@ void HandleActionTrain(CUnit *unit)
 			return;
 		} else {
 			player->Notify(NotifyYellow, unit->X, unit->Y,
-				"Unable to Train %s", unit->Orders[0]->Type->Name);
+				_("Unable to train %s"), unit->Orders[0]->Type->Name);
 		}
 	}
 
