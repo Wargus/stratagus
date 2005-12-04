@@ -116,7 +116,7 @@ static void MoveToLocation(CUnit *unit)
 			}
 
 			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-				"You cannot reach building place");
+				_("You cannot reach building place"));
 			if (unit->Player->AiEnabled) {
 				AiCanNotReach(unit, unit->Orders[0]->Type);
 			}
@@ -174,7 +174,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 		}
 
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-			"You cannot build %s here",type->Name);
+			_("You cannot build %s here"), type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -194,7 +194,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	if (unit->Player->CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-			"Not enough resources to build %s", type->Name);
+			_("Not enough resources to build %s"), type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -212,7 +212,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	//
 	if (unit->Player->CheckLimits(type) < 0) {
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-			"Can't build more units %s", type->Name);
+			_("Can't build more units %s"), type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -252,7 +252,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		unit->Orders[0]->Action = UnitActionStill;
 
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-			"Unable to create building %s",type->Name);
+			_("Unable to create building %s"), type->Name);
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -512,7 +512,7 @@ void HandleActionBuilt(CUnit *unit)
 		}
 
 		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
-			"New %s done", type->Name);
+			_("New %s done"), type->Name);
 		if (unit->Player == ThisPlayer) {
 			if (unit->Type->Sound.Ready.Sound) {
 				PlayUnitSound(unit, VoiceReady);
