@@ -737,7 +737,7 @@ void CButtonPanel::DoClicked(int button)
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
 			UI.ButtonPanel.Update();
-			UI.StatusLine.Set("Select Target");
+			UI.StatusLine.Set(_("Select Target"));
 			break;
 		case ButtonSpellCast:
 			if (KeyModifiers & ModifierControl) {
@@ -865,7 +865,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
 			if (!Selected[0]->Player->CheckUnitType(type)) {
-				UI.StatusLine.Set("Select Location");
+				UI.StatusLine.Set(_("Select Location"));
 				ClearCosts();
 				CursorBuilding = type;
 				// FIXME: check is this =9 necessary?
@@ -884,7 +884,7 @@ void CButtonPanel::DoClicked(int button)
 			if (Selected[0]->Orders[0]->Action == UnitActionTrain &&
 					!EnableTrainingQueue) {
 				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->X,
-					Selected[0]->Y, "Unit training queue is full");
+					Selected[0]->Y, _("Unit training queue is full"));
 			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
 					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);

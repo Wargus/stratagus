@@ -1776,7 +1776,7 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: Not if, in input mode.
 			if (!IsNetworkGame()) {
 				GamePaused = 1;
-				UI.StatusLine.Set("Game Paused");
+				UI.StatusLine.Set(_("Game Paused"));
 			}
 			ProcessMenu("menu-game", 0);
 			return;
@@ -1920,7 +1920,6 @@ void UIHandleButtonUp(unsigned button)
 			//    Other clicks.
 			//
 			if (NumSelected == 1) {
-printf("Race = %d\n", Selected[0]->Player->Race);
 				if (Selected[0]->Orders[0]->Action == UnitActionBuilt) {
 					PlayUnitSound(Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
@@ -1935,11 +1934,11 @@ printf("Race = %d\n", Selected[0]->Player->Race);
 				if (Selected[0]->Player == ThisPlayer) {
 					char buf[64];
 					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
-						sprintf(buf, "You have ~<%d~> %ss",
+						sprintf(buf, _("You have ~<%d~> %ss"),
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name);
 					} else {
-						sprintf(buf, "You have ~<%d~> %s(s)",
+						sprintf(buf, _("You have ~<%d~> %s(s)"),
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name);
 					}
