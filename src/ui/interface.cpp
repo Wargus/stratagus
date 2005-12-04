@@ -91,7 +91,7 @@ static void ShowInput(void)
 {
 	char *input;
 
-	sprintf(InputStatusLine, "_(MESSAGE:%s~!_"), Input);
+	sprintf(InputStatusLine, _("MESSAGE:%s~!_"), Input);
 	input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.W) {
