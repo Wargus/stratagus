@@ -661,7 +661,7 @@ void StartMap(const char *filename)
 	CreateGame(filename, &Map);
 
 	UI.StatusLine.Set(NameLine);
-	SetMessage("Do it! Do it now!");
+	SetMessage(_("Do it! Do it now!"));
 
 	//  Play the game.
 	GameMainLoop();

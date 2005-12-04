@@ -2969,7 +2969,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			}
 		}
 		target->Player->Notify(NotifyRed, target->X, target->Y,
-			"%s attacked", target->Type->Name);
+			_("%s attacked"), target->Type->Name);
 		if (target->Player->AiEnabled) {
 			AiHelpMe(attacker, target);
 		}
