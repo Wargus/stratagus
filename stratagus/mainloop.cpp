@@ -445,12 +445,12 @@ void GameMainLoop(void)
 	NetworkQuit();
 	EndReplayLog();
 	if (GameResult == GameDefeat) {
-		fprintf(stderr, "You have lost!\n");
-		UI.StatusLine.Set("You have lost!");
+		fprintf(stderr, _("You have lost!\n"));
+		UI.StatusLine.Set(_("You have lost!"));
 		ProcessMenu("menu-defeated", 1);
 	} else if (GameResult == GameVictory) {
-		fprintf(stderr, "You have won!\n");
-		UI.StatusLine.Set("You have won!");
+		fprintf(stderr, _("You have won!\n"));
+		UI.StatusLine.Set(_("You have won!"));
 		ProcessMenu("menu-victory", 1);
 	}
 

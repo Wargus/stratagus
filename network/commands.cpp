@@ -834,9 +834,9 @@ static void DoNextReplay(void)
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info
-			ThisPlayer->Notify(NotifyYellow, -1, -1, "No sync info for this replay !");
+			ThisPlayer->Notify(NotifyYellow, -1, -1, _("No sync info for this replay !"));
 		} else {
-			ThisPlayer->Notify(NotifyYellow, -1, -1, "Replay got out of sync (%lu) !", GameCycle);
+			ThisPlayer->Notify(NotifyYellow, -1, -1, _("Replay got out of sync (%lu) !"), GameCycle);
 			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
 			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
 			Assert(0);
@@ -845,7 +845,7 @@ static void DoNextReplay(void)
 			// return;
 		}
 #else
-		ThisPlayer->Notify(NotifyYellow, -1, -1, "Replay got out of sync !");
+		ThisPlayer->Notify(NotifyYellow, -1, -1, _("Replay got out of sync !"));
 		ReplayStep = 0;
 		NextLogCycle = ~0UL;
 		return;
@@ -956,7 +956,7 @@ static void ReplayEachCycle(void)
 	}
 
 	if (!ReplayStep) {
-		SetMessage("End of replay");
+		SetMessage(_("End of replay"));
 		GameObserve = 0;
 		return;
 	}
@@ -971,7 +971,7 @@ static void ReplayEachCycle(void)
 			(NextLogCycle == ~0UL || NextLogCycle == GameCycle));
 
 	if (!ReplayStep) {
-		SetMessage("End of replay");
+		SetMessage(_("End of replay"));
 		GameObserve = 0;
 	}
 }

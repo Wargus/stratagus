@@ -960,7 +960,7 @@ void NetworkEvent(void)
 			NetworkIn[packet->Header.Cycle][player][i].Type = packet->Header.Type[i];
 			NetworkIn[packet->Header.Cycle][player][i].Data = *nc;
 		} else {
-			SetMessage("%s Sent Bad Command", Players[player].Name);
+			SetMessage(_("%s Sent Bad Command"), Players[player].Name);
 		}
 	}
 
@@ -1057,7 +1057,7 @@ static void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 			if (ply != NetworkSyncSeeds[GameCycle & 0xFF] ||
 					ntohs(ncq->Data.Unit) != NetworkSyncHashs[GameCycle & 0xFF]) {
 
-				SetMessage("Network out of sync");
+				SetMessage(_("Network out of sync"));
 				DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d!\n\n" _C_
 					ply _C_ NetworkSyncSeeds[GameCycle & 0xFF] _C_
 					ntohs(ncq->Data.Unit) _C_ NetworkSyncHashs[GameCycle & 0xFF]);
@@ -1294,7 +1294,7 @@ void NetworkRecover(void)
 			// FIXME: display a menu while we wait
 			if (secs >= 3 && secs < NetworkTimeout) {
 				if (FrameCounter % FRAMES_PER_SECOND < (unsigned long)NetworkUpdates) {
-					SetMessage("Waiting for player \"%s\": %d:%02d", Hosts[i].PlyName,
+					SetMessage(_("Waiting for player \"%s\": %d:%02d"), Hosts[i].PlyName,
 						(NetworkTimeout - secs) / 60, (NetworkTimeout - secs) % 60);
 				}
 			}
@@ -1310,7 +1310,7 @@ void NetworkRecover(void)
 				NetworkIn[n & 0xFF][Hosts[i].PlyNr][0].Type = MessageQuit;
 				NetworkIn[n & 0xFF][Hosts[i].PlyNr][0].Data = nc;
 				PlayerQuit[Hosts[i].PlyNr] = 1;
-				SetMessage("Timed out");
+				SetMessage(_("Timed out"));
 
 				ncq = &NetworkIn[n & 0xFF][Hosts[i].PlyNr][0];
 				np.Header.Cycle = ncq->Time & 0xFF;
