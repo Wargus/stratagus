@@ -62,8 +62,8 @@ const char *Translate(const char *str)
 	if (i != Entries.end() && !i->second.empty()) {
 		return i->second.c_str();
 	} else {
-      DebugPrint("Couldn't translate: %s\n" _C_ str);
-      return str;
+		DebugPrint("Couldn't translate: %s\n" _C_ str);
+		return str;
     }
 }
 
@@ -88,8 +88,6 @@ void LoadPO(const char *file)
 	char *s;
 	char *currmsg;
 	char fullfile[1024];
-
-	Entries.clear();
 
 	LibraryFileName(file, fullfile);
 	fd = fopen(fullfile, "rb");
