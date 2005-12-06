@@ -1826,39 +1826,81 @@ static int CclStratagusLibraryPath(lua_State *l)
 }
 
 /**
-**  Return a table with the files found in the subdirectory.
+**  Return a table with the filtered items found in the subdirectory.
 */
-static int CclListDirectory(lua_State *l)
+static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 {
 	char directory[256];
 	const char *userdir;
 	std::vector<FileList> flp;
 	int n;
 	int i;
+	int pathtype;
 
 	LuaCheckArgs(l, 1);
-	
-	// security: disallow all special characters
 	userdir = lua_tostring(l, 1);
 	n = strlen(userdir);
-	for (i = 0; i < n; i++) {
+
+	pathtype = 0; // path relative to stratagus dir
+	if (n > 0 && *userdir == '~') {
+		// path relative to user preferences directory
+		pathtype = 1;
+	}
+
+	// security: disallow all special characters
+	for (i = pathtype; i < n; i++) {
 		if (!(isalnum(userdir[i]) || userdir[i]=='/')) {
 			LuaError(l, "Forbidden directory");
 		}
 	}
-	
-	sprintf(directory, "%s/%s", StratagusLibPath, userdir);
+
+	if (pathtype == 1) {
+#ifdef USE_WIN32
+		sprintf(directory, "%s/%s", userdir);
+#else
+		sprintf(directory, "%s/" STRATAGUS_HOME_PATH "/%s/%s",
+			getenv("HOME"), GameName, userdir);
+#endif
+	} else {
+		sprintf(directory, "%s/%s", StratagusLibPath, userdir);
+	}
 	lua_pop(l, 1);
 	lua_newtable(l);
 	n = ReadDataDirectory(directory, NULL, flp);
 	for (i = 0; i < n; i++) {
-		lua_pushnumber(l, i);
-		lua_pushstring(l, flp[i].name);
-		lua_settable(l, 1);
+		if ((flp[i].type & mask) == type) {
+			lua_pushnumber(l, i);
+			lua_pushstring(l, flp[i].name);
+			lua_settable(l, 1);
+		}
 		delete[] flp[i].name;
 	}
 
 	return 1;
+}
+
+/**
+**  Return a table with the files or directories found in the subdirectory.
+*/
+static int CclListDirectory(lua_State *l)
+{
+	return CclFilteredListDirectory(l, 0, 0);
+}
+
+/**
+**  Return a table with the files found in the subdirectory.
+*/
+static int CclListFilesInDirectory(lua_State *l)
+{
+	return CclFilteredListDirectory(l, 0x1, 0x1);
+}
+
+/**
+**  Return a table with the files found in the subdirectory.
+*/
+static int CclListDirsInDirectory(lua_State *l)
+{
+	return CclFilteredListDirectory(l, 0x0, 0x1);
 }
 
 /**
@@ -2493,6 +2535,8 @@ void InitCcl(void)
 	lua_register(Lua, "CompileFeature", CclGetCompileFeature);
 	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
 	lua_register(Lua, "ListDirectory", CclListDirectory);
+	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
+	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
 	lua_register(Lua, "GameCycle", CclGameCycle);
 	lua_register(Lua, "SetGameName", CclSetGameName);
 	lua_register(Lua, "SetGameCycle", CclSetGameCycle);
