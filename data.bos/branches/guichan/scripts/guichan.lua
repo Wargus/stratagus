@@ -234,9 +234,11 @@ function RunReplayMenu(s)
   local menu
   menu = BosMenu("Show a Replay")
 
+  local browser = menu:addBrowser("~logs/", ".log$")
+
   function startreplaybutton(s)
     print("Starting map -------")
-    StartReplay("/home/feb/.stratagus-2.2/bos/logs/log_of_stratagus_0.log")
+    StartReplay("~logs/" .. browser:getSelectedItem())
     menu:stop()
   end
 
