@@ -1855,6 +1855,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	}
 
 	if (pathtype == 1) {
+		userdir++;
 #ifdef USE_WIN32
 		sprintf(directory, "%s/%s", userdir);
 #else
