@@ -696,8 +696,21 @@ void StartEditor(const char *filename)
 void StartReplay(const char *filename)
 {
 	int i;
+	char replay[512];
 
-	LoadReplay(filename);
+	if (*filename == '~') {
+		filename++;
+#ifdef USE_WIN32
+		sprintf(replay, "%s/%s", filename);
+#else
+		sprintf(replay, "%s/" STRATAGUS_HOME_PATH "/%s/%s",
+			getenv("HOME"), GameName, filename);
+#endif
+	} else {
+		sprintf(replay, "%s/%s", StratagusLibPath, filename);
+	}
+
+	LoadReplay(replay);
 
 	// FIXME why is this needed ?
 	for (i = 0; i < MAX_OBJECTIVES; i++) {
