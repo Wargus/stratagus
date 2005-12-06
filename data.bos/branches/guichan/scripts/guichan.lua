@@ -28,7 +28,7 @@
 --      $Id$
 
 -- Global usefull objects for menus  ----------
-dark = Color(8, 8, 38, 130)
+dark = Color(38, 38, 78, 130)
 clear = Color(200, 200, 120)
 black = Color(0, 0, 0)
 
@@ -76,7 +76,7 @@ function BosMenu(title)
   function menu:addBrowser(path, filter)
     local mapslist = {}
     local u = 1
-    local fileslist = ListDirectory(path)
+    local fileslist = ListFilesInDirectory(path)
     local i
     local f
     for i,f in fileslist do

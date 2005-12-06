@@ -54,7 +54,7 @@ SetDefaultMap="maps/default.smp"
 --	Music play list -	Insert your titles here
 -------------------------------------------------------------------------------
 playlist = {}
-local musiclist = ListDirectory("music/")
+local musiclist = ListFilesInDirectory("music/")
 for i,f in musiclist do
   if(string.find(f, ".ogg$") or string.find(f, ".wav$") or string.find(f, ".mp3$")) then 
     print("Added music file:" .. f) 
