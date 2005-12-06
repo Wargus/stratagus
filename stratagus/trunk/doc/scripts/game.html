@@ -866,13 +866,44 @@ Returns the Stratagus library path. The Stratagus library path points to the gam
 <h3>ListDirectory(path)</h3>
 
 Returns a list with all files and subdirectories found in the directory pointed by path. 
-The path must point to a subdirectory of the game directory. The path cannot 
-include any special character.
+If the given path starts with '~', then the path is relative to the
+user stratagus preferences directory.
+The path cannot include any special character.
 
 <h4>Example</h4>
 
 <pre>
     list = ListDirectory("music/")
+</pre>
+
+<a name="ListFilesInDirectory"></a>
+<h3>ListFilesInDirectory(path)</h3>
+
+Returns a list with all files found in the directory pointed by path. 
+The path is relative to the game directory. 
+If the given path starts with '~', then the path is relative to the
+stratagus' user preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre>
+    list = ListFilesInDirectory("music/")
+</pre>
+
+<a name="ListDirsInDirectory"></a>
+<h3>ListDirsInDirectory(path)</h3>
+
+Returns a list with all subdirectories found in the directory pointed by path. 
+The path is relative to the game directory.
+If the given path starts with '~', then the path is relative to the
+user stratagus preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre>
+    list = ListDirsInDirectory("music/")
 </pre>
 
 <a name="LoadMap"></a>
