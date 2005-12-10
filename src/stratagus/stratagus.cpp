@@ -693,19 +693,23 @@ void StartEditor(const char *filename)
 	guichanActive = true;
 }
 
+/**
+**  FIXME: docu
+*/
 void StartReplay(const char *filename)
 {
 	int i;
 	char replay[512];
+	const char *s;
 
 	if (*filename == '~') {
-		filename++;
-#ifdef USE_WIN32
-		sprintf(replay, "%s/%s", filename);
-#else
-		sprintf(replay, "%s/" STRATAGUS_HOME_PATH "/%s/%s",
-			getenv("HOME"), GameName, filename);
-#endif
+		++filename;
+		if ((s = getenv("HOME")) && GameName) {
+			sprintf(replay, "%s/%s/%s/%s",
+				s, STRATAGUS_HOME_PATH, GameName, filename);
+		} else {
+			sprintf(replay, "%s/%s", StratagusLibPath, filename);
+		}
 	} else {
 		sprintf(replay, "%s/%s", StratagusLibPath, filename);
 	}
