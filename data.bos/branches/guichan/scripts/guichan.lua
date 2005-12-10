@@ -153,8 +153,8 @@ function BosMenu(title)
     menu:addCentered(titlelabel, Video.Width / 2, Video.Height/20)
   end
 
-  exitButton = menu:addButton("~!Exit", 
-        Video.Width / 2 - 100, Video.Height - 100, 
+  exitButton = menu:addButton(_("~!Exit"),
+        Video.Width / 2 - 100, Video.Height - 100,
         function() menu:stop() end)
   return menu
 end
@@ -167,7 +167,7 @@ Widget:setGlobalFont(CFont:Get("large"))
 
 function RunSubMenu(s)
   local menu
-  menu = BosMenu("Empty sub menu")
+  menu = BosMenu(_("Empty sub menu"))
   menu:run()
 end
 
@@ -177,25 +177,25 @@ startingresources = 5
 
 function RunStartGameMenu(s)
   local menu
-  menu = BosMenu("Start Game")
+  menu = BosMenu(_("Start Game"))
 
-  menu:writeText("Players:", 20, 80)
-  players = menu:writeText("No map", 80, 80)
-  menu:writeText("Description:", 20, 120)
-  descr = menu:writeText("No map",40, 160)
+  menu:writeText(_("Players:"), 20, 80)
+  players = menu:writeText(_("No map"), 80, 80)
+  menu:writeText(_("Description:"), 20, 120)
+  descr = menu:writeText(_("No map"),40, 160)
 
-  local fow = menu:addCheckBox("Fog of war", 25, 200, function() end)
+  local fow = menu:addCheckBox(_("Fog of war"), 25, 200, function() end)
   fow:setMarked(true)
-  local revealmap = menu:addCheckBox("Reveal map", 25, 230, function() end)
+  local revealmap = menu:addCheckBox(_("Reveal map"), 25, 230, function() end)
   
-  menu:writeText("Difficulty:", 20, Video.Height*11/20)
-  menu:addDropDown({"easy", "normal", "hard"}, 120, Video.Height*11/20 + 7,
+  menu:writeText(_("Difficulty:"), 20, Video.Height*11/20)
+  menu:addDropDown({_("easy"), _("normal"), _("hard")}, 120, Video.Height*11/20 + 7,
       function(dd) difficulty = (5 - dd:getSelected()*2) end)
-  menu:writeText("Map richness:", 20, Video.Height*12/20)
-  menu:addDropDown({"high", "normal", "low"}, 140, Video.Height*12/20 + 7,
+  menu:writeText(_("Map richness:"), 20, Video.Height*12/20)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, 140, Video.Height*12/20 + 7,
       function(dd) mapresources = (5 - dd:getSelected()*2) end)
-  menu:writeText("Starting resources:", 20, Video.Height*13/20)
-  menu:addDropDown({"high", "normal", "low"}, 170, Video.Height*13/20 + 7,
+  menu:writeText(_("Starting resources:"), 20, Video.Height*13/20)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, 170, Video.Height*13/20 + 7,
       function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
 
@@ -223,7 +223,7 @@ function RunStartGameMenu(s)
     StartMap("maps/" .. browser:getSelectedItem())
     menu:stop()
   end
-  menu:addButton("Start", 20, Video.Height - 100, startgamebutton)
+  menu:addButton(_("Start"), 20, Video.Height - 100, startgamebutton)
 
   menu:run()
   PresentMap = OldPresentMap
@@ -232,7 +232,7 @@ end
 
 function RunReplayMenu(s)
   local menu
-  menu = BosMenu("Show a Replay")
+  menu = BosMenu(_("Show a Replay"))
 
   local browser = menu:addBrowser("~logs/", ".log$")
 
@@ -242,7 +242,7 @@ function RunReplayMenu(s)
     menu:stop()
   end
 
-  menu:addButton("~!Start", 100, 300, startreplaybutton)
+  menu:addButton(_("~!Start"), 100, 300, startreplaybutton)
 
   menu:run()
 end
@@ -257,14 +257,14 @@ function RunWidgetsMenu(s)
   normalImage:Load() -- FIXME remove when immediatly loaded
   pressedImage:Load() -- idem
 
-  b = Label("Translucent widgets")
+  b = Label(_("Translucent widgets"))
   b:setFont(CFont:Get("large"))
   b:adjustSize();
   menu:add(b, 20, 10)
 
-  menu:addButton("SubMenu", 30, 50, RunSubMenu)
+  menu:addButton(_("SubMenu"), 30, 50, RunSubMenu)
 
-  b = TextField("text input")
+  b = TextField(_("text input"))
   b:setActionCallback(function() print("field") end)
   b:setFont(CFont:Get("game"))
   b:setBaseColor(clear)
@@ -281,20 +281,20 @@ function RunWidgetsMenu(s)
   b:setForegroundColor(clear)
   b:setBackgroundColor(clear)
 
-  b = RadioButton("Platoon", "dumgroup", true)
+  b = RadioButton(_("Platoon"), "dumgroup", true)
   b:setActionCallback(function() print("one") end)
   b:setBaseColor(dark)
   b:setForegroundColor(clear)
   b:setBackgroundColor(dark)
   menu:add(b, 20, 180)
-  b = RadioButton("Army", "dumgroup")
+  b = RadioButton(_("Army"), "dumgroup")
   b:setActionCallback(function() print("two") end)
   b:setBaseColor(dark)
   b:setForegroundColor(clear)
   b:setBackgroundColor(dark)
   menu:add(b, 150, 180)
 
-  menu:addCheckBox("CheckBox", 20, 210, function(s) print("checked ?") end)
+  menu:addCheckBox(_("CheckBox"), 20, 210, function(s) print("checked ?") end)
 
   local ic = CGraphic:New("units/assault/ico_assault.png")
   ic:Load()
@@ -303,14 +303,14 @@ function RunWidgetsMenu(s)
 
   b = DropDownWidget()
   b:setFont(CFont:Get("game"))
-  b:setList({"line1", "line2"})
+  b:setList({_("line1"), _("line2")})
   b:setActionCallback(function(s) print("dropdown ".. b:getSelected()) end)
   b:setBaseColor(dark)
   b:setForegroundColor(clear)
   b:setBackgroundColor(dark)
   menu:add(b, 20, 350)
 
-  win = Windows("Test", 70, 70)
+  win = Windows(_("Test"), 70, 70)
   win:setBaseColor(dark)
   win:setForegroundColor(dark)
   win:setBackgroundColor(dark)
@@ -327,18 +327,18 @@ function RunWidgetsMenu(s)
   end
 
 
-  b = Label("Image based widgets")
+  b = Label(_("Image based widgets"))
   b:setFont(CFont:Get("large"))
   b:adjustSize();
   menu:add(b, 330, 10)
 
-  b = ImageButton("SubMenu")
+  b = ImageButton(_("SubMenu"))
   b:setNormalImage(normalImage)
   b:setPressedImage(pressedImage)
   b:setActionCallback(RunSubMenu)
   menu:add(b, 330, 50)
 
-  b = ImageCheckBox("ImageCheckBox")
+  b = ImageCheckBox(_("ImageCheckBox"))
   local cb = CGraphic:New("ui/widgets/checkbox-unchecked-normal.png")
   cb:Load()
   b:setUncheckedNormalImage(cb)
@@ -372,7 +372,7 @@ function RunCampaignsMenu(s)
   local menu
   local b
 
-  menu = BosMenu("List of Campaigns")
+  menu = BosMenu(_("List of Campaigns"))
 
   local browser = menu:addBrowser("campaigns/", "^%a")
   function startgamebutton(s)
@@ -380,7 +380,7 @@ function RunCampaignsMenu(s)
     Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()
   end
-  menu:addButton("Start", 100, 300, startgamebutton)
+  menu:addButton(_("Start"), 100, 300, startgamebutton)
 
   menu:run()
 end
@@ -389,8 +389,8 @@ function RunLoadGameMenu(s)
   local menu
   local b
 
-  menu = BosMenu("Load Game")
-  menu:addButton("~!OK", 176 - (106 / 2), 352 - 11 - 27, function() end)
+  menu = BosMenu(_("Load Game"))
+  menu:addButton(_("~!OK"), 176 - (106 / 2), 352 - 11 - 27, function() end)
 
   menu:run()
 end
@@ -402,27 +402,27 @@ function RunCreditsMenu(s)
 
   local credits
   credits = {
-     "Graphics:",
+     _("Graphics:"),
      "  Tina Petersen Jensen",
      "  Soeren Soendergaard Jensen",
      "  TimberDragon",
      "  Frank Loeffler",
      "  Francois Beerten",
      "",
-     "Scripting:",
+     _("Scripting:"),
      "  Francois Beerten",
      "  Lois Taulelle",
      "",
-     "Maps and campaigns:",
+     _("Maps and campaigns:"),
      "  Lois Taulelle",
      "  Francois Beerten",
      "",
-     "Sound:",
+     _("Sound:"),
      "  Tina Petersen",
      "  Brian Pedersen",
      " ",
-     "powered by STRATAGUS",
-     "Stratagus Programmers:",
+     _("powered by STRATAGUS"),
+     _("Stratagus Programmers:"),
      "  Andreas 'Ari' Arens",
      "  Lutz 'Johns' Sammer",
      "  Edgar 'Froese' Toernig",
@@ -479,7 +479,7 @@ function RunCreditsMenu(s)
      "  Dave Turner",
      "  Ben Hines",
      "  Kachalov Anton",
-     "Patches",
+     _("Patches"),
      "  Martin Renold",
      "  Martin Hajduch",
      "  Jeff Binder",
@@ -488,18 +488,18 @@ function RunCreditsMenu(s)
      "  Phil Hannent",
      "  Alexander MacLean",
      "",
-     "Stratagus Media Project Graphics",
+     _("Stratagus Media Project Graphics"),
       -- land construction site-summer-01.png; big_fire.png; explosion.png; green_cross.png; winter, big fire
      "  Paolo D'Inca", 
      "  Rick Elliot", -- cursor arrows
      "  Chris Hopp", -- small_fire.png
      "",
      "",
-     "The Bos and the Stratagus Team thanks all the people who have contributed",
-     "patches, bug reports, ideas."
+     _("The Bos and the Stratagus Team thanks all the people who have contributed"),
+     _("patches, bug reports, ideas.")
   }
 
-  menu = BosMenu("Battle of Survival Credits")
+  menu = BosMenu(_("Battle of Survival Credits"))
 
   local sw = ScrollingWidget(400, Video.Height * 12 / 20)
   menu:add(sw, Video.Width / 2 - 200, Video.Height / 20 * 3)
@@ -516,15 +516,15 @@ function RunMultiPlayerMenu(s)
   local menu
   local b
 
-  menu = BosMenu("MultiPlayer")
-  menu:writeText("Coming soon ...", Video.Width/2 - 100, Video.Height/3)
+  menu = BosMenu(_("MultiPlayer"))
+  menu:writeText(_("Coming soon ..."), Video.Width/2 - 100, Video.Height/3)
 
   menu:run()
 end
 
 function RunEditorMenu(s)
   local menu
-  menu = BosMenu("Editor")
+  menu = BosMenu(_("Editor"))
 
   local browser = menu:addBrowser("maps/", "^.*%.smp$")
   function starteditorbutton(s)
@@ -533,7 +533,7 @@ function RunEditorMenu(s)
     menu:stop()
   end
 
-  menu:addButton("Start Editor", 100, 300, starteditorbutton)
+  menu:addButton(_("Start Editor"), 100, 300, starteditorbutton)
 
   menu:run()
 end
@@ -543,15 +543,15 @@ Load("scripts/menus/options.lua")
 function BuildMainMenu(menu)
   local x = Video.Width / 2 - 100
   local ystep = Video.Height / 20
-  menu:addButton("~!Start Game", x, ystep * 4, RunStartGameMenu)
-  menu:addButton("Start ~!Editor", x, ystep * 5, RunEditorMenu)
-  menu:addButton("~!Options", x, ystep * 6, function() RunOptionsMenu() menu:stop(1) end)
-  menu:addButton("~!MultiPlayer", x, ystep * 7, RunMultiPlayerMenu)
-  menu:addButton("~!Campaigns", x, ystep * 8, RunCampaignsMenu)
-  menu:addButton("~!Load Game", x, ystep * 9, RunLoadGameMenu)
-  menu:addButton("Show ~!Replay", x, ystep * 10, RunReplayMenu)
-  menu:addButton("~!Credits", x, ystep * 11, RunCreditsMenu)
-  menu:addButton("~!Widgets Demo", x, ystep * 12, RunWidgetsMenu)
+  menu:addButton(_("~!Start Game"), x, ystep * 4, RunStartGameMenu)
+  menu:addButton(_("Start ~!Editor"), x, ystep * 5, RunEditorMenu)
+  menu:addButton(_("~!Options"), x, ystep * 6, function() RunOptionsMenu() menu:stop(1) end)
+  menu:addButton(_("~!MultiPlayer"), x, ystep * 7, RunMultiPlayerMenu)
+  menu:addButton(_("~!Campaigns"), x, ystep * 8, RunCampaignsMenu)
+  menu:addButton(_("~!Load Game"), x, ystep * 9, RunLoadGameMenu)
+  menu:addButton(_("Show ~!Replay"), x, ystep * 10, RunReplayMenu)
+  menu:addButton(_("~!Credits"), x, ystep * 11, RunCreditsMenu)
+  menu:addButton(_("~!Widgets Demo"), x, ystep * 12, RunWidgetsMenu)
 end
 
 function RunMainMenu(s)
