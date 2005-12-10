@@ -1836,6 +1836,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	int n;
 	int i;
 	int pathtype;
+	const char *s;
 
 	LuaCheckArgs(l, 1);
 	userdir = lua_tostring(l, 1);
@@ -1855,13 +1856,13 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	}
 
 	if (pathtype == 1) {
-		userdir++;
-#ifdef USE_WIN32
-		sprintf(directory, "%s/%s", userdir);
-#else
-		sprintf(directory, "%s/" STRATAGUS_HOME_PATH "/%s/%s",
-			getenv("HOME"), GameName, userdir);
-#endif
+		++userdir;
+		if ((s = getenv("HOME")) && GameName) {
+			sprintf(directory, "%s/%s/%s/%s",
+				s, STRATAGUS_HOME_PATH, GameName, userdir);
+		} else {
+			sprintf(directory, "%s/%s", StratagusLibPath, userdir);
+		}
 	} else {
 		sprintf(directory, "%s/%s", StratagusLibPath, userdir);
 	}
