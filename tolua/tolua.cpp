@@ -77,6 +77,13 @@ static int tolua_collect_ButtonWidget (lua_State* tolua_S)
  return 0;
 }
 
+static int tolua_collect_MenuScreen (lua_State* tolua_S)
+{
+ MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_TextField (lua_State* tolua_S)
 {
  TextField* self = (TextField*) tolua_tousertype(tolua_S,1,0);
@@ -126,9 +133,9 @@ static int tolua_collect_CPlayer (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_MenuScreen (lua_State* tolua_S)
+static int tolua_collect_StatBoxWidget (lua_State* tolua_S)
 {
- MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ StatBoxWidget* self = (StatBoxWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -201,14 +208,15 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
+ tolua_usertype(tolua_S,"CPreference");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
- tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"MenuScreen");
@@ -5350,6 +5358,132 @@ static int tolua_stratagus_ScrollingWidget_restart00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StatBoxWidget_new00
+static int tolua_stratagus_StatBoxWidget_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"StatBoxWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+ {
+  StatBoxWidget* tolua_ret = (StatBoxWidget*)  new StatBoxWidget(width,height);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"StatBoxWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StatBoxWidget_new00_local
+static int tolua_stratagus_StatBoxWidget_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"StatBoxWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+ {
+  StatBoxWidget* tolua_ret = (StatBoxWidget*)  new StatBoxWidget(width,height);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"StatBoxWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: caption of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_get_StatBoxWidget_caption
+static int tolua_get_StatBoxWidget_caption(lua_State* tolua_S)
+{
+  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'caption'",NULL);
+#endif
+ tolua_pushcppstring(tolua_S,(const char*)self->Getcaption());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: caption of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_set_StatBoxWidget_caption
+static int tolua_set_StatBoxWidget_caption(lua_State* tolua_S)
+{
+  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'caption'",NULL);
+ if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Setcaption(((std::string)  tolua_tocppstring(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: percent of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_get_StatBoxWidget_unsigned_percent
+static int tolua_get_StatBoxWidget_unsigned_percent(lua_State* tolua_S)
+{
+  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'percent'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Getpercent());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: percent of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_set_StatBoxWidget_unsigned_percent
+static int tolua_set_StatBoxWidget_unsigned_percent(lua_State* tolua_S)
+{
+  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'percent'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Setpercent((( unsigned int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: add of class  Container */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Container_add00
 static int tolua_stratagus_Container_add00(lua_State* tolua_S)
@@ -8453,6 +8587,18 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_ScrollingWidget_new00_local);
   tolua_function(tolua_S,"add",tolua_stratagus_ScrollingWidget_add00);
   tolua_function(tolua_S,"restart",tolua_stratagus_ScrollingWidget_restart00);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"StatBoxWidget","StatBoxWidget","Widget",tolua_collect_StatBoxWidget);
+#else
+ tolua_cclass(tolua_S,"StatBoxWidget","StatBoxWidget","Widget",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"StatBoxWidget");
+  tolua_function(tolua_S,"new",tolua_stratagus_StatBoxWidget_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_StatBoxWidget_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_StatBoxWidget_new00_local);
+  tolua_variable(tolua_S,"caption",tolua_get_StatBoxWidget_caption,tolua_set_StatBoxWidget_caption);
+  tolua_variable(tolua_S,"percent",tolua_get_StatBoxWidget_unsigned_percent,tolua_set_StatBoxWidget_unsigned_percent);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"Container","Container","",NULL);
  tolua_beginmodule(tolua_S,"Container");
