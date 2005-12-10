@@ -1025,10 +1025,102 @@ void ListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 /**
 **  FIXME: docu
 */
-void DropDownWidget::setList(lua_State *lua, lua_Object *lo) 
+void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 {
 	listmodel.setList(lua, lo);
 	setListModel(&listmodel);
+}
+
+/*----------------------------------------------------------------------------
+--  DropDownWidget
+----------------------------------------------------------------------------*/
+
+/**
+**  StatBoxWidget constructor
+**
+**  @param width   Width of the StatBoxWidget.
+**  @param height  Height of the StatBoxWidget.
+*/
+StatBoxWidget::StatBoxWidget(int width, int height) : percent(100)
+{
+	setWidth(width);
+	setHeight(height);
+
+	setBackgroundColor(gcn::Color(0, 0, 0));
+	setBaseColor(gcn::Color(255, 255, 255));
+	setForegroundColor(gcn::Color(128, 128, 128));
+}
+
+/**
+**  Draw StatBoxWidget.
+**
+**  @param graphics  Graphic driver used to draw.
+**
+**  @todo caption seem to be placed upper than the middle.
+**  @todo set direction (hor./vert.) and growing direction(up/down, left/rigth).
+*/
+void StatBoxWidget::draw(gcn::Graphics *graphics)
+{
+	int x;
+	int y;
+	int width;
+	int height;
+
+	x = getX();
+	y = getY();
+	width = getWidth();
+	height = getHeight();
+
+	graphics->setColor(getBackgroundColor());
+	graphics->fillRectangle(gcn::Rectangle(0, 0, width, height));
+
+	graphics->setColor(getBaseColor());
+	graphics->drawRectangle(gcn::Rectangle(1, 1, width - 2, height - 2));
+
+	graphics->setColor(getForegroundColor());
+	width = percent * width / 100;
+	graphics->fillRectangle(gcn::Rectangle(2, 2, width - 4, height - 4));
+	graphics->setFont(getFont());
+	graphics->drawText(Getcaption(),
+						(getWidth() - getFont()->getWidth(Getcaption())) / 2,
+						(height - getFont()->getHeight()) / 2);
+}
+
+/**
+**  Set caption of StatBoxWidget.
+**
+**  @param caption  New value.
+*/
+void StatBoxWidget::Setcaption(const std::string&caption)
+{
+	this->caption = caption;
+}
+
+/**
+**  Get caption of StatBoxWidget.
+*/
+
+const std::string& StatBoxWidget::Getcaption() const
+{
+	return caption;
+}
+
+/**
+**  Set percent of StatBoxWidget.
+**
+**  @param percent  New value.
+*/
+void StatBoxWidget::Setpercent(const int percent)
+{
+	this->percent = percent;
+}
+
+/**
+**  Get percent of StatBoxWidget.
+*/
+int StatBoxWidget::Getpercent() const
+{
+	return percent;
 }
 
 
