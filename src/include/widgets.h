@@ -225,6 +225,27 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 };
 
+class StatBoxWidget : public gcn::Widget
+{
+public:
+	StatBoxWidget(int width, int height);
+
+	virtual void draw(gcn::Graphics *graphics);
+	void Setcaption(const std::string&s);
+	const std::string& Getcaption() const;
+	void Setpercent(const int percent);
+	int Getpercent() const;
+
+private:
+	int width;            /// width of the widget.
+	int height;           /// height of the widget.
+	std::string caption;  ///  caption of the widget.
+	unsigned int percent; /// percent value of the widget.
+};
+
+
+
+
 class MenuScreen : public gcn::Container
 {
 	bool runLoop;
