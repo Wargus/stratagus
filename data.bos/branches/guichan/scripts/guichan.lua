@@ -301,6 +301,12 @@ function RunWidgetsMenu(s)
   b = ImageWidget(ic)
   menu:add(b, 20, 250)
 
+  local sb = StatBoxWidget(200, 20)
+  sb.caption = "progress"
+  sb.percent = 45
+  menu:add(sb, 20, 300)
+  sb:setBackgroundColor(dark)
+
   b = DropDownWidget()
   b:setFont(CFont:Get("game"))
   b:setList({_("line1"), _("line2")})
@@ -325,7 +331,7 @@ function RunWidgetsMenu(s)
   for i,f in {"Jarod", "was", "here", " ", ":)"} do
     sw:add(Label(f), 0, 20 * i + 50)
   end
-
+  
 
   b = Label(_("Image based widgets"))
   b:setFont(CFont:Get("large"))
@@ -363,6 +369,8 @@ function RunWidgetsMenu(s)
   bs:setWidth(100)
   bs:setHeight(20)
   menu:add(bs, 330, 140)
+
+
 
   menu:run()
 end
