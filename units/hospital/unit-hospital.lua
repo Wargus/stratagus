@@ -87,7 +87,7 @@ DefineUnitType("build-dead-body5", {
 	Name = "HospCrater",
 	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {256, 256}},
 	Animations = "animations-elitebuild5", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {5, 4},
+	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {6, 5},
 	BoxSize = {124, 92}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
