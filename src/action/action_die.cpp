@@ -93,25 +93,16 @@ void HandleActionDie(CUnit *unit)
 		unit->CurrentSightRange = unit->Type->Stats[unit->Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 		MapMarkUnitSight(unit);
 
-		CommandStopUnit(unit); // This clears all order queues
-#ifdef DEBUG
-		if (unit->Orders[0]->Action != UnitActionDie) {
-			DebugPrint("Reset to die is really needed\n");
-		}
-#endif
-		unit->Orders[0]->Action = UnitActionDie;
-		--unit->OrderCount; // remove the stop command
+		// We must be dead to get here, it we aren't we need to know why
+		// This assert replaces and old DEBUG message "Reset to die is really needed"
+		Assert(unit->Orders[0]->Action == UnitActionDie);
+
 		unit->SubAction = 0;
 		unit->Frame = 0;
 		UnitUpdateHeading(unit);
 		if (unit->Type->Animations && unit->Type->Animations->Death) {
 			UnitShowAnimation(unit, unit->Type->Animations->Death);
 		}
-
-		// FIXME: perhaps later or never is better
-#if 0
-		ChangeUnitOwner(unit, &Players[PlayerNumNeutral]);
-#endif
 	}
 }
 
