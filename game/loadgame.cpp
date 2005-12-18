@@ -212,12 +212,9 @@ void LoadGame(char *filename)
 	unsigned syncrand;
 	unsigned synchash;
 
-	CleanModules();
 	// log will be enabled if found in the save game
 	CommandLogDisabled = 1;
 	SaveGameLoading = 1;
-
-	LoadCcl();
 
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
