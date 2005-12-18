@@ -266,8 +266,6 @@ public:
 	tolua_property__s unsigned int percent; /// percent value of the widget.
 };
 
-
-
 class Container
 {
 	void add(Widget *widget, int x, int y);
@@ -287,3 +285,5 @@ $void StartEditor(const char *str);
 void StartEditor(const char *str);
 $void StartReplay(const char *str);
 void StartReplay(const char *str);
+$void StartSavedGame(const char *str);
+void StartSavedGame(const char *str);

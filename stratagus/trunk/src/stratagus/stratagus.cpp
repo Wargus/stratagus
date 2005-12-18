@@ -652,6 +652,23 @@ void CleanGame(void)
 	InitDefinedVariables(); // internal script.
 }
 
+static void ExpandPath(char *newpath, const char *path)
+{
+	char *s;
+
+	if (*path == '~') {
+		++path;
+		if ((s = getenv("HOME")) && GameName) {
+			sprintf(newpath, "%s/%s/%s/%s",
+				s, STRATAGUS_HOME_PATH, GameName, path);
+		} else {
+			sprintf(newpath, "%s/%s", StratagusLibPath, path);
+		}
+	} else {
+		sprintf(newpath, "%s/%s", StratagusLibPath, path);
+	}
+}
+
 void StartMap(const char *filename) 
 {
 	guichanActive = false;
@@ -674,6 +691,18 @@ void StartMap(const char *filename)
 	CleanGame();
 }
 
+void StartSavedGame(const char *filename) 
+{
+	char path[512];
+
+	guichanActive = false;
+	SaveGameLoading = 1;
+	ExpandPath(path, filename);
+	LoadGame(path);
+
+	StartMap(filename);
+}
+	
 void StartEditor(const char *filename) 
 {
 	guichanActive = false;
@@ -693,27 +722,12 @@ void StartEditor(const char *filename)
 	guichanActive = true;
 }
 
-/**
-**  FIXME: docu
-*/
 void StartReplay(const char *filename)
 {
 	int i;
 	char replay[512];
-	const char *s;
 
-	if (*filename == '~') {
-		++filename;
-		if ((s = getenv("HOME")) && GameName) {
-			sprintf(replay, "%s/%s/%s/%s",
-				s, STRATAGUS_HOME_PATH, GameName, filename);
-		} else {
-			sprintf(replay, "%s/%s", StratagusLibPath, filename);
-		}
-	} else {
-		sprintf(replay, "%s/%s", StratagusLibPath, filename);
-	}
-
+	ExpandPath(replay, filename);
 	LoadReplay(replay);
 
 	// FIXME why is this needed ?
