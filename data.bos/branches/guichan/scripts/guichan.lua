@@ -279,123 +279,6 @@ function RunLoadGameMenu(s)
   menu:run()
 end
 
-
-function RunCreditsMenu(s)
-  local menu
-  local b
-
-  local credits
-  credits = {
-     _("Graphics:"),
-     "  Tina Petersen Jensen",
-     "  Soeren Soendergaard Jensen",
-     "  TimberDragon",
-     "  Frank Loeffler",
-     "  Francois Beerten",
-     "",
-     _("Scripting:"),
-     "  Francois Beerten",
-     "  Lois Taulelle",
-     "",
-     _("Maps and campaigns:"),
-     "  Lois Taulelle",
-     "  Francois Beerten",
-     "",
-     _("Sound:"),
-     "  Tina Petersen",
-     "  Brian Pedersen",
-     " ",
-     _("powered by STRATAGUS"),
-     _("Stratagus Programmers:"),
-     "  Andreas 'Ari' Arens",
-     "  Lutz 'Johns' Sammer",
-     "  Edgar 'Froese' Toernig",
-     "  Jimmy Salmon",
-     "  Nehal Mistry",
-     "  Russell Smith",
-     "  Francois Beerten",
-     "  Joris Dauphin",
-     "  Mark Pazolli",
-     "  Valery Shchedrin",
-     "  Iftikhar Rathore",
-     "  Charles K Hardin",
-     "  Fabrice Rossi",
-     "  DigiCat",
-     "  Josh Cogliati",
-     "  Patrick Mullen",
-     "  Vladi Belperchinov-Shabanski",
-     "  Cris Daniluk",
-     "  Patrice Fortier",
-     "  FT Rathore",
-     "  Trent Piepho",
-     "  Jon Gabrielson",
-     "  Lukas Hejtmanek",
-     "  Steinar Hamre",
-     "  Ian Farmer",
-     "  Sebastian Drews",
-     "  Jarek Sobieszek",
-     "  Anthony Towns",
-     "  Stefan Dirsch",
-     "  Al Koskelin",
-     "  George J. Carrette",
-     "  Dirk 'Guardian' Richartz",
-     "  Michael O'Reilly",
-     "  Dan Hensley",
-     "  Sean McMillian",
-     "  Mike Earl",
-     "  Ian Turner",
-     "  David Slimp",
-     "  Iuri Fiedoruk",
-     "  Luke Mauldin",
-     "  Nathan Adams",
-     "  Stephan Rasenberger",
-     "  Dave Reed",
-     "  Josef Spillner",
-     "  James Dessart",
-     "  Jan Uerpmann",
-     "  Aaron Berger",
-     "  Latimerius",
-     "  Antonis Chaniotis",
-     "  Samuel Hays",
-     "  David Martinez Moreno",
-     "  Flavio Silvestrow",
-     "  Daniel Burrows",
-     "  Dave Turner",
-     "  Ben Hines",
-     "  Kachalov Anton",
-     _("Patches"),
-     "  Martin Renold",
-     "  Martin Hajduch",
-     "  Jeff Binder",
-     "  Ludovic",
-     "  Juan Pablo",
-     "  Phil Hannent",
-     "  Alexander MacLean",
-     "",
-     _("Stratagus Media Project Graphics"),
-      -- land construction site-summer-01.png; big_fire.png; explosion.png; green_cross.png; winter, big fire
-     "  Paolo D'Inca", 
-     "  Rick Elliot", -- cursor arrows
-     "  Chris Hopp", -- small_fire.png
-     "",
-     "",
-     _("The Bos and the Stratagus Team thanks all the people who have contributed"),
-     _("patches, bug reports, ideas.")
-  }
-
-  menu = BosMenu(_("Battle of Survival Credits"))
-
-  local sw = ScrollingWidget(400, Video.Height * 12 / 20)
-  menu:add(sw, Video.Width / 2 - 200, Video.Height / 20 * 3)
-  sw:setBackgroundColor(dark)
-  sw:setActionCallback(function() sw:restart() end)
-  for i,f in credits do
-    sw:add(Label(f), 50, 20 * i + 50)
-  end
-
-  menu:run()
-end
-
 function RunMultiPlayerMenu(s)
   local menu
   local b
@@ -423,6 +306,7 @@ function RunEditorMenu(s)
 end
 
 Load("scripts/menus/options.lua")
+Load("scripts/menus/credits.lua")
 Load("scripts/menus/widgetsdemo.lua")
 
 function BuildMainMenu(menu)
