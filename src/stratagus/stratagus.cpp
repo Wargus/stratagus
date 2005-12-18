@@ -36,20 +36,16 @@
 ** @section Introduction Introduction
 **
 ** Welcome to the source code documentation of the Stratagus engine.
-** For an open source project it is very important to have a good
-** source code documentation, I have tried to do this with the help
-** of doxygen (http://www.doxygen.org) or doc++
-** (http://www.zib.de/Visual/software/doc++/index.html). Please read the
-** documentation of this nice open source programs, to see how this all
-** works.
+** Extract the source documentation with doxygen (http://www.doxygen.org)
+** or doc++ (http://www.zib.de/Visual/software/doc++/index.html) tools.
 **
 ** Any help to improve this documention is welcome. If you didn't
-** understand something or you found a failure or a wrong spelling
+** understand something or you found an error or a wrong spelling
 ** or wrong grammer please write an email (including a patch :).
 **
 ** @section Informations Informations
 **
-** Visit the http://Stratagus.Org web page for the latest news and
+** Visit the http://stratagus.org web page for the latest news and
 ** ../doc/readme.html for other documentations.
 **
 ** @section Modules Modules

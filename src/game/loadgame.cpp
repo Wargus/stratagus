@@ -203,8 +203,6 @@ void LoadModules(void)
 **  Load a game to file.
 **
 **  @param filename  File name to be loaded.
-**
-**  @note  Later we want to store in a more compact binary format.
 */
 void LoadGame(char *filename)
 {
@@ -251,9 +249,6 @@ void LoadAll(void)
 	LoadGame("save_file_stratagus1.sav");
 	SaveGame("save_file_stratagus2.sav");
 	LoadGame("save_file_stratagus2.sav");
-#endif
-#if 0
-	LoadGame ("save_file_of_stratagus.ccl");
 #endif
 }
 
