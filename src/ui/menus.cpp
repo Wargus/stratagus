@@ -1479,7 +1479,10 @@ static void LoadGameOk(void)
 		return ;
 	}
 	sprintf(TempPathBuf, "%s/%s", SaveDir, ScenSelectFileName);
+	CommandLogDisabled = 1;
 	SaveGameLoading = 1;
+	CleanModules();
+	LoadCcl();
 	LoadGame(TempPathBuf);
 	Callbacks = &GameCallbacks;
 	SetMessage(_("Loaded game: %s"), TempPathBuf);
