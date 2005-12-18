@@ -229,7 +229,6 @@ function RunStartGameMenu(s)
   PresentMap = OldPresentMap
 end
 
-
 function RunReplayMenu(s)
   local menu
   menu = BosMenu(_("Show a Replay"))
@@ -246,135 +245,6 @@ function RunReplayMenu(s)
 
   menu:run()
 end
-
-function RunWidgetsMenu(s)
-  local menu
-  local b
-  menu = BosMenu()
-
-  local normalImage = CGraphic:New("graphics/button.png", 200, 24)
-  local pressedImage = CGraphic:New("graphics/pressed.png", 200, 24)
-  normalImage:Load() -- FIXME remove when immediatly loaded
-  pressedImage:Load() -- idem
-
-  b = Label(_("Translucent widgets"))
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-  menu:add(b, 20, 10)
-
-  menu:addButton(_("SubMenu"), 30, 50, RunSubMenu)
-
-  b = TextField(_("text input"))
-  b:setActionCallback(function() print("field") end)
-  b:setFont(CFont:Get("game"))
-  b:setBaseColor(clear)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(dark)
-  menu:add(b, 20, 100)
-
-  b = Slider(0, 1)
-  b:setActionCallback(function() print("slider") end)
-  menu:add(b, 20, 140)
-  b:setWidth(60)
-  b:setHeight(20)
-  b:setBaseColor(dark)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(clear)
-
-  b = RadioButton(_("Platoon"), "dumgroup", true)
-  b:setActionCallback(function() print("one") end)
-  b:setBaseColor(dark)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(dark)
-  menu:add(b, 20, 180)
-  b = RadioButton(_("Army"), "dumgroup")
-  b:setActionCallback(function() print("two") end)
-  b:setBaseColor(dark)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(dark)
-  menu:add(b, 150, 180)
-
-  menu:addCheckBox(_("CheckBox"), 20, 210, function(s) print("checked ?") end)
-
-  local ic = CGraphic:New("units/assault/ico_assault.png")
-  ic:Load()
-  b = ImageWidget(ic)
-  menu:add(b, 20, 250)
-
-  local sb = StatBoxWidget(200, 20)
-  sb.caption = "progress"
-  sb.percent = 45
-  menu:add(sb, 20, 300)
-  sb:setBackgroundColor(dark)
-
-  b = DropDownWidget()
-  b:setFont(CFont:Get("game"))
-  b:setList({_("line1"), _("line2")})
-  b:setActionCallback(function(s) print("dropdown ".. b:getSelected()) end)
-  b:setBaseColor(dark)
-  b:setForegroundColor(clear)
-  b:setBackgroundColor(dark)
-  menu:add(b, 20, 350)
-
-  win = Windows(_("Test"), 70, 70)
-  win:setBaseColor(dark)
-  win:setForegroundColor(dark)
-  win:setBackgroundColor(dark)
-  menu:add(win, 40, 450)
-  win2 = Windows("", 50, 50)
-  win:add(win2, 0, 0)
-
-  local sw = ScrollingWidget(200, 50)
-  menu:add(sw, 20, 380)
-  sw:setBackgroundColor(dark)
-  sw:setActionCallback(function() sw:restart() end)
-  for i,f in {"Jarod", "was", "here", " ", ":)"} do
-    sw:add(Label(f), 0, 20 * i + 50)
-  end
-  
-
-  b = Label(_("Image based widgets"))
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-  menu:add(b, 330, 10)
-
-  b = ImageButton(_("SubMenu"))
-  b:setNormalImage(normalImage)
-  b:setPressedImage(pressedImage)
-  b:setActionCallback(RunSubMenu)
-  menu:add(b, 330, 50)
-
-  b = ImageCheckBox(_("ImageCheckBox"))
-  local cb = CGraphic:New("ui/widgets/checkbox-unchecked-normal.png")
-  cb:Load()
-  b:setUncheckedNormalImage(cb)
-  cb = CGraphic:New("ui/widgets/checkbox-unchecked-pressed.png")
-  cb:Load()
-  b:setUncheckedPressedImage(cb)
-  cb = CGraphic:New("ui/widgets/checkbox-checked-normal.png")
-  cb:Load()
-  b:setCheckedNormalImage(cb)
-  cb = CGraphic:New("ui/widgets/checkbox-checked-pressed.png")
-  cb:Load()
-  b:setCheckedPressedImage(cb)
-  menu:add(b, 330, 210)
-
-  bs = ImageSlider(0,1)
-  local wimg = CGraphic:New("ui/widgets/undef_square.png")
-  wimg:Load()
-  bs:setMarkerImage(wimg)
-  local wimg2 = CGraphic:New("ui/widgets/scrollhorizontal_default.png")
-  wimg2:Load()
-  bs:setBackgroundImage(wimg2)
-  bs:setWidth(100)
-  bs:setHeight(20)
-  menu:add(bs, 330, 140)
-
-
-
-  menu:run()
-end
-
 
 function RunCampaignsMenu(s)
   local menu
@@ -553,6 +423,7 @@ function RunEditorMenu(s)
 end
 
 Load("scripts/menus/options.lua")
+Load("scripts/menus/widgetsdemo.lua")
 
 function BuildMainMenu(menu)
   local x = Video.Width / 2 - 100
