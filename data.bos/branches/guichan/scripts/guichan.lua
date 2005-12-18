@@ -398,7 +398,13 @@ function RunLoadGameMenu(s)
   local b
 
   menu = BosMenu(_("Load Game"))
-  menu:addButton(_("~!OK"), 176 - (106 / 2), 352 - 11 - 27, function() end)
+  local browser = menu:addBrowser("~save", ".sav.gz$")
+    function startgamebutton(s)
+    print("Starting saved game")
+    StartSavedGame("~save/" .. browser:getSelectedItem())
+    menu:stop()
+  end
+  menu:addButton(_("Start"), 100, 300, startgamebutton)
 
   menu:run()
 end
