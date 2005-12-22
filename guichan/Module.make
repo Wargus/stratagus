@@ -63,7 +63,7 @@ widgets/window.cpp \
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
 
-HDRS += \
+MHDRS = \
 include/guichan/actionlistener.h \
 include/guichan/allegro.h \
 include/guichan/basiccontainer.h \
@@ -111,3 +111,5 @@ include/guichan/widgets/textfield.h \
 include/guichan/widgets/window.h \
 include/guichan/x.h \
 include/guichan.h
+
+HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))
