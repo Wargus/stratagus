@@ -35,9 +35,9 @@ DefineAnimations("animations-jet", {
 	"unbreakable end", "wait 1", },
     Move = {"unbreakable begin", 
         "frame 5", "move 5", "wait 1", "frame 5", "move 4", "wait 1",
-        "frame 10", "move 5", "wait 1", "frame 10", "move 4", "wait 1",
+        "frame 5", "move 5", "wait 1", "frame 5", "move 4", "wait 1",
         "frame 5", "move 4", "wait 1", "frame 5", "move 5", "wait 1",
-        "frame 10", "move 5", "wait 1",
+        "frame 5", "move 5", "wait 1",
 	"unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 0", "wait 15","unbreakable end", "wait 1",},
     })
