@@ -39,8 +39,8 @@ DefineAiHelper(
   -- Building can train which units.
   --
   {"train", "unit-vault", "unit-engineer"},
-  {"train", "unit-camp", "unit-assault", "unit-bazoo", "unit-grenadier"},
-  {"train", "unit-hosp", "unit-medic", "unit-dorcoz"},
+  {"train", "unit-camp", "unit-assault", "unit-bazoo", "unit-grenadier", "unit-dorcoz"},
+  {"train", "unit-hosp", "unit-medic"},
   {"train", "unit-vfac", "unit-apcs", "unit-harvester"},
   --
   -- Building can research which spells or upgrades.
