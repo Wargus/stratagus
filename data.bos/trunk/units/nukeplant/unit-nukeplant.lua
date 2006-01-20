@@ -65,7 +65,7 @@ DefineUnitType("unit-nuke", {
 	Animations = "animations-nuke", Icon = "icon-nuke",
 	Costs = {"time", 600, "titanium", 5000, "crystal", 5000},
 	RepairHp = 2, RepairCosts = {"titanium", 5}, Construction = "construction-nuke",
-	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize  = {7, 5}, BoxSize = {256, 256},
+	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize  = {7, 5}, BoxSize = {224, 160},
 	SightRange = 3, Armor = 15 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 50, AnnoyComputerFactor = 55,
 	Points = 200, Supply = 1000, ExplodeWhenKilled = "missile-160x128-explosion",
@@ -90,7 +90,7 @@ DefineUnitType("build-dead-nuke", {
 	Image = {"file", GetCurrentLuaPath().."/nukeplant_c.png", "size", {256, 256}},
 	Animations = "animations-nukebuild", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {7, 5},
-	BoxSize = {256, 256}, SightRange = 1, BasicDamage = 0,
+	BoxSize = {224, 160}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
