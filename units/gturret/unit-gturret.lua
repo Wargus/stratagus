@@ -92,7 +92,7 @@ DefineAnimations("animations-dead-gturret", {
 
 DefineUnitType("build-dead-gturret", {
 	Name = "GturretCrater",
-	Image = {"file", GetCurrentLuaPath().."/gturret_c.png", "size", {64, 64}},
+	Image = {"file", GetCurrentLuaPath().."/gturret_c.png", "size", {96, 96}},
 	Animations = "animations-dead-gturret", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {2, 2}, BoxSize = {220, 156}, SightRange = 1,
