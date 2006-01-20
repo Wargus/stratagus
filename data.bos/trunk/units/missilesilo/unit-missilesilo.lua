@@ -75,12 +75,14 @@ DefineUnitType("unit-msilo", {
 	VisibleUnderFog = true,
 	})
 DefineAnimations("animations-dead-msilo", {
-    Death = {"unbreakable begin", "wait 1", "frame 1", "wait 2000", 
-             "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
+        "unbreakable end", "wait 1", },
     })
+
 DefineUnitType("build-dead-msilo", {
 	Name = "SiloCrater",
-	Image = {"file", GetCurrentLuaPath().."/missile_silo.png", "size", {256, 256}},
+	Image = {"file", GetCurrentLuaPath().."/missile_silo_c.png", "size", {256, 256}},
 	Animations = "animations-dead-msilo", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,	TileSize = {5, 5},
 	BoxSize = {124, 124}, SightRange = 1, BasicDamage = 0,
