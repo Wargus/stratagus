@@ -65,7 +65,7 @@ DefineConstruction("construction-cannon", {
 
 DefineMissileType("missile-cannon", {
 	File = "units/cannon/weapon.png",
-	Size = {128, 128}, Frames = 8, NumDirections = 1,
+	Size = {128, 128}, Frames = 6, NumDirections = 1,
 	ImpactSound = "rocket-impact", DrawLevel = 150,
 	Class = "missile-class-point-to-point", Sleep = 1, 
 	Speed = 20, Range = 3})
@@ -73,7 +73,7 @@ DefineMissileType("missile-cannon", {
 DefineUnitType("unit-cannon", {
 	Name = "Cannon",
 	Image = {"file", "units/cannon/cannon.png", "size", {128, 128},},
-	Offset ={0, -20},
+	Offset ={0, 0},
 	Shadow = {"file", "units/cannon/cannon_s.png", "size", {128, 128}},
 	Animations = "animations-cannon", Icon = "icon-cannon",
 	Costs = {"time", 330, "titanium", 250, "crystal", 350}, 
@@ -97,8 +97,8 @@ DefineUnitType("unit-cannon", {
 
 DefineAnimations("animations-dead-cannon", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
-        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", 
-        "wait 1", "unbreakable end", "wait 1", },
+        "frame 1", "wait 2000", "frame 2", "wait 2000", "frame 2", "wait 1", 
+        "unbreakable end", "wait 1", },
     })
 
 DefineUnitType("build-dead-cannon", {
