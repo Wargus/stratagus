@@ -85,13 +85,13 @@ DefineUnitType("unit-camp", {
 
 DefineAnimations("animations-dead-camp", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
-        "frame 0", "wait 200", "frame 0", "wait 200", "frame 0", "wait 200",
-        "frame 0", "wait 200", "frame 0", "wait 1", "unbreakable end", "wait 1", },
+        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
+        "unbreakable end", "wait 1", },
     })
 
 DefineUnitType("build-dead-camp", {
 	Name = "CampCrater",
-	Image = {"file", GetCurrentLuaPath().."/training_camp.png", "size", {224, 224}},
+	Image = {"file", GetCurrentLuaPath().."/training_camp_c.png", "size", {224, 224}},
 	Animations = "animations-dead-camp", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {7, 5}, BoxSize = {220, 156}, SightRange = 1,

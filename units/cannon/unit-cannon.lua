@@ -89,11 +89,27 @@ DefineUnitType("unit-cannon", {
 	ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	NumDirections = 8, Flip = false,
-	Corpse = {"build-dead-body2", 0}, Type = "land",
+	Corpse = {"build-dead-cannon", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {"selected", "cannon-selected",}
 })
+
+DefineAnimations("animations-dead-cannon", {
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", 
+        "wait 1", "unbreakable end", "wait 1", },
+    })
+
+DefineUnitType("build-dead-cannon", {
+	Name = "CannonCrater",
+	Image = {"file", GetCurrentLuaPath().."/cannon_c.png", "size", {128, 128}},
+	Animations = "animations-dead-cannon", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,
+	TileSize = {2, 2}, BoxSize = {220, 156}, SightRange = 1,
+	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
+	Priority = 0, Type = "land", Building = true, Vanishes = true
+	})
 
 
 DefineAllow("unit-cannon", "AAAAAAAAAAAAAAAA")

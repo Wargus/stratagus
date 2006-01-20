@@ -75,7 +75,7 @@ DefineUnitType("unit-gturret", {
 	ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	NumDirections = 8, Flip = false,
-	Corpse = {"build-dead-body2", 0}, Type = "land",
+	Corpse = {"build-dead-gturret", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {"selected", "gturret-selected",}
@@ -83,6 +83,23 @@ DefineUnitType("unit-gturret", {
 
 MakeSound("gturret-selected", "units/gturret/gturret_select.wav")
 MakeSound("gturret-attack", "units/gturret/gturret_attack.wav")
+
+DefineAnimations("animations-dead-gturret", {
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
+        "unbreakable end", "wait 1", },
+    })
+
+DefineUnitType("build-dead-gturret", {
+	Name = "GturretCrater",
+	Image = {"file", GetCurrentLuaPath().."/gturret_c.png", "size", {64, 64}},
+	Animations = "animations-dead-gturret", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,
+	TileSize = {2, 2}, BoxSize = {220, 156}, SightRange = 1,
+	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
+	Priority = 0, Type = "land", Building = true, Vanishes = true
+	})
+
 
 DefineAllow("unit-gturret", "AAAAAAAAAAAAAAAA")
 

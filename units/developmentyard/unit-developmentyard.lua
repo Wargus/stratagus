@@ -66,7 +66,7 @@ DefineUnitType("unit-dev-yard", {
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
 	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
-	Corpse = {"build-dead-body1", 0}, Type = "land",
+	Corpse = {"build-dead-devyard", 0}, Type = "land",
 	VisibleUnderFog = true,	Building = true, BuilderOutside = true,
 	Sounds = {
 		"selected", "dev-selected",
@@ -74,15 +74,16 @@ DefineUnitType("unit-dev-yard", {
 		"help", "dev-help",
 		"dead", "dev-dead"}
 	})
-DefineAnimations("animations-elitebuild1", {
-    Death = {"unbreakable begin", "wait 1", "frame 16", "wait 2000", 
-        "frame 16", "wait 200", "frame 16", "wait 200", "frame 17", "wait 200",
-        "frame 17", "wait 200", "frame 17", "wait 1", "unbreakable end", "wait 1", },
+
+DefineAnimations("animations-devyard", {
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
+        "unbreakable end", "wait 1", },
     }) 
-DefineUnitType("build-dead-body1", {
+DefineUnitType("build-dead-devyard", {
 	Name = "DevelopmentyardCrater",
-	Image = {"file", GetCurrentLuaPath().."/development_yard.png", "size", {256, 256}},
-	Animations = "animations-elitebuild1", Icon = "icon-cancel",
+	Image = {"file", GetCurrentLuaPath().."/development_yard_c.png", "size", {256, 256}},
+	Animations = "animations-devyard", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {7, 6}, BoxSize = {220, 192},
 	SightRange = 1, BasicDamage = 0, PiercingDamage = 0,
