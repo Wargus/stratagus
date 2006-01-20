@@ -73,7 +73,7 @@ DefineMissileType("missile-cannon", {
 DefineUnitType("unit-cannon", {
 	Name = "Cannon",
 	Image = {"file", "units/cannon/cannon.png", "size", {128, 128},},
-	Offset ={0, 0},
+	Offset ={0, -20},
 	Shadow = {"file", "units/cannon/cannon_s.png", "size", {128, 128}},
 	Animations = "animations-cannon", Icon = "icon-cannon",
 	Costs = {"time", 330, "titanium", 250, "crystal", 350}, 
