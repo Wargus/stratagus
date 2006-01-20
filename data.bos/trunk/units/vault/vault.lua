@@ -34,7 +34,6 @@ DefineAnimations("animations-vault", {
     Still = {"frame 15", "wait 5", "frame 16", "wait 5", "frame 17", "wait 5",
         "frame 18", "wait 5", "frame 19", "wait 5", "frame 18", "wait 5",
         "frame 17", "wait 5", "frame 16", "wait 5", "frame 15", "wait 10", },
-    Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 3", },
     })
 
 DefineIcon({
@@ -84,7 +83,7 @@ DefineUnitType("unit-vault", {
 		"dead", "dev-dead"}
 	})
 
-DefineAnimations("animations-vault", {
+DefineAnimations("animations-vault2", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200",  "unbreakable end", "wait 1", },
     })
@@ -92,9 +91,9 @@ DefineAnimations("animations-vault", {
 DefineUnitType("build-dead-vault", {
 	Name = "vaultCrater",
 	Image = {"file", GetCurrentLuaPath().."/vault_c.png", "size", {256, 256}},
-	Animations = "animations-vault", Icon = "icon-cancel",
+	Animations = "animations-vault2", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
-	TileSize = {6, 6}, BoxSize = {124, 124}, SightRange = 1,
+	TileSize = {6, 6}, BoxSize = {196, 164}, SightRange = 1,
 	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})

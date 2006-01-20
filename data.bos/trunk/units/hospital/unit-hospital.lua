@@ -78,7 +78,7 @@ DefineUnitType("unit-hosp", {
 		"dead", "hosp-dead"}
 	})
 
-DefineAnimations("animations-hosp", {
+DefineAnimations("animations-hosp2", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "unbreakable end", "wait 1", },
     })
@@ -86,7 +86,7 @@ DefineAnimations("animations-hosp", {
 DefineUnitType("build-dead-hosp", {
 	Name = "HospCrater",
 	Image = {"file", GetCurrentLuaPath().."/hospital_c.png", "size", {256, 256}},
-	Animations = "animations-hosp", Icon = "icon-cancel",
+	Animations = "animations-hosp2", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {6, 5},
 	BoxSize = {124, 92}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none",
