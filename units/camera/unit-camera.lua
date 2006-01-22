@@ -53,7 +53,7 @@ DefineIcon({
 	Name = "icon-cam_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/camera/camera_b.png"})
+	File = "units/camera/camera_i.png"})
 
 MakeSound("camera-selected", "units/camera/sfx_camera.select.wav")
 

@@ -31,44 +31,44 @@
 DefineIcon({
 	Name = "icon-gen_b",
 	Size = {46, 38},
-	Frame = 1,
-	File = "elites/units/engineer_icons.png"})
+	Frame = 0,
+	File = "units/generator/generator_i.png"})
 
 DefineIcon({
 	Name = "icon-camp_b",
 	Size = {46, 38},
-	Frame = 2,
-	File = "elites/units/engineer_icons.png"})
+	Frame = 0,
+	File = "units/camp/training_camp_i.png"})
 
 DefineIcon({
 	Name = "icon-dev_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/units/engineer_icons.png"})
+	File = "units/developmentyard/development_yard_i.png"})
 
 DefineIcon({
 	Name = "icon-rfac_b",
 	Size = {46, 38},
-	Frame = 6,
-	File = "elites/units/engineer_icons.png"})
+	Frame = 0,
+	File = "units/research/research_facility_i.png"})
 
 DefineIcon({
 	Name = "icon-hosp_b",
 	Size = {46, 38},
-	Frame = 7,
-	File = "elites/units/engineer_icons.png"})
+	Frame = 0,
+	File = "units/hospital/hospital_i.png"})
 
 DefineIcon({
 	Name = "icon-vfac_b",
 	Size = {46, 38},
-	Frame = 8,
-	File = "elites/units/engineer_icons.png"})
+	Frame = 0,
+	File = "units/vehiculefactory/vehicle_factory_i.png"})
 
 DefineIcon({
 	Name = "icon-msilo_b",
 	Size = {46, 38},
-	Frame = 9,
-	File = "elites/units/engineer_icons.png"})
+	Frame = 0,
+	File = "units/missilesilo/missile_silo_i.png"})
 
 -- upgrades
 DefineIcon({

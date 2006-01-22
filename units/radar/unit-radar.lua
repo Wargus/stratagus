@@ -45,7 +45,7 @@ DefineIcon({
 	Name = "icon-radar_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/radar/radar_b.png"})
+	File = "units/radar/radar_i.png"})
 
 MakeSound("radar-selected", GetCurrentLuaPath().."/sfx_rdar.select.wav")
 
