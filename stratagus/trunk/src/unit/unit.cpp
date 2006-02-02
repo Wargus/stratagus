@@ -1138,7 +1138,7 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
 	n = UnitCacheOnTile(x, y,units);
 	while (n) {
 		unit = units[--n];
-		if (cloak != (int)unit->Type->PermanentCloak) {
+		if (cloak != (int)unit->Type->PermanentCloak && player != unit->Player) {
 			continue;
 		}
 		//
@@ -1177,7 +1177,7 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
 		unit = units[--n];
 		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
 			unit->Y <= y && unit->Y + unit->Type->TileHeight - 1 >= y);
-		if (cloak != (int)unit->Type->PermanentCloak) {
+		if (cloak != (int)unit->Type->PermanentCloak && player != unit->Player) {
 			continue;
 		}
 		p = player->Index;
@@ -1237,7 +1237,7 @@ void UnitCountSeen(CUnit *unit)
 			newv = 0;
 			for (x = 0; x < unit->Type->TileWidth; ++x) {
 				for (y = 0; y < unit->Type->TileHeight; ++y) {
-					if (unit->Type->PermanentCloak) {
+					if (unit->Type->PermanentCloak && unit->Player != &Players[p]) {
 						if (Map.Fields[(unit->Y + y) * Map.Info.MapWidth + unit->X + x].VisCloak[p]) {
 							newv++;
 						}
