@@ -9,7 +9,7 @@
 --
 --      guichan.lua - The main UI lua script.
 --
---      (c) Copyright 2005 by François Beerten
+--      (c) Copyright 2005 by Franï¿½is Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -146,6 +146,18 @@ function BosMenu(title)
     return label
   end
 
+  function menu:addTextInputField(text, x, y)
+    local b = TextField(text)
+    b:setActionCallback(function() print("field") end)
+    b:setFont(CFont:Get("game"))
+    b:setBaseColor(clear)
+    b:setForegroundColor(clear)
+    b:setBackgroundColor(dark)
+    b:setSize(100, 18)
+    menu:add(b, x, y)
+    return b
+  end
+
   if title then
     local titlelabel = Label(title)
     titlelabel:setFont(CFont:Get("large"))
@@ -278,13 +290,93 @@ function RunLoadGameMenu(s)
 
   menu:run()
 end
+joincounter = 0
+
+function RunJoiningMapMenu(s)
+  local menu
+  local server
+  local x = Video.Width/2 - 100
+  local listener
+
+  menu = BosMenu(_("Joining game: Map"))
+  menu:addButton(_("~!Start Game"), x,  Video.Height*10/20, function() LocalSetupState.Ready[1] = 1 end)
+  joincounter = 0
+  local function listen()
+     NetworkProcessClientRequest()
+     if GetNetworkState() == 15  then
+        SetThisPlayer(1)
+        joincounter = joincounter + 1
+        if joincounter == 30 then 
+          NetworkGamePrepareGameSettings()
+          StartMap("maps/default.smp")
+          menu:stop()
+        end
+     end
+  end
+  listener = LuaActionListener(listen)
+  menu:addLogicCallback(listener)
+  menu:run()
+end
+
+function RunJoiningGameMenu(s)
+  local menu
+  local server
+  local x = Video.Width/2 - 100
+  local listener
+
+  menu = BosMenu(_("Joining game"))
+  --menu:addButton(_("~!Join Game"), x,  Video.Height*10/20, RunJoinGameMenu)
+  local function checkconnection() 
+      NetworkProcessClientRequest() 
+      if GetNetworkState() == 3 then
+           RunJoiningMapMenu()
+           menu:stop()
+      end
+  end
+  listener = LuaActionListener(checkconnection)
+  menu:addLogicCallback(listener)
+  menu:run()
+end
+
+function RunJoinIpMenu()
+  local menu
+  local server
+  local x = Video.Width/2 - 100
+
+  menu = BosMenu(_("Enter Server address"))
+  menu:writeText(_("IP or server name :"), x, Video.Height*8/20)
+  server = menu:addTextInputField("localhost", x + 90, Video.Height*9/20 + 4)
+  menu:addButton(_("~!Join Game"), x,  Video.Height*10/20, 
+     function(s) 
+       NetworkSetupServerAddress(server:getText()) 
+       NetworkInitClientConnect() 
+       RunJoiningGameMenu() 
+     end
+  )
+  menu:run()
+end
+
+function RunCreateMultiGameMenu(s)
+  local menu
+  menu = BosMenu(_("Create MultiPlayer game"))
+  menu:run()
+end
 
 function RunMultiPlayerMenu(s)
   local menu
   local b
+  local x = Video.Width/2 - 100
+  local nick
 
   menu = BosMenu(_("MultiPlayer"))
-  menu:writeText(_("Coming soon ..."), Video.Width/2 - 100, Video.Height/3)
+
+  menu:writeText(_("Nickname :"), x, Video.Height*8/20)
+  nick = menu:addTextInputField("unknown", x + 90, Video.Height*8/20 + 4)
+
+  menu:addButton(_("~!Join Game"), x,  Video.Height*11/20, 
+      function(s) SetLocalPlayerName(nick:getText()) RunJoinIpMenu() menu:stop(1) end)
+  menu:addButton(_("~!Create Game"), x,  Video.Height*12/20, 
+      function(s) SetLocalPlayerName(nick:getText()) RunCreateMultiGameMenu() menu:stop(1) end)
 
   menu:run()
 end
