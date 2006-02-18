@@ -7,11 +7,11 @@ int GetNetworkState();
 
 
 class ServerSetup {
-	int ResOpt;                /// Resources option
-	int UnsOpt;                /// Unit # option
-	int FwsOpt;                /// Fog of war option
-	int TssOpt;                /// Tileset select option
-	int GaTOpt;                /// Game type option
+	int ResourcesOption;
+	int UnitsOption;           /// Unit # option
+	int FogOfWar; 
+	int TilesetSelection;
+	int GameTypeOption;                /// Game type option
 	int CompOpt[PlayerMax];    /// Free slot option selection
 	int Ready[PlayerMax];      /// Client ready state
 	int Race[PlayerMax];       /// Client race selection
