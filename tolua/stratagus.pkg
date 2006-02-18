@@ -9,6 +9,7 @@ $#include "font.h"
 $#include "widgets.h"
 $#include "sound.h"
 $#include "sound_server.h"
+$#include "netconnect.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
@@ -38,6 +39,7 @@ $]
 
 $pfile "minimap.pkg"
 $pfile "ui.pkg"
+$pfile "network.pkg"
 $pfile "video.pkg"
 $pfile "font.pkg"
 $pfile "upgrade.pkg"

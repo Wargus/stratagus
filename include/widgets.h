@@ -243,18 +243,18 @@ private:
 	unsigned int percent; /// percent value of the widget.
 };
 
-
-
-
 class MenuScreen : public gcn::Container
 {
 	bool runLoop;
 	int loopResult;
 	gcn::Widget *oldtop;
+	LuaActionListener *logiclistener;
 public:
 	MenuScreen();
 	int run();
 	void stop(int result = 0);
+	void addLogicCallback(LuaActionListener *listener);
+	virtual void logic();
 };
 
 #endif

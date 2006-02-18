@@ -1,0 +1,25 @@
+
+int NetworkSetupServerAddress(const char *serveraddr);
+void NetworkInitClientConnect(void);
+void NetworkProcessClientRequest(void);
+$int GetNetworkState() {return (int)NetLocalState;}
+int GetNetworkState();
+
+
+class ServerSetup {
+	int ResOpt;                /// Resources option
+	int UnsOpt;                /// Unit # option
+	int FwsOpt;                /// Fog of war option
+	int TssOpt;                /// Tileset select option
+	int GaTOpt;                /// Game type option
+	int CompOpt[PlayerMax];    /// Free slot option selection
+	int Ready[PlayerMax];      /// Client ready state
+	int Race[PlayerMax];       /// Client race selection
+	long LastFrame[PlayerMax];  /// Last message received
+	// Fill in here...
+};
+extern ServerSetup LocalSetupState;
+
+$void NetworkGamePrepareGameSettings(void);
+void NetworkGamePrepareGameSettings(void);
+

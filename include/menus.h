@@ -304,6 +304,7 @@ typedef struct _menu_ {
 ----------------------------------------------------------------------------*/
 
 extern int GuiGameStarted;                    /// Game Started?
+extern bool oldMenusRunning;                  /// Are the old menus running ?
 extern Menu *CurrentMenu;                     /// Current menu
 extern CGraphic *MenuButtonGraphics[];/// Menu button graphics
 extern CGraphic *MenuButtonG;         /// Current menu button graphics
