@@ -969,7 +969,11 @@ static void ClientParseConnected(const InitMessage *msg)
 			}
 			NetLocalState = ccs_mapinfo;
 			NetStateMsgCnt = 0;
-			NetConnectRunning = 0; // Kick the menu..
+			if (oldMenusRunning) {
+				// Kick the menu..
+				DebugPrint("ClientParseConnected kick the menu\n");
+				NetConnectRunning = 0; // Kick the menu..
+			}
 			break;
 
 		case ICMWelcome: // Server has accepted us (dup)
@@ -1138,6 +1142,7 @@ static void ClientParseStarted(const InitMessage *msg)
 	switch(msg->SubType) {
 
 		case ICMGo: // Server's final go ..
+			DebugPrint("ClientParseStarted ICMGo !!!!!\n");
 			NetConnectRunning = 0; // End the menu..
 			break;
 

@@ -1133,7 +1133,7 @@ int StatBoxWidget::Getpercent() const
 **  MenuScreen constructor
 */
 MenuScreen::MenuScreen() : 
-	Container(), runLoop(true)
+	Container(), runLoop(true), logiclistener(0)
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
@@ -1166,4 +1166,24 @@ void MenuScreen::stop(int result)
 	loopResult = result;
 }
 
+void MenuScreen::addLogicCallback(LuaActionListener *listener)
+{
+	logiclistener = listener;
+}
+
+extern int NetConnectRunning;
+extern void NetworkProcessClientRequest();
+void MenuScreen::logic() 
+{
+	if (NetConnectRunning == 2) {
+		NetworkProcessClientRequest();
+	}
+	/*if (NetConnectRunning == 1) {
+		NetworkProcessServerRequest();
+	}*/
+	if (logiclistener) {
+		logiclistener->action("");
+	}
+	Container::logic();
+}
 //@}

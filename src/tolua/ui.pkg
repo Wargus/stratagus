@@ -224,6 +224,7 @@ class Label : public Widget
 class TextField : public Widget
 {
 	TextField(const std::string &text);
+	std::string & getText();
 };
 
 class ListBoxWidget : public Widget
@@ -277,6 +278,7 @@ class MenuScreen : Container
 	MenuScreen() : runLoop(false) {}
 	int run();
 	void stop(int result = 0);
+	void addLogicCallback(LuaActionListener *actionListener);
 };
 
 $void StartMap(const char *str);
@@ -287,3 +289,5 @@ $void StartReplay(const char *str);
 void StartReplay(const char *str);
 $void StartSavedGame(const char *str);
 void StartSavedGame(const char *str);
+
+

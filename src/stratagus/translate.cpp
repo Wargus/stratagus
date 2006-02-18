@@ -62,9 +62,8 @@ const char *Translate(const char *str)
 	if (i != Entries.end() && !i->second.empty()) {
 		return i->second.c_str();
 	} else {
-		DebugPrint("Couldn't translate: %s\n" _C_ str);
 		return str;
-    }
+	}
 }
 
 /**
