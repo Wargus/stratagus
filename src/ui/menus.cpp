@@ -3326,7 +3326,7 @@ static void GameRESAction(Menuitem *mi, int i)
 
 	if (!mi || mi->D.Pulldown.curopt == i) {
 		GameSettings.Resources = v[i];
-		ServerSetupState.ResOpt = i;
+		ServerSetupState.ResourcesOption = i;
 		if (mi) {
 			NetworkServerResyncClients();
 		}
@@ -3340,7 +3340,7 @@ static void GameUNSAction(Menuitem *mi, int i)
 {
 	if (!mi || mi->D.Pulldown.curopt == i) {
 		GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
-		ServerSetupState.UnsOpt = i;
+		ServerSetupState.UnitsOption = i;
 		if (mi) {
 			NetworkServerResyncClients();
 		}
@@ -3355,7 +3355,7 @@ static void GameTSSAction(Menuitem *mi, int i)
 	if (!mi || mi->D.Pulldown.curopt == i) {
 		// Subtract 1 for default option.
 		GameSettings.Terrain = i - 1;
-		ServerSetupState.TssOpt = i;
+		ServerSetupState.TilesetSelection = i;
 		if (mi) {
 			NetworkServerResyncClients();
 		}
@@ -3369,7 +3369,7 @@ static void GameGATAction(Menuitem *mi, int i)
 {
 	if (!mi || mi->D.Pulldown.curopt == i) {
 		GameSettings.GameType = i ? SettingsGameTypeMelee + i - 1 : SettingsGameTypeMapDefault;
-		ServerSetupState.GaTOpt = i;
+		ServerSetupState.GameTypeOption = i;
 		if (mi) {
 			NetworkServerResyncClients();
 		}
@@ -3417,7 +3417,7 @@ static void MultiGameFWSAction(Menuitem *mi, int i)
 				GameSettings.RevealMap = 1;
 				break;
 		}
-		ServerSetupState.FwsOpt = i;
+		ServerSetupState.FogOfWar = i;
 		if (mi) {
 			NetworkServerResyncClients();
 		}
@@ -4029,25 +4029,25 @@ void NetClientUpdateState(void)
 
 	menu = FindMenu("menu-net-multi-client");
 
-	GameRESAction(NULL, ServerSetupState.ResOpt);
+	GameRESAction(NULL, ServerSetupState.ResourcesOption);
 	menu->Items[CLIENT_RESOURCE].D.Pulldown.curopt =
-		ServerSetupState.ResOpt;
+		ServerSetupState.ResourcesOption;
 
-	GameUNSAction(NULL, ServerSetupState.UnsOpt);
+	GameUNSAction(NULL, ServerSetupState.UnitsOption);
 	menu->Items[CLIENT_UNITS].D.Pulldown.curopt =
-		ServerSetupState.UnsOpt;
+		ServerSetupState.UnitsOption;
 
-	MultiGameFWSAction(NULL, ServerSetupState.FwsOpt);
+	MultiGameFWSAction(NULL, ServerSetupState.FogOfWar);
 	menu->Items[CLIENT_FOG_OF_WAR].D.Pulldown.curopt =
-		ServerSetupState.FwsOpt;
+		ServerSetupState.FogOfWar;
 
-	GameTSSAction(NULL, ServerSetupState.TssOpt);
+	GameTSSAction(NULL, ServerSetupState.TilesetSelection);
 	menu->Items[CLIENT_TILESET].D.Pulldown.curopt =
-		ServerSetupState.TssOpt;
+		ServerSetupState.TilesetSelection;
 
-	GameGATAction(NULL, ServerSetupState.GaTOpt);
+	GameGATAction(NULL, ServerSetupState.GameTypeOption);
 	menu->Items[CLIENT_GAMETYPE].D.Pulldown.curopt =
-		ServerSetupState.GaTOpt;
+		ServerSetupState.GameTypeOption;
 
 	MultiClientUpdate(0);
 	DebugPrint("MultiClientMenuRedraw\n");

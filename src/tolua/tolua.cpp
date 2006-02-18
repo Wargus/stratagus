@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Feb 17 19:13:41 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Feb 18 12:36:05 2006.
 */
 
 #ifndef __cplusplus
@@ -5963,151 +5963,151 @@ static int tolua_stratagus_GetNetworkState00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: ResOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_ResOpt
-static int tolua_get_ServerSetup_ResOpt(lua_State* tolua_S)
+/* get function: ResourcesOption of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_ResourcesOption
+static int tolua_get_ServerSetup_ResourcesOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResourcesOption'",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->ResOpt);
+ tolua_pushnumber(tolua_S,(lua_Number)self->ResourcesOption);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: ResOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_ResOpt
-static int tolua_set_ServerSetup_ResOpt(lua_State* tolua_S)
+/* set function: ResourcesOption of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_ResourcesOption
+static int tolua_set_ServerSetup_ResourcesOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResourcesOption'",NULL);
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->ResOpt = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->ResourcesOption = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: UnsOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_UnsOpt
-static int tolua_get_ServerSetup_UnsOpt(lua_State* tolua_S)
+/* get function: UnitsOption of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_UnitsOption
+static int tolua_get_ServerSetup_UnitsOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UnsOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UnitsOption'",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->UnsOpt);
+ tolua_pushnumber(tolua_S,(lua_Number)self->UnitsOption);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: UnsOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_UnsOpt
-static int tolua_set_ServerSetup_UnsOpt(lua_State* tolua_S)
+/* set function: UnitsOption of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_UnitsOption
+static int tolua_set_ServerSetup_UnitsOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UnsOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UnitsOption'",NULL);
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->UnsOpt = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->UnitsOption = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: FwsOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_FwsOpt
-static int tolua_get_ServerSetup_FwsOpt(lua_State* tolua_S)
+/* get function: FogOfWar of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_FogOfWar
+static int tolua_get_ServerSetup_FogOfWar(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FwsOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FogOfWar'",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->FwsOpt);
+ tolua_pushnumber(tolua_S,(lua_Number)self->FogOfWar);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: FwsOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_FwsOpt
-static int tolua_set_ServerSetup_FwsOpt(lua_State* tolua_S)
+/* set function: FogOfWar of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_FogOfWar
+static int tolua_set_ServerSetup_FogOfWar(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FwsOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FogOfWar'",NULL);
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->FwsOpt = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->FogOfWar = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: TssOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_TssOpt
-static int tolua_get_ServerSetup_TssOpt(lua_State* tolua_S)
+/* get function: TilesetSelection of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_TilesetSelection
+static int tolua_get_ServerSetup_TilesetSelection(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TssOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TilesetSelection'",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->TssOpt);
+ tolua_pushnumber(tolua_S,(lua_Number)self->TilesetSelection);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: TssOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_TssOpt
-static int tolua_set_ServerSetup_TssOpt(lua_State* tolua_S)
+/* set function: TilesetSelection of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_TilesetSelection
+static int tolua_set_ServerSetup_TilesetSelection(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TssOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TilesetSelection'",NULL);
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->TssOpt = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->TilesetSelection = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: GaTOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_GaTOpt
-static int tolua_get_ServerSetup_GaTOpt(lua_State* tolua_S)
+/* get function: GameTypeOption of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_GameTypeOption
+static int tolua_get_ServerSetup_GameTypeOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GaTOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GameTypeOption'",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->GaTOpt);
+ tolua_pushnumber(tolua_S,(lua_Number)self->GameTypeOption);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: GaTOpt of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_GaTOpt
-static int tolua_set_ServerSetup_GaTOpt(lua_State* tolua_S)
+/* set function: GameTypeOption of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_GameTypeOption
+static int tolua_set_ServerSetup_GameTypeOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GaTOpt'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GameTypeOption'",NULL);
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->GaTOpt = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->GameTypeOption = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -9243,11 +9243,11 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"GetNetworkState",tolua_stratagus_GetNetworkState00);
  tolua_cclass(tolua_S,"ServerSetup","ServerSetup","",NULL);
  tolua_beginmodule(tolua_S,"ServerSetup");
-  tolua_variable(tolua_S,"ResOpt",tolua_get_ServerSetup_ResOpt,tolua_set_ServerSetup_ResOpt);
-  tolua_variable(tolua_S,"UnsOpt",tolua_get_ServerSetup_UnsOpt,tolua_set_ServerSetup_UnsOpt);
-  tolua_variable(tolua_S,"FwsOpt",tolua_get_ServerSetup_FwsOpt,tolua_set_ServerSetup_FwsOpt);
-  tolua_variable(tolua_S,"TssOpt",tolua_get_ServerSetup_TssOpt,tolua_set_ServerSetup_TssOpt);
-  tolua_variable(tolua_S,"GaTOpt",tolua_get_ServerSetup_GaTOpt,tolua_set_ServerSetup_GaTOpt);
+  tolua_variable(tolua_S,"ResourcesOption",tolua_get_ServerSetup_ResourcesOption,tolua_set_ServerSetup_ResourcesOption);
+  tolua_variable(tolua_S,"UnitsOption",tolua_get_ServerSetup_UnitsOption,tolua_set_ServerSetup_UnitsOption);
+  tolua_variable(tolua_S,"FogOfWar",tolua_get_ServerSetup_FogOfWar,tolua_set_ServerSetup_FogOfWar);
+  tolua_variable(tolua_S,"TilesetSelection",tolua_get_ServerSetup_TilesetSelection,tolua_set_ServerSetup_TilesetSelection);
+  tolua_variable(tolua_S,"GameTypeOption",tolua_get_ServerSetup_GameTypeOption,tolua_set_ServerSetup_GameTypeOption);
   tolua_array(tolua_S,"CompOpt",tolua_get_stratagus_ServerSetup_CompOpt,tolua_set_stratagus_ServerSetup_CompOpt);
   tolua_array(tolua_S,"Ready",tolua_get_stratagus_ServerSetup_Ready,tolua_set_stratagus_ServerSetup_Ready);
   tolua_array(tolua_S,"Race",tolua_get_stratagus_ServerSetup_Race,tolua_set_stratagus_ServerSetup_Race);
