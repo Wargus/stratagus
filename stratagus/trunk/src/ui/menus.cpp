@@ -357,7 +357,7 @@ static void MultiMetaServerClose(void); //Close Master Server connection
 //others
 static void GameMenuReturn(void);
 static void NetErrorMenu(char *error);
-static void NetworkGamePrepareGameSettings(void);
+void NetworkGamePrepareGameSettings(void);
 static void MultiGamePTSAction(Menuitem *mi, int o);
 static void NetMultiPlayerDrawFunc(Menuitem *mi);
 static void MultiGamePlayerSelectorsUpdate(int initial);
@@ -378,6 +378,8 @@ std::map<std::string, void *> MenuFuncHash;
 
 	/// Game started
 int GuiGameStarted;
+	/// Are the old menus running ?
+bool oldMenusRunning = false;
 	/// Editor cancel button pressed
 static int EditorCancelled;
 
@@ -3470,7 +3472,7 @@ static void MultiGameClientDrawFunc(Menuitem *mi)
 /**
 ** Multiplayer network game final race an player type setup.
 */
-static void NetworkGamePrepareGameSettings(void)
+void NetworkGamePrepareGameSettings(void)
 {
 	int c;
 	int h;
@@ -5129,7 +5131,7 @@ static void ReplayGameCancel(void)
 */
 static void NetErrorMenu(char *error)
 {
-	Menu *menu;
+    	Menu *menu;
 
 	menu = FindMenu("menu-net-error");
 	menu->Items[1].D.Text.text = NewStringDesc(error);

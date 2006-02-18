@@ -484,6 +484,7 @@ void PreMenuSetup(void)
 */
 void MenuLoop(const char *filename, CMap *map)
 {
+	oldMenusRunning = true;
 	for (;;) {
 		//
 		//  Clear screen
@@ -593,9 +594,7 @@ void MenuLoop(const char *filename, CMap *map)
 }
 
 /**
-**  Menu loop.
-**
-**  Show the menus, start game, return back.
+**  Run the guichan main menus loop.
 **
 **  @param filename  map filename
 **  @param map       map loaded
@@ -605,7 +604,8 @@ void GuichanLoop(const char *filename, CMap *map)
 	char buf[1024];
 
 	initGuichan(Video.Width, Video.Height);
-
+	InitNetwork1();
+	InterfaceState = IfaceStateMenu;
 	//  Clear screen
 	Video.ClearScreen();
 	Invalidate();
@@ -619,6 +619,7 @@ void GuichanLoop(const char *filename, CMap *map)
 	LuaLoadFile(buf);
 
 	freeGuichan();
+	ExitNetwork1();
 }
 
 extern void CleanMissiles();
@@ -668,6 +669,8 @@ static void ExpandPath(char *newpath, const char *path)
 void StartMap(const char *filename) 
 {
 	guichanActive = false;
+	NetConnectRunning = 0;
+	InterfaceState = IfaceStateNormal;
 
 	//  Create the game.
 	DebugPrint("Creating game with map: %s\n" _C_ filename);
@@ -685,6 +688,7 @@ void StartMap(const char *filename)
 	guichanActive = true;
 
 	CleanGame();
+	InterfaceState = IfaceStateMenu;
 }
 
 void StartSavedGame(const char *filename) 
