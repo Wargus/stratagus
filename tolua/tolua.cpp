@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Feb 18 12:36:05 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Feb 18 22:17:34 2006.
 */
 
 #ifndef __cplusplus
@@ -34,6 +34,7 @@ void StartEditor(const char *str);
 void StartReplay(const char *str);
 void StartSavedGame(const char *str);
 int GetNetworkState() {return (int)NetLocalState;}
+extern char NetworkMapName[1024];
 void NetworkGamePrepareGameSettings(void);
 
 /* function to release collected object via destructor */
@@ -5910,6 +5911,58 @@ static int tolua_stratagus_NetworkInitClientConnect00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NetworkInitServerConnect */
+#ifndef TOLUA_DISABLE_tolua_stratagus_NetworkInitServerConnect00
+static int tolua_stratagus_NetworkInitServerConnect00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  NetworkInitServerConnect();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'NetworkInitServerConnect'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NetworkServerStartGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_NetworkServerStartGame00
+static int tolua_stratagus_NetworkServerStartGame00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  NetworkServerStartGame();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'NetworkServerStartGame'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: NetworkProcessClientRequest */
 #ifndef TOLUA_DISABLE_tolua_stratagus_NetworkProcessClientRequest00
 static int tolua_stratagus_NetworkProcessClientRequest00(lua_State* tolua_S)
@@ -5958,6 +6011,32 @@ static int tolua_stratagus_GetNetworkState00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetNetworkState'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NetworkServerResyncClients */
+#ifndef TOLUA_DISABLE_tolua_stratagus_NetworkServerResyncClients00
+static int tolua_stratagus_NetworkServerResyncClients00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  NetworkServerResyncClients();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'NetworkServerResyncClients'.",&tolua_err);
  return 0;
 #endif
 }
@@ -6048,6 +6127,36 @@ static int tolua_set_ServerSetup_FogOfWar(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->FogOfWar = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: RevealMap of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_RevealMap
+static int tolua_get_ServerSetup_RevealMap(lua_State* tolua_S)
+{
+  ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RevealMap'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->RevealMap);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: RevealMap of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_RevealMap
+static int tolua_set_ServerSetup_RevealMap(lua_State* tolua_S)
+{
+  ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RevealMap'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->RevealMap = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -6341,6 +6450,53 @@ static int tolua_set_LocalSetupState(lua_State* tolua_S)
 #endif
   LocalSetupState = *((ServerSetup*)  tolua_tousertype(tolua_S,2,0))
 ;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: ServerSetupState */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetupState
+static int tolua_get_ServerSetupState(lua_State* tolua_S)
+{
+ tolua_pushusertype(tolua_S,(void*)&ServerSetupState,"ServerSetup");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: ServerSetupState */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetupState
+static int tolua_set_ServerSetupState(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,2,"ServerSetup",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  ServerSetupState = *((ServerSetup*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: NetworkMapName */
+#ifndef TOLUA_DISABLE_tolua_get_NetworkMapName
+static int tolua_get_NetworkMapName(lua_State* tolua_S)
+{
+ tolua_pushstring(tolua_S,(const char*)NetworkMapName);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: NetworkMapName */
+#ifndef TOLUA_DISABLE_tolua_set_NetworkMapName
+static int tolua_set_NetworkMapName(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+ strncpy(NetworkMapName,tolua_tostring(tolua_S,2,0),1024-1);
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -9239,13 +9395,17 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"StartSavedGame",tolua_stratagus_StartSavedGame00);
  tolua_function(tolua_S,"NetworkSetupServerAddress",tolua_stratagus_NetworkSetupServerAddress00);
  tolua_function(tolua_S,"NetworkInitClientConnect",tolua_stratagus_NetworkInitClientConnect00);
+ tolua_function(tolua_S,"NetworkInitServerConnect",tolua_stratagus_NetworkInitServerConnect00);
+ tolua_function(tolua_S,"NetworkServerStartGame",tolua_stratagus_NetworkServerStartGame00);
  tolua_function(tolua_S,"NetworkProcessClientRequest",tolua_stratagus_NetworkProcessClientRequest00);
  tolua_function(tolua_S,"GetNetworkState",tolua_stratagus_GetNetworkState00);
+ tolua_function(tolua_S,"NetworkServerResyncClients",tolua_stratagus_NetworkServerResyncClients00);
  tolua_cclass(tolua_S,"ServerSetup","ServerSetup","",NULL);
  tolua_beginmodule(tolua_S,"ServerSetup");
   tolua_variable(tolua_S,"ResourcesOption",tolua_get_ServerSetup_ResourcesOption,tolua_set_ServerSetup_ResourcesOption);
   tolua_variable(tolua_S,"UnitsOption",tolua_get_ServerSetup_UnitsOption,tolua_set_ServerSetup_UnitsOption);
   tolua_variable(tolua_S,"FogOfWar",tolua_get_ServerSetup_FogOfWar,tolua_set_ServerSetup_FogOfWar);
+  tolua_variable(tolua_S,"RevealMap",tolua_get_ServerSetup_RevealMap,tolua_set_ServerSetup_RevealMap);
   tolua_variable(tolua_S,"TilesetSelection",tolua_get_ServerSetup_TilesetSelection,tolua_set_ServerSetup_TilesetSelection);
   tolua_variable(tolua_S,"GameTypeOption",tolua_get_ServerSetup_GameTypeOption,tolua_set_ServerSetup_GameTypeOption);
   tolua_array(tolua_S,"CompOpt",tolua_get_stratagus_ServerSetup_CompOpt,tolua_set_stratagus_ServerSetup_CompOpt);
@@ -9254,6 +9414,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_array(tolua_S,"LastFrame",tolua_get_stratagus_ServerSetup_LastFrame,tolua_set_stratagus_ServerSetup_LastFrame);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"LocalSetupState",tolua_get_LocalSetupState,tolua_set_LocalSetupState);
+ tolua_variable(tolua_S,"ServerSetupState",tolua_get_ServerSetupState,tolua_set_ServerSetupState);
+ tolua_variable(tolua_S,"NetworkMapName",tolua_get_NetworkMapName,tolua_set_NetworkMapName);
  tolua_function(tolua_S,"NetworkGamePrepareGameSettings",tolua_stratagus_NetworkGamePrepareGameSettings00);
  tolua_cclass(tolua_S,"CVideo","CVideo","",NULL);
  tolua_beginmodule(tolua_S,"CVideo");
