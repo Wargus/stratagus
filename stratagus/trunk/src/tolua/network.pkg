@@ -1,15 +1,18 @@
 
 int NetworkSetupServerAddress(const char *serveraddr);
 void NetworkInitClientConnect(void);
+void NetworkInitServerConnect(void);
+void NetworkServerStartGame(void);
 void NetworkProcessClientRequest(void);
 $int GetNetworkState() {return (int)NetLocalState;}
 int GetNetworkState();
-
+void NetworkServerResyncClients(void);
 
 class ServerSetup {
 	int ResourcesOption;
 	int UnitsOption;           /// Unit # option
-	int FogOfWar; 
+	int FogOfWar;
+	int RevealMap;
 	int TilesetSelection;
 	int GameTypeOption;                /// Game type option
 	int CompOpt[PlayerMax];    /// Free slot option selection
@@ -19,6 +22,10 @@ class ServerSetup {
 	// Fill in here...
 };
 extern ServerSetup LocalSetupState;
+extern ServerSetup ServerSetupState;
+
+$extern char NetworkMapName[1024];
+char NetworkMapName[1024];
 
 $void NetworkGamePrepareGameSettings(void);
 void NetworkGamePrepareGameSettings(void);

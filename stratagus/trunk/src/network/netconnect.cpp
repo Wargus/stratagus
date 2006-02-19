@@ -87,6 +87,7 @@ static int NetStateMsgCnt;              /// Number of consecutive msgs of same t
 static unsigned char LastStateMsgType;  /// Subtype of last InitConfig message sent
 static unsigned long NetLastPacketSent; /// Tick the last network packet was sent
 static unsigned long NetworkServerIP;   /// Network Client: IP of server to join
+char NetworkMapName[1024];   		/// Name of the map recieved with ICMMap
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
@@ -282,6 +283,12 @@ void NetworkInitServerConnect(void)
 
 	// preset the server (initially always slot 0)
 	memcpy(Hosts[0].PlyName, LocalPlayerName, 16);
+	
+	memset(&ServerSetupState, 0, sizeof(ServerSetup));
+        for (i = 2; i < PlayerMax - 1; ++i) {
+                ServerSetupState.CompOpt[i] = 1;
+        }
+
 }
 
 /**
@@ -954,6 +961,8 @@ static void ClientParseConnected(const InitMessage *msg)
 
 		case ICMMap: // Server has sent us new map info
 			pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath);
+			memcpy(NetworkMapName, msg->u.MapPath, 256);
+			NetworkMapName[255] = 0;
 			memcpy(MenuMapFullPath + pathlen, msg->u.MapPath, 256);
 			MenuMapFullPath[pathlen + 255] = 0;
 			if (NetClientSelectScenario()) {
@@ -1019,6 +1028,7 @@ static void ClientParseSynced(const InitMessage *msg)
 	switch(msg->SubType) {
 
 		case ICMState: // Server has sent us new state info
+			DebugPrint("ccs_synced: ICMState recieved\n");
 			ServerSetupState = msg->u.State;
 			NetClientUpdateState();
 			NetLocalState = ccs_async;
@@ -1083,6 +1093,7 @@ static void ClientParseAsync(const InitMessage *msg)
 	switch(msg->SubType) {
 
 		case ICMResync: // Server has resynced with us and sends resync data
+			DebugPrint("ccs_async: ICMResync\n");
 			for (i = 1; i < PlayerMax - 1; ++i) {
 				if (i != NetLocalHostsSlot) {
 					Hosts[i].Host = msg->u.Hosts[i].Host;
@@ -1341,7 +1352,9 @@ static void ServerParseWaiting(const int h)
 			// this code path happens until client acknoledges the map
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
-			strncpy(message.u.MapPath, CurrentMapPath, 256);
+			strncpy(message.u.MapPath, NetworkMapName, 256);
+			if (oldMenusRunning)
+				strncpy(message.u.MapPath, CurrentMapPath, 256);
 			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
