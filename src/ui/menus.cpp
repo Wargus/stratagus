@@ -4050,7 +4050,7 @@ void NetClientUpdateState(void)
 		ServerSetupState.GameTypeOption;
 
 	MultiClientUpdate(0);
-	DebugPrint("MultiClientMenuRedraw\n");
+	DebugPrint("NetClientUpdateState\n");
 }
 
 /**

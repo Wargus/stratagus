@@ -85,6 +85,7 @@ typedef struct _setup_state_ {
 	unsigned char ResourcesOption;       /// Resources option
 	unsigned char UnitsOption;           /// Unit # option
 	unsigned char FogOfWar;              /// Fog of war option
+	unsigned char RevealMap;             /// Reveal all the map
 	unsigned char TilesetSelection;      /// Tileset select option
 	unsigned char GameTypeOption;        /// Game type option
 	unsigned char CompOpt[PlayerMax];    /// Free slot option selection
