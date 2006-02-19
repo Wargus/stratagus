@@ -108,9 +108,16 @@ function RunJoiningGameMenu(s)
   local listener
 
   menu = BosMenu(_("Joining game"))
-  --menu:addButton(_("~!Join Game"), x,  Video.Height*10/20, RunJoinGameMenu)
+
+  local sb = StatBoxWidget(300, 30)
+  sb.caption = "Connecting ..."
+  sb.percent = 0
+  menu:add(sb, x-50, Video.Height/2)
+  sb:setBackgroundColor(dark)
+
   local function checkconnection() 
-      NetworkProcessClientRequest() 
+      NetworkProcessClientRequest()
+      sb.percent = sb.percent + 1 
       if GetNetworkState() == 3 then
            -- got ICMMap => load map
            RunJoiningMapMenu()
@@ -134,7 +141,8 @@ function RunJoinIpMenu()
      function(s) 
        NetworkSetupServerAddress(server:getText()) 
        NetworkInitClientConnect() 
-       RunJoiningGameMenu() 
+       RunJoiningGameMenu()
+       menu:stop() 
      end
   )
   menu:run()
