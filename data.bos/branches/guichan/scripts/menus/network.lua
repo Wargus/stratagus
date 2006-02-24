@@ -65,9 +65,17 @@ function RunJoiningMapMenu(s)
       OldPresentMap(description, nplayers, w, h, id)
   end
 
-  menu:writeText(NetworkMapName, 20, 20)
+  menu:writeText("Map: " .. NetworkMapName, 40, 40)
   Load(NetworkMapName) -- TODO SECURITY !!!
-  menu:addButton(_("~!Start Game"), x,  Video.Height*10/20, function() LocalSetupState.Ready[1] = 1 end)
+  local function readycb(dd)
+     if dd:isMarked() == true then 
+        LocalSetupState.Ready[1] = 1 
+     else 
+        LocalSetupState.Ready[1] = 0 
+     end 
+  end
+  menu:addCheckBox(_("~!Ready"), x,  Video.Height*10/20, readycb)
+
   joincounter = 0
   local function listen()
      NetworkProcessClientRequest()
