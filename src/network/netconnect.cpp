@@ -647,6 +647,7 @@ void NetworkProcessClientRequest(void)
 	InitMessage message;
 	int i;
 
+	memset(&message, 0, sizeof(message));
 changed:
 	sprintf(NetTriesText, "Connected try %d of 20", NetStateMsgCnt);
 	switch (NetLocalState) {
