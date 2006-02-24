@@ -1125,6 +1125,7 @@ static void NetworkResendCommands(void)
 	//
 	// Build packet of 4 messages.
 	//
+	memset(&packet, 0, sizeof(packet));
 	packet.Header.Type[0] = MessageResend;
 	packet.Header.Type[1] = MessageNone;
 	packet.Header.Cycle =
