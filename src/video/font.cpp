@@ -753,7 +753,7 @@ void CFont::MeasureWidths()
 **  @param font  Font number
 */
 #ifdef USE_OPENGL
-static void MakeFontColorTextures(CFont *font)
+void MakeFontColorTextures(CFont *font)
 {
 	SDL_Surface *s;
 	CGraphic *g;
