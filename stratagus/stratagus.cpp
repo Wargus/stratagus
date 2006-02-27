@@ -604,7 +604,6 @@ void GuichanLoop(const char *filename, CMap *map)
 	char buf[1024];
 
 	initGuichan(Video.Width, Video.Height);
-	InitNetwork1();
 	InterfaceState = IfaceStateMenu;
 	//  Clear screen
 	Video.ClearScreen();
@@ -619,7 +618,6 @@ void GuichanLoop(const char *filename, CMap *map)
 	LuaLoadFile(buf);
 
 	freeGuichan();
-	ExitNetwork1();
 }
 
 extern void CleanMissiles();
