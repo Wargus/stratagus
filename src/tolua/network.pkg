@@ -1,3 +1,7 @@
+$void InitNetwork1(void);
+$void ExitNetwork1(void);
+void InitNetwork1(void);
+void ExitNetwork1(void);
 
 int NetworkSetupServerAddress(const char *serveraddr);
 void NetworkInitClientConnect(void);
