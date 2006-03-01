@@ -950,6 +950,43 @@ static void ClientParseConnecting(const InitMessage *msg)
 }
 
 /**
+** Check if the map name looks safe.
+**
+** A map name looks safe when there are no special characters
+** and no .. or // sequences. This way only real valid
+** maps from the map directory will be loaded.
+** @return true if the map name look safe.
+**/
+static bool IsSafeMapName(const char *mapname) 
+{
+	char buf[256];
+	const char *ch;
+
+	strncpy(buf, mapname, 256);
+	buf[255] = 0;
+	if (strlen(buf) >= 255)
+		return false;
+	if (strstr(buf, "..")) {
+		return false;
+	}
+	if (strstr(buf, "//")) {
+		return false;
+	}
+	if (buf[0] == 0) {	
+		return false;
+	}
+	ch = buf;
+	while (*ch != 0) {
+		if (!isalnum(*ch) && *ch != '/' && *ch != '.' && !isdigit(*ch)) {
+			return false;
+		}
+		ch++;
+	}
+
+	return true;
+}
+
+/**
 ** Parse a network menu packet in client connected state.
 **
 ** @param msg message received
@@ -961,6 +998,11 @@ static void ClientParseConnected(const InitMessage *msg)
 	switch (msg->SubType) {
 
 		case ICMMap: // Server has sent us new map info
+			if (!IsSafeMapName(msg->u.MapPath)) {
+				fprintf(stderr, "Unsecure map name!\n");
+				NetLocalState = ccs_badmap;
+				break;
+			}
 			pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath);
 			memcpy(NetworkMapName, msg->u.MapPath, 256);
 			NetworkMapName[255] = 0;
