@@ -27,6 +27,7 @@ class ServerSetup {
 };
 extern ServerSetup LocalSetupState;
 extern ServerSetup ServerSetupState;
+extern int NetLocalHostsSlot;
 
 $extern char NetworkMapName[1024];
 char NetworkMapName[1024];
