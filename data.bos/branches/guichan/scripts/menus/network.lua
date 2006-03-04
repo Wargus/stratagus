@@ -66,12 +66,13 @@ function RunJoiningMapMenu(s)
   end
 
   menu:writeText("Map: " .. NetworkMapName, 40, 40)
-  Load(NetworkMapName) -- TODO SECURITY !!!
+  -- Security: The map name is checked by the stratagus engine.
+  Load(NetworkMapName)
   local function readycb(dd)
      if dd:isMarked() == true then 
-        LocalSetupState.Ready[1] = 1 
+        LocalSetupState.Ready[NetLocalHostsSlot] = 1 
      else 
-        LocalSetupState.Ready[1] = 0 
+        LocalSetupState.Ready[NetLocalHostsSlot] = 0 
      end 
   end
   menu:addCheckBox(_("~!Ready"), x,  Video.Height*10/20, readycb)
