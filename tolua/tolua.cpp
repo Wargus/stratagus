@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Mon Feb 27 21:14:36 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Mar  4 21:15:59 2006.
 */
 
 #ifndef __cplusplus
@@ -6532,6 +6532,30 @@ static int tolua_set_ServerSetupState(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: NetLocalHostsSlot */
+#ifndef TOLUA_DISABLE_tolua_get_NetLocalHostsSlot
+static int tolua_get_NetLocalHostsSlot(lua_State* tolua_S)
+{
+ tolua_pushnumber(tolua_S,(lua_Number)NetLocalHostsSlot);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: NetLocalHostsSlot */
+#ifndef TOLUA_DISABLE_tolua_set_NetLocalHostsSlot
+static int tolua_set_NetLocalHostsSlot(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  NetLocalHostsSlot = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: NetworkMapName */
 #ifndef TOLUA_DISABLE_tolua_get_NetworkMapName
 static int tolua_get_NetworkMapName(lua_State* tolua_S)
@@ -9471,6 +9495,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"LocalSetupState",tolua_get_LocalSetupState,tolua_set_LocalSetupState);
  tolua_variable(tolua_S,"ServerSetupState",tolua_get_ServerSetupState,tolua_set_ServerSetupState);
+ tolua_variable(tolua_S,"NetLocalHostsSlot",tolua_get_NetLocalHostsSlot,tolua_set_NetLocalHostsSlot);
  tolua_variable(tolua_S,"NetworkMapName",tolua_get_NetworkMapName,tolua_set_NetworkMapName);
  tolua_function(tolua_S,"NetworkGamePrepareGameSettings",tolua_stratagus_NetworkGamePrepareGameSettings00);
  tolua_cclass(tolua_S,"CVideo","CVideo","",NULL);
