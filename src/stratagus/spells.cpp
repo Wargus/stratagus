@@ -10,7 +10,7 @@
 //
 /**@name spells.cpp - The spell cast action. */
 //
-//      (c) Copyright 1998-2005 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2006 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -66,23 +66,8 @@
 /*----------------------------------------------------------------------------
 -- Definitons
 ----------------------------------------------------------------------------*/
-#ifndef min
-#ifdef __GNUC__
-#define min(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a < _b ? _a : _b; })
-#else
-#define min min
-static inline min(int a, int b) { return a < b ? a : b; }
-#endif
-#endif
-
-#ifndef max
-#ifdef __GNUC__
-#define max(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a > _b ? _a : _b; })
-#else
-#define max max
-static inline max(int a, int b) { return a > b ? a : b; }
-#endif
-#endif
+static inline int s_min(int a, int b) { return a < b ? a : b; }
+static inline int s_max(int a, int b) { return a > b ? a : b; }
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -514,18 +499,18 @@ int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	//  Avoid div by 0 errors too!
 	castcount = 0;
 	if (hp) {
-		castcount = max(castcount, diffHP / abs(hp) + (((hp < 0) &&
+		castcount = s_max(castcount, diffHP / abs(hp) + (((hp < 0) &&
 			(diffHP % (-hp) > 0)) ? 1 : 0));
 	}
 	if (mana) {
-		castcount = max(castcount, diffMana / abs(mana) + (((mana < 0) &&
+		castcount = s_max(castcount, diffMana / abs(mana) + (((mana < 0) &&
 			(diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
-		castcount = min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
+		castcount = s_min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
 	}
 	if (this->MaxMultiCast) {
-		castcount = min(castcount, this->MaxMultiCast);
+		castcount = s_min(castcount, this->MaxMultiCast);
 	}
 
 	caster->Variable[MANA_INDEX].Value -= castcount * manacost;
