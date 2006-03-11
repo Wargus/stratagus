@@ -416,10 +416,10 @@ namespace gcn
         }
 
         key.setValue(value);
-        key.setShiftPressed(keysym.mod & KMOD_SHIFT);
-        key.setControlPressed(keysym.mod & KMOD_CTRL);
-        key.setAltPressed(keysym.mod & KMOD_ALT);
-        key.setMetaPressed(keysym.mod & KMOD_META);
+        key.setShiftPressed((keysym.mod & KMOD_SHIFT) != 0);
+        key.setControlPressed((keysym.mod & KMOD_CTRL) != 0);
+        key.setAltPressed((keysym.mod & KMOD_ALT) != 0);
+        key.setMetaPressed((keysym.mod & KMOD_META) != 0);
 
         if (keysym.sym >= SDLK_KP0 && keysym.sym <= SDLK_KP_EQUALS)
         {

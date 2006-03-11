@@ -10,7 +10,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -59,11 +59,18 @@
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
 #pragma warning(disable:4786)               /// Truncated to 255 chars
+#include <stdio.h>
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
+#define unlink _unlink
 #include <string.h>
 #define strdup _strdup
-#define strncasecmp strnicmp
+#define strncasecmp _strnicmp
+#include <io.h>
+#define access _access
+#define write _write
+#include <direct.h>
+#define mkdir _mkdir
 
 #endif  // } _MSC_VER
 
