@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.cpp - The draw routines for units. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -61,23 +61,8 @@
 /*----------------------------------------------------------------------------
 --  Definitions
 ----------------------------------------------------------------------------*/
-#ifndef min
-#ifdef __GNUC__
-#define min(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a < _b ? _a : _b; })
-#else
-#define min min
-static inline min(int a, int b) { return a < b ? a : b; }
-#endif
-#endif
-
-#ifndef max
-#ifdef __GNUC__
-#define max(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a > _b ? _a : _b; })
-#else
-#define max max
-static inline max(int a, int b) { return a > b ? a : b; }
-#endif
-#endif
+static inline int s_min(int a, int b) { return a < b ? a : b; }
+static inline int s_max(int a, int b) { return a > b ? a : b; }
 
 
 /*----------------------------------------------------------------------------
@@ -225,7 +210,7 @@ void DrawSelectionCircle(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
+		s_min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
 }
 
 /**
@@ -239,9 +224,9 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		min((x2 - x1) / 2, (y2 - y1) / 2), 95);
+		s_min((x2 - x1) / 2, (y2 - y1) / 2), 95);
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		min((x2 - x1) / 2, (y2 - y1) / 2));
+		s_min((x2 - x1) / 2, (y2 - y1) / 2));
 }
 
 /**
