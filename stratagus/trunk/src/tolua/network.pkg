@@ -28,6 +28,13 @@ class ServerSetup {
 extern ServerSetup LocalSetupState;
 extern ServerSetup ServerSetupState;
 extern int NetLocalHostsSlot;
+struct NetworkHost {
+	unsigned long  Host;         /// Host address
+	unsigned short Port;         /// Port on host
+	unsigned short PlyNr;        /// Player nummer
+	char           PlyName[16];  /// Name of player
+};
+extern NetworkHost Hosts[PlayerMax];
 
 $extern char NetworkMapName[1024];
 char NetworkMapName[1024];
