@@ -27,6 +27,38 @@
 --
 --      $Id: guichan.lua 305 2005-12-18 13:36:42Z feb $
 
+
+function addPlayersList(menu)
+  local i
+  local players_name = {}
+  local players_state = {}
+  for i=1,8 do
+     players_name[i] = menu:writeText("Player"..i, 300, 280 + i*18)
+     players_state[i] = menu:writeText("Preparing", 380, 280 + i*18)
+  end
+
+  local function updatePlayers()
+    players_state[1]:setCaption("Creator")
+    players_name[1]:setCaption(Hosts[0].PlyName)
+    for i=2,8 do
+      if Hosts[i-1].PlyName == "" then
+         players_name[i]:setCaption("")
+         players_state[i]:setCaption("")
+      else
+         if ServerSetupState.Ready[i-1] == 1 then
+           players_state[i]:setCaption("Ready")    
+         else
+           players_state[i]:setCaption("Preparing")
+         end
+         players_name[i]:setCaption(Hosts[i-1].PlyName)
+     end
+    end
+  end
+
+  return updatePlayers
+end
+
+
 joincounter = 0
 
 function RunJoiningMapMenu(s)
@@ -75,7 +107,9 @@ function RunJoiningMapMenu(s)
         LocalSetupState.Ready[NetLocalHostsSlot] = 0 
      end 
   end
-  menu:addCheckBox(_("~!Ready"), x,  Video.Height*10/20, readycb)
+  menu:addCheckBox(_("~!Ready"), x,  Video.Height*15/20, readycb)
+
+  local updatePlayersList = addPlayersList(menu)
 
   joincounter = 0
   local function listen()
@@ -90,6 +124,7 @@ function RunJoiningMapMenu(s)
      else
         revealmap:setMarked(false)
      end
+     updatePlayersList()
      if GetNetworkState() == 15  then
         SetThisPlayer(1)
         joincounter = joincounter + 1
@@ -210,7 +245,7 @@ function RunCreateMultiGameMenu(s)
   NetworkMapName = "maps/default.smp"
   maptext = menu:writeText(NetworkMapName, 20, 20)
 
-  local browser = menu:addBrowser("maps/", "^.*%.smp$")
+  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
   local function cb(s)
     local newmap = "maps/" .. browser:getSelectedItem()
     print(browser:getSelectedItem())
@@ -219,10 +254,12 @@ function RunCreateMultiGameMenu(s)
     maptext:setCaption(newmap)
   end
   browser:setActionCallback(cb)
+  
+  local updatePlayers = addPlayersList(menu)
 
   NetworkInitServerConnect();
   ServerSetupState.FogOfWar = 1
-  menu:addButton(_("~!StartGameWhenReady"), x,  Video.Height*10/20, 
+  menu:addButton(_("~!StartGameWhenReady"), x,  Video.Height*16/20, 
      function(s)    
         SetFogOfWar(fow:isMarked())
         if revealmap:isMarked() == true then
@@ -234,6 +271,9 @@ function RunCreateMultiGameMenu(s)
         menu:stop()
      end
   )
+  
+  local listener = LuaActionListener(updatePlayers)
+  menu:addLogicCallback(listener)
   menu:run()
 end
 
