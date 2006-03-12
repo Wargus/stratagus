@@ -73,7 +73,20 @@ function BosMenu(title)
     return b
   end
 
-  function menu:addBrowser(path, filter)
+  function menu:addListBox(x, y, w, h, list)
+    local bq
+    bq = ListBoxWidget(w, h)
+    bq:setList(list)
+    bq:setBaseColor(black)
+    bq:setForegroundColor(clear)
+    bq:setBackgroundColor(dark)
+    bq:setFont(CFont:Get("game"))
+    menu:add(bq, x, y)   
+    bq.itemslist = list
+    return bq
+  end
+
+  function menu:addBrowser(path, filter, x, y, w, h)
     local mapslist = {}
     local u = 1
     local fileslist = ListFilesInDirectory(path)
@@ -81,22 +94,13 @@ function BosMenu(title)
     local f
     for i,f in fileslist do
       if(string.find(f, filter)) then
-        print("Added item:" .. f .. "--" )
         mapslist[u] = f
         u = u + 1
       end
     end
 
     local bq
-    bq = ListBoxWidget(300, 200)
-    bq:setList(mapslist)
-    bq:setBaseColor(black)
-    bq:setForegroundColor(clear)
-    bq:setBackgroundColor(dark)
-    bq:setFont(CFont:Get("game"))
-    menu:add(bq, 300, 100)
-    
-    bq.itemslist = mapslist
+    bq = menu:addListBox(x, y, w, h, mapslist)
     bq.getSelectedItem = function(self)
         return self.itemslist[self:getSelected() + 1]
     end
@@ -219,7 +223,7 @@ function RunStartGameMenu(s)
       OldPresentMap(description, nplayers, w, h, id)
   end
  
-  local browser = menu:addBrowser("maps/", "^.*%.smp$")
+  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
   local function cb(s)
     print(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
@@ -246,7 +250,7 @@ function RunReplayMenu(s)
   local menu
   menu = BosMenu(_("Show a Replay"))
 
-  local browser = menu:addBrowser("~logs/", ".log$")
+  local browser = menu:addBrowser("~logs/", ".log$", 300, 100, 300, 200)
 
   function startreplaybutton(s)
     print("Starting map -------")
@@ -265,7 +269,7 @@ function RunCampaignsMenu(s)
 
   menu = BosMenu(_("List of Campaigns"))
 
-  local browser = menu:addBrowser("campaigns/", "^%a")
+  local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200)
   function startgamebutton(s)
     print("Starting campaign")
     Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
@@ -281,7 +285,7 @@ function RunLoadGameMenu(s)
   local b
 
   menu = BosMenu(_("Load Game"))
-  local browser = menu:addBrowser("~save", ".sav.gz$")
+  local browser = menu:addBrowser("~save", ".sav.gz$", 300, 100, 300, 200)
     function startgamebutton(s)
     print("Starting saved game")
     StartSavedGame("~save/" .. browser:getSelectedItem())
@@ -296,7 +300,7 @@ function RunEditorMenu(s)
   local menu
   menu = BosMenu(_("Editor"))
 
-  local browser = menu:addBrowser("maps/", "^.*%.smp$")
+  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
   function starteditorbutton(s)
     print("Starting map -------")
     StartEditor("test.smp")
