@@ -39,7 +39,7 @@ The game is still in development. You can get the latest version with <a href="h
  <pre>svn co svn://bos.seul.org/svn/bos/data.bos/trunk data.bos</pre>
 
 <p>You'll need the latest development version of the stratagus engine:<br>
- <pre>cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/stratagus co stratagus</pre>
+ <pre>svn co https://svn.sourceforge.net/svnroot/stratagus/stratagus/trunk stratagus</pre>
 
 <p>To start the game run :<br>
  <pre>./stratagus -d path/to/data.bos</pre>
