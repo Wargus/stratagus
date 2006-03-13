@@ -1258,24 +1258,27 @@ void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
 */
 void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 {
+	float xx1, yy1, xx2, yy2;
 	GLubyte r, g, b, a;
 
-	if (x1 < x2) {
-		++x2;
-	} else if (x1 > x2) {
-		--x2;
+	xx1 = x1; xx2 = x2; yy1 = y1; yy2 = y2;
+	if (xx1 <= xx2) {
+		xx2 += 0.5f;
+	} else {
+		xx1 += 0.5f;
 	}
-	if (y1 < y2) {
-		++y2;
-	} else if (y1 > y2) {
-		--y2;
+	if (yy1 <= yy2) {
+		yy2 += 0.5f;
+	} else {
+		yy1 += 0.5f;
 	}
+
 	GetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
-	glVertex2i(x1, y1);
-	glVertex2i(x2, y2);
+	glVertex2f(xx1, yy1);
+	glVertex2f(xx2, yy2);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 }
