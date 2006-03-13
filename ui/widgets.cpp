@@ -65,19 +65,17 @@ bool guichanActive = true;
 */
 void initGuichan(int width, int height)
 {
-	// FIXME: opengl
-	gcn::SDLGraphics *graphics;   // Graphics driver
+#ifdef USE_OPENGL
+	MyOpenGLGraphics *graphics = new MyOpenGLGraphics();
+#else
+	gcn::SDLGraphics *graphics = new gcn::SDLGraphics();
 
-#if 0
-	// We want unicode
-	SDL_EnableUNICODE(1);
-#endif
-
-	graphics = new gcn::SDLGraphics();
 	// Set the target for the graphics object to be the screen.
 	// In other words, we will draw to the screen.
 	// Note, any surface will do, it doesn't have to be the screen.
 	graphics->setTarget(TheScreen);
+#endif
+
 	input = new gcn::SDLInput();
 	
 	gui = new gcn::Gui();
@@ -179,6 +177,63 @@ LuaActionListener::~LuaActionListener()
 {
 	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }
+
+
+/*----------------------------------------------------------------------------
+--  MyOpenGLGraphics
+----------------------------------------------------------------------------*/
+
+
+#ifdef USE_OPENGL
+void MyOpenGLGraphics::drawImage(const gcn::Image* image, int srcX, int srcY,
+	int dstX, int dstY, int width, int height)
+{
+	const gcn::ClipRectangle &r = this->getCurrentClipArea();
+	int right = (r.x + r.width < Video.Width) ? r.x + r.width : Video.Width - 1;
+	int bottom = (r.y + r.height < Video.Height) ? r.y + r.height : Video.Height - 1;
+
+	if (r.x >= right || r.y >= bottom) {
+		return;
+	}
+
+	PushClipping();
+	SetClipping(r.x, r.y, right, bottom);
+	((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
+		dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+	PopClipping();
+}
+
+void MyOpenGLGraphics::drawPoint(int x, int y)
+{
+	gcn::Color c = this->getColor();
+	Video.DrawPixelClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
+		x + mClipStack.top().xOffset, y + mClipStack.top().yOffset);
+}
+
+void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
+{
+	gcn::Color c = this->getColor();
+	Video.DrawLineClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
+		x1 + mClipStack.top().xOffset, y1 + mClipStack.top().yOffset,
+		x2 + mClipStack.top().xOffset, y2 + mClipStack.top().yOffset);
+}
+
+void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle& rectangle)
+{
+	gcn::Color c = this->getColor();
+	Video.DrawRectangle(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
+		rectangle.x + mClipStack.top().xOffset, rectangle.y + mClipStack.top().yOffset,
+		rectangle.width, rectangle.height);
+}
+
+void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
+{
+	gcn::Color c = this->getColor();
+	Video.FillRectangle(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
+		rectangle.x + mClipStack.top().xOffset, rectangle.y + mClipStack.top().yOffset,
+		rectangle.width, rectangle.height);
+}
+#endif
 
 
 /*----------------------------------------------------------------------------
