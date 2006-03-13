@@ -189,10 +189,10 @@ void MyOpenGLGraphics::drawImage(const gcn::Image* image, int srcX, int srcY,
 	int dstX, int dstY, int width, int height)
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
-	int right = (r.x + r.width < Video.Width) ? r.x + r.width : Video.Width - 1;
-	int bottom = (r.y + r.height < Video.Height) ? r.y + r.height : Video.Height - 1;
+	int right = (r.x + r.width - 1 < Video.Width) ? r.x + r.width - 1 : Video.Width - 1;
+	int bottom = (r.y + r.height - 1 < Video.Height) ? r.y + r.height - 1 : Video.Height - 1;
 
-	if (r.x >= right || r.y >= bottom) {
+	if (r.x > right || r.y > bottom) {
 		return;
 	}
 
