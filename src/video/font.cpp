@@ -91,18 +91,17 @@ CFont *LargeTitleFont;  /// Large font used in episoden titles
 void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 	int x, int y) 
 {
-	int right;
-	int bottom;
+	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
+	int right = (r.x + r.width < Video.Width) ? r.x + r.width : Video.Width - 1;
+	int bottom = (r.y + r.height < Video.Height) ? r.y + r.height : Video.Height - 1;
 
-	const gcn::ClipRectangle r = graphics->getCurrentClipArea();
-	right = (r.x + r.width < Video.Width) ? r.x + r.width: Video.Width - 1;
-	bottom = (r.y + r.height < Video.Height) ? r.y + r.height: Video.Height - 1;
 	if (r.x >= right || r.y >= bottom) {
 		return;
 	}
+
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
-	VideoDrawText(x + r.xOffset, y + r.yOffset, this, txt.c_str());
+	VideoDrawTextClip(x + r.xOffset, y + r.yOffset, this, txt.c_str());
 	PopClipping();
 }
 
