@@ -250,7 +250,7 @@ namespace gcn
         
         int textX;
         int textY;
-        textY = (getTitleBarHeight() - getFont()->getHeight()) / 2;
+        textY = ((int)getTitleBarHeight() - getFont()->getHeight()) / 2;
         switch (getAlignment())
         {
           case Graphics::LEFT:
