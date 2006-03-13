@@ -330,7 +330,7 @@ void MapUnmarkTileDetectCloak(const CPlayer *player, int x, int y)
 **  @param marker  Function to mark or unmark sight
 */
 void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
-	void (*marker)(const CPlayer *, int, int))
+	MapMarkerFunc *marker)
 {
 	int mx;
 	int my;
