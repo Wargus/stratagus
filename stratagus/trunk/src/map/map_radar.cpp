@@ -104,7 +104,7 @@ unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, in
 	}
 
 	// Check jamming first, if we are jammed, exit
-	for (i = 0; i < PlayerMax ; ++i) {
+	for (i = 0; i < PlayerMax; ++i) {
 		if (jamming[i] > 0 && (punit->SharedVision & (1 << i)) &&
 				(Players[i].SharedVision & (1 << punit->Index))) {
 			// We are jammed, return nothing
