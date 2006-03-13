@@ -103,7 +103,9 @@ public:
 	inline bool IsLoaded() { return Surface != NULL; }
 
 	//guichan
+#ifndef USE_OPENGL
 	virtual void * _getData() const {return Surface;}
+#endif
 	virtual int getWidth() const {return Width;}
 	virtual int getHeight() const {return Height;}
 
