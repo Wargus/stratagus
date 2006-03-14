@@ -521,18 +521,10 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	}
 
 	type = 'n';
-#ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
 		*cp = 0;
 		type = 'z';
 	}
-#endif
-#ifdef USE_BZ2LIB
-	if (strcmp(cp, ".bz2") == 0) {
-		*cp = 0;
-		type = 'b';
-	}
-#endif
 	if (*cp != '\0') {
 		return 0;
 	}
@@ -1385,10 +1377,6 @@ static void SaveGameOk(void)
 		// Strip .gz extension.
 		if (!strcmp(TempPathBuf + strlen(TempPathBuf) - 3, ".gz")) {
 			TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
-		}
-		// Strip .bz2 extension.
-		if (!strcmp(TempPathBuf + strlen(TempPathBuf) - 4, ".bz2")) {
-			TempPathBuf[strlen(TempPathBuf) - 4] = '\0';
 		}
 		// Add .sav if not already there.
 		if (strcmp(TempPathBuf + strlen(TempPathBuf) - 4, ".sav")) {

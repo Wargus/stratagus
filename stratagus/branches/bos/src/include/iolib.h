@@ -38,14 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
-
-#ifdef USE_ZLIB
 #include <zlib.h>
-#endif
-
-#ifdef USE_BZ2LIB
-#include <bzlib.h>
-#endif
 
 class CMapInfo;
 
@@ -86,13 +79,10 @@ public:
 
 private:
 	int   cl_type;   /// type of CFile
-	FILE *cl_plain;  /// standard file pointer
-#ifdef USE_ZLIB
-	gzFile cl_gz;    /// gzip file pointer
-#endif // !USE_ZLIB
-#ifdef USE_BZ2LIB
-	BZFILE *cl_bz;   /// bzip2 file pointer
-#endif // !USE_BZ2LIB
+	union {
+		FILE *cl_plain;  /// standard file pointer
+		gzFile cl_gz;    /// gzip file pointer
+	} cl_file;
 };
 
 enum {
@@ -105,7 +95,6 @@ enum {
 #define CL_OPEN_READ 0x1
 #define CL_OPEN_WRITE 0x2
 #define CL_WRITE_GZ 0x4
-#define CL_WRITE_BZ2 0x8
 
 /*----------------------------------------------------------------------------
 --  Functions
