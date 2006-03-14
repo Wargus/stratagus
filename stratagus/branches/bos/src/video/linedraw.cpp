@@ -10,7 +10,7 @@
 //
 /**@name linedraw.cpp - The general linedraw functions. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
+//      (c) Copyright 2000-2006 by Lutz Sammer, Stephan Rasenberg,
 //                                 Jimmy Salmon, and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -48,16 +48,6 @@
 /*----------------------------------------------------------------------------
 -- Declarations
 ----------------------------------------------------------------------------*/
-
-/**
-** Bitmask, denoting a postion left/right/above/below clip rectangle
-** (mainly used by VideoDrawLineClip)
-*/
-#define ClipCodeInside 0 /// Clipping inside rectangle
-#define ClipCodeAbove  1 /// Clipping above rectangle
-#define ClipCodeBelow  2 /// Clipping below rectangle
-#define ClipCodeLeft   4 /// Clipping left rectangle
-#define ClipCodeRight  8 /// Clipping right rectangle
 
 /*----------------------------------------------------------------------------
 -- Variables
