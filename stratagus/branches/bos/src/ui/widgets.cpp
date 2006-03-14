@@ -65,7 +65,12 @@ bool guichanActive = true;
 */
 void initGuichan(int width, int height)
 {
-	MyOpenGLGraphics *graphics = new MyOpenGLGraphics();
+	gcn::SDLGraphics *graphics = new gcn::SDLGraphics();
+
+	// Set the target for the graphics object to be the screen.
+	// In other words, we will draw to the screen.
+	// Note, any surface will do, it doesn't have to be the screen.
+	graphics->setTarget(TheScreen);
 
 	input = new gcn::SDLInput();
 	
