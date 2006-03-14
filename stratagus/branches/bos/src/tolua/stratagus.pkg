@@ -1,0 +1,56 @@
+$#include "stratagus.h"
+$#include "ui.h"
+$#include "minimap.h"
+$#include "player.h"
+$#include "unittype.h"
+$#include "unit.h"
+$#include "video.h"
+$#include "font.h"
+$#include "widgets.h"
+$#include "sound.h"
+$#include "sound_server.h"
+$#include "netconnect.h"
+
+$#ifdef _MSC_VER
+$#pragma warning(disable:4800)
+$#endif
+
+$[
+mt = { __index = function(t, key) return CIcon:Get(key) end }
+Icons = {}
+setmetatable(Icons, mt)
+
+mt = { __index = function(t, key) return CUpgrade:Get(key) end }
+Upgrades = {}
+setmetatable(Upgrades, mt)
+
+mt = { __index = function(t, key) return CFont:Get(key) end }
+Fonts = {}
+setmetatable(Fonts, mt)
+
+mt = { __index = function(t, key) return CFontColor:Get(key) end }
+FontColors = {}
+setmetatable(FontColors, mt)
+$]
+
+#define MaxCosts 7
+#define PlayerMax 16
+#define UnitMax 2048
+
+$pfile "minimap.pkg"
+$pfile "ui.pkg"
+$pfile "network.pkg"
+$pfile "video.pkg"
+$pfile "font.pkg"
+$pfile "upgrade.pkg"
+$pfile "player.pkg"
+$pfile "unittype.pkg"
+$pfile "unit.pkg"
+$pfile "sound.pkg"
+
+extern const char *Translate(const char *str);
+extern void AddTranslation(const char *str1, const char *str2);
+extern void LoadPO(const char *file);
+
+extern const char *Translate @ _(const char *str);
+

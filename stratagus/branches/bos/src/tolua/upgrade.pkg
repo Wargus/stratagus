@@ -1,0 +1,9 @@
+class CUpgrade
+{
+  static CUpgrade *New(const char *ident);
+  static CUpgrade *Get(const char *ident);
+
+  int Costs[MaxCosts];
+  CIcon *Icon;
+};
+

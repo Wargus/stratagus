@@ -1,0 +1,293 @@
+class CButtonPanel
+{
+	int X;
+	int Y;
+	bool ShowCommandKey;
+};
+
+class CInfoPanel
+{
+	int X;
+	int Y;
+};
+
+class CUserInterface
+{
+	CInfoPanel InfoPanel;
+	CButtonPanel ButtonPanel;
+	CMinimap Minimap;
+};
+
+extern CUserInterface UI;
+
+class CIcon
+{
+	static CIcon *New(const char *ident);
+	static CIcon *Get(const char *ident);
+
+	tolua_readonly tolua_property__s char *Ident;
+	CGraphic *G;
+	int Frame;
+};
+
+extern bool GetMouseScroll(void);
+extern void SetMouseScroll(bool enabled);
+extern int GetMouseScrollSpeed(void);
+extern void SetMouseScrollSpeed(int speed);
+extern bool GetKeyScroll(void);
+extern void SetKeyScroll(bool enabled);
+extern int GetKeyScrollSpeed(void);
+extern void SetKeyScrollSpeed(int speed);
+extern bool GetGrabMouse(void);
+extern void SetGrabMouse(bool enabled);
+extern bool GetLeaveStops(void);
+extern void SetLeaveStops(bool enabled);
+extern int GetDoubleClickDelay(void);
+extern void SetDoubleClickDelay(int delay);
+extern int GetHoldClickDelay(void);
+extern void SetHoldClickDelay(int delay);
+
+
+//
+//  Guichan
+//
+
+$using namespace gcn;
+
+class Color
+{
+	Color(int r, int g, int b, int a = 255);
+	int r;
+	int g;
+	int b;
+	int a;
+};
+
+class LuaActionListener
+{
+	LuaActionListener(lua_State *lua, lua_Object luaref);
+};
+
+class Widget 
+{
+	virtual void setWidth(int width);
+	virtual int getWidth() const;
+	virtual void setHeight(int height);
+	virtual int getHeight() const;
+	virtual void setSize(int width, int height);
+	virtual void setX(int x);
+	virtual int getX() const;
+	virtual void setY(int y);
+	virtual int getY() const;
+	virtual void setPosition(int x, int y);
+	virtual void setEnabled(bool enabled);
+	virtual bool isEnabled() const;
+
+	virtual void setBaseColor(const Color &color);
+	virtual void setForegroundColor(const Color &color);
+	virtual void setBackgroundColor(const Color &color);
+
+	static void setGlobalFont(CFont *font);
+	void setForegroundColor(const Color &color);
+	void setBackgroundColor(const Color &color);
+	void setBaseColor(const Color &color);
+	void setSize(int width, int height);
+	void setBorderSize(int width);
+	virtual void setFont(CFont *font);
+
+	virtual void addActionListener(LuaActionListener *actionListener);
+};
+
+$[
+Widget.setActionCallback = function(w, f) 
+  w.actioncb = LuaActionListener(f)
+  w:addActionListener(w.actioncb)
+end 
+$]
+
+class ImageWidget : public Widget
+{
+	ImageWidget(CGraphic *image);
+};
+
+class ButtonWidget : public Widget
+{
+	ButtonWidget(const std::string &caption);
+	virtual void setCaption(const std::string &caption);
+	virtual const std::string &getCaption() const;
+	virtual void adjustSize();
+};
+
+class ImageButton : public Widget
+{
+	ImageButton();
+	ImageButton(const std::string &caption);
+
+	void setNormalImage(CGraphic *image);
+	void setPressedImage(CGraphic *image);
+	void setDisabledImage(CGraphic *image);
+	void setHotKey(const int key);
+	void setHotKey(const char *key);
+};
+
+class RadioButton : public Widget
+{
+	RadioButton();
+	RadioButton(const std::string &caption, const std::string &group, bool marked = false);
+
+	virtual bool isMarked();
+	virtual void setMarked(bool marked);
+	virtual const std::string &getCaption() const;
+	virtual void setCaption(const std::string &caption);
+	virtual void setGroup(const std::string &group);
+	virtual const std::string &getGroup() const;
+	virtual void adjustSize();
+};
+
+class ImageRadioButton : public RadioButton
+{
+	ImageRadioButton();
+	ImageRadioButton(const std::string &caption, const std::string &group, bool marked = false);
+
+	void setUncheckedNormalImage(CGraphic *image);
+	void setUncheckedPressedImage(CGraphic *image);
+	void setCheckedNormalImage(CGraphic *image);
+	void setCheckedPressedImage(CGraphic *image);
+};
+
+class CheckBox : public Widget
+{
+	CheckBox();
+	CheckBox(const std::string &caption, bool marked = false);
+
+	virtual bool isMarked() const;
+	virtual void setMarked(bool marked);
+	virtual const std::string &getCaption() const;
+	virtual void setCaption(const std::string &caption);
+	virtual void adjustSize();
+};
+
+class ImageCheckBox : public CheckBox
+{
+	ImageCheckBox();
+	ImageCheckBox(const std::string &caption, bool marked = false);
+
+	void setUncheckedNormalImage(CGraphic *image);
+	void setUncheckedPressedImage(CGraphic *image);
+	void setCheckedNormalImage(CGraphic *image);
+	void setCheckedPressedImage(CGraphic *image);
+};
+
+class Slider : public Widget
+{
+	Slider(double scaleEnd = 1.0);
+	Slider(double scaleStart, double scaleEnd);
+	virtual void setScale(double scaleStart, double scaleEnd);
+	virtual double getScaleStart() const;
+	virtual void setScaleStart(double scaleStart);
+	virtual double getScaleEnd() const;
+	virtual void setScaleEnd(double scaleEnd);
+	virtual double getValue();
+	virtual void setValue(double value);
+	virtual void setMarkerLength(int length);
+	virtual int getMarkerLength() const;
+	virtual void setOrientation(unsigned int orientation);
+	virtual unsigned int getOrientation() const;
+	virtual void setStepLength(double length);
+	virtual double getStepLength() const;
+
+	enum { HORIZONTAL = 0, VERTICAL };
+};
+
+class ImageSlider : public Slider
+{
+	ImageSlider(double scaleEnd = 1.0);
+	ImageSlider(double scaleStart, double scaleEnd);
+	void setMarkerImage(CGraphic *image);
+	void setBackgroundImage(CGraphic *image);
+};
+
+class Label : public Widget
+{
+	Label(const std::string &caption);
+	const std::string &getCaption() const;
+	void setCaption(const std::string &caption);
+	virtual void adjustSize();
+};
+
+// FIXME Combine with ScrollArea in our own widget
+//class TextBox : public Widget
+//{
+//	TextBox(const std::string &text);
+//};
+
+class TextField : public Widget
+{
+	TextField(const std::string &text);
+	std::string & getText();
+};
+
+class ListBoxWidget : public Widget
+{
+	ListBoxWidget(unsigned int width, unsigned int height);
+	void setList(lua_State *lua, lua_Object *lo);
+	void setSelected (int selected);
+	int getSelected();
+};
+
+class DropDownWidget : public Widget
+{
+	DropDownWidget();
+	void setList(lua_State *lua, lua_Object *lo);
+	int getSelected();
+	void setSelected(int selection);
+};
+
+class Windows : public Widget
+{
+	Windows(const std::string &text, int width, int height);
+	void add(Widget *widget, int x, int y);
+};
+
+class ScrollingWidget : public Widget
+{
+public:
+	ScrollingWidget(int width, int height);
+	void add(Widget *widget, int x, int y);
+	void restart();
+};
+
+class StatBoxWidget : public Widget
+{
+public:
+	StatBoxWidget(int width, int height);
+
+public:
+	tolua_property__s std::string caption;
+	tolua_property__s unsigned int percent; /// percent value of the widget.
+};
+
+class Container
+{
+	void add(Widget *widget, int x, int y);
+	void clear();
+};
+
+class MenuScreen : Container
+{
+	MenuScreen() : runLoop(false) {}
+	int run();
+	void stop(int result = 0);
+	void addLogicCallback(LuaActionListener *actionListener);
+};
+
+$void StartMap(const char *str);
+void StartMap(const char *str);
+$void StartEditor(const char *str);
+void StartEditor(const char *str);
+$void StartReplay(const char *str);
+void StartReplay(const char *str);
+$void StartSavedGame(const char *str);
+void StartSavedGame(const char *str);
+
+
