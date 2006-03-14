@@ -518,11 +518,6 @@ CSample *LoadSample(const char *name)
 		return sample;
 	}
 #endif
-#ifdef USE_FLAC
-	if ((sample = LoadFlac(buf, PlayAudioLoadInMemory))) {
-		return sample;
-	}
-#endif
 #ifdef USE_MAD
 	if ((sample = LoadMp3(buf, PlayAudioLoadInMemory))) {
 		return sample;
@@ -686,11 +681,6 @@ int PlayMusic(const char *file)
 #ifdef USE_MAD
 	if (!sample) {
 		sample = LoadMp3(name, PlayAudioStream);
-	}
-#endif
-#ifdef USE_FLAC
-	if (!sample) {
-		sample = LoadFlac(name, PlayAudioStream);
 	}
 #endif
 #ifdef USE_MIKMOD
