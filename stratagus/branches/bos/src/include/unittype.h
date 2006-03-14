@@ -552,10 +552,6 @@ public:
 		TerrainHarvester(0), LoseResources(0),
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{
-#ifdef USE_OPENGL
-		memset(PlayerColorSpriteWhenLoaded, 0, sizeof(PlayerColorSpriteWhenLoaded));
-		memset(PlayerColorSpriteWhenEmpty, 0, sizeof(PlayerColorSpriteWhenEmpty));
-#endif
 	}
 
 	char    *FileWhenLoaded;        /// Change the graphic when the unit is loaded.
@@ -572,10 +568,6 @@ public:
 	//  Runtime info:
 	CGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
 	CGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
-#ifdef USE_OPENGL
-	CGraphic *PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
-	CGraphic *PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
-#endif
 };
 
 /**

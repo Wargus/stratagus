@@ -725,7 +725,6 @@ void PlayersEachSecond(int player)
 	}
 }
 
-#ifndef USE_OPENGL
 /**
 **  Change current color set to new player.
 **
@@ -747,7 +746,6 @@ void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite)
 	}
 	SDL_UnlockSurface(sprite->Surface);
 }
-#endif
 
 /**
 **  Setup the player colors for the current palette.

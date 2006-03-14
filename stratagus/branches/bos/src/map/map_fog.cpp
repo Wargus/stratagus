@@ -73,10 +73,8 @@ int *VisionLookup;
 
 static unsigned char *VisibleTable;
 
-#ifndef USE_OPENGL
 static SDL_Surface *OnlyFogSurface;
 static CGraphic *AlphaFogG;
-#endif
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -463,7 +461,6 @@ void UpdateFogOfWarChange(void)
 **  @param x  X position into video memory
 **  @param y  Y position into video memory
 */
-#ifndef USE_OPENGL
 void VideoDrawOnlyFog(int x, int y)
 {
 	int oldx;
@@ -487,13 +484,6 @@ void VideoDrawOnlyFog(int x, int y)
 
 	SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
 }
-#else
-void VideoDrawOnlyFog(int x, int y)
-{
-	Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-		x, y, TileSizeX, TileSizeY);
-}
-#endif
 
 /*----------------------------------------------------------------------------
 --  Old version correct working but not 100% original
@@ -610,11 +600,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 		if (tile && tile != tile2) {
-#ifdef USE_OPENGL
-			Map.TileGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
-#else
 			AlphaFogG->DrawFrameClip(tile, dx, dy);
-#endif
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
@@ -701,17 +687,14 @@ void CViewport::DrawMapFogOfWar() const
 */
 void CMap::InitFogOfWar(void)
 {
-#ifndef USE_OPENGL
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 	Uint32 color;
 	SDL_Surface *s;
-#endif
 
 	FogGraphic->Load();
 
-#ifndef USE_OPENGL
 	//
 	// Generate Only Fog surface.
 	//
@@ -776,7 +759,6 @@ void CMap::InitFogOfWar(void)
 	AlphaFogG->GraphicWidth = s->w;
 	AlphaFogG->GraphicHeight = s->h;
 	AlphaFogG->NumFrames = 1;
-#endif
 
 	VisibleTable = new unsigned char[Info.MapWidth * Info.MapHeight];
 }
@@ -792,14 +774,12 @@ void CMap::CleanFogOfWar(void)
 	CGraphic::Free(Map.FogGraphic);
 	FogGraphic = NULL;
 
-#ifndef USE_OPENGL
 	if (OnlyFogSurface) {
 		SDL_FreeSurface(OnlyFogSurface);
 		OnlyFogSurface = NULL;
 	}
 	CGraphic::Free(AlphaFogG);
 	AlphaFogG = NULL;
-#endif
 }
 
 /**

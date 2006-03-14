@@ -169,10 +169,6 @@ extern int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number);
 
 	/// Load and initialize the fonts
 extern void LoadFonts(void);
-#ifdef USE_OPENGL
-	/// Reload OpenGL fonts
-extern void ReloadFonts(void);
-#endif
 	/// Cleanup the font module
 extern void CleanFonts(void);
 

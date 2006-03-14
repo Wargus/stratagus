@@ -364,34 +364,6 @@ void SaveScreenshotPNG(const char *name)
 
 	png_write_info(png_ptr, info_ptr);
 
-#ifdef USE_OPENGL
-	unsigned char *pixels = new unsigned char[Video.Width * Video.Height * 3];
-	if (!pixels) {
-		fprintf(stderr, "Out of memory\n");
-		exit(1);
-	}
-	glReadBuffer(GL_FRONT);
-	glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE,
-		pixels);
-	for (i = 0; i < Video.Height; ++i) {
-		unsigned char *src;
-		unsigned char *dst;
-
-		src = pixels + (Video.Height - 1 - i) * Video.Width * 3;
-		dst = row;
-
-		// Convert bgr to rgb
-		for (j = 0; j < Video.Width; ++j) {
-			dst[0] = src[2];
-			dst[1] = src[1];
-			dst[2] = src[0];
-			dst += 3;
-			src += 3;
-		}
-		png_write_row(png_ptr, row);
-	}
-	delete[] pixels;
-#else
 	for (i = 0; i < Video.Height; ++i) {
 		switch (Video.Depth) {
 			case 15: {
@@ -435,7 +407,6 @@ void SaveScreenshotPNG(const char *name)
 		}
 		png_write_row(png_ptr, row);
 	}
-#endif
 
 	png_write_end(png_ptr, info_ptr);
 

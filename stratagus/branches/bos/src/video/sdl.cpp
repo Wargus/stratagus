@@ -50,9 +50,6 @@
 #include <unistd.h>
 #endif
 #include "SDL.h"
-#ifdef USE_OPENGL
-#include "SDL_opengl.h"
-#endif
 
 #ifdef USE_BEOS
 #include <sys/socket.h>
@@ -83,12 +80,8 @@
 
 SDL_Surface *TheScreen; /// Internal screen
 
-#ifndef USE_OPENGL
 static SDL_Rect Rects[100];
 static int NumRects;
-#else
-int GLMaxTextureSize;   /// Max texture size supported on the video card
-#endif
 
 static int FrameTicks; /// Frame length in ms
 static int FrameRemainder; /// Frame remainder 0.1 ms
@@ -131,33 +124,6 @@ void SetVideoSync(void)
 /*----------------------------------------------------------------------------
 --  Video
 ----------------------------------------------------------------------------*/
-
-#ifdef USE_OPENGL
-/**
-**  Initialize open gl for doing 2d with 3d.
-*/
-static void InitOpenGL(void)
-{
-	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(0.375, 0.375, 0.);
-
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
-	glShadeModel(GL_FLAT);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &GLMaxTextureSize);
-}
-#endif
 
 #if defined(DEBUG) && !defined(USE_WIN32)
 static void CleanExit(int signum)
@@ -211,9 +177,6 @@ void InitVideoSdl(void)
 	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
 	}
-#ifdef USE_OPENGL
-	flags |= SDL_OPENGL;
-#endif
 
 	if (!Video.Width || !Video.Height) {
 		Video.Width = 640;
@@ -240,10 +203,6 @@ void InitVideoSdl(void)
 
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
-
-#ifdef USE_OPENGL
-	InitOpenGL();
-#endif
 
 	ColorBlack = Video.MapRGB(TheScreen->format, 0, 0, 0);
 	ColorDarkGreen = Video.MapRGB(TheScreen->format, 48, 100, 4);
@@ -279,7 +238,6 @@ int VideoValidResolution(int w, int h)
 */
 void InvalidateArea(int x, int y, int w, int h)
 {
-#ifndef USE_OPENGL
 	Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
 	Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
 	Rects[NumRects].x = x;
@@ -287,7 +245,6 @@ void InvalidateArea(int x, int y, int w, int h)
 	Rects[NumRects].w = w;
 	Rects[NumRects].h = h;
 	++NumRects;
-#endif
 }
 
 /**
@@ -295,13 +252,11 @@ void InvalidateArea(int x, int y, int w, int h)
 */
 void Invalidate(void)
 {
-#ifndef USE_OPENGL
 	Rects[0].x = 0;
 	Rects[0].y = 0;
 	Rects[0].w = Video.Width;
 	Rects[0].h = Video.Height;
 	NumRects = 1;
-#endif
 }
 
 /**
@@ -542,9 +497,7 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 		SkipGameCycle = SkipFrames;
 	}
 
-#ifndef USE_OPENGL
 	Video.ClearScreen();
-#endif
 }
 
 /**
@@ -552,15 +505,8 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 */
 void RealizeVideoMemory(void)
 {
-#ifdef USE_OPENGL
 	SDL_GL_SwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#else
-	if (NumRects) {
-		SDL_UpdateRects(TheScreen, NumRects, Rects);
-		NumRects = 0;
-	}
-#endif
 }
 
 /**
@@ -568,11 +514,9 @@ void RealizeVideoMemory(void)
 */
 void SdlLockScreen(void)
 {
-#ifndef USE_OPENGL
 	if (SDL_MUSTLOCK(TheScreen)) {
 		SDL_LockSurface(TheScreen);
 	}
-#endif
 }
 
 /**
@@ -580,11 +524,9 @@ void SdlLockScreen(void)
 */
 void SdlUnlockScreen(void)
 {
-#ifndef USE_OPENGL
 	if (SDL_MUSTLOCK(TheScreen)) {
 		SDL_UnlockSurface(TheScreen);
 	}
-#endif
 }
 
 /**
@@ -623,11 +565,9 @@ void ToggleFullScreen(void)
 	int w;
 	int h;
 	int bpp;
-#ifndef USE_OPENGL
 	unsigned char *pixels;
 	SDL_Color *palette;
 	int ncolors;
-#endif
 
 	if (!TheScreen) { // don't bother if there's no surface.
 		return;
@@ -643,7 +583,6 @@ void ToggleFullScreen(void)
 	// save the contents of the screen.
 	framesize = w * h * TheScreen->format->BytesPerPixel;
 
-#ifndef USE_OPENGL
 	if (!(pixels = new unsigned char[framesize])) { // out of memory
 		return;
 	}
@@ -665,16 +604,13 @@ void ToggleFullScreen(void)
 			ncolors * sizeof(SDL_Color));
 	}
 	SDL_UnlockSurface(TheScreen);
-#endif
 
 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
-#ifndef USE_OPENGL
 			delete[] pixels;
 			delete[] palette;
-#endif
 			fprintf(stderr, "Toggle to fullscreen, crashed all\n");
 			Exit(-1);
 		}
@@ -685,12 +621,6 @@ void ToggleFullScreen(void)
 	SDL_ShowCursor(SDL_ENABLE);
 	SDL_ShowCursor(SDL_DISABLE);
 
-#ifdef USE_OPENGL
-	InitOpenGL();
-	ReloadGraphics();
-	ReloadFonts();
-	UI.Minimap.Reload();
-#else
 	SDL_LockSurface(TheScreen);
 	memcpy(TheScreen->pixels, pixels, framesize);
 	delete[] pixels;
@@ -701,7 +631,6 @@ void ToggleFullScreen(void)
 		delete[] palette;
 	}
 	SDL_UnlockSurface(TheScreen);
-#endif
 
 	SDL_SetClipRect(TheScreen, &clip);
 

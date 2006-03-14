@@ -34,11 +34,6 @@
 //@{
 
 #include "SDL.h"
-
-#ifdef USE_OPENGL
-#include "SDL_opengl.h"
-#endif
-
 #include "guichan.h"
 
 class CGraphic : public gcn::Image {
@@ -47,15 +42,7 @@ private:
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1)
 	{
-#ifndef USE_OPENGL
 		SurfaceFlip = NULL;
-#else
-		TextureWidth = 0.f;
-		TextureHeight = 0.f;
-		Textures = NULL;
-		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
-		NumTextures = 0;
-#endif
 	}
 	~CGraphic() {}
 
@@ -70,9 +57,6 @@ public:
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
-#ifdef USE_OPENGL
-	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y) const;
-#endif
 	void DrawFrameClip(unsigned frame, int x, int y) const;
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
@@ -80,9 +64,6 @@ public:
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
-#ifdef USE_OPENGL
-	void DoDrawFrameClipX(GLuint *textures, unsigned frame, int x, int y) const;
-#endif
 	void DrawFrameClipX(unsigned frame, int x, int y) const;
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
@@ -103,36 +84,20 @@ public:
 	inline bool IsLoaded() { return Surface != NULL; }
 
 	//guichan
-#ifndef USE_OPENGL
 	virtual void * _getData() const {return Surface;}
-#endif
 	virtual int getWidth() const {return Width;}
 	virtual int getHeight() const {return Height;}
 
 	char *File;                /// Filename
 	char *HashFile;            /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
-#ifndef USE_OPENGL
 	SDL_Surface *SurfaceFlip;  /// Flipped surface
-#endif
 	int Width;                 /// Width of a frame
 	int Height;                /// Height of a frame
 	int NumFrames;             /// Number of frames
 	int GraphicWidth;          /// Original graphic width
 	int GraphicHeight;         /// Original graphic height
 	int Refs;                  /// Uses of this graphic
-#ifdef USE_OPENGL
-	GLfloat TextureWidth;      /// Width of the texture
-	GLfloat TextureHeight;     /// Height of the texture
-	GLuint *Textures;          /// Texture names
-	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
-	int NumTextures;
-#endif
-
-#ifdef USE_OPENGL
-	friend void MakeFontColorTextures(CFont *font);
-	friend void CleanFonts(void);
-#endif
 };
 
 #ifdef USE_MNG
@@ -153,11 +118,6 @@ public:
 	unsigned char *buffer;
 	unsigned long ticks;
 	int iteration;
-#ifdef USE_OPENGL
-	GLfloat texture_width;   /// Width of the texture
-	GLfloat texture_height;  /// Height of the texture
-	GLuint texture_name;     /// Texture name
-#endif
 };
 #endif
 
@@ -264,7 +224,6 @@ public:
 	void FillCircleClip(Uint32 color, int x, int y, int radius);
 	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
 
-#ifndef USE_OPENGL
 	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b) {
 		return SDL_MapRGB(f, r, g, b);
 	}
@@ -277,25 +236,6 @@ public:
 	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
 		SDL_GetRGBA(c, f, r, g, b, a);
 	}
-#else
-	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b) {
-		return MapRGBA(f, r, g, b, 0xFF);
-	}
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
-		return (r | (g << 8) | (b << 16) | (a << 24));
-	}
-	inline void GetRGB(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b) {
-		*r = (c >> 0) & 0xff;
-		*g = (c >> 8) & 0xff;
-		*b = (c >> 16) & 0xff;
-	}
-	inline void GetRGBA(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
-		*r = (c >> 0) & 0xff;
-		*g = (c >> 8) & 0xff;
-		*b = (c >> 16) & 0xff;
-		*a = (c >> 24) & 0xff;
-	}
-#endif
 
 	int Width;
 	int Height;
@@ -335,11 +275,6 @@ extern void SetPlayersPalette(void);
 	/// The SDL screen
 extern SDL_Surface *TheScreen;
 
-#ifdef USE_OPENGL
-	/// Max texture size supported on the video card
-extern int GLMaxTextureSize;
-#endif
-
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 #define RMASK 0xff000000
 #define GMASK 0x00ff0000
@@ -360,18 +295,6 @@ extern int VideoValidResolution(int w, int h);
 
 	/// Load graphic from PNG file
 extern int LoadGraphicPNG(CGraphic *g);
-
-#ifdef USE_OPENGL
-	/// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic);
-	/// Make an OpenGL texture of the player color pixels only.
-extern void MakePlayerColorTexture(CGraphic *graphic, int player);
-#endif
-
-#ifdef USE_OPENGL
-	/// Reload OpenGL graphics
-extern void ReloadGraphics(void);
-#endif
 
 	/// Initializes video synchronization.
 extern void SetVideoSync(void);
@@ -430,26 +353,12 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
-#ifdef USE_OPENGL
-void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
-	int ex, int ey, int x, int y, int flip);
-#endif
-
-#ifndef USE_OPENGL
 	/// Draw pixel unclipped.
 extern void (*VideoDrawPixel)(Uint32 color, int x, int y);
 
 	/// Draw translucent pixel unclipped.
 extern void (*VideoDrawTransPixel)(Uint32 color, int x, int y,
 	unsigned char alpha);
-#else
-	/// Draw pixel unclipped.
-extern void VideoDrawPixel(Uint32 color, int x, int y);
-
-	/// Draw translucent pixel unclipped.
-extern void VideoDrawTransPixel(Uint32 color, int x, int y,
-	unsigned char alpha);
-#endif
 
 //@}
 
