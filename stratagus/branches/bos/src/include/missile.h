@@ -363,14 +363,6 @@ enum _missile_class_ {
 	MissileClassHit,
 	/// Missile flies from x,y to x1,y1 using a parabolic path
 	MissileClassParabolic,
-	/// Missile wait on x,y until a non-air unit comes by, the explodes.
-	MissileClassLandMine,
-	/// Missile appears at x,y, is whirlwind
-	MissileClassWhirlwind,
-	/// Missile surround x,y
-	MissileClassFlameShield,
-	/// Missile is death coil.
-	MissileClassDeathCoil
 };
 
 	/// Base structure of missile-types
@@ -517,22 +509,6 @@ public:
 	virtual void Action();
 };
 class MissileParabolic : public Missile {
-public:
-	virtual void Action();
-};
-class MissileLandMine : public Missile {
-public:
-	virtual void Action();
-};
-class MissileWhirlwind : public Missile {
-public:
-	virtual void Action();
-};
-class MissileFlameShield : public Missile {
-public:
-	virtual void Action();
-};
-class MissileDeathCoil : public Missile {
 public:
 	virtual void Action();
 };
