@@ -10,7 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1998-2006 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -300,11 +300,8 @@ static void LoadMap(const char *filename, CMap *map)
 */
 static void GameTypeFreeForAll(void)
 {
-	int i;
-	int j;
-
-	for (i = 0; i < PlayerMax - 1; ++i) {
-		for (j = 0; j < PlayerMax - 1; ++j) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		for (int j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 			}
@@ -317,15 +314,13 @@ static void GameTypeFreeForAll(void)
 */
 static void GameTypeTopVsBottom(void)
 {
-	int i;
-	int j;
 	int top;
 	int middle;
 
 	middle = Map.Info.MapHeight / 2;
-	for (i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		top = Players[i].StartY <= middle;
-		for (j = 0; j < PlayerMax - 1; ++j) {
+		for (int j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if ((top && Players[j].StartY <= middle) ||
 						(!top && Players[j].StartY > middle)) {
@@ -344,15 +339,13 @@ static void GameTypeTopVsBottom(void)
 */
 static void GameTypeLeftVsRight(void)
 {
-	int i;
-	int j;
 	int left;
 	int middle;
 
 	middle = Map.Info.MapWidth / 2;
-	for (i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		left = Players[i].StartX <= middle;
-		for (j = 0; j < PlayerMax - 1; ++j) {
+		for (int j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if ((left && Players[j].StartX <= middle) ||
 						(!left && Players[j].StartX > middle)) {
@@ -371,14 +364,11 @@ static void GameTypeLeftVsRight(void)
 */
 static void GameTypeManVsMachine(void)
 {
-	int i;
-	int j;
-
-	for (i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
 		}
-		for (j = 0; j < PlayerMax - 1; ++j) {
+		for (int j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if (Players[i].Type == Players[j].Type) {
 					CommandDiplomacy(i, DiplomacyAllied, j);
@@ -392,18 +382,15 @@ static void GameTypeManVsMachine(void)
 }
 
 /**
-**  Man vs Machine whith Humans on a Team
+**  Man vs Machine with Humans on a Team
 */
 static void GameTypeManTeamVsMachine(void)
 {
-	int i;
-	int j;
-
-	for (i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
 		}
-		for (j = 0; j < PlayerMax - 1; ++j) {
+		for (int j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if (Players[i].Type == Players[j].Type) {
 					CommandDiplomacy(i, DiplomacyAllied, j);
@@ -422,47 +409,16 @@ static void GameTypeManTeamVsMachine(void)
 }
 
 /**
-**  CreateGame.
-**
-**  Load map, graphics, sounds, etc
-**
-**  @param filename  map filename
-**  @param map       map loaded
-**
-**  @todo FIXME: use in this function InitModules / LoadModules!!!
+**  Create the players
 */
-void CreateGame(const char *filename, CMap *map)
+static void CreatePlayers(void)
 {
-	int i;
-	int j;
+	for (int i = 0; i < PlayerMax; ++i) {
+		int p = Map.Info.PlayerType[i];
+		int aiopps = 0;
 
-	if (SaveGameLoading) {
-		SaveGameLoading = 0;
-		// Load game, already created game with Init/LoadModules
-		return;
-	}
-
-	InitVisionTable(); // build vision table for fog of war
-	InitPlayers();
-	
-	if (!Map.Info.Filename && filename) {
-		char path[PATH_MAX];
-		
-		Assert(filename);
-		LibraryFileName(filename, path);
-		if(strcasestr(filename, ".smp")) {
-			LuaLoadFile(path);
-		}
-	}
-
-	for (i = 0; i < PlayerMax; ++i) {
-		int p;
-		int aiopps;
-
-		p = Map.Info.PlayerType[i];
-		aiopps = 0;
 		// Single player games only:
-		// ARI: FIXME: convert to a preset array to share with network game code
+		// FIXME: convert to a preset array to share with network game code
 		if (GameSettings.Opponents != SettingsPresetMapDefault) {
 			if (p == PlayerPerson && ThisPlayer != NULL) {
 				p = PlayerComputer;
@@ -481,6 +437,101 @@ void CreateGame(const char *filename, CMap *map)
 		}
 		CreatePlayer(p);
 	}
+}
+
+/**
+**  Set the starting resources for all players
+*/
+static void SetStartingResources(void)
+{
+	if (GameSettings.Resources == SettingsResourcesMapDefault) {
+		return;
+	}
+
+	for (int player = 0; player < PlayerMax; ++player) {
+		if (Players[player].Type == PlayerNobody) {
+			continue;
+		}
+		for (int i = 1; i < MaxCosts; ++i) {
+			switch (GameSettings.Resources) {
+				case SettingsResourcesLow:
+					Players[player].Resources[i] = DefaultResourcesLow[i];
+					break;
+				case SettingsResourcesMedium:
+					Players[player].Resources[i] = DefaultResourcesMedium[i];
+					break;
+				case SettingsResourcesHigh:
+					Players[player].Resources[i] = DefaultResourcesHigh[i];
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
+/**
+**  Setup game types
+*/
+static void SetGameType(void)
+{
+	// TODO: implement more game types
+	if (GameSettings.GameType == SettingsGameTypeMapDefault) {
+		return;
+	}
+
+	switch (GameSettings.GameType) {
+		case SettingsGameTypeMelee:
+			break;
+		case SettingsGameTypeFreeForAll:
+			GameTypeFreeForAll();
+			break;
+		case SettingsGameTypeTopVsBottom:
+			GameTypeTopVsBottom();
+			break;
+		case SettingsGameTypeLeftVsRight:
+			GameTypeLeftVsRight();
+			break;
+		case SettingsGameTypeManVsMachine:
+			GameTypeManVsMachine();
+			break;
+		case SettingsGameTypeManTeamVsMachine:
+			GameTypeManTeamVsMachine();
+	}
+}
+
+/**
+**  CreateGame.
+**
+**  Load map, graphics, sounds, etc
+**
+**  @param filename  map filename
+**  @param map       map loaded
+**
+**  @todo FIXME: use in this function InitModules / LoadModules!!!
+*/
+void CreateGame(const char *filename, CMap *map)
+{
+	if (SaveGameLoading) {
+		SaveGameLoading = 0;
+		// Load game, already created game with Init/LoadModules
+		return;
+	}
+
+	InitVisionTable(); // build vision table for fog of war
+	InitPlayers();
+	
+	if (!Map.Info.Filename && filename) {
+		char path[PATH_MAX];
+		
+		Assert(filename);
+		LibraryFileName(filename, path);
+		if (strcasestr(filename, ".smp")) {
+			LuaLoadFile(path);
+		}
+	}
+
+	CreatePlayers();
 
 	if (filename) {
 		// FIXME: LibraryFile here?
@@ -524,71 +575,9 @@ void CreateGame(const char *filename, CMap *map)
 		Map.Reveal();
 	}
 
-	if (GameSettings.Resources != SettingsResourcesMapDefault) {
-		for (j = 0; j < PlayerMax; ++j) {
-			if (Players[j].Type == PlayerNobody) {
-				continue;
-			}
-			for (i = 1; i < MaxCosts; ++i) {
-				switch (GameSettings.Resources) {
-					case SettingsResourcesLow:
-						Players[j].Resources[i] = DefaultResourcesLow[i];
-						break;
-					case SettingsResourcesMedium:
-						Players[j].Resources[i] = DefaultResourcesMedium[i];
-						break;
-					case SettingsResourcesHigh:
-						Players[j].Resources[i] = DefaultResourcesHigh[i];
-						break;
-					default:
-						break;
-				}
-			}
-		}
-	}
+	SetStartingResources();
 
-	//
-	// Setup game types
-	//
-	// FIXME: implement more game types
-	if (GameSettings.GameType != SettingsGameTypeMapDefault) {
-		switch (GameSettings.GameType) {
-			case SettingsGameTypeMelee:
-				break;
-			case SettingsGameTypeFreeForAll:
-				GameTypeFreeForAll();
-				break;
-			case SettingsGameTypeTopVsBottom:
-				GameTypeTopVsBottom();
-				break;
-			case SettingsGameTypeLeftVsRight:
-				GameTypeLeftVsRight();
-				break;
-			case SettingsGameTypeManVsMachine:
-				GameTypeManVsMachine();
-				break;
-			case SettingsGameTypeManTeamVsMachine:
-				GameTypeManTeamVsMachine();
-
-			// Future game type ideas
-#if 0
-			case SettingsGameTypeOneOnOne:
-				break;
-			case SettingsGameTypeCaptureTheFlag:
-				break;
-			case SettingsGameTypeGreed:
-				break;
-			case SettingsGameTypeSlaughter:
-				break;
-			case SettingsGameTypeSuddenDeath:
-				break;
-			case SettingsGameTypeTeamMelee:
-				break;
-			case SettingsGameTypeTeamCaptureTheFlag:
-				break;
-#endif
-		}
-	}
+	SetGameType();
 
 	//
 	// Graphic part
@@ -683,7 +672,7 @@ void CreateGame(const char *filename, CMap *map)
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.
 	//
-	for (i = 0; i < NumUnits; ++i) {
+	for (int i = 0; i < NumUnits; ++i) {
 		// I don't really think that there can be any rescued
 		// units at this point.
 		if (Units[i]->RescuedFrom) {
@@ -706,15 +695,13 @@ void CreateGame(const char *filename, CMap *map)
 */
 void InitSettings(void)
 {
-	int i;
-
 	if (RestartScenario) {
 		Map.NoFogOfWar = GameSettings.NoFogOfWar;
 		FlagRevealMap = GameSettings.RevealMap;
 		return;
 	}
 
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].Race = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Type = SettingsPresetMapDefault;
