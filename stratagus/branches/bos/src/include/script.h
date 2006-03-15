@@ -277,7 +277,6 @@ extern void LoadCcl(void);                /// Load ccl config file
 extern void SaveCcl(CFile *file);        /// Save CCL module
 extern void SavePreferences(void);        /// Save user preferences
 extern int CclCommand(const char *command);/// Execute a ccl command
-extern void CleanCclCredits();            /// Free Ccl Credits Memory
 
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);

@@ -110,7 +110,6 @@ void CleanModules(void)
 	Map.Clean();
 	Map.CleanFogOfWar();
 	CleanReplayLog();
-	CleanCclCredits();
 	CleanSpells();
 	FreeVisionTable();
 	FreeAStar();

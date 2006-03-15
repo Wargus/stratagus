@@ -147,16 +147,6 @@ public:
 
 // ----------------------------------------------------------------------------
 
-class Credits {
-public:
-	Credits() : Background(NULL), Names(NULL) {}
-
-	char *Background;  /// Background picture
-	char *Names;       /// Names
-};
-
-// ----------------------------------------------------------------------------
-
 extern std::vector<char *> Tips;  /// Array of tips
 extern bool ShowTips;             /// Show tips at start of level
 extern int CurrentTip;            /// Current tip to display
@@ -167,7 +157,6 @@ extern int CurrentTip;            /// Current tip to display
 
 extern Settings GameSettings;  /// Game settings
 extern Intro    GameIntro;     /// Game intro
-extern Credits  GameCredits;   /// Game credits
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -175,14 +164,10 @@ extern Credits  GameCredits;   /// Game credits
 
 	/// Show level intro
 extern void ShowIntro(const Intro *intro);
-	/// Show game credits
-extern void ShowCredits(Credits *credits);
 	/// Show picture
 extern void ShowPicture(CampaignChapter *chapter);
 	/// Show stats
 extern void ShowStats();
-	/// Register CCL functions for credits
-extern void CreditsCclRegister(void);
 	/// Register CCL functions for objectives
 extern void ObjectivesCclRegister(void);
 	/// Save the objectives

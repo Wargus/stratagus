@@ -2599,7 +2599,6 @@ void InitCcl(void)
 	AiCclRegister();
 	CampaignCclRegister();
 	TriggerCclRegister();
-	CreditsCclRegister();
 	ObjectivesCclRegister();
 	SpellCclRegister();
 

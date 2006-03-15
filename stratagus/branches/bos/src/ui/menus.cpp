@@ -116,7 +116,6 @@ static void CampaignGameMenu(void);
 static void ReplayGameMenu(void);
 static void GlobalOptionsMenu(void);
 static void StartEditor(void);
-static void GameShowCredits(void);
 static void GameMenuExit(void);
 
 // Confirm menus
@@ -1016,7 +1015,6 @@ void InitMenuFuncHash(void)
 	HASHADD(ReplayGameMenu,"replay-game-menu");
 	HASHADD(GlobalOptionsMenu,"global-options-menu");
 	HASHADD(StartEditor,"game-start-editor");
-	HASHADD(GameShowCredits,"game-show-credits");
 	HASHADD(GameMenuExit,"game-menu-exit");
 
 // Confirm menus
@@ -2130,14 +2128,6 @@ static void PreferencesExit(Menu *menu)
 static void GameOptionsMenu(void)
 {
 	ProcessMenu("menu-game-options", 0);
-}
-
-/**
-**  Show the game credits.
-*/
-static void GameShowCredits(void)
-{
-	ShowCredits(&GameCredits);
 }
 
 /**
