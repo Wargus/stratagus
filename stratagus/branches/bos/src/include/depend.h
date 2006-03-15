@@ -10,7 +10,7 @@
 //
 /**@name depend.h - The units/upgrade dependencies headerfile. */
 //
-//      (c) Copyright 2000-2004 by Vladi Belperchinov-Shabanski
+//      (c) Copyright 2000-2006 by Vladi Belperchinov-Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ extern void CleanDependencies();
 extern void AddDependency(const char *target, const char *required, int count,
 	int or_flag);
 	/// Check a dependency by identifier
-extern int CheckDependByIdent(const CPlayer *player, const char *target);
+extern bool CheckDependByIdent(const CPlayer *player, const char *target);
 
 //@}
 

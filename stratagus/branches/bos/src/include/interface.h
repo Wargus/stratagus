@@ -10,7 +10,7 @@
 //
 /**@name interface.h - The user interface header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ enum ButtonCmd {
 };
 
 class ButtonAction;
-typedef int (*ButtonCheckFunc)(const CUnit *, const ButtonAction *);
+typedef bool (*ButtonCheckFunc)(const CUnit *, const ButtonAction *);
 
 	/// Action of button
 class ButtonAction {
@@ -364,43 +364,43 @@ extern int HandleMouseScrollArea(int x, int y);
 // in button_checks.c
 //
 	/// Check is always true
-extern int ButtonCheckTrue(const CUnit *unit,
+extern bool ButtonCheckTrue(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check is always false
-extern int ButtonCheckFalse(const CUnit *unit,
+extern bool ButtonCheckFalse(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if allowed upgrade is ready
-extern int ButtonCheckUpgrade(const CUnit *unit,
+extern bool ButtonCheckUpgrade(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if allowed units exists
-extern int ButtonCheckUnitsOr(const CUnit *unit,
+extern bool ButtonCheckUnitsOr(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if allowed units exists
-extern int ButtonCheckUnitsAnd(const CUnit *unit,
+extern bool ButtonCheckUnitsAnd(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if have network play
-extern int ButtonCheckNetwork(const CUnit *unit,
+extern bool ButtonCheckNetwork(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if don't have network play
-extern int ButtonCheckNoNetwork(const CUnit *unit,
+extern bool ButtonCheckNoNetwork(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if unit isn't working (train,upgrade,research)
-extern int ButtonCheckNoWork(const CUnit *unit,
+extern bool ButtonCheckNoWork(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if unit isn't researching or upgrading
-extern int ButtonCheckNoResearch(const CUnit *unit,
+extern bool ButtonCheckNoResearch(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if all requirements for an attack to are meet
-extern int ButtonCheckAttack(const CUnit *unit,
+extern bool ButtonCheckAttack(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if all requirements for an upgrade to are meet
-extern int ButtonCheckUpgradeTo(const CUnit *unit,
+extern bool ButtonCheckUpgradeTo(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if all requirements for a research are meet
-extern int ButtonCheckResearch(const CUnit *unit,
+extern bool ButtonCheckResearch(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if all requirements for a single research are meet
-extern int ButtonCheckSingleResearch(const CUnit *unit,
+extern bool ButtonCheckSingleResearch(const CUnit *unit,
 	const ButtonAction *button);
 
 //
