@@ -104,13 +104,6 @@ DefineMenuItem("pos", { 208, 109 + (36 * 6)}, "font", "large",
     "func", "game-start-editor",
     "style", "gm-full"},
   "menu", "menu-program-start")
-DefineMenuItem("pos", { 208, 109 + (36 * 7)}, "font", "large",
-  "button", {
-    "caption", _("S~!how Credits"),
-    "hotkey", "h",
-    "func", "game-show-credits",
-    "style", "gm-full"},
-  "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 8)}, "font", "large",
   "button", {
     "caption", _("E~!xit Program"),
