@@ -10,7 +10,7 @@
 //
 /**@name ui.h - The user interface header file. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -204,6 +204,7 @@ protected:
 public:
 	/// Draw the full Viewport.
 	void Draw() const;
+	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
 	int AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const;
 

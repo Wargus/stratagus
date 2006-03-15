@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@
 
 #include "script.h"
 
-extern void DoScrollArea(int state, int fast);
+extern void DoScrollArea(int state, bool fast);
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -2086,7 +2086,7 @@ void EditorMainLoop(void)
 				DoScrollArea(MouseScrollState, 0);
 			}
 			if (UI.KeyScroll && !(FrameCounter % SpeedKeyScroll)) {
-				DoScrollArea(KeyScrollState, KeyModifiers & ModifierControl);
+				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
 						(EditorState == EditorEditTile ||
 							EditorState == EditorEditUnit)) {

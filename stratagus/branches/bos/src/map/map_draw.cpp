@@ -10,7 +10,7 @@
 //
 /**@name map_draw.cpp - The map drawing. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -257,6 +257,7 @@ void CViewport::Draw() const
 
 	PushClipping();
 	SetClipping(this->X, this->Y, this->EndX, this->EndY);
+
 	this->DrawMapBackgroundInViewport();
 
 	//
@@ -294,8 +295,32 @@ void CViewport::Draw() const
 			ShowOrder(Selected[i]);
 		}
 	}
+
+	DrawBorder();
+
 	PopClipping();
 }
+
+/**
+**  Draw border around the viewport
+*/
+void CViewport::DrawBorder() const
+{
+	// if we a single viewport, no need to denote the "selected" one
+	if (UI.NumViewports == 1) {
+		return;
+	}
+
+	Uint32 color = ColorBlack;
+	if (this == UI.SelectedViewport) {
+		color = ColorOrange;
+	}
+
+	Video.DrawRectangle(color, this->X, this->Y, this->EndX - this->X + 1,
+		this->EndY - this->Y + 1);
+}
+
+
 
 /**
 **  Initialize the fog of war.
