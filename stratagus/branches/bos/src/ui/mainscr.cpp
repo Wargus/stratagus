@@ -1060,7 +1060,8 @@ void SetMessage(const char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	vsnprintf(temp, sizeof(temp), fmt, va);
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 	if (CheckRepeatMessage(temp)) {
 		return;
@@ -1084,7 +1085,8 @@ void SetMessageEvent(int x, int y, const char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	vsnprintf(temp, sizeof(temp), fmt, va);
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 	if (CheckRepeatMessage(temp) == 0) {
 		AddMessage(temp);
