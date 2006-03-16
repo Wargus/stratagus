@@ -119,7 +119,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 	const char *value;
 	int args;
 	int i;
-
+	CBuildRestrictionAnd &andlist = *new CBuildRestrictionAnd();
 	args = luaL_getn(l, -1);
 	Assert(!(args & 1)); // must be even
 
@@ -166,7 +166,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules distance tag: %s" _C_ value);
 				}
 			}
-			blist.push_back(b);
+			andlist.push_back(b);
 		} else if (!strcmp(value, "addon")) {
 			CBuildRestrictionAddOn *b = new CBuildRestrictionAddOn;
 
@@ -182,7 +182,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
 				}
 			}
-			blist.push_back(b);
+			andlist.push_back(b);
 		} else if (!strcmp(value, "ontop")) {
 			CBuildRestrictionOnTop *b = new CBuildRestrictionOnTop;
 
@@ -198,12 +198,13 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules ontop tag: %s" _C_ value);
 				}
 			}
-			blist.push_back(b);
+			andlist.push_back(b);
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
+	blist.push_back(&andlist);
 }
 
 /**
