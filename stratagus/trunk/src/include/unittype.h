@@ -775,6 +775,34 @@ public:
 	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const = 0;
 };
 
+
+class CBuildRestrictionAnd : public CBuildRestriction {
+public:
+
+	virtual ~CBuildRestrictionAnd() {
+		for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
+			i != _or_list.end(); ++i) {
+			delete *i;
+		}
+		_or_list.clear();
+	} ;
+	virtual void Init() {
+		for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
+			i != _or_list.end(); ++i) {
+			(*i)->Init();
+		}
+	};
+	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
+public:
+	void push_back(CBuildRestriction *restriction) {
+		_or_list.push_back(restriction);
+	}
+private:
+	std::vector<CBuildRestriction*> _or_list;
+};
+
+
+
 class CBuildRestrictionAddOn : public CBuildRestriction {
 public:
 	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), ParentName(NULL), Parent(NULL) {};
