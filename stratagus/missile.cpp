@@ -168,7 +168,7 @@ Missile::Missile() :
 */
 Missile *Missile::Init(MissileType *mtype, int sx, int sy, int dx, int dy)
 {
-	Missile *missile;
+	Missile *missile = NULL;
 
 
 	switch (mtype->Class) {

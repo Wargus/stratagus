@@ -1967,11 +1967,11 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 	CUnit *table[UnitMax];
 	int n;
 	int i;
-	int x1;
-	int x2;
-	int y1;
-	int y2;
-	int distance;
+	int x1 = 0;
+	int x2 = 0;
+	int y1 = 0;
+	int y2 = 0;
+	int distance = 0;
 
 	if (this->DistanceType == LessThanEqual ||
 		this->DistanceType == GreaterThan ||

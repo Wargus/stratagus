@@ -167,7 +167,7 @@ void DoScrollArea(int state, int fast)
 void DrawMapArea(void)
 {
 	CViewport *vp;
-	const CViewport *evp;
+	const CViewport *evp = NULL;
 
 	if (InterfaceState == IfaceStateNormal) {
 		// Draw all map viewports
