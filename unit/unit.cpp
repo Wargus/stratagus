@@ -1962,6 +1962,17 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 }
 
 // Run Distance Checking
+bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
+{
+	for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
+		i != _or_list.end(); ++i) {
+		if (!(*i)->Check(type, x, y, ontoptarget)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
 {
 	CUnit *table[UnitMax];
@@ -2131,22 +2142,25 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		}
 	}
 
+	if (type->BuildingRules.empty()) {
+		return (CUnit *)1;
+	}
 	ontoptarget = NULL;
 	for (std::vector<CBuildRestriction *>::const_iterator ib = type->BuildingRules.begin();
 		ib != type->BuildingRules.end(); ++ib) {
 		const CBuildRestriction *b = *ib;
 
 		// All checks processed, did we really have success
-		if (!b->Check(type, x, y, ontoptarget)) {
-			return NULL;
+		if (b->Check(type, x, y, ontoptarget)) {
+			// We passed a full ruleset return
+			if (unit == NULL) {
+				return ontoptarget ? ontoptarget : (CUnit *)1;
+			} else {
+				return ontoptarget ? ontoptarget : (CUnit *)unit;
+			}
 		}
 	}
-	// We passed a full ruleset return
-	if (unit == NULL) {
-		return ontoptarget ? ontoptarget : (CUnit *)1;
-	} else {
-		return ontoptarget ? ontoptarget : (CUnit *)unit;
-	}
+	return NULL;
 }
 
 /**
