@@ -1792,8 +1792,8 @@ static CContentType *CclParseContent(lua_State *l)
 {
 	CContentType *content;
 	const char *key;
-	int posX;
-	int posY;
+	int posX = 0;
+	int posY = 0;
 	ConditionPanel *condition;
 
 	Assert(lua_istable(l, -1));

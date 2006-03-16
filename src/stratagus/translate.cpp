@@ -85,7 +85,7 @@ void LoadPO(const char *file)
 	char msgid[16 * 1024];
 	char msgstr[16 * 1024];
 	char *s;
-	char *currmsg;
+	char *currmsg = NULL;
 	char fullfile[1024];
 
 	LibraryFileName(file, fullfile);
