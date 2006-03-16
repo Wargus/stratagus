@@ -1023,7 +1023,7 @@ static int CclDefineAiPlayer(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "ai-type")) {
-			CAiType *ait;
+			CAiType *ait = NULL;
 
 			value = LuaToString(l, j + 1);
 			for (k = 0; k < (int)AiTypes.size(); ++k) {

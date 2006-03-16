@@ -509,7 +509,7 @@ int AiFindWall(AiForce *force)
 int AiPlanAttack(AiForce *force)
 {
 	unsigned char *watermatrix;
-	const CUnit *aiunit;
+	const CUnit *aiunit = NULL;
 	int x;
 	int y;
 	int i;
