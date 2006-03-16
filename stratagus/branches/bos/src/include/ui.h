@@ -237,7 +237,16 @@ enum ViewportModeType {
 	NUM_VIEWPORT_MODES,             /// Number of different viewports.
 };
 
-#define ScPanel "sc-panel"          /// hack for transparency
+class CMapArea
+{
+public:
+	CMapArea() : X(0), Y(0), EndX(0), EndY(0) {}
+
+	int X;                          /// Screen pixel left corner x coordinate
+	int Y;                          /// Screen pixel upper corner y coordinate
+	int EndX;                       /// Screen pixel right x coordinate
+	int EndY;                       /// Screen pixel bottom y coordinate
+};
 
 /**
 **  Menu panels
@@ -478,7 +487,7 @@ public:
 class CStatusLine
 {
 public:
-	CStatusLine() : W(0), TextX(0), TextY(0), Font(0)
+	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0)
 	{
 		StatusLine[0] = '\0';
 	}
@@ -487,7 +496,7 @@ public:
 	void Set(const char *status);
 	void Clear();
 
-	int W;
+	int Width;
 	int TextX;
 	int TextY;
 	CFont *Font;
@@ -501,29 +510,7 @@ private:
 */
 class CUserInterface {
 public:
-	CUserInterface() : Name(NULL), Width(0), Height(0),
-		MouseScroll(false), KeyScroll(false),
-		MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
-		MouseWarpX(0), MouseWarpY(0),
-		NormalFontColor(NULL), ReverseFontColor(NULL),
-		PanelIndex(NULL), NumberPanel(0), SingleSelectedButton(NULL),
-		MaxSelectedFont(0), MaxSelectedTextX(0), MaxSelectedTextY(0),
-		SingleTrainingButton(NULL), SingleTrainingText(NULL),
-		SingleTrainingFont(0), SingleTrainingTextX(0), SingleTrainingTextY(0),
-		TrainingText(NULL), TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
-		UpgradingButton(NULL), ResearchingButton(NULL),
-		CompletedBarColor(0), CompletedBarShadow(0),
-		PieMenuBackgroundG(NULL), PieMouseButton(0),
-		ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
-		SelectedViewport(NULL), NumViewports(0),
-		ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
-		VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
-	{
-		memset(Resources, 0, sizeof(Resources));
-		memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
-		memset(PieX, 0, sizeof(PieX));
-		memset(PieY, 0, sizeof(PieY));
-	}
+	CUserInterface();
 	~CUserInterface();
 
 	void Load();
@@ -609,8 +596,7 @@ public:
 	CViewport *SelectedViewport;        /// Current selected active viewport
 	int NumViewports;                   /// # Viewports currently used
 	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
-	// Map* attributes of Viewport are unused here:
-	CViewport MapArea;                  /// geometry of the whole map area
+	CMapArea MapArea;                   /// geometry of the whole map area
 
 	// Menu buttons
 	Button MenuButton;                  /// menu button
@@ -665,7 +651,6 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern CUserInterface UI;                           /// The user interface
-extern std::vector<CUserInterface *> UI_Table;      /// All available user interfaces
 
 	/// Hash table of all the button styles
 extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
@@ -689,7 +674,7 @@ extern char *UiGroupKeys;               /// Up to 11 keys used for group selecti
 ----------------------------------------------------------------------------*/
 
 	/// Initialize the ui
-extern void InitUserInterface(const char *race_name);
+extern void InitUserInterface(void);
 	/// Save the ui state
 extern void SaveUserInterface(CFile *file);
 	/// Clean up the ui module

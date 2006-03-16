@@ -625,83 +625,49 @@ static void DrawVSlider(Menuitem *mi, int mx, int my)
 	x = mx + mi->XOfs;
 	y = my + mi->YOfs;
 
-	if (mi->D.VSlider.style == MI_STYLE_SC_VSLIDER) {
-		int upb;
-		int downb;
-
-		if (flags & MI_FLAGS_DISABLED) {
-			upb = MBUTTON_SC_UP_ARROW - 1;
-			downb = MBUTTON_SC_DOWN_ARROW - 1;
-		} else if (flags & MI_FLAGS_CLICKED) {
-			if (mi->D.VSlider.cflags&MI_CFLAGS_UP) {
-				upb = MBUTTON_SC_UP_ARROW + 1;
-				downb = MBUTTON_SC_DOWN_ARROW;
-			} else if (mi->D.VSlider.cflags&MI_CFLAGS_DOWN) {
-				upb = MBUTTON_SC_UP_ARROW;
-				downb = MBUTTON_SC_DOWN_ARROW + 1;
-			} else {
-				upb = MBUTTON_SC_UP_ARROW;
-				downb = MBUTTON_SC_DOWN_ARROW;
-			}
-		} else {
-			upb = MBUTTON_SC_UP_ARROW;
-			downb = MBUTTON_SC_DOWN_ARROW;
-		}
-		MenuButtonG->DrawFrame(upb, x, y);
-		MenuButtonG->DrawFrame(downb, x, y + h - 1 - 16);
-
-		MenuButtonG->DrawFrame(MBUTTON_SC_S_VCONT - 1, x, y + 16 + 2);
-		for (p = y + 16 + 2 + 8 + 1; p < y + h - 1 - 16 - 2 - 8; p += 8) {
-			MenuButtonG->DrawFrame(MBUTTON_SC_S_VCONT, x, p);
-		}
-		MenuButtonG->DrawFrame(MBUTTON_SC_S_VCONT + 1, x, y + h - 1 - 16 - 2 - 8);
-		p = (mi->D.VSlider.percent * (h - 54)) / 100;
-		MenuButtonG->DrawFrame(MBUTTON_SC_S_KNOB, x, y + 16 + 2 + p);
+	if (flags & MI_FLAGS_DISABLED) {
+		PushClipping();
+		SetClipping(0, 0, Video.Width - 1, y + h - 20);
+//		if (mi->transparent) {
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT - 1, x, y - 2);
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT - 1, x, y + h / 2);
+//		} else {
+			MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT - 1, x, y - 2);
+			MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT - 1, x, y + h / 2);
+//		}
+		PopClipping();
+		MenuButtonG->DrawFrame(MBUTTON_UP_ARROW - 1, x, y - 2);
+		MenuButtonG->DrawFrame(MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
 	} else {
-		if (flags & MI_FLAGS_DISABLED) {
-			PushClipping();
-			SetClipping(0, 0, Video.Width - 1, y + h - 20);
-//			if (mi->transparent) {
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT - 1, x, y - 2);
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT - 1, x, y + h / 2);
-//			} else {
-				MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT - 1, x, y - 2);
-				MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT - 1, x, y + h / 2);
-//			}
-			PopClipping();
-			MenuButtonG->DrawFrame(MBUTTON_UP_ARROW - 1, x, y - 2);
-			MenuButtonG->DrawFrame(MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
+		PushClipping();
+		SetClipping(0, 0, Video.Width - 1, y + h - 20);
+//		if (mi->transparent) {
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT, x, y - 2);
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT, x, y + h / 2);
+//		} else {
+			MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT, x, y - 2);
+			MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT, x, y + h / 2);
+//		}
+		PopClipping();
+		if (mi->D.VSlider.cflags & MI_CFLAGS_UP) {
+			MenuButtonG->DrawFrame(MBUTTON_UP_ARROW + 1, x, y - 2);
 		} else {
-			PushClipping();
-			SetClipping(0, 0, Video.Width - 1, y + h - 20);
-//			if (mi->transparent) {
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT, x, y - 2);
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT, x, y + h / 2);
-//			} else {
-				MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT, x, y - 2);
-				MenuButtonG->DrawFrameClip(MBUTTON_S_VCONT, x, y + h / 2);
-//			}
-			PopClipping();
-			if (mi->D.VSlider.cflags & MI_CFLAGS_UP) {
-				MenuButtonG->DrawFrame(MBUTTON_UP_ARROW + 1, x, y - 2);
-			} else {
-				MenuButtonG->DrawFrame(MBUTTON_UP_ARROW, x, y - 2);
-			}
-			if (mi->D.VSlider.cflags & MI_CFLAGS_DOWN) {
-				MenuButtonG->DrawFrame(MBUTTON_DOWN_ARROW + 1, x, y + h - 20);
-			} else {
-				MenuButtonG->DrawFrame(MBUTTON_DOWN_ARROW, x, y + h - 20);
-			}
-			p = (mi->D.VSlider.percent * (h - 54)) / 100;
-			MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 1, y + 18 + p);
+			MenuButtonG->DrawFrame(MBUTTON_UP_ARROW, x, y - 2);
 		}
+		if (mi->D.VSlider.cflags & MI_CFLAGS_DOWN) {
+			MenuButtonG->DrawFrame(MBUTTON_DOWN_ARROW + 1, x, y + h - 20);
+		} else {
+			MenuButtonG->DrawFrame(MBUTTON_DOWN_ARROW, x, y + h - 20);
+		}
+		p = (mi->D.VSlider.percent * (h - 54)) / 100;
+		MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 1, y + 18 + p);
+	}
 
-		if (flags & MI_FLAGS_SELECTED) {
-			if (flags & MI_FLAGS_DISABLED) {
-				Video.DrawRectangleClip(ColorGray, x, y - 2, w, h + 2);
-			} else {
-				Video.DrawRectangleClip(ColorYellow, x, y - 2, w, h + 2);
-			}
+	if (flags & MI_FLAGS_SELECTED) {
+		if (flags & MI_FLAGS_DISABLED) {
+			Video.DrawRectangleClip(ColorGray, x, y - 2, w, h + 2);
+		} else {
+			Video.DrawRectangleClip(ColorYellow, x, y - 2, w, h + 2);
 		}
 	}
 }
@@ -728,83 +694,49 @@ static void DrawHSlider(Menuitem *mi, int mx, int my)
 	x = mx + mi->XOfs;
 	y = my + mi->YOfs;
 
-	if (mi->D.HSlider.style == MI_STYLE_SC_HSLIDER) {
-		int leftb;
-		int rightb;
-
-		if (flags & MI_FLAGS_DISABLED) {
-			leftb = MBUTTON_SC_LEFT_ARROW - 1;
-			rightb = MBUTTON_SC_RIGHT_ARROW - 1;
-		} else if (flags & MI_FLAGS_CLICKED) {
-			if (mi->D.VSlider.cflags & MI_CFLAGS_LEFT) {
-				leftb = MBUTTON_SC_LEFT_ARROW + 1;
-				rightb = MBUTTON_SC_RIGHT_ARROW;
-			} else if (mi->D.VSlider.cflags & MI_CFLAGS_RIGHT) {
-				leftb = MBUTTON_SC_LEFT_ARROW;
-				rightb = MBUTTON_SC_RIGHT_ARROW + 1;
-			} else {
-				leftb = MBUTTON_SC_LEFT_ARROW;
-				rightb = MBUTTON_SC_RIGHT_ARROW;
-			}
-		} else {
-			leftb = MBUTTON_SC_LEFT_ARROW;
-			rightb = MBUTTON_SC_RIGHT_ARROW;
-		}
-		MenuButtonG->DrawFrame(leftb, x, y);
-		MenuButtonG->DrawFrame(rightb, x + w - 1 - 16, y);
-
-		MenuButtonG->DrawFrame(MBUTTON_SC_S_HCONT - 1, x + 16 + 2, y);
-		for (p = x + 16 + 2 + 8 + 1; p < x + w - 1 - 16 - 2 - 8; p += 8) {
-			MenuButtonG->DrawFrame(MBUTTON_SC_S_HCONT, p, y);
-		}
-		MenuButtonG->DrawFrame(MBUTTON_SC_S_HCONT + 1, x + w - 1 - 16 - 2 - 8, y);
-		p = (mi->D.VSlider.percent * (w - 54)) / 100;
-		MenuButtonG->DrawFrame(MBUTTON_SC_S_KNOB, x + 16 + 2 + p, y);
+	if (flags & MI_FLAGS_DISABLED) {
+		PushClipping();
+		SetClipping(0, 0, x + w - 20, Video.Height - 1);
+//		if (mi->transparent) {
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT - 1, x - 2, y);
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT - 1, x + w / 2, y);
+//		} else {
+			MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT - 1, x - 2, y);
+			MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT - 1, x + w / 2, y);
+//		}
+		PopClipping();
+		MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW - 1, x - 2, y);
+		MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
 	} else {
-		if (flags & MI_FLAGS_DISABLED) {
-			PushClipping();
-			SetClipping(0, 0, x + w - 20, Video.Height - 1);
-//			if (mi->transparent) {
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT - 1, x - 2, y);
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT - 1, x + w / 2, y);
-//			} else {
-				MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT - 1, x - 2, y);
-				MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT - 1, x + w / 2, y);
-//			}
-			PopClipping();
-			MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW - 1, x - 2, y);
-			MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
+		PushClipping();
+		SetClipping(0, 0, x + w - 20, Video.Height - 1);
+//		if (mi->transparent) {
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x - 2, y);
+//			VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x + w / 2, y);
+//		} else {
+			MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
+			MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x + w / 2, y);
+//		}
+		PopClipping();
+		if (mi->D.HSlider.cflags & MI_CFLAGS_LEFT) {
+			MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW + 1, x - 2, y);
 		} else {
-			PushClipping();
-			SetClipping(0, 0, x + w - 20, Video.Height - 1);
-//			if (mi->transparent) {
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x - 2, y);
-//				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x + w / 2, y);
-//			} else {
-				MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
-				MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x + w / 2, y);
-//			}
-			PopClipping();
-			if (mi->D.HSlider.cflags & MI_CFLAGS_LEFT) {
-				MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW + 1, x - 2, y);
-			} else {
-				MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW, x - 2, y);
-			}
-			if (mi->D.HSlider.cflags & MI_CFLAGS_RIGHT) {
-				MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW + 1, x + w - 20, y);
-			} else {
-				MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW, x + w - 20, y);
-			}
-			p = (mi->D.HSlider.percent * (w - 54)) / 100;
-			MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 18 + p, y + 1);
+			MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW, x - 2, y);
 		}
+		if (mi->D.HSlider.cflags & MI_CFLAGS_RIGHT) {
+			MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW + 1, x + w - 20, y);
+		} else {
+			MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW, x + w - 20, y);
+		}
+		p = (mi->D.HSlider.percent * (w - 54)) / 100;
+		MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 18 + p, y + 1);
+	}
 
-		if (flags & MI_FLAGS_SELECTED) {
-			if (flags & MI_FLAGS_DISABLED) {
-				Video.DrawRectangleClip(ColorGray, x - 2, y, w + 2, h);
-			} else {
-				Video.DrawRectangleClip(ColorYellow, x - 2, y, w + 2, h);
-			}
+	if (flags & MI_FLAGS_SELECTED) {
+		if (flags & MI_FLAGS_DISABLED) {
+			Video.DrawRectangleClip(ColorGray, x - 2, y, w + 2, h);
+		} else {
+			Video.DrawRectangleClip(ColorYellow, x - 2, y, w + 2, h);
 		}
 	}
 }
@@ -1048,33 +980,8 @@ void DrawMenu(Menu *menu)
 		menu->BackgroundG->DrawFrame(0, 0, 0);
 	}
 
-	if (menu->Panel && !strcmp(menu->Panel, ScPanel)) {
-		// Background
-		Video.FillTransRectangle(ColorBlack, menu->X + 1,
-				menu->Y + 1, menu->Width - 2, menu->Height - 2, 50);
-		Video.DrawHLineClip(ColorBlue, menu->X + 3, menu->Y, menu->Width - 6);
-		Video.DrawHLineClip(ColorBlue, menu->X + 3, menu->Y + menu->Height - 1, menu->Width - 6);
-		Video.DrawVLineClip(ColorBlue, menu->X, menu->Y + 3, menu->Height - 6);
-		Video.DrawVLineClip(ColorBlue, menu->X + menu->Width - 1, menu->Y + 3, menu->Height - 6);
-		// top left
-		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 1);
-		Video.DrawPixelClip(ColorBlue, menu->X + 2, menu->Y + 1);
-		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 2);
-		// top right
-		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + 1);
-		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 1);
-		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 2);
-		// bottom left
-		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 3);
-		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 2);
-		Video.DrawPixelClip(ColorBlue, menu->X + 2, menu->Y + menu->Height - 2);
-		// bottom right
-		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + menu->Height - 2);
-		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 2);
-		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 3);
-	} else if (menu->Panel) {
+	if (menu->Panel) {
 		std::vector<MenuPanel *>::iterator menupanel;
-
 
 		for (menupanel = UI.MenuPanels.begin(); menupanel != UI.MenuPanels.end(); ++menupanel) {
 			if (!strcmp((*menupanel)->Ident, menu->Panel)) {
@@ -1855,11 +1762,7 @@ static void MenuHandleMouseMove(int x, int y)
 						j = y - ys;
 						mi->D.VSlider.cursel = 0;
 
-						if (mi->D.VSlider.style == MI_STYLE_SC_VSLIDER) {
-							arrowsize = 16;
-						} else {
-							arrowsize = 20;
-						}
+						arrowsize = 20;
 
 						if (j < arrowsize) {
 							mi->D.VSlider.cursel |= MI_CFLAGS_UP;
@@ -1935,11 +1838,7 @@ static void MenuHandleMouseMove(int x, int y)
 						j = x - xs;
 						mi->D.HSlider.cursel = 0;
 
-						if (mi->D.HSlider.style == MI_STYLE_SC_HSLIDER) {
-							arrowsize = 16;
-						} else {
-							arrowsize = 20;
-						}
+						arrowsize = 20;
 
 						if (j < arrowsize) {
 							mi->D.HSlider.cursel |= MI_CFLAGS_LEFT;

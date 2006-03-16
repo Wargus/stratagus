@@ -131,7 +131,7 @@ void InitModules(void)
 	InitSyncRand();
 	InitIcons();
 	InitVideoCursors();
-	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]);
+	InitUserInterface();
 	InitMenus(ThisPlayer->Race);
 	InitPlayers();
 	InitMissileTypes();

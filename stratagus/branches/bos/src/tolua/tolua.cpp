@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Mar  5 12:22:18 2006.
+** Generated automatically by tolua++-1.0.7 on Wed Mar 15 21:13:58 2006.
 */
 
 #ifndef __cplusplus
@@ -207,12 +207,14 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CIcon");
  tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
+ tolua_usertype(tolua_S,"CStatusLine");
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
@@ -601,6 +603,246 @@ static int tolua_set_CInfoPanel_Y(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Width of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_get_CStatusLine_Width
+static int tolua_get_CStatusLine_Width(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Width'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Width);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Width of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_set_CStatusLine_Width
+static int tolua_set_CStatusLine_Width(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Width'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Width = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: TextX of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_get_CStatusLine_TextX
+static int tolua_get_CStatusLine_TextX(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextX'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->TextX);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: TextX of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_set_CStatusLine_TextX
+static int tolua_set_CStatusLine_TextX(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextX'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->TextX = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: TextY of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_get_CStatusLine_TextY
+static int tolua_get_CStatusLine_TextY(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextY'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->TextY);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: TextY of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_set_CStatusLine_TextY
+static int tolua_set_CStatusLine_TextY(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextY'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->TextY = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Font of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_get_CStatusLine_Font_ptr
+static int tolua_get_CStatusLine_Font_ptr(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Font'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->Font,"CFont");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Font of class  CStatusLine */
+#ifndef TOLUA_DISABLE_tolua_set_CStatusLine_Font_ptr
+static int tolua_set_CStatusLine_Font_ptr(lua_State* tolua_S)
+{
+  CStatusLine* self = (CStatusLine*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Font'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CFont",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Font = ((CFont*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: X of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_get_CMapArea_X
+static int tolua_get_CMapArea_X(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'X'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->X);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: X of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_set_CMapArea_X
+static int tolua_set_CMapArea_X(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'X'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->X = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Y of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_get_CMapArea_Y
+static int tolua_get_CMapArea_Y(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Y'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Y);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Y of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_set_CMapArea_Y
+static int tolua_set_CMapArea_Y(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Y'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Y = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EndX of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_get_CMapArea_EndX
+static int tolua_get_CMapArea_EndX(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EndX'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->EndX);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: EndX of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_set_CMapArea_EndX
+static int tolua_set_CMapArea_EndX(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EndX'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->EndX = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EndY of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_get_CMapArea_EndY
+static int tolua_get_CMapArea_EndY(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EndY'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->EndY);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: EndY of class  CMapArea */
+#ifndef TOLUA_DISABLE_tolua_set_CMapArea_EndY
+static int tolua_set_CMapArea_EndY(lua_State* tolua_S)
+{
+  CMapArea* self = (CMapArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EndY'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->EndY = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: InfoPanel of class  CUserInterface */
 #ifndef TOLUA_DISABLE_tolua_get_CUserInterface_InfoPanel
 static int tolua_get_CUserInterface_InfoPanel(lua_State* tolua_S)
@@ -686,6 +928,66 @@ static int tolua_set_CUserInterface_Minimap(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->Minimap = *((CMinimap*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: StatusLine of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_StatusLine
+static int tolua_get_CUserInterface_StatusLine(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'StatusLine'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->StatusLine,"CStatusLine");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: StatusLine of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_StatusLine
+static int tolua_set_CUserInterface_StatusLine(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'StatusLine'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CStatusLine",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->StatusLine = *((CStatusLine*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MapArea of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_MapArea
+static int tolua_get_CUserInterface_MapArea(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapArea'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->MapArea,"CMapArea");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MapArea of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_MapArea
+static int tolua_set_CUserInterface_MapArea(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapArea'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CMapArea",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MapArea = *((CMapArea*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -9280,11 +9582,27 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"X",tolua_get_CInfoPanel_X,tolua_set_CInfoPanel_X);
   tolua_variable(tolua_S,"Y",tolua_get_CInfoPanel_Y,tolua_set_CInfoPanel_Y);
  tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CStatusLine","CStatusLine","",NULL);
+ tolua_beginmodule(tolua_S,"CStatusLine");
+  tolua_variable(tolua_S,"Width",tolua_get_CStatusLine_Width,tolua_set_CStatusLine_Width);
+  tolua_variable(tolua_S,"TextX",tolua_get_CStatusLine_TextX,tolua_set_CStatusLine_TextX);
+  tolua_variable(tolua_S,"TextY",tolua_get_CStatusLine_TextY,tolua_set_CStatusLine_TextY);
+  tolua_variable(tolua_S,"Font",tolua_get_CStatusLine_Font_ptr,tolua_set_CStatusLine_Font_ptr);
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CMapArea","CMapArea","",NULL);
+ tolua_beginmodule(tolua_S,"CMapArea");
+  tolua_variable(tolua_S,"X",tolua_get_CMapArea_X,tolua_set_CMapArea_X);
+  tolua_variable(tolua_S,"Y",tolua_get_CMapArea_Y,tolua_set_CMapArea_Y);
+  tolua_variable(tolua_S,"EndX",tolua_get_CMapArea_EndX,tolua_set_CMapArea_EndX);
+  tolua_variable(tolua_S,"EndY",tolua_get_CMapArea_EndY,tolua_set_CMapArea_EndY);
+ tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CUserInterface","CUserInterface","",NULL);
  tolua_beginmodule(tolua_S,"CUserInterface");
   tolua_variable(tolua_S,"InfoPanel",tolua_get_CUserInterface_InfoPanel,tolua_set_CUserInterface_InfoPanel);
   tolua_variable(tolua_S,"ButtonPanel",tolua_get_CUserInterface_ButtonPanel,tolua_set_CUserInterface_ButtonPanel);
   tolua_variable(tolua_S,"Minimap",tolua_get_CUserInterface_Minimap,tolua_set_CUserInterface_Minimap);
+  tolua_variable(tolua_S,"StatusLine",tolua_get_CUserInterface_StatusLine,tolua_set_CUserInterface_StatusLine);
+  tolua_variable(tolua_S,"MapArea",tolua_get_CUserInterface_MapArea,tolua_set_CUserInterface_MapArea);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"UI",tolua_get_UI,tolua_set_UI);
  tolua_cclass(tolua_S,"CIcon","CIcon","",NULL);

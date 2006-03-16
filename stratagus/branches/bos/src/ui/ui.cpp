@@ -65,96 +65,79 @@ int SpeedMouseScroll = MOUSE_SCROLL_SPEED; /// mouse scroll speed
 */
 CUserInterface UI;
 
-/**
-**  The available user interfaces.
-*/
-std::vector<CUserInterface *> UI_Table;
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-static void ClipViewport(CViewport *vp, int ClipX, int ClipY);
-static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps);
+CUserInterface::CUserInterface() :
+	Name(NULL), Width(0), Height(0),
+	MouseScroll(false), KeyScroll(false),
+	MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
+	MouseWarpX(0), MouseWarpY(0),
+	NormalFontColor(NULL), ReverseFontColor(NULL),
+	PanelIndex(NULL), NumberPanel(0), SingleSelectedButton(NULL),
+	MaxSelectedFont(0), MaxSelectedTextX(0), MaxSelectedTextY(0),
+	SingleTrainingButton(NULL), SingleTrainingText(NULL),
+	SingleTrainingFont(0), SingleTrainingTextX(0), SingleTrainingTextY(0),
+	TrainingText(NULL), TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
+	UpgradingButton(NULL), ResearchingButton(NULL),
+	CompletedBarColor(0), CompletedBarShadow(0),
+	PieMenuBackgroundG(NULL), PieMouseButton(0),
+	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
+	SelectedViewport(NULL), NumViewports(0),
+	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
+	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
+{
+	memset(Resources, 0, sizeof(Resources));
+	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
+	memset(PieX, 0, sizeof(PieX));
+	memset(PieY, 0, sizeof(PieY));
+
+	Point.Name = new_strdup("cursor-point");
+	Glass.Name = new_strdup("cursor-glass");
+	Cross.Name = new_strdup("cursor-cross");
+	YellowHair.Name = new_strdup("cursor-yellow-hair");
+	GreenHair.Name = new_strdup("cursor-green-hair");
+	RedHair.Name = new_strdup("cursor-red-hair");
+	Scroll.Name = new_strdup("cursor-scroll");
+
+	ArrowE.Name = new_strdup("cursor-arrow-e");
+	ArrowNE.Name = new_strdup("cursor-arrow-ne");
+	ArrowN.Name = new_strdup("cursor-arrow-n");
+	ArrowNW.Name = new_strdup("cursor-arrow-nw");
+	ArrowW.Name = new_strdup("cursor-arrow-w");
+	ArrowSW.Name = new_strdup("cursor-arrow-sw");
+	ArrowS.Name = new_strdup("cursor-arrow-s");
+	ArrowSE.Name = new_strdup("cursor-arrow-se");
+
+	NormalFontColor = "light-blue";
+	ReverseFontColor = "yellow";
+}
 
 
 /**
 **  Initialize the user interface.
-**
-**  The function looks through ::UI_Table, to find a matching user
-**  interface. It uses the race_name and the current video window sizes to
-**  find it.
-**
-**  @param race_name  The race identifier, to select the interface.
 */
-void InitUserInterface(const char *race_name)
+void InitUserInterface(void)
 {
-	int i;
-	int best;
-	int num_vps;
-	ViewportModeType vp_mode;
-	CViewport vps[MAX_NUM_VIEWPORTS];
-	bool show_command_key;
-
-	// select the correct slot
-	best = 0;
-	for (i = 0; i < (int)UI_Table.size(); ++i) {
-		if (!strcmp(race_name, UI_Table[i]->Name)) {
-			// perfect
-			if (Video.Width == UI_Table[i]->Width &&
-					Video.Height == UI_Table[i]->Height) {
-				best = i;
-				break;
-			}
-			// too big
-			if (Video.Width < UI_Table[i]->Width ||
-					Video.Height < UI_Table[i]->Height) {
-				continue;
-			}
-			// best smaller
-			if (UI_Table[i]->Width * UI_Table[i]->Height >=
-					UI_Table[best]->Width * UI_Table[best]->Height) {
-				best = i;
-			}
-		}
-	}
-
-	num_vps = UI.NumViewports;
-	vp_mode = UI.ViewportMode;
-	for (i = 0; i < num_vps; ++i) {
-		vps[i].MapX = UI.Viewports[i].MapX;
-		vps[i].MapY = UI.Viewports[i].MapY;
-	}
-	show_command_key = UI.ButtonPanel.ShowCommandKey;
-
-	UI = *UI_Table[best];
-
 	UI.Offset640X = (Video.Width - 640) / 2;
 	UI.Offset480Y = (Video.Height - 480) / 2;
 
 	//
 	// Calculations
 	//
-	if (UI.MapArea.EndX > Map.Info.MapWidth * TileSizeX - 1) {
-		UI.MapArea.EndX = Map.Info.MapWidth * TileSizeX - 1;
-	}
-	if (UI.MapArea.EndY > Map.Info.MapHeight * TileSizeY - 1) {
-		UI.MapArea.EndY = Map.Info.MapHeight * TileSizeY - 1;
+	if (Map.Info.MapWidth) {
+		if (UI.MapArea.EndX > Map.Info.MapWidth * TileSizeX - 1) {
+			UI.MapArea.EndX = Map.Info.MapWidth * TileSizeX - 1;
+		}
+		if (UI.MapArea.EndY > Map.Info.MapHeight * TileSizeY - 1) {
+			UI.MapArea.EndY = Map.Info.MapHeight * TileSizeY - 1;
+		}
 	}
 
 	UI.SelectedViewport = UI.Viewports;
 
-	if (num_vps) {
-		SetViewportMode(vp_mode);
-		for (i = 0; i < num_vps; ++i) {
-			UI.Viewports[i].MapX = vps[i].MapX;
-			UI.Viewports[i].MapY = vps[i].MapY;
-		}
-		FinishViewportModeConfiguration(UI.Viewports, num_vps);
-	} else {
-		SetViewportMode(VIEWPORT_SINGLE);
-	}
-	UI.ButtonPanel.ShowCommandKey = show_command_key;
+	SetViewportMode(VIEWPORT_SINGLE);
 
 	UI.CompletedBarColor = Video.MapRGB(TheScreen->format,
 		UI.CompletedBarColorRGB.r,
@@ -169,10 +152,7 @@ void InitUserInterface(const char *race_name)
 void CursorConfig::Load()
 {
 	Assert(Name);
-	Assert(!Cursor);
-
 	Cursor = CursorByIdent(Name);
-
 	Assert(!strcmp(Name, Cursor->Ident));
 }
 
@@ -230,6 +210,10 @@ void CUserInterface::Load(void)
 	for (menupanel = MenuPanels.begin(); menupanel != MenuPanels.end(); ++menupanel) {
 		(*menupanel)->G->Load();
 	}
+
+	MenuButton.X = Video.Width - 200;
+	MenuButton.Y = 0;
+	MenuButton.Style = FindButtonStyle("black");
 }
 
 /**
@@ -271,15 +255,9 @@ CUserInterface::~CUserInterface()
 	int i;
 	std::vector<MenuPanel *>::iterator menupanel;
 
-	// FIXME: this is horrible!  rewrite this!
-	// We're only supposed to delete UI_Table[i], not UI
-	if (this == &UI) {
-		return;
-	}
-
 	delete[] Name;
-	delete[] NormalFontColor;
-	delete[] ReverseFontColor;
+//	delete[] NormalFontColor;
+//	delete[] ReverseFontColor;
 
 	// Filler
 	for (i = 0; i < (int)Fillers.size(); ++i) {
@@ -325,14 +303,6 @@ void CleanUserInterface(void)
 	int i;
 	int j;
 
-	//
-	// Free the available user interfaces.
-	//
-	for (i = 0; i < (int)UI_Table.size(); ++i) {
-		delete UI_Table[i];
-	}
-	UI_Table.clear();
-
 	for (std::vector<CUnitInfoPanel *>::iterator panel = AllPanels.begin();
 		panel != AllPanels.end(); ++panel) {
 		delete *panel;
@@ -356,7 +326,6 @@ void CleanUserInterface(void)
 		delete[] TitleScreens;
 		TitleScreens = NULL;
 	}
-	UI = CUserInterface();
 }
 
 /**

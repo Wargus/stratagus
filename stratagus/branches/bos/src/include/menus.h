@@ -273,9 +273,6 @@ typedef struct _menuitem_ {
 
 #define MI_IFLAGS_PASSWORD 1 /// Input is a password
 
-#define MI_STYLE_SC_VSLIDER 1
-#define MI_STYLE_SC_HSLIDER 2
-
 typedef void (*InitFuncType)(struct _menu_ *);
 typedef void (*ExitFuncType)(struct _menu_ *);
 typedef void (*NetActionType)(void);

@@ -601,7 +601,7 @@ void CreateGame(const char *filename, CMap *map)
 
 	InitSelections();
 
-	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]);
+	InitUserInterface();
 	UI.Load();
 
 	UI.Minimap.Create();

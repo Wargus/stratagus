@@ -11,11 +11,29 @@ class CInfoPanel
 	int Y;
 };
 
+class CStatusLine
+{
+	int Width;
+	int TextX;
+	int TextY;
+	CFont *Font;
+};
+
+class CMapArea
+{
+	int X;
+	int Y;
+	int EndX;
+	int EndY;
+};
+
 class CUserInterface
 {
 	CInfoPanel InfoPanel;
 	CButtonPanel ButtonPanel;
 	CMinimap Minimap;
+	CStatusLine StatusLine;
+	CMapArea MapArea;
 };
 
 extern CUserInterface UI;

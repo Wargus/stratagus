@@ -1146,7 +1146,7 @@ void CStatusLine::Draw(void)
 {
 	if (StatusLine[0]) {
 		PushClipping();
-		SetClipping(TextX, TextY, TextX + W - 1, Video.Height - 1);
+		SetClipping(TextX, TextY, TextX + Width - 1, Video.Height - 1);
 		VideoDrawTextClip(TextX, TextY, Font, StatusLine);
 		PopClipping();
 	}
