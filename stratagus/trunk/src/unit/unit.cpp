@@ -2143,7 +2143,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 	}
 
 	if (type->BuildingRules.empty()) {
-		return (CUnit *)1;
+		return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 	}
 	ontoptarget = NULL;
 	for (std::vector<CBuildRestriction *>::const_iterator ib = type->BuildingRules.begin();
