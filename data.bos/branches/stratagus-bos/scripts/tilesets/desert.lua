@@ -242,4 +242,3 @@ DefineTileset(
  }
 )
 
-BuildTilesetTables()
