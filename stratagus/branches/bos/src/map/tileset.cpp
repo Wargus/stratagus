@@ -94,8 +94,6 @@ void CleanTilesets(void)
 	delete[] Map.Tileset.Table;
 	delete[] Map.Tileset.FlagsTable;
 	delete[] Map.Tileset.Tiles;
-	delete[] Map.Tileset.MixedLookupTable;
-	delete[] Map.Tileset.TileTypeTable;
 	if (Map.Tileset.SolidTerrainTypes) {
 		delete[] Map.Tileset.SolidTerrainTypes[0].TerrainName;
 	}

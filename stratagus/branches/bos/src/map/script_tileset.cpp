@@ -183,35 +183,6 @@ static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 }
 
 /**
-**  Parse the special slot part of a tileset definition
-**
-**  @param l        Lua state.
-**  @param tileset  Tileset to be filled.
-*/
-static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = luaL_getn(l, -1);
-
-	//
-	//  Parse the list: (still everything could be changed!)
-	//
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-
-		LuaError(l, "special: unsupported tag: %s" _C_ value);
-	}
-}
-
-/**
 **  Parse the solid slot part of a tileset definition
 **
 **  @param l        Lua state.
@@ -402,16 +373,9 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 		++j;
 
 		//
-		//  special part
-		//
-		if (!strcmp(value, "special")) {
-			lua_rawgeti(l, t, j + 1);
-			DefineTilesetParseSpecial(l, tileset);
-			lua_pop(l, 1);
-		//
 		//  solid part
 		//
-		} else if (!strcmp(value, "solid")) {
+		if (!strcmp(value, "solid")) {
 			lua_rawgeti(l, t, j + 1);
 			index = DefineTilesetParseSolid(l, tileset, index);
 			lua_pop(l, 1);
@@ -444,7 +408,6 @@ static int CclDefineTileset(lua_State *l)
 	delete[] Map.Tileset.ImageFile;
 	delete[] Map.Tileset.Table;
 	delete[] Map.Tileset.Tiles;
-	delete[] Map.Tileset.TileTypeTable;
 	memset(&Map.Tileset, 0, sizeof(CTileset));
 
 	Map.Tileset.TileSizeX = 32;
@@ -486,201 +449,6 @@ static int CclDefineTileset(lua_State *l)
 }
 
 /**
-**  Build tileset tables like MixedLookupTable
-**
-**  Called after LoadTileset and only for tilesets that have wall, 
-**  trees and rocks. This function will be deleted when removing 
-**  support of walls and alike in the tileset.
-*/
-static int CclBuildTilesetTables(lua_State *l)
-{
-	int n;
-	int tile;
-	int solid;
-	int mixed;
-	const unsigned short *table;
-	int i;
-
-	LuaCheckArgs(l, 0);
-
-	//  Calculate number of tiles in graphic tile
-	n = Map.Tileset.NumTiles;
-
-	Map.Tileset.MixedLookupTable = new int[n];
-	memset(Map.Tileset.MixedLookupTable, 0, n * sizeof(int));
-
-	//  Build the TileTypeTable
-	Map.Tileset.TileTypeTable = new unsigned char[n];
-	memset(Map.Tileset.TileTypeTable, 0, n * sizeof(unsigned char));
-
-	table = Map.Tileset.Table;
-	for (i = 0; i < n; ++i) {
-		if ((tile = table[i])) {
-			unsigned flags;
-
-			//Initialize all Lookup Items to zero
-			Map.Tileset.MixedLookupTable[table[i]] = 0;
-
-			flags = Map.Tileset.FlagsTable[i];
-			if (flags & MapFieldWaterAllowed) {
-				Map.Tileset.TileTypeTable[tile] = TileTypeWater;
-			} else if (flags & MapFieldCoastAllowed) {
-				Map.Tileset.TileTypeTable[tile] = TileTypeCoast;
-			}
-		}
-	}
-
-	//  Build wood removement table.
-	n = Map.Tileset.NumTiles;
-	for (mixed = solid = i = 0; i < n;) {
-		if (Map.Tileset.Tiles[i].BaseTerrain &&
-				Map.Tileset.Tiles[i].MixTerrain) {
-			i += 256;
-		} else {
-			i += 16;
-		}
-	}
-
-	//Mark which corners of each tile has tree in it.
-	//All corners for solid tiles. (Same for rocks)
-	//1 Bottom Left
-	//2 Bottom Right
-	//4 Top Right
-	//8 Top Left
-	//16 Bottom Tree Tile
-	//32 Top Tree Tile
-	for (i = solid; i < solid + 16; ++i) {
-		Map.Tileset.MixedLookupTable[table[i]] = 15;
-	}
-	for (i = mixed; i < mixed + 256; ++i) {
-		int check;
-
-		check = (int)((i - mixed) / 16);
-		switch (check) {
-			case 0:
-				Map.Tileset.MixedLookupTable[table[i]] = 8;
-				break;
-			case 1:
-				Map.Tileset.MixedLookupTable[table[i]] = 4;
-				break;
-			case 2:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4;
-				break;
-			case 3:
-				Map.Tileset.MixedLookupTable[table[i]] = 1;
-				break;
-			case 4:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 1;
-				break;
-			case 5:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 1;
-				break;
-			case 6:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 1;
-				break;
-			case 7:
-				Map.Tileset.MixedLookupTable[table[i]] = 2;
-				break;
-			case 8:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2;
-				break;
-			case 9:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2;
-				break;
-			case 10:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 2;
-				break;
-			case 11:
-				Map.Tileset.MixedLookupTable[table[i]] = 2 + 1;
-				break;
-			case 12:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2 + 1;
-				break;
-			case 13:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2 + 1;
-				break;
-			default:
-				Map.Tileset.MixedLookupTable[table[i]] = 0;
-				break;
-		}
-	}
-
-	//  Build rock removement table.
-	for (mixed = solid = i = 0; i < n;) {
-		if (Map.Tileset.Tiles[i].BaseTerrain &&
-				Map.Tileset.Tiles[i].MixTerrain) {
-			i += 256;
-		} else {
-			i += 16;
-		}
-	}
-
-	//Mark which corners of each tile has rock in it.
-	//All corners for solid tiles.
-	//1 Bottom Left
-	//2 Bottom Right
-	//4 Top Right
-	//8 Top Left
-	for (i = solid; i < solid + 16; ++i) {
-		Map.Tileset.MixedLookupTable[table[i]] = 15;
-	}
-	for (i = mixed; i < mixed + 256; ++i) {
-		int check;
-
-		check = (int)((i - mixed) / 16);
-		switch (check) {
-			case 0:
-				Map.Tileset.MixedLookupTable[table[i]] = 8;
-				break;
-			case 1:
-				Map.Tileset.MixedLookupTable[table[i]] = 4;
-				break;
-			case 2:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4;
-				break;
-			case 3:
-				Map.Tileset.MixedLookupTable[table[i]] = 1;
-				break;
-			case 4:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 1;
-				break;
-			case 5:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 1;
-				break;
-			case 6:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 1;
-				break;
-			case 7:
-				Map.Tileset.MixedLookupTable[table[i]] = 2;
-				break;
-			case 8:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2;
-				break;
-			case 9:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2;
-				break;
-			case 10:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 4 + 2;
-				break;
-			case 11:
-				Map.Tileset.MixedLookupTable[table[i]] = 2 + 1;
-				break;
-			case 12:
-				Map.Tileset.MixedLookupTable[table[i]] = 8 + 2 + 1;
-				break;
-			case 13:
-				Map.Tileset.MixedLookupTable[table[i]] = 4 + 2 + 1;
-				break;
-			default:
-				Map.Tileset.MixedLookupTable[table[i]] = 0;
-				break;
-		}
-	}
-
-	return 0;
-}
-
-/**
 **  Set the flags like "water" for a tile of a tileset
 **
 **  @param l  Lua state.
@@ -711,7 +479,6 @@ void TilesetCclRegister(void)
 {
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
-	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
 }
 
 //@}

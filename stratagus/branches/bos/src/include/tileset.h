@@ -91,21 +91,6 @@
 **      If this index is 0, the tile is a solid tile.
 **      @see CTileset::TileNames
 **
-**  CTileset::TileTypeTable
-**
-**      Lookup table of the tile type. Maps the graphic file tile
-**      number back to a tile type (::TileTypeWood, ::TileTypeWater,
-**      ...)
-**
-**      @note The creation of this table is currently hardcoded in
-**      the engine. It should be calculated from the flags in the
-**      tileset configuration (CCL). And it is created for the map
-**      and not for the tileset.
-**
-**      @note I'm not sure if this table is needed in the future.
-**
-**      @see TileType.
-**
 **  CTileset::NumNames
 **
 **      Number of different tile names.
@@ -113,70 +98,6 @@
 **  CTileset::TileNames
 **
 **      The different tile names. FE "light-grass", "dark-water".
-**
-**  CTileset::TopOneTree
-**
-**      The tile number of tile only containing the top part of a tree.
-**      Is created on the map by lumber chopping.
-**
-**  CTileset::MidOneTree
-**
-**      The tile number of tile only containing the connection of
-**      the top part to the bottom part of tree.
-**      Is created on the map by lumber chopping.
-**
-**  CTileset::BotOneTree
-**
-**      The tile number of tile only containing the bottom part of a
-**      tree. Is created on the map by lumber chopping.
-**
-**  CTileset::RemovedTree
-**
-**      The tile number of the tile placed where trees are removed.
-**      Is created on the map by lumber chopping.
-**
-**  CTileset::GrowingTree[2]
-**
-**      Contains the tile numbers of a growing tree from small to big.
-**      @note Not yet used.
-**
-**  Tilset::WoodTable[20]
-**
-**      Table for wood removable. This table contains the tile which
-**      is placed after a tree removement, depending on the surrounding.
-**
-**  CTileset::MixedLookupTable[]
-**      Table for finding what part of the tile contains wood/rock,
-**      and which part is grass or bare ground.
-**
-**  CTileset::TopOneRock
-**
-**      The tile number of tile only containing the top part of a rock.
-**      Is created on the map by destroying rocks.
-**
-**  CTileset::MidOneRock
-**
-**      The tile number of tile only containing the connection of
-**      the top part to the bottom part of a rock.
-**      Is created on the map by destroying rocks.
-**
-**  CTileset::BotOneRock
-**
-**      The tile number of tile only containing the bottom part of a
-**      rock. Is created on the map by destroying rocks.
-**
-**  CTileset::RemovedRock
-**
-**      The tile number of the tile placed where rocks are removed.
-**      Is created on the map by destroying rocks.
-**
-**  CTileset::RockTable[20]
-**
-**      Table for rock removable. Depending on the surrinding this
-**      table contains the new tile to be placed.
-**
-**      @todo Johns: I don't think this table or routines look correct.
-**      But they work correct.
 **
 **
 **  @struct TileInfo tileset.h
@@ -243,13 +164,8 @@ public:
 
 	TileInfo *Tiles; /// Tile descriptions
 
-	// TODO: currently hardcoded
-	unsigned char *TileTypeTable;   /// For fast lookup of tile type
-
 	int NumTerrainTypes;                 /// Number of different terrain types
 	SolidTerrainInfo *SolidTerrainTypes; /// Information about solid terrains.
-
-	int *MixedLookupTable;   /// Lookup for what part of tile used
 };
 
 /*----------------------------------------------------------------------------
