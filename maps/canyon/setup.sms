@@ -116,7 +116,7 @@ LoadTileModels("maps/canyon/terrain.lua")
 --allow
 -- place units
 unit= CreateUnit("unit-vault", 0, {7, 32})
-unit= CreateUnit("unit-vault", 1, {59, 44})
+unit= CreateUnit("unit-vault", 1, {58, 44})
 unit= CreateUnit("unit-engineer", 1, {58, 48})
 unit= CreateUnit("unit-engineer", 1, {59, 49})
 unit= CreateUnit("unit-engineer", 1, {61, 50})
