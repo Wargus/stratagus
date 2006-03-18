@@ -5,12 +5,12 @@
 ##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 ##             \/                  \/          \//_____/            \/
 ##  ______________________                           ______________________
-##			  T H E   W A R   B E G I N S
-##	   Stratagus - A free fantasy real time strategy game engine
+##                        T H E   W A R   B E G I N S
+##         Stratagus - A free fantasy real time strategy game engine
 ##
-##	Module.make	-	Module Makefile (included from Makefile).
+##      Module.make - Module Makefile (included from Makefile).
 ##
-##	(c) Copyright 2004 by The Stratagus Team
+##      (c) Copyright 2004-2006 by The Stratagus Team
 ##
 ##      This program is free software; you can redistribute it and/or modify
 ##      it under the terms of the GNU General Public License as published by
@@ -27,6 +27,6 @@
 
 MODULE = src/map
 MSRC =   script_map.cpp script_tileset.cpp map.cpp map_draw.cpp map_fog.cpp \
-         map_radar.cpp map_save.cpp map_wall.cpp minimap.cpp tileset.cpp
+         map_radar.cpp map_save.cpp minimap.cpp tileset.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
