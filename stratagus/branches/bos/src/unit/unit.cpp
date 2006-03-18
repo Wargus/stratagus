@@ -347,10 +347,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 			// If unit is dieing, it's already been lost by all players
 			// don't count again
 			if (type->Building) {
-				// FIXME: support more races
-				if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-					player->TotalBuildings++;
-				}
+				player->TotalBuildings++;
 			} else {
 				player->TotalUnits++;
 			}
@@ -364,10 +361,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type->Building && Orders[0]->Action != UnitActionDie) {
-		// FIXME: support more races
-		if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-			player->NumBuildings++;
-		}
+		player->NumBuildings++;
 	}
 	Player = player;
 	Stats = &type->Stats[Player->Index];
@@ -419,10 +413,9 @@ CUnit *MakeUnit(CUnitType *type, CPlayer *player)
 **  @param width     Width of the first container of unit.
 **  @param height    Height of the first container of unit.
 **  @param f         Function to (un)mark for normal vision.
-**  @param f2        Function to (un)mark for cloaking vision.
 */
 static void MapMarkUnitSightRec(const CUnit *unit, int x, int y, int width, int height,
-	MapMarkerFunc *f, MapMarkerFunc *f2)
+	MapMarkerFunc *f)
 {
 	CUnit *unit_inside; // iterator on units inside unit.
 	int i;             // number of units inside to process.
@@ -431,13 +424,9 @@ static void MapMarkUnitSightRec(const CUnit *unit, int x, int y, int width, int 
 	Assert(f);
 	MapSight(unit->Player, x, y, width, height, unit->CurrentSightRange, f);
 
-	if (unit->Type && unit->Type->DetectCloak && f2) {
-		MapSight(unit->Player, x, y, width, height, unit->CurrentSightRange, f2);
-	}
-
 	unit_inside = unit->UnitInside;
 	for (i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		MapMarkUnitSightRec(unit_inside, x, y, width, height, f, f2);
+		MapMarkUnitSightRec(unit_inside, x, y, width, height, f);
 	}
 }
 
@@ -475,7 +464,7 @@ void MapMarkUnitSight(CUnit *unit)
 
 	MapMarkUnitSightRec(unit,
 		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
-		MapMarkTileSight, MapMarkTileDetectCloak);
+		MapMarkTileSight);
 
 	// Never mark radar, except if the top unit, and unit is usable
 	if (unit == container && !unit->IsUnusable()) {
@@ -508,7 +497,7 @@ void MapUnmarkUnitSight(CUnit *unit)
 	Assert(container->Type);
 	MapMarkUnitSightRec(unit,
 		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
-		MapUnmarkTileSight, MapUnmarkTileDetectCloak);
+		MapUnmarkTileSight);
 
 	// Never mark radar, except if the top unit?
 	if (unit == container && !unit->IsUnusable()) {
@@ -866,10 +855,7 @@ void UnitLost(CUnit *unit)
 		player->Units[player->TotalNumUnits] = NULL;
 
 		if (unit->Type->Building) {
-			// FIXME: support more races
-			if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-				player->NumBuildings--;
-			}
+			player->NumBuildings--;
 		}
 
 		if (unit->Orders[0]->Action != UnitActionBuilt) {
@@ -1126,9 +1112,8 @@ void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player)
 **  @param player  The player this is for.
 **  @param x       x location to check
 **  @param y       y location to check
-**  @param cloak   If we mark cloaked units too.
 */
-void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
+void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y)
 {
 	int p;
 	int n;
@@ -1138,9 +1123,6 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
 	n = UnitCacheOnTile(x, y,units);
 	while (n) {
 		unit = units[--n];
-		if (cloak != (int)unit->Type->PermanentCloak && player != unit->Player) {
-			continue;
-		}
 		//
 		//  If the unit goes out of fog, this can happen for any player that
 		//  this player shares vision with, and can't YET see the unit.
@@ -1163,9 +1145,8 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
 **  @param player    The player to mark for.
 **  @param x         x location to check if building is on, and mark as seen
 **  @param y         y location to check if building is on, and mark as seen
-**  @param cloak     If this is for cloaked units.
 */
-void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
+void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y)
 {
 	int p;
 	int n;
@@ -1177,9 +1158,6 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
 		unit = units[--n];
 		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
 			unit->Y <= y && unit->Y + unit->Type->TileHeight - 1 >= y);
-		if (cloak != (int)unit->Type->PermanentCloak && player != unit->Player) {
-			continue;
-		}
 		p = player->Index;
 		Assert(unit->VisCount[p]);
 		unit->VisCount[p]--;
@@ -1237,15 +1215,10 @@ void UnitCountSeen(CUnit *unit)
 			newv = 0;
 			for (x = 0; x < unit->Type->TileWidth; ++x) {
 				for (y = 0; y < unit->Type->TileHeight; ++y) {
-					if (unit->Type->PermanentCloak && unit->Player != &Players[p]) {
-						if (Map.Fields[(unit->Y + y) * Map.Info.MapWidth + unit->X + x].VisCloak[p]) {
-							newv++;
-						}
-					} else {
-						//  Icky ugly code trick. With NoFogOfWar we haveto be > 0;
-						if (Map.Fields[(unit->Y + y) * Map.Info.MapWidth + unit->X + x].Visible[p] > 1 - (Map.NoFogOfWar ? 1 : 0)) {
-							newv++;
-						}
+					//  Icky ugly code trick. With NoFogOfWar we haveto be > 0;
+					if (Map.Fields[(unit->Y + y) * Map.Info.MapWidth + unit->X + x].Visible[p] >
+							1 - (Map.NoFogOfWar ? 1 : 0)) {
+						newv++;
 					}
 				}
 			}
@@ -2244,19 +2217,6 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 /*----------------------------------------------------------------------------
   -- Finding units
   ----------------------------------------------------------------------------*/
-
-/**
-**  Find the closest piece of wood for an unit.
-**
-**  @param unit    The unit.
-**  @param x       OUT: Map X position of tile.
-**  @param y       OUT: Map Y position of tile.
-*/
-int FindWoodInSight(const CUnit *unit, int *x, int *y)
-{
-	return FindTerrainType(unit->Type->MovementMask, 0, MapFieldForest, 9999,
-		unit->Player, unit->X, unit->Y, x, y);
-}
 
 /**
 **  Find the closest piece of terrain with the given flags.

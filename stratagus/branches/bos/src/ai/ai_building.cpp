@@ -94,8 +94,7 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 			if (worker && x == worker->X && y == worker->Y) {
 				surrounding[surroundingnb++] = 1;
 			} else if (Map.Fields[x + y * Map.Info.MapWidth].Flags &
-						(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
-						MapFieldForest | MapFieldBuilding)) {
+						(MapFieldUnpassable | MapFieldBuilding)) {
 				surrounding[surroundingnb++] = 0;
 			} else{
 				// Can pass there
@@ -515,16 +514,6 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, int
 				m = matrix + x + y * w;
 				if (*m) { // already checked
 					continue;
-				}
-				//
-				// Look if there is wood
-				//
-				if (Map.ForestOnMap(x, y)) {
-					if (AiFindBuildingPlace2(worker, type, x, y, dx, dy, 1)) {
-						delete[] morg;
-						delete[] points;
-						return 1;
-					}
 				}
 
 				if (CanMoveToMask(x, y, mask)) { // reachable

@@ -69,14 +69,6 @@ std::vector<CUnitType *> UnitTypes;   /// unit-types definition
 std::map<std::string, CUnitType *> UnitTypeMap;
 
 /**
-**  Next unit type are used hardcoded in the source.
-**
-**  @todo find a way to make it configurable!
-*/
-CUnitType *UnitTypeHumanWall;       /// Human wall
-CUnitType *UnitTypeOrcWall;         /// Orc wall
-
-/**
 **  Default resources for a new player.
 */
 int DefaultResources[MaxCosts];
@@ -417,12 +409,6 @@ void InitUnitTypes(int reset_player_stats)
 
 	// LUDO : called after game is loaded -> don't reset stats !
 	UpdateStats(reset_player_stats); // Calculate the stats
-
-	//
-	// Setup hardcoded unit types. FIXME: should be moved to some configs.
-	//
-	UnitTypeHumanWall = UnitTypeByIdent("unit-human-wall");
-	UnitTypeOrcWall = UnitTypeByIdent("unit-orc-wall");
 }
 
 /**
@@ -685,12 +671,6 @@ void CleanUnitTypes(void)
 		delete (*it);
 	}
 	UnitTypeVar.DecoVar.clear();
-
-	//
-	// Clean hardcoded unit types.
-	//
-	UnitTypeHumanWall = NULL;
-	UnitTypeOrcWall = NULL;
 }
 
 //@}

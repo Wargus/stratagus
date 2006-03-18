@@ -216,7 +216,7 @@ void MapMarkTileSight(const CPlayer *player, int x, int y)
 		case 1:  // Unseen
 			// When there is NoFogOfWar only unexplored tiles are marked.
 			if (!Map.NoFogOfWar || v == 0) {
-				UnitsOnTileMarkSeen(player, x, y, 0);
+				UnitsOnTileMarkSeen(player, x, y);
 			}
 			v = 2;
 			Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index] = v;
@@ -263,7 +263,7 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 		case 2:
 			// When there is NoFogOfWar units never get unmarked.
 			if (!Map.NoFogOfWar) {
-				UnitsOnTileUnmarkSeen(player, x, y, 0);
+				UnitsOnTileUnmarkSeen(player, x, y);
 			}
 			// Check visible Tile, then deduct...
 			if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
@@ -274,46 +274,6 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 			break;
 	}
 	Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index] = v;
-}
-
-/**
-** Mark a tile for cloak detection.
-**
-** @param player  Player to mark sight.
-** @param x       X tile to mark.
-** @param y       Y tile to mark.
-*/
-void MapMarkTileDetectCloak(const CPlayer *player, int x, int y)
-{
-	unsigned char v;
-
-	v = Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index];
-	if (v == 0) {
-		UnitsOnTileMarkSeen(player, x, y, 1);
-	}
-	Assert(v != 255);
-	++v;
-	Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index] = v;
-}
-
-/**
-** Unmark a tile for cloak detection.
-**
-** @param player  Player to mark sight.
-** @param x       X tile to mark.
-** @param y       Y tile to mark.
-*/
-void MapUnmarkTileDetectCloak(const CPlayer *player, int x, int y)
-{
-	unsigned char v;
-
-	v = Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index];
-	Assert(v != 0);
-	if (v == 1) {
-		UnitsOnTileUnmarkSeen(player, x, y, 1);
-	}
-	--v;
-	Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index] = v;
 }
 
 /**

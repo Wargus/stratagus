@@ -164,11 +164,6 @@ static int CclStratagusMap(lua_State *l)
 						++j2;
 						for (; j2 < args2; ++j2) {
 							lua_rawgeti(l, -1, j2 + 1);
-							if (lua_isnumber(l, -1)) {
-								Map.Fields[i].Value = LuaToNumber(l, -1);
-								lua_pop(l, 1);
-								continue;
-							}
 							value = LuaToString(l, -1);
 							lua_pop(l, 1);
 							if (!strcmp(value, "explored")) {
@@ -176,8 +171,6 @@ static int CclStratagusMap(lua_State *l)
 								lua_rawgeti(l, -1, j2 + 1);
 								Map.Fields[i].Visible[(int)LuaToNumber(l, -1)] = 1;
 								lua_pop(l, 1);
-							} else if (!strcmp(value, "human")) {
-								Map.Fields[i].Flags |= MapFieldHuman;
 
 							} else if (!strcmp(value, "land")) {
 								Map.Fields[i].Flags |= MapFieldLandAllowed;
@@ -190,13 +183,6 @@ static int CclStratagusMap(lua_State *l)
 								Map.Fields[i].Flags |= MapFieldNoBuilding;
 							} else if (!strcmp(value, "block")) {
 								Map.Fields[i].Flags |= MapFieldUnpassable;
-
-							} else if (!strcmp(value, "wall")) {
-								Map.Fields[i].Flags |= MapFieldWall;
-							} else if (!strcmp(value, "rock")) {
-								Map.Fields[i].Flags |= MapFieldRocks;
-							} else if (!strcmp(value, "wood")) {
-								Map.Fields[i].Flags |= MapFieldForest;
 
 							} else if (!strcmp(value, "ground")) {
 								Map.Fields[i].Flags |= MapFieldLandUnit;
@@ -434,7 +420,6 @@ static int CclSetTile(lua_State *l)
 	h = LuaToNumber(l, 3);
 
 	Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
-	Map.Fields[w + h * Map.Info.MapWidth].Value = 0;
 	Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
 	Map.Fields[w + h * Map.Info.MapWidth].Cost = 
 		1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);

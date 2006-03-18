@@ -69,17 +69,12 @@
 **
 **    ::MapFieldVisible field is visible.
 **    ::MapFieldExplored field is explored.
-**    ::MapFieldHuman human player is the owner of the field used for
-**      walls.
 **    ::MapFieldLandAllowed land units are allowed.
 **    ::MapFieldCoastAllowed coast units (transporter) and coast
 **      buildings (shipyard) are allowed.
 **    ::MapFieldWaterAllowed water units allowed.
 **    ::MapFieldNoBuilding no buildings allowed.
 **    ::MapFieldUnpassable field is movement blocked.
-**    ::MapFieldWall field contains wall.
-**    ::MapFieldRocks field contains rocks.
-**    ::MapFieldForest field contains forest.
 **    ::MapFieldLandUnit land unit on field.
 **    ::MapFieldAirUnit air unit on field.
 **    ::MapFieldSeaUnit water unit on field.
@@ -92,21 +87,11 @@
 **
 **    Unit cost to move in this tile.
 **
-**  CMapField::Value
-**
-**    Extra value for each tile. This currently only used for
-**    walls, contains the remaining hit points of the wall and
-**    for forest, contains the frames until they grow.
-**
 **  CMapField::Visible[]
 **
 **    Counter how many units of the player can see this field. 0 the
 **    field is not explored, 1 explored, n-1 unit see it. Currently
 **    no more than 253 units can see a field.
-**
-**  CMapField::VisCloak[]
-**
-**    Visiblity for cloaking.
 **
 **  CMapField::Radar[]
 **
@@ -203,11 +188,9 @@ class CUnitType;
 	/// Describes a field of the map
 class CMapField {
 public:
-	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0),
-		UnitCache()
+	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0)
 	{
 		memset(Visible, 0, sizeof(Visible));
-		memset(VisCloak, 0, sizeof(VisCloak));
 		memset(Radar, 0, sizeof(Radar));
 		memset(RadarJammer, 0, sizeof(RadarJammer));
 	}
@@ -216,11 +199,7 @@ public:
 	unsigned short SeenTile;  /// last seen tile (FOW)
 	unsigned short Flags;     /// field flags
 	unsigned char Cost; /// Unit cost to move in this tile
-	// FIXME: Value can be removed, walls and regeneration can be handled
-	//        different.
-	unsigned char Value;               /// HP for walls/ Wood Regeneration
 	unsigned char Visible[PlayerMax];  /// Seen counter 0 unexplored
-	unsigned char VisCloak[PlayerMax]; /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];    /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
 	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
@@ -229,17 +208,12 @@ public:
 // Not used until now:
 #define MapFieldSpeedMask 0x0007  /// Move faster on this tile
 
-#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
-
 #define MapFieldLandAllowed  0x0010  /// Land units allowed
 #define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
 #define MapFieldWaterAllowed 0x0040  /// Water units allowed
 #define MapFieldNoBuilding   0x0080  /// No buildings allowed
 
 #define MapFieldUnpassable 0x0100  /// Field is movement blocked
-#define MapFieldWall       0x0200  /// Field contains wall
-#define MapFieldRocks      0x0400  /// Field contains rocks
-#define MapFieldForest     0x0800  /// Field contains forest
 
 #define MapFieldLandUnit 0x1000  /// Land unit on field
 #define MapFieldAirUnit  0x2000  /// Air unit on field
@@ -299,30 +273,10 @@ public:
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(int x, int y);
 
-	/// Regenerate the forest.
-	void RegenerateForest(void);
 	/// Reveal the complete map, make everything known.
 	void Reveal(void);
 	/// Save the map.
 	void Save(CFile *file) const;
-
-//
-// Wall
-//
-	/// Wall is hit.
-	void HitWall(unsigned x, unsigned y, unsigned damage);
-	/// Set wall on field.
-	void RemoveWall(unsigned x, unsigned y);
-	/// Set wall on field.
-	void SetWall(unsigned x, unsigned y, int humanwall);
-
-	/// Returns true, if wall on the map tile field
-	bool WallOnMap(int x, int y) const;
-	/// Returns true, if human wall on the map tile field
-	bool HumanWallOnMap(int x, int y) const;
-	/// Returns true, if orc wall on the map tile field
-	bool OrcWallOnMap(int x, int y) const;
-
 
 //
 //  Tile type.
@@ -333,27 +287,10 @@ public:
 	/// Returns true, if coast on the map tile field
 	bool CoastOnMap(int x, int y) const;
 
-	/// Returns true, if forest on the map tile field
-	bool ForestOnMap(int x, int y) const;
-
-	/// Returns true, if rock on the map tile field
-	bool RockOnMap(int x, int y) const;
-
-
 
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar(void);
-
-	/// Check if the seen tile-type is wood
-	bool IsSeenTile(unsigned short type, int x, int y) const;
-	/// Correct the surrounding seen wood fields
-	void FixNeighbors(unsigned short type, int seen, int x, int y);
-	/// Correct the seen wood field, depending on the surrounding
-	void FixTile(unsigned short type, int seen, int x, int y);
-
-	/// Regenerate the forest.
-	void RegenerateForestTile(int x, int y);
 
 
 public:
@@ -407,10 +344,6 @@ extern int MapFogFilterFlags(CPlayer *player, int x, int y, int mask);
 extern MapMarkerFunc MapMarkTileSight;
 	/// Unmark a tile for normal sight
 extern MapMarkerFunc MapUnmarkTileSight;
-	/// Mark a tile for cloak detection
-extern MapMarkerFunc MapMarkTileDetectCloak;
-	/// Unmark a tile for cloak detection
-extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 	/// Mark sight changes
 extern void MapSight(const CPlayer *player, int x, int y, int w,
@@ -441,16 +374,6 @@ extern void MapUnmarkTileRadar(const CPlayer *player, int x, int y);
 extern void MapMarkTileRadarJammer(const CPlayer *player, int x, int y);
 	/// Unmark a tile as jammed, decrease is jamming'ness
 extern void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y);
-
-//
-// in map_wall.c
-//
-	/// Correct the seen wall field, depending on the surrounding
-extern void MapFixSeenWallTile(int x, int y);
-	/// Correct the surrounding seen wall fields
-extern void MapFixSeenWallNeighbors(int x, int y);
-	/// Correct the real wall field, depending on the surrounding
-extern void MapFixWallTile(int x, int y);
 
 //
 // in ccl_map.c

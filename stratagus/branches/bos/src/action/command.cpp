@@ -447,12 +447,6 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 				order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				order->MinRange = unit->Type->MinAttackRange;
 			}
-		} else if (Map.WallOnMap(x,y)) {
-			// FIXME: look into action_attack.c about this ugly problem
-			order->X = x;
-			order->Y = y;
-			order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
-			order->MinRange = unit->Type->MinAttackRange;
 		} else {
 			order->X = x;
 			order->Y = y;
@@ -681,60 +675,6 @@ void CommandDismiss(CUnit *unit)
 	} else {
 		DebugPrint("Suicide unit ... \n");
 		LetUnitDie(unit);
-	}
-	ClearSavedAction(unit);
-}
-
-/**
-**  Send unit harvest a location
-**
-**  @param unit   pointer to unit.
-**  @param x      X map position for harvest.
-**  @param y      Y map position for harvest.
-**  @param flush  if true, flush command queue.
-*/
-void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
-{
-	COrder *order;
-	int nx;
-	int ny;
-
-	//
-	// Check if unit is still valid? (NETWORK!)
-	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
-		if (unit->Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			order = &unit->NewOrder;
-			ReleaseOrder(order);
-		} else if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		order->Action = UnitActionResource;
-
-		//  Find the closest piece of wood next to a tile where the unit can move
-		if (!FindTerrainType(0, (unit->Type->MovementMask), 1, 20,
-				unit->Player, x, y, &nx, &ny)) {
-			DebugPrint("FIXME: Give up???\n");
-		}
-
-		// Max Value > 1
-		if ((abs(nx - x) | abs(ny - y)) > 1) {
-			if (!FindTerrainType(0, MapFieldForest, 0, 20, unit->Player,
-					nx, ny, &nx, &ny)) {
-				DebugPrint("FIXME: Give up???\n");
-			}
-		} else {
-			// The destination is next to a reacahble tile.
-			nx = x;
-			ny = y;
-		}
-		order->X = nx;
-		order->Y = ny;
-
-		order->Range = 1;
 	}
 	ClearSavedAction(unit);
 }

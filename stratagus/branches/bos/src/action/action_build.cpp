@@ -526,19 +526,6 @@ void HandleActionBuilt(CUnit *unit)
 			AiWorkComplete(worker, unit);
 		}
 
-		// FIXME: Vladi: this is just a hack to test wall fixing,
-		// FIXME:  also not sure if the right place...
-		// FIXME: Johns: hardcoded unit-type wall / more races!
-		if (unit->Type == UnitTypeOrcWall ||
-				unit->Type == UnitTypeHumanWall) {
-			Map.SetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
-			unit->Remove(NULL);
-			UnitLost(unit);
-			UnitClearOrders(unit);
-			unit->Release();
-			return;
-		}
-
 		UpdateForNewUnit(unit, 0);
 
 		// Set the direction of the building if it supports them

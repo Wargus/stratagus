@@ -177,9 +177,8 @@ void EditTile(int x, int y, int tile)
 	// Change the flags
 	//
 	mf = &Map.Fields[y * Map.Info.MapWidth + x];
-	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
-		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-		MapFieldWall | MapFieldRocks | MapFieldForest);
+	mf->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
+		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable);
 
 	mf->Flags |= Map.Tileset.FlagsTable[16 + tile * 16];
 
@@ -941,9 +940,6 @@ static void DrawEditorInfo(void)
 		flags & MapFieldUnpassable   ? 'u' : '-',
 		flags & MapFieldNoBuilding   ? 'n' : '-',
 		flags & MapFieldHuman        ? 'h' : '-',
-		flags & MapFieldWall         ? 'w' : '-',
-		flags & MapFieldRocks        ? 'r' : '-',
-		flags & MapFieldForest       ? 'f' : '-',
 		flags & MapFieldLandAllowed  ? 'L' : '-',
 		flags & MapFieldCoastAllowed ? 'C' : '-',
 		flags & MapFieldWaterAllowed ? 'W' : '-',

@@ -618,10 +618,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->ClicksToExplode = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PermanentCloak")) {
-			type->PermanentCloak = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "DetectCloak")) {
-			type->DetectCloak = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {
 			//  Warning: CanTransport should only be used AFTER all bool flags
 			//  have been defined.
@@ -702,9 +698,6 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						res->ResourceCapacity = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "terrain-harvester")) {
-						res->TerrainHarvester = 1;
-						--k;
 					} else if (!strcmp(value, "lose-resources")) {
 						res->LoseResources = 1;
 						--k;
@@ -1928,8 +1921,6 @@ void UpdateUnitVariables(const CUnit *unit)
 	type->BoolFlag[SEAUNIT_INDEX]               = type->SeaUnit;
 	type->BoolFlag[EXPLODEWHENKILLED_INDEX]     = type->ExplodeWhenKilled;
 	type->BoolFlag[VISIBLEUNDERFOG_INDEX]       = type->VisibleUnderFog;
-	type->BoolFlag[PERMANENTCLOAK_INDEX]        = type->PermanentCloak;
-	type->BoolFlag[DETECTCLOAK_INDEX]           = type->DetectCloak;
 	type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX] = type->AttackFromTransporter;
 	type->BoolFlag[VANISHES_INDEX]              = type->Vanishes;
 	type->BoolFlag[GROUNDATTACK_INDEX]          = type->GroundAttack;
@@ -1960,7 +1951,7 @@ void InitDefinedVariables()
 		}; // names of the variable.
 	const char *boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
-		"\"VisibleUnderFog\", \"PermanentCloack\", \"DetectCloak\", \"AttackFromTransporter\","
+		"\"VisibleUnderFog\", \"AttackFromTransporter\","
 		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
 		"\"BuilderOutSide\", \"BuilderLost\", \"CanHarvest\", \"Harvester\","
 		"\"SelectableByRectangle\", \"IsNotSelectable\", \"Decoration\","
