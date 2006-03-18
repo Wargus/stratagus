@@ -64,7 +64,7 @@ DefineUnitType("unit-dorcoz", {
         MaxAttackRange = 7, Priority = 60, Points = 50, Demand = 1,
         Corpse = {"unit-dead-body", 0}, Type = "land", RightMouseAction = "attack",
         CanAttack = true, CanTargetLand = true, LandUnit = true, organic = true,
-        SelectableByRectangle = true, DetectCloak = true,
+        SelectableByRectangle = true,
         RightMouseAction = "attack",
         Sounds = {
                 "selected", "dorcoz-selected",

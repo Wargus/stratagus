@@ -121,7 +121,7 @@ DefineUnitType("unit-revealer", {
 	SightRange = 12,
 	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, DecayRate = 1, Type = "land",
-	Building = true, Revealer = true, DetectCloak = true})
+	Building = true, Revealer = true})
 
 -- Needed for stratagus otherwise it crashes
 DefineUnitType("unit-human-wall", {

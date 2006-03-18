@@ -360,9 +360,26 @@ function DefineEliteScreen(screen_width, screen_height)
 	DefineUI(unpack(ui))
 end
 
+--[[
 DefineEliteScreen(640, 480)
 DefineEliteScreen(800, 600)
 DefineEliteScreen(1024, 768)
 DefineEliteScreen(1280, 960)
 DefineEliteScreen(1600, 1200)
+]]
+
+UI.MapArea.X = 0
+UI.MapArea.Y = --[[16]] 0
+UI.MapArea.EndX = --[[UI.MapArea.X + (Video.Width - 200) - 1]] Video.Width-1
+UI.MapArea.EndY = --[[UI.MapArea.Y + (Video.Height - 32) - 1]] Video.Height-1
+
+UI.StatusLine.TextX = 38
+UI.StatusLine.TextY = Video.Height - 14
+UI.StatusLine.Width = Video.Width - 200 - 100
+UI.StatusLine.Font = Fonts["game"]
+
+UI.Minimap.X = Video.Width - 200 + 46
+UI.Minimap.Y = 24 + 17 - 8
+UI.Minimap.W = 121
+UI.Minimap.H = 105
 
