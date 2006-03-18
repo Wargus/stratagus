@@ -703,7 +703,7 @@ void RestrictCursorToMinimap(void)
 
 	if (CursorY < UI.Minimap.Y) {
 		CursorStartY = UI.Minimap.Y;
-	} else if (CursorY >= UI.Minimap.Y + UI.Minimap.W) {
+	} else if (CursorY >= UI.Minimap.Y + UI.Minimap.H) {
 		CursorStartY = UI.Minimap.Y + UI.Minimap.H - 1;
 	} else {
 		CursorStartY = CursorY;
