@@ -213,27 +213,6 @@ function DefineEliteScreen(screen_width, screen_height)
 	AddFiller(ui, "elites/ui/ui_minimap.png", {screen_width - 200, 24-8})
 
 	local ui2 = {
-		"resources", {
-			"titanium", {
-				File = "elites/ui/ui_res_icons.png", Frame = 0,
-				Pos = {67 +   0, 0}, 
-				Size = {14, 14}, 
-				TextPos = {85 +   0, 1}},
-			"crystal", {
-				File = "elites/ui/ui_res_icons.png", Frame = 1,
-				Pos = {67 +  75, 0},
-				Size = {14, 14},
-				TextPos =  {85 +  75, 1}},
-			"food", {
-				File = "elites/ui/ui_res_icons.png", Frame = 3,
-				Pos =  {67 + 150, 0}, 
-				Size = {14, 14}, 
-				TextPos = {85 + 150, 1}},
-			"score", {
-				File = "elites/ui/ui_res_icons.png", Frame = 4,
-				Pos = {67 + 300, 0}, 
-				Size = {14, 14}, 
-				TextPos = {85 + 300, 1}}},
 		"info-panel", {
 			"panel", {
 				"file", "elites/ui/ui_info.png",
@@ -382,4 +361,34 @@ UI.Minimap.X = Video.Width - 200 + 46
 UI.Minimap.Y = 24 + 17 - 8
 UI.Minimap.W = 121
 UI.Minimap.H = 105
+
+-- titanium
+UI.Resources[0].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[0].IconFrame = 0
+UI.Resources[0].IconX = 67 + 0
+UI.Resources[0].IconY = 0
+UI.Resources[0].TextX = 85 + 0
+UI.Resources[0].TextY = 1
+
+-- crystal
+UI.Resources[1].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[1].IconFrame = 1
+UI.Resources[1].IconX = 67 + 75
+UI.Resources[1].IconY = 0
+UI.Resources[1].TextX = 85 + 75
+UI.Resources[1].TextY = 1
+
+UI.Resources[FoodCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[FoodCost].IconFrame = 2
+UI.Resources[FoodCost].IconX = 67 + 150
+UI.Resources[FoodCost].IconY = 0
+UI.Resources[FoodCost].TextX = 85 + 150
+UI.Resources[FoodCost].TextY = 1
+
+UI.Resources[ScoreCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[ScoreCost].IconFrame = 3
+UI.Resources[ScoreCost].IconX = 67 + 300
+UI.Resources[ScoreCost].IconY = 0
+UI.Resources[ScoreCost].TextX = 85 + 300
+UI.Resources[ScoreCost].TextY = 1
 
