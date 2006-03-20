@@ -7,7 +7,7 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---	vehiculefactory.lua	-	Define the vehiculefactory
+--	vehiclefactory.lua	-	Define the vehiclefactory
 --
 --	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
 --
