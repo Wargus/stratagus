@@ -32,8 +32,6 @@ DefineTileset(
  "image", "tiles/desert.png",
  -- Slots descriptions
  "slots", {
-  "special", {-- Can't be in pud
-  },
   "solid", { "unused",
     {}},-- 000
   "solid", { "light-water", "water",
