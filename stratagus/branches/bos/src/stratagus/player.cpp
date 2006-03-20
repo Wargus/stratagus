@@ -88,15 +88,12 @@ int PlayerColorIndexCount;
 */
 void InitPlayers(void)
 {
-	int p;
-	int x;
-
-	for (p = 0; p < PlayerMax; ++p) {
+	for (int p = 0; p < PlayerMax; ++p) {
 		Players[p].Index = p;
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
-		for (x = 0; x < PlayerColorIndexCount; ++x) {
+		for (int x = 0; x < PlayerColorIndexCount; ++x) {
 			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
 				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
 		}
@@ -108,9 +105,7 @@ void InitPlayers(void)
 */
 void CleanPlayers(void)
 {
-	int p;
-
-	for (p = 0; p < PlayerMax; ++p) {
+	for (int p = 0; p < PlayerMax; ++p) {
 		delete[] Players[p].Name;
 	}
 	ThisPlayer = NULL;
@@ -125,9 +120,7 @@ void CleanPlayers(void)
 */
 void CleanRaces(void)
 {
-	int p;
-
-	for (p = 0; p < PlayerRaces.Count; ++p) {
+	for (int p = 0; p < PlayerRaces.Count; ++p) {
 		delete[] PlayerRaces.Name[p];
 		delete[] PlayerRaces.Display[p];
 	}
@@ -143,7 +136,6 @@ void CleanRaces(void)
 */
 void SavePlayers(CFile *file)
 {
-	int i;
 	int j;
 	unsigned char r;
 	unsigned char g;
@@ -155,7 +147,7 @@ void SavePlayers(CFile *file)
 	//
 	//  Dump all players
 	//
-	for (i = 0; i < NumPlayers; ++i) {
+	for (int i = 0; i < NumPlayers; ++i) {
 		file->printf("Player(%d,\n", i);
 		file->printf("  \"name\", \"%s\",\n", Players[i].Name);
 		file->printf("  \"type\", ");
@@ -498,9 +490,9 @@ void CPlayer::SetResource(int resource, int value)
 /**
 **  Check if the unit-type didn't break any unit limits.
 **
-**  @param type    Type of unit.
+**  @param type  Type of unit.
 **
-**  @return        True if enough, negative on problem.
+**  @return      True if enough, negative on problem.
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
@@ -511,29 +503,29 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 	//
 	if (NumUnits < UnitMax) {
 		if (type->Building && this->NumBuildings >= this->BuildingLimit) {
-			Notify(NotifyYellow, -1, -1, "Building Limit Reached");
+			Notify(NotifyYellow, -1, -1, _("Building Limit Reached"));
 			return -1;
 		}
 		if (!type->Building && (this->TotalNumUnits - this->NumBuildings) >= this->UnitLimit) {
-			Notify(NotifyYellow, -1, -1, "Unit Limit Reached");
+			Notify(NotifyYellow, -1, -1, _("Unit Limit Reached"));
 			return -2;
 		}
 		if (this->Demand + type->Demand > this->Supply && type->Demand) {
-			Notify(NotifyYellow, -1, -1, "Insufficient Supply, increase Supply.");
+			Notify(NotifyYellow, -1, -1, _("Insufficient Supply, increase Supply."));
 			return -3;
 		}
 		if (this->TotalNumUnits >= this->TotalUnitLimit) {
-			Notify(NotifyYellow, -1, -1, "Total Unit Limit Reached");
+			Notify(NotifyYellow, -1, -1, _("Total Unit Limit Reached"));
 			return -4;
 		}
 		if (this->UnitTypesCount[type->Slot] >=  this->Allow.Units[type->Slot]) {
-			Notify(NotifyYellow, -1, -1, "Limit of %d reached for this unit type",
+			Notify(NotifyYellow, -1, -1, _("Limit of %d reached for this unit type"),
 				this->Allow.Units[type->Slot]);
 			return -6;
 		}
 		return 1;
 	} else {
-		Notify(NotifyYellow, -1, -1, "Cannot create more units.");
+		Notify(NotifyYellow, -1, -1, _("Cannot create more units."));
 		if (AiEnabled) {
 			// AiNoMoreUnits(player, type);
 		}
@@ -544,19 +536,16 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 /**
 **  Check if enough resources for are available.
 **
-**  @param costs   How many costs.
+**  @param costs  How many costs.
 **
-**  @return        False if all enough, otherwise a bit mask.
+**  @return       False if all enough, otherwise a bit mask.
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
 int CPlayer::CheckCosts(const int *costs) const
 {
-	int i;
-	int err;
-
-	err = 0;
-	for (i = 1; i < MaxCosts; ++i) {
+	int err = 0;
+	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Resources[i] < costs[i]) {
 			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
 				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
@@ -564,16 +553,15 @@ int CPlayer::CheckCosts(const int *costs) const
 			err |= 1 << i;
 		}
 	}
-
 	return err;
 }
 
 /**
 **  Check if enough resources for new unit is available.
 **
-**  @param type    Type of unit.
+**  @param type  Type of unit.
 **
-**  @return        False if all enough, otherwise a bit mask.
+**  @return      False if all enough, otherwise a bit mask.
 */
 int CPlayer::CheckUnitType(const CUnitType *type) const
 {
@@ -583,7 +571,7 @@ int CPlayer::CheckUnitType(const CUnitType *type) const
 /**
 **  Add costs to the resources
 **
-**  @param costs   How many costs.
+**  @param costs  How many costs.
 */
 void CPlayer::AddCosts(const int *costs)
 {
@@ -595,7 +583,7 @@ void CPlayer::AddCosts(const int *costs)
 /**
 **  Add the costs of an unit type to resources
 **
-**  @param type    Type of unit.
+**  @param type  Type of unit.
 */
 void CPlayer::AddUnitType(const CUnitType *type)
 {
@@ -619,7 +607,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 /**
 **  Subtract costs from the resources
 **
-**  @param costs   How many costs.
+**  @param costs  How many costs.
 */
 void CPlayer::SubCosts(const int *costs)
 {
@@ -631,7 +619,7 @@ void CPlayer::SubCosts(const int *costs)
 /**
 **  Substract the costs of new unit from resources
 **
-**  @param type    Type of unit.
+**  @param type  Type of unit.
 */
 void CPlayer::SubUnitType(const CUnitType *type)
 {
@@ -654,9 +642,9 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 /**
 **  Have unit of type.
 **
-**  @param type    Type of unit.
+**  @param type  Type of unit.
 **
-**  @return        How many exists, false otherwise.
+**  @return      How many exists, false otherwise.
 */
 int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 {
@@ -666,9 +654,9 @@ int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 /**
 **  Have unit of type.
 **
-**  @param ident   Identifier of unit-type that should be lookuped.
+**  @param ident  Identifier of unit-type that should be lookuped.
 **
-**  @return        How many exists, false otherwise.
+**  @return       How many exists, false otherwise.
 **
 **  @note This function should not be used during run time.
 */
@@ -708,10 +696,8 @@ void PlayersEachCycle(void)
 */
 void PlayersEachSecond(int player)
 {
-	int res;
-
 	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
-		for (res = 0; res < MaxCosts; ++res) {
+		for (int res = 0; res < MaxCosts; ++res) {
 			Players[player].Revenue[res] =
 				Players[player].Resources[res] -
 				Players[player].LastResources[res];
@@ -801,11 +787,11 @@ void DebugPlayers(void)
 /**
 **  Notify player about a problem.
 **
-**  @param type    Problem type
-**  @param x       Map X tile position
-**  @param y       Map Y tile position
-**  @param fmt     Message format
-**  @param ...     Message varargs
+**  @param type  Problem type
+**  @param x     Map X tile position
+**  @param y     Map Y tile position
+**  @param fmt   Message format
+**  @param ...   Message varargs
 **
 **  @note The parameter type, isn't yet used.
 **  @todo FIXME: We must also notfiy allied players.

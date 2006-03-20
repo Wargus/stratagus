@@ -5,6 +5,16 @@ class CButtonPanel
 	bool ShowCommandKey;
 };
 
+class CResourceInfo
+{
+	CGraphic *G;
+	int IconFrame;
+	int IconX;
+	int IconY;
+	int TextX;
+	int TextY;
+};
+
 class CInfoPanel
 {
 	int X;
@@ -29,6 +39,7 @@ class CMapArea
 
 class CUserInterface
 {
+	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
 	CButtonPanel ButtonPanel;
 	CMinimap Minimap;

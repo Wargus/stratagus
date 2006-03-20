@@ -38,12 +38,9 @@
 
 class CGraphic : public gcn::Image {
 private:
-	CGraphic() : File(NULL), HashFile(NULL), Surface(NULL),
+	CGraphic() : File(NULL), HashFile(NULL), Surface(NULL), SurfaceFlip(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		Refs(1)
-	{
-		SurfaceFlip = NULL;
-	}
+		Refs(1) {}
 	~CGraphic() {}
 
 public:

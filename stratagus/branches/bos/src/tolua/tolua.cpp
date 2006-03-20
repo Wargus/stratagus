@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Wed Mar 15 21:13:58 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Mar 19 21:01:24 2006.
 */
 
 #ifndef __cplusplus
@@ -56,9 +56,9 @@ static int tolua_collect_Label (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_Color (lua_State* tolua_S)
+static int tolua_collect_ImageRadioButton (lua_State* tolua_S)
 {
- Color* self = (Color*) tolua_tousertype(tolua_S,1,0);
+ ImageRadioButton* self = (ImageRadioButton*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -70,16 +70,23 @@ static int tolua_collect_DropDownWidget (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_Windows (lua_State* tolua_S)
+static int tolua_collect_CResourceInfo (lua_State* tolua_S)
 {
- Windows* self = (Windows*) tolua_tousertype(tolua_S,1,0);
+ CResourceInfo* self = (CResourceInfo*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
 
-static int tolua_collect_MenuScreen (lua_State* tolua_S)
+static int tolua_collect_StatBoxWidget (lua_State* tolua_S)
 {
- MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ StatBoxWidget* self = (StatBoxWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_Color (lua_State* tolua_S)
+{
+ Color* self = (Color*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -91,9 +98,9 @@ static int tolua_collect_ButtonWidget (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_LuaActionListener (lua_State* tolua_S)
+static int tolua_collect_ListBoxWidget (lua_State* tolua_S)
 {
- LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
+ ListBoxWidget* self = (ListBoxWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -119,9 +126,9 @@ static int tolua_collect_ScrollingWidget (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_ImageWidget (lua_State* tolua_S)
+static int tolua_collect_MenuScreen (lua_State* tolua_S)
 {
- ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
+ MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -147,16 +154,16 @@ static int tolua_collect_CPlayer (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_StatBoxWidget (lua_State* tolua_S)
+static int tolua_collect_Windows (lua_State* tolua_S)
 {
- StatBoxWidget* self = (StatBoxWidget*) tolua_tousertype(tolua_S,1,0);
+ Windows* self = (Windows*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
 
-static int tolua_collect_ImageRadioButton (lua_State* tolua_S)
+static int tolua_collect_LuaActionListener (lua_State* tolua_S)
 {
- ImageRadioButton* self = (ImageRadioButton*) tolua_tousertype(tolua_S,1,0);
+ LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -182,9 +189,9 @@ static int tolua_collect_NetworkHost (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_ListBoxWidget (lua_State* tolua_S)
+static int tolua_collect_ImageWidget (lua_State* tolua_S)
 {
- ListBoxWidget* self = (ListBoxWidget*) tolua_tousertype(tolua_S,1,0);
+ ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -209,7 +216,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
- tolua_usertype(tolua_S,"ImageWidget");
+ tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
  tolua_usertype(tolua_S,"CColor");
@@ -221,24 +228,25 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CPreference");
- tolua_usertype(tolua_S,"Windows");
  tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"StatBoxWidget");
- tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"NetworkHost");
- tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"MenuScreen");
- tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"RadioButton");
+ tolua_usertype(tolua_S,"CResourceInfo");
+ tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Slider");
 }
@@ -543,6 +551,186 @@ static int tolua_set_CButtonPanel_ShowCommandKey(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: G of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CResourceInfo_G_ptr
+static int tolua_get_CResourceInfo_G_ptr(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->G,"CGraphic");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: G of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CResourceInfo_G_ptr
+static int tolua_set_CResourceInfo_G_ptr(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->G = ((CGraphic*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: IconFrame of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CResourceInfo_IconFrame
+static int tolua_get_CResourceInfo_IconFrame(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'IconFrame'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->IconFrame);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: IconFrame of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CResourceInfo_IconFrame
+static int tolua_set_CResourceInfo_IconFrame(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'IconFrame'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->IconFrame = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: IconX of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CResourceInfo_IconX
+static int tolua_get_CResourceInfo_IconX(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'IconX'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->IconX);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: IconX of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CResourceInfo_IconX
+static int tolua_set_CResourceInfo_IconX(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'IconX'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->IconX = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: IconY of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CResourceInfo_IconY
+static int tolua_get_CResourceInfo_IconY(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'IconY'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->IconY);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: IconY of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CResourceInfo_IconY
+static int tolua_set_CResourceInfo_IconY(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'IconY'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->IconY = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: TextX of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CResourceInfo_TextX
+static int tolua_get_CResourceInfo_TextX(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextX'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->TextX);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: TextX of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CResourceInfo_TextX
+static int tolua_set_CResourceInfo_TextX(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextX'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->TextX = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: TextY of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CResourceInfo_TextY
+static int tolua_get_CResourceInfo_TextY(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextY'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->TextY);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: TextY of class  CResourceInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CResourceInfo_TextY
+static int tolua_set_CResourceInfo_TextY(lua_State* tolua_S)
+{
+  CResourceInfo* self = (CResourceInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TextY'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->TextY = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: X of class  CInfoPanel */
 #ifndef TOLUA_DISABLE_tolua_get_CInfoPanel_X
 static int tolua_get_CInfoPanel_X(lua_State* tolua_S)
@@ -839,6 +1027,58 @@ static int tolua_set_CMapArea_EndY(lua_State* tolua_S)
 #endif
   self->EndY = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Resources of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_CUserInterface_Resources
+static int tolua_get_stratagus_CUserInterface_Resources(lua_State* tolua_S)
+{
+ int tolua_index;
+  CUserInterface* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CUserInterface*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxResourceInfo)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->Resources[tolua_index],"CResourceInfo");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Resources of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_CUserInterface_Resources
+static int tolua_set_stratagus_CUserInterface_Resources(lua_State* tolua_S)
+{
+ int tolua_index;
+  CUserInterface* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CUserInterface*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxResourceInfo)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->Resources[tolua_index] = *((CResourceInfo*)  tolua_tousertype(tolua_S,3,0));
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -9559,6 +9799,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  } /* end of embedded lua code */
 
  tolua_constant(tolua_S,"MaxCosts",MaxCosts);
+ tolua_constant(tolua_S,"FoodCost",FoodCost);
+ tolua_constant(tolua_S,"ScoreCost",ScoreCost);
+ tolua_constant(tolua_S,"MaxResourceInfo",MaxResourceInfo);
  tolua_constant(tolua_S,"PlayerMax",PlayerMax);
  tolua_constant(tolua_S,"UnitMax",UnitMax);
  tolua_cclass(tolua_S,"CMinimap","CMinimap","",NULL);
@@ -9576,6 +9819,19 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"X",tolua_get_CButtonPanel_X,tolua_set_CButtonPanel_X);
   tolua_variable(tolua_S,"Y",tolua_get_CButtonPanel_Y,tolua_set_CButtonPanel_Y);
   tolua_variable(tolua_S,"ShowCommandKey",tolua_get_CButtonPanel_ShowCommandKey,tolua_set_CButtonPanel_ShowCommandKey);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"CResourceInfo","CResourceInfo","",tolua_collect_CResourceInfo);
+#else
+ tolua_cclass(tolua_S,"CResourceInfo","CResourceInfo","",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"CResourceInfo");
+  tolua_variable(tolua_S,"G",tolua_get_CResourceInfo_G_ptr,tolua_set_CResourceInfo_G_ptr);
+  tolua_variable(tolua_S,"IconFrame",tolua_get_CResourceInfo_IconFrame,tolua_set_CResourceInfo_IconFrame);
+  tolua_variable(tolua_S,"IconX",tolua_get_CResourceInfo_IconX,tolua_set_CResourceInfo_IconX);
+  tolua_variable(tolua_S,"IconY",tolua_get_CResourceInfo_IconY,tolua_set_CResourceInfo_IconY);
+  tolua_variable(tolua_S,"TextX",tolua_get_CResourceInfo_TextX,tolua_set_CResourceInfo_TextX);
+  tolua_variable(tolua_S,"TextY",tolua_get_CResourceInfo_TextY,tolua_set_CResourceInfo_TextY);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CInfoPanel","CInfoPanel","",NULL);
  tolua_beginmodule(tolua_S,"CInfoPanel");
@@ -9598,6 +9854,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CUserInterface","CUserInterface","",NULL);
  tolua_beginmodule(tolua_S,"CUserInterface");
+  tolua_array(tolua_S,"Resources",tolua_get_stratagus_CUserInterface_Resources,tolua_set_stratagus_CUserInterface_Resources);
   tolua_variable(tolua_S,"InfoPanel",tolua_get_CUserInterface_InfoPanel,tolua_set_CUserInterface_InfoPanel);
   tolua_variable(tolua_S,"ButtonPanel",tolua_get_CUserInterface_ButtonPanel,tolua_set_CUserInterface_ButtonPanel);
   tolua_variable(tolua_S,"Minimap",tolua_get_CUserInterface_Minimap,tolua_set_CUserInterface_Minimap);

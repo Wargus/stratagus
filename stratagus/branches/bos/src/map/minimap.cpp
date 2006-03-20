@@ -517,6 +517,10 @@ void CMinimap::Draw(int vx, int vy)
 	SDL_Rect drect = {X, Y};
 	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
 
+	// make sure we have room for the border
+	Assert(X > 0 && Y > 0 && X + W + 1 < Video.Width && Y + H + 1 < Video.Height);
+	Video.DrawRectangle(ColorWhite, X - 1, Y - 1, W + 2, H + 2);
+
 	DrawEvents();
 }
 

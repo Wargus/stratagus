@@ -88,7 +88,6 @@ CUserInterface::CUserInterface() :
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
 	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 {
-	memset(Resources, 0, sizeof(Resources));
 	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
 	memset(PieX, 0, sizeof(PieX));
 	memset(PieY, 0, sizeof(PieY));
@@ -252,47 +251,10 @@ void SaveUserInterface(CFile *file)
 */
 CUserInterface::~CUserInterface()
 {
-	int i;
-	std::vector<MenuPanel *>::iterator menupanel;
-
 	delete[] Name;
 //	delete[] NormalFontColor;
 //	delete[] ReverseFontColor;
 
-	// Filler
-	for (i = 0; i < (int)Fillers.size(); ++i) {
-		CGraphic::Free(Fillers[i].G);
-	}
-
-	// Resource Icons
-	for (i = 0; i < MaxCosts + 2; ++i) {
-		CGraphic::Free(Resources[i].G);
-	}
-
-	// Info Panel
-	CGraphic::Free(InfoPanel.G);
-	delete[] PanelIndex;
-	delete SingleSelectedButton;
-	delete SingleTrainingButton;
-	delete UpgradingButton;
-	delete ResearchingButton;
-
-	// Button Panel
-	CGraphic::Free(ButtonPanel.G);
-
-	// Pie Menu
-	CGraphic::Free(PieMenuBackgroundG);
-
-	// Menu Panels
-	for (menupanel = MenuPanels.begin(); menupanel != MenuPanels.end(); ++menupanel) {
-		CGraphic::Free((*menupanel)->G);
-		delete[] (*menupanel)->Ident;
-		delete *menupanel;
-	}
-
-	// Backgrounds
-	CGraphic::Free(VictoryBackgroundG);
-	CGraphic::Free(DefeatBackgroundG);
 }
 
 /**
@@ -302,6 +264,42 @@ void CleanUserInterface(void)
 {
 	int i;
 	int j;
+	std::vector<MenuPanel *>::iterator menupanel;
+
+	// Filler
+	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
+		CGraphic::Free(UI.Fillers[i].G);
+	}
+
+	// Resource Icons
+	for (i = 0; i <= ScoreCost; ++i) {
+		CGraphic::Free(UI.Resources[i].G);
+	}
+
+	// Info Panel
+	CGraphic::Free(UI.InfoPanel.G);
+	delete[] UI.PanelIndex;
+	delete UI.SingleSelectedButton;
+	delete UI.SingleTrainingButton;
+	delete UI.UpgradingButton;
+	delete UI.ResearchingButton;
+
+	// Button Panel
+	CGraphic::Free(UI.ButtonPanel.G);
+
+	// Pie Menu
+	CGraphic::Free(UI.PieMenuBackgroundG);
+
+	// Menu Panels
+	for (menupanel = UI.MenuPanels.begin(); menupanel != UI.MenuPanels.end(); ++menupanel) {
+		CGraphic::Free((*menupanel)->G);
+		delete[] (*menupanel)->Ident;
+		delete *menupanel;
+	}
+
+	// Backgrounds
+	CGraphic::Free(UI.VictoryBackgroundG);
+	CGraphic::Free(UI.DefeatBackgroundG);
 
 	for (std::vector<CUnitInfoPanel *>::iterator panel = AllPanels.begin();
 		panel != AllPanels.end(); ++panel) {

@@ -472,6 +472,20 @@ public:
 	bool ShowCommandKey;
 };
 
+class CResourceInfo {
+public:
+	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0),
+		TextX(-1), TextY(-1) {}
+
+	CGraphic *G;                      /// icon graphic
+	int IconFrame;                    /// icon frame
+	int IconX;                        /// icon X position
+	int IconY;                        /// icon Y position
+	int TextX;                        /// text X position
+	int TextY;                        /// text Y position
+};
+#define MaxResourceInfo  MaxCosts + 2 /// +2 for food and score
+
 class CInfoPanel
 {
 public:
@@ -536,15 +550,7 @@ public:
 	// Fillers
 	std::vector<CFiller> Fillers;       /// Filler graphics
 
-	struct {
-		CGraphic *G;                    /// icon graphic
-		int IconFrame;                  /// icon frame
-		int IconX;                      /// icon X position
-		int IconY;                      /// icon Y position
-		int TextX;                      /// text X position
-		int TextY;                      /// text Y position
-	} Resources[MaxCosts + 2];          /// Icon+Text of all resources
-                                        /// +2 for food and score
+	CResourceInfo Resources[MaxResourceInfo];/// Icon+Text of all resources
 
 	// Info panel
 	CInfoPanel InfoPanel;               /// Info panel
