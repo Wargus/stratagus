@@ -77,7 +77,7 @@ DefineUnitType("unit-artil", {
 	Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
-	LandUnit = true, SelectableByRectangle = true, 
+	SelectableByRectangle = true, 
 	Demand = 50, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 8,
 	Sounds = {}

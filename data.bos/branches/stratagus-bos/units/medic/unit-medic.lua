@@ -96,7 +96,7 @@ DefineUnitType("unit-medic", {
 	MaxAttackRange = 1, Priority = 60, Points = 50,
 	Corpse = {"unit-dead-body5", 0},
 	Type = "land", CanTargetLand = true,
-	LandUnit = true, Demand = 0, organic = true,
+	Demand = 0, organic = true,
 	SelectableByRectangle = true,
 	CanCastSpell = {"spell-healing"},
 	AutoCastActive = {"spell-healing"},
