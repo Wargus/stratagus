@@ -812,8 +812,7 @@ public:
 		RandomMovementProbability(0), ClicksToExplode(0),
 		CanTransport(NULL), MaxOnBoard(0), StartingResources(0),
 		UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
-		MouseAction(0), Points(0), CanTarget(0),
-		Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
+		MouseAction(0), Points(0), CanTarget(0), Flip(0), Revealer(0),
 		ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 		Coward(0), AttackFromTransporter(0),
 		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
@@ -918,9 +917,6 @@ public:
 
 	unsigned Flip : 1;              /// Flip image when facing left
 	unsigned Revealer : 1;          /// reveal the fog of war
-	unsigned LandUnit : 1;          /// Land animated
-	unsigned AirUnit : 1;           /// Air animated
-	unsigned SeaUnit : 1;           /// Sea animated
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned Building : 1;          /// Building
 	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.

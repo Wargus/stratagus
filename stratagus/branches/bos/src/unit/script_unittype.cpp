@@ -606,12 +606,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->AutoBuildRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ShoreBuilding")) {
 			type->ShoreBuilding = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "LandUnit")) {
-			type->LandUnit = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "AirUnit")) {
-			type->AirUnit = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SeaUnit")) {
-			type->SeaUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RandomMovementProbability")) {
 			type->RandomMovementProbability = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ClicksToExplode")) {
@@ -1916,9 +1910,6 @@ void UpdateUnitVariables(const CUnit *unit)
 	type->BoolFlag[BUILDING_INDEX]              = type->Building;
 	type->BoolFlag[FLIP_INDEX]                  = type->Flip;
 	type->BoolFlag[REVEALER_INDEX]              = type->Revealer;
-	type->BoolFlag[LANDUNIT_INDEX]              = type->LandUnit;
-	type->BoolFlag[AIRUNIT_INDEX]               = type->AirUnit;
-	type->BoolFlag[SEAUNIT_INDEX]               = type->SeaUnit;
 	type->BoolFlag[EXPLODEWHENKILLED_INDEX]     = type->ExplodeWhenKilled;
 	type->BoolFlag[VISIBLEUNDERFOG_INDEX]       = type->VisibleUnderFog;
 	type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX] = type->AttackFromTransporter;

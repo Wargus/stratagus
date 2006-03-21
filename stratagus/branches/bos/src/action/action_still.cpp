@@ -262,13 +262,6 @@ void ActionStillGeneric(CUnit *unit, int ground)
 		unit->SubAction = unit->State = 0; // No attacking, restart
 	}
 	Assert(!unit->Orders[0]->Goal);
-
-	//
-	// Sea and air units are floating up/down.
-	//
-	if (unit->Type->SeaUnit || unit->Type->AirUnit) {
-		unit->IY = (MyRand() >> 15) & 1;
-	}
 }
 
 /**
