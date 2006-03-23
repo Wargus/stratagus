@@ -1,7 +1,43 @@
+class CFiller
+{
+	CGraphic *G;
+	int X;
+	int Y;
+};
+
+class CUIButton
+{
+	CUIButton();
+
+	int X;
+	int Y;
+	ButtonStyle *Style;
+};
+
+$using std::vector;
+
+class vector
+{
+	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton)
+
+	void clear();
+	int size() const;
+
+	const T& operator[](int index) const;
+	T& operator[](int index);
+	void push_back(T val);
+
+	vector();
+	~vector();
+};
+
+
 class CButtonPanel
 {
 	int X;
 	int Y;
+	vector<CUIButton> Buttons;
+	CColor AutoCastBorderColorRGB;
 	bool ShowCommandKey;
 };
 
@@ -39,8 +75,16 @@ class CMapArea
 
 class CUserInterface
 {
+	vector<CFiller> Fillers;
 	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
+	CUIButton *SingleSelectedButton;
+	vector<CUIButton> SelectedButtons;
+	CUIButton *SingleTrainingButton;
+	vector<CUIButton> TrainingButtons;
+	CUIButton *UpgradingButton;
+	CUIButton *ResearchingButton;
+	vector<CUIButton> TransportingButtons;
 	CButtonPanel ButtonPanel;
 	CMinimap Minimap;
 	CStatusLine StatusLine;
@@ -58,6 +102,9 @@ class CIcon
 	CGraphic *G;
 	int Frame;
 };
+
+extern ButtonStyle *FindButtonStyle(const char *style);
+extern CheckboxStyle *FindCheckboxStyle(const char *style);
 
 extern bool GetMouseScroll(void);
 extern void SetMouseScroll(bool enabled);

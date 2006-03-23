@@ -393,7 +393,7 @@ void DoRightButton(int sx, int sy)
 **
 **  @return        True if mouse is on the button, False otherwise.
 */
-static inline int OnButton(int x, int y, Button *button)
+static inline int OnButton(int x, int y, CUIButton *button)
 {
 	return x >= button->X && x < button->X + button->Style->Width &&
 		y >= button->Y && y < button->Y + button->Style->Height;

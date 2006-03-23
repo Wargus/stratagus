@@ -139,10 +139,10 @@ public:
 };
 
 	/// buttons on screen themselves
-class Button {
+class CUIButton {
 public:
-	Button() : X(0), Y(0), Text(NULL), Style(NULL) {}
-	~Button() { delete[] Text; }
+	CUIButton() : X(0), Y(0), Text(NULL), Style(NULL) {}
+	~CUIButton() { delete[] Text; }
 
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
@@ -467,7 +467,7 @@ public:
 	CGraphic *G;
 	int X;
 	int Y;
-	std::vector<Button> Buttons;
+	std::vector<CUIButton> Buttons;
 	SDL_Color AutoCastBorderColorRGB;
 	bool ShowCommandKey;
 };
@@ -530,10 +530,6 @@ public:
 	void Load();
 
 
-	char *Name;                         /// interface name to select
-	int Width;                          /// useable for this width
-	int Height;                         /// useable for this height
-
 	bool MouseScroll;                   /// Enable mouse scrolling
 	bool KeyScroll;                     /// Enable keyboard scrolling
 		/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
@@ -557,30 +553,30 @@ public:
 	char *PanelIndex;                   /// Index of the InfoPanel.
 	char NumberPanel;                   /// Number of Panel.
 
-	Button *SingleSelectedButton;       /// Button for single selected unit
+	CUIButton *SingleSelectedButton;    /// Button for single selected unit
 
-	std::vector<Button> SelectedButtons;/// Selected buttons
+	std::vector<CUIButton> SelectedButtons;/// Selected buttons
 	CFont *MaxSelectedFont;             /// Font type to use
 	int MaxSelectedTextX;               /// position to place '+#' text
 	int MaxSelectedTextY;               /// if > maximum units selected
 
-	Button *SingleTrainingButton;       /// Button for single training
+	CUIButton *SingleTrainingButton;    /// Button for single training
 	char *SingleTrainingText;           /// Text for single training
 	CFont *SingleTrainingFont;          /// Font for single traning
 	int SingleTrainingTextX;            /// X text position single training
 	int SingleTrainingTextY;            /// Y text position single training
 
-	std::vector<Button> TrainingButtons;/// Training buttons
+	std::vector<CUIButton> TrainingButtons;/// Training buttons
 	char *TrainingText;                 /// Multiple Training Text
 	CFont *TrainingFont;                /// Multiple Training Font
 	int TrainingTextX;                  /// Multiple Training X Text position
 	int TrainingTextY;                  /// Multiple Training Y Text position
 
-	Button *UpgradingButton;            /// Button info for upgrade
+	CUIButton *UpgradingButton;         /// Button info for upgrade
 
-	Button *ResearchingButton;          /// Button info for researching
+	CUIButton *ResearchingButton;       /// Button info for researching
 
-	std::vector<Button> TransportingButtons;/// Button info for transporting
+	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
 	// Completed bar
 	SDL_Color CompletedBarColorRGB;     /// color for completed bar
@@ -588,10 +584,10 @@ public:
 	int CompletedBarShadow;             /// should complete bar have shadow
 
 	// Button panel
-	CButtonPanel  ButtonPanel;
+	CButtonPanel ButtonPanel;
 
 	// Pie Menu
-	CGraphic *PieMenuBackgroundG;        /// Optional background image for the piemenu
+	CGraphic *PieMenuBackgroundG;       /// Optional background image for the piemenu
 	int PieMouseButton;/// Which mouse button pops up the piemenu. Deactivate with the NoButton value.
 	int PieX[8];                        /// X position of the pies
 	int PieY[8];                        /// Y position of the pies
@@ -605,9 +601,9 @@ public:
 	CMapArea MapArea;                   /// geometry of the whole map area
 
 	// Menu buttons
-	Button MenuButton;                  /// menu button
-	Button NetworkMenuButton;           /// network menu button
-	Button NetworkDiplomacyButton;      /// network diplomacy button
+	CUIButton MenuButton;               /// menu button
+	CUIButton NetworkMenuButton;        /// network menu button
+	CUIButton NetworkDiplomacyButton;   /// network diplomacy button
 
 	// The minimap
 	CMinimap Minimap;                   /// minimap

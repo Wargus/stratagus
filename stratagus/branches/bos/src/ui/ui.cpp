@@ -70,7 +70,6 @@ CUserInterface UI;
 ----------------------------------------------------------------------------*/
 
 CUserInterface::CUserInterface() :
-	Name(NULL), Width(0), Height(0),
 	MouseScroll(false), KeyScroll(false),
 	MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	MouseWarpX(0), MouseWarpY(0),
@@ -251,10 +250,8 @@ void SaveUserInterface(CFile *file)
 */
 CUserInterface::~CUserInterface()
 {
-	delete[] Name;
 //	delete[] NormalFontColor;
 //	delete[] ReverseFontColor;
-
 }
 
 /**
