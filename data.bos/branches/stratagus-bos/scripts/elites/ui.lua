@@ -339,13 +339,98 @@ function DefineEliteScreen(screen_width, screen_height)
 	DefineUI(unpack(ui))
 end
 
---[[
-DefineEliteScreen(640, 480)
-DefineEliteScreen(800, 600)
-DefineEliteScreen(1024, 768)
-DefineEliteScreen(1280, 960)
-DefineEliteScreen(1600, 1200)
-]]
+function AddButtonPanelButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.ButtonPanel.Buttons:push_back(b)
+end
+
+AddButtonPanelButton(Video.Width - 177 + 4, 340 - 12)
+AddButtonPanelButton(Video.Width - 122 + 4, 340 - 12)
+AddButtonPanelButton(Video.Width - 67  + 4, 340 - 12)
+AddButtonPanelButton(Video.Width - 177 + 4, 385 - 12)
+AddButtonPanelButton(Video.Width - 122 + 4, 385 - 12)
+AddButtonPanelButton(Video.Width - 67  + 4, 385 - 12)
+AddButtonPanelButton(Video.Width - 177 + 4, 430 - 12)
+AddButtonPanelButton(Video.Width - 122 + 4, 430 - 12)
+AddButtonPanelButton(Video.Width - 67  + 4, 430 - 12)
+
+UI.ButtonPanel.AutoCastBorderColorRGB = CColor(0, 0, 252)
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 16
+b.Style = FindButtonStyle("icon")
+UI.SingleSelectedButton = b
+
+function AddSelectedButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.SelectedButtons:push_back(b)
+end
+
+AddSelectedButton(Video.Width - 200 +  13, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  28, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  43, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  58, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  73, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  88, 152 + 16)
+AddSelectedButton(Video.Width - 200 + 103, 152 + 16)
+AddSelectedButton(Video.Width - 200 + 118, 152 + 16)
+AddSelectedButton(Video.Width - 200 + 133, 152 + 16)
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 91
+b.Style = FindButtonStyle("icon")
+UI.SingleTrainingButton = b
+
+function AddTrainingButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.TrainingButtons:push_back(b)
+end
+
+AddTrainingButton(Video.Width - 200 + 13, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 28, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 43, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 58, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 73, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 88, 152 + 91)
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 91
+b.Style = FindButtonStyle("icon")
+UI.UpgradingButton = b
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 91
+b.Style = FindButtonStyle("icon")
+UI.ResearchingButton = b
+
+function AddTransportingButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.TransportingButtons:push_back(b)
+end
+
+AddTransportingButton(Video.Width - 200 + 13, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 28, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 43, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 58, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 73, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 88, 152 + 91)
+
 
 UI.MapArea.X = 0
 UI.MapArea.Y = --[[16]] 0
