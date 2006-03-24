@@ -27,6 +27,25 @@
 --
 --      $Id: guichan.lua 305 2005-12-18 13:36:42Z feb $
 
+-- TODO: 
+--  * lua cleanup
+--  * StartWhenReady => Start Game (with protections) !
+
+function bool2int(boolvalue)
+  if boolvalue == true then
+    return 1
+  else
+    return 0
+  end
+end
+
+function int2bool(int)
+  if int == 0 then
+    return false
+  else
+    return true
+  end
+end
 
 function addPlayersList(menu)
   local i
@@ -108,11 +127,7 @@ function RunJoiningMapMenu(s)
   -- Security: The map name is checked by the stratagus engine.
   Load(NetworkMapName)
   local function readycb(dd)
-     if dd:isMarked() == true then 
-        LocalSetupState.Ready[NetLocalHostsSlot] = 1 
-     else 
-        LocalSetupState.Ready[NetLocalHostsSlot] = 0 
-     end 
+     LocalSetupState.Ready[NetLocalHostsSlot] = bool2int(dd:isMarked())
   end
   menu:addCheckBox(_("~!Ready"), sx*11,  sy*14, readycb)
 
@@ -121,16 +136,8 @@ function RunJoiningMapMenu(s)
   joincounter = 0
   local function listen()
      NetworkProcessClientRequest()
-     if ServerSetupState.FogOfWar == 1 then
-        fow:setMarked(true)
-     else
-        fow:setMarked(false)
-     end
-     if ServerSetupState.RevealMap == 1 then
-        revealmap:setMarked(true)
-     else
-        revealmap:setMarked(false)
-     end
+     fow:setMarked(int2bool(ServerSetupState.FogOfWar))
+     revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
      updatePlayersList()
      if GetNetworkState() == 15  then
         SetThisPlayer(1)
@@ -215,21 +222,13 @@ function RunServerMultiGameMenu(map, description, numplayers)
   descr = menu:writeText(description, sx+20, sy*3+90)
 
   local function fowCb(dd)
-      if dd:isMarked() == true then 
-         ServerSetupState.FogOfWar = 1 
-      else 
-         ServerSetupState.FogOfWar = 0 
-      end
+      ServerSetupState.FogOfWar = bool2int(dd:isMarked()) 
       NetworkServerResyncClients()
   end
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, fowCb)
   fow:setMarked(true)
   local function revealMapCb(dd)
-      if dd:isMarked() then 
-         ServerSetupState.RevealMap = 1 
-      else 
-         ServerSetupState.RevealMap = 0 
-      end
+      ServerSetupState.RevealMap = bool2int(dd:isMarked()) 
       NetworkServerResyncClients()
   end
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, revealMapCb)
