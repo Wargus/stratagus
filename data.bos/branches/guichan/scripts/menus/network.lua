@@ -192,16 +192,16 @@ function RunJoinIpMenu()
   menu:run()
 end
 
-function RunCreateMultiGameMenu(s)
+function RunServerMultiGameMenu(map, description)
   local menu
   local x = Video.Width/2 - 100
 
   menu = BosMenu(_("Create MultiPlayer game"))
 
   menu:writeText(_("Players:"), 20, 80)
-  players = menu:writeText(_("No map"), 80, 80)
+  players = menu:writeText(map, 80, 80)
   menu:writeText(_("Description:"), 20, 120)
-  descr = menu:writeText(_("No map"),40, 160)
+  descr = menu:writeText(description,40, 160)
 
   local function fowCb(dd)
       if dd:isMarked() == true then 
@@ -233,30 +233,9 @@ function RunCreateMultiGameMenu(s)
   menu:addDropDown({_("high"), _("normal"), _("low")}, 170, Video.Height*13/20 + 7,
       function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
-  local OldPresentMap = PresentMap
-  PresentMap = function(description, nplayers, w, h, id)
-      print(description)
-      players:setCaption(""..nplayers)
-      descr:setCaption(description)
-      OldPresentMap(description, nplayers, w, h, id)
-  end
-
-  Load("maps/default.smp")
-  NetworkMapName = "maps/default.smp"
-  maptext = menu:writeText(NetworkMapName, 20, 20)
-
-  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
-  local function cb(s)
-    local newmap = "maps/" .. browser:getSelectedItem()
-    print(browser:getSelectedItem())
-    NetworkMapName = newmap
-    Load(newmap)
-    maptext:setCaption(newmap)
-  end
-  browser:setActionCallback(cb)
-  
   local updatePlayers = addPlayersList(menu)
 
+  NetworkMapName = map
   NetworkInitServerConnect();
   ServerSetupState.FogOfWar = 1
   menu:addButton(_("~!StartGameWhenReady"), x,  Video.Height*16/20, 
@@ -267,13 +246,56 @@ function RunCreateMultiGameMenu(s)
         end
         NetworkServerStartGame() 
         NetworkGamePrepareGameSettings()
-	StartMap(NetworkMapName)
+	StartMap(map)
         menu:stop()
      end
   )
   
   local listener = LuaActionListener(updatePlayers)
   menu:addLogicCallback(listener)
+  menu:run()
+end
+
+function RunCreateMultiGameMenu(s)
+  local menu
+  local x = Video.Width/2 - 100
+  local map = _("No Map")
+  local description = _("No map")
+  local mapfile = "maps/default.smp"
+
+  menu = BosMenu(_("Create MultiPlayer game"))
+
+  menu:writeText(_("Players:"), 20, 80)
+  players = menu:writeText(map, 80, 80)
+  menu:writeText(_("Description:"), 20, 120)
+  descr = menu:writeText(description, 40, 160)
+
+  local OldPresentMap = PresentMap
+  PresentMap = function(description, nplayers, w, h, id)
+      print(description)
+      players:setCaption(""..nplayers)
+      descr:setCaption(description)
+      OldPresentMap(description, nplayers, w, h, id)
+  end
+
+  Load(mapfile)
+  maptext = menu:writeText(NetworkMapName, 20, 20)
+
+  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
+  local function cb(s)
+    mapfile = "maps/" .. browser:getSelectedItem()
+    print(browser:getSelectedItem())
+    Load(mapfile)
+    maptext:setCaption(mapfile)
+  end
+  browser:setActionCallback(cb)
+  
+  menu:addButton(_("~!Create Game"), x,  Video.Height*16/20, 
+     function(s)    
+	RunServerMultiGameMenu(mapfile, description)
+        menu:stop()
+     end
+  )
   menu:run()
 end
 
@@ -286,7 +308,7 @@ function RunMultiPlayerMenu(s)
   menu = BosMenu(_("MultiPlayer"))
 
   menu:writeText(_("Nickname :"), x, Video.Height*8/20)
-  nick = menu:addTextInputField("unknown", x + 90, Video.Height*8/20 + 4)
+  nick = menu:addTextInputField("Unknown", x + 90, Video.Height*8/20 + 4)
 
   InitNetwork1()
   menu:addButton(_("~!Join Game"), x,  Video.Height*11/20, 
