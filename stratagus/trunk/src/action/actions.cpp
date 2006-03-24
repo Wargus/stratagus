@@ -643,7 +643,7 @@ void UnitActions(void)
 		// Calculate some hash.
 		//
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
-		SyncHash ^= unit->Orders[0] ? unit->Orders[0]->Action << 18 : 0;
+		SyncHash ^= !unit->Orders.empty() ? unit->Orders[0]->Action << 18 : 0;
 		SyncHash ^= unit->State << 12;
 		SyncHash ^= unit->SubAction << 6;
 		SyncHash ^= unit->Refs << 3;
