@@ -150,6 +150,14 @@ function BosMenu(title)
     return label
   end
 
+  function menu:writeLargeText(text, x, y)
+    local label = Label(text)
+    label:setFont(CFont:Get("large"))
+    label:setSize(200, 30)
+    menu:add(label, x, y)
+    return label
+  end
+
   function menu:addTextInputField(text, x, y)
     local b = TextField(text)
     b:setActionCallback(function() print("field") end)

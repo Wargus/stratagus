@@ -32,9 +32,13 @@ function addPlayersList(menu)
   local i
   local players_name = {}
   local players_state = {}
+  local sx = Video.Width / 20
+  local sy = Video.Height / 20
+
+  menu:writeLargeText(_("Players"), sx * 11, sy*3)
   for i=1,8 do
-     players_name[i] = menu:writeText("Player"..i, 300, 280 + i*18)
-     players_state[i] = menu:writeText("Preparing", 380, 280 + i*18)
+     players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
+     players_state[i] = menu:writeText("Preparing", sx * 11 + 80, sy*4 + i*18)
   end
 
   local function updatePlayers()
@@ -64,29 +68,33 @@ joincounter = 0
 function RunJoiningMapMenu(s)
   local menu
   local server
-  local x = Video.Width/2 - 100
-  local listener
+  local listener  
+  local sx = Video.Width / 20
+  local sy = Video.Height / 20
 
   menu = BosMenu(_("Joining game: Map"))
 
-  menu:writeText(_("Players:"), 20, 80)
-  players = menu:writeText(_("No map"), 80, 80)
-  menu:writeText(_("Description:"), 20, 120)
-  descr = menu:writeText(_("No map"),40, 160)
+  menu:writeLargeText(_("Map"), sx, sy*3)
+  maptext = menu:writeText(_("File:"), sx, sy*3+30)
+  maptext = menu:writeText(NetworkMapName, sx+50, sy*3+30)
+  menu:writeText(_("Players:"), sx, sy*3+50)
+  players = menu:writeText(numplayers, sx+70, sy*3+50)
+  menu:writeText(_("Description:"), sx, sy*3+70)
+  descr = menu:writeText(description, sx+20, sy*3+90)
 
-  local fow = menu:addCheckBox(_("Fog of war"), 25, 200, function() end)
+  local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
   fow:setMarked(true)
   ServerSetupState.FogOfWar = 1
-  local revealmap = menu:addCheckBox(_("Reveal map"), 25, 230, function() end)
+  local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, function() end)
   
-  menu:writeText(_("Difficulty:"), 20, Video.Height*11/20)
-  menu:addDropDown({_("easy"), _("normal"), _("hard")}, 120, Video.Height*11/20 + 7,
+  menu:writeText(_("Difficulty:"), sx, sy*11)
+  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
       function(dd) difficulty = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Map richness:"), 20, Video.Height*12/20)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, 140, Video.Height*12/20 + 7,
+  menu:writeText(_("Map richness:"), sx, sy*11+25)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
       function(dd) mapresources = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Starting resources:"), 20, Video.Height*13/20)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, 170, Video.Height*13/20 + 7,
+  menu:writeText(_("Starting resources:"), sx, sy*11+50)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
       function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
   local OldPresentMap = PresentMap
@@ -97,7 +105,6 @@ function RunJoiningMapMenu(s)
       OldPresentMap(description, nplayers, w, h, id)
   end
 
-  menu:writeText("Map: " .. NetworkMapName, 40, 40)
   -- Security: The map name is checked by the stratagus engine.
   Load(NetworkMapName)
   local function readycb(dd)
@@ -107,7 +114,7 @@ function RunJoiningMapMenu(s)
         LocalSetupState.Ready[NetLocalHostsSlot] = 0 
      end 
   end
-  menu:addCheckBox(_("~!Ready"), x,  Video.Height*15/20, readycb)
+  menu:addCheckBox(_("~!Ready"), sx*11,  sy*14, readycb)
 
   local updatePlayersList = addPlayersList(menu)
 
@@ -192,16 +199,20 @@ function RunJoinIpMenu()
   menu:run()
 end
 
-function RunServerMultiGameMenu(map, description)
+function RunServerMultiGameMenu(map, description, numplayers)
   local menu
-  local x = Video.Width/2 - 100
+  local sx = Video.Width / 20
+  local sy = Video.Height / 20
 
   menu = BosMenu(_("Create MultiPlayer game"))
 
-  menu:writeText(_("Players:"), 20, 80)
-  players = menu:writeText(map, 80, 80)
-  menu:writeText(_("Description:"), 20, 120)
-  descr = menu:writeText(description,40, 160)
+  menu:writeLargeText(_("Map"), sx, sy*3)
+  maptext = menu:writeText(_("File:"), sx, sy*3+30)
+  maptext = menu:writeText(map, sx+50, sy*3+30)
+  menu:writeText(_("Players:"), sx, sy*3+50)
+  players = menu:writeText(numplayers, sx+70, sy*3+50)
+  menu:writeText(_("Description:"), sx, sy*3+70)
+  descr = menu:writeText(description, sx+20, sy*3+90)
 
   local function fowCb(dd)
       if dd:isMarked() == true then 
@@ -211,7 +222,7 @@ function RunServerMultiGameMenu(map, description)
       end
       NetworkServerResyncClients()
   end
-  local fow = menu:addCheckBox(_("Fog of war"), 25, 200, fowCb)
+  local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, fowCb)
   fow:setMarked(true)
   local function revealMapCb(dd)
       if dd:isMarked() then 
@@ -221,16 +232,16 @@ function RunServerMultiGameMenu(map, description)
       end
       NetworkServerResyncClients()
   end
-  local revealmap = menu:addCheckBox(_("Reveal map"), 25, 230, revealMapCb)
+  local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, revealMapCb)
   
-  menu:writeText(_("Difficulty:"), 20, Video.Height*11/20)
-  menu:addDropDown({_("easy"), _("normal"), _("hard")}, 120, Video.Height*11/20 + 7,
+  menu:writeText(_("Difficulty:"), sx, sy*11)
+  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
       function(dd) difficulty = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Map richness:"), 20, Video.Height*12/20)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, 140, Video.Height*12/20 + 7,
+  menu:writeText(_("Map richness:"), sx, sy*11+25)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
       function(dd) mapresources = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Starting resources:"), 20, Video.Height*13/20)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, 170, Video.Height*13/20 + 7,
+  menu:writeText(_("Starting resources:"), sx, sy*11+50)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
       function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
   local updatePlayers = addPlayersList(menu)
@@ -238,7 +249,7 @@ function RunServerMultiGameMenu(map, description)
   NetworkMapName = map
   NetworkInitServerConnect();
   ServerSetupState.FogOfWar = 1
-  menu:addButton(_("~!StartGameWhenReady"), x,  Video.Height*16/20, 
+  menu:addButton(_("~!StartGameWhenReady"), sx * 11,  sy*14, 
      function(s)    
         SetFogOfWar(fow:isMarked())
         if revealmap:isMarked() == true then
@@ -258,30 +269,33 @@ end
 
 function RunCreateMultiGameMenu(s)
   local menu
-  local x = Video.Width/2 - 100
   local map = _("No Map")
   local description = _("No map")
   local mapfile = "maps/default.smp"
+  local numplayers = 2
+  local sx = Video.Width / 20
+  local sy = Video.Height / 20
 
   menu = BosMenu(_("Create MultiPlayer game"))
 
-  menu:writeText(_("Players:"), 20, 80)
-  players = menu:writeText(map, 80, 80)
-  menu:writeText(_("Description:"), 20, 120)
-  descr = menu:writeText(description, 40, 160)
+  maptext = menu:writeText(_("File:"), sx, sy*3+30)
+  maptext = menu:writeText(mapfile, sx+50, sy*3+30)
+  menu:writeText(_("Players:"), sx, sy*3+50)
+  players = menu:writeText(numplayers, sx+70, sy*3+50)
+  menu:writeText(_("Description:"), sx, sy*3+70)
+  descr = menu:writeText(description, sx+20, sy*3+90)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
       print(description)
-      players:setCaption(""..nplayers)
+      numplayers = 2
+      players:setCaption(""..numplayers)
       descr:setCaption(description)
       OldPresentMap(description, nplayers, w, h, id)
   end
 
   Load(mapfile)
-  maptext = menu:writeText(NetworkMapName, 20, 20)
-
-  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
+  local browser = menu:addBrowser("maps/", "^.*%.smp$", sx*10, sy*2+20, sx*8, sy*11)
   local function cb(s)
     mapfile = "maps/" .. browser:getSelectedItem()
     print(browser:getSelectedItem())
@@ -290,9 +304,9 @@ function RunCreateMultiGameMenu(s)
   end
   browser:setActionCallback(cb)
   
-  menu:addButton(_("~!Create Game"), x,  Video.Height*16/20, 
+  menu:addButton(_("~!Create Game"), sx,  sy*11, 
      function(s)    
-	RunServerMultiGameMenu(mapfile, description)
+	RunServerMultiGameMenu(mapfile, description, numplayers)
         menu:stop()
      end
   )
