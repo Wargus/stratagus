@@ -61,6 +61,8 @@
 #include "guichan/sdl/sdlgraphics.h"
 #include "guichan/sdl/sdlpixel.h"
 
+#include "video.h"
+
 // For some reason an old version of MSVC did not like std::abs,
 // so we added this macro.
 #ifndef ABS
@@ -173,16 +175,9 @@ namespace gcn
             int y1 = area.y > top.y ? area.y : top.y;
             int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
             int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
-            int x, y;
 
-            for (y = y1; y < y2; y++)
-            {
-                for (x = x1; x < x2; x++)
-                {
-                    SDLputPixelAlpha(mTarget, x, y, mColor);
-                }
-            }
-            
+			Video.FillTransRectangle(SDL_MapRGB(TheScreen->format, mColor.r, mColor.g, mColor.b),
+				x1, y1, x2 - x1, y2 - y1, mColor.a);
         }
         else
         {
