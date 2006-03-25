@@ -175,11 +175,13 @@ namespace gcn
      */
     inline unsigned int SDLAlpha16(unsigned int src, unsigned int dst, unsigned char a)
     {
-        unsigned int b = ((src & 0x1f) * a + (dst & 0x1f) * (255 - a)) >> 8;
-        unsigned int g = ((src & 0x7e0) * a + (dst & 0x7e0) * (255 - a)) >> 8;
-        unsigned int r = ((src & 0xf800) * a + (dst & 0xf800) * (255 - a)) >> 8;
+		// Loses precision for speed
+		a = (255 - a) >> 3;
 
-        return (b & 0x1f) | (g & 0x7e0) | (r & 0xf800);
+		src = (((src << 16) | src) & 0x07E0F81F);
+		dst = ((dst << 16) | dst) & 0x07E0F81F;
+		dst = ((((dst - src) * a) >> 5) + src) & 0x07E0F81F;
+		return (dst >> 16) | dst;
     }
     
     /**
@@ -191,11 +193,17 @@ namespace gcn
      */
     inline unsigned int SDLAlpha32(unsigned int src, unsigned int dst, unsigned char a)
     {
-        unsigned int b = ((src & 0xff) * a + (dst & 0xff) * (255 - a)) >> 8;
-        unsigned int g = ((src & 0xff00) * a + (dst & 0xff00) * (255 - a)) >> 8;
-        unsigned int r = ((src & 0xff0000) * a + (dst & 0xff0000) * (255 - a)) >> 8;
+		a = 255 - a;
 
-        return (b & 0xff) | (g & 0xff00) | (r & 0xff0000);
+		unsigned int src2 = (src & 0xFF00FF00) >> 8;
+		src &= 0x00FF00FF;
+
+		unsigned int dst2 = (dst & 0xFF00FF00) >> 8;
+		dst &= 0x00FF00FF;
+
+		dst = ((((dst - src) * a) >> 8) + src) & 0x00FF00FF;
+		dst2 = ((((dst2 - src2) * a) >> 8) + src2) & 0x00FF00FF;
+		return dst | (dst2 << 8);
     }
     
     /**
