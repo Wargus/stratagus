@@ -70,13 +70,13 @@
 **
 **  @return    True if any part of area is visible, false otherwise
 */
-int CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const
+bool CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const
 {
 	if (ex < this->MapX || ey < this->MapY ||
 			sx >= this->MapX + this->MapWidth || sy >= this->MapY + this->MapHeight) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -90,9 +90,7 @@ int CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const
 */
 int CViewport::Viewport2MapX(int x) const
 {
-	int r;
-
-	r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
+	int r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
 	return r < Map.Info.MapWidth ? r : Map.Info.MapWidth - 1;
 }
 
@@ -107,9 +105,7 @@ int CViewport::Viewport2MapX(int x) const
 */
 int CViewport::Viewport2MapY(int y) const
 {
-	int r;
-
-	r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
+	int r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
 	return r < Map.Info.MapHeight ? r : Map.Info.MapHeight - 1;
 }
 
@@ -189,7 +185,7 @@ void CViewport::Center(int x, int y, int offsetx, int offsety)
 /**
 **  Draw the map backgrounds.
 **
-** StephanR: variables explained below for screen:<PRE>
+** variables explained below for screen:<PRE>
 ** *---------------------------------------*
 ** |                                       |
 ** |        *-----------------------*      |<-TheUi.MapY,dy (in pixels)
@@ -213,21 +209,14 @@ void CViewport::Center(int x, int y, int offsetx, int offsety)
 */
 void CViewport::DrawMapBackgroundInViewport() const
 {
-	int sx;
-	int sy;
-	int dx;
-	int ex;
-	int dy;
-	int ey;
-
-	ex = this->EndX;
-	sy = this->MapY * Map.Info.MapWidth;
-	dy = this->Y - this->OffsetY;
-	ey = this->EndY;
+	int ex = this->EndX;
+	int sy = this->MapY * Map.Info.MapWidth;
+	int dy = this->Y - this->OffsetY;
+	int ey = this->EndY;
 
 	while (dy <= ey) {
-		sx = this->MapX + sy;
-		dx = this->X - this->OffsetX;
+		int sx = this->MapX + sy;
+		int dx = this->X - this->OffsetX;
 		while (dx <= ex) {
 			if (ReplayRevealMap) {
 				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].Tile, dx, dy);

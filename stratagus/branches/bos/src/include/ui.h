@@ -206,7 +206,7 @@ public:
 	void Draw() const;
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
-	int AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const;
+	bool AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const;
 
 	int X;                      /// Screen pixel left corner x coordinate
 	int Y;                      /// Screen pixel upper corner y coordinate
