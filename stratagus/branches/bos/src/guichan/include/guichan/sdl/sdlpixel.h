@@ -167,6 +167,22 @@ namespace gcn
     }
 
     /**
+     * Blends two 16 bit colors together.
+     *
+     * @param src the source color.
+     * @param dst the destination color.
+     * @param a alpha.
+     */
+    inline unsigned int SDLAlpha16(unsigned int src, unsigned int dst, unsigned char a)
+    {
+        unsigned int b = ((src & 0x1f) * a + (dst & 0x1f) * (255 - a)) >> 8;
+        unsigned int g = ((src & 0x7e0) * a + (dst & 0x7e0) * (255 - a)) >> 8;
+        unsigned int r = ((src & 0xf800) * a + (dst & 0xf800) * (255 - a)) >> 8;
+
+        return (b & 0x1f) | (g & 0x7e0) | (r & 0xf800);
+    }
+    
+    /**
      * Blends two 32 bit colors together.
      *
      * @param src the source color.
@@ -207,7 +223,7 @@ namespace gcn
               break;
         
           case 2:
-              *(Uint16 *)p = pixel;
+              *(Uint16 *)p = SDLAlpha16(pixel, *(Uint16 *)p, color.a);
               break;
         
           case 3:
