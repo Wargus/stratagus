@@ -139,8 +139,6 @@ static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char al
 
 	alpha = 255 - alpha;
 
-	Video.LockScreen();
-
 	p = &((Uint32*)TheScreen->pixels)[x + y * Video.Width];
 
 	sp2 = (color & 0xFF00FF00) >> 8;
@@ -153,8 +151,6 @@ static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char al
 	dp1 = ((((dp1 - color) * alpha) >> 8) + color) & 0x00FF00FF;
 	dp2 = ((((dp2 - sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
 	*p = (dp1 | (dp2 << 8));
-
-	Video.UnlockScreen();
 }
 
 /**
@@ -625,27 +621,17 @@ void CVideo::FillRectangleClip(Uint32 color, int x, int y,
 void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	SDL_Rect drect;
-	SDL_Surface *s;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+	int ex = x + w;
+	int ey = y + h;
+	int sx = x;
 
-	// FIXME: optimize
-	s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
-		24, RMASK, GMASK, BMASK, 0);
-
-	GetRGB(color, TheScreen->format, &r, &g, &b);
-	color = MapRGB(s->format, r, g, b);
-
-	SDL_FillRect(s, NULL, color);
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
-	SDL_BlitSurface(s, NULL, TheScreen, &drect);
-	SDL_FreeSurface(s);
+	LockScreen();
+	for (; y < ey; ++y) {
+		for (x = sx; x < ex; ++x) {
+			VideoDoDrawTransPixel(color, x, y, alpha);
+		}
+	}
+	UnlockScreen();
 }
 
 /**
