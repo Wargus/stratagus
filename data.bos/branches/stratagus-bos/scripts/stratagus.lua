@@ -203,6 +203,10 @@ SetFogOfWarGraphics("general/fog.png")
 
 Load("preferences1.lua")
 
+if (Video.Width == 0) then
+	SetVideoResolution(800, 600)
+end
+
 --; Uses Stratagus Library path!
 Load("scripts/bos.lua")
 Load("scripts/icons.lua")
