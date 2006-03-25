@@ -640,18 +640,8 @@ void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 void CVideo::FillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	SDL_Rect oldrect;
-	SDL_Rect newrect;
-
-	SDL_GetClipRect(TheScreen, &oldrect);
-	newrect.x = ClipX1;
-	newrect.y = ClipY1;
-	newrect.w = ClipX2 + 1 - ClipX1;
-	newrect.h = ClipY2 + 1 - ClipY1;
-
-	SDL_SetClipRect(TheScreen, &newrect);
+	CLIP_RECTANGLE(x, y, w, h);
 	FillTransRectangle(color, x, y, w, h, alpha);
-	SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 /**
