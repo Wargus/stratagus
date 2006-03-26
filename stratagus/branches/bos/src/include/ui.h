@@ -215,8 +215,8 @@ public:
 
 	int MapX;                   /// Map tile left corner x coordinate
 	int MapY;                   /// Map tile upper corner y coordinate
-	int OffsetX;                /// Map tile offset
-	int OffsetY;                /// Map tile offset
+	int OffsetX;                /// X Offset within MapX
+	int OffsetY;                /// Y Offset within MapY
 	int MapWidth;               /// Width in map tiles
 	int MapHeight;              /// Height in map tiles
 
