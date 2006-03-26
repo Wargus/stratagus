@@ -1513,12 +1513,16 @@ void UIHandleButtonDown(unsigned button)
 			SubScrollY = 0;
 			GameCursor = UI.Scroll.Cursor;
 		} else if (MouseButtons & RightButton) {
-			if (!GameObserve && !GamePaused) {
+			int x;
+			int y;
+
+			x = (CursorX - UI.MouseViewport->X + (UI.MouseViewport->MapX - 1) * TileSizeX + UI.MouseViewport->OffsetX) / TileSizeX;
+			y = (CursorY - UI.MouseViewport->Y + (UI.MouseViewport->MapY - 1) * TileSizeY + UI.MouseViewport->OffsetY) / TileSizeY;
+
+			if (!GameObserve && !GamePaused && x >= 0 && y >= 0 && x < Map.Info.MapWidth - 1 && y < Map.Info.MapHeight - 1) {
 				CUnit *unit;
 				// FIXME: Rethink the complete chaos of coordinates here
 				// FIXME: Johns: Perhaps we should use a pixel map coordinates
-				int x;
-				int y;
 
 				x = UI.MouseViewport->Viewport2MapX(CursorX);
 				y = UI.MouseViewport->Viewport2MapY(CursorY);
