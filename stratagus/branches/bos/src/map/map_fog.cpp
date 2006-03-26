@@ -622,10 +622,22 @@ void CViewport::DrawMapFogOfWar() const
 	dy = Y - OffsetY;
 	ey = EndY;
 
-	while (dy <= ey) {
+	while (dy <= ey && (sy / Map.Info.MapWidth) < Map.Info.MapHeight) {
+		if (sy / Map.Info.MapWidth < 0) {
+			sy += Map.Info.MapWidth;
+			dy += TileSizeY;
+			continue;
+		}
+
 		sx = MapX + sy;
 		dx = X - OffsetX;
-		while (dx <= ex) {
+		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+			if (sx - sy < 0) {
+				++sx;
+				dx += TileSizeX;
+				continue;
+			}
+
 			mx = (dx - X + OffsetX) / TileSizeX + MapX;
 			my = (dy - Y + OffsetY) / TileSizeY + MapY;
 			if (VisibleTable[my * Map.Info.MapWidth + mx]) {

@@ -246,6 +246,10 @@ public:
 	int Y;                          /// Screen pixel upper corner y coordinate
 	int EndX;                       /// Screen pixel right x coordinate
 	int EndY;                       /// Screen pixel bottom y coordinate
+	int ScrollPaddingLeft;          /// Scrollable area past the left of map
+	int ScrollPaddingRight;         /// Scrollable area past the right of map
+	int ScrollPaddingTop;           /// Scrollable area past the top of map
+	int ScrollPaddingBottom;        /// Scrollable area past the bottom of map
 };
 
 /**

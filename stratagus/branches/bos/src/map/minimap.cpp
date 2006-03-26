@@ -592,6 +592,25 @@ void CMinimap::DrawCursor(int vx, int vy)
 	int w = (UI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
 	int h = (UI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
 
+	if (x < X) {
+		w -= (X - x);
+		x = X;
+	} else if (x + w > X + W) {
+		w -= (x + w) - (X + W);
+		x = X + W - w;
+	}
+	if (y < Y) {
+		h -= (Y - y);
+		y = Y;
+	} else if (y + h > Y + H) {
+		h -= (y + h) - (Y + H);
+		y = Y + H - h;
+	}
+
+	if (w < 0 || h < 0) {
+		return;
+	}
+
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	Video.DrawTransRectangle(UI.ViewportCursorColor, x, y, w, h, 128);
 }

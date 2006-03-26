@@ -71,6 +71,10 @@ class CMapArea
 	int Y;
 	int EndX;
 	int EndY;
+	int ScrollPaddingLeft;
+	int ScrollPaddingRight;
+	int ScrollPaddingTop;
+	int ScrollPaddingBottom;
 };
 
 class CUserInterface

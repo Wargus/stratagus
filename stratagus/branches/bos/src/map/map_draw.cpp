@@ -147,17 +147,17 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 {
 	x = x * TileSizeX + offsetx;
 	y = y * TileSizeY + offsety;
-	if (x < 0) {
-		x = 0;
+	if (x < -UI.MapArea.ScrollPaddingLeft) {
+		x = -UI.MapArea.ScrollPaddingLeft;
 	}
-	if (y < 0) {
-		y = 0;
+	if (y < -UI.MapArea.ScrollPaddingTop) {
+		y = -UI.MapArea.ScrollPaddingTop;
 	}
-	if (x > Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1) {
-		x = Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1;
+	if (x > Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight) {
+		x = Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight;
 	}
-	if (y > Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1) {
-		y = Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1;
+	if (y > Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom) {
+		y = Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom;
 	}
 	this->MapX = x / TileSizeX;
 	this->MapY = y / TileSizeY;
@@ -214,10 +214,22 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int dy = this->Y - this->OffsetY;
 	int ey = this->EndY;
 
-	while (dy <= ey) {
+	while (dy <= ey && (sy / Map.Info.MapWidth) < Map.Info.MapHeight) {
+		if (sy / Map.Info.MapWidth < 0) {
+			sy += Map.Info.MapWidth;
+			dy += TileSizeY;
+			continue;
+		}
+
 		int sx = this->MapX + sy;
 		int dx = this->X - this->OffsetX;
-		while (dx <= ex) {
+		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+			if (sx - sy < 0) {
+				++sx;
+				dx += TileSizeX;
+				continue;
+			}
+
 			if (ReplayRevealMap) {
 				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].Tile, dx, dy);
 			} else {
