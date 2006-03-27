@@ -240,7 +240,9 @@ enum ViewportModeType {
 class CMapArea
 {
 public:
-	CMapArea() : X(0), Y(0), EndX(0), EndY(0) {}
+	CMapArea() : X(0), Y(0), EndX(0), EndY(0),
+		ScrollPaddingLeft(0), ScrollPaddingRight(0),
+		ScrollPaddingTop(0), ScrollPaddingBottom(0) {}
 
 	int X;                          /// Screen pixel left corner x coordinate
 	int Y;                          /// Screen pixel upper corner y coordinate
