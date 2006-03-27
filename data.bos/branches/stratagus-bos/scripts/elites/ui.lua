@@ -437,6 +437,11 @@ UI.MapArea.Y = --[[16]] 0
 UI.MapArea.EndX = --[[UI.MapArea.X + (Video.Width - 200) - 1]] Video.Width-1
 UI.MapArea.EndY = --[[UI.MapArea.Y + (Video.Height - 32) - 1]] Video.Height-1
 
+UI.MapArea.ScrollPaddingLeft = 192
+UI.MapArea.ScrollPaddingRight = 192
+UI.MapArea.ScrollPaddingTop = 192
+UI.MapArea.ScrollPaddingBottom = 192
+
 UI.StatusLine.TextX = 38
 UI.StatusLine.TextY = Video.Height - 14
 UI.StatusLine.Width = Video.Width - 200 - 100
