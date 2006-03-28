@@ -1432,20 +1432,17 @@ void UIHandleButtonDown(unsigned button)
 		if (CursorBuilding) {
 			// Possible Selected[0] was removed from map
 			// need to make sure there is an unit to build
-			if (Selected[0] && (MouseButtons & LeftButton)) {// enter select mode
-				int x;
-				int y;
-				int i;
-				int j;
+			if (Selected[0] && (MouseButtons & LeftButton) && 
+			  UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {// enter select mode
 				int explored;
+				int x = UI.MouseViewport->Viewport2MapX(CursorX);
+				int y = UI.MouseViewport->Viewport2MapY(CursorY);
 
-				x = UI.MouseViewport->Viewport2MapX(CursorX);
-				y = UI.MouseViewport->Viewport2MapY(CursorY);
 				// FIXME: error messages
 
 				explored = 1;
-				for (j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
-					for (i = 0; i < Selected[0]->Type->TileWidth; ++i) {
+				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
+					for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
 						if (!Map.IsFieldExplored(ThisPlayer, x + i, y + j)) {
 							explored = 0;
 							break;
