@@ -1282,7 +1282,7 @@ static void UISelectStateButtonDown(unsigned button)
 	//
 	//  Clicking on the map.
 	//
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
 		UI.StatusLine.Clear();
 		ClearCosts();
 		CursorState = CursorStatePoint;
@@ -1295,11 +1295,8 @@ static void UISelectStateButtonDown(unsigned button)
 
 			vp = UI.MouseViewport;
 			if (ClickMissile) {
-				int mx;
-				int my;
-
-				mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
-				my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
+				int mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
+				int my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					mx, my, mx, my);
 			}
