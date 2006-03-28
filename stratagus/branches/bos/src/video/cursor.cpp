@@ -74,9 +74,6 @@ int CursorY;                 /// cursor position on screen Y
 int CursorStartX;            /// rectangle started on screen X
 int CursorStartY;            /// rectangle started on screen Y
 
-int SubScrollX;              /// pixels the mouse moved while scrolling
-int SubScrollY;              /// pixels the mouse moved while scrolling
-
 	/// X position of starting point of selection rectangle, in screen pixels.
 int CursorStartScrMapX;
 	/// Y position of starting point of selection rectangle, in screen pixels.

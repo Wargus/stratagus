@@ -1498,8 +1498,6 @@ void UIHandleButtonDown(unsigned button)
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
-			SubScrollX = 0;
-			SubScrollY = 0;
 			GameCursor = UI.Scroll.Cursor;
 		} else if (MouseButtons & RightButton) {
 			int x;

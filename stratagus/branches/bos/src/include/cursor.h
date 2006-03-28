@@ -178,8 +178,6 @@ extern int CursorStartX;        /// rectangle started on screen X
 extern int CursorStartY;        /// rectangle started on screen Y
 extern int CursorStartScrMapX;  /// the same in screen map coordinate system
 extern int CursorStartScrMapY;  /// the same in screen map coordinate system
-extern int SubScrollX;          /// pixels the mouse moved while scrolling
-extern int SubScrollY;          /// pixels the mouse moved while scrolling
 
 /*----------------------------------------------------------------------------
 --  Functions
