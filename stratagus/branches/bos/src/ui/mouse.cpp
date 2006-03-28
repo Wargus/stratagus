@@ -717,8 +717,6 @@ void UIHandleMouseMove(int x, int y)
 	//  Move map.
 	//
 	if (GameCursor == UI.Scroll.Cursor) {
-		int xo;
-		int yo;
 		int speed;
 
 		if (KeyModifiers & ModifierControl) {
@@ -727,20 +725,11 @@ void UIHandleMouseMove(int x, int y)
 			speed = UI.MouseScrollSpeedDefault;
 		}
 
-		xo = UI.MouseViewport->MapX;
-		yo = UI.MouseViewport->MapY;
-		SubScrollX += speed * (x - CursorStartX);
-		SubScrollY += speed * (y - CursorStartY);
-
-		// only tile based scrolling is supported
-		xo += SubScrollX / TileSizeX;
-		SubScrollX = SubScrollX % TileSizeX;
-		yo += SubScrollY / TileSizeY;
-		SubScrollY = SubScrollY % TileSizeY;
-
+		UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
+			UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
+			UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
 		UI.MouseWarpX = CursorStartX;
 		UI.MouseWarpY = CursorStartY;
-		UI.MouseViewport->Set(xo, yo, 0, 0);
 		return;
 	}
 
