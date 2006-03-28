@@ -162,11 +162,11 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 	}
 
 	this->MapX = x / TileSizeX;
-	if (x < 0) {
+	if (x < 0 && x % TileSizeX) {
 		this->MapX--;
 	}
 	this->MapY = y / TileSizeY;
-	if (y < 0) {
+	if (y < 0 && y % TileSizeY) {
 		this->MapY--;
 	}
 	this->OffsetX = x % TileSizeX;
