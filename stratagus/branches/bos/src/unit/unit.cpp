@@ -2131,7 +2131,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 **
 **  @return       true if we can build on this point.
 */
-static bool CanBuildOn(int x, int y, int mask)
+bool CanBuildOn(int x, int y, int mask)
 {
 	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		return false;
