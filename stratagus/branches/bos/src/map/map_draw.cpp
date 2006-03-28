@@ -147,6 +147,7 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 {
 	x = x * TileSizeX + offsetx;
 	y = y * TileSizeY + offsety;
+
 	if (x < -UI.MapArea.ScrollPaddingLeft) {
 		x = -UI.MapArea.ScrollPaddingLeft;
 	}
@@ -159,10 +160,23 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 	if (y > Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom) {
 		y = Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom;
 	}
+
 	this->MapX = x / TileSizeX;
+	if (x < 0) {
+		this->MapX--;
+	}
 	this->MapY = y / TileSizeY;
+	if (y < 0) {
+		this->MapY--;
+	}
 	this->OffsetX = x % TileSizeX;
+	if (this->OffsetX < 0) {
+		this->OffsetX += TileSizeX;
+	}
 	this->OffsetY = y % TileSizeY;
+	if (this->OffsetY < 0) {
+		this->OffsetY += TileSizeY;
+	}
 	this->MapWidth = ((this->EndX - this->X) + this->OffsetX - 1) / TileSizeX + 1;
 	this->MapHeight = ((this->EndY - this->Y) + this->OffsetY - 1) / TileSizeY + 1;
 }
