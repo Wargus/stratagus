@@ -98,11 +98,7 @@ bool CViewport::IsInsideMapArea(int x, int y) const
 		tiley /= TileSizeY;
 	}
 
-	if (tilex < 0 || tiley < 0 || tilex >= Map.Info.MapWidth || tiley >= Map.Info.MapHeight) {
-		return false;
-	} else {
-		return true;
-	}
+	return (tilex >= 0 && tiley >= 0 && tilex < Map.Info.MapWidth && tiley < Map.Info.MapHeight);
 }
 
 /**
