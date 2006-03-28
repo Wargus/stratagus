@@ -79,6 +79,32 @@ bool CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) cons
 	return true;
 }
 
+bool CViewport::IsInsideMapArea(int x, int y) const
+{
+	int tilex;
+	int tiley;
+
+	tilex = x - this->X + this->MapX * TileSizeX + this->OffsetX;
+	if (tilex < 0) {
+		tilex = (tilex - TileSizeX + 1) / TileSizeX;
+	} else {
+		tilex /= TileSizeX;
+	}
+
+	tiley = y - this->Y + this->MapY * TileSizeY + this->OffsetY;
+	if (tiley < 0) {
+		tiley = (tiley - TileSizeY + 1) / TileSizeY;
+	} else {
+		tiley /= TileSizeY;
+	}
+
+	if (tilex < 0 || tiley < 0 || tilex >= Map.Info.MapWidth || tiley >= Map.Info.MapHeight) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
 /**
 **  Convert viewport x coordinate to map tile x coordinate.
 **

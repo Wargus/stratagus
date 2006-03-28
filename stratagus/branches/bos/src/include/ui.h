@@ -183,6 +183,8 @@ public:
 	CViewport() : X(0), Y(0), EndX(0), EndY(0), MapX(0), MapY(0),
 		OffsetX(0), OffsetY(0), MapWidth(0), MapHeight(0), Unit(NULL) {};
 
+	/// Check if X and Y pixels are within map area
+	bool IsInsideMapArea(int x, int y) const;
 	/// Convert screen X pixel to map tile
 	int Viewport2MapX(int x) const;
 	/// Convert screen Y pixel to map tile
