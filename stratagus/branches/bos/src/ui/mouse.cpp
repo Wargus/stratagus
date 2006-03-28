@@ -775,12 +775,10 @@ void UIHandleMouseMove(int x, int y)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
-	if (CursorOn == CursorOnMap) {
-		const CViewport *vp;
-
-		vp = UI.MouseViewport;
-		if (Map.IsFieldExplored(ThisPlayer, vp->Viewport2MapX(x),
-				vp->Viewport2MapY(y)) || ReplayRevealMap) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
+		const CViewport *vp = UI.MouseViewport;
+		if (Map.IsFieldExplored(ThisPlayer, vp->Viewport2MapX(x), vp->Viewport2MapY(y)) ||
+				ReplayRevealMap) {
 			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
