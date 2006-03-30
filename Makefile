@@ -151,7 +151,7 @@ depend:
 	@echo
 
 ctags:
-	ctags --C++-kinds=+px `find . -name *.cpp -o -name *.c -o -name *.h`
+	ctags --C++-kinds=+px `find . -name '*.cpp' -o -name '*.c' -o -name '*.h'`
 
 ##############################################################################
 #
