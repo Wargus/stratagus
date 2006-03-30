@@ -150,6 +150,9 @@ depend:
 	-MM $(CFLAGS) $$i >>.depend; done
 	@echo
 
+ctags:
+	ctags `find . -name *.cpp -o -name *.c -o -name *.h`
+
 ##############################################################################
 #
 #	include dependency files, if they exist
