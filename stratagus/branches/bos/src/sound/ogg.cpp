@@ -277,8 +277,8 @@ int OggInit(CFile *f, OggData *data)
 		vorbis_synthesis_init(&data->vdsp, &data->vinfo);
 		vorbis_block_init(&data->vdsp, &data->vblock);
 	} else {
-    	vorbis_info_clear(&data->vinfo);
-    	vorbis_comment_clear(&data->vcomment);
+		vorbis_info_clear(&data->vinfo);
+		vorbis_comment_clear(&data->vcomment);
 	}
 
 #ifdef USE_THEORA
@@ -286,8 +286,8 @@ int OggInit(CFile *f, OggData *data)
 		theora_decode_init(&data->tstate, &data->tinfo);
 		data->tstate.internal_encode = NULL;  // needed for a bug in libtheora (fixed in next release)
 	} else {
-    	theora_info_clear(&data->tinfo);
-    	theora_comment_clear(&data->tcomment);
+		theora_info_clear(&data->tinfo);
+		theora_comment_clear(&data->tcomment);
 	}
 
 	return !(num_vorbis || num_theora);
