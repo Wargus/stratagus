@@ -84,7 +84,7 @@ DefineUnitType("unit-gturret", {
 MakeSound("gturret-selected", "units/gturret/gturret_select.wav")
 MakeSound("gturret-attack", "units/gturret/gturret_attack.wav")
 
-DefineAllow("unit-gturret", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-gturret", "AAAAAAAA")
 
 DefineButton({
 	Pos = 2, Level = 3, Icon = "icon-gturret_b", Action = "build",

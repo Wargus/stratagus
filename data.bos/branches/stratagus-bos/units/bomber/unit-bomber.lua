@@ -59,9 +59,9 @@ DefineMissileType("missile-bomber", {
 DefineUnitType("unit-bomber", {
 	Name = "bomber Construction",
 	Image = {"file", "units/bomber/unit_bomber.png", "size", {128, 128}},
-	Shadow = {"file", "units/bomber/unit_bomber_s.png", "size", {128, 128}, "offset", {5, 128}},
+	Shadow = {"file", "units/bomber/unit_bomber_s.png", "size", {128, 128}, "offset", {5, 42}},
 	Animations = "animations-bomber", Icon = "icon-bomber",
-	Flip = false,
+	Flip = false, --Offset = {0, -128},
 	Costs = {"time", 100, "titanium", 200, "crystal", 450},
 	RepairHp = 1, RepairCosts = {"crystal", 6},
 	Speed = 20, HitPoints = 50, DrawLevel = 125, TileSize  = {2, 2}, BoxSize = {64, 64},
@@ -80,7 +80,7 @@ DefineUnitType("unit-bomber", {
 	}
 })
 
-DefineAllow("unit-bomber", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-bomber", "AAAAAAAA")
 
 DefineButton({
 	Pos = 2, Level = 0, Icon = "icon-bomber", Action = "train-unit",

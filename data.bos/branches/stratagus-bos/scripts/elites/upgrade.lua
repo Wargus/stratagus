@@ -76,12 +76,12 @@ DefineModifier("upgrade-void",
 	{"piercing-damage", 10},
 	{"apply-to", "unit-bazoo"}, {"apply-to", "unit-assault"})
 
-DefineAllow("upgrade-expl", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-expl2", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-tdril", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-ddril", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-pdril", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-void", "AAAAAAAAAAAAAAAA")
+DefineAllow("upgrade-expl", "AAAAAAAA")
+DefineAllow("upgrade-expl2", "AAAAAAAA")
+DefineAllow("upgrade-tdril", "AAAAAAAA")
+DefineAllow("upgrade-ddril", "AAAAAAAA")
+DefineAllow("upgrade-pdril", "AAAAAAAA")
+DefineAllow("upgrade-void", "AAAAAAAA")
 
 -- DefineDependency("upgrade-void", {"upgrade-expl2", "upgrade-pdril"})
 DefineDependency("unit-bazoo", {"upgrade-expl2"})

@@ -383,6 +383,10 @@ AddSelectedButton(Video.Width - 200 + 103, 152 + 16)
 AddSelectedButton(Video.Width - 200 + 118, 152 + 16)
 AddSelectedButton(Video.Width - 200 + 133, 152 + 16)
 
+UI.MaxSelectedFont = Fonts["game"]
+UI.MaxSelectedTextX = Video.Width - 200 + 10
+UI.MaxSelectedTextY = 152 + 10
+
 b = CUIButton:new()
 b.X = Video.Width - 200 + 13
 b.Y = 152 + 91

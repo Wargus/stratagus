@@ -97,6 +97,6 @@ DefineUnitType("build-dead-body4", {
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
-DefineAllow("unit-rfac", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-rfac", "AAAAAAAA")
 
 

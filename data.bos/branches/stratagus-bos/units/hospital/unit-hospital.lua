@@ -93,5 +93,5 @@ DefineUnitType("build-dead-body5", {
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
-DefineAllow("unit-hosp", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-hosp", "AAAAAAAA")
 

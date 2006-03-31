@@ -96,4 +96,4 @@ DefineUnitType("build-dead-body2", {
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
-DefineAllow("unit-gen", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-gen", "AAAAAAAA")

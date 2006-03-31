@@ -83,5 +83,5 @@ DefineUnitType("build-dead-body1", {
 	Missile = "missile-none", Priority = 0, Type = "land",
 	Building = true, Vanishes = true, Sounds = {}})
 
-DefineAllow("unit-dev-yard", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-dev-yard", "AAAAAAAA")
 

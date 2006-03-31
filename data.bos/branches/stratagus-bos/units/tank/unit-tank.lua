@@ -76,7 +76,7 @@ DefineUnitType("unit-tank", {
 	}
 })
 
-DefineAllow("unit-tank", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-tank", "AAAAAAAA")
 DefineDependency("unit-tank", {"unit-vfac"})
 
 DefineButton({

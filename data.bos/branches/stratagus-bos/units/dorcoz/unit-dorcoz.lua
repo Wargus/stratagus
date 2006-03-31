@@ -74,7 +74,7 @@ DefineUnitType("unit-dorcoz", {
                 "dead", "basic terras voices dead"}
         })
 
-DefineAllow("unit-dorcoz", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-dorcoz", "AAAAAAAA")
 
 DefineButton({
         Pos = 4, Level = 0, Icon = "icon-dorcoz",

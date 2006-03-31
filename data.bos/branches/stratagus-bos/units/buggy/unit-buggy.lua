@@ -106,7 +106,7 @@ DefineUnitType("unit-buggy", {
 		"dead",        "buggy-die"}
 })
 
-DefineAllow("unit-buggy", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-buggy", "AAAAAAAA")
 
 DefineButton({
 	Pos = 3, Level = 0, Icon = "icon-buggy", Action = "train-unit",

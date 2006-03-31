@@ -30,10 +30,10 @@
 --   Stuff for the different races
 Load("scripts/elites/upgrade.lua")
 
-DefineAllow("unit-gold-mine", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-gold-mine", "AAAAAAAA")
 
-DefineAllow("unit-dead-body", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-1x1-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-2x2-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-3x3-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-4x4-place", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-dead-body", "AAAAAAAA")
+DefineAllow("unit-destroyed-1x1-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-2x2-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-3x3-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-4x4-place", "AAAAAAAA")
