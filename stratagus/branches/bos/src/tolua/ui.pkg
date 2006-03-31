@@ -83,7 +83,12 @@ class CUserInterface
 	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
 	CUIButton *SingleSelectedButton;
+
 	vector<CUIButton> SelectedButtons;
+	CFont *MaxSelectedFont;
+	int MaxSelectedTextX;
+	int MaxSelectedTextY;
+
 	CUIButton *SingleTrainingButton;
 	vector<CUIButton> TrainingButtons;
 	CUIButton *UpgradingButton;

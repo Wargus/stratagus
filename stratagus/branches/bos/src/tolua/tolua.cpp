@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Mar 26 15:56:34 2006.
+** Generated automatically by tolua++-1.0.7 on Thu Mar 30 19:31:44 2006.
 */
 
 #ifndef __cplusplus
@@ -2235,6 +2235,96 @@ static int tolua_set_CUserInterface_SelectedButtons(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->SelectedButtons = *((vector<CUIButton>*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MaxSelectedFont of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_MaxSelectedFont_ptr
+static int tolua_get_CUserInterface_MaxSelectedFont_ptr(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxSelectedFont'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->MaxSelectedFont,"CFont");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MaxSelectedFont of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_MaxSelectedFont_ptr
+static int tolua_set_CUserInterface_MaxSelectedFont_ptr(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxSelectedFont'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CFont",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MaxSelectedFont = ((CFont*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MaxSelectedTextX of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_MaxSelectedTextX
+static int tolua_get_CUserInterface_MaxSelectedTextX(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxSelectedTextX'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MaxSelectedTextX);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MaxSelectedTextX of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_MaxSelectedTextX
+static int tolua_set_CUserInterface_MaxSelectedTextX(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxSelectedTextX'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MaxSelectedTextX = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MaxSelectedTextY of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_MaxSelectedTextY
+static int tolua_get_CUserInterface_MaxSelectedTextY(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxSelectedTextY'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MaxSelectedTextY);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MaxSelectedTextY of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_MaxSelectedTextY
+static int tolua_set_CUserInterface_MaxSelectedTextY(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxSelectedTextY'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MaxSelectedTextY = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -11257,6 +11347,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"InfoPanel",tolua_get_CUserInterface_InfoPanel,tolua_set_CUserInterface_InfoPanel);
   tolua_variable(tolua_S,"SingleSelectedButton",tolua_get_CUserInterface_SingleSelectedButton_ptr,tolua_set_CUserInterface_SingleSelectedButton_ptr);
   tolua_variable(tolua_S,"SelectedButtons",tolua_get_CUserInterface_SelectedButtons,tolua_set_CUserInterface_SelectedButtons);
+  tolua_variable(tolua_S,"MaxSelectedFont",tolua_get_CUserInterface_MaxSelectedFont_ptr,tolua_set_CUserInterface_MaxSelectedFont_ptr);
+  tolua_variable(tolua_S,"MaxSelectedTextX",tolua_get_CUserInterface_MaxSelectedTextX,tolua_set_CUserInterface_MaxSelectedTextX);
+  tolua_variable(tolua_S,"MaxSelectedTextY",tolua_get_CUserInterface_MaxSelectedTextY,tolua_set_CUserInterface_MaxSelectedTextY);
   tolua_variable(tolua_S,"SingleTrainingButton",tolua_get_CUserInterface_SingleTrainingButton_ptr,tolua_set_CUserInterface_SingleTrainingButton_ptr);
   tolua_variable(tolua_S,"TrainingButtons",tolua_get_CUserInterface_TrainingButtons,tolua_set_CUserInterface_TrainingButtons);
   tolua_variable(tolua_S,"UpgradingButton",tolua_get_CUserInterface_UpgradingButton_ptr,tolua_set_CUserInterface_UpgradingButton_ptr);
