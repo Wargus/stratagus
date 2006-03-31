@@ -1300,7 +1300,7 @@ void CInfoPanel::Draw(void)
 			if (NumSelected > (int)UI.SelectedButtons.size()) {
 				char buf[5];
 
-				sprintf(buf, "+%ud", static_cast<unsigned int> (NumSelected - UI.SelectedButtons.size()));
+				sprintf(buf, "+%u", static_cast<unsigned int> (NumSelected - UI.SelectedButtons.size()));
 				VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
 					UI.MaxSelectedFont, buf);
 			}
