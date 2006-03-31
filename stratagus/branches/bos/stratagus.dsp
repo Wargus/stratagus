@@ -439,10 +439,6 @@ SOURCE=.\src\map\map_save.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\map_wall.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\map\minimap.cpp
 # End Source File
 # Begin Source File
@@ -501,14 +497,6 @@ SOURCE=.\src\pathfinder\script_pathfinder.cpp
 # Begin Group "sound"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\sound\flac.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\sound\mad.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=.\src\sound\mikmod.cpp
@@ -760,10 +748,6 @@ SOURCE=.\src\video\png.cpp
 # Begin Source File
 
 SOURCE=.\src\video\sdl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\video\sprite.cpp
 # End Source File
 # Begin Source File
 
