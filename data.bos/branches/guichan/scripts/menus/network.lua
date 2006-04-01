@@ -29,7 +29,9 @@
 
 -- TODO: 
 --  * lua cleanup
---  * StartWhenReady => Start Game (with protections) !
+--  * abort (exit)
+--  * network errors
+--  * load and store LocalPlayerName from/in preferences2.lua
 
 function bool2int(boolvalue)
   if boolvalue == true then
@@ -47,20 +49,24 @@ function int2bool(int)
   end
 end
 
-function addPlayersList(menu)
+function addPlayersList(menu, numplayers)
   local i
   local players_name = {}
   local players_state = {}
   local sx = Video.Width / 20
   local sy = Video.Height / 20
+  local numplayers_text
 
   menu:writeLargeText(_("Players"), sx * 11, sy*3)
   for i=1,8 do
      players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
      players_state[i] = menu:writeText("Preparing", sx * 11 + 80, sy*4 + i*18)
   end
+  numplayers_text = menu:writeText("Open slots : " .. numplayers - 1, sx *11, sy*4 + 144)
 
   local function updatePlayers()
+    local connected_players = 0
+    local ready_players = 0
     players_state[1]:setCaption("Creator")
     players_name[1]:setCaption(Hosts[0].PlyName)
     for i=2,8 do
@@ -68,7 +74,9 @@ function addPlayersList(menu)
          players_name[i]:setCaption("")
          players_state[i]:setCaption("")
       else
+         connected_players = connected_players + 1
          if ServerSetupState.Ready[i-1] == 1 then
+           ready_players = ready_players + 1
            players_state[i]:setCaption("Ready")    
          else
            players_state[i]:setCaption("Preparing")
@@ -76,6 +84,8 @@ function addPlayersList(menu)
          players_name[i]:setCaption(Hosts[i-1].PlyName)
      end
     end
+    numplayers_text:setCaption("Open slots : " .. numplayers - 1 - connected_players)
+    return (connected_players > 0 and ready_players == connected_players)
   end
 
   return updatePlayers
@@ -90,6 +100,7 @@ function RunJoiningMapMenu(s)
   local listener  
   local sx = Video.Width / 20
   local sy = Video.Height / 20
+  local numplayers = 3
 
   menu = BosMenu(_("Joining game: Map"))
 
@@ -121,6 +132,7 @@ function RunJoiningMapMenu(s)
       print(description)
       players:setCaption(""..nplayers)
       descr:setCaption(description)
+      numplayers = nplayers
       OldPresentMap(description, nplayers, w, h, id)
   end
 
@@ -131,7 +143,7 @@ function RunJoiningMapMenu(s)
   end
   menu:addCheckBox(_("~!Ready"), sx*11,  sy*14, readycb)
 
-  local updatePlayersList = addPlayersList(menu)
+  local updatePlayersList = addPlayersList(menu, numplayers)
 
   joincounter = 0
   local function listen()
@@ -210,6 +222,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   local menu
   local sx = Video.Width / 20
   local sy = Video.Height / 20
+  local startgame
 
   menu = BosMenu(_("Create MultiPlayer game"))
 
@@ -243,12 +256,12 @@ function RunServerMultiGameMenu(map, description, numplayers)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
       function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
-  local updatePlayers = addPlayersList(menu)
+  local updatePlayers = addPlayersList(menu, numplayers)
 
   NetworkMapName = map
   NetworkInitServerConnect();
   ServerSetupState.FogOfWar = 1
-  menu:addButton(_("~!StartGameWhenReady"), sx * 11,  sy*14, 
+  startgame = menu:addButton(_("~!Start Game"), sx * 11,  sy*14, 
      function(s)    
         SetFogOfWar(fow:isMarked())
         if revealmap:isMarked() == true then
@@ -260,8 +273,14 @@ function RunServerMultiGameMenu(map, description, numplayers)
         menu:stop()
      end
   )
-  
-  local listener = LuaActionListener(updatePlayers)
+  startgame:setVisible(false)
+  local waitingtext = menu:writeText(_("Waiting for players"), sx*11, sy*14)
+  local function updateStartButton(ready) 
+     startgame:setVisible(ready)
+     waitingtext:setVisible(not ready)
+  end
+
+  local listener = LuaActionListener(function(s) updateStartButton(updatePlayers()) end)
   menu:addLogicCallback(listener)
   menu:run()
 end
@@ -271,7 +290,7 @@ function RunCreateMultiGameMenu(s)
   local map = _("No Map")
   local description = _("No map")
   local mapfile = "maps/default.smp"
-  local numplayers = 2
+  local numplayers = 3
   local sx = Video.Width / 20
   local sy = Video.Height / 20
 
@@ -287,7 +306,7 @@ function RunCreateMultiGameMenu(s)
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
       print(description)
-      numplayers = 2
+      numplayers = nplayers
       players:setCaption(""..numplayers)
       descr:setCaption(description)
       OldPresentMap(description, nplayers, w, h, id)
