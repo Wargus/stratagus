@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Mar  5 12:22:18 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Apr  1 16:29:41 2006.
 */
 
 #ifndef __cplusplus
@@ -1930,6 +1930,71 @@ static int tolua_stratagus_Widget_isEnabled00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'isEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setVisible of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_setVisible00
+static int tolua_stratagus_Widget_setVisible00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Widget",0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
+  bool visible = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setVisible'",NULL);
+#endif
+ {
+  self->setVisible(visible);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setVisible'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: isVisible of class  Widget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Widget_isVisible00
+static int tolua_stratagus_Widget_isVisible00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Widget* self = (const Widget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isVisible'",NULL);
+#endif
+ {
+  bool tolua_ret = (bool)  self->isVisible();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'isVisible'.",&tolua_err);
  return 0;
 #endif
 }
@@ -9349,6 +9414,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setPosition",tolua_stratagus_Widget_setPosition00);
   tolua_function(tolua_S,"setEnabled",tolua_stratagus_Widget_setEnabled00);
   tolua_function(tolua_S,"isEnabled",tolua_stratagus_Widget_isEnabled00);
+  tolua_function(tolua_S,"setVisible",tolua_stratagus_Widget_setVisible00);
+  tolua_function(tolua_S,"isVisible",tolua_stratagus_Widget_isVisible00);
   tolua_function(tolua_S,"setBaseColor",tolua_stratagus_Widget_setBaseColor00);
   tolua_function(tolua_S,"setForegroundColor",tolua_stratagus_Widget_setForegroundColor00);
   tolua_function(tolua_S,"setBackgroundColor",tolua_stratagus_Widget_setBackgroundColor00);

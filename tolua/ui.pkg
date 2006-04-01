@@ -82,6 +82,8 @@ class Widget
 	virtual void setPosition(int x, int y);
 	virtual void setEnabled(bool enabled);
 	virtual bool isEnabled() const;
+	virtual void setVisible(bool visible);
+	virtual bool isVisible() const;
 
 	virtual void setBaseColor(const Color &color);
 	virtual void setForegroundColor(const Color &color);
