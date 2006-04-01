@@ -284,12 +284,12 @@
 
 #include "upgrade_structs.h"
 #include "video.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CUnit;
 class CUnitType;
 class PlayerAi;
 class CFile;
@@ -392,14 +392,31 @@ public:
 	/// Notify player about a problem
 	void Notify(int type, int x, int y, const char *fmt, ...) const;
 
-	bool IsEnemy(const CPlayer *x) const;
-	bool IsEnemy(const CUnit *x) const;
-	bool IsAllied(const CPlayer *x) const;
-	bool IsAllied(const CUnit *x) const;
-	bool IsSharedVision(const CPlayer *x) const;
-	bool IsSharedVision(const CUnit *x) const;
-	bool IsTeamed(const CPlayer *x) const;
-	bool IsTeamed(const CUnit *x) const;
+	inline bool IsEnemy(const CPlayer *x) const {
+		return (this->Enemy & (1 << x->Index)) != 0;
+	}
+	inline bool IsEnemy(const CUnit *x) const {
+		return this->IsEnemy(x->Player);
+	}
+	inline bool IsAllied(const CPlayer *x) const {
+		return (this->Allied & (1 << x->Index)) != 0;
+	}
+	inline bool IsAllied(const CUnit *x) const {
+		return this->IsAllied(x->Player);
+	}
+	inline bool IsSharedVision(const CPlayer *x) const {
+		return (this->SharedVision & (1 << x->Index)) != 0 &&
+			(x->SharedVision & (1 << this->Index)) != 0;
+	}
+	inline bool IsSharedVision(const CUnit *x) const {
+		return this->IsSharedVision(x->Player);
+	}
+	inline bool IsTeamed(const CPlayer *x) const {
+		return this->Team == x->Team;
+	}
+	inline bool IsTeamed(const CUnit *x) const {
+		return this->IsTeamed(x->Player);
+	}
 };
 
 /**
