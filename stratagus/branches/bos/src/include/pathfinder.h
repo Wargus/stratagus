@@ -77,7 +77,7 @@ extern int AStarFixedUnitCrossingCost;
 	/// cost associated to move on a tile occupied by a moving unit
 extern int AStarMovingUnitCrossingCost;
 	/// Whether to have knowledge of terrain that we haven't visited yet
-extern int AStarKnowUnknown;
+extern bool AStarKnowUnknown;
 	/// Cost of using a square we haven't seen before.
 extern int AStarUnknownTerrainCost;
 
