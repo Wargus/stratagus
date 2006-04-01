@@ -1048,7 +1048,8 @@ static void ClientParseMapInfo(const InitMessage *msg)
 
 		case ICMState: // Server has sent us first state info
 			ServerSetupState = msg->u.State;
-			NetClientUpdateState();
+			if (oldMenusRunning)
+				NetClientUpdateState();
 			NetLocalState = ccs_synced;
 			NetStateMsgCnt = 0;
 			break;
@@ -1073,7 +1074,8 @@ static void ClientParseSynced(const InitMessage *msg)
 		case ICMState: // Server has sent us new state info
 			DebugPrint("ccs_synced: ICMState recieved\n");
 			ServerSetupState = msg->u.State;
-			NetClientUpdateState();
+			if (oldMenusRunning)
+				NetClientUpdateState();
 			NetLocalState = ccs_async;
 			NetStateMsgCnt = 0;
 			break;
@@ -1150,7 +1152,8 @@ static void ClientParseAsync(const InitMessage *msg)
 					memcpy(Hosts[i].PlyName, LocalPlayerName, 16);
 				}
 			}
-			NetClientUpdateState();
+			if (oldMenusRunning)
+				NetClientUpdateState();
 			NetLocalState = ccs_synced;
 			NetStateMsgCnt = 0;
 			break;
