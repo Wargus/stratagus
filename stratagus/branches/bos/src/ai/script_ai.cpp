@@ -1284,7 +1284,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
 			if (subargs) {
-				ai->UnitTypeRequests.reserve(subargs / 2);
+				ai->UnitTypeRequests.resize(subargs / 2);
 			}
 			for (k = 0; k < subargs; ++k) {
 				const char *ident;
