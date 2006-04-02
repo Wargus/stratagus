@@ -211,7 +211,7 @@ function RunStartGameMenu(s)
   local players
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local map = "maps/default.smp"
+  local map = "default.smp"
 
   menu = BosMenu(_("Start Game"))
 
@@ -246,12 +246,13 @@ function RunStartGameMenu(s)
       OldPresentMap(description, nplayers, w, h, id)
   end
  
-  Load("maps/default.smp")
+  Load("maps/"..map)
   local browser = menu:addBrowser("maps/", "^.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11)
   local function cb(s)
     print(browser:getSelectedItem())
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
+    map = browser:getSelectedItem()
   end
   browser:setActionCallback(cb)
 
@@ -261,7 +262,7 @@ function RunStartGameMenu(s)
     if revealmap:isMarked() == true then
        RevealMap()
     end
-    StartMap("maps/" .. browser:getSelectedItem())
+    StartMap("maps/" .. map)
     PresentMap = OldPresentMap
     menu:stop()
   end
