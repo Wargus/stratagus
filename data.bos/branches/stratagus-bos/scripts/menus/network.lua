@@ -329,6 +329,7 @@ function RunCreateMultiGameMenu(s)
      end
   )
   menu:run()
+  PresentMap = OldPresentMap
 end
 
 function RunMultiPlayerMenu(s)
