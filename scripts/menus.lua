@@ -57,63 +57,63 @@ DefineMenuItem("pos", { 0, 0}, "font", "game",
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 0)}, "font", "large",
   "button", {
-    "caption", "~!Single Player Game",
+    "caption", _("~!Single Player Game"),
     "hotkey", "s",
     "func", "single-player-game-menu",
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 1)}, "font", "large",
   "button", {
-    "caption", "~!Multi Player Game",
+    "caption", _("~!Multi Player Game"),
     "hotkey", "m",
     "func", "multi-player-game-menu",
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 2)}, "font", "large",
   "button", {
-    "caption", "~!Campaign Game",
+    "caption", _("~!Campaign Game"),
     "hotkey", "c",
     "func", "campaign-game-menu",
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 3)}, "font", "large",
   "button", {
-    "caption", "~!Load Game",
+    "caption", _("~!Load Game"),
     "hotkey", "l",
     "func", function() ProcessMenu("menu-load-game") end,
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 4)}, "font", "large",
   "button", {
-    "caption", "~!Replay Game",
+    "caption", _("~!Replay Game"),
     "hotkey", "r",
     "func", "replay-game-menu",
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 5)}, "font", "large",
   "button", {
-    "caption", "~!Options",
+    "caption", _("~!Options"),
     "hotkey", "o",
     "func", function() ProcessMenu("menu-global-options", 1) end,
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 6)}, "font", "large",
   "button", {
-    "caption", "~!Editor",
+    "caption", _("~!Editor"),
     "hotkey", "e",
     "func", "game-start-editor",
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 7)}, "font", "large",
   "button", {
-    "caption", "S~!how Credits",
+    "caption", _("S~!how Credits"),
     "hotkey", "h",
     "func", "game-show-credits",
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 8)}, "font", "large",
   "button", {
-    "caption", "E~!xit Program",
+    "caption", _("E~!xit Program"),
     "hotkey", "x",
     "func", "game-menu-exit",
     "style", "gm-full"},

@@ -38,8 +38,9 @@ print("Battle of Survival default config file loading ...\n")
 --	Enter your default title screen.
 
 SetTitleScreens(
-      {Image="video/stratagus_intro.ogg"},
-      {Image="video/bos_intro.ogg"})
+--      {Image="video/stratagus_intro.ogg"},
+--      {Image="video/bos_intro.ogg"}
+)
 
 --	Enter your menu music.
 -- SetMenuMusic("music/title.ogg")
@@ -54,7 +55,7 @@ SetDefaultMap="maps/default.smp"
 --	Music play list -	Insert your titles here
 -------------------------------------------------------------------------------
 playlist = {}
-local musiclist = ListDirectory("music/")
+local musiclist = ListFilesInDirectory("music/")
 for i,f in musiclist do
   if(string.find(f, ".ogg$") or string.find(f, ".wav$") or string.find(f, ".mp3$")) then 
     print("Added music file:" .. f) 
@@ -66,7 +67,6 @@ SetSelectionStyle("corners")
 Preference.ShowSightRange = false
 Preference.ShowAttackRange = false
 Preference.ShowReactionRange = false
-
 Preference.ShowOrders = 2
 
 ManaSprite("general/mana2.png", 0, -1, 31, 4)

@@ -164,10 +164,10 @@ local i
 local f
 local ff
 
-list = ListDirectory("units/")
+list = ListDirsInDirectory("units/")
 for i,f in list do
   if not(string.find(f, "^%.")) then
-     local subdirlist = ListDirectory("units/" .. f)
+     local subdirlist = ListFilesInDirectory("units/" .. f)
      for i, ff in subdirlist do
         if(string.find(ff, "^unit-.*%.lua$")) then
           print("Loading unit: " .. ff)
