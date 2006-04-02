@@ -86,12 +86,16 @@ function BosMenu(title)
     return bq
   end
 
-  function menu:addBrowser(path, filter, x, y, w, h)
+  function menu:addBrowser(path, filter, x, y, w, h, lister)
     local mapslist = {}
     local u = 1
-    local fileslist = ListFilesInDirectory(path)
+    local fileslist
     local i
     local f
+    if lister == nil then
+       lister = ListFilesInDirectory
+    end
+    fileslist = lister(path)
     for i,f in fileslist do
       if(string.find(f, filter)) then
         mapslist[u] = f
@@ -290,10 +294,10 @@ function RunCampaignsMenu(s)
 
   menu = BosMenu(_("List of Campaigns"))
 
-  local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200)
+  local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200, ListDirsInDirectory)
   function startgamebutton(s)
     print("Starting campaign")
-    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
+    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign1.lua")
     menu:stop()
   end
   menu:addButton(_("Start"), 100, 300, startgamebutton)
