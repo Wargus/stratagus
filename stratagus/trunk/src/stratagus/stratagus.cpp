@@ -599,10 +599,13 @@ void MenuLoop(const char *filename, CMap *map)
 **
 **  @param filename  map filename
 **  @param map       map loaded
+**
+**  @return      0 in success, else exit.
 */
-void GuichanLoop(const char *filename, CMap *map)
+int GuichanLoop(const char *filename, CMap *map)
 {
 	char buf[1024];
+	int status;
 
 	initGuichan(Video.Width, Video.Height);
 	InterfaceState = IfaceStateMenu;
@@ -616,9 +619,10 @@ void GuichanLoop(const char *filename, CMap *map)
 
 	// FIXME delete this when switching to full guichan GUI
 	LibraryFileName("scripts/guichan.lua", buf);
-	LuaLoadFile(buf);
+	status = LuaLoadFile(buf);
 
 	freeGuichan();
+	return status;
 }
 
 extern void CleanMissiles();
@@ -805,8 +809,9 @@ static int main1(int argc, char **argv)
 	InitUnitsMemory();  // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
-	GuichanLoop(MapName, &Map);
-	MenuLoop(MapName, &Map);  // Enter the menu loop
+	if (GuichanLoop(MapName, &Map)) {
+		MenuLoop(MapName, &Map);  // Enter the old menu loop
+	}
 
 	return 0;
 }
