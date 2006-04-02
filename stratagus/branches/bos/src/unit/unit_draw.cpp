@@ -180,10 +180,10 @@ void DrawUnitSelection(const CUnit *unit)
 
 	x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
 		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
-		(type->Width - type->Sprite->Width) / 2;
+		(type->Width - type->Sprite->Width) / 2 + type->OffsetX;
 	y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
 		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
-		(type->Height - type->Sprite->Height) / 2;
+		(type->Height - type->Sprite->Height) / 2 + type->OffsetY;
 	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
 }
 
