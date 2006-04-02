@@ -86,12 +86,16 @@ function BosMenu(title)
     return bq
   end
 
-  function menu:addBrowser(path, filter, x, y, w, h)
+  function menu:addBrowser(path, filter, x, y, w, h, lister)
     local mapslist = {}
     local u = 1
-    local fileslist = ListFilesInDirectory(path)
+    local fileslist
     local i
     local f
+    if lister == nil then
+       lister = ListFilesInDirectory
+    end
+    fileslist = lister(path)
     for i,f in fileslist do
       if(string.find(f, filter)) then
         mapslist[u] = f
@@ -150,6 +154,14 @@ function BosMenu(title)
     return label
   end
 
+  function menu:writeLargeText(text, x, y)
+    local label = Label(text)
+    label:setFont(CFont:Get("large"))
+    label:setSize(200, 30)
+    menu:add(label, x, y)
+    return label
+  end
+
   function menu:addTextInputField(text, x, y)
     local b = TextField(text)
     b:setActionCallback(function() print("field") end)
@@ -193,40 +205,54 @@ startingresources = 5
 
 function RunStartGameMenu(s)
   local menu
+  local maptext
+  local descr
+  local numplayers = 2
+  local players
+  local sx = Video.Width / 20
+  local sy = Video.Height / 20
+  local map = "default.smp"
+
   menu = BosMenu(_("Start Game"))
 
-  menu:writeText(_("Players:"), 20, 80)
-  players = menu:writeText(_("No map"), 80, 80)
-  menu:writeText(_("Description:"), 20, 120)
-  descr = menu:writeText(_("No map"),40, 160)
+  menu:writeLargeText(_("Map"), sx, sy*3)
+  menu:writeText(_("File:"), sx, sy*3+30)
+  maptext = menu:writeText(map, sx+50, sy*3+30)
+  menu:writeText(_("Players:"), sx, sy*3+50)
+  players = menu:writeText(numplayers, sx+70, sy*3+50)
+  menu:writeText(_("Description:"), sx, sy*3+70)
+  descr = menu:writeText(description, sx+20, sy*3+90)
 
-  local fow = menu:addCheckBox(_("Fog of war"), 25, 200, function() end)
+  local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
   fow:setMarked(true)
-  local revealmap = menu:addCheckBox(_("Reveal map"), 25, 230, function() end)
+  local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, function() end)
   
-  menu:writeText(_("Difficulty:"), 20, Video.Height*11/20)
-  menu:addDropDown({_("easy"), _("normal"), _("hard")}, 120, Video.Height*11/20 + 7,
+  menu:writeText(_("Difficulty:"), sx, sy*11)
+  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
       function(dd) difficulty = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Map richness:"), 20, Video.Height*12/20)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, 140, Video.Height*12/20 + 7,
+  menu:writeText(_("Map richness:"), sx, sy*11+25)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
       function(dd) mapresources = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Starting resources:"), 20, Video.Height*13/20)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, 170, Video.Height*13/20 + 7,
+  menu:writeText(_("Starting resources:"), sx, sy*11+50)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
       function(dd) startingresources = (5 - dd:getSelected()*2) end)
-
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
       print(description)
+      numplayers = nplayers
       players:setCaption(""..nplayers)
       descr:setCaption(description)
       OldPresentMap(description, nplayers, w, h, id)
   end
  
-  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
+  Load("maps/"..map)
+  local browser = menu:addBrowser("maps/", "^.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11)
   local function cb(s)
     print(browser:getSelectedItem())
+    maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
+    map = browser:getSelectedItem()
   end
   browser:setActionCallback(cb)
 
@@ -236,11 +262,11 @@ function RunStartGameMenu(s)
     if revealmap:isMarked() == true then
        RevealMap()
     end
-    StartMap("maps/" .. browser:getSelectedItem())
+    StartMap("maps/" .. map)
     PresentMap = OldPresentMap
     menu:stop()
   end
-  menu:addButton(_("Start"), 20, Video.Height - 100, startgamebutton)
+  menu:addButton(_("Start"),  sx * 11,  sy*14, startgamebutton)
 
   menu:run()
   PresentMap = OldPresentMap
@@ -269,10 +295,10 @@ function RunCampaignsMenu(s)
 
   menu = BosMenu(_("List of Campaigns"))
 
-  local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200)
+  local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200, ListDirsInDirectory)
   function startgamebutton(s)
     print("Starting campaign")
-    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
+    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign1.lua")
     menu:stop()
   end
   menu:addButton(_("Start"), 100, 300, startgamebutton)
@@ -302,8 +328,7 @@ function RunEditorMenu(s)
 
   local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
   function starteditorbutton(s)
-    print("Starting map -------")
-    StartEditor("test.smp")
+    StartEditor("maps/" .. browser:getSelectedItem())
     menu:stop()
   end
 
