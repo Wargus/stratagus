@@ -323,8 +323,7 @@ function RunEditorMenu(s)
 
   local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
   function starteditorbutton(s)
-    print("Starting map -------")
-    StartEditor("test.smp")
+    StartEditor("maps/" .. browser:getSelectedItem())
     menu:stop()
   end
 
