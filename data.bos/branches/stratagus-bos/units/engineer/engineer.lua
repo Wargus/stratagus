@@ -80,7 +80,7 @@ DefineUnitType("unit-engineer", {
 	Armor = 1, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	MaxAttackRange = 1, Priority = 50, Points = 30, Corpse = {"unit-dead-body2", 0},
 	Type = "land", Demand = 0, RightMouseAction = "harvest", RepairRange = 1,
-	CanTargetLand = true, Coward = true,
+	CanTargetLand = true, LandUnit = true, Coward = true,
 	CanGatherResources = {{
 		"file-when-loaded", GetCurrentLuaPath().."/unit_engineer.png",
 		"resource-id", "titanium",

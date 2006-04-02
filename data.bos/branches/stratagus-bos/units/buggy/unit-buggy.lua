@@ -96,7 +96,7 @@ DefineUnitType("unit-buggy", {
 	Corpse = {"buggy_destroyed", 0}, Type = "land",
 	MaxAttackRange = 6, CanAttack = true, CanTargetLand = true,
 	RightMouseAction = "attack",
-	SelectableByRectangle = true,
+	LandUnit = true, SelectableByRectangle = true,
 	VisibleUnderFog = true,
 	Sounds = {
 		"selected",    "buggy-selected",

@@ -84,7 +84,7 @@ DefineUnitType("unit-harvester", {
 	Armor = 25, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	MaxAttackRange = 0, Priority = 50, Points = 30, Type = "land",
 	Demand = 50, RightMouseAction = "harvest", CanAttack = true, CanTargetLand = true,
-	Coward = true,
+	LandUnit = true, Coward = true,
 	CanGatherResources = {{
 		"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",
 		"resource-id", "titanium",

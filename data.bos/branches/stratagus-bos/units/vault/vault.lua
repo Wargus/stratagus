@@ -34,7 +34,6 @@ DefineAnimations("animations-vault", {
     Still = {"frame 15", "wait 5", "frame 16", "wait 5", "frame 17", "wait 5",
         "frame 18", "wait 5", "frame 19", "wait 5", "frame 18", "wait 5",
         "frame 17", "wait 5", "frame 16", "wait 5", "frame 15", "wait 10", },
-    Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 3", },
     })
 
 DefineIcon({
@@ -65,16 +64,16 @@ MakeSound("dev-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
 
 DefineUnitType("unit-vault", {
 	Name = "Vault",
-	Image = {"file", "units/vault/vault.png", "size", {200, 200}},
-	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {200, 200}},
+	Image = {"file", "units/vault/vault.png", "size", {256, 256}},
+	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {256, 256}},
 	Animations = "animations-vault", Icon = "icon-vault",
 	Costs = {"time", 150, "titanium", 1000, "crystal", 1000},
 	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-vault",
-	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {5, 4}, BoxSize = {164, 132},
+	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {6, 6}, BoxSize = {196, 164},
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
 	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
-	Corpse = {"build-dead-body3", 0}, Type = "land",
+	Corpse = {"build-dead-vault", 0}, Type = "land",
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	CanStore = {"crystal", "titanium"},
 	Sounds = {
@@ -83,5 +82,21 @@ DefineUnitType("unit-vault", {
 		"help", "dev-help",
 		"dead", "dev-dead"}
 	})
+
+DefineAnimations("animations-vault2", {
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200",  "unbreakable end", "wait 1", },
+    })
+
+DefineUnitType("build-dead-vault", {
+	Name = "vaultCrater",
+	Image = {"file", GetCurrentLuaPath().."/vault_c.png", "size", {256, 256}},
+	Animations = "animations-vault2", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,
+	TileSize = {6, 6}, BoxSize = {196, 164}, SightRange = 1,
+	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
+	Priority = 0, Type = "land", Building = true, Vanishes = true
+	})
+
 
 DefineAllow("unit-vault", "AAAAAAAA")

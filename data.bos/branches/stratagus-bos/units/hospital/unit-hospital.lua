@@ -60,16 +60,16 @@ MakeSound("hosp-dead", GetCurrentLuaPath().."/sfx_hosp.die.wav")
 
 DefineUnitType("unit-hosp", {
 	Name = "Hospital",
-	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {200, 200}},
-	Shadow = {"file", GetCurrentLuaPath().."/hospital_s.png", "size", {200, 200}},
+	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {256, 256}},
+	Shadow = {"file", GetCurrentLuaPath().."/hospital_s.png", "size", {256, 256}},
 	Animations = "animations-hosp", Icon = "icon-hosp",
 	Costs = {"time", 125, "titanium", 500, "crystal", 100},
 	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-hosp",
-	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize = {5, 4},
-	BoxSize = {160, 128}, SightRange = 2, Armor = 30, BasicDamage = 0,
+	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize = {6, 5},
+	BoxSize = {192, 160}, SightRange = 2, Armor = 30, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
 	AnnoyComputerFactor = 45, Demand = 200, Points = 200,
-	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = {"build-dead-body5", 0},
+	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = {"build-dead-hosp", 0},
 	Type = "land", Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	Sounds = {
 		"selected", "hosp-selected",
@@ -78,16 +78,16 @@ DefineUnitType("unit-hosp", {
 		"dead", "hosp-dead"}
 	})
 
-DefineAnimations("animations-elitebuild5", {
-    Death = {"unbreakable begin", "wait 1", "frame 1", "wait 2000", 
-        "frame 0", "wait 200", "unbreakable end", "wait 1", },
+DefineAnimations("animations-hosp2", {
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200", "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-body5", {
+DefineUnitType("build-dead-hosp", {
 	Name = "HospCrater",
-	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {200, 200}},
-	Animations = "animations-elitebuild5", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {5, 4},
+	Image = {"file", GetCurrentLuaPath().."/hospital_c.png", "size", {256, 256}},
+	Animations = "animations-hosp2", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {6, 5},
 	BoxSize = {124, 92}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
@@ -95,3 +95,7 @@ DefineUnitType("build-dead-body5", {
 
 DefineAllow("unit-hosp", "AAAAAAAA")
 
+DefineButton({
+	Pos = 2, Level = 2, Icon = "icon-hosp_b", Action = "build",
+	Value = "unit-hosp", Key = "h", Hint = "BUILD ~!HOSPITAL",
+	ForUnit = {"unit-engineer"}})

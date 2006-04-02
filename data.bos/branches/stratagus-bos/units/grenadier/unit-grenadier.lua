@@ -72,7 +72,7 @@ DefineUnitType("unit-grenadier", {
 	Armor = 2, BasicDamage = 15, PiercingDamage = 15, Missile = "missile-grenadier",
 	MaxAttackRange = 5, Priority = 60, Points = 50, Corpse = {"unit-dead-body3", 0},
 	Type = "land", CanAttack = true, CanTargetLand = true,
-	organic = true, Demand = 0, SelectableByRectangle = true,
+	LandUnit = true, organic = true, Demand = 0, SelectableByRectangle = true,
 	Sounds = {
 		"selected", "grenadier-selected",
 		"acknowledge", "grenadier-acknowledge",

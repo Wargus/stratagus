@@ -74,7 +74,7 @@ DefineUnitType("unit-bazoo", {
 	Type = "land", Demand = 0, 
 	RightMouseAction = "attack",
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
-	organic = true, SelectableByRectangle = true,
+	LandUnit = true, organic = true, SelectableByRectangle = true,
 	Sounds = {
 		"selected", "bazoo-selected",
 		"acknowledge", "bazoo-acknowledge",

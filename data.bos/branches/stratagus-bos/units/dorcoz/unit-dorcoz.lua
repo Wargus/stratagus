@@ -63,7 +63,8 @@ DefineUnitType("unit-dorcoz", {
         Armor = 2, BasicDamage = 6, PiercingDamage = 3, Missile = "missile-dorcoz",
         MaxAttackRange = 7, Priority = 60, Points = 50, Demand = 1,
         Corpse = {"unit-dead-body", 0}, Type = "land", RightMouseAction = "attack",
-        CanAttack = true, CanTargetLand = true, organic = true,
+        CanAttack = true, CanTargetLand = true, CanTargetAir = true,
+        LandUnit = true, organic = true,
         SelectableByRectangle = true,
         RightMouseAction = "attack",
         Sounds = {

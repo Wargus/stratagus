@@ -112,7 +112,7 @@ DefineUnitType("build-dead-cannon", {
 	})
 
 
-DefineAllow("unit-cannon", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-cannon", "AAAAAAAA")
 
 DefineButton({
 	Pos = 3, Level = 3, Icon = "icon-cannon_b", Action = "build",

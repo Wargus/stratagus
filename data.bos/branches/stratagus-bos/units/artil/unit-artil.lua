@@ -46,14 +46,12 @@ DefineAnimations("animations-artil", {
         "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
         "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
         "frame 0", "move 1", "unbreakable end", "wait 1", },
-    Attack = {"unbreakable begin", "frame 0", "wait 10",
-        "frame 0", "sound bazoo-attack", "attack", "wait 1",
-        "frame 5", "wait 10",
-        "frame 0", "wait 25", "unbreakable end", "wait 1", },
-    Death = {"unbreakable begin", "frame 10", "wait 10", "unbreakable end", 
-        "wait 1",},
+    Attack = {"unbreakable begin", "frame 0", "wait 10", 
+        "frame 5", "sound bazoo-attack", "attack", "wait 2", 
+        "frame 10", "wait 5", "frame 15", "wait 5", "frame 20", "wait 10", 
+        "frame 0", "wait 60", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 30", "wait 5", "unbreakable end", "wait 1", },
     })
-
 
 DefineIcon({
 	Name = "icon-artil",
@@ -63,9 +61,8 @@ DefineIcon({
 
 DefineUnitType("unit-artil", {
 	Name = "Artil",
-	Image = {"file", "units/artil/unit_artil.png", "size", {160, 160}},
-        Offset = {0, -10},
-	Shadow = {"file", "units/artil/unit_artil_s.png", "size", {160, 160}},
+	Image = {"file", "units/artil/unit_artil.png", "size", {96, 96}},
+	Shadow = {"file", "units/artil/unit_artil_s.png", "size", {96, 96}},
 	Animations = "animations-artil", Icon = "icon-artil",
 	Flip = false,
 	Costs = {"time", 200, "titanium", 300, "crystal", 300},
@@ -77,7 +74,7 @@ DefineUnitType("unit-artil", {
 	Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
-	SelectableByRectangle = true, 
+	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 50, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 8,
 	Sounds = {}

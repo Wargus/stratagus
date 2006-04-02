@@ -35,23 +35,27 @@ DefineIcon({
 
 DefineConstruction("construction-gen", {
 	Constructions = {
-		{Percent = 0, File = "main", Frame = 9},
-		{Percent = 10, File = "main", Frame = 10},
-		{Percent = 20, File = "main", Frame = 11},
-		{Percent = 30, File = "main", Frame = 12},
-		{Percent = 40, File = "main", Frame = 13},
-		{Percent = 50, File = "main", Frame = 14},
-		{Percent = 60, File = "main", Frame = 15},
-		{Percent = 70, File = "main", Frame = 16},
-		{Percent = 80, File = "main", Frame = 17},
-		{Percent = 90, File = "main", Frame = 0}
+		{Percent = 0, File = "main", Frame = 32},
+		{Percent = 10, File = "main", Frame = 33},
+		{Percent = 30, File = "main", Frame = 34},
+		{Percent = 40, File = "main", Frame = 35},
+		{Percent = 50, File = "main", Frame = 36},
+		{Percent = 70, File = "main", Frame = 37},
+		{Percent = 80, File = "main", Frame = 38}
 	}
     })
 
 DefineAnimations("animations-gen", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
-        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
+        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2",
+        "frame 9", "wait 2", "frame 10", "wait 2", "frame 11", "wait 2",
+        "frame 12", "wait 2", "frame 13", "wait 2", "frame 14", "wait 2",
+        "frame 15", "wait 2", "frame 16", "wait 2", "frame 17", "wait 2",
+        "frame 18", "wait 2", "frame 19", "wait 2", "frame 20", "wait 2",
+        "frame 21", "wait 2", "frame 22", "wait 2", "frame 23", "wait 2",
+        "frame 24", "wait 2", "frame 25", "wait 2", "frame 26", "wait 2",
+        "frame 27", "wait 2", "wait 2", },
     })
 
 MakeSound("gen-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
@@ -70,7 +74,7 @@ DefineUnitType("unit-gen", {
 	SightRange = 1, Armor = 10 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
 	Points = 100, Supply = 125, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = {"build-dead-body2", 0}, Type = "land",
+	Corpse = {"build-dead-gen", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {
@@ -80,20 +84,28 @@ DefineUnitType("unit-gen", {
 		"dead", "gen-dead"}
 	})
 
-DefineAnimations("animations-elitebuild2", {
-    Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
-        "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
-        "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
+DefineAnimations("animations-dead-gen", {
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
+        "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-body2", {
-	Name = "GeneratorCrater",
-	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
-	Animations = "animations-elitebuild2", Icon = "icon-cancel",
+DefineUnitType("build-dead-gen", {
+	Name = "GenCrater",
+	Image = {"file", GetCurrentLuaPath().."/generator_c.png", "size", {64, 64}},
+	Animations = "animations-dead-gen", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
-	TileSize = {2, 2}, BoxSize = {60, 60}, SightRange = 1,
+	TileSize = {2, 2}, BoxSize = {220, 156}, SightRange = 1,
 	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
+
+
 DefineAllow("unit-gen", "AAAAAAAA")
+
+DefineButton({
+	Pos = 2, Level = 1, Icon = "icon-gen_b", Action = "build",
+	Value = "unit-gen", Key = "g", Hint = "BUILD ~!GENERATOR",
+	ForUnit = {"unit-engineer"}})
+
