@@ -202,7 +202,7 @@ DefineMenuItem("pos", { 176, 11}, "font", "large",
   "text", {"caption", "Sound Options", "align", "center"},
   "menu", "menu-sound-options")
 DefineMenuItem("pos", { 16, 36 * 1}, "font", "game",
-  "text", {"caption", "Master Volume", "align", "left"},
+  "text", {"caption", "Effects Volume", "align", "left"},
   "menu", "menu-sound-options")
 DefineMenuItem("pos", { 32, 36 * 1.5}, "font", "small",
   "hslider", {"size", {198, 18},
