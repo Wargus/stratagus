@@ -38,8 +38,9 @@ print("Battle of Survival default config file loading ...\n")
 --	Enter your default title screen.
 
 SetTitleScreens(
-      {Image="video/stratagus_intro.ogg"},
-      {Image="video/bos_intro.ogg"})
+--      {Image="video/stratagus_intro.ogg"},
+--      {Image="video/bos_intro.ogg"}
+)
 
 --	Enter your menu music.
 -- SetMenuMusic("music/title.ogg")
