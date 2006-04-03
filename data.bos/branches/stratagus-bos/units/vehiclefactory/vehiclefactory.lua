@@ -62,8 +62,8 @@ MakeSound("vfac-dead", GetCurrentLuaPath().."/sfx_vfac.die.wav")
 
 DefineUnitType("unit-vfac", {
 	Name = "Vehicle Factory",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 256}},
-	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 256}},
+	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 254}},
+	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 254}},
 	Animations = "animations-vfac", Icon = "icon-vfac",
 	Costs = {"time", 200, "titanium", 750, "crystal", 100},
 	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-vfac",
@@ -88,7 +88,7 @@ DefineAnimations("animations-vfac2", {
 
 DefineUnitType("build-dead-vfac", {
 	Name = "FactoryCrater",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_c.png", "size", {256, 256}},
+	Image = {"file", GetCurrentLuaPath().."/vehicle_c.png", "size", {256, 254}},
 	Animations = "animations-vfac2", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {7, 5},
 	BoxSize = {220, 156}, SightRange = 1, BasicDamage = 0,

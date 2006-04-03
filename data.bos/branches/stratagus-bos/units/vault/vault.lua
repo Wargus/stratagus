@@ -64,8 +64,8 @@ MakeSound("dev-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
 
 DefineUnitType("unit-vault", {
 	Name = "Vault",
-	Image = {"file", "units/vault/vault.png", "size", {256, 256}},
-	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {256, 256}},
+	Image = {"file", "units/vault/vault.png", "size", {236, 208}},
+	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {236, 208}},
 	Animations = "animations-vault", Icon = "icon-vault",
 	Costs = {"time", 150, "titanium", 1000, "crystal", 1000},
 	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-vault",
@@ -90,7 +90,7 @@ DefineAnimations("animations-vault2", {
 
 DefineUnitType("build-dead-vault", {
 	Name = "vaultCrater",
-	Image = {"file", GetCurrentLuaPath().."/vault_c.png", "size", {256, 256}},
+	Image = {"file", GetCurrentLuaPath().."/vault_c.png", "size", {236, 208}},
 	Animations = "animations-vault2", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {6, 6}, BoxSize = {196, 164}, SightRange = 1,
