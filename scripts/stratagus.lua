@@ -9,7 +9,7 @@
 --
 --	stratagus.lua	-	The craft configuration language.
 --
---	(c) Copyright 1998-2005 by Crestez Leonard and François Beerten
+--	(c) Copyright 1998-2005 by Crestez Leonard and Franï¿½is Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -218,7 +218,6 @@ Load("scripts/dependency.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ai.lua")
 Load("scripts/campaigns.lua")
-Load("scripts/credits.lua")
 Load("scripts/tips.lua")
 Load("scripts/ranks.lua")
 Load("scripts/menus.lua")
