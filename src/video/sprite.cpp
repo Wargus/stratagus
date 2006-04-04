@@ -124,7 +124,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				ety = sty + (ety / GLMaxTextureSize);
 			}
 
-			texture = sy2 / GLMaxTextureSize * (g->GraphicWidth / GLMaxTextureSize + 1) +
+			texture = sy2 / GLMaxTextureSize * ((g->GraphicWidth - 1) / GLMaxTextureSize + 1) +
 				sx2 / GLMaxTextureSize;
 
 			glBindTexture(GL_TEXTURE_2D, textures[texture]);

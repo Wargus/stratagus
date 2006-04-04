@@ -735,8 +735,6 @@ static int PowerOf2(int x)
 static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	int ow, int oh)
 {
-	int i;
-	int j;
 	int h;
 	int w;
 	unsigned char *tex;
@@ -780,28 +778,25 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	for (i = 0; i < maxh; ++i) {
+	for (int i = 0; i < maxh; ++i) {
 		sp = (const unsigned char *)g->Surface->pixels + ow * bpp +
 			(oh + i) * g->Surface->pitch;
 		tp = tex + i * w * 4;
-		for (j = 0; j < maxw; ++j) {
-			int z;
-			SDL_Color p;
-
+		for (int j = 0; j < maxw; ++j) {
 			if (bpp == 1) {
 				if (useckey && *sp == ckey) {
 					tp[3] = 0;
 				} else {
-					p = f->palette->colors[*sp];
+					SDL_Color p = f->palette->colors[*sp];
 					tp[0] = p.r;
 					tp[1] = p.g;
 					tp[2] = p.b;
 					tp[3] = alpha;
 				}
 				if (colors) {
-					for (z = 0; z < PlayerColorIndexCount; ++z) {
+					for (int z = 0; z < PlayerColorIndexCount; ++z) {
 						if (*sp == PlayerColorIndexStart + z) {
-							p = colors->Colors[z];
+							SDL_Color p = colors->Colors[z];
 							tp[0] = p.r;
 							tp[1] = p.g;
 							tp[2] = p.b;
@@ -844,8 +839,9 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
-	if ((i = glGetError())) {
-		DebugPrint("glTexImage2D(%x)\n" _C_ i);
+	int x;
+	if ((x = glGetError())) {
+		DebugPrint("glTexImage2D(%x)\n" _C_ x);
 	}
 #endif
 	SDL_UnlockSurface(g->Surface);
@@ -866,12 +862,18 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 	int th;
 	GLuint *textures;
 
-	tw = g->GraphicWidth / (GLMaxTextureSize + 1) + 1;
-	th = g->GraphicHeight / (GLMaxTextureSize + 1) + 1;
+	tw = (g->GraphicWidth - 1) / GLMaxTextureSize + 1;
+	th = (g->GraphicHeight - 1) / GLMaxTextureSize + 1;
 
 	i = g->GraphicWidth % GLMaxTextureSize;
+	if (i == 0) {
+		i = GLMaxTextureSize;
+	}
 	g->TextureWidth = (GLfloat)i / PowerOf2(i);
 	i = g->GraphicHeight % GLMaxTextureSize;
+	if (i == 0) {
+		i = GLMaxTextureSize;
+	}
 	g->TextureHeight = (GLfloat)i / PowerOf2(i);
 
 	g->NumTextures = tw * th;
