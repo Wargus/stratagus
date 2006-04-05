@@ -88,6 +88,7 @@ def CheckOpenGL(env, conf):
          print("Can't find OpenGL libs. Exiting")
          sys.exit(1)
   env.Append(CPPDEFINES = 'USE_OPENGL')
+  sourcesEngine.append(globSources("guichan/opengl"))
 
 def CheckLuaLib(env, conf):
   if env.WhereIs('lua-config'):
@@ -172,7 +173,7 @@ else:
 env.Append(CPPPATH='src/include')
 env.Append(CPPPATH='src/guichan/include')
 BuildDir('build', 'src', duplicate = 0)
-if env['debug']:
+if env['debug'] or env['DEBUG']:
     env.Append(CPPDEFINES = 'DEBUG')
     env.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
 else:
