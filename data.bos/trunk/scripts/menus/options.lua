@@ -219,8 +219,8 @@ function BuildVideoOptionsMenu(menu)
   if Video.Width == 800 then
     b:setMarked(true)
   end
-  b = menu:addRadioButton(_("1024 x 800"), "video", offx, offy + 36 * 3.5,
-    function() SetVideoSize(1024, 800) menu:stop(1) end)
+  b = menu:addRadioButton(_("1024 x 768"), "video", offx, offy + 36 * 3.5,
+    function() SetVideoSize(1024, 768) menu:stop(1) end)
   if Video.Width == 1024 then
     b:setMarked(true)
   end
