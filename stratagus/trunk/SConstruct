@@ -173,7 +173,7 @@ else:
 env.Append(CPPPATH='src/include')
 env.Append(CPPPATH='src/guichan/include')
 BuildDir('build', 'src', duplicate = 0)
-if env['debug'] or env['DEBUG']:
+if env['debug'] or ARGUMENTS.has_key('DEBUG'):
     env.Append(CPPDEFINES = 'DEBUG')
     env.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
 else:
