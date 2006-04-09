@@ -611,7 +611,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 		if (tile && tile != tile2) {
 #ifdef USE_OPENGL
-			Map.TileGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
+			Map.FogGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
 #else
 			AlphaFogG->DrawFrameClip(tile, dx, dy);
 #endif
