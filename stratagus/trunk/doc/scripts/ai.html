@@ -118,26 +118,21 @@ This defines how a special AI works. Each level can use his own AI definition.
     can be used for any race use "*".
 </dd>
 <dt>class</dt>
-<dd>Class name of this definition. Used to chooce the AI for computer players.
+<dd>Class name of this definition. Used to choose the AI for computer players.
 The puds contains numbers which are mapped by the C table AiTypeWcNames into
 internal names. Some common used names are "passive", "land-attack",
 "sea-attack", "air-attack".
 </dd>
 <dt>script</dt>
-<dd>A list of scheme statements executed one after another.<p>
-<code>( (code-1) (code-2) ... (code-n) )</code><p>
-code-1 can be any valid scheme statement. Currently each second this
-statement is executed, if the statement returns not #t, than the next
-time the next statement is executed. No statement should use more than 3 ms.
+<dd>A lua function.<p>
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; Defines the passive computer AI, which does nothing.
-(DefineAi "passive-ai" "*" "passive"
-  '((AiSleep	10000)
+    -- Defines the passive computer AI, which does nothing.
+DefineAi("passive-ai", "*", "passive", function() AiSleep(10000) end)
 </pre>
 
 <a name="DefineAiHelper"></a>
@@ -152,7 +147,7 @@ and what they can build and many other things that the AI must know.
 <dt>list</dt>
 <dd>A list of features:
  <ul>
- <li><code>(list 'build 'builder 'building-1 ... 'building-n)</code>
+ <li><code>{"build", "builder", "building-1", ... "building-n"}</code>
   <dl>
   <dt>builder</dt>
   <dd>Name of the unit-type that can build.
@@ -164,7 +159,7 @@ and what they can build and many other things that the AI must know.
   </dl>
   <b>Note:</b> If more units can build the same buildings you need the same list
 	for all units.
- <li><code>(list 'train 'trainer 'unit-1 ... 'unit-n)</code>
+ <li><code>{"train", "trainer", "unit-1", ... "unit-n"}</code>
   <dl>
   <dt>trainer</dt>
   <dd>Name of the unit-type that can train the units.
@@ -176,7 +171,7 @@ and what they can build and many other things that the AI must know.
   </dl>
   <b>Note:</b> If more units can train the same unit you need the same list
 	for all units.
- <li><code>(list 'upgrade 'unit 'upgraded-unit-1 ... 'upgraded-unit-n)</code>
+ <li><code>{"upgrade", "unit", "upgraded-unit-1", ... "upgraded-unit-n"}</code>
   <dl>
   <dt>unit</dt>
   <dd>Name of the unit-type that can be upgraded.
@@ -186,7 +181,7 @@ and what they can build and many other things that the AI must know.
   <dd>Names of the unit-types to that the unit can be upgraded.
   </dd>
   </dl>
- <li><code>(list 'research 'researcher 'upgrade-1 ... 'spell-n)</code>
+ <li><code>{"research", "researcher", "upgrade-1", ... "spell-n"}</code>
   <dl>
   <dt>researcher</dt>
   <dd>Name of the unit-type that can reasearch upgrades or spells.
@@ -196,7 +191,7 @@ and what they can build and many other things that the AI must know.
   <dd>Names of the upgrades or spells that can be researched by the researcher.
   </dd>
   </dl>
- <li><code>(list 'repair 'worker 'unit-1 ... 'unit-n)</code>
+ <li><code>{"repair", "worker", "unit-1", ... "unit-n"}</code>
   <dl>
   <dt>worker</dt>
   <dd>Name of the unit-type that can repair other units.
@@ -208,7 +203,7 @@ and what they can build and many other things that the AI must know.
   </dl>
   <b>Note:</b> If more units can repair the same units you need the same list
 	for all units.
- <li><code>(list 'equiv 'unit 'unit-1 ... 'unit-n)</code>
+ <li><code>{"equiv", "unit", "unit-1", ... "unit-n"}</code>
   <dl>
   <dt>unit</dt>
   <dd>Name of the unit-type that have equilvalent units.
@@ -218,7 +213,7 @@ and what they can build and many other things that the AI must know.
   <dd>Names of the unit-types that can be uses by the AI equivalent.
   </dd>
   </dl>
- <li><code>(list 'unit-limit 'unit 'resource)</code>
+ <li><code>{"unit-limit", "unit", "resource"}</code>
   <dl>
   <dt>unit</dt>
   <dd>Name of the unit-type that must be produced to reduce the unit limit.
@@ -227,7 +222,7 @@ and what they can build and many other things that the AI must know.
   <dd>Name of the resource producing the shortage.
   </dd>
   </dl>
-  <i>I think we should swap the arguments: 'resource 'unit.</i>
+  <i>I think we should swap the arguments: "resource" "unit".</i>
  </ul>
 </dd>
 </dl>
@@ -237,14 +232,14 @@ and what they can build and many other things that the AI must know.
 A minimal AI helper definition:
 
 <pre>
-(DefineAiHelper
-  (list 'build 'unit-peasant 'unit-farm)
-  (list 'train 'unit-town-hall 'unit-peasant)
-  (list 'upgrade 'unit-town-hall 'unit-keep)
-  (list 'research 'unit-human-blacksmith 'upgrade-sword1)
-  (list 'repair 'unit-peasant 'unit-town-hall)
-  (list 'unit-limit 'unit-farm 'food)
-  (list 'unit-equiv 'unit-town-hall 'unit-keep))
+DefineAiHelper(
+  {"build", "unit-peasant", "unit-farm"},
+  {"train", "unit-town-hall", "unit-peasant"},
+  {"upgrade", "unit-town-hall", "unit-keep"},
+  {"research", "unit-human-blacksmith", "upgrade-sword1"},
+  {"repair", "unit-peasant", "unit-town-hall"},
+  {"unit-limit", "unit-farm", "food"},
+  {"unit-equiv", "unit-town-hall", "unit-keep"})
 </pre>
 
 <p>A peasant can build a farm.
@@ -270,9 +265,9 @@ Define an AI player. (NOT SUPPORTED)
 <h4>Example</h4>
 
 <pre>
-    ;; FIXME:
+    -- FIXME:
 FIXME:
-    (DefineAiPlayer (list ...))
+    DefineAiPlayer()
 </pre>
 
 
@@ -285,8 +280,8 @@ goals.
 
 <dl> 	 
 <dt>force</dt>
-<dd>Id of the force to which the attacking units belong. THe force ids 0 to 9 are currently
-supported.
+<dd>ID of the force to which the attacking units belong. The force ids 0 to 9
+are currently supported.
 </dd>
 </dl>
  
@@ -322,10 +317,10 @@ supported.
 <h4>Example</h4>
 
 <pre>
-    ;; Force 0 is build with one footman. When the force is ready, sleep for
-    ;; 500 frames.
-    (AiForce 0 'unit-footman 1)
-    (if (AiCheckForce 0) (AiSleep 500))
+    -- Force 0 is build with one footman. When the force is ready, sleep for
+    -- 500 frames.
+    AiForce(0, "unit-footman", 1)
+    if (AiCheckForce(0)) then AiSleep(500) end
 </pre>
 
 <a name="AiDebug"></a>
@@ -336,28 +331,28 @@ Enable or disable the debug output of the AI script execution.
 
 <dl>
 <dt>flag</dt>
-<dd>If #t enables printing of the AI commands, if #f disables it.
+<dd>If true enables printing of the AI commands, if false disables it.
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; Prints now the commands of this computer player.
-    (AiDebug #t)
+    -- Prints now the commands of this computer player.
+    AiDebug(true)
 </pre>
 
 <a name="AiDebugPlayer"></a>
 <h3>AiDebugPlayer(1, 2, 3, ...)</h3>
 
 Activate dump of AI forces and strategy on stdout.<br>
-Parameters are player number, or 'self, for thisplayer.<br>
-'none will stop all AI debug output.
+Parameters are player number, or "self", for thisplayer.<br>
+"none" will stop all AI debug output.
 
 <h4>Example</h4>
 
 <pre>
-    (AiDebugPlayer 'self)
+    AiDebugPlayer("self")
 </pre>
 
 <a name="AiDump"></a>
@@ -369,8 +364,8 @@ Dump some AI debug information.
 <h4>Example</h4>
 
 <pre>
-    ;; Prints out some debug information.
-    (AiDump)
+    -- Prints out some debug information.
+    AiDump()
 </pre>
 
 <a name="AiForce"></a>
@@ -411,10 +406,10 @@ each unit-type one after the other?</i>
 <h4>Example</h4>
 
 <pre>
-    ;; First the force 0 is filled up with 4 footmans and 5 bowmans, after this
-    ;; force 1 is filled with 3 footmans and 2 bowmans.
-    (AiForce 0 'unit-footman 4 'unit-bowman 5)
-    (AiForce 1 'unit-footman 3 'unit-bowman 2)
+    -- First the force 0 is filled up with 4 footmans and 5 bowmans, after this
+    -- force 1 is filled with 3 footmans and 2 bowmans.
+    AiForce(0, "unit-footman", 4, "unit-bowman", 5)
+    AiForce(1, "unit-footman", 3, "unit-bowman", 2)
 </pre>
 
 <a name="AiForceRole"></a>
@@ -429,15 +424,15 @@ Define the role of a force.
 supported.
 </dd>
 <dt>role</dt>
-<dd>The role of the force.  Can be either 'attack or 'defend'.
+<dd>The role of the force.  Can be either "attack" or "defend".
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; Sets the role of force 0 to attack.
-    AiForceRole(0, 'attack)
+    -- Sets the role of force 0 to attack.
+    AiForceRole(0, "attack")
 </pre>
 
 <a name="AiGetRace"></a>
@@ -468,10 +463,10 @@ Get the number of cycles to sleep.
 
 <h3>AiNeed(unit-type)</h3>
 
-Tells the AI that it should have an unit of this unit-type. The AI builds or
+Tells the AI that it should have a unit of this unit-type. The AI builds or
 trains units in this order of the AiSet/AiNeed commands. If the unit or an
 equivalent unit already exists, the AI does nothing. If the unit is lost, it is
-automatic rebuild. If the units are requested in wrong order, the AI could 
+automatically rebuilt. If the units are requested in wrong order, the AI could 
 hang up. Resources are collected automatic and farms are automatic build, but
 additional could be requested.
 
@@ -485,9 +480,9 @@ additional could be requested.
 <h4>Example</h4>
 
 <pre>
-    ;; The great hall must be build before a barrack.
-  (AiNeed (unit-type 'unit-great-hall))
-  (AiNeed (unit-type 'unit-barrack))
+    -- The great hall must be build before a barrack.
+  AiNeed("unit-great-hall")
+  AiNeed("unit-barrack")
 </pre>
 
 <a name="AiPlayer"></a>
@@ -529,7 +524,7 @@ AI could hang up.
 <h3>AiSet(unit-type, count)</h3>
 
 This AiNeed with a number. Tells the AI that it should have a specified number
-of an unit of this unit-type. The AI builds or trains units in this order of
+of a unit of this unit-type. The AI builds or trains units in this order of
 the AiSet/AiNeed commands. If the unit or an equivalent unit already exists,
 the AI does nothing. If the units are lost, they are automatic rebuild. If the
 units are requested in wrong order, the AI could hang up. Resources are
@@ -572,7 +567,7 @@ Set AI player resource collect percent.
 <h4>Example</h4>
 
 <pre>
-    ;; Set the collect percent to 50% gold and 50% wood.
+    -- Set the collect percent to 50% gold and 50% wood.
     AiSetCollect(0, 50, 50, 0, 0, 0, 0)
 </pre>
 
@@ -629,7 +624,7 @@ upgrades.
 
 <dl>
 <dt>unit-type</dt>
-<dd>Unit type to that an unit should be upgraded.
+<dd>Unit type to that a unit should be upgraded.
 </dd>
 </dl>
 
@@ -644,7 +639,7 @@ upgrades.
 <h3>AiWait(type)</h3>
 
 Waits until the *first* request of this unit-type is completed.
-Don't forget to request an unit-type, before you wait on it.
+Don't forget to request a unit-type, before you wait on it.
 
 <dl>
 <dt>type</dt>
@@ -655,9 +650,9 @@ Don't forget to request an unit-type, before you wait on it.
 <h4>Example</h4>
 
 <pre>
-    ;; Proceed only if a peasant is ready.
-    (AiNeed 'unit-peasant)
-    (AiWait 'unit-peasant)
+    -- Proceed only if a peasant is ready.
+    AiNeed("unit-peasant")
+    AiWait("unit-peasant")
 </pre>
 
 <a name="AiWaitForce"></a>
@@ -677,10 +672,10 @@ supported.
 <h4>Example</h4>
 
 <pre>
-    ;; Force 0 is build with one footman. The script continues processing, if the
-    ;; footman is ready trained.
-    (AiForce 0 'unit-footman 1)
-    (AiWaitForce 0)
+    -- Force 0 is build with one footman. The script continues processing, if the
+    -- footman is ready trained.
+    AiForce(0, "unit-footman", 1)
+    AiWaitForce(0)
 </pre>
 
 <h2>Notes</h2>
@@ -691,24 +686,25 @@ If you want to write this you know who to contact.
 <h2>Examples</h2>
 
 <pre>
-(DefineAi "wc2-example" 'orc 'land-attack
+DefineAi("wc2-example", "orc", "land-attack",
+ function()
 </pre><p style="margin-left:1cm;">
-This is the AI "wc2-example" usable for human race and land-attack.
+This is the AI "wc2-example" usable for orc race and land-attack.
 </p><pre>
-  '( (AiNeed (unit-type 'unit-great-hall))
+     AiNeed("unit-great-hall")
 </pre><p style="margin-left:1cm;">
 The first need unit is the great-hall.
 </p><pre>
-     (AiNeed 'unit-peon)
+     AiNeed("unit-peon")
 </pre><p style="margin-left:1cm;">
 The next unit should be the peon.
 </p><pre>
-     (AiWait 'unit-great-hall)
+     AiWait("unit-great-hall")
 </pre><p style="margin-left:1cm;">
 Now wait until the great hall is available. Could hang if no great hall can be
 build.
 </p><pre>
-     (AiWait 'unit-peon) ))
+     AiWait("unit-peon")
 </pre><p style="margin-left:1cm;">
 Now wait unit we have a worker to build the next things.
 </p>
@@ -718,5 +714,5 @@ FIXME: need some complex examples.
 <hr>
 Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<address>(c) 2002-2003 by <a href="http://stratagus.org">
+<address>(c) 2002-2006 by <a href="http://stratagus.org">
 The Stratagus Project</a></address></body></html>
