@@ -4833,6 +4833,9 @@ int EditorSaveMenu(void)
 */
 static void EditorSaveInit(Menu *menu)
 {
+	if (!*ScenSelectPath) {
+		sprintf(ScenSelectPath, "%s/maps", StratagusLibPath);
+	}
 	EditorSaveLBInit(menu->Items + 1);
 }
 
