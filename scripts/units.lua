@@ -156,7 +156,7 @@ DefineUnitType("unit-orc-wall", {
 -- Load production buildings
 Load("units/vault/vault.lua")
 Load("units/engineer/engineer.lua")
-Load("units/vehiculefactory/vehiculefactory.lua")
+Load("units/vehiclefactory/vehiclefactory.lua")
 
 -- Find and load all other units
 local list
