@@ -56,10 +56,15 @@ DefineAnimations("animations-elitecorpse1", {
         "frame 0", "wait 200", "frame 5", "wait 200", "frame 10", "wait 200", 
         "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
     })
-function DefineHumanCorpse(livingunit)
+
+function DefineHumanCorpse(livingunit, size)
+   if (size == nil) then
+    size = {64, 64}
+   end
+
    DefineUnitType("unit-dead-" .. livingunit, {
 	Name = livingunit .. "body",
-	Image = {"file", GetCurrentLuaPath().."/unit_" .. livingunit .. "_c.png", "size", {64, 64}},
+	Image = {"file", GetCurrentLuaPath().."/unit_" .. livingunit .. "_c.png", "size", size},
 	Animations = "animations-elitecorpse1", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {1, 1},
 	BoxSize = {31, 31}, SightRange = 1, BasicDamage = 0,

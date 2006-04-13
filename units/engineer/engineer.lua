@@ -70,8 +70,8 @@ MakeSound("engineer-harvest", GetCurrentLuaPath().."/engineer_attack.wav")
 
 DefineUnitType("unit-engineer", {
 	Name = "Engineer",
-	Image = {"file", GetCurrentLuaPath().."/unit_engineer.png", "size", {64, 64}},
-	Shadow = {"file", GetCurrentLuaPath().."/unit_engineer_s.png", "size", {64, 64}},
+	Image = {"file", GetCurrentLuaPath().."/unit_engineer.png", "size", {56, 56}},
+	Shadow = {"file", GetCurrentLuaPath().."/unit_engineer_s.png", "size", {56, 56}},
 	DrawLevel = 19, Animations = "animations-engineer", Icon = "icon-engineer",
 	Costs = {"time", 50, "titanium", 50, "crystal", 100},
 	Speed = 8, HitPoints = 30, DrawLevel = 25,
@@ -107,6 +107,6 @@ DefineUnitType("unit-engineer", {
 		"help", "engineer-help",
 		"dead", "engineer-die"}
 	})
-DefineHumanCorpse("engineer")
+DefineHumanCorpse("engineer", {56, 56})
 
 DefineAllow("unit-engineer", "AAAAAAAAAAAAAAAA")

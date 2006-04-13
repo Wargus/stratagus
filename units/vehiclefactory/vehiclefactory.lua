@@ -7,7 +7,7 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---	vehiclefactory.lua	-	Define the vehiclefactory
+--	vehiculefactory.lua	-	Define the vehiculefactory
 --
 --	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
 --
@@ -62,8 +62,8 @@ MakeSound("vfac-dead", GetCurrentLuaPath().."/sfx_vfac.die.wav")
 
 DefineUnitType("unit-vfac", {
 	Name = "Vehicle Factory",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 256}},
-	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 256}},
+	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 254}},
+	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 254}},
 	Animations = "animations-vfac", Icon = "icon-vfac",
 	Costs = {"time", 200, "titanium", 750, "crystal", 100},
 	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-vfac",
@@ -71,7 +71,7 @@ DefineUnitType("unit-vfac", {
 	BoxSize = {220, 156}, SightRange = 2, Armor = 30, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
 	AnnoyComputerFactor = 45, Demand = 400, Points = 200,
-	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = {"build-dead-body6", 0},
+	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = {"build-dead-vfac", 0},
 	Type = "land",  Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	Sounds = {
 		"selected", "vfac-selected",
@@ -80,16 +80,16 @@ DefineUnitType("unit-vfac", {
 		"dead", "vfac-dead"}
 	})
 
-DefineAnimations("animations-elitebuild6", {
-    Death = {"unbreakable begin", "wait 1", "frame 30", "wait 2000", 
-        "frame 30", "wait 200", "frame 30", "wait 200", "frame 31", "wait 200",
-        "frame 31", "wait 200", "frame 31", "wait 1", "unbreakable end", "wait 1", },
+DefineAnimations("animations-vfac2", {
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+        "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
+        "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-body6", {
+DefineUnitType("build-dead-vfac", {
 	Name = "FactoryCrater",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 256}},
-	Animations = "animations-elitebuild6", Icon = "icon-cancel",
+	Image = {"file", GetCurrentLuaPath().."/vehicle_c.png", "size", {256, 254}},
+	Animations = "animations-vfac2", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {7, 5},
 	BoxSize = {220, 156}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none",
@@ -98,3 +98,7 @@ DefineUnitType("build-dead-body6", {
 
 DefineAllow("unit-vfac", "AAAAAAAAAAAAAAAA")
 
+DefineButton({
+	Pos = 3, Level = 2, Icon = "icon-vfac_b", Action = "build",
+	Value = "unit-vfac", Key = "v", Hint = "BUILD ~!VEHICLE FACTORY",
+	ForUnit = {"unit-engineer"}})
