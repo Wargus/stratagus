@@ -62,7 +62,7 @@ DefineIcon({
 	Name = "icon-vfac_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/vehiculefactory/vehicle_factory_i.png"})
+	File = "units/vehiclefactory/vehicle_factory_i.png"})
 
 DefineIcon({
 	Name = "icon-msilo_b",
