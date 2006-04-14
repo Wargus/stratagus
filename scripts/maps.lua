@@ -29,12 +29,10 @@
 --
 
 function DefineImageTilemodels(terrain, imgx, imgy)
-   local til
-   local imgsize
-   til = {}
-   imgsize = imgx * imgy - 1
-   for i = 0, imgsize do
-      til[i+1] = i
+   local til = {}
+
+   for i = 0, imgx * imgy - 1 do
+      til[i + 1] = i
    end
 
    DefineTileset(
@@ -50,9 +48,9 @@ end
 
 function RepeatMap(mapx, mapy, imgx, imgy)
    -- Tile map
-   for x = 0,mapx-1 do
-     for y = 0,mapy-1 do
-       SetTile( math.mod(y, imgx) + math.mod(x,imgx)*imgx, y, x)
+   for y = 0, mapy - 1 do
+     for x = 0, mapx - 1 do
+       SetTile(math.mod(x, imgx) + math.mod(y, imgy) * imgx, x, y)
      end
    end
 
