@@ -639,7 +639,6 @@ void CleanGame(void)
 	EndReplayLog();
 	CleanMessages();
 
-	CleanPlayers();
 	CleanUnits();
 	CleanSelections();
 	CleanGroups();
@@ -649,7 +648,6 @@ void CleanGame(void)
 	CleanReplayLog();
 	FreeVisionTable();
 	FreeAStar();
-	InitDefinedVariables(); // internal script.
 }
 
 static void ExpandPath(char *newpath, const char *path)
@@ -677,6 +675,7 @@ void StartMap(const char *filename)
 
 	//  Create the game.
 	DebugPrint("Creating game with map: %s\n" _C_ filename);
+	CleanPlayers();
 	CreateGame(filename, &Map);
 
 	UI.StatusLine.Set(NameLine);
