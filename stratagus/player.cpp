@@ -108,11 +108,6 @@ void InitPlayers(void)
 */
 void CleanPlayers(void)
 {
-	int p;
-
-	for (p = 0; p < PlayerMax; ++p) {
-		delete[] Players[p].Name;
-	}
 	ThisPlayer = NULL;
 	memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
@@ -368,7 +363,7 @@ void CreatePlayer(int type)
 			team = 2 + NumPlayers;
 			break;
 	}
-	printf("CreatePlayer name %s\n", player->Name);
+	DebugPrint("CreatePlayer name %s\n" _C_ player->Name);
 
 	player->Type = type;
 	player->Race = 0;
@@ -476,8 +471,7 @@ void CPlayer::SetSide(int side)
 */
 void CPlayer::SetName(const char *name)
 {
-	delete[] this->Name;
-	this->Name = new_strdup(name);
+	strncpy(Name,name, sizeof(Name)-1);
 }
 
 /*----------------------------------------------------------------------------
