@@ -199,6 +199,24 @@ function RunSubMenu(s)
   menu:run()
 end
 
+function RunResultsMenu(s)
+  local menu
+  menu = BosMenu(_("Results"))
+  local sx = Video.Width / 20
+  local sy = Video.Height / 20
+  local result
+
+  if GameResult == GameVictory then
+     result = _("Victory")
+  elseif GameResult == GameDraw then
+      result = _("Draw")
+  else
+      result = _("Defeat")
+  end
+  menu:writeLargeText(result, sx, sy*3)
+  menu:run()
+end
+
 difficulty = 5
 mapresources = 5
 startingresources = 5
@@ -263,6 +281,7 @@ function RunStartGameMenu(s)
        RevealMap()
     end
     StartMap("maps/" .. map)
+    RunResultsMenu(s)
     PresentMap = OldPresentMap
     menu:stop()
   end
