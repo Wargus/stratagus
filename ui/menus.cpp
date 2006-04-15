@@ -662,7 +662,7 @@ static char *LBRetrieve(const Menuitem *mi, int i)
 	if ((*fl)[i].type) {
 		strcpy(buffer, "   ");
 	} else {
-		strcpy(buffer, "\260 ");
+		strcpy(buffer, "D  ");
 	}
 
 	strcat(buffer, (*fl)[i].name);
