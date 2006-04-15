@@ -10,7 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1998-2006 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -91,17 +91,48 @@ static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 **  @param mapname   map filename
 **  @param map       map loaded
 */
-static void LoadStratagusMap(const char *mapname, CMap *map)
+static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map)
 {
 	char mapfull[PATH_MAX];
 	CFile file;
 
-	if (file.open(mapname, CL_OPEN_READ) == -1) {
+	// Try the same directory as the smp file first
+	strcpy(mapfull, smpname);
+	char *p = strrchr(mapfull, '/');
+	if (!p) {
+		p = mapfull;
+	} else {
+		++p;
+	}
+	strcpy(p, mapname);
+
+	if (file.open(mapfull, CL_OPEN_READ) == -1) {
+		// Not found, try StratagusLibPath and the smp's dir
 		strcpy(mapfull, StratagusLibPath);
 		strcat(mapfull, "/");
-		strcat(mapfull, mapname);
+		strcat(mapfull, smpname);
+		char *p = strrchr(mapfull, '/');
+		if (!p) {
+			p = mapfull;
+		} else {
+			++p;
+		}
+		strcpy(p, mapname);
+		if (file.open(mapfull, CL_OPEN_READ) == -1) {
+			// Not found, try mapname by itself
+			if (file.open(mapname, CL_OPEN_READ) == -1) {
+				// Not found again, try StratagusLibPath as a last resort
+				strcpy(mapfull, StratagusLibPath);
+				strcat(mapfull, "/");
+				strcat(mapfull, mapname);
+			} else {
+				strcpy(mapfull, mapname);
+				file.close();
+			}
+		} else {
+			file.close();
+		}
 	} else {
-		strcpy(mapfull, mapname);
 		file.close();
 	}
 
@@ -290,7 +321,7 @@ static void LoadMap(const char *filename, CMap *map)
 			}
 			Assert(map->Info.Filename);
 			map->Create();
-			LoadStratagusMap(map->Info.Filename, map);
+			LoadStratagusMap(filename, map->Info.Filename, map);
 			return;
 		}
 	}
