@@ -101,7 +101,7 @@ static int CclPlayer(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			player->Name = new_strdup(LuaToString(l, j + 1));
+			player->SetName(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (!strcmp(value, "neutral")) {
@@ -847,8 +847,7 @@ static int CclSetPlayerData(lua_State *l)
 	data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		delete[] p->Name;
-		p->Name = new_strdup(LuaToString(l, 3));
+		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		int i;
 		const char *racename;

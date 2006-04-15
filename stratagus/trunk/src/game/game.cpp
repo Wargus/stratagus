@@ -515,7 +515,7 @@ void CreateGame(const char *filename, CMap *map)
 		InitNetwork2();
 	} else {
 		if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {
-		  ThisPlayer->Name = new_strdup(LocalPlayerName);
+		  ThisPlayer->SetName(LocalPlayerName);
 		}
 	}
 

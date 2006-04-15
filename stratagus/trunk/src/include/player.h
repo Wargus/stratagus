@@ -303,7 +303,7 @@ class CPlayer
 {
 public:
 	int   Index;        /// player as number
-	char *Name;         /// name of non computer
+	char  Name[128];    /// name of non computer
 
 	int   Type;         /// type of player (human,computer,...)
 	int   Race;         /// race of player (orc,human,...)

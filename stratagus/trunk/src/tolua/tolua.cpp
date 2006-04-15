@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Apr  1 16:29:41 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Apr 15 16:05:33 2006.
 */
 
 #ifndef __cplusplus
@@ -7773,8 +7773,7 @@ static int tolua_set_CPlayer_Name(lua_State* tolua_S)
  if (!tolua_isstring(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->Name = ((char*)  tolua_tostring(tolua_S,2,0))
-;
+ strncpy(self->Name,tolua_tostring(tolua_S,2,0),128-1);
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
