@@ -291,5 +291,10 @@ $void StartReplay(const char *str);
 void StartReplay(const char *str);
 $void StartSavedGame(const char *str);
 void StartSavedGame(const char *str);
-
-
+$#include "campaign.h"
+enum GameResults {
+	GameNoResult,
+	GameVictory,
+	GameDefeat, 
+	GameDraw
+} GameResult;

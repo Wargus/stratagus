@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Apr 15 16:05:33 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Apr 15 18:58:41 2006.
 */
 
 #ifndef __cplusplus
@@ -33,6 +33,7 @@ void StartMap(const char *str);
 void StartEditor(const char *str);
 void StartReplay(const char *str);
 void StartSavedGame(const char *str);
+#include "campaign.h"
 void InitNetwork1(void);
 void ExitNetwork1(void);
 int GetNetworkState() {return (int)NetLocalState;}
@@ -5931,6 +5932,30 @@ static int tolua_stratagus_StartSavedGame00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: GameResult */
+#ifndef TOLUA_DISABLE_tolua_get_GameResult
+static int tolua_get_GameResult(lua_State* tolua_S)
+{
+ tolua_pushnumber(tolua_S,(lua_Number)GameResult);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameResult */
+#ifndef TOLUA_DISABLE_tolua_set_GameResult
+static int tolua_set_GameResult(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  GameResult = ((GameResults) (int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: InitNetwork1 */
 #ifndef TOLUA_DISABLE_tolua_stratagus_InitNetwork100
 static int tolua_stratagus_InitNetwork100(lua_State* tolua_S)
@@ -9708,6 +9733,11 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
  tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);
  tolua_function(tolua_S,"StartSavedGame",tolua_stratagus_StartSavedGame00);
+ tolua_constant(tolua_S,"GameNoResult",GameNoResult);
+ tolua_constant(tolua_S,"GameVictory",GameVictory);
+ tolua_constant(tolua_S,"GameDefeat",GameDefeat);
+ tolua_constant(tolua_S,"GameDraw",GameDraw);
+ tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
  tolua_function(tolua_S,"InitNetwork1",tolua_stratagus_InitNetwork100);
  tolua_function(tolua_S,"ExitNetwork1",tolua_stratagus_ExitNetwork100);
  tolua_function(tolua_S,"NetworkSetupServerAddress",tolua_stratagus_NetworkSetupServerAddress00);
