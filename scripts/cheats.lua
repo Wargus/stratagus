@@ -33,21 +33,14 @@ godcheat = false
 function HandleCheats(str)
   local resources = { "titanium", "crystal" }
 
-  if (str == "there is no aliens level") then
-    -- FIXME: no function yet
-    AddMessage("cheat enabled")
-
-  elseif (str == "glittering prizes") then
+  if (str == "rich") then
     SetPlayerData(GetThisPlayer(), "Resources", "titanium",
       GetPlayerData(GetThisPlayer(), "Resources", "titanium") + 12000)
     SetPlayerData(GetThisPlayer(), "Resources", "crystal",
       GetPlayerData(GetThisPlayer(), "Resources", "crystal") + 5000)
     AddMessage("!!! :)")
 
-  elseif (str == "on screen") then
-    RevealMap()
-
-  elseif (str == "showpath") then
+  elseif (str == "reveal") then
     RevealMap()
 
   elseif (str == "fow on") then
@@ -55,6 +48,10 @@ function HandleCheats(str)
 
   elseif (str == "fow off") then
     SetFogOfWar(false)
+ 
+  elseif (str == "see all") then
+    SetFogOfWar(false)
+    RevealMap()
 
   elseif (str == "fast debug") then
     for i = 1,table.getn(resources) do
@@ -78,7 +75,7 @@ function HandleCheats(str)
     SetSpeedResearch(1)
     AddMessage("NORMAL DEBUG SPEED")
 
-  elseif (str == "make it so") then
+  elseif (str == "speed cheat") then
     if (speedcheat) then
       speedcheat = false
       for i = 1,table.getn(resources) do
@@ -107,13 +104,13 @@ function HandleCheats(str)
       AddMessage("SO!")
     end
 
-  elseif (str == "unite the clans") then
+  elseif (str == "victory") then
     ActionVictory()
 
-  elseif (str == "you pitiful worm") then
+  elseif (str == "defeat") then
     ActionDefeat()
 
-  elseif (str == "it is a good day to die") then
+  elseif (str == "godcheat") then
     if (godcheat) then
       godcheat = false
       SetGodMode(false)
