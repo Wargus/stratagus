@@ -127,7 +127,7 @@ CUpgrade *CUpgrade::Get(const char *ident)
 {
 	CUpgrade *upgrade = Upgrades[ident];
 	if (!upgrade) {
-		DebugPrint("upgrade not found: %s" _C_ ident);
+		DebugPrint("upgrade not found: %s\n" _C_ ident);
 	}
 	return upgrade;
 }
