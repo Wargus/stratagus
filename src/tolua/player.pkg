@@ -1,6 +1,6 @@
 class CPlayer
 {
-	char *Name;
+	char Name[128];
 
 	int Resources[MaxCosts];
 	int Incomes[MaxCosts];
