@@ -10,7 +10,7 @@
 //
 /**@name video.h - The video headerfile. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 1999-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 #include "guichan.h"
 
 class CGraphic : public gcn::Image {
-private:
+protected:
 	CGraphic() : File(NULL), HashFile(NULL), Surface(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1)
@@ -53,7 +53,6 @@ private:
 		TextureWidth = 0.f;
 		TextureHeight = 0.f;
 		Textures = NULL;
-		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
 		NumTextures = 0;
 #endif
 	}
@@ -76,7 +75,6 @@ public:
 	void DrawFrameClip(unsigned frame, int x, int y) const;
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
@@ -86,7 +84,6 @@ public:
 	void DrawFrameClipX(unsigned frame, int x, int y) const;
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 
 
 	static CGraphic *New(const char *file, int w = 0, int h = 0);
@@ -125,13 +122,33 @@ public:
 	GLfloat TextureWidth;      /// Width of the texture
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint *Textures;          /// Texture names
-	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
 	int NumTextures;
 #endif
 
 #ifdef USE_OPENGL
 	friend void MakeFontColorTextures(CFont *font);
 	friend void CleanFonts(void);
+#endif
+};
+
+class CPlayerColorGraphic : public CGraphic
+{
+protected:
+	CPlayerColorGraphic() {
+#ifdef USE_OPENGL
+		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
+#endif
+	}
+
+public:
+	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
+
+	static CPlayerColorGraphic *New(const char *file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *ForceNew(const char *file, int w = 0, int h = 0);
+
+#ifdef USE_OPENGL
+	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
 #endif
 };
 

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Apr 15 18:58:41 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Apr 16 09:04:31 2006.
 */
 
 #ifndef __cplusplus
@@ -202,6 +202,7 @@ static int tolua_collect_Slider (lua_State* tolua_S)
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
+ tolua_usertype(tolua_S,"CPlayerColorGraphic");
  tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"ImageRadioButton");
  tolua_usertype(tolua_S,"CFontColor");
@@ -232,8 +233,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"Color");
+ tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"MenuScreen");
@@ -7200,6 +7201,40 @@ static int tolua_stratagus_CGraphic_Resize00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: New of class  CPlayerColorGraphic */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPlayerColorGraphic_New00
+static int tolua_stratagus_CPlayerColorGraphic_New00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"CPlayerColorGraphic",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* file = ((const char*)  tolua_tostring(tolua_S,2,0));
+  int w = ((int)  tolua_tonumber(tolua_S,3,0));
+  int h = ((int)  tolua_tonumber(tolua_S,4,0));
+ {
+  CPlayerColorGraphic* tolua_ret = (CPlayerColorGraphic*)  CPlayerColorGraphic::New(file,w,h);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPlayerColorGraphic");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  CColor */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CColor_new00
 static int tolua_stratagus_CColor_new00(lua_State* tolua_S)
@@ -9793,6 +9828,10 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"Free",tolua_stratagus_CGraphic_Free00);
   tolua_function(tolua_S,"Load",tolua_stratagus_CGraphic_Load00);
   tolua_function(tolua_S,"Resize",tolua_stratagus_CGraphic_Resize00);
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CPlayerColorGraphic","CPlayerColorGraphic","CGraphic",NULL);
+ tolua_beginmodule(tolua_S,"CPlayerColorGraphic");
+  tolua_function(tolua_S,"New",tolua_stratagus_CPlayerColorGraphic_New00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"CColor","CColor","",tolua_collect_CColor);
