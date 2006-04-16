@@ -10,7 +10,7 @@
 //
 /**@name icons.cpp - The icons. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -182,7 +182,12 @@ void CleanIcons(void)
 */
 void CIcon::DrawIcon(const CPlayer *player, int x, int y) const
 {
-	this->G->DrawPlayerColorFrameClip(player->Index, this->Frame, x, y);
+	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(this->G);
+	if (g) {
+		g->DrawPlayerColorFrameClip(player->Index, this->Frame, x, y);
+	} else {
+		this->G->DrawFrameClip(this->Frame, x, y);
+	}
 }
 
 /**
