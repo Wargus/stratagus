@@ -110,6 +110,9 @@ function HandleCheats(str)
   elseif (str == "defeat") then
     ActionDefeat()
 
+  elseif (str == "draw") then
+    ActionDraw()
+
   elseif (str == "godcheat") then
     if (godcheat) then
       godcheat = false
