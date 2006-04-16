@@ -54,13 +54,23 @@ Container.addCentered = function(self, widget, x, y)
   self.add(self, widget, x - widget:getWidth() / 2, y)
 end
 
-function BosMenu(title)
+function BosMenu(title, background)
   local menu
   local exitButton
+  local bg
+  local bgg
 
   menu = MenuScreen()
 
-  menu:add(backgroundWidget, 0, 0)
+  if background == nil then
+     bg = backgroundWidget
+  else
+     bgg = CGraphic:New(background)
+     bgg:Load()
+     bgg:Resize(Video.Width, Video.Height)
+     bg = ImageWidget(bgg)
+  end
+  menu:add(bg, 0, 0)
 
   function menu:addButton(caption, x, y, callback)
     local b
@@ -201,19 +211,24 @@ end
 
 function RunResultsMenu(s)
   local menu
-  menu = BosMenu(_("Results"))
+  local background = "graphics/screens/menu.png"
   local sx = Video.Width / 20
   local sy = Video.Height / 20
   local result
 
   if GameResult == GameVictory then
-     result = _("Victory")
+     result = _("Victory !")
   elseif GameResult == GameDraw then
-      result = _("Draw")
-  else
-      result = _("Defeat")
+      result = _("Draw !")
+  elseif GameResult == GameDefeat then
+      result = _("Defeat !")
+      background = "graphics/screens/defeat.png"
+  else 
+      return
   end
-  menu:writeLargeText(result, sx, sy*3)
+
+  menu = BosMenu(_("Results"), background)
+  menu:writeLargeText(result, sx*6, sy*5)
   menu:run()
 end
 
