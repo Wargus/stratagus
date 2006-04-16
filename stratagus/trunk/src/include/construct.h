@@ -10,7 +10,7 @@
 //
 /**@name construct.h - The constructions headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -100,6 +100,10 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGraphic;
+class CPlayerColorGraphic;
+
+
 enum ConstructionFileType {
 	ConstructionFileConstruction,
 	ConstructionFileMain,
@@ -141,7 +145,7 @@ public:
 
 // --- FILLED UP ---
 
-	CGraphic *Sprite;       /// construction sprite image
+	CPlayerColorGraphic *Sprite;/// construction sprite image
 	int      Width;         /// sprite width
 	int      Height;        /// sprite height
 	CGraphic *ShadowSprite; /// construction shadow sprite image

@@ -10,7 +10,7 @@
 //
 /**@name unittype.h - The unit-types headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -524,7 +524,7 @@ class Mng;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CGraphic;
+class CPlayerColorGraphic;
 class CConstruction;
 class CAnimations;
 class MissileType;
@@ -551,12 +551,7 @@ public:
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
 		TerrainHarvester(0), LoseResources(0),
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
-	{
-#ifdef USE_OPENGL
-		memset(PlayerColorSpriteWhenLoaded, 0, sizeof(PlayerColorSpriteWhenLoaded));
-		memset(PlayerColorSpriteWhenEmpty, 0, sizeof(PlayerColorSpriteWhenEmpty));
-#endif
-	}
+	{}
 
 	char    *FileWhenLoaded;        /// Change the graphic when the unit is loaded.
 	char    *FileWhenEmpty;         /// Change the graphic when the unit is empty.
@@ -570,12 +565,8 @@ public:
 	unsigned TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
 	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
 	//  Runtime info:
-	CGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
-	CGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
-#ifdef USE_OPENGL
-	CGraphic *PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
-	CGraphic *PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
-#endif
+	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
+	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 };
 
 /**
@@ -1015,7 +1006,7 @@ public:
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player
 
-	CGraphic *Sprite;                /// Sprite images
+	CPlayerColorGraphic *Sprite;     /// Sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 };
 
@@ -1068,8 +1059,8 @@ extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 extern void SaveUnitTypes(CFile *file);            /// Save the unit-type table
 extern CUnitType *NewUnitTypeSlot(char *);            /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
-extern void DrawUnitType(const CUnitType *type, CGraphic *sprite, int player,
-	int frame, int x, int y);
+extern void DrawUnitType(const CUnitType *type, CPlayerColorGraphic *sprite,
+	int player, int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table
 extern void LoadUnitTypeSprite(CUnitType *unittype); /// Load the sprite for a unittype

@@ -1436,7 +1436,7 @@ void CUnit::Draw() const
 	int frame;
 	int state;
 	int constructed;
-	CGraphic *sprite;
+	CPlayerColorGraphic *sprite;
 	ResourceInfo *resinfo;
 	CConstructionFrame *cframe;
 	CUnitType *type;

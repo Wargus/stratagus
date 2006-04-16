@@ -10,7 +10,7 @@
 //
 /**@name unittype.cpp - The unit types. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -352,7 +352,7 @@ CUnitType *NewUnitTypeSlot(char *ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType *type, CGraphic *sprite, int player, int frame,
+void DrawUnitType(const CUnitType *type, CPlayerColorGraphic *sprite, int player, int frame,
 	int x, int y)
 {
 	// FIXME: move this calculation to high level.
@@ -449,7 +449,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 		for (i = 0; i < MaxCosts; ++i) {
 			if ((resinfo = type->ResInfo[i])) {
 				if (resinfo->FileWhenLoaded) {
-					resinfo->SpriteWhenLoaded = CGraphic::New(resinfo->FileWhenLoaded,
+					resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
 						type->Width, type->Height);
 					resinfo->SpriteWhenLoaded->Load();
 					if (type->Flip) {
@@ -457,7 +457,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 					}
 				}
 				if (resinfo->FileWhenEmpty) {
-					resinfo->SpriteWhenEmpty = CGraphic::New(resinfo->FileWhenEmpty,
+					resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
 						type->Width, type->Height);
 					resinfo->SpriteWhenEmpty->Load();
 					if (type->Flip) {
@@ -469,7 +469,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 	}
 
 	if (type->File) {
-		type->Sprite = CGraphic::New(type->File, type->Width, type->Height);
+		type->Sprite = CPlayerColorGraphic::New(type->File, type->Width, type->Height);
 		type->Sprite->Load();
 		if (type->Flip) {
 			type->Sprite->Flip();

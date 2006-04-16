@@ -10,7 +10,7 @@
 //
 /**@name graphic.cpp - The general graphic functions. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 1999-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -247,7 +247,6 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 #endif
 }
 
-
 /**
 **  Draw graphic object clipped and with player colors.
 **
@@ -256,7 +255,7 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
+void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	int x, int y)
 {
 #ifndef USE_OPENGL
@@ -448,7 +447,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
+void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 	int x, int y)
 {
 #ifndef USE_OPENGL
@@ -503,6 +502,42 @@ CGraphic *CGraphic::New(const char *file, int w, int h)
 }
 
 /**
+**  Make a new player color graphic object.
+**
+**  @param file  Filename
+**  @param w     Width of a frame (optional)
+**  @param h     Height of a frame (optional)
+**
+**  @return      New graphic object
+*/
+CPlayerColorGraphic *CPlayerColorGraphic::New(const char *file, int w, int h)
+{
+	if (!file) {
+		return new CPlayerColorGraphic;
+	}
+
+	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
+	if (!g) {
+		g = new CPlayerColorGraphic;
+		if (!g) {
+			fprintf(stderr, "Out of memory\n");
+			ExitFatal(-1);
+		}
+		// FIXME: use a constructor for this
+		g->File = new_strdup(file);
+		g->HashFile = new_strdup(g->File);
+		g->Width = w;
+		g->Height = h;
+		GraphicHash[g->HashFile] = g;
+	} else {
+		++g->Refs;
+		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
+	}
+
+	return g;
+}
+
+/**
 **  Make a new graphic object.  Don't reuse a graphic from the hash table.
 **
 **  @param file  Filename
@@ -514,6 +549,33 @@ CGraphic *CGraphic::New(const char *file, int w, int h)
 CGraphic *CGraphic::ForceNew(const char *file, int w, int h)
 {
 	CGraphic *g = new CGraphic;
+	if (!g) {
+		fprintf(stderr, "Out of memory\n");
+		ExitFatal(-1);
+	}
+	g->File = new_strdup(file);
+	g->HashFile = new char[strlen(file) + 2 * sizeof(g->File) + 3];
+	sprintf(g->HashFile, "%s%p", g->File, g->File);
+	g->Width = w;
+	g->Height = h;
+	GraphicHash[g->HashFile] = g;
+
+	return g;
+}
+
+/**
+**  Make a new player color graphic object.  Don't reuse a graphic from the
+**  hash table.
+**
+**  @param file  Filename
+**  @param w     Width of a frame (optional)
+**  @param h     Height of a frame (optional)
+**
+**  @return      New graphic object
+*/
+CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const char *file, int w, int h)
+{
+	CPlayerColorGraphic *g = new CPlayerColorGraphic;
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
@@ -594,9 +656,12 @@ void CGraphic::Free(CGraphic *g)
 			glDeleteTextures(g->NumTextures, g->Textures);
 			delete[] g->Textures;
 		}
-		for (i = 0; i < PlayerMax; ++i) {
-			if (g->PlayerColorTextures[i]) {
-				glDeleteTextures(g->NumTextures, g->PlayerColorTextures[i]);
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+		if (cg) {
+			for (i = 0; i < PlayerMax; ++i) {
+				if (cg->PlayerColorTextures[i]) {
+					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
+				}
 			}
 		}
 
@@ -915,7 +980,7 @@ void MakeTexture(CGraphic *g)
 **  @param g       The graphic to texture with player colors.
 **  @param player  Player number to make textures for.
 */
-void MakePlayerColorTexture(CGraphic *g, int player)
+void MakePlayerColorTexture(CPlayerColorGraphic *g, int player)
 {
 	if (g->PlayerColorTextures[player]) {
 		return;
