@@ -360,6 +360,9 @@ public:
 	/// Change player name
 	void SetName(const char *name);
 
+	/// Clear turn related player data
+	void Clear();
+
 	/// Set a resource of the player
 	void SetResource(int resource, int value);
 

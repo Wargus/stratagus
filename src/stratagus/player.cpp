@@ -109,8 +109,12 @@ void InitPlayers(void)
 */
 void CleanPlayers(void)
 {
+	int i;
+
 	ThisPlayer = NULL;
-	memset(Players, 0, sizeof(Players));
+	for (i = 0; i < PlayerMax; i++) {
+		Players[i].Clear();
+	}
 	NumPlayers = 0;
 
 	NoRescueCheck = 0;
@@ -473,6 +477,46 @@ void CPlayer::SetSide(int side)
 void CPlayer::SetName(const char *name)
 {
 	strncpy(Name,name, sizeof(Name)-1);
+}
+
+/**
+**  Clear all player data excepts members which don't change.
+**
+**  The fields that are not cleared are 
+**  UnitLimit, BuildingLimit, TotalUnitLimit and Allow.
+*/
+void CPlayer::Clear() 
+{
+	Index = 0;
+	memset(Name, 0, sizeof(Name));
+	Type = 0;
+	Race = 0;
+	memset(AiName, 0, sizeof(AiName));
+	Team = 0;
+	Enemy = 0;
+	Allied = 0;
+	SharedVision = 0;
+	StartX = 0;
+	StartY = 0;
+	memset(Resources, 0, sizeof(Name));
+	memset(LastResources, 0, sizeof(Name));
+	memset(Incomes, 0, sizeof(Name));
+	memset(Revenue, 0, sizeof(Name));
+	memset(UnitTypesCount, 0, sizeof(Name));
+	AiEnabled = 0;
+	Ai = 0;
+	memset(Units, 0, sizeof(Units));
+	TotalNumUnits = 0;
+	NumBuildings = 0;
+	Supply = 0;
+	Demand = 0;
+	Score = 0;
+	TotalUnits = 0;
+	TotalBuildings = 0;
+	memset(TotalResources, 0, sizeof(TotalResources));
+	TotalRazings = 0;
+	TotalKills = 0;
+	memset(&UpgradeTimers, 0, sizeof(UpgradeTimers));
 }
 
 /*----------------------------------------------------------------------------
