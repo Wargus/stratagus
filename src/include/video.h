@@ -382,7 +382,7 @@ extern int LoadGraphicPNG(CGraphic *g);
 	/// Make an OpenGL texture
 extern void MakeTexture(CGraphic *graphic);
 	/// Make an OpenGL texture of the player color pixels only.
-extern void MakePlayerColorTexture(CGraphic *graphic, int player);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 #endif
 
 #ifdef USE_OPENGL
