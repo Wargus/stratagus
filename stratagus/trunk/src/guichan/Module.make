@@ -5,12 +5,12 @@
 ##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 ##             \/                  \/          \//_____/            \/ 
 ##  ______________________                           ______________________
-##			  T H E   W A R   B E G I N S
-##	   Stratagus - A free fantasy real time strategy game engine
+##                        T H E   W A R   B E G I N S
+##         Stratagus - A free fantasy real time strategy game engine
 ##
-##	Module.make	-	Module Makefile (included from Makefile).
+##      Module.make - Module Makefile (included from Makefile).
 ##
-##	(c) Copyright 2004 by The Stratagus Team
+##      (c) Copyright 2004-2006 by The Stratagus Team
 ##
 ##      This program is free software; you can redistribute it and/or modify
 ##      it under the terms of the GNU General Public License as published by
@@ -86,9 +86,6 @@ include/guichan/keylistener.h \
 include/guichan/listmodel.h \
 include/guichan/mouseinput.h \
 include/guichan/mouselistener.h \
-include/guichan/opengl/openglgraphics.h \
-include/guichan/opengl/openglimageloader.h \
-include/guichan/opengl.h \
 include/guichan/platform.h \
 include/guichan/rectangle.h \
 include/guichan/sdl/sdlgraphics.h \
