@@ -264,9 +264,10 @@ class StatBoxWidget : public Widget
 public:
 	StatBoxWidget(int width, int height);
 
-public:
-	tolua_property__s std::string caption;
-	tolua_property__s unsigned int percent; /// percent value of the widget.
+	void setCaption(const std::string &s);
+	const std::string &getCaption() const;
+	void setPercent(const int percent);
+	int getPercent() const;
 };
 
 class Container
