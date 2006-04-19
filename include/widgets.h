@@ -10,7 +10,7 @@
 //
 /**@name widgets.h - The widgets headerfile. */
 //
-//      (c) Copyright 2005 by François Beerten and Jimmy Salmon
+//      (c) Copyright 2005-2006 by François Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ public:
 };
 
 #ifdef USE_OPENGL
-class MyOpenGLGraphics : public gcn::OpenGLGraphics
+class MyOpenGLGraphics : public gcn::Graphics
 {
 public:
 	virtual void drawImage(const gcn::Image *image, int srcX, int srcY,
@@ -69,6 +69,12 @@ public:
 	virtual void drawLine(int x1, int y1, int x2, int y2);
 	virtual void drawRectangle(const gcn::Rectangle &rectangle);
 	virtual void fillRectangle(const gcn::Rectangle &rectangle);
+
+	virtual void setColor(const gcn::Color& color) { mColor = color; }
+	virtual const gcn::Color& getColor() { return mColor; }
+
+private:
+	gcn::Color mColor;
 };
 #endif
 

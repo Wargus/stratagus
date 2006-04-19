@@ -711,11 +711,14 @@ void ReloadGraphics(void)
 			(*i)->Textures = NULL;
 			MakeTexture(*i);
 		}
-		for (int j = 0; j < PlayerMax; ++j) {
-			if ((*i)->PlayerColorTextures[j]) {
-				delete[] (*i)->PlayerColorTextures[j];
-				(*i)->PlayerColorTextures[j] = NULL;
-				MakePlayerColorTexture(*i, j);
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
+		if (cg) {
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (cg->PlayerColorTextures[j]) {
+					delete[] cg->PlayerColorTextures[j];
+					cg->PlayerColorTextures[j] = NULL;
+					MakePlayerColorTexture(cg, j);
+				}
 			}
 		}
 	}
@@ -945,12 +948,13 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 	if (g->NumTextures > 1) {
 		tw = tw;
 	}
-	if (!colors) {
+	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+	if (!colors || !cg) {
 		textures = g->Textures = new GLuint[g->NumTextures];
 		glGenTextures(g->NumTextures, g->Textures);
 	} else {
-		textures = g->PlayerColorTextures[player] = new GLuint[g->NumTextures];
-		glGenTextures(g->NumTextures, g->PlayerColorTextures[player]);
+		textures = cg->PlayerColorTextures[player] = new GLuint[cg->NumTextures];
+		glGenTextures(cg->NumTextures, cg->PlayerColorTextures[player]);
 	}
 
 	for (int j = 0; j < th; ++j) {
