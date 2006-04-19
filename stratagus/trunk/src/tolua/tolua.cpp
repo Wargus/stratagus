@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Apr 16 09:04:31 2006.
+** Generated automatically by tolua++-1.0.7 on Wed Apr 19 12:50:06 2006.
 */
 
 #ifndef __cplusplus
@@ -5537,65 +5537,134 @@ static int tolua_stratagus_StatBoxWidget_new00_local(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: caption of class  StatBoxWidget */
-#ifndef TOLUA_DISABLE_tolua_get_StatBoxWidget_caption
-static int tolua_get_StatBoxWidget_caption(lua_State* tolua_S)
+/* method: setCaption of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StatBoxWidget_setCaption00
+static int tolua_stratagus_StatBoxWidget_setCaption00(lua_State* tolua_S)
 {
-  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'caption'",NULL);
-#endif
- tolua_pushcppstring(tolua_S,(const char*)self->Getcaption());
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: caption of class  StatBoxWidget */
-#ifndef TOLUA_DISABLE_tolua_set_StatBoxWidget_caption
-static int tolua_set_StatBoxWidget_caption(lua_State* tolua_S)
-{
-  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'caption'",NULL);
- if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+ if (
+ !tolua_isusertype(tolua_S,1,"StatBoxWidget",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
 #endif
-  self->Setcaption(((std::string)  tolua_tocppstring(tolua_S,2,0))
-)
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: percent of class  StatBoxWidget */
-#ifndef TOLUA_DISABLE_tolua_get_StatBoxWidget_unsigned_percent
-static int tolua_get_StatBoxWidget_unsigned_percent(lua_State* tolua_S)
-{
+ {
   StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+  const std::string s = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'percent'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCaption'",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->Getpercent());
+ {
+  self->setCaption(s);
+ tolua_pushcppstring(tolua_S,(const char*)s);
+ }
+ }
  return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: percent of class  StatBoxWidget */
-#ifndef TOLUA_DISABLE_tolua_set_StatBoxWidget_unsigned_percent
-static int tolua_set_StatBoxWidget_unsigned_percent(lua_State* tolua_S)
+/* method: getCaption of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StatBoxWidget_getCaption00
+static int tolua_stratagus_StatBoxWidget_getCaption00(lua_State* tolua_S)
 {
-  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'percent'",NULL);
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+ if (
+ !tolua_isusertype(tolua_S,1,"const StatBoxWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
 #endif
-  self->Setpercent((( unsigned int)  tolua_tonumber(tolua_S,2,0))
-)
-;
+ {
+  const StatBoxWidget* self = (const StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getCaption'",NULL);
+#endif
+ {
+  const std::string tolua_ret = (const std::string)  self->getCaption();
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getCaption'.",&tolua_err);
  return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setPercent of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StatBoxWidget_setPercent00
+static int tolua_stratagus_StatBoxWidget_setPercent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"StatBoxWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  StatBoxWidget* self = (StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+  const int percent = ((const int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setPercent'",NULL);
+#endif
+ {
+  self->setPercent(percent);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setPercent'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getPercent of class  StatBoxWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StatBoxWidget_getPercent00
+static int tolua_stratagus_StatBoxWidget_getPercent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const StatBoxWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const StatBoxWidget* self = (const StatBoxWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getPercent'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getPercent();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getPercent'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -9743,8 +9812,10 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_StatBoxWidget_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_StatBoxWidget_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_StatBoxWidget_new00_local);
-  tolua_variable(tolua_S,"caption",tolua_get_StatBoxWidget_caption,tolua_set_StatBoxWidget_caption);
-  tolua_variable(tolua_S,"percent",tolua_get_StatBoxWidget_unsigned_percent,tolua_set_StatBoxWidget_unsigned_percent);
+  tolua_function(tolua_S,"setCaption",tolua_stratagus_StatBoxWidget_setCaption00);
+  tolua_function(tolua_S,"getCaption",tolua_stratagus_StatBoxWidget_getCaption00);
+  tolua_function(tolua_S,"setPercent",tolua_stratagus_StatBoxWidget_setPercent00);
+  tolua_function(tolua_S,"getPercent",tolua_stratagus_StatBoxWidget_getPercent00);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"Container","Container","",NULL);
  tolua_beginmodule(tolua_S,"Container");

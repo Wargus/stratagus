@@ -257,10 +257,10 @@ public:
 	StatBoxWidget(int width, int height);
 
 	virtual void draw(gcn::Graphics *graphics);
-	void Setcaption(const std::string&s);
-	const std::string& Getcaption() const;
-	void Setpercent(const int percent);
-	int Getpercent() const;
+	void setCaption(const std::string &s);
+	const std::string &getCaption() const;
+	void setPercent(const int percent);
+	int getPercent() const;
 
 private:
 	int width;            /// width of the widget.

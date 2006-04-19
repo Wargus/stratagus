@@ -1136,8 +1136,8 @@ void StatBoxWidget::draw(gcn::Graphics *graphics)
 	width = percent * width / 100;
 	graphics->fillRectangle(gcn::Rectangle(2, 2, width - 4, height - 4));
 	graphics->setFont(getFont());
-	graphics->drawText(Getcaption(),
-						(getWidth() - getFont()->getWidth(Getcaption())) / 2,
+	graphics->drawText(getCaption(),
+						(getWidth() - getFont()->getWidth(getCaption())) / 2,
 						(height - getFont()->getHeight()) / 2);
 }
 
@@ -1146,7 +1146,7 @@ void StatBoxWidget::draw(gcn::Graphics *graphics)
 **
 **  @param caption  New value.
 */
-void StatBoxWidget::Setcaption(const std::string&caption)
+void StatBoxWidget::setCaption(const std::string &caption)
 {
 	this->caption = caption;
 }
@@ -1155,7 +1155,7 @@ void StatBoxWidget::Setcaption(const std::string&caption)
 **  Get caption of StatBoxWidget.
 */
 
-const std::string& StatBoxWidget::Getcaption() const
+const std::string &StatBoxWidget::getCaption() const
 {
 	return caption;
 }
@@ -1165,7 +1165,7 @@ const std::string& StatBoxWidget::Getcaption() const
 **
 **  @param percent  New value.
 */
-void StatBoxWidget::Setpercent(const int percent)
+void StatBoxWidget::setPercent(const int percent)
 {
 	this->percent = percent;
 }
@@ -1173,7 +1173,7 @@ void StatBoxWidget::Setpercent(const int percent)
 /**
 **  Get percent of StatBoxWidget.
 */
-int StatBoxWidget::Getpercent() const
+int StatBoxWidget::getPercent() const
 {
 	return percent;
 }
