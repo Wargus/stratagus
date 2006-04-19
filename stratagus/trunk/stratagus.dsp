@@ -257,22 +257,6 @@ SOURCE=.\src\game\trigger.cpp
 # Begin Group "guichan"
 
 # PROP Default_Filter ""
-# Begin Group "opengl"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\guichan\opengl\opengl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\guichan\opengl\openglgraphics.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\guichan\opengl\openglimageloader.cpp
-# End Source File
-# End Group
 # Begin Group "sdl"
 
 # PROP Default_Filter ""
@@ -966,18 +950,6 @@ SOURCE=.\src\include\widgets.h
 # Begin Group "guichan."
 
 # PROP Default_Filter ""
-# Begin Group "opengl."
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\guichan\include\guichan\opengl\openglgraphics.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\guichan\include\guichan\opengl\openglimageloader.h
-# End Source File
-# End Group
 # Begin Group "sdl."
 
 # PROP Default_Filter ""
