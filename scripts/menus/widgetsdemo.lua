@@ -82,8 +82,8 @@ function RunWidgetsMenu(s)
   menu:add(b, 20, 250)
 
   local sb = StatBoxWidget(200, 20)
-  sb.caption = "progress"
-  sb.percent = 45
+  sb:setCaption("progress")
+  sb:setPercent(45)
   menu:add(sb, 20, 300)
   sb:setBackgroundColor(dark)
 

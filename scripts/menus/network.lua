@@ -180,8 +180,8 @@ function RunJoiningGameMenu(s)
   menu = BosMenu(_("Joining game"))
 
   local sb = StatBoxWidget(300, 30)
-  sb.caption = "Connecting ..."
-  sb.percent = 0
+  sb:setCaption("Connecting ...")
+  sb:setPercent(0)
   menu:add(sb, x-50, Video.Height/2)
   sb:setBackgroundColor(dark)
 
