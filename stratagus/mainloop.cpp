@@ -10,7 +10,7 @@
 //
 /**@name mainloop.cpp - The main game loop. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -310,8 +310,6 @@ void GameMainLoop(void)
 
 	MultiPlayerReplayEachCycle();
 
-	PlaySectionMusic(PlaySectionGame);
-
 	while (GameRunning) {
 
 		// Can't find a better place.
@@ -369,18 +367,6 @@ void GameMainLoop(void)
 					if (player < NumPlayers) {
 						PlayersEachSecond(player);
 					}
-			}
-
-			//
-			// Work todo each realtime second.
-			// FIXME: Not called while pause or in the user interface.
-			//
-			switch (GameCycle % ((CYCLES_PER_SECOND * VideoSyncSpeed / 100) + 1)) {
-				case 10:
-					if (!(GameCycle % 2)) {
-						PlaySectionMusic(PlaySectionUnknown);
-					}
-					break;
 			}
 		}
 
@@ -457,7 +443,6 @@ void GameMainLoop(void)
 		}
 
 		if (GameResult == GameVictory || GameResult == GameDefeat) {
-			PlaySectionMusic(PlaySectionStats);
 			ShowStats();
 		}
 	}

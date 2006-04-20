@@ -10,7 +10,7 @@
 //
 /**@name sound.h - The sound header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -77,33 +77,6 @@ public:
 	SoundConfig Rescue[MAX_RACES];  /// rescue units
 };
 
-enum PlaySectionType {
-	PlaySectionUnknown = -1,  /// Unknown
-	PlaySectionGame,          /// Game
-	PlaySectionBriefing,      /// Briefing
-	PlaySectionStats,         /// Stats
-	PlaySectionStatsVictory,  /// Stats Victory
-	PlaySectionStatsDefeat,   /// Stats Defeat
-	PlaySectionMainMenu,      /// Main menu
-};
-
-enum PlaySectionOrder {
-	PlaySectionOrderAll,     /// Sequential order
-	PlaySectionOrderRandom,  /// Random order
-};
-
-class PlaySection {
-public:
-	PlaySection() : Race(NULL), Type(PlaySectionUnknown),
-		Files(NULL), FileOrder(PlaySectionOrderAll) {}
-
-	char            *Race;       /// Race, NULL if for all races
-	PlaySectionType  Type;       /// Type
-	char           **Files;      /// Files
-	PlaySectionOrder FileOrder;  /// File order
-};
-
-
 /**
 **  Sound definition.
 */
@@ -161,8 +134,6 @@ extern GameSound GameSounds;  /// Game sound configuration
 
 extern bool CallbackMusic;  /// flag true callback ccl if stops
 
-extern std::vector<PlaySection> PlaySections;  /// Play sections
-
 	/// global range control (max cut off distance for sound)
 extern int DistanceSilent;
 
@@ -196,9 +167,6 @@ extern void InitSoundClient(void);
 
 	/// Check if music is finished and play the next song
 extern void CheckMusicFinished(bool force = false);
-
-	/// Play a music section
-extern void PlaySectionMusic(PlaySectionType section);
 
 	/// Initialize music
 extern void InitMusic(void);

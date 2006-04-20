@@ -519,7 +519,6 @@ void MenuLoop(const char *filename, CMap *map)
 					strcmp(CurrentMusicFile, MenuMusic)) {
 				StopMusic();
 			}
-			PlaySectionMusic(PlaySectionMainMenu);
 
 			if (!IsMusicPlaying() && MenuMusic) {
 				PlayMusic(MenuMusic);
@@ -581,7 +580,6 @@ void MenuLoop(const char *filename, CMap *map)
 
 		// Reload the main config file
 		LoadCcl();
-		PlaySectionMusic(PlaySectionMainMenu);
 
 		PreMenuSetup();
 

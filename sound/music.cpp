@@ -10,7 +10,7 @@
 //
 /**@name music.cpp - Background music support */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 2002-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -61,9 +61,6 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<PlaySection> PlaySections;    /// Play Sections
-static PlaySectionType CurrentPlaySection;/// Current Play Section
-
 static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
 static bool MusicFinished;                /// Music ended and we need a new file
 
@@ -104,60 +101,6 @@ void CheckMusicFinished(bool force)
 			StopMusic();
 		} else {
 			LuaCall(0, 1);
-		}
-	}
-}
-
-/**
-**  FIXME: docu
-*/
-void PlaySectionMusic(PlaySectionType section)
-{
-	int i;
-	int j;
-	int found;
-	int numfiles;
-
-	if (PlaySections.empty()) {
-		return;
-	}
-
-	if (section == PlaySectionUnknown) {
-		section = CurrentPlaySection;
-	}
-
-	if (section == PlaySectionStats) {
-		if (GameResult == GameVictory) {
-			section = PlaySectionStatsVictory;
-		} else {
-			section = PlaySectionStatsDefeat;
-		}
-	}
-
-	for (i = 0; i < (int)PlaySections.size(); ++i) {
-		if (PlaySections[i].Type == section && (!PlaySections[i].Race ||
-				!(strcmp(PlaySections[i].Race, PlayerRaces.Name[ThisPlayer->Race])))) {
-			break;
-		}
-	}
-	CurrentPlaySection = PlaySections[i].Type;
-
-	if (PlaySections[i].Files) {
-		found = 0;
-		numfiles = 0;
-		for (j = 0; PlaySections[i].Files[j] && !found; ++j) {
-			if (!strcmp(PlaySections[i].Files[j], CurrentMusicFile)) {
-				found = 1;
-				++numfiles;
-			}
-		}
-		if (found) {
-			if (PlaySections[i].FileOrder == PlaySectionOrderAll) {
-				PlayMusic(PlaySections[i].Files[0]);
-			} else if (PlaySections[i].FileOrder == PlaySectionOrderRandom) {
-				j = MyRand() % numfiles;
-				PlayMusic(PlaySections[i].Files[j]);
-			}
 		}
 	}
 }
