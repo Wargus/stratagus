@@ -10,7 +10,7 @@
 //
 /**@name script_sound.cpp - The sound ccl functions. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
+//      (c) Copyright 1999-2006 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -316,95 +316,6 @@ static int CclDefineGameSounds(lua_State *l)
 }
 
 /**
-**  Define play sections
-**
-**  @param l  Lua state.
-*/
-static int CclDefinePlaySections(lua_State *l)
-{
-	const char *value;
-	PlaySection *p;
-	int args;
-	int j;
-	int subargs;
-	int k;
-	PlaySection s;
-
-	// FIXME: PlaySections is never cleared!
-	PlaySections.push_back(s);
-	p = &PlaySections.back();
-
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		++j;
-		if (!strcmp(value, "race")) {
-			p->Race = new_strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "type")) {
-			value = LuaToString(l, j + 1);
-			if (!strcmp(value, "game")) {
-				p->Type = PlaySectionGame;
-			} else if (!strcmp(value, "briefing")) {
-				p->Type = PlaySectionBriefing;
-			} else if (!strcmp(value, "stats-victory")) {
-				p->Type = PlaySectionStatsVictory;
-			} else if (!strcmp(value, "stats-defeat")) {
-				p->Type = PlaySectionStatsDefeat;
-			} else if (!strcmp(value, "main-menu")) {
-				p->Type = PlaySectionMainMenu;
-			} else {
-				LuaError(l, "Unsupported tag: %s" _C_ value);
-			}
-		} else if (!strcmp(value, "no-cd")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				if (!strcmp(value, "order")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					value = LuaToString(l, -1);
-					lua_pop(l, 1);
-					if (!strcmp(value, "all")) {
-						p->FileOrder = PlaySectionOrderAll;
-					} else if (!strcmp(value, "random")) {
-						p->FileOrder = PlaySectionOrderRandom;
-					} else {
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				} else if (!strcmp(value, "files")) {
-					int subsubargs;
-					int subk;
-
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					subsubargs = luaL_getn(l, -1);
-					p->Files = new char *[subsubargs + 1];
-					p->Files[subsubargs] = NULL;
-					for (subk = 0; subk < subsubargs; ++subk) {
-						lua_rawgeti(l, -1, subk + 1);
-						p->Files[subk] = new_strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-					}
-					lua_pop(l, 1);
-				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	return 0;
-}
-
-/**
 **  Set the cut off distance.
 **
 **  @param l  Lua state.
@@ -475,8 +386,6 @@ static int CclPlayFile(lua_State *l)
 */
 void SoundCclRegister(void)
 {
-	lua_register(Lua, "DefinePlaySections", CclDefinePlaySections);
-
 	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
 	lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
 	lua_register(Lua, "MapSound", CclMapSound);
