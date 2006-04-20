@@ -10,7 +10,7 @@
 //
 /**@name menu_proc.cpp - The menu processing code. */
 //
-//      (c) Copyright 1999-2005 by Andreas Arens, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2006 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -2586,9 +2586,6 @@ void ProcessMenu(const char *menu_id, int loop)
 	if (loop) {
 		while (CurrentMenu != NULL) {
 			CheckMusicFinished();
-			if (!(FrameCounter % ((VideoSyncSpeed * CYCLES_PER_SECOND) / 50))) {
-				PlaySectionMusic(PlaySectionUnknown);
-			}
 
 			InterfaceState = IfaceStateNormal;
 			UpdateDisplay();
