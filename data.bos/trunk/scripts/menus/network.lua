@@ -187,7 +187,7 @@ function RunJoiningGameMenu(s)
 
   local function checkconnection() 
       NetworkProcessClientRequest()
-      sb.percent = sb.percent + 1 
+      sb:setPercent(sb:getPercent() + 1) 
       if GetNetworkState() == 3 then
            -- got ICMMap => load map
            RunJoiningMapMenu()
