@@ -10,7 +10,7 @@
 //
 /**@name map_radar.cpp - The map radar handling. */
 //
-//      (c) Copyright 2004-2005 by Russell Smith.
+//      (c) Copyright 2004-2006 by Russell Smith and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -58,26 +58,26 @@
 **  @param pradar  Player to who has radar.
 **  @param punit   Unit to check for.
 **
-**  @return        0 jammed or not radar visible, >0 radar visible.
+**  @return        true if radar visible, false if jammed or not radar visible.
 */
-unsigned char UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit)
+bool UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit)
 {
 	for (int i = punit->X; i < punit->X + punit->Type->TileWidth; ++i) {
 		for (int j = punit->Y; j < punit->Y + punit->Type->TileHeight; ++j) {
 			if (IsTileRadarVisible(pradar, punit->Player, i, j) != 0) {
-				return 1;
+				return true;
 			}
 		}
 	}
 
 	// Can't exit till the end, as we might be be able to see a different tile
-	return 0;
+	return false;
 }
 
 /**
 **  Find out if a unit is visible under radar (By player, or by shared vision)
 **
-**  @param pradar  Player to who has radar.
+**  @param pradar  Player who has radar.
 **  @param punit   Player who is being check.
 **  @param x       x tile location to check.
 **  @param y       y tile location to check.
@@ -86,7 +86,6 @@ unsigned char UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit)
 */
 unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y)
 {
-	int i;
 	unsigned char radarvision;
 	unsigned char *radar;
 	unsigned char *jamming;
@@ -104,7 +103,7 @@ unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, in
 	}
 
 	// Check jamming first, if we are jammed, exit
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (jamming[i] > 0 && (punit->SharedVision & (1 << i)) &&
 				(Players[i].SharedVision & (1 << punit->Index))) {
 			// We are jammed, return nothing

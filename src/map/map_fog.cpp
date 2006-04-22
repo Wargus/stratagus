@@ -10,7 +10,7 @@
 //
 /**@name map_fog.cpp - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Vladi Shabanski,
+//      (c) Copyright 1999-2006 by Lutz Sammer, Vladi Shabanski,
 //                                 Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -71,7 +71,7 @@ static const int FogTable[16] = {
 unsigned char *VisionTable[3];
 int *VisionLookup;
 
-static unsigned char *VisibleTable;
+static unsigned short *VisibleTable;
 
 #ifndef USE_OPENGL
 static SDL_Surface *OnlyFogSurface;
@@ -131,11 +131,11 @@ static int LookupSight(const CPlayer *player, int tx, int ty)
 **
 **  @return        0 unexplored, 1 explored, > 1 visible.
 */
-unsigned char CMap::IsTileVisible(const CPlayer *player, int x, int y) const
+unsigned short CMap::IsTileVisible(const CPlayer *player, int x, int y) const
 {
 	int i;
-	unsigned char visiontype;
-	unsigned char *visible;
+	unsigned short visiontype;
+	unsigned short *visible;
 
 	visible = this->Fields[y * this->Info.MapWidth + x].Visible;
 	visiontype = visible[player->Index];
@@ -208,32 +208,25 @@ int MapFogFilterFlags(CPlayer *player, int x, int y, int mask)
 */
 void MapMarkTileSight(const CPlayer *player, int x, int y)
 {
-	unsigned char v;
-
 	Assert(0 <= x && x < Map.Info.MapWidth);
 	Assert(0 <= y && y < Map.Info.MapHeight);
-	v = Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index];
-	switch (v) {
-		case 0:  // Unexplored
-		case 1:  // Unseen
-			// When there is NoFogOfWar only unexplored tiles are marked.
-			if (!Map.NoFogOfWar || v == 0) {
-				UnitsOnTileMarkSeen(player, x, y, 0);
-			}
-			v = 2;
-			Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index] = v;
-			if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
-				Map.MarkSeenTile(x, y);
-			}
-			return;
-		case 255:  // Overflow
-			DebugPrint("Visible overflow (Player): %d\n" _C_ player->Index);
-			break;
-		default:  // seen -> seen
-			++v;
-			break;
+
+	unsigned short *v;
+
+	v = &Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index];
+	if (*v == 0 || *v == 1) { // Unexplored or unseen
+		// When there is no fog only unexplored tiles are marked.
+		if (!Map.NoFogOfWar || *v == 0) {
+			UnitsOnTileMarkSeen(player, x, y, 0);
+		}
+		*v = 2;
+		if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
+			Map.MarkSeenTile(x, y);
+		}
+		return;
 	}
-	Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index] = v;
+	Assert(*v != 65535);
+	++*v;
 }
 
 /**
@@ -245,18 +238,13 @@ void MapMarkTileSight(const CPlayer *player, int x, int y)
 */
 void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 {
-	unsigned char v;
-
 	Assert(0 <= x && x < Map.Info.MapWidth);
 	Assert(0 <= y && y < Map.Info.MapHeight);
-	v = Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index];
-	switch (v) {
-		case 255:
-			// FIXME: (mr-russ) Lookupsight is broken :(
-			Assert(0);
-			v = LookupSight(player, x, y);
-			Assert(v >= 254);
-			break;
+
+	unsigned short *v;
+
+	v = &Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index];
+	switch (*v) {
 		case 0:  // Unexplored
 		case 1:
 			// We are at minimum, don't do anything shouldn't happen.
@@ -272,50 +260,47 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 				Map.MarkSeenTile(x, y);
 			}
 		default:  // seen -> seen
-			v--;
+			--*v;
 			break;
 	}
-	Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index] = v;
 }
 
 /**
-** Mark a tile for cloak detection.
+**  Mark a tile for cloak detection.
 **
-** @param player  Player to mark sight.
-** @param x       X tile to mark.
-** @param y       Y tile to mark.
+**  @param player  Player to mark sight.
+**  @param x       X tile to mark.
+**  @param y       Y tile to mark.
 */
 void MapMarkTileDetectCloak(const CPlayer *player, int x, int y)
 {
-	unsigned char v;
+	unsigned char *v;
 
-	v = Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index];
-	if (v == 0) {
+	v = &Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index];
+	if (*v == 0) {
 		UnitsOnTileMarkSeen(player, x, y, 1);
 	}
-	Assert(v != 255);
-	++v;
-	Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index] = v;
+	Assert(*v != 255);
+	++*v;
 }
 
 /**
-** Unmark a tile for cloak detection.
+**  Unmark a tile for cloak detection.
 **
-** @param player  Player to mark sight.
-** @param x       X tile to mark.
-** @param y       Y tile to mark.
+**  @param player  Player to mark sight.
+**  @param x       X tile to mark.
+**  @param y       Y tile to mark.
 */
 void MapUnmarkTileDetectCloak(const CPlayer *player, int x, int y)
 {
-	unsigned char v;
+	unsigned char *v;
 
-	v = Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index];
-	Assert(v != 0);
-	if (v == 1) {
+	v = &Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index];
+	Assert(*v != 0);
+	if (*v == 1) {
 		UnitsOnTileUnmarkSeen(player, x, y, 1);
 	}
-	--v;
-	Map.Fields[x + y * Map.Info.MapWidth].VisCloak[player->Index] = v;
+	--*v;
 }
 
 /**
@@ -778,7 +763,7 @@ void CMap::InitFogOfWar(void)
 	AlphaFogG->NumFrames = 1;
 #endif
 
-	VisibleTable = new unsigned char[Info.MapWidth * Info.MapHeight];
+	VisibleTable = new unsigned short[Info.MapWidth * Info.MapHeight];
 }
 
 /**
@@ -888,7 +873,7 @@ void InitVisionTable(void)
 					break;
 				}
 
-			   // search rigth
+			   // search right
 			   // search up - store as down.
 			   // search diagonal
 			}  while (direction && marker > (maxsize * 2));
