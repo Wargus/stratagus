@@ -10,7 +10,7 @@
 //
 /**@name map.h - The map headerfile. */
 //
-//      (c) Copyright 1998-2005 by Vladi Shabanski, Lutz Sammer, and
+//      (c) Copyright 1998-2006 by Vladi Shabanski, Lutz Sammer, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -187,14 +187,8 @@ class CUnitType;
 --  Map
 ----------------------------------------------------------------------------*/
 
-// JOHNS: only limited by computer memory
-//            OLD    NEW Code
-// 512x512:     2 MB   3 MB
-// 1024x1024:   8 MB  12 MB
-// 2048*2048:  32 MB  48 MB
-// 4096*4096: 128 MB 192 MB
-#define MaxMapWidth  256  ///  maximal map width supported
-#define MaxMapHeight 256  /// maximal map height supported
+#define MaxMapWidth  256  /// max map width supported
+#define MaxMapHeight 256  /// max map height supported
 
 /*----------------------------------------------------------------------------
 --  Map - field
@@ -215,13 +209,13 @@ public:
 	unsigned short Tile;      /// graphic tile number
 	unsigned short SeenTile;  /// last seen tile (FOW)
 	unsigned short Flags;     /// field flags
-	unsigned char Cost; /// Unit cost to move in this tile
+	unsigned char Cost;       /// unit cost to move in this tile
 	// FIXME: Value can be removed, walls and regeneration can be handled
 	//        different.
-	unsigned char Value;               /// HP for walls/ Wood Regeneration
-	unsigned char Visible[PlayerMax];  /// Seen counter 0 unexplored
-	unsigned char VisCloak[PlayerMax]; /// Visiblity for cloaking.
-	unsigned char Radar[PlayerMax];    /// Visiblity for radar.
+	unsigned char Value;                  /// HP for walls/ Wood Regeneration
+	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
+	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
+	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
 	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
 };
@@ -284,18 +278,18 @@ public:
 	void ClearTile(unsigned short type, unsigned x, unsigned y);
 
 	/// Find if a tile is visible (with shared vision).
-	unsigned char IsTileVisible(const CPlayer *player, int x, int y) const;
+	unsigned short IsTileVisible(const CPlayer *player, int x, int y) const;
 
 	/// Check if a field for the user is explored.
 	bool IsFieldExplored(const CPlayer *player, int x, int y) const
 	{
 		return IsTileVisible(player, x, y) > 0;
-	};
+	}
 	/// Check if a field for the user is visible.
 	bool IsFieldVisible(const CPlayer *player, int x, int y) const
 	{
 		return IsTileVisible(player, x, y) > 1;
-	};
+	}
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(int x, int y);
 
@@ -430,7 +424,7 @@ extern void FreeVisionTable(void);
 //
 
 	/// Check if a unit is visible on radar
-extern unsigned char UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit);
+extern bool UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit);
 	/// Check if a tile is visible on radar
 extern unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y);
 	/// Mark a tile as radar visible, or incrase radar vision
