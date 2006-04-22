@@ -10,7 +10,7 @@
 //
 /**@name network.h - The network header file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Russell Smith
+//      (c) Copyright 1998-2006 by Lutz Sammer, Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -124,23 +124,23 @@ typedef struct _ack_message_ {
 /**
 **  Network command message.
 */
-typedef struct _network_command_ {
-	UnitRef        Unit;  /// Command for unit
+struct NetworkCommand {
+	UnitRef Unit;         /// Command for unit
 	unsigned short X;     /// Map position X
 	unsigned short Y;     /// Map position Y
-	UnitRef        Dest;  /// Destination unit
-} NetworkCommand;
+	UnitRef Dest;         /// Destination unit
+};
 
 /**
 **  Extended network command message.
 */
-typedef struct _network_extended_command_ {
+struct NetworkExtendedCommand {
 	unsigned char  ExtendedType;  /// Extended network command type
 	unsigned char  Arg1;          /// Argument 1
 	unsigned short Arg2;          /// Argument 2
 	unsigned short Arg3;          /// Argument 3
 	unsigned short Arg4;          /// Argument 4
-} NetworkExtendedCommand;
+};
 
 /**
 **  Network chat message.
@@ -154,7 +154,7 @@ typedef struct _network_chat_ {
 **  Network Selection Info
 */
 typedef struct _network_selection_header_ {
-	unsigned NumberSent : 6;  /// New Number Selected
+	unsigned NumberSent : 6;   /// New Number Selected
 	unsigned Add : 1;          /// Adding to Selection
 	unsigned Remove : 1;       /// Removing from Selection
 	unsigned char Type[MaxNetworkCommands];  /// Command
@@ -181,11 +181,10 @@ typedef struct _network_packet_header_ {
 **  Network packet.
 **
 **  This is sent over the network.
-**
 */
 typedef struct _network_packet_ {
 	NetworkPacketHeader Header;  /// Packet Header Info
-	NetworkCommand      Command[MaxNetworkCommands];
+	NetworkCommand Command[MaxNetworkCommands];
 } NetworkPacket;
 
 /*----------------------------------------------------------------------------
@@ -199,6 +198,7 @@ extern int NetworkUpdates;        /// Network update each # game cycles
 extern int NetworkLag;            /// Network lag (# game cycles)
 extern unsigned long NetworkStatus[PlayerMax];  /// Network status
 extern int NoRandomPlacementMultiplayer;        /// Removes randomization of player placements
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -214,8 +214,7 @@ extern void NetworkCommands(void);  /// Get all network commands
 extern void NetworkChatMessage(const char *msg);  /// Send chat message
 	/// Send network command.
 extern void NetworkSendCommand(int command, const CUnit *unit, int x,
-	int y, const CUnit *dest, const CUnitType *type,
-	int status);
+	int y, const CUnit *dest, const CUnitType *type, int status);
 	/// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 	int arg3, int arg4, int status);
@@ -226,70 +225,3 @@ extern void NetworkCclRegister(void);
 //@}
 
 #endif // !__NETWORK_H__
-
-/**
-**  @author Copyright by Edgar Toernig.
-**  @name   dllist.h - Double linked lists.
-**
-**  $Id$
-*/
-
-#ifndef ETLIB_DLLIST_H
-#define ETLIB_DLLIST_H
-
-//@{
-
-struct dl_node
-{
-	struct dl_node *next;
-	struct dl_node *prev;
-};
-
-struct dl_head
-{
-	struct dl_node *first;
-	struct dl_node *null;
-	struct dl_node *last;
-};
-
-static inline struct dl_head *dl_init(struct dl_head *h)
-{
-	h->first = (struct dl_node *)&h->null;
-	h->null = 0;
-	h->last = (struct dl_node *)&h->first;
-	return h;
-}
-
-static inline struct dl_node *dl_remove(struct dl_node *n)
-{
-	n->prev->next = n->next;
-	n->next->prev = n->prev;
-	return n;
-}
-
-static inline struct dl_node *
-dl_insert_after(struct dl_node *p, struct dl_node *n)
-{
-	n->next = p->next;
-	n->prev = p;
-	p->next = n;
-	n->next->prev = n;
-	return n;
-}
-
-/* A constructor for static list heads. */
-#define DL_LIST(id) struct dl_head id[1] = {{ \
-	(struct dl_node *)&id[0].null, 0,\
-	(struct dl_node *)&id[0].first \
-	}}
-
-#define dl_empty(h)             ((h)->first->next == 0)
-#define dl_insert_before(p, n)  dl_insert_after((p)->prev, (n))
-#define dl_insert_first(h, n)   (dl_insert_before((h)->first, (n)))
-#define dl_insert_last(h, n)    (dl_insert_after((h)->last, (n)))
-#define dl_remove_first(h)      dl_remove((h)->first) // mustn't be empty!
-#define dl_remove_last(h)       dl_remove((h)->last) // mustn't be empty!
-
-//@}
-
-#endif /* ETLIB_DLLIST_H */
