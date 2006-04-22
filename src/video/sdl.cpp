@@ -10,7 +10,7 @@
 //
 /**@name sdl.cpp - SDL video support. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -375,24 +375,27 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 
 		case SDL_ACTIVEEVENT:
 			if (event->active.state & SDL_APPMOUSEFOCUS) {
-				static int InMainWindow = 1;
+				static bool InMainWindow = true;
 
 				if (InMainWindow && !event->active.gain) {
 					InputMouseExit(callbacks, SDL_GetTicks());
 				}
-				InMainWindow = event->active.gain;
+				InMainWindow = (event->active.gain != 0);
 			}
 			if (event->active.state & SDL_APPACTIVE) {
-				static int IsVisible = 1;
+				static bool IsVisible = true;
+				static bool DoTogglePause = false;
 
 				if (IsVisible && !event->active.gain) {
-					IsVisible = 0;
+					IsVisible = false;
 					if (!GamePaused) {
+						DoTogglePause = true;
 						UiTogglePause();
 					}
 				} else if (!IsVisible && event->active.gain) {
-					IsVisible = 1;
-					if (GamePaused) {
+					IsVisible = true;
+					if (GamePaused && DoTogglePause) {
+						DoTogglePause = false;
 						UiTogglePause();
 					}
 				}
