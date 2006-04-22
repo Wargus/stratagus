@@ -10,7 +10,7 @@
 //
 /**@name network.cpp - The network. */
 //
-//      (c) Copyright 2000-2003 by Lutz Sammer, Andreas Arens.
+//      (c) Copyright 2000-2006 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -209,11 +209,10 @@
 */
 
 //----------------------------------------------------------------------------
-// Includes
+//  Includes
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -233,24 +232,22 @@
 #include "campaign.h"
 #include "master.h"
 
-//#define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
 
 //----------------------------------------------------------------------------
-// Declaration
+//  Declaration
 //----------------------------------------------------------------------------
 
 /**
-** Network command input/output queue.
+**  Network command input/output queue.
 */
-typedef struct _network_command_queue_ {
-	struct dl_node List[1]; /// double linked list
+struct NetworkCommandQueue {
 	unsigned long Time;     /// time to execute
 	unsigned char Type;     /// Command Type
 	NetworkCommand Data;    /// command content
-} NetworkCommandQueue;
+};
 
 //----------------------------------------------------------------------------
-// Variables
+//  Variables
 //----------------------------------------------------------------------------
 
 int NetworkNumInterfaces;                  /// Network number of interfaces
@@ -272,8 +269,8 @@ static unsigned long NetworkDelay;         /// Delay counter for recover.
 static int NetworkSyncSeeds[256];          /// Network sync seeds.
 static int NetworkSyncHashs[256];          /// Network sync hashs.
 static NetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
-static DL_LIST(CommandsIn);                /// Network command input queue
-static DL_LIST(MsgCommandsIn);             /// Network message input queue
+std::list<NetworkCommandQueue *> CommandsIn;   /// Network command input queue
+std::list<NetworkCommandQueue *> MsgCommandsIn;/// Network message input queue
 
 #ifdef DEBUG
 static int NetworkReceivedPackets;         /// Packets received packets
@@ -294,40 +291,27 @@ static int NumNCQs;                        /// Number of NCQs in use
 
 
 //----------------------------------------------------------------------------
-// Mid-Level api functions
+//  Mid-Level api functions
 //----------------------------------------------------------------------------
 
 /**
-** Send message to all clients.
+**  Send message to all clients.
 **
-** @param buf   Buffer of outgoing message.
-** @param len   Buffer length.
-**
+**  @param buf  Buffer of outgoing message.
+**  @param len  Buffer length.
 */
 void NetworkBroadcast(const void *buf, int len)
 {
-	int i;
-
-#undef PACKET_LOSS
-
 	// Send to all clients.
-#ifdef PACKET_LOSS
-	if ((MyRand() & PACKET_LOSS)) {
-#endif
-	for (i = 0; i < HostsCount; ++i) {
-		int n;
-
-		n = NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port, buf, len);
+	for (int i = 0; i < HostsCount; ++i) {
+		NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port, buf, len);
 	}
-#ifdef PACKET_LOSS
-	}
-#endif
 }
 
 /**
-** Network send packet. Build it from queue and broadcast.
+**  Network send packet. Build it from queue and broadcast.
 **
-** @param ncq Outgoing network queue start.
+**  @param ncq  Outgoing network queue start.
 */
 static void NetworkSendPacket(const NetworkCommandQueue *ncq)
 {
@@ -340,7 +324,7 @@ static void NetworkSendPacket(const NetworkCommandQueue *ncq)
 #endif
 
 	//
-	// Build packet of Up to MaxNetworkCommands messages.
+	// Build packet of up to MaxNetworkCommands messages.
 	//
 	numcommands = 0;
 	packet.Header.Cycle = ncq[0].Time & 0xFF;
@@ -354,16 +338,8 @@ static void NetworkSendPacket(const NetworkCommandQueue *ncq)
 		packet.Header.Type[i] = MessageNone;
 	}
 
-	// if (0 || !(rand() & 15))
-
-	NetworkBroadcast(&packet, sizeof(NetworkPacketHeader) + sizeof(NetworkCommand) * numcommands);
-
-#if 0
-	// Disabled for testing network speed
-	if (HostsCount < 3) { // enough bandwidth to send twice :)
-		NetworkBroadcast(&packet, sizeof(NetworkPacketHeader) + sizeof(NetworkCommand) * numcommands);
-	}
-#endif
+	NetworkBroadcast(&packet, sizeof(NetworkPacketHeader) +
+		sizeof(NetworkCommand) * numcommands);
 }
 
 //----------------------------------------------------------------------------
@@ -393,23 +369,22 @@ void InitNetwork1(void)
 	if (NetworkUpdates <= 0) {
 		NetworkUpdates = 1;
 	}
-	// Lag must be multiple of Updates?
-	NetworkLag /= NetworkUpdates;
-	NetworkLag *= NetworkUpdates;
+	// Lag must be multiple of updates
+	NetworkLag = (NetworkLag / NetworkUpdates) * NetworkUpdates;
 
 	// Our communication port
 	port = NetworkPort;
 	for (i = 0; i < 10; ++i) {
 		NetworkFildes = NetOpenUDP(port + i);
-		if (IsNetworkGame()) {
+		if (NetworkFildes != (Socket)-1) {
 			break;
 		}
-		if (i == 9) {
-			fprintf(stderr,"NETWORK: No free ports %d-%d available, aborting\n",
-				port, port + i);
-			NetExit(); // machine dependent network exit
-			return;
-		}
+	}
+	if (i == 10) {
+		fprintf(stderr, "NETWORK: No free ports %d-%d available, aborting\n",
+			port, port + i);
+		NetExit(); // machine dependent network exit
+		return;
 	}
 
 #if 1
@@ -442,8 +417,8 @@ void InitNetwork1(void)
 	}
 #endif
 
-	dl_init(CommandsIn);
-	dl_init(MsgCommandsIn);
+	CommandsIn.clear();
+	MsgCommandsIn.clear();
 
 	NumNCQs = 0;
 }
@@ -456,6 +431,7 @@ void ExitNetwork1(void)
 	if (!IsNetworkGame()) { // No network running
 		return;
 	}
+
 #ifdef DEBUG
 	DebugPrint("Received: %d packets, %d early, %d late, %d dups, %d lost.\n" _C_
 		NetworkReceivedPackets _C_ NetworkReceivedEarly _C_ NetworkReceivedLate _C_
@@ -463,9 +439,10 @@ void ExitNetwork1(void)
 	DebugPrint("Send: %d packets, %d resend\n" _C_
 		NetworkSendPackets _C_ NetworkSendResend);
 #endif
-	NetCloseUDP(NetworkFildes);
 
+	NetCloseUDP(NetworkFildes);
 	NetExit(); // machine dependent setup
+
 	NetworkFildes = (Socket)-1;
 	NetworkInSync = 1;
 	NetPlayers = 0;
@@ -477,10 +454,6 @@ void ExitNetwork1(void)
 */
 void InitNetwork2(void)
 {
-	int i;
-	int n;
-	int c;
-
 	NetworkConnectSetupGame();
 
 	DebugPrint("Lag %d, Updates %d, Hosts %d\n" _C_
@@ -490,9 +463,9 @@ void InitNetwork2(void)
 	// Prepare first time without syncs.
 	//
 	memset(NetworkIn, 0, sizeof(NetworkIn));
-	for (i = 0; i <= NetworkLag; i += NetworkUpdates) {
-		for (n = 0; n < HostsCount; ++n) {
-			for (c = 0; c < MaxNetworkCommands; ++c) {
+	for (int i = 0; i <= NetworkLag; i += NetworkUpdates) {
+		for (int n = 0; n < HostsCount; ++n) {
+			for (int c = 0; c < MaxNetworkCommands; ++c) {
 				NetworkIn[i][Hosts[n].PlyNr][c].Time = i;
 				NetworkIn[i][Hosts[n].PlyNr][c].Type = MessageSync;
 			}
@@ -518,7 +491,9 @@ void InitNetwork2(void)
 static NetworkCommandQueue *AllocNCQ(void)
 {
 	Assert(NumNCQs != MAX_NCQS);
-	return &NCQs[NumNCQs++];
+	NetworkCommandQueue *ncq = &NCQs[NumNCQs++];
+	memset(ncq, 0, sizeof(*ncq));
+	return ncq;
 }
 
 /**
@@ -532,51 +507,49 @@ static void FreeNCQ(NetworkCommandQueue *ncq)
 }
 
 //----------------------------------------------------------------------------
-// Commands input
+//  Commands input
 //----------------------------------------------------------------------------
 
 /**
-** Prepare send of command message.
+**  Prepare send of command message.
 **
-** Convert arguments into network format and place it into output queue.
+**  Convert arguments into network format and place it into output queue.
 **
-** @param command      Command (Move,Attack,...).
-** @param unit         Unit that receive the command.
-** @param x            optional X map position.
-** @param y            optional y map position.
-** @param dest         optional destination unit.
-** @param type         optional unit-type argument.
-** @param status       Append command or flush old commands.
+**  @param command  Command (Move,Attack,...).
+**  @param unit     Unit that receive the command.
+**  @param x        optional X map position.
+**  @param y        optional y map position.
+**  @param dest     optional destination unit.
+**  @param type     optional unit-type argument.
+**  @param status   Append command or flush old commands.
 **
-** @warning
-** Destination and unit-type shares the same network slot.
+**  @warning  Destination and unit-type shares the same network slot.
 */
 void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
 	const CUnit *dest, const CUnitType *type, int status)
 {
 	NetworkCommandQueue *ncq;
-	NetworkCommandQueue *check;
+	std::list<NetworkCommandQueue *>::iterator it;
 
 	// Check for duplicate command in queue
-	check = (NetworkCommandQueue *)CommandsIn->first->next;
-	while (check) {
-		if ((check->Type & 0x7F) == command &&
-			check->Data.Unit == htons(unit->Slot) &&
-			check->Data.X == htons(x) &&
-			check->Data.Y == htons(y)) {
-			if (dest && check->Data.Dest == htons(dest->Slot)) {
+	for (it = CommandsIn.begin(); it != CommandsIn.end(); ++it) {
+		ncq = *it;
+		if ((ncq->Type & 0x7F) == command &&
+				ncq->Data.Unit == htons(unit->Slot) &&
+				ncq->Data.X == htons(x) &&
+				ncq->Data.Y == htons(y)) {
+			if (dest && ncq->Data.Dest == htons(dest->Slot)) {
 				return;
-			} else if (type && check->Data.Dest == htons(type->Slot)) {
+			} else if (type && ncq->Data.Dest == htons(type->Slot)) {
 				return;
-			} else if (check->Data.Dest == 0xFFFF) {
+			} else if (ncq->Data.Dest == 0xFFFF) {
 				return;
 			}
 		}
-		check = (NetworkCommandQueue *)check->List->next;
 	}
 
 	ncq = AllocNCQ();
-	dl_insert_first(CommandsIn, ncq->List);
+	CommandsIn.push_back(ncq);
 
 	ncq->Time = GameCycle;
 	ncq->Type = command;
@@ -598,16 +571,16 @@ void NetworkSendCommand(int command, const CUnit *unit, int x, int y,
 }
 
 /**
-** Prepare send of extended command message.
+**  Prepare send of extended command message.
 **
-** Convert arguments into network format and place it into output queue.
+**  Convert arguments into network format and place it into output queue.
 **
-** @param command     Command (Move,Attack,...).
-** @param arg1        optional argument #1
-** @param arg2        optional argument #2
-** @param arg3        optional argument #3
-** @param arg4        optional argument #4
-** @param status      Append command or flush old commands.
+**  @param command  Command (Move,Attack,...).
+**  @param arg1     optional argument #1
+**  @param arg2     optional argument #2
+**  @param arg3     optional argument #3
+**  @param arg4     optional argument #4
+**  @param status   Append command or flush old commands.
 */
 void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 	int arg4, int status)
@@ -616,10 +589,10 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 	NetworkExtendedCommand *nec;
 
 	ncq = AllocNCQ();
-	dl_insert_first(CommandsIn, ncq->List);
+	CommandsIn.push_back(ncq);
 
 	ncq->Time = GameCycle;
-	nec=(NetworkExtendedCommand *)&ncq->Data;
+	nec = (NetworkExtendedCommand *)&ncq->Data;
 
 	ncq->Type = MessageExtendedCommand;
 	if (status) {
@@ -633,11 +606,10 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 }
 
 /**
-**  Sends My Selections to Teammates
+**  Sends my selections to teammates
 **
 **  @param units  Units to send
 **  @param count  Number of units to send
-**
 */
 void NetworkSendSelection(CUnit **units, int count)
 {
@@ -715,8 +687,6 @@ void NetworkSendSelection(CUnit **units, int count)
 */
 static void NetworkProcessSelection(NetworkPacket *packet, int player)
 {
-	int i;
-	int j;
 	CUnit *units[UnitMax];
 	NetworkSelectionHeader *header;
 	NetworkSelection *selection;
@@ -732,9 +702,9 @@ static void NetworkProcessSelection(NetworkPacket *packet, int player)
 	adjust = (header->Add << 1) | header->Remove;
 	unitcount = 0;
 
-	for (i = 0; header->Type[i] == MessageSelection; ++i) {
+	for (int i = 0; header->Type[i] == MessageSelection; ++i) {
 		selection = (NetworkSelection *)&(packet->Command[i]);
-		for (j = 0; j < 4 && unitcount < count; ++j) {
+		for (int j = 0; j < 4 && unitcount < count; ++j) {
 			units[unitcount++] = Units[ntohs(selection->Unit[j])];
 		}
 	}
@@ -751,7 +721,6 @@ static void NetworkProcessSelection(NetworkPacket *packet, int player)
 static void NetworkRemovePlayer(int player)
 {
 	int i;
-	int c;
 
 	// Remove player from Hosts and clear NetworkIn
 	for (i = 0; i < HostsCount; ++i) {
@@ -762,19 +731,19 @@ static void NetworkRemovePlayer(int player)
 		}
 	}
 	for (i = 0; i < 256; ++i) {
-		for (c = 0; c < MaxNetworkCommands; ++c) {
+		for (int c = 0; c < MaxNetworkCommands; ++c) {
 			NetworkIn[i][player][c].Time = 0;
 		}
 	}
 }
 
 /**
-** Called if message for the network is ready.
-** (by WaitEventsOneFrame)
+**  Called if message for the network is ready.
+**  (by WaitEventsOneFrame)
 **
-** @todo
-** NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
-** Must be calculated.
+**  @todo
+**  NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
+**  Must be calculated.
 */
 void NetworkEvent(void)
 {
@@ -783,7 +752,7 @@ void NetworkEvent(void)
 	int player;
 	int i;
 	int commands;
-	int allowed;
+	bool allowed;
 	unsigned long n;
 
 	if (!IsNetworkGame()) {
@@ -866,16 +835,13 @@ void NetworkEvent(void)
 		}
 
 		if (packet->Header.Type[i] == MessageResend) {
-			int j;
-			int c;
-
 			// Destination cycle (time to execute).
 			n = ((GameCycle + 128) & ~0xFF) | packet->Header.Cycle;
 			if (n > GameCycle + 128) {
 				n -= 0x100;
 			}
 
-			// FIXME: not neccessary to send this packet multiple times!!!!
+			// FIXME: not necessary to send this packet multiple times!!!!
 			// other side sends re-send until it gets an answer.
 
 			if (n != NetworkIn[n & 0xFF][ThisPlayer->Index][0].Time) {
@@ -886,17 +852,16 @@ void NetworkEvent(void)
 			NetworkSendPacket(NetworkIn[n & 0xFF][ThisPlayer->Index]);
 
 			// Check if a player quit this cycle
-			for (j = 0; j < HostsCount; ++j) {
-				for (c = 0; c < MaxNetworkCommands; ++c) {
+			for (int j = 0; j < HostsCount; ++j) {
+				for (int c = 0; c < MaxNetworkCommands; ++c) {
 					NetworkCommandQueue *ncq;
-					int k;
 					ncq = &NetworkIn[n & 0xFF][Hosts[j].PlyNr][c];
 					if (ncq->Time && ncq->Type == MessageQuit) {
 						NetworkPacket np;
 						np.Header.Cycle = ncq->Time & 0xFF;
 						np.Header.Type[0] = ncq->Type;
 						np.Command[0] = ncq->Data;
-						for (k = 1; k < MaxNetworkCommands; ++k) {
+						for (int k = 1; k < MaxNetworkCommands; ++k) {
 							np.Header.Type[k] = MessageNone;
 						}
 
@@ -924,11 +889,11 @@ void NetworkEvent(void)
 		switch (packet->Header.Type[i] & 0x7F) {
 			case MessageExtendedCommand:
 				// FIXME: ensure the sender is part of the command
-				allowed = 1;
+				allowed = true;
 				break;
 			case MessageSync:
 				// Sync does not matter
-				allowed = 1;
+				allowed = true;
 				break;
 			case MessageQuit:
 			case MessageQuitAck:
@@ -936,22 +901,22 @@ void NetworkEvent(void)
 			case MessageChat:
 			case MessageChatTerm:
 				// FIXME: ensure it's from the right player
-				allowed = 1;
+				allowed = true;
 				break;
 			case MessageCommandDismiss:
 				// Allow to explode critters.
 				if ((UnitSlots[ntohs(nc->Unit)]->Player->Index == PlayerNumNeutral) &&
 					UnitSlots[ntohs(nc->Unit)]->Type->ClicksToExplode) {
-					allowed = 1;
+					allowed = true;
 					break;
 				}
 				// Fall through!
 			default:
 				if (UnitSlots[ntohs(nc->Unit)]->Player->Index == player ||
 						Players[player].IsTeamed(UnitSlots[ntohs(nc->Unit)])) {
-					allowed = 1;
+					allowed = true;
 				} else {
-					allowed = 0;
+					allowed = false;
 				}
 		}
 
@@ -960,7 +925,7 @@ void NetworkEvent(void)
 			NetworkIn[packet->Header.Cycle][player][i].Type = packet->Header.Type[i];
 			NetworkIn[packet->Header.Cycle][player][i].Data = *nc;
 		} else {
-			SetMessage(_("%s Sent Bad Command"), Players[player].Name);
+			SetMessage(_("%s sent bad command"), Players[player].Name);
 		}
 	}
 
@@ -984,23 +949,20 @@ void NetworkEvent(void)
 }
 
 /**
-** Quit the game.
+**  Quit the game.
 */
 void NetworkQuit(void)
 {
-	int n;
-	int i;
-
 	if (!ThisPlayer) {
 		return;
 	}
 
-	n = (GameCycle + NetworkUpdates) / NetworkUpdates * NetworkUpdates + NetworkLag;
+	int n = (GameCycle + NetworkUpdates) / NetworkUpdates * NetworkUpdates + NetworkLag;
 	NetworkIn[n & 0xFF][ThisPlayer->Index][0].Type = MessageQuit;
 	NetworkIn[n & 0xFF][ThisPlayer->Index][0].Time = n;
 	NetworkIn[n & 0xFF][ThisPlayer->Index][0].Data.X = ThisPlayer->Index;
 
-	for (i = 1; i < MaxNetworkCommands; ++i) {
+	for (int i = 1; i < MaxNetworkCommands; ++i) {
 		NetworkIn[n & 0xFF][ThisPlayer->Index][i].Type = MessageNone;
 	}
 
@@ -1008,9 +970,9 @@ void NetworkQuit(void)
 }
 
 /**
-** Send chat message. (Message is sent with low priority)
+**  Send chat message. (Message is sent with low priority)
 **
-** @param msg Text message to send.
+**  @param msg  Text message to send.
 */
 void NetworkChatMessage(const char *msg)
 {
@@ -1024,7 +986,7 @@ void NetworkChatMessage(const char *msg)
 		n = strlen(msg);
 		while (n >= (int)sizeof(ncm->Text)) {
 			ncq = AllocNCQ();
-			dl_insert_first(MsgCommandsIn, ncq->List);
+			MsgCommandsIn.push_back(ncq);
 			ncq->Type = MessageChat;
 			ncm = (NetworkChat *)(&ncq->Data);
 			ncm->Player = ThisPlayer->Index;
@@ -1033,7 +995,7 @@ void NetworkChatMessage(const char *msg)
 			n -= sizeof(ncm->Text);
 		}
 		ncq = AllocNCQ();
-		dl_insert_first(MsgCommandsIn, ncq->List);
+		MsgCommandsIn.push_back(ncq);
 		ncq->Type = MessageChatTerm;
 		ncm = (NetworkChat *)(&ncq->Data);
 		ncm->Player = ThisPlayer->Index;
@@ -1042,9 +1004,9 @@ void NetworkChatMessage(const char *msg)
 }
 
 /**
-** Parse a network command.
+**  Parse a network command.
 **
-** @param ncq Network command from queue
+**  @param ncq  Network command from queue
 */
 static void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 {
@@ -1106,13 +1068,11 @@ static void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 }
 
 /**
-** Network resend commands, we have a missing packet send to all clients
-** what packet we are missing.
+**  Network resend commands, we have a missing packet send to all clients
+**  what packet we are missing.
 **
-** @todo
-** We need only send to the clients, that have not delivered the
-** packet. I'm not sure that the extra packets I send with this
-** packet are useful.
+**  @todo
+**  We need only send to the clients, that have not delivered the packet.
 */
 static void NetworkResendCommands(void)
 {
@@ -1123,7 +1083,7 @@ static void NetworkResendCommands(void)
 #endif
 
 	//
-	// Build packet of 4 messages.
+	// Build packet
 	//
 	memset(&packet, 0, sizeof(packet));
 	packet.Header.Type[0] = MessageResend;
@@ -1136,7 +1096,7 @@ static void NetworkResendCommands(void)
 }
 
 /**
-** Network send commands.
+**  Network send commands.
 */
 static void NetworkSendCommands(void)
 {
@@ -1151,7 +1111,7 @@ static void NetworkSendCommands(void)
 	incommand = NULL;
 	ncq = NetworkIn[(GameCycle + NetworkLag) & 0xFF][ThisPlayer->Index];
 	memset(ncq, 0, sizeof(NetworkCommandQueue) * MaxNetworkCommands);
-	if (dl_empty(CommandsIn) && dl_empty(MsgCommandsIn)) {
+	if (CommandsIn.empty() && MsgCommandsIn.empty()) {
 		ncq[0].Type = MessageSync;
 		ncq[0].Data.Unit = htons(SyncHash&0xFFFF);
 		ncq[0].Data.X = htons(SyncRandSeed>>16);
@@ -1159,10 +1119,10 @@ static void NetworkSendCommands(void)
 		ncq[0].Time = GameCycle + NetworkLag;
 		numcommands = 1;
 	} else {
-		while ((!dl_empty(CommandsIn) || !dl_empty(MsgCommandsIn)) &&
+		while ((!CommandsIn.empty() || !MsgCommandsIn.empty()) &&
 				numcommands < MaxNetworkCommands) {
-			if (!dl_empty(CommandsIn)) {
-				incommand = (NetworkCommandQueue *)CommandsIn->last;
+			if (!CommandsIn.empty()) {
+				incommand = CommandsIn.front();
 #ifdef DEBUG
 				if (incommand->Type != MessageExtendedCommand) {
 					// FIXME: we can send destoyed units over network :(
@@ -1172,10 +1132,10 @@ static void NetworkSendCommands(void)
 					}
 				}
 #endif
-				dl_remove_last(CommandsIn);
+				CommandsIn.pop_front();
 			} else {
-				incommand = (NetworkCommandQueue *)MsgCommandsIn->last;
-				dl_remove_last(MsgCommandsIn);
+				incommand = MsgCommandsIn.front();
+				MsgCommandsIn.pop_front();
 			}
 			memcpy(&ncq[numcommands], incommand, sizeof(NetworkCommandQueue));
 			ncq[numcommands].Time = GameCycle + NetworkLag;
@@ -1195,22 +1155,20 @@ static void NetworkSendCommands(void)
 }
 
 /**
-** Network excecute commands.
+**  Network excecute commands.
 */
 static void NetworkExecCommands(void)
 {
 	NetworkCommandQueue *ncq;
-	int i;
-	int c;
 
 	//
 	// Must execute commands on all computers in the same order.
 	//
-	for (i = 0; i < NumPlayers; ++i) {
+	for (int i = 0; i < NumPlayers; ++i) {
 		//
 		// Remove commands.
 		//
-		for (c = 0; c < MaxNetworkCommands; ++c) {
+		for (int c = 0; c < MaxNetworkCommands; ++c) {
 			ncq = &NetworkIn[GameCycle & 0xFF][i][c];
 			if (ncq->Type == MessageNone) {
 				break;
@@ -1230,12 +1188,11 @@ static void NetworkExecCommands(void)
 }
 
 /**
-** Network synchronize commands.
+**  Network synchronize commands.
 */
 static void NetworkSyncCommands(void)
 {
 	const NetworkCommandQueue *ncq;
-	int i;
 	unsigned long n;
 
 	//
@@ -1243,7 +1200,7 @@ static void NetworkSyncCommands(void)
 	//
 	NetworkInSync = 1;
 	n = GameCycle + NetworkUpdates;
-	for (i = 0; i < HostsCount; ++i) {
+	for (int i = 0; i < HostsCount; ++i) {
 		ncq = NetworkIn[n & 0xFF][Hosts[i].PlyNr];
 		if (ncq[0].Time != n) {
 			NetworkInSync = 0;
@@ -1255,15 +1212,13 @@ static void NetworkSyncCommands(void)
 }
 
 /**
-** Handle network commands.
+**  Handle network commands.
 */
 void NetworkCommands(void)
 {
 	if (IsNetworkGame()) {
-		//
-		// Send messages to all clients (other players)
-		//
 		if (!(GameCycle % NetworkUpdates)) {
+			// Send messages to all clients (other players)
 			NetworkSendCommands();
 			NetworkExecCommands();
 			NetworkSyncCommands();
@@ -1273,17 +1228,15 @@ void NetworkCommands(void)
 
 
 /**
-** Recover network.
+**  Recover network.
 */
 void NetworkRecover(void)
 {
-	int i;
-
 	if (FrameCounter > NetworkDelay) {
 		NetworkDelay += NetworkUpdates;
 
 		// Check for players that timed out
-		for (i = 0; i < HostsCount; ++i) {
+		for (int i = 0; i < HostsCount; ++i) {
 			int secs;
 
 			if (!NetworkLastFrame[Hosts[i].PlyNr]) {
