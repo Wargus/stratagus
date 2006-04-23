@@ -650,6 +650,7 @@ void CleanUnitTypes(void)
 		delete[] type->Sound.Dead.Name;
 
 		CGraphic::Free(type->Sprite);
+		CGraphic::Free(type->ShadowSprite);
 #ifdef USE_MNG
 		if (type->Portrait.Num) {
 			for (j = 0; j < type->Portrait.Num; ++j) {
