@@ -4,7 +4,7 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2001-2004 by Lutz Sammer and Nehal Mistry
+----	(c) Copyright 2001-2006 by Lutz Sammer, Francois Beerten and Nehal Mistry
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -20,16 +20,22 @@
 ----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ----    02111-1307, USA.
 -->
-    <title>Development for Stratagus Version 2.1</title>
+    <title>Development for Stratagus Version 2.2</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
 <body>
 
-<h1>Development for Stratagus Version 2.1</h1>
+<h1>Development for Stratagus Version 2.2</h1>
 <hr>
 
 This file should give you some information to help with development of Stratagus.<p>
+
+<h2>IRC - Internet Relay Chat</h2>
+
+You can try to meet other Stratagus developers and users on the 
+<a href="http://www.freenode.net/">FreeNode</a> IRC Network, in the
+<a href="irc://irc.freenode.net/stratagus">#stratagus</a> channel.
 
 <h2>Mailing list</h2>
 
@@ -37,12 +43,6 @@ If you want to help with development for Stratagus you should
 <a href="http://lists.sourceforge.net/mailman/listinfo/stratagus-devel">join</a> 
 the stratagus-devel mailing list.<br> You may also want to look at the 
 <a href="http://sourceforge.net/mailarchive/forum.php?forum_id=39600">archives.</a>
-
-<h2>IRC - Internet Relay Chat</h2>
-
-You can try to meet other Stratagus developers and users on the 
-<a href="http://www.freenode.net/">FreeNode</a> IRC Network, in channel
-<a href="irc://irc.freenode.net/stratagus">#Stratagus</a>.
 
 <h2>Bugs and tasks</h2>
 
@@ -58,55 +58,56 @@ IRC channel whether anybody else is already working on it.
 
 <h2>Building Stratagus</h2>
 
-<h3>Installing CVS client</h3>
+<h3>Installing the Subversion client</h3>
 
-If you want to help develop, it is the best that you use CVS. To do
-so, first you need CVS for your system. Savannah has a <a
-href="http://sourceforge.net/cvs/?group_id=84903">guide</a> that
-will help you get started.
+If you want to help develop, you should use Subversion. 
+The online book <a href="http://svnbook.red-bean.com/">Version Control with
+Subversion</a> will help you master Subversion.
 
-<h3>Getting Stratagus from CVS</h3>
+<h3>Getting Stratagus from Subversion</h3>
 
-<h4>There are 2 modules in the CVS repository.</h4>
+<h4>The subversion repository of stratagus has two main directories:</h4>
 
 <ul>
     <li>stratagus - The Stratagus engine source<p>
 	The source to the Stratagus engine. The source is licenced
 	under the GNU General Public License.
-	<b>This module is needed for development.</b>
+	<b>This contains the sources needed for development.</b>
 
     <li>htdocs - The Stratagus Website<p>
-	The website is stored in CVS for easy updating and version management
+	The website is stored in subversion for easy updating and version management
 	by mulitple people.  This module is not needed unless you plan to update
 	the stratagus website 
 </ul>
 
-<h4>How do I access to these modules?</h4>
+<h4>The stratagus directory is itself divided into 3 subdirectories:</h4>
 
-The instructions for accessing the modules are on the 
-<a href="http://sourceforge.net/cvs/?group_id=84903">project cvs</a> page.<br> 
-NOTE: it is highly recommended that you use the -z3 flag, this compresses 
-the data and therefore speeds the transfer up. Also be warned that sourceforge
-has its anonymous CVS up to 5 hours behind developer CVS. Changes to developer
-CVS are not immediate for anonymous users.<p>
+<ul>
+    <li>trunk - The main development branch. 
+        Almost all activity happens in this directory.
+    <li>branches - Special development branches.
+    <li>tags - Snapshots of the code of special interest like releases. 
+</ul>
+
+<h4>How do I get the latest source code of Stratagus?</h4>
+
+The instructions for accessing the source code are on the 
+<a href="http://sourceforge.net/svn/?group_id=84903">project subversion</a> page.<br> 
+<p>
 
 For example:<p>
 
-cvs -d:pserver:anoncvs@cvs.sourceforge.net:/cvsroot/stratagus login<br />
-<i>"When prompted for a password for anonymous, simply press the Enter key."</i><br>
-cvs -z3 -d:pserver:anoncvs@cvs.sourceforge.net:/cvsroot/stratagus co stratagus<br />
+<pre>svn co https://svn.sourceforge.net/svnroot/stratagus/stratagus/trunk stratagus</pre>
+<p>
 
-This is done only once. To update your CVS directory, go into 
-the module directory and type 'cvs -z3 -q update -dP'.<p>
+This is done only once. To update your working copy, go into 
+the directory and type 'svn up'.<p>
 
-You may put these flags in your ~/.cvsrc file so that you only 
-need to type 'cvs update', the cvs (1) man page will show you how.
+<h3>Getting Stratagus without Subversion</h3>
 
-<h3>Getting Stratagus without CVS</h3>
-
-Only releases are made outside of CVS.  If you wish to be involved with
-development, it is best that you obtain CVS, or learn how to use it so
-you can get access to CVS. CVS usually remains quite stable and is easier
+Only releases are made outside of Subversion.  If you wish to be involved with
+development, you should obtain the sources via Subversion. 
+Subversion usually remains quite stable and is easier
 for you to keep up to date. Release versions of stratagus are available 
 <a href="http://sourceforge.net/project/showfiles.php?group_id=84903">here</a>. 
 Many of the games that use the stratagus engine will, and should bundle these 
@@ -179,7 +180,7 @@ Please read the doxygen/doc++ documentation.
 //
 /**@name {filename}.c	-	{One line description of this file} */
 //
-//  (c) Copyright 2004 by {insert your name here}
+//  (c) Copyright 2006 by {insert your name here}
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -192,32 +193,19 @@ Please read the doxygen/doc++ documentation.
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-//  02111-1307, USA.
+//  Foundation, Inc., 51 Franklin St, Fifth Floor, 
+//  Boston, MA  02110-1301  USA
 //
 //  $Id$
 
 //@{
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include &lt;stdio.h&gt;
 
 #include "stratagus.h"
-
 // More game includes.
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 // Global and local variables of this module.
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 // Local and global functions of this module.
 
@@ -233,7 +221,7 @@ If you fix in other modules, please imitate the coding style of the original cod
 <a href="/usr/src/linux/Documentation/CodingStyle">Linux kernel coding style</a> (also 
 found online <a href="http://lwn.net/2001/1115/a/CodingStyle.php3">here</a>).
 <ul>
-    <li>Write ANSI C.
+    <li>Write ANSI C++.
     <li>All Tabs (Developers use 4 columns for a tab).
     <li>No line should be longer than 78 characters.
 	<li>All comments should be on their own line.
@@ -254,7 +242,7 @@ found online <a href="http://lwn.net/2001/1115/a/CodingStyle.php3">here</a>).
 
     // function with variables defined.
     int function(int a, int b)
-	{
+    {
         int x;
         int y;
 
@@ -295,16 +283,14 @@ included in the main Stratagus source.<p>
 Follow these steps:<p>
 
 <ul>
-    <li>cvs -q update -d
-    <li>cvs -q diff -u &gt; your-nickname.diff
+    <li>svn up
+    <li>svn diff &gt; your-nickname.diff
     <li>upload 'your-nickname.diff' to the
     <a href="http://sourceforge.net/tracker/?group_id=84903&atid=574267">patch tracker</a>.
 </ul>
 
-Please also read the <a href="datadir.html">Stratagus data directory description.</a><p>
-
 <hr>
-(C) Copyright 1998-2004 by The <a href="http://stratagus.org">Stratagus</a> Project 
+(C) Copyright 1998-2006 by The <a href="http://stratagus.org">Stratagus</a> Project 
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>

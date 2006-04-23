@@ -4,7 +4,7 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2002-2004 by Nehal Mistry.
+----	(c) Copyright 2002-2006 by Nehal Mistry, Francois Beerten.
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -26,13 +26,14 @@
 
 <body>
 
-<h1>Installation instructions for Stratagus 2.1</h1><p>
+<h1>Installation instructions for Stratagus 2.2</h1><p>
 <hr>
 
     <h2>Software Requirements</h2>
     <ul>
-	<li><b>A supported operating system:</b> Win32, Linux, Mac OS X, BSD, 
+	<li><b>A supported operating system:</b> Linux, Mac OS X, BSD, 
 	Possibly any other Unix/POSIX OS.<br>
+	Microsoft Windows 98 SE, or higher.
 	<font color=red>NOTE: some features of Winsock2 (WS2_32.DLL) are used. So even 
 	if you plan to play single player only, 
 	WinNT4.0 users will need 
@@ -43,18 +44,16 @@
 	<li><a href="http://www.libsdl.org/index.php">SDL</a> (required).<p>
 	<li><a href="http://www.libpng.org/pub/png/">libpng</a> (required).<p>
 	<li><a href="http://www.gzip.org/zlib/">zlib</a> (required).<p>
-	<li><a href="http://www.lua.org/">Lua</a> (required).<p>
+	<li><a href="http://www.lua.org/">Lua</a> and lualib (required).<p>
 	<li><a href="http://www.xiph.org/ogg/vorbis/">libvorbis</a> (recommended).<p>
 	<li><a href="http://www.theora.org/">libtheora</a> (recommended).<p>
-	<li><a href="http://mikmod.raphnet.net/">libmikmod</a> (recommended).<p>
+	<li><a href="http://www.xipg.org/">libogg</a> (recommended).<p>
+	<li><a href="http://mikmod.raphnet.net/">libmikmod</a> (optional).<p>
 	<li><a href="http://sources.redhat.com/bzip2/">libbzip2</a> (optional).<p>
 	<li><a href="http://flac.sourceforge.net/">libFLAC</a> (optional).<p>
 	<li><a href="http://www.underbit.com/products/mad/">libmad</a> (optional).<p>
 
-	<li>Either the original or expansion wc2 CD (not Battle.net edition) for 
-	<a href="http://wargus.sourceforge.net/">wargus</a>, 
-	or another 
-	<a href="http://stratagus.sourceforge.net/games.shtml">game</a>.<br>
+	<a href="http://stratagus.sourceforge.net/games.shtml">A stratagus game</a>.<br>
     </ul>
 
     <h2>Hardware Requirements</h2>
@@ -69,14 +68,14 @@
 	<li><b>Video Card:</b> Any graphics card that can handle 16 bpp 
 	and 640x480 is supported. (OpenGL is supported, and requires a 32MB Card)<p>
 
-	<li><b>Sound Card:</b> Recommended. Windows (for Win32) or SDL 
-	(for unix or Mac OS X) compatible sound cards are supported.<p>
+	<li><b>Sound Card:</b> Recommended. SDL compatible sound cards are supported.<p>
     </ul>
 
     <h2>Installation</h2>
 
     Mac OS X users: Extract the "contrib/macosx.tgz" file to the 
-    top-level directory and read "Read Me.rtf".<p>
+    top-level directory and read "Read Me.rtf". 
+    <font color="red">NOTE: Lacking a Mac OS X developper, those instructions are outdated.</font> <p>
 
     <ul>
 	<li><b>Step 1, Download and Extract:</b><p>
@@ -95,7 +94,12 @@
 	<li><b>Step 2, Compile:</b><p>
 
 	<ul>
-	    <li><b>GCC/Mingw users:</b>
+		<li><b>GCC/Mingw users:</b></br>
+		Using <a href="www.scons.org">scons</a>:
+		<ul>
+		<li>Run 'scons'.
+		</ul>
+		Using the autotools:
 		<ul>
 		<li>Run './autogen.sh' then './configure' to create the Makefile.
 		<li>When complete, type 'make depend &amp;&amp; make' to compile, and 
@@ -123,7 +127,7 @@
     </ul>
 
 <hr>
-(C) Copyright 1998-2005 by The <a href="http://stratagus.org">Stratagus</a> Project 
+(C) Copyright 1998-2006 by The <a href="http://stratagus.org">Stratagus</a> Project 
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
