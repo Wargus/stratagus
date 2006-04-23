@@ -10,7 +10,7 @@
 //
 /**@name widgets.cpp - The stratagus ui widgets. */
 //
-//      (c) Copyright 2005 by François Beerten and Jimmy Salmon
+//      (c) Copyright 2005 by Franï¿½is Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1233,9 +1233,9 @@ void MenuScreen::logic()
 	if (NetConnectRunning == 2) {
 		NetworkProcessClientRequest();
 	}
-	/*if (NetConnectRunning == 1) {
-		NetworkProcessServerRequest();
-	}*/
+	if (NetConnectRunning == 1) {
+		//NetworkProcessServerRequest();
+	}
 	if (logiclistener) {
 		logiclistener->action("");
 	}
