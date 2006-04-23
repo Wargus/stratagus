@@ -83,45 +83,6 @@ static CGraphic *AlphaFogG;
 ----------------------------------------------------------------------------*/
 
 /**
-**  Find the Number of Units that can see this square using a long
-**  lookup. So when a 225 Viewed square can be calculated properly.
-**
-**  @param player  Player to mark sight.
-**  @param tx      X center position.
-**  @param ty      Y center position.
-**
-**  @return        Number of units that can see this square.
-*/
-static int LookupSight(const CPlayer *player, int tx, int ty)
-{
-	int i;
-	int visiblecount;
-	int range;
-	int mapdistance;
-	CUnit *unit;
-
-	visiblecount = 0;
-	for (i = 0; i < player->TotalNumUnits; ++i) {
-		unit = player->Units[i];
-		range = unit->CurrentSightRange;
-		mapdistance = MapDistanceToUnit(tx, ty, unit);
-		if (mapdistance <= range) {
-			++visiblecount;
-		}
-		if ((tx >= unit->X && tx < unit->X + unit->Type->TileWidth &&
-				mapdistance == range + 1) || (ty >= unit->Y &&
-				ty < unit->Y + unit->Type->TileHeight &&
-				mapdistance == range + 1)) {
-			--visiblecount;
-		}
-		if (visiblecount >= 255) {
-			return 255;
-		}
-	}
-	return visiblecount;
-}
-
-/**
 **  Find out if a field is seen (By player, or by shared vision)
 **  This function will return > 1 with no fog of war.
 **
