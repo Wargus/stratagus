@@ -1024,6 +1024,7 @@ int ListBoxWidget::getSelected() const
 void ListBoxWidget::setBackgroundColor(const gcn::Color &color)
 {
 	ScrollArea::setBackgroundColor(color);
+	ScrollArea::setBaseColor(color);
 	listbox.setBackgroundColor(color);
 }
 
