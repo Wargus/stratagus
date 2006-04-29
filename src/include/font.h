@@ -75,7 +75,7 @@ private:
 		G(NULL) {}
 
 public:
-	~CFont() {delete[] Ident; delete[] CharWidth;};
+	~CFont();
 
 
 	static CFont *New(const char *ident, CGraphic *g);

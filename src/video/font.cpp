@@ -10,7 +10,7 @@
 //
 /**@name font.cpp - The color fonts. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -255,6 +255,15 @@ int CFont::Width(const char *text) const
 		}
 	}
 	return width;
+}
+
+CFont::~CFont()
+{
+	if (G) {
+		CGraphic::Free(G);
+	}
+	delete[] Ident;
+	delete[] CharWidth;
 }
 
 /**
@@ -947,7 +956,6 @@ void CleanFonts(void)
 		}
 #endif
 
-		CGraphic::Free(font->G);
 		delete font;
 	}
 #ifdef USE_OPENGL
