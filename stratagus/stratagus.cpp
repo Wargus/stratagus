@@ -618,7 +618,8 @@ int GuichanLoop(const char *filename, CMap *map)
 	// FIXME delete this when switching to full guichan GUI
 	LibraryFileName("scripts/guichan.lua", buf);
 	status = LuaLoadFile(buf);
-	CleanModules();
+	if (status == 0)
+		CleanModules();
 
 	freeGuichan();
 	return status;
