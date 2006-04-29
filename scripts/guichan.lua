@@ -209,7 +209,7 @@ function RunSubMenu(s)
   menu:run()
 end
 
-function RunResultsMenu(s)
+function RunResultsMenu()
   local menu
   local background = "graphics/screens/menu.png"
   local sx = Video.Width / 20
@@ -247,6 +247,11 @@ function RunResultsMenu(s)
   end
 
   menu:run()
+end
+
+function RunMap(map)
+   StartMap(map)
+   RunResultsMenu(s)
 end
 
 difficulty = 5
@@ -312,8 +317,7 @@ function RunStartGameMenu(s)
     if revealmap:isMarked() == true then
        RevealMap()
     end
-    StartMap("maps/" .. map)
-    RunResultsMenu(s)
+    RunMap("maps/" .. map)
     PresentMap = OldPresentMap
     menu:stop()
   end
