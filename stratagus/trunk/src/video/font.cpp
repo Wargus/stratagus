@@ -721,38 +721,38 @@ void CFont::MeasureWidths()
 	Uint32 ckey;
 	int ipr;  // images per row
 
-	int maxy = this->G->GraphicWidth / this->G->Width * this->G->GraphicHeight / this->G->Height;
-	this->CharWidth = new char[maxy];
-	memset(this->CharWidth, 0, maxy);
-	this->CharWidth[0] = this->G->Width / 2;  // a reasonable value for SPACE
-	ckey = this->G->Surface->format->colorkey;
-	ipr = this->G->Surface->w / this->G->Width;
+	int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
+	CharWidth = new char[maxy];
+	memset(CharWidth, 0, maxy);
+	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
+	ckey = G->Surface->format->colorkey;
+	ipr = G->Surface->w / G->Width;
 
-	SDL_LockSurface(this->G->Surface);
+	SDL_LockSurface(G->Surface);
 	for (int y = 1; y < maxy; ++y) {
-		sp = (const unsigned char *)this->G->Surface->pixels +
-			(y / ipr) * this->G->Surface->pitch * this->G->Height +
-			(y % ipr) * this->G->Width - 1;
-		gp = sp + this->G->Surface->pitch * this->G->Height;
+		sp = (const unsigned char *)G->Surface->pixels +
+			(y / ipr) * G->Surface->pitch * G->Height +
+			(y % ipr) * G->Width - 1;
+		gp = sp + G->Surface->pitch * G->Height;
 		// Bail out if no letters left
-		if (gp >= ((const unsigned char *)this->G->Surface->pixels +
-				this->G->Surface->pitch * this->G->GraphicHeight)) {
+		if (gp >= ((const unsigned char *)G->Surface->pixels +
+				G->Surface->pitch * G->GraphicHeight)) {
 			break;
 		}
 		while (sp < gp) {
-			lp = sp + this->G->Width;
+			lp = sp + G->Width;
 			for (; sp < lp; --lp) {
 				if (*lp != ckey) {
-					if (lp - sp > this->CharWidth[y]) {  // max width
-						this->CharWidth[y] = lp - sp;
+					if (lp - sp > CharWidth[y]) {  // max width
+						CharWidth[y] = lp - sp;
 					}
 				}
 			}
-			sp += this->G->Surface->pitch;
+			sp += G->Surface->pitch;
 		}
 
 	}
-	SDL_UnlockSurface(this->G->Surface);
+	SDL_UnlockSurface(G->Surface);
 }
 
 /**
