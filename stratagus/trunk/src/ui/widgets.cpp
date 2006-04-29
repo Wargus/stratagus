@@ -10,7 +10,7 @@
 //
 /**@name widgets.cpp - The stratagus ui widgets. */
 //
-//      (c) Copyright 2005 by Fran�is Beerten and Jimmy Salmon
+//      (c) Copyright 2005-2006 by Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -87,16 +87,17 @@ void initGuichan(int width, int height)
 }
 
 /**
-**  FIXME: docu
+**  Free all guichan infrastructure
 */
 void freeGuichan() 
 {
-	// FIXME do a full cleanup
+	delete gui->getGraphics();
 	delete gui;
 	delete input;
 
 	gui = NULL;
 	input = NULL;
+	guichanActive = false;
 }
 
 /**
@@ -111,9 +112,6 @@ void handleInput(const SDL_Event *event)
 	}
 }
 
-/**
-**  FIXME: docu
-*/
 void DrawGuichanWidgets() 
 {
 	if (gui && guichanActive) {
