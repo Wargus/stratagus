@@ -75,8 +75,7 @@ private:
 		G(NULL) {}
 
 public:
-	~CFont();
-
+	virtual ~CFont();
 
 	static CFont *New(const char *ident, CGraphic *g);
 	static CFont *Get(const char *ident);
