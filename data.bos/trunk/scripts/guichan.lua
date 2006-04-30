@@ -408,7 +408,7 @@ function BuildMainMenu(menu)
   menu:addButton(_("~!Load Game"), x, ystep * 9, RunLoadGameMenu)
   menu:addButton(_("Show ~!Replay"), x, ystep * 10, RunReplayMenu)
   menu:addButton(_("~!Credits"), x, ystep * 11, RunCreditsMenu)
-  menu:addButton(_("~!Widgets Demo"), x, ystep * 12, RunWidgetsMenu)
+  menu:addButton("~!Widgets Demo", x, ystep * 12, RunWidgetsMenu)
 end
 
 function RunMainMenu(s)

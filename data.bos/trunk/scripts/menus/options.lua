@@ -209,22 +209,22 @@ function BuildVideoOptionsMenu(menu)
   local offx = (Video.Width - 352) / 2 + 100
   local offy = (Video.Height - 352) / 2
 
-  b = menu:addRadioButton(_("640 x 480"), "video", offx, offy + 36 * 1.5,
+  b = menu:addRadioButton("640 x 480", "video", offx, offy + 36 * 1.5,
     function() SetVideoSize(640, 480) menu:stop(1) end)
   if Video.Width == 640 then
     b:setMarked(true)
   end
-  b = menu:addRadioButton(_("800 x 600"), "video", offx, offy + 36 * 2.5,
+  b = menu:addRadioButton("800 x 600", "video", offx, offy + 36 * 2.5,
     function() SetVideoSize(800, 600) menu:stop(1) end)
   if Video.Width == 800 then
     b:setMarked(true)
   end
-  b = menu:addRadioButton(_("1024 x 768"), "video", offx, offy + 36 * 3.5,
+  b = menu:addRadioButton("1024 x 768", "video", offx, offy + 36 * 3.5,
     function() SetVideoSize(1024, 768) menu:stop(1) end)
   if Video.Width == 1024 then
     b:setMarked(true)
   end
-  b = menu:addRadioButton(_("1600 x 1200"), "video", offx, offy + 36 * 4.5,
+  b = menu:addRadioButton("1600 x 1200", "video", offx, offy + 36 * 4.5,
     function() SetVideoSize(1600, 1200) menu:stop(1) end)
   if Video.Width == 1600 then
     b:setMarked(true)
