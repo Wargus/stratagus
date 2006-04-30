@@ -262,7 +262,7 @@ function RunLanguageOptionsMenu(s)
   b = menu:addRadioButton("Français", "lang", offx, offy + 36 * 2.5,
     function() LoadPO("languages/fr.po") LoadPO("languages/bos-fr.po") end)
   b = menu:addRadioButton("Suomi", "lang", offx, offy + 36 * 3.5,
-    function() LoadPO("languages/fi.po") end)
+    function() LoadPO("languages/fi.po") LoadPO("languages/bos-fi.po") end)
   b = menu:addRadioButton("Polski", "lang", offx, offy + 36 * 4.5,
     function() LoadPO("languages/pl.po") end)
 
