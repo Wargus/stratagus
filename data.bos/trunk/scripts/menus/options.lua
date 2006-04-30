@@ -257,7 +257,7 @@ function RunLanguageOptionsMenu(s)
 
   menu = BosMenu(_("Language Selection"))
   b = menu:addRadioButton("English", "lang", offx, offy + 36 * 1.5,
-    function() LoadPO("languages/en.po") end)
+    function() LoadPO("languages/en.po") LoadPO("languages/bos-en.po") end)
   b:setMarked(true)
   b = menu:addRadioButton("Français", "lang", offx, offy + 36 * 2.5,
     function() LoadPO("languages/fr.po") LoadPO("languages/bos-fr.po") end)
