@@ -9,7 +9,7 @@
 --
 --      options.lua - The option menus
 --
---      (c) Copyright 2005 by François Beerten
+--      (c) Copyright 2005-2006 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -249,11 +249,32 @@ function RunVideoOptionsMenu(s)
   end 
 end
 
+function RunLanguageOptionsMenu(s)
+  local menu 
+  local b
+  local offx = (Video.Width - 352) / 2 + 100
+  local offy = (Video.Height - 352) / 2
+
+  menu = BosMenu(_("Language Selection"))
+  b = menu:addRadioButton("English", "lang", offx, offy + 36 * 1.5,
+    function() LoadPO("languages/en.po") end)
+  b:setMarked(true)
+  b = menu:addRadioButton("FranÃ§ais", "lang", offx, offy + 36 * 2.5,
+    function() LoadPO("languages/fr.po") LoadPO("languages/bos-fr.po") end)
+  b = menu:addRadioButton("Suomi", "lang", offx, offy + 36 * 3.5,
+    function() LoadPO("languages/fi.po") end)
+  b = menu:addRadioButton("Polski", "lang", offx, offy + 36 * 4.5,
+    function() LoadPO("languages/pl.po") end)
+
+  menu:run()
+end
+
 function BuildOptionsMenu(menu)
   local x = Video.Width / 2 - 100
   menu:addButton(_("Sound"), x, 140, RunSoundOptionsMenu)
   menu:addButton(_("Video"), x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
   menu:addButton(_("Speed"), x, 220, RunSpeedOptionsMenu)
+  menu:addButton(_("Language"), x, 260, function() RunLanguageOptionsMenu() menu:stop(1) end)
 end
 
 function RunOptionsMenu(s)
