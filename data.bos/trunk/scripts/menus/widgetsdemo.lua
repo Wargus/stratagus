@@ -9,7 +9,7 @@
 --
 --      widgetsdemo.lua - Demonstration of the UI widgets available.
 --
---      (c) Copyright 2005 by François Beerten
+--      (c) Copyright 2005-2006 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -37,14 +37,14 @@ function RunWidgetsMenu(s)
   normalImage:Load() -- FIXME remove when immediatly loaded
   pressedImage:Load() -- idem
 
-  b = Label(_("Translucent widgets"))
+  b = Label("Translucent widgets")
   b:setFont(CFont:Get("large"))
   b:adjustSize();
   menu:add(b, 20, 10)
 
-  menu:addButton(_("SubMenu"), 30, 50, RunSubMenu)
+  menu:addButton("SubMenu", 30, 50, RunSubMenu)
 
-  b = TextField(_("text input"))
+  b = TextField("text input")
   b:setActionCallback(function() print("field") end)
   b:setFont(CFont:Get("game"))
   b:setBaseColor(clear)
@@ -61,20 +61,20 @@ function RunWidgetsMenu(s)
   b:setForegroundColor(clear)
   b:setBackgroundColor(clear)
 
-  b = RadioButton(_("Platoon"), "dumgroup", true)
+  b = RadioButton("Platoon", "dumgroup", true)
   b:setActionCallback(function() print("one") end)
   b:setBaseColor(dark)
   b:setForegroundColor(clear)
   b:setBackgroundColor(dark)
   menu:add(b, 20, 180)
-  b = RadioButton(_("Army"), "dumgroup")
+  b = RadioButton("Army", "dumgroup")
   b:setActionCallback(function() print("two") end)
   b:setBaseColor(dark)
   b:setForegroundColor(clear)
   b:setBackgroundColor(dark)
   menu:add(b, 150, 180)
 
-  menu:addCheckBox(_("CheckBox"), 20, 210, function(s) print("checked ?") end)
+  menu:addCheckBox("CheckBox", 20, 210, function(s) print("checked ?") end)
 
   local ic = CGraphic:New("units/assault/ico_assault.png")
   ic:Load()
@@ -89,14 +89,14 @@ function RunWidgetsMenu(s)
 
   b = DropDownWidget()
   b:setFont(CFont:Get("game"))
-  b:setList({_("line1"), _("line2")})
+  b:setList({"line1", "line2"})
   b:setActionCallback(function(s) print("dropdown ".. b:getSelected()) end)
   b:setBaseColor(dark)
   b:setForegroundColor(clear)
   b:setBackgroundColor(dark)
   menu:add(b, 20, 350)
 
-  win = Windows(_("Test"), 70, 70)
+  win = Windows("Test", 70, 70)
   win:setBaseColor(dark)
   win:setForegroundColor(dark)
   win:setBackgroundColor(dark)
@@ -113,18 +113,18 @@ function RunWidgetsMenu(s)
   end
   
 
-  b = Label(_("Image based widgets"))
+  b = Label("Image based widgets")
   b:setFont(CFont:Get("large"))
   b:adjustSize();
   menu:add(b, 330, 10)
 
-  b = ImageButton(_("SubMenu"))
+  b = ImageButton("SubMenu")
   b:setNormalImage(normalImage)
   b:setPressedImage(pressedImage)
   b:setActionCallback(RunSubMenu)
   menu:add(b, 330, 50)
 
-  b = ImageCheckBox(_("ImageCheckBox"))
+  b = ImageCheckBox("ImageCheckBox")
   local cb = CGraphic:New("ui/widgets/checkbox-unchecked-normal.png")
   cb:Load()
   b:setUncheckedNormalImage(cb)
@@ -149,8 +149,6 @@ function RunWidgetsMenu(s)
   bs:setWidth(100)
   bs:setHeight(20)
   menu:add(bs, 330, 140)
-
-
 
   menu:run()
 end
