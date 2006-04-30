@@ -353,7 +353,7 @@ function RunCampaignsMenu(s)
   local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200, ListDirsInDirectory)
   function startgamebutton(s)
     print("Starting campaign")
-    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign1.lua")
+    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()
   end
   menu:addButton(_("Start"), 100, 300, startgamebutton)
