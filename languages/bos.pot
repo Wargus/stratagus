@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-30 18:32+0200\n"
+"POT-Creation-Date: 2006-04-30 19:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -243,22 +243,6 @@ msgstr ""
 msgid "Music Volume"
 msgstr ""
 
-#: scripts/menus/options.lua:212
-msgid "640 x 480"
-msgstr ""
-
-#: scripts/menus/options.lua:217
-msgid "800 x 600"
-msgstr ""
-
-#: scripts/menus/options.lua:222
-msgid "1024 x 768"
-msgstr ""
-
-#: scripts/menus/options.lua:227
-msgid "1600 x 1200"
-msgstr ""
-
 #: scripts/menus/options.lua:233
 msgid "Fullscreen"
 msgstr ""
@@ -271,68 +255,24 @@ msgstr ""
 msgid "Language Selection"
 msgstr ""
 
-#: scripts/menus/options.lua:273
+#: scripts/menus/options.lua:274
 msgid "Sound"
 msgstr ""
 
-#: scripts/menus/options.lua:274
+#: scripts/menus/options.lua:275
 msgid "Video"
 msgstr ""
 
-#: scripts/menus/options.lua:275
+#: scripts/menus/options.lua:276
 msgid "Speed"
 msgstr ""
 
-#: scripts/menus/options.lua:276
+#: scripts/menus/options.lua:277
 msgid "Language"
 msgstr ""
 
-#: scripts/menus/options.lua:284
+#: scripts/menus/options.lua:285
 msgid "Options"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:40
-msgid "Translucent widgets"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:45 scripts/menus/widgetsdemo.lua:121
-msgid "SubMenu"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:47
-msgid "text input"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:64
-msgid "Platoon"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:70
-msgid "Army"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:77
-msgid "CheckBox"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:92
-msgid "line1"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:92
-msgid "line2"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:99
-msgid "Test"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:116
-msgid "Image based widgets"
-msgstr ""
-
-#: scripts/menus/widgetsdemo.lua:127
-msgid "ImageCheckBox"
 msgstr ""
 
 #: scripts/menus/credits.lua:36
@@ -474,8 +414,4 @@ msgstr ""
 
 #: scripts/guichan.lua:410
 msgid "~!Credits"
-msgstr ""
-
-#: scripts/guichan.lua:411
-msgid "~!Widgets Demo"
 msgstr ""
