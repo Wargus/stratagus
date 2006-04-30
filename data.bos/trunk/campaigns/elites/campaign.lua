@@ -12,7 +12,7 @@
 --
 --  campaign.lua  -  Define the Elite campaign 1.
 --
---  (c) Copyright 2005 by Loïs Taulelle
+--  (c) Copyright 2005-2006 by Lois Taulelle and FranÃ§ois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -31,15 +31,35 @@
 --=============================================================================
 --  Define the campaign
 --
-DefineCampaign("elites", "name", "~!Elites",
-    "campaign", {
-    "play-level", "campaigns/elites/level01.smp",
-    "play-level", "campaigns/elites/level02.smp",
-    "play-level", "campaigns/elites/level03.smp",
-    "play-level", "campaigns/elites/level04.smp",
-    "play-level", "campaigns/elites/level05.smp",
-    "play-level", "campaigns/elites/level06.smp",
-    "play-level", "campaigns/elites/level07.smp",
-    "play-level", "campaigns/elites/level08.smp",
-    "play-level", "campaigns/elites/level09.smp",
-    "play-level", "campaigns/elites/level10.smp" })
+
+function CreateMapStep(map)
+   return function() RunMap(map) end
+end
+
+local steps = {
+  CreateMapStep("campaigns/elites/level01.smp"),
+  CreateMapStep("campaigns/elites/level02.smp"),
+  CreateMapStep("campaigns/elites/level03.smp"),
+  CreateMapStep("campaigns/elites/level04.smp"),
+  CreateMapStep("campaigns/elites/level05.smp"),
+  CreateMapStep("campaigns/elites/level06.smp"),
+  CreateMapStep("campaigns/elites/level07.smp"),
+  CreateMapStep("campaigns/elites/level08.smp"),
+  CreateMapStep("campaigns/elites/level09.smp"),
+  CreateMapStep("campaigns/elites/level10.smp")}
+
+position = 1
+function RunCampaign()
+  while position < 10 do
+    steps[position]()
+    if GameResult == GameVictory then
+       position = position + 1
+    elseif GameResult == GameDefeat then
+       position = position
+    else 
+      return
+    end
+  end
+end
+RunCampaign()
+
