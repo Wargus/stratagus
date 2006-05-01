@@ -48,6 +48,8 @@
 
 typedef std::map<std::string, std::string> EntriesType;
 static EntriesType Entries;
+std::string StratagusTranslation;
+std::string GameTranslation;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -178,5 +180,16 @@ void LoadPO(const char *file)
 	fclose(fd);
 }
 
+/** Set the stratagus and game translations
+**
+** Those filenames will be saved in the preferences when SavePreferences will be called.
+**/
+void SetTranslationsFiles(const char *stratagusfile, const char *gamefile)
+{
+	LoadPO(stratagusfile);
+	LoadPO(gamefile);
+	StratagusTranslation = stratagusfile;
+	GameTranslation = gamefile;
+}
 //@}
 
