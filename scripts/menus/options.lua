@@ -256,15 +256,27 @@ function RunLanguageOptionsMenu(s)
   local offy = (Video.Height - 352) / 2
 
   menu = BosMenu(_("Language Selection"))
-  b = menu:addRadioButton("English", "lang", offx, offy + 36 * 1.5,
-    function() LoadPO("languages/en.po") LoadPO("languages/bos-en.po") end)
-  b:setMarked(true)
-  b = menu:addRadioButton("Français", "lang", offx, offy + 36 * 2.5,
-    function() LoadPO("languages/fr.po") LoadPO("languages/bos-fr.po") end)
-  b = menu:addRadioButton("Suomi", "lang", offx, offy + 36 * 3.5,
-    function() LoadPO("languages/fi.po") LoadPO("languages/bos-fi.po") end)
-  b = menu:addRadioButton("Polski", "lang", offx, offy + 36 * 4.5,
-    function() LoadPO("languages/pl.po") end)
+  local function AddLanguage(language, po, h)
+     local function SetLanguage()
+        SetTranslationsFiles("languages/" .. po .. ".po",
+                          "languages/bos-" .. po .. ".po") 
+        SavePreferences()
+     end      
+     local rb = menu:addRadioButton(language, "lang", offx, offy + 36 * h, SetLanguage)
+     if StratagusTranslation == ("languages/" .. po .. ".po") then
+       rb:setMarked(true)
+     end
+     return rb
+  end
+     
+  print(StratagusTranslation)
+  b = AddLanguage("English", "en", 1.5)
+  if StratagusTranslation == "" then
+     b:setMarked(true)
+  end
+  AddLanguage("Français", "fr", 2.5)
+  AddLanguage("Suomi", "fi", 3.5)
+  AddLanguage("Polski", "pl", 4.5)
 
   menu:run()
 end
