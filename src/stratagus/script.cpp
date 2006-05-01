@@ -2702,6 +2702,9 @@ void SavePreferences(void)
 	fprintf(fd, "SetMusicEnabled(%s)\n", IsMusicEnabled() ? "true" : "false");
 	fprintf(fd, "SetMusicVolume(%d)\n", GetMusicVolume());
 
+	fprintf(fd, "SetTranslationsFiles(\"%s\", \"%s\")\n", 
+		StratagusTranslation.c_str(), GameTranslation.c_str());
+
 	fclose(fd);
 }
 

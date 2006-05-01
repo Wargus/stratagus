@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Wed Apr 19 12:50:06 2006.
+** Generated automatically by tolua++-1.0.7 on Mon May  1 11:59:24 2006.
 */
 
 #ifndef __cplusplus
@@ -9375,6 +9375,84 @@ static int tolua_stratagus_LoadPO00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: SetTranslationsFiles */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetTranslationsFiles00
+static int tolua_stratagus_SetTranslationsFiles00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* stratagusfile = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const char* gamefile = ((const char*)  tolua_tostring(tolua_S,2,0));
+ {
+  SetTranslationsFiles(stratagusfile,gamefile);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetTranslationsFiles'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: StratagusTranslation */
+#ifndef TOLUA_DISABLE_tolua_get_StratagusTranslation
+static int tolua_get_StratagusTranslation(lua_State* tolua_S)
+{
+ tolua_pushcppstring(tolua_S,(const char*)StratagusTranslation);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: StratagusTranslation */
+#ifndef TOLUA_DISABLE_tolua_set_StratagusTranslation
+static int tolua_set_StratagusTranslation(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  StratagusTranslation = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: GameTranslation */
+#ifndef TOLUA_DISABLE_tolua_get_GameTranslation
+static int tolua_get_GameTranslation(lua_State* tolua_S)
+{
+ tolua_pushcppstring(tolua_S,(const char*)GameTranslation);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameTranslation */
+#ifndef TOLUA_DISABLE_tolua_set_GameTranslation
+static int tolua_set_GameTranslation(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  GameTranslation = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Translate */
 #ifndef TOLUA_DISABLE_tolua_stratagus__00
 static int tolua_stratagus__00(lua_State* tolua_S)
@@ -10003,6 +10081,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
  tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
  tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
+ tolua_function(tolua_S,"SetTranslationsFiles",tolua_stratagus_SetTranslationsFiles00);
+ tolua_variable(tolua_S,"StratagusTranslation",tolua_get_StratagusTranslation,tolua_set_StratagusTranslation);
+ tolua_variable(tolua_S,"GameTranslation",tolua_get_GameTranslation,tolua_set_GameTranslation);
  tolua_function(tolua_S,"_",tolua_stratagus__00);
  tolua_endmodule(tolua_S);
  return 1;
