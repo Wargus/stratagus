@@ -10,7 +10,7 @@
 //
 /**@name script_ai.cpp - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer, Ludovic Pollet,
+//      (c) Copyright 2000-2006 by Lutz Sammer, Ludovic Pollet,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -865,29 +865,19 @@ static int CclAiSetReserve(lua_State *l)
 **  Set AI player resource collect percent.
 **
 **  @param l  Lua state.
-**
-**  @return     Old resource vector
 */
 static int CclAiSetCollect(lua_State *l)
 {
-	int i;
-
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	// FIXME: use key/value pairs
-	lua_newtable(l);
-	for (i = 0; i < MaxCosts; ++i) {
-		lua_pushnumber(l, AiPlayer->Collect[i]);
-		lua_rawseti(l, -2, i + 1);
-	}
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		lua_rawgeti(l, 1, i + 1);
 		AiPlayer->Collect[i] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 	}
-	return 1;
+	return 0;
 }
 
 /**
