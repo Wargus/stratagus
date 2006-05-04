@@ -31,7 +31,7 @@ STRATAGUS_LIBS= -lpng -lz -lm \
 	@EXTRA_LIBS@ @VIDEO_LIBS@ @THREAD_LIBS@ $(COMP_LIBS) \
 	@FLAC_LIBS@ @VORBIS_LIBS@ @THEORA_LIBS@ @MNG_LIBS@ \
 	@MAD_LIBS@ @MIKMOD_LIBS@ @LUA_LIBS@ @STATIC_LDFLAGS@ \
-	-lz -lm -L/usr/local/lib
+	-lz -lm \$LDDFLAGS
 
 DISTLIST=$(TOPDIR)/distlist
 TAGS=$(TOPDIR)/src/tags
@@ -43,6 +43,8 @@ ARCH=@ARCH@
 OE=@OE@
 OBJDIR=@OBJDIR@
 
+CPPFLAGS=@EXTRA_CPPFLAGS@ \$CPPFLAGS
+
 IFLAGS=	-I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include \
     $(XIFLAGS)
 
@@ -52,8 +54,7 @@ CFLAGS=$(IFLAGS) @DEFS@ -I. \
     @VORBIS_CFLAGS@ @THEORA_CFLAGS@ \
     @MNG_CFLAGS@ @MAD_CFLAGS@ @FLAC_CFLAGS@ \
     @MIKMOD_CFLAGS@ @LUA_CFLAGS@ \
-    $(COMP_CFLAGS) @PLATFORM@ \
-    -I/usr/local/include -I/usr/X11R6/include
+    $(COMP_CFLAGS) @PLATFORM@ \$CFLAGS \
 
 CTAGSFLAGS=-i defptvS -a -f 
 
