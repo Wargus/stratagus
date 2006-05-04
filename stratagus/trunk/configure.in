@@ -39,24 +39,24 @@ if test "$ARCH" = "bsd" ; then
 fi
 
 if test "$ARCH" = "macosx" ; then
-    if [ -d /usr/local/include ]; then
+    if test -d /usr/local/include; then
 	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/usr/local/include"
     fi
-    if [ -d /usr/local/lib ]; then
+    if test -d /usr/local/lib; then
 	EXTRA_LIBS="$EXTRA_LIBS -L/usr/local/lib"
     fi
 
-    if [ -d /sw/include ]; then
+    if test -d /sw/include; then
 	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/sw/include"
     fi
-    if [ -d /sw/lib ]; then
+    if test -d /sw/lib; then
 	EXTRA_LIBS="$EXTRA_LIBS -L/sw/lib"
     fi
 
-    if [ -d /opt/local/include ]; then
+    if test -d /opt/local/include; then
 	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/opt/local/include"
     fi
-    if [ -d /opt/local/lib ]; then
+    if test -d /opt/local/lib; then
 	EXTRA_LIBS="$EXTRA_LIBS -L/opt/local/lib"
     fi
 fi
