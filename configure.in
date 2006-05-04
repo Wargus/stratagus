@@ -7,8 +7,6 @@ AM_CONFIG_HEADER(config.h)
 
 AC_CHECK_FUNCS(strcasestr)
 
-CPPFLAGS="$CPPFLAGS -I/usr/local/include -L/usr/local/lib -I/sw/include -L/sw/lib"
-
 AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
 AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
 
@@ -36,32 +34,40 @@ else
     ARCH=linux
 fi
 
+EXTRA_CFLAGS=$CFLAGS
+EXTRA_CPPFLAGS=$CPPFLAGS
+EXTRA_LIBS=$LDFLAGS
+
+if test "$ARCH" = "bsd" ; then
+    EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/usr/X11R6/include"
+fi
+
 if test "$ARCH" = "macosx" ; then
     if [ -d /usr/local/include ]; then
-	EXTRA_CFLAGS="$EXTRA_CFLAGS -I/usr/local/include"
-	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/usr/local/include"
     fi
     if [ -d /usr/local/lib ]; then
 	EXTRA_LIBS="$EXTRA_LIBS -L/usr/local/lib"
     fi
 
     if [ -d /sw/include ]; then
-	EXTRA_CFLAGS="$EXTRA_CFLAGS -I/sw/include"
-	CPPFLAGS="$CPPFLAGS -I/sw/include"
+	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/sw/include"
     fi
     if [ -d /sw/lib ]; then
 	EXTRA_LIBS="$EXTRA_LIBS -L/sw/lib"
     fi
 
     if [ -d /opt/local/include ]; then
-	EXTRA_CFLAGS="$EXTRA_CFLAGS -I/opt/local/include"
-	CPPFLAGS="$CPPFLAGS -I/opt/local/include"
+	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/opt/local/include"
     fi
     if [ -d /opt/local/lib ]; then
 	EXTRA_LIBS="$EXTRA_LIBS -L/opt/local/lib"
     fi
 fi
 
+CPPFLAGS=$EXTRA_CPPFLAGS
+
+AC_SUBST(EXTRA_CPPFLAGS)
 AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(EXTRA_LIBS)
 
