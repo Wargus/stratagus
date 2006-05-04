@@ -37,8 +37,8 @@ else
 fi
 
 if test "$ARCH" = "macosx" ; then
-    EXTRA_CFLAGS=-I/sw/include
-    EXTRA_LIBS=-L/sw/lib
+    EXTRA_CFLAGS="-I/sw/include -I/usr/local/include"
+    EXTRA_LIBS="-L/sw/lib -L/usr/local/lib"
     CPPFLAGS="$CPPFLAGS -I/sw/include"
 fi
 
