@@ -393,7 +393,6 @@ void SetSoundRange(CSound *sound, unsigned char range)
 **  @return        the sound unique identifier
 **
 **  @todo FIXME: Must handle the errors better.
-**  FIXME: Support for more sample files (ogg/flac/mp3).
 */
 CSound *RegisterSound(const char *files[], unsigned number)
 {
