@@ -114,10 +114,9 @@ static int ConvertToStereo32(const char *src, char *dest, int frequency,
 	if (chansize == 1) {
 		format = AUDIO_U8;
 	} else {
-		format = AUDIO_S16;
+		format = AUDIO_S16SYS;
 	}
-	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16,
-		2, 44100);
+	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16SYS, 2, 44100);
 
 	acvt.buf = (unsigned char *)dest;
 	memcpy(dest, src, bytes);
