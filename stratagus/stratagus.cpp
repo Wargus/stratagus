@@ -95,7 +95,7 @@
 ** @see script_sound.cpp @see sound_id.cpp @see sound_server.cpp
 ** @see unitsound.cpp
 ** @see sdl_audio.cpp
-** @see mad.cpp @see ogg.cpp @see flac.cpp @see wav.cpp
+** @see ogg.cpp @see wav.cpp
 **
 ** @subsection Video Video
 **
@@ -901,17 +901,11 @@ int main(int argc, char **argv)
 #ifdef USE_BZ2LIB
 		"BZ2LIB "
 #endif
-#ifdef USE_FLAC
-		"FLAC "
-#endif
 #ifdef USE_VORBIS
 		"VORBIS "
 #endif
 #ifdef USE_THEORA
 		"THEORA "
-#endif
-#ifdef USE_MAD
-		"MP3 "
 #endif
 #ifdef USE_MIKMOD
 		"MIKMOD "
