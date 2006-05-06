@@ -83,10 +83,8 @@ extern char *CurrentMusicFile;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CSample *LoadFlac(const char *name, int flags);   /// Load a flac file
 extern CSample *LoadWav(const char *name, int flags);    /// Load a wav file
 extern CSample *LoadVorbis(const char *name, int flags); /// Load a vorbis file
-extern CSample *LoadMp3(const char *name, int flags);    /// Load a mp3 file
 extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
 
 	/// Set the channel volume

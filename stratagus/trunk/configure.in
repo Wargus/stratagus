@@ -262,38 +262,6 @@ AC_SUBST(MNG_CFLAGS)
 AC_SUBST(MNG_LIBS)
 dnl ----------------------------
 
-dnl --- CHECK FOR MAD LIB ------
-AC_ARG_WITH(mad,
-    [  --with-mad		  [Use mad mp3 (default: no)]], MAD="$with_mad")
-MAD_CFLAGS=
-MAD_LIBS=
-if test "$MAD" != "yes"; then
-    MAD_CFLAGS=""
-    MAD_LIBS=""
-else
-    AC_CHECK_LIB(mad, mad_decoder_init,, AC_MSG_ERROR(libmad not found))
-    MAD_CFLAGS="-DUSE_MAD"
-    MAD_LIBS="-lmad"
-fi
-AC_SUBST(MAD_CFLAGS)
-AC_SUBST(MAD_LIBS)
-dnl ----------------------------
-
-dnl --- CHECK FOR FLAC LIB -----
-AC_ARG_WITH(flac,
-    [  --with-flac		  [Use FLAC (default: no)]], FLAC="$with_flac")
-if test "$FLAC" != "yes"; then
-    FLAC_CFLAGS=
-    FLAC_LIBS=
-else
-    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init,, AC_MSG_ERROR(libFLAC not found))
-    FLAC_CFLAGS="-DUSE_FLAC"
-    FLAC_LIBS="-lFLAC"
-fi
-AC_SUBST(FLAC_CFLAGS)
-AC_SUBST(FLAC_LIBS)
-dnl ----------------------------
-
 dnl ---- CHECK FOR LUA ---------
 AC_ARG_WITH(lua, 
     [  --with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")
