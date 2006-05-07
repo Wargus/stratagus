@@ -276,7 +276,8 @@ function RunLanguageOptionsMenu(s)
   end
   AddLanguage("Français", "fr", 2.5)
   AddLanguage("Suomi", "fi", 3.5)
-  AddLanguage("Polski", "pl", 4.5)
+  AddLanguage("Deutsch", "de", 4.5)
+  AddLanguage("Polski", "pl", 5.5)
 
   menu:run()
 end
