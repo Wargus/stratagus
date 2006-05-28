@@ -627,6 +627,7 @@ int GuichanLoop(const char *filename, CMap *map)
 
 extern void CleanMissiles();
 extern void InitDefinedVariables();
+extern void CleanTriggers();
 /**
 **  Cleanup game.
 **
@@ -639,6 +640,7 @@ void CleanGame(void)
 	EndReplayLog();
 	CleanMessages();
 
+	CleanTriggers();
 	CleanUnits();
 	CleanSelections();
 	CleanGroups();
