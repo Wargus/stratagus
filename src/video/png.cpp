@@ -10,7 +10,7 @@
 //
 /**@name png.cpp - The png graphic file loader. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ int LoadGraphicPNG(CGraphic *g)
 	 entries exist, use full alpha channel */
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
 		int num_trans;
-		Uint8 *trans;
+		png_bytep trans;
 
 		png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
 			&transv);
