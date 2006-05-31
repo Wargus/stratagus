@@ -10,7 +10,7 @@
 //
 /**@name sound_server.cpp - The sound server (hardware layer and so on) */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi, and
+//      (c) Copyright 1998-2006 by Lutz Sammer, Fabrice Rossi, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -118,7 +118,7 @@ static int ConvertToStereo32(const char *src, char *dest, int frequency,
 	}
 	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16SYS, 2, 44100);
 
-	acvt.buf = (unsigned char *)dest;
+	acvt.buf = (Uint8 *)dest;
 	memcpy(dest, src, bytes);
 	acvt.len = bytes;
 
