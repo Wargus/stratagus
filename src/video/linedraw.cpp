@@ -10,7 +10,7 @@
 //
 /**@name linedraw.cpp - The general linedraw functions. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
+//      (c) Copyright 2000-2006 by Lutz Sammer, Stephan Rasenberg,
 //                                 Jimmy Salmon, and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -641,9 +641,7 @@ void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 {
 	SDL_Rect drect;
 	SDL_Surface *s;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+	Uint8 r, g, b;
 
 	// FIXME: optimize
 	s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
