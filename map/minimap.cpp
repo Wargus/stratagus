@@ -10,7 +10,7 @@
 //
 /**@name minimap.cpp - The minimap. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -261,8 +261,8 @@ void CMinimap::UpdateTerrain(void)
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						Map.TileGraphic->Surface->pitch];
 			} else if (bpp == 3) {
-				unsigned char *d;
-				unsigned char *s;
+				Uint8 *d;
+				Uint8 *s;
 
 				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
@@ -391,8 +391,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						Map.TileGraphic->Surface->pitch];
 			} else if (bpp == 3) {
-				unsigned char *d;
-				unsigned char *s;
+				Uint8 *d;
+				Uint8 *s;
 
 				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
@@ -507,7 +507,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 				((Uint8 *)MinimapSurface->pixels)[mx + w + (my + h) * MinimapSurface->pitch] =
 					Video.MapRGB(MinimapSurface->format, c.r, c.g, c.b);
 			} else if (bpp == 3) {
-				unsigned char *d;
+				Uint8 *d;
 
 				d = &((Uint8 *)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch];
 				*(d + MinimapSurface->format->Rshift / 8) = c.r;
@@ -575,8 +575,8 @@ void CMinimap::Update(void)
 					((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 						((Uint8*)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch];
 				} else if (bpp == 3) {
-					unsigned char *d;
-					unsigned char *s;
+					Uint8 *d;
+					Uint8 *s;
 
 					d = &((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch];
 					s = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
@@ -597,7 +597,7 @@ void CMinimap::Update(void)
 					((Uint8 *)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 						Video.MapRGB(MinimapSurface->format, 0, 0, 0);
 				} else if (bpp == 3) {
-					unsigned char *d;
+					Uint8 *d;
 
 					d = &((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch];
 					*(d + MinimapSurface->format->Rshift / 8) = 0;
