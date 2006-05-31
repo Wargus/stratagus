@@ -433,11 +433,13 @@ static int CclSetTile(lua_State *l)
 	w = LuaToNumber(l, 2);
 	h = LuaToNumber(l, 3);
 
-	Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
-	Map.Fields[w + h * Map.Info.MapWidth].Value = 0;
-	Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
-	Map.Fields[w + h * Map.Info.MapWidth].Cost = 
-		1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
+	if (Map.Fields) {
+		Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
+		Map.Fields[w + h * Map.Info.MapWidth].Value = 0;
+		Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
+		Map.Fields[w + h * Map.Info.MapWidth].Cost = 
+			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
+	}
 
 	return 0;
 }
