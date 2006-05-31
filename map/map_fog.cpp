@@ -648,9 +648,7 @@ void CViewport::DrawMapFogOfWar() const
 void CMap::InitFogOfWar(void)
 {
 #ifndef USE_OPENGL
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+	Uint8 r, g, b;
 	Uint32 color;
 	SDL_Surface *s;
 #endif
@@ -683,7 +681,7 @@ void CMap::InitFogOfWar(void)
 		int i;
 		int j;
 		Uint32 c;
-		unsigned char a;
+		Uint8 a;
 		SDL_PixelFormat *f;
 
 		// Copy the top row to a new surface
