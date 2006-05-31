@@ -10,7 +10,7 @@
 //
 /**@name player.cpp - The players. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -145,9 +145,7 @@ void SavePlayers(CFile *file)
 {
 	int i;
 	int j;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+	Uint8 r, g, b;
 
 	file->printf("\n--------------------------------------------\n");
 	file->printf("--- MODULE: players $Id$\n\n");
