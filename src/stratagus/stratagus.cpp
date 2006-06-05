@@ -669,7 +669,7 @@ static void ExpandPath(char *newpath, const char *path)
 	}
 }
 
-void StartMap(const char *filename) 
+void StartMap(const char *filename, bool clean = true) 
 {
 	guichanActive = false;
 	NetConnectRunning = 0;
@@ -677,7 +677,9 @@ void StartMap(const char *filename)
 
 	//  Create the game.
 	DebugPrint("Creating game with map: %s\n" _C_ filename);
-	CleanPlayers();
+	if (clean) {
+		CleanPlayers();
+	}
 	CreateGame(filename, &Map);
 
 	UI.StatusLine.Set(NameLine);
@@ -701,10 +703,11 @@ void StartSavedGame(const char *filename)
 
 	guichanActive = false;
 	SaveGameLoading = 1;
+	CleanPlayers();
 	ExpandPath(path, filename);
 	LoadGame(path);
 
-	StartMap(filename);
+	StartMap(filename, false);
 }
 	
 void StartEditor(const char *filename) 
@@ -731,6 +734,7 @@ void StartReplay(const char *filename)
 	int i;
 	char replay[512];
 
+	CleanPlayers();
 	ExpandPath(replay, filename);
 	LoadReplay(replay);
 
@@ -743,7 +747,7 @@ void StartReplay(const char *filename)
 
 	//TODO ReplayRevealMap = 1
 
-	StartMap(CurrentMapPath);
+	StartMap(CurrentMapPath, false);
 }
 
 //----------------------------------------------------------------------------
