@@ -284,8 +284,8 @@ class MenuScreen : Container
 	void addLogicCallback(LuaActionListener *actionListener);
 };
 
-$void StartMap(const char *str);
-void StartMap(const char *str);
+$void StartMap(const char *str, bool clean = false);
+void StartMap(const char *str, bool clean = false);
 $void StartEditor(const char *str);
 void StartEditor(const char *str);
 $void StartReplay(const char *str);
