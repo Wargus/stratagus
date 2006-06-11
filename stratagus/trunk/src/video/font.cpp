@@ -743,7 +743,7 @@ void CFont::MeasureWidths()
 		while (sp < gp) {
 			lp = sp + G->Width;
 			for (; sp < lp; --lp) {
-				if (*lp != ckey) {
+				if (*lp != ckey && *lp != 7) {
 					if (lp - sp > CharWidth[y]) {  // max width
 						CharWidth[y] = lp - sp;
 					}
