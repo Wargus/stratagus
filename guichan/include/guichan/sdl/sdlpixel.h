@@ -107,7 +107,7 @@ namespace gcn
         
         }
 
-        unsigned char r,g,b,a;
+        Uint8 r,g,b,a;
     
         SDL_GetRGBA(color, surface->format, &r, &g, &b, &a);
         SDL_UnlockSurface(surface);
