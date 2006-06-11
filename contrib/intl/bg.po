@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Stratagus traduction\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 18:54-0600\n"
-"PO-Revision-Date: 2006-03-23 14:12+0100\n"
+"PO-Revision-Date: 2006-05-20 16:48+0100\n"
 "Last-Translator: Alexander Petkov <sasho_manga_fen@yahoo.com>\n"
 "Language-Team: Bulgarian\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: src/action/action_build.cpp:119
 msgid "You cannot reach building place"
-msgstr "Не правилно място да строене"
+msgstr "Не мога да достигна мястото за стоене."
 
 #: src/action/action_build.cpp:177
 #, c-format
@@ -39,7 +39,7 @@ msgstr "Не може да строите повече единици %s"
 #: src/action/action_build.cpp:255
 #, c-format
 msgid "Unable to create building %s"
-msgstr "Не мога да пусна сградата %s"
+msgstr "Не мога да създам сградата %s"
 
 #: src/action/action_build.cpp:515
 #, c-format
@@ -161,7 +161,7 @@ msgstr "Replay got out of sync !"
 #: src/network/commands.cpp:959
 #: src/network/commands.cpp:974
 msgid "End of replay"
-msgstr "Край на Replay"
+msgstr "Край на повторението"
 
 #: src/network/network.cpp:963
 #, c-format
@@ -175,7 +175,7 @@ msgstr "Network out of sync"
 #: src/network/network.cpp:1297
 #, c-format
 msgid "Waiting for player \"%s\": %d:%02d"
-msgstr "En attente de joueurs \"%s\": %d:%02d"
+msgstr "Чакам играча \"%s\": %d:%02d"
 
 #: src/network/network.cpp:1313
 msgid "Timed out"
@@ -202,7 +202,7 @@ msgstr "Ти победи!"
 #: src/stratagus/stratagus.cpp:575
 #: src/stratagus/stratagus.cpp:664
 msgid "Do it! Do it now!"
-msgstr "Do it! Do it now!!"
+msgstr "Направи го! Направи го сега!!"
 
 #: src/stratagus/stratagus.cpp:819
 #, c-format
@@ -212,15 +212,15 @@ msgstr "Благодаря ви, че играхте Stratagus.\n"
 #: src/ui/botpanel.cpp:740
 #: src/ui/botpanel.cpp:805
 msgid "Select Target"
-msgstr "Select Target"
+msgstr "Посочи мишената"
 
 #: src/ui/botpanel.cpp:868
 msgid "Select Location"
-msgstr "Select Location"
+msgstr "Посочи местонахождението"
 
 #: src/ui/botpanel.cpp:887
 msgid "Unit training queue is full"
-msgstr "Unit training queue is full"
+msgstr "Няма място пред опашката за трениране на единици."
 
 #: src/ui/interface.cpp:94
 #, c-format
