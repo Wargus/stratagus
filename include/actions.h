@@ -10,7 +10,7 @@
 //
 /**@name actions.h - The actions headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ extern void CommandMoveOrder(CUnit *unit, int src, int dst);
 ----------------------------------------------------------------------------*/
 
 	/// Generic still action
-extern void ActionStillGeneric(CUnit *unit, int ground);
+extern void ActionStillGeneric(CUnit *unit, bool stand_ground);
 	/// Handle command still
 extern void HandleActionStill(CUnit *unit);
 	/// Handle command stand ground

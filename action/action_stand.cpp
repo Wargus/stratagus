@@ -10,7 +10,7 @@
 //
 /**@name action_stand.cpp - The stand ground action. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2000-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@
 */
 void HandleActionStandGround(CUnit *unit)
 {
-	ActionStillGeneric(unit, 1);
+	ActionStillGeneric(unit, true);
 }
 
 //@}
