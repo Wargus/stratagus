@@ -116,6 +116,9 @@ function BosMenu(title, background)
     local bq
     bq = menu:addListBox(x, y, w, h, mapslist)
     bq.getSelectedItem = function(self)
+        if self:getSelected() < 0 then
+           return self.itemslist[1]
+        end
         return self.itemslist[self:getSelected() + 1]
     end
 
