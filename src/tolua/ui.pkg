@@ -1,8 +1,66 @@
+$using std::string;
+$using std::vector;
+
+class CFiller
+{
+	CFiller();
+	
+	CGraphic *G;
+	int X;
+	int Y;
+};
+
+class CUIButton
+{
+	CUIButton();
+
+	int X;
+	int Y;
+	string Text;
+	ButtonStyle *Style;
+};
+
+class CMenuPanel
+{
+	CMenuPanel();
+
+	string Ident;
+	CGraphic *G;
+};
+
+class vector
+{
+	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, CMenuPanel)
+
+	void clear();
+	int size() const;
+
+	const T& operator[](int index) const;
+	T& operator[](int index);
+	void push_back(T val);
+
+	vector();
+	~vector();
+};
+
+
 class CButtonPanel
 {
 	int X;
 	int Y;
+	vector<CUIButton> Buttons;
+	CColor AutoCastBorderColorRGB;
 	bool ShowCommandKey;
+};
+
+class CResourceInfo
+{
+	CGraphic *G;
+	int IconFrame;
+	int IconX;
+	int IconY;
+	int TextX;
+	int TextY;
 };
 
 class CInfoPanel
@@ -11,11 +69,58 @@ class CInfoPanel
 	int Y;
 };
 
+class CStatusLine
+{
+	int Width;
+	int TextX;
+	int TextY;
+	CFont *Font;
+};
+
+class CMapArea
+{
+	int X;
+	int Y;
+	int EndX;
+	int EndY;
+	int ScrollPaddingLeft;
+	int ScrollPaddingRight;
+	int ScrollPaddingTop;
+	int ScrollPaddingBottom;
+};
+
 class CUserInterface
 {
+	string NormalFontColor;
+	string ReverseFontColor;
+	
+	vector<CFiller> Fillers;
+
+	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
+	CUIButton *SingleSelectedButton;
+
+	vector<CUIButton> SelectedButtons;
+	CFont *MaxSelectedFont;
+	int MaxSelectedTextX;
+	int MaxSelectedTextY;
+
+	CUIButton *SingleTrainingButton;
+	vector<CUIButton> TrainingButtons;
+	CUIButton *UpgradingButton;
+	CUIButton *ResearchingButton;
+	vector<CUIButton> TransportingButtons;
+	
 	CButtonPanel ButtonPanel;
+
+	CUIButton MenuButton;
+	CUIButton NetworkMenuButton;
+	CUIButton NetworkDiplomacyButton;
+
 	CMinimap Minimap;
+	CStatusLine StatusLine;
+	CMapArea MapArea;
+	vector<CMenuPanel> MenuPanels;
 };
 
 extern CUserInterface UI;
@@ -29,6 +134,9 @@ class CIcon
 	CGraphic *G;
 	int Frame;
 };
+
+extern ButtonStyle *FindButtonStyle(const char *style);
+extern CheckboxStyle *FindCheckboxStyle(const char *style);
 
 extern bool GetMouseScroll(void);
 extern void SetMouseScroll(bool enabled);
@@ -292,10 +400,12 @@ $void StartReplay(const char *str);
 void StartReplay(const char *str);
 $void StartSavedGame(const char *str);
 void StartSavedGame(const char *str);
+
 $#include "campaign.h"
 enum GameResults {
 	GameNoResult,
 	GameVictory,
-	GameDefeat, 
+	GameDefeat,
 	GameDraw
 } GameResult;
+

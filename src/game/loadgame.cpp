@@ -132,7 +132,7 @@ void InitModules(void)
 	InitSyncRand();
 	InitIcons();
 	InitVideoCursors();
-	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]);
+	InitUserInterface();
 	InitMenus(ThisPlayer->Race);
 	InitPlayers();
 	InitMissileTypes();
@@ -192,7 +192,7 @@ void LoadModules(void)
 	SetPlayersPalette();
 	UI.Minimap.Create();
 
-	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+	SetDefaultTextColors(UI.NormalFontColor.c_str(), UI.ReverseFontColor.c_str());
 
 #if 0
 	LoadButtons();

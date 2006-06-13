@@ -65,8 +65,8 @@ static CFontColor *FontColor;                   /// Current font color
 static CFontColor *LastTextColor;          /// Last text color
 static CFontColor *DefaultTextColor;       /// Default text color
 static CFontColor *ReverseTextColor;       /// Reverse text color
-static char *DefaultNormalColorIndex;      /// Default normal color index
-static char *DefaultReverseColorIndex;     /// Default reverse color index
+static const char *DefaultNormalColorIndex;     /// Default normal color index
+static const char *DefaultReverseColorIndex;    /// Default reverse color index
 
 #ifdef USE_OPENGL
 /**
@@ -144,7 +144,7 @@ static void VideoDrawChar(const CGraphic *g,
 **  @param normal   Normal text color.
 **  @param reverse  Reverse text color.
 */
-void SetDefaultTextColors(char *normal, char *reverse)
+void SetDefaultTextColors(const char *normal, const char *reverse)
 {
 	DefaultNormalColorIndex = normal;
 	DefaultReverseColorIndex = reverse;
@@ -158,7 +158,7 @@ void SetDefaultTextColors(char *normal, char *reverse)
 **  @param normalp   Normal text color pointer.
 **  @param reversep  Reverse text color pointer.
 */
-void GetDefaultTextColors(char **normalp, char **reversep)
+void GetDefaultTextColors(const char **normalp, const char **reversep)
 {
 	*normalp = DefaultNormalColorIndex;
 	*reversep = DefaultReverseColorIndex;

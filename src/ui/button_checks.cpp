@@ -10,7 +10,7 @@
 //
 /**@name button_checks.cpp - The button checks. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//      (c) Copyright 1999-2006 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -59,9 +59,9 @@
 **
 **  @return        True if enabled.
 */
-int ButtonCheckTrue(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckTrue(const CUnit *unit, const ButtonAction *button)
 {
-	return 1;
+	return true;
 }
 
 /**
@@ -73,9 +73,9 @@ int ButtonCheckTrue(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckFalse(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckFalse(const CUnit *unit, const ButtonAction *button)
 {
-	return 0;
+	return false;
 }
 
 /**
@@ -86,7 +86,7 @@ int ButtonCheckFalse(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUpgrade(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUpgrade(const CUnit *unit, const ButtonAction *button)
 {
 	return UpgradeIdentAllowed(unit->Player, button->AllowStr) == 'R';
 }
@@ -99,22 +99,21 @@ int ButtonCheckUpgrade(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 {
 	char *buf;
-	const char *s;
 	CPlayer *player;
 
 	player = unit->Player;
 	buf = new_strdup(button->AllowStr);
-	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
-			return 1;
+			return true;
 		}
 	}
 	delete[] buf;
-	return 0;
+	return false;
 }
 
 /**
@@ -125,22 +124,21 @@ int ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 {
 	char *buf;
-	const char *s;
 	CPlayer *player;
 
 	player = unit->Player;
 	buf = new_strdup(button->AllowStr);
-	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
-			return 0;
+			return false;
 		}
 	}
 	delete[] buf;
-	return 1;
+	return true;
 }
 
 /**
@@ -153,7 +151,7 @@ int ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-int ButtonCheckNetwork(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNetwork(const CUnit *unit, const ButtonAction *button)
 {
 	return IsNetworkGame();
 }
@@ -168,7 +166,7 @@ int ButtonCheckNetwork(const CUnit *unit, const ButtonAction *button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-int ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 {
 	return !IsNetworkGame();
 }
@@ -182,10 +180,9 @@ int ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 {
-	return
-		unit->Orders[0]->Action != UnitActionTrain &&
+	return unit->Orders[0]->Action != UnitActionTrain &&
 		unit->Orders[0]->Action != UnitActionUpgradeTo &&
 		unit->Orders[0]->Action != UnitActionResearch;
 }
@@ -198,10 +195,9 @@ int ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
 {
-	return
-		unit->Orders[0]->Action != UnitActionUpgradeTo &&
+	return unit->Orders[0]->Action != UnitActionUpgradeTo &&
 		unit->Orders[0]->Action != UnitActionResearch;
 }
 
@@ -214,10 +210,10 @@ int ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
 {
 	if (unit->Orders[0]->Action != UnitActionStill) {
-		return 0;
+		return false;
 	}
 	return CheckDependByIdent(unit->Player, button->ValueStr);
 }
@@ -230,7 +226,7 @@ int ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckAttack(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckAttack(const CUnit *unit, const ButtonAction *button)
 {
 	return unit->Type->CanAttack;
 }
@@ -243,22 +239,22 @@ int ButtonCheckAttack(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
+bool ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
 {
 	// don't show any if working
 	if (!ButtonCheckNoWork(unit, button)) {
-		return 0;
+		return false;
 	}
 
 	// check if allowed
 	if (!CheckDependByIdent(unit->Player, button->ValueStr)) {
-		return 0;
+		return false;
 	}
 	if (!strncmp(button->ValueStr, "upgrade-", 8) &&
 			UpgradeIdentAllowed(unit->Player, button->ValueStr) != 'A') {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -270,16 +266,16 @@ int ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckSingleResearch(const CUnit *unit,
+bool ButtonCheckSingleResearch(const CUnit *unit,
 	const ButtonAction *button)
 {
 	if (ButtonCheckResearch(unit, button)) {
 		if (!unit->Player->UpgradeTimers.Upgrades[
 				UpgradeIdByIdent(button->ValueStr)]) {
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 //@}

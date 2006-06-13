@@ -471,7 +471,7 @@ void PreMenuSetup(void)
 	LoadCursors(PlayerRaces.Name[0]);
 	InitSettings();
 
-	InitUserInterface(PlayerRaces.Name[0]);
+	InitUserInterface();
 	UI.Load();
 }
 

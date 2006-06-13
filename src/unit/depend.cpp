@@ -10,7 +10,7 @@
 //
 /**@name depend.cpp - The units/upgrade dependencies */
 //
-//      (c) Copyright 2000-2005 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 2000-2006 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -189,7 +189,7 @@ void AddDependency(const char *target, const char *required, int count,
 **
 **  @return        True if available, false otherwise.
 */
-int CheckDependByIdent(const CPlayer *player, const char *target)
+bool CheckDependByIdent(const CPlayer *player, const char *target)
 {
 	DependRule rule;
 	const DependRule *node;
@@ -203,19 +203,19 @@ int CheckDependByIdent(const CPlayer *player, const char *target)
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = UnitTypeByIdent(target);
 		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
-			return 0;
+			return false;
 		}
 		rule.Type = DependRuleUnitType;
 	} else if (!strncmp(target, "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
-			return 0;
+			return false;
 		}
 		rule.Type = DependRuleUpgrade;
 	} else {
 		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target);
-		return 0;
+		return false;
 	}
 
 	//
@@ -227,12 +227,12 @@ int CheckDependByIdent(const CPlayer *player, const char *target)
 		while (node->Type != rule.Type ||
 				node->Kind.Upgrade != rule.Kind.Upgrade) {
 			if (!node->Next) {  // end of list
-				return 1;
+				return true;
 			}
 			node = node->Next;
 		}
 	} else {
-		return 1;
+		return true;
 	}
 
 	//
@@ -259,13 +259,13 @@ int CheckDependByIdent(const CPlayer *player, const char *target)
 			}
 			temp = temp->Rule;
 		}
-		return 1;  // all rules matches.
+		return true;  // all rules matches.
 
 try_or:
 		node = node->Next;
 	}
 
-	return 0;  // no rule matches
+	return false;  // no rule matches
 }
 
 /**
