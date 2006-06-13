@@ -217,10 +217,6 @@ function DefineEliteScreen(screen_width, screen_height)
 				"panel-building-contents"..info_panel_x},
 			"completed-bar", {
 				"color", {50, 50, 80}}},
-		"piemenu", {
-			"radius", 70,
-			"file", "ui/rosace1.png",
-			"mouse-button", "middle"},
 	}
 	AppendElements(ui,ui2)
 	DefineUI(unpack(ui))
@@ -400,6 +396,10 @@ UI.Resources[ScoreCost].IconX = 67 + 300
 UI.Resources[ScoreCost].IconY = 0
 UI.Resources[ScoreCost].TextX = 85 + 300
 UI.Resources[ScoreCost].TextY = 1
+
+UI.PieMenu.G = CGraphic:New("ui/rosace1.png")
+UI.PieMenu.MouseButton = MiddleButton
+UI.PieMenu:SetRadius(70)
 
 UI.MenuButton.X = Video.Width - 200
 UI.MenuButton.Y = 0
