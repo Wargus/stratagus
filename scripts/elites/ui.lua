@@ -205,164 +205,222 @@ function DefineEliteScreen(screen_width, screen_height)
 	local info_panel_y = 160 - 8
 
 	DefineElitePanels(info_panel_x, info_panel_y)
-	local ui = {"elites", screen_width, screen_height,
-		"normal-font-color", "light-blue",
-		"reverse-font-color", "yellow"}
+	local ui = {"elites", screen_width, screen_height}
 	-- no menu panel ?
 	-- minimap
-	AddFiller(ui, "elites/ui/ui_minimap.png", {screen_width - 200, 24-8})
 
 	local ui2 = {
-		"resources", {
-			"titanium", {
-				File = "elites/ui/ui_res_icons.png", Frame = 0,
-				Pos = {67 +   0, 0}, 
-				Size = {14, 14}, 
-				TextPos = {85 +   0, 1}},
-			"crystal", {
-				File = "elites/ui/ui_res_icons.png", Frame = 1,
-				Pos = {67 +  75, 0},
-				Size = {14, 14},
-				TextPos =  {85 +  75, 1}},
-			"food", {
-				File = "elites/ui/ui_res_icons.png", Frame = 3,
-				Pos =  {67 + 150, 0}, 
-				Size = {14, 14}, 
-				TextPos = {85 + 150, 1}},
-			"score", {
-				File = "elites/ui/ui_res_icons.png", Frame = 4,
-				Pos = {67 + 300, 0}, 
-				Size = {14, 14}, 
-				TextPos = {85 + 300, 1}}},
 		"info-panel", {
-			"panel", {
-				"file", "elites/ui/ui_info.png",
-				"pos", {info_panel_x, info_panel_y},
-				"size", {200, 176}},
 			"panels", {"panel-general-contents"..info_panel_x, 
 				"panel-attack-unit-contents"..info_panel_x,
-		                "panel-all-unit-contents"..info_panel_x, 
+				"panel-all-unit-contents"..info_panel_x, 
 				"panel-building-contents"..info_panel_x},
-			"selected", {
-				"single", {
-					"icon", {
-					   "pos", {info_panel_x + 13, info_panel_y+16}, "style", "icon"}
-				},
-				"multiple", {
-					"icons", {
-						{"pos", {info_panel_x + 13, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 28, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 43, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 58, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 73, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 88, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 103, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 118, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 133, info_panel_y+16}, "style", "icon"}},
-					"max-text", {
-						"font", "game",
-						"pos", {info_panel_x + 10, info_panel_y + 10}}}},
-			"training", {
-				"single", {
-					"text", {"text", "", "font", "game", "pos", {screen_width - 187, 204}},
-					"icon", {"pos", {info_panel_x + 13, info_panel_y + 91}, "style", "icon"}},
-				"multiple", {
-					"icons", {
-						{"pos", {info_panel_x + 13, info_panel_y + 91}, "style", "icon"},
-						{"pos", {info_panel_x + 28, info_panel_y + 91}, "style", "icon"},
-						{"pos", {info_panel_x + 43, info_panel_y + 91}, "style", "icon"},
-						{"pos", {info_panel_x + 58, info_panel_y + 91}, "style", "icon"},
-						{"pos", {info_panel_x + 73, info_panel_y + 91}, "style", "icon"},
-						{"pos", {info_panel_x + 88, info_panel_y + 91}, "style", "icon"}}}},
-			"upgrading", {
-				"icon", {"pos", {info_panel_x + 13, 243}, "style", "icon"}},
-			"researching", {
-				"icon", {"pos", {info_panel_x + 13, 243}, "style", "icon"}},
-			"transporting", {"icons", {
-					{"pos", {info_panel_x + 13, info_panel_y + 91}, "style", "icon"},
-					{"pos", {info_panel_x + 28, info_panel_y + 91}, "style", "icon"},
-					{"pos", {info_panel_x + 43, info_panel_y + 91}, "style", "icon"},
-					{"pos", {info_panel_x + 58, info_panel_y + 91}, "style", "icon"},
-					{"pos", {info_panel_x + 73, info_panel_y + 91}, "style", "icon"},
-					{"pos", {info_panel_x + 88, info_panel_y + 91}, "style", "icon"}}},
 			"completed-bar", {
 				"color", {50, 50, 80}}},
-		"button-panel", {
-			"panel", {
-				"file", "elites/ui/ui_" .. screen_width .. "_bpanel.png",
-				"pos", {screen_width - 200, 336-8-8}},
-			"icons", {
-				{"pos", {screen_width - 177+4, 340-12}, "style", "icon"},
-				{"pos", {screen_width - 122+4, 340-12}, "style", "icon"},
-				{"pos", {screen_width - 67+4, 340-12},  "style", "icon"},
-				{"pos", {screen_width - 177+4, 385-12}, "style", "icon"},
-				{"pos", {screen_width - 122+4, 385-12}, "style", "icon"},
-				{"pos", {screen_width - 67+4, 385-12},  "style", "icon"},
-				{"pos", {screen_width - 177+4, 430-12}, "style", "icon"},
-				{"pos", {screen_width - 122+4, 430-12}, "style", "icon"},
-				{"pos", {screen_width - 67+4, 430-12},  "style", "icon"}},
-		        "auto-cast-border-color", {0, 0, 252}},
 		"piemenu", {
 			"radius", 70,
 			"file", "ui/rosace1.png",
 			"mouse-button", "middle"},
-		"map-area", {
-			Pos = {0, 16},
-			Size = {
-				screen_width - 200,
-				screen_height - 32}},
-		"menu-panel", {
-			"menu-button", {
-				Pos = {screen_width - 200, 0},
-				Caption = "Menu (~<F10~>)",
-				Style = "black"},
-			"network-menu-button", {
-				Pos = {screen_width - 200, 0},
-				Caption = "Menu", 
-				Style = "network"},
-			"network-diplomacy-button", {
-				Pos = {screen_width - 100, 0},
-				Caption = "Diplomacy",
-				Style = "network"}},
-		"minimap", {
-                       Pos = {screen_width - 200 + 46, 24 + 17-8},
-                       Size = {121, 105}},
-		"status-line", {
-			TextPos = {2 + 36, screen_height - 14},
-			Font = "game",
-			Width = screen_width - 200 - 100 },
-		"cursors", {
-  			 Point = "cursor-point",
-     			 Glass = "cursor-glass",
-      			 Cross = "cursor-cross",
-		         Yellow = "cursor-yellow-hair",
-		         Green = "cursor-green-hair",
-     			 Red = "cursor-red-hair",
-		         Scroll = "cursor-scroll",
-		         ArrowE = "cursor-arrow-e",
-                         ArrowNE = "cursor-arrow-ne",
-                         ArrowN = "cursor-arrow-n",
-                         ArrowNW = "cursor-arrow-nw",
-                         ArrowW = "cursor-arrow-w",
-                         ArrowSW = "cursor-arrow-sw",
-                         ArrowS = "cursor-arrow-s",
-                         ArrowSE = "cursor-arrow-se"},
-		"menu-panels", {
-			"panel1", "general/panel_1.png",
-			"panel2", "general/panel_2.png",
-			"panel3", "general/panel_3.png",
-			"panel4", "general/panel_4.png",
-			"panel5", "general/panel_5.png"},
-		"victory-background", "screens/general.png",
-		"defeat-background", "screens/general.png"
 	}
 	AppendElements(ui,ui2)
 	DefineUI(unpack(ui))
 end
 
-DefineEliteScreen(640, 480)
-DefineEliteScreen(800, 600)
-DefineEliteScreen(1024, 768)
-DefineEliteScreen(1280, 960)
-DefineEliteScreen(1600, 1200)
+
+UI.NormalFontColor = "light-blue"
+UI.ReverseFontColor = "yellow"
+
+
+function AddFiller(file, x, y)
+	b = CFiller:new_local()
+	b.G = CGraphic:New(file)
+	b.X = x
+	b.Y = y
+	UI.Fillers:push_back(b)
+end
+
+AddFiller("elites/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
+AddFiller("elites/ui/ui_info.png", Video.Width - 200, 152)
+AddFiller("elites/ui/ui_" .. Video.Width .. "_bpanel.png",
+	Video.Width - 200, 336 - 8 - 8)
+
+UI.InfoPanel.X = Video.Width - 200
+UI.InfoPanel.Y = 152
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 16
+b.Style = FindButtonStyle("icon")
+UI.SingleSelectedButton = b
+
+function AddSelectedButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.SelectedButtons:push_back(b)
+end
+
+AddSelectedButton(Video.Width - 200 +  13, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  28, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  43, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  58, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  73, 152 + 16)
+AddSelectedButton(Video.Width - 200 +  88, 152 + 16)
+AddSelectedButton(Video.Width - 200 + 103, 152 + 16)
+AddSelectedButton(Video.Width - 200 + 118, 152 + 16)
+AddSelectedButton(Video.Width - 200 + 133, 152 + 16)
+
+UI.MaxSelectedFont = Fonts["game"]
+UI.MaxSelectedTextX = Video.Width - 200 + 10
+UI.MaxSelectedTextY = 152 + 10
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 91
+b.Style = FindButtonStyle("icon")
+UI.SingleTrainingButton = b
+
+function AddTrainingButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.TrainingButtons:push_back(b)
+end
+
+AddTrainingButton(Video.Width - 200 + 13, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 28, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 43, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 58, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 73, 152 + 91)
+AddTrainingButton(Video.Width - 200 + 88, 152 + 91)
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 91
+b.Style = FindButtonStyle("icon")
+UI.UpgradingButton = b
+
+b = CUIButton:new()
+b.X = Video.Width - 200 + 13
+b.Y = 152 + 91
+b.Style = FindButtonStyle("icon")
+UI.ResearchingButton = b
+
+function AddTransportingButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.TransportingButtons:push_back(b)
+end
+
+AddTransportingButton(Video.Width - 200 + 13, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 28, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 43, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 58, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 73, 152 + 91)
+AddTransportingButton(Video.Width - 200 + 88, 152 + 91)
+
+function AddButtonPanelButton(x, y)
+	b = CUIButton:new_local()
+	b.X = x
+	b.Y = y
+	b.Style = FindButtonStyle("icon")
+	UI.ButtonPanel.Buttons:push_back(b)
+end
+
+AddButtonPanelButton(Video.Width - 177 + 4, 340 - 12)
+AddButtonPanelButton(Video.Width - 122 + 4, 340 - 12)
+AddButtonPanelButton(Video.Width - 67  + 4, 340 - 12)
+AddButtonPanelButton(Video.Width - 177 + 4, 385 - 12)
+AddButtonPanelButton(Video.Width - 122 + 4, 385 - 12)
+AddButtonPanelButton(Video.Width - 67  + 4, 385 - 12)
+AddButtonPanelButton(Video.Width - 177 + 4, 430 - 12)
+AddButtonPanelButton(Video.Width - 122 + 4, 430 - 12)
+AddButtonPanelButton(Video.Width - 67  + 4, 430 - 12)
+
+UI.ButtonPanel.AutoCastBorderColorRGB = CColor(0, 0, 252)
+
+
+UI.MapArea.X = 0
+UI.MapArea.Y = 16
+UI.MapArea.EndX = UI.MapArea.X + (Video.Width - 200) - 1
+UI.MapArea.EndY = UI.MapArea.Y + (Video.Height - 32) - 1
+
+UI.MapArea.ScrollPaddingLeft = 192
+UI.MapArea.ScrollPaddingRight = 192
+UI.MapArea.ScrollPaddingTop = 192
+UI.MapArea.ScrollPaddingBottom = 192
+
+UI.Minimap.X = Video.Width - 200 + 46
+UI.Minimap.Y = 24 + 17 - 8
+UI.Minimap.W = 121
+UI.Minimap.H = 105
+
+UI.StatusLine.TextX = 38
+UI.StatusLine.TextY = Video.Height - 14
+UI.StatusLine.Width = Video.Width - 200 - 100
+UI.StatusLine.Font = Fonts["game"]
+
+-- titanium
+UI.Resources[0].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[0].IconFrame = 0
+UI.Resources[0].IconX = 67 + 0
+UI.Resources[0].IconY = 0
+UI.Resources[0].TextX = 85 + 0
+UI.Resources[0].TextY = 1
+
+-- crystal
+UI.Resources[1].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[1].IconFrame = 1
+UI.Resources[1].IconX = 67 + 75
+UI.Resources[1].IconY = 0
+UI.Resources[1].TextX = 85 + 75
+UI.Resources[1].TextY = 1
+
+-- food
+UI.Resources[FoodCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[FoodCost].IconFrame = 3
+UI.Resources[FoodCost].IconX = 67 + 150
+UI.Resources[FoodCost].IconY = 0
+UI.Resources[FoodCost].TextX = 85 + 150
+UI.Resources[FoodCost].TextY = 1
+
+-- score
+UI.Resources[ScoreCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[ScoreCost].IconFrame = 4
+UI.Resources[ScoreCost].IconX = 67 + 300
+UI.Resources[ScoreCost].IconY = 0
+UI.Resources[ScoreCost].TextX = 85 + 300
+UI.Resources[ScoreCost].TextY = 1
+
+UI.MenuButton.X = Video.Width - 200
+UI.MenuButton.Y = 0
+UI.MenuButton.Text = "Menu (~<F10~>)"
+UI.MenuButton.Style = FindButtonStyle("black")
+
+UI.NetworkMenuButton.X = Video.Width - 200
+UI.NetworkMenuButton.Y = 0
+UI.NetworkMenuButton.Text = "Menu"
+UI.NetworkMenuButton.Style = FindButtonStyle("network")
+
+UI.NetworkDiplomacyButton.X = Video.Width - 100
+UI.NetworkDiplomacyButton.Y = 0
+UI.NetworkDiplomacyButton.Text = "Diplomacy"
+UI.NetworkDiplomacyButton.Style = FindButtonStyle("network")
+
+function AddMenuPanel(ident, file)
+	b = CMenuPanel:new_local()
+	b.Ident = ident
+	b.G = CGraphic:New(file)
+	UI.MenuPanels:push_back(b)
+end
+
+AddMenuPanel("panel1", "general/panel_1.png")
+AddMenuPanel("panel2", "general/panel_2.png")
+AddMenuPanel("panel3", "general/panel_3.png")
+AddMenuPanel("panel4", "general/panel_4.png")
+AddMenuPanel("panel5", "general/panel_5.png")
 
