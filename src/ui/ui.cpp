@@ -207,10 +207,6 @@ void CUserInterface::Load(void)
 	for (menupanel = MenuPanels.begin(); menupanel != MenuPanels.end(); ++menupanel) {
 		(*menupanel).G->Load();
 	}
-
-	MenuButton.X = Video.Width - 200;
-	MenuButton.Y = 0;
-	MenuButton.Style = FindButtonStyle("black");
 }
 
 /**
