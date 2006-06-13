@@ -240,9 +240,14 @@ function AddFiller(file, x, y)
 end
 
 AddFiller("elites/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
-AddFiller("elites/ui/ui_info.png", Video.Width - 200, 152)
 AddFiller("elites/ui/ui_" .. Video.Width .. "_bpanel.png",
 	Video.Width - 200, 336 - 8 - 8)
+
+b = CFiller:new_local()
+b.G = CGraphic:New("elites/ui/ui_info.png", 200, 176)
+b.X = Video.Width - 200
+b.Y = 152
+UI.Fillers:push_back(b)
 
 UI.InfoPanel.X = Video.Width - 200
 UI.InfoPanel.Y = 152
