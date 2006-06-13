@@ -427,7 +427,7 @@ void DoRightButton(int sx, int sy)
 **
 **  @return        True if mouse is on the button, False otherwise.
 */
-static inline int OnButton(int x, int y, Button *button)
+static inline int OnButton(int x, int y, CUIButton *button)
 {
 	return x >= button->X && x < button->X + button->Style->Width &&
 		y >= button->Y && y < button->Y + button->Style->Height;
@@ -751,8 +751,6 @@ void UIHandleMouseMove(int x, int y)
 	//  Move map.
 	//
 	if (GameCursor == UI.Scroll.Cursor) {
-		int xo;
-		int yo;
 		int speed;
 
 		if (KeyModifiers & ModifierControl) {
@@ -761,20 +759,11 @@ void UIHandleMouseMove(int x, int y)
 			speed = UI.MouseScrollSpeedDefault;
 		}
 
-		xo = UI.MouseViewport->MapX;
-		yo = UI.MouseViewport->MapY;
-		SubScrollX += speed * (x - CursorStartX);
-		SubScrollY += speed * (y - CursorStartY);
-
-		// only tile based scrolling is supported
-		xo += SubScrollX / TileSizeX;
-		SubScrollX = SubScrollX % TileSizeX;
-		yo += SubScrollY / TileSizeY;
-		SubScrollY = SubScrollY % TileSizeY;
-
 		UI.MouseWarpX = CursorStartX;
 		UI.MouseWarpY = CursorStartY;
-		UI.MouseViewport->Set(xo, yo, 0, 0);
+		UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
+			UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
+			UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
 		return;
 	}
 
@@ -1566,8 +1555,6 @@ void UIHandleButtonDown(unsigned button)
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
-			SubScrollX = 0;
-			SubScrollY = 0;
 			GameCursor = UI.Scroll.Cursor;
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {

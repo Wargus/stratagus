@@ -34,6 +34,9 @@ setmetatable(FontColors, mt)
 $]
 
 #define MaxCosts 7
+#define FoodCost MaxCosts
+#define ScoreCost MaxCosts + 1
+#define MaxResourceInfo MaxCosts + 2
 #define PlayerMax 16
 #define UnitMax 2048
 

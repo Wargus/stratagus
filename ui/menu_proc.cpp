@@ -112,10 +112,10 @@ Menu *FindMenu(const char *menu_id)
 */
 static void DrawMenuText(const MenuitemText *mit, int x, int y, CFont *font, int flag)
 {
-	char *oldnc;
-	char *oldrc;
-	char *nc;
-	char *rc;
+	const char *oldnc;
+	const char *oldrc;
+	const char *nc;
+	const char *rc;
 	char *text;
 	int l;
 
@@ -157,10 +157,10 @@ static void DrawMenuText(const MenuitemText *mit, int x, int y, CFont *font, int
 void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	const char *text)
 {
-	char *nc;
-	char *rc;
-	char *oldnc;
-	char *oldrc;
+	const char *nc;
+	const char *rc;
+	const char *oldnc;
+	const char *oldrc;
 	int i;
 	ButtonStyleProperties *p;
 	ButtonStyleProperties *pimage;
@@ -289,10 +289,10 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 static void DrawPulldown(Menuitem *mi, int mx, int my)
 {
 	int i;
-	char *nc;
-	char *rc;
-	char *oldnc;
-	char *oldrc;
+	const char *nc;
+	const char *rc;
+	const char *oldnc;
+	const char *oldrc;
 	char *text;
 	unsigned flags;
 	MenuButtonId rb;
@@ -535,10 +535,10 @@ static void DrawListbox(Menuitem *mi, int mx, int my)
 {
 	int i;
 	int s;
-	char *nc;
-	char *rc;
-	char *oldnc;
-	char *oldrc;
+	const char *nc;
+	const char *rc;
+	const char *oldnc;
+	const char *oldrc;
 	char *text;
 	MenuButtonId rb;
 	unsigned flags;
@@ -822,10 +822,10 @@ static void DrawHSlider(Menuitem *mi, int mx, int my)
 static void DrawCheckbox(CheckboxStyle *style, unsigned flags, unsigned checked,
 	int x, int y, const char *text)
 {
-	char *nc;
-	char *rc;
-	char *oldnc;
-	char *oldrc;
+	const char *nc;
+	const char *rc;
+	const char *oldnc;
+	const char *oldrc;
 	int i;
 	ButtonStyleProperties *p;
 	ButtonStyleProperties *pimage;
@@ -940,10 +940,10 @@ static void DrawCheckbox(CheckboxStyle *style, unsigned flags, unsigned checked,
 */
 static void DrawInput(Menuitem *mi, int mx, int my)
 {
-	char *nc;
-	char *rc;
-	char *oldnc;
-	char *oldrc;
+	const char *nc;
+	const char *rc;
+	const char *oldnc;
+	const char *oldrc;
 	char *text;
 	unsigned flags;
 	MenuButtonId rb;
@@ -1073,12 +1073,11 @@ void DrawMenu(Menu *menu)
 		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 2);
 		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 3);
 	} else if (menu->Panel) {
-		std::vector<MenuPanel *>::iterator menupanel;
-
+		std::vector<CMenuPanel>::iterator menupanel;
 
 		for (menupanel = UI.MenuPanels.begin(); menupanel != UI.MenuPanels.end(); ++menupanel) {
-			if (!strcmp((*menupanel)->Ident, menu->Panel)) {
-				(*menupanel)->G->DrawSub(0, 0, (*menupanel)->G->Width, (*menupanel)->G->Height,
+			if (!strcmp((*menupanel).Ident.c_str(), menu->Panel)) {
+				(*menupanel).G->DrawSub(0, 0, (*menupanel).G->Width, (*menupanel).G->Height,
 					menu->X, menu->Y);
 				break;
 			}
