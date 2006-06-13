@@ -722,7 +722,7 @@ void CFont::MeasureWidths()
 	int ipr;  // images per row
 
 	int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
-	delete CharWidth;
+	delete[] CharWidth;
 	CharWidth = new char[maxy];
 	memset(CharWidth, 0, maxy);
 	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
