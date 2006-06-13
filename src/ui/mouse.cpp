@@ -775,17 +775,17 @@ void UIHandleMouseMove(int x, int y)
 	//  Make the piemenu "follow" the mouse
 	//
 	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
-		if (CursorX - CursorStartX > UI.PieX[2]) {
-			CursorStartX = CursorX - UI.PieX[2];
+		if (CursorX - CursorStartX > UI.PieMenu.X[2]) {
+			CursorStartX = CursorX - UI.PieMenu.X[2];
 		}
-		if (CursorStartX - CursorX > UI.PieX[2]) {
-			CursorStartX = CursorX + UI.PieX[2];
+		if (CursorStartX - CursorX > UI.PieMenu.X[2]) {
+			CursorStartX = CursorX + UI.PieMenu.X[2];
 		}
-		if (CursorStartY - CursorY > UI.PieY[4]) {
-			CursorStartY = CursorY + UI.PieY[4];
+		if (CursorStartY - CursorY > UI.PieMenu.Y[4]) {
+			CursorStartY = CursorY + UI.PieMenu.Y[4];
 		}
-		if (CursorY - CursorStartY > UI.PieY[4]) {
-			CursorStartY = CursorY - UI.PieY[4];
+		if (CursorY - CursorStartY > UI.PieMenu.Y[4]) {
+			CursorStartY = CursorY - UI.PieMenu.Y[4];
 		}
 		return;
 	}
@@ -1534,7 +1534,7 @@ void UIHandleButtonDown(unsigned button)
 			return;
 		}
 
-		if (MouseButtons & UI.PieMouseButton) { // enter pie menu
+		if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
 			UnitUnderCursor = NULL;
 			GameCursor = UI.Point.Cursor;  // Reset
 			CursorStartX = CursorX;
@@ -1948,15 +1948,11 @@ void UIHandleButtonUp(unsigned button)
 */
 static int GetPieUnderCursor(void)
 {
-	int i;
-	int x;
-	int y;
-
-	x = CursorX - (CursorStartX - ICON_SIZE_X / 2);
-	y = CursorY - (CursorStartY - ICON_SIZE_Y / 2);
-	for (i = 0; i < 8; ++i) {
-		if (x > UI.PieX[i] && x < UI.PieX[i] + ICON_SIZE_X &&
-				y > UI.PieY[i] && y < UI.PieY[i] + ICON_SIZE_Y) {
+	int x = CursorX - (CursorStartX - ICON_SIZE_X / 2);
+	int y = CursorY - (CursorStartY - ICON_SIZE_Y / 2);
+	for (int i = 0; i < 8; ++i) {
+		if (x > UI.PieMenu.X[i] && x < UI.PieMenu.X[i] + ICON_SIZE_X &&
+				y > UI.PieMenu.Y[i] && y < UI.PieMenu.Y[i] + ICON_SIZE_Y) {
 			return i;
 		}
 	}
@@ -1987,10 +1983,10 @@ void DrawPieMenu(void)
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
 	// Draw background
-	if (UI.PieMenuBackgroundG) {
-		UI.PieMenuBackgroundG->DrawFrameClip(0,
-			CursorStartX - UI.PieMenuBackgroundG->Width / 2,
-			CursorStartY - UI.PieMenuBackgroundG->Height / 2);
+	if (UI.PieMenu.G) {
+		UI.PieMenu.G->DrawFrameClip(0,
+			CursorStartX - UI.PieMenu.G->Width / 2,
+			CursorStartY - UI.PieMenu.G->Height / 2);
 	}
 	player = Selected[0]->Player;
 
@@ -1999,8 +1995,8 @@ void DrawPieMenu(void)
 			int x;
 			int y;
 
-			x = CursorStartX - ICON_SIZE_X / 2 + UI.PieX[i];
-			y = CursorStartY - ICON_SIZE_Y / 2 + UI.PieY[i];
+			x = CursorStartX - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
+			y = CursorStartY - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 			// Draw icon
 			buttons[i].Icon.Icon->DrawIcon(player, x, y);
 

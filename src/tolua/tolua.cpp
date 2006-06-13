@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Mon Jun 12 20:23:10 2006.
+** Generated automatically by tolua++-1.0.7 on Tue Jun 13 18:47:20 2006.
 */
 
 #ifndef __cplusplus
@@ -271,17 +271,18 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CMenuPanel");
  tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
- tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"Windows");
  tolua_usertype(tolua_S,"ServerSetup");
@@ -1982,6 +1983,203 @@ static int tolua_set_CButtonPanel_ShowCommandKey(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: G of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_get_CPieMenu_G_ptr
+static int tolua_get_CPieMenu_G_ptr(lua_State* tolua_S)
+{
+  CPieMenu* self = (CPieMenu*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->G,"CGraphic");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: G of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_set_CPieMenu_G_ptr
+static int tolua_set_CPieMenu_G_ptr(lua_State* tolua_S)
+{
+  CPieMenu* self = (CPieMenu*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'G'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CGraphic",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->G = ((CGraphic*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MouseButton of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_get_CPieMenu_MouseButton
+static int tolua_get_CPieMenu_MouseButton(lua_State* tolua_S)
+{
+  CPieMenu* self = (CPieMenu*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MouseButton'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MouseButton);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MouseButton of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_set_CPieMenu_MouseButton
+static int tolua_set_CPieMenu_MouseButton(lua_State* tolua_S)
+{
+  CPieMenu* self = (CPieMenu*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MouseButton'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MouseButton = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: X of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_CPieMenu_X
+static int tolua_get_stratagus_CPieMenu_X(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPieMenu* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPieMenu*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=8)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->X[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: X of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_CPieMenu_X
+static int tolua_set_stratagus_CPieMenu_X(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPieMenu* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPieMenu*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=8)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->X[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Y of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_CPieMenu_Y
+static int tolua_get_stratagus_CPieMenu_Y(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPieMenu* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPieMenu*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=8)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Y[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Y of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_CPieMenu_Y
+static int tolua_set_stratagus_CPieMenu_Y(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPieMenu* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPieMenu*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=8)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->Y[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetRadius of class  CPieMenu */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPieMenu_SetRadius00
+static int tolua_stratagus_CPieMenu_SetRadius00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"CPieMenu",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  CPieMenu* self = (CPieMenu*)  tolua_tousertype(tolua_S,1,0);
+  int radius = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRadius'",NULL);
+#endif
+ {
+  self->SetRadius(radius);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetRadius'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: G of class  CResourceInfo */
 #ifndef TOLUA_DISABLE_tolua_get_CResourceInfo_G_ptr
 static int tolua_get_CResourceInfo_G_ptr(lua_State* tolua_S)
@@ -3079,6 +3277,36 @@ static int tolua_set_CUserInterface_ButtonPanel(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->ButtonPanel = *((CButtonPanel*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: PieMenu of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_PieMenu
+static int tolua_get_CUserInterface_PieMenu(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'PieMenu'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->PieMenu,"CPieMenu");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: PieMenu of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_PieMenu
+static int tolua_set_CUserInterface_PieMenu(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'PieMenu'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CPieMenu",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->PieMenu = *((CPieMenu*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -12194,6 +12422,12 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_constant(tolua_S,"MaxResourceInfo",MaxResourceInfo);
  tolua_constant(tolua_S,"PlayerMax",PlayerMax);
  tolua_constant(tolua_S,"UnitMax",UnitMax);
+ tolua_constant(tolua_S,"NoButton",NoButton);
+ tolua_constant(tolua_S,"LeftButton",LeftButton);
+ tolua_constant(tolua_S,"MiddleButton",MiddleButton);
+ tolua_constant(tolua_S,"RightButton",RightButton);
+ tolua_constant(tolua_S,"UpButton",UpButton);
+ tolua_constant(tolua_S,"DownButton",DownButton);
  tolua_cclass(tolua_S,"CMinimap","CMinimap","",NULL);
  tolua_beginmodule(tolua_S,"CMinimap");
   tolua_variable(tolua_S,"X",tolua_get_CMinimap_X,tolua_set_CMinimap_X);
@@ -12302,6 +12536,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"AutoCastBorderColorRGB",tolua_get_CButtonPanel_AutoCastBorderColorRGB,tolua_set_CButtonPanel_AutoCastBorderColorRGB);
   tolua_variable(tolua_S,"ShowCommandKey",tolua_get_CButtonPanel_ShowCommandKey,tolua_set_CButtonPanel_ShowCommandKey);
  tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CPieMenu","CPieMenu","",NULL);
+ tolua_beginmodule(tolua_S,"CPieMenu");
+  tolua_variable(tolua_S,"G",tolua_get_CPieMenu_G_ptr,tolua_set_CPieMenu_G_ptr);
+  tolua_variable(tolua_S,"MouseButton",tolua_get_CPieMenu_MouseButton,tolua_set_CPieMenu_MouseButton);
+  tolua_array(tolua_S,"X",tolua_get_stratagus_CPieMenu_X,tolua_set_stratagus_CPieMenu_X);
+  tolua_array(tolua_S,"Y",tolua_get_stratagus_CPieMenu_Y,tolua_set_stratagus_CPieMenu_Y);
+  tolua_function(tolua_S,"SetRadius",tolua_stratagus_CPieMenu_SetRadius00);
+ tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"CResourceInfo","CResourceInfo","",tolua_collect_CResourceInfo);
 #else
@@ -12356,6 +12598,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"ResearchingButton",tolua_get_CUserInterface_ResearchingButton_ptr,tolua_set_CUserInterface_ResearchingButton_ptr);
   tolua_variable(tolua_S,"TransportingButtons",tolua_get_CUserInterface_TransportingButtons,tolua_set_CUserInterface_TransportingButtons);
   tolua_variable(tolua_S,"ButtonPanel",tolua_get_CUserInterface_ButtonPanel,tolua_set_CUserInterface_ButtonPanel);
+  tolua_variable(tolua_S,"PieMenu",tolua_get_CUserInterface_PieMenu,tolua_set_CUserInterface_PieMenu);
   tolua_variable(tolua_S,"MenuButton",tolua_get_CUserInterface_MenuButton,tolua_set_CUserInterface_MenuButton);
   tolua_variable(tolua_S,"NetworkMenuButton",tolua_get_CUserInterface_NetworkMenuButton,tolua_set_CUserInterface_NetworkMenuButton);
   tolua_variable(tolua_S,"NetworkDiplomacyButton",tolua_get_CUserInterface_NetworkDiplomacyButton,tolua_set_CUserInterface_NetworkDiplomacyButton);
