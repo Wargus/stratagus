@@ -77,7 +77,7 @@ void DrawMenuButtonArea(void)
 					ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 				UI.MenuButton.X, UI.MenuButton.Y,
-				UI.MenuButton.Text);
+				UI.MenuButton.Text.c_str());
 		}
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
@@ -87,7 +87,7 @@ void DrawMenuButtonArea(void)
 					ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
 				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 				UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
-				UI.NetworkMenuButton.Text);
+				UI.NetworkMenuButton.Text.c_str());
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
@@ -96,7 +96,7 @@ void DrawMenuButtonArea(void)
 					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
 				(GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
 				UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
-				UI.NetworkDiplomacyButton.Text);
+				UI.NetworkDiplomacyButton.Text.c_str());
 		}
 	}
 }
@@ -1060,7 +1060,8 @@ void SetMessage(const char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	vsnprintf(temp, sizeof(temp), fmt, va);
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 	if (CheckRepeatMessage(temp)) {
 		return;
@@ -1084,7 +1085,8 @@ void SetMessageEvent(int x, int y, const char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	vsnprintf(temp, sizeof(temp), fmt, va);
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 	if (CheckRepeatMessage(temp) == 0) {
 		AddMessage(temp);
@@ -1144,7 +1146,7 @@ void CStatusLine::Draw(void)
 {
 	if (StatusLine[0]) {
 		PushClipping();
-		SetClipping(TextX, TextY, TextX + W - 1, Video.Height - 1);
+		SetClipping(TextX, TextY, TextX + Width - 1, Video.Height - 1);
 		VideoDrawTextClip(TextX, TextY, Font, StatusLine);
 		PopClipping();
 	}
@@ -1298,7 +1300,7 @@ void CInfoPanel::Draw(void)
 			if (NumSelected > (int)UI.SelectedButtons.size()) {
 				char buf[5];
 
-				sprintf(buf, "+%ud", static_cast<unsigned int> (NumSelected - UI.SelectedButtons.size()));
+				sprintf(buf, "+%u", static_cast<unsigned int> (NumSelected - UI.SelectedButtons.size()));
 				VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
 					UI.MaxSelectedFont, buf);
 			}
@@ -1340,8 +1342,8 @@ void CInfoPanel::Draw(void)
 	} else {
 		int x;
 		int y;
-		char *nc;
-		char *rc;
+		const char *nc;
+		const char *rc;
 		// FIXME: need some cool ideas for this.
 
 		x = UI.InfoPanel.X + 16;

@@ -94,7 +94,7 @@ static void ShowInput(void)
 	sprintf(InputStatusLine, _("MESSAGE:%s~!_"), Input);
 	input = InputStatusLine;
 	// FIXME: This is slow!
-	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.W) {
+	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
 		++input;
 	}
 	KeyState = KeyStateCommand;

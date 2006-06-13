@@ -652,7 +652,7 @@ void CreateGame(const char *filename, CMap *map)
 
 	InitSelections();
 
-	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]);
+	InitUserInterface();
 	UI.Load();
 
 	UI.Minimap.Create();
@@ -704,7 +704,7 @@ void CreateGame(const char *filename, CMap *map)
 	//
 	InitTriggers();
 
-	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+	SetDefaultTextColors(UI.NormalFontColor.c_str(), UI.ReverseFontColor.c_str());
 
 #if 0
 	if (!UI.SelectedViewport) {

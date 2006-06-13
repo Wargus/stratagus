@@ -1281,8 +1281,8 @@ void InitMenuFuncHash(void)
 */
 static void NameLineDrawFunc(Menuitem *mi)
 {
-	char *nc;
-	char *rc;
+	const char *nc;
+	const char *rc;
 
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
@@ -3255,8 +3255,8 @@ static void GameSetupInit(Menu *menu)
 */
 static void GameDrawFunc(Menuitem *mi)
 {
-	char *nc;
-	char *rc;
+	const char *nc;
+	const char *rc;
 	int l;
 	char buffer[32];
 
@@ -3825,8 +3825,8 @@ static void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
 	Menu *menu;
 	int i;
-	char *nc;
-	char *rc;
+	const char *nc;
+	const char *rc;
 
 	menu = FindMenu("menu-multi-setup");
 	i = mi - menu->Items - SERVER_PLAYER_TEXT;

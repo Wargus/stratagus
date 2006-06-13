@@ -70,7 +70,7 @@
 **
 **  @return    True if any part of area is visible, false otherwise
 */
-int CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const
+bool CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) const
 {
 	if (ex < this->MapX || ey < this->MapY ||
 			sx >= this->MapX + this->MapWidth || sy >= this->MapY + this->MapHeight) {
