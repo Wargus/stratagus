@@ -53,6 +53,16 @@ class CButtonPanel
 	bool ShowCommandKey;
 };
 
+class CPieMenu
+{
+	CGraphic *G;
+	int MouseButton;
+	int X[8];
+	int Y[8];
+	
+	void SetRadius(int radius);
+};
+
 class CResourceInfo
 {
 	CGraphic *G;
@@ -112,6 +122,8 @@ class CUserInterface
 	vector<CUIButton> TransportingButtons;
 	
 	CButtonPanel ButtonPanel;
+	
+	CPieMenu PieMenu;
 
 	CUIButton MenuButton;
 	CUIButton NetworkMenuButton;
