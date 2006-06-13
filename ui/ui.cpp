@@ -80,15 +80,12 @@ CUserInterface::CUserInterface() :
 	TrainingText(NULL), TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
 	UpgradingButton(NULL), ResearchingButton(NULL),
 	CompletedBarColor(0), CompletedBarShadow(0),
-	PieMenuBackgroundG(NULL), PieMouseButton(0),
 	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
 	SelectedViewport(NULL), NumViewports(0),
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
 	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 {
 	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
-	memset(PieX, 0, sizeof(PieX));
-	memset(PieY, 0, sizeof(PieY));
 
 	Point.Name = new_strdup("cursor-point");
 	Glass.Name = new_strdup("cursor-glass");
@@ -180,8 +177,8 @@ void CUserInterface::Load(void)
 	if (ButtonPanel.G) {
 		ButtonPanel.G->Load();
 	}
-	if (PieMenuBackgroundG) {
-		PieMenuBackgroundG->Load();
+	if (PieMenu.G) {
+		PieMenu.G->Load();
 	}
 
 	//
@@ -278,7 +275,7 @@ void CleanUserInterface(void)
 	CGraphic::Free(UI.ButtonPanel.G);
 
 	// Pie Menu
-	CGraphic::Free(UI.PieMenuBackgroundG);
+	CGraphic::Free(UI.PieMenu.G);
 
 	// Menu Panels
 	for (menupanel = UI.MenuPanels.begin(); menupanel != UI.MenuPanels.end(); ++menupanel) {

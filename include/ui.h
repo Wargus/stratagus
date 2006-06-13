@@ -482,6 +482,29 @@ public:
 	bool ShowCommandKey;
 };
 
+class CPieMenu {
+public:
+	CPieMenu() : G(NULL), MouseButton(NoButton)
+	{
+		memset(this->X, 0, sizeof(this->X));
+		memset(this->Y, 0, sizeof(this->Y));
+	}
+
+	CGraphic *G;         /// Optional background image
+	int MouseButton;     /// Which mouse button pops up the piemenu, deactivate with NoButton
+	int X[8];            /// X position of the pies
+	int Y[8];            /// Y position of the pies
+
+	void SetRadius(int radius) {
+		const int coeffX[] = {    0,  193, 256, 193,   0, -193, -256, -193};
+		const int coeffY[] = { -256, -193,   0, 193, 256,  193,    0, -193};
+		for (int i = 0; i < 8; ++i) {
+			this->X[i] = (coeffX[i] * radius) >> 8;
+			this->Y[i] = (coeffY[i] * radius) >> 8;
+		}
+	}
+};
+
 class CResourceInfo {
 public:
 	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0),
@@ -597,10 +620,7 @@ public:
 	CButtonPanel ButtonPanel;
 
 	// Pie Menu
-	CGraphic *PieMenuBackgroundG;       /// Optional background image for the piemenu
-	int PieMouseButton;/// Which mouse button pops up the piemenu. Deactivate with the NoButton value.
-	int PieX[8];                        /// X position of the pies
-	int PieY[8];                        /// Y position of the pies
+	CPieMenu PieMenu;
 
 	// Map area
 	ViewportModeType ViewportMode;      /// Current viewport mode

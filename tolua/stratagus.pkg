@@ -40,6 +40,13 @@ $]
 #define PlayerMax 16
 #define UnitMax 2048
 
+#define NoButton 0
+#define LeftButton 2
+#define MiddleButton 4
+#define RightButton 8
+#define UpButton 16
+#define DownButton 32
+
 $pfile "minimap.pkg"
 $pfile "ui.pkg"
 $pfile "network.pkg"
