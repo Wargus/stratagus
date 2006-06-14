@@ -79,6 +79,9 @@ extern void DoScrollArea(int state, int fast);
 static int IconWidth;                       /// Icon width in panels
 static int IconHeight;                      /// Icon height in panels
 
+static int ButtonPanelWidth;
+static int ButtonPanelHeight;
+
 
 char EditorMapLoaded;  /// Map loaded in editor
 int EditorWriteCompressedMaps = 1;
@@ -352,12 +355,12 @@ static int CalculateUnitIcons(void)
 	i = 0;
 	count = 0;
 	x = UI.ButtonPanel.Y + 24;
-	while (x < UI.ButtonPanel.Y + UI.ButtonPanel.G->Height - IconHeight) {
+	while (x < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
 		++i;
 		x += IconHeight + 2;
 	}
 	x = UI.ButtonPanel.X + 10;
-	while (x < UI.ButtonPanel.X + UI.ButtonPanel.G->Width - IconWidth) {
+	while (x < UI.ButtonPanel.X + ButtonPanelWidth - IconWidth) {
 		count += i;
 		x += IconWidth + 8;
 	}
@@ -653,12 +656,12 @@ static void DrawUnitIcons(void)
 	//
 	y = UI.ButtonPanel.Y + 24;
 	i = Editor.UnitIndex;
-	while (y < UI.ButtonPanel.Y + UI.ButtonPanel.G->Height - IconHeight) {
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
 		if (i >= (int) Editor.ShownUnitTypes.size()) {
 			break;
 		}
 		x = UI.ButtonPanel.X + 10;
-		while (x < UI.ButtonPanel.X + UI.ButtonPanel.G->Width - IconWidth) {
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - IconWidth) {
 			if (i >= (int) Editor.ShownUnitTypes.size()) {
 				break;
 			}
@@ -1728,7 +1731,7 @@ static void EditorCallbackMouse(int x, int y)
 
 		i = Editor.UnitIndex;
 		by = UI.ButtonPanel.Y + 24;
-		while (by < UI.ButtonPanel.Y + UI.ButtonPanel.G->Height - IconHeight) {
+		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
 			if (i >= (int) Editor.ShownUnitTypes.size()) {
 				break;
 			}
@@ -2005,6 +2008,9 @@ void CEditor::Init(void)
 	Units.Load();
 
 	RecalculateShownUnits();
+
+	ButtonPanelWidth = 200;
+	ButtonPanelHeight = 144;
 }
 
 /**
