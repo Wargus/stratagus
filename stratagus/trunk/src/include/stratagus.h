@@ -240,6 +240,7 @@ enum {
 class TitleScreenLabel {
 public:
 	TitleScreenLabel() : Text(NULL), Font(0), Xofs(0), Yofs(0), Flags(0) {}
+	~TitleScreenLabel() { delete[] this->Text; }
 
 	char *Text;
 	CFont *Font;
@@ -252,6 +253,16 @@ class TitleScreen {
 public:
 	TitleScreen() : File(NULL), Music(NULL), Timeout(0), Iterations(0),
 		Labels(NULL) {}
+	~TitleScreen() {
+		delete[] this->File;
+		delete[] this->Music;
+		if (this->Labels) {
+			for (int i = 0; this->Labels[i]; ++i) {
+				delete this->Labels[i];
+			}
+			delete[] this->Labels;
+		}
+	}
 
 	char *File;
 	char *Music;

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Tue Jun 13 18:47:20 2006.
+** Generated automatically by tolua++-1.0.7 on Tue Jun 13 22:29:10 2006.
 */
 
 #ifndef __cplusplus
@@ -31,7 +31,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 using std::string;
 using std::vector;
 using namespace gcn;
-void StartMap(const char *str, bool clean = false);
+void StartMap(const char *str, bool clean = true);
 void StartEditor(const char *str);
 void StartReplay(const char *str);
 void StartSavedGame(const char *str);
@@ -8793,7 +8793,7 @@ static int tolua_stratagus_StartMap00(lua_State* tolua_S)
 #endif
  {
   const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
-  bool clean = ((bool)  tolua_toboolean(tolua_S,2,false));
+  bool clean = ((bool)  tolua_toboolean(tolua_S,2,true));
  {
   StartMap(str,clean);
  }

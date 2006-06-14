@@ -603,8 +603,7 @@ void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
 */
 static void DrawUnitInfo(CUnit *unit)
 {
-	int i; // iterator on panel. And some other things.
-	int index;  // Index of the Panel.
+	int i;
 	CUnitType *type;
 	const CUnitStats *stats;
 	int x;
@@ -613,13 +612,12 @@ static void DrawUnitInfo(CUnit *unit)
 
 	Assert(unit);
 	UpdateUnitVariables(unit);
-	for (i = 0; i < UI.NumberPanel; ++i) {
-		index = UI.PanelIndex[i];
-		if (CanShowContent(AllPanels[index]->Condition, unit)) {
-			for (std::vector<CContentType *>::const_iterator content = AllPanels[index]->Contents.begin();
-				 content != AllPanels[index]->Contents.end(); ++content) {
+	for (i = 0; i < (int)UI.InfoPanelContents.size(); ++i) {
+		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
+			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();
+					content != UI.InfoPanelContents[i]->Contents.end(); ++content) {
 				if (CanShowContent((*content)->Condition, unit)) {
-					(*content)->Draw(unit, AllPanels[index]->DefaultFont);
+					(*content)->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
 				}
 			}
 		}

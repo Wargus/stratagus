@@ -266,7 +266,7 @@ public:
 	CMenuPanel() : G(NULL) {}
 
 	std::string Ident;              /// Unique identifier
-	CGraphic *G;              /// Graphic
+	CGraphic *G;                    /// Graphic
 };
 
 /**
@@ -280,7 +280,7 @@ public:
 	~ConditionPanel() {
 		delete[] BoolFlags;
 		delete[] Variables;
-	};
+	}
 
 	bool ShowOnlySelected;      /// if true, show only for selected unit.
 
@@ -297,8 +297,8 @@ public:
 */
 class CContentType {
 public:
-	CContentType() : PosX(0), PosY(0), Condition(NULL) {};
-	virtual ~CContentType() { delete Condition; };
+	CContentType() : PosX(0), PosY(0), Condition(NULL) {}
+	virtual ~CContentType() { delete Condition; }
 
 		/// Tell how show the variable Index.
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const = 0;
@@ -315,11 +315,11 @@ public:
 class CContentTypeText : public CContentType {
 public:
 	CContentTypeText() : Text(NULL), Font(NULL), Centered(0), Index(-1),
-		Component(VariableValue), ShowName(0), Stat(0) {};
+		Component(VariableValue), ShowName(0), Stat(0) {}
 	virtual ~CContentTypeText() {
 		FreeStringDesc(Text);
 		delete Text;
-	};
+	}
 
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
@@ -338,8 +338,8 @@ public:
 class CContentTypeFormattedText : public CContentType {
 public:
 	CContentTypeFormattedText() : Format(NULL), Font(NULL), Centered(0),
-		Index(-1), Component(VariableValue) {};
-	virtual ~CContentTypeFormattedText() { delete [] Format;};
+		Index(-1), Component(VariableValue) {}
+	virtual ~CContentTypeFormattedText() { delete[] this->Format; }
 
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
@@ -356,8 +356,8 @@ public:
 class CContentTypeFormattedText2 : public CContentType {
 public:
 	CContentTypeFormattedText2() : Format(NULL), Font(NULL), Centered(0),
-		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {};
-	virtual ~CContentTypeFormattedText2() { delete [] Format;};
+		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
+	virtual ~CContentTypeFormattedText2() { delete[] Format; }
 
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
@@ -385,7 +385,7 @@ public:
 */
 class CContentTypeLifeBar : public CContentType {
 public:
-	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {};
+	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
 
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
@@ -403,7 +403,7 @@ public:
 */
 class CContentTypeCompleteBar : public CContentType {
 public:
-	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0) {};
+	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0) {}
 
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
@@ -415,7 +415,6 @@ public:
 // take UI.CompletedBar color for the moment.
 	Color colors;        /// Color to show (depend of value)
 #endif
-
 };
 
 /**
@@ -424,7 +423,7 @@ public:
 class CUnitInfoPanel {
 public:
 	CUnitInfoPanel() : Name(NULL), PosX(0), PosY(0), DefaultFont(0),
-		Contents(), Condition(NULL) {};
+		Contents(), Condition(NULL) {}
 	~CUnitInfoPanel() {
 		delete[] Name;
 		for (std::vector<CContentType *>::iterator content = Contents.begin();
@@ -433,7 +432,7 @@ public:
 		}
 		Contents.clear();
 		delete Condition;
-	};
+	}
 
 
 	char *Name;            /// Ident of the panel.
@@ -445,8 +444,6 @@ public:
 
 	ConditionPanel *Condition; /// Condition to show the panel; if NULL, no condition.
 };
-
-extern std::vector<CUnitInfoPanel *> AllPanels;  /// Array of panels.
 
 
 class CFiller
@@ -576,15 +573,12 @@ public:
 	std::string NormalFontColor;        /// Color for normal text displayed
 	std::string ReverseFontColor;       /// Color for reverse text displayed
 
-	// Fillers
 	std::vector<CFiller> Fillers;       /// Filler graphics
 
 	CResourceInfo Resources[MaxResourceInfo];/// Icon+Text of all resources
 
-	// Info panel
 	CInfoPanel InfoPanel;               /// Info panel
-	char *PanelIndex;                   /// Index of the InfoPanel.
-	char NumberPanel;                   /// Number of Panel.
+	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
 
 	CUIButton *SingleSelectedButton;    /// Button for single selected unit
 
@@ -690,7 +684,7 @@ extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 	/// Hash table of all the checkbox styles
 extern std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
 
-extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
+extern bool RightButtonAttacks;         /// right button attacks
 extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 
 extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
