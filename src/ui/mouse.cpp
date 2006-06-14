@@ -759,11 +759,11 @@ void UIHandleMouseMove(int x, int y)
 			speed = UI.MouseScrollSpeedDefault;
 		}
 
-		UI.MouseWarpX = CursorStartX;
-		UI.MouseWarpY = CursorStartY;
 		UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
 			UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
 			UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
+		UI.MouseWarpX = CursorStartX;
+		UI.MouseWarpY = CursorStartY;
 		return;
 	}
 
@@ -809,12 +809,10 @@ void UIHandleMouseMove(int x, int y)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
-	if (CursorOn == CursorOnMap) {
-		const CViewport *vp;
-
-		vp = UI.MouseViewport;
-		if (Map.IsFieldExplored(ThisPlayer, vp->Viewport2MapX(x),
-				vp->Viewport2MapY(y)) || ReplayRevealMap) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
+		const CViewport *vp = UI.MouseViewport;
+		if (Map.IsFieldExplored(ThisPlayer, vp->Viewport2MapX(x), vp->Viewport2MapY(y)) ||
+				ReplayRevealMap) {
 			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
@@ -1341,7 +1339,7 @@ static void UISelectStateButtonDown(unsigned button)
 	//
 	//  Clicking on the map.
 	//
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
 		UI.StatusLine.Clear();
 		ClearCosts();
 		CursorState = CursorStatePoint;
@@ -1354,11 +1352,8 @@ static void UISelectStateButtonDown(unsigned button)
 
 			vp = UI.MouseViewport;
 			if (ClickMissile) {
-				int mx;
-				int my;
-
-				mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
-				my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
+				int mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
+				int my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					mx, my, mx, my);
 			}
@@ -1494,20 +1489,17 @@ void UIHandleButtonDown(unsigned button)
 		if (CursorBuilding) {
 			// Possible Selected[0] was removed from map
 			// need to make sure there is an unit to build
-			if (Selected[0] && (MouseButtons & LeftButton)) {// enter select mode
-				int x;
-				int y;
-				int i;
-				int j;
+			if (Selected[0] && (MouseButtons & LeftButton) &&
+					UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {// enter select mode
 				int explored;
+				int x = UI.MouseViewport->Viewport2MapX(CursorX);
+				int y = UI.MouseViewport->Viewport2MapY(CursorY);
 
-				x = UI.MouseViewport->Viewport2MapX(CursorX);
-				y = UI.MouseViewport->Viewport2MapY(CursorY);
 				// FIXME: error messages
 
 				explored = 1;
-				for (j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
-					for (i = 0; i < Selected[0]->Type->TileWidth; ++i) {
+				for (int j = 0; explored && j < Selected[0]->Type->TileHeight; ++j) {
+					for (int i = 0; i < Selected[0]->Type->TileWidth; ++i) {
 						if (!Map.IsFieldExplored(ThisPlayer, x + i, y + j)) {
 							explored = 0;
 							break;
@@ -1557,12 +1549,13 @@ void UIHandleButtonDown(unsigned button)
 			CursorStartY = CursorY;
 			GameCursor = UI.Scroll.Cursor;
 		} else if (MouseButtons & RightButton) {
-			if (!GameObserve && !GamePaused) {
+			int x;
+			int y;
+
+			if (!GameObserve && !GamePaused && UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {
 				CUnit *unit;
 				// FIXME: Rethink the complete chaos of coordinates here
 				// FIXME: Johns: Perhaps we should use a pixel map coordinates
-				int x;
-				int y;
 
 				x = UI.MouseViewport->Viewport2MapX(CursorX);
 				y = UI.MouseViewport->Viewport2MapY(CursorY);
@@ -1644,7 +1637,7 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 				if (!GameObserve && !GamePaused &&
-					ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor < Selected[0]->OrderCount &&
 						Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 						DebugPrint("Cancel slot %d %s\n" _C_
@@ -1660,7 +1653,7 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 				if (!GameObserve && !GamePaused &&
-					ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel upgrade %s\n" _C_
 							Selected[0]->Type->Ident);
@@ -1672,7 +1665,7 @@ void UIHandleButtonDown(unsigned button)
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 				if (!GameObserve && !GamePaused &&
-					ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel research %s\n" _C_
 							Selected[0]->Type->Ident);
@@ -1687,7 +1680,7 @@ void UIHandleButtonDown(unsigned button)
 				//  for transporter
 				//
 				if (!GameObserve && !GamePaused &&
-					ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(Selected[0])) {
 					if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 						uins = Selected[0]->UnitInside;
 						for (i = ButtonUnderCursor; i; uins = uins->NextContained) {
@@ -1703,7 +1696,7 @@ void UIHandleButtonDown(unsigned button)
 				}
 			} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 				if (!GameObserve && !GamePaused &&
-					ThisPlayer->IsTeamed(Selected[0])) {
+						ThisPlayer->IsTeamed(Selected[0])) {
 					UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				}
 			}

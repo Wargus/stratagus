@@ -77,28 +77,6 @@ typedef int MenuButtonId;
 #define MBUTTON_PULLDOWN    46
 #define MBUTTON_VTHIN       48
 
-#define MBUTTON_SC_GEM_ROUND                 7
-#define MBUTTON_SC_GEM_SQUARE               12
-#define MBUTTON_SC_UP_ARROW                 17
-#define MBUTTON_SC_DOWN_ARROW               20
-#define MBUTTON_SC_LEFT_ARROW               23
-#define MBUTTON_SC_RIGHT_ARROW              26
-#define MBUTTON_SC_S_KNOB                   28
-#define MBUTTON_SC_S_VCONT                  30
-#define MBUTTON_SC_S_HCONT                  33
-#define MBUTTON_SC_PULLDOWN_DOWN_ARROW      50
-#define MBUTTON_SC_PULLDOWN_DISABLED        54
-#define MBUTTON_SC_PULLDOWN                 57
-#define MBUTTON_SC_PULLDOWN_TOP             60
-#define MBUTTON_SC_PULLDOWN_MIDDLE          63
-#define MBUTTON_SC_PULLDOWN_BOTTOM          66
-#define MBUTTON_SC_PULLDOWN_BOTTOM_SELECTED 69
-#define MBUTTON_SC_PULLDOWN_TOP_SELECTED    72
-#define MBUTTON_SC_INPUT                    81
-#define MBUTTON_SC_BUTTON_LEFT              107
-#define MBUTTON_SC_BUTTON                   116
-#define MBUTTON_SC_BUTTON_RIGHT             125
-
 	/// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_STATE 5
 #define SERVER_PLAYER_READY 32

@@ -840,7 +840,7 @@ extern CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *
 	/// @todo more docu
 extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y);
 	/// @todo more docu
-extern int CanBuildOn(int x, int y, int mask);
+extern bool CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
 

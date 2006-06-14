@@ -672,8 +672,10 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 		type = unit->Type;
 		sprite_x = unit->X * TileSizeX + unit->IX;
 		sprite_x -= (type->BoxWidth - TileSizeX * type->TileWidth) / 2;
+		sprite_x += type->OffsetX;
 		sprite_y = unit->Y * TileSizeY + unit->IY;
 		sprite_y -= (type->BoxHeight - TileSizeY * type->TileHeight) / 2;
+		sprite_y += type->OffsetY;
 		if (sprite_x + type->BoxWidth < sx0) {
 			continue;
 		}

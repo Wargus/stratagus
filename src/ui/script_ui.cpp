@@ -220,15 +220,6 @@ static int CclSetTitleScreens(lua_State *l)
 
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
-			delete[] TitleScreens[i]->File;
-			delete[] TitleScreens[i]->Music;
-			if (TitleScreens[i]->Labels) {
-				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
-					delete[] TitleScreens[i]->Labels[j]->Text;
-					delete TitleScreens[i]->Labels[j];
-				}
-				delete[] TitleScreens[i]->Labels;
-			}
 			delete TitleScreens[i];
 		}
 		delete[] TitleScreens;
@@ -924,34 +915,31 @@ static int CclDefinePanelContents(lua_State *l)
 static int CclDefineViewports(lua_State *l)
 {
 	const char *value;
-	CUserInterface *ui;
 	int i;
 	int args;
-	int j;
 	int slot;
 
 	i = 0;
-	ui = &UI;
 	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		value = LuaToString(l, j + 1);
 		++j;
 		if (!strcmp(value, "mode")) {
-			ui->ViewportMode = (ViewportModeType)(int)LuaToNumber(l, j + 1);
+			UI.ViewportMode = (ViewportModeType)(int)LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "viewport")) {
 			if (!lua_istable(l, j + 1) && luaL_getn(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
-			ui->Viewports[i].MapX = LuaToNumber(l, -1);
+			UI.Viewports[i].MapX = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
-			ui->Viewports[i].MapY = LuaToNumber(l, -1);
+			UI.Viewports[i].MapY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 3);
 			slot = (int)LuaToNumber(l, -1);
 			if (slot != -1) {
-				ui->Viewports[i].Unit = UnitSlots[slot];
+				UI.Viewports[i].Unit = UnitSlots[slot];
 			}
 			lua_pop(l, 1);
 			++i;
@@ -959,7 +947,7 @@ static int CclDefineViewports(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
-	ui->NumViewports = i;
+	UI.NumViewports = i;
 
 	return 0;
 }

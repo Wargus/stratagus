@@ -59,7 +59,7 @@
 
 #include "script.h"
 
-extern void DoScrollArea(int state, int fast);
+extern void DoScrollArea(int state, bool fast);
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -2092,7 +2092,7 @@ void EditorMainLoop(void)
 				DoScrollArea(MouseScrollState, 0);
 			}
 			if (UI.KeyScroll && !(FrameCounter % SpeedKeyScroll)) {
-				DoScrollArea(KeyScrollState, KeyModifiers & ModifierControl);
+				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
 						(EditorState == EditorEditTile ||
 							EditorState == EditorEditUnit)) {
