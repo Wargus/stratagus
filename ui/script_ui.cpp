@@ -68,8 +68,6 @@ typedef struct _info_text_ {
 std::map<std::string, ButtonStyle *> ButtonStyleHash;
 std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
 
-std::vector<CUnitInfoPanel *> AllPanels; /// Array of panels.
-
 static int HandleCount = 1;     /// Lua handler count
 
 CPreference Preference;
@@ -903,16 +901,16 @@ static int CclDefinePanelContents(lua_State *l)
 			(*content)->PosX += infopanel->PosX;
 			(*content)->PosY += infopanel->PosY;
 		}
-		for (j = 0; j < (int)AllPanels.size(); ++j) {
-			if (!strcmp(infopanel->Name, AllPanels[j]->Name)) {
+		for (j = 0; j < (int)UI.InfoPanelContents.size(); ++j) {
+			if (!strcmp(infopanel->Name, UI.InfoPanelContents[j]->Name)) {
 				DebugPrint("Redefinition of Panel '%s'" _C_ infopanel->Name);
-				delete AllPanels[j];
-				AllPanels[j] = infopanel;
+				delete UI.InfoPanelContents[j];
+				UI.InfoPanelContents[j] = infopanel;
 				break;
 			}
 		}
-		if (j == (int)AllPanels.size()) {
-			AllPanels.push_back(infopanel);
+		if (j == (int)UI.InfoPanelContents.size()) {
+			UI.InfoPanelContents.push_back(infopanel);
 		}
 	}
 	return 0;
@@ -987,7 +985,7 @@ static int CclSetShowCommandKey(lua_State *l)
 static int CclRightButtonAttacks(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	RightButtonAttacks = 1;
+	RightButtonAttacks = true;
 	return 0;
 }
 
@@ -999,7 +997,7 @@ static int CclRightButtonAttacks(lua_State *l)
 static int CclRightButtonMoves(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	RightButtonAttacks = 0;
+	RightButtonAttacks = false;
 	return 0;
 }
 

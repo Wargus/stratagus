@@ -88,15 +88,12 @@ int PlayerColorIndexCount;
 */
 void InitPlayers(void)
 {
-	int p;
-	int x;
-
-	for (p = 0; p < PlayerMax; ++p) {
+	for (int p = 0; p < PlayerMax; ++p) {
 		Players[p].Index = p;
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
-		for (x = 0; x < PlayerColorIndexCount; ++x) {
+		for (int x = 0; x < PlayerColorIndexCount; ++x) {
 			PlayerColors[p][x] = Video.MapRGB(TheScreen->format,
 				PlayerColorsRGB[p][x].r,
 				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
@@ -109,10 +106,8 @@ void InitPlayers(void)
 */
 void CleanPlayers(void)
 {
-	int i;
-
 	ThisPlayer = NULL;
-	for (i = 0; i < PlayerMax; i++) {
+	for (int i = 0; i < PlayerMax; i++) {
 		Players[i].Clear();
 	}
 	NumPlayers = 0;
@@ -125,9 +120,7 @@ void CleanPlayers(void)
 */
 void CleanRaces(void)
 {
-	int p;
-
-	for (p = 0; p < PlayerRaces.Count; ++p) {
+	for (int p = 0; p < PlayerRaces.Count; ++p) {
 		delete[] PlayerRaces.Name[p];
 		delete[] PlayerRaces.Display[p];
 	}
@@ -496,11 +489,11 @@ void CPlayer::Clear()
 	SharedVision = 0;
 	StartX = 0;
 	StartY = 0;
-	memset(Resources, 0, sizeof(Name));
-	memset(LastResources, 0, sizeof(Name));
-	memset(Incomes, 0, sizeof(Name));
-	memset(Revenue, 0, sizeof(Name));
-	memset(UnitTypesCount, 0, sizeof(Name));
+	memset(Resources, 0, sizeof(Resources));
+	memset(LastResources, 0, sizeof(LastResources));
+	memset(Incomes, 0, sizeof(Incomes));
+	memset(Revenue, 0, sizeof(Revenue));
+	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	AiEnabled = 0;
 	Ai = 0;
 	memset(Units, 0, sizeof(Units));
@@ -508,13 +501,18 @@ void CPlayer::Clear()
 	NumBuildings = 0;
 	Supply = 0;
 	Demand = 0;
+	UnitLimit = 0;
+	BuildingLimit = 0;
+	TotalUnitLimit = 0;
 	Score = 0;
 	TotalUnits = 0;
 	TotalBuildings = 0;
 	memset(TotalResources, 0, sizeof(TotalResources));
 	TotalRazings = 0;
 	TotalKills = 0;
-	memset(&UpgradeTimers, 0, sizeof(UpgradeTimers));
+	Color = 0;
+	Allow.Clear();
+	UpgradeTimers.Clear();
 }
 
 /*----------------------------------------------------------------------------

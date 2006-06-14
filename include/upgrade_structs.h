@@ -208,7 +208,9 @@ public:
 */
 class CAllow {
 public:
-	CAllow() {
+	CAllow() { this->Clear(); }
+
+	void Clear() {
 		memset(Units, 0, sizeof(Units));
 		memset(Upgrades, 0, sizeof(Upgrades));
 	}
@@ -223,8 +225,10 @@ public:
 */
 class CUpgradeTimers {
 public:
-	CUpgradeTimers() {
-		memset(Upgrades, 0, UpgradeMax * sizeof(int));
+	CUpgradeTimers() { this->Clear(); }
+
+	void Clear() {
+		memset(Upgrades, 0, sizeof(Upgrades));
 	}
 
 	/**
@@ -232,7 +236,6 @@ public:
 	**  this struct.
 	*/
 	int Upgrades[UpgradeMax];       /// counter for each upgrade
-
 };
 
 /*----------------------------------------------------------------------------

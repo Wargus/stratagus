@@ -54,7 +54,7 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-char RightButtonAttacks;                   /// right button 0 move, 1 attack
+bool RightButtonAttacks;                   /// right button attacks
 
 
 int SpeedKeyScroll = KEY_SCROLL_SPEED;     /// keyboard scroll speed
@@ -73,7 +73,7 @@ CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false),
 	MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	MouseWarpX(0), MouseWarpY(0),
-	PanelIndex(NULL), NumberPanel(0), SingleSelectedButton(NULL),
+	SingleSelectedButton(NULL),
 	MaxSelectedFont(0), MaxSelectedTextX(0), MaxSelectedTextY(0),
 	SingleTrainingButton(NULL), SingleTrainingText(NULL),
 	SingleTrainingFont(0), SingleTrainingTextX(0), SingleTrainingTextY(0),
@@ -250,13 +250,13 @@ CUserInterface::~CUserInterface()
 void CleanUserInterface(void)
 {
 	int i;
-	int j;
 	std::vector<CMenuPanel>::iterator menupanel;
 
 	// Filler
 	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
 		CGraphic::Free(UI.Fillers[i].G);
 	}
+	UI.Fillers.clear();
 
 	// Resource Icons
 	for (i = 0; i <= ScoreCost; ++i) {
@@ -265,11 +265,23 @@ void CleanUserInterface(void)
 
 	// Info Panel
 	CGraphic::Free(UI.InfoPanel.G);
-	delete[] UI.PanelIndex;
+	for (std::vector<CUnitInfoPanel *>::iterator panel = UI.InfoPanelContents.begin();
+			panel != UI.InfoPanelContents.end(); ++panel) {
+		delete *panel;
+	}
+	UI.InfoPanelContents.clear();
+
 	delete UI.SingleSelectedButton;
+	UI.SelectedButtons.clear();
 	delete UI.SingleTrainingButton;
+	delete[] UI.SingleTrainingText;
+	UI.SingleTrainingText = NULL;
+	UI.TrainingButtons.clear();
+	delete[] UI.TrainingText;
+	UI.TrainingText = NULL;
 	delete UI.UpgradingButton;
 	delete UI.ResearchingButton;
+	UI.TransportingButtons.clear();
 
 	// Button Panel
 	CGraphic::Free(UI.ButtonPanel.G);
@@ -281,29 +293,15 @@ void CleanUserInterface(void)
 	for (menupanel = UI.MenuPanels.begin(); menupanel != UI.MenuPanels.end(); ++menupanel) {
 		CGraphic::Free((*menupanel).G);
 	}
+	UI.MenuPanels.clear();
 
 	// Backgrounds
 	CGraphic::Free(UI.VictoryBackgroundG);
 	CGraphic::Free(UI.DefeatBackgroundG);
 
-	for (std::vector<CUnitInfoPanel *>::iterator panel = AllPanels.begin();
-		panel != AllPanels.end(); ++panel) {
-		delete *panel;
-	}
-	AllPanels.clear();
-
-	// Free Title screen.
+	// Title Screens
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
-			delete[] TitleScreens[i]->File;
-			delete[] TitleScreens[i]->Music;
-			if (TitleScreens[i]->Labels) {
-				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
-					delete[] TitleScreens[i]->Labels[j]->Text;
-					delete TitleScreens[i]->Labels[j];
-				}
-				delete[] TitleScreens[i]->Labels;
-			}
 			delete TitleScreens[i];
 		}
 		delete[] TitleScreens;
