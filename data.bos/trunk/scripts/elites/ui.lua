@@ -97,7 +97,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	{ Pos = {114, 25}, More = {"Text", {ShowName = true}} }, -- FIXME:split for long name
 	--{ Pos = {10, 158}, More = {"Text", {Variable = "Slot"}},
 	--	Condition = {Slot = "only"} }, -- DEBUG ONLY.
--- Ressource Left
+-- Resource Left
 	{ Pos = {76, 86}, Condition = {ShowOpponent = false, GiveResource = "only"},
 		More = {"FormattedText2", {Format = "%s: %d", Variable = "GiveResource",
 					Component1 = "Name", Component2 = "Value", Centered = true}}
@@ -165,7 +165,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 		More = {"CompleteBar", {Variable = "Mana", Height = 16, Width = 140, Border = true}}
 	},
 	{ Pos = {86, 141}, More = {"Text", {Variable = "Mana"}}, Condition = {Mana = "only"} },
--- Ressource Carry
+-- Resource Carry
 	{ Pos = {16, 138}, Condition = {CarryResource = "only"},
 		More = {"FormattedText2", {Format = "Carry: %d %s", Variable = "CarryResource",
 				Component1 = "Value", Component2 = "Name"}}
@@ -211,16 +211,15 @@ function DefineEliteScreen(screen_width, screen_height)
 
 	local ui2 = {
 		"info-panel", {
-			"panels", {"panel-general-contents"..info_panel_x, 
-				"panel-attack-unit-contents"..info_panel_x,
-				"panel-all-unit-contents"..info_panel_x, 
-				"panel-building-contents"..info_panel_x},
 			"completed-bar", {
 				"color", {50, 50, 80}}},
 	}
 	AppendElements(ui,ui2)
 	DefineUI(unpack(ui))
 end
+
+
+DefineElitePanels(Video.Width - 200, 152)
 
 
 UI.NormalFontColor = "light-blue"
@@ -342,6 +341,8 @@ AddButtonPanelButton(Video.Width - 177 + 4, 430 - 12)
 AddButtonPanelButton(Video.Width - 122 + 4, 430 - 12)
 AddButtonPanelButton(Video.Width - 67  + 4, 430 - 12)
 
+UI.ButtonPanel.X = Video.Width - 200
+UI.ButtonPanel.Y = 336 - 8 - 8
 UI.ButtonPanel.AutoCastBorderColorRGB = CColor(0, 0, 252)
 
 
