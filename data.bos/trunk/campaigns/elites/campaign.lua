@@ -33,7 +33,11 @@
 --
 
 function CreateMapStep(map)
-   return function() RunMap(map) end
+   function RunCampaignMap()
+     Load(map) -- Needed to force the load of the presentation
+     RunMap(map) 
+   end
+   return RunCampaignMap
 end
 
 local steps = {
