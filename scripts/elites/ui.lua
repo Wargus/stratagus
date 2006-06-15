@@ -351,10 +351,10 @@ UI.MapArea.Y = 16
 UI.MapArea.EndX = UI.MapArea.X + (Video.Width - 200) - 1
 UI.MapArea.EndY = UI.MapArea.Y + (Video.Height - 32) - 1
 
-UI.MapArea.ScrollPaddingLeft = 192
-UI.MapArea.ScrollPaddingRight = 192
-UI.MapArea.ScrollPaddingTop = 192
-UI.MapArea.ScrollPaddingBottom = 192
+UI.MapArea.ScrollPaddingLeft = 0
+UI.MapArea.ScrollPaddingRight = 0
+UI.MapArea.ScrollPaddingTop = 0
+UI.MapArea.ScrollPaddingBottom = 0
 
 UI.Minimap.X = Video.Width - 200 + 46
 UI.Minimap.Y = 24 + 17 - 8
