@@ -256,8 +256,6 @@ public:
 	int ScrollPaddingBottom;        /// Scrollable area past the bottom of map
 };
 
-#define ScPanel "sc-panel"          /// hack for transparency
-
 /**
 **  Menu panels
 */

@@ -136,7 +136,6 @@ void CleanRaces(void)
 */
 void SavePlayers(CFile *file)
 {
-	int i;
 	int j;
 	Uint8 r, g, b;
 
@@ -146,7 +145,7 @@ void SavePlayers(CFile *file)
 	//
 	//  Dump all players
 	//
-	for (i = 0; i < NumPlayers; ++i) {
+	for (int i = 0; i < NumPlayers; ++i) {
 		file->printf("Player(%d,\n", i);
 		file->printf("  \"name\", \"%s\",\n", Players[i].Name);
 		file->printf("  \"type\", ");
@@ -546,29 +545,29 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 	//
 	if (NumUnits < UnitMax) {
 		if (type->Building && this->NumBuildings >= this->BuildingLimit) {
-			Notify(NotifyYellow, -1, -1, "Building Limit Reached");
+			Notify(NotifyYellow, -1, -1, _("Building Limit Reached"));
 			return -1;
 		}
 		if (!type->Building && (this->TotalNumUnits - this->NumBuildings) >= this->UnitLimit) {
-			Notify(NotifyYellow, -1, -1, "Unit Limit Reached");
+			Notify(NotifyYellow, -1, -1, _("Unit Limit Reached"));
 			return -2;
 		}
 		if (this->Demand + type->Demand > this->Supply && type->Demand) {
-			Notify(NotifyYellow, -1, -1, "Insufficient Supply, increase Supply.");
+			Notify(NotifyYellow, -1, -1, _("Insufficient Supply, increase Supply."));
 			return -3;
 		}
 		if (this->TotalNumUnits >= this->TotalUnitLimit) {
-			Notify(NotifyYellow, -1, -1, "Total Unit Limit Reached");
+			Notify(NotifyYellow, -1, -1, _("Total Unit Limit Reached"));
 			return -4;
 		}
 		if (this->UnitTypesCount[type->Slot] >=  this->Allow.Units[type->Slot]) {
-			Notify(NotifyYellow, -1, -1, "Limit of %d reached for this unit type",
+			Notify(NotifyYellow, -1, -1, _("Limit of %d reached for this unit type"),
 				this->Allow.Units[type->Slot]);
 			return -6;
 		}
 		return 1;
 	} else {
-		Notify(NotifyYellow, -1, -1, "Cannot create more units.");
+		Notify(NotifyYellow, -1, -1, _("Cannot create more units."));
 		if (AiEnabled) {
 			// AiNoMoreUnits(player, type);
 		}
@@ -587,11 +586,8 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 */
 int CPlayer::CheckCosts(const int *costs) const
 {
-	int i;
-	int err;
-
-	err = 0;
-	for (i = 1; i < MaxCosts; ++i) {
+	int err = 0;
+	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Resources[i] < costs[i]) {
 			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
 				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
@@ -599,7 +595,6 @@ int CPlayer::CheckCosts(const int *costs) const
 			err |= 1 << i;
 		}
 	}
-
 	return err;
 }
 
@@ -743,10 +738,8 @@ void PlayersEachCycle(void)
 */
 void PlayersEachSecond(int player)
 {
-	int res;
-
 	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
-		for (res = 0; res < MaxCosts; ++res) {
+		for (int res = 0; res < MaxCosts; ++res) {
 			Players[player].Revenue[res] =
 				Players[player].Resources[res] -
 				Players[player].LastResources[res];

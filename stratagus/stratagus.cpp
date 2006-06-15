@@ -259,44 +259,42 @@ unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 ==  MAIN
 ============================================================================*/
 
-static int WaitNoEvent;                      /// Flag got an event
-static int WaitMouseX;                       /// Mouse X position
-static int WaitMouseY;                       /// Mouse Y position
+static bool WaitNoEvent;                     /// Flag got an event
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey(unsigned dummy)
+static void WaitCallbackButtonPressed(unsigned dummy)
 {
-	WaitNoEvent = 0;
+	WaitNoEvent = false;
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey1(unsigned dummy)
+static void WaitCallbackButtonReleased(unsigned dummy)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey2(unsigned dummy1, unsigned dummy2)
+static void WaitCallbackKeyPressed(unsigned dummy1, unsigned dummy2)
 {
-	WaitNoEvent = 0;
+	WaitNoEvent = false;
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey3(unsigned dummy1, unsigned dummy2)
+static void WaitCallbackKeyReleased(unsigned dummy1, unsigned dummy2)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey4(unsigned dummy1, unsigned dummy2)
+static void WaitCallbackKeyRepeated(unsigned dummy1, unsigned dummy2)
 {
 }
 
@@ -305,8 +303,6 @@ static void WaitCallbackKey4(unsigned dummy1, unsigned dummy2)
 */
 static void WaitCallbackMouse(int x, int y)
 {
-	WaitMouseX = x;
-	WaitMouseY = y;
 }
 
 /**
@@ -317,38 +313,70 @@ static void WaitCallbackExit(void)
 }
 
 /**
+**  Show a title image
+*/
+static void ShowTitleImage(TitleScreen *t)
+{
+	EventCallback callbacks;
+	CGraphic *g;
+
+	WaitNoEvent = true;
+
+	callbacks.ButtonPressed = WaitCallbackButtonPressed;
+	callbacks.ButtonReleased = WaitCallbackButtonReleased;
+	callbacks.MouseMoved = WaitCallbackMouse;
+	callbacks.MouseExit = WaitCallbackExit;
+	callbacks.KeyPressed = WaitCallbackKeyPressed;
+	callbacks.KeyReleased = WaitCallbackKeyReleased;
+	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
+	callbacks.NetworkEvent = NetworkEvent;
+
+	g = CGraphic::New(t->File);
+	g->Load();
+	g->Resize(Video.Width, Video.Height);
+
+	int timeout = t->Timeout * CYCLES_PER_SECOND;
+	if (!timeout) {
+		timeout = -1;
+	}
+
+	while (timeout-- && WaitNoEvent) {
+		g->DrawSubClip(0, 0, g->Width, g->Height,
+			(Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
+		TitleScreenLabel **labels = t->Labels;
+		if (labels && labels[0] && labels[0]->Font &&
+				labels[0]->Font->IsLoaded()) {
+			for (int j = 0; labels[j]; ++j) {
+				// offsets are for 640x480, scale up to actual resolution
+				int x = labels[j]->Xofs * Video.Width / 640;
+				int y = labels[j]->Yofs * Video.Width / 640;
+				if (labels[j]->Flags & TitleFlagCenter) {
+					x -= labels[j]->Font->Width(labels[j]->Text) / 2;
+				}
+				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
+			}
+		}
+
+		Invalidate();
+		RealizeVideoMemory();
+		WaitEventsOneFrame(&callbacks);
+	}
+
+	CGraphic::Free(g);
+}
+
+/**
 **  Show the title screens
 */
 static void ShowTitleScreens(void)
 {
-	EventCallback callbacks;
-	int timeout;
-	int i;
-	int j;
-	int x;
-	int y;
-
 	if (!TitleScreens) {
 		return;
 	}
 
 	SetVideoSync();
-	callbacks.ButtonPressed = WaitCallbackKey;
-	callbacks.ButtonReleased = WaitCallbackKey1;
-	callbacks.MouseMoved = WaitCallbackMouse;
-	callbacks.MouseExit = WaitCallbackExit;
-	callbacks.KeyPressed = WaitCallbackKey2;
-	callbacks.KeyReleased = WaitCallbackKey3;
-	callbacks.KeyRepeated = WaitCallbackKey4;
-	callbacks.NetworkEvent = NetworkEvent;
 
-	for (i = 0; TitleScreens[i]; ++i) {
-		WaitNoEvent = 1;
-		timeout = TitleScreens[i]->Timeout * CYCLES_PER_SECOND;
-		if (!timeout) {
-			timeout = -1;
-		}
-
+	for (int i = 0; TitleScreens[i]; ++i) {
 		if (TitleScreens[i]->Music) {
 			if (!strcmp(TitleScreens[i]->Music, "none") ||
 					PlayMusic(TitleScreens[i]->Music) == -1) {
@@ -357,61 +385,7 @@ static void ShowTitleScreens(void)
 		}
 
 		if (PlayMovie(TitleScreens[i]->File)) {
-			TitleScreenLabel **labels;
-			CGraphic *g;
-#ifdef USE_MNG
-			Mng *mng = new Mng;
-
-			if (mng->Load(TitleScreens[i]->File) == -1) {
-				delete mng;
-				mng = NULL;
-			}
-			g = NULL;
-			if (!mng) {
-#endif
-				g = CGraphic::New(TitleScreens[i]->File);
-				g->Load();
-				g->Resize(Video.Width, Video.Height);
-#ifdef USE_MNG
-			}
-#endif
-
-			while (timeout-- && WaitNoEvent) {
-#ifdef USE_MNG
-				if (mng) {
-					mng->Draw((Video.Width - mng->surface->w) / 2,
-						(Video.Height - mng->surface->h) / 2);
-					if (mng->iteration == TitleScreens[i]->Iterations) {
-						WaitNoEvent = 0;
-					}
-				} else {
-#endif
-					g->DrawSubClip(0, 0, g->Width, g->Height,
-						(Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
-#ifdef USE_MNG
-				}
-#endif
-				labels = TitleScreens[i]->Labels;
-				if (labels && labels[0] && labels[0]->Font &&
-						labels[0]->Font->IsLoaded()) {
-					for (j = 0; labels[j]; ++j) {
-						x = labels[j]->Xofs * Video.Width / 640;
-						y = labels[j]->Yofs * Video.Width / 640;
-						if (labels[j]->Flags & TitleFlagCenter) {
-							x -= labels[j]->Font->Width(labels[j]->Text) / 2;
-						}
-						VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
-					}
-				}
-
-				Invalidate();
-				RealizeVideoMemory();
-				WaitEventsOneFrame(&callbacks);
-			}
-#ifdef USE_MNG
-			delete mng;
-#endif
-			CGraphic::Free(g);
+			ShowTitleImage(TitleScreens[i]);
 		}
 
 		Video.ClearScreen();
@@ -428,15 +402,15 @@ void ShowLoadProgress(const char *fmt, ...)
 {
 	va_list va;
 	char temp[4096];
-	char *s;
 
 	va_start(va, fmt);
-	vsnprintf(temp, sizeof(temp), fmt, va);
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 
 	if (Video.Depth && GameFont && GameFont->IsLoaded()) {
 		// Remove non printable chars
-		for (s = temp; *s; ++s) {
+		for (char *s = temp; *s; ++s) {
 			if (*s < 32) {
 				*s = ' ';
 			}
@@ -618,8 +592,9 @@ int GuichanLoop(const char *filename, CMap *map)
 	// FIXME delete this when switching to full guichan GUI
 	LibraryFileName("scripts/guichan.lua", buf);
 	status = LuaLoadFile(buf);
-	if (status == 0)
+	if (status == 0) {
 		CleanModules();
+	}
 
 	freeGuichan();
 	return status;
@@ -731,7 +706,6 @@ void StartEditor(const char *filename)
 
 void StartReplay(const char *filename)
 {
-	int i;
 	char replay[512];
 
 	CleanPlayers();
@@ -739,7 +713,7 @@ void StartReplay(const char *filename)
 	LoadReplay(replay);
 
 	// FIXME why is this needed ?
-	for (i = 0; i < MAX_OBJECTIVES; i++) {
+	for (int i = 0; i < MAX_OBJECTIVES; i++) {
 		delete[] GameIntro.Objectives[i];
 		GameIntro.Objectives[i] = NULL;
 	}

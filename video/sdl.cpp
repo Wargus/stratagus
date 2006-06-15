@@ -474,8 +474,9 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 		// Time of frame over? This makes the CPU happy. :(
 		//
 		ticks = SDL_GetTicks();
-		if (!interrupts && ticks + 11 < NextFrameTicks) {
-			SDL_Delay(10);
+		if (!interrupts && ticks < NextFrameTicks) {
+			SDL_Delay(NextFrameTicks - ticks);
+			ticks = SDL_GetTicks();
 		}
 		while (ticks >= NextFrameTicks) {
 			++interrupts;
