@@ -74,9 +74,31 @@ bool CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) cons
 {
 	if (ex < this->MapX || ey < this->MapY ||
 			sx >= this->MapX + this->MapWidth || sy >= this->MapY + this->MapHeight) {
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
+}
+
+bool CViewport::IsInsideMapArea(int x, int y) const
+{
+	int tilex;
+	int tiley;
+
+	tilex = x - this->X + this->MapX * TileSizeX + this->OffsetX;
+	if (tilex < 0) {
+		tilex = (tilex - TileSizeX + 1) / TileSizeX;
+	} else {
+		tilex /= TileSizeX;
+	}
+
+	tiley = y - this->Y + this->MapY * TileSizeY + this->OffsetY;
+	if (tiley < 0) {
+		tiley = (tiley - TileSizeY + 1) / TileSizeY;
+	} else {
+		tiley /= TileSizeY;
+	}
+
+	return (tilex >= 0 && tiley >= 0 && tilex < Map.Info.MapWidth && tiley < Map.Info.MapHeight);
 }
 
 /**
@@ -90,9 +112,7 @@ bool CViewport::AnyMapAreaVisibleInViewport(int sx, int sy, int ex, int ey) cons
 */
 int CViewport::Viewport2MapX(int x) const
 {
-	int r;
-
-	r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
+	int r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
 	return r < Map.Info.MapWidth ? r : Map.Info.MapWidth - 1;
 }
 
@@ -107,9 +127,7 @@ int CViewport::Viewport2MapX(int x) const
 */
 int CViewport::Viewport2MapY(int y) const
 {
-	int r;
-
-	r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
+	int r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
 	return r < Map.Info.MapHeight ? r : Map.Info.MapHeight - 1;
 }
 
@@ -151,22 +169,36 @@ void CViewport::Set(int x, int y, int offsetx, int offsety)
 {
 	x = x * TileSizeX + offsetx;
 	y = y * TileSizeY + offsety;
-	if (x < 0) {
-		x = 0;
+
+	if (x < -UI.MapArea.ScrollPaddingLeft) {
+		x = -UI.MapArea.ScrollPaddingLeft;
 	}
-	if (y < 0) {
-		y = 0;
+	if (y < -UI.MapArea.ScrollPaddingTop) {
+		y = -UI.MapArea.ScrollPaddingTop;
 	}
-	if (x > Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1) {
-		x = Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1;
+	if (x > Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight) {
+		x = Map.Info.MapWidth * TileSizeX - (this->EndX - this->X) - 1 + UI.MapArea.ScrollPaddingRight;
 	}
-	if (y > Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1) {
-		y = Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1;
+	if (y > Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom) {
+		y = Map.Info.MapHeight * TileSizeY - (this->EndY - this->Y) - 1 + UI.MapArea.ScrollPaddingBottom;
 	}
+
 	this->MapX = x / TileSizeX;
+	if (x < 0 && x % TileSizeX) {
+		this->MapX--;
+	}
 	this->MapY = y / TileSizeY;
+	if (y < 0 && y % TileSizeY) {
+		this->MapY--;
+	}
 	this->OffsetX = x % TileSizeX;
+	if (this->OffsetX < 0) {
+		this->OffsetX += TileSizeX;
+	}
 	this->OffsetY = y % TileSizeY;
+	if (this->OffsetY < 0) {
+		this->OffsetY += TileSizeY;
+	}
 	this->MapWidth = ((this->EndX - this->X) + this->OffsetX - 1) / TileSizeX + 1;
 	this->MapHeight = ((this->EndY - this->Y) + this->OffsetY - 1) / TileSizeY + 1;
 }
@@ -213,22 +245,27 @@ void CViewport::Center(int x, int y, int offsetx, int offsety)
 */
 void CViewport::DrawMapBackgroundInViewport() const
 {
-	int sx;
-	int sy;
-	int dx;
-	int ex;
-	int dy;
-	int ey;
+	int ex = this->EndX;
+	int sy = this->MapY * Map.Info.MapWidth;
+	int dy = this->Y - this->OffsetY;
+	int ey = this->EndY;
 
-	ex = this->EndX;
-	sy = this->MapY * Map.Info.MapWidth;
-	dy = this->Y - this->OffsetY;
-	ey = this->EndY;
+	while (dy <= ey && (sy / Map.Info.MapWidth) < Map.Info.MapHeight) {
+		if (sy / Map.Info.MapWidth < 0) {
+			sy += Map.Info.MapWidth;
+			dy += TileSizeY;
+			continue;
+		}
 
-	while (dy <= ey) {
-		sx = this->MapX + sy;
-		dx = this->X - this->OffsetX;
-		while (dx <= ex) {
+		int sx = this->MapX + sy;
+		int dx = this->X - this->OffsetX;
+		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+			if (sx - sy < 0) {
+				++sx;
+				dx += TileSizeX;
+				continue;
+			}
+
 			if (ReplayRevealMap) {
 				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].Tile, dx, dy);
 			} else {
@@ -294,8 +331,32 @@ void CViewport::Draw() const
 			ShowOrder(Selected[i]);
 		}
 	}
+
+	DrawBorder();
+
 	PopClipping();
 }
+
+/**
+**  Draw border around the viewport
+*/
+void CViewport::DrawBorder() const
+{
+	// if we a single viewport, no need to denote the "selected" one
+	if (UI.NumViewports == 1) {
+		return;
+	}
+
+	Uint32 color = ColorBlack;
+	if (this == UI.SelectedViewport) {
+		color = ColorOrange;
+	}
+
+	Video.DrawRectangle(color, this->X, this->Y, this->EndX - this->X + 1,
+		this->EndY - this->Y + 1);
+}
+
+
 
 /**
 **  Initialize the fog of war.

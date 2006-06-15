@@ -99,7 +99,7 @@ EventCallback MenuCallbacks; /// Menu callbacks
 **  @todo  Support dynamic acceleration of scroll speed.
 **  @todo  If the scroll key is longer pressed the area is scrolled faster.
 */
-void DoScrollArea(int state, int fast)
+void DoScrollArea(int state, bool fast)
 {
 	CViewport *vp;
 	int stepx;
@@ -160,54 +160,23 @@ void DoScrollArea(int state, int fast)
 
 /**
 **  Draw map area
-**
-**  @todo  Fix the FIXME's and we only need to draw a line between the
-**         viewports and show the active viewport.
 */
 void DrawMapArea(void)
 {
-	CViewport *vp;
-	const CViewport *evp = NULL;
-
-	if (InterfaceState == IfaceStateNormal) {
-		// Draw all map viewports
-		evp = UI.Viewports + UI.NumViewports;
-		for (vp = UI.Viewports; vp < evp; ++vp) {
-			//
-			// A unit is tracked, center viewport on this unit.
-			//
-			if (vp->Unit) {
-				if (vp->Unit->Destroyed ||
-						vp->Unit->Orders[0]->Action == UnitActionDie) {
-					vp->Unit = NoUnitP;
-				} else {
-					vp->Center(vp->Unit->X, vp->Unit->Y,
-						vp->Unit->IX + TileSizeX / 2, vp->Unit->IY + TileSizeY / 2);
-				}
+	// Draw all of the viewports
+	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+		// Center viewport on tracked unit
+		if (vp->Unit) {
+			if (vp->Unit->Destroyed ||
+					vp->Unit->Orders[0]->Action == UnitActionDie) {
+				vp->Unit = NoUnitP;
+			} else {
+				vp->Center(vp->Unit->X, vp->Unit->Y,
+					vp->Unit->IX + TileSizeX / 2, vp->Unit->IY + TileSizeY / 2);
 			}
-	
-			vp->Draw();
-		}
-	}
-	// if we a single viewport, no need to denote the "selected" one
-	if (UI.NumViewports == 1) {
-		return;
-	}
-
-	//
-	// Separate the viewports and mark the active viewport.
-	//
-	for (vp = UI.Viewports; vp < evp; ++vp) {
-		Uint32 color;
-
-		if (vp == UI.SelectedViewport) {
-			color = ColorOrange;
-		} else {
-			color = ColorBlack;
 		}
 
-		Video.DrawRectangle(color, vp->X, vp->Y, vp->EndX - vp->X + 1,
-			vp->EndY - vp->Y + 1);
+		vp->Draw();
 	}
 }
 
@@ -220,8 +189,6 @@ void DrawMapArea(void)
 void UpdateDisplay(void)
 {
 	if (GameRunning || EditorRunning == EditorEditing) {
-		int i;
-
 		DrawMapArea();
 		DrawMessages();
 
@@ -230,7 +197,7 @@ void UpdateDisplay(void)
 		}
 
 		if (!BigMapMode) {
-			for (i = 0; i < (int)UI.Fillers.size(); ++i) {
+			for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
 				UI.Fillers[i].G->DrawSubClip(0, 0,
 					UI.Fillers[i].G->Width,
 					UI.Fillers[i].G->Height,
@@ -267,6 +234,18 @@ void UpdateDisplay(void)
 	Invalidate();
 }
 
+static void InitGameCallbacks(void)
+{
+	GameCallbacks.ButtonPressed = HandleButtonDown;
+	GameCallbacks.ButtonReleased = HandleButtonUp;
+	GameCallbacks.MouseMoved = HandleMouseMove;
+	GameCallbacks.MouseExit = HandleMouseExit;
+	GameCallbacks.KeyPressed = HandleKeyDown;
+	GameCallbacks.KeyReleased = HandleKeyUp;
+	GameCallbacks.KeyRepeated = HandleKeyRepeat;
+	GameCallbacks.NetworkEvent = NetworkEvent;
+}
+
 /**
 **  Game main loop.
 **
@@ -282,19 +261,12 @@ void GameMainLoop(void)
 #ifdef DEBUG  // removes the setjmp warnings
 	static bool showtip;
 #else
-	int showtip;
+	bool showtip;
 #endif
 	int player;
 	int RealVideoSyncSpeed;
 
-	GameCallbacks.ButtonPressed = HandleButtonDown;
-	GameCallbacks.ButtonReleased = HandleButtonUp;
-	GameCallbacks.MouseMoved = HandleMouseMove;
-	GameCallbacks.MouseExit = HandleMouseExit;
-	GameCallbacks.KeyPressed = HandleKeyDown;
-	GameCallbacks.KeyReleased = HandleKeyUp;
-	GameCallbacks.KeyRepeated = HandleKeyRepeat;
-	GameCallbacks.NetworkEvent = NetworkEvent;
+	InitGameCallbacks();
 
 	Callbacks = &GameCallbacks;
 
@@ -302,7 +274,7 @@ void GameMainLoop(void)
 	GameCursor = UI.Point.Cursor;
 	GameRunning = 1;
 
-	showtip = 0;
+	showtip = false;
 	RealVideoSyncSpeed = VideoSyncSpeed;
 	if (!IsNetworkGame()) {  // Don't show them for net play
 		showtip = ShowTips;
@@ -377,7 +349,7 @@ void GameMainLoop(void)
 		//
 		// Map scrolling
 		//
-		DoScrollArea(MouseScrollState | KeyScrollState, KeyModifiers & ModifierControl);
+		DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 
 		if (FastForwardCycle > GameCycle &&
 				RealVideoSyncSpeed != VideoSyncSpeed) {
@@ -411,7 +383,7 @@ void GameMainLoop(void)
 		if (showtip) {
 			ProcessMenu("menu-tips", 1);
 			InterfaceState = IfaceStateNormal;
-			showtip = 0;
+			showtip = false;
 		}
 	}
 

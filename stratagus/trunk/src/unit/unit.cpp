@@ -2172,12 +2172,12 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 **
 **  @return 1 if we can build on this point.
 */
-int CanBuildOn(int x, int y, int mask)
+bool CanBuildOn(int x, int y, int mask)
 {
 	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
-		return 0;
+		return false;
 	}
-	return (Map.Fields[x + y * Map.Info.MapWidth].Flags & mask) ? 0 : 1;
+	return (Map.Fields[x + y * Map.Info.MapWidth].Flags & mask) ? false : true;
 }
 
 /**
