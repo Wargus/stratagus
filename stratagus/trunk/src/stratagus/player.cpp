@@ -510,7 +510,8 @@ void CPlayer::Clear()
 	TotalRazings = 0;
 	TotalKills = 0;
 	Color = 0;
-	Allow.Clear();
+	// FIXME: can't clear Allow since it's initialized already
+//	Allow.Clear();
 	UpgradeTimers.Clear();
 }
 
