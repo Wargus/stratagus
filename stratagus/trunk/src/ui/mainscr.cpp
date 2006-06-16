@@ -10,7 +10,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Valery Shchedrin, and
+//      (c) Copyright 1998-2006 by Lutz Sammer, Valery Shchedrin, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -71,7 +71,6 @@ void DrawMenuButtonArea(void)
 {
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {
-			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(UI.MenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
@@ -81,7 +80,6 @@ void DrawMenuButtonArea(void)
 		}
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
-			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(UI.NetworkMenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
@@ -90,7 +88,6 @@ void DrawMenuButtonArea(void)
 				UI.NetworkMenuButton.Text.c_str());
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
-			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(UI.NetworkDiplomacyButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
@@ -115,15 +112,15 @@ void DrawMenuButtonArea(void)
 */
 static void UiDrawLifeBar(const CUnit *unit, int x, int y)
 {
-	int f;
-	Uint32 color;
-
 	// FIXME: add icon borders
 	y += unit->Type->Icon.Icon->G->Height;
 	Video.FillRectangleClip(ColorBlack, x, y,
 		unit->Type->Icon.Icon->G->Width, 7);
+
 	if (unit->Variable[HP_INDEX].Value) {
-		f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
+		Uint32 color;
+		int f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
+
 		if (f > 75) {
 			color = ColorDarkGreen;
 		} else if (f > 50) {
@@ -133,6 +130,7 @@ static void UiDrawLifeBar(const CUnit *unit, int x, int y)
 		} else {
 			color = ColorRed;
 		}
+
 		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
 		Video.FillRectangleClip(color, x + 1, y + 1, f, 5);
 	}
@@ -148,14 +146,13 @@ static void UiDrawLifeBar(const CUnit *unit, int x, int y)
 */
 static void UiDrawManaBar(const CUnit *unit, int x, int y)
 {
-	int f;
-
 	// FIXME: add icon borders
 	y += unit->Type->Icon.Icon->G->Height;
 	Video.FillRectangleClip(ColorBlack, x, y + 3,
 		unit->Type->Icon.Icon->G->Width, 4);
+
 	if (unit->Stats->Variables[MANA_INDEX].Max) {
-		f = (100 * unit->Variable[MANA_INDEX].Value) / unit->Variable[MANA_INDEX].Max;
+		int f = (100 * unit->Variable[MANA_INDEX].Value) / unit->Variable[MANA_INDEX].Max;
 		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
@@ -170,40 +167,39 @@ static void UiDrawManaBar(const CUnit *unit, int x, int y)
 **
 **  @return            0 if we can't show the content, else 1.
 */
-static int CanShowContent(const ConditionPanel *condition, const CUnit *unit)
+static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 {
-	int i; // iterator on variables and flags.
+	int i;
 
 	Assert(unit);
 	if (!condition) {
-		return 1;
+		return true;
 	}
 	if ((condition->ShowOnlySelected && !unit->Selected) ||
 			(unit->Player->Type == PlayerNeutral && condition->HideNeutral) ||
 			(ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent) ||
 			(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
-		return 0;
+		return false;
 	}
 	if (condition->BoolFlags) {
-		for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
+		for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
 			if (condition->BoolFlags[i] != CONDITION_TRUE) {
-				if ((condition->BoolFlags[i] == CONDITION_ONLY) ^ (unit->Type->BoolFlag[i])) {
-					return 0;
+				if ((condition->BoolFlags[i] == CONDITION_ONLY) ^ unit->Type->BoolFlag[i]) {
+					return false;
 				}
 			}
 		}
 	}
 	if (condition->Variables) {
-		for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+		for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY)
-					^ (unit->Variable[i].Enable) ) {
-					return 0;
+				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit->Variable[i].Enable) {
+					return false;
 				}
 			}
 		}
 	}
-	return 1;
+	return true;
 }
 
 typedef enum {
@@ -226,50 +222,51 @@ typedef struct {
 */
 UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 {
-	UStrInt val;    // result.
+	UStrInt val;
 	CVariable *var;
 
 	Assert(unit);
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
 
 	switch (t) {
-		case 0 : // Unit :
+		case 0: // Unit:
 			var = &unit->Variable[index];
 			break;
-		case 1 : // Type :
+		case 1: // Type:
 			var = &unit->Type->Variable[index];
 			break;
-		case 2 : // Stats :
+		case 2: // Stats:
 			var = &unit->Stats->Variables[index];
 			break;
-		default :
-			DebugPrint("Bad value for getComponent : t = %d" _C_ t);
+		default:
+			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
 			var = &unit->Variable[index];
 			break;
 	}
+
 	switch (e) {
-		case VariableValue :
+		case VariableValue:
 			val.type = USTRINT_INT;
 			val.i = var->Value;
 			break;
-		case VariableMax :
+		case VariableMax:
 			val.type = USTRINT_INT;
 			val.i = var->Max;
 			break;
-		case VariableIncrease :
+		case VariableIncrease:
 			val.type = USTRINT_INT;
 			val.i = var->Increase;
 			break;
-		case VariableDiff :
+		case VariableDiff:
 			val.type = USTRINT_INT;
 			val.i = var->Max - var->Value;
 			break;
-		case VariablePercent :
+		case VariablePercent:
 			Assert(unit->Variable[index].Max != 0);
 			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
-		case VariableName :
+		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
 				val.s = DefaultResourceNames[unit->Type->GivesResource];
@@ -297,24 +294,24 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 {
 	Assert(unit);
 	switch (e) {
-		case UnitRefItSelf :
+		case UnitRefItSelf:
 			return unit;
-		case UnitRefInside :
+		case UnitRefInside:
 			return unit->UnitInside;
-		case UnitRefContainer :
+		case UnitRefContainer:
 			return unit->Container;
 		case UnitRefWorker :
 			if (unit->Orders[0]->Action == UnitActionBuilt) {
 				return unit->Data.Built.Worker;
 			} else {
-				return 0;
+				return NoUnitP;
 			}
-		case UnitRefGoal :
+		case UnitRefGoal:
 			return unit->Goal;
-		default :
+		default:
 			Assert(0);
 	}
-	return 0;
+	return NoUnitP;
 }
 
 
@@ -328,25 +325,16 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	char *text;             // Optional text to display.
 	CFont *font;            // Font to use.
-	int index;              // Index of optionnal variable.
 	int x;                  // X coordinate to display.
 	int y;                  // Y coordinate to display.
-	EnumVariable component; // Component of the optional variable to use.
-	int value;              // Value of variable.
-	int diff;               // Max - value of the variable.
-	char buf[64];           // string to stock number conversion.
 
 	x = this->PosX;
 	y = this->PosY;
-	font = this->Font;
-	if (!font) {
-		font = defaultfont;
-	}
+	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
-	index = this->Index;
 
-	Assert(unit || index == -1);
-	Assert(index == -1 || (0 <= index && index < UnitTypeVar.NumberVariable));
+	Assert(unit || this->Index == -1);
+	Assert(this->Index == -1 || (0 <= this->Index && this->Index < UnitTypeVar.NumberVariable));
 
 	if (this->Text) {
 		text = EvalString(this->Text);
@@ -358,34 +346,37 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 		x += font->Width(text);
 		delete[] text;
 	}
+
 	if (this->ShowName) {
 		VideoDrawTextCentered(x, y, font, unit->Type->Name);
 		return;
 	}
-	if (index != -1) {
+
+	if (this->Index != -1) {
 		if (!this->Stat) {
-			component = this->Component;
+			EnumVariable component = this->Component;
 			switch (component) {
-			case VariableValue:
-			case VariableMax:
-			case VariableIncrease:
-			case VariableDiff:
-			case VariablePercent:
-				VideoDrawNumber(x, y, font, GetComponent(unit, index, component, 0).i);
-				break;
-			case VariableName :
-				VideoDrawText(x, y, font, GetComponent(unit, index, component, 0).s);
-				break;
-			default :
-				Assert(0);
+				case VariableValue:
+				case VariableMax:
+				case VariableIncrease:
+				case VariableDiff:
+				case VariablePercent:
+					VideoDrawNumber(x, y, font, GetComponent(unit, this->Index, component, 0).i);
+					break;
+				case VariableName:
+					VideoDrawText(x, y, font, GetComponent(unit, this->Index, component, 0).s);
+					break;
+				default:
+					Assert(0);
 			}
 		} else {
-			value = unit->Type->Variable[index].Value;
-			diff = unit->Stats->Variables[index].Value - value;
+			int value = unit->Type->Variable[this->Index].Value;
+			int diff = unit->Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {
 				VideoDrawNumber(x, y, font, value);
 			} else {
+				char buf[64];
 				sprintf(buf, diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
 				VideoDrawText(x, y, font, buf);
 			}
@@ -405,27 +396,22 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 */
 void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	const char *text;
 	CFont *font;
-	int index;
 	char buf[256];
 	UStrInt usi1;
 
 	Assert(unit);
-	text = this->Format;
-	font = this->Font;
-	if (!font) {
-		font = defaultfont;
-	}
+	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
-	index = this->Index;
-	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	usi1 = GetComponent(unit, index, this->Component, 0);
+
+	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	usi1 = GetComponent(unit, this->Index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
-		sprintf(buf, text, usi1.s);
+		sprintf(buf, this->Format, usi1.s);
 	} else {
-		sprintf(buf, text, usi1.i);
+		sprintf(buf, this->Format, usi1.i);
 	}
+
 	if (this->Centered) {
 		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
 	} else {
@@ -445,34 +431,27 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) cons
 */
 void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	const char *text;
 	CFont *font;
-	int index1, index2;
 	char buf[256];
 	UStrInt usi1, usi2;
 
 	Assert(unit);
-	text = this->Format;
-	font = this->Font;
-	if (!font) {
-		font = defaultfont;
-	}
+	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
-	index1 = this->Index1;
-	index2 = this->Index2;
-	usi1 = GetComponent(unit, index1, this->Component1, 0);
-	usi2 = GetComponent(unit, index2, this->Component2, 0);
+
+	usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
+	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
 	if (usi1.type == USTRINT_STR) {
 		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, text, usi1.s, usi2.s);
+			sprintf(buf, this->Format, usi1.s, usi2.s);
 		} else {
-			sprintf(buf, text, usi1.s, usi2.i);
+			sprintf(buf, this->Format, usi1.s, usi2.i);
 		}
 	} else {
 		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, text, usi1.i, usi2.s);
+			sprintf(buf, this->Format, usi1.i, usi2.s);
 		} else {
-			sprintf(buf, text, usi1.i, usi2.i);
+			sprintf(buf, this->Format, usi1.i, usi2.i);
 		}
 	}
 	if (this->Centered) {
@@ -490,15 +469,10 @@ void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) con
 */
 void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	int x;
-	int y;
-
 	Assert(unit);
-	x = this->PosX;
-	y = this->PosY;
 	unit = GetUnitRef(unit, this->UnitRef);
 	if (unit && unit->Type->Icon.Icon) {
-		unit->Type->Icon.Icon->DrawIcon(unit->Player, x, y);
+		unit->Type->Icon.Icon->DrawIcon(unit->Player, this->PosX, this->PosY);
 	}
 }
 
@@ -513,21 +487,15 @@ void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
 */
 void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	int x;         // X coordinate of the bar.
-	int y;         // Y coordinate of the bar.
-	int index;     // index of variable.
-	int f;         // percent of value/Max
-	Uint32 color;  // Color of bar.
-
 	Assert(unit);
-	x = this->PosX;
-	y = this->PosY;
-	index = this->Index;
-	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	if (!unit->Variable[index].Max) {
+	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	if (!unit->Variable[this->Index].Max) {
 		return;
 	}
-	f = (100 * unit->Variable[index].Value) / unit->Variable[index].Max;
+
+	Uint32 color;
+	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
+
 	if (f > 75) {
 		color = ColorDarkGreen;
 	} else if (f > 50) {
@@ -537,11 +505,12 @@ void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 	} else {
 		color = ColorRed;
 	}
+
 	// Border
-	Video.FillRectangleClip(ColorBlack, x - 1, y - 1,
+	Video.FillRectangleClip(ColorBlack, this->PosX - 1, this->PosY - 1,
 		this->Width + 2, this->Height + 2);
 
-	Video.FillRectangleClip(color, x, y,
+	Video.FillRectangleClip(color, this->PosX, this->PosY,
 		(f * this->Width) / 100, this->Height);
 }
 
@@ -556,26 +525,22 @@ void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 */
 void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	int x;         // X coordinate of the bar.
-	int y;         // Y coordinate of the bar.
-	int index;     // index of variable.
-	int f;         // percent of value/Max.
-	int w;         // Width of the bar.
-	int h;         // Height of the bar.
-
 	Assert(unit);
-	x = this->PosX;
-	y = this->PosY;
-	w = this->Width;
-	h = this->Height;
-	Assert(w > 0);
-	Assert(h > 4);
-	index = this->Index;
-	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	if (!unit->Variable[index].Max) {
+	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	if (!unit->Variable[this->Index].Max) {
 		return;
 	}
-	f = (100 * unit->Variable[index].Value) / unit->Variable[index].Max;
+
+	int x = this->PosX;
+	int y = this->PosY;
+	int w = this->Width;
+	int h = this->Height;
+
+	Assert(w > 0);
+	Assert(h > 4);
+
+	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
+
 	if (!this->Border) {
 		Video.FillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
 		if (UI.CompletedBarShadow) {
@@ -627,6 +592,7 @@ static void DrawUnitInfo(CUnit *unit)
 	stats = unit->Stats;
 	Assert(type);
 	Assert(stats);
+
 	// Draw IconUnit
 #ifdef USE_MNG
 	if (type->Portrait.Num) {
@@ -653,8 +619,10 @@ static void DrawUnitInfo(CUnit *unit)
 				(IconActive | (MouseButtons & LeftButton)) : 0,
 			x, y, NULL);
 	}
+
 	x = UI.InfoPanel.X;
 	y = UI.InfoPanel.Y;
+
 	//
 	//  Show progress if they are selected.
 	//
@@ -754,41 +722,6 @@ static void DrawUnitInfo(CUnit *unit)
 		}
 		return;
 	}
-
-#if 0 // Must be removed after transforming in lua
-	char buf[64];
-	int vpos;
-
-
-	//
-	//  Stores resources.
-	//
-	vpos = 77; // Start of resource drawing
-	for (i = 1; i < MaxCosts; ++i) {
-		if (type->CanStore[i]) {
-			if (vpos == 77) {
-				VideoDrawText(x + 20, y + 8 + 61, GameFont, _("Production"));
-			}
-			sprintf(buf, "%s:", DefaultResourceNames[i]);
-			VideoDrawText(x + 78 - GameFont->Width(buf),
-				y + 8 + vpos, GameFont, buf);
-			VideoDrawNumber(x + 78, y + 8 + vpos, GameFont, DefaultIncomes[i]);
-			// Incomes have been upgraded
-			if (unit->Player->Incomes[i] != DefaultIncomes[i]) {
-				sprintf(buf, "~<+%i~>",
-					unit->Player->Incomes[i] - DefaultIncomes[i]);
-				VideoDrawText(x + 96, y + 8 + vpos, GameFont, buf);
-			}
-			sprintf(buf, "(%+.1f)", unit->Player->Revenue[i] / 1000.0);
-			VideoDrawText(x + 120, y + 8 + vpos, GameFont, buf);
-			vpos += 16;
-		}
-	}
-	if (vpos != 77) {
-		// We displayed at least one resource
-		return;
-	}
-#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -867,11 +800,9 @@ static int  MessagesEventIndex;                  /// FIXME: docu
 */
 static void ShiftMessages(void)
 {
-	int z;
-
 	if (MessagesCount) {
 		--MessagesCount;
-		for (z = 0; z < MessagesCount; ++z) {
+		for (int z = 0; z < MessagesCount; ++z) {
 			strcpy(Messages[z], Messages[z + 1]);
 		}
 	}
@@ -882,11 +813,9 @@ static void ShiftMessages(void)
 */
 static void ShiftMessagesEvent(void)
 {
-	int z;
-
 	if (MessagesEventCount) {
 		--MessagesEventCount;
-		for (z = 0; z < MessagesEventCount; ++z) {
+		for (int z = 0; z < MessagesEventCount; ++z) {
 			MessagesEventX[z] = MessagesEventX[z + 1];
 			MessagesEventY[z] = MessagesEventY[z + 1];
 			strcpy(MessagesEvent[z], MessagesEvent[z + 1]);
@@ -923,10 +852,8 @@ void UpdateMessages(void)
 */
 void DrawMessages(void)
 {
-	int z;
-
 	// Draw message line(s)
-	for (z = 0; z < MessagesCount; ++z) {
+	for (int z = 0; z < MessagesCount; ++z) {
 		if (z == 0) {
 			PushClipping();
 			SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
@@ -1142,10 +1069,12 @@ void CleanMessages(void)
 */
 void CStatusLine::Draw(void)
 {
-	if (StatusLine[0]) {
+	if (!this->StatusLine.empty()) {
 		PushClipping();
-		SetClipping(TextX, TextY, TextX + Width - 1, Video.Height - 1);
-		VideoDrawTextClip(TextX, TextY, Font, StatusLine);
+		SetClipping(this->TextX, this->TextY,
+			this->TextX + this->Width - 1, Video.Height - 1);
+		VideoDrawTextClip(this->TextX, this->TextY, this->Font,
+			this->StatusLine.c_str());
 		PopClipping();
 	}
 }
@@ -1155,11 +1084,10 @@ void CStatusLine::Draw(void)
 **
 **  @param status  New status line information.
 */
-void CStatusLine::Set(const char *status)
+void CStatusLine::Set(const std::string &status)
 {
-	if (KeyState != KeyStateInput && strcmp(StatusLine, status)) {
-		strncpy(StatusLine, status, sizeof(StatusLine) - 1);
-		StatusLine[sizeof(StatusLine) - 1] = '\0';
+	if (KeyState != KeyStateInput) {
+		this->StatusLine = status;
 	}
 }
 
@@ -1169,7 +1097,7 @@ void CStatusLine::Set(const char *status)
 void CStatusLine::Clear(void)
 {
 	if (KeyState != KeyStateInput) {
-		UI.StatusLine.Set("");
+		this->StatusLine.clear();
 	}
 }
 
@@ -1191,10 +1119,7 @@ static int Costs[MaxCosts + 1];              /// costs to display in status line
 */
 void DrawCosts(void)
 {
-	int i;
-	int x;
-
-	x = UI.StatusLine.TextX + 268;
+	int x = UI.StatusLine.TextX + 268;
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
 		UI.Resources[GoldCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
@@ -1203,7 +1128,7 @@ void DrawCosts(void)
 		x += 45;
 	}
 
-	for (i = 1; i <= MaxCosts; ++i) {
+	for (int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (UI.Resources[i].G) {
 				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
@@ -1391,18 +1316,14 @@ void CInfoPanel::Draw(void)
 */
 void DrawTimer(void)
 {
-	char buf[30];
-	int hour;
-	int min;
-	int sec;
-
 	if (!GameTimer.Init) {
 		return;
 	}
 
-	sec = GameTimer.Cycles / CYCLES_PER_SECOND % 60;
-	min = (GameTimer.Cycles / CYCLES_PER_SECOND / 60) % 60;
-	hour = (GameTimer.Cycles / CYCLES_PER_SECOND / 3600);
+	int sec = GameTimer.Cycles / CYCLES_PER_SECOND % 60;
+	int min = (GameTimer.Cycles / CYCLES_PER_SECOND / 60) % 60;
+	int hour = (GameTimer.Cycles / CYCLES_PER_SECOND / 3600);
+	char buf[30];
 
 	if (hour) {
 		sprintf(buf, "%d:%02d:%02d", hour, min, sec);
@@ -1410,9 +1331,7 @@ void DrawTimer(void)
 		sprintf(buf, "%d:%02d", min, sec);
 	}
 
-	// FIXME: make this configurable
-	VideoDrawText(UI.SelectedViewport->EndX - 70,
-		UI.SelectedViewport->Y + 15, GameFont, buf);
+	VideoDrawText(UI.Timer.X, UI.Timer.Y, UI.Timer.Font, buf);
 }
 
 /**
