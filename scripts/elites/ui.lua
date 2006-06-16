@@ -366,6 +366,10 @@ UI.StatusLine.TextY = Video.Height - 14
 UI.StatusLine.Width = Video.Width - 200 - 100
 UI.StatusLine.Font = Fonts["game"]
 
+UI.Timer.X = UI.MapArea.EndY - 70
+UI.Timer.Y = UI.MapArea.Y + 15
+UI.Timer.Font = Fonts["game"]
+
 -- titanium
 UI.Resources[0].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
 UI.Resources[0].IconFrame = 0
