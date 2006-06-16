@@ -529,13 +529,11 @@ public:
 class CStatusLine
 {
 public:
-	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0)
-	{
-		StatusLine[0] = '\0';
-	}
+	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0) {}
 
 	void Draw();
-	void Set(const char *status);
+	void Set(const std::string &status);
+	inline const std::string &Get() { return this->StatusLine; }
 	void Clear();
 
 	int Width;
@@ -544,13 +542,25 @@ public:
 	CFont *Font;
 
 private:
-	char StatusLine[256];
+	std::string StatusLine;
 };
+
+class CUITimer
+{
+public:
+	CUITimer() : X(0), Y(0), Font(NULL) {}
+
+	int X;
+	int Y;
+	CFont *Font;
+};
+
 
 /**
 **  Defines the user interface.
 */
-class CUserInterface {
+class CUserInterface
+{
 public:
 	CUserInterface();
 	~CUserInterface();
@@ -633,6 +643,9 @@ public:
 
 	// The status line
 	CStatusLine StatusLine;             /// status line
+
+	// Game timer
+	CUITimer Timer;                     /// game timer
 
 	// Offsets for 640x480 center used by menus
 	int Offset640X;                     /// Offset for 640x480 X position
