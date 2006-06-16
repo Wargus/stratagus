@@ -500,9 +500,10 @@ void CPlayer::Clear()
 	NumBuildings = 0;
 	Supply = 0;
 	Demand = 0;
-	UnitLimit = 0;
-	BuildingLimit = 0;
-	TotalUnitLimit = 0;
+	// FIXME: can't clear limits since it's initialized already
+//	UnitLimit = 0;
+//	BuildingLimit = 0;
+//	TotalUnitLimit = 0;
 	Score = 0;
 	TotalUnits = 0;
 	TotalBuildings = 0;
