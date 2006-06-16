@@ -1,15 +1,6 @@
 $using std::string;
 $using std::vector;
 
-class CFiller
-{
-	CFiller();
-	
-	CGraphic *G;
-	int X;
-	int Y;
-};
-
 class CUIButton
 {
 	CUIButton();
@@ -20,12 +11,33 @@ class CUIButton
 	ButtonStyle *Style;
 };
 
+class CMapArea
+{
+	int X;
+	int Y;
+	int EndX;
+	int EndY;
+	int ScrollPaddingLeft;
+	int ScrollPaddingRight;
+	int ScrollPaddingTop;
+	int ScrollPaddingBottom;
+};
+
 class CMenuPanel
 {
 	CMenuPanel();
 
 	string Ident;
 	CGraphic *G;
+};
+
+class CFiller
+{
+	CFiller();
+	
+	CGraphic *G;
+	int X;
+	int Y;
 };
 
 class vector
@@ -81,22 +93,21 @@ class CInfoPanel
 
 class CStatusLine
 {
+	void Set(const std::string &status);
+	const std::string &Get();
+	void Clear();
+
 	int Width;
 	int TextX;
 	int TextY;
 	CFont *Font;
 };
 
-class CMapArea
+class CUITimer
 {
 	int X;
 	int Y;
-	int EndX;
-	int EndY;
-	int ScrollPaddingLeft;
-	int ScrollPaddingRight;
-	int ScrollPaddingTop;
-	int ScrollPaddingBottom;
+	CFont *Font;
 };
 
 class CUserInterface
@@ -125,13 +136,15 @@ class CUserInterface
 	
 	CPieMenu PieMenu;
 
+	CMapArea MapArea;
+
 	CUIButton MenuButton;
 	CUIButton NetworkMenuButton;
 	CUIButton NetworkDiplomacyButton;
 
 	CMinimap Minimap;
 	CStatusLine StatusLine;
-	CMapArea MapArea;
+	CUITimer Timer;
 	vector<CMenuPanel> MenuPanels;
 };
 
