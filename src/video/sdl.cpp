@@ -305,30 +305,6 @@ void Invalidate(void)
 }
 
 /**
-**  Handle keyboard key press!
-**
-**  @param callbacks  Callback funktion for key down.
-**  @param code       SDL keysym structure pointer.
-*/
-static void SdlHandleKeyPress(const EventCallback *callbacks,
-	const SDL_keysym *code)
-{
-	InputKeyButtonPress(callbacks, SDL_GetTicks(), code->sym, code->unicode);
-}
-
-/**
-**  Handle keyboard key release!
-**
-**  @param callbacks  Callback funktion for key up.
-**  @param code       SDL keysym structure pointer.
-*/
-static void SdlHandleKeyRelease(const EventCallback *callbacks,
-	const SDL_keysym *code)
-{
-	InputKeyButtonRelease(callbacks, SDL_GetTicks(), code->sym, code->unicode);
-}
-
-/**
 **  Handle interactive input event.
 **
 **  @param callbacks  Callback structure for events.
@@ -338,17 +314,11 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 {
 	switch (event->type) {
 		case SDL_MOUSEBUTTONDOWN:
-			//
-			//  SDL has already a good order of the buttons.
-			//
 			InputMouseButtonPress(callbacks, SDL_GetTicks(),
 				event->button.button);
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			//
-			//  SDL has already a good order of the buttons.
-			//
 			InputMouseButtonRelease(callbacks, SDL_GetTicks(),
 				event->button.button);
 			break;
@@ -362,11 +332,8 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 			if ((UI.MouseWarpX != -1 || UI.MouseWarpY != -1) &&
 					(event->motion.x != UI.MouseWarpX ||
 						event->motion.y != UI.MouseWarpY)) {
-				int xw;
-				int yw;
-
-				xw = UI.MouseWarpX;
-				yw = UI.MouseWarpY;
+				int xw = UI.MouseWarpX;
+				int yw = UI.MouseWarpY;
 				UI.MouseWarpX = -1;
 				UI.MouseWarpY = -1;
 				SDL_WarpMouse(xw, yw);
@@ -403,15 +370,18 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 			break;
 
 		case SDL_KEYDOWN:
-			SdlHandleKeyPress(callbacks, &event->key.keysym);
+			InputKeyButtonPress(callbacks, SDL_GetTicks(),
+				event->key.keysym.sym, event->key.keysym.unicode);
 			break;
 
 		case SDL_KEYUP:
-			SdlHandleKeyRelease(callbacks, &event->key.keysym);
+			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
+				event->key.keysym.sym, event->key.keysym.unicode);
 			break;
 
 		case SDL_QUIT:
 			Exit(0);
+			break;
 	}
 
 	handleInput(event);
