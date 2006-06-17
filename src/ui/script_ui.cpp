@@ -2900,14 +2900,7 @@ static int CclAddMessage(lua_State *l)
 static int CclResetKeystrokeHelp(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-
-	std::vector<KeyStrokeHelp>::iterator i;
-	for (i = KeyStrokeHelps.begin(); i != KeyStrokeHelps.end(); ++i) {
-		delete[] (*i).Key;
-		delete[] (*i).Help;
-	}
 	KeyStrokeHelps.clear();
-
 	return 0;
 }
 
@@ -2965,12 +2958,11 @@ static int CclDefineMapSetup(lua_State *l)
 */
 static int CclAddKeystrokeHelp(lua_State *l)
 {
-	KeyStrokeHelp h;
-
 	LuaCheckArgs(l, 2);
 
-	h.Key = new_strdup(LuaToString(l, 1));
-	h.Help = new_strdup(LuaToString(l, 2));
+	CKeyStrokeHelp h;
+	h.Key = LuaToString(l, 1);
+	h.Help = LuaToString(l, 2);
 
 	KeyStrokeHelps.push_back(h);
 
