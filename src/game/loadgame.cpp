@@ -10,7 +10,7 @@
 //
 /**@name loadgame.cpp - Load game. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2006 by Lutz Sammer, Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -233,23 +233,6 @@ void LoadGame(char *filename)
 	SyncRandSeed = syncrand;
 	SyncHash = synchash;
 	SelectionChanged();
-}
-
-/**
-**  Load all game data.
-**
-**  Test function for the later load/save functions.
-*/
-void LoadAll(void)
-{
-#if 1
-	SaveGame("save_file_stratagus0.sav");
-	LoadGame("save_file_stratagus0.sav");
-	SaveGame("save_file_stratagus1.sav");
-	LoadGame("save_file_stratagus1.sav");
-	SaveGame("save_file_stratagus2.sav");
-	LoadGame("save_file_stratagus2.sav");
-#endif
 }
 
 //@}
