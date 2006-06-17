@@ -289,15 +289,13 @@ extern CGraphic *MenuButtonG;         /// Current menu button graphics
 
 extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 
-class KeyStrokeHelp {
+class CKeyStrokeHelp {
 public:
-	KeyStrokeHelp() : Key(NULL), Help(NULL) {}
-
-	char *Key;
-	char *Help;
+	std::string Key;
+	std::string Help;
 };
 
-extern std::vector<KeyStrokeHelp> KeyStrokeHelps; /// Keystroke help pairs
+extern std::vector<CKeyStrokeHelp> KeyStrokeHelps; /// Keystroke help pairs
 
 #define MENUS_MAXMENU 128  /// @todo wrong place, docu
 #define MENUS_MAXFUNC 128  /// @todo wrong place, docu
