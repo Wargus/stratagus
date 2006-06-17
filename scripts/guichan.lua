@@ -195,8 +195,8 @@ function BosMenu(title, background)
   end
 
   exitButton = menu:addButton(_("~!Exit"),
-        Video.Width / 2 - 100, Video.Height - 100,
-        function() menu:stop() end)
+    Video.Width / 2 - 100, Video.Height - 100,
+    function() menu:stop() end)
   return menu
 end
 
@@ -220,14 +220,14 @@ function RunResultsMenu()
   local result
 
   if GameResult == GameVictory then
-     result = _("Victory !")
+    result = _("Victory !")
   elseif GameResult == GameDraw then
-      result = _("Draw !")
+    result = _("Draw !")
   elseif GameResult == GameDefeat then
-      result = _("Defeat !")
-      background = "graphics/screens/defeat.png"
+    result = _("Defeat !")
+    background = "graphics/screens/defeat.png"
   else 
-      return
+    return
   end
 
   menu = BosMenu(_("Results"), background)
@@ -253,8 +253,8 @@ function RunResultsMenu()
 end
 
 function RunMap(map)
-   StartMap(map)
-   RunResultsMenu(s)
+  StartMap(map)
+  RunResultsMenu(s)
 end
 
 difficulty = 5
@@ -287,21 +287,21 @@ function RunStartGameMenu(s)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
-      function(dd) difficulty = (5 - dd:getSelected()*2) end)
+    function(dd) difficulty = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-      function(dd) mapresources = (5 - dd:getSelected()*2) end)
+    function(dd) mapresources = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
-      function(dd) startingresources = (5 - dd:getSelected()*2) end)
+    function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
-      print(description)
-      numplayers = nplayers
-      players:setCaption(""..nplayers)
-      descr:setCaption(description)
-      OldPresentMap(description, nplayers, w, h, id)
+    print(description)
+    numplayers = nplayers
+    players:setCaption(""..nplayers)
+    descr:setCaption(description)
+    OldPresentMap(description, nplayers, w, h, id)
   end
  
   Load("maps/"..map)
@@ -428,6 +428,4 @@ end
 
 
 RunMainMenu()
-
-
 
