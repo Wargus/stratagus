@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Thu Jun 15 22:50:48 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Jun 17 16:48:30 2006.
 */
 
 #ifndef __cplusplus
@@ -269,28 +269,29 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
  tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"CMenuPanel");
  tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
  tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"NetworkHost");
+ tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
@@ -517,6 +518,66 @@ static int tolua_set_CMinimap_Transparent(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  LuaActionListener */
+#ifndef TOLUA_DISABLE_tolua_stratagus_LuaActionListener_new00
+static int tolua_stratagus_LuaActionListener_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"LuaActionListener",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  lua_State* lua =  tolua_S;
+  lua_Object luaref = ((lua_Object)  tolua_tovalue(tolua_S,2,0));
+ {
+  LuaActionListener* tolua_ret = (LuaActionListener*)  new LuaActionListener(lua,luaref);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"LuaActionListener");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  LuaActionListener */
+#ifndef TOLUA_DISABLE_tolua_stratagus_LuaActionListener_new00_local
+static int tolua_stratagus_LuaActionListener_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"LuaActionListener",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  lua_State* lua =  tolua_S;
+  lua_Object luaref = ((lua_Object)  tolua_tovalue(tolua_S,2,0));
+ {
+  LuaActionListener* tolua_ret = (LuaActionListener*)  new LuaActionListener(lua,luaref);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"LuaActionListener");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  CUIButton */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CUIButton_new00
 static int tolua_stratagus_CUIButton_new00(lua_State* tolua_S)
@@ -688,6 +749,36 @@ static int tolua_set_CUIButton_Style_ptr(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->Style = ((ButtonStyle*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Callback of class  CUIButton */
+#ifndef TOLUA_DISABLE_tolua_get_CUIButton_Callback_ptr
+static int tolua_get_CUIButton_Callback_ptr(lua_State* tolua_S)
+{
+  CUIButton* self = (CUIButton*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Callback'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)self->Callback,"LuaActionListener");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Callback of class  CUIButton */
+#ifndef TOLUA_DISABLE_tolua_set_CUIButton_Callback_ptr
+static int tolua_set_CUIButton_Callback_ptr(lua_State* tolua_S)
+{
+  CUIButton* self = (CUIButton*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Callback'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"LuaActionListener",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Callback = ((LuaActionListener*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -4584,66 +4675,6 @@ static int tolua_set_Color_a(lua_State* tolua_S)
   self->a = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new of class  LuaActionListener */
-#ifndef TOLUA_DISABLE_tolua_stratagus_LuaActionListener_new00
-static int tolua_stratagus_LuaActionListener_new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"LuaActionListener",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  lua_State* lua =  tolua_S;
-  lua_Object luaref = ((lua_Object)  tolua_tovalue(tolua_S,2,0));
- {
-  LuaActionListener* tolua_ret = (LuaActionListener*)  new LuaActionListener(lua,luaref);
- tolua_pushusertype(tolua_S,(void*)tolua_ret,"LuaActionListener");
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  LuaActionListener */
-#ifndef TOLUA_DISABLE_tolua_stratagus_LuaActionListener_new00_local
-static int tolua_stratagus_LuaActionListener_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"LuaActionListener",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  lua_State* lua =  tolua_S;
-  lua_Object luaref = ((lua_Object)  tolua_tovalue(tolua_S,2,0));
- {
-  LuaActionListener* tolua_ret = (LuaActionListener*)  new LuaActionListener(lua,luaref);
- tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"LuaActionListener");
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -8810,6 +8841,39 @@ static int tolua_stratagus_Container_add00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: remove of class  Container */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Container_remove00
+static int tolua_stratagus_Container_remove00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Container",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Container* self = (Container*)  tolua_tousertype(tolua_S,1,0);
+  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'remove'",NULL);
+#endif
+ {
+  self->remove(widget);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'remove'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: clear of class  Container */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Container_clear00
 static int tolua_stratagus_Container_clear00(lua_State* tolua_S)
@@ -8842,8 +8906,8 @@ static int tolua_stratagus_Container_clear00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: new of class  MenuScreen */
-#ifndef TOLUA_DISABLE_tolua_stratagus_MenuScreen_new00
-static int tolua_stratagus_MenuScreen_new00(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_new00
+static int tolua_stratagus_CMenuScreen_new00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -8870,8 +8934,8 @@ static int tolua_stratagus_MenuScreen_new00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: new_local of class  MenuScreen */
-#ifndef TOLUA_DISABLE_tolua_stratagus_MenuScreen_new00_local
-static int tolua_stratagus_MenuScreen_new00_local(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_new00_local
+static int tolua_stratagus_CMenuScreen_new00_local(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -8898,25 +8962,27 @@ static int tolua_stratagus_MenuScreen_new00_local(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: run of class  MenuScreen */
-#ifndef TOLUA_DISABLE_tolua_stratagus_MenuScreen_run00
-static int tolua_stratagus_MenuScreen_run00(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_run00
+static int tolua_stratagus_CMenuScreen_run00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
  !tolua_isusertype(tolua_S,1,"MenuScreen",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
+ !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
   MenuScreen* self = (MenuScreen*)  tolua_tousertype(tolua_S,1,0);
+  bool loop = ((bool)  tolua_toboolean(tolua_S,2,true));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'run'",NULL);
 #endif
  {
-  int tolua_ret = (int)  self->run();
+  int tolua_ret = (int)  self->run(loop);
  tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
  }
  }
@@ -8930,8 +8996,8 @@ static int tolua_stratagus_MenuScreen_run00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: stop of class  MenuScreen */
-#ifndef TOLUA_DISABLE_tolua_stratagus_MenuScreen_stop00
-static int tolua_stratagus_MenuScreen_stop00(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_stop00
+static int tolua_stratagus_CMenuScreen_stop00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -8963,8 +9029,8 @@ static int tolua_stratagus_MenuScreen_stop00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: addLogicCallback of class  MenuScreen */
-#ifndef TOLUA_DISABLE_tolua_stratagus_MenuScreen_addLogicCallback00
-static int tolua_stratagus_MenuScreen_addLogicCallback00(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_addLogicCallback00
+static int tolua_stratagus_CMenuScreen_addLogicCallback00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -12657,6 +12723,16 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Transparent",tolua_get_CMinimap_Transparent,tolua_set_CMinimap_Transparent);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
+ tolua_cclass(tolua_S,"LuaActionListener","LuaActionListener","",tolua_collect_LuaActionListener);
+#else
+ tolua_cclass(tolua_S,"LuaActionListener","LuaActionListener","",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"LuaActionListener");
+  tolua_function(tolua_S,"new",tolua_stratagus_LuaActionListener_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_LuaActionListener_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_LuaActionListener_new00_local);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
  tolua_cclass(tolua_S,"CUIButton","CUIButton","",tolua_collect_CUIButton);
 #else
  tolua_cclass(tolua_S,"CUIButton","CUIButton","",NULL);
@@ -12669,7 +12745,24 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Y",tolua_get_CUIButton_Y,tolua_set_CUIButton_Y);
   tolua_variable(tolua_S,"Text",tolua_get_CUIButton_Text,tolua_set_CUIButton_Text);
   tolua_variable(tolua_S,"Style",tolua_get_CUIButton_Style_ptr,tolua_set_CUIButton_Style_ptr);
+  tolua_variable(tolua_S,"Callback",tolua_get_CUIButton_Callback_ptr,tolua_set_CUIButton_Callback_ptr);
  tolua_endmodule(tolua_S);
+
+ { /* begin embedded lua code */
+  int top;
+  top = lua_gettop(tolua_S);
+  static unsigned char B[] = {
+  10, 67, 85, 73, 66,117,116,116,111,110, 46, 83,101,116, 67,
+   97,108,108, 98, 97, 99,107, 32, 61, 32,102,117,110, 99,116,
+  105,111,110, 40,119, 44, 32,102, 41, 10,119, 46, 67, 97,108,
+  108, 98, 97, 99,107, 32, 61, 32, 76,117, 97, 65, 99,116,105,
+  111,110, 76,105,115,116,101,110,101,114, 58,110,101,119, 40,
+  102, 41, 10,101,110,100,32
+  };
+  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 2");
+  lua_settop(tolua_S, top);
+ } /* end of embedded lua code */
+
  tolua_cclass(tolua_S,"CMapArea","CMapArea","",NULL);
  tolua_beginmodule(tolua_S,"CMapArea");
   tolua_variable(tolua_S,"X",tolua_get_CMapArea_X,tolua_set_CMapArea_X);
@@ -12876,16 +12969,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"b",tolua_get_Color_b,tolua_set_Color_b);
   tolua_variable(tolua_S,"a",tolua_get_Color_a,tolua_set_Color_a);
  tolua_endmodule(tolua_S);
-#ifdef __cplusplus
- tolua_cclass(tolua_S,"LuaActionListener","LuaActionListener","",tolua_collect_LuaActionListener);
-#else
- tolua_cclass(tolua_S,"LuaActionListener","LuaActionListener","",NULL);
-#endif
- tolua_beginmodule(tolua_S,"LuaActionListener");
-  tolua_function(tolua_S,"new",tolua_stratagus_LuaActionListener_new00);
-  tolua_function(tolua_S,"new_local",tolua_stratagus_LuaActionListener_new00_local);
-  tolua_function(tolua_S,".call",tolua_stratagus_LuaActionListener_new00_local);
- tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"Widget","Widget","",NULL);
  tolua_beginmodule(tolua_S,"Widget");
   tolua_function(tolua_S,"setWidth",tolua_stratagus_Widget_setWidth00);
@@ -12926,9 +13009,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    99,116,105,111,110, 76,105,115,116,101,110,101,114, 40,102,
    41, 10,119, 58, 97,100,100, 65, 99,116,105,111,110, 76,105,
   115,116,101,110,101,114, 40,119, 46, 97, 99,116,105,111,110,
-   99, 98, 41, 10,101,110,100, 32,32
+   99, 98, 41, 10,101,110,100,32
   };
-  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 2");
+  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 3");
   lua_settop(tolua_S, top);
  } /* end of embedded lua code */
 
@@ -13175,24 +13258,57 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setPercent",tolua_stratagus_StatBoxWidget_setPercent00);
   tolua_function(tolua_S,"getPercent",tolua_stratagus_StatBoxWidget_getPercent00);
  tolua_endmodule(tolua_S);
- tolua_cclass(tolua_S,"Container","Container","",NULL);
+ tolua_cclass(tolua_S,"BasicContainer","BasicContainer","Widget",NULL);
+ tolua_beginmodule(tolua_S,"BasicContainer");
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"Container","Container","BasicContainer",NULL);
  tolua_beginmodule(tolua_S,"Container");
   tolua_function(tolua_S,"add",tolua_stratagus_Container_add00);
+  tolua_function(tolua_S,"remove",tolua_stratagus_Container_remove00);
   tolua_function(tolua_S,"clear",tolua_stratagus_Container_clear00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
- tolua_cclass(tolua_S,"MenuScreen","MenuScreen","Container",tolua_collect_MenuScreen);
+ tolua_cclass(tolua_S,"CMenuScreen","MenuScreen","Container",tolua_collect_MenuScreen);
 #else
- tolua_cclass(tolua_S,"MenuScreen","MenuScreen","Container",NULL);
+ tolua_cclass(tolua_S,"CMenuScreen","MenuScreen","Container",NULL);
 #endif
- tolua_beginmodule(tolua_S,"MenuScreen");
-  tolua_function(tolua_S,"new",tolua_stratagus_MenuScreen_new00);
-  tolua_function(tolua_S,"new_local",tolua_stratagus_MenuScreen_new00_local);
-  tolua_function(tolua_S,".call",tolua_stratagus_MenuScreen_new00_local);
-  tolua_function(tolua_S,"run",tolua_stratagus_MenuScreen_run00);
-  tolua_function(tolua_S,"stop",tolua_stratagus_MenuScreen_stop00);
-  tolua_function(tolua_S,"addLogicCallback",tolua_stratagus_MenuScreen_addLogicCallback00);
+ tolua_beginmodule(tolua_S,"CMenuScreen");
+  tolua_function(tolua_S,"new",tolua_stratagus_CMenuScreen_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_CMenuScreen_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_CMenuScreen_new00_local);
+  tolua_function(tolua_S,"run",tolua_stratagus_CMenuScreen_run00);
+  tolua_function(tolua_S,"stop",tolua_stratagus_CMenuScreen_stop00);
+  tolua_function(tolua_S,"addLogicCallback",tolua_stratagus_CMenuScreen_addLogicCallback00);
  tolua_endmodule(tolua_S);
+
+ { /* begin embedded lua code */
+  int top;
+  top = lua_gettop(tolua_S);
+  static unsigned char B[] = {
+  10,102,117,110, 99,116,105,111,110, 32, 77,101,110,117, 83,
+   99,114,101,101,110, 40, 41, 10,108,111, 99, 97,108, 32,109,
+  101,110,117, 32, 61, 32, 67, 77,101,110,117, 83, 99,114,101,
+  101,110, 40, 41, 10, 13, 10,108,111, 99, 97,108, 32,103,117,
+  105, 99,104, 97,110, 97,100,100, 32, 61, 32, 67,111,110,116,
+   97,105,110,101,114, 46, 97,100,100, 13, 10,102,117,110, 99,
+  116,105,111,110, 32,109,101,110,117, 58, 97,100,100, 40,119,
+  105,100,103,101,116, 44, 32,120, 44, 32,121, 41, 13, 10,105,
+  102, 32,110,111,116, 32,115,101,108,102, 46, 95, 97,100,100,
+  101,100, 87,105,100,103,101,116,115, 32,116,104,101,110, 13,
+   10,115,101,108,102, 46, 95, 97,100,100,101,100, 87,105,100,
+  103,101,116,115, 32, 61, 32,123,125, 13, 10,101,110,100, 13,
+   10,115,101,108,102, 46, 95, 97,100,100,101,100, 87,105,100,
+  103,101,116,115, 91,119,105,100,103,101,116, 93, 32, 61, 32,
+  116,114,117,101, 13, 10,103,117,105, 99,104, 97,110, 97,100,
+  100, 40,115,101,108,102, 44, 32,119,105,100,103,101,116, 44,
+   32,120, 44, 32,121, 41, 13, 10,101,110,100, 13, 10, 13, 10,
+  114,101,116,117,114,110, 32,109,101,110,117, 10,101,110,100,
+  32
+  };
+  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 4");
+  lua_settop(tolua_S, top);
+ } /* end of embedded lua code */
+
  tolua_function(tolua_S,"StartMap",tolua_stratagus_StartMap00);
  tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
  tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);

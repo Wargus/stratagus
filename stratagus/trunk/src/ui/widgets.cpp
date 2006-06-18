@@ -40,21 +40,50 @@
 #include "cursor.h"
 #include "ui.h"
 #include "widgets.h"
+#include "network.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
 // Guichan stuff we need
-gcn::Gui *gui;         /// A Gui object - binds it all together
-gcn::SDLInput *input;  /// Input driver
+gcn::Gui *Gui;         /// A Gui object - binds it all together
+gcn::SDLInput *Input;  /// Input driver
 
-bool guichanActive = true;
+bool GuichanActive = true;
+
+static EventCallback GuichanCallbacks;
+
+static std::stack<MenuScreen *> MenuStack;
 
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+
+static void MenuHandleButtonDown(unsigned buttons)
+{
+}
+static void MenuHandleButtonUp(unsigned buttons)
+{
+}
+static void MenuHandleMouseMove(int x, int y)
+{
+	HandleCursorMove(&x, &y);
+}
+static void MenuHandleKeyDown(unsigned key, unsigned keychar)
+{
+	HandleKeyModifiersDown(key, keychar);
+}
+static void MenuHandleKeyUp(unsigned key, unsigned keychar)
+{
+	HandleKeyModifiersUp(key, keychar);
+}
+static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
+{
+	HandleKeyModifiersDown(key, keychar);
+}
 
 
 /**
@@ -76,14 +105,23 @@ void initGuichan(int width, int height)
 	graphics->setTarget(TheScreen);
 #endif
 
-	input = new gcn::SDLInput();
+	Input = new gcn::SDLInput();
 	
-	gui = new gcn::Gui();
-	gui->setGraphics(graphics);
-	gui->setInput(input);
-	gui->setTop(NULL);
+	Gui = new gcn::Gui();
+	Gui->setGraphics(graphics);
+	Gui->setInput(Input);
+	Gui->setTop(NULL);
 
-	guichanActive = true;
+	GuichanActive = true;
+
+	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
+	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
+	GuichanCallbacks.MouseMoved = &MenuHandleMouseMove;
+	GuichanCallbacks.MouseExit = &HandleMouseExit;
+	GuichanCallbacks.KeyPressed = &MenuHandleKeyDown;
+	GuichanCallbacks.KeyReleased = &MenuHandleKeyUp;
+	GuichanCallbacks.KeyRepeated = &MenuHandleKeyRepeat;
+	GuichanCallbacks.NetworkEvent = NetworkEvent;
 }
 
 /**
@@ -91,13 +129,13 @@ void initGuichan(int width, int height)
 */
 void freeGuichan() 
 {
-	delete gui->getGraphics();
-	delete gui;
-	delete input;
+	delete Gui->getGraphics();
+	delete Gui;
+	delete Input;
 
-	gui = NULL;
-	input = NULL;
-	guichanActive = false;
+	Gui = NULL;
+	Input = NULL;
+	GuichanActive = false;
 }
 
 /**
@@ -107,16 +145,18 @@ void freeGuichan()
 */
 void handleInput(const SDL_Event *event) 
 {
-	if (input && guichanActive) {
-		input->pushInput(*event);
+	if (Input && GuichanActive) {
+		Input->pushInput(*event);
+		if (Gui) {
+			Gui->logic();
+		}
 	}
 }
 
 void DrawGuichanWidgets() 
 {
-	if (gui && guichanActive) {
-		gui->logic();
-		gui->draw();
+	if (Gui && GuichanActive) {
+		Gui->draw();
 	}
 }
 
@@ -1191,24 +1231,32 @@ MenuScreen::MenuScreen() :
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
-	oldtop = gui->getTop();
-	gui->setTop(this);
 }
 
 /**
 **  Run the menu.  Loops until stop is called.
 */
-int MenuScreen::run() 
+int MenuScreen::run(bool loop)
 {
-	loopResult = 0;
-	SetVideoSync();
-	while (runLoop) {
-		UpdateDisplay();
-		RealizeVideoMemory();
-		WaitEventsOneFrame(&MenuCallbacks);
+	this->oldtop = Gui->getTop();
+	Gui->setTop(this);
+	this->loopResult = 0;
+	this->runLoop = loop;
+
+	if (loop) {
+		while (runLoop) {
+			UpdateDisplay();
+			RealizeVideoMemory();
+			WaitEventsOneFrame(&GuichanCallbacks);
+		}
+		Gui->setTop(this->oldtop);
+	} else {
+		GuichanActive = true;
+		Callbacks = &GuichanCallbacks;
+		MenuStack.push(this);
 	}
-	gui->setTop(oldtop);
-	return loopResult;
+
+	return this->loopResult;
 }
 
 /**
@@ -1216,8 +1264,18 @@ int MenuScreen::run()
 */
 void MenuScreen::stop(int result)
 {
-	runLoop = false;
-	loopResult = result;
+	if (!this->runLoop) {
+		Gui->setTop(this->oldtop);
+		Assert(MenuStack.top() == this);
+		MenuStack.pop();
+		if (MenuStack.empty()) {
+			GuichanActive = false;
+			Callbacks = &GameCallbacks;
+		}
+	}
+
+	this->runLoop = false;
+	this->loopResult = result;
 }
 
 void MenuScreen::addLogicCallback(LuaActionListener *listener)
@@ -1227,7 +1285,8 @@ void MenuScreen::addLogicCallback(LuaActionListener *listener)
 
 extern int NetConnectRunning;
 extern void NetworkProcessClientRequest();
-void MenuScreen::logic() 
+
+void MenuScreen::logic()
 {
 	if (NetConnectRunning == 2) {
 		NetworkProcessClientRequest();

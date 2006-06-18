@@ -1,6 +1,14 @@
 $using std::string;
 $using std::vector;
 
+$using namespace gcn;
+
+
+class LuaActionListener
+{
+	LuaActionListener(lua_State *lua, lua_Object luaref);
+};
+
 class CUIButton
 {
 	CUIButton();
@@ -9,7 +17,14 @@ class CUIButton
 	int Y;
 	string Text;
 	ButtonStyle *Style;
+	LuaActionListener *Callback;
 };
+
+$[
+CUIButton.SetCallback = function(w, f)
+  w.Callback = LuaActionListener:new(f)
+end
+$]
 
 class CMapArea
 {
@@ -185,8 +200,6 @@ extern void SetHoldClickDelay(int delay);
 //  Guichan
 //
 
-$using namespace gcn;
-
 class Color
 {
 	Color(int r, int g, int b, int a = 255);
@@ -194,11 +207,6 @@ class Color
 	int g;
 	int b;
 	int a;
-};
-
-class LuaActionListener
-{
-	LuaActionListener(lua_State *lua, lua_Object luaref);
 };
 
 class Widget 
@@ -223,21 +231,21 @@ class Widget
 	virtual void setBackgroundColor(const Color &color);
 
 	static void setGlobalFont(CFont *font);
-	void setForegroundColor(const Color &color);
-	void setBackgroundColor(const Color &color);
-	void setBaseColor(const Color &color);
-	void setSize(int width, int height);
-	void setBorderSize(int width);
+	virtual void setForegroundColor(const Color &color);
+	virtual void setBackgroundColor(const Color &color);
+	virtual void setBaseColor(const Color &color);
+	virtual void setSize(int width, int height);
+	virtual void setBorderSize(int width);
 	virtual void setFont(CFont *font);
 
 	virtual void addActionListener(LuaActionListener *actionListener);
 };
 
 $[
-Widget.setActionCallback = function(w, f) 
+Widget.setActionCallback = function(w, f)
   w.actioncb = LuaActionListener(f)
   w:addActionListener(w.actioncb)
-end 
+end
 $]
 
 class ImageWidget : public Widget
@@ -381,7 +389,7 @@ class DropDownWidget : public Widget
 class Windows : public Widget
 {
 	Windows(const std::string &text, int width, int height);
-	void add(Widget *widget, int x, int y);
+	virtual void add(Widget *widget, int x, int y);
 };
 
 class ScrollingWidget : public Widget
@@ -403,19 +411,44 @@ public:
 	int getPercent() const;
 };
 
-class Container
+class BasicContainer : public Widget
 {
-	void add(Widget *widget, int x, int y);
-	void clear();
 };
 
-class MenuScreen : Container
+class Container : public BasicContainer
 {
-	MenuScreen() : runLoop(false) {}
-	int run();
+	virtual void add(Widget *widget, int x, int y);
+	virtual void remove(Widget *widget);
+	virtual void clear();
+};
+
+class MenuScreen : public Container
+{
+	MenuScreen();
+	int run(bool loop = true);
 	void stop(int result = 0);
 	void addLogicCallback(LuaActionListener *actionListener);
 };
+$renaming MenuScreen @ CMenuScreen
+
+$[
+function MenuScreen()
+  local menu = CMenuScreen()
+
+  -- Store the widget in the container. This way we keep a reference
+  -- to the widget until the container gets deleted.
+  local guichanadd = Container.add
+  function menu:add(widget, x, y)
+    if not self._addedWidgets then
+       self._addedWidgets = {}
+    end
+    self._addedWidgets[widget] = true
+    guichanadd(self, widget, x, y)
+  end
+
+  return menu
+end
+$]
 
 $void StartMap(const char *str, bool clean = true);
 void StartMap(const char *str, bool clean = true);

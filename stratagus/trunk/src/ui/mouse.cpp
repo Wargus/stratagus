@@ -1758,7 +1758,13 @@ void UIHandleButtonUp(unsigned button)
 				GamePaused = 1;
 				UI.StatusLine.Set(_("Game Paused"));
 			}
+#if 0
 			ProcessMenu("menu-game", 0);
+#else
+			if (UI.MenuButton.Callback) {
+				UI.MenuButton.Callback->action("");
+			}
+#endif
 			return;
 		}
 	}
