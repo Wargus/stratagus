@@ -1986,6 +1986,31 @@ static int CclSetVideoSyncSpeed(lua_State *l)
 }
 
 /**
+**  Set the game speed
+**
+**  @param l  Lua state.
+*/
+static int CclSetGameSpeed(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	VideoSyncSpeed = LuaToNumber(l, 1) * 100 / CYCLES_PER_SECOND;
+	SetVideoSync();
+	return 0;
+}
+
+/**
+**  Get the game speed
+**
+**  @param l  Lua state.
+*/
+static int CclGetGameSpeed(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushnumber(l, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+	return 1;
+}
+
+/**
 **  Set the local player name
 **
 **  @param l  Lua state.
@@ -2544,6 +2569,8 @@ void InitCcl(void)
 	lua_register(Lua, "SetGameCycle", CclSetGameCycle);
 	lua_register(Lua, "SetGamePaused", CclSetGamePaused);
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
+	lua_register(Lua, "SetGameSpeed", CclSetGameSpeed);
+	lua_register(Lua, "GetGameSpeed", CclGetGameSpeed);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
 	lua_register(Lua, "SetGodMode", CclSetGodMode);
 
@@ -2692,8 +2719,6 @@ void SavePreferences(void)
 
 	// Speeds
 	fprintf(fd, "SetVideoSyncSpeed(%d)\n", VideoSyncSpeed);
-	fprintf(fd, "SetMouseScrollSpeed(%d)\n", SpeedMouseScroll);
-	fprintf(fd, "SetKeyScrollSpeed(%d)\n", SpeedKeyScroll);
 
 	// Sound options
 	fprintf(fd, "SetEffectsEnabled(%s)\n", IsEffectsEnabled() ? "true" : "false");

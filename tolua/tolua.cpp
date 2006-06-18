@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Jun 17 16:48:30 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Jun 18 14:54:50 2006.
 */
 
 #ifndef __cplusplus
@@ -4101,61 +4101,6 @@ static int tolua_stratagus_SetMouseScroll00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: GetMouseScrollSpeed */
-#ifndef TOLUA_DISABLE_tolua_stratagus_GetMouseScrollSpeed00
-static int tolua_stratagus_GetMouseScrollSpeed00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnoobj(tolua_S,1,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
- {
-  int tolua_ret = (int)  GetMouseScrollSpeed();
- tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetMouseScrollSpeed'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: SetMouseScrollSpeed */
-#ifndef TOLUA_DISABLE_tolua_stratagus_SetMouseScrollSpeed00
-static int tolua_stratagus_SetMouseScrollSpeed00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  int speed = ((int)  tolua_tonumber(tolua_S,1,0));
- {
-  SetMouseScrollSpeed(speed);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetMouseScrollSpeed'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* function: GetKeyScroll */
 #ifndef TOLUA_DISABLE_tolua_stratagus_GetKeyScroll00
 static int tolua_stratagus_GetKeyScroll00(lua_State* tolua_S)
@@ -4206,61 +4151,6 @@ static int tolua_stratagus_SetKeyScroll00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetKeyScroll'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: GetKeyScrollSpeed */
-#ifndef TOLUA_DISABLE_tolua_stratagus_GetKeyScrollSpeed00
-static int tolua_stratagus_GetKeyScrollSpeed00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnoobj(tolua_S,1,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
- {
-  int tolua_ret = (int)  GetKeyScrollSpeed();
- tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetKeyScrollSpeed'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: SetKeyScrollSpeed */
-#ifndef TOLUA_DISABLE_tolua_stratagus_SetKeyScrollSpeed00
-static int tolua_stratagus_SetKeyScrollSpeed00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  int speed = ((int)  tolua_tonumber(tolua_S,1,0));
- {
-  SetKeyScrollSpeed(speed);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetKeyScrollSpeed'.",&tolua_err);
  return 0;
 #endif
 }
@@ -12941,12 +12831,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"FindCheckboxStyle",tolua_stratagus_FindCheckboxStyle00);
  tolua_function(tolua_S,"GetMouseScroll",tolua_stratagus_GetMouseScroll00);
  tolua_function(tolua_S,"SetMouseScroll",tolua_stratagus_SetMouseScroll00);
- tolua_function(tolua_S,"GetMouseScrollSpeed",tolua_stratagus_GetMouseScrollSpeed00);
- tolua_function(tolua_S,"SetMouseScrollSpeed",tolua_stratagus_SetMouseScrollSpeed00);
  tolua_function(tolua_S,"GetKeyScroll",tolua_stratagus_GetKeyScroll00);
  tolua_function(tolua_S,"SetKeyScroll",tolua_stratagus_SetKeyScroll00);
- tolua_function(tolua_S,"GetKeyScrollSpeed",tolua_stratagus_GetKeyScrollSpeed00);
- tolua_function(tolua_S,"SetKeyScrollSpeed",tolua_stratagus_SetKeyScrollSpeed00);
  tolua_function(tolua_S,"GetGrabMouse",tolua_stratagus_GetGrabMouse00);
  tolua_function(tolua_S,"SetGrabMouse",tolua_stratagus_SetGrabMouse00);
  tolua_function(tolua_S,"GetLeaveStops",tolua_stratagus_GetLeaveStops00);
@@ -13288,22 +13174,21 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   10,102,117,110, 99,116,105,111,110, 32, 77,101,110,117, 83,
    99,114,101,101,110, 40, 41, 10,108,111, 99, 97,108, 32,109,
   101,110,117, 32, 61, 32, 67, 77,101,110,117, 83, 99,114,101,
-  101,110, 40, 41, 10, 13, 10,108,111, 99, 97,108, 32,103,117,
-  105, 99,104, 97,110, 97,100,100, 32, 61, 32, 67,111,110,116,
-   97,105,110,101,114, 46, 97,100,100, 13, 10,102,117,110, 99,
-  116,105,111,110, 32,109,101,110,117, 58, 97,100,100, 40,119,
-  105,100,103,101,116, 44, 32,120, 44, 32,121, 41, 13, 10,105,
-  102, 32,110,111,116, 32,115,101,108,102, 46, 95, 97,100,100,
-  101,100, 87,105,100,103,101,116,115, 32,116,104,101,110, 13,
-   10,115,101,108,102, 46, 95, 97,100,100,101,100, 87,105,100,
-  103,101,116,115, 32, 61, 32,123,125, 13, 10,101,110,100, 13,
-   10,115,101,108,102, 46, 95, 97,100,100,101,100, 87,105,100,
-  103,101,116,115, 91,119,105,100,103,101,116, 93, 32, 61, 32,
-  116,114,117,101, 13, 10,103,117,105, 99,104, 97,110, 97,100,
-  100, 40,115,101,108,102, 44, 32,119,105,100,103,101,116, 44,
-   32,120, 44, 32,121, 41, 13, 10,101,110,100, 13, 10, 13, 10,
-  114,101,116,117,114,110, 32,109,101,110,117, 10,101,110,100,
-  32
+  101,110, 40, 41, 10,108,111, 99, 97,108, 32,103,117,105, 99,
+  104, 97,110, 97,100,100, 32, 61, 32, 67,111,110,116, 97,105,
+  110,101,114, 46, 97,100,100, 10,102,117,110, 99,116,105,111,
+  110, 32,109,101,110,117, 58, 97,100,100, 40,119,105,100,103,
+  101,116, 44, 32,120, 44, 32,121, 41, 10,105,102, 32,110,111,
+  116, 32,115,101,108,102, 46, 95, 97,100,100,101,100, 87,105,
+  100,103,101,116,115, 32,116,104,101,110, 10,115,101,108,102,
+   46, 95, 97,100,100,101,100, 87,105,100,103,101,116,115, 32,
+   61, 32,123,125, 10,101,110,100, 10,115,101,108,102, 46, 95,
+   97,100,100,101,100, 87,105,100,103,101,116,115, 91,119,105,
+  100,103,101,116, 93, 32, 61, 32,116,114,117,101, 10,103,117,
+  105, 99,104, 97,110, 97,100,100, 40,115,101,108,102, 44, 32,
+  119,105,100,103,101,116, 44, 32,120, 44, 32,121, 41, 10,101,
+  110,100, 10,114,101,116,117,114,110, 32,109,101,110,117, 10,
+  101,110,100,32
   };
   lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 4");
   lua_settop(tolua_S, top);

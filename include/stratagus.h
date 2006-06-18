@@ -214,12 +214,6 @@ extern char NameLine[];
 	/// Scrolling area (>= VideoWidth - 16 x)
 #define SCROLL_RIGHT  (Video.Width - 16)
 
-	/// Mouse scrolling magnify
-#define MOUSE_SCROLL_SPEED  3
-
-	/// Keyboard scrolling magnify
-#define KEY_SCROLL_SPEED  3
-
 	/// Frames per second to display (original 30-40)
 #define FRAMES_PER_SECOND  30  // 1/30s
 	/// Game cycles per second to simulate (original 30-40)
