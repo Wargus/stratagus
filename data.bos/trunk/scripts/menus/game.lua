@@ -25,7 +25,7 @@
 --      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 --      02111-1307, USA.
 --
---      $Id: guichan.lua 304 2005-12-18 13:13:15Z feb $
+--      $Id$
 
 function BosGameMenu()
   menu = MenuScreen()
