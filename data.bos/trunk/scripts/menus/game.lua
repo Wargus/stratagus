@@ -36,7 +36,7 @@ function BosGameMenu()
 
   function menu:addLabel(text, x, y)
     local label = Label(text)
-    label:setFont(CFont:Get("large"))
+    label:setFont(Fonts["large"])
     label:adjustSize()
     self:add(label, x - label:getWidth() / 2, y)
   end
@@ -65,7 +65,18 @@ function BosGameMenu()
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
     b:setActionCallback(function(s) callback(b, s) end)
-    b:setFont(CFont:Get("game"))
+    b:setFont(Fonts["game"])
+    self:add(b, x, y)
+    return b
+  end
+
+  function menu:addSlider(min, max, w, h, x, y, callback)
+    local b = Slider(min, max)
+    b:setBaseColor(dark)
+    b:setForegroundColor(clear)
+    b:setBackgroundColor(clear)
+    b:setSize(w, h)
+    b:setActionCallback(function(s) callback(b, s) end)
     self:add(b, x, y)
     return b
   end
@@ -103,7 +114,7 @@ function RunOptionsMenu()
   menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
     function() end)
   menu:addButton(_("Speeds (~<F8~>)"), 16, 40 + (36 * 1),
-    function() RunSpeedOptions() end)
+    function() RunSpeedOptionsMenu() end)
   menu:addButton(_("Preferences (~<F9~>)"), 16, 40 + (36 * 2),
     function() RunPreferencesMenu() end)
   menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 3),
@@ -116,12 +127,30 @@ end
 
 function RunSpeedOptionsMenu()
   local menu = BosGameMenu()
+  local l
 
   menu:addLabel(_("Speed Settings"), 128, 11)
-  menu:addLabel(_("Game Speed"), 16, 36 * 1)
-  menu:addLabel(_("Mouse Scroll"), 16, 36 * 3)
-  menu:addLabel(_("Keyboard Scroll"), 16, 36 * 5)
-  menu:addButton(_("~!OK"), 128 - (106 / 2), 248,
+
+  l = Label(_("Game Speed"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, 16, 36 * 1)
+
+  local gamespeed = {}
+  gamespeed = menu:addSlider(15, 75, 198, 18, 32, 36 * 1.5,
+    function() SetGameSpeed(gamespeed:getValue()) end)
+  gamespeed:setValue(GetGameSpeed())
+
+  l = Label(_("slow"))
+  l:setFont(Fonts["small"])
+  l:adjustSize()
+  menu:add(l, 34, (36 * 2) + 6)
+  l = Label(_("fast"))
+  l:setFont(Fonts["small"])
+  l:adjustSize()
+  menu:add(l, 230, (36 * 2) + 6)
+
+  menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 248,
     function() menu:stop(1) end)
 
   menu:run(false)
