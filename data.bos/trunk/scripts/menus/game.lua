@@ -73,6 +73,7 @@ function BosGameMenu()
   return menu
 end
 
+
 function RunGameMenu(s)
   local menu = BosGameMenu()
 
@@ -86,7 +87,7 @@ function RunGameMenu(s)
   menu:addButton(_("Help (~<F1~>)"), 16, 40 + (36 * 2),
     function() print "help" end)
   menu:addButton(_("~!Objectives"), 16, 40 + (36 * 3),
-    function() print "objectives" end)
+    function() RunObjectivesMenu() end)
   menu:addButton(_("~!End Scenario"), 16, 40 + (36 * 4),
     function() RunEndScenarioMenu() end)
   menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
@@ -102,12 +103,25 @@ function RunOptionsMenu()
   menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
     function() end)
   menu:addButton(_("Speeds (~<F8~>)"), 16, 40 + (36 * 1),
-    function() end)
+    function() RunSpeedOptions() end)
   menu:addButton(_("Preferences (~<F9~>)"), 16, 40 + (36 * 2),
     function() RunPreferencesMenu() end)
   menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 3),
     function() end)
   menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunSpeedOptionsMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Speed Settings"), 128, 11)
+  menu:addLabel(_("Game Speed"), 16, 36 * 1)
+  menu:addLabel(_("Mouse Scroll"), 16, 36 * 3)
+  menu:addLabel(_("Keyboard Scroll"), 16, 36 * 5)
+  menu:addButton(_("~!OK"), 128 - (106 / 2), 248,
     function() menu:stop(1) end)
 
   menu:run(false)
@@ -119,8 +133,10 @@ function RunPreferencesMenu()
   menu:addLabel(_("Preferences"), 128, 11)
   menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
     function() end)
-  menu:addCheckBox(_("Show command key"), 16, 36 * 2,
-    function() end)
+  local ckey = {}
+  ckey = menu:addCheckBox(_("Show command key"), 16, 36 * 2,
+    function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
+  ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
     function() menu:stop(1) end)
 
@@ -197,6 +213,55 @@ function RunExitConfirmMenu()
     function() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
     function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunObjectivesMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Objectives"), 128, 11)
+  menu:addButton(_("~!OK"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunVictoryMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Congratulations!"), 144, 11)
+  menu:addLabel(_("You are victorious!"), 144, 32)
+  menu:addButton(_("~!Victory"), 32, 54,
+    function() menu:stop(1) end)
+  menu:addButton(_("Save ~!Replay"), 32, 90,
+    function() RunSaveReplayMenu() end)
+
+  menu:run(false)
+end
+
+function RunDefeatMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("You have failed to"), 144, 11)
+  menu:addLabel(_("achieve victory!"), 144, 32)
+  menu:addButton(_("~!OK"), 32, 56,
+    function() menu:stop(1) end)
+  menu:addButton(_("Save ~!Replay"), 32, 90,
+    function() RunSaveReplayMenu() end)
+
+  menu:run(false)
+end
+
+function RunSaveReplayMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Save Replay"), 144, 11)
+  -- input 14,40
+  menu:addSmallButton(_("~!OK"), 14, 80,
+    function() menu:stop(1) end)
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), 162, 80,
+    function() end)
 
   menu:run(false)
 end
