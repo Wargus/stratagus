@@ -180,12 +180,8 @@ extern CheckboxStyle *FindCheckboxStyle(const char *style);
 
 extern bool GetMouseScroll(void);
 extern void SetMouseScroll(bool enabled);
-extern int GetMouseScrollSpeed(void);
-extern void SetMouseScrollSpeed(int speed);
 extern bool GetKeyScroll(void);
 extern void SetKeyScroll(bool enabled);
-extern int GetKeyScrollSpeed(void);
-extern void SetKeyScrollSpeed(int speed);
 extern bool GetGrabMouse(void);
 extern void SetGrabMouse(bool enabled);
 extern bool GetLeaveStops(void);

@@ -57,9 +57,6 @@
 bool RightButtonAttacks;                   /// right button attacks
 
 
-int SpeedKeyScroll = KEY_SCROLL_SPEED;     /// keyboard scroll speed
-int SpeedMouseScroll = MOUSE_SCROLL_SPEED; /// mouse scroll speed
-
 /**
 **  The user interface configuration
 */
@@ -656,33 +653,6 @@ void SetMouseScroll(bool enabled)
 }
 
 /**
-**  Get speed of mouse scrolling
-*/
-int GetMouseScrollSpeed(void)
-{
-	return SpeedMouseScroll;
-}
-
-/**
-**  Set speed of mouse scrolling
-**
-**  @param speed  Mouse scroll speed
-*/
-void SetMouseScrollSpeed(int speed)
-{
-	if (speed == 0) {
-		SetMouseScroll(false);
-	} else {
-		SetMouseScroll(true);
-		if (speed < 1 || speed > FRAMES_PER_SECOND) {
-			SpeedMouseScroll = MOUSE_SCROLL_SPEED;
-		} else {
-			SpeedMouseScroll = speed;
-		}
-	}
-}
-
-/**
 **  Check if keyboard scrolling is enabled
 */
 bool GetKeyScroll()
@@ -698,33 +668,6 @@ bool GetKeyScroll()
 void SetKeyScroll(bool enabled)
 {
 	UI.KeyScroll = enabled;
-}
-
-/**
-**  Get speed of keyboard scrolling
-*/
-int GetKeyScrollSpeed(void)
-{
-	return SpeedKeyScroll;
-}
-
-/**
-**  Set speed of keyboard scrolling
-**
-**  @param speed  Keyboard scroll speed
-*/
-void SetKeyScrollSpeed(int speed)
-{
-	if (speed == 0) {
-		SetKeyScroll(false);
-	} else {
-		SetKeyScroll(true);
-		if (speed < 1 || speed > FRAMES_PER_SECOND) {
-			SpeedKeyScroll = KEY_SCROLL_SPEED;
-		} else {
-			SpeedKeyScroll = speed;
-		}
-	}
 }
 
 /**

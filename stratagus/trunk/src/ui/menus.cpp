@@ -222,8 +222,6 @@ static void SetCommandKey(Menuitem *mi);
 static void SpeedOptionsInit(Menu *menu);
 static void SpeedOptionsExit(Menu *menu);
 static void GameSpeedHSAction(Menuitem *mi);
-static void MouseScrollHSAction(Menuitem *mi);
-static void KeyboardScrollHSAction(Menuitem *mi);
 
 // Game options
 
@@ -1134,8 +1132,6 @@ void InitMenuFuncHash(void)
 	HASHADD(SpeedOptionsInit,"speed-options-init");
 	HASHADD(SpeedOptionsExit,"speed-options-exit");
 	HASHADD(GameSpeedHSAction,"game-speed-hs-action");
-	HASHADD(MouseScrollHSAction,"mouse-scroll-hs-action");
-	HASHADD(KeyboardScrollHSAction,"keyboard-scroll-hs-action");
 
 // Game options
 	HASHADD(SoundOptionsMenu,"sound-options-menu");
@@ -1906,15 +1902,6 @@ void SpeedOptionsInit(Menu *menu)
 	}
 	if (menu->Items[i].D.HSlider.percent > 100) {
 		menu->Items[i].D.HSlider.percent = 100;
-	}
-
-	menu->Items[i + 4].D.HSlider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
-	if (UI.MouseScroll == false) {
-		menu->Items[i + 4].D.HSlider.percent = 0;
-	}
-	menu->Items[i + 8].D.HSlider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
-	if (UI.KeyScroll == false) {
-		menu->Items[i + 8].D.HSlider.percent = 0;
 	}
 }
 
@@ -3074,22 +3061,6 @@ static void GameSpeedHSAction(Menuitem *mi)
 {
 	VideoSyncSpeed = (mi->D.HSlider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 	SetVideoSync();
-}
-
-/**
-** Mouse scroll horizontal slider action callback
-*/
-static void MouseScrollHSAction(Menuitem *mi)
-{
-	SetMouseScrollSpeed(10 - (mi->D.HSlider.percent * 9) / 100);
-}
-
-/**
-** Keyboard scroll horizontal slider action callback
-*/
-static void KeyboardScrollHSAction(Menuitem *mi)
-{
-	SetKeyScrollSpeed(10 - (mi->D.HSlider.percent * 9) / 100);
 }
 
 /**
