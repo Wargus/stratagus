@@ -260,11 +260,75 @@ function RunHelpMenu()
   menu:run(false)
 end
 
+local keystrokes = {
+  {"Alt-F", "- toggle full screen"},
+  {"Alt-G", "- toggle grab mouse"},
+  {"Ctrl-S", "- mute sound"},
+  {"Ctrl-M", "- mute music"},
+  {"+", "- increase game speed"},
+  {"-", "- decrease game speed"},
+  {"Ctrl-P", "- pause game"},
+  {"PAUSE", "- pause game"},
+  {"PRINT", "- make screen shot"},
+  {"Alt-H", "- help menu"},
+  {"Alt-R", "- restart scenario"},
+  {"Alt-Q", "- quit to main menu"},
+  {"Alt-X", "- quit game"},
+  {"Alt-B", "- toggle expand map"},
+  {"Alt-M", "- game menu"},
+  {"ENTER", "- write a message"},
+  {"SPACE", "- goto last event"},
+  {"TAB", "- hide/unhide terrain"},
+  {"Ctrl-T", "- track unit"},
+  {"Alt-I", "- find idle peon"},
+  {"Alt-C", "- center on selected unit"},
+  {"Alt-V", "- next view port"},
+  {"Ctrl-V", "- previous view port"},
+  {"^", "- select nothing"},
+  {"#", "- select group"},
+  {"##", "- center on group"},
+  {"Ctrl-#", "- define group"},
+  {"Shift-#", "- add to group"},
+  {"Alt-#", "- add to alternate group"},
+  {"F2-F4", "- recall map position"},
+  {"Shift F2-F4", "- save map postition"},
+  {"F5", "- game options"},
+  {"F7", "- sound options"},
+  {"F8", "- speed options"},
+  {"F9", "- preferences"},
+  {"F10", "- game menu"},
+  {"F11", "- save game"},
+  {"F12", "- load game"},
+}
+
 function RunKeystrokeHelpMenu()
   local menu = BosGameMenu()
   menu:setSize(352, 352)
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
     (Video.Height - menu:getHeight()) / 2)
+
+  local c = Container()
+  c:setOpaque(false)
+
+  for i=1,table.getn(keystrokes) do
+    local l = Label(keystrokes[i][1])
+    l:setFont(Fonts["game"])
+    l:adjustSize()
+    c:add(l, 0, 20 * (i - 1))
+    local l = Label(keystrokes[i][2])
+    l:setFont(Fonts["game"])
+    l:adjustSize()
+    c:add(l, 80, 20 * (i - 1))
+  end
+
+  local s = ScrollArea()
+  c:setSize(320 - s:getScrollbarWidth(), 20 * table.getn(keystrokes))
+  s:setBaseColor(dark)
+  s:setBackgroundColor(dark)
+  s:setForegroundColor(clear)
+  s:setSize(320, 216)
+  s:setContent(c)
+  menu:add(s, 16, 60)
 
   menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
   menu:addButton(_("Previous (~<Esc~>)"), (352 / 2) - (224 / 2), 352 - 40,
