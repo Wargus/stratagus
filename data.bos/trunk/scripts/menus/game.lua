@@ -85,7 +85,7 @@ function RunGameMenu(s)
   menu:addButton(_("Options (~<F5~>)"), 16, 40 + (36 * 1),
     function() RunOptionsMenu() end)
   menu:addButton(_("Help (~<F1~>)"), 16, 40 + (36 * 2),
-    function() print "help" end)
+    function() RunHelpMenu() end)
   menu:addButton(_("~!Objectives"), 16, 40 + (36 * 3),
     function() RunObjectivesMenu() end)
   menu:addButton(_("~!End Scenario"), 16, 40 + (36 * 4),
@@ -212,6 +212,50 @@ function RunExitConfirmMenu()
   menu:addButton(_("E~!xit Program"), 16, 11 + (24 * 3) + 29,
     function() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunHelpMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Help Menu"), 128, 11)
+  menu:addButton(_("Keystroke ~!Help"), 16, 40 + (36 * 0),
+    function() RunKeystrokeHelpMenu() end)
+  menu:addButton(_("Stratagus ~!Tips"), 16, 40 + (36 * 1),
+    function() RunTipsMenu() end)
+  menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunKeystrokeHelpMenu()
+  local menu = BosGameMenu()
+  menu:setSize(352, 352)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
+
+  menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
+  menu:addButton(_("Previous (~<Esc~>)"), (352 / 2) - (224 / 2), 352 - 40,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunTipsMenu()
+  local menu = BosGameMenu()
+  menu:setSize(288, 256)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
+
+  menu:addLabel(_("Stratagus Tips"), 144, 11)
+  menu:addCheckBox(_("Show tips at startup"), 14, 256 - 75,
+    function() end)
+  menu:addSmallButton(_("~!Next Tip"), 14, 256 - 40,
+    function() end)
+  menu:addSmallButton(_("~!Close"), 168, 256 - 40,
     function() menu:stop(1) end)
 
   menu:run(false)
