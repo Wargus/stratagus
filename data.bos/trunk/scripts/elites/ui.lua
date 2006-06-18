@@ -10,7 +10,7 @@
 --      ui.lua - Define the elites user interface
 --
 --      (c) Copyright 2001-2005 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
---                                 and François Beerten.
+--                                 and Franï¿½is Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -55,19 +55,6 @@ DefineCursor({
 	File = "general/red.png",
 	HotSpot = {15, 15},
 	Size = {32, 32}})
-
-------------------------------------------------------------------------------;
---	* Race elites.
-------------------------------------------------------------------------------;
-function AppendElements(t, elements)
-	for k,v in pairs(elements) do
-		if(type(k)=="number") then 
-			table.insert(t, v)
-		else
-			table.insert(t, k, v)
-		end
-	end
-end
 
 function AddFiller(ui, graphic, position)
 	table.insert(ui, "filler")
@@ -197,25 +184,6 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	{ Pos = {16, 97}, Condition = {Speed = "only"},
 		More = {"Text", {Text = "Speed: ", Variable = "Speed", Stat = true}}
 	} } })
-end
-
-
-function DefineEliteScreen(screen_width, screen_height)
-	local info_panel_x = screen_width - 200
-	local info_panel_y = 160 - 8
-
-	DefineElitePanels(info_panel_x, info_panel_y)
-	local ui = {"elites", screen_width, screen_height}
-	-- no menu panel ?
-	-- minimap
-
-	local ui2 = {
-		"info-panel", {
-			"completed-bar", {
-				"color", {50, 50, 80}}},
-	}
-	AppendElements(ui,ui2)
-	DefineUI(unpack(ui))
 end
 
 
