@@ -410,6 +410,7 @@ UI.MenuButton.X = Video.Width - 200
 UI.MenuButton.Y = 0
 UI.MenuButton.Text = "Menu (~<F10~>)"
 UI.MenuButton.Style = FindButtonStyle("black")
+UI.MenuButton:SetCallback(function() RunGameMenu() end)
 
 UI.NetworkMenuButton.X = Video.Width - 200
 UI.NetworkMenuButton.Y = 0

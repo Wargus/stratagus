@@ -27,7 +27,7 @@
 --
 --      $Id$
 
--- Global usefull objects for menus  ----------
+-- Global useful objects for menus  ----------
 dark = Color(38, 38, 78, 130)
 clear = Color(200, 200, 120)
 black = Color(0, 0, 0)
@@ -36,23 +36,6 @@ bckground = CGraphic:New("graphics/screens/menu.png")
 bckground:Load()
 bckground:Resize(Video.Width, Video.Height)
 backgroundWidget = ImageWidget(bckground)
-
--- Store the widget in the container. This way we keep a refence
--- to the widget until the container gets deleted.
--- TODO: embed this in tolua++
-local guichanadd = Container.add
-Container.add = function(self, widget, x, y)
-  -- ugly hack, should be done in some kind of constructor
-  if not self._addedWidgets then
-     self._addedWidgets = {}
-  end
-  self._addedWidgets[widget] = true
-  guichanadd(self, widget, x, y)
-end
-
-Container.addCentered = function(self, widget, x, y)
-  self.add(self, widget, x - widget:getWidth() / 2, y)
-end
 
 function BosMenu(title, background)
   local menu
@@ -71,6 +54,10 @@ function BosMenu(title, background)
      bg = ImageWidget(bgg)
   end
   menu:add(bg, 0, 0)
+
+  function menu:addCentered(widget, x, y)
+    self:add(widget, x - widget:getWidth() / 2, y)
+  end
 
   function menu:addButton(caption, x, y, callback)
     local b
@@ -91,7 +78,7 @@ function BosMenu(title, background)
     bq:setForegroundColor(clear)
     bq:setBackgroundColor(dark)
     bq:setFont(CFont:Get("game"))
-    menu:add(bq, x, y)   
+    self:add(bq, x, y)   
     bq.itemslist = list
     return bq
   end
@@ -114,7 +101,7 @@ function BosMenu(title, background)
     end
 
     local bq
-    bq = menu:addListBox(x, y, w, h, mapslist)
+    bq = self:addListBox(x, y, w, h, mapslist)
     bq.getSelectedItem = function(self)
         if self:getSelected() < 0 then
            return self.itemslist[1]
@@ -163,7 +150,7 @@ function BosMenu(title, background)
     local label = Label(text)
     label:setFont(CFont:Get("game"))
     label:setSize(200, 30)
-    menu:add(label, x, y)
+    self:add(label, x, y)
     return label
   end
 
@@ -171,7 +158,7 @@ function BosMenu(title, background)
     local label = Label(text)
     label:setFont(CFont:Get("large"))
     label:setSize(200, 30)
-    menu:add(label, x, y)
+    self:add(label, x, y)
     return label
   end
 
@@ -183,7 +170,7 @@ function BosMenu(title, background)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
     b:setSize(100, 18)
-    menu:add(b, x, y)
+    self:add(b, x, y)
     return b
   end
 
@@ -400,6 +387,7 @@ Load("scripts/menus/network.lua")
 Load("scripts/menus/options.lua")
 Load("scripts/menus/credits.lua")
 Load("scripts/menus/widgetsdemo.lua")
+Load("scripts/menus/game.lua")
 
 function BuildMainMenu(menu)
   local x = Video.Width / 2 - 100
