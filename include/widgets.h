@@ -38,7 +38,7 @@
 #endif
 typedef int lua_Object; // from tolua++.h
 
-extern bool guichanActive;
+extern bool GuichanActive;
 
 void initGuichan(int w, int h);
 void freeGuichan();
@@ -265,7 +265,7 @@ public:
 private:
 	int width;            /// width of the widget.
 	int height;           /// height of the widget.
-	std::string caption;  ///  caption of the widget.
+	std::string caption;  /// caption of the widget.
 	unsigned int percent; /// percent value of the widget.
 };
 
@@ -277,7 +277,7 @@ class MenuScreen : public gcn::Container
 	LuaActionListener *logiclistener;
 public:
 	MenuScreen();
-	int run();
+	int run(bool loop = true);
 	void stop(int result = 0);
 	void addLogicCallback(LuaActionListener *listener);
 	virtual void logic();

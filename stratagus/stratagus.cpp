@@ -646,7 +646,7 @@ static void ExpandPath(char *newpath, const char *path)
 
 void StartMap(const char *filename, bool clean = true) 
 {
-	guichanActive = false;
+	GuichanActive = false;
 	NetConnectRunning = 0;
 	InterfaceState = IfaceStateNormal;
 
@@ -666,7 +666,7 @@ void StartMap(const char *filename, bool clean = true)
 	//  Clear screen
 	Video.ClearScreen();
 	Invalidate();
-	guichanActive = true;
+	GuichanActive = true;
 
 	CleanGame();
 	InterfaceState = IfaceStateMenu;
@@ -676,7 +676,7 @@ void StartSavedGame(const char *filename)
 {
 	char path[512];
 
-	guichanActive = false;
+	GuichanActive = false;
 	SaveGameLoading = 1;
 	CleanPlayers();
 	ExpandPath(path, filename);
@@ -687,7 +687,7 @@ void StartSavedGame(const char *filename)
 	
 void StartEditor(const char *filename) 
 {
-	guichanActive = false;
+	GuichanActive = false;
 	
 	strcpy(CurrentMapPath, filename);
 
@@ -701,7 +701,7 @@ void StartEditor(const char *filename)
 	// Clear screen
 	Video.ClearScreen();
 	Invalidate();
-	guichanActive = true;
+	GuichanActive = true;
 }
 
 void StartReplay(const char *filename)

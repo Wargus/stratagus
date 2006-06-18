@@ -51,6 +51,7 @@
 #include "interface.h"
 #include "script.h"
 #include "minimap.h"
+#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -141,13 +142,14 @@ public:
 	/// buttons on screen themselves
 class CUIButton {
 public:
-	CUIButton() : X(0), Y(0), Style(NULL) {}
+	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
 	~CUIButton() {}
 
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
 	std::string Text;               /// button text
 	ButtonStyle *Style;             /// button style
+	LuaActionListener *Callback;    /// callback function
 };
 
 #define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
