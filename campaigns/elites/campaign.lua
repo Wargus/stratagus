@@ -40,6 +40,8 @@ function CreateMapStep(map)
    return RunCampaignMap
 end
 
+currentCampaign = "campaigns/elites/campaign.lua"
+
 local steps = {
   CreateMapStep("campaigns/elites/level01.smp"),
   CreateMapStep("campaigns/elites/level02.smp"),
@@ -52,7 +54,19 @@ local steps = {
   CreateMapStep("campaigns/elites/level09.smp"),
   CreateMapStep("campaigns/elites/level10.smp")}
 
-position = 1
+if position == nil then
+  position = 1
+else
+  -- We just finished a loaded game.
+  if GameResult == GameVictory then
+    position = position + 1
+  elseif GameResult == GameDefeat then
+    position = position
+  else 
+    return
+  end
+end
+
 function RunCampaign()
   while position < 10 do
     steps[position]()
@@ -66,4 +80,6 @@ function RunCampaign()
   end
 end
 RunCampaign()
+
+currentCampaign = nil
 
