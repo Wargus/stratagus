@@ -223,8 +223,11 @@ class Widget
 	virtual bool isVisible() const;
 
 	virtual void setBaseColor(const Color &color);
+	virtual const Color& getBaseColor() const;
 	virtual void setForegroundColor(const Color &color);
+	virtual const Color& getForegroundColor() const;
 	virtual void setBackgroundColor(const Color &color);
+	virtual const Color& getBackgroundColor() const;
 
 	static void setGlobalFont(CFont *font);
 	virtual void setForegroundColor(const Color &color);
@@ -388,7 +391,20 @@ class Windows : public Widget
 	virtual void add(Widget *widget, int x, int y);
 };
 
-class ScrollingWidget : public Widget
+class BasicContainer : public Widget
+{
+};
+
+class ScrollArea : public BasicContainer
+{
+	ScrollArea();
+	virtual void setContent(Widget *widget);
+	virtual Widget *getContent();
+	virtual void setScrollbarWidth(int width);
+	virtual int getScrollbarWidth();
+};
+
+class ScrollingWidget : public ScrollArea
 {
 public:
 	ScrollingWidget(int width, int height);
@@ -407,12 +423,11 @@ public:
 	int getPercent() const;
 };
 
-class BasicContainer : public Widget
-{
-};
-
 class Container : public BasicContainer
 {
+	Container();
+	virtual void setOpaque(bool opaque);
+	virtual bool isOpaque() const;
 	virtual void add(Widget *widget, int x, int y);
 	virtual void remove(Widget *widget);
 	virtual void clear();
