@@ -9,8 +9,8 @@
 --
 --      ui.lua - Define the elites user interface
 --
---      (c) Copyright 2001-2005 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
---                                 and Fran�is Beerten.
+--      (c) Copyright 2001-2006 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
+--                                 and Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -28,33 +28,6 @@
 --
 --      $Id$
 
-DefineCursor({
-	Name = "cursor-point",
-	Race = "elites",
-	File = "elites/ui/elites_claw.png",
-	HotSpot = {1, 1}, 
-	Size = {28, 32}})
-
-DefineCursor({
-	Name = "cursor-green-hair",
-	Race = "elites",
-	File = "general/green.png",
-	HotSpot = {15, 15},
-	Size = {32, 32}})
-
-DefineCursor({
-	Name = "cursor-yellow-hair",
-	Race = "elites",
-	File = "general/yellow.png",
-	HotSpot = {15, 15},
-	Size = {32, 32}})
-
-DefineCursor({
-	Name = "cursor-red-hair",
-	Race = "elites",
-	File = "general/red.png",
-	HotSpot = {15, 15},
-	Size = {32, 32}})
 
 function AddFiller(ui, graphic, position)
 	table.insert(ui, "filler")
