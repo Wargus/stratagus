@@ -59,6 +59,17 @@ function BosGameMenu()
     menu:add(b, x, y)
   end
 
+  function menu:addCheckBox(caption, x, y, callback)
+    local b = CheckBox(caption)
+    b:setBaseColor(clear)
+    b:setForegroundColor(clear)
+    b:setBackgroundColor(dark)
+    b:setActionCallback(function(s) callback(b, s) end)
+    b:setFont(CFont:Get("game"))
+    self:add(b, x, y)
+    return b
+  end
+
   return menu
 end
 
@@ -71,7 +82,7 @@ function RunGameMenu(s)
   menu:addSmallButton(_("Load (~<F12~>)"), 16 + 12 + 106, 40,
     function() print "load" end)
   menu:addButton(_("Options (~<F5~>)"), 16, 40 + (36 * 1),
-    function() print "save" end)
+    function() RunOptionsMenu() end)
   menu:addButton(_("Help (~<F1~>)"), 16, 40 + (36 * 2),
     function() print "help" end)
   menu:addButton(_("~!Objectives"), 16, 40 + (36 * 3),
@@ -79,6 +90,38 @@ function RunGameMenu(s)
   menu:addButton(_("~!End Scenario"), 16, 40 + (36 * 4),
     function() RunEndScenarioMenu() end)
   menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunOptionsMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Game Options"), 128, 11)
+  menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
+    function() end)
+  menu:addButton(_("Speeds (~<F8~>)"), 16, 40 + (36 * 1),
+    function() end)
+  menu:addButton(_("Preferences (~<F9~>)"), 16, 40 + (36 * 2),
+    function() RunPreferencesMenu() end)
+  menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 3),
+    function() end)
+  menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunPreferencesMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Preferences"), 128, 11)
+  menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
+    function() end)
+  menu:addCheckBox(_("Show command key"), 16, 36 * 2,
+    function() end)
+  menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
     function() menu:stop(1) end)
 
   menu:run(false)
