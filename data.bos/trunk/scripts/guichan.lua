@@ -359,8 +359,12 @@ function RunLoadGameMenu(s)
   local browser = menu:addBrowser("~save", ".sav.gz$", 300, 100, 300, 200)
     function startgamebutton(s)
       print("Starting saved game")
+      currentCampaign = nil
       StartSavedGame("~save/" .. browser:getSelectedItem())
       RunResultsMenu()
+      if not (currentCampaign == nil) then
+         Load(currentCampaign)
+      end
     menu:stop()
   end
   menu:addButton(_("Start"), 100, 300, startgamebutton)
