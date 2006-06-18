@@ -700,9 +700,6 @@ extern std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
 extern bool RightButtonAttacks;         /// right button attacks
 extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 
-extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
-extern int SpeedMouseScroll;            /// Mouse Scrolling Speed, in Frames
-
 extern char DefaultGroupKeys[];         /// Default group keys
 extern char *UiGroupKeys;               /// Up to 11 keys used for group selection
 
@@ -749,18 +746,10 @@ extern void SetViewportMode(ViewportModeType mode);
 extern bool GetMouseScroll(void);
 	/// Enable/disable scrolling with the mouse
 extern void SetMouseScroll(bool enabled);
-	/// Get speed of mouse scrolling
-extern int GetMouseScrollSpeed(void);
-	/// Set speed of mouse scrolling
-extern void SetMouseScrollSpeed(int speed);
 	/// Check if keyboard scrolling is enabled
 extern bool GetKeyScroll(void);
 	/// Enable/disable scrolling with the keyboard
 extern void SetKeyScroll(bool enabled);
-	/// Get speed of keyboard scrolling
-extern int GetKeyScrollSpeed(void);
-	/// Set speed of keyboard scrolling
-extern void SetKeyScrollSpeed(int speed);
 	/// Check if mouse grabbing is enabled
 extern bool GetGrabMouse(void);
 	/// Enable/disable grabbing the mouse
