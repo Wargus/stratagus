@@ -649,34 +649,6 @@ DefineMenuItem("pos", { 34, (36 * 2) + 6}, "font", "small",
 DefineMenuItem("pos", { 230, (36 * 2) + 6}, "font", "small",
   "text", {"caption", "fast", "align", "right"},
   "menu", "menu-speed-options")
-DefineMenuItem("pos", { 16, 36 * 3}, "font", "game",
-  "text", {"caption", "Mouse Scroll", "align", "left"},
-  "menu", "menu-speed-options")
-DefineMenuItem("pos", { 32, 36 * 3.5}, "font", "small",
-  "hslider", {"size", {198, 18},
-    "func", "mouse-scroll-hs-action",
-    "handler", "scen-select-ok"},
-  "menu", "menu-speed-options")
-DefineMenuItem("pos", { 34, (36 * 4) + 6}, "font", "small",
-  "text", {"caption", "off", "align", "left"},
-  "menu", "menu-speed-options")
-DefineMenuItem("pos", { 230, (36 * 4) + 6}, "font", "small",
-  "text", {"caption", "fast", "align", "right"},
-  "menu", "menu-speed-options")
-DefineMenuItem("pos", { 16, 36 * 5}, "font", "game",
-  "text", {"caption", "Keyboard Scroll", "align", "left"},
-  "menu", "menu-speed-options")
-DefineMenuItem("pos", { 32, 36 * 5.5}, "font", "small",
-  "hslider", {"size", {198, 18},
-    "func", "keyboard-scroll-hs-action",
-    "handler", "scen-select-ok"},
-  "menu", "menu-speed-options")
-DefineMenuItem("pos", { 34, (36 * 6) + 6}, "font", "small",
-  "text", {"caption", "off", "align", "left"},
-  "menu", "menu-speed-options")
-DefineMenuItem("pos", { 230, (36 * 6) + 6}, "font", "small",
-  "text", {"caption", "fast", "align", "right"},
-  "menu", "menu-speed-options")
 DefineMenuItem("pos", { 128 - (106 / 2), 245}, "font", "large",
   "button", {
     "caption", "~!OK",

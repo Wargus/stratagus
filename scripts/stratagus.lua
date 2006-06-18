@@ -112,8 +112,6 @@ SetLeaveStops(true)
 --	Enable mouse and keyboard scrolling.
 SetMouseScroll(true)
 SetKeyScroll(true)
-SetKeyScrollSpeed(1)
-SetMouseScrollSpeed(1)
 SetMouseScrollSpeedDefault(4)
 SetMouseScrollSpeedControl(15)
 

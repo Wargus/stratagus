@@ -77,7 +77,7 @@ function BosMenu(title, background)
     bq:setBaseColor(black)
     bq:setForegroundColor(clear)
     bq:setBackgroundColor(dark)
-    bq:setFont(CFont:Get("game"))
+    bq:setFont(Fonts["game"])
     self:add(bq, x, y)   
     bq.itemslist = list
     return bq
@@ -119,7 +119,7 @@ function BosMenu(title, background)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
     b:setActionCallback(function(s) callback(b, s) end)
-    b:setFont(CFont:Get("game"))
+    b:setFont(Fonts["game"])
     self:add(b, x, y)
     return b
   end
@@ -137,7 +137,7 @@ function BosMenu(title, background)
 
   function menu:addDropDown(list, x, y, callback)
     local dd = DropDownWidget()
-    dd:setFont(CFont:Get("game"))
+    dd:setFont(Fonts["game"])
     dd:setList(list)
     dd:setActionCallback(function(s) callback(dd, s) end)
     dd:setBaseColor(dark)
@@ -148,7 +148,7 @@ function BosMenu(title, background)
 
   function menu:writeText(text, x, y)
     local label = Label(text)
-    label:setFont(CFont:Get("game"))
+    label:setFont(Fonts["game"])
     label:setSize(200, 30)
     self:add(label, x, y)
     return label
@@ -156,7 +156,7 @@ function BosMenu(title, background)
 
   function menu:writeLargeText(text, x, y)
     local label = Label(text)
-    label:setFont(CFont:Get("large"))
+    label:setFont(Fonts["large"])
     label:setSize(200, 30)
     self:add(label, x, y)
     return label
@@ -165,7 +165,7 @@ function BosMenu(title, background)
   function menu:addTextInputField(text, x, y)
     local b = TextField(text)
     b:setActionCallback(function() print("field") end)
-    b:setFont(CFont:Get("game"))
+    b:setFont(Fonts["game"])
     b:setBaseColor(clear)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
@@ -176,7 +176,7 @@ function BosMenu(title, background)
 
   if title then
     local titlelabel = Label(title)
-    titlelabel:setFont(CFont:Get("large"))
+    titlelabel:setFont(Fonts["large"])
     titlelabel:adjustSize()
     menu:addCentered(titlelabel, Video.Width / 2, Video.Height/20)
   end
@@ -188,7 +188,7 @@ function BosMenu(title, background)
 end
 
 -- Default configurations -------
-Widget:setGlobalFont(CFont:Get("large"))
+Widget:setGlobalFont(Fonts["large"])
 
 
 -- Define the different menus ----------
