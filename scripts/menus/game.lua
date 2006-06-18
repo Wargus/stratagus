@@ -28,7 +28,7 @@
 --      $Id$
 
 function BosGameMenu()
-  menu = MenuScreen()
+  local menu = MenuScreen()
   menu:setSize(256, 288)
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
     (Video.Height - menu:getHeight()) / 2)
@@ -42,8 +42,7 @@ function BosGameMenu()
   end
 
   function menu:addSmallButton(caption, x, y, callback)
-    local b
-    b = ButtonWidget(caption)
+    local b = ButtonWidget(caption)
     b:setActionCallback(callback)
     b:setSize(106, 28)
     b:setBackgroundColor(dark)
@@ -52,8 +51,7 @@ function BosGameMenu()
   end
 
   function menu:addButton(caption, x, y, callback)
-    local b
-    b = ButtonWidget(caption)
+    local b = ButtonWidget(caption)
     b:setActionCallback(callback)
     b:setSize(224, 28)
     b:setBackgroundColor(dark)
@@ -91,12 +89,70 @@ function RunEndScenarioMenu()
 
   menu:addLabel(_("End Scenario"), 128, 11)
   menu:addButton(_("~!Restart Scenario"), 16, 40 + (36 * 0),
-    function() end)
+    function() RunRestartConfirmMenu() end)
   menu:addButton(_("~!Surrender"), 16, 40 + (36 * 1),
-    function() end)
+    function() RunSurrenderConfirmMenu() end)
   menu:addButton(_("~!Quit to Menu"), 16, 40 + (36 * 2),
-    function() end)
+    function() RunQuitToMenuConfirmMenu() end)
+  menu:addButton(_("E~!xit Program"), 16, 40 + (36 * 3),
+    function() RunExitConfirmMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunRestartConfirmMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Are you sure you"), 128, 11)
+  menu:addLabel(_("want to restart"), 128, 11 + (24 * 1))
+  menu:addLabel(_("the scenario?"), 128, 11 + (24 * 2))
+  menu:addButton(_("~!Restart Scenario"), 16, 11 + (24 * 3) + 29,
+    function() end)
+  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunSurrenderConfirmMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Are you sure you"), 128, 11)
+  menu:addLabel(_("want to surrender"), 128, 11 + (24 * 1))
+  menu:addLabel(_("to your enemies?"), 128, 11 + (24 * 2))
+  menu:addButton(_("~!Surrender"), 16, 11 + (24 * 3) + 29,
+    function() end)
+  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunQuitToMenuConfirmMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Are you sure you"), 128, 11)
+  menu:addLabel(_("want to quit to"), 128, 11 + (24 * 1))
+  menu:addLabel(_("the main menu?"), 128, 11 + (24 * 2))
+  menu:addButton(_("~!Surrender"), 16, 11 + (24 * 3) + 29,
+    function() end)
+  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunExitConfirmMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Are you sure you"), 128, 11)
+  menu:addLabel(_("want to exit"), 128, 11 + (24 * 1))
+  menu:addLabel(_("Stratagus?"), 128, 11 + (24 * 2))
+  menu:addButton(_("E~!xit Program"), 16, 11 + (24 * 3) + 29,
+    function() end)
+  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
     function() menu:stop(1) end)
 
   menu:run(false)
