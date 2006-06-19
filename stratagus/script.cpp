@@ -1857,10 +1857,13 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 
 	if (pathtype == 1) {
 		++userdir;
+#ifndef WIN32
 		if ((s = getenv("HOME")) && GameName) {
 			sprintf(directory, "%s/%s/%s/%s",
 				s, STRATAGUS_HOME_PATH, GameName, userdir);
-		} else {
+		} else
+#endif
+		{
 			sprintf(directory, "%s/%s", StratagusLibPath, userdir);
 		}
 	} else {
