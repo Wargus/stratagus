@@ -1836,7 +1836,9 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	int n;
 	int i;
 	int pathtype;
+#ifndef WIN32
 	const char *s;
+#endif
 
 	LuaCheckArgs(l, 1);
 	userdir = lua_tostring(l, 1);
