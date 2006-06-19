@@ -633,10 +633,13 @@ static void ExpandPath(char *newpath, const char *path)
 
 	if (*path == '~') {
 		++path;
+#ifndef WIN32
 		if ((s = getenv("HOME")) && GameName) {
 			sprintf(newpath, "%s/%s/%s/%s",
 				s, STRATAGUS_HOME_PATH, GameName, path);
-		} else {
+		} else
+#endif
+		{
 			sprintf(newpath, "%s/%s", StratagusLibPath, path);
 		}
 	} else {
