@@ -160,8 +160,10 @@ function RunPreferencesMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("Preferences"), 128, 11)
-  menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
-    function() end)
+  local fog = {}
+  fog = menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
+    function() SetFogOfWar(fog:isMarked()) end)
+  fog:setMarked(GetFogOfWar())
   local ckey = {}
   ckey = menu:addCheckBox(_("Show command key"), 16, 36 * 2,
     function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
