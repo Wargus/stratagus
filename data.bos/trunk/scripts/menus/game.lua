@@ -148,7 +148,7 @@ function RunGameMenu(s)
   menu:addSmallButton(_("Load (~<F12~>)"), 16 + 12 + 106, 40,
     function() RunLoadMenu() end)
   menu:addButton(_("Options (~<F5~>)"), 16, 40 + (36 * 1),
-    function() RunOptionsMenu() end)
+    function() RunGameOptionsMenu() end)
   menu:addButton(_("Help (~<F1~>)"), 16, 40 + (36 * 2),
     function() RunHelpMenu() end)
   menu:addButton(_("~!Objectives"), 16, 40 + (36 * 3),
@@ -156,7 +156,7 @@ function RunGameMenu(s)
   menu:addButton(_("~!End Scenario"), 16, 40 + (36 * 4),
     function() RunEndScenarioMenu() end)
   menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -175,9 +175,9 @@ function RunSaveMenu()
   browser:setActionCallback(cb)
 
   menu:addSmallButton(_("Save"), 16, 248,
-    function() SaveGame(t:getText()) menu:stop(1) end)
+    function() SaveGame(t:getText()) menu:stop(0) end)
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -197,30 +197,30 @@ function RunLoadMenu()
     function() StartSavedGame("~save/"..browser:getSelectedItem()) end)
 
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
 
-function RunOptionsMenu()
+function RunGameOptionsMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("Game Options"), 128, 11)
   menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
     function() end)
   menu:addButton(_("Speeds (~<F8~>)"), 16, 40 + (36 * 1),
-    function() RunSpeedOptionsMenu() end)
+    function() RunGameSpeedOptionsMenu() end)
   menu:addButton(_("Preferences (~<F9~>)"), 16, 40 + (36 * 2),
     function() RunPreferencesMenu() end)
   menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 3),
     function() end)
   menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
 
-function RunSpeedOptionsMenu()
+function RunGameSpeedOptionsMenu()
   local menu = BosGameMenu()
   local l
 
@@ -246,7 +246,7 @@ function RunSpeedOptionsMenu()
   menu:add(l, 230, (36 * 2) + 6)
 
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -264,7 +264,7 @@ function RunPreferencesMenu()
     function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
   ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -282,7 +282,7 @@ function RunEndScenarioMenu()
   menu:addButton(_("E~!xit Program"), 16, 40 + (36 * 3),
     function() RunExitConfirmMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), 16, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -296,7 +296,7 @@ function RunRestartConfirmMenu()
   menu:addButton(_("~!Restart Scenario"), 16, 11 + (24 * 3) + 29,
     function() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -310,7 +310,7 @@ function RunSurrenderConfirmMenu()
   menu:addButton(_("~!Surrender"), 16, 11 + (24 * 3) + 29,
     function() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -324,7 +324,7 @@ function RunQuitToMenuConfirmMenu()
   menu:addButton(_("~!Quit to Menu"), 16, 11 + (24 * 3) + 29,
     function() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -338,7 +338,7 @@ function RunExitConfirmMenu()
   menu:addButton(_("E~!xit Program"), 16, 11 + (24 * 3) + 29,
     function() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -352,7 +352,7 @@ function RunHelpMenu()
   menu:addButton(_("Stratagus ~!Tips"), 16, 40 + (36 * 1),
     function() RunTipsMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -429,7 +429,7 @@ function RunKeystrokeHelpMenu()
 
   menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
   menu:addButton(_("Previous (~<Esc~>)"), (352 / 2) - (224 / 2), 352 - 40,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -446,7 +446,7 @@ function RunTipsMenu()
   menu:addSmallButton(_("~!Next Tip"), 14, 256 - 40,
     function() end)
   menu:addSmallButton(_("~!Close"), 168, 256 - 40,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
@@ -456,18 +456,21 @@ function RunObjectivesMenu()
 
   menu:addLabel(_("Objectives"), 128, 11)
   menu:addButton(_("~!OK"), 16, 248,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end
 
 function RunVictoryMenu()
   local menu = BosGameMenu()
+  menu:setSize(288, 128)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
 
   menu:addLabel(_("Congratulations!"), 144, 11)
   menu:addLabel(_("You are victorious!"), 144, 32)
   menu:addButton(_("~!Victory"), 32, 54,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
   menu:addButton(_("Save ~!Replay"), 32, 90,
     function() RunSaveReplayMenu() end)
 
@@ -476,11 +479,14 @@ end
 
 function RunDefeatMenu()
   local menu = BosGameMenu()
+  menu:setSize(288, 128)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
 
   menu:addLabel(_("You have failed to"), 144, 11)
   menu:addLabel(_("achieve victory!"), 144, 32)
   menu:addButton(_("~!OK"), 32, 56,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
   menu:addButton(_("Save ~!Replay"), 32, 90,
     function() RunSaveReplayMenu() end)
 
@@ -489,13 +495,16 @@ end
 
 function RunSaveReplayMenu()
   local menu = BosGameMenu()
+  menu:setSize(288, 128)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
 
   menu:addLabel(_("Save Replay"), 144, 11)
-  -- input 14,40
+  menu:addTextInputField("", 14, 40, 260)
   menu:addSmallButton(_("~!OK"), 14, 80,
-    function() menu:stop(1) end)
+    function() menu:stop(0) end)
   menu:addSmallButton(_("Cancel (~<Esc~>)"), 162, 80,
-    function() end)
+    function() menu:stop(0) end)
 
   menu:run(false)
 end

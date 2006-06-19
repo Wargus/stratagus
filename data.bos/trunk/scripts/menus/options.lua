@@ -42,9 +42,9 @@ function RunSpeedOptionsMenu(s)
   b:adjustSize();
   menu:add(b, offx + 16, offy + 36 * 1)
 
-  local gamespeedslider = Slider(50, 250)
-  gamespeedslider:setValue(0) --FIXME
-  gamespeedslider:setActionCallback(function() fixme(gamespeedslider:getValue()) end)
+  local gamespeedslider = Slider(15, 75)
+  gamespeedslider:setValue(GetGameSpeed())
+  gamespeedslider:setActionCallback(function() SetGameSpeed(gamespeedslider:getValue()) end)
   gamespeedslider:setWidth(198)
   gamespeedslider:setHeight(18)
   gamespeedslider:setBaseColor(dark)
@@ -61,58 +61,6 @@ function RunSpeedOptionsMenu(s)
   b:setFont(CFont:Get("game"))
   b:adjustSize();
   menu:addCentered(b, offx + 230, offy + 36 * 2 + 6)
-
-  b = Label(_("Mouse Scroll"))
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:add(b, offx + 16, offy + 36 * 3)
-
-  local mousescrollslider = Slider(0, 10)
-  if (GetMouseScroll()) then speed = GetMouseScrollSpeed() else speed = 0 end
-  mousescrollslider:setValue(10 - speed)
-  mousescrollslider:setActionCallback(function() SetMouseScrollSpeed(10 - mousescrollslider:getValue()) end)
-  mousescrollslider:setWidth(198)
-  mousescrollslider:setHeight(18)
-  mousescrollslider:setBaseColor(dark)
-  mousescrollslider:setForegroundColor(clear)
-  mousescrollslider:setBackgroundColor(clear)
-  menu:add(mousescrollslider, offx + 32, offy + 36 * 3.5)
-
-  b = Label(_("off"))
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 34, offy + 36 * 4 + 6)
-  
-  b = Label(_("fast"))
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 230, offy + 36 * 4 + 6)
-
-  b = Label(_("Keyboard Scroll"))
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:add(b, offx + 16, offy + 36 * 5)
-
-  local keyboardscrollslider = Slider(0, 10)
-  if (GetKeyScroll()) then speed = GetKeyScrollSpeed() else speed = 0 end
-  keyboardscrollslider:setValue(10 - speed)
-  keyboardscrollslider:setActionCallback(function() SetKeyScrollSpeed(10 - keyboardscrollslider:getValue()) end)
-  keyboardscrollslider:setWidth(198)
-  keyboardscrollslider:setHeight(18)
-  keyboardscrollslider:setBaseColor(dark)
-  keyboardscrollslider:setForegroundColor(clear)
-  keyboardscrollslider:setBackgroundColor(clear)
-  menu:add(keyboardscrollslider, offx + 32, offy + 36 * 5.5)
-
-  b = Label(_("off"))
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 34, offy + 36 * 6 + 6)
-  
-  b = Label(_("fast"))
-  b:setFont(CFont:Get("game"))
-  b:adjustSize();
-  menu:addCentered(b, offx + 230, offy + 36 * 6 + 6)
 
   menu:addButton(_("~!OK"), offx + 128 - (200 / 2), offy + 245,
     function() SavePreferences(); menu:stop() end)
