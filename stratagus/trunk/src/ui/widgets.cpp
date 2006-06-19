@@ -41,6 +41,7 @@
 #include "ui.h"
 #include "widgets.h"
 #include "network.h"
+#include "netconnect.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -1243,6 +1244,9 @@ int MenuScreen::run(bool loop)
 	this->loopResult = 0;
 	this->runLoop = loop;
 
+	CursorState = CursorStatePoint;
+	GameCursor = UI.Point.Cursor;
+
 	if (loop) {
 		while (runLoop) {
 			UpdateDisplay();
@@ -1271,6 +1275,10 @@ void MenuScreen::stop(int result)
 		if (MenuStack.empty()) {
 			GuichanActive = false;
 			Callbacks = &GameCallbacks;
+			GamePaused = false;
+			if (GameRunning) {
+				UIHandleMouseMove(CursorX, CursorY);
+			}
 		}
 	}
 
@@ -1282,9 +1290,6 @@ void MenuScreen::addLogicCallback(LuaActionListener *listener)
 {
 	logiclistener = listener;
 }
-
-extern int NetConnectRunning;
-extern void NetworkProcessClientRequest();
 
 void MenuScreen::logic()
 {

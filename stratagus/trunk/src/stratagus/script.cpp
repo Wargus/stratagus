@@ -1966,9 +1966,9 @@ static int CclSetGamePaused(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	if (lua_isboolean(l, 1)) {
-		GamePaused = lua_toboolean(l, 1);
+		GamePaused = lua_toboolean(l, 1) ? true : false;
 	} else {
-		GamePaused = static_cast<char>(lua_tonumber(l, 1));
+		GamePaused = lua_tonumber(l, 1) ? true : false;
 	}
 	return 0;
 }

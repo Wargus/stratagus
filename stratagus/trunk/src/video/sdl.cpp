@@ -424,12 +424,6 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 
 	ticks = SDL_GetTicks();
 	if (ticks > NextFrameTicks) { // We are too slow :(
-#ifdef DEBUG
-		// FIXME: need locking!
-		// if (InterfaceState == IfaceStateNormal) {
-		// VideoDrawText(UI.MapX+10,UI.MapY+10,GameFont,"SLOW FRAME!!");
-		// }
-#endif
 		++SlowFrameCounter;
 	}
 

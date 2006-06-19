@@ -1755,7 +1755,7 @@ void UIHandleButtonUp(unsigned button)
 				ButtonUnderCursor == ButtonUnderNetworkMenu)) {
 			// FIXME: Not if, in input mode.
 			if (!IsNetworkGame()) {
-				GamePaused = 1;
+				GamePaused = true;
 				UI.StatusLine.Set(_("Game Paused"));
 			}
 #if 0

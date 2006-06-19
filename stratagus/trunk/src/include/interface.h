@@ -184,11 +184,11 @@ enum _cursor_on_ {
 ----------------------------------------------------------------------------*/
 
 	/// Flag telling if the game is running
-extern char GameRunning;
+extern bool GameRunning;
 	/// Flag telling if the game is paused
-extern char GamePaused;
+extern bool GamePaused;
 	/// Flag telling if the game is in observe mode
-extern char GameObserve;
+extern bool GameObserve;
 	/// Flag telling not to advance to the next game cycle
 extern char SkipGameCycle;
 	/// Invincibility cheat
