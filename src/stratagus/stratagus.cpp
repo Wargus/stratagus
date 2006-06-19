@@ -629,7 +629,9 @@ void CleanGame(void)
 
 static void ExpandPath(char *newpath, const char *path)
 {
+#ifndef WIN32
 	char *s;
+#endif
 
 	if (*path == '~') {
 		++path;
