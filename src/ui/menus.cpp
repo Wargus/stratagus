@@ -1313,7 +1313,7 @@ static void GameMenuReturn(void)
 	}
 	InterfaceState = IfaceStateNormal;
 	UI.StatusLine.Clear();
-	GamePaused = 0;
+	GamePaused = false;
 }
 
 /**
@@ -2197,7 +2197,7 @@ static void EndScenarioMenu(void)
 static void EndScenarioRestart(void)
 {
 	RestartScenario = 1;
-	GameRunning = 0;
+	GameRunning = false;
 	GameMenuReturn();
 }
 
@@ -2207,7 +2207,7 @@ static void EndScenarioRestart(void)
 static void EndScenarioSurrender(void)
 {
 	GameResult = GameDefeat;
-	GameRunning = 0;
+	GameRunning = false;
 	GameMenuReturn();
 }
 
@@ -2217,7 +2217,7 @@ static void EndScenarioSurrender(void)
 static void EndScenarioQuitMenu(void)
 {
 	QuitToMenu = 1;
-	GameRunning = 0;
+	GameRunning = false;
 	GameMenuReturn();
 }
 
@@ -2227,7 +2227,7 @@ static void EndScenarioQuitMenu(void)
 static void GameMenuEnd(void)
 {
 	InterfaceState = IfaceStateNormal;
-	GameRunning = 0;
+	GameRunning = false;
 	CursorOn = CursorOnUnknown;
 	CurrentMenu = NULL;
 }

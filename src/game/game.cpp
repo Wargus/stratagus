@@ -556,7 +556,7 @@ void CreateGame(const char *filename, CMap *map)
 		CallbackMusicOn();
 	}
 #if 0
-	GamePaused = 1;
+	GamePaused = true;
 #endif
 
 	if (FlagRevealMap) {

@@ -71,9 +71,9 @@ static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
 char DefaultGroupKeys[] = "0123456789`";/// Default group keys
 char *UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
-char GameRunning;                    /// Current running state
-char GamePaused;                     /// Current pause state
-char GameObserve;                    /// Observe mode
+bool GameRunning;                    /// Current running state
+bool GamePaused;                     /// Current pause state
+bool GameObserve;                    /// Observe mode
 char SkipGameCycle;                  /// Skip the next game cycle
 char BigMapMode;                     /// Show only the map
 enum _iface_state_ InterfaceState;   /// Current interface state
@@ -269,7 +269,7 @@ static void UiToggleMusic(void)
 void UiTogglePause(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused ^= 1;
+		GamePaused = !GamePaused;
 		if (GamePaused) {
 			UI.StatusLine.Set(_("Game Paused"));
 		} else {
@@ -284,7 +284,7 @@ void UiTogglePause(void)
 static void UiEnterMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 #if 0
@@ -302,7 +302,7 @@ static void UiEnterMenu(void)
 static void UiEnterHelpMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	ProcessMenu("menu-help", 0);
@@ -314,7 +314,7 @@ static void UiEnterHelpMenu(void)
 static void UiEnterOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	ProcessMenu("menu-game-options", 0);
@@ -326,7 +326,7 @@ static void UiEnterOptionsMenu(void)
 static void UiEnterSoundOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	SoundOptionsMenu();
@@ -338,7 +338,7 @@ static void UiEnterSoundOptionsMenu(void)
 static void UiEnterSpeedOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	SpeedOptionsMenu();
@@ -350,7 +350,7 @@ static void UiEnterSpeedOptionsMenu(void)
 static void UiEnterPreferencesOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	PreferencesMenu();
@@ -367,7 +367,7 @@ static void UiEnterSaveGameMenu(void)
 	}
 
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	SaveGameMenu();
@@ -384,7 +384,7 @@ static void UiEnterLoadGameMenu(void)
 	}
 
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	LoadGameMenu();
@@ -396,7 +396,7 @@ static void UiEnterLoadGameMenu(void)
 static void UiExitConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	ExitConfirmMenu();
@@ -408,7 +408,7 @@ static void UiExitConfirmMenu(void)
 static void UiQuitToMenuConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	QuitToMenuConfirmMenu();
@@ -420,7 +420,7 @@ static void UiQuitToMenuConfirmMenu(void)
 static void UiRestartConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
-		GamePaused = 1;
+		GamePaused = true;
 		UI.StatusLine.Set(_("Game Paused"));
 	}
 	RestartConfirmMenu();

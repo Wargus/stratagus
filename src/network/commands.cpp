@@ -750,7 +750,7 @@ int LoadReplay(const char *name)
 	} else {
 		DisabledShowTips = 0;
 	}
-	GameObserve = 1;
+	GameObserve = true;
 	InitReplay = 1;
 
 	return 0;
@@ -792,7 +792,7 @@ void CleanReplayLog(void)
 		ShowTips = true;
 		DisabledShowTips = 0;
 	}
-	GameObserve = 0;
+	GameObserve = false;
 	NetPlayers = 0;
 	ReplayGameType = ReplayNone;
 }
@@ -957,7 +957,7 @@ static void ReplayEachCycle(void)
 
 	if (!ReplayStep) {
 		SetMessage(_("End of replay"));
-		GameObserve = 0;
+		GameObserve = false;
 		return;
 	}
 
@@ -972,7 +972,7 @@ static void ReplayEachCycle(void)
 
 	if (!ReplayStep) {
 		SetMessage(_("End of replay"));
-		GameObserve = 0;
+		GameObserve = false;
 	}
 }
 
