@@ -354,7 +354,7 @@ extern SDL_Surface *TheScreen;
 
 #ifdef USE_OPENGL
 	/// Max texture size supported on the video card
-extern int GLMaxTextureSize;
+extern GLint GLMaxTextureSize;
 #endif
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN

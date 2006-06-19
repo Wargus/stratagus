@@ -87,7 +87,7 @@ SDL_Surface *TheScreen; /// Internal screen
 static SDL_Rect Rects[100];
 static int NumRects;
 #else
-int GLMaxTextureSize;   /// Max texture size supported on the video card
+GLint GLMaxTextureSize;   /// Max texture size supported on the video card
 #endif
 
 static int FrameTicks; /// Frame length in ms
