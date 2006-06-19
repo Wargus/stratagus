@@ -168,15 +168,14 @@ function RunSaveMenu()
 
   local t = menu:addTextInputField("game.sav", 16, 40, 224)
 
-  local browser = menu:addBrowser("save/", "^.*%.sav$",  16, 70, 224, 166)
+  local browser = menu:addBrowser("~save", ".sav.gz$", 16, 70, 224, 166)
   local function cb(s)
-    print(browser:getSelectedItem())
+    t:setText(browser:getSelectedItem())
   end
   browser:setActionCallback(cb)
 
   menu:addSmallButton(_("Save"), 16, 248,
-    function() end)
-
+    function() SaveGame(t:getText()) menu:stop(1) end)
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
     function() menu:stop(1) end)
 
@@ -188,14 +187,14 @@ function RunLoadMenu()
 
   menu:addLabel(_("Load Game"), 128, 11)
 
-  local browser = menu:addBrowser("save/", "^.*%.sav$",  16, 40, 224, 200)
+  local browser = menu:addBrowser("~save", ".sav.gz$", 16, 40, 224, 200)
   local function cb(s)
     print(browser:getSelectedItem())
   end
   browser:setActionCallback(cb)
 
   menu:addSmallButton(_("Load"), 16, 248,
-    function() end)
+    function() StartSavedGame("~save/"..browser:getSelectedItem()) end)
 
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
     function() menu:stop(1) end)
