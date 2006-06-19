@@ -334,6 +334,13 @@ static int CclSetFogOfWar(lua_State *l)
 	return 0;
 }
 
+static int CclGetFogOfWar(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, !Map.NoFogOfWar);
+	return 1;
+}
+
 /**
 **  Enable display of terrain in minimap.
 **
@@ -519,6 +526,7 @@ void MapCclRegister(void)
 
 	lua_register(Lua, "SetDefaultMap", CclSetDefaultMap);
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
+	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
