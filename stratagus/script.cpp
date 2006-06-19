@@ -1866,7 +1866,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 		} else
 #endif
 		{
-			sprintf(directory, "%s/%s", StratagusLibPath, userdir);
+			sprintf(directory, "%s/%s", GameName, userdir);
 		}
 	} else {
 		sprintf(directory, "%s/%s", StratagusLibPath, userdir);
