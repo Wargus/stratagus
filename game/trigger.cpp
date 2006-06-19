@@ -500,8 +500,8 @@ static int CclActionVictory(lua_State *l)
 	LuaCheckArgs(l, 0);
 
 	GameResult = GameVictory;
-	GamePaused = 1;
-	GameRunning = 0;
+	GamePaused = true;
+	GameRunning = false;
 	return 0;
 }
 
@@ -513,8 +513,8 @@ static int CclActionDefeat(lua_State *l)
 	LuaCheckArgs(l, 0);
 
 	GameResult = GameDefeat;
-	GamePaused = 1;
-	GameRunning = 0;
+	GamePaused = true;
+	GameRunning = false;
 	return 0;
 }
 
@@ -526,8 +526,8 @@ static int CclActionDraw(lua_State *l)
 	LuaCheckArgs(l, 0);
 
 	GameResult = GameDraw;
-	GamePaused = 1;
-	GameRunning = 0;
+	GamePaused = true;
+	GameRunning = false;
 	return 0;
 }
 

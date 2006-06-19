@@ -2124,7 +2124,7 @@ void CloseMenu(void)
 			(GameRunning || GameResult != GameNoResult)) {
 		InterfaceState = IfaceStateNormal;
 		Callbacks = &GameCallbacks;
-		GamePaused = 0;
+		GamePaused = false;
 		UIHandleMouseMove(CursorX, CursorY);
 	}
 }

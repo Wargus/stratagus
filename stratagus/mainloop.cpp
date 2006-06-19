@@ -272,7 +272,7 @@ void GameMainLoop(void)
 
 	SetVideoSync();
 	GameCursor = UI.Point.Cursor;
-	GameRunning = 1;
+	GameRunning = true;
 
 	showtip = false;
 	RealVideoSyncSpeed = VideoSyncSpeed;
@@ -420,7 +420,7 @@ void GameMainLoop(void)
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
-	GamePaused = 0;
+	GamePaused = false;
 	GodMode = false;
 }
 
