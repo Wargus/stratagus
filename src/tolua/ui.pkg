@@ -366,7 +366,8 @@ class Label : public Widget
 class TextField : public Widget
 {
 	TextField(const std::string &text);
-	std::string & getText();
+	virtual void setText(const std::string& text);
+	virtual std::string &getText();
 };
 
 class ListBoxWidget : public Widget
