@@ -642,7 +642,7 @@ static void ExpandPath(char *newpath, const char *path)
 		} else
 #endif
 		{
-			sprintf(newpath, "%s/%s", StratagusLibPath, path);
+			sprintf(newpath, "%s/%s", GameName, path);
 		}
 	} else {
 		sprintf(newpath, "%s/%s", StratagusLibPath, path);
