@@ -81,6 +81,60 @@ function BosGameMenu()
     return b
   end
 
+  function menu:addListBox(x, y, w, h, list)
+    local bq
+    bq = ListBoxWidget(w, h)
+    bq:setList(list)
+    bq:setBaseColor(black)
+    bq:setForegroundColor(clear)
+    bq:setBackgroundColor(dark)
+    bq:setFont(Fonts["game"])
+    self:add(bq, x, y)   
+    bq.itemslist = list
+    return bq
+  end
+
+  function menu:addBrowser(path, filter, x, y, w, h, lister)
+    local mapslist = {}
+    local u = 1
+    local fileslist
+    local i
+    local f
+    if lister == nil then
+       lister = ListFilesInDirectory
+    end
+    fileslist = lister(path)
+    for i,f in fileslist do
+      if(string.find(f, filter)) then
+        mapslist[u] = f
+        u = u + 1
+      end
+    end
+
+    local bq
+    bq = self:addListBox(x, y, w, h, mapslist)
+    bq.getSelectedItem = function(self)
+        if self:getSelected() < 0 then
+           return self.itemslist[1]
+        end
+        return self.itemslist[self:getSelected() + 1]
+    end
+
+    return bq
+  end
+
+  function menu:addTextInputField(text, x, y, w)
+    local b = TextField(text)
+    b:setActionCallback(function() print("field") end)
+    b:setFont(Fonts["game"])
+    b:setBaseColor(clear)
+    b:setForegroundColor(clear)
+    b:setBackgroundColor(dark)
+    b:setSize(w, 18)
+    self:add(b, x, y)
+    return b
+  end
+
   return menu
 end
 
@@ -90,9 +144,9 @@ function RunGameMenu(s)
 
   menu:addLabel(_("Game Menu"), 128, 11)
   menu:addSmallButton(_("Save (~<F11~>)"), 16, 40,
-    function() print "save"; RunTestMenu() end)
+    function() RunSaveMenu() end)
   menu:addSmallButton(_("Load (~<F12~>)"), 16 + 12 + 106, 40,
-    function() print "load" end)
+    function() RunLoadMenu() end)
   menu:addButton(_("Options (~<F5~>)"), 16, 40 + (36 * 1),
     function() RunOptionsMenu() end)
   menu:addButton(_("Help (~<F1~>)"), 16, 40 + (36 * 2),
@@ -102,6 +156,48 @@ function RunGameMenu(s)
   menu:addButton(_("~!End Scenario"), 16, 40 + (36 * 4),
     function() RunEndScenarioMenu() end)
   menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunSaveMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Save Game"), 128, 11)
+
+  local t = menu:addTextInputField("game.sav", 16, 40, 224)
+
+  local browser = menu:addBrowser("save/", "^.*%.sav$",  16, 70, 224, 166)
+  local function cb(s)
+    print(browser:getSelectedItem())
+  end
+  browser:setActionCallback(cb)
+
+  menu:addSmallButton(_("Save"), 16, 248,
+    function() end)
+
+  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
+    function() menu:stop(1) end)
+
+  menu:run(false)
+end
+
+function RunLoadMenu()
+  local menu = BosGameMenu()
+
+  menu:addLabel(_("Load Game"), 128, 11)
+
+  local browser = menu:addBrowser("save/", "^.*%.sav$",  16, 40, 224, 200)
+  local function cb(s)
+    print(browser:getSelectedItem())
+  end
+  browser:setActionCallback(cb)
+
+  menu:addSmallButton(_("Load"), 16, 248,
+    function() end)
+
+  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
     function() menu:stop(1) end)
 
   menu:run(false)
