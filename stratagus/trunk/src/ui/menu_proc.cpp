@@ -189,6 +189,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	}
 }
 
+#if 0
 /**
 ** Paste text from the clipboard
 */
@@ -280,6 +281,7 @@ static void PasteFromClipboard(Menuitem *mi)
 #endif
 #endif
 }
+#endif
 
 typedef struct _menu_stack_ {
 	struct _menu_ *Menu;
