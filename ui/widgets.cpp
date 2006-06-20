@@ -1232,6 +1232,11 @@ MenuScreen::MenuScreen() :
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
+
+	// The gui must be set immediatly as it is used by widgets
+	// when they are added to the container
+	oldtop = Gui->getTop();
+	Gui->setTop(this);
 }
 
 /**
@@ -1239,8 +1244,6 @@ MenuScreen::MenuScreen() :
 */
 int MenuScreen::run(bool loop)
 {
-	this->oldtop = Gui->getTop();
-	Gui->setTop(this);
 	this->loopResult = 0;
 	this->runLoop = loop;
 
