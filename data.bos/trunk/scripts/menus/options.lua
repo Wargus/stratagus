@@ -181,13 +181,9 @@ function BuildVideoOptionsMenu(menu)
     b:setMarked(true)
   end
 
-  fullscreen = menu:addCheckBox(_("Fullscreen"), offx, offy + 36 * 5.5,
+  fullScreen = menu:addCheckBox(_("Fullscreen"), offx, offy + 36 * 5.5,
     function() ToggleFullScreen(); SavePreferences() end)
-  -- warning doing 'fullScreen:setMarked(Video.FullScreen)' directly fails
-  b = Video.FullScreen
-  if b == true then 	 
-    fullScreen:setMarked(true) 	 
-  end
+  fullScreen:setMarked(Video.FullScreen)
 end
 
 function RunVideoOptionsMenu(s)
