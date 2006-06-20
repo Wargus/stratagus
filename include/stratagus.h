@@ -282,8 +282,8 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
-extern void LoadGame(char *filename);       /// Load saved game back
-extern void SaveGame(const char *filename); /// Save game for later load
+extern void LoadGame(const char *filename); /// Load saved game
+extern void SaveGame(const char *filename); /// Save game
 extern int SaveGameLoading;                 /// Save game is in progress of loading
 
 extern void Exit(int err);                  /// Exit stratagus
@@ -297,7 +297,7 @@ extern void DrawMapArea(void);              /// Draw the map area
 extern void GameMainLoop(void);             /// Game main loop
 
 	/// Show load progress
-extern void ShowLoadProgress(const char *fmt,...);
+extern void ShowLoadProgress(const char *fmt, ...);
 
 /*============================================================================
 ==  Misc

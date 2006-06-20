@@ -204,7 +204,7 @@ void LoadModules(void)
 **
 **  @param filename  File name to be loaded.
 */
-void LoadGame(char *filename)
+void LoadGame(const char *filename)
 {
 	unsigned long game_cycle;
 	unsigned syncrand;

@@ -84,7 +84,6 @@ int MouseScrollState = ScrollNone;
 
 EventCallback *Callbacks;    /// Current callbacks
 EventCallback GameCallbacks; /// Game callbacks
-EventCallback MenuCallbacks; /// Menu callbacks
 
 //----------------------------------------------------------------------------
 // Functions
@@ -220,7 +219,6 @@ void UpdateDisplay(void)
 	}
 
 	DrawPieMenu(); // draw pie menu only if needed
-	DrawMenu(CurrentMenu);
 
 	DrawGuichanWidgets();
 	
@@ -387,11 +385,13 @@ void GameMainLoop(void)
 		}
 	}
 
+#if 0
 	if (Callbacks == &MenuCallbacks) {
 		while (CurrentMenu) {
 			CloseMenu();
 		}
 	}
+#endif
 
 	//
 	// Game over

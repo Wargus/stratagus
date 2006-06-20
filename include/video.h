@@ -435,7 +435,6 @@ extern void ToggleGrabMouse(int mode);
 
 extern EventCallback *Callbacks;    /// Current callbacks
 extern EventCallback GameCallbacks; /// Game callbacks
-extern EventCallback MenuCallbacks; /// Menu callbacks
 
 extern Uint32 ColorBlack;
 extern Uint32 ColorDarkGreen;
