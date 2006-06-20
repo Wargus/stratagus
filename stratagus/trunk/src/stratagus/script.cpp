@@ -309,11 +309,11 @@ static int CclLoad(lua_State *l)
 }
 
 /**
-**  Load the SaveGame Header
+**  Load the SavedGameInfo Header
 **
 **  @param l  Lua state.
 */
-static int CclSaveGame(lua_State *l)
+static int CclSavedGameInfo(lua_State *l)
 {
 	const char *value;
 	char buf[1024];
@@ -2608,7 +2608,7 @@ void InitCcl(void)
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
-	lua_register(Lua, "SaveGame", CclSaveGame);
+	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
 	AliasRegister();
 	NetworkCclRegister();

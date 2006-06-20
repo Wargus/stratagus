@@ -283,147 +283,13 @@ void UiTogglePause(void)
 */
 static void UiEnterMenu(void)
 {
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-#if 0
-	ProcessMenu("menu-game", 0);
-#else
 	if (UI.MenuButton.Callback) {
+		if (!IsNetworkGame()) {
+			GamePaused = true;
+			UI.StatusLine.Set(_("Game Paused"));
+		}
 		UI.MenuButton.Callback->action("");
 	}
-#endif
-}
-
-/**
-**  Enter help menu
-*/
-static void UiEnterHelpMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	ProcessMenu("menu-help", 0);
-}
-
-/**
-**  Enter options menu
-*/
-static void UiEnterOptionsMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	ProcessMenu("menu-game-options", 0);
-}
-
-/**
-**  Enter Sound Options menu
-*/
-static void UiEnterSoundOptionsMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	SoundOptionsMenu();
-}
-
-/**
-**  Enter Speed Options menu
-*/
-static void UiEnterSpeedOptionsMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	SpeedOptionsMenu();
-}
-
-/**
-**  Enter Preferences Options menu
-*/
-static void UiEnterPreferencesOptionsMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	PreferencesMenu();
-}
-
-/**
-**  Enter Save Game Menu
-*/
-static void UiEnterSaveGameMenu(void)
-{
-	// Disable save menu in multiplayer and replays
-	if (IsNetworkGame() || ReplayGameType != ReplayNone) {
-		return;
-	}
-
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	SaveGameMenu();
-}
-
-/**
-**  Enter Load Game Menu
-*/
-static void UiEnterLoadGameMenu(void)
-{
-	// Disable load menu in multiplayer
-	if (IsNetworkGame()) {
-		return;
-	}
-
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	LoadGameMenu();
-}
-
-/**
-**  Enter Exit Confirm menu
-*/
-static void UiExitConfirmMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	ExitConfirmMenu();
-}
-
-/**
-**  Enter Quit To Menu Confirm menu
-*/
-static void UiQuitToMenuConfirmMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	QuitToMenuConfirmMenu();
-}
-
-/**
-**  Enter Restart Confirm menu
-*/
-static void UiRestartConfirmMenu(void)
-{
-	if (!IsNetworkGame()) {
-		GamePaused = true;
-		UI.StatusLine.Set(_("Game Paused"));
-	}
-	RestartConfirmMenu();
 }
 
 /**
@@ -659,7 +525,7 @@ static int CommandKey(int key)
 			break;
 
 		case SDLK_F1:
-			UiEnterHelpMenu();
+			//UiEnterHelpMenu();
 			break;
 
 		case SDLK_F2:
@@ -691,25 +557,25 @@ static int CommandKey(int key)
 
 		case SDLK_F5: // Options menu
 			if (KeyState != KeyStateInput) {
-				UiEnterOptionsMenu();
+				//UiEnterOptionsMenu();
 			}
 			break;
 
 		case SDLK_F7: // Sound Options menu
 			if (KeyState != KeyStateInput) {
-				UiEnterSoundOptionsMenu();
+				//UiEnterSoundOptionsMenu();
 			}
 			break;
 
 		case SDLK_F8: // Speed Options menu
 			if (KeyState != KeyStateInput) {
-				UiEnterSpeedOptionsMenu();
+				//UiEnterSpeedOptionsMenu();
 			}
 			break;
 
 		case SDLK_F9: // Preferences menu
 			if (KeyState != KeyStateInput) {
-				UiEnterPreferencesOptionsMenu();
+				//UiEnterPreferencesOptionsMenu();
 			}
 			break;
 
@@ -729,7 +595,7 @@ static int CommandKey(int key)
 			}
 			// FALL THROUGH (ALT+L)
 		case SDLK_F12:
-			UiEnterLoadGameMenu();
+			//UiEnterLoadGameMenu();
 			break;
 
 		case 's': // ALT+S, F11 save game menu
@@ -744,7 +610,7 @@ static int CommandKey(int key)
 			}
 			// FALL THROUGH (ALT+S)
 		case SDLK_F11:
-			UiEnterSaveGameMenu();
+			//UiEnterSaveGameMenu();
 			break;
 
 		case 't': // ALT+T, CTRL+T Track unit
@@ -784,7 +650,7 @@ static int CommandKey(int key)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-			UiEnterHelpMenu();
+			//UiEnterHelpMenu();
 			break;
 
 		case SDLK_SPACE: // center on last action
@@ -804,21 +670,21 @@ static int CommandKey(int key)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-			UiExitConfirmMenu();
+			//UiExitConfirmMenu();
 			break;
 
 		case 'q': // ALT+Q, CTRL+Q: Quit level
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-			UiQuitToMenuConfirmMenu();
+			//UiQuitToMenuConfirmMenu();
 			break;
 
 		case 'r': // ALT+R, CTRL+R: Restart scenario
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-			UiRestartConfirmMenu();
+			//UiRestartConfirmMenu();
 			break;
 
 		case 'i':

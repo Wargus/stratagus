@@ -10,7 +10,7 @@
 //
 /**@name menus.h - The menu headerfile. */
 //
-//      (c) Copyright 1999-2005 by Andreas Arens and Jimmy Salmon
+//      (c) Copyright 1999-2006 by Andreas Arens and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -67,15 +67,10 @@ typedef int MenuButtonId;
 
 /// @todo FILL IN THIS TABLE!!!!
 
-#define MBUTTON_UP_ARROW    29
-#define MBUTTON_DOWN_ARROW  32
 #define MBUTTON_LEFT_ARROW  35
 #define MBUTTON_RIGHT_ARROW 38
 #define MBUTTON_S_KNOB      40
-#define MBUTTON_S_VCONT     42
 #define MBUTTON_S_HCONT     44
-#define MBUTTON_PULLDOWN    46
-#define MBUTTON_VTHIN       48
 
 	/// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_STATE 5
@@ -93,10 +88,6 @@ typedef int MenuButtonId;
 #define CLIENT_GAMETYPE     31
 #define CLIENT_PLAYER_READY 32
 #define CLIENT_PLAYER_TEXT  46
-
-// For the game speed slider in the speed settings screen.
-#define MIN_GAME_SPEED 50
-#define MAX_GAME_SPEED 250
 
 class ButtonStyle;
 class CMapInfo;
@@ -249,11 +240,6 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_KNOB  4
 #define MI_CFLAGS_CONT  8
 
-#define MI_IFLAGS_PASSWORD 1 /// Input is a password
-
-#define MI_STYLE_SC_VSLIDER 1
-#define MI_STYLE_SC_HSLIDER 2
-
 typedef void (*InitFuncType)(struct _menu_ *);
 typedef void (*ExitFuncType)(struct _menu_ *);
 typedef void (*NetActionType)(void);
@@ -284,21 +270,8 @@ typedef struct _menu_ {
 extern int GuiGameStarted;                    /// Game Started?
 extern bool oldMenusRunning;                  /// Are the old menus running ?
 extern Menu *CurrentMenu;                     /// Current menu
-extern CGraphic *MenuButtonGraphics[];/// Menu button graphics
-extern CGraphic *MenuButtonG;         /// Current menu button graphics
 
 extern char MenuMapFullPath[1024];   /// Full path to currently selected map
-
-class CKeyStrokeHelp {
-public:
-	std::string Key;
-	std::string Help;
-};
-
-extern std::vector<CKeyStrokeHelp> KeyStrokeHelps; /// Keystroke help pairs
-
-#define MENUS_MAXMENU 128  /// @todo wrong place, docu
-#define MENUS_MAXFUNC 128  /// @todo wrong place, docu
 
 	/// Hash table of all the menus
 extern std::map<std::string, Menu *> MenuMap;
@@ -316,13 +289,9 @@ extern void InitMenuFuncHash(void);
 extern void InitMenus(int race);
 	/// Update menu item state. (disabled, ...)
 extern void UpdateMenuItemButton(Menuitem *items);
-	/// Draw menu
-extern void DrawMenu(Menu *menu);
 	/// Draw menu button
 extern void DrawMenuButton(ButtonStyle *style, unsigned flags,
 	int x, int y, const char *text);
-	/// Set menu backgound and draw it
-extern void MenusSetBackground(void);
 	/// Draw and process a menu
 extern void ProcessMenu(const char *menu_id, int loop);
 	/// End the current menu
@@ -339,29 +308,8 @@ extern void NetConnectForceDisplayUpdate(void);
 	/// Compare Local State <-> Server's state, force Update when changes
 extern void NetClientCheckLocalState(void);
 
-	/// Sound options menu
-extern void SoundOptionsMenu(void);
-	/// Speed options menu
-extern void SpeedOptionsMenu(void);
-	/// Preferences menu
-extern void PreferencesMenu(void);
 	/// Diplomacy menu
 extern void DiplomacyMenu(void);
-
-	/// Save game menu
-extern void SaveGameMenu(void);
-	/// Load game menu
-extern void LoadGameMenu(void);
-
-	/// Restart confirm menu
-extern void RestartConfirmMenu(void);
-	/// Quit to menu confirm menu
-extern void QuitToMenuConfirmMenu(void);
-	/// Exit confirm menu
-extern void ExitConfirmMenu(void);
-
-	/// Initialize the (ccl-loaded) menus data
-extern void InitMenuData(void);
 
 	/// Edit resource properties
 extern void EditorEditResource(void);

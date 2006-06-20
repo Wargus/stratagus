@@ -469,22 +469,22 @@ static void DrawTileIcons(void)
 	}
 
 	VideoDrawTextCentered(x, y, GameFont, "1x1");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "2x2");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "3x3");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "4x4");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "Random");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "Filler");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
 	y += 20;
 
 	y = UI.ButtonPanel.Y + 4;
@@ -597,25 +597,25 @@ static void DrawUnitIcons(void)
 	y = UI.InfoPanel.Y + 140;
 
 	VideoDrawText(x + 28 * 0, y, GameFont, "Un");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowUnitsToSelect ? 2 : 0),
-		x + 28 * 0, y + 16);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowUnitsToSelect ? 2 : 0),
+	//	x + 28 * 0, y + 16);
 	VideoDrawText(x + 28 * 1, y, GameFont, "Bu");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowBuildingsToSelect ? 2 : 0),
-		x + 28 * 1, y + 16);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowBuildingsToSelect ? 2 : 0),
+	//	x + 28 * 1, y + 16);
 #if 0
 	VideoDrawText(x + 28 * 2, y, GameFont, "He");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowHeroesToSelect ? 2 : 0),
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowHeroesToSelect ? 2 : 0),
 		x + 28 * 2, y + 16);
 #endif
 	VideoDrawText(x + 28 * 3, y, GameFont, "La");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowLandToSelect ? 2 : 0),
-		x + 28 * 3, y + 16);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowLandToSelect ? 2 : 0),
+	//	x + 28 * 3, y + 16);
 	VideoDrawText(x + 28 * 4, y, GameFont, "Wa");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowWaterToSelect ? 2 : 0),
-		x + 28 * 4, y + 16);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowWaterToSelect ? 2 : 0),
+	//	x + 28 * 4, y + 16);
 	VideoDrawText(x + 28 * 5, y, GameFont, "Ai");
-	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowAirToSelect ? 2 : 0),
-		x + 28 * 5, y + 16);
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowAirToSelect ? 2 : 0),
+	//	x + 28 * 5, y + 16);
 
 	//
 	// Scroll bar for units. FIXME: drag not supported.
@@ -626,30 +626,30 @@ static void DrawUnitIcons(void)
 
 	PushClipping();
 	SetClipping(0, 0, x + j - 20, Video.Height - 1);
-	MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
+	//MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
 	PopClipping();
 	if (UI.ButtonPanel.X + 4 < CursorX
 			&& CursorX < UI.ButtonPanel.X + 24
 			&& UI.ButtonPanel.Y + 4 < CursorY
 			&& CursorY < UI.ButtonPanel.Y + 24
 			&& MouseButtons & LeftButton) {
-		MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW + 1, x - 2, y);
+		//MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW + 1, x - 2, y);
 	} else {
-		MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW, x - 2, y);
+		//MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW, x - 2, y);
 	}
 	if (UI.ButtonPanel.X + 176 - 24 < CursorX
 			&& CursorX < UI.ButtonPanel.X + 176 - 4
 			&& UI.ButtonPanel.Y + 4 < CursorY
 			&& CursorY < UI.ButtonPanel.Y + 24
 			&& MouseButtons & LeftButton) {
-		MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
+		//MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
 	} else {
-		MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW, x + j - 20, y);
+		//MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW, x + j - 20, y);
 	}
 
 	percent = Editor.UnitIndex * 100 / (Editor.ShownUnitTypes.size() ? Editor.ShownUnitTypes.size() : 1);
 	i = (percent * (j - 54)) / 100;
-	MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 18 + i, y + 1);
+	//MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
 	//
 	//  Draw the unit icons.
