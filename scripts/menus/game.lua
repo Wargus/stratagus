@@ -143,8 +143,10 @@ function RunGameMenu(s)
   local menu = BosGameMenu()
 
   menu:addLabel(_("Game Menu"), 128, 11)
+  -- FIXME: disable for multiplayer or replay
   menu:addSmallButton(_("Save (~<F11~>)"), 16, 40,
     function() RunSaveMenu() end)
+  -- FIXME: disable for multiplayer
   menu:addSmallButton(_("Load (~<F12~>)"), 16 + 12 + 106, 40,
     function() RunLoadMenu() end)
   menu:addButton(_("Options (~<F5~>)"), 16, 40 + (36 * 1),
@@ -246,7 +248,7 @@ function RunGameSpeedOptionsMenu()
   menu:add(l, 230, (36 * 2) + 6)
 
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 248,
-    function() menu:stop(0) end)
+    function() SavePreferences(); menu:stop(0) end)
 
   menu:run(false)
 end
@@ -256,6 +258,7 @@ function RunPreferencesMenu()
 
   menu:addLabel(_("Preferences"), 128, 11)
   local fog = {}
+  -- FIXME: disable checkbox for multiplayer or replays
   fog = menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
     function() SetFogOfWar(fog:isMarked()) end)
   fog:setMarked(GetFogOfWar())
@@ -264,7 +267,7 @@ function RunPreferencesMenu()
     function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
   ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
-    function() menu:stop(0) end)
+    function() SavePreferences(); menu:stop(0) end)
 
   menu:run(false)
 end
@@ -273,6 +276,7 @@ function RunEndScenarioMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("End Scenario"), 128, 11)
+  -- FIXME: disable for multiplayer
   menu:addButton(_("~!Restart Scenario"), 16, 40 + (36 * 0),
     function() RunRestartConfirmMenu() end)
   menu:addButton(_("~!Surrender"), 16, 40 + (36 * 1),
@@ -471,6 +475,7 @@ function RunVictoryMenu()
   menu:addLabel(_("You are victorious!"), 144, 32)
   menu:addButton(_("~!Victory"), 32, 54,
     function() menu:stop(0) end)
+  -- FIXME: check if log is disabled
   menu:addButton(_("Save ~!Replay"), 32, 90,
     function() RunSaveReplayMenu() end)
 
@@ -487,6 +492,7 @@ function RunDefeatMenu()
   menu:addLabel(_("achieve victory!"), 144, 32)
   menu:addButton(_("~!OK"), 32, 56,
     function() menu:stop(0) end)
+  -- FIXME: check if log is disabled
   menu:addButton(_("Save ~!Replay"), 32, 90,
     function() RunSaveReplayMenu() end)
 

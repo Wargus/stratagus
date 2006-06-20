@@ -81,6 +81,7 @@ function RunSoundOptionsMenu(s)
   b:adjustSize();
   menu:add(b, offx + 16, offy + 36 * 1)
 
+  -- FIXME: disable if effects turned off
   local soundslider = Slider(0, 255)
   soundslider:setValue(GetEffectsVolume())
   soundslider:setActionCallback(function() SetEffectsVolume(soundslider:getValue()) end)
@@ -113,6 +114,7 @@ function RunSoundOptionsMenu(s)
   b:adjustSize();
   menu:add(b, offx + 16, offy + 36 * 3)
 
+  -- FIXME: disable if music turned off
   local musicslider = Slider(0, 255)
   musicslider:setValue(GetMusicVolume())
   musicslider:setActionCallback(function() SetMusicVolume(musicslider:getValue()) end)
@@ -150,6 +152,7 @@ function SetVideoSize(width, height)
   Video:ResizeScreen(width, height)
   bckground:Resize(Video.Width, Video.Height)
   backgroundWidget = ImageWidget(bckground)
+  SavePreferences()
 end
 
 function BuildVideoOptionsMenu(menu)
@@ -179,11 +182,8 @@ function BuildVideoOptionsMenu(menu)
   end
 
   fullscreen = menu:addCheckBox(_("Fullscreen"), offx, offy + 36 * 5.5,
-    function() ToggleFullScreen() end)
-  b = Video.FullScreen 
-  if b == true then 
-    fullScreen:setMarked(true)
-  end
+    function() ToggleFullScreen(); SavePreferences() end)
+  fullScreen:setMarked(Video.FullScreen)
 end
 
 function RunVideoOptionsMenu(s)
