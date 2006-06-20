@@ -238,7 +238,6 @@ void CVideo::ResizeScreen(int w, int h)
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 	TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,
 		TheScreen->flags);
-	SavePreferences();
 	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 }
 
