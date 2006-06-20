@@ -1141,29 +1141,6 @@ static void SaveGameOk(void)
 }
 
 /**
-** Load game ok button callback
-*/
-static void LoadGameOk(void)
-{
-	if (!ScenSelectFileName[0]) {
-		return ;
-	}
-	sprintf(TempPathBuf, "%s/%s", SaveDir, ScenSelectFileName);
-	CommandLogDisabled = 1;
-	SaveGameLoading = 1;
-	CleanModules();
-	LoadCcl();
-	LoadGame(TempPathBuf);
-	Callbacks = &GameCallbacks;
-	SetMessage(_("Loaded game: %s"), TempPathBuf);
-	GuiGameStarted = 1;
-	GameMenuReturn();
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
-}
-
-/**
 **  Save confirm init callback
 */
 static void SaveConfirmInit(Menu *menu)
@@ -1725,30 +1702,6 @@ static void MultiScenSelectMenu(void)
 	MultiGamePlayerSelectorsUpdate(1);
 
 	menu->Items[6].Flags = MI_FLAGS_DISABLED;
-}
-
-/**
-** Start campaign from menu.
-**
-** @param number Number of the compaign.
-*/
-static void StartCampaignFromMenu(int number)
-{
-#if 0
-	// JOHNS: this is currently not needed:
-
-	// Any Campaign info should be displayed through a DrawFunc() Item
-	// in the CAMPAIN_CONT menu processed below...
-	ProcessMenu("menu-campaign-continue", 1);
-	// Set GuiGameStarted = 1 to actually run a game here...
-	// See CustomGameStart() for info...
-#endif
-
-	PlayCampaign(Campaigns[number]->Ident);
-	GuiGameStarted = 1;
-
-	// FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
-	CloseMenu();
 }
 
 /**
@@ -4128,76 +4081,6 @@ void ErrorMenu(char *error)
 /*----------------------------------------------------------------------------
 --  Init functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Initialize player races for a menu item
-*/
-static void InitPlayerRaces(Menuitem *mi)
-{
-	int i;
-	int n;
-
-	for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
-		if (PlayerRaces.Visible[i]) {
-			++n;
-		}
-	}
-	++n;
-	// Reallocate pulldown options.
-	delete[] mi->D.Pulldown.options;
-	mi->D.Pulldown.options = new char *[n];
-	mi->D.Pulldown.options[0] = new_strdup("Map Default");
-	for (i = 0, n = 1; i < PlayerRaces.Count; ++i) {
-		if (PlayerRaces.Visible[i]) {
-			mi->D.Pulldown.options[n++] = new_strdup(PlayerRaces.Display[i]);
-		}
-	}
-	mi->D.Pulldown.noptions = n;
-	mi->D.Pulldown.defopt = 0;
-}
-
-/**
-**  Initialize tilesets for a menu item
-*/
-static void InitTilesets(Menuitem *mi, int mapdefault)
-{
-#if 0
-	int i;
-	int n;
-
-	// Reallocate pulldown options.
-	if (mi->D.Pulldown.options) {
-		delete[] mi->D.Pulldown.options;
-	}
-	n = NumTilesets + (mapdefault ? 1 : 0);
-	mi->D.Pulldown.options = new char *[n];
-	n = 0;
-	if (mapdefault) {
-		mi->D.Pulldown.options[n++] = new_strdup("Map Default");
-	}
-	for (i = 0; i < NumTilesets; ++i) {
-		mi->D.Pulldown.options[n++] = new_strdup(Tilesets[i]->Name);
-	}
-	mi->D.Pulldown.noptions = n;
-	mi->D.Pulldown.defopt = 0;
-#endif
-}
-
-#if 0
-/**
-**  FIXME: docu
-*/
-static void MultiGameMasterReport(void)
-{
-// CloseMenu();
-
-	ProcessMenu("metaserver-list", 1);
-	if (GuiGameStarted) {
-		GameMenuReturn();
-	}
-
-}
-#endif
 
 /**
 **  Menu for Mater Server Game list.
