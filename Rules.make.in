@@ -24,9 +24,6 @@ VIDEO_CFLAGS = @VIDEO_CFLAGS@
 COMP_CFLAGS		= -DUSE_ZLIB @BZ2_CFLAGS@
 COMP_LIBS		= -lz @BZ2_LIBS@
 
-TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm @EXTRA_LIBS@ @THREAD_LIBS@ -L/usr/local/lib \
-	@STATIC_LDFLAGS@
-
 STRATAGUS_LIBS= -lpng -lz -lm \
 	@EXTRA_LIBS@ @VIDEO_LIBS@ @THREAD_LIBS@ $(COMP_LIBS) \
 	@VORBIS_LIBS@ @THEORA_LIBS@ @MNG_LIBS@ \
@@ -37,10 +34,6 @@ DISTLIST=$(TOPDIR)/distlist
 TAGS=$(TOPDIR)/src/tags
 
 # Linux
-EXE=@EXE@
-OUTFILE=@OUTFILE@
-ARCH=@ARCH@
-OE=@OE@
 OBJDIR=@OBJDIR@
 
 CPPFLAGS=@EXTRA_CPPFLAGS@
@@ -55,18 +48,3 @@ CFLAGS=$(CPPFLAGS) $(IFLAGS) @DEFS@ -I. \
     @MNG_CFLAGS@ \
     @MIKMOD_CFLAGS@ @LUA_CFLAGS@ \
     $(COMP_CFLAGS) @PLATFORM@ \
-
-CTAGSFLAGS=-i defptvS -a -f 
-
-# Locks versions with a symbolic name
-LOCKVER=	rcs -q -n$(NAME)
-
-# Source code documentation
-DOXYGEN=	doxygen
-DOCIFY=		docify
-DOCPP=		doc++
-
-%.doc: %.c
-	@$(TOPDIR)/tools/aledoc $< | $(DOCIFY) > $*-c.doc 2>/dev/null
-%.doc: %.h
-	@$(TOPDIR)/tools/aledoc $< | $(DOCIFY) > $*-h.doc 2>/dev/null

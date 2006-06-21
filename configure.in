@@ -5,14 +5,8 @@ AC_PREREQ([2.50])
 AC_PROG_CXX
 AM_CONFIG_HEADER(config.h)
 
-EXE=
-OUTFILE="\$(TOPDIR)/stratagus\$(EXE)"
-OE=o
 OBJDIR=obj
 if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
-    WIN32=1
-    EXE=.exe
-    OUTFILE="\$(TOPDIR)/stratagus\$(EXE)"
     ARCH=win32
     OBJDIR=winobj
     PLATFORM="-DUSE_WIN32"
@@ -77,18 +71,12 @@ AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
 AC_ARG_ENABLE(win32,
     [  --enable-win32	  Force win32, useful for cross-compiling (default: no)])
 if test "$enable_win32" = "yes"; then
-    WIN32=1
-    EXE=.exe
-    OUTFILE="\$(TOPDIR)/stratagus\$(EXE)"
     ARCH=win32
     OBJDIR=winobj
     PLATFORM="-DUSE_WIN32"
     PATH="/usr/local/cross/bin:$PATH"
 fi
-AC_SUBST(EXE)
-AC_SUBST(OUTFILE)
-AC_SUBST(ARCH)
-AC_SUBST(OE)
+
 AC_SUBST(OBJDIR)
 AC_SUBST(PLATFORM)
 
@@ -137,7 +125,7 @@ if test "$enable_static" != "yes"; then
 else
     VIDEO_LIBS="`$SDLCONFIG --static-libs`"
 fi
-if test "$WIN32" = "1"; then
+if test "$ARCH" = "win32"; then
     if test "`uname -a | grep -is cygwin`"; then
 	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32"
     else
@@ -301,7 +289,7 @@ else
 fi
 AC_SUBST(PREFIX)
 
-if test "$WIN32" = "1"; then
+if test "$ARCH" = "win32"; then
     if ! test -f Rules.make; then
 	echo "include Rules.make.WIN32" >Rules.make
     fi
