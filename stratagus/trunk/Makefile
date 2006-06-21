@@ -68,7 +68,7 @@ OBJ_ALL = $(OBJ)
 
 .PHONY:	make-objdir all-src
 
-all:	all-src stratagus$(EXE)
+all:	all-src stratagus
 
 make-objdir:
 	@mkdir -p $(dir $(OBJ))
@@ -102,14 +102,8 @@ doc::
 
 all-src: make-objdir $(OBJ)
 
-# UNIX-TARGET
 stratagus: $(OBJ) 
 	$(CXX) -o stratagus $^ $(STRATAGUS_LIBS)
-
-# WIN32-TARGET
-stratagus.exe:	$(OBJ) \
-	    src/$(OBJDIR)/stratagusrc.$(OE)
-	$(CXX) -o stratagus$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS)
 
 strip:
 	@if [ -f stratagus ]; then strip stratagus; fi
@@ -121,9 +115,9 @@ src/metaserver/$(OBJDIR):
 metaserver: src/metaserver/$(OBJDIR) $(METASERVER_OBJ)
 	$(CXX) -o $@ $(METASERVER_OBJ) $(STRATAGUS_LIBS) -lsqlite3
 
-src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
+src/$(OBJDIR)/stratagusrc.o: src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
-	cd src; windres -o $(OBJDIR)/stratagusrc.$(OE) stratagus.rc; cd ..
+	cd src; windres -o $(OBJDIR)/stratagusrc.o stratagus.rc; cd ..
 
 clean::
 	$(RM) -rf $(dir $(OBJ))
@@ -136,7 +130,7 @@ distclean:	clean
 	for i in $(MODULES_ALL); do \
 	[ $(OBJDIR) == "." ] || $(RM) -rf $$i/$(OBJDIR); \
 	$(RM) $$i/.#* $$i/*~; done
-	$(RM) stratagus$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt \
+	$(RM) -f stratagus stratagus.exe gmon.sum .depend .#* *~ stderr.txt stdout.txt \
 	srcdoc/* .depend Rules.make config.log config.status configure
 	$(RM) -rf autom4te.cache/
 	@echo
@@ -214,13 +208,13 @@ dist: distlist
 bin-dist: all
 	$(RM) $(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
-	echo stratagus$(EXE) >>$(DISTLIST)
+	echo stratagus >>$(DISTLIST)
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	chmod -R a+rX $(distdir)
-	strip -s -R .comment $(distdir)/stratagus$(EXE)
+	strip -s -R .comment $(distdir)/stratagus
 	tar czhf stratagus-$(mydate)-linux.tar.gz $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -228,13 +222,13 @@ bin-dist: all
 bin-dist-gl: all
 	$(RM) $(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
-	echo stratagus$(EXE) >>$(DISTLIST)
+	echo stratagus >>$(DISTLIST)
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	chmod -R a+rX $(distdir)
-	strip -s -R .comment $(distdir)/stratagus$(EXE)
+	strip -s -R .comment $(distdir)/stratagus
 	tar czhf stratagus-$(mydate)-linux-gl.tar.gz $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -244,13 +238,13 @@ bin-dist-gl: all
 win32-bin-dist2: win32
 	@$(RM) $(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
-	@echo stratagus$(EXE) >>$(DISTLIST)
+	@echo stratagus.exe >>$(DISTLIST)
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
 	@chmod 777 $(distdir)
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	@chmod -R a+rX $(distdir)
-	@strip -s -R .comment $(distdir)/stratagus$(EXE)
+	@strip -s -R .comment $(distdir)/stratagus.exe
 	@echo "(c) 2003 by the Stratagus Project http://Stratagus.Org" | \
 	zip -zq9r stratagus-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
