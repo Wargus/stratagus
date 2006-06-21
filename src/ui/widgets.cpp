@@ -146,10 +146,15 @@ void freeGuichan()
 */
 void handleInput(const SDL_Event *event) 
 {
-	if (Input && GuichanActive) {
-		Input->pushInput(*event);
-		if (Gui) {
-			Gui->logic();
+	if (GuichanActive) {
+		if (event) {
+			if (Input) {
+				Input->pushInput(*event);
+			}
+		} else {
+			if (Gui) {
+				Gui->logic();
+			}
 		}
 	}
 }
