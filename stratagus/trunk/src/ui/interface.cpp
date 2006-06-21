@@ -59,6 +59,7 @@
 #include "iolib.h"
 #include "commands.h"
 #include "ai.h"
+#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

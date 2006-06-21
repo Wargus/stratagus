@@ -786,6 +786,262 @@ void ImageSlider::setBackgroundImage(gcn::Image *image)
 
 
 /*----------------------------------------------------------------------------
+--  MultiLineLabel
+----------------------------------------------------------------------------*/
+
+
+/**
+**  MultiLineLabel constructor
+*/
+MultiLineLabel::MultiLineLabel()
+{
+	this->mAlignment = LEFT;
+	this->mVerticalAlignment = TOP;
+	this->mLineWidth = 0;
+}
+
+/**
+**  MultiLineLabel constructor
+*/
+MultiLineLabel::MultiLineLabel(const std::string &caption)
+{
+	this->mCaption = caption;
+	this->mAlignment = LEFT;
+	this->mVerticalAlignment = TOP;
+
+	int w = this->getFont()->getWidth(caption);
+	this->mLineWidth = w;
+	this->setWidth(w);
+	this->setHeight(getFont()->getHeight());
+}
+
+/**
+**  Set the caption
+*/
+void MultiLineLabel::setCaption(const std::string &caption)
+{
+	this->mCaption = caption;
+	this->wordWrap();
+}
+
+/**
+**  Get the caption
+*/
+const std::string &MultiLineLabel::getCaption() const
+{
+	return this->mCaption;
+}
+
+/**
+**  Set the horizontal alignment
+*/
+void MultiLineLabel::setAlignment(unsigned int alignment)
+{
+	this->mAlignment = alignment;
+}
+
+/**
+**  Get the horizontal alignment
+*/
+unsigned int MultiLineLabel::getAlignment()
+{
+	return this->mAlignment;
+}
+
+/**
+**  Set the vertical alignment
+*/
+void MultiLineLabel::setVerticalAlignment(unsigned int alignment)
+{
+	this->mVerticalAlignment = alignment;
+}
+
+/**
+**  Get the vertical alignment
+*/
+unsigned int MultiLineLabel::getVerticalAlignment()
+{
+	return this->mVerticalAlignment;
+}
+
+/**
+**  Set the line width
+*/
+void MultiLineLabel::setLineWidth(int width)
+{
+	this->mLineWidth = width;
+	this->wordWrap();
+}
+
+/**
+**  Get the line width
+*/
+int MultiLineLabel::getLineWidth()
+{
+	return this->mLineWidth;
+}
+
+/**
+**  Adjust the size
+*/
+void MultiLineLabel::adjustSize()
+{
+	int width = 0;
+	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
+		int w = this->getFont()->getWidth(this->mTextRows[i]);
+		if (width < w) {
+			if (w <= this->mLineWidth) {
+				width = w;
+			} else {
+				width = this->mLineWidth;
+			}
+		}
+	}
+	this->setWidth(width);
+	this->setHeight(this->getFont()->getHeight() * this->mTextRows.size());
+}
+
+/**
+**  Draw the label
+*/
+void MultiLineLabel::draw(gcn::Graphics *graphics)
+{
+	graphics->setFont(getFont());
+	graphics->setColor(getForegroundColor());
+
+	int textX, textY;
+	switch (this->getAlignment()) {
+		case LEFT:
+			textX = 0;
+			break;
+		case CENTER:
+			textX = this->getWidth() / 2;
+			break;
+		case RIGHT:
+			textX = this->getWidth();
+			break;
+		default:
+			throw GCN_EXCEPTION("Unknown alignment.");
+	}
+	switch (this->getVerticalAlignment()) {
+		case TOP:
+			textY = 0;
+			break;
+		case CENTER:
+			textY = (this->getHeight() - this->mTextRows.size() * this->getFont()->getHeight()) / 2;
+			break;
+		case BOTTOM:
+			textY = this->getHeight() - this->mTextRows.size() * this->getFont()->getHeight();
+			break;
+		default:
+			throw GCN_EXCEPTION("Unknown alignment.");
+	}
+
+	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
+		graphics->drawText(this->mTextRows[i], textX, textY + i * this->getFont()->getHeight(),
+			this->getAlignment());
+	}
+}
+
+/**
+**  Draw the border
+*/
+void MultiLineLabel::drawBorder(gcn::Graphics *graphics)
+{
+	gcn::Color faceColor = getBaseColor();
+	gcn::Color highlightColor, shadowColor;
+	int alpha = getBaseColor().a;
+	int width = getWidth() + getBorderSize() * 2 - 1;
+	int height = getHeight() + getBorderSize() * 2 - 1;
+	highlightColor = faceColor + 0x303030;
+	highlightColor.a = alpha;
+	shadowColor = faceColor - 0x303030;
+	shadowColor.a = alpha;
+
+	for (unsigned int i = 0; i < getBorderSize(); ++i) {
+		graphics->setColor(shadowColor);
+		graphics->drawLine(i, i, width - i, i);
+		graphics->drawLine(i, i + 1, i, height - i - 1);
+		graphics->setColor(highlightColor);
+		graphics->drawLine(width - i, i + 1, width - i, height - i); 
+		graphics->drawLine(i, height - i, width - i - 1, height - i); 
+	}
+}
+
+/**
+**  Do word wrap
+*/
+void MultiLineLabel::wordWrap()
+{
+	gcn::Font *font = this->getFont();
+	int lineWidth = this->getLineWidth();
+	std::string str = this->getCaption();
+	std::string::size_type pos, lastPos = 0;
+	std::string substr;
+	bool done = false;
+
+	this->mTextRows.clear();
+
+	while (!done) {
+		if (font->getWidth(str) > lineWidth || str.find('\n') != std::string::npos) {
+			// string too wide or has a newline, split it up
+			lastPos = 0;
+			while (1) {
+				// look for any whitespace
+				pos = str.find_first_of(" \t\n", lastPos ? lastPos + 1 : 0);
+				if (pos != std::string::npos) {
+					// found space, now check width
+					substr = str.substr(0, pos);
+					if (font->getWidth(substr) > lineWidth) {
+						// sub-string is too big, use last good position
+						if (lastPos == 0) {
+							// didn't find a good last position
+							substr = str.substr(0, pos);
+							this->mTextRows.push_back(substr);
+							str = str.substr(pos + 1);
+							break;
+						} else {
+							substr = str.substr(0, lastPos);
+							this->mTextRows.push_back(substr);
+							str = str.substr(lastPos + 1);
+							break;
+						}
+					} else {
+						// sub-string is small enough
+						// stop if we found a newline, otherwise look for next space
+						if (str[pos] == '\n') {
+							substr = str.substr(0, pos);
+							this->mTextRows.push_back(substr);
+							str = str.substr(pos + 1);
+							break;
+						}
+					}
+				} else {
+					// no space found
+					if (lastPos == 0) {
+						// didn't find a good last position, we're done
+						this->mTextRows.push_back(str);
+						done = true;
+						break;
+					} else {
+						substr = str.substr(0, lastPos);
+						this->mTextRows.push_back(substr);
+						str = str.substr(lastPos + 1);
+						break;
+					}
+				}
+				lastPos = pos;
+			}
+		} else {
+			// string small enough
+			this->mTextRows.push_back(str);
+			done = true;
+		}
+	}
+}
+
+
+/*----------------------------------------------------------------------------
 --  ScrollingWidget
 ----------------------------------------------------------------------------*/
 
@@ -1233,7 +1489,7 @@ MenuScreen::MenuScreen() :
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
 
-	// The gui must be set immediatly as it is used by widgets
+	// The gui must be set immediately as it is used by widgets
 	// when they are added to the container
 	oldtop = Gui->getTop();
 	Gui->setTop(this);

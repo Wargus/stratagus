@@ -61,6 +61,7 @@
 #include "ui.h"
 #include "network.h"
 #include "spells.h"
+#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

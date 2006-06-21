@@ -51,7 +51,6 @@
 #include "interface.h"
 #include "script.h"
 #include "minimap.h"
-#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -59,6 +58,7 @@
 
 class CUnit;
 class CFile;
+class LuaActionListener;
 
 /*----------------------------------------------------------------------------
 --  Definitions
