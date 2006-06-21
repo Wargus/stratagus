@@ -700,7 +700,7 @@ static int CommandKey(int key)
 		case 'v': // ALT+V, CTRL+V: Viewport
 			if (KeyModifiers & ModifierControl) {
 				CycleViewportMode(-1);
-			} else {
+			} else if (KeyModifiers & ModifierAlt) {
 				CycleViewportMode(1);
 			}
 			break;
