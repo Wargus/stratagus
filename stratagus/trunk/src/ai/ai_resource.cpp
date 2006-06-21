@@ -305,6 +305,7 @@ static void AiRequestSupply(void)
 	CUnitType *type;
 	AiBuildQueue *queue;
 	int counter[UnitTypeMax];
+	unsigned int needmask;
 
 	//
 	// Count the already made build requests.
@@ -319,6 +320,7 @@ static void AiRequestSupply(void)
 	// Check if we can build this?
 	//
 	n = AiHelpers.UnitLimit[0].size();
+	needmask = 0;
 	for (i = 0; i < n; ++i) {
 		type = AiHelpers.UnitLimit[0][i];
 		if (counter[type->Slot]) { // Already ordered.
@@ -329,8 +331,7 @@ static void AiRequestSupply(void)
 		// Check if resources available.
 		//
 		if ((c = AiCheckUnitTypeCosts(type))) {
-			AiPlayer->NeededMask |= c;
-			return;
+			needmask |= c;
 		} else {
 			if (AiMakeUnit(type)) {
 				AiBuildQueue newqueue;
@@ -339,8 +340,10 @@ static void AiRequestSupply(void)
 				newqueue.Made = 1;
 				AiPlayer->UnitTypeBuilt.insert(
 					AiPlayer->UnitTypeBuilt.begin(), newqueue);
+				return ;
 			}
 		}
+		AiPlayer->NeededMask |= needmask;
 	}
 }
 

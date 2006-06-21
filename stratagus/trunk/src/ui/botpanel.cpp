@@ -69,9 +69,9 @@
 	/// for unit buttons sub-menus etc.
 int CurrentButtonLevel;
 	/// All buttons for units
-static ButtonAction *UnitButtonTable[MAX_BUTTONS];
+ButtonAction *UnitButtonTable[MAX_BUTTONS];
 	/// buttons in UnitButtonTable
-static int NumUnitButtons;
+unsigned int NumUnitButtons;
 
 ButtonAction *CurrentButtons;             /// Pointer to current buttons
 
@@ -85,7 +85,7 @@ ButtonAction *CurrentButtons;             /// Pointer to current buttons
 void InitButtons(void)
 {
 	// Resolve the icon names.
-	for (int z = 0; z < NumUnitButtons; ++z) {
+	for (unsigned int z = 0; z < NumUnitButtons; ++z) {
 		UnitButtonTable[z]->Icon.Load();
 	}
 	CurrentButtons = NULL;
@@ -176,7 +176,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 void CleanButtons(void)
 {
 	// Free the allocated buttons.
-	for (int z = 0; z < NumUnitButtons; ++z) {
+	for (unsigned int z = 0; z < NumUnitButtons; ++z) {
 		Assert(UnitButtonTable[z]);
 		delete[] UnitButtonTable[z]->ValueStr;
 		delete[] UnitButtonTable[z]->AllowStr;
@@ -534,13 +534,13 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 {
 	char unit_ident[128];
-	int z;
+	unsigned int z;
 	int i;
 	ButtonAction *res;
 	int allow;         // button is available for at least 1 unit.
 
 	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
-	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
+	for (z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
 
@@ -592,12 +592,12 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 	char unit_ident[128];
 	ButtonAction *buttonaction;
 	ButtonAction *res;
-	int z;
+	unsigned int z;
 
 	Assert(unit);
 
 	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
-	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
+	for (z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
 
