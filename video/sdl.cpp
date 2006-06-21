@@ -505,6 +505,7 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 			break;
 		}
 	}
+	handleInput(NULL);
 
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;
