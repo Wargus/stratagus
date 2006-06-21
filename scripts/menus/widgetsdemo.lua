@@ -150,6 +150,16 @@ function RunWidgetsMenu(s)
   bs:setHeight(20)
   menu:add(bs, 330, 140)
 
+  x = MultiLineLabel("a bc def ghij klmnop qrstuvw wwwwwwwwwwwwwwwwwwwwwwwwwwwwww test\na t\na c b")
+  x:setFont(Fonts["large"])
+  x:setAlignment(MultiLineLabel.CENTER)
+  x:setVerticalAlignment(MultiLineLabel.CENTER)
+  x:setLineWidth(100)
+  x:adjustSize()
+  x:setBorderSize(1)
+  x:setHeight(200)
+  menu:add(x, 330, 270)
+
   menu:run()
 end
 
