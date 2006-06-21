@@ -47,7 +47,7 @@
 #include "pathfinder.h"
 #include "ai_local.h"
 #include "player.h"
-
+#include "interface.h"
 
 /**
 **  Insert new unit-type element.
@@ -57,20 +57,187 @@
 **  @param base   Base type to insert into table.
 */
 static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
-	int n, CUnitType *base)
+	unsigned int n, CUnitType *base)
 {
-	if (n >= (int)table.size()) {
+	assert(base != NULL);
+
+	if (n >= table.size()) {
 		table.resize(n + 1);
 	}
 
 	// Look if already known
-	std::vector<CUnitType *>::iterator i;
+	std::vector<CUnitType *>::const_iterator i;
 	for (i = table[n].begin(); i != table[n].end(); ++i) {
 		if (*i == base) {
 			return;
 		}
 	}
 	table[n].push_back(base);
+}
+
+/**
+**  Transform list of unit separed with coma to a true list.
+*/
+static std::vector<CUnitType *> getUnitTypeFromString(const std::string& list)
+{
+	std::vector<CUnitType *> res;
+	
+	if (list == "*") {
+		return UnitTypes;
+	}
+	int begin = 1;
+	int end = 0;
+	std::string unitName;
+	end = list.find(",", begin);
+	while (end != -1) {
+		unitName = list.substr(begin, end - begin);
+		begin = end + 1;
+		end = list.find(",", begin);
+		if (!unitName.empty()) {
+			assert(unitName[0] != ',');
+			res.push_back(UnitTypeByIdent(unitName.c_str()));
+		}
+	}
+	return res;
+}
+
+/**
+**  Get list of unittype which can be repared.
+*/
+static std::vector<CUnitType *> getReparableUnits()
+{
+	std::vector<CUnitType *> res;
+
+	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+		CUnitType *type = *i;
+
+		if (type->RepairHP > 0) {
+			res.push_back(type);
+		}
+	}
+	return res;
+}
+
+/**
+**  Get sorted list of unittype with Supply not null.
+**
+**  @note Better (supply / cost) first.
+*/
+static std::vector<CUnitType *> getSupplyUnits()
+{
+	std::vector<CUnitType *> res;
+	std::vector<CUnitType *> sorted_res;
+
+
+	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+		CUnitType *type = *i;
+
+		if (type->Supply > 0) {
+			res.push_back(type);
+		}
+	}
+	// Now, sort them, best first.
+	while (!res.empty()) {
+		float bestscore;
+		CUnitType *besttype;
+
+		bestscore = 0;
+		for (std::vector<CUnitType *>::const_iterator i = res.begin(); i != res.end(); ++i) {
+			CUnitType *type = *i;
+			float score;
+			unsigned int cost = 0;
+
+			for (unsigned j = 0; j < MaxCosts; ++j) {
+				cost += type->_Costs[j];
+			}
+			score = ((float) type->Supply) / cost;
+			if (score > bestscore) {
+				bestscore = score;
+				besttype = type;
+			}
+		}
+		sorted_res.push_back(besttype);
+		for (std::vector<CUnitType *>::iterator i = res.begin(); i != res.end(); ++i) {
+			if (*i == besttype) {
+				i = res.erase(i);
+				break;
+			}
+		}
+	}
+	return sorted_res;
+}
+
+/**
+**  Init AiHelper.
+**
+**  @param aiHelper  variable to initialise.
+**
+**  @todo missing Equiv initialisation.
+*/
+static void InitAiHelper(AiHelper &aiHelper)
+{
+	extern ButtonAction *UnitButtonTable[];
+	extern unsigned int NumUnitButtons;
+
+	std::vector<CUnitType *> reparableUnits = getReparableUnits();
+	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
+
+	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
+		AiHelperInsert(aiHelper.UnitLimit, 0, *i);
+	}
+
+	for (unsigned int i = 0; i < NumUnitButtons; ++i) {
+		const ButtonAction &button = *UnitButtonTable[i];
+		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button.UnitMask);
+
+		switch (button.Action) {
+			case ButtonRepair :
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					for (std::vector<CUnitType *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
+						AiHelperInsert(aiHelper.Repair, (*k)->Slot, *j);
+					}
+				}
+				break;
+			case ButtonBuild:
+			{
+				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.Build, buildingType->Slot, (*j));
+				}
+				break;
+			}
+			case ButtonTrain :
+			{
+				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.Train, trainingType->Slot, (*j));
+				}
+				break;
+			}
+			case ButtonUpgradeTo :
+			{
+				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.Upgrade, upgradeToType->Slot, *j);
+				}
+				break;
+			}
+			case ButtonResearch :
+			{
+				int researchId = UpgradeIdByIdent(button.ValueStr);
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.Research, researchId, *j);
+				}
+				break;
+			}
+			default:
+				break;
+		}
+	}
 }
 
 /**
@@ -93,6 +260,8 @@ static int CclDefineAiHelper(lua_State *l)
 	int subargs;
 	int k;
 
+
+	InitAiHelper(AiHelpers);
 #ifdef DEBUG
 	type = NULL;
 	upgrade = NULL;
@@ -114,24 +283,26 @@ static int CclDefineAiHelper(lua_State *l)
 		// Type build,train,research/upgrade.
 		//
 		if (!strcmp(value, "build")) {
-			what = 0;
+			what = -1;
 		} else if (!strcmp(value, "train")) {
-			what = 1;
+			what = -1;
 		} else if (!strcmp(value, "upgrade")) {
-			what = 2;
+			what = -1;
 		} else if (!strcmp(value, "research")) {
-			what = 3;
+			what = -1;
 		} else if (!strcmp(value, "unit-limit")) {
-			what = 4;
+			what = -1;
 		} else if (!strcmp(value, "unit-equiv")) {
 			what = 5;
 		} else if (!strcmp(value, "repair")) {
-			what = 6;
+			what = -1;
 		} else {
 			LuaError(l, "unknown tag: %s" _C_ value);
 			what = -1;
 		}
-
+		if (what == -1) {
+			continue;
+		}
 		//
 		// Get the base unit type, which could handle the action.
 		//
@@ -153,51 +324,14 @@ static int CclDefineAiHelper(lua_State *l)
 			lua_rawgeti(l, j + 1, k + 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			if (what == 3) {
-				upgrade = CUpgrade::Get(value);
-				if (!upgrade) {
-					LuaError(l, "unknown upgrade: %s" _C_ value);
-				}
-			} else if (what == 4) {
-				if (!strcmp("food", value)) {
-					cost = 0;
-				} else {
-					LuaError(l, "unknown limit: %s" _C_ value);
-				}
-			} else {
-				type = UnitTypeByIdent(value);
-				if (!type) {
-					LuaError(l, "unknown unittype: %s" _C_ value);
-				}
+			type = UnitTypeByIdent(value);
+			if (!type) {
+				LuaError(l, "unknown unittype: %s" _C_ value);
 			}
-
-			switch (what) {
-				case 0: // build
-					AiHelperInsert(AiHelpers.Build, type->Slot, base);
-					break;
-				case 1: // train
-					AiHelperInsert(AiHelpers.Train, type->Slot, base);
-					break;
-				case 2: // upgrade
-					AiHelperInsert(AiHelpers.Upgrade, type->Slot, base);
-					break;
-				case 3: // research
-					AiHelperInsert(AiHelpers.Research, (upgrade->ID), base);
-					break;
-				case 4: // unit-limit
-					AiHelperInsert(AiHelpers.UnitLimit, cost, base);
-					break;
-				case 5: // equivalence
-					AiHelperInsert(AiHelpers.Equiv, base->Slot, type);
-					AiNewUnitTypeEquiv(base, type);
-					break;
-				case 6: // repair
-					AiHelperInsert(AiHelpers.Repair, type->Slot, base);
-					break;
-			}
+			AiHelperInsert(AiHelpers.Equiv, base->Slot, type);
+			AiNewUnitTypeEquiv(base, type);
 		}
 	}
-
 	return 0;
 }
 
