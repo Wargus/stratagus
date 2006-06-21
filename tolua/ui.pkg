@@ -223,11 +223,11 @@ class Widget
 	virtual bool isVisible() const;
 
 	virtual void setBaseColor(const Color &color);
-	virtual const Color& getBaseColor() const;
+	virtual const Color &getBaseColor() const;
 	virtual void setForegroundColor(const Color &color);
-	virtual const Color& getForegroundColor() const;
+	virtual const Color &getForegroundColor() const;
 	virtual void setBackgroundColor(const Color &color);
-	virtual const Color& getBackgroundColor() const;
+	virtual const Color &getBackgroundColor() const;
 
 	static void setGlobalFont(CFont *font);
 	virtual void setForegroundColor(const Color &color);
@@ -357,6 +357,31 @@ class Label : public Widget
 	virtual void adjustSize();
 };
 
+class MultiLineLabel : public Widget
+{
+	MultiLineLabel();
+	MultiLineLabel(const std::string &caption);
+
+	virtual void setCaption(const std::string &caption);
+	virtual const std::string &getCaption() const;
+	virtual void setAlignment(unsigned int alignment);
+	virtual unsigned int getAlignment();
+	virtual void setVerticalAlignment(unsigned int alignment);
+	virtual unsigned int getVerticalAlignment();
+	virtual void setLineWidth(int width);
+	virtual int getLineWidth();
+	virtual void adjustSize();
+	virtual void draw(gcn::Graphics *graphics);
+
+	enum {
+		LEFT = 0,
+		CENTER,
+		RIGHT,
+		TOP,
+		BOTTOM
+	};
+};
+
 // FIXME Combine with ScrollArea in our own widget
 //class TextBox : public Widget
 //{
@@ -366,7 +391,7 @@ class Label : public Widget
 class TextField : public Widget
 {
 	TextField(const std::string &text);
-	virtual void setText(const std::string& text);
+	virtual void setText(const std::string &text);
 	virtual std::string &getText();
 };
 

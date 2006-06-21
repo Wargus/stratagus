@@ -70,8 +70,8 @@ public:
 	virtual void drawRectangle(const gcn::Rectangle &rectangle);
 	virtual void fillRectangle(const gcn::Rectangle &rectangle);
 
-	virtual void setColor(const gcn::Color& color) { mColor = color; }
-	virtual const gcn::Color& getColor() { return mColor; }
+	virtual void setColor(const gcn::Color &color) { mColor = color; }
+	virtual const gcn::Color &getColor() { return mColor; }
 
 private:
 	gcn::Color mColor;
@@ -184,6 +184,41 @@ public:
 	gcn::Image *backgroundImage;
 };
 
+class MultiLineLabel : public gcn::Widget
+{
+public:
+	MultiLineLabel();
+	MultiLineLabel(const std::string &caption);
+
+	virtual void setCaption(const std::string &caption);
+	virtual const std::string &getCaption() const;
+	virtual void setAlignment(unsigned int alignment);
+	virtual unsigned int getAlignment();
+	virtual void setVerticalAlignment(unsigned int alignment);
+	virtual unsigned int getVerticalAlignment();
+	virtual void setLineWidth(int width);
+	virtual int getLineWidth();
+	virtual void adjustSize();
+	virtual void draw(gcn::Graphics *graphics);
+	virtual void drawBorder(gcn::Graphics *graphics);
+
+	enum {
+		LEFT = 0,
+		CENTER,
+		RIGHT,
+		TOP,
+		BOTTOM
+	};
+
+private:
+	void wordWrap();
+
+	std::string mCaption;
+	std::vector<std::string> mTextRows;
+	unsigned int mAlignment;
+	unsigned int mVerticalAlignment;
+	int mLineWidth;
+};
 
 class ScrollingWidget : public gcn::ScrollArea
 {
