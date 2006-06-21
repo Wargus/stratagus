@@ -933,10 +933,10 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 			textY = 0;
 			break;
 		case CENTER:
-			textY = (this->getHeight() - this->mTextRows.size() * this->getFont()->getHeight()) / 2;
+			textY = (this->getHeight() - (int)this->mTextRows.size() * this->getFont()->getHeight()) / 2;
 			break;
 		case BOTTOM:
-			textY = this->getHeight() - this->mTextRows.size() * this->getFont()->getHeight();
+			textY = this->getHeight() - (int)this->mTextRows.size() * this->getFont()->getHeight();
 			break;
 		default:
 			throw GCN_EXCEPTION("Unknown alignment.");
