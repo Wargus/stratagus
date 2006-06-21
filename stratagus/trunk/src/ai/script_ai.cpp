@@ -59,7 +59,7 @@
 static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 	unsigned int n, CUnitType *base)
 {
-	assert(base != NULL);
+	Assert(base != NULL);
 
 	if (n >= table.size()) {
 		table.resize(n + 1);
@@ -94,7 +94,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string& list)
 		begin = end + 1;
 		end = list.find(",", begin);
 		if (!unitName.empty()) {
-			assert(unitName[0] != ',');
+			Assert(unitName[0] != ',');
 			res.push_back(UnitTypeByIdent(unitName.c_str()));
 		}
 	}
