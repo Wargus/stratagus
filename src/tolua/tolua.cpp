@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Mon Jun 19 21:02:03 2006.
+** Generated automatically by tolua++-1.0.7 on Tue Jun 20 22:15:17 2006.
 */
 
 #ifndef __cplusplus
@@ -45,37 +45,16 @@ void NetworkGamePrepareGameSettings(void);
 /* function to release collected object via destructor */
 #ifdef __cplusplus
 
-static int tolua_collect_DropDownWidget (lua_State* tolua_S)
+static int tolua_collect_Label (lua_State* tolua_S)
 {
- DropDownWidget* self = (DropDownWidget*) tolua_tousertype(tolua_S,1,0);
+ Label* self = (Label*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
 
-static int tolua_collect_ImageSlider (lua_State* tolua_S)
+static int tolua_collect_ImageRadioButton (lua_State* tolua_S)
 {
- ImageSlider* self = (ImageSlider*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_LuaActionListener (lua_State* tolua_S)
-{
- LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_Color (lua_State* tolua_S)
-{
- Color* self = (Color*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_ImageWidget (lua_State* tolua_S)
-{
- ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
+ ImageRadioButton* self = (ImageRadioButton*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -87,51 +66,9 @@ static int tolua_collect_vector_CUIButton_ (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_CMenuPanel (lua_State* tolua_S)
-{
- CMenuPanel* self = (CMenuPanel*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_CFiller (lua_State* tolua_S)
-{
- CFiller* self = (CFiller*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_CheckBox (lua_State* tolua_S)
-{
- CheckBox* self = (CheckBox*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_MenuScreen (lua_State* tolua_S)
-{
- MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_ScrollArea (lua_State* tolua_S)
-{
- ScrollArea* self = (ScrollArea*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
 static int tolua_collect_CResourceInfo (lua_State* tolua_S)
 {
  CResourceInfo* self = (CResourceInfo*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_StatBoxWidget (lua_State* tolua_S)
-{
- StatBoxWidget* self = (StatBoxWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -143,37 +80,9 @@ static int tolua_collect_vector_CFiller_ (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_Container (lua_State* tolua_S)
-{
- Container* self = (Container*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_ButtonWidget (lua_State* tolua_S)
-{
- ButtonWidget* self = (ButtonWidget*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_ScrollingWidget (lua_State* tolua_S)
-{
- ScrollingWidget* self = (ScrollingWidget*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
 static int tolua_collect_TextField (lua_State* tolua_S)
 {
  TextField* self = (TextField*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_ImageCheckBox (lua_State* tolua_S)
-{
- ImageCheckBox* self = (ImageCheckBox*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -185,16 +94,16 @@ static int tolua_collect_CUIButton (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_Windows (lua_State* tolua_S)
+static int tolua_collect_MultiLineLabel (lua_State* tolua_S)
 {
- Windows* self = (Windows*) tolua_tousertype(tolua_S,1,0);
+ MultiLineLabel* self = (MultiLineLabel*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
 
-static int tolua_collect_vector_CMenuPanel_ (lua_State* tolua_S)
+static int tolua_collect_CheckBox (lua_State* tolua_S)
 {
- vector<CMenuPanel>* self = (vector<CMenuPanel>*) tolua_tousertype(tolua_S,1,0);
+ CheckBox* self = (CheckBox*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -213,27 +122,6 @@ static int tolua_collect_CPlayer (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_ListBoxWidget (lua_State* tolua_S)
-{
- ListBoxWidget* self = (ListBoxWidget*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_Label (lua_State* tolua_S)
-{
- Label* self = (Label*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_RadioButton (lua_State* tolua_S)
-{
- RadioButton* self = (RadioButton*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
 static int tolua_collect_CColor (lua_State* tolua_S)
 {
  CColor* self = (CColor*) tolua_tousertype(tolua_S,1,0);
@@ -248,9 +136,128 @@ static int tolua_collect_NetworkHost (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_ImageRadioButton (lua_State* tolua_S)
+static int tolua_collect_ImageSlider (lua_State* tolua_S)
 {
- ImageRadioButton* self = (ImageRadioButton*) tolua_tousertype(tolua_S,1,0);
+ ImageSlider* self = (ImageSlider*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ListBoxWidget (lua_State* tolua_S)
+{
+ ListBoxWidget* self = (ListBoxWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_Color (lua_State* tolua_S)
+{
+ Color* self = (Color*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_CMenuPanel (lua_State* tolua_S)
+{
+ CMenuPanel* self = (CMenuPanel*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_CFiller (lua_State* tolua_S)
+{
+ CFiller* self = (CFiller*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ScrollArea (lua_State* tolua_S)
+{
+ ScrollArea* self = (ScrollArea*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_Windows (lua_State* tolua_S)
+{
+ Windows* self = (Windows*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_Container (lua_State* tolua_S)
+{
+ Container* self = (Container*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ButtonWidget (lua_State* tolua_S)
+{
+ ButtonWidget* self = (ButtonWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ImageCheckBox (lua_State* tolua_S)
+{
+ ImageCheckBox* self = (ImageCheckBox*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ScrollingWidget (lua_State* tolua_S)
+{
+ ScrollingWidget* self = (ScrollingWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_vector_CMenuPanel_ (lua_State* tolua_S)
+{
+ vector<CMenuPanel>* self = (vector<CMenuPanel>*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_DropDownWidget (lua_State* tolua_S)
+{
+ DropDownWidget* self = (DropDownWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_ImageWidget (lua_State* tolua_S)
+{
+ ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_RadioButton (lua_State* tolua_S)
+{
+ RadioButton* self = (RadioButton*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_LuaActionListener (lua_State* tolua_S)
+{
+ LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_MenuScreen (lua_State* tolua_S)
+{
+ MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_StatBoxWidget (lua_State* tolua_S)
+{
+ StatBoxWidget* self = (StatBoxWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -275,45 +282,47 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CUIButton");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"gcn::Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"MenuScreen");
+ tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"CMenuPanel");
  tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
  tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"ScrollArea");
  tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"NetworkHost");
+ tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"vector<CMenuPanel>");
- tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"CResourceInfo");
  tolua_usertype(tolua_S,"CUITimer");
@@ -7959,6 +7968,439 @@ static int tolua_stratagus_Label_adjustSize00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_new00
+static int tolua_stratagus_MultiLineLabel_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  MultiLineLabel* tolua_ret = (MultiLineLabel*)  new MultiLineLabel();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"MultiLineLabel");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_new00_local
+static int tolua_stratagus_MultiLineLabel_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  MultiLineLabel* tolua_ret = (MultiLineLabel*)  new MultiLineLabel();
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"MultiLineLabel");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_new01
+static int tolua_stratagus_MultiLineLabel_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+ {
+  MultiLineLabel* tolua_ret = (MultiLineLabel*)  new MultiLineLabel(caption);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"MultiLineLabel");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_stratagus_MultiLineLabel_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_new01_local
+static int tolua_stratagus_MultiLineLabel_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+ {
+  MultiLineLabel* tolua_ret = (MultiLineLabel*)  new MultiLineLabel(caption);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"MultiLineLabel");
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_stratagus_MultiLineLabel_new00_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setCaption of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_setCaption00
+static int tolua_stratagus_MultiLineLabel_setCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setCaption'",NULL);
+#endif
+ {
+  self->setCaption(caption);
+ tolua_pushcppstring(tolua_S,(const char*)caption);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getCaption of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_getCaption00
+static int tolua_stratagus_MultiLineLabel_getCaption00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const MultiLineLabel* self = (const MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getCaption'",NULL);
+#endif
+ {
+  const std::string tolua_ret = (const std::string)  self->getCaption();
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getCaption'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setAlignment of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_setAlignment00
+static int tolua_stratagus_MultiLineLabel_setAlignment00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int alignment = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setAlignment'",NULL);
+#endif
+ {
+  self->setAlignment(alignment);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setAlignment'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getAlignment of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_getAlignment00
+static int tolua_stratagus_MultiLineLabel_getAlignment00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getAlignment'",NULL);
+#endif
+ {
+  unsigned int tolua_ret = (unsigned int)  self->getAlignment();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getAlignment'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setVerticalAlignment of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_setVerticalAlignment00
+static int tolua_stratagus_MultiLineLabel_setVerticalAlignment00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int alignment = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setVerticalAlignment'",NULL);
+#endif
+ {
+  self->setVerticalAlignment(alignment);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setVerticalAlignment'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getVerticalAlignment of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_getVerticalAlignment00
+static int tolua_stratagus_MultiLineLabel_getVerticalAlignment00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getVerticalAlignment'",NULL);
+#endif
+ {
+  unsigned int tolua_ret = (unsigned int)  self->getVerticalAlignment();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getVerticalAlignment'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setLineWidth of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_setLineWidth00
+static int tolua_stratagus_MultiLineLabel_setLineWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setLineWidth'",NULL);
+#endif
+ {
+  self->setLineWidth(width);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setLineWidth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getLineWidth of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_getLineWidth00
+static int tolua_stratagus_MultiLineLabel_getLineWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getLineWidth'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getLineWidth();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getLineWidth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: adjustSize of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_adjustSize00
+static int tolua_stratagus_MultiLineLabel_adjustSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'adjustSize'",NULL);
+#endif
+ {
+  self->adjustSize();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'adjustSize'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: draw of class  MultiLineLabel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_MultiLineLabel_draw00
+static int tolua_stratagus_MultiLineLabel_draw00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MultiLineLabel",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"gcn::Graphics",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MultiLineLabel* self = (MultiLineLabel*)  tolua_tousertype(tolua_S,1,0);
+  gcn::Graphics* graphics = ((gcn::Graphics*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'draw'",NULL);
+#endif
+ {
+  self->draw(graphics);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'draw'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  TextField */
 #ifndef TOLUA_DISABLE_tolua_stratagus_TextField_new00
 static int tolua_stratagus_TextField_new00(lua_State* tolua_S)
@@ -13528,6 +13970,34 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"getCaption",tolua_stratagus_Label_getCaption00);
   tolua_function(tolua_S,"setCaption",tolua_stratagus_Label_setCaption00);
   tolua_function(tolua_S,"adjustSize",tolua_stratagus_Label_adjustSize00);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"MultiLineLabel","MultiLineLabel","Widget",tolua_collect_MultiLineLabel);
+#else
+ tolua_cclass(tolua_S,"MultiLineLabel","MultiLineLabel","Widget",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"MultiLineLabel");
+  tolua_function(tolua_S,"new",tolua_stratagus_MultiLineLabel_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_MultiLineLabel_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_MultiLineLabel_new00_local);
+  tolua_function(tolua_S,"new",tolua_stratagus_MultiLineLabel_new01);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_MultiLineLabel_new01_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_MultiLineLabel_new01_local);
+  tolua_function(tolua_S,"setCaption",tolua_stratagus_MultiLineLabel_setCaption00);
+  tolua_function(tolua_S,"getCaption",tolua_stratagus_MultiLineLabel_getCaption00);
+  tolua_function(tolua_S,"setAlignment",tolua_stratagus_MultiLineLabel_setAlignment00);
+  tolua_function(tolua_S,"getAlignment",tolua_stratagus_MultiLineLabel_getAlignment00);
+  tolua_function(tolua_S,"setVerticalAlignment",tolua_stratagus_MultiLineLabel_setVerticalAlignment00);
+  tolua_function(tolua_S,"getVerticalAlignment",tolua_stratagus_MultiLineLabel_getVerticalAlignment00);
+  tolua_function(tolua_S,"setLineWidth",tolua_stratagus_MultiLineLabel_setLineWidth00);
+  tolua_function(tolua_S,"getLineWidth",tolua_stratagus_MultiLineLabel_getLineWidth00);
+  tolua_function(tolua_S,"adjustSize",tolua_stratagus_MultiLineLabel_adjustSize00);
+  tolua_function(tolua_S,"draw",tolua_stratagus_MultiLineLabel_draw00);
+  tolua_constant(tolua_S,"LEFT",MultiLineLabel::LEFT);
+  tolua_constant(tolua_S,"CENTER",MultiLineLabel::CENTER);
+  tolua_constant(tolua_S,"RIGHT",MultiLineLabel::RIGHT);
+  tolua_constant(tolua_S,"TOP",MultiLineLabel::TOP);
+  tolua_constant(tolua_S,"BOTTOM",MultiLineLabel::BOTTOM);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"TextField","TextField","Widget",tolua_collect_TextField);
