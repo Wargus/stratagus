@@ -86,9 +86,6 @@ int CclInConfigFile;                  /// True while config file parsing
 int SaveGameLoading;                  /// If a Saved Game is Loading
 const char *CurrentLuaFile;                 /// Lua file currently being interpreted
 
-std::vector<char *> Tips;             /// Array of tips
-bool ShowTips;                        /// Show tips at start of level
-int CurrentTip;                       /// Current tip to display
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
@@ -734,7 +731,7 @@ StringDesc *NewStringDesc(const char *s)
 static ES_GameInfo StringToGameInfo(const char *s)
 {
 	int i;
-	const char *sgameinfo[] = {"Tips", "Objectives", NULL};
+	const char *sgameinfo[] = {"Objectives", NULL};
 
 	for (i = 0; sgameinfo[i]; ++i) {
 		if (!strcmp(s, sgameinfo[i])) {
@@ -1130,8 +1127,6 @@ char *EvalString(const StringDesc *s)
 			}
 		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
 			switch (s->D.GameInfoType) {
-				case ES_GameInfo_Tips :
-					return new_strdup(Tips[CurrentTip]);
 				case ES_GameInfo_Objectives :
 					res = GameIntro.Objectives[0];
 					if (!res) {
@@ -2089,60 +2084,6 @@ static int CclSetGodMode(lua_State *l)
 }
 
 /**
-**  Enable/disable Showing the tips at the start of a level.
-**
-**  @param l  Lua state.
-**
-**  @return      The old state of tips displayed.
-*/
-static int CclSetShowTips(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	ShowTips = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
-**  Set the current tip number.
-**
-**  @param l  Lua state.
-**
-**  @return     The old tip number.
-*/
-static int CclSetCurrentTip(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	CurrentTip = LuaToNumber(l, 1);
-	if (CurrentTip >= (int)Tips.size()) {
-		CurrentTip = 0;
-	}
-	return 0;
-}
-
-/**
-**  Add a new tip to the list of tips.
-**
-**  @param l  Lua state.
-**
-**  @todo  FIXME: Memory for tips is never freed.
-*/
-static int CclAddTip(lua_State *l)
-{
-	const char *str;
-
-	LuaCheckArgs(l, 1);
-	str = LuaToString(l, 1);
-	for (int i = 0; i < (int)Tips.size(); ++i) {
-		if (!strcmp(str, Tips[i])) {
-			break;
-		}
-	}
-	Tips.push_back(new_strdup(str));
-
-	return 0;
-}
-
-/**
 **  Set resource harvesting speed.
 **
 **  @param l  Lua state.
@@ -2579,10 +2520,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
 	lua_register(Lua, "SetGodMode", CclSetGodMode);
 
-	lua_register(Lua, "SetShowTips", CclSetShowTips);
-	lua_register(Lua, "SetCurrentTip", CclSetCurrentTip);
-	lua_register(Lua, "AddTip", CclAddTip);
-
 	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
 	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
 	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
@@ -2706,9 +2643,6 @@ void SavePreferences(void)
 	fprintf(fd, "SetLocalPlayerName(\"%s\")\n", LocalPlayerName);
 
 	// Game options
-	fprintf(fd, "SetShowTips(%s)\n", ShowTips ? "true" : "false");
-	fprintf(fd, "SetCurrentTip(%d)\n", CurrentTip);
-
 	fprintf(fd, "SetFogOfWar(%s)\n", !Map.NoFogOfWar ? "true" : "false");
 	fprintf(fd, "SetShowCommandKey(%s)\n", UI.ButtonPanel.ShowCommandKey ? "true" : "false");
 

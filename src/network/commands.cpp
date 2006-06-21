@@ -153,7 +153,6 @@ public:
 int CommandLogDisabled;            /// True if command log is off
 ReplayType ReplayGameType;         /// Replay game type
 static int DisabledLog;            /// Disabled log for replay
-static int DisabledShowTips;       /// Disabled show tips
 static CFile *LogFile;            /// Replay log file
 static unsigned long NextLogCycle; /// Next log cycle number
 static int InitReplay;             /// Initialize replay
@@ -744,12 +743,6 @@ int LoadReplay(const char *name)
 		CommandLogDisabled = 1;
 		DisabledLog = 1;
 	}
-	if (ShowTips) {
-		ShowTips = false;
-		DisabledShowTips = 1;
-	} else {
-		DisabledShowTips = 0;
-	}
 	GameObserve = true;
 	InitReplay = 1;
 
@@ -788,10 +781,6 @@ void CleanReplayLog(void)
 		CommandLogDisabled = 0;
 		DisabledLog = 0;
 // }
-	if (DisabledShowTips) {
-		ShowTips = true;
-		DisabledShowTips = 0;
-	}
 	GameObserve = false;
 	NetPlayers = 0;
 	ReplayGameType = ReplayNone;

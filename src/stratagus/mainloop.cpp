@@ -274,9 +274,6 @@ void GameMainLoop(void)
 
 	showtip = false;
 	RealVideoSyncSpeed = VideoSyncSpeed;
-	if (!IsNetworkGame()) {  // Don't show them for net play
-		showtip = ShowTips;
-	}
 
 	MultiPlayerReplayEachCycle();
 
@@ -376,12 +373,6 @@ void GameMainLoop(void)
 		}
 		if (!NetworkInSync) {
 			NetworkRecover(); // recover network
-		}
-
-		if (showtip) {
-			ProcessMenu("menu-tips", 1);
-			InterfaceState = IfaceStateNormal;
-			showtip = false;
 		}
 	}
 
