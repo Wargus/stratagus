@@ -438,19 +438,71 @@ function RunKeystrokeHelpMenu()
   menu:run(false)
 end
 
+local tips = {
+  "You can select all of your currently visible units of the same type by holding down the CTRL key and selecting a unit or by \"double clicking\" on a unit.",
+  "The more engineers you have collecting resources, the faster your economy will grow.",
+
+  "Use your engineers to repair damaged buildings.",
+  "Explore your surroundings early in the game.",
+
+
+  "Keep all engineers working. Use ALT-I to find idle engineers.",
+  "You can make units automatically cast spells by selecting a unit, holding down CTRL and clicking on the spell icon.  CTRL click again to turn off.",
+
+  -- Shift tips
+  "You can give an unit an order which is executed after it finishes the current work, if you hold the SHIFT key.",
+  "You can give way points, if you press the SHIFT key, while you click right for the move command.",
+  "You can order an engineer to build one building after the other, if you hold the SHIFT key, while you place the building.",
+  "You can build many of the same building, if you hold the ALT and SHIFT keys while you place the buildings.",
+
+  "Use CTRL-V or ALT-V to cycle through the viewport configuration, you can than monitor your base and lead an attack.",
+
+  "Know a useful tip?  Then add it here!",
+}
+local tipnumber = 0
+
 function RunTipsMenu()
   local menu = BosGameMenu()
-  menu:setSize(288, 256)
+  menu:setSize(384, 256)
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
     (Video.Height - menu:getHeight()) / 2)
 
-  menu:addLabel(_("Stratagus Tips"), 144, 11)
+  menu:addLabel(_("Stratagus Tips"), 192, 11)
+
+  local l = MultiLineLabel()
+  l:setFont(Fonts["game"])
+  l:setSize(356, 144)
+  l:setLineWidth(356)
+  menu:add(l, 14, 36)
+  -- FIXME: save tipnumber
+  function l:prevTip()
+    tipnumber = tipnumber - 1
+    if (tipnumber < 1) then
+      tipnumber = table.getn(tips)
+    end
+    self:setCaption(tips[tipnumber])
+  end
+  function l:nextTip()
+    tipnumber = tipnumber + 1
+    if (tipnumber > table.getn(tips)) then
+      tipnumber = 1
+    end
+    self:setCaption(tips[tipnumber])
+  end
+  if (tipnumber == 0) then
+    l:nextTip()
+  end
+
+  --FIXME: save setting
   menu:addCheckBox(_("Show tips at startup"), 14, 256 - 75,
     function() end)
-  menu:addSmallButton(_("~!Next Tip"), 14, 256 - 40,
-    function() end)
-  menu:addSmallButton(_("~!Close"), 168, 256 - 40,
+  menu:addSmallButton(_("~!OK"), 14, 256 - 40,
     function() menu:stop(0) end)
+  menu:addSmallButton(_("~!Previous Tip"), 14 + 106 + 11, 256 - 40,
+    function() l:prevTip() end)
+  menu:addSmallButton(_("~!Next Tip"), 14 + 106 + 11 + 106 + 11, 256 - 40,
+    function() l:nextTip() end)
+
 
   menu:run(false)
 end
