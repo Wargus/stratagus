@@ -76,9 +76,6 @@ ShowHealthDot()
 ShowManaDot()
 ShowNoFull()
 
---	Enable show tips at the start of a level
-SetShowTips(true)
-
 -------------------------------------------------------------------------------
 --	Game modification
 -------------------------------------------------------------------------------
@@ -219,7 +216,6 @@ Load("scripts/upgrade.lua")
 Load("scripts/dependency.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ai.lua")
-Load("scripts/tips.lua")
 Load("scripts/ranks.lua")
 Load("scripts/cheats.lua")
 Load("scripts/maps.lua")
