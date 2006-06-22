@@ -33,9 +33,11 @@ function RunBriefingMenu(objectivestext, briefingtext)
   local b
 
   if objectivestext == nil then
+    current_objective = default_objective
     return
   end
 
+  current_objective = objectivestext
   objectivestext = {_("Objectives :"), objectivestext}
 
   menu = BosMenu(_("Briefing level 1 The river"))
@@ -63,7 +65,7 @@ function CreateMapStep(map, objectivestext, briefingtext)
    function RunCampaignMap()
      RunBriefingMenu(objectivestext, briefingtext)
      Load(map) -- Needed to force the load of the presentation
-     RunMap(map) 
+     RunMap(map, objectivestext) 
    end
    return RunCampaignMap
 end

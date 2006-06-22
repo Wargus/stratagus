@@ -222,4 +222,6 @@ Load("scripts/maps.lua")
 
 Load("preferences2.lua")
 
+default_objective = "Eliminate your ennemies."
+
 print("... ready!")
