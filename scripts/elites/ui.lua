@@ -29,11 +29,6 @@
 --      $Id$
 
 
-function AddFiller(ui, graphic, position)
-	table.insert(ui, "filler")
-	table.insert(ui, {File = graphic, Pos = position})
-end
-
 function DefineElitePanels(info_panel_x, info_panel_y) 
    local min_damage = Max(1, Div(ActiveUnitVar("PiercingDamage"), 2))
    local max_damage = Add(ActiveUnitVar("PiercingDamage"), ActiveUnitVar("BasicDamage"))
@@ -175,6 +170,7 @@ function AddFiller(file, x, y)
 	UI.Fillers:push_back(b)
 end
 
+UI.Fillers:clear()
 AddFiller("elites/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
 AddFiller("elites/ui/ui_" .. Video.Width .. "_bpanel.png",
 	Video.Width - 200, 336 - 8 - 8)
@@ -202,6 +198,7 @@ function AddSelectedButton(x, y)
 	UI.SelectedButtons:push_back(b)
 end
 
+UI.SelectedButtons:clear()
 AddSelectedButton(Video.Width - 200 +  13, 152 + 16)
 AddSelectedButton(Video.Width - 200 +  28, 152 + 16)
 AddSelectedButton(Video.Width - 200 +  43, 152 + 16)
@@ -230,6 +227,7 @@ function AddTrainingButton(x, y)
 	UI.TrainingButtons:push_back(b)
 end
 
+UI.TrainingButtons:clear()
 AddTrainingButton(Video.Width - 200 + 13, 152 + 91)
 AddTrainingButton(Video.Width - 200 + 28, 152 + 91)
 AddTrainingButton(Video.Width - 200 + 43, 152 + 91)
@@ -257,6 +255,7 @@ function AddTransportingButton(x, y)
 	UI.TransportingButtons:push_back(b)
 end
 
+UI.TransportingButtons:clear()
 AddTransportingButton(Video.Width - 200 + 13, 152 + 91)
 AddTransportingButton(Video.Width - 200 + 28, 152 + 91)
 AddTransportingButton(Video.Width - 200 + 43, 152 + 91)
@@ -272,6 +271,7 @@ function AddButtonPanelButton(x, y)
 	UI.ButtonPanel.Buttons:push_back(b)
 end
 
+UI.ButtonPanel.Buttons:clear()
 AddButtonPanelButton(Video.Width - 177 + 4, 340 - 12)
 AddButtonPanelButton(Video.Width - 122 + 4, 340 - 12)
 AddButtonPanelButton(Video.Width - 67  + 4, 340 - 12)
@@ -370,6 +370,7 @@ function AddMenuPanel(ident, file)
 	UI.MenuPanels:push_back(b)
 end
 
+UI.MenuPanels:clear()
 AddMenuPanel("panel1", "general/panel_1.png")
 AddMenuPanel("panel2", "general/panel_2.png")
 AddMenuPanel("panel3", "general/panel_3.png")
