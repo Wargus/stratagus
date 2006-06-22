@@ -355,8 +355,7 @@ function RunLoadGameMenu(s)
             currentCampaign = nil
             return
          end
-         Load(currentCampaign)
-         RunCampaign()
+         RunCampaign(currentCampaign)
       end
     menu:stop()
   end

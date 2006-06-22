@@ -69,14 +69,20 @@ function CreateMapStep(map, objectivestext, briefingtext)
 end
 
 
-function RunCampaign()
+function RunCampaign(campaign)
+  Load(campaign)
+  currentCampaign = campaign
+  if position == nil then
+    position = 1
+  end
   while position < 10 do
     campaign_steps[position]()
     if GameResult == GameVictory then
        position = position + 1
     elseif GameResult == GameDefeat then
        position = position
-    else 
+    else
+      currentCampaign = nil
       return
     end
   end
@@ -93,8 +99,7 @@ function RunCampaignsMenu(s)
   local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200, ListDirsInDirectory)
   function startgamebutton(s)
     print("Starting campaign")
-    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
-    RunCampaign()
+    RunCampaign("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()
   end
   menu:addButton(_("Start"), 100, 300, startgamebutton)
