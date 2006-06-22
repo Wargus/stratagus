@@ -152,6 +152,7 @@ function SetVideoSize(width, height)
   Video:ResizeScreen(width, height)
   bckground:Resize(Video.Width, Video.Height)
   backgroundWidget = ImageWidget(bckground)
+  Load("scripts/ui.lua")
   SavePreferences()
 end
 
