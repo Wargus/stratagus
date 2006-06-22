@@ -155,12 +155,6 @@ public:
 	char *Names;       /// Names
 };
 
-// ----------------------------------------------------------------------------
-
-extern std::vector<char *> Tips;  /// Array of tips
-extern bool ShowTips;             /// Show tips at start of level
-extern int CurrentTip;            /// Current tip to display
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/

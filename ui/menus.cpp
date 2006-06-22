@@ -100,14 +100,6 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl);
 static void MultiPlayerGameMenu(void);
 static void GameMenuExit(void);
 
-// Tips
-static void TipsInit(Menu *menu);
-static void TipsExit(Menu *menu);
-static void TipsShowTipsCheckbox(Menuitem *mi);
-static void TipsShowTipsText(Menuitem *mi);
-static void TipsNextTip(void);
-static void TipsPreviousTip(void);
-
 // Custom game setup
 static void GameSetupInit(Menu *menu);
 static void ScenSelectMenu(void);
@@ -174,9 +166,6 @@ static void DiplomacyInit(Menu *menu);
 static void DiplomacyExit(Menu *menu);
 static void DiplomacyWait(Menuitem *mi);
 static void DiplomacyOk(void);
-
-// Help
-static void TipsMenu(void);
 
 // Save
 static void SaveGameOk(void);
@@ -903,14 +892,6 @@ void InitMenuFuncHash(void)
 	HASHADD(MultiPlayerGameMenu,"multi-player-game-menu");
 	HASHADD(GameMenuExit,"game-menu-exit");
 
-// Tips
-	HASHADD(TipsInit,"tips-init");
-	HASHADD(TipsExit,"tips-exit");
-	HASHADD(TipsShowTipsCheckbox,"tips-show-tips-checkbox");
-	HASHADD(TipsShowTipsText,"tips-show-tips-text");
-	HASHADD(TipsNextTip,"tips-next-tip");
-	HASHADD(TipsPreviousTip,"tips-previous-tip");
-
 // Custom game setup
 	HASHADD(GameSetupInit,"game-setup-init");
 	HASHADD(ScenSelectMenu,"scen-select-menu");
@@ -981,9 +962,6 @@ void InitMenuFuncHash(void)
 	HASHADD(DiplomacyExit,"diplomacy-exit");
 	HASHADD(DiplomacyWait,"diplomacy-wait");
 	HASHADD(DiplomacyOk,"diplomacy-ok");
-
-// Help
-	HASHADD(TipsMenu,"tips-menu");
 
 // Save
 	HASHADD(SaveGameOk,"save-game-ok");
@@ -1560,95 +1538,6 @@ static void SaveReplayOk(void)
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
-}
-
-/**
-** Tips menu
-*/
-static void TipsMenu(void)
-{
-	ProcessMenu("menu-tips", 0);
-}
-
-/**
-** Cycle to the next tip
-*/
-static void TipsCycleNextTip(void)
-{
-	++CurrentTip;
-	if (CurrentTip >= (int)Tips.size()) {
-		CurrentTip = 0;
-	}
-}
-
-/**
-**  Cycle to the previous tip
-*/
-static void TipsCyclePreviousTip(void)
-{
-	if (CurrentTip != 0) {
-		--CurrentTip;
-	} else {
-		CurrentTip = Tips.size() - 1;
-	}
-}
-
-/**
-**  Tips menu init callback
-*/
-static void TipsInit(Menu *menu)
-{
-}
-
-/**
-**  Tips menu exit callback
-*/
-static void TipsExit(Menu *menu)
-{
-	TipsCycleNextTip();
-	SavePreferences();
-}
-
-/**
-**  Show tips at startup gem callback
-*/
-static void TipsShowTipsCheckbox(Menuitem *mi)
-{
-	if (mi->Menu->Items[1].D.Checkbox.Checked) {
-		ShowTips = true;
-	} else {
-		ShowTips = false;
-	}
-}
-
-/**
-**  Show tips at startup text callback
-*/
-static void TipsShowTipsText(Menuitem *mi)
-{
-	if (!mi->Menu->Items[1].D.Checkbox.Checked) {
-		ShowTips = true;
-		mi->Menu->Items[1].D.Checkbox.Checked = 1;
-	} else {
-		ShowTips = false;
-		mi->Menu->Items[1].D.Checkbox.Checked = 0;
-	}
-}
-
-/**
-** Tips menu next tip button callback
-*/
-static void TipsNextTip(void)
-{
-	TipsCycleNextTip();
-}
-
-/**
-** Tips menu previous tip button callback
-*/
-static void TipsPreviousTip(void)
-{
-	TipsCyclePreviousTip();
 }
 
 /**

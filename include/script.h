@@ -129,7 +129,6 @@ typedef enum {
 } EString; /// All possible value for a string.
 
 typedef enum {
-	ES_GameInfo_Tips = 0,        /// Current tip.
 	ES_GameInfo_Objectives       /// All Objectives of the game.
 } ES_GameInfo; /// All possible value for a game info string.
 
