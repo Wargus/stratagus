@@ -32,18 +32,23 @@
 --  Define the campaign
 --
 
-function CreateMapStep(map)
-   function RunCampaignMap()
-     Load(map) -- Needed to force the load of the presentation
-     RunMap(map) 
-   end
-   return RunCampaignMap
-end
-
 currentCampaign = "campaigns/elites/campaign.lua"
 
-local steps = {
-  CreateMapStep("campaigns/elites/level01.smp"),
+local briefingtext1 = {
+  "You're the last remaining free leader. ",
+  "Defend your small outpost in this crucial battle. ",
+  "Your first enemy, Imperial general Szarin, ",
+  "knows that victory will spell the end of ",
+  "yours. You must lead your war-weary troops ", 
+  "and stop him at all costs."
+}
+
+if position == nil then
+  position = 1
+end
+
+campaign_steps = {
+  CreateMapStep("campaigns/elites/level01.smp", "Kill them all !", briefingtext1),
   CreateMapStep("campaigns/elites/level02.smp"),
   CreateMapStep("campaigns/elites/level03.smp"),
   CreateMapStep("campaigns/elites/level04.smp"),
@@ -54,32 +59,5 @@ local steps = {
   CreateMapStep("campaigns/elites/level09.smp"),
   CreateMapStep("campaigns/elites/level10.smp")}
 
-if position == nil then
-  position = 1
-else
-  -- We just finished a loaded game.
-  if GameResult == GameVictory then
-    position = position + 1
-  elseif GameResult == GameDefeat then
-    position = position
-  else 
-    return
-  end
-end
 
-function RunCampaign()
-  while position < 10 do
-    steps[position]()
-    if GameResult == GameVictory then
-       position = position + 1
-    elseif GameResult == GameDefeat then
-       position = position
-    else 
-      return
-    end
-  end
-end
-RunCampaign()
-
-currentCampaign = nil
 

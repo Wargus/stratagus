@@ -334,22 +334,6 @@ function RunReplayMenu(s)
   menu:run()
 end
 
-function RunCampaignsMenu(s)
-  local menu
-  local b
-
-  menu = BosMenu(_("List of Campaigns"))
-
-  local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200, ListDirsInDirectory)
-  function startgamebutton(s)
-    print("Starting campaign")
-    Load("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
-    menu:stop()
-  end
-  menu:addButton(_("Start"), 100, 300, startgamebutton)
-
-  menu:run()
-end
 
 function RunLoadGameMenu(s)
   local menu
@@ -363,7 +347,16 @@ function RunLoadGameMenu(s)
       StartSavedGame("~save/" .. browser:getSelectedItem())
       RunResultsMenu()
       if not (currentCampaign == nil) then
+         if GameResult == GameVictory then
+            position = position + 1
+         elseif GameResult == GameDefeat then
+            position = position
+         else
+            currentCampaign = nil
+            return
+         end
          Load(currentCampaign)
+         RunCampaign()
       end
     menu:stop()
   end
@@ -392,6 +385,7 @@ Load("scripts/menus/options.lua")
 Load("scripts/menus/credits.lua")
 Load("scripts/menus/widgetsdemo.lua")
 Load("scripts/menus/game.lua")
+Load("scripts/menus/campaigns.lua")
 
 function BuildMainMenu(menu)
   local x = Video.Width / 2 - 100
