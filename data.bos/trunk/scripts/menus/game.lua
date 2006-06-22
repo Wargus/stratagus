@@ -33,6 +33,8 @@ function BosGameMenu()
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
     (Video.Height - menu:getHeight()) / 2)
   menu:setBorderSize(1)
+  menu:setOpaque(true)
+  menu:setBaseColor(dark)
 
   function menu:addLabel(text, x, y)
     local label = Label(text)
@@ -509,9 +511,21 @@ end
 
 function RunObjectivesMenu()
   local menu = BosGameMenu()
+  menu:setSize(384, 256)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
 
-  menu:addLabel(_("Objectives"), 128, 11)
-  menu:addButton(_("~!OK"), 16, 248,
+  menu:addLabel(_("Objectives"), 192, 11)
+
+  local l = MultiLineLabel()
+  l:setFont(Fonts["game"])
+  l:setSize(356, 144)
+  l:setLineWidth(356)
+  menu:add(l, 14, 36)
+
+  --FIXME: l:setCaption()
+
+  menu:addButton(_("~!OK"), 80, 256 - 40,
     function() menu:stop(0) end)
 
   menu:run(false)
