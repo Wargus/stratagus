@@ -4,15 +4,12 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---  Invasion - Battle of Survival                  
---   A GPL'd futuristic RTS game
+--      Invasion - Battle of Survival                  
+--       A GPL'd futuristic RTS game
 --
---  Invasion - Battle of Survival                  
---   A GPL'd futuristic RTS game
+--      campaign.lua  -  Define the Elite campaign 1.
 --
---  campaign.lua  -  Define the Elite campaign 1.
---
---  (c) Copyright 2005-2006 by Lois Taulelle and François Beerten
+--      (c) Copyright 2005-2006 by Lois Taulelle and François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -32,8 +29,6 @@
 --  Define the campaign
 --
 
-currentCampaign = "campaigns/elites/campaign.lua"
-
 local briefingtext1 = {
   "You're the last remaining free leader. ",
   "Defend your small outpost in this crucial battle. ",
@@ -42,10 +37,6 @@ local briefingtext1 = {
   "yours. You must lead your war-weary troops ", 
   "and stop him at all costs."
 }
-
-if position == nil then
-  position = 1
-end
 
 campaign_steps = {
   CreateMapStep("campaigns/elites/level01.smp", "Kill them all !", briefingtext1),
@@ -58,6 +49,4 @@ campaign_steps = {
   CreateMapStep("campaigns/elites/level08.smp"),
   CreateMapStep("campaigns/elites/level09.smp"),
   CreateMapStep("campaigns/elites/level10.smp")}
-
-
 
