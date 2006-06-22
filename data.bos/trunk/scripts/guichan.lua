@@ -239,7 +239,12 @@ function RunResultsMenu()
   menu:run()
 end
 
-function RunMap(map)
+function RunMap(map, objective)
+  if objective == nil then
+    current_objective = default_objective
+  else
+    current_objective = objective
+  end
   StartMap(map)
   RunResultsMenu(s)
 end
