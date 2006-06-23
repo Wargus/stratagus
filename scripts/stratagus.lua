@@ -184,11 +184,11 @@ SetAllPlayersTotalUnitLimit(400)
 function SinglePlayerTriggers()
   AddTrigger(
     function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
-    function() return ActionDefeat() end)
+    function() return StopGame(GameDefeat) end)
 
   AddTrigger(
     function() return GetNumOpponents(GetThisPlayer()) == 0 end,
-    function() return ActionVictory() end)   
+    function() return StopGame(GameVictory) end)   
 end
 
 -------------------------------------------------------------------------------
@@ -222,6 +222,6 @@ Load("scripts/maps.lua")
 
 Load("preferences2.lua")
 
-default_objective = "Eliminate your ennemies."
+default_objective = _("Eliminate your ennemies.")
 
 print("... ready!")
