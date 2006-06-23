@@ -508,10 +508,12 @@ $void StartSavedGame(const char *str);
 void StartSavedGame(const char *str);
 
 $#include "campaign.h"
-enum GameResults {
+typedef enum {
 	GameNoResult,
 	GameVictory,
 	GameDefeat,
 	GameDraw
-} GameResult;
-
+} GameResults; 
+GameResults GameResult;
+$void StopGame(GameResults result);
+void StopGame(GameResults result);
