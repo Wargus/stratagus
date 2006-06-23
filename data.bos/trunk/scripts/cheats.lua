@@ -7,9 +7,9 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---      wc2.lua - WC2 compatibility level
+--      cheats.lua - Cheats
 --
---      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
+--      (c) Copyright 2001-2006 by Lutz Sammer and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -105,13 +105,13 @@ function HandleCheats(str)
     end
 
   elseif (str == "victory") then
-    ActionVictory()
+    StopGame(GameVictory)
 
   elseif (str == "defeat") then
-    ActionDefeat()
+    StopGame(GameDefeat)
 
   elseif (str == "draw") then
-    ActionDraw()
+    StopGame(GameDraw)
 
   elseif (str == "godcheat") then
     if (godcheat) then
