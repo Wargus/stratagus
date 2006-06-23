@@ -36,11 +36,13 @@ function BosGameMenu()
   menu:setOpaque(true)
   menu:setBaseColor(dark)
 
-  function menu:addLabel(text, x, y)
+  function menu:addLabel(text, x, y, font)
     local label = Label(text)
-    label:setFont(Fonts["large"])
+    if (font == nil) then font = Fonts["large"] end
+    label:setFont(font)
     label:adjustSize()
     self:add(label, x - label:getWidth() / 2, y)
+    return label
   end
 
   function menu:addSmallButton(caption, x, y, callback)
@@ -50,6 +52,7 @@ function BosGameMenu()
     b:setBackgroundColor(dark)
     b:setBaseColor(dark)
     menu:add(b, x, y)
+    return b
   end
 
   function menu:addButton(caption, x, y, callback)
@@ -211,17 +214,21 @@ function RunGameOptionsMenu()
 
   menu:addLabel(_("Game Options"), 128, 11)
   menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
-    function() end)
+    function() RunSoundOptionsMenu() end)
   menu:addButton(_("Speeds (~<F8~>)"), 16, 40 + (36 * 1),
     function() RunGameSpeedOptionsMenu() end)
   menu:addButton(_("Preferences (~<F9~>)"), 16, 40 + (36 * 2),
     function() RunPreferencesMenu() end)
   menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 3),
-    function() end)
+    function() RunDiplomacyMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
     function() menu:stop(0) end)
 
   menu:run(false)
+end
+
+function RunSoundOptionsMenu()
+  --FIXME:
 end
 
 function RunGameSpeedOptionsMenu()
@@ -270,6 +277,35 @@ function RunPreferencesMenu()
   ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
     function() SavePreferences(); menu:stop(0) end)
+
+  menu:run(false)
+end
+
+function RunDiplomacyMenu()
+  local l
+  local menu = BosGameMenu()
+  menu:setSize(384, 384)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
+
+  menu:addLabel(_("Diplomacy"), 192, 11)
+
+  menu:addLabel(_("Allied"), 136, 30, Fonts["game"])
+  menu:addLabel(_("Enemy"), 208, 30, Fonts["game"])
+  menu:addLabel(_("Shared Vision"), 310, 30, Fonts["game"])
+
+  for i=1,14 do
+    l = Label(Players[i - 1].Name)
+    l:setFont(Fonts["game"])
+    l:adjustSize()
+    menu:add(l, 16, (21 * i) + 27)
+    menu:addCheckBox("", 126, (21 * i) + 24, function() end)
+    menu:addCheckBox("", 198, (21 * i) + 24, function() end)
+    menu:addCheckBox("", 300, (21 * i) + 24, function() end)
+  end
+
+  menu:addSmallButton(_("~!OK"), 75, 384 - 40, function() menu:stop() end)
+  menu:addSmallButton(_("~!Cancel"), 195, 384 - 40, function() menu:stop() end)
 
   menu:run(false)
 end
