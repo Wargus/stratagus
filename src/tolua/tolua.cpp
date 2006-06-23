@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Thu Jun 22 20:28:46 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Jun 23 13:12:05 2006.
 */
 
 #ifndef __cplusplus
@@ -36,6 +36,7 @@ void StartEditor(const char *str);
 void StartReplay(const char *str);
 void StartSavedGame(const char *str);
 #include "campaign.h"
+void StopGame(GameResults result);
 void InitNetwork1(void);
 void ExitNetwork1(void);
 int GetNetworkState() {return (int)NetLocalState;}
@@ -10049,6 +10050,34 @@ static int tolua_set_GameResult(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: StopGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StopGame00
+static int tolua_stratagus_StopGame00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  GameResults result = ((GameResults) (int)  tolua_tonumber(tolua_S,1,0));
+ {
+  StopGame(result);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StopGame'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: InitNetwork1 */
 #ifndef TOLUA_DISABLE_tolua_stratagus_InitNetwork100
 static int tolua_stratagus_InitNetwork100(lua_State* tolua_S)
@@ -14230,6 +14259,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_constant(tolua_S,"GameDefeat",GameDefeat);
  tolua_constant(tolua_S,"GameDraw",GameDraw);
  tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
+ tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
  tolua_function(tolua_S,"InitNetwork1",tolua_stratagus_InitNetwork100);
  tolua_function(tolua_S,"ExitNetwork1",tolua_stratagus_ExitNetwork100);
  tolua_function(tolua_S,"NetworkSetupServerAddress",tolua_stratagus_NetworkSetupServerAddress00);

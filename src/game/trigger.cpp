@@ -493,15 +493,23 @@ static int CclGetTimer(lua_State *l)
 -- Actions
 ---------------------------------------------------------------------------*/
 /**
+**  Stop the running game with a given result
+*/
+void StopGame(GameResults result)
+{
+	GameResult = result;
+	GamePaused = true;
+	GameRunning = false;
+}
+
+/**
 **  Action condition player wins.
 */
 static int CclActionVictory(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	GameResult = GameVictory;
-	GamePaused = true;
-	GameRunning = false;
+	StopGame(GameVictory);
 	return 0;
 }
 
@@ -512,9 +520,7 @@ static int CclActionDefeat(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	GameResult = GameDefeat;
-	GamePaused = true;
-	GameRunning = false;
+	StopGame(GameDefeat);
 	return 0;
 }
 
@@ -525,9 +531,7 @@ static int CclActionDraw(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	GameResult = GameDraw;
-	GamePaused = true;
-	GameRunning = false;
+	StopGame(GameDraw);
 	return 0;
 }
 
