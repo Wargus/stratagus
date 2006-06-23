@@ -205,6 +205,15 @@ class Color
 	int a;
 };
 
+class Graphics
+{
+	enum {
+		LEFT = 0,
+		CENTER,
+		RIGHT
+	};
+};
+
 class Widget 
 {
 	virtual void setWidth(int width);
@@ -354,6 +363,8 @@ class Label : public Widget
 	Label(const std::string &caption);
 	const std::string &getCaption() const;
 	void setCaption(const std::string &caption);
+	virtual void setAlignment(unsigned int alignment);
+	virtual unsigned int getAlignment();
 	virtual void adjustSize();
 };
 
