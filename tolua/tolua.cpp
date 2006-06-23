@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Tue Jun 20 22:15:17 2006.
+** Generated automatically by tolua++-1.0.7 on Thu Jun 22 20:28:46 2006.
 */
 
 #ifndef __cplusplus
@@ -275,59 +275,60 @@ static int tolua_collect_Slider (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CPlayerColorGraphic");
- tolua_usertype(tolua_S,"Label");
+ tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"ImageRadioButton");
  tolua_usertype(tolua_S,"vector<CUIButton>");
  tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"CPreference");
  tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"CPreference");
- tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CUIButton");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"gcn::Graphics");
+ tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CStatusLine");
  tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"CMinimap");
- tolua_usertype(tolua_S,"StatBoxWidget");
+ tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"NetworkHost");
+ tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CMenuPanel");
  tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
  tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"ScrollArea");
  tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"MenuScreen");
+ tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"vector<CMenuPanel>");
- tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"gcn::Graphics");
  tolua_usertype(tolua_S,"MultiLineLabel");
- tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"CResourceInfo");
  tolua_usertype(tolua_S,"CUITimer");
- tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"RadioButton");
+ tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Slider");
 }
@@ -7937,6 +7938,71 @@ static int tolua_stratagus_Label_setCaption00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: setAlignment of class  Label */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Label_setAlignment00
+static int tolua_stratagus_Label_setAlignment00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Label",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Label* self = (Label*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int alignment = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setAlignment'",NULL);
+#endif
+ {
+  self->setAlignment(alignment);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setAlignment'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getAlignment of class  Label */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Label_getAlignment00
+static int tolua_stratagus_Label_getAlignment00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Label",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Label* self = (Label*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getAlignment'",NULL);
+#endif
+ {
+  unsigned int tolua_ret = (unsigned int)  self->getAlignment();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getAlignment'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: adjustSize of class  Label */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Label_adjustSize00
 static int tolua_stratagus_Label_adjustSize00(lua_State* tolua_S)
@@ -13753,6 +13819,12 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"b",tolua_get_Color_b,tolua_set_Color_b);
   tolua_variable(tolua_S,"a",tolua_get_Color_a,tolua_set_Color_a);
  tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"Graphics","Graphics","",NULL);
+ tolua_beginmodule(tolua_S,"Graphics");
+  tolua_constant(tolua_S,"LEFT",Graphics::LEFT);
+  tolua_constant(tolua_S,"CENTER",Graphics::CENTER);
+  tolua_constant(tolua_S,"RIGHT",Graphics::RIGHT);
+ tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"Widget","Widget","",NULL);
  tolua_beginmodule(tolua_S,"Widget");
   tolua_function(tolua_S,"setWidth",tolua_stratagus_Widget_setWidth00);
@@ -13969,6 +14041,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_Label_new00_local);
   tolua_function(tolua_S,"getCaption",tolua_stratagus_Label_getCaption00);
   tolua_function(tolua_S,"setCaption",tolua_stratagus_Label_setCaption00);
+  tolua_function(tolua_S,"setAlignment",tolua_stratagus_Label_setAlignment00);
+  tolua_function(tolua_S,"getAlignment",tolua_stratagus_Label_getAlignment00);
   tolua_function(tolua_S,"adjustSize",tolua_stratagus_Label_adjustSize00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
