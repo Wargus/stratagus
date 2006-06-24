@@ -459,7 +459,7 @@ public:
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(false)
+	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(true)
 	{
 		AutoCastBorderColorRGB.r = 0;
 		AutoCastBorderColorRGB.g = 0;
