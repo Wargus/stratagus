@@ -59,8 +59,8 @@ static bool MusicPlaying;        /// flag true if playing music
 static int EffectsVolume = 128;  /// effects sound volume
 static int MusicVolume = 128;    /// music volume
 
-static bool MusicEnabled;
-static bool EffectsEnabled;
+static bool MusicEnabled = true;
+static bool EffectsEnabled = true;
 
 	/// Channels for sound effects and unit speach
 struct SoundChannel {
@@ -541,7 +541,8 @@ int PlaySample(CSample *sample)
 
 	SDL_LockAudio();
 
-	if (EffectsEnabled && sample && NextFreeChannel != MaxChannels) {
+	if (SoundEnabled() && EffectsEnabled && sample &&
+			NextFreeChannel != MaxChannels) {
 		channel = FillChannel(sample, EffectsVolume, 0);
 	}
 
@@ -595,9 +596,7 @@ int GetEffectsVolume(void)
 */
 void SetEffectsEnabled(bool enabled)
 {
-	if (SoundEnabled()) {
-		EffectsEnabled = enabled;
-	}
+	EffectsEnabled = enabled;
 }
 
 /**
@@ -605,7 +604,7 @@ void SetEffectsEnabled(bool enabled)
 */
 bool IsEffectsEnabled(void)
 {
-	return SoundEnabled() && EffectsEnabled;
+	return EffectsEnabled;
 }
 
 /*----------------------------------------------------------------------------
@@ -654,7 +653,7 @@ int PlayMusic(const char *file)
 	char buffer[PATH_MAX];
 	CSample *sample;
 
-	if (!IsMusicEnabled()) {
+	if (!SoundEnabled() || !IsMusicEnabled()) {
 		return -1;
 	}
 
@@ -735,13 +734,11 @@ int GetMusicVolume(void)
 */
 void SetMusicEnabled(bool enabled)
 {
-	if (SoundEnabled()) {
-		if (enabled) {
-			MusicEnabled = true;
-		} else {
-			MusicEnabled = false;
-			StopMusic();
-		}
+	if (enabled) {
+		MusicEnabled = true;
+	} else {
+		MusicEnabled = false;
+		StopMusic();
 	}
 }
 
@@ -750,7 +747,7 @@ void SetMusicEnabled(bool enabled)
 */
 bool IsMusicEnabled(void)
 {
-	return SoundEnabled() && MusicEnabled;
+	return MusicEnabled;
 }
 
 /**
@@ -824,8 +821,6 @@ int InitSound(void)
 		return 1;
 	}
 	SoundInitialized = true;
-	EffectsEnabled = true;
-	MusicEnabled = true;
 
 	// ARI: The following must be done here to allow sound to work in
 	// pre-start menus!
