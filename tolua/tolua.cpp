@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Jun 23 19:58:46 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Jun 24 13:19:02 2006.
 */
 
 #ifndef __cplusplus
@@ -13562,6 +13562,34 @@ static int tolua_stratagus__00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: Exit */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Exit00
+static int tolua_stratagus_Exit00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int err = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  Exit(err);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Exit'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 {
@@ -14448,6 +14476,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"GameTranslation",tolua_get_GameTranslation,tolua_set_GameTranslation);
  tolua_function(tolua_S,"SaveGame",tolua_stratagus_SaveGame00);
  tolua_function(tolua_S,"_",tolua_stratagus__00);
+ tolua_function(tolua_S,"Exit",tolua_stratagus_Exit00);
  tolua_endmodule(tolua_S);
  return 1;
 }

@@ -69,3 +69,5 @@ extern void SaveGame(const char *filename);
 
 extern const char *Translate @ _(const char *str);
 
+void Exit(int err);
+
