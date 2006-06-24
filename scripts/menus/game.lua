@@ -311,40 +311,97 @@ function RunDiplomacyMenu()
   local allied = {}
   local enemy = {}
   local sharedvision = {}
+  local j = 0
 
+  for i=0,14 do
+    if (Players[i].Type ~= PlayerNobody and ThisPlayer.Index ~= i) then
+      j = j + 1
 
-  for i=1,14 do
-    local l = Label(Players[i - 1].Name)
-    l:setFont(Fonts["game"])
-    l:adjustSize()
-    menu:add(l, 16, (21 * i) + 27)
+      local l = Label(Players[i].Name)
+      l:setFont(Fonts["game"])
+      l:adjustSize()
+      menu:add(l, 16, (21 * j) + 27)
 
-    local alliedcb = {}
-    local enemycb = {}
-    local sharedvisioncb = {}
+      local alliedcb = {}
+      local enemycb = {}
+      local sharedvisioncb = {}
 
-    alliedcb = menu:addCheckBox("", 126, (21 * i) + 24,
-      function()
-        if (alliedcb:isMarked() and enemycb:isMarked()) then
-          enemycb:setMarked(false)
-        end
-      end)
-    alliedcb:setMarked(ThisPlayer:IsAllied(Players[i - 1]))
-    allied[i] = alliedcb
-    enemycb = menu:addCheckBox("", 198, (21 * i) + 24,
-      function()
-        if (alliedcb:isMarked() and enemycb:isMarked()) then
-          alliedcb:setMarked(false)
-        end
-      end)
-    enemycb:setMarked(ThisPlayer:IsEnemy(Players[i - 1]))
-    enemy[i] = enemycb
-    sharedvisioncb = menu:addCheckBox("", 300, (21 * i) + 24,
-      function() end)
-    sharedvisioncb:setMarked(ThisPlayer:IsSharedVision(Players[i - 1]))
+      alliedcb = menu:addCheckBox("", 126, (21 * j) + 24,
+        function()
+          if (alliedcb:isMarked() and enemycb:isMarked()) then
+            enemycb:setMarked(false)
+          end
+        end)
+      alliedcb:setMarked(ThisPlayer:IsAllied(Players[i]))
+      allied[j] = alliedcb
+      allied[j].index = i
+
+      enemycb = menu:addCheckBox("", 198, (21 * j) + 24,
+        function()
+          if (alliedcb:isMarked() and enemycb:isMarked()) then
+            alliedcb:setMarked(false)
+          end
+        end)
+      enemycb:setMarked(ThisPlayer:IsEnemy(Players[i]))
+      enemy[j] = enemycb
+
+      sharedvisioncb = menu:addCheckBox("", 300, (21 * j) + 24,
+        function() end)
+      sharedvisioncb:setMarked(ThisPlayer:IsSharedVision(Players[i]))
+      sharedvision[j] = sharedvisioncb
+    end
   end
 
-  menu:addSmallButton(_("~!OK"), 75, 384 - 40, function() menu:stop() end)
+  menu:addSmallButton(_("~!OK"), 75, 384 - 40,
+    function()
+      for j=1,table.getn(allied) do
+        local i = allied[j].index
+
+        -- allies
+        if (allied[j]:isMarked() and enemy[j]:isMarked() == false) then
+          if (ThisPlayer:IsAllied(Players[i]) == false or
+             ThisPlayer:IsEnemy(Players[i])) then
+            SetDiplomacy(ThisPlayer.Index, "allied", i)
+          end
+        end
+
+        -- enemies
+        if (allied[j]:isMarked() == false and enemy[j]:isMarked()) then
+          if (ThisPlayer:IsAllied(Players[i]) or
+             ThisPlayer:IsEnemy(Players[i]) == false) then
+            SetDiplomacy(ThisPlayer.Index, "enemy", i)
+          end
+        end
+
+        -- neutral
+        if (allied[j]:isMarked() == false and enemy[j]:isMarked() == false) then
+          if (ThisPlayer:IsAllied(Players[i]) or
+             ThisPlayer:IsEnemy(Players[i])) then
+            SetDiplomacy(ThisPlayer.Index, "neutral", i)
+          end
+        end
+
+        -- crazy
+        if (allied[j]:isMarked() and enemy[j]:isMarked()) then
+          if (ThisPlayer:IsAllied(Players[i]) == false or
+             ThisPlayer:IsEnemy(Players[i]) == false) then
+            SetDiplomacy(ThisPlayer.Index, "crazy", i)
+          end
+        end
+
+        -- shared vision
+        if (sharedvision[i]:isMarked()) then
+          if (ThisPlayer:IsSharedVision(Players[i]) == false) then
+            SetSharedVision(ThisPlayer.Index, true, i)
+          end
+        else
+          if (ThisPlayer:IsSharedVision(Players[i])) then
+            SetSharedVision(ThisPlayer.Index, false, i)
+          end
+        end
+      end
+      menu:stop()
+    end)
   menu:addSmallButton(_("~!Cancel"), 195, 384 - 40, function() menu:stop() end)
 
   menu:run(false)
