@@ -67,11 +67,6 @@ typedef int MenuButtonId;
 
 /// @todo FILL IN THIS TABLE!!!!
 
-#define MBUTTON_LEFT_ARROW  35
-#define MBUTTON_RIGHT_ARROW 38
-#define MBUTTON_S_KNOB      40
-#define MBUTTON_S_HCONT     44
-
 	/// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_STATE 5
 #define SERVER_PLAYER_READY 32
@@ -232,14 +227,6 @@ typedef struct _menuitem_ {
 	} D;
 } Menuitem;
 
-	/// for MI_TYPE_xSLIDER
-#define MI_CFLAGS_UP    1
-#define MI_CFLAGS_DOWN  2
-#define MI_CFLAGS_LEFT  1
-#define MI_CFLAGS_RIGHT 2
-#define MI_CFLAGS_KNOB  4
-#define MI_CFLAGS_CONT  8
-
 typedef void (*InitFuncType)(struct _menu_ *);
 typedef void (*ExitFuncType)(struct _menu_ *);
 typedef void (*NetActionType)(void);
@@ -275,27 +262,16 @@ extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 
 	/// Hash table of all the menus
 extern std::map<std::string, Menu *> MenuMap;
-	/// Hash table of all the menu functions
-extern std::map<std::string, void *> MenuFuncHash;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Initialize the hash tables for the menus
-extern void InitMenuFuncHash(void);
-
-	/// Set-up menus for a specific race
-extern void InitMenus(int race);
-	/// Update menu item state. (disabled, ...)
-extern void UpdateMenuItemButton(Menuitem *items);
 	/// Draw menu button
 extern void DrawMenuButton(ButtonStyle *style, unsigned flags,
 	int x, int y, const char *text);
 	/// Draw and process a menu
 extern void ProcessMenu(const char *menu_id, int loop);
-	/// End the current menu
-extern void CloseMenu(void);
 	/// Find a menu by id
 extern Menu *FindMenu(const char *menu_id);
 
@@ -307,9 +283,6 @@ extern void NetClientUpdateState(void);
 extern void NetConnectForceDisplayUpdate(void);
 	/// Compare Local State <-> Server's state, force Update when changes
 extern void NetClientCheckLocalState(void);
-
-	/// Diplomacy menu
-extern void DiplomacyMenu(void);
 
 	/// Edit resource properties
 extern void EditorEditResource(void);
@@ -331,9 +304,6 @@ extern void MenuLoop(const char *filename, CMap *map);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);
-
-	/// Exit Menus
-extern void ExitMenus();
 
 //@}
 

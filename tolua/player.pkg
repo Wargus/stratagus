@@ -1,6 +1,18 @@
+enum PlayerTypes {
+	PlayerNeutral = 2,
+	PlayerNobody  = 3,
+	PlayerComputer = 4,
+	PlayerPerson = 5,
+	PlayerRescuePassive = 6,
+	PlayerRescueActive = 7,
+};
+
 class CPlayer
 {
+	int Index;
 	char Name[128];
+	
+	int Type;
 
 	int Resources[MaxCosts];
 	int Incomes[MaxCosts];
@@ -22,6 +34,17 @@ class CPlayer
 	int TotalResources[MaxCosts];
 	int TotalRazings;
 	int TotalKills;
+	
+	bool IsEnemy(const CPlayer *x) const;
+	bool IsEnemy(const CUnit *x) const;
+	bool IsAllied(const CPlayer *x) const;
+	bool IsAllied(const CUnit *x) const;
+	bool IsSharedVision(const CPlayer *x) const;
+	bool IsSharedVision(const CUnit *x) const;
+	bool IsBothSharedVision(const CPlayer *x) const;
+	bool IsBothSharedVision(const CUnit *x) const;
+	bool IsTeamed(const CPlayer *x) const;
+	bool IsTeamed(const CUnit *x) const;
 };
 
 extern CPlayer Players[PlayerMax];

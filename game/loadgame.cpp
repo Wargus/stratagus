@@ -133,7 +133,6 @@ void InitModules(void)
 	InitIcons();
 	InitVideoCursors();
 	InitUserInterface();
-	InitMenus(ThisPlayer->Race);
 	InitPlayers();
 	InitMissileTypes();
 	InitMissiles();

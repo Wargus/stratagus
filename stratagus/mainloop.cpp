@@ -376,14 +376,6 @@ void GameMainLoop(void)
 		}
 	}
 
-#if 0
-	if (Callbacks == &MenuCallbacks) {
-		while (CurrentMenu) {
-			CloseMenu();
-		}
-	}
-#endif
-
 	//
 	// Game over
 	//

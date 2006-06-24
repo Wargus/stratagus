@@ -901,20 +901,36 @@ bool CPlayer::IsAllied(const CUnit *x) const
 }
 
 /**
-**  Check if the player shares vision
+**  Check if the player shares vision with the player
 */
 bool CPlayer::IsSharedVision(const CPlayer *x) const
+{
+	return (this->SharedVision & (1 << x->Index)) != 0;
+}
+
+/**
+**  Check if the player shares vision with the unit
+*/
+bool CPlayer::IsSharedVision(const CUnit *x) const
+{
+	return this->IsSharedVision(x->Player);
+}
+
+/**
+**  Check if the both players share vision
+*/
+bool CPlayer::IsBothSharedVision(const CPlayer *x) const
 {
 	return (this->SharedVision & (1 << x->Index)) != 0 &&
 		(x->SharedVision & (1 << this->Index)) != 0;
 }
 
 /**
-**  Check if the unit shares vision
+**  Check if the player and the unit share vision
 */
-bool CPlayer::IsSharedVision(const CUnit *x) const
+bool CPlayer::IsBothSharedVision(const CUnit *x) const
 {
-	return this->IsSharedVision(x->Player);
+	return this->IsBothSharedVision(x->Player);
 }
 
 /**
