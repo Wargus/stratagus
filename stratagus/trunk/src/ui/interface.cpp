@@ -241,10 +241,12 @@ static void UiToggleSound(void)
 		}
 	}
 
-	if (IsEffectsEnabled()) {
-		UI.StatusLine.Set(_("Sound is on."));
-	} else {
-		UI.StatusLine.Set(_("Sound is off."));
+	if (SoundEnabled()) {
+		if (IsEffectsEnabled()) {
+			UI.StatusLine.Set(_("Sound is on."));
+		} else {
+			UI.StatusLine.Set(_("Sound is off."));
+		}
 	}
 }
 
@@ -254,13 +256,15 @@ static void UiToggleSound(void)
 static void UiToggleMusic(void)
 {
 	static int vol;
-	if (GetMusicVolume()) {
-		vol = GetMusicVolume();
-		SetMusicVolume(0);
-		UI.StatusLine.Set(_("Music is off."));
-	} else {
-		SetMusicVolume(vol);
-		UI.StatusLine.Set(_("Music is on."));
+	if (SoundEnabled()) {
+		if (GetMusicVolume()) {
+			vol = GetMusicVolume();
+			SetMusicVolume(0);
+			UI.StatusLine.Set(_("Music is off."));
+		} else {
+			SetMusicVolume(vol);
+			UI.StatusLine.Set(_("Music is on."));
+		}
 	}
 }
 

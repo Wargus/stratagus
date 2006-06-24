@@ -93,7 +93,7 @@ void CheckMusicFinished(bool force)
 	MusicFinished = false;
 	SDL_UnlockMutex(MusicFinishedMutex);
 
-	if ((proceed || force) && IsMusicEnabled() && CallbackMusic) {
+	if ((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
 		lua_pushstring(Lua, "MusicStopped");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
 		if (!lua_isfunction(Lua, -1)) {
