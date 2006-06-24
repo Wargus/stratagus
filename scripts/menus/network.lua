@@ -269,7 +269,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
         end
         NetworkServerStartGame() 
         NetworkGamePrepareGameSettings()
-	RunMap(map)
+        RunMap(map)
         menu:stop()
      end
   )

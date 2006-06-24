@@ -87,8 +87,7 @@ function BosGameMenu()
   end
 
   function menu:addListBox(x, y, w, h, list)
-    local bq
-    bq = ListBoxWidget(w, h)
+    local bq = ListBoxWidget(w, h)
     bq:setList(list)
     bq:setBaseColor(black)
     bq:setForegroundColor(clear)
@@ -106,7 +105,7 @@ function BosGameMenu()
     local i
     local f
     if lister == nil then
-       lister = ListFilesInDirectory
+      lister = ListFilesInDirectory
     end
     fileslist = lister(path)
     for i,f in fileslist do
@@ -116,13 +115,12 @@ function BosGameMenu()
       end
     end
 
-    local bq
-    bq = self:addListBox(x, y, w, h, mapslist)
+    local bq = self:addListBox(x, y, w, h, mapslist)
     bq.getSelectedItem = function(self)
-        if self:getSelected() < 0 then
-           return self.itemslist[1]
-        end
-        return self.itemslist[self:getSelected() + 1]
+      if self:getSelected() < 0 then
+         return self.itemslist[1]
+      end
+      return self.itemslist[self:getSelected() + 1]
     end
 
     return bq
@@ -182,7 +180,15 @@ function RunSaveMenu()
   browser:setActionCallback(cb)
 
   menu:addSmallButton(_("Save"), 16, 248,
-    function() SaveGame(t:getText()) menu:stop() end)
+    -- FIXME: use a confirm menu if the file exists already
+    function()
+      SaveGame(t:getText())
+      UI.StatusLine:Set("Saved game to: " .. t:getText())
+      menu:stop()
+    end)
+
+  -- FIXME: do we want a delete button?
+
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
     function() menu:stop() end)
 
@@ -291,7 +297,6 @@ function RunPreferencesMenu()
 end
 
 function RunDiplomacyMenu()
-  local l
   local menu = BosGameMenu()
   menu:setSize(384, 384)
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
@@ -303,14 +308,40 @@ function RunDiplomacyMenu()
   menu:addLabel(_("Enemy"), 208, 30, Fonts["game"])
   menu:addLabel(_("Shared Vision"), 310, 30, Fonts["game"])
 
+  local allied = {}
+  local enemy = {}
+  local sharedvision = {}
+
+
   for i=1,14 do
-    l = Label(Players[i - 1].Name)
+    local l = Label(Players[i - 1].Name)
     l:setFont(Fonts["game"])
     l:adjustSize()
     menu:add(l, 16, (21 * i) + 27)
-    menu:addCheckBox("", 126, (21 * i) + 24, function() end)
-    menu:addCheckBox("", 198, (21 * i) + 24, function() end)
-    menu:addCheckBox("", 300, (21 * i) + 24, function() end)
+
+    local alliedcb = {}
+    local enemycb = {}
+    local sharedvisioncb = {}
+
+    alliedcb = menu:addCheckBox("", 126, (21 * i) + 24,
+      function()
+        if (alliedcb:isMarked() and enemycb:isMarked()) then
+          enemycb:setMarked(false)
+        end
+      end)
+    alliedcb:setMarked(ThisPlayer:IsAllied(Players[i - 1]))
+    allied[i] = alliedcb
+    enemycb = menu:addCheckBox("", 198, (21 * i) + 24,
+      function()
+        if (alliedcb:isMarked() and enemycb:isMarked()) then
+          alliedcb:setMarked(false)
+        end
+      end)
+    enemycb:setMarked(ThisPlayer:IsEnemy(Players[i - 1]))
+    enemy[i] = enemycb
+    sharedvisioncb = menu:addCheckBox("", 300, (21 * i) + 24,
+      function() end)
+    sharedvisioncb:setMarked(ThisPlayer:IsSharedVision(Players[i - 1]))
   end
 
   menu:addSmallButton(_("~!OK"), 75, 384 - 40, function() menu:stop() end)
@@ -539,9 +570,11 @@ function RunTipsMenu()
   end
   if (preferences.TipNumber == 0) then
     l:nextTip()
+  else
+    l:updateCaption()
   end
 
-  showtips = {}
+  local showtips = {}
   showtips = menu:addCheckBox(_("Show tips at startup"), 14, 256 - 75,
     function()
       preferences.ShowTips = showtips:isMarked()
