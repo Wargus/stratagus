@@ -73,16 +73,16 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** For saving lua state (table, number, string, bool, not function).
+**  For saving lua state (table, number, string, bool, not function).
 **
-** @param l lua_State to save.
-** @param is_root non-null for the main call, 0 for recursif call.
+**  @param l        lua_State to save.
+**  @param is_root  true for the main call, 0 for recursif call.
 **
-** @return NULL if nothing could be saved.
-** else a string that could be executed in lua to restore lua state
-** @todo do the output prettier (adjust indentation, newline)
+**  @return  NULL if nothing could be saved.
+**           else a string that could be executed in lua to restore lua state
+**  @todo    do the output prettier (adjust indentation, newline)
 */
-static char *SaveGlobal(lua_State *l, int is_root)
+char *SaveGlobal(lua_State *l, bool is_root)
 {
 	int type_key;
 	int type_value;
@@ -101,7 +101,7 @@ static char *SaveGlobal(lua_State *l, int is_root)
 		lua_pushstring(l, "_G");// global table in lua.
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
-	sep = (is_root) ? "" : ", ";
+	sep = is_root ? "" : ", ";
 	Assert(lua_istable(l, -1));
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
@@ -122,8 +122,8 @@ static char *SaveGlobal(lua_State *l, int is_root)
 				!strcmp(key, "_LOADED") || !strcmp(key, "loadlib") || !strcmp(key, "string") ||
 				!strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug") ||
 				!strcmp(key, "coroutine")
-		// other string to protected ?
-		))) {
+				// other string to protected ?
+				))) {
 			lua_pop(l, 1); // pop the value
 			continue;
 		}
@@ -143,7 +143,7 @@ static char *SaveGlobal(lua_State *l, int is_root)
 				break;
 			case LUA_TTABLE:
 				lua_pushvalue(l, -1);
-				tmp = SaveGlobal(l, 0);
+				tmp = SaveGlobal(l, false);
 				value = NULL;
 				if (tmp != NULL) {
 					value = strdcat3("{", tmp, "}");
@@ -214,6 +214,10 @@ static char *SaveGlobal(lua_State *l, int is_root)
 	}
 	lua_pop(l, 1); // pop the table
 //	Assert(!is_root || !lua_gettop(l));
+	if (!res) {
+		res = new char[1];
+		res[0] = '\0';
+	}
 	return res;
 }
 
@@ -311,7 +315,7 @@ void SaveGame(const char *filename)
 	SaveObjectives(&file);
 	SaveReplayList(&file);
 	// FIXME: find all state information which must be saved.
-	s = SaveGlobal(Lua, 1);
+	s = SaveGlobal(Lua, true);
 	if (s != NULL) {
 		file.printf("-- Lua state\n\n %s\n", s);
 		delete[] s;

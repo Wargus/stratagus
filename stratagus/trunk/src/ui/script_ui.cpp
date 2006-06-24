@@ -918,19 +918,6 @@ static int CclDefineViewports(lua_State *l)
 }
 
 /**
-**  Enable/disable display of command keys in panels.
-**
-**  @param l  Lua state.
-*/
-static int CclSetShowCommandKey(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UI.ButtonPanel.ShowCommandKey = LuaToBoolean(l, 1);
-	UI.ButtonPanel.Update();
-	return 0;
-}
-
-/**
 **  Fighter right button attacks as default.
 **
 **  @param l  Lua state.
@@ -1735,7 +1722,6 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "DefinePanelContents", CclDefinePanelContents);
 	lua_register(Lua, "DefineViewports", CclDefineViewports);
 
-	lua_register(Lua, "SetShowCommandKey", CclSetShowCommandKey);
 	lua_register(Lua, "RightButtonAttacks", CclRightButtonAttacks);
 	lua_register(Lua, "RightButtonMoves", CclRightButtonMoves);
 
