@@ -1257,6 +1257,7 @@ static void EndScenarioQuitMenu(void)
 	GameMenuReturn();
 }
 
+#if 0
 /**
 **  End the running game from menu.
 */
@@ -1267,7 +1268,9 @@ static void GameMenuEnd(void)
 	CursorOn = CursorOnUnknown;
 	CurrentMenu = NULL;
 }
+#endif
 
+#if 0
 /**
 ** Save replay Ok button.
 */
@@ -1326,6 +1329,7 @@ static void SaveReplayOk(void)
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
 }
+#endif
 
 /**
 **  Get map info from select path+name
