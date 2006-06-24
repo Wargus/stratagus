@@ -163,7 +163,7 @@ function RunGameMenu(s)
   menu:addButton(_("~!End Scenario"), 16, 40 + (36 * 4),
     function() RunEndScenarioMenu() end)
   menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -182,9 +182,9 @@ function RunSaveMenu()
   browser:setActionCallback(cb)
 
   menu:addSmallButton(_("Save"), 16, 248,
-    function() SaveGame(t:getText()) menu:stop(0) end)
+    function() SaveGame(t:getText()) menu:stop() end)
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -204,7 +204,7 @@ function RunLoadMenu()
     function() StartSavedGame("~save/"..browser:getSelectedItem()) end)
 
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -222,7 +222,7 @@ function RunGameOptionsMenu()
   menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 3),
     function() RunDiplomacyMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -260,7 +260,7 @@ function RunGameSpeedOptionsMenu()
     function()
       preferences.GameSpeed = GetGameSpeed()
       SavePreferences()
-      menu:stop(0)
+      menu:stop()
     end)
 
   menu:run(false)
@@ -284,7 +284,7 @@ function RunPreferencesMenu()
       preferences.FogOfWar = GetFogOfWar()
       preferences.ShowCommandKey = UI.ButtonPanel.ShowCommandKey
       SavePreferences()
-      menu:stop(0)
+      menu:stop()
     end)
 
   menu:run(false)
@@ -333,7 +333,7 @@ function RunEndScenarioMenu()
   menu:addButton(_("E~!xit Program"), 16, 40 + (36 * 3),
     function() RunExitConfirmMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), 16, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -347,7 +347,7 @@ function RunRestartConfirmMenu()
   menu:addButton(_("~!Restart Scenario"), 16, 11 + (24 * 3) + 29,
     function() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -359,9 +359,9 @@ function RunSurrenderConfirmMenu()
   menu:addLabel(_("want to surrender"), 128, 11 + (24 * 1))
   menu:addLabel(_("to your enemies?"), 128, 11 + (24 * 2))
   menu:addButton(_("~!Surrender"), 16, 11 + (24 * 3) + 29,
-    function() StopGame(GameDefeat) menu:stop(0) end)
+    function() StopGame(GameDefeat) menu:stop() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -373,9 +373,9 @@ function RunQuitToMenuConfirmMenu()
   menu:addLabel(_("want to quit to"), 128, 11 + (24 * 1))
   menu:addLabel(_("the main menu?"), 128, 11 + (24 * 2))
   menu:addButton(_("~!Quit to Menu"), 16, 11 + (24 * 3) + 29,
-    function() StopGame(GameNoResult) menu:stop(0) end)
+    function() StopGame(GameNoResult) menu:stop() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -387,9 +387,9 @@ function RunExitConfirmMenu()
   menu:addLabel(_("want to exit"), 128, 11 + (24 * 1))
   menu:addLabel(_("Stratagus?"), 128, 11 + (24 * 2))
   menu:addButton(_("E~!xit Program"), 16, 11 + (24 * 3) + 29,
-    function() end)
+    function() Exit(0) end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -403,7 +403,7 @@ function RunHelpMenu()
   menu:addButton(_("Stratagus ~!Tips"), 16, 40 + (36 * 1),
     function() RunTipsMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -480,7 +480,7 @@ function RunKeystrokeHelpMenu()
 
   menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
   menu:addButton(_("Previous (~<Esc~>)"), (352 / 2) - (224 / 2), 352 - 40,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -549,7 +549,7 @@ function RunTipsMenu()
     end)
   showtips:setMarked(preferences.ShowTips)
   menu:addSmallButton(_("~!OK"), 14, 256 - 40,
-    function() l:nextTip(); menu:stop(0) end)
+    function() l:nextTip(); menu:stop() end)
   menu:addSmallButton(_("~!Previous Tip"), 14 + 106 + 11, 256 - 40,
     function() l:prevTip(); l:updateCaption() end)
   menu:addSmallButton(_("~!Next Tip"), 14 + 106 + 11 + 106 + 11, 256 - 40,
@@ -575,7 +575,7 @@ function RunObjectivesMenu()
   l:setCaption(current_objective)
 
   menu:addButton(_("~!OK"), 80, 256 - 40,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
@@ -589,7 +589,7 @@ function RunVictoryMenu()
   menu:addLabel(_("Congratulations!"), 144, 11)
   menu:addLabel(_("You are victorious!"), 144, 32)
   menu:addButton(_("~!Victory"), 32, 54,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
   -- FIXME: check if log is disabled
   menu:addButton(_("Save ~!Replay"), 32, 90,
     function() RunSaveReplayMenu() end)
@@ -606,7 +606,7 @@ function RunDefeatMenu()
   menu:addLabel(_("You have failed to"), 144, 11)
   menu:addLabel(_("achieve victory!"), 144, 32)
   menu:addButton(_("~!OK"), 32, 56,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
   -- FIXME: check if log is disabled
   menu:addButton(_("Save ~!Replay"), 32, 90,
     function() RunSaveReplayMenu() end)
@@ -623,9 +623,9 @@ function RunSaveReplayMenu()
   menu:addLabel(_("Save Replay"), 144, 11)
   menu:addTextInputField("", 14, 40, 260)
   menu:addSmallButton(_("~!OK"), 14, 80,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
   menu:addSmallButton(_("Cancel (~<Esc~>)"), 162, 80,
-    function() menu:stop(0) end)
+    function() menu:stop() end)
 
   menu:run(false)
 end
