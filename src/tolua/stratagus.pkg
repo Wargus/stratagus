@@ -62,8 +62,9 @@ extern const char *Translate(const char *str);
 extern void AddTranslation(const char *str1, const char *str2);
 extern void LoadPO(const char *file);
 extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
-std::string StratagusTranslation;
-std::string GameTranslation;
+extern std::string StratagusTranslation;
+extern std::string GameTranslation;
+
 extern void SaveGame(const char *filename);
 
 extern const char *Translate @ _(const char *str);

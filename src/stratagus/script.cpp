@@ -2586,90 +2586,34 @@ void SavePreferences(void)
 {
 	FILE *fd;
 	char buf[PATH_MAX];
-	int i;
 
-	//
-	//  preferences1.ccl
-	//  This file is loaded before stratagus.ccl
-	//
-
+	lua_pushstring(Lua, "preferences");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	if (lua_type(Lua, -1) == LUA_TTABLE) {
 #ifdef USE_WIN32
-	strcpy(buf, GameName);
-	mkdir(buf);
-	strcat(buf, "/preferences1.lua");
+		strcpy(buf, GameName);
+		mkdir(buf);
+		strcat(buf, "/preferences.lua");
 #else
-	sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
-	mkdir(buf, 0777);
-	strcat(buf, "/");
-	strcat(buf, GameName);
-	mkdir(buf, 0777);
-	strcat(buf, "/preferences1.lua");
+		sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
+		mkdir(buf, 0777);
+		strcat(buf, "/");
+		strcat(buf, GameName);
+		mkdir(buf, 0777);
+		strcat(buf, "/preferences.lua");
 #endif
 
-	fd = fopen(buf, "w");
-	if (!fd) {
-		return;
-	}
-
-	fprintf(fd, "--- -----------------------------------------\n");
-	fprintf(fd, "--- $Id$\n");
-
-	fprintf(fd, "Video.Width = %d\n", Video.Width);
-	fprintf(fd, "Video.Height = %d\n", Video.Height);
-
-	fclose(fd);
-
-	//
-	//  preferences2.ccl
-	//  This file is loaded after stratagus.ccl
-	//
-
-#ifdef USE_WIN32
-	sprintf(buf, "%s/preferences2.lua", GameName);
-#else
-	sprintf(buf, "%s/%s/%s/preferences2.lua", getenv("HOME"),
-		STRATAGUS_HOME_PATH, GameName);
-#endif
-
-	fd = fopen(buf, "w");
-	if (!fd) {
-		return;
-	}
-
-	fprintf(fd, "--- -----------------------------------------\n");
-	fprintf(fd, "--- $Id$\n");
-
-	fprintf(fd, "Video.FullScreen = %s\n", Video.FullScreen ? "true" : "false");
-	fprintf(fd, "SetLocalPlayerName(\"%s\")\n", LocalPlayerName);
-
-	// Game options
-	fprintf(fd, "SetFogOfWar(%s)\n", !Map.NoFogOfWar ? "true" : "false");
-	fprintf(fd, "SetShowCommandKey(%s)\n", UI.ButtonPanel.ShowCommandKey ? "true" : "false");
-
-	fprintf(fd, "SetGroupKeys(\"");
-	for (i = 0; UiGroupKeys[i]; ++i) {
-		if (UiGroupKeys[i] != '"') {
-			fprintf(fd, "%c", UiGroupKeys[i]);
-		} else {
-			fprintf(fd, "\\\"");
+		fd = fopen(buf, "w");
+		if (!fd) {
+			return;
 		}
+
+		char *s = SaveGlobal(Lua, false);
+		fprintf(fd, "preferences = {\n%s}\n", s);
+		delete[] s;
+
+		fclose(fd);
 	}
-	fprintf(fd, "\")\n");
-
-	// Speeds
-	fprintf(fd, "SetVideoSyncSpeed(%d)\n", VideoSyncSpeed);
-
-	// Sound options
-	fprintf(fd, "SetEffectsEnabled(%s)\n", IsEffectsEnabled() ? "true" : "false");
-	fprintf(fd, "SetEffectsVolume(%d)\n", GetEffectsVolume());
-
-	fprintf(fd, "SetMusicEnabled(%s)\n", IsMusicEnabled() ? "true" : "false");
-	fprintf(fd, "SetMusicVolume(%d)\n", GetMusicVolume());
-
-	fprintf(fd, "SetTranslationsFiles(\"%s\", \"%s\")\n", 
-		StratagusTranslation.c_str(), GameTranslation.c_str());
-
-	fclose(fd);
 }
 
 /**
