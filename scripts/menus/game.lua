@@ -214,7 +214,7 @@ function RunGameOptionsMenu()
 
   menu:addLabel(_("Game Options"), 128, 11)
   menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
-    function() RunSoundOptionsMenu() end)
+    function() RunGameSoundOptionsMenu() end)
   menu:addButton(_("Speeds (~<F8~>)"), 16, 40 + (36 * 1),
     function() RunGameSpeedOptionsMenu() end)
   menu:addButton(_("Preferences (~<F9~>)"), 16, 40 + (36 * 2),
@@ -227,7 +227,7 @@ function RunGameOptionsMenu()
   menu:run(false)
 end
 
-function RunSoundOptionsMenu()
+function RunGameSoundOptionsMenu()
   --FIXME:
 end
 
@@ -257,7 +257,11 @@ function RunGameSpeedOptionsMenu()
   menu:add(l, 230, (36 * 2) + 6)
 
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 248,
-    function() SavePreferences(); menu:stop(0) end)
+    function()
+      preferences.GameSpeed = GetGameSpeed()
+      SavePreferences()
+      menu:stop(0)
+    end)
 
   menu:run(false)
 end
@@ -276,7 +280,12 @@ function RunPreferencesMenu()
     function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
   ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
   menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
-    function() SavePreferences(); menu:stop(0) end)
+    function()
+      preferences.FogOfWar = GetFogOfWar()
+      preferences.ShowCommandKey = UI.ButtonPanel.ShowCommandKey
+      SavePreferences()
+      menu:stop(0)
+    end)
 
   menu:run(false)
 end
@@ -497,7 +506,6 @@ local tips = {
 
   "Know a useful tip?  Then add it here!",
 }
-local tipnumber = 0
 
 function RunTipsMenu()
   local menu = BosGameMenu()
@@ -512,35 +520,40 @@ function RunTipsMenu()
   l:setSize(356, 144)
   l:setLineWidth(356)
   menu:add(l, 14, 36)
-  -- FIXME: save tipnumber
   function l:prevTip()
-    tipnumber = tipnumber - 1
-    if (tipnumber < 1) then
-      tipnumber = table.getn(tips)
+    preferences.TipNumber = preferences.TipNumber - 1
+    if (preferences.TipNumber < 1) then
+      preferences.TipNumber = table.getn(tips)
     end
-    self:setCaption(tips[tipnumber])
+    SavePreferences()
   end
   function l:nextTip()
-    tipnumber = tipnumber + 1
-    if (tipnumber > table.getn(tips)) then
-      tipnumber = 1
+    preferences.TipNumber = preferences.TipNumber + 1
+    if (preferences.TipNumber > table.getn(tips)) then
+      preferences.TipNumber = 1
     end
-    self:setCaption(tips[tipnumber])
+    SavePreferences()
   end
-  if (tipnumber == 0) then
+  function l:updateCaption()
+    self:setCaption(tips[preferences.TipNumber])
+  end
+  if (preferences.TipNumber == 0) then
     l:nextTip()
   end
 
-  --FIXME: save setting
-  menu:addCheckBox(_("Show tips at startup"), 14, 256 - 75,
-    function() end)
+  showtips = {}
+  showtips = menu:addCheckBox(_("Show tips at startup"), 14, 256 - 75,
+    function()
+      preferences.ShowTips = showtips:isMarked()
+      SavePreferences()
+    end)
+  showtips:setMarked(preferences.ShowTips)
   menu:addSmallButton(_("~!OK"), 14, 256 - 40,
-    function() menu:stop(0) end)
+    function() l:nextTip(); menu:stop(0) end)
   menu:addSmallButton(_("~!Previous Tip"), 14 + 106 + 11, 256 - 40,
-    function() l:prevTip() end)
+    function() l:prevTip(); l:updateCaption() end)
   menu:addSmallButton(_("~!Next Tip"), 14 + 106 + 11 + 106 + 11, 256 - 40,
-    function() l:nextTip() end)
-
+    function() l:nextTip(); l:updateCaption() end)
 
   menu:run(false)
 end
