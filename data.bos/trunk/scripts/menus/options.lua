@@ -63,7 +63,11 @@ function RunSpeedOptionsMenu(s)
   menu:addCentered(b, offx + 230, offy + 36 * 2 + 6)
 
   menu:addButton(_("~!OK"), offx + 128 - (200 / 2), offy + 245,
-    function() SavePreferences(); menu:stop() end)
+    function()
+      preferences.GameSpeed = GetGameSpeed()
+      SavePreferences()
+      menu:stop()
+    end)
 
   menu:run()
 end
@@ -143,7 +147,14 @@ function RunSoundOptionsMenu(s)
   musiccheckbox:adjustSize();
 
   menu:addButton(_("~!OK"), offx + 176 - (200 / 2), offy + 352 - 11 - 27,
-    function() SavePreferences(); menu:stop() end)
+    function()
+      preferences.EffectsVolume = GetEffectsVolume()
+      preferences.EffectsEnabled = IsEffectsEnabled()
+      preferences.MusicVolume = GetMusicVolume()
+      preferences.MusicEnabled = IsMusicEnabled()
+      SavePreferences()
+      menu:stop()
+    end)
 
   menu:run()
 end
@@ -153,6 +164,8 @@ function SetVideoSize(width, height)
   bckground:Resize(Video.Width, Video.Height)
   backgroundWidget = ImageWidget(bckground)
   Load("scripts/ui.lua")
+  preferences.VideoWidth = Video.Width
+  preferences.VideoHeight = Video.Height
   SavePreferences()
 end
 
@@ -183,7 +196,11 @@ function BuildVideoOptionsMenu(menu)
   end
 
   fullScreen = menu:addCheckBox(_("Fullscreen"), offx, offy + 36 * 5.5,
-    function() ToggleFullScreen(); SavePreferences() end)
+    function()
+      ToggleFullScreen()
+      preferences.VideoFullScreen = Video.FullScreen
+      SavePreferences()
+    end)
   fullScreen:setMarked(Video.FullScreen)
 end
 
@@ -209,6 +226,8 @@ function RunLanguageOptionsMenu(s)
      local function SetLanguage()
         SetTranslationsFiles("languages/" .. po .. ".po",
                           "languages/bos-" .. po .. ".po") 
+        preferences.StratagusTranslation = StratagusTranslation
+        preferences.GameTranslation = GameTranslation
         SavePreferences()
      end      
      local rb = menu:addRadioButton(language, "lang", offx, offy + 36 * h, SetLanguage)

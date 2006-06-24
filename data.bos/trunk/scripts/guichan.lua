@@ -274,7 +274,7 @@ function RunStartGameMenu(s)
   descr = menu:writeText(description, sx+20, sy*3+90)
 
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
-  fow:setMarked(true)
+  fow:setMarked(preferences.FogOfWar)
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, function() end)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
@@ -284,7 +284,7 @@ function RunStartGameMenu(s)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
     function(dd) mapresources = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
     function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
   local OldPresentMap = PresentMap

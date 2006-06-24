@@ -100,9 +100,6 @@ SetClickMissile("missile-green-cross")
 --	Set the name of the missile to use when displaying damage
 SetDamageMissile("missile-hit")
 
---	Disable grabbing the mouse.
-SetGrabMouse(false)
-
 --	Enable stopping scrolling on mouse leave.
 SetLeaveStops(true)
 
@@ -114,12 +111,6 @@ SetMouseScrollSpeedControl(15)
 
 SetDoubleClickDelay(300)
 SetHoldClickDelay(1000)
-
---	Enable the display of the command keys in buttons.
-SetShowCommandKey(true)
-
---  Enable fog of war by default.
-SetFogOfWar(true)
 
 --	Enable minimap terrain by default.
 SetMinimapTerrain(true)
@@ -196,11 +187,44 @@ end
 -------------------------------------------------------------------------------
 SetFogOfWarGraphics("general/fog.png")
 
-Load("preferences1.lua")
+Load("preferences.lua")
 
-if (Video.Width == 0) then
-	SetVideoResolution(800, 600)
+if (preferences == nil) then
+  preferences = {
+    VideoWidth = 800,
+    VideoHeight = 600,
+    VideoFullScreen = false,
+    PlayerName = "Player",
+    FogOfWar = true,
+    ShowCommandKey = true,
+    GroupKeys = "0123456789`",
+    GameSpeed = 30,
+    EffectsEnabled = true,
+    EffectsVolume = 128,
+    MusicEnabled = true,
+    MusicVolume = 128,
+    StratagusTranslation = "",
+    GameTranslation = "",
+    TipNumber = 0,
+    ShowTips = true,
+    GrabMouse = false,
+  }
 end
+
+SetVideoResolution(preferences.VideoWidth, preferences.VideoHeight)
+SetVideoFullScreen(preferences.VideoFullScreen)
+SetLocalPlayerName(preferences.PlayerName)
+SetFogOfWar(preferences.FogOfWar)
+UI.ButtonPanel.ShowCommandKey = preferences.ShowCommandKey
+SetGroupKeys(preferences.GroupKeys)
+SetGameSpeed(preferences.GameSpeed)
+SetEffectsEnabled(preferences.EffectsEnabled)
+SetEffectsVolume(preferences.EffectsVolume)
+SetMusicEnabled(preferences.MusicEnabled)
+SetMusicVolume(preferences.MusicVolume)
+SetTranslationsFiles(preferences.StratagusTranslation, preferences.GameTranslation)
+SetGrabMouse(preferences.GrabMouse)
+
 
 --; Uses Stratagus Library path!
 Load("scripts/bos.lua")
@@ -220,7 +244,6 @@ Load("scripts/ranks.lua")
 Load("scripts/cheats.lua")
 Load("scripts/maps.lua")
 
-Load("preferences2.lua")
 
 default_objective = _("Eliminate your ennemies.")
 
