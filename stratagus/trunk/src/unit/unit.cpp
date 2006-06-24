@@ -1147,7 +1147,7 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
 		//  It will be able to see the unit after the Unit->VisCount ++
 		//
 		for (p = 0; p < PlayerMax; ++p) {
-			if (player->IsSharedVision(&Players[p]) || (p == player->Index)) {
+			if (player->IsBothSharedVision(&Players[p]) || (p == player->Index)) {
 				if (!unit->IsVisible(Players + p)) {
 					UnitGoesOutOfFog(unit, Players + p);
 				}
@@ -1191,7 +1191,7 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
 		//
 		if (!unit->VisCount[p]) {
 			for (p = 0; p < PlayerMax; ++p) {
-				if (player->IsSharedVision(&Players[p]) || p == player->Index) {
+				if (player->IsBothSharedVision(&Players[p]) || p == player->Index) {
 					if (!unit->IsVisible(Players + p)) {
 						UnitGoesUnderFog(unit, Players + p);
 					}
@@ -1284,7 +1284,7 @@ bool CUnit::IsVisible(const CPlayer *player) const
 		return true;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (player->IsSharedVision(&Players[p])) {
+		if (player->IsBothSharedVision(&Players[p])) {
 			if (VisCount[p]) {
 				return true;
 			}
@@ -1307,7 +1307,7 @@ bool CUnit::IsVisibleAsGoal(const CPlayer *player) const
 	// Invisibility
 	//
 	if (Variable[INVISIBLE_INDEX].Value && (player != Player) &&
-			(!player->IsSharedVision(Player))) {
+			(!player->IsBothSharedVision(Player))) {
 		return false;
 	}
 	if (IsVisible(player) || player->Type == PlayerComputer ||
@@ -1334,7 +1334,7 @@ bool CUnit::IsVisibleOnMap(const CPlayer *player) const
 	// Invisible units.
 	//
 	if (Variable[INVISIBLE_INDEX].Value && player != Player &&
-			!player->IsSharedVision(Player)) {
+			!player->IsBothSharedVision(Player)) {
 		return false;
 	}
 
@@ -1356,7 +1356,7 @@ bool CUnit::IsVisibleOnMinimap() const
 	// Invisible units.
 	//
 	if (Variable[INVISIBLE_INDEX].Value && (ThisPlayer != Player) &&
-			(!ThisPlayer->IsSharedVision(Player))) {
+			(!ThisPlayer->IsBothSharedVision(Player))) {
 		return false;
 	}
 	if (IsVisible(ThisPlayer) || ReplayRevealMap ||
@@ -1402,7 +1402,7 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 
 	// Those are never ever visible.
 	if (Variable[INVISIBLE_INDEX].Value && ThisPlayer != Player &&
-			!ThisPlayer->IsSharedVision(Player)) {
+			!ThisPlayer->IsBothSharedVision(Player)) {
 		return false;
 	}
 
@@ -3415,24 +3415,44 @@ bool CUnit::IsAllied(const CUnit *x) const
 }
 
 /**
-**  Check if the player shares vision
+**  Check if unit shares vision with the player
 **
 **  @param x  Player to check
 */
 bool CUnit::IsSharedVision(const CPlayer *x) const
 {
-	return (this->Player->SharedVision & (1 << x->Index)) != 0 &&
-		(x->SharedVision & (1 << this->Player->Index)) != 0;
+	return (this->Player->SharedVision & (1 << x->Index)) != 0;
 }
 
 /**
-**  Check if the unit shares vision
+**  Check if the unit shares vision with the unit
 **
 **  @param x  Unit to check
 */
 bool CUnit::IsSharedVision(const CUnit *x) const
 {
 	return IsSharedVision(x->Player);
+}
+
+/**
+**  Check if both players share vision
+**
+**  @param x  Player to check
+*/
+bool CUnit::IsBothSharedVision(const CPlayer *x) const
+{
+	return (this->Player->SharedVision & (1 << x->Index)) != 0 &&
+		(x->SharedVision & (1 << this->Player->Index)) != 0;
+}
+
+/**
+**  Check if both units share vision
+**
+**  @param x  Unit to check
+*/
+bool CUnit::IsBothSharedVision(const CUnit *x) const
+{
+	return IsBothSharedVision(x->Player);
 }
 
 /**

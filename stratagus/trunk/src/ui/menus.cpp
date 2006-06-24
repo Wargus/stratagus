@@ -10,7 +10,7 @@
 //
 /**@name menus.cpp - The menu function code. */
 //
-//      (c) Copyright 1999-2005 by Andreas Arens, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2006 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -98,7 +98,6 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl);
 
 // Program start
 static void MultiPlayerGameMenu(void);
-static void GameMenuExit(void);
 
 // Custom game setup
 static void GameSetupInit(Menu *menu);
@@ -164,24 +163,10 @@ static void EndScenarioQuitMenu(void);
 // Diplomacy options
 static void DiplomacyInit(Menu *menu);
 static void DiplomacyExit(Menu *menu);
-static void DiplomacyWait(Menuitem *mi);
 static void DiplomacyOk(void);
 
-// Save
-static void SaveGameOk(void);
-static void DeleteConfirmMenu(void);
-
-// Confirm save
-static void SaveConfirmInit(Menu *menu);
-static void SaveConfirmExit(Menu *menu);
-static void SaveConfirmOk(void);
-static void SaveConfirmCancel(void);
-
 // Confirm delete
-static void DeleteConfirmInit(Menu *menu);
-static void DeleteConfirmExit(Menu *menu);
 static void DeleteConfirmOk(void);
-static void DeleteConfirmCancel(void);
 
 // Editor select
 static void EditorNewMap(void);
@@ -279,12 +264,6 @@ static void MultiGamePlayerSelectorsUpdate(int initial);
 
 	/// Hash table of all the menus
 std::map<std::string, Menu *> MenuMap;
-	/// Hash table of all the menu functions
-std::map<std::string, void *> MenuFuncHash;
-
-#define HASHADD(x, y) { \
-	MenuFuncHash[y] = (void *)x; \
-}
 
 	/// Game started
 int GuiGameStarted;
@@ -843,6 +822,7 @@ static void ReplayGameFolder(void)
 	}
 }
 
+#if 0
 /**
 ** Initialize the hash table of menu functions
 */
@@ -872,7 +852,6 @@ void InitMenuFuncHash(void)
 
 // Game menu
 	HASHADD(GameMenuReturn,"game-menu-return");
-	HASHADD(CloseMenu,"end-menu");
 
 // Victory, lost
 	HASHADD(GameMenuEnd,"game-menu-end");
@@ -890,7 +869,6 @@ void InitMenuFuncHash(void)
 
 // Program start
 	HASHADD(MultiPlayerGameMenu,"multi-player-game-menu");
-	HASHADD(GameMenuExit,"game-menu-exit");
 
 // Custom game setup
 	HASHADD(GameSetupInit,"game-setup-init");
@@ -954,30 +932,13 @@ void InitMenuFuncHash(void)
 	HASHADD(EndScenarioSurrender,"end-scenario-surrender");
 	HASHADD(EndScenarioQuitMenu,"end-scenario-quit-to-menu");
 
-// Game options
-	HASHADD(DiplomacyMenu,"diplomacy-menu");
-
 // Diplomacy options
 	HASHADD(DiplomacyInit,"diplomacy-init");
 	HASHADD(DiplomacyExit,"diplomacy-exit");
-	HASHADD(DiplomacyWait,"diplomacy-wait");
 	HASHADD(DiplomacyOk,"diplomacy-ok");
 
-// Save
-	HASHADD(SaveGameOk,"save-game-ok");
-	HASHADD(DeleteConfirmMenu,"delete-confirm-menu");
-
-// Confirm save
-	HASHADD(SaveConfirmInit,"save-confirm-init");
-	HASHADD(SaveConfirmExit,"save-confirm-exit");
-	HASHADD(SaveConfirmOk,"save-confirm-ok");
-	HASHADD(SaveConfirmCancel,"save-confirm-cancel");
-
 // Confirm delete
-	HASHADD(DeleteConfirmInit,"delete-confirm-init");
-	HASHADD(DeleteConfirmExit,"delete-confirm-exit");
 	HASHADD(DeleteConfirmOk,"delete-confirm-ok");
-	HASHADD(DeleteConfirmCancel,"delete-confirm-cancel");
 
 // Editor select
 	HASHADD(EditorNewMap,"editor-new-map");
@@ -1063,6 +1024,7 @@ void InitMenuFuncHash(void)
 	HASHADD(SelectGameServer,"select-game-server");
 	HASHADD(MultiMetaServerClose,"menu-internet-end-menu");
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --  Button action handler and Init/Exit functions
@@ -1073,49 +1035,9 @@ void InitMenuFuncHash(void)
 */
 static void GameMenuReturn(void)
 {
-	while (CurrentMenu) {
-		CloseMenu();
-	}
 	InterfaceState = IfaceStateNormal;
 	UI.StatusLine.Clear();
 	GamePaused = false;
-}
-
-/**
-** Save game
-*/
-static void SaveGameOk(void)
-{
-	const char *name;
-
-	name = ScenSelectFileName;
-
-	if (ScenSelectFileName[0] != '\0') {
-		strcpy(TempPathBuf, SaveDir);
-		strcat(TempPathBuf, "/");
-		strcat(TempPathBuf, name);
-
-		// Strip .gz extension.
-		if (!strcmp(TempPathBuf + strlen(TempPathBuf) - 3, ".gz")) {
-			TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
-		}
-		// Strip .bz2 extension.
-		if (!strcmp(TempPathBuf + strlen(TempPathBuf) - 4, ".bz2")) {
-			TempPathBuf[strlen(TempPathBuf) - 4] = '\0';
-		}
-		// Add .sav if not already there.
-		if (strcmp(TempPathBuf + strlen(TempPathBuf) - 4, ".sav")) {
-			strcat(TempPathBuf, ".sav");
-		}
-
-		if (access(TempPathBuf,F_OK)) {
-			SaveGame(TempPathBuf);
-			SetMessage(_("Saved game to: %s"), TempPathBuf);
-			CloseMenu();
-		} else {
-			ProcessMenu("menu-save-confirm", 0);
-		}
-	}
 }
 
 #if 0
@@ -1144,102 +1066,6 @@ static void LoadGameOk(void)
 #endif
 
 /**
-**  Save confirm init callback
-*/
-static void SaveConfirmInit(Menu *menu)
-{
-	static char name[PATH_MAX]; // FIXME: much memory wasted
-	int fileLength;
-	Menu *save_menu;
-
-	save_menu = FindMenu("menu-save-game");
-	fileLength = strlen(save_menu->Items[1].D.Input.buffer) - 3;
-
-	strcpy(name, "the file: ");
-	strncat(name, save_menu->Items[1].D.Input.buffer, fileLength);
-	if (strstr(name, ".sav") == NULL) {
-		strcat(name, ".sav");
-	}
-	menu->Items[2].D.Text.text = NewStringDesc(name);
-}
-
-/**
-**  Save confirm exit callback
-*/
-static void SaveConfirmExit(Menu *menu)
-{
-	FreeStringDesc(menu->Items[2].D.Text.text);
-	delete menu->Items[2].D.Text.text;
-	menu->Items[2].D.Text.text = NULL;
-}
-
-/**
-**  Save confirm ok button
-*/
-static void SaveConfirmOk(void)
-{
-	int fileLength;
-	Menu *menu;
-
-	menu = FindMenu("menu-save-game");
-	fileLength = strlen(menu->Items[1].D.Input.buffer) - 3;
-
-	strcpy(TempPathBuf, SaveDir);
-	strcat(TempPathBuf, "/");
-	strncat(TempPathBuf, menu->Items[1].D.Input.buffer, fileLength);
-	if (strstr(TempPathBuf, ".sav") == NULL) {
-		strcat(TempPathBuf, ".sav");
-	}
-	SaveGame(TempPathBuf);
-	SetMessage(_("Saved game to: %s"), TempPathBuf);
-	GameMenuReturn();
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
-}
-
-/**
-** Save confirm cancel button
-*/
-static void SaveConfirmCancel(void)
-{
-	CloseMenu();
-}
-
-/**
-** Delete menu
-*/
-static void DeleteConfirmMenu(void)
-{
-	ProcessMenu("menu-delete-confirm", 0);
-}
-
-/**
-**  Init callback for delete confirm menu
-*/
-static void DeleteConfirmInit(Menu *menu)
-{
-	Menu *save_menu;
-	static char name[PATH_MAX]; // FIXME: much memory wasted
-
-	save_menu = FindMenu("menu-save-game");
-	strcpy(name, "the file: ");
-	strcat(name, save_menu->Items[1].D.Input.buffer);
-	name[strlen(name) - 3] = '\0';
-	menu->Items[2].D.Text.text = NewStringDesc(name);
-}
-
-/**
-**  Exit callback for delete confirm menu
-*/
-static void DeleteConfirmExit(Menu *menu)
-{
-	FreeStringDesc(menu->Items[2].D.Text.text);
-	delete menu->Items[2].D.Text.text;
-	menu->Items[2].D.Text.text = NULL;
-}
-
-/**
 **  Delete confirm ok button
 */
 static void DeleteConfirmOk(void)
@@ -1252,7 +1078,7 @@ static void DeleteConfirmOk(void)
 	strcat(TempPathBuf, menu->Items[1].D.Input.buffer);
 	TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
 	unlink(TempPathBuf);
-	CloseMenu();
+	//CloseMenu();
 
 	// Update list of files and clear input
 //	SaveGameLBInit(&CurrentMenu->Items[2]);
@@ -1261,22 +1087,6 @@ static void DeleteConfirmOk(void)
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
-}
-
-/**
-** Delete confirm cancel button
-*/
-static void DeleteConfirmCancel(void)
-{
-	CloseMenu();
-}
-
-/**
-**  Diplomacy options menu
-*/
-void DiplomacyMenu(void)
-{
-	ProcessMenu("menu-diplomacy", 0);
 }
 
 /**
@@ -1341,29 +1151,6 @@ static void DiplomacyExit(Menu *menu)
 		delete menu->Items[4 * i + 4].D.Text.text;
 		menu->Items[4 * i + 4].D.Text.text = NULL;
 	}
-}
-
-/**
-** Diplomacy gem callback
-*/
-static void DiplomacyWait(Menuitem *mi)
-{
-	int player;
-	int item;
-
-	item = mi - mi->Menu->Items;
-	player = (item - 4) / 4;
-
-	// Don't allow allies and enemies at the same time
-	if (item == 4 * player + 5) {
-		mi->Menu->Items[4 * player + 5].D.Checkbox.Checked = 1;
-		mi->Menu->Items[4 * player + 6].D.Checkbox.Checked = 0;
-	} else if (item == 4 * player + 6) {
-		mi->Menu->Items[4 * player + 5].D.Checkbox.Checked = 0;
-		mi->Menu->Items[4 * player + 6].D.Checkbox.Checked = 1;
-	}
-
-	// Don't set diplomacy until clicking ok
 }
 
 /**
@@ -1437,7 +1224,7 @@ static void DiplomacyOk(void)
 			++j;
 		}
 	}
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -1534,19 +1321,10 @@ static void SaveReplayOk(void)
 	fclose(fd);
 
 	delete[] buf;
-	CloseMenu();
+	//CloseMenu();
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
-}
-
-/**
-**  Exit the game from menu.
-*/
-static void GameMenuExit(void)
-{
-	ExitMenus();
-	Exit(0);
 }
 
 /**
@@ -1640,7 +1418,7 @@ static void StartCampaignFromMenu(int number)
 	GuiGameStarted = 1;
 
 	// FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
-	CloseMenu();
+	//CloseMenu();
 }
 #endif
 
@@ -1653,7 +1431,7 @@ static void EnterNameCancel(void)
 
 	menu = CurrentMenu;
 	menu->Items[1].D.Input.nch = 0;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -1666,7 +1444,7 @@ static void EnterNameAction(Menuitem *mi, int key)
 	} else {
 		mi[1].Flags &= ~MI_FLAGS_DISABLED;
 		if (key == 10 || key == 13) {
-			CloseMenu();
+			//CloseMenu();
 		}
 	}
 }
@@ -1677,7 +1455,7 @@ static void EnterNameAction(Menuitem *mi, int key)
 static void EnterServerIPCancel(void)
 {
 	CurrentMenu->Items[1].D.Input.nch = 0;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -1690,7 +1468,7 @@ static void EnterServerIPAction(Menuitem *mi, int key)
 	} else {
 		mi[1].Flags &= ~MI_FLAGS_DISABLED;
 		if (key == 10 || key == 13) {
-			CloseMenu();
+			//CloseMenu();
 		}
 	}
 }
@@ -1761,7 +1539,7 @@ static void JoinNetGameMenu(void)
 	ProcessMenu("menu-net-connecting", 1);
 
 	if (GuiGameStarted) {
-		CloseMenu();
+		//CloseMenu();
 	}
 }
 
@@ -1795,7 +1573,7 @@ static void NetConnectingCancel(void)
 	NetworkExitClientConnect();
 	// Trigger TerminateNetConnect() to call us again and end the menu
 	NetLocalState = ccs_usercanceled;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -2024,7 +1802,7 @@ static void ScenSelectOk(void)
 			strcat(CurrentMapPath, "/");
 		}
 		strcat(CurrentMapPath, ScenSelectFileName);
-		CloseMenu();
+		//CloseMenu();
 	}
 }
 
@@ -2049,7 +1827,7 @@ static void ScenSelectCancel(void)
 		*s = '\0';
 	}
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -2058,7 +1836,7 @@ static void ScenSelectCancel(void)
 static void GameCancel(void)
 {
 	FreeMapInfo(&Map.Info);
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -2088,7 +1866,7 @@ static void CustomGameStart(void)
 	GameIntro.Objectives[0] = new_strdup(DefaultObjective);
 
 	GuiGameStarted = 1;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -2987,7 +2765,7 @@ static void EditorSelectCancel(void)
 {
 	QuitToMenu = 1;
 	EditorRunning = EditorNotRunning;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -3031,7 +2809,7 @@ static void EditorNewMap(void)
 	*CurrentMapPath = '\0';
 
 	GuiGameStarted = 1;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -3111,7 +2889,7 @@ static void EditorNewOk(void)
 		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath,
 				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
 		LuaLoadFile(tilemodel);
-		CloseMenu();
+		//CloseMenu();
 	}
 }
 
@@ -3121,7 +2899,7 @@ static void EditorNewOk(void)
 static void EditorNewCancel(void)
 {
 	EditorCancelled = 1;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -3154,7 +2932,7 @@ static void EditorMainLoadMap(void)
 	}
 	
 	GuiGameStarted = 1;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -3192,7 +2970,7 @@ static void EditorMainLoadOk(void)
 		strcat(ScenSelectDisplayPath, ScenSelectPathName);
 		EditorMainLoadLBInit(mi);
 	} else if (ScenSelectFileName[0]) {
-		CloseMenu();
+		//CloseMenu();
 	}
 }
 
@@ -3227,7 +3005,7 @@ static void EditorMainLoadCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -3268,7 +3046,7 @@ void EditorLoadMenu(void)
 
 	EditorMapLoaded = 1;
 	EditorRunning = EditorNotRunning;
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -3290,7 +3068,7 @@ static void EditorLoadOk(void)
 		strcat(ScenSelectDisplayPath, ScenSelectPathName);
 		EditorMainLoadLBInit(mi);
 	} else if (ScenSelectFileName[0]) {
-		CloseMenu();
+		//CloseMenu();
 	}
 }
 
@@ -3845,7 +3623,7 @@ static void EditorQuitToMenu(void)
 {
 	QuitToMenu = 1;
 	EditorRunning = EditorNotRunning;
-	CloseMenu();
+	//CloseMenu();
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
@@ -3934,7 +3712,7 @@ static void ReplayGameOk(void)
 		GameIntro.Objectives[0] = new_strdup(DefaultObjective);
 
 		GuiGameStarted = 1;
-		CloseMenu();
+		//CloseMenu();
 
 		if (menu->Items[6].D.Checkbox.Checked) {
 			ReplayRevealMap = 1;
@@ -3973,7 +3751,7 @@ static void ReplayGameCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	CloseMenu();
+	//CloseMenu();
 }
 
 /**
@@ -4099,7 +3877,7 @@ static void MultiGameMasterReport(void)
 */
 static void ShowMetaServerList(void)
 {
-	CloseMenu();
+	//CloseMenu();
 
 	GuiGameStarted = 0;
 	ProcessMenu("metaserver-list", 1);
@@ -4245,7 +4023,7 @@ static void SelectGameServer(Menuitem *mi)
 
 	j = mi - mi->Menu->Items;
 	mi->Menu->Items[j].D.Checkbox.Checked = 0;
-	CloseMenu();
+	//CloseMenu();
 
 	tmp = EvalString(mi->Menu->Items[j - 4].D.Text.text);
 	strcpy(server_host_buffer, tmp);
@@ -4277,7 +4055,7 @@ static void SelectGameServer(Menuitem *mi)
 	ProcessMenu("menu-net-connecting", 1);
 
 	if (GuiGameStarted) {
-		CloseMenu();
+		//CloseMenu();
 	}
 }
 
@@ -4340,106 +4118,7 @@ static void MultiMetaServerClose(void)
 {
 	MetaClose();
 	MetaServerInUse = 0;
-	CloseMenu();
+	//CloseMenu();
 }
-
-/**
-**  Update menu item state. (disabled, ...)
-**
-**  @param items  Menu items
-*/
-void UpdateMenuItemButton(Menuitem *items)
-{
-	void (*handler)(void);
-
-	Assert(items);
-	Assert(items->MiType == MiTypeButton);
-
-	// Enable by default.
-	items->Flags &= ~MI_FLAGS_DISABLED;
-	handler = items->D.Button.Handler;
-	// restrict then
-	if (((handler == SaveConfirmOk || handler == SaveGameOk) &&
-			(!ScenSelectFileName[0])) ||
-		(handler == DeleteConfirmOk && !SelectedFileExist) ||
-		(handler == DeleteConfirmMenu && !SelectedFileExist) ||
-		((handler == SaveGameOk) &&
-			(!GameRunning || IsNetworkGame() || ReplayGameType != ReplayNone)) ||
-		((handler == EndScenarioRestart) &&
-			(GameRunning && IsNetworkGame())) ||
-		//
-		// MultiPlayer
-		//
-		(handler == MultiPlayerGameMenu && NetworkNumInterfaces == 0) ||
-		(handler == MultiClientReady && LocalSetupState.Ready[NetLocalHostsSlot]) ||
-		(handler == MultiClientNotReady && !LocalSetupState.Ready[NetLocalHostsSlot]) ||
-		//
-		// Folder
-		//
-		((handler == EditorMainLoadFolder || handler == ReplayGameFolder ||
-			handler == ScenSelectFolder || handler == EditorSaveFolder) &&
-			(!*ScenSelectDisplayPath)) ||
-		((handler == ReplayGameOk || handler == EditorLoadOk ||
-			handler == ScenSelectOk || handler == EditorSaveOk) &&
-			(!ScenSelectFileName[0] && !ScenSelectPathName[0]))
-		) {
-		items->Flags = MI_FLAGS_DISABLED;
-	}
-
-	//
-	// Multiplayer
-	//
-	if (handler == MultiScenSelectMenu || handler == MultiGameStart) {
-		char plyrs; // other player has connected.
-		char ready; // all player are here.
-		int i;
-
-		plyrs = 0;
-		ready = 1;
-
-
-		// Calculate available slots from map info
-		for (i = 1; i < PlayerMax; i++) {
-			if (Map.Info.PlayerType[i] == PlayerPerson) {
-				if (Hosts[i].PlyNr) {
-					plyrs = 1;
-					if (!ServerSetupState.Ready[i]) {
-						ready = 0;
-						break;
-					}
-				} else {
-					if (ServerSetupState.CompOpt[i] == 0) {
-						ready = 0;
-					}
-				}
-			}
-		}
-		if (handler == MultiScenSelectMenu && plyrs) {
-			items->Flags = MI_FLAGS_DISABLED;
-		}
-		if (handler == MultiGameStart && !ready) {
-			items->Flags = MI_FLAGS_DISABLED;
-		}
-	}
-
-#if 1 // FIXME : Remove it when lua modified.
-	//
-	//  Text modification.
-	//
-	if (handler == ReplayGameOk || handler == ScenSelectOk || handler == EditorLoadOk) {
-		delete[] items->D.Button.Text;
-		items->D.Button.Text = new_strdup(ScenSelectPathName[0] ? "Open" : "Ok");
-	} else if (handler == EditorSaveOk) {
-		delete[] items->D.Button.Text;
-		items->D.Button.Text = new_strdup(ScenSelectPathName[0] ? "Open" : "Save");
-	}
-	if (handler == EditorMainLoadFolder || handler == ReplayGameFolder ||
-			handler == ScenSelectFolder || handler == EditorSaveFolder) {
-		delete[] items->D.Button.Text;
-		items->D.Button.Text = new_strdup(ScenSelectDisplayPath);
-	}
-#endif
-}
-
 
 //@}
