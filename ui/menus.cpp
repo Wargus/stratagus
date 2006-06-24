@@ -77,17 +77,22 @@
 -- Prototypes for local functions
 ----------------------------------------------------------------------------*/
 
+#if 0
 static void EditorEndMenu(void);
+#endif
 
 /*----------------------------------------------------------------------------
 -- Prototypes for action handlers and helper functions
 ----------------------------------------------------------------------------*/
 
 // Victory, lost
+#if 0
 static void GameMenuEnd(void);
 static void SaveReplayOk(void);
+#endif
 
 // Scenario select
+#if 0
 static void ScenSelectInit(Menu *menu);
 static void ScenSelectExit(Menu *menu);
 static void ScenSelectTPMSAction(Menuitem *mi, int i);
@@ -95,11 +100,15 @@ static void ScenSelectVSAction(Menuitem *mi);
 static void ScenSelectOk(void);
 static void ScenSelectCancel(void);
 static int ScenSelectRDFilter(char *pathbuf, FileList *fl);
+#endif
 
 // Program start
+#if 0
 static void MultiPlayerGameMenu(void);
+#endif
 
 // Custom game setup
+#if 0
 static void GameSetupInit(Menu *menu);
 static void ScenSelectMenu(void);
 static void CustomGameStart(void);
@@ -111,12 +120,16 @@ static void GameUNSAction(Menuitem *mi, int i);
 static void GameTSSAction(Menuitem *mi, int i);
 static void GameGATAction(Menuitem *mi, int i);
 static void CustomGameOPSAction(Menuitem *mi, int i);
+#endif
 
 // Enter name
+#if 0
 static void EnterNameAction(Menuitem *mi, int key);
 static void EnterNameCancel(void);
+#endif
 
 // Net create join
+#if 0
 static void JoinNetGameMenu(void);
 static void CreateNetGameMenu(void);
 static void CreateInternetGameMenu(void);
@@ -124,8 +137,10 @@ static void CreateInternetGameMenu(void);
 // Multi net type
 static void MultiPlayerLANGame(void);
 static void MultiPlayerInternetGame(void);
+#endif
 
 // Net multi setup
+#if 0
 static void MultiGameSetupInit(Menu *menu);
 static void MultiGameSetupExit(Menu *menu);
 static void MultiGameDrawFunc(Menuitem *mi);
@@ -133,12 +148,16 @@ static void MultiScenSelectMenu(void);
 static void MultiGameStart(void);
 static void MultiGameCancel(void);
 static void MultiGameFWSAction(Menuitem *mi, int i);
+#endif
 
 // Enter server ip
+#if 0
 static void EnterServerIPAction(Menuitem *mi, int key);
 static void EnterServerIPCancel(void);
+#endif
 
 // Net multi client
+#if 0
 static void TerminateNetConnect(void);
 static void MultiGameClientInit(Menu *menu);
 static void MultiGameClientExit(Menu *menu);
@@ -149,73 +168,101 @@ static void MultiClientCancel(void);
 static void MultiClientRCSAction(Menuitem *mi, int i);
 static void MultiClientCheckboxAction(Menuitem *mi);
 static void MultiClientUpdate(int initial);
+#endif
 
 // Net connecting
+#if 0
 static void NetConnectingInit(Menu *menu);
 static void NetConnectingExit(Menu *menu);
 static void NetConnectingCancel(void);
+#endif
 
 // End scenario
+#if 0
 static void EndScenarioRestart(void);
 static void EndScenarioSurrender(void);
 static void EndScenarioQuitMenu(void);
+#endif
 
 // Diplomacy options
+#if 0
 static void DiplomacyInit(Menu *menu);
 static void DiplomacyExit(Menu *menu);
 static void DiplomacyOk(void);
+#endif
 
 // Confirm delete
+#if 0
 static void DeleteConfirmOk(void);
+#endif
 
 // Editor select
+#if 0
 static void EditorNewMap(void);
 static void EditorMainLoadMap(void);
 static void EditorSelectCancel(void);
+#endif
 
 // Editor new
+#if 0
 static void EditorNewDrawFunc(Menuitem *mi);
 static void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
 static void EditorNewMapSizeEnterAction(Menuitem *mi, int key);
 static void EditorNewOk(void);
 static void EditorNewCancel(void);
+#endif
 
 // Editor main load map
+#if 0
 static void EditorMainLoadInit(Menu *menu);
 static void EditorMainLoadExit(Menu *menu);
 static void EditorMainLoadVSAction(Menuitem *mi);
 static void EditorMainLoadOk(void);
 static void EditorMainLoadCancel(void);
 static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
+#endif
 
 // Editor load map
+#if 0
 static void EditorLoadOk(void);
 static void EditorLoadCancel(void);
+#endif
 
 // Editor menu
+#if 0
 static void EditorMapPropertiesMenu(void);
 static void EditorPlayerPropertiesMenu(void);
 static void EditorQuitToMenu(void);
+#endif
 
 // Editor map properties
+#if 0
 static void EditorMapPropertiesEnterAction(Menuitem *mi, int key);
 static void EditorMapPropertiesOk(void);
+#endif
 
 // Editor player properties
+#if 0
 static void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
 static void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
+#endif
 
 // Editor edit resource
+#if 0
 static void EditorEditResourceEnterAction(Menuitem *mi,int key);
 static void EditorEditResourceOk(void);
 static void EditorEditResourceCancel(void);
+#endif
 
 // Editor edit ai properties
+#if 0
 static void EditorEditAiPropertiesCheckbox(Menuitem *mi);
 static void EditorEditAiPropertiesOk(void);
 static void EditorEditAiPropertiesCancel(void);
+#endif
 
 // Editor save
+#if 0
 static void EditorSaveInit(Menu *menu);
 static void EditorSaveExit(Menu *menu);
 static void EditorSaveVSAction(Menuitem *mi);
@@ -223,13 +270,17 @@ static void EditorSaveEnterAction(Menuitem *mi, int key);
 static void EditorSaveOk(void);
 static void EditorSaveCancel(void);
 static int EditorSaveRDFilter(char *pathbuf, FileList *fl);
+#endif
 
 // Editor save confirm
+#if 0
 static void EditorSaveConfirmInit(Menu *menu);
 static void EditorSaveConfirmOk(void);
 static void EditorSaveConfirmCancel(void);
+#endif
 
 // Replay game
+#if 0
 static void ReplayGameInit(Menu *menu);
 static void ReplayGameExit(Menu *menu);
 static void ReplayGameVSAction(Menuitem *mi);
@@ -237,26 +288,34 @@ static void ReplayGameDisableFog(Menuitem *mi);
 static void ReplayGameOk(void);
 static void ReplayGameCancel(void);
 static int ReplayGameRDFilter(char *pathbuf, FileList *fl);
+#endif
 
 // Metaserver
 //static void MultiGameMasterReport(void);
 //static void EnterMasterAction(Menuitem *mi, int key);
+#if 0
 static void ShowMetaServerList(void); // Addition for Magnant
 static void MultiMetaServerGameSetupInit(Menu *menu); // init callback
 static void MultiMetaServerGameSetupExit(Menu *menu); // exit callback
 static void SelectGameServer(Menuitem *mi); // Game Server selection so that client joins the game
 static void AddGameServer(void); //Add Game Server on Meta server
-static void ChangeGameServer(void); //Change Game Parameters on Meta server
 static int MetaServerConnectError(void); // Display error message
 static void MultiMetaServerClose(void); //Close Master Server connection
+#endif
+static void ChangeGameServer(void); //Change Game Parameters on Meta server
+
 //others
+#if 0
 static void GameMenuReturn(void);
 static void NetErrorMenu(char *error);
+#endif
 void NetworkGamePrepareGameSettings(void);
+
+#if 0
 static void MultiGamePTSAction(Menuitem *mi, int o);
 static void NetMultiPlayerDrawFunc(Menuitem *mi);
 static void MultiGamePlayerSelectorsUpdate(int initial);
-
+#endif
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -270,7 +329,9 @@ int GuiGameStarted;
 	/// Are the old menus running ?
 bool oldMenusRunning = false;
 	/// Editor cancel button pressed
+
 static int EditorCancelled;
+
 
 /**
 ** Other client and server selection state for Multiplayer clients
@@ -281,14 +342,18 @@ ServerSetup LocalSetupState;
 static char ScenSelectPath[1024];        /// Scenario selector path
 static char ScenSelectDisplayPath[1024]; /// Displayed selector path
 static char ScenSelectFileName[128];     /// Scenario selector name
+#if 0
 static char ScenSelectPathName[128];     /// Path name.
 
 static char SelectedFileExist;           /// True if ScenSelectFileName is an existing file.
+#endif
 
 char MenuMapFullPath[1024];              /// Selected map path+name
 
+#if 0
 static char *SaveDir;                    /// Save game directory
 static char TempPathBuf[PATH_MAX];       /// Temporary buffer for paths
+#endif
 
 /// FIXME: -> ccl...
 static char *mgptsoptions[] = {
@@ -305,6 +370,7 @@ static char *mgptsoptions[] = {
 // Map info stuff //
 ////////////////////
 
+#if 0
 /**
 **  Allocate and deep copy a MapInfo structure
 **
@@ -329,7 +395,9 @@ static CMapInfo *DuplicateMapInfo(const CMapInfo *orig)
 
 	return dest;
 }
+#endif
 
+#if 0
 /**
 **  Free map info data
 **
@@ -353,11 +421,13 @@ static void FreeMapInfos(std::vector<FileList> *fl, int n)
 		(*fl)[i].name = NULL;
 	}
 }
+#endif
 
 //////////////
 //  Filter  //
 //////////////
 
+#if 0
 /**
 **  Editor main load read directory filter
 **
@@ -461,7 +531,9 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	}
 	return 1;
 }
+#endif
 
+#if 0
 /**
 **  Replay game read directory filter
 */
@@ -471,7 +543,9 @@ static int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 
 	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
 }
+#endif
 
+#if 0
 /**
 **  Editor main load read directory filter
 */
@@ -481,7 +555,9 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 
 	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
 }
+#endif
 
+#if 0
 /**
 **  Editor save read directory filter
 */
@@ -491,7 +567,9 @@ static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 
 	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
 }
+#endif
 
+#if 0
 /**
 **  Scenario select read directory filter
 */
@@ -511,11 +589,13 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 
 	return GenericRDFilter(pathbuf, fl, suf, sz, sz);
 }
+#endif
 
 ////////////////
 // LBRetrieve //
 ////////////////
 
+#if 0
 /**
 **  Listbox retrieve callback.
 **
@@ -545,7 +625,9 @@ static char *LBRetrieve(const Menuitem *mi, int i)
 	strcat(buffer, (*fl)[i].name);
 	return buffer;
 }
+#endif
 
+#if 0
 /**
 **  Listbox retrieve callback and draw some info.
 **
@@ -595,11 +677,13 @@ static char *LBRetrieveAndInfo(const Menuitem *mi, int i)
 	}
 	return LBRetrieve(mi, i);
 }
+#endif
 
 ////////////////
 //  LBAction  //
 ////////////////
 
+#if 0
 /**
 **  Update path and file name with the listbox.
 **
@@ -633,6 +717,9 @@ static int PathLBAction(const Menuitem *mi, int i)
 		return 2;
 	}
 }
+#endif
+
+#if 0
 /**
 ** Save game listbox action callback
 */
@@ -645,6 +732,9 @@ static void SaveGameLBAction(Menuitem *mi, int i)
 	sprintf(mi->Menu->Items[1].D.Input.buffer, "%s~!_", ScenSelectFileName);
 	mi->Menu->Items[1].D.Input.nch = strlen(ScenSelectFileName);
 }
+#endif
+
+#if 0
 /**
 **  Editor save listbox action callback
 */
@@ -657,11 +747,13 @@ static void EditorSaveLBAction(Menuitem *mi, int i)
 	sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
 	mi->Menu->Items[3].D.Input.nch = strlen(ScenSelectFileName);
 }
+#endif
 
 //////////////
 //  LBInit  //
 //////////////
 
+#if 0
 /**
 **  Listbox exit callback.
 **
@@ -683,7 +775,9 @@ static void LBExit(Menuitem *mi)
 	mi->D.Listbox.noptions = 0;
 	mi[1].Flags |= MI_FLAGS_DISABLED;
 }
+#endif
 
+#if 0
 /**
 **  Listbox init callback.
 **
@@ -722,7 +816,9 @@ static void LBInit(Menuitem *mi, const char *path, int (*filter)(char *, FileLis
 		mi[1].Flags |= MI_FLAGS_DISABLED;
 	}
 }
+#endif
 
+#if 0
 /**
 **  Scenario select listbox init callback
 */
@@ -730,6 +826,9 @@ static void ScenSelectLBInit(Menuitem *mi)
 {
 	LBInit(mi, ScenSelectPath, ScenSelectRDFilter);
 }
+#endif
+
+#if 0
 /**
 ** Editor main load listbox init callback
 */
@@ -737,6 +836,9 @@ static void EditorMainLoadLBInit(Menuitem *mi)
 {
 	LBInit(mi, ScenSelectPath, EditorMainLoadRDFilter);
 }
+#endif
+
+#if 0
 /**
 ** Editor save listbox init callback
 */
@@ -746,6 +848,9 @@ static void EditorSaveLBInit(Menuitem *mi)
 	sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
 	mi->Menu->Items[3].D.Input.nch = strlen(ScenSelectFileName);
 }
+#endif
+
+#if 0
 /**
 ** Replay game listbox init callback
 */
@@ -753,11 +858,13 @@ static void ReplayGameLBInit(Menuitem *mi)
 {
 	LBInit(mi, ScenSelectPath, ReplayGameRDFilter);
 }
+#endif
 
 /////////////////////
 // Folder.         //
 /////////////////////
 
+#if 0
 /**
 **  Go to parent folder.
 **
@@ -784,7 +891,9 @@ static int ParentFolder()
 	ScenSelectFileName[0] = '\0';
 	return 1;
 }
+#endif
 
+#if 0
 /**
 ** Scenario select folder button
 */
@@ -794,6 +903,9 @@ static void ScenSelectFolder(void)
 		ScenSelectLBInit(CurrentMenu->Items + 1);
 	}
 }
+#endif
+
+#if 0
 /**
 ** Editor main load folder button
 */
@@ -803,6 +915,9 @@ static void EditorMainLoadFolder(void)
 		EditorMainLoadLBInit(CurrentMenu->Items + 1);
 	}
 }
+#endif
+
+#if 0
 /**
 ** Editor save folder button
 */
@@ -812,6 +927,9 @@ static void EditorSaveFolder(void)
 		EditorSaveLBInit(CurrentMenu->Items + 1);
 	}
 }
+#endif
+
+#if 0
 /**
 **  Replay game folder button callback
 */
@@ -821,6 +939,7 @@ static void ReplayGameFolder(void)
 		ReplayGameLBInit(CurrentMenu->Items + 1);
 	}
 }
+#endif
 
 #if 0
 /**
@@ -1030,6 +1149,7 @@ void InitMenuFuncHash(void)
 --  Button action handler and Init/Exit functions
 ----------------------------------------------------------------------------*/
 
+#if 0
 /**
 ** Leave menus and return to game mode
 */
@@ -1039,6 +1159,7 @@ static void GameMenuReturn(void)
 	UI.StatusLine.Clear();
 	GamePaused = false;
 }
+#endif
 
 #if 0
 /**
@@ -1065,6 +1186,7 @@ static void LoadGameOk(void)
 }
 #endif
 
+#if 0
 /**
 **  Delete confirm ok button
 */
@@ -1088,7 +1210,9 @@ static void DeleteConfirmOk(void)
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
 }
+#endif
 
+#if 0
 /**
 **  Diplomacy init callback
 */
@@ -1138,7 +1262,9 @@ static void DiplomacyInit(Menu *menu)
 		menu->Items[4 * j + 7].Flags |= MI_FLAGS_INVISIBLE;
 	}
 }
+#endif
 
+#if 0
 /**
 **  Diplomacy exit callback
 */
@@ -1152,7 +1278,9 @@ static void DiplomacyExit(Menu *menu)
 		menu->Items[4 * i + 4].D.Text.text = NULL;
 	}
 }
+#endif
 
+#if 0
 /**
 ** Diplomacy Ok button callback
 */
@@ -1226,7 +1354,9 @@ static void DiplomacyOk(void)
 	}
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 **  Restart the scenario
 */
@@ -1236,7 +1366,9 @@ static void EndScenarioRestart(void)
 	GameRunning = false;
 	GameMenuReturn();
 }
+#endif
 
+#if 0
 /**
 **  End the game in defeat
 */
@@ -1246,7 +1378,10 @@ static void EndScenarioSurrender(void)
 	GameRunning = false;
 	GameMenuReturn();
 }
+#endif
 
+
+#if 0
 /**
 **  End the game and return to the menu
 */
@@ -1256,6 +1391,7 @@ static void EndScenarioQuitMenu(void)
 	GameRunning = false;
 	GameMenuReturn();
 }
+#endif
 
 #if 0
 /**
@@ -1354,6 +1490,7 @@ static void GetInfoFromSelectPath(void)
 	ScenSelectPath[i] = '\0'; // Remove appended part
 }
 
+#if 0
 /**
 ** Enter select scenario menu.
 */
@@ -1380,7 +1517,9 @@ static void ScenSelectMenu(void)
 		menu->Items[12].D.Pulldown.curopt = 0;
 	}
 }
+#endif
 
+#if 0
 /**
 ** Enter multiplayer select scenario menu.
 */
@@ -1399,6 +1538,7 @@ static void MultiScenSelectMenu(void)
 
 	menu->Items[6].Flags = MI_FLAGS_DISABLED;
 }
+#endif
 
 #if 0
 /**
@@ -1426,6 +1566,7 @@ static void StartCampaignFromMenu(int number)
 }
 #endif
 
+#if 0
 /**
 ** Cancel button of player name menu pressed.
 */
@@ -1437,7 +1578,9 @@ static void EnterNameCancel(void)
 	menu->Items[1].D.Input.nch = 0;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Input field action of player name menu.
 */
@@ -1452,7 +1595,9 @@ static void EnterNameAction(Menuitem *mi, int key)
 		}
 	}
 }
+#endif
 
+#if 0
 /**
 ** Cancel button of enter server ip/name menu pressed.
 */
@@ -1461,7 +1606,9 @@ static void EnterServerIPCancel(void)
 	CurrentMenu->Items[1].D.Input.nch = 0;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Input field action of server ip/name.
 */
@@ -1476,7 +1623,9 @@ static void EnterServerIPAction(Menuitem *mi, int key)
 		}
 	}
 }
+#endif
 
+#if 0
 /**
 ** Start processing join a network game menu.
 */
@@ -1546,7 +1695,9 @@ static void JoinNetGameMenu(void)
 		//CloseMenu();
 	}
 }
+#endif
 
+#if 0
 /**
 **  Network connect menu init.
 */
@@ -1555,7 +1706,9 @@ static void NetConnectingInit(Menu *menu)
 	menu->Items[1].D.Text.text = NewStringDesc(NetServerText);
 	menu->Items[2].D.Text.text = NewStringDesc(NetTriesText);
 }
+#endif
 
+#if 0
 /**
 **  Network connect menu exit.
 */
@@ -1568,7 +1721,9 @@ static void NetConnectingExit(Menu *menu)
 	menu->Items[1].D.Text.text = NULL;
 	menu->Items[2].D.Text.text = NULL;
 }
+#endif
 
+#if 0
 /**
 **  Cancel button of network connect menu pressed.
 */
@@ -1579,7 +1734,9 @@ static void NetConnectingCancel(void)
 	NetLocalState = ccs_usercanceled;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 **  Call back from menu loop, if network state has changed.
 */
@@ -1631,7 +1788,9 @@ static void TerminateNetConnect(void)
 		NetConnectingCancel();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Start processing network game setup menu (server).
 */
@@ -1643,7 +1802,9 @@ static void CreateNetGameMenu(void)
 		GameMenuReturn();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Start process network game setup menu (server).
 ** Internet game, register with meta server
@@ -1658,7 +1819,9 @@ static void CreateInternetGameMenu(void)
 	}
 
 }
+#endif
 
+#if 0
 /**
 ** Multiplayer game start game button pressed.
 */
@@ -1675,7 +1838,9 @@ static void MultiGameStart(void)
 
 	CustomGameStart();
 }
+#endif
 
+#if 0
 /**
 ** Enter multiplayer game menu.
 */
@@ -1719,7 +1884,9 @@ static void MultiPlayerGameMenu(void)
 		GameMenuReturn();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Process LAN/P2P game menu
 */
@@ -1731,7 +1898,9 @@ static void MultiPlayerLANGame(void)
 		GameMenuReturn();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Process Internet game menu
 */
@@ -1749,7 +1918,9 @@ static void MultiPlayerInternetGame(void)
 		GameMenuReturn();
 	}
 }
+#endif
 
+#if 0
 /**
 **  Initialize the scenario selector menu.
 */
@@ -1757,7 +1928,9 @@ static void ScenSelectInit(Menu *menu)
 {
 	ScenSelectLBInit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 **  Exit the scenario selector menu.
 */
@@ -1765,7 +1938,9 @@ static void ScenSelectExit(Menu *menu)
 {
 	LBExit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 **  Scenario select map type action callback
 */
@@ -1774,14 +1949,18 @@ static void ScenSelectTPMSAction(Menuitem *mi, int i)
 	mi = mi->Menu->Items + 1;
 	ScenSelectLBInit(mi);
 }
+#endif
 
+#if 0
 /**
 **  Scenario select vertical slider action callback
 */
 static void ScenSelectVSAction(Menuitem *mi)
 {
 }
+#endif
 
+#if 0
 /**
 ** Scenario select ok button
 */
@@ -1809,7 +1988,9 @@ static void ScenSelectOk(void)
 		//CloseMenu();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Scenario select cancel button.
 */
@@ -1833,7 +2014,9 @@ static void ScenSelectCancel(void)
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Custom game cancel button callback
 */
@@ -1842,7 +2025,9 @@ static void GameCancel(void)
 	FreeMapInfo(&Map.Info);
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Custom game start game button pressed.
 */
@@ -1872,7 +2057,9 @@ static void CustomGameStart(void)
 	GuiGameStarted = 1;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Single player custom game menu entered.
 */
@@ -1923,7 +2110,9 @@ static void GameSetupInit(Menu *menu)
 		custom_menu->Items[12].D.Pulldown.curopt = 0;
 	}
 }
+#endif
 
+#if 0
 /**
 ** FIXME: docu
 */
@@ -1960,7 +2149,9 @@ static void GameDrawFunc(Menuitem *mi)
 #endif
 	SetDefaultTextColors(nc, rc);
 }
+#endif
 
+#if 0
 /**
 **  Menu setup race pulldown action.
 **
@@ -1989,6 +2180,7 @@ static void GameRCSAction(Menuitem *mi, int i)
 		NetworkServerResyncClients();
 	}
 }
+#endif
 
 /**
 ** Game resources action callback
@@ -2050,6 +2242,7 @@ static void GameGATAction(Menuitem *mi, int i)
 	}
 }
 
+#if 0
 /**
 ** Game opponents action callback
 */
@@ -2057,6 +2250,7 @@ static void CustomGameOPSAction(Menuitem *mi, int i)
 {
 	GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
+#endif
 
 /**
 ** Menu setup fog-of-war pulldown action.
@@ -2098,6 +2292,7 @@ static void MultiGameFWSAction(Menuitem *mi, int i)
 	}
 }
 
+#if 0
 /**
 ** Multiplayer menu player server states.
 */
@@ -2125,7 +2320,9 @@ static void MultiGamePTSAction(Menuitem *mi, int o)
 	}
 
 }
+#endif
 
+#if 0
 /**
 ** Multiplayer server draw func
 */
@@ -2133,7 +2330,9 @@ static void MultiGameDrawFunc(Menuitem *mi)
 {
 	GameDrawFunc(mi);
 }
+#endif
 
+#if 0
 /**
 ** Multiplayer client draw func
 */
@@ -2142,6 +2341,7 @@ static void MultiGameClientDrawFunc(Menuitem *mi)
 	// FIXME: do something better
 	GameDrawFunc(mi);
 }
+#endif
 
 /**
 ** Multiplayer network game final race an player type setup.
@@ -2432,6 +2632,7 @@ static void MultiClientUpdate(int initial)
 	}
 }
 
+#if 0
 /**
 **  Multiplayer server menu init callback
 */
@@ -2467,14 +2668,18 @@ static void MultiGameSetupInit(Menu *menu)
 	}
 
 }
+#endif
 
+#if 0
 /**
 **  Multiplayer server menu exit callback
 */
 static void MultiGameSetupExit(Menu *menu)
 {
 }
+#endif
 
+#if 0
 /**
 **  Cancel button of server multi player menu pressed.
 */
@@ -2491,7 +2696,9 @@ static void MultiGameCancel(void)
 	NetPlayers = 0; // Make single player menus work again!
 	GameCancel();
 }
+#endif
 
+#if 0
 /**
 **  Draw the multi player setup menu.
 */
@@ -2545,7 +2752,9 @@ static void NetMultiPlayerDrawFunc(Menuitem *mi)
 
 	SetDefaultTextColors(nc, rc);
 }
+#endif
 
+#if 0
 /**
 **  Cancel button of multiplayer client menu pressed.
 */
@@ -2555,7 +2764,9 @@ static void MultiClientCancel(void)
 	FreeMapInfo(&Map.Info);
 	// GameCancel();
 }
+#endif
 
+#if 0
 /**
 **  Multiplayer client menu init callback
 */
@@ -2573,14 +2784,18 @@ static void MultiGameClientInit(Menu *menu)
 		menu->Items[CLIENT_RACE].Flags = 0;
 	}
 }
+#endif
 
+#if 0
 /**
 **  Multiplayer client menu exit callback
 */
 static void MultiGameClientExit(Menu *menu)
 {
 }
+#endif
 
+#if 0
 /**
 **  Multiplayer client gem action. Toggles ready flag.
 */
@@ -2603,7 +2818,9 @@ static void MultiClientCheckboxAction(Menuitem *mi)
 		MultiClientUpdate(0);
 	}
 }
+#endif
 
+#if 0
 /**
 **  Multiplayer client races action callback
 */
@@ -2614,7 +2831,9 @@ static void MultiClientRCSAction(Menuitem *mi, int i)
 		MultiClientUpdate(0);
 	}
 }
+#endif
 
+#if 0
 /**
 ** Multiplayer client ready button
 */
@@ -2629,7 +2848,9 @@ static void MultiClientReady(void)
 	LocalSetupState.Ready[NetLocalHostsSlot] = 1;
 	MultiClientUpdate(0);
 }
+#endif
 
+#if 0
 /**
 ** Multiplayer client not ready button
 */
@@ -2644,6 +2865,7 @@ static void MultiClientNotReady(void)
 	LocalSetupState.Ready[NetLocalHostsSlot] = 0;
 	MultiClientUpdate(0);
 }
+#endif
 
 /**
 ** Callback from netconnect loop in Client-Sync state:
@@ -2762,6 +2984,7 @@ void SetupEditor(void)
 }
 
 
+#if 0
 /**
 ** Editor select cancel button callback
 */
@@ -2771,7 +2994,9 @@ static void EditorSelectCancel(void)
 	EditorRunning = EditorNotRunning;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Called from menu, for new editor map.
 */
@@ -2815,21 +3040,27 @@ static void EditorNewMap(void)
 	GuiGameStarted = 1;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor new map draw func
 */
 static void EditorNewDrawFunc(Menuitem *mi)
 {
 }
+#endif
 
+#if 0
 /**
 ** Editor new map, map description input box callback
 */
 static void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key)
 {
 }
+#endif
 
+#if 0
 /**
 ** Editor new map, size input box callback
 */
@@ -2840,7 +3071,9 @@ static void EditorNewMapSizeEnterAction(Menuitem * mi, int key)
 		strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
 	}
 }
+#endif
 
+#if 0
 /**
 ** Editor new map ok button
 */
@@ -2896,7 +3129,9 @@ static void EditorNewOk(void)
 		//CloseMenu();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Editor new map cancel button
 */
@@ -2905,7 +3140,9 @@ static void EditorNewCancel(void)
 	EditorCancelled = 1;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor main load map menu
 */
@@ -2938,7 +3175,9 @@ static void EditorMainLoadMap(void)
 	GuiGameStarted = 1;
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor main load init callback
 */
@@ -2946,7 +3185,9 @@ static void EditorMainLoadInit(Menu *menu)
 {
 	EditorMainLoadLBInit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 ** Editor main load exit callback
 */
@@ -2954,7 +3195,9 @@ static void EditorMainLoadExit(Menu *menu)
 {
 	LBExit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 ** Editor main load ok button
 */
@@ -2977,7 +3220,9 @@ static void EditorMainLoadOk(void)
 		//CloseMenu();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Editor main load cancel button
 */
@@ -3011,13 +3256,16 @@ static void EditorMainLoadCancel(void)
 
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor main load vertical slider action callback
 */
 static void EditorMainLoadVSAction(Menuitem *mi)
 {
 }
+#endif
 
 /**
 **  Editor load map menu
@@ -3053,6 +3301,7 @@ void EditorLoadMenu(void)
 	//CloseMenu();
 }
 
+#if 0
 /**
 ** Editor main load ok button
 */
@@ -3075,7 +3324,9 @@ static void EditorLoadOk(void)
 		//CloseMenu();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Editor main load cancel button
 */
@@ -3109,7 +3360,9 @@ static void EditorLoadCancel(void)
 
 	EditorEndMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor map properties menu
 */
@@ -3140,14 +3393,18 @@ static void EditorMapPropertiesMenu(void)
 	delete menu->Items[4].D.Text.text;
 	menu->Items[4].D.Text.text = NULL;
 }
+#endif
 
+#if 0
 /**
 ** Editor map properties input box callback
 */
 static void EditorMapPropertiesEnterAction(Menuitem *mi, int key)
 {
 }
+#endif
 
+#if 0
 /**
 ** Editor map properties ok button
 */
@@ -3188,14 +3445,18 @@ static void EditorMapPropertiesOk(void)
 
 	EditorEndMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor player properties draw func
 */
 static void EditorPlayerPropertiesDrawFunc(Menuitem *mi)
 {
 }
+#endif
 
+#if 0
 /**
 ** Editor player properties input box callback
 */
@@ -3205,7 +3466,9 @@ static void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key)
 		strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
 	}
 }
+#endif
 
+#if 0
 	/// Player type conversion from internal fc to menu number
 static int PlayerTypesFcToMenu[] = {
 	0,
@@ -3217,7 +3480,9 @@ static int PlayerTypesFcToMenu[] = {
 	2,
 	3,
 };
+#endif
 
+#if 0
 	/// Player type conversion from menu to internal fc number
 static int PlayerTypesMenuToFc[] = {
 	PlayerPerson,
@@ -3227,7 +3492,9 @@ static int PlayerTypesMenuToFc[] = {
 	PlayerNeutral,
 	PlayerNobody,
 };
+#endif
 
+#if 0
 /**
 **  Convert player ai from internal fc number to menu number
 **
@@ -3247,7 +3514,9 @@ static int PlayerSetAiToMenu(char *ainame, MenuitemPulldown *menu)
 	DebugPrint("Invalid Ai number: %s\n" _C_ ainame);
 	return i;
 }
+#endif
 
+#if 0
 /**
 **  Get the ai ident from the pulldown menu
 **
@@ -3257,7 +3526,9 @@ static char *PlayerGetAiFromMenu(MenuitemPulldown *menu)
 {
 	return menu->options[menu->curopt];
 }
+#endif
 
+#if 0
 /**
 ** Edit player properties menu
 */
@@ -3308,6 +3579,7 @@ static void EditorPlayerPropertiesMenu(void)
 		Players[i].Resources[OilCost] = atoi(oil[i]);
 	}
 }
+#endif
 
 /**
 ** Edit resource properties
@@ -3332,6 +3604,7 @@ void EditorEditResource(void)
 	menu->Items[0].D.Text.text = NULL;
 }
 
+#if 0
 /**
 ** Key pressed in menu-editor-edit-resource
 */
@@ -3343,7 +3616,9 @@ static void EditorEditResourceEnterAction(Menuitem *mi,int key)
 		EditorEditResourceOk();
 	}
 }
+#endif
 
+#if 0
 /**
 ** Ok button from menu-editor-edit-resource
 */
@@ -3380,7 +3655,9 @@ static void EditorEditResourceOk(void)
 	delete menu->Items[1].D.Text.text;
 	menu->Items[1].D.Text.text = NULL;
 }
+#endif
 
+#if 0
 /**
 ** Cancel button from menu-editor-edit-resource
 */
@@ -3388,6 +3665,7 @@ static void EditorEditResourceCancel(void)
 {
 	GameMenuReturn();
 }
+#endif
 
 /**
 ** Edit ai properties
@@ -3408,6 +3686,7 @@ void EditorEditAiProperties(void)
 	ProcessMenu("menu-editor-edit-ai-properties", 1);
 }
 
+#if 0
 /**
 ** Active or Passive gem clicked in menu-editor-edit-ai-properties
 */
@@ -3421,7 +3700,9 @@ static void EditorEditAiPropertiesCheckbox(Menuitem *mi)
 		mi->Menu->Items[1].D.Checkbox.Checked = 0;
 	}
 }
+#endif
 
+#if 0
 /**
 ** Ok button from menu-editor-edit-ai-properties
 */
@@ -3437,7 +3718,9 @@ static void EditorEditAiPropertiesOk(void)
 	}
 	GameMenuReturn();
 }
+#endif
 
+#if 0
 /**
 ** Cancel button from menu-editor-edit-ai-properties
 */
@@ -3445,6 +3728,7 @@ static void EditorEditAiPropertiesCancel(void)
 {
 	GameMenuReturn();
 }
+#endif
 
 /**
 ** Save map from the editor
@@ -3491,6 +3775,7 @@ int EditorSaveMenu(void)
 	return ret;
 }
 
+#if 0
 /**
 **  Editor save init callback
 */
@@ -3501,7 +3786,9 @@ static void EditorSaveInit(Menu *menu)
 	}
 	EditorSaveLBInit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 **  Editor save exit callback
 */
@@ -3509,7 +3796,9 @@ static void EditorSaveExit(Menu *menu)
 {
 	LBExit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 ** Editor save ok button
 */
@@ -3549,7 +3838,9 @@ static void EditorSaveOk(void)
 		}
 	}
 }
+#endif
 
+#if 0
 /**
 ** Editor save cancel button
 */
@@ -3558,14 +3849,18 @@ static void EditorSaveCancel(void)
 	EditorCancelled = 1;
 	EditorEndMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor save vertical slider action callback
 */
 static void EditorSaveVSAction(Menuitem *mi)
 {
 }
+#endif
 
+#if 0
 /**
 ** Editor save input callback
 */
@@ -3583,7 +3878,9 @@ static void EditorSaveEnterAction(Menuitem *mi, int key)
 		}
 	}
 }
+#endif
 
+#if 0
 /**
 ** Editor save confirm init callback
 */
@@ -3591,7 +3888,9 @@ static void EditorSaveConfirmInit(Menu *menu)
 {
 	menu->Items[2].D.Text.text = NewStringDesc(ScenSelectFileName);
 }
+#endif
 
+#if 0
 /**
 ** Editor save confirm ok button
 */
@@ -3602,7 +3901,9 @@ static void EditorSaveConfirmOk(void)
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorEndMenu();
 }
+#endif
 
+#if 0
 /**
 ** Editor save confirm cancel button
 */
@@ -3617,7 +3918,9 @@ static void EditorSaveConfirmCancel(void)
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
 }
+#endif
 
+#if 0
 /**
 ** Called from menu, to quit editor to menu.
 **
@@ -3632,7 +3935,9 @@ static void EditorQuitToMenu(void)
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
 }
+#endif
 
+#if 0
 /**
 ** End menus state of the editor.
 */
@@ -3645,7 +3950,9 @@ static void EditorEndMenu(void)
 	EditorUpdateDisplay();
 	InterfaceState = IfaceStateMenu;
 }
+#endif
 
+#if 0
 /**
 **  Replay game menu init callback
 */
@@ -3657,7 +3964,9 @@ static void ReplayGameInit(Menu *menu)
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 	ReplayGameLBInit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 **  Replay game menu exit callback
 */
@@ -3665,21 +3974,27 @@ static void ReplayGameExit(Menu *menu)
 {
 	LBExit(menu->Items + 1);
 }
+#endif
 
+#if 0
 /**
 **  Replay game vertical slider action
 */
 static void ReplayGameVSAction(Menuitem *mi)
 {
 }
+#endif
 
+#if 0
 /**
 ** Replay game disable fog gem callback
 */
 static void ReplayGameDisableFog(Menuitem *mi)
 {
 }
+#endif
 
+#if 0
 /**
 ** Replay game ok button callback
 */
@@ -3725,7 +4040,9 @@ static void ReplayGameOk(void)
 		}
 	}
 }
+#endif
 
+#if 0
 /**
 ** Replay game cancel button callback
 */
@@ -3757,7 +4074,9 @@ static void ReplayGameCancel(void)
 
 	//CloseMenu();
 }
+#endif
 
+#if 0
 /**
 ** Net error menu
 **
@@ -3774,6 +4093,7 @@ static void NetErrorMenu(char *error)
 	delete menu->Items[1].D.Text.text;
 	menu->Items[1].D.Text.text = NULL;
 }
+#endif
 
 /**
 ** Error menu
@@ -3876,6 +4196,7 @@ static void MultiGameMasterReport(void)
 }
 #endif
 
+#if 0
 /**
 **  Menu for Mater Server Game list.
 */
@@ -3889,7 +4210,9 @@ static void ShowMetaServerList(void)
 		GameMenuReturn();
 	}
 }
+#endif
 
+#if 0
 /**
 **  Multiplayer server menu init callback
 **
@@ -3991,7 +4314,9 @@ static void MultiMetaServerGameSetupInit(Menu *menu)
 		menu->Items[j + 5].Flags = MI_FLAGS_DISABLED;
 	}
 }
+#endif
 
+#if 0
 /**
 **  Multiplayer server menu exit callback
 */
@@ -4014,7 +4339,9 @@ static void MultiMetaServerGameSetupExit(Menu *menu)
 // CloseMenu();
 // CloseMenu();
 }
+#endif
 
+#if 0
 /**
 **  Action taken when a player select an online game
 */
@@ -4062,7 +4389,9 @@ static void SelectGameServer(Menuitem *mi)
 		//CloseMenu();
 	}
 }
+#endif
 
+#if 0
 /**
 **  Action to add a game server on the meta-server.
 */
@@ -4076,6 +4405,7 @@ static void AddGameServer(void)
 
 	// FIXME: Get Reply from Queue
 }
+#endif
 
 /**
 **  Action to add a game server on the meta-server.
@@ -4105,6 +4435,7 @@ static void ChangeGameServer(void)
 	// FIXME: Get Reply from Queue
 }
 
+#if 0
 /**
 **  FIXME: docu
 */
@@ -4114,7 +4445,9 @@ static int MetaServerConnectError(void)
 	NetErrorMenu("Cannot Connect to Meta-Server");
 	return 0;
 }
+#endif
 
+#if 0
 /**
 **  Close MetaServer connection
 */
@@ -4124,5 +4457,6 @@ static void MultiMetaServerClose(void)
 	MetaServerInUse = 0;
 	//CloseMenu();
 }
+#endif
 
 //@}
