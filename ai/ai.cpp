@@ -10,7 +10,8 @@
 //
 /**@name ai.cpp - The computer player AI main file. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Ludovic Pollet
+//      (c) Copyright 2000-2006 by Lutz Sammer, Ludovic Pollet, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -173,9 +174,13 @@ PlayerAi *AiPlayer;             /// Current AI player
 */
 static void AiExecuteScript(void)
 {
-	PlayerAi *pai;
+	// FIXME: this shouldn't happen but it sometimes does after
+	// FIXME: leaving a menu
+	if (lua_gettop(Lua) != 0) {
+		lua_settop(Lua, 0);
+	}
 
-	pai = AiPlayer;
+	PlayerAi *pai = AiPlayer;
 	if (pai->Script) {
 		lua_pushstring(Lua, "_ai_scripts_");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
@@ -578,7 +583,7 @@ void AiInit(CPlayer *player)
 }
 
 /**
-**  Initialise global structures of the AI
+**  Initialize global structures of the AI
 */
 void InitAiModule(void)
 {
@@ -590,14 +595,9 @@ void InitAiModule(void)
 */
 void CleanAi(void)
 {
-	int i;
-	int p;
-	PlayerAi *pai;
-	CAiType *aitype;
-
-	for (p = 0; p < PlayerMax; ++p) {
-		if ((pai = (PlayerAi *)Players[p].Ai)) {
-			delete pai;
+	for (int p = 0; p < PlayerMax; ++p) {
+		if (Players[p].Ai) {
+			delete Players[p].Ai;
 			Players[p].Ai = NULL;
 		}
 	}
@@ -605,8 +605,8 @@ void CleanAi(void)
 	//
 	//  Free AiTypes.
 	//
-	for (i = 0; i < (int)AiTypes.size(); ++i) {
-		aitype = AiTypes[i];
+	for (int i = 0; i < (int)AiTypes.size(); ++i) {
+		CAiType *aitype = AiTypes[i];
 		delete[] aitype->Name;
 		delete[] aitype->Race;
 		delete[] aitype->Class;
@@ -666,7 +666,6 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType *type)
 */
 static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType *type)
 {
-	int i;
 	int equivalents[UnitTypeMax + 1];
 	int equivalentsCount;
 
@@ -678,7 +677,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType *type)
 	//  This could happen if an upgrade is ready, look for equivalent units.
 	//
 	equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
-	for (i = 0; i < equivalentsCount; ++i) {
+	for (int i = 0; i < equivalentsCount; ++i) {
 		if (AiRemoveFromBuilt2(pai, UnitTypes[equivalents[i]])) {
 			return;
 		}
@@ -721,7 +720,6 @@ static int AiReduceMadeInBuilt2(PlayerAi *pai, const CUnitType *type)
 */
 static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType *type)
 {
-	int i;
 	int equivs[UnitTypeMax + 1];
 	int equivnb;
 
@@ -733,7 +731,7 @@ static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType *type)
 	//
 	equivnb = AiFindUnitTypeEquiv(type, equivs);
 
-	for (i = 0; i < (int)AiHelpers.Equiv[type->Slot].size(); ++i) {
+	for (int i = 0; i < (int)AiHelpers.Equiv[type->Slot].size(); ++i) {
 		if (AiReduceMadeInBuilt2(pai, UnitTypes[equivs[i]])) {
 			return;
 		}
@@ -866,7 +864,6 @@ void AiWorkComplete(CUnit *unit, CUnit *what)
 	}
 
 	Assert(what->Player->Type != PlayerPerson);
-
 	AiRemoveFromBuilt(what->Player->Ai, what->Type);
 }
 
@@ -883,7 +880,6 @@ void AiCanNotBuild(CUnit *unit, const CUnitType *what)
 		what->Ident _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
-
 	AiReduceMadeInBuilt(unit->Player->Ai, what);
 }
 
@@ -896,7 +892,6 @@ void AiCanNotBuild(CUnit *unit, const CUnitType *what)
 void AiCanNotReach(CUnit *unit, const CUnitType *what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
-
 	AiReduceMadeInBuilt(unit->Player->Ai, what);
 }
 
@@ -1038,12 +1033,8 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 */
 void AiCanNotMove(CUnit *unit)
 {
-	int gx;
-	int gy;
-	int gw;
-	int gh;
-	int minrange;
-	int maxrange;
+	int gx, gy, gw, gh;
+	int minrange, maxrange;
 
 	AiPlayer = unit->Player->Ai;
 
@@ -1083,8 +1074,7 @@ void AiCanNotMove(CUnit *unit)
 void AiNeedMoreSupply(const CUnit *unit, const CUnitType *what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
-
-	((PlayerAi *)unit->Player->Ai)->NeedSupply = true;
+	unit->Player->Ai->NeedSupply = true;
 }
 
 /**
@@ -1147,12 +1137,10 @@ void AiResearchComplete(CUnit *unit, const CUpgrade *what)
 */
 void AiEachCycle(CPlayer *player)
 {
-	AiTransportRequest *aitr;
-
 	AiPlayer = player->Ai;
 
 	for (int i = 0; i < (int)AiPlayer->TransportRequests.size(); ++i) {
-		aitr = &AiPlayer->TransportRequests[i];
+		AiTransportRequest *aitr = &AiPlayer->TransportRequests[i];
 		aitr->Unit->RefsDecrease();
 		if (aitr->Order.Goal) {
 			aitr->Order.Goal->RefsDecrease();
@@ -1162,7 +1150,7 @@ void AiEachCycle(CPlayer *player)
 }
 
 /**
-**  This called for each player, each second.
+**  This is called for each player each second.
 **
 **  @param player  The player structure pointer.
 */
