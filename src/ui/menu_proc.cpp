@@ -283,73 +283,6 @@ static void PasteFromClipboard(Menuitem *mi)
 }
 #endif
 
-typedef struct _menu_stack_ {
-	struct _menu_ *Menu;
-	int CurSel;
-	struct _menu_stack_ *Next;
-} MenuStack;
-
-MenuStack *Menus;             /// FIXME : docu
-
-/**
-** Push the current menu onto the stack.
-*/
-static void PushMenu(void)
-{
-	MenuStack *menu;
-
-	menu = new MenuStack;
-	menu->Menu = CurrentMenu;
-	menu->CurSel = MenuButtonCurSel;
-	menu->Next = Menus;
-	Menus = menu;
-}
-
-/**
-** Pop the stack and set the current menu
-*/
-static void PopMenu(void)
-{
-	MenuStack *menu;
-
-	if (Menus && Menus->Menu == CurrentMenu) {
-		if (CurrentMenu->ExitFunc) {
-			CurrentMenu->ExitFunc(CurrentMenu); // action/destructor
-		}
-
-		MenuButtonUnderCursor = -1;
-		MenuButtonCurSel = -1;
-		CurrentMenu = NULL;
-
-		MenuButtonCurSel = Menus->CurSel;
-		menu = Menus;
-		Menus = Menus->Next;
-		delete menu;
-		if (Menus) {
-			CurrentMenu = Menus->Menu;
-		}
-	} else {
-		CurrentMenu = NULL;
-	}
-}
-
-/**
-**  End process menu
-*/
-void CloseMenu(void)
-{
-	CursorOn = CursorOnUnknown;
-	PopMenu();
-
-	if (!CurrentMenu && Callbacks != &GameCallbacks &&
-			(GameRunning || GameResult != GameNoResult)) {
-		InterfaceState = IfaceStateNormal;
-		Callbacks = &GameCallbacks;
-		GamePaused = false;
-		UIHandleMouseMove(CursorX, CursorY);
-	}
-}
-
 /**
 ** Process a menu.
 **
@@ -390,11 +323,6 @@ void ProcessMenu(const char *menu_id, int loop)
 		return;
 	}
 	CurrentMenu = menu;
-
-	if (!loop) {
-//		Callbacks = &MenuCallbacks;
-		PushMenu();
-	}
 
 	MenuButtonCurSel = -1;
 	for (i = 0; i < menu->NumItems; ++i) {
@@ -490,25 +418,6 @@ void ProcessMenu(const char *menu_id, int loop)
 		MenuButtonUnderCursor = MenuButtonUnderCursorSave;
 		MenuButtonCurSel = MenuButtonCurSelSave;
 	}
-
-	// FIXME: should ExitMenus() be called instead?!?
-}
-
-/**
-**  Init Menus for a specific race
-**
-**  @param race    The Race to set-up for
-*/
-void InitMenus(int race)
-{
-	CurrentMenu = NULL;
-}
-
-/**
-**  Exit Menus code (freeing data)
-*/
-void ExitMenus(void)
-{
 }
 
 //@}

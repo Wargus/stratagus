@@ -636,8 +636,6 @@ void CreateGame(const char *filename, CMap *map)
 	InitIcons();
 	LoadIcons();
 
-	// FIXME: Race only known in single player game:
-	InitMenus(ThisPlayer->Race);
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
 	UnitUnderCursor = NoUnitP;
 

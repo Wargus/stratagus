@@ -1538,8 +1538,10 @@ void MenuScreen::stop(int result)
 		MenuStack.pop();
 		if (MenuStack.empty()) {
 			GuichanActive = false;
+			//InterfaceState = IfaceStateNormal;
 			Callbacks = &GameCallbacks;
 			GamePaused = false;
+			UI.StatusLine.Clear();
 			if (GameRunning) {
 				UIHandleMouseMove(CursorX, CursorY);
 			}

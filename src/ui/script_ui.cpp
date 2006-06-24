@@ -1739,8 +1739,6 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
 
 	lua_register(Lua, "SetGroupKeys", CclSetGroupKeys);
-
-	InitMenuFuncHash();
 }
 
 //@}
