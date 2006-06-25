@@ -707,9 +707,9 @@ void StartEditor(const char *filename)
 	GuichanActive = true;
 }
 
-void StartReplay(const char *filename)
+void StartReplay(const char *filename, bool reveal)
 {
-	char replay[512];
+	char replay[PATH_MAX];
 
 	CleanPlayers();
 	ExpandPath(replay, filename);
@@ -722,7 +722,7 @@ void StartReplay(const char *filename)
 	}
 	GameIntro.Objectives[0] = new_strdup(DefaultObjective);
 
-	//TODO ReplayRevealMap = 1
+	ReplayRevealMap = reveal;
 
 	StartMap(CurrentMapPath, false);
 }
