@@ -322,6 +322,8 @@ function RunDiplomacyMenu()
       l:adjustSize()
       menu:add(l, 16, (21 * j) + 27)
 
+      -- FIXME: disable checkboxes in replays or if on the same team
+
       local alliedcb = {}
       local enemycb = {}
       local sharedvisioncb = {}

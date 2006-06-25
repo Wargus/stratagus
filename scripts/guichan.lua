@@ -328,9 +328,11 @@ function RunReplayMenu(s)
 
   local browser = menu:addBrowser("~logs/", ".log$", 300, 100, 300, 200)
 
+  local reveal = menu:addCheckBox(_("Reveal map"), 100, 250, function() end)
+
   function startreplaybutton(s)
     print("Starting map -------")
-    StartReplay("~logs/" .. browser:getSelectedItem())
+    StartReplay("~logs/" .. browser:getSelectedItem(), reveal:isMarked())
     menu:stop()
   end
 
