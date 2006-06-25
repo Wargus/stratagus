@@ -63,7 +63,6 @@ GameResults GameResult;                      /// Outcome of the game
 char CurrentMapPath[1024];                   /// Path of the current map
 char DefaultMap[1024] = "maps/default.smp";  /// Default map path
 int RestartScenario;                         /// Restart the scenario
-int QuitToMenu;                              /// Quit to menu
 std::vector<Campaign *> Campaigns;           /// Campaigns
 
 static Campaign *CurrentCampaign;        /// Playing this campaign
@@ -85,11 +84,6 @@ char *NextChapter(void)
 	if (RestartScenario) {
 		RestartScenario = 0;
 		return CurrentMapPath;
-	}
-	if (QuitToMenu) {
-		QuitToMenu = 0;
-		CurrentCampaign = NULL;
-		return NULL;
 	}
 	if (!CurrentCampaign) {
 		return NULL;

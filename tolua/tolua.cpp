@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Jun 24 15:32:06 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Jun 25 08:56:11 2006.
 */
 
 #ifndef __cplusplus
@@ -33,7 +33,7 @@ using std::vector;
 using namespace gcn;
 void StartMap(const char *str, bool clean = true);
 void StartEditor(const char *str);
-void StartReplay(const char *str);
+void StartReplay(const char *str, bool reveal = false);
 void StartSavedGame(const char *str);
 #include "campaign.h"
 void StopGame(GameResults result);
@@ -9978,15 +9978,17 @@ static int tolua_stratagus_StartReplay00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isstring(tolua_S,1,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
+ !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
   const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+  bool reveal = ((bool)  tolua_toboolean(tolua_S,2,false));
  {
-  StartReplay(str);
+  StartReplay(str,reveal);
  }
  }
  return 0;
