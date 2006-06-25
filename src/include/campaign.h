@@ -145,7 +145,6 @@ public:
 
 extern GameResults GameResult;   /// Outcome of the game
 extern int RestartScenario;      /// Restart the scenario
-extern int QuitToMenu;           /// Quit to menu
 extern char DefaultMap[1024];    /// Default map path
 extern char DefaultObjective[];  /// The default scenario objective
 

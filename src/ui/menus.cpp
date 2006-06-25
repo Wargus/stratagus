@@ -180,15 +180,6 @@ static void NetConnectingCancel(void);
 // End scenario
 #if 0
 static void EndScenarioRestart(void);
-static void EndScenarioSurrender(void);
-static void EndScenarioQuitMenu(void);
-#endif
-
-// Diplomacy options
-#if 0
-static void DiplomacyInit(Menu *menu);
-static void DiplomacyExit(Menu *menu);
-static void DiplomacyOk(void);
 #endif
 
 // Confirm delete
@@ -277,17 +268,6 @@ static int EditorSaveRDFilter(char *pathbuf, FileList *fl);
 static void EditorSaveConfirmInit(Menu *menu);
 static void EditorSaveConfirmOk(void);
 static void EditorSaveConfirmCancel(void);
-#endif
-
-// Replay game
-#if 0
-static void ReplayGameInit(Menu *menu);
-static void ReplayGameExit(Menu *menu);
-static void ReplayGameVSAction(Menuitem *mi);
-static void ReplayGameDisableFog(Menuitem *mi);
-static void ReplayGameOk(void);
-static void ReplayGameCancel(void);
-static int ReplayGameRDFilter(char *pathbuf, FileList *fl);
 #endif
 
 // Metaserver
@@ -530,18 +510,6 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 		return 0;
 	}
 	return 1;
-}
-#endif
-
-#if 0
-/**
-**  Replay game read directory filter
-*/
-static int ReplayGameRDFilter(char *pathbuf, FileList *fl)
-{
-	const char *suf[] = {".log", 0};
-
-	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
 }
 #endif
 
@@ -850,16 +818,6 @@ static void EditorSaveLBInit(Menuitem *mi)
 }
 #endif
 
-#if 0
-/**
-** Replay game listbox init callback
-*/
-static void ReplayGameLBInit(Menuitem *mi)
-{
-	LBInit(mi, ScenSelectPath, ReplayGameRDFilter);
-}
-#endif
-
 /////////////////////
 // Folder.         //
 /////////////////////
@@ -931,18 +889,6 @@ static void EditorSaveFolder(void)
 
 #if 0
 /**
-**  Replay game folder button callback
-*/
-static void ReplayGameFolder(void)
-{
-	if (ParentFolder()) {
-		ReplayGameLBInit(CurrentMenu->Items + 1);
-	}
-}
-#endif
-
-#if 0
-/**
 ** Initialize the hash table of menu functions
 */
 void InitMenuFuncHash(void)
@@ -953,7 +899,6 @@ void InitMenuFuncHash(void)
 	HASHADD(LBRetrieve, "save-game-lb-retrieve");
 	HASHADD(LBRetrieve, "load-game-lb-retrieve");
 	HASHADD(LBRetrieve, "editor-save-lb-retrieve");
-	HASHADD(LBRetrieve, "replay-game-lb-retrieve");
 
 	HASHADD(LBRetrieveAndInfo, "editor-load-lb-retrieve");
 	HASHADD(LBRetrieveAndInfo, "scen-select-lb-retrieve");
@@ -965,7 +910,6 @@ void InitMenuFuncHash(void)
 	HASHADD(PathLBAction, "editor-main-load-lb-action");
 	HASHADD(PathLBAction, "editor-load-lb-action");
 	HASHADD(EditorSaveLBAction, "editor-save-lb-action");
-	HASHADD(PathLBAction, "replay-game-lb-action");
 
 #endif
 
@@ -1048,13 +992,6 @@ void InitMenuFuncHash(void)
 
 // End scenario
 	HASHADD(EndScenarioRestart,"end-scenario-restart");
-	HASHADD(EndScenarioSurrender,"end-scenario-surrender");
-	HASHADD(EndScenarioQuitMenu,"end-scenario-quit-to-menu");
-
-// Diplomacy options
-	HASHADD(DiplomacyInit,"diplomacy-init");
-	HASHADD(DiplomacyExit,"diplomacy-exit");
-	HASHADD(DiplomacyOk,"diplomacy-ok");
 
 // Confirm delete
 	HASHADD(DeleteConfirmOk,"delete-confirm-ok");
@@ -1126,15 +1063,6 @@ void InitMenuFuncHash(void)
 	HASHADD(EditorSaveConfirmInit,"editor-save-confirm-init");
 	HASHADD(EditorSaveConfirmOk,"editor-save-confirm-ok");
 	HASHADD(EditorSaveConfirmCancel,"editor-save-confirm-cancel");
-
-// Replay game
-	HASHADD(ReplayGameInit,"replay-game-init");
-	HASHADD(ReplayGameExit,"replay-game-exit");
-	HASHADD(ReplayGameVSAction,"replay-game-vs-action");
-	HASHADD(ReplayGameFolder,"replay-game-folder");
-	HASHADD(ReplayGameDisableFog,"replay-game-disable-fog");
-	HASHADD(ReplayGameOk,"replay-game-ok");
-	HASHADD(ReplayGameCancel,"replay-game-cancel");
 
 // Metaserver
 	HASHADD(ShowMetaServerList,"metaserver-list");
@@ -1214,180 +1142,11 @@ static void DeleteConfirmOk(void)
 
 #if 0
 /**
-**  Diplomacy init callback
-*/
-static void DiplomacyInit(Menu *menu)
-{
-	int i;
-	int j;
-
-	j = 0;
-
-	for (i = 0; i <= PlayerMax - 2; ++i) {
-		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
-			menu->Items[4 * j + 4].D.Text.text = NewStringDesc(Players[i].Name);
-			if (ThisPlayer->Allied & (1 << Players[i].Index)) {
-				menu->Items[4 * j + 5].D.Checkbox.Checked = 1;
-			} else {
-				menu->Items[4 * j + 5].D.Checkbox.Checked = 0;
-			}
-			if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
-				menu->Items[4 * j + 6].D.Checkbox.Checked = 1;
-			} else {
-				menu->Items[4 * j + 6].D.Checkbox.Checked = 0;
-			}
-			if (ThisPlayer->SharedVision & (1 << Players[i].Index)) {
-				menu->Items[4 * j + 7].D.Checkbox.Checked = 1;
-			} else {
-				menu->Items[4 * j + 7].D.Checkbox.Checked = 0;
-			}
-
-			if (ReplayGameType != ReplayNone || ThisPlayer->Team == Players[i].Team) {
-				menu->Items[4 * j + 5].Flags |= MI_FLAGS_DISABLED;
-				menu->Items[4 * j + 6].Flags |= MI_FLAGS_DISABLED;
-				menu->Items[4 * j + 7].Flags |= MI_FLAGS_DISABLED;
-			} else {
-				menu->Items[4 * j + 5].Flags &= ~MI_FLAGS_DISABLED;
-				menu->Items[4 * j + 6].Flags &= ~MI_FLAGS_DISABLED;
-				menu->Items[4 * j + 7].Flags &= ~MI_FLAGS_DISABLED;
-			}
-
-			++j;
-		}
-	}
-	for (; j <= PlayerMax - 3; ++j) {
-		menu->Items[4 * j + 4].D.Text.text = NULL;
-		menu->Items[4 * j + 5].Flags |= MI_FLAGS_INVISIBLE;
-		menu->Items[4 * j + 6].Flags |= MI_FLAGS_INVISIBLE;
-		menu->Items[4 * j + 7].Flags |= MI_FLAGS_INVISIBLE;
-	}
-}
-#endif
-
-#if 0
-/**
-**  Diplomacy exit callback
-*/
-static void DiplomacyExit(Menu *menu)
-{
-	int i;
-
-	for (i = 0; i <= PlayerMax - 3; ++i) {
-		FreeStringDesc(menu->Items[4 * i + 4].D.Text.text);
-		delete menu->Items[4 * i + 4].D.Text.text;
-		menu->Items[4 * i + 4].D.Text.text = NULL;
-	}
-}
-#endif
-
-#if 0
-/**
-** Diplomacy Ok button callback
-*/
-static void DiplomacyOk(void)
-{
-	Menu *menu;
-	int i;
-	int j;
-
-	menu = CurrentMenu;
-	j = 0;
-
-	for (i=0; i<=PlayerMax - 2; ++i) {
-		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
-			// Menu says to ally
-			if (menu->Items[4 * j + 5].D.Checkbox.Checked &&
-				!menu->Items[4 * j + 6].D.Checkbox.Checked) {
-				// Are they allied?
-				if (!(ThisPlayer->Allied & (1 << Players[i].Index) &&
-						!(ThisPlayer->Enemy & (1 << Players[i].Index)))) {
-					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyAllied,
-						Players[i].Index);
-				}
-			}
-			// Menu says to be enemies
-			if (!menu->Items[4 * j + 5].D.Checkbox.Checked &&
-				menu->Items[4 * j + 6].D.Checkbox.Checked) {
-				// Are they enemies?
-				if (!(!(ThisPlayer->Allied & (1 << Players[i].Index)) &&
-						ThisPlayer->Enemy & (1 << Players[i].Index))) {
-					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyEnemy,
-						Players[i].Index);
-				}
-			}
-			// Menu says to be neutral
-			if (!menu->Items[4 * j + 5].D.Checkbox.Checked &&
-				!menu->Items[4 * j + 6].D.Checkbox.Checked) {
-				// Are they neutral?
-				if (!(!(ThisPlayer->Allied & (1 << Players[i].Index)) &&
-						!(ThisPlayer->Enemy & (1 << Players[i].Index)))) {
-					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyNeutral,
-						Players[i].Index);
-				}
-			}
-			// Menu says to be crazy
-			if (menu->Items[4 * j + 5].D.Checkbox.Checked &&
-				menu->Items[4 * j + 6].D.Checkbox.Checked) {
-				// Are they crazy?
-				if (!(ThisPlayer->Allied & (1 << Players[i].Index) &&
-						ThisPlayer->Enemy & (1 << Players[i].Index))) {
-					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyCrazy,
-						Players[i].Index);
-				}
-			}
-			// Shared vision
-			if (menu->Items[4 * j + 7].D.Checkbox.Checked) {
-				if (!(ThisPlayer->SharedVision & (1 << Players[i].Index))) {
-					SendCommandSharedVision(ThisPlayer->Index, true,
-						Players[i].Index);
-				}
-			}
-			else {
-				if (ThisPlayer->SharedVision&(1<<Players[i].Index)) {
-					SendCommandSharedVision(ThisPlayer->Index, false,
-						Players[i].Index);
-				}
-			}
-
-			++j;
-		}
-	}
-	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
 **  Restart the scenario
 */
 static void EndScenarioRestart(void)
 {
 	RestartScenario = 1;
-	GameRunning = false;
-	GameMenuReturn();
-}
-#endif
-
-#if 0
-/**
-**  End the game in defeat
-*/
-static void EndScenarioSurrender(void)
-{
-	GameResult = GameDefeat;
-	GameRunning = false;
-	GameMenuReturn();
-}
-#endif
-
-
-#if 0
-/**
-**  End the game and return to the menu
-*/
-static void EndScenarioQuitMenu(void)
-{
-	QuitToMenu = 1;
 	GameRunning = false;
 	GameMenuReturn();
 }
@@ -2990,7 +2749,7 @@ void SetupEditor(void)
 */
 static void EditorSelectCancel(void)
 {
-	QuitToMenu = 1;
+	//QuitToMenu = 1;
 	EditorRunning = EditorNotRunning;
 	//CloseMenu();
 }
@@ -3928,7 +3687,7 @@ static void EditorSaveConfirmCancel(void)
 */
 static void EditorQuitToMenu(void)
 {
-	QuitToMenu = 1;
+	//QuitToMenu = 1;
 	EditorRunning = EditorNotRunning;
 	//CloseMenu();
 	SelectedFileExist = 0;
@@ -3949,130 +3708,6 @@ static void EditorEndMenu(void)
 	InterfaceState = IfaceStateNormal;
 	EditorUpdateDisplay();
 	InterfaceState = IfaceStateMenu;
-}
-#endif
-
-#if 0
-/**
-**  Replay game menu init callback
-*/
-static void ReplayGameInit(Menu *menu)
-{
-	Assert(*ScenSelectPath);
-
-	menu->Items[6].D.Checkbox.Checked = 0;
-	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-	ReplayGameLBInit(menu->Items + 1);
-}
-#endif
-
-#if 0
-/**
-**  Replay game menu exit callback
-*/
-static void ReplayGameExit(Menu *menu)
-{
-	LBExit(menu->Items + 1);
-}
-#endif
-
-#if 0
-/**
-**  Replay game vertical slider action
-*/
-static void ReplayGameVSAction(Menuitem *mi)
-{
-}
-#endif
-
-#if 0
-/**
-** Replay game disable fog gem callback
-*/
-static void ReplayGameDisableFog(Menuitem *mi)
-{
-}
-#endif
-
-#if 0
-/**
-** Replay game ok button callback
-*/
-static void ReplayGameOk(void)
-{
-	Menu *menu;
-	Menuitem *mi;
-	int i;
-
-	menu = CurrentMenu;
-	mi = &menu->Items[1];
-	if (ScenSelectPathName[0]) {
-		strcat(ScenSelectPath, "/");
-		strcat(ScenSelectPath, ScenSelectPathName);
-		if (ScenSelectDisplayPath[0]) {
-			strcat(ScenSelectDisplayPath, "/");
-		}
-		strcat(ScenSelectDisplayPath, ScenSelectPathName);
-		ReplayGameLBInit(mi);
-	} else if (ScenSelectFileName[0]) {
-		if (ScenSelectPath[0]) {
-			strcat(ScenSelectPath, "/");
-			strcat(ScenSelectPath, ScenSelectFileName);
-		} else {
-			strcpy(ScenSelectPath, ScenSelectFileName);
-		}
-
-		LoadReplay(ScenSelectPath);
-
-		for (i = 0; i < MAX_OBJECTIVES; i++) {
-			delete[] GameIntro.Objectives[i];
-			GameIntro.Objectives[i] = NULL;
-		}
-		GameIntro.Objectives[0] = new_strdup(DefaultObjective);
-
-		GuiGameStarted = 1;
-		//CloseMenu();
-
-		if (menu->Items[6].D.Checkbox.Checked) {
-			ReplayRevealMap = 1;
-		} else {
-			ReplayRevealMap = 0;
-		}
-	}
-}
-#endif
-
-#if 0
-/**
-** Replay game cancel button callback
-*/
-static void ReplayGameCancel(void)
-{
-	char *s;
-
-	//
-	//  Use last selected map.
-	//
-	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
-	strcpy(ScenSelectPath, StratagusLibPath);
-	if (*ScenSelectPath) {
-		strcat(ScenSelectPath, "/");
-	}
-	strcat(ScenSelectPath, CurrentMapPath);
-	if ((s = strrchr(ScenSelectPath, '/'))) {
-		strcpy(ScenSelectFileName, s + 1);
-		*s = '\0';
-	}
-	strcpy(ScenSelectDisplayPath, CurrentMapPath);
-	if ((s = strrchr(ScenSelectDisplayPath, '/'))) {
-		*s = '\0';
-	} else {
-		*ScenSelectDisplayPath = '\0';
-	}
-
-	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-
-	//CloseMenu();
 }
 #endif
 

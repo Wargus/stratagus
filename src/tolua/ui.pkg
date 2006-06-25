@@ -502,8 +502,8 @@ $void StartMap(const char *str, bool clean = true);
 void StartMap(const char *str, bool clean = true);
 $void StartEditor(const char *str);
 void StartEditor(const char *str);
-$void StartReplay(const char *str);
-void StartReplay(const char *str);
+$void StartReplay(const char *str, bool reveal = false);
+void StartReplay(const char *str, bool reveal = false);
 $void StartSavedGame(const char *str);
 void StartSavedGame(const char *str);
 
