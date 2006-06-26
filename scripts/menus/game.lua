@@ -187,8 +187,6 @@ function RunSaveMenu()
       menu:stop()
     end)
 
-  -- FIXME: do we want a delete button?
-
   menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
     function() menu:stop() end)
 
