@@ -284,20 +284,6 @@ void UiTogglePause(void)
 }
 
 /**
-**  Enter menu mode.
-*/
-static void UiEnterMenu(void)
-{
-	if (UI.MenuButton.Callback) {
-		if (!IsNetworkGame()) {
-			GamePaused = true;
-			UI.StatusLine.Set(_("Game Paused"));
-		}
-		UI.MenuButton.Callback->action("");
-	}
-}
-
-/**
 **  Toggle big map mode.
 **
 **  @todo FIXME: We should try to keep the same view, if possible
@@ -465,13 +451,41 @@ static void UiTrackUnit(void)
 }
 
 /**
+**  Call the lua function HandleCommandKey
+*/
+static bool HandleCommandKey(int key)
+{
+	bool ret;
+
+	lua_pushstring(Lua, "HandleCommandKey");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	if (!lua_isfunction(Lua, -1)) {
+		DebugPrint("No HandleCommandKey function in lua.\n");
+		return false;
+	}
+	lua_pushstring(Lua, SdlKey2Str(key));
+	lua_pushboolean(Lua, (KeyModifiers & ModifierControl));
+	lua_pushboolean(Lua, (KeyModifiers & ModifierAlt));
+	lua_pushboolean(Lua, (KeyModifiers & ModifierShift));
+	LuaCall(4, 0);
+	if (lua_gettop(Lua) == 1) {
+		ret = LuaToBoolean(Lua, 1);
+		lua_pop(Lua, 1);
+	} else {
+		LuaError(Lua, "HandleCommandKey must return a boolean");
+		ret = false;
+	}
+	return ret;
+}
+
+/**
 **  Handle keys in command mode.
 **
 **  @param key  Key scancode.
 **
 **  @return     True, if key is handled; otherwise false.
 */
-static int CommandKey(int key)
+static bool CommandKey(int key)
 {
 	char *ptr;
 
@@ -488,7 +502,7 @@ static int CommandKey(int key)
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: // RETURN
 			UiBeginInput();
-			return 1;
+			return true;
 
 		// Unselect everything
 		case SDLK_CARET:
@@ -520,19 +534,6 @@ static int CommandKey(int key)
 			}
 			break;
 
-		case 'p': // CTRL+P, ALT+P Toggle pause
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			// FALL THROUGH (CTRL+P, ALT+P)
-		case SDLK_PAUSE:
-			UiTogglePause();
-			break;
-
-		case SDLK_F1:
-			//UiEnterHelpMenu();
-			break;
-
 		case SDLK_F2:
 		case SDLK_F3:
 		case SDLK_F4: // Set/Goto place
@@ -543,45 +544,8 @@ static int CommandKey(int key)
 			}
 			break;
 
-		case 'm': // CTRL+M Turn music on / off
-		          // ALT+M, F10 Game menu
-			if (KeyModifiers & ModifierControl) {
-				UiToggleMusic();
-				SavePreferences();
-				break;
-			}
-			if (!(KeyModifiers & ModifierAlt)) {
-				break;
-			}
-			// FALL THROUGH (ALT+M)
-		case SDLK_F10: // Game Options menu
-			if (KeyState != KeyStateInput) {
-				UiEnterMenu();
-			}
-			break;
-
-		case SDLK_F5: // Options menu
-			if (KeyState != KeyStateInput) {
-				//UiEnterOptionsMenu();
-			}
-			break;
-
-		case SDLK_F7: // Sound Options menu
-			if (KeyState != KeyStateInput) {
-				//UiEnterSoundOptionsMenu();
-			}
-			break;
-
-		case SDLK_F8: // Speed Options menu
-			if (KeyState != KeyStateInput) {
-				//UiEnterSpeedOptionsMenu();
-			}
-			break;
-
-		case SDLK_F9: // Preferences menu
-			if (KeyState != KeyStateInput) {
-				//UiEnterPreferencesOptionsMenu();
-			}
+		case SDLK_SPACE: // center on last action
+			CenterOnMessage();
 			break;
 
 		case SDLK_EQUALS: // plus is shift-equals.
@@ -592,37 +556,6 @@ static int CommandKey(int key)
 		case SDLK_MINUS: // - Slower
 		case SDLK_KP_MINUS:
 			UiDecreaseGameSpeed();
-			break;
-
-		case 'l': // ALT+L, F12 load game menu
-			if (!(KeyModifiers & ModifierAlt)) {
-				break;
-			}
-			// FALL THROUGH (ALT+L)
-		case SDLK_F12:
-			//UiEnterLoadGameMenu();
-			break;
-
-		case 's': // ALT+S, F11 save game menu
-		          // CTRL+S - Turn sound on / off
-			if (KeyModifiers & ModifierControl) {
-				UiToggleSound();
-				SavePreferences();
-				break;
-			}
-			if (!(KeyModifiers & ModifierAlt)) {
-				break;
-			}
-			// FALL THROUGH (ALT+S)
-		case SDLK_F11:
-			//UiEnterSaveGameMenu();
-			break;
-
-		case 't': // ALT+T, CTRL+T Track unit
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			UiTrackUnit();
 			break;
 
 		case 'b': // ALT+B, CTRL+B Toggle big map
@@ -651,47 +584,6 @@ static int CommandKey(int key)
 			UiToggleGrabMouse();
 			break;
 
-		case 'h': // ALT+H, CTRL+H Help menu
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			//UiEnterHelpMenu();
-			break;
-
-		case SDLK_SPACE: // center on last action
-			CenterOnMessage();
-			break;
-
-		case SDLK_TAB: // TAB toggles minimap.
-					// FIXME: more...
-					// FIXME: shift+TAB
-			if (KeyModifiers & ModifierAlt) {
-				break;
-			}
-			UiToggleTerrain();
-			break;
-
-		case 'x': // ALT+X, CTRL+X: Exit game
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			//UiExitConfirmMenu();
-			break;
-
-		case 'q': // ALT+Q, CTRL+Q: Quit level
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			//UiQuitToMenuConfirmMenu();
-			break;
-
-		case 'r': // ALT+R, CTRL+R: Restart scenario
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			//UiRestartConfirmMenu();
-			break;
-
 		case 'i':
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
@@ -701,12 +593,53 @@ static int CommandKey(int key)
 			UiFindIdleWorker();
 			break;
 
+		case 'm': // CTRL+M Turn music on / off
+			if (KeyModifiers & ModifierControl) {
+				UiToggleMusic();
+				SavePreferences();
+				break;
+			}
+			break;
+
+		case 'p': // CTRL+P, ALT+P Toggle pause
+			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				break;
+			}
+			// FALL THROUGH (CTRL+P, ALT+P)
+		case SDLK_PAUSE:
+			UiTogglePause();
+			break;
+
+		case 's': // CTRL+S - Turn sound on / off
+			if (KeyModifiers & ModifierControl) {
+				UiToggleSound();
+				SavePreferences();
+				break;
+			}
+			break;
+
+		case 't': // ALT+T, CTRL+T Track unit
+			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				break;
+			}
+			UiTrackUnit();
+			break;
+
 		case 'v': // ALT+V, CTRL+V: Viewport
 			if (KeyModifiers & ModifierControl) {
 				CycleViewportMode(-1);
 			} else if (KeyModifiers & ModifierAlt) {
 				CycleViewportMode(1);
 			}
+			break;
+
+		case SDLK_TAB: // TAB toggles minimap.
+					// FIXME: more...
+					// FIXME: shift+TAB
+			if (KeyModifiers & ModifierAlt) {
+				break;
+			}
+			UiToggleTerrain();
 			break;
 
 		case SDLK_UP:
@@ -727,9 +660,12 @@ static int CommandKey(int key)
 			break;
 
 		default:
-			return 0;
+			if (HandleCommandKey(key)) {
+				break;
+			}
+			return false;
 	}
-	return 1;
+	return true;
 }
 
 /**
