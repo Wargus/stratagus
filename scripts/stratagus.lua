@@ -241,6 +241,7 @@ Load("scripts/dependency.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ai.lua")
 Load("scripts/ranks.lua")
+Load("scripts/commands.lua")
 Load("scripts/cheats.lua")
 Load("scripts/maps.lua")
 
