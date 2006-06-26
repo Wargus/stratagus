@@ -72,9 +72,6 @@
 */
 Menu *CurrentMenu;
 
-static int MenuButtonUnderCursor = -1;
-static int MenuButtonCurSel = -1;
-
 /*----------------------------------------------------------------------------
 -- Menu operation functions
 ----------------------------------------------------------------------------*/
@@ -293,96 +290,16 @@ static void PasteFromClipboard(Menuitem *mi)
 */
 void ProcessMenu(const char *menu_id, int loop)
 {
-	int i;
 	int oldncr;
-	Menuitem *mi;
-	Menu *menu;
-	Menu *CurrentMenuSave;
-	int MenuButtonUnderCursorSave;
-	int MenuButtonCurSelSave;
-
-	CurrentMenuSave = NULL;
-	MenuButtonUnderCursorSave = -1;
-	MenuButtonCurSelSave = -1;
 
 	CancelBuildingMode();
 
 	// Recursion protection:
 	if (loop) {
-		CurrentMenuSave = CurrentMenu;
-		MenuButtonUnderCursorSave = MenuButtonUnderCursor;
-		MenuButtonCurSelSave = MenuButtonCurSel;
 		InterfaceState = IfaceStateMenu;
 	}
 
 	ButtonUnderCursor = -1;
-	CursorState = CursorStatePoint;
-	GameCursor = UI.Point.Cursor;
-	menu = FindMenu(menu_id);
-	if (menu == NULL) {
-		return;
-	}
-	CurrentMenu = menu;
-
-	MenuButtonCurSel = -1;
-	for (i = 0; i < menu->NumItems; ++i) {
-		mi = menu->Items + i;
-		switch (mi->MiType) {
-			case MiTypeButton:
-			case MiTypePulldown:
-			case MiTypeListbox:
-			case MiTypeVslider:
-			case MiTypeHslider:
-			case MiTypeInput:
-				mi->Flags &= ~(MI_FLAGS_CLICKED | MI_FLAGS_ACTIVE | MI_FLAGS_SELECTED);
-				if (i == menu->DefSel) {
-					mi->Flags |= MI_FLAGS_SELECTED;
-					MenuButtonCurSel = i;
-				}
-				break;
-			default:
-				break;
-			
-		}
-		switch (mi->MiType) {
-			case MiTypePulldown:
-				mi->D.Pulldown.cursel = 0;
-				if (mi->D.Pulldown.defopt != -1) {
-					mi->D.Pulldown.curopt = mi->D.Pulldown.defopt;
-				}
-				break;
-			case MiTypeListbox:
-				mi->D.Listbox.cursel = -1;
-				mi->D.Listbox.startline = 0;
-				if (mi->D.Listbox.defopt != -1) {
-					mi->D.Listbox.curopt = mi->D.Listbox.defopt;
-				}
-				break;
-			case MiTypeVslider:
-				mi->D.VSlider.cflags = 0;
-				if (mi->D.VSlider.defper != -1) {
-					mi->D.VSlider.percent = mi->D.VSlider.defper;
-				}
-				break;
-			case MiTypeHslider:
-				mi->D.HSlider.cflags = 0;
-				if (mi->D.HSlider.defper != -1) {
-					mi->D.HSlider.percent = mi->D.HSlider.defper;
-				}
-				break;
-			default:
-				break;
-		}
-	}
-	if (menu->InitFunc) {
-		menu->InitFunc(menu);
-	}
-	MenuButtonUnderCursor = -1;
-
-	if (loop) {
-		SetVideoSync();
-		//MenuHandleMouseMove(CursorX,CursorY); // This activates buttons as appropriate!
-	}
 
 	if (loop) {
 		while (CurrentMenu != NULL) {
@@ -403,20 +320,9 @@ void ProcessMenu(const char *menu_id, int loop)
 			}
 			// stopped by network activity?
 			if (oldncr == 2 && NetConnectRunning == 0) {
-				if (menu->NetAction) {
-					menu->NetAction();
-				}
+				//menu->NetAction();
 			}
 		}
-	}
-
-	if (loop) {
-		if (menu->ExitFunc) {
-			menu->ExitFunc(menu); // action/destructor
-		}
-		CurrentMenu = CurrentMenuSave;
-		MenuButtonUnderCursor = MenuButtonUnderCursorSave;
-		MenuButtonCurSel = MenuButtonCurSelSave;
 	}
 }
 

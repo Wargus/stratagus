@@ -40,6 +40,9 @@
 #include <signal.h>
 #endif
 
+#include <map>
+#include <string>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -89,6 +92,8 @@ static int NumRects;
 #else
 GLint GLMaxTextureSize;   /// Max texture size supported on the video card
 #endif
+
+static std::map<int, std::string> Key2Str;
 
 static int FrameTicks; /// Frame length in ms
 static int FrameRemainder; /// Frame remainder 0.1 ms
@@ -172,6 +177,103 @@ static void CleanExit(int signum)
 #endif
 
 /**
+**  Initialize SDLKey to string map
+*/
+static void InitKey2Str()
+{
+	if (!Key2Str.empty()) {
+		return;
+	}
+
+	int i;
+	char str[20];
+
+	Key2Str[SDLK_BACKSPACE] = "backspace";
+	Key2Str[SDLK_TAB] = "tab";
+	Key2Str[SDLK_CLEAR] = "clear";
+	Key2Str[SDLK_RETURN] = "return";
+	Key2Str[SDLK_PAUSE] = "pause";
+	Key2Str[SDLK_ESCAPE] = "escape";
+	Key2Str[SDLK_SPACE] = " ";
+	Key2Str[SDLK_EXCLAIM] = "!";
+	Key2Str[SDLK_QUOTEDBL] = "\"";
+	Key2Str[SDLK_HASH] = "#";
+	Key2Str[SDLK_DOLLAR] = "$";
+	Key2Str[SDLK_AMPERSAND] = "&";
+	Key2Str[SDLK_QUOTE] = "'";
+	Key2Str[SDLK_LEFTPAREN] = "(";
+	Key2Str[SDLK_RIGHTPAREN] = ")";
+	Key2Str[SDLK_ASTERISK] = "*";
+	Key2Str[SDLK_PLUS] = "+";
+	Key2Str[SDLK_COMMA] = ",";
+	Key2Str[SDLK_MINUS] = "-";
+	Key2Str[SDLK_PERIOD] = ".";
+	Key2Str[SDLK_SLASH] = "/";
+
+	str[1] = '\0';
+	for (i = SDLK_0; i <= SDLK_9; ++i) {
+		str[0] = i;
+		Key2Str[i] = str;
+	}
+
+	Key2Str[SDLK_COLON] = ":";
+	Key2Str[SDLK_SEMICOLON] = ";";
+	Key2Str[SDLK_LESS] = "<";
+	Key2Str[SDLK_EQUALS] = "=";
+	Key2Str[SDLK_GREATER] = ">";
+	Key2Str[SDLK_QUESTION] = "?";
+	Key2Str[SDLK_AT] = "@";
+	Key2Str[SDLK_LEFTBRACKET] = "[";
+	Key2Str[SDLK_BACKSLASH] = "\\";
+	Key2Str[SDLK_RIGHTBRACKET] = "]";
+	Key2Str[SDLK_BACKQUOTE] = "`";
+
+	str[1] = '\0';
+	for (i = SDLK_a; i <= SDLK_z; ++i) {
+		str[0] = i;
+		Key2Str[i] = str;
+	}
+
+	Key2Str[SDLK_DELETE] = "delete";
+
+	for (i = SDLK_KP0; i <= SDLK_KP9; ++i) {
+		sprintf(str, "kp_%d", i - SDLK_KP0);
+		Key2Str[i] = str;
+	}
+
+	Key2Str[SDLK_KP_PERIOD] = "kp_period";
+	Key2Str[SDLK_KP_DIVIDE] = "kp_divide";
+	Key2Str[SDLK_KP_MULTIPLY] = "kp_multiply";
+	Key2Str[SDLK_KP_MINUS] = "kp_minus";
+	Key2Str[SDLK_KP_PLUS] = "kp_plus";
+	Key2Str[SDLK_KP_ENTER] = "kp_enter";
+	Key2Str[SDLK_KP_EQUALS] = "kp_equals";
+	Key2Str[SDLK_UP] = "up";
+	Key2Str[SDLK_DOWN] = "down";
+	Key2Str[SDLK_RIGHT] = "right";
+	Key2Str[SDLK_LEFT] = "left";
+	Key2Str[SDLK_INSERT] = "insert";
+	Key2Str[SDLK_HOME] = "home";
+	Key2Str[SDLK_END] = "end";
+	Key2Str[SDLK_PAGEUP] = "pageup";
+	Key2Str[SDLK_PAGEDOWN] = "pagedown";
+
+	for (i = SDLK_F1; i <= SDLK_F15; ++i) {
+		sprintf(str, "f%d", i - SDLK_F1 + 1);
+		Key2Str[i] = str;
+	}
+
+	Key2Str[SDLK_HELP] = "help";
+	Key2Str[SDLK_PRINT] = "print";
+	Key2Str[SDLK_SYSREQ] = "sysreq";
+	Key2Str[SDLK_BREAK] = "break";
+	Key2Str[SDLK_MENU] = "menu";
+	Key2Str[SDLK_POWER] = "power";
+	Key2Str[SDLK_EURO] = "euro";
+	Key2Str[SDLK_UNDO] = "undo";
+}
+
+/**
 **  Initialize the video part for SDL.
 */
 void InitVideoSdl(void)
@@ -244,6 +346,8 @@ void InitVideoSdl(void)
 #ifdef USE_OPENGL
 	InitOpenGL();
 #endif
+
+	InitKey2Str();
 
 	ColorBlack = Video.MapRGB(TheScreen->format, 0, 0, 0);
 	ColorDarkGreen = Video.MapRGB(TheScreen->format, 48, 100, 4);
@@ -554,6 +658,14 @@ void SdlUnlockScreen(void)
 		SDL_UnlockSurface(TheScreen);
 	}
 #endif
+}
+
+/**
+**  Convert a SDLKey to a string
+*/
+const char *SdlKey2Str(int key)
+{
+	return Key2Str[key].c_str();
 }
 
 /**

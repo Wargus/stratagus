@@ -428,6 +428,9 @@ extern void PopClipping(void);
 	/// Returns the ticks in ms since start
 extern unsigned long GetTicks(void);
 
+	/// Convert a SDLKey to a string
+extern const char *SdlKey2Str(int key);
+
 	/// Check if the mouse is grabbed
 extern bool SdlGetGrabMouse(void);
 	/// Toggle mouse grab mode
