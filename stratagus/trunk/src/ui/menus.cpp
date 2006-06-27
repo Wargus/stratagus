@@ -93,13 +93,7 @@ static void SaveReplayOk(void);
 
 // Scenario select
 #if 0
-static void ScenSelectInit(Menu *menu);
-static void ScenSelectExit(Menu *menu);
 static void ScenSelectTPMSAction(Menuitem *mi, int i);
-static void ScenSelectVSAction(Menuitem *mi);
-static void ScenSelectOk(void);
-static void ScenSelectCancel(void);
-static int ScenSelectRDFilter(char *pathbuf, FileList *fl);
 #endif
 
 // Program start
@@ -113,7 +107,6 @@ static void GameSetupInit(Menu *menu);
 static void ScenSelectMenu(void);
 static void CustomGameStart(void);
 static void GameCancel(void);
-static void GameDrawFunc(Menuitem *mi);
 static void GameRCSAction(Menuitem *mi, int i);
 static void GameRESAction(Menuitem *mi, int i);
 static void GameUNSAction(Menuitem *mi, int i);
@@ -143,7 +136,6 @@ static void MultiPlayerInternetGame(void);
 #if 0
 static void MultiGameSetupInit(Menu *menu);
 static void MultiGameSetupExit(Menu *menu);
-static void MultiGameDrawFunc(Menuitem *mi);
 static void MultiScenSelectMenu(void);
 static void MultiGameStart(void);
 static void MultiGameCancel(void);
@@ -403,162 +395,6 @@ static void FreeMapInfos(std::vector<FileList> *fl, int n)
 }
 #endif
 
-//////////////
-//  Filter  //
-//////////////
-
-#if 0
-/**
-**  Editor main load read directory filter
-**
-**  @param pathbuf    Pathname and filename of current file (or directory) to check.
-**  @param fl         OUT : Filelist to update.
-**  @param suf        suffixe allowed.
-**  @param width      Restiction size map.
-**  @param height     Restiction size map.
-**
-**  @return 1 if it is a valid file, else 0.
-**
-**  @note suffixes supported : ".log", ".sav", ".smp"
-*/
-static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int width, int height)
-{
-	unsigned int i;
-	char type;      // type of compression =>  'b':bzip2 'z':gzip 'n':none
-	char *filename;
-	char *cp;
-
-	Assert(pathbuf && *pathbuf);
-	Assert(fl);
-
-	memset(fl, 0, sizeof (*fl));
-	filename = strrchr(pathbuf, '/');
-	if (filename) {
-		++filename;
-	} else {
-		filename = pathbuf;
-	}
-	cp = filename;
-	for (i = 0; suf[i]; i++) {
-		char *lcp;
-
-		lcp = NULL;
-		cp = filename;
-		while (cp != NULL) {
-			lcp = cp;
-			cp = strcasestr(cp + 1, suf[i]);
-		}
-		if (lcp >= filename) {
-			cp = lcp + strlen(suf[i]);
-			break;
-		}
-	}
-	if (!suf[i]) {
-		return 0;
-	}
-
-	type = 'n';
-#ifdef USE_ZLIB
-	if (strcmp(cp, ".gz") == 0) {
-		*cp = 0;
-		type = 'z';
-	}
-#endif
-#ifdef USE_BZ2LIB
-	if (strcmp(cp, ".bz2") == 0) {
-		*cp = 0;
-		type = 'b';
-	}
-#endif
-	if (*cp != '\0') {
-		return 0;
-	}
-
-	if (strcasestr(filename, ".smp")) {
-		CMapInfo *info;
-
-		info = DuplicateMapInfo(&Map.Info);
-		FreeMapInfo(&Map.Info);
-		LoadStratagusMapInfo(pathbuf);
-
-		if ((width != -1 && Map.Info.MapWidth != width) ||
-			(height != -1 && Map.Info.MapHeight != height)) {
-			FreeMapInfo(&Map.Info);
-			// Restore Map.Info
-			// We don't strdup string attributs of info. (like DuplicateMapInfo dooe)
-			// because we don't free the these in original.
-			Map.Info = *info;
-			delete info;
-			return 0;
-		}
-		fl->type = 1;
-		fl->name = new_strdup(filename);
-		fl->xdata = DuplicateMapInfo(&Map.Info);
-		// Restore Map.Info
-		// We don't strdup string attributs of info. (like DuplicateMapInfo dooe)
-		// because we don't free the these in original.
-		Map.Info = *info;
-		delete info;
-	} else if (strcasestr(filename, ".log")) {
-		fl->type = 1;
-		fl->name = new_strdup(filename);
-	} else if (strcasestr(filename, ".sav")) {
-		fl->type = type;
-		fl->name = new_strdup(filename);
-	} else {
-		DebugPrint("file '%s' unsupported with this extension\n" _C_ filename);
-		return 0;
-	}
-	return 1;
-}
-#endif
-
-#if 0
-/**
-**  Editor main load read directory filter
-*/
-static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
-{
-	const char *suf[] = {".smp", 0};
-
-	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
-}
-#endif
-
-#if 0
-/**
-**  Editor save read directory filter
-*/
-static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
-{
-	const char *suf[] = {".smp", 0};
-
-	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
-}
-#endif
-
-#if 0
-/**
-**  Scenario select read directory filter
-*/
-static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
-{
-	const char *suf[3] = {".smp", 0};
-	static int szl[] = {-1, 32, 64, 96, 128, 256, 512, 1024};
-	int sz;
-	Menu *menu;
-	int curopt;
-
-	menu = FindMenu("menu-select-scenario");
-	sz = szl[menu->Items[8].D.Pulldown.curopt];
-
-	//MAPTODO simplify
-	curopt = 0;
-
-	return GenericRDFilter(pathbuf, fl, suf, sz, sz);
-}
-#endif
-
 ////////////////
 // LBRetrieve //
 ////////////////
@@ -689,21 +525,6 @@ static int PathLBAction(const Menuitem *mi, int i)
 
 #if 0
 /**
-** Save game listbox action callback
-*/
-static void SaveGameLBAction(Menuitem *mi, int i)
-{
-	Assert(mi->MiType == MiTypeListbox);
-	Assert(i >= 0);
-
-	PathLBAction(mi, i);
-	sprintf(mi->Menu->Items[1].D.Input.buffer, "%s~!_", ScenSelectFileName);
-	mi->Menu->Items[1].D.Input.nch = strlen(ScenSelectFileName);
-}
-#endif
-
-#if 0
-/**
 **  Editor save listbox action callback
 */
 static void EditorSaveLBAction(Menuitem *mi, int i)
@@ -783,16 +604,6 @@ static void LBInit(Menuitem *mi, const char *path, int (*filter)(char *, FileLis
 	} else {
 		mi[1].Flags |= MI_FLAGS_DISABLED;
 	}
-}
-#endif
-
-#if 0
-/**
-**  Scenario select listbox init callback
-*/
-static void ScenSelectLBInit(Menuitem *mi)
-{
-	LBInit(mi, ScenSelectPath, ScenSelectRDFilter);
 }
 #endif
 
@@ -905,7 +716,6 @@ void InitMenuFuncHash(void)
 	HASHADD(LBRetrieveAndInfo, "editor-main-load-lb-retrieve");
 
 	HASHADD(PathLBAction, "scen-select-lb-action");
-	HASHADD(SaveGameLBAction, "save-game-lb-action");
 	HASHADD(PathLBAction, "load-game-lb-action");
 	HASHADD(PathLBAction, "editor-main-load-lb-action");
 	HASHADD(PathLBAction, "editor-load-lb-action");
@@ -921,14 +731,8 @@ void InitMenuFuncHash(void)
 	HASHADD(SaveReplayOk,"save-replay-ok");
 
 // Scenario select
-	HASHADD(ScenSelectInit,"scen-select-init");
-	HASHADD(ScenSelectExit,"scen-select-exit");
 	HASHADD(ScenSelectTPMSAction,"scen-select-tpms-action");
-	HASHADD(ScenSelectVSAction,"scen-select-vs-action");
 	HASHADD(ScenSelectFolder,"scen-select-folder");
-	HASHADD(ScenSelectOk,"scen-select-ok");
-	HASHADD(ScenSelectCancel,"scen-select-cancel");
-	HASHADD(ScenSelectRDFilter,"scen-select-rd-filter");
 
 // Program start
 	HASHADD(MultiPlayerGameMenu,"multi-player-game-menu");
@@ -938,7 +742,6 @@ void InitMenuFuncHash(void)
 	HASHADD(ScenSelectMenu,"scen-select-menu");
 	HASHADD(CustomGameStart,"custom-game-start");
 	HASHADD(GameCancel,"game-cancel");
-	HASHADD(GameDrawFunc,"game-draw-func");
 	HASHADD(GameRCSAction,"game-rcs-action");
 	HASHADD(GameRESAction,"game-res-action");
 	HASHADD(GameUNSAction,"game-uns-action");
@@ -962,7 +765,6 @@ void InitMenuFuncHash(void)
 // Net multi setup
 	HASHADD(MultiGameSetupInit,"multi-game-setup-init");
 	HASHADD(MultiGameSetupExit,"multi-game-setup-exit");
-	HASHADD(MultiGameDrawFunc,"multi-game-draw-func");
 	HASHADD(MultiScenSelectMenu,"multi-scen-select");
 	HASHADD(MultiGameStart,"multi-game-start");
 	HASHADD(MultiGameCancel,"multi-game-cancel");
@@ -1681,97 +1483,12 @@ static void MultiPlayerInternetGame(void)
 
 #if 0
 /**
-**  Initialize the scenario selector menu.
-*/
-static void ScenSelectInit(Menu *menu)
-{
-	ScenSelectLBInit(menu->Items + 1);
-}
-#endif
-
-#if 0
-/**
-**  Exit the scenario selector menu.
-*/
-static void ScenSelectExit(Menu *menu)
-{
-	LBExit(menu->Items + 1);
-}
-#endif
-
-#if 0
-/**
 **  Scenario select map type action callback
 */
 static void ScenSelectTPMSAction(Menuitem *mi, int i)
 {
 	mi = mi->Menu->Items + 1;
 	ScenSelectLBInit(mi);
-}
-#endif
-
-#if 0
-/**
-**  Scenario select vertical slider action callback
-*/
-static void ScenSelectVSAction(Menuitem *mi)
-{
-}
-#endif
-
-#if 0
-/**
-** Scenario select ok button
-*/
-static void ScenSelectOk(void)
-{
-	Menu *menu;
-	Menuitem *mi;
-
-	menu = CurrentMenu;
-	mi = &menu->Items[1];
-	if (ScenSelectPathName[0]) {
-		strcat(ScenSelectPath, "/");
-		strcat(ScenSelectPath, ScenSelectPathName);
-		if (ScenSelectDisplayPath[0]) {
-			strcat(ScenSelectDisplayPath, "/");
-		}
-		strcat(ScenSelectDisplayPath, ScenSelectPathName);
-		ScenSelectLBInit(mi);
-	} else if (ScenSelectFileName[0]){
-		strcpy(CurrentMapPath, ScenSelectDisplayPath);
-		if (CurrentMapPath[0]) {
-			strcat(CurrentMapPath, "/");
-		}
-		strcat(CurrentMapPath, ScenSelectFileName);
-		//CloseMenu();
-	}
-}
-#endif
-
-#if 0
-/**
-** Scenario select cancel button.
-*/
-static void ScenSelectCancel(void)
-{
-	char *s;
-
-	//
-	//  Use last selected map.
-	//
-	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
-	strcpy(ScenSelectPath, StratagusLibPath);
-	if (*ScenSelectPath) {
-		strcat(ScenSelectPath, "/");
-	}
-	strcat(ScenSelectPath, CurrentMapPath);
-	if ((s = strrchr(ScenSelectPath, '/'))) {
-		strcpy(ScenSelectFileName, s + 1);
-		*s = '\0';
-	}
-	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-	//CloseMenu();
 }
 #endif
 
@@ -1868,45 +1585,6 @@ static void GameSetupInit(Menu *menu)
 	if (custom_menu->Items[12].D.Pulldown.curopt >= n) {
 		custom_menu->Items[12].D.Pulldown.curopt = 0;
 	}
-}
-#endif
-
-#if 0
-/**
-** FIXME: docu
-*/
-static void GameDrawFunc(Menuitem *mi)
-{
-	const char *nc;
-	const char *rc;
-	int l;
-	char buffer[32];
-
-	GetDefaultTextColors(&nc, &rc);
-	SetDefaultTextColors(rc, rc);
-	l = GameFont->Width("Scenario:");
-	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380, GameFont, "Scenario:");
-	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380 + 24 , GameFont, ScenSelectFileName);
-	if (Map.Info.Description) {
-		VideoDrawText(UI.Offset640X + 16 + l + 8, UI.Offset480Y + 380, GameFont, Map.Info.Description);
-	}
-	sprintf(buffer, " (%d x %d)", Map.Info.MapWidth, Map.Info.MapHeight);
-	VideoDrawText(UI.Offset640X + 16 + l + 8 + GameFont->Width(ScenSelectFileName), UI.Offset480Y + 380 + 24, GameFont, buffer);
-
-#if 0
-	for (n = j = 0; j < PlayerMax; j++) {
-		if (info->PlayerType[j] == PlayerPerson) {
-			n++;
-		}
-	}
-	if (n == 1) {
-		VideoDrawText(menu->X+8,menu->Y + 254 + 40,LargeFont,"1 player");
-	} else {
-		sprintf(buffer, "%d players", n);
-		VideoDrawText(menu->X+8,menu->Y + 254 + 40,LargeFont,buffer);
-	}
-#endif
-	SetDefaultTextColors(nc, rc);
 }
 #endif
 
@@ -2078,27 +1756,6 @@ static void MultiGamePTSAction(Menuitem *mi, int o)
 		}
 	}
 
-}
-#endif
-
-#if 0
-/**
-** Multiplayer server draw func
-*/
-static void MultiGameDrawFunc(Menuitem *mi)
-{
-	GameDrawFunc(mi);
-}
-#endif
-
-#if 0
-/**
-** Multiplayer client draw func
-*/
-static void MultiGameClientDrawFunc(Menuitem *mi)
-{
-	// FIXME: do something better
-	GameDrawFunc(mi);
 }
 #endif
 
