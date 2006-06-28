@@ -1531,12 +1531,17 @@ int MenuScreen::run(bool loop)
 /**
 **  Stop the menu from running
 */
-void MenuScreen::stop(int result)
+void MenuScreen::stop(int result, bool stopAll)
 {
 	if (!this->runLoop) {
 		Gui->setTop(this->oldtop);
 		Assert(MenuStack.top() == this);
 		MenuStack.pop();
+		if (stopAll) {
+			while (!MenuStack.empty()) {
+				MenuStack.pop();
+			}
+		}
 		if (MenuStack.empty()) {
 			GuichanActive = false;
 			//InterfaceState = IfaceStateNormal;
@@ -1575,4 +1580,5 @@ void MenuScreen::logic()
 	}
 	Container::logic();
 }
+
 //@}
