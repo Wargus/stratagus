@@ -1,4 +1,4 @@
-function HandleCommandKey(key, ctrl, alt, shift)
+function HandleIngameCommandKey(key, ctrl, alt, shift)
   -- FIXME: pause game if not multiplayer
   if ((key == "h" and (ctrl or alt)) or key == "f1") then
     RunHelpMenu()
@@ -28,3 +28,4 @@ function HandleCommandKey(key, ctrl, alt, shift)
   return true
 end
 
+HandleCommandKey = HandleIngameCommandKey
