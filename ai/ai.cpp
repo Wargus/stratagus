@@ -174,18 +174,13 @@ PlayerAi *AiPlayer;             /// Current AI player
 */
 static void AiExecuteScript(void)
 {
-	// FIXME: this shouldn't happen but it sometimes does after
-	// FIXME: leaving a menu
-	if (lua_gettop(Lua) != 0) {
-		lua_settop(Lua, 0);
-	}
-
 	PlayerAi *pai = AiPlayer;
+
 	if (pai->Script) {
 		lua_pushstring(Lua, "_ai_scripts_");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
 		lua_pushstring(Lua, pai->Script);
-		lua_rawget(Lua, 1);
+		lua_rawget(Lua, -2);
 		LuaCall(0, 1);
 		lua_pop(Lua, 1);
 	}
