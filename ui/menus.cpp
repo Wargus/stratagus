@@ -1588,6 +1588,7 @@ static void GameRCSAction(Menuitem *mi, int i)
 }
 #endif
 
+#if 0
 /**
 ** Game resources action callback
 */
@@ -1647,6 +1648,7 @@ static void GameGATAction(Menuitem *mi, int i)
 		}
 	}
 }
+#endif
 
 #if 0
 /**
@@ -1658,6 +1660,7 @@ static void CustomGameOPSAction(Menuitem *mi, int i)
 }
 #endif
 
+#if 0
 /**
 ** Menu setup fog-of-war pulldown action.
 */
@@ -1697,6 +1700,7 @@ static void MultiGameFWSAction(Menuitem *mi, int i)
 		}
 	}
 }
+#endif
 
 #if 0
 /**
@@ -1944,6 +1948,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 	}
 }
 
+#if 0
 /**
 ** Update client network menu.
 */
@@ -2016,6 +2021,7 @@ static void MultiClientUpdate(int initial)
 		}
 	}
 }
+#endif
 
 #if 0
 /**
