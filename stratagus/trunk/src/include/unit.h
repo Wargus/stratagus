@@ -10,7 +10,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -891,10 +891,10 @@ extern int CanTarget(const CUnitType *type, const CUnitType *dest);
 extern int CanTransport(const CUnit *transporter, const CUnit *unit);
 
 	/// Check if unit can move.
-extern int CanMove(const CUnit *);
+extern bool CanMove(const CUnit *unit);
 
 	/// Generate a unit reference, a printable unique string for unit
-extern char *UnitReference(const CUnit *);
+extern char *UnitReference(const CUnit *unit);
 	/// Save an order
 extern void SaveOrder(const COrder *order, CFile *file);
 	/// save unit-structure

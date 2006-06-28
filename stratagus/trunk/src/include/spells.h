@@ -10,7 +10,7 @@
 //
 /**@name spells.h - The Spells. */
 //
-//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2006 by Vladi Belperchinov-Shabanski,
 //                                 Joris DAUPHIN, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -401,7 +401,7 @@ extern void InitSpells(void);
 extern void CleanSpells(void);
 
 	/// return 1 if spell is availible, 0 if not (must upgrade)
-extern int SpellIsAvailable(const CPlayer *player, int SpellId);
+extern bool SpellIsAvailable(const CPlayer *player, int SpellId);
 
 	/// returns != 0 if spell can be casted (enough mana, valid target)
 extern int CanCastSpell(const CUnit *caster, const SpellType *spell,

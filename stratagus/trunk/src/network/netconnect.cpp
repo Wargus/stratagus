@@ -10,7 +10,7 @@
 //
 /**@name netconnect.cpp - The network high level connection code. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer, Andreas Arens.
+//      (c) Copyright 2001-2006 by Lutz Sammer, Andreas Arens.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1021,11 +1021,6 @@ static void ClientParseConnected(const InitMessage *msg)
 			}
 			NetLocalState = ccs_mapinfo;
 			NetStateMsgCnt = 0;
-			if (oldMenusRunning) {
-				// Kick the menu..
-				DebugPrint("ClientParseConnected kick the menu\n");
-				NetConnectRunning = 0; // Kick the menu..
-			}
 			break;
 
 		case ICMWelcome: // Server has accepted us (dup)
@@ -1048,8 +1043,6 @@ static void ClientParseMapInfo(const InitMessage *msg)
 
 		case ICMState: // Server has sent us first state info
 			ServerSetupState = msg->u.State;
-			if (oldMenusRunning)
-				NetClientUpdateState();
 			NetLocalState = ccs_synced;
 			NetStateMsgCnt = 0;
 			break;
@@ -1074,8 +1067,6 @@ static void ClientParseSynced(const InitMessage *msg)
 		case ICMState: // Server has sent us new state info
 			DebugPrint("ccs_synced: ICMState recieved\n");
 			ServerSetupState = msg->u.State;
-			if (oldMenusRunning)
-				NetClientUpdateState();
 			NetLocalState = ccs_async;
 			NetStateMsgCnt = 0;
 			break;
@@ -1152,8 +1143,6 @@ static void ClientParseAsync(const InitMessage *msg)
 					memcpy(Hosts[i].PlyName, LocalPlayerName, 16);
 				}
 			}
-			if (oldMenusRunning)
-				NetClientUpdateState();
 			NetLocalState = ccs_synced;
 			NetStateMsgCnt = 0;
 			break;
@@ -1395,12 +1384,10 @@ static void ServerParseWaiting(const int h)
 			NetStates[h].MsgCnt = 0;
 			/* Fall through */
 		case ccs_connected:
-			// this code path happens until client acknoledges the map
+			// this code path happens until client acknowledges the map
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
 			strncpy(message.u.MapPath, NetworkMapName, 256);
-			if (oldMenusRunning)
-				strncpy(message.u.MapPath, CurrentMapPath, 256);
 			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_

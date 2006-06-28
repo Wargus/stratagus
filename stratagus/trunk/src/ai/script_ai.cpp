@@ -176,8 +176,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 */
 static void InitAiHelper(AiHelper &aiHelper)
 {
-	extern ButtonAction *UnitButtonTable[];
-	extern unsigned int NumUnitButtons;
+	extern std::vector<ButtonAction *> UnitButtonTable;
 
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
 	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
@@ -186,7 +185,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 		AiHelperInsert(aiHelper.UnitLimit, 0, *i);
 	}
 
-	for (unsigned int i = 0; i < NumUnitButtons; ++i) {
+	for (int i = 0; i < (int)UnitButtonTable.size(); ++i) {
 		const ButtonAction &button = *UnitButtonTable[i];
 		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button.UnitMask);
 

@@ -10,7 +10,7 @@
 //
 /**@name mouse.cpp - The mouse handling. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -71,11 +71,11 @@ int MouseButtons;                            /// Current pressed mouse buttons
 
 int KeyModifiers;                            /// Current keyboard modifiers
 
-CUnit *UnitUnderCursor;                       /// Unit under cursor
+CUnit *UnitUnderCursor;                      /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
-char GameMenuButtonClicked;                  /// Menu button was clicked
-char GameDiplomacyButtonClicked;             /// Diplomacy button was clicked
+bool GameMenuButtonClicked;                  /// Menu button was clicked
+bool GameDiplomacyButtonClicked;             /// Diplomacy button was clicked
 bool LeaveStops;                             /// Mouse leaves windows stops scroll
 
 enum _cursor_on_ CursorOn = CursorOnUnknown; /// Cursor on field
@@ -428,7 +428,7 @@ void DoRightButton(int sx, int sy)
 **
 **  @return        True if mouse is on the button, False otherwise.
 */
-static inline int OnButton(int x, int y, CUIButton *button)
+static inline bool OnButton(int x, int y, CUIButton *button)
 {
 	return x >= button->X && x < button->X + button->Style->Width &&
 		y >= button->Y && y < button->Y + button->Style->Height;
@@ -445,14 +445,14 @@ static inline int OnButton(int x, int y, CUIButton *button)
 **
 **  @return    True if mouse is on the graphic, False otherwise.
 */
-static inline int OnGraphic(int x, int y, CGraphic *g, int gx, int gy)
+static inline bool OnGraphic(int x, int y, CGraphic *g, int gx, int gy)
 {
 	x -= gx;
 	y -= gy;
 	if (x >= 0 && x < g->Width && y >= 0 && y < g->Height) {
 		return !g->TransparentPixel(x, y);
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -464,7 +464,7 @@ static inline int OnGraphic(int x, int y, CGraphic *g, int gx, int gy)
 static void HandleMouseOn(int x, int y)
 {
 	int i;
-	int on_ui;
+	bool on_ui;
 
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
@@ -602,10 +602,10 @@ static void HandleMouseOn(int x, int y)
 	//
 	//  On UI graphic
 	//
-	on_ui = 0;
+	on_ui = false;
 	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
 		if (OnGraphic(x, y, UI.Fillers[i].G, UI.Fillers[i].X, UI.Fillers[i].Y)) {
-			on_ui = 1;
+			on_ui = true;
 			break;
 		}
 	}
@@ -895,19 +895,15 @@ void UIHandleMouseMove(int x, int y)
 */
 static int SendRepair(int sx, int sy)
 {
-	int i;
-	CUnit *unit;
 	CUnit *dest;
-	int ret;
-
-	ret = 0;
+	int ret = 0;
 
 	// Check if the dest is repairable!
 	if ((dest = UnitUnderCursor) && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
 			dest->Type->RepairHP &&
 			(dest->Player == ThisPlayer || ThisPlayer->IsAllied(dest))) {
-		for (i = 0; i < NumSelected; ++i) {
-			unit = Selected[i];
+		for (int i = 0; i < NumSelected; ++i) {
+			CUnit *unit = Selected[i];
 			if (unit->Type->RepairRange) {
 				SendCommandRepair(unit, sx / TileSizeX, sy / TileSizeY, dest,
 					!(KeyModifiers & ModifierShift));
@@ -1029,13 +1025,10 @@ static int SendAttack(int sx, int sy)
 */
 static int SendAttackGround(int sx, int sy)
 {
-	int i;
-	CUnit *unit;
-	int ret;
+	int ret = 0;
 
-	ret = 0;
-	for (i = 0; i < NumSelected; ++i) {
-		unit = Selected[i];
+	for (int i = 0; i < NumSelected; ++i) {
+		CUnit *unit = Selected[i];
 		if (unit->Type->CanAttack) {
 			SendCommandAttackGround(unit, sx / TileSizeX, sy / TileSizeY,
 				!(KeyModifiers & ModifierShift));
@@ -1057,13 +1050,10 @@ static int SendAttackGround(int sx, int sy)
 */
 static int SendPatrol(int sx, int sy)
 {
-	int i;
-	CUnit *unit;
-	int ret;
+	int ret = 0;
 
-	ret = 0;
-	for (i = 0; i < NumSelected; ++i) {
-		unit = Selected[i];
+	for (int i = 0; i < NumSelected; ++i) {
+		CUnit *unit = Selected[i];
 		SendCommandPatrol(unit, sx / TileSizeX, sy / TileSizeY,
 			!(KeyModifiers & ModifierShift));
 		ret = 1;
@@ -1156,11 +1146,9 @@ static int SendResource(int sx, int sy)
 */
 static int SendUnload(int sx, int sy)
 {
-	int i;
-	int ret;
+	int ret = 0;
 
-	ret = 0;
-	for (i = 0; i < NumSelected; ++i) {
+	for (int i = 0; i < NumSelected; ++i) {
 		// FIXME: not only transporter selected?
 		SendCommandUnload(Selected[i], sx / TileSizeX, sy / TileSizeY, NoUnitP,
 			!(KeyModifiers & ModifierShift));
@@ -1183,12 +1171,9 @@ static int SendUnload(int sx, int sy)
 */
 static int SendSpellCast(int sx, int sy)
 {
-	int i;
-	CUnit *unit;
 	CUnit *dest;
-	int ret;
+	int ret = 0;
 
-	ret = 0;
 	dest = UnitUnderCursor;
 
 	/* NOTE: Vladi:
@@ -1196,8 +1181,8 @@ static int SendSpellCast(int sx, int sy)
 	   (if exists). All checks are performed at spell cast handle
 	   function which will cancel function if cannot be executed
 	 */
-	for (i = 0; i < NumSelected; ++i) {
-		unit = Selected[i];
+	for (int i = 0; i < NumSelected; ++i) {
+		CUnit *unit = Selected[i];
 		if (!unit->Type->CanCastSpell) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
 				unit->Slot _C_ unit->Type->Name);
@@ -1225,7 +1210,6 @@ static int SendSpellCast(int sx, int sy)
 */
 static void SendCommand(int sx, int sy)
 {
-	int i;
 	int ret;
 
 	ret = 0;
@@ -1263,7 +1247,7 @@ static void SendCommand(int sx, int sy)
 
 	if (ret) {
 		// Acknowledge the command with first selected unit.
-		for (i = 0; i < NumSelected; ++i) {
+		for (int i = 0; i < NumSelected; ++i) {
 			if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
 				PlayUnitSound(Selected[i], VoiceAcknowledging);
 				break;
@@ -1283,8 +1267,6 @@ static void SendCommand(int sx, int sy)
 */
 static void DoSelectionButtons(int num, unsigned button)
 {
-	CUnit *unit;
-
 	if (GameObserve || GamePaused) {
 		return;
 	}
@@ -1292,7 +1274,8 @@ static void DoSelectionButtons(int num, unsigned button)
 	if (num >= NumSelected || !(MouseButtons & LeftButton)) {
 		return;
 	}
-	unit = Selected[num];
+
+	CUnit *unit = Selected[num];
 
 	if ((KeyModifiers & ModifierControl) ||
 			(MouseButtons & (LeftButton << MouseDoubleShift))) {
@@ -1330,9 +1313,6 @@ static void DoSelectionButtons(int num, unsigned button)
 */
 static void UISelectStateButtonDown(unsigned button)
 {
-	int sx;
-	int sy;
-
 	if (GameObserve || GamePaused) {
 		return;
 	}
@@ -1349,17 +1329,15 @@ static void UISelectStateButtonDown(unsigned button)
 		UI.ButtonPanel.Update();
 
 		if (MouseButtons & LeftButton) {
-			const CViewport *vp;
-
-			vp = UI.MouseViewport;
+			const CViewport *vp = UI.MouseViewport;
 			if (ClickMissile) {
 				int mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
 				int my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					mx, my, mx, my);
 			}
-			sx = CursorX - vp->X + TileSizeX * vp->MapX + vp->OffsetX;
-			sy = CursorY - vp->Y + TileSizeY * vp->MapY + vp->OffsetY;
+			int sx = CursorX - vp->X + TileSizeX * vp->MapX + vp->OffsetX;
+			int sy = CursorY - vp->Y + TileSizeY * vp->MapY + vp->OffsetY;
 			SendCommand(sx, sy);
 		}
 		return;
@@ -1369,14 +1347,12 @@ static void UISelectStateButtonDown(unsigned button)
 	//  Clicking on the minimap.
 	//
 	if (CursorOn == CursorOnMinimap) {
-		int mx;
-		int my;
+		int mx = UI.Minimap.Screen2MapX(CursorX);
+		int my = UI.Minimap.Screen2MapY(CursorY);
 
-		mx = UI.Minimap.Screen2MapX(CursorX);
-		my = UI.Minimap.Screen2MapY(CursorY);
 		if (MouseButtons & LeftButton) {
-			sx = mx * TileSizeX;
-			sy = my * TileSizeY;
+			int sx = mx * TileSizeX;
+			int sy = my * TileSizeY;
 			UI.StatusLine.Clear();
 			ClearCosts();
 			CursorState = CursorStatePoint;
@@ -1614,11 +1590,11 @@ void UIHandleButtonDown(unsigned button)
 						ButtonUnderCursor == ButtonUnderNetworkMenu) &&
 						!GameMenuButtonClicked) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					GameMenuButtonClicked = 1;
+					GameMenuButtonClicked = true;
 				} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy &&
 						!GameDiplomacyButtonClicked) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					GameDiplomacyButtonClicked = 1;
+					GameDiplomacyButtonClicked = true;
 				}
 			//
 			//  clicked on selected button
@@ -1750,7 +1726,7 @@ void UIHandleButtonUp(unsigned button)
 	//  Menu (F10) button
 	//
 	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
-		GameMenuButtonClicked = 0;
+		GameMenuButtonClicked = false;
 		if (ButtonAreaUnderCursor == ButtonAreaMenu &&
 			(ButtonUnderCursor == ButtonUnderMenu ||
 				ButtonUnderCursor == ButtonUnderNetworkMenu)) {
@@ -1759,13 +1735,9 @@ void UIHandleButtonUp(unsigned button)
 				GamePaused = true;
 				UI.StatusLine.Set(_("Game Paused"));
 			}
-#if 0
-			ProcessMenu("menu-game", 0);
-#else
 			if (UI.MenuButton.Callback) {
 				UI.MenuButton.Callback->action("");
 			}
-#endif
 			return;
 		}
 	}
@@ -1774,7 +1746,7 @@ void UIHandleButtonUp(unsigned button)
 	//  Diplomacy button
 	//
 	if ((1 << button) == LeftButton && GameDiplomacyButtonClicked) {
-		GameDiplomacyButtonClicked = 0;
+		GameDiplomacyButtonClicked = false;
 		if (ButtonAreaUnderCursor == ButtonAreaMenu &&
 				ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
 			// FIXME: Not if, in input mode.
@@ -2028,13 +2000,11 @@ void DrawPieMenu(void)
 */
 static void HandlePieMenuMouseSelection(void)
 {
-	int pie;
-
 	if (!CurrentButtons) {  // no buttons
 		return;
 	}
 
-	pie = GetPieUnderCursor();
+	int pie = GetPieUnderCursor();
 	if (pie != -1) {
 		UI.ButtonPanel.DoClicked(pie);
 		if (CurrentButtons[pie].Action == ButtonButton) {
@@ -2054,7 +2024,5 @@ static void HandlePieMenuMouseSelection(void)
 		CursorOn = CursorOnUnknown;
 		UIHandleMouseMove(CursorX, CursorY); // recompute CursorOn and company
 	}
-
-	return;
 }
 //@}
