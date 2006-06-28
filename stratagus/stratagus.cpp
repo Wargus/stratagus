@@ -10,8 +10,8 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Francois Beerten 
-//            and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer, Francois Beerten, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -447,6 +447,7 @@ void PreMenuSetup(void)
 	UI.Load();
 }
 
+#if 0
 /**
 **  Menu loop.
 **
@@ -563,6 +564,7 @@ void MenuLoop(const char *filename, CMap *map)
 		}
 	}
 }
+#endif
 
 /**
 **  Run the guichan main menus loop.
@@ -572,7 +574,7 @@ void MenuLoop(const char *filename, CMap *map)
 **
 **  @return      0 in success, else exit.
 */
-int GuichanLoop(const char *filename, CMap *map)
+static int MenuLoop(const char *filename, CMap *map)
 {
 	char buf[1024];
 	int status;
@@ -791,9 +793,7 @@ static int main1(int argc, char **argv)
 	InitUnitsMemory();  // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
-	if (GuichanLoop(MapName, &Map)) {
-		MenuLoop(MapName, &Map);  // Enter the old menu loop
-	}
+	MenuLoop(MapName, &Map);
 
 	return 0;
 }
