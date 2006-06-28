@@ -42,6 +42,7 @@
 #include "widgets.h"
 #include "network.h"
 #include "netconnect.h"
+#include "editor.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -1539,7 +1540,11 @@ void MenuScreen::stop(int result)
 		if (MenuStack.empty()) {
 			GuichanActive = false;
 			//InterfaceState = IfaceStateNormal;
-			Callbacks = &GameCallbacks;
+			if (!EditorRunning) {
+				Callbacks = &GameCallbacks;
+			} else {
+				Callbacks = &EditorCallbacks;
+			}
 			GamePaused = false;
 			UI.StatusLine.Clear();
 			if (GameRunning) {

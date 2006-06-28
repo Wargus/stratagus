@@ -61,6 +61,7 @@
 #include "script.h"
 
 extern void DoScrollArea(int state, bool fast);
+extern void DrawGuichanWidgets();
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -1070,9 +1071,9 @@ void EditorUpdateDisplay(void)
 	//
 	UI.StatusLine.Draw();
 
-	DrawCursor();
+	DrawGuichanWidgets();
 
-	// FIXME: For now update everything each frame
+	DrawCursor();
 
 	// refresh entire screen, so no further invalidate needed
 	Invalidate();
@@ -2012,6 +2013,15 @@ void CEditor::Init(void)
 
 	ButtonPanelWidth = 200;
 	ButtonPanelHeight = 144;
+
+	EditorCallbacks.ButtonPressed = EditorCallbackButtonDown;
+	EditorCallbacks.ButtonReleased = EditorCallbackButtonUp;
+	EditorCallbacks.MouseMoved = EditorCallbackMouse;
+	EditorCallbacks.MouseExit = EditorCallbackExit;
+	EditorCallbacks.KeyPressed = EditorCallbackKeyDown;
+	EditorCallbacks.KeyReleased = EditorCallbackKeyUp;
+	EditorCallbacks.KeyRepeated = EditorCallbackKey3;
+	EditorCallbacks.NetworkEvent = NetworkEvent;
 }
 
 /**
@@ -2047,11 +2057,11 @@ int EditorSaveMap(const char *file)
 */
 void EditorMainLoop(void)
 {
-	EventCallback callbacks;
-	int OldCommandLogDisabled;
+	int OldCommandLogDisabled = CommandLogDisabled;
+	EventCallback *OldCallbacks = Callbacks;
 
-	OldCommandLogDisabled = CommandLogDisabled;
 	CommandLogDisabled = 1;
+	Callbacks = &EditorCallbacks;
 
 	while (1) {
 		EditorMapLoaded = false;
@@ -2063,15 +2073,6 @@ void EditorMainLoop(void)
 		InterfaceState = IfaceStateNormal;
 
 		SetVideoSync();
-
-		callbacks.ButtonPressed = EditorCallbackButtonDown;
-		callbacks.ButtonReleased = EditorCallbackButtonUp;
-		callbacks.MouseMoved = EditorCallbackMouse;
-		callbacks.MouseExit = EditorCallbackExit;
-		callbacks.KeyPressed = EditorCallbackKeyDown;
-		callbacks.KeyReleased = EditorCallbackKeyUp;
-		callbacks.KeyRepeated = EditorCallbackKey3;
-		callbacks.NetworkEvent = NetworkEvent;
 
 		GameCursor = UI.Point.Cursor;
 		InterfaceState = IfaceStateNormal;
@@ -2101,7 +2102,7 @@ void EditorMainLoop(void)
 				}
 			}
 
-			WaitEventsOneFrame(&callbacks);
+			WaitEventsOneFrame(Callbacks);
 		}
 
 		if (!EditorMapLoaded) {
@@ -2122,6 +2123,7 @@ void EditorMainLoop(void)
 	}
 
 	CommandLogDisabled = OldCommandLogDisabled;
+	Callbacks = OldCallbacks;
 }
 
 //@}
