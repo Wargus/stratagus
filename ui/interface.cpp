@@ -453,7 +453,7 @@ static void UiTrackUnit(void)
 /**
 **  Call the lua function HandleCommandKey
 */
-static bool HandleCommandKey(int key)
+bool HandleCommandKey(int key)
 {
 	bool ret;
 

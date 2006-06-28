@@ -1375,7 +1375,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		return;
 	}
 
-
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
 	if ((ptr = strchr(UiGroupKeys, key))) {
 		key = '0' + ptr - UiGroupKeys;
@@ -1391,22 +1390,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			ToggleFullScreen();
 			break;
 
-		case 's': // ALT+S, CTRL+S, F11 save map menu
-		case SDLK_F11:
-			if (key == 's' && !(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			if (EditorSaveMenu() != -1) {
-				UI.StatusLine.Set(_("Map saved"));
-			}
-			InterfaceState = IfaceStateNormal;
-			break;
-
-		case SDLK_F12:
-			EditorLoadMenu();
-			InterfaceState = IfaceStateNormal;
-			break;
-
 		case 'v': // 'v' Viewport
 			if (KeyModifiers & ModifierControl) {
 				CycleViewportMode(-1);
@@ -1415,12 +1398,14 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
+		// FIXME: move to lua
 		case 'r': // CTRL+R Randomize map
 			if (KeyModifiers & ModifierControl) {
 				Editor.CreateRandomMap();
 			}
 			break;
 
+		// FIXME: move to lua
 		case 'm': // CTRL+M Mirror edit
 			if (KeyModifiers & ModifierControl)  {
 				++MirrorEdit;
@@ -1459,10 +1444,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
-		case SDLK_F10:
-			ProcessMenu("menu-editor", 1);
-			break;
-
 		case SDLK_UP: // Keyboard scrolling
 		case SDLK_KP8:
 			KeyScrollState |= ScrollUp;
@@ -1495,10 +1476,8 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
-
-
-
 		default:
+			HandleCommandKey(key);
 			return;
 	}
 	return;
