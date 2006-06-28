@@ -436,8 +436,9 @@ extern bool SdlGetGrabMouse(void);
 	/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 
-extern EventCallback *Callbacks;    /// Current callbacks
-extern EventCallback GameCallbacks; /// Game callbacks
+extern EventCallback *Callbacks;      /// Current callbacks
+extern EventCallback GameCallbacks;   /// Game callbacks
+extern EventCallback EditorCallbacks; /// Editor callbacks
 
 extern Uint32 ColorBlack;
 extern Uint32 ColorDarkGreen;

@@ -82,8 +82,9 @@ int KeyScrollState = ScrollNone;
 	/// variable set when we are scrolling via mouse
 int MouseScrollState = ScrollNone;
 
-EventCallback *Callbacks;    /// Current callbacks
-EventCallback GameCallbacks; /// Game callbacks
+EventCallback *Callbacks;      /// Current callbacks
+EventCallback GameCallbacks;   /// Game callbacks
+EventCallback EditorCallbacks; /// Editor callbacks
 
 //----------------------------------------------------------------------------
 // Functions
