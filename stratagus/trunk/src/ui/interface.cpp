@@ -456,6 +456,7 @@ static void UiTrackUnit(void)
 bool HandleCommandKey(int key)
 {
 	bool ret;
+	int base = lua_gettop(Lua);
 
 	lua_pushstring(Lua, "HandleCommandKey");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
@@ -468,8 +469,8 @@ bool HandleCommandKey(int key)
 	lua_pushboolean(Lua, (KeyModifiers & ModifierAlt));
 	lua_pushboolean(Lua, (KeyModifiers & ModifierShift));
 	LuaCall(4, 0);
-	if (lua_gettop(Lua) == 1) {
-		ret = LuaToBoolean(Lua, 1);
+	if (lua_gettop(Lua) - base == 1) {
+		ret = LuaToBoolean(Lua, base + 1);
 		lua_pop(Lua, 1);
 	} else {
 		LuaError(Lua, "HandleCommandKey must return a boolean");
