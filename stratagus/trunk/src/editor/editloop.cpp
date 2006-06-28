@@ -2016,11 +2016,11 @@ void CEditor::Init(void)
 */
 int EditorSaveMap(const char *file)
 {
-	if (SaveStratagusMap(file, &Map, Editor.TerrainEditable) == -1) {
-		ErrorMenu("Cannot save map");
-		InterfaceState = IfaceStateNormal;
-		EditorUpdateDisplay();
-		InterfaceState = IfaceStateMenu;
+	char path[PATH_MAX];
+
+	sprintf(path, "%s/%s", StratagusLibPath, file);
+	if (SaveStratagusMap(path, &Map, Editor.TerrainEditable) == -1) {
+		printf("Cannot save map\n");
 		return -1;
 	}
 
