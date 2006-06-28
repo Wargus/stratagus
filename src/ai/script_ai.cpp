@@ -251,21 +251,14 @@ static int CclDefineAiHelper(lua_State *l)
 	const char *value;
 	int what;
 	CUnitType *base;
-	CUnitType *type;
-	CUpgrade *upgrade;
-	int cost;
+	CUnitType *type = NULL;
 	int args;
 	int j;
 	int subargs;
 	int k;
 
-
 	InitAiHelper(AiHelpers);
-#ifdef DEBUG
-	type = NULL;
-	upgrade = NULL;
-	cost = 0;
-#endif
+
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
