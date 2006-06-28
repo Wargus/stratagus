@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Jun 25 08:56:11 2006.
+** Generated automatically by tolua++-1.0.7 on Wed Jun 28 22:45:28 2006.
 */
 
 #ifndef __cplusplus
@@ -33,6 +33,7 @@ using std::vector;
 using namespace gcn;
 void StartMap(const char *str, bool clean = true);
 void StartEditor(const char *str);
+int EditorSaveMap(const char *file);
 void StartReplay(const char *str, bool reveal = false);
 void StartSavedGame(const char *str);
 #include "campaign.h"
@@ -9970,6 +9971,35 @@ static int tolua_stratagus_StartEditor00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: EditorSaveMap */
+#ifndef TOLUA_DISABLE_tolua_stratagus_EditorSaveMap00
+static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* file = ((const char*)  tolua_tostring(tolua_S,1,0));
+ {
+  int tolua_ret = (int)  EditorSaveMap(file);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'EditorSaveMap'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: StartReplay */
 #ifndef TOLUA_DISABLE_tolua_stratagus_StartReplay00
 static int tolua_stratagus_StartReplay00(lua_State* tolua_S)
@@ -14681,6 +14711,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 
  tolua_function(tolua_S,"StartMap",tolua_stratagus_StartMap00);
  tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
+ tolua_function(tolua_S,"EditorSaveMap",tolua_stratagus_EditorSaveMap00);
  tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);
  tolua_function(tolua_S,"StartSavedGame",tolua_stratagus_StartSavedGame00);
  tolua_constant(tolua_S,"GameNoResult",GameNoResult);
