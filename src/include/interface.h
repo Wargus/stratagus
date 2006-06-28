@@ -316,6 +316,9 @@ extern void UiTogglePause(void);
 	/// Handle cheats
 extern int HandleCheats(const char *input);
 
+	/// Call the lua function HandleCommandKey
+bool HandleCommandKey(int key);
+
 //
 // Chaos pur.
 //
