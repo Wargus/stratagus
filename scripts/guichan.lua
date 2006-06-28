@@ -377,7 +377,11 @@ function RunEditorMenu(s)
 
   local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
   function starteditorbutton(s)
+    UI.MenuButton:SetCallback(function() RunEditorIngameMenu() end)
+    HandleCommandKey = HandleEditorIngameCommandKey
     StartEditor("maps/" .. browser:getSelectedItem())
+    UI.MenuButton:SetCallback(function() RunGameMenu() end)
+    HandleCommandKey = HandleIngameCommandKey
     menu:stop()
   end
 
@@ -390,7 +394,8 @@ Load("scripts/menus/network.lua")
 Load("scripts/menus/options.lua")
 Load("scripts/menus/credits.lua")
 Load("scripts/menus/widgetsdemo.lua")
-Load("scripts/menus/game.lua")
+Load("scripts/menus/ingame/game.lua")
+Load("scripts/menus/ingame/editor.lua")
 Load("scripts/menus/campaigns.lua")
 
 function BuildMainMenu(menu)
