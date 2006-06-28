@@ -385,22 +385,6 @@ void GameMainLoop(void)
 	NetworkQuit();
 	EndReplayLog();
 
-	if (oldMenusRunning) {
-		if (GameResult == GameDefeat) {
-			fprintf(stderr, _("You have lost!\n"));
-			UI.StatusLine.Set(_("You have lost!"));
-			ProcessMenu("menu-defeated", 1);
-		} else if (GameResult == GameVictory) {
-			fprintf(stderr, _("You have won!\n"));
-			UI.StatusLine.Set(_("You have won!"));
-			ProcessMenu("menu-victory", 1);
-		}
-
-		if (GameResult == GameVictory || GameResult == GameDefeat) {
-			ShowStats();
-		}
-	}
-
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 	GamePaused = false;

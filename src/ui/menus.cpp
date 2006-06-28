@@ -296,12 +296,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial);
 	/// Hash table of all the menus
 std::map<std::string, Menu *> MenuMap;
 
-	/// Game started
-int GuiGameStarted;
-	/// Are the old menus running ?
-bool oldMenusRunning = false;
 	/// Editor cancel button pressed
-
 static int EditorCancelled;
 
 
@@ -910,32 +905,6 @@ static void LoadGameOk(void)
 	SetMessage(_("Loaded game: %s"), TempPathBuf);
 	GuiGameStarted = 1;
 	GameMenuReturn();
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
-}
-#endif
-
-#if 0
-/**
-**  Delete confirm ok button
-*/
-static void DeleteConfirmOk(void)
-{
-	Menu *menu;
-
-	menu = FindMenu("menu-save-game");
-	strcpy(TempPathBuf, SaveDir);
-	strcat(TempPathBuf, "/");
-	strcat(TempPathBuf, menu->Items[1].D.Input.buffer);
-	TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
-	unlink(TempPathBuf);
-	//CloseMenu();
-
-	// Update list of files and clear input
-//	SaveGameLBInit(&CurrentMenu->Items[2]);
-	strcpy(CurrentMenu->Items[1].D.Input.buffer, "~!_");
-	CurrentMenu->Items[1].D.Input.nch = 0;
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
@@ -2332,6 +2301,7 @@ void NetConnectForceDisplayUpdate(void)
 	MultiGamePlayerSelectorsUpdate(2);
 }
 
+#if 0
 /**
 ** Update client menu to follow server menu.
 */
@@ -2364,6 +2334,7 @@ void NetClientUpdateState(void)
 	MultiClientUpdate(0);
 	DebugPrint("NetClientUpdateState\n");
 }
+#endif
 
 /**
 ** Setup Editor Paths
@@ -2712,7 +2683,7 @@ void EditorLoadMenu(void)
 		strcpy(CurrentMapPath, ScenSelectFileName);
 	}
 
-	EditorMapLoaded = 1;
+	EditorMapLoaded = true;
 	EditorRunning = EditorNotRunning;
 	//CloseMenu();
 }

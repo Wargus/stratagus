@@ -10,7 +10,7 @@
 //
 /**@name botpanel.cpp - The bottom panel. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2006 by Lutz Sammer, Vladi Belperchinov-Shabanski,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <vector>
 
 #include "stratagus.h"
 
@@ -59,9 +60,6 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-	/// How many different buttons are allowed
-#define MAX_BUTTONS  2048
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -69,11 +67,9 @@
 	/// for unit buttons sub-menus etc.
 int CurrentButtonLevel;
 	/// All buttons for units
-ButtonAction *UnitButtonTable[MAX_BUTTONS];
-	/// buttons in UnitButtonTable
-unsigned int NumUnitButtons;
-
-ButtonAction *CurrentButtons;             /// Pointer to current buttons
+std::vector<ButtonAction *> UnitButtonTable;
+	/// Pointer to current buttons
+ButtonAction *CurrentButtons;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -85,7 +81,7 @@ ButtonAction *CurrentButtons;             /// Pointer to current buttons
 void InitButtons(void)
 {
 	// Resolve the icon names.
-	for (unsigned int z = 0; z < NumUnitButtons; ++z) {
+	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		UnitButtonTable[z]->Icon.Load();
 	}
 	CurrentButtons = NULL;
@@ -98,7 +94,7 @@ void InitButtons(void)
 /**
 **  FIXME: docu
 */
-int AddButton(int pos, int level, const char *icon_ident,
+int AddButton(int pos, int level, char *icon_ident,
 	ButtonCmd action, const char *value, const ButtonCheckFunc func,
 	const char *allow, int key, const char *hint, const char *umask)
 {
@@ -110,7 +106,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 
 	ba->Pos = pos;
 	ba->Level = level;
-	ba->Icon.Name = (char *)icon_ident;
+	ba->Icon.Name = icon_ident;
 	// FIXME: check if already initited
 	//ba->Icon.Load();
 	ba->Action = action;
@@ -163,7 +159,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 		sprintf(buf, ",%s,", umask);
 	}
 	ba->UnitMask = new_strdup(buf);
-	UnitButtonTable[NumUnitButtons++] = ba;
+	UnitButtonTable.push_back(ba);
 	// FIXME: check if already initited
 	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end
 	return 1;
@@ -176,7 +172,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 void CleanButtons(void)
 {
 	// Free the allocated buttons.
-	for (unsigned int z = 0; z < NumUnitButtons; ++z) {
+	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		Assert(UnitButtonTable[z]);
 		delete[] UnitButtonTable[z]->ValueStr;
 		delete[] UnitButtonTable[z]->AllowStr;
@@ -184,7 +180,7 @@ void CleanButtons(void)
 		delete[] UnitButtonTable[z]->UnitMask;
 		delete UnitButtonTable[z];
 	}
-	NumUnitButtons = 0;
+	UnitButtonTable.clear();
 
 	CurrentButtonLevel = 0;
 	delete[] CurrentButtons;
@@ -385,26 +381,24 @@ void CButtonPanel::Draw(void)
 */
 void UpdateStatusLineForButton(const ButtonAction *button)
 {
-	int v;  // button->Value.
 	const CUnitStats *stats;
 
 	Assert(button);
 	UI.StatusLine.Set(button->Hint);
 
-	v = button->Value;
 	switch (button->Action) {
 		case ButtonBuild:
 		case ButtonTrain:
 		case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
-			stats = &UnitTypes[v]->Stats[ThisPlayer->Index];
-			SetCosts(0, UnitTypes[v]->Demand, stats->Costs);
+			stats = &UnitTypes[button->Value]->Stats[ThisPlayer->Index];
+			SetCosts(0, UnitTypes[button->Value]->Demand, stats->Costs);
 			break;
 		case ButtonResearch:
-			SetCosts(0, 0, AllUpgrades[v]->Costs);
+			SetCosts(0, 0, AllUpgrades[button->Value]->Costs);
 			break;
 		case ButtonSpellCast:
-			SetCosts(SpellTypeTable[v]->ManaCost, 0, NULL);
+			SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
 			break;
 		default:
 			ClearCosts();
@@ -417,19 +411,19 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 ----------------------------------------------------------------------------*/
 
 /**
-**  tell if the button is allowed for the unit.
+**  Check if the button is allowed for the unit.
 **
-**  @param unit         unit which checks for allow.
-**  @param buttonaction button to check if it is allowed.
+**  @param unit          unit which checks for allow.
+**  @param buttonaction  button to check if it is allowed.
 **
 **  @return 1 if button is allowed, 0 else.
 **
-**  @todo FIXME : better check. (dependancy, resource, ...)
-**  @todo FIXME : make difference with impossible and not yet researched.
+**  @todo FIXME: better check. (dependancy, resource, ...)
+**  @todo FIXME: make difference with impossible and not yet researched.
 */
-static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
+static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 {
-	int res;
+	bool res;
 
 	Assert(unit);
 	Assert(buttonaction);
@@ -438,7 +432,7 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 		return buttonaction->Allowed(unit, buttonaction);
 	}
 
-	res = 0;
+	res = false;
 	// FIXME: we have to check and if these unit buttons are available
 	//    i.e. if button action is ButtonTrain for example check if
 	// required unit is not restricted etc...
@@ -447,7 +441,7 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 		case ButtonStandGround:
 		case ButtonButton:
 		case ButtonMove:
-			res = 1;
+			res = true;
 			break;
 		case ButtonRepair:
 			res = unit->Type->RepairRange > 0;
@@ -460,7 +454,7 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
 					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
 						unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
-				res = 1;
+				res = true;
 			}
 			break;
 		case ButtonReturn:
@@ -468,7 +462,7 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
 					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
 						unit->Type->ResInfo[unit->CurrentResource]->LoseResources))) {
-				res = 1;
+				res = true;
 			}
 			break;
 		case ButtonAttack:
@@ -476,7 +470,7 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			break;
 		case ButtonAttackGround:
 			if (unit->Type->GroundAttack) {
-				res = 1;
+				res = true;
 			}
 			break;
 		case ButtonTrain:
@@ -501,7 +495,7 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			res = (Selected[0]->Type->CanTransport && Selected[0]->BoardCount);
 			break;
 		case ButtonCancel:
-			res = 1;
+			res = true;
 			break;
 		case ButtonCancelUpgrade:
 			res = unit->Orders[0]->Action == UnitActionUpgradeTo ||
@@ -534,20 +528,19 @@ static int IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 {
 	char unit_ident[128];
-	unsigned int z;
-	int i;
+	int z;
 	ButtonAction *res;
-	int allow;         // button is available for at least 1 unit.
+	bool allow;         // button is available for at least 1 unit.
 
 	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
-	for (z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
+	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
 
 	sprintf(unit_ident,	",%s-group,",
 			PlayerRaces.Name[ThisPlayer->Race]);
 
-	for (z = 0; z < NumUnitButtons; ++z) {
+	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
 			continue;
 		}
@@ -557,10 +550,10 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 				!strstr(UnitButtonTable[z]->UnitMask, unit_ident)) {
 			continue;
 		}
-		allow = 1;
-		for (i = 0; i < NumSelected; i++) {
+		allow = true;
+		for (int i = 0; i < NumSelected; i++) {
 			if (!IsButtonAllowed(Selected[i], UnitButtonTable[z])) {
-				allow = 0;
+				allow = false;
 				break;
 			}
 		}
@@ -592,12 +585,12 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 	char unit_ident[128];
 	ButtonAction *buttonaction;
 	ButtonAction *res;
-	unsigned int z;
+	int z;
 
 	Assert(unit);
 
 	res = new ButtonAction[UI.ButtonPanel.Buttons.size()];
-	for (z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
+	for (z = 0; z < (int)UI.ButtonPanel.Buttons.size(); ++z) {
 		res[z].Pos = -1;
 	}
 
@@ -617,7 +610,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 		sprintf(unit_ident, ",%s,", unit->Type->Ident);
 	}
 
-	for (z = 0; z < NumUnitButtons; ++z) {
+	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		int pos; // keep position, modified if alt-buttons required
 
 		buttonaction = UnitButtonTable[z];
@@ -654,7 +647,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 void CButtonPanel::Update(void)
 {
 	CUnit *unit;
-	int sameType;   // 1 if all selected units are same type, 0 else.
+	bool sameType;
 
 	// Default is no button.
 	delete[] CurrentButtons;
@@ -670,17 +663,17 @@ void CButtonPanel::Update(void)
 		return;
 	}
 
-	sameType = 1;
+	sameType = true;
 	// multiple selected
 	for (int i = 1; i < NumSelected; ++i) {
 		if (Selected[i]->Type != unit->Type) {
-			sameType = 0;
+			sameType = false;
 			break;
 		}
 	}
 
 	// We have selected different units types
-	if (sameType == 0) {
+	if (!sameType) {
 		CurrentButtons = UpdateButtonPanelMultipleUnits();
 	} else {
 		// We have same type units selected

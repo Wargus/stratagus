@@ -10,7 +10,7 @@
 //
 /**@name editor.h - The editor file. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer
+//      (c) Copyright 2002-2006 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 
 #include <vector>
 #include "player.h"
+#include "icons.h"
 
 class CUnitType;
 class IconConfig;
@@ -53,7 +54,7 @@ enum EditorRunningType {
 
 extern EditorRunningType EditorRunning;
 
-extern char EditorMapLoaded;  /// Map loaded in editor
+extern bool EditorMapLoaded;  /// Map loaded in editor
 extern int EditorWriteCompressedMaps;
 
 	/// Current editor state type.
@@ -88,13 +89,13 @@ public:
 	void CreateRandomMap() const;
 
 
-	std::vector<char*> UnitTypes;                   /// Sorted editor unit-type table.
+	std::vector<char *> UnitTypes;                  /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
 
 	bool TerrainEditable;        /// Is the terrain editable ?
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.
-	char* StartUnitName;         /// name of the Unit used to display the start location.
+	char *StartUnitName;         /// name of the Unit used to display the start location.
 	const CUnitType *StartUnit;  /// Unit used to display the start location.
 
 	bool ShowUnitsToSelect;      /// Show units in unit list.

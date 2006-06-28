@@ -215,9 +215,9 @@ extern int ButtonAreaUnderCursor;
 	/// button number under the cursor
 extern int ButtonUnderCursor;
 	/// menu button was clicked down
-extern char GameMenuButtonClicked;
+extern bool GameMenuButtonClicked;
 	/// diplomacy button was clicked down
-extern char GameDiplomacyButtonClicked;
+extern bool GameDiplomacyButtonClicked;
 	/// Mouse leaves windows stops scroll
 extern bool LeaveStops;
 	/// current CursorOn field
@@ -243,7 +243,7 @@ extern void InitButtons(void);
 	/// Free memory for buttons
 extern void CleanButtons(void);
 	/// Make a new button
-extern int AddButton(int pos, int level, const char *IconIdent,
+extern int AddButton(int pos, int level, char *IconIdent,
 	ButtonCmd action, const char *value, const ButtonCheckFunc func,
 	const char *arg, int key, const char *hint, const char *umask);
 

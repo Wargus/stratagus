@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@
 #include "ui.h"
 #include "interface.h"
 #include "font.h"
+#include "widgets.h"
 #include "editor.h"
 #include "campaign.h"
 #include "menus.h"
@@ -83,7 +84,7 @@ static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
 
-char EditorMapLoaded;  /// Map loaded in editor
+bool EditorMapLoaded;  /// Map loaded in editor
 int EditorWriteCompressedMaps = 1;
 
 EditorStateType EditorState;                /// Current editor state.
@@ -94,8 +95,8 @@ static char TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
 static int TileCursor;           /// Tile type number
 
-static int MirrorEdit = 0;           /// Mirror editing enabled
-static int UnitPlacedThisPress = 0;  ///Only allow one unit per press
+static int MirrorEdit = 0;                /// Mirror editing enabled
+static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -1030,7 +1031,7 @@ void EditorUpdateDisplay(void)
 		(ButtonAreaUnderCursor == ButtonAreaMenu
 			&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 		(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-		UI.MenuButton.X,UI.MenuButton.Y,
+		UI.MenuButton.X, UI.MenuButton.Y,
 		UI.MenuButton.Text.c_str());
 
 	//
@@ -1093,14 +1094,16 @@ static void EditorCallbackButtonUp(unsigned button)
 		return;
 	}
 
-	if ((1 << button) == LeftButton && GameMenuButtonClicked == 1) {
-		GameMenuButtonClicked = 0;
+	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
+		GameMenuButtonClicked = false;
 		if (ButtonUnderCursor == ButtonUnderMenu) {
-			ProcessMenu("menu-editor", 1);
+			if (UI.MenuButton.Callback) {
+				UI.MenuButton.Callback->action("");
+			}
 		}
 	}
 	if ((1 << button) == LeftButton) {
-		UnitPlacedThisPress = 0;
+		UnitPlacedThisPress = false;
 	}
 }
 
@@ -1117,7 +1120,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
 			(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
 		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-		GameMenuButtonClicked = 1;
+		GameMenuButtonClicked = true;
 		return;
 	}
 	//
@@ -1335,7 +1338,7 @@ static void EditorCallbackButtonDown(unsigned button)
 						EditUnit(UI.MouseViewport->Viewport2MapX(CursorX),
 							UI.MouseViewport->Viewport2MapY(CursorY),
 							CursorBuilding, Players + Editor.SelectedPlayer);
-						UnitPlacedThisPress = 1;
+						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
 						UI.StatusLine.Set(_("Unit can't be placed here."));
@@ -1601,10 +1604,10 @@ static void EditorCallbackMouse(int x, int y)
 
 	// Automatically unpress when map tile has changed
 	if (LastMapX != UI.SelectedViewport->Viewport2MapX(CursorX) ||
-		LastMapY != UI.SelectedViewport->Viewport2MapY(CursorY)) {
+			LastMapY != UI.SelectedViewport->Viewport2MapY(CursorY)) {
 		LastMapX = UI.SelectedViewport->Viewport2MapX(CursorX);
 		LastMapY = UI.SelectedViewport->Viewport2MapY(CursorY);
-		UnitPlacedThisPress = 0;
+		UnitPlacedThisPress = false;
 	}
 	//
 	// Drawing tiles on map.
@@ -1653,7 +1656,7 @@ static void EditorCallbackMouse(int x, int y)
 					EditUnit(UI.SelectedViewport->Viewport2MapX(CursorX),
 						UI.SelectedViewport->Viewport2MapY(CursorY),
 						CursorBuilding, Players + Editor.SelectedPlayer);
-					UnitPlacedThisPress = 1;
+					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}
 			}
@@ -2051,7 +2054,7 @@ void EditorMainLoop(void)
 	CommandLogDisabled = 1;
 
 	while (1) {
-		EditorMapLoaded = 0;
+		EditorMapLoaded = false;
 		EditorRunning = EditorEditing;
 
 		Editor.Init();

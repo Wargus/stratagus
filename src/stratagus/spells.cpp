@@ -1031,10 +1031,9 @@ SpellType *SpellTypeByIdent(const char *ident)
 **
 **  @return          0 if spell is not available, else no null.
 */
-int SpellIsAvailable(const CPlayer *player, int spellid)
+bool SpellIsAvailable(const CPlayer *player, int spellid)
 {
 	int dependencyId;
-
 	dependencyId = SpellTypeTable[spellid]->DependencyId;
 
 	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';

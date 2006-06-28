@@ -254,8 +254,6 @@ typedef struct _menu_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int GuiGameStarted;                    /// Game Started?
-extern bool oldMenusRunning;                  /// Are the old menus running ?
 extern Menu *CurrentMenu;                     /// Current menu
 
 extern char MenuMapFullPath[1024];   /// Full path to currently selected map
@@ -277,8 +275,6 @@ extern Menu *FindMenu(const char *menu_id);
 
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);
-	/// State info received from server, Update the client menu.
-extern void NetClientUpdateState(void);
 	/// Notify menu display code to update info
 extern void NetConnectForceDisplayUpdate(void);
 	/// Compare Local State <-> Server's state, force Update when changes
@@ -298,9 +294,6 @@ extern void SetupEditor(void);
 
 	/// Error menu
 extern void ErrorMenu(char *);
-
-	/// Menu Loop
-extern void MenuLoop(const char *filename, CMap *map);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);

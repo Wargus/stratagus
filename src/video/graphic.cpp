@@ -1137,15 +1137,15 @@ void CGraphic::Resize(int w, int h)
 **
 **  @return   True if the pixel is transparent, False otherwise
 */
-int CGraphic::TransparentPixel(int x, int y)
+bool CGraphic::TransparentPixel(int x, int y)
 {
 	unsigned char *p;
 	int bpp;
-	int ret;
+	bool ret;
 
 	bpp = Surface->format->BytesPerPixel;
 	if ((bpp == 1 && !(Surface->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
-		return 0;
+		return false;
 	}
 
 	ret = 0;
@@ -1153,11 +1153,11 @@ int CGraphic::TransparentPixel(int x, int y)
 	p = (unsigned char *)Surface->pixels + y * Surface->pitch + x * bpp;
 	if (bpp == 1) {
 		if (*p == Surface->format->colorkey) {
-			ret = 1;
+			ret = true;
 		}
 	} else {
 		if (p[Surface->format->Ashift >> 3] == 255) {
-			ret = 1;
+			ret = true;
 		}
 	}
 	SDL_UnlockSurface(Surface);
