@@ -447,7 +447,7 @@ function RunSurrenderConfirmMenu()
   menu:addLabel(_("want to surrender"), 128, 11 + (24 * 1))
   menu:addLabel(_("to your enemies?"), 128, 11 + (24 * 2))
   menu:addButton(_("~!Surrender"), 16, 11 + (24 * 3) + 29,
-    function() StopGame(GameDefeat) menu:stop() end)
+    function() StopGame(GameDefeat) menu:stopAll() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
 
@@ -461,7 +461,7 @@ function RunQuitToMenuConfirmMenu()
   menu:addLabel(_("want to quit to"), 128, 11 + (24 * 1))
   menu:addLabel(_("the main menu?"), 128, 11 + (24 * 2))
   menu:addButton(_("~!Quit to Menu"), 16, 11 + (24 * 3) + 29,
-    function() StopGame(GameNoResult) menu:stop() end)
+    function() StopGame(GameNoResult) menu:stopAll() end)
   menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
 
