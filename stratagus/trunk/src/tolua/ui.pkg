@@ -473,8 +473,10 @@ class Container : public BasicContainer
 class MenuScreen : public Container
 {
 	MenuScreen();
+
 	int run(bool loop = true);
 	void stop(int result = 0);
+	void stopAll(int result = 0);
 	void addLogicCallback(LuaActionListener *actionListener);
 };
 $renaming MenuScreen @ CMenuScreen
