@@ -38,7 +38,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
    DefinePanelContents(
 -- Default presentation. ------------------------
   {
-  Ident = "panel-general-contents"..info_panel_x,
+  Ident = "panel-general-contents",
   Pos = {info_panel_x, info_panel_y}, DefaultFont = "game",
   Contents = {
 	{ Pos = {14, 56}, Condition = {ShowOpponent = false, HideNeutral = true},
@@ -61,7 +61,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   } },
 -- Supply Building constructed.----------------
   {
-  Ident = "panel-building-contents"..info_panel_x,
+  Ident = "panel-building-contents",
   Pos = {info_panel_x, info_panel_y}, DefaultFont = "game",
   Condition = {ShowOpponent = false, HideNeutral = true, Build = "false", Supply = "only", Training = "false", UpgradeTo = "false"},
 -- FIXME more condition. not town hall.
@@ -76,7 +76,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   } },
 -- All own unit -----------------
   {
-  Ident = "panel-all-unit-contents"..info_panel_x,
+  Ident = "panel-all-unit-contents",
   Pos = {info_panel_x, info_panel_y},
   DefaultFont = "game",
   Condition = {ShowOpponent = false, HideNeutral = true, Build = "false"},
@@ -129,7 +129,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   } },
 -- Attack Unit -----------------------------
   {
-  Ident = "panel-attack-unit-contents"..info_panel_x,
+  Ident = "panel-attack-unit-contents",
   Pos = {info_panel_x, info_panel_y},
   DefaultFont = "game",
   Condition = {ShowOpponent = false, HideNeutral = true, Building = "false", Build = "false"},
