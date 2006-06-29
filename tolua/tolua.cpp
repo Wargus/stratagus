@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Wed Jun 28 22:45:28 2006.
+** Generated automatically by tolua++-1.0.7 on Wed Jun 28 19:11:01 2006.
 */
 
 #ifndef __cplusplus
@@ -9880,6 +9880,39 @@ static int tolua_stratagus_CMenuScreen_stop00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: stopAll of class  MenuScreen */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_stopAll00
+static int tolua_stratagus_CMenuScreen_stopAll00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MenuScreen",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MenuScreen* self = (MenuScreen*)  tolua_tousertype(tolua_S,1,0);
+  int result = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'stopAll'",NULL);
+#endif
+ {
+  self->stopAll(result);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'stopAll'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: addLogicCallback of class  MenuScreen */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_addLogicCallback00
 static int tolua_stratagus_CMenuScreen_addLogicCallback00(lua_State* tolua_S)
@@ -14679,6 +14712,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_CMenuScreen_new00_local);
   tolua_function(tolua_S,"run",tolua_stratagus_CMenuScreen_run00);
   tolua_function(tolua_S,"stop",tolua_stratagus_CMenuScreen_stop00);
+  tolua_function(tolua_S,"stopAll",tolua_stratagus_CMenuScreen_stopAll00);
   tolua_function(tolua_S,"addLogicCallback",tolua_stratagus_CMenuScreen_addLogicCallback00);
  tolua_endmodule(tolua_S);
 

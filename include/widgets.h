@@ -306,16 +306,20 @@ private:
 
 class MenuScreen : public gcn::Container
 {
+public:
+	MenuScreen();
+
+	int run(bool loop = true);
+	void stop(int result = 0, bool stopAll = false);
+	void stopAll(int result = 0) { stop(result, true); }
+	void addLogicCallback(LuaActionListener *listener);
+	virtual void logic();
+
+private:
 	bool runLoop;
 	int loopResult;
 	gcn::Widget *oldtop;
 	LuaActionListener *logiclistener;
-public:
-	MenuScreen();
-	int run(bool loop = true);
-	void stop(int result = 0);
-	void addLogicCallback(LuaActionListener *listener);
-	virtual void logic();
 };
 
 #endif
