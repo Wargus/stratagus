@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Wed Jun 28 19:11:01 2006.
+** Generated automatically by tolua++-1.0.7 on Thu Jun 29 20:33:51 2006.
 */
 
 #ifndef __cplusplus
@@ -110,9 +110,9 @@ static int tolua_collect_CheckBox (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_ImageButton (lua_State* tolua_S)
+static int tolua_collect_ImageWidget (lua_State* tolua_S)
 {
- ImageButton* self = (ImageButton*) tolua_tousertype(tolua_S,1,0);
+ ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -159,9 +159,9 @@ static int tolua_collect_Color (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_CMenuPanel (lua_State* tolua_S)
+static int tolua_collect_DropDownWidget (lua_State* tolua_S)
 {
- CMenuPanel* self = (CMenuPanel*) tolua_tousertype(tolua_S,1,0);
+ DropDownWidget* self = (DropDownWidget*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -222,16 +222,16 @@ static int tolua_collect_vector_CMenuPanel_ (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_DropDownWidget (lua_State* tolua_S)
+static int tolua_collect_ImageButton (lua_State* tolua_S)
 {
- DropDownWidget* self = (DropDownWidget*) tolua_tousertype(tolua_S,1,0);
+ ImageButton* self = (ImageButton*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
 
-static int tolua_collect_ImageWidget (lua_State* tolua_S)
+static int tolua_collect_LuaActionListener (lua_State* tolua_S)
 {
- ImageWidget* self = (ImageWidget*) tolua_tousertype(tolua_S,1,0);
+ LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -243,9 +243,9 @@ static int tolua_collect_RadioButton (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_LuaActionListener (lua_State* tolua_S)
+static int tolua_collect_CMenuPanel (lua_State* tolua_S)
 {
- LuaActionListener* self = (LuaActionListener*) tolua_tousertype(tolua_S,1,0);
+ CMenuPanel* self = (CMenuPanel*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -278,59 +278,61 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CPlayerColorGraphic");
  tolua_usertype(tolua_S,"LuaActionListener");
- tolua_usertype(tolua_S,"ImageRadioButton");
+ tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"vector<CUIButton>");
  tolua_usertype(tolua_S,"CFontColor");
- tolua_usertype(tolua_S,"CUserInterface");
  tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"gcn::Graphics");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"CUIButton");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
- tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"Windows");
  tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"BasicContainer");
+ tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CMinimap");
- tolua_usertype(tolua_S,"NetworkHost");
+ tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CMenuPanel");
  tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
  tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"ScrollArea");
- tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"MenuScreen");
+ tolua_usertype(tolua_S,"Button");
+ tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"StatBoxWidget");
+ tolua_usertype(tolua_S,"ListBox");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"vector<CMenuPanel>");
- tolua_usertype(tolua_S,"gcn::Graphics");
  tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"CResourceInfo");
- tolua_usertype(tolua_S,"CUITimer");
  tolua_usertype(tolua_S,"RadioButton");
- tolua_usertype(tolua_S,"ImageWidget");
+ tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"CUITimer");
+ tolua_usertype(tolua_S,"CResourceInfo");
+ tolua_usertype(tolua_S,"ImageRadioButton");
  tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Slider");
 }
@@ -5492,6 +5494,192 @@ static int tolua_stratagus_Widget_addActionListener00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  ScrollArea */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_new00
+static int tolua_stratagus_ScrollArea_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ScrollArea",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  ScrollArea* tolua_ret = (ScrollArea*)  new ScrollArea();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ScrollArea");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ScrollArea */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_new00_local
+static int tolua_stratagus_ScrollArea_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ScrollArea",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  ScrollArea* tolua_ret = (ScrollArea*)  new ScrollArea();
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ScrollArea");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setContent of class  ScrollArea */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_setContent00
+static int tolua_stratagus_ScrollArea_setContent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
+  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setContent'",NULL);
+#endif
+ {
+  self->setContent(widget);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setContent'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getContent of class  ScrollArea */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_getContent00
+static int tolua_stratagus_ScrollArea_getContent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getContent'",NULL);
+#endif
+ {
+  Widget* tolua_ret = (Widget*)  self->getContent();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"Widget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getContent'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setScrollbarWidth of class  ScrollArea */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_setScrollbarWidth00
+static int tolua_stratagus_ScrollArea_setScrollbarWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setScrollbarWidth'",NULL);
+#endif
+ {
+  self->setScrollbarWidth(width);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setScrollbarWidth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getScrollbarWidth of class  ScrollArea */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_getScrollbarWidth00
+static int tolua_stratagus_ScrollArea_getScrollbarWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getScrollbarWidth'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getScrollbarWidth();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getScrollbarWidth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  ImageWidget */
 #ifndef TOLUA_DISABLE_tolua_stratagus_ImageWidget_new00
 static int tolua_stratagus_ImageWidget_new00(lua_State* tolua_S)
@@ -8760,6 +8948,245 @@ static int tolua_stratagus_ListBoxWidget_getSelected00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  Windows */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_new00
+static int tolua_stratagus_Windows_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Windows",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string text = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  int width = ((int)  tolua_tonumber(tolua_S,3,0));
+  int height = ((int)  tolua_tonumber(tolua_S,4,0));
+ {
+  Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"Windows");
+ tolua_pushcppstring(tolua_S,(const char*)text);
+ }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  Windows */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_new00_local
+static int tolua_stratagus_Windows_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Windows",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string text = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  int width = ((int)  tolua_tonumber(tolua_S,3,0));
+  int height = ((int)  tolua_tonumber(tolua_S,4,0));
+ {
+  Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Windows");
+ tolua_pushcppstring(tolua_S,(const char*)text);
+ }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: add of class  Windows */
+#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_add00
+static int tolua_stratagus_Windows_add00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"Windows",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  Windows* self = (Windows*)  tolua_tousertype(tolua_S,1,0);
+  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+  int x = ((int)  tolua_tonumber(tolua_S,3,0));
+  int y = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
+#endif
+ {
+  self->add(widget,x,y);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  ScrollingWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_new00
+static int tolua_stratagus_ScrollingWidget_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+ {
+  ScrollingWidget* tolua_ret = (ScrollingWidget*)  new ScrollingWidget(width,height);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ScrollingWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  ScrollingWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_new00_local
+static int tolua_stratagus_ScrollingWidget_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+ {
+  ScrollingWidget* tolua_ret = (ScrollingWidget*)  new ScrollingWidget(width,height);
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ScrollingWidget");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: add of class  ScrollingWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_add00
+static int tolua_stratagus_ScrollingWidget_add00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollingWidget* self = (ScrollingWidget*)  tolua_tousertype(tolua_S,1,0);
+  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+  int x = ((int)  tolua_tonumber(tolua_S,3,0));
+  int y = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
+#endif
+ {
+  self->add(widget,x,y);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: restart of class  ScrollingWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_restart00
+static int tolua_stratagus_ScrollingWidget_restart00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollingWidget* self = (ScrollingWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'restart'",NULL);
+#endif
+ {
+  self->restart();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'restart'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  DropDownWidget */
 #ifndef TOLUA_DISABLE_tolua_stratagus_DropDownWidget_new00
 static int tolua_stratagus_DropDownWidget_new00(lua_State* tolua_S)
@@ -8898,12 +9325,12 @@ static int tolua_stratagus_DropDownWidget_setSelected00(lua_State* tolua_S)
 #endif
  {
   DropDownWidget* self = (DropDownWidget*)  tolua_tousertype(tolua_S,1,0);
-  int selection = ((int)  tolua_tonumber(tolua_S,2,0));
+  int selected = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSelected'",NULL);
 #endif
  {
-  self->setSelected(selection);
+  self->setSelected(selected);
  }
  }
  return 0;
@@ -8915,426 +9342,33 @@ static int tolua_stratagus_DropDownWidget_setSelected00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: new of class  Windows */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_new00
-static int tolua_stratagus_Windows_new00(lua_State* tolua_S)
+/* method: getListBox of class  DropDownWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDownWidget_getListBox00
+static int tolua_stratagus_DropDownWidget_getListBox00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isusertable(tolua_S,1,"Windows",0,&tolua_err) ||
- !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const std::string text = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  int width = ((int)  tolua_tonumber(tolua_S,3,0));
-  int height = ((int)  tolua_tonumber(tolua_S,4,0));
- {
-  Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
- tolua_pushusertype(tolua_S,(void*)tolua_ret,"Windows");
- tolua_pushcppstring(tolua_S,(const char*)text);
- }
- }
- return 2;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  Windows */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_new00_local
-static int tolua_stratagus_Windows_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"Windows",0,&tolua_err) ||
- !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const std::string text = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  int width = ((int)  tolua_tonumber(tolua_S,3,0));
-  int height = ((int)  tolua_tonumber(tolua_S,4,0));
- {
-  Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
- tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Windows");
- tolua_pushcppstring(tolua_S,(const char*)text);
- }
- }
- return 2;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: add of class  Windows */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Windows_add00
-static int tolua_stratagus_Windows_add00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"Windows",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  Windows* self = (Windows*)  tolua_tousertype(tolua_S,1,0);
-  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
-  int x = ((int)  tolua_tonumber(tolua_S,3,0));
-  int y = ((int)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
-#endif
- {
-  self->add(widget,x,y);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new of class  ScrollArea */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_new00
-static int tolua_stratagus_ScrollArea_new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"ScrollArea",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,1,"DropDownWidget",0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
+  DropDownWidget* self = (DropDownWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getListBox'",NULL);
+#endif
  {
-  ScrollArea* tolua_ret = (ScrollArea*)  new ScrollArea();
- tolua_pushusertype(tolua_S,(void*)tolua_ret,"ScrollArea");
+  ListBox* tolua_ret = (ListBox*)  self->getListBox();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ListBox");
  }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  ScrollArea */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_new00_local
-static int tolua_stratagus_ScrollArea_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"ScrollArea",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
- {
-  ScrollArea* tolua_ret = (ScrollArea*)  new ScrollArea();
- tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ScrollArea");
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: setContent of class  ScrollArea */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_setContent00
-static int tolua_stratagus_ScrollArea_setContent00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
-  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setContent'",NULL);
-#endif
- {
-  self->setContent(widget);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setContent'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: getContent of class  ScrollArea */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_getContent00
-static int tolua_stratagus_ScrollArea_getContent00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getContent'",NULL);
-#endif
- {
-  Widget* tolua_ret = (Widget*)  self->getContent();
- tolua_pushusertype(tolua_S,(void*)tolua_ret,"Widget");
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'getContent'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: setScrollbarWidth of class  ScrollArea */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_setScrollbarWidth00
-static int tolua_stratagus_ScrollArea_setScrollbarWidth00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
-  int width = ((int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setScrollbarWidth'",NULL);
-#endif
- {
-  self->setScrollbarWidth(width);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setScrollbarWidth'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: getScrollbarWidth of class  ScrollArea */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollArea_getScrollbarWidth00
-static int tolua_stratagus_ScrollArea_getScrollbarWidth00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"ScrollArea",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  ScrollArea* self = (ScrollArea*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getScrollbarWidth'",NULL);
-#endif
- {
-  int tolua_ret = (int)  self->getScrollbarWidth();
- tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'getScrollbarWidth'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new of class  ScrollingWidget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_new00
-static int tolua_stratagus_ScrollingWidget_new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  int width = ((int)  tolua_tonumber(tolua_S,2,0));
-  int height = ((int)  tolua_tonumber(tolua_S,3,0));
- {
-  ScrollingWidget* tolua_ret = (ScrollingWidget*)  new ScrollingWidget(width,height);
- tolua_pushusertype(tolua_S,(void*)tolua_ret,"ScrollingWidget");
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  ScrollingWidget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_new00_local
-static int tolua_stratagus_ScrollingWidget_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  int width = ((int)  tolua_tonumber(tolua_S,2,0));
-  int height = ((int)  tolua_tonumber(tolua_S,3,0));
- {
-  ScrollingWidget* tolua_ret = (ScrollingWidget*)  new ScrollingWidget(width,height);
- tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ScrollingWidget");
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: add of class  ScrollingWidget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_add00
-static int tolua_stratagus_ScrollingWidget_add00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  ScrollingWidget* self = (ScrollingWidget*)  tolua_tousertype(tolua_S,1,0);
-  Widget* widget = ((Widget*)  tolua_tousertype(tolua_S,2,0));
-  int x = ((int)  tolua_tonumber(tolua_S,3,0));
-  int y = ((int)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
-#endif
- {
-  self->add(widget,x,y);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: restart of class  ScrollingWidget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_restart00
-static int tolua_stratagus_ScrollingWidget_restart00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  ScrollingWidget* self = (ScrollingWidget*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'restart'",NULL);
-#endif
- {
-  self->restart();
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'restart'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'getListBox'.",&tolua_err);
  return 0;
 #endif
 }
@@ -14395,6 +14429,23 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   lua_settop(tolua_S, top);
  } /* end of embedded lua code */
 
+ tolua_cclass(tolua_S,"BasicContainer","BasicContainer","Widget",NULL);
+ tolua_beginmodule(tolua_S,"BasicContainer");
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"ScrollArea","ScrollArea","BasicContainer",tolua_collect_ScrollArea);
+#else
+ tolua_cclass(tolua_S,"ScrollArea","ScrollArea","BasicContainer",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"ScrollArea");
+  tolua_function(tolua_S,"new",tolua_stratagus_ScrollArea_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_ScrollArea_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_ScrollArea_new00_local);
+  tolua_function(tolua_S,"setContent",tolua_stratagus_ScrollArea_setContent00);
+  tolua_function(tolua_S,"getContent",tolua_stratagus_ScrollArea_getContent00);
+  tolua_function(tolua_S,"setScrollbarWidth",tolua_stratagus_ScrollArea_setScrollbarWidth00);
+  tolua_function(tolua_S,"getScrollbarWidth",tolua_stratagus_ScrollArea_getScrollbarWidth00);
+ tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ImageWidget","ImageWidget","Widget",tolua_collect_ImageWidget);
 #else
@@ -14419,9 +14470,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"adjustSize",tolua_stratagus_ButtonWidget_adjustSize00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
- tolua_cclass(tolua_S,"ImageButton","ImageButton","Widget",tolua_collect_ImageButton);
+ tolua_cclass(tolua_S,"ImageButton","ImageButton","Button",tolua_collect_ImageButton);
 #else
- tolua_cclass(tolua_S,"ImageButton","ImageButton","Widget",NULL);
+ tolua_cclass(tolua_S,"ImageButton","ImageButton","Button",NULL);
 #endif
  tolua_beginmodule(tolua_S,"ImageButton");
   tolua_function(tolua_S,"new",tolua_stratagus_ImageButton_new00);
@@ -14606,10 +14657,13 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setText",tolua_stratagus_TextField_setText00);
   tolua_function(tolua_S,"getText",tolua_stratagus_TextField_getText00);
  tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"ListBox","ListBox","Widget",NULL);
+ tolua_beginmodule(tolua_S,"ListBox");
+ tolua_endmodule(tolua_S);
 #ifdef __cplusplus
- tolua_cclass(tolua_S,"ListBoxWidget","ListBoxWidget","Widget",tolua_collect_ListBoxWidget);
+ tolua_cclass(tolua_S,"ListBoxWidget","ListBoxWidget","ScrollArea",tolua_collect_ListBoxWidget);
 #else
- tolua_cclass(tolua_S,"ListBoxWidget","ListBoxWidget","Widget",NULL);
+ tolua_cclass(tolua_S,"ListBoxWidget","ListBoxWidget","ScrollArea",NULL);
 #endif
  tolua_beginmodule(tolua_S,"ListBoxWidget");
   tolua_function(tolua_S,"new",tolua_stratagus_ListBoxWidget_new00);
@@ -14618,19 +14672,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"setList",tolua_stratagus_ListBoxWidget_setList00);
   tolua_function(tolua_S,"setSelected",tolua_stratagus_ListBoxWidget_setSelected00);
   tolua_function(tolua_S,"getSelected",tolua_stratagus_ListBoxWidget_getSelected00);
- tolua_endmodule(tolua_S);
-#ifdef __cplusplus
- tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","Widget",tolua_collect_DropDownWidget);
-#else
- tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","Widget",NULL);
-#endif
- tolua_beginmodule(tolua_S,"DropDownWidget");
-  tolua_function(tolua_S,"new",tolua_stratagus_DropDownWidget_new00);
-  tolua_function(tolua_S,"new_local",tolua_stratagus_DropDownWidget_new00_local);
-  tolua_function(tolua_S,".call",tolua_stratagus_DropDownWidget_new00_local);
-  tolua_function(tolua_S,"setList",tolua_stratagus_DropDownWidget_setList00);
-  tolua_function(tolua_S,"getSelected",tolua_stratagus_DropDownWidget_getSelected00);
-  tolua_function(tolua_S,"setSelected",tolua_stratagus_DropDownWidget_setSelected00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"Windows","Windows","Widget",tolua_collect_Windows);
@@ -14643,23 +14684,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_Windows_new00_local);
   tolua_function(tolua_S,"add",tolua_stratagus_Windows_add00);
  tolua_endmodule(tolua_S);
- tolua_cclass(tolua_S,"BasicContainer","BasicContainer","Widget",NULL);
- tolua_beginmodule(tolua_S,"BasicContainer");
- tolua_endmodule(tolua_S);
-#ifdef __cplusplus
- tolua_cclass(tolua_S,"ScrollArea","ScrollArea","BasicContainer",tolua_collect_ScrollArea);
-#else
- tolua_cclass(tolua_S,"ScrollArea","ScrollArea","BasicContainer",NULL);
-#endif
- tolua_beginmodule(tolua_S,"ScrollArea");
-  tolua_function(tolua_S,"new",tolua_stratagus_ScrollArea_new00);
-  tolua_function(tolua_S,"new_local",tolua_stratagus_ScrollArea_new00_local);
-  tolua_function(tolua_S,".call",tolua_stratagus_ScrollArea_new00_local);
-  tolua_function(tolua_S,"setContent",tolua_stratagus_ScrollArea_setContent00);
-  tolua_function(tolua_S,"getContent",tolua_stratagus_ScrollArea_getContent00);
-  tolua_function(tolua_S,"setScrollbarWidth",tolua_stratagus_ScrollArea_setScrollbarWidth00);
-  tolua_function(tolua_S,"getScrollbarWidth",tolua_stratagus_ScrollArea_getScrollbarWidth00);
- tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"ScrollingWidget","ScrollingWidget","ScrollArea",tolua_collect_ScrollingWidget);
 #else
@@ -14671,6 +14695,20 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_ScrollingWidget_new00_local);
   tolua_function(tolua_S,"add",tolua_stratagus_ScrollingWidget_add00);
   tolua_function(tolua_S,"restart",tolua_stratagus_ScrollingWidget_restart00);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","BasicContainer",tolua_collect_DropDownWidget);
+#else
+ tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","BasicContainer",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"DropDownWidget");
+  tolua_function(tolua_S,"new",tolua_stratagus_DropDownWidget_new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_DropDownWidget_new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_DropDownWidget_new00_local);
+  tolua_function(tolua_S,"setList",tolua_stratagus_DropDownWidget_setList00);
+  tolua_function(tolua_S,"getSelected",tolua_stratagus_DropDownWidget_getSelected00);
+  tolua_function(tolua_S,"setSelected",tolua_stratagus_DropDownWidget_setSelected00);
+  tolua_function(tolua_S,"getListBox",tolua_stratagus_DropDownWidget_getListBox00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"StatBoxWidget","StatBoxWidget","Widget",tolua_collect_StatBoxWidget);
