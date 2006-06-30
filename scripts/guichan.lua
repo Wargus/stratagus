@@ -144,6 +144,7 @@ function BosMenu(title, background)
     dd:setForegroundColor(clear)
     dd:setBackgroundColor(dark)
     self:add(dd, x, y)
+    return dd
   end
 
   function menu:writeText(text, x, y)
