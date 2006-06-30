@@ -46,9 +46,9 @@ function RunEditorIngameMenu(s)
   menu:addButton(_("Save (~<F11~>)"), 16, 40,
     function() RunEditorSaveMenu() end)
   menu:addButton(_("Map Properties (~<F5~>)"), 16, 40 + (36 * 1),
-    function() end)
+    function() RunEditorMapPropertiesMenu() end)
   menu:addButton(_("Player Properties (~<F6~>)"), 16, 40 + (36 * 2),
-    function() end)
+    function() RunEditorPlayerPropertiesMenu() end)
 
   menu:addButton(_("~!Exit to menu"), 16, 40 + (36 * 4),
     function() end)
@@ -86,4 +86,102 @@ function RunEditorSaveMenu()
   menu:run(false)
 end
 
+function RunEditorMapPropertiesMenu()
+  local menu = BosGameMenu()
+  menu:setSize(288, 256)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
+
+  menu:addLabel(_("Map Properties"), 288 / 2, 11)
+
+  local l = Label(_("Map Description:"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, (288 - 260) / 2, 11 + 36)
+
+  menu:addTextInputField("", (288 - 260) / 2, 11 + 36 + 22, 260)
+
+  local l = Label(_("Size:"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, (288 - 260) / 2, 11 + (36 * 2) + 22)
+
+  local sizeLabel = Label("")
+  sizeLabel:setFont(Fonts["game"])
+  menu:add(sizeLabel, 288 - ((288 - 260) / 2) - 152, 11 + (36 * 2) + 22)
+
+  menu:addSmallButton(_("~!OK"), (288 - (106 * 2)) / 4, 256 - 11 - 27,
+    function()
+      -- FIXME: save new properties
+      menu:stop()
+    end
+  )
+
+  menu:addSmallButton(_("~!Cancel"), (288 - (288 - (106 * 2)) / 4) - 106, 256 - 11 - 27,
+    function()
+      menu:stop()
+    end
+  )
+
+  menu:run(false)
+end
+
+function RunEditorPlayerPropertiesMenu()
+  local menu = BosGameMenu()
+  menu:setSize(640, 480)
+  menu:setPosition((Video.Width - menu:getWidth()) / 2,
+    (Video.Height - menu:getHeight()) / 2)
+
+  menu:addLabel(_("Player Properties"), 640 / 2, 11)
+
+  menu:addSmallButton(_("OK"), 455, 440, function() menu:stop() end)
+
+  for i=0,15 do
+    local l = Label(tostring(i))
+    l:setFont(Fonts["game"])
+    l:adjustSize()
+    menu:add(l, 12, 40 + (22 * (i + 1)))
+  end
+
+  local l = Label(_("Race"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, 40, 40 + (22 * 0))
+
+  local l = Label(_("Type"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, 130, 40 + (22 * 0))
+
+  local types = {_("Person"), _("Computer"), _("Rescue (Passive)"),
+    _("Rescue (Active)"), _("Neutral"), _("Nobody")}
+  for i=0,14 do
+    local d = menu:addDropDown(types, 130, 40 + (22 * (i + 1)),
+      function() end)
+    d:getListBox():setWidth(150)
+    d:setWidth(150)
+  end
+
+  local l = Label(_("AI"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, 290, 40 + (22 * 0))
+
+  local l = Label(_("Titanium"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, 420, 40 + (22 * 0))
+
+  local l = Label(_("Crystal"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, 490, 40 + (22 * 0))
+
+  local l = Label(_("Quality"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, 560, 40 + (22 * 0))
+
+  menu:run(false)
+end
 

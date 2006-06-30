@@ -138,6 +138,18 @@ function BosGameMenu()
     return b
   end
 
+  function menu:addDropDown(list, x, y, callback)
+    local dd = DropDownWidget()
+    dd:setFont(Fonts["game"])
+    dd:setList(list)
+    dd:setActionCallback(function(s) callback(dd, s) end)
+    dd:setBaseColor(dark)
+    dd:setForegroundColor(clear)
+    dd:setBackgroundColor(dark)
+    self:add(dd, x, y)
+    return dd
+  end
+
   return menu
 end
 
