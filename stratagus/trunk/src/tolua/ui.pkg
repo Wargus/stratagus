@@ -256,6 +256,19 @@ Widget.setActionCallback = function(w, f)
 end
 $]
 
+class BasicContainer : public Widget
+{
+};
+
+class ScrollArea : public BasicContainer
+{
+	ScrollArea();
+	virtual void setContent(Widget *widget);
+	virtual Widget *getContent();
+	virtual void setScrollbarWidth(int width);
+	virtual int getScrollbarWidth();
+};
+
 class ImageWidget : public Widget
 {
 	ImageWidget(CGraphic *image);
@@ -269,7 +282,7 @@ class ButtonWidget : public Widget
 	virtual void adjustSize();
 };
 
-class ImageButton : public Widget
+class ImageButton : public Button
 {
 	ImageButton();
 	ImageButton(const std::string &caption);
@@ -406,20 +419,16 @@ class TextField : public Widget
 	virtual std::string &getText();
 };
 
-class ListBoxWidget : public Widget
+class ListBox : public Widget
+{
+};
+
+class ListBoxWidget : public ScrollArea
 {
 	ListBoxWidget(unsigned int width, unsigned int height);
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected (int selected);
 	int getSelected();
-};
-
-class DropDownWidget : public Widget
-{
-	DropDownWidget();
-	void setList(lua_State *lua, lua_Object *lo);
-	int getSelected();
-	void setSelected(int selection);
 };
 
 class Windows : public Widget
@@ -428,25 +437,21 @@ class Windows : public Widget
 	virtual void add(Widget *widget, int x, int y);
 };
 
-class BasicContainer : public Widget
-{
-};
-
-class ScrollArea : public BasicContainer
-{
-	ScrollArea();
-	virtual void setContent(Widget *widget);
-	virtual Widget *getContent();
-	virtual void setScrollbarWidth(int width);
-	virtual int getScrollbarWidth();
-};
-
 class ScrollingWidget : public ScrollArea
 {
 public:
 	ScrollingWidget(int width, int height);
 	void add(Widget *widget, int x, int y);
 	void restart();
+};
+
+class DropDownWidget : public BasicContainer
+{
+	DropDownWidget();
+	void setList(lua_State *lua, lua_Object *lo);
+	virtual int getSelected();
+	virtual void setSelected(int selected);
+	virtual ListBox *getListBox();
 };
 
 class StatBoxWidget : public Widget
