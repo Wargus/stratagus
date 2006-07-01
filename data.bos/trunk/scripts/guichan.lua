@@ -209,6 +209,7 @@ function RunResultsMenu()
 
   if GameResult == GameVictory then
     result = _("Victory !")
+    background = "graphics/screens/victory.png"
   elseif GameResult == GameDraw then
     result = _("Draw !")
   elseif GameResult == GameDefeat then
