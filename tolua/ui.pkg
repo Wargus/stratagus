@@ -274,7 +274,11 @@ class ImageWidget : public Widget
 	ImageWidget(CGraphic *image);
 };
 
-class ButtonWidget : public Widget
+class Button : public Widget
+{
+};
+
+class ButtonWidget : public Button
 {
 	ButtonWidget(const std::string &caption);
 	virtual void setCaption(const std::string &caption);
