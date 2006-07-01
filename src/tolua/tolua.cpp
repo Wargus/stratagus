@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Thu Jun 29 20:33:51 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Jun 30 23:08:47 2006.
 */
 
 #ifndef __cplusplus
@@ -328,11 +328,11 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"vector<CMenuPanel>");
  tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"ImageButton");
- tolua_usertype(tolua_S,"CUITimer");
  tolua_usertype(tolua_S,"CResourceInfo");
+ tolua_usertype(tolua_S,"CUITimer");
  tolua_usertype(tolua_S,"ImageRadioButton");
+ tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Slider");
 }
@@ -14456,10 +14456,13 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new_local",tolua_stratagus_ImageWidget_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_ImageWidget_new00_local);
  tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"Button","Button","Widget",NULL);
+ tolua_beginmodule(tolua_S,"Button");
+ tolua_endmodule(tolua_S);
 #ifdef __cplusplus
- tolua_cclass(tolua_S,"ButtonWidget","ButtonWidget","Widget",tolua_collect_ButtonWidget);
+ tolua_cclass(tolua_S,"ButtonWidget","ButtonWidget","Button",tolua_collect_ButtonWidget);
 #else
- tolua_cclass(tolua_S,"ButtonWidget","ButtonWidget","Widget",NULL);
+ tolua_cclass(tolua_S,"ButtonWidget","ButtonWidget","Button",NULL);
 #endif
  tolua_beginmodule(tolua_S,"ButtonWidget");
   tolua_function(tolua_S,"new",tolua_stratagus_ButtonWidget_new00);
