@@ -10,7 +10,7 @@
 //
 /**@name commands.h - The commands header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,12 +32,6 @@
 #define __COMMANDS_H__
 
 //@{
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -65,7 +59,7 @@ extern ReplayType ReplayGameType;  /// Replay game type
 ----------------------------------------------------------------------------*/
 
 	/// Log commands into file
-void CommandLog(const char *action, const CUnit *unit, int flush,
+extern void CommandLog(const char *action, const CUnit *unit, int flush,
 	int x, int y, const CUnit *dest, const char *value, int num);
 	/// Replay user commands from log each cycle, single player games
 extern void SinglePlayerReplayEachCycle(void);
