@@ -169,9 +169,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
 #include "iocompat.h"
 #include "tileset.h"
-#include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

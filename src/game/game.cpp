@@ -66,6 +66,7 @@
 #include "campaign.h"
 #include "trigger.h"
 #include "commands.h"
+#include "iolib.h"
 #include "iocompat.h"
 
 #include "script.h"

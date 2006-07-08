@@ -44,6 +44,7 @@
 #include "unittype.h"
 #include "script.h"
 #include "player.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -84,17 +85,13 @@ void InitGroups(void)
 */
 void SaveGroups(CFile *file)
 {
-	int i;
-	int g;
-	char *ref;
-
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: groups $Id$\n\n");
 
-	for (g = 0; g < NUM_GROUPS; ++g) {
+	for (int g = 0; g < NUM_GROUPS; ++g) {
 		file->printf("Group(%d, %d, {", g, Groups[g].NumUnits);
-		for (i = 0; i < Groups[g].NumUnits; ++i) {
-			ref = UnitReference(Groups[g].Units[i]);
+		for (int i = 0; i < Groups[g].NumUnits; ++i) {
+			char *ref = UnitReference(Groups[g].Units[i]);
 			file->printf("\"%s\", ", ref);
 			delete[] ref;
 		}

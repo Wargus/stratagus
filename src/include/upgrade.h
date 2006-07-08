@@ -10,7 +10,7 @@
 //
 /**@name upgrade.h - The upgrades headerfile. */
 //
-//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2006 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,16 +34,12 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "upgrade_structs.h"
-
-/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CFile;
+class CPlayer;
+class CUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -56,7 +52,7 @@ class CFile;
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
 	/// save the upgrades
-extern void SaveUpgrades(CFile *);
+extern void SaveUpgrades(CFile *file);
 	/// cleanup upgrade module
 extern void CleanUpgrades(void);
 

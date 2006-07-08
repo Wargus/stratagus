@@ -47,7 +47,12 @@ extern "C" {
 }
 #endif
 
-#include "unit.h"
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+class CUnit;
+class CFile;
 
 typedef struct _lua_user_data_ {
 	int Type;
@@ -79,8 +84,6 @@ extern int LuaCall(int narg, int clear);
 		} \
 	} while (0)
 
-
-#include "iolib.h"
 
 typedef enum {
 	ENumber_Lua,         /// a lua function.

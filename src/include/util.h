@@ -31,8 +31,7 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
-#include "SDL.h"
-
+//@{
 
 /*----------------------------------------------------------------------------
 --  Random
@@ -66,5 +65,7 @@ extern char *strdcat3(const char *l, const char *m, const char *r);
 	/// case insensitive strstr
 extern char *strcasestr(const char *str, const char *substr);
 #endif // !HAVE_STRCASESTR
+
+//@}
 
 #endif /* __UTIL_H__ */

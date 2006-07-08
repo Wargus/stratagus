@@ -43,7 +43,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "iolib.h"
 #include "ogg/ogg.h"
 #include "vorbis/codec.h"
 #ifdef USE_THEORA
@@ -53,6 +52,8 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+class CFile;
 
 /**
 **  Ogg data structure to handle vorbis/theora streaming.

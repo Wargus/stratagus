@@ -56,6 +56,7 @@
 #include "missile.h"
 #include "script.h"
 #include "spells.h"
+#include "iolib.h"
 
 #include "util.h"
 

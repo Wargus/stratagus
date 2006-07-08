@@ -49,6 +49,7 @@
 #include "campaign.h"
 #include "ui.h"
 #include "player.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -34,12 +34,6 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "util.h"
-
-/*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
 
@@ -140,7 +134,7 @@
 **      Contains the tile numbers of a growing tree from small to big.
 **      @note Not yet used.
 **
-**  Tilset::WoodTable[20]
+**  CTilset::WoodTable[20]
 **
 **      Table for wood removable. This table contains the tile which
 **      is placed after a tree removement, depending on the surrounding.

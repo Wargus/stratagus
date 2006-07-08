@@ -38,9 +38,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-#include "icons.h"
-
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -53,6 +50,7 @@
 
 class CUnitType;
 class CVariable;
+class CIcon;
 
 /**
 **  Indices into costs/resource/income array.
