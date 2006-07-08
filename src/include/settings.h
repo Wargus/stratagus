@@ -10,7 +10,7 @@
 //
 /**@name settings.h - The game settings headerfile. */
 //
-//      (c) Copyright 2000-2005 by Andreas Arens and Jimmy Salmon
+//      (c) Copyright 2000-2006 by Andreas Arens and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -144,24 +144,12 @@ public:
 	char *Objectives[MAX_OBJECTIVES];      /// Objectives text
 };  /// Intro definition
 
-
-// ----------------------------------------------------------------------------
-
-class Credits {
-public:
-	Credits() : Background(NULL), Names(NULL) {}
-
-	char *Background;  /// Background picture
-	char *Names;       /// Names
-};
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 extern Settings GameSettings;  /// Game settings
 extern Intro    GameIntro;     /// Game intro
-extern Credits  GameCredits;   /// Game credits
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -169,14 +157,10 @@ extern Credits  GameCredits;   /// Game credits
 
 	/// Show level intro
 extern void ShowIntro(const Intro *intro);
-	/// Show game credits
-extern void ShowCredits(Credits *credits);
 	/// Show picture
 extern void ShowPicture(CampaignChapter *chapter);
 	/// Show stats
 extern void ShowStats();
-	/// Register CCL functions for credits
-extern void CreditsCclRegister(void);
 	/// Register CCL functions for objectives
 extern void ObjectivesCclRegister(void);
 	/// Save the objectives

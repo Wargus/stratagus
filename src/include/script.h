@@ -10,7 +10,7 @@
 //
 /**@name script.h - The clone configuration language headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -279,7 +279,6 @@ extern void LoadCcl(void);                /// Load ccl config file
 extern void SaveCcl(CFile *file);        /// Save CCL module
 extern void SavePreferences(void);        /// Save user preferences
 extern int CclCommand(const char *command);/// Execute a ccl command
-extern void CleanCclCredits();            /// Free Ccl Credits Memory
 
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
