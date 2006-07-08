@@ -216,6 +216,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "movie.h"
 #include "pathfinder.h"
 #include "widgets.h"
+#include "iolib.h"
 
 #ifdef DEBUG
 extern int CclUnits(lua_State *l);

@@ -153,6 +153,7 @@
 #include "map.h"
 #include "pathfinder.h"
 #include "ai_local.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

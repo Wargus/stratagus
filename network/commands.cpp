@@ -51,6 +51,7 @@
 #include "script.h"
 #include "commands.h"
 #include "interface.h"
+#include "iolib.h"
 #include "iocompat.h"
 #include "settings.h"
 #include "spells.h"

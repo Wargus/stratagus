@@ -44,8 +44,7 @@
 #include <string>
 #include <map>
 
-#include "util.h"
-#include "video.h"
+#include "SDL.h"
 #include "upgrade_structs.h"
 #include "cursor.h"
 #include "interface.h"

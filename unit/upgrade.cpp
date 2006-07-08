@@ -54,6 +54,7 @@
 #include "unit.h"
 #include "unittype.h"
 #include "actions.h"
+#include "iolib.h"
 
 #include "myendian.h"
 

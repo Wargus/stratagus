@@ -63,6 +63,7 @@
 #include "editor.h"
 #include "spells.h"
 #include "construct.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

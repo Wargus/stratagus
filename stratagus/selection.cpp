@@ -49,6 +49,7 @@
 #include "ui.h"
 #include "commands.h"
 #include "network.h"
+#include "iolib.h"
 
 #include "script.h"
 

@@ -37,12 +37,6 @@
 -- Documentation
 ----------------------------------------------------------------------------*/
 
-class CFile;
-struct lua_State;
-#ifdef USE_MNG
-class Mng;
-#endif
-
 /**
 **  @class CUnitType unittype.h
 **
@@ -515,10 +509,13 @@ class Mng;
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "SDL.h"
+
 #include <vector>
 #include "upgrade_structs.h"
 #include "util.h"
 #include "unitsound.h"
+#include "icons.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -528,6 +525,11 @@ class CPlayerColorGraphic;
 class CConstruction;
 class CAnimations;
 class MissileType;
+class CFile;
+struct lua_State;
+#ifdef USE_MNG
+class Mng;
+#endif
 
 CUnitType *UnitTypeByIdent(const char *);
 
