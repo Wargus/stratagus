@@ -47,6 +47,7 @@
 #include "campaign.h"
 #include "interface.h"
 #include "unit.h"
+#include "iolib.h"
 
 
 /*----------------------------------------------------------------------------

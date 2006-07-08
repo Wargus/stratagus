@@ -39,6 +39,7 @@
 #include <string.h>
 
 #include "stratagus.h"
+#include "unit.h"
 #include "tileset.h"
 #include "video.h"
 #include "map.h"

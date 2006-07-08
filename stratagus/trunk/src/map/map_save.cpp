@@ -43,6 +43,7 @@
 #include "player.h"
 #include "unit.h"
 #include "ui.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

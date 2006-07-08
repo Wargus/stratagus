@@ -41,7 +41,6 @@
 
 #include "unit.h"
 #include "unitsound.h"
-#include "sound_server.h"
 #include "player.h"
 
 /*----------------------------------------------------------------------------
@@ -50,6 +49,7 @@
 
 class CUnit;
 class Missile;
+class CSample;
 
 /*----------------------------------------------------------------------------
 --  Definitons

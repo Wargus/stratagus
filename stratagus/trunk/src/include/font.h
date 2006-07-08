@@ -56,16 +56,14 @@
 **    Contains the graphics of the font, Only 9 colors are supported.
 */
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
-----------------------------------------------------------------------------*/
-
-class CGraphic;
-
-/*----------------------------------------------------------------------------
---  Definitions
 ----------------------------------------------------------------------------*/
 
 	/// Font definition
@@ -80,13 +78,13 @@ public:
 	static CFont *New(const char *ident, CGraphic *g);
 	static CFont *Get(const char *ident);
 
-	inline int Height() const {return G->Height;}
+	inline int Height() const { return G->Height; }
 	int Width(const char *text) const;
-	inline bool IsLoaded() {return G && G->IsLoaded();}
+	inline bool IsLoaded() { return G && G->IsLoaded(); }
 
-	virtual int getHeight() const {return Height();}
+	virtual int getHeight() const { return Height(); }
 	virtual int getWidth(const std::string &text) const
-		{return Width(text.c_str());}
+		{ return Width(text.c_str()); }
 	virtual void drawString(gcn::Graphics *graphics, const std::string &text, 
 		int x, int y);
 	
@@ -112,20 +110,14 @@ public:
 	SDL_Color Colors[MaxFontColors];
 };
 
-/**
-**  Font selector for the font functions.
-**  @todo should be removed
-*/
-extern CFont *SmallFont;       /// Small font used in stats
-extern CFont *GameFont;        /// Normal font used in game
-extern CFont *LargeFont;       /// Large font used in menus
-extern CFont *SmallTitleFont;  /// Small font used in episoden titles
-extern CFont *LargeTitleFont;  /// Large font used in episoden titles
+/*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
 
 #define MaxFonts 15  /// Number of fonts supported
 
 /**
-**  Color selector for the font functions.
+**  FIXME: should be moved to lua
 */
 #define FontRed "red"
 #define FontGreen "green"
@@ -136,6 +128,16 @@ extern CFont *LargeTitleFont;  /// Large font used in episoden titles
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+/**
+**  Font selector for the font functions.
+**  FIXME: should be moved to lua
+*/
+extern CFont *SmallFont;       /// Small font used in stats
+extern CFont *GameFont;        /// Normal font used in game
+extern CFont *LargeFont;       /// Large font used in menus
+extern CFont *SmallTitleFont;  /// Small font used in episoden titles
+extern CFont *LargeTitleFont;  /// Large font used in episoden titles
 
 /*----------------------------------------------------------------------------
 --  Functions
