@@ -46,12 +46,12 @@ function BosMenu(title, background)
   menu = MenuScreen()
 
   if background == nil then
-     bg = backgroundWidget
+    bg = backgroundWidget
   else
-     bgg = CGraphic:New(background)
-     bgg:Load()
-     bgg:Resize(Video.Width, Video.Height)
-     bg = ImageWidget(bgg)
+    bgg = CGraphic:New(background)
+    bgg:Load()
+    bgg:Resize(Video.Width, Video.Height)
+    bg = ImageWidget(bgg)
   end
   menu:add(bg, 0, 0)
 
@@ -103,10 +103,10 @@ function BosMenu(title, background)
     local bq
     bq = self:addListBox(x, y, w, h, mapslist)
     bq.getSelectedItem = function(self)
-        if self:getSelected() < 0 then
-           return self.itemslist[1]
-        end
-        return self.itemslist[self:getSelected() + 1]
+      if self:getSelected() < 0 then
+        return self.itemslist[1]
+      end
+      return self.itemslist[self:getSelected() + 1]
     end
 
     return bq
@@ -241,13 +241,25 @@ function RunResultsMenu()
   menu:run()
 end
 
-function RunMap(map, objective)
+function RunMap(map, objective, fow, revealmap)
   if objective == nil then
     current_objective = default_objective
   else
     current_objective = objective
   end
-  StartMap(map)
+  loop = true
+  while (loop) do
+    if fow ~= nil then
+      SetFogOfWar(fow)
+    end
+    if revealmap == true then
+       RevealMap()
+    end
+    StartMap(map)
+    if GameResult ~= GameRestart then
+      loop = false
+    end
+  end
   RunResultsMenu(s)
 end
 
@@ -310,11 +322,7 @@ function RunStartGameMenu(s)
 
   local function startgamebutton(s)
     print("Starting map -------")
-    SetFogOfWar(fow:isMarked())
-    if revealmap:isMarked() == true then
-       RevealMap()
-    end
-    RunMap("maps/" .. map)
+    RunMap("maps/" .. map, nil, fow:isMarked(), revealmap:isMarked())
     PresentMap = OldPresentMap
     menu:stop()
   end
@@ -353,9 +361,15 @@ function RunLoadGameMenu(s)
     function startgamebutton(s)
       print("Starting saved game")
       currentCampaign = nil
-      StartSavedGame("~save/" .. browser:getSelectedItem())
+      loop = true
+      while (loop) do
+        StartSavedGame("~save/" .. browser:getSelectedItem())
+        if (GameResult ~= GameRestart) then
+          loop = false
+        end
+      end
       RunResultsMenu()
-      if not (currentCampaign == nil) then
+      if currentCampaign ~= nil then
          if GameResult == GameVictory then
             position = position + 1
          elseif GameResult == GameDefeat then
