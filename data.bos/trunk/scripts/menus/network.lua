@@ -59,8 +59,8 @@ function addPlayersList(menu, numplayers)
 
   menu:writeLargeText(_("Players"), sx * 11, sy*3)
   for i=1,8 do
-     players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
-     players_state[i] = menu:writeText("Preparing", sx * 11 + 80, sy*4 + i*18)
+    players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
+    players_state[i] = menu:writeText("Preparing", sx * 11 + 80, sy*4 + i*18)
   end
   numplayers_text = menu:writeText("Open slots : " .. numplayers - 1, sx *11, sy*4 + 144)
 
@@ -71,17 +71,17 @@ function addPlayersList(menu, numplayers)
     players_name[1]:setCaption(Hosts[0].PlyName)
     for i=2,8 do
       if Hosts[i-1].PlyName == "" then
-         players_name[i]:setCaption("")
-         players_state[i]:setCaption("")
+        players_name[i]:setCaption("")
+        players_state[i]:setCaption("")
       else
-         connected_players = connected_players + 1
-         if ServerSetupState.Ready[i-1] == 1 then
-           ready_players = ready_players + 1
-           players_state[i]:setCaption("Ready")    
-         else
-           players_state[i]:setCaption("Preparing")
-         end
-         players_name[i]:setCaption(Hosts[i-1].PlyName)
+        connected_players = connected_players + 1
+        if ServerSetupState.Ready[i-1] == 1 then
+          ready_players = ready_players + 1
+          players_state[i]:setCaption("Ready")    
+        else
+          players_state[i]:setCaption("Preparing")
+        end
+        players_name[i]:setCaption(Hosts[i-1].PlyName)
      end
     end
     numplayers_text:setCaption("Open slots : " .. numplayers - 1 - connected_players)
@@ -119,21 +119,21 @@ function RunJoiningMapMenu(s)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
-      function(dd) difficulty = (5 - dd:getSelected()*2) end)
+    function(dd) difficulty = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-      function(dd) mapresources = (5 - dd:getSelected()*2) end)
+    function(dd) mapresources = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
-      function(dd) startingresources = (5 - dd:getSelected()*2) end)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
+    function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
-      print(description)
-      players:setCaption(""..nplayers)
-      descr:setCaption(description)
-      numplayers = nplayers
-      OldPresentMap(description, nplayers, w, h, id)
+    print(description)
+    players:setCaption(""..nplayers)
+    descr:setCaption(description)
+    numplayers = nplayers
+    OldPresentMap(description, nplayers, w, h, id)
   end
 
   -- Security: The map name is checked by the stratagus engine.
@@ -147,24 +147,24 @@ function RunJoiningMapMenu(s)
 
   joincounter = 0
   local function listen()
-     NetworkProcessClientRequest()
-     fow:setMarked(int2bool(ServerSetupState.FogOfWar))
-     revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
-     updatePlayersList()
-     if GetNetworkState() == 15  then
-        SetThisPlayer(1)
-        joincounter = joincounter + 1
-        if joincounter == 30 then
-          SetFogOfWar(fow:isMarked())
-          if revealmap:isMarked() == true then
-             RevealMap()
-          end
-          NetworkGamePrepareGameSettings()
-          RunMap(NetworkMapName)
-          PresentMap = OldPresentMap
-          menu:stop()
+    NetworkProcessClientRequest()
+    fow:setMarked(int2bool(ServerSetupState.FogOfWar))
+    revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
+    updatePlayersList()
+    if GetNetworkState() == 15  then
+      SetThisPlayer(1)
+      joincounter = joincounter + 1
+      if joincounter == 30 then
+        SetFogOfWar(fow:isMarked())
+        if revealmap:isMarked() == true then
+          RevealMap()
         end
-     end
+        NetworkGamePrepareGameSettings()
+        RunMap(NetworkMapName)
+        PresentMap = OldPresentMap
+        menu:stop()
+      end
+    end
   end
   listener = LuaActionListener(listen)
   menu:addLogicCallback(listener)
@@ -186,13 +186,13 @@ function RunJoiningGameMenu(s)
   sb:setBackgroundColor(dark)
 
   local function checkconnection() 
-      NetworkProcessClientRequest()
-      sb:setPercent(sb:getPercent() + 1) 
-      if GetNetworkState() == 3 then
-           -- got ICMMap => load map
-           RunJoiningMapMenu()
-           menu:stop()
-      end
+    NetworkProcessClientRequest()
+    sb:setPercent(sb:getPercent() + 1) 
+    if GetNetworkState() == 3 then
+      -- got ICMMap => load map
+      RunJoiningMapMenu()
+      menu:stop()
+    end
   end
   listener = LuaActionListener(checkconnection)
   menu:addLogicCallback(listener)
@@ -208,12 +208,12 @@ function RunJoinIpMenu()
   menu:writeText(_("IP or server name :"), x, Video.Height*8/20)
   server = menu:addTextInputField("localhost", x + 90, Video.Height*9/20 + 4)
   menu:addButton(_("~!Join Game"), x,  Video.Height*10/20, 
-     function(s) 
-       NetworkSetupServerAddress(server:getText()) 
-       NetworkInitClientConnect() 
-       RunJoiningGameMenu()
-       menu:stop() 
-     end
+    function(s) 
+      NetworkSetupServerAddress(server:getText()) 
+      NetworkInitClientConnect() 
+      RunJoiningGameMenu()
+      menu:stop() 
+    end
   )
   menu:run()
 end
@@ -235,49 +235,49 @@ function RunServerMultiGameMenu(map, description, numplayers)
   descr = menu:writeText(description, sx+20, sy*3+90)
 
   local function fowCb(dd)
-      ServerSetupState.FogOfWar = bool2int(dd:isMarked()) 
-      NetworkServerResyncClients()
+    ServerSetupState.FogOfWar = bool2int(dd:isMarked()) 
+    NetworkServerResyncClients()
   end
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, fowCb)
   fow:setMarked(true)
   local function revealMapCb(dd)
-      ServerSetupState.RevealMap = bool2int(dd:isMarked()) 
-      NetworkServerResyncClients()
+    ServerSetupState.RevealMap = bool2int(dd:isMarked()) 
+    NetworkServerResyncClients()
   end
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, revealMapCb)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
-      function(dd) difficulty = (5 - dd:getSelected()*2) end)
+    function(dd) difficulty = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-      function(dd) mapresources = (5 - dd:getSelected()*2) end)
+    function(dd) mapresources = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 140, sy*11+50 + 7,
-      function(dd) startingresources = (5 - dd:getSelected()*2) end)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
+    function(dd) startingresources = (5 - dd:getSelected()*2) end)
 
   local updatePlayers = addPlayersList(menu, numplayers)
 
   NetworkMapName = map
-  NetworkInitServerConnect();
+  NetworkInitServerConnect()
   ServerSetupState.FogOfWar = 1
   startgame = menu:addButton(_("~!Start Game"), sx * 11,  sy*14, 
-     function(s)    
-        SetFogOfWar(fow:isMarked())
-        if revealmap:isMarked() == true then
-          RevealMap()
-        end
-        NetworkServerStartGame() 
-        NetworkGamePrepareGameSettings()
-        RunMap(map)
-        menu:stop()
-     end
+    function(s)    
+      SetFogOfWar(fow:isMarked())
+      if revealmap:isMarked() == true then
+        RevealMap()
+      end
+      NetworkServerStartGame() 
+      NetworkGamePrepareGameSettings()
+      RunMap(map)
+      menu:stop()
+    end
   )
   startgame:setVisible(false)
   local waitingtext = menu:writeText(_("Waiting for players"), sx*11, sy*14)
   local function updateStartButton(ready) 
-     startgame:setVisible(ready)
-     waitingtext:setVisible(not ready)
+    startgame:setVisible(ready)
+    waitingtext:setVisible(not ready)
   end
 
   local listener = LuaActionListener(function(s) updateStartButton(updatePlayers()) end)
@@ -305,11 +305,11 @@ function RunCreateMultiGameMenu(s)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
-      print(description)
-      numplayers = nplayers
-      players:setCaption(""..numplayers)
-      descr:setCaption(description)
-      OldPresentMap(description, nplayers, w, h, id)
+    print(description)
+    numplayers = nplayers
+    players:setCaption(""..numplayers)
+    descr:setCaption(description)
+    OldPresentMap(description, nplayers, w, h, id)
   end
 
   Load(mapfile)
@@ -323,10 +323,10 @@ function RunCreateMultiGameMenu(s)
   browser:setActionCallback(cb)
   
   menu:addButton(_("~!Create Game"), sx,  sy*11, 
-     function(s)    
-	RunServerMultiGameMenu(mapfile, description, numplayers)
-        menu:stop()
-     end
+    function(s)    
+      RunServerMultiGameMenu(mapfile, description, numplayers)
+      menu:stop()
+    end
   )
   menu:run()
   PresentMap = OldPresentMap
@@ -341,15 +341,29 @@ function RunMultiPlayerMenu(s)
   menu = BosMenu(_("MultiPlayer"))
 
   menu:writeText(_("Nickname :"), x, Video.Height*8/20)
-  nick = menu:addTextInputField("Unknown", x + 90, Video.Height*8/20 + 4)
+  nick = menu:addTextInputField(GetLocalPlayerName(), x + 90, Video.Height*8/20 + 4)
 
   InitNetwork1()
   menu:addButton(_("~!Join Game"), x,  Video.Height*11/20, 
-      function(s) SetLocalPlayerName(nick:getText()) RunJoinIpMenu() menu:stop(1) end)
+    function(s)
+      if nick:getText() ~= GetLocalPlayerName() then
+        SetLocalPlayerName(nick:getText())
+        SavePreferences()
+      end
+      RunJoinIpMenu()
+      menu:stop(1)
+    end)
   menu:addButton(_("~!Create Game"), x,  Video.Height*12/20, 
-      function(s) SetLocalPlayerName(nick:getText()) RunCreateMultiGameMenu() menu:stop(1) end)
+    function(s)
+      if nick:getText() ~= GetLocalPlayerName() then
+        SetLocalPlayerName(nick:getText())
+        SavePreferences()
+      end
+      RunCreateMultiGameMenu()
+      menu:stop(1)
+    end)
 
   menu:run()
-  ExitNetwork1();
+  ExitNetwork1()
 end
 
