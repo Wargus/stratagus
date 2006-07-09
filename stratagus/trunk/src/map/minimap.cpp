@@ -456,7 +456,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 	int bpp;
 #endif
 
-	if (EditorRunning || ReplayRevealMap || unit->IsVisible(ThisPlayer)) {
+	if (Editor.Running || ReplayRevealMap || unit->IsVisible(ThisPlayer)) {
 		type = unit->Type;
 	} else {
 		type = unit->Seen.Type;
