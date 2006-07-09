@@ -42,9 +42,6 @@ SetTitleScreens(
 --      {Image="video/bos_intro.ogg"}
 )
 
---	Enter your menu music.
--- SetMenuMusic("music/title.ogg")
-
 --	Set the game name
 SetGameName("bos")
 
