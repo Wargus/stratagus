@@ -115,12 +115,6 @@ static void GameGATAction(Menuitem *mi, int i);
 static void CustomGameOPSAction(Menuitem *mi, int i);
 #endif
 
-// Enter name
-#if 0
-static void EnterNameAction(Menuitem *mi, int key);
-static void EnterNameCancel(void);
-#endif
-
 // Net create join
 #if 0
 static void JoinNetGameMenu(void);
@@ -140,12 +134,6 @@ static void MultiScenSelectMenu(void);
 static void MultiGameStart(void);
 static void MultiGameCancel(void);
 static void MultiGameFWSAction(Menuitem *mi, int i);
-#endif
-
-// Enter server ip
-#if 0
-static void EnterServerIPAction(Menuitem *mi, int key);
-static void EnterServerIPCancel(void);
 #endif
 
 // Net multi client
@@ -739,10 +727,6 @@ void InitMenuFuncHash(void)
 	HASHADD(GameGATAction,"game-gat-action");
 	HASHADD(CustomGameOPSAction,"custom-game-ops-action");
 
-// Enter name
-	HASHADD(EnterNameAction,"enter-name-action");
-	HASHADD(EnterNameCancel,"enter-name-cancel");
-
 // Net create join
 	HASHADD(JoinNetGameMenu,"net-join-game");
 	HASHADD(CreateNetGameMenu,"net-create-game");
@@ -760,10 +744,6 @@ void InitMenuFuncHash(void)
 	HASHADD(MultiGameCancel,"multi-game-cancel");
 	HASHADD(MultiGamePTSAction,"multi-game-pts-action");
 	HASHADD(MultiGameFWSAction,"multi-game-fws-action");
-
-// Enter server ip
-	HASHADD(EnterServerIPAction,"enter-server-ip-action");
-	HASHADD(EnterServerIPCancel,"enter-server-ip-cancel");
 
 // Net multi client
 	HASHADD(TerminateNetConnect,"terminate-net-connect");
@@ -1073,65 +1053,6 @@ static void StartCampaignFromMenu(int number)
 
 	// FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
 	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
-** Cancel button of player name menu pressed.
-*/
-static void EnterNameCancel(void)
-{
-	Menu *menu;
-
-	menu = CurrentMenu;
-	menu->Items[1].D.Input.nch = 0;
-	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
-** Input field action of player name menu.
-*/
-static void EnterNameAction(Menuitem *mi, int key)
-{
-	if (mi->D.Input.nch == 0) {
-		mi[1].Flags = MI_FLAGS_DISABLED;
-	} else {
-		mi[1].Flags &= ~MI_FLAGS_DISABLED;
-		if (key == 10 || key == 13) {
-			//CloseMenu();
-		}
-	}
-}
-#endif
-
-#if 0
-/**
-** Cancel button of enter server ip/name menu pressed.
-*/
-static void EnterServerIPCancel(void)
-{
-	CurrentMenu->Items[1].D.Input.nch = 0;
-	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
-** Input field action of server ip/name.
-*/
-static void EnterServerIPAction(Menuitem *mi, int key)
-{
-	if (mi->D.Input.nch == 0) {
-		mi[1].Flags = MI_FLAGS_DISABLED;
-	} else {
-		mi[1].Flags &= ~MI_FLAGS_DISABLED;
-		if (key == 10 || key == 13) {
-			//CloseMenu();
-		}
-	}
 }
 #endif
 
@@ -2364,7 +2285,7 @@ void SetupEditor(void)
 static void EditorSelectCancel(void)
 {
 	//QuitToMenu = 1;
-	EditorRunning = EditorNotRunning;
+	Editor.Running = EditorNotRunning;
 	//CloseMenu();
 }
 #endif
@@ -2669,8 +2590,8 @@ void EditorLoadMenu(void)
 		strcpy(CurrentMapPath, ScenSelectFileName);
 	}
 
-	EditorMapLoaded = true;
-	EditorRunning = EditorNotRunning;
+	Editor.MapLoaded = true;
+	Editor.Running = EditorNotRunning;
 	//CloseMenu();
 }
 
@@ -3128,7 +3049,7 @@ int EditorSaveMenu(void)
 	ProcessMenu("menu-editor-save", 1);
 
 	if (!EditorCancelled) {
-		if (EditorWriteCompressedMaps && !strstr(path, ".gz")) {
+		if (Editor.WriteCompressedMaps && !strstr(path, ".gz")) {
 			sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
 		} else {
 			sprintf(path, "%s/%s", ScenSelectPath, ScenSelectFileName);
@@ -3302,7 +3223,7 @@ static void EditorSaveConfirmCancel(void)
 static void EditorQuitToMenu(void)
 {
 	//QuitToMenu = 1;
-	EditorRunning = EditorNotRunning;
+	Editor.Running = EditorNotRunning;
 	//CloseMenu();
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';

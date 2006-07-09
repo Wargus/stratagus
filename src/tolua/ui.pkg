@@ -57,7 +57,7 @@ class CFiller
 
 class vector
 {
-	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, CMenuPanel)
+	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, CMenuPanel, string)
 
 	void clear();
 	int size() const;

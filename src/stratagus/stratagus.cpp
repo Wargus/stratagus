@@ -504,10 +504,10 @@ void MenuLoop(const char *filename, CMap *map)
 				old_video_sync = VideoSyncSpeed;
 				VideoSyncSpeed = 100;
 				SetVideoSync();
-				if (EditorRunning == EditorCommandLine) {
+				if (Editor.Running == EditorCommandLine) {
 					SetupEditor();
 				}
-				if (EditorRunning) {
+				if (Editor.Running) {
 					ProcessMenu("menu-editor-select", 1);
 				} else {
 					ProcessMenu("menu-program-start", 1);
@@ -519,7 +519,7 @@ void MenuLoop(const char *filename, CMap *map)
 			DebugPrint("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 			filename = CurrentMapPath;
 		} else {
-			if (EditorRunning) {
+			if (Editor.Running) {
 				SetupEditor();
 			}
 			strcpy(CurrentMapPath, filename);
@@ -532,7 +532,7 @@ void MenuLoop(const char *filename, CMap *map)
 		//
 		//  Start editor or game.
 		//
-		if (EditorRunning) {
+		if (Editor.Running) {
 			EditorMainLoop();
 		} else {
 			//
@@ -690,25 +690,6 @@ void StartSavedGame(const char *filename)
 	StartMap(filename, false);
 }
 	
-void StartEditor(const char *filename) 
-{
-	GuichanActive = false;
-	
-	strcpy(CurrentMapPath, filename);
-
-	Map.Info.Description = new_strdup(filename);
-	Map.Info.MapWidth = 64;
-	Map.Info.MapHeight = 64;
-	
-	// Run the editor.
-	EditorMainLoop();
-
-	// Clear screen
-	Video.ClearScreen();
-	Invalidate();
-	GuichanActive = true;
-}
-
 void StartReplay(const char *filename, bool reveal)
 {
 	char replay[PATH_MAX];
@@ -961,7 +942,7 @@ int main(int argc, char **argv)
 				}
 				continue;
 			case 'e':
-				EditorRunning = EditorCommandLine;
+				Editor.Running = EditorCommandLine;
 				continue;
 			case 'E':
 				EditorStartFile = optarg;

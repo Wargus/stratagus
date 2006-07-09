@@ -34,54 +34,42 @@
 //@{
 
 #include <vector>
+#include <string>
 #include "player.h"
 #include "icons.h"
 
-class CUnitType;
-class IconConfig;
-
 /*----------------------------------------------------------------------------
---  Variables
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-	/// Editor is running
+class CUnitType;
+
 enum EditorRunningType {
-	EditorNotRunning = 0,   /// Not Running
-	EditorStarted = 1,      /// Editor Enabled at all
-	EditorCommandLine = 2,  /// Called from Command Line
-	EditorEditing = 4       /// Editor is fully running
+	EditorNotRunning = 0,    /// Not Running
+	EditorStarted = 1,       /// Editor Enabled at all
+	EditorCommandLine = 2,   /// Called from Command Line
+	EditorEditing = 4,       /// Editor is fully running
 };
 
-extern EditorRunningType EditorRunning;
-
-extern bool EditorMapLoaded;  /// Map loaded in editor
-extern int EditorWriteCompressedMaps;
-
-	/// Current editor state type.
 enum EditorStateType {
-	EditorSelecting,  ///< Select
-	EditorEditTile,   ///< Edit tiles
-	EditorEditUnit,   ///< Edit units
-	EditorSetStartLocation ///< Set the start location
-};    ///< Current editor state
-	/// Current editor state.
-extern EditorStateType EditorState;
-
-extern const char *EditorStartFile;  /// Editor CCL start file
+	EditorSelecting,         /// Select
+	EditorEditTile,          /// Edit tiles
+	EditorEditUnit,          /// Edit units
+	EditorSetStartLocation   /// Set the start location
+};
 
 class CEditor {
 public:
 	CEditor() : TerrainEditable(true),
-				StartUnitName(NULL), StartUnit(NULL),
-				ShowUnitsToSelect(true), ShowBuildingsToSelect(true),
-				ShowAirToSelect(true), ShowLandToSelect(true), ShowWaterToSelect(true),
-
-				UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
-				CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral)
-
-				 {};
+		StartUnitName(NULL), StartUnit(NULL),
+		ShowUnitsToSelect(true), ShowBuildingsToSelect(true),
+		ShowAirToSelect(true), ShowLandToSelect(true), ShowWaterToSelect(true),
+		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
+		CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
+		MapLoaded(false), WriteCompressedMaps(true)
+		{};
 	~CEditor() {
-		delete [] StartUnitName;
+		delete[] StartUnitName;
 	};
 
 	void Init();
@@ -89,7 +77,7 @@ public:
 	void CreateRandomMap() const;
 
 
-	std::vector<char *> UnitTypes;                  /// Sorted editor unit-type table.
+	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
 
 	bool TerrainEditable;        /// Is the terrain editable ?
@@ -114,14 +102,28 @@ public:
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
 
+	bool MapLoaded;              /// Map loaded in editor
+	bool WriteCompressedMaps;    /// Use compression when saving
+
+	EditorRunningType Running;   /// Editor is running
+
+	EditorStateType State;       /// Current editor state
 };
+
+/*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
 
 extern CEditor Editor;
 
+extern const char *EditorStartFile;  /// Editor CCL start file
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+	/// Start the editor
+extern void StartEditor(const char *filename);
 
 	/// Editor main event loop
 extern void EditorMainLoop(void);
