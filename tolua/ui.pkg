@@ -525,7 +525,9 @@ typedef enum {
 	GameNoResult,
 	GameVictory,
 	GameDefeat,
-	GameDraw
+	GameDraw,
+	GameQuitToMenu,
+	GameRestart,
 } GameResults; 
 GameResults GameResult;
 $void StopGame(GameResults result);
