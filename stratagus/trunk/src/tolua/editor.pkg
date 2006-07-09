@@ -1,0 +1,15 @@
+$#include "editor.h"
+
+class CEditor
+{
+	bool TerrainEditable;
+	const CUnitType *StartUnit;
+};
+
+extern CEditor Editor;
+
+void StartEditor(const char *filename);
+int EditorSaveMap(const char *file);
+
+extern bool EditorWriteCompressedMaps;
+
