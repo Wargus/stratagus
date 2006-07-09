@@ -219,8 +219,6 @@ extern char NameLine[];
 	/// Game cycles per second to simulate (original 30-40)
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
 
-#define DEFAULT_START_ORDERS 4  // The number of Orders allocated on unit creation
-
 /*----------------------------------------------------------------------------
 --  stratagus.c
 ----------------------------------------------------------------------------*/
@@ -267,7 +265,6 @@ public:
 
 extern TitleScreen **TitleScreens;          /// File for title screen
 extern char *GameName;                      /// Name of the game
-extern char *MenuMusic;                     /// File for menu music
 extern char *ClickMissile;                  /// Missile to show when you click
 extern char *DamageMissile;                 /// Missile to show damage caused
 extern char *StratagusLibPath;              /// Location of stratagus data
