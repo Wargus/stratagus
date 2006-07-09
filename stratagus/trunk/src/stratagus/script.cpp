@@ -2026,6 +2026,18 @@ static int CclSetLocalPlayerName(lua_State *l)
 	return 0;
 }
 
+/**
+**  Get the local player name
+**
+**  @param l  Lua state.
+*/
+static int CclGetLocalPlayerName(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushstring(l, LocalPlayerName);
+	return 1;
+}
+
 
 /**
 **  Affect UseHPForXp.
@@ -2518,6 +2530,7 @@ void InitCcl(void)
 	lua_register(Lua, "SetGameSpeed", CclSetGameSpeed);
 	lua_register(Lua, "GetGameSpeed", CclGetGameSpeed);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
+	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
 	lua_register(Lua, "SetGodMode", CclSetGodMode);
 
 	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
