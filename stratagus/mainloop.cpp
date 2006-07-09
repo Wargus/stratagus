@@ -188,7 +188,7 @@ void DrawMapArea(void)
 */
 void UpdateDisplay(void)
 {
-	if (GameRunning || EditorRunning == EditorEditing) {
+	if (GameRunning || Editor.Running == EditorEditing) {
 		DrawMapArea();
 		DrawMessages();
 

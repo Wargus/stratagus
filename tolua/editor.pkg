@@ -2,14 +2,14 @@ $#include "editor.h"
 
 class CEditor
 {
+	vector<string> UnitTypes;
 	bool TerrainEditable;
 	const CUnitType *StartUnit;
+	bool WriteCompressedMaps;
 };
 
 extern CEditor Editor;
 
 void StartEditor(const char *filename);
 int EditorSaveMap(const char *file);
-
-extern bool EditorWriteCompressedMaps;
 

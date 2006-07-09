@@ -84,13 +84,6 @@ static int IconHeight;                      /// Icon height in panels
 static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
-
-bool EditorMapLoaded;  /// Map loaded in editor
-int EditorWriteCompressedMaps = 1;
-
-EditorStateType EditorState;                /// Current editor state.
-EditorRunningType EditorRunning;  /// Running State of editor.
-
 static char TileToolRandom;      /// Tile tool draws random
 static char TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
@@ -370,19 +363,18 @@ static int CalculateUnitIcons(void)
 }
 
 /**
-**  Calculate the max height and the max widht of icons,
+**  Calculate the max height and the max width of icons,
 **  and assign them to IconHeight and IconWidth
 */
 static void CalculateMaxIconSize(void)
 {
-	int i;
 	const CUnitType *type;
 	const CIcon *icon;
 
 	IconWidth = 0;
 	IconHeight = 0;
-	for (i = 0; i < (int) Editor.UnitTypes.size(); ++i) {
-		type = UnitTypeByIdent(Editor.UnitTypes[i]);
+	for (int i = 0; i < (int)Editor.UnitTypes.size(); ++i) {
+		type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
 		Assert(type && type->Icon.Icon);
 		icon = type->Icon.Icon;
 		if (IconWidth < icon->G->Width) {
@@ -400,13 +392,12 @@ static void CalculateMaxIconSize(void)
 */
 static void RecalculateShownUnits(void)
 {
-	int i;
 	const CUnitType *type;
 
 	Editor.ShownUnitTypes.clear();
 
-	for (i = 0; i < (int) Editor.UnitTypes.size(); ++i) {
-		type = UnitTypeByIdent(Editor.UnitTypes[i]);
+	for (int i = 0; i < (int)Editor.UnitTypes.size(); ++i) {
+		type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
 
 		if (type->Building && !Editor.ShowBuildingsToSelect) {
 			continue;
@@ -431,10 +422,8 @@ static void RecalculateShownUnits(void)
 		Editor.ShownUnitTypes.push_back(type);
 	}
 
-	if (Editor.UnitIndex >= (int) Editor.ShownUnitTypes.size()) {
-		int count;
-
-		count = CalculateUnitIcons();
+	if (Editor.UnitIndex >= (int)Editor.ShownUnitTypes.size()) {
+		int count = CalculateUnitIcons();
 		Editor.UnitIndex = Editor.ShownUnitTypes.size() / count * count;
 	}
 	// Quick & dirty make them invalid
@@ -749,20 +738,20 @@ static void DrawEditorPanel(void)
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
-			(EditorState == EditorSelecting ? IconSelected : 0),
+			(Editor.State == EditorSelecting ? IconSelected : 0),
 		x, y, NULL);
 	icon = Editor.Units.Icon;
 	Assert(icon);
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == UnitButton ? IconActive : 0) |
-			(EditorState == EditorEditUnit ? IconSelected : 0),
+			(Editor.State == EditorEditUnit ? IconSelected : 0),
 		x + UNIT_ICON_X, y + UNIT_ICON_Y, NULL);
 
 	if (Editor.TerrainEditable) {
 		DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
 			(ButtonUnderCursor == TileButton ? IconActive : 0) |
-				(EditorState == EditorEditTile ? IconSelected : 0));
+				(Editor.State == EditorEditTile ? IconSelected : 0));
 	}
 
 	if (Editor.StartUnit) {
@@ -770,7 +759,7 @@ static void DrawEditorPanel(void)
 		Assert(icon);
 		icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 			(ButtonUnderCursor == StartButton ? IconActive : 0) |
-				(EditorState == EditorSetStartLocation ? IconSelected : 0),
+				(Editor.State == EditorSetStartLocation ? IconSelected : 0),
 			x + START_ICON_X, y + START_ICON_Y, NULL);
 	} else {
 		//  No unit specified.
@@ -787,7 +776,7 @@ static void DrawEditorPanel(void)
 		PopClipping();
 	}
 
-	switch (EditorState) {
+	switch (Editor.State) {
 		case EditorSelecting:
 			break;
 		case EditorEditTile:
@@ -818,7 +807,7 @@ static void DrawMapCursor(void)
 	//  (Menu reset CursorBuilding)
 	//
 	if (!CursorBuilding) {
-		switch (EditorState) {
+		switch (Editor.State) {
 			case EditorSelecting:
 			case EditorEditTile:
 				break;
@@ -843,7 +832,7 @@ static void DrawMapCursor(void)
 		y = UI.MouseViewport->Viewport2MapY(CursorY);
 		x = UI.MouseViewport->Map2ViewportX(x);
 		y = UI.MouseViewport->Map2ViewportY(y);
-		if (EditorState == EditorEditTile) {
+		if (Editor.State == EditorEditTile) {
 			int i;
 			int j;
 
@@ -1144,17 +1133,17 @@ static void EditorCallbackButtonDown(unsigned button)
 		CursorBuilding = NULL;
 		switch (ButtonUnderCursor) {
 			case SelectButton :
-				EditorState = EditorSelecting;
+				Editor.State = EditorSelecting;
 				return;
 			case UnitButton:
-				EditorState = EditorEditUnit;
+				Editor.State = EditorEditUnit;
 				return;
 			case TileButton :
 				if (EditorEditTile)
-					EditorState = EditorEditTile;
+					Editor.State = EditorEditTile;
 				return;
 			case StartButton:
-				EditorState = EditorSetStartLocation;
+				Editor.State = EditorSetStartLocation;
 				return;
 			default:
 				break;
@@ -1164,7 +1153,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on tile area
 	//
 	if (CursorOn == CursorOnButton && ButtonUnderCursor >= 100 &&
-			EditorState == EditorEditTile) {
+			Editor.State == EditorEditTile) {
 		switch (ButtonUnderCursor) {
 			case 300:
 				TileCursorSize = 1;
@@ -1192,7 +1181,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 	
 	// Click on player area
-	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
+	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Cursor on player icons
 		if (Editor.CursorPlayer != -1) {
 			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
@@ -1206,7 +1195,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	//
 	// Click on unit area
 	//
-	if (EditorState == EditorEditUnit) {
+	if (Editor.State == EditorEditUnit) {
 		int percent;
 		int j;
 		int count;
@@ -1299,7 +1288,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	//
 	// Right click on a resource
 	//
-	if (EditorState == EditorSelecting) {
+	if (Editor.State == EditorSelecting) {
 		if ((MouseButtons & RightButton && UnitUnderCursor)) {
 			if (UnitUnderCursor->Type->GivesResource) {
 				EditorEditResource();
@@ -1324,13 +1313,13 @@ static void EditorCallbackButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & LeftButton) {
-			if (EditorState == EditorEditTile) {
+			if (Editor.State == EditorEditTile) {
 				EditTiles(UI.MouseViewport->Viewport2MapX(CursorX),
 					UI.MouseViewport->Viewport2MapY(CursorY), TileCursor,
 					TileCursorSize);
 			}
 			if (!UnitPlacedThisPress) {
-				if (EditorState == EditorEditUnit && CursorBuilding) {
+				if (Editor.State == EditorEditUnit && CursorBuilding) {
 					if (CanBuildUnitType(NULL, CursorBuilding,
 							UI.MouseViewport->Viewport2MapX(CursorX),
 							UI.MouseViewport->Viewport2MapY(CursorY), 1)) {
@@ -1348,7 +1337,7 @@ static void EditorCallbackButtonDown(unsigned button)
 					}
 				}
 			}
-			if (EditorState == EditorSetStartLocation) {
+			if (Editor.State == EditorSetStartLocation) {
 				Players[Editor.SelectedPlayer].StartX = UI.MouseViewport->Viewport2MapX(CursorX);
 				Players[Editor.SelectedPlayer].StartY = UI.MouseViewport->Viewport2MapY(CursorY);
 			}
@@ -1593,7 +1582,7 @@ static void EditorCallbackMouse(int x, int y)
 	// Drawing tiles on map.
 	//
 	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
-			(EditorState == EditorEditTile || EditorState == EditorEditUnit)) {
+			(Editor.State == EditorEditTile || Editor.State == EditorEditUnit)) {
 
 		//
 		// Scroll the map
@@ -1624,11 +1613,11 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		RestrictCursorToViewport();
 
-		if (EditorState == EditorEditTile) {
+		if (Editor.State == EditorEditTile) {
 			EditTiles(UI.SelectedViewport->Viewport2MapX(CursorX),
 				UI.SelectedViewport->Viewport2MapY(CursorY), TileCursor,
 				TileCursorSize);
-		} else if (EditorState == EditorEditUnit && CursorBuilding) {
+		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, CursorBuilding,
 					UI.SelectedViewport->Viewport2MapX(CursorX),
@@ -1678,7 +1667,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Handle edit unit area
 	//
-	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
+	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Scrollbar
 		if (UI.ButtonPanel.X + 4 < CursorX
 				&& CursorX < UI.ButtonPanel.X + 176 - 4
@@ -1744,7 +1733,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Handle tile area
 	//
-	if (EditorState == EditorEditTile) {
+	if (Editor.State == EditorEditTile) {
 		i = 0;
 		bx = UI.InfoPanel.X + 4;
 		by = UI.InfoPanel.Y + 4 + IconHeight + 10;
@@ -2043,8 +2032,8 @@ void EditorMainLoop(void)
 	Callbacks = &EditorCallbacks;
 
 	while (1) {
-		EditorMapLoaded = false;
-		EditorRunning = EditorEditing;
+		Editor.MapLoaded = false;
+		Editor.Running = EditorEditing;
 
 		Editor.Init();
 
@@ -2055,11 +2044,11 @@ void EditorMainLoop(void)
 
 		GameCursor = UI.Point.Cursor;
 		InterfaceState = IfaceStateNormal;
-		EditorState = EditorSelecting;
+		Editor.State = EditorSelecting;
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
 
-		while (EditorRunning) {
+		while (Editor.Running) {
 			CheckMusicFinished();
 
 			UI.Minimap.Update();
@@ -2075,8 +2064,8 @@ void EditorMainLoop(void)
 			if (UI.KeyScroll) {
 				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
-						(EditorState == EditorEditTile ||
-							EditorState == EditorEditUnit)) {
+						(Editor.State == EditorEditTile ||
+							Editor.State == EditorEditUnit)) {
 					EditorCallbackButtonDown(0);
 				}
 			}
@@ -2084,7 +2073,7 @@ void EditorMainLoop(void)
 			WaitEventsOneFrame(Callbacks);
 		}
 
-		if (!EditorMapLoaded) {
+		if (!Editor.MapLoaded) {
 			break;
 		}
 
@@ -2103,6 +2092,28 @@ void EditorMainLoop(void)
 
 	CommandLogDisabled = OldCommandLogDisabled;
 	Callbacks = OldCallbacks;
+}
+
+/**
+**  Start the editor
+*/
+void StartEditor(const char *filename)
+{
+	GuichanActive = false;
+	
+	strcpy(CurrentMapPath, filename);
+
+	Map.Info.Description = new_strdup(filename);
+	Map.Info.MapWidth = 64;
+	Map.Info.MapHeight = 64;
+	
+	// Run the editor.
+	EditorMainLoop();
+
+	// Clear screen
+	Video.ClearScreen();
+	Invalidate();
+	GuichanActive = true;
 }
 
 //@}

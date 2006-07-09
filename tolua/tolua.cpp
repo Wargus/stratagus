@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Jul  9 14:06:20 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Jul  9 16:25:10 2006.
 */
 
 #ifndef __cplusplus
@@ -172,6 +172,13 @@ static int tolua_collect_CFiller (lua_State* tolua_S)
  return 0;
 }
 
+static int tolua_collect_vector_string_ (lua_State* tolua_S)
+{
+ vector<string>* self = (vector<string>*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_ScrollArea (lua_State* tolua_S)
 {
  ScrollArea* self = (ScrollArea*) tolua_tousertype(tolua_S,1,0);
@@ -242,16 +249,16 @@ static int tolua_collect_RadioButton (lua_State* tolua_S)
  return 0;
 }
 
-static int tolua_collect_CMenuPanel (lua_State* tolua_S)
+static int tolua_collect_MenuScreen (lua_State* tolua_S)
 {
- CMenuPanel* self = (CMenuPanel*) tolua_tousertype(tolua_S,1,0);
+ MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
 
-static int tolua_collect_MenuScreen (lua_State* tolua_S)
+static int tolua_collect_CMenuPanel (lua_State* tolua_S)
 {
- MenuScreen* self = (MenuScreen*) tolua_tousertype(tolua_S,1,0);
+ CMenuPanel* self = (CMenuPanel*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -280,58 +287,59 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"vector<CUIButton>");
  tolua_usertype(tolua_S,"CEditor");
- tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CPreference");
- tolua_usertype(tolua_S,"gcn::Graphics");
- tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"CFontColor");
+ tolua_usertype(tolua_S,"ListBox");
  tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CUIButton");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"ServerSetup");
- tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"MenuScreen");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"gcn::Graphics");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"CMenuPanel");
  tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
- tolua_usertype(tolua_S,"CPieMenu");
+ tolua_usertype(tolua_S,"vector<string>");
  tolua_usertype(tolua_S,"ScrollArea");
  tolua_usertype(tolua_S,"Button");
- tolua_usertype(tolua_S,"StatBoxWidget");
+ tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"ListBox");
+ tolua_usertype(tolua_S,"Windows");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"vector<CMenuPanel>");
- tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"ImageButton");
- tolua_usertype(tolua_S,"CResourceInfo");
- tolua_usertype(tolua_S,"CUITimer");
  tolua_usertype(tolua_S,"ImageRadioButton");
+ tolua_usertype(tolua_S,"CPieMenu");
+ tolua_usertype(tolua_S,"CUITimer");
+ tolua_usertype(tolua_S,"CResourceInfo");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Slider");
@@ -2180,6 +2188,283 @@ static int tolua_stratagus_vector_CMenuPanel__delete00(lua_State* tolua_S)
 #endif
  {
   vector<CMenuPanel>* self = (vector<CMenuPanel>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
+#endif
+ delete self;
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: clear of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__clear00
+static int tolua_stratagus_vector_string__clear00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'",NULL);
+#endif
+ {
+  self->clear();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'clear'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: size of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__size00
+static int tolua_stratagus_vector_string__size00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'size'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->size();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'size'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator[] of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string___geti00
+static int tolua_stratagus_vector_string___geti00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator[]'",NULL);
+#endif
+ {
+  const string tolua_ret = (const string)  self->operator[](index);
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function '.geti'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator&[] of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string___seti00
+static int tolua_stratagus_vector_string___seti00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+  string tolua_value = ((string)  tolua_tocppstring(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator&[]'",NULL);
+#endif
+ self->operator[](index) =  tolua_value;
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function '.seti'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator[] of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string___geti01
+static int tolua_stratagus_vector_string___geti01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator[]'",NULL);
+#endif
+ {
+  string tolua_ret = (string)  self->operator[](index);
+ tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+ }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_string___geti00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: push_back of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__push_back00
+static int tolua_stratagus_vector_string__push_back00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  string val = ((string)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'push_back'",NULL);
+#endif
+ {
+  self->push_back(val);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'push_back'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__new00
+static int tolua_stratagus_vector_string__new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"vector<string>",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  vector<string>* tolua_ret = (vector<string>*)  new vector<string>();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"vector<string>");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__new00_local
+static int tolua_stratagus_vector_string__new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"vector<string>",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  vector<string>* tolua_ret = (vector<string>*)  new vector<string>();
+ tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"vector<string>");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: delete of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__delete00
+static int tolua_stratagus_vector_string__delete00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
 #endif
@@ -13757,6 +14042,36 @@ static int tolua_stratagus_StopMusic00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: UnitTypes of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_get_CEditor_UnitTypes
+static int tolua_get_CEditor_UnitTypes(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UnitTypes'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->UnitTypes,"vector<string>");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: UnitTypes of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_set_CEditor_UnitTypes
+static int tolua_set_CEditor_UnitTypes(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UnitTypes'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"vector<string>",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->UnitTypes = *((vector<string>*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: TerrainEditable of class  CEditor */
 #ifndef TOLUA_DISABLE_tolua_get_CEditor_TerrainEditable
 static int tolua_get_CEditor_TerrainEditable(lua_State* tolua_S)
@@ -13797,6 +14112,36 @@ static int tolua_get_CEditor_StartUnit_ptr(lua_State* tolua_S)
 #endif
  tolua_pushusertype(tolua_S,(void*)self->StartUnit,"const CUnitType");
  return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: WriteCompressedMaps of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_get_CEditor_WriteCompressedMaps
+static int tolua_get_CEditor_WriteCompressedMaps(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'WriteCompressedMaps'",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)self->WriteCompressedMaps);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: WriteCompressedMaps of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_set_CEditor_WriteCompressedMaps
+static int tolua_set_CEditor_WriteCompressedMaps(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'WriteCompressedMaps'",NULL);
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->WriteCompressedMaps = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -13878,30 +14223,6 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'EditorSaveMap'.",&tolua_err);
  return 0;
 #endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: EditorWriteCompressedMaps */
-#ifndef TOLUA_DISABLE_tolua_get_EditorWriteCompressedMaps
-static int tolua_get_EditorWriteCompressedMaps(lua_State* tolua_S)
-{
- tolua_pushboolean(tolua_S,(bool)EditorWriteCompressedMaps);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: EditorWriteCompressedMaps */
-#ifndef TOLUA_DISABLE_tolua_set_EditorWriteCompressedMaps
-static int tolua_set_EditorWriteCompressedMaps(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  EditorWriteCompressedMaps = ((bool)  tolua_toboolean(tolua_S,2,0))
-;
- return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -14349,6 +14670,23 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new_local",tolua_stratagus_vector_CMenuPanel__new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_vector_CMenuPanel__new00_local);
   tolua_function(tolua_S,"delete",tolua_stratagus_vector_CMenuPanel__delete00);
+ tolua_endmodule(tolua_S);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"vector_string_","vector<string>","",tolua_collect_vector_string_);
+#else
+ tolua_cclass(tolua_S,"vector_string_","vector<string>","",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"vector_string_");
+  tolua_function(tolua_S,"clear",tolua_stratagus_vector_string__clear00);
+  tolua_function(tolua_S,"size",tolua_stratagus_vector_string__size00);
+  tolua_function(tolua_S,".geti",tolua_stratagus_vector_string___geti00);
+  tolua_function(tolua_S,".seti",tolua_stratagus_vector_string___seti00);
+  tolua_function(tolua_S,".geti",tolua_stratagus_vector_string___geti01);
+  tolua_function(tolua_S,"push_back",tolua_stratagus_vector_string__push_back00);
+  tolua_function(tolua_S,"new",tolua_stratagus_vector_string__new00);
+  tolua_function(tolua_S,"new_local",tolua_stratagus_vector_string__new00_local);
+  tolua_function(tolua_S,".call",tolua_stratagus_vector_string__new00_local);
+  tolua_function(tolua_S,"delete",tolua_stratagus_vector_string__delete00);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CButtonPanel","CButtonPanel","",NULL);
  tolua_beginmodule(tolua_S,"CButtonPanel");
@@ -15062,13 +15400,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"StopMusic",tolua_stratagus_StopMusic00);
  tolua_cclass(tolua_S,"CEditor","CEditor","",NULL);
  tolua_beginmodule(tolua_S,"CEditor");
+  tolua_variable(tolua_S,"UnitTypes",tolua_get_CEditor_UnitTypes,tolua_set_CEditor_UnitTypes);
   tolua_variable(tolua_S,"TerrainEditable",tolua_get_CEditor_TerrainEditable,tolua_set_CEditor_TerrainEditable);
   tolua_variable(tolua_S,"StartUnit",tolua_get_CEditor_StartUnit_ptr,NULL);
+  tolua_variable(tolua_S,"WriteCompressedMaps",tolua_get_CEditor_WriteCompressedMaps,tolua_set_CEditor_WriteCompressedMaps);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"Editor",tolua_get_Editor,tolua_set_Editor);
  tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
  tolua_function(tolua_S,"EditorSaveMap",tolua_stratagus_EditorSaveMap00);
- tolua_variable(tolua_S,"EditorWriteCompressedMaps",tolua_get_EditorWriteCompressedMaps,tolua_set_EditorWriteCompressedMaps);
  tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
  tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
  tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
