@@ -348,6 +348,7 @@ function RunMultiPlayerMenu(s)
     function(s)
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())
+        preferences.PlayerName = nick:getText()
         SavePreferences()
       end
       RunJoinIpMenu()
@@ -357,6 +358,7 @@ function RunMultiPlayerMenu(s)
     function(s)
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())
+        preferences.PlayerName = nick:getText()
         SavePreferences()
       end
       RunCreateMultiGameMenu()
