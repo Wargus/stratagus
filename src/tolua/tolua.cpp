@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Jun 30 23:08:47 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Jul  8 21:12:25 2006.
 */
 
 #ifndef __cplusplus
@@ -14793,6 +14793,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_constant(tolua_S,"GameVictory",GameVictory);
  tolua_constant(tolua_S,"GameDefeat",GameDefeat);
  tolua_constant(tolua_S,"GameDraw",GameDraw);
+ tolua_constant(tolua_S,"GameQuitToMenu",GameQuitToMenu);
+ tolua_constant(tolua_S,"GameRestart",GameRestart);
  tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
  tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
  tolua_function(tolua_S,"InitNetwork1",tolua_stratagus_InitNetwork100);
