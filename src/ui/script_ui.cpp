@@ -313,19 +313,6 @@ static int CclSetTitleScreens(lua_State *l)
 }
 
 /**
-**  Default menu music.
-**
-**  @param l  Lua state.
-*/
-static int CclSetMenuMusic(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	delete[] MenuMusic;
-	MenuMusic = new_strdup(LuaToString(l, 1));
-	return 0;
-}
-
-/**
 **  Process a menu.
 **
 **  @param l  Lua state.
@@ -1713,7 +1700,6 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
-	lua_register(Lua, "SetMenuMusic", CclSetMenuMusic);
 
 	lua_register(Lua, "ProcessMenu", CclProcessMenu);
 

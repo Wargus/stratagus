@@ -227,7 +227,6 @@ extern int CclUnits(lua_State *l);
 ----------------------------------------------------------------------------*/
 
 TitleScreen **TitleScreens;          /// Title screens to show at startup
-char *MenuMusic;                     /// File for menu music
 char *StratagusLibPath;              /// Path for data directory
 char LocalPlayerName[16];            /// Name of local player
 
