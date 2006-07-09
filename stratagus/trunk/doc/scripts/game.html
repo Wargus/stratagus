@@ -53,7 +53,6 @@
 <a href="#CenterMap">CenterMap</a>
 <a href="#ChangeUnitsOwner">ChangeUnitsOwner</a>
 <a href="#CreateUnit">CreateUnit</a>
-<a href="#Credits">Credits</a>
 <a href="#DefineBurningBuilding">DefineBurningBuilding</a>
 <a href="#DefineCampaign">DefineCampaign</a>
 <a href="#DefineConstruction">DefineConstruction</a>
@@ -292,40 +291,6 @@ placed in the closest available spot.
 <pre>
     -- Creates a footman for player 2 at location 31x34.
     CreateUnit("unit-footman", 2, {31, 34})
-</pre>
-
-<a name="Credits"></a>
-<h3>Credits("type1", "text1", "type2", "text2", ...)</h3>
-
-Parse the credits configuration. Credits takes a list of pairs of text as argument. 
-The first one gives the kind of text follows in the pair, for example name or title.
-<p>
-Note: "name", "comment" and "title" are for now rendered in the same way.
-
-<dl>
-<dt>typeX</dt>
-<dd>Type of text to display. This can be:<br>
-<ul>
-<li>background: textX has the path to the background image of the credits menu.
-<li>title: textX is a title
-<li>name: textX is a name
-<li>comment: textX is a comment
-</ul>
-<dt>textX</dt>
-<dd>Text to display.</dd>
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    Credits(
-        "background", "graphics/screens/sky.png",
-        "title", "CHRISTMAS",
-        "name", " ",
-        "title", "Author",
-        "name", "Santa Claus",
-        "comment", "Happy new year !")
 </pre>
 
 <a name="DefineBurningBuilding"></a>
