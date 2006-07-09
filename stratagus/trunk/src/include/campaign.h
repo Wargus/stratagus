@@ -50,6 +50,8 @@ typedef enum GameResults {
 	GameVictory,   /// Game was won
 	GameDefeat,    /// Game was lost
 	GameDraw,      /// Game was draw
+	GameQuitToMenu,/// Quit to menu
+	GameRestart,   /// Restart game
 };                 /// Game results
 
 /**
