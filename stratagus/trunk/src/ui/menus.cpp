@@ -169,11 +169,6 @@ static void NetConnectingExit(Menu *menu);
 static void NetConnectingCancel(void);
 #endif
 
-// End scenario
-#if 0
-static void EndScenarioRestart(void);
-#endif
-
 // Confirm delete
 #if 0
 static void DeleteConfirmOk(void);
@@ -787,9 +782,6 @@ void InitMenuFuncHash(void)
 	HASHADD(NetConnectingExit,"net-connecting-exit");
 	HASHADD(NetConnectingCancel,"net-connecting-cancel");
 
-// End scenario
-	HASHADD(EndScenarioRestart,"end-scenario-restart");
-
 // Confirm delete
 	HASHADD(DeleteConfirmOk,"delete-confirm-ok");
 
@@ -908,18 +900,6 @@ static void LoadGameOk(void)
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
-}
-#endif
-
-#if 0
-/**
-**  Restart the scenario
-*/
-static void EndScenarioRestart(void)
-{
-	RestartScenario = 1;
-	GameRunning = false;
-	GameMenuReturn();
 }
 #endif
 
