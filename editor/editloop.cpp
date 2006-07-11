@@ -2114,6 +2114,8 @@ void StartEditor(const char *filename)
 	Video.ClearScreen();
 	Invalidate();
 	GuichanActive = true;
+
+	Editor.TerrainEditable = true;
 }
 
 //@}
