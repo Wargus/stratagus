@@ -435,8 +435,6 @@ static void RecalculateShownUnits(void)
 --  Display
 ----------------------------------------------------------------------------*/
 
-#define MBUTTON_GEM_SQUARE  24
-
 /**
 **  Draw tile icons.
 **
@@ -665,7 +663,7 @@ static void DrawUnitIcons(void)
 					icon->G->Width - 2, icon->G->Height - 2);
 			}
 			if (i == Editor.CursorUnitIndex) {
-				Video.DrawRectangleClip(ColorWhite,x - 1, y - 1,
+				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 					icon->G->Width + 2, icon->G->Height + 2);
 			}
 
@@ -1799,15 +1797,17 @@ static void EditorCallbackMouse(int x, int y)
 		UI.StatusLine.Set(_("Unit mode"));
 		return;
 	}
-	if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorX &&
-			CursorX < UI.InfoPanel.X + 4 + TILE_ICON_X + TileSizeX + 7 &&
-			UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorY &&
-			CursorY < UI.InfoPanel.Y + 4 + TILE_ICON_Y + TileSizeY + 7) {
-		ButtonAreaUnderCursor = -1;
-		ButtonUnderCursor = TileButton;
-		CursorOn = CursorOnButton;
-		UI.StatusLine.Set(_("Tile mode"));
-		return;
+	if (Editor.TerrainEditable) {
+		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorX &&
+				CursorX < UI.InfoPanel.X + 4 + TILE_ICON_X + TileSizeX + 7 &&
+				UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorY &&
+				CursorY < UI.InfoPanel.Y + 4 + TILE_ICON_Y + TileSizeY + 7) {
+			ButtonAreaUnderCursor = -1;
+			ButtonUnderCursor = TileButton;
+			CursorOn = CursorOnButton;
+			UI.StatusLine.Set(_("Tile mode"));
+			return;
+		}
 	}
 	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorX &&
 			CursorX < UI.InfoPanel.X + 4 + START_ICON_X + TileSizeX + 7 &&
