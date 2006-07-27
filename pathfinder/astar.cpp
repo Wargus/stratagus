@@ -44,6 +44,12 @@
 #include "unittype.h"
 #include "pathfinder.h"
 
+#if defined(DEBUG_ASTAR)
+#define AstarDebugPrint(x) DebugPrint(x)
+#else
+#define AstarDebugPrint(x)
+#endif
+
 /*----------------------------------------------------------------------------
 -- Declarations
 ----------------------------------------------------------------------------*/
@@ -794,15 +800,15 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 		// If obstructing unit is moving, wait for a bit.
 		if (unit->Data.Move.Fast) {
 			unit->Data.Move.Fast--;
-			DebugPrint("WAIT at %d\n" _C_ unit->Data.Move.Fast);
+			AstarDebugPrint("WAIT at %d\n" _C_ unit->Data.Move.Fast);
 			result = PF_WAIT;
 		} else {
 			unit->Data.Move.Fast = 10;
-			DebugPrint("SET WAIT to 10\n");
+			AstarDebugPrint("SET WAIT to 10\n");
 			result = 0;
 		}
 		if (unit->Data.Move.Fast == 0 && result != 0) {
-			DebugPrint("WAIT expired\n");
+			AstarDebugPrint("WAIT expired\n");
 			result=NewPath(unit);
 			if( result>0 ) {
 				*pxd=Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
