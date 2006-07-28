@@ -10,7 +10,7 @@
 //
 /**@name cursor.cpp - The cursors. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Nehal Mistry,
+//      (c) Copyright 1998-2006 by Lutz Sammer, Nehal Mistry,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
