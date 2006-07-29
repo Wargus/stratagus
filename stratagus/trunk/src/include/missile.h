@@ -393,7 +393,7 @@ public:
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
 	void Init(void);
-	void MissileType::DrawMissileType(int frame, int x, int y) const;
+	void DrawMissileType(int frame, int x, int y) const;
 
 
 	char *Ident;               /// missile name

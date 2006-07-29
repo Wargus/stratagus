@@ -272,7 +272,7 @@ public:
 	virtual void setFont(gcn::Font *font);
 	virtual void addActionListener(gcn::ActionListener *actionListener);
 private:
-	void ListBoxWidget::adjustSize();
+	void adjustSize();
 private:
 	LuaListModel lualistmodel;
 	gcn::ListBox listbox;
