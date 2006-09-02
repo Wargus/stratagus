@@ -44,7 +44,7 @@ The game is still in development. You can get the latest version with <a href="h
 <p>To start the game run :<br>
  <pre>./stratagus -d path/to/data.bos</pre>
 
-<p>See <a href="http://colabti.de/wiki/pmwiki/Bos/FAQ">bos FAQ</a> to get more informations.
+<p>See <a href="http://bos.seul.org/wiki/index.php/Bos/FAQ">bos FAQ</a> to get more informations.
 
 <p>You can browse the source code via <a href="http://svn.seul.org/websvn/listing.php?repname=bos&path=%2F&sc=0">websvn</a>.</p>
 
