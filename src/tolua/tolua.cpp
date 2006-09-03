@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Jul  9 16:25:10 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Sep  3 12:55:24 2006.
 */
 
 #ifndef __cplusplus
@@ -14145,6 +14145,36 @@ static int tolua_set_CEditor_WriteCompressedMaps(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Running of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_get_CEditor_Running
+static int tolua_get_CEditor_Running(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Running'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Running);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Running of class  CEditor */
+#ifndef TOLUA_DISABLE_tolua_set_CEditor_Running
+static int tolua_set_CEditor_Running(lua_State* tolua_S)
+{
+  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Running'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Running = ((EditorRunningType) (int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Editor */
 #ifndef TOLUA_DISABLE_tolua_get_Editor
 static int tolua_get_Editor(lua_State* tolua_S)
@@ -15398,12 +15428,17 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"IsMusicEnabled",tolua_stratagus_IsMusicEnabled00);
  tolua_function(tolua_S,"PlayMusic",tolua_stratagus_PlayMusic00);
  tolua_function(tolua_S,"StopMusic",tolua_stratagus_StopMusic00);
+ tolua_constant(tolua_S,"EditorNotRunning",EditorNotRunning);
+ tolua_constant(tolua_S,"EditorStarted",EditorStarted);
+ tolua_constant(tolua_S,"EditorCommandLine",EditorCommandLine);
+ tolua_constant(tolua_S,"EditorEditing",EditorEditing);
  tolua_cclass(tolua_S,"CEditor","CEditor","",NULL);
  tolua_beginmodule(tolua_S,"CEditor");
   tolua_variable(tolua_S,"UnitTypes",tolua_get_CEditor_UnitTypes,tolua_set_CEditor_UnitTypes);
   tolua_variable(tolua_S,"TerrainEditable",tolua_get_CEditor_TerrainEditable,tolua_set_CEditor_TerrainEditable);
   tolua_variable(tolua_S,"StartUnit",tolua_get_CEditor_StartUnit_ptr,NULL);
   tolua_variable(tolua_S,"WriteCompressedMaps",tolua_get_CEditor_WriteCompressedMaps,tolua_set_CEditor_WriteCompressedMaps);
+  tolua_variable(tolua_S,"Running",tolua_get_CEditor_Running,tolua_set_CEditor_Running);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"Editor",tolua_get_Editor,tolua_set_Editor);
  tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
