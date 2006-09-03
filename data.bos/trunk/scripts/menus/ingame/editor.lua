@@ -51,7 +51,7 @@ function RunEditorIngameMenu(s)
     function() RunEditorPlayerPropertiesMenu() end)
 
   menu:addButton(_("~!Exit to menu"), 16, 40 + (36 * 4),
-    function() end)
+    function() Editor.Running = EditorNotRunning end)
   menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
 
