@@ -291,19 +291,23 @@ namespace gcn
         mMarkerLength = length;
     }
 
-    void Slider::keyPress(const Key& key)
+    bool Slider::keyPress(const Key& key)
     {
+        bool ret = false;
+
         if (getOrientation() == HORIZONTAL)
         {
             if (key.getValue() == Key::RIGHT)
             {
                 setValue(getValue() + getStepLength());
                 generateAction();
+                ret = true;
             }
             else if (key.getValue() == Key::LEFT)
             {
                 setValue(getValue() - getStepLength());
                 generateAction();
+                ret = true;
             }
         }
         else
@@ -312,13 +316,16 @@ namespace gcn
             {
                 setValue(getValue() + getStepLength());
                 generateAction();
+                ret = true;
             }
             else if (key.getValue() == Key::DOWN)
             {
                 setValue(getValue() - getStepLength());
                 generateAction();
+                ret = true;
             }
         }
+        return ret;
     }
 
     void Slider::setOrientation(unsigned int orientation)

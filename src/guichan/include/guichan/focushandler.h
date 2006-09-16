@@ -217,6 +217,11 @@ namespace gcn
          * Drag nothing.
          */
         virtual void dragNone();
+
+		/**
+		 * Check if a hot key was pressed.
+		 */
+		virtual void checkHotKey(const KeyInput &keyInput);
         
     protected:
         typedef std::vector<Widget*> WidgetVector;

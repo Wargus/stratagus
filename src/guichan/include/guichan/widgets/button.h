@@ -137,7 +137,9 @@ namespace gcn
             
         virtual void lostFocus();
         
-
+		virtual void hotKeyPress();
+		virtual void hotKeyRelease();
+    
         // Inherited from MouseListener
         
         virtual void mouseClick(int x, int y, int button, int count);
@@ -149,13 +151,13 @@ namespace gcn
 
         // Inherited from KeyListener
 
-        virtual void keyPress(const Key& key);
+        virtual bool keyPress(const Key& key);
     
-        virtual void keyRelease(const Key& key);
-    
+        virtual bool keyRelease(const Key& key);
+
     protected:
         std::string mCaption;
-        bool mMouseDown, mKeyDown;
+        bool mMouseDown, mKeyDown, mHotKeyDown;
         unsigned int mAlignment;        
     };  
 }
