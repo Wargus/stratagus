@@ -43,16 +43,16 @@ function RunEditorIngameMenu(s)
   local menu = BosGameMenu()
 
   menu:addLabel(_("Game Menu"), 128, 11)
-  menu:addButton(_("Save (~<F11~>)"), 16, 40,
+  menu:addButton(_("Save (~<F11~>)"), "f11", 16, 40,
     function() RunEditorSaveMenu() end)
-  menu:addButton(_("Map Properties (~<F5~>)"), 16, 40 + (36 * 1),
+  menu:addButton(_("Map Properties (~<F5~>)"), "f5", 16, 40 + (36 * 1),
     function() RunEditorMapPropertiesMenu() end)
-  menu:addButton(_("Player Properties (~<F6~>)"), 16, 40 + (36 * 2),
+  menu:addButton(_("Player Properties (~<F6~>)"), "f6", 16, 40 + (36 * 2),
     function() RunEditorPlayerPropertiesMenu() end)
 
-  menu:addButton(_("~!Exit to menu"), 16, 40 + (36 * 4),
+  menu:addButton(_("~!Exit to menu"), "e", 16, 40 + (36 * 4),
     function() Editor.Running = EditorNotRunning end)
-  menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Return to Game (~<Esc~>)"), "esc", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)

@@ -55,8 +55,9 @@ function BosGameMenu()
     return b
   end
 
-  function menu:addButton(caption, x, y, callback)
+  function menu:addButton(caption, hotkey, x, y, callback)
     local b = ButtonWidget(caption)
+    b:setHotKey(hotkey)
     b:setActionCallback(callback)
     b:setSize(224, 28)
     b:setBackgroundColor(dark)
@@ -164,15 +165,15 @@ function RunGameMenu(s)
   -- FIXME: disable for multiplayer
   menu:addSmallButton(_("Load (~<F12~>)"), 16 + 12 + 106, 40,
     function() RunLoadMenu() end)
-  menu:addButton(_("Options (~<F5~>)"), 16, 40 + (36 * 1),
+  menu:addButton(_("Options (~<F5~>)"), "f5", 16, 40 + (36 * 1),
     function() RunGameOptionsMenu() end)
-  menu:addButton(_("Help (~<F1~>)"), 16, 40 + (36 * 2),
+  menu:addButton(_("Help (~<F1~>)"), "f1", 16, 40 + (36 * 2),
     function() RunHelpMenu() end)
-  menu:addButton(_("~!Objectives"), 16, 40 + (36 * 3),
+  menu:addButton(_("~!Objectives"), "o", 16, 40 + (36 * 3),
     function() RunObjectivesMenu() end)
-  menu:addButton(_("~!End Scenario"), 16, 40 + (36 * 4),
+  menu:addButton(_("~!End Scenario"), "e", 16, 40 + (36 * 4),
     function() RunEndScenarioMenu() end)
-  menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Return to Game (~<Esc~>)"), "esc", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -229,15 +230,15 @@ function RunGameOptionsMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("Game Options"), 128, 11)
-  menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
+  menu:addButton(_("Sound (~<F7~>)"), "f7", 16, 40 + (36 * 0),
     function() RunGameSoundOptionsMenu() end)
-  menu:addButton(_("Speeds (~<F8~>)"), 16, 40 + (36 * 1),
+  menu:addButton(_("Speeds (~<F8~>)"), "f8", 16, 40 + (36 * 1),
     function() RunGameSpeedOptionsMenu() end)
-  menu:addButton(_("Preferences (~<F9~>)"), 16, 40 + (36 * 2),
+  menu:addButton(_("Preferences (~<F9~>)"), "f9", 16, 40 + (36 * 2),
     function() RunPreferencesMenu() end)
-  menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 3),
+  menu:addButton(_("~!Diplomacy"), "d", 16, 40 + (36 * 3),
     function() RunDiplomacyMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
+  menu:addButton(_("Previous (~<Esc~>)"), "esc", 128 - (224 / 2), 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -424,15 +425,15 @@ function RunEndScenarioMenu()
 
   menu:addLabel(_("End Scenario"), 128, 11)
   -- FIXME: disable for multiplayer
-  menu:addButton(_("~!Restart Scenario"), 16, 40 + (36 * 0),
+  menu:addButton(_("~!Restart Scenario"), "r", 16, 40 + (36 * 0),
     function() RunRestartConfirmMenu() end)
-  menu:addButton(_("~!Surrender"), 16, 40 + (36 * 1),
+  menu:addButton(_("~!Surrender"), "s", 16, 40 + (36 * 1),
     function() RunSurrenderConfirmMenu() end)
-  menu:addButton(_("~!Quit to Menu"), 16, 40 + (36 * 2),
+  menu:addButton(_("~!Quit to Menu"), "q", 16, 40 + (36 * 2),
     function() RunQuitToMenuConfirmMenu() end)
-  menu:addButton(_("E~!xit Program"), 16, 40 + (36 * 3),
+  menu:addButton(_("E~!xit Program"), "x", 16, 40 + (36 * 3),
     function() RunExitConfirmMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Previous (~<Esc~>)"), "esc", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -444,9 +445,9 @@ function RunRestartConfirmMenu()
   menu:addLabel(_("Are you sure you"), 128, 11)
   menu:addLabel(_("want to restart"), 128, 11 + (24 * 1))
   menu:addLabel(_("the scenario?"), 128, 11 + (24 * 2))
-  menu:addButton(_("~!Restart Scenario"), 16, 11 + (24 * 3) + 29,
+  menu:addButton(_("~!Restart Scenario"), "r", 16, 11 + (24 * 3) + 29,
     function() StopGame(GameRestart); menu:stopAll() end)
-  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -458,9 +459,9 @@ function RunSurrenderConfirmMenu()
   menu:addLabel(_("Are you sure you"), 128, 11)
   menu:addLabel(_("want to surrender"), 128, 11 + (24 * 1))
   menu:addLabel(_("to your enemies?"), 128, 11 + (24 * 2))
-  menu:addButton(_("~!Surrender"), 16, 11 + (24 * 3) + 29,
+  menu:addButton(_("~!Surrender"), "s", 16, 11 + (24 * 3) + 29,
     function() StopGame(GameDefeat); menu:stopAll() end)
-  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -472,9 +473,9 @@ function RunQuitToMenuConfirmMenu()
   menu:addLabel(_("Are you sure you"), 128, 11)
   menu:addLabel(_("want to quit to"), 128, 11 + (24 * 1))
   menu:addLabel(_("the main menu?"), 128, 11 + (24 * 2))
-  menu:addButton(_("~!Quit to Menu"), 16, 11 + (24 * 3) + 29,
+  menu:addButton(_("~!Quit to Menu"), "q", 16, 11 + (24 * 3) + 29,
     function() StopGame(GameQuitToMenu); menu:stopAll() end)
-  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -486,9 +487,9 @@ function RunExitConfirmMenu()
   menu:addLabel(_("Are you sure you"), 128, 11)
   menu:addLabel(_("want to exit"), 128, 11 + (24 * 1))
   menu:addLabel(_("Stratagus?"), 128, 11 + (24 * 2))
-  menu:addButton(_("E~!xit Program"), 16, 11 + (24 * 3) + 29,
+  menu:addButton(_("E~!xit Program"), "x", 16, 11 + (24 * 3) + 29,
     function() Exit(0) end)
-  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -498,11 +499,11 @@ function RunHelpMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("Help Menu"), 128, 11)
-  menu:addButton(_("Keystroke ~!Help"), 16, 40 + (36 * 0),
+  menu:addButton(_("Keystroke ~!Help"), "h", 16, 40 + (36 * 0),
     function() RunKeystrokeHelpMenu() end)
-  menu:addButton(_("Stratagus ~!Tips"), 16, 40 + (36 * 1),
+  menu:addButton(_("Stratagus ~!Tips"), "t", 16, 40 + (36 * 1),
     function() RunTipsMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
+  menu:addButton(_("Previous (~<Esc~>)"), "esc", 128 - (224 / 2), 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -579,7 +580,7 @@ function RunKeystrokeHelpMenu()
   menu:add(s, 16, 60)
 
   menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
-  menu:addButton(_("Previous (~<Esc~>)"), (352 / 2) - (224 / 2), 352 - 40,
+  menu:addButton(_("Previous (~<Esc~>)"), "esc", (352 / 2) - (224 / 2), 352 - 40,
     function() menu:stop() end)
 
   menu:run(false)
@@ -676,7 +677,7 @@ function RunObjectivesMenu()
 
   l:setCaption(current_objective)
 
-  menu:addButton(_("~!OK"), 80, 256 - 40,
+  menu:addButton(_("~!OK"), "o", 80, 256 - 40,
     function() menu:stop() end)
 
   menu:run(false)
@@ -690,10 +691,10 @@ function RunVictoryMenu()
 
   menu:addLabel(_("Congratulations!"), 144, 11)
   menu:addLabel(_("You are victorious!"), 144, 32)
-  menu:addButton(_("~!Victory"), 32, 54,
+  menu:addButton(_("~!Victory"), "v", 32, 54,
     function() menu:stop() end)
   -- FIXME: check if log is disabled
-  menu:addButton(_("Save ~!Replay"), 32, 90,
+  menu:addButton(_("Save ~!Replay"), "r", 32, 90,
     function() RunSaveReplayMenu() end)
 
   menu:run(false)
@@ -707,10 +708,10 @@ function RunDefeatMenu()
 
   menu:addLabel(_("You have failed to"), 144, 11)
   menu:addLabel(_("achieve victory!"), 144, 32)
-  menu:addButton(_("~!OK"), 32, 56,
+  menu:addButton(_("~!OK"), "o", 32, 56,
     function() menu:stop() end)
   -- FIXME: check if log is disabled
-  menu:addButton(_("Save ~!Replay"), 32, 90,
+  menu:addButton(_("Save ~!Replay"), "r", 32, 90,
     function() RunSaveReplayMenu() end)
 
   menu:run(false)

@@ -42,7 +42,7 @@ function RunWidgetsMenu(s)
   b:adjustSize();
   menu:add(b, 20, 10)
 
-  menu:addButton("SubMenu", 30, 50, RunSubMenu)
+  menu:addButton("SubMenu", 0, 30, 50, RunSubMenu)
 
   b = TextField("text input")
   b:setActionCallback(function() print("field") end)

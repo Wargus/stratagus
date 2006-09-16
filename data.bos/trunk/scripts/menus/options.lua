@@ -62,7 +62,7 @@ function RunSpeedOptionsMenu(s)
   b:adjustSize();
   menu:addCentered(b, offx + 230, offy + 36 * 2 + 6)
 
-  menu:addButton(_("~!OK"), offx + 128 - (200 / 2), offy + 245,
+  menu:addButton(_("~!OK"), "o", offx + 128 - (200 / 2), offy + 245,
     function()
       preferences.GameSpeed = GetGameSpeed()
       SavePreferences()
@@ -146,7 +146,7 @@ function RunSoundOptionsMenu(s)
   musiccheckbox:setMarked(IsMusicEnabled())
   musiccheckbox:adjustSize();
 
-  menu:addButton(_("~!OK"), offx + 176 - (200 / 2), offy + 352 - 11 - 27,
+  menu:addButton(_("~!OK"), "o", offx + 176 - (200 / 2), offy + 352 - 11 - 27,
     function()
       preferences.EffectsVolume = GetEffectsVolume()
       preferences.EffectsEnabled = IsEffectsEnabled()
@@ -252,10 +252,10 @@ end
 
 function BuildOptionsMenu(menu)
   local x = Video.Width / 2 - 100
-  menu:addButton(_("Sound"), x, 140, RunSoundOptionsMenu)
-  menu:addButton(_("Video"), x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
-  menu:addButton(_("Speed"), x, 220, RunSpeedOptionsMenu)
-  menu:addButton(_("Language"), x, 260, function() RunLanguageOptionsMenu() menu:stop(1) end)
+  menu:addButton(_("Sound"), 0, x, 140, RunSoundOptionsMenu)
+  menu:addButton(_("Video"), 0, x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
+  menu:addButton(_("Speed"), 0, x, 220, RunSpeedOptionsMenu)
+  menu:addButton(_("Language"), 0, x, 260, function() RunLanguageOptionsMenu() menu:stop(1) end)
 end
 
 function RunOptionsMenu(s)
