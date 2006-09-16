@@ -81,6 +81,7 @@ namespace gcn
         
         mMouseDown = false;
         mKeyDown = false;
+        mHotKeyDown = false;
 
         addMouseListener(this);
         addKeyListener(this);    
@@ -210,7 +211,7 @@ namespace gcn
 
     bool Button::isPressed() const
     {
-        return (hasMouse() && mMouseDown) || mKeyDown;
+        return (hasMouse() && mMouseDown) || mKeyDown || mHotKeyDown;
     }
     
     void Button::mouseClick(int x, int y, int button, int count)
@@ -237,21 +238,45 @@ namespace gcn
         }
     }
   
-    void Button::keyPress(const Key& key)
+    bool Button::keyPress(const Key& key)
     {
+        bool ret = false;
+
         if (key.getValue() == Key::ENTER || key.getValue() == Key::SPACE)
         {
             mKeyDown = true;
+            ret = true;
         }
 
-        mMouseDown = false;    
+        mHotKeyDown = false;
+        mMouseDown = false;
+        return ret;
     }
 
-    void Button::keyRelease(const Key& key)
+    bool Button::keyRelease(const Key& key)
     {
+        bool ret = false;
+
         if ((key.getValue() == Key::ENTER || key.getValue() == Key::SPACE) && mKeyDown)
         {
             mKeyDown = false;
+            generateAction();
+            ret = true;
+        }
+        return ret;
+    }
+
+    void Button::hotKeyPress()
+    {
+        mHotKeyDown = true;
+        mMouseDown = false;
+    }
+
+    void Button::hotKeyRelease()
+    {
+        if (mHotKeyDown)
+        {
+            mHotKeyDown = false;
             generateAction();
         }
     }
@@ -260,5 +285,6 @@ namespace gcn
     {
         mMouseDown = false;
         mKeyDown = false;
+		mHotKeyDown = false;
     }  
 }

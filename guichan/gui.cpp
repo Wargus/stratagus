@@ -210,17 +210,24 @@ namespace gcn
                 }
                 else
                 {
+                    bool keyProcessed = false;
+
                     // Send key inputs to the focused widgets
                     if (mFocusHandler->getFocused())                        
                     {
                         if (mFocusHandler->getFocused()->isFocusable())
                         {
-                            mFocusHandler->getFocused()->_keyInputMessage(ki);
+                            keyProcessed = mFocusHandler->getFocused()->_keyInputMessage(ki);
                         }
                         else
                         {
                             mFocusHandler->focusNone();
                         }
+                    }
+
+                    if (!keyProcessed)
+                    {
+                        mFocusHandler->checkHotKey(ki);
                     }
                 }
                 

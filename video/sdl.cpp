@@ -669,6 +669,20 @@ const char *SdlKey2Str(int key)
 }
 
 /**
+**  Convert a string to SDLKey
+*/
+int Str2SdlKey(const char *str)
+{
+	std::map<int, std::string>::iterator i;
+	for (i = Key2Str.begin(); i != Key2Str.end(); ++i) {
+		if (!strcmp(str, (*i).second.c_str())) {
+			return (*i).first;
+		}
+	}
+	return 0;
+}
+
+/**
 **  Check if the mouse is grabbed
 */
 bool SdlGetGrabMouse(void)

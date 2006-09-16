@@ -3291,64 +3291,8 @@ void ErrorMenu(char *error)
 }
 
 /*----------------------------------------------------------------------------
---  Init functions
+--  Metaserver
 ----------------------------------------------------------------------------*/
-
-#if 0
-/**
-**  Initialize player races for a menu item
-*/
-static void InitPlayerRaces(Menuitem *mi)
-{
-	int i;
-	int n;
-
-	for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
-		if (PlayerRaces.Visible[i]) {
-			++n;
-		}
-	}
-	++n;
-	// Reallocate pulldown options.
-	delete[] mi->D.Pulldown.options;
-	mi->D.Pulldown.options = new char *[n];
-	mi->D.Pulldown.options[0] = new_strdup("Map Default");
-	for (i = 0, n = 1; i < PlayerRaces.Count; ++i) {
-		if (PlayerRaces.Visible[i]) {
-			mi->D.Pulldown.options[n++] = new_strdup(PlayerRaces.Display[i]);
-		}
-	}
-	mi->D.Pulldown.noptions = n;
-	mi->D.Pulldown.defopt = 0;
-}
-
-/**
-**  Initialize tilesets for a menu item
-*/
-static void InitTilesets(Menuitem *mi, int mapdefault)
-{
-#if 0
-	int i;
-	int n;
-
-	// Reallocate pulldown options.
-	if (mi->D.Pulldown.options) {
-		delete[] mi->D.Pulldown.options;
-	}
-	n = NumTilesets + (mapdefault ? 1 : 0);
-	mi->D.Pulldown.options = new char *[n];
-	n = 0;
-	if (mapdefault) {
-		mi->D.Pulldown.options[n++] = new_strdup("Map Default");
-	}
-	for (i = 0; i < NumTilesets; ++i) {
-		mi->D.Pulldown.options[n++] = new_strdup(Tilesets[i]->Name);
-	}
-	mi->D.Pulldown.noptions = n;
-	mi->D.Pulldown.defopt = 0;
-#endif
-}
-#endif
 
 #if 0
 /**

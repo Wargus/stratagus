@@ -236,14 +236,16 @@ namespace gcn
         mCaption = caption;
     }
 
-    void RadioButton::keyPress(const Key& key)
+    bool RadioButton::keyPress(const Key& key)
     {
         if (key.getValue() == Key::ENTER ||
             key.getValue() == Key::SPACE)
         {
             setMarked(true);
             generateAction();
-        }    
+            return true;
+        }
+        return false;
     }
 
     void RadioButton::mouseClick(int x, int y, int button, int count)

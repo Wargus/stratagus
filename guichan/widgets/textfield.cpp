@@ -155,51 +155,62 @@ namespace gcn
         }      
     }
   
-    void TextField::keyPress(const Key& key)
+    bool TextField::keyPress(const Key& key)
     {
+        bool ret = false;
+
         if (key.getValue() == Key::LEFT && mCaretPosition > 0)
         {
             --mCaretPosition;
+            ret = true;
         }
 
         else if (key.getValue() == Key::RIGHT && mCaretPosition < mText.size())
         {
             ++mCaretPosition;
+            ret = true;
         }
 
         else if (key.getValue() == Key::DELETE && mCaretPosition < mText.size())
         {
             mText.erase(mCaretPosition, 1);
+            ret = true;
         }
 
         else if (key.getValue() == Key::BACKSPACE && mCaretPosition > 0)
         {
             mText.erase(mCaretPosition - 1, 1);
             --mCaretPosition;
+            ret = true;
         }
 
         else if (key.getValue() == Key::ENTER)
         {
             generateAction();
+            ret = true;
         }
 
         else if (key.getValue() == Key::HOME)
         {
             mCaretPosition = 0;
+            ret = true;
         }    
 
         else if (key.getValue() == Key::END)
         {
             mCaretPosition = mText.size();
+            ret = true;
         }    
 
         else if (key.isCharacter())
         {
             mText.insert(mCaretPosition, std::string(1,(char)key.getValue()));
             ++mCaretPosition;
+            ret = true;
         }
 
-        fixScroll();    
+        fixScroll();
+        return ret;
     }
 
     void TextField::adjustSize()

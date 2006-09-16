@@ -152,7 +152,7 @@ namespace gcn
 
         // Inherited from KeyListener
         
-        virtual void keyPress(const Key& key);   
+        virtual bool keyPress(const Key& key);   
         
     protected:
         /**
