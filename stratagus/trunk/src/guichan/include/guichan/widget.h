@@ -378,7 +378,17 @@ namespace gcn
          *
          * @param keyInput the KeyInput message.
          */
-        virtual void _keyInputMessage(const KeyInput& keyInput);
+        virtual bool _keyInputMessage(const KeyInput& keyInput);
+
+        /**
+         * Called when a Widget's hot key is pressed
+         */
+        virtual void hotKeyPress() {}
+
+        /**
+         * Called when a Widget's hot key is released
+         */
+        virtual void hotKeyRelease() {}
 
         /**
          * Called when the mouse enters the Widget area.
@@ -553,6 +563,17 @@ namespace gcn
         virtual void fontChanged() { }
 
         /**
+         * Get the hot key
+         */
+        virtual int getHotKey() const { return mHotKey; }
+
+        /**
+         * Set the hot key
+         */
+        virtual void setHotKey(const int key);
+        virtual void setHotKey(const char *key);
+
+        /**
          * Checks whether a Widget exists or not, that is if it still exists
          * an instance of the object.
          *
@@ -667,6 +688,7 @@ namespace gcn
         bool mEnabled;
         
         Font* mCurrentFont;
+        int mHotKey;
         static DefaultFont mDefaultFont;
         static Font* mGlobalFont;
         static std::list<Widget*> mWidgets;

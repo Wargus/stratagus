@@ -297,6 +297,38 @@ namespace gcn
     {
         mDraggedWidget = NULL;
     }
+
+    void FocusHandler::checkHotKey(const KeyInput &keyInput)
+    {
+        int keyin = keyInput.getKey().getValue();
+
+        for (int i = 0; i < (int)mWidgets.size(); ++i)
+        {
+            int hotKey = mWidgets[i]->getHotKey();
+
+            if (hotKey == 0)
+            {
+                continue;
+            }
+
+            if ((isascii(keyin) && tolower(keyin) == hotKey) || keyin == hotKey)
+            {
+                if (keyInput.getType() == KeyInput::PRESS)
+                {
+                    mWidgets[i]->hotKeyPress();
+                    if (mWidgets[i]->isFocusable())
+                    {
+                        this->requestFocus(mWidgets[i]);
+                    }
+                }
+                else
+                {
+                    mWidgets[i]->hotKeyRelease();
+                }
+                break;
+            }
+        }
+    }
     
     void FocusHandler::tabNext()
     {

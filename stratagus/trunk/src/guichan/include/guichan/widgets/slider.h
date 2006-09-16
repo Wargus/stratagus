@@ -214,7 +214,7 @@ namespace gcn
 
         // Inherited from KeyListener
 
-        virtual void keyPress(const Key& key);
+        virtual bool keyPress(const Key& key);
 
         /**
          * Draw orientations for the slider. It can be drawn verticaly or

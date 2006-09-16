@@ -191,8 +191,10 @@ namespace gcn
         }
     }
   
-    void TextBox::keyPress(const Key& key)
-    {    
+    bool TextBox::keyPress(const Key& key)
+    {
+        bool ret = false;
+
         if (key.getValue() == Key::LEFT)
         {
             --mCaretColumn;
@@ -210,6 +212,7 @@ namespace gcn
                     mCaretColumn = mTextRows[mCaretRow].size();
                 }
             }
+            ret = true;
         }
 
         else if (key.getValue() == Key::RIGHT)
@@ -234,26 +237,31 @@ namespace gcn
                     mCaretColumn = 0;
                 }
             }
+            ret = true;
         }
 
         else if (key.getValue() == Key::DOWN)
         {
             setCaretRow(mCaretRow + 1);
+            ret = true;
         }
 
         else if (key.getValue() == Key::UP)
         {
             setCaretRow(mCaretRow - 1);
+            ret = true;
         }
 
         else if (key.getValue() == Key::HOME)
         {
             mCaretColumn = 0;
+            ret = true;
         }    
 
         else if (key.getValue() == Key::END)
         {
             mCaretColumn = mTextRows[mCaretRow].size();
+            ret = true;
         }    
 
         else if (key.getValue() == Key::ENTER && mEditable)
@@ -263,6 +271,7 @@ namespace gcn
             mTextRows[mCaretRow].resize(mCaretColumn);
             ++mCaretRow;
             mCaretColumn = 0;
+            ret = true;
         }
 
         else if (key.getValue() == Key::BACKSPACE
@@ -271,6 +280,7 @@ namespace gcn
         {
             mTextRows[mCaretRow].erase(mCaretColumn - 1, 1);
             --mCaretColumn;
+            ret = true;
         }
 
         else if (key.getValue() == Key::BACKSPACE
@@ -282,6 +292,7 @@ namespace gcn
             mTextRows[mCaretRow - 1] += mTextRows[mCaretRow];
             mTextRows.erase(mTextRows.begin() + mCaretRow);
             --mCaretRow;
+            ret = true;
         }
 
         else if (key.getValue() == Key::DELETE
@@ -289,6 +300,7 @@ namespace gcn
                  && mEditable)
         {
             mTextRows[mCaretRow].erase(mCaretColumn, 1);
+            ret = true;
         }
 
         else if (key.getValue() == Key::DELETE
@@ -298,6 +310,7 @@ namespace gcn
         {
             mTextRows[mCaretRow] += mTextRows[mCaretRow + 1];
             mTextRows.erase(mTextRows.begin() + mCaretRow + 1);
+            ret = true;
         }
 
         else if(key.getValue() == Key::PAGE_UP)
@@ -311,6 +324,7 @@ namespace gcn
             {
                 mCaretRow = 0;
             }
+            ret = true;
         }
 
         else if(key.getValue() == Key::PAGE_DOWN)
@@ -324,6 +338,7 @@ namespace gcn
             {
                 mCaretRow = mTextRows.size() - 1;
             }
+            ret = true;
         }
 
         else if(key.getValue() == Key::TAB
@@ -331,6 +346,7 @@ namespace gcn
         {
             mTextRows[mCaretRow].insert(mCaretColumn,std::string("    "));
             mCaretColumn += 4;      
+            ret = true;
         }
 
         else if (key.isCharacter()
@@ -338,10 +354,12 @@ namespace gcn
         {
             mTextRows[mCaretRow].insert(mCaretColumn,std::string(1,(char)key.getValue()));
             ++mCaretColumn;
+            ret = true;
         }   
    
         adjustSize();
-        scrollToCaret();    
+        scrollToCaret();
+        return ret;
     }
 
     void TextBox::adjustSize()

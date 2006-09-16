@@ -180,7 +180,7 @@ namespace gcn
 
         virtual void drawBorder(Graphics* graphics);
         
-        virtual void _keyInputMessage(const KeyInput& keyInput);
+        virtual bool _keyInputMessage(const KeyInput& keyInput);
         
         virtual void logic();
         
@@ -213,7 +213,7 @@ namespace gcn
 
         // Inherited from KeyListener
         
-        virtual void keyPress(const Key& key);
+        virtual bool keyPress(const Key& key);
 
 
         // Inherited from MouseListener

@@ -63,6 +63,8 @@
 
 #include <iostream>
 
+extern int Str2SdlKey(const char *str);
+
 namespace gcn
 {
     Font* Widget::mGlobalFont = NULL;
@@ -86,6 +88,7 @@ namespace gcn
         mTabOut = true;
         mEnabled = true;
         mClickButton = 0;
+        mHotKey = 0;
         
         mCurrentFont = NULL;
         mWidgets.push_back(this); 
@@ -466,7 +469,7 @@ namespace gcn
         }    
     }
 
-    void Widget::_keyInputMessage(const KeyInput& keyInput)
+    bool Widget::_keyInputMessage(const KeyInput& keyInput)
     {
         if (mFocusHandler == NULL)
         {
@@ -476,27 +479,36 @@ namespace gcn
         if (!mEnabled || (mFocusHandler->getModalFocused() != NULL &&
                           !hasModalFocus()))
         {
-            return;
+            return false;
         }
         
         KeyListenerIterator iter;
+        bool keyProcessed = false;
     
         switch(keyInput.getType())
         {
           case KeyInput::PRESS:
               for (iter = mKeyListeners.begin(); iter != mKeyListeners.end(); ++iter)
               {
-                  (*iter)->keyPress(keyInput.getKey());
-              }        
+                  if ((*iter)->keyPress(keyInput.getKey()))
+                  {
+                      keyProcessed = true;
+                  }
+              }
               break;
         
           case KeyInput::RELEASE:
               for (iter = mKeyListeners.begin(); iter != mKeyListeners.end(); ++iter)
               {
-                  (*iter)->keyRelease(keyInput.getKey());
+                  if ((*iter)->keyRelease(keyInput.getKey()))
+                  {
+                      keyProcessed = true;
+                  }
               }        
               break;
-        }    
+        }
+
+        return keyProcessed;
     }
 
     void Widget::_mouseInMessage()
@@ -587,6 +599,37 @@ namespace gcn
         mCurrentFont = font;
         fontChanged();    
     } 
+
+    void Widget::setHotKey(const int key)
+    {
+        if (isascii(key))
+        {
+            mHotKey = tolower(key);
+        }
+        else
+        {
+            mHotKey = key;
+        }
+    }
+
+    void Widget::setHotKey(const char *key)
+    {
+        if (key)
+        {
+            if (strlen(key) == 1 || isalnum(key[0]))
+            {
+                mHotKey = tolower(key[0]);
+            }
+            else
+            {
+                mHotKey = ::Str2SdlKey(key);
+                if (mHotKey == 0)
+                {
+                    throw GCN_EXCEPTION("Could not parse hot key");
+                }
+            }
+        }
+    }
 
     bool Widget::widgetExists(const Widget* widget)
     {

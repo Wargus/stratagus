@@ -189,11 +189,14 @@ namespace gcn
         }
     }
 
-    void ListBox::keyPress(const Key& key)
-    {    
+    bool ListBox::keyPress(const Key& key)
+    {
+        bool ret = false;
+
         if (key.getValue() == Key::ENTER || key.getValue() == Key::SPACE)
         {
             generateAction();
+            ret = true;
         }
         else if (key.getValue() == Key::UP)
         {      
@@ -203,11 +206,15 @@ namespace gcn
             {
                 setSelected(0);
             }
+            ret = true;
         }
         else if (key.getValue() == Key::DOWN)
         {
             setSelected(mSelected + 1);
+			ret = true;
         }
+
+        return ret;
     }
 
     void ListBox::mousePress(int x, int y, int button)

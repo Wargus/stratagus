@@ -291,7 +291,7 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
 */
 ImageButton::ImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), hotKey(0)
+	disabledImage(NULL)
 {
 	setForegroundColor(0xffffff);
 }
@@ -303,7 +303,7 @@ ImageButton::ImageButton() :
 */
 ImageButton::ImageButton(const std::string &caption) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), hotKey(0)
+	disabledImage(NULL)
 {
 	setForegroundColor(0xffffff);
 }
@@ -378,73 +378,6 @@ void ImageButton::adjustSize()
 		Button::adjustSize();
 	}
 }
-
-/**
-**  Check if a key is a hotkey
-*/
-static bool isHotKey(const gcn::Key &key, int hotKey)
-{
-	if (isascii(key.getValue())) {
-		return tolower(key.getValue()) == hotKey;
-	} else {
-		return key.getValue() == hotKey;
-	}
-}
-
-/**
-**  Key pressed callback
-**
-**  @param key  Key that is pressed
-*/
-void ImageButton::keyPress(const gcn::Key &key)
-{
-	Button::keyPress(key);
-	if (isHotKey(key, hotKey)) {
-		mKeyDown = true;
-	}
-}
-
-/**
-**  Key released callback
-**
-**  @param key  Key that is released
-*/
-void ImageButton::keyRelease(const gcn::Key &key)
-{
-	Button::keyRelease(key);
-	if (mKeyDown && isHotKey(key, hotKey)) {
-		mKeyDown = false;
-		generateAction();
-	}
-}
-
-/**
-**  Set the hot key
-**
-**  @param key  The hot key
-*/
-void ImageButton::setHotKey(const int key)
-{
-	if (isascii(key)) {
-		hotKey = tolower(key);
-	} else {
-		hotKey = key;
-	}
-}
-
-/**
-**  Set the hot key
-**
-**  @param key  The hot key
-*/
-void ImageButton::setHotKey(const char *key)
-{
-	Assert(key);
-	Assert(strlen(key) == 1);
-	Assert(isalnum(key[0]));
-	hotKey = tolower(key[0]);
-}
-
 
 /*----------------------------------------------------------------------------
 --  ImageRadioButton

@@ -246,6 +246,10 @@ class Widget
 	virtual void setBorderSize(int width);
 	virtual void setFont(CFont *font);
 
+	virtual int getHotKey() const;
+	virtual void setHotKey(const int key);
+	virtual void setHotKey(const char *key);
+
 	virtual void addActionListener(LuaActionListener *actionListener);
 };
 
@@ -294,8 +298,6 @@ class ImageButton : public Button
 	void setNormalImage(CGraphic *image);
 	void setPressedImage(CGraphic *image);
 	void setDisabledImage(CGraphic *image);
-	void setHotKey(const int key);
-	void setHotKey(const char *key);
 };
 
 class RadioButton : public Widget

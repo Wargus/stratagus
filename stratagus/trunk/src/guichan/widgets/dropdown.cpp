@@ -355,7 +355,7 @@ namespace gcn
         }        
     }
     
-    void DropDown::keyPress(const Key& key)
+    bool DropDown::keyPress(const Key& key)
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
@@ -366,7 +366,9 @@ namespace gcn
             && !mDroppedDown)
         {
             dropDown();
-        }        
+            return true;
+        }
+		return false;
     }
   
     void DropDown::mousePress(int x, int y, int button)
@@ -527,8 +529,8 @@ namespace gcn
         }        
     }
 
-    void DropDown::_keyInputMessage(const KeyInput& keyInput)
-    {        
+    bool DropDown::_keyInputMessage(const KeyInput& keyInput)
+    {
         if (mDroppedDown)
         {
             if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
@@ -538,12 +540,16 @@ namespace gcn
 
             if (mFocusHandler.getFocused() != NULL)
             {
-                mFocusHandler.getFocused()->_keyInputMessage(keyInput);
+                return mFocusHandler.getFocused()->_keyInputMessage(keyInput);
+            }
+            else
+            {
+                return false;
             }
         }
         else
         {
-            BasicContainer::_keyInputMessage(keyInput);
+            return BasicContainer::_keyInputMessage(keyInput);
         }        
     }
     
