@@ -207,7 +207,7 @@ function RunJoinIpMenu()
   menu = BosMenu(_("Enter Server address"))
   menu:writeText(_("IP or server name :"), x, Video.Height*8/20)
   server = menu:addTextInputField("localhost", x + 90, Video.Height*9/20 + 4)
-  menu:addButton(_("~!Join Game"), x,  Video.Height*10/20, 
+  menu:addButton(_("~!Join Game"), "j", x,  Video.Height*10/20, 
     function(s) 
       NetworkSetupServerAddress(server:getText()) 
       NetworkInitClientConnect() 
@@ -261,7 +261,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   NetworkMapName = map
   NetworkInitServerConnect()
   ServerSetupState.FogOfWar = 1
-  startgame = menu:addButton(_("~!Start Game"), sx * 11,  sy*14, 
+  startgame = menu:addButton(_("~!Start Game"), "s", sx * 11,  sy*14, 
     function(s)    
       SetFogOfWar(fow:isMarked())
       if revealmap:isMarked() == true then
@@ -322,7 +322,7 @@ function RunCreateMultiGameMenu(s)
   end
   browser:setActionCallback(cb)
   
-  menu:addButton(_("~!Create Game"), sx,  sy*11, 
+  menu:addButton(_("~!Create Game"), "c", sx,  sy*11, 
     function(s)    
       RunServerMultiGameMenu(mapfile, description, numplayers)
       menu:stop()
@@ -344,7 +344,7 @@ function RunMultiPlayerMenu(s)
   nick = menu:addTextInputField(GetLocalPlayerName(), x + 90, Video.Height*8/20 + 4)
 
   InitNetwork1()
-  menu:addButton(_("~!Join Game"), x,  Video.Height*11/20, 
+  menu:addButton(_("~!Join Game"), "j", x, Video.Height*11/20, 
     function(s)
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())
@@ -354,7 +354,7 @@ function RunMultiPlayerMenu(s)
       RunJoinIpMenu()
       menu:stop(1)
     end)
-  menu:addButton(_("~!Create Game"), x,  Video.Height*12/20, 
+  menu:addButton(_("~!Create Game"), "c", x, Video.Height*12/20, 
     function(s)
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())

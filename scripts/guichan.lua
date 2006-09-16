@@ -59,9 +59,10 @@ function BosMenu(title, background)
     self:add(widget, x - widget:getWidth() / 2, y)
   end
 
-  function menu:addButton(caption, x, y, callback)
+  function menu:addButton(caption, hotkey, x, y, callback)
     local b
     b = ButtonWidget(caption)
+    b:setHotKey(hotkey)
     b:setActionCallback(callback)
     b:setSize(200, 24)
     b:setBackgroundColor(dark)
@@ -182,7 +183,7 @@ function BosMenu(title, background)
     menu:addCentered(titlelabel, Video.Width / 2, Video.Height/20)
   end
 
-  exitButton = menu:addButton(_("~!Exit"),
+  exitButton = menu:addButton(_("E~!xit"), "x",
     Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
   return menu
@@ -326,7 +327,7 @@ function RunStartGameMenu(s)
     PresentMap = OldPresentMap
     menu:stop()
   end
-  menu:addButton(_("Start"),  sx * 11,  sy*14, startgamebutton)
+  menu:addButton(_("Start"), 0,  sx * 11,  sy*14, startgamebutton)
 
   menu:run()
   PresentMap = OldPresentMap
@@ -346,7 +347,7 @@ function RunReplayMenu(s)
     menu:stop()
   end
 
-  menu:addButton(_("~!Start"), 100, 300, startreplaybutton)
+  menu:addButton(_("~!Start"), "s", 100, 300, startreplaybutton)
 
   menu:run()
 end
@@ -382,7 +383,7 @@ function RunLoadGameMenu(s)
       end
     menu:stop()
   end
-  menu:addButton(_("Start"), 100, 300, startgamebutton)
+  menu:addButton(_("Start"), 0, 100, 300, startgamebutton)
 
   menu:run()
 end
@@ -401,7 +402,7 @@ function RunEditorMenu(s)
     menu:stop()
   end
 
-  menu:addButton(_("Start Editor"), 100, 300, starteditorbutton)
+  menu:addButton(_("Start Editor"), 0, 100, 300, starteditorbutton)
 
   menu:run()
 end
@@ -417,15 +418,15 @@ Load("scripts/menus/campaigns.lua")
 function BuildMainMenu(menu)
   local x = Video.Width / 2 - 100
   local ystep = Video.Height / 20
-  menu:addButton(_("~!Start Game"), x, ystep * 4, RunStartGameMenu)
-  menu:addButton(_("Start ~!Editor"), x, ystep * 5, RunEditorMenu)
-  menu:addButton(_("~!Options"), x, ystep * 6, function() RunOptionsMenu() menu:stop(1) end)
-  menu:addButton(_("~!MultiPlayer"), x, ystep * 7, RunMultiPlayerMenu)
-  menu:addButton(_("~!Campaigns"), x, ystep * 8, RunCampaignsMenu)
-  menu:addButton(_("~!Load Game"), x, ystep * 9, RunLoadGameMenu)
-  menu:addButton(_("Show ~!Replay"), x, ystep * 10, RunReplayMenu)
-  menu:addButton(_("~!Credits"), x, ystep * 11, RunCreditsMenu)
-  menu:addButton("~!Widgets Demo", x, ystep * 12, RunWidgetsMenu)
+  menu:addButton(_("~!Start Game"), "s", x, ystep * 4, RunStartGameMenu)
+  menu:addButton(_("Start ~!Editor"), "e", x, ystep * 5, RunEditorMenu)
+  menu:addButton(_("~!Options"), "o", x, ystep * 6, function() RunOptionsMenu() menu:stop(1) end)
+  menu:addButton(_("~!MultiPlayer"), "m", x, ystep * 7, RunMultiPlayerMenu)
+  menu:addButton(_("~!Campaigns"), "c", x, ystep * 8, RunCampaignsMenu)
+  menu:addButton(_("~!Load Game"), "l", x, ystep * 9, RunLoadGameMenu)
+  menu:addButton(_("Show ~!Replay"), "r", x, ystep * 10, RunReplayMenu)
+  menu:addButton(_("Cre~!dits"), "d", x, ystep * 11, RunCreditsMenu)
+  menu:addButton("~!Widgets Demo", "w", x, ystep * 12, RunWidgetsMenu)
 end
 
 function RunMainMenu(s)

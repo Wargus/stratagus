@@ -104,7 +104,7 @@ function RunCampaignsMenu(s)
     RunCampaign("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()
   end
-  menu:addButton(_("Start"), 100, 300, startgamebutton)
+  menu:addButton(_("Start"), 0, 100, 300, startgamebutton)
 
   menu:run()
 end
