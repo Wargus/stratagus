@@ -6,8 +6,6 @@ function HandleIngameCommandKey(key, ctrl, alt, shift)
     RunGameOptionsMenu()
   elseif (key == "f7") then
     RunGameSoundOptionsMenu()
-  elseif (key == "f8") then
-    RunGameSpeedOptionsMenu()
   elseif (key == "f9") then
     RunPreferencesMenu()
   elseif ((key == "m" and alt) or key == "f10") then
