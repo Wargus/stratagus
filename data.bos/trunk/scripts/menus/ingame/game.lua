@@ -45,8 +45,9 @@ function BosGameMenu()
     return label
   end
 
-  function menu:addSmallButton(caption, x, y, callback)
+  function menu:addSmallButton(caption, hotkey, x, y, callback)
     local b = ButtonWidget(caption)
+    b:setHotKey(hotkey)
     b:setActionCallback(callback)
     b:setSize(106, 28)
     b:setBackgroundColor(dark)
@@ -160,10 +161,10 @@ function RunGameMenu(s)
 
   menu:addLabel(_("Game Menu"), 128, 11)
   -- FIXME: disable for multiplayer or replay
-  menu:addSmallButton(_("Save (~<F11~>)"), 16, 40,
+  menu:addSmallButton(_("Save (~<F11~>)"), "f11", 16, 40,
     function() RunSaveMenu() end)
   -- FIXME: disable for multiplayer
-  menu:addSmallButton(_("Load (~<F12~>)"), 16 + 12 + 106, 40,
+  menu:addSmallButton(_("Load (~<F12~>)"), "f12", 16 + 12 + 106, 40,
     function() RunLoadMenu() end)
   menu:addButton(_("Options (~<F5~>)"), "f5", 16, 40 + (36 * 1),
     function() RunGameOptionsMenu() end)
@@ -192,7 +193,7 @@ function RunSaveMenu()
   end
   browser:setActionCallback(cb)
 
-  menu:addSmallButton(_("Save"), 16, 248,
+  menu:addSmallButton(_("Save"), 0, 16, 248,
     -- FIXME: use a confirm menu if the file exists already
     function()
       SaveGame(t:getText())
@@ -200,7 +201,7 @@ function RunSaveMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
+  menu:addSmallButton(_("Cancel"), 0, 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -217,10 +218,10 @@ function RunLoadMenu()
   end
   browser:setActionCallback(cb)
 
-  menu:addSmallButton(_("Load"), 16, 248,
+  menu:addSmallButton(_("Load"), 0, 16, 248,
     function() StartSavedGame("~save/"..browser:getSelectedItem()) end)
 
-  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
+  menu:addSmallButton(_("Cancel"), 0, 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -273,7 +274,7 @@ function RunGameSpeedOptionsMenu()
   l:adjustSize()
   menu:add(l, 230, (36 * 2) + 6)
 
-  menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 248,
+  menu:addSmallButton(_("~!OK"), "o", 128 - (106 / 2), 248,
     function()
       preferences.GameSpeed = GetGameSpeed()
       SavePreferences()
@@ -296,7 +297,7 @@ function RunPreferencesMenu()
   ckey = menu:addCheckBox(_("Show command key"), 16, 36 * 2,
     function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
   ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
-  menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
+  menu:addSmallButton(_("~!OK"), "o", 128 - (106 / 2), 245,
     function()
       preferences.FogOfWar = GetFogOfWar()
       preferences.ShowCommandKey = UI.ButtonPanel.ShowCommandKey
@@ -365,7 +366,7 @@ function RunDiplomacyMenu()
     end
   end
 
-  menu:addSmallButton(_("~!OK"), 75, 384 - 40,
+  menu:addSmallButton(_("~!OK"), "o", 75, 384 - 40,
     function()
       for j=1,table.getn(allied) do
         local i = allied[j].index
@@ -415,7 +416,7 @@ function RunDiplomacyMenu()
       end
       menu:stop()
     end)
-  menu:addSmallButton(_("~!Cancel"), 195, 384 - 40, function() menu:stop() end)
+  menu:addSmallButton(_("~!Cancel"), "c", 195, 384 - 40, function() menu:stop() end)
 
   menu:run(false)
 end
@@ -651,11 +652,11 @@ function RunTipsMenu()
       SavePreferences()
     end)
   showtips:setMarked(preferences.ShowTips)
-  menu:addSmallButton(_("~!OK"), 14, 256 - 40,
+  menu:addSmallButton(_("~!OK"), "o", 14, 256 - 40,
     function() l:nextTip(); menu:stop() end)
-  menu:addSmallButton(_("~!Previous Tip"), 14 + 106 + 11, 256 - 40,
+  menu:addSmallButton(_("~!Previous Tip"), "p", 14 + 106 + 11, 256 - 40,
     function() l:prevTip(); l:updateCaption() end)
-  menu:addSmallButton(_("~!Next Tip"), 14 + 106 + 11 + 106 + 11, 256 - 40,
+  menu:addSmallButton(_("~!Next Tip"), "n", 14 + 106 + 11 + 106 + 11, 256 - 40,
     function() l:nextTip(); l:updateCaption() end)
 
   menu:run(false)
@@ -725,9 +726,9 @@ function RunSaveReplayMenu()
 
   menu:addLabel(_("Save Replay"), 144, 11)
   menu:addTextInputField("", 14, 40, 260)
-  menu:addSmallButton(_("~!OK"), 14, 80,
+  menu:addSmallButton(_("~!OK"), "o", 14, 80,
     function() menu:stop() end)
-  menu:addSmallButton(_("Cancel (~<Esc~>)"), 162, 80,
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), "esc", 162, 80,
     function() menu:stop() end)
 
   menu:run(false)
