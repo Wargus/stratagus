@@ -184,6 +184,7 @@ int PlayMovie(const char *name)
 	SDL_Rect rect;
 	SDL_Overlay *yuv_overlay;
 	CSample *sample;
+	const EventCallback *old_callbacks;
 	EventCallback callbacks;
 	unsigned int start_ticks;
 	int need_data;
@@ -251,6 +252,9 @@ int PlayMovie(const char *name)
 	callbacks.KeyRepeated = MovieCallbackKeyRepeated;
 	callbacks.NetworkEvent = NetworkEvent;
 
+	old_callbacks = GetCallbacks();
+	SetCallbacks(&callbacks);
+
 	Invalidate();
 	RealizeVideoMemory();
 
@@ -278,7 +282,7 @@ int PlayMovie(const char *name)
 			need_data = 1;
 		}
 		
-		WaitEventsOneFrame(&callbacks);
+		WaitEventsOneFrame();
 	}
 
 	StopMusic();
@@ -286,6 +290,8 @@ int PlayMovie(const char *name)
 
 	OggFree(&data);
 	f.close();
+
+	SetCallbacks(old_callbacks);
 
 	return 0;
 }
