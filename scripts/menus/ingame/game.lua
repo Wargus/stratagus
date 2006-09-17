@@ -36,120 +36,16 @@ function BosGameMenu()
   menu:setOpaque(true)
   menu:setBaseColor(dark)
 
-  function menu:addLabel(text, x, y, font)
-    local label = Label(text)
-    if (font == nil) then font = Fonts["large"] end
-    label:setFont(font)
-    label:adjustSize()
-    self:add(label, x - label:getWidth() / 2, y)
-    return label
-  end
+  AddMenuHelpers(menu)
 
+  -- FIXME: not a good solution
+  -- default size is 200,24 but we want 224,28 so we override these functions
+  menu.addButtonOrig = menu.addButton
+  function menu:addButton(caption, hotkey, x, y, callback, size)
+    return self:addButtonOrig(caption, hotkey, x, y, callback, {224, 28})
+  end
   function menu:addSmallButton(caption, hotkey, x, y, callback)
-    local b = ButtonWidget(caption)
-    b:setHotKey(hotkey)
-    b:setActionCallback(callback)
-    b:setSize(106, 28)
-    b:setBackgroundColor(dark)
-    b:setBaseColor(dark)
-    menu:add(b, x, y)
-    return b
-  end
-
-  function menu:addButton(caption, hotkey, x, y, callback)
-    local b = ButtonWidget(caption)
-    b:setHotKey(hotkey)
-    b:setActionCallback(callback)
-    b:setSize(224, 28)
-    b:setBackgroundColor(dark)
-    b:setBaseColor(dark)
-    menu:add(b, x, y)
-  end
-
-  function menu:addCheckBox(caption, x, y, callback)
-    local b = CheckBox(caption)
-    b:setBaseColor(clear)
-    b:setForegroundColor(clear)
-    b:setBackgroundColor(dark)
-    b:setActionCallback(function(s) callback(b, s) end)
-    b:setFont(Fonts["game"])
-    self:add(b, x, y)
-    return b
-  end
-
-  function menu:addSlider(min, max, w, h, x, y, callback)
-    local b = Slider(min, max)
-    b:setBaseColor(dark)
-    b:setForegroundColor(clear)
-    b:setBackgroundColor(clear)
-    b:setSize(w, h)
-    b:setActionCallback(function(s) callback(b, s) end)
-    self:add(b, x, y)
-    return b
-  end
-
-  function menu:addListBox(x, y, w, h, list)
-    local bq = ListBoxWidget(w, h)
-    bq:setList(list)
-    bq:setBaseColor(black)
-    bq:setForegroundColor(clear)
-    bq:setBackgroundColor(dark)
-    bq:setFont(Fonts["game"])
-    self:add(bq, x, y)   
-    bq.itemslist = list
-    return bq
-  end
-
-  function menu:addBrowser(path, filter, x, y, w, h, lister)
-    local mapslist = {}
-    local u = 1
-    local fileslist
-    local i
-    local f
-    if lister == nil then
-      lister = ListFilesInDirectory
-    end
-    fileslist = lister(path)
-    for i,f in fileslist do
-      if(string.find(f, filter)) then
-        mapslist[u] = f
-        u = u + 1
-      end
-    end
-
-    local bq = self:addListBox(x, y, w, h, mapslist)
-    bq.getSelectedItem = function(self)
-      if self:getSelected() < 0 then
-         return self.itemslist[1]
-      end
-      return self.itemslist[self:getSelected() + 1]
-    end
-
-    return bq
-  end
-
-  function menu:addTextInputField(text, x, y, w)
-    local b = TextField(text)
-    b:setActionCallback(function() print("field") end)
-    b:setFont(Fonts["game"])
-    b:setBaseColor(clear)
-    b:setForegroundColor(clear)
-    b:setBackgroundColor(dark)
-    b:setSize(w, 18)
-    self:add(b, x, y)
-    return b
-  end
-
-  function menu:addDropDown(list, x, y, callback)
-    local dd = DropDownWidget()
-    dd:setFont(Fonts["game"])
-    dd:setList(list)
-    dd:setActionCallback(function(s) callback(dd, s) end)
-    dd:setBaseColor(dark)
-    dd:setForegroundColor(clear)
-    dd:setBackgroundColor(dark)
-    self:add(dd, x, y)
-    return dd
+    return self:addButtonOrig(caption, hotkey, x, y, callback, {106, 28})
   end
 
   return menu

@@ -37,43 +37,61 @@ bckground:Load()
 bckground:Resize(Video.Width, Video.Height)
 backgroundWidget = ImageWidget(bckground)
 
-function BosMenu(title, background)
-  local menu
-  local exitButton
-  local bg
-  local bgg
-
-  menu = MenuScreen()
-
-  if background == nil then
-    bg = backgroundWidget
-  else
-    bgg = CGraphic:New(background)
-    bgg:Load()
-    bgg:Resize(Video.Width, Video.Height)
-    bg = ImageWidget(bgg)
-  end
-  menu:add(bg, 0, 0)
-
+function AddMenuHelpers(menu)
   function menu:addCentered(widget, x, y)
     self:add(widget, x - widget:getWidth() / 2, y)
   end
 
-  function menu:addButton(caption, hotkey, x, y, callback)
-    local b
-    b = ButtonWidget(caption)
+  function menu:addLabel(text, x, y, font, center)
+    local label = Label(text)
+    if (font == nil) then font = Fonts["large"] end
+    label:setFont(font)
+    label:adjustSize()
+    if (center == nil or center == true) then -- center text by default
+      x = x - label:getWidth() / 2
+    end
+    self:add(label, x, y)
+
+    return label
+  end
+
+  function menu:writeText(text, x, y)
+    return self:addLabel(text, x, y, Fonts["game"], false)
+  end
+
+  function menu:writeLargeText(text, x, y)
+    return self:addLabel(text, x, y, Fonts["large"], false)
+  end
+
+  function menu:addButton(caption, hotkey, x, y, callback, size)
+    local b = ButtonWidget(caption)
     b:setHotKey(hotkey)
     b:setActionCallback(callback)
-    b:setSize(200, 24)
+    if (size == nil) then size = {200, 24} end
+    b:setSize(size[1], size[2])
     b:setBackgroundColor(dark)
     b:setBaseColor(dark)
     self:add(b, x, y)
     return b
   end
 
+  function menu:addSmallButton(caption, hotkey, x, y, callback)
+    return self:addButton(caption, hotkey, x, y, callback, {106, 28})
+  end
+
+  function menu:addSlider(min, max, w, h, x, y, callback)
+    local b = Slider(min, max)
+    b:setBaseColor(dark)
+    b:setForegroundColor(clear)
+    b:setBackgroundColor(clear)
+    b:setSize(w, h)
+    b:setActionCallback(function(s) callback(b, s) end)
+    self:add(b, x, y)
+    return b
+  end
+
   function menu:addListBox(x, y, w, h, list)
-    local bq
-    bq = ListBoxWidget(w, h)
+    local bq = ListBoxWidget(w, h)
     bq:setList(list)
     bq:setBaseColor(black)
     bq:setForegroundColor(clear)
@@ -95,16 +113,15 @@ function BosMenu(title, background)
     end
     fileslist = lister(path)
     for i,f in fileslist do
-      if(string.find(f, filter)) then
+      if (string.find(f, filter)) then
         mapslist[u] = f
         u = u + 1
       end
     end
 
-    local bq
-    bq = self:addListBox(x, y, w, h, mapslist)
+    local bq = self:addListBox(x, y, w, h, mapslist)
     bq.getSelectedItem = function(self)
-      if self:getSelected() < 0 then
+      if (self:getSelected() < 0) then
         return self.itemslist[1]
       end
       return self.itemslist[self:getSelected() + 1]
@@ -114,8 +131,7 @@ function BosMenu(title, background)
   end
 
   function menu:addCheckBox(caption, x, y, callback)
-    local b
-    b = CheckBox(caption)
+    local b = CheckBox(caption)
     b:setBaseColor(clear)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
@@ -126,8 +142,7 @@ function BosMenu(title, background)
   end
 
   function menu:addRadioButton(caption, group, x, y, callback)
-    local b
-    b = RadioButton(caption, group)
+    local b = RadioButton(caption, group)
     b:setBaseColor(dark)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
@@ -148,39 +163,42 @@ function BosMenu(title, background)
     return dd
   end
 
-  function menu:writeText(text, x, y)
-    local label = Label(text)
-    label:setFont(Fonts["game"])
-    label:setSize(200, 30)
-    self:add(label, x, y)
-    return label
-  end
-
-  function menu:writeLargeText(text, x, y)
-    local label = Label(text)
-    label:setFont(Fonts["large"])
-    label:setSize(200, 30)
-    self:add(label, x, y)
-    return label
-  end
-
-  function menu:addTextInputField(text, x, y)
+  function menu:addTextInputField(text, x, y, w)
     local b = TextField(text)
-    b:setActionCallback(function() print("field") end)
+    b:setActionCallback(function() print("field") end) --FIXME: remove this?
     b:setFont(Fonts["game"])
     b:setBaseColor(clear)
     b:setForegroundColor(clear)
     b:setBackgroundColor(dark)
-    b:setSize(100, 18)
+    if (w == nil) then w = 100 end
+    b:setSize(w, 18)
     self:add(b, x, y)
     return b
   end
+end
+
+function BosMenu(title, background)
+  local menu
+  local exitButton
+  local bg
+  local bgg
+
+  menu = MenuScreen()
+
+  if background == nil then
+    bg = backgroundWidget
+  else
+    bgg = CGraphic:New(background)
+    bgg:Load()
+    bgg:Resize(Video.Width, Video.Height)
+    bg = ImageWidget(bgg)
+  end
+  menu:add(bg, 0, 0)
+
+  AddMenuHelpers(menu)
 
   if title then
-    local titlelabel = Label(title)
-    titlelabel:setFont(Fonts["large"])
-    titlelabel:adjustSize()
-    menu:addCentered(titlelabel, Video.Width / 2, Video.Height/20)
+    menu:addLabel(title, Video.Width / 2, Video.Height / 20, Fonts["large"])
   end
 
   exitButton = menu:addButton(_("E~!xit"), "x",
