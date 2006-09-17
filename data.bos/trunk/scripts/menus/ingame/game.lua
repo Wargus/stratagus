@@ -161,11 +161,8 @@ function RunGameMenu(s)
 
   menu:addLabel(_("Game Menu"), 128, 11)
   -- FIXME: disable for multiplayer or replay
-  menu:addSmallButton(_("Save (~<F11~>)"), "f11", 16, 40,
+  menu:addButton(_("Save (~<F11~>)"), "f11", 16, 40,
     function() RunSaveMenu() end)
-  -- FIXME: disable for multiplayer
-  menu:addSmallButton(_("Load (~<F12~>)"), "f12", 16 + 12 + 106, 40,
-    function() RunLoadMenu() end)
   menu:addButton(_("Options (~<F5~>)"), "f5", 16, 40 + (36 * 1),
     function() RunGameOptionsMenu() end)
   menu:addButton(_("Help (~<F1~>)"), "f1", 16, 40 + (36 * 2),
@@ -207,6 +204,7 @@ function RunSaveMenu()
   menu:run(false)
 end
 
+-- NOTE: currently unused ! --
 function RunLoadMenu()
   local menu = BosGameMenu()
 
