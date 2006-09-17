@@ -656,6 +656,8 @@ static void ExpandPath(char *newpath, const char *path)
 
 void StartMap(const char *filename, bool clean = true) 
 {
+	const char *nc, *rc;
+
 	GuichanActive = false;
 	NetConnectRunning = 0;
 	InterfaceState = IfaceStateNormal;
@@ -665,6 +667,8 @@ void StartMap(const char *filename, bool clean = true)
 	if (clean) {
 		CleanPlayers();
 	}
+	GetDefaultTextColors(&nc, &rc);
+
 	CreateGame(filename, &Map);
 
 	UI.StatusLine.Set(NameLine);
@@ -680,6 +684,7 @@ void StartMap(const char *filename, bool clean = true)
 
 	CleanGame();
 	InterfaceState = IfaceStateMenu;
+	SetDefaultTextColors(nc, rc);
 }
 
 void StartSavedGame(const char *filename) 
