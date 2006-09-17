@@ -82,7 +82,6 @@ int KeyScrollState = ScrollNone;
 	/// variable set when we are scrolling via mouse
 int MouseScrollState = ScrollNone;
 
-EventCallback *Callbacks;      /// Current callbacks
 EventCallback GameCallbacks;   /// Game callbacks
 EventCallback EditorCallbacks; /// Editor callbacks
 
@@ -264,10 +263,12 @@ void GameMainLoop(void)
 #endif
 	int player;
 	int RealVideoSyncSpeed;
+	const EventCallback *old_callbacks;
 
 	InitGameCallbacks();
 
-	Callbacks = &GameCallbacks;
+	old_callbacks = GetCallbacks();
+	SetCallbacks(&GameCallbacks);
 
 	SetVideoSync();
 	GameCursor = UI.Point.Cursor;
@@ -370,7 +371,7 @@ void GameMainLoop(void)
 			VideoSyncSpeed = RealVideoSyncSpeed;
 		}
 		if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
-			WaitEventsOneFrame(Callbacks);
+			WaitEventsOneFrame();
 		}
 		if (!NetworkInSync) {
 			NetworkRecover(); // recover network
@@ -390,6 +391,8 @@ void GameMainLoop(void)
 	ReplayRevealMap = 0;
 	GamePaused = false;
 	GodMode = false;
+
+	SetCallbacks(old_callbacks);
 }
 
 //@}

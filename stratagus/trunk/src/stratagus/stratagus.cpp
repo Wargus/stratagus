@@ -317,6 +317,7 @@ static void WaitCallbackExit(void)
 */
 static void ShowTitleImage(TitleScreen *t)
 {
+	const EventCallback *old_callbacks;
 	EventCallback callbacks;
 	CGraphic *g;
 
@@ -330,6 +331,9 @@ static void ShowTitleImage(TitleScreen *t)
 	callbacks.KeyReleased = WaitCallbackKeyReleased;
 	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
 	callbacks.NetworkEvent = NetworkEvent;
+
+	old_callbacks = GetCallbacks();
+	SetCallbacks(&callbacks);
 
 	g = CGraphic::New(t->File);
 	g->Load();
@@ -359,9 +363,10 @@ static void ShowTitleImage(TitleScreen *t)
 
 		Invalidate();
 		RealizeVideoMemory();
-		WaitEventsOneFrame(&callbacks);
+		WaitEventsOneFrame();
 	}
 
+	SetCallbacks(old_callbacks);
 	CGraphic::Free(g);
 }
 

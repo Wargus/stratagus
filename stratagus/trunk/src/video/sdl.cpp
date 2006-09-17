@@ -99,6 +99,8 @@ static int FrameTicks; /// Frame length in ms
 static int FrameRemainder; /// Frame remainder 0.1 ms
 static int FrameFraction; /// Frame fractional term
 
+const EventCallback *Callbacks;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -488,7 +490,25 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 			break;
 	}
 
-	handleInput(event);
+	if (callbacks == GetCallbacks()) {
+		handleInput(event);
+	}
+}
+
+/**
+**  Set the current callbacks
+*/
+void SetCallbacks(const EventCallback *callbacks)
+{
+	Callbacks = callbacks;
+}
+
+/**
+**  Get the current callbacks
+*/
+const EventCallback *GetCallbacks()
+{
+	return Callbacks;
 }
 
 /**
@@ -505,7 +525,7 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 **
 **  FIXME: the initialition could be moved out of the loop
 */
-void WaitEventsOneFrame(const EventCallback *callbacks)
+void WaitEventsOneFrame()
 {
 	struct timeval tv;
 	fd_set rfds;
@@ -531,8 +551,8 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 		++SlowFrameCounter;
 	}
 
-	InputMouseTimeout(callbacks, ticks);
-	InputKeyTimeout(callbacks, ticks);
+	InputMouseTimeout(GetCallbacks(), ticks);
+	InputKeyTimeout(GetCallbacks(), ticks);
 	CursorAnimate(ticks);
 
 	interrupts = 0;
@@ -590,7 +610,7 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 #endif
 
 		if (i) { // Handle SDL event
-			SdlDoEvent(callbacks, event);
+			SdlDoEvent(GetCallbacks(), event);
 		}
 
 		if (s > 0) {
@@ -598,7 +618,7 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 			// Network
 			//
 			if (IsNetworkGame() && FD_ISSET(NetworkFildes, &rfds) ) {
-				callbacks->NetworkEvent();
+				GetCallbacks()->NetworkEvent();
 			}
 		}
 

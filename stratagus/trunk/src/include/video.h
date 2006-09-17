@@ -413,8 +413,13 @@ extern void RealizeVideoMemory(void);
 	/// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char *name);
 
+	/// Set the current callbacks
+extern void SetCallbacks(const EventCallback *callbacks);
+	/// Get the current callbacks
+extern const EventCallback *GetCallbacks();
+
 	/// Process all system events. Returns if the time for a frame is over
-extern void WaitEventsOneFrame(const EventCallback *callbacks);
+extern void WaitEventsOneFrame();
 
 	/// Toggle full screen mode
 extern void ToggleFullScreen(void);
@@ -436,7 +441,6 @@ extern bool SdlGetGrabMouse(void);
 	/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 
-extern EventCallback *Callbacks;      /// Current callbacks
 extern EventCallback GameCallbacks;   /// Game callbacks
 extern EventCallback EditorCallbacks; /// Editor callbacks
 
