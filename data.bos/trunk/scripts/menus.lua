@@ -477,7 +477,7 @@ DefineMenuItem("pos", { 16, 40 + (36 * 3)}, "font", "large",
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
   "button", {
     "caption", "Previous (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "end-menu",
     "style", "gm-full"},
   "menu", "menu-end-scenario")
@@ -580,7 +580,7 @@ DefineMenuItem("pos", { 16, 11 + (24 * 3) + 29}, "font", "large",
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
   "button", {
     "caption", "Cancel (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "end-menu",
     "style", "gm-full"},
   "menu", "menu-restart-confirm")
@@ -610,7 +610,7 @@ DefineMenuItem("pos", { 16, 11 + (24 * 3) + 29}, "font", "large",
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
   "button", {
     "caption", "Cancel (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "end-menu",
     "style", "gm-full"},
   "menu", "menu-surrender-confirm")
@@ -640,7 +640,7 @@ DefineMenuItem("pos", { 16, 11 + (24 * 3) + 29}, "font", "large",
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
   "button", {
     "caption", "Cancel (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "end-menu",
     "style", "gm-full"},
   "menu", "menu-quit-to-menu-confirm")
@@ -670,7 +670,7 @@ DefineMenuItem("pos", { 16, 11 + (24 * 3) + 29}, "font", "large",
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
   "button", {
     "caption", "Cancel (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "end-menu",
     "style", "gm-full"},
   "menu", "menu-exit-confirm")

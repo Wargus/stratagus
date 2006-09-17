@@ -693,7 +693,7 @@ DefineMenuItem("pos", { 144, 53}, "font", "large",
 DefineMenuItem("pos", { 32, 90}, "font", "large",
   "button", {
     "caption", "Cancel (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "net-connecting-cancel",
     "style", "gm-full"},
   "menu", "menu-net-connecting")
