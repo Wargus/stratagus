@@ -55,7 +55,7 @@ DefineMenuItem("pos", { 208, 320 + (36 * 1)}, "font", "large",
 DefineMenuItem("pos", { 208, 320 + (36 * 2)}, "font", "large",
   "button", {
     "caption", "Cancel (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "editor-select-cancel",
     "style", "gm-full"},
   "menu", "menu-editor-select")
@@ -251,7 +251,7 @@ DefineMenuItem("pos", { 16, 288 - 40 - 36}, "font", "large",
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
   "button", {
     "caption", "Return to Editor (~<Esc~>)",
-    "hotkey", "esc",
+    "hotkey", "escape",
     "func", "game-menu-return",
     "style", "gm-full"},
   "menu", "menu-editor")

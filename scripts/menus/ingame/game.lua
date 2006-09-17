@@ -174,7 +174,7 @@ function RunGameMenu(s)
     function() RunObjectivesMenu() end)
   menu:addButton(_("~!End Scenario"), "e", 16, 40 + (36 * 4),
     function() RunEndScenarioMenu() end)
-  menu:addButton(_("Return to Game (~<Esc~>)"), "esc", 16, 248,
+  menu:addButton(_("Return to Game (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -239,7 +239,7 @@ function RunGameOptionsMenu()
     function() RunPreferencesMenu() end)
   menu:addButton(_("~!Diplomacy"), "d", 16, 40 + (36 * 3),
     function() RunDiplomacyMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), "esc", 128 - (224 / 2), 248,
+  menu:addButton(_("Previous (~<Esc~>)"), "escape", 128 - (224 / 2), 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -434,7 +434,7 @@ function RunEndScenarioMenu()
     function() RunQuitToMenuConfirmMenu() end)
   menu:addButton(_("E~!xit Program"), "x", 16, 40 + (36 * 3),
     function() RunExitConfirmMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), "esc", 16, 248,
+  menu:addButton(_("Previous (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -448,7 +448,7 @@ function RunRestartConfirmMenu()
   menu:addLabel(_("the scenario?"), 128, 11 + (24 * 2))
   menu:addButton(_("~!Restart Scenario"), "r", 16, 11 + (24 * 3) + 29,
     function() StopGame(GameRestart); menu:stopAll() end)
-  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -462,7 +462,7 @@ function RunSurrenderConfirmMenu()
   menu:addLabel(_("to your enemies?"), 128, 11 + (24 * 2))
   menu:addButton(_("~!Surrender"), "s", 16, 11 + (24 * 3) + 29,
     function() StopGame(GameDefeat); menu:stopAll() end)
-  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -476,7 +476,7 @@ function RunQuitToMenuConfirmMenu()
   menu:addLabel(_("the main menu?"), 128, 11 + (24 * 2))
   menu:addButton(_("~!Quit to Menu"), "q", 16, 11 + (24 * 3) + 29,
     function() StopGame(GameQuitToMenu); menu:stopAll() end)
-  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -490,7 +490,7 @@ function RunExitConfirmMenu()
   menu:addLabel(_("Stratagus?"), 128, 11 + (24 * 2))
   menu:addButton(_("E~!xit Program"), "x", 16, 11 + (24 * 3) + 29,
     function() Exit(0) end)
-  menu:addButton(_("Cancel (~<Esc~>)"), "esc", 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -504,7 +504,7 @@ function RunHelpMenu()
     function() RunKeystrokeHelpMenu() end)
   menu:addButton(_("Stratagus ~!Tips"), "t", 16, 40 + (36 * 1),
     function() RunTipsMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), "esc", 128 - (224 / 2), 248,
+  menu:addButton(_("Previous (~<Esc~>)"), "escape", 128 - (224 / 2), 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -581,7 +581,7 @@ function RunKeystrokeHelpMenu()
   menu:add(s, 16, 60)
 
   menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
-  menu:addButton(_("Previous (~<Esc~>)"), "esc", (352 / 2) - (224 / 2), 352 - 40,
+  menu:addButton(_("Previous (~<Esc~>)"), "escape", (352 / 2) - (224 / 2), 352 - 40,
     function() menu:stop() end)
 
   menu:run(false)
@@ -728,7 +728,7 @@ function RunSaveReplayMenu()
   menu:addTextInputField("", 14, 40, 260)
   menu:addSmallButton(_("~!OK"), "o", 14, 80,
     function() menu:stop() end)
-  menu:addSmallButton(_("Cancel (~<Esc~>)"), "esc", 162, 80,
+  menu:addSmallButton(_("Cancel (~<Esc~>)"), "escape", 162, 80,
     function() menu:stop() end)
 
   menu:run(false)

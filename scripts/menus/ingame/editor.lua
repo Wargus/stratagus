@@ -52,7 +52,7 @@ function RunEditorIngameMenu(s)
 
   menu:addButton(_("~!Exit to menu"), "e", 16, 40 + (36 * 4),
     function() Editor.Running = EditorNotRunning end)
-  menu:addButton(_("Return to Game (~<Esc~>)"), "esc", 16, 248,
+  menu:addButton(_("Return to Game (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
