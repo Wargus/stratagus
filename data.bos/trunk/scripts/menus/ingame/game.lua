@@ -231,11 +231,9 @@ function RunGameOptionsMenu()
   menu:addLabel(_("Game Options"), 128, 11)
   menu:addButton(_("Sound (~<F7~>)"), "f7", 16, 40 + (36 * 0),
     function() RunGameSoundOptionsMenu() end)
-  menu:addButton(_("Speeds (~<F8~>)"), "f8", 16, 40 + (36 * 1),
-    function() RunGameSpeedOptionsMenu() end)
-  menu:addButton(_("Preferences (~<F9~>)"), "f9", 16, 40 + (36 * 2),
+  menu:addButton(_("Game (~<F9~>)"), "f9", 16, 40 + (36 * 1),
     function() RunPreferencesMenu() end)
-  menu:addButton(_("~!Diplomacy"), "d", 16, 40 + (36 * 3),
+  menu:addButton(_("~!Diplomacy"), "d", 16, 40 + (36 * 2),
     function() RunDiplomacyMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), "escape", 128 - (224 / 2), 248,
     function() menu:stop() end)
@@ -243,62 +241,46 @@ function RunGameOptionsMenu()
   menu:run(false)
 end
 
-function RunGameSoundOptionsMenu()
-  --FIXME:
-end
-
-function RunGameSpeedOptionsMenu()
+function RunPreferencesMenu()
   local menu = BosGameMenu()
-  local l
 
-  menu:addLabel(_("Speed Settings"), 128, 11)
+  menu:addLabel(_("Game Options"), 128, 11)
 
-  l = Label(_("Game Speed"))
+  local fog = {}
+  -- FIXME: disable checkbox for multiplayer or replays
+  fog = menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
+    function() SetFogOfWar(fog:isMarked()) end)
+  fog:setMarked(GetFogOfWar())
+
+  local ckey = {}
+  ckey = menu:addCheckBox(_("Show command key"), 16, 36 * 2,
+    function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
+  ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
+
+  local l = Label(_("Game Speed"))
   l:setFont(Fonts["game"])
   l:adjustSize()
-  menu:add(l, 16, 36 * 1)
+  menu:add(l, 16, 36 * 3)
 
   local gamespeed = {}
-  gamespeed = menu:addSlider(15, 75, 198, 18, 32, 36 * 1.5,
+  gamespeed = menu:addSlider(15, 75, 198, 18, 32, 36 * 3.5,
     function() SetGameSpeed(gamespeed:getValue()) end)
   gamespeed:setValue(GetGameSpeed())
 
   l = Label(_("slow"))
   l:setFont(Fonts["small"])
   l:adjustSize()
-  menu:add(l, 34, (36 * 2) + 6)
+  menu:add(l, 34, (36 * 4) + 6)
   l = Label(_("fast"))
   l:setFont(Fonts["small"])
   l:adjustSize()
-  menu:add(l, 230, (36 * 2) + 6)
+  menu:add(l, 230, (36 * 4) + 6)
 
-  menu:addSmallButton(_("~!OK"), "o", 128 - (106 / 2), 248,
-    function()
-      preferences.GameSpeed = GetGameSpeed()
-      SavePreferences()
-      menu:stop()
-    end)
-
-  menu:run(false)
-end
-
-function RunPreferencesMenu()
-  local menu = BosGameMenu()
-
-  menu:addLabel(_("Preferences"), 128, 11)
-  local fog = {}
-  -- FIXME: disable checkbox for multiplayer or replays
-  fog = menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
-    function() SetFogOfWar(fog:isMarked()) end)
-  fog:setMarked(GetFogOfWar())
-  local ckey = {}
-  ckey = menu:addCheckBox(_("Show command key"), 16, 36 * 2,
-    function() UI.ButtonPanel.ShowCommandKey = ckey:isMarked() end)
-  ckey:setMarked(UI.ButtonPanel.ShowCommandKey)
   menu:addSmallButton(_("~!OK"), "o", 128 - (106 / 2), 245,
     function()
       preferences.FogOfWar = GetFogOfWar()
       preferences.ShowCommandKey = UI.ButtonPanel.ShowCommandKey
+      preferences.GameSpeed = GetGameSpeed()
       SavePreferences()
       menu:stop()
     end)
