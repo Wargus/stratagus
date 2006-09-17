@@ -63,7 +63,18 @@
 
 #include <iostream>
 
+#include "guichan/sdl/sdlinput.h"
+#include "SDL.h"
 extern int Str2SdlKey(const char *str);
+
+static int convertKey(const char *key)
+{
+	SDL_keysym keysym;
+	memset(&keysym, 0, sizeof(keysym));
+	keysym.sym = (SDLKey)Str2SdlKey(key);
+	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
+	return k.getValue();
+}
 
 namespace gcn
 {
@@ -616,17 +627,10 @@ namespace gcn
     {
         if (key)
         {
-            if (strlen(key) == 1 || isalnum(key[0]))
+			mHotKey = ::convertKey(key);
+            if (mHotKey == 0)
             {
-                mHotKey = tolower(key[0]);
-            }
-            else
-            {
-                mHotKey = ::Str2SdlKey(key);
-                if (mHotKey == 0)
-                {
-                    throw GCN_EXCEPTION("Could not parse hot key");
-                }
+                throw GCN_EXCEPTION("Could not parse hot key");
             }
         }
     }
