@@ -105,6 +105,14 @@ namespace gcn
 
         virtual MouseInput dequeueMouseInput();
 
+        /**
+         * Converts an SDL keysym to a Key object.
+         *
+         * @param key an SDL keysym
+         * @return a Key object.
+         */
+        static Key convertKeyCharacter(SDL_keysym key);
+
     protected:
         /**
          * Converts a mouse button from SDL to a Guichan mouse button
@@ -114,14 +122,6 @@ namespace gcn
          * @return a Guichan button.     
          */
         int convertMouseButton(int button);
-
-        /**
-         * Converts an SDL keysym to a Key object.
-         *
-         * @param key an SDL keysym
-         * @return a Key object.
-         */
-        Key convertKeyCharacter(SDL_keysym key);
 
         std::queue<KeyInput> mKeyInputQueue;
         std::queue<MouseInput> mMouseInputQueue;
