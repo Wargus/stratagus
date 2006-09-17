@@ -1446,15 +1446,18 @@ int MenuScreen::run(bool loop)
 	GameCursor = UI.Point.Cursor;
 
 	if (loop) {
+		const EventCallback *old_callbacks = GetCallbacks();
+		SetCallbacks(&GuichanCallbacks);
 		while (runLoop) {
 			UpdateDisplay();
 			RealizeVideoMemory();
-			WaitEventsOneFrame(&GuichanCallbacks);
+			WaitEventsOneFrame();
 		}
+		SetCallbacks(old_callbacks);
 		Gui->setTop(this->oldtop);
 	} else {
 		GuichanActive = true;
-		Callbacks = &GuichanCallbacks;
+		SetCallbacks(&GuichanCallbacks);
 		MenuStack.push(this);
 	}
 
@@ -1479,9 +1482,9 @@ void MenuScreen::stop(int result, bool stopAll)
 			GuichanActive = false;
 			//InterfaceState = IfaceStateNormal;
 			if (!Editor.Running) {
-				Callbacks = &GameCallbacks;
+				SetCallbacks(&GameCallbacks);
 			} else {
-				Callbacks = &EditorCallbacks;
+				SetCallbacks(&EditorCallbacks);
 			}
 			GamePaused = false;
 			UI.StatusLine.Clear();

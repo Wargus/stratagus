@@ -2026,10 +2026,10 @@ int EditorSaveMap(const char *file)
 void EditorMainLoop(void)
 {
 	int OldCommandLogDisabled = CommandLogDisabled;
-	EventCallback *OldCallbacks = Callbacks;
+	const EventCallback *old_callbacks = GetCallbacks();
 
 	CommandLogDisabled = 1;
-	Callbacks = &EditorCallbacks;
+	SetCallbacks(&EditorCallbacks);
 
 	while (1) {
 		Editor.MapLoaded = false;
@@ -2070,7 +2070,7 @@ void EditorMainLoop(void)
 				}
 			}
 
-			WaitEventsOneFrame(Callbacks);
+			WaitEventsOneFrame();
 		}
 
 		if (!Editor.MapLoaded) {
@@ -2091,7 +2091,7 @@ void EditorMainLoop(void)
 	}
 
 	CommandLogDisabled = OldCommandLogDisabled;
-	Callbacks = OldCallbacks;
+	SetCallbacks(old_callbacks);
 }
 
 /**

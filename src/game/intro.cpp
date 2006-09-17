@@ -387,6 +387,7 @@ static void ShowIntroSoundCallback(int channel)
 void ShowIntro(const Intro *intro)
 {
 	EventCallback callbacks;
+	const EventCallback *old_callbacks;
 	CGraphic *background;
 	char *text;
 	int line;
@@ -419,6 +420,9 @@ void ShowIntro(const Intro *intro)
 	callbacks.KeyReleased = IntroCallbackKey2;
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
+
+	old_callbacks = GetCallbacks();
+	SetCallbacks(&callbacks);
 
 	background = CGraphic::New(intro->Background);
 	background->Load();
@@ -522,7 +526,7 @@ void ShowIntro(const Intro *intro)
 		if (!IntroNoEvent) {
 			break;
 		}
-		WaitEventsOneFrame(&callbacks);
+		WaitEventsOneFrame();
 		if (c == 0) {
 			c = 1;
 		} else {
@@ -542,6 +546,8 @@ void ShowIntro(const Intro *intro)
 	CGraphic::Free(background);
 
 	Video.ClearScreen();
+
+	SetCallbacks(old_callbacks);
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -591,6 +597,7 @@ static void PictureDrawText(CampaignChapter *chapter, ChapterTextLines *chlines)
 */
 void ShowPicture(CampaignChapter *chapter)
 {
+	const EventCallback *old_callbacks;
 	EventCallback callbacks;
 	CGraphic *background;
 	int old_video_sync;
@@ -615,6 +622,9 @@ void ShowPicture(CampaignChapter *chapter)
 	callbacks.KeyReleased = IntroCallbackKey2;
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
+
+	old_callbacks = GetCallbacks();
+	SetCallbacks(&callbacks);
 
 	background = CGraphic::New(chapter->Data.Picture.Image);
 	background->Load();
@@ -650,7 +660,7 @@ void ShowPicture(CampaignChapter *chapter)
 		Invalidate();
 		RealizeVideoMemory();
 
-		WaitEventsOneFrame(&callbacks);
+		WaitEventsOneFrame();
 		++i;
 	}
 	i = chapter->Data.Picture.FadeOut * i / (max ? max : 1);
@@ -670,7 +680,7 @@ void ShowPicture(CampaignChapter *chapter)
 		Invalidate();
 		RealizeVideoMemory();
 
-		WaitEventsOneFrame(&callbacks);
+		WaitEventsOneFrame();
 		++j;
 	}
 
@@ -690,7 +700,7 @@ void ShowPicture(CampaignChapter *chapter)
 		Invalidate();
 		RealizeVideoMemory();
 
-		WaitEventsOneFrame(&callbacks);
+		WaitEventsOneFrame();
 		--i;
 	}
 
@@ -706,6 +716,8 @@ void ShowPicture(CampaignChapter *chapter)
 	}
 
 	Video.ClearScreen();
+
+	SetCallbacks(old_callbacks);
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -1079,6 +1091,7 @@ static int GameStatsDrawFunc(int frame)
 */
 void ShowStats(void)
 {
+	const EventCallback *old_callbacks;
 	EventCallback callbacks;
 	CGraphic *g;
 	int done;
@@ -1097,6 +1110,9 @@ void ShowStats(void)
 	callbacks.KeyReleased = IntroCallbackKey2;
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
+
+	old_callbacks = GetCallbacks();
+	SetCallbacks(&callbacks);
 
 	Video.ClearScreen();
 
@@ -1139,9 +1155,11 @@ void ShowStats(void)
 			break;
 		}
 
-		WaitEventsOneFrame(&callbacks);
+		WaitEventsOneFrame();
 		++frame;
 	}
+
+	SetCallbacks(old_callbacks);
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
