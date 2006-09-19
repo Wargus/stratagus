@@ -716,8 +716,9 @@ static void AiCheckingWork(void)
 	//
 	// Look to the build requests, what can be done.
 	//
-	for (int i = 0; i < (int)AiPlayer->UnitTypeBuilt.size(); ++i) {
-		queue = &AiPlayer->UnitTypeBuilt[i];
+	int sz = AiPlayer->UnitTypeBuilt.size();
+	for (int i = 0; i < sz; ++i) {
+		queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 		if (queue->Want > queue->Made) {
 			type = queue->Type;
 
@@ -749,6 +750,8 @@ static void AiCheckingWork(void)
 				continue;
 			} else {
 				if (AiMakeUnit(type)) {
+					// AiRequestSupply can change UnitTypeBuilt so recalculate queue
+					queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 					++queue->Made;
 				}
 			}
