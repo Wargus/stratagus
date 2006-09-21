@@ -77,8 +77,10 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
+#if 0
 	/// Editor cancel button pressed
 static int EditorCancelled;
+#endif
 
 /**
 ** Other client and server selection state for Multiplayer clients
@@ -87,17 +89,21 @@ ServerSetup ServerSetupState;
 ServerSetup LocalSetupState;
 
 static char ScenSelectPath[1024];        /// Scenario selector path
+#if 0
 static char ScenSelectDisplayPath[1024]; /// Displayed selector path
+#endif
 static char ScenSelectFileName[128];     /// Scenario selector name
 
 char MenuMapFullPath[1024];              /// Selected map path+name
 
+#if 0
 /// FIXME: -> ccl...
 static char *mgptsoptions[] = {
 	"Available",
 	"Computer",
 	"Closed",
 };
+#endif
 
 /*----------------------------------------------------------------------------
 -- Functions
