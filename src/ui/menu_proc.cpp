@@ -34,34 +34,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-
-#ifdef USE_WIN32
-#ifdef _MSC_VER
-#undef NOUSER
-#endif
-#include <windows.h>
-#endif
 
 #include "video.h"
 #include "font.h"
-#include "interface.h"
 #include "menus.h"
-#include "cursor.h"
-#include "network.h"
 #include "netconnect.h"
-#include "ui.h"
-#include "sound_server.h"
 #include "sound.h"
-#include "script.h"
-#include "campaign.h"
-
-#include "SDL.h"
-#include "SDL_syswm.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -85,7 +64,7 @@ Menu *CurrentMenu;
 */
 Menu *FindMenu(const char *menu_id)
 {
-	return MenuMap[menu_id];
+	return NULL;
 }
 
 /**

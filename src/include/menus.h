@@ -97,14 +97,6 @@ struct _menuitem_;
 typedef void (*MenuitemTextActionType)(struct _menuitem_ *);
 typedef void (*MenuitemButtonHandlerType)(void);
 typedef void (*MenuitemPulldownActionType)(struct _menuitem_ *, int);
-typedef void (*MenuitemListboxActionType)(struct _menuitem_ *, int);
-typedef void *(*MenuitemListboxRetrieveType)(struct _menuitem_ *, int);
-typedef void (*MenuitemListboxHandlerType)(void);
-typedef void (*MenuitemVSliderActionType)(struct _menuitem_ *);
-typedef void (*MenuitemVSliderHandlerType)(void);
-typedef void (*MenuitemHSliderActionType)(struct _menuitem_ *);
-typedef void (*MenuitemHSliderHandlerType)(void);
-typedef void (*MenuitemDrawfuncDrawType)(struct _menuitem_ *);
 typedef void (*MenuitemInputActionType)(struct _menuitem_ *, int);
 typedef void (*MenuitemCheckboxActionType)(struct _menuitem_ *);
 
@@ -136,48 +128,6 @@ typedef struct _menuitem_pulldown_ {
 	int curopt;
 	int cursel;  /* used in popup state */
 } MenuitemPulldown;
-typedef struct _menuitem_listbox_ {
-	void *options;
-	int xsize;
-	int ysize;
-	MenuButtonId button;
-	MenuitemListboxActionType action;
-	int noptions;
-	int defopt;
-	int curopt;
-	int cursel;  /* used in mouse-over state */
-	int nlines;
-	int startline;
-	int dohandler;
-	MenuitemListboxRetrieveType retrieveopt;
-	MenuitemListboxHandlerType handler;  /* for return key */
-} MenuitemListbox;
-typedef struct _menuitem_vslider_ {
-	unsigned cflags;
-	int xsize;  /// x-size of slider, not including buttons
-	int ysize;  /// y-size of slider, not including buttons
-	MenuitemVSliderActionType action;
-	int defper;
-	int percent;  /// percent of the way to bottom (0 to 100)
-	int cursel;   /// used in mouse-over state
-	int style;
-	MenuitemVSliderHandlerType handler; /// for return key
-} MenuitemVslider;
-typedef struct _menuitem_hslider_ {
-	unsigned cflags;
-	int xsize;  /// x-size of slider, not including buttons
-	int ysize;  /// y-size of slider, not including buttons
-	MenuitemHSliderActionType action;
-	int defper;
-	int percent;  /// percent of the way to right (0 to 100)
-	int curper;   /// used in mouse-move state
-	int cursel;   /// used in mouse-over state
-	int style;
-	MenuitemHSliderHandlerType handler; /// for return key
-} MenuitemHslider;
-typedef struct _menuitem_drawfunc_ {
-	MenuitemDrawfuncDrawType draw;
-} MenuitemDrawfunc;
 typedef struct _menuitem_input_ {
 	char *buffer;
 	unsigned int iflags;
@@ -199,9 +149,8 @@ typedef struct _menuitem_checkbox_ {
 
 struct _menu_;
 typedef enum {
-	MiTypeText, MiTypeButton, MiTypePulldown, MiTypeListbox,
-	MiTypeVslider, MiTypeHslider, MiTypeDrawfunc, MiTypeInput,
-	MiTypeCheckbox
+	MiTypeText, MiTypeButton, MiTypePulldown,
+	MiTypeInput, MiTypeCheckbox
 } MiTypeType;
 
 typedef struct _menuitem_ {
@@ -217,10 +166,6 @@ typedef struct _menuitem_ {
 		MenuitemText Text;
 		MenuitemButton Button;
 		MenuitemPulldown Pulldown;
-		MenuitemListbox Listbox;
-		MenuitemVslider VSlider;
-		MenuitemHslider HSlider;
-		MenuitemDrawfunc DrawFunc;
 		MenuitemInput Input;
 		MenuitemCheckbox Checkbox;
 		// ... add here ...
@@ -258,9 +203,6 @@ extern Menu *CurrentMenu;                     /// Current menu
 
 extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 
-	/// Hash table of all the menus
-extern std::map<std::string, Menu *> MenuMap;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -284,13 +226,6 @@ extern void NetClientCheckLocalState(void);
 extern void EditorEditResource(void);
 	/// Edit ai properties
 extern void EditorEditAiProperties(void);
-
-	/// Save map from the editor
-extern int EditorSaveMenu(void);
-	/// Load map from the editor
-extern void EditorLoadMenu(void);
-	/// Setup Editor Paths
-extern void SetupEditor(void);
 
 	/// Error menu
 extern void ErrorMenu(char *);
