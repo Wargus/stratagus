@@ -74,214 +74,11 @@
 
 
 /*----------------------------------------------------------------------------
--- Prototypes for local functions
-----------------------------------------------------------------------------*/
-
-#if 0
-static void EditorEndMenu(void);
-#endif
-
-/*----------------------------------------------------------------------------
--- Prototypes for action handlers and helper functions
-----------------------------------------------------------------------------*/
-
-// Victory, lost
-#if 0
-static void GameMenuEnd(void);
-static void SaveReplayOk(void);
-#endif
-
-// Scenario select
-#if 0
-static void ScenSelectTPMSAction(Menuitem *mi, int i);
-#endif
-
-// Program start
-#if 0
-static void MultiPlayerGameMenu(void);
-#endif
-
-// Custom game setup
-#if 0
-static void GameSetupInit(Menu *menu);
-static void ScenSelectMenu(void);
-static void CustomGameStart(void);
-static void GameCancel(void);
-static void GameRCSAction(Menuitem *mi, int i);
-static void GameRESAction(Menuitem *mi, int i);
-static void GameUNSAction(Menuitem *mi, int i);
-static void GameTSSAction(Menuitem *mi, int i);
-static void GameGATAction(Menuitem *mi, int i);
-static void CustomGameOPSAction(Menuitem *mi, int i);
-#endif
-
-// Net create join
-#if 0
-static void JoinNetGameMenu(void);
-static void CreateNetGameMenu(void);
-static void CreateInternetGameMenu(void);
-
-// Multi net type
-static void MultiPlayerLANGame(void);
-static void MultiPlayerInternetGame(void);
-#endif
-
-// Net multi setup
-#if 0
-static void MultiGameSetupInit(Menu *menu);
-static void MultiGameSetupExit(Menu *menu);
-static void MultiScenSelectMenu(void);
-static void MultiGameStart(void);
-static void MultiGameCancel(void);
-static void MultiGameFWSAction(Menuitem *mi, int i);
-#endif
-
-// Net multi client
-#if 0
-static void TerminateNetConnect(void);
-static void MultiGameClientInit(Menu *menu);
-static void MultiGameClientExit(Menu *menu);
-static void MultiGameClientDrawFunc(Menuitem *mi);
-static void MultiClientReady(void);
-static void MultiClientNotReady(void);
-static void MultiClientCancel(void);
-static void MultiClientRCSAction(Menuitem *mi, int i);
-static void MultiClientCheckboxAction(Menuitem *mi);
-static void MultiClientUpdate(int initial);
-#endif
-
-// Net connecting
-#if 0
-static void NetConnectingInit(Menu *menu);
-static void NetConnectingExit(Menu *menu);
-static void NetConnectingCancel(void);
-#endif
-
-// Confirm delete
-#if 0
-static void DeleteConfirmOk(void);
-#endif
-
-// Editor select
-#if 0
-static void EditorNewMap(void);
-static void EditorMainLoadMap(void);
-static void EditorSelectCancel(void);
-#endif
-
-// Editor new
-#if 0
-static void EditorNewDrawFunc(Menuitem *mi);
-static void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
-static void EditorNewMapSizeEnterAction(Menuitem *mi, int key);
-static void EditorNewOk(void);
-static void EditorNewCancel(void);
-#endif
-
-// Editor main load map
-#if 0
-static void EditorMainLoadInit(Menu *menu);
-static void EditorMainLoadExit(Menu *menu);
-static void EditorMainLoadVSAction(Menuitem *mi);
-static void EditorMainLoadOk(void);
-static void EditorMainLoadCancel(void);
-static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
-#endif
-
-// Editor load map
-#if 0
-static void EditorLoadOk(void);
-static void EditorLoadCancel(void);
-#endif
-
-// Editor menu
-#if 0
-static void EditorMapPropertiesMenu(void);
-static void EditorPlayerPropertiesMenu(void);
-static void EditorQuitToMenu(void);
-#endif
-
-// Editor map properties
-#if 0
-static void EditorMapPropertiesEnterAction(Menuitem *mi, int key);
-static void EditorMapPropertiesOk(void);
-#endif
-
-// Editor player properties
-#if 0
-static void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
-static void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
-#endif
-
-// Editor edit resource
-#if 0
-static void EditorEditResourceEnterAction(Menuitem *mi,int key);
-static void EditorEditResourceOk(void);
-static void EditorEditResourceCancel(void);
-#endif
-
-// Editor edit ai properties
-#if 0
-static void EditorEditAiPropertiesCheckbox(Menuitem *mi);
-static void EditorEditAiPropertiesOk(void);
-static void EditorEditAiPropertiesCancel(void);
-#endif
-
-// Editor save
-#if 0
-static void EditorSaveInit(Menu *menu);
-static void EditorSaveExit(Menu *menu);
-static void EditorSaveVSAction(Menuitem *mi);
-static void EditorSaveEnterAction(Menuitem *mi, int key);
-static void EditorSaveOk(void);
-static void EditorSaveCancel(void);
-static int EditorSaveRDFilter(char *pathbuf, FileList *fl);
-#endif
-
-// Editor save confirm
-#if 0
-static void EditorSaveConfirmInit(Menu *menu);
-static void EditorSaveConfirmOk(void);
-static void EditorSaveConfirmCancel(void);
-#endif
-
-// Metaserver
-//static void MultiGameMasterReport(void);
-//static void EnterMasterAction(Menuitem *mi, int key);
-#if 0
-static void ShowMetaServerList(void); // Addition for Magnant
-static void MultiMetaServerGameSetupInit(Menu *menu); // init callback
-static void MultiMetaServerGameSetupExit(Menu *menu); // exit callback
-static void SelectGameServer(Menuitem *mi); // Game Server selection so that client joins the game
-static void AddGameServer(void); //Add Game Server on Meta server
-static int MetaServerConnectError(void); // Display error message
-static void MultiMetaServerClose(void); //Close Master Server connection
-#endif
-static void ChangeGameServer(void); //Change Game Parameters on Meta server
-
-//others
-#if 0
-static void GameMenuReturn(void);
-static void NetErrorMenu(char *error);
-#endif
-void NetworkGamePrepareGameSettings(void);
-
-#if 0
-static void MultiGamePTSAction(Menuitem *mi, int o);
-static void NetMultiPlayerDrawFunc(Menuitem *mi);
-static void MultiGamePlayerSelectorsUpdate(int initial);
-#endif
-
-/*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
-	/// Hash table of all the menus
-std::map<std::string, Menu *> MenuMap;
-
 	/// Editor cancel button pressed
 static int EditorCancelled;
-
 
 /**
 ** Other client and server selection state for Multiplayer clients
@@ -292,18 +89,8 @@ ServerSetup LocalSetupState;
 static char ScenSelectPath[1024];        /// Scenario selector path
 static char ScenSelectDisplayPath[1024]; /// Displayed selector path
 static char ScenSelectFileName[128];     /// Scenario selector name
-#if 0
-static char ScenSelectPathName[128];     /// Path name.
-
-static char SelectedFileExist;           /// True if ScenSelectFileName is an existing file.
-#endif
 
 char MenuMapFullPath[1024];              /// Selected map path+name
-
-#if 0
-static char *SaveDir;                    /// Save game directory
-static char TempPathBuf[PATH_MAX];       /// Temporary buffer for paths
-#endif
 
 /// FIXME: -> ccl...
 static char *mgptsoptions[] = {
@@ -315,548 +102,6 @@ static char *mgptsoptions[] = {
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-
-////////////////////
-// Map info stuff //
-////////////////////
-
-#if 0
-/**
-**  Allocate and deep copy a MapInfo structure
-**
-**  @param orig  source of the copy.
-**
-**  @return copy of orig.
-*/
-static CMapInfo *DuplicateMapInfo(const CMapInfo *orig)
-{
-	CMapInfo *dest;
-
-	Assert(orig);
-
-	dest = new CMapInfo;
-	memcpy(dest, orig, sizeof(CMapInfo));
-	if (orig->Description) {
-		dest->Description = new_strdup(orig->Description);
-	}
-	if (orig->Filename) {
-		dest->Filename = new_strdup(orig->Filename);
-	}
-
-	return dest;
-}
-#endif
-
-#if 0
-/**
-**  Free map info data
-**
-**  @param fl  File list to free.
-**  @param n   Size of file list.
-*/
-static void FreeMapInfos(std::vector<FileList> *fl, int n)
-{
-	int i;
-
-	Assert(fl);
-	Assert(0 <= n);
-
-	for (i = 0; i < n; i++) {
-		if ((*fl)[i].xdata) {
-			FreeMapInfo((*fl)[i].xdata);
-			delete (*fl)[i].xdata;
-			(*fl)[i].xdata = NULL;
-		}
-		delete[] (*fl)[i].name;
-		(*fl)[i].name = NULL;
-	}
-}
-#endif
-
-////////////////
-// LBRetrieve //
-////////////////
-
-#if 0
-/**
-**  Listbox retrieve callback.
-**
-**  @param mi    Listbox.
-**  @param i     Line to retrieve.
-**
-**  @return string to display in listbox.
-*/
-static char *LBRetrieve(const Menuitem *mi, int i)
-{
-	std::vector<FileList> *fl;
-	static char buffer[1024];
-
-	Assert(mi->MiType == MiTypeListbox);
-	Assert(i >= 0);
-
-	if (i >= mi->D.Listbox.noptions) {
-		return NULL;
-	}
-	fl = (std::vector<FileList> *)mi->D.Listbox.options;
-	if ((*fl)[i].type) {
-		strcpy(buffer, "   ");
-	} else {
-		strcpy(buffer, "D  ");
-	}
-
-	strcat(buffer, (*fl)[i].name);
-	return buffer;
-}
-#endif
-
-#if 0
-/**
-**  Listbox retrieve callback and draw some info.
-**
-**  @param mi    Listbox.
-**  @param i     Line to retrieve.
-**
-**  @return string to display in listbox.
-*/
-static char *LBRetrieveAndInfo(const Menuitem *mi, int i)
-{
-	std::vector<FileList> *fl;
-	CMapInfo *info;
-
-	Assert(mi->MiType == MiTypeListbox);
-	Assert(i >= 0);
-
-	if (i >= mi->D.Listbox.noptions) {
-		return NULL;
-	}
-	fl = (std::vector<FileList> *)mi->D.Listbox.options;
-	info = (*fl)[i].xdata;
-	if ((*fl)[i].type && i == mi->D.Listbox.curopt && info) {
-		static char buffer[1024];
-		int j;
-		int n;
-
-		// Draw optional description.
-		if (info->Description) {
-			VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254, LargeFont, info->Description);
-		}
-		// Draw map size.
-		sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 20, LargeFont, buffer);
-
-		// Draw number of players.
-		for (n = j = 0; j < PlayerMax; j++) {
-			if (info->PlayerType[j] == PlayerPerson) {
-				n++;
-			}
-		}
-		if (n == 1) {
-			VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, "1 player");
-		} else {
-			sprintf(buffer, "%d players", n);
-			VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, buffer);
-		}
-	}
-	return LBRetrieve(mi, i);
-}
-#endif
-
-////////////////
-//  LBAction  //
-////////////////
-
-#if 0
-/**
-**  Update path and file name with the listbox.
-**
-**  @param mi    listbox.
-**  @param i     line in the listbox.
-**
-**  @return 0 if nothing selected, 1 for file, 2 for directory.
-*/
-static int PathLBAction(const Menuitem *mi, int i)
-{
-	std::vector<FileList> *fl;
-
-	Assert(mi->MiType == MiTypeListbox);
-	Assert(i >= 0);
-
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
-	SelectedFileExist = 0;
-	if (i >= mi->D.Listbox.noptions) {
-		return 0;
-	}
-	fl = (std::vector<FileList> *)mi->D.Listbox.options;
-	if ((*fl)[i].type) {
-		Assert(strlen((*fl)[i].name) < sizeof(ScenSelectFileName));
-		strcpy(ScenSelectFileName, (*fl)[i].name);
-		SelectedFileExist = 1;
-		return 1;
-	} else {
-		Assert(strlen((*fl)[i].name) < sizeof(ScenSelectPathName));
-		strcpy(ScenSelectPathName, (*fl)[i].name);
-		return 2;
-	}
-}
-#endif
-
-#if 0
-/**
-**  Editor save listbox action callback
-*/
-static void EditorSaveLBAction(Menuitem *mi, int i)
-{
-	Assert(mi->MiType == MiTypeListbox);
-	Assert(i >= 0);
-
-	PathLBAction(mi, i);
-	sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
-	mi->Menu->Items[3].D.Input.nch = strlen(ScenSelectFileName);
-}
-#endif
-
-//////////////
-//  LBInit  //
-//////////////
-
-#if 0
-/**
-**  Listbox exit callback.
-**
-**  @param mi  Listbox to free.
-*/
-static void LBExit(Menuitem *mi)
-{
-	std::vector<FileList> *fl;
-
-	Assert(mi->MiType == MiTypeListbox);
-
-	if (!mi->D.Listbox.noptions) {
-		return ;
-	}
-	fl = (std::vector<FileList> *)mi->D.Listbox.options;
-	FreeMapInfos(fl, mi->D.Listbox.noptions);
-	delete fl;
-	mi->D.Listbox.options = NULL;
-	mi->D.Listbox.noptions = 0;
-	mi[1].Flags |= MI_FLAGS_DISABLED;
-}
-#endif
-
-#if 0
-/**
-**  Listbox init callback.
-**
-**  @param mi      Listbox to free.
-**  @param path    Path
-**  @param filter  Filter
-*/
-static void LBInit(Menuitem *mi, const char *path, int (*filter)(char *, FileList *))
-{
-	int noptions;
-
-	Assert(mi->MiType == MiTypeListbox);
-	Assert(path);
-
-	LBExit(mi);
-
-	mi->D.Listbox.options = (void *)new std::vector<FileList>;
-	mi->D.Listbox.noptions = ReadDataDirectory(path, filter,
-		*(std::vector<FileList> *)mi->D.Listbox.options);
-
-	noptions = mi->D.Listbox.noptions;
-	mi->D.Listbox.startline = 0;
-	if (mi->D.Listbox.noptions > 0) {
-		mi->D.Listbox.curopt = 0;
-		mi->D.Listbox.cursel = 0;
-	} else {
-		mi->D.Listbox.curopt = -1;
-		mi->D.Listbox.cursel = -1;
-	}
-	mi[1].D.VSlider.percent = 0;
-	mi[1].D.HSlider.percent = 0;
-	PathLBAction(mi, 0);
-	if (noptions > mi->D.Listbox.nlines) {
-		mi[1].Flags &= ~MI_FLAGS_DISABLED;
-	} else {
-		mi[1].Flags |= MI_FLAGS_DISABLED;
-	}
-}
-#endif
-
-#if 0
-/**
-** Editor main load listbox init callback
-*/
-static void EditorMainLoadLBInit(Menuitem *mi)
-{
-	LBInit(mi, ScenSelectPath, EditorMainLoadRDFilter);
-}
-#endif
-
-#if 0
-/**
-** Editor save listbox init callback
-*/
-static void EditorSaveLBInit(Menuitem *mi)
-{
-	LBInit(mi, ScenSelectPath, EditorSaveRDFilter);
-	sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
-	mi->Menu->Items[3].D.Input.nch = strlen(ScenSelectFileName);
-}
-#endif
-
-/////////////////////
-// Folder.         //
-/////////////////////
-
-#if 0
-/**
-**  Go to parent folder.
-**
-**  @return 1 if path have changed.
-*/
-static int ParentFolder()
-{
-	char *cp;
-
-	if (!ScenSelectDisplayPath[0]) {
-		return 0;
-	}
-	cp = strrchr(ScenSelectDisplayPath, '/');
-	if (cp) {
-		*cp = '\0';
-	} else {
-		ScenSelectDisplayPath[0] = '\0';
-	}
-	cp = strrchr(ScenSelectPath, '/');
-	Assert(cp);
-	*cp = 0;
-	SelectedFileExist = 0;
-	ScenSelectPathName[0] = '\0';
-	ScenSelectFileName[0] = '\0';
-	return 1;
-}
-#endif
-
-#if 0
-/**
-** Scenario select folder button
-*/
-static void ScenSelectFolder(void)
-{
-	if (ParentFolder()) {
-		ScenSelectLBInit(CurrentMenu->Items + 1);
-	}
-}
-#endif
-
-#if 0
-/**
-** Editor main load folder button
-*/
-static void EditorMainLoadFolder(void)
-{
-	if (ParentFolder()) {
-		EditorMainLoadLBInit(CurrentMenu->Items + 1);
-	}
-}
-#endif
-
-#if 0
-/**
-** Editor save folder button
-*/
-static void EditorSaveFolder(void)
-{
-	if (ParentFolder()) {
-		EditorSaveLBInit(CurrentMenu->Items + 1);
-	}
-}
-#endif
-
-#if 0
-/**
-** Initialize the hash table of menu functions
-*/
-void InitMenuFuncHash(void)
-{
-	HASHADD(NULL, "null");
-
-#if 1 // Must be rename and remove duplicate.
-	HASHADD(LBRetrieve, "save-game-lb-retrieve");
-	HASHADD(LBRetrieve, "load-game-lb-retrieve");
-	HASHADD(LBRetrieve, "editor-save-lb-retrieve");
-
-	HASHADD(LBRetrieveAndInfo, "editor-load-lb-retrieve");
-	HASHADD(LBRetrieveAndInfo, "scen-select-lb-retrieve");
-	HASHADD(LBRetrieveAndInfo, "editor-main-load-lb-retrieve");
-
-	HASHADD(PathLBAction, "scen-select-lb-action");
-	HASHADD(PathLBAction, "load-game-lb-action");
-	HASHADD(PathLBAction, "editor-main-load-lb-action");
-	HASHADD(PathLBAction, "editor-load-lb-action");
-	HASHADD(EditorSaveLBAction, "editor-save-lb-action");
-
-#endif
-
-// Game menu
-	HASHADD(GameMenuReturn,"game-menu-return");
-
-// Victory, lost
-	HASHADD(GameMenuEnd,"game-menu-end");
-	HASHADD(SaveReplayOk,"save-replay-ok");
-
-// Scenario select
-	HASHADD(ScenSelectTPMSAction,"scen-select-tpms-action");
-	HASHADD(ScenSelectFolder,"scen-select-folder");
-
-// Program start
-	HASHADD(MultiPlayerGameMenu,"multi-player-game-menu");
-
-// Custom game setup
-	HASHADD(GameSetupInit,"game-setup-init");
-	HASHADD(ScenSelectMenu,"scen-select-menu");
-	HASHADD(CustomGameStart,"custom-game-start");
-	HASHADD(GameCancel,"game-cancel");
-	HASHADD(GameRCSAction,"game-rcs-action");
-	HASHADD(GameRESAction,"game-res-action");
-	HASHADD(GameUNSAction,"game-uns-action");
-	HASHADD(GameTSSAction,"game-tss-action");
-	HASHADD(GameGATAction,"game-gat-action");
-	HASHADD(CustomGameOPSAction,"custom-game-ops-action");
-
-// Net create join
-	HASHADD(JoinNetGameMenu,"net-join-game");
-	HASHADD(CreateNetGameMenu,"net-create-game");
-	HASHADD(CreateInternetGameMenu,"net-internet-create-game");
-
-// Multi net type
-	HASHADD(MultiPlayerLANGame,"net-lan-game");
-	HASHADD(MultiPlayerInternetGame,"net-internet-game");
-
-// Net multi setup
-	HASHADD(MultiGameSetupInit,"multi-game-setup-init");
-	HASHADD(MultiGameSetupExit,"multi-game-setup-exit");
-	HASHADD(MultiScenSelectMenu,"multi-scen-select");
-	HASHADD(MultiGameStart,"multi-game-start");
-	HASHADD(MultiGameCancel,"multi-game-cancel");
-	HASHADD(MultiGamePTSAction,"multi-game-pts-action");
-	HASHADD(MultiGameFWSAction,"multi-game-fws-action");
-
-// Net multi client
-	HASHADD(TerminateNetConnect,"terminate-net-connect");
-	HASHADD(MultiGameClientInit,"multi-game-client-init");
-	HASHADD(MultiGameClientExit,"multi-game-client-exit");
-	HASHADD(MultiGameClientDrawFunc,"multi-client-draw-func");
-	HASHADD(MultiClientReady,"multi-client-ready");
-	HASHADD(MultiClientNotReady,"multi-client-not-ready");
-	HASHADD(MultiClientCancel,"multi-client-cancel");
-	HASHADD(MultiClientRCSAction,"multi-client-rcs-action");
-	HASHADD(MultiClientCheckboxAction,"multi-client-checkbox-action");
-	HASHADD(NetMultiPlayerDrawFunc,"net-multi-player-draw-func");
-
-// Net connecting
-	HASHADD(NetConnectingInit,"net-connecting-init");
-	HASHADD(NetConnectingExit,"net-connecting-exit");
-	HASHADD(NetConnectingCancel,"net-connecting-cancel");
-
-// Confirm delete
-	HASHADD(DeleteConfirmOk,"delete-confirm-ok");
-
-// Editor select
-	HASHADD(EditorNewMap,"editor-new-map");
-	HASHADD(EditorMainLoadMap,"editor-main-load-map");
-	HASHADD(EditorSelectCancel,"editor-select-cancel");
-
-// Editor new
-	HASHADD(EditorNewDrawFunc,"editor-new-draw-func");
-	HASHADD(EditorNewMapDescriptionEnterAction,"editor-new-map-description-enter-action");
-	HASHADD(EditorNewMapSizeEnterAction,"editor-new-map-size-enter-action");
-	HASHADD(EditorNewOk,"editor-new-ok");
-	HASHADD(EditorNewCancel,"editor-new-cancel");
-
-// Editor main load map
-	HASHADD(EditorMainLoadInit,"editor-main-load-init");
-	HASHADD(EditorMainLoadExit,"editor-main-load-exit");
-	HASHADD(EditorMainLoadVSAction,"editor-main-load-vs-action");
-	HASHADD(EditorMainLoadOk,"editor-main-load-ok");
-	HASHADD(EditorMainLoadCancel,"editor-main-load-cancel");
-	HASHADD(EditorMainLoadFolder,"editor-main-load-folder");
-
-// Editor load map
-	HASHADD(EditorMainLoadInit,"editor-load-init");
-	HASHADD(EditorMainLoadExit,"editor-load-exit");
-	HASHADD(EditorMainLoadVSAction,"editor-load-vs-action");
-	HASHADD(EditorLoadOk,"editor-load-ok");
-	HASHADD(EditorLoadCancel,"editor-load-cancel");
-	HASHADD(EditorMainLoadFolder,"editor-load-folder");
-
-// Editor menu
-	HASHADD(EditorSaveMenu,"editor-save-menu");
-	HASHADD(EditorLoadMenu,"editor-load-menu");
-	HASHADD(EditorMapPropertiesMenu,"editor-map-properties-menu");
-	HASHADD(EditorPlayerPropertiesMenu,"editor-player-properties-menu");
-	HASHADD(EditorQuitToMenu,"editor-quit-to-menu");
-
-// Editor map properties
-	HASHADD(EditorMapPropertiesEnterAction,"editor-map-properties-enter-action");
-	HASHADD(EditorMapPropertiesOk,"editor-map-properties-ok");
-	HASHADD(EditorEndMenu,"editor-end-menu");
-
-// Editor player properties
-	HASHADD(EditorPlayerPropertiesDrawFunc,"editor-player-properties-draw-func");
-	HASHADD(EditorPlayerPropertiesEnterAction,"editor-player-properties-enter-action");
-
-// Editor edit resource
-	HASHADD(EditorEditResourceEnterAction,"editor-edit-resource-enter-action");
-	HASHADD(EditorEditResourceOk,"editor-edit-resource-ok");
-	HASHADD(EditorEditResourceCancel,"editor-edit-resource-cancel");
-
-// Editor edit ai properties
-	HASHADD(EditorEditAiPropertiesCheckbox,"editor-edit-ai-properties-checkbox");
-	HASHADD(EditorEditAiPropertiesOk,"editor-edit-ai-properties-ok");
-	HASHADD(EditorEditAiPropertiesCancel,"editor-edit-ai-properties-cancel");
-
-// Editor save
-	HASHADD(EditorSaveInit,"editor-save-init");
-	HASHADD(EditorSaveExit,"editor-save-exit");
-	HASHADD(EditorSaveFolder,"editor-save-folder");
-	HASHADD(EditorSaveVSAction,"editor-save-vs-action");
-	HASHADD(EditorSaveEnterAction,"editor-save-enter-action");
-	HASHADD(EditorSaveOk,"editor-save-ok");
-	HASHADD(EditorSaveCancel,"editor-save-cancel");
-
-// Editor save confirm
-	HASHADD(EditorSaveConfirmInit,"editor-save-confirm-init");
-	HASHADD(EditorSaveConfirmOk,"editor-save-confirm-ok");
-	HASHADD(EditorSaveConfirmCancel,"editor-save-confirm-cancel");
-
-// Metaserver
-	HASHADD(ShowMetaServerList,"metaserver-list");
-	HASHADD(MultiMetaServerGameSetupInit,"metaserver-list-init");
-	HASHADD(MultiMetaServerGameSetupExit,"metaserver-list-exit");
-	HASHADD(SelectGameServer,"select-game-server");
-	HASHADD(MultiMetaServerClose,"menu-internet-end-menu");
-}
-#endif
-
-/*----------------------------------------------------------------------------
---  Button action handler and Init/Exit functions
-----------------------------------------------------------------------------*/
-
-#if 0
-/**
-** Leave menus and return to game mode
-*/
-static void GameMenuReturn(void)
-{
-	InterfaceState = IfaceStateNormal;
-	UI.StatusLine.Clear();
-	GamePaused = false;
-}
-#endif
 
 #if 0
 /**
@@ -880,19 +125,6 @@ static void LoadGameOk(void)
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
-}
-#endif
-
-#if 0
-/**
-**  End the running game from menu.
-*/
-static void GameMenuEnd(void)
-{
-	InterfaceState = IfaceStateNormal;
-	GameRunning = false;
-	CursorOn = CursorOnUnknown;
-	CurrentMenu = NULL;
 }
 #endif
 
@@ -954,79 +186,6 @@ static void SaveReplayOk(void)
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
-}
-#endif
-
-/**
-**  Get map info from select path+name
-*/
-static void GetInfoFromSelectPath(void)
-{
-	int i;
-
-	if (!ScenSelectFileName[0]) {
-		return;
-	}
-	if (ScenSelectPath[0]) {
-		i = strlen(ScenSelectPath);
-		strcat(ScenSelectPath, "/");
-	} else {
-		i = 0;
-	}
-	strcat(ScenSelectPath, ScenSelectFileName); // Final map name with path
-	if (strcasestr(ScenSelectFileName, ".smp")) {
-		LoadStratagusMapInfo(ScenSelectPath);
-	}
-	ScenSelectPath[i] = '\0'; // Remove appended part
-}
-
-#if 0
-/**
-** Enter select scenario menu.
-*/
-static void ScenSelectMenu(void)
-{
-	Menu *menu;
-	int n;
-	int j;
-	int t;
-
-	ProcessMenu("menu-select-scenario", 1);
-
-	GetInfoFromSelectPath();
-
-	menu = FindMenu("menu-custom-game");
-	for (n = j = 0; j < PlayerMax; ++j) {
-		t = Map.Info.PlayerType[j];
-		if (t == PlayerPerson || t == PlayerComputer) {
-			n++;
-		}
-	}
-	menu->Items[12].D.Pulldown.noptions = n;
-	if (menu->Items[12].D.Pulldown.curopt >= n) {
-		menu->Items[12].D.Pulldown.curopt = 0;
-	}
-}
-#endif
-
-#if 0
-/**
-** Enter multiplayer select scenario menu.
-*/
-static void MultiScenSelectMenu(void)
-{
-	Menu *menu;
-	unsigned flags;
-
-	// FIXME: remove when cm works with multiplayer
-	menu = FindMenu("menu-select-scenario");
-	flags = menu->Items[6].Flags;
-	menu->Items[6].Flags = MI_FLAGS_DISABLED;
-
-	ScenSelectMenu();
-	MultiGamePlayerSelectorsUpdate(1);
-
-	menu->Items[6].Flags = MI_FLAGS_DISABLED;
 }
 #endif
 
@@ -1359,17 +518,6 @@ static void ScenSelectTPMSAction(Menuitem *mi, int i)
 {
 	mi = mi->Menu->Items + 1;
 	ScenSelectLBInit(mi);
-}
-#endif
-
-#if 0
-/**
-** Custom game cancel button callback
-*/
-static void GameCancel(void)
-{
-	FreeMapInfo(&Map.Info);
-	//CloseMenu();
 }
 #endif
 
@@ -1718,6 +866,7 @@ void NetworkGamePrepareGameSettings(void)
 #endif
 }
 
+#if 0
 /**
 ** Player selectors have changed.
 ** Caution: Called by map change (initial = 1)!
@@ -1848,6 +997,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 		ChangeGameServer();
 	}
 }
+#endif
 
 #if 0
 /**
@@ -1964,15 +1114,6 @@ static void MultiGameSetupInit(Menu *menu)
 
 #if 0
 /**
-**  Multiplayer server menu exit callback
-*/
-static void MultiGameSetupExit(Menu *menu)
-{
-}
-#endif
-
-#if 0
-/**
 **  Cancel button of server multi player menu pressed.
 */
 static void MultiGameCancel(void)
@@ -2075,15 +1216,6 @@ static void MultiGameClientInit(Menu *menu)
 		menu->Items[2].Flags = 0;
 		menu->Items[CLIENT_RACE].Flags = 0;
 	}
-}
-#endif
-
-#if 0
-/**
-**  Multiplayer client menu exit callback
-*/
-static void MultiGameClientExit(Menu *menu)
-{
 }
 #endif
 
@@ -2205,7 +1337,7 @@ int NetClientSelectScenario(void)
 */
 void NetConnectForceDisplayUpdate(void)
 {
-	MultiGamePlayerSelectorsUpdate(2);
+//	MultiGamePlayerSelectorsUpdate(2);
 }
 
 #if 0
@@ -2243,6 +1375,7 @@ void NetClientUpdateState(void)
 }
 #endif
 
+#if 0
 /**
 ** Setup Editor Paths
 */
@@ -2276,6 +1409,7 @@ void SetupEditor(void)
 	}
 
 }
+#endif
 
 
 #if 0
@@ -2333,24 +1467,6 @@ static void EditorNewMap(void)
 
 	GuiGameStarted = 1;
 	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
-** Editor new map draw func
-*/
-static void EditorNewDrawFunc(Menuitem *mi)
-{
-}
-#endif
-
-#if 0
-/**
-** Editor new map, map description input box callback
-*/
-static void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key)
-{
 }
 #endif
 
@@ -2427,17 +1543,6 @@ static void EditorNewOk(void)
 
 #if 0
 /**
-** Editor new map cancel button
-*/
-static void EditorNewCancel(void)
-{
-	EditorCancelled = 1;
-	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
 ** Editor main load map menu
 */
 static void EditorMainLoadMap(void)
@@ -2468,26 +1573,6 @@ static void EditorMainLoadMap(void)
 	
 	GuiGameStarted = 1;
 	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
-** Editor main load init callback
-*/
-static void EditorMainLoadInit(Menu *menu)
-{
-	EditorMainLoadLBInit(menu->Items + 1);
-}
-#endif
-
-#if 0
-/**
-** Editor main load exit callback
-*/
-static void EditorMainLoadExit(Menu *menu)
-{
-	LBExit(menu->Items + 1);
 }
 #endif
 
@@ -2554,14 +1639,6 @@ static void EditorMainLoadCancel(void)
 
 #if 0
 /**
-** Editor main load vertical slider action callback
-*/
-static void EditorMainLoadVSAction(Menuitem *mi)
-{
-}
-#endif
-
-/**
 **  Editor load map menu
 */
 void EditorLoadMenu(void)
@@ -2594,6 +1671,7 @@ void EditorLoadMenu(void)
 	Editor.Running = EditorNotRunning;
 	//CloseMenu();
 }
+#endif
 
 #if 0
 /**
@@ -2691,15 +1769,6 @@ static void EditorMapPropertiesMenu(void)
 
 #if 0
 /**
-** Editor map properties input box callback
-*/
-static void EditorMapPropertiesEnterAction(Menuitem *mi, int key)
-{
-}
-#endif
-
-#if 0
-/**
 ** Editor map properties ok button
 */
 static void EditorMapPropertiesOk(void)
@@ -2738,15 +1807,6 @@ static void EditorMapPropertiesOk(void)
 
 
 	EditorEndMenu();
-}
-#endif
-
-#if 0
-/**
-** Editor player properties draw func
-*/
-static void EditorPlayerPropertiesDrawFunc(Menuitem *mi)
-{
 }
 #endif
 
@@ -3024,6 +2084,7 @@ static void EditorEditAiPropertiesCancel(void)
 }
 #endif
 
+#if 0
 /**
 ** Save map from the editor
 **
@@ -3067,28 +2128,6 @@ int EditorSaveMenu(void)
 		}
 	}
 	return ret;
-}
-
-#if 0
-/**
-**  Editor save init callback
-*/
-static void EditorSaveInit(Menu *menu)
-{
-	if (!*ScenSelectPath) {
-		sprintf(ScenSelectPath, "%s/maps", StratagusLibPath);
-	}
-	EditorSaveLBInit(menu->Items + 1);
-}
-#endif
-
-#if 0
-/**
-**  Editor save exit callback
-*/
-static void EditorSaveExit(Menu *menu)
-{
-	LBExit(menu->Items + 1);
 }
 #endif
 
@@ -3136,26 +2175,6 @@ static void EditorSaveOk(void)
 
 #if 0
 /**
-** Editor save cancel button
-*/
-static void EditorSaveCancel(void)
-{
-	EditorCancelled = 1;
-	EditorEndMenu();
-}
-#endif
-
-#if 0
-/**
-** Editor save vertical slider action callback
-*/
-static void EditorSaveVSAction(Menuitem *mi)
-{
-}
-#endif
-
-#if 0
-/**
 ** Editor save input callback
 */
 static void EditorSaveEnterAction(Menuitem *mi, int key)
@@ -3171,46 +2190,6 @@ static void EditorSaveEnterAction(Menuitem *mi, int key)
 			EditorSaveOk();
 		}
 	}
-}
-#endif
-
-#if 0
-/**
-** Editor save confirm init callback
-*/
-static void EditorSaveConfirmInit(Menu *menu)
-{
-	menu->Items[2].D.Text.text = NewStringDesc(ScenSelectFileName);
-}
-#endif
-
-#if 0
-/**
-** Editor save confirm ok button
-*/
-static void EditorSaveConfirmOk(void)
-{
-	FreeStringDesc(CurrentMenu->Items[2].D.Text.text);
-	delete CurrentMenu->Items[2].D.Text.text;
-	CurrentMenu->Items[2].D.Text.text = NULL;
-	EditorEndMenu();
-}
-#endif
-
-#if 0
-/**
-** Editor save confirm cancel button
-*/
-static void EditorSaveConfirmCancel(void)
-{
-	FreeStringDesc(CurrentMenu->Items[2].D.Text.text);
-	delete[] CurrentMenu->Items[2].D.Text.text;
-	CurrentMenu->Items[2].D.Text.text = NULL;
-	EditorCancelled = 1;
-	EditorEndMenu();
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
 }
 #endif
 
@@ -3233,28 +2212,13 @@ static void EditorQuitToMenu(void)
 
 #if 0
 /**
-** End menus state of the editor.
-*/
-static void EditorEndMenu(void)
-{
-	CursorOn = CursorOnUnknown;
-	CurrentMenu = NULL;
-
-	InterfaceState = IfaceStateNormal;
-	EditorUpdateDisplay();
-	InterfaceState = IfaceStateMenu;
-}
-#endif
-
-#if 0
-/**
 ** Net error menu
 **
 ** @param error Error message
 */
 static void NetErrorMenu(char *error)
 {
-    	Menu *menu;
+    Menu *menu;
 
 	menu = FindMenu("menu-net-error");
 	menu->Items[1].D.Text.text = NewStringDesc(error);
@@ -3521,6 +2485,7 @@ static void AddGameServer(void)
 }
 #endif
 
+#if 0
 /**
 **  Action to add a game server on the meta-server.
 */
@@ -3548,6 +2513,7 @@ static void ChangeGameServer(void)
 
 	// FIXME: Get Reply from Queue
 }
+#endif
 
 #if 0
 /**

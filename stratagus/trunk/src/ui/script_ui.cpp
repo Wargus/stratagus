@@ -313,37 +313,6 @@ static int CclSetTitleScreens(lua_State *l)
 }
 
 /**
-**  Process a menu.
-**
-**  @param l  Lua state.
-*/
-static int CclProcessMenu(lua_State *l)
-{
-	int args;
-	int loop;
-	const char *mid;
-
-	args = lua_gettop(l);
-	if (args != 1 && args != 2) {
-		LuaError(l, "incorrect argument");
-	}
-	mid = LuaToString(l, 1);
-	if (args == 2) {
-		loop = LuaToNumber(l, 2);
-	} else {
-		loop = 0;
-	}
-
-	if (!FindMenu(mid)) {
-		LuaError(l, "menu not found: %s" _C_ mid);
-	} else {
-		ProcessMenu(mid, loop);
-	}
-
-	return 0;
-}
-
-/**
 **  Define a cursor.
 **
 **  @param l  Lua state.
@@ -1700,8 +1669,6 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
-
-	lua_register(Lua, "ProcessMenu", CclProcessMenu);
 
 	lua_register(Lua, "DefineCursor", CclDefineCursor);
 	lua_register(Lua, "SetGameCursor", CclSetGameCursor);
