@@ -743,12 +743,6 @@ void InitSettings(void)
 {
 	int i;
 
-	if (RestartScenario) {
-		Map.NoFogOfWar = GameSettings.NoFogOfWar;
-		FlagRevealMap = GameSettings.RevealMap;
-		return;
-	}
-
 	for (i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].Race = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
