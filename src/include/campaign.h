@@ -57,7 +57,6 @@ typedef enum GameResults {
 ----------------------------------------------------------------------------*/
 
 extern GameResults GameResult;   /// Outcome of the game
-extern char DefaultMap[1024];    /// Default map path
 
 //@}
 

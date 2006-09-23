@@ -309,18 +309,6 @@ static int CclShowMapLocation(lua_State *l)
 }
 
 /**
-**  Set the default map.
-**
-**  @param l  Lua state.
-*/
-static int CclSetDefaultMap(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	strncpy(DefaultMap, LuaToString(l, 1), sizeof(DefaultMap) - 1);
-	return 0;
-}
-
-/**
 **  Set fog of war on/off.
 **
 **  @param l  Lua state.
@@ -527,7 +515,6 @@ void MapCclRegister(void)
 	lua_register(Lua, "SetStartView", CclSetStartView);
 	lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
 
-	lua_register(Lua, "SetDefaultMap", CclSetDefaultMap);
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
