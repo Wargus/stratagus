@@ -50,7 +50,6 @@
 #include "ui.h"
 #include "player.h"
 #include "spells.h"
-#include "menus.h"
 #include "depend.h"
 #include "sound.h"
 #include "map.h"
