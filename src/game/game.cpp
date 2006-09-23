@@ -62,7 +62,7 @@
 #include "netconnect.h"
 #include "missile.h"
 #include "settings.h"
-#include "campaign.h"
+#include "results.h"
 #include "trigger.h"
 #include "commands.h"
 #include "iolib.h"
@@ -76,6 +76,7 @@
 
 Settings GameSettings;  /// Game Settings
 static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
+GameResults GameResult;                      /// Outcome of the game
 
 /*----------------------------------------------------------------------------
 --  Functions
