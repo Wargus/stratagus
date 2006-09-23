@@ -550,11 +550,8 @@ void CreateGame(const char *filename, CMap *map)
 		}
 	}
 
-	if (GameIntro.Title) {
-		ShowIntro(&GameIntro);
-	} else {
-		CallbackMusicOn();
-	}
+	CallbackMusicOn();
+
 #if 0
 	GamePaused = true;
 #endif

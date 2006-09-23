@@ -708,13 +708,6 @@ void StartReplay(const char *filename, bool reveal)
 	ExpandPath(replay, filename);
 	LoadReplay(replay);
 
-	// FIXME why is this needed ?
-	for (int i = 0; i < MAX_OBJECTIVES; i++) {
-		delete[] GameIntro.Objectives[i];
-		GameIntro.Objectives[i] = NULL;
-	}
-	//GameIntro.Objectives[0] = new_strdup(DefaultObjective);
-
 	ReplayRevealMap = reveal;
 
 	StartMap(CurrentMapPath, false);

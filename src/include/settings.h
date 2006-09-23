@@ -124,45 +124,18 @@ enum GameTypes {
 #endif
 };
 
-
-// ----------------------------------------------------------------------------
-
-#define MAX_BRIEFING_VOICES 20  /// How many intro voices supported
-#define MAX_OBJECTIVES 9  /// How many objectives supported
-
-class Intro {
-public:
-	Intro() : Title(NULL), Background(NULL), TextFile(NULL) {
-		memset(VoiceFile, 0, sizeof(VoiceFile));
-		memset(Objectives, 0, sizeof(Objectives));
-	}
-
-	char *Title;                           /// Intro title
-	char *Background;                      /// Background picture
-	char *TextFile;                        /// Intro text file
-	char *VoiceFile[MAX_BRIEFING_VOICES];  /// Intro voice file
-	char *Objectives[MAX_OBJECTIVES];      /// Objectives text
-};  /// Intro definition
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 extern Settings GameSettings;  /// Game settings
-extern Intro    GameIntro;     /// Game intro
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Show level intro
-extern void ShowIntro(const Intro *intro);
 	/// Show stats
 extern void ShowStats();
-	/// Register CCL functions for objectives
-extern void ObjectivesCclRegister(void);
-	/// Save the objectives
-extern void SaveObjectives(CFile *file);
 	/// Create a game
 extern void CreateGame(const char *filename, CMap *map);
 	/// Init Setting to default values
