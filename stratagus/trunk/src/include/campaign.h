@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name campaign.h - The campaign headerfile. */
+/**@name result.h - The game results headerfile. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2006 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,16 +28,10 @@
 //
 //      $Id$
 
-#ifndef __CAMPAIGN_H__
-#define __CAMPAIGN_H__
+#ifndef __RESULTS_H__
+#define __RESULTS_H__
 
 //@{
-
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 /**
 **  Possible outcomes of the game.
@@ -52,12 +46,8 @@ typedef enum GameResults {
 };                 /// Game results
 
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 extern GameResults GameResult;   /// Outcome of the game
 
 //@}
 
-#endif // !__CAMPAIGN_H__
+#endif

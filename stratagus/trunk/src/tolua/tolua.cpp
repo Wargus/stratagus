@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Sep 16 14:16:35 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Sep 23 23:38:39 2006.
 */
 
 #ifndef __cplusplus
@@ -34,7 +34,7 @@ using namespace gcn;
 void StartMap(const char *str, bool clean = true);
 void StartReplay(const char *str, bool reveal = false);
 void StartSavedGame(const char *str);
-#include "campaign.h"
+#include "results.h"
 void StopGame(GameResults result);
 void InitNetwork1(void);
 void ExitNetwork1(void);
