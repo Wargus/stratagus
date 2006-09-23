@@ -357,11 +357,13 @@ UI.NetworkMenuButton.X = Video.Width - 200
 UI.NetworkMenuButton.Y = 0
 UI.NetworkMenuButton.Text = "Menu"
 UI.NetworkMenuButton.Style = FindButtonStyle("network")
+UI.NetworkMenuButton:SetCallback(function() RunGameMenu() end)
 
 UI.NetworkDiplomacyButton.X = Video.Width - 100
 UI.NetworkDiplomacyButton.Y = 0
 UI.NetworkDiplomacyButton.Text = "Diplomacy"
 UI.NetworkDiplomacyButton.Style = FindButtonStyle("network")
+UI.NetworkDiplomacyButton:SetCallback(function() RunDiplomacyMenu() end)
 
 function AddMenuPanel(ident, file)
 	b = CMenuPanel:new_local()
