@@ -49,7 +49,6 @@
 GameResults GameResult;                      /// Outcome of the game
 char CurrentMapPath[1024];                   /// Path of the current map
 char DefaultMap[1024] = "maps/default.smp";  /// Default map path
-int RestartScenario;                         /// Restart the scenario
 
 
 
