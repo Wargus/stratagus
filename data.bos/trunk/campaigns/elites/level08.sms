@@ -9,7 +9,7 @@
 --
 --  level08.sms -  Define the Elites campaign 1, map 8.
 --
---  (c) Copyright 2005 by Loïs Taulelle, François Beerten
+--  (c) Copyright 2005-2006 by Lois Taulelle, Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -29,11 +29,6 @@
 --  Define level 08 Map Setup
 --
 
-Briefing("type", "wc2",
-  "title", "Savoy steps",
-  "objective", "Drive the enemy out. Kill all enemy units",
-  "background", "campaigns/elites/menu.png",
-  "text", "campaigns/elites/level08.txt")
 
 -- Units
 DefineAllow("unit-engineer",                    "AAAAAAAAAAAAAAAA")

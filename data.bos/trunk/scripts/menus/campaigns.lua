@@ -38,24 +38,21 @@ function RunBriefingMenu(objectivestext, briefingtext)
   end
 
   current_objective = objectivestext
-  objectivestext = {_("Objectives :"), objectivestext}
-
-  menu = BosMenu(_("Briefing level 1 The river"))
-
-  local sw = ScrollingWidget(400, Video.Height * 12 / 20)
-  menu:add(sw, Video.Width / 2 - 200, Video.Height / 20 * 3)
-  sw:setBackgroundColor(dark)
-  sw:setActionCallback(function() sw:restart() end)
-  local lastpos = 50
-  for i,f in briefingtext do
-    sw:add(Label(f), 20, lastpos)
-    lastpos = lastpos + 20
-  end
-  lastpos = lastpos +  20
-  for j,f in objectivestext do
-    sw:add(Label(f), 20, lastpos)
-    lastpos = lastpos + 20
-  end
+  menu = BosMenu(_("Briefing"))
+  local text = briefingtext .. 
+      "\n\n" ..
+      _("Objectives :") ..
+      "         \n" ..
+      objectivestext
+  local t= MultiLineLabel(text)
+  t:setFont(Fonts["large"])
+  t:setAlignment(MultiLineLabel.LEFT)
+  t:setVerticalAlignment(MultiLineLabel.CENTER)
+  t:setLineWidth(400)
+  t:adjustSize()
+  t:setHeight(Video.Height * 12 / 20)
+  t:setBackgroundColor(dark)
+  menu:add(t, Video.Width / 2 - 200, Video.Height / 20 * 3)
 
   menu:run()
 end
