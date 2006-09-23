@@ -9,7 +9,7 @@
 --
 --  level02.sms  -  Define the Elites campaign 1, map 2.
 --
---  (c) Copyright 2005 by Loïs Taulelle, François Beerten
+--  (c) Copyright 2005 by Loï¿½ Taulelle, Franï¿½is Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -28,12 +28,6 @@
 --=============================================================================
 --  Define level 02 Map Setup
 --
-
-Briefing("type", "wc2",
-  "title", "Green Valley",
-  "objective", "Gain an ally and drive the enemy out. Kill all enemy units",
-  "background", "campaigns/elites/menu.png",
-  "text", "campaigns/elites/level02.txt")
 
 -- AI
 --SetAiType(1, "ai-rush")

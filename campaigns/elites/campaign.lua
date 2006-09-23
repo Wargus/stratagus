@@ -29,24 +29,39 @@
 --  Define the campaign
 --
 
-local briefingtext1 = {
-  "You're the last remaining free leader. ",
-  "Defend your small outpost in this crucial battle. ",
-  "Your first enemy, Imperial general Szarin, ",
-  "knows that victory will spell the end of ",
-  "yours. You must lead your war-weary troops ", 
-  "and stop him at all costs."
-}
+local briefingtext01 = 
+   "You're the last remaining free leader. "..
+   "Defend your small outpost in this crucial battle. "..
+   "Your first enemy, Imperial general Szarin, "..
+   "knows that victory will spell the end of "..
+   "yours. You must lead your war-weary troops ".. 
+   "and stop him at all costs. "
+local briefingtext02 =
+   "Your scouts report that a small force of mercenary is encamped in the " ..
+   "Green Valley. " ..
+   "Mercenaries no doubt sees this conflict as an opportunity to expand their " ..
+   "military influence. Not to worry, though: Mercenarie's troops are neutral " ..
+   "and in fact their presence offers you a strategic advantage. If you should " ..
+   "so, choose to first capture the mercenary vault, you will have the resources " ..
+   "to complete your quest easily. "
+local briefingtextcoming =
+   "This is level 3" ..
+   "Text coming!"
 
 campaign_steps = {
-  CreateMapStep("campaigns/elites/level01.smp", "Kill them all !", briefingtext1),
-  CreateMapStep("campaigns/elites/level02.smp"),
-  CreateMapStep("campaigns/elites/level03.smp"),
-  CreateMapStep("campaigns/elites/level04.smp"),
-  CreateMapStep("campaigns/elites/level05.smp"),
-  CreateMapStep("campaigns/elites/level06.smp"),
-  CreateMapStep("campaigns/elites/level07.smp"),
-  CreateMapStep("campaigns/elites/level08.smp"),
-  CreateMapStep("campaigns/elites/level09.smp"),
-  CreateMapStep("campaigns/elites/level10.smp")}
+  CreateMapStep("campaigns/elites/level01.smp",
+      "Build your base. Drive the enemy out. Kill all enemy units", 
+      briefingtext01),
+  CreateMapStep("campaigns/elites/level02.smp", 
+      "Gain an ally and drive the enemy out. Kill all enemy units", 
+      briefingtext02),
+  CreateMapStep("campaigns/elites/level03.smp", _("Kill them all !"), briefingtextcoming),
+  CreateMapStep("campaigns/elites/level04.smp", _("Kill them all !"), briefingtextcoming),
+  CreateMapStep("campaigns/elites/level05.smp", _("Kill them all !"), briefingtextcoming),
+  CreateMapStep("campaigns/elites/level06.smp", _("Kill them all !"), briefingtextcoming),
+  CreateMapStep("campaigns/elites/level07.smp", _("Kill them all !"), briefingtextcoming),
+  CreateMapStep("campaigns/elites/level08.smp", _("Kill them all !"), briefingtextcoming),
+  CreateMapStep("campaigns/elites/level09.smp", _("Kill them all !"), briefingtextcoming),
+  CreateMapStep("campaigns/elites/level10.smp", _("Kill them all !"), briefingtextcoming)
+}
 
