@@ -1727,18 +1727,25 @@ void UIHandleButtonUp(unsigned button)
 	//
 	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
 		GameMenuButtonClicked = false;
-		if (ButtonAreaUnderCursor == ButtonAreaMenu &&
-			(ButtonUnderCursor == ButtonUnderMenu ||
-				ButtonUnderCursor == ButtonUnderNetworkMenu)) {
-			// FIXME: Not if, in input mode.
-			if (!IsNetworkGame()) {
-				GamePaused = true;
-				UI.StatusLine.Set(_("Game Paused"));
+		if (ButtonAreaUnderCursor == ButtonAreaMenu) {
+			if (ButtonUnderCursor == ButtonUnderMenu ||
+					ButtonUnderCursor == ButtonUnderNetworkMenu) {
+				// FIXME: Not if, in input mode.
+				if (!IsNetworkGame()) {
+					GamePaused = true;
+					UI.StatusLine.Set(_("Game Paused"));
+				}
+				if (ButtonUnderCursor == ButtonUnderMenu) {
+					if (UI.MenuButton.Callback) {
+						UI.MenuButton.Callback->action("");
+					}
+				} else {
+					if (UI.NetworkMenuButton.Callback) {
+						UI.NetworkMenuButton.Callback->action("");
+					}
+				}
+				return;
 			}
-			if (UI.MenuButton.Callback) {
-				UI.MenuButton.Callback->action("");
-			}
-			return;
 		}
 	}
 
@@ -1749,8 +1756,9 @@ void UIHandleButtonUp(unsigned button)
 		GameDiplomacyButtonClicked = false;
 		if (ButtonAreaUnderCursor == ButtonAreaMenu &&
 				ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
-			// FIXME: Not if, in input mode.
-			ProcessMenu("menu-diplomacy", 0);
+			if (UI.NetworkDiplomacyButton.Callback) {
+				UI.NetworkDiplomacyButton.Callback->action("");
+			}
 			return;
 		}
 	}
