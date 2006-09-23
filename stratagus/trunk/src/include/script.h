@@ -126,8 +126,7 @@ typedef enum {
 	EString_If,           /// If cond then String1 else String2.
 	EString_UnitName,     /// UnitType Name.
 	EString_SubString,    /// SubString.
-	EString_Line,         /// line n of the string.
-	EString_GameInfo      /// Infos of game (objectives, tips, ...).
+	EString_Line          /// line n of the string.
 // FIXME: add others.
 } EString; /// All possible value for a string.
 
