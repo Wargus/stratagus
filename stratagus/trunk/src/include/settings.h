@@ -41,7 +41,7 @@
 
 class CFile;
 class CMap;
-class CampaignChapter;
+
 
 /*----------------------------------------------------------------------------
 --  Settings  __WIP__
@@ -157,8 +157,6 @@ extern Intro    GameIntro;     /// Game intro
 
 	/// Show level intro
 extern void ShowIntro(const Intro *intro);
-	/// Show picture
-extern void ShowPicture(CampaignChapter *chapter);
 	/// Show stats
 extern void ShowStats();
 	/// Register CCL functions for objectives

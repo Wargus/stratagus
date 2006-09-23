@@ -311,7 +311,6 @@ void SaveGame(const char *filename)
 	SaveGroups(&file);
 	SaveMissiles(&file);
 	SaveTriggers(&file);
-	SaveCampaign(&file);
 	SaveObjectives(&file);
 	SaveReplayList(&file);
 	// FIXME: find all state information which must be saved.

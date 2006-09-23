@@ -713,7 +713,7 @@ void StartReplay(const char *filename, bool reveal)
 		delete[] GameIntro.Objectives[i];
 		GameIntro.Objectives[i] = NULL;
 	}
-	GameIntro.Objectives[0] = new_strdup(DefaultObjective);
+	//GameIntro.Objectives[0] = new_strdup(DefaultObjective);
 
 	ReplayRevealMap = reveal;
 

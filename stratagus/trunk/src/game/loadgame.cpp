@@ -90,7 +90,6 @@ void CleanModules(void)
 #endif
 	CleanUserInterface();
 	CleanFonts();
-	CleanCampaign();
 	CleanTriggers();
 	CleanAi();
 	CleanPlayers();
