@@ -10,7 +10,7 @@
 //
 /**@name script.cpp - The configuration language. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
+//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -722,27 +722,6 @@ StringDesc *NewStringDesc(const char *s)
 }
 
 /**
-**  Convert the string in the gameinfo enum number.
-**
-**  @param s  string to convert to enum number.
-**
-**  @return   the enum number.
-*/
-static ES_GameInfo StringToGameInfo(const char *s)
-{
-	int i;
-	const char *sgameinfo[] = {"Objectives", NULL};
-
-	for (i = 0; sgameinfo[i]; ++i) {
-		if (!strcmp(s, sgameinfo[i])) {
-			return (ES_GameInfo)i;
-		}
-	}
-	Assert(0);
-	return (ES_GameInfo)-1; // Error.
-}
-
-/**
 **  Return String description.
 **
 **  @param l  lua state.
@@ -843,16 +822,6 @@ StringDesc *CclParseStringDesc(lua_State *l)
 					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
 				}
 				lua_pop(l, 1); // font name.
-			}
-			lua_pop(l, 1); // table.
-		} else if (!strcmp(key, "GameInfo")) {
-			res->e = EString_GameInfo;
-			if (!lua_isstring(l, -1)) {
-				LuaError(l, "Bad type of arg in GameInfo\n");
-			}
-			res->D.GameInfoType = StringToGameInfo(LuaToString(l, -1));
-			if ((int) res->D.GameInfoType == -1) {
-				LuaError(l, "argument '%s' in GameInfo is not valid.\n" _C_ LuaToString(l, -1));
 			}
 			lua_pop(l, 1); // table.
 		} else {
@@ -1125,24 +1094,6 @@ char *EvalString(const StringDesc *s)
 				}
 				return res;
 			}
-		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
-			switch (s->D.GameInfoType) {
-				case ES_GameInfo_Objectives :
-					res = GameIntro.Objectives[0];
-					if (!res) {
-						str = new char[1];
-						str[0] = '\0';
-						return str;
-					}
-					res = new_strdup(res);
-					for (i = 1; GameIntro.Objectives[i]; ++i) {
-						tmp1 = strdcat(res, "\n");
-						delete[] res;
-						res = strdcat(tmp1, GameIntro.Objectives[i]);
-						delete[] tmp1;
-					}
-					return res;
-			}
 	}
 	return NULL;
 }
@@ -1275,8 +1226,6 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Line.Line;
 			FreeNumberDesc(s->D.Line.MaxLen);
 			delete s->D.Line.MaxLen;
-			break;
-		case EString_GameInfo : // Some info of the game (tips, objectives, ...).
 			break;
 	}
 }
@@ -2580,7 +2529,6 @@ void InitCcl(void)
 	UserInterfaceCclRegister();
 	AiCclRegister();
 	TriggerCclRegister();
-	ObjectivesCclRegister();
 	SpellCclRegister();
 
 	EditorCclRegister();

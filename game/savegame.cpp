@@ -311,7 +311,6 @@ void SaveGame(const char *filename)
 	SaveGroups(&file);
 	SaveMissiles(&file);
 	SaveTriggers(&file);
-	SaveObjectives(&file);
 	SaveReplayList(&file);
 	// FIXME: find all state information which must be saved.
 	s = SaveGlobal(Lua, true);
