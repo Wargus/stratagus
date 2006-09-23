@@ -52,7 +52,6 @@
 #include "font.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "menus.h"
 #include "depend.h"
 #include "interface.h"
 #include "cursor.h"
