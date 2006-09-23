@@ -2579,7 +2579,6 @@ void InitCcl(void)
 	SoundCclRegister();
 	UserInterfaceCclRegister();
 	AiCclRegister();
-	CampaignCclRegister();
 	TriggerCclRegister();
 	ObjectivesCclRegister();
 	SpellCclRegister();
