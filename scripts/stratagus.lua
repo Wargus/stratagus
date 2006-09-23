@@ -45,9 +45,6 @@ SetTitleScreens(
 --	Set the game name
 SetGameName("bos")
 
---	set the default map file.
-SetDefaultMap="maps/default.smp"
-
 -------------------------------------------------------------------------------
 --	Music play list -	Insert your titles here
 -------------------------------------------------------------------------------
