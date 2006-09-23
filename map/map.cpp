@@ -10,8 +10,8 @@
 //
 /**@name map.cpp - The map. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Vladi Shabanski and
-//                                 François Beerten
+//      (c) Copyright 1998-2006 by Lutz Sammer, Vladi Shabanski and
+//                                 Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ CMap Map;                        /// The current map
 int FlagRevealMap;               /// Flag must reveal the map
 int ReplayRevealMap;             /// Reveal Map is replay
 int ForestRegeneration;          /// Forest regeneration
+char CurrentMapPath[1024];       /// Path of the current map
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling

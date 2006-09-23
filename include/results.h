@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name campaign.cpp - The campaign control. */
+/**@name result.h - The game results headerfile. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2006 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,29 +26,28 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
+//      $Id: results.h 7561 2006-09-23 21:23:56Z feber $
+
+#ifndef __RESULTS_H__
+#define __RESULTS_H__
 
 //@{
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "stratagus.h"
-#include "script.h"
-#include "unittype.h"
-#include "map.h"
-#include "campaign.h"
-#include "settings.h"
-#include "iolib.h"
-#include "font.h"
-#include "video.h"
-#include "movie.h"
+/**
+**  Possible outcomes of the game.
+*/
+typedef enum GameResults {
+	GameNoResult,  /// Game has no result
+	GameVictory,   /// Game was won
+	GameDefeat,    /// Game was lost
+	GameDraw,      /// Game was draw
+	GameQuitToMenu,/// Quit to menu
+	GameRestart,   /// Restart game
+};                 /// Game results
 
 
-GameResults GameResult;                      /// Outcome of the game
-char CurrentMapPath[1024];                   /// Path of the current map
-
-
+extern GameResults GameResult;   /// Outcome of the game
 
 //@}
+
+#endif

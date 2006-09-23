@@ -518,7 +518,8 @@ void StartReplay(const char *str, bool reveal = false);
 $void StartSavedGame(const char *str);
 void StartSavedGame(const char *str);
 
-$#include "campaign.h"
+$#include "results.h"
+#include "results.h"
 typedef enum {
 	GameNoResult,
 	GameVictory,
