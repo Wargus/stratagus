@@ -723,7 +723,7 @@ static int CclReplayLog(lua_State *l)
 */
 bool IsReplayGame()
 {
-	return CurrentReplay != NULL;
+	return ReplayGameType != ReplayNone;
 }
 
 /**
