@@ -74,7 +74,7 @@ function RunCampaign(campaign)
   if position == nil then
     position = 1
   end
-  while position < 10 do
+  while position <= table.getn(campaign_steps) do
     campaign_steps[position]()
     if GameResult == GameVictory then
        position = position + 1
