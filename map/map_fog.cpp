@@ -286,9 +286,8 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 	int cycle;
 	int p;
 
-	// Mark as seen
+	// Units under construction have no sight range.
 	if (!range) {
-		DebugPrint("Zero sight range\n");
 		return;
 	}
 
