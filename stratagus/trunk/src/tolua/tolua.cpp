@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Sep 23 23:38:39 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Sep 24 11:40:58 2006.
 */
 
 #ifndef __cplusplus
@@ -31,17 +31,18 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 using std::string;
 using std::vector;
 using namespace gcn;
-void StartMap(const char *str, bool clean = true);
-void StartReplay(const char *str, bool reveal = false);
-void StartSavedGame(const char *str);
-#include "results.h"
-void StopGame(GameResults result);
 void InitNetwork1(void);
 void ExitNetwork1(void);
 int GetNetworkState() {return (int)NetLocalState;}
 extern char NetworkMapName[1024];
 void NetworkGamePrepareGameSettings(void);
 #include "editor.h"
+bool ReplayingGame();
+void StartMap(const char *str, bool clean = true);
+void StartReplay(const char *str, bool reveal = false);
+void StartSavedGame(const char *str);
+#include "results.h"
+void StopGame(GameResults result);
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -10297,146 +10298,6 @@ static int tolua_stratagus_CMenuScreen_addLogicCallback00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: StartMap */
-#ifndef TOLUA_DISABLE_tolua_stratagus_StartMap00
-static int tolua_stratagus_StartMap00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
- !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
-  bool clean = ((bool)  tolua_toboolean(tolua_S,2,true));
- {
-  StartMap(str,clean);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'StartMap'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: StartReplay */
-#ifndef TOLUA_DISABLE_tolua_stratagus_StartReplay00
-static int tolua_stratagus_StartReplay00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
- !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
-  bool reveal = ((bool)  tolua_toboolean(tolua_S,2,false));
- {
-  StartReplay(str,reveal);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'StartReplay'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: StartSavedGame */
-#ifndef TOLUA_DISABLE_tolua_stratagus_StartSavedGame00
-static int tolua_stratagus_StartSavedGame00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
- {
-  StartSavedGame(str);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'StartSavedGame'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: GameResult */
-#ifndef TOLUA_DISABLE_tolua_get_GameResult
-static int tolua_get_GameResult(lua_State* tolua_S)
-{
- tolua_pushnumber(tolua_S,(lua_Number)GameResult);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: GameResult */
-#ifndef TOLUA_DISABLE_tolua_set_GameResult
-static int tolua_set_GameResult(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  GameResult = ((GameResults) (int)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: StopGame */
-#ifndef TOLUA_DISABLE_tolua_stratagus_StopGame00
-static int tolua_stratagus_StopGame00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  GameResults result = ((GameResults) (int)  tolua_tonumber(tolua_S,1,0));
- {
-  StopGame(result);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'StopGame'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* function: InitNetwork1 */
 #ifndef TOLUA_DISABLE_tolua_stratagus_InitNetwork100
 static int tolua_stratagus_InitNetwork100(lua_State* tolua_S)
@@ -14288,6 +14149,173 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: ReplayingGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ReplayingGame00
+static int tolua_stratagus_ReplayingGame00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  bool tolua_ret = (bool)  ReplayingGame();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ReplayingGame'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StartMap */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StartMap00
+static int tolua_stratagus_StartMap00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+  bool clean = ((bool)  tolua_toboolean(tolua_S,2,true));
+ {
+  StartMap(str,clean);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StartMap'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StartReplay */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StartReplay00
+static int tolua_stratagus_StartReplay00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+  bool reveal = ((bool)  tolua_toboolean(tolua_S,2,false));
+ {
+  StartReplay(str,reveal);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StartReplay'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StartSavedGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StartSavedGame00
+static int tolua_stratagus_StartSavedGame00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+ {
+  StartSavedGame(str);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StartSavedGame'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: GameResult */
+#ifndef TOLUA_DISABLE_tolua_get_GameResult
+static int tolua_get_GameResult(lua_State* tolua_S)
+{
+ tolua_pushnumber(tolua_S,(lua_Number)GameResult);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameResult */
+#ifndef TOLUA_DISABLE_tolua_set_GameResult
+static int tolua_set_GameResult(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  GameResult = ((GameResults) (int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StopGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StopGame00
+static int tolua_stratagus_StopGame00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  GameResults result = ((GameResults) (int)  tolua_tonumber(tolua_S,1,0));
+ {
+  StopGame(result);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StopGame'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Translate */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Translate00
 static int tolua_stratagus_Translate00(lua_State* tolua_S)
@@ -15276,17 +15304,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   lua_settop(tolua_S, top);
  } /* end of embedded lua code */
 
- tolua_function(tolua_S,"StartMap",tolua_stratagus_StartMap00);
- tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);
- tolua_function(tolua_S,"StartSavedGame",tolua_stratagus_StartSavedGame00);
- tolua_constant(tolua_S,"GameNoResult",GameNoResult);
- tolua_constant(tolua_S,"GameVictory",GameVictory);
- tolua_constant(tolua_S,"GameDefeat",GameDefeat);
- tolua_constant(tolua_S,"GameDraw",GameDraw);
- tolua_constant(tolua_S,"GameQuitToMenu",GameQuitToMenu);
- tolua_constant(tolua_S,"GameRestart",GameRestart);
- tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
- tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
  tolua_function(tolua_S,"InitNetwork1",tolua_stratagus_InitNetwork100);
  tolua_function(tolua_S,"ExitNetwork1",tolua_stratagus_ExitNetwork100);
  tolua_function(tolua_S,"NetworkSetupServerAddress",tolua_stratagus_NetworkSetupServerAddress00);
@@ -15476,6 +15493,18 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"Editor",tolua_get_Editor,tolua_set_Editor);
  tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
  tolua_function(tolua_S,"EditorSaveMap",tolua_stratagus_EditorSaveMap00);
+ tolua_function(tolua_S,"ReplayingGame",tolua_stratagus_ReplayingGame00);
+ tolua_function(tolua_S,"StartMap",tolua_stratagus_StartMap00);
+ tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);
+ tolua_function(tolua_S,"StartSavedGame",tolua_stratagus_StartSavedGame00);
+ tolua_constant(tolua_S,"GameNoResult",GameNoResult);
+ tolua_constant(tolua_S,"GameVictory",GameVictory);
+ tolua_constant(tolua_S,"GameDefeat",GameDefeat);
+ tolua_constant(tolua_S,"GameDraw",GameDraw);
+ tolua_constant(tolua_S,"GameQuitToMenu",GameQuitToMenu);
+ tolua_constant(tolua_S,"GameRestart",GameRestart);
+ tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
+ tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
  tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
  tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
  tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
