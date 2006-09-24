@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Sep 24 11:40:58 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Sep 24 11:52:55 2006.
 */
 
 #ifndef __cplusplus
@@ -31,13 +31,12 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 using std::string;
 using std::vector;
 using namespace gcn;
-void InitNetwork1(void);
-void ExitNetwork1(void);
+#include "network.h"
 int GetNetworkState() {return (int)NetLocalState;}
 extern char NetworkMapName[1024];
 void NetworkGamePrepareGameSettings(void);
 #include "editor.h"
-bool ReplayingGame();
+bool IsReplayGame();
 void StartMap(const char *str, bool clean = true);
 void StartReplay(const char *str, bool reveal = false);
 void StartSavedGame(const char *str);
@@ -10350,6 +10349,33 @@ static int tolua_stratagus_ExitNetwork100(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: IsNetworkGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_IsNetworkGame00
+static int tolua_stratagus_IsNetworkGame00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  bool tolua_ret = (bool)  IsNetworkGame();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsNetworkGame'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: NetworkSetupServerAddress */
 #ifndef TOLUA_DISABLE_tolua_stratagus_NetworkSetupServerAddress00
 static int tolua_stratagus_NetworkSetupServerAddress00(lua_State* tolua_S)
@@ -14149,9 +14175,9 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: ReplayingGame */
-#ifndef TOLUA_DISABLE_tolua_stratagus_ReplayingGame00
-static int tolua_stratagus_ReplayingGame00(lua_State* tolua_S)
+/* function: IsReplayGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_IsReplayGame00
+static int tolua_stratagus_IsReplayGame00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -14163,14 +14189,14 @@ static int tolua_stratagus_ReplayingGame00(lua_State* tolua_S)
 #endif
  {
  {
-  bool tolua_ret = (bool)  ReplayingGame();
+  bool tolua_ret = (bool)  IsReplayGame();
  tolua_pushboolean(tolua_S,(bool)tolua_ret);
  }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'ReplayingGame'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'IsReplayGame'.",&tolua_err);
  return 0;
 #endif
 }
@@ -15306,6 +15332,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 
  tolua_function(tolua_S,"InitNetwork1",tolua_stratagus_InitNetwork100);
  tolua_function(tolua_S,"ExitNetwork1",tolua_stratagus_ExitNetwork100);
+ tolua_function(tolua_S,"IsNetworkGame",tolua_stratagus_IsNetworkGame00);
  tolua_function(tolua_S,"NetworkSetupServerAddress",tolua_stratagus_NetworkSetupServerAddress00);
  tolua_function(tolua_S,"NetworkInitClientConnect",tolua_stratagus_NetworkInitClientConnect00);
  tolua_function(tolua_S,"NetworkInitServerConnect",tolua_stratagus_NetworkInitServerConnect00);
@@ -15493,7 +15520,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"Editor",tolua_get_Editor,tolua_set_Editor);
  tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
  tolua_function(tolua_S,"EditorSaveMap",tolua_stratagus_EditorSaveMap00);
- tolua_function(tolua_S,"ReplayingGame",tolua_stratagus_ReplayingGame00);
+ tolua_function(tolua_S,"IsReplayGame",tolua_stratagus_IsReplayGame00);
  tolua_function(tolua_S,"StartMap",tolua_stratagus_StartMap00);
  tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);
  tolua_function(tolua_S,"StartSavedGame",tolua_stratagus_StartSavedGame00);
