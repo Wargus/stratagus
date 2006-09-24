@@ -71,7 +71,7 @@ function RunEditorSaveMenu()
   end
   browser:setActionCallback(cb)
 
-  menu:addSmallButton(_("Save"), 16, 248,
+  menu:addSmallButton(_("Save"), 0, 16, 248,
     -- FIXME: use a confirm menu if the file exists already
     function()
       print(t:getText())
@@ -80,7 +80,7 @@ function RunEditorSaveMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
+  menu:addSmallButton(_("Cancel"), 0, 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -110,14 +110,14 @@ function RunEditorMapPropertiesMenu()
   sizeLabel:setFont(Fonts["game"])
   menu:add(sizeLabel, 288 - ((288 - 260) / 2) - 152, 11 + (36 * 2) + 22)
 
-  menu:addSmallButton(_("~!OK"), (288 - (106 * 2)) / 4, 256 - 11 - 27,
+  menu:addSmallButton(_("~!OK"), "o", (288 - (106 * 2)) / 4, 256 - 11 - 27,
     function()
       -- FIXME: save new properties
       menu:stop()
     end
   )
 
-  menu:addSmallButton(_("~!Cancel"), (288 - (288 - (106 * 2)) / 4) - 106, 256 - 11 - 27,
+  menu:addSmallButton(_("~!Cancel"), "c", (288 - (288 - (106 * 2)) / 4) - 106, 256 - 11 - 27,
     function()
       menu:stop()
     end
@@ -134,7 +134,7 @@ function RunEditorPlayerPropertiesMenu()
 
   menu:addLabel(_("Player Properties"), 640 / 2, 11)
 
-  menu:addSmallButton(_("OK"), 455, 440, function() menu:stop() end)
+  menu:addSmallButton(_("OK"), 0, 455, 440, function() menu:stop() end)
 
   for i=0,15 do
     local l = Label(tostring(i))
