@@ -49,6 +49,24 @@ function int2bool(int)
   end
 end
 
+function ErrorMenu(errmsg)
+  local menu
+
+  menu = BosMenu(_("Error"))
+
+  local l = MultiLineLabel(errmsg)
+  l:setFont(Fonts["large"])
+  l:setAlignment(MultiLineLabel.CENTER)
+  l:setVerticalAlignment(MultiLineLabel.CENTER)
+  l:setLineWidth(340)
+  l:setWidth(340)
+  l:setHeight(200)
+  l:setBackgroundColor(dark)
+  menu:add(l, Video.Width / 2 - 170, Video.Height / 2 - 100)
+
+  menu:run()
+end
+
 function addPlayersList(menu, numplayers)
   local i
   local players_name = {}
@@ -112,11 +130,13 @@ function RunJoiningMapMenu(s)
   menu:writeText(_("Description:"), sx, sy*3+70)
   descr = menu:writeText(description, sx+20, sy*3+90)
 
+  -- FIXME: only the server can set these settings
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
   fow:setMarked(true)
   ServerSetupState.FogOfWar = 1
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, function() end)
   
+  -- FIXME: only the server can set these settings
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
     function(dd) difficulty = (5 - dd:getSelected()*2) end)
@@ -151,10 +171,11 @@ function RunJoiningMapMenu(s)
     fow:setMarked(int2bool(ServerSetupState.FogOfWar))
     revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
     updatePlayersList()
-    if GetNetworkState() == 15  then
+    -- FIXME: don't use numbers
+    if (GetNetworkState() == 15) then -- server started the game
       SetThisPlayer(1)
       joincounter = joincounter + 1
-      if joincounter == 30 then
+      if (joincounter == 30) then
         SetFogOfWar(fow:isMarked())
         if revealmap:isMarked() == true then
           RevealMap()
@@ -176,6 +197,8 @@ function RunJoiningGameMenu(s)
   local server
   local x = Video.Width/2 - 100
   local listener
+  local state
+  local percent = 0
 
   menu = BosMenu(_("Joining game"))
 
@@ -187,11 +210,17 @@ function RunJoiningGameMenu(s)
 
   local function checkconnection() 
     NetworkProcessClientRequest()
-    sb:setPercent(sb:getPercent() + 1) 
-    if GetNetworkState() == 3 then
+    percent = percent + 100 / (24 * GetGameSpeed()) -- 24 seconds * fps
+    sb:setPercent(percent)
+    state = GetNetworkState()
+    -- FIXME: do not use numbers
+    if (state == 3) then -- ccs_mapinfo
       -- got ICMMap => load map
       RunJoiningMapMenu()
       menu:stop()
+    elseif (state == 10) then -- ccs_unreachable
+      ErrorMenu(_("Cannot reach server"))
+      menu:stop(1)
     end
   end
   listener = LuaActionListener(checkconnection)
@@ -209,9 +238,16 @@ function RunJoinIpMenu()
   server = menu:addTextInputField("localhost", x + 90, Video.Height*9/20 + 4)
   menu:addButton(_("~!Join Game"), "j", x,  Video.Height*10/20, 
     function(s) 
-      NetworkSetupServerAddress(server:getText()) 
+      -- FIXME: allow port ("localhost:1234")
+      if (NetworkSetupServerAddress(server:getText()) ~= 0) then
+        ErrorMenu(_("Invalid server name"))
+        return
+      end
       NetworkInitClientConnect() 
-      RunJoiningGameMenu()
+      if (RunJoiningGameMenu() ~= 0) then
+        -- connect failed, don't leave this menu
+        return
+      end
       menu:stop() 
     end
   )
