@@ -511,23 +511,3 @@ function MenuScreen()
 end
 $]
 
-$void StartMap(const char *str, bool clean = true);
-void StartMap(const char *str, bool clean = true);
-$void StartReplay(const char *str, bool reveal = false);
-void StartReplay(const char *str, bool reveal = false);
-$void StartSavedGame(const char *str);
-void StartSavedGame(const char *str);
-
-$#include "results.h"
-#include "results.h"
-typedef enum {
-	GameNoResult,
-	GameVictory,
-	GameDefeat,
-	GameDraw,
-	GameQuitToMenu,
-	GameRestart,
-} GameResults; 
-GameResults GameResult;
-$void StopGame(GameResults result);
-void StopGame(GameResults result);
