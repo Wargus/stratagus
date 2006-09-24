@@ -45,7 +45,7 @@ function BosGameMenu()
     return self:addButtonOrig(caption, hotkey, x, y, callback, {224, 28})
   end
   function menu:addSmallButton(caption, hotkey, x, y, callback)
-    return self:addButtonOrig(caption, hotkey, x, y, callback, {106, 28})
+    return self:addButtonOrig(caption, hotkey, x, y, callback, {100, 24})
   end
 
   return menu
@@ -119,6 +119,12 @@ function RunLoadMenu()
     function() menu:stop() end)
 
   menu:run(false)
+end
+
+function  RunGameSoundOptionsMenu()
+  local menu = BosGameMenu()
+  
+  AddSoundOptions(menu, 0, 0, 128 - 224/2, 280)
 end
 
 function RunGameOptionsMenu()

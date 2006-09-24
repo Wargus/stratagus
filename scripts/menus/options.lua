@@ -72,13 +72,8 @@ function RunSpeedOptionsMenu(s)
   menu:run()
 end
 
-function RunSoundOptionsMenu(s)
-  local menu
+function AddSoundOptions(menu, offx, offy, centerx, bottom)
   local b
-  local offx = (Video.Width - 352) / 2
-  local offy = (Video.Height - 352) / 2
-
-  menu = BosMenu(_("Sound Options"))
 
   b = Label(_("Effects Volume"))
   b:setFont(CFont:Get("game"))
@@ -107,16 +102,15 @@ function RunSoundOptionsMenu(s)
   menu:addCentered(b, offx + 218, offy + 36 * 2 + 6)
 
   local effectscheckbox = {}
-  effectscheckbox = menu:addCheckBox(_("Enabled"), offx + 240, offy + 36 * 1.5,
+  effectscheckbox = menu:addCheckBox(_("Enabled"), offx + 32, offy + 36 * 3,
     function() SetEffectsEnabled(effectscheckbox:isMarked()) end)
-  effectscheckbox:setFont(CFont:Get("large"))
   effectscheckbox:setMarked(IsEffectsEnabled())
   effectscheckbox:adjustSize();
 
   b = Label(_("Music Volume"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:add(b, offx + 16, offy + 36 * 3)
+  menu:add(b, offx + 16, offy + 36 * 4)
 
   -- FIXME: disable if music turned off
   local musicslider = Slider(0, 255)
@@ -127,26 +121,25 @@ function RunSoundOptionsMenu(s)
   musicslider:setBaseColor(dark)
   musicslider:setForegroundColor(clear)
   musicslider:setBackgroundColor(clear)
-  menu:add(musicslider, offx + 32, offy + 36 * 3.5)
+  menu:add(musicslider, offx + 32, offy + 36 * 4.5)
 
   b = Label(_("min"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 44, offy + 36 * 4 + 6)
+  menu:addCentered(b, offx + 44, offy + 36 * 5 + 6)
   
   b = Label(_("max"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 218, offy + 36 * 4 + 6)
+  menu:addCentered(b, offx + 218, offy + 36 * 5 + 6)
 
   local musiccheckbox = {}
-  musiccheckbox = menu:addCheckBox(_("Enabled"), offx + 240, offy + 36 * 3.5,
+  musiccheckbox = menu:addCheckBox(_("Enabled"), offx + 32, offy + 36 * 6,
     function() SetMusicEnabled(musiccheckbox:isMarked()) end)
-  musiccheckbox:setFont(CFont:Get("large"))
   musiccheckbox:setMarked(IsMusicEnabled())
   musiccheckbox:adjustSize();
 
-  menu:addButton(_("~!OK"), "o", offx + 176 - (200 / 2), offy + 352 - 11 - 27,
+  b = menu:addButton(_("~!OK"), "o", centerx, bottom - 11 - 27,
     function()
       preferences.EffectsVolume = GetEffectsVolume()
       preferences.EffectsEnabled = IsEffectsEnabled()
@@ -157,6 +150,17 @@ function RunSoundOptionsMenu(s)
     end)
 
   menu:run()
+end
+
+function RunSoundOptionsMenu(s)
+  local menu
+  local b
+  local offx = (Video.Width - 260) / 2
+  local offy = (Video.Height - 352) / 2
+
+  menu = BosMenu(_("Sound Options"))
+
+  AddSoundOptions(menu, offx, offy, offx + 130 - 200/2, offy + 352)
 end
 
 function SetVideoSize(width, height)
