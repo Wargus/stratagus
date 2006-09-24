@@ -58,6 +58,7 @@ $pfile "unittype.pkg"
 $pfile "unit.pkg"
 $pfile "sound.pkg"
 $pfile "editor.pkg"
+$pfile "game.pkg"
 
 extern const char *Translate(const char *str);
 extern void AddTranslation(const char *str1, const char *str2);
