@@ -2,6 +2,13 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 Development version:
+- New Briefing screens (Francois Beerten)
+- New in-game menus (Jimmy Salmon, Francois Beerten)
+- Added translations (todo list authors)
+- New Victory and Defeat screens (TimberDragon, Francois Beerten)
+- New Multiplayer menus (Francois Beerten)
+- New background images (TimberDragon, p0ng)
+- Added completly new guichan based menus (Francois Beerten, Jimmy Salmon)
 - Added New Button Format (TimberDragon)
 - Added Nuclear Power Plant (TimberDragon, p0ng)
 - Added new building corpses (TimberDragon)
