@@ -1,5 +1,5 @@
-$bool ReplayingGame();
-bool ReplayingGame();
+$bool IsReplayGame();
+bool IsReplayGame();
 
 
 $void StartMap(const char *str, bool clean = true);
