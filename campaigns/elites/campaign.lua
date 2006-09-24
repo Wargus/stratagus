@@ -44,9 +44,6 @@ local briefingtext02 =
    "and in fact their presence offers you a strategic advantage. If you should " ..
    "so, choose to first capture the mercenary vault, you will have the resources " ..
    "to complete your quest easily. "
-local briefingtextcoming =
-   "This is level 3" ..
-   "Text coming!"
 
 campaign_steps = {
   CreateMapStep("campaigns/elites/level01.smp",
@@ -55,13 +52,21 @@ campaign_steps = {
   CreateMapStep("campaigns/elites/level02.smp", 
       "Gain an ally and drive the enemy out. Kill all enemy units", 
       briefingtext02),
-  CreateMapStep("campaigns/elites/level03.smp", _("Kill them all !"), briefingtextcoming),
-  CreateMapStep("campaigns/elites/level04.smp", _("Kill them all !"), briefingtextcoming),
-  CreateMapStep("campaigns/elites/level05.smp", _("Kill them all !"), briefingtextcoming),
-  CreateMapStep("campaigns/elites/level06.smp", _("Kill them all !"), briefingtextcoming),
-  CreateMapStep("campaigns/elites/level07.smp", _("Kill them all !"), briefingtextcoming),
-  CreateMapStep("campaigns/elites/level08.smp", _("Kill them all !"), briefingtextcoming),
-  CreateMapStep("campaigns/elites/level09.smp", _("Kill them all !"), briefingtextcoming),
-  CreateMapStep("campaigns/elites/level10.smp", _("Kill them all !"), briefingtextcoming)
+  CreateMapStep("campaigns/elites/level03.smp", _("Kill them all !"), 
+      "Level 3"),
+  CreateMapStep("campaigns/elites/level04.smp", _("Kill them all !"), 
+      "Level 4"),
+  CreateMapStep("campaigns/elites/level05.smp", _("Kill them all !"), 
+      "Level 5"),
+  CreateMapStep("campaigns/elites/level06.smp", _("Kill them all !"), 
+      "Level 6"),
+  CreateMapStep("campaigns/elites/level07.smp", _("Kill them all !"), 
+      "Level 7"),
+  CreateMapStep("campaigns/elites/level08.smp", _("Kill them all !"), 
+      "Level 8"),
+  CreateMapStep("campaigns/elites/level09.smp", _("Kill them all !"), 
+      "Level 9"),
+  CreateMapStep("campaigns/elites/level10.smp", _("Kill them all !"), 
+      "Level 10")
 }
 
