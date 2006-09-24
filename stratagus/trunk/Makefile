@@ -197,7 +197,7 @@ dist: distlist
 	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-src.tar.gz $(distdir)
-	echo "(c) 2005 The Stratagus Project" | \
+	echo "(c) 2006 The Stratagus Project" | \
 	zip -zq9r $(distdir)-src.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
