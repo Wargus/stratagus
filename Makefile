@@ -42,9 +42,7 @@ MODULES = src/action src/ai src/beos src/editor src/game \
           src/sound src/stratagus src/tolua src/ui src/unit \
           src/video
 
-MODULES_METASERVER = src/metaserver
-
-MODULES_ALL = $(MODULES) $(MODULES_METASERVER)
+MODULES_ALL = $(MODULES)
 
 MISC :=
 
@@ -56,12 +54,7 @@ include $(patsubst %, %/Module.make, $(MODULES))
 OBJ := $(patsubst %.cpp, %.o, $(SRC))
 OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 
-METASERVER_SRC := src/network/lowlevel.cpp
-include src/metaserver/Module.make
-METASERVER_OBJ := $(patsubst %.cpp, %.o, $(METASERVER_SRC))
-METASERVER_OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(METASERVER_OBJ))),$(notdir $(METASERVER_OBJ)))
-
-SRC_ALL = $(SRC) $(METASERVER_SRC)
+SRC_ALL = $(SRC)
 OBJ_ALL = $(OBJ)
 
 .SUFFIXES: .cpp .o
@@ -108,12 +101,6 @@ stratagus: $(OBJ)
 strip:
 	@if [ -f stratagus ]; then strip stratagus; fi
 	@if [ -f stratagus.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip stratagus.exe; fi
-
-src/metaserver/$(OBJDIR):
-	mkdir $@
-
-metaserver: src/metaserver/$(OBJDIR) $(METASERVER_OBJ)
-	$(CXX) -o $@ $(METASERVER_OBJ) $(STRATAGUS_LIBS) -lsqlite3
 
 src/$(OBJDIR)/stratagusrc.o: src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
@@ -170,7 +157,7 @@ PICS    = contrib/stratagus.ico contrib/poweredby.png
 
 MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  Rules.make.in configure.in configure config.h.in Makefile \
-	  src/stratagus.rc stratagus.dsw stratagus.dsp metaserver.dsp \
+	  src/stratagus.rc stratagus.sln stratagus.vcproj \
 	  autogen.sh SConstruct src/tolua/*.pkg \
 	  $(patsubst %, %/Module.make, $(MODULES_ALL)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
