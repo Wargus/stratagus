@@ -49,6 +49,7 @@
 #include "netconnect.h"
 #include "interface.h"
 #include "menus.h"
+#include "settings.h"
 
 
 //----------------------------------------------------------------------------
@@ -408,6 +409,14 @@ void NetworkServerStartGame(void)
 		}
 	}
 
+	// Calculate NetPlayers
+	NetPlayers = h;
+	for (i = 1; i < h; ++i) {
+		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
+			NetPlayers--;
+		}
+	}
+
 	// Compact host list.. (account for computer/closed slots in the middle..)
 	for (i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0) {
@@ -624,6 +633,91 @@ breakout:
 		DebugPrint("Sending InitReply Message Go: (%d) to %d.%d.%d.%d:%d\n" _C_
 			n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
 	}
+}
+
+/**
+** Multiplayer network game final race an player type setup.
+*/
+void NetworkGamePrepareGameSettings(void)
+{
+	int c;
+	int h;
+	int i;
+	int num[PlayerMax];
+	int comp[PlayerMax];
+	int v;
+
+	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
+
+	GameSettings.NetGameType = SettingsMultiPlayerGame;
+
+#ifdef DEBUG
+	for (i = 0; i < PlayerMax-1; i++) {
+		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
+		if (ServerSetupState.CompOpt[i] == 0) {
+			for (h = 0; h < NetPlayers; h++) {
+				if (Hosts[h].PlyNr == i) {
+					printf("%s", Hosts[h].PlyName);
+				}
+			}
+		}
+		printf("\n");
+	}
+#endif
+
+	// Make a list of the available player slots.
+	for (c = h = i = 0; i < PlayerMax; i++) {
+		if (Map.Info.PlayerType[i] == PlayerPerson) {
+			num[h++] = i;
+		}
+		if (Map.Info.PlayerType[i] == PlayerComputer) {
+			comp[c++] = i; // available computer player slots
+		}
+	}
+	for (i = 0; i < h; i++) {
+		switch(ServerSetupState.CompOpt[num[i]]) {
+			case 0:
+				GameSettings.Presets[num[i]].Type = PlayerPerson;
+				v = ServerSetupState.Race[num[i]];
+				if (v != 0) {
+					int n;
+					int x;
+
+					for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
+						if (PlayerRaces.Visible[n]) {
+							if (x + 1 == v) {
+								break;
+							}
+							++x;
+						}
+					}
+					GameSettings.Presets[num[i]].Race = x;
+				} else {
+					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
+				}
+				break;
+			case 1:
+				GameSettings.Presets[num[i]].Type = PlayerComputer;
+				break;
+			case 2:
+				GameSettings.Presets[num[i]].Type = PlayerNobody;
+			default:
+				break;
+		}
+	}
+	for (i = 0; i < c; i++) {
+		if (ServerSetupState.CompOpt[comp[i]] == 2) { // closed..
+			GameSettings.Presets[comp[i]].Type = PlayerNobody;
+			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
+		}
+	}
+
+#ifdef DEBUG
+	for (i = 0; i < NetPlayers; i++) {
+		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
+		;
+	}
+#endif
 }
 
 /**

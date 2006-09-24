@@ -202,6 +202,7 @@ extern ServerSetup LocalSetupState;        /// Network menu: Multiplayer Client 
 ----------------------------------------------------------------------------*/
 
 extern void NetworkServerStartGame(void);   /// Server user has finally hit the start game button
+extern void NetworkGamePrepareGameSettings(void);
 extern void NetworkConnectSetupGame(void);  /// Assign Player slot, evaluate Setup state..
 
 extern void NetworkInitClientConnect(void);  /// Setup network connect state machine for clients
