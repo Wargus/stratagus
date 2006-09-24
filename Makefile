@@ -120,7 +120,7 @@ src/$(OBJDIR)/stratagusrc.o: src/stratagus.rc
 	cd src; windres -o $(OBJDIR)/stratagusrc.o stratagus.rc; cd ..
 
 clean::
-	$(RM) -rf $(dir $(OBJ))
+	$(RM) -rf $(OBJ)
 	for i in $(MODULES_ALL); do \
 	$(RM) -rf $$i/*.doc; done
 	$(RM) core gmon.out cscope.out *.doc 
