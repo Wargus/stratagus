@@ -294,7 +294,7 @@ function RunStartGameMenu(s)
   local players
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local map = "default.smp"
+  local map = "islandwar.smp"
 
   menu = BosMenu(_("Start Game"))
 
