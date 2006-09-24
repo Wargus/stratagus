@@ -34,44 +34,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <limits.h>
-
 #include "stratagus.h"
 
-#include "SDL.h"
-
-#include "iocompat.h"
-
-#include "unittype.h"
-#include "video.h"
-#include "player.h"
-#include "font.h"
-#include "tileset.h"
 #include "map.h"
-#include "minimap.h"
-#include "interface.h"
-#include "menus.h"
-#include "cursor.h"
-#include "iolib.h"
-#include "network.h"
 #include "netconnect.h"
-#include "settings.h"
-#include "ui.h"
-#include "campaign.h"
-#include "sound_server.h"
-#include "sound.h"
-#include "script.h"
-#include "editor.h"
-#include "commands.h"
-#include "actions.h"
-#include "net_lowlevel.h"
-#include "master.h"
-#include "construct.h"
-
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -89,21 +55,9 @@ ServerSetup ServerSetupState;
 ServerSetup LocalSetupState;
 
 static char ScenSelectPath[1024];        /// Scenario selector path
-#if 0
-static char ScenSelectDisplayPath[1024]; /// Displayed selector path
-#endif
 static char ScenSelectFileName[128];     /// Scenario selector name
 
 char MenuMapFullPath[1024];              /// Selected map path+name
-
-#if 0
-/// FIXME: -> ccl...
-static char *mgptsoptions[] = {
-	"Available",
-	"Computer",
-	"Closed",
-};
-#endif
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -264,201 +218,6 @@ static void TerminateNetConnect(void)
 
 #if 0
 /**
-** Multiplayer game start game button pressed.
-*/
-static void MultiGameStart(void)
-{
-	if (MetaServerInUse) {
-		SendMetaCommand("StartGame", "");
-	}
-
-	GameSettings.Presets[0].Race = SettingsPresetMapDefault;
-
-	NetworkServerStartGame();
-	NetworkGamePrepareGameSettings();
-
-	CustomGameStart();
-}
-#endif
-
-#if 0
-/**
-** Enter multiplayer game menu.
-*/
-static void MultiPlayerGameMenu(void)
-{
-	char NameBuf[32];
-	Menu *menu;
-
-	menu = FindMenu("menu-enter-name");
-	menu->Items[1].D.Input.buffer = NameBuf;
-	strcpy(NameBuf, LocalPlayerName);
-	strcat(NameBuf, "~!_");
-	menu->Items[1].D.Input.nch = strlen(NameBuf) - 3;
-	menu->Items[1].D.Input.maxch = 15;
-	menu->Items[2].Flags &= ~MI_FLAGS_DISABLED;
-
-	ProcessMenu("menu-enter-name", 1);
-
-	if (menu->Items[1].D.Input.nch == 0) {
-		return;
-	}
-
-	NameBuf[menu->Items[1].D.Input.nch] = 0; // Now finally here is the name
-	memset(LocalPlayerName, 0, 16);
-	strcpy(LocalPlayerName, NameBuf);
-
-	// FIXME: Only save if player name changed
-	SavePreferences();
-
-	GuiGameStarted = 0;
-	if (!MasterHost) {
-		// No Metaserver Configured - Go right to LAN Game.
-		ProcessMenu("menu-create-join-menu", 1);
-	} else {
-		ProcessMenu("menu-multi-net-type-menu", 1);
-	}
-
-
-	DebugPrint("GuiGameStarted: %d\n" _C_ GuiGameStarted);
-	if (GuiGameStarted) {
-		GameMenuReturn();
-	}
-}
-#endif
-
-#if 0
-/**
-** Process LAN/P2P game menu
-*/
-static void MultiPlayerLANGame(void)
-{
-	ProcessMenu("menu-create-join-menu", 1);
-	MetaServerInUse = 0;
-	if (GuiGameStarted) {
-		GameMenuReturn();
-	}
-}
-#endif
-
-#if 0
-/**
-** Process Internet game menu
-*/
-static void MultiPlayerInternetGame(void)
-{
-	//Connect to Meta Server
-	if (MetaInit() == -1 ) {
-		MetaServerInUse = 0;
-		MetaServerConnectError();
-		return;
-	}
-	MetaServerInUse = 1;
-	ProcessMenu("menu-internet-create-join-menu", 1);
-	if (GuiGameStarted) {
-		GameMenuReturn();
-	}
-}
-#endif
-
-#if 0
-/**
-**  Scenario select map type action callback
-*/
-static void ScenSelectTPMSAction(Menuitem *mi, int i)
-{
-	mi = mi->Menu->Items + 1;
-	ScenSelectLBInit(mi);
-}
-#endif
-
-#if 0
-/**
-** Custom game start game button pressed.
-*/
-static void CustomGameStart(void)
-{
-	int i;
-	char *p;
-
-	if (ScenSelectPath[0]) {
-		strcat(ScenSelectPath, "/");
-		strcat(ScenSelectPath, ScenSelectFileName); // Final map name with path
-		p = ScenSelectPath + strlen(StratagusLibPath) + 1;
-		strcpy(CurrentMapPath, p);
-	} else {
-		strcpy(CurrentMapPath, ScenSelectFileName);
-		strcat(ScenSelectPath, ScenSelectFileName); // Final map name with path
-	}
-
-	for (i = 0; i < MAX_OBJECTIVES; i++) {
-		if (GameIntro.Objectives[i]) {
-			delete[] GameIntro.Objectives[i];
-			GameIntro.Objectives[i] = NULL;
-		}
-	}
-	GameIntro.Objectives[0] = new_strdup(DefaultObjective);
-
-	GuiGameStarted = 1;
-	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
-** Single player custom game menu entered.
-*/
-static void GameSetupInit(Menu *menu)
-{
-	Menu *custom_menu;
-	int n;
-	int j;
-	int t;
-	char *s;
-
-	//
-	//  No old path, setup the default.
-	//
-	if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
-		strcpy(CurrentMapPath, DefaultMap);
-	}
-
-	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
-	strcpy(ScenSelectPath, StratagusLibPath);
-	if (*ScenSelectPath) {
-		strcat(ScenSelectPath, "/");
-	}
-	strcat(ScenSelectPath, CurrentMapPath);
-	if ((s = strrchr(ScenSelectPath, '/'))) {
-		strcpy(ScenSelectFileName, s + 1);
-		*s = '\0';
-	}
-	strcpy(ScenSelectDisplayPath, CurrentMapPath);
-	if ((s = strrchr(ScenSelectDisplayPath, '/'))) {
-		*s = '\0';
-	} else {
-		*ScenSelectDisplayPath = '\0';
-	}
-	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-
-	GetInfoFromSelectPath();
-
-	custom_menu = FindMenu("menu-custom-game");
-	for (n = j = 0; j < PlayerMax; ++j) {
-		t = Map.Info.PlayerType[j];
-		if (t == PlayerPerson || t == PlayerComputer) {
-			++n;
-		}
-	}
-	custom_menu->Items[12].D.Pulldown.noptions = n;
-	if (custom_menu->Items[12].D.Pulldown.curopt >= n) {
-		custom_menu->Items[12].D.Pulldown.curopt = 0;
-	}
-}
-#endif
-
-#if 0
-/**
 **  Menu setup race pulldown action.
 **
 **  @note 0 is default-race.
@@ -604,244 +363,6 @@ static void MultiGameFWSAction(Menuitem *mi, int i)
 
 #if 0
 /**
-** Multiplayer menu player server states.
-*/
-static void MultiGamePTSAction(Menuitem *mi, int o)
-{
-	Menu *menu;
-	int i;
-
-	menu = FindMenu("menu-multi-setup");
-	i = mi - menu->Items - SERVER_PLAYER_STATE;
-	// JOHNS: Must this be always true?
-	// ARI: NO! think of client menus!
-	// Assert(i >= 0 && i <= PlayerMax - 1);
-
-	if (i > 0 && i < PlayerMax-1) {
-		if (mi->D.Pulldown.curopt == o) {
-			if (mi->D.Pulldown.noptions == 2) { // computer slot
-				ServerSetupState.CompOpt[i] = o + 1;
-			} else {
-				ServerSetupState.CompOpt[i] = o;
-			}
-			MultiGamePlayerSelectorsUpdate(3); // Recalc buttons on server
-			NetworkServerResyncClients();
-		}
-	}
-
-}
-#endif
-
-#if 0
-/**
-** Player selectors have changed.
-** Caution: Called by map change (initial = 1)!
-** Caution: Called by network events from clients (initial = 2)!
-** Caution: Called by button action on server (initial = 3)!
-*/
-static void MultiGamePlayerSelectorsUpdate(int initial)
-{
-	Menu *menu;
-	int i;
-	int h;
-	int c;
-	int avail;
-	int ready;
-	int plyrs;
-
-	menu = FindMenu("menu-multi-setup");
-
-	// FIXME: What this has to do:
-	// Use lag gem as KICK button
-	//  Notify clients about MAP change: (initial = 1...)
-
-	// Calculate available slots from map info
-	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (Map.Info.PlayerType[i] == PlayerPerson) {
-			h++; // available interactive player slots
-		}
-		if (Map.Info.PlayerType[i] == PlayerComputer) {
-			c++; // available computer player slots
-		}
-	}
-
-	avail = h;
-	plyrs = 0;
-	// Setup the player menu
-	for (ready = i = 1; i < PlayerMax-1; i++) {
-		if (initial == 1) {
-			if (i < h) {
-				ServerSetupState.CompOpt[i] = 0;
-			}
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
-
-			// FIXME: don't forget to throw out additional players
-			//   without available slots here!
-
-		}
-		if (Hosts[i].PlyNr) {
-			menu->Items[SERVER_PLAYER_STATE + i].Flags |= MI_FLAGS_INVISIBLE;
-			menu->Items[SERVER_PLAYER_TEXT + i].Flags &= ~MI_FLAGS_INVISIBLE;
-
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
-			++plyrs;
-			if (ServerSetupState.Ready[i]) {
-				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.Checked = 1;
-				++ready;
-			}
-
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
-		} else {
-			// don't allow network and button events to intercept server player's action on pulldown buttons!
-			if (!(menu->Items[SERVER_PLAYER_STATE + i].Flags & MI_FLAGS_CLICKED)) {
-				if (initial == 1 ||
-					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].MiType != MiTypePulldown)) {
-					menu->Items[SERVER_PLAYER_STATE + i].Flags = MI_FLAGS_NONE;
-					menu->Items[SERVER_PLAYER_TEXT + i].Flags |= MI_FLAGS_INVISIBLE;
-					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i];
-				}
-			}
-			if (i < h && ServerSetupState.CompOpt[i] != 0) {
-				avail--;
-			}
-
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
-		}
-
-
-		if (i >= h) {
-			// Allow to switch off (close) preset ai-computer slots
-			// FIXME: evaluate game type...
-			if (initial == 1 && i < h + c) {
-				menu->Items[SERVER_PLAYER_STATE + i].Flags &= ~MI_FLAGS_DISABLED;
-				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.noptions = 2;
-				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.options = mgptsoptions + 1;
-				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = 0;
-				ServerSetupState.CompOpt[i] = 1;
-				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i] - 1;
-			}
-
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
-		}
-
-		if (i >= h + c) {
-			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.defopt = 2;
-			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = 2;
-			menu->Items[SERVER_PLAYER_STATE + i].Flags = MI_FLAGS_DISABLED;
-		}
-	}
-
-
-	// Tell connect state machines how many interactive players we can have
-	NetPlayers = avail;
-	// Check if all players are ready.
-	DebugPrint("READY to START: AVAIL = %d, READY = %d\n" _C_ avail
-			_C_ ready);
-
-	// Disable the select scenario after players have joined.
-	if (plyrs) {
-		// disable Select Scenario button
-		menu->Items[2].Flags = MI_FLAGS_DISABLED;
-	} else {
-		// enable Select Scenario button
-		menu->Items[2].Flags = 0;
-	}
-	if (ready == avail) {
-		if (menu->Items[3].Flags == MI_FLAGS_DISABLED) {
-			// enable start game button
-			menu->Items[3].Flags = 0;
-		}
-	} else {
-		// disable start game button
-		menu->Items[3].Flags = MI_FLAGS_DISABLED;
-	}
-
-	if (MetaServerInUse) {
-		ChangeGameServer();
-	}
-}
-#endif
-
-#if 0
-/**
-** Update client network menu.
-*/
-static void MultiClientUpdate(int initial)
-{
-	Menu *menu;
-	int i;
-	int h;
-	int c;
-
-	menu = FindMenu("menu-net-multi-client");
-
-	//  Calculate available slots from map info
-	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (Map.Info.PlayerType[i] == PlayerPerson) {
-			h++; // available interactive player slots
-		}
-		if (Map.Info.PlayerType[i] == PlayerComputer) {
-			c++; // available computer player slots
-		}
-	}
-
-	//
-	// Setup defaults, reset values.
-	//
-	if (initial) {
-		menu->Items[CLIENT_PLAYER_STATE].Flags |= MI_FLAGS_INVISIBLE;
-		menu->Items[CLIENT_PLAYER_TEXT].Flags &= ~MI_FLAGS_INVISIBLE;
-		memset(&ServerSetupState, 0, sizeof(ServerSetup));
-		memset(&LocalSetupState, 0, sizeof(ServerSetup));
-	}
-	for (i = 1; i < PlayerMax - 1; i++) {
-		//
-		// Johns: This works only if initial. Hosts[i].PlyNr is later lost.
-		//
-		if (Hosts[i].PlyNr || i == NetLocalHostsSlot) {
-			menu->Items[CLIENT_PLAYER_STATE + i].Flags |= MI_FLAGS_INVISIBLE;
-			menu->Items[CLIENT_PLAYER_TEXT + i].Flags &= ~MI_FLAGS_INVISIBLE;
-			if (i == NetLocalHostsSlot) {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
-			} else {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_NONE;
-			}
-		} else {
-			menu->Items[CLIENT_PLAYER_STATE + i].Flags &= ~MI_FLAGS_INVISIBLE;
-			menu->Items[CLIENT_PLAYER_TEXT + i].Flags |= MI_FLAGS_INVISIBLE;
-			menu->Items[CLIENT_PLAYER_STATE + i].Flags |= MI_FLAGS_DISABLED;
-			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt =
-				ServerSetupState.CompOpt[i];
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_INVISIBLE;
-		}
-
-		menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.Checked = !!ServerSetupState.Ready[i];
-
-#if 0
-		if (i != NetLocalHostsSlot) {
-		//if (i >= h) {
-			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt =
-				ServerSetupState.CompOpt[i];
-		}
-#endif
-
-		// Unused slots are always disabled.
-		if (i >= h + c) {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags =
-				MI_FLAGS_INVISIBLE;
-			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.defopt =
-				menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt = 2;
-			menu->Items[CLIENT_PLAYER_STATE + i].Flags = MI_FLAGS_DISABLED;
-		}
-	}
-}
-#endif
-
-#if 0
-/**
 **  Multiplayer server menu init callback
 */
 static void MultiGameSetupInit(Menu *menu)
@@ -899,62 +420,6 @@ static void MultiGameCancel(void)
 
 #if 0
 /**
-**  Draw the multi player setup menu.
-*/
-static void NetMultiPlayerDrawFunc(Menuitem *mi)
-{
-	Menu *menu;
-	int i;
-	const char *nc;
-	const char *rc;
-
-	menu = FindMenu("menu-multi-setup");
-	i = mi - menu->Items - SERVER_PLAYER_TEXT;
-	if (i >= 0 && i < PlayerMax - 1) { // Ugly test to detect server
-		if (i > 0) {
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags &=
-				~MI_FLAGS_DISABLED;
-			// Note: re-disabled in MultiGamePlayerSelectorsUpdate()
-			// for kicked out clients!!
-			if (ServerSetupState.Ready[i]) {
-				menu->Items[SERVER_PLAYER_READY - 1 + i].Flags |= MI_FLAGS_DISABLED;
-				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.Checked = 1;
-			} else {
-				menu->Items[SERVER_PLAYER_READY - 1 + i].Flags |= MI_FLAGS_DISABLED;
-				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.Checked = 0;
-			}
-			if (ServerSetupState.LastFrame[i] + 30 > FrameCounter) {
-				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags |= MI_FLAGS_DISABLED;
-				menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.Checked = 1;
-			} else {
-				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags |= MI_FLAGS_DISABLED;
-			}
-
-		}
-	} else {
-		menu = FindMenu("menu-net-multi-client");
-		i = mi - menu->Items - CLIENT_PLAYER_TEXT;
-		if (i > 0) {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags &=
-				~MI_FLAGS_DISABLED;
-			if (i == NetLocalHostsSlot) {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags &= ~MI_FLAGS_DISABLED;
-			} else {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags |= MI_FLAGS_DISABLED;
-			}
-		}
-	}
-
-	GetDefaultTextColors(&nc, &rc);
-	SetDefaultTextColors(rc, rc);
-	VideoDrawText(UI.Offset640X + mi->XOfs, UI.Offset480Y + mi->YOfs, GameFont, Hosts[i].PlyName);
-
-	SetDefaultTextColors(nc, rc);
-}
-#endif
-
-#if 0
-/**
 **  Cancel button of multiplayer client menu pressed.
 */
 static void MultiClientCancel(void)
@@ -962,98 +427,6 @@ static void MultiClientCancel(void)
 	NetworkDetachFromServer();
 	FreeMapInfo(&Map.Info);
 	// GameCancel();
-}
-#endif
-
-#if 0
-/**
-**  Multiplayer client menu init callback
-*/
-static void MultiGameClientInit(Menu *menu)
-{
-	// GameSetupInit(mi);
-	MultiClientUpdate(1);
-	if (LocalSetupState.Ready[NetLocalHostsSlot]) {
-		menu->Items[2].Flags = MI_FLAGS_DISABLED;
-		menu->Items[3].Flags = 0;
-		menu->Items[CLIENT_RACE].Flags = MI_FLAGS_DISABLED;
-	} else {
-		menu->Items[3].Flags = MI_FLAGS_DISABLED;
-		menu->Items[2].Flags = 0;
-		menu->Items[CLIENT_RACE].Flags = 0;
-	}
-}
-#endif
-
-#if 0
-/**
-**  Multiplayer client gem action. Toggles ready flag.
-*/
-static void MultiClientCheckboxAction(Menuitem *mi)
-{
-	int i;
-
-	i = mi - mi->Menu->Items - CLIENT_PLAYER_READY + 1;
-	if (i == NetLocalHostsSlot) {
-		LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
-		if (LocalSetupState.Ready[i]) {
-			mi->Menu->Items[2].Flags = MI_FLAGS_DISABLED;
-			mi->Menu->Items[3].Flags = 0;
-			mi->Menu->Items[CLIENT_RACE].Flags = MI_FLAGS_DISABLED;
-		} else {
-			mi->Menu->Items[3].Flags = MI_FLAGS_DISABLED;
-			mi->Menu->Items[2].Flags = 0;
-			mi->Menu->Items[CLIENT_RACE].Flags = 0;
-		}
-		MultiClientUpdate(0);
-	}
-}
-#endif
-
-#if 0
-/**
-**  Multiplayer client races action callback
-*/
-static void MultiClientRCSAction(Menuitem *mi, int i)
-{
-	if (mi->D.Pulldown.curopt == i) {
-		LocalSetupState.Race[NetLocalHostsSlot] = mi->D.Pulldown.noptions - 1 - i;
-		MultiClientUpdate(0);
-	}
-}
-#endif
-
-#if 0
-/**
-** Multiplayer client ready button
-*/
-static void MultiClientReady(void)
-{
-	Menu *menu;
-
-	menu = FindMenu("menu-net-multi-client");
-	menu->Items[2].Flags = MI_FLAGS_DISABLED;
-	menu->Items[3].Flags = 0;
-	menu->Items[CLIENT_RACE].Flags = MI_FLAGS_DISABLED;
-	LocalSetupState.Ready[NetLocalHostsSlot] = 1;
-	MultiClientUpdate(0);
-}
-#endif
-
-#if 0
-/**
-** Multiplayer client not ready button
-*/
-static void MultiClientNotReady(void)
-{
-	Menu *menu;
-
-	menu = FindMenu("menu-net-multi-client");
-	menu->Items[3].Flags = MI_FLAGS_DISABLED;
-	menu->Items[2].Flags = 0;
-	menu->Items[CLIENT_RACE].Flags = 0;
-	LocalSetupState.Ready[NetLocalHostsSlot] = 0;
-	MultiClientUpdate(0);
 }
 #endif
 
@@ -1105,41 +478,6 @@ void NetConnectForceDisplayUpdate(void)
 {
 //	MultiGamePlayerSelectorsUpdate(2);
 }
-
-#if 0
-/**
-** Update client menu to follow server menu.
-*/
-void NetClientUpdateState(void)
-{
-	Menu *menu;
-
-	menu = FindMenu("menu-net-multi-client");
-
-	GameRESAction(NULL, ServerSetupState.ResourcesOption);
-	menu->Items[CLIENT_RESOURCE].D.Pulldown.curopt =
-		ServerSetupState.ResourcesOption;
-
-	GameUNSAction(NULL, ServerSetupState.UnitsOption);
-	menu->Items[CLIENT_UNITS].D.Pulldown.curopt =
-		ServerSetupState.UnitsOption;
-
-	MultiGameFWSAction(NULL, ServerSetupState.FogOfWar);
-	menu->Items[CLIENT_FOG_OF_WAR].D.Pulldown.curopt =
-		ServerSetupState.FogOfWar;
-
-	GameTSSAction(NULL, ServerSetupState.TilesetSelection);
-	menu->Items[CLIENT_TILESET].D.Pulldown.curopt =
-		ServerSetupState.TilesetSelection;
-
-	GameGATAction(NULL, ServerSetupState.GameTypeOption);
-	menu->Items[CLIENT_GAMETYPE].D.Pulldown.curopt =
-		ServerSetupState.GameTypeOption;
-
-	MultiClientUpdate(0);
-	DebugPrint("NetClientUpdateState\n");
-}
-#endif
 
 #if 0
 /**
@@ -1998,6 +1336,26 @@ static void CreateInternetGameMenu(void)
 		GameMenuReturn();
 	}
 
+}
+#endif
+
+#if 0
+/**
+** Process Internet game menu
+*/
+static void MultiPlayerInternetGame(void)
+{
+	//Connect to Meta Server
+	if (MetaInit() == -1 ) {
+		MetaServerInUse = 0;
+		MetaServerConnectError();
+		return;
+	}
+	MetaServerInUse = 1;
+	ProcessMenu("menu-internet-create-join-menu", 1);
+	if (GuiGameStarted) {
+		GameMenuReturn();
+	}
 }
 #endif
 
