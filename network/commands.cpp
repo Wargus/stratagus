@@ -719,6 +719,14 @@ static int CclReplayLog(lua_State *l)
 }
 
 /**
+**  Check if we're replaying a game
+*/
+bool ReplayingGame()
+{
+	return CurrentReplay != NULL;
+}
+
+/**
 **  Save generated replay
 **
 **  @param file  file to save to.
