@@ -244,6 +244,8 @@ void NetworkInitClientConnect(void)
 		Hosts[i].PlyNr = 0;
 		memset(Hosts[i].PlyName, 0, 16);
 	}
+	memset(&ServerSetupState, 0, sizeof(ServerSetup));
+	memset(&LocalSetupState, 0, sizeof(ServerSetup));
 }
 
 /**
@@ -286,10 +288,10 @@ void NetworkInitServerConnect(void)
 	memcpy(Hosts[0].PlyName, LocalPlayerName, 16);
 	
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
-        for (i = 2; i < PlayerMax - 1; ++i) {
-                ServerSetupState.CompOpt[i] = 1;
-        }
-
+	memset(&LocalSetupState, 0, sizeof(ServerSetup));
+	for (i = 2; i < PlayerMax - 1; ++i) {
+		ServerSetupState.CompOpt[i] = 1;
+	}
 }
 
 /**
