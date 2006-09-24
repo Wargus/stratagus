@@ -123,7 +123,7 @@ function RunJoiningMapMenu(s)
   menu = BosMenu(_("Joining game: Map"))
 
   menu:writeLargeText(_("Map"), sx, sy*3)
-  maptext = menu:writeText(_("File:"), sx, sy*3+30)
+  menu:writeText(_("File:"), sx, sy*3+30)
   maptext = menu:writeText(NetworkMapName, sx+50, sy*3+30)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
