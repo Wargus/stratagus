@@ -199,8 +199,6 @@ typedef struct _menu_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern Menu *CurrentMenu;                     /// Current menu
-
 extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 
 /*----------------------------------------------------------------------------
@@ -210,10 +208,6 @@ extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 	/// Draw menu button
 extern void DrawMenuButton(ButtonStyle *style, unsigned flags,
 	int x, int y, const char *text);
-	/// Draw and process a menu
-extern void ProcessMenu(const char *menu_id, int loop);
-	/// Find a menu by id
-extern Menu *FindMenu(const char *menu_id);
 
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);
@@ -226,9 +220,6 @@ extern void NetClientCheckLocalState(void);
 extern void EditorEditResource(void);
 	/// Edit ai properties
 extern void EditorEditAiProperties(void);
-
-	/// Error menu
-extern void ErrorMenu(char *);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);
