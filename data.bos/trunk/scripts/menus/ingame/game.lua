@@ -56,9 +56,11 @@ function RunGameMenu(s)
   local menu = BosGameMenu()
 
   menu:addLabel(_("Game Menu"), 128, 11)
-  -- FIXME: disable for multiplayer or replay
-  menu:addButton(_("Save (~<F11~>)"), "f11", 16, 40,
+  local b = menu:addButton(_("Save (~<F11~>)"), "f11", 16, 40,
     function() RunSaveMenu() end)
+  if (IsReplayGame() or IsNetworkGame()) then
+    b:setEnabled(false)
+  end
   menu:addButton(_("Options (~<F5~>)"), "f5", 16, 40 + (36 * 1),
     function() RunGameOptionsMenu() end)
   menu:addButton(_("Help (~<F1~>)"), "f1", 16, 40 + (36 * 2),
@@ -149,10 +151,12 @@ function RunPreferencesMenu()
   menu:addLabel(_("Game Options"), 128, 11)
 
   local fog = {}
-  -- FIXME: disable checkbox for multiplayer or replays
   fog = menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
     function() SetFogOfWar(fog:isMarked()) end)
   fog:setMarked(GetFogOfWar())
+  if (IsReplayGame() or IsNetworkGame() then
+    fog:setEnabled(false)
+  end
 
   local ckey = {}
   ckey = menu:addCheckBox(_("Show command key"), 16, 36 * 2,
@@ -307,9 +311,11 @@ function RunEndScenarioMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("End Scenario"), 128, 11)
-  -- FIXME: disable for multiplayer
-  menu:addButton(_("~!Restart Scenario"), "r", 16, 40 + (36 * 0),
+  local b = menu:addButton(_("~!Restart Scenario"), "r", 16, 40 + (36 * 0),
     function() RunRestartConfirmMenu() end)
+  if (IsNetworkGame() then
+    b:setEnabled(false)
+  end
   menu:addButton(_("~!Surrender"), "s", 16, 40 + (36 * 1),
     function() RunSurrenderConfirmMenu() end)
   menu:addButton(_("~!Quit to Menu"), "q", 16, 40 + (36 * 2),
