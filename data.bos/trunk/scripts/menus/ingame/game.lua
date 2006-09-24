@@ -127,6 +127,8 @@ function  RunGameSoundOptionsMenu()
   local menu = BosGameMenu()
   
   AddSoundOptions(menu, 0, 0, 128 - 224/2, 280)
+
+  menu:run(false)
 end
 
 function RunGameOptionsMenu()
