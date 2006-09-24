@@ -2037,7 +2037,7 @@ void EditorMainLoop(void)
 
 		Editor.Init();
 
-		ProcessMenu("menu-editor-tips", 1);
+		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;
 
 		SetVideoSync();

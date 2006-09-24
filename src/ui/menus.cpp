@@ -197,130 +197,6 @@ static void SaveReplayOk(void)
 
 #if 0
 /**
-** Start campaign from menu.
-**
-** @param number Number of the compaign.
-*/
-static void StartCampaignFromMenu(int number)
-{
-#if 0
-	// JOHNS: this is currently not needed:
-
-	// Any Campaign info should be displayed through a DrawFunc() Item
-	// in the CAMPAIN_CONT menu processed below...
-	ProcessMenu("menu-campaign-continue", 1);
-	// Set GuiGameStarted = 1 to actually run a game here...
-	// See CustomGameStart() for info...
-#endif
-
-	PlayCampaign(Campaigns[number]->Ident);
-	GuiGameStarted = 1;
-
-	// FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
-	//CloseMenu();
-}
-#endif
-
-#if 0
-/**
-** Start processing join a network game menu.
-*/
-static void JoinNetGameMenu(void)
-{
-	char server_host_buffer[64];
-	char *port;
-	Menu *menu;
-
-	//
-	//  Prepare enter ip/hostname menu
-	//
-	if (NetworkArg) {
-		strncpy(server_host_buffer, NetworkArg, 24);
-		server_host_buffer[24] = 0;
-		if (NetworkPort != NetworkDefaultPort) {
-			strcat(server_host_buffer, ":");
-			port = new char[10];
-			sprintf(port, "%d", NetworkPort);
-			strcat(server_host_buffer, port);
-			delete[] port;
-		}
-	} else {
-		server_host_buffer[0] = '\0';
-	}
-	menu = FindMenu("menu-enter-server");
-	strcat(server_host_buffer, "~!_");
-	menu->Items[1].D.Input.buffer = server_host_buffer;
-	menu->Items[1].D.Input.nch = strlen(server_host_buffer) - 3;
-	menu->Items[1].D.Input.maxch = 60;
-	if (menu->Items[1].D.Input.nch) {
-		menu->Items[2].Flags &= ~MI_FLAGS_DISABLED;
-	} else {
-		menu->Items[2].Flags |= MI_FLAGS_DISABLED;
-	}
-
-	ProcessMenu("menu-enter-server", 1);
-
-	if (menu->Items[1].D.Input.nch == 0) {
-		return;
-	}
-
-	if ( (port = strchr(server_host_buffer, ':')) != NULL) {
-		NetworkPort = atoi(port + 1);
-		port[0] = 0;
-	}
-
-	// Now finally here is the address
-	server_host_buffer[menu->Items[1].D.Input.nch] = 0;
-	if (NetworkSetupServerAddress(server_host_buffer)) {
-		NetErrorMenu("Unable to lookup host.");
-		return;
-	}
-	NetworkInitClientConnect();
-	if (!NetConnectRunning) {
-		TerminateNetConnect();
-		return;
-	}
-
-	delete[] NetworkArg;
-	NetworkArg = new_strdup(server_host_buffer);
-
-	// Here we really go...
-	ProcessMenu("menu-net-connecting", 1);
-
-	if (GuiGameStarted) {
-		//CloseMenu();
-	}
-}
-#endif
-
-#if 0
-/**
-**  Network connect menu init.
-*/
-static void NetConnectingInit(Menu *menu)
-{
-	menu->Items[1].D.Text.text = NewStringDesc(NetServerText);
-	menu->Items[2].D.Text.text = NewStringDesc(NetTriesText);
-}
-#endif
-
-#if 0
-/**
-**  Network connect menu exit.
-*/
-static void NetConnectingExit(Menu *menu)
-{
-	FreeStringDesc(menu->Items[1].D.Text.text);
-	FreeStringDesc(menu->Items[2].D.Text.text);
-	delete menu->Items[1].D.Text.text;
-	delete menu->Items[2].D.Text.text;
-	menu->Items[1].D.Text.text = NULL;
-	menu->Items[2].D.Text.text = NULL;
-}
-#endif
-
-#if 0
-/**
 **  Cancel button of network connect menu pressed.
 */
 static void NetConnectingCancel(void)
@@ -383,37 +259,6 @@ static void TerminateNetConnect(void)
 	} else {
 		NetConnectingCancel();
 	}
-}
-#endif
-
-#if 0
-/**
-** Start processing network game setup menu (server).
-*/
-static void CreateNetGameMenu(void)
-{
-	GuiGameStarted = 0;
-	ProcessMenu("menu-multi-setup", 1);
-	if (GuiGameStarted) {
-		GameMenuReturn();
-	}
-}
-#endif
-
-#if 0
-/**
-** Start process network game setup menu (server).
-** Internet game, register with meta server
-*/
-static void CreateInternetGameMenu(void)
-{
-	GuiGameStarted = 0;
-	AddGameServer();
-	ProcessMenu("menu-multi-setup", 1);
-	if (GuiGameStarted) {
-		GameMenuReturn();
-	}
-
 }
 #endif
 
@@ -786,91 +631,6 @@ static void MultiGamePTSAction(Menuitem *mi, int o)
 
 }
 #endif
-
-/**
-** Multiplayer network game final race an player type setup.
-*/
-void NetworkGamePrepareGameSettings(void)
-{
-	int c;
-	int h;
-	int i;
-	int num[PlayerMax];
-	int comp[PlayerMax];
-	int v;
-
-	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
-
-	GameSettings.NetGameType=SettingsMultiPlayerGame;
-
-#ifdef DEBUG
-	for (i = 0; i < PlayerMax-1; i++) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
-		if (ServerSetupState.CompOpt[i] == 0) {
-			for (h = 0; h < NetPlayers; h++) {
-				if (Hosts[h].PlyNr == i) {
-					printf("%s", Hosts[h].PlyName);
-				}
-			}
-		}
-		printf("\n");
-	}
-#endif
-
-	// Make a list of the available player slots.
-	for (c = h = i = 0; i < PlayerMax; i++) {
-		if (Map.Info.PlayerType[i] == PlayerPerson) {
-			num[h++] = i;
-		}
-		if (Map.Info.PlayerType[i] == PlayerComputer) {
-			comp[c++] = i; // available computer player slots
-		}
-	}
-	for (i = 0; i < h; i++) {
-		switch(ServerSetupState.CompOpt[num[i]]) {
-			case 0:
-				GameSettings.Presets[num[i]].Type = PlayerPerson;
-				v = ServerSetupState.Race[num[i]];
-				if (v != 0) {
-					int n;
-					int x;
-
-					for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
-						if (PlayerRaces.Visible[n]) {
-							if (x + 1 == v) {
-								break;
-							}
-							++x;
-						}
-					}
-					GameSettings.Presets[num[i]].Race = x;
-				} else {
-					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
-				}
-				break;
-			case 1:
-				GameSettings.Presets[num[i]].Type = PlayerComputer;
-				break;
-			case 2:
-				GameSettings.Presets[num[i]].Type = PlayerNobody;
-			default:
-				break;
-		}
-	}
-	for (i = 0; i < c; i++) {
-		if (ServerSetupState.CompOpt[comp[i]] == 2) { // closed..
-			GameSettings.Presets[comp[i]].Type = PlayerNobody;
-			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
-		}
-	}
-
-#ifdef DEBUG
-	for (i = 0; i < NetPlayers; i++) {
-		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
-		;
-	}
-#endif
-}
 
 #if 0
 /**
@@ -1946,6 +1706,7 @@ static void EditorPlayerPropertiesMenu(void)
 */
 void EditorEditResource(void)
 {
+#if 0
 	Menu *menu;
 	char buf[13];
 	char buf2[32];
@@ -1962,6 +1723,7 @@ void EditorEditResource(void)
 	FreeStringDesc(menu->Items[0].D.Text.text);
 	delete menu->Items[0].D.Text.text;
 	menu->Items[0].D.Text.text = NULL;
+#endif
 }
 
 #if 0
@@ -2032,6 +1794,7 @@ static void EditorEditResourceCancel(void)
 */
 void EditorEditAiProperties(void)
 {
+#if 0
 	Menu *menu;
 
 	menu = FindMenu("menu-editor-edit-ai-properties");
@@ -2044,6 +1807,7 @@ void EditorEditAiProperties(void)
 	}
 
 	ProcessMenu("menu-editor-edit-ai-properties", 1);
+#endif
 }
 
 #if 0
@@ -2216,53 +1980,26 @@ static void EditorQuitToMenu(void)
 }
 #endif
 
-#if 0
-/**
-** Net error menu
-**
-** @param error Error message
-*/
-static void NetErrorMenu(char *error)
-{
-    Menu *menu;
-
-	menu = FindMenu("menu-net-error");
-	menu->Items[1].D.Text.text = NewStringDesc(error);
-	ProcessMenu("menu-net-error", 1);
-	FreeStringDesc(menu->Items[1].D.Text.text);
-	delete menu->Items[1].D.Text.text;
-	menu->Items[1].D.Text.text = NULL;
-}
-#endif
-
-/**
-** Error menu
-**
-** @param error Error message
-*/
-void ErrorMenu(char *error)
-{
-	Menu *menu;
-	int oldx;
-	int oldy;
-
-	menu = FindMenu("menu-net-error");
-	oldx = menu->X;
-	oldy = menu->Y;
-	menu->X = (Video.Width - menu->Width) / 2;
-	menu->Y = (Video.Height - menu->Height) / 2;
-	menu->Items[1].D.Text.text = NewStringDesc(error);
-	ProcessMenu("menu-net-error", 1);
-	FreeStringDesc(menu->Items[1].D.Text.text);
-	delete menu->Items[1].D.Text.text;
-	menu->Items[1].D.Text.text = NULL;
-	menu->X = oldx;
-	menu->Y = oldy;
-}
-
 /*----------------------------------------------------------------------------
 --  Metaserver
 ----------------------------------------------------------------------------*/
+
+#if 0
+/**
+** Start process network game setup menu (server).
+** Internet game, register with meta server
+*/
+static void CreateInternetGameMenu(void)
+{
+	GuiGameStarted = 0;
+	AddGameServer();
+	ProcessMenu("menu-multi-setup", 1);
+	if (GuiGameStarted) {
+		GameMenuReturn();
+	}
+
+}
+#endif
 
 #if 0
 /**
