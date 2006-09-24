@@ -721,7 +721,7 @@ static int CclReplayLog(lua_State *l)
 /**
 **  Check if we're replaying a game
 */
-bool ReplayingGame()
+bool IsReplayGame()
 {
 	return CurrentReplay != NULL;
 }

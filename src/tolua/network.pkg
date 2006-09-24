@@ -1,7 +1,9 @@
-$void InitNetwork1(void);
-$void ExitNetwork1(void);
+$#include "network.h"
+
 void InitNetwork1(void);
 void ExitNetwork1(void);
+
+bool IsNetworkGame();
 
 int NetworkSetupServerAddress(const char *serveraddr);
 void NetworkInitClientConnect(void);
