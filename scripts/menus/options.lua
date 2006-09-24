@@ -148,8 +148,6 @@ function AddSoundOptions(menu, offx, offy, centerx, bottom)
       SavePreferences()
       menu:stop()
     end)
-
-  menu:run()
 end
 
 function RunSoundOptionsMenu(s)
@@ -161,6 +159,8 @@ function RunSoundOptionsMenu(s)
   menu = BosMenu(_("Sound Options"))
 
   AddSoundOptions(menu, offx, offy, offx + 130 - 200/2, offy + 352)
+
+  menu:run()
 end
 
 function SetVideoSize(width, height)
