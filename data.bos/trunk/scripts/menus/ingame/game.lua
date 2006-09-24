@@ -154,7 +154,7 @@ function RunPreferencesMenu()
   fog = menu:addCheckBox(_("Fog of War Enabled"), 16, 36 * 1,
     function() SetFogOfWar(fog:isMarked()) end)
   fog:setMarked(GetFogOfWar())
-  if (IsReplayGame() or IsNetworkGame() then
+  if (IsReplayGame() or IsNetworkGame()) then
     fog:setEnabled(false)
   end
 
@@ -313,7 +313,7 @@ function RunEndScenarioMenu()
   menu:addLabel(_("End Scenario"), 128, 11)
   local b = menu:addButton(_("~!Restart Scenario"), "r", 16, 40 + (36 * 0),
     function() RunRestartConfirmMenu() end)
-  if (IsNetworkGame() then
+  if (IsNetworkGame()) then
     b:setEnabled(false)
   end
   menu:addButton(_("~!Surrender"), "s", 16, 40 + (36 * 1),
