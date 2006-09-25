@@ -45,7 +45,7 @@ class CGraphic : public gcn::Image {
 protected:
 	CGraphic() : File(NULL), HashFile(NULL), Surface(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		Refs(1)
+		Refs(1), Resized(false)
 	{
 #ifndef USE_OPENGL
 		SurfaceFlip = NULL;
@@ -118,6 +118,7 @@ public:
 	int GraphicWidth;          /// Original graphic width
 	int GraphicHeight;         /// Original graphic height
 	int Refs;                  /// Uses of this graphic
+	bool Resized;              /// Image has been resized
 #ifdef USE_OPENGL
 	GLfloat TextureWidth;      /// Width of the texture
 	GLfloat TextureHeight;     /// Height of the texture
