@@ -1321,6 +1321,15 @@ void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 	setListModel(&listmodel);
 }
 
+/**
+**  Set the drop down size
+*/
+void DropDownWidget::setSize(int width, int height)
+{
+	DropDown::setSize(width, height);
+	this->getListBox()->setSize(width, height);
+}
+
 /*----------------------------------------------------------------------------
 --  DropDownWidget
 ----------------------------------------------------------------------------*/

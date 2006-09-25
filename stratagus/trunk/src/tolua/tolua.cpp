@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Sep 24 11:52:55 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Sep 24 20:00:41 2006.
 */
 
 #ifndef __cplusplus
@@ -285,46 +285,47 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CPlayerColorGraphic");
  tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"BasicContainer");
- tolua_usertype(tolua_S,"vector<CUIButton>");
  tolua_usertype(tolua_S,"CEditor");
+ tolua_usertype(tolua_S,"vector<CUIButton>");
  tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"CFontColor");
- tolua_usertype(tolua_S,"ListBox");
  tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"ListBox");
  tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"MultiLineLabel");
+ tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"CUpgrade");
  tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"TextField");
- tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"CUIButton");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"NetworkHost");
+ tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
  tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"MenuScreen");
- tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"gcn::Graphics");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"StatBoxWidget");
+ tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CMenuPanel");
  tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
  tolua_usertype(tolua_S,"vector<string>");
  tolua_usertype(tolua_S,"ScrollArea");
  tolua_usertype(tolua_S,"Button");
- tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"DropDown");
  tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
@@ -9504,6 +9505,201 @@ static int tolua_stratagus_ScrollingWidget_restart00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: getSelected of class  DropDown */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDown_getSelected00
+static int tolua_stratagus_DropDown_getSelected00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"DropDown",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  DropDown* self = (DropDown*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getSelected'",NULL);
+#endif
+ {
+  int tolua_ret = (int)  self->getSelected();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getSelected'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setSelected of class  DropDown */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDown_setSelected00
+static int tolua_stratagus_DropDown_setSelected00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"DropDown",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  DropDown* self = (DropDown*)  tolua_tousertype(tolua_S,1,0);
+  int selected = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSelected'",NULL);
+#endif
+ {
+  self->setSelected(selected);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setSelected'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setScrollArea of class  DropDown */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDown_setScrollArea00
+static int tolua_stratagus_DropDown_setScrollArea00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"DropDown",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"ScrollArea",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  DropDown* self = (DropDown*)  tolua_tousertype(tolua_S,1,0);
+  ScrollArea* scrollArea = ((ScrollArea*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setScrollArea'",NULL);
+#endif
+ {
+  self->setScrollArea(scrollArea);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setScrollArea'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getScrollArea of class  DropDown */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDown_getScrollArea00
+static int tolua_stratagus_DropDown_getScrollArea00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"DropDown",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  DropDown* self = (DropDown*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getScrollArea'",NULL);
+#endif
+ {
+  ScrollArea* tolua_ret = (ScrollArea*)  self->getScrollArea();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ScrollArea");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getScrollArea'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setListBox of class  DropDown */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDown_setListBox00
+static int tolua_stratagus_DropDown_setListBox00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"DropDown",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"ListBox",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  DropDown* self = (DropDown*)  tolua_tousertype(tolua_S,1,0);
+  ListBox* listBox = ((ListBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setListBox'",NULL);
+#endif
+ {
+  self->setListBox(listBox);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setListBox'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getListBox of class  DropDown */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDown_getListBox00
+static int tolua_stratagus_DropDown_getListBox00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"DropDown",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  DropDown* self = (DropDown*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getListBox'",NULL);
+#endif
+ {
+  ListBox* tolua_ret = (ListBox*)  self->getListBox();
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"ListBox");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getListBox'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  DropDownWidget */
 #ifndef TOLUA_DISABLE_tolua_stratagus_DropDownWidget_new00
 static int tolua_stratagus_DropDownWidget_new00(lua_State* tolua_S)
@@ -9594,71 +9790,6 @@ static int tolua_stratagus_DropDownWidget_setList00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: getSelected of class  DropDownWidget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_DropDownWidget_getSelected00
-static int tolua_stratagus_DropDownWidget_getSelected00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"DropDownWidget",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  DropDownWidget* self = (DropDownWidget*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getSelected'",NULL);
-#endif
- {
-  int tolua_ret = (int)  self->getSelected();
- tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'getSelected'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: setSelected of class  DropDownWidget */
-#ifndef TOLUA_DISABLE_tolua_stratagus_DropDownWidget_setSelected00
-static int tolua_stratagus_DropDownWidget_setSelected00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"DropDownWidget",0,&tolua_err) ||
- !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  DropDownWidget* self = (DropDownWidget*)  tolua_tousertype(tolua_S,1,0);
-  int selected = ((int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSelected'",NULL);
-#endif
- {
-  self->setSelected(selected);
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setSelected'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: getListBox of class  DropDownWidget */
 #ifndef TOLUA_DISABLE_tolua_stratagus_DropDownWidget_getListBox00
 static int tolua_stratagus_DropDownWidget_getListBox00(lua_State* tolua_S)
@@ -9686,6 +9817,41 @@ static int tolua_stratagus_DropDownWidget_getListBox00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'getListBox'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setSize of class  DropDownWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DropDownWidget_setSize00
+static int tolua_stratagus_DropDownWidget_setSize00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"DropDownWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  DropDownWidget* self = (DropDownWidget*)  tolua_tousertype(tolua_S,1,0);
+  int width = ((int)  tolua_tonumber(tolua_S,2,0));
+  int height = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSize'",NULL);
+#endif
+ {
+  self->setSize(width,height);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setSize'.",&tolua_err);
  return 0;
 #endif
 }
@@ -15245,19 +15411,27 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"add",tolua_stratagus_ScrollingWidget_add00);
   tolua_function(tolua_S,"restart",tolua_stratagus_ScrollingWidget_restart00);
  tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"DropDown","DropDown","BasicContainer",NULL);
+ tolua_beginmodule(tolua_S,"DropDown");
+  tolua_function(tolua_S,"getSelected",tolua_stratagus_DropDown_getSelected00);
+  tolua_function(tolua_S,"setSelected",tolua_stratagus_DropDown_setSelected00);
+  tolua_function(tolua_S,"setScrollArea",tolua_stratagus_DropDown_setScrollArea00);
+  tolua_function(tolua_S,"getScrollArea",tolua_stratagus_DropDown_getScrollArea00);
+  tolua_function(tolua_S,"setListBox",tolua_stratagus_DropDown_setListBox00);
+  tolua_function(tolua_S,"getListBox",tolua_stratagus_DropDown_getListBox00);
+ tolua_endmodule(tolua_S);
 #ifdef __cplusplus
- tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","BasicContainer",tolua_collect_DropDownWidget);
+ tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","DropDown",tolua_collect_DropDownWidget);
 #else
- tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","BasicContainer",NULL);
+ tolua_cclass(tolua_S,"DropDownWidget","DropDownWidget","DropDown",NULL);
 #endif
  tolua_beginmodule(tolua_S,"DropDownWidget");
   tolua_function(tolua_S,"new",tolua_stratagus_DropDownWidget_new00);
   tolua_function(tolua_S,"new_local",tolua_stratagus_DropDownWidget_new00_local);
   tolua_function(tolua_S,".call",tolua_stratagus_DropDownWidget_new00_local);
   tolua_function(tolua_S,"setList",tolua_stratagus_DropDownWidget_setList00);
-  tolua_function(tolua_S,"getSelected",tolua_stratagus_DropDownWidget_getSelected00);
-  tolua_function(tolua_S,"setSelected",tolua_stratagus_DropDownWidget_setSelected00);
   tolua_function(tolua_S,"getListBox",tolua_stratagus_DropDownWidget_getListBox00);
+  tolua_function(tolua_S,"setSize",tolua_stratagus_DropDownWidget_setSize00);
  tolua_endmodule(tolua_S);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"StatBoxWidget","StatBoxWidget","Widget",tolua_collect_StatBoxWidget);
