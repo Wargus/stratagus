@@ -445,24 +445,31 @@ class Windows : public Widget
 
 class ScrollingWidget : public ScrollArea
 {
-public:
 	ScrollingWidget(int width, int height);
 	void add(Widget *widget, int x, int y);
 	void restart();
 };
 
-class DropDownWidget : public BasicContainer
+class DropDown : public BasicContainer
+{
+	virtual int getSelected();
+	virtual void setSelected(int selected);
+	virtual void setScrollArea(ScrollArea* scrollArea);
+	virtual ScrollArea *getScrollArea();
+	virtual void setListBox(ListBox* listBox);
+	virtual ListBox *getListBox();
+};
+
+class DropDownWidget : public DropDown
 {
 	DropDownWidget();
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual int getSelected();
-	virtual void setSelected(int selected);
 	virtual ListBox *getListBox();
+	virtual void setSize(int width, int height);
 };
 
 class StatBoxWidget : public Widget
 {
-public:
 	StatBoxWidget(int width, int height);
 
 	void setCaption(const std::string &s);
