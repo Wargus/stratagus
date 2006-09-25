@@ -815,7 +815,7 @@ static int CclDefinePanelContents(lua_State *l)
 		}
 		for (j = 0; j < (int)UI.InfoPanelContents.size(); ++j) {
 			if (!strcmp(infopanel->Name, UI.InfoPanelContents[j]->Name)) {
-				DebugPrint("Redefinition of Panel '%s'" _C_ infopanel->Name);
+				DebugPrint("Redefinition of Panel '%s'\n" _C_ infopanel->Name);
 				delete UI.InfoPanelContents[j];
 				UI.InfoPanelContents[j] = infopanel;
 				break;

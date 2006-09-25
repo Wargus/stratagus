@@ -1009,9 +1009,47 @@ void CGraphic::Resize(int w, int h)
 	int x;
 	int bpp;
 
+	Assert(Surface); // can't resize before it's been loaded
+
 	if (GraphicWidth == w && GraphicHeight == h) {
 		return;
 	}
+
+	// Resizing the same image multiple times looks horrible
+	// If the image has already been resized then get a clean copy first
+	if (Resized) {
+		if (Surface) {
+			if (Surface->flags & SDL_PREALLOC) {
+				pixels = (unsigned char *)Surface->pixels;
+			} else {
+				pixels = NULL;
+			}
+			SDL_FreeSurface(Surface);
+			delete[] pixels;
+		}
+#ifndef USE_OPENGL
+		if (SurfaceFlip) {
+			if (SurfaceFlip->flags & SDL_PREALLOC) {
+				pixels = (unsigned char *)SurfaceFlip->pixels;
+			} else {
+				pixels = NULL;
+			}
+			SDL_FreeSurface(SurfaceFlip);
+			delete[] pixels;
+		}
+#endif
+
+		this->Width = this->Height = 0;
+		this->Surface = this->SurfaceFlip = NULL;
+		this->Load();
+
+		Resized = false;
+		if (GraphicWidth == w && GraphicHeight == h) {
+			return;
+		}
+	}
+
+	Resized = true;
 
 	bpp = Surface->format->BytesPerPixel;
 	if (bpp == 1) {
