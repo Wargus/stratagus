@@ -164,7 +164,7 @@ namespace gcn
         area.x += top.xOffset;
         area.y += top.yOffset;
 
-        if(!area.intersect(top))
+        if(!area.intersect(top) || mColor.a == 0)
         {
             return;
         }
