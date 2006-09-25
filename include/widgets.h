@@ -277,6 +277,7 @@ class DropDownWidget : public gcn::DropDown
 public:
 	DropDownWidget() {}
 	void setList(lua_State *lua, lua_Object *lo);
+	virtual void setSize(int width, int height);
 };
 
 class StatBoxWidget : public gcn::Widget
