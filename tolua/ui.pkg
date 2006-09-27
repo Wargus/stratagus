@@ -437,10 +437,33 @@ class ListBoxWidget : public ScrollArea
 	int getSelected();
 };
 
-class Windows : public Widget
+class Window : public BasicContainer
+{
+	Window();
+	Window(const std::string& caption);
+	Window(Widget* content, const std::string& caption = "");
+	
+	virtual void setCaption(const std::string &caption);
+	virtual const std::string &getCaption() const;
+	virtual void setAlignment(unsigned int alignment);
+	virtual unsigned int getAlignment() const;
+	virtual void setContent(Widget* widget);
+	virtual Widget* getContent() const;
+	virtual void setPadding(unsigned int padding);
+	virtual unsigned int getPadding() const;
+	virtual void setTitleBarHeight(unsigned int height);
+	virtual unsigned int getTitleBarHeight();
+	virtual void setMovable(bool movable);
+	virtual bool isMovable() const;
+	virtual void resizeToContent();
+	virtual void setOpaque(bool opaque);
+	virtual bool isOpaque();
+};
+
+class Windows : public Window
 {
 	Windows(const std::string &text, int width, int height);
-	virtual void add(Widget *widget, int x, int y);
+	void add(Widget *widget, int x, int y);
 };
 
 class ScrollingWidget : public ScrollArea
