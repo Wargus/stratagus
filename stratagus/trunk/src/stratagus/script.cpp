@@ -1820,7 +1820,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	n = ReadDataDirectory(directory, NULL, flp);
 	for (i = 0; i < n; i++) {
 		if ((flp[i].type & mask) == type) {
-			lua_pushnumber(l, i);
+			lua_pushnumber(l, i + 1);
 			lua_pushstring(l, flp[i].name);
 			lua_settable(l, 1);
 		}
