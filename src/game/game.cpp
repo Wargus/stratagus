@@ -315,7 +315,14 @@ static void LoadMap(const char *filename, CMap *map)
 			}
 		}
 #endif
-		if (!strcmp(tmp, ".smp")) {
+		if (!strcmp(tmp, ".smp")
+#ifdef USE_ZLIB
+				|| !strcmp(tmp, ".smp.gz")
+#endif
+#ifdef USE_BZ2LIB
+				|| !strcmp(tmp, ".smp.bz2")
+#endif
+		) {
 			if (!map->Info.Filename) {
 				// The map info hasn't been loaded yet => do it now
 				LoadStratagusMapInfo(filename);
