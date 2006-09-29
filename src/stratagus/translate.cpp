@@ -90,6 +90,10 @@ void LoadPO(const char *file)
 	char *currmsg = NULL;
 	char fullfile[1024];
 
+	if (!file || !*file) {
+		return;
+	}
+
 	LibraryFileName(file, fullfile);
 	fd = fopen(fullfile, "rb");
 	if (!fd) {
