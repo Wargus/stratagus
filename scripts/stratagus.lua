@@ -9,7 +9,7 @@
 --
 --	stratagus.lua	-	The craft configuration language.
 --
---	(c) Copyright 1998-2005 by Crestez Leonard and Fran�is Beerten
+--	(c) Copyright 1998-2006 by Crestez Leonard and Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ print("Battle of Survival default config file loading ...\n")
 --	Enter your default title screen.
 
 SetTitleScreens(
---      {Image="video/stratagus_intro.ogg"},
---      {Image="video/bos_intro.ogg"}
+      {Image="video/stratagus_intro.ogg"},
+      {Image="video/bos_intro.ogg"}
 )
 
 --	Set the game name
@@ -132,7 +132,6 @@ DefinePlayerColorIndex(208, 4)
 DefinePlayerColors({
   "red", {{164, 0, 0}, {124, 0, 0}, {92, 4, 0}, {68, 4, 0}},
   "blue", {{12, 72, 204}, {4, 40, 160}, {0, 20, 116}, {0, 4, 76}},
-  "green", {{44, 180, 148}, {20, 132, 92}, {4, 84, 44}, {0, 40, 12}},
   "violet", {{152, 72, 176}, {116, 44, 132}, {80, 24, 88}, {44, 8, 44}},
   "orange", {{248, 140, 20}, {200, 96, 16}, {152, 60, 16}, {108, 32, 12}},
   "black", {{40, 40, 60}, {28, 28, 44}, {20, 20, 32}, {12, 12, 20}},
@@ -146,6 +145,7 @@ DefinePlayerColors({
   "black", {{40, 40, 60}, {28, 28, 44}, {20, 20, 32}, {12, 12, 20}},
   "white", {{224, 224, 224}, {152, 152, 180}, {84, 84, 128}, {36, 40, 76}},
   "yellow", {{252, 252, 72}, {228, 204, 40}, {204, 160, 16}, {180, 116, 0}},
+  "green", {{44, 180, 148}, {20, 132, 92}, {4, 84, 44}, {0, 40, 12}},
 })
 
 --	Chittin
