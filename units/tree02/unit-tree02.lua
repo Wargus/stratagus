@@ -10,7 +10,7 @@
 --
 --	unit-tree.lua	-	Define the radar unit.
 --
---	(c) Copyright 2005 by François Beerten.
+--	(c) Copyright 2005-2006 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ DefineUnitType("unit-tree02", {
 	Construction = "construction-tree",
 	Speed = 0, HitPoints = 50, DrawLevel = 25, 
 	TileSize  = {1, 1}, BoxSize = {32, 32},
-	NeutralMinimapColor = {10, 250, 10},
+	NeutralMinimapColor = {73, 159, 9},
 	SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
 	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
