@@ -471,7 +471,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 			type->NeutralMinimapColorRGB.r,
 			type->NeutralMinimapColorRGB.g,
 			type->NeutralMinimapColorRGB.b);
-	} else if (unit->Player == ThisPlayer) {
+	} else if (unit->Player == ThisPlayer && !Editor.Running) {
 		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 				(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
