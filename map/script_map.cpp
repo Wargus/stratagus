@@ -430,6 +430,16 @@ static int CclSetTile(lua_State *l)
 	tile = LuaToNumber(l, 1);
 	w = LuaToNumber(l, 2);
 	h = LuaToNumber(l, 3);
+	
+	if (w >= Map.Info.MapWidth) {
+		LuaError(l, "Exceeded map width");
+	}
+	if (h >= Map.Info.MapHeight) {
+		LuaError(l, "Exceeded map height");
+	}
+	if (tile >= Map.Tileset.NumTiles) {
+		LuaError(l, "Exceeded number of tiles");
+	}
 
 	if (Map.Fields) {
 		Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
