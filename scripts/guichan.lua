@@ -322,7 +322,6 @@ function RunStartGameMenu(s)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
-    print(description)
     numplayers = nplayers
     players:setCaption(""..nplayers)
     descr:setCaption(description)
@@ -332,7 +331,6 @@ function RunStartGameMenu(s)
   Load("maps/"..selectedmap)
   local browser = menu:addBrowser("maps/", "^.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11)
   local function cb(s)
-    print(browser:getSelectedItem())
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
     map = browser:getSelectedItem()
@@ -425,7 +423,6 @@ function RunEditorMenu(s)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
-    print(description)
     numplayers = nplayers
     players:setCaption(""..nplayers)
     descr:setCaption(description)
@@ -435,7 +432,6 @@ function RunEditorMenu(s)
   Load("maps/"..selectedmap)
   local browser = menu:addBrowser("maps/", "^.*%.smp$", sx*10, sy*2+20, sx*8, sy*11)
   local function selectMap(s)
-    print(browser:getSelectedItem())
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
     selectedmap = browser:getSelectedItem()
