@@ -531,9 +531,9 @@ function RunTipsMenu()
   end
   if (preferences.TipNumber == 0) then
     l:nextTip()
-  else
-    l:updateCaption()
   end
+
+  l:updateCaption()
 
   local showtips = {}
   showtips = menu:addCheckBox(_("Show tips at startup"), 14, 256 - 75,
