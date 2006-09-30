@@ -294,17 +294,17 @@ function RunStartGameMenu(s)
   local players
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local map = "islandwar.smp"
+  local selectedmap = "islandwar.smp"
 
   menu = BosMenu(_("Start Game"))
 
   menu:writeLargeText(_("Map"), sx, sy*3)
   menu:writeText(_("File:"), sx, sy*3+30)
-  maptext = menu:writeText(map, sx+50, sy*3+30)
+  local maptext = menu:writeText(selectedmap .. "                       ", sx+50, sy*3+30)
   menu:writeText(_("Players:"), sx, sy*3+50)
-  players = menu:writeText(numplayers, sx+70, sy*3+50)
+  local players = menu:writeText("             ", sx+70, sy*3+50)
   menu:writeText(_("Description:"), sx, sy*3+70)
-  descr = menu:writeText(description, sx+20, sy*3+90)
+  local descr = menu:writeText("                                        ", sx+20, sy*3+90)
 
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
   fow:setMarked(preferences.FogOfWar)
@@ -329,7 +329,7 @@ function RunStartGameMenu(s)
     OldPresentMap(description, nplayers, w, h, id)
   end
  
-  Load("maps/"..map)
+  Load("maps/"..selectedmap)
   local browser = menu:addBrowser("maps/", "^.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11)
   local function cb(s)
     print(browser:getSelectedItem())
@@ -341,7 +341,7 @@ function RunStartGameMenu(s)
 
   local function startgamebutton(s)
     print("Starting map -------")
-    RunMap("maps/" .. map, nil, fow:isMarked(), revealmap:isMarked())
+    RunMap("maps/" .. selectedmap, nil, fow:isMarked(), revealmap:isMarked())
     PresentMap = OldPresentMap
     menu:stop()
   end
