@@ -67,8 +67,8 @@ function RunGameMenu(s)
     function() RunHelpMenu() end)
   menu:addButton(_("~!Objectives"), "o", 16, 40 + (36 * 3),
     function() RunObjectivesMenu() end)
-  menu:addButton(_("~!End Scenario"), "e", 16, 40 + (36 * 4),
-    function() RunEndScenarioMenu() end)
+  menu:addButton(_("~!End Game"), "e", 16, 40 + (36 * 4),
+    function() RunEndGameMenu() end)
   menu:addButton(_("Return to Game (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
@@ -309,11 +309,11 @@ function RunDiplomacyMenu()
   menu:run(false)
 end
 
-function RunEndScenarioMenu()
+function RunEndGameMenu()
   local menu = BosGameMenu()
 
-  menu:addLabel(_("End Scenario"), 128, 11)
-  local b = menu:addButton(_("~!Restart Scenario"), "r", 16, 40 + (36 * 0),
+  menu:addLabel(_("End Game"), 128, 11)
+  local b = menu:addButton(_("~!Restart Game"), "r", 16, 40 + (36 * 0),
     function() RunRestartConfirmMenu() end)
   if (IsNetworkGame()) then
     b:setEnabled(false)
