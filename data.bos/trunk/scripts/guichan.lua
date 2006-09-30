@@ -408,21 +408,52 @@ end
 
 function RunEditorMenu(s)
   local menu
+  local sx = Video.Width / 20
+  local sy = Video.Height / 20
+  local selectedmap = "islandwar.smp"
+  local numplayers = 2
+
   menu = BosMenu(_("Editor"))
 
-  local browser = menu:addBrowser("maps/", "^.*%.smp$", 300, 100, 300, 200)
+  menu:writeLargeText(_("Map"), sx, sy*3)
+  menu:writeText(_("File:"), sx, sy*3+30)
+  local maptext = menu:writeText(selectedmap .. "                       ", sx+50, sy*3+30)
+  menu:writeText(_("Players:"), sx, sy*3+50)
+  local players = menu:writeText("             ", sx+70, sy*3+50)
+  menu:writeText(_("Description:"), sx, sy*3+70)
+  local descr = menu:writeText("                                        ", sx+20, sy*3+90)
+
+  local OldPresentMap = PresentMap
+  PresentMap = function(description, nplayers, w, h, id)
+    print(description)
+    numplayers = nplayers
+    players:setCaption(""..nplayers)
+    descr:setCaption(description)
+    OldPresentMap(description, nplayers, w, h, id)
+  end
+
+  Load("maps/"..selectedmap)
+  local browser = menu:addBrowser("maps/", "^.*%.smp$", sx*10, sy*2+20, sx*8, sy*11)
+  local function selectMap(s)
+    print(browser:getSelectedItem())
+    maptext:setCaption(browser:getSelectedItem())
+    Load("maps/" .. browser:getSelectedItem())
+    selectedmap = browser:getSelectedItem()
+  end
+  browser:setActionCallback(selectMap)
+
   function starteditorbutton(s)
     UI.MenuButton:SetCallback(function() RunEditorIngameMenu() end)
     HandleCommandKey = HandleEditorIngameCommandKey
-    StartEditor("maps/" .. browser:getSelectedItem())
+    StartEditor(selectedmap)
     UI.MenuButton:SetCallback(function() RunGameMenu() end)
     HandleCommandKey = HandleIngameCommandKey
     menu:stop()
   end
-
-  menu:addButton(_("Start Editor"), 0, 100, 300, starteditorbutton)
+  menu:addButton(_("Start Editor"), 0, sx * 11,  sy*14, starteditorbutton)
 
   menu:run()
+  PresentMap = OldPresentMap
 end
 
 Load("scripts/menus/network.lua")
