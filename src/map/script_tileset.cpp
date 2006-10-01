@@ -10,7 +10,7 @@
 //
 /**@name script_tileset.cpp - The tileset ccl functions. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer, François Beerten and Jimmy Salmon
+//      (c) Copyright 2000-2006 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -940,6 +940,11 @@ static int CclSetTileFlags(lua_State *l)
 	}
 
 	tilenumber = LuaToNumber(l, 1);
+	
+	if (tilenumber >= Map.Tileset.NumTiles) {
+		LuaError(l, "Accessed a tile that's not defined");
+	}
+	
 	j = 0;
 	flags = 0;
 	ParseTilesetTileFlags(l, &flags, &j);
