@@ -59,11 +59,11 @@ public:
 class MyOpenGLGraphics : public gcn::Graphics
 {
 public:
+	virtual void _beginDraw();
+	virtual void _endDraw();
+
 	virtual void drawImage(const gcn::Image *image, int srcX, int srcY,
 		int dstX, int dstY, int width, int height);
-
-	virtual void _beginDraw() {}
-	virtual void _endDraw() {}
 
 	virtual void drawPoint(int x, int y);
 	virtual void drawLine(int x1, int y1, int x2, int y2);

@@ -37,6 +37,7 @@
 
 #ifdef USE_OPENGL
 #include "SDL_opengl.h"
+class CFont;
 #endif
 
 #include "guichan.h"

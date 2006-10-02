@@ -61,6 +61,7 @@
 #include "guichan/sdl/sdlgraphics.h"
 #include "guichan/sdl/sdlpixel.h"
 
+#include "stratagus.h"
 #include "video.h"
 
 // For some reason an old version of MSVC did not like std::abs,
