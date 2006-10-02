@@ -230,6 +230,17 @@ LuaActionListener::~LuaActionListener()
 
 
 #ifdef USE_OPENGL
+void MyOpenGLGraphics::_beginDraw()
+{
+	gcn::Rectangle area(0, 0, Video.Width, Video.Height);
+	pushClipArea(area);
+}
+
+void MyOpenGLGraphics::_endDraw()
+{
+	popClipArea();
+}
+
 void MyOpenGLGraphics::drawImage(const gcn::Image* image, int srcX, int srcY,
 	int dstX, int dstY, int width, int height)
 {

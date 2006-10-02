@@ -1037,10 +1037,11 @@ void CGraphic::Resize(int w, int h)
 			SDL_FreeSurface(SurfaceFlip);
 			delete[] pixels;
 		}
+		SurfaceFlip = NULL;
 #endif
 
 		this->Width = this->Height = 0;
-		this->Surface = this->SurfaceFlip = NULL;
+		this->Surface = NULL;
 		this->Load();
 
 		Resized = false;

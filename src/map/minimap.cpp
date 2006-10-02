@@ -548,11 +548,16 @@ void CMinimap::Update(void)
 #ifndef USE_OPENGL
 	bpp = MinimapSurface->format->BytesPerPixel;
 #endif
+
 	//
 	// Draw the terrain
 	//
 	if (WithTerrain) {
+#ifndef USE_OPENGL
 		SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
+#else
+		memcpy(MinimapSurface, MinimapTerrainSurface, MinimapTextureWidth * MinimapTextureHeight * 4);
+#endif
 	}
 	
 #ifndef USE_OPENGL
