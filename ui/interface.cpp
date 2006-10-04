@@ -238,6 +238,7 @@ static void UiToggleSound(void)
 		} else {
 			SetEffectsEnabled(true);
 			SetMusicEnabled(true);
+			CheckMusicFinished(true);
 		}
 	}
 
