@@ -292,7 +292,7 @@ function RunDiplomacyMenu()
         end
 
         -- shared vision
-        if (sharedvision[i]:isMarked()) then
+        if (sharedvision[j]:isMarked()) then
           if (ThisPlayer:IsSharedVision(Players[i]) == false) then
             SetSharedVision(ThisPlayer.Index, true, i)
           end
