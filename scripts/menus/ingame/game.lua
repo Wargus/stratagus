@@ -9,7 +9,7 @@
 --
 --      game.lua - In-game menus.
 --
---      (c) Copyright 2006 by Jimmy Salmon
+--      (c) Copyright 2006 by Jimmy Salmon and Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -335,8 +335,8 @@ function RunRestartConfirmMenu()
 
   menu:addLabel(_("Are you sure you"), 128, 11)
   menu:addLabel(_("want to restart"), 128, 11 + (24 * 1))
-  menu:addLabel(_("the scenario?"), 128, 11 + (24 * 2))
-  menu:addButton(_("~!Restart Scenario"), "r", 16, 11 + (24 * 3) + 29,
+  menu:addLabel(_("the game?"), 128, 11 + (24 * 2))
+  menu:addButton(_("~!Restart Game"), "r", 16, 11 + (24 * 3) + 29,
     function() StopGame(GameRestart); menu:stopAll() end)
   menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
@@ -411,7 +411,7 @@ local keystrokes = {
   {"PAUSE", "- pause game"},
   {"PRINT", "- make screen shot"},
   {"Alt-H", "- help menu"},
-  {"Alt-R", "- restart scenario"},
+  {"Alt-R", "- restart game"},
   {"Alt-Q", "- quit to main menu"},
   {"Alt-X", "- quit game"},
   {"Alt-B", "- toggle expand map"},
