@@ -333,7 +333,7 @@ function RunStartGameMenu(s)
   local function cb(s)
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
-    map = browser:getSelectedItem()
+    selectedmap = browser:getSelectedItem()
   end
   browser:setActionCallback(cb)
 
