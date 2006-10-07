@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Oct  7 10:08:57 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Oct  7 11:44:41 2006.
 */
 
 #ifndef __cplusplus
@@ -11175,6 +11175,71 @@ static int tolua_stratagus_CMenuScreen_addLogicCallback00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: setDrawMenusUnder of class  MenuScreen */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_setDrawMenusUnder00
+static int tolua_stratagus_CMenuScreen_setDrawMenusUnder00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MenuScreen",0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MenuScreen* self = (MenuScreen*)  tolua_tousertype(tolua_S,1,0);
+  bool drawunder = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setDrawMenusUnder'",NULL);
+#endif
+ {
+  self->setDrawMenusUnder(drawunder);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setDrawMenusUnder'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getDrawMenusUnder of class  MenuScreen */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CMenuScreen_getDrawMenusUnder00
+static int tolua_stratagus_CMenuScreen_getDrawMenusUnder00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"MenuScreen",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  MenuScreen* self = (MenuScreen*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getDrawMenusUnder'",NULL);
+#endif
+ {
+  bool tolua_ret = (bool)  self->getDrawMenusUnder();
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getDrawMenusUnder'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: InitNetwork1 */
 #ifndef TOLUA_DISABLE_tolua_stratagus_InitNetwork100
 static int tolua_stratagus_InitNetwork100(lua_State* tolua_S)
@@ -16331,6 +16396,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"stop",tolua_stratagus_CMenuScreen_stop00);
   tolua_function(tolua_S,"stopAll",tolua_stratagus_CMenuScreen_stopAll00);
   tolua_function(tolua_S,"addLogicCallback",tolua_stratagus_CMenuScreen_addLogicCallback00);
+  tolua_function(tolua_S,"setDrawMenusUnder",tolua_stratagus_CMenuScreen_setDrawMenusUnder00);
+  tolua_function(tolua_S,"getDrawMenusUnder",tolua_stratagus_CMenuScreen_getDrawMenusUnder00);
  tolua_endmodule(tolua_S);
 
  { /* begin embedded lua code */

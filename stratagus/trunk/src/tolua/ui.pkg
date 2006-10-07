@@ -519,6 +519,8 @@ class MenuScreen : public Container
 	void stop(int result = 0);
 	void stopAll(int result = 0);
 	void addLogicCallback(LuaActionListener *actionListener);
+	void setDrawMenusUnder(bool drawunder);
+	bool getDrawMenusUnder();
 };
 $renaming MenuScreen @ CMenuScreen
 
