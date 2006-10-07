@@ -10,6 +10,7 @@ $#include "widgets.h"
 $#include "sound.h"
 $#include "sound_server.h"
 $#include "netconnect.h"
+$#include "map.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)
@@ -59,6 +60,7 @@ $pfile "unit.pkg"
 $pfile "sound.pkg"
 $pfile "editor.pkg"
 $pfile "game.pkg"
+$pfile "map.pkg"
 
 extern const char *Translate(const char *str);
 extern void AddTranslation(const char *str1, const char *str2);
