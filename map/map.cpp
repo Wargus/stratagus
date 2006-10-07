@@ -404,7 +404,6 @@ void CMap::Clean(void)
 	memset(&this->Tileset, 0, sizeof(this->Tileset));
 	memset(this->TileModelsFileName, 0, sizeof(this->TileModelsFileName));
 	this->TileGraphic = NULL;
-	this->FogGraphic = NULL;
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
