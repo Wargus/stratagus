@@ -63,6 +63,7 @@
 
 extern void DoScrollArea(int state, bool fast);
 extern void DrawGuichanWidgets();
+extern void CleanGame();
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -2013,6 +2014,8 @@ void StartEditor(const char *filename)
 	Invalidate();
 
 	Editor.TerrainEditable = true;
+
+	CleanGame();
 }
 
 //@}
