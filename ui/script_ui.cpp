@@ -1627,7 +1627,7 @@ static int CclPresentMap(lua_State *l)
 {
 	LuaCheckArgs(l, 5);
 
-	Map.Info.Description = new_strdup(LuaToString(l, 1));
+	Map.Info.Description = LuaToString(l, 1);
 	// Number of players in LuaToNumber(l, 3); // Not used yet.
 	Map.Info.MapWidth = LuaToNumber(l, 3);
 	Map.Info.MapHeight = LuaToNumber(l, 4);
@@ -1644,8 +1644,7 @@ static int CclPresentMap(lua_State *l)
 static int CclDefineMapSetup(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	delete[] Map.Info.Filename;
-	Map.Info.Filename = new_strdup(LuaToString(l, 1));
+	Map.Info.Filename = LuaToString(l, 1);
 
 	return 0;
 }

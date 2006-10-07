@@ -160,7 +160,7 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
-	Map.Info.Filename = new_strdup(mapname);
+	Map.Info.Filename = mapname;
 }
 
 /**
@@ -323,13 +323,13 @@ static void LoadMap(const char *filename, CMap *map)
 				|| !strcmp(tmp, ".smp.bz2")
 #endif
 		) {
-			if (!map->Info.Filename) {
+			if (map->Info.Filename.empty()) {
 				// The map info hasn't been loaded yet => do it now
 				LoadStratagusMapInfo(filename);
 			}
-			Assert(map->Info.Filename);
+			Assert(!map->Info.Filename.empty());
 			map->Create();
-			LoadStratagusMap(filename, map->Info.Filename, map);
+			LoadStratagusMap(filename, map->Info.Filename.c_str(), map);
 			return;
 		}
 	}
@@ -492,7 +492,7 @@ void CreateGame(const char *filename, CMap *map)
 	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 	
-	if (!Map.Info.Filename && filename) {
+	if (Map.Info.Filename.empty() && filename) {
 		char path[PATH_MAX];
 		
 		Assert(filename);

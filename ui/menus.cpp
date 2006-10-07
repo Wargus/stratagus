@@ -561,7 +561,7 @@ static void EditorNewMap(void)
 	}
 
 	description[strlen(description) - 3] = '\0';
-	Map.Info.Description = new_strdup(description);
+	Map.Info.Description = description;
 	Map.Info.MapWidth = atoi(width);
 	Map.Info.MapHeight = atoi(height);
 
@@ -851,7 +851,7 @@ static void EditorMapPropertiesMenu(void)
 	menu = FindMenu("menu-editor-map-properties");
 
 	menu->Items[2].D.Input.buffer = description;
-	strcpy(description, Map.Info.Description);
+	strcpy(description, Map.Info.Description.c_str());
 	strcat(description, "~!_");
 	menu->Items[2].D.Input.nch = strlen(description) - 3;
 	menu->Items[2].D.Input.maxch = 31;
@@ -884,8 +884,7 @@ static void EditorMapPropertiesOk(void)
 
 	description = menu->Items[2].D.Input.buffer;
 	description[strlen(description)-3] = '\0';
-	delete[] Map.Info.Description;
-	Map.Info.Description = new_strdup(description);
+	Map.Info.Description = description;
 
 	#if 0
 	// MAPTODO

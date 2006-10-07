@@ -79,7 +79,7 @@ void CMap::Save(CFile *file) const
 
 	file->printf("  \"size\", {%d, %d},\n", this->Info.MapWidth, this->Info.MapHeight);
 	file->printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
-	file->printf("  \"filename\", \"%s\",\n", this->Info.Filename);
+	file->printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
 
 	file->printf("  \"map-fields\", {\n");
 	for (h = 0; h < this->Info.MapHeight; ++h) {
