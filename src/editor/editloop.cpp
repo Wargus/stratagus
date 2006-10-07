@@ -57,6 +57,7 @@
 #include "iolib.h"
 #include "iocompat.h"
 #include "commands.h"
+#include "guichan.h"
 
 #include "script.h"
 
@@ -98,6 +99,30 @@ enum _mode_buttons_ {
 	TileButton,          /// Tile mode button
 	StartButton
 };
+
+extern gcn::Gui *Gui;
+static gcn::Container *editorContainer;
+static gcn::Slider *editorSlider;
+
+static int CalculateUnitIcons(void);
+
+class EditorSliderListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId) {
+		int iconsPerStep = CalculateUnitIcons();
+		int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		double value = editorSlider->getValue();
+		for (int i = 1; i <= steps; ++i) {
+			if (value <= (double)i / steps) {
+				Editor.UnitIndex = iconsPerStep * (i - 1);
+				break;
+			}
+		}
+	}
+};
+
+static EditorSliderListener *editorSliderListener;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -575,8 +600,6 @@ static void DrawUnitIcons(void)
 	int x;
 	int y;
 	int i;
-	int j;
-	int percent;
 	CIcon *icon;
 
 	//
@@ -605,40 +628,6 @@ static void DrawUnitIcons(void)
 	VideoDrawText(x + 28 * 5, y, GameFont, "Ai");
 	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowAirToSelect ? 2 : 0),
 	//	x + 28 * 5, y + 16);
-
-	//
-	// Scroll bar for units. FIXME: drag not supported.
-	//
-	x = UI.ButtonPanel.X + 4;
-	y = UI.ButtonPanel.Y + 4;
-	j = 176 - 8;
-
-	PushClipping();
-	SetClipping(0, 0, x + j - 20, Video.Height - 1);
-	//MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
-	PopClipping();
-	if (UI.ButtonPanel.X + 4 < CursorX
-			&& CursorX < UI.ButtonPanel.X + 24
-			&& UI.ButtonPanel.Y + 4 < CursorY
-			&& CursorY < UI.ButtonPanel.Y + 24
-			&& MouseButtons & LeftButton) {
-		//MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW + 1, x - 2, y);
-	} else {
-		//MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW, x - 2, y);
-	}
-	if (UI.ButtonPanel.X + 176 - 24 < CursorX
-			&& CursorX < UI.ButtonPanel.X + 176 - 4
-			&& UI.ButtonPanel.Y + 4 < CursorY
-			&& CursorY < UI.ButtonPanel.Y + 24
-			&& MouseButtons & LeftButton) {
-		//MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
-	} else {
-		//MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW, x + j - 20, y);
-	}
-
-	percent = Editor.UnitIndex * 100 / (Editor.ShownUnitTypes.size() ? Editor.ShownUnitTypes.size() : 1);
-	i = (percent * (j - 54)) / 100;
-	//MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
 	//
 	//  Draw the unit icons.
@@ -1132,16 +1121,21 @@ static void EditorCallbackButtonDown(unsigned button)
 		switch (ButtonUnderCursor) {
 			case SelectButton :
 				Editor.State = EditorSelecting;
+				editorSlider->setVisible(false);
 				return;
 			case UnitButton:
 				Editor.State = EditorEditUnit;
+				editorSlider->setVisible(true);
 				return;
 			case TileButton :
-				if (EditorEditTile)
+				if (EditorEditTile) {
 					Editor.State = EditorEditTile;
+				}
+				editorSlider->setVisible(false);
 				return;
 			case StartButton:
 				Editor.State = EditorSetStartLocation;
+				editorSlider->setVisible(false);
 				return;
 			default:
 				break;
@@ -1194,36 +1188,6 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on unit area
 	//
 	if (Editor.State == EditorEditUnit) {
-		int percent;
-		int j;
-		int count;
-
-		percent = Editor.UnitIndex * 100 / (Editor.ShownUnitTypes.size() ? Editor.ShownUnitTypes.size() : 1);
-		j = (percent * (176 - 8 - 54)) / 100;
-		count = CalculateUnitIcons();
-
-		// Unit icons scroll left area
-		if (UI.ButtonPanel.X + 4 < CursorX &&
-				CursorX < UI.ButtonPanel.X + 4 + 18 + j &&
-				UI.ButtonPanel.Y + 4 < CursorY &&
-				CursorY < UI.ButtonPanel.Y + 24) {
-			if (Editor.UnitIndex - count >= 0) {
-				Editor.UnitIndex -= count;
-			} else {
-				Editor.UnitIndex = 0;
-			}
-			return;
-		}
-		// Unit icons scroll right area
-		if (UI.ButtonPanel.X + 4 + 18 + j + 18 < CursorX &&
-				CursorX < UI.ButtonPanel.X + 176 - 4 &&
-				UI.ButtonPanel.Y + 4 < CursorY &&
-				CursorY < UI.ButtonPanel.Y + 24) {
-			if (Editor.UnitIndex + count <= (int) Editor.ShownUnitTypes.size()) {
-				Editor.UnitIndex += count;
-			}
-			return;
-		}
 		// Cursor on unit icons
 		if (Editor.CursorUnitIndex != -1) {
 			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
@@ -2031,6 +1995,25 @@ void EditorMainLoop(void)
 	CommandLogDisabled = 1;
 	SetCallbacks(&EditorCallbacks);
 
+	gcn::Widget *oldTop = Gui->getTop();
+
+	editorContainer = new gcn::Container();
+	editorContainer->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
+	editorContainer->setOpaque(false);
+	Gui->setTop(editorContainer);
+
+	editorSliderListener = new EditorSliderListener();
+
+	editorSlider = new gcn::Slider();
+	editorSlider->setBaseColor(gcn::Color(38, 38, 78, 130));
+	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
+	editorSlider->setBackgroundColor(gcn::Color(200, 200, 120));
+	editorSlider->setSize(176, 16);
+	editorSlider->setVisible(false);
+	editorSlider->addActionListener(editorSliderListener);
+
+	editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+
 	while (1) {
 		Editor.MapLoaded = false;
 		Editor.Running = EditorEditing;
@@ -2092,6 +2075,10 @@ void EditorMainLoop(void)
 
 	CommandLogDisabled = OldCommandLogDisabled;
 	SetCallbacks(old_callbacks);
+	Gui->setTop(oldTop);
+	delete editorContainer;
+	delete editorSliderListener;
+	delete editorSlider;
 }
 
 /**
@@ -2099,8 +2086,6 @@ void EditorMainLoop(void)
 */
 void StartEditor(const char *filename)
 {
-	GuichanActive = false;
-	
 	strcpy(CurrentMapPath, filename);
 
 	Map.Info.Description = new_strdup(filename);
@@ -2113,7 +2098,6 @@ void StartEditor(const char *filename)
 	// Clear screen
 	Video.ClearScreen();
 	Invalidate();
-	GuichanActive = true;
 
 	Editor.TerrainEditable = true;
 }
