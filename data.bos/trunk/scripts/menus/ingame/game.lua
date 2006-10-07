@@ -222,8 +222,6 @@ function RunDiplomacyMenu()
       l:adjustSize()
       menu:add(l, 16, (21 * j) + 27)
 
-      -- FIXME: disable checkboxes in replays or if on the same team
-
       local alliedcb = {}
       local enemycb = {}
       local sharedvisioncb = {}
@@ -251,6 +249,12 @@ function RunDiplomacyMenu()
         function() end)
       sharedvisioncb:setMarked(ThisPlayer:IsSharedVision(Players[i]))
       sharedvision[j] = sharedvisioncb
+
+      if (IsReplayGame() or ThisPlayer:IsTeamed(Players[i])) then
+        alliedcb:setEnabled(false)
+        enemycb:setEnabled(false)
+        sharedvisioncb:setEnabled(false)
+      end
     end
   end
 
