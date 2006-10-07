@@ -59,6 +59,8 @@
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
 #pragma warning(disable:4786)               /// Truncated to 255 chars
+#include <stdlib.h>
+#define abort() _ASSERT(0)
 #include <stdio.h>
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
