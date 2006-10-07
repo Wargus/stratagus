@@ -52,8 +52,6 @@
 gcn::Gui *Gui;         /// A Gui object - binds it all together
 gcn::SDLInput *Input;  /// Input driver
 
-bool GuichanActive = true;
-
 static EventCallback GuichanCallbacks;
 
 static std::stack<MenuScreen *> MenuStack;
@@ -114,8 +112,6 @@ void initGuichan(int width, int height)
 	Gui->setInput(Input);
 	Gui->setTop(NULL);
 
-	GuichanActive = true;
-
 	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
 	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
 	GuichanCallbacks.MouseMoved = &MenuHandleMouseMove;
@@ -137,7 +133,6 @@ void freeGuichan()
 
 	Gui = NULL;
 	Input = NULL;
-	GuichanActive = false;
 }
 
 /**
@@ -147,22 +142,20 @@ void freeGuichan()
 */
 void handleInput(const SDL_Event *event) 
 {
-	if (GuichanActive) {
-		if (event) {
-			if (Input) {
-				Input->pushInput(*event);
-			}
-		} else {
-			if (Gui) {
-				Gui->logic();
-			}
+	if (event) {
+		if (Input) {
+			Input->pushInput(*event);
+		}
+	} else {
+		if (Gui) {
+			Gui->logic();
 		}
 	}
 }
 
 void DrawGuichanWidgets() 
 {
-	if (Gui && GuichanActive) {
+	if (Gui) {
 		Gui->draw();
 	}
 }
@@ -1443,7 +1436,7 @@ int StatBoxWidget::getPercent() const
 **  MenuScreen constructor
 */
 MenuScreen::MenuScreen() : 
-	Container(), runLoop(true), logiclistener(0)
+	Container(), runLoop(true), logiclistener(0), drawUnder(false)
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
@@ -1476,7 +1469,6 @@ int MenuScreen::run(bool loop)
 		SetCallbacks(old_callbacks);
 		Gui->setTop(this->oldtop);
 	} else {
-		GuichanActive = true;
 		SetCallbacks(&GuichanCallbacks);
 		MenuStack.push(this);
 	}
@@ -1501,7 +1493,6 @@ void MenuScreen::stop(int result, bool stopAll)
 		if (MenuStack.empty()) {
 			//InterfaceState = IfaceStateNormal;
 			if (!Editor.Running) {
-				GuichanActive = false;
 				SetCallbacks(&GameCallbacks);
 			} else {
 				SetCallbacks(&EditorCallbacks);
@@ -1521,6 +1512,20 @@ void MenuScreen::stop(int result, bool stopAll)
 void MenuScreen::addLogicCallback(LuaActionListener *listener)
 {
 	logiclistener = listener;
+}
+
+void MenuScreen::draw(gcn::Graphics *graphics)
+{
+	if (this->drawUnder) {
+		gcn::Widget *w = Gui->getTop();
+		Gui->setTop(oldtop);
+		gcn::Rectangle r = Gui->getGraphics()->getCurrentClipArea();
+		Gui->getGraphics()->popClipArea();
+		Gui->draw();
+		Gui->setTop(w);
+		Gui->getGraphics()->pushClipArea(r);
+	}
+	gcn::Container::draw(graphics);
 }
 
 void MenuScreen::logic()

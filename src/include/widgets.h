@@ -307,13 +307,17 @@ public:
 	void stop(int result = 0, bool stopAll = false);
 	void stopAll(int result = 0) { stop(result, true); }
 	void addLogicCallback(LuaActionListener *listener);
+	virtual void draw(gcn::Graphics *graphics);
 	virtual void logic();
+	void setDrawMenusUnder(bool drawUnder) { this->drawUnder = drawUnder; }
+	bool getDrawMenusUnder() { return this->drawUnder; }
 
 private:
 	bool runLoop;
 	int loopResult;
 	gcn::Widget *oldtop;
 	LuaActionListener *logiclistener;
+	bool drawUnder;
 };
 
 #endif

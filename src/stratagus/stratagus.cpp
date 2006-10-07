@@ -217,6 +217,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "pathfinder.h"
 #include "widgets.h"
 #include "iolib.h"
+#include "guichan.h"
 
 #ifdef DEBUG
 extern int CclUnits(lua_State *l);
@@ -654,11 +655,18 @@ static void ExpandPath(char *newpath, const char *path)
 	}
 }
 
+extern gcn::Gui *Gui;
+
 void StartMap(const char *filename, bool clean = true) 
 {
 	const char *nc, *rc;
 
-	GuichanActive = false;
+	gcn::Widget *oldTop = Gui->getTop();
+	gcn::Container *container = new gcn::Container();
+	container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
+	container->setOpaque(false);
+	Gui->setTop(container);
+
 	NetConnectRunning = 0;
 	InterfaceState = IfaceStateNormal;
 
@@ -680,18 +688,19 @@ void StartMap(const char *filename, bool clean = true)
 	//  Clear screen
 	Video.ClearScreen();
 	Invalidate();
-	GuichanActive = true;
 
 	CleanGame();
 	InterfaceState = IfaceStateMenu;
 	SetDefaultTextColors(nc, rc);
+
+	Gui->setTop(oldTop);
+	delete container;
 }
 
 void StartSavedGame(const char *filename) 
 {
 	char path[512];
 
-	GuichanActive = false;
 	SaveGameLoading = 1;
 	CleanPlayers();
 	ExpandPath(path, filename);
