@@ -88,7 +88,7 @@ static int CclStratagusMap(lua_State *l)
 		} else if (!strcmp(value, "uid")) {
 			Map.Info.MapUID = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "description")) {
-			Map.Info.Description = new_strdup(LuaToString(l, j + 1));
+			Map.Info.Description = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -127,7 +127,7 @@ static int CclStratagusMap(lua_State *l)
 					--k;
 				} else if (!strcmp(value, "filename")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					Map.Info.Filename = new_strdup(LuaToString(l, -1));
+					Map.Info.Filename = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "map-fields")) {
 					int i;

@@ -286,7 +286,7 @@ void SaveGame(const char *filename)
 	file.printf("---  \"comment\", \"$Id$\",\n");
 	file.printf("---  \"type\",    \"%s\",\n", "single-player");
 	file.printf("---  \"date\",    \"%s\",\n", s);
-	file.printf("---  \"map\",     \"%s\",\n", Map.Info.Description);
+	file.printf("---  \"map\",     \"%s\",\n", Map.Info.Description.c_str());
 	file.printf("---  \"media-version\", \"%s\"", "Undefined");
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
 		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
