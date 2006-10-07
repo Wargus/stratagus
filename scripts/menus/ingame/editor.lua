@@ -149,6 +149,14 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 40, 40 + (22 * 0))
 
+  local types = {_("Elites")}
+  for i=0,14 do
+    local d = menu:addDropDown(types, 40, 40 + (22 * (i + 1)),
+      function() end)
+    d:getListBox():setWidth(80)
+    d:setWidth(80)
+  end
+
   local l = Label(_("Type"))
   l:setFont(Fonts["game"])
   l:adjustSize()
@@ -168,20 +176,40 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 290, 40 + (22 * 0))
 
+  local types = {_("Default")}
+  for i=0,14 do
+    local d = menu:addDropDown(types, 290, 40 + (22 * (i + 1)),
+      function() end)
+    d:getListBox():setWidth(120)
+    d:setWidth(80)
+  end
+
   local l = Label(_("Titanium"))
   l:setFont(Fonts["game"])
   l:adjustSize()
   menu:add(l, 420, 40 + (22 * 0))
+
+  for i=0,14 do
+    local d = menu:addTextInputField("" .. 1, 420, 40 + (22 * (i + 1)), 60)
+  end
 
   local l = Label(_("Crystal"))
   l:setFont(Fonts["game"])
   l:adjustSize()
   menu:add(l, 490, 40 + (22 * 0))
 
-  local l = Label(_("Quality"))
+  for i=0,14 do
+    local d = menu:addTextInputField("" .. 1, 490, 40 + (22 * (i + 1)), 60)
+  end
+
+  local l = Label(_("Energy"))
   l:setFont(Fonts["game"])
   l:adjustSize()
   menu:add(l, 560, 40 + (22 * 0))
+
+  for i=0,14 do
+    local d = menu:addTextInputField("" .. 1, 560, 40 + (22 * (i + 1)), 60)
+  end
 
   menu:run(false)
 end
