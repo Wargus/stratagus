@@ -398,7 +398,14 @@ void CMap::Clean(void)
 	// Tileset freed by Tileset?
 
 	FreeMapInfo(&this->Info);
-	memset(this, 0, sizeof(*this));
+	this->Fields = NULL;
+	memset(this->Visible, 0, sizeof(this->Visible));
+	this->NoFogOfWar = false;
+	memset(&this->Tileset, 0, sizeof(this->Tileset));
+	memset(this->TileModelsFileName, 0, sizeof(this->TileModelsFileName));
+	this->TileGraphic = NULL;
+	this->FogGraphic = NULL;
+
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 
