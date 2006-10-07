@@ -99,20 +99,21 @@ function RunEditorMapPropertiesMenu()
   l:adjustSize()
   menu:add(l, (288 - 260) / 2, 11 + 36)
 
-  menu:addTextInputField("", (288 - 260) / 2, 11 + 36 + 22, 260)
+  local desc = menu:addTextInputField(Map.Info.Description,
+    (288 - 260) / 2, 11 + 36 + 22, 260)
 
   local l = Label(_("Size:"))
   l:setFont(Fonts["game"])
   l:adjustSize()
   menu:add(l, (288 - 260) / 2, 11 + (36 * 2) + 22)
 
-  local sizeLabel = Label("")
+  local sizeLabel = Label("" .. Map.Info.MapWidth .. " x " .. Map.Info.MapHeight)
   sizeLabel:setFont(Fonts["game"])
   menu:add(sizeLabel, 288 - ((288 - 260) / 2) - 152, 11 + (36 * 2) + 22)
 
   menu:addSmallButton(_("~!OK"), "o", (288 - (106 * 2)) / 4, 256 - 11 - 27,
     function()
-      -- FIXME: save new properties
+      Map.Info.Description = desc:getText()
       menu:stop()
     end
   )
