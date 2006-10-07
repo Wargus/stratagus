@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Tue Sep 26 20:42:44 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Oct  7 10:08:57 2006.
 */
 
 #ifndef __cplusplus
@@ -25,6 +25,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S);
 #include "sound.h"
 #include "sound_server.h"
 #include "netconnect.h"
+#include "map.h"
 #ifdef _MSC_VER
 #pragma warning(disable:4800)
 #endif
@@ -290,67 +291,69 @@ static int tolua_collect_Slider (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CPlayerColorGraphic");
- tolua_usertype(tolua_S,"CEditor");
- tolua_usertype(tolua_S,"LuaActionListener");
- tolua_usertype(tolua_S,"BasicContainer");
- tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"MenuScreen");
+ tolua_usertype(tolua_S,"ImageRadioButton");
  tolua_usertype(tolua_S,"vector<CUIButton>");
- tolua_usertype(tolua_S,"ServerSetup");
- tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CFontColor");
- tolua_usertype(tolua_S,"NetworkHost");
- tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"vector<CFiller>");
+ tolua_usertype(tolua_S,"CMap");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"MultiLineLabel");
- tolua_usertype(tolua_S,"TextField");
- tolua_usertype(tolua_S,"ListBox");
  tolua_usertype(tolua_S,"CUIButton");
- tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
- tolua_usertype(tolua_S,"ImageWidget");
+ tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
- tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"StatBoxWidget");
- tolua_usertype(tolua_S,"CMinimap");
- tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"DropDown");
- tolua_usertype(tolua_S,"CMenuPanel");
- tolua_usertype(tolua_S,"CFiller");
+ tolua_usertype(tolua_S,"DropDownWidget");
  tolua_usertype(tolua_S,"CheckboxStyle");
- tolua_usertype(tolua_S,"vector<string>");
+ tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"ScrollArea");
  tolua_usertype(tolua_S,"Button");
- tolua_usertype(tolua_S,"gcn::Graphics");
  tolua_usertype(tolua_S,"CInfoPanel");
- tolua_usertype(tolua_S,"Container");
- tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"Window");
- tolua_usertype(tolua_S,"CVideo");
- tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
- tolua_usertype(tolua_S,"vector<CMenuPanel>");
- tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"ImageButton");
- tolua_usertype(tolua_S,"ImageRadioButton");
- tolua_usertype(tolua_S,"CPieMenu");
+ tolua_usertype(tolua_S,"StatBoxWidget");
  tolua_usertype(tolua_S,"CUITimer");
- tolua_usertype(tolua_S,"CResourceInfo");
- tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"Widget");
+ tolua_usertype(tolua_S,"Label");
+ tolua_usertype(tolua_S,"CResourceInfo");
+ tolua_usertype(tolua_S,"vector<CFiller>");
+ tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"CMapInfo");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CMapArea");
+ tolua_usertype(tolua_S,"ImageWidget");
+ tolua_usertype(tolua_S,"gcn::Graphics");
+ tolua_usertype(tolua_S,"NetworkHost");
+ tolua_usertype(tolua_S,"CStatusLine");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"Window");
+ tolua_usertype(tolua_S,"CMenuPanel");
+ tolua_usertype(tolua_S,"CFiller");
+ tolua_usertype(tolua_S,"vector<string>");
+ tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"MultiLineLabel");
+ tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"ButtonWidget");
+ tolua_usertype(tolua_S,"CEditor");
+ tolua_usertype(tolua_S,"CVideo");
+ tolua_usertype(tolua_S,"ImageCheckBox");
+ tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"BasicContainer");
+ tolua_usertype(tolua_S,"vector<CMenuPanel>");
+ tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"RadioButton");
+ tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"ListBox");
+ tolua_usertype(tolua_S,"DropDown");
  tolua_usertype(tolua_S,"Slider");
 }
 
@@ -15217,6 +15220,116 @@ static int tolua_stratagus_StopGame00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Description of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CMapInfo_Description
+static int tolua_get_CMapInfo_Description(lua_State* tolua_S)
+{
+  CMapInfo* self = (CMapInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Description'",NULL);
+#endif
+ tolua_pushcppstring(tolua_S,(const char*)self->Description);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Description of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CMapInfo_Description
+static int tolua_set_CMapInfo_Description(lua_State* tolua_S)
+{
+  CMapInfo* self = (CMapInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Description'",NULL);
+ if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Description = ((string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MapWidth of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CMapInfo_MapWidth
+static int tolua_get_CMapInfo_MapWidth(lua_State* tolua_S)
+{
+  CMapInfo* self = (CMapInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapWidth'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MapWidth);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MapHeight of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_get_CMapInfo_MapHeight
+static int tolua_get_CMapInfo_MapHeight(lua_State* tolua_S)
+{
+  CMapInfo* self = (CMapInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapHeight'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MapHeight);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Info of class  CMap */
+#ifndef TOLUA_DISABLE_tolua_get_CMap_Info
+static int tolua_get_CMap_Info(lua_State* tolua_S)
+{
+  CMap* self = (CMap*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Info'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->Info,"CMapInfo");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Info of class  CMap */
+#ifndef TOLUA_DISABLE_tolua_set_CMap_Info
+static int tolua_set_CMap_Info(lua_State* tolua_S)
+{
+  CMap* self = (CMap*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Info'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CMapInfo",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Info = *((CMapInfo*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Map */
+#ifndef TOLUA_DISABLE_tolua_get_Map
+static int tolua_get_Map(lua_State* tolua_S)
+{
+ tolua_pushusertype(tolua_S,(void*)&Map,"CMap");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Map */
+#ifndef TOLUA_DISABLE_tolua_set_Map
+static int tolua_set_Map(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,2,"CMap",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  Map = *((CMap*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Translate */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Translate00
 static int tolua_stratagus_Translate00(lua_State* tolua_S)
@@ -16449,6 +16562,17 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_constant(tolua_S,"GameRestart",GameRestart);
  tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
  tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
+ tolua_cclass(tolua_S,"CMapInfo","CMapInfo","",NULL);
+ tolua_beginmodule(tolua_S,"CMapInfo");
+  tolua_variable(tolua_S,"Description",tolua_get_CMapInfo_Description,tolua_set_CMapInfo_Description);
+  tolua_variable(tolua_S,"MapWidth",tolua_get_CMapInfo_MapWidth,NULL);
+  tolua_variable(tolua_S,"MapHeight",tolua_get_CMapInfo_MapHeight,NULL);
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"CMap","CMap","",NULL);
+ tolua_beginmodule(tolua_S,"CMap");
+  tolua_variable(tolua_S,"Info",tolua_get_CMap_Info,tolua_set_CMap_Info);
+ tolua_endmodule(tolua_S);
+ tolua_variable(tolua_S,"Map",tolua_get_Map,tolua_set_Map);
  tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
  tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
  tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
