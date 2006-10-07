@@ -1943,20 +1943,32 @@ void DropOutAll(const CUnit *source)
 */
 CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 {
-	CBuildRestrictionOnTop *b;
+	CBuildRestrictionAnd *andb;
+	CBuildRestrictionOnTop *ontopb;
 
 	for (std::vector<CBuildRestriction *>::iterator i = unit->Type->BuildingRules.begin();
-		i != unit->Type->BuildingRules.end(); ++i) {
-		b = dynamic_cast<CBuildRestrictionOnTop*> (*i);
-		if (!b) {
-			continue;
-		}
-		if (!parent) {
-			// Guess this is right
-			return b;
-		}
-		if (parent == b->Parent) {
-			return b;
+			i != unit->Type->BuildingRules.end(); ++i) {
+		if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
+			if (!parent) {
+				// Guess this is right
+				return ontopb;
+			}
+			if (parent == ontopb->Parent) {
+				return ontopb;
+			}
+		} else if ((andb = dynamic_cast<CBuildRestrictionAnd *>(*i))) {
+			for (std::vector<CBuildRestriction *>::iterator i = andb->_or_list.begin();
+					i != andb->_or_list.end(); ++i) {
+				if ((ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i))) {
+					if (!parent) {
+						// Guess this is right
+						return ontopb;
+					}
+					if (parent == ontopb->Parent) {
+						return ontopb;
+					}
+				}
+			}
 		}
 	}
 	return NULL;
