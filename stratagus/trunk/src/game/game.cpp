@@ -217,7 +217,7 @@ int SaveStratagusMap(const char *mapname, CMap *map, int writeTerrain)
 	gzprintf(f, ")\n");
 	
 	gzprintf(f, "PresentMap(\"%s\", %d, %d, %d, %d)\n",
-			map->Info.Description, numplayers, map->Info.MapWidth, map->Info.MapHeight,
+			map->Info.Description.c_str(), numplayers, map->Info.MapWidth, map->Info.MapHeight,
 			map->Info.MapUID + 1);
 
 	mapsetupname = strrchr(mapsetup, '/');
