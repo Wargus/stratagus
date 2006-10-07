@@ -1499,9 +1499,9 @@ void MenuScreen::stop(int result, bool stopAll)
 			}
 		}
 		if (MenuStack.empty()) {
-			GuichanActive = false;
 			//InterfaceState = IfaceStateNormal;
 			if (!Editor.Running) {
+				GuichanActive = false;
 				SetCallbacks(&GameCallbacks);
 			} else {
 				SetCallbacks(&EditorCallbacks);
