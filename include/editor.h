@@ -62,8 +62,6 @@ class CEditor {
 public:
 	CEditor() : TerrainEditable(true),
 		StartUnitName(NULL), StartUnit(NULL),
-		ShowUnitsToSelect(true), ShowBuildingsToSelect(true),
-		ShowAirToSelect(true), ShowLandToSelect(true), ShowWaterToSelect(true),
 		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
 		CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
 		MapLoaded(false), WriteCompressedMaps(true)
@@ -85,15 +83,6 @@ public:
 	IconConfig Units;            /// Editor's units icon.
 	char *StartUnitName;         /// name of the Unit used to display the start location.
 	const CUnitType *StartUnit;  /// Unit used to display the start location.
-
-	bool ShowUnitsToSelect;      /// Show units in unit list.
-	bool ShowBuildingsToSelect;  /// Show buildings in unit list.
-#if 0
-	bool ShowHeroesToSelect;     /// Show heroes in unit list.
-#endif
-	bool ShowAirToSelect;        /// Show air units in unit list.
-	bool ShowLandToSelect;       /// Show land units in unit list.
-	bool ShowWaterToSelect;      /// Show water units in unit list.
 
 	int UnitIndex;               /// Unit icon draw index.
 	int CursorUnitIndex;         /// Unit icon under cursor.
