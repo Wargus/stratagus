@@ -423,27 +423,6 @@ static void RecalculateShownUnits(void)
 
 	for (int i = 0; i < (int)Editor.UnitTypes.size(); ++i) {
 		type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
-
-		if (type->Building && !Editor.ShowBuildingsToSelect) {
-			continue;
-		}
-		if (!type->Building && !Editor.ShowUnitsToSelect) {
-			continue;
-		}
-#if 0
-		if (type->Hero && !Editor.ShowHeroesToSelect) {
-			continue;
-		}
-#endif
-		if (type->UnitType == UnitTypeLand && !Editor.ShowLandToSelect) {
-			continue;
-		}
-		if (type->UnitType == UnitTypeNaval && !Editor.ShowWaterToSelect) {
-			continue;
-		}
-		if (type->UnitType == UnitTypeFly && !Editor.ShowAirToSelect) {
-			continue;
-		}
 		Editor.ShownUnitTypes.push_back(type);
 	}
 
@@ -607,27 +586,6 @@ static void DrawUnitIcons(void)
 	//
 	x = UI.InfoPanel.X + 10;
 	y = UI.InfoPanel.Y + 140;
-
-	VideoDrawText(x + 28 * 0, y, GameFont, "Un");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowUnitsToSelect ? 2 : 0),
-	//	x + 28 * 0, y + 16);
-	VideoDrawText(x + 28 * 1, y, GameFont, "Bu");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowBuildingsToSelect ? 2 : 0),
-	//	x + 28 * 1, y + 16);
-#if 0
-	VideoDrawText(x + 28 * 2, y, GameFont, "He");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowHeroesToSelect ? 2 : 0),
-		x + 28 * 2, y + 16);
-#endif
-	VideoDrawText(x + 28 * 3, y, GameFont, "La");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowLandToSelect ? 2 : 0),
-	//	x + 28 * 3, y + 16);
-	VideoDrawText(x + 28 * 4, y, GameFont, "Wa");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowWaterToSelect ? 2 : 0),
-	//	x + 28 * 4, y + 16);
-	VideoDrawText(x + 28 * 5, y, GameFont, "Ai");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (Editor.ShowAirToSelect ? 2 : 0),
-	//	x + 28 * 5, y + 16);
 
 	//
 	//  Draw the unit icons.
@@ -1192,57 +1150,6 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (Editor.CursorUnitIndex != -1) {
 			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
-			return;
-		}
-		// Cursor on unit selection icons
-		if (UI.InfoPanel.X + 10 + 28 * 0 < CursorX &&
-				CursorX < UI.InfoPanel.X + 10 + 28 * 1 &&
-				UI.InfoPanel.Y + 140 < CursorY &&
-				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			Editor.ShowUnitsToSelect ^= 1;
-			RecalculateShownUnits();
-			return;
-		}
-		if (UI.InfoPanel.X + 10 + 28 * 1 < CursorX &&
-				CursorX < UI.InfoPanel.X + 10 + 28 * 2 &&
-				UI.InfoPanel.Y + 140 < CursorY &&
-				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			Editor.ShowBuildingsToSelect ^= 1;
-			RecalculateShownUnits();
-			return;
-		}
-#if 0
-		if (UI.InfoPanel.X + 10 + 28 * 2 < CursorX &&
-				CursorX < UI.InfoPanel.X + 10 + 28 * 3 &&
-				UI.InfoPanel.Y + 140 < CursorY &&
-				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			Editor.ShowHeroesToSelect ^= 1;
-			RecalculateShownUnits();
-			return;
-		}
-#endif
-		if (UI.InfoPanel.X + 10 + 28 * 3 < CursorX &&
-				CursorX < UI.InfoPanel.X + 10 + 28 * 4 &&
-				UI.InfoPanel.Y + 140 < CursorY &&
-				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			Editor.ShowLandToSelect ^= 1;
-			RecalculateShownUnits();
-			return;
-		}
-		if (UI.InfoPanel.X + 10 + 28 * 4 < CursorX &&
-				CursorX < UI.InfoPanel.X + 10 + 28 * 5 &&
-				UI.InfoPanel.Y + 140 < CursorY &&
-				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			Editor.ShowWaterToSelect ^= 1;
-			RecalculateShownUnits();
-			return;
-		}
-		if (UI.InfoPanel.X + 10 + 28 * 5 < CursorX &&
-				CursorX < UI.InfoPanel.X + 10 + 28 * 6 &&
-				UI.InfoPanel.Y + 140 < CursorY &&
-				CursorY < UI.InfoPanel.Y + 140 + 28) {
-			Editor.ShowAirToSelect ^= 1;
-			RecalculateShownUnits();
 			return;
 		}
 	}
