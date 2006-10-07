@@ -2083,14 +2083,20 @@ void EditorMainLoop(void)
 
 /**
 **  Start the editor
+**
+**  @param filename  Map to load, NULL to create a new map
 */
 void StartEditor(const char *filename)
 {
-	strcpy(CurrentMapPath, filename);
-
-	Map.Info.Description = new_strdup(filename);
-	Map.Info.MapWidth = 64;
-	Map.Info.MapHeight = 64;
+	if (filename) {
+		strcpy(CurrentMapPath, filename);
+	} else {
+		// new map, choose some default values
+		strcpy(CurrentMapPath, "");
+		Map.Info.Description = "";
+		Map.Info.MapWidth = 64;
+		Map.Info.MapHeight = 64;
+	}
 	
 	// Run the editor.
 	EditorMainLoop();

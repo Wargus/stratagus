@@ -367,9 +367,10 @@ void PreprocessMap(void)
 void FreeMapInfo(CMapInfo *info)
 {
 	if (info) {
-		delete[] info->Description;
-		delete[] info->Filename;
-		memset(info, 0, sizeof(CMapInfo));
+		info->MapWidth = info->MapHeight = 0;
+		memset(info->PlayerSide, 0, sizeof(info->PlayerSide));
+		memset(info->PlayerType, 0, sizeof(info->PlayerType));
+		info->MapUID = 0;
 	}
 }
 
@@ -666,9 +667,10 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 void LoadStratagusMapInfo(const char *mapname) 
 {
 	// Set the default map setup by replacing .smp with .sms
-	delete[] Map.Info.Filename;
-	Map.Info.Filename = new_strdup(mapname);
-	memcpy(strstr(Map.Info.Filename, ".smp"), ".sms", 4);
+	char *file = new_strdup(mapname);
+	memcpy(strstr(file, ".smp"), ".sms", 4);
+	Map.Info.Filename = file;
+	delete[] file;
 	
 	LuaLoadFile(mapname);
 }

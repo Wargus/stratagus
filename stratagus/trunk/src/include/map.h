@@ -169,6 +169,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <string>
 #include <vector>
 #include "iocompat.h"
 #include "tileset.h"
@@ -249,8 +250,8 @@ public:
 */
 class CMapInfo {
 public:
-	char *Description;     /// Map description
-	char *Filename;        /// Map filename
+	std::string Description;     /// Map description
+	std::string Filename;        /// Map filename
 	int MapWidth;          /// Map width
 	int MapHeight;         /// Map height
 	int PlayerType[PlayerMax];  /// Same player->Type
