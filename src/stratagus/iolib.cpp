@@ -349,8 +349,7 @@ int CFile::printf(char *format, ...)
 		oldsize = size;
 		if (n > -1) { // glibc 2.1
 			size = n + 1; // precisely what is needed
-		} else {    /* glibc 2.0 */
-			DebugPrint("Something could be wrong in CLprintf.\n");
+		} else {    /* glibc 2.0, vc++ */
 			size *= 2;  // twice the old size
 		}
 		if ((newp = new char[size]) == NULL) {
