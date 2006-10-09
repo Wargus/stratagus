@@ -8,8 +8,8 @@
 --   A GPL'd futuristic RTS game
 --
 -- Stratagus Map Presentation
--- Copyright 2005 by François Beerten
+-- Copyright 2005-2006 by Francois Beerten
 
-PresentMap("Cold Antarticum", 2, 64, 64, 440283939)
-DefinePlayerTypes("person", "person")
+PresentMap("Cold Antarticum", 4, 64, 64, 440283939)
+DefinePlayerTypes("person", "person", "person", "person")
 DefineMapSetup("maps/antarticum/setup.sms")
