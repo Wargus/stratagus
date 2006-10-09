@@ -960,6 +960,12 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
+	if (Players[playerno].Type == PlayerNobody) {
+		printf("CreateUnit: player %d does not exist\n", playerno);
+		LuaError(l, "bad player");
+		return 0;
+	}
+
 	unit = MakeUnit(unittype, &Players[playerno]);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate unit");
