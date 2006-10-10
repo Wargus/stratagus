@@ -591,6 +591,7 @@ function RunObjectivesMenu()
   menu:run(false)
 end
 
+-- FIXME: never gets run
 function RunVictoryMenu()
   local menu = BosGameMenu()
   menu:setSize(288, 128)
@@ -608,6 +609,7 @@ function RunVictoryMenu()
   menu:run(false)
 end
 
+-- FIXME: never gets run
 function RunDefeatMenu()
   local menu = BosGameMenu()
   menu:setSize(288, 128)
@@ -625,6 +627,7 @@ function RunDefeatMenu()
   menu:run(false)
 end
 
+-- FIXME: never gets run
 function RunSaveReplayMenu()
   local menu = BosGameMenu()
   menu:setSize(288, 128)
@@ -634,7 +637,7 @@ function RunSaveReplayMenu()
   menu:addLabel(_("Save Replay"), 144, 11)
   menu:addTextInputField("", 14, 40, 260)
   menu:addSmallButton(_("~!OK"), "o", 14, 80,
-    function() menu:stop() end)
+    function() --[[ FIXME: save replay ]] menu:stop() end)
   menu:addSmallButton(_("Cancel (~<Esc~>)"), "escape", 162, 80,
     function() menu:stop() end)
 
