@@ -115,27 +115,6 @@ function RunSaveMenu()
   menu:run(false)
 end
 
--- NOTE: currently unused ! --
-function RunLoadMenu()
-  local menu = BosGameMenu()
-
-  menu:addLabel(_("Load Game"), 128, 11)
-
-  local browser = menu:addBrowser("~save", ".sav.gz$", 16, 40, 224, 200)
-  local function cb(s)
-    print(browser:getSelectedItem())
-  end
-  browser:setActionCallback(cb)
-
-  menu:addSmallButton(_("Load"), 0, 16, 248,
-    function() StartSavedGame("~save/"..browser:getSelectedItem()) end)
-
-  menu:addSmallButton(_("Cancel"), 0, 16 + 12 + 106, 248,
-    function() menu:stop() end)
-
-  menu:run(false)
-end
-
 function  RunGameSoundOptionsMenu()
   local menu = BosGameMenu()
   
@@ -591,56 +570,4 @@ function RunObjectivesMenu()
   menu:run(false)
 end
 
--- FIXME: never gets run
-function RunVictoryMenu()
-  local menu = BosGameMenu()
-  menu:setSize(288, 128)
-  menu:setPosition((Video.Width - menu:getWidth()) / 2,
-    (Video.Height - menu:getHeight()) / 2)
-
-  menu:addLabel(_("Congratulations!"), 144, 11)
-  menu:addLabel(_("You are victorious!"), 144, 32)
-  menu:addButton(_("~!Victory"), "v", 32, 54,
-    function() menu:stop() end)
-  -- FIXME: check if log is disabled
-  menu:addButton(_("Save ~!Replay"), "r", 32, 90,
-    function() RunSaveReplayMenu() end)
-
-  menu:run(false)
-end
-
--- FIXME: never gets run
-function RunDefeatMenu()
-  local menu = BosGameMenu()
-  menu:setSize(288, 128)
-  menu:setPosition((Video.Width - menu:getWidth()) / 2,
-    (Video.Height - menu:getHeight()) / 2)
-
-  menu:addLabel(_("You have failed to"), 144, 11)
-  menu:addLabel(_("achieve victory!"), 144, 32)
-  menu:addButton(_("~!OK"), "o", 32, 56,
-    function() menu:stop() end)
-  -- FIXME: check if log is disabled
-  menu:addButton(_("Save ~!Replay"), "r", 32, 90,
-    function() RunSaveReplayMenu() end)
-
-  menu:run(false)
-end
-
--- FIXME: never gets run
-function RunSaveReplayMenu()
-  local menu = BosGameMenu()
-  menu:setSize(288, 128)
-  menu:setPosition((Video.Width - menu:getWidth()) / 2,
-    (Video.Height - menu:getHeight()) / 2)
-
-  menu:addLabel(_("Save Replay"), 144, 11)
-  menu:addTextInputField("", 14, 40, 260)
-  menu:addSmallButton(_("~!OK"), "o", 14, 80,
-    function() --[[ FIXME: save replay ]] menu:stop() end)
-  menu:addSmallButton(_("Cancel (~<Esc~>)"), "escape", 162, 80,
-    function() menu:stop() end)
-
-  menu:run(false)
-end
 
