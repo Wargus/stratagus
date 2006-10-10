@@ -91,8 +91,21 @@ function RunSaveMenu()
   menu:addSmallButton(_("Save"), 0, 16, 248,
     -- FIXME: use a confirm menu if the file exists already
     function()
-      SaveGame(t:getText())
-      UI.StatusLine:Set("Saved game to: " .. t:getText())
+      local name = t:getText()
+      -- strip .gz
+      if (string.find(name, ".gz$") ~= nil) then
+        name = string.sub(name, 1, string.len(name) - 3)
+      end
+      -- append .sav
+      if (string.find(name, ".sav$") == nil) then
+        name = name .. ".sav"
+      end
+      -- replace invalid chars with underscore
+      local t = {"\\", "/", ":", "*", "?", "\"", "<", ">", "|"}
+      table.foreachi(t, function(k,v) name = string.gsub(name, v, "_") end)
+
+      SaveGame(name)
+      UI.StatusLine:Set("Saved game to: " .. name)
       menu:stop()
     end)
 
