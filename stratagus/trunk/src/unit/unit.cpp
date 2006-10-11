@@ -1782,28 +1782,28 @@ void DropOutOnSide(CUnit *unit, int heading, int addx, int addy)
 	for (;;) {
 startw:
 		for (i = addy; i--; ++y) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				goto found;
 			}
 		}
 		++addx;
 starts:
 		for (i = addx; i--; ++x) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				goto found;
 			}
 		}
 		++addy;
 starte:
 		for (i = addy; i--; --y) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				goto found;
 			}
 		}
 		++addx;
 startn:
 		for (i = addx; i--; --x) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				goto found;
 			}
 		}
