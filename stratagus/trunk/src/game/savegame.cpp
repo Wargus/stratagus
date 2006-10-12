@@ -55,7 +55,7 @@
 #include "map.h"
 #include "player.h"
 #include "ai.h"
-#include "campaign.h"
+#include "results.h"
 #include "trigger.h"
 #include "settings.h"
 #include "iolib.h"

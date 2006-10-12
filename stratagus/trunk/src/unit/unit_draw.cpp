@@ -1348,10 +1348,11 @@ void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
 /**
 **  Draw construction shadow.
 **
-**  @param unit   Unit pointer.
-**  @param frame  Frame number to draw.
-**  @param x      X position.
-**  @param y      Y position.
+**  @param unit    Unit pointer.
+**  @param cframe  Construction frame
+**  @param frame   Frame number to draw.
+**  @param x       X position.
+**  @param y       Y position.
 */
 static void DrawConstructionShadow(const CUnit *unit, const CConstructionFrame *cframe,
 	int frame, int x, int y)

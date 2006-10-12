@@ -112,7 +112,7 @@ void CleanGroups(void)
 }
 
 /**
-**  Return the number of units of group #num
+**  Return the number of units of group num
 **
 **  @param num  Group number.
 **
@@ -124,7 +124,7 @@ int GetNumberUnitsOfGroup(int num)
 }
 
 /**
-**  Return the units of group #num
+**  Return the units of group num
 **
 **  @param num  Group number.
 **
@@ -136,7 +136,7 @@ CUnit **GetUnitsOfGroup(int num)
 }
 
 /**
-**  Clear contents of group #num
+**  Clear contents of group num
 **
 **  @param num  Group number.
 */
@@ -154,7 +154,7 @@ void ClearGroup(int num)
 }
 
 /**
-**  Add units to group #num contents from unit array "units"
+**  Add units to group num contents from unit array "units"
 **
 **  @param units   Array of units to place into group.
 **  @param nunits  Number of units in array.
@@ -188,7 +188,7 @@ void AddToGroup(CUnit **units, int nunits, int num)
 }
 
 /**
-**  Set group #num contents to unit array "units"
+**  Set group num contents to unit array "units"
 **
 **  @param units   Array of units to place into group.
 **  @param nunits  Number of units in array.

@@ -47,7 +47,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "interface.h"
-#include "campaign.h"
+#include "results.h"
 #include "util.h"
 #include "script.h"
 

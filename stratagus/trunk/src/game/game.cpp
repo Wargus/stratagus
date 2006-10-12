@@ -89,8 +89,9 @@ GameResults GameResult;                      /// Outcome of the game
 /**
 **  Load a Stratagus map.
 **
-**  @param mapname   map filename
-**  @param map       map loaded
+**  @param smpname  smp filename
+**  @param mapname  map filename
+**  @param map      map loaded
 */
 static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map)
 {

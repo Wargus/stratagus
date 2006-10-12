@@ -644,7 +644,7 @@ int PlayMusic(CSample *sample)
 /**
 **  Play a music file.
 **
-**  @param name  Name of music file, format is automatically detected.
+**  @param file  Name of music file, format is automatically detected.
 **
 **  @return      0 if music is playing, -1 if not.
 */
