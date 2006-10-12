@@ -367,6 +367,8 @@ void PreprocessMap(void)
 void FreeMapInfo(CMapInfo *info)
 {
 	if (info) {
+		info->Description.clear();
+		info->Filename.clear();
 		info->MapWidth = info->MapHeight = 0;
 		memset(info->PlayerSide, 0, sizeof(info->PlayerSide));
 		memset(info->PlayerType, 0, sizeof(info->PlayerType));
