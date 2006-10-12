@@ -86,6 +86,7 @@
 **  @note        resx and resy are undefined if a position is not found.
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
+**  @bug         FIXME: This function fails for units larger than 1x1.
 */
 static int FindUnloadPosition(int x, int y, int *resx, int *resy, int mask)
 {
