@@ -911,7 +911,7 @@ static int CclMoveUnit(lua_State *l)
 	} else {
 		unit->X = ix;
 		unit->Y = iy;
-		DropOutOnSide(unit, heading, unit->Type->TileWidth, unit->Type->TileHeight);
+		DropOutOnSide(unit, heading, 1, 1);
 	}
 
 //	PlaceUnit(unit, ix, iy);
@@ -977,7 +977,7 @@ static int CclCreateUnit(lua_State *l)
 		} else {
 			unit->X = ix;
 			unit->Y = iy;
-			DropOutOnSide(unit, heading, unittype->TileWidth, unittype->TileHeight);
+			DropOutOnSide(unit, heading, 1, 1);
 		}
 		UpdateForNewUnit(unit, 0);
 
