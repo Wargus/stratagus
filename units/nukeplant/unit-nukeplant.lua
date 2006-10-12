@@ -53,10 +53,10 @@ DefineAnimations("animations-nuke", {
         "frame 13", "wait 20", "frame 14", "wait 20", "wait 20", },
     })
 
-MakeSound("gen-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
-MakeSound("gen-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
-MakeSound("gen-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
-MakeSound("gen-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
+MakeSound("nuke-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
+MakeSound("nuke-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
+MakeSound("nuke-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
+MakeSound("nuke-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
 
 DefineUnitType("unit-nuke", {
 	Name = "nukeplant",
@@ -73,10 +73,10 @@ DefineUnitType("unit-nuke", {
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {
-		"selected", "gen-selected",
-		"ready", "gen-ready",
-		"help", "gen-help",
-		"dead", "gen-dead"}
+		"selected", "nuke-selected",
+		"ready", "nuke-ready",
+		"help", "nuke-help",
+		"dead", "nuke-dead"}
 	})
 
 DefineAnimations("animations-nukebuild", {
