@@ -56,12 +56,11 @@ class CPlayer;
 */
 class CAiType {
 public:
-	CAiType() : Name(NULL), Race(NULL), Class(NULL), Script(NULL),
-		FunctionName(NULL) {}
+	CAiType() {}
 
-	char *Name;     /// Name of this ai
-	char *Race;     /// for this race
-	char *Class;    /// class of this ai
+	std::string Name;     /// Name of this ai
+	std::string Race;     /// for this race
+	std::string Class;    /// class of this ai
 
 #if 0
 	// nice flags
@@ -69,8 +68,8 @@ public:
 	unsigned char AllVisbile : 1;  /// Ai sees invisibile area
 #endif
 
-	char *Script;       /// Main script
-	char *FunctionName; /// Name of the function
+	std::string Script;       /// Main script
+	std::string FunctionName; /// Name of the function
 };
 
 /**
@@ -185,7 +184,7 @@ public:
 */
 class PlayerAi {
 public:
-	PlayerAi() : Player(NULL), AiType(NULL), Script(NULL), ScriptDebug(0),
+	PlayerAi() : Player(NULL), AiType(NULL), ScriptDebug(false),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
 		LastExplorationGameCycle(0), LastCanNotMoveGameCycle(0),
 		LastRepairBuilding(0)
@@ -200,7 +199,7 @@ public:
 	CPlayer *Player;               /// Engine player structure
 	CAiType *AiType;               /// AI type of this player AI
 	// controller
-	char *Script;                  /// Script executed
+	std::string Script;            /// Script executed
 	bool ScriptDebug;              /// Flag script debuging on/off
 	unsigned long SleepCycles;     /// Cycles to sleep
 
