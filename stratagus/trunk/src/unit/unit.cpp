@@ -1735,19 +1735,18 @@ void UnitHeadingFromDeltaXY(CUnit *unit, int dx, int dy)
   ----------------------------------------------------------------------------*/
 
 /**
-**  Reappear unit on map.
+**  Place a unit on the map to the side of a unit.
 **
 **  @param unit       Unit to drop out.
 **  @param heading    Direction in which the unit should appear.
-**  @param addx       Tile size in x.
-**  @param addy       Tile size in y.
+**  @param addx       Tile width of unit it's dropping out of.
+**  @param addy       Tile height of unit it's dropping out of.
 */
 void DropOutOnSide(CUnit *unit, int heading, int addx, int addy)
 {
 	int x;
 	int y;
 	int i;
-	int mask;
 
 	if (unit->Container) {
 		x = unit->Container->X;
@@ -1755,11 +1754,7 @@ void DropOutOnSide(CUnit *unit, int heading, int addx, int addy)
 	} else {
 		x = unit->X;
 		y = unit->Y;
-		// n0b0dy: yes, when training an unit.
 	}
-
-
-	mask = unit->Type->MovementMask;
 
 	if (heading < LookingNE || heading > LookingNW) {
 		x += addx - 1;
@@ -1815,13 +1810,13 @@ found:
 }
 
 /**
-**  Reappear unit on map nearest to x, y.
+**  Place a unit on the map nearest to x, y.
 **
 **  @param unit    Unit to drop out.
 **  @param gx      Goal X map tile position.
 **  @param gy      Goal Y map tile position.
-**  @param addx    Tile size in x.
-**  @param addy    Tile size in y.
+**  @param addx    Tile width of unit it's dropping out of.
+**  @param addy    Tile height of unit it's dropping out of.
 */
 void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 {
@@ -1831,7 +1826,6 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 	int bestx;
 	int besty;
 	int bestd;
-	int mask;
 	int n;
 
 	Assert(unit->Removed);
@@ -1846,18 +1840,15 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 	}
 
 	Assert(x != -1 && y != -1);
-	mask = unit->Type->MovementMask;
 
 	bestd = 99999;
-#ifdef DEBUG
-	bestx = besty = 0; // keep the compiler happy
-#endif
+	bestx = besty = 0;
 
 	// FIXME: if we reach the map borders we can go fast up, left, ...
 	--x;
 	for (;;) {
 		for (i = addy; i--; ++y) { // go down
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
@@ -1868,7 +1859,7 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 		}
 		++addx;
 		for (i = addx; i--; ++x) { // go right
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
@@ -1879,7 +1870,7 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 		}
 		++addy;
 		for (i = addy; i--; --y) { // go up
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
@@ -1890,7 +1881,7 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 		}
 		++addx;
 		for (i = addx; i--; --x) { // go left
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanBeAt(unit, x, y)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
 					bestd = n;
@@ -1910,7 +1901,7 @@ void DropOutNearest(CUnit *unit, int gx, int gy, int addx, int addy)
 /**
 **  Drop out all units inside unit.
 **
-**  @param source    All units inside source are dropped out.
+**  @param source  All units inside source are dropped out.
 */
 void DropOutAll(const CUnit *source)
 {
