@@ -887,7 +887,6 @@ static int CclMoveUnit(lua_State *l)
 {
 	CUnit *unit;
 	int heading;
-	int mask;
 	int ix;
 	int iy;
 
@@ -905,8 +904,7 @@ static int CclMoveUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	heading = SyncRand() % 256;
-	mask = unit->Type->MovementMask;
-	if (CheckedCanMoveToMask(ix, iy, mask)) {
+	if (UnitCanBeAt(unit, ix, iy)) {
 		unit->Place(ix, iy);
 	} else {
 		unit->X = ix;
@@ -932,7 +930,6 @@ static int CclCreateUnit(lua_State *l)
 	CUnit *unit;
 	int heading;
 	int playerno;
-	int mask;
 	int ix;
 	int iy;
 
@@ -971,8 +968,7 @@ static int CclCreateUnit(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		mask = unit->Type->MovementMask;
-		if (CheckedCanMoveToMask(ix, iy, mask)) {
+		if (UnitCanBeAt(unit, ix, iy)) {
 			unit->Place(ix, iy);
 		} else {
 			unit->X = ix;
