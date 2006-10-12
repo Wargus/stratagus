@@ -177,10 +177,10 @@ static void AiExecuteScript(void)
 {
 	PlayerAi *pai = AiPlayer;
 
-	if (pai->Script) {
+	if (!pai->Script.empty()) {
 		lua_pushstring(Lua, "_ai_scripts_");
 		lua_gettable(Lua, LUA_GLOBALSINDEX);
-		lua_pushstring(Lua, pai->Script);
+		lua_pushstring(Lua, pai->Script.c_str());
 		lua_rawget(Lua, -2);
 		LuaCall(0, 1);
 		lua_pop(Lua, 1);
@@ -337,9 +337,9 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	int i;
 
 	file->printf("DefineAiPlayer(%d,\n", plynr);
-	file->printf("  \"ai-type\", \"%s\",\n", ai->AiType->Name);
+	file->printf("  \"ai-type\", \"%s\",\n", ai->AiType->Name.c_str());
 
-	file->printf("  \"script\", \"%s\",\n", ai->Script);
+	file->printf("  \"script\", \"%s\",\n", ai->Script.c_str());
 	file->printf("  \"script-debug\", %s,\n", ai->ScriptDebug ? "true" : "false");
 	file->printf("  \"sleep-cycles\", %lu,\n", ai->SleepCycles);
 
@@ -527,8 +527,6 @@ void AiInit(CPlayer *player)
 		fprintf(stderr, "Out of memory.\n");
 		exit(0);
 	}
-	// FIXME: use constructor
-	memset(pai, 0, sizeof(*pai));
 
 	pai->Player = player;
 	ait = NULL;
@@ -548,10 +546,10 @@ void AiInit(CPlayer *player)
 	}
 	for (i = 0; i < (int)AiTypes.size(); ++i) {
 		ait = AiTypes[i];
-		if (ait->Race && strcmp(ait->Race, PlayerRaces.Name[player->Race])) {
+		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player->Race]) {
 			continue;
 		}
-		if (ainame && strcmp(ainame, ait->Class)) {
+		if (ainame && ait->Class != ainame) {
 			continue;
 		}
 		break;
@@ -566,7 +564,7 @@ void AiInit(CPlayer *player)
 		DebugPrint("AI: Using fallback:\n");
 	}
 	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player->Race] _C_ 
-		ait->Race ? ait->Race : "All" _C_ ainame _C_ ait->Class);
+		!ait->Race.empty() ? ait->Race.c_str() : "All" _C_ ainame _C_ ait->Class.c_str());
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;
@@ -603,11 +601,7 @@ void CleanAi(void)
 	//
 	for (int i = 0; i < (int)AiTypes.size(); ++i) {
 		CAiType *aitype = AiTypes[i];
-		delete[] aitype->Name;
-		delete[] aitype->Race;
-		delete[] aitype->Class;
-		delete[] aitype->Script;
-		delete[] aitype->FunctionName;
+
 		delete aitype;
 	}
 	AiTypes.clear();

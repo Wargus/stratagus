@@ -353,13 +353,13 @@ static int CclDefineAi(lua_State *l)
 	//
 	// AI Name
 	//
-	aitype->Name = new_strdup(LuaToString(l, 1));
+	aitype->Name = LuaToString(l, 1);
 
 #ifdef DEBUG
 	for (int i = 1; i < (int)AiTypes.size(); ++i) {
 		ait = AiTypes[i];
-		if (!strcmp(aitype->Name, ait->Name)) {
-			DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ ait->Name);
+		if (aitype->Name == ait->Name) {
+			DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ ait->Name.c_str());
 		}
 	}
 #endif
@@ -369,15 +369,15 @@ static int CclDefineAi(lua_State *l)
 	//
 	value = LuaToString(l, 2);
 	if (*value != '*') {
-		aitype->Race = new_strdup(value);
+		aitype->Race = value;
 	} else {
-		aitype->Race = NULL;
+		aitype->Race.clear();
 	}
 
 	//
 	// AI Class
 	//
-	aitype->Class = new_strdup(LuaToString(l, 3));
+	aitype->Class = LuaToString(l, 3);
 
 	//
 	// AI Script
@@ -392,12 +392,8 @@ static int CclDefineAi(lua_State *l)
 		lua_pushstring(l, "_ai_scripts_");
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
-	aitype->Script = new char[strlen(aitype->Name) +
-		(aitype->Race ? strlen(aitype->Race) : 0) +
-		strlen(aitype->Class) + 1];
-	sprintf(aitype->Script, "%s%s%s", aitype->Name,
-		(aitype->Race ? aitype->Race : ""), aitype->Class);
-	lua_pushstring(l, aitype->Script);
+	aitype->Script = aitype->Name + aitype->Race + aitype->Class;
+	lua_pushstring(l, aitype->Script.c_str());
 	lua_pushvalue(l, 4);
 	lua_rawset(l, 5);
 	lua_pop(l, 1);
@@ -413,7 +409,7 @@ static int CclDefineAi(lua_State *l)
 	lua_call(l, 1, 1);
 	lua_pushstring(l, "name");
 	lua_gettable(l, -2);
-	aitype->FunctionName = new_strdup(LuaToString(l, -1));
+	aitype->FunctionName = LuaToString(l, -1);
 	lua_pop(l, 2); // FIXME : check if this value is correct.
 	// We can have opcode of this function with string.dump(function)
 	// Problems are for sub functions...
@@ -1144,7 +1140,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			value = LuaToString(l, j + 1);
 			for (k = 0; k < (int)AiTypes.size(); ++k) {
 				ait = AiTypes[k];
-				if (!strcmp(ait->Name, value)) {
+				if (ait->Name == value) {
 					break;
 				}
 			}
@@ -1154,7 +1150,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			ai->AiType = ait;
 			ai->Script = ait->Script;
 		} else if (!strcmp(value, "script")) {
-			ai->Script = new_strdup(LuaToString(l, j + 1));
+			ai->Script = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "script-debug")) {
 			ai->ScriptDebug = LuaToBoolean(l, j + 1);
 		} else if (!strcmp(value, "sleep-cycles")) {
