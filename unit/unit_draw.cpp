@@ -390,7 +390,7 @@ static int CclManaSprite(lua_State *l)
 		(int) LuaToNumber(l, 2), (int) LuaToNumber(l, 3),
 		(int) LuaToNumber(l, 4), (int) LuaToNumber(l, 5));
 
-	DebugPrint("instead of ManaSprite, you should write instead :\n%s" _C_ buffer);
+	DebugPrint("instead of ManaSprite, you should write instead :\n%s\n" _C_ buffer);
 
 	CclCommand(buffer);
 	return 0;
@@ -413,7 +413,7 @@ static int CclHealthSprite(lua_State *l)
 		(int) LuaToNumber(l, 2), (int) LuaToNumber(l, 3),
 		(int )LuaToNumber(l, 4), (int) LuaToNumber(l, 5));
 
-	DebugPrint("instead of HealthSprite, you should write instead :\n%s" _C_ buffer);
+	DebugPrint("instead of HealthSprite, you should write instead :\n%s\n" _C_ buffer);
 
 	CclCommand(buffer);
 	return 0;
