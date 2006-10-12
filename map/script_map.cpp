@@ -46,7 +46,7 @@
 #include "tileset.h"
 #include "minimap.h"
 #include "actions.h"
-#include "campaign.h"
+#include "results.h"
 #include "ui.h"
 #include "player.h"
 #include "iolib.h"

@@ -51,7 +51,7 @@
 #include "font.h"
 #include "widgets.h"
 #include "editor.h"
-#include "campaign.h"
+#include "results.h"
 #include "menus.h"
 #include "sound.h"
 #include "iolib.h"

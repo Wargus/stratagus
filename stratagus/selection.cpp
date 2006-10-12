@@ -538,7 +538,7 @@ int ToggleUnitsByType(CUnit *base)
 }
 
 /**
-**  Change selected units to units from group #group_number
+**  Change selected units to units from group group_number
 **  Doesn't change the selection if the group has no unit.
 **
 **  @param group_number  number of the group to be selected.

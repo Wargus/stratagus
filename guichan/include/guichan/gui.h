@@ -65,7 +65,6 @@ namespace gcn
 {
     // The following comment will appear in the doxygen main page.
     /**
-     * @mainpage
      * @section Introduction
      * This documentation is mostly intended as a reference to the API. If you want to get started with Guichan, we suggest you check out the programs in the examples directory of the Guichan release.
      * @n

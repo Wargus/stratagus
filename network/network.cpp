@@ -229,7 +229,7 @@
 #include "netconnect.h"
 #include "commands.h"
 #include "interface.h"
-#include "campaign.h"
+#include "results.h"
 #include "master.h"
 
 
