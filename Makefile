@@ -159,7 +159,7 @@ MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  Rules.make.in configure.in configure config.h.in Makefile \
 	  src/stratagus.rc stratagus.sln stratagus.vcproj \
 	  autogen.sh SConstruct src/tolua/*.pkg \
-	  src/intl/*.po src/intl/*.pot \
+	  contrib/intl/*.po contrib/intl/*.pot \
 	  $(patsubst %, %/Module.make, $(MODULES_ALL)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
