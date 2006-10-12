@@ -44,7 +44,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "trigger.h"
-#include "campaign.h"
+#include "results.h"
 #include "interface.h"
 #include "unit.h"
 #include "iolib.h"

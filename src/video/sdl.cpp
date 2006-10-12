@@ -521,9 +521,7 @@ const EventCallback *GetCallbacks()
 **  All events available are fetched. Sound and network only if available.
 **  Returns if the time for one frame is over.
 **
-**  @param callbacks  Callbacks that handle the events.
-**
-**  FIXME: the initialition could be moved out of the loop
+**  FIXME: the initialization could be moved out of the loop
 */
 void WaitEventsOneFrame()
 {

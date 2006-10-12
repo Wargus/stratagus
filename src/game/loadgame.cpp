@@ -51,7 +51,7 @@
 #include "script.h"
 #include "ui.h"
 #include "ai.h"
-#include "campaign.h"
+#include "results.h"
 #include "trigger.h"
 #include "actions.h"
 #include "minimap.h"

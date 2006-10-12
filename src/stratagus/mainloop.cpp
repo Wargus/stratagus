@@ -62,7 +62,7 @@
 #include "ui.h"
 #include "unit.h"
 #include "trigger.h"
-#include "campaign.h"
+#include "results.h"
 #include "settings.h"
 #include "commands.h"
 #include "pathfinder.h"

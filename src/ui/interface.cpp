@@ -54,7 +54,7 @@
 #include "minimap.h"
 #include "network.h"
 #include "font.h"
-#include "campaign.h"
+#include "results.h"
 #include "video.h"
 #include "iolib.h"
 #include "commands.h"

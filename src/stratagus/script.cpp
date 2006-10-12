@@ -61,7 +61,7 @@
 #include "font.h"
 #include "pathfinder.h"
 #include "ai.h"
-#include "campaign.h"
+#include "results.h"
 #include "trigger.h"
 #include "settings.h"
 #include "editor.h"

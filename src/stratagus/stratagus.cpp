@@ -211,7 +211,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "netconnect.h"
 #include "ai.h"
 #include "commands.h"
-#include "campaign.h"
+#include "results.h"
 #include "editor.h"
 #include "movie.h"
 #include "pathfinder.h"
