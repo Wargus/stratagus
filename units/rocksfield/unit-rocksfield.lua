@@ -46,11 +46,14 @@ DefineUnitType("unit-gold-mine", {
 	SightRange = 1, Speed = 0, HitPoints = 25500, Priority = 0,
 	Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Corpse = {"unit-destroyed-4x4-place", 0}, ExplodeWhenKilled = "missile-explosion",
-	Type = "land", Building = true, GivesResource = "titanium", CanHarvest = true,
+	Type = "land", Building = true, GivesResource = "titanium", CanHarvest = true
+    --[[
 	Sounds = {
 		"selected", "gold-mine-selected",
 		"acknowledge", "gold-mine-acknowledge",
 		"ready", "gold-mine-ready",
 		"help", "gold-mine-help",
-		"dead", "building destroyed"}})
+		"dead", "building destroyed"}
+    ]]
+    })
 

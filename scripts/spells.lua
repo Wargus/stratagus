@@ -46,6 +46,7 @@ DefineSpell("spell-nuke",
 		{"demolish" ,
 			"range", 4,
 			"damage", 250}},
+    -- FIXME: bazoo-attack isn't defined yet
 	"sound-when-cast", "bazoo-attack",
 	"autocast", {"range", 128}
 )

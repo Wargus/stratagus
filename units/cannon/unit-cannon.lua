@@ -91,8 +91,8 @@ DefineUnitType("unit-cannon", {
 	NumDirections = 8, Flip = false,
 	Corpse = {"build-dead-cannon", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
-	VisibleUnderFog = true,
-	Sounds = {"selected", "cannon-selected",}
+	VisibleUnderFog = true
+	--Sounds = {"selected", "cannon-selected",}
 })
 
 DefineAnimations("animations-dead-cannon", {

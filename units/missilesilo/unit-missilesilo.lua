@@ -52,7 +52,7 @@ DefineAnimations("animations-msilo", {
              "frame 18", "wait 5", "frame 19", "wait 5", },
     Train = {"frame 15", "wait 5", "frame 16", },
     Attack = {"unbreakable begin", "frame 11", "wait 4",
-        "frame 12", "sound msilo-attack", "wait 2", "attack",
+        "frame 12", --[["sound msilo-attack",]] "wait 2", "attack",
         "frame 13", "wait 2", "frame 14", "wait 10", "frame 15", 
         "unbreakable end", "wait 25", },
     })
