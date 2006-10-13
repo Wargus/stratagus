@@ -102,7 +102,7 @@ static int CclDefineMissileType(lua_State *l)
 	if (mtype) {
 		DebugPrint("Redefining missile-type `%s'\n" _C_ str);
 	} else {
-		mtype = NewMissileTypeSlot(new_strdup(str));  // str consumed!
+		mtype = NewMissileTypeSlot(str);
 	}
 
 	mtype->NumDirections = 1;
@@ -167,11 +167,9 @@ static int CclDefineMissileType(lua_State *l)
 		} else if (!strcmp(value, "Range")) {
 			mtype->Range = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ImpactMissile")) {
-			delete[] mtype->ImpactName;
-			mtype->ImpactName = new_strdup(LuaToString(l, -1));
+			mtype->ImpactName = LuaToString(l, -1);
 		} else if (!strcmp(value, "SmokeMissile")) {
-			delete[] mtype->SmokeName;
-			mtype->SmokeName = new_strdup(LuaToString(l, -1));
+			mtype->SmokeName = LuaToString(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {
 			mtype->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {
