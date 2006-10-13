@@ -376,12 +376,12 @@ enum _missile_class_ {
 	/// Base structure of missile-types
 class MissileType {
 public:
-	MissileType() : Ident(NULL), Transparency(0), Width(0), Height(0),
+	MissileType() : Transparency(0), Width(0), Height(0),
 		DrawLevel(0), SpriteFrames(0), NumDirections(0),
 		Flip(false), CanHitOwner(false), FriendlyFire(false),
 		Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
-		Range(0), SplashFactor(0), ImpactName(NULL), ImpactMissile(NULL),
-		SmokeName(NULL), SmokeMissile(NULL), G(NULL)
+		Range(0), SplashFactor(0), ImpactMissile(NULL),
+		SmokeMissile(NULL), G(NULL)
 	{
 		FiredSound.Name = NULL;
 		FiredSound.Sound = NULL;
@@ -396,7 +396,7 @@ public:
 	void DrawMissileType(int frame, int x, int y) const;
 
 
-	char *Ident;               /// missile name
+	std::string Ident;         /// missile name
 	int Transparency;          /// missile transparency
 	int Width;                 /// missile width in pixels
 	int Height;                /// missile height in pixels
@@ -420,9 +420,9 @@ public:
 
 	int Range;                 /// missile damage range
 	int SplashFactor;          /// missile splash divisor
-	char *ImpactName;          /// impact missile-type name
+	std::string ImpactName;    /// impact missile-type name
 	MissileType *ImpactMissile;/// missile produces an impact
-	char *SmokeName;           /// impact missile-type name
+	std::string SmokeName;     /// impact missile-type name
 	MissileType *SmokeMissile; /// Trailling missile
 
 // --- FILLED UP ---
@@ -565,9 +565,9 @@ extern void MissileCclRegister(void);
 	/// load all missile sprites
 extern void LoadMissileSprites();
 	/// allocate an empty missile-type slot
-extern MissileType *NewMissileTypeSlot(char *ident);
+extern MissileType *NewMissileTypeSlot(const std::string& ident);
 	/// Get missile-type by ident
-extern MissileType *MissileTypeByIdent(const char *ident);
+extern MissileType *MissileTypeByIdent(const std::string& ident);
 	/// create a missile
 extern Missile *MakeMissile(MissileType *mtype, int sx, int sy, int dx,
 	int dy);

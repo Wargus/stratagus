@@ -120,7 +120,7 @@ void LoadMissileSprites(void)
 **
 **  @return       Missile type pointer.
 */
-MissileType *MissileTypeByIdent(const char *ident)
+MissileType *MissileTypeByIdent(const std::string& ident)
 {
 	return MissileTypeMap[ident];
 }
@@ -132,7 +132,7 @@ MissileType *MissileTypeByIdent(const char *ident)
 **
 **  @return       New allocated (zeroed) missile-type pointer.
 */
-MissileType *NewMissileTypeSlot(char *ident)
+MissileType *NewMissileTypeSlot(const std::string& ident)
 {
 	MissileType *mtype;
 
@@ -1193,7 +1193,7 @@ void Missile::SaveMissile(CFile *file) const
 {
 	char *s1;
 
-	file->printf("Missile(\"type\", \"%s\",", this->Type->Ident);
+	file->printf("Missile(\"type\", \"%s\",", this->Type->Ident.c_str());
 	file->printf(" \"%s\",", this->Local ? "local" : "global");
 	file->printf(" \"pos\", {%d, %d}, \"origin-pos\", {%d, %d}, \"goal\", {%d, %d},",
 		this->X, this->Y, this->SourceX, this->SourceY, this->DX, this->DY);
@@ -1257,14 +1257,8 @@ void MissileType::Init(void)
 	if (this->ImpactSound.Name) {
 		this->ImpactSound.Sound = SoundForName(this->ImpactSound.Name);
 	}
-	if (this->ImpactName) {
-		this->ImpactMissile = MissileTypeByIdent(this->ImpactName);
-	}
-	if (this->SmokeName) {
-		this->SmokeMissile = MissileTypeByIdent(this->SmokeName);
-	}
-
-
+	this->ImpactMissile = MissileTypeByIdent(this->ImpactName);
+	this->SmokeMissile = MissileTypeByIdent(this->SmokeName);
 }
 
 /**
@@ -1284,14 +1278,13 @@ void InitMissileTypes(void)
 	}
 }
 
-
+/**
+**  Destructor.
+*/
 MissileType::~MissileType()
 {
-	delete[] this->Ident;
 	delete[] this->FiredSound.Name;
 	delete[] this->ImpactSound.Name;
-	delete[] this->ImpactName;
-	delete[] this->SmokeName;
 	CGraphic::Free(this->G);
 }
 
