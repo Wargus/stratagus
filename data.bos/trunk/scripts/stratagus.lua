@@ -239,6 +239,6 @@ Load("scripts/cheats.lua")
 Load("scripts/maps.lua")
 
 
-default_objective = _("Eliminate your ennemies.")
+default_objective = _("Eliminate your enemies.")
 
 print("... ready!")
