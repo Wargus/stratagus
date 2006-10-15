@@ -219,11 +219,14 @@ public:
 	ScrollingWidget(int width, int height);
 	void add(gcn::Widget *widget, int x, int y);
 	void restart();
+	void setSpeed(float speed) { this->speedY = speed; }
+	float getSpeed() { return this->speedY; }
 private:
 	virtual void logic();
 private:
 	gcn::Container container; /// Data container
-	int speedY;               /// vertical speed of the container (positive number: go up).
+	float speedY;             /// vertical speed of the container (positive number: go up).
+	float containerY;         /// Y position of the container
 	bool finished;            /// True while scrolling ends.
 };
 

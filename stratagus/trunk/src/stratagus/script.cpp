@@ -195,34 +195,32 @@ int LuaCall(int narg, int clear)
 }
 
 /**
-**  Load a file and execute it
-**
-**  @param file  File to load and execute
-**
-**  @return      0 in success, else exit.
+**  Load a file into a buffer
 */
-int LuaLoadFile(const char *file)
+static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
 {
-	int status;
-	int size;
-	int read;
-	int location;
-	char *buf;
 	CFile fp;
-	const char *PreviousLuaFile;
+	int size;
 	int oldsize;
+	int location;
+	int read;
+	char *buf;
 
-	PreviousLuaFile = CurrentLuaFile;
-	CurrentLuaFile = file;
+	*buffer = NULL;
+	*buffersize = 0;
 
 	if (fp.open(file, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file '%s': %s\n",
 			file, strerror(errno));
-		return -1;
+		return;
 	}
 
 	size = 10000;
 	buf = new char[size];
+	if (!buf) {
+		fprintf(stderr, "Out of memory\n");
+		ExitFatal(-1);
+	}
 	location = 0;
 	for (;;) {
 		read = fp.read(&buf[location], size - location);
@@ -244,7 +242,33 @@ int LuaLoadFile(const char *file)
 	}
 	fp.close();
 
-	if (!(status = luaL_loadbuffer(Lua, buf, location, file))) {
+	*buffer = buf;
+	*buffersize = location;
+}
+
+/**
+**  Load a file and execute it
+**
+**  @param file  File to load and execute
+**
+**  @return      0 in success, else exit.
+*/
+int LuaLoadFile(const char *file)
+{
+	int status;
+	const char *PreviousLuaFile;
+	char *buf;
+	int size;
+
+	PreviousLuaFile = CurrentLuaFile;
+	CurrentLuaFile = file;
+
+	LuaLoadBuffer(file, &buf, &size);
+	if (!buf) {
+		return -1;
+	}
+
+	if (!(status = luaL_loadbuffer(Lua, buf, size, file))) {
 		LuaCall(0, 1);
 	} else {
 		report(status);
@@ -255,6 +279,9 @@ int LuaLoadFile(const char *file)
 	return status;
 }
 
+/**
+**  Get the directory of the current lua file
+*/
 static int CclGetCurrentLuaPath(lua_State *l)
 {
 	char *path;
@@ -301,6 +328,30 @@ static int CclLoad(lua_State *l)
 	LibraryFileName(LuaToString(l, 1), buf);
 	if (LuaLoadFile(buf) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
+	}
+	return 0;
+}
+
+/**
+**  Load a file into a buffer and return it.
+**
+**  @param l  Lua state.
+**
+**  @return   buffer or nil on failure
+*/
+static int CclLoadBuffer(lua_State *l)
+{
+	char file[1024];
+	char *buf;
+	int size;
+
+	LuaCheckArgs(l, 1);
+	LibraryFileName(LuaToString(l, 1), file);
+	LuaLoadBuffer(file, &buf, &size);
+	if (buf) {
+		lua_pushstring(l, buf);
+		delete[] buf; // Lua creates an internal copy
+		return 1;
 	}
 	return 0;
 }
@@ -2506,6 +2557,7 @@ void InitCcl(void)
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
+	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
