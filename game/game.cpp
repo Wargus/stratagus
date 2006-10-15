@@ -121,14 +121,14 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 		}
 		strcpy(p, mapname);
 		if (file.open(mapfull, CL_OPEN_READ) == -1) {
-			// Not found, try mapname by itself
-			if (file.open(mapname, CL_OPEN_READ) == -1) {
-				// Not found again, try StratagusLibPath as a last resort
-				strcpy(mapfull, StratagusLibPath);
-				strcat(mapfull, "/");
-				strcat(mapfull, mapname);
-			} else {
+			// Not found again, try StratagusLibPath
+			strcpy(mapfull, StratagusLibPath);
+			strcat(mapfull, "/");
+			strcat(mapfull, mapname);
+			if (file.open(mapfull, CL_OPEN_READ) == -1) {
+				// Not found, try mapname by itself as a last resort
 				strcpy(mapfull, mapname);
+			} else {
 				file.close();
 			}
 		} else {
