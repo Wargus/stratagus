@@ -1030,7 +1030,7 @@ void ScrollingWidget::logic()
 {
 	if (speedY - containerY < container.getHeight() - getHeight()) {
 		containerY -= speedY;
-		container.setY(containerY);
+		container.setY((int)containerY);
 	} else if (!finished){
 		finished = true;
 		generateAction();
