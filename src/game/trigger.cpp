@@ -676,6 +676,7 @@ static int TriggerExecuteAction(int script)
 	int ret;
 	int args;
 	int j;
+	int base = lua_gettop(Lua);
 
 	ret = 0;
 
@@ -684,12 +685,12 @@ static int TriggerExecuteAction(int script)
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(Lua, -1, j + 1);
 		LuaCall(0, 0);
-		if (lua_gettop(Lua) > 2 && lua_toboolean(Lua, -1)) {
+		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
 			ret = 1;
 		} else {
 			ret = 0;
 		}
-		lua_settop(Lua, 2);
+		lua_settop(Lua, base + 1);
 		if (WaitFrame > FrameCounter) {
 			lua_pop(Lua, 1);
 			return 0;
@@ -720,6 +721,7 @@ static void TriggerRemoveTrigger(int trig)
 void TriggersEachCycle(void)
 {
 	int triggers;
+	int base = lua_gettop(Lua);
 
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
@@ -761,13 +763,13 @@ void TriggersEachCycle(void)
 		Trigger += 2;
 		LuaCall(0, 0);
 		// If condition is true execute action
-		if (lua_gettop(Lua) > 1 && lua_toboolean(Lua, -1)) {
-			lua_settop(Lua, 1);
+		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
+			lua_settop(Lua, base + 1);
 			if (TriggerExecuteAction(WaitTrigger + 1)) {
 				TriggerRemoveTrigger(WaitTrigger);
 			}
 		}
-		lua_settop(Lua, 1);
+		lua_settop(Lua, base + 1);
 	}
 	lua_pop(Lua, 1);
 }
