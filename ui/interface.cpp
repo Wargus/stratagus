@@ -696,6 +696,7 @@ int HandleCheats(const char *input)
 		return 1;
 	}
 #endif
+	int base = lua_gettop(Lua);
 	lua_pushstring(Lua, "HandleCheats");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	if (!lua_isfunction(Lua, -1)) {
@@ -704,9 +705,8 @@ int HandleCheats(const char *input)
 	}
 	lua_pushstring(Lua, input);
 	LuaCall(1, 0);
-	ret = lua_gettop(Lua);
-	if (lua_gettop(Lua) == 1) {
-		ret = LuaToBoolean(Lua, 1);
+	if (lua_gettop(Lua) - base == 1) {
+		ret = LuaToBoolean(Lua, -1);
 		lua_pop(Lua, 1);
 	} else {
 		LuaError(Lua, "HandleCheats must return a boolean");
