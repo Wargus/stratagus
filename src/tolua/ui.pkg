@@ -471,6 +471,8 @@ class ScrollingWidget : public ScrollArea
 	ScrollingWidget(int width, int height);
 	void add(Widget *widget, int x, int y);
 	void restart();
+	void setSpeed(float speed);
+	float getSpeed();
 };
 
 class DropDown : public BasicContainer

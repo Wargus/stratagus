@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Oct  7 11:44:41 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Oct 14 20:47:36 2006.
 */
 
 #ifndef __cplusplus
@@ -10217,6 +10217,71 @@ static int tolua_stratagus_ScrollingWidget_restart00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: setSpeed of class  ScrollingWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_setSpeed00
+static int tolua_stratagus_ScrollingWidget_setSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollingWidget* self = (ScrollingWidget*)  tolua_tousertype(tolua_S,1,0);
+  float speed = ((float)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setSpeed'",NULL);
+#endif
+ {
+  self->setSpeed(speed);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getSpeed of class  ScrollingWidget */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ScrollingWidget_getSpeed00
+static int tolua_stratagus_ScrollingWidget_getSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"ScrollingWidget",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  ScrollingWidget* self = (ScrollingWidget*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getSpeed'",NULL);
+#endif
+ {
+  float tolua_ret = (float)  self->getSpeed();
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: getSelected of class  DropDown */
 #ifndef TOLUA_DISABLE_tolua_stratagus_DropDown_getSelected00
 static int tolua_stratagus_DropDown_getSelected00(lua_State* tolua_S)
@@ -16331,6 +16396,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,".call",tolua_stratagus_ScrollingWidget_new00_local);
   tolua_function(tolua_S,"add",tolua_stratagus_ScrollingWidget_add00);
   tolua_function(tolua_S,"restart",tolua_stratagus_ScrollingWidget_restart00);
+  tolua_function(tolua_S,"setSpeed",tolua_stratagus_ScrollingWidget_setSpeed00);
+  tolua_function(tolua_S,"getSpeed",tolua_stratagus_ScrollingWidget_getSpeed00);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"DropDown","DropDown","BasicContainer",NULL);
  tolua_beginmodule(tolua_S,"DropDown");
