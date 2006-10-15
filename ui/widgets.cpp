@@ -997,7 +997,7 @@ void MultiLineLabel::wordWrap()
 */
 ScrollingWidget::ScrollingWidget(int width, int height) :
 	gcn::ScrollArea(NULL, gcn::ScrollArea::SHOW_NEVER, gcn::ScrollArea::SHOW_NEVER),
-	speedY(1), finished(false)
+	speedY(1.f), containerY(0.f), finished(false)
 {
 	container.setDimension(gcn::Rectangle(0, 0, width, height));
 	container.setOpaque(false);
@@ -1028,8 +1028,9 @@ void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
 */
 void ScrollingWidget::logic()
 {
-	if (speedY - container.getY() < container.getHeight() - getHeight()) {
-		container.setY(container.getY() - speedY);
+	if (speedY - containerY < container.getHeight() - getHeight()) {
+		containerY -= speedY;
+		container.setY(containerY);
 	} else if (!finished){
 		finished = true;
 		generateAction();
