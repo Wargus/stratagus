@@ -2016,6 +2016,7 @@ void StartEditor(const char *filename)
 	Editor.TerrainEditable = true;
 
 	CleanGame();
+	CleanPlayers();
 }
 
 //@}
