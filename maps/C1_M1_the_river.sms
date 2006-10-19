@@ -9,17 +9,17 @@
 --
 -- Stratagus Map generated automatically from a pud.
 -- Original file: C1_M1_the_river.pud
--- Copyright 2005 François Beerten
+-- Copyright 2005-2006 Francois Beerten
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-SetStartView(0, 0, 0)
+SetStartView(0, 7, 25)
 SetPlayerData(0, "Resources", "titanium", 1500)
 SetPlayerData(0, "Resources", "crystal", 2000)
 SetPlayerData(0, "Resources", "gas", 1000)
 SetPlayerData(0, "RaceName", "elites")
 SetAiType(0, "ai-rush")
-SetStartView(1, 0, 0)
+SetStartView(1, 73, 116)
 SetPlayerData(1, "Resources", "titanium", 1500)
 SetPlayerData(1, "Resources", "crystal", 2000)
 SetPlayerData(1, "Resources", "gas", 1000)
