@@ -141,7 +141,7 @@ msgstr "~!Bereit"
 
 #: scripts/menus/network.lua:180
 msgid "Joining game"
-msgstr "Joining game"
+msgstr "Trete Spiel bei"
 
 #: scripts/menus/network.lua:207
 msgid "Enter Server address"
@@ -185,7 +185,7 @@ msgstr "Multiplayer"
 
 #: scripts/menus/network.lua:343
 msgid "Nickname :"
-msgstr "Nickname :"
+msgstr "Spitzname :"
 
 #: scripts/menus/options.lua:38
 msgid "Speed Options"
@@ -226,7 +226,7 @@ msgstr "Sound-Optionen"
 
 #: scripts/menus/options.lua:131
 msgid "Effects Volume"
-msgstr "Effekte-Lautstärke"
+msgstr "Effekt-Lautstärke"
 
 #: scripts/menus/options.lua:146 scripts/menus/options.lua:178
 msgid "min"
@@ -278,15 +278,15 @@ msgstr "Optionen"
 
 #: scripts/menus/credits.lua:36
 msgid "Graphics:"
-msgstr "Graphics:"
+msgstr "Graphik:"
 
 #: scripts/menus/credits.lua:43
 msgid "Scripting:"
-msgstr "Scripting:"
+msgstr "Scripte:"
 
 #: scripts/menus/credits.lua:47
 msgid "Maps and campaigns:"
-msgstr ""
+msgstr "Karten und Kampagnen"
 
 #: scripts/menus/credits.lua:51
 msgid "Sound:"
@@ -298,7 +298,7 @@ msgstr "powered by STRATAGUS"
 
 #: scripts/menus/credits.lua:56
 msgid "Stratagus Programmers:"
-msgstr "Stratagus Programmers:"
+msgstr "Stratagus Programmierer:"
 
 #: scripts/menus/credits.lua:113
 msgid "Patches"
@@ -314,7 +314,7 @@ msgstr "The Bos and the Stratagus Team thanks all the people who have contribute
 
 #: scripts/menus/credits.lua:130
 msgid "patches, bug reports, ideas."
-msgstr "patches, bug reports, ideas."
+msgstr "Patche, Fehlerberichte, Ideen."
 
 #: scripts/menus/credits.lua:133
 msgid "Battle of Survival Credits"
