@@ -1,0 +1,11 @@
+
+Howto add fonts to Bos :
+(add any useful help is necessary)
+
+ * make ttf2png (don't forget SDL_ttf lib)
+ * get a ttf fonts 
+(for example, DejaVu on http://dejavu.sourceforge.net/wiki/index.php/Download )
+ * run ttf2png: ./ttf2png DejaVuSans.ttf 14
+ * move fonts.png result file to graphics/general/dejavusans14.png
+ * modify scripts/fonts.lua in accordance
+
