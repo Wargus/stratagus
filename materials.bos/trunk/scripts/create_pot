@@ -1,0 +1,19 @@
+# to be executed from the bos root directory
+mkdir -p tmp
+cp -r scripts tmp/
+cd tmp
+find scripts \( -name .svn -prune \) -o -name "*.lua" -exec bash -c "sed \"{}\" -e 's/--/#/g' > \"{}.new\"" \;
+find scripts \( -type d -name .svn -prune \) -o -type d -exec mmv -od "{}/*.lua.new" "{}/#1.lua" \;
+find scripts -name "*.lua.new" -exec rm "{}" \;
+touch bos.pot
+find scripts \( -name .svn -prune \) -o -type d -exec bash -c 'xgettext -j -F -o bos.pot -L Python --from-code=UTF-8 --copyright-holder="BOS" {}/*.lua' \;
+sed -e 's/SOME DESCRIPTIVE TITLE/BOS Battle of Survival translation template/g' \
+    -e 's/Copyright (C) YEAR BOS/Copyright (C) YEAR BOS, but note that this file was automatically generated/g' \
+    -e "s/YEAR/`date|awk '{print $6}'`/g" \
+    -e 's/same license as the PACKAGE package/GPL, see the README/g' \
+    -e 's/CHARSET/UTF-8/g' \
+  bos.pot > bos.pot.tmp
+mv bos.pot.tmp bos.pot
+cp bos.pot ../languages/bos.pot.new
+cd ..
+rm -rf tmp
