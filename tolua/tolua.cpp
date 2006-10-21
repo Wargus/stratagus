@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Oct 14 20:47:36 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Oct 21 15:37:52 2006.
 */
 
 #ifndef __cplusplus
@@ -14914,6 +14914,37 @@ static int tolua_stratagus_IsMusicEnabled00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: PlayFile */
+#ifndef TOLUA_DISABLE_tolua_stratagus_PlayFile00
+static int tolua_stratagus_PlayFile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"LuaActionListener",1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const char* name = ((const char*)  tolua_tostring(tolua_S,1,0));
+  LuaActionListener* listener = ((LuaActionListener*)  tolua_tousertype(tolua_S,2,NULL));
+ {
+  int tolua_ret = (int)  PlayFile(name,listener);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'PlayFile'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: PlayMusic */
 #ifndef TOLUA_DISABLE_tolua_stratagus_PlayMusic00
 static int tolua_stratagus_PlayMusic00(lua_State* tolua_S)
@@ -14964,6 +14995,96 @@ static int tolua_stratagus_StopMusic00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StopMusic'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetChannelVolume */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetChannelVolume00
+static int tolua_stratagus_SetChannelVolume00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int channel = ((int)  tolua_tonumber(tolua_S,1,0));
+  int volume = ((int)  tolua_tonumber(tolua_S,2,0));
+ {
+  int tolua_ret = (int)  SetChannelVolume(channel,volume);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetChannelVolume'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetChannelStereo */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetChannelStereo00
+static int tolua_stratagus_SetChannelStereo00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int channel = ((int)  tolua_tonumber(tolua_S,1,0));
+  int stereo = ((int)  tolua_tonumber(tolua_S,2,0));
+ {
+  int tolua_ret = (int)  SetChannelStereo(channel,stereo);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetChannelStereo'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StopChannel */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StopChannel00
+static int tolua_stratagus_StopChannel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int channel = ((int)  tolua_tonumber(tolua_S,1,0));
+ {
+  StopChannel(channel);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StopChannel'.",&tolua_err);
  return 0;
 #endif
 }
@@ -16667,8 +16788,29 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"IsEffectsEnabled",tolua_stratagus_IsEffectsEnabled00);
  tolua_function(tolua_S,"SetMusicEnabled",tolua_stratagus_SetMusicEnabled00);
  tolua_function(tolua_S,"IsMusicEnabled",tolua_stratagus_IsMusicEnabled00);
+ tolua_function(tolua_S,"PlayFile",tolua_stratagus_PlayFile00);
+
+ { /* begin embedded lua code */
+  int top;
+  top = lua_gettop(tolua_S);
+  static unsigned char B[] = {
+  10,102,117,110, 99,116,105,111,110, 32, 80,108, 97,121, 83,
+  111,117,110,100, 70,105,108,101, 40,102,105,108,101, 44, 32,
+   99, 97,108,108, 98, 97, 99,107, 41, 10,114,101,116,117,114,
+  110, 32, 80,108, 97,121, 70,105,108,101, 40,102,105,108,101,
+   44, 32, 76,117, 97, 65, 99,116,105,111,110, 76,105,115,116,
+  101,110,101,114, 58,110,101,119, 40, 99, 97,108,108, 98, 97,
+   99,107, 41, 41, 10,101,110,100,32
+  };
+  lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 5");
+  lua_settop(tolua_S, top);
+ } /* end of embedded lua code */
+
  tolua_function(tolua_S,"PlayMusic",tolua_stratagus_PlayMusic00);
  tolua_function(tolua_S,"StopMusic",tolua_stratagus_StopMusic00);
+ tolua_function(tolua_S,"SetChannelVolume",tolua_stratagus_SetChannelVolume00);
+ tolua_function(tolua_S,"SetChannelStereo",tolua_stratagus_SetChannelStereo00);
+ tolua_function(tolua_S,"StopChannel",tolua_stratagus_StopChannel00);
  tolua_constant(tolua_S,"EditorNotRunning",EditorNotRunning);
  tolua_constant(tolua_S,"EditorStarted",EditorStarted);
  tolua_constant(tolua_S,"EditorCommandLine",EditorCommandLine);

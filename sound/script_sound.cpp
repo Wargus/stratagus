@@ -361,27 +361,6 @@ static int CclSetSoundRange(lua_State *l) {
 }
 
 /**
-**  Callback for when PlaySoundFile finishes
-*/
-static void PlaySoundFileFinished(int channel)
-{
-	delete GetChannelSample(channel);
-}
-
-/**
-**  Play a sound file.
-**
-**  @param l  Lua state.
-*/
-static int CclPlayFile(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	int channel = PlaySoundFile(LuaToString(l, 1));
-	SetChannelFinishedCallback(channel, PlaySoundFileFinished);
-	return 0;
-}
-
-/**
 **  Register CCL features for sound.
 */
 void SoundCclRegister(void)
@@ -394,7 +373,6 @@ void SoundCclRegister(void)
 	lua_register(Lua, "MakeSound", CclMakeSound);
 	lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
 	lua_register(Lua, "PlaySound", CclPlaySound);
-	lua_register(Lua, "PlayFile", CclPlayFile);
 }
 
 //@}
