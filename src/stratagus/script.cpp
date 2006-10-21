@@ -2387,7 +2387,6 @@ int CclUnits(lua_State *l)
 	int freeslots;
 	int destroyed;
 	int nullrefs;
-	static char buf[80];
 
 	LuaCheckArgs(l, 0);
 	freeslots = MAX_UNIT_SLOTS - UnitSlotFree - 1;
@@ -2406,10 +2405,8 @@ int CclUnits(lua_State *l)
 		}
 	}
 
-	sprintf(buf, "%d free, %d(%d) used, %d destroyed, %d null",
-		freeslots, UnitSlotFree, NumUnits, destroyed, nullrefs);
-	UI.StatusLine.Set(buf);
-	fprintf(stderr, "%s\n", buf);
+	DebugPrint("%d free, %d(%d) used, %d destroyed, %d null\n" _C_
+		freeslots _C_ UnitSlotFree _C_ NumUnits _C_ destroyed _C_ nullrefs);
 
 	lua_pushnumber(l, destroyed);
 	return 1;
