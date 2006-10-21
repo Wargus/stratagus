@@ -43,6 +43,7 @@
 
 #include "SDL.h"
 
+#include "sound.h"
 #include "video.h"
 #include "sound.h"
 #include "unitsound.h"
@@ -54,8 +55,7 @@
 #include "map.h"
 #include "tileset.h"
 #include "ui.h"
-
-#include "sound.h"
+#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -367,6 +367,47 @@ void PlayGameSound(CSound *sound, unsigned char volume)
 		return;
 	}
 	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
+}
+
+static std::map<int, LuaActionListener *> ChannelMap;
+
+/**
+**  Callback for PlaySoundFile
+*/
+static void PlaySoundFileCallback(int channel)
+{
+	LuaActionListener *listener = ChannelMap[channel];
+	if (listener != NULL) {
+		listener->action("");
+		ChannelMap[channel] = NULL;
+	}
+	delete GetChannelSample(channel);
+}
+
+/**
+**  Play a sound file
+**
+**  @param name      Filename of a sound to play
+**  @param listener  Optional lua callback
+**
+**  @return          Channel number the sound is playing on, -1 for error
+*/
+int PlayFile(const char *name, LuaActionListener *listener)
+{
+	int channel = -1;
+	CSample *sample;
+
+	sample = LoadSample(name);
+	if (sample) {
+		channel = PlaySample(sample);
+		if (channel != -1) {
+			SetChannelVolume(channel, MaxVolume);
+			SetChannelFinishedCallback(channel, PlaySoundFileCallback);
+			ChannelMap[channel] = listener;
+		}
+	}
+
+	return channel;
 }
 
 /**

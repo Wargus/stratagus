@@ -50,6 +50,7 @@
 class CUnit;
 class Missile;
 class CSample;
+class LuaActionListener;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -149,6 +150,9 @@ extern void PlayUnitSound(const CUnit *unit, CSound *sound);
 extern void PlayMissileSound(const Missile *missile, CSound *sound);
 	/// Play a game sound
 extern void PlayGameSound(CSound *sound, unsigned char volume);
+
+	/// Play a sound file
+extern int PlayFile(const char *name, LuaActionListener *listener = NULL);
 
 	/// Modify the range of a given sound.
 extern void SetSoundRange(CSound *sound, unsigned char range);
