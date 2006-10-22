@@ -115,9 +115,10 @@ function RunSaveMenu()
   menu:run(false)
 end
 
-function  RunGameSoundOptionsMenu()
+function RunGameSoundOptionsMenu()
   local menu = BosGameMenu()
-  
+ 
+  menu:addLabel(_("Sound Options"), 128, 11)
   AddSoundOptions(menu, 0, 0, 128 - 224/2, 280)
 
   menu:run(false)
@@ -170,11 +171,11 @@ function RunPreferencesMenu()
   l = Label(_("slow"))
   l:setFont(Fonts["small"])
   l:adjustSize()
-  menu:add(l, 34, (36 * 4) + 6)
+  menu:add(l, 32, (36 * 4) + 6)
   l = Label(_("fast"))
   l:setFont(Fonts["small"])
   l:adjustSize()
-  menu:add(l, 230, (36 * 4) + 6)
+  menu:add(l, 230 - l:getWidth(), (36 * 4) + 6)
 
   menu:addSmallButton(_("~!OK"), "o", 128 - (106 / 2), 245,
     function()

@@ -55,12 +55,12 @@ function RunSpeedOptionsMenu(s)
   b = Label(_("slow"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 34, offy + 36 * 2 + 6)
+  menu:add(b, offx + 32, offy + 36 * 2 + 6)
   
   b = Label(_("fast"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 230, offy + 36 * 2 + 6)
+  menu:add(b, offx + 230 - b:getWidth(), offy + 36 * 2 + 6)
 
   menu:addButton(_("~!OK"), "o", offx + 128 - (200 / 2), offy + 245,
     function()
@@ -94,12 +94,12 @@ function AddSoundOptions(menu, offx, offy, centerx, bottom)
   b = Label(_("min"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 44, offy + 36 * 2 + 6)
+  menu:add(b, offx + 32, offy + 36 * 2 + 6)
   
   b = Label(_("max"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 218, offy + 36 * 2 + 6)
+  menu:add(b, offx + 230 - b:getWidth(), offy + 36 * 2 + 6)
 
   local effectscheckbox = {}
   effectscheckbox = menu:addCheckBox(_("Enabled"), offx + 32, offy + 36 * 3,
@@ -126,12 +126,12 @@ function AddSoundOptions(menu, offx, offy, centerx, bottom)
   b = Label(_("min"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 44, offy + 36 * 5 + 6)
+  menu:add(b, offx + 32, offy + 36 * 5 + 6)
   
   b = Label(_("max"))
   b:setFont(CFont:Get("game"))
   b:adjustSize();
-  menu:addCentered(b, offx + 218, offy + 36 * 5 + 6)
+  menu:add(b, offx + 230 - b:getWidth(), offy + 36 * 5 + 6)
 
   local musiccheckbox = {}
   musiccheckbox = menu:addCheckBox(_("Enabled"), offx + 32, offy + 36 * 6,
@@ -152,7 +152,6 @@ end
 
 function RunSoundOptionsMenu(s)
   local menu
-  local b
   local offx = (Video.Width - 260) / 2
   local offy = (Video.Height - 352) / 2
 
@@ -227,18 +226,18 @@ function RunLanguageOptionsMenu(s)
 
   menu = BosMenu(_("Language Selection"))
   local function AddLanguage(language, po, h)
-     local function SetLanguage()
-        SetTranslationsFiles("languages/" .. po .. ".po",
+    local function SetLanguage()
+      SetTranslationsFiles("languages/" .. po .. ".po",
                           "languages/bos-" .. po .. ".po") 
-        preferences.StratagusTranslation = StratagusTranslation
-        preferences.GameTranslation = GameTranslation
-        SavePreferences()
-     end      
-     local rb = menu:addRadioButton(language, "lang", offx, offy + 36 * h, SetLanguage)
-     if StratagusTranslation == ("languages/" .. po .. ".po") then
-       rb:setMarked(true)
-     end
-     return rb
+      preferences.StratagusTranslation = StratagusTranslation
+      preferences.GameTranslation = GameTranslation
+      SavePreferences()
+    end      
+    local rb = menu:addRadioButton(language, "lang", offx, offy + 36 * h, SetLanguage)
+    if StratagusTranslation == ("languages/" .. po .. ".po") then
+      rb:setMarked(true)
+    end
+    return rb
   end
      
   print(StratagusTranslation)
