@@ -268,6 +268,7 @@ function RunMap(map, objective, fow, revealmap)
   end
   loop = true
   while (loop) do
+    InitGameVariables()
     if fow ~= nil then
       SetFogOfWar(fow)
     end
@@ -359,6 +360,7 @@ function RunReplayMenu(s)
 
   function startreplaybutton(s)
     print("Starting map -------")
+    InitGameVariables()
     StartReplay("~logs/" .. browser:getSelectedItem(), reveal:isMarked())
     menu:stop()
   end
@@ -380,6 +382,7 @@ function RunLoadGameMenu(s)
       currentCampaign = nil
       loop = true
       while (loop) do
+        InitGameVariables()
         StartSavedGame("~save/" .. browser:getSelectedItem())
         if (GameResult ~= GameRestart) then
           loop = false

@@ -148,8 +148,10 @@ DefinePlayerColors({
   "green", {{44, 180, 148}, {20, 132, 92}, {4, 84, 44}, {0, 40, 12}},
 })
 
---	Chittin
-SetSpeeds(1)
+function InitGameVariables()
+   -- Chittin
+   SetSpeeds(1)
+end
 
 AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "dont-know-unseen-terrain", "unseen-terrain-cost", 2)
 
