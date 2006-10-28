@@ -885,14 +885,14 @@ static int CclAiSleep(lua_State *l)
 	int i;
 
 	LuaCheckArgs(l, 1);
-	if (AiPlayer->SleepCycles) {
+	i = LuaToNumber(l, 1);
+	if (AiPlayer->SleepCycles || i == 0) {
 		if (AiPlayer->SleepCycles < GameCycle) {
 			AiPlayer->SleepCycles = 0;
 			lua_pushboolean(l, 0);
 			return 1;
 		}
 	} else {
-		i = LuaToNumber(l, 1);
 		AiPlayer->SleepCycles = GameCycle + i;
 	}
 
