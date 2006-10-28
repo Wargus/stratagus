@@ -308,6 +308,15 @@ static void AiRequestSupply(void)
 	unsigned int needmask;
 
 	//
+	// Don't request supply if we're sleeping.  When the script starts it may
+	// request a better unit than the one we pick here.  If we only have enough
+	// resources for one unit we don't want to build the wrong one.
+	//
+	if (AiPlayer->SleepCycles < GameCycle) {
+		return;
+	}
+
+	//
 	// Count the already made build requests.
 	//
 	memset(counter, 0, sizeof(counter));
