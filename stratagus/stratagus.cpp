@@ -805,7 +805,6 @@ void Exit(int err)
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
 	lua_settop(Lua, 0);
-	CleanModules();
 	lua_close(Lua);
 #endif
 
