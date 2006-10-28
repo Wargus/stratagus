@@ -2387,42 +2387,6 @@ static int CclDefineDefaultResourceAmounts(lua_State *l)
 }
 
 /**
-**  Debug unit slots.
-**
-**  @param l  Lua state.
-*/
-int CclUnits(lua_State *l)
-{
-	CUnit **slot;
-	int freeslots;
-	int destroyed;
-	int nullrefs;
-
-	LuaCheckArgs(l, 0);
-	freeslots = MAX_UNIT_SLOTS - UnitSlotFree - 1;
-
-	//
-	//  Look how many slots are used
-	//
-	destroyed = nullrefs = 0;
-	for (slot = UnitSlots; slot < UnitSlots + UnitSlotFree; ++slot) {
-		if (*slot) {
-			if ((*slot)->Destroyed) {
-				++destroyed;
-			} else if (!(*slot)->Refs) {
-				++nullrefs;
-			}
-		}
-	}
-
-	DebugPrint("%d free, %d(%d) used, %d destroyed, %d null\n" _C_
-		freeslots _C_ UnitSlotFree _C_ NumUnits _C_ destroyed _C_ nullrefs);
-
-	lua_pushnumber(l, destroyed);
-	return 1;
-}
-
-/**
 **  Compiled with sound.
 **
 **  @param l  Lua state.
@@ -2593,7 +2557,6 @@ void InitCcl(void)
 	EditorCclRegister();
 
 	lua_register(Lua, "LoadMap", CclLoadMap);
-	lua_register(Lua, "Units", CclUnits);
 	lua_register(Lua, "SyncRand", CclSyncRand);
 }
 
