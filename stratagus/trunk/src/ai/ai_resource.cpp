@@ -988,7 +988,7 @@ static void AiCollectResources(void)
 		//
 		// Try to complete each ressource in the priority order
 		//
-		unit = 0;
+		unit = NoUnitP;
 		for (i = 0; i < MaxCosts; ++i) {
 			c = priority_resource[i];
 
@@ -1035,16 +1035,16 @@ static void AiCollectResources(void)
 					// Don't complete with lower priority ones...
 					if (wanted[src_c] > wanted[c] ||
 							(wanted[src_c] == wanted[c] &&
-								num_units_assigned[src_c] <= num_units_assigned[c]) + 1) {
+								num_units_assigned[src_c] <= num_units_assigned[c] + 1)) {
 						continue;
 					}
 
-					for (k = num_units_assigned[src_c]-1; k >= 0 ; --k) {
+					for (k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
 						unit = units_assigned[k][src_c];
 
 						// unit can't harvest : next one
 						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(unit, c)) {
-							unit = 0;
+							unit = NoUnitP;
 							continue;
 						}
 
