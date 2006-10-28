@@ -506,13 +506,19 @@ static void AiForceAttacks(AiForce *force)
 	}
 
 	// Find a unit that isn't idle
-	unit = NULL;
+	unit = NoUnitP;
 	for (i = 0; i < (int)force->Units.size(); ++i) {
 		aiunit = force->Units[i];
-		// Still some action
 		if (!aiunit->IsIdle()) {
-			unit = aiunit;
-			break;
+			// Found an idle unit, use it if we find nothing better
+			if (unit == NoUnitP) {
+				unit = aiunit;
+			}
+			// If the unit has a goal use it
+			if (aiunit->Orders[0]->Goal != NoUnitP) {
+				unit = aiunit;
+				break;
+			}
 		}
 	}
 
