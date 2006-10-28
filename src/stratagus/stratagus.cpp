@@ -619,6 +619,7 @@ void CleanGame(void)
 
 	CleanTriggers();
 	CleanUnits();
+	CleanAi();
 	CleanSelections();
 	CleanGroups();
 	CleanMissiles();

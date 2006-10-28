@@ -91,7 +91,7 @@ void CleanModules(void)
 	CleanUserInterface();
 	CleanFonts();
 	CleanTriggers();
-	CleanAi();
+	FreeAi();
 	CleanPlayers();
 	CleanRaces();
 	CleanConstructions();

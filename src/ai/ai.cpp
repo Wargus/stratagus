@@ -584,8 +584,9 @@ void InitAiModule(void)
 	AiResetUnitTypeEquiv();
 }
 
+
 /**
-**  Cleanup the AI.
+**  Cleanup the AI in order to enable to restart a game.
 */
 void CleanAi(void)
 {
@@ -595,7 +596,16 @@ void CleanAi(void)
 			Players[p].Ai = NULL;
 		}
 	}
+}
 
+
+/**
+**  Free all AI resources.
+*/
+void FreeAi()
+{
+	CleanAi();
+	
 	//
 	//  Free AiTypes.
 	//
