@@ -151,6 +151,7 @@ DefinePlayerColors({
 function InitGameVariables()
    -- Chittin
    SetSpeeds(1)
+   InitAiScripts()
 end
 
 AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "dont-know-unseen-terrain", "unseen-terrain-cost", 2)
