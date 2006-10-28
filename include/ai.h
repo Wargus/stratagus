@@ -59,6 +59,7 @@ extern void AiEachSecond(CPlayer *player);  /// Called each second
 extern void InitAiModule(void);       /// Init AI global structures
 extern void AiInit(CPlayer *player);   /// Init AI for this player
 extern void CleanAi(void);            /// Cleanup the AI module
+extern void FreeAi(void);            /// Free the AI resources
 extern void SaveAi(CFile *file);     /// Save the AI state
 
 extern void AiCclRegister(void);      /// Register ccl features
