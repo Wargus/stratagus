@@ -1033,7 +1033,9 @@ static void AiCollectResources(void)
 					src_c = priority_resource[j];
 
 					// Don't complete with lower priority ones...
-					if (wanted[src_c] >= wanted[c]) {
+					if (wanted[src_c] > wanted[c] ||
+							(wanted[src_c] == wanted[c] &&
+								num_units_assigned[src_c] <= num_units_assigned[c]) + 1) {
 						continue;
 					}
 
