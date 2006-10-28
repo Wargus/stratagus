@@ -312,7 +312,7 @@ static void AiRequestSupply(void)
 	// request a better unit than the one we pick here.  If we only have enough
 	// resources for one unit we don't want to build the wrong one.
 	//
-	if (AiPlayer->SleepCycles < GameCycle) {
+	if (AiPlayer->SleepCycles != 0) {
 		return;
 	}
 
