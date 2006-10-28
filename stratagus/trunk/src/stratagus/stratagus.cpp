@@ -219,10 +219,6 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "iolib.h"
 #include "guichan.h"
 
-#ifdef DEBUG
-extern int CclUnits(lua_State *l);
-#endif
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -808,7 +804,6 @@ void Exit(int err)
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
 	lua_settop(Lua, 0);
-	CclUnits(Lua);
 	CleanModules();
 	lua_close(Lua);
 #endif
