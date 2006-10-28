@@ -74,8 +74,10 @@ function AiLoop(loop_funcs, loop_pos)
     return true
 end
 
-ai_pos = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+function InitAiScripts()
+  ai_pos = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+  ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+end
 
 local ai_loop_funcs = {
   function() print("Looping !"); return false end,
