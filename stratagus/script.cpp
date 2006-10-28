@@ -453,6 +453,15 @@ bool LuaToBoolean(lua_State *l, int narg)
 */
 void CclGarbageCollect(int fast)
 {
+#if LUA_VERSION_NUM >= 501
+	DebugPrint("Garbage collect (before): %d\n" _C_
+		lua_gc(Lua, LUA_GCCOUNT, 0));
+
+	lua_gc(Lua, LUA_GCCOLLECT, 0);
+
+	DebugPrint("Garbage collect (after): %d\n" _C_
+		lua_gc(Lua, LUA_GCCOUNT, 0));
+#else
 	DebugPrint("Garbage collect (before): %d/%d\n" _C_
 		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 
@@ -460,6 +469,7 @@ void CclGarbageCollect(int fast)
 
 	DebugPrint("Garbage collect (after): %d/%d\n" _C_
 		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
+#endif
 }
 
 // ////////////////////
