@@ -85,9 +85,6 @@ void CleanModules(void)
 
 	CleanIcons();
 	CleanCursors();
-#if 0
-	CleanMenus();
-#endif
 	CleanUserInterface();
 	CleanFonts();
 	CleanTriggers();
@@ -135,9 +132,6 @@ void InitModules(void)
 	InitMissileTypes();
 	InitMissiles();
 	InitConstructions();
-#if 0
-	InitDecorations();
-#endif
 
 	// LUDO : 0 = don't reset player stats ( units level , upgrades, ... ) !
 	InitUnitTypes(0);
@@ -168,9 +162,6 @@ void LoadModules(void)
 	LoadIcons();
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
 	UI.Load();
-#if 0
-	LoadPlayers();
-#endif
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
 #endif
@@ -190,10 +181,6 @@ void LoadModules(void)
 	UI.Minimap.Create();
 
 	SetDefaultTextColors(UI.NormalFontColor.c_str(), UI.ReverseFontColor.c_str());
-
-#if 0
-	LoadButtons();
-#endif
 }
 
 /**
