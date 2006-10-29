@@ -436,6 +436,94 @@ static void RecalculateShownUnits(void)
 	Editor.SelectedUnitIndex = -1;
 }
 
+static MenuScreen *editResourceMenu;
+static gcn::Label *editResourceLabel;
+static gcn::TextField *editResourceTextField;
+static gcn::Button *editResourceOKButton;
+static gcn::Button *editResourceCancelButton;
+
+static void CleanEditResource()
+{
+	delete editResourceMenu;
+	editResourceMenu = NULL;
+	delete editResourceLabel;
+	editResourceLabel = NULL;
+	delete editResourceTextField;
+	editResourceTextField = NULL;
+	delete editResourceOKButton;
+	editResourceOKButton = NULL;
+	delete editResourceCancelButton;
+	editResourceCancelButton = NULL;
+}
+
+class CEditResourceOKActionListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId) {
+		UnitUnderCursor->ResourcesHeld = atoi(editResourceTextField->getText().c_str());
+		editResourceMenu->stop();
+	}
+};
+static CEditResourceOKActionListener EditResourceOKListener;
+
+class CEditResourceCancelActionListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId) {
+		editResourceMenu->stop();
+	}
+};
+static CEditResourceCancelActionListener EditResourceCancelListener;
+
+/**
+** Edit resource properties
+*/
+void EditorEditResource(void)
+{
+	CleanEditResource();
+
+	editResourceMenu = new MenuScreen();
+
+	editResourceMenu->setOpaque(true);
+	editResourceMenu->setBaseColor(gcn::Color(38, 38, 78, 130));
+	editResourceMenu->setSize(288, 128);
+	editResourceMenu->setPosition((Video.Width - editResourceMenu->getWidth()) / 2,
+		(Video.Height - editResourceMenu->getHeight()) / 2);
+	editResourceMenu->setBorderSize(1);
+	editResourceMenu->setDrawMenusUnder(false);
+
+	std::string s(std::string("Amount of ") + DefaultResourceNames[UnitUnderCursor->Type->GivesResource] + ":");
+	editResourceLabel = new gcn::Label(s);
+	editResourceMenu->add(editResourceLabel, 288 / 2 - editResourceLabel->getWidth() / 2, 11);
+
+	char buf[30];
+	sprintf(buf, "%d", UnitUnderCursor->ResourcesHeld);
+	editResourceTextField = new gcn::TextField(buf);
+	editResourceTextField->setBaseColor(gcn::Color(200, 200, 120));
+	editResourceTextField->setForegroundColor(gcn::Color(200, 200, 120));
+	editResourceTextField->setBackgroundColor(gcn::Color(38, 38, 78));
+	editResourceTextField->setSize(212, 20);
+	editResourceMenu->add(editResourceTextField, 40, 46);
+
+	editResourceOKButton = new gcn::Button(_("~!OK"));
+	editResourceOKButton->setHotKey("o");
+	editResourceOKButton->setSize(106, 28);
+	editResourceOKButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
+	editResourceOKButton->setBaseColor(gcn::Color(38, 38, 78, 130));
+	editResourceOKButton->addActionListener(&EditResourceOKListener);
+	editResourceMenu->add(editResourceOKButton, 24, 88);
+
+	editResourceCancelButton = new gcn::Button(_("~!Cancel"));
+	editResourceCancelButton->setHotKey("c");
+	editResourceCancelButton->setSize(106, 28);
+	editResourceCancelButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
+	editResourceCancelButton->setBaseColor(gcn::Color(38, 38, 78, 130));
+	editResourceCancelButton->addActionListener(&EditResourceCancelListener);
+	editResourceMenu->add(editResourceCancelButton, 154, 88);
+
+	editResourceMenu->run(false);
+}
+
 /*----------------------------------------------------------------------------
 --  Display
 ----------------------------------------------------------------------------*/
@@ -2017,6 +2105,7 @@ void StartEditor(const char *filename)
 
 	CleanGame();
 	CleanPlayers();
+	CleanEditResource();
 }
 
 //@}

@@ -216,8 +216,6 @@ extern void NetConnectForceDisplayUpdate(void);
 	/// Compare Local State <-> Server's state, force Update when changes
 extern void NetClientCheckLocalState(void);
 
-	/// Edit resource properties
-extern void EditorEditResource(void);
 	/// Edit ai properties
 extern void EditorEditAiProperties(void);
 
