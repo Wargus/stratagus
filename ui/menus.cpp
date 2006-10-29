@@ -1038,31 +1038,6 @@ static void EditorPlayerPropertiesMenu(void)
 }
 #endif
 
-/**
-** Edit resource properties
-*/
-void EditorEditResource(void)
-{
-#if 0
-	Menu *menu;
-	char buf[13];
-	char buf2[32];
-
-	menu = FindMenu("menu-editor-edit-resource");
-
-	sprintf(buf2, "Amount of %s:", DefaultResourceNames[UnitUnderCursor->Type->GivesResource]);
-	menu->Items[0].D.Text.text = NewStringDesc(buf2);
-	sprintf(buf, "%d~!_", UnitUnderCursor->ResourcesHeld);
-	menu->Items[1].D.Input.buffer = buf;
-	menu->Items[1].D.Input.nch = strlen(buf) - 3;
-	menu->Items[1].D.Input.maxch = 6;
-	ProcessMenu("menu-editor-edit-resource", 1);
-	FreeStringDesc(menu->Items[0].D.Text.text);
-	delete menu->Items[0].D.Text.text;
-	menu->Items[0].D.Text.text = NULL;
-#endif
-}
-
 #if 0
 /**
 ** Key pressed in menu-editor-edit-resource
