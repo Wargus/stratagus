@@ -37,13 +37,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
-#include <vector>
-#include <map>
-
 #include "ui.h"
-#include "util.h"
-#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Defines/Declarations
@@ -215,9 +209,6 @@ extern int NetClientSelectScenario(void);
 extern void NetConnectForceDisplayUpdate(void);
 	/// Compare Local State <-> Server's state, force Update when changes
 extern void NetClientCheckLocalState(void);
-
-	/// Edit ai properties
-extern void EditorEditAiProperties(void);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);
