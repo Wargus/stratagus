@@ -1038,69 +1038,6 @@ static void EditorPlayerPropertiesMenu(void)
 }
 #endif
 
-#if 0
-/**
-** Key pressed in menu-editor-edit-resource
-*/
-static void EditorEditResourceEnterAction(Menuitem *mi,int key)
-{
-	if (mi->D.Input.nch > 0 && !isdigit(mi->D.Input.buffer[mi->D.Input.nch - 1])) {
-		strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
-	} else if (key==10 || key==13) {
-		EditorEditResourceOk();
-	}
-}
-#endif
-
-#if 0
-/**
-** Ok button from menu-editor-edit-resource
-*/
-static void EditorEditResourceOk(void)
-{
-	Menu *menu;
-	unsigned value;
-
-	menu = CurrentMenu;
-	value = atoi(menu->Items[1].D.Input.buffer);
-	if (value < 2500) {
-		strcpy(menu->Items[1].D.Input.buffer, "2500~!_");
-		menu->Items[1].D.Input.nch = 4;
-		menu = FindMenu("menu-editor-error");
-		menu->Items[1].D.Text.text = NewStringDesc("Must be greater than 2500");
-	} else if (value > 655000) {
-		strcpy(menu->Items[1].D.Input.buffer, "655000~!_");
-		menu->Items[1].D.Input.nch = 6;
-		menu = FindMenu("menu-editor-error");
-		menu->Items[1].D.Text.text = NewStringDesc("Must be smaller than 655000");
-	} else if (value / 2500 * 2500 != value) {
-		value = (value + 1250)/ 2500 * 2500;
-		sprintf(menu->Items[1].D.Input.buffer, "%d~!_", value);
-		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Input.buffer) - 3;
-		menu = FindMenu("menu-editor-error");
-		menu->Items[1].D.Text.text = NewStringDesc("Must be a multiple of 2500");
-	} else {
-		UnitUnderCursor->ResourcesHeld = value;
-		GameMenuReturn();
-		return;
-	}
-	ProcessMenu("menu-editor-error", 1);
-	FreeStringDesc(menu->Items[1].D.Text.text);
-	delete menu->Items[1].D.Text.text;
-	menu->Items[1].D.Text.text = NULL;
-}
-#endif
-
-#if 0
-/**
-** Cancel button from menu-editor-edit-resource
-*/
-static void EditorEditResourceCancel(void)
-{
-	GameMenuReturn();
-}
-#endif
-
 /**
 ** Edit ai properties
 */
