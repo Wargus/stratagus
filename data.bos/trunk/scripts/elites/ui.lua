@@ -365,17 +365,3 @@ UI.NetworkDiplomacyButton.Text = "Diplomacy"
 UI.NetworkDiplomacyButton.Style = FindButtonStyle("network")
 UI.NetworkDiplomacyButton:SetCallback(function() RunDiplomacyMenu() end)
 
-function AddMenuPanel(ident, file)
-	b = CMenuPanel:new_local()
-	b.Ident = ident
-	b.G = CGraphic:New(file)
-	UI.MenuPanels:push_back(b)
-end
-
-UI.MenuPanels:clear()
-AddMenuPanel("panel1", "general/panel_1.png")
-AddMenuPanel("panel2", "general/panel_2.png")
-AddMenuPanel("panel3", "general/panel_3.png")
-AddMenuPanel("panel4", "general/panel_4.png")
-AddMenuPanel("panel5", "general/panel_5.png")
-
