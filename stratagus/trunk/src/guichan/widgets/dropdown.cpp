@@ -218,7 +218,8 @@ namespace gcn
     
         if (mListBox->getListModel() && mListBox->getSelected() >= 0)
         {
-            graphics->drawText(mListBox->getListModel()->getElementAt(mListBox->getSelected()), 1, 0);
+            graphics->drawText(mListBox->getListModel()->getElementAt(mListBox->getSelected()),
+                1, (h - getFont()->getHeight()) / 2);
         }
 
         if (hasFocus())
@@ -475,7 +476,7 @@ namespace gcn
         }
 
         int listBoxHeight = mListBox->getHeight();
-        int h2 = getFont()->getHeight();
+		int h2 = mOldH ? mOldH : getFont()->getHeight();
 
         setHeight(h2);
 
