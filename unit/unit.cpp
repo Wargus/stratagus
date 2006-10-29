@@ -276,10 +276,7 @@ void CUnit::Init(CUnitType *type)
 
 	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
-	// On Load, Some units don't have Still animation, eg Deadbody
-	if (Type->Animations && !Type->Animations->Still) {
-		Frame = type->StillFrame;
-	}
+	Frame = type->StillFrame;
 
 	if (UnitTypeVar.NumberVariable) {
 		Assert(!Variable);
