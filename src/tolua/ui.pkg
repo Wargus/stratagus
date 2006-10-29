@@ -138,7 +138,9 @@ class CUserInterface
 	CUIButton *UpgradingButton;
 	CUIButton *ResearchingButton;
 	vector<CUIButton> TransportingButtons;
-	
+
+	CColor CompletedBarColorRGB;
+
 	CButtonPanel ButtonPanel;
 	
 	CPieMenu PieMenu;
