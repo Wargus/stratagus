@@ -1198,24 +1198,33 @@ void ShowOrder(const CUnit *unit)
 {
 	int x1;
 	int y1;
-	int i;
+	COrder *order;
 
 	if (unit->Destroyed) {
 		return;
 	}
 
+	// Get current position
 	x1 = CurrentViewport->Map2ViewportX(
 		unit->X) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
 	y1 = CurrentViewport->Map2ViewportY(
 		unit->Y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
 
-	ShowSingleOrder(unit, x1, y1, unit->Orders[0]);
-#if 1
-	for (i = 1; i < unit->OrderCount; ++i) {
+	// If the current order is cancelled show the next one
+	if (unit->OrderCount > 1 && unit->OrderFlush) {
+		order = unit->Orders[1];
+	} else {
+		order = unit->Orders[0];
+	}
+	ShowSingleOrder(unit, x1, y1, order);
+
+	// Show the rest of the orders
+	for (int i = 1 + (unit->OrderFlush ? 1 : 0); i < unit->OrderCount; ++i) {
 		GetOrderPosition(unit, unit->Orders[i - 1], &x1, &y1);
 		ShowSingleOrder(unit, x1, y1, unit->Orders[i]);
 	}
-#endif
+
+	// Show order for new trained units
 	if (!CanMove(unit)) {
 		ShowSingleOrder(unit, x1, y1, &unit->NewOrder);
 	}
