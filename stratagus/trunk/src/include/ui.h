@@ -606,7 +606,7 @@ public:
 	// Completed bar
 	SDL_Color CompletedBarColorRGB;     /// color for completed bar
 	Uint32 CompletedBarColor;           /// color for completed bar
-	int CompletedBarShadow;             /// should complete bar have shadow
+	bool CompletedBarShadow;             /// should complete bar have shadow
 
 	// Button panel
 	CButtonPanel ButtonPanel;
