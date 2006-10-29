@@ -217,6 +217,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "pathfinder.h"
 #include "widgets.h"
 #include "iolib.h"
+#include "util.h"
 #include "guichan.h"
 
 /*----------------------------------------------------------------------------
