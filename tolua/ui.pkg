@@ -140,6 +140,7 @@ class CUserInterface
 	vector<CUIButton> TransportingButtons;
 
 	CColor CompletedBarColorRGB;
+	bool CompletedBarShadow;
 
 	CButtonPanel ButtonPanel;
 	
