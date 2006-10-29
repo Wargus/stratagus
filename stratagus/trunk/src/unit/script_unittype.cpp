@@ -1859,7 +1859,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	// Resources.
 	if (unit->Type->GivesResource) {
 		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[GIVERESOURCE_INDEX].Max = 655350; // FIXME use better value ?
+		unit->Variable[GIVERESOURCE_INDEX].Max = 0x7FFFFFFF;
 	}
 	if (unit->Type->Harvester && unit->CurrentResource) {
 		unit->Variable[CARRYRESOURCE_INDEX].Value = unit->ResourcesHeld;
