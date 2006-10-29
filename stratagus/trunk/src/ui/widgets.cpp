@@ -1519,11 +1519,13 @@ void MenuScreen::draw(gcn::Graphics *graphics)
 {
 	if (this->drawUnder) {
 		gcn::Widget *w = Gui->getTop();
+		gcn::Widget *f = w->_getFocusHandler()->getFocused();
 		Gui->setTop(oldtop);
 		gcn::Rectangle r = Gui->getGraphics()->getCurrentClipArea();
 		Gui->getGraphics()->popClipArea();
 		Gui->draw();
 		Gui->setTop(w);
+		w->_getFocusHandler()->requestFocus(f);
 		Gui->getGraphics()->pushClipArea(r);
 	}
 	gcn::Container::draw(graphics);
