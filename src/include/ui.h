@@ -258,17 +258,6 @@ public:
 };
 
 /**
-**  Menu panels
-*/
-class CMenuPanel {
-public:
-	CMenuPanel() : G(NULL) {}
-
-	std::string Ident;              /// Unique identifier
-	CGraphic *G;                    /// Graphic
-};
-
-/**
 **  Condition to show panel content.
 */
 class ConditionPanel {
@@ -677,8 +666,6 @@ public:
 /// SoundConfig PlacementError;         /// played on placements errors
 /// SoundConfig PlacementSuccess;       /// played on placements success
 /// SoundConfig Click;                  /// click noice used often
-
-	std::vector<CMenuPanel> MenuPanels;/// Menu panels
 
 	CGraphic *VictoryBackgroundG;       /// Victory background graphic
 	CGraphic *DefeatBackgroundG;        /// Defeat background graphic

@@ -153,7 +153,6 @@ void CursorConfig::Load()
 void CUserInterface::Load(void)
 {
 	int i;
-	std::vector<CMenuPanel>::iterator menupanel;
 
 	//
 	//  Load graphics
@@ -197,10 +196,6 @@ void CUserInterface::Load(void)
 	ArrowSW.Load();
 	ArrowS.Load();
 	ArrowSE.Load();
-
-	for (menupanel = MenuPanels.begin(); menupanel != MenuPanels.end(); ++menupanel) {
-		(*menupanel).G->Load();
-	}
 }
 
 /**
@@ -247,7 +242,6 @@ CUserInterface::~CUserInterface()
 void CleanUserInterface(void)
 {
 	int i;
-	std::vector<CMenuPanel>::iterator menupanel;
 
 	// Filler
 	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
@@ -285,12 +279,6 @@ void CleanUserInterface(void)
 
 	// Pie Menu
 	CGraphic::Free(UI.PieMenu.G);
-
-	// Menu Panels
-	for (menupanel = UI.MenuPanels.begin(); menupanel != UI.MenuPanels.end(); ++menupanel) {
-		CGraphic::Free((*menupanel).G);
-	}
-	UI.MenuPanels.clear();
 
 	// Backgrounds
 	CGraphic::Free(UI.VictoryBackgroundG);
