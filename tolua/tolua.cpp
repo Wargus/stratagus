@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Oct 28 18:42:20 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Oct 29 13:17:47 2006.
 */
 
 #ifndef __cplusplus
@@ -3427,6 +3427,36 @@ static int tolua_set_CUserInterface_TransportingButtons(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->TransportingButtons = *((vector<CUIButton>*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: CompletedBarColorRGB of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_CompletedBarColorRGB
+static int tolua_get_CUserInterface_CompletedBarColorRGB(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'CompletedBarColorRGB'",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->CompletedBarColorRGB,"CColor");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: CompletedBarColorRGB of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_CompletedBarColorRGB
+static int tolua_set_CUserInterface_CompletedBarColorRGB(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'CompletedBarColorRGB'",NULL);
+ if (!tolua_isusertype(tolua_S,2,"CColor",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->CompletedBarColorRGB = *((CColor*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -15626,6 +15656,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"UpgradingButton",tolua_get_CUserInterface_UpgradingButton_ptr,tolua_set_CUserInterface_UpgradingButton_ptr);
   tolua_variable(tolua_S,"ResearchingButton",tolua_get_CUserInterface_ResearchingButton_ptr,tolua_set_CUserInterface_ResearchingButton_ptr);
   tolua_variable(tolua_S,"TransportingButtons",tolua_get_CUserInterface_TransportingButtons,tolua_set_CUserInterface_TransportingButtons);
+  tolua_variable(tolua_S,"CompletedBarColorRGB",tolua_get_CUserInterface_CompletedBarColorRGB,tolua_set_CUserInterface_CompletedBarColorRGB);
   tolua_variable(tolua_S,"ButtonPanel",tolua_get_CUserInterface_ButtonPanel,tolua_set_CUserInterface_ButtonPanel);
   tolua_variable(tolua_S,"PieMenu",tolua_get_CUserInterface_PieMenu,tolua_set_CUserInterface_PieMenu);
   tolua_variable(tolua_S,"MapArea",tolua_get_CUserInterface_MapArea,tolua_set_CUserInterface_MapArea);
