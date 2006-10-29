@@ -61,6 +61,7 @@ namespace gcn
     {
         mDroppedDown = false;
         mPushed = false;
+        mOldH = 0;
     
         setWidth(100);
         setFocusable(true);
@@ -89,6 +90,7 @@ namespace gcn
         setFocusable(true);
         mDroppedDown = false;
         mPushed = false;    
+        mOldH = 0;
     
         mDefaultScrollArea = new ScrollArea();
         mDefaultScrollArea->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
@@ -124,6 +126,7 @@ namespace gcn
         setFocusable(true);
         mDroppedDown = false;
         mPushed = false;
+        mOldH = 0;
     
         mDefaultScrollArea = NULL;
         mDefaultListBox = NULL;
@@ -476,7 +479,7 @@ namespace gcn
         }
 
         int listBoxHeight = mListBox->getHeight();
-		int h2 = mOldH ? mOldH : getFont()->getHeight();
+        int h2 = mOldH ? mOldH : getFont()->getHeight();
 
         setHeight(h2);
 
