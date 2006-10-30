@@ -474,7 +474,9 @@ function BuildMainMenu(menu)
   menu:addButton(_("~!Load Game"), "l", x, ystep * 9, RunLoadGameMenu)
   menu:addButton(_("Show ~!Replay"), "r", x, ystep * 10, RunReplayMenu)
   menu:addButton(_("Cre~!dits"), "d", x, ystep * 11, RunCreditsMenu)
-  menu:addButton("~!Widgets Demo", "w", x, ystep * 12, RunWidgetsMenu)
+  if false then 
+     menu:addButton("~!Widgets Demo", "w", x, ystep * 12, RunWidgetsMenu)
+  end
 end
 
 function RunMainMenu(s)
