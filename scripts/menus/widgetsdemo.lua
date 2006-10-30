@@ -32,11 +32,6 @@ function RunWidgetsMenu(s)
   local b
   menu = BosMenu()
 
-  local normalImage = CGraphic:New("graphics/button.png", 200, 24)
-  local pressedImage = CGraphic:New("graphics/pressed.png", 200, 24)
-  normalImage:Load() -- FIXME remove when immediatly loaded
-  pressedImage:Load() -- idem
-
   b = Label("Translucent widgets")
   b:setFont(CFont:Get("large"))
   b:adjustSize();
@@ -112,44 +107,7 @@ function RunWidgetsMenu(s)
     sw:add(Label(f), 0, 20 * i + 50)
   end
   
-
-  b = Label("Image based widgets")
-  b:setFont(CFont:Get("large"))
-  b:adjustSize();
-  menu:add(b, 330, 10)
-
-  b = ImageButton("SubMenu")
-  b:setNormalImage(normalImage)
-  b:setPressedImage(pressedImage)
-  b:setActionCallback(RunSubMenu)
-  menu:add(b, 330, 50)
-
-  b = ImageCheckBox("ImageCheckBox")
-  local cb = CGraphic:New("ui/widgets/checkbox-unchecked-normal.png")
-  cb:Load()
-  b:setUncheckedNormalImage(cb)
-  cb = CGraphic:New("ui/widgets/checkbox-unchecked-pressed.png")
-  cb:Load()
-  b:setUncheckedPressedImage(cb)
-  cb = CGraphic:New("ui/widgets/checkbox-checked-normal.png")
-  cb:Load()
-  b:setCheckedNormalImage(cb)
-  cb = CGraphic:New("ui/widgets/checkbox-checked-pressed.png")
-  cb:Load()
-  b:setCheckedPressedImage(cb)
-  menu:add(b, 330, 210)
-
-  bs = ImageSlider(0,1)
-  local wimg = CGraphic:New("ui/widgets/undef_square.png")
-  wimg:Load()
-  bs:setMarkerImage(wimg)
-  local wimg2 = CGraphic:New("ui/widgets/scrollhorizontal_default.png")
-  wimg2:Load()
-  bs:setBackgroundImage(wimg2)
-  bs:setWidth(100)
-  bs:setHeight(20)
-  menu:add(bs, 330, 140)
-
+  
   x = MultiLineLabel("a bc def ghij klmnop qrstuvw wwwwwwwwwwwwwwwwwwwwwwwwwwwwww test\na t\na c b")
   x:setFont(Fonts["large"])
   x:setAlignment(MultiLineLabel.CENTER)
