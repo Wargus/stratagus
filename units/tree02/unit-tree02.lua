@@ -52,7 +52,7 @@ DefineUnitType("unit-tree02", {
 	Corpse = {"unit-destroyed-1x1-place", 0}, 
 	Type = "land",
 	Building = true, BuilderOutside = true,
-	VisibleUnderFog = false,
+	VisibleUnderFog = true,
 	NumDirections = 1,
 	Sounds = {}
 })
