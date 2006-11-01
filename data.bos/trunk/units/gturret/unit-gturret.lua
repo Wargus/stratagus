@@ -78,11 +78,17 @@ DefineUnitType("unit-gturret", {
 	Corpse = {"build-dead-gturret", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
-	Sounds = {"selected", "gturret-selected",}
+	Sounds = {
+		"selected", "gturret-selected",
+		"ready", "gturret-ready",
+		"help", "gturret-help"
+		}
 })
 
-MakeSound("gturret-selected", "units/gturret/gturret_select.wav")
-MakeSound("gturret-attack", "units/gturret/gturret_attack.wav")
+MakeSound("gturret-selected", GetCurrentLuaPath().."/gturret_select.wav")
+MakeSound("gturret-attack", GetCurrentLuaPath().."/gturret_attack.wav")
+MakeSound("gturret-ready", GetCurrentLuaPath().."/gturret.completed.wav")
+MakeSound("gturret-help", GetCurrentLuaPath().."/gturret.underattack.wav")
 
 DefineAnimations("animations-dead-gturret", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 

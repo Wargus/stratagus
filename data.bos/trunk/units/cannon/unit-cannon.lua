@@ -70,6 +70,10 @@ DefineMissileType("missile-cannon", {
 	Class = "missile-class-point-to-point", Sleep = 1, 
 	Speed = 20, Range = 3})
 
+MakeSound("cannon-ready", GetCurrentLuaPath().."/cannon.completed.wav")
+MakeSound("cannon-help", GetCurrentLuaPath().."/cannon.underattack.wav")
+MakeSound("cannon-selected", GetCurrentLuaPath().."/cannon_selected.wav")
+
 DefineUnitType("unit-cannon", {
 	Name = "Cannon",
 	Image = {"file", "units/cannon/cannon.png", "size", {128, 128},},
@@ -91,8 +95,12 @@ DefineUnitType("unit-cannon", {
 	NumDirections = 8, Flip = false,
 	Corpse = {"build-dead-cannon", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
-	VisibleUnderFog = true
-	--Sounds = {"selected", "cannon-selected",}
+	VisibleUnderFog = true,
+	Sounds = {
+		"selected", "cannon-selected",
+		"help", "cannon-help",
+		"ready", "cannon-ready"
+		}
 })
 
 DefineAnimations("animations-dead-cannon", {
