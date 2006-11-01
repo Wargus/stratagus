@@ -227,7 +227,6 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 {
 	FileWriter *f;
 	int i, j;
-	char *extension;
 
 	try {
 		f = CreateFileWriter(mapsetup);
