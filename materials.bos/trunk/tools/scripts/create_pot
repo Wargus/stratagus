@@ -14,7 +14,7 @@ find scripts -name "*.lua.new" -exec rm "{}" \;
 # create the new pot file by adding the entries of all lua scripts to it
 # using xgettext
 touch bos.pot
-find scripts \( -name .svn -prune \) -o -type d -exec bash -c 'xgettext -j -F -o bos.pot -L Python --from-code=UTF-8 --copyright-holder="BOS" {}/*.lua' \;
+find scripts \( -name .svn -prune \) -o -type d -exec bash -c 'xgettext -j -F -o bos.pot -L Python --from-code=UTF-8 --copyright-holder="BOS" -k_ {}/*.lua' \;
 sed -e 's/SOME DESCRIPTIVE TITLE/BOS Battle of Survival translation template/g' \
     -e 's/Copyright (C) YEAR BOS/Copyright (C) YEAR BOS, but note that this file was automatically generated/g' \
     -e "s/YEAR/`date|awk '{print $6}'`/g" \
