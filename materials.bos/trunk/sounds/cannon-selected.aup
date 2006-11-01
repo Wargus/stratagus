@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<audacityproject projname="cannon-selected_data" version="1.1.0" audacityversion="1.2.4" sel0="0.0000000000" sel1="3.6485208333" vpos="0" h="0.0000000000" zoom="86.1328125000" rate="22050.000000" >
+	<tags title="" artist="" album="" track="-1" year="" genre="-1" comments="" id3v2="1" />
+	<wavetrack name="electric_tower_charge_up_22khz" channel="2" linked="0" offset="0.00000000" rate="48000.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="262144" sampleformat="131073" numsamples="175129" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00054.au' len='175129' min='-1.000000' max='1.000000' rms='0.604376'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+</audacityproject>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<audacityproject projname="cannon-attack_data" version="1.1.0" audacityversion="1.2.4" sel0="0.0000000000" sel1="0.5301238444" vpos="0" h="0.0000000000" zoom="1976.8965517241" rate="22050.000000" >
+	<tags title="" artist="" album="" track="-1" year="" genre="-1" comments="" id3v2="1" />
+	<wavetrack name="Blaster_1" channel="1" linked="0" offset="0.00000000" rate="22050.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="524288" sampleformat="131073" numsamples="11455" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00028.au' len='11455' min='-1.000000' max='1.000000' rms='0.128295'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+	<wavetrack name="Blaster_1" channel="0" linked="0" offset="0.00000000" rate="22050.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="524288" sampleformat="131073" numsamples="11455" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00027.au' len='11455' min='-1.000000' max='1.000000' rms='0.206363'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+	<wavetrack name="Piste audio" channel="0" linked="0" offset="0.00000000" rate="22050.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="524288" sampleformat="131073" numsamples="11447" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00016.au' len='11447' min='-1.000000' max='1.000000' rms='0.216552'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+</audacityproject>

@@ -1,0 +1,17 @@
+
+ * Voices have been generated using : 
+- festival (http://www.cstr.ed.ac.uk/projects/festival) 
+- US1 MBROLA voice (http://www.cstr.ed.ac.uk/projects/festival/mbrola.html)
+
+ * ~/.festivalrc
+(Parameter.set 'Audio_Method 'linux16audio)
+(set! voice_default 'voice_us1_mbrola)
+
+ * Command line : text2wave file.txt -o output.wav
+(from the Festival toolbox)
+
+ * Using Audacity to correct sounds :
+-> bitrate = 16bits
+-> sample rate = 22k
+-> apply Compressor effect with -14dB gain
+

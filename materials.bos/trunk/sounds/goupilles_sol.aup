@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<audacityproject projname="goupilles_sol_data" version="1.1.0" audacityversion="1.2.3" sel0="0.0000000000" sel1="0.0000000000" vpos="64" h="0.0000000000" zoom="559.4531250000" rate="22050.000000" >
+	<tags title="" artist="" album="" track="-1" year="" genre="-1" comments="" id3v2="1" />
+	<wavetrack name="goupille sol" channel="2" linked="0" offset="0.09861678" rate="44100.000000" gain="0.501187" pan="0.000000" >
+		<sequence maxsamples="524288" sampleformat="131073" numsamples="32304" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00076.au' len='31924' min='-0.496117' max='0.449760' rms='0.016782'/>
+			</waveblock>
+			<waveblock start="31924" >
+				<simpleblockfile filename='b00077.au' len='380' min='-0.000229' max='0.000046' rms='0.000011'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+	<wavetrack name="goupille sol" channel="2" linked="0" offset="0.02641723" rate="44100.000000" gain="0.501187" pan="0.000000" >
+		<sequence maxsamples="524288" sampleformat="131073" numsamples="42935" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00081.au' len='42935' min='-0.245563' max='0.221210' rms='0.009433'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='2'>
+			<controlpoint t='0.465142392290' val='1.000000000000'/>
+			<controlpoint t='0.465147392290' val='1.000000000000'/>
+		</envelope>
+	</wavetrack>
+	<wavetrack name="goupille sol" channel="2" linked="0" offset="0.01251701" rate="44100.000000" gain="0.501187" pan="0.000000" >
+		<sequence maxsamples="262144" sampleformat="131073" numsamples="42444" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00092.au' len='42444' min='-0.495781' max='0.448478' rms='0.017469'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+	<wavetrack name="goupille sol" channel="2" linked="0" offset="0.29850340" rate="44100.000000" gain="0.501187" pan="0.000000" >
+		<sequence maxsamples="524288" sampleformat="131073" numsamples="30936" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00087.au' len='30936' min='-0.147387' max='0.149157' rms='0.006112'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+</audacityproject>

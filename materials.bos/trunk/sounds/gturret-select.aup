@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<audacityproject projname="gturret-select_data" version="1.1.0" audacityversion="1.2.3" sel0="0.0022005644" sel1="0.0022005644" vpos="0" h="0.0000000000" zoom="454.4288723107" rate="22050.000000" >
+	<tags title="" artist="" album="" track="-1" year="" genre="-1" comments="" id3v2="1" />
+	<wavetrack name="gun_reload_22k" channel="2" linked="0" offset="0.36530612" rate="22050.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="262144" sampleformat="131073" numsamples="20735" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00000.au' len='20735' min='-1.000000' max='1.000000' rms='0.053834'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+	<wavetrack name="rotating_turret_22k" channel="2" linked="0" offset="0.00000000" rate="22050.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="262144" sampleformat="131073" numsamples="50803" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00001.au' len='50803' min='-0.749935' max='0.749966' rms='0.192522'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+</audacityproject>

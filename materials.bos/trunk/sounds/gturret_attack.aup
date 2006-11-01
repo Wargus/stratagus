@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<audacityproject projname="gturret_attack_data" version="1.1.0" audacityversion="1.2.3" sel0="0.0000000000" sel1="0.0000000000" vpos="0" h="0.0000000000" zoom="1026.2553249343" rate="22050.000000" >
+	<tags title="" artist="" album="" track="-1" year="" genre="-1" comments="" id3v2="1" />
+	<wavetrack name="machine_gun_fire_22khz_lp" channel="2" linked="0" offset="0.00000000" rate="22050.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="262144" sampleformat="131073" numsamples="22066" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00049.au' len='22066' min='-1.000000' max='1.000000' rms='0.181029'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='20'>
+			<controlpoint t='0.090970056689' val='1.000000000000'/>
+			<controlpoint t='0.090975056689' val='1.000000000000'/>
+			<controlpoint t='0.181945113379' val='1.000000000000'/>
+			<controlpoint t='0.181950113379' val='1.000000000000'/>
+			<controlpoint t='0.272920170068' val='1.000000000000'/>
+			<controlpoint t='0.272925170068' val='1.000000000000'/>
+			<controlpoint t='0.363895226757' val='1.000000000000'/>
+			<controlpoint t='0.363900226757' val='1.000000000000'/>
+			<controlpoint t='0.454870283447' val='1.000000000000'/>
+			<controlpoint t='0.454875283447' val='1.000000000000'/>
+			<controlpoint t='0.545845340136' val='1.000000000000'/>
+			<controlpoint t='0.545850340136' val='1.000000000000'/>
+			<controlpoint t='0.636820396825' val='1.000000000000'/>
+			<controlpoint t='0.636825396825' val='1.000000000000'/>
+			<controlpoint t='0.727795453515' val='1.000000000000'/>
+			<controlpoint t='0.727800453515' val='1.000000000000'/>
+			<controlpoint t='0.818770510204' val='1.000000000000'/>
+			<controlpoint t='0.818775510204' val='1.000000000000'/>
+			<controlpoint t='0.909745566893' val='1.000000000000'/>
+			<controlpoint t='0.909750566893' val='1.000000000000'/>
+		</envelope>
+	</wavetrack>
+	<wavetrack name="goupilles_sol" channel="2" linked="0" offset="0.00000000" rate="22050.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="262144" sampleformat="131073" numsamples="22050" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00095.au' len='22050' min='-0.239216' max='0.232715' rms='0.009573'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+</audacityproject>
