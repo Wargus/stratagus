@@ -9,22 +9,10 @@ Stratagus game engine.
 
 Licence
 -------
-Invasion - Battle of Survival is copyrighted in 2004 by the Invasion Team
-(http://savannah.nongnu.org/project/memberlist.php?group=stratagus-bos)
+This work, Invasion - Battle of Survival, is copyrighted in 2004-2006 by
+Tina Petersen Jensen, Francois Beerten et al.
 
-This game is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; version 2 dated June, 1991.
-
-This game is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-02110-1301, USA.
+Read the file COPYRIGHT.txt for the detailed copyright notice.
 
 
 How to install
@@ -46,9 +34,9 @@ Execute the folowing command in the stratagus directory:
 How to contact us
 -----------------
 For any questions, remarks or thanks you can contact us at:
-http://savannah.nongnu.org/projects/stratagus-bos/ 
+http://bos.seul.org/ 
 
-Or discuss with the stratagus team on irc on the channel #stratagus at
+Or discuss with the team on irc on the channel #bos at
 freenode.net.
 
 Please report bugs in our bug tracker:
