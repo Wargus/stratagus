@@ -68,7 +68,7 @@ def convertAccessMap(imagename, accessname):
 if __name__ == '__main__':
   if len(sys.argv) != 3:
      print 'Convert a png image into access instructions for a terrain'
-     print 'Usage: accessmap.py <image> <access>'
+     print 'Usage: accessmap.py <image> <access type> > lua file'
      sys.exit(-2)
   convertAccessMap(sys.argv[1], sys.argv[2])
 
