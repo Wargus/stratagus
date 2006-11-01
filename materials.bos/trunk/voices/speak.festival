@@ -1,0 +1,6 @@
+(Parameter.set 'Audio_Required_Rate 44100)
+(Parameter.set 'Audio_Required_Format 'riff)
+(Parameter.set 'Audio_Command "cp $FILE OUTPUT")
+(Parameter.set 'Audio_Method 'Audio_Command)
+(voice_VOICE_diphone)
+(SayText "TEXT")

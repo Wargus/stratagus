@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# This is a small script to generate some speech used by the buggy using
+# 'festival', a text so speech synthesiser.
+# (c) Frank Loeffler (2006)
+
+VOICE=ed
+#VOICE=al
+
+function create
+{
+  echo "$2" | \
+    text2wave -o "$1" -F 44100 -scale 3.0 -eval "(voice_k${VOICE}_diphone)"
+}
+
+create "buggy_attacked.wav" "buggy attacked!"
+create "buggy_ready.wav"    "buggy is ready!"
+create "buggy_action.wav"   "yes sir!"
+create "buggy_die.wav"      "aaaaaa."
+create "buggy_select.wav"   "yes commander?"
