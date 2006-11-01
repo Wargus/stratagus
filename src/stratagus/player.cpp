@@ -511,8 +511,11 @@ void CPlayer::Clear()
 	TotalRazings = 0;
 	TotalKills = 0;
 	Color = 0;
-	// FIXME: can't clear Allow since it's initialized already
-//	Allow.Clear();
+	// Allow has already been initialised by DefineAllow and DefineUnitAllow.
+	// Thus we cannot simply clear it.
+	// But we have to revert upgrades that could have happened during a
+	// the previous game.
+	Allow.RevertUpgrades();
 	UpgradeTimers.Clear();
 }
 
