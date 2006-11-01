@@ -677,4 +677,75 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 	return fl.size();
 }
 
+
+
+void FileWriter::printf(const char *format, ...) 
+{
+	// FIXME: hardcoded size
+	char buf[1024];
+	
+	va_list ap;
+	va_start(ap, format);
+	vsnprintf(buf, 1024, format, ap);
+	va_end(ap);
+	write(buf, strlen(buf));
+}
+
+
+class RawFileWriter : public FileWriter
+{
+	FILE *file;
+
+public:
+	RawFileWriter(const char *filename) {
+		file = fopen(filename, "wb");
+		if (!file) {
+			fprintf(stderr,"Can't open file '%s' for writing\n", filename);
+			throw FileException();
+		}
+	}
+
+	virtual ~RawFileWriter() {
+		fclose(file);
+	}
+
+	virtual int write(const char *data, unsigned int size)
+	{
+		return fwrite(data, size, 1, file);
+	}
+};
+
+class GzFileWriter : public FileWriter
+{
+	gzFile file;
+
+public:
+	GzFileWriter(const char *filename) {
+		file = gzopen(filename, "wb9");
+		if (!file) {
+			fprintf(stderr,"Can't open file '%s' for writing\n", filename);
+			throw FileException();
+		}
+	}
+
+	virtual ~GzFileWriter() {
+		gzclose(file);
+	}
+
+	virtual int write(const char *data, unsigned int size)
+	{
+		return gzwrite(file, data, size);
+	}
+};
+
+
+FileWriter * CreateFileWriter(const char *filename)
+{
+	if (strcasestr(filename,".gz")) {
+		return new GzFileWriter(filename);
+	} else {
+		return new RawFileWriter(filename);
+	}
+}
+
 //@}
