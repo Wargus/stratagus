@@ -5,6 +5,8 @@
 
  * ~/.festivalrc
 (Parameter.set 'Audio_Method 'linux16audio)
+;; (set! voice_default 'voice_rab_diphone)
+;; (set! voice_default 'voice_don_diphone)
 (set! voice_default 'voice_us1_mbrola)
 
  * Command line : text2wave file.txt -o output.wav
