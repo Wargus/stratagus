@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # This is a small script to generate some speech used by the buggy using
-# 'festival', a text so speech synthesiser.
+# 'festival', a text to speech synthesiser.
 # (c) Frank Loeffler (2006)
 
 VOICE=ed
