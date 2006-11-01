@@ -30,6 +30,31 @@
 -- Load the animations for the units.
 Load("scripts/anim.lua")
 
+AllowedUnits = {}
+
+local oldDefineAllow = DefineAllow
+function DefineAllow(unit, access)
+   AllowedUnits[unit] = access
+end
+
+function AllowDefaultUnits()
+   for unit, default in AllowedUnits do
+      DefineAllow(unit, default)
+   end 
+end
+
+function DisallowAllUnits()
+   for unit, default in AllowedUnits do
+      DefineAllow(unit, "FFFFFFFFFFFFFFFF")
+   end
+end
+
+function AllowAllUnits()
+   for unit, default in AllowedUnits do
+      DefineAllow(unit, "AAAAAAAAAAAAAAAA")
+   end
+end
+
 function DefineCommonButtons(forUnits) 
    DefineButton({
         Pos = 1, Level = 0, Icon = "icon-move",
@@ -153,3 +178,6 @@ for i,f in list do
   end
 end
 
+-- restore the old DefineAllow function
+-- TODO: use another name in the unit scripts
+DefineAllow = oldDefineAllow
