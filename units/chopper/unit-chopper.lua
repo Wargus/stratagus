@@ -55,6 +55,9 @@ DefineIcon({
 	Frame = 0,
 	File = "units/chopper/ico_chopper.png"})
 
+MakeSound("chopper-ready", GetCurrentLuaPath().."/chopper.ready.wav")
+MakeSound("chopper-help", GetCurrentLuaPath().."/chopper.underattack.wav")
+
 DefineUnitType("unit-chopper", {
 	Name = "Chopper",
 	Image = {"file", "units/chopper/unit_chopper.png", "size", {128,128}},
@@ -75,7 +78,9 @@ DefineUnitType("unit-chopper", {
 	NumDirections = 8, MaxAttackRange = 7,
 	Sounds = {
 		"selected", "grenadier-selected",
-		"acknowledge", "grenadier-acknowledge"
+		"acknowledge", "grenadier-acknowledge",
+		"ready", "chopper-ready",
+		"help", "chopper-help"
 	}
 })
 

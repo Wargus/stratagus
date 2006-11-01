@@ -56,6 +56,9 @@ DefineMissileType("missile-bomber", {
 	ImpactSound = "rocket-impact", DrawLevel = 150,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 16, Range = 16})
 
+MakeSound("bomber-ready", GetCurrentLuaPath().."/bomber.ready.wav")
+MakeSound("bomber-help", GetCurrentLuaPath().."/bomber.underattack.wav")
+
 DefineUnitType("unit-bomber", {
 	Name = "bomber Construction",
 	Image = {"file", "units/bomber/unit_bomber.png", "size", {128, 128}},
@@ -76,8 +79,10 @@ DefineUnitType("unit-bomber", {
 	NumDirections = 8, MaxAttackRange = 1,
 	Sounds = {
 		"selected", "grenadier-selected",
-		"acknowledge", "grenadier-acknowledge"
-	}
+		"acknowledge", "grenadier-acknowledge",
+		"ready", "bomber-ready",
+		"help", "bomber-help"
+		}
 })
 
 DefineAllow("unit-bomber", "AAAAAAAAAAAAAAAA")

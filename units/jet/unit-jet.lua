@@ -54,6 +54,9 @@ DefineMissileType("missile-jet", {
 	ImpactSound = "rocket-impact", DrawLevel = 150,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 16, Range = 16})
 
+MakeSound("jet-ready", GetCurrentLuaPath().."/jet.ready.wav")
+MakeSound("jet-help", GetCurrentLuaPath().."/jet.underattack.wav")
+
 DefineUnitType("unit-jet", {
 	Name = "Jet fighter",
 	Image = {"file", "units/jet/unit_jet.png", "size", {128, 128}},
@@ -77,8 +80,10 @@ DefineUnitType("unit-jet", {
 	NumDirections = 8, MaxAttackRange = 5,
 	Sounds = {
 		"selected", "grenadier-selected",
-		"acknowledge", "grenadier-acknowledge"
-	}
+		"acknowledge", "grenadier-acknowledge",
+		"ready", "jet-ready",
+		"help", "jet-help"
+		}
 })
 
 DefineAllow("unit-jet", "AAAAAAAAAAAAAAAA")

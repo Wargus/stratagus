@@ -56,6 +56,8 @@ DefineIcon({
 	File = "units/camera/camera_i.png"})
 
 MakeSound("camera-selected", "units/camera/sfx_camera.select.wav")
+MakeSound("camera-ready", GetCurrentLuaPath().."/camera.completed.wav")
+MakeSound("camera-help", GetCurrentLuaPath().."/camera.underattack.wav")
 
 DefineConstruction("construction-cam", {
 	Constructions = {
@@ -85,7 +87,10 @@ DefineUnitType("unit-cam", {
 	Corpse = {"camera_destroyed", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
-	Sounds = {"selected", "camera-selected"}
+	Sounds = {"selected", "camera-selected",
+		"ready", "camera-ready",
+		"help", "camera-help"
+		}
 })
 
 DefineUnitType("camera_destroyed", {

@@ -48,6 +48,8 @@ DefineIcon({
 	File = "units/radar/radar_i.png"})
 
 MakeSound("radar-selected", GetCurrentLuaPath().."/sfx_rdar.select.wav")
+MakeSound("radar-ready", GetCurrentLuaPath().."/radar.completed.wav")
+MakeSound("radar-help", GetCurrentLuaPath().."/radar.underattack.wav")
 
 DefineConstruction("construction-radar", {
 	Constructions = {
@@ -73,7 +75,11 @@ DefineUnitType("unit-radar", {
 	VisibleUnderFog = true,
 	NumDirections = 1,
 	RadarRange = 40,
-	Sounds = {"selected", "radar-selected"}
+	Sounds = {
+		"selected", "radar-selected",
+		"ready", "radar-ready",
+		"help", "radar-help"
+		}
 })
 
 DefineUnitType("radar_destroyed", {
