@@ -1,6 +1,8 @@
 
-These patterns are for use with Gimp 2.2.x and upper versions. Simply
-import and use with tools (brushes, clone, paint, etc)
+These patterns are for use with Gimp 2.2.x and upper versions. 
+
+Simply copy them in ~/.gimp-2.2/patterns/, then use with tools 
+(brushes, clone, paint, etc)
 
 Provided by GruiicK:
 dried_mud.pat  grass37.pat    grass611.pat   redsoil13.pat  stone36.pat
