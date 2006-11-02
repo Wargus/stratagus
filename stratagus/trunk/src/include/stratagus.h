@@ -155,7 +155,7 @@ inline char *new_strdup(const char *str)
 --  General
 ----------------------------------------------------------------------------*/
 
-#define VERSION  "2.2-CVS"                 /// Engine version shown
+#define VERSION  "2.2-ALPHA"                 /// Engine version shown
 
 #ifndef StratagusMajorVerion
 	/// Stratagus major version
