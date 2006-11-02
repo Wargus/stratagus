@@ -2,16 +2,7 @@
 <!--#set var="title" value="Bos"-->
 <!--#include file="header.shtml" -->
 
-      <h2>News</h2>
-      <h3>Invasion - Battle of Survival (BoS) 2.0 soon to be released</h3>
-<p>With the Stratagus engine 2.2 release coming in sight, Invasion Team
-is pleased to announce the BoS 2.0 freezing process.<br>
-<br>
-BoS 2.0 integrates new features like Guichan menus, improved UI, 
-image-based map system, new units, new set elements...
-(and a lot of new, great, and funny bugs from Stratagus team!! :o)</p>
-
-      
+    
       <h2>About</h2>
       <p>Invasion - Battle of Survival is a real-time strategy game
 using the <a href="http://www.stratagus.org/">Stratagus</a> game
@@ -21,6 +12,16 @@ Invasion - Battle of Survival is copyrighted in 2004-2005 by the <a
  href="http://savannah.nongnu.org/project/memberlist.php?group=stratagus-bos">Invasion
 Team</a>. The game is distributed under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU
 General Public License V2</a>.
+
+      <h2>News</h2>
+      <h3>Invasion - Battle of Survival (BoS) 2.0 soon to be released</h3>
+<p>With the Stratagus engine 2.2 release coming in sight, Invasion Team
+is pleased to announce the BoS 2.0 freezing process.<br>
+<br>
+BoS 2.0 integrates new features like Guichan menus, improved UI, 
+image-based map system, new units, new set elements...
+(and a lot of new, great, and funny bugs from Stratagus team!! :o)</p>
+
       <h2>Project<br>
       </h2>
       <a href="http://savannah.nongnu.org/projects/stratagus-bos/">Latest
