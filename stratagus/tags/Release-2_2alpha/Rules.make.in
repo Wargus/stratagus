@@ -1,0 +1,50 @@
+##       _________ __                 __                               
+##      /   _____//  |_____________ _/  |______     ____  __ __  ______
+##      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+##      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+##             \/                  \/          \//_____/            \/ 
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   Stratagus - A free fantasy real time strategy game engine
+##
+
+# Compile commands
+CXX=@CXX@
+RM=rm -f
+MAKE=make
+
+# Prefix for 'make install'
+PREFIX=@PREFIX@
+
+# Video support
+VIDEO_CFLAGS = @VIDEO_CFLAGS@
+
+# Compression support
+COMP_CFLAGS		= -DUSE_ZLIB @BZ2_CFLAGS@
+COMP_LIBS		= -lz @BZ2_LIBS@
+
+STRATAGUS_LIBS= -lpng -lz -lm \
+	@EXTRA_LIBS@ @VIDEO_LIBS@ @THREAD_LIBS@ $(COMP_LIBS) \
+	@VORBIS_LIBS@ @THEORA_LIBS@ @MNG_LIBS@ \
+	@MIKMOD_LIBS@ @LUA_LIBS@ @STATIC_LDFLAGS@ \
+	-lz -lm $(LDFLAGS)
+
+DISTLIST=$(TOPDIR)/distlist
+TAGS=$(TOPDIR)/src/tags
+
+# Linux
+OBJDIR=@OBJDIR@
+
+CPPFLAGS=@EXTRA_CPPFLAGS@
+
+IFLAGS=	-I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include \
+    $(XIFLAGS)
+
+CFLAGS=$(CPPFLAGS) $(IFLAGS) @DEFS@ -I. \
+    @PROFILE_CFLAGS@ @STRATAGUS_CFLAGS@ @EXTRA_CFLAGS@ \
+    @VIDEO_CFLAGS@ @BZ2_CFLAGS@ \
+    @VORBIS_CFLAGS@ @THEORA_CFLAGS@ \
+    @MNG_CFLAGS@ \
+    @MIKMOD_CFLAGS@ @LUA_CFLAGS@ \
+    $(COMP_CFLAGS) @PLATFORM@ \

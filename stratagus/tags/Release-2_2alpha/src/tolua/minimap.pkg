@@ -1,0 +1,11 @@
+class CMinimap
+{
+	int X;
+	int Y;
+	int W;
+	int H;
+	bool WithTerrain;
+	bool ShowSelected;
+	bool Transparent;
+};
+
