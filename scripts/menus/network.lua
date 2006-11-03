@@ -218,8 +218,23 @@ function RunJoiningGameMenu(s)
       -- got ICMMap => load map
       RunJoiningMapMenu()
       menu:stop()
+    elseif (state == 4) then -- ccs_badmap
+      ErrorMenu(_("Map not available"))
+      menu:stop(1)
     elseif (state == 10) then -- ccs_unreachable
       ErrorMenu(_("Cannot reach server"))
+      menu:stop(1)
+    elseif (state == 12) then -- ccs_nofreeslots
+      ErrorMenu(_("Server is full"))
+      menu:stop(1)
+    elseif (state == 13) then -- ccs_serverquits
+      ErrorMenu(_("Server gone"))
+      menu:stop(1)
+    elseif (state == 16) then -- ccs_incompatibleengine
+      ErrorMenu(_("Incompatible engine version"))
+      menu:stop(1)
+    elseif (state == 17) then -- ccs_incompatiblenetwork
+      ErrorMenu(_("Incompatible netowrk version"))
       menu:stop(1)
     end
   end
