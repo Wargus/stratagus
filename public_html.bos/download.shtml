@@ -6,6 +6,15 @@
 The engine and the game are evolving a lot. Therefore, <em><font color="red">the game will work only 
 with the version of the Stratagus engine matching the release !</font></em>
 
+<h3>Release 2.0 Alpha (2006/11/2)</h3>
+This version of Invasion - Battle of Survival works with version 2.2 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
+
+<ul>
+<li>Linux: <a href="files/bos-2.2alpha.tar.gz">bos-2.2alpha.tar.gz</a></li>
+<li>Windows: <a href="files/BattleOfSurvival-2.0alpha.exe">BattleOfSurvival-2.0alpha.exe</a></li>
+</ul>
+
+
 <h3>Release 1.1 (2004/7/4)</h3>
 This version of Invasion - Battle of Survival works with version 2.1 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
 The packages include a pre-compiled binary of the stratagus engine.
@@ -13,7 +22,7 @@ The packages include a pre-compiled binary of the stratagus engine.
 <ul>
 <li>Linux: <a href="files/bos_1_1.tar.gz">bos_1_1.tar.gz</a></li>
 <li>Debian Linux: <a href="http://packages.debian.org/unstable/games/bos">bos</a> 
-      package in debian unstable by David Martínez Moreno.
+      package in debian unstable by David Martï¿½ez Moreno.
 <li>Windows: <a href="files/BattleOfSurvival-1.1.exe">BattleOfSurvival-1.1.exe</a></li>
 </ul>
 
