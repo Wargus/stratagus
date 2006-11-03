@@ -254,9 +254,19 @@ dnl ---- CHECK FOR LUA ---------
 AC_ARG_WITH(lua, 
     [  --with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")
 if test "x$LUAPFX" != "x"; then
-    LUA_CFLAGS="-I$LUAPFX/include"
-    LUA_LIBS="-L$LUAPFX/lib"
+    if test -f "$LUAPFX/lua.h"; then
+        LUA_CFLAGS="-I$LUAPFX"
+        LUA_LIBS="-L$LUAPFX"
+    else
+        LUA_CFLAGS="-I$LUAPFX/include"
+        LUA_LIBS="-L$LUAPFX/lib"
+    fi
 fi
+
+OLDCPPFLAGS="$CFLAGS"
+CPPFLAGS="$CPPFLAGS $LUA_CFLAGS"
+AC_CHECK_HEADERS(lua.h,, AC_MSG_ERROR(could not find lua.h))
+CPPFLAGS="$OLDCPPFLAGS"
 
 if test "$ARCH" = "linux"; then
     LUA_LIBS="$LUA_LIBS -ldl"
