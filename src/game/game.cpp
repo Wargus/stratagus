@@ -168,7 +168,7 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 // Write the map presentation file
 int WriteMapPresentation(const char *mapname, CMap *map, char *mapsetup)
 {
-	FileWriter *f;
+	FileWriter *f = NULL;
 	int i;
 	int topplayer;
 	int numplayers;
@@ -198,14 +198,15 @@ int WriteMapPresentation(const char *mapname, CMap *map, char *mapsetup)
 		f->printf(")\n");
 	
 		f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-				map->Info.Description.c_str(), numplayers, map->Info.MapWidth, map->Info.MapHeight,
-				map->Info.MapUID + 1);
+			map->Info.Description.c_str(), numplayers, map->Info.MapWidth, map->Info.MapHeight,
+			map->Info.MapUID + 1);
 
 		mapsetupname = strrchr(mapsetup, '/');
-		if (!mapsetupname)
+		if (!mapsetupname) {
 			mapsetupname = mapsetup;
+		}
 		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
-	} catch(FileException &e) {
+	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
 		delete f;
 		return -1;
@@ -225,7 +226,7 @@ int WriteMapPresentation(const char *mapname, CMap *map, char *mapsetup)
 */
 int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 {
-	FileWriter *f;
+	FileWriter *f = NULL;
 	int i, j;
 
 	try {
@@ -284,7 +285,7 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 			}
 		}
 		f->printf("\n\n");
-	} catch(FileException &e) {
+	} catch (const FileException &) {
 		fprintf(stderr,"Can't save map setup : `%s' \n", mapsetup);
 		delete f;
 		return -1;
@@ -320,8 +321,9 @@ int SaveStratagusMap(const char *mapname, CMap *map, int writeTerrain)
 	}
 	memcpy(extension, ".sms", 4 * sizeof(char));
 
-	if (WriteMapPresentation(mapname, map, mapsetup) == -1)
+	if (WriteMapPresentation(mapname, map, mapsetup) == -1) {
 		return -1;
+	}
 
 	return WriteMapSetup(mapsetup, map, writeTerrain);
 }

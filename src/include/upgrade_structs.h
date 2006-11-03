@@ -210,8 +210,9 @@ public:
 
 	void RevertUpgrades() {
 		for (int i = 0; i < UpgradeMax; i++) {
-			if (Upgrades[i] == 'R')
+			if (Upgrades[i] == 'R') {
 				Upgrades[i] = 'A';
+			}
 		}
 	}
 
