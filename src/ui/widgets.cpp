@@ -144,7 +144,11 @@ void handleInput(const SDL_Event *event)
 {
 	if (event) {
 		if (Input) {
-			Input->pushInput(*event);
+			try {
+				Input->pushInput(*event);
+			} catch (const gcn::Exception &) {
+				// ignore unhandled buttons
+			}
 		}
 	} else {
 		if (Gui) {
