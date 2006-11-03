@@ -119,6 +119,7 @@ function RunJoiningMapMenu(s)
   local sx = Video.Width / 20
   local sy = Video.Height / 20
   local numplayers = 3
+  local state
 
   menu = BosMenu(_("Joining game: Map"))
 
@@ -171,8 +172,9 @@ function RunJoiningMapMenu(s)
     fow:setMarked(int2bool(ServerSetupState.FogOfWar))
     revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
     updatePlayersList()
+    state = GetNetworkState()
     -- FIXME: don't use numbers
-    if (GetNetworkState() == 15) then -- server started the game
+    if (state == 15) then -- ccs_started, server started the game
       SetThisPlayer(1)
       joincounter = joincounter + 1
       if (joincounter == 30) then
@@ -185,6 +187,9 @@ function RunJoiningMapMenu(s)
         PresentMap = OldPresentMap
         menu:stop()
       end
+    elseif (state == 10) then -- ccs_unreachable
+      ErrorMenu(_("Cannot reach server"))
+      menu:stop(1)
     end
   end
   listener = LuaActionListener(listen)
