@@ -44,9 +44,8 @@
 
 #include "stratagus.h"
 #include "iocompat.h"
-
-#include "map.h" // for CurrentMapPath
-
+#include "map.h"
+#include "util.h"
 #include "iolib.h"
 
 /*----------------------------------------------------------------------------
@@ -686,7 +685,8 @@ void FileWriter::printf(const char *format, ...)
 	
 	va_list ap;
 	va_start(ap, format);
-	vsnprintf(buf, 1024, format, ap);
+	buf[sizeof(buf) - 1] = '\0';
+	vsnprintf(buf, sizeof(buf) - 1, format, ap);
 	va_end(ap);
 	write(buf, strlen(buf));
 }
@@ -739,9 +739,9 @@ public:
 };
 
 
-FileWriter * CreateFileWriter(const char *filename)
+FileWriter *CreateFileWriter(const char *filename)
 {
-	if (strcasestr(filename,".gz")) {
+	if (strcasestr(filename, ".gz")) {
 		return new GzFileWriter(filename);
 	} else {
 		return new RawFileWriter(filename);

@@ -54,14 +54,15 @@ class CMapInfo;
 ----------------------------------------------------------------------------*/
 
 /**
-** Exception thrown by FileWriter objects.
+**  Exception thrown by FileWriter objects.
 **/
 class FileException 
-{};
+{
+};
 
 
 /**
-** Abstract class representing files one can write to.
+**  Abstract class representing files one can write to.
 */
 class FileWriter
 {
@@ -75,12 +76,12 @@ public:
 
 
 /**
-** Create a file writer object that works for the given file name.
+**  Create a file writer object that works for the given file name.
 **
-** If the file name ends with '.gz', the file writer returned
-** will compress the data with zlib.
+**  If the file name ends with '.gz', the file writer returned
+**  will compress the data with zlib.
 */
-FileWriter * CreateFileWriter(const char *filename);
+FileWriter *CreateFileWriter(const char *filename);
 
 
 
