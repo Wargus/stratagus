@@ -1,0 +1,417 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-04-30 19:20+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: scripts/menus.lua:60
+msgid "~!Single Player Game"
+msgstr ""
+
+#: scripts/menus.lua:67
+msgid "~!Multi Player Game"
+msgstr ""
+
+#: scripts/menus.lua:74
+msgid "~!Campaign Game"
+msgstr ""
+
+#: scripts/menus.lua:81 scripts/guichan.lua:408
+msgid "~!Load Game"
+msgstr ""
+
+#: scripts/menus.lua:88
+msgid "~!Replay Game"
+msgstr ""
+
+#: scripts/menus.lua:95 scripts/guichan.lua:405
+msgid "~!Options"
+msgstr ""
+
+#: scripts/menus.lua:102
+msgid "~!Editor"
+msgstr ""
+
+#: scripts/menus.lua:109
+msgid "S~!how Credits"
+msgstr ""
+
+#: scripts/menus.lua:116
+msgid "E~!xit Program"
+msgstr ""
+
+#: scripts/menus/network.lua:60
+msgid "Players"
+msgstr ""
+
+#: scripts/menus/network.lua:105
+msgid "Joining game: Map"
+msgstr ""
+
+#: scripts/menus/network.lua:107 scripts/menus/network.lua:229
+#: scripts/guichan.lua:273
+msgid "Map"
+msgstr ""
+
+#: scripts/menus/network.lua:108 scripts/menus/network.lua:230
+#: scripts/menus/network.lua:299 scripts/guichan.lua:274
+msgid "File:"
+msgstr ""
+
+#: scripts/menus/network.lua:110 scripts/menus/network.lua:232
+#: scripts/menus/network.lua:301 scripts/guichan.lua:276
+msgid "Players:"
+msgstr ""
+
+#: scripts/menus/network.lua:112 scripts/menus/network.lua:234
+#: scripts/menus/network.lua:303 scripts/guichan.lua:278
+msgid "Description:"
+msgstr ""
+
+#: scripts/menus/network.lua:115 scripts/menus/network.lua:241
+#: scripts/guichan.lua:281
+msgid "Fog of war"
+msgstr ""
+
+#: scripts/menus/network.lua:118 scripts/menus/network.lua:247
+#: scripts/guichan.lua:283
+msgid "Reveal map"
+msgstr ""
+
+#: scripts/menus/network.lua:120 scripts/menus/network.lua:249
+#: scripts/guichan.lua:285
+msgid "Difficulty:"
+msgstr ""
+
+#: scripts/menus/network.lua:121 scripts/menus/network.lua:250
+#: scripts/guichan.lua:286
+msgid "easy"
+msgstr ""
+
+#: scripts/menus/network.lua:121 scripts/menus/network.lua:124
+#: scripts/menus/network.lua:127 scripts/menus/network.lua:250
+#: scripts/menus/network.lua:253 scripts/menus/network.lua:256
+#: scripts/guichan.lua:286 scripts/guichan.lua:289 scripts/guichan.lua:292
+msgid "normal"
+msgstr ""
+
+#: scripts/menus/network.lua:121 scripts/menus/network.lua:250
+#: scripts/guichan.lua:286
+msgid "hard"
+msgstr ""
+
+#: scripts/menus/network.lua:123 scripts/menus/network.lua:252
+#: scripts/guichan.lua:288
+msgid "Map richness:"
+msgstr ""
+
+#: scripts/menus/network.lua:124 scripts/menus/network.lua:127
+#: scripts/menus/network.lua:253 scripts/menus/network.lua:256
+#: scripts/guichan.lua:289 scripts/guichan.lua:292
+msgid "high"
+msgstr ""
+
+#: scripts/menus/network.lua:124 scripts/menus/network.lua:127
+#: scripts/menus/network.lua:253 scripts/menus/network.lua:256
+#: scripts/guichan.lua:289 scripts/guichan.lua:292
+msgid "low"
+msgstr ""
+
+#: scripts/menus/network.lua:126 scripts/menus/network.lua:255
+#: scripts/guichan.lua:291
+msgid "Starting resources:"
+msgstr ""
+
+#: scripts/menus/network.lua:144
+msgid "~!Ready"
+msgstr ""
+
+#: scripts/menus/network.lua:180
+msgid "Joining game"
+msgstr ""
+
+#: scripts/menus/network.lua:207
+msgid "Enter Server address"
+msgstr ""
+
+#: scripts/menus/network.lua:208
+msgid "IP or server name :"
+msgstr ""
+
+#: scripts/menus/network.lua:210 scripts/menus/network.lua:347
+msgid "~!Join Game"
+msgstr ""
+
+#: scripts/menus/network.lua:227 scripts/menus/network.lua:297
+msgid "Create MultiPlayer game"
+msgstr ""
+
+#: scripts/menus/network.lua:264 scripts/guichan.lua:403
+msgid "~!Start Game"
+msgstr ""
+
+#: scripts/menus/network.lua:277
+msgid "Waiting for players"
+msgstr ""
+
+#: scripts/menus/network.lua:290
+msgid "No Map"
+msgstr ""
+
+#: scripts/menus/network.lua:291
+msgid "No map"
+msgstr ""
+
+#: scripts/menus/network.lua:325 scripts/menus/network.lua:349
+msgid "~!Create Game"
+msgstr ""
+
+#: scripts/menus/network.lua:341
+msgid "MultiPlayer"
+msgstr ""
+
+#: scripts/menus/network.lua:343
+msgid "Nickname :"
+msgstr ""
+
+#: scripts/menus/options.lua:38
+msgid "Speed Options"
+msgstr ""
+
+#: scripts/menus/options.lua:40
+msgid "Game Speed"
+msgstr ""
+
+#: scripts/menus/options.lua:55
+msgid "slow"
+msgstr ""
+
+#: scripts/menus/options.lua:60 scripts/menus/options.lua:86
+#: scripts/menus/options.lua:112
+msgid "fast"
+msgstr ""
+
+#: scripts/menus/options.lua:65
+msgid "Mouse Scroll"
+msgstr ""
+
+#: scripts/menus/options.lua:81 scripts/menus/options.lua:107
+msgid "off"
+msgstr ""
+
+#: scripts/menus/options.lua:91
+msgid "Keyboard Scroll"
+msgstr ""
+
+#: scripts/menus/options.lua:117 scripts/menus/options.lua:195
+msgid "~!OK"
+msgstr ""
+
+#: scripts/menus/options.lua:129
+msgid "Sound Options"
+msgstr ""
+
+#: scripts/menus/options.lua:131
+msgid "Effects Volume"
+msgstr ""
+
+#: scripts/menus/options.lua:146 scripts/menus/options.lua:178
+msgid "min"
+msgstr ""
+
+#: scripts/menus/options.lua:151 scripts/menus/options.lua:183
+msgid "max"
+msgstr ""
+
+#: scripts/menus/options.lua:157 scripts/menus/options.lua:189
+msgid "Enabled"
+msgstr ""
+
+#: scripts/menus/options.lua:163
+msgid "Music Volume"
+msgstr ""
+
+#: scripts/menus/options.lua:233
+msgid "Fullscreen"
+msgstr ""
+
+#: scripts/menus/options.lua:246
+msgid "Video Options"
+msgstr ""
+
+#: scripts/menus/options.lua:258
+msgid "Language Selection"
+msgstr ""
+
+#: scripts/menus/options.lua:274
+msgid "Sound"
+msgstr ""
+
+#: scripts/menus/options.lua:275
+msgid "Video"
+msgstr ""
+
+#: scripts/menus/options.lua:276
+msgid "Speed"
+msgstr ""
+
+#: scripts/menus/options.lua:277
+msgid "Language"
+msgstr ""
+
+#: scripts/menus/options.lua:285
+msgid "Options"
+msgstr ""
+
+#: scripts/menus/credits.lua:36
+msgid "Graphics:"
+msgstr ""
+
+#: scripts/menus/credits.lua:43
+msgid "Scripting:"
+msgstr ""
+
+#: scripts/menus/credits.lua:47
+msgid "Maps and campaigns:"
+msgstr ""
+
+#: scripts/menus/credits.lua:51
+msgid "Sound:"
+msgstr ""
+
+#: scripts/menus/credits.lua:55
+msgid "powered by STRATAGUS"
+msgstr ""
+
+#: scripts/menus/credits.lua:56
+msgid "Stratagus Programmers:"
+msgstr ""
+
+#: scripts/menus/credits.lua:113
+msgid "Patches"
+msgstr ""
+
+#: scripts/menus/credits.lua:122
+msgid "Stratagus Media Project Graphics"
+msgstr ""
+
+#: scripts/menus/credits.lua:129
+msgid ""
+"The Bos and the Stratagus Team thanks all the people who have contributed"
+msgstr ""
+
+#: scripts/menus/credits.lua:130
+msgid "patches, bug reports, ideas."
+msgstr ""
+
+#: scripts/menus/credits.lua:133
+msgid "Battle of Survival Credits"
+msgstr ""
+
+#: scripts/guichan.lua:194
+msgid "~!Exit"
+msgstr ""
+
+#: scripts/guichan.lua:208
+msgid "Empty sub menu"
+msgstr ""
+
+#: scripts/guichan.lua:220
+msgid "Victory !"
+msgstr ""
+
+#: scripts/guichan.lua:222
+msgid "Draw !"
+msgstr ""
+
+#: scripts/guichan.lua:224
+msgid "Defeat !"
+msgstr ""
+
+#: scripts/guichan.lua:230
+msgid "Results"
+msgstr ""
+
+#: scripts/guichan.lua:233
+msgid "Player"
+msgstr ""
+
+#: scripts/guichan.lua:234
+msgid "Units"
+msgstr ""
+
+#: scripts/guichan.lua:235
+msgid "Buildings"
+msgstr ""
+
+#: scripts/guichan.lua:236
+msgid "Kills"
+msgstr ""
+
+#: scripts/guichan.lua:237
+msgid "Razings"
+msgstr ""
+
+#: scripts/guichan.lua:271
+msgid "Start Game"
+msgstr ""
+
+#: scripts/guichan.lua:324 scripts/guichan.lua:359 scripts/guichan.lua:375
+msgid "Start"
+msgstr ""
+
+#: scripts/guichan.lua:332
+msgid "Show a Replay"
+msgstr ""
+
+#: scripts/guichan.lua:342
+msgid "~!Start"
+msgstr ""
+
+#: scripts/guichan.lua:351
+msgid "List of Campaigns"
+msgstr ""
+
+#: scripts/guichan.lua:368
+msgid "Load Game"
+msgstr ""
+
+#: scripts/guichan.lua:382
+msgid "Editor"
+msgstr ""
+
+#: scripts/guichan.lua:390
+msgid "Start Editor"
+msgstr ""
+
+#: scripts/guichan.lua:404
+msgid "Start ~!Editor"
+msgstr ""
+
+#: scripts/guichan.lua:406
+msgid "~!MultiPlayer"
+msgstr ""
+
+#: scripts/guichan.lua:407
+msgid "~!Campaigns"
+msgstr ""
+
+#: scripts/guichan.lua:409
+msgid "Show ~!Replay"
+msgstr ""
+
+#: scripts/guichan.lua:410
+msgid "~!Credits"
+msgstr ""
