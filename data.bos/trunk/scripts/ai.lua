@@ -42,6 +42,7 @@ DefineAiHelper(
   {"train", "unit-camp", "unit-assault", "unit-bazoo", "unit-grenadier", "unit-dorcoz"},
   {"train", "unit-hosp", "unit-medic"},
   {"train", "unit-vfac", "unit-apcs", "unit-harvester"},
+  {"train", "unit-jet", "unit-bomber", "unit-chopper"},
   --
   -- Building can research which spells or upgrades.
   --
