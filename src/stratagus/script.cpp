@@ -2628,6 +2628,20 @@ void LoadCcl(void)
 */
 void SaveCcl(CFile *file)
 {
+	int i;
+
+	file->printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
+
+	for (i = 0; i < MaxCosts; ++i) {
+		file->printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
+			DefaultResourceNames[i], SpeedResourcesHarvest[i]);
+		file->printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
+			DefaultResourceNames[i], SpeedResourcesReturn[i]);
+	}
+	file->printf("SetSpeedBuild(%d)\n", SpeedBuild);
+	file->printf("SetSpeedTrain(%d)\n", SpeedTrain);
+	file->printf("SetSpeedUpgrade(%d)\n", SpeedUpgrade);
+	file->printf("SetSpeedResearch(%d)\n", SpeedResearch);
 }
 
 //@}
