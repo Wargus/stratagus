@@ -9,7 +9,7 @@
 --
 --	ai.lua		-	Define the AI.
 --
---	(c) Copyright 2000-2004 by Lutz Sammer
+--	(c) Copyright 2000-2006 by Lutz Sammer
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -34,26 +34,30 @@ DefineAiHelper(
   --
   {"build", "unit-engineer",
    "unit-msilo", "unit-dev-yard", "unit-gen", "unit-camp",
-   "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret"},
+   "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
+   "unit-cam", "unit-cannon", "unit-nuke", "unit-radar"},
   --
   -- Building can train which units.
   --
   {"train", "unit-vault", "unit-engineer"},
-  {"train", "unit-camp", "unit-assault", "unit-bazoo", "unit-grenadier", "unit-dorcoz"},
+  {"train", "unit-camp", "unit-assault", "unit-bazoo", "unit-grenadier",
+   "unit-dorcoz"},
   {"train", "unit-hosp", "unit-medic"},
-  {"train", "unit-vfac", "unit-apcs", "unit-harvester"},
+  {"train", "unit-vfac", "unit-apcs", "unit-harvester", "unit-artil",
+   "unit-buggy", "unit-rtank", "unit-tank"},
   {"train", "unit-dev-yard", "unit-jet", "unit-bomber", "unit-chopper"},
   --
   -- Building can research which spells or upgrades.
   --
   {"research", "unit-rfac", "upgrade-expl", "upgrade-expl2",
-  "upgrade-tdril", "upgrade-pdril", "upgrade-ddril"},
+   "upgrade-tdril", "upgrade-pdril", "upgrade-ddril", "upgrade-void"},
   --
   -- Unit can repair which units.
   --
   {"repair", "unit-engineer",
    "unit-msilo", "unit-dev-yard", "unit-gen", "unit-camp", "unit-apcs",
-   "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret"},
+   "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
+   "unit-nuke", "unit-radar"},
   --
   -- Reduce unit limits.
   --
