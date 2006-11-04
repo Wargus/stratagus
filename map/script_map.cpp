@@ -469,6 +469,10 @@ static int CclDefinePlayerTypes(lua_State *l)
 	}
 
 	for (i = 0; i < numplayers && i < PlayerMax; i++) {
+		if (lua_isnil(l, i + 1)) {
+			numplayers = i;
+			break;
+		}
 		type = LuaToString(l, i + 1);
 		if (!strcmp(type, "neutral")) {
 			Map.Info.PlayerType[i] = PlayerNeutral;
