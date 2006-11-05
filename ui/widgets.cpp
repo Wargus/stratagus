@@ -1047,6 +1047,7 @@ void ScrollingWidget::logic()
 void ScrollingWidget::restart()
 {
 	container.setY(0);
+	containerY = 0.f;
 	finished = (container.getHeight() == getHeight());
 }
 
