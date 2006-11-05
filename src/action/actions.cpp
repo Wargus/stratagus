@@ -629,7 +629,7 @@ void UnitActions(void)
 		fprintf(logf, "%d %s S%d/%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit->Type ? unit->Type->Ident : "unit-killed",
 			unit->State, unit->SubAction,
-			unit->Orders.empty() ? unit->Orders[0]->Action : -1,
+			!unit->Orders.empty() ? unit->Orders[0]->Action : -1,
 			unit->Player ? unit->Player->Index : -1, unit->Refs,SyncRandSeed,
 			unit->X, unit->Y, unit->IX, unit->IY);
 
