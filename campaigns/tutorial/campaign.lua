@@ -44,16 +44,17 @@ campaign_steps = {
       "With the vault, we will train 2 extra "..
       "engineers to reinforce our group. "..
       "We also need a power plant in order to"..
-      "to allow us to build more units ".. 
+      "allow us to build more units ".. 
       "for our base.\n"..
       "-- End of transmission 2. Sergeant TJ --"),
-  CreateMapStep("maps/tutorial.smp", 
-      "",
-      "News from the Front:\n"..
-      ". "..
-      " "..
-      " "..
-      " ".. 
+  CreateMapStep("campaigns/tutorial/level03.smp", 
+      "Harvest 200 crystals and 100 titanium",
+      "News from the Front:\n\n"..
+      "The abandoned vault has few resources left. "..
+      "For the extension of the base, we need 300 "..
+      "more crystals and 200 of titanium. "..
+      "Our engineer detected large amounts of "..
+      "titanium in the rocks.\n".. 
       "-- End of transmission. Sergeant TJ --"),
 
 }
