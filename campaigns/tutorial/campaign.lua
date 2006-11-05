@@ -51,8 +51,8 @@ campaign_steps = {
       "Harvest 200 crystals and 100 titanium",
       "News from the Front:\n\n"..
       "The abandoned vault has few resources left. "..
-      "For the extension of the base, we need 300 "..
-      "more crystals and 200 of titanium. "..
+      "For the extension of the base, we need 200 "..
+      "more crystals and 100 of titanium. "..
       "Our engineer detected large amounts of "..
       "titanium in the rocks.\n".. 
       "-- End of transmission. Sergeant TJ --"),
