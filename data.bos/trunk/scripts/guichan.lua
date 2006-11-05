@@ -338,6 +338,7 @@ function RunStartGameMenu(s)
   end
   browser:setActionCallback(cb)
 
+  AllowAllUnits()
   local function startgamebutton(s)
     print("Starting map -------")
     RunMap("maps/" .. selectedmap, nil, fow:isMarked(), revealmap:isMarked())
@@ -404,6 +405,7 @@ function RunLoadGameMenu(s)
   end
   menu:addButton(_("Start"), 0, 100, 300, startgamebutton)
 
+  DisallowAllUnits()
   menu:run()
 end
 
