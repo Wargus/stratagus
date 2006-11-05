@@ -80,8 +80,6 @@ void HandleActionDie(CUnit *unit)
 			return;
 		}
 
-		unit->State = unit->Type->CorpseScript;
-
 		Assert(unit->Type->TileWidth == unit->Type->CorpseType->TileWidth &&
 			unit->Type->TileHeight == unit->Type->CorpseType->TileHeight);
 
