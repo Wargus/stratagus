@@ -486,19 +486,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Supply")) {
 			type->Supply = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
 			if (redefine) {
 				delete[] type->CorpseName;
 			}
-			lua_rawgeti(l, -1, 1);
 			type->CorpseName = new_strdup(LuaToString(l, -1));
-			lua_pop(l, 1);
 			type->CorpseType = NULL;
-			lua_rawgeti(l, -1, 2);
-			type->CorpseScript = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
 			type->Explosion.Name = new_strdup(LuaToString(l, -1));

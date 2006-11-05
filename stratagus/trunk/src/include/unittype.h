@@ -123,11 +123,6 @@
 **    Corpse unit-type pointer, only this should be used during run
 **    time. Many unit-types can share the same corpse.
 **
-**  CUnitType::CorpseScript
-**
-**    Index into corpse animation script. Used if unit-types share
-**    the same corpse but have different animations.
-**
 **
 **  @todo continue this documentation
 **
@@ -844,7 +839,7 @@ public:
 		Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 		ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 		Animations(NULL), StillFrame(0),
-		CorpseName(NULL), CorpseType(NULL), CorpseScript(0),
+		CorpseName(NULL), CorpseType(NULL),
 		Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
 		BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
@@ -910,7 +905,6 @@ public:
 
 	char *CorpseName;               /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
-	int CorpseScript;               /// Corpse script start
 
 	// this is taken from the UDTA section
 	CConstruction *Construction;    /// What is shown in construction phase
