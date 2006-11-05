@@ -62,6 +62,11 @@ void HandleActionFollow(CUnit *unit)
 {
 	CUnit *goal;
 
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
+
 	//
 	// Reached target
 	//
