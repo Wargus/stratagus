@@ -67,7 +67,7 @@ make-objdir:
 	@mkdir -p $(dir $(OBJ))
 
 %.o: $(@D)../%.cpp
-	$(CXX) -c $(CFLAGS) $(subst $(OBJDIR)/../,,$<) -o $@
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(subst $(OBJDIR)/../,,$<) -o $@
 
 help:
 	@-echo "make cycle			clean,depend,tags,all"
@@ -96,7 +96,7 @@ doc::
 all-src: make-objdir $(OBJ)
 
 stratagus: $(OBJ) 
-	$(CXX) -o stratagus $^ $(STRATAGUS_LIBS)
+	$(CXX) -o stratagus $^ $(CXXFLAGS) $(LDFLAGS)
 
 strip:
 	@if [ -f stratagus ]; then strip stratagus; fi
@@ -128,7 +128,7 @@ depend:
 	@for i in $(SRC) ; do\
 	echo -e "\rMaking dependencies for $$i";\
 	$(CXX) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.cpp/\.o/g'`\
-	-MM $(CFLAGS) $$i >>.depend; done
+	-MM $(CPPFLAGS) $$i >>.depend; done
 	@echo
 
 ctags:
