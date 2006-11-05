@@ -7,7 +7,7 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---  level01.smp  -  Tutorial map 1.
+--  level01.sms  -  Tutorial map 1.
 --
 --  (c) Copyright 2006 by Francois Berteen
 --
@@ -29,6 +29,19 @@
 --  Define level 01 Map Presentation
 --
 
-DefinePlayerTypes("person","person")
-PresentMap("Tutorial map 1", 2, 64, 64, 203124691)
-DefineMapSetup("campaigns/tutorial/level01.sms")
+Load("maps/tutorial/setup.sms")
+
+unit= CreateUnit("unit-buggy", 0, {3, 59})
+unit= CreateUnit("unit-engineer", 0, {5, 59})
+
+DisallowAllUnits()
+AddTrigger(
+    function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
+    function() return StopGame(GameDefeat) end)
+
+AddTrigger(
+    function() local x
+               x = GetNumUnitsAt(GetThisPlayer(), "units", {22 - 3, 38 - 3}, {28 + 3, 44 + 3}) 
+               return x == 2 end,
+    function() return StopGame(GameVictory) end)
+

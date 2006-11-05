@@ -35,7 +35,7 @@ campaign_steps = {
       "Reports from our spies say the vault is still unharmed.\n"..
       "Move your troops to the vault as fast as possible.\n"..
       "-- End of transmission 1. Commander GK --"),
-  CreateMapStep("maps/tutorial.smp",
+  CreateMapStep("campaigns/tutorial/level02.smp",
       "Train 2 engineers and build 1 power plant",
       "News from the Front:\n\n"..
       "We finally arrived at our camp.\n"..
@@ -46,7 +46,7 @@ campaign_steps = {
       "We also need a power plant in order to"..
       "to allow us to build more units ".. 
       "for our base.\n"..
-      "-- End of transmission 1. Sergeant TJ --"),
+      "-- End of transmission 2. Sergeant TJ --"),
   CreateMapStep("maps/tutorial.smp", 
       "",
       "News from the Front:\n"..

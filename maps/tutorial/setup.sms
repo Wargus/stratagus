@@ -106,8 +106,6 @@ LoadTileModels("maps/tutorial/terrain.lua")
 
 --allow
 -- place units
-unit= CreateUnit("unit-buggy", 0, {3, 59})
-unit= CreateUnit("unit-engineer", 0, {5, 59})
 unit= CreateUnit("unit-rtank", 1, {60, 2})
 unit= CreateUnit("unit-rtank", 1, {61, 3})
 unit= CreateUnit("unit-rtank", 1, {58, 2})
