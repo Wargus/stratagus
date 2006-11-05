@@ -1139,9 +1139,6 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
 		if (cloak != (int)unit->Type->PermanentCloak) {
 			continue;
 		}
-		if (unit->Type->PermanentCloak && player != unit->Player) {
-			continue;
-		}
 		//
 		//  If the unit goes out of fog, this can happen for any player that
 		//  this player shares vision with, and can't YET see the unit.
@@ -1179,9 +1176,6 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int cloak)
 		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
 			unit->Y <= y && unit->Y + unit->Type->TileHeight - 1 >= y);
 		if (cloak != (int)unit->Type->PermanentCloak) {
-			continue;
-		}
-		if (unit->Type->PermanentCloak && player != unit->Player) {
 			continue;
 		}
 		p = player->Index;
