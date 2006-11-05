@@ -28,7 +28,7 @@
 
 
 campaign_steps = {
-  CreateMapStep("maps/tutorial.smp",
+  CreateMapStep("campaigns/tutorial/level01.smp",
       "Move your units to the vault in the center of the map",
       "Order from the Central Command:\n\n"..
       "TODO.\n"..

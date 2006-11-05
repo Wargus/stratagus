@@ -30,6 +30,17 @@
 --
 
 DefinePlayerTypes("person","person")
-PresentMap("Tutorial map 1", 2, 128, 128, 2403124691)
-DefineMapSetup("campaigns/tutorial/level01.sms")
+PresentMap("Tutorial map 1", 2, 64, 64, 203124691)
+DefineMapSetup("maps/tutorial/setup.sms")
+
+DisallowAllUnits()
+AddTrigger(
+    function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
+    function() return StopGame(GameDefeat) end)
+
+AddTrigger(
+    function() local x
+               x = GetNumUnitsAt(GetThisPlayer(), "units", {22 - 3, 38 - 3}, {28 + 3, 44 + 3}) 
+               return x == 2 end,
+    function() return StopGame(GameVictory) end)
 
