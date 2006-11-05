@@ -69,7 +69,7 @@ DefineUnitType("unit-nuke", {
 	SightRange = 3, Armor = 15 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 50, AnnoyComputerFactor = 55,
 	Points = 200, Supply = 1000, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = {"build-dead-nuke", 0}, Type = "land",
+	Corpse = "build-dead-nuke", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {

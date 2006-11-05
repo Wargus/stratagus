@@ -66,7 +66,7 @@ DefineUnitType("unit-dev-yard", {
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
 	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
-	Corpse = {"build-dead-devyard", 0}, Type = "land",
+	Corpse = "build-dead-devyard", Type = "land",
 	VisibleUnderFog = true,	Building = true, BuilderOutside = true,
 	Sounds = {
 		"selected", "dev-selected",

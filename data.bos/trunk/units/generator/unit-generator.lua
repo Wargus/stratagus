@@ -74,7 +74,7 @@ DefineUnitType("unit-gen", {
 	SightRange = 1, Armor = 10 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
 	Points = 100, Supply = 125, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = {"build-dead-gen", 0}, Type = "land",
+	Corpse = "build-dead-gen", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {

@@ -78,7 +78,7 @@ DefineUnitType("unit-engineer", {
 	TileSize = {1, 1}, BoxSize = {17, 28},
 	SightRange = 5, ComputerReactionRange = 6, PersonReactionRange = 4,
 	Armor = 1, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	MaxAttackRange = 1, Priority = 50, Points = 30, Corpse = {"unit-dead-body2", 0},
+	MaxAttackRange = 1, Priority = 50, Points = 30, Corpse = "unit-dead-body2",
 	Type = "land", Demand = 0, RightMouseAction = "harvest", RepairRange = 1,
 	CanTargetLand = true, LandUnit = true, Coward = true,
 	CanGatherResources = {{

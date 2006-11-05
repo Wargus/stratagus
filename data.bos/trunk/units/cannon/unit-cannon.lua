@@ -93,7 +93,7 @@ DefineUnitType("unit-cannon", {
 	ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	NumDirections = 8, Flip = false,
-	Corpse = {"build-dead-cannon", 0}, Type = "land",
+	Corpse = "build-dead-cannon", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {
