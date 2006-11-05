@@ -3,7 +3,7 @@
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-SetStartView(0, 6, 56)
+SetStartView(0, 23, 39)
 SetPlayerData(0, "Resources", "crystal", 2000)
 SetPlayerData(0, "Resources", "titanium", 1000)
 SetPlayerData(0, "Resources", "gas", 1000)
@@ -14,7 +14,7 @@ SetPlayerData(1, "Resources", "crystal", 2000)
 SetPlayerData(1, "Resources", "titanium", 1000)
 SetPlayerData(1, "Resources", "gas", 1000)
 SetPlayerData(1, "RaceName", "elites")
-SetAiType(1, "ai-passive")
+SetAiType(1, "ai-rush")
 SetStartView(2, 0, 0)
 SetPlayerData(2, "Resources", "crystal", 2000)
 SetPlayerData(2, "Resources", "titanium", 1000)
