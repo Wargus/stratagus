@@ -31,7 +31,9 @@ campaign_steps = {
   CreateMapStep("campaigns/tutorial/level01.smp",
       "Move your units to the vault in the center of the map",
       "Order from the Central Command:\n\n"..
-      "TODO.\n"..
+      "Attacks of the base E411 destroyed all its defenses.\n"..
+      "Reports from our spies say the vault is still unharmed.\n"..
+      "Move your troops to the vault as fast as possible.\n"..
       "-- End of transmission 1. Commander GK --"),
   CreateMapStep("maps/tutorial.smp",
       "Train 2 engineers and build 1 power plant",
