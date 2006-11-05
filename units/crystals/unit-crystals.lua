@@ -83,7 +83,7 @@ for i = 1, 13 do
         HitPoints = 50,	TileSize= {1, 1}, BoxSize = {31, 31},
         NeutralMinimapColor = {81, 200, 234},
         Armor = 999, Missile = "missile-none",
-        Priority = 0, Corpse = {"unit-destroyed-1x1-place", 0},
+        Priority = 0, Corpse = "unit-destroyed-1x1-place",
         Type = "land", Building = true, VisibleUnderFog = true,
         GivesResource = "crystal", CanHarvest = true})
 end

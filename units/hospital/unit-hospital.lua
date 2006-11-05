@@ -69,7 +69,7 @@ DefineUnitType("unit-hosp", {
 	BoxSize = {192, 160}, SightRange = 2, Armor = 30, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
 	AnnoyComputerFactor = 45, Demand = 200, Points = 200,
-	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = {"build-dead-hosp", 0},
+	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = "build-dead-hosp",
 	Type = "land", Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	Sounds = {
 		"selected", "hosp-selected",

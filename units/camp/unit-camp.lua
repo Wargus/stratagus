@@ -74,7 +74,7 @@ DefineUnitType("unit-camp", {
 	SightRange = 1, Armor = 25, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 30, AnnoyComputerFactor = 35,
 	Points = 160, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = {"build-dead-camp", 0}, Type = "land",
+	Corpse = "build-dead-camp", Type = "land",
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	Sounds = {
 		"selected", "camp-selected",

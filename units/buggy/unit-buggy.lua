@@ -93,7 +93,7 @@ DefineUnitType("unit-buggy", {
 	Armor = 3 , BasicDamage = 5, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
 	Points = 100, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-	Corpse = {"buggy_destroyed", 0}, Type = "land",
+	Corpse = "buggy_destroyed", Type = "land",
 	MaxAttackRange = 6, CanAttack = true, CanTargetLand = true,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true,

@@ -70,7 +70,7 @@ DefineUnitType("unit-grenadier", {
 	ComputerReactionRange = 6, PersonReactionRange = 6,
 	RightMouseAction = "attack",
 	Armor = 2, BasicDamage = 15, PiercingDamage = 15, Missile = "missile-grenadier",
-	MaxAttackRange = 5, Priority = 60, Points = 50, Corpse = {"unit-dead-body3", 0},
+	MaxAttackRange = 5, Priority = 60, Points = 50, Corpse = "unit-dead-body3",
 	Type = "land", CanAttack = true, CanTargetLand = true,
 	LandUnit = true, organic = true, Demand = 0, SelectableByRectangle = true,
 	Sounds = {
