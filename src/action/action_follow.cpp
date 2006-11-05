@@ -81,22 +81,20 @@ void HandleActionFollow(CUnit *unit)
 			return;
 		}
 
-		// Two posibilities, both broken. maybe we should change the animation system?
-		// FIXME: Unit doesn't decrease range
-#if 0
-		if ((goal->X == unit->Orders[0]->X && goal->Y == unit->Orders[0]->Y) || unit->State) {
-			UnitShowAnimation(unit, unit->Type->Animations->Still);
-			//
-			// Sea and air units are floating up/down.
-			//
-			if (unit->Type->SeaUnit || unit->Type->AirUnit) {
-				unit->IY = (MyRand() >> 15) & 1;
+		if (goal->X == unit->Orders[0]->X && goal->Y == unit->Orders[0]->Y) {
+			// Move to the next order
+			if (unit->OrderCount > 1) {
+				goal->RefsDecrease();
+				unit->Orders[0]->Goal = NoUnitP;
+				unit->SubAction = 0;
+				unit->Orders[0]->Action = UnitActionStill;
+				return;
 			}
-			return;
-		}
-#else
-		// FIXME: Unit doesn't animate.
-		if ((goal->X == unit->Orders[0]->X && goal->Y == unit->Orders[0]->Y)) {
+
+			// Reset frame to still frame while we wait
+			// FIXME: Unit doesn't animate.
+			unit->Frame = unit->Type->StillFrame;
+			UnitUpdateHeading(unit);
 			unit->Wait = 10;
 			if (unit->Orders[0]->Range > 1) {
 				unit->Orders[0]->Range = 1;
@@ -104,7 +102,7 @@ void HandleActionFollow(CUnit *unit)
 			}
 			return;
 		}
-#endif
+
 		unit->SubAction = 0;
 	}
 
