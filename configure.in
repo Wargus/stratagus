@@ -9,108 +9,185 @@ OBJDIR=obj
 if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
     ARCH=win32
     OBJDIR=winobj
-    PLATFORM="-DUSE_WIN32"
+    CPPFLAGS="$CPPFLAGS -DUSE_WIN32"
 elif test "`uname -a | grep -is bsd`"; then
     ARCH=bsd
-    PLATFORM="-DBSD"
+    CPPFLAGS="$CPPFLAGS -DBSD"
 elif test "`uname -a | grep -is beos`"; then
     ARCH=beos
-    PLATFORM="-DUSE_BEOS"
+    CPPFLAGS="$CPPFLAGS -DUSE_BEOS"
 elif test "`uname -a | grep -is darwin`"; then
     ARCH=macosx
-    PLATFORM="-DUSE_MAC"
+    CPPFLAGS="$CPPFLAGS -DUSE_MAC"
 else
     ARCH=linux
 fi
 
-EXTRA_CFLAGS=$CFLAGS
-EXTRA_CPPFLAGS=$CPPFLAGS
-EXTRA_LIBS=$LDFLAGS
-
 if test "$ARCH" = "bsd" ; then
-    EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/usr/X11R6/include -I/usr/local/include"
-    EXTRA_LIBS="$EXTRA_LIBS -L/usr/local/lib"
+    CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include -I/usr/local/include"
+    LIBS="$LIBS -L/usr/local/lib"
 fi
 
 if test "$ARCH" = "macosx" ; then
     if test -d /usr/local/include; then
-	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/usr/local/include"
+	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
     fi
     if test -d /usr/local/lib; then
-	EXTRA_LIBS="$EXTRA_LIBS -L/usr/local/lib"
+	LIBS="$LIBS -L/usr/local/lib"
     fi
 
     if test -d /sw/include; then
-	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/sw/include"
+	CPPFLAGS="$CPPFLAGS -I/sw/include"
     fi
     if test -d /sw/lib; then
-	EXTRA_LIBS="$EXTRA_LIBS -L/sw/lib"
+	LIBS="$LIBS -L/sw/lib"
     fi
 
     if test -d /opt/local/include; then
-	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I/opt/local/include"
+	CPPFLAGS="$CPPFLAGS -I/opt/local/include"
     fi
     if test -d /opt/local/lib; then
-	EXTRA_LIBS="$EXTRA_LIBS -L/opt/local/lib"
+	LIBS="$LIBS -L/opt/local/lib"
     fi
 fi
 
-CFLAGS=$EXTRA_CFLAGS
-CPPFLAGS=$EXTRA_CPPFLAGS
-LDFLAGS=$EXTRA_LIBS
-
-AC_SUBST(EXTRA_CPPFLAGS)
-AC_SUBST(EXTRA_CFLAGS)
-AC_SUBST(EXTRA_LIBS)
-
 AC_CHECK_FUNCS(strcasestr)
 
-AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
-AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
+AC_CHECK_HEADER(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
+AC_CHECK_HEADER(png.h,, AC_MSG_ERROR(could not find png.h))
 
 AC_ARG_ENABLE(win32,
     [  --enable-win32	  Force win32, useful for cross-compiling (default: no)])
 if test "$enable_win32" = "yes"; then
     ARCH=win32
     OBJDIR=winobj
-    PLATFORM="-DUSE_WIN32"
+    CPPFLAGS="$CPPFLAGS -DUSE_WIN32"
     PATH="/usr/local/cross/bin:$PATH"
 fi
 
 AC_SUBST(OBJDIR)
-AC_SUBST(PLATFORM)
 
 AC_ARG_ENABLE(static,
     [  --enable-static	  Compile a static binary (default: no)])
-if test "$enable_static" != "yes"; then
-    STATIC_LDFLAGS=
-else
-    STATIC_LDFLAGS="-static"
+if test "$enable_static" = "yes"; then
+    LDFLAGS="$LDFLAGS -static"
 fi
-AC_SUBST(STATIC_LDFLAGS)
 
 AC_ARG_ENABLE(profile,
     [  --enable-profile	  Enable profiling support, implies --enable-debug (default: no)])
-if test "$enable_profile" != "yes"; then
-    PROFILE_CFLAGS=""
-else
-    PROFILE_CFLAGS="-pg"
+if test "$enable_profile" = "yes"; then
+    CXXFLAGS="-pg"
 fi
-AC_SUBST(PROFILE_CFLAGS)
 
 AC_ARG_ENABLE(debug,
-    [  --enable-debug	  [Enable debug, implies --disable-optimization (default: no)]])
+    [  --enable-debug	  [Enable debug (default: no)]])
 if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
-    STRATAGUS_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
+	CXXFLAGS="$CXXFLAGS -O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
 else
-    STRATAGUS_CFLAGS="-g -fsigned-char -Wsign-compare -Werror -Wall -DDEBUG"
+	CXXFLAGS="$CXXFLAGS -O0 -g -fsigned-char -Wsign-compare -Werror -Wall"
+	CPPFLAGS="$CPPFLAGS -DDEBUG"
 fi
-AC_SUBST(STRATAGUS_CFLAGS)
 
 dnl AC_ARG_ENABLE(optimization,
 dnl    [  --enable-optimization	  [Enable detection of optimization flags (default: no)]])
 dnl FIXME: todo
 
+dnl --- OPENGL -----------------
+AC_ARG_WITH(opengl,
+    [  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
+if test "$with_opengl" != "no"; then
+	CPPFLAGS="$CPPFLAGS -DUSE_OPENGL -I$x_includes"
+
+	AC_PATH_X
+	if test "$no_x" != "yes"; then
+		CXXFLAGS="$CXXFLAGS $X_CXXFLAGS"
+		LDFLAGS="$LDFLAGS $X_LIBS -L$x_libraries"
+	fi
+
+	AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries are required))
+fi
+
+dnl --- BZIP2 ------------------
+AC_ARG_WITH(bzip2,
+    [  --with-bzip2		  [Use bzip2 (default: yes)]])
+if test "$with_bzip2" != "no"; then
+    AC_CHECK_HEADER(bzlib.h,, BZIP2=no)
+    if test "$BZIP2" != "no"; then
+	AC_CHECK_LIB(bz2, main, CPPFLAGS="$CPPFLAGS -DUSE_BZ2LIB" LDFLAGS="$LDFLAGS -lbz2", BZIP2=no)
+    fi
+    if test "$BZIP2" = "no"; then
+	AC_MSG_ERROR(libbzip2 headers and/or libraries could not be found)
+    fi
+fi
+
+dnl --- VORBIS -----------------
+AC_ARG_WITH(vorbis, 
+    [  --with-vorbis		  [Use vorbis (default: autodetect)]])
+if test "$with_vorbis" != "no"; then
+    AC_CHECK_HEADER(ogg/ogg.h,, VORBIS=no)
+    AC_CHECK_HEADER(vorbis/codec.h,, VORBIS=no)
+    if test "$VORBIS" != "no"; then
+	AC_CHECK_LIB(vorbis, vorbis_info_init, CPPFLAGS="$CPPFLAGS -DUSE_VORBIS" LDFLAGS="$LDFLAGS -lvorbis -logg", VORBIS=no, -logg)
+    fi
+    if test "x$with_vorbis" != "x" -a "$VORBIS" = "no"; then
+	AC_MSG_ERROR(vorbis headers and/or libraries could not be found)
+    fi
+fi
+
+dnl --- THEORA -----------------
+AC_ARG_WITH(theora,
+    [  --with-theora		  [Use theora (default: autodetect)]])
+if test "$with_theora" != "no"; then
+    AC_CHECK_HEADER(ogg/ogg.h,, THEORA=no)
+    AC_CHECK_HEADER(theora/theora.h,, THEORA=no)
+    if test "$THEORA" != "no"; then
+	AC_CHECK_LIB(theora, theora_decode_init, CPPFLAGS="$CPPFLAGS -DUSE_THEORA" LDFLAGS="$LDFLAGS -ltheora -logg", THEORA=no, -logg)
+    fi
+    if test "x$with_theora" != "x" -a "$THEORA" = "no"; then
+	AC_MSG_ERROR(theora headers and/or libraries could not be found)
+    fi
+fi
+
+dnl --- MIKMOD -----------------
+AC_ARG_WITH(mikmod, 
+    [  --with-mikmod		  [Use mikmod (default: autodetect)]])
+if test "$with_mikmod" != "no"; then
+    AC_CHECK_HEADER(mikmod.h,, MIKMOD=no)
+    if test "$MIKMOD" != "no"; then
+	AC_CHECK_LIB(mikmod, MikMod_Init, CPPFLAGS="$CPPFLAGS -DUSE_MIKMOD" LDFLAGS="$LDFLAGS -lmikmod", MIKMOD=no)
+    fi
+    if test "x$with_mikmod" != "x" -a "$MIKMOD" = "no"; then
+	AC_MSG_ERROR(mikmod headers and/or libraries could not be found)
+    fi
+fi
+
+dnl --- MNG --------------------
+AC_ARG_WITH(mng,
+    [  --with-mng		  [Use mng (default: no)]])
+if test "$with_mng" != "no" -a "x$with_mng" != "x"; then
+    AC_CHECK_HEADER(mng.h,, MNG=no)
+    if test "$MNG" != "no"; then
+	AC_CHECK_LIB(mng, mng_initialize, CPPFLAGS="$CPPFLAGS -DUSE_MNG" LDFLAGS="$LDFLAGS -lmng", MNG=no)
+    fi
+    if test "$MNG" = "no"; then
+	AC_MSG_ERROR(mng headers and/or libraries could not be found)
+    fi
+fi
+
+dnl --- LUA --------------------
+AC_ARG_WITH(lua-inc, 
+    [  --with-lua-inc=DIR	  [Location of Lua headers]], CPPFLAGS="$CPPFLAGS -I$withval")
+AC_ARG_WITH(lua-lib, 
+    [  --with-lua-lib=DIR	  [Location of Lua libraries]], LDFLAGS="$LDFLAGS -L$withval")
+if test "$ARCH" = "linux"; then
+    LDFLAGS="$LDFLAGS -ldl"
+fi
+
+AC_CHECK_HEADER(lua.h,, AC_MSG_ERROR(could not find lua.h))
+AC_SEARCH_LIBS(lua_getfenv, lua lua50 lua5.0, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lua5 is required))
+AC_SEARCH_LIBS(luaopen_base, lualib lualib50 lualib5.0, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lualib5 is required))
+
+dnl --- SDL --------------------
 AC_CHECK_PROGS(SDLCONFIG, sdl-config)
 if test "x$SDLCONFIG" = "x"; then
     AC_CHECK_PROGS(SDLCONFIG, sdl11-config)
@@ -119,172 +196,15 @@ if test "x$SDLCONFIG" = "x"; then
     echo "*** sdl-config not found";
     exit 1;
 fi
-VIDEO_CFLAGS="`$SDLCONFIG --cflags`"
+
+CPPFLAGS="$CPPFLAGS `$SDLCONFIG --cflags`"
 if test "$enable_static" != "yes"; then
-    VIDEO_LIBS="`$SDLCONFIG --libs`"
+    LDFLAGS="$LDFLAGS `$SDLCONFIG --libs`"
 else
-    VIDEO_LIBS="`$SDLCONFIG --static-libs`"
-fi
-if test "$ARCH" = "win32"; then
-    if test "`uname -a | grep -is cygwin`"; then
-	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32"
-    else
-	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
-    fi
-fi
-AC_SUBST(VIDEO_CFLAGS)
-AC_SUBST(VIDEO_LIBS)
-AC_SUBST(THREAD_LIBS)
-
-dnl --- OPENGL support ---------
-AC_ARG_WITH(opengl,
-    [  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
-if test "$with_opengl" != "no"; then
-	VIDEO_CFLAGS="$VIDEO_CFLAGS -DUSE_OPENGL"
-	if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
-		VIDEO_LIBS="$VIDEO_LIBS -lopengl32"
-	else
-		AC_PATH_X
-		AC_PATH_XTRA
-		CPPFLAGS="$CPPFLAGS -I$x_includes"
-		LDFLAGS="$LDFLAGS -L$x_libraries"
-		AC_CHECK_LIB(GL, glViewport,, AC_MSG_ERROR(libGL not found))
-		if test "x$have_x" = "xyes"; then
-			VIDEO_CFLAGS="$VIDEO_CFLAGS $X_CFLAGS"
-			VIDEO_LIBS="$VIDEO_LIBS $X_LIBS -lGL"
-		else
-			VIDEO_LIBS="$VIDEO_LIBS -lGL"
-		fi
-	fi
-fi
-AC_SUBST(VIDEO_CFLAGS)
-AC_SUBST(VIDEO_LIBS)
-dnl ----------------------------
-
-dnl --- CHECK FOR BZIP2 --------
-AC_ARG_WITH(bzip2,
-    [  --with-bzip2		  [Use bzip2 (default: yes)]],, with_bzip2="yes")
-if test "$with_bzip2" != "no"; then
-    AC_CHECK_LIB(bz2, main, 
-        [BZ2_CFLAGS="-DUSE_BZ2LIB"
-         BZ2_LIBS="-lbz2"],
-        [BZ2_CFLAGS=""
-         BZ2_LIBS=""])
-else
-    BZ2_CFLAGS=""
-    BZ2_LIBS=""
-fi
-AC_SUBST(BZ2_CFLAGS)
-AC_SUBST(BZ2_LIBS)
-dnl ----------------------------
-
-AC_ARG_WITH(theora,
-    [  --with-theora		  [Use theora, implies --with-vorbis (default: autodetect)]], THEORA="$with_theora")
-THEORA_CFLAGS=
-THEORA_LIBS=
-if test "$THEORA" != "no"; then
-    with_theora="yes"
-    THEORA="yes"
-    AC_CHECK_HEADERS(ogg/ogg.h,, THEORA=no)
-    AC_CHECK_HEADERS(theora/theora.h,, THEORA=no)
-    if test "$THEORA" != "no"; then
-	AC_CHECK_LIB(theora, theora_decode_init,, AC_MSG_ERROR(libtheora not found), -logg)
-	THEORA_CFLAGS="-DUSE_THEORA"
-	THEORA_LIBS="-ltheora -logg"
-    fi
-fi
-AC_SUBST(THEORA_CFLAGS)
-AC_SUBST(THEORA_LIBS)
-
-
-dnl --- CHECK FOR OGG VORBIS ---
-AC_ARG_WITH(vorbis, 
-    [  --with-vorbis		  [Use vorbis (default: autodetect)]], VORBIS="$with_vorbis")
-VORBIS_CFLAGS=
-VORRBIS_LIBS=
-if test "$VORBIS" != "no"; then
-    VORBIS="yes"
-    AC_CHECK_HEADERS(ogg/ogg.h,, VORBIS=no)
-    AC_CHECK_HEADERS(vorbis/codec.h,, VORBIS=no)
-    if test "$VORBIS" != "no"; then
-	AC_CHECK_LIB(vorbis, vorbis_info_init,, AC_MSG_ERROR(libvorbis not found), -logg)
-	VORBIS_CFLAGS="-DUSE_VORBIS"
-	VORBIS_LIBS="-lvorbis -logg"
-    fi
-fi
-AC_SUBST(VORBIS_CFLAGS)
-AC_SUBST(VORBIS_LIBS)
-dnl ----------------------------
-
-dnl --- CHECK FOR MIKMOD ---
-AC_ARG_WITH(mikmod, 
-    [  --with-mikmod		  [Use mikmod (default: autodetect)]], MIKMOD="$with_mikmod")
-MIKMOD_CFLAGS=
-MIKMOD_LIBS=
-if test "$MIKMOD" != "no"; then
-    AC_CHECK_HEADERS(mikmod.h, MIKMOD=yes, MIKMOD=no)
-    if test "$MIKMOD" != "no"; then
-	AC_CHECK_LIB(mikmod, MikMod_Init,, AC_MSG_ERROR(libmikmod not found))
-	MIKMOD_CFLAGS="-DUSE_MIKMOD"
-	MIKMOD_LIBS="-lmikmod"
-    fi
-fi
-AC_SUBST(MIKMOD_CFLAGS)
-AC_SUBST(MIKMOD_LIBS)
-dnl ----------------------------
-
-dnl --- CHECK FOR MNG LIB ------
-AC_ARG_WITH(mng,
-    [  --with-mng		  [Use mng (default: no)]], MNG="$with_mng")
-MNG_CFLAGS=
-MNG_LIBS=
-if test "$MNG" != "yes"; then
-    MNG_CFLAGS=""
-    MNG_LIBS=""
-else
-    AC_CHECK_LIB(mng, mng_initialize,, AC_MSG_ERROR(libmng not found))
-    MNG_CFLAGS="-DUSE_MNG"
-    MNG_LIBS="-lmng"
-fi
-AC_SUBST(MNG_CFLAGS)
-AC_SUBST(MNG_LIBS)
-dnl ----------------------------
-
-dnl ---- CHECK FOR LUA ---------
-AC_ARG_WITH(lua, 
-    [  --with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")
-if test "x$LUAPFX" != "x"; then
-    if test -f "$LUAPFX/lua.h"; then
-        LUA_CFLAGS="-I$LUAPFX"
-        LUA_LIBS="-L$LUAPFX"
-    else
-        LUA_CFLAGS="-I$LUAPFX/include"
-        LUA_LIBS="-L$LUAPFX/lib"
-    fi
+    LDFLAGS="$LDFLAGS `$SDLCONFIG --static-libs`"
 fi
 
-OLDCPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LUA_CFLAGS"
-AC_CHECK_HEADERS(lua.h,, AC_MSG_ERROR(could not find lua.h))
-CPPFLAGS="$OLDCPPFLAGS"
 
-if test "$ARCH" = "linux"; then
-    LUA_LIBS="$LUA_LIBS -ldl"
-fi
-AC_CHECK_LIB(lua, lua_getfenv, LUA_LIBS="$LUA_LIBS -llua",
-AC_CHECK_LIB(lua50, lua_setfenv, LUA_LIBS="$LUA_LIBS -llua50",
-AC_CHECK_LIB(lua5.0, lua_setfenv, LUA_LIBS="$LUA_LIBS -llua5.0",
-[AC_MSG_ERROR(Lua5 is required)], $LUA_LIBS -lm), $LUA_LIBS -lm), $LUA_LIBS -lm)
-AC_CHECK_LIB(lualib, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib",
-AC_CHECK_LIB(lualib50, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib50",
-AC_CHECK_LIB(lualib5.0, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib5.0",
-[AC_MSG_ERROR(Lualib5 is required)], $LUA_LIBS -lm), $LUA_LIBS -lm),$LUA_LIBS -lm)
-
-LUA_LIBS="$LUA_LIBS -lm"
-AC_SUBST(LUA_CFLAGS)
-AC_SUBST(LUA_LIBS)
-	
-dnl ---- end of lua check ------
 
 if test "$prefix" = "NONE"; then
     PREFIX=/usr/local
@@ -292,6 +212,18 @@ else
     PREFIX="$prefix"
 fi
 AC_SUBST(PREFIX)
+
+if test "$ARCH" = "win32"; then
+    if test "`uname -a | grep -is cygwin`"; then
+	LDFLAGS="$LDFLAGS -lwsock32 -lws2_32"
+    else
+	LDFLAGS="$LDFLAGS -lwsock32 -lws2_32 -lmingwex -lgmon"
+    fi
+fi
+
+AC_SUBST(CPPFLAGS)
+AC_SUBST(CXXFLAGS)
+AC_SUBST(LDFLAGS)
 
 if test "$ARCH" = "win32"; then
     if ! test -f Rules.make; then
