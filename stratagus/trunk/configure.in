@@ -95,7 +95,7 @@ dnl FIXME: todo
 
 dnl --- EXTRA DIRS -------------
 AC_ARG_WITH(extra-includes, 
-    [  --with-extra-includes=DIR [Location of additional include directiories]], CPPFLAGS="$CPPFLAGS -I$withval")
+    [  --with-extra-includes=DIR  [Location of additional include directiories]], CPPFLAGS="$CPPFLAGS -I$withval")
 AC_ARG_WITH(extra-libs, 
     [  --with-extra-libs=DIR	  [Location of additional library directories]], LDFLAGS="$LDFLAGS -L$withval")
 
@@ -108,7 +108,6 @@ if test "$with_opengl" != "no"; then
 	AC_PATH_X
 	if test "$no_x" != "yes"; then
 		CPPFLAGS="$CPPFLAGS -I$x_includes"
-		CXXFLAGS="$CXXFLAGS $X_CXXFLAGS"
 		LDFLAGS="$LDFLAGS $X_LIBS -L$x_libraries"
 	fi
 
