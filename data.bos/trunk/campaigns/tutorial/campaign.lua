@@ -31,7 +31,7 @@ campaign_steps = {
   CreateMapStep("campaigns/tutorial/level01.smp",
       "Move your units to the vault in the center of the map",
       "Order from the Central Command:\n\n"..
-      "Attacks of the base E411 destroyed all its defenses.\n"..
+      "Attacks on the base E411 destroyed all its defenses.\n"..
       "Reports from our spies say the vault is still unharmed.\n"..
       "Move your troops to the vault as fast as possible.\n"..
       "-- End of transmission 1. Commander GK --"),
@@ -39,11 +39,11 @@ campaign_steps = {
       "Train 2 engineers and build 1 power plant",
       "News from the Front:\n\n"..
       "We finally arrived at our camp.\n"..
-      "Despite of the recent attacks, the vault is still "..
-      "in a good state. "..
+      "Despite the recent attacks, the vault is still "..
+      "in good condition. "..
       "With the vault, we will train 2 extra "..
       "engineers to reinforce our group. "..
-      "We also need a power plant in order to"..
+      "We also need a power plant in order to "..
       "allow us to build more units ".. 
       "for our base.\n"..
       "-- End of transmission 2. Sergeant TJ --"),
@@ -52,7 +52,7 @@ campaign_steps = {
       "News from the Front:\n\n"..
       "The abandoned vault has few resources left. "..
       "For the extension of the base, we need 200 "..
-      "more crystals and 100 of titanium. "..
+      "more crystals and 100 titanium. "..
       "Our engineer detected large amounts of "..
       "titanium in the rocks.\n".. 
       "-- End of transmission. Sergeant TJ --"),
