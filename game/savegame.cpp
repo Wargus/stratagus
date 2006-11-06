@@ -121,7 +121,8 @@ char *SaveGlobal(lua_State *l, bool is_root)
 				!strcmp(key, "error") || !strcmp(key, "loadfile") || !strcmp(key, "arg") ||
 				!strcmp(key, "_LOADED") || !strcmp(key, "loadlib") || !strcmp(key, "string") ||
 				!strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug") ||
-				!strcmp(key, "coroutine")
+				!strcmp(key, "coroutine") || !strcmp(key, "Icons") || !strcmp(key, "Upgrades") ||
+				!strcmp(key, "Fonts") || !strcmp(key, "FontColors")
 				// other string to protected ?
 				))) {
 			lua_pop(l, 1); // pop the value
