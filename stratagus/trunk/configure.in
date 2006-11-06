@@ -2,6 +2,7 @@
 AC_INIT(configure.in)
 AC_PREREQ([2.50])
 
+CXXFLAGS=
 AC_PROG_CXX
 AM_CONFIG_HEADER(config.h)
 
@@ -96,15 +97,16 @@ dnl --- OPENGL -----------------
 AC_ARG_WITH(opengl,
     [  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
 if test "$with_opengl" != "no"; then
-	CPPFLAGS="$CPPFLAGS -DUSE_OPENGL -I$x_includes"
+	CPPFLAGS="$CPPFLAGS -DUSE_OPENGL"
 
 	AC_PATH_X
 	if test "$no_x" != "yes"; then
+		CPPFLAGS="$CPPFLAGS -I$x_includes"
 		CXXFLAGS="$CXXFLAGS $X_CXXFLAGS"
 		LDFLAGS="$LDFLAGS $X_LIBS -L$x_libraries"
 	fi
 
-	AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries are required))
+	AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
 fi
 
 dnl --- BZIP2 ------------------
