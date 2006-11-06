@@ -115,6 +115,12 @@ int DoActionMove(CUnit *unit)
 				unit->Moving = 0;
 				return d;
 			case PF_WAIT: // No path, wait
+				// Reset frame to still frame while we wait
+				// FIXME: Unit doesn't animate.
+				unit->Frame = unit->Type->StillFrame;
+				UnitUpdateHeading(unit);
+				unit->Wait = 10;
+
 				unit->Moving = 0;
 				return d;
 			default: // On the way moving
@@ -190,6 +196,12 @@ void HandleActionMove(CUnit *unit)
 
 	Assert(unit);
 	Assert(CanMove(unit));
+
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
+
 	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
 		NewResetPath(unit);
