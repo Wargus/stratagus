@@ -93,6 +93,12 @@ dnl AC_ARG_ENABLE(optimization,
 dnl    [  --enable-optimization	  [Enable detection of optimization flags (default: no)]])
 dnl FIXME: todo
 
+dnl --- EXTRA DIRS -------------
+AC_ARG_WITH(extra-includes, 
+    [  --with-extra-includes=DIR [Location of additional include directiories]], CPPFLAGS="$CPPFLAGS -I$withval")
+AC_ARG_WITH(extra-libs, 
+    [  --with-extra-libs=DIR	  [Location of additional library directories]], LDFLAGS="$LDFLAGS -L$withval")
+
 dnl --- OPENGL -----------------
 AC_ARG_WITH(opengl,
     [  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
@@ -177,14 +183,9 @@ if test "$with_mng" != "no" -a "x$with_mng" != "x"; then
 fi
 
 dnl --- LUA --------------------
-AC_ARG_WITH(lua-inc, 
-    [  --with-lua-inc=DIR	  [Location of Lua headers]], CPPFLAGS="$CPPFLAGS -I$withval")
-AC_ARG_WITH(lua-lib, 
-    [  --with-lua-lib=DIR	  [Location of Lua libraries]], LDFLAGS="$LDFLAGS -L$withval")
 if test "$ARCH" = "linux"; then
     LDFLAGS="$LDFLAGS -ldl"
 fi
-
 AC_CHECK_HEADER(lua.h,, AC_MSG_ERROR(could not find lua.h))
 AC_SEARCH_LIBS(lua_getfenv, lua lua50 lua5.0, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lua5 is required))
 AC_SEARCH_LIBS(luaopen_base, lualib lualib50 lualib5.0, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lualib5 is required))
