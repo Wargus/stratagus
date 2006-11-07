@@ -115,7 +115,11 @@ if test "$with_opengl" != "no"; then
 		LDFLAGS="$LDFLAGS $X_LIBS -L$x_libraries"
 	fi
 
-	AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
+	if test "$ARCH" = "win32"; then
+	    AC_CHECK_LIB(opengl32, main, LDFLAGS="$LDFLAGS -lopengl32", AC_MSG_ERROR(opengl libraries cannot be not found))
+	else
+	    AC_SEARCH_LIBS(glViewport, GL opengl32 sdl, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(opengl libraries cannot be not found))
+	fi
 fi
 
 dnl --- BZIP2 ------------------
@@ -178,7 +182,7 @@ AC_ARG_WITH(mng,
 if test "$with_mng" != "no" -a "x$with_mng" != "x"; then
     AC_CHECK_HEADER(libmng.h,, MNG=no)
     if test "$MNG" != "no"; then
-	AC_CHECK_LIB(mng, mng_initialize, CPPFLAGS="$CPPFLAGS -DUSE_MNG" LDFLAGS="$LDFLAGS -lmng", MNG=no)
+	AC_CHECK_LIB(mng, main, CPPFLAGS="$CPPFLAGS -DUSE_MNG" LDFLAGS="$LDFLAGS -lmng", MNG=no)
     fi
     if test "$MNG" = "no"; then
 	AC_MSG_ERROR(mng headers and/or libraries could not be found)
