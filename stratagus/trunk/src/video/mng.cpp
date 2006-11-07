@@ -60,7 +60,7 @@ static mng_ptr MNG_DECL my_alloc(mng_size_t len)
 
 static void MNG_DECL my_free(mng_ptr ptr, mng_size_t len)
 {
-	delete[] ptr;
+	delete[] static_cast<char*>(ptr);
 }
 
 static mng_bool MNG_DECL my_openstream(mng_handle handle)
