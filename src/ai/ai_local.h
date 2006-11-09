@@ -111,7 +111,7 @@ enum AiForceRole {
 class AiForce {
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false), Role(0),
-		State(0), GoalX(0), GoalY(0), MustTransport(0) {}
+		State(0), GoalX(0), GoalY(0), MustTransport(false) {}
 
 	void Reset() {
 		Completed = false;
@@ -122,7 +122,7 @@ public:
 		Units.clear();
 		State = 0;
 		GoalX = GoalY = 0;
-		MustTransport = 0;
+		MustTransport = false;
 	}
 
 	bool Completed;     /// Flag saying force is complete build
@@ -139,7 +139,7 @@ public:
 	int State;         /// Attack state
 	int GoalX;         /// Attack point X tile map position
 	int GoalY;         /// Attack point Y tile map position
-	int MustTransport; /// Flag must use transporter
+	bool MustTransport;/// Flag must use transporter
 };
 
 /**
