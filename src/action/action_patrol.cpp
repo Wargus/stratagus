@@ -48,6 +48,23 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Swap the patrol points.
+*/
+static void SwapPatrolPoints(CUnit *unit)
+{
+	int tmp;
+
+	tmp = unit->Orders[0]->Arg1.Patrol.X;
+	unit->Orders[0]->Arg1.Patrol.X = unit->Orders[0]->X;
+	unit->Orders[0]->X = tmp;
+	tmp = unit->Orders[0]->Arg1.Patrol.Y;
+	unit->Orders[0]->Arg1.Patrol.Y = unit->Orders[0]->Y;
+	unit->Orders[0]->Y = tmp;
+
+	NewResetPath(unit);
+}
+
+/**
 **  Unit Patrol:
 **    The unit patrols between two points.
 **    Any enemy unit in reaction range is attacked.
@@ -60,39 +77,56 @@
 */
 void HandleActionPatrol(CUnit *unit)
 {
-	const CUnit *goal;
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
 
 	if (!unit->SubAction) { // first entry.
 		NewResetPath(unit);
 		unit->SubAction = 1;
 	}
 
-	if (DoActionMove(unit) < 0) { // reached end-point or stop
-		int tmp;
-
-		Assert(unit->Orders[0]->Action == UnitActionPatrol);
-
-		//
-		// Swap the points.
-		//
-		tmp = unit->Orders[0]->Arg1.Patrol.X;
-		unit->Orders[0]->Arg1.Patrol.X = unit->Orders[0]->X;
-		unit->Orders[0]->X = tmp;
-		tmp = unit->Orders[0]->Arg1.Patrol.Y;
-		unit->Orders[0]->Arg1.Patrol.Y = unit->Orders[0]->Y;
-		unit->Orders[0]->Y = tmp;
-
-		NewResetPath(unit);
+	switch (DoActionMove(unit)) {
+		case PF_FAILED:
+			unit->SubAction = 1;
+			break;
+		case PF_UNREACHABLE:
+			// Increase range and try again
+			unit->SubAction = 1;
+			if (unit->Orders[0]->Range <= Map.Info.MapWidth ||
+					unit->Orders[0]->Range <= Map.Info.MapHeight) {
+				unit->Orders[0]->Range++;
+				break;
+			}
+			// FALL THROUGH
+		case PF_REACHED:
+			unit->SubAction = 1;
+			unit->Orders[0]->Range = 0;
+			SwapPatrolPoints(unit);
+			break;
+		case PF_WAIT:
+			// Wait for a while then give up
+			unit->SubAction++;
+			if (unit->SubAction == 5) {
+				unit->SubAction = 1;
+				unit->Orders[0]->Range = 0;
+				SwapPatrolPoints(unit);
+			}
+			break;
+		default: // moving
+			unit->SubAction = 1;
+			break;
 	}
 
 	if (!unit->Anim.Unbreakable) {
 		//
 		// Attack any enemy in reaction range.
-		//  If don't set the goal, the unit can than choose a
+		//  If don't set the goal, the unit can then choose a
 		//  better goal if moving nearer to enemy.
 		//
 		if (unit->Type->CanAttack) {
-			goal = AttackUnitsInReactRange(unit);
+			const CUnit *goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
