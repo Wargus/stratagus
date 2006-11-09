@@ -522,7 +522,7 @@ static void AiForceAttacks(AiForce *force)
 		}
 	}
 
-	if (i != (int)force->Units.size()) {
+	if (unit != NoUnitP) {
 		// Give idle units a new goal
 		// FIXME: may not be a good goal
 		for (i = 0; i < (int)force->Units.size(); ++i) {
