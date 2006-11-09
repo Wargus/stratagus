@@ -161,7 +161,7 @@ int DoActionMove(CUnit *unit)
 	} else {
 		xd = Heading2X[unit->Direction / NextDirection];
 		yd = Heading2Y[unit->Direction / NextDirection];
-		d = 0;
+		d = unit->Data.Move.Length + 1;
 	}
 
 	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
