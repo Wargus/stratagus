@@ -805,7 +805,7 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 		} else {
 			unit->Data.Move.Fast = 10;
 			AstarDebugPrint("SET WAIT to 10\n");
-			result = 0;
+			result = PF_WAIT;
 		}
 		if (unit->Data.Move.Fast == 0 && result != 0) {
 			AstarDebugPrint("WAIT expired\n");
