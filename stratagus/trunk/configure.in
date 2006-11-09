@@ -143,11 +143,16 @@ if test "$with_vorbis" != "no"; then
 	if test "x$with_vorbis" != "x" -a "$VORBIS" = "no"; then
 		AC_MSG_ERROR(vorbis headers and/or libraries could not be found)
 	fi
+else
+	VORBIS=no
 fi
 
 dnl --- THEORA -----------------
 AC_ARG_WITH(theora,
 	[  --with-theora		  [Use theora (default: autodetect)]])
+if test "$with_theora" != "no" -a "$VORBIS" = "no"; then
+	AC_MSG_ERROR(vorbis is required for theora support)
+fi
 if test "$with_theora" != "no"; then
 	AC_CHECK_HEADER(ogg/ogg.h,, THEORA=no)
 	AC_CHECK_HEADER(theora/theora.h,, THEORA=no)
