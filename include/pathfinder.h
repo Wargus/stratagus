@@ -70,8 +70,6 @@ enum _move_return_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-	/// Path matrix
-extern unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];
 	/// cost associated to move on a tile occupied by a fixed unit
 extern int AStarFixedUnitCrossingCost;
 	/// cost associated to move on a tile occupied by a moving unit
