@@ -12,7 +12,7 @@
 //
 //      I use breadth-first.
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith
+//      (c) Copyright 1998-2006 by Lutz Sammer, Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,30 +33,18 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-
 #include "stratagus.h"
-#include "video.h"
-#include "tileset.h"
 #include "map.h"
 #include "unittype.h"
-#include "player.h"
 #include "unit.h"
 #include "pathfinder.h"
-#include "missile.h"
-#include "ui.h"
 
 #ifndef MAX_PATH_LENGTH
 #define MAX_PATH_LENGTH  9 /// Maximal path part returned.
 #endif
-
-#define USE_BEST  /// Goto best point, don't stop.
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -70,7 +58,7 @@
 **  88:     Marks the possible goal fields.
 **  98:     Marks map border, for faster limits checks.
 */
-unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
+static unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
 static unsigned int LocalMatrix[MaxMapWidth * MaxMapHeight];
 
 /*----------------------------------------------------------------------------
@@ -114,9 +102,12 @@ static void InitMatrix(unsigned char *matrix)
 	memset(matrix + i, 98, w + 1);  // +1 for ships!
 }
 
+/**
+**  Initialize the local matrix
+*/
 static void InitLocalMatrix(void)
 {
-	memset(LocalMatrix, 0, Map.Info.MapWidth * Map.Info.MapHeight * sizeof(int)); // initialize matrix
+	memset(LocalMatrix, 0, Map.Info.MapWidth * Map.Info.MapHeight * sizeof(int));
 }
 
 /**
@@ -144,14 +135,14 @@ unsigned char *MakeMatrix(void)
 /**
 **  Mark place in matrix.
 **
-**  @param gx       X position of target area
-**  @param gy       Y position of target area
-**  @param gw       Width of target area
-**  @param gh       Height of target area
-**  @param range    Range to search at
-**  @param matrix   Target area marked in matrix
+**  @param gx      X position of target area
+**  @param gy      Y position of target area
+**  @param gw      Width of target area
+**  @param gh      Height of target area
+**  @param range   Range to search at
+**  @param matrix  Target area marked in matrix
 **
-**  @returns        depth, -1 unreachable
+**  @return        depth, -1 unreachable
 */
 static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned int *matrix)
 {
@@ -269,9 +260,8 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 **  This use the flood-fill algorithms.
 **  @todo can be done faster, if starting from both sides.
 **
-**  @param unit     Path for this unit.
-**  @param matrix   Matrix for calculation.
-**
+**  @param unit    Path for this unit.
+**  @param matrix  Matrix for calculation.
 */
 static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 {
@@ -310,7 +300,7 @@ static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 	n = 2;
 
 	//
-	//  Pop a point from stack, push all neightbors which could be entered.
+	//  Pop a point from stack, push all neighbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
@@ -366,15 +356,15 @@ static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 /**
 **  Can the unit 'src' reach the place x,y.
 **
-**  @param src          Unit for the path.
-**  @param x            Map X tile position.
-**  @param y            Map Y tile position.
-**  @param w            Width of Goal
-**  @param h            Height of Goal
-**  @param minrange     min range to the tile
-**  @param range        Range to the tile.
+**  @param src       Unit for the path.
+**  @param x         Map X tile position.
+**  @param y         Map Y tile position.
+**  @param w         Width of Goal
+**  @param h         Height of Goal
+**  @param minrange  min range to the tile
+**  @param range     Range to the tile.
 **
-**  @return         Distance to place.
+**  @return          Distance to place.
 */
 int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, int range)
 {
@@ -384,9 +374,11 @@ int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, i
 
 	//
 	//  Setup movement.
+	//  Try to reuse the previous matrix if it's the same mask, same cycle,
+	//  and the location was reachable.
 	//
-	if (src->Type->MovementMask != mask || LastGameCycle != GameCycle
-		|| LocalMatrix[src->X + src->Y * Map.Info.MapWidth] == 0) {
+	if (src->Type->MovementMask != mask || LastGameCycle != GameCycle ||
+			LocalMatrix[src->X + src->Y * Map.Info.MapWidth] == 0) {
 		InitLocalMatrix();
 		FillMatrix(src, LocalMatrix);
 		LastGameCycle = GameCycle;
@@ -397,7 +389,7 @@ int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, i
 	//  Find a path to the place.
 	//
 	if ((depth = CheckPlaceInMatrix(x, y, w, h, range, LocalMatrix)) < 0) {
-		DebugPrint("Can't move to destination, not route to goal\n");
+		DebugPrint("Can't move to destination, no route to goal\n");
 		return 0;
 	}
 
@@ -407,11 +399,11 @@ int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, i
 /**
 **  Can the unit 'src' reach the unit 'dst'.
 **
-**  @param src      Unit for the path.
-**  @param dst      Unit to be reached.
-**  @param range    Range to unit.
+**  @param src    Unit for the path.
+**  @param dst    Unit to be reached.
+**  @param range  Range to unit.
 **
-**  @return  Distance to place.
+**  @return       Distance to place.
 */
 int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 {
@@ -442,8 +434,8 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 **
 **  @param unit  Path for this unit.
 **
-**  @return         >0 remaining path length, 0 wait for path, -1
-**                  reached goal, -2 can't reach the goal.
+**  @return      >0 remaining path length, 0 wait for path, -1
+**               reached goal, -2 can't reach the goal.
 */
 int NewPath(CUnit *unit)
 {
@@ -475,7 +467,7 @@ int NewPath(CUnit *unit)
 		gy = unit->Orders[0]->Y;
 	}
 	path = unit->Data.Move.Path;
-	i = AStarFindPath(unit,gx,gy,gw,gh,minrange,maxrange,path);
+	i = AStarFindPath(unit, gx, gy, gw, gh, minrange, maxrange, path);
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;
 	}
