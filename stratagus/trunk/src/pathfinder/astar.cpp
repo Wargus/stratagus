@@ -384,17 +384,19 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 		}
 	}
 
-	for (x = gx; x < gx + gw && !minrange; ++x) {
-		for (y = gy; y < gy + gh; ++y) {
-			if (x < 0 || x >= Map.Info.MapWidth || y < 0 || y >= Map.Info.MapHeight) {
-				continue;
-			}
-			if (CostMoveTo(unit, x, y, mask, AStarFixedUnitCrossingCost) >= 0) {
-				AStarMatrix[y * Map.Info.MapWidth + x].InGoal = 1;
-				goal_reachable = 1;
-			}
-			if (*num_in_close < Threshold) {
-				CloseSet[(*num_in_close)++] = y * Map.Info.MapWidth + x;
+	if (minrange == 0) {
+		for (x = gx; x < gx + gw && !minrange; ++x) {
+			for (y = gy; y < gy + gh; ++y) {
+				if (x < 0 || x >= Map.Info.MapWidth || y < 0 || y >= Map.Info.MapHeight) {
+					continue;
+				}
+				if (CostMoveTo(unit, x, y, mask, AStarFixedUnitCrossingCost) >= 0) {
+					AStarMatrix[y * Map.Info.MapWidth + x].InGoal = 1;
+					goal_reachable = 1;
+				}
+				if (*num_in_close < Threshold) {
+					CloseSet[(*num_in_close)++] = y * Map.Info.MapWidth + x;
+				}
 			}
 		}
 	}
@@ -478,8 +480,7 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 				// If we travelled on an angle, mark down as well.
 				if (VisionTable[1][steps] == VisionTable[2][steps]) {
 					// do down
-					quad = 0;
-					while (quad < 4) {
+					for (quad = 0; quad < 4; ++quad) {
 						if (quad < 2) {
 							filler = 1;
 						} else {
@@ -495,7 +496,6 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 							}
 							goal_reachable = 1;
 						}
-						++quad;
 					}
 				}
 
@@ -509,8 +509,7 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 				cy[3] -= VisionTable[2][steps];
 
 				// Mark Actually Goal curve change
-				quad = 0;
-				while (quad < 4) {
+				for (quad = 0; quad < 4; ++quad) {
 					if (cx[quad] >= 0 && cx[quad] < Map.Info.MapWidth && cy[quad] >= 0 &&
 						cy[quad] < Map.Info.MapHeight &&
 						CostMoveTo(unit, cx[quad], cy[quad], mask, AStarFixedUnitCrossingCost) >= 0) {
@@ -521,7 +520,6 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 						}
 						goal_reachable = 1;
 					}
-					++quad;
 				}
 			}
 			++steps;
