@@ -50,4 +50,29 @@ AddTrigger(
        local c = GetPlayerData(GetThisPlayer(), "Resources", "crystal")
        return (t > 1099 and c > 2199) end,
     function() return StopGame(GameVictory) end)
+  
+AddCampaignMessage(1,  
+  "To Harvest Titanium or Crystal, first select your engineer. Then, "..
+  "start harvesting, either by right-clicking on the Titanium Spike, "..
+  "or by selecting the pick-axe from the menu on the right and then "..
+  "left-clicking on the target, or by typing 'h', and then left-clicking."
+)
+
+AddCampaignMessage(1000,
+  "Commander LL says:  Get out there and start harvesting! Now, dammit!"
+)
+
+AddCampaignMessage(2000,
+  "Commander LL says:  Didn't you hear me, boy? I said, "..
+  "get your lazy bones out of bed! Now MOVE!"
+)
+
+AddCampaignMessage(3000,
+  "Commander LL says:  You poor excuse for a maggot! Why, I bet the best "..
+  "part of you ended up as a brown stain on the mattress!"
+)
+
+AddCampaignFinalAssault(4000,
+  "Commander LL says:  Okay, you're in a world of shit, now, mister."
+)
 
