@@ -103,6 +103,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 	int j;
 	int n;
 	CMapField *mf;
+	CUnit *unit;
 
 	// Optimize small searches.
 	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
@@ -137,10 +138,11 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 				// It should only be used in here, unless you somehow want the unit
 				// to be out of cache.
 				//
-				if (!(*k)->CacheLock && !(*k)->Type->Revealer) {
-					Assert(!(*k)->Removed);
-					(*k)->CacheLock = 1;
-					table[n++] = *k;
+				unit = *k;
+				if (!unit->CacheLock && !unit->Type->Revealer) {
+					Assert(!unit->Removed);
+					unit->CacheLock = 1;
+					table[n++] = unit;
 				}
 			}
 			++mf;
