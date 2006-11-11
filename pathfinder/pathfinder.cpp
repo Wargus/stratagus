@@ -132,223 +132,6 @@ unsigned char *MakeMatrix(void)
 	return matrix;
 }
 
-/**
-**  Mark place in matrix.
-**
-**  @param gx      X position of target area
-**  @param gy      Y position of target area
-**  @param gw      Width of target area
-**  @param gh      Height of target area
-**  @param range   Range to search at
-**  @param matrix  Target area marked in matrix
-**
-**  @return        depth, -1 unreachable
-*/
-static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned int *matrix)
-{
-	int cx[4];
-	int cy[4];
-	int steps;
-	int cycle;
-	int x;
-	int y;
-	int quad;
-	int filler;
-
-	if (range == 0 && gw == 0 && gh == 0) {
-		return matrix[gx + gy * Map.Info.MapWidth];
-	}
-
-	// Mark top, bottom, left, right
-
-	// Mark Top and Bottom of Goal
-	for (x = gx; x <= gx + gw; ++x) {
-		if (x >= 0 && x < Map.Info.MapWidth) {
-			if ( gy - range >= 0 && matrix[(gy - range) * Map.Info.MapWidth + x]) {
-				return 1;
-			}
-			if (gy + range + gh < Map.Info.MapHeight && matrix[(gy + range + gh) * Map.Info.MapWidth + x]) {
-				return 1;
-			}
-		}
-	}
-
-	for (y = gy; y <= gy + gh; ++y) {
-		if (y >= 0 && y < Map.Info.MapHeight) {
-			if (gx - range >= 0 && matrix[y * Map.Info.MapWidth + gx - range]) {
-				return 1;
-			}
-			if (gx + gw + range < Map.Info.MapWidth && matrix[y * Map.Info.MapWidth + gx + gw + range]) {
-				return 1;
-			}
-		}
-	}
-
-	// Mark Goal Border in Matrix
-
-	// Mark Edges of goal
-
-	steps = 0;
-	// Find place to start. (for marking curves)
-	while(VisionTable[0][steps] != range && VisionTable[1][steps] == 0 && VisionTable[2][steps] == 0) {
-		steps++;
-	}
-	// 0 - Top right Quadrant
-	cx[0] = gx + gw;
-	cy[0] = gy - VisionTable[0][steps];
-	// 1 - Top left Quadrant
-	cx[1] = gx;
-	cy[1] = gy - VisionTable[0][steps];
-	// 2 - Bottom Left Quadrant
-	cx[2] = gx;
-	cy[2] = gy + VisionTable[0][steps]+gh;
-	// 3 - Bottom Right Quadrant
-	cx[3] = gx + gw;
-	cy[3] = gy + VisionTable[0][steps]+gh;
-
-	++steps;  // Move past blank marker
-	while (VisionTable[1][steps] != 0 || VisionTable[2][steps] != 0) {
-		// Loop through for repeat cycle
-		cycle = 0;
-		while (cycle++ < VisionTable[0][steps]) {
-			// If we travelled on an angle, mark down as well.
-			if (VisionTable[1][steps] == VisionTable[2][steps]) {
-				// do down
-				quad = 0;
-				while (quad < 4) {
-					if (quad < 2) {
-						filler = 1;
-					} else {
-						filler = -1;
-					}
-					if (cx[quad] >= 0 && cx[quad] < Map.Info.MapWidth && cy[quad] + filler >= 0 &&
-						cy[quad] + filler < Map.Info.MapHeight && matrix[(cy[quad] + filler) * Map.Info.MapWidth + cx[quad]]) {
-						return 1;
-					}
-					++quad;
-				}
-			}
-
-			cx[0] += VisionTable[1][steps];
-			cy[0] += VisionTable[2][steps];
-			cx[1] -= VisionTable[1][steps];
-			cy[1] += VisionTable[2][steps];
-			cx[2] -= VisionTable[1][steps];
-			cy[2] -= VisionTable[2][steps];
-			cx[3] += VisionTable[1][steps];
-			cy[3] -= VisionTable[2][steps];
-
-			// Mark Actually Goal curve change
-			quad = 0;
-			while (quad < 4) {
-				if (cx[quad] >= 0 && cx[quad] < Map.Info.MapWidth && cy[quad] >= 0 &&
-					cy[quad] < Map.Info.MapHeight &&
-					matrix[cy[quad] * Map.Info.MapWidth + cx[quad]] ) {
-					return 1;
-				}
-				++quad;
-			}
-		}
-		++steps;
-	}
-	return 0;
-}
-
-/**
-**  Flood fill an area for a matrix.
-**
-**  This use the flood-fill algorithms.
-**  @todo can be done faster, if starting from both sides.
-**
-**  @param unit    Path for this unit.
-**  @param matrix  Matrix for calculation.
-*/
-static void FillMatrix(const CUnit *unit, unsigned int *matrix)
-{
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-		int depth;
-	} *points;
-	int x;
-	int y;
-	int rx;
-	int ry;
-	int mask;
-	int wp;
-	int rp;
-	int ep;
-	int n;
-	int j;
-	int depth;
-	int size;
-	unsigned int *m;
-
-	size = 4 * (Map.Info.MapWidth + Map.Info.MapHeight);
-	points = new p[size];
-
-	mask = unit->Type->MovementMask;
-	// Ignore all possible mobile units.
-	// FIXME: bad? mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
-
-	points[0].X = x = unit->X;
-	points[0].Y = y = unit->Y;
-	points[0].depth = 1;
-	rp = 0;
-	matrix[x + y * Map.Info.MapWidth] = depth = 1;   // mark start point
-	ep = wp = 1;                                // start with one point
-	n = 2;
-
-	//
-	//  Pop a point from stack, push all neighbors which could be entered.
-	//
-	for (;;) {
-		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
-			depth = points[rp].depth;
-			for (j = 0; j < 8; ++j) {       // mark all neighbors
-				x = rx + Heading2X[j];
-				y = ry + Heading2Y[j];
-				if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
-					// Outside the map
-					continue;
-				}
-				m = matrix + x + y * Map.Info.MapWidth;
-				if (*m) {
-					continue;
-				}
-				if (CanMoveToMask(x, y, mask)) {    // reachable
-					*m = depth + 1;
-					points[wp].X = x;   // push the point
-					points[wp].Y = y;
-					points[wp].depth = depth + 1;
-					if (++wp >= size) {             // round about
-						wp = 0;
-					}
-				} else {                             // unreachable
-					*m = 0;
-				}
-			}
-
-			// Loop for
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-
-		//
-		//  Continue with next frame.
-		//
-		if (rp == wp) {  // unreachable, no more points available
-			break;
-		}
-		ep = wp;
-	}
-
-	delete[] points;
-}
-
 /*----------------------------------------------------------------------------
 --  PATH-FINDER USE
 ----------------------------------------------------------------------------*/
@@ -368,32 +151,24 @@ static void FillMatrix(const CUnit *unit, unsigned int *matrix)
 */
 int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, int range)
 {
-	int depth;
-	static unsigned long LastGameCycle;
-	static unsigned mask;
-
-	//
-	//  Setup movement.
-	//  Try to reuse the previous matrix if it's the same mask, same cycle,
-	//  and the location was reachable.
-	//
-	if (src->Type->MovementMask != mask || LastGameCycle != GameCycle ||
-			LocalMatrix[src->X + src->Y * Map.Info.MapWidth] == 0) {
-		InitLocalMatrix();
-		FillMatrix(src, LocalMatrix);
-		LastGameCycle = GameCycle;
-		mask = src->Type->MovementMask;
+	int i = AStarFindPath(src, x, y, w, h, minrange, range, NULL);
+	switch (i) {
+		case PF_FAILED:
+		case PF_UNREACHABLE:
+		case PF_REACHED:
+			i = 0;
+			break;
+		case PF_WAIT:
+			Assert(0);
+			i = 0;
+			break;
+		case PF_MOVE:
+			break;
+		default:
+			break;
 	}
 
-	//
-	//  Find a path to the place.
-	//
-	if ((depth = CheckPlaceInMatrix(x, y, w, h, range, LocalMatrix)) < 0) {
-		DebugPrint("Can't move to destination, no route to goal\n");
-		return 0;
-	}
-
-	return depth;
+	return i;
 }
 
 /**
