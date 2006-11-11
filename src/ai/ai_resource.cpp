@@ -1349,7 +1349,7 @@ void AiResourceManager(void)
 	// Collect resources.
 	//
 	if ((GameCycle / CYCLES_PER_SECOND) % COLLECT_RESOURCES_INTERVAL ==
-			AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
+			(unsigned long)AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
 		AiCollectResources();
 	}
 
