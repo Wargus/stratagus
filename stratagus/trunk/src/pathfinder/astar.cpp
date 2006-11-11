@@ -180,32 +180,10 @@ static int AStarFindMinimum()
 */
 static void AStarRemoveMinimum(int pos)
 {
-	int i;
-	int j;
-	int end;
-	Open swap;
+	Assert(pos == 0);
 
-	if (--OpenSetSize) {
-		OpenSet[pos] = OpenSet[OpenSetSize];
-		// now we exchange the new root with its smallest child until the
-		// order is correct
-		i = 0;
-		end = (OpenSetSize >> 1) - 1;
-		while (i <= end) {
-			j = (i << 1) + 1;
-			if (j < OpenSetSize - 1 && OpenSet[j].Costs >= OpenSet[j + 1].Costs) {
-				++j;
-			}
-			if (OpenSet[i].Costs > OpenSet[j].Costs) {
-				swap = OpenSet[i];
-				OpenSet[i] = OpenSet[j];
-				OpenSet[j] = swap;
-				i = j;
-			} else {
-				break;
-			}
-		}
-	}
+	--OpenSetSize;
+	memmove(OpenSet, OpenSet + 1, sizeof(Open) * OpenSetSize);
 }
 
 /**
