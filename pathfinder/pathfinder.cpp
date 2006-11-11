@@ -59,7 +59,6 @@
 **  98:     Marks map border, for faster limits checks.
 */
 static unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
-static unsigned int LocalMatrix[MaxMapWidth * MaxMapHeight];
 
 /*----------------------------------------------------------------------------
 --  Functions
