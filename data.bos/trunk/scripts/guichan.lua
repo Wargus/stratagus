@@ -355,8 +355,13 @@ function RunReplayMenu(s)
   local menu
   menu = BosMenu(_("Show a Replay"))
 
-  local browser = menu:addBrowser("~logs/", ".log$", 300, 100, 300, 200)
+  -- By default allow all units.
+  -- Current implementation relies on the hypothesis that the map setup will
+  -- configure which units are allowed.
+  -- Stratagus should store complete starting conditions in the log.
+  AllowAllUnits()
 
+  local browser = menu:addBrowser("~logs/", ".log$", 300, 100, 300, 200)
   local reveal = menu:addCheckBox(_("Reveal map"), 100, 250, function() end)
 
   function startreplaybutton(s)
