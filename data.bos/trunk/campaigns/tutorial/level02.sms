@@ -52,3 +52,7 @@ AddTrigger(
        return (e == 3 and g == 1) end,
     function() return StopGame(GameVictory) end)
 
+AddCampaignFinalAssault(4000,
+  "Commander LL says:  Too late !"
+)
+

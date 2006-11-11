@@ -46,3 +46,10 @@ AddTrigger(
     function() return StopGame(GameVictory) end)
 
 SetStartView(0, 6, 56)
+AddCampaignMessage(1, 
+   "To move your units effectively, first select them all by"..
+   "holding down the left mouse button while dragging a box around " ..
+   "the units. Next right click in the center "..
+   "of the map to order them to move."
+)
+
