@@ -48,15 +48,17 @@
 #include "actions.h"
 #include "player.h"
 
-static int AiMakeUnit(CUnitType *type);
-
 /*----------------------------------------------------------------------------
---  Variables
+--  Defines
 ----------------------------------------------------------------------------*/
+
+#define COLLECT_RESOURCES_INTERVAL 4
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+static int AiMakeUnit(CUnitType *type);
 
 /**
 **  Check if the costs are available for the AI.
@@ -1346,7 +1348,10 @@ void AiResourceManager(void)
 	//
 	// Collect resources.
 	//
-	AiCollectResources();
+	if ((GameCycle / CYCLES_PER_SECOND) % COLLECT_RESOURCES_INTERVAL ==
+			AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
+		AiCollectResources();
+	}
 
 	//
 	// Check repair.
