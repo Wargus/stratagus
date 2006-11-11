@@ -103,14 +103,6 @@ static void InitMatrix(unsigned char *matrix)
 }
 
 /**
-**  Initialize the local matrix
-*/
-static void InitLocalMatrix(void)
-{
-	memset(LocalMatrix, 0, Map.Info.MapWidth * Map.Info.MapHeight * sizeof(int));
-}
-
-/**
 **  Create empty movement matrix.
 */
 unsigned char *CreateMatrix(void)
