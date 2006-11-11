@@ -153,7 +153,7 @@ function InitGameVariables()
    InitAiScripts()
 end
 
-AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "dont-know-unseen-terrain", "unseen-terrain-cost", 2)
+AStar("fixed-unit-cost", 1000, "moving-unit-cost", 4, "dont-know-unseen-terrain", "unseen-terrain-cost", 2)
 
 --	Maximum number of selectable units
 SetMaxSelectable(24)
