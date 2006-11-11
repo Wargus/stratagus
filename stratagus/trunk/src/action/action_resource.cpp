@@ -98,6 +98,7 @@ static int MoveToResource(CUnit *unit)
 		}
 		switch (DoActionMove(unit)) {
 			case PF_UNREACHABLE:
+				unit->Wait = 10;
 				if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 9999,
 						unit->Player, unit->X, unit->Y, &x, &y)) {
 					unit->Orders[0]->X = x;
@@ -107,11 +108,7 @@ static int MoveToResource(CUnit *unit)
 					// FIXME: can't this overflow? It really shouldn't, since
 					// x and y are really supossed to be reachable, checked thorugh a flood fill.
 					// I don't know, sometimes stuff happens.
-#if 0
-					return MoveToResource(unit);
-#else
 					return 0;
-#endif
 				}
 				return -1;
 			case PF_REACHED:
