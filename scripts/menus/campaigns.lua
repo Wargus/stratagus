@@ -57,6 +57,29 @@ function RunBriefingMenu(objectivestext, briefingtext)
   menu:run()
 end
 
+function AddCampaignMessage(when, text)
+  AddTrigger(
+    function() return (GameCycle() >= when) end,
+    function() return AddMessage(text) end
+  )
+end
+
+function AddCampaignFinalAssault(when, text)
+  AddTrigger(
+    function() return (GameCycle() >= when) end,
+    function() 
+      AddMessage(text)
+      CreateUnit("unit-vault", 1, {60, 8})
+      CreateUnit("unit-tank", 1, {59, 12})
+      CreateUnit("unit-tank", 1, {61, 12})
+      CreateUnit("unit-tank", 1, {59, 14})
+      CreateUnit("unit-tank", 1, {60, 14})
+      AiForce(9, {"unit-tank", 4, "unit-rtank", 3})
+      AiAttackWithForce(9)
+    end
+  )
+end
+
 
 function CreateMapStep(map, objectivestext, briefingtext)
    function RunCampaignMap()
