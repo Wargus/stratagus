@@ -472,6 +472,11 @@ void HandleActionAttack(CUnit *unit)
 		unit->Orders[0]->Action == UnitActionAttack);
 	Assert(unit->Orders[0]->Goal || (unit->Orders[0]->X != -1 && unit->Orders[0]->Y != -1));
 
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
+
 	switch (unit->SubAction) {
 		//
 		// First entry
