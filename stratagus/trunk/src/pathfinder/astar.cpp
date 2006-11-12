@@ -760,7 +760,7 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 	// let's clean up the matrix now
 	AStarCleanUp(num_in_close);
 	if ((Map.Info.MapWidth*Map.Info.MapHeight) - counter > 500) {
-		DebugPrint("%s:%d Visited %d tiles, length %d tiles\n" _C_ unit->Type->Name _C_ UnitNumber(unit) 
+		AstarDebugPrint("%s:%d Visited %d tiles, length %d tiles\n" _C_ unit->Type->Name _C_ UnitNumber(unit) 
 			_C_ (Map.Info.MapWidth*Map.Info.MapHeight) - counter _C_ path_length);
 	}
 	return path_length;
