@@ -10,7 +10,8 @@
 //
 /**@name astar.cpp - The a* path finder routines. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer,Fabrice Rossi, Russell Smith
+//      (c) Copyright 1999-2006 by Lutz Sammer,Fabrice Rossi, Russell Smith,
+//                                  Francois Beerten.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -99,9 +100,8 @@ int AStarKnowUnknown = 0;
 int AStarUnknownTerrainCost = 2;
 
 /**
-** The Open set is handled by a Heap stored in a table
-** 0 is the root
-** node i left son is at 2*i+1 and right son is at 2*i+2
+** The Open set is handled by a stored array
+** the end of the array holds the item witht he smallest cost.
 */
 
 /// The set of Open nodes
@@ -163,49 +163,19 @@ static void AStarCleanUp(int num_in_close)
 
 /**
 ** Find the best node in the current open node set
-** Returns the position of this node in the open node set (always 0 in the
-** current heap based implementation)
+** Returns the position of this node in the open node set 
 */
-#define AStarFindMinimum() 0
-#if 0
-static int AStarFindMinimum()
-{
-	return 0;
-}
-#endif
+#define AStarFindMinimum() (OpenSetSize - 1)
+
 
 /**
-** Remove the minimum from the open node set (and update the heap)
-** pos is the position of the minimum (0 in the heap based implementation)
+** Remove the minimum from the open node set
 */
 static void AStarRemoveMinimum(int pos)
 {
-	int i;
-	int j;
-	int end;
-	Open swap;
+	Assert(pos == OpenSetSize - 1);
 
-	if (--OpenSetSize) {
-		OpenSet[pos] = OpenSet[OpenSetSize];
-		// now we exchange the new root with its smallest child until the
-		// order is correct
-		i = 0;
-		end = (OpenSetSize >> 1) - 1;
-		while (i <= end) {
-			j = (i << 1) + 1;
-			if (j < OpenSetSize - 1 && OpenSet[j].Costs >= OpenSet[j + 1].Costs) {
-				++j;
-			}
-			if (OpenSet[i].Costs > OpenSet[j].Costs) {
-				swap = OpenSet[i];
-				OpenSet[i] = OpenSet[j];
-				OpenSet[j] = swap;
-				i = j;
-			} else {
-				break;
-			}
-		}
-	}
+	OpenSetSize--;
 }
 
 /**
@@ -214,60 +184,70 @@ static void AStarRemoveMinimum(int pos)
 */
 static int AStarAddNode(int x, int y, int o, int costs)
 {
-	int i;
-	int j;
-	Open swap;
-
-	i = OpenSetSize;
-	if (OpenSetSize >= OpenSetMaxSize) {
+	int bigi, smalli;
+	int midcost;
+	int midi;
+	
+	if (OpenSetSize + 1 >= OpenSetMaxSize) {
 		fprintf(stderr, "A* internal error: raise Open Set Max Size "
 				"(current value %d)\n", OpenSetMaxSize);
 		return PF_FAILED;
 	}
-	OpenSet[i].X = x;
-	OpenSet[i].Y = y;
-	OpenSet[i].O = o;
-	OpenSet[i].Costs = costs;
-	++OpenSetSize;
-	while (i > 0) {
-		j = (i - 1) >> 1;
-		if (OpenSet[i].Costs < OpenSet[j].Costs) {
-			swap = OpenSet[i];
-			OpenSet[i] = OpenSet[j];
-			OpenSet[j] = swap;
-			i = j;
+
+	
+	// find where we should insert this node.
+	bigi = 0;
+	smalli = OpenSetSize;
+
+	// binary search where to insert the new node
+	while (bigi < smalli) {
+		midi = (smalli + bigi) >> 1;
+		midcost = OpenSet[midi].Costs;
+		if (costs > midcost) {
+			smalli = midi;
+		} else if (costs < midcost ) {
+			if (bigi == midi) {
+				bigi++;
+			} else {
+				bigi = midi;
+			}
 		} else {
-			break;
+			bigi = midi;
+			smalli = midi;
 		}
 	}
+
+	if (OpenSetSize > bigi) { 
+		// free a the slot for our node
+		memmove(&OpenSet[bigi+1], &OpenSet[bigi], (OpenSetSize - bigi) * sizeof(Open));
+	}
+
+	// fill our new node
+	OpenSet[bigi].X = x;
+	OpenSet[bigi].Y = y;
+	OpenSet[bigi].O = o;
+	OpenSet[bigi].Costs = costs;
+	++OpenSetSize;
 
 	return 0;
 }
 
 /**
-** Change the cost associated to an open node. The new cost MUST BE LOWER
-** than the old one in the current heap based implementation.
+** Change the cost associated to an open node. 
+** Can be further optimised knowing that the new cost MUST BE LOWER
+** than the old one.
 */
 static void AStarReplaceNode(int pos, int costs)
 {
-	int i;
-	int j;
-	Open swap;
+	Open node;
 
-	i = pos;
-	OpenSet[pos].Costs = costs;
-	// we need to go up, as the cost can only decrease
-	while (i > 0) {
-		j = (i - 1) >> 1;
-		if (OpenSet[i].Costs < OpenSet[j].Costs) {
-			swap = OpenSet[i];
-			OpenSet[i] = OpenSet[j];
-			OpenSet[j] = swap;
-			i = j;
-		} else {
-			break;
-		}
-	}
+	// Remove the outdated node
+	node = OpenSet[pos];
+	OpenSetSize--;
+	memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
+
+	// Re-add the node with the new cost
+	AStarAddNode(node.X, node.Y, node.O, node.Costs);
 }
 
 
