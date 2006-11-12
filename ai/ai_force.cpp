@@ -401,6 +401,7 @@ void AiAttackWithForceAt(int force, int x, int y)
 		//
 		for (int i = 0; i < (int)AiPlayer->Force[force].Units.size(); ++i) {
 			CUnit *aiunit = AiPlayer->Force[force].Units[i];
+			aiunit->Wait = i / 4;
 			if (aiunit->Type->CanAttack) {
 				CommandAttack(aiunit, x, y, NULL, FlushCommands);
 			} else {
@@ -478,6 +479,7 @@ void AiAttackWithForce(int force)
 		//
 		for (i = 0; i < (int)AiPlayer->Force[force].Units.size(); ++i) {
 			aiunit = AiPlayer->Force[force].Units[i];
+			aiunit->Wait = i / 4;
 			if (aiunit->Type->CanAttack) {
 				CommandAttack(aiunit, enemy->X, enemy->Y, NULL, FlushCommands);
 			} else {
