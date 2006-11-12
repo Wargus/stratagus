@@ -126,19 +126,17 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 		y2 = Map.Info.MapHeight;
 	}
 
-	std::vector<CUnit *>::iterator k, end;
-
 	n = 0;
 	for (i = y1; i < y2; ++i) {
 		mf = &Map.Fields[i * Map.Info.MapWidth + x1];
 		for (j = x1; j < x2; ++j) {
-			for (k = mf->UnitCache.begin(), end = mf->UnitCache.end(); k != end; ++k) {
+			for (size_t k = 0, end = mf->UnitCache.size(); k < end; ++k) {
 				//
 				// To avoid getting a unit in multiple times we use a cache lock.
 				// It should only be used in here, unless you somehow want the unit
 				// to be out of cache.
 				//
-				unit = *k;
+				unit = mf->UnitCache[k];
 				if (!unit->CacheLock && !unit->Type->Revealer) {
 					Assert(!unit->Removed);
 					unit->CacheLock = 1;
