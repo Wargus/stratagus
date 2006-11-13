@@ -86,15 +86,12 @@ end
 
 local ai_loop_funcs = {
   function() print("Looping !"); return false end,
-  function() return AiForce(1, {"unit-assault", 20}) end,
-  function() return AiForce(2, {"unit-grenadier", 8}) end,
-  function() return AiForce(3, {"unit-bazoo", 8}) end,
-  function() return AiWaitForce(2) end,
-  function() return AiWaitForce(3) end,  -- wait until attack party is completed
+  function() return AiForce(1, {"unit-assault", 20, 
+                                "unit-grenadier", 8, 
+                                "unit-bazoo", 8}) end,
+  function() return AiWaitForce(1) end,  -- wait until attack party is completed
   function() return AiSleep(50*difficulty) end,
   function() return AiAttackWithForce(1) end,
-  function() return AiAttackWithForce(2) end,
-  function() return AiAttackWithForce(3) end,
   function() ai_loop_pos[player] = 0; return false end,
 }
 
