@@ -157,7 +157,7 @@ msgstr "~!Spiel beitreten"
 
 #: scripts/menus/network.lua:227 scripts/menus/network.lua:297
 msgid "Create MultiPlayer game"
-msgstr "Multiplayer-Spiel erstellen"
+msgstr "Mehrspieler-Spiel erstellen"
 
 #: scripts/menus/network.lua:264 scripts/guichan.lua:403
 msgid "~!Start Game"
@@ -181,7 +181,7 @@ msgstr "~!Spiel erstellen"
 
 #: scripts/menus/network.lua:341
 msgid "MultiPlayer"
-msgstr "Multiplayer"
+msgstr "Mehrspieler"
 
 #: scripts/menus/network.lua:343
 msgid "Nickname :"
@@ -206,7 +206,7 @@ msgstr "schnell"
 
 #: scripts/menus/options.lua:65
 msgid "Mouse Scroll"
-msgstr "Maus-Scroll"
+msgstr "Mausscroll"
 
 #: scripts/menus/options.lua:81 scripts/menus/options.lua:107
 msgid "off"
@@ -214,7 +214,7 @@ msgstr "aus"
 
 #: scripts/menus/options.lua:91
 msgid "Keyboard Scroll"
-msgstr "Keyboard-Scroll"
+msgstr "Tastaturscroll"
 
 #: scripts/menus/options.lua:117 scripts/menus/options.lua:195
 msgid "~!OK"
@@ -226,7 +226,7 @@ msgstr "Sound-Optionen"
 
 #: scripts/menus/options.lua:131
 msgid "Effects Volume"
-msgstr "Effekt-Lautstärke"
+msgstr "Effektlautstärke"
 
 #: scripts/menus/options.lua:146 scripts/menus/options.lua:178
 msgid "min"
@@ -250,7 +250,7 @@ msgstr "Vollbild"
 
 #: scripts/menus/options.lua:246
 msgid "Video Options"
-msgstr "Video-Optionen"
+msgstr "Videooptionen"
 
 #: scripts/menus/options.lua:258
 msgid "Language Selection"
@@ -286,7 +286,7 @@ msgstr "Scripte:"
 
 #: scripts/menus/credits.lua:47
 msgid "Maps and campaigns:"
-msgstr "Karten und Kampagnen"
+msgstr "Karten und Kampagnen:"
 
 #: scripts/menus/credits.lua:51
 msgid "Sound:"
@@ -309,12 +309,12 @@ msgid "Stratagus Media Project Graphics"
 msgstr "Stratagus Media Project Graphics"
 
 #: scripts/menus/credits.lua:129
-msgid ""
-msgstr "The Bos and the Stratagus Team thanks all the people who have contributed"
+msgid "The Bos and the Stratagus Team thanks all the people who have contributed"
+msgstr "Die Teams von Bos und Stratagus danken allen, die mit Patches, "
 
 #: scripts/menus/credits.lua:130
 msgid "patches, bug reports, ideas."
-msgstr "Patche, Fehlerberichte, Ideen."
+msgstr "Fehlerberichten und Ideen geholfen haben."
 
 #: scripts/menus/credits.lua:133
 msgid "Battle of Survival Credits"
