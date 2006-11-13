@@ -116,7 +116,7 @@ msgstr "schwer"
 #: scripts/menus/network.lua:123 scripts/menus/network.lua:252
 #: scripts/guichan.lua:288
 msgid "Map richness:"
-msgstr ""
+msgstr "Kartenrohstoffe:"
 
 #: scripts/menus/network.lua:124 scripts/menus/network.lua:127
 #: scripts/menus/network.lua:253 scripts/menus/network.lua:256
