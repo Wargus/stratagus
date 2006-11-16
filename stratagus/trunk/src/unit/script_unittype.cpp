@@ -1961,18 +1961,10 @@ void InitDefinedVariables()
 	int i;
 
 	// Variables.
-	if (UnitTypeVar.VariableName) {
-		for (i = 0; i < NVARALREADYDEFINED; ++i) {
-			delete[] UnitTypeVar.VariableName[i];
-		}
-		delete[] UnitTypeVar.VariableName;
-	}
 	UnitTypeVar.VariableName = new char *[NVARALREADYDEFINED];
 	for (i = 0; i < NVARALREADYDEFINED; ++i) {
 		UnitTypeVar.VariableName[i] = new_strdup(var[i]);
 	}
-
-	delete[] UnitTypeVar.Variable;
 	UnitTypeVar.Variable = new CVariable[i];
 	UnitTypeVar.NumberVariable = i;
 
