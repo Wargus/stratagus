@@ -1940,7 +1940,7 @@ void UpdateUnitVariables(const CUnit *unit)
 }
 
 /**
-**  Define already variables, usefull for drawing now.
+**  Define already variables, useful for drawing now.
 */
 void InitDefinedVariables()
 {
@@ -1955,16 +1955,24 @@ void InitDefinedVariables()
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
 		"\"VisibleUnderFog\", \"PermanentCloack\", \"DetectCloak\", \"AttackFromTransporter\","
 		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
-		"\"BuilderOutSide\", \"BuilderLost\", \"CanHarvest\", \"Harvester\","
+		"\"BuilderOutside\", \"BuilderLost\", \"CanHarvest\", \"Harvester\","
 		"\"SelectableByRectangle\", \"IsNotSelectable\", \"Decoration\","
 		"\"Indestructible\", \"Teleporter\")";
-	int i; // iterator for var and boolflag.
+	int i;
 
 	// Variables.
+	if (UnitTypeVar.VariableName) {
+		for (i = 0; i < NVARALREADYDEFINED; ++i) {
+			delete[] UnitTypeVar.VariableName[i];
+		}
+		delete[] UnitTypeVar.VariableName;
+	}
 	UnitTypeVar.VariableName = new char *[NVARALREADYDEFINED];
 	for (i = 0; i < NVARALREADYDEFINED; ++i) {
 		UnitTypeVar.VariableName[i] = new_strdup(var[i]);
 	}
+
+	delete[] UnitTypeVar.Variable;
 	UnitTypeVar.Variable = new CVariable[i];
 	UnitTypeVar.NumberVariable = i;
 
