@@ -78,26 +78,6 @@ CUnitType *UnitTypeHumanWall;       /// Human wall
 CUnitType *UnitTypeOrcWall;         /// Orc wall
 
 /**
-**  Default resources for a new player.
-*/
-int DefaultResources[MaxCosts];
-
-/**
-**  Default resources for a new player with low resources.
-*/
-int DefaultResourcesLow[MaxCosts];
-
-/**
-**  Default resources for a new player with mid resources.
-*/
-int DefaultResourcesMedium[MaxCosts];
-
-/**
-**  Default resources for a new player with high resources.
-*/
-int DefaultResourcesHigh[MaxCosts];
-
-/**
 **  Default incomes for a new player.
 */
 int DefaultIncomes[MaxCosts];
