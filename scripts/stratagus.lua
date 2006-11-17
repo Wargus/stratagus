@@ -116,10 +116,6 @@ SetFogOfWarOpacity(128)
 --	Define default resources
 -------------------------------------------------------------------------------
 
-DefineDefaultResources(0, 2000, 1000, 1000, 1000, 1000, 1000)
-DefineDefaultResourcesLow(0, 2000, 1000, 1000, 1000, 1000, 1000)
-DefineDefaultResourcesMedium(0, 5000, 2000, 2000, 2000, 2000, 2000)
-DefineDefaultResourcesHigh(0, 10000, 5000, 5000, 5000, 5000, 5000)
 DefineDefaultIncomes(0, 100, 100, 100, 100, 100, 100)
 DefineDefaultActions("stop", "mine", "harvest", "drill", "mine", "mine", "mine")
 
