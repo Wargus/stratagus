@@ -2230,72 +2230,6 @@ static int CclSetSpeeds(lua_State *l)
 }
 
 /**
-**  Define default resources for a new player.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResources(lua_State *l)
-{
-	int i;
-	int args;
-
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResources[i] = LuaToNumber(l, i + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define default resources for a new player with low resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourcesLow(lua_State *l)
-{
-	int i;
-	int args;
-
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResourcesLow[i] = LuaToNumber(l, i + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define default resources for a new player with mid resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourcesMedium(lua_State *l)
-{
-	int i;
-	int args;
-
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResourcesMedium[i] = LuaToNumber(l, i + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define default resources for a new player with high resources.
-*/
-static int CclDefineDefaultResourcesHigh(lua_State *l)
-{
-	int i;
-	int args;
-
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResourcesHigh[i] = LuaToNumber(l, i + 1);
-	}
-	return 0;
-}
-
-/**
 **  Define default incomes for a new player.
 **
 **  @param l  Lua state.
@@ -2514,10 +2448,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
-	lua_register(Lua, "DefineDefaultResources", CclDefineDefaultResources);
-	lua_register(Lua, "DefineDefaultResourcesLow", CclDefineDefaultResourcesLow);
-	lua_register(Lua, "DefineDefaultResourcesMedium", CclDefineDefaultResourcesMedium);
-	lua_register(Lua, "DefineDefaultResourcesHigh", CclDefineDefaultResourcesHigh);
 	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);

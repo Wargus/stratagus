@@ -519,7 +519,6 @@ static void GameTypeManTeamVsMachine(void)
 void CreateGame(const char *filename, CMap *map)
 {
 	int i;
-	int j;
 
 	if (SaveGameLoading) {
 		SaveGameLoading = 0;
@@ -541,30 +540,30 @@ void CreateGame(const char *filename, CMap *map)
 	}
 
 	for (i = 0; i < PlayerMax; ++i) {
-		int p;
+		int playertype;
 		int aiopps;
 
-		p = Map.Info.PlayerType[i];
+		playertype = Map.Info.PlayerType[i];
 		aiopps = 0;
 		// Single player games only:
 		// ARI: FIXME: convert to a preset array to share with network game code
 		if (GameSettings.Opponents != SettingsPresetMapDefault) {
-			if (p == PlayerPerson && ThisPlayer != NULL) {
-				p = PlayerComputer;
+			if (playertype == PlayerPerson && ThisPlayer != NULL) {
+				playertype = PlayerComputer;
 			}
-			if (p == PlayerComputer) {
+			if (playertype == PlayerComputer) {
 				if (aiopps < GameSettings.Opponents) {
 					++aiopps;
 				} else {
-					p = PlayerNobody;
+					playertype = PlayerNobody;
 				}
 			}
 		}
 		// Network games only:
 		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
-			p = GameSettings.Presets[i].Type;
+			playertype = GameSettings.Presets[i].Type;
 		}
-		CreatePlayer(p);
+		CreatePlayer(playertype);
 	}
 
 	if (filename) {
@@ -604,29 +603,6 @@ void CreateGame(const char *filename, CMap *map)
 
 	if (FlagRevealMap) {
 		Map.Reveal();
-	}
-
-	if (GameSettings.Resources != SettingsResourcesMapDefault) {
-		for (j = 0; j < PlayerMax; ++j) {
-			if (Players[j].Type == PlayerNobody) {
-				continue;
-			}
-			for (i = 1; i < MaxCosts; ++i) {
-				switch (GameSettings.Resources) {
-					case SettingsResourcesLow:
-						Players[j].Resources[i] = DefaultResourcesLow[i];
-						break;
-					case SettingsResourcesMedium:
-						Players[j].Resources[i] = DefaultResourcesMedium[i];
-						break;
-					case SettingsResourcesHigh:
-						Players[j].Resources[i] = DefaultResourcesHigh[i];
-						break;
-					default:
-						break;
-				}
-			}
-		}
 	}
 
 	//
