@@ -118,6 +118,7 @@ function RunCampaignsMenu(s)
 
   menu = BosMenu(_("List of Campaigns"))
 
+  ResetMapOptions()
   local browser = menu:addBrowser("campaigns/", "^%a", 300, 100, 300, 200, ListDirsInDirectory)
   function startgamebutton(s)
     print("Starting campaign")

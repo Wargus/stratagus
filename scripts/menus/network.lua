@@ -399,6 +399,7 @@ function RunMultiPlayerMenu(s)
   menu:writeText(_("Nickname :"), x, Video.Height*8/20)
   nick = menu:addTextInputField(GetLocalPlayerName(), x + 90, Video.Height*8/20 + 4)
 
+  ResetMapOptions()
   InitNetwork1()
   menu:addButton(_("~!Join Game"), "j", x, Video.Height*11/20, 
     function(s)

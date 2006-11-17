@@ -283,9 +283,13 @@ function RunMap(map, objective, fow, revealmap)
   RunResultsMenu(s)
 end
 
-difficulty = 5
-mapresources = 5
-startingresources = 5
+
+function ResetMapOptions()
+  difficulty = 5
+  mapresources = 5
+  startingresources = 5
+end
+
 
 function RunStartGameMenu(s)
   local menu
@@ -311,6 +315,7 @@ function RunStartGameMenu(s)
   fow:setMarked(preferences.FogOfWar)
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, function() end)
   
+  ResetMapOptions()
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
     function(dd) difficulty = (5 - dd:getSelected()*2) end)
@@ -366,6 +371,7 @@ function RunReplayMenu(s)
 
   function startreplaybutton(s)
     print("Starting map -------")
+    ResetMapOptions()
     InitGameVariables()
     StartReplay("~logs/" .. browser:getSelectedItem(), reveal:isMarked())
     menu:stop()
