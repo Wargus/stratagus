@@ -52,10 +52,6 @@
 <a href="#DefineDefaultIncomes">DefineDefaultIncomes</a>
 <a href="#DefineDefaultResourceAmounts">DefineDefaultResourceAmounts</a>
 <a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
-<a href="#DefineDefaultResources">DefineDefaultResources</a>
-<a href="#DefineDefaultResourcesHigh">DefineDefaultResourcesHigh</a>
-<a href="#DefineDefaultResourcesLow">DefineDefaultResourcesLow</a>
-<a href="#DefineDefaultResourcesMedium">DefineDefaultResourcesMedium</a>
 <a href="#DefineSprites">DefinesSprites</a>
 <a href="#GetVideoFullScreen">GetVideoFullScreen</a>
 <a href="#GetVideoResolution">GetVideoResolution</a>
@@ -265,80 +261,6 @@ Names the resources in a given order.
     -- Define Resource names
     DefineDefaultResourceNames(
         "time", "gold", "wood", "oil", "ore", "stone", "coal")
-</pre>
-
-<a name="DefineDefaultResources"></a>
-<h3>DefineDefaultResources(amount, ...)</h3>
-
-Defines the default amount of starting resources when you begin a game. the Map can redefine this,
-or it can be chosen from the menu.
-
-<dl>
-<dt>amount</dt>
-<dd>The amount of a resource to start with</dd>
-<dt><i>RETURNS</i></dt>
-<dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- Defines starting resources
-	DefineDefaultResources(0, 2000, 1000, 1000, 1000, 1000, 1000)
-</pre>
-
-<a name="DefineDefaultResourcesHigh"></a>
-<h3>DefineDefaultResourcesHigh(amount, ...)</h3>
-
-Defines the default amount of starting resources when you begin a game by selecting "High Resources".
-
-<dl>
-<dt>amount</dt>
-<dd>The amount of a resource to start with</dd>
-<dt><i>RETURNS</i></dt>
-<dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    DefineDefaultResourcesHigh(0, 10000, 5000, 5000, 5000, 5000, 5000)
-</pre>
-
-<a name="DefineDefaultResourcesLow"></a>
-<h3>DefineDefaultResourcesLow(amount, ...)</h3>
-
-Defines the default amount of starting resources when you begin a game by selecting "Low Resources".
-
-<dl>
-<dt>amount</dt>
-<dd>The amount of a resource to start with</dd>
-<dt><i>RETURNS</i></dt>
-<dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    DefineDefaultResourcesLow(0, 2000, 1000, 1000, 1000, 1000, 1000)
-</pre>
-  
-<a name="DefineDefaultResourcesMedium"></a>
-<h3>DefineDefaultResourcesMedium(amount, ...)</h3>
-
-Defines the default amount of starting resources when you begin a game by selecting "Medium Resources".
-
-<dl>
-<dt>amount</dt>
-<dd>The amount of a resource to start with</dd>
-<dt><i>RETURNS</i></dt>
-<dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    DefineDefaultResourcesMedium(0, 5000, 2000, 2000, 2000, 2000, 2000)
 </pre>
 
 
