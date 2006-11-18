@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Nov 17 19:34:02 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Nov 17 22:09:01 2006.
 */
 
 #ifndef __cplusplus
@@ -15086,6 +15086,78 @@ static int tolua_stratagus_StopGame00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: GameRunning */
+#ifndef TOLUA_DISABLE_tolua_get_GameRunning
+static int tolua_get_GameRunning(lua_State* tolua_S)
+{
+ tolua_pushboolean(tolua_S,(bool)GameRunning);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameRunning */
+#ifndef TOLUA_DISABLE_tolua_set_GameRunning
+static int tolua_set_GameRunning(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  GameRunning = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: GamePaused */
+#ifndef TOLUA_DISABLE_tolua_get_GamePaused
+static int tolua_get_GamePaused(lua_State* tolua_S)
+{
+ tolua_pushboolean(tolua_S,(bool)GamePaused);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GamePaused */
+#ifndef TOLUA_DISABLE_tolua_set_GamePaused
+static int tolua_set_GamePaused(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  GamePaused = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: GameObserve */
+#ifndef TOLUA_DISABLE_tolua_get_GameObserve
+static int tolua_get_GameObserve(lua_State* tolua_S)
+{
+ tolua_pushboolean(tolua_S,(bool)GameObserve);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameObserve */
+#ifndef TOLUA_DISABLE_tolua_set_GameObserve
+static int tolua_set_GameObserve(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  GameObserve = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Race of class  SettingsPresets */
 #ifndef TOLUA_DISABLE_tolua_get_SettingsPresets_Race
 static int tolua_get_SettingsPresets_Race(lua_State* tolua_S)
@@ -16831,6 +16903,9 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_constant(tolua_S,"GameRestart",GameRestart);
  tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
  tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
+ tolua_variable(tolua_S,"GameRunning",tolua_get_GameRunning,tolua_set_GameRunning);
+ tolua_variable(tolua_S,"GamePaused",tolua_get_GamePaused,tolua_set_GamePaused);
+ tolua_variable(tolua_S,"GameObserve",tolua_get_GameObserve,tolua_set_GameObserve);
 #ifdef __cplusplus
  tolua_cclass(tolua_S,"SettingsPresets","SettingsPresets","",tolua_collect_SettingsPresets);
 #else

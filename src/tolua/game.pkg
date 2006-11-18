@@ -25,6 +25,10 @@ GameResults GameResult;
 $void StopGame(GameResults result);
 void StopGame(GameResults result);
 
+extern bool GameRunning;
+extern bool GamePaused;
+extern bool GameObserve;
+
 
 $#include "settings.h"
 
