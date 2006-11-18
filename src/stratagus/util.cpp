@@ -141,7 +141,13 @@ unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 	if (dst == NULL || src == NULL || dstsize == 0) {
 		return EINVAL;
 	}
-	size_t mincount = strnlen(src, count);
+	size_t mincount;
+	if (count == _TRUNCATE)
+	   // UNSAFE, but cant do better in this case !
+	   mincount = strlen(src);
+	else
+	   mincount = strnlen(src, count);
+
 	if (mincount > count) {
 		mincount = count;
 	}
@@ -174,7 +180,7 @@ unsigned int strcat_s(char *dst, size_t dstsize, const char *src)
 	if (count == 0) {
 		return EINVAL;
 	}
-	if (strlen(src) + count >= dstsize) {
+	if (strlen(src) >= count ) {
 		return ERANGE;
 	}
 	strcpy(enddst, src);
