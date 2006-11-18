@@ -54,39 +54,11 @@ static int EditorCancelled;
 ServerSetup ServerSetupState;
 ServerSetup LocalSetupState;
 
-static char ScenSelectPath[1024];        /// Scenario selector path
-static char ScenSelectFileName[128];     /// Scenario selector name
-
 char MenuMapFullPath[1024];              /// Selected map path+name
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-
-#if 0
-/**
-** Load game ok button callback
-*/
-static void LoadGameOk(void)
-{
-	if (!ScenSelectFileName[0]) {
-		return ;
-	}
-	sprintf(TempPathBuf, "%s/%s", SaveDir, ScenSelectFileName);
-	CommandLogDisabled = 1;
-	SaveGameLoading = 1;
-	CleanModules();
-	LoadCcl();
-	LoadGame(TempPathBuf);
-	Callbacks = &GameCallbacks;
-	SetMessage(_("Loaded game: %s"), TempPathBuf);
-	GuiGameStarted = 1;
-	GameMenuReturn();
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
-}
-#endif
 
 #if 0
 /**
@@ -213,109 +185,6 @@ static void TerminateNetConnect(void)
 	} else {
 		NetConnectingCancel();
 	}
-}
-#endif
-
-#if 0
-/**
-**  Menu setup race pulldown action.
-**
-**  @note 0 is default-race.
-*/
-static void GameRCSAction(Menuitem *mi, int i)
-{
-	int n;
-	int x;
-
-	if (mi->D.Pulldown.curopt == i) {
-		for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
-			if (PlayerRaces.Visible[n]) {
-				if (x + 1 == i) {
-					break;
-				}
-				++x;
-			}
-		}
-		if (i != 0) {
-			GameSettings.Presets[0].Race = x;
-		} else {
-			GameSettings.Presets[0].Race = SettingsPresetMapDefault;
-		}
-		ServerSetupState.Race[0] = i;
-		NetworkServerResyncClients();
-	}
-}
-#endif
-
-#if 0
-/**
-** Game resources action callback
-*/
-static void GameRESAction(Menuitem *mi, int i)
-{
-	int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
-				SettingsResourcesMedium, SettingsResourcesHigh };
-
-	if (!mi || mi->D.Pulldown.curopt == i) {
-		GameSettings.Resources = v[i];
-		ServerSetupState.ResourcesOption = i;
-		if (mi) {
-			NetworkServerResyncClients();
-		}
-	}
-}
-
-/**
-** Game units action callback
-*/
-static void GameUNSAction(Menuitem *mi, int i)
-{
-	if (!mi || mi->D.Pulldown.curopt == i) {
-		GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
-		ServerSetupState.UnitsOption = i;
-		if (mi) {
-			NetworkServerResyncClients();
-		}
-	}
-}
-
-/**
-** Game tilesets action callback
-*/
-static void GameTSSAction(Menuitem *mi, int i)
-{
-	if (!mi || mi->D.Pulldown.curopt == i) {
-		// Subtract 1 for default option.
-		GameSettings.Terrain = i - 1;
-		ServerSetupState.TilesetSelection = i;
-		if (mi) {
-			NetworkServerResyncClients();
-		}
-	}
-}
-
-/**
-** Called if the pulldown menu of the game type is changed.
-*/
-static void GameGATAction(Menuitem *mi, int i)
-{
-	if (!mi || mi->D.Pulldown.curopt == i) {
-		GameSettings.GameType = i ? SettingsGameTypeMelee + i - 1 : SettingsGameTypeMapDefault;
-		ServerSetupState.GameTypeOption = i;
-		if (mi) {
-			NetworkServerResyncClients();
-		}
-	}
-}
-#endif
-
-#if 0
-/**
-** Game opponents action callback
-*/
-static void CustomGameOPSAction(Menuitem *mi, int i)
-{
-	GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
 #endif
 
@@ -453,19 +322,6 @@ void NetClientCheckLocalState(void)
 */
 int NetClientSelectScenario(void)
 {
-	char *cp;
-
-	cp = strrchr(MenuMapFullPath, '/');
-	if (cp) {
-		strcpy(ScenSelectFileName, cp + 1);
-		*cp = 0;
-		strcpy(ScenSelectPath, MenuMapFullPath);
-		*cp = '/';
-	} else {
-		strcpy(ScenSelectFileName, MenuMapFullPath);
-		ScenSelectPath[0] = 0;
-	}
-
 	FreeMapInfo(&Map.Info);
 	LoadStratagusMapInfo(MenuMapFullPath);
 	return 0;
