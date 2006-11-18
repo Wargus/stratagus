@@ -750,8 +750,9 @@ void InitSettings(void)
 	GameSettings.Resources = SettingsPresetMapDefault;
 	GameSettings.NumUnits = SettingsPresetMapDefault;
 	GameSettings.Opponents = SettingsPresetMapDefault;
-	GameSettings.Terrain = SettingsPresetMapDefault;
+	GameSettings.Difficulty = SettingsPresetMapDefault;
 	GameSettings.GameType = SettingsPresetMapDefault;
+	GameSettings.MapRichness = SettingsPresetMapDefault;
 	GameSettings.NetGameType = SettingsSinglePlayerGame;
 }
 

@@ -111,8 +111,8 @@ public:
 	FullReplay() :
 		Comment1(NULL), Comment2(NULL), Comment3(NULL), Date(NULL), Map(NULL),
 		MapPath(NULL), MapId(0), Type(0), Race(0), LocalPlayer(0),
-		Resource(0), NumUnits(0), TileSet(0), NoFow(false), RevealMap(0),
-		GameType(0), Opponents(0), Commands(NULL)
+		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), RevealMap(0),
+		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
 	{
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
@@ -130,11 +130,12 @@ public:
 	int LocalPlayer;
 	MPPlayer Players[PlayerMax];
 
-	int  Resource;
+	int Resource;
 	int NumUnits;
-	int TileSet;
+	int Difficulty;
 	bool NoFow;
 	int RevealMap;
+	int MapRichness;
 	int GameType;
 	int Opponents;
 	int Engine[3];
@@ -211,10 +212,11 @@ static FullReplay *StartReplay(void)
 	replay->MapPath = new_strdup(CurrentMapPath);
 	replay->Resource = GameSettings.Resources;
 	replay->NumUnits = GameSettings.NumUnits;
-	replay->TileSet = GameSettings.Terrain;
+	replay->Difficulty = GameSettings.Difficulty;
 	replay->NoFow = GameSettings.NoFogOfWar;
 	replay->GameType = GameSettings.GameType;
 	replay->RevealMap = GameSettings.RevealMap;
+	replay->MapRichness = GameSettings.MapRichness;
 	replay->Opponents = GameSettings.Opponents;
 
 	replay->Engine[0] = StratagusMajorVersion;
@@ -258,10 +260,11 @@ static void ApplyReplaySettings(void)
 	}
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
-	GameSettings.Terrain = CurrentReplay->TileSet;
+	GameSettings.Difficulty = CurrentReplay->Difficulty;
 	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
 	GameSettings.GameType = CurrentReplay->GameType;
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
+	GameSettings.MapRichness = CurrentReplay->MapRichness;
 	GameSettings.Opponents = CurrentReplay->Opponents;
 
 	// FIXME : check engine version
@@ -367,11 +370,12 @@ static void SaveFullLog(CFile *dest)
 	dest->printf("  },\n");
 	dest->printf("  Resource = %d,\n", CurrentReplay->Resource);
 	dest->printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
-	dest->printf("  TileSet = %d,\n", CurrentReplay->TileSet);
+	dest->printf("  Difficulty = %d,\n", CurrentReplay->Difficulty);
 	dest->printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
 	dest->printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
 	dest->printf("  GameType = %d,\n", CurrentReplay->GameType);
 	dest->printf("  Opponents = %d,\n", CurrentReplay->Opponents);
+	dest->printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
 	dest->printf("  Engine = { %d, %d, %d },\n",
 		CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
 	dest->printf("  Network = { %d, %d, %d }\n",
@@ -663,8 +667,8 @@ static int CclReplayLog(lua_State *l)
 			replay->Resource = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NumUnits")) {
 			replay->NumUnits = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "TileSet")) {
-			replay->TileSet = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Difficulty")) {
+			replay->Difficulty = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NoFow")) {
 			replay->NoFow = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RevealMap")) {
@@ -673,6 +677,8 @@ static int CclReplayLog(lua_State *l)
 			replay->GameType = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Opponents")) {
 			replay->Opponents = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MapRichness")) {
+			replay->MapRichness = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
