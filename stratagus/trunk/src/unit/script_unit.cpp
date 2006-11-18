@@ -994,6 +994,10 @@ static int CclSetResourcesHeld(lua_State *l)
 
 	LuaCheckArgs(l, 2);
 
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
