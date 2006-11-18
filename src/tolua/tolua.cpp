@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 18 12:08:17 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 18 15:13:45 2006.
 */
 
 #ifndef __cplusplus
@@ -15481,31 +15481,31 @@ static int tolua_set_Settings_Opponents(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: Terrain of class  Settings */
-#ifndef TOLUA_DISABLE_tolua_get_Settings_Terrain
-static int tolua_get_Settings_Terrain(lua_State* tolua_S)
+/* get function: Difficulty of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_Difficulty
+static int tolua_get_Settings_Difficulty(lua_State* tolua_S)
 {
   Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Terrain'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Difficulty'",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->Terrain);
+ tolua_pushnumber(tolua_S,(lua_Number)self->Difficulty);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: Terrain of class  Settings */
-#ifndef TOLUA_DISABLE_tolua_set_Settings_Terrain
-static int tolua_set_Settings_Terrain(lua_State* tolua_S)
+/* set function: Difficulty of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_Difficulty
+static int tolua_set_Settings_Difficulty(lua_State* tolua_S)
 {
   Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Terrain'",NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Difficulty'",NULL);
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->Terrain = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->Difficulty = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -15596,6 +15596,36 @@ static int tolua_set_Settings_RevealMap(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->RevealMap = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MapRichness of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_MapRichness
+static int tolua_get_Settings_MapRichness(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapRichness'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MapRichness);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MapRichness of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_MapRichness
+static int tolua_set_Settings_MapRichness(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapRichness'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MapRichness = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -16986,10 +17016,11 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Resources",tolua_get_Settings_Resources,tolua_set_Settings_Resources);
   tolua_variable(tolua_S,"NumUnits",tolua_get_Settings_NumUnits,tolua_set_Settings_NumUnits);
   tolua_variable(tolua_S,"Opponents",tolua_get_Settings_Opponents,tolua_set_Settings_Opponents);
-  tolua_variable(tolua_S,"Terrain",tolua_get_Settings_Terrain,tolua_set_Settings_Terrain);
+  tolua_variable(tolua_S,"Difficulty",tolua_get_Settings_Difficulty,tolua_set_Settings_Difficulty);
   tolua_variable(tolua_S,"GameType",tolua_get_Settings_GameType,tolua_set_Settings_GameType);
   tolua_variable(tolua_S,"NoFogOfWar",tolua_get_Settings_NoFogOfWar,tolua_set_Settings_NoFogOfWar);
   tolua_variable(tolua_S,"RevealMap",tolua_get_Settings_RevealMap,tolua_set_Settings_RevealMap);
+  tolua_variable(tolua_S,"MapRichness",tolua_get_Settings_MapRichness,tolua_set_Settings_MapRichness);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"GameSettings",tolua_get_GameSettings,tolua_set_GameSettings);
  tolua_cclass(tolua_S,"CMapInfo","CMapInfo","",NULL);

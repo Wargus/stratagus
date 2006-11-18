@@ -46,10 +46,11 @@ class Settings {
 	int Resources;
 	int NumUnits;
 	int Opponents;
-	int Terrain;
+	int Difficulty;
 	int GameType;
 	bool NoFogOfWar;
 	int RevealMap;
+	int MapRichness;
 };
 
 extern Settings GameSettings;
