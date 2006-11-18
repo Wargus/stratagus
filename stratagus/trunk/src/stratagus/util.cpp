@@ -141,7 +141,7 @@ unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 	if (dst == NULL || src == NULL || dstsize == 0) {
 		return EINVAL;
 	}
-	int mincount = strlen(src);
+	size_t mincount = strnlen(src, count);
 	if (mincount > count) {
 		mincount = count;
 	}
@@ -153,7 +153,7 @@ unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 			mincount = dstsize - 1;
 		}
 	}
-	for (int i = 0; i < mincount; ++i) {
+	for (size_t i = 0; i < mincount; ++i) {
 		*dst++ = *src++;
 	}
 	*dst = '\0';
@@ -166,13 +166,15 @@ unsigned int strcat_s(char *dst, size_t dstsize, const char *src)
 		return EINVAL;
 	}
 	char *enddst = dst;
-	while (enddst - dst < dstsize && *enddst != '\0') {
+	size_t count = dstsize;
+	while (count > 0 && *enddst != '\0') {
 		++enddst;
+		count--;
 	}
-	if (enddst - dst >= dstsize) {
+	if (count == 0) {
 		return EINVAL;
 	}
-	if (strlen(src) + (enddst - dst) >= dstsize) {
+	if (strlen(src) + count >= dstsize) {
 		return ERANGE;
 	}
 	strcpy(enddst, src);
