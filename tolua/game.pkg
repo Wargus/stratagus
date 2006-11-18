@@ -25,3 +25,27 @@ GameResults GameResult;
 $void StopGame(GameResults result);
 void StopGame(GameResults result);
 
+
+$#include "settings.h"
+
+struct SettingsPresets {
+	int Race;
+	int Team;
+	int Type;
+};
+
+class Settings {
+	int NetGameType;
+
+	SettingsPresets Presets[PlayerMax];
+
+	int Resources;
+	int NumUnits;
+	int Opponents;
+	int Terrain;
+	int GameType;
+	bool NoFogOfWar;
+	int RevealMap;
+};
+
+extern Settings GameSettings;
