@@ -47,6 +47,12 @@ class CMap;
 --  Settings  __WIP__
 ----------------------------------------------------------------------------*/
 
+struct SettingsPresets {
+	int Race;  /// Race of the player
+	int Team;  /// Team of player -- NOT SELECTABLE YET
+	int Type;  /// Type of player (for network games)
+};
+
 /**
 **  Settings structure
 **
@@ -62,11 +68,7 @@ public:
 
 //  Individual presets:
 //  For single-player game only Presets[0] will be used..
-	struct {
-		int Race;  /// Race of the player
-		int Team;  /// Team of player -- NOT SELECTABLE YET
-		int Type;  /// Type of player (for network games)
-	} Presets[PlayerMax];
+	SettingsPresets Presets[PlayerMax];
 
 //  Common settings:
 	int Resources;   /// Preset resource factor
