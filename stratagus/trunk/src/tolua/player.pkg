@@ -14,6 +14,9 @@ class CPlayer
 	
 	int Type;
 
+	int StartX;
+	int StartY;
+
 	int Resources[MaxCosts];
 	int Incomes[MaxCosts];
 	const int Revenue[MaxCosts];
