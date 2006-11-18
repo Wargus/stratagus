@@ -230,15 +230,20 @@ void CVideo::ClearScreen(void)
 
 /**
 **  Resize the video screen.
+**
+**  @return  True if the resolution changed, false otherwise
 */
-void CVideo::ResizeScreen(int w, int h)
+bool CVideo::ResizeScreen(int w, int h)
 {
-	Width = w;
-	Height = h;
-	SDL_InitSubSystem(SDL_INIT_VIDEO);
-	TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,
-		TheScreen->flags);
-	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+	if (VideoValidResolution(w, h)) {
+		Width = w;
+		Height = h;
+		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,
+			TheScreen->flags);
+		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+		return true;
+	}
+	return false;
 }
 
 /**
