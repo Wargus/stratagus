@@ -745,15 +745,13 @@ void CreateGame(const char *filename, CMap *map)
 */
 void InitSettings(void)
 {
-	int i;
-
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].Race = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Type = SettingsPresetMapDefault;
 	}
-	GameSettings.Resources = SettingsResourcesMapDefault;
-	GameSettings.NumUnits = SettingsNumUnitsMapDefault;
+	GameSettings.Resources = SettingsPresetMapDefault;
+	GameSettings.NumUnits = SettingsPresetMapDefault;
 	GameSettings.Opponents = SettingsPresetMapDefault;
 	GameSettings.Terrain = SettingsPresetMapDefault;
 	GameSettings.GameType = SettingsPresetMapDefault;

@@ -1989,7 +1989,7 @@ void CEditor::Init(void)
 				Map.Tileset.Table[0x50];
 			Map.Fields[i].Flags = Map.Tileset.FlagsTable[0x50];
 		}
-		GameSettings.Resources = SettingsResourcesMapDefault;
+		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame(NULL, &Map);
 	} else {
 		CreateGame(CurrentMapPath, &Map);
