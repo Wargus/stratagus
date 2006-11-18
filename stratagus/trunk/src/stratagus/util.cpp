@@ -136,20 +136,32 @@ unsigned int strcpy_s(char *dst, size_t dstsize, const char *src)
 	return 0;
 }
 
+#ifdef __MINGW32__
+static size_t strnlen(const char *str, size_t strsize)
+{
+	size_t len = 0;
+	while (len < strsize) {
+		if (*str == '\0') {
+			break;
+		}
+		++str;
+		++len;
+	}
+	return len;
+}
+#endif
+
 unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 {
 	if (dst == NULL || src == NULL || dstsize == 0) {
 		return EINVAL;
 	}
-	size_t mincount;
-	if (count == _TRUNCATE)
-	   // UNSAFE, but cant do better in this case !
-	   mincount = strlen(src);
-	else
-	   mincount = strnlen(src, count);
 
-	if (mincount > count) {
-		mincount = count;
+	size_t mincount;
+	if (count == _TRUNCATE) {
+	   mincount = strnlen(src, dstsize);
+	} else {
+	   mincount = strnlen(src, count);
 	}
 	if (mincount >= dstsize) {
 		if (count != _TRUNCATE) {
