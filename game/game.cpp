@@ -540,25 +540,7 @@ void CreateGame(const char *filename, CMap *map)
 	}
 
 	for (i = 0; i < PlayerMax; ++i) {
-		int playertype;
-		int aiopps;
-
-		playertype = Map.Info.PlayerType[i];
-		aiopps = 0;
-		// Single player games only:
-		// ARI: FIXME: convert to a preset array to share with network game code
-		if (GameSettings.Opponents != SettingsPresetMapDefault) {
-			if (playertype == PlayerPerson && ThisPlayer != NULL) {
-				playertype = PlayerComputer;
-			}
-			if (playertype == PlayerComputer) {
-				if (aiopps < GameSettings.Opponents) {
-					++aiopps;
-				} else {
-					playertype = PlayerNobody;
-				}
-			}
-		}
+		int playertype = Map.Info.PlayerType[i];
 		// Network games only:
 		if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
 			playertype = GameSettings.Presets[i].Type;
