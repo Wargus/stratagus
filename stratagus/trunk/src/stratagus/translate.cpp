@@ -94,7 +94,7 @@ void LoadPO(const char *file)
 		return;
 	}
 
-	LibraryFileName(file, fullfile);
+	LibraryFileName(file, fullfile, sizeof(fullfile));
 	fd = fopen(fullfile, "rb");
 	if (!fd) {
 		fprintf(stderr, "Could not open file: %s\n", file);

@@ -232,15 +232,13 @@ static FullReplay *StartReplay(void)
 */
 static void ApplyReplaySettings(void)
 {
-	int i;
-
 	if (CurrentReplay->Type == ReplayMultiPlayer) {
 		ExitNetwork1();
 		NetPlayers = 2;
 		GameSettings.NetGameType = SettingsMultiPlayerGame;
 
 		ReplayGameType = ReplayMultiPlayer;
-		for (i = 0; i < PlayerMax; ++i) {
+		for (int i = 0; i < PlayerMax; ++i) {
 			GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 			GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 			GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
@@ -253,7 +251,11 @@ static void ApplyReplaySettings(void)
 		ReplayGameType = ReplaySinglePlayer;
 	}
 
-	strcpy(CurrentMapPath, CurrentReplay->MapPath);
+	if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), CurrentReplay->MapPath) != 0) {
+		fprintf(stderr, "Replay map path is too long\n");
+		// FIXME: need to handle errors better
+		Exit(1);
+	}
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
 	GameSettings.Terrain = CurrentReplay->TileSet;
@@ -442,17 +444,17 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		char logsdir[PATH_MAX];
 
 #ifdef USE_WIN32
-		strcpy(logsdir, GameName);
+		strcpy_s(logsdir, sizeof(logsdir), GameName);
 		mkdir(logsdir);
-		strcat(logsdir, "/logs");
+		strcat_s(logsdir, sizeof(logsdir), "/logs");
 		mkdir(logsdir);
 #else
 		sprintf(logsdir, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
 		mkdir(logsdir, 0777);
-		strcat(logsdir, "/");
-		strcat(logsdir, GameName);
+		strcat_s(logsdir, sizeof(logsdir), "/");
+		strcat_s(logsdir, sizeof(logsdir), GameName);
 		mkdir(logsdir, 0777);
-		strcat(logsdir, "/logs");
+		strcat_s(logsdir, sizeof(logsdir), "/logs");
 		mkdir(logsdir, 0777);
 #endif
 
