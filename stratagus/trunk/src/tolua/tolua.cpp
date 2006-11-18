@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov  5 22:27:14 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Nov 17 19:34:02 2006.
 */
 
 #ifndef __cplusplus
@@ -43,6 +43,7 @@ void StartReplay(const char *str, bool reveal = false);
 void StartSavedGame(const char *str);
 #include "results.h"
 void StopGame(GameResults result);
+#include "settings.h"
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -236,6 +237,13 @@ static int tolua_collect_StatBoxWidget (lua_State* tolua_S)
  return 0;
 }
 
+static int tolua_collect_SettingsPresets (lua_State* tolua_S)
+{
+ SettingsPresets* self = (SettingsPresets*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
 static int tolua_collect_RadioButton (lua_State* tolua_S)
 {
  RadioButton* self = (RadioButton*) tolua_tousertype(tolua_S,1,0);
@@ -277,67 +285,69 @@ static int tolua_collect_Slider (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CPlayerColorGraphic");
- tolua_usertype(tolua_S,"CMap");
- tolua_usertype(tolua_S,"LuaActionListener");
- tolua_usertype(tolua_S,"ImageRadioButton");
- tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"MenuScreen");
+ tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"vector<CUIButton>");
- tolua_usertype(tolua_S,"CEditor");
- tolua_usertype(tolua_S,"CPreference");
  tolua_usertype(tolua_S,"CFontColor");
- tolua_usertype(tolua_S,"Window");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"gcn::Graphics");
- tolua_usertype(tolua_S,"vector<CFiller>");
+ tolua_usertype(tolua_S,"CMap");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"CMapInfo");
- tolua_usertype(tolua_S,"TextField");
- tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CUIButton");
- tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
- tolua_usertype(tolua_S,"ImageWidget");
+ tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
- tolua_usertype(tolua_S,"NetworkHost");
  tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
- tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"MenuScreen");
- tolua_usertype(tolua_S,"CMinimap");
- tolua_usertype(tolua_S,"ListBox");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
- tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"DropDownWidget");
- tolua_usertype(tolua_S,"CFiller");
  tolua_usertype(tolua_S,"CheckboxStyle");
  tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"ScrollArea");
- tolua_usertype(tolua_S,"Button");
- tolua_usertype(tolua_S,"DropDown");
- tolua_usertype(tolua_S,"CInfoPanel");
- tolua_usertype(tolua_S,"Container");
- tolua_usertype(tolua_S,"ButtonWidget");
  tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"CVideo");
- tolua_usertype(tolua_S,"ImageCheckBox");
+ tolua_usertype(tolua_S,"CInfoPanel");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"StatBoxWidget");
- tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"BasicContainer");
- tolua_usertype(tolua_S,"vector<string>");
- tolua_usertype(tolua_S,"CResourceInfo");
  tolua_usertype(tolua_S,"CUITimer");
- tolua_usertype(tolua_S,"RadioButton");
- tolua_usertype(tolua_S,"ImageButton");
  tolua_usertype(tolua_S,"Widget");
+ tolua_usertype(tolua_S,"Label");
+ tolua_usertype(tolua_S,"Settings");
+ tolua_usertype(tolua_S,"CResourceInfo");
+ tolua_usertype(tolua_S,"vector<CFiller>");
+ tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"CMapInfo");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"MultiLineLabel");
+ tolua_usertype(tolua_S,"ImageWidget");
+ tolua_usertype(tolua_S,"SettingsPresets");
+ tolua_usertype(tolua_S,"gcn::Graphics");
+ tolua_usertype(tolua_S,"NetworkHost");
+ tolua_usertype(tolua_S,"CStatusLine");
+ tolua_usertype(tolua_S,"ListBox");
+ tolua_usertype(tolua_S,"Window");
+ tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"CFiller");
+ tolua_usertype(tolua_S,"vector<string>");
+ tolua_usertype(tolua_S,"CUpgrade");
+ tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"ButtonWidget");
+ tolua_usertype(tolua_S,"CVideo");
+ tolua_usertype(tolua_S,"ImageCheckBox");
+ tolua_usertype(tolua_S,"CFont");
+ tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"ImageRadioButton");
+ tolua_usertype(tolua_S,"CEditor");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"CMapArea");
+ tolua_usertype(tolua_S,"RadioButton");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"Button");
+ tolua_usertype(tolua_S,"DropDown");
  tolua_usertype(tolua_S,"Slider");
 }
 
@@ -15076,6 +15086,412 @@ static int tolua_stratagus_StopGame00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Race of class  SettingsPresets */
+#ifndef TOLUA_DISABLE_tolua_get_SettingsPresets_Race
+static int tolua_get_SettingsPresets_Race(lua_State* tolua_S)
+{
+  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Race'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Race);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Race of class  SettingsPresets */
+#ifndef TOLUA_DISABLE_tolua_set_SettingsPresets_Race
+static int tolua_set_SettingsPresets_Race(lua_State* tolua_S)
+{
+  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Race'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Race = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Team of class  SettingsPresets */
+#ifndef TOLUA_DISABLE_tolua_get_SettingsPresets_Team
+static int tolua_get_SettingsPresets_Team(lua_State* tolua_S)
+{
+  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Team'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Team);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Team of class  SettingsPresets */
+#ifndef TOLUA_DISABLE_tolua_set_SettingsPresets_Team
+static int tolua_set_SettingsPresets_Team(lua_State* tolua_S)
+{
+  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Team'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Team = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Type of class  SettingsPresets */
+#ifndef TOLUA_DISABLE_tolua_get_SettingsPresets_Type
+static int tolua_get_SettingsPresets_Type(lua_State* tolua_S)
+{
+  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Type'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Type);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Type of class  SettingsPresets */
+#ifndef TOLUA_DISABLE_tolua_set_SettingsPresets_Type
+static int tolua_set_SettingsPresets_Type(lua_State* tolua_S)
+{
+  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Type'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Type = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: NetGameType of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_NetGameType
+static int tolua_get_Settings_NetGameType(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'NetGameType'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->NetGameType);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: NetGameType of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_NetGameType
+static int tolua_set_Settings_NetGameType(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'NetGameType'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->NetGameType = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Presets of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_Settings_Presets
+static int tolua_get_stratagus_Settings_Presets(lua_State* tolua_S)
+{
+ int tolua_index;
+  Settings* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (Settings*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=PlayerMax)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushusertype(tolua_S,(void*)&self->Presets[tolua_index],"SettingsPresets");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Presets of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_Settings_Presets
+static int tolua_set_stratagus_Settings_Presets(lua_State* tolua_S)
+{
+ int tolua_index;
+  Settings* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (Settings*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+ tolua_Error tolua_err;
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=PlayerMax)
+ tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->Presets[tolua_index] = *((SettingsPresets*)  tolua_tousertype(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Resources of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_Resources
+static int tolua_get_Settings_Resources(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Resources'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Resources);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Resources of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_Resources
+static int tolua_set_Settings_Resources(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Resources'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Resources = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: NumUnits of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_NumUnits
+static int tolua_get_Settings_NumUnits(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'NumUnits'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->NumUnits);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: NumUnits of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_NumUnits
+static int tolua_set_Settings_NumUnits(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'NumUnits'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->NumUnits = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Opponents of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_Opponents
+static int tolua_get_Settings_Opponents(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Opponents'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Opponents);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Opponents of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_Opponents
+static int tolua_set_Settings_Opponents(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Opponents'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Opponents = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Terrain of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_Terrain
+static int tolua_get_Settings_Terrain(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Terrain'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Terrain);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Terrain of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_Terrain
+static int tolua_set_Settings_Terrain(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Terrain'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Terrain = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: GameType of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_GameType
+static int tolua_get_Settings_GameType(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GameType'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->GameType);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameType of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_GameType
+static int tolua_set_Settings_GameType(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GameType'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->GameType = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: NoFogOfWar of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_NoFogOfWar
+static int tolua_get_Settings_NoFogOfWar(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'NoFogOfWar'",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)self->NoFogOfWar);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: NoFogOfWar of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_NoFogOfWar
+static int tolua_set_Settings_NoFogOfWar(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'NoFogOfWar'",NULL);
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->NoFogOfWar = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: RevealMap of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_get_Settings_RevealMap
+static int tolua_get_Settings_RevealMap(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RevealMap'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->RevealMap);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: RevealMap of class  Settings */
+#ifndef TOLUA_DISABLE_tolua_set_Settings_RevealMap
+static int tolua_set_Settings_RevealMap(lua_State* tolua_S)
+{
+  Settings* self = (Settings*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RevealMap'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->RevealMap = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: GameSettings */
+#ifndef TOLUA_DISABLE_tolua_get_GameSettings
+static int tolua_get_GameSettings(lua_State* tolua_S)
+{
+ tolua_pushusertype(tolua_S,(void*)&GameSettings,"Settings");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameSettings */
+#ifndef TOLUA_DISABLE_tolua_set_GameSettings
+static int tolua_set_GameSettings(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,2,"Settings",0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  GameSettings = *((Settings*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Description of class  CMapInfo */
 #ifndef TOLUA_DISABLE_tolua_get_CMapInfo_Description
 static int tolua_get_CMapInfo_Description(lua_State* tolua_S)
@@ -16415,6 +16831,29 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_constant(tolua_S,"GameRestart",GameRestart);
  tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
  tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
+#ifdef __cplusplus
+ tolua_cclass(tolua_S,"SettingsPresets","SettingsPresets","",tolua_collect_SettingsPresets);
+#else
+ tolua_cclass(tolua_S,"SettingsPresets","SettingsPresets","",NULL);
+#endif
+ tolua_beginmodule(tolua_S,"SettingsPresets");
+  tolua_variable(tolua_S,"Race",tolua_get_SettingsPresets_Race,tolua_set_SettingsPresets_Race);
+  tolua_variable(tolua_S,"Team",tolua_get_SettingsPresets_Team,tolua_set_SettingsPresets_Team);
+  tolua_variable(tolua_S,"Type",tolua_get_SettingsPresets_Type,tolua_set_SettingsPresets_Type);
+ tolua_endmodule(tolua_S);
+ tolua_cclass(tolua_S,"Settings","Settings","",NULL);
+ tolua_beginmodule(tolua_S,"Settings");
+  tolua_variable(tolua_S,"NetGameType",tolua_get_Settings_NetGameType,tolua_set_Settings_NetGameType);
+  tolua_array(tolua_S,"Presets",tolua_get_stratagus_Settings_Presets,tolua_set_stratagus_Settings_Presets);
+  tolua_variable(tolua_S,"Resources",tolua_get_Settings_Resources,tolua_set_Settings_Resources);
+  tolua_variable(tolua_S,"NumUnits",tolua_get_Settings_NumUnits,tolua_set_Settings_NumUnits);
+  tolua_variable(tolua_S,"Opponents",tolua_get_Settings_Opponents,tolua_set_Settings_Opponents);
+  tolua_variable(tolua_S,"Terrain",tolua_get_Settings_Terrain,tolua_set_Settings_Terrain);
+  tolua_variable(tolua_S,"GameType",tolua_get_Settings_GameType,tolua_set_Settings_GameType);
+  tolua_variable(tolua_S,"NoFogOfWar",tolua_get_Settings_NoFogOfWar,tolua_set_Settings_NoFogOfWar);
+  tolua_variable(tolua_S,"RevealMap",tolua_get_Settings_RevealMap,tolua_set_Settings_RevealMap);
+ tolua_endmodule(tolua_S);
+ tolua_variable(tolua_S,"GameSettings",tolua_get_GameSettings,tolua_set_GameSettings);
  tolua_cclass(tolua_S,"CMapInfo","CMapInfo","",NULL);
  tolua_beginmodule(tolua_S,"CMapInfo");
   tolua_variable(tolua_S,"Description",tolua_get_CMapInfo_Description,tolua_set_CMapInfo_Description);
