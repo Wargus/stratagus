@@ -191,7 +191,7 @@ int PlayMovie(const char *name)
 	int diff;
 	char buffer[PATH_MAX];
 
-	name = LibraryFileName(name, buffer);
+	name = LibraryFileName(name, buffer, sizeof(buffer));
 
 	if (f.open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);

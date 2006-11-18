@@ -10,7 +10,7 @@
 //
 /**@name util.cpp - General utilites. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include "stratagus.h"
 #include "util.h"
@@ -122,6 +123,63 @@ long isqrt(long num)
 --  Strings
 ----------------------------------------------------------------------------*/
 
+#if !defined(_MSC_VER) || _MSC_VER < 1400
+unsigned int strcpy_s(char *dst, size_t dstsize, const char *src)
+{
+	if (dst == NULL || src == NULL) {
+		return EINVAL;
+	}
+	if (strlen(src) >= dstsize) {
+		return ERANGE;
+	}
+	strcpy(dst, src);
+	return 0;
+}
+
+unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
+{
+	if (dst == NULL || src == NULL || dstsize == 0) {
+		return EINVAL;
+	}
+	int mincount = strlen(src);
+	if (mincount > count) {
+		mincount = count;
+	}
+	if (mincount >= dstsize) {
+		if (count != _TRUNCATE) {
+			dst[0] = '\0';
+			return EINVAL;
+		} else {
+			mincount = dstsize - 1;
+		}
+	}
+	for (int i = 0; i < mincount; ++i) {
+		*dst++ = *src++;
+	}
+	*dst = '\0';
+	return 0;
+}
+
+unsigned int strcat_s(char *dst, size_t dstsize, const char *src)
+{
+	if (dst == NULL || src == NULL) {
+		return EINVAL;
+	}
+	char *enddst = dst;
+	while (enddst - dst < dstsize && *enddst != '\0') {
+		++enddst;
+	}
+	if (enddst - dst >= dstsize) {
+		return EINVAL;
+	}
+	if (strlen(src) + (enddst - dst) >= dstsize) {
+		return ERANGE;
+	}
+	strcpy(enddst, src);
+	return 0;
+}
+#endif
+
 /**
 **  String duplicate/concatenate (two arguments)
 **
@@ -132,12 +190,12 @@ long isqrt(long num)
 */
 char *strdcat(const char *l, const char *r)
 {
-	char *res;
+	int len = strlen(l) + strlen(r) + 1;
+	char *res = new char[len];
 
-	res = new char[strlen(l) + strlen(r) + 1];
 	if (res) {
-		strcpy(res, l);
-		strcat(res, r);
+		strcpy_s(res, len, l);
+		strcat_s(res, len, r);
 	}
 	return res;
 }
@@ -153,13 +211,13 @@ char *strdcat(const char *l, const char *r)
 */
 char *strdcat3(const char *l, const char *m, const char *r)
 {
-	char *res;
+	int len = strlen(l) + strlen(m) + strlen(r) + 1;
+	char *res = new char[len];
 
-	res = new char[strlen(l) + strlen(m) + strlen(r) + 1];
 	if (res) {
-		strcpy(res, l);
-		strcat(res, m);
-		strcat(res, r);
+		strcpy_s(res, len, l);
+		strcat_s(res, len, m);
+		strcat_s(res, len, r);
 	}
 	return res;
 }

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Nov 17 22:47:11 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 18 12:08:17 2006.
 */
 
 #ifndef __cplusplus
@@ -34,7 +34,7 @@ using std::vector;
 using namespace gcn;
 #include "network.h"
 int GetNetworkState() {return (int)NetLocalState;}
-extern char NetworkMapName[1024];
+extern char NetworkMapName[256];
 void NetworkGamePrepareGameSettings(void);
 #include "editor.h"
 bool IsReplayGame();
@@ -11826,7 +11826,7 @@ static int tolua_set_NetworkMapName(lua_State* tolua_S)
  if (!tolua_isstring(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
- strncpy(NetworkMapName,tolua_tostring(tolua_S,2,0),1024-1);
+ strncpy(NetworkMapName,tolua_tostring(tolua_S,2,0),256-1);
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -12000,10 +12000,11 @@ static int tolua_stratagus_CVideo_ResizeScreen00(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeScreen'",NULL);
 #endif
  {
-  self->ResizeScreen(width,height);
+  bool tolua_ret = (bool)  self->ResizeScreen(width,height);
+ tolua_pushboolean(tolua_S,(bool)tolua_ret);
  }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ResizeScreen'.",&tolua_err);

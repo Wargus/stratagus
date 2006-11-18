@@ -325,7 +325,7 @@ static int CclLoad(lua_State *l)
 	char buf[1024];
 
 	LuaCheckArgs(l, 1);
-	LibraryFileName(LuaToString(l, 1), buf);
+	LibraryFileName(LuaToString(l, 1), buf, sizeof(buf));
 	if (LuaLoadFile(buf) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
 	}
@@ -346,7 +346,7 @@ static int CclLoadBuffer(lua_State *l)
 	int size;
 
 	LuaCheckArgs(l, 1);
-	LibraryFileName(LuaToString(l, 1), file);
+	LibraryFileName(LuaToString(l, 1), file, sizeof(file));
 	LuaLoadBuffer(file, &buf, &size);
 	if (buf) {
 		lua_pushstring(l, buf);
@@ -364,7 +364,6 @@ static int CclLoadBuffer(lua_State *l)
 static int CclSavedGameInfo(lua_State *l)
 {
 	const char *value;
-	char buf[1024];
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -376,15 +375,14 @@ static int CclSavedGameInfo(lua_State *l)
 		value = LuaToString(l, -2);
 
 		if (!strcmp(value, "SaveFile")) {
-			strcpy(CurrentMapPath, LuaToString(l, -1));
-			// If .pud, we don't need to load anything from it
-			if (!strcasestr(LuaToString(l, -1), ".pud")) {
-				strcpy(buf, StratagusLibPath);
-				strcat(buf, "/");
-				strcat(buf, LuaToString(l, -1));
-				if (LuaLoadFile(buf) == -1) {
-					DebugPrint("Load failed: %s\n" _C_ value);
-				}
+			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
+				LuaError(l, "SaveFile too long");
+			}
+			std::string buf = StratagusLibPath;
+			buf += "/";
+			buf += LuaToString(l, -1);
+			if (LuaLoadFile(buf.c_str()) == -1) {
+				DebugPrint("Load failed: %s\n" _C_ value);
 			}
 		} else if (!strcmp(value, "SyncHash")) {
 			SyncHash = LuaToNumber(l, -1);
@@ -2031,8 +2029,7 @@ static int CclSetLocalPlayerName(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	str = LuaToString(l, 1);
-	strncpy(LocalPlayerName, str, sizeof(LocalPlayerName) - 1);
-	LocalPlayerName[sizeof(LocalPlayerName) - 1] = '\0';
+	strncpy_s(LocalPlayerName, sizeof(LocalPlayerName), str, _TRUNCATE);
 	return 0;
 }
 
@@ -2502,16 +2499,16 @@ void SavePreferences(void)
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
 #ifdef USE_WIN32
-		strcpy(buf, GameName);
+		strcpy_s(buf, sizeof(buf), GameName);
 		mkdir(buf);
-		strcat(buf, "/preferences.lua");
+		strcat_s(buf, sizeof(buf), "/preferences.lua");
 #else
 		sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
 		mkdir(buf, 0777);
-		strcat(buf, "/");
-		strcat(buf, GameName);
+		strcat_s(buf, sizeof(buf), "/");
+		strcat_s(buf, sizeof(buf), GameName);
 		mkdir(buf, 0777);
-		strcat(buf, "/preferences.lua");
+		strcat_s(buf, sizeof(buf), "/preferences.lua");
 #endif
 
 		fd = fopen(buf, "w");
@@ -2539,7 +2536,7 @@ void LoadCcl(void)
 	//  Load and evaluate configuration file
 	//
 	CclInConfigFile = 1;
-	file = LibraryFileName(CclStartFile, buf);
+	file = LibraryFileName(CclStartFile, buf, sizeof(buf));
 	if (access(buf, R_OK)) {
 		printf("Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);

@@ -299,7 +299,7 @@ int Mng::Load(const char *name)
 	mng_retcode myretcode;
 	char buf[PATH_MAX];
 
-	LibraryFileName(name, buf);
+	LibraryFileName(name, buf, sizeof(buf));
 
 	this->name = new_strdup(buf);
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);

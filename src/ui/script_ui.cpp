@@ -1483,13 +1483,14 @@ static int CclDefineButton(lua_State *l)
 				lua_rawgeti(l, -1, k + 1);
 				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
-				char *news1 = new char[strlen(s1) + strlen(s2) + 2];
-				strcpy(news1, s1);
-				strcat(news1, s2);
+				int news1len = strlen(s1) + strlen(s2) + 2;
+				char *news1 = new char[news1len];
+				strcpy_s(news1, news1len, s1);
+				strcat_s(news1, news1len, s2);
 				delete[] s1;
 				s1 = news1;
 				if (k != subargs - 1) {
-					strcat(s1, ",");
+					strcat_s(s1, news1len, ",");
 				}
 			}
 			ba.AllowStr = s1;
@@ -1511,10 +1512,11 @@ static int CclDefineButton(lua_State *l)
 				lua_rawgeti(l, -1, k + 1);
 				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
-				char *news1 = new char[strlen(s1) + strlen(s2) + 2];
-				strcpy(news1, s1);
-				strcat(news1, s2);
-				strcat(news1, ",");
+				int news1len = strlen(s1) + strlen(s2) + 2;
+				char *news1 = new char[news1len];
+				strcpy_s(news1, news1len, s1);
+				strcat_s(news1, news1len, s2);
+				strcat_s(news1, news1len, ",");
 				delete[] s1;
 				s1 = news1;
 			}

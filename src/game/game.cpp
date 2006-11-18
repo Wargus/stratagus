@@ -99,35 +99,35 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 	CFile file;
 
 	// Try the same directory as the smp file first
-	strcpy(mapfull, smpname);
+	strcpy_s(mapfull, sizeof(mapfull), smpname);
 	char *p = strrchr(mapfull, '/');
 	if (!p) {
 		p = mapfull;
 	} else {
 		++p;
 	}
-	strcpy(p, mapname);
+	strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname);
 
 	if (file.open(mapfull, CL_OPEN_READ) == -1) {
 		// Not found, try StratagusLibPath and the smp's dir
-		strcpy(mapfull, StratagusLibPath);
-		strcat(mapfull, "/");
-		strcat(mapfull, smpname);
+		strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath);
+		strcat_s(mapfull, sizeof(mapfull), "/");
+		strcat_s(mapfull, sizeof(mapfull), smpname);
 		char *p = strrchr(mapfull, '/');
 		if (!p) {
 			p = mapfull;
 		} else {
 			++p;
 		}
-		strcpy(p, mapname);
+		strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname);
 		if (file.open(mapfull, CL_OPEN_READ) == -1) {
 			// Not found again, try StratagusLibPath
-			strcpy(mapfull, StratagusLibPath);
-			strcat(mapfull, "/");
-			strcat(mapfull, mapname);
+			strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath);
+			strcat_s(mapfull, sizeof(mapfull), "/");
+			strcat_s(mapfull, sizeof(mapfull), mapname);
 			if (file.open(mapfull, CL_OPEN_READ) == -1) {
 				// Not found, try mapname by itself as a last resort
-				strcpy(mapfull, mapname);
+				strcpy_s(mapfull, sizeof(mapfull), mapname);
 			} else {
 				file.close();
 			}
@@ -314,7 +314,7 @@ int SaveStratagusMap(const char *mapname, CMap *map, int writeTerrain)
 		ExitFatal(-1);
 	}
 
-	strcpy(mapsetup, mapname);
+	strcpy_s(mapsetup, sizeof(mapsetup), mapname);
 	extension = strstr(mapsetup, ".smp");
 	if (!extension) {
 		fprintf(stderr, "%s: invalid Statagus map filename\n", mapname);
@@ -533,7 +533,7 @@ void CreateGame(const char *filename, CMap *map)
 		char path[PATH_MAX];
 		
 		Assert(filename);
-		LibraryFileName(filename, path);
+		LibraryFileName(filename, path, sizeof(path));
 		if(strcasestr(filename, ".smp")) {
 			LuaLoadFile(path);
 		}
@@ -549,11 +549,8 @@ void CreateGame(const char *filename, CMap *map)
 	}
 
 	if (filename) {
-		// FIXME: LibraryFile here?
 		if (CurrentMapPath != filename) {
-			//  strcpy is not safe if parameters overlap.
-			//  Or at least this is what valgrind says.
-			strcpy(CurrentMapPath, filename);
+			strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename);
 		}
 
 		//

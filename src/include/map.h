@@ -364,7 +364,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern CMap Map;  /// The current map
-extern char CurrentMapPath[]; /// Path to the current map
+extern char CurrentMapPath[1024]; /// Path to the current map
 
 	/// Vision Table to see where to locate goals and vision
 extern unsigned char *VisionTable[3];

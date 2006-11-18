@@ -144,7 +144,7 @@ enum {
 ----------------------------------------------------------------------------*/
 
 	/// Build libary path name
-extern char *LibraryFileName(const char *file, char *buffer);
+extern char *LibraryFileName(const char *file, char *buffer, size_t buffersize);
 
 	/// Read the contents of a directory
 extern int ReadDataDirectory(const char *dirname, int (*filter)(char*, FileList *),
