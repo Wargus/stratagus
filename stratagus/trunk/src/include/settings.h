@@ -44,7 +44,7 @@ class CMap;
 
 
 /*----------------------------------------------------------------------------
---  Settings  __WIP__
+--  Settings
 ----------------------------------------------------------------------------*/
 
 struct SettingsPresets {
@@ -62,8 +62,7 @@ struct SettingsPresets {
 **  simplifies load/save/reinitialization, etc...
 **
 */
-class Settings {
-public:
+struct Settings {
 	int NetGameType;   /// Multiplayer or single player
 
 //  Individual presets:
@@ -87,20 +86,6 @@ public:
 */
 #define SettingsSinglePlayerGame  1
 #define SettingsMultiPlayerGame   2
-
-/**
-**  Resource-Preset factor
-*/
-#define SettingsResourcesMapDefault  SettingsPresetMapDefault
-#define SettingsResourcesLow     0
-#define SettingsResourcesMedium  1
-#define SettingsResourcesHigh    2
-
-/**
-**  NumUnits start settings
-*/
-#define SettingsNumUnitsMapDefault  SettingsPresetMapDefault
-#define SettingsNumUnits1    0
 
 /**
 **  GameType settings
