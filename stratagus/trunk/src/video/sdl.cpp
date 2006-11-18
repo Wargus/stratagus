@@ -751,6 +751,10 @@ void ToggleFullScreen(void)
 	h = TheScreen->h;
 	bpp = TheScreen->format->BitsPerPixel;
 
+	if (!SDL_VideoModeOK(w, h, bpp,	flags ^ SDL_FULLSCREEN)) {
+		return;
+	}
+
 	SDL_GetClipRect(TheScreen, &clip);
 
 	// save the contents of the screen.
