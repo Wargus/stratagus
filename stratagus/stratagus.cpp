@@ -525,7 +525,7 @@ void MenuLoop(const char *filename, CMap *map)
 			if (Editor.Running) {
 				SetupEditor();
 			}
-			strcpy(CurrentMapPath, filename);
+			strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename);
 		}
 		if (IsNetworkGame() && NetPlayers < 2) {
 			GameSettings.Presets[0].Race = GameSettings.Presets[Hosts[0].PlyNr].Race;
@@ -593,7 +593,7 @@ static int MenuLoop(const char *filename, CMap *map)
 	GameCursor = UI.Point.Cursor;
 
 	// FIXME delete this when switching to full guichan GUI
-	LibraryFileName("scripts/guichan.lua", buf);
+	LibraryFileName("scripts/guichan.lua", buf, sizeof(buf));
 	status = LuaLoadFile(buf);
 	if (status == 0) {
 		CleanModules();
@@ -922,12 +922,12 @@ int main(int argc, char **argv)
 	//  Default player name to username on unix systems.
 	memset(LocalPlayerName, 0, sizeof(LocalPlayerName));
 #ifdef USE_WIN32
-	strcpy(LocalPlayerName, "Anonymous");
+	strcpy_s(LocalPlayerName, sizeof(LocalPlayerName), "Anonymous");
 #else
 	if (getenv("USER")) {
 		strncpy(LocalPlayerName, getenv("USER"), sizeof(LocalPlayerName) - 1);
 	} else {
-		strcpy(LocalPlayerName, "Anonymous");
+		strcpy_s(LocalPlayerName, sizeof(LocalPlayerName), "Anonymous");
 	}
 #endif
 
@@ -965,8 +965,7 @@ int main(int argc, char **argv)
 				NetworkArg = new_strdup(optarg);
 				continue;
 			case 'N':
-				memset(LocalPlayerName, 0, sizeof(LocalPlayerName));
-				strncpy(LocalPlayerName, optarg, sizeof(LocalPlayerName) - 1);
+				strncpy_s(LocalPlayerName, sizeof(LocalPlayerName), optarg, _TRUNCATE);
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);

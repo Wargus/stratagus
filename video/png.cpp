@@ -111,7 +111,7 @@ int LoadGraphicPNG(CGraphic *g)
 		return -1;
 	}
 
-	LibraryFileName(g->File, name);
+	LibraryFileName(g->File, name, sizeof(name));
 	if (!name) {
 		return -1;
 	}

@@ -134,11 +134,13 @@
 ============================================================================*/
 
 #include <string.h>
+#include "util.h"
 
 inline char *new_strdup(const char *str)
 {
-	char *newstr = new char[strlen(str) + 1];
-	strcpy(newstr, str);
+	int len = strlen(str) + 1;
+	char *newstr = new char[len];
+	strcpy_s(newstr, len, str);
 	return newstr;
 }
 

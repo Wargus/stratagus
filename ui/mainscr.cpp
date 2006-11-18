@@ -803,7 +803,7 @@ static void ShiftMessages(void)
 	if (MessagesCount) {
 		--MessagesCount;
 		for (int z = 0; z < MessagesCount; ++z) {
-			strcpy(Messages[z], Messages[z + 1]);
+			strcpy_s(Messages[z], sizeof(Messages[z]), Messages[z + 1]);
 		}
 	}
 }
@@ -818,7 +818,7 @@ static void ShiftMessagesEvent(void)
 		for (int z = 0; z < MessagesEventCount; ++z) {
 			MessagesEventX[z] = MessagesEventX[z + 1];
 			MessagesEventY[z] = MessagesEventY[z + 1];
-			strcpy(MessagesEvent[z], MessagesEvent[z + 1]);
+			strcpy_s(MessagesEvent[z], sizeof(MessagesEvent[z]), MessagesEvent[z + 1]);
 		}
 	}
 }
@@ -912,7 +912,7 @@ static void AddMessage(const char *msg)
 			ptr = next - 1;
 		}
 	} else {
-		strcpy(message, msg);
+		strcpy_s(message, sizeof(Messages[MessagesCount]), msg);
 		next = ptr = message + strlen(message);
 	}
 
@@ -1022,7 +1022,7 @@ void SetMessageEvent(int x, int y, const char *fmt, ...)
 	}
 
 	if (x != -1) {
-		strcpy(MessagesEvent[MessagesEventCount], temp);
+		strcpy_s(MessagesEvent[MessagesEventCount], sizeof(MessagesEvent[MessagesEventCount]), temp);
 		MessagesEventX[MessagesEventCount] = x;
 		MessagesEventY[MessagesEventCount] = y;
 		MessagesEventIndex = MessagesEventCount;

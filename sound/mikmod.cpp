@@ -213,7 +213,7 @@ CSample *LoadMikMod(const char *name, int flags)
 		registered = 1;
 	}
 
-	strcpy(s, name);
+	strcpy_s(s, sizeof(s), name);
 	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		delete f;

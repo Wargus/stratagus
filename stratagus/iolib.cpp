@@ -141,11 +141,11 @@ int CFile::open(const char *name, long openflags)
 	char openstring[5];
 
 	if ((openflags & CL_OPEN_READ) && (openflags & CL_OPEN_WRITE)) {
-		strcpy(openstring, "rwb");
+		strcpy_s(openstring, sizeof(openstring), "rwb");
 	} else if (openflags &CL_OPEN_READ) {
-		strcpy(openstring, "rb");
+		strcpy_s(openstring, sizeof(openstring), "rb");
 	} else if (openflags & CL_OPEN_WRITE) {
-		strcpy(openstring,"wb");
+		strcpy_s(openstring,sizeof(openstring), "wb");
 	} else {
 		DebugPrint("Bad CLopen flags");
 		Assert(0);
@@ -458,7 +458,7 @@ long CFile::tell()
 **              is replaced by the full filename witht he correct extension.
 **  @return 1 if the file has been found.
 **/
-static int FindFileWithExtension(char *file)
+static int FindFileWithExtension(char *file, size_t filesize)
 {
 	char buf[PATH_MAX];
 
@@ -468,14 +468,14 @@ static int FindFileWithExtension(char *file)
 #ifdef USE_ZLIB // gzip or bzip2 in global shared directory
 	sprintf(buf, "%s.gz", file);
 	if (!access(buf, R_OK)) {
-		strcpy(file, buf);
+		strcpy_s(file, filesize, buf);
 		return 1;
 	}
 #endif
 #ifdef USE_BZ2LIB
 	sprintf(buf, "%s.bz2", file);
 	if (!access(buf, R_OK)) {
-		strcpy(file, buf);
+		strcpy_s(file, filesize, buf);
 		return 1;
 	}
 #endif
@@ -494,39 +494,39 @@ static int FindFileWithExtension(char *file)
 **
 **  @return Pointer to buffer.
 */
-char *LibraryFileName(const char *file, char *buffer)
+char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 {
 	char *s;
 
 	// Absolute path or in current directory.
-	strcpy(buffer, file);
+	strcpy_s(buffer, buffersize, file);
 	if (*buffer == '/') {
 		return buffer;
 	}
-	if (FindFileWithExtension(buffer)) {
+	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
 
 	// Try in map directory
 	if (*CurrentMapPath) {
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
-			strcpy(buffer, CurrentMapPath);
+			strcpy_s(buffer, buffersize, CurrentMapPath);
 			if ((s = strrchr(buffer, '/'))) {
 				s[1] = '\0';
 			}
-			strcat(buffer, file);
+			strcat_s(buffer, buffersize, file);
 		} else {
-			strcpy(buffer, StratagusLibPath);
+			strcpy_s(buffer, buffersize, StratagusLibPath);
 			if (*buffer) {
-				strcat(buffer, "/");
+				strcat_s(buffer, buffersize, "/");
 			}
-			strcat(buffer, CurrentMapPath);
+			strcat_s(buffer, buffersize, CurrentMapPath);
 			if ((s = strrchr(buffer, '/'))) {
 				s[1] = '\0';
 			}
-			strcat(buffer, file);
+			strcat_s(buffer, buffersize, file);
 		}
-		if (FindFileWithExtension(buffer)) {
+		if (FindFileWithExtension(buffer, buffersize)) {
 			return buffer;
 		}
 	}
@@ -535,7 +535,7 @@ char *LibraryFileName(const char *file, char *buffer)
 	//  In user home directory
 	if (GameName) {
 		sprintf(buffer, "%s/%s", GameName, file);
-		if (FindFileWithExtension(buffer)) {
+		if (FindFileWithExtension(buffer, buffersize)) {
 			return buffer;
 		}
 	}
@@ -544,14 +544,14 @@ char *LibraryFileName(const char *file, char *buffer)
 	//  In user home directory
 	if ((s = getenv("HOME")) && GameName) {
 		sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName, file);
-		if (FindFileWithExtension(buffer)) {
+		if (FindFileWithExtension(buffer, buffersize)) {
 			return buffer;
 		}
 	}
 
 	// In global shared directory
 	sprintf(buffer, "%s/%s", StratagusLibPath, file);
-	if (FindFileWithExtension(buffer)) {
+	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
 
@@ -559,7 +559,7 @@ char *LibraryFileName(const char *file, char *buffer)
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
 	sprintf(buffer, "%s/graphics/%s", StratagusLibPath, file);
-	if (FindFileWithExtension(buffer)) {
+	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
 
@@ -567,12 +567,12 @@ char *LibraryFileName(const char *file, char *buffer)
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
 	sprintf(buffer, "%s/sounds/%s", StratagusLibPath, file);
-	if (FindFileWithExtension(buffer)) {
+	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
 
 	DebugPrint("File `%s' not found\n" _C_ file);
-	strcpy(buffer, file);
+	strcpy_s(buffer, buffersize, file);
 	return buffer;
 }
 
@@ -603,7 +603,7 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 	char buffer[PATH_MAX];
 	char *filename;
 
-	strcpy(buffer, dirname);
+	strcpy_s(buffer, sizeof(buffer), dirname);
 	n = strlen(buffer);
 	if (!n || buffer[n - 1] != '/') {
 		buffer[n++] = '/';
@@ -620,7 +620,7 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 		while ((dp = readdir(dirp)) != NULL) {
 			filename = dp->d_name;
 #else
-	strcat(buffer, "*.*");
+	strcat_s(buffer, sizeof(buffer), "*.*");
 	hFile = _findfirst(buffer, &fileinfo);
 	if (hFile != -1L) {
 		do {
@@ -634,7 +634,7 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 				continue;
 			}
 
-			strcpy(np, filename);
+			strcpy_s(np, sizeof(buffer) - (np - buffer), filename);
 			if (stat(buffer, &st) == 0) {
 				isdir = S_ISDIR(st.st_mode);
 				if (isdir || S_ISREG(st.st_mode)) {

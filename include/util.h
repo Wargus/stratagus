@@ -10,7 +10,7 @@
 //
 /**@name util.h - General utilities. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -55,6 +55,13 @@ extern long isqrt(long num);
 /*----------------------------------------------------------------------------
 --  Strings
 ----------------------------------------------------------------------------*/
+
+#if !defined(_MSC_VER) || _MSC_VER < 1400
+#define _TRUNCATE ((size_t)-1)
+extern unsigned int strcpy_s(char *dst, size_t dstsize, const char *src);
+extern unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count);
+extern unsigned int strcat_s(char *dst, size_t dstsize, const char *src);
+#endif
 
 	/// strdup + strcat
 extern char *strdcat(const char *l, const char *r);

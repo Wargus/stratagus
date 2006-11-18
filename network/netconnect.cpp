@@ -89,7 +89,7 @@ static int NetStateMsgCnt;              /// Number of consecutive msgs of same t
 static unsigned char LastStateMsgType;  /// Subtype of last InitConfig message sent
 static unsigned long NetLastPacketSent; /// Tick the last network packet was sent
 static unsigned long NetworkServerIP;   /// Network Client: IP of server to join
-char NetworkMapName[1024];   		/// Name of the map recieved with ICMMap
+char NetworkMapName[256];               /// Name of the map recieved with ICMMap
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
@@ -1059,17 +1059,16 @@ static bool IsSafeMapName(const char *mapname)
 	char buf[256];
 	const char *ch;
 
-	strncpy(buf, mapname, 256);
-	buf[255] = 0;
-	if (strlen(buf) >= 255)
+	if (strncpy_s(buf, sizeof(buf), mapname, sizeof(buf)) != 0) {
 		return false;
+	}
 	if (strstr(buf, "..")) {
 		return false;
 	}
 	if (strstr(buf, "//")) {
 		return false;
 	}
-	if (buf[0] == 0) {	
+	if (buf[0] == '\0') {	
 		return false;
 	}
 	ch = buf;
@@ -1101,9 +1100,8 @@ static void ClientParseConnected(const InitMessage *msg)
 				break;
 			}
 			pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath);
-			memcpy(NetworkMapName, msg->u.MapPath, 256);
-			NetworkMapName[255] = 0;
-			memcpy(MenuMapFullPath + pathlen, msg->u.MapPath, 256);
+			strncpy_s(NetworkMapName, sizeof(NetworkMapName), msg->u.MapPath, _TRUNCATE);
+			memcpy(MenuMapFullPath + pathlen, msg->u.MapPath, sizeof(msg->u.MapPath));
 			MenuMapFullPath[pathlen + 255] = 0;
 			if (NetClientSelectScenario()) {
 				NetLocalState = ccs_badmap;
@@ -1484,7 +1482,7 @@ static void ServerParseWaiting(const int h)
 			// this code path happens until client acknowledges the map
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
-			strncpy(message.u.MapPath, NetworkMapName, 256);
+			strncpy_s(message.u.MapPath, sizeof(message.u.MapPath), NetworkMapName, sizeof(NetworkMapName));
 			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_

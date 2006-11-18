@@ -507,7 +507,7 @@ CSample *LoadSample(const char *name)
 	CSample *sample;
 	char buf[PATH_MAX];
 
-	LibraryFileName(name, buf);
+	LibraryFileName(name, buf, sizeof(buf));
 
 	if ((sample = LoadWav(buf, PlayAudioLoadInMemory))) {
 		return sample;
@@ -660,7 +660,7 @@ int PlayMusic(const char *file)
 	delete[] CurrentMusicFile;
 	CurrentMusicFile = NULL;
 
-	char *name = LibraryFileName(file, buffer);
+	char *name = LibraryFileName(file, buffer, sizeof(buffer));
 
 	DebugPrint("play music %s\n" _C_ name);
 

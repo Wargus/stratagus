@@ -723,19 +723,19 @@ static void DrawPlayers(void)
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
-				strcat(buf, "Neutral");
+				strcat_s(buf, sizeof(buf), "Neutral");
 				break;
 			case PlayerNobody:
 			default:
-				strcat(buf, "Nobody");
+				strcat_s(buf, sizeof(buf), "Nobody");
 				break;
 			case PlayerPerson:
-				strcat(buf, "Person");
+				strcat_s(buf, sizeof(buf), "Person");
 				break;
 			case PlayerComputer:
 			case PlayerRescuePassive:
 			case PlayerRescueActive:
-				strcat(buf, "Computer");
+				strcat_s(buf, sizeof(buf), "Computer");
 				break;
 		}
 
@@ -1948,7 +1948,7 @@ void CEditor::Init(void)
 	// Load and evaluate the editor configuration file
 	// FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
 	//
-	file = LibraryFileName(EditorStartFile, buf);
+	file = LibraryFileName(EditorStartFile, buf, sizeof(buf));
 	if (clf.open(file, CL_OPEN_READ) != -1) {
 		clf.close();
 		ShowLoadProgress("Script %s", file);
@@ -2169,11 +2169,14 @@ void EditorMainLoop(void)
 void StartEditor(const char *filename)
 {
 	if (filename) {
-		strcpy(CurrentMapPath, filename);
-	} else {
+		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
+			filename = NULL;
+		}
+	}
+	if (!filename) {
 		// new map, choose some default values
-		strcpy(CurrentMapPath, "");
-		Map.Info.Description = "";
+		strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), "");
+		Map.Info.Description.clear();
 		Map.Info.MapWidth = 64;
 		Map.Info.MapHeight = 64;
 	}

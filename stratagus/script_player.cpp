@@ -131,7 +131,7 @@ static int CclPlayer(lua_State *l)
 				LuaError(l, "Unsupported race: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "ai-name")) {
-			strcpy(player->AiName, LuaToString(l, j + 1));
+			strcpy_s(player->AiName, sizeof(player->AiName), LuaToString(l, j + 1));
 		} else if (!strcmp(value, "team")) {
 			player->Team = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "enemy")) {
@@ -938,7 +938,7 @@ static int CclSetAiType(lua_State *l)
 	p = CclGetPlayer(l);
 	lua_pop(l, 1);
 
-	strcpy(p->AiName, LuaToString(l, 2));
+	strcpy_s(p->AiName, sizeof(p->AiName), LuaToString(l, 2));
 
 	return 0;
 }

@@ -816,10 +816,10 @@ static int InputKey(int key)
 				}
 				if (!strncasecmp(namestart, Players[i].Name, strlen(namestart))) {
 					InputIndex += strlen(Players[i].Name) - strlen(namestart);
-					strcpy(namestart, Players[i].Name);
+					strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name);
 					if (namestart == Input) {
 						InputIndex += 2;
-						strcat(namestart, ": ");
+						strcat_s(namestart, sizeof(Input) - (namestart - Input), ": ");
 					}
 					ShowInput();
 				}

@@ -365,7 +365,7 @@ void CreatePlayer(int type)
 	player->Team = team;
 	player->Enemy = 0;
 	player->Allied = 0;
-	strcpy(player->AiName, "ai-passive");
+	strcpy_s(player->AiName, sizeof(player->AiName), "ai-passive");
 
 	//
 	//  Calculate enemy/allied mask.
@@ -466,7 +466,7 @@ void CPlayer::SetSide(int side)
 */
 void CPlayer::SetName(const char *name)
 {
-	strncpy(Name,name, sizeof(Name)-1);
+	strncpy_s(Name, sizeof(Name), name, _TRUNCATE);
 }
 
 /**

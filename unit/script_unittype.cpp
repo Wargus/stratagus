@@ -1197,7 +1197,7 @@ static void AddLabel(lua_State *l, CAnimation *anim, char *label)
 		LuaError(l, "Too many labels: %s" _C_ label);
 	}
 	Labels[NumLabels].Anim = anim;
-	strcpy(Labels[NumLabels].Name, label);
+	strcpy_s(Labels[NumLabels].Name, sizeof(Labels[NumLabels].Name), label);
 	++NumLabels;
 }
 
@@ -1224,7 +1224,7 @@ static void FindLabelLater(lua_State *l, CAnimation **anim, char *label)
 		LuaError(l, "Too many gotos: %s" _C_ label);
 	}
 	LabelsLater[NumLabelsLater].Anim = anim;
-	strcpy(LabelsLater[NumLabelsLater].Name, label);
+	strcpy_s(LabelsLater[NumLabelsLater].Name, sizeof(LabelsLater[NumLabelsLater].Name), label);
 	++NumLabelsLater;
 }
 

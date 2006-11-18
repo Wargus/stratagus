@@ -153,7 +153,7 @@ int AddButton(int pos, int level, char *icon_ident,
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
-		strcpy(buf, umask);
+		strcpy_s(buf, sizeof(buf), umask);
 	} else {
 		sprintf(buf, ",%s,", umask);
 	}
@@ -347,7 +347,7 @@ void CButtonPanel::Draw(void)
 		//
 		if (ShowCommandKey) {
 			if (CurrentButtons[i].Key == 27) {
-				strcpy(buf, "ESC");
+				strcpy_s(buf, sizeof(buf), "ESC");
 			} else {
 				buf[0] = toupper(CurrentButtons[i].Key);
 				buf[1] = '\0';
@@ -598,13 +598,13 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 	//
 	if (unit->Orders[0]->Action == UnitActionBuilt) {
 		// Trick 17 to get the cancel-build button
-		strcpy(unit_ident, ",cancel-build,");
+		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
 	} else if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
 		// Trick 17 to get the cancel-upgrade button
-		strcpy(unit_ident, ",cancel-upgrade,");
+		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else if (unit->Orders[0]->Action == UnitActionResearch) {
 		// Trick 17 to get the cancel-upgrade button
-		strcpy(unit_ident, ",cancel-upgrade,");
+		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
 		sprintf(unit_ident, ",%s,", unit->Type->Ident);
 	}
