@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Nov 17 22:09:01 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Nov 17 22:47:11 2006.
 */
 
 #ifndef __cplusplus
@@ -12888,6 +12888,66 @@ static int tolua_set_CPlayer_Type(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: StartX of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_get_CPlayer_StartX
+static int tolua_get_CPlayer_StartX(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'StartX'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->StartX);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: StartX of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_set_CPlayer_StartX
+static int tolua_set_CPlayer_StartX(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'StartX'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->StartX = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: StartY of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_get_CPlayer_StartY
+static int tolua_get_CPlayer_StartY(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'StartY'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->StartY);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: StartY of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_set_CPlayer_StartY
+static int tolua_set_CPlayer_StartY(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'StartY'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->StartY = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Resources of class  CPlayer */
 #ifndef TOLUA_DISABLE_tolua_get_stratagus_CPlayer_Resources
 static int tolua_get_stratagus_CPlayer_Resources(lua_State* tolua_S)
@@ -16791,6 +16851,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Index",tolua_get_CPlayer_Index,tolua_set_CPlayer_Index);
   tolua_variable(tolua_S,"Name",tolua_get_CPlayer_Name,tolua_set_CPlayer_Name);
   tolua_variable(tolua_S,"Type",tolua_get_CPlayer_Type,tolua_set_CPlayer_Type);
+  tolua_variable(tolua_S,"StartX",tolua_get_CPlayer_StartX,tolua_set_CPlayer_StartX);
+  tolua_variable(tolua_S,"StartY",tolua_get_CPlayer_StartY,tolua_set_CPlayer_StartY);
   tolua_array(tolua_S,"Resources",tolua_get_stratagus_CPlayer_Resources,tolua_set_stratagus_CPlayer_Resources);
   tolua_array(tolua_S,"Incomes",tolua_get_stratagus_CPlayer_Incomes,tolua_set_stratagus_CPlayer_Incomes);
   tolua_array(tolua_S,"Revenue",tolua_get_stratagus_CPlayer_Revenue,NULL);
