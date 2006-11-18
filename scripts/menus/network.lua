@@ -140,13 +140,13 @@ function RunJoiningMapMenu(s)
   -- FIXME: only the server can set these settings
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
-    function(dd) difficulty = (5 - dd:getSelected()*2) end)
+    function(dd) GameSettings.Difficulty = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-    function(dd) mapresources = (5 - dd:getSelected()*2) end)
+    function(dd) GameSettings.MapRichness = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
-    function(dd) startingresources = (5 - dd:getSelected()*2) end)
+    function(dd) GameSettings.Resources = (5 - dd:getSelected()*2) end)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
@@ -304,13 +304,13 @@ function RunServerMultiGameMenu(map, description, numplayers)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
-    function(dd) difficulty = (5 - dd:getSelected()*2) end)
+    function(dd) GameSettings.Difficulty = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-    function(dd) mapresources = (5 - dd:getSelected()*2) end)
+    function(dd) GameSettings.MapRichness = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
-    function(dd) startingresources = (5 - dd:getSelected()*2) end)
+    function(dd) GameSettings.Resources = (5 - dd:getSelected()*2) end)
 
   local updatePlayers = addPlayersList(menu, numplayers)
 
