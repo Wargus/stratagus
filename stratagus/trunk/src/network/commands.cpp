@@ -414,7 +414,7 @@ static void AppendLog(LogEntry *log, CFile *dest)
 ** @param num       optional number argument
 */
 void CommandLog(const char *action, const CUnit *unit, int flush,
-	int x, int y, const CUnit *dest, const std::string &value, int num)
+	int x, int y, const CUnit *dest, const char *value, int num)
 {
 	LogEntry *log;
 
@@ -497,7 +497,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	// Value given.
 	//
-	log->Value = value;
+	log->Value = (value ? value : "");
 
 	//
 	// Number given.
@@ -734,7 +734,7 @@ int LoadReplay(const std::string &name)
 	CleanReplayLog();
 	ReplayGameType = ReplaySinglePlayer;
 
-	LuaLoadFile(name.c_str());
+	LuaLoadFile(name);
 
 	NextLogCycle = ~0UL;
 	if (!CommandLogDisabled) {
@@ -1356,7 +1356,7 @@ void SendCommandCancelUpgradeTo(CUnit *unit)
 void SendCommandResearch(CUnit *unit, CUpgrade *what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("research", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
+		CommandLog("research", unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
 		CommandResearch(unit, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
@@ -1668,7 +1668,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandResearch:
 			CommandLog("research", unit, status, -1, -1, NoUnitP,
-				AllUpgrades[x]->Ident, -1);
+				AllUpgrades[x]->Ident.c_str(), -1);
 			CommandResearch(unit, AllUpgrades[x], status);
 			break;
 		case MessageCommandCancelResearch:

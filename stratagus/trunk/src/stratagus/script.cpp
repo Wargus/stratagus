@@ -84,7 +84,7 @@ char *CclStartFile;                   /// CCL start file
 char *GameName;                       /// Game Preferences
 int CclInConfigFile;                  /// True while config file parsing
 int SaveGameLoading;                  /// If a Saved Game is Loading
-const char *CurrentLuaFile;                 /// Lua file currently being interpreted
+std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
@@ -253,22 +253,22 @@ static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
 **
 **  @return      0 in success, else exit.
 */
-int LuaLoadFile(const char *file)
+int LuaLoadFile(const std::string &file)
 {
 	int status;
-	const char *PreviousLuaFile;
+	std::string PreviousLuaFile;
 	char *buf;
 	int size;
 
 	PreviousLuaFile = CurrentLuaFile;
 	CurrentLuaFile = file;
 
-	LuaLoadBuffer(file, &buf, &size);
+	LuaLoadBuffer(file.c_str(), &buf, &size);
 	if (!buf) {
 		return -1;
 	}
 
-	if (!(status = luaL_loadbuffer(Lua, buf, size, file))) {
+	if (!(status = luaL_loadbuffer(Lua, buf, size, file.c_str()))) {
 		LuaCall(0, 1);
 	} else {
 		report(status);
@@ -288,7 +288,7 @@ static int CclGetCurrentLuaPath(lua_State *l)
 	char *seperator;
 
 	LuaCheckArgs(l, 0);
-	path = new_strdup(CurrentLuaFile);
+	path = new_strdup(CurrentLuaFile.c_str());
 	Assert(path);
 	seperator = strrchr(path, '/');
 	if (seperator) {
@@ -381,7 +381,7 @@ static int CclSavedGameInfo(lua_State *l)
 			std::string buf = StratagusLibPath;
 			buf += "/";
 			buf += LuaToString(l, -1);
-			if (LuaLoadFile(buf.c_str()) == -1) {
+			if (LuaLoadFile(buf) == -1) {
 				DebugPrint("Load failed: %s\n" _C_ value);
 			}
 		} else if (!strcmp(value, "SyncHash")) {

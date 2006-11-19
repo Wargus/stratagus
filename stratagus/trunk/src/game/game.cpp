@@ -166,7 +166,7 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 
 
 // Write the map presentation file
-int WriteMapPresentation(const char *mapname, CMap *map, char *mapsetup)
+static int WriteMapPresentation(const std::string &mapname, CMap *map, char *mapsetup)
 {
 	FileWriter *f = NULL;
 	int i;
@@ -304,20 +304,20 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 **  @param map       map to save
 **  @param writeTerrain   write the tiles map in the .sms
 */
-int SaveStratagusMap(const char *mapname, CMap *map, int writeTerrain)
+int SaveStratagusMap(const std::string &mapname, CMap *map, int writeTerrain)
 {
 	char mapsetup[PATH_MAX];
 	char *extension;
 
 	if (!map->Info.MapWidth || !map->Info.MapHeight) {
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
+		fprintf(stderr, "%s: invalid Stratagus map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
 
-	strcpy_s(mapsetup, sizeof(mapsetup), mapname);
+	strcpy_s(mapsetup, sizeof(mapsetup), mapname.c_str());
 	extension = strstr(mapsetup, ".smp");
 	if (!extension) {
-		fprintf(stderr, "%s: invalid Statagus map filename\n", mapname);
+		fprintf(stderr, "%s: invalid Statagus map filename\n", mapname.c_str());
 	}
 	memcpy(extension, ".sms", 4 * sizeof(char));
 

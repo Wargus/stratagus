@@ -81,7 +81,7 @@ public:
 **  If the file name ends with '.gz', the file writer returned
 **  will compress the data with zlib.
 */
-FileWriter *CreateFileWriter(const char *filename);
+FileWriter *CreateFileWriter(const std::string &filename);
 
 
 
