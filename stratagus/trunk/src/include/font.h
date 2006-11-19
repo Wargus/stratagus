@@ -69,14 +69,14 @@
 	/// Font definition
 class CFont : public gcn::Font {
 private:
-	CFont(const char *ident) : Ident(new_strdup(ident)), CharWidth(NULL),
+	CFont(const std::string &ident) : Ident(ident), CharWidth(NULL),
 		G(NULL) {}
 
 public:
 	virtual ~CFont();
 
-	static CFont *New(const char *ident, CGraphic *g);
-	static CFont *Get(const char *ident);
+	static CFont *New(const std::string &ident, CGraphic *g);
+	static CFont *Get(const std::string &ident);
 
 	inline int Height() const { return G->Height; }
 	int Width(const char *text) const;
@@ -90,7 +90,7 @@ public:
 	
 	void MeasureWidths();
 
-	char *Ident;          /// Ident of the font.
+	std::string Ident;    /// Ident of the font.
 	char *CharWidth;      /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
 };
@@ -100,13 +100,13 @@ public:
 	/// Font color definition
 class CFontColor {
 public:
-	CFontColor(const char *ident);
+	CFontColor(const std::string &ident);
 	~CFontColor();
 
-	static CFontColor *New(const char *ident);
-	static CFontColor *Get(const char *ident);
+	static CFontColor *New(const std::string &ident);
+	static CFontColor *Get(const std::string &ident);
 
-	char *Ident;
+	std::string Ident;
 	SDL_Color Colors[MaxFontColors];
 };
 

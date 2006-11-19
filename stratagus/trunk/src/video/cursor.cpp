@@ -99,7 +99,7 @@ CCursor *GameCursor;                 /// current shown cursor-type
 **
 **  @param race  Cursor graphics of this race to load.
 */
-void LoadCursors(const char *race)
+void LoadCursors(const std::string &race)
 {
 	std::vector<CCursor>::iterator i;
 
@@ -107,7 +107,7 @@ void LoadCursors(const char *race)
 		//
 		//  Only load cursors of this race or universal cursors.
 		//
-		if ((*i).Race && strcmp((*i).Race, race)) {
+		if ((*i).Race != race) {
 			continue;
 		}
 
@@ -127,19 +127,19 @@ void LoadCursors(const char *race)
 **
 **  @note If we have more cursors, we should add hash to find them faster.
 */
-CCursor *CursorByIdent(const char *ident)
+CCursor *CursorByIdent(const std::string &ident)
 {
 	std::vector<CCursor>::iterator i;
 
 	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		if (strcmp((*i).Ident, ident)) {
+		if ((*i).Ident != ident) {
 			continue;
 		}
-		if (!(*i).Race || (*i).G->IsLoaded()) {
+		if ((*i).Race.empty() || (*i).G->IsLoaded()) {
 			return &(*i);
 		}
 	}
-	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident);
+	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident.c_str());
 	return NULL;
 }
 
@@ -340,8 +340,6 @@ void CleanCursors(void)
 
 	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CGraphic::Free((*i).G);
-		delete[] (*i).Ident;
-		delete[] (*i).Race;
 	}
 	AllCursors.clear();
 

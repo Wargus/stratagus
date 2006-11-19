@@ -124,22 +124,20 @@ public:
 	/// Construction shown during construction of a building
 class CConstruction {
 public:
-	CConstruction() : Ident(NULL), Frames(NULL), Sprite(NULL), Width(0),
+	CConstruction() : Frames(NULL), Sprite(NULL), Width(0),
 		Height(0), ShadowSprite(NULL), ShadowWidth(0), ShadowHeight(0)
 	{
-		File.File = NULL;
 		File.Width = 0;
 		File.Height = 0;
-		ShadowFile.File = NULL;
 		ShadowFile.Width = 0;
 		ShadowFile.Height = 0;
 	}
 
-	char *Ident;  /// construction identifier
+	std::string Ident;   /// construction identifier
 	struct {
-		char *File;    /// sprite file
-		int   Width;   /// sprite width
-		int   Height;  /// sprite height
+		std::string File;/// sprite file
+		int Width;       /// sprite width
+		int Height;      /// sprite height
 	} File, ShadowFile;
 	CConstructionFrame *Frames;  /// construction frames
 
@@ -172,7 +170,7 @@ extern void LoadConstructions(void);
 	/// Clean up the constructions module
 extern void CleanConstructions(void);
 	/// Get construction by identifier
-extern CConstruction *ConstructionByIdent(const char *ident);
+extern CConstruction *ConstructionByIdent(const std::string &ident);
 
 	/// Register ccl features
 extern void ConstructionCclRegister(void);
