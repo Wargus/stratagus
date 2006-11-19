@@ -780,7 +780,7 @@ static int InputKey(int key)
 				}
 				sprintf(ChatMessage, "~%s~<%s>~> %s",
 					PlayerColorNames[ThisPlayer->Index],
-					ThisPlayer->Name, Input);
+					ThisPlayer->Name.c_str(), Input);
 				// FIXME: only to selected players ...
 				NetworkChatMessage(ChatMessage);
 			}
@@ -814,9 +814,9 @@ static int InputKey(int key)
 				if (Players[i].Type != PlayerPerson) {
 					continue;
 				}
-				if (!strncasecmp(namestart, Players[i].Name, strlen(namestart))) {
-					InputIndex += strlen(Players[i].Name) - strlen(namestart);
-					strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name);
+				if (!strncasecmp(namestart, Players[i].Name.c_str(), strlen(namestart))) {
+					InputIndex += strlen(Players[i].Name.c_str()) - strlen(namestart);
+					strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name.c_str());
 					if (namestart == Input) {
 						InputIndex += 2;
 						strcat_s(namestart, sizeof(Input) - (namestart - Input), ": ");

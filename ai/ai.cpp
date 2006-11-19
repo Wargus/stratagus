@@ -519,7 +519,6 @@ void AiInit(CPlayer *player)
 {
 	PlayerAi *pai;
 	CAiType *ait;
-	char *ainame;
 	int i;
 
 	pai = new PlayerAi;
@@ -531,9 +530,8 @@ void AiInit(CPlayer *player)
 	pai->Player = player;
 	ait = NULL;
 
-	ainame = player->AiName;
 	DebugPrint("%d - %p - looking for class %s\n" _C_
-		player->Index _C_ player _C_ ainame);
+		player->Index _C_ player _C_ player->AiName);
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//
@@ -549,7 +547,7 @@ void AiInit(CPlayer *player)
 		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player->Race]) {
 			continue;
 		}
-		if (ainame && ait->Class != ainame) {
+		if (!player->AiName.empty() && ait->Class != player->AiName) {
 			continue;
 		}
 		break;
@@ -559,12 +557,12 @@ void AiInit(CPlayer *player)
 		// FIXME: surely we can do something better than exit
 		exit(0);
 	}
-	if (!ainame) {
+	if (player->AiName.empty()) {
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
 	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player->Race] _C_ 
-		!ait->Race.empty() ? ait->Race.c_str() : "All" _C_ ainame _C_ ait->Class.c_str());
+		!ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player->AiName.c_str() _C_ ait->Class.c_str());
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;

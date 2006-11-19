@@ -925,7 +925,7 @@ void NetworkEvent(void)
 			NetworkIn[packet->Header.Cycle][player][i].Type = packet->Header.Type[i];
 			NetworkIn[packet->Header.Cycle][player][i].Data = *nc;
 		} else {
-			SetMessage(_("%s sent bad command"), Players[player].Name);
+			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
 		}
 	}
 
