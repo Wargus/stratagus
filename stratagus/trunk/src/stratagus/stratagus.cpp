@@ -657,7 +657,7 @@ extern gcn::Gui *Gui;
 
 void StartMap(const char *filename, bool clean = true) 
 {
-	const char *nc, *rc;
+	std::string nc, rc;
 
 	gcn::Widget *oldTop = Gui->getTop();
 	gcn::Container *container = new gcn::Container();
@@ -673,7 +673,7 @@ void StartMap(const char *filename, bool clean = true)
 	if (clean) {
 		CleanPlayers();
 	}
-	GetDefaultTextColors(&nc, &rc);
+	GetDefaultTextColors(nc, rc);
 
 	CreateGame(filename, &Map);
 

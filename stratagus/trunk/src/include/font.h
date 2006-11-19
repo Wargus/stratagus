@@ -144,9 +144,9 @@ extern CFont *LargeTitleFont;  /// Large font used in episoden titles
 ----------------------------------------------------------------------------*/
 
 	/// Set the default text colors for normal and reverse text
-extern void SetDefaultTextColors(const char *normal, const char *reverse);
+extern void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
 	/// Get the default text colors for normal and reverse text
-extern void GetDefaultTextColors(const char **normalp, const char **reversep);
+extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
 	///  Return the 'line' line of the string 's'.
 extern char *GetLineFont(int line, char *s, int maxlen, CFont *font);
 	/// Draw text unclipped
