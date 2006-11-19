@@ -177,7 +177,7 @@ static int TheoraProcessData(OggData *data)
 **
 **  @return       Non-zero if file isn't a supported movie.
 */
-int PlayMovie(const char *name)
+int PlayMovie(const std::string &name)
 {
 	OggData data;
 	CFile f;
@@ -191,10 +191,10 @@ int PlayMovie(const char *name)
 	int diff;
 	char buffer[PATH_MAX];
 
-	name = LibraryFileName(name, buffer, sizeof(buffer));
+	LibraryFileName(name.c_str(), buffer, sizeof(buffer));
 
-	if (f.open(name, CL_OPEN_READ) == -1) {
-		fprintf(stderr, "Can't open file `%s'\n", name);
+	if (f.open(buffer, CL_OPEN_READ) == -1) {
+		fprintf(stderr, "Can't open file `%s'\n", name.c_str());
 		return -1;
 	}
 
@@ -230,7 +230,7 @@ int PlayMovie(const char *name)
 	}
 
 	StopMusic();
-	if ((sample = LoadVorbis(name, PlayAudioStream))) {
+	if ((sample = LoadVorbis(buffer, PlayAudioStream))) {
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
 			fprintf(stderr, "Unsupported sound format in movie\n");

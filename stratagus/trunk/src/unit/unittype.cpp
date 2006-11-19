@@ -230,13 +230,13 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 **  @param plynr  Player number.
 **  @param file   Output file.
 */
-static void SaveUnitStats(const CUnitStats *stats, const char *ident, int plynr,
+static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int plynr,
 	CFile *file)
 {
 	int j;
 
 	Assert(plynr < PlayerMax);
-	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
+	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
 	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) {
 		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
 			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
@@ -296,7 +296,7 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 **
 **  @return       New allocated (zeroed) unit-type pointer.
 */
-CUnitType *NewUnitTypeSlot(char *ident)
+CUnitType *NewUnitTypeSlot(const std::string &ident)
 {
 	CUnitType *type;
 
@@ -416,7 +416,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 	ResourceInfo *resinfo;
 	int i;
 
-	if (type->ShadowFile) {
+	if (!type->ShadowFile.empty()) {
 		type->ShadowSprite = CGraphic::ForceNew(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
 		type->ShadowSprite->Load();
@@ -429,7 +429,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 	if (type->Harvester) {
 		for (i = 0; i < MaxCosts; ++i) {
 			if ((resinfo = type->ResInfo[i])) {
-				if (resinfo->FileWhenLoaded) {
+				if (!resinfo->FileWhenLoaded.empty()) {
 					resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
 						type->Width, type->Height);
 					resinfo->SpriteWhenLoaded->Load();
@@ -437,7 +437,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 						resinfo->SpriteWhenLoaded->Flip();
 					}
 				}
-				if (resinfo->FileWhenEmpty) {
+				if (!resinfo->FileWhenEmpty.empty()) {
 					resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
 						type->Width, type->Height);
 					resinfo->SpriteWhenEmpty->Load();
@@ -449,7 +449,7 @@ void LoadUnitTypeSprite(CUnitType *type)
 		}
 	}
 
-	if (type->File) {
+	if (!type->File.empty()) {
 		type->Sprite = CPlayerColorGraphic::New(type->File, type->Width, type->Height);
 		type->Sprite->Load();
 		if (type->Flip) {
@@ -510,7 +510,7 @@ void LoadUnitTypes(void)
 		//
 #ifndef DYNAMIC_LOAD
 		if (!type->Sprite) {
-			ShowLoadProgress("Unit \"%s\"", type->Name);
+			ShowLoadProgress("Unit \"%s\"", type->Name.c_str());
 			LoadUnitTypeSprite(type);
 		}
 #endif
@@ -571,10 +571,8 @@ void CleanUnitTypes(void)
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
 
-		Assert(type->Ident);
-		delete[] type->Ident;
-		Assert(type->Name);
-		delete[] type->Name;
+		Assert(!type->Ident.empty());
+		Assert(!type->Name.empty());
 
 		delete[] type->Variable;
 		delete[] type->BoolFlag;
@@ -591,8 +589,6 @@ void CleanUnitTypes(void)
 			delete *b;
 		}
 		type->BuildingRules.clear();
-		delete[] type->File;
-		delete[] type->ShadowFile;
 		delete[] type->Missile.Name;
 		delete[] type->Explosion.Name;
 		delete[] type->CorpseName;
@@ -606,12 +602,6 @@ void CleanUnitTypes(void)
 				}
 				if (type->ResInfo[res]->SpriteWhenEmpty) {
 					CGraphic::Free(type->ResInfo[res]->SpriteWhenEmpty);
-				}
-				if (type->ResInfo[res]->FileWhenEmpty) {
-					delete[] type->ResInfo[res]->FileWhenEmpty;
-				}
-				if (type->ResInfo[res]->FileWhenLoaded) {
-					delete[] type->ResInfo[res]->FileWhenLoaded;
 				}
 				delete type->ResInfo[res];
 			}

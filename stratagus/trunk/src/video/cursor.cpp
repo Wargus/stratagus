@@ -112,7 +112,7 @@ void LoadCursors(const std::string &race)
 		}
 
 		if ((*i).G && !(*i).G->IsLoaded()) {
-			ShowLoadProgress("Cursor %s", (*i).G->File);
+			ShowLoadProgress("Cursor %s", (*i).G->File.c_str());
 			(*i).G->Load();
 		}
 	}

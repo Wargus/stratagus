@@ -322,7 +322,7 @@ static int CclDefineCursor(lua_State *l)
 	const char *value;
 	std::string name;
 	std::string race;
-	const char *file;
+	std::string file;
 	int hotx;
 	int hoty;
 	int w;
@@ -335,7 +335,6 @@ static int CclDefineCursor(lua_State *l)
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	file = NULL;
 	hotx = hoty = w = h = rate = 0;
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
@@ -374,7 +373,7 @@ static int CclDefineCursor(lua_State *l)
 		lua_pop(l, 1);
 	}
 
-	Assert(!name.empty() && file && w && h);
+	Assert(!name.empty() && !file.empty() && w && h);
 
 	if (race == "any") {
 		race.clear();
@@ -926,7 +925,7 @@ CheckboxStyle *FindCheckboxStyle(const char *style)
 static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 {
 	const char *value;
-	char *file;
+	std::string file;
 	int w;
 	int h;
 
@@ -934,14 +933,13 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 		LuaError(l, "incorrect argument");
 	}
 
-	file = NULL;
 	w = h = 0;
 
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "File")) {
-			file = new_strdup(LuaToString(l, -1));
+			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -1012,9 +1010,8 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 		lua_pop(l, 1);
 	}
 
-	if (file) {
+	if (!file.empty()) {
 		p->Sprite = CGraphic::New(file, w, h);
-		delete[] file;
 	}
 }
 

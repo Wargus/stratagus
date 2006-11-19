@@ -1099,7 +1099,7 @@ static void ShowUnitInfo(const CUnit *unit)
 	int i;
 
 	i = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
-		unit->Type->Name, unit->Player->Index,
+		unit->Type->Name.c_str(), unit->Player->Index,
 		unit->Active ? "active" : "passive");
 	if (unit->Type->GivesResource) {
 		sprintf(buf + i," Amount %d", unit->ResourcesHeld);
@@ -1755,8 +1755,8 @@ static void EditorCallbackMouse(int x, int y)
 				if (bx < x && x < bx + IconWidth &&
 						by < y && y < by + IconHeight) {
 					sprintf(buf,"%s \"%s\"",
-						Editor.ShownUnitTypes[i]->Ident,
-						Editor.ShownUnitTypes[i]->Name);
+						Editor.ShownUnitTypes[i]->Ident.c_str(),
+						Editor.ShownUnitTypes[i]->Name.c_str());
 					UI.StatusLine.Set(buf);
 					Editor.CursorUnitIndex = i;
 #if 0

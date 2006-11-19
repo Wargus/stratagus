@@ -543,15 +543,14 @@ public:
 
 class ResourceInfo {
 public:
-	ResourceInfo() : FileWhenLoaded(NULL), FileWhenEmpty(NULL),
-		HarvestFromOutside(0), WaitAtResource(0), ResourceStep(0),
+	ResourceInfo() : HarvestFromOutside(0), WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
 		TerrainHarvester(0), LoseResources(0),
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
 
-	char    *FileWhenLoaded;        /// Change the graphic when the unit is loaded.
-	char    *FileWhenEmpty;         /// Change the graphic when the unit is empty.
+	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
+	std::string FileWhenEmpty;      /// Change the graphic when the unit is empty.
 	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
 	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
 	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
@@ -834,9 +833,7 @@ public:
 	/// @todo n0body: AutoBuildRate not implemented.
 class CUnitType {
 public:
-	CUnitType() : Ident(NULL), Name(NULL), Slot(0),
-		File(NULL), ShadowFile(NULL),
-		Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
+	CUnitType() : Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 		ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 		Animations(NULL), StillFrame(0),
 		CorpseName(NULL), CorpseType(NULL),
@@ -871,11 +868,11 @@ public:
 		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	}
 
-	char *Ident;                    /// Identifier
-	char *Name;                     /// Pretty name shown from the engine
+	std::string Ident;              /// Identifier
+	std::string Name;               /// Pretty name shown from the engine
 	int Slot;                       /// Type as number
-	char *File;                     /// Sprite files
-	char *ShadowFile;               /// Shadow file
+	std::string File;               /// Sprite files
+	std::string ShadowFile;         /// Shadow file
 
 	int Width;                      /// Sprite width
 	int Height;                     /// Sprite height
@@ -1053,7 +1050,7 @@ extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by
 extern int GetVariableIndex(const char *VarName);    /// Get index of the variable
 
 extern void SaveUnitTypes(CFile *file);              /// Save the unit-type table
-extern CUnitType *NewUnitTypeSlot(char *);           /// Allocate an empty unit-type slot
+extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType *type, CPlayerColorGraphic *sprite,
 	int player, int frame, int x, int y);

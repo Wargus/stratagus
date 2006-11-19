@@ -677,7 +677,7 @@ static int CclAiWait(lua_State *l)
 			lua_pushboolean(l, 1);
 			return 1;
 		}
-		DebugPrint("Broken? waiting on %s which wasn't requested.\n" _C_ type->Ident);
+		DebugPrint("Broken? waiting on %s which wasn't requested.\n" _C_ type->Ident.c_str());
 		lua_pushboolean(l, 0);
 		return 1;
 	}
@@ -1033,13 +1033,13 @@ static int CclAiDump(lua_State *l)
 	n = (int)AiPlayer->UnitTypeRequests.size();
 	printf("UnitTypeRequests(%d):\n", n);
 	for (i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->UnitTypeRequests[i].Type->Ident);
+		printf("%s ", AiPlayer->UnitTypeRequests[i].Type->Ident.c_str());
 	}
 	printf("\n");
 	n = (int)AiPlayer->UpgradeToRequests.size();
 	printf("UpgradeToRequests(%d):\n", n);
 	for (i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->UpgradeToRequests[i]->Ident);
+		printf("%s ", AiPlayer->UpgradeToRequests[i]->Ident.c_str());
 	}
 	printf("\n");
 	n = (int)AiPlayer->ResearchRequests.size();
@@ -1055,7 +1055,7 @@ static int CclAiDump(lua_State *l)
 	printf("Building queue:\n");
 	for (i = 0; i < (int)AiPlayer->UnitTypeBuilt.size(); ++i) {
 		queue = &AiPlayer->UnitTypeBuilt[i];
-		printf("%s(%d/%d) ", queue->Type->Ident, queue->Made, queue->Want);
+		printf("%s(%d/%d) ", queue->Type->Ident.c_str(), queue->Made, queue->Want);
 	}
 	printf("\n");
 
@@ -1068,7 +1068,7 @@ static int CclAiDump(lua_State *l)
 			AiPlayer->Force[i].Attacking ? ",attack" : "");
 		for (int j = 0; j < (int)AiPlayer->Force[i].UnitTypes.size(); ++j) {
 			aut = &AiPlayer->Force[i].UnitTypes[j];
-			printf("%s(%d) ", aut->Type->Ident, aut->Want);
+			printf("%s(%d) ", aut->Type->Ident.c_str(), aut->Want);
 		}
 		printf("\n");
 	}

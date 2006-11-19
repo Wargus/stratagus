@@ -170,8 +170,6 @@ void CleanUpgrades(void)
 */
 void SaveUpgrades(CFile *file)
 {
-	int p;
-
 	file->printf("\n-- -----------------------------------------\n");
 	file->printf("-- MODULE: upgrades $Id$\n\n");
 
@@ -179,8 +177,8 @@ void SaveUpgrades(CFile *file)
 	//  Save the allow
 	//
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		file->printf("DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident);
-		for (p = 0; p < PlayerMax; ++p) {
+		file->printf("DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident.c_str());
+		for (int p = 0; p < PlayerMax; ++p) {
 			if (p) {
 				file->printf(", ");
 			}
@@ -195,7 +193,7 @@ void SaveUpgrades(CFile *file)
 	//
 	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
 		file->printf("DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident.c_str());
-		for (p = 0; p < PlayerMax; ++p) {
+		for (int p = 0; p < PlayerMax; ++p) {
 			file->printf("%c", Players[p].Allow.Upgrades[j]);
 		}
 		file->printf("\")\n");

@@ -87,7 +87,7 @@ static int CclDefineMissileType(lua_State *l)
 	const char *str;
 	MissileType *mtype;
 	unsigned i;
-	char *file;
+	std::string file;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -110,15 +110,13 @@ static int CclDefineMissileType(lua_State *l)
 	// Ensure we don't divide by zero.
 	mtype->SplashFactor = 100;
 
-	file = NULL;
-
 	//
 	// Parse the arguments
 	//
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "File")) {
-			file = new_strdup(LuaToString(l, -1));
+			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -179,7 +177,7 @@ static int CclDefineMissileType(lua_State *l)
 		}
 	}
 
-	if (file) {
+	if (!file.empty()) {
 		mtype->G = CGraphic::New(file, mtype->Width, mtype->Height);
 	}
 

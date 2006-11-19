@@ -74,10 +74,9 @@ static inline int s_max(int a, int b) { return a > b ? a : b; }
 */
 class Decoration {
 public:
-	Decoration() : File(NULL), HotX(0), HotY(0), Width(0), Height(0),
-		Sprite(NULL) {}
+	Decoration() : HotX(0), HotY(0), Width(0), Height(0), Sprite(NULL) {}
 
-	char *File;       /// File containing the graphics data
+	std::string File; /// File containing the graphics data
 	int HotX;         /// X drawing position (relative)
 	int HotY;         /// Y drawing position (relative)
 	int Width;        /// width of the decoration
@@ -325,7 +324,7 @@ static int CclDefineSprites(lua_State *l)
 			if (!strcmp(key, "Name")) {
 				name = LuaToString(l, -1);
 			} else if (!strcmp(key, "File")) {
-				deco.File = new_strdup(LuaToString(l, -1));
+				deco.File = LuaToString(l, -1);
 			} else if (!strcmp(key, "Offset")) {
 				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 					LuaError(l, "incorrect argument");
@@ -358,11 +357,11 @@ static int CclDefineSprites(lua_State *l)
 			DecoSprite.Name.push_back(new_strdup(name));
 			DecoSprite.SpriteArray.push_back(deco);
 		} else {
-			delete[] DecoSprite.SpriteArray[index].File;
+			DecoSprite.SpriteArray[index].File.clear();
 			DecoSprite.SpriteArray[index] = deco;
 		}
 		// Now verify validity.
-		if (DecoSprite.SpriteArray[index].File == NULL) {
+		if (DecoSprite.SpriteArray[index].File.empty()) {
 			LuaError(l, "CclDefineSprites requires the File flag for sprite.");
 		}
 		// FIXME check if file is valid with good size ?
@@ -723,7 +722,7 @@ void LoadDecorations(void)
 {
 	std::vector<Decoration>::iterator i;
 	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
-		ShowLoadProgress("Decorations `%s'", (*i).File);
+		ShowLoadProgress("Decorations `%s'", (*i).File.c_str());
 		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
 		(*i).Sprite->Load();
 	}
@@ -736,7 +735,6 @@ void CleanDecorations(void)
 {
 	for (int i = 0; i < (int)DecoSprite.SpriteArray.size(); ++i) {
 		delete[] DecoSprite.Name[i];
-		delete[] DecoSprite.SpriteArray[i].File;
 		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);
 	}
 

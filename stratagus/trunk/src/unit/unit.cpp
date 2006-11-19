@@ -784,7 +784,7 @@ void CUnit::Remove(CUnit *host)
 {
 	if (Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
-		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident _C_ Slot);
+		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ Slot);
 		return;
 	}
 	UnitCacheRemove(this);
@@ -915,7 +915,7 @@ void UnitLost(CUnit *unit)
 		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID] = 0;
 	}
 
-	DebugPrint("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
+	DebugPrint("Lost %s(%d)\n" _C_ unit->Type->Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
@@ -2984,7 +2984,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			}
 		}
 		target->Player->Notify(NotifyRed, target->X, target->Y,
-			_("%s attacked"), target->Type->Name);
+			_("%s attacked"), target->Type->Name.c_str());
 		if (target->Player->AiEnabled) {
 			AiHelpMe(attacker, target);
 		}
@@ -3598,7 +3598,7 @@ void SaveOrder(const COrder *order, CFile *file)
 	}
 	file->printf(" \"tile\", {%d, %d},", order->X, order->Y);
 	if (order->Type) {
-		file->printf(" \"type\", \"%s\",", order->Type->Ident);
+		file->printf(" \"type\", \"%s\",", order->Type->Ident.c_str());
 	}
 	// Extra arg.
 	switch (order->Action) {
@@ -3608,7 +3608,7 @@ void SaveOrder(const COrder *order, CFile *file)
 			break;
 		case UnitActionSpellCast:
 			if (order->Arg1.Spell) {
-				file->printf(" \"spell\", \"%s\",", order->Arg1.Spell->Ident);
+				file->printf(" \"spell\", \"%s\",", order->Arg1.Spell->Ident.c_str());
 			}
 			break;
 		case UnitActionResearch:
@@ -3641,9 +3641,9 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	file->printf("\nUnit(%d, ", UnitNumber(unit));
 
 	// 'type and 'player must be first, needed to create the unit slot
-	file->printf("\"type\", \"%s\", ", unit->Type->Ident);
+	file->printf("\"type\", \"%s\", ", unit->Type->Ident.c_str());
 	if (unit->Seen.Type) {
-		file->printf("\"seen-type\", \"%s\", ", unit->Seen.Type->Ident);
+		file->printf("\"seen-type\", \"%s\", ", unit->Seen.Type->Ident.c_str());
 	}
 
 	file->printf("\"player\", %d,\n  ", unit->Player->Index);
@@ -3881,7 +3881,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	if (unit->AutoCastSpell) {
 		for (i = 0; (unsigned int) i < SpellTypeTable.size(); ++i) {
 			if (unit->AutoCastSpell[i]) {
-				file->printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident);
+				file->printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident.c_str());
 			}
 		}
 	}

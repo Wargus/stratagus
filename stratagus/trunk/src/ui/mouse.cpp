@@ -1185,7 +1185,7 @@ static int SendSpellCast(int sx, int sy)
 		CUnit *unit = Selected[i];
 		if (!unit->Type->CanCastSpell) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
-				unit->Slot _C_ unit->Type->Name);
+				unit->Slot _C_ unit->Type->Name.c_str());
 			// this unit cannot cast spell
 			continue;
 		}
@@ -1619,7 +1619,7 @@ void UIHandleButtonDown(unsigned button)
 						Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 						DebugPrint("Cancel slot %d %s\n" _C_
 							ButtonUnderCursor _C_
-							Selected[0]->Orders[ButtonUnderCursor]->Type->Ident);
+							Selected[0]->Orders[ButtonUnderCursor]->Type->Ident.c_str());
 						SendCommandCancelTraining(Selected[0],
 							ButtonUnderCursor,
 							Selected[0]->Orders[ButtonUnderCursor]->Type);
@@ -1633,7 +1633,7 @@ void UIHandleButtonDown(unsigned button)
 						ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel upgrade %s\n" _C_
-							Selected[0]->Type->Ident);
+							Selected[0]->Type->Ident.c_str());
 						SendCommandCancelUpgradeTo(Selected[0]);
 					}
 				}
@@ -1645,7 +1645,7 @@ void UIHandleButtonDown(unsigned button)
 						ThisPlayer->IsTeamed(Selected[0])) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel research %s\n" _C_
-							Selected[0]->Type->Ident);
+							Selected[0]->Type->Ident.c_str());
 						SendCommandCancelResearch(Selected[0]);
 					}
 				}
@@ -1903,11 +1903,11 @@ void UIHandleButtonUp(unsigned button)
 					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
 						sprintf(buf, _("You have ~<%d~> %ss"),
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
-							Selected[0]->Type->Name);
+							Selected[0]->Type->Name.c_str());
 					} else {
 						sprintf(buf, _("You have ~<%d~> %s(s)"),
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
-							Selected[0]->Type->Name);
+							Selected[0]->Type->Name.c_str());
 					}
 					UI.StatusLine.Set(buf);
 				}

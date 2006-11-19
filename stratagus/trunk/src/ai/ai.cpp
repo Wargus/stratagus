@@ -370,13 +370,13 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 		file->printf("\n    \"types\", { ");
 		for (j = 0; j < (int)ai->Force[i].UnitTypes.size(); ++j) {
 			const AiUnitType *aut = &ai->Force[i].UnitTypes[j];
-			file->printf("%d, \"%s\", ", aut->Want, aut->Type->Ident);
+			file->printf("%d, \"%s\", ", aut->Want, aut->Type->Ident.c_str());
 		}
 		file->printf("},\n    \"units\", {");
 		for (j = 0; j < (int)ai->Force[i].Units.size(); ++j) {
 			const CUnit *aiunit = ai->Force[i].Units[j];
 			file->printf(" %d, \"%s\",", UnitNumber(aiunit),
-				aiunit->Type->Ident);
+				aiunit->Type->Ident.c_str());
 		}
 		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
 			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY, ai->Force[i].MustTransport);
@@ -443,14 +443,14 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	file->printf("  \"last-can-not-move-cycle\", %lu,\n", ai->LastCanNotMoveGameCycle);
 	file->printf("  \"unit-type\", {");
 	for (i = 0; i < (int)ai->UnitTypeRequests.size(); ++i) {
-		file->printf("\"%s\", ", ai->UnitTypeRequests[i].Type->Ident);
+		file->printf("\"%s\", ", ai->UnitTypeRequests[i].Type->Ident.c_str());
 		file->printf("%d, ", ai->UnitTypeRequests[i].Count);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"upgrade\", {");
 	for (i = 0; i < (int)ai->UpgradeToRequests.size(); ++i) {
-		file->printf("\"%s\", ", ai->UpgradeToRequests[i]->Ident);
+		file->printf("\"%s\", ", ai->UpgradeToRequests[i]->Ident.c_str());
 	}
 	file->printf("},\n");
 
@@ -466,7 +466,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	file->printf("  \"building\", {");
 	for (i = 0; i < (int)ai->UnitTypeBuilt.size(); ++i) {
 		const AiBuildQueue *queue = &ai->UnitTypeBuilt[i];
-		file->printf("\"%s\", %d, %d, ", queue->Type->Ident, queue->Made, queue->Want);
+		file->printf("\"%s\", %d, %d, ", queue->Type->Ident.c_str(), queue->Made, queue->Want);
 	}
 	file->printf("},\n");
 
@@ -756,7 +756,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
 		defender->Player->Index _C_ UnitNumber(defender) _C_
-		defender->Type->Ident _C_ defender->X _C_ defender->Y);
+		defender->Type->Ident.c_str() _C_ defender->X _C_ defender->Y);
 
 	//
 	//  Don't send help to scouts (zeppelin,eye of vision).
@@ -813,7 +813,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 void AiUnitKilled(CUnit *unit)
 {
 	DebugPrint("%d: %d(%s) killed\n" _C_
-		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str());
 
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -825,13 +825,13 @@ void AiUnitKilled(CUnit *unit)
 			break;
 		case UnitActionBuilt:
 			DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-				unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+				unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str());
 			AiReduceMadeInBuilt(unit->Player->Ai, unit->Type);
 			break;
 		case UnitActionBuild:
 			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 				unit->Player->Index _C_ UnitNumber(unit) _C_
-				unit->Type->Ident _C_ unit->Orders[0]->Type->Ident);
+				unit->Type->Ident.c_str() _C_ unit->Orders[0]->Type->Ident.c_str());
 			if (!unit->Orders[0]->Goal) {
 				AiReduceMadeInBuilt(unit->Player->Ai, unit->Orders[0]->Type);
 			}
@@ -839,7 +839,7 @@ void AiUnitKilled(CUnit *unit)
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
 				unit->Player->Index _C_ UnitNumber(unit) _C_
-				unit->Type->Ident _C_ unit->Orders[0]->Action);
+				unit->Type->Ident.c_str() _C_ unit->Orders[0]->Action);
 			break;
 	}
 }
@@ -854,11 +854,11 @@ void AiWorkComplete(CUnit *unit, CUnit *what)
 {
 	if (unit) {
 		DebugPrint("%d: %d(%s) build %s at %d,%d completed\n" _C_
-			what->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
-			what->Type->Ident _C_ unit->X _C_ unit->Y);
+			what->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
+			what->Type->Ident.c_str() _C_ unit->X _C_ unit->Y);
 	} else {
 		DebugPrint("%d: building %s at %d,%d completed\n" _C_
-			what->Player->Index _C_ what->Type->Ident _C_ what->X _C_ what->Y);
+			what->Player->Index _C_ what->Type->Ident.c_str() _C_ what->X _C_ what->Y);
 	}
 
 	Assert(what->Player->Type != PlayerPerson);
@@ -874,8 +874,8 @@ void AiWorkComplete(CUnit *unit, CUnit *what)
 void AiCanNotBuild(CUnit *unit, const CUnitType *what)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
-		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
-		what->Ident _C_ unit->X _C_ unit->Y);
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
+		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 	AiReduceMadeInBuilt(unit->Player->Ai, what);
@@ -1084,8 +1084,8 @@ void AiNeedMoreSupply(const CUnit *unit, const CUnitType *what)
 void AiTrainingComplete(CUnit *unit, CUnit *what)
 {
 	DebugPrint("%d: %d(%s) training %s at %d,%d completed\n" _C_
-		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
-		what->Type->Ident _C_ unit->X _C_ unit->Y);
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
+		what->Type->Ident.c_str() _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1105,8 +1105,8 @@ void AiTrainingComplete(CUnit *unit, CUnit *what)
 void AiUpgradeToComplete(CUnit *unit, const CUnitType *what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
-		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
-		what->Ident _C_ unit->X _C_ unit->Y);
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
+		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 }
@@ -1120,7 +1120,7 @@ void AiUpgradeToComplete(CUnit *unit, const CUnitType *what)
 void AiResearchComplete(CUnit *unit, const CUpgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
-		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
 		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);

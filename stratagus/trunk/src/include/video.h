@@ -44,7 +44,7 @@ class CFont;
 
 class CGraphic : public gcn::Image {
 protected:
-	CGraphic() : File(NULL), HashFile(NULL), Surface(NULL),
+	CGraphic() : Surface(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
 	{
@@ -87,8 +87,8 @@ public:
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
 
 
-	static CGraphic *New(const char *file, int w = 0, int h = 0);
-	static CGraphic *ForceNew(const char *file, int w = 0, int h = 0);
+	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
+	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 
 	static void Free(CGraphic *g);
 
@@ -107,8 +107,8 @@ public:
 	virtual int getWidth() const { return Width; }
 	virtual int getHeight() const { return Height; }
 
-	char *File;                /// Filename
-	char *HashFile;            /// Filename used in hash
+	std::string File;          /// Filename
+	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
 #ifndef USE_OPENGL
 	SDL_Surface *SurfaceFlip;  /// Flipped surface
@@ -146,8 +146,8 @@ public:
 	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
 
-	static CPlayerColorGraphic *New(const char *file, int w = 0, int h = 0);
-	static CPlayerColorGraphic *ForceNew(const char *file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 
 #ifdef USE_OPENGL
 	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
