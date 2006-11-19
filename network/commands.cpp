@@ -934,7 +934,7 @@ static void ReplayEachCycle(void)
 		int i;
 		for (i = 0; i < PlayerMax; ++i) {
 			if (!CurrentReplay->Players[i].Name.empty()) {
-				Players[i].SetName(CurrentReplay->Players[i].Name.c_str());
+				Players[i].SetName(CurrentReplay->Players[i].Name);
 			}
 		}
 		ReplayStep = CurrentReplay->Commands;

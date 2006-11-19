@@ -464,7 +464,7 @@ void CPlayer::SetSide(int side)
 **
 **  @param name    New name.
 */
-void CPlayer::SetName(const char *name)
+void CPlayer::SetName(const std::string &name)
 {
 	Name = name;
 }
