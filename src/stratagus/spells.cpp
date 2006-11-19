@@ -1010,10 +1010,10 @@ void InitSpells(void)
 **
 **  @return       spell-type struct pointer.
 */
-SpellType *SpellTypeByIdent(const char *ident)
+SpellType *SpellTypeByIdent(const std::string &ident)
 {
 	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
-		if (strcmp((*i)->Ident, ident) == 0) {
+		if (strcmp((*i)->Ident, ident.c_str()) == 0) {
 			return *i;
 		}
 	}

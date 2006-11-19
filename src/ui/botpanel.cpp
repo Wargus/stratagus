@@ -93,9 +93,9 @@ void InitButtons(void)
 /**
 **  FIXME: docu
 */
-int AddButton(int pos, int level, char *icon_ident,
-	ButtonCmd action, const char *value, const ButtonCheckFunc func,
-	const char *allow, int key, const char *hint, const char *umask)
+int AddButton(int pos, int level, const std::string &icon_ident,
+	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
+	const std::string &allow, int key, const std::string &hint, const std::string &umask)
 {
 	char buf[2048];
 	ButtonAction *ba;
@@ -109,14 +109,14 @@ int AddButton(int pos, int level, char *icon_ident,
 	// FIXME: check if already initited
 	//ba->Icon.Load();
 	ba->Action = action;
-	if (value) {
-		ba->ValueStr = new_strdup(value);
+	if (!value.empty()) {
+		ba->ValueStr = new_strdup(value.c_str());
 		switch (action) {
 			case ButtonSpellCast:
 				ba->Value = SpellTypeByIdent(value)->Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
-					DebugPrint("Spell %s does not exist?\n" _C_ value);
+					DebugPrint("Spell %s does not exist?\n" _C_ value.c_str());
 					Assert(ba->Value >= 0);
 				}
 #endif
@@ -134,7 +134,7 @@ int AddButton(int pos, int level, char *icon_ident,
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
 			default:
-				ba->Value = atoi(value);
+				ba->Value = atoi(value.c_str());
 				break;
 		}
 	} else {
@@ -143,19 +143,19 @@ int AddButton(int pos, int level, char *icon_ident,
 	}
 
 	ba->Allowed = func;
-	if (allow) {
-		ba->AllowStr = new_strdup(allow);
+	if (!allow.empty()) {
+		ba->AllowStr = new_strdup(allow.c_str());
 	} else {
 		ba->AllowStr = NULL;
 	}
 	ba->Key = key;
-	ba->Hint = new_strdup(hint);
+	ba->Hint = new_strdup(hint.c_str());
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
-		strcpy_s(buf, sizeof(buf), umask);
+		strcpy_s(buf, sizeof(buf), umask.c_str());
 	} else {
-		sprintf(buf, ",%s,", umask);
+		sprintf(buf, ",%s,", umask.c_str());
 	}
 	ba->UnitMask = new_strdup(buf);
 	UnitButtonTable.push_back(ba);

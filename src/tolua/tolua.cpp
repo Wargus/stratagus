@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 18 19:13:40 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 18 21:27:36 2006.
 */
 
 #ifndef __cplusplus
@@ -3864,7 +3864,7 @@ static int tolua_get_CIcon_Ident(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
 #endif
- tolua_pushstring(tolua_S,(const char*)self->GetIdent());
+ tolua_pushcppstring(tolua_S,(const char*)self->GetIdent());
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE

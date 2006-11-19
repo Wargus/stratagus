@@ -243,9 +243,9 @@ extern void InitButtons(void);
 	/// Free memory for buttons
 extern void CleanButtons(void);
 	/// Make a new button
-extern int AddButton(int pos, int level, char *IconIdent,
-	ButtonCmd action, const char *value, const ButtonCheckFunc func,
-	const char *arg, int key, const char *hint, const char *umask);
+extern int AddButton(int pos, int level, const std::string &IconIdent,
+	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
+	const std::string &arg, int key, const std::string &hint, const std::string &umask);
 
 //
 // in mouse.c
@@ -314,7 +314,7 @@ extern void SetHoldClickDelay(int delay);
 	/// Toggle pause mode
 extern void UiTogglePause(void);
 	/// Handle cheats
-extern int HandleCheats(const char *input);
+extern int HandleCheats(const std::string &input);
 
 	/// Call the lua function HandleCommandKey
 bool HandleCommandKey(int key);

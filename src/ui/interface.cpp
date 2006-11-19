@@ -675,12 +675,12 @@ static bool CommandKey(int key)
 **
 **  @return  1 if a cheat was handled, 0 otherwise
 */
-int HandleCheats(const char *input)
+int HandleCheats(const std::string &input)
 {
 	int ret;
 
 #ifdef DEBUG
-	if (!strcmp(input, "ai me")) {
+	if (input == "ai me") {
 		if (ThisPlayer->AiEnabled) {
 			ThisPlayer->AiEnabled = 0;
 			ThisPlayer->Type = PlayerPerson;
@@ -703,7 +703,7 @@ int HandleCheats(const char *input)
 		DebugPrint("No HandleCheats function in lua.\n");
 		return 0;
 	}
-	lua_pushstring(Lua, input);
+	lua_pushstring(Lua, input.c_str());
 	LuaCall(1, 0);
 	if (lua_gettop(Lua) - base == 1) {
 		ret = LuaToBoolean(Lua, -1);

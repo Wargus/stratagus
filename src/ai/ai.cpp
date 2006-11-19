@@ -531,7 +531,7 @@ void AiInit(CPlayer *player)
 	ait = NULL;
 
 	DebugPrint("%d - %p - looking for class %s\n" _C_
-		player->Index _C_ player _C_ player->AiName);
+		player->Index _C_ player _C_ player->AiName.c_str());
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//

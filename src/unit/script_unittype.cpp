@@ -349,10 +349,7 @@ static int CclDefineUnitType(lua_State *l)
 				DebugPrint("Warning animation `%s' not found\n" _C_ LuaToString(l, -1));
 			}
 		} else if (!strcmp(value, "Icon")) {
-			if (redefine) {
-				delete[] type->Icon.Name;
-			}
-			type->Icon.Name = new_strdup(LuaToString(l, -1));
+			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
 #ifdef USE_MNG
 		} else if (!strcmp(value, "Portrait")) {

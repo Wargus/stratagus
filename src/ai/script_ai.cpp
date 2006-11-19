@@ -1045,7 +1045,7 @@ static int CclAiDump(lua_State *l)
 	n = (int)AiPlayer->ResearchRequests.size();
 	printf("ResearchRequests(%d):\n", n);
 	for (i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->ResearchRequests[i]->Ident);
+		printf("%s ", AiPlayer->ResearchRequests[i]->Ident.c_str());
 	}
 	printf("\n");
 

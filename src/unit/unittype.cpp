@@ -284,7 +284,7 @@ void SaveUnitTypes(CFile *file)
 **
 **  @return       Unit-type pointer.
 */
-CUnitType *UnitTypeByIdent(const char *ident)
+CUnitType *UnitTypeByIdent(const std::string &ident)
 {
 	return UnitTypeMap[ident];
 }

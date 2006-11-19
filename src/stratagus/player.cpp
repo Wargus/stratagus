@@ -707,7 +707,7 @@ int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 **
 **  @note This function should not be used during run time.
 */
-int CPlayer::HaveUnitTypeByIdent(const char *ident) const
+int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
 {
 	return this->UnitTypesCount[UnitTypeByIdent(ident)->Slot];
 }

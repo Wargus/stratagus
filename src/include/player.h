@@ -391,7 +391,7 @@ public:
 	/// Does the player have units of that type
 	int HaveUnitTypeByType(const CUnitType *type) const;
 	/// Does the player have units of that type
-	int HaveUnitTypeByIdent(const char *ident) const;
+	int HaveUnitTypeByIdent(const std::string &ident) const;
 
 	/// Notify player about a problem
 	void Notify(int type, int x, int y, const char *fmt, ...) const;

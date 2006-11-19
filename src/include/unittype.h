@@ -526,7 +526,7 @@ struct lua_State;
 class Mng;
 #endif
 
-CUnitType *UnitTypeByIdent(const char *);
+CUnitType *UnitTypeByIdent(const std::string &ident);
 
 /**
 **  Missile type definition (used in config tables)
@@ -1045,23 +1045,23 @@ extern CUnitTypeVar UnitTypeVar;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CUnitType *CclGetUnitType(lua_State *l);  /// Access unit-type object
-extern void UnitTypeCclRegister(void);          /// Register ccl features
+extern CUnitType *CclGetUnitType(lua_State *l);      /// Access unit-type object
+extern void UnitTypeCclRegister(void);               /// Register ccl features
 
-extern void UpdateStats(int reset_to_default);  /// Update unit stats
-extern CUnitType *UnitTypeByIdent(const char *);  /// Get unit-type by ident
-extern int GetVariableIndex(const char *VarName); /// Get index of the variable
+extern void UpdateStats(int reset_to_default);       /// Update unit stats
+extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
+extern int GetVariableIndex(const char *VarName);    /// Get index of the variable
 
-extern void SaveUnitTypes(CFile *file);            /// Save the unit-type table
-extern CUnitType *NewUnitTypeSlot(char *);            /// Allocate an empty unit-type slot
+extern void SaveUnitTypes(CFile *file);              /// Save the unit-type table
+extern CUnitType *NewUnitTypeSlot(char *);           /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType *type, CPlayerColorGraphic *sprite,
 	int player, int frame, int x, int y);
 
-extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table
+extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 extern void LoadUnitTypeSprite(CUnitType *unittype); /// Load the sprite for a unittype
-extern void LoadUnitTypes(void);                    /// Load the unit-type data
-extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
+extern void LoadUnitTypes(void);                     /// Load the unit-type data
+extern void CleanUnitTypes(void);                    /// Cleanup unit-type module
 
 // in script_unittype.c
 

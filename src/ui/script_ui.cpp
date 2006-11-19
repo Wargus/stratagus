@@ -1378,7 +1378,7 @@ static int CclDefineButton(lua_State *l)
 		} else if (!strcmp(value, "Level")) {
 			ba.Level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			ba.Icon.Name = new_strdup(LuaToString(l, -1));
+			ba.Icon.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Action")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "move")) {
@@ -1526,7 +1526,7 @@ static int CclDefineButton(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
-	AddButton(ba.Pos, ba.Level, new_strdup(ba.Icon.Name), ba.Action, ba.ValueStr,
+	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
 	delete[] ba.ValueStr;
 	delete[] ba.AllowStr;
