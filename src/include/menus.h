@@ -201,7 +201,7 @@ extern char MenuMapFullPath[1024];   /// Full path to currently selected map
 
 	/// Draw menu button
 extern void DrawMenuButton(ButtonStyle *style, unsigned flags,
-	int x, int y, const char *text);
+	int x, int y, const std::string &text);
 
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);

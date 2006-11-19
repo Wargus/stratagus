@@ -60,7 +60,7 @@
 **  @param text   text to print on button
 */
 void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
-	const char *text)
+	const std::string &text)
 {
 	const char *nc;
 	const char *rc;
@@ -106,7 +106,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//
 	//  Text
 	//
-	if (text && text[0]) {
+	if (!text.empty()) {
 		GetDefaultTextColors(&oldnc, &oldrc);
 		nc = p->TextNormalColor ? p->TextNormalColor :
 			style->TextNormalColor ? style->TextNormalColor : oldnc;
@@ -116,12 +116,12 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 
 		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
 			VideoDrawTextCentered(x + p->TextX, y + p->TextY,
-				style->Font, text);
+				style->Font, text.c_str());
 		} else if (p->TextAlign == TextAlignLeft) {
-			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
+			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text.c_str());
 		} else {
-			VideoDrawText(x + p->TextX - style->Font->Width(text), y + p->TextY,
-				style->Font, text);
+			VideoDrawText(x + p->TextX - style->Font->Width(text.c_str()), y + p->TextY,
+				style->Font, text.c_str());
 		}
 
 		SetDefaultTextColors(oldnc, oldrc);
