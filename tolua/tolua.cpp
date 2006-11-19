@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 18 23:36:14 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 19 09:54:31 2006.
 */
 
 #ifndef __cplusplus
@@ -12429,7 +12429,7 @@ static int tolua_stratagus_CFont_New00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CFont",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isusertype(tolua_S,3,"CGraphic",0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
@@ -12437,14 +12437,15 @@ static int tolua_stratagus_CFont_New00(lua_State* tolua_S)
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
   CGraphic* g = ((CGraphic*)  tolua_tousertype(tolua_S,3,0));
  {
   CFont* tolua_ret = (CFont*)  CFont::New(ident,g);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFont");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12461,20 +12462,21 @@ static int tolua_stratagus_CFont_Get00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CFont",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   CFont* tolua_ret = (CFont*)  CFont::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFont");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
@@ -12557,20 +12559,21 @@ static int tolua_stratagus_CFontColor_New00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CFontColor",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   CFontColor* tolua_ret = (CFontColor*)  CFontColor::New(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFontColor");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12587,20 +12590,21 @@ static int tolua_stratagus_CFontColor_Get00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CFontColor",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   CFontColor* tolua_ret = (CFontColor*)  CFontColor::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFontColor");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
