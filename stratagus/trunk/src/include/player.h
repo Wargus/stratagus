@@ -282,6 +282,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <string>
 #include "upgrade_structs.h"
 #include "video.h"
 
@@ -303,11 +304,11 @@ class CPlayer
 {
 public:
 	int   Index;        /// player as number
-	char  Name[128];    /// name of non computer
+	std::string Name;   /// name of non computer
 
 	int   Type;         /// type of player (human,computer,...)
 	int   Race;         /// race of player (orc,human,...)
-	char  AiName[128];  /// AI for computer
+	std::string AiName; /// AI for computer
 
 	// friend enemy detection
 	int      Team;          /// team of player

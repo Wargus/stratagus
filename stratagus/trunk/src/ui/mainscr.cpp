@@ -1296,7 +1296,7 @@ void CInfoPanel::Draw(void)
 				Video.DrawRectangle(ColorWhite,x, y, 12, 12);
 				Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
 
-				VideoDrawText(x + 27, y, GameFont,Players[i].Name);
+				VideoDrawText(x + 27, y, GameFont,Players[i].Name.c_str());
 				VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);
 				y += 14;
 			}

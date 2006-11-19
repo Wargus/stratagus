@@ -865,7 +865,7 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = Map.Info.PlayerSide[i];
 		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[Map.Info.PlayerType[i]];
-		PlayerSetAiToMenu(Players[i].AiName, &menu->Items[AI_POSITION + i].D.Pulldown);
+		PlayerSetAiToMenu(Players[i].AiName.c_str(), &menu->Items[AI_POSITION + i].D.Pulldown);
 		sprintf(gold[i], "%d~!_", Players[i].Resources[GoldCost]);
 		sprintf(lumber[i], "%d~!_", Players[i].Resources[WoodCost]);
 		sprintf(oil[i], "%d~!_", Players[i].Resources[OilCost]);
@@ -885,8 +885,7 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		Map.Info.PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
 		Map.Info.PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
-		strcpy(Players[i].AiName, 
-				PlayerGetAiFromMenu(&menu->Items[AI_POSITION + i].D.Pulldown));
+		Players[i].AiName = PlayerGetAiFromMenu(&menu->Items[AI_POSITION + i].D.Pulldown));
 		Players[i].Resources[GoldCost] = atoi(gold[i]);
 		Players[i].Resources[WoodCost] = atoi(lumber[i]);
 		Players[i].Resources[OilCost] = atoi(oil[i]);

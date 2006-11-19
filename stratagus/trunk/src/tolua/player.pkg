@@ -10,7 +10,7 @@ enum PlayerTypes {
 class CPlayer
 {
 	int Index;
-	char Name[128];
+	string Name;
 	
 	int Type;
 

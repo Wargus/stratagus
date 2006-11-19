@@ -147,7 +147,7 @@ void SavePlayers(CFile *file)
 	//
 	for (int i = 0; i < NumPlayers; ++i) {
 		file->printf("Player(%d,\n", i);
-		file->printf("  \"name\", \"%s\",\n", Players[i].Name);
+		file->printf("  \"name\", \"%s\",\n", Players[i].Name.c_str());
 		file->printf("  \"type\", ");
 		switch (Players[i].Type) {
 			case PlayerNeutral:       file->printf("\"neutral\",");         break;
@@ -159,7 +159,7 @@ void SavePlayers(CFile *file)
 			default:                  file->printf("%d,",Players[i].Type);break;
 		}
 		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race]);
-		file->printf(" \"ai-name\", \"%s\",\n", Players[i].AiName);
+		file->printf(" \"ai-name\", \"%s\",\n", Players[i].AiName.c_str());
 		file->printf("  \"team\", %d,", Players[i].Team);
 
 		file->printf(" \"enemy\", \"");
@@ -358,14 +358,14 @@ void CreatePlayer(int type)
 			team = 2 + NumPlayers;
 			break;
 	}
-	DebugPrint("CreatePlayer name %s\n" _C_ player->Name);
+	DebugPrint("CreatePlayer name %s\n" _C_ player->Name.c_str());
 
 	player->Type = type;
 	player->Race = 0;
 	player->Team = team;
 	player->Enemy = 0;
 	player->Allied = 0;
-	strcpy_s(player->AiName, sizeof(player->AiName), "ai-passive");
+	player->AiName = "ai-passive";
 
 	//
 	//  Calculate enemy/allied mask.
@@ -466,7 +466,7 @@ void CPlayer::SetSide(int side)
 */
 void CPlayer::SetName(const char *name)
 {
-	strncpy_s(Name, sizeof(Name), name, _TRUNCATE);
+	Name = name;
 }
 
 /**
@@ -478,10 +478,10 @@ void CPlayer::SetName(const char *name)
 void CPlayer::Clear() 
 {
 	Index = 0;
-	memset(Name, 0, sizeof(Name));
+	Name.clear();
 	Type = 0;
 	Race = 0;
-	memset(AiName, 0, sizeof(AiName));
+	AiName.clear();
 	Team = 0;
 	Enemy = 0;
 	Allied = 0;
@@ -826,9 +826,9 @@ void DebugPlayers(void)
 		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i] _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
-			Players[i].Name _C_ playertype _C_
+			Players[i].Name.c_str() _C_ playertype _C_
 			PlayerRaces.Name[Players[i].Race] _C_
-			Players[i].AiName);
+			Players[i].AiName.c_str());
 	}
 #endif
 }
@@ -866,7 +866,7 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 	if (this == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);
 	} else {
-		SetMessageEvent(x, y, "(%s): %s", Name, temp);
+		SetMessageEvent(x, y, "(%s): %s", Name.c_str(), temp);
 	}
 
 }
