@@ -123,11 +123,11 @@ class CUnitType;
 	/// Private type which specifies the cursor-type
 class CCursor {
 public:
-	CCursor() : Ident(NULL), Race(NULL), HotX(0), HotY(0),
+	CCursor() : HotX(0), HotY(0),
 		SpriteFrame(0), FrameRate(0), G(NULL) {}
 
-	char *Ident;  /// Identifier to reference it
-	char *Race;   /// Race name
+	std::string Ident;  /// Identifier to reference it
+	std::string Race;   /// Race name
 
 	int HotX;     /// Hot point x
 	int HotY;     /// Hot point y
@@ -143,12 +143,11 @@ public:
 	/// Cursor config reference
 class CursorConfig {
 public:
-	CursorConfig() : Name(NULL), Cursor(NULL) {}
-	~CursorConfig() { delete[] Name; }
+	CursorConfig() : Cursor(NULL) {}
 
 	void Load();
 
-	char *Name;       /// Config cursor-type name
+	std::string Name; /// Config cursor-type name
 	CCursor *Cursor;  /// Cursor-type pointer
 };
 
@@ -184,10 +183,10 @@ extern int CursorStartScrMapY;  /// the same in screen map coordinate system
 ----------------------------------------------------------------------------*/
 
 	/// Load all cursors
-extern void LoadCursors(const char *racename);
+extern void LoadCursors(const std::string &racename);
 
 	/// Cursor by identifier
-extern CCursor *CursorByIdent(const char *ident);
+extern CCursor *CursorByIdent(const std::string &ident);
 
 	/// Draw any cursor
 extern void DrawCursor(void);

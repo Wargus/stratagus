@@ -320,8 +320,8 @@ static int CclSetTitleScreens(lua_State *l)
 static int CclDefineCursor(lua_State *l)
 {
 	const char *value;
-	const char *name;
-	const char *race;
+	std::string name;
+	std::string race;
 	const char *file;
 	int hotx;
 	int hoty;
@@ -335,7 +335,7 @@ static int CclDefineCursor(lua_State *l)
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	name = race = file = NULL;
+	file = NULL;
 	hotx = hoty = w = h = rate = 0;
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
@@ -374,10 +374,10 @@ static int CclDefineCursor(lua_State *l)
 		lua_pop(l, 1);
 	}
 
-	Assert(name && file && w && h);
+	Assert(!name.empty() && file && w && h);
 
-	if (!strcmp(race, "any")) {
-		race = NULL;
+	if (race == "any") {
+		race.clear();
 	}
 
 	//
@@ -390,14 +390,10 @@ static int CclDefineCursor(lua_State *l)
 			//
 			//  Race not same, not found.
 			//
-			if (AllCursors[i].Race && race) {
-				if (strcmp(AllCursors[i].Race, race)) {
-					continue;
-				}
-			} else if (AllCursors[i].Race != race) {
+			if (AllCursors[i].Race != race) {
 				continue;
 			}
-			if (!strcmp(AllCursors[i].Ident, name)) {
+			if (AllCursors[i].Ident == name) {
 				ct = &AllCursors[i];
 				break;
 			}
@@ -410,8 +406,8 @@ static int CclDefineCursor(lua_State *l)
 		CCursor c;
 		AllCursors.push_back(c);
 		ct = &AllCursors.back();
-		ct->Ident = new_strdup(name);
-		ct->Race = race ? new_strdup(race) : NULL;
+		ct->Ident = name;
+		ct->Race = race;
 	}
 
 	ct->G = CGraphic::New(file, w, h);

@@ -77,10 +77,10 @@ void LoadConstructions(void)
 	std::vector<CConstruction *>::iterator i;
 
 	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		if (!(*i)->Ident) {
+		if ((*i)->Ident.empty()) {
 			continue;
 		}
-		file = (*i)->File.File;
+		file = (*i)->File.File.c_str();
 		(*i)->Width = (*i)->File.Width;
 		(*i)->Height = (*i)->File.Height;
 		if (file && *file) {
@@ -89,7 +89,7 @@ void LoadConstructions(void)
 			(*i)->Sprite->Load();
 			(*i)->Sprite->Flip();
 		}
-		file = (*i)->ShadowFile.File;
+		file = (*i)->ShadowFile.File.c_str();
 		(*i)->ShadowWidth = (*i)->ShadowFile.Width;
 		(*i)->ShadowHeight = (*i)->ShadowFile.Height;
 		if (file && *file) {
@@ -116,10 +116,7 @@ void CleanConstructions(void)
 	//  Free the construction table.
 	//
 	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		delete[] (*i)->Ident;
-		delete[] (*i)->File.File;
 		CGraphic::Free((*i)->Sprite);
-		delete[] (*i)->ShadowFile.File;
 		CGraphic::Free((*i)->ShadowSprite);
 		cframe = (*i)->Frames;
 		while (cframe) {
@@ -139,16 +136,16 @@ void CleanConstructions(void)
 **
 **  @return       Construction structure pointer
 */
-CConstruction *ConstructionByIdent(const char *ident)
+CConstruction *ConstructionByIdent(const std::string &ident)
 {
 	std::vector<CConstruction *>::iterator i;
 
 	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		if ((*i)->Ident && !strcmp(ident, (*i)->Ident)) {
+		if (ident == (*i)->Ident) {
 			return *i;
 		}
 	}
-	DebugPrint("Construction `%s' not found.\n" _C_ ident);
+	DebugPrint("Construction `%s' not found.\n" _C_ ident.c_str());
 	return NULL;
 }
 
@@ -164,7 +161,7 @@ CConstruction *ConstructionByIdent(const char *ident)
 static int CclDefineConstruction(lua_State *l)
 {
 	const char *value;
-	char *str;
+	std::string str;
 	CConstruction *construction;
 	std::vector<CConstruction *>::iterator i;
 	int subargs;
@@ -177,13 +174,12 @@ static int CclDefineConstruction(lua_State *l)
 
 	// Slot identifier
 
-	str = new_strdup(LuaToString(l, 1));
+	str = LuaToString(l, 1);
 
 	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
-		if (!strcmp((*i)->Ident, str)) {
+		if ((*i)->Ident == str) {
 			// Redefine
 			construction = *i;
-			delete[] construction->Ident;
 			break;
 		}
 	}
@@ -237,12 +233,10 @@ static int CclDefineConstruction(lua_State *l)
 				lua_pop(l, 1);
 			}
 			if (files) {
-				delete[] construction->File.File;
 				construction->File.File = file;
 				construction->File.Width = w;
 				construction->File.Height = h;
 			} else {
-				delete[] construction->ShadowFile.File;
 				construction->ShadowFile.File = file;
 				construction->ShadowFile.Width = w;
 				construction->ShadowFile.Height = h;
