@@ -179,7 +179,7 @@ void LoadModules(void)
 	SetPlayersPalette();
 	UI.Minimap.Create();
 
-	SetDefaultTextColors(UI.NormalFontColor.c_str(), UI.ReverseFontColor.c_str());
+	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 }
 
 /**

@@ -700,7 +700,7 @@ void CreateGame(const char *filename, CMap *map)
 	//
 	InitTriggers();
 
-	SetDefaultTextColors(UI.NormalFontColor.c_str(), UI.ReverseFontColor.c_str());
+	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 
 #if 0
 	if (!UI.SelectedViewport) {

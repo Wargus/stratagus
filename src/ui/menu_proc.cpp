@@ -62,10 +62,10 @@
 void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	const std::string &text)
 {
-	const char *nc;
-	const char *rc;
-	const char *oldnc;
-	const char *oldrc;
+	std::string nc;
+	std::string rc;
+	std::string oldnc;
+	std::string oldrc;
 	int i;
 	ButtonStyleProperties *p;
 	ButtonStyleProperties *pimage;
@@ -107,11 +107,11 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//  Text
 	//
 	if (!text.empty()) {
-		GetDefaultTextColors(&oldnc, &oldrc);
-		nc = p->TextNormalColor ? p->TextNormalColor :
-			style->TextNormalColor ? style->TextNormalColor : oldnc;
-		rc = p->TextReverseColor ? p->TextReverseColor :
-			style->TextReverseColor ? style->TextReverseColor : oldrc;
+		GetDefaultTextColors(oldnc, oldrc);
+		nc = !p->TextNormalColor.empty() ? p->TextNormalColor :
+			!style->TextNormalColor.empty() ? style->TextNormalColor : oldnc;
+		rc = !p->TextReverseColor.empty() ? p->TextReverseColor :
+			!style->TextReverseColor.empty() ? style->TextReverseColor : oldrc;
 		SetDefaultTextColors(nc, rc);
 
 		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
