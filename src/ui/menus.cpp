@@ -1259,8 +1259,7 @@ static void SelectGameServer(Menuitem *mi)
 		return;
 	}
 
-	delete[] NetworkArg;
-	NetworkArg = new_strdup(server_host_buffer);
+	NetworkArg = server_host_buffer;
 
 	// Here we really go...
 	ProcessMenu("menu-net-connecting", 1);

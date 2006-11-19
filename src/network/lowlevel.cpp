@@ -212,17 +212,17 @@ int NetSetNonBlocking(Socket sockfd)
 **
 **  @param host  Host name (f.e. 192.168.0.0 or stratagus.net)
 */
-unsigned long NetResolveHost(const char *host)
+unsigned long NetResolveHost(const std::string &host)
 {
 	unsigned long addr;
 
-	if (host) {
-		addr = inet_addr(host); // try dot notation
+	if (!host.empty()) {
+		addr = inet_addr(host.c_str()); // try dot notation
 		if (addr == INADDR_NONE) {
 			struct hostent *he;
 
 			he = 0;
-			he = gethostbyname(host);
+			he = gethostbyname(host.c_str());
 			if (he) {
 				addr = 0;
 				Assert(he->h_length == 4);

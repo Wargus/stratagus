@@ -857,14 +857,14 @@ static void DrawEditorPanel(void)
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
 			(Editor.State == EditorSelecting ? IconSelected : 0),
-		x, y, NULL);
+		x, y, "");
 	icon = Editor.Units.Icon;
 	Assert(icon);
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 		(ButtonUnderCursor == UnitButton ? IconActive : 0) |
 			(Editor.State == EditorEditUnit ? IconSelected : 0),
-		x + UNIT_ICON_X, y + UNIT_ICON_Y, NULL);
+		x + UNIT_ICON_X, y + UNIT_ICON_Y, "");
 
 	if (Editor.TerrainEditable) {
 		DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
@@ -878,7 +878,7 @@ static void DrawEditorPanel(void)
 		icon->DrawUnitIcon(Players, UI.SingleSelectedButton->Style,
 			(ButtonUnderCursor == StartButton ? IconActive : 0) |
 				(Editor.State == EditorSetStartLocation ? IconSelected : 0),
-			x + START_ICON_X, y + START_ICON_Y, NULL);
+			x + START_ICON_X, y + START_ICON_Y, "");
 	} else {
 		//  No unit specified.
 		//  Todo : FIXME Should we just warn user to define Start unit ?

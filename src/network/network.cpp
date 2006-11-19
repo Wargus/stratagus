@@ -974,7 +974,7 @@ void NetworkQuit(void)
 **
 **  @param msg  Text message to send.
 */
-void NetworkChatMessage(const char *msg)
+void NetworkChatMessage(const std::string &msg)
 {
 	NetworkCommandQueue *ncq;
 	NetworkChat *ncm;
@@ -982,8 +982,8 @@ void NetworkChatMessage(const char *msg)
 	int n;
 
 	if (IsNetworkGame()) {
-		cp = msg;
-		n = strlen(msg);
+		cp = msg.c_str();
+		n = msg.size();
 		while (n >= (int)sizeof(ncm->Text)) {
 			ncq = AllocNCQ();
 			MsgCommandsIn.push_back(ncq);
