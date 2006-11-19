@@ -617,7 +617,7 @@ static void DrawUnitInfo(CUnit *unit)
 		type->Icon.Icon->DrawUnitIcon(unit->Player, UI.SingleSelectedButton->Style,
 			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 				(IconActive | (MouseButtons & LeftButton)) : 0,
-			x, y, NULL);
+			x, y, "");
 	}
 
 	x = UI.InfoPanel.X;
@@ -642,7 +642,7 @@ static void DrawUnitInfo(CUnit *unit)
 						(ButtonAreaUnderCursor == ButtonAreaTraining &&
 							ButtonUnderCursor == 0) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0,
-						UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, NULL);
+						UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
 				}
 			} else {
 				if (UI.TrainingText) {
@@ -658,7 +658,7 @@ static void DrawUnitInfo(CUnit *unit)
 								(ButtonAreaUnderCursor == ButtonAreaTraining &&
 									ButtonUnderCursor == i) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0,
-								UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, NULL);
+								UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
 						}
 					}
 				}
@@ -676,7 +676,7 @@ static void DrawUnitInfo(CUnit *unit)
 					(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.UpgradingButton->X, UI.UpgradingButton->Y, NULL);
+					UI.UpgradingButton->X, UI.UpgradingButton->Y, "");
 			}
 			return;
 		}
@@ -691,7 +691,7 @@ static void DrawUnitInfo(CUnit *unit)
 					(ButtonAreaUnderCursor == ButtonAreaResearching &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.ResearchingButton->X, UI.ResearchingButton->Y, NULL);
+					UI.ResearchingButton->X, UI.ResearchingButton->Y, "");
 			}
 			return;
 		}
@@ -709,7 +709,7 @@ static void DrawUnitInfo(CUnit *unit)
 				uins->Type->Icon.Icon->DrawUnitIcon(unit->Player, UI.TransportingButtons[j].Style,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, NULL);
+					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, "");
 				UiDrawLifeBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 					UiDrawManaBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
@@ -1211,7 +1211,7 @@ void CInfoPanel::Draw(void)
 					UI.SelectedButtons[i].Style,
 					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, NULL);
+					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, "");
 				UiDrawLifeBar(Selected[i],
 					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 

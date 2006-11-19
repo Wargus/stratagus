@@ -211,7 +211,7 @@ extern void NetworkSync(void);   /// Hold in sync
 extern void NetworkQuit(void);   /// Quit game
 extern void NetworkRecover(void);   /// Recover network
 extern void NetworkCommands(void);  /// Get all network commands
-extern void NetworkChatMessage(const char *msg);  /// Send chat message
+extern void NetworkChatMessage(const std::string &msg);  /// Send chat message
 	/// Send network command.
 extern void NetworkSendCommand(int command, const CUnit *unit, int x,
 	int y, const CUnit *dest, const CUnitType *type, int status);

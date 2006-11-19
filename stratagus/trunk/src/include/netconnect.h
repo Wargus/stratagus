@@ -177,7 +177,7 @@ enum _net_client_con_state_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char *NetworkArg;  /// Network command line argument
+extern std::string NetworkArg;  /// Network command line argument
 extern int NetPlayers;    /// Network players
 extern int NetworkPort;   /// Local network port to use
 
@@ -210,7 +210,7 @@ extern void NetworkExitClientConnect(void);  /// Terminate network connect state
 extern void NetworkInitServerConnect(void);  /// Setup network connect state machine for the server
 extern void NetworkExitServerConnect(void);  /// Terminate network connect state machine for the server
 extern int NetworkParseSetupEvent(const char *buf, int size);  /// Parse a network connect event
-extern int NetworkSetupServerAddress(const char *serveraddr);  /// Menu: Setup the server IP
+extern int NetworkSetupServerAddress(const std::string &serveraddr);  /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest(void);  /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest(void);  /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients(void);  /// Menu Loop: Server: Mark clients state to send stateinfo message

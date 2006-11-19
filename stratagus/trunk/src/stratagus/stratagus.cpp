@@ -962,7 +962,7 @@ int main(int argc, char **argv)
 				NetworkPort = atoi(optarg);
 				continue;
 			case 'n':
-				NetworkArg = new_strdup(optarg);
+				NetworkArg = optarg;
 				continue;
 			case 'N':
 				strncpy_s(LocalPlayerName, sizeof(LocalPlayerName), optarg, _TRUNCATE);

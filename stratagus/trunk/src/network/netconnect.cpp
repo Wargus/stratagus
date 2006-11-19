@@ -65,7 +65,7 @@
 // Variables
 //----------------------------------------------------------------------------
 
-char *NetworkArg;                      /// Network command line argument
+std::string NetworkArg;                /// Network command line argument
 int NetPlayers;                        /// How many network players
 int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 
@@ -209,7 +209,7 @@ static void NetworkSendRateLimitedClientMessage(InitMessage *msg, unsigned long 
 **
 ** @return True, if error; otherwise false.
 */
-int NetworkSetupServerAddress(const char *serveraddr)
+int NetworkSetupServerAddress(const std::string &serveraddr)
 {
 	unsigned long addr;
 
@@ -219,7 +219,7 @@ int NetworkSetupServerAddress(const char *serveraddr)
 	}
 	NetworkServerIP = addr;
 
-	DebugPrint("SELECTED SERVER: %s (%d.%d.%d.%d)\n" _C_ serveraddr _C_
+	DebugPrint("SELECTED SERVER: %s (%d.%d.%d.%d)\n" _C_ serveraddr.c_str() _C_
 		NIPQUAD(ntohl(addr)));
 
 	sprintf(NetServerText, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
