@@ -414,7 +414,7 @@ static void AppendLog(LogEntry *log, CFile *dest)
 ** @param num       optional number argument
 */
 void CommandLog(const char *action, const CUnit *unit, int flush,
-	int x, int y, const CUnit *dest, const char *value, int num)
+	int x, int y, const CUnit *dest, const std::string &value, int num)
 {
 	LogEntry *log;
 
@@ -497,7 +497,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	// Value given.
 	//
-	log->Value = (value ? value : "");
+	log->Value = value;
 
 	//
 	// Number given.

@@ -56,8 +56,7 @@ CEditor Editor;
 static int CclSetEditorSelectIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	delete[] Editor.Select.Name;
-	Editor.Select.Name = new_strdup(LuaToString(l, 1));
+	Editor.Select.Name = LuaToString(l, 1);
 	return 0;
 }
 
@@ -69,8 +68,7 @@ static int CclSetEditorSelectIcon(lua_State *l)
 static int CclSetEditorUnitsIcon(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	delete[] Editor.Units.Name;
-	Editor.Units.Name = new_strdup(LuaToString(l, 1));
+	Editor.Units.Name = LuaToString(l, 1);
 	return 0;
 }
 

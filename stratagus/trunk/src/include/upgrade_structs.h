@@ -142,15 +142,15 @@ public:
 */
 class CUpgrade {
 public:
-	CUpgrade(const char *ident);
+	CUpgrade(const std::string &ident);
 	~CUpgrade();
 
-	static CUpgrade *New(const char *ident);
-	static CUpgrade *Get(const char *ident);
+	static CUpgrade *New(const std::string &ident);
+	static CUpgrade *Get(const std::string &ident);
 
 	void SetIcon(CIcon *icon);
 
-	char *Ident;                      /// identifier
+	std::string Ident;                /// identifier
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
 		// TODO: not used by buttons

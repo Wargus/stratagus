@@ -3613,7 +3613,7 @@ void SaveOrder(const COrder *order, CFile *file)
 			break;
 		case UnitActionResearch:
 			if (order->Arg1.Upgrade) {
-				file->printf(" \"upgrade\", \"%s\",", order->Arg1.Upgrade->Ident);
+				file->printf(" \"upgrade\", \"%s\",", order->Arg1.Upgrade->Ident.c_str());
 			}
 			break;
 		case UnitActionResource :
@@ -3846,7 +3846,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 			}
 		case UnitActionResearch:
 			file->printf(",\n  \"data-research\", {");
-			file->printf("\"ident\", \"%s\",", unit->Data.Research.Upgrade->Ident);
+			file->printf("\"ident\", \"%s\",", unit->Data.Research.Upgrade->Ident.c_str());
 			file->printf("}");
 			break;
 		case UnitActionUpgradeTo:

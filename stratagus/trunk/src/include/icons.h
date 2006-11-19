@@ -106,48 +106,34 @@ class ButtonStyle;
 	/// Icon: rectangle image used in menus
 class CIcon {
 public:
-	CIcon(const char *ident);
+	CIcon(const std::string &ident);
 	~CIcon();
 
-	static CIcon *New(const char *ident);
-	static CIcon *Get(const char *ident);
+	static CIcon *New(const std::string &ident);
+	static CIcon *Get(const std::string &ident);
 
 	/// Draw icon
 	void DrawIcon(const CPlayer *player, int x, int y) const;
 	/// Draw icon of an unit
 	void DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
-		unsigned flags, int x, int y, const char *text) const;
+		unsigned flags, int x, int y, const std::string &text) const;
 
-	inline const char *GetIdent() { return this->Ident; }
+	inline const std::string &GetIdent() { return this->Ident; }
 
 	CGraphic *G;              /// Graphic data
 	int Frame;                /// Frame number in graphic
 private:
-	char *Ident;              /// Icon identifier
+	std::string Ident;        /// Icon identifier
 };
 
 	/// Icon reference (used in config tables)
 class IconConfig {
 public:
-	IconConfig() : Name(NULL), Icon(NULL) {}
-	~IconConfig()
-	{
-		delete [] Name;
-	};
-
-	IconConfig &operator = (const IconConfig &rhs)
-	{
-		if (this == &rhs) {
-			return *this;
-		}
-		Name = new_strdup(rhs.Name);
-		Icon = rhs.Icon;
-		return *this;
-	}
+	IconConfig() : Icon(NULL) {}
 
 	void Load();
 
-	char *Name;          /// config icon name
+	std::string Name;    /// config icon name
 	CIcon *Icon;         /// icon pointer to use to run time
 };
 
