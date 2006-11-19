@@ -201,9 +201,8 @@ void CIcon::DrawIcon(const CPlayer *player, int x, int y) const
 void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 	unsigned flags, int x, int y, const std::string &text) const
 {
-	ButtonStyle s;
+	ButtonStyle s(*style);
 
-	memcpy(&s, style, sizeof(ButtonStyle));
 	s.Default.Sprite = s.Hover.Sprite = s.Selected.Sprite =
 		s.Clicked.Sprite = s.Disabled.Sprite = this->G;
 	s.Default.Frame = s.Hover.Frame = s.Selected.Frame =
