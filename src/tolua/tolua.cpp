@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 18 15:13:45 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 18 19:13:40 2006.
 */
 
 #ifndef __cplusplus
@@ -12838,7 +12838,7 @@ static int tolua_get_CPlayer_Name(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
 #endif
- tolua_pushstring(tolua_S,(const char*)self->Name);
+ tolua_pushcppstring(tolua_S,(const char*)self->Name);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -12851,10 +12851,11 @@ static int tolua_set_CPlayer_Name(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
- if (!tolua_isstring(tolua_S,2,0,&tolua_err))
+ if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
- strncpy(self->Name,tolua_tostring(tolua_S,2,0),128-1);
+  self->Name = ((string)  tolua_tocppstring(tolua_S,2,0))
+;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE

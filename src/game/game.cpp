@@ -252,7 +252,7 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 				i, PlayerRaces.Name[Players[i].Race]);
 			f->printf("SetAiType(%d, \"%s\")\n",
-				i, Players[i].AiName);
+				i, Players[i].AiName.c_str());
 		}
 		f->printf("\n");
 
