@@ -672,10 +672,10 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 **
 **  @param mapname    map filename
 **/
-void LoadStratagusMapInfo(const char *mapname) 
+void LoadStratagusMapInfo(const std::string &mapname) 
 {
 	// Set the default map setup by replacing .smp with .sms
-	char *file = new_strdup(mapname);
+	char *file = new_strdup(mapname.c_str());
 	memcpy(strstr(file, ".smp"), ".sms", 4);
 	Map.Info.Filename = file;
 	delete[] file;

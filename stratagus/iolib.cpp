@@ -697,10 +697,10 @@ class RawFileWriter : public FileWriter
 	FILE *file;
 
 public:
-	RawFileWriter(const char *filename) {
-		file = fopen(filename, "wb");
+	RawFileWriter(const std::string &filename) {
+		file = fopen(filename.c_str(), "wb");
 		if (!file) {
-			fprintf(stderr,"Can't open file '%s' for writing\n", filename);
+			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
 			throw FileException();
 		}
 	}
@@ -720,10 +720,10 @@ class GzFileWriter : public FileWriter
 	gzFile file;
 
 public:
-	GzFileWriter(const char *filename) {
-		file = gzopen(filename, "wb9");
+	GzFileWriter(const std::string &filename) {
+		file = gzopen(filename.c_str(), "wb9");
 		if (!file) {
-			fprintf(stderr,"Can't open file '%s' for writing\n", filename);
+			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
 			throw FileException();
 		}
 	}
@@ -738,10 +738,12 @@ public:
 	}
 };
 
-
-FileWriter *CreateFileWriter(const char *filename)
+/**
+**  Create FileWriter
+*/
+FileWriter *CreateFileWriter(const std::string &filename)
 {
-	if (strcasestr(filename, ".gz")) {
+	if (strcasestr(filename.c_str(), ".gz")) {
 		return new GzFileWriter(filename);
 	} else {
 		return new RawFileWriter(filename);
