@@ -1168,8 +1168,6 @@ SpellType::SpellType(int slot, const char *identname) :
 	AutoCast(NULL), AICast(NULL)
 {
 	Ident = new_strdup(identname);
-	SoundWhenCast.Name = NULL;
-	SoundWhenCast.Sound = NULL;
 }
 
 /**
@@ -1190,8 +1188,6 @@ SpellType::~SpellType()
 	//
 	delete AutoCast;
 	delete AICast;
-
-	delete[] SoundWhenCast.Name;
 }
 
 

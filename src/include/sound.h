@@ -186,9 +186,9 @@ extern void InitMusic(void);
 // sound_id.cpp
 
 	/// Map sound to identifier
-extern void MapSound(const char *sound_name, CSound *id);
+extern void MapSound(const std::string &sound_name, CSound *id);
 	/// Get the sound id bound to an identifier
-extern CSound *SoundForName(const char *sound_name);
+extern CSound *SoundForName(const std::string &sound_name);
 	/// Make a sound bound to identifier
 extern CSound *MakeSound(const char *sound_name, const char *file[], int nb);
 	/// Make a sound group bound to identifier

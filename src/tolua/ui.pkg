@@ -161,8 +161,8 @@ extern CUserInterface UI;
 
 class CIcon
 {
-	static CIcon *New(const char *ident);
-	static CIcon *Get(const char *ident);
+	static CIcon *New(const std::string &ident);
+	static CIcon *Get(const std::string &ident);
 
 	tolua_readonly tolua_property__s std::string Ident;
 	CGraphic *G;
