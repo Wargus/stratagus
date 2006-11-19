@@ -105,7 +105,7 @@ bool ButtonCheckUnitsOr(const CUnit *unit, const ButtonAction *button)
 	CPlayer *player;
 
 	player = unit->Player;
-	buf = new_strdup(button->AllowStr);
+	buf = new_strdup(button->AllowStr.c_str());
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
@@ -130,7 +130,7 @@ bool ButtonCheckUnitsAnd(const CUnit *unit, const ButtonAction *button)
 	CPlayer *player;
 
 	player = unit->Player;
-	buf = new_strdup(button->AllowStr);
+	buf = new_strdup(button->AllowStr.c_str());
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
@@ -250,7 +250,7 @@ bool ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
 	if (!CheckDependByIdent(unit->Player, button->ValueStr)) {
 		return false;
 	}
-	if (!strncmp(button->ValueStr, "upgrade-", 8) &&
+	if (!strncmp(button->ValueStr.c_str(), "upgrade-", 8) &&
 			UpgradeIdentAllowed(unit->Player, button->ValueStr) != 'A') {
 		return false;
 	}

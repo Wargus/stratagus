@@ -107,7 +107,7 @@ void LoadCursors(const std::string &race)
 		//
 		//  Only load cursors of this race or universal cursors.
 		//
-		if ((*i).Race != race) {
+		if (!(*i).Race.empty() && (*i).Race != race) {
 			continue;
 		}
 
