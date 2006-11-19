@@ -460,7 +460,7 @@ int UpgradeIdByIdent(const std::string &ident)
 	if ((upgrade = CUpgrade::Get(ident))) {
 		return upgrade->ID;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident);
+	DebugPrint(" fix this %s\n" _C_ ident.c_str());
 	return -1;
 }
 
