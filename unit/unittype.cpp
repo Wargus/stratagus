@@ -617,19 +617,6 @@ void CleanUnitTypes(void)
 			}
 		}
 
-		//
-		// FIXME: Sounds can't be freed, they still stuck in sound hash.
-		//
-		delete[] type->Sound.Selected.Name;
-		delete[] type->Sound.Acknowledgement.Name;
-		delete[] type->Sound.Ready.Name;
-		delete[] type->Sound.Repair.Name;
-		for (j = 0; j < MaxCosts; ++j) {
-			delete[] type->Sound.Harvest[j].Name;
-		}
-		delete[] type->Sound.Help.Name;
-		delete[] type->Sound.Dead.Name;
-
 		CGraphic::Free(type->Sprite);
 		CGraphic::Free(type->ShadowSprite);
 #ifdef USE_MNG

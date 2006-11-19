@@ -64,7 +64,7 @@ static std::map<std::string, CSound *> SoundMap;
 **  @param name  Name of the sound (now freed by caller!).
 **  @param id    Sound identifier.
 */
-void MapSound(const char *name, CSound *id)
+void MapSound(const std::string &name, CSound *id)
 {
 	SoundMap[name] = id;
 }
@@ -76,13 +76,13 @@ void MapSound(const char *name, CSound *id)
 **
 **  @return      Sound identifier for this name.
 */
-CSound *SoundForName(const char *name)
+CSound *SoundForName(const std::string &name)
 {
-	Assert(name);
+	Assert(!name.empty());
 
 	CSound *result = SoundMap[name];
 	if (!result) {
-		DebugPrint("Can't find sound `%s' in sound table\n" _C_ name);
+		DebugPrint("Can't find sound `%s' in sound table\n" _C_ name.c_str());
 	}
 	return result;
 }

@@ -383,9 +383,7 @@ public:
 		Range(0), SplashFactor(0), ImpactMissile(NULL),
 		SmokeMissile(NULL), G(NULL)
 	{
-		FiredSound.Name = NULL;
 		FiredSound.Sound = NULL;
-		ImpactSound.Name = NULL;
 		ImpactSound.Sound = NULL;
 	};
 	~MissileType();

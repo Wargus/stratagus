@@ -848,32 +848,20 @@ static int CclDefineUnitType(lua_State *l)
 				++k;
 
 				if (!strcmp(value, "selected")) {
-					if (redefine) {
-						delete[] type->Sound.Selected.Name;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Selected.Name = new_strdup(LuaToString(l, -1));
+					type->Sound.Selected.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "acknowledge")) {
-					if (redefine) {
-						delete[] type->Sound.Acknowledgement.Name;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Acknowledgement.Name = new_strdup(LuaToString(l, -1));
+					type->Sound.Acknowledgement.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "ready")) {
-					if (redefine) {
-						delete[] type->Sound.Ready.Name;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Ready.Name = new_strdup(LuaToString(l, -1));
+					type->Sound.Ready.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "repair")) {
-					if (redefine) {
-						delete[] type->Sound.Repair.Name;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Repair.Name = new_strdup(LuaToString(l, -1));
+					type->Sound.Repair.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "harvest")) {
 					int res;
@@ -891,25 +879,16 @@ static int CclDefineUnitType(lua_State *l)
 					if (res == MaxCosts) {
 						LuaError(l, "Resource not found: %s" _C_ value);
 					}
-					if (redefine) {
-						delete[] type->Sound.Harvest[res].Name;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Harvest[res].Name = new_strdup(LuaToString(l, -1));
+					type->Sound.Harvest[res].Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "help")) {
-					if (redefine) {
-						delete[] type->Sound.Help.Name;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Help.Name = new_strdup(LuaToString(l, -1));
+					type->Sound.Help.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "dead")) {
-					if (redefine) {
-						delete[] type->Sound.Dead.Name;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Dead.Name = new_strdup(LuaToString(l, -1));
+					type->Sound.Dead.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
