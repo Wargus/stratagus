@@ -456,7 +456,7 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 
 	file->printf("  \"research\", {");
 	for (i = 0; i < (int)ai->ResearchRequests.size(); ++i) {
-		file->printf("\"%s\", ", ai->ResearchRequests[i]->Ident);
+		file->printf("\"%s\", ", ai->ResearchRequests[i]->Ident.c_str());
 	}
 	file->printf("},\n");
 
@@ -1121,7 +1121,7 @@ void AiResearchComplete(CUnit *unit, const CUpgrade *what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
-		what->Ident _C_ unit->X _C_ unit->Y);
+		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
 
