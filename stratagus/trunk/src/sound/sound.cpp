@@ -70,16 +70,16 @@ GameSound GameSounds
 #ifndef laterUSE_CCL
 // FIXME: Removing this crashes?
 ={
-	{"placement error", NULL},
-	{"placement success", NULL},
-	{"click", NULL},
-	{"transport docking", NULL},
-	{"building construction", NULL},
-	{ {"basic human voices work complete", NULL},
-		{"basic orc voices work complete", NULL},
+	SoundConfig("placement error"),
+	SoundConfig("placement success"),
+	SoundConfig("click"),
+	SoundConfig("transport docking"),
+	SoundConfig("building construction"),
+	{ SoundConfig("basic human voices work complete"),
+		SoundConfig("basic orc voices work complete"),
 	},
-	{ {"rescue (human) UNUSED", NULL},
-		{"rescue (orc) UNUSED", NULL},
+	{ SoundConfig("rescue (human) UNUSED"),
+		SoundConfig("rescue (orc) UNUSED"),
 	},
 }
 #endif
@@ -521,13 +521,13 @@ void InitSoundClient(void)
 	}
 	for (i = 0; i < PlayerRaces.Count; ++i) {
 		if (!GameSounds.WorkComplete[i].Sound &&
-				GameSounds.WorkComplete[i].Name) {
+				!GameSounds.WorkComplete[i].Name.empty()) {
 			GameSounds.WorkComplete[i].Sound =
 				SoundForName(GameSounds.WorkComplete[i].Name);
 		}
 	}
 	for (i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.Rescue[i].Sound && GameSounds.Rescue[i].Name) {
+		if (!GameSounds.Rescue[i].Sound && !GameSounds.Rescue[i].Name.empty()) {
 			GameSounds.Rescue[i].Sound =
 				SoundForName(GameSounds.Rescue[i].Name);
 		}

@@ -1251,10 +1251,10 @@ void MissileType::Init(void)
 	//
 	// Resolve impact missiles and sounds.
 	//
-	if (this->FiredSound.Name) {
+	if (!this->FiredSound.Name.empty()) {
 		this->FiredSound.Sound = SoundForName(this->FiredSound.Name);
 	}
-	if (this->ImpactSound.Name) {
+	if (!this->ImpactSound.Name.empty()) {
 		this->ImpactSound.Sound = SoundForName(this->ImpactSound.Name);
 	}
 	this->ImpactMissile = MissileTypeByIdent(this->ImpactName);
@@ -1283,8 +1283,6 @@ void InitMissileTypes(void)
 */
 MissileType::~MissileType()
 {
-	delete[] this->FiredSound.Name;
-	delete[] this->ImpactSound.Name;
 	CGraphic::Free(this->G);
 }
 

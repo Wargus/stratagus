@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Nov 18 22:57:11 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Nov 18 23:36:14 2006.
 */
 
 #ifndef __cplusplus
@@ -3804,20 +3804,21 @@ static int tolua_stratagus_CIcon_New00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CIcon",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   CIcon* tolua_ret = (CIcon*)  CIcon::New(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CIcon");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -3834,20 +3835,21 @@ static int tolua_stratagus_CIcon_Get00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CIcon",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   CIcon* tolua_ret = (CIcon*)  CIcon::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CIcon");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
@@ -12667,20 +12669,21 @@ static int tolua_stratagus_CUpgrade_New00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CUpgrade",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::New(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12697,20 +12700,21 @@ static int tolua_stratagus_CUpgrade_Get00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CUpgrade",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* ident = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
  {
   CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
+ tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);

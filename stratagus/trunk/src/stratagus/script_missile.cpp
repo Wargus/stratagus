@@ -138,11 +138,9 @@ static int CclDefineMissileType(lua_State *l)
 		} else if (!strcmp(value, "transparency")) {
 			mtype->Transparency = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "FiredSound")) {
-			delete[] mtype->FiredSound.Name;
-			mtype->FiredSound.Name = new_strdup(LuaToString(l, -1));
+			mtype->FiredSound.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ImpactSound")) {
-			delete[] mtype->ImpactSound.Name;
-			mtype->ImpactSound.Name = new_strdup(LuaToString(l, -1));
+			mtype->ImpactSound.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Class")) {
 			value = LuaToString(l, -1);
 			for (i = 0; MissileClassNames[i]; ++i) {

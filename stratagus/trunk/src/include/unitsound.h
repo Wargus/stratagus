@@ -52,13 +52,11 @@ class CSound;
 class SoundConfig
 {
 public:
-//	SoundConfig() : Name(NULL), Sound(NULL) {};
-//	SoundConfig(const char *name) : Name(strdup(name)), Sound(NULL) {};
+	SoundConfig() : Sound(NULL) {}
+	SoundConfig(std::string name) : Name(name), Sound(NULL) {}
 
-//	~SoundConfig() {/*free(Name);*/};
-
-	char *Name;     /// config sound name
-	CSound *Sound;  /// identifier send to sound server
+	std::string Name;     /// config sound name
+	CSound *Sound;        /// identifier send to sound server
 };
 
 /**
@@ -68,17 +66,6 @@ public:
 */
 class CUnitSound {
 public:
-	CUnitSound() {
-		// FIXME: this should be done in SoundConfig's constructor
-		memset(&Selected, 0, sizeof(Selected));
-		memset(&Acknowledgement, 0, sizeof(Acknowledgement));
-		memset(&Ready, 0, sizeof(Ready));
-		memset(&Repair, 0, sizeof(Repair));
-		memset(Harvest, 0, sizeof(Harvest));
-		memset(&Help, 0, sizeof(Help));
-		memset(&Dead, 0, sizeof(Dead));
-	}
-
 	SoundConfig Selected;           /// selected by user
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Ready;              /// unit training... ready
