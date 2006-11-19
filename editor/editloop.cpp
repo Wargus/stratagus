@@ -1140,7 +1140,7 @@ void EditorUpdateDisplay(void)
 			&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 		(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 		UI.MenuButton.X, UI.MenuButton.Y,
-		UI.MenuButton.Text.c_str());
+		UI.MenuButton.Text);
 
 	//
 	// Minimap

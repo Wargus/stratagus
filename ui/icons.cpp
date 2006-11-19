@@ -213,7 +213,7 @@ void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 		s.Default.BorderColor = 0;
 	}
 	// FIXME: player colors
-	DrawMenuButton(&s, flags, x, y, text.c_str());
+	DrawMenuButton(&s, flags, x, y, text);
 }
 
 /**
