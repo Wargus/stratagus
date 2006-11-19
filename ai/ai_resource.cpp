@@ -590,12 +590,12 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	tablep = &AiHelpers.Research;
 
 	if (upgrade->ID > n) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident.c_str());
 		return;
 	}
 	table = &(*tablep)[upgrade->ID];
 	if (!table->size()) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident.c_str());
 		return;
 	}
 
