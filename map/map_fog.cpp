@@ -712,7 +712,7 @@ void CMap::InitFogOfWar(void)
 		}
 		SDL_UnlockSurface(s);
 	}
-	AlphaFogG = CGraphic::New(NULL);
+	AlphaFogG = CGraphic::New("");
 	AlphaFogG->Surface = s;
 	AlphaFogG->Width = TileSizeX;
 	AlphaFogG->Height = TileSizeY;

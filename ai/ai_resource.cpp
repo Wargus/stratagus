@@ -417,7 +417,7 @@ int AiCountUnitBuilders(CUnitType *type)
 	const std::vector<CUnitType *> *table;
 
 	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0) {
-		DebugPrint("Can't build `%s' now\n" _C_ type->Ident);
+		DebugPrint("Can't build `%s' now\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 	//
@@ -431,12 +431,12 @@ int AiCountUnitBuilders(CUnitType *type)
 		tablep = &AiHelpers.Train;
 	}
 	if (type->Slot > n) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 	table = &(*tablep)[type->Slot];
 	if (!table->size()) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 
@@ -491,12 +491,12 @@ static int AiMakeUnit(CUnitType *type)
 			tablep = &AiHelpers.Train;
 		}
 		if (type->Slot > n) { // Oops not known.
-			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 			continue;
 		}
 		table = &(*tablep)[type->Slot];
 		if (!table->size()) { // Oops not known.
-			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 			continue;
 		}
 
@@ -683,12 +683,12 @@ void AiAddUpgradeToRequest(CUnitType *type)
 	tablep = &AiHelpers.Upgrade;
 
 	if (type->Slot > n) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return;
 	}
 	table = &(*tablep)[type->Slot];
 	if (!table->size()) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return;
 	}
 
@@ -1204,12 +1204,12 @@ static int AiRepairUnit(CUnit *unit)
 	tablep = &AiHelpers.Repair;
 	type = unit->Type;
 	if (type->Slot > n) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 	table = &(*tablep)[type->Slot];
 	if (!table->size()) { // Oops not known.
-		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident.c_str());
 		return 0;
 	}
 

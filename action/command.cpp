@@ -876,7 +876,7 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 {
 	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
-		type ? type->Ident : "-any-");
+		type ? type->Ident.c_str() : "-any-");
 
 	ClearSavedAction(unit);
 
@@ -1127,7 +1127,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
-		UnitNumber(unit) _C_ spell->Ident _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
+		UnitNumber(unit) _C_ spell->Ident.c_str() _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
 	Assert(unit->Type->CanCastSpell[spell->Slot]);
 
 	//

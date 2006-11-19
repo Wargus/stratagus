@@ -234,7 +234,7 @@ static int CclDefineUnitType(lua_State *l)
 	if (type) {
 		redefine = 1;
 	} else {
-		type = NewUnitTypeSlot(new_strdup(str));
+		type = NewUnitTypeSlot(str);
 		redefine = 0;
 	}
 
@@ -247,9 +247,6 @@ static int CclDefineUnitType(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
-			if (redefine) {
-				delete[] type->Name;
-			}
 			type->Name = new_strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
@@ -263,11 +260,8 @@ static int CclDefineUnitType(lua_State *l)
 				++k;
 
 				if (!strcmp(value, "file")) {
-					if (redefine) {
-						delete[] type->File;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->File = new_strdup(LuaToString(l, -1));
+					type->File = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -297,11 +291,8 @@ static int CclDefineUnitType(lua_State *l)
 				++k;
 
 				if (!strcmp(value, "file")) {
-					if (redefine) {
-						delete[] type->ShadowFile;
-					}
 					lua_rawgeti(l, -1, k + 1);
-					type->ShadowFile = new_strdup(LuaToString(l, -1));
+					type->ShadowFile = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -703,14 +694,14 @@ static int CclDefineUnitType(lua_State *l)
 						--k;
 					} else if (!strcmp(value, "file-when-empty")) {
 						lua_rawgeti(l, -1, k + 1);
-						res->FileWhenEmpty = new_strdup(LuaToString(l, -1));
+						res->FileWhenEmpty = LuaToString(l, -1);
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
 						lua_rawgeti(l, -1, k + 1);
-						res->FileWhenLoaded = new_strdup(LuaToString(l, -1));
+						res->FileWhenLoaded = LuaToString(l, -1);
 						lua_pop(l, 1);
 					} else {
-					   printf("\n%s\n",type->Name);
+					   printf("\n%s\n", type->Name.c_str());
 					   LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -917,7 +908,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 			if (i == UnitTypeVar.NumberBoolFlag) {
-				printf("\n%s\n",type->Name);
+				printf("\n%s\n", type->Name.c_str());
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		}
@@ -933,7 +924,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		LuaError(l, "Unit-type `%s': right-attack is set, but can-attack is not\n" _C_ type->Name);
+		LuaError(l, "Unit-type `%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
 	}
 
 	return 0;
@@ -1114,7 +1105,7 @@ static int CclGetUnitTypeIdent(lua_State *l)
 
 	type = CclGetUnitType(l);
 	if (type) {
-		lua_pushstring(l, type->Ident);
+		lua_pushstring(l, type->Ident.c_str());
 	} else {
 		LuaError(l, "unit '%s' not defined" _C_ LuaToString(l, -1));
 	}
@@ -1135,7 +1126,7 @@ static int CclGetUnitTypeName(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	type = CclGetUnitType(l);
-	lua_pushstring(l, type->Name);
+	lua_pushstring(l, type->Name.c_str());
 	return 1;
 }
 
@@ -1155,8 +1146,7 @@ static int CclSetUnitTypeName(lua_State *l)
 	lua_pushvalue(l, 1);
 	type = CclGetUnitType(l);
 	lua_pop(l, 1);
-	delete[] type->Name;
-	type->Name = new_strdup(LuaToString(l, 2));
+	type->Name = LuaToString(l, 2);
 
 	lua_pushvalue(l, 2);
 	return 1;
@@ -1879,7 +1869,7 @@ void UpdateUnitVariables(const CUnit *unit)
 		if (unit->Variable[i].Value > unit->Variable[i].Max) {
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
 						" value = %d, max = %d\n"
-						_C_ type->Ident _C_ unit->Slot _C_ UnitTypeVar.VariableName[i]
+						_C_ type->Ident.c_str() _C_ unit->Slot _C_ UnitTypeVar.VariableName[i]
 						_C_ unit->Variable[i].Value _C_ unit->Variable[i].Max);
 		}
 #endif

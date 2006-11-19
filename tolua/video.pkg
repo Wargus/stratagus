@@ -14,7 +14,7 @@ void ToggleFullScreen(void);
 class CGraphic
 {
 public:
-	static CGraphic *New(const char *file, int w = 0, int h = 0);
+	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static void Free(CGraphic *);
 	void Load();
 	void Resize(int w, int h);
@@ -23,7 +23,7 @@ public:
 class CPlayerColorGraphic : public CGraphic
 {
 public:
-	static CPlayerColorGraphic *New(const char *file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
 };
 
 class CColor {

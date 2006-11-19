@@ -179,11 +179,11 @@ void HandleActionSpellCast(CUnit *unit)
 				if (unit->Variable[MANA_INDEX].Value < spell->ManaCost) {
 					unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 						_("%s: not enough mana for spell: %s"),
-						unit->Type->Name, spell->Name);
+						unit->Type->Name, spell->Name.c_str());
 				} else {
 					unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 						_("%s: can't cast spell: %s"),
-						unit->Type->Name, spell->Name);
+						unit->Type->Name, spell->Name.c_str());
 				}
 
 				if (unit->Player->AiEnabled) {

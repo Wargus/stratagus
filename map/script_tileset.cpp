@@ -522,8 +522,6 @@ static int CclDefineTileset(lua_State *l)
 	int args;
 	int j;
 
-	delete[] Map.Tileset.Name;
-	delete[] Map.Tileset.ImageFile;
 	delete[] Map.Tileset.Table;
 	delete[] Map.Tileset.Tiles;
 	delete[] Map.Tileset.TileTypeTable;
@@ -541,9 +539,9 @@ static int CclDefineTileset(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "name")) {
-			Map.Tileset.Name = new_strdup(LuaToString(l, j));
+			Map.Tileset.Name = LuaToString(l, j);
 		} else if (!strcmp(value, "image")) {
-			Map.Tileset.ImageFile = new_strdup(LuaToString(l, j));
+			Map.Tileset.ImageFile = LuaToString(l, j);
 		} else if (!strcmp(value, "size")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");

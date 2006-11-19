@@ -598,7 +598,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
-		sprintf(unit_ident, ",%s,", unit->Type->Ident);
+		sprintf(unit_ident, ",%s,", unit->Type->Ident.c_str());
 	}
 
 	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {

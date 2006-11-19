@@ -1,7 +1,7 @@
 class CUnitType
 {
-	char *Ident;
-	char *Name;
+	std::string Ident;
+	std::string Name;
 
 	int MinAttackRange;
 	int ClicksToExplode;
