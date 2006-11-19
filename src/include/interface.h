@@ -81,21 +81,20 @@ typedef bool (*ButtonCheckFunc)(const CUnit *, const ButtonAction *);
 class ButtonAction {
 public:
 	ButtonAction() : Pos(0), Level(0), Action(ButtonMove), Value(0),
-		ValueStr(NULL), Allowed(NULL), AllowStr(NULL), UnitMask(NULL),
-		Key(0), Hint(NULL) {}
+		Allowed(NULL), Key(0) {}
 
 	int Pos;          /// button position in the grid
 	int Level;        /// requires button level
 	ButtonCmd Action; /// command on button press
 	int Value;        /// extra value for command
-	char *ValueStr;   /// keep original value string
+	std::string ValueStr;    /// keep original value string
 
 	ButtonCheckFunc Allowed; /// Check if this button is allowed
-	char       *AllowStr;    /// argument for allowed
-	char       *UnitMask;    /// for which units is it available
+	std::string AllowStr;    /// argument for allowed
+	std::string UnitMask;    /// for which units is it available
 	IconConfig  Icon;        /// icon to display
-	int         Key;         /// alternative on keyboard
-	char       *Hint;        /// tip text
+	int Key;                 /// alternative on keyboard
+	std::string Hint;        /// tip text
 };
 
 	/// Button area under cursor

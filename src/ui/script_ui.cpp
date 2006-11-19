@@ -1490,10 +1490,11 @@ static int CclDefineButton(lua_State *l)
 				}
 			}
 			ba.AllowStr = s1;
+			delete[] s1;
 		} else if (!strcmp(value, "Key")) {
 			ba.Key = *LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
-			ba.Hint = new_strdup(LuaToString(l, -1));
+			ba.Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "ForUnit")) {
 			int subargs;
 			int k;
@@ -1517,9 +1518,9 @@ static int CclDefineButton(lua_State *l)
 				s1 = news1;
 			}
 			ba.UnitMask = s1;
-			if (!strncmp(ba.UnitMask, ",*,", 3)) {
-				delete[] ba.UnitMask;
-				ba.UnitMask = new_strdup("*");
+			delete[] s1;
+			if (!strncmp(ba.UnitMask.c_str(), ",*,", 3)) {
+				ba.UnitMask = "*";
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1528,10 +1529,6 @@ static int CclDefineButton(lua_State *l)
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
-	delete[] ba.ValueStr;
-	delete[] ba.AllowStr;
-	delete[] ba.Hint;
-	delete[] ba.UnitMask;
 
 	return 0;
 }

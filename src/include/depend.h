@@ -133,7 +133,7 @@ extern void CleanDependencies();
 extern void AddDependency(const char *target, const char *required, int count,
 	int or_flag);
 	/// Check a dependency by identifier
-extern bool CheckDependByIdent(const CPlayer *player, const char *target);
+extern bool CheckDependByIdent(const CPlayer *player, const std::string &target);
 
 //@}
 
