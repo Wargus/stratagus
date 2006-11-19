@@ -250,6 +250,14 @@ namespace gcn
     
     void FocusHandler::remove(Widget* widget)
     {
+        if (widget == mFocusedWidget)
+        {
+            mFocusedWidget = NULL;
+        }
+        if (widget == mDraggedWidget)
+        {
+            mDraggedWidget = NULL;
+        }
         if (widget == mToBeFocused)
         {
             mToBeFocused = NULL;
