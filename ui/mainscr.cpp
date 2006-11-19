@@ -1265,8 +1265,8 @@ void CInfoPanel::Draw(void)
 	} else {
 		int x;
 		int y;
-		const char *nc;
-		const char *rc;
+		std::string nc;
+		std::string rc;
 		// FIXME: need some cool ideas for this.
 
 		x = UI.InfoPanel.X + 16;
@@ -1280,7 +1280,7 @@ void CInfoPanel::Draw(void)
 			CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 		y += 20;
 
-		GetDefaultTextColors(&nc, &rc);
+		GetDefaultTextColors(nc, rc);
 		for (i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
 				if (ThisPlayer->Allied & (1 << Players[i].Index)) {

@@ -74,7 +74,7 @@ class ButtonStyleProperties {
 public:
 	ButtonStyleProperties() : Sprite(NULL), Frame(0), BorderColor(0),
 		BorderSize(0), TextAlign(TextAlignUndefined),
-		TextX(0), TextY(0), TextNormalColor(NULL), TextReverseColor(NULL)
+		TextX(0), TextY(0)
 	{
 		BorderColorRGB.r = BorderColorRGB.g = BorderColorRGB.b = 0;
 	}
@@ -87,21 +87,20 @@ public:
 	TextAlignment TextAlign;        /// Text alignment
 	int TextX;                      /// Text X location
 	int TextY;                      /// Text Y location
-	char *TextNormalColor;          /// Normal text color
-	char *TextReverseColor;         /// Reverse text color
+	std::string TextNormalColor;    /// Normal text color
+	std::string TextReverseColor;   /// Reverse text color
 } ;
 
 class ButtonStyle {
 public:
 	ButtonStyle() : Width(0), Height(0), Font(0),
-		TextNormalColor(NULL), TextReverseColor(NULL),
 		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
 
 	int Width;                      /// Button width
 	int Height;                     /// Button height
 	CFont *Font;                    /// Font
-	char *TextNormalColor;          /// Normal text color
-	char *TextReverseColor;         /// Reverse text color
+	std::string TextNormalColor;    /// Normal text color
+	std::string TextReverseColor;   /// Reverse text color
 	TextAlignment TextAlign;        /// Text alignment
 	int TextX;                      /// Text X location
 	int TextY;                      /// Text Y location
@@ -115,14 +114,13 @@ public:
 class CheckboxStyle {
 public:
 	CheckboxStyle() : Width(0), Height(0), Font(0),
-		TextNormalColor(NULL), TextReverseColor(NULL),
 		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
 
 	int Width;                      /// Checkbox width
 	int Height;                     /// Checkbox height
 	CFont *Font;                    /// Font
-	char *TextNormalColor;          /// Normal text color
-	char *TextReverseColor;         /// Reverse text color
+	std::string TextNormalColor;    /// Normal text color
+	std::string TextReverseColor;   /// Reverse text color
 	TextAlignment TextAlign;        /// Text alignment
 	int TextX;                      /// Text X location
 	int TextY;                      /// Text Y location

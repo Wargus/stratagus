@@ -1003,11 +1003,9 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 				LuaError(l, "Invalid text alignment: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "TextNormalColor")) {
-			delete[] p->TextNormalColor;
-			p->TextNormalColor = new_strdup(LuaToString(l, -1));
+			p->TextNormalColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextReverseColor")) {
-			delete[] p->TextReverseColor;
-			p->TextReverseColor = new_strdup(LuaToString(l, -1));
+			p->TextReverseColor = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1061,11 +1059,9 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (!strcmp(value, "Font")) {
 			b->Font = CFont::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
-			delete[] b->TextNormalColor;
-			b->TextNormalColor = new_strdup(LuaToString(l, -1));
+			b->TextNormalColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextReverseColor")) {
-			delete[] b->TextReverseColor;
-			b->TextReverseColor = new_strdup(LuaToString(l, -1));
+			b->TextReverseColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextPos")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -1186,11 +1182,9 @@ static int CclDefineCheckboxStyle(lua_State *l)
 		} else if (!strcmp(value, "Font")) {
 			c->Font = CFont::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "TextNormalColor")) {
-			delete[] c->TextNormalColor;
-			c->TextNormalColor = new_strdup(LuaToString(l, -1));
+			c->TextNormalColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextReverseColor")) {
-			delete[] c->TextReverseColor;
-			c->TextReverseColor = new_strdup(LuaToString(l, -1));
+			c->TextReverseColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextPos")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
