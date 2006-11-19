@@ -262,7 +262,6 @@ CFont::~CFont()
 	if (G) {
 		CGraphic::Free(G);
 	}
-	delete[] Ident;
 	delete[] CharWidth;
 }
 
@@ -849,7 +848,7 @@ void ReloadFonts(void)
 **
 **  @return       New font
 */
-CFont *CFont::New(const char *ident, CGraphic *g)
+CFont *CFont::New(const std::string &ident, CGraphic *g)
 {
 	CFont *font = Fonts[ident];
 	if (font) {
@@ -873,11 +872,11 @@ CFont *CFont::New(const char *ident, CGraphic *g)
 **
 **  @return       The font
 */
-CFont *CFont::Get(const char *ident)
+CFont *CFont::Get(const std::string &ident)
 {
 	CFont *font = Fonts[ident];
 	if (!font) {
-		DebugPrint("font not found: %s" _C_ ident);
+		DebugPrint("font not found: %s" _C_ ident.c_str());
 	}
 	return font;
 }
@@ -885,9 +884,9 @@ CFont *CFont::Get(const char *ident)
 /**
 **  CFontColor constructor
 */
-CFontColor::CFontColor(const char *ident)
+CFontColor::CFontColor(const std::string &ident)
 {
-	Ident = new_strdup(ident);
+	Ident = ident;
 	memset(Colors, 0, sizeof(Colors));
 }
 
@@ -896,7 +895,6 @@ CFontColor::CFontColor(const char *ident)
 */
 CFontColor::~CFontColor()
 {
-	delete[] this->Ident;
 }
 
 /**
@@ -906,7 +904,7 @@ CFontColor::~CFontColor()
 **
 **  @return       New font color
 */
-CFontColor *CFontColor::New(const char *ident)
+CFontColor *CFontColor::New(const std::string &ident)
 {
 	CFontColor *fc = FontColors[ident];
 	if (fc) {
@@ -926,7 +924,7 @@ CFontColor *CFontColor::New(const char *ident)
 **
 **  @return       The font color
 */
-CFontColor *CFontColor::Get(const char *ident)
+CFontColor *CFontColor::Get(const std::string &ident)
 {
 	CFontColor *fc = FontColors[ident];
 	if (!fc) {

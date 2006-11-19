@@ -217,7 +217,7 @@ void UpdateStats(int reset)
 **
 **  @return  Pointer to the animation structure.
 */
-CAnimations *AnimationsByIdent(const char *ident)
+CAnimations *AnimationsByIdent(const std::string &ident)
 {
 	return AnimationMap[ident];
 }

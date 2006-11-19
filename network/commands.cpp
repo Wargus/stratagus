@@ -729,12 +729,12 @@ void SaveReplayList(CFile *file)
 **
 **  @param name  name of file to load.
 */
-int LoadReplay(const char *name)
+int LoadReplay(const std::string &name)
 {
 	CleanReplayLog();
 	ReplayGameType = ReplaySinglePlayer;
 
-	LuaLoadFile(name);
+	LuaLoadFile(name.c_str());
 
 	NextLogCycle = ~0UL;
 	if (!CommandLogDisabled) {

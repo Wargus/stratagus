@@ -84,22 +84,22 @@ CUserInterface::CUserInterface() :
 {
 	memset(&CompletedBarColorRGB, 0, sizeof(CompletedBarColorRGB));
 
-	Point.Name = new_strdup("cursor-point");
-	Glass.Name = new_strdup("cursor-glass");
-	Cross.Name = new_strdup("cursor-cross");
-	YellowHair.Name = new_strdup("cursor-yellow-hair");
-	GreenHair.Name = new_strdup("cursor-green-hair");
-	RedHair.Name = new_strdup("cursor-red-hair");
-	Scroll.Name = new_strdup("cursor-scroll");
+	Point.Name = "cursor-point";
+	Glass.Name = "cursor-glass";
+	Cross.Name = "cursor-cross";
+	YellowHair.Name = "cursor-yellow-hair";
+	GreenHair.Name = "cursor-green-hair";
+	RedHair.Name = "cursor-red-hair";
+	Scroll.Name = "cursor-scroll";
 
-	ArrowE.Name = new_strdup("cursor-arrow-e");
-	ArrowNE.Name = new_strdup("cursor-arrow-ne");
-	ArrowN.Name = new_strdup("cursor-arrow-n");
-	ArrowNW.Name = new_strdup("cursor-arrow-nw");
-	ArrowW.Name = new_strdup("cursor-arrow-w");
-	ArrowSW.Name = new_strdup("cursor-arrow-sw");
-	ArrowS.Name = new_strdup("cursor-arrow-s");
-	ArrowSE.Name = new_strdup("cursor-arrow-se");
+	ArrowE.Name = "cursor-arrow-e";
+	ArrowNE.Name = "cursor-arrow-ne";
+	ArrowN.Name = "cursor-arrow-n";
+	ArrowNW.Name = "cursor-arrow-nw";
+	ArrowW.Name = "cursor-arrow-w";
+	ArrowSW.Name = "cursor-arrow-sw";
+	ArrowS.Name = "cursor-arrow-s";
+	ArrowSE.Name = "cursor-arrow-se";
 
 	NormalFontColor = "light-blue";
 	ReverseFontColor = "yellow";
@@ -142,9 +142,9 @@ void InitUserInterface(void)
 */
 void CursorConfig::Load()
 {
-	Assert(Name);
+	Assert(!Name.empty());
 	Cursor = CursorByIdent(Name);
-	Assert(!strcmp(Name, Cursor->Ident));
+	Assert(Name == Cursor->Ident);
 }
 
 /**

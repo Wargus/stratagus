@@ -140,7 +140,7 @@ extern std::map<std::string, CAnimations *> AnimationMap;
 ----------------------------------------------------------------------------*/
 
 	/// Get the animations structure by ident
-extern CAnimations *AnimationsByIdent(const char *ident);
+extern CAnimations *AnimationsByIdent(const std::string &ident);
 
 
 //@}

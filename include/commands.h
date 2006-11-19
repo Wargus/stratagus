@@ -68,7 +68,7 @@ extern void SinglePlayerReplayEachCycle(void);
 	/// Replay user commands from log each cycle, multiplayer games
 extern void MultiPlayerReplayEachCycle(void);
 	/// Load replay
-extern int LoadReplay(const char *);
+extern int LoadReplay(const std::string &name);
 	/// End logging
 extern void EndReplayLog(void);
 	/// Clean replay
