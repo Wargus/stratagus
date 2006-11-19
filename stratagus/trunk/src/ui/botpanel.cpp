@@ -110,7 +110,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	//ba->Icon.Load();
 	ba->Action = action;
 	if (!value.empty()) {
-		ba->ValueStr = new_strdup(value.c_str());
+		ba->ValueStr = value;
 		switch (action) {
 			case ButtonSpellCast:
 				ba->Value = SpellTypeByIdent(value)->Slot;
@@ -138,18 +138,14 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 				break;
 		}
 	} else {
-		ba->ValueStr = NULL;
+		ba->ValueStr.clear();
 		ba->Value = 0;
 	}
 
 	ba->Allowed = func;
-	if (!allow.empty()) {
-		ba->AllowStr = new_strdup(allow.c_str());
-	} else {
-		ba->AllowStr = NULL;
-	}
+	ba->AllowStr = allow;
 	ba->Key = key;
-	ba->Hint = new_strdup(hint.c_str());
+	ba->Hint = hint;
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
@@ -157,7 +153,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	} else {
 		sprintf(buf, ",%s,", umask.c_str());
 	}
-	ba->UnitMask = new_strdup(buf);
+	ba->UnitMask = buf;
 	UnitButtonTable.push_back(ba);
 	// FIXME: check if already initited
 	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end
@@ -173,10 +169,6 @@ void CleanButtons(void)
 	// Free the allocated buttons.
 	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		Assert(UnitButtonTable[z]);
-		delete[] UnitButtonTable[z]->ValueStr;
-		delete[] UnitButtonTable[z]->AllowStr;
-		delete[] UnitButtonTable[z]->Hint;
-		delete[] UnitButtonTable[z]->UnitMask;
 		delete UnitButtonTable[z];
 	}
 	UnitButtonTable.clear();
@@ -483,7 +475,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 		case ButtonResearch:
 		case ButtonBuild:
 			res = CheckDependByIdent(unit->Player, buttonaction->ValueStr);
-			if (res && !strncmp(buttonaction->ValueStr, "upgrade-", 8)) {
+			if (res && !strncmp(buttonaction->ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(unit->Player, buttonaction->ValueStr) == 'A';
 			}
 			break;
@@ -546,7 +538,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 
 		// any unit or unit in list
 		if (UnitButtonTable[z]->UnitMask[0] != '*' &&
-				!strstr(UnitButtonTable[z]->UnitMask, unit_ident)) {
+				!strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
 			continue;
 		}
 		allow = true;
@@ -622,7 +614,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 
 		// any unit or unit in list
 		if (buttonaction->UnitMask[0] != '*' &&
-				!strstr(buttonaction->UnitMask, unit_ident)) {
+				!strstr(buttonaction->UnitMask.c_str(), unit_ident)) {
 			continue;
 		}
 		allow = IsButtonAllowed(unit, buttonaction);

@@ -189,7 +189,7 @@ void AddDependency(const char *target, const char *required, int count,
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByIdent(const CPlayer *player, const char *target)
+bool CheckDependByIdent(const CPlayer *player, const std::string &target)
 {
 	DependRule rule;
 	const DependRule *node;
@@ -199,14 +199,14 @@ bool CheckDependByIdent(const CPlayer *player, const char *target)
 	//
 	//  first have to check, if target is allowed itself
 	//
-	if (!strncmp(target, "unit-", 5)) {
+	if (!strncmp(target.c_str(), "unit-", 5)) {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = UnitTypeByIdent(target);
 		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
 			return false;
 		}
 		rule.Type = DependRuleUnitType;
-	} else if (!strncmp(target, "upgrade-", 8)) {
+	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
@@ -214,7 +214,7 @@ bool CheckDependByIdent(const CPlayer *player, const char *target)
 		}
 		rule.Type = DependRuleUpgrade;
 	} else {
-		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target);
+		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
 	}
 
