@@ -76,7 +76,7 @@ void DrawMenuButtonArea(void)
 					ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 				UI.MenuButton.X, UI.MenuButton.Y,
-				UI.MenuButton.Text.c_str());
+				UI.MenuButton.Text);
 		}
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
@@ -85,7 +85,7 @@ void DrawMenuButtonArea(void)
 					ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
 				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 				UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
-				UI.NetworkMenuButton.Text.c_str());
+				UI.NetworkMenuButton.Text);
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
 			DrawMenuButton(UI.NetworkDiplomacyButton.Style,
@@ -93,7 +93,7 @@ void DrawMenuButtonArea(void)
 					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
 				(GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
 				UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
-				UI.NetworkDiplomacyButton.Text.c_str());
+				UI.NetworkDiplomacyButton.Text);
 		}
 	}
 }
