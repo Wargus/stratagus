@@ -451,11 +451,11 @@ extern void MapCclRegister(void);
 // mixed sources
 //
 	/// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const char *filename, CMap *map, int writeTerrain);
+extern int SaveStratagusMap(const std::string &filename, CMap *map, int writeTerrain);
 
 
 	/// Load map presentation
-extern void LoadStratagusMapInfo(const char *mapname);
+extern void LoadStratagusMapInfo(const std::string &mapname);
 	/// Release info for a map
 extern void FreeMapInfo(CMapInfo *info);
 
