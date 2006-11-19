@@ -86,16 +86,14 @@ std::map<std::string, CUpgrade *> Upgrades;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CUpgrade::CUpgrade(const char *ident) :
-	ID(0)
+CUpgrade::CUpgrade(const std::string &ident) :
+	Ident(ident), ID(0)
 {
-	Ident = new_strdup(ident);
 	memset(this->Costs, 0, sizeof(this->Costs));
 }
 
 CUpgrade::~CUpgrade()
 {
-	delete[] Ident;
 }
 
 /**
@@ -103,7 +101,7 @@ CUpgrade::~CUpgrade()
 **
 **  @param ident  Upgrade identifier
 */
-CUpgrade *CUpgrade::New(const char *ident)
+CUpgrade *CUpgrade::New(const std::string &ident)
 {
 	CUpgrade *upgrade = Upgrades[ident];
 	if (upgrade) {
@@ -124,11 +122,11 @@ CUpgrade *CUpgrade::New(const char *ident)
 **
 **  @return       Upgrade pointer or NULL if not found.
 */
-CUpgrade *CUpgrade::Get(const char *ident)
+CUpgrade *CUpgrade::Get(const std::string &ident)
 {
 	CUpgrade *upgrade = Upgrades[ident];
 	if (!upgrade) {
-		DebugPrint("upgrade not found: %s\n" _C_ ident);
+		DebugPrint("upgrade not found: %s\n" _C_ ident.c_str());
 	}
 	return upgrade;
 }
@@ -196,7 +194,7 @@ void SaveUpgrades(CFile *file)
 	//  Save the upgrades
 	//
 	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
-		file->printf("DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident);
+		file->printf("DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident.c_str());
 		for (p = 0; p < PlayerMax; ++p) {
 			file->printf("%c", Players[p].Allow.Upgrades[j]);
 		}
@@ -437,14 +435,14 @@ void UpgradesCclRegister(void)
 **  @param ident  The unit-type identifier.
 **  @return       Unit-type ID (int) or -1 if not found.
 */
-int UnitTypeIdByIdent(const char *ident)
+int UnitTypeIdByIdent(const std::string &ident)
 {
 	const CUnitType *type;
 
 	if ((type = UnitTypeByIdent(ident))) {
 		return type->Slot;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident);
+	DebugPrint(" fix this %s\n" _C_ ident.c_str());
 	Assert(0);
 	return -1;
 }
@@ -455,7 +453,7 @@ int UnitTypeIdByIdent(const char *ident)
 **  @param ident  The upgrade identifier.
 **  @return       Upgrade ID (int) or -1 if not found.
 */
-int UpgradeIdByIdent(const char *ident)
+int UpgradeIdByIdent(const std::string &ident)
 {
 	const CUpgrade *upgrade;
 
@@ -748,14 +746,14 @@ char UpgradeIdAllowed(const CPlayer *player, int id)
 **
 **  @note This function shouldn't be used during runtime, it is only for setup.
 */
-char UpgradeIdentAllowed(const CPlayer *player, const char *ident)
+char UpgradeIdentAllowed(const CPlayer *player, const std::string &ident)
 {
 	int id;
 
 	if ((id = UpgradeIdByIdent(ident)) != -1) {
 		return UpgradeIdAllowed(player, id);
 	}
-	DebugPrint("Fix your code, wrong idenifier `%s'\n" _C_ ident);
+	DebugPrint("Fix your code, wrong idenifier `%s'\n" _C_ ident.c_str());
 	return '-';
 }
 
@@ -769,7 +767,7 @@ char UpgradeIdentAllowed(const CPlayer *player, const char *ident)
 **  @param player  Player pointer.
 **  @param ident   Upgrade ident.
 */
-int UpgradeIdentAvailable(const CPlayer *player, const char *ident)
+int UpgradeIdentAvailable(const CPlayer *player, const std::string &ident)
 {
 	int allow;
 

@@ -928,7 +928,7 @@ CFontColor *CFontColor::Get(const std::string &ident)
 {
 	CFontColor *fc = FontColors[ident];
 	if (!fc) {
-		DebugPrint("font color not found: %s" _C_ ident);
+		DebugPrint("font color not found: %s" _C_ ident.c_str());
 	}
 	return fc;
 }

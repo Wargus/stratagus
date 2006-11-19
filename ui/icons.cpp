@@ -66,9 +66,8 @@ std::map<std::string, CIcon *> Icons;          /// Map of ident to icon.
 /**
 **  CIcon constructor
 */
-CIcon::CIcon(const char *ident) : G(NULL), Frame(0)
+CIcon::CIcon(const std::string &ident) : G(NULL), Frame(0), Ident(ident)
 {
-	Ident = new_strdup(ident);
 }
 
 /**
@@ -76,7 +75,6 @@ CIcon::CIcon(const char *ident) : G(NULL), Frame(0)
 */
 CIcon::~CIcon()
 {
-	delete[] this->Ident;
 	CGraphic::Free(this->G);
 }
 
@@ -87,7 +85,7 @@ CIcon::~CIcon()
 **
 **  @return       New icon
 */
-CIcon *CIcon::New(const char *ident)
+CIcon *CIcon::New(const std::string &ident)
 {
 	CIcon *icon = Icons[ident];
 	if (icon) {
@@ -107,11 +105,11 @@ CIcon *CIcon::New(const char *ident)
 **
 **  @return       The icon
 */
-CIcon *CIcon::Get(const char *ident)
+CIcon *CIcon::Get(const std::string &ident)
 {
 	CIcon *icon = Icons[ident];
 	if (!icon) {
-		DebugPrint("icon not found: %s" _C_ ident);
+		DebugPrint("icon not found: %s" _C_ ident.c_str());
 	}
 	return icon;
 }
@@ -123,12 +121,12 @@ CIcon *CIcon::Get(const char *ident)
 */
 void IconConfig::Load()
 {
-	Assert(Name);
+	Assert(!Name.empty());
 
 	Icon = CIcon::Get(Name);
 #if 0
 	if (!Icon) {
-		printf("Can't find icon %s\n", Name);
+		printf("Can't find icon %s\n", Name.c_str());
 		ExitFatal(-1);
 	}
 #endif
@@ -154,7 +152,7 @@ void LoadIcons(void)
 		ShowLoadProgress("Icons %s", icon->G->File);
 		if (icon->Frame >= icon->G->NumFrames) {
 			DebugPrint("Invalid icon frame: %s - %d\n" _C_
-				icon->GetIdent() _C_ icon->Frame);
+				icon->GetIdent().c_str() _C_ icon->Frame);
 			icon->Frame = 0;
 		}
 	}
@@ -201,7 +199,7 @@ void CIcon::DrawIcon(const CPlayer *player, int x, int y) const
 **  @param text    Optional text to display
 */
 void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
-	unsigned flags, int x, int y, const char *text) const
+	unsigned flags, int x, int y, const std::string &text) const
 {
 	ButtonStyle s;
 
@@ -215,7 +213,7 @@ void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 		s.Default.BorderColor = 0;
 	}
 	// FIXME: player colors
-	DrawMenuButton(&s, flags, x, y, text);
+	DrawMenuButton(&s, flags, x, y, text.c_str());
 }
 
 /**
