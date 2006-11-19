@@ -359,7 +359,7 @@ public:
 	/// Change player side
 	void SetSide(int side);
 	/// Change player name
-	void SetName(const char *name);
+	void SetName(const std::string &name);
 
 	/// Clear turn related player data
 	void Clear();
