@@ -576,10 +576,10 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type, int *dx, int
 	//
 	// Find a good place for a new hall
 	//
-	DebugPrint("Want to build a %s(%s)\n" _C_ type->Ident _C_ type->Name);
+	DebugPrint("Want to build a %s(%s)\n" _C_ type->Ident.c_str() _C_ type->Name.c_str());
 	if (type->CanStore[GoldCost] && AiFindHallPlace(worker, type, dx, dy)) {
-		DebugPrint("Found place for town hall (%s,%s)\n" _C_ type->Ident _C_ type->
-			Name);
+		DebugPrint("Found place for town hall (%s,%s)\n" _C_ type->Ident.c_str() _C_
+			type->Name.c_str());
 		return 1;
 	}
 	//

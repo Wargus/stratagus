@@ -1074,7 +1074,7 @@ char *EvalString(const StringDesc *s)
 		case EString_UnitName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
-				return new_strdup(unit->Type->Name);
+				return new_strdup(unit->Type->Name.c_str());
 			} else { // ERROR.
 				return NULL;
 			}

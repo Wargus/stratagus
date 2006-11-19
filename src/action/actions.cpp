@@ -248,7 +248,7 @@ static void HandleActionNone(CUnit *unit)
 {
 	DebugPrint("FIXME: Should not happen!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
-		UnitNumber(unit) _C_ unit->Type->Ident);
+		UnitNumber(unit) _C_ unit->Type->Ident.c_str());
 }
 
 /**
@@ -260,7 +260,7 @@ static void HandleActionNotWritten(CUnit *unit)
 {
 	DebugPrint("FIXME: Not written!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
-		UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->Orders[0]->Action);
+		UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_ unit->Orders[0]->Action);
 }
 
 /**
@@ -627,7 +627,7 @@ void UnitActions(void)
 
 		fprintf(logf, "%lu: ", GameCycle);
 		fprintf(logf, "%d %s S%d/%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
-			UnitNumber(unit), unit->Type ? unit->Type->Ident : "unit-killed",
+			UnitNumber(unit), unit->Type ? unit->Type->Ident.c_str() : "unit-killed",
 			unit->State, unit->SubAction,
 			!unit->Orders.empty() ? unit->Orders[0]->Action : -1,
 			unit->Player ? unit->Player->Index : -1, unit->Refs,SyncRandSeed,

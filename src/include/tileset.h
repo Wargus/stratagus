@@ -238,8 +238,8 @@ struct SolidTerrainInfo {
 	/// Tileset definition
 class CTileset {
 public:
-	char *Name;      /// Nice name to display
-	char *ImageFile; /// File containing image data
+	std::string Name;           /// Nice name to display
+	std::string ImageFile;      /// File containing image data
 
 	int NumTiles;               /// Number of tiles in the tables
 	int TileSizeX;              /// Size of a tile in X

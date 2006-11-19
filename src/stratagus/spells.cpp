@@ -708,7 +708,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 	}
 
 	if (cansummon) {
-		DebugPrint("Summoning a %s\n" _C_ unittype->Name);
+		DebugPrint("Summoning a %s\n" _C_ unittype->Name.c_str());
 
 		//
 		// Create units.
@@ -1013,7 +1013,7 @@ void InitSpells(void)
 SpellType *SpellTypeByIdent(const std::string &ident)
 {
 	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
-		if (strcmp((*i)->Ident, ident.c_str()) == 0) {
+		if ((*i)->Ident == ident) {
 			return *i;
 		}
 	}
@@ -1120,8 +1120,8 @@ int SpellCast(CUnit *caster, const SpellType *spell, CUnit *target,
 		y = caster->Y;
 		target = caster;
 	}
-	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
-		caster->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
+	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident.c_str() _C_
+		caster->Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ x _C_ y);
 	if (CanCastSpell(caster, spell, target, x, y)) {
 		cont = 1;
 		mustSubtractMana = 1;
@@ -1160,14 +1160,12 @@ int SpellCast(CUnit *caster, const SpellType *spell, CUnit *target,
 /**
 **  SpellType constructor.
 */
-SpellType::SpellType(int slot, const char *identname) :
-	Name(NULL), Slot(slot),
-	Target(), Action(),
+SpellType::SpellType(int slot, const std::string &ident) :
+	Ident(ident), Slot(slot), Target(), Action(),
 	Range(0), ManaCost(0), RepeatCast(0),
 	DependencyId(-1), Condition(NULL),
 	AutoCast(NULL), AICast(NULL)
 {
-	Ident = new_strdup(identname);
 }
 
 /**
@@ -1175,8 +1173,6 @@ SpellType::SpellType(int slot, const char *identname) :
 */
 SpellType::~SpellType()
 {
-	delete[] Ident;
-	delete[] Name;
 	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
 		delete *act;
 	}

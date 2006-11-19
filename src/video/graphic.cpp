@@ -54,6 +54,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+static int HashCount;
+
 static std::map<std::string, CGraphic *> GraphicHash;
 
 #ifdef USE_OPENGL
@@ -474,9 +476,9 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const char *file, int w, int h)
+CGraphic *CGraphic::New(const std::string &file, int w, int h)
 {
-	if (!file) {
+	if (file.empty()) {
 		return new CGraphic;
 	}
 
@@ -488,8 +490,8 @@ CGraphic *CGraphic::New(const char *file, int w, int h)
 			ExitFatal(-1);
 		}
 		// FIXME: use a constructor for this
-		g->File = new_strdup(file);
-		g->HashFile = new_strdup(g->File);
+		g->File = file;
+		g->HashFile = g->File;
 		g->Width = w;
 		g->Height = h;
 		GraphicHash[g->HashFile] = g;
@@ -510,9 +512,9 @@ CGraphic *CGraphic::New(const char *file, int w, int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const char *file, int w, int h)
+CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &file, int w, int h)
 {
-	if (!file) {
+	if (file.empty()) {
 		return new CPlayerColorGraphic;
 	}
 
@@ -524,8 +526,8 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const char *file, int w, int h)
 			ExitFatal(-1);
 		}
 		// FIXME: use a constructor for this
-		g->File = new_strdup(file);
-		g->HashFile = new_strdup(g->File);
+		g->File = file;
+		g->HashFile = g->File;
 		g->Width = w;
 		g->Height = h;
 		GraphicHash[g->HashFile] = g;
@@ -546,16 +548,18 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const char *file, int w, int h)
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::ForceNew(const char *file, int w, int h)
+CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 {
 	CGraphic *g = new CGraphic;
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	g->File = new_strdup(file);
-	g->HashFile = new char[strlen(file) + 2 * sizeof(g->File) + 3];
-	sprintf(g->HashFile, "%s%p", g->File, g->File);
+	g->File = file;
+	char *hashfile = new char[file.size() + 32];
+	sprintf(hashfile, "%s%d", file.c_str(), HashCount++);
+	g->HashFile = hashfile;
+	delete[] hashfile;
 	g->Width = w;
 	g->Height = h;
 	GraphicHash[g->HashFile] = g;
@@ -573,16 +577,18 @@ CGraphic *CGraphic::ForceNew(const char *file, int w, int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const char *file, int w, int h)
+CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int w, int h)
 {
 	CPlayerColorGraphic *g = new CPlayerColorGraphic;
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	g->File = new_strdup(file);
-	g->HashFile = new char[strlen(file) + 2 * sizeof(g->File) + 3];
-	sprintf(g->HashFile, "%s%p", g->File, g->File);
+	g->File = file;
+	char *hashfile = new char[file.size() + 32];
+	sprintf(hashfile, "%s%d", file.c_str(), HashCount++);
+	g->HashFile = hashfile;
+	delete[] hashfile;
 	g->Width = w;
 	g->Height = h;
 	GraphicHash[g->HashFile] = g;
@@ -601,7 +607,7 @@ void CGraphic::Load()
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(this) == -1) {
-		fprintf(stderr, "Can't load the graphic `%s'\n", File);
+		fprintf(stderr, "Can't load the graphic `%s'\n", File.c_str());
 		ExitFatal(-1);
 	}
 
@@ -616,7 +622,7 @@ void CGraphic::Load()
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 			(GraphicHeight / Height) * Height != GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", File);
+		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.c_str());
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
 			Width, Height, GraphicWidth, GraphicHeight);
 		ExitFatal(1);
@@ -689,11 +695,9 @@ void CGraphic::Free(CGraphic *g)
 		}
 #endif
 
-		if (g->HashFile) {
+		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);
 		}
-		delete[] g->File;
-		delete[] g->HashFile;
 		delete g;
 	}
 }

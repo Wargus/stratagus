@@ -645,7 +645,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 */
 static int CclDefineSpell(lua_State *l)
 {
-	const char *identname;
+	std::string identname;
 	SpellType *spell;
 	const char *value;
 	int args;
@@ -655,7 +655,7 @@ static int CclDefineSpell(lua_State *l)
 	identname = LuaToString(l, 1);
 	spell = SpellTypeByIdent(identname);
 	if (spell != NULL) {
-		DebugPrint("Redefining spell-type `%s'\n" _C_ identname);
+		DebugPrint("Redefining spell-type `%s'\n" _C_ identname.c_str());
 	} else {
 		spell = new SpellType(SpellTypeTable.size(), identname);
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
@@ -680,8 +680,7 @@ static int CclDefineSpell(lua_State *l)
 		value = LuaToString(l, i + 1);
 		++i;
 		if (!strcmp(value, "showname")) {
-			delete[] spell->Name;
-			spell->Name = new_strdup(LuaToString(l, i + 1));
+			spell->Name = LuaToString(l, i + 1);
 		} else if (!strcmp(value, "manacost")) {
 			spell->ManaCost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "range")) {
@@ -844,7 +843,7 @@ static void SaveSpellAction(CFile *file, SpellActionType *action)
 		CLprintf(file, ")\n");
 	} else if (action->CastFunction == CastSummon) {
 		CLprintf(file, "(summon unit-type %s time-to-live %d",
-				action->Data.Summon.UnitType->Ident,
+				action->Data.Summon.UnitType->Ident.c_str(),
 				action->Data.Summon.TTL);
 		if (action->Data.Summon.RequireCorpse) {
 			CLprintf(file, " require-corpse ");
@@ -856,7 +855,7 @@ static void SaveSpellAction(CFile *file, SpellActionType *action)
 				action->Data.Demolish.Damage);
 	} else if (action->CastFunction == CastPolymorph) {
 		CLprintf(file, "(polymorph new-form %s)",
-				action->Data.Polymorph.NewForm->Ident);
+				action->Data.Polymorph.NewForm->Ident.c_str());
 	} else if (action->CastFunction == CastCapture) {
 		CLprintf(file, "(capture damage %d percent %d",
 				action->Data.Capture.Damage,
@@ -867,7 +866,7 @@ static void SaveSpellAction(CFile *file, SpellActionType *action)
 		CLprintf(file, ")\n");
 	} else if (action->CastFunction == CastSpawnPortal) {
 		CLprintf(file, "(spawn-portal portal-type %s)",
-				action->Data.SpawnPortal.PortalType->Ident);
+				action->Data.SpawnPortal.PortalType->Ident.c_str());
 	}
 }
 

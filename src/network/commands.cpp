@@ -478,7 +478,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	log->GameCycle = GameCycle;
 
 	log->UnitNumber = (unit ? UnitNumber(unit) : -1);
-	log->UnitIdent = (unit ? unit->Type->Ident : "");
+	log->UnitIdent = (unit ? unit->Type->Ident.c_str() : "");
 
 	log->Action = action;
 	log->Flush = flush;
@@ -815,7 +815,7 @@ static void DoNextReplay(void)
 	val = ReplayStep->Value.c_str();
 	num = ReplayStep->Num;
 
-	Assert(unit == -1 || !strcmp(ReplayStep->UnitIdent.c_str(), UnitSlots[unit]->Type->Ident));
+	Assert(unit == -1 || ReplayStep->UnitIdent == UnitSlots[unit]->Type->Ident);
 
 	if (SyncRandSeed != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG
@@ -1200,7 +1200,7 @@ void SendCommandBuildBuilding(CUnit *unit, int x, int y,
 	CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("build", unit, flush, x, y, NoUnitP, what->Ident, -1);
+		CommandLog("build", unit, flush, x, y, NoUnitP, what->Ident.c_str(), -1);
 		CommandBuildBuilding(unit, x, y, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandBuild, unit, x, y, NoUnitP, what, flush);
@@ -1286,7 +1286,7 @@ void SendCommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 void SendCommandTrainUnit(CUnit *unit, CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("train", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
+		CommandLog("train", unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
 		CommandTrainUnit(unit, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, what, flush);
@@ -1304,7 +1304,7 @@ void SendCommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
-				type ? type->Ident : NULL, slot);
+				type ? type->Ident.c_str() : NULL, slot);
 		CommandCancelTraining(unit, slot, type);
 	} else {
 		NetworkSendCommand(MessageCommandCancelTrain, unit, slot, 0, NoUnitP,
@@ -1322,7 +1322,7 @@ void SendCommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 void SendCommandUpgradeTo(CUnit *unit, CUnitType *what, int flush)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("upgrade-to", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
+		CommandLog("upgrade-to", unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
 		CommandUpgradeTo(unit, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandUpgrade, unit, 0, 0, NoUnitP, what, flush);
@@ -1609,7 +1609,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			CommandUnload(unit, x, y, dest, status);
 			break;
 		case MessageCommandBuild:
-			CommandLog("build", unit, status, x, y, NoUnitP, UnitTypes[dstnr]->Ident,
+			CommandLog("build", unit, status, x, y, NoUnitP, UnitTypes[dstnr]->Ident.c_str(),
 				-1);
 			CommandBuildBuilding(unit, x, y, UnitTypes[dstnr], status);
 			break;
@@ -1641,14 +1641,14 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandTrain:
 			CommandLog("train", unit, status, -1, -1, NoUnitP,
-				UnitTypes[dstnr]->Ident, -1);
+				UnitTypes[dstnr]->Ident.c_str(), -1);
 			CommandTrainUnit(unit, UnitTypes[dstnr], status);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
 				CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
-					UnitTypes[dstnr]->Ident, (short)x);
+					UnitTypes[dstnr]->Ident.c_str(), (short)x);
 				CommandCancelTraining(unit, (short)x, UnitTypes[dstnr]);
 			} else {
 				CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
@@ -1658,7 +1658,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandUpgrade:
 			CommandLog("upgrade-to", unit, status, -1, -1, NoUnitP,
-				UnitTypes[dstnr]->Ident, -1);
+				UnitTypes[dstnr]->Ident.c_str(), -1);
 			CommandUpgradeTo(unit, UnitTypes[dstnr], status);
 			break;
 		case MessageCommandCancelUpgrade:

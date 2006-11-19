@@ -107,12 +107,13 @@ int LoadGraphicPNG(CGraphic *g)
 	ckey = -1;
 	ret = 0;
 
-	if (!g->File) {
+	if (g->File.empty()) {
 		return -1;
 	}
 
-	LibraryFileName(g->File, name, sizeof(name));
-	if (!name) {
+	name[0] = '\0';
+	LibraryFileName(g->File.c_str(), name, sizeof(name));
+	if (name[0] == '\0') {
 		return -1;
 	}
 

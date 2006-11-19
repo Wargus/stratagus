@@ -74,7 +74,7 @@ void LoadTileset(void)
 	TileSizeX = Map.Tileset.TileSizeX;
 	TileSizeY = Map.Tileset.TileSizeY;
 
-	ShowLoadProgress("Tileset `%s'", Map.Tileset.ImageFile);
+	ShowLoadProgress("Tileset `%s'", Map.Tileset.ImageFile.c_str());
 	//Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile);
 	Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile, TileSizeX, TileSizeY);
 	Map.TileGraphic->Load();
@@ -89,8 +89,6 @@ void LoadTileset(void)
 void CleanTilesets(void)
 {
 	// Free the tileset data
-	delete[] Map.Tileset.Name;
-	delete[] Map.Tileset.ImageFile;
 	delete[] Map.Tileset.Table;
 	delete[] Map.Tileset.FlagsTable;
 	delete[] Map.Tileset.Tiles;

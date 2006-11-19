@@ -402,7 +402,7 @@ static int CclSetForestRegeneration(lua_State *l)
 */
 static int CclSetFogOfWarGraphics(lua_State *l)
 {
-	const char *FogGraphicFile;
+	std::string FogGraphicFile;
 
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);

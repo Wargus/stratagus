@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov 19 09:54:31 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 19 15:41:25 2006.
 */
 
 #ifndef __cplusplus
@@ -12074,7 +12074,7 @@ static int tolua_stratagus_CGraphic_New00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CGraphic",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
  !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
  !tolua_isnoobj(tolua_S,5,&tolua_err)
@@ -12083,15 +12083,16 @@ static int tolua_stratagus_CGraphic_New00(lua_State* tolua_S)
  else
 #endif
  {
-  const char* file = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string file = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
   int w = ((int)  tolua_tonumber(tolua_S,3,0));
   int h = ((int)  tolua_tonumber(tolua_S,4,0));
  {
   CGraphic* tolua_ret = (CGraphic*)  CGraphic::New(file,w,h);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CGraphic");
+ tolua_pushcppstring(tolua_S,(const char*)file);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12203,7 +12204,7 @@ static int tolua_stratagus_CPlayerColorGraphic_New00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertable(tolua_S,1,"CPlayerColorGraphic",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
  !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
  !tolua_isnoobj(tolua_S,5,&tolua_err)
@@ -12212,15 +12213,16 @@ static int tolua_stratagus_CPlayerColorGraphic_New00(lua_State* tolua_S)
  else
 #endif
  {
-  const char* file = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string file = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
   int w = ((int)  tolua_tonumber(tolua_S,3,0));
   int h = ((int)  tolua_tonumber(tolua_S,4,0));
  {
   CPlayerColorGraphic* tolua_ret = (CPlayerColorGraphic*)  CPlayerColorGraphic::New(file,w,h);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPlayerColorGraphic");
+ tolua_pushcppstring(tolua_S,(const char*)file);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -13944,7 +13946,7 @@ static int tolua_get_CUnitType_Ident(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
 #endif
- tolua_pushstring(tolua_S,(const char*)self->Ident);
+ tolua_pushcppstring(tolua_S,(const char*)self->Ident);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -13957,10 +13959,10 @@ static int tolua_set_CUnitType_Ident(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Ident'",NULL);
- if (!tolua_isstring(tolua_S,2,0,&tolua_err))
+ if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->Ident = ((char*)  tolua_tostring(tolua_S,2,0))
+  self->Ident = ((std::string)  tolua_tocppstring(tolua_S,2,0))
 ;
  return 0;
 }
@@ -13974,7 +13976,7 @@ static int tolua_get_CUnitType_Name(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
 #endif
- tolua_pushstring(tolua_S,(const char*)self->Name);
+ tolua_pushcppstring(tolua_S,(const char*)self->Name);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -13987,10 +13989,10 @@ static int tolua_set_CUnitType_Name(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
- if (!tolua_isstring(tolua_S,2,0,&tolua_err))
+ if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->Name = ((char*)  tolua_tostring(tolua_S,2,0))
+  self->Name = ((std::string)  tolua_tocppstring(tolua_S,2,0))
 ;
  return 0;
 }

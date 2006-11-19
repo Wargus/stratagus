@@ -349,13 +349,13 @@ public:
 */
 class SpellType {
 public:
-	SpellType(int slot, const char *identname);
+	SpellType(int slot, const std::string &ident);
 	~SpellType();
 
 	// Identification stuff
-	char *Ident;    /// Spell unique identifier (spell-holy-vision)
-	char *Name;     /// Spell name shown by the engine
-	int Slot;       /// Spell numeric identifier
+	std::string Ident;    /// Spell unique identifier (spell-holy-vision)
+	std::string Name;     /// Spell name shown by the engine
+	int Slot;             /// Spell numeric identifier
 
 	// Spell Specifications
 	TargetType Target;          /// Targetting information. See TargetType.

@@ -247,10 +247,8 @@ public:
 
 class TitleScreen {
 public:
-	TitleScreen() : File(NULL), Music(NULL), Timeout(0), Iterations(0),
-		Labels(NULL) {}
+	TitleScreen() : Music(NULL), Timeout(0), Iterations(0), Labels(NULL) {}
 	~TitleScreen() {
-		delete[] this->File;
 		delete[] this->Music;
 		if (this->Labels) {
 			for (int i = 0; this->Labels[i]; ++i) {
@@ -260,7 +258,7 @@ public:
 		}
 	}
 
-	char *File;
+	std::string File;
 	char *Music;
 	int Timeout;
 	int Iterations;

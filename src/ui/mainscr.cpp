@@ -348,7 +348,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 	}
 
 	if (this->ShowName) {
-		VideoDrawTextCentered(x, y, font, unit->Type->Name);
+		VideoDrawTextCentered(x, y, font, unit->Type->Name.c_str());
 		return;
 	}
 

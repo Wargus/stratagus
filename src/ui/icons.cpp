@@ -149,7 +149,7 @@ void LoadIcons(void)
 	for (std::vector<CIcon *>::size_type i = 0; i < AllIcons.size(); ++i) {
 		CIcon *icon = AllIcons[i];
 		icon->G->Load();
-		ShowLoadProgress("Icons %s", icon->G->File);
+		ShowLoadProgress("Icons %s", icon->G->File.c_str());
 		if (icon->Frame >= icon->G->NumFrames) {
 			DebugPrint("Invalid icon frame: %s - %d\n" _C_
 				icon->GetIdent().c_str() _C_ icon->Frame);

@@ -804,7 +804,7 @@ void LoadFonts(void)
 
 	for (int i = 0; i < (int)AllFonts.size(); ++i) {
 		if ((g = AllFonts[i]->G)) {
-			ShowLoadProgress("Fonts %s", g->File);
+			ShowLoadProgress("Fonts %s", g->File.c_str());
 			g->Load();
 			AllFonts[i]->MeasureWidths();
 #ifdef USE_OPENGL
