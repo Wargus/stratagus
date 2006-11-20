@@ -39,7 +39,7 @@ msgstr "Besprechung"
 
 #: scripts/guichan.lua:246
 msgid "Buildings"
-msgstr "Gebäude"
+msgstr "GebÃ¤ude"
 
 #: scripts/menus/ingame/game.lua:112 scripts/menus/ingame/editor.lua:83
 msgid "Cancel"
@@ -103,11 +103,11 @@ msgstr "Editor"
 
 #: scripts/menus/ingame/editor.lua:45
 msgid "Editor Menu"
-msgstr "Editormenü"
+msgstr "EditormenÃ¼"
 
 #: scripts/menus/options.lua:78
 msgid "Effects Volume"
-msgstr "Effektlautstärke"
+msgstr "EffektlautstÃ¤rke"
 
 #: scripts/stratagus.lua:243
 msgid "Eliminate your enemies."
@@ -119,7 +119,7 @@ msgstr "Elite"
 
 #: scripts/guichan.lua:218
 msgid "Empty sub menu"
-msgstr "Leeres Untermenü"
+msgstr "Leeres UntermenÃ¼"
 
 #: scripts/menus/options.lua:105 scripts/menus/options.lua:137
 msgid "Enabled"
@@ -178,7 +178,7 @@ msgstr "Spiel (~<F9~>)"
 
 #: scripts/menus/ingame/game.lua:58
 msgid "Game Menu"
-msgstr "Spielmenü"
+msgstr "SpielmenÃ¼"
 
 #: scripts/menus/ingame/game.lua:130 scripts/menus/ingame/game.lua:146
 msgid "Game Options"
@@ -198,7 +198,7 @@ msgstr "Hilfe (~<F1~>)"
 
 #: scripts/menus/ingame/game.lua:389
 msgid "Help Menu"
-msgstr "Hilfemenü"
+msgstr "HilfemenÃ¼"
 
 #: scripts/menus/network.lua:257
 msgid "IP or server name :"
@@ -226,7 +226,7 @@ msgstr "Spiel beitreten: Karte"
 
 #: scripts/menus/ingame/game.lua:470
 msgid "Keystroke Help Menu"
-msgstr "Tastenbelegungshilfemenü"
+msgstr "TastenbelegungshilfemenÃ¼"
 
 #: scripts/menus/ingame/game.lua:390
 msgid "Keystroke ~!Help"
@@ -237,11 +237,11 @@ msgstr "Tasten~!hilfe"
 #: campaigns/elites/campaign.lua:63 campaigns/elites/campaign.lua:65
 #: campaigns/elites/campaign.lua:67 campaigns/elites/campaign.lua:69
 msgid "Kill them all !"
-msgstr "Töte sie alle !"
+msgstr "TÃ¶te sie alle !"
 
 #: scripts/guichan.lua:247
 msgid "Kills"
-msgstr "Zerstörte Einheiten"
+msgstr "ZerstÃ¶rte Einheiten"
 
 #: scripts/menus/options.lua:261
 msgid "Language"
@@ -278,7 +278,7 @@ msgstr "Karteneigenschaften (~<F5~>)"
 
 #: scripts/menus/network.lua:227
 msgid "Map not available"
-msgstr "Karte nicht verfügbar"
+msgstr "Karte nicht verfÃ¼gbar"
 
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:308
 #: scripts/guichan.lua:317
@@ -295,7 +295,7 @@ msgstr "Mehrspieler"
 
 #: scripts/menus/options.lua:110
 msgid "Music Volume"
-msgstr "Musiklautstärke"
+msgstr "MusiklautstÃ¤rke"
 
 #: scripts/menus/ingame/editor.lua:166
 msgid "Neutral"
@@ -370,7 +370,7 @@ msgstr "Spieler:"
 #: scripts/menus/ingame/game.lua:137 scripts/menus/ingame/game.lua:324
 #: scripts/menus/ingame/game.lua:394 scripts/menus/ingame/game.lua:471
 msgid "Previous (~<Esc~>)"
-msgstr "Zurück (~<Esc~>)"
+msgstr "ZurÃ¼ck (~<Esc~>)"
 
 #: scripts/menus/ingame/editor.lua:147
 msgid "Race"
@@ -378,7 +378,7 @@ msgstr "Rasse"
 
 #: scripts/guichan.lua:248
 msgid "Razings"
-msgstr "Zerstörte Gebäude"
+msgstr "ZerstÃ¶rte GebÃ¤ude"
 
 #: scripts/menus/ingame/editor.lua:166
 msgid "Rescue (Active)"
@@ -394,11 +394,11 @@ msgstr "Ergebnisse"
 
 #: scripts/menus/ingame/game.lua:72
 msgid "Return to Game (~<Esc~>)"
-msgstr "Zurück zum Spiel (!<Esc~>)"
+msgstr "ZurÃ¼ck zum Spiel (!<Esc~>)"
 
 #: scripts/menus/ingame/editor.lua:55
 msgid "Return to the Editor (~<Esc~>)"
-msgstr "Zurück zum Editor (~<Esc~>)"
+msgstr "ZurÃ¼ck zum Editor (~<Esc~>)"
 
 #: scripts/menus/network.lua:138 scripts/menus/network.lua:303
 #: scripts/guichan.lua:312 scripts/guichan.lua:365
@@ -455,7 +455,7 @@ msgstr "~!Aufzeichnung abspielen"
 
 #: scripts/menus/ingame/editor.lua:105
 msgid "Size:"
-msgstr "Größe:"
+msgstr "GrÃ¶ÃŸe:"
 
 #: scripts/menus/options.lua:258
 msgid "Sound"
@@ -615,7 +615,7 @@ msgstr "das Spiel?"
 
 #: scripts/menus/ingame/game.lua:363
 msgid "the main menu?"
-msgstr "das Hauptmenü"
+msgstr "das HauptmenÃ¼"
 
 #: scripts/menus/ingame/game.lua:349
 msgid "to your enemies?"
@@ -659,7 +659,7 @@ msgstr "~!Spiel beenden"
 
 #: scripts/menus/ingame/editor.lua:53
 msgid "~!Exit to menu"
-msgstr "E~!nde zum Menü"
+msgstr "E~!nde zum MenÃ¼"
 
 #: scripts/menus/network.lua:259 scripts/menus/network.lua:403
 msgid "~!Join Game"
@@ -675,7 +675,7 @@ msgstr "~!Multiplayer"
 
 #: scripts/menus/ingame/game.lua:546
 msgid "~!Next Tip"
-msgstr "~!Nächster Tipp"
+msgstr "~!NÃ¤chster Tipp"
 
 #: scripts/menus/options.lua:65 scripts/menus/options.lua:142
 #: scripts/menus/ingame/game.lua:180 scripts/menus/ingame/game.lua:254
