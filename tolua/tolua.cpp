@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov 19 16:13:10 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 19 20:45:08 2006.
 */
 
 #ifndef __cplusplus
@@ -2685,10 +2685,9 @@ static int tolua_stratagus_CStatusLine_Set00(lua_State* tolua_S)
 #endif
  {
   self->Set(status);
- tolua_pushcppstring(tolua_S,(const char*)status);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Set'.",&tolua_err);
@@ -3815,10 +3814,9 @@ static int tolua_stratagus_CIcon_New00(lua_State* tolua_S)
  {
   CIcon* tolua_ret = (CIcon*)  CIcon::New(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CIcon");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -3846,10 +3844,9 @@ static int tolua_stratagus_CIcon_Get00(lua_State* tolua_S)
  {
   CIcon* tolua_ret = (CIcon*)  CIcon::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CIcon");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
@@ -4987,12 +4984,12 @@ static int tolua_stratagus_Widget_setBaseColor00(lua_State* tolua_S)
 #endif
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+  const Color color = *((const Color*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBaseColor'",NULL);
 #endif
  {
-  self->setBaseColor(*color);
+  self->setBaseColor(color);
  }
  }
  return 0;
@@ -5052,12 +5049,12 @@ static int tolua_stratagus_Widget_setForegroundColor00(lua_State* tolua_S)
 #endif
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+  const Color color = *((const Color*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setForegroundColor'",NULL);
 #endif
  {
-  self->setForegroundColor(*color);
+  self->setForegroundColor(color);
  }
  }
  return 0;
@@ -5117,12 +5114,12 @@ static int tolua_stratagus_Widget_setBackgroundColor00(lua_State* tolua_S)
 #endif
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+  const Color color = *((const Color*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBackgroundColor'",NULL);
 #endif
  {
-  self->setBackgroundColor(*color);
+  self->setBackgroundColor(color);
  }
  }
  return 0;
@@ -5209,12 +5206,12 @@ static int tolua_stratagus_Widget_setForegroundColor01(lua_State* tolua_S)
  else
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+  const Color color = *((const Color*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setForegroundColor'",NULL);
 #endif
  {
-  self->setForegroundColor(*color);
+  self->setForegroundColor(color);
  }
  }
  return 0;
@@ -5237,12 +5234,12 @@ static int tolua_stratagus_Widget_setBackgroundColor01(lua_State* tolua_S)
  else
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+  const Color color = *((const Color*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBackgroundColor'",NULL);
 #endif
  {
-  self->setBackgroundColor(*color);
+  self->setBackgroundColor(color);
  }
  }
  return 0;
@@ -5265,12 +5262,12 @@ static int tolua_stratagus_Widget_setBaseColor01(lua_State* tolua_S)
  else
  {
   Widget* self = (Widget*)  tolua_tousertype(tolua_S,1,0);
-  const Color* color = ((const Color*)  tolua_tousertype(tolua_S,2,0));
+  const Color color = *((const Color*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setBaseColor'",NULL);
 #endif
  {
-  self->setBaseColor(*color);
+  self->setBaseColor(color);
  }
  }
  return 0;
@@ -5766,10 +5763,9 @@ static int tolua_stratagus_ButtonWidget_new00(lua_State* tolua_S)
  {
   ButtonWidget* tolua_ret = (ButtonWidget*)  new ButtonWidget(caption);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ButtonWidget");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -5797,10 +5793,9 @@ static int tolua_stratagus_ButtonWidget_new00_local(lua_State* tolua_S)
  {
   ButtonWidget* tolua_ret = (ButtonWidget*)  new ButtonWidget(caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ButtonWidget");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -5831,10 +5826,9 @@ static int tolua_stratagus_ButtonWidget_setCaption00(lua_State* tolua_S)
 #endif
  {
   self->setCaption(caption);
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
@@ -5979,10 +5973,9 @@ static int tolua_stratagus_ImageButton_new01(lua_State* tolua_S)
  {
   ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageButton");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_ImageButton_new00(tolua_S);
 }
@@ -6005,10 +5998,9 @@ static int tolua_stratagus_ImageButton_new01_local(lua_State* tolua_S)
  {
   ImageButton* tolua_ret = (ImageButton*)  new ImageButton(caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageButton");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_ImageButton_new00_local(tolua_S);
 }
@@ -6190,11 +6182,9 @@ static int tolua_stratagus_RadioButton_new01(lua_State* tolua_S)
  {
   RadioButton* tolua_ret = (RadioButton*)  new RadioButton(caption,group,marked);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"RadioButton");
- tolua_pushcppstring(tolua_S,(const char*)caption);
- tolua_pushcppstring(tolua_S,(const char*)group);
  }
  }
- return 3;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_RadioButton_new00(tolua_S);
 }
@@ -6221,11 +6211,9 @@ static int tolua_stratagus_RadioButton_new01_local(lua_State* tolua_S)
  {
   RadioButton* tolua_ret = (RadioButton*)  new RadioButton(caption,group,marked);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"RadioButton");
- tolua_pushcppstring(tolua_S,(const char*)caption);
- tolua_pushcppstring(tolua_S,(const char*)group);
  }
  }
- return 3;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_RadioButton_new00_local(tolua_S);
 }
@@ -6350,10 +6338,9 @@ static int tolua_stratagus_RadioButton_setCaption00(lua_State* tolua_S)
 #endif
  {
   self->setCaption(caption);
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
@@ -6384,10 +6371,9 @@ static int tolua_stratagus_RadioButton_setGroup00(lua_State* tolua_S)
 #endif
  {
   self->setGroup(group);
- tolua_pushcppstring(tolua_S,(const char*)group);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setGroup'.",&tolua_err);
@@ -6536,11 +6522,9 @@ static int tolua_stratagus_ImageRadioButton_new01(lua_State* tolua_S)
  {
   ImageRadioButton* tolua_ret = (ImageRadioButton*)  new ImageRadioButton(caption,group,marked);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageRadioButton");
- tolua_pushcppstring(tolua_S,(const char*)caption);
- tolua_pushcppstring(tolua_S,(const char*)group);
  }
  }
- return 3;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_ImageRadioButton_new00(tolua_S);
 }
@@ -6567,11 +6551,9 @@ static int tolua_stratagus_ImageRadioButton_new01_local(lua_State* tolua_S)
  {
   ImageRadioButton* tolua_ret = (ImageRadioButton*)  new ImageRadioButton(caption,group,marked);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageRadioButton");
- tolua_pushcppstring(tolua_S,(const char*)caption);
- tolua_pushcppstring(tolua_S,(const char*)group);
  }
  }
- return 3;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_ImageRadioButton_new00_local(tolua_S);
 }
@@ -6784,10 +6766,9 @@ static int tolua_stratagus_CheckBox_new01(lua_State* tolua_S)
  {
   CheckBox* tolua_ret = (CheckBox*)  new CheckBox(caption,marked);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CheckBox");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_CheckBox_new00(tolua_S);
 }
@@ -6812,10 +6793,9 @@ static int tolua_stratagus_CheckBox_new01_local(lua_State* tolua_S)
  {
   CheckBox* tolua_ret = (CheckBox*)  new CheckBox(caption,marked);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"CheckBox");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_CheckBox_new00_local(tolua_S);
 }
@@ -6940,10 +6920,9 @@ static int tolua_stratagus_CheckBox_setCaption00(lua_State* tolua_S)
 #endif
  {
   self->setCaption(caption);
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
@@ -7058,10 +7037,9 @@ static int tolua_stratagus_ImageCheckBox_new01(lua_State* tolua_S)
  {
   ImageCheckBox* tolua_ret = (ImageCheckBox*)  new ImageCheckBox(caption,marked);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ImageCheckBox");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_ImageCheckBox_new00(tolua_S);
 }
@@ -7086,10 +7064,9 @@ static int tolua_stratagus_ImageCheckBox_new01_local(lua_State* tolua_S)
  {
   ImageCheckBox* tolua_ret = (ImageCheckBox*)  new ImageCheckBox(caption,marked);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ImageCheckBox");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_ImageCheckBox_new00_local(tolua_S);
 }
@@ -7965,10 +7942,9 @@ static int tolua_stratagus_Label_new00(lua_State* tolua_S)
  {
   Label* tolua_ret = (Label*)  new Label(caption);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Label");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -7996,10 +7972,9 @@ static int tolua_stratagus_Label_new00_local(lua_State* tolua_S)
  {
   Label* tolua_ret = (Label*)  new Label(caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Label");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -8062,10 +8037,9 @@ static int tolua_stratagus_Label_setCaption00(lua_State* tolua_S)
 #endif
  {
   self->setCaption(caption);
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
@@ -8243,10 +8217,9 @@ static int tolua_stratagus_MultiLineLabel_new01(lua_State* tolua_S)
  {
   MultiLineLabel* tolua_ret = (MultiLineLabel*)  new MultiLineLabel(caption);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"MultiLineLabel");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_MultiLineLabel_new00(tolua_S);
 }
@@ -8269,10 +8242,9 @@ static int tolua_stratagus_MultiLineLabel_new01_local(lua_State* tolua_S)
  {
   MultiLineLabel* tolua_ret = (MultiLineLabel*)  new MultiLineLabel(caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"MultiLineLabel");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_MultiLineLabel_new00_local(tolua_S);
 }
@@ -8300,10 +8272,9 @@ static int tolua_stratagus_MultiLineLabel_setCaption00(lua_State* tolua_S)
 #endif
  {
   self->setCaption(caption);
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
@@ -8622,10 +8593,9 @@ static int tolua_stratagus_TextField_new00(lua_State* tolua_S)
  {
   TextField* tolua_ret = (TextField*)  new TextField(text);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"TextField");
- tolua_pushcppstring(tolua_S,(const char*)text);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -8653,10 +8623,9 @@ static int tolua_stratagus_TextField_new00_local(lua_State* tolua_S)
  {
   TextField* tolua_ret = (TextField*)  new TextField(text);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"TextField");
- tolua_pushcppstring(tolua_S,(const char*)text);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -8687,10 +8656,9 @@ static int tolua_stratagus_TextField_setText00(lua_State* tolua_S)
 #endif
  {
   self->setText(text);
- tolua_pushcppstring(tolua_S,(const char*)text);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setText'.",&tolua_err);
@@ -8967,10 +8935,9 @@ static int tolua_stratagus_Window_new01(lua_State* tolua_S)
  {
   Window* tolua_ret = (Window*)  new Window(caption);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Window");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_Window_new00(tolua_S);
 }
@@ -8993,10 +8960,9 @@ static int tolua_stratagus_Window_new01_local(lua_State* tolua_S)
  {
   Window* tolua_ret = (Window*)  new Window(caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Window");
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 2;
+ return 1;
 tolua_lerror:
  return tolua_stratagus_Window_new00_local(tolua_S);
 }
@@ -9010,14 +8976,16 @@ static int tolua_stratagus_Window_new02(lua_State* tolua_S)
  if (
  !tolua_isusertable(tolua_S,1,"Window",0,&tolua_err) ||
  !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
+ !tolua_iscppstring(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
  goto tolua_lerror;
  else
  {
   Widget* content = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,3,""));
  {
-  Window* tolua_ret = (Window*)  new Window(content);
+  Window* tolua_ret = (Window*)  new Window(content,caption);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Window");
  }
  }
@@ -9035,76 +9003,22 @@ static int tolua_stratagus_Window_new02_local(lua_State* tolua_S)
  if (
  !tolua_isusertable(tolua_S,1,"Window",0,&tolua_err) ||
  !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
+ !tolua_iscppstring(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
  goto tolua_lerror;
  else
  {
   Widget* content = ((Widget*)  tolua_tousertype(tolua_S,2,0));
+  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,3,""));
  {
-  Window* tolua_ret = (Window*)  new Window(content);
+  Window* tolua_ret = (Window*)  new Window(content,caption);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Window");
  }
  }
  return 1;
 tolua_lerror:
  return tolua_stratagus_Window_new01_local(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new of class  Window */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Window_new03
-static int tolua_stratagus_Window_new03(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"Window",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
- goto tolua_lerror;
- else
- {
-  Widget* content = ((Widget*)  tolua_tousertype(tolua_S,2,0));
-  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
- {
-  Window* tolua_ret = (Window*)  new Window(content,caption);
- tolua_pushusertype(tolua_S,(void*)tolua_ret,"Window");
- tolua_pushcppstring(tolua_S,(const char*)caption);
- }
- }
- return 2;
-tolua_lerror:
- return tolua_stratagus_Window_new02(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  Window */
-#ifndef TOLUA_DISABLE_tolua_stratagus_Window_new03_local
-static int tolua_stratagus_Window_new03_local(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"Window",0,&tolua_err) ||
- !tolua_isusertype(tolua_S,2,"Widget",0,&tolua_err) ||
- !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
- goto tolua_lerror;
- else
- {
-  Widget* content = ((Widget*)  tolua_tousertype(tolua_S,2,0));
-  const std::string caption = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
- {
-  Window* tolua_ret = (Window*)  new Window(content,caption);
- tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Window");
- tolua_pushcppstring(tolua_S,(const char*)caption);
- }
- }
- return 2;
-tolua_lerror:
- return tolua_stratagus_Window_new02_local(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -9130,10 +9044,9 @@ static int tolua_stratagus_Window_setCaption00(lua_State* tolua_S)
 #endif
  {
   self->setCaption(caption);
- tolua_pushcppstring(tolua_S,(const char*)caption);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
@@ -9618,10 +9531,9 @@ static int tolua_stratagus_Windows_new00(lua_State* tolua_S)
  {
   Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Windows");
- tolua_pushcppstring(tolua_S,(const char*)text);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -9653,10 +9565,9 @@ static int tolua_stratagus_Windows_new00_local(lua_State* tolua_S)
  {
   Windows* tolua_ret = (Windows*)  new Windows(text,width,height);
  tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"Windows");
- tolua_pushcppstring(tolua_S,(const char*)text);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
@@ -10337,10 +10248,9 @@ static int tolua_stratagus_StatBoxWidget_setCaption00(lua_State* tolua_S)
 #endif
  {
   self->setCaption(s);
- tolua_pushcppstring(tolua_S,(const char*)s);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'setCaption'.",&tolua_err);
@@ -11019,10 +10929,9 @@ static int tolua_stratagus_NetworkSetupServerAddress00(lua_State* tolua_S)
  {
   int tolua_ret = (int)  NetworkSetupServerAddress(serveraddr);
  tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
- tolua_pushcppstring(tolua_S,(const char*)serveraddr);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'NetworkSetupServerAddress'.",&tolua_err);
@@ -12089,10 +11998,9 @@ static int tolua_stratagus_CGraphic_New00(lua_State* tolua_S)
  {
   CGraphic* tolua_ret = (CGraphic*)  CGraphic::New(file,w,h);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CGraphic");
- tolua_pushcppstring(tolua_S,(const char*)file);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12219,10 +12127,9 @@ static int tolua_stratagus_CPlayerColorGraphic_New00(lua_State* tolua_S)
  {
   CPlayerColorGraphic* tolua_ret = (CPlayerColorGraphic*)  CPlayerColorGraphic::New(file,w,h);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPlayerColorGraphic");
- tolua_pushcppstring(tolua_S,(const char*)file);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12444,10 +12351,9 @@ static int tolua_stratagus_CFont_New00(lua_State* tolua_S)
  {
   CFont* tolua_ret = (CFont*)  CFont::New(ident,g);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFont");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12475,10 +12381,9 @@ static int tolua_stratagus_CFont_Get00(lua_State* tolua_S)
  {
   CFont* tolua_ret = (CFont*)  CFont::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFont");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
@@ -12572,10 +12477,9 @@ static int tolua_stratagus_CFontColor_New00(lua_State* tolua_S)
  {
   CFontColor* tolua_ret = (CFontColor*)  CFontColor::New(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFontColor");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12603,10 +12507,9 @@ static int tolua_stratagus_CFontColor_Get00(lua_State* tolua_S)
  {
   CFontColor* tolua_ret = (CFontColor*)  CFontColor::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CFontColor");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
@@ -12686,10 +12589,9 @@ static int tolua_stratagus_CUpgrade_New00(lua_State* tolua_S)
  {
   CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::New(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
@@ -12717,10 +12619,9 @@ static int tolua_stratagus_CUpgrade_Get00(lua_State* tolua_S)
  {
   CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::Get(ident);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
- tolua_pushcppstring(tolua_S,(const char*)ident);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
@@ -14622,10 +14523,9 @@ static int tolua_stratagus_PlayFile00(lua_State* tolua_S)
  {
   int tolua_ret = (int)  PlayFile(name,listener);
  tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
- tolua_pushcppstring(tolua_S,(const char*)name);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'PlayFile'.",&tolua_err);
@@ -14652,10 +14552,9 @@ static int tolua_stratagus_PlayMusic00(lua_State* tolua_S)
  {
   int tolua_ret = (int)  PlayMusic(name);
  tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
- tolua_pushcppstring(tolua_S,(const char*)name);
  }
  }
- return 2;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'PlayMusic'.",&tolua_err);
@@ -15961,10 +15860,9 @@ static int tolua_stratagus_SaveGame00(lua_State* tolua_S)
   const std::string filename = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
  {
   SaveGame(filename);
- tolua_pushcppstring(tolua_S,(const char*)filename);
  }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SaveGame'.",&tolua_err);
@@ -16647,9 +16545,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"new",tolua_stratagus_Window_new02);
   tolua_function(tolua_S,"new_local",tolua_stratagus_Window_new02_local);
   tolua_function(tolua_S,".call",tolua_stratagus_Window_new02_local);
-  tolua_function(tolua_S,"new",tolua_stratagus_Window_new03);
-  tolua_function(tolua_S,"new_local",tolua_stratagus_Window_new03_local);
-  tolua_function(tolua_S,".call",tolua_stratagus_Window_new03_local);
   tolua_function(tolua_S,"setCaption",tolua_stratagus_Window_setCaption00);
   tolua_function(tolua_S,"getCaption",tolua_stratagus_Window_getCaption00);
   tolua_function(tolua_S,"setAlignment",tolua_stratagus_Window_setAlignment00);

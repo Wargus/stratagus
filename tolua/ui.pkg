@@ -100,7 +100,7 @@ class CInfoPanel
 
 class CStatusLine
 {
-	void Set(const std::string &status);
+	void Set(const std::string status);
 	const std::string &Get();
 	void Clear();
 
@@ -161,8 +161,8 @@ extern CUserInterface UI;
 
 class CIcon
 {
-	static CIcon *New(const std::string &ident);
-	static CIcon *Get(const std::string &ident);
+	static CIcon *New(const std::string ident);
+	static CIcon *Get(const std::string ident);
 
 	tolua_readonly tolua_property__s std::string Ident;
 	CGraphic *G;
@@ -225,17 +225,17 @@ class Widget
 	virtual void setVisible(bool visible);
 	virtual bool isVisible() const;
 
-	virtual void setBaseColor(const Color &color);
+	virtual void setBaseColor(const Color color);
 	virtual const Color &getBaseColor() const;
-	virtual void setForegroundColor(const Color &color);
+	virtual void setForegroundColor(const Color color);
 	virtual const Color &getForegroundColor() const;
-	virtual void setBackgroundColor(const Color &color);
+	virtual void setBackgroundColor(const Color color);
 	virtual const Color &getBackgroundColor() const;
 
 	static void setGlobalFont(CFont *font);
-	virtual void setForegroundColor(const Color &color);
-	virtual void setBackgroundColor(const Color &color);
-	virtual void setBaseColor(const Color &color);
+	virtual void setForegroundColor(const Color color);
+	virtual void setBackgroundColor(const Color color);
+	virtual void setBaseColor(const Color color);
 	virtual void setSize(int width, int height);
 	virtual void setBorderSize(int width);
 	virtual void setFont(CFont *font);
@@ -278,8 +278,8 @@ class Button : public Widget
 
 class ButtonWidget : public Button
 {
-	ButtonWidget(const std::string &caption);
-	virtual void setCaption(const std::string &caption);
+	ButtonWidget(const std::string caption);
+	virtual void setCaption(const std::string caption);
 	virtual const std::string &getCaption() const;
 	virtual void adjustSize();
 };
@@ -287,7 +287,7 @@ class ButtonWidget : public Button
 class ImageButton : public Button
 {
 	ImageButton();
-	ImageButton(const std::string &caption);
+	ImageButton(const std::string caption);
 
 	void setNormalImage(CGraphic *image);
 	void setPressedImage(CGraphic *image);
@@ -297,13 +297,13 @@ class ImageButton : public Button
 class RadioButton : public Widget
 {
 	RadioButton();
-	RadioButton(const std::string &caption, const std::string &group, bool marked = false);
+	RadioButton(const std::string caption, const std::string group, bool marked = false);
 
 	virtual bool isMarked();
 	virtual void setMarked(bool marked);
 	virtual const std::string &getCaption() const;
-	virtual void setCaption(const std::string &caption);
-	virtual void setGroup(const std::string &group);
+	virtual void setCaption(const std::string caption);
+	virtual void setGroup(const std::string group);
 	virtual const std::string &getGroup() const;
 	virtual void adjustSize();
 };
@@ -311,7 +311,7 @@ class RadioButton : public Widget
 class ImageRadioButton : public RadioButton
 {
 	ImageRadioButton();
-	ImageRadioButton(const std::string &caption, const std::string &group, bool marked = false);
+	ImageRadioButton(const std::string caption, const std::string group, bool marked = false);
 
 	void setUncheckedNormalImage(CGraphic *image);
 	void setUncheckedPressedImage(CGraphic *image);
@@ -322,19 +322,19 @@ class ImageRadioButton : public RadioButton
 class CheckBox : public Widget
 {
 	CheckBox();
-	CheckBox(const std::string &caption, bool marked = false);
+	CheckBox(const std::string caption, bool marked = false);
 
 	virtual bool isMarked() const;
 	virtual void setMarked(bool marked);
 	virtual const std::string &getCaption() const;
-	virtual void setCaption(const std::string &caption);
+	virtual void setCaption(const std::string caption);
 	virtual void adjustSize();
 };
 
 class ImageCheckBox : public CheckBox
 {
 	ImageCheckBox();
-	ImageCheckBox(const std::string &caption, bool marked = false);
+	ImageCheckBox(const std::string caption, bool marked = false);
 
 	void setUncheckedNormalImage(CGraphic *image);
 	void setUncheckedPressedImage(CGraphic *image);
@@ -373,9 +373,9 @@ class ImageSlider : public Slider
 
 class Label : public Widget
 {
-	Label(const std::string &caption);
+	Label(const std::string caption);
 	const std::string &getCaption() const;
-	void setCaption(const std::string &caption);
+	void setCaption(const std::string caption);
 	virtual void setAlignment(unsigned int alignment);
 	virtual unsigned int getAlignment();
 	virtual void adjustSize();
@@ -384,9 +384,9 @@ class Label : public Widget
 class MultiLineLabel : public Widget
 {
 	MultiLineLabel();
-	MultiLineLabel(const std::string &caption);
+	MultiLineLabel(const std::string caption);
 
-	virtual void setCaption(const std::string &caption);
+	virtual void setCaption(const std::string caption);
 	virtual const std::string &getCaption() const;
 	virtual void setAlignment(unsigned int alignment);
 	virtual unsigned int getAlignment();
@@ -409,13 +409,13 @@ class MultiLineLabel : public Widget
 // FIXME Combine with ScrollArea in our own widget
 //class TextBox : public Widget
 //{
-//	TextBox(const std::string &text);
+//	TextBox(const std::string text);
 //};
 
 class TextField : public Widget
 {
-	TextField(const std::string &text);
-	virtual void setText(const std::string &text);
+	TextField(const std::string text);
+	virtual void setText(const std::string text);
 	virtual std::string &getText();
 };
 
@@ -434,10 +434,10 @@ class ListBoxWidget : public ScrollArea
 class Window : public BasicContainer
 {
 	Window();
-	Window(const std::string& caption);
-	Window(Widget* content, const std::string& caption = "");
+	Window(const std::string caption);
+	Window(Widget *content, const std::string caption = "");
 	
-	virtual void setCaption(const std::string &caption);
+	virtual void setCaption(const std::string caption);
 	virtual const std::string &getCaption() const;
 	virtual void setAlignment(unsigned int alignment);
 	virtual unsigned int getAlignment() const;
@@ -456,7 +456,7 @@ class Window : public BasicContainer
 
 class Windows : public Window
 {
-	Windows(const std::string &text, int width, int height);
+	Windows(const std::string text, int width, int height);
 	void add(Widget *widget, int x, int y);
 };
 
@@ -491,7 +491,7 @@ class StatBoxWidget : public Widget
 {
 	StatBoxWidget(int width, int height);
 
-	void setCaption(const std::string &s);
+	void setCaption(const std::string s);
 	const std::string &getCaption() const;
 	void setPercent(const int percent);
 	int getPercent() const;

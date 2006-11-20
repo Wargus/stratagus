@@ -5,7 +5,7 @@ void ExitNetwork1(void);
 
 bool IsNetworkGame();
 
-int NetworkSetupServerAddress(const std::string &serveraddr);
+int NetworkSetupServerAddress(const std::string serveraddr);
 void NetworkInitClientConnect(void);
 void NetworkInitServerConnect(void);
 void NetworkServerStartGame(void);
