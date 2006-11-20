@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov 19 15:41:25 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 19 16:13:10 2006.
 */
 
 #ifndef __cplusplus
@@ -14609,7 +14609,7 @@ static int tolua_stratagus_PlayFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
  !tolua_isusertype(tolua_S,2,"LuaActionListener",1,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -14617,14 +14617,15 @@ static int tolua_stratagus_PlayFile00(lua_State* tolua_S)
  else
 #endif
  {
-  const char* name = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const std::string name = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
   LuaActionListener* listener = ((LuaActionListener*)  tolua_tousertype(tolua_S,2,NULL));
  {
   int tolua_ret = (int)  PlayFile(name,listener);
  tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ tolua_pushcppstring(tolua_S,(const char*)name);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'PlayFile'.",&tolua_err);
@@ -14640,20 +14641,21 @@ static int tolua_stratagus_PlayMusic00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* name = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const std::string name = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
  {
   int tolua_ret = (int)  PlayMusic(name);
  tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ tolua_pushcppstring(tolua_S,(const char*)name);
  }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'PlayMusic'.",&tolua_err);
@@ -15949,19 +15951,20 @@ static int tolua_stratagus_SaveGame00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const std::string filename = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
  {
   SaveGame(filename);
+ tolua_pushcppstring(tolua_S,(const char*)filename);
  }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SaveGame'.",&tolua_err);

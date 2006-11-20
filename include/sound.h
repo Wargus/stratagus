@@ -152,7 +152,7 @@ extern void PlayMissileSound(const Missile *missile, CSound *sound);
 extern void PlayGameSound(CSound *sound, unsigned char volume);
 
 	/// Play a sound file
-extern int PlayFile(const char *name, LuaActionListener *listener = NULL);
+extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL);
 
 	/// Modify the range of a given sound.
 extern void SetSoundRange(CSound *sound, unsigned char range);
@@ -190,9 +190,9 @@ extern void MapSound(const std::string &sound_name, CSound *id);
 	/// Get the sound id bound to an identifier
 extern CSound *SoundForName(const std::string &sound_name);
 	/// Make a sound bound to identifier
-extern CSound *MakeSound(const char *sound_name, const char *file[], int nb);
+extern CSound *MakeSound(const std::string &sound_name, const char *file[], int nb);
 	/// Make a sound group bound to identifier
-extern CSound *MakeSoundGroup(const char *name, CSound *first, CSound *second);
+extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
 
 
 //@}

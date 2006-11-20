@@ -2051,7 +2051,7 @@ int EditorSaveMap(const char *file)
 {
 	char path[PATH_MAX];
 
-	sprintf(path, "%s/%s", StratagusLibPath, file);
+	sprintf(path, "%s/%s", StratagusLibPath.c_str(), file);
 	if (SaveStratagusMap(path, &Map, Editor.TerrainEditable) == -1) {
 		printf("Cannot save map\n");
 		return -1;

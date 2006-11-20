@@ -80,7 +80,7 @@ static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
 
 // FIXME: move out of sound_server.cpp
-char *CurrentMusicFile;    /// Current music filename
+std::string CurrentMusicFile;    /// Current music filename
 
 static struct {
 	CSample *Sample;       /// Music sample
@@ -502,12 +502,12 @@ void StopChannel(int channel)
 **
 **  @todo  Add streaming, caching support.
 */
-CSample *LoadSample(const char *name)
+CSample *LoadSample(const std::string &name)
 {
 	CSample *sample;
 	char buf[PATH_MAX];
 
-	LibraryFileName(name, buf, sizeof(buf));
+	LibraryFileName(name.c_str(), buf, sizeof(buf));
 
 	if ((sample = LoadWav(buf, PlayAudioLoadInMemory))) {
 		return sample;
@@ -523,7 +523,7 @@ CSample *LoadSample(const char *name)
 	}
 #endif
 
-	fprintf(stderr, "Can't load the sound `%s'\n", name);
+	fprintf(stderr, "Can't load the sound `%s'\n", name.c_str());
 
 	return sample;
 }
@@ -558,7 +558,7 @@ int PlaySample(CSample *sample)
 **
 **  @return      Channel number the sound is playing on, -1 for error
 */
-int PlaySoundFile(const char *name)
+int PlaySoundFile(const std::string &name)
 {
 	CSample *sample = LoadSample(name);
 	if (sample) {
@@ -632,8 +632,7 @@ int PlayMusic(CSample *sample)
 		StopMusic();
 		MusicChannel.Sample = sample;
 		MusicPlaying = true;
-		delete[] CurrentMusicFile;
-		CurrentMusicFile = NULL;
+		CurrentMusicFile.clear();
 		return 0;
 	} else {
 		DebugPrint("Could not play sample\n");
@@ -648,7 +647,7 @@ int PlayMusic(CSample *sample)
 **
 **  @return      0 if music is playing, -1 if not.
 */
-int PlayMusic(const char *file)
+int PlayMusic(const std::string &file)
 {
 	char buffer[PATH_MAX];
 	CSample *sample;
@@ -657,10 +656,9 @@ int PlayMusic(const char *file)
 		return -1;
 	}
 
-	delete[] CurrentMusicFile;
-	CurrentMusicFile = NULL;
+	CurrentMusicFile.clear();
 
-	char *name = LibraryFileName(file, buffer, sizeof(buffer));
+	char *name = LibraryFileName(file.c_str(), buffer, sizeof(buffer));
 
 	DebugPrint("play music %s\n" _C_ name);
 
@@ -681,10 +679,10 @@ int PlayMusic(const char *file)
 		StopMusic();
 		MusicChannel.Sample = sample;
 		MusicPlaying = true;
-		CurrentMusicFile = new_strdup(file);
+		CurrentMusicFile = file;
 		return 0;
 	} else {
-		DebugPrint("Could not play %s\n" _C_ file);
+		DebugPrint("Could not play %s\n" _C_ file.c_str());
 		return -1;
 	}
 }

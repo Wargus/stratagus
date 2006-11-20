@@ -1330,7 +1330,7 @@ static void UISelectStateButtonDown(unsigned button)
 
 		if (MouseButtons & LeftButton) {
 			const CViewport *vp = UI.MouseViewport;
-			if (ClickMissile) {
+			if (!ClickMissile.empty()) {
 				int mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
 				int my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
@@ -1359,7 +1359,7 @@ static void UISelectStateButtonDown(unsigned button)
 			GameCursor = UI.Point.Cursor;
 			CurrentButtonLevel = 0;
 			UI.ButtonPanel.Update();
-			if (ClickMissile) {
+			if (!ClickMissile.empty()) {
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					sx + TileSizeX / 2, sy + TileSizeY / 2, 0, 0);
 			}
@@ -1541,7 +1541,7 @@ void UIHandleButtonDown(unsigned button)
 						!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;                // if right click on building -- blink
 				} else { // if not not click on building -- green cross
-					if (ClickMissile) {
+					if (!ClickMissile.empty()) {
 						MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 							UI.MouseViewport->MapX * TileSizeX +
 								CursorX - UI.MouseViewport->X + UI.MouseViewport->OffsetX,
@@ -1562,7 +1562,7 @@ void UIHandleButtonDown(unsigned button)
 				TileSizeX / 2, TileSizeY / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
-				if (ClickMissile) {
+				if (!ClickMissile.empty()) {
 					MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 						UI.Minimap.Screen2MapX(CursorX) * TileSizeX + TileSizeX / 2,
 						UI.Minimap.Screen2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);

@@ -77,7 +77,7 @@ enum _play_audio_flags_ {
 ----------------------------------------------------------------------------*/
 
 	/// Current music file
-extern char *CurrentMusicFile;
+extern std::string CurrentMusicFile;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -99,11 +99,11 @@ extern CSample *GetChannelSample(int channel);
 extern void StopChannel(int channel);
 
 	/// Load a sample
-extern CSample *LoadSample(const char *name);
+extern CSample *LoadSample(const std::string &name);
 	/// Play a sample
 extern int PlaySample(CSample *sample);
 	/// Play a sound file
-extern int PlaySoundFile(const char *name);
+extern int PlaySoundFile(const std::string &name);
 
 	/// Set effects volume
 extern void SetEffectsVolume(int volume);
@@ -119,7 +119,7 @@ void SetMusicFinishedCallback(void (*callback)(void));
 	/// Play a music file
 extern int PlayMusic(CSample *sample);
 	/// Play a music file
-extern int PlayMusic(const char *file);
+extern int PlayMusic(const std::string &file);
 	/// Stop music playing
 extern void StopMusic(void);
 	/// Set music volume

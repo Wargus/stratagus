@@ -84,9 +84,9 @@ static void SaveReplayOk(void)
 	}
 
 #ifdef WIN32
-	sprintf(TempPathBuf, "%s/logs/",GameName);
+	sprintf(TempPathBuf, "%s/logs/", GameName.c_str());
 #else
-	sprintf(TempPathBuf, "%s/%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH,GameName);
+	sprintf(TempPathBuf, "%s/%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH, GameName.c_str());
 	strcat(TempPathBuf, "/logs/");
 #endif
 	ptr = TempPathBuf + strlen(TempPathBuf);
@@ -352,7 +352,7 @@ void SetupEditor(void)
 	//
 	// Use the last path.
 	//
-	strcpy(ScenSelectPath, StratagusLibPath);
+	strcpy(ScenSelectPath, StratagusLibPath.c_str());
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
 	}
@@ -493,7 +493,7 @@ static void EditorNewOk(void)
 
 		sprintf(Map.TileModelsFileName, "scripts/tilesets/%s.lua",
 				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
-		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath,
+		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath.c_str(),
 				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
 		LuaLoadFile(tilemodel);
 		//CloseMenu();
@@ -524,7 +524,7 @@ static void EditorMainLoadMap(void)
 		s = ScenSelectPath + strlen(ScenSelectPath);
 		*s = '/';
 		strcpy(s+1, ScenSelectFileName); // Final map name with path
-		p = ScenSelectPath + strlen(StratagusLibPath) + 1;
+		p = ScenSelectPath + StratagusLibPath.size() + 1;
 		strcpy(CurrentMapPath, p);
 		*s = '\0';
 	} else {
@@ -575,7 +575,7 @@ static void EditorMainLoadCancel(void)
 	//  Use last selected map.
 	//
 	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
-	strcpy(ScenSelectPath, StratagusLibPath);
+	strcpy(ScenSelectPath, StratagusLibPath.c_str());
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
 	}
@@ -620,7 +620,7 @@ void EditorLoadMenu(void)
 		s = ScenSelectPath + strlen(ScenSelectPath);
 		*s = '/';
 		strcpy(s + 1, ScenSelectFileName); // Final map name with path
-		p = ScenSelectPath + strlen(StratagusLibPath) + 1;
+		p = ScenSelectPath + StratagusLibPath.size() + 1;
 		strcpy(CurrentMapPath, p);
 		*s = '\0';
 	} else {
@@ -672,7 +672,7 @@ static void EditorLoadCancel(void)
 	//  Use last selected map.
 	//
 	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
-	strcpy(ScenSelectPath, StratagusLibPath);
+	strcpy(ScenSelectPath, StratagusLibPath.c_str());
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
 	}
@@ -931,7 +931,7 @@ int EditorSaveMenu(void)
 			s = ScenSelectPath + strlen(ScenSelectPath);
 			*s = '/';
 			strcpy(s + 1, ScenSelectFileName); // Final map name with path
-			p = ScenSelectPath + strlen(StratagusLibPath) + 1;
+			p = ScenSelectPath + StratagusLibPath.size() + 1;
 			strcpy(CurrentMapPath, p);
 			*s = '\0';
 		}

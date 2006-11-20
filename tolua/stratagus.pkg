@@ -69,7 +69,7 @@ extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile
 extern std::string StratagusTranslation;
 extern std::string GameTranslation;
 
-extern void SaveGame(const char *filename);
+extern void SaveGame(const std::string &filename);
 
 extern const char *Translate @ _(const char *str);
 
