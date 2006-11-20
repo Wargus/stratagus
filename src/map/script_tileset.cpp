@@ -522,10 +522,7 @@ static int CclDefineTileset(lua_State *l)
 	int args;
 	int j;
 
-	delete[] Map.Tileset.Table;
-	delete[] Map.Tileset.Tiles;
-	delete[] Map.Tileset.TileTypeTable;
-	memset(&Map.Tileset, 0, sizeof(CTileset));
+	Map.Tileset.Clear();
 
 	Map.Tileset.TileSizeX = 32;
 	Map.Tileset.TileSizeY = 32;

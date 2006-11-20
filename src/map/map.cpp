@@ -403,7 +403,7 @@ void CMap::Clean(void)
 	this->Fields = NULL;
 	memset(this->Visible, 0, sizeof(this->Visible));
 	this->NoFogOfWar = false;
-	memset(&this->Tileset, 0, sizeof(this->Tileset));
+	this->Tileset.Clear();
 	memset(this->TileModelsFileName, 0, sizeof(this->TileModelsFileName));
 	this->TileGraphic = NULL;
 

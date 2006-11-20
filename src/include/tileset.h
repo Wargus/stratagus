@@ -238,6 +238,42 @@ struct SolidTerrainInfo {
 	/// Tileset definition
 class CTileset {
 public:
+	void Clear() {
+		Name.clear();
+		ImageFile.clear();
+		NumTiles = 0;
+		TileSizeX = 0;
+		TileSizeY = 0;
+		delete[] Table;
+		Table = NULL;
+		delete[] FlagsTable;
+		FlagsTable = NULL;
+		delete[] Tiles;
+		Tiles = NULL;
+		delete[] TileTypeTable;
+		TileTypeTable = NULL;
+		for (int i = 0; i < NumTerrainTypes; ++i) {
+			delete[] SolidTerrainTypes[i].TerrainName;
+		}
+		delete[] SolidTerrainTypes;
+		SolidTerrainTypes = NULL;
+		NumTerrainTypes = 0;
+		TopOneTree = 0;
+		MidOneTree = 0;
+		BotOneTree = 0;
+		RemovedTree = 0;
+		memset(GrowingTree, 0, sizeof(GrowingTree));
+		memset(WoodTable, 0, sizeof(WoodTable));
+		delete[] MixedLookupTable;
+		MixedLookupTable = NULL;
+		TopOneRock = 0;
+		MidOneRock = 0;
+		BotOneRock = 0;
+		RemovedRock = 0;
+		memset(RockTable, 0, sizeof(RockTable));
+		memset(HumanWallTable, 0, sizeof(HumanWallTable));
+		memset(OrcWallTable, 0, sizeof(OrcWallTable));
+	}
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
 
