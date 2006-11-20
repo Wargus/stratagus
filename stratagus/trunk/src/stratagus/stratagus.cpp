@@ -642,7 +642,7 @@ static void ExpandPath(char *newpath, const char *path)
 #ifndef WIN32
 		if ((s = getenv("HOME")) && !GameName.empty()) {
 			sprintf(newpath, "%s/%s/%s/%s",
-				s, STRATAGUS_HOME_PATH, GameName, path);
+				s, STRATAGUS_HOME_PATH, GameName.c_str(), path);
 		} else
 #endif
 		{
