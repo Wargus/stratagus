@@ -298,14 +298,14 @@ int PlayMovie(const std::string &name)
 
 #else
 
-#include <string.h>
+#include <string>
 
 /**
 **  FIXME: docu
 */
-int PlayMovie(const char *name)
+int PlayMovie(const std::string &name)
 {
-	if (strstr(name, ".ogg\0") || strstr(name, ".avi\0")) {
+	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".avi")) {
 		return 0;
 	}
 	return -1;
