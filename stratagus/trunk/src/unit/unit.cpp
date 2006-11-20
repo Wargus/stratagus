@@ -234,7 +234,7 @@ static CUnit *AllocUnit(void)
 		}
 		DebugPrint("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_ unit->Slot);
 		slot = UnitSlots + unit->Slot;
-		memset(unit, 0, sizeof(*unit));
+		unit->Init();
 	} else {
 		//
 		// Allocate structure

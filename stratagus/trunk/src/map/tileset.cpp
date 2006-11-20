@@ -88,17 +88,7 @@ void LoadTileset(void)
 */
 void CleanTilesets(void)
 {
-	// Free the tileset data
-	delete[] Map.Tileset.Table;
-	delete[] Map.Tileset.FlagsTable;
-	delete[] Map.Tileset.Tiles;
-	delete[] Map.Tileset.MixedLookupTable;
-	delete[] Map.Tileset.TileTypeTable;
-	if (Map.Tileset.SolidTerrainTypes) {
-		delete[] Map.Tileset.SolidTerrainTypes[0].TerrainName;
-	}
-	delete[] Map.Tileset.SolidTerrainTypes;
-	memset(&Map.Tileset, 0, sizeof(CTileset));
+	Map.Tileset.Clear();
 
 	//
 	// Should this be done by the map?

@@ -505,24 +505,67 @@ enum _directions_ {
 	/// The big unit structure
 class CUnit {
 public:
-	CUnit() : Refs(0), Slot(0), UnitSlot(NULL), PlayerSlot(NULL),
-		Next(NULL), CacheLock(0), InsideCount(0), BoardCount(0),
-		UnitInside(NULL), Container(NULL), NextContained(NULL),
-		PrevContained(NULL), X(0), Y(0), Type(NULL), Player(NULL),
-		Stats(NULL), CurrentSightRange(0), Colors(NULL),
-		IX(0), IY(0), Frame(0), Direction(0), Attacked(0),
-		Burning(0), Destroyed(0), Removed(0), Selected(0),
-		TeamSelected(0), Constructed(0), Active(0), Boarded(0),
-		RescuedFrom(NULL), Variable(NULL), TTL(0), GroupId(0), LastGroup(0),
-		ResourcesHeld(0), SubAction(0), Wait(0), State(0), Blink(0),
-		Moving(0), ReCast(0), CurrentResource(0), OrderCount(0),
-		OrderFlush(0), AutoCastSpell(NULL), AutoRepair(0),
-		Goal(NULL)
-	{
+	CUnit() { Init(); }
+
+	void Init() {
+		Refs = 0;
+		Slot = 0;
+		UnitSlot = NULL;
+		PlayerSlot = NULL;
+		Next = NULL;
+		CacheLock = 0;
+		InsideCount = 0;
+		BoardCount = 0;
+		UnitInside = NULL;
+		Container = NULL;
+		NextContained = NULL;
+		PrevContained = NULL;
+		X = 0;
+		Y = 0;
+		Type = NULL;
+		Player = NULL;
+		Stats = NULL;
+		CurrentSightRange = 0;
+		Colors = NULL;
+		IX = 0;
+		IY = 0;
+		Frame = 0;
+		Direction = 0;
+		Attacked = 0;
+		Burning = 0;
+		Destroyed = 0;
+		Removed = 0;
+		Selected = 0;
+		TeamSelected = 0;
+		Constructed = 0;
+		Active = 0;
+		Boarded = 0;
+		RescuedFrom = NULL;
 		memset(VisCount, 0, sizeof(VisCount));
 		memset(&Seen, 0, sizeof(Seen));
+		Variable = NULL;
+		TTL = 0;
+		GroupId = 0;
+		LastGroup = 0;
+		ResourcesHeld = 0;
+		SubAction = 0;
+		Wait = 0;
+		State = 0;
+		Blink = 0;
+		Moving = 0;
+		ReCast = 0;
 		memset(&Anim, 0, sizeof(Anim));
+		CurrentResource = 0;
+		OrderCount = 0;
+		OrderFlush = 0;
+		Orders.clear();
+		SavedOrder.Init();
+		NewOrder.Init();
+		CriticalOrder.Init();
+		AutoCastSpell = NULL;
+		AutoRepair = 0;
 		memset(&Data, 0, sizeof(Data));
+		Goal = NULL;
 	}
 
 	// @note int is faster than shorts
