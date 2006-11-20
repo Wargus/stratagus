@@ -119,7 +119,7 @@ static CSound *CclGetSound(lua_State *l)
 static int CclMakeSound(lua_State *l)
 {
 	CSound *id;
-	const char *c_name;
+	std::string c_name;
 	const char *c_file;
 	char **c_files;
 	int args;
@@ -169,7 +169,7 @@ static int CclMakeSound(lua_State *l)
 static int CclMakeSoundGroup(lua_State *l)
 {
 	CSound *id;
-	const char *c_name;
+	std::string c_name;
 	CSound *first;
 	CSound *second;
 	LuaUserData *data;

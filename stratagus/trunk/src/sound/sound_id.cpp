@@ -99,14 +99,14 @@ CSound *SoundForName(const std::string &name)
 **
 **  @return      the sound id of the created group
 */
-CSound *MakeSound(const char *name, const char *file[], int nb)
+CSound *MakeSound(const std::string &name, const char *file[], int nb)
 {
 	CSound *sound;
 
 	Assert(nb <= 255);
 
 	if ((sound = SoundMap[name])) {
-		DebugPrint("re-register sound `%s'\n" _C_ name);
+		DebugPrint("re-register sound `%s'\n" _C_ name.c_str());
 		return sound;
 	}
 
@@ -129,12 +129,12 @@ CSound *MakeSound(const char *name, const char *file[], int nb)
 **
 **  @return        Registered sound identifier.
 */
-CSound *MakeSoundGroup(const char *name, CSound *first, CSound *second)
+CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 {
 	CSound *sound;
 
 	if ((sound = SoundMap[name])) {
-		DebugPrint("re-register sound `%s'\n" _C_ name);
+		DebugPrint("re-register sound `%s'\n" _C_ name.c_str());
 		return sound;
 	}
 
