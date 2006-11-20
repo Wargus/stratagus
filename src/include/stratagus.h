@@ -235,10 +235,9 @@ enum {
 
 class TitleScreenLabel {
 public:
-	TitleScreenLabel() : Text(NULL), Font(0), Xofs(0), Yofs(0), Flags(0) {}
-	~TitleScreenLabel() { delete[] this->Text; }
+	TitleScreenLabel() : Font(0), Xofs(0), Yofs(0), Flags(0) {}
 
-	char *Text;
+	std::string Text;
 	CFont *Font;
 	int Xofs;
 	int Yofs;
@@ -247,9 +246,8 @@ public:
 
 class TitleScreen {
 public:
-	TitleScreen() : Music(NULL), Timeout(0), Iterations(0), Labels(NULL) {}
+	TitleScreen() : Timeout(0), Iterations(0), Labels(NULL) {}
 	~TitleScreen() {
-		delete[] this->Music;
 		if (this->Labels) {
 			for (int i = 0; this->Labels[i]; ++i) {
 				delete this->Labels[i];
@@ -259,17 +257,17 @@ public:
 	}
 
 	std::string File;
-	char *Music;
+	std::string Music;
 	int Timeout;
 	int Iterations;
 	TitleScreenLabel **Labels;
 };
 
 extern TitleScreen **TitleScreens;          /// File for title screen
-extern char *GameName;                      /// Name of the game
-extern char *ClickMissile;                  /// Missile to show when you click
-extern char *DamageMissile;                 /// Missile to show damage caused
-extern char *StratagusLibPath;              /// Location of stratagus data
+extern std::string GameName;                /// Name of the game
+extern std::string ClickMissile;            /// Missile to show when you click
+extern std::string DamageMissile;           /// Missile to show damage caused
+extern std::string StratagusLibPath;        /// Location of stratagus data
 
 extern int SpeedBuild;                      /// Speed factor for building
 extern int SpeedTrain;                      /// Speed factor for training
@@ -281,8 +279,8 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
-extern void LoadGame(const char *filename); /// Load saved game
-extern void SaveGame(const char *filename); /// Save game
+extern void LoadGame(const std::string &filename); /// Load saved game
+extern void SaveGame(const std::string &filename); /// Save game
 extern int SaveGameLoading;                 /// Save game is in progress of loading
 struct lua_State;
 extern char *SaveGlobal(lua_State *l, bool is_root); /// For saving lua state
@@ -315,7 +313,7 @@ extern void ShowLoadProgress(const char *fmt, ...);
 	/// How many resources the player gets back if canceling upgrade
 #define CancelUpgradeCostsFactor   100
 
-extern char *CompileOptions;
+extern std::string CompileOptions;
 //@}
 
 #endif // !__STRATAGUS_H__

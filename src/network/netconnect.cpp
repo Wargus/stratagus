@@ -1099,7 +1099,7 @@ static void ClientParseConnected(const InitMessage *msg)
 				NetLocalState = ccs_badmap;
 				break;
 			}
-			pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath);
+			pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath.c_str());
 			strncpy_s(NetworkMapName, sizeof(NetworkMapName), msg->u.MapPath, _TRUNCATE);
 			memcpy(MenuMapFullPath + pathlen, msg->u.MapPath, sizeof(msg->u.MapPath));
 			MenuMapFullPath[pathlen + 255] = 0;

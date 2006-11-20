@@ -110,7 +110,7 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 
 	if (file.open(mapfull, CL_OPEN_READ) == -1) {
 		// Not found, try StratagusLibPath and the smp's dir
-		strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath);
+		strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
 		strcat_s(mapfull, sizeof(mapfull), "/");
 		strcat_s(mapfull, sizeof(mapfull), smpname);
 		char *p = strrchr(mapfull, '/');
@@ -122,7 +122,7 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 		strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname);
 		if (file.open(mapfull, CL_OPEN_READ) == -1) {
 			// Not found again, try StratagusLibPath
-			strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath);
+			strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
 			strcat_s(mapfull, sizeof(mapfull), "/");
 			strcat_s(mapfull, sizeof(mapfull), mapname);
 			if (file.open(mapfull, CL_OPEN_READ) == -1) {

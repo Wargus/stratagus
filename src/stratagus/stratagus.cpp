@@ -225,7 +225,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 ----------------------------------------------------------------------------*/
 
 TitleScreen **TitleScreens;          /// Title screens to show at startup
-char *StratagusLibPath;              /// Path for data directory
+std::string StratagusLibPath;        /// Path for data directory
 char LocalPlayerName[16];            /// Name of local player
 
 	/// Name, Version, Copyright
@@ -233,7 +233,7 @@ char NameLine[] =
 	"Stratagus V" VERSION ", (c) 1998-2006 by The Stratagus Project.";
 
 static char *MapName;                /// Filename of the map to load
-char *CompileOptions;                /// Compile options.
+std::string CompileOptions;          /// Compile options.
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
@@ -353,9 +353,9 @@ static void ShowTitleImage(TitleScreen *t)
 				int x = labels[j]->Xofs * Video.Width / 640;
 				int y = labels[j]->Yofs * Video.Width / 640;
 				if (labels[j]->Flags & TitleFlagCenter) {
-					x -= labels[j]->Font->Width(labels[j]->Text) / 2;
+					x -= labels[j]->Font->Width(labels[j]->Text.c_str()) / 2;
 				}
-				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
+				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text.c_str());
 			}
 		}
 
@@ -380,8 +380,8 @@ static void ShowTitleScreens(void)
 	SetVideoSync();
 
 	for (int i = 0; TitleScreens[i]; ++i) {
-		if (TitleScreens[i]->Music) {
-			if (!strcmp(TitleScreens[i]->Music, "none") ||
+		if (!TitleScreens[i]->Music.empty()) {
+			if (TitleScreens[i]->Music == "none" ||
 					PlayMusic(TitleScreens[i]->Music) == -1) {
 				StopMusic();
 			}
@@ -561,7 +561,7 @@ void MenuLoop(const char *filename, CMap *map)
 
 		filename = NextChapter();
 		if (filename && filename != CurrentMapPath) {
-			sprintf(CurrentMapPath, "%s/%s", StratagusLibPath, filename);
+			sprintf(CurrentMapPath, "%s/%s", StratagusLibPath.c_str(), filename);
 			filename = CurrentMapPath;
 			DebugPrint("Next chapter %s\n" _C_ CurrentMapPath);
 		}
@@ -640,16 +640,16 @@ static void ExpandPath(char *newpath, const char *path)
 	if (*path == '~') {
 		++path;
 #ifndef WIN32
-		if ((s = getenv("HOME")) && GameName) {
+		if ((s = getenv("HOME")) && !GameName.empty()) {
 			sprintf(newpath, "%s/%s/%s/%s",
 				s, STRATAGUS_HOME_PATH, GameName, path);
 		} else
 #endif
 		{
-			sprintf(newpath, "%s/%s", GameName, path);
+			sprintf(newpath, "%s/%s", GameName.c_str(), path);
 		}
 	} else {
-		sprintf(newpath, "%s/%s", StratagusLibPath, path);
+		sprintf(newpath, "%s/%s", StratagusLibPath.c_str(), path);
 	}
 }
 
@@ -730,7 +730,7 @@ static void PrintHeader(void)
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, and others.\n"
 		"\t(http://stratagus.org)"
-		"\nCompile options %s", NameLine, CompileOptions);
+		"\nCompile options %s", NameLine, CompileOptions.c_str());
 }
 
 /**
@@ -914,7 +914,7 @@ int main(int argc, char **argv)
 	const char *pathPtr = CFStringGetCStringPtr(macPath,
 		CFStringGetSystemEncoding());
 	Assert(pathPtr);
-	StratagusLibPath = new_strdup(pathPtr);
+	StratagusLibPath = pathPtr;
 #endif
 	CclStartFile = "scripts/stratagus.lua";
 	EditorStartFile = "scripts/editor.lua";
@@ -942,13 +942,17 @@ int main(int argc, char **argv)
 				CclStartFile = optarg;
 				continue;
 			case 'd':
-				StratagusLibPath = optarg;
-				for (p = StratagusLibPath; *p; ++p) {
+			{
+				char *libpath = new_strdup(optarg);
+				for (p = libpath; *p; ++p) {
 					if (*p == '\\') {
 						*p = '/';
 					}
 				}
+				StratagusLibPath = libpath;
+				delete[] libpath;
 				continue;
+			}
 			case 'e':
 				Editor.Running = EditorCommandLine;
 				continue;

@@ -258,7 +258,7 @@ static std::string GetSaveDir()
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-void SaveGame(const char *filename)
+void SaveGame(const std::string &filename)
 {
 	time_t now;
 	CFile file;
@@ -268,7 +268,7 @@ void SaveGame(const char *filename)
 
 	fullpath = GetSaveDir() + filename;
 	if (file.open(fullpath.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
-		fprintf(stderr, "Can't save to `%s'\n", filename);
+		fprintf(stderr, "Can't save to `%s'\n", filename.c_str());
 		return;
 	}
 
@@ -294,7 +294,7 @@ void SaveGame(const char *filename)
 	file.printf("  SyncHash = %d, \n", SyncHash);
 	file.printf("  SyncRandSeed = %d, \n", SyncRandSeed);
 	file.printf("  SaveFile = \"%s\"\n", CurrentMapPath);
-	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename);
+	file.printf("\n---  \"preview\", \"%s.pam\",\n", filename.c_str());
 	file.printf("} )\n\n");
 
 	// FIXME: probably not the right place for this

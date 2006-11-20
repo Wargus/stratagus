@@ -392,7 +392,7 @@ static void PlaySoundFileCallback(int channel)
 **
 **  @return          Channel number the sound is playing on, -1 for error
 */
-int PlayFile(const char *name, LuaActionListener *listener)
+int PlayFile(const std::string &name, LuaActionListener *listener)
 {
 	int channel = -1;
 	CSample *sample;

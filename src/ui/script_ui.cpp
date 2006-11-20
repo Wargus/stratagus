@@ -55,8 +55,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-char *ClickMissile;              /// FIXME:docu
-char *DamageMissile;             /// FIXME:docu
+std::string ClickMissile;        /// FIXME:docu
+std::string DamageMissile;       /// FIXME:docu
 
 typedef struct _info_text_ {
 	char *Text;                  /// FIXME:docu
@@ -113,10 +113,9 @@ static int CclSetClickMissile(lua_State *l)
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
-	delete[] ClickMissile;
-	ClickMissile = NULL;
+	ClickMissile.clear();
 	if (args == 1 && !lua_isnil(l, 1)) {
-		ClickMissile = new_strdup(lua_tostring(l, 1));
+		ClickMissile = lua_tostring(l, 1);
 	}
 
 	return 0;
@@ -135,10 +134,9 @@ static int CclSetDamageMissile(lua_State *l)
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
-	delete[] DamageMissile;
-	DamageMissile = NULL;
+	DamageMissile.clear();
 	if (args == 1 && !lua_isnil(l, 1)) {
-		DamageMissile = new_strdup(lua_tostring(l, 1));
+		DamageMissile = lua_tostring(l, 1);
 	}
 
 	return 0;
@@ -240,9 +238,9 @@ static int CclSetTitleScreens(lua_State *l)
 		while (lua_next(l, j + 1)) {
 			value = LuaToString(l, -2);
 			if (!strcmp(value, "Image")) {
-				TitleScreens[j]->File = new_strdup(LuaToString(l, -1));
+				TitleScreens[j]->File = LuaToString(l, -1);
 			} else if (!strcmp(value, "Music")) {
-				TitleScreens[j]->Music = new_strdup(LuaToString(l, -1));
+				TitleScreens[j]->Music = LuaToString(l, -1);
 			} else if (!strcmp(value, "Timeout")) {
 				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Iterations")) {
@@ -264,7 +262,7 @@ static int CclSetTitleScreens(lua_State *l)
 					while (lua_next(l, -2)) {
 						value = LuaToString(l, -2);
 						if (!strcmp(value, "Text")) {
-							TitleScreens[j]->Labels[k]->Text = new_strdup(LuaToString(l, -1));
+							TitleScreens[j]->Labels[k]->Text = LuaToString(l, -1);
 						} else if (!strcmp(value, "Font")) {
 							TitleScreens[j]->Labels[k]->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {

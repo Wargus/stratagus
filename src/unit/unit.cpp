@@ -3031,7 +3031,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		CommandStopUnit(attacker); // Attacker shouldn't continue attack!
 	}
 
-	if ((target->IsVisibleOnMap(ThisPlayer) || ReplayRevealMap) && DamageMissile) {
+	if ((target->IsVisibleOnMap(ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
 		MakeLocalMissile(MissileTypeByIdent(DamageMissile),
 				target->X * TileSizeX + target->Type->TileWidth * TileSizeX / 2,
 				target->Y * TileSizeY + target->Type->TileHeight * TileSizeY / 2,

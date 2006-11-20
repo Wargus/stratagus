@@ -516,7 +516,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 			}
 			strcat_s(buffer, buffersize, file);
 		} else {
-			strcpy_s(buffer, buffersize, StratagusLibPath);
+			strcpy_s(buffer, buffersize, StratagusLibPath.c_str());
 			if (*buffer) {
 				strcat_s(buffer, buffersize, "/");
 			}
@@ -533,8 +533,8 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 
 #ifdef USE_WIN32
 	//  In user home directory
-	if (GameName) {
-		sprintf(buffer, "%s/%s", GameName, file);
+	if (!GameName.empty()) {
+		sprintf(buffer, "%s/%s", GameName.c_str(), file);
 		if (FindFileWithExtension(buffer, buffersize)) {
 			return buffer;
 		}
@@ -542,15 +542,15 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 #endif
 
 	//  In user home directory
-	if ((s = getenv("HOME")) && GameName) {
-		sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName, file);
+	if ((s = getenv("HOME")) && !GameName.empty()) {
+		sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName.c_str(), file);
 		if (FindFileWithExtension(buffer, buffersize)) {
 			return buffer;
 		}
 	}
 
 	// In global shared directory
-	sprintf(buffer, "%s/%s", StratagusLibPath, file);
+	sprintf(buffer, "%s/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
@@ -558,7 +558,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "%s/graphics/%s", StratagusLibPath, file);
+	sprintf(buffer, "%s/graphics/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
@@ -566,7 +566,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	// Support for sounds in default sounds dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "%s/sounds/%s", StratagusLibPath, file);
+	sprintf(buffer, "%s/sounds/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}

@@ -431,7 +431,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		char logsdir[PATH_MAX];
 
 #ifdef USE_WIN32
-		strcpy_s(logsdir, sizeof(logsdir), GameName);
+		strcpy_s(logsdir, sizeof(logsdir), GameName.c_str());
 		mkdir(logsdir);
 		strcat_s(logsdir, sizeof(logsdir), "/logs");
 		mkdir(logsdir);
@@ -439,7 +439,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		sprintf(logsdir, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
 		mkdir(logsdir, 0777);
 		strcat_s(logsdir, sizeof(logsdir), "/");
-		strcat_s(logsdir, sizeof(logsdir), GameName);
+		strcat_s(logsdir, sizeof(logsdir), GameName.c_str());
 		mkdir(logsdir, 0777);
 		strcat_s(logsdir, sizeof(logsdir), "/logs");
 		mkdir(logsdir, 0777);
