@@ -28,10 +28,6 @@
 --
 --	$Id$
 
--- Load the buttons of all races
-
-Load("scripts/elites/buttons.lua")
-
 -- general cancel button ------------------------------------------------------
 
 DefineButton( { Pos = 9, Level = 9, Icon = "icon-cancel",
