@@ -9,7 +9,7 @@
 --
 --	upgrade.lua	-	Define the upgrades.
 --
---	(c) Copyright 2001 - 2004 by Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2006 by Lutz Sammer, Crestez Leonard and Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,62 @@
 --
 --	$Id$
 
---   Stuff for the different races
-Load("scripts/elites/upgrade.lua")
+
+function DefineUpgrade(name, icon, costs)
+   u = CUpgrade:New(name)
+   u.Icon = Icons[icon]
+   for j = 1,table.getn(costs) do
+      u.Costs[j - 1] = costs[j]
+   end
+end
+
+DefineUpgrade("upgrade-expl", "icon-expl",
+	{100, 250, 300, 0, 0, 0, 0})
+DefineUpgrade("upgrade-expl2", "icon-expl2",
+	{150, 350, 400, 0, 0, 0, 0})
+DefineUpgrade("upgrade-tdril", "icon-tdril",
+	{100, 250, 220, 0, 0, 0, 0})
+DefineUpgrade("upgrade-ddril", "icon-ddril",
+	{150, 350, 350, 0, 0, 0, 0})
+DefineUpgrade("upgrade-pdril", "icon-pdril",
+	{200, 450, 450, 0, 0, 0, 0})
+DefineUpgrade("upgrade-void", "icon-void",
+	{2000, 0, 0, 0, 0, 0, 0})
+
+
+DefineModifier("upgrade-expl2",
+	{"Level", 1},
+	{"piercing-damage", 5},
+	{"apply-to", "unit-grenadier"})
+
+DefineModifier("upgrade-tdril",
+	{"Level", 1},
+--	{"harvesting", 10}
+	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
+
+DefineModifier("upgrade-ddril",
+	{"Level", 1},
+--	{"harvesting", 20}
+	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
+
+DefineModifier("upgrade-pdril",
+	{"Level", 1},
+--	{"harvesting", 30}
+	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
+
+DefineModifier("upgrade-void",
+	{"Level",1},
+	{"piercing-damage", 10},
+	{"apply-to", "unit-bazoo"}, {"apply-to", "unit-assault"})
+
+DefineAllow("upgrade-expl", "AAAAAAAAAAAAAAAA")
+DefineAllow("upgrade-expl2", "AAAAAAAAAAAAAAAA")
+DefineAllow("upgrade-tdril", "AAAAAAAAAAAAAAAA")
+DefineAllow("upgrade-ddril", "AAAAAAAAAAAAAAAA")
+DefineAllow("upgrade-pdril", "AAAAAAAAAAAAAAAA")
+DefineAllow("upgrade-void", "AAAAAAAAAAAAAAAA")
+
+
 
 DefineAllow("unit-gold-mine", "AAAAAAAAAAAAAAAA")
 
