@@ -220,9 +220,9 @@ static int WriteMapPresentation(const std::string &mapname, CMap *map, char *map
 /**
 **  Write the map setup file.
 **
-**  @param mapname   map filename
-**  @param map       map to save
-**  @param writeTerrain   write the tiles map in the .sms
+**  @param mapsetup      map filename
+**  @param map           map to save
+**  @param writeTerrain  write the tiles map in the .sms
 */
 int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 {

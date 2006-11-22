@@ -454,8 +454,10 @@ long CFile::tell()
 /**
 **  Find a file with its correct extension ("", ".gz" or ".bz2")
 **
-**  @param file The string with the file path. Upon success, the string 
-**              is replaced by the full filename witht he correct extension.
+**  @param file      The string with the file path. Upon success, the string 
+**                   is replaced by the full filename witht he correct extension.
+**  @param filesize  Size of the file buffer
+**
 **  @return 1 if the file has been found.
 **/
 static int FindFileWithExtension(char *file, size_t filesize)
@@ -489,8 +491,9 @@ static int FindFileWithExtension(char *file, size_t filesize)
 **  Try current directory, user home directory, global directory.
 **  This supports .gz, .bz2 and .zip.
 **
-**  @param file    Filename to open.
-**  @param buffer  Allocated buffer for generated filename.
+**  @param file        Filename to open.
+**  @param buffer      Allocated buffer for generated filename.
+**  @param buffersize  Size of the buffer
 **
 **  @return Pointer to buffer.
 */
