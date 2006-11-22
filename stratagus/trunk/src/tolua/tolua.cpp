@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sun Nov 19 20:45:08 2006.
+** Generated automatically by tolua++-1.0.7 on Tue Nov 21 21:24:09 2006.
 */
 
 #ifndef __cplusplus
@@ -15678,6 +15678,40 @@ static int tolua_set_Map(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: SetTile */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetTile00
+static int tolua_stratagus_SetTile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  int tile = ((int)  tolua_tonumber(tolua_S,1,0));
+  int w = ((int)  tolua_tonumber(tolua_S,2,0));
+  int h = ((int)  tolua_tonumber(tolua_S,3,0));
+  int value = ((int)  tolua_tonumber(tolua_S,4,0));
+ {
+  SetTile(tile,w,h,value);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetTile'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Translate */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Translate00
 static int tolua_stratagus_Translate00(lua_State* tolua_S)
@@ -16944,6 +16978,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Info",tolua_get_CMap_Info,tolua_set_CMap_Info);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"Map",tolua_get_Map,tolua_set_Map);
+ tolua_function(tolua_S,"SetTile",tolua_stratagus_SetTile00);
  tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
  tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
  tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
