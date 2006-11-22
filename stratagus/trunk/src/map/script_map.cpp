@@ -417,7 +417,10 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 /**
 **  Set a tile
 **
-**  @param l  Lua state.
+**  @param tile   Tile number
+**  @param w      X coordinate
+**  @param h      Y coordinate
+**  @param value  Value of the tile
 */
 void SetTile(int tile, int w, int h, int value)
 {
