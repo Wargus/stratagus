@@ -975,21 +975,21 @@ void MissileHit(Missile *missile)
 			MissileHitsGoal(missile, goal, splash);
 		}
 	}
+
 	//
 	// Missile hits ground.
 	//
-	// FIXME: no bock writing it correct.
 	x -= missile->Type->Range;
 	y -= missile->Type->Range;
 	for (i = missile->Type->Range * 2; --i;) {
 		for (n = missile->Type->Range * 2; --n;) {
 			if (x + i >= 0 && x + i < Map.Info.MapWidth && y + n >= 0 && y + n < Map.Info.MapHeight) {
-				if (i == 0 && n == 0) {
-					MissileHitsWall(missile, x + i, y + n, 1);
-				} else {
-					MissileHitsWall(missile, x + i, y + n,
-						MapDistance(x, y, i, n) * missile->Type->SplashFactor);
+				int d = MapDistance(x + missile->Type->Range, y + missile->Type->Range, x + i, y + n);
+				d *= missile->Type->SplashFactor;
+				if (d == 0) {
+					d = 1;
 				}
+				MissileHitsWall(missile, x + i, y + n, d);
 			}
 		}
 	}
