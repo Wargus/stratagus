@@ -419,37 +419,32 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclSetTile(lua_State *l)
+void SetTile(int tile, int w, int h, int value)
 {
-	int tile;
-	int w;
-	int h;
-
-	LuaCheckArgs(l, 3);
-	
-	tile = LuaToNumber(l, 1);
-	w = LuaToNumber(l, 2);
-	h = LuaToNumber(l, 3);
-	
-	if (w >= Map.Info.MapWidth) {
-		LuaError(l, "Exceeded map width");
+	if (w < 0 || w >= Map.Info.MapWidth) {
+		fprintf(stderr, "Invalid map width: %d\n", w);
+		return;
 	}
-	if (h >= Map.Info.MapHeight) {
-		LuaError(l, "Exceeded map height");
+	if (h < 0 || h >= Map.Info.MapHeight) {
+		fprintf(stderr, "Invalid map height: %d\n", h);
+		return;
 	}
-	if (tile >= Map.Tileset.NumTiles) {
-		LuaError(l, "Exceeded number of tiles");
+	if (tile < 0 || tile >= Map.Tileset.NumTiles) {
+		fprintf(stderr, "Invalid tile number: %d\n", tile);
+		return;
+	}
+	if (value < 0 || value >= 256) {
+		fprintf(stderr, "Invalid tile number: %d\n", tile);
+		return;
 	}
 
 	if (Map.Fields) {
 		Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
-		Map.Fields[w + h * Map.Info.MapWidth].Value = 0;
+		Map.Fields[w + h * Map.Info.MapWidth].Value = value;
 		Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
 		Map.Fields[w + h * Map.Info.MapWidth].Cost = 
 			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
 	}
-
-	return 0;
 }
 
 /**
@@ -539,7 +534,6 @@ void MapCclRegister(void)
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 
 	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
-	lua_register(Lua, "SetTile", CclSetTile);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 }
 

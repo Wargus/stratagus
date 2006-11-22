@@ -442,8 +442,10 @@ extern void MapFixSeenWallNeighbors(int x, int y);
 extern void MapFixWallTile(int x, int y);
 
 //
-// in ccl_map.c
+// in script_map.c
 //
+	/// Set a tile
+extern void SetTile(int tile, int w, int h, int value = 0);
 	/// register ccl features
 extern void MapCclRegister(void);
 
