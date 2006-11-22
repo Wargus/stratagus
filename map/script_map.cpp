@@ -415,7 +415,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 }
 
 /**
-**  Define Fog graphics
+**  Set a tile
 **
 **  @param l  Lua state.
 */
@@ -453,7 +453,7 @@ static int CclSetTile(lua_State *l)
 }
 
 /**
-** Define the type of each player available for the map
+**  Define the type of each player available for the map
 **
 **  @param l  Lua state.
 */
