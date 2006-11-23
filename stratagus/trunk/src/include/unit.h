@@ -937,7 +937,7 @@ extern int CanTransport(const CUnit *transporter, const CUnit *unit);
 extern bool CanMove(const CUnit *unit);
 
 	/// Generate a unit reference, a printable unique string for unit
-extern char *UnitReference(const CUnit *unit);
+extern std::string UnitReference(const CUnit *unit);
 	/// Save an order
 extern void SaveOrder(const COrder *order, CFile *file);
 	/// save unit-structure
