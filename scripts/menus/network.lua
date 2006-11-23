@@ -283,7 +283,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   menu = BosMenu(_("Create MultiPlayer game"))
 
   menu:writeLargeText(_("Map"), sx, sy*3)
-  maptext = menu:writeText(_("File:"), sx, sy*3+30)
+  menu:writeText(_("File:"), sx, sy*3+30)
   maptext = menu:writeText(map, sx+50, sy*3+30)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
@@ -352,7 +352,7 @@ function RunCreateMultiGameMenu(s)
 
   menu = BosMenu(_("Create MultiPlayer game"))
 
-  maptext = menu:writeText(_("File:"), sx, sy*3+30)
+  menu:writeText(_("File:"), sx, sy*3+30)
   maptext = menu:writeText(mapfile, sx+50, sy*3+30)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
@@ -364,7 +364,9 @@ function RunCreateMultiGameMenu(s)
     print(description)
     numplayers = nplayers
     players:setCaption(""..numplayers)
+    players:adjustSize()
     descr:setCaption(description)
+    descr:adjustSize()
     OldPresentMap(description, nplayers, w, h, id)
   end
 
@@ -375,6 +377,7 @@ function RunCreateMultiGameMenu(s)
     print(browser:getSelectedItem())
     Load(mapfile)
     maptext:setCaption(mapfile)
+    maptext:adjustSize()
   end
   browser:setActionCallback(cb)
   
