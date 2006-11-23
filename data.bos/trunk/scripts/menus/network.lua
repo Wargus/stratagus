@@ -361,7 +361,7 @@ function RunCreateMultiGameMenu(s)
 
   local OldPresentMap = PresentMap
   PresentMap = function(desc, nplayers, w, h, id)
-    print(description)
+    print(desc)
     numplayers = nplayers
     players:setCaption(""..numplayers)
     players:adjustSize()
