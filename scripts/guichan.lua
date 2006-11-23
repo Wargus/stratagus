@@ -288,6 +288,8 @@ function ResetMapOptions()
   GameSettings.Difficulty = 5
   GameSettings.MapRichness = 5
   GameSettings.Resources = 5
+  GameSettings.NoFogOfWar = false
+  GameSettings.RevealMap = 0
 end
 
 
@@ -313,9 +315,11 @@ function RunStartGameMenu(s)
   local descr = menu:writeText("No map", sx+20, sy*3+90)
   descr:setWidth(sx * 9 - 20 - 20)
 
-  local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
+  local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120,
+    function(f) GameSettings.NoFogOfWar = not f:isMarked() end)
   fow:setMarked(preferences.FogOfWar)
-  local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, function() end)
+  local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150,
+    function(f) GameSettings.RevealMap = f:isMarked() end)
   
   ResetMapOptions()
   menu:writeText(_("Difficulty:"), sx, sy*11)

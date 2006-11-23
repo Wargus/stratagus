@@ -171,7 +171,9 @@ function RunJoiningMapMenu(s)
   local function listen()
     NetworkProcessClientRequest()
     fow:setMarked(int2bool(ServerSetupState.FogOfWar))
+    GameSettings.NoFogOfWar = not int2bool(ServerSetupState.FogOfWar)
     revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
+    GameSettings.RevealMap = ServerSetupState.RevealMap
     updatePlayersList()
     state = GetNetworkState()
     -- FIXME: don't use numbers
@@ -296,12 +298,14 @@ function RunServerMultiGameMenu(map, description, numplayers)
   local function fowCb(dd)
     ServerSetupState.FogOfWar = bool2int(dd:isMarked()) 
     NetworkServerResyncClients()
+    GameSettings.NoFogOfWar = not dd:isMarked()
   end
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, fowCb)
   fow:setMarked(true)
   local function revealMapCb(dd)
     ServerSetupState.RevealMap = bool2int(dd:isMarked()) 
     NetworkServerResyncClients()
+    GameSettings.RevealMap = bool2int(dd:isMarked())
   end
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, revealMapCb)
   
