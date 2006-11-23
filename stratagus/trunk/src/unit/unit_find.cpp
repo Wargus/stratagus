@@ -576,6 +576,28 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 }
 
 /**
+** Reference unit used by CompareUnitDistance.
+**/
+static const CUnit *referenceunit;
+
+/**
+** Returns a value less then 0, 0 or bigger then 0,
+** when the first unit is repectively nearer, at the same distance
+** or further away then the 2nd from the referenceunit.
+**/
+static int CompareUnitDistance(const void *v1, const void *v2)
+{
+	CUnit *c1 = *(CUnit **)v1;
+	CUnit *c2  = *(CUnit **)v2;
+
+	int d1 = MapDistanceBetweenUnits(referenceunit, c1);
+	int d2 = MapDistanceBetweenUnits(referenceunit, c2);
+
+	return d1 - d2;
+}
+
+
+/**
 **  Attack units in distance.
 **
 **  If the unit can attack must be handled by caller.
@@ -618,6 +640,11 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 	type = unit->Type;
 	n = UnitCacheSelect(x - range, y - range, x + range + type->TileWidth,
 		y + range + type->TileHeight, table);
+	
+	if (range > 25 && n > 9) {
+		referenceunit = unit;
+		qsort((void*)table, n, sizeof(CUnit*), &CompareUnitDistance);
+	}
 
 	best_unit = NoUnitP;
 	best_cost = INT_MAX;
