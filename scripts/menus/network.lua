@@ -360,11 +360,12 @@ function RunCreateMultiGameMenu(s)
   descr = menu:writeText(description, sx+20, sy*3+90)
 
   local OldPresentMap = PresentMap
-  PresentMap = function(description, nplayers, w, h, id)
+  PresentMap = function(desc, nplayers, w, h, id)
     print(description)
     numplayers = nplayers
     players:setCaption(""..numplayers)
     players:adjustSize()
+    description = desc
     descr:setCaption(description)
     descr:adjustSize()
     OldPresentMap(description, nplayers, w, h, id)
