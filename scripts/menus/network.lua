@@ -125,10 +125,12 @@ function RunJoiningMapMenu(s)
   menu:writeLargeText(_("Map"), sx, sy*3)
   menu:writeText(_("File:"), sx, sy*3+30)
   maptext = menu:writeText(NetworkMapName, sx+50, sy*3+30)
+  maptext:setWidth(sx * 9 - 50 - 20)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
   menu:writeText(_("Description:"), sx, sy*3+70)
-  descr = menu:writeText(description, sx+20, sy*3+90)
+  descr = menu:writeText("Unknown map", sx+20, sy*3+90)
+  descr:setWidth(sx * 9 - 20 - 20)
 
   -- FIXME: only the server can set these settings
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
@@ -283,10 +285,12 @@ function RunServerMultiGameMenu(map, description, numplayers)
   menu:writeLargeText(_("Map"), sx, sy*3)
   menu:writeText(_("File:"), sx, sy*3+30)
   maptext = menu:writeText(map, sx+50, sy*3+30)
+  maptext:setWidth(sx * 9 - 50 - 20)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
   menu:writeText(_("Description:"), sx, sy*3+70)
   descr = menu:writeText(description, sx+20, sy*3+90)
+  descr:setWidth(sx * 9 - 20 - 20)
 
   local function fowCb(dd)
     ServerSetupState.FogOfWar = bool2int(dd:isMarked()) 
@@ -352,20 +356,21 @@ function RunCreateMultiGameMenu(s)
 
   menu:writeText(_("File:"), sx, sy*3+30)
   maptext = menu:writeText(mapfile, sx+50, sy*3+30)
+  maptext:setWidth(sx * 9 - 50 - 20)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
   menu:writeText(_("Description:"), sx, sy*3+70)
   descr = menu:writeText(description, sx+20, sy*3+90)
+  descr:setWidth(sx * 9 - 20 - 20)
 
   local OldPresentMap = PresentMap
   PresentMap = function(desc, nplayers, w, h, id)
-    print(desc)
+    print(description)
     numplayers = nplayers
     players:setCaption(""..numplayers)
     players:adjustSize()
     description = desc
     descr:setCaption(description)
-    descr:adjustSize()
     OldPresentMap(description, nplayers, w, h, id)
   end
 
@@ -376,12 +381,12 @@ function RunCreateMultiGameMenu(s)
     print(browser:getSelectedItem())
     Load(mapfile)
     maptext:setCaption(mapfile)
-    maptext:adjustSize()
   end
   browser:setActionCallback(cb)
   
   menu:addButton(_("~!Create Game"), "c", sx,  sy*11, 
     function(s)    
+      print (description)
       RunServerMultiGameMenu(mapfile, description, numplayers)
       menu:stop()
     end
