@@ -243,7 +243,7 @@ void NetworkInitClientConnect(void)
 		Hosts[i].Host = 0;
 		Hosts[i].Port = 0;
 		Hosts[i].PlyNr = 0;
-		memset(Hosts[i].PlyName, 0, 16);
+		memset(Hosts[i].PlyName, 0, sizeof(Hosts[i].PlyName));
 	}
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
 	memset(&LocalSetupState, 0, sizeof(ServerSetup));
@@ -282,11 +282,11 @@ void NetworkInitServerConnect(void)
 		Hosts[i].Host = 0;
 		Hosts[i].Port = 0;
 		Hosts[i].PlyNr = 0; // slotnr until final cfg msg
-		memset(Hosts[i].PlyName, 0, 16);
+		memset(Hosts[i].PlyName, 0, sizeof(Hosts[i].PlyName));
 	}
 
 	// preset the server (initially always slot 0)
-	memcpy(Hosts[0].PlyName, LocalPlayerName, 16);
+	memcpy(Hosts[0].PlyName, LocalPlayerName, sizeof(Hosts[0].PlyName) - 1);
 	
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
 	memset(&LocalSetupState, 0, sizeof(ServerSetup));
@@ -529,7 +529,7 @@ void NetworkServerStartGame(void)
 	for (i = 0; i < NetPlayers; ++i) {
 		message.u.Hosts[i].Host = Hosts[i].Host;
 		message.u.Hosts[i].Port = Hosts[i].Port;
-		memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+		memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
 		message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
 	}
 
@@ -728,10 +728,8 @@ void NetworkGamePrepareGameSettings(void)
 */
 void NetworkConnectSetupGame(void)
 {
-	int i;
-
 	ThisPlayer->SetName(LocalPlayerName);
-	for (i = 0; i < HostsCount; ++i) {
+	for (int i = 0; i < HostsCount; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
 }
@@ -774,7 +772,7 @@ changed:
 			if (NetStateMsgCnt < 48) { // 48 retries = 24 seconds
 				message.Type = MessageInitHello;
 				message.SubType = ICMHello;
-				memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16);
+				memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, sizeof(message.u.Hosts[0].PlyName) - 1);
 				message.MapUID = 0L;
 				NetworkSendRateLimitedClientMessage(&message, 500);
 				sprintf(NetTriesText, "Connecting try %d of 48", NetStateMsgCnt);
@@ -890,7 +888,7 @@ static void KickDeadClient(int c)
 	Hosts[c].Host = 0;
 	Hosts[c].Port = 0;
 	Hosts[c].PlyNr = 0;
-	memset(Hosts[c].PlyName, 0, 16);
+	memset(Hosts[c].PlyName, 0, sizeof(Hosts[c].PlyName));
 	ServerSetupState.Ready[c] = 0;
 	ServerSetupState.Race[c] = 0;
 	ServerSetupState.LastFrame[c] = 0L;
@@ -1018,7 +1016,7 @@ static void ClientParseConnecting(const InitMessage *msg)
 			NetLocalState = ccs_connected;
 			NetStateMsgCnt = 0;
 			NetLocalHostsSlot = ntohs(msg->u.Hosts[0].PlyNr);
-			memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16); // Name of server player
+			memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, sizeof(Hosts[0].PlyName) - 1); // Name of server player
 			NetworkLag= ntohl(msg->Lag);
 			NetworkUpdates= ntohl(msg->Updates);
 
@@ -1030,11 +1028,11 @@ static void ClientParseConnecting(const InitMessage *msg)
 					Hosts[i].Port = msg->u.Hosts[i].Port;
 					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
 					if (Hosts[i].PlyNr) {
-						memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+						memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[i].PlyName) - 1);
 					}
 				} else {
 					Hosts[i].PlyNr = i;
-					memcpy(Hosts[i].PlyName, LocalPlayerName, 16);
+					memcpy(Hosts[i].PlyName, LocalPlayerName, sizeof(Hosts[i].PlyName) - 1);
 				}
 			}
 			break;
@@ -1174,7 +1172,7 @@ static void ClientParseSynced(const InitMessage *msg)
 					Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
 					Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
 					Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-					memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
+					memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName - 1);
 					HostsCount++;
 					DebugPrint("Client %d = %d.%d.%d.%d:%d [%s]\n" _C_
 							ntohs(ntohs(msg->u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg->u.Hosts[i].Host)) _C_
@@ -1189,7 +1187,7 @@ static void ClientParseSynced(const InitMessage *msg)
 			Hosts[HostsCount].Host = NetLastHost;
 			Hosts[HostsCount].Port = NetLastPort;
 			Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-			memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
+			memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 			++HostsCount;
 			NetPlayers = HostsCount + 1;
 			DebugPrint("Server %d = %d.%d.%d.%d:%d [%s]\n" _C_
@@ -1200,7 +1198,7 @@ static void ClientParseSynced(const InitMessage *msg)
 			Hosts[HostsCount].Host = 0;
 			Hosts[HostsCount].Port = 0;
 			Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-			memcpy(Hosts[HostsCount].PlyName, LocalPlayerName, 16);
+			memcpy(Hosts[HostsCount].PlyName, LocalPlayerName, sizeof(Hosts[HostsCount].PlyName) - 1);
 
 			NetLocalState = ccs_goahead;
 			NetStateMsgCnt = 0;
@@ -1231,11 +1229,11 @@ static void ClientParseAsync(const InitMessage *msg)
 					Hosts[i].Port = msg->u.Hosts[i].Port;
 					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
 					if (Hosts[i].PlyNr) {
-						memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+						memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[i].PlyName) - 1);
 					}
 				} else {
 					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-					memcpy(Hosts[i].PlyName, LocalPlayerName, 16);
+					memcpy(Hosts[i].PlyName, LocalPlayerName, sizeof(Hosts[i].PlyName) - 1);
 				}
 			}
 			NetLocalState = ccs_synced;
@@ -1352,7 +1350,7 @@ static void ServerParseHello(int h, const InitMessage *msg)
 			Hosts[h].Host = NetLastHost;
 			Hosts[h].Port = NetLastPort;
 			Hosts[h].PlyNr = h;
-			memcpy(Hosts[h].PlyName, msg->u.Hosts[0].PlyName, 16);
+			memcpy(Hosts[h].PlyName, msg->u.Hosts[0].PlyName, sizeof(Hosts[h].PlyName) - 1);
 			DebugPrint("New client %d.%d.%d.%d:%d [%s]\n" _C_
 				NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort) _C_ Hosts[h].PlyName);
 			NetStates[h].State = ccs_connecting;
@@ -1372,7 +1370,7 @@ static void ServerParseHello(int h, const InitMessage *msg)
 	message.Type = MessageInitReply;
 	message.SubType = ICMWelcome; // Acknowledge: Client is welcome
 	message.u.Hosts[0].PlyNr = htons(h); // Host array slot number
-	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16); // Name of server player
+	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, sizeof(message.u.Hosts[0].PlyName) - 1); // Name of server player
 	message.MapUID = 0L;
 	for (i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 		if (i != h) {
@@ -1380,7 +1378,7 @@ static void ServerParseHello(int h, const InitMessage *msg)
 				message.u.Hosts[i].Host = Hosts[i].Host;
 				message.u.Hosts[i].Port = Hosts[i].Port;
 				message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-				memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+				memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
 			} else {
 				message.u.Hosts[i].Host = 0;
 				message.u.Hosts[i].Port = 0;
@@ -1432,7 +1430,7 @@ static void ServerParseResync(const int h)
 						message.u.Hosts[i].Host = Hosts[i].Host;
 						message.u.Hosts[i].Port = Hosts[i].Port;
 						message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-						memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+						memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, sizeof(message.u.Hosts[i].PlyName) - 1);
 					} else {
 						message.u.Hosts[i].Host = 0;
 						message.u.Hosts[i].Port = 0;
