@@ -1138,9 +1138,7 @@ void SaveSelections(CFile *file)
 	file->printf("SetGroupId(%d)\n", GroupId);
 	file->printf("Selection(%d, {", NumSelected);
 	for (int i = 0; i < NumSelected; ++i) {
-		char *ref = UnitReference(Selected[i]);
-		file->printf("\"%s\", ", ref);
-		delete[] ref;
+		file->printf("\"%s\", ", UnitReference(Selected[i]).c_str());
 	}
 	file->printf("})\n");
 }

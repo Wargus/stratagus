@@ -39,6 +39,8 @@
 #include <string.h>
 #include <limits.h>
 #include <math.h>
+#include <sstream>
+#include <iomanip>
 
 #include "stratagus.h"
 
@@ -3494,11 +3496,12 @@ bool CUnit::IsUnusable() const
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
-char *UnitReference(const CUnit *unit)
+std::string UnitReference(const CUnit *unit)
 {
-	char *ref = new char[10];
-	sprintf(ref, "U%04X", UnitNumber(unit));
-	return ref;
+	std::stringstream ss;
+	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase <<
+		std::hex << UnitNumber(unit);
+	return ss.str();
 }
 
 /**
@@ -3509,8 +3512,6 @@ char *UnitReference(const CUnit *unit)
 */
 void SaveOrder(const COrder *order, CFile *file)
 {
-	char *ref;
-
 	file->printf("{");
 	switch (order->Action) {
 		case UnitActionNone:
@@ -3594,8 +3595,7 @@ void SaveOrder(const COrder *order, CFile *file)
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
-		file->printf(" \"goal\", \"%s\",", ref = UnitReference(order->Goal));
-		delete[] ref;
+		file->printf(" \"goal\", \"%s\",", UnitReference(order->Goal).c_str());
 	}
 	file->printf(" \"tile\", {%d, %d},", order->X, order->Y);
 	if (order->Type) {
@@ -3635,7 +3635,6 @@ void SaveOrder(const COrder *order, CFile *file)
 */
 void SaveUnit(const CUnit *unit, CFile *file)
 {
-	char *ref;
 	CUnit *uins;
 	int i;
 
@@ -3778,8 +3777,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 		file->printf("\n  \"units-contained\", {");
 		uins = unit->UnitInside->PrevContained;
 		for (i = unit->InsideCount; i; --i, uins = uins->PrevContained) {
-			file->printf("\"%s\"", ref = UnitReference(uins));
-			delete[] ref;
+			file->printf("\"%s\"", UnitReference(uins).c_str());
 			if (i > 1) {
 				file->printf(", ");
 			}
@@ -3834,8 +3832,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 
 				if (unit->Data.Built.Worker) {
 					file->printf("\"worker\", \"%s\", ",
-					ref = UnitReference(unit->Data.Built.Worker));
-					delete[] ref;
+						UnitReference(unit->Data.Built.Worker).c_str());
 				}
 				file->printf("\"progress\", %d, \"frame\", %d,",
 					unit->Data.Built.Progress, frame);
