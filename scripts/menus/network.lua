@@ -114,7 +114,6 @@ joincounter = 0
 
 function RunJoiningMapMenu(s)
   local menu
-  local server
   local listener  
   local sx = Video.Width / 20
   local sy = Video.Height / 20
@@ -199,7 +198,6 @@ end
 
 function RunJoiningGameMenu(s)
   local menu
-  local server
   local x = Video.Width/2 - 100
   local listener
   local state
