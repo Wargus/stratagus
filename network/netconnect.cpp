@@ -1050,8 +1050,9 @@ static void ClientParseConnecting(const InitMessage *msg)
 ** A map name looks safe when there are no special characters
 ** and no .. or // sequences. This way only real valid
 ** maps from the map directory will be loaded.
-** @return true if the map name look safe.
-**/
+**
+** @return  true if the map name looks safe.
+*/
 static bool IsSafeMapName(const char *mapname) 
 {
 	char buf[256];
@@ -1071,8 +1072,8 @@ static bool IsSafeMapName(const char *mapname)
 	}
 	ch = buf;
 	while (*ch != 0) {
-		if (!isalnum(*ch) && *ch != '/' && *ch != '.' && 
-			*ch != '(' && *ch != ')' && *ch != '_') {
+		if (!isalnum(*ch) && *ch != '/' && *ch != '.' && *ch != '-' &&
+				*ch != '(' && *ch != ')' && *ch != '_') {
 			return false;
 		}
 		ch++;
@@ -1088,20 +1089,23 @@ static bool IsSafeMapName(const char *mapname)
 */
 static void ClientParseConnected(const InitMessage *msg)
 {
-	int pathlen;
-
 	switch (msg->SubType) {
 
 		case ICMMap: // Server has sent us new map info
+		{
 			if (!IsSafeMapName(msg->u.MapPath)) {
 				fprintf(stderr, "Unsecure map name!\n");
 				NetLocalState = ccs_badmap;
 				break;
 			}
-			pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath.c_str());
 			strncpy_s(NetworkMapName, sizeof(NetworkMapName), msg->u.MapPath, _TRUNCATE);
-			memcpy(MenuMapFullPath + pathlen, msg->u.MapPath, sizeof(msg->u.MapPath));
-			MenuMapFullPath[pathlen + 255] = 0;
+			std::string mappath = StratagusLibPath + "/" + NetworkMapName;
+			if (mappath.size() >= sizeof(MenuMapFullPath)) {
+				fprintf(stderr, "Map path too long\n");
+				NetLocalState = ccs_badmap;
+				break;
+			}
+			strcpy_s(MenuMapFullPath, sizeof(MenuMapFullPath), mappath.c_str());
 			if (NetClientSelectScenario()) {
 				NetLocalState = ccs_badmap;
 				break;
@@ -1116,6 +1120,7 @@ static void ClientParseConnected(const InitMessage *msg)
 			NetLocalState = ccs_mapinfo;
 			NetStateMsgCnt = 0;
 			break;
+		}
 
 		case ICMWelcome: // Server has accepted us (dup)
 			break;
