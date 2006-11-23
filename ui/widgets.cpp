@@ -1530,7 +1530,7 @@ void MenuScreen::draw(gcn::Graphics *graphics)
 		Gui->getGraphics()->popClipArea();
 		Gui->draw();
 		Gui->setTop(w);
-		w->_getFocusHandler()->requestFocus(f);
+		w->_getFocusHandler()->setFocus(f);
 		Gui->getGraphics()->pushClipArea(r);
 	}
 	gcn::Container::draw(graphics);

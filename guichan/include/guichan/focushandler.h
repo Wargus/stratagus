@@ -100,6 +100,11 @@ namespace gcn
         virtual void requestFocus(Widget* widget);
 
         /**
+         * Sets focus immediately.
+         */
+        virtual void setFocus(Widget* widget);
+
+        /**
          * Sets drag to a Widget.
          *
          * @param widget the Widget to drag.
