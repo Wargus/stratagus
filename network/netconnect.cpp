@@ -1172,7 +1172,7 @@ static void ClientParseSynced(const InitMessage *msg)
 					Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
 					Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
 					Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-					memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName - 1);
+					memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, sizeof(Hosts[HostsCount].PlyName) - 1);
 					HostsCount++;
 					DebugPrint("Client %d = %d.%d.%d.%d:%d [%s]\n" _C_
 							ntohs(ntohs(msg->u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg->u.Hosts[i].Host)) _C_
