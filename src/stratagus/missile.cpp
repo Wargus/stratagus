@@ -1191,8 +1191,6 @@ MissileType *MissileBurningBuilding(int percent)
 */
 void Missile::SaveMissile(CFile *file) const
 {
-	char *s1;
-
 	file->printf("Missile(\"type\", \"%s\",", this->Type->Ident.c_str());
 	file->printf(" \"%s\",", this->Local ? "local" : "global");
 	file->printf(" \"pos\", {%d, %d}, \"origin-pos\", {%d, %d}, \"goal\", {%d, %d},",
@@ -1201,12 +1199,10 @@ void Missile::SaveMissile(CFile *file) const
 		this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
 
 	if (this->SourceUnit) {
-		file->printf(" \"source\", \"%s\",", s1 = UnitReference(this->SourceUnit));
-		delete[] s1;
+		file->printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
 	}
 	if (this->TargetUnit) {
-		file->printf(" \"target\", \"%s\",", s1 = UnitReference(this->TargetUnit));
-		delete[] s1;
+		file->printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
 	}
 
 	file->printf(" \"damage\", %d,", this->Damage);

@@ -91,9 +91,7 @@ void SaveGroups(CFile *file)
 	for (int g = 0; g < NUM_GROUPS; ++g) {
 		file->printf("Group(%d, %d, {", g, Groups[g].NumUnits);
 		for (int i = 0; i < Groups[g].NumUnits; ++i) {
-			char *ref = UnitReference(Groups[g].Units[i]);
-			file->printf("\"%s\", ", ref);
-			delete[] ref;
+			file->printf("\"%s\", ", UnitReference(Groups[g].Units[i]).c_str());
 		}
 		file->printf("})\n");
 	}
