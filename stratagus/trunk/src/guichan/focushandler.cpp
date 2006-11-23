@@ -75,6 +75,11 @@ namespace gcn
         mToBeFocused = widget;        
     }
 
+    void FocusHandler::setFocus(Widget* widget)
+    {
+        mFocusedWidget = widget;
+    }
+
     void FocusHandler::requestDrag(Widget* widget)
     {
         mToBeDragged = widget;
