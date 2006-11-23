@@ -422,19 +422,20 @@ CUnit *MakeUnit(CUnitType *type, CPlayer *player)
 static void MapMarkUnitSightRec(const CUnit *unit, int x, int y, int width, int height,
 	MapMarkerFunc *f, MapMarkerFunc *f2)
 {
-	CUnit *unit_inside; // iterator on units inside unit.
-	int i;             // number of units inside to process.
+	CUnit *unit_inside;
 
 	Assert(unit);
 	Assert(f);
-	MapSight(unit->Player, x, y, width, height, unit->CurrentSightRange, f);
+	MapSight(unit->Player, x, y, width, height,
+		unit->Container ? unit->Container->CurrentSightRange : unit->CurrentSightRange, f);
 
 	if (unit->Type && unit->Type->DetectCloak && f2) {
-		MapSight(unit->Player, x, y, width, height, unit->CurrentSightRange, f2);
+		MapSight(unit->Player, x, y, width, height,
+			unit->Container ? unit->Container->CurrentSightRange : unit->CurrentSightRange, f2);
 	}
 
 	unit_inside = unit->UnitInside;
-	for (i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (int i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
 		MapMarkUnitSightRec(unit_inside, x, y, width, height, f, f2);
 	}
 }
