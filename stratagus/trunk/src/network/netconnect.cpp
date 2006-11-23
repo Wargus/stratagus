@@ -1071,7 +1071,8 @@ static bool IsSafeMapName(const char *mapname)
 	}
 	ch = buf;
 	while (*ch != 0) {
-		if (!isalnum(*ch) && *ch != '/' && *ch != '.' && !isdigit(*ch)) {
+		if (!isalnum(*ch) && *ch != '/' && *ch != '.' && 
+			*ch != '(' && *ch != ')' && *ch != '_') {
 			return false;
 		}
 		ch++;
