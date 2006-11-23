@@ -1232,6 +1232,11 @@ void NetworkCommands(void)
 */
 void NetworkRecover(void)
 {
+	if (HostsCount == 0) {
+		NetworkInSync = 1;
+		return;
+	}
+
 	if (FrameCounter > NetworkDelay) {
 		NetworkDelay += NetworkUpdates;
 
