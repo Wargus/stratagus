@@ -103,6 +103,7 @@ function addPlayersList(menu, numplayers)
      end
     end
     numplayers_text:setCaption("Open slots : " .. numplayers - 1 - connected_players)
+    numplayers_text:adjustSize()
     return (connected_players > 0 and ready_players == connected_players)
   end
 
