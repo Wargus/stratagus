@@ -178,8 +178,11 @@ function RunJoiningMapMenu(s)
     revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
     GameSettings.RevealMap = ServerSetupState.RevealMap
     difficulty:setSelected((5 - ServerSetupState.Difficulty) / 2)
+    GameSettings.Difficulty = ServerSetupState.Difficulty
     richness:setSelected((5 - ServerSetupState.MapRichness) / 2)
+    GameSettings.MapRichness = ServerSetupState.MapRichness
     resources:setSelected((5 - ServerSetupState.ResourcesOption) / 2)
+    GameSettings.Resources = ServerSetupState.ResourcesOption
     updatePlayersList()
     state = GetNetworkState()
     -- FIXME: don't use numbers
