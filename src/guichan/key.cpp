@@ -170,7 +170,7 @@ namespace gcn
 			str.insert(str.end(), 0x80 | (mValue & 0x3F));
 		} else if (mValue <= 0xFFFF) {
 			str.insert(str.end(), 0xE0 | ((mValue >> 12) & 0x0F));
-			str.insert(str.end(), 0x80 | ((mValue >> 6) & 0x1F));
+			str.insert(str.end(), 0x80 | ((mValue >> 6) & 0x3F));
 			str.insert(str.end(), 0x80 | (mValue & 0x3F));
 		}
 		return str;
