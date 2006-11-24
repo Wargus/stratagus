@@ -29,7 +29,7 @@
 
 Load("scripts/widgets.lua")
 
-Load("scripts/elites/ui.lua")
+Load("scripts/uilayout.lua")
 
 Load("scripts/cursors.lua")
 
