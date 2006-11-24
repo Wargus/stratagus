@@ -132,22 +132,25 @@ function RunJoiningMapMenu(s)
   descr = menu:writeText("Unknown map", sx+20, sy*3+90)
   descr:setWidth(sx * 9 - 20 - 20)
 
-  -- FIXME: only the server can set these settings
   local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120, function() end)
   fow:setMarked(true)
   ServerSetupState.FogOfWar = 1
+  fow:setEnabled(false)
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, function() end)
+  revealmap:setEnabled(false)
   
-  -- FIXME: only the server can set these settings
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
-    function(dd) GameSettings.Difficulty = (5 - dd:getSelected()*2) end)
+  local difficulty = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
+    function(dd) end)
+  difficulty:setEnabled(false)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-    function(dd) GameSettings.MapRichness = (5 - dd:getSelected()*2) end)
+  local richness = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
+    function(dd) end)
+  richness:setEnabled(false)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
-    function(dd) GameSettings.Resources = (5 - dd:getSelected()*2) end)
+  local resources = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
+    function(dd) end)
+  resources:setEnabled(false)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
@@ -174,6 +177,9 @@ function RunJoiningMapMenu(s)
     GameSettings.NoFogOfWar = not int2bool(ServerSetupState.FogOfWar)
     revealmap:setMarked(int2bool(ServerSetupState.RevealMap))
     GameSettings.RevealMap = ServerSetupState.RevealMap
+    difficulty:setSelected((5 - ServerSetupState.Difficulty) / 2)
+    richness:setSelected((5 - ServerSetupState.MapRichness) / 2)
+    resources:setSelected((5 - ServerSetupState.ResourcesOption) / 2)
     updatePlayersList()
     state = GetNetworkState()
     -- FIXME: don't use numbers
@@ -311,19 +317,34 @@ function RunServerMultiGameMenu(map, description, numplayers)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
   menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
-    function(dd) GameSettings.Difficulty = (5 - dd:getSelected()*2) end)
+    function(dd)
+      GameSettings.Difficulty = 5 - dd:getSelected()*2
+      ServerSetupState.Difficulty = GameSettings.Difficulty
+      NetworkServerResyncClients()
+    end)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-    function(dd) GameSettings.MapRichness = (5 - dd:getSelected()*2) end)
+    function(dd)
+      GameSettings.MapRichness = 5 - dd:getSelected()*2
+      ServerSetupState.MapRichness = GameSettings.MapRichness
+      NetworkServerResyncClients()
+    end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
   menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
-    function(dd) GameSettings.Resources = (5 - dd:getSelected()*2) end)
+    function(dd)
+      GameSettings.Resources = 5 - dd:getSelected()*2
+      ServerSetupState.ResourcesOption = GameSettings.Resources
+      NetworkServerResyncClients()
+    end)
 
   local updatePlayers = addPlayersList(menu, numplayers)
 
   NetworkMapName = map
   NetworkInitServerConnect()
   ServerSetupState.FogOfWar = 1
+  ServerSetupState.Difficulty = 5
+  ServerSetupState.MapRichness = 5
+  ServerSetupState.ResourcesOption = 5
   startgame = menu:addButton(_("~!Start Game"), "s", sx * 11,  sy*14, 
     function(s)    
       SetFogOfWar(fow:isMarked())
