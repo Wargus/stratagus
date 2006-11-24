@@ -103,6 +103,10 @@ static COrder *GetNextOrder(CUnit *unit, int flush)
 		// empty command queue
 		ReleaseOrders(unit);
 	}
+	if (unit->OrderCount == 0x7F) {
+		return NULL;
+	}
+
 	unit->Orders.push_back(new COrder);
 
 	return unit->Orders[(int)unit->OrderCount++];
