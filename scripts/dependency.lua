@@ -9,8 +9,8 @@
 --
 --      dependency.lua     -       Define the dependencies.
 --
---      (c) Copyright 2001 - 2005 by Lutz Sammer, Crestez Leonard, 
---      Francois Beerten and Loïs Taulelle
+--      (c) Copyright 2001 - 2006 by Lutz Sammer, Crestez Leonard, 
+--      Francois Beerten and Lois Taulelle
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -28,6 +28,11 @@
 --
 --      $Id: upgrade.lua 198 2005-08-19 16:44:05Z gruiick $
 
---   Stuff for the different races
 
-Load("scripts/elites/dependency.lua")
+DefineDependency("unit-bazoo", {"upgrade-expl2"})
+DefineDependency("unit-grenadier", {"upgrade-expl"})
+DefineDependency("unit-hosp", {"unit-vault", "unit-camp"})
+DefineDependency("unit-vfac", {"unit-vault", "unit-rfac"})
+DefineDependency("unit-msilo", {"unit-vault", "unit-rfac", "unit-dev-yard"})
+
+DefineDependency("upgrade-expl2", {"upgrade-expl"})
