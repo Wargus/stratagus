@@ -224,7 +224,7 @@ namespace gcn
 
         else if (key.isCharacter())
         {
-            mText.insert(mCaretPosition, std::string(1,(char)key.getValue()));
+            mText.insert(mCaretPosition,key.toString());
             ++mCaretPosition;
             ret = true;
         }
