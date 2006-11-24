@@ -268,7 +268,7 @@ function RunJoinIpMenu()
 
   menu = BosMenu(_("Enter Server address"))
   menu:writeText(_("IP or server name :"), x, Video.Height*8/20)
-  server = menu:addTextInputField("localhost", x + 90, Video.Height*9/20 + 4)
+  server = menu:addTextInputField("localhost", x + 60, Video.Height*9/20 + 4, 130)
   menu:addButton(_("~!Join Game"), "j", x,  Video.Height*10/20, 
     function(s) 
       -- FIXME: allow port ("localhost:1234")
