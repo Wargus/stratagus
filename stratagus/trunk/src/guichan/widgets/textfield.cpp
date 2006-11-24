@@ -173,7 +173,8 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::DELETE && mCaretPosition < mText.size())
+        else if ((key.getValue() == Key::DELETE || key.getValue() == 'h' - 'a' + 1) &&
+            mCaretPosition < mText.size())
         {
             mText.erase(mCaretPosition, 1);
             ret = true;
@@ -192,32 +193,32 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::HOME)
+        else if (key.getValue() == Key::HOME || key.getValue() == 'a' - 'a' + 1) // ctrl-a
         {
             mCaretPosition = 0;
             ret = true;
         }    
 
-        else if (key.getValue() == Key::END)
+        else if (key.getValue() == Key::END || key.getValue() == 'e' - 'a' + 1)  //ctrl-e
         {
             mCaretPosition = mText.size();
             ret = true;
         }    
 
-        else if (key.getValue() == 21)
+        else if (key.getValue() == 'u' - 'a' + 1) // ctrl-u
         {
             setText("");
             ret = true;
         }
 
-        else if (key.getValue() == 22)
+        else if (key.getValue() == 'v' - 'a' + 1) // ctrl-v
         {
-			std::string str;
-			if (GetClipboard(str) >= 0) {
-				for (size_t i = 0; i < str.size(); ++i) {
-					keyPress(Key(str[i]));
-				}
-			}
+            std::string str;
+            if (GetClipboard(str) >= 0) {
+                for (size_t i = 0; i < str.size(); ++i) {
+                    keyPress(Key(str[i]));
+                }
+            }
         }
 
         else if (key.isCharacter())
