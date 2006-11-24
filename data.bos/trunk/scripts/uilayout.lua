@@ -7,7 +7,7 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---      ui.lua - Define the elites user interface
+--      uilayout.lua - Define the ingame layout and user interface
 --
 --      (c) Copyright 2001-2006 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
 --                                 and Francois Beerten.
