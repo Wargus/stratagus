@@ -173,14 +173,14 @@ namespace gcn
             ret = true;
         }
 
-        else if ((key.getValue() == Key::DELETE || key.getValue() == 'h' - 'a' + 1) &&
-            mCaretPosition < mText.size())
+        else if (key.getValue() == Key::DELETE && mCaretPosition < mText.size())
         {
             mText.erase(mCaretPosition, 1);
             ret = true;
         }
 
-        else if (key.getValue() == Key::BACKSPACE && mCaretPosition > 0)
+        else if ((key.getValue() == Key::BACKSPACE || key.getValue() == 'h' - 'a' + 1) &&
+            mCaretPosition > 0)
         {
             mText.erase(mCaretPosition - 1, 1);
             --mCaretPosition;
