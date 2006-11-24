@@ -159,4 +159,20 @@ namespace gcn
     {
         return mValue;    
     }
+
+	std::string Key::toString() const
+	{
+		std::string str;
+		if (mValue <= 0x007F) {
+			str.insert(str.end(), mValue);
+		} else if (mValue <= 0x07FF) {
+			str.insert(str.end(), 0xC0 | ((mValue >> 6) & 0x1F));
+			str.insert(str.end(), 0x80 | (mValue & 0x3F));
+		} else if (mValue <= 0xFFFF) {
+			str.insert(str.end(), 0xE0 | ((mValue >> 12) & 0x0F));
+			str.insert(str.end(), 0x80 | ((mValue >> 6) & 0x1F));
+			str.insert(str.end(), 0x80 | (mValue & 0x3F));
+		}
+		return str;
+	}
 }

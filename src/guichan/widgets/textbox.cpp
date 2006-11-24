@@ -352,7 +352,7 @@ namespace gcn
         else if (key.isCharacter()
                  && mEditable)
         {
-            mTextRows[mCaretRow].insert(mCaretColumn,std::string(1,(char)key.getValue()));
+            mTextRows[mCaretRow].insert(mCaretColumn,key.toString());
             ++mCaretColumn;
             ret = true;
         }   

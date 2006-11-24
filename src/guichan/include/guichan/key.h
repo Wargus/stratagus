@@ -188,6 +188,11 @@ namespace gcn
          */
         void setValue(int value);
 
+		/**
+		 * Convert to a UTF8 string
+		 */
+		std::string toString() const;
+
         /**
          * An enum with key values.
          */
