@@ -218,6 +218,7 @@ namespace gcn
                 for (size_t i = 0; i < str.size(); ++i) {
                     keyPress(Key(str[i]));
                 }
+                ret = true;
             }
         }
 
