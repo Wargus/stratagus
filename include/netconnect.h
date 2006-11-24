@@ -88,6 +88,8 @@ typedef struct _setup_state_ {
 	unsigned char RevealMap;             /// Reveal all the map
 	unsigned char TilesetSelection;      /// Tileset select option
 	unsigned char GameTypeOption;        /// Game type option
+	unsigned char Difficulty;            /// Difficulty option
+	unsigned char MapRichness;           /// Map richness option
 	unsigned char CompOpt[PlayerMax];    /// Free slot option selection
 	unsigned char Ready[PlayerMax];      /// Client ready state
 	unsigned char Race[PlayerMax];       /// Client race selection
