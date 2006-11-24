@@ -202,6 +202,12 @@ namespace gcn
             ret = true;
         }    
 
+        else if (key.getValue() == 21)
+        {
+            setText("");
+            ret = true;
+        }
+
         else if (key.isCharacter())
         {
             mText.insert(mCaretPosition, std::string(1,(char)key.getValue()));
