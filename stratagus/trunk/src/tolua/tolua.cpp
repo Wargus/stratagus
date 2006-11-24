@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Tue Nov 21 21:24:09 2006.
+** Generated automatically by tolua++-1.0.7 on Thu Nov 23 16:09:43 2006.
 */
 
 #ifndef __cplusplus
@@ -11098,8 +11098,8 @@ static int tolua_stratagus_NetworkServerResyncClients00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* get function: ResourcesOption of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_ResourcesOption
-static int tolua_get_ServerSetup_ResourcesOption(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_ResourcesOption
+static int tolua_get_ServerSetup_unsigned_ResourcesOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11111,8 +11111,8 @@ static int tolua_get_ServerSetup_ResourcesOption(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* set function: ResourcesOption of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_ResourcesOption
-static int tolua_set_ServerSetup_ResourcesOption(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_ResourcesOption
+static int tolua_set_ServerSetup_unsigned_ResourcesOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11121,15 +11121,15 @@ static int tolua_set_ServerSetup_ResourcesOption(lua_State* tolua_S)
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->ResourcesOption = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->ResourcesOption = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* get function: UnitsOption of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_UnitsOption
-static int tolua_get_ServerSetup_UnitsOption(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_UnitsOption
+static int tolua_get_ServerSetup_unsigned_UnitsOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11141,8 +11141,8 @@ static int tolua_get_ServerSetup_UnitsOption(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* set function: UnitsOption of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_UnitsOption
-static int tolua_set_ServerSetup_UnitsOption(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_UnitsOption
+static int tolua_set_ServerSetup_unsigned_UnitsOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11151,15 +11151,15 @@ static int tolua_set_ServerSetup_UnitsOption(lua_State* tolua_S)
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->UnitsOption = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->UnitsOption = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* get function: FogOfWar of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_FogOfWar
-static int tolua_get_ServerSetup_FogOfWar(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_FogOfWar
+static int tolua_get_ServerSetup_unsigned_FogOfWar(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11171,8 +11171,8 @@ static int tolua_get_ServerSetup_FogOfWar(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* set function: FogOfWar of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_FogOfWar
-static int tolua_set_ServerSetup_FogOfWar(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_FogOfWar
+static int tolua_set_ServerSetup_unsigned_FogOfWar(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11181,15 +11181,15 @@ static int tolua_set_ServerSetup_FogOfWar(lua_State* tolua_S)
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->FogOfWar = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->FogOfWar = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* get function: RevealMap of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_RevealMap
-static int tolua_get_ServerSetup_RevealMap(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_RevealMap
+static int tolua_get_ServerSetup_unsigned_RevealMap(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11201,8 +11201,8 @@ static int tolua_get_ServerSetup_RevealMap(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* set function: RevealMap of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_RevealMap
-static int tolua_set_ServerSetup_RevealMap(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_RevealMap
+static int tolua_set_ServerSetup_unsigned_RevealMap(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11211,15 +11211,15 @@ static int tolua_set_ServerSetup_RevealMap(lua_State* tolua_S)
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->RevealMap = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->RevealMap = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* get function: TilesetSelection of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_TilesetSelection
-static int tolua_get_ServerSetup_TilesetSelection(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_TilesetSelection
+static int tolua_get_ServerSetup_unsigned_TilesetSelection(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11231,8 +11231,8 @@ static int tolua_get_ServerSetup_TilesetSelection(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* set function: TilesetSelection of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_TilesetSelection
-static int tolua_set_ServerSetup_TilesetSelection(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_TilesetSelection
+static int tolua_set_ServerSetup_unsigned_TilesetSelection(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11241,15 +11241,15 @@ static int tolua_set_ServerSetup_TilesetSelection(lua_State* tolua_S)
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->TilesetSelection = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->TilesetSelection = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* get function: GameTypeOption of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_GameTypeOption
-static int tolua_get_ServerSetup_GameTypeOption(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_GameTypeOption
+static int tolua_get_ServerSetup_unsigned_GameTypeOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11261,8 +11261,8 @@ static int tolua_get_ServerSetup_GameTypeOption(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* set function: GameTypeOption of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_GameTypeOption
-static int tolua_set_ServerSetup_GameTypeOption(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_GameTypeOption
+static int tolua_set_ServerSetup_unsigned_GameTypeOption(lua_State* tolua_S)
 {
   ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -11271,7 +11271,67 @@ static int tolua_set_ServerSetup_GameTypeOption(lua_State* tolua_S)
  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->GameTypeOption = ((int)  tolua_tonumber(tolua_S,2,0))
+  self->GameTypeOption = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Difficulty of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_Difficulty
+static int tolua_get_ServerSetup_unsigned_Difficulty(lua_State* tolua_S)
+{
+  ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Difficulty'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Difficulty);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Difficulty of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_Difficulty
+static int tolua_set_ServerSetup_unsigned_Difficulty(lua_State* tolua_S)
+{
+  ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Difficulty'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Difficulty = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MapRichness of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_MapRichness
+static int tolua_get_ServerSetup_unsigned_MapRichness(lua_State* tolua_S)
+{
+  ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapRichness'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->MapRichness);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MapRichness of class  ServerSetup */
+#ifndef TOLUA_DISABLE_tolua_set_ServerSetup_unsigned_MapRichness
+static int tolua_set_ServerSetup_unsigned_MapRichness(lua_State* tolua_S)
+{
+  ServerSetup* self = (ServerSetup*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapRichness'",NULL);
+ if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MapRichness = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -11324,7 +11384,7 @@ static int tolua_set_stratagus_ServerSetup_CompOpt(lua_State* tolua_S)
  if (tolua_index<0 || tolua_index>=PlayerMax)
  tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
-  self->CompOpt[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+  self->CompOpt[tolua_index] = ((unsigned)  tolua_tonumber(tolua_S,3,0));
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -11376,7 +11436,7 @@ static int tolua_set_stratagus_ServerSetup_Ready(lua_State* tolua_S)
  if (tolua_index<0 || tolua_index>=PlayerMax)
  tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
-  self->Ready[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+  self->Ready[tolua_index] = ((unsigned)  tolua_tonumber(tolua_S,3,0));
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -11428,7 +11488,7 @@ static int tolua_set_stratagus_ServerSetup_Race(lua_State* tolua_S)
  if (tolua_index<0 || tolua_index>=PlayerMax)
  tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
-  self->Race[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+  self->Race[tolua_index] = ((unsigned)  tolua_tonumber(tolua_S,3,0));
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -11480,7 +11540,7 @@ static int tolua_set_stratagus_ServerSetup_LastFrame(lua_State* tolua_S)
  if (tolua_index<0 || tolua_index>=PlayerMax)
  tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
-  self->LastFrame[tolua_index] = ((long)  tolua_tonumber(tolua_S,3,0));
+  self->LastFrame[tolua_index] = ((unsigned long)  tolua_tonumber(tolua_S,3,0));
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -16727,12 +16787,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"NetworkServerResyncClients",tolua_stratagus_NetworkServerResyncClients00);
  tolua_cclass(tolua_S,"ServerSetup","ServerSetup","",NULL);
  tolua_beginmodule(tolua_S,"ServerSetup");
-  tolua_variable(tolua_S,"ResourcesOption",tolua_get_ServerSetup_ResourcesOption,tolua_set_ServerSetup_ResourcesOption);
-  tolua_variable(tolua_S,"UnitsOption",tolua_get_ServerSetup_UnitsOption,tolua_set_ServerSetup_UnitsOption);
-  tolua_variable(tolua_S,"FogOfWar",tolua_get_ServerSetup_FogOfWar,tolua_set_ServerSetup_FogOfWar);
-  tolua_variable(tolua_S,"RevealMap",tolua_get_ServerSetup_RevealMap,tolua_set_ServerSetup_RevealMap);
-  tolua_variable(tolua_S,"TilesetSelection",tolua_get_ServerSetup_TilesetSelection,tolua_set_ServerSetup_TilesetSelection);
-  tolua_variable(tolua_S,"GameTypeOption",tolua_get_ServerSetup_GameTypeOption,tolua_set_ServerSetup_GameTypeOption);
+  tolua_variable(tolua_S,"ResourcesOption",tolua_get_ServerSetup_unsigned_ResourcesOption,tolua_set_ServerSetup_unsigned_ResourcesOption);
+  tolua_variable(tolua_S,"UnitsOption",tolua_get_ServerSetup_unsigned_UnitsOption,tolua_set_ServerSetup_unsigned_UnitsOption);
+  tolua_variable(tolua_S,"FogOfWar",tolua_get_ServerSetup_unsigned_FogOfWar,tolua_set_ServerSetup_unsigned_FogOfWar);
+  tolua_variable(tolua_S,"RevealMap",tolua_get_ServerSetup_unsigned_RevealMap,tolua_set_ServerSetup_unsigned_RevealMap);
+  tolua_variable(tolua_S,"TilesetSelection",tolua_get_ServerSetup_unsigned_TilesetSelection,tolua_set_ServerSetup_unsigned_TilesetSelection);
+  tolua_variable(tolua_S,"GameTypeOption",tolua_get_ServerSetup_unsigned_GameTypeOption,tolua_set_ServerSetup_unsigned_GameTypeOption);
+  tolua_variable(tolua_S,"Difficulty",tolua_get_ServerSetup_unsigned_Difficulty,tolua_set_ServerSetup_unsigned_Difficulty);
+  tolua_variable(tolua_S,"MapRichness",tolua_get_ServerSetup_unsigned_MapRichness,tolua_set_ServerSetup_unsigned_MapRichness);
   tolua_array(tolua_S,"CompOpt",tolua_get_stratagus_ServerSetup_CompOpt,tolua_set_stratagus_ServerSetup_CompOpt);
   tolua_array(tolua_S,"Ready",tolua_get_stratagus_ServerSetup_Ready,tolua_set_stratagus_ServerSetup_Ready);
   tolua_array(tolua_S,"Race",tolua_get_stratagus_ServerSetup_Race,tolua_set_stratagus_ServerSetup_Race);

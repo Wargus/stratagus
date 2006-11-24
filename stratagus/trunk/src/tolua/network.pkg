@@ -15,17 +15,18 @@ int GetNetworkState();
 void NetworkServerResyncClients(void);
 
 class ServerSetup {
-	int ResourcesOption;
-	int UnitsOption;           /// Unit # option
-	int FogOfWar;
-	int RevealMap;
-	int TilesetSelection;
-	int GameTypeOption;                /// Game type option
-	int CompOpt[PlayerMax];    /// Free slot option selection
-	int Ready[PlayerMax];      /// Client ready state
-	int Race[PlayerMax];       /// Client race selection
-	long LastFrame[PlayerMax];  /// Last message received
-	// Fill in here...
+	unsigned char ResourcesOption;
+	unsigned char UnitsOption;
+	unsigned char FogOfWar;
+	unsigned char RevealMap;
+	unsigned char TilesetSelection;
+	unsigned char GameTypeOption;
+	unsigned char Difficulty;
+	unsigned char MapRichness;
+	unsigned CompOpt[PlayerMax];
+	unsigned Ready[PlayerMax];
+	unsigned Race[PlayerMax];
+	unsigned long LastFrame[PlayerMax];
 };
 extern ServerSetup LocalSetupState;
 extern ServerSetup ServerSetupState;
