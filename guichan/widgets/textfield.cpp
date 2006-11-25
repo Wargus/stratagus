@@ -158,7 +158,7 @@ namespace gcn
         }      
     }
 
-	static int GetPrev(std::string text, int curpos)
+	static int GetPrev(const std::string &text, int curpos)
 	{
 		--curpos;
 		while (curpos >= 0) {
@@ -173,7 +173,7 @@ namespace gcn
 		return 0;
 	}
 
-	static int GetNext(std::string text, int curpos)
+	static int GetNext(const std::string &text, int curpos)
 	{
 		char c = text[curpos];
 		if (!(c & 0x80)) {
