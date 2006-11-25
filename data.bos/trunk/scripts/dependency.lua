@@ -36,3 +36,6 @@ DefineDependency("unit-vfac", {"unit-vault", "unit-rfac"})
 DefineDependency("unit-msilo", {"unit-vault", "unit-rfac", "unit-dev-yard"})
 
 DefineDependency("upgrade-expl2", {"upgrade-expl"})
+DefineDependency("upgrade-ddril", {"upgrade-tdril"})
+DefineDependency("upgrade-pdril", {"upgrade-ddril"})
+
