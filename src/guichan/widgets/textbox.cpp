@@ -212,7 +212,7 @@ namespace gcn
 
 	static int GetNext(const std::string &text, int curpos)
 	{
-		if (curpos == text.size()) {
+		if (curpos == (int)text.size()) {
 			return curpos + 1;
 		}
 		char c = text[curpos];
