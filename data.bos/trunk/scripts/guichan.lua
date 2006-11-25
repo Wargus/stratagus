@@ -54,6 +54,21 @@ function AddMenuHelpers(menu)
 
     return label
   end
+  function menu:addMultiLineLabel(text, x, y, font, center, width)
+    local label = MultiLineLabel(text)
+    if (font == nil) then font = Fonts["large"] end
+    label:setFont(font)
+    if (width == nil) then width = 240 end
+    label:setLineWidth(width)
+    label:adjustSize()
+    if (center == nil or center == true) then -- center text by default
+      x = x - label:getWidth() / 2
+    end
+    self:add(label, x, y)
+
+    return label
+  end
+
 
   function menu:writeText(text, x, y)
     return self:addLabel(text, x, y, Fonts["game"], false)
