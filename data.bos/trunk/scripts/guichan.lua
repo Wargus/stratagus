@@ -500,7 +500,7 @@ function BuildMainMenu(menu)
   menu:addButton(_("Start ~!Editor"), "e", x2, ystep * 6, RunEditorMenu)
 
   if false then 
-     menu:addButton("~!Widgets Demo", "w", x, ystep * 12, RunWidgetsMenu)
+     menu:addButton("~!Widgets Demo", "w", x2, ystep * 7, RunWidgetsMenu)
   end
 end
 
