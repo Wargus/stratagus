@@ -50,7 +50,7 @@ DefineAiHelper(
   -- Building can research which spells or upgrades.
   --
   {"research", "unit-rfac", "upgrade-expl", "upgrade-expl2",
-   "upgrade-tdril", "upgrade-pdril", "upgrade-ddril", "upgrade-void"},
+   "upgrade-tdril", "upgrade-pdril", "upgrade-ddril"},
   --
   -- Unit can repair which units.
   --

@@ -229,7 +229,7 @@ DefineButton({
 
 DefineButton({
 	Pos = 5, Level = 0, Icon = "icon-harvest",
-	Action = "harvest", Value = "upgrade-void",
+	Action = "harvest",
 	Key = "h", Hint = "SET ~!HARVEST/MINE",
 	ForUnit = {"unit-vault"}})
 
