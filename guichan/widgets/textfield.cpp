@@ -59,6 +59,7 @@
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
 #include "guichan/widgets/textfield.h"
+#include "guichan/exception.h"
 
 static int GetClipboard(std::string &str);
 
@@ -156,6 +157,37 @@ namespace gcn
             fixScroll();
         }      
     }
+
+	static int GetPrev(std::string text, int curpos)
+	{
+		--curpos;
+		while (curpos >= 0) {
+			if ((text[curpos] & 0xC0) != 0x80) {
+				return curpos;
+			}
+			--curpos;
+		}
+		if (curpos < 0) {
+			throw GCN_EXCEPTION("Invalid UTF8.");
+		}
+		return 0;
+	}
+
+	static int GetNext(std::string text, int curpos)
+	{
+		char c = text[curpos];
+		if (!(c & 0x80)) {
+			return curpos + 1;
+		}
+		if ((c & 0xE0) == 0xC0) {
+			return curpos + 2;
+		}
+		if ((c & 0xF0) == 0xE0) {
+			return curpos + 3;
+		}
+		throw GCN_EXCEPTION("Invalid UTF8.");
+		return 0;
+	}
   
     bool TextField::keyPress(const Key& key)
     {
@@ -163,27 +195,29 @@ namespace gcn
 
         if (key.getValue() == Key::LEFT && mCaretPosition > 0)
         {
-            --mCaretPosition;
+            mCaretPosition = GetPrev(mText, mCaretPosition);
             ret = true;
         }
 
         else if (key.getValue() == Key::RIGHT && mCaretPosition < mText.size())
         {
-            ++mCaretPosition;
+            mCaretPosition = GetNext(mText, mCaretPosition);
             ret = true;
         }
 
         else if (key.getValue() == Key::DELETE && mCaretPosition < mText.size())
         {
-            mText.erase(mCaretPosition, 1);
+			int newpos = GetNext(mText, mCaretPosition);
+            mText.erase(mCaretPosition, newpos - mCaretPosition);
             ret = true;
         }
 
         else if ((key.getValue() == Key::BACKSPACE || key.getValue() == 'h' - 'a' + 1) &&
             mCaretPosition > 0)
         {
-            mText.erase(mCaretPosition - 1, 1);
-            --mCaretPosition;
+            int newpos = GetPrev(mText, mCaretPosition);
+            mText.erase(newpos, mCaretPosition - newpos);
+			mCaretPosition = newpos;
             ret = true;
         }
 
@@ -225,7 +259,7 @@ namespace gcn
         else if (key.isCharacter())
         {
             mText.insert(mCaretPosition,key.toString());
-            ++mCaretPosition;
+            mCaretPosition = GetNext(mText, mCaretPosition);
             ret = true;
         }
 
