@@ -715,6 +715,19 @@ int HandleCheats(const std::string &input)
 	return ret;
 }
 
+static int GetPrev(const char *text, int curpos)
+{
+	--curpos;
+	while (curpos >= 0) {
+		if ((text[curpos] & 0xC0) != 0x80) {
+			return curpos;
+		}
+		--curpos;
+	}
+	Assert(curpos >= 0);
+	return 0;
+}
+
 /**
 **  Handle keys in input mode.
 **
@@ -795,7 +808,8 @@ static int InputKey(int key)
 				if (Input[InputIndex - 1] == '~') {
 					Input[--InputIndex] = '\0';
 				}
-				Input[--InputIndex] = '\0';
+				InputIndex = GetPrev(Input, InputIndex);
+				Input[InputIndex] = '\0';
 				ShowInput();
 			}
 			return 1;
@@ -827,15 +841,21 @@ static int InputKey(int key)
 			return 1;
 
 		default:
-			if (key >= ' ' && key <= 256) {
-				if ((key == '~' && InputIndex < (int)sizeof(Input) - 2) ||
-						InputIndex < (int)sizeof(Input) - 1) {
-					Input[InputIndex++] = key;
-					Input[InputIndex] = '\0';
-					if (key == '~') {
+			if (key >= ' ') {
+				gcn::Key k(key);
+				std::string kstr = k.toString();
+				if (key == '~') {
+					if (InputIndex < (int)sizeof(Input) - 2) {
+						Input[InputIndex++] = key;
 						Input[InputIndex++] = key;
 						Input[InputIndex] = '\0';
+						ShowInput();
 					}
+				} else if (InputIndex < (int)(sizeof(Input) - kstr.size())) {
+					for (size_t i = 0; i < kstr.size(); ++i) {
+						Input[InputIndex++] = kstr[i];
+					}
+					Input[InputIndex] = '\0';
 					ShowInput();
 				}
 				return 1;
