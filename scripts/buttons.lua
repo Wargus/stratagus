@@ -224,12 +224,6 @@ DefineButton({
 	Key = "d", Hint = "RESEARCH POWER ~!DRILL",
 	ForUnit = {"unit-rfac"}})
 
-DefineButton({
-	Pos = 9, Level = 0, Icon = "icon-void",
-	Action = "research", Value = "upgrade-void",
-	Allowed = "check-single-research",
-	Key = "v", Hint = "RESEARCH ALIEN ~!VOID",
-	ForUnit = {"unit-rfac"}})
 
 -- town hall upgrades ---------------------------------------------------------
 

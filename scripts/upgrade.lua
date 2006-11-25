@@ -46,8 +46,6 @@ DefineUpgrade("upgrade-ddril", "icon-ddril",
 	{150, 350, 350, 0, 0, 0, 0})
 DefineUpgrade("upgrade-pdril", "icon-pdril",
 	{200, 450, 450, 0, 0, 0, 0})
-DefineUpgrade("upgrade-void", "icon-void",
-	{2000, 0, 0, 0, 0, 0, 0})
 
 
 DefineModifier("upgrade-expl2",
@@ -70,17 +68,12 @@ DefineModifier("upgrade-pdril",
 --	{"harvesting", 30}
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
-DefineModifier("upgrade-void",
-	{"Level",1},
-	{"piercing-damage", 10},
-	{"apply-to", "unit-bazoo"}, {"apply-to", "unit-assault"})
 
 DefineAllow("upgrade-expl", "AAAAAAAAAAAAAAAA")
 DefineAllow("upgrade-expl2", "AAAAAAAAAAAAAAAA")
 DefineAllow("upgrade-tdril", "AAAAAAAAAAAAAAAA")
 DefineAllow("upgrade-ddril", "AAAAAAAAAAAAAAAA")
 DefineAllow("upgrade-pdril", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-void", "AAAAAAAAAAAAAAAA")
 
 
 
