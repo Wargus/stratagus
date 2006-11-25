@@ -37,18 +37,18 @@ DefineAnimations("animations-dead_buggy", {
  
 DefineAnimations("animations-buggy", {
     Still = {"frame 0", "wait 1", },
-    Move = {"unbreakable begin", "frame 0", "move 2", "wait 1",
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 5", "move 2", "wait 1", 
-        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
-        "frame 10", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 15", "move 2", "wait 1", 
+    Move = {"unbreakable begin",        "frame  0", "move 2", "wait 1",
+        "frame  0", "move 2", "wait 1", "frame  0", "move 2", "wait 1", 
+        "frame  0", "move 2", "wait 1", "frame  5", "move 2", "wait 1", 
+        "frame  5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
+        "frame 10", "move 2", "wait 1", "frame  0", "move 2", "wait 1", 
+        "frame  0", "move 2", "wait 1", "frame  0", "move 2", "wait 1", 
+        "frame  0", "move 2", "wait 1", "frame 15", "move 2", "wait 1", 
         "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 1", 
         "frame 20", "move 2", "unbreakable end", "wait 1", },
     Attack = {"unbreakable begin", "frame 0", "wait 10", 
         "frame 25", "sound assault-attack", "attack", "wait 1", 
-        "frame 0", "unbreakable end", "wait 1", },
+        "frame  0", "unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 30", "unbreakable end", "wait 1", },
     })
 
