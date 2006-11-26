@@ -66,7 +66,7 @@ all:	all-src stratagus
 make-objdir:
 	@mkdir -p $(dir $(OBJ))
 
-%.o: $(@D)../%.cpp
+%.o: $(@D)../%.cpp $(RULESFILE)
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(subst $(OBJDIR)/../,,$<) -o $@
 
 help:
