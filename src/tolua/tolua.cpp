@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Thu Nov 23 16:09:43 2006.
+** Generated automatically by tolua++-1.0.7 on Sun Nov 26 20:51:08 2006.
 */
 
 #ifndef __cplusplus
@@ -10973,14 +10973,16 @@ static int tolua_stratagus_NetworkInitServerConnect00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isnoobj(tolua_S,1,&tolua_err)
+ !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
+  int openslots = ((int)  tolua_tonumber(tolua_S,1,0));
  {
-  NetworkInitServerConnect();
+  NetworkInitServerConnect(openslots);
  }
  }
  return 0;

@@ -7,7 +7,7 @@ bool IsNetworkGame();
 
 int NetworkSetupServerAddress(const std::string serveraddr);
 void NetworkInitClientConnect(void);
-void NetworkInitServerConnect(void);
+void NetworkInitServerConnect(int openslots);
 void NetworkServerStartGame(void);
 void NetworkProcessClientRequest(void);
 $int GetNetworkState() {return (int)NetLocalState;}
