@@ -576,15 +576,15 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 }
 
 /**
-** Reference unit used by CompareUnitDistance.
-**/
+**  Reference unit used by CompareUnitDistance.
+*/
 static const CUnit *referenceunit;
 
 /**
-** Returns a value less then 0, 0 or bigger then 0,
-** when the first unit is repectively nearer, at the same distance
-** or further away then the 2nd from the referenceunit.
-**/
+**  Returns a value less then 0, 0 or bigger then 0,
+**  when the first unit is repectively nearer, at the same distance
+**  or further away then the 2nd from the referenceunit.
+*/
 static int CompareUnitDistance(const void *v1, const void *v2)
 {
 	CUnit *c1 = *(CUnit **)v1;
@@ -593,7 +593,11 @@ static int CompareUnitDistance(const void *v1, const void *v2)
 	int d1 = MapDistanceBetweenUnits(referenceunit, c1);
 	int d2 = MapDistanceBetweenUnits(referenceunit, c2);
 
-	return d1 - d2;
+	if (d1 - d2 != 0) {
+		return d1 - d2;
+	} else {
+		return c1->Slot - c2->Slot;
+	}
 }
 
 
@@ -729,6 +733,9 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 */
 CUnit *AttackUnitsInRange(const CUnit *unit)
 {
+	if (GameCycle == 6007) {
+		unit = unit;
+	}
 	Assert(unit->Type->CanAttack);
 	return AttackUnitsInDistance(unit, unit->Stats->Variables[ATTACKRANGE_INDEX].Max);
 }
