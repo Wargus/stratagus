@@ -17,7 +17,7 @@ MAKE=make
 # Prefix for 'make install'
 PREFIX=@PREFIX@
 
-CPPFLAGS=@CPPFLAGS@ -DUSE_ZLIB -I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include
+CPPFLAGS=@DEFS@ @CPPFLAGS@ -DUSE_ZLIB -I$(TOPDIR) -I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include
 CXXFLAGS=@CXXFLAGS@
 LDFLAGS=@LDFLAGS@ -lpng -lz -lm
 
