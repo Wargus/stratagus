@@ -73,6 +73,21 @@ extern char *strdcat3(const char *l, const char *m, const char *r);
 extern char *strcasestr(const char *str, const char *substr);
 #endif // !HAVE_STRCASESTR
 
+/*----------------------------------------------------------------------------
+--  Clipboard
+----------------------------------------------------------------------------*/
+
+#include <string>
+
+int GetClipboard(std::string &str);
+
+/*----------------------------------------------------------------------------
+--  UTF8
+----------------------------------------------------------------------------*/
+
+int UTF8GetNext(const std::string &text, int curpos);
+int UTF8GetPrev(const std::string &text, int curpos);
+
 //@}
 
 #endif /* __UTIL_H__ */
