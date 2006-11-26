@@ -57,6 +57,7 @@ if test -d /usr/include/lua50; then
 fi
 
 AC_CHECK_FUNCS(strcasestr)
+AC_CHECK_FUNCS(strnlen)
 
 AC_CHECK_HEADER(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
 AC_CHECK_HEADER(png.h,, AC_MSG_ERROR(could not find png.h))

@@ -146,8 +146,8 @@ unsigned int strcpy_s(char *dst, size_t dstsize, const char *src)
 	return 0;
 }
 
-#ifdef __MINGW32__
-static size_t strnlen(const char *str, size_t strsize)
+#ifndef HAVE_STRNLEN
+size_t strnlen(const char *str, size_t strsize)
 {
 	size_t len = 0;
 	while (len < strsize) {
