@@ -344,7 +344,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   local updatePlayers = addPlayersList(menu, numplayers)
 
   NetworkMapName = map
-  NetworkInitServerConnect()
+  NetworkInitServerConnect(numplayers)
   ServerSetupState.FogOfWar = 1
   ServerSetupState.Difficulty = 5
   ServerSetupState.MapRichness = 5
