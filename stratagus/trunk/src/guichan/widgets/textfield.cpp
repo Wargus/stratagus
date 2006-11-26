@@ -155,7 +155,16 @@ namespace gcn
         {
             mCaretPosition = getFont()->getStringIndexAt(mText, x + mXScroll);
             fixScroll();
-        }      
+        }
+        else if (hasMouse() && button == MouseInput::MIDDLE)
+        {
+            std::string str;
+            if (GetClipboard(str) >= 0) {
+                for (size_t i = 0; i < str.size(); ++i) {
+                    keyPress(Key(str[i]));
+                }
+            }
+        }
     }
 
 	static int GetPrev(const std::string &text, int curpos)
