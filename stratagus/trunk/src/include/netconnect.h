@@ -209,7 +209,7 @@ extern void NetworkConnectSetupGame(void);  /// Assign Player slot, evaluate Set
 
 extern void NetworkInitClientConnect(void);  /// Setup network connect state machine for clients
 extern void NetworkExitClientConnect(void);  /// Terminate network connect state machine for clients
-extern void NetworkInitServerConnect(void);  /// Setup network connect state machine for the server
+extern void NetworkInitServerConnect(int openslots);  /// Setup network connect state machine for the server
 extern void NetworkExitServerConnect(void);  /// Terminate network connect state machine for the server
 extern int NetworkParseSetupEvent(const char *buf, int size);  /// Parse a network connect event
 extern int NetworkSetupServerAddress(const std::string &serveraddr);  /// Menu: Setup the server IP

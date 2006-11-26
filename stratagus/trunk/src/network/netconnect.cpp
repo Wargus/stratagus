@@ -270,7 +270,7 @@ void NetworkDetachFromServer(void)
 /**
 ** Setup Network connect state machine for the server
 */
-void NetworkInitServerConnect(void)
+void NetworkInitServerConnect(int openslots)
 {
 	int i;
 
@@ -290,7 +290,7 @@ void NetworkInitServerConnect(void)
 	
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
 	memset(&LocalSetupState, 0, sizeof(ServerSetup));
-	for (i = 2; i < PlayerMax - 1; ++i) {
+	for (i = openslots; i < PlayerMax - 1; ++i) {
 		ServerSetupState.CompOpt[i] = 1;
 	}
 }
@@ -319,7 +319,7 @@ void NetworkExitServerConnect(void)
 		}
 	}
 
-	NetworkInitServerConnect(); // Reset Hosts slots
+	NetworkInitServerConnect(0); // Reset Hosts slots
 
 	NetConnectRunning = 0;
 }
