@@ -33,16 +33,16 @@
 #include <ctype.h>
 #include <errno.h>
 
-#ifdef USE_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#elif defined(_XLIB_H_)
-#include <X11/Xlib.h>
-#endif
-
 #include "stratagus.h"
 #include "util.h"
 
+#ifdef USE_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#elif defined(HAVE_X)
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#endif
 
 /*----------------------------------------------------------------------------
 --  Random
@@ -379,12 +379,12 @@ int getopt(int argc, char *const *argv, const char *opts)
 */
 int GetClipboard(std::string &str)
 {
-#if defined(USE_WIN32) || defined(_XLIB_H_)
+#if defined(USE_WIN32) || defined(HAVE_X)
 	int i;
 	unsigned char *clipboard;
 #ifdef USE_WIN32
 	HGLOBAL handle;
-#elif defined(_XLIB_H_)
+#elif defined(HAVE_X)
 	Display *display;
 	Window window;
 	Atom rettype;
@@ -408,7 +408,7 @@ int GetClipboard(std::string &str)
 		CloseClipboard();
 		return -1;
 	}
-#elif defined(_XLIB_H_)
+#elif defined(HAVE_X)
 	if (!(display = XOpenDisplay(NULL))) {
 		return -1;
 	}
@@ -457,7 +457,7 @@ int GetClipboard(std::string &str)
 #ifdef USE_WIN32
 	GlobalUnlock(handle);
 	CloseClipboard();
-#elif defined(_XLIB_H_)
+#elif defined(HAVE_X)
 	if (clipboard != NULL) {
 		XFree(clipboard);
 	}
