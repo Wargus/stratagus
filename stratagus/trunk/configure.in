@@ -156,11 +156,11 @@ fi
 
 dnl --- THEORA -----------------
 AC_ARG_WITH(theora,
-	[  --with-theora		  [Use theora (default: autodetect)]])
-if test "$with_theora" != "no" -a "$VORBIS" = "no"; then
-	AC_MSG_ERROR(vorbis is required for theora support)
-fi
-if test "$with_theora" != "no"; then
+	[  --with-theora		  [Use theora (default: no)]])
+if test "$with_theora" != "no" -a "x$with_theora" != "x"; then
+	if test "$VORBIS" = "no";
+		AC_MSG_ERROR(vorbis is required for theora support)
+	fi
 	AC_CHECK_HEADER(ogg/ogg.h,, THEORA=no)
 	AC_CHECK_HEADER(theora/theora.h,, THEORA=no)
 	if test "$THEORA" != "no"; then
