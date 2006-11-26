@@ -715,19 +715,6 @@ int HandleCheats(const std::string &input)
 	return ret;
 }
 
-static int GetPrev(const char *text, int curpos)
-{
-	--curpos;
-	while (curpos >= 0) {
-		if ((text[curpos] & 0xC0) != 0x80) {
-			return curpos;
-		}
-		--curpos;
-	}
-	Assert(curpos >= 0);
-	return 0;
-}
-
 /**
 **  Handle keys in input mode.
 **
@@ -808,9 +795,11 @@ static int InputKey(int key)
 				if (Input[InputIndex - 1] == '~') {
 					Input[--InputIndex] = '\0';
 				}
-				InputIndex = GetPrev(Input, InputIndex);
-				Input[InputIndex] = '\0';
-				ShowInput();
+				InputIndex = UTF8GetPrev(Input, InputIndex);
+				if (InputIndex >= 0) {
+					Input[InputIndex] = '\0';
+					ShowInput();
+				}
 			}
 			return 1;
 
