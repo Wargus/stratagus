@@ -1020,9 +1020,9 @@ static void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 					ntohs(ncq->Data.Unit) != NetworkSyncHashs[GameCycle & 0xFF]) {
 
 				SetMessage(_("Network out of sync"));
-				DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d!\n\n" _C_
+				DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
 					ply _C_ NetworkSyncSeeds[GameCycle & 0xFF] _C_
-					ntohs(ncq->Data.Unit) _C_ NetworkSyncHashs[GameCycle & 0xFF]);
+					ntohs(ncq->Data.Unit) _C_ NetworkSyncHashs[GameCycle & 0xFF] _C_ GameCycle);
 			}
 			return;
 		case MessageChat:
