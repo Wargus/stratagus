@@ -160,6 +160,10 @@ def AutoConfigure(env):
   if conf.CheckFunc('strcasestr'):
      env.Append(CPPDEFINES = 'HAVE_STRCASESTR')
 
+  # check for optional headers
+  if conf.CheckHeader('X11/Xlib.h') and conf.CheckHeader('X11/Xatom.h'):
+     env.Append(CPPDEFINES = 'HAVE_X')
+
   env = conf.Finish()
 
 if not os.path.exists("build_config.py")  \
