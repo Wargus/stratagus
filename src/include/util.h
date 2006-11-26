@@ -68,10 +68,15 @@ extern char *strdcat(const char *l, const char *r);
 	/// strdup + strcat + strcat
 extern char *strdcat3(const char *l, const char *m, const char *r);
 
-#if !defined(HAVE_STRCASESTR)
+#ifndef HAVE_STRCASESTR
 	/// case insensitive strstr
 extern char *strcasestr(const char *str, const char *substr);
 #endif // !HAVE_STRCASESTR
+
+#ifndef HAVE_STRNLEN
+	/// determine length of a fixed-length string
+extern size_t strnlen(const char *str, size_t strsize);
+#endif // !HAVE_STRNLEN
 
 /*----------------------------------------------------------------------------
 --  Clipboard
