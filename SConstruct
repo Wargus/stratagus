@@ -161,7 +161,8 @@ def AutoConfigure(env):
      env.Append(CPPDEFINES = 'HAVE_STRCASESTR')
 
   # check for optional headers
-  if conf.CheckHeader('X11/Xlib.h') and conf.CheckHeader('X11/Xatom.h'):
+  if (conf.CheckHeader('X11/Xlib.h') and conf.CheckHeader('X11/Xatom.h') and
+     conf.CheckLib('X11')):
      env.Append(CPPDEFINES = 'HAVE_X')
 
   env = conf.Finish()
