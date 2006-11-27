@@ -313,6 +313,12 @@ function RunRestartConfirmMenu()
       _("~!Restart Game"), "r", GameRestart)
 end
 
+function RunQuitToMenuConfirmMenu()
+  RunConfirmTypeMenu(
+     _("Are you sure you want to quit to the main menu?"),
+     _("~!Quit to Menu"), "q", GameQuitToMenu)
+end
+
 function RunEndGameMenu()
   local menu = BosGameMenu()
 
@@ -327,9 +333,7 @@ function RunEndGameMenu()
       _("Are you sure you want to surrender to your enemies?"),
       _("~!Surrender"), "s", GameDefeat) end)
   menu:addButton(_("~!Quit to Menu"), "q", 16, 40 + (36 * 2),
-    function() RunConfirmTypeMenu(
-      _("Are you sure you want to quit to the main menu?"),
-      _("~!Quit to Menu"), "q", GameQuitToMenu) end)
+    RunQuitToMenuConfirmMenu)
   menu:addButton(_("E~!xit Program"), "x", 16, 40 + (36 * 3),
     function() RunExitConfirmMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), "escape", 16, 248,
