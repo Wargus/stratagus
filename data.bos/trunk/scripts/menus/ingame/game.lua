@@ -335,7 +335,7 @@ function RunEndGameMenu()
   menu:addButton(_("~!Quit to Menu"), "q", 16, 40 + (36 * 2),
     RunQuitToMenuConfirmMenu)
   menu:addButton(_("E~!xit Program"), "x", 16, 40 + (36 * 3),
-    function() RunExitConfirmMenu() end)
+    RunExitConfirmMenu)
   menu:addButton(_("Previous (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
 
