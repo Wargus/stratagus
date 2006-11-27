@@ -41,11 +41,11 @@ DefineUpgrade("upgrade-expl", "icon-expl",
 DefineUpgrade("upgrade-expl2", "icon-expl2",
 	{150, 350, 400, 0, 0, 0, 0})
 DefineUpgrade("upgrade-tdril", "icon-tdril",
-	{100, 250, 220, 0, 0, 0, 0})
+	{100, 300, 220, 0, 0, 0, 0})
 DefineUpgrade("upgrade-ddril", "icon-ddril",
-	{150, 350, 350, 0, 0, 0, 0})
+	{150, 400, 350, 0, 0, 0, 0})
 DefineUpgrade("upgrade-pdril", "icon-pdril",
-	{200, 450, 450, 0, 0, 0, 0})
+	{200, 600, 450, 0, 0, 0, 0})
 
 
 DefineModifier("upgrade-expl2",
@@ -55,17 +55,17 @@ DefineModifier("upgrade-expl2",
 
 DefineModifier("upgrade-tdril",
 	{"Level", 1},
---	{"harvesting", 10}
+	{"armor", 1},
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
 DefineModifier("upgrade-ddril",
 	{"Level", 1},
---	{"harvesting", 20}
+	{"armor", 1},
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
 DefineModifier("upgrade-pdril",
 	{"Level", 1},
---	{"harvesting", 30}
+	{"armor", 1},
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
 
