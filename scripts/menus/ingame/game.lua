@@ -306,14 +306,19 @@ function RunDiplomacyMenu()
   menu:run(false)
 end
 
+
+function RunRestartConfirmMenu()
+  RunConfirmTypeMenu(
+      _("Are you sure you want to restart the game?"),
+      _("~!Restart Game"), "r", GameRestart)
+end
+
 function RunEndGameMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("End Game"), 128, 11)
   local b = menu:addButton(_("~!Restart Game"), "r", 16, 40 + (36 * 0),
-    function() RunConfirmTypeMenu(
-      _("Are you sure you want to restart the game?"),
-      _("~!Restart Game"), "r", GameRestart) end)
+    RunRestartConfirmMenu)
   if (IsNetworkGame()) then
     b:setEnabled(false)
   end
