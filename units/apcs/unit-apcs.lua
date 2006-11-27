@@ -9,7 +9,7 @@
 --
 --	unit-apcs.lua	-	Define the apcs
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2006 by Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ DefineUnitType("unit-apcs", {
 	Armor = 10, BasicDamage = 5, PiercingDamage = 5, Missile = "missile-none",
 	MaxAttackRange = 4, Priority = 60, Points = 50,
 	CanTransport = {"organic", "only"}, AttackFromTransporter = true, MaxOnBoard = 6,
-	Type = "land", RepairHp = 2, RepairCosts = {titanium, 2},
+	Type = "land", RepairHp = 2, RepairCosts = {"titanium", 2},
 	RightMouseAction = "attack",
 	ExplodeWhenKilled = "missile-160x128-explosion",
 	LandUnit = true, Demand = 0, 
