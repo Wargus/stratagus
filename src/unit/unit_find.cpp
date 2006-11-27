@@ -733,9 +733,6 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 */
 CUnit *AttackUnitsInRange(const CUnit *unit)
 {
-	if (GameCycle == 6007) {
-		unit = unit;
-	}
 	Assert(unit->Type->CanAttack);
 	return AttackUnitsInDistance(unit, unit->Stats->Variables[ATTACKRANGE_INDEX].Max);
 }
