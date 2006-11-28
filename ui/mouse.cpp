@@ -286,7 +286,7 @@ void DoRightButton(int sx, int sy)
 			if (type->RepairRange && dest &&
 					dest->Type->RepairHP &&
 					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
-					(dest->Player == unit->Player || dest->IsAllied(dest))) {
+					(dest->Player == unit->Player || unit->IsAllied(dest))) {
 				dest->Blink = 4;
 				SendCommandRepair(unit, x, y, dest, flush);
 				continue;
@@ -370,7 +370,7 @@ void DoRightButton(int sx, int sy)
 		// FIXME: attack/follow/board ...
 		if ((action == MouseActionMove || action == MouseActionSail) &&
 				(dest && dest != unit) &&
-				(dest->Player == unit->Player|| unit->IsAllied(dest))) {
+				(dest->Player == unit->Player || unit->IsAllied(dest))) {
 			dest->Blink = 4;
 			SendCommandFollow(unit, dest, flush);
 			continue;

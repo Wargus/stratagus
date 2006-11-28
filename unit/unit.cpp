@@ -2492,7 +2492,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 						mine->Type->CanHarvest &&
 						(mine->Player->Index == PlayerMax - 1 ||
 							mine->Player == unit->Player ||
-							unit->IsAllied(mine))) {
+							(unit->IsAllied(mine) && mine->IsAllied(unit))) {
 					if (destu) {
 						n = (abs(destx - x) > abs(desty - y)) ? abs(destx - x) : abs(desty - y);
 						if (n < bestd) {
