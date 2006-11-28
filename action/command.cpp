@@ -900,7 +900,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 		if (unit->Player == ThisPlayer && unit->Selected) {
 			SelectedUnitChanged();
 		}
-	} else if (unit->OrderCount < slot) {
+	} else if (unit->OrderCount <= slot) {
 		// Order has moved
 		return;
 	} else if (unit->Orders[slot]->Action != UnitActionTrain) {
