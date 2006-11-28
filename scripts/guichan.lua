@@ -295,7 +295,7 @@ function RunMap(map, objective, fow, revealmap)
       loop = false
     end
   end
-  RunResultsMenu(s)
+  RunResultsMenu()
 end
 
 
@@ -395,6 +395,7 @@ function RunReplayMenu(s)
     ResetMapOptions()
     InitGameVariables()
     StartReplay("~logs/" .. browser:getSelectedItem(), reveal:isMarked())
+    RunResultsMenu()
     menu:stop()
   end
 
