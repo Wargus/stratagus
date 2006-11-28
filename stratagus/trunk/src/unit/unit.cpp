@@ -2627,7 +2627,7 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 				// Look if there is a deposit
 				//
 				if ((depot = ResourceDepositOnMap(x, y, resource)) &&
-						((unit->IsAllied(depot)) ||
+						((unit->IsAllied(depot) && depot->IsAllied(unit)) ||
 							(unit->Player == depot->Player))) {
 					delete[] points;
 					return depot;
