@@ -334,7 +334,7 @@ function RunStartGameMenu(s)
     function(f) GameSettings.NoFogOfWar = not f:isMarked() end)
   fow:setMarked(preferences.FogOfWar)
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150,
-    function(f) GameSettings.RevealMap = f:isMarked() end)
+    function(f) GameSettings.RevealMap = bool2int(f:isMarked()) end)
   
   ResetMapOptions()
   menu:writeText(_("Difficulty:"), sx, sy*11)
