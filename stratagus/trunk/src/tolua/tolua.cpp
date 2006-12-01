@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Dec  1 09:19:21 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Dec  1 09:23:17 2006.
 */
 
 #ifndef __cplusplus
@@ -14163,6 +14163,35 @@ static int tolua_set_CUnitType_Demand(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: UnitTypeByIdent */
+#ifndef TOLUA_DISABLE_tolua_stratagus_UnitTypeByIdent00
+static int tolua_stratagus_UnitTypeByIdent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+ {
+  CUnitType* tolua_ret = (CUnitType*)  UnitTypeByIdent(ident);
+ tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUnitType");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'UnitTypeByIdent'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: X of class  CUnit */
 #ifndef TOLUA_DISABLE_tolua_get_CUnit_X
 static int tolua_get_CUnit_X(lua_State* tolua_S)
@@ -16145,7 +16174,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    41, 32,101,110,100, 32,125, 10, 70,111,110,116, 67,111,108,
   111,114,115, 32, 61, 32,123,125, 10,115,101,116,109,101,116,
    97,116, 97, 98,108,101, 40, 70,111,110,116, 67,111,108,111,
-  114,115, 44, 32,109,116, 41,32
+  114,115, 44, 32,109,116, 41, 10,109,116, 32, 61, 32,123, 32,
+   95, 95,105,110,100,101,120, 32, 61, 32,102,117,110, 99,116,
+  105,111,110, 40,116, 44, 32,107,101,121, 41, 32,114,101,116,
+  117,114,110, 32, 85,110,105,116, 84,121,112,101, 66,121, 73,
+  100,101,110,116, 40,107,101,121, 41, 32,101,110,100, 32,125,
+   10, 85,110,105,116, 84,121,112,101,115, 32, 61, 32,123,125,
+   10,115,101,116,109,101,116, 97,116, 97, 98,108,101, 40, 85,
+  110,105,116, 84,121,112,101,115, 44, 32,109,116, 41,32
   };
   lua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 1");
   lua_settop(tolua_S, top);
@@ -17015,6 +17051,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Supply",tolua_get_CUnitType_Supply,tolua_set_CUnitType_Supply);
   tolua_variable(tolua_S,"Demand",tolua_get_CUnitType_Demand,tolua_set_CUnitType_Demand);
  tolua_endmodule(tolua_S);
+ tolua_function(tolua_S,"UnitTypeByIdent",tolua_stratagus_UnitTypeByIdent00);
  tolua_cclass(tolua_S,"CUnit","CUnit","",NULL);
  tolua_beginmodule(tolua_S,"CUnit");
   tolua_variable(tolua_S,"X",tolua_get_CUnit_X,tolua_set_CUnit_X);
