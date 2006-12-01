@@ -21,6 +21,8 @@ class CPlayer
 	int Incomes[MaxCosts];
 	const int Revenue[MaxCosts];
 
+	int UnitTypesCount[UnitTypeMax];
+
 	CUnit *Units[UnitMax];
 	int TotalNumUnits;
 	int NumBuildings;
