@@ -2,6 +2,7 @@ class CUnitType
 {
 	std::string Ident;
 	std::string Name;
+	int Slot;
 
 	int MinAttackRange;
 	int ClicksToExplode;
