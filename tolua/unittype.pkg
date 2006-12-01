@@ -11,3 +11,5 @@ class CUnitType
 	int Demand;
 };
 
+CUnitType *UnitTypeByIdent(const std::string ident);
+
