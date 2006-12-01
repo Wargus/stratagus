@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Dec  1 09:34:19 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Dec  1 19:41:38 2006.
 */
 
 #ifndef __cplusplus
@@ -79,13 +79,6 @@ static int tolua_collect_CResourceInfo (lua_State* tolua_S)
 static int tolua_collect_vector_CFiller_ (lua_State* tolua_S)
 {
  vector<CFiller>* self = (vector<CFiller>*) tolua_tousertype(tolua_S,1,0);
- delete self;
- return 0;
-}
-
-static int tolua_collect_const (lua_State* tolua_S)
-{
- const* self = (const*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -298,7 +291,6 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CMap");
  tolua_usertype(tolua_S,"CIcon");
- tolua_usertype(tolua_S,"const");
  tolua_usertype(tolua_S,"CUIButton");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageButton");
@@ -345,11 +337,11 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"ButtonWidget");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"ImageRadioButton");
  tolua_usertype(tolua_S,"CEditor");
  tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"RadioButton");
@@ -13083,7 +13075,7 @@ static int tolua_get_stratagus_CPlayer_UnitTypesCount(lua_State* tolua_S)
  if (tolua_index<0 || tolua_index>=UnitTypeMax)
  tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
- tolua_pushusertype(tolua_S,(void*)&self->UnitTypesCount[tolua_index],"const");
+ tolua_pushnumber(tolua_S,(lua_Number)self->UnitTypesCount[tolua_index]);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
