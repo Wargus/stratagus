@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Dec  1 09:23:17 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Dec  1 09:34:19 2006.
 */
 
 #ifndef __cplusplus
@@ -79,6 +79,13 @@ static int tolua_collect_CResourceInfo (lua_State* tolua_S)
 static int tolua_collect_vector_CFiller_ (lua_State* tolua_S)
 {
  vector<CFiller>* self = (vector<CFiller>*) tolua_tousertype(tolua_S,1,0);
+ delete self;
+ return 0;
+}
+
+static int tolua_collect_const (lua_State* tolua_S)
+{
+ const* self = (const*) tolua_tousertype(tolua_S,1,0);
  delete self;
  return 0;
 }
@@ -291,6 +298,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CMap");
  tolua_usertype(tolua_S,"CIcon");
+ tolua_usertype(tolua_S,"const");
  tolua_usertype(tolua_S,"CUIButton");
  tolua_usertype(tolua_S,"CheckBox");
  tolua_usertype(tolua_S,"ImageButton");
@@ -337,11 +345,11 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"ButtonWidget");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
- tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"ImageRadioButton");
  tolua_usertype(tolua_S,"CEditor");
  tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"RadioButton");
@@ -13075,34 +13083,8 @@ static int tolua_get_stratagus_CPlayer_UnitTypesCount(lua_State* tolua_S)
  if (tolua_index<0 || tolua_index>=UnitTypeMax)
  tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
- tolua_pushnumber(tolua_S,(lua_Number)self->UnitTypesCount[tolua_index]);
+ tolua_pushusertype(tolua_S,(void*)&self->UnitTypesCount[tolua_index],"const");
  return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: UnitTypesCount of class  CPlayer */
-#ifndef TOLUA_DISABLE_tolua_set_stratagus_CPlayer_UnitTypesCount
-static int tolua_set_stratagus_CPlayer_UnitTypesCount(lua_State* tolua_S)
-{
- int tolua_index;
-  CPlayer* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (CPlayer*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
- tolua_Error tolua_err;
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=UnitTypeMax)
- tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
-  self->UnitTypesCount[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
- return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -14023,23 +14005,6 @@ static int tolua_get_CUnitType_Slot(lua_State* tolua_S)
 #endif
  tolua_pushnumber(tolua_S,(lua_Number)self->Slot);
  return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Slot of class  CUnitType */
-#ifndef TOLUA_DISABLE_tolua_set_CUnitType_Slot
-static int tolua_set_CUnitType_Slot(lua_State* tolua_S)
-{
-  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Slot'",NULL);
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->Slot = ((int)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -17013,7 +16978,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_array(tolua_S,"Resources",tolua_get_stratagus_CPlayer_Resources,tolua_set_stratagus_CPlayer_Resources);
   tolua_array(tolua_S,"Incomes",tolua_get_stratagus_CPlayer_Incomes,tolua_set_stratagus_CPlayer_Incomes);
   tolua_array(tolua_S,"Revenue",tolua_get_stratagus_CPlayer_Revenue,NULL);
-  tolua_array(tolua_S,"UnitTypesCount",tolua_get_stratagus_CPlayer_UnitTypesCount,tolua_set_stratagus_CPlayer_UnitTypesCount);
+  tolua_array(tolua_S,"UnitTypesCount",tolua_get_stratagus_CPlayer_UnitTypesCount,NULL);
   tolua_array(tolua_S,"Units",tolua_get_stratagus_CPlayer_Units,tolua_set_stratagus_CPlayer_Units);
   tolua_variable(tolua_S,"TotalNumUnits",tolua_get_CPlayer_TotalNumUnits,tolua_set_CPlayer_TotalNumUnits);
   tolua_variable(tolua_S,"NumBuildings",tolua_get_CPlayer_NumBuildings,tolua_set_CPlayer_NumBuildings);
@@ -17045,7 +17010,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_beginmodule(tolua_S,"CUnitType");
   tolua_variable(tolua_S,"Ident",tolua_get_CUnitType_Ident,tolua_set_CUnitType_Ident);
   tolua_variable(tolua_S,"Name",tolua_get_CUnitType_Name,tolua_set_CUnitType_Name);
-  tolua_variable(tolua_S,"Slot",tolua_get_CUnitType_Slot,tolua_set_CUnitType_Slot);
+  tolua_variable(tolua_S,"Slot",tolua_get_CUnitType_Slot,NULL);
   tolua_variable(tolua_S,"MinAttackRange",tolua_get_CUnitType_MinAttackRange,tolua_set_CUnitType_MinAttackRange);
   tolua_variable(tolua_S,"ClicksToExplode",tolua_get_CUnitType_ClicksToExplode,tolua_set_CUnitType_ClicksToExplode);
   tolua_variable(tolua_S,"Supply",tolua_get_CUnitType_Supply,tolua_set_CUnitType_Supply);

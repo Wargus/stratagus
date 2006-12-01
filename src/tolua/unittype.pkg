@@ -2,7 +2,7 @@ class CUnitType
 {
 	std::string Ident;
 	std::string Name;
-	int Slot;
+	tolua_readonly int Slot;
 
 	int MinAttackRange;
 	int ClicksToExplode;
