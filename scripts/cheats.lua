@@ -125,9 +125,8 @@ function HandleCheats(str)
     end
 
   elseif (str == "fill mana") then
-    t = GetUnits("this");
-    for i = 1,table.getn(t) do
-      SetUnitMana(t[i], 255)
+    for i = 0,ThisPlayer.TotalNumUnits-1 do
+      SetUnitVariable(ThisPlayer.Units[i].Slot, "Mana", 255)
     end
 
   else
