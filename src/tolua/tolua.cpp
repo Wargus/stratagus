@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Dec  1 19:41:38 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Dec  2 11:47:47 2006.
 */
 
 #ifndef __cplusplus
@@ -14149,6 +14149,19 @@ static int tolua_stratagus_UnitTypeByIdent00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Slot of class  CUnit */
+#ifndef TOLUA_DISABLE_tolua_get_CUnit_Slot
+static int tolua_get_CUnit_Slot(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Slot'",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->Slot);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: X of class  CUnit */
 #ifndef TOLUA_DISABLE_tolua_get_CUnit_X
 static int tolua_get_CUnit_X(lua_State* tolua_S)
@@ -17011,6 +17024,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"UnitTypeByIdent",tolua_stratagus_UnitTypeByIdent00);
  tolua_cclass(tolua_S,"CUnit","CUnit","",NULL);
  tolua_beginmodule(tolua_S,"CUnit");
+  tolua_variable(tolua_S,"Slot",tolua_get_CUnit_Slot,NULL);
   tolua_variable(tolua_S,"X",tolua_get_CUnit_X,tolua_set_CUnit_X);
   tolua_variable(tolua_S,"Y",tolua_get_CUnit_Y,tolua_set_CUnit_Y);
   tolua_variable(tolua_S,"Type",tolua_get_CUnit_Type_ptr,tolua_set_CUnit_Type_ptr);
