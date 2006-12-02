@@ -229,6 +229,13 @@ int NewPath(CUnit *unit)
 		gh = unit->Orders[0]->Height;
 		maxrange = unit->Orders[0]->Range;
 		minrange = unit->Orders[0]->MinRange;
+		// Large units may have a goal that goes outside the map, fix it here
+		if (unit->Orders[0]->X + unit->Type->TileWidth >= Map.Info.MapWidth) {
+			unit->Orders[0]->X = Map.Info.MapWidth - unit->Type->TileWidth - 1;
+		}
+		if (unit->Orders[0]->Y + unit->Type->TileHeight >= Map.Info.MapHeight) {
+			unit->Orders[0]->Y = Map.Info.MapHeight - unit->Type->TileHeight - 1;
+		}
 		gx = unit->Orders[0]->X;
 		gy = unit->Orders[0]->Y;
 	}
