@@ -59,33 +59,41 @@ DefineButton({
 DefineButton({
 	Pos = 1, Level = 0, Icon = "icon-move",
 	Action = "move", Key = "m", Hint = "~!MOVE",
-	ForUnit = {"unit-engineer", "unit-harvester", "unit-assault", "unit-grenadier",
-		"unit-bazoo", "unit-medic", "unit-apcs", "unit-buggy", "elites-group"}})
+	ForUnit = {"unit-engineer", "unit-harvester", "unit-assault",
+             "unit-grenadier", "unit-bazoo", "unit-medic",
+             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "elites-group"}})
 
 DefineButton({
 	Pos = 2, Level = 0, Icon = "icon-stop",
 	Action = "stop", Key = "s", Hint = "~!STOP",
-	ForUnit = {"unit-engineer", "unit-harvester", "unit-assault", "unit-grenadier",
-		"unit-bazoo", "unit-medic", "unit-apcs", "unit-gturret", "elites-group",
-                "unit-buggy", "unit-cannon"}})
+	ForUnit = {"unit-engineer", "unit-harvester", "unit-assault",
+             "unit-grenadier", "unit-bazoo", "unit-medic",
+             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-gturret", "unit-cannon",
+             "elites-group"}})
 
 DefineButton({
 	Pos = 3, Level = 0, Icon = "icon-attack",
 	Action = "attack", Key = "a", Hint = "~!ATTACK",
-	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo", "unit-apcs", "unit-gturret",
-		"elites-group", "unit-buggy", "unit-cannon"}})
+	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo",
+             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-gturret", "unit-cannon",
+             "elites-group",}})
 
 DefineButton({
 	Pos = 4, Level = 0, Icon = "icon-patrol",
 	Action = "patrol", Key = "p", Hint = "~!PATROL",
-	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo", "elites-group",
-             "unit-buggy"}})
+	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo",
+             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "elites-group",}})
 
 DefineButton({
 	Pos = 5, Level = 0, Icon = "icon-stand-ground",
 	Action = "stand-ground", Key = "t", Hint = "S~!TAND GROUND",
-	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo", "unit-apcs",
-		"unit-medic", "elites-group", "unit-buggy"}})
+	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo",
+             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-medic", "elites-group",}})
 
 -- resource specific actions ---------------------------------------------------
 
