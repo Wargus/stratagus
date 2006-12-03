@@ -347,10 +347,10 @@ UI.PieMenu.G = CGraphic:New("ui/rosace1.png")
 UI.PieMenu.MouseButton = MiddleButton
 UI.PieMenu:SetRadius(70)
 
-UI.MenuButton.X = Video.Width - 200
+UI.MenuButton.X = Video.Width - 130
 UI.MenuButton.Y = 0
 UI.MenuButton.Text = "Menu (~<F10~>)"
-UI.MenuButton.Style = FindButtonStyle("black")
+UI.MenuButton.Style = FindButtonStyle("network")
 UI.MenuButton:SetCallback(function() RunGameMenu() end)
 
 UI.NetworkMenuButton.X = Video.Width - 200
