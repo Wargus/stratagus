@@ -1032,10 +1032,12 @@ void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
 */
 void ScrollingWidget::logic()
 {
-	if (speedY - containerY < container.getHeight() - getHeight()) {
+	if (container.getHeight() + containerY - speedY > 0 ) {
+		// the bottom of the container is lower than the top 
+		// of the widget. It is thus still visible.
 		containerY -= speedY;
 		container.setY((int)containerY);
-	} else if (!finished){
+	} else if (!finished) {
 		finished = true;
 		generateAction();
 	}
