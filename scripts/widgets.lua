@@ -58,7 +58,7 @@ DefineButtonStyle("main", {
 })
 
 DefineButtonStyle("black", {
-  Size = {200, 12},
+  Size = {190, 12},
   Font = "game",
   TextNormalColor = "yellow",
   TextReverseColor = "white",
@@ -89,12 +89,12 @@ DefineButtonStyle("black", {
 
 
 DefineButtonStyle("network", {
-  Size = {80, 19},
+  Size = {80, 12},
   Font = "game",
   TextNormalColor = "yellow",
   TextReverseColor = "white",
   TextAlign = "Center",
-  TextPos = {40, 4},
+  TextPos = {40, 0},
   Default = {
     Size = {300, 144},
   },
