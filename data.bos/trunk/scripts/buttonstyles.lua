@@ -7,7 +7,7 @@
 --  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
---      widgets.lua - Define the widgets
+--      buttonstyles.lua - Define the widgets
 --
 --      (c) Copyright 2004 by Jimmy Salmon
 --
