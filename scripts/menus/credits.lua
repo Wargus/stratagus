@@ -9,7 +9,7 @@
 --
 --      credits.lua - Credits menu.
 --
---      (c) Copyright 2005 by François Beerten
+--      (c) Copyright 2005-2006 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -126,7 +126,8 @@ function RunCreditsMenu(s)
      "  Chris Hopp", -- small_fire.png
      "",
      "",
-     _("The Bos and the Stratagus Team thanks all the people who have contributed"),
+     _("The Bos and the Stratagus Team thanks"),
+     _("everybody who has contributed"),
      _("patches, bug reports, ideas.")
   }
 
