@@ -417,6 +417,11 @@ void NetworkServerStartGame(void)
 	for (i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
 			NetPlayers--;
+		} else if (Hosts[i].PlyName[0] == 0) {
+			// Unused slot gets a computer player
+			ServerSetupState.CompOpt[i] = 1;
+			LocalSetupState.CompOpt[i] = 1;
+			NetPlayers--;
 		}
 	}
 
