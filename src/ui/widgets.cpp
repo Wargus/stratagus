@@ -1544,7 +1544,7 @@ void MenuScreen::logic()
 		NetworkProcessClientRequest();
 	}
 	if (NetConnectRunning == 1) {
-		//NetworkProcessServerRequest();
+		NetworkProcessServerRequest();
 	}
 	if (logiclistener) {
 		logiclistener->action("");
