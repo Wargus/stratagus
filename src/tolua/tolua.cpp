@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Sat Dec  2 11:47:47 2006.
+** Generated automatically by tolua++-1.0.7 on Mon Dec  4 23:39:25 2006.
 */
 
 #ifndef __cplusplus
@@ -11099,6 +11099,32 @@ static int tolua_stratagus_NetworkServerResyncClients00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NetworkDetachFromServer */
+#ifndef TOLUA_DISABLE_tolua_stratagus_NetworkDetachFromServer00
+static int tolua_stratagus_NetworkDetachFromServer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  NetworkDetachFromServer();
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'NetworkDetachFromServer'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: ResourcesOption of class  ServerSetup */
 #ifndef TOLUA_DISABLE_tolua_get_ServerSetup_unsigned_ResourcesOption
 static int tolua_get_ServerSetup_unsigned_ResourcesOption(lua_State* tolua_S)
@@ -16875,6 +16901,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"NetworkProcessClientRequest",tolua_stratagus_NetworkProcessClientRequest00);
  tolua_function(tolua_S,"GetNetworkState",tolua_stratagus_GetNetworkState00);
  tolua_function(tolua_S,"NetworkServerResyncClients",tolua_stratagus_NetworkServerResyncClients00);
+ tolua_function(tolua_S,"NetworkDetachFromServer",tolua_stratagus_NetworkDetachFromServer00);
  tolua_cclass(tolua_S,"ServerSetup","ServerSetup","",NULL);
  tolua_beginmodule(tolua_S,"ServerSetup");
   tolua_variable(tolua_S,"ResourcesOption",tolua_get_ServerSetup_unsigned_ResourcesOption,tolua_set_ServerSetup_unsigned_ResourcesOption);
