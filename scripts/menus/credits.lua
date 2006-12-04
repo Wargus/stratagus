@@ -141,6 +141,9 @@ function RunCreditsMenu(s)
     sw:add(Label(f), 50, 20 * i + 50)
   end
 
+  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 100, 
+                 Video.Height - 100, function() menu:stop() end)
+
   menu:run()
 end
 

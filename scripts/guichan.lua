@@ -194,7 +194,6 @@ end
 
 function BosMenu(title, background)
   local menu
-  local exitButton
   local bg
   local bgg
 
@@ -216,9 +215,6 @@ function BosMenu(title, background)
     menu:addLabel(title, Video.Width / 2, Video.Height / 20, Fonts["large"])
   end
 
-  exitButton = menu:addButton(_("E~!xit"), "x",
-    Video.Width / 2 - 100, Video.Height - 100,
-    function() menu:stop() end)
   return menu
 end
 
@@ -271,6 +267,9 @@ function RunResultsMenu()
       menu:writeText(GetPlayerData(i, "TotalRazings"), sx*12, sy*(8+i))     
     end
   end
+
+  menu:addButton(_("~!Continue"), "c", Video.Width / 2 - 100, Video.Height - 100,
+                 function() menu:stop() end)
 
   menu:run()
 end
@@ -371,7 +370,10 @@ function RunStartGameMenu(s)
     PresentMap = OldPresentMap
     menu:stop()
   end
-  menu:addButton(_("Start"), 0,  sx * 11,  sy*14, startgamebutton)
+  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+                 function() menu:stop() end)
+  menu:addButton(_("~!Start"), "s", Video.Width /2 + 50 ,  Video.Height - 100,
+                 startgamebutton)
 
   menu:run()
   PresentMap = OldPresentMap
@@ -399,7 +401,10 @@ function RunReplayMenu(s)
     menu:stop()
   end
 
-  menu:addButton(_("~!Start"), "s", 100, 300, startreplaybutton)
+  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+                 function() menu:stop() end)
+  menu:addButton(_("~!Start"), "s", Video.Width /2 + 50 ,  Video.Height - 100,
+                 startreplaybutton)
 
   menu:run()
 end
@@ -410,7 +415,8 @@ function RunLoadGameMenu(s)
   local b
 
   menu = BosMenu(_("Load Game"))
-  local browser = menu:addBrowser("~save", ".sav.gz$", 300, 100, 300, 200)
+  local browser = menu:addBrowser("~save", ".sav.gz$", 
+                                 Video.Width / 2 - 150, 100, 300, 200)
     function startgamebutton(s)
       print("Starting saved game")
       currentCampaign = nil
@@ -436,7 +442,10 @@ function RunLoadGameMenu(s)
       end
     menu:stop()
   end
-  menu:addButton(_("Start"), 0, 100, 300, startgamebutton)
+  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+                 function() menu:stop() end)
+  menu:addButton(_("~!Start"), "s", Video.Width /2 + 50 ,  Video.Height - 100,
+                 startgamebutton)
 
   DisallowAllUnits()
   menu:run()
@@ -484,7 +493,10 @@ function RunEditorMenu(s)
     HandleCommandKey = HandleIngameCommandKey
     menu:stop()
   end
-  menu:addButton(_("Start Editor"), 0, sx * 11,  sy*14, starteditorbutton)
+  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+                 function() menu:stop() end)
+  menu:addButton(_("Start ~!Editor"), "e", Video.Width / 2 + 50, Video.Height -100,
+                 starteditorbutton)
 
   menu:run()
   PresentMap = OldPresentMap
@@ -514,6 +526,9 @@ function BuildMainMenu(menu)
 
   menu:addButton(_("Cre~!dits"), "d", x1, ystep * 6, RunCreditsMenu)
   menu:addButton(_("Start ~!Editor"), "e", x2, ystep * 6, RunEditorMenu)
+
+  menu:addButton(_("E~!xit"), "x", Video.Width / 2 - 100, Video.Height - 100,
+                 function() menu:stop() end)
 
   if false then 
      menu:addButton("~!Widgets Demo", "w", x2, ystep * 7, RunWidgetsMenu)
