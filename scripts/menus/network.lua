@@ -169,8 +169,10 @@ function RunJoiningMapMenu(s)
   end
   menu:addCheckBox(_("~!Ready"), sx*11,  sy*14, readycb)
 
-  menu:addButton(_("~!Cancel"), "c", sx * 10 -100, Video.Height - 100,
-                 function() menu:stop() end)
+  menu:addButton(_("~!Cancel"), "c", sx * 10 - 100, Video.Height - 100,
+                 function() 
+                 NetworkDetachFromServer() menu:stop() end
+  )
 
   local updatePlayersList = addPlayersList(menu, numplayers)
 
