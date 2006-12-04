@@ -169,6 +169,9 @@ function RunJoiningMapMenu(s)
   end
   menu:addCheckBox(_("~!Ready"), sx*11,  sy*14, readycb)
 
+  menu:addButton(_("~!Cancel"), "c", sx * 10 -100, Video.Height - 100,
+                 function() menu:stop() end)
+
   local updatePlayersList = addPlayersList(menu, numplayers)
 
   joincounter = 0
@@ -225,6 +228,9 @@ function RunJoiningGameMenu(s)
   sb:setPercent(0)
   menu:add(sb, x-50, Video.Height/2)
   sb:setBackgroundColor(dark)
+
+  menu:addButton(_("~!Cancel"), "c", x, Video.Height - 100,
+                 function() menu:stop() end)
 
   local function checkconnection() 
     NetworkProcessClientRequest()
@@ -284,6 +290,8 @@ function RunJoinIpMenu()
       menu:stop() 
     end
   )
+  menu:addButton(_("~!Cancel"), "c", x, Video.Height - 100,
+                 function() menu:stop() end)
   menu:run()
 end
 
@@ -349,7 +357,14 @@ function RunServerMultiGameMenu(map, description, numplayers)
   ServerSetupState.Difficulty = 5
   ServerSetupState.MapRichness = 5
   ServerSetupState.ResourcesOption = 5
-  startgame = menu:addButton(_("~!Start Game"), "s", sx * 11,  sy*14, 
+
+  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 100, Video.Height - 100,
+                 function() menu:stop() end)
+
+  startgame = menu:addButton(_("~!Start Game"), 
+    "s", 
+    Video.Width / 2 + 50, 
+    Video.Height - 100,
     function(s)    
       SetFogOfWar(fow:isMarked())
       if revealmap:isMarked() == true then
@@ -415,7 +430,9 @@ function RunCreateMultiGameMenu(s)
   end
   browser:setActionCallback(cb)
   
-  menu:addButton(_("~!Create Game"), "c", sx,  sy*11, 
+  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 250, Video.Height - 100,
+                 function() menu:stop(1) end)
+  menu:addButton(_("Create ~!Game"), "g", Video.Width / 2 + 50, Video.Height - 100,
     function(s)    
       print (description)
       RunServerMultiGameMenu(mapfile, description, numplayers)
@@ -449,7 +466,7 @@ function RunMultiPlayerMenu(s)
       RunJoinIpMenu()
       menu:stop(1)
     end)
-  menu:addButton(_("~!Create Game"), "c", x, Video.Height*12/20, 
+  menu:addButton(_("Create ~!Game"), "g", x, Video.Height*12/20, 
     function(s)
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())
@@ -460,6 +477,8 @@ function RunMultiPlayerMenu(s)
       menu:stop(1)
     end)
 
+  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 100, Video.Height - 100,
+                 function() menu:stop() end)
   menu:run()
   ExitNetwork1()
 end
