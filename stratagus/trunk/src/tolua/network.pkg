@@ -13,6 +13,7 @@ void NetworkProcessClientRequest(void);
 $int GetNetworkState() {return (int)NetLocalState;}
 int GetNetworkState();
 void NetworkServerResyncClients(void);
+void NetworkDetachFromServer(void);
 
 class ServerSetup {
 	unsigned char ResourcesOption;
