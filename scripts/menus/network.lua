@@ -360,7 +360,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   ServerSetupState.MapRichness = 5
   ServerSetupState.ResourcesOption = 5
 
-  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
 
   startgame = menu:addButton(_("~!Start Game"), 
