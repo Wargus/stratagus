@@ -9,7 +9,7 @@
 --
 --	unit-jet.lua	-	Define the jet unit.
 --
---	(c) Copyright 2005 by François Beerten.
+--	(c) Copyright 2005-2006 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ DefineUnitType("unit-jet", {
 	Animations = "animations-jet", Icon = "icon-jet",
 	Flip = false,
 	Costs = {"time", 100, "titanium", 200, "crystal", 500},
-	RepairHp = 1, RepairCosts = {"crystal", 6},
+	RepairCosts = {"crystal", 6},
 	Speed = 60, HitPoints = 50, DrawLevel = 125, TileSize  = {3, 3}, 
 	BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
