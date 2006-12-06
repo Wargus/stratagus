@@ -9,7 +9,7 @@
 --
 --	unit-chopper.lua	-	Define the chopper unit.
 --
---	(c) Copyright 2005 by François Beerten.
+--	(c) Copyright 2005-2006 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ DefineUnitType("unit-chopper", {
 	Animations = "animations-chopper", Icon = "icon-chopper",
 	Flip = false,
 	Costs = {"time", 100, "titanium", 150, "crystal", 450},
-	RepairHp = 1, RepairCosts = {"crystal", 6},
+	RepairCosts = {"crystal", 6},
 	Speed = 40, HitPoints = 50, DrawLevel = 125, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
