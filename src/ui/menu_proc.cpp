@@ -116,12 +116,12 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 
 		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
 			VideoDrawTextCentered(x + p->TextX, y + p->TextY,
-				style->Font, text.c_str());
+				style->Font, text);
 		} else if (p->TextAlign == TextAlignLeft) {
-			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text.c_str());
+			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
 		} else {
 			VideoDrawText(x + p->TextX - style->Font->Width(text.c_str()), y + p->TextY,
-				style->Font, text.c_str());
+				style->Font, text);
 		}
 
 		SetDefaultTextColors(oldnc, oldrc);

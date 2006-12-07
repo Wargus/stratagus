@@ -348,7 +348,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 	}
 
 	if (this->ShowName) {
-		VideoDrawTextCentered(x, y, font, unit->Type->Name.c_str());
+		VideoDrawTextCentered(x, y, font, unit->Type->Name);
 		return;
 	}
 
@@ -1074,7 +1074,7 @@ void CStatusLine::Draw(void)
 		SetClipping(this->TextX, this->TextY,
 			this->TextX + this->Width - 1, Video.Height - 1);
 		VideoDrawTextClip(this->TextX, this->TextY, this->Font,
-			this->StatusLine.c_str());
+			this->StatusLine);
 		PopClipping();
 	}
 }
@@ -1296,7 +1296,7 @@ void CInfoPanel::Draw(void)
 				Video.DrawRectangle(ColorWhite,x, y, 12, 12);
 				Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
 
-				VideoDrawText(x + 27, y, GameFont,Players[i].Name.c_str());
+				VideoDrawText(x + 27, y, GameFont,Players[i].Name);
 				VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);
 				y += 14;
 			}
