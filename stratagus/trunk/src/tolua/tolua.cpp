@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Mon Dec  4 23:39:25 2006.
+** Generated automatically by tolua++-1.0.7 on Wed Dec  6 21:34:41 2006.
 */
 
 #ifndef __cplusplus
@@ -12520,7 +12520,7 @@ static int tolua_stratagus_CFont_Width00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
  !tolua_isusertype(tolua_S,1,"CFont",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
  goto tolua_lerror;
@@ -12528,7 +12528,7 @@ static int tolua_stratagus_CFont_Width00(lua_State* tolua_S)
 #endif
  {
   CFont* self = (CFont*)  tolua_tousertype(tolua_S,1,0);
-  const char* text = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const std::string text = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Width'",NULL);
 #endif

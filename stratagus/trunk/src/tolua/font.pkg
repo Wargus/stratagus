@@ -4,7 +4,7 @@ class CFont
 	static CFont *Get(const std::string ident);
 
 	int Height();
-	int Width(const char *text);
+	int Width(const std::string text);
 };
 
 
