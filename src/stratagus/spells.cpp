@@ -951,6 +951,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit *caster, const SpellType *spell
 			//  Check every unit if it is a possible target
 			//
 			for (i = 0, j = 0; i < nunits; ++i) {
+				// Can't cast spell on ourself
+				if (caster == table[i]) {
+					continue;
+				}
 				//  FIXME: autocast conditions should include normal conditions.
 				//  FIXME: no, really, they should.
 				if (PassCondition(caster, spell, table[i], x, y, spell->Condition) &&
