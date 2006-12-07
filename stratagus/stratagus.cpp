@@ -355,7 +355,7 @@ static void ShowTitleImage(TitleScreen *t)
 				if (labels[j]->Flags & TitleFlagCenter) {
 					x -= labels[j]->Font->Width(labels[j]->Text.c_str()) / 2;
 				}
-				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text.c_str());
+				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
 			}
 		}
 

@@ -101,7 +101,7 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
-	VideoDrawTextClip(x + r.xOffset, y + r.yOffset, this, txt.c_str());
+	VideoDrawTextClip(x + r.xOffset, y + r.yOffset, this, txt);
 	PopClipping();
 }
 
@@ -167,15 +167,15 @@ void GetDefaultTextColors(std::string &normalp, std::string &reversep)
 /**
 **  Get the next utf8 character from a string
 */
-static bool GetUTF8(const char *&text, int &utf8)
+static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 {
 	// end of string
-	if (!*text) {
+	if (pos >= text.size()) {
 		return false;
 	}
 
 	int count;
-	char c = *text++;
+	char c = text[pos++];
 
 	// ascii
 	if (!(c & 0x80)) {
@@ -204,7 +204,7 @@ static bool GetUTF8(const char *&text, int &utf8)
 	}
 
 	while (count--) {
-		c = *text++;
+		c = text[pos++];
 		if ((c & 0xC0) != 0x80) {
 			DebugPrint("Invalid utf8\n");
 			return false;
@@ -223,29 +223,28 @@ static bool GetUTF8(const char *&text, int &utf8)
 **
 **  @return      The width in pixels of the text.
 */
-int CFont::Width(const char *text) const
+int CFont::Width(const std::string &text) const
 {
-	int width;
-	bool isformat;
+	int width = 0;
+	bool isformat = false;
 	int utf8;
+	size_t pos = 0;
 
-	isformat = false;
-	width = 0;
-	while (GetUTF8(text, utf8)) {
+	while (GetUTF8(text, pos, utf8)) {
 		if (utf8 == '~') {
-			if (!*text) {  // bad formatted string
+			if (pos >= text.size()) {  // bad formatted string
 				break;
 			}
-			if (*text == '<' || *text == '>') {
+			if (text[pos] == '<' || text[pos] == '>') {
 				isformat = false;
-				++text;
+				++pos;
 				continue;
 			}
-			if (*text == '!') {
-				++text;
+			if (text[pos] == '!') {
+				++pos;
 				continue;
 			}
-			if (*text != '~') { // ~~ -> ~
+			if (text[pos] != '~') { // ~~ -> ~
 				isformat = !isformat;
 				continue;
 			}
@@ -303,7 +302,7 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 **
 **  @return      The length of the printed text.
 */
-static int DoDrawText(int x, int y, CFont *font, const char *text,
+static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 	int clip)
 {
 	int w;
@@ -316,6 +315,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 	int c;
 	CGraphic *g;
 	int utf8;
+	size_t pos;
 
 	if (clip) {
 		DrawChar = VideoDrawCharClip;
@@ -330,13 +330,15 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 #endif
 	rev = NULL;
 	widths = 0;
-	while (GetUTF8(text, utf8)) {
+	pos = 0;
+	while (GetUTF8(text, pos, utf8)) {
 		if (utf8 == '~') {
-			switch (*text) {
+			switch (text[pos]) {
 				case '\0':  // wrong formatted string.
 					DebugPrint("oops, format your ~\n");
 					return widths;
 				case '~':
+					++pos;  
 					break;
 				case '!':
 					rev = FontColor;
@@ -344,18 +346,15 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 #ifdef USE_OPENGL
 					g = FontColorGraphics[font][FontColor];
 #endif
-					++text;
-					if (!GetUTF8(text, utf8)) {
-						continue;
-					}
-					break;
+					++pos;
+					continue;
 				case '<':
 					LastTextColor = FontColor;
 					FontColor = ReverseTextColor;
 #ifdef USE_OPENGL
 					g = FontColorGraphics[font][FontColor];
 #endif
-					++text;
+					++pos;
 					continue;
 				case '>':
 					rev = LastTextColor;  // swap last and current color
@@ -364,11 +363,11 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 #ifdef USE_OPENGL
 					g = FontColorGraphics[font][FontColor];
 #endif
-					++text;
+					++pos;
 					continue;
 
 				default:
-					p = text;
+					p = text.c_str() + pos;
 					while (*p && *p !='~') {
 						++p;
 					}
@@ -376,15 +375,18 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 						DebugPrint("oops, format your ~\n");
 						return widths;
 					}
-					color = new char[p - text + 1];
-					memcpy(color, text, p - text);
-					color[p - text] = '\0';
-					text = p + 1;
+					color = new char[p - (text.c_str() + pos) + 1];
+					memcpy(color, text.c_str() + pos, p - (text.c_str() + pos));
+					color[p - (text.c_str() + pos)] = '\0';
+					pos = p - text.c_str() + 1;
 					LastTextColor = FontColor;
-					FontColor = CFontColor::Get(color);
+					CFontColor *fc = CFontColor::Get(color);
+					if (fc) {
+						FontColor = fc;
 #ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
+						g = FontColorGraphics[font][fc];
 #endif
+					}
 					delete[] color;
 					continue;
 			}
@@ -427,7 +429,7 @@ static int DoDrawText(int x, int y, CFont *font, const char *text,
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawText(int x, int y, CFont *font, const char *text)
+int VideoDrawText(int x, int y, CFont *font, const std::string &text)
 {
 	return DoDrawText(x, y, font, text, 0);
 }
@@ -444,7 +446,7 @@ int VideoDrawText(int x, int y, CFont *font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawTextClip(int x, int y, CFont *font, const char *text)
+int VideoDrawTextClip(int x, int y, CFont *font, const std::string &text)
 {
 	return DoDrawText(x, y, font, text, 1);
 }
@@ -461,7 +463,7 @@ int VideoDrawTextClip(int x, int y, CFont *font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawReverseText(int x, int y, CFont *font, const char *text)
+int VideoDrawReverseText(int x, int y, CFont *font, const std::string &text)
 {
 	int w;
 
@@ -484,7 +486,7 @@ int VideoDrawReverseText(int x, int y, CFont *font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawReverseTextClip(int x, int y, CFont *font, const char *text)
+int VideoDrawReverseTextClip(int x, int y, CFont *font, const std::string &text)
 {
 	int w;
 
@@ -507,7 +509,7 @@ int VideoDrawReverseTextClip(int x, int y, CFont *font, const char *text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawTextCentered(int x, int y, CFont *font, const char *text)
+int VideoDrawTextCentered(int x, int y, CFont *font, const std::string &text)
 {
 	int dx;
 

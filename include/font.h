@@ -79,7 +79,7 @@ public:
 	static CFont *Get(const std::string &ident);
 
 	inline int Height() const { return G->Height; }
-	int Width(const char *text) const;
+	int Width(const std::string &text) const;
 	inline bool IsLoaded() { return G && G->IsLoaded(); }
 
 	virtual int getHeight() const { return Height(); }
@@ -150,15 +150,15 @@ extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
 	///  Return the 'line' line of the string 's'.
 extern char *GetLineFont(int line, char *s, int maxlen, CFont *font);
 	/// Draw text unclipped
-extern int VideoDrawText(int x, int y, CFont *font, const char *text);
+extern int VideoDrawText(int x, int y, CFont *font, const std::string &text);
 	/// Draw text unclipped
-extern int VideoDrawTextClip(int x, int y, CFont *font, const char *text);
+extern int VideoDrawTextClip(int x, int y, CFont *font, const std::string &text);
 	/// Draw reverse text unclipped
-extern int VideoDrawReverseText(int x, int y, CFont *font, const char *text);
+extern int VideoDrawReverseText(int x, int y, CFont *font, const std::string &text);
 	/// Draw reverse text clipped
-extern int VideoDrawReverseTextClip(int x, int y, CFont *font, const char *text);
+extern int VideoDrawReverseTextClip(int x, int y, CFont *font, const std::string &text);
 	/// Draw text centered and unclipped
-extern int VideoDrawTextCentered(int x, int y, CFont *font, const char *text);
+extern int VideoDrawTextCentered(int x, int y, CFont *font, const std::string &text);
 	/// Draw number unclipped
 extern int VideoDrawNumber(int x, int y, CFont *font, int number);
 	/// Draw number clipped
