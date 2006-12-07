@@ -138,14 +138,14 @@ static void bzseek(BZFILE *file, unsigned offset, int whence)
 int CFile::open(const char *name, long openflags)
 {
 	char buf[512];
-	char openstring[5];
+	const char *openstring;
 
 	if ((openflags & CL_OPEN_READ) && (openflags & CL_OPEN_WRITE)) {
-		strcpy_s(openstring, sizeof(openstring), "rwb");
+		openstring = "rwb";
 	} else if (openflags &CL_OPEN_READ) {
-		strcpy_s(openstring, sizeof(openstring), "rb");
+		openstring = "rb";
 	} else if (openflags & CL_OPEN_WRITE) {
-		strcpy_s(openstring,sizeof(openstring), "wb");
+		openstring = "wb";
 	} else {
 		DebugPrint("Bad CLopen flags");
 		Assert(0);
@@ -459,7 +459,7 @@ long CFile::tell()
 **  @param filesize  Size of the file buffer
 **
 **  @return 1 if the file has been found.
-**/
+*/
 static int FindFileWithExtension(char *file, size_t filesize)
 {
 	char buf[PATH_MAX];
