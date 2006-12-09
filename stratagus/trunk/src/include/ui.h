@@ -381,20 +381,18 @@ public:
 */
 class CUnitInfoPanel {
 public:
-	CUnitInfoPanel() : Name(NULL), PosX(0), PosY(0), DefaultFont(0),
+	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
 		Contents(), Condition(NULL) {}
 	~CUnitInfoPanel() {
-		delete[] Name;
 		for (std::vector<CContentType *>::iterator content = Contents.begin();
-			content != Contents.end(); ++content) {
+				content != Contents.end(); ++content) {
 			delete *content;
 		}
-		Contents.clear();
 		delete Condition;
 	}
 
 
-	char *Name;            /// Ident of the panel.
+	std::string Name;      /// Ident of the panel.
 	int PosX;              /// X coordinate of the panel.
 	int PosY;              /// Y coordinate of the panel.
 	CFont *DefaultFont;    /// Default font for content.
@@ -557,13 +555,13 @@ public:
 	int MaxSelectedTextY;               /// if > maximum units selected
 
 	CUIButton *SingleTrainingButton;    /// Button for single training
-	char *SingleTrainingText;           /// Text for single training
+	std::string SingleTrainingText;     /// Text for single training
 	CFont *SingleTrainingFont;          /// Font for single traning
 	int SingleTrainingTextX;            /// X text position single training
 	int SingleTrainingTextY;            /// Y text position single training
 
 	std::vector<CUIButton> TrainingButtons;/// Training buttons
-	char *TrainingText;                 /// Multiple Training Text
+	std::string TrainingText;           /// Multiple Training Text
 	CFont *TrainingFont;                /// Multiple Training Font
 	int TrainingTextX;                  /// Multiple Training X Text position
 	int TrainingTextY;                  /// Multiple Training Y Text position
@@ -673,7 +671,7 @@ extern void CleanUserInterface(void);
 extern void UserInterfaceCclRegister(void);
 
 	/// Find a button style
-extern ButtonStyle *FindButtonStyle(const char *style);
+extern ButtonStyle *FindButtonStyle(const std::string &style);
 
 	/// Called if the mouse is moved in Normal interface state
 extern void UIHandleMouseMove(int x, int y);

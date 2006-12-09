@@ -72,9 +72,9 @@ CUserInterface::CUserInterface() :
 	MouseWarpX(0), MouseWarpY(0),
 	SingleSelectedButton(NULL),
 	MaxSelectedFont(0), MaxSelectedTextX(0), MaxSelectedTextY(0),
-	SingleTrainingButton(NULL), SingleTrainingText(NULL),
+	SingleTrainingButton(NULL),
 	SingleTrainingFont(0), SingleTrainingTextX(0), SingleTrainingTextY(0),
-	TrainingText(NULL), TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
+	TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
 	UpgradingButton(NULL), ResearchingButton(NULL),
 	CompletedBarColor(0), CompletedBarShadow(0),
 	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
@@ -265,11 +265,9 @@ void CleanUserInterface(void)
 	delete UI.SingleSelectedButton;
 	UI.SelectedButtons.clear();
 	delete UI.SingleTrainingButton;
-	delete[] UI.SingleTrainingText;
-	UI.SingleTrainingText = NULL;
+	UI.SingleTrainingText.clear();
 	UI.TrainingButtons.clear();
-	delete[] UI.TrainingText;
-	UI.TrainingText = NULL;
+	UI.TrainingText.clear();
 	delete UI.UpgradingButton;
 	delete UI.ResearchingButton;
 	UI.TransportingButtons.clear();
