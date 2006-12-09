@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Dec  8 19:40:00 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Dec  8 20:12:40 2006.
 */
 
 #ifndef __cplusplus
@@ -3934,14 +3934,14 @@ static int tolua_stratagus_FindButtonStyle00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
  !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
  goto tolua_lerror;
  else
 #endif
  {
-  const char* style = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const std::string style = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
  {
   ButtonStyle* tolua_ret = (ButtonStyle*)  FindButtonStyle(style);
  tolua_pushusertype(tolua_S,(void*)tolua_ret,"ButtonStyle");

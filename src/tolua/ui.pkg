@@ -169,7 +169,7 @@ class CIcon
 	int Frame;
 };
 
-extern ButtonStyle *FindButtonStyle(const char *style);
+extern ButtonStyle *FindButtonStyle(const std::string style);
 
 extern bool GetMouseScroll(void);
 extern void SetMouseScroll(bool enabled);

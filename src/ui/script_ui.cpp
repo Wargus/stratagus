@@ -778,7 +778,7 @@ static int CclDefinePanelContents(lua_State *l)
 		for (lua_pushnil(l); lua_next(l, i + 1); lua_pop(l, 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Ident")) {
-				infopanel->Name = new_strdup(LuaToString(l, -1));
+				infopanel->Name = LuaToString(l, -1);
 			} else if (!strcmp(key, "Pos")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // X
@@ -801,13 +801,13 @@ static int CclDefinePanelContents(lua_State *l)
 			}
 		}
 		for (std::vector<CContentType *>::iterator content = infopanel->Contents.begin();
-			content != infopanel->Contents.end(); ++content) { // Default value for invalid value.
+				content != infopanel->Contents.end(); ++content) { // Default value for invalid value.
 			(*content)->PosX += infopanel->PosX;
 			(*content)->PosY += infopanel->PosY;
 		}
 		for (j = 0; j < (int)UI.InfoPanelContents.size(); ++j) {
-			if (!strcmp(infopanel->Name, UI.InfoPanelContents[j]->Name)) {
-				DebugPrint("Redefinition of Panel '%s'\n" _C_ infopanel->Name);
+			if (infopanel->Name == UI.InfoPanelContents[j]->Name) {
+				DebugPrint("Redefinition of Panel '%s'\n" _C_ infopanel->Name.c_str());
 				delete UI.InfoPanelContents[j];
 				UI.InfoPanelContents[j] = infopanel;
 				break;
@@ -896,7 +896,7 @@ static int CclRightButtonMoves(lua_State *l)
 **
 **  @return       Button style, NULL if not found.
 */
-ButtonStyle *FindButtonStyle(const char *style)
+ButtonStyle *FindButtonStyle(const std::string &style)
 {
 	return ButtonStyleHash[style];
 }
