@@ -203,10 +203,8 @@ void CIcon::DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 {
 	ButtonStyle s(*style);
 
-	s.Default.Sprite = s.Hover.Sprite = s.Selected.Sprite =
-		s.Clicked.Sprite = s.Disabled.Sprite = this->G;
-	s.Default.Frame = s.Hover.Frame = s.Selected.Frame =
-		s.Clicked.Frame = s.Disabled.Frame = this->Frame;
+	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
+	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->Frame;
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
 		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
