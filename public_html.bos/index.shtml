@@ -7,20 +7,20 @@
 using the <a href="http://www.stratagus.org/">Stratagus</a> game
 engine. <br>
       </p>
-Invasion - Battle of Survival is copyrighted in 2004-2005 by the <a
- href="http://savannah.nongnu.org/project/memberlist.php?group=stratagus-bos">Invasion
-Team</a>. The game is distributed under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU
-General Public License V2</a>.
+
+<p>
+Invasion - Battle of Survival is copyrighted in 2004-2006 by 
+Tina Petersen Jensen, Francois Beerten et al. See COPYRIGHT.txt in 
+the package for the full copyright notice.
+</p>
 
       <h2>News</h2>
-      <h3>The Alpha prerelease of Invasion - Battle of Survival 2.0 has been released</h3>
-<p>After a long wait, a prerelease of the next version of the game is available.
-Get it from the <a href="http://bos.seul.org/download.shtml">download section</a>, give it a try and
-tell us what you liked and the bugs you found. Note that a few things like the campaigns are not complete yet.
+      <h3>Invasion - Battle of Survival 2.0 has been released !</h3>
+<p>Get it from the <a href="http://bos.seul.org/download.shtml">download section</a>.
 </p>
 <p>
 Invasion - Battle of Survival 2.0 integrates new features like Guichan menus, improved UI, 
-image-based map system, new units, new set elements...
+image-based map system, new units, new set elements, internationalisation, ...
 </p>
 
       <h2>Project<br>
