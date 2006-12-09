@@ -27,7 +27,6 @@
 --
 --	$Id$
 
--- For documentation see stratagus/doc/ccl/ccl.html
 
 print("Battle of Survival default config file loading ...\n")
 
