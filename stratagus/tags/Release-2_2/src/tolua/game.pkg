@@ -1,0 +1,56 @@
+$bool IsReplayGame();
+bool IsReplayGame();
+
+
+$void StartMap(const char *str, bool clean = true);
+void StartMap(const char *str, bool clean = true);
+$void StartReplay(const char *str, bool reveal = false);
+void StartReplay(const char *str, bool reveal = false);
+$void StartSavedGame(const char *str);
+void StartSavedGame(const char *str);
+
+$#include "results.h"
+
+typedef enum {
+    GameNoResult,
+    GameVictory,
+    GameDefeat,
+    GameDraw,
+    GameQuitToMenu,
+    GameRestart,
+} GameResults;
+
+GameResults GameResult;
+
+$void StopGame(GameResults result);
+void StopGame(GameResults result);
+
+extern bool GameRunning;
+extern bool GamePaused;
+extern bool GameObserve;
+
+
+$#include "settings.h"
+
+struct SettingsPresets {
+	int Race;
+	int Team;
+	int Type;
+};
+
+class Settings {
+	int NetGameType;
+
+	SettingsPresets Presets[PlayerMax];
+
+	int Resources;
+	int NumUnits;
+	int Opponents;
+	int Difficulty;
+	int GameType;
+	bool NoFogOfWar;
+	int RevealMap;
+	int MapRichness;
+};
+
+extern Settings GameSettings;

@@ -1,0 +1,16 @@
+class CMapInfo
+{
+	string Description;
+	tolua_readonly int MapWidth;
+	tolua_readonly int MapHeight;
+};
+
+class CMap
+{
+	CMapInfo Info;
+};
+
+extern CMap Map;
+
+void SetTile(int tile, int w, int h, int value = 0);
+

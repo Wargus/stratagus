@@ -1,0 +1,27 @@
+##       _________ __                 __                               
+##      /   _____//  |_____________ _/  |______     ____  __ __  ______
+##      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+##      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+##             \/                  \/          \//_____/            \/ 
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   Stratagus - A free fantasy real time strategy game engine
+##
+
+# Compile commands
+CXX=@CXX@
+RM=rm -f
+MAKE=make
+
+# Prefix for 'make install'
+PREFIX=@PREFIX@
+
+CPPFLAGS=@DEFS@ @CPPFLAGS@ -DUSE_ZLIB -I$(TOPDIR) -I$(TOPDIR)/src/include -I$(TOPDIR)/src/guichan/include
+CXXFLAGS=@CXXFLAGS@
+LDFLAGS=@LDFLAGS@ -lpng -lz -lm
+
+OBJDIR=@OBJDIR@
+
+DISTLIST=$(TOPDIR)/distlist
+TAGS=$(TOPDIR)/src/tags
