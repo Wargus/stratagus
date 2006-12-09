@@ -7,8 +7,8 @@ Invasion - Battle of Survival is a real-time strategy game using the
 Stratagus game engine. 
 
 
-Licence
--------
+Copyright and Licence
+---------------------
 This work, Invasion - Battle of Survival, is copyrighted in 2004-2006 by
 Tina Petersen Jensen, Francois Beerten et al.
 
@@ -21,8 +21,8 @@ How to install
 Unpack the game data in a games directory:
 > tar -xzvf Invasion-bos.tgz
 
-You also need to get and install the Stratagus engine available at
-http://www.stratagus.org
+You also need to get version 2.2 of the Stratagus engine available at
+http://www.stratagus.org.
 
 
 How to start the game
@@ -45,7 +45,7 @@ http://savannah.nongnu.org/bugs/?group=stratagus-bos
 
 Have fun,
 
-The Invasion team.
+The BOS team.
 
  
 
