@@ -41,20 +41,10 @@ DefineButtonStyle("network", {
   Hover = {
     TextNormalColor = "white",
   },
-  Selected = {
-    Border = {
-      Color = {252, 252, 0}, Size = 1,
-    },
-  },
   Clicked = {
     Size = {300, 144},
     TextNormalColor = "white",
     TextPos = {42, 2},
-  },
-  Disabled = {
-    Size = {300, 144},
-    TextNormalColor = "grey",
-    TextReverseColor = "grey",
   },
 })
 
@@ -76,17 +66,10 @@ DefineButtonStyle("icon", {
       Color = {128, 128, 128}, Size = 1,
     },
   },
-  Selected = {
-    Border = {
-      Color = {0, 252, 0}, Size = 1,
-    },
-  },
   Clicked = {
     TextNormalColor = "white",
     Border = {
       Color = {128, 128, 128}, Size = 1,
     },
-  },
-  Disabled = {
   },
 })
