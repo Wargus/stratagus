@@ -64,6 +64,9 @@ function ErrorMenu(errmsg)
   l:setBackgroundColor(dark)
   menu:add(l, Video.Width / 2 - 170, Video.Height / 2 - 100)
 
+  menu:addButton(_("~!OK"), "o", Video.Width / 2 - 100, Video.Height - 100,
+    function() menu:stop() end)
+
   menu:run()
 end
 
