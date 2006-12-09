@@ -170,7 +170,6 @@ class CIcon
 };
 
 extern ButtonStyle *FindButtonStyle(const char *style);
-extern CheckboxStyle *FindCheckboxStyle(const char *style);
 
 extern bool GetMouseScroll(void);
 extern void SetMouseScroll(bool enabled);

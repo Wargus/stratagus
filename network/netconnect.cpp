@@ -904,7 +904,6 @@ static void KickDeadClient(int c)
 			NetStates[n].State = ccs_async;
 		}
 	}
-	NetConnectForceDisplayUpdate();
 }
 
 /**
@@ -1105,16 +1104,7 @@ static void ClientParseConnected(const InitMessage *msg)
 			}
 			strncpy_s(NetworkMapName, sizeof(NetworkMapName), msg->u.MapPath, _TRUNCATE);
 			std::string mappath = StratagusLibPath + "/" + NetworkMapName;
-			if (mappath.size() >= sizeof(MenuMapFullPath)) {
-				fprintf(stderr, "Map path too long\n");
-				NetLocalState = ccs_badmap;
-				break;
-			}
-			strcpy_s(MenuMapFullPath, sizeof(MenuMapFullPath), mappath.c_str());
-			if (NetClientSelectScenario()) {
-				NetLocalState = ccs_badmap;
-				break;
-			}
+			LoadStratagusMapInfo(mappath);
 			if (ntohl(msg->MapUID) != Map.Info.MapUID) {
 				NetLocalState = ccs_badmap;
 				fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
@@ -1405,8 +1395,6 @@ static void ServerParseHello(int h, const InitMessage *msg)
 		// Detects UDP input firewalled or behind NAT firewall clients
 		// If packets are missed, clients are kicked by AYT check later..
 		KickDeadClient(h);
-	} else {
-		NetConnectForceDisplayUpdate();
 	}
 }
 
@@ -1479,7 +1467,6 @@ static void ServerParseWaiting(const int h)
 	InitMessage message;
 
 	ServerSetupState.LastFrame[h] = FrameCounter;
-	NetConnectForceDisplayUpdate();
 
 	switch (NetStates[h].State) {
 		// client has recvd welcome and is waiting for info
@@ -1616,7 +1603,6 @@ static void ServerParseState(const int h, const InitMessage *msg)
 					NetStates[i].State = ccs_async;
 				}
 			}
-			NetConnectForceDisplayUpdate();
 			/* Fall through */
 		case ccs_async:
 			// this code path happens until client acknoledges the state change reply

@@ -106,34 +106,7 @@ public:
 	int TextY;                      /// Text Y location
 	ButtonStyleProperties Default;  /// Default button properties
 	ButtonStyleProperties Hover;    /// Hover button properties
-	ButtonStyleProperties Selected; /// Selected button properties
 	ButtonStyleProperties Clicked;  /// Clicked button properties
-	ButtonStyleProperties Disabled; /// Disabled button properties
-};
-
-class CheckboxStyle {
-public:
-	CheckboxStyle() : Width(0), Height(0), Font(0),
-		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
-
-	int Width;                      /// Checkbox width
-	int Height;                     /// Checkbox height
-	CFont *Font;                    /// Font
-	std::string TextNormalColor;    /// Normal text color
-	std::string TextReverseColor;   /// Reverse text color
-	TextAlignment TextAlign;        /// Text alignment
-	int TextX;                      /// Text X location
-	int TextY;                      /// Text Y location
-	ButtonStyleProperties Default;  /// Default checkbox properties
-	ButtonStyleProperties Hover;    /// Hover checkbox properties
-	ButtonStyleProperties Selected; /// Selected checkbox properties
-	ButtonStyleProperties Clicked;  /// Clicked checkbox properties
-	ButtonStyleProperties Disabled; /// Disabled checkbox properties
-	ButtonStyleProperties Checked;  /// Default checkbox properties
-	ButtonStyleProperties CheckedHover;    /// Checked hover checkbox properties
-	ButtonStyleProperties CheckedSelected; /// Checked selected checkbox properties
-	ButtonStyleProperties CheckedClicked;  /// Checked clicked checkbox properties
-	ButtonStyleProperties CheckedDisabled; /// Checked disabled checkbox properties
 };
 
 	/// buttons on screen themselves
@@ -678,9 +651,6 @@ extern CUserInterface UI;                           /// The user interface
 	/// Hash table of all the button styles
 extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 
-	/// Hash table of all the checkbox styles
-extern std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
-
 extern bool RightButtonAttacks;         /// right button attacks
 extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 
@@ -704,8 +674,6 @@ extern void UserInterfaceCclRegister(void);
 
 	/// Find a button style
 extern ButtonStyle *FindButtonStyle(const char *style);
-	/// Find a checkbox style
-extern CheckboxStyle *FindCheckboxStyle(const char *style);
 
 	/// Called if the mouse is moved in Normal interface state
 extern void UIHandleMouseMove(int x, int y);
