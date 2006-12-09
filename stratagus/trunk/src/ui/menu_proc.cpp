@@ -35,12 +35,10 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
-
+#include "ui.h"
 #include "video.h"
 #include "font.h"
 #include "menus.h"
-#include "netconnect.h"
-#include "sound.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -70,14 +68,10 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	ButtonStyleProperties *p;
 	ButtonStyleProperties *pimage;
 
-	if (flags & MI_FLAGS_DISABLED) {
-		p = &style->Disabled;
-	} else if (flags & MI_FLAGS_CLICKED) {
+	if (flags & MI_FLAGS_CLICKED) {
 		p = &style->Clicked;
 	} else if (flags & MI_FLAGS_ACTIVE) {
 		p = &style->Hover;
-	} else if (flags & MI_FLAGS_SELECTED) {
-		p = &style->Selected;
 	} else {
 		p = &style->Default;
 	}
@@ -86,12 +80,10 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//  Image
 	//
 	pimage = p;
-	if (!p->Sprite && !(flags & MI_FLAGS_INVISIBLE)) {
+	if (!p->Sprite) {
 		// No image.  Try hover, selected, then default
 		if ((flags & MI_FLAGS_ACTIVE) && style->Hover.Sprite) {
 			pimage = &style->Hover;
-		} else if ((flags & MI_FLAGS_SELECTED) && style->Selected.Sprite) {
-			pimage = &style->Selected;
 		} else if (style->Default.Sprite) {
 			pimage = &style->Default;
 		}
@@ -130,12 +122,6 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//
 	//  Border
 	//
-	if (!p->BorderSize) {
-		// No border, check if there's a Selected border
-		if ((flags & MI_FLAGS_SELECTED) && style->Selected.BorderSize) {
-			p = &style->Selected;
-		}
-	}
 	if (!p->BorderColor) {
 		p->BorderColor = Video.MapRGB(TheScreen->format,
 			p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
@@ -147,100 +133,6 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 		}
 	}
 }
-
-#if 0
-/**
-** Paste text from the clipboard
-*/
-static void PasteFromClipboard(Menuitem *mi)
-{
-#if defined(USE_WIN32) || defined(_XLIB_H_)
-	int i;
-	unsigned char *clipboard;
-#ifdef USE_WIN32
-	HGLOBAL handle;
-#elif defined(_XLIB_H_)
-	Display *display;
-	Window window;
-	Atom rettype;
-	unsigned long nitem;
-	unsigned long dummy;
-	int retform;
-	XEvent event;
-#endif
-
-#ifdef USE_WIN32
-	if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
-		return;
-	}
-	handle = GetClipboardData(CF_TEXT);
-	if (!handle) {
-		CloseClipboard();
-		return;
-	}
-	clipboard = (unsigned char *)GlobalLock(handle);
-	if (!clipboard) {
-		CloseClipboard();
-		return;
-	}
-#elif defined(_XLIB_H_)
-	if (!(display = XOpenDisplay(NULL))) {
-		return;
-	}
-
-	// Creates a non maped temporary X window to hold the selection
-	if (!(window = XCreateSimpleWindow(display,
-			DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, 0))) {
-		XCloseDisplay(display);
-		return;
-	}
-
-	XConvertSelection(display, XA_PRIMARY, XA_STRING, XA_STRING,
-		window, CurrentTime);
-
-	XNextEvent(display, &event);
-
-	if (event.type != SelectionNotify ||
-			event.xselection.property != XA_STRING) {
-		return;
-	}
-
-	XGetWindowProperty(display, window, XA_STRING, 0, 1024, False,
-		XA_STRING, &rettype, &retform, &nitem, &dummy, &clipboard);
-
-	XDestroyWindow(display, window);
-	XCloseDisplay(display);
-
-	if (rettype != XA_STRING || retform != 8) {
-		if (clipboard != NULL) {
-			XFree(clipboard);
-		}
-		clipboard = NULL;
-	}
-
-	if (clipboard == NULL) {
-		return;
-	}
-#endif
-	for (i = 0; mi->D.Input.nch < mi->D.Input.maxch && clipboard[i] &&
-			mi->Font->Width(mi->D.Input.buffer) + 8 < mi->D.Input.xsize; ++i) {
-		if (clipboard[i] >= 32 && clipboard[i] != '~') {
-			mi->D.Input.buffer[mi->D.Input.nch] = clipboard[i];
-			++mi->D.Input.nch;
-		}
-	}
-	strcpy(mi->D.Input.buffer + mi->D.Input.nch, "~!_");
-#ifdef USE_WIN32
-	GlobalUnlock(handle);
-	CloseClipboard();
-#elif defined(_XLIB_H_)
-	if (clipboard != NULL) {
-		XFree(clipboard);
-	}
-#endif
-#endif
-}
-#endif
 
 #if 0
 /**
@@ -280,10 +172,6 @@ void ProcessMenu(const char *menu_id, int loop)
 			}
 			if (NetConnectRunning == 1) {
 				NetworkProcessServerRequest();
-			}
-			// stopped by network activity?
-			if (oldncr == 2 && NetConnectRunning == 0) {
-				//menu->NetAction();
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Wed Dec  6 21:34:41 2006.
+** Generated automatically by tolua++-1.0.7 on Fri Dec  8 19:40:00 2006.
 */
 
 #ifndef __cplusplus
@@ -304,7 +304,6 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
  tolua_usertype(tolua_S,"DropDownWidget");
- tolua_usertype(tolua_S,"CheckboxStyle");
  tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"ScrollArea");
  tolua_usertype(tolua_S,"Windows");
@@ -320,7 +319,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CUnitType");
  tolua_usertype(tolua_S,"CMapInfo");
- tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"SettingsPresets");
@@ -337,13 +336,13 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"ButtonWidget");
  tolua_usertype(tolua_S,"CVideo");
  tolua_usertype(tolua_S,"ImageCheckBox");
- tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"LuaActionListener");
  tolua_usertype(tolua_S,"ImageRadioButton");
  tolua_usertype(tolua_S,"CEditor");
  tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"ServerSetup");
+ tolua_usertype(tolua_S,"TextField");
  tolua_usertype(tolua_S,"CMapArea");
+ tolua_usertype(tolua_S,"ServerSetup");
  tolua_usertype(tolua_S,"RadioButton");
  tolua_usertype(tolua_S,"CMinimap");
  tolua_usertype(tolua_S,"Button");
@@ -3952,35 +3951,6 @@ static int tolua_stratagus_FindButtonStyle00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'FindButtonStyle'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: FindCheckboxStyle */
-#ifndef TOLUA_DISABLE_tolua_stratagus_FindCheckboxStyle00
-static int tolua_stratagus_FindCheckboxStyle00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isstring(tolua_S,1,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const char* style = ((const char*)  tolua_tostring(tolua_S,1,0));
- {
-  CheckboxStyle* tolua_ret = (CheckboxStyle*)  FindCheckboxStyle(style);
- tolua_pushusertype(tolua_S,(void*)tolua_ret,"CheckboxStyle");
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'FindCheckboxStyle'.",&tolua_err);
  return 0;
 #endif
 }
@@ -16410,7 +16380,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Frame",tolua_get_CIcon_Frame,tolua_set_CIcon_Frame);
  tolua_endmodule(tolua_S);
  tolua_function(tolua_S,"FindButtonStyle",tolua_stratagus_FindButtonStyle00);
- tolua_function(tolua_S,"FindCheckboxStyle",tolua_stratagus_FindCheckboxStyle00);
  tolua_function(tolua_S,"GetMouseScroll",tolua_stratagus_GetMouseScroll00);
  tolua_function(tolua_S,"SetMouseScroll",tolua_stratagus_SetMouseScroll00);
  tolua_function(tolua_S,"GetKeyScroll",tolua_stratagus_GetKeyScroll00);

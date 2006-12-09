@@ -66,7 +66,6 @@ typedef struct _info_text_ {
 } InfoText;                      /// FIXME:docu
 
 std::map<std::string, ButtonStyle *> ButtonStyleHash;
-std::map<std::string, CheckboxStyle *> CheckboxStyleHash;
 
 static int HandleCount = 1;     /// Lua handler count
 
@@ -903,18 +902,6 @@ ButtonStyle *FindButtonStyle(const char *style)
 }
 
 /**
-**  Find a checkbox style
-**
-**  @param style  Name of the style to find.
-**
-**  @return       Checkbox style, NULL if not found.
-*/
-CheckboxStyle *FindCheckboxStyle(const char *style)
-{
-	return CheckboxStyleHash[style];
-}
-
-/**
 **  Parse button style properties
 **
 **  @param l  Lua state.
@@ -1034,8 +1021,7 @@ static int CclDefineButtonStyle(lua_State *l)
 	if (!b) {
 		b = ButtonStyleHash[style] = new ButtonStyle;
 		// Set to bogus value to see if it was set later
-		b->Default.TextX = b->Hover.TextX = b->Selected.TextX =
-			b->Clicked.TextX = b->Disabled.TextX = 0xFFFFFF;
+		b->Default.TextX = b->Hover.TextX = b->Clicked.TextX = 0xFFFFFF;
 	}
 
 	lua_pushnil(l);
@@ -1082,12 +1068,8 @@ static int CclDefineButtonStyle(lua_State *l)
 			ParseButtonStyleProperties(l, &b->Default);
 		} else if (!strcmp(value, "Hover")) {
 			ParseButtonStyleProperties(l, &b->Hover);
-		} else if (!strcmp(value, "Selected")) {
-			ParseButtonStyleProperties(l, &b->Selected);
 		} else if (!strcmp(value, "Clicked")) {
 			ParseButtonStyleProperties(l, &b->Clicked);
-		} else if (!strcmp(value, "Disabled")) {
-			ParseButtonStyleProperties(l, &b->Disabled);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1102,17 +1084,9 @@ static int CclDefineButtonStyle(lua_State *l)
 		b->Hover.TextX = b->TextX;
 		b->Hover.TextY = b->TextY;
 	}
-	if (b->Selected.TextX == 0xFFFFFF) {
-		b->Selected.TextX = b->TextX;
-		b->Selected.TextY = b->TextY;
-	}
 	if (b->Clicked.TextX == 0xFFFFFF) {
 		b->Clicked.TextX = b->TextX;
 		b->Clicked.TextY = b->TextY;
-	}
-	if (b->Disabled.TextX == 0xFFFFFF) {
-		b->Disabled.TextX = b->TextX;
-		b->Disabled.TextY = b->TextY;
 	}
 
 	if (b->Default.TextAlign == TextAlignUndefined) {
@@ -1121,182 +1095,8 @@ static int CclDefineButtonStyle(lua_State *l)
 	if (b->Hover.TextAlign == TextAlignUndefined) {
 		b->Hover.TextAlign = b->TextAlign;
 	}
-	if (b->Selected.TextAlign == TextAlignUndefined) {
-		b->Selected.TextAlign = b->TextAlign;
-	}
 	if (b->Clicked.TextAlign == TextAlignUndefined) {
 		b->Clicked.TextAlign = b->TextAlign;
-	}
-	if (b->Disabled.TextAlign == TextAlignUndefined) {
-		b->Disabled.TextAlign = b->TextAlign;
-	}
-
-	return 0;
-}
-
-/**
-**  Define a checkbox style
-**
-**  @param l  Lua state.
-*/
-static int CclDefineCheckboxStyle(lua_State *l)
-{
-	const char *style;
-	const char *value;
-	CheckboxStyle *c;
-
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument");
-	}
-
-	style = LuaToString(l, 1);
-	c = CheckboxStyleHash[style];
-	if (!c) {
-		c = CheckboxStyleHash[style] = new CheckboxStyle;
-		// Set to bogus value to see if it was set later
-		c->Default.TextX = c->Hover.TextX = c->Selected.TextX =
-			c->Clicked.TextX = c->Disabled.TextX =
-			c->Checked.TextX = c->CheckedHover.TextX = c->CheckedSelected.TextX =
-			c->CheckedClicked.TextX = c->CheckedDisabled.TextX = 0xFFFFFF;
-	}
-
-	lua_pushnil(l);
-	while (lua_next(l, 2)) {
-		value = LuaToString(l, -2);
-		if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			c->Width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			c->Height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "Font")) {
-			c->Font = CFont::Get(LuaToString(l, -1));
-		} else if (!strcmp(value, "TextNormalColor")) {
-			c->TextNormalColor = LuaToString(l, -1);
-		} else if (!strcmp(value, "TextReverseColor")) {
-			c->TextReverseColor = LuaToString(l, -1);
-		} else if (!strcmp(value, "TextPos")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			c->TextX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			c->TextY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "TextAlign")) {
-			value = LuaToString(l, -1);
-			if (!strcmp(value, "Center")) {
-				c->TextAlign = TextAlignCenter;
-			} else if (!strcmp(value, "Right")) {
-				c->TextAlign = TextAlignRight;
-			} else if (!strcmp(value, "Left")) {
-				c->TextAlign = TextAlignLeft;
-			} else {
-				LuaError(l, "Invalid text alignment: %s" _C_ value);
-			}
-		} else if (!strcmp(value, "Default")) {
-			ParseButtonStyleProperties(l, &c->Default);
-		} else if (!strcmp(value, "Hover")) {
-			ParseButtonStyleProperties(l, &c->Hover);
-		} else if (!strcmp(value, "Selected")) {
-			ParseButtonStyleProperties(l, &c->Selected);
-		} else if (!strcmp(value, "Clicked")) {
-			ParseButtonStyleProperties(l, &c->Clicked);
-		} else if (!strcmp(value, "Disabled")) {
-			ParseButtonStyleProperties(l, &c->Disabled);
-		} else if (!strcmp(value, "Checked")) {
-			ParseButtonStyleProperties(l, &c->Checked);
-		} else if (!strcmp(value, "CheckedHover")) {
-			ParseButtonStyleProperties(l, &c->CheckedHover);
-		} else if (!strcmp(value, "CheckedSelected")) {
-			ParseButtonStyleProperties(l, &c->CheckedSelected);
-		} else if (!strcmp(value, "CheckedClicked")) {
-			ParseButtonStyleProperties(l, &c->CheckedClicked);
-		} else if (!strcmp(value, "CheckedDisabled")) {
-			ParseButtonStyleProperties(l, &c->CheckedDisabled);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-		lua_pop(l, 1);
-	}
-
-	if (c->Default.TextX == 0xFFFFFF) {
-		c->Default.TextX = c->TextX;
-		c->Default.TextY = c->TextY;
-	}
-	if (c->Hover.TextX == 0xFFFFFF) {
-		c->Hover.TextX = c->TextX;
-		c->Hover.TextY = c->TextY;
-	}
-	if (c->Selected.TextX == 0xFFFFFF) {
-		c->Selected.TextX = c->TextX;
-		c->Selected.TextY = c->TextY;
-	}
-	if (c->Clicked.TextX == 0xFFFFFF) {
-		c->Clicked.TextX = c->TextX;
-		c->Clicked.TextY = c->TextY;
-	}
-	if (c->Disabled.TextX == 0xFFFFFF) {
-		c->Disabled.TextX = c->TextX;
-		c->Disabled.TextY = c->TextY;
-	}
-	if (c->Checked.TextX == 0xFFFFFF) {
-		c->Checked.TextX = c->TextX;
-		c->Checked.TextY = c->TextY;
-	}
-	if (c->CheckedHover.TextX == 0xFFFFFF) {
-		c->CheckedHover.TextX = c->TextX;
-		c->CheckedHover.TextY = c->TextY;
-	}
-	if (c->CheckedSelected.TextX == 0xFFFFFF) {
-		c->CheckedSelected.TextX = c->TextX;
-		c->CheckedSelected.TextY = c->TextY;
-	}
-	if (c->CheckedClicked.TextX == 0xFFFFFF) {
-		c->CheckedClicked.TextX = c->TextX;
-		c->CheckedClicked.TextY = c->TextY;
-	}
-	if (c->CheckedDisabled.TextX == 0xFFFFFF) {
-		c->CheckedDisabled.TextX = c->TextX;
-		c->CheckedDisabled.TextY = c->TextY;
-	}
-
-	if (c->Default.TextAlign == TextAlignUndefined) {
-		c->Default.TextAlign = c->TextAlign;
-	}
-	if (c->Hover.TextAlign == TextAlignUndefined) {
-		c->Hover.TextAlign = c->TextAlign;
-	}
-	if (c->Selected.TextAlign == TextAlignUndefined) {
-		c->Selected.TextAlign = c->TextAlign;
-	}
-	if (c->Clicked.TextAlign == TextAlignUndefined) {
-		c->Clicked.TextAlign = c->TextAlign;
-	}
-	if (c->Disabled.TextAlign == TextAlignUndefined) {
-		c->Disabled.TextAlign = c->TextAlign;
-	}
-	if (c->Checked.TextAlign == TextAlignUndefined) {
-		c->Checked.TextAlign = c->TextAlign;
-	}
-	if (c->CheckedHover.TextAlign == TextAlignUndefined) {
-		c->CheckedHover.TextAlign = c->TextAlign;
-	}
-	if (c->CheckedSelected.TextAlign == TextAlignUndefined) {
-		c->CheckedSelected.TextAlign = c->TextAlign;
-	}
-	if (c->CheckedClicked.TextAlign == TextAlignUndefined) {
-		c->CheckedClicked.TextAlign = c->TextAlign;
-	}
-	if (c->CheckedDisabled.TextAlign == TextAlignUndefined) {
-		c->CheckedDisabled.TextAlign = c->TextAlign;
 	}
 
 	return 0;
@@ -1664,7 +1464,6 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "DefineButton", CclDefineButton);
 
 	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
-	lua_register(Lua, "DefineCheckboxStyle", CclDefineCheckboxStyle);
 
 	lua_register(Lua, "PresentMap", CclPresentMap);
 	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);

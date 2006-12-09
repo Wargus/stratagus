@@ -54,8 +54,6 @@ static int EditorCancelled;
 ServerSetup ServerSetupState;
 ServerSetup LocalSetupState;
 
-char MenuMapFullPath[1024];              /// Selected map path+name
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
@@ -287,18 +285,6 @@ static void MultiGameCancel(void)
 }
 #endif
 
-#if 0
-/**
-**  Cancel button of multiplayer client menu pressed.
-*/
-static void MultiClientCancel(void)
-{
-	NetworkDetachFromServer();
-	FreeMapInfo(&Map.Info);
-	// GameCancel();
-}
-#endif
-
 /**
 ** Callback from netconnect loop in Client-Sync state:
 ** Compare local state with server's information
@@ -315,24 +301,6 @@ void NetClientCheckLocalState(void)
 		return;
 	}
 	/* ADD HERE */
-}
-
-/**
-** FIXME: docu
-*/
-int NetClientSelectScenario(void)
-{
-	FreeMapInfo(&Map.Info);
-	LoadStratagusMapInfo(MenuMapFullPath);
-	return 0;
-}
-
-/**
-** FIXME: docu
-*/
-void NetConnectForceDisplayUpdate(void)
-{
-//	MultiGamePlayerSelectorsUpdate(2);
 }
 
 #if 0
@@ -988,8 +956,6 @@ static void EditorSaveOk(void)
 */
 static void EditorSaveEnterAction(Menuitem *mi, int key)
 {
-	Assert(mi->MiType == MiTypeInput);
-
 	strncpy(ScenSelectFileName, mi->D.Input.buffer, mi->D.Input.nch);
 	ScenSelectFileName[mi->D.Input.nch] = '\0';
 	ScenSelectPathName[0] = '\0';
