@@ -304,7 +304,7 @@ UI.Minimap.H = 105
 
 UI.StatusLine.TextX = 38
 UI.StatusLine.TextY = Video.Height - 14
-UI.StatusLine.Width = Video.Width - 200 - 100
+UI.StatusLine.Width = Video.Width - 38
 UI.StatusLine.Font = Fonts["game"]
 
 UI.Timer.X = UI.MapArea.EndY - 70
