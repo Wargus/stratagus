@@ -1125,7 +1125,7 @@ void DrawCosts(void)
 		UI.Resources[GoldCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
 
 		VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, CostsMana);
-		x += 45;
+		x += 60;
 	}
 
 	for (int i = 1; i <= MaxCosts; ++i) {
@@ -1135,8 +1135,8 @@ void DrawCosts(void)
 					x, UI.StatusLine.TextY);
 			}
 			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont,Costs[i]);
-			x += 45;
-			if (x > Video.Width - 45) {
+			x += 60;
+			if (x > Video.Width - 60) {
 				break;
 			}
 		}
