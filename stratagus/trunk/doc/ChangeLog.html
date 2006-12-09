@@ -26,13 +26,22 @@
 
 <body>
 
-<h1>ChangeLog: Stratagus Version 2.2 Alpha</h1>
+<h1>ChangeLog: Stratagus Version 2.2</h1>
 <hr>
 
 
 <ul>
 <p><li>2.2 Released<p>
 	<ul>
+	<li>Fixed bug #1599216: dragging the mouse when a game ends 
+	    crashes in the results menu (from Jimmy Salmon)
+	<li>Added utf8 support in guichan text boxes (from Jimmy Salmon)
+	<li>Added paste support in guichan text boxes (from Jimmy Salmon and Nehal Mistry)
+	<li>Fixed bug #1607428: segfault in pathfinder (from Jimmy Salmon)
+	<li>ScrollingWidget waits till the bottom of the container scrolled by before callin
+g the callback. (from Francois Beerten)
+	<li>Make unused slots use an AI player by default. (from Francois Beerten)
+	<li>Fixed bug #1607858 "Player leaving a multiplayer game stays in the list". (from Fran&ccedil;ois Beerten)
 	<li>Optimised the pathfinder (from Fran&ccedil;ois Beerten and Jimmy Salmon)
 	<li>Redesigned the lua API for the User Interface (from Fran&ccedil;ois Beerten).
 	<li>Integrated the Guichan library (from Fran&ccedil;ois Beerten).
@@ -49,7 +58,7 @@
 	<li>Fixed bug #1202958: Value out of range (Bad slot usage) (from Joris Dauphin).
 	<li>Fixed bug #1215552: Crash with mirror editing (from Jimmy Salmon).
 	<li>Fixed bug #1206083: crash when destroying a non-complete building (from Jimmy Salmon).
-	<li>Conversion to the Stratagus Map format (from François Beerten).
+	<li>Conversion to the Stratagus Map format (from Franï¿½is Beerten).
 	<li>Added minimap animation for events (from Jimmy Salmon).
 	<li>Applied patch #1123499: Failed Save returns invalid path (from Andrzej Zaborowski).
 	<li>Fixed bug #1182181: Ability to control enemy units. (from Russell Smith).
@@ -164,7 +173,7 @@
     <li>Drawing mirror images for units and missiles facing left is optional (from Jimmy Salmon).
     <li>Moved cheat codes out of the engine and into ccl (from Jimmy Salmon).
     <li>Converted scripts to Lua (from Jimmy Salmon).
-    <li>Added Text strings support to Title Screen (from Carlos Perelló Marín).
+    <li>Added Text strings support to Title Screen (from Carlos Perellï¿½Marï¿½).
     <li>Splash Damage Configurable (from Russell Smith).
     <li>Fixed Bug #6924: missile cast near map border (from Russell Smith).
     <li>Rewrote video using SDL surfaces (from Nehal Mistry).
