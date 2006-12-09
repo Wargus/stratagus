@@ -632,7 +632,7 @@ static void DrawUnitInfo(CUnit *unit)
 		//
 		if (unit->Orders[0]->Action == UnitActionTrain) {
 			if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
-				if (UI.SingleTrainingText) {
+				if (!UI.SingleTrainingText.empty()) {
 					VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
 						UI.SingleTrainingFont, UI.SingleTrainingText);
 				}
@@ -645,7 +645,7 @@ static void DrawUnitInfo(CUnit *unit)
 						UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
 				}
 			} else {
-				if (UI.TrainingText) {
+				if (!UI.TrainingText.empty()) {
 					VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
 						UI.TrainingFont, UI.TrainingText);
 				}
