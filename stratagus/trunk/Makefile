@@ -163,7 +163,7 @@ MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  $(patsubst %, %/Module.make, $(MODULES_ALL)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
-mydate	= $(shell date +%y%m%d)
+mydate	?= $(shell date +%y%m%d)
 distdir	= stratagus-$(mydate)
 
 #why is this needed?
