@@ -3782,10 +3782,6 @@
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\opengl.h"
-					>
-				</File>
-				<File
 					RelativePath="src\guichan\include\guichan\platform.h"
 					>
 				</File>
@@ -3801,18 +3797,6 @@
 					RelativePath="src\guichan\include\guichan\x.h"
 					>
 				</File>
-				<Filter
-					Name="opengl."
-					>
-					<File
-						RelativePath="src\guichan\include\guichan\opengl\openglgraphics.h"
-						>
-					</File>
-					<File
-						RelativePath="src\guichan\include\guichan\opengl\openglimageloader.h"
-						>
-					</File>
-				</Filter>
 				<Filter
 					Name="sdl."
 					>
