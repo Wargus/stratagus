@@ -31,8 +31,7 @@
 
 
 -- Units
-DefineAllow("unit-engineer",                    "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-vault",                       "AAAAAAAAAAAAAAAA")
+AllowDefaultUnits()
 
 -- Map
 Load("maps/C1_M7_Bellegarde.sms")

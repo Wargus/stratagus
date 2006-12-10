@@ -33,8 +33,7 @@
 --SetAiType(1, "ai-rush")
 
 -- Units
-DefineAllow("unit-engineer",                    "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-vault",                       "AAAAAAAAAAAAAAAA")
+AllowDefaultUnits()
 
 -- Map
 Load("maps/C1_M3_Buffy_forrest.sms")
