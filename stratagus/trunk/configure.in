@@ -61,7 +61,12 @@ AC_CHECK_FUNCS(strnlen)
 
 AC_PATH_X
 if test "$no_x" != "yes"; then
-	CPPFLAGS="$CPPFLAGS -I$x_includes"
+	if test "x$x_includes" != "x"; then
+		CPPFLAGS="$CPPFLAGS -I$x_includes"
+	fi
+	if test "x$x_libraries" != "x"; then
+		LDFLAGS="$LDFLAGS -L$x_libraries"
+	fi
 	AC_DEFINE(HAVE_X, 1, Define to 1 if you have X. Used for pasting from the clipboard.)
 fi
 
@@ -111,12 +116,6 @@ AC_ARG_WITH(opengl,
 	[  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
 if test "$with_opengl" != "no"; then
 	CPPFLAGS="$CPPFLAGS -DUSE_OPENGL"
-
-	AC_PATH_X
-	if test "$no_x" != "yes"; then
-		CPPFLAGS="$CPPFLAGS -I$x_includes"
-		LDFLAGS="$LDFLAGS $X_LIBS -L$x_libraries"
-	fi
 
 	if test "$ARCH" = "win32"; then
 		AC_CHECK_LIB(opengl32, main, LDFLAGS="$LDFLAGS -lopengl32", AC_MSG_ERROR(opengl libraries cannot be not found))
