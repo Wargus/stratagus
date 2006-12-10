@@ -33,9 +33,7 @@
 
 #include <guichan.h>
 #include <guichan/gsdl.h>
-#ifdef USE_OPENGL
-#include <guichan/opengl.h>
-#endif
+
 typedef int lua_Object; // from tolua++.h
 
 extern bool GuichanActive;
