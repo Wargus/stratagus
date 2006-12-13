@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-09 18:54-0600\n"
+"POT-Creation-Date: 2006-12-12 21:22-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,234 +89,231 @@ msgstr ""
 msgid "Upgrade to %s complete"
 msgstr ""
 
-#: src/action/command.cpp:1315
+#: src/action/command.cpp:1319
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr ""
 
-#: src/action/command.cpp:1317
+#: src/action/command.cpp:1321
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr ""
 
-#: src/editor/editloop.cpp:1338
+#: src/editor/editloop.cpp:508 src/editor/editloop.cpp:592
+msgid "~!OK"
+msgstr ""
+
+#: src/editor/editloop.cpp:516 src/editor/editloop.cpp:600
+msgid "~!Cancel"
+msgstr ""
+
+#: src/editor/editloop.cpp:583
+msgid "Artificial Intelligence"
+msgstr ""
+
+#: src/editor/editloop.cpp:1376
 msgid "Unit can't be placed here."
 msgstr ""
 
-#: src/editor/editloop.cpp:1393
-msgid "Map saved"
-msgstr ""
-
-#: src/editor/editloop.cpp:1425
+#: src/editor/editloop.cpp:1448
 msgid "Mirror editing enabled: 2-side"
 msgstr ""
 
-#: src/editor/editloop.cpp:1428
+#: src/editor/editloop.cpp:1451
 msgid "Mirror editing enabled: 4-side"
 msgstr ""
 
-#: src/editor/editloop.cpp:1431
+#: src/editor/editloop.cpp:1454
 msgid "Mirror editing disabled"
 msgstr ""
 
-#: src/editor/editloop.cpp:1451
+#: src/editor/editloop.cpp:1474
 msgid "Unit deleted"
 msgstr ""
 
-#: src/editor/editloop.cpp:1478 src/editor/editloop.cpp:1487
+#: src/editor/editloop.cpp:1497 src/editor/editloop.cpp:1506
 msgid "Unit owner modified"
 msgstr ""
 
-#: src/editor/editloop.cpp:1816
+#: src/editor/editloop.cpp:1831
 msgid "Select mode"
 msgstr ""
 
-#: src/editor/editloop.cpp:1826
+#: src/editor/editloop.cpp:1841
 msgid "Unit mode"
 msgstr ""
 
-#: src/editor/editloop.cpp:1836
+#: src/editor/editloop.cpp:1852
 msgid "Tile mode"
 msgstr ""
 
-#: src/editor/editloop.cpp:1846
+#: src/editor/editloop.cpp:1863
 msgid "Set start location mode"
 msgstr ""
 
-#: src/network/commands.cpp:837
+#: src/network/commands.cpp:824
 msgid "No sync info for this replay !"
 msgstr ""
 
-#: src/network/commands.cpp:839
+#: src/network/commands.cpp:826
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr ""
 
-#: src/network/commands.cpp:848
+#: src/network/commands.cpp:835
 msgid "Replay got out of sync !"
 msgstr ""
 
-#: src/network/commands.cpp:959 src/network/commands.cpp:974
+#: src/network/commands.cpp:946 src/network/commands.cpp:961
 msgid "End of replay"
 msgstr ""
 
-#: src/network/network.cpp:963
+#: src/network/network.cpp:928
 #, c-format
-msgid "%s Sent Bad Command"
+msgid "%s sent bad command"
 msgstr ""
 
-#: src/network/network.cpp:1060
+#: src/network/network.cpp:1022
 msgid "Network out of sync"
 msgstr ""
 
-#: src/network/network.cpp:1297
+#: src/network/network.cpp:1256
 #, c-format
 msgid "Waiting for player \"%s\": %d:%02d"
 msgstr ""
 
-#: src/network/network.cpp:1313
+#: src/network/network.cpp:1272
 msgid "Timed out"
 msgstr ""
 
-#: src/stratagus/mainloop.cpp:448
+#: src/stratagus/player.cpp:553
+msgid "Building Limit Reached"
+msgstr ""
+
+#: src/stratagus/player.cpp:557
+msgid "Unit Limit Reached"
+msgstr ""
+
+#: src/stratagus/player.cpp:561
+msgid "Insufficient Supply, increase Supply."
+msgstr ""
+
+#: src/stratagus/player.cpp:565
+msgid "Total Unit Limit Reached"
+msgstr ""
+
+#: src/stratagus/player.cpp:569
 #, c-format
-msgid "You have lost!\n"
+msgid "Limit of %d reached for this unit type"
 msgstr ""
 
-#: src/stratagus/mainloop.cpp:449
-msgid "You have lost!"
+#: src/stratagus/player.cpp:575
+msgid "Cannot create more units."
 msgstr ""
 
-#: src/stratagus/mainloop.cpp:452
-#, c-format
-msgid "You have won!\n"
-msgstr ""
-
-#: src/stratagus/mainloop.cpp:453
-msgid "You have won!"
-msgstr ""
-
-#: src/stratagus/stratagus.cpp:575 src/stratagus/stratagus.cpp:664
+#: src/stratagus/stratagus.cpp:548 src/stratagus/stratagus.cpp:681
 msgid "Do it! Do it now!"
 msgstr ""
 
-#: src/stratagus/stratagus.cpp:819
+#: src/stratagus/stratagus.cpp:812
 #, c-format
 msgid "Thanks for playing Stratagus.\n"
 msgstr ""
 
-#: src/ui/botpanel.cpp:740 src/ui/botpanel.cpp:805
+#: src/ui/botpanel.cpp:724 src/ui/botpanel.cpp:789
 msgid "Select Target"
 msgstr ""
 
-#: src/ui/botpanel.cpp:868
+#: src/ui/botpanel.cpp:852
 msgid "Select Location"
 msgstr ""
 
-#: src/ui/botpanel.cpp:887
+#: src/ui/botpanel.cpp:871
 msgid "Unit training queue is full"
 msgstr ""
 
-#: src/ui/interface.cpp:94
+#: src/ui/interface.cpp:95
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr ""
 
-#: src/ui/interface.cpp:244
+#: src/ui/interface.cpp:247
 msgid "Sound is on."
 msgstr ""
 
-#: src/ui/interface.cpp:246
+#: src/ui/interface.cpp:249
 msgid "Sound is off."
 msgstr ""
 
-#: src/ui/interface.cpp:259
+#: src/ui/interface.cpp:264
 msgid "Music is off."
 msgstr ""
 
-#: src/ui/interface.cpp:262
+#: src/ui/interface.cpp:267
 msgid "Music is on."
 msgstr ""
 
-#: src/ui/interface.cpp:274 src/ui/interface.cpp:288 src/ui/interface.cpp:300
-#: src/ui/interface.cpp:312 src/ui/interface.cpp:324 src/ui/interface.cpp:336
-#: src/ui/interface.cpp:348 src/ui/interface.cpp:365 src/ui/interface.cpp:382
-#: src/ui/interface.cpp:394 src/ui/interface.cpp:406 src/ui/interface.cpp:418
-#: src/ui/mouse.cpp:1779
+#: src/ui/interface.cpp:280 src/ui/mouse.cpp:1736
 msgid "Game Paused"
 msgstr ""
 
-#: src/ui/interface.cpp:276
+#: src/ui/interface.cpp:282
 msgid "Game Resumed"
 msgstr ""
 
-#: src/ui/interface.cpp:449
+#: src/ui/interface.cpp:313
 msgid "Big map enabled"
 msgstr ""
 
-#: src/ui/interface.cpp:458
+#: src/ui/interface.cpp:322
 msgid "Returning to old map"
 msgstr ""
 
-#: src/ui/interface.cpp:469
+#: src/ui/interface.cpp:333
 msgid "Faster"
 msgstr ""
 
-#: src/ui/interface.cpp:485
+#: src/ui/interface.cpp:349
 msgid "Slower"
 msgstr ""
 
-#: src/ui/interface.cpp:540
+#: src/ui/interface.cpp:404
 msgid "Terrain displayed."
 msgstr ""
 
-#: src/ui/interface.cpp:542
+#: src/ui/interface.cpp:406
 msgid "Terrain hidden."
 msgstr ""
 
-#: src/ui/interface.cpp:575
+#: src/ui/interface.cpp:439
 msgid "Grab mouse toggled."
 msgstr ""
 
-#: src/ui/interface.cpp:1090
+#: src/ui/interface.cpp:914
 msgid "Screenshot made."
 msgstr ""
 
-#: src/ui/mainscr.cpp:772
-msgid "Production"
-msgstr ""
-
-#: src/ui/mainscr.cpp:1046
+#: src/ui/mainscr.cpp:971
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr ""
 
-#: src/ui/mainscr.cpp:1120
+#: src/ui/mainscr.cpp:1047
 #, c-format
 msgid "~<Event: %s~>"
 msgstr ""
 
-#: src/ui/menus.cpp:1398 src/ui/menus.cpp:1541
-#, c-format
-msgid "Saved game to: %s"
-msgstr ""
-
-#: src/ui/menus.cpp:1485
-#, c-format
-msgid "Loaded game: %s"
-msgstr ""
-
-#: src/ui/mouse.cpp:1937
+#: src/ui/mouse.cpp:1904
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr ""
 
-#: src/ui/mouse.cpp:1941
+#: src/ui/mouse.cpp:1908
 #, c-format
 msgid "You have ~<%d~> %s(s)"
 msgstr ""
 
-#: src/unit/unit.cpp:2972
+#: src/unit/unit.cpp:2990
 #, c-format
 msgid "%s attacked"
 msgstr ""
