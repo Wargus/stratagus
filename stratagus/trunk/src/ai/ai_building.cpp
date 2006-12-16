@@ -239,7 +239,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 					return 1;
 				}
 
-				if (CanMoveToMask(x, y, mask)) { // reachable
+				if (CheckedCanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
 					points[wp].X = x; // push the point
 					points[wp].Y = y;
