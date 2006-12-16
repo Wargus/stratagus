@@ -202,9 +202,9 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	points[0].Y = y;
 	// also use the bottom right
 	if (type->TileWidth > 1 && x + type->TileWidth - 1 < Map.Info.MapWidth &&
-		y + type->TileHeight - 1 < Map.Info.MapHeight) {
+			y + type->TileHeight - 1 < Map.Info.MapHeight) {
 		points[1].X = x + type->TileWidth - 1;
-		points[1].Y = y + type->TileWidth - 1;
+		points[1].Y = y + type->TileHeight - 1;
 		ep = wp = 2; // start with two points
 	} else {
 		ep = wp = 1; // start with one point
@@ -239,7 +239,7 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 					return 1;
 				}
 
-				if (CheckedCanMoveToMask(x, y, mask)) { // reachable
+				if (CanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
 					points[wp].X = x; // push the point
 					points[wp].Y = y;
