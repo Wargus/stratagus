@@ -519,7 +519,7 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 		dtype = dest->Type;
 
 		// put in x-y the real point which will be hit...
-		// (only meaningfull when dtype->TileWidth > 1)
+		// (only meaningful when dtype->TileWidth > 1)
 		if (u->X < dest->X) {
 			x = dest->X;
 		} else if (u->X > dest->X + dtype->TileWidth - 1) {
@@ -530,8 +530,8 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 
 		if (u->Y < dest->Y) {
 			y = dest->Y;
-		} else if (u->Y > dest->Y + dtype->TileWidth - 1) {
-			y = dest->Y + dtype->TileWidth - 1;
+		} else if (u->Y > dest->Y + dtype->TileHeight - 1) {
+			y = dest->Y + dtype->TileHeight - 1;
 		} else {
 			y = u->Y;
 		}
