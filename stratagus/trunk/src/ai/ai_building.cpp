@@ -201,7 +201,8 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	points[0].X = x;
 	points[0].Y = y;
 	// also use the bottom right
-	if (type->TileWidth > 1 && x + type->TileWidth - 1 < Map.Info.MapWidth &&
+	if ((type->TileWidth > 1 || type->TileHeight > 1) &&
+			x + type->TileWidth - 1 < Map.Info.MapWidth &&
 			y + type->TileHeight - 1 < Map.Info.MapHeight) {
 		points[1].X = x + type->TileWidth - 1;
 		points[1].Y = y + type->TileHeight - 1;
