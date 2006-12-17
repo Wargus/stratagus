@@ -21,7 +21,7 @@ How to install
 Unpack the game data in a games directory:
 > tar -xzvf Invasion-bos.tgz
 
-You also need to get version 2.2 of the Stratagus engine available at
+You also need to get version 2.2.1 of the Stratagus engine available at
 http://www.stratagus.org.
 
 
