@@ -1,0 +1,540 @@
+$using std::string;
+$using std::vector;
+
+$using namespace gcn;
+
+
+class LuaActionListener
+{
+	LuaActionListener(lua_State *lua, lua_Object luaref);
+};
+
+class CUIButton
+{
+	CUIButton();
+
+	int X;
+	int Y;
+	string Text;
+	ButtonStyle *Style;
+	LuaActionListener *Callback;
+};
+
+$[
+CUIButton.SetCallback = function(w, f)
+  w.Callback = LuaActionListener:new(f)
+end
+$]
+
+class CMapArea
+{
+	int X;
+	int Y;
+	int EndX;
+	int EndY;
+	int ScrollPaddingLeft;
+	int ScrollPaddingRight;
+	int ScrollPaddingTop;
+	int ScrollPaddingBottom;
+};
+
+class CFiller
+{
+	CFiller();
+	
+	CGraphic *G;
+	int X;
+	int Y;
+};
+
+class vector
+{
+	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, string)
+
+	void clear();
+	int size() const;
+
+	const T& operator[](int index) const;
+	T& operator[](int index);
+	void push_back(T val);
+
+	vector();
+	~vector();
+};
+
+
+class CButtonPanel
+{
+	int X;
+	int Y;
+	vector<CUIButton> Buttons;
+	CColor AutoCastBorderColorRGB;
+	bool ShowCommandKey;
+};
+
+class CPieMenu
+{
+	CGraphic *G;
+	int MouseButton;
+	int X[8];
+	int Y[8];
+	
+	void SetRadius(int radius);
+};
+
+class CResourceInfo
+{
+	CGraphic *G;
+	int IconFrame;
+	int IconX;
+	int IconY;
+	int TextX;
+	int TextY;
+};
+
+class CInfoPanel
+{
+	int X;
+	int Y;
+};
+
+class CStatusLine
+{
+	void Set(const std::string status);
+	const std::string &Get();
+	void Clear();
+
+	int Width;
+	int TextX;
+	int TextY;
+	CFont *Font;
+};
+
+class CUITimer
+{
+	int X;
+	int Y;
+	CFont *Font;
+};
+
+class CUserInterface
+{
+	string NormalFontColor;
+	string ReverseFontColor;
+	
+	vector<CFiller> Fillers;
+
+	CResourceInfo Resources[MaxResourceInfo];
+	CInfoPanel InfoPanel;
+	CUIButton *SingleSelectedButton;
+
+	vector<CUIButton> SelectedButtons;
+	CFont *MaxSelectedFont;
+	int MaxSelectedTextX;
+	int MaxSelectedTextY;
+
+	CUIButton *SingleTrainingButton;
+	vector<CUIButton> TrainingButtons;
+	CUIButton *UpgradingButton;
+	CUIButton *ResearchingButton;
+	vector<CUIButton> TransportingButtons;
+
+	CColor CompletedBarColorRGB;
+	bool CompletedBarShadow;
+
+	CButtonPanel ButtonPanel;
+	
+	CPieMenu PieMenu;
+
+	CMapArea MapArea;
+
+	CUIButton MenuButton;
+	CUIButton NetworkMenuButton;
+	CUIButton NetworkDiplomacyButton;
+
+	CMinimap Minimap;
+	CStatusLine StatusLine;
+	CUITimer Timer;
+};
+
+extern CUserInterface UI;
+
+class CIcon
+{
+	static CIcon *New(const std::string ident);
+	static CIcon *Get(const std::string ident);
+
+	tolua_readonly tolua_property__s std::string Ident;
+	CGraphic *G;
+	int Frame;
+};
+
+extern ButtonStyle *FindButtonStyle(const std::string style);
+
+extern bool GetMouseScroll(void);
+extern void SetMouseScroll(bool enabled);
+extern bool GetKeyScroll(void);
+extern void SetKeyScroll(bool enabled);
+extern bool GetGrabMouse(void);
+extern void SetGrabMouse(bool enabled);
+extern bool GetLeaveStops(void);
+extern void SetLeaveStops(bool enabled);
+extern int GetDoubleClickDelay(void);
+extern void SetDoubleClickDelay(int delay);
+extern int GetHoldClickDelay(void);
+extern void SetHoldClickDelay(int delay);
+
+
+//
+//  Guichan
+//
+
+class Color
+{
+	Color(int r, int g, int b, int a = 255);
+	int r;
+	int g;
+	int b;
+	int a;
+};
+
+class Graphics
+{
+	enum {
+		LEFT = 0,
+		CENTER,
+		RIGHT
+	};
+};
+
+class Widget 
+{
+	virtual void setWidth(int width);
+	virtual int getWidth() const;
+	virtual void setHeight(int height);
+	virtual int getHeight() const;
+	virtual void setSize(int width, int height);
+	virtual void setX(int x);
+	virtual int getX() const;
+	virtual void setY(int y);
+	virtual int getY() const;
+	virtual void setPosition(int x, int y);
+	virtual void setEnabled(bool enabled);
+	virtual bool isEnabled() const;
+	virtual void setVisible(bool visible);
+	virtual bool isVisible() const;
+
+	virtual void setBaseColor(const Color color);
+	virtual const Color &getBaseColor() const;
+	virtual void setForegroundColor(const Color color);
+	virtual const Color &getForegroundColor() const;
+	virtual void setBackgroundColor(const Color color);
+	virtual const Color &getBackgroundColor() const;
+
+	static void setGlobalFont(CFont *font);
+	virtual void setForegroundColor(const Color color);
+	virtual void setBackgroundColor(const Color color);
+	virtual void setBaseColor(const Color color);
+	virtual void setSize(int width, int height);
+	virtual void setBorderSize(int width);
+	virtual void setFont(CFont *font);
+
+	virtual int getHotKey() const;
+	virtual void setHotKey(const int key);
+	virtual void setHotKey(const char *key);
+
+	virtual void addActionListener(LuaActionListener *actionListener);
+};
+
+$[
+Widget.setActionCallback = function(w, f)
+  w._actioncb = LuaActionListener(f)
+  w:addActionListener(w._actioncb)
+end
+$]
+
+class BasicContainer : public Widget
+{
+};
+
+class ScrollArea : public BasicContainer
+{
+	ScrollArea();
+	virtual void setContent(Widget *widget);
+	virtual Widget *getContent();
+	virtual void setScrollbarWidth(int width);
+	virtual int getScrollbarWidth();
+};
+
+class ImageWidget : public Widget
+{
+	ImageWidget(CGraphic *image);
+};
+
+class Button : public Widget
+{
+};
+
+class ButtonWidget : public Button
+{
+	ButtonWidget(const std::string caption);
+	virtual void setCaption(const std::string caption);
+	virtual const std::string &getCaption() const;
+	virtual void adjustSize();
+};
+
+class ImageButton : public Button
+{
+	ImageButton();
+	ImageButton(const std::string caption);
+
+	void setNormalImage(CGraphic *image);
+	void setPressedImage(CGraphic *image);
+	void setDisabledImage(CGraphic *image);
+};
+
+class RadioButton : public Widget
+{
+	RadioButton();
+	RadioButton(const std::string caption, const std::string group, bool marked = false);
+
+	virtual bool isMarked();
+	virtual void setMarked(bool marked);
+	virtual const std::string &getCaption() const;
+	virtual void setCaption(const std::string caption);
+	virtual void setGroup(const std::string group);
+	virtual const std::string &getGroup() const;
+	virtual void adjustSize();
+};
+
+class ImageRadioButton : public RadioButton
+{
+	ImageRadioButton();
+	ImageRadioButton(const std::string caption, const std::string group, bool marked = false);
+
+	void setUncheckedNormalImage(CGraphic *image);
+	void setUncheckedPressedImage(CGraphic *image);
+	void setCheckedNormalImage(CGraphic *image);
+	void setCheckedPressedImage(CGraphic *image);
+};
+
+class CheckBox : public Widget
+{
+	CheckBox();
+	CheckBox(const std::string caption, bool marked = false);
+
+	virtual bool isMarked() const;
+	virtual void setMarked(bool marked);
+	virtual const std::string &getCaption() const;
+	virtual void setCaption(const std::string caption);
+	virtual void adjustSize();
+};
+
+class ImageCheckBox : public CheckBox
+{
+	ImageCheckBox();
+	ImageCheckBox(const std::string caption, bool marked = false);
+
+	void setUncheckedNormalImage(CGraphic *image);
+	void setUncheckedPressedImage(CGraphic *image);
+	void setCheckedNormalImage(CGraphic *image);
+	void setCheckedPressedImage(CGraphic *image);
+};
+
+class Slider : public Widget
+{
+	Slider(double scaleEnd = 1.0);
+	Slider(double scaleStart, double scaleEnd);
+	virtual void setScale(double scaleStart, double scaleEnd);
+	virtual double getScaleStart() const;
+	virtual void setScaleStart(double scaleStart);
+	virtual double getScaleEnd() const;
+	virtual void setScaleEnd(double scaleEnd);
+	virtual double getValue();
+	virtual void setValue(double value);
+	virtual void setMarkerLength(int length);
+	virtual int getMarkerLength() const;
+	virtual void setOrientation(unsigned int orientation);
+	virtual unsigned int getOrientation() const;
+	virtual void setStepLength(double length);
+	virtual double getStepLength() const;
+
+	enum { HORIZONTAL = 0, VERTICAL };
+};
+
+class ImageSlider : public Slider
+{
+	ImageSlider(double scaleEnd = 1.0);
+	ImageSlider(double scaleStart, double scaleEnd);
+	void setMarkerImage(CGraphic *image);
+	void setBackgroundImage(CGraphic *image);
+};
+
+class Label : public Widget
+{
+	Label(const std::string caption);
+	const std::string &getCaption() const;
+	void setCaption(const std::string caption);
+	virtual void setAlignment(unsigned int alignment);
+	virtual unsigned int getAlignment();
+	virtual void adjustSize();
+};
+
+class MultiLineLabel : public Widget
+{
+	MultiLineLabel();
+	MultiLineLabel(const std::string caption);
+
+	virtual void setCaption(const std::string caption);
+	virtual const std::string &getCaption() const;
+	virtual void setAlignment(unsigned int alignment);
+	virtual unsigned int getAlignment();
+	virtual void setVerticalAlignment(unsigned int alignment);
+	virtual unsigned int getVerticalAlignment();
+	virtual void setLineWidth(int width);
+	virtual int getLineWidth();
+	virtual void adjustSize();
+	virtual void draw(gcn::Graphics *graphics);
+
+	enum {
+		LEFT = 0,
+		CENTER,
+		RIGHT,
+		TOP,
+		BOTTOM
+	};
+};
+
+// FIXME Combine with ScrollArea in our own widget
+//class TextBox : public Widget
+//{
+//	TextBox(const std::string text);
+//};
+
+class TextField : public Widget
+{
+	TextField(const std::string text);
+	virtual void setText(const std::string text);
+	virtual std::string &getText();
+};
+
+class ListBox : public Widget
+{
+};
+
+class ListBoxWidget : public ScrollArea
+{
+	ListBoxWidget(unsigned int width, unsigned int height);
+	void setList(lua_State *lua, lua_Object *lo);
+	void setSelected (int selected);
+	int getSelected();
+};
+
+class Window : public BasicContainer
+{
+	Window();
+	Window(const std::string caption);
+	Window(Widget *content, const std::string caption = "");
+	
+	virtual void setCaption(const std::string caption);
+	virtual const std::string &getCaption() const;
+	virtual void setAlignment(unsigned int alignment);
+	virtual unsigned int getAlignment() const;
+	virtual void setContent(Widget* widget);
+	virtual Widget* getContent() const;
+	virtual void setPadding(unsigned int padding);
+	virtual unsigned int getPadding() const;
+	virtual void setTitleBarHeight(unsigned int height);
+	virtual unsigned int getTitleBarHeight();
+	virtual void setMovable(bool movable);
+	virtual bool isMovable() const;
+	virtual void resizeToContent();
+	virtual void setOpaque(bool opaque);
+	virtual bool isOpaque();
+};
+
+class Windows : public Window
+{
+	Windows(const std::string text, int width, int height);
+	void add(Widget *widget, int x, int y);
+};
+
+class ScrollingWidget : public ScrollArea
+{
+	ScrollingWidget(int width, int height);
+	void add(Widget *widget, int x, int y);
+	void restart();
+	void setSpeed(float speed);
+	float getSpeed();
+};
+
+class DropDown : public BasicContainer
+{
+	virtual int getSelected();
+	virtual void setSelected(int selected);
+	virtual void setScrollArea(ScrollArea* scrollArea);
+	virtual ScrollArea *getScrollArea();
+	virtual void setListBox(ListBox* listBox);
+	virtual ListBox *getListBox();
+};
+
+class DropDownWidget : public DropDown
+{
+	DropDownWidget();
+	void setList(lua_State *lua, lua_Object *lo);
+	virtual ListBox *getListBox();
+	virtual void setSize(int width, int height);
+};
+
+class StatBoxWidget : public Widget
+{
+	StatBoxWidget(int width, int height);
+
+	void setCaption(const std::string s);
+	const std::string &getCaption() const;
+	void setPercent(const int percent);
+	int getPercent() const;
+};
+
+class Container : public BasicContainer
+{
+	Container();
+	virtual void setOpaque(bool opaque);
+	virtual bool isOpaque() const;
+	virtual void add(Widget *widget, int x, int y);
+	virtual void remove(Widget *widget);
+	virtual void clear();
+};
+
+class MenuScreen : public Container
+{
+	MenuScreen();
+
+	int run(bool loop = true);
+	void stop(int result = 0);
+	void stopAll(int result = 0);
+	void addLogicCallback(LuaActionListener *actionListener);
+	void setDrawMenusUnder(bool drawunder);
+	bool getDrawMenusUnder();
+};
+$renaming MenuScreen @ CMenuScreen
+
+$[
+function MenuScreen()
+  local menu = CMenuScreen()
+
+  -- Store the widget in the container. This way we keep a reference
+  -- to the widget until the container gets deleted.
+  local guichanadd = Container.add
+  function menu:add(widget, x, y)
+    if not self._addedWidgets then
+       self._addedWidgets = {}
+    end
+    self._addedWidgets[widget] = true
+    guichanadd(self, widget, x, y)
+  end
+
+  return menu
+end
+$]
+
