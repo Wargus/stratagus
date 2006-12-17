@@ -1,0 +1,78 @@
+--            ____            
+--           / __ )____  _____
+--          / __  / __ \/ ___/
+--         / /_/ / /_/ (__  ) 
+--        /_____/\____/____/  
+--
+--  Invasion - Battle of Survival                  
+--   A GPL'd futuristic RTS game
+--
+--  level03.sms  -  Tutorial map 3.
+--
+--  (c) Copyright 2006 by Francois Berteen
+--
+--      This program is free software; you can redistribute it and/or modify
+--      it under the terms of the GNU General Public License as published by
+--      the Free Software Foundation; either version 2 of the License, or
+--      (at your option) any later version.
+--  
+--      This program is distributed in the hope that it will be useful,
+--      but WITHOUT ANY WARRANTY; without even the implied warranty of
+--      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--      GNU General Public License for more details.
+--  
+--      You should have received a copy of the GNU General Public License
+--      along with this program; if not, write to the Free Software
+--      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+--
+--=============================================================================
+--  Define level 03 Map Presentation
+--
+
+Load("maps/tutorial/setup.sms")
+
+CreateUnit("unit-buggy", 0, {23, 44})
+CreateUnit("unit-engineer", 0, {25, 44})
+CreateUnit("unit-engineer", 0, {21, 38})
+CreateUnit("unit-engineer", 0, {21, 39})
+
+DisallowAllUnits()
+DefineAllow("unit-engineer", "AAAAAAAAAAAA")
+DefineAllow("unit-gen", "AAAAAAAAAAAA")
+
+AddTrigger(
+    function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
+    function() return StopGame(GameDefeat) end)
+
+AddTrigger(
+    function() 
+       local t = GetPlayerData(GetThisPlayer(), "Resources", "titanium")
+       local c = GetPlayerData(GetThisPlayer(), "Resources", "crystal")
+       return (t > 1099 and c > 2199) end,
+    function() return StopGame(GameVictory) end)
+  
+AddCampaignMessage(1,  
+  "To Harvest Titanium or Crystal, first select your engineer. Then, "..
+  "start harvesting, either by right-clicking on the Titanium Spike, "..
+  "or by selecting the pick-axe from the menu on the right and then "..
+  "left-clicking on the target, or by typing 'h', and then left-clicking."
+)
+
+AddCampaignMessage(1000,
+  "Commander LL says:  Get out there and start harvesting! Now, dammit!"
+)
+
+AddCampaignMessage(2000,
+  "Commander LL says:  Didn't you hear me, boy? I said, "..
+  "get your lazy bones out of bed! Now MOVE!"
+)
+
+AddCampaignMessage(3000,
+  "Commander LL says:  You poor excuse for a maggot! Why, I bet the best "..
+  "part of you ended up as a brown stain on the mattress!"
+)
+
+AddCampaignFinalAssault(4000,
+  "Commander LL says:  Okay, you're in a world of shit, now, mister."
+)
+

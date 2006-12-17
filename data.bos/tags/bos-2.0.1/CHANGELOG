@@ -1,0 +1,80 @@
+Change log for Invasion - Battle of Survival
+--------------------------------------------
+Version 2.0.1 (2006 12 17):
+- Updated french and "english" stratagus translations (Francois Beerten)
+- Fix allowed units in the elites campaign (Francois Beerten)
+
+Version 2.0 (2006 12 9):
+- Improved exit buttons and menu layout (Encolpe Degoute, Francois Beerten)
+- Updated french and german translations (Encolpe Degoute, Frank Loeffler)
+- Engineers cannot repair aircraft (Francois Beerten)
+- Speed up player leaving in multiplayer games (Francois Beerten)
+- Fixed bug #18333: Can't scroll to north-east using mouse cursor (Francois Beerten)
+- Added a tutorial campaign (Francois Beerten)
+- Added "help" messages in the tutorial (Francois Beerten and Rob Dawson)
+- Many bug fixes
+
+Version 2.0 Alpha (2006 11 2):
+- New map WetLands01 (Lois Taulelle)
+- Added new voices for new units (Lois Taulelle)
+- New Tutorial Base Map (Francois Beerten)
+- New Briefing screens (Francois Beerten)
+- New in-game menus (Jimmy Salmon, Francois Beerten)
+- Added translations (various authors)
+- New Victory and Defeat screens (TimberDragon, Francois Beerten)
+- New Multiplayer menus (Francois Beerten)
+- New background images (TimberDragon, p0ng)
+- Added completly new guichan based menus (Francois Beerten, Jimmy Salmon)
+- Added New Button Format (TimberDragon)
+- Added Nuclear Power Plant (TimberDragon, p0ng)
+- Added new building corpses (TimberDragon)
+- New graphics for the power generator unit (p0ng, TimberDragon)
+- New graphics for the dev yard (TimberDragon)
+- Add Jet and Bomber units (TimberDragon, Francois Beerten)
+- Add Cannon unit (TimberDragon, Francois Beerten)
+- Add Chopper unit (TimberDragon, Francois Beerten)
+- Add Antharus unit (Francois Beerten)
+- New Vehicle factory graphics (p0ng, TimberDragon)
+- New Vault graphics (p0ng, TimberDragon)
+- New Bridge map (TimberDragon, Francois Beerten)
+- New Missile Silo graphics (p0ng, TimberDragon)
+- New Research Factory graphics (p0ng, TimberDragon)
+- Added extra trees (TimberDragon, Francois Beerten)
+- Add sounds for Gun Turret unit (Lois Taulelle)
+- New Gun Turret graphics (Lois Taulelle, Francois Beerten, TimberDragon)
+- New hospital graphics (p0ng, TimberDragon)
+- Added Island map with roads and of course water (TimberDragon, Francois Beerten)
+- Added River image-based map. (TimberDragon, Francois Beerten)
+- Added Battlefield image-based map. (Francois Beerten)
+- Added a helper function for image-based maps. (Francois Beerten)
+- New units directory with automatic loading of the units. (Francois Beerten)
+- Added new map Antarticum. (Francois Beerten)
+- List all available campaigns in the campaigns directory automatically. (Francois Beerten)
+- Added the elites campaign. (Lois Taulelle)
+- Improved the graphical look of the in-game interface. (Francois Beerten)
+- Moved init and exit functions from DefineMenuItem 
+  to DefineMenu. (Francois Beerten)
+- Use GetNumOpponents instead of IfOpponents. (Francois Beerten)
+- Removed attack sound entry in unit definitions. (Francois Beerten)
+- Conversion of all animations to the new format. (Lois Taulelle)
+- Added artil unit. (TimberDragon, Lois Taulelle, Francois Beerten)
+- Added rocket tank unit. (TimberDragon, Lois Taulelle, Francois Beerten)
+- Added tank unit. (TimberDragon, Lois Taulelle, Francois Beerten)
+- Added sounds for the camera and radar unit. (micahf)
+- Replaced assault attack sound with a bearable one. (micahf)
+- Added tree unit. (TimberDragon, Francois Beerten)
+- Playlist created dynamically with music files found in 
+  the music subdirectory. (Francois Beerten)
+- Added radar unit. (Francois Beerten)
+- Added camera unit. (Frank Loeffler)
+- Make ingame text fit nicely in panels. (Francois Beerten)
+- Updated scripts to use DefineButtonStyle as required by newer 
+  Stratagus engine. (Jimmy Salmon, Francois Beerten)
+- Fixed maximum width for chat on the status line. (Francois Beerten)
+- Made the sound of the attacking assault unit weaker. 
+  The sound is bearable now. (Francois Beerten)
+- Fixed bug #8880 where an APC could load another APC. (Francois Beerten)
+
+For changes up to version 1.1 see the CVS repository 
+at https://savannah.nongnu.org/cvs/?group=stratagus-bos.
+

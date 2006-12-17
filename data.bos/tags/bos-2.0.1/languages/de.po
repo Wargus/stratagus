@@ -1,0 +1,349 @@
+# translation of de.po to
+# This file is distributed under the same license as the PACKAGE package.
+# Dirk, 2006.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Dirk, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: de\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-05-02 15:45+0100\n"
+"PO-Revision-Date: 2006-05-05 18:31+0200\n"
+"Last-Translator: Dirk\n"
+"Language-Team:  <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMAN\n"
+"X-Generator: KBabel 1.10.2\n"
+
+#: src/action/action_build.cpp:119
+msgid "You cannot reach building place"
+msgstr "Bauplatz nicht erreichbar"
+
+#: src/action/action_build.cpp:177
+#, c-format
+msgid "You cannot build %s here"
+msgstr "Sie können %s hier nicht bauen"
+
+#: src/action/action_build.cpp:197
+#, c-format
+msgid "Not enough resources to build %s"
+msgstr "Nicht genügend Ressourcen um %s zu bauen"
+
+#: src/action/action_build.cpp:215
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Kann nicht mehr Einheiten %s bauen"
+
+#: src/action/action_build.cpp:255
+#, c-format
+#, fuzzy
+msgid "Unable to create building %s"
+msgstr "Nicht in der Lage, Gebäude zu errichten %s"
+
+#: src/action/action_build.cpp:515
+#, c-format
+msgid "New %s done"
+msgstr "Bauen von %s abgeschlossen"
+
+#: src/action/action_repair.cpp:84
+#, c-format
+msgid "We need more %s for repair!"
+msgstr "Wir benötigen zum Reparieren mehr %s"
+
+#: src/action/action_research.cpp:103
+#, c-format
+msgid "%s: complete"
+msgstr "%s: fertiggestellt"
+
+#: src/action/action_returngoods.cpp:68
+msgid "No Resources to Return."
+msgstr "Keine Ressourcen zum zurückbringen."
+
+#: src/action/action_spellcast.cpp:181
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: Nicht genügend Mana für Spell: %s"
+
+#: src/action/action_spellcast.cpp:185
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: Kann Spell nicht casten: %s"
+
+#: src/action/action_train.cpp:170
+#, c-format
+#, fuzzy
+msgid "New %s ready"
+msgstr "%s einsatzbereit"
+
+#: src/action/action_train.cpp:217
+#, c-format
+#, fuzzy
+msgid "Unable to train %s"
+msgstr "Nicht in der Lage, %s auszubilden"
+
+#: src/action/action_upgradeto.cpp:199
+#, c-format
+msgid "Upgrade to %s canceled"
+msgstr "Upgrade zu %s abgebrochen"
+
+#: src/action/action_upgradeto.cpp:207
+#, c-format
+msgid "Upgrade to %s complete"
+msgstr "Upgrade zu %s fertiggestellt"
+
+#: src/action/command.cpp:1315
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Spieler \"%s\" hat das Spiel verlassen"
+
+#: src/action/command.cpp:1317
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Spieler \"%s\" wurde getötet"
+
+#: src/editor/editloop.cpp:1338
+msgid "Unit can't be placed here."
+msgstr "Einheit kann hier nicht platziert werden."
+
+#: src/editor/editloop.cpp:1393
+msgid "Map saved"
+msgstr "Karte gespeichert"
+
+#: src/editor/editloop.cpp:1425
+#, fuzzy
+msgid "Mirror editing enabled: 2-side"
+msgstr "Spiegel-Editieren aktiviert: 2-seitig"
+
+#: src/editor/editloop.cpp:1428
+#, fuzzy
+msgid "Mirror editing enabled: 4-side"
+msgstr "Spiegel-Editieren aktiviert: 4-seitig"
+
+#: src/editor/editloop.cpp:1431
+#, fuzzy
+msgid "Mirror editing disabled"
+msgstr "Spiegel-Editieren deaktiviert"
+
+#: src/editor/editloop.cpp:1451
+msgid "Unit deleted"
+msgstr "Einheit gelöscht"
+
+#: src/editor/editloop.cpp:1478
+#: src/editor/editloop.cpp:1487
+msgid "Unit owner modified"
+msgstr "Einheitenbesitzer geändert"
+
+#: src/editor/editloop.cpp:1816
+msgid "Select mode"
+msgstr "Modus auswählen"
+
+#: src/editor/editloop.cpp:1826
+msgid "Unit mode"
+msgstr "Einheiten-Modus"
+
+#: src/editor/editloop.cpp:1836
+msgid "Tile mode"
+msgstr "Tile-Modus"
+
+#: src/editor/editloop.cpp:1846
+msgid "Set start location mode"
+msgstr "Startpunkt-Setzen-Modus"
+
+#: src/network/commands.cpp:837
+#, fuzzy
+msgid "No sync info for this replay !"
+msgstr "Keine Synchronisationsdaten für diese Aufnahme gefunden"
+
+#: src/network/commands.cpp:839
+#, c-format
+#, fuzzy
+msgid "Replay got out of sync (%lu) !"
+msgstr "Aufnahme hat Synchronisation verloren (%lu) !"
+
+#: src/network/commands.cpp:848
+#, fuzzy
+msgid "Replay got out of sync !"
+msgstr "Aufnahme hat Synchronisation verloren !"
+
+#: src/network/commands.cpp:959
+#: src/network/commands.cpp:974
+msgid "End of replay"
+msgstr "Ende der Aufnahme"
+
+#: src/network/network.cpp:963
+#, c-format
+msgid "%s Sent Bad Command"
+msgstr "%s hat ein schlechtes Kommando gesendet"
+
+#: src/network/network.cpp:1060
+#, fuzzy
+msgid "Network out of sync"
+msgstr "Netzwerk hat Synchronisation verloren"
+
+#: src/network/network.cpp:1297
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Warten auf Spieler \"%s\": %d:%02d"
+
+#: src/network/network.cpp:1313
+msgid "Timed out"
+msgstr "Zeit abgelaufen"
+
+#: src/stratagus/mainloop.cpp:448
+#, c-format
+msgid "You have lost!\n"
+msgstr "Sie haben verloren!\n"
+
+#: src/stratagus/mainloop.cpp:449
+msgid "You have lost!"
+msgstr "Sie haben verloren!"
+
+#: src/stratagus/mainloop.cpp:452
+#, c-format
+msgid "You have won!\n"
+msgstr "Sie haben gewonnen!\n"
+
+#: src/stratagus/mainloop.cpp:453
+msgid "You have won!"
+msgstr "Sie haben gewonnen!"
+
+#: src/stratagus/stratagus.cpp:575
+#: src/stratagus/stratagus.cpp:664
+msgid "Do it! Do it now!"
+msgstr "Tu es! Tu es jetzt!"
+
+#: src/stratagus/stratagus.cpp:819
+#, c-format
+msgid "Thanks for playing Stratagus.\n"
+msgstr "Danke, dass Sie Stratagus gespielt haben.\n"
+
+#: src/ui/botpanel.cpp:740
+#: src/ui/botpanel.cpp:805
+msgid "Select Target"
+msgstr "Ziel auswählen"
+
+#: src/ui/botpanel.cpp:868
+msgid "Select Location"
+msgstr "Zielort auswählen"
+
+#: src/ui/botpanel.cpp:887
+msgid "Unit training queue is full"
+msgstr "Trainingsschlange ist voll."
+
+#: src/ui/interface.cpp:94
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "MESSAGE:%s~!_"
+
+#: src/ui/interface.cpp:244
+msgid "Sound is on."
+msgstr "Sound ist aktiviert."
+
+#: src/ui/interface.cpp:246
+msgid "Sound is off."
+msgstr "Sound ist deaktiviert."
+
+#: src/ui/interface.cpp:259
+msgid "Music is off."
+msgstr "Musik ist deaktiviert."
+
+#: src/ui/interface.cpp:262
+msgid "Music is on."
+msgstr "Musik ist aktiviert."
+
+#: src/ui/interface.cpp:274
+#: src/ui/interface.cpp:288
+#: src/ui/interface.cpp:300
+#: src/ui/interface.cpp:312
+#: src/ui/interface.cpp:324
+#: src/ui/interface.cpp:336
+#: src/ui/interface.cpp:348
+#: src/ui/interface.cpp:365
+#: src/ui/interface.cpp:382
+#: src/ui/interface.cpp:394
+#: src/ui/interface.cpp:406
+#: src/ui/interface.cpp:418
+#: src/ui/mouse.cpp:1779
+msgid "Game Paused"
+msgstr "Spiel pausiert"
+
+#: src/ui/interface.cpp:276
+msgid "Game Resumed"
+msgstr "Zum Spiel zurückgekehrt"
+
+#: src/ui/interface.cpp:449
+msgid "Big map enabled"
+msgstr "Große Karte aktiviert."
+
+#: src/ui/interface.cpp:458
+msgid "Returning to old map"
+msgstr "Zur alten Karte zurückkehren."
+
+#: src/ui/interface.cpp:469
+msgid "Faster"
+msgstr "Schneller"
+
+#: src/ui/interface.cpp:485
+msgid "Slower"
+msgstr "Langsamer"
+
+#: src/ui/interface.cpp:540
+msgid "Terrain displayed."
+msgstr "Terrain angezeigt."
+
+#: src/ui/interface.cpp:542
+msgid "Terrain hidden."
+msgstr "Terrain versteckt."
+
+#: src/ui/interface.cpp:575
+msgid "Grab mouse toggled."
+msgstr ""
+
+#: src/ui/interface.cpp:1090
+msgid "Screenshot made."
+msgstr "Screenshot erstellt."
+
+#: src/ui/mainscr.cpp:772
+msgid "Production"
+msgstr "Produktion"
+
+#: src/ui/mainscr.cpp:1046
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Letzte Nachricht wurde ~<%d~> mal wiederholt"
+
+#: src/ui/mainscr.cpp:1120
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Ereignis: %s~>"
+
+#: src/ui/menus.cpp:1398
+#: src/ui/menus.cpp:1541
+#, c-format
+msgid "Saved game to: %s"
+msgstr "Spiel gespeichert: %s"
+
+#: src/ui/menus.cpp:1485
+#, c-format
+msgid "Loaded game: %s"
+msgstr "Spiel geladen: %s"
+
+#: src/ui/mouse.cpp:1937
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Sie haben ~<%d~> %ss"
+
+#: src/ui/mouse.cpp:1941
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "Sie haben ~<%d~> %s(s)"
+
+#: src/unit/unit.cpp:2972
+#, c-format
+msgid "%s attacked"
+msgstr "%s wird attackiert"
+

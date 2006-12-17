@@ -1,0 +1,715 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-12-06 22:11+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: campaigns/elites/campaign.lua:55 campaigns/elites/campaign.lua:57
+#: campaigns/elites/campaign.lua:59 campaigns/elites/campaign.lua:61
+#: campaigns/elites/campaign.lua:63 campaigns/elites/campaign.lua:65
+#: campaigns/elites/campaign.lua:67 campaigns/elites/campaign.lua:69
+msgid "Kill them all !"
+msgstr "Kill them all !"
+
+#: scripts/guichan.lua:229
+msgid "Empty sub menu"
+msgstr "Empty sub menu"
+
+#: scripts/guichan.lua:241
+msgid "Victory !"
+msgstr "Victory !"
+
+#: scripts/guichan.lua:244
+msgid "Draw !"
+msgstr "Draw !"
+
+#: scripts/guichan.lua:246
+msgid "Defeat !"
+msgstr "Defeat !"
+
+#: scripts/guichan.lua:252
+msgid "Results"
+msgstr "Results"
+
+#: scripts/guichan.lua:255
+msgid "Player"
+msgstr "Player"
+
+#: scripts/guichan.lua:256
+msgid "Units"
+msgstr "Units"
+
+#: scripts/guichan.lua:257
+msgid "Buildings"
+msgstr "Buildings"
+
+#: scripts/guichan.lua:258
+msgid "Kills"
+msgstr "Kills"
+
+#: scripts/guichan.lua:259
+msgid "Razings"
+msgstr "Razings"
+
+#: scripts/guichan.lua:271
+msgid "~!Continue"
+msgstr "~!Continue"
+
+#: scripts/guichan.lua:320
+msgid "Start Game"
+msgstr "Start Game"
+
+#: scripts/guichan.lua:322 scripts/guichan.lua:463
+#: scripts/menus/network.lua:126 scripts/menus/network.lua:308
+msgid "Map"
+msgstr "Map"
+
+#: scripts/guichan.lua:323 scripts/guichan.lua:464
+#: scripts/menus/network.lua:127 scripts/menus/network.lua:309
+#: scripts/menus/network.lua:405
+msgid "File:"
+msgstr "File:"
+
+#: scripts/guichan.lua:326 scripts/guichan.lua:466
+#: scripts/menus/network.lua:130 scripts/menus/network.lua:312
+#: scripts/menus/network.lua:408
+msgid "Players:"
+msgstr "Players:"
+
+#: scripts/guichan.lua:328 scripts/guichan.lua:468
+#: scripts/menus/network.lua:132 scripts/menus/network.lua:314
+#: scripts/menus/network.lua:410
+msgid "Description:"
+msgstr "Description:"
+
+#: scripts/guichan.lua:332 scripts/menus/network.lua:136
+#: scripts/menus/network.lua:323
+msgid "Fog of war"
+msgstr "Fog of war"
+
+#: scripts/guichan.lua:335 scripts/guichan.lua:393
+#: scripts/menus/network.lua:140 scripts/menus/network.lua:330
+msgid "Reveal map"
+msgstr "Reveal map"
+
+#: scripts/guichan.lua:339 scripts/menus/network.lua:143
+#: scripts/menus/network.lua:332
+msgid "Difficulty:"
+msgstr "Difficulty:"
+
+#: scripts/guichan.lua:340 scripts/menus/network.lua:144
+#: scripts/menus/network.lua:333
+msgid "easy"
+msgstr "easy"
+
+#: scripts/guichan.lua:340 scripts/guichan.lua:343 scripts/guichan.lua:346
+#: scripts/menus/network.lua:144 scripts/menus/network.lua:148
+#: scripts/menus/network.lua:152 scripts/menus/network.lua:333
+#: scripts/menus/network.lua:340 scripts/menus/network.lua:347
+msgid "normal"
+msgstr "normal"
+
+#: scripts/guichan.lua:340 scripts/menus/network.lua:144
+#: scripts/menus/network.lua:333
+msgid "hard"
+msgstr "hard"
+
+#: scripts/guichan.lua:342 scripts/menus/network.lua:147
+#: scripts/menus/network.lua:339
+msgid "Map richness:"
+msgstr "Map richness:"
+
+#: scripts/guichan.lua:343 scripts/guichan.lua:346
+#: scripts/menus/network.lua:148 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:340 scripts/menus/network.lua:347
+msgid "high"
+msgstr "high"
+
+#: scripts/guichan.lua:343 scripts/guichan.lua:346
+#: scripts/menus/network.lua:148 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:340 scripts/menus/network.lua:347
+msgid "low"
+msgstr "low"
+
+#: scripts/guichan.lua:345 scripts/menus/network.lua:151
+#: scripts/menus/network.lua:346
+msgid "Starting resources:"
+msgstr "Starting resources:"
+
+#: scripts/guichan.lua:373 scripts/guichan.lua:404 scripts/guichan.lua:445
+#: scripts/guichan.lua:496 scripts/menus/campaigns.lua:133
+#: scripts/menus/credits.lua:144
+msgid "~!Main Menu"
+msgstr "~!Main Menu"
+
+#: scripts/guichan.lua:375 scripts/guichan.lua:406 scripts/guichan.lua:447
+#: scripts/menus/campaigns.lua:135
+msgid "~!Start"
+msgstr "~!Start"
+
+#: scripts/guichan.lua:384
+msgid "Show a Replay"
+msgstr "Show a Replay"
+
+#: scripts/guichan.lua:417
+msgid "Load Game"
+msgstr "Load Game"
+
+#: scripts/guichan.lua:461
+msgid "Editor"
+msgstr "Editor"
+
+#: scripts/guichan.lua:498 scripts/guichan.lua:528
+msgid "Start ~!Editor"
+msgstr "Start ~!Editor"
+
+#: scripts/guichan.lua:519 scripts/menus/network.lua:366
+msgid "~!Start Game"
+msgstr "~!Start Game"
+
+#: scripts/guichan.lua:520
+msgid "~!Load Game"
+msgstr "~!Load Game"
+
+#: scripts/guichan.lua:521
+msgid "~!Campaigns"
+msgstr "~!Campaigns"
+
+#: scripts/guichan.lua:522
+msgid "Show ~!Replay"
+msgstr "Show ~!Replay"
+
+#: scripts/guichan.lua:524
+msgid "~!MultiPlayer"
+msgstr "~!MultiPlayer"
+
+#: scripts/guichan.lua:525
+msgid "~!Options"
+msgstr "~!Options"
+
+#: scripts/guichan.lua:527
+msgid "Cre~!dits"
+msgstr "Cre~!dits"
+
+#: scripts/guichan.lua:530
+msgid "E~!xit"
+msgstr "E~!xit"
+
+#: scripts/menus/campaigns.lua:41
+msgid "Briefing"
+msgstr "Briefing"
+
+#: scripts/menus/campaigns.lua:44
+msgid "Objectives :"
+msgstr "Objectives :"
+
+#: scripts/menus/campaigns.lua:57
+msgid "Start"
+msgstr "Start"
+
+#: scripts/menus/campaigns.lua:122
+msgid "List of Campaigns"
+msgstr "List of Campaigns"
+
+#: scripts/menus/credits.lua:36
+msgid "Graphics:"
+msgstr "Graphics:"
+
+#: scripts/menus/credits.lua:43
+msgid "Scripting:"
+msgstr "Scripting:"
+
+#: scripts/menus/credits.lua:47
+msgid "Maps and campaigns:"
+msgstr "Maps and campaigns:"
+
+#: scripts/menus/credits.lua:51
+msgid "Sound:"
+msgstr "Sound:"
+
+#: scripts/menus/credits.lua:55
+msgid "powered by STRATAGUS"
+msgstr "powered by STRATAGUS"
+
+#: scripts/menus/credits.lua:56
+msgid "Stratagus Programmers:"
+msgstr "Stratagus Programmers:"
+
+#: scripts/menus/credits.lua:113
+msgid "Patches"
+msgstr "Patches"
+
+#: scripts/menus/credits.lua:122
+msgid "Stratagus Media Project Graphics"
+msgstr "Stratagus Media Project Graphics"
+
+#: scripts/menus/credits.lua:129
+msgid "The Bos and the Stratagus Team thanks"
+msgstr "The Bos and the Stratagus Team thanks"
+
+#: scripts/menus/credits.lua:130
+msgid "everybody who has contributed"
+msgstr "everybody who has contributed"
+
+#: scripts/menus/credits.lua:131
+msgid "patches, bug reports, ideas."
+msgstr "patches, bug reports, ideas."
+
+#: scripts/menus/credits.lua:134
+msgid "Battle of Survival Credits"
+msgstr "Battle of Survival Credits"
+
+#: scripts/menus/ingame/editor.lua:45
+msgid "Editor Menu"
+msgstr "Editor Menu"
+
+#: scripts/menus/ingame/editor.lua:46 scripts/menus/ingame/game.lua:59
+msgid "Save (~<F11~>)"
+msgstr "Save (~<F11~>)"
+
+#: scripts/menus/ingame/editor.lua:48
+msgid "Map Properties (~<F5~>)"
+msgstr "Map Properties (~<F5~>)"
+
+#: scripts/menus/ingame/editor.lua:50
+msgid "Player Properties (~<F6~>)"
+msgstr "Player Properties (~<F6~>)"
+
+#: scripts/menus/ingame/editor.lua:53
+msgid "~!Exit to menu"
+msgstr "~!Exit to menu"
+
+#: scripts/menus/ingame/editor.lua:55
+msgid "Return to the Editor (~<Esc~>)"
+msgstr "Return to the Editor (~<Esc~>)"
+
+#: scripts/menus/ingame/editor.lua:64
+msgid "Save Map"
+msgstr "Save Map"
+
+#: scripts/menus/ingame/editor.lua:74 scripts/menus/ingame/game.lua:91
+msgid "Save"
+msgstr "Save"
+
+#: scripts/menus/ingame/editor.lua:83 scripts/menus/ingame/game.lua:112
+msgid "Cancel"
+msgstr "Cancel"
+
+#: scripts/menus/ingame/editor.lua:95
+msgid "Map Properties"
+msgstr "Map Properties"
+
+#: scripts/menus/ingame/editor.lua:97
+msgid "Map Description:"
+msgstr "Map Description:"
+
+#: scripts/menus/ingame/editor.lua:105
+msgid "Size:"
+msgstr "Size:"
+
+#: scripts/menus/ingame/editor.lua:114 scripts/menus/ingame/game.lua:180
+#: scripts/menus/ingame/game.lua:254 scripts/menus/ingame/game.lua:527
+#: scripts/menus/ingame/game.lua:553 scripts/menus/options.lua:65
+#: scripts/menus/options.lua:142 scripts/menus/options.lua:162
+#: scripts/menus/options.lua:222 scripts/menus/options.lua:262
+msgid "~!OK"
+msgstr "~!OK"
+
+#: scripts/menus/ingame/editor.lua:121 scripts/menus/ingame/game.lua:304
+#: scripts/menus/network.lua:172 scripts/menus/network.lua:234
+#: scripts/menus/network.lua:295 scripts/menus/network.lua:363
+#: scripts/menus/network.lua:435 scripts/menus/network.lua:482
+msgid "~!Cancel"
+msgstr "~!Cancel"
+
+#: scripts/menus/ingame/editor.lua:136
+msgid "Player Properties"
+msgstr "Player Properties"
+
+#: scripts/menus/ingame/editor.lua:138
+msgid "OK"
+msgstr "OK"
+
+#: scripts/menus/ingame/editor.lua:147
+msgid "Race"
+msgstr "Race"
+
+#: scripts/menus/ingame/editor.lua:152
+msgid "Elites"
+msgstr "Elites"
+
+#: scripts/menus/ingame/editor.lua:160
+msgid "Type"
+msgstr "Type"
+
+#: scripts/menus/ingame/editor.lua:165
+msgid "Person"
+msgstr "Person"
+
+#: scripts/menus/ingame/editor.lua:165
+msgid "Computer"
+msgstr "Computer"
+
+#: scripts/menus/ingame/editor.lua:165
+msgid "Rescue (Passive)"
+msgstr "Rescue (Passive)"
+
+#: scripts/menus/ingame/editor.lua:166
+msgid "Rescue (Active)"
+msgstr "Rescue (Active)"
+
+#: scripts/menus/ingame/editor.lua:166
+msgid "Neutral"
+msgstr "Neutral"
+
+#: scripts/menus/ingame/editor.lua:166
+msgid "Nobody"
+msgstr "Nobody"
+
+#: scripts/menus/ingame/editor.lua:174
+msgid "AI"
+msgstr "AI"
+
+#: scripts/menus/ingame/editor.lua:179
+msgid "Default"
+msgstr "Default"
+
+#: scripts/menus/ingame/editor.lua:187
+msgid "Titanium"
+msgstr "Titanium"
+
+#: scripts/menus/ingame/editor.lua:196
+msgid "Crystal"
+msgstr "Crystal"
+
+#: scripts/menus/ingame/editor.lua:205
+msgid "Energy"
+msgstr "Energy"
+
+#: scripts/menus/ingame/game.lua:58
+msgid "Game Menu"
+msgstr "Game Menu"
+
+#: scripts/menus/ingame/game.lua:64
+msgid "Options (~<F5~>)"
+msgstr "Options (~<F5~>)"
+
+#: scripts/menus/ingame/game.lua:66
+msgid "Help (~<F1~>)"
+msgstr "Help (~<F1~>)"
+
+#: scripts/menus/ingame/game.lua:68
+msgid "~!Objectives"
+msgstr "~!Objectives"
+
+#: scripts/menus/ingame/game.lua:70
+msgid "~!End Game"
+msgstr "~!End Game"
+
+#: scripts/menus/ingame/game.lua:72
+msgid "Return to Game (~<Esc~>)"
+msgstr "Return to Game (~<Esc~>)"
+
+#: scripts/menus/ingame/game.lua:81
+msgid "Save Game"
+msgstr "Save Game"
+
+#: scripts/menus/ingame/game.lua:121 scripts/menus/options.lua:158
+msgid "Sound Options"
+msgstr "Sound Options"
+
+#: scripts/menus/ingame/game.lua:130 scripts/menus/ingame/game.lua:146
+msgid "Game Options"
+msgstr "Game Options"
+
+#: scripts/menus/ingame/game.lua:131
+msgid "Sound (~<F7~>)"
+msgstr "Sound (~<F7~>)"
+
+#: scripts/menus/ingame/game.lua:133
+msgid "Game (~<F9~>)"
+msgstr "Game (~<F9~>)"
+
+#: scripts/menus/ingame/game.lua:135
+msgid "~!Diplomacy"
+msgstr "~!Diplomacy"
+
+#: scripts/menus/ingame/game.lua:137 scripts/menus/ingame/game.lua:339
+#: scripts/menus/ingame/game.lua:379 scripts/menus/ingame/game.lua:456
+msgid "Previous (~<Esc~>)"
+msgstr "Previous (~<Esc~>)"
+
+#: scripts/menus/ingame/game.lua:149
+msgid "Fog of War Enabled"
+msgstr "Fog of War Enabled"
+
+#: scripts/menus/ingame/game.lua:157
+msgid "Show command key"
+msgstr "Show command key"
+
+#: scripts/menus/ingame/game.lua:161 scripts/menus/options.lua:40
+msgid "Game Speed"
+msgstr "Game Speed"
+
+#: scripts/menus/ingame/game.lua:171 scripts/menus/options.lua:55
+msgid "slow"
+msgstr "slow"
+
+#: scripts/menus/ingame/game.lua:175 scripts/menus/options.lua:60
+msgid "fast"
+msgstr "fast"
+
+#: scripts/menus/ingame/game.lua:198
+msgid "Diplomacy"
+msgstr "Diplomacy"
+
+#: scripts/menus/ingame/game.lua:200
+msgid "Allied"
+msgstr "Allied"
+
+#: scripts/menus/ingame/game.lua:201
+msgid "Enemy"
+msgstr "Enemy"
+
+#: scripts/menus/ingame/game.lua:202
+msgid "Shared Vision"
+msgstr "Shared Vision"
+
+#: scripts/menus/ingame/game.lua:312
+msgid "Are you sure you want to restart the game?"
+msgstr "Are you sure you want to restart the game?"
+
+#: scripts/menus/ingame/game.lua:313 scripts/menus/ingame/game.lua:326
+msgid "~!Restart Game"
+msgstr "~!Restart Game"
+
+#: scripts/menus/ingame/game.lua:318
+msgid "Are you sure you want to quit to the main menu?"
+msgstr "Are you sure you want to quit to the main menu?"
+
+#: scripts/menus/ingame/game.lua:319 scripts/menus/ingame/game.lua:335
+msgid "~!Quit to Menu"
+msgstr "~!Quit to Menu"
+
+#: scripts/menus/ingame/game.lua:325
+msgid "End Game"
+msgstr "End Game"
+
+#: scripts/menus/ingame/game.lua:331 scripts/menus/ingame/game.lua:334
+msgid "~!Surrender"
+msgstr "~!Surrender"
+
+#: scripts/menus/ingame/game.lua:333
+msgid "Are you sure you want to surrender to your enemies?"
+msgstr "Are you sure you want to surrender to your enemies?"
+
+#: scripts/menus/ingame/game.lua:337 scripts/menus/ingame/game.lua:363
+msgid "E~!xit Program"
+msgstr "E~!xit Program"
+
+#: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
+msgid "Cancel (~<Esc~>)"
+msgstr "Cancel (~<Esc~>)"
+
+#: scripts/menus/ingame/game.lua:362
+msgid "Are you sure you want to exit Stratagus?"
+msgstr "Are you sure you want to exit Stratagus?"
+
+#: scripts/menus/ingame/game.lua:374
+msgid "Help Menu"
+msgstr "Help Menu"
+
+#: scripts/menus/ingame/game.lua:375
+msgid "Keystroke ~!Help"
+msgstr "Keystroke ~!Help"
+
+#: scripts/menus/ingame/game.lua:377
+msgid "Stratagus ~!Tips"
+msgstr "Stratagus ~!Tips"
+
+#: scripts/menus/ingame/game.lua:455
+msgid "Keystroke Help Menu"
+msgstr "Keystroke Help Menu"
+
+#: scripts/menus/ingame/game.lua:490
+msgid "Stratagus Tips"
+msgstr "Stratagus Tips"
+
+#: scripts/menus/ingame/game.lua:521
+msgid "Show tips at startup"
+msgstr "Show tips at startup"
+
+#: scripts/menus/ingame/game.lua:529
+msgid "~!Previous Tip"
+msgstr "~!Previous Tip"
+
+#: scripts/menus/ingame/game.lua:531
+msgid "~!Next Tip"
+msgstr "~!Next Tip"
+
+#: scripts/menus/ingame/game.lua:543
+msgid "Objectives"
+msgstr "Objectives"
+
+#: scripts/menus/network.lua:55
+msgid "Error"
+msgstr "Error"
+
+#: scripts/menus/network.lua:78
+msgid "Players"
+msgstr "Players"
+
+#: scripts/menus/network.lua:124
+msgid "Joining game: Map"
+msgstr "Joining game: Map"
+
+#: scripts/menus/network.lua:170
+msgid "~!Ready"
+msgstr "~!Ready"
+
+#: scripts/menus/network.lua:210 scripts/menus/network.lua:251
+msgid "Cannot reach server"
+msgstr "Cannot reach server"
+
+#: scripts/menus/network.lua:226
+msgid "Joining game"
+msgstr "Joining game"
+
+#: scripts/menus/network.lua:248
+msgid "Map not available"
+msgstr "Map not available"
+
+#: scripts/menus/network.lua:254
+msgid "Server is full"
+msgstr "Server is full"
+
+#: scripts/menus/network.lua:257
+msgid "Server gone"
+msgstr "Server gone"
+
+#: scripts/menus/network.lua:260
+msgid "Incompatible engine version"
+msgstr "Incompatible engine version"
+
+#: scripts/menus/network.lua:263
+msgid "Incompatible netowrk version"
+msgstr "Incompatible netowrk version"
+
+#: scripts/menus/network.lua:277
+msgid "Enter Server address"
+msgstr "Enter Server address"
+
+#: scripts/menus/network.lua:278
+msgid "IP or server name :"
+msgstr "IP or server name :"
+
+#: scripts/menus/network.lua:280 scripts/menus/network.lua:461
+msgid "~!Join Game"
+msgstr "~!Join Game"
+
+#: scripts/menus/network.lua:284
+msgid "Invalid server name"
+msgstr "Invalid server name"
+
+#: scripts/menus/network.lua:306 scripts/menus/network.lua:403
+msgid "Create MultiPlayer game"
+msgstr "Create MultiPlayer game"
+
+#: scripts/menus/network.lua:383
+msgid "Waiting for players"
+msgstr "Waiting for players"
+
+#: scripts/menus/network.lua:396
+msgid "No Map"
+msgstr "No Map"
+
+#: scripts/menus/network.lua:397
+msgid "No map"
+msgstr "No map"
+
+#: scripts/menus/network.lua:437 scripts/menus/network.lua:471
+msgid "Create ~!Game"
+msgstr "Create ~!Game"
+
+#: scripts/menus/network.lua:454
+msgid "MultiPlayer"
+msgstr "MultiPlayer"
+
+#: scripts/menus/network.lua:456
+msgid "Nickname :"
+msgstr "Nickname :"
+
+#: scripts/menus/options.lua:38
+msgid "Speed Options"
+msgstr "Speed Options"
+
+#: scripts/menus/options.lua:78
+msgid "Effects Volume"
+msgstr "Effects Volume"
+
+#: scripts/menus/options.lua:94 scripts/menus/options.lua:126
+msgid "min"
+msgstr "min"
+
+#: scripts/menus/options.lua:99 scripts/menus/options.lua:131
+msgid "max"
+msgstr "max"
+
+#: scripts/menus/options.lua:105 scripts/menus/options.lua:137
+msgid "Enabled"
+msgstr "Enabled"
+
+#: scripts/menus/options.lua:110
+msgid "Music Volume"
+msgstr "Music Volume"
+
+#: scripts/menus/options.lua:206
+msgid "Fullscreen"
+msgstr "Fullscreen"
+
+#: scripts/menus/options.lua:220
+msgid "Video Options"
+msgstr "Video Options"
+
+#: scripts/menus/options.lua:236
+msgid "Language Selection"
+msgstr "Language Selection"
+
+#: scripts/menus/options.lua:269
+msgid "Sound"
+msgstr "Sound"
+
+#: scripts/menus/options.lua:270
+msgid "Video"
+msgstr "Video"
+
+#: scripts/menus/options.lua:271
+msgid "Speed"
+msgstr "Speed"
+
+#: scripts/menus/options.lua:272
+msgid "Language"
+msgstr "Language"
+
+#: scripts/menus/options.lua:274
+msgid "~!Main menu"
+msgstr "~!Main menu"
+
+#: scripts/menus/options.lua:282
+msgid "Options"
+msgstr "Options"
+
+#: scripts/stratagus.lua:239
+msgid "Eliminate your enemies."
+msgstr "Eliminate your enemies."
