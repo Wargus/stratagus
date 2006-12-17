@@ -1055,8 +1055,8 @@ void AiCanNotMove(CUnit *unit)
 		gy = unit->Orders[0]->Y;
 	}
 
-	if (PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange) ||
-			unit->Type->UnitType == UnitTypeFly) {
+	if (unit->Type->UnitType == UnitTypeFly ||
+			PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		return;
