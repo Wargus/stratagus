@@ -54,6 +54,10 @@ include $(patsubst %, %/Module.make, $(MODULES))
 OBJ := $(patsubst %.cpp, %.o, $(SRC))
 OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 
+ifneq ($(findstring -DUSE_WIN32, $(CPPFLAGS)),)
+OBJ := $(OBJ) src/$(OBJDIR)/stratagusrc.o
+endif
+
 SRC_ALL = $(SRC)
 OBJ_ALL = $(OBJ)
 
