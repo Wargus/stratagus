@@ -9,7 +9,7 @@
 ##         Stratagus - A free fantasy real time strategy game engine
 ##
 ##      SConstruct build file. See http://www.scons.org for info about scons.
-##      (c) Copyright 2005 by Francois Beerten
+##      (c) Copyright 2005-2007 by Francois Beerten
 ##
 ##      Stratagus is free software; you can redistribute it and/or modify
 ##      it under the terms of the GNU General Public License as published
@@ -67,8 +67,6 @@ def globSources(sourceDirs):
 
 sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua")
 sourcesEngine.append(globSources("guichan guichan/sdl guichan/widgets"))
-sourcesMetaserver = globSources("metaserver")
-sourcesMetaserver.append("build/network/lowlevel.cpp")
 
 def CheckOpenGL(env, conf):
   opengl = {}
@@ -192,6 +190,6 @@ if env['profile']:
 
 # Targets
 Default(env.Program('stratagus', sourcesEngine))
-env.Program('metaserver', sourcesMetaserver)
+
 
 
