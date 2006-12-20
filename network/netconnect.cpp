@@ -96,6 +96,12 @@ char NetworkMapName[256];               /// Name of the map recieved with ICMMap
 /// For now just specify with the -P port command line arg...
 static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 
+/**
+** Client and server selection state for Multiplayer clients
+*/
+ServerSetup ServerSetupState;
+ServerSetup LocalSetupState;
+
 //----------------------------------------------------------------------------
 // Functions
 //----------------------------------------------------------------------------
@@ -736,6 +742,23 @@ void NetworkConnectSetupGame(void)
 	ThisPlayer->SetName(LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
+	}
+}
+
+/**
+** Callback from netconnect loop in Client-Sync state:
+** Compare local state with server's information
+** and force update when changes have occured.
+*/
+void NetClientCheckLocalState(void)
+{
+	if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
+		NetLocalState = ccs_changed;
+		return;
+	}
+	if (LocalSetupState.Race[NetLocalHostsSlot] != ServerSetupState.Race[NetLocalHostsSlot]) {
+		NetLocalState = ccs_changed;
+		return;
 	}
 }
 
@@ -1900,5 +1923,7 @@ int NetworkParseSetupEvent(const char *buf, int size)
 	}
 	return 0;
 }
+
+
 
 //@}
