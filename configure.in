@@ -67,6 +67,7 @@ if test "$no_x" != "yes"; then
 	if test "x$x_libraries" != "x"; then
 		LDFLAGS="$LDFLAGS -L$x_libraries"
 	fi
+	LDFLAGS="$LDFLAGS -lX11"
 	AC_DEFINE(HAVE_X, 1, Define to 1 if you have X. Used for pasting from the clipboard.)
 fi
 
