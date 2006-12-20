@@ -27,6 +27,6 @@
 
 MODULE = src/ui
 MSRC =   botpanel.cpp button_checks.cpp script_ui.cpp icons.cpp interface.cpp \
-         mainscr.cpp menu_proc.cpp menus.cpp mouse.cpp ui.cpp widgets.cpp
+         mainscr.cpp menu_proc.cpp mouse.cpp ui.cpp widgets.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
