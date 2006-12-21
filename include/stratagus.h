@@ -200,7 +200,7 @@ extern char NameLine[];
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-#define PlayerMax    16                 /// How many players are supported
+#define PlayerMax    8                  /// How many players are supported
 #define UnitTypeMax  257                /// How many unit types supported
 #define UpgradeMax   256                /// How many upgrades supported
 #define UnitMax      2048               /// How many units supported
