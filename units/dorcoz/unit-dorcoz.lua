@@ -65,7 +65,7 @@ DefineUnitType("unit-dorcoz", {
         Corpse = "unit-dead-body", Type = "land", RightMouseAction = "attack",
         CanAttack = true, CanTargetLand = true, CanTargetAir = true,
         LandUnit = true, organic = true,
-        SelectableByRectangle = true, DetectCloak = true,
+        SelectableByRectangle = true,
         RightMouseAction = "attack"
         --[[
         Sounds = {
