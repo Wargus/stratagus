@@ -89,7 +89,7 @@ DefineUnitType("unit-artil", {
 		}
 })
 
-DefineAllow("unit-artil", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-artil", "AAAAAAAA")
 DefineDependency("unit-artil", {"unit-vfac"})
 
 DefineCommonButtons({"unit-artil"})

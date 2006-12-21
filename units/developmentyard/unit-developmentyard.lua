@@ -90,7 +90,7 @@ DefineUnitType("build-dead-devyard", {
 	Missile = "missile-none", Priority = 0, Type = "land",
 	Building = true, Vanishes = true, Sounds = {}})
 
-DefineAllow("unit-dev-yard", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-dev-yard", "AAAAAAAA")
 
 DefineButton({
 	Pos = 7, Level = 2, Icon = "icon-dev_b", Action = "build",
