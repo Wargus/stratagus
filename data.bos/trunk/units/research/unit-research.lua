@@ -97,7 +97,7 @@ DefineUnitType("build-dead-research", {
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
-DefineAllow("unit-rfac", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-rfac", "AAAAAAAA")
 
 DefineButton({
 	Pos = 6, Level = 1, Icon = "icon-rfac_b", Action = "build",

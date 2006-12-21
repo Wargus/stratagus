@@ -45,13 +45,13 @@ end
 
 function DisallowAllUnits()
    for unit, default in AllowedUnits do
-      DefineAllow(unit, "FFFFFFFFFFFFFFFF")
+      DefineAllow(unit, "FFFFFFFF")
    end
 end
 
 function AllowAllUnits()
    for unit, default in AllowedUnits do
-      DefineAllow(unit, "AAAAAAAAAAAAAAAA")
+      DefineAllow(unit, "AAAAAAAA")
    end
 end
 

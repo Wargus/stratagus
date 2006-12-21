@@ -86,4 +86,4 @@ DefineUnitType("unit-assault", {
 	})
 DefineHumanCorpse("assault")
 
-DefineAllow("unit-assault", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-assault", "AAAAAAAA")

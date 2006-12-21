@@ -77,7 +77,7 @@ DefineUnitType("unit-dorcoz", {
         ]]
         })
 
-DefineAllow("unit-dorcoz", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-dorcoz", "AAAAAAAA")
 
 DefineButton({
         Pos = 4, Level = 0, Icon = "icon-dorcoz",

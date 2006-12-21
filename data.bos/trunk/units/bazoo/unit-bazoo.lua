@@ -84,4 +84,4 @@ DefineUnitType("unit-bazoo", {
 	})
 DefineHumanCorpse("bazoo")
 
-DefineAllow("unit-bazoo", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-bazoo", "AAAAAAAA")

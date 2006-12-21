@@ -109,4 +109,4 @@ DefineUnitType("unit-engineer", {
 	})
 DefineHumanCorpse("engineer", {56, 56})
 
-DefineAllow("unit-engineer", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-engineer", "AAAAAAAA")

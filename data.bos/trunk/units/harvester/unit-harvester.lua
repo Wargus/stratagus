@@ -110,4 +110,4 @@ DefineUnitType("unit-harvester", {
 		"help", "harvester-help",
 		"dead", "harvester-die"}
 	})
-DefineAllow("unit-harvester", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-harvester", "AAAAAAAA")

@@ -96,7 +96,7 @@ DefineUnitType("build-dead-vfac", {
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
-DefineAllow("unit-vfac", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-vfac", "AAAAAAAA")
 
 DefineButton({
 	Pos = 3, Level = 2, Icon = "icon-vfac_b", Action = "build",

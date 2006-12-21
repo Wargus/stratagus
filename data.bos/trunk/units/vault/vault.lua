@@ -99,4 +99,4 @@ DefineUnitType("build-dead-vault", {
 	})
 
 
-DefineAllow("unit-vault", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-vault", "AAAAAAAA")

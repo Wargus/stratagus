@@ -69,18 +69,18 @@ DefineModifier("upgrade-pdril",
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
 
-DefineAllow("upgrade-expl", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-expl2", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-tdril", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-ddril", "AAAAAAAAAAAAAAAA")
-DefineAllow("upgrade-pdril", "AAAAAAAAAAAAAAAA")
+DefineAllow("upgrade-expl", "AAAAAAAA")
+DefineAllow("upgrade-expl2", "AAAAAAAA")
+DefineAllow("upgrade-tdril", "AAAAAAAA")
+DefineAllow("upgrade-ddril", "AAAAAAAA")
+DefineAllow("upgrade-pdril", "AAAAAAAA")
 
 
 
-DefineAllow("unit-gold-mine", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-gold-mine", "AAAAAAAA")
 
-DefineAllow("unit-dead-body", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-1x1-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-2x2-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-3x3-place", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-destroyed-4x4-place", "AAAAAAAAAAAAAAAA")
+DefineAllow("unit-dead-body", "AAAAAAAA")
+DefineAllow("unit-destroyed-1x1-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-2x2-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-3x3-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-4x4-place", "AAAAAAAA")
