@@ -507,9 +507,6 @@ class CAnimations;
 class MissileType;
 class CFile;
 struct lua_State;
-#ifdef USE_MNG
-class Mng;
-#endif
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
 
@@ -840,9 +837,6 @@ public:
 		GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
-#ifdef USE_MNG
-		memset(&Portrait, 0, sizeof(Portrait));
-#endif
 		memset(_Costs, 0, sizeof(_Costs));
 		memset(RepairCosts, 0, sizeof(RepairCosts));
 		memset(CanStore, 0, sizeof(CanStore));
@@ -871,15 +865,7 @@ public:
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
-#ifdef USE_MNG
-	struct _portrait_ {
-		char **Files;
-		int Num;
-		Mng **Mngs;
-		int CurrMng;
-		int NumIterations;
-	} Portrait;
-#endif
+
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
 

@@ -442,18 +442,6 @@ void LoadUnitTypeSprite(CUnitType *type)
 			type->Sprite->Flip();
 		}
 	}
-
-#ifdef USE_MNG
-	if (type->Portrait.Num) {
-		for (i = 0; i < type->Portrait.Num; ++i) {
-			type->Portrait.Mngs[i] = new Mng;
-			type->Portrait.Mngs[i]->Load(type->Portrait.Files[i]);
-		}
-		// FIXME: should be configurable
-		type->Portrait.CurrMng = 0;
-		type->Portrait.NumIterations = SyncRand() % 16 + 1;
-	}
-#endif
 }
 
 /**
@@ -595,16 +583,6 @@ void CleanUnitTypes(void)
 
 		CGraphic::Free(type->Sprite);
 		CGraphic::Free(type->ShadowSprite);
-#ifdef USE_MNG
-		if (type->Portrait.Num) {
-			for (j = 0; j < type->Portrait.Num; ++j) {
-				delete type->Portrait.Mngs[j];
-				delete[] type->Portrait.Files[j];
-			}
-			delete[] type->Portrait.Mngs;
-			delete[] type->Portrait.Files;
-		}
-#endif
 
 		delete UnitTypes[i];
 	}
