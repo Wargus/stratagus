@@ -93,10 +93,6 @@
 **    field is not explored, 1 explored, n-1 unit see it. Currently
 **    no more than 253 units can see a field.
 **
-**  CMapField::VisCloak[]
-**
-**    Visiblity for cloaking.
-**
 **  CMapField::Radar[]
 **
 **    Visiblity for radar.
@@ -190,7 +186,6 @@ public:
 	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0)
 	{
 		memset(Visible, 0, sizeof(Visible));
-		memset(VisCloak, 0, sizeof(VisCloak));
 		memset(Radar, 0, sizeof(Radar));
 		memset(RadarJammer, 0, sizeof(RadarJammer));
 	}
@@ -201,7 +196,6 @@ public:
 	unsigned char Cost;       /// unit cost to move in this tile
 
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
-	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
 	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
@@ -341,10 +335,6 @@ extern int MapFogFilterFlags(CPlayer *player, int x, int y, int mask);
 extern MapMarkerFunc MapMarkTileSight;
 	/// Unmark a tile for normal sight
 extern MapMarkerFunc MapUnmarkTileSight;
-	/// Mark a tile for cloak detection
-extern MapMarkerFunc MapMarkTileDetectCloak;
-	/// Unmark a tile for cloak detection
-extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 	/// Mark sight changes
 extern void MapSight(const CPlayer *player, int x, int y, int w,

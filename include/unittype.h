@@ -265,14 +265,6 @@
 **
 **    Unit is visible under fog of war.
 **
-**  CUnitType::PermanentCloak
-**
-**    Unit is permanently cloaked.
-**
-**  CUnitType::DetectCloak
-**
-**    These units can detect Cloaked units.
-**
 **  CUnitType::Coward
 **
 **    Unit is a coward, and acts defensively. it will not attack
@@ -839,7 +831,7 @@ public:
 		MouseAction(0), Points(0), CanTarget(0),
 		Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
 		ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
-		PermanentCloak(0), DetectCloak(0), Coward(0), AttackFromTransporter(0),
+		Coward(0), AttackFromTransporter(0),
 		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 		BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
@@ -947,8 +939,6 @@ public:
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned Building : 1;          /// Building
 	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
-	unsigned PermanentCloak : 1;    /// Is only visible by CloakDetectors.
-	unsigned DetectCloak : 1;       /// Can see Cloaked units.
 	unsigned Coward : 1;            /// Unit will only attack if instructed.
 	unsigned AttackFromTransporter : 1;  /// Can attack from transporter
 	unsigned Vanishes : 1;          /// Corpes & destroyed places.
