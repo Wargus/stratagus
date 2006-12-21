@@ -451,8 +451,7 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 	//
 	mf = &Map.Fields[y * Map.Info.MapWidth + x];
 	mf->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
-		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-		MapFieldRocks | MapFieldForest);
+		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable);
 
 	mf->Flags |= Map.Tileset.FlagsTable[tile];
 

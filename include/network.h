@@ -90,7 +90,6 @@ enum _message_type_ {
 	MessageCommandUnload,          /// Unit command unload
 	MessageCommandBuild,           /// Unit command build building
 	MessageCommandDismiss,         /// Unit command dismiss unit
-	MessageCommandResourceLoc,     /// Unit command resource location
 	MessageCommandResource,        /// Unit command resource
 	MessageCommandReturn,          /// Unit command return goods
 	MessageCommandTrain,           /// Unit command train

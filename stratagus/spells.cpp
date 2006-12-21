@@ -105,8 +105,6 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	int xmax;
 	int ymax;
 	int i;
-	int ix;
-	int iy;
 	int n;
 	CUnit *table[UnitMax];
 
@@ -144,22 +142,6 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 		}
 	}
 
-	//
-	// Terrain effect of the explosion
-	//
-	for (ix = xmin; ix <= xmax; ++ix) {
-		for (iy = ymin; iy <= ymax; ++iy) {
-			n = Map.Fields[ix + iy * Map.Info.MapWidth].Flags;
-			if (MapDistance(ix, iy, x, y ) > this->Range) {
-				// Not in circle range
-				continue;
-			} else if (n & MapFieldRocks) {
-				Map.ClearTile(MapFieldRocks, ix, iy);
-			} else if (n & MapFieldForest) {
-				Map.ClearTile(MapFieldForest, ix, iy);
-			}
-		}
-	}
 	return 1;
 }
 

@@ -89,9 +89,6 @@ void CMap::Save(CFile *file) const
 
 			mf = &this->Fields[h * this->Info.MapWidth + w];
 			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
-			if (mf->Value) {
-				file->printf(" %d,", mf->Value);
-			}
 			for (i = 0; i < PlayerMax; ++i) {
 				if (mf->Visible[i] == 1) {
 					file->printf(" \"explored\", %d,", i);
@@ -111,12 +108,6 @@ void CMap::Save(CFile *file) const
 			}
 			if (mf->Flags & MapFieldUnpassable) {
 				file->printf(" \"block\",");
-			}
-			if (mf->Flags & MapFieldRocks) {
-				file->printf(" \"rock\",");
-			}
-			if (mf->Flags & MapFieldForest) {
-				file->printf(" \"wood\",");
 			}
 #if 1
 			// Not Required for save

@@ -683,9 +683,6 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						res->ResourceCapacity = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "terrain-harvester")) {
-						res->TerrainHarvester = 1;
-						--k;
 					} else if (!strcmp(value, "lose-resources")) {
 						res->LoseResources = 1;
 						--k;

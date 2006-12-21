@@ -75,8 +75,6 @@
 **    ::MapFieldWaterAllowed water units allowed.
 **    ::MapFieldNoBuilding no buildings allowed.
 **    ::MapFieldUnpassable field is movement blocked.
-**    ::MapFieldRocks field contains rocks.
-**    ::MapFieldForest field contains forest.
 **    ::MapFieldLandUnit land unit on field.
 **    ::MapFieldAirUnit air unit on field.
 **    ::MapFieldSeaUnit water unit on field.
@@ -88,11 +86,6 @@
 **  CMapField::Cost
 **
 **    Unit cost to move in this tile.
-**
-**  CMapField::Value
-**
-**    Extra value for each tile. This currently only used for
-**    forest, contains the frames until they grow.
 **
 **  CMapField::Visible[]
 **
@@ -194,8 +187,7 @@ class CUnitType;
 	/// Describes a field of the map
 class CMapField {
 public:
-	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0),
-		UnitCache()
+	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0)
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -207,9 +199,7 @@ public:
 	unsigned short SeenTile;  /// last seen tile (FOW)
 	unsigned short Flags;     /// field flags
 	unsigned char Cost;       /// unit cost to move in this tile
-	// FIXME: Value can be removed, regeneration can be handled
-	//        different.
-	unsigned char Value;                  /// Wood Regeneration
+
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
@@ -226,8 +216,6 @@ public:
 #define MapFieldNoBuilding   0x0080  /// No buildings allowed
 
 #define MapFieldUnpassable 0x0100  /// Field is movement blocked
-#define MapFieldRocks      0x0400  /// Field contains rocks
-#define MapFieldForest     0x0800  /// Field contains forest
 
 #define MapFieldLandUnit 0x1000  /// Land unit on field
 #define MapFieldAirUnit  0x2000  /// Air unit on field
@@ -268,8 +256,6 @@ public:
 	void Clean();
 	/// Cleanup memory for fog of war tables
 	void CleanFogOfWar(void);
-	/// Remove wood/rock from the map.
-	void ClearTile(unsigned short type, unsigned x, unsigned y);
 
 	/// Find if a tile is visible (with shared vision).
 	unsigned short IsTileVisible(const CPlayer *player, int x, int y) const;
@@ -301,24 +287,10 @@ public:
 	/// Returns true, if coast on the map tile field
 	bool CoastOnMap(int x, int y) const;
 
-	/// Returns true, if forest on the map tile field
-	bool ForestOnMap(int x, int y) const;
-
-	/// Returns true, if rock on the map tile field
-	bool RockOnMap(int x, int y) const;
-
-
 
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar(void);
-
-	/// Check if the seen tile-type is wood
-	bool IsSeenTile(unsigned short type, int x, int y) const;
-	/// Correct the surrounding seen wood fields
-	void FixNeighbors(unsigned short type, int seen, int x, int y);
-	/// Correct the seen wood field, depending on the surrounding
-	void FixTile(unsigned short type, int seen, int x, int y);
 
 public:
 	CMapField *Fields;              /// fields on map
@@ -348,8 +320,6 @@ extern int *VisionLookup;
 
 	/// Contrast of fog of war
 extern int FogOfWarOpacity;
-	/// Forest regeneration
-extern int ForestRegeneration;
 	/// Flag must reveal the map
 extern int FlagRevealMap;
 	/// Flag must reveal map when in replay

@@ -124,54 +124,6 @@
 **      The tile number of tile only containing the bottom part of a
 **      tree. Is created on the map by lumber chopping.
 **
-**  CTileset::RemovedTree
-**
-**      The tile number of the tile placed where trees are removed.
-**      Is created on the map by lumber chopping.
-**
-**  CTileset::GrowingTree[2]
-**
-**      Contains the tile numbers of a growing tree from small to big.
-**      @note Not yet used.
-**
-**  CTilset::WoodTable[20]
-**
-**      Table for wood removable. This table contains the tile which
-**      is placed after a tree removement, depending on the surrounding.
-**
-**  CTileset::MixedLookupTable[]
-**      Table for finding what part of the tile contains wood/rock,
-**      and which part is grass or bare ground.
-**
-**  CTileset::TopOneRock
-**
-**      The tile number of tile only containing the top part of a rock.
-**      Is created on the map by destroying rocks.
-**
-**  CTileset::MidOneRock
-**
-**      The tile number of tile only containing the connection of
-**      the top part to the bottom part of a rock.
-**      Is created on the map by destroying rocks.
-**
-**  CTileset::BotOneRock
-**
-**      The tile number of tile only containing the bottom part of a
-**      rock. Is created on the map by destroying rocks.
-**
-**  CTileset::RemovedRock
-**
-**      The tile number of the tile placed where rocks are removed.
-**      Is created on the map by destroying rocks.
-**
-**  CTileset::RockTable[20]
-**
-**      Table for rock removable. Depending on the surrinding this
-**      table contains the new tile to be placed.
-**
-**      @todo Johns: I don't think this table or routines look correct.
-**      But they work correct.
-**
 **
 **  @struct TileInfo tileset.h
 **
@@ -208,7 +160,6 @@ extern int TileSizeY; /// Size of a tile in Y
 enum TileType {
 	TileTypeUnknown,    /// Unknown tile type
 	TileTypeWood,       /// Any wood tile
-	TileTypeRock,       /// Any rock tile
 	TileTypeCoast,      /// Any coast tile
 	TileTypeWater,      /// Any water tile
 };
@@ -248,19 +199,6 @@ public:
 		delete[] SolidTerrainTypes;
 		SolidTerrainTypes = NULL;
 		NumTerrainTypes = 0;
-		TopOneTree = 0;
-		MidOneTree = 0;
-		BotOneTree = 0;
-		RemovedTree = 0;
-		memset(GrowingTree, 0, sizeof(GrowingTree));
-		memset(WoodTable, 0, sizeof(WoodTable));
-		delete[] MixedLookupTable;
-		MixedLookupTable = NULL;
-		TopOneRock = 0;
-		MidOneRock = 0;
-		BotOneRock = 0;
-		RemovedRock = 0;
-		memset(RockTable, 0, sizeof(RockTable));
 	}
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
@@ -278,19 +216,6 @@ public:
 
 	int NumTerrainTypes;                 /// Number of different terrain types
 	SolidTerrainInfo *SolidTerrainTypes; /// Information about solid terrains.
-
-	unsigned TopOneTree;     /// Tile for one tree top
-	unsigned MidOneTree;     /// Tile for one tree middle
-	unsigned BotOneTree;     /// Tile for one tree bottom
-	int RemovedTree;         /// Tile placed where trees are gone
-	unsigned GrowingTree[2]; /// Growing tree tiles
-	int WoodTable[20];       /// Table for tree removable
-	int *MixedLookupTable;   /// Lookup for what part of tile used
-	unsigned TopOneRock;     /// Tile for one rock top
-	unsigned MidOneRock;     /// Tile for one rock middle
-	unsigned BotOneRock;     /// Tile for one rock bottom
-	int RemovedRock;         /// Tile placed where rocks are gone
-	int RockTable[20];       /// Removed rock placement table
 };
 
 /*----------------------------------------------------------------------------

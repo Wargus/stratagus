@@ -2255,19 +2255,6 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
   ----------------------------------------------------------------------------*/
 
 /**
-**  Find the closest piece of wood for an unit.
-**
-**  @param unit    The unit.
-**  @param x       OUT: Map X position of tile.
-**  @param y       OUT: Map Y position of tile.
-*/
-int FindWoodInSight(const CUnit *unit, int *x, int *y)
-{
-	return FindTerrainType(unit->Type->MovementMask, 0, MapFieldForest, 9999,
-		unit->Player, unit->X, unit->Y, x, y);
-}
-
-/**
 **  Find the closest piece of terrain with the given flags.
 **
 **  @param movemask    The movement mask to reach that location.

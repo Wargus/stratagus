@@ -94,8 +94,7 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 			if (worker && x == worker->X && y == worker->Y) {
 				surrounding[surroundingnb++] = 1;
 			} else if (Map.Fields[x + y * Map.Info.MapWidth].Flags &
-						(MapFieldUnpassable | MapFieldRocks |
-						MapFieldForest | MapFieldBuilding)) {
+					(MapFieldUnpassable | MapFieldBuilding)) {
 				surrounding[surroundingnb++] = 0;
 			} else{
 				// Can pass there
@@ -447,119 +446,6 @@ static int AiFindHallPlace(const CUnit *worker, const CUnitType *type, int *dx, 
 }
 
 /**
-**  Find free building place for lumber mill. (flood fill version)
-**
-**  @param worker  Worker to build building.
-**  @param type    Type of building.
-**  @param dx      Pointer for X position returned.
-**  @param dy      Pointer for Y position returned.
-**
-**  @return        True if place found, false if not found.
-**
-**  @todo          FIXME: This is slow really slow, using two flood
-**                 fills, is not a perfect solution.
-*/
-static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type, int *dx,
-	int *dy)
-{
-	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
-	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
-	int size;
-	int x;
-	int y;
-	int rx;
-	int ry;
-	int mask;
-	int wp;
-	int rp;
-	int ep;
-	int i;
-	int w;
-	unsigned char *m;
-	unsigned char *morg;
-	unsigned char *matrix;
-
-	x = worker->X;
-	y = worker->Y;
-	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
-
-	//
-	// Make movement matrix.
-	//
-	morg = MakeMatrix();
-	w = Map.Info.MapWidth + 2;
-	matrix = morg + w + w + 2;
-
-	points[0].X = x;
-	points[0].Y = y;
-	rp = 0;
-	matrix[x + y * w] = 1; // mark start point
-	ep = wp = 1; // start with one point
-
-	mask = worker->Type->MovementMask;
-
-	//
-	// Pop a point from stack, push all neightbors which could be entered.
-	//
-	for (;;) {
-		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				m = matrix + x + y * w;
-				if (*m) { // already checked
-					continue;
-				}
-				//
-				// Look if there is wood
-				//
-				if (Map.ForestOnMap(x, y)) {
-					if (AiFindBuildingPlace2(worker, type, x, y, dx, dy, 1)) {
-						delete[] morg;
-						delete[] points;
-						return 1;
-					}
-				}
-
-				if (CanMoveToMask(x, y, mask)) { // reachable
-					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-
-		//
-		// Continue with next frame.
-		//
-		if (rp == wp) { // unreachable, no more points available
-			break;
-		}
-		ep = wp;
-	}
-
-	delete[] morg;
-	delete[] points;
-	return 0;
-}
-
-/**
 **  Find free building place.
 **
 **  @param worker  Worker to build building.
@@ -581,12 +467,6 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type, int *dx, int
 	if (type->CanStore[GoldCost] && AiFindHallPlace(worker, type, dx, dy)) {
 		DebugPrint("Found place for town hall (%s,%s)\n" _C_ type->Ident.c_str() _C_
 			type->Name.c_str());
-		return 1;
-	}
-	//
-	// Find a place near wood for a lumber mill
-	//
-	if (type->CanStore[WoodCost] && AiFindLumberMillPlace(worker, type, dx, dy)) {
 		return 1;
 	}
 	//

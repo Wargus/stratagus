@@ -165,11 +165,6 @@ static int CclStratagusMap(lua_State *l)
 						++j2;
 						for (; j2 < args2; ++j2) {
 							lua_rawgeti(l, -1, j2 + 1);
-							if (lua_isnumber(l, -1)) {
-								Map.Fields[i].Value = LuaToNumber(l, -1);
-								lua_pop(l, 1);
-								continue;
-							}
 							value = LuaToString(l, -1);
 							lua_pop(l, 1);
 							if (!strcmp(value, "explored")) {
@@ -189,11 +184,6 @@ static int CclStratagusMap(lua_State *l)
 								Map.Fields[i].Flags |= MapFieldNoBuilding;
 							} else if (!strcmp(value, "block")) {
 								Map.Fields[i].Flags |= MapFieldUnpassable;
-
-							} else if (!strcmp(value, "rock")) {
-								Map.Fields[i].Flags |= MapFieldRocks;
-							} else if (!strcmp(value, "wood")) {
-								Map.Fields[i].Flags |= MapFieldForest;
 
 							} else if (!strcmp(value, "ground")) {
 								Map.Fields[i].Flags |= MapFieldLandUnit;
@@ -366,32 +356,6 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 }
 
 /**
-**  Set forest regeneration speed.
-**
-**  @param l  Lua state.
-**
-**  @return   Old speed
-*/
-static int CclSetForestRegeneration(lua_State *l)
-{
-	int i;
-	int old;
-
-	LuaCheckArgs(l, 1);
-	i = LuaToNumber(l, 1);
-	if (i < 0 || i > 255) {
-		PrintFunction();
-		fprintf(stdout, "Regeneration speed should be 0 - 255\n");
-		i = 100;
-	}
-	old = ForestRegeneration;
-	ForestRegeneration = i;
-
-	lua_pushnumber(l, old);
-	return 1;
-}
-
-/**
 **  Define Fog graphics
 **
 **  @param l  Lua state.
@@ -439,7 +403,6 @@ void SetTile(int tile, int w, int h, int value)
 
 	if (Map.Fields) {
 		Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
-		Map.Fields[w + h * Map.Info.MapWidth].Value = value;
 		Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
 		Map.Fields[w + h * Map.Info.MapWidth].Cost = 
 			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
@@ -529,8 +492,6 @@ void MapCclRegister(void)
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
-
-	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 
 	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);

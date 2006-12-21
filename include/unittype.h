@@ -491,13 +491,6 @@
 **
 **    Cycles the unit waits while inside the depot to unload.
 **
-**  ResourceInfo::TerrainHarvester
-**
-**    The unit will harvest terrain. For now this only works
-**    for wood. maybe it could be made to work for rocks, but
-**    more than that requires a tileset rewrite.
-**  @todo more configurable.
-**
 */
 
 /*----------------------------------------------------------------------------
@@ -545,8 +538,7 @@ class ResourceInfo {
 public:
 	ResourceInfo() : HarvestFromOutside(0), WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
-		TerrainHarvester(0), LoseResources(0),
-		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
+		LoseResources(0), SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
 
 	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
@@ -558,7 +550,6 @@ public:
 	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 	unsigned FinalResource;         /// Convert resource when delivered.
-	unsigned TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
 	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.

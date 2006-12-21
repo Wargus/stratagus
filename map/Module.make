@@ -27,6 +27,6 @@
 
 MODULE = src/map
 MSRC =   script_map.cpp script_tileset.cpp map.cpp map_draw.cpp map_fog.cpp \
-         map_radar.cpp map_save.cpp map_wall.cpp minimap.cpp tileset.cpp
+         map_radar.cpp map_save.cpp minimap.cpp tileset.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

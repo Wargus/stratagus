@@ -899,8 +899,6 @@ extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 	/// Find the neareast piece of terrain with specific flags.
 extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		const CPlayer *player, int x, int y, int *px, int *py);
-	/// Find the nearest piece of wood in sight range
-extern int FindWoodInSight(const CUnit *unit, int *x, int *y);
 
 	/// @todo more docu
 extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);

@@ -115,9 +115,6 @@ extern void SendCommandBuildBuilding(CUnit *unit, int x, int y,
 	CUnitType *what, int flush);
 	/// Send cancel building command
 extern void SendCommandDismiss(CUnit *unit);
-	/// Send harvest location command
-extern void SendCommandResourceLoc(CUnit *unit, int x, int y,
-	int flush);
 	/// Send harvest command
 extern void SendCommandResource(CUnit *unit, CUnit *dest,
 	int flush);

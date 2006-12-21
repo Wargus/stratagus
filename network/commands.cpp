@@ -865,8 +865,6 @@ static void DoNextReplay(void)
 		SendCommandBuildBuilding(UnitSlots[unit], posx, posy, UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "dismiss")) {
 		SendCommandDismiss(UnitSlots[unit]);
-	} else if (!strcmp(action, "resource-loc")) {
-		SendCommandResourceLoc(UnitSlots[unit], posx, posy, flags);
 	} else if (!strcmp(action, "resource")) {
 		SendCommandResource(UnitSlots[unit], dunit, flags);
 	} else if (!strcmp(action, "return")) {
@@ -1221,24 +1219,6 @@ void SendCommandDismiss(CUnit *unit)
 	} else {
 		NetworkSendCommand(MessageCommandDismiss, unit, 0, 0, NULL, 0,
 			FlushCommands);
-	}
-}
-
-/**
-**  Send command: Unit harvests a location (wood for now).
-**
-** @param unit     pointer to unit.
-** @param x        X map tile position where to harvest.
-** @param y        Y map tile position where to harvest.
-** @param flush    Flag flush all pending commands.
-*/
-void SendCommandResourceLoc(CUnit *unit, int x, int y, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("resource-loc", unit, flush, x, y, NoUnitP, NULL, -1);
-		CommandResourceLoc(unit, x, y, flush);
-	} else {
-		NetworkSendCommand(MessageCommandResourceLoc, unit, x, y, NoUnitP, 0, flush);
 	}
 }
 
@@ -1616,10 +1596,6 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandDismiss:
 			CommandLog("dismiss", unit, FlushCommands, -1, -1, NULL, NULL, -1);
 			CommandDismiss(unit);
-			break;
-		case MessageCommandResourceLoc:
-			CommandLog("resource-loc", unit, status, x, y, NoUnitP, NULL, -1);
-			CommandResourceLoc(unit, x, y, status);
 			break;
 		case MessageCommandResource:
 			dest = NoUnitP;

@@ -55,8 +55,6 @@
 #define LandUnitMask ( \
 	MapFieldLandUnit | \
 	MapFieldBuilding | \
-	MapFieldRocks | \
-	MapFieldForest | \
 	MapFieldCoastAllowed | \
 	MapFieldWaterAllowed | \
 	MapFieldUnpassable)
@@ -64,8 +62,6 @@
 #define NavalUnitMask ( \
 	MapFieldLandUnit | \
 	MapFieldBuilding | \
-	MapFieldRocks | \
-	MapFieldForest | \
 	MapFieldCoastAllowed | \
 	MapFieldLandAllowed | \
 	MapFieldUnpassable)
