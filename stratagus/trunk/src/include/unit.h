@@ -857,9 +857,9 @@ extern void UnitGoesUnderFog(CUnit *unit, const CPlayer *player);
 	/// Call when an Unit goes out of fog.
 extern void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player);
 	/// Marks a unit as seen
-extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int p);
+extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y);
 	/// Unmarks a unit as seen
-extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int p);
+extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y);
 	/// Does a recount for VisCount
 extern void UnitCountSeen(CUnit *unit);
 
