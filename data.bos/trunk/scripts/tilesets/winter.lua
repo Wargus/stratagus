@@ -32,12 +32,6 @@ DefineTileset(
  "image", "tiles/winter.png",
  -- Slots descriptions
  "slots", {
-  "special", {-- Can't be in pud
-   "top-one-tree", 121, "mid-one-tree", 122, "bot-one-tree", 123,
-   "removed-tree", 126,
-   "growing-tree", { -1, -1 },
-   "top-one-rock", 161, "mid-one-rock", 162, "bot-one-rock", 163,
-   "removed-rock", 166 },
   "solid", { "unused",
     {}},-- 000
   "solid", { "light-water", "water",
@@ -52,9 +46,9 @@ DefineTileset(
     { 356, 357, 356,   0, 358, 359, 360, 361, 362, 363, 358, 359, 358, 359, 358, 359}},-- 050
   "solid", { "dark_desert", "land",
     { 364, 365, 364,   0, 366, 367, 368, 369, 370, 371, 366, 367, 366, 367, 366, 367}},-- 060
-  "solid", { "forest", "land", "forest", "unpassable",
+  "solid", { "forest", "land", "unpassable",
     { 125, 127, 128}},-- 070
-  "solid", { "rocks", "land", "rock", "unpassable",
+  "solid", { "rocks", "land", "unpassable",
     { 165, 177, 178, 179}},-- 080
   "solid", { "human-closed-wall", "land", "unpassable",
     {  16,   0,  52,   0,  88}},-- 090
@@ -121,7 +115,7 @@ DefineTileset(
     { 205, 205},-- 3D0
     {},-- 3E0
     {}},-- 3F0
-  "mixed", { "rocks", "light-grass", "land", "rock", "unpassable",
+  "mixed", { "rocks", "light-grass", "land", "unpassable",
     { 150, 173},-- 400
     { 142, 167},-- 410
     { 164, 176},-- 420
@@ -172,7 +166,7 @@ DefineTileset(
     { 268, 269},-- 6D0
     {},-- 6E0
     {}},-- 6F0
-  "mixed", { "forest", "light-desert", "land", "forest", "unpassable",
+  "mixed", { "forest", "light-desert", "land", "unpassable",
     { 129, 110},-- 700
     { 102, 130},-- 710
     { 124, 131},-- 720
@@ -246,4 +240,3 @@ DefineTileset(
  }
 )
 
-BuildTilesetTables()
