@@ -428,11 +428,6 @@ public:
 };
 
 
-enum PlayerRacesOld {
-	PlayerRaceHuman = 0,  /// belongs to human
-	PlayerRaceOrc  = 1,   /// belongs to orc
-};
-
 /**
 **  Types for the player
 **
