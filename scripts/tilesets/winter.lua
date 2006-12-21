@@ -56,13 +56,13 @@ DefineTileset(
     { 125, 127, 128}},-- 070
   "solid", { "rocks", "land", "rock", "unpassable",
     { 165, 177, 178, 179}},-- 080
-  "solid", { "human-closed-wall", "land", "human", "wall", "unpassable",
+  "solid", { "human-closed-wall", "land", "unpassable",
     {  16,   0,  52,   0,  88}},-- 090
-  "solid", { "orc-closed-wall", "land", "wall", "unpassable",
+  "solid", { "orc-closed-wall", "land", "unpassable",
     {  34,   0,  70,   0,  88}},-- 0A0
-  "solid", { "human-open-wall", "land", "human", "wall", "unpassable",
+  "solid", { "human-open-wall", "land", "unpassable",
     {  33,   0,  69,   0, 101}},-- 0B0
-  "solid", { "orc-open-wall", "land", "wall", "unpassable",
+  "solid", { "orc-open-wall", "land", "unpassable",
     {  51,   0,  87,   0, 101}},-- 0C0
   "solid", { "unused",
     {}},-- 0D0
@@ -189,7 +189,7 @@ DefineTileset(
     { 105, 105},-- 7D0
     {},-- 7E0
     {}},-- 7F0
-  "mixed", { "human-wall", "dark_desert", "land", "human", "wall", "unpassable",
+  "mixed", { "human-wall", "dark_desert", "land", "unpassable",
     {  17,   0,  53,   0,  89},-- 800
     {  18,   0,  54,   0,  90},-- 810
     {  19,   0,  55,   0,  91},-- 820
@@ -206,7 +206,7 @@ DefineTileset(
     {  32,   0,  68,   0,  99},-- 8D0
     {},-- 8E0
     {}},-- 8F0
-  "mixed", { "orc-wall", "dark_desert", "land", "wall", "unpassable",
+  "mixed", { "orc-wall", "dark_desert", "land", "unpassable",
     {  35,   0,  71,   0,  89},-- 900
     {  36,   0,  72,   0,  90},-- 910
     {  37,   0,  73,   0,  91},-- 920
