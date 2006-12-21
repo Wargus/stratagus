@@ -108,14 +108,6 @@ void CMap::MarkSeenTile(int x, int y)
 		} else if (RockOnMap(x, y)) {
 			FixTile(MapFieldRocks, 1, x, y);
 			FixNeighbors(MapFieldRocks, 1, x, y);
-
-		//  Handle Walls changes.
-		} else if (this->Tileset.TileTypeTable[tile] == TileTypeHumanWall ||
-				this->Tileset.TileTypeTable[tile] == TileTypeOrcWall ||
-				this->Tileset.TileTypeTable[seentile] == TileTypeHumanWall ||
-				this->Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
-			MapFixSeenWallTile(x, y);
-			MapFixSeenWallNeighbors(x, y);
 		}
 	}
 
@@ -195,51 +187,6 @@ bool CMap::CoastOnMap(int tx, int ty) const
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
 	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldCoastAllowed) != 0;
 
-}
-
-/**
-**  Wall on map tile.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if wall, false otherwise.
-*/
-bool CMap::WallOnMap(int tx, int ty) const
-{
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldWall) != 0;
-
-}
-
-/**
-**  Human wall on map tile.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if human wall, false otherwise.
-*/
-bool CMap::HumanWallOnMap(int tx, int ty) const
-{
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (Fields[tx + ty * Info.MapWidth].Flags &
-		(MapFieldWall | MapFieldHuman)) == (MapFieldWall | MapFieldHuman);
-}
-
-/**
-**  Orc wall on map tile.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if orcish wall, false otherwise.
-*/
-bool CMap::OrcWallOnMap(int tx, int ty) const
-{
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (Fields[tx + ty * Info.MapWidth].Flags &
-		(MapFieldWall | MapFieldHuman)) == MapFieldWall;
 }
 
 /**
@@ -345,16 +292,6 @@ void PreprocessMap(void)
 		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			mf = Map.Fields + ix + iy * Map.Info.MapWidth;
 			mf->SeenTile = mf->Tile;
-		}
-	}
-
-	// it is required for fixing the wood that all tiles are marked as seen!
-	if (Map.Tileset.TileTypeTable) {
-		for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
-			for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
-				MapFixWallTile(ix, iy);
-				MapFixSeenWallTile(ix, iy);
-			}
 		}
 	}
 }

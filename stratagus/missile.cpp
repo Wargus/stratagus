@@ -408,21 +408,6 @@ void FireMissile(CUnit *unit)
 	if (unit->Type->Missile.Missile->Class == MissileClassNone) {
 		// No goal, take target coordinates
 		if (!goal) {
-			dx = unit->Orders[0]->X;
-			dy = unit->Orders[0]->Y;
-			if (Map.WallOnMap(dx, dy)) {
-				if (Map.HumanWallOnMap(dx, dy)) {
-					Map.HitWall(dx, dy,
-						CalculateDamageStats(unit->Stats,
-							UnitTypeHumanWall->Stats, unit->Variable[BLOODLUST_INDEX].Value, unit->Variable[XP_INDEX].Value));
-				} else {
-					Map.HitWall(dx, dy,
-						CalculateDamageStats(unit->Stats,
-							UnitTypeOrcWall->Stats, unit->Variable[BLOODLUST_INDEX].Value, unit->Variable[XP_INDEX].Value));
-				}
-				return;
-			}
-
 			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
@@ -858,39 +843,6 @@ static void MissileHitsGoal(const Missile *missile, CUnit *goal, int splash)
 }
 
 /**
-**  Missile hits wall.
-**
-**  @param missile  Missile hitting the goal.
-**  @param x        Wall X map tile position.
-**  @param y        Wall Y map tile position.
-**  @param splash   Splash damage divisor.
-**
-**  @todo FIXME: Support for more races.
-*/
-static void MissileHitsWall(const Missile *missile, int x, int y, int splash)
-{
-	CUnitStats *stats; // stat of the wall.
-
-	if (!Map.WallOnMap(x, y)) {
-		return;
-	}
-	if (missile->Damage) {  // direct damage, spells mostly
-		Map.HitWall(x, y, missile->Damage / splash);
-		return;
-	}
-
-	Assert(missile->SourceUnit != NULL);
-	if (Map.HumanWallOnMap(x, y)) {
-		stats = UnitTypeHumanWall->Stats;
-	} else {
-		Assert(Map.OrcWallOnMap(x, y));
-		stats = UnitTypeOrcWall->Stats;
-	}
-	Map.HitWall(x, y, CalculateDamageStats(missile->SourceUnit->Stats, stats, 0, 0) / splash);
-
-}
-
-/**
 **  Work for missile hit.
 **
 **  @param missile  Missile reaching end-point.
@@ -949,7 +901,6 @@ void MissileHit(Missile *missile)
 			MissileHitsGoal(missile, goal, 1);
 			return;
 		}
-		MissileHitsWall(missile, x, y, 1);
 		return;
 	}
 
@@ -973,24 +924,6 @@ void MissileHit(Missile *missile)
 				splash = 1;
 			}
 			MissileHitsGoal(missile, goal, splash);
-		}
-	}
-
-	//
-	// Missile hits ground.
-	//
-	x -= missile->Type->Range;
-	y -= missile->Type->Range;
-	for (i = missile->Type->Range * 2; --i;) {
-		for (n = missile->Type->Range * 2; --n;) {
-			if (x + i >= 0 && x + i < Map.Info.MapWidth && y + n >= 0 && y + n < Map.Info.MapHeight) {
-				int d = MapDistance(x + missile->Type->Range, y + missile->Type->Range, x + i, y + n);
-				d *= missile->Type->SplashFactor;
-				if (d == 0) {
-					d = 1;
-				}
-				MissileHitsWall(missile, x + i, y + n, d);
-			}
 		}
 	}
 }

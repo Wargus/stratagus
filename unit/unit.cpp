@@ -347,10 +347,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 			// If unit is dieing, it's already been lost by all players
 			// don't count again
 			if (type->Building) {
-				// FIXME: support more races
-				if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-					player->TotalBuildings++;
-				}
+				player->TotalBuildings++;
 			} else {
 				player->TotalUnits++;
 			}
@@ -364,10 +361,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type->Building && Orders[0]->Action != UnitActionDie) {
-		// FIXME: support more races
-		if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-			player->NumBuildings++;
-		}
+		player->NumBuildings++;
 	}
 	Player = player;
 	Stats = &type->Stats[Player->Index];
@@ -867,10 +861,7 @@ void UnitLost(CUnit *unit)
 		player->Units[player->TotalNumUnits] = NULL;
 
 		if (unit->Type->Building) {
-			// FIXME: support more races
-			if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-				player->NumBuildings--;
-			}
+			player->NumBuildings--;
 		}
 
 		if (unit->Orders[0]->Action != UnitActionBuilt) {

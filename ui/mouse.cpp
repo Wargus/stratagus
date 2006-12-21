@@ -326,19 +326,6 @@ void DoRightButton(int sx, int sy)
 					continue;
 				}
 
-				if (Map.WallOnMap(x, y)) {
-					if (unit->Player->Race == PlayerRaceHuman &&
-							Map.OrcWallOnMap(x, y)) {
-						SendCommandAttack(unit, x, y, NoUnitP, flush);
-						continue;
-					}
-					if (unit->Player->Race == PlayerRaceOrc &&
-							Map.HumanWallOnMap(x, y)) {
-						SendCommandAttack(unit, x, y, NoUnitP, flush);
-						continue;
-					}
-				}
-
 				if ((dest->Player == unit->Player || unit->IsAllied(dest)) &&
 						dest != unit) {
 					dest->Blink = 4;

@@ -157,8 +157,6 @@ static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 			flags |= MapFieldNoBuilding;
 		} else if (!strcmp(value, "unpassable")) {
 			flags |= MapFieldUnpassable;
-		} else if (!strcmp(value, "wall")) {
-			flags |= MapFieldWall;
 		} else if (!strcmp(value, "rock")) {
 			flags |= MapFieldRocks;
 		} else if (!strcmp(value, "forest")) {
@@ -171,8 +169,6 @@ static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 			flags |= MapFieldSeaUnit;
 		} else if (!strcmp(value, "building")) {
 			flags |= MapFieldBuilding;
-		} else if (!strcmp(value, "human")) {
-			flags |= MapFieldHuman;
 		} else if (!strcmp(value, "fastest")) {
 			flags = (flags & ~MapFieldSpeedMask);
 		} else if (!strcmp(value, "fast")) {
@@ -563,11 +559,11 @@ static int CclDefineTileset(lua_State *l)
 }
 
 /**
-** Build tileset tables like HumanWallTable or MixedLookupTable
+** Build tileset tables like MixedLookupTable
 **
-** Called after LoadTileset and only for tilesets that have wall, 
+** Called after LoadTileset and only for tilesets that have 
 ** trees and rocks. This function will be deleted when removing 
-** support of walls and alike in the tileset.
+** support of trees and alike in the tileset.
 */
 static int CclBuildTilesetTables(lua_State *l)
 {
@@ -603,12 +599,6 @@ static int CclBuildTilesetTables(lua_State *l)
 				Map.Tileset.TileTypeTable[tile] = TileTypeWater;
 			} else if (flags & MapFieldCoastAllowed) {
 				Map.Tileset.TileTypeTable[tile] = TileTypeCoast;
-			} else if (flags & MapFieldWall) {
-				if (flags & MapFieldHuman) {
-					Map.Tileset.TileTypeTable[tile] = TileTypeHumanWall;
-				} else {
-					Map.Tileset.TileTypeTable[tile] = TileTypeOrcWall;
-				}
 			} else if (flags & MapFieldRocks) {
 				Map.Tileset.TileTypeTable[tile] = TileTypeRock;
 			} else if (flags & MapFieldForest) {
@@ -852,69 +842,6 @@ static int CclBuildTilesetTables(lua_State *l)
 	Map.Tileset.RockTable[17] = Map.Tileset.BotOneRock;
 	Map.Tileset.RockTable[18] = Map.Tileset.TopOneRock;
 	Map.Tileset.RockTable[19] = Map.Tileset.MidOneRock;
-
-	// FIXME: Build wall replacement tables
-	Map.Tileset.HumanWallTable[ 0] = 0x090;
-	Map.Tileset.HumanWallTable[ 1] = 0x830;
-	Map.Tileset.HumanWallTable[ 2] = 0x810;
-	Map.Tileset.HumanWallTable[ 3] = 0x850;
-	Map.Tileset.HumanWallTable[ 4] = 0x800;
-	Map.Tileset.HumanWallTable[ 5] = 0x840;
-	Map.Tileset.HumanWallTable[ 6] = 0x820;
-	Map.Tileset.HumanWallTable[ 7] = 0x860;
-	Map.Tileset.HumanWallTable[ 8] = 0x870;
-	Map.Tileset.HumanWallTable[ 9] = 0x8B0;
-	Map.Tileset.HumanWallTable[10] = 0x890;
-	Map.Tileset.HumanWallTable[11] = 0x8D0;
-	Map.Tileset.HumanWallTable[12] = 0x880;
-	Map.Tileset.HumanWallTable[13] = 0x8C0;
-	Map.Tileset.HumanWallTable[14] = 0x8A0;
-	Map.Tileset.HumanWallTable[15] = 0x0B0;
-
-	Map.Tileset.OrcWallTable[ 0] = 0x0A0;
-	Map.Tileset.OrcWallTable[ 1] = 0x930;
-	Map.Tileset.OrcWallTable[ 2] = 0x910;
-	Map.Tileset.OrcWallTable[ 3] = 0x950;
-	Map.Tileset.OrcWallTable[ 4] = 0x900;
-	Map.Tileset.OrcWallTable[ 5] = 0x940;
-	Map.Tileset.OrcWallTable[ 6] = 0x920;
-	Map.Tileset.OrcWallTable[ 7] = 0x960;
-	Map.Tileset.OrcWallTable[ 8] = 0x970;
-	Map.Tileset.OrcWallTable[ 9] = 0x9B0;
-	Map.Tileset.OrcWallTable[10] = 0x990;
-	Map.Tileset.OrcWallTable[11] = 0x9D0;
-	Map.Tileset.OrcWallTable[12] = 0x980;
-	Map.Tileset.OrcWallTable[13] = 0x9C0;
-	Map.Tileset.OrcWallTable[14] = 0x9A0;
-	Map.Tileset.OrcWallTable[15] = 0x0C0;
-
-	// Set destroyed walls to TileTypeUnknown
-	for (i = 0; i < 16; ++i) {
-		n = 0;
-		tile = Map.Tileset.HumanWallTable[i];
-		while (Map.Tileset.Table[tile]) { // Skip good tiles
-			++tile;
-			++n;
-		}
-		while (!Map.Tileset.Table[tile]) { // Skip separator
-			++tile;
-			++n;
-		}
-		while (Map.Tileset.Table[tile]) { // Skip good tiles
-			++tile;
-			++n;
-		}
-		while (!Map.Tileset.Table[tile]) { // Skip separator
-			++tile;
-			++n;
-		}
-		while (n < 16 && Map.Tileset.Table[tile]) {
-			Map.Tileset.TileTypeTable[
-				Map.Tileset.Table[tile]] = TileTypeUnknown;
-			++tile;
-			++n;
-		}
-	}
 
 	return 0;
 }
