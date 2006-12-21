@@ -153,8 +153,6 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 			if (MapDistance(ix, iy, x, y ) > this->Range) {
 				// Not in circle range
 				continue;
-			} else if (n & MapFieldWall) {
-				Map.RemoveWall(ix, iy);
 			} else if (n & MapFieldRocks) {
 				Map.ClearTile(MapFieldRocks, ix, iy);
 			} else if (n & MapFieldForest) {

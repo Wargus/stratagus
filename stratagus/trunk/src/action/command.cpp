@@ -451,12 +451,6 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 				order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				order->MinRange = unit->Type->MinAttackRange;
 			}
-		} else if (Map.WallOnMap(x,y)) {
-			// FIXME: look into action_attack.c about this ugly problem
-			order->X = x;
-			order->Y = y;
-			order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
-			order->MinRange = unit->Type->MinAttackRange;
 		} else {
 			order->X = x;
 			order->Y = y;

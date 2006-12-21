@@ -1013,10 +1013,6 @@ public:
 
 extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
 
-/// @todo this hardcoded unit-types must be removed!!
-extern CUnitType *UnitTypeHumanWall;          /// Human wall
-extern CUnitType *UnitTypeOrcWall;            /// Orc wall
-
 /**
 **  Variable info for unit and unittype.
 */

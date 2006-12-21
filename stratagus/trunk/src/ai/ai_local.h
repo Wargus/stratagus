@@ -337,8 +337,6 @@ extern void AiForceManager(void);
 //
 // Plans
 //
-	/// Find a wall to attack
-extern int AiFindWall(AiForce *force);
 	/// Plan the an attack
 extern int AiPlanAttack(AiForce *force);
 	/// Send explorers around the map

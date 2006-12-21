@@ -172,14 +172,6 @@
 **      @todo Johns: I don't think this table or routines look correct.
 **      But they work correct.
 **
-**  CTileset::HumanWallTable
-**
-**      Table of human wall tiles, index depends on the surroundings.
-**
-**  CTileset::OrcWallTable
-**
-**      Table of orc wall tiles, index depends on the surroundings.
-**
 **
 **  @struct TileInfo tileset.h
 **
@@ -218,8 +210,6 @@ enum TileType {
 	TileTypeWood,       /// Any wood tile
 	TileTypeRock,       /// Any rock tile
 	TileTypeCoast,      /// Any coast tile
-	TileTypeHumanWall,  /// Any human wall tile
-	TileTypeOrcWall,    /// Any orc wall tile
 	TileTypeWater,      /// Any water tile
 };
 
@@ -271,8 +261,6 @@ public:
 		BotOneRock = 0;
 		RemovedRock = 0;
 		memset(RockTable, 0, sizeof(RockTable));
-		memset(HumanWallTable, 0, sizeof(HumanWallTable));
-		memset(OrcWallTable, 0, sizeof(OrcWallTable));
 	}
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
@@ -303,9 +291,6 @@ public:
 	unsigned BotOneRock;     /// Tile for one rock bottom
 	int RemovedRock;         /// Tile placed where rocks are gone
 	int RockTable[20];       /// Removed rock placement table
-
-	unsigned HumanWallTable[16];    /// Human wall placement table
-	unsigned OrcWallTable[16];      /// Orc wall placement table
 };
 
 /*----------------------------------------------------------------------------

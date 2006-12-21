@@ -450,9 +450,9 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 	// Change the flags
 	//
 	mf = &Map.Fields[y * Map.Info.MapWidth + x];
-	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+	mf->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-		MapFieldWall | MapFieldRocks | MapFieldForest);
+		MapFieldRocks | MapFieldForest);
 
 	mf->Flags |= Map.Tileset.FlagsTable[tile];
 
@@ -475,22 +475,12 @@ static void EditorTileChanged2(int x, int y, int d)
 	unsigned q2;
 	unsigned u;
 	int tile;
-	CMapField *mf;
 
 	quad = QuadFromTile(x, y);
 
 	//
 	// Change the surrounding
 	//
-
-	//
-	// Special case 1) Walls.
-	//
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
-	if (mf->Flags & MapFieldWall) {
-		Map.SetWall(x, y, mf->Flags & MapFieldHuman);
-		return;
-	}
 
 	//
 	// How this works:

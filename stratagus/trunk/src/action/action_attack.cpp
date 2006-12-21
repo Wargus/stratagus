@@ -145,7 +145,6 @@ static int CheckForTargetInRange(CUnit *unit)
 {
 	CUnit *goal;
 	CUnit *temp;
-	int wall;
 
 	//
 	// Target is dead?
@@ -158,9 +157,7 @@ static int CheckForTargetInRange(CUnit *unit)
 	//
 	// No goal: if meeting enemy attack it.
 	//
-	wall = 0;
-	if (!goal && !(wall = Map.WallOnMap(unit->Orders[0]->X, unit->Orders[0]->Y)) &&
-			unit->Orders[0]->Action != UnitActionAttackGround) {
+	if (!goal && unit->Orders[0]->Action != UnitActionAttackGround) {
 		goal = AttackUnitsInReactRange(unit);
 		if (goal) {
 			if (unit->SavedOrder.Action == UnitActionStill) {
@@ -259,13 +256,12 @@ static void MoveToTarget(CUnit *unit)
 			return;
 		}
 		//
-		// Attacking wall or ground.
+		// Attacking ground.
 		//
-		if (!goal && (Map.WallOnMap(unit->Orders[0]->X, unit->Orders[0]->Y) ||
-					unit->Orders[0]->Action == UnitActionAttackGround) &&
+		if (!goal && unit->Orders[0]->Action == UnitActionAttackGround &&
 				MapDistanceToUnit(unit->Orders[0]->X, unit->Orders[0]->Y, unit) <=
 					unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			// Reached wall or ground, now attacking it
+			// Reached ground, now attacking it
 			unit->State = 0;
 			UnitHeadingFromDeltaXY(unit, unit->Orders[0]->X - unit->X,
 				unit->Orders[0]->Y - unit->Y);
@@ -324,11 +320,10 @@ static void AttackTarget(CUnit *unit)
 		return;
 	}
 	//
-	// Goal is "weak" or a wall.
+	// Goal is "weak".
 	//
 	goal = unit->Orders[0]->Goal;
-	if (!goal && (Map.WallOnMap(unit->Orders[0]->X, unit->Orders[0]->Y) ||
-			unit->Orders[0]->Action == UnitActionAttackGround)) {
+	if (!goal && unit->Orders[0]->Action == UnitActionAttackGround) {
 		return;
 	}
 

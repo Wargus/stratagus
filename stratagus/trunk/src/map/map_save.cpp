@@ -97,9 +97,6 @@ void CMap::Save(CFile *file) const
 					file->printf(" \"explored\", %d,", i);
 				}
 			}
-			if (mf->Flags & MapFieldHuman) {
-				file->printf(" \"human\",");
-			}
 			if (mf->Flags & MapFieldLandAllowed) {
 				file->printf(" \"land\",");
 			}
@@ -114,9 +111,6 @@ void CMap::Save(CFile *file) const
 			}
 			if (mf->Flags & MapFieldUnpassable) {
 				file->printf(" \"block\",");
-			}
-			if (mf->Flags & MapFieldWall) {
-				file->printf(" \"wall\",");
 			}
 			if (mf->Flags & MapFieldRocks) {
 				file->printf(" \"rock\",");

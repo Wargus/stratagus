@@ -177,8 +177,6 @@ static int CclStratagusMap(lua_State *l)
 								lua_rawgeti(l, -1, j2 + 1);
 								Map.Fields[i].Visible[(int)LuaToNumber(l, -1)] = 1;
 								lua_pop(l, 1);
-							} else if (!strcmp(value, "human")) {
-								Map.Fields[i].Flags |= MapFieldHuman;
 
 							} else if (!strcmp(value, "land")) {
 								Map.Fields[i].Flags |= MapFieldLandAllowed;
@@ -192,8 +190,6 @@ static int CclStratagusMap(lua_State *l)
 							} else if (!strcmp(value, "block")) {
 								Map.Fields[i].Flags |= MapFieldUnpassable;
 
-							} else if (!strcmp(value, "wall")) {
-								Map.Fields[i].Flags |= MapFieldWall;
 							} else if (!strcmp(value, "rock")) {
 								Map.Fields[i].Flags |= MapFieldRocks;
 							} else if (!strcmp(value, "wood")) {

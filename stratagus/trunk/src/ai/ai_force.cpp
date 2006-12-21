@@ -463,10 +463,8 @@ void AiAttackWithForce(int force)
 			DebugPrint("Need to plan an attack with transporter\n");
 			if (!AiPlayer->Force[force].State &&
 					!AiPlanAttack(&AiPlayer->Force[force])) {
-				DebugPrint("Can't transport, look for walls\n");
-				if (!AiFindWall(&AiPlayer->Force[force])) {
-					AiPlayer->Force[force].Attacking = false;
-				}
+				DebugPrint("Can't transport\n");
+				AiPlayer->Force[force].Attacking = false;
 			}
 			return;
 		}
