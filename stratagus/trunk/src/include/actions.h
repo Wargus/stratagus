@@ -103,8 +103,6 @@ extern void CommandBuildBuilding(CUnit *, int x, int y,
 	CUnitType *, int);
 	/// Prepare command dismiss
 extern void CommandDismiss(CUnit *unit);
-	/// Prepare command resource location
-extern void CommandResourceLoc(CUnit *unit, int x, int y, int flush);
 	/// Prepare command resource
 extern void CommandResource(CUnit *unit, CUnit *dest,
 	int flush);

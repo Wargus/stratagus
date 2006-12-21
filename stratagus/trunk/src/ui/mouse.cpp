@@ -264,22 +264,6 @@ void DoRightButton(int sx, int sy)
 						SendCommandResource(unit, dest, flush);
 						continue;
 					}
-				} else {
-					// FIXME: support harvesting more types of terrain.
-					for (res = 0; res < MaxCosts; ++res) {
-						if (type->ResInfo[res] &&
-								type->ResInfo[res]->TerrainHarvester &&
-								Map.IsFieldExplored(unit->Player, x, y) &&
-								Map.ForestOnMap(x, y) &&
-								((unit->CurrentResource != res) ||
-									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
-							SendCommandResourceLoc(unit, x, y, flush);
-							break;
-						}
-					}
-					if (res != MaxCosts) {
-						continue;
-					}
 				}
 			}
 			// Go and repair
@@ -393,11 +377,6 @@ void DoRightButton(int sx, int sy)
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, flush);
 				continue;
-			}
-			// FIXME: support harvesting more types of terrain.
-			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
-				SendCommandResourceLoc(unit, x, y, flush);
-				break;
 			}
 		}
 
@@ -1085,35 +1064,12 @@ static int SendResource(int sx, int sy)
 				SendCommandResource(Selected[i],dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
-			} else {
-				for (res = 0; res < MaxCosts; ++res) {
-					if (unit->Type->ResInfo[res] &&
-							unit->Type->ResInfo[res]->TerrainHarvester &&
-							Map.IsFieldExplored(unit->Player, x, y) &&
-							Map.ForestOnMap(x, y) &&
-							Selected[i]->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
-							((unit->CurrentResource != res) ||
-								(unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity))) {
-						SendCommandResourceLoc(unit, x, y,
-							!(KeyModifiers & ModifierShift));
-						ret = 1;
-						break;
-					}
-				}
-				if (res != MaxCosts) {
-					continue;
-				}
 			}
 		}
 		if (!CanMove(unit)) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));
-				ret = 1;
-				continue;
-			}
-			if (Map.IsFieldExplored(unit->Player, x, y) && Map.ForestOnMap(x, y)) {
-				SendCommandResourceLoc(unit, x, y, !(KeyModifiers & ModifierShift));
 				ret = 1;
 				continue;
 			}

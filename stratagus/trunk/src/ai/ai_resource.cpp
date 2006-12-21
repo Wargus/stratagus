@@ -784,13 +784,8 @@ static void AiCheckingWork(void)
 */
 static int AiAssignHarvester(CUnit *unit, int resource)
 {
-	ResourceInfo *resinfo;
-	// These will hold the coordinates of the forest.
-	int forestx;
-	int foresty;
 	std::vector<CUnitType *>::iterator i;
 	int exploremask;
-	//  This will hold the resulting gather destination.
 	CUnit *dest;
 
 	// It can't.
@@ -798,48 +793,33 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 		return 0;
 	}
 
-	resinfo = unit->Type->ResInfo[resource];
-	Assert(resinfo);
-	if (resinfo->TerrainHarvester) {
-		//
-		// Code for terrain harvesters. Search for piece of terrain to mine.
-		//
-		if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 1000,
-				unit->Player, unit->X, unit->Y, &forestx, &foresty)) {
-			CommandResourceLoc(unit, forestx, foresty, FlushCommands);
-			return 1;
-		}
-		// Ask the AI to explore...
-		AiExplore(unit->X, unit->Y, MapFieldLandUnit);
-	} else {
-		//
-		// Find a resource to harvest from.
-		//
-		if ((dest = UnitFindResource(unit, unit->X, unit->Y, 1000, resource))) {
-			CommandResource(unit, dest, FlushCommands);
-			return 1;
-		}
-		exploremask = 0;
-		for (i = UnitTypes.begin(); i != UnitTypes.end(); i++) {
-			if (*i && (*i)->GivesResource == resource) {
-				switch ((*i)->UnitType) {
-				case UnitTypeLand:
-					exploremask |= MapFieldLandUnit;
-					break;
-				case UnitTypeFly:
-					exploremask |= MapFieldAirUnit;
-					break;
-				case UnitTypeNaval:
-					exploremask |= MapFieldSeaUnit;
-					break;
-				default:
-					Assert(0);
-				}
+	//
+	// Find a resource to harvest from.
+	//
+	if ((dest = UnitFindResource(unit, unit->X, unit->Y, 1000, resource))) {
+		CommandResource(unit, dest, FlushCommands);
+		return 1;
+	}
+	exploremask = 0;
+	for (i = UnitTypes.begin(); i != UnitTypes.end(); i++) {
+		if (*i && (*i)->GivesResource == resource) {
+			switch ((*i)->UnitType) {
+			case UnitTypeLand:
+				exploremask |= MapFieldLandUnit;
+				break;
+			case UnitTypeFly:
+				exploremask |= MapFieldAirUnit;
+				break;
+			case UnitTypeNaval:
+				exploremask |= MapFieldSeaUnit;
+				break;
+			default:
+				Assert(0);
 			}
 		}
-		// Ask the AI to explore
-		AiExplore(unit->X, unit->Y, exploremask);
 	}
+	// Ask the AI to explore
+	AiExplore(unit->X, unit->Y, exploremask);
 
 	// Failed.
 	return 0;
