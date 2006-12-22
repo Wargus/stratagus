@@ -230,7 +230,6 @@
 #include "commands.h"
 #include "interface.h"
 #include "results.h"
-#include "master.h"
 
 
 //----------------------------------------------------------------------------
