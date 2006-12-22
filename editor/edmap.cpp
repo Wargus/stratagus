@@ -10,7 +10,7 @@
 //
 /**@name edmap.cpp - Editor map functions. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer
+//      (c) Copyright 2002-2006 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -735,8 +735,6 @@ void CEditor::CreateRandomMap(void) const
 	EditorRandomizeTile(GRASS_TILE, 20, 16);
 	EditorRandomizeTile(WOOD_TILE,  60,  4);
 	EditorRandomizeTile(ROCK_TILE,  30,  2);
-
-	EditorRandomizeUnit("unit-gold-mine",  5,  50000);
 }
 
 //@}
