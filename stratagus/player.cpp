@@ -61,7 +61,6 @@
 int NumPlayers;                  /// How many player slots used
 CPlayer Players[PlayerMax];       /// All players in play
 CPlayer *ThisPlayer;              /// Player on this computer
-PlayerRace PlayerRaces;          /// Player races
 
 int NoRescueCheck;               /// Disable rescue check
 
@@ -116,18 +115,6 @@ void CleanPlayers(void)
 }
 
 /**
-**  Clean up the PlayerRaces names.
-*/
-void CleanRaces(void)
-{
-	for (int p = 0; p < PlayerRaces.Count; ++p) {
-		delete[] PlayerRaces.Name[p];
-		delete[] PlayerRaces.Display[p];
-	}
-	PlayerRaces.Count = 0;
-}
-
-/**
 **  Save state of players to file.
 **
 **  @param file  Output file.
@@ -158,7 +145,6 @@ void SavePlayers(CFile *file)
 			case PlayerRescueActive:  file->printf("\"rescue-active\","); break;
 			default:                  file->printf("%d,",Players[i].Type);break;
 		}
-		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race]);
 		file->printf(" \"ai-name\", \"%s\",\n", Players[i].AiName.c_str());
 		file->printf("  \"team\", %d,", Players[i].Team);
 
@@ -361,7 +347,6 @@ void CreatePlayer(int type)
 	DebugPrint("CreatePlayer name %s\n" _C_ player->Name.c_str());
 
 	player->Type = type;
-	player->Race = 0;
 	player->Team = team;
 	player->Enemy = 0;
 	player->Allied = 0;
@@ -447,19 +432,6 @@ void CreatePlayer(int type)
 }
 
 /**
-**  Change player side.
-**
-**  @param side    New side (Race).
-*/
-void CPlayer::SetSide(int side)
-{
-	Assert(side >= 0 && side < PlayerRaces.Count);
-	Assert(PlayerRaces.Name[side]);
-
-	this->Race = side;
-}
-
-/**
 **  Change player name.
 **
 **  @param name    New name.
@@ -480,7 +452,6 @@ void CPlayer::Clear()
 	Index = 0;
 	Name.clear();
 	Type = 0;
-	Race = 0;
 	AiName.clear();
 	Team = 0;
 	Enemy = 0;
@@ -806,8 +777,8 @@ void DebugPlayers(void)
 	int i;
 	const char *playertype;
 
-	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
-	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
+	DebugPrint("Nr   Color   I Name     Type         Ai\n");
+	DebugPrint("--  -------- - -------- ------------ -----\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (Players[i].Type == PlayerNobody) {
 			continue;
@@ -823,11 +794,10 @@ void DebugPlayers(void)
 			case 7: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i] _C_
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %s\n" _C_ i _C_ PlayerColorNames[i] _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name.c_str() _C_ playertype _C_
-			PlayerRaces.Name[Players[i].Race] _C_
 			Players[i].AiName.c_str());
 	}
 #endif

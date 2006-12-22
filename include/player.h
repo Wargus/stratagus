@@ -72,19 +72,6 @@
 **    #PlayerRescuePassive and #PlayerRescueActive.
 **    @see #PlayerTypes.
 **
-**  CPlayer::RaceName
-**
-**    Name of the race to which the player belongs, used to select
-**    the user interface and the AI.
-**    We have 'orc', 'human', 'alliance' or 'mythical'. Should
-**    only be used during configuration and not during runtime.
-**
-**  CPlayer::Race
-**
-**    Race number of the player. This field is setup from the level
-**    map. This number is mapped with #PlayerRaces to the symbolic
-**    name CPlayer::RaceName.
-**
 **  CPlayer::AiName
 **
 **    AI name for computer. This field is setup
@@ -303,11 +290,10 @@ class CFile;
 class CPlayer
 {
 public:
-	int   Index;        /// player as number
+	int Index;          /// player as number
 	std::string Name;   /// name of non computer
 
-	int   Type;         /// type of player (human,computer,...)
-	int   Race;         /// race of player (orc,human,...)
+	int Type;           /// type of player (human,computer,...)
 	std::string AiName; /// AI for computer
 
 	// friend enemy detection
@@ -356,8 +342,6 @@ public:
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 
-	/// Change player side
-	void SetSide(int side);
 	/// Change player name
 	void SetName(const std::string &name);
 
@@ -406,25 +390,6 @@ public:
 	bool IsBothSharedVision(const CUnit *x) const;
 	bool IsTeamed(const CPlayer *x) const;
 	bool IsTeamed(const CUnit *x) const;
-};
-
-/**
-**  Races for the player
-**  Mapped with #PlayerRaces to a symbolic name.
-*/
-#define MAX_RACES 8
-class PlayerRace {
-public:
-	PlayerRace() : Count(0) {
-		memset(Visible, 0, sizeof(Visible));
-		memset(Name, 0, sizeof(Name));
-		memset(Display, 0, sizeof(Display));
-	}
-
-	char  Visible[MAX_RACES];  /// race should be visible in pulldown
-	char *Name[MAX_RACES];     /// race names
-	char *Display[MAX_RACES];  /// text to display in pulldown
-	int   Count;               /// number of races
 };
 
 
@@ -498,8 +463,6 @@ extern SDL_Color *PlayerColorsRGB[PlayerMax]; /// Player colors
 extern Uint32 *PlayerColors[PlayerMax];       /// Player colors
 extern char *PlayerColorNames[PlayerMax];  /// Player color names
 
-extern PlayerRace PlayerRaces;  /// Player races
-
 /**
 **  Which indexes to replace with player color
 */
@@ -514,8 +477,6 @@ extern int PlayerColorIndexCount;
 extern void InitPlayers(void);
 	/// Clean up players
 extern void CleanPlayers(void);
-	/// Clean up races
-extern void CleanRaces(void);
 	/// Save players
 extern void SavePlayers(CFile *file);
 

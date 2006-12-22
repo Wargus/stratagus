@@ -119,17 +119,6 @@ static int CclPlayer(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "race")) {
-			value = LuaToString(l, j + 1);
-			for (i = 0; i < PlayerRaces.Count; ++i) {
-				if (!strcmp(value, PlayerRaces.Name[i])) {
-					player->Race = i;
-					break;
-				}
-			}
-			if (i == PlayerRaces.Count) {
-				LuaError(l, "Unsupported race: %s" _C_ value);
-			}
 		} else if (!strcmp(value, "ai-name")) {
 			player->AiName = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "team")) {
@@ -575,62 +564,6 @@ static int CclSharedVision(lua_State *l)
 }
 
 /**
-**  Define race names
-**
-**  @param l  Lua state.
-*/
-static int CclDefineRaceNames(lua_State *l)
-{
-	int i;
-	int j;
-	int k;
-	int args;
-	int subargs;
-	const char *value;
-
-	PlayerRaces.Count = 0;
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		if (!strcmp(value, "race")) {
-			++j;
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			i = PlayerRaces.Count++;
-			PlayerRaces.Name[i] = NULL;
-			PlayerRaces.Display[i] = NULL;
-			PlayerRaces.Visible[i] = 0;
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				if (!strcmp(value, "name")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					PlayerRaces.Name[i] = new_strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "display")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					PlayerRaces.Display[i] = new_strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "visible")) {
-					PlayerRaces.Visible[i] = 1;
-				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-
-	return 0;
-}
-
-/**
 **  Define player colors
 **
 **  @param l  Lua state.
@@ -740,9 +673,6 @@ static int CclGetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, p->Name.c_str());
 		return 1;
-	} else if (!strcmp(data, "RaceName")) {
-		lua_pushstring(l, PlayerRaces.Name[p->Race]);
-		return 1;
 	} else if (!strcmp(data, "Resources")) {
 		const char *res;
 		int i;
@@ -848,21 +778,6 @@ static int CclSetPlayerData(lua_State *l)
 
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
-	} else if (!strcmp(data, "RaceName")) {
-		int i;
-		const char *racename;
-
-		racename = LuaToString(l, 3);
-		p->Race = 0;
-		for (i = 0; i < PlayerRaces.Count; ++i) {
-			if (!strcmp(racename, PlayerRaces.Name[i])) {
-				p->Race = i;
-				break;
-			}
-		}
-		if (i == PlayerRaces.Count)	{
-			LuaError(l, "invalid race name '%s'" _C_ racename);
-		}
 	} else if (!strcmp(data, "Resources")) {
 		const char *res;
 		int i;
@@ -969,7 +884,6 @@ void PlayerCclRegister(void)
 	lua_register(Lua, "SetSharedVision", CclSetSharedVision);
 	lua_register(Lua, "SharedVision", CclSharedVision);
 
-	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
 

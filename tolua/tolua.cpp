@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Dec  8 20:12:40 2006.
+** Generated automatically by tolua++-1.0.7 on Thu Dec 21 20:53:34 2006.
 */
 
 #ifndef __cplusplus
@@ -11439,58 +11439,6 @@ static int tolua_set_stratagus_ServerSetup_Ready(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: Race of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_stratagus_ServerSetup_Race
-static int tolua_get_stratagus_ServerSetup_Race(lua_State* tolua_S)
-{
- int tolua_index;
-  ServerSetup* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (ServerSetup*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
- tolua_Error tolua_err;
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=PlayerMax)
- tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
- tolua_pushnumber(tolua_S,(lua_Number)self->Race[tolua_index]);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Race of class  ServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_stratagus_ServerSetup_Race
-static int tolua_set_stratagus_ServerSetup_Race(lua_State* tolua_S)
-{
- int tolua_index;
-  ServerSetup* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (ServerSetup*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
- tolua_Error tolua_err;
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=PlayerMax)
- tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
-  self->Race[tolua_index] = ((unsigned)  tolua_tonumber(tolua_S,3,0));
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: LastFrame of class  ServerSetup */
 #ifndef TOLUA_DISABLE_tolua_get_stratagus_ServerSetup_LastFrame
 static int tolua_get_stratagus_ServerSetup_LastFrame(lua_State* tolua_S)
@@ -15271,36 +15219,6 @@ static int tolua_set_GameObserve(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: Race of class  SettingsPresets */
-#ifndef TOLUA_DISABLE_tolua_get_SettingsPresets_Race
-static int tolua_get_SettingsPresets_Race(lua_State* tolua_S)
-{
-  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Race'",NULL);
-#endif
- tolua_pushnumber(tolua_S,(lua_Number)self->Race);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Race of class  SettingsPresets */
-#ifndef TOLUA_DISABLE_tolua_set_SettingsPresets_Race
-static int tolua_set_SettingsPresets_Race(lua_State* tolua_S)
-{
-  SettingsPresets* self = (SettingsPresets*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Race'",NULL);
- if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
- tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->Race = ((int)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: Team of class  SettingsPresets */
 #ifndef TOLUA_DISABLE_tolua_get_SettingsPresets_Team
 static int tolua_get_SettingsPresets_Team(lua_State* tolua_S)
@@ -16883,7 +16801,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"MapRichness",tolua_get_ServerSetup_unsigned_MapRichness,tolua_set_ServerSetup_unsigned_MapRichness);
   tolua_array(tolua_S,"CompOpt",tolua_get_stratagus_ServerSetup_CompOpt,tolua_set_stratagus_ServerSetup_CompOpt);
   tolua_array(tolua_S,"Ready",tolua_get_stratagus_ServerSetup_Ready,tolua_set_stratagus_ServerSetup_Ready);
-  tolua_array(tolua_S,"Race",tolua_get_stratagus_ServerSetup_Race,tolua_set_stratagus_ServerSetup_Race);
   tolua_array(tolua_S,"LastFrame",tolua_get_stratagus_ServerSetup_LastFrame,tolua_set_stratagus_ServerSetup_LastFrame);
  tolua_endmodule(tolua_S);
  tolua_variable(tolua_S,"LocalSetupState",tolua_get_LocalSetupState,tolua_set_LocalSetupState);
@@ -17101,7 +17018,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_cclass(tolua_S,"SettingsPresets","SettingsPresets","",NULL);
 #endif
  tolua_beginmodule(tolua_S,"SettingsPresets");
-  tolua_variable(tolua_S,"Race",tolua_get_SettingsPresets_Race,tolua_set_SettingsPresets_Race);
   tolua_variable(tolua_S,"Team",tolua_get_SettingsPresets_Team,tolua_set_SettingsPresets_Team);
   tolua_variable(tolua_S,"Type",tolua_get_SettingsPresets_Type,tolua_set_SettingsPresets_Type);
  tolua_endmodule(tolua_S);

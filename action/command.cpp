@@ -699,7 +699,6 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 	//
 	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie &&
 			!dest->Destroyed) {
-		// FIXME: more races, could happen with many orders in queue.
 		if (!unit->Type->Building && !unit->Type->Harvester) {
 			ClearSavedAction(unit);
 			return;
@@ -738,7 +737,6 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
 	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
-		// FIXME: more races, could happen with many orders in queue.
 		if (!unit->Type->Building && !unit->Type->Harvester && !unit->ResourcesHeld) {
 			ClearSavedAction(unit);
 			return;

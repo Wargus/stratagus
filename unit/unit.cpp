@@ -1580,7 +1580,7 @@ void RescueUnits(void)
 					if (around[i]->Type->CanAttack &&
 							unit->IsAllied(around[i])) {
 						//
-						//  City center converts complete race
+						//  City center converts complete player
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!
 						if (unit->Type->CanStore[GoldCost]) {
@@ -1590,8 +1590,7 @@ void RescueUnits(void)
 						unit->RescuedFrom = unit->Player;
 						unit->ChangeOwner(around[i]->Player);
 						unit->Blink = 5;
-						PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound,
-							MaxSampleVolume);
+						PlayGameSound(GameSounds.Rescue.Sound, MaxSampleVolume);
 						break;
 					}
 				}

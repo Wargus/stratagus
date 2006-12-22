@@ -528,8 +528,8 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 		res[z].Pos = -1;
 	}
 
-	sprintf(unit_ident,	",%s-group,",
-			PlayerRaces.Name[ThisPlayer->Race]);
+	// FIXME: hardcoded race name
+	sprintf(unit_ident,	",elites-group,");
 
 	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {

@@ -318,7 +318,6 @@ static int CclDefineCursor(lua_State *l)
 {
 	const char *value;
 	std::string name;
-	std::string race;
 	std::string file;
 	int hotx;
 	int hoty;
@@ -338,8 +337,6 @@ static int CclDefineCursor(lua_State *l)
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Race")) {
-			race = LuaToString(l, -1);
 		} else if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "HotSpot")) {
@@ -372,10 +369,6 @@ static int CclDefineCursor(lua_State *l)
 
 	Assert(!name.empty() && !file.empty() && w && h);
 
-	if (race == "any") {
-		race.clear();
-	}
-
 	//
 	//  Look if this kind of cursor already exists.
 	//
@@ -383,12 +376,6 @@ static int CclDefineCursor(lua_State *l)
 	i = 0;
 	if (AllCursors.size()) {
 		for (; i < (int)AllCursors.size(); ++i) {
-			//
-			//  Race not same, not found.
-			//
-			if (AllCursors[i].Race != race) {
-				continue;
-			}
 			if (AllCursors[i].Ident == name) {
 				ct = &AllCursors[i];
 				break;
@@ -403,7 +390,6 @@ static int CclDefineCursor(lua_State *l)
 		AllCursors.push_back(c);
 		ct = &AllCursors.back();
 		ct->Ident = name;
-		ct->Race = race;
 	}
 
 	ct->G = CGraphic::New(file, w, h);

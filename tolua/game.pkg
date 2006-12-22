@@ -33,7 +33,6 @@ extern bool GameObserve;
 $#include "settings.h"
 
 struct SettingsPresets {
-	int Race;
 	int Team;
 	int Type;
 };

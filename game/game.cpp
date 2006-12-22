@@ -249,8 +249,6 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[OilCost], 
 				Players[i].Resources[OilCost]);
-			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-				i, PlayerRaces.Name[Players[i].Race]);
 			f->printf("SetAiType(%d, \"%s\")\n",
 				i, Players[i].AiName.c_str());
 		}
@@ -634,7 +632,7 @@ void CreateGame(const char *filename, CMap *map)
 	InitIcons();
 	LoadIcons();
 
-	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
+	LoadCursors();
 	UnitUnderCursor = NoUnitP;
 
 	InitMissileTypes();
@@ -743,7 +741,6 @@ void CreateGame(const char *filename, CMap *map)
 void InitSettings(void)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		GameSettings.Presets[i].Race = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Type = SettingsPresetMapDefault;
 	}
