@@ -56,6 +56,12 @@ if test -d /usr/include/lua50; then
 	CPPFLAGS="$CPPFLAGS -I/usr/include/lua50"
 fi
 
+dnl --- EXTRA DIRS -------------
+AC_ARG_WITH(extra-includes, 
+	[  --with-extra-includes=DIR  [Location of additional include directiories]], CPPFLAGS="$CPPFLAGS -I$withval")
+AC_ARG_WITH(extra-libs, 
+	[  --with-extra-libs=DIR	  [Location of additional library directories]], LDFLAGS="$LDFLAGS -L$withval")
+
 AC_CHECK_FUNCS(strcasestr)
 AC_CHECK_FUNCS(strnlen)
 
@@ -67,6 +73,7 @@ if test "$no_x" != "yes"; then
 	if test "x$x_libraries" != "x"; then
 		LDFLAGS="$LDFLAGS -L$x_libraries"
 	fi
+	LDFLAGS="$LDFLAGS -lX11"
 	AC_DEFINE(HAVE_X, 1, Define to 1 if you have X. Used for pasting from the clipboard.)
 fi
 
@@ -104,12 +111,6 @@ else
 	CXXFLAGS="$CXXFLAGS -O0 -g -fsigned-char -Wsign-compare -Werror -Wall"
 	CPPFLAGS="$CPPFLAGS -DDEBUG"
 fi
-
-dnl --- EXTRA DIRS -------------
-AC_ARG_WITH(extra-includes, 
-	[  --with-extra-includes=DIR  [Location of additional include directiories]], CPPFLAGS="$CPPFLAGS -I$withval")
-AC_ARG_WITH(extra-libs, 
-	[  --with-extra-libs=DIR	  [Location of additional library directories]], LDFLAGS="$LDFLAGS -L$withval")
 
 dnl --- OPENGL -----------------
 AC_ARG_WITH(opengl,
@@ -180,6 +181,19 @@ if test "$with_mikmod" != "no"; then
 	fi
 	if test "x$with_mikmod" != "x" -a "$MIKMOD" = "no"; then
 		AC_MSG_ERROR(mikmod headers and/or libraries could not be found)
+	fi
+fi
+
+dnl --- MNG --------------------
+AC_ARG_WITH(mng,
+	[  --with-mng		  [Use mng (default: no)]])
+if test "$with_mng" != "no" -a "x$with_mng" != "x"; then
+	AC_CHECK_HEADER(libmng.h,, MNG=no)
+	if test "$MNG" != "no"; then
+		AC_CHECK_LIB(mng, main, CPPFLAGS="$CPPFLAGS -DUSE_MNG" LDFLAGS="$LDFLAGS -lmng", MNG=no)
+	fi
+	if test "$MNG" = "no"; then
+		AC_MSG_ERROR(mng headers and/or libraries could not be found)
 	fi
 fi
 
