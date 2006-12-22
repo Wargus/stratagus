@@ -443,7 +443,7 @@ void PreMenuSetup(void)
 
 	InitVideoCursors();
 
-	LoadCursors(PlayerRaces.Name[0]);
+	LoadCursors();
 	InitSettings();
 
 	InitUserInterface();

@@ -94,10 +94,9 @@ public:
 */
 class MPPlayer {
 public:
-	MPPlayer() : Race(0), Team(0), Type(0) {}
+	MPPlayer() : Team(0), Type(0) {}
 
 	std::string Name;
-	int Race;
 	int Team;
 	int Type;
 };
@@ -108,7 +107,7 @@ public:
 class FullReplay {
 public:
 	FullReplay() :
-		MapId(0), Type(0), Race(0), LocalPlayer(0),
+		MapId(0), Type(0), LocalPlayer(0),
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), RevealMap(0),
 		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
 	{
@@ -124,7 +123,6 @@ public:
 	unsigned MapId;
 
 	int Type;
-	int Race;
 	int LocalPlayer;
 	MPPlayer Players[PlayerMax];
 
@@ -197,7 +195,6 @@ static FullReplay *StartReplay(void)
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->Players[i].Name = Players[i].Name;
-		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		replay->Players[i].Team = GameSettings.Presets[i].Team;
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
 	}
@@ -239,7 +236,6 @@ static void ApplyReplaySettings(void)
 
 		ReplayGameType = ReplayMultiPlayer;
 		for (int i = 0; i < PlayerMax; ++i) {
-			GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 			GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 			GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
 		}
@@ -247,7 +243,6 @@ static void ApplyReplaySettings(void)
 		NetLocalPlayerNumber = CurrentReplay->LocalPlayer;
 	} else {
 		GameSettings.NetGameType = SettingsSinglePlayerGame;
-		GameSettings.Presets[0].Race = CurrentReplay->Race;
 		ReplayGameType = ReplaySinglePlayer;
 	}
 
@@ -336,7 +331,6 @@ static void SaveFullLog(CFile *dest)
 	dest->printf("  MapPath = \"%s\",\n", CurrentReplay->MapPath.c_str());
 	dest->printf("  MapId = %u,\n", CurrentReplay->MapId);
 	dest->printf("  Type = %d,\n", CurrentReplay->Type);
-	dest->printf("  Race = %d,\n", CurrentReplay->Race);
 	dest->printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
 	dest->printf("  Players = {\n");
 	for (i = 0; i < PlayerMax; ++i) {
@@ -345,7 +339,6 @@ static void SaveFullLog(CFile *dest)
 		} else {
 			dest->printf("\t{");
 		}
-		dest->printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		dest->printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		dest->printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
 			i != PlayerMax - 1 ? ",\n" : "\n");
@@ -612,8 +605,6 @@ static int CclReplayLog(lua_State *l)
 			replay->MapId = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			replay->Type = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Race")) {
-			replay->Race = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LocalPlayer")) {
 			replay->LocalPlayer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Players")) {
@@ -633,8 +624,6 @@ static int CclReplayLog(lua_State *l)
 					value = LuaToString(l, -2);
 					if (!strcmp(value, "Name")) {
 						replay->Players[j].Name = LuaToString(l, -1);
-					} else if (!strcmp(value, "Race")) {
-						replay->Players[j].Race = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Team")) {
 						replay->Players[j].Team = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Type")) {

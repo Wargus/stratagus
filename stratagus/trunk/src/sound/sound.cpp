@@ -64,7 +64,7 @@
 /**
 **  Various sounds used in game.
 **
-**  FIXME: @todo support more races. Must remove static config.
+**  FIXME: @todo Must remove static config.
 */
 GameSound GameSounds
 #ifndef laterUSE_CCL
@@ -75,12 +75,8 @@ GameSound GameSounds
 	SoundConfig("click"),
 	SoundConfig("transport docking"),
 	SoundConfig("building construction"),
-	{ SoundConfig("basic human voices work complete"),
-		SoundConfig("basic orc voices work complete"),
-	},
-	{ SoundConfig("rescue (human) UNUSED"),
-		SoundConfig("rescue (orc) UNUSED"),
-	},
+	SoundConfig("basic human voices work complete"),
+	SoundConfig("rescue (human) UNUSED"),
 }
 #endif
 	;
@@ -195,7 +191,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 		case VoiceDying:
 			return unit->Type->Sound.Dead.Sound;
 		case VoiceWorkCompleted:
-			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
+			return GameSounds.WorkComplete.Sound;
 		case VoiceBuilding:
 			return GameSounds.BuildingConstruction.Sound;
 		case VoiceDocking:
@@ -493,8 +489,6 @@ CSound *RegisterTwoGroups(CSound *first, CSound *second)
 */
 void InitSoundClient(void)
 {
-	int i;
-
 	if (!SoundEnabled()) { // No sound enabled
 		return;
 	}
@@ -519,18 +513,14 @@ void InitSoundClient(void)
 		GameSounds.BuildingConstruction.Sound =
 			SoundForName(GameSounds.BuildingConstruction.Name);
 	}
-	for (i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.WorkComplete[i].Sound &&
-				!GameSounds.WorkComplete[i].Name.empty()) {
-			GameSounds.WorkComplete[i].Sound =
-				SoundForName(GameSounds.WorkComplete[i].Name);
-		}
+	if (!GameSounds.WorkComplete.Sound &&
+			!GameSounds.WorkComplete.Name.empty()) {
+		GameSounds.WorkComplete.Sound =
+			SoundForName(GameSounds.WorkComplete.Name);
 	}
-	for (i = 0; i < PlayerRaces.Count; ++i) {
-		if (!GameSounds.Rescue[i].Sound && !GameSounds.Rescue[i].Name.empty()) {
-			GameSounds.Rescue[i].Sound =
-				SoundForName(GameSounds.Rescue[i].Name);
-		}
+	if (!GameSounds.Rescue.Sound && !GameSounds.Rescue.Name.empty()) {
+		GameSounds.Rescue.Sound =
+			SoundForName(GameSounds.Rescue.Name);
 	}
 
 	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + TileSizeX) / TileSizeX;

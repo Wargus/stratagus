@@ -92,7 +92,6 @@ typedef struct _setup_state_ {
 	unsigned char MapRichness;           /// Map richness option
 	unsigned char CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	unsigned char Ready[PlayerMax];      /// Client ready state
-	unsigned char Race[PlayerMax];       /// Client race selection
 	unsigned long LastFrame[PlayerMax];  /// Last message received
 	// Fill in here...
 } ServerSetup;

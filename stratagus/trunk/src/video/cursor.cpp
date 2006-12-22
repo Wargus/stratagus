@@ -96,21 +96,12 @@ CCursor *GameCursor;                 /// current shown cursor-type
 
 /**
 **  Load all cursor sprites.
-**
-**  @param race  Cursor graphics of this race to load.
 */
-void LoadCursors(const std::string &race)
+void LoadCursors()
 {
 	std::vector<CCursor>::iterator i;
 
 	for (i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		//
-		//  Only load cursors of this race or universal cursors.
-		//
-		if (!(*i).Race.empty() && (*i).Race != race) {
-			continue;
-		}
-
 		if ((*i).G && !(*i).G->IsLoaded()) {
 			ShowLoadProgress("Cursor %s", (*i).G->File.c_str());
 			(*i).G->Load();
@@ -135,9 +126,7 @@ CCursor *CursorByIdent(const std::string &ident)
 		if ((*i).Ident != ident) {
 			continue;
 		}
-		if ((*i).Race.empty() || (*i).G->IsLoaded()) {
-			return &(*i);
-		}
+		return &(*i);
 	}
 	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident.c_str());
 	return NULL;

@@ -336,14 +336,13 @@ static int CclDefineAiHelper(lua_State *l)
 */
 static int CclDefineAi(lua_State *l)
 {
-	const char *value;
 	CAiType *aitype;
 #ifdef DEBUG
 	const CAiType *ait;
 #endif
 
-	LuaCheckArgs(l, 4);
-	if (!lua_isfunction(l, 4)) {
+	LuaCheckArgs(l, 3);
+	if (!lua_isfunction(l, 3)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -365,19 +364,9 @@ static int CclDefineAi(lua_State *l)
 #endif
 
 	//
-	// AI Race
-	//
-	value = LuaToString(l, 2);
-	if (*value != '*') {
-		aitype->Race = value;
-	} else {
-		aitype->Race.clear();
-	}
-
-	//
 	// AI Class
 	//
-	aitype->Class = LuaToString(l, 3);
+	aitype->Class = LuaToString(l, 2);
 
 	//
 	// AI Script
@@ -392,10 +381,10 @@ static int CclDefineAi(lua_State *l)
 		lua_pushstring(l, "_ai_scripts_");
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
-	aitype->Script = aitype->Name + aitype->Race + aitype->Class;
+	aitype->Script = aitype->Name + aitype->Class;
 	lua_pushstring(l, aitype->Script.c_str());
-	lua_pushvalue(l, 4);
-	lua_rawset(l, 5);
+	lua_pushvalue(l, 3);
+	lua_rawset(l, 4);
 	lua_pop(l, 1);
 
 // Get name of function
@@ -405,7 +394,7 @@ static int CclDefineAi(lua_State *l)
 	lua_pushstring(l, "getinfo");
 	lua_gettable(l, -2);
 	Assert(lua_isfunction(l, -1));
-	lua_pushvalue(l, 4);
+	lua_pushvalue(l, 3);
 	lua_call(l, 1, 1);
 	lua_pushstring(l, "name");
 	lua_gettable(l, -2);
@@ -495,18 +484,6 @@ static void InsertResearchRequests(CUpgrade *upgrade)
 }
 
 //----------------------------------------------------------------------------
-
-/**
-**  Get the race of the current AI player.
-**
-**  @param l  Lua state.
-*/
-static int CclAiGetRace(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushstring(l, PlayerRaces.Name[AiPlayer->Player->Race]);
-	return 1;
-}
 
 /**
 **  Get the number of cycles to sleep.
@@ -1524,7 +1501,6 @@ void AiCclRegister(void)
 	lua_register(Lua, "DefineAiHelper", CclDefineAiHelper);
 	lua_register(Lua, "DefineAi", CclDefineAi);
 
-	lua_register(Lua, "AiGetRace", CclAiGetRace);
 	lua_register(Lua, "AiGetSleepCycles", CclAiGetSleepCycles);
 
 	lua_register(Lua, "AiDebug", CclAiDebug);

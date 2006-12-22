@@ -59,7 +59,6 @@ public:
 	CAiType() {}
 
 	std::string Name;     /// Name of this ai
-	std::string Race;     /// for this race
 	std::string Class;    /// class of this ai
 
 #if 0

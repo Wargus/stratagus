@@ -544,9 +544,6 @@ void AiInit(CPlayer *player)
 	}
 	for (i = 0; i < (int)AiTypes.size(); ++i) {
 		ait = AiTypes[i];
-		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player->Race]) {
-			continue;
-		}
 		if (!player->AiName.empty() && ait->Class != player->AiName) {
 			continue;
 		}
@@ -561,8 +558,7 @@ void AiInit(CPlayer *player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player->Race] _C_ 
-		!ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player->AiName.c_str() _C_ ait->Class.c_str());
+	DebugPrint("AI: %s:%s\n" _C_ player->AiName.c_str() _C_ ait->Class.c_str());
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;

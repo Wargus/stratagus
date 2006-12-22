@@ -26,7 +26,6 @@ class ServerSetup {
 	unsigned char MapRichness;
 	unsigned CompOpt[PlayerMax];
 	unsigned Ready[PlayerMax];
-	unsigned Race[PlayerMax];
 	unsigned long LastFrame[PlayerMax];
 };
 extern ServerSetup LocalSetupState;

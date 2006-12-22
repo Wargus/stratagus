@@ -73,9 +73,9 @@ public:
 	SoundConfig BuildingConstruction;  /// building under construction
 
 	/// @todo (Fabrice) I don't think it's the correct place to put this
-	SoundConfig WorkComplete[MAX_RACES];  /// building ready
+	SoundConfig WorkComplete;  /// building ready
 
-	SoundConfig Rescue[MAX_RACES];  /// rescue units
+	SoundConfig Rescue;        /// rescue units
 };
 
 /**

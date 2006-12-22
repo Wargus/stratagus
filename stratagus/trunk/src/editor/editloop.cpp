@@ -716,9 +716,7 @@ static void DrawPlayers(void)
 	x = UI.InfoPanel.X + 4;
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
-		i = sprintf(buf,"Plyr %d %s ", Editor.SelectedPlayer,
-				PlayerRaces.Name[Map.Info.PlayerSide[Editor.SelectedPlayer]]);
-		// Players[SelectedPlayer].RaceName);
+		i = sprintf(buf,"Plyr %d ", Editor.SelectedPlayer);
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
@@ -1966,7 +1964,7 @@ void CEditor::Init(void)
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
 				Map.Info.PlayerType[i] = PlayerNeutral;
-				Map.Info.PlayerSide[i] = Players[i].Race = 0;
+				Map.Info.PlayerSide[i] = 0;
 			} else {
 				CreatePlayer(PlayerNobody);
 				Map.Info.PlayerType[i] = PlayerNobody;

@@ -54,12 +54,6 @@
 **    files and during startup. Don't use this in game, use instead
 **    the pointer to this structure.
 **
-**  CCursor::Race
-**
-**    Owning Race of this cursor ("human", "orc", "alliance",
-**    "mythical", ...). If NULL, this cursor could be used by any
-**    race.
-**
 **  CCursor::HotX CCursor::HotY
 **
 **    Hot spot of the cursor in pixels. Relative to the sprite origin
@@ -127,7 +121,6 @@ public:
 		SpriteFrame(0), FrameRate(0), G(NULL) {}
 
 	std::string Ident;  /// Identifier to reference it
-	std::string Race;   /// Race name
 
 	int HotX;     /// Hot point x
 	int HotY;     /// Hot point y
@@ -183,7 +176,7 @@ extern int CursorStartScrMapY;  /// the same in screen map coordinate system
 ----------------------------------------------------------------------------*/
 
 	/// Load all cursors
-extern void LoadCursors(const std::string &racename);
+extern void LoadCursors();
 
 	/// Cursor by identifier
 extern CCursor *CursorByIdent(const std::string &ident);

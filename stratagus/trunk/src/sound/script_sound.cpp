@@ -234,7 +234,6 @@ static int CclDefineGameSounds(lua_State *l)
 {
 	//FIXME: should allow to define ALL the game sounds
 	const char *value;
-	int i;
 	int args;
 	int j;
 	LuaUserData *data;
@@ -265,49 +264,17 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			GameSounds.PlacementSuccess.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "work-complete")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			for (i = 0; i < PlayerRaces.Count; ++i) {
-				if (!strcmp(PlayerRaces.Name[i], value)) {
-					break;
-				}
-			}
-			if (i == PlayerRaces.Count) {
-				LuaError(l, "Unknown race: %s" _C_ value);
-			}
-			lua_rawgeti(l, j + 1, 2);
-			if (!lua_isuserdata(l, -1) ||
-					(data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
+			if (!lua_isuserdata(l, j + 1) ||
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			lua_pop(l, 1);
-			GameSounds.WorkComplete[i].Sound = (CSound *)data->Data;
+			GameSounds.WorkComplete.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "rescue")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			for (i = 0; i < PlayerRaces.Count; ++i) {
-				if (!strcmp(PlayerRaces.Name[i], value)) {
-					break;
-				}
-			}
-			if (i == PlayerRaces.Count) {
-				LuaError(l, "Unknown race: %s" _C_ value);
-			}
-			lua_rawgeti(l, j + 1, 2);
-			if (!lua_isuserdata(l, -1) ||
-					(data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
+			if (!lua_isuserdata(l, j + 1) ||
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			lua_pop(l, 1);
-			GameSounds.Rescue[i].Sound = (CSound *)data->Data;
+			GameSounds.Rescue.Sound = (CSound *)data->Data;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

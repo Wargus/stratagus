@@ -89,7 +89,6 @@ void CleanModules(void)
 	CleanTriggers();
 	FreeAi();
 	CleanPlayers();
-	CleanRaces();
 	CleanConstructions();
 	CleanDecorations();
 	CleanUnitTypes();
@@ -159,7 +158,7 @@ void LoadModules(void)
 {
 	LoadFonts();
 	LoadIcons();
-	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
+	LoadCursors();
 	UI.Load();
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
