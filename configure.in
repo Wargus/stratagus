@@ -56,6 +56,12 @@ if test -d /usr/include/lua50; then
 	CPPFLAGS="$CPPFLAGS -I/usr/include/lua50"
 fi
 
+dnl --- EXTRA DIRS -------------
+AC_ARG_WITH(extra-includes, 
+	[  --with-extra-includes=DIR  [Location of additional include directiories]], CPPFLAGS="$CPPFLAGS -I$withval")
+AC_ARG_WITH(extra-libs, 
+	[  --with-extra-libs=DIR	  [Location of additional library directories]], LDFLAGS="$LDFLAGS -L$withval")
+
 AC_CHECK_FUNCS(strcasestr)
 AC_CHECK_FUNCS(strnlen)
 
@@ -105,12 +111,6 @@ else
 	CXXFLAGS="$CXXFLAGS -O0 -g -fsigned-char -Wsign-compare -Werror -Wall"
 	CPPFLAGS="$CPPFLAGS -DDEBUG"
 fi
-
-dnl --- EXTRA DIRS -------------
-AC_ARG_WITH(extra-includes, 
-	[  --with-extra-includes=DIR  [Location of additional include directiories]], CPPFLAGS="$CPPFLAGS -I$withval")
-AC_ARG_WITH(extra-libs, 
-	[  --with-extra-libs=DIR	  [Location of additional library directories]], LDFLAGS="$LDFLAGS -L$withval")
 
 dnl --- OPENGL -----------------
 AC_ARG_WITH(opengl,
