@@ -862,12 +862,6 @@ static int CclUnit(lua_State *l)
 		MapMarkUnitSight(unit);
 	}
 
-	// Place on map
-	if (!unit->Removed) {
-		unit->Removed = 1;
-		unit->Place(unit->X, unit->Y);
-	}
-
 	// Fix Colors for rescued units.
 	if (unit->RescuedFrom) {
 		unit->Colors = &unit->RescuedFrom->UnitColors;

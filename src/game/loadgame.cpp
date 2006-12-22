@@ -182,6 +182,16 @@ void LoadModules(void)
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 }
 
+static void PlaceUnits()
+{
+	for (int i = 0; i < NumUnits; ++i) {
+		if (!Units[i]->Removed) {
+			Units[i]->Removed = 1;
+			Units[i]->Place(Units[i]->X, Units[i]->Y);
+		}
+	}
+}
+
 /**
 **  Load a game to file.
 **
@@ -204,6 +214,8 @@ void LoadGame(const std::string &filename)
 	InitVisionTable();
 	LuaLoadFile(filename);
 	CclGarbageCollect(0);
+
+	PlaceUnits();
 
 	game_cycle = GameCycle;
 	syncrand = SyncRandSeed;
