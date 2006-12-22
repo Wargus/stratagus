@@ -67,7 +67,6 @@
 #include "editor.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "master.h"
 #include "netconnect.h"
 #include "network.h"
 #include "spells.h"
@@ -2446,8 +2445,6 @@ void InitCcl(void)
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
-
-	lua_register(Lua, "SetMetaServer", CclSetMetaServer);
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
