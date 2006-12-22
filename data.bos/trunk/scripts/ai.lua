@@ -131,10 +131,10 @@ function AiRush()
     return AiLoop(ai_funcs, ai_pos)
 end
 
-DefineAi("ai-rush", "*", "ai-rush", AiRush)
+DefineAi("ai-rush", "ai-rush", AiRush)
 
 function AiPassive()
 end
 
-DefineAi("ai-passive", "*", "ai-passive", AiPassive)
+DefineAi("ai-passive", "ai-passive", AiPassive)
 
