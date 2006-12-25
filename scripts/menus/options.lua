@@ -159,9 +159,6 @@ function RunSoundOptionsMenu(s)
 
   AddSoundOptions(menu, offx, offy, offx + 130 - 200/2, offy + 352)
 
-  menu:addButton(_("~!OK"), "o", offx + 128 - (200 / 2), offy + 245,
-    function() menu:stop() end)
-
   menu:run()
 end
 
