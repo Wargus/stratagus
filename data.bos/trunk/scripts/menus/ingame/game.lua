@@ -206,7 +206,7 @@ function RunDiplomacyMenu()
   local sharedvision = {}
   local j = 0
 
-  for i=0,14 do
+  for i=0,6 do
     if (Players[i].Type ~= PlayerNobody and ThisPlayer.Index ~= i) then
       j = j + 1
 
