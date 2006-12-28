@@ -759,17 +759,7 @@ void DrawResources(void)
 --  MESSAGE
 ----------------------------------------------------------------------------*/
 
-#define MESSAGES_TIMEOUT (FRAMES_PER_SECOND * 5) /// Message timeout 5 seconds
-
-static unsigned long MessagesFrameTimeout;       /// Frame to expire message
-
-
 #define MESSAGES_MAX  10                         /// How many can be displayed
-
-static char Messages[MESSAGES_MAX][128];         /// Array of messages
-static int  MessagesCount;                       /// Number of messages
-static int  MessagesSameCount;                   /// Counts same message repeats
-static int  MessagesScrollY;                     /// Used for smooth scrolling
 
 static char MessagesEvent[MESSAGES_MAX][64];     /// Array of event messages
 static int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
@@ -777,11 +767,30 @@ static int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
 static int  MessagesEventCount;                  /// Number of event messages
 static int  MessagesEventIndex;                  /// FIXME: docu
 
+class MessagesDisplay
+{
+	char Messages[MESSAGES_MAX][128];         /// Array of messages
+	int  MessagesCount;                       /// Number of messages
+	int  MessagesSameCount;                   /// Counts same message repeats
+	int  MessagesScrollY;
+	unsigned long MessagesFrameTimeout;       /// Frame to expire message
+
+	static const int MESSAGES_TIMEOUT = (FRAMES_PER_SECOND * 5); /// Message timeout 5 seconds
+protected:
+	void ShiftMessages();
+	void AddMessage(const char *msg);
+	int CheckRepeatMessage(const char *msg);
+public:
+	void UpdateMessages();
+	void AddUniqueMessage(char *s);
+	void DrawMessages();
+	void CleanMessages();
+};
 
 /**
 **  Shift messages array by one.
 */
-static void ShiftMessages(void)
+void MessagesDisplay::ShiftMessages()
 {
 	if (MessagesCount) {
 		--MessagesCount;
@@ -792,26 +801,11 @@ static void ShiftMessages(void)
 }
 
 /**
-**  Shift messages events array by one.
-*/
-static void ShiftMessagesEvent(void)
-{
-	if (MessagesEventCount) {
-		--MessagesEventCount;
-		for (int z = 0; z < MessagesEventCount; ++z) {
-			MessagesEventX[z] = MessagesEventX[z + 1];
-			MessagesEventY[z] = MessagesEventY[z + 1];
-			strcpy_s(MessagesEvent[z], sizeof(MessagesEvent[z]), MessagesEvent[z + 1]);
-		}
-	}
-}
-
-/**
 **  Update messages
 **
 **  @todo FIXME: make scroll speed configurable.
 */
-void UpdateMessages(void)
+void MessagesDisplay::UpdateMessages()
 {
 	if (!MessagesCount) {
 		return;
@@ -833,7 +827,7 @@ void UpdateMessages(void)
 **
 **  @todo FIXME: make message font configurable.
 */
-void DrawMessages(void)
+void MessagesDisplay::DrawMessages()
 {
 	// Draw message line(s)
 	for (int z = 0; z < MessagesCount; ++z) {
@@ -859,7 +853,7 @@ void DrawMessages(void)
 **
 **  @param msg  Message to add.
 */
-static void AddMessage(const char *msg)
+void MessagesDisplay::AddMessage(const char *msg)
 {
 	char *ptr;
 	char *message;
@@ -935,7 +929,7 @@ static void AddMessage(const char *msg)
 **
 **  @return     non-zero to skip this message
 */
-static int CheckRepeatMessage(const char *msg)
+int MessagesDisplay::CheckRepeatMessage(const char *msg)
 {
 	if (MessagesCount < 1) {
 		return 0;
@@ -958,6 +952,40 @@ static int CheckRepeatMessage(const char *msg)
 }
 
 /**
+**  Add a new message to display only if it differs from the preceeding one.
+*/
+void MessagesDisplay::AddUniqueMessage(char *s)
+{
+	if (CheckRepeatMessage(s)) {
+		return;
+	}
+	AddMessage(s);
+}
+
+/**
+**  Cleanup messages.
+*/
+void MessagesDisplay::CleanMessages(void)
+{
+	MessagesCount = 0;
+	MessagesSameCount = 0;
+	MessagesEventCount = 0;
+	MessagesEventIndex = 0;
+	MessagesScrollY = 0;
+}
+
+MessagesDisplay allmessages;
+
+void UpdateMessages() {
+	allmessages.UpdateMessages();
+}
+
+void CleanMessages()
+{
+	allmessages.CleanMessages();
+}
+
+/**
 **  Set message to display.
 **
 **  @param fmt  To be displayed in text overlay.
@@ -971,10 +999,27 @@ void SetMessage(const char *fmt, ...)
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
-	if (CheckRepeatMessage(temp)) {
-		return;
+	allmessages.AddUniqueMessage(temp);
+}
+
+void DrawMessages()
+{
+	allmessages.DrawMessages();
+}
+
+/**
+**  Shift messages events array by one.
+*/
+void ShiftMessagesEvent(void)
+{
+	if (MessagesEventCount) {
+		--MessagesEventCount;
+		for (int z = 0; z < MessagesEventCount; ++z) {
+			MessagesEventX[z] = MessagesEventX[z + 1];
+			MessagesEventY[z] = MessagesEventY[z + 1];
+			strcpy_s(MessagesEvent[z], sizeof(MessagesEvent[z]), MessagesEvent[z + 1]);
+		}
 	}
-	AddMessage(temp);
 }
 
 /**
@@ -996,9 +1041,7 @@ void SetMessageEvent(int x, int y, const char *fmt, ...)
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
-	if (CheckRepeatMessage(temp) == 0) {
-		AddMessage(temp);
-	}
+	allmessages.AddUniqueMessage(temp);
 
 	if (MessagesEventCount == MESSAGES_MAX) {
 		ShiftMessagesEvent();
@@ -1031,17 +1074,6 @@ void CenterOnMessage(void)
 	++MessagesEventIndex;
 }
 
-/**
-**  Cleanup messages.
-*/
-void CleanMessages(void)
-{
-	MessagesCount = 0;
-	MessagesSameCount = 0;
-	MessagesEventCount = 0;
-	MessagesEventIndex = 0;
-	MessagesScrollY = 0;
-}
 
 /*----------------------------------------------------------------------------
 --  STATUS LINE
