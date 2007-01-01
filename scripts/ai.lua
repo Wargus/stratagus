@@ -28,6 +28,22 @@
 --	$Id$
 --
 
+-- The list of registered AIs in BOS
+-- Every AI has an entry name: {internal_name, name, fun, initfun}
+-- See at RegisterAi() for a description what these are
+AiList = {}
+
+-- Function to register an AI to BOS
+-- Parameters:
+-- internal_name : Internal name of the Ai (without leading "ai-"
+-- name          : Name of the AI the Player sees and which gets translated
+-- fun           : main AI function
+-- initfun       : initialization function, can be obmitted
+function RegisterAi(internal_name, name, fun, initfun)
+  DefineAi("ai-" .. internal_name, "ai-" .. internal_name, fun)
+  AiList[name] = {internal_name, name, fun, initfun}
+end
+
 DefineAiHelper(
   --
   -- Unit can build which buildings.
@@ -63,78 +79,26 @@ DefineAiHelper(
   --
   {"unit-limit", "unit-gen", "food"})
 
-local player
-
-function AiLoop(loop_funcs, loop_pos)
-    local ret
-
-    player = AiPlayer() + 1
-    while (true) do
-    	ret = loop_funcs[loop_pos[player]]()
-	if (ret) then
-	    break
-	end
-	loop_pos[player] = loop_pos[player] + 1
-    end
-    return true
-end
-
+-- Execute all AI init scripts
 function InitAiScripts()
-  ai_pos = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-  ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+  for key,value in next,AiList do
+    -- check if this AI actually has an init script
+    if (value[4] ~= nil) then
+      value[4]()
+    end
+  end
 end
 
-local ai_loop_funcs = {
-  function() print("Looping !"); return false end,
-  function() return AiForce(1, {"unit-assault", 20, 
-                                "unit-grenadier", 8, 
-                                "unit-bazoo", 8}) end,
-  function() return AiWaitForce(1) end,  -- wait until attack party is completed
-  function() return AiSleep(50*GameSettings.Difficulty) end,
-  function() return AiAttackWithForce(1) end,
-  function() ai_loop_pos[player] = 0; return false end,
-}
+-- Find and load all Ais
+local list
+local i
+local f
+list = ListFilesInDirectory("scripts/ais/")
 
-local ai_funcs = {
-  function() AiDebug(false) return false end,
-  function() return AiSleep(AiGetSleepCycles()) end,
-  function() return AiNeed("unit-vault") end,
-  function() return AiSet("unit-engineer", 10) end,
-  function() return AiWait("unit-vault") end,
-
-  function() return AiNeed("unit-camp") end,
-  function() return AiWait("unit-camp") end,
-  function() return AiForce(0, {"unit-assault", 10}) end,
-  function() return AiWaitForce(0) end, 
-  function() return AiNeed("unit-camp") end,
-  function() return AiSleep(125*GameSettings.Difficulty) end,
-  function() return AiNeed("unit-camp") end,
-  
-  function() return AiForce(1, {"unit-assault", 10}) end,
-  function() return AiWaitForce(1) end,
-  function() return AiSleep(50*GameSettings.Difficulty) end, 
-  function() return AiAttackWithForce(1) end,
-
-  function() return AiForce(0, {"unit-assault", 20}) end,
-  function() return AiNeed("unit-rfac") end,
-  function() return AiResearch("upgrade-expl") end,
-  function() return AiForce(1, {"unit-assault", 20, "unit-grenadier", 8}) end,
-  function() return AiWaitForce(1) end, 
-  function() return AiAttackWithForce(1) end,
-
-  function() return AiResearch("upgrade-expl2") end,
-  function() return AiLoop(ai_loop_funcs, ai_loop_pos) end,
-}
-
-function AiRush()
---    print(AiPlayer() .. " position ".. ai_pos[AiPlayer() + 1]);
-    return AiLoop(ai_funcs, ai_pos)
+for i,f in list do
+  if(string.find(f, "^.*%.lua$")) then
+    print("Loading AI: " .. f)
+    Load("scripts/ais/" .. f)
+  end
 end
-
-DefineAi("ai-rush", "ai-rush", AiRush)
-
-function AiPassive()
-end
-
-DefineAi("ai-passive", "ai-passive", AiPassive)
 
