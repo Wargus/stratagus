@@ -137,20 +137,12 @@ def AutoConfigure(env):
   env.Append(CPPDEFINES = Split("USE_ZLIB"))
 
   # Check for optional libraries #
-  if conf.CheckLib('bz2'):
-     env.Append(CPPDEFINES = 'USE_BZ2LIB')
   if conf.CheckLib('ogg'):
      env.Append(CPPDEFINES = 'USE_OGG')
   if conf.CheckLib('vorbis'):
      env.Append(CPPDEFINES = 'USE_VORBIS')
   if conf.CheckLib('theora'):
      env.Append(CPPDEFINES = 'USE_THEORA')
-  if conf.CheckLib('mikmod'):
-     env.Append(CPPDEFINES = 'USE_MIKMOD')
-  if conf.CheckLib('mad'):
-     env.Append(CPPDEFINES = 'USE_MAD')
-  if conf.CheckLib('FLAC'):
-     env.Append(CPPDEFINES = 'USE_FLAC')
   if env['opengl']:
      CheckOpenGL(env, conf)
   
