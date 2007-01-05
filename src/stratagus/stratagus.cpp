@@ -723,6 +723,44 @@ void StartReplay(const char *filename, bool reveal)
 	StartMap(CurrentMapPath, false);
 }
 
+void SaveReplay(const std::string filename)
+{
+	FILE *fd;
+	char *buf;
+	char *logdir;
+	char tmp[PATH_MAX];
+	struct stat sb;
+
+#ifdef WIN32
+	sprintf(tmp, "%s/logs/", GameName.c_str());
+#else
+	sprintf(tmp, "%s/%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH, GameName.c_str());
+	strcat(tmp, "/logs/");
+#endif
+	logdir = tmp + strlen(tmp);
+
+	sprintf(logdir, "log_of_stratagus_%d.log", ThisPlayer->Index);
+
+	stat(tmp, &sb);
+	buf = new char[sb.st_size];
+	fd = fopen(tmp, "rb");
+	fread(buf, sb.st_size, 1, fd);
+	fclose(fd);
+
+	strcpy(logdir, filename.c_str());
+
+	fd = fopen(tmp, "wb");
+	if (!fd) {
+		fprintf(stderr, "Can't save to `%s'\n", tmp);
+		delete[] buf;
+		return;
+	}
+	fwrite(buf, sb.st_size, 1, fd);
+	fclose(fd);
+
+	delete[] buf;
+}
+
 //----------------------------------------------------------------------------
 
 /**
