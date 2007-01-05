@@ -10,7 +10,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -165,7 +165,7 @@ inline char *new_strdup(const char *str)
 	/// Stratagus minor version (maximal 99)
 #define StratagusMinorVersion  2
 	/// Stratagus patch level (maximal 99)
-#define StratagusPatchLevel    1
+#define StratagusPatchLevel    2
 	/// Stratagus version (1,2,3) -> 10203
 #define StratagusVersion \
 	(StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 \

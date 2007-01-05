@@ -42,7 +42,7 @@
 	/// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion 9
 	/// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel   4
+#define NetworkProtocolPatchLevel   5
 	/// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 + \
