@@ -339,26 +339,11 @@ static void LoadMap(const char *filename, CMap *map)
 
 	tmp = strrchr(filename, '.');
 	if (tmp) {
-#ifdef USE_ZLIB
 		if (!strcmp(tmp, ".gz")) {
 			while (tmp - 1 > filename && *--tmp != '.') {
 			}
 		}
-#endif
-#ifdef USE_BZ2LIB
-		if (!strcmp(tmp, ".bz2")) {
-			while (tmp - 1 > filename && *--tmp != '.') {
-			}
-		}
-#endif
-		if (!strcmp(tmp, ".smp")
-#ifdef USE_ZLIB
-				|| !strcmp(tmp, ".smp.gz")
-#endif
-#ifdef USE_BZ2LIB
-				|| !strcmp(tmp, ".smp.bz2")
-#endif
-		) {
+		if (!strcmp(tmp, ".smp") || !strcmp(tmp, ".smp.gz")) {
 			if (map->Info.Filename.empty()) {
 				// The map info hasn't been loaded yet => do it now
 				LoadStratagusMapInfo(filename);

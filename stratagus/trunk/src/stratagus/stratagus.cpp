@@ -748,12 +748,6 @@ int main(int argc, char **argv)
 #ifdef DEBUG
 		"DEBUG "
 #endif
-#ifdef USE_ZLIB
-		"ZLIB "
-#endif
-#ifdef USE_BZ2LIB
-		"BZ2LIB "
-#endif
 #ifdef USE_VORBIS
 		"VORBIS "
 #endif

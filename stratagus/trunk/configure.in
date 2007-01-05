@@ -125,19 +125,6 @@ if test "$with_opengl" != "no"; then
 	fi
 fi
 
-dnl --- BZIP2 ------------------
-AC_ARG_WITH(bzip2,
-	[  --with-bzip2		  [Use bzip2 (default: yes)]])
-if test "$with_bzip2" != "no"; then
-	AC_CHECK_HEADER(bzlib.h,, BZIP2=no)
-	if test "$BZIP2" != "no"; then
-		AC_CHECK_LIB(bz2, main, CPPFLAGS="$CPPFLAGS -DUSE_BZ2LIB" LDFLAGS="$LDFLAGS -lbz2", BZIP2=no)
-	fi
-	if test "$BZIP2" = "no"; then
-		AC_MSG_ERROR(libbzip2 headers and/or libraries could not be found)
-	fi
-fi
-
 dnl --- VORBIS -----------------
 AC_ARG_WITH(vorbis, 
 	[  --with-vorbis		  [Use vorbis (default: autodetect)]])

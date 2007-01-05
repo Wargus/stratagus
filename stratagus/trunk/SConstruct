@@ -133,8 +133,6 @@ def AutoConfigure(env):
   if not CheckLuaLib(env, conf):
      print 'Did not find required lua library. Exiting!'
      Exit(1)
-  # stratagus defines for required libraries
-  env.Append(CPPDEFINES = Split("USE_ZLIB"))
 
   # Check for optional libraries #
   if conf.CheckLib('ogg'):

@@ -77,8 +77,6 @@ CFile::~CFile()
 }
 
 
-#ifdef USE_ZLIB
-
 #ifndef z_off_t // { ZLIB_VERSION<="1.0.4"
 
 /**
@@ -100,32 +98,6 @@ static int gzseek(CFile *file, unsigned offset, int whence)
 }
 
 #endif // } ZLIB_VERSION<="1.0.4"
-
-#endif // USE_ZLIB
-
-#ifdef USE_BZ2LIB
-
-/**
-**  Seek on compressed input. (I hope newer libs support it directly)
-**
-**  @param file    File handle
-**  @param offset  Seek position
-**  @param whence  How to seek
-*/
-static void bzseek(BZFILE *file, unsigned offset, int whence)
-{
-	char buf[32];
-
-	while (offset > sizeof(buf)) {
-		BZ2_bzread(file, buf, sizeof(buf));
-		offset -= sizeof(buf);
-	}
-	BZ2_bzread(file, buf, offset);
-}
-
-#endif // USE_BZ2LIB
-
-#if defined(USE_ZLIB) || defined(USE_BZ2LIB)
 
 /**
 **  CLopen Library file open
@@ -155,52 +127,21 @@ int CFile::open(const char *name, long openflags)
 	cl_type = CLF_TYPE_INVALID;
 
 	if (openflags & CL_OPEN_WRITE) {
-#ifdef USE_BZ2LIB
-		if ((openflags & CL_WRITE_BZ2) &&
-				(cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), openstring))) {
-			cl_type = CLF_TYPE_BZIP2;
-		} else
-#endif
-#ifdef USE_ZLIB
 		if ((openflags & CL_WRITE_GZ) &&
 				(cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), openstring))) {
 			cl_type = CLF_TYPE_GZIP;
-		} else
-#endif
-		if ((cl_plain = fopen(name, openstring))) {
+		} else if ((cl_plain = fopen(name, openstring))) {
 			cl_type = CLF_TYPE_PLAIN;
 		}
 	} else {
 		if (!(cl_plain = fopen(name, openstring))) { // try plain first
-#ifdef USE_ZLIB
 			if ((cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), "rb"))) {
 				cl_type = CLF_TYPE_GZIP;
-			} else
-#endif
-#ifdef USE_BZ2LIB
-			if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), "rb"))) {
-				cl_type = CLF_TYPE_BZIP2;
-			} else
-#endif
-			{ }
-
+			}
 		} else {
 			cl_type = CLF_TYPE_PLAIN;
 			// Hmm, plain worked, but nevertheless the file may be compressed!
 			if (fread(buf, 2, 1, cl_plain) == 1) {
-#ifdef USE_BZ2LIB
-				if (buf[0] == 'B' && buf[1] == 'Z') {
-					fclose(cl_plain);
-					if ((cl_bz = BZ2_bzopen(name, "rb"))) {
-						cl_type = CLF_TYPE_BZIP2;
-					} else {
-						if (!(cl_plain = fopen(name, "rb"))) {
-							cl_type = CLF_TYPE_INVALID;
-						}
-					}
-				}
-#endif // USE_BZ2LIB
-#ifdef USE_ZLIB
 				if (buf[0] == 0x1f) { // don't check for buf[1] == 0x8b, so that old compress also works!
 					fclose(cl_plain);
 					if ((cl_gz = gzopen(name, "rb"))) {
@@ -211,7 +152,6 @@ int CFile::open(const char *name, long openflags)
 						}
 					}
 				}
-#endif // USE_ZLIB
 			}
 			if (cl_type == CLF_TYPE_PLAIN) { // ok, it is not compressed
 				rewind(cl_plain);
@@ -241,17 +181,9 @@ int CFile::close()
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = fclose(cl_plain);
 		}
-#ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gzclose(cl_gz);
 		}
-#endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			BZ2_bzclose(cl_bz);
-			ret = 0;
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -275,16 +207,9 @@ int CFile::read(void *buf, size_t len)
 		if (cl_type == CLF_TYPE_PLAIN) {
 			ret = fread(buf, 1, len, cl_plain);
 		}
-#ifdef USE_ZLIB
 		if (cl_type == CLF_TYPE_GZIP) {
 			ret = gzread(cl_gz, buf, len);
 		}
-#endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (cl_type == CLF_TYPE_BZIP2) {
-			ret = BZ2_bzread(cl_bz, buf, len);
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -297,16 +222,9 @@ void CFile::flush()
 		if (cl_type == CLF_TYPE_PLAIN) {
 			fflush(cl_plain);
 		}
-#ifdef USE_ZLIB
 		if (cl_type == CLF_TYPE_GZIP) {
 			gzflush(cl_gz, Z_SYNC_FLUSH);
 		}
-#endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (cl_type == CLF_TYPE_BZIP2) {
-			BZ2_bzflush(cl_bz);
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -367,16 +285,9 @@ int CFile::printf(char *format, ...)
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = fwrite(p, size, 1, cl_plain);
 		}
-#ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gzwrite(cl_gz, p, size);
 		}
-#endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			ret = BZ2_bzwrite(cl_bz, p, size);
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -401,17 +312,9 @@ int CFile::seek(long offset, int whence)
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = fseek(cl_plain, offset, whence);
 		}
-#ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gzseek(cl_gz, offset, whence);
 		}
-#endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			bzseek(cl_bz, offset, whence);
-			ret = 0;
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -432,27 +335,17 @@ long CFile::tell()
 		if (tp == CLF_TYPE_PLAIN) {
 			ret = ftell(cl_plain);
 		}
-#ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gztell(cl_gz);
 		}
-#endif // USE_ZLIB
-#ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			// FIXME: need to implement this
-			ret = -1;
-		}
-#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
 	return ret;
 }
 
-#endif // USE_ZLIB || USE_BZ2LIB
-
 /**
-**  Find a file with its correct extension ("", ".gz" or ".bz2")
+**  Find a file with its correct extension ("" or ".gz")
 **
 **  @param file      The string with the file path. Upon success, the string 
 **                   is replaced by the full filename witht he correct extension.
@@ -467,20 +360,11 @@ static int FindFileWithExtension(char *file, size_t filesize)
 	if (!access(file, R_OK)) {
 		return 1;
 	}
-#ifdef USE_ZLIB // gzip or bzip2 in global shared directory
 	sprintf(buf, "%s.gz", file);
 	if (!access(buf, R_OK)) {
 		strcpy_s(file, filesize, buf);
 		return 1;
 	}
-#endif
-#ifdef USE_BZ2LIB
-	sprintf(buf, "%s.bz2", file);
-	if (!access(buf, R_OK)) {
-		strcpy_s(file, filesize, buf);
-		return 1;
-	}
-#endif
 
 	return 0;
 }
@@ -489,7 +373,6 @@ static int FindFileWithExtension(char *file, size_t filesize)
 **  Generate a filename into library.
 **
 **  Try current directory, user home directory, global directory.
-**  This supports .gz, .bz2 and .zip.
 **
 **  @param file        Filename to open.
 **  @param buffer      Allocated buffer for generated filename.
