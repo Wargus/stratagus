@@ -10,7 +10,7 @@
 //
 /**@name unit.cpp - The units. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -2934,6 +2934,11 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	// Can now happen by splash damage
 	// Multiple places send x/y as damage, which may be zero
 	if (!damage) {
+		return;
+	}
+
+	// Units with 0 hp can't be hit
+	if (target->Variable[HP_INDEX].Value == 0) {
 		return;
 	}
 
