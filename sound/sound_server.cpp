@@ -517,11 +517,6 @@ CSample *LoadSample(const std::string &name)
 		return sample;
 	}
 #endif
-#ifdef USE_MIKMOD
-	if ((sample = LoadMikMod(buf, PlayAudioLoadInMemory))) {
-		return sample;
-	}
-#endif
 
 	fprintf(stderr, "Can't load the sound `%s'\n", name.c_str());
 
@@ -667,11 +662,6 @@ int PlayMusic(const std::string &file)
 #ifdef USE_VORBIS
 	if (!sample) {
 		sample = LoadVorbis(name, PlayAudioStream);
-	}
-#endif
-#ifdef USE_MIKMOD
-	if (!sample) {
-		sample = LoadMikMod(name, PlayAudioStream);
 	}
 #endif
 
