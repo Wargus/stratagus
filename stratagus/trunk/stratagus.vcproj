@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="src\include,include,src\guichan\include"
-				PreprocessorDefinitions="_DEBUG;DEBUG;USE_WIN32;USE_MIKMOD;USE_VORBIS;USE_THEORA;HAVE_STRNLEN;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATEx=1"
+				PreprocessorDefinitions="_DEBUG;DEBUG;USE_WIN32;USE_VORBIS;USE_THEORA;HAVE_STRNLEN;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -75,7 +75,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib mikmod.lib theora_static.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib theora_static.lib"
 				OutputFile=".\Debug/stratagus.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -149,7 +149,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="src\include,include,src\guichan\include"
-				PreprocessorDefinitions="NDEBUG;USE_WIN32;USE_MIKMOD;USE_VORBIS;USE_THEORA;HAVE_STRNLEN;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE=1"
+				PreprocessorDefinitions="NDEBUG;USE_WIN32;USE_VORBIS;USE_THEORA;HAVE_STRNLEN;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -174,7 +174,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib mikmod.lib theora_static.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib theora_static.lib"
 				OutputFile=".\Release/stratagus.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -2091,28 +2091,6 @@
 				<Filter
 					Name="sound"
 					>
-					<File
-						RelativePath="src\sound\mikmod.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-					</File>
 					<File
 						RelativePath="src\sound\music.cpp"
 						>
