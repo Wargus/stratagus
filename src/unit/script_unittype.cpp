@@ -279,6 +279,10 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "Unsupported image tag: %s" _C_ value);
 				}
 			}
+			if (redefine && type->Sprite) {
+				CGraphic::Free(type->Sprite);
+				type->Sprite = NULL;
+			}
 		} else if (!strcmp(value, "Shadow")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -321,6 +325,10 @@ static int CclDefineUnitType(lua_State *l)
 				} else {
 					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
 				}
+			}
+			if (redefine && type->ShadowSprite) {
+				CGraphic::Free(type->ShadowSprite);
+				type->ShadowSprite = NULL;
 			}
 		} else if (!strcmp(value, "Offset")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
