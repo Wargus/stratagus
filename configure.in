@@ -246,6 +246,9 @@ AC_SUBST(LDFLAGS)
 if test "$ARCH" = "win32"; then
 	if ! test -f Rules.make; then
 		echo "include Rules.make.WIN32" >Rules.make
+	else
+		# touch it for dependency reasons
+		touch Rules.make
 	fi
 	AC_CONFIG_FILES(Rules.make.WIN32:Rules.make.in)
 else
