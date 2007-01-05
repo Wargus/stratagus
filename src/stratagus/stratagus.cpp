@@ -698,13 +698,16 @@ void StartMap(const char *filename, bool clean = true)
 void StartSavedGame(const char *filename) 
 {
 	char path[512];
+	std::string nc, rc;
 
+	GetDefaultTextColors(nc, rc);
 	SaveGameLoading = 1;
 	CleanPlayers();
 	ExpandPath(path, filename);
 	LoadGame(path);
 
 	StartMap(filename, false);
+	SetDefaultTextColors(nc, rc);
 }
 	
 void StartReplay(const char *filename, bool reveal)
