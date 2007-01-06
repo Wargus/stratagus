@@ -10,7 +10,7 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Francois Beerten, and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Francois Beerten, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -166,6 +166,7 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+#include <sstream>
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -599,6 +600,69 @@ void StartReplay(const char *filename, bool reveal)
 	ReplayRevealMap = reveal;
 
 	StartMap(CurrentMapPath, false);
+}
+
+/**
+**  Save the replay
+**
+**  @param filename  Name of the file to save to
+**
+**  @return          0 for success, -1 for failure
+*/
+int SaveReplay(const std::string &filename)
+{
+	FILE *fd;
+	char *buf;
+	std::stringstream logfile;
+	std::string str;
+	struct stat sb;
+
+	if (filename.find_first_of("\\/") != std::string::npos) {
+		fprintf(stderr, "\\ or / not allowed in SaveReplay filename\n");
+		return -1;
+	}
+
+#ifdef WIN32
+	logfile << GameName << "/logs/";
+#else
+	logfile << getenv("HOME") << "/" << STRATAGUS_HOME_PATH << "/" << GameName << "/logs/";
+#endif
+	str = logfile.str();
+
+	logfile << "log_of_stratagus_" << ThisPlayer->Index << ".log";
+
+	if (stat(logfile.str().c_str(), &sb)) {
+		fprintf(stderr, "stat failed\n");
+		return -1;
+	}
+	buf = new char[sb.st_size];
+	if (!buf) {
+		fprintf(stderr, "Out of memory\n");
+		return -1;
+	}
+	fd = fopen(logfile.str().c_str(), "rb");
+	if (!fd) {
+		fprintf(stderr, "fopen failed\n");
+		delete[] buf;
+		return -1;
+	}
+	fread(buf, sb.st_size, 1, fd);
+	fclose(fd);
+
+	str += filename;
+
+	fd = fopen(str.c_str(), "wb");
+	if (!fd) {
+		fprintf(stderr, "Can't save to `%s'\n", str.c_str());
+		delete[] buf;
+		return -1;
+	}
+	fwrite(buf, sb.st_size, 1, fd);
+	fclose(fd);
+
+	delete[] buf;
+
+	return 0;
 }
 
 //----------------------------------------------------------------------------

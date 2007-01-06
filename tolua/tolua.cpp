@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Thu Dec 21 20:53:34 2006.
+** Generated automatically by tolua++-1.0.7 on Sat Jan  6 09:44:10 2007.
 */
 
 #ifndef __cplusplus
@@ -41,6 +41,7 @@ bool IsReplayGame();
 void StartMap(const char *str, bool clean = true);
 void StartReplay(const char *str, bool reveal = false);
 void StartSavedGame(const char *str);
+int SaveReplay(const std::string &filename);
 #include "results.h"
 void StopGame(GameResults result);
 #include "settings.h"
@@ -15095,6 +15096,35 @@ static int tolua_stratagus_StartSavedGame00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: SaveReplay */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SaveReplay00
+static int tolua_stratagus_SaveReplay00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string filename = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+ {
+  int tolua_ret = (int)  SaveReplay(filename);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SaveReplay'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: GameResult */
 #ifndef TOLUA_DISABLE_tolua_get_GameResult
 static int tolua_get_GameResult(lua_State* tolua_S)
@@ -17001,6 +17031,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_function(tolua_S,"StartMap",tolua_stratagus_StartMap00);
  tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);
  tolua_function(tolua_S,"StartSavedGame",tolua_stratagus_StartSavedGame00);
+ tolua_function(tolua_S,"SaveReplay",tolua_stratagus_SaveReplay00);
  tolua_constant(tolua_S,"GameNoResult",GameNoResult);
  tolua_constant(tolua_S,"GameVictory",GameVictory);
  tolua_constant(tolua_S,"GameDefeat",GameDefeat);
