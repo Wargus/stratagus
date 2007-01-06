@@ -27,32 +27,40 @@ import os
 import sys
 import glob
 from stat import *
+import filecmp
 
 ccflags = "-fsigned-char"
-customDefines = "USE_HP_FOR_XP"
-
 SConsignFile()
 
-if os.path.exists("build_config.py")  \
-     and os.stat("build_config.py")[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
-   # Remove outdated build_config.py
-   os.remove("build_config.py")
-opts = Options("build_config.py", ARGUMENTS)
-opts.Add('CPPPATH', 'Additional preprocessor paths')
-opts.Add('CPPFLAGS', 'Additional preprocessor flags')
-opts.Add('CPPDEFINES', 'defined constants', Split(customDefines))
-opts.Add('LIBPATH', 'Additional library paths')
-opts.Add('LIBS', 'Additional libraries')
-opts.Add('CCFLAGS', 'C Compiler flags', Split(ccflags))
-opts.Add('LINKFLAGS', 'Linker Compiler flags')
-opts.Add('CC', 'C Compiler')
-opts.Add('CXX', 'C++ Compiler')
-opts.Add('debug', 'Build with debugging options', 0)
-opts.Add('opengl', 'Build with opengl support', 0)
-opts.Add('profile', 'Build with profiling support', 0)
+def DefineOptions(filename, args):
+   opts = Options(filename, args)
+   opts.Add('CPPPATH', 'Additional preprocessor paths')
+   opts.Add('CPPFLAGS', 'Additional preprocessor flags')
+   opts.Add('CPPDEFINES', 'defined constants', Split(''))
+   opts.Add('LIBPATH', 'Additional library paths')
+   opts.Add('LIBS', 'Additional libraries')
+   opts.Add('CCFLAGS', 'C Compiler flags', Split(ccflags))
+   opts.Add('LINKFLAGS', 'Linker Compiler flags')
+   opts.Add('CC', 'C Compiler')
+   opts.Add('CXX', 'C++ Compiler')
+   opts.Add('debug', 'Build with debugging options', 0)
+   opts.Add('opengl', 'Build with opengl support', 0)
+   opts.Add('profile', 'Build with profiling support', 0)
+   return opts
+
+
+opts = DefineOptions("build_options.py", ARGUMENTS)
 env = Environment() # for an unknown reason Environment(options=opts) doesnt work well
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
+optionsChanged = True
+if os.path.exists('build_options.py'):
+   os.rename('build_options.py', 'build_options_OLD_FOR_CHECK.py')
+   optionsChanged = False
+opts.Save("build_options.py", env)
+if not optionsChanged:
+   optionsChanged  = not filecmp.cmp('build_options.py', 'build_options_OLD_FOR_CHECK.py', False)
+   os.remove('build_options_OLD_FOR_CHECK.py')
 
 def globSources(sourceDirs):
   sources = []
@@ -64,6 +72,7 @@ def globSources(sourceDirs):
   for s in sources:
     targetsources.append('build' + s[3:])
   return targetsources
+
 
 sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua")
 sourcesEngine.append(globSources("guichan guichan/sdl guichan/widgets"))
@@ -141,7 +150,7 @@ def AutoConfigure(env):
      env.Append(CPPDEFINES = 'USE_VORBIS')
   if conf.CheckLib('theora'):
      env.Append(CPPDEFINES = 'USE_THEORA')
-  if env['opengl']:
+  if env['opengl'] == 1:
      CheckOpenGL(env, conf)
   
   # check for optional functions
@@ -155,14 +164,26 @@ def AutoConfigure(env):
 
   env = conf.Finish()
 
-if not os.path.exists("build_config.py")  \
-     or os.stat("build_config.py")[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
-    print "build_config.py doesn't exist or out of date."
-    print "Generating new build config..."
-    AutoConfigure(env)
-    opts.Save("build_config.py", env)
-else:
-    print "Using build_config.py"
+def AutoConfigureIfNeeded():
+   cachename = "build_conf_cache.py"
+   if os.path.exists(cachename):  
+      if optionsChanged or \
+         os.stat(cachename)[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
+            # Remove outdated cache file
+            os.remove(cachename)
+   if optionsChanged or not os.path.exists(cachename):
+      print cachename + " doesn't exist or out of date."
+      print "Generating new build config cache ..."
+      cache = DefineOptions(cachename, {})
+      AutoConfigure(env)
+      cache.Save(cachename, env)
+   else:
+      cache = DefineOptions(cachename, {})
+      print "Using " + cachename
+      cache.Update(env)
+
+
+AutoConfigureIfNeeded()
 
 # Stratagus build specifics
 env.Append(CPPPATH='src/include')
