@@ -560,7 +560,6 @@ void StartMap(const char *filename, bool clean = true)
 	CreateGame(filename, &Map);
 
 	UI.StatusLine.Set(NameLine);
-	SetMessage(_("Do it! Do it now!"));
 
 	//  Play the game.
 	GameMainLoop();
