@@ -10,7 +10,7 @@
 //
 /**@name map.cpp - The map. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Vladi Shabanski and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Vladi Shabanski and
 //                                 Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -302,15 +302,16 @@ void CMap::Clean(void)
 /**
 **  Load the map presentation
 **
-**  @param mapname    map filename
-**/
+**  @param mapname  map filename
+*/
 void LoadStratagusMapInfo(const std::string &mapname) 
 {
 	// Set the default map setup by replacing .smp with .sms
-	char *file = new_strdup(mapname.c_str());
-	memcpy(strstr(file, ".smp"), ".sms", 4);
-	Map.Info.Filename = file;
-	delete[] file;
+	std::string::size_type loc = mapname.find(".smp");
+	if (loc != std::string::npos) {
+		Map.Info.Filename = mapname;
+		Map.Info.Filename.replace(loc, 4, ".sms");
+	}
 	
 	LuaLoadFile(mapname);
 }
