@@ -9,7 +9,7 @@
 --
 --	ai.lua		-	Define the AI.
 --
---	(c) Copyright 2000-2006 by Lutz Sammer
+--	(c) Copyright 2000-2007 by Lutz Sammer, Frank Loeffler
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
