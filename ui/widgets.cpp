@@ -756,10 +756,9 @@ MultiLineLabel::MultiLineLabel(const std::string &caption)
 	this->mAlignment = LEFT;
 	this->mVerticalAlignment = TOP;
 
-	int w = this->getFont()->getWidth(caption);
-	this->mLineWidth = w;
-	this->setWidth(w);
-	this->setHeight(getFont()->getHeight());
+	this->mLineWidth = 999999;
+	this->wordWrap();
+	this->adjustSize();
 }
 
 /**
@@ -930,7 +929,7 @@ void MultiLineLabel::wordWrap()
 	this->mTextRows.clear();
 
 	while (!done) {
-		if (font->getWidth(str) > lineWidth || str.find('\n') != std::string::npos) {
+		if (str.find('\n') != std::string::npos || font->getWidth(str) > lineWidth) {
 			// string too wide or has a newline, split it up
 			lastPos = 0;
 			while (1) {
