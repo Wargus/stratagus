@@ -739,6 +739,11 @@ int SaveReplay(const std::string &filename)
 	std::string str;
 	struct stat sb;
 
+	if (filename.find_first_of("\\/") != std::string::npos) {
+		fprintf(stderr, "\\ or / not allowed in SaveReplay filename\n");
+		return -1;
+	}
+
 #ifdef WIN32
 	logfile << GameName << "/logs/";
 #else
