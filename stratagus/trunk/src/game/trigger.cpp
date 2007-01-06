@@ -245,7 +245,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 		if (unittype == ANY_UNIT ||
 				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
-				(unittype == unit->Type)) {
+				(unittype == unit->Type && !unit->Constructed)) {
 			//
 			// Check the player
 			//
