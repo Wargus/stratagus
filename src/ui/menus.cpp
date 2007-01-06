@@ -60,67 +60,6 @@ ServerSetup LocalSetupState;
 
 #if 0
 /**
-** Save replay Ok button.
-*/
-static void SaveReplayOk(void)
-{
-	FILE *fd;
-	Menu *menu;
-	char *buf;
-	struct stat s;
-	char *ptr;
-
-	menu = FindMenu("menu-save-replay");
-
-	if (strchr(menu->Items[1].D.Input.buffer, '/')) {
-		ErrorMenu("Name cannot contain '/'");
-		return;
-	}
-	if (strchr(menu->Items[1].D.Input.buffer, '\\')) {
-		ErrorMenu("Name cannot contain '\\'");
-		return;
-	}
-
-#ifdef WIN32
-	sprintf(TempPathBuf, "%s/logs/", GameName.c_str());
-#else
-	sprintf(TempPathBuf, "%s/%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH, GameName.c_str());
-	strcat(TempPathBuf, "/logs/");
-#endif
-	ptr = TempPathBuf + strlen(TempPathBuf);
-	sprintf(ptr, "log_of_stratagus_%d.log", ThisPlayer->Index);
-
-	stat(TempPathBuf, &s);
-	buf = new char[s.st_size];
-	fd = fopen(TempPathBuf, "rb");
-	fread(buf, s.st_size, 1, fd);
-	fclose(fd);
-
-	strncpy(ptr, menu->Items[1].D.Input.buffer, menu->Items[1].D.Input.nch);
-	ptr[menu->Items[1].D.Input.nch] = '\0';
-	if (!strcasestr(menu->Items[1].D.Input.buffer, ".log")) {
-		strcat(ptr, ".log");
-	}
-
-	fd = fopen(TempPathBuf, "wb");
-	if (!fd) {
-		ErrorMenu("Cannot write to file");
-		delete[] buf;
-		return;
-	}
-	fwrite(buf, s.st_size, 1, fd);
-	fclose(fd);
-
-	delete[] buf;
-	//CloseMenu();
-	SelectedFileExist = 0;
-	ScenSelectFileName[0] = '\0';
-	ScenSelectPathName[0] = '\0';
-}
-#endif
-
-#if 0
-/**
 **  Cancel button of network connect menu pressed.
 */
 static void NetConnectingCancel(void)
