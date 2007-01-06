@@ -9,7 +9,7 @@ Stratagus game engine.
 
 Copyright and Licence
 ---------------------
-This work, Invasion - Battle of Survival, is copyrighted in 2004-2006 by
+This work, Invasion - Battle of Survival, is copyrighted in 2004-2007 by
 Tina Petersen Jensen, Francois Beerten et al.
 
 Read the file COPYRIGHT.txt for the detailed copyright notice.
