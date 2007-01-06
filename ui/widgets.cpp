@@ -922,7 +922,7 @@ void MultiLineLabel::wordWrap()
 	gcn::Font *font = this->getFont();
 	int lineWidth = this->getLineWidth();
 	std::string str = this->getCaption();
-	std::string::size_type pos, lastPos = 0;
+	std::string::size_type pos, lastPos;
 	std::string substr;
 	bool done = false;
 
@@ -931,16 +931,16 @@ void MultiLineLabel::wordWrap()
 	while (!done) {
 		if (str.find('\n') != std::string::npos || font->getWidth(str) > lineWidth) {
 			// string too wide or has a newline, split it up
-			lastPos = 0;
+			lastPos = -1;
 			while (1) {
 				// look for any whitespace
-				pos = str.find_first_of(" \t\n", lastPos ? lastPos + 1 : 0);
+				pos = str.find_first_of(" \t\n", lastPos + 1);
 				if (pos != std::string::npos) {
 					// found space, now check width
 					substr = str.substr(0, pos);
 					if (font->getWidth(substr) > lineWidth) {
 						// sub-string is too big, use last good position
-						if (lastPos == 0) {
+						if (lastPos == -1) {
 							// didn't find a good last position
 							substr = str.substr(0, pos);
 							this->mTextRows.push_back(substr);
@@ -949,6 +949,15 @@ void MultiLineLabel::wordWrap()
 						} else {
 							substr = str.substr(0, lastPos);
 							this->mTextRows.push_back(substr);
+							// If we stopped at a space then skip any extra spaces but stop at a newline
+							if (str[lastPos] != '\n') {
+								while (str[lastPos + 1] == ' ' || str[lastPos + 1] == '\t' || str[lastPos + 1] == '\n') {
+									++lastPos;
+									if (str[lastPos] == '\n') {
+										break;
+									}
+								}
+							}
 							str = str.substr(lastPos + 1);
 							break;
 						}
@@ -964,7 +973,7 @@ void MultiLineLabel::wordWrap()
 					}
 				} else {
 					// no space found
-					if (lastPos == 0) {
+					if (lastPos == -1) {
 						// didn't find a good last position, we're done
 						this->mTextRows.push_back(str);
 						done = true;
