@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Jan  5 22:31:13 2007.
+** Generated automatically by tolua++-1.0.7 on Fri Jan  5 20:09:47 2007.
 */
 
 #ifndef __cplusplus
@@ -41,7 +41,7 @@ bool IsReplayGame();
 void StartMap(const char *str, bool clean = true);
 void StartReplay(const char *str, bool reveal = false);
 void StartSavedGame(const char *str);
-extern void SaveReplay(const std::string filename);
+extern int SaveReplay(const string &filename);
 #include "results.h"
 void StopGame(GameResults result);
 #include "settings.h"
@@ -15162,12 +15162,13 @@ static int tolua_stratagus_SaveReplay00(lua_State* tolua_S)
  else
 #endif
  {
-  const std::string filename = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  const string filename = ((const string)  tolua_tocppstring(tolua_S,1,0));
  {
-  SaveReplay(filename);
+  int tolua_ret = (int)  SaveReplay(filename);
+ tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
  }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SaveReplay'.",&tolua_err);

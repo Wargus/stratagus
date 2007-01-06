@@ -9,8 +9,9 @@ void StartReplay(const char *str, bool reveal = false);
 $void StartSavedGame(const char *str);
 void StartSavedGame(const char *str);
 
-$extern void SaveReplay(const std::string filename);
-extern void SaveReplay(const std::string filename);
+$extern int SaveReplay(const string &filename);
+
+extern int SaveReplay(const string filename);
 
 $#include "results.h"
 

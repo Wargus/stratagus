@@ -166,6 +166,7 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+#include <sstream>
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -723,42 +724,62 @@ void StartReplay(const char *filename, bool reveal)
 	StartMap(CurrentMapPath, false);
 }
 
-void SaveReplay(const std::string filename)
+/**
+**  Save the replay
+**
+**  @param filename  Name of the file to save to
+**
+**  @return          0 for success, -1 for failure
+*/
+int SaveReplay(const std::string &filename)
 {
 	FILE *fd;
 	char *buf;
-	char *logdir;
-	char tmp[PATH_MAX];
+	std::stringstream logfile;
+	std::string str;
 	struct stat sb;
 
 #ifdef WIN32
-	sprintf(tmp, "%s/logs/", GameName.c_str());
+	logfile << GameName << "/logs/";
 #else
-	sprintf(tmp, "%s/%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH, GameName.c_str());
-	strcat(tmp, "/logs/");
+	logfile << getenv("HOME") << "/" << STRATAGUS_HOME_PATH << "/" << GameName << "/logs/";
 #endif
-	logdir = tmp + strlen(tmp);
+	str = logfile.str();
 
-	sprintf(logdir, "log_of_stratagus_%d.log", ThisPlayer->Index);
+	logfile << "log_of_stratagus_" << ThisPlayer->Index << ".log";
 
-	stat(tmp, &sb);
+	if (stat(logfile.str().c_str(), &sb)) {
+		fprintf(stderr, "stat failed\n");
+		return -1;
+	}
 	buf = new char[sb.st_size];
-	fd = fopen(tmp, "rb");
+	if (!buf) {
+		fprintf(stderr, "Out of memory\n");
+		return -1;
+	}
+	fd = fopen(logfile.str().c_str(), "rb");
+	if (!fd) {
+		fprintf(stderr, "fopen failed\n");
+		delete[] buf;
+		return -1;
+	}
 	fread(buf, sb.st_size, 1, fd);
 	fclose(fd);
 
-	strcpy(logdir, filename.c_str());
+	str += filename;
 
-	fd = fopen(tmp, "wb");
+	fd = fopen(str.c_str(), "wb");
 	if (!fd) {
-		fprintf(stderr, "Can't save to `%s'\n", tmp);
+		fprintf(stderr, "Can't save to `%s'\n", str.c_str());
 		delete[] buf;
-		return;
+		return -1;
 	}
 	fwrite(buf, sb.st_size, 1, fd);
 	fclose(fd);
 
 	delete[] buf;
+
+	return 0;
 }
 
 //----------------------------------------------------------------------------
