@@ -10,7 +10,7 @@
 //
 /**@name menu_proc.cpp - The menu processing code. */
 //
-//      (c) Copyright 1999-2006 by Andreas Arens, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2007 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 		} else if (p->TextAlign == TextAlignLeft) {
 			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
 		} else {
-			VideoDrawText(x + p->TextX - style->Font->Width(text.c_str()), y + p->TextY,
+			VideoDrawText(x + p->TextX - style->Font->Width(text), y + p->TextY,
 				style->Font, text);
 		}
 

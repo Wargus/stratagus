@@ -399,7 +399,7 @@ static void CalculateMaxIconSize(void)
 	IconWidth = 0;
 	IconHeight = 0;
 	for (int i = 0; i < (int)Editor.UnitTypes.size(); ++i) {
-		type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+		type = UnitTypeByIdent(Editor.UnitTypes[i]);
 		Assert(type && type->Icon.Icon);
 		icon = type->Icon.Icon;
 		if (IconWidth < icon->G->Width) {
@@ -422,7 +422,7 @@ static void RecalculateShownUnits(void)
 	Editor.ShownUnitTypes.clear();
 
 	for (int i = 0; i < (int)Editor.UnitTypes.size(); ++i) {
-		type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+		type = UnitTypeByIdent(Editor.UnitTypes[i]);
 		Editor.ShownUnitTypes.push_back(type);
 	}
 
