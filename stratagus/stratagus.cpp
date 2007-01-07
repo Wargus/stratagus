@@ -354,7 +354,7 @@ static void ShowTitleImage(TitleScreen *t)
 				int x = labels[j]->Xofs * Video.Width / 640;
 				int y = labels[j]->Yofs * Video.Width / 640;
 				if (labels[j]->Flags & TitleFlagCenter) {
-					x -= labels[j]->Font->Width(labels[j]->Text.c_str()) / 2;
+					x -= labels[j]->Font->Width(labels[j]->Text) / 2;
 				}
 				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
 			}
