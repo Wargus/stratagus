@@ -38,19 +38,19 @@ function DefineAllow(unit, access)
 end
 
 function AllowDefaultUnits()
-   for unit, default in AllowedUnits do
+   for unit, default in pairs(AllowedUnits) do
       DefineAllow(unit, default)
    end 
 end
 
 function DisallowAllUnits()
-   for unit, default in AllowedUnits do
+   for unit, default in pairs(AllowedUnits) do
       DefineAllow(unit, "FFFFFFFF")
    end
 end
 
 function AllowAllUnits()
-   for unit, default in AllowedUnits do
+   for unit, default in pairs(AllowedUnits) do
       DefineAllow(unit, "AAAAAAAA")
    end
 end

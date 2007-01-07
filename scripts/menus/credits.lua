@@ -137,7 +137,7 @@ function RunCreditsMenu(s)
   menu:add(sw, Video.Width / 2 - 200, Video.Height / 20 * 3)
   sw:setBackgroundColor(dark)
   sw:setActionCallback(function() sw:restart() end)
-  for i,f in credits do
+  for i,f in ipairs(credits) do
     sw:add(Label(f), 50, 20 * i + 50)
   end
 
