@@ -469,7 +469,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 
 	if (seen && !IsSeenTile(type, x, y)) {
 		return;
-	} else if (!seen && !(mf->Flags & MapFieldForest)) {
+	} else if (!seen && !(mf->Flags & type)) {
 		return;
 	}
 
