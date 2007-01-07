@@ -131,20 +131,6 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	}
 
 	//
-	//  Effect of the explosion on units. Don't bother if damage is 0
-	//
-	if (this->Damage) {
-		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
-		for (i = 0; i < n; ++i) {
-			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
-					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
-				// Don't hit flying units!
-				HitUnit(caster, table[i], this->Damage);
-			}
-		}
-	}
-
-	//
 	// Terrain effect of the explosion
 	//
 	for (ix = xmin; ix <= xmax; ++ix) {
@@ -162,6 +148,21 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 			}
 		}
 	}
+
+	//
+	//  Effect of the explosion on units. Don't bother if damage is 0
+	//
+	if (this->Damage) {
+		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
+		for (i = 0; i < n; ++i) {
+			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
+					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
+				// Don't hit flying units!
+				HitUnit(caster, table[i], this->Damage);
+			}
+		}
+	}
+
 	return 1;
 }
 
