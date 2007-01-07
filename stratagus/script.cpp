@@ -168,7 +168,7 @@ static int report(int status)
 	return status;
 }
 
-static int luatraceback (lua_State *L) 
+static int luatraceback(lua_State *L) 
 {
 	lua_pushliteral(L, "debug");
 	lua_gettable(L, LUA_GLOBALSINDEX);
@@ -178,7 +178,6 @@ static int luatraceback (lua_State *L)
 	}
 	lua_pushliteral(L, "traceback");
 	lua_gettable(L, -2);
-	lua_pop(L, -2);
 	if (!lua_isfunction(L, -1)) {
 		lua_pop(L, 2);
 		return 1;
@@ -1857,6 +1856,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	std::vector<FileList> flp;
 	int n;
 	int i;
+	int j;
 	int pathtype;
 #ifndef WIN32
 	const char *s;
@@ -1896,11 +1896,12 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	lua_pop(l, 1);
 	lua_newtable(l);
 	n = ReadDataDirectory(directory, NULL, flp);
-	for (i = 0; i < n; i++) {
+	for (i = 0, j = 0; i < n; i++) {
 		if ((flp[i].type & mask) == type) {
-			lua_pushnumber(l, i + 1);
+			lua_pushnumber(l, j + 1);
 			lua_pushstring(l, flp[i].name);
 			lua_settable(l, 1);
+			++j;
 		}
 		delete[] flp[i].name;
 	}
@@ -2344,7 +2345,7 @@ static int CclGetCompileFeature(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	str = LuaToString(l, 1);
-	if (strstr(CompileOptions.c_str(), str)) {
+	if (CompileOptions.find(str) != std::string::npos) {
 		DebugPrint("I have %s\n" _C_ str);
 		lua_pushboolean(l, 1);
 	} else {
