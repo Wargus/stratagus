@@ -20,15 +20,19 @@
 
 /* a fast check if a is b, without parameter validation
  i.e. if b is equal to a or a superclass of a. */
-TOLUA_API int tolua_fast_isa(lua_State *L, int mt_indexa, int mt_indexb)
+TOLUA_API int tolua_fast_isa(lua_State *L, int mt_indexa, int mt_indexb, int super_index)
 {
  int result;
 	if (lua_rawequal(L,mt_indexa,mt_indexb))
 		result = 1;
 	else
 	{
-		lua_pushliteral(L,"tolua_super");
-		lua_rawget(L,LUA_REGISTRYINDEX);  /* stack: super */
+		if (super_index) {
+			lua_pushvalue(L, super_index);
+		} else {
+			lua_pushliteral(L,"tolua_super");
+			lua_rawget(L,LUA_REGISTRYINDEX);  /* stack: super */
+		};
 		lua_pushvalue(L,mt_indexa);       /* stack: super mta */
 		lua_rawget(L,-2);                 /* stack: super super[mta] */
 		lua_pushvalue(L,mt_indexb);       /* stack: super super[mta] mtb */
