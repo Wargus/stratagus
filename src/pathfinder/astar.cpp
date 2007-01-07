@@ -389,16 +389,16 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 	}
 
 	int sx = std::max(gx, 0);
-	int ex = std::min(gx + gw, Map.Info.MapWidth - unit->Type->TileWidth - 1);
+	int ex = std::min(gx + gw, Map.Info.MapWidth - unit->Type->TileWidth);
 	int sy = std::max(gy, 0);
-	int ey = std::min(gy + gh, Map.Info.MapHeight - unit->Type->TileHeight - 1);
+	int ey = std::min(gy + gh, Map.Info.MapHeight - unit->Type->TileHeight);
 
 	// Mark top, bottom, left, right
 	for (range = minrange; range <= maxrange; ++range) {
 		z1 = gy - range;
 		z2 = gy + range + gh;
-		doz1 = z1 >= 0 && z1 < Map.Info.MapHeight - unit->Type->TileHeight;
-		doz2 = z2 >= 0 && z2 < Map.Info.MapHeight - unit->Type->TileHeight;
+		doz1 = z1 >= 0 && z1 + unit->Type->TileHeight - 1 < Map.Info.MapHeight;
+		doz2 = z2 >= 0 && z2 + unit->Type->TileHeight - 1 < Map.Info.MapHeight;
 		if (doz1 || doz2) {
 			// Mark top and bottom of goal
 			for (x = sx; x <= ex; ++x) {
@@ -420,8 +420,8 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 		}
 		z1 = gx - range;
 		z2 = gx + gw + range;
-		doz1 = z1 >= 0 && z1 < Map.Info.MapHeight - unit->Type->TileHeight;
-		doz2 = z2 >= 0 && z2 < Map.Info.MapHeight - unit->Type->TileHeight;
+		doz1 = z1 >= 0 && z1 + unit->Type->TileWidth - 1 < Map.Info.MapWidth;
+		doz2 = z2 >= 0 && z2 + unit->Type->TileWidth - 1 < Map.Info.MapWidth;
 		if (doz1 || doz2) {
 			// Mark left and right of goal
 			for (y = sy; y <= ey; ++y) {
@@ -477,8 +477,8 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 						} else {
 							filler = -1;
 						}
-						if (cx[quad] >= 0 && cx[quad] + unit->Type->TileWidth < Map.Info.MapWidth &&
-								cy[quad] + filler >= 0 && cy[quad] + filler + unit->Type->TileHeight < Map.Info.MapHeight &&
+						if (cx[quad] >= 0 && cx[quad] + unit->Type->TileWidth - 1 < Map.Info.MapWidth &&
+								cy[quad] + filler >= 0 && cy[quad] + filler + unit->Type->TileHeight - 1 < Map.Info.MapHeight &&
 								CostMoveTo(unit, cx[quad], cy[quad] + filler, mask) >= 0) {
 							eo = (cy[quad] + filler) * Map.Info.MapWidth + cx[quad];
 							AStarMatrix[eo].InGoal = 1;
@@ -501,8 +501,8 @@ static int AStarMarkGoal(const CUnit *unit, int gx, int gy, int gw, int gh, int 
 
 				// Mark Actually Goal curve change
 				for (quad = 0; quad < 4; ++quad) {
-					if (cx[quad] >= 0 && cx[quad] + unit->Type->TileWidth < Map.Info.MapWidth &&
-							cy[quad] >= 0 && cy[quad] + unit->Type->TileHeight < Map.Info.MapHeight &&
+					if (cx[quad] >= 0 && cx[quad] + unit->Type->TileWidth - 1 < Map.Info.MapWidth &&
+							cy[quad] >= 0 && cy[quad] + unit->Type->TileHeight - 1 < Map.Info.MapHeight &&
 							CostMoveTo(unit, cx[quad], cy[quad], mask) >= 0) {
 						eo = cy[quad] * Map.Info.MapWidth + cx[quad];
 						AStarMatrix[eo].InGoal = 1;
@@ -640,8 +640,8 @@ int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh, int minrang
 			//
 			// Outside the map or can't be entered.
 			//
-			if (ex < 0 || ex + unit->Type->TileWidth >= Map.Info.MapWidth ||
-					ey < 0 || ey + unit->Type->TileHeight >= Map.Info.MapHeight) {
+			if (ex < 0 || ex + unit->Type->TileWidth - 1 >= Map.Info.MapWidth ||
+					ey < 0 || ey + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
 				continue;
 			}
 
