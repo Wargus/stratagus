@@ -1104,9 +1104,6 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 		} else {
 			order->X = x;
 			order->Y = y;
-			if (order->Range == 0) {
-				order->Range = 1;
-			}
 		}
 		order->Arg1.Spell = spell;
 	}
