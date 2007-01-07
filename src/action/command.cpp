@@ -1158,7 +1158,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 				// FIXME: dest->Type is now set to 0. maybe we shouldn't bother.
 				order->X = dest->X /*+ dest->Type->TileWidth / 2*/  - order->Range;
 				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;
-				order->Range <<= 2;
+				order->Range <<= 1;
 			} else {
 				order->Goal = dest;
 				dest->RefsIncrease();
@@ -1166,7 +1166,9 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 		} else {
 			order->X = x;
 			order->Y = y;
-			order->Range <<= 1;
+			if (order->Range == 0) {
+				order->Range = 1;
+			}
 		}
 		order->Arg1.Spell = spell;
 	}
