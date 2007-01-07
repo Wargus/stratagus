@@ -22,6 +22,18 @@
 */
 static void storeatubox (lua_State* L, int lo)
 {
+	#ifdef LUA_VERSION_NUM
+		lua_getfenv(L, lo);
+		if (lua_rawequal(L, -1, TOLUA_NOPEER)) {
+			lua_pop(L, 1);
+			lua_newtable(L);
+			lua_pushvalue(L, -1);
+			lua_setfenv(L, lo);	/* stack: k,v,table  */
+		};
+		lua_insert(L, -3);
+		lua_settable(L, -3); /* on lua 5.1, we trade the "tolua_peers" lookup for a settable call */
+		lua_pop(L, 1);
+	#else
 	 /* stack: key value (to be stored) */
 		lua_pushstring(L,"tolua_peers");
 		lua_rawget(L,LUA_REGISTRYINDEX);        /* stack: k v ubox */
@@ -39,6 +51,7 @@ static void storeatubox (lua_State* L, int lo)
 		lua_pop(L,1);                           /* pop ubox */
 		lua_rawset(L,-3);                       /* store at table */
 		lua_pop(L,1);                           /* pop ubox[u] */
+	#endif
 }
 
 /* Module index function
@@ -127,6 +140,15 @@ static int class_index_event (lua_State* L)
 	if (t == LUA_TUSERDATA)
 	{
 		/* Access alternative table */
+		#ifdef LUA_VERSION_NUM /* new macro on version 5.1 */
+		lua_getfenv(L,1);
+		if (!lua_rawequal(L, -1, TOLUA_NOPEER)) {
+			lua_pushvalue(L, 2); /* key */
+			lua_gettable(L, -2); /* on lua 5.1, we trade the "tolua_peers" lookup for a gettable call */
+			if (!lua_isnil(L, -1))
+				return 1;
+		};
+		#else
 		lua_pushstring(L,"tolua_peers");
 		lua_rawget(L,LUA_REGISTRYINDEX);        /* stack: obj key ubox */
 		lua_pushvalue(L,1);
@@ -138,6 +160,7 @@ static int class_index_event (lua_State* L)
 			if (!lua_isnil(L,-1))
 				return 1;
 		}
+		#endif
 		lua_settop(L,2);                        /* stack: obj key */
 		/* Try metatables */
 		lua_pushvalue(L,1);                     /* stack: obj key obj */
@@ -156,7 +179,7 @@ static int class_index_event (lua_State* L)
 					lua_call(L,2,1);
 					return 1;
 				}
-   }
+			}
 			else
 			{
 			 lua_pushvalue(L,2);                    /* stack: obj key mt key */
@@ -238,7 +261,7 @@ static int class_newindex_event (lua_State* L)
 					lua_call(L,3,0);
 					return 0;
 				}
-   }
+			}
 			else
 			{
 				lua_pushstring(L,".set");
@@ -372,19 +395,22 @@ static int class_gc_event (lua_State* L)
 	return 0;
 }
 */
-static int class_gc_event (lua_State* L)
+TOLUA_API int class_gc_event (lua_State* L)
 {
 	void* u = *((void**)lua_touserdata(L,1));
 	int top;
 	/*fprintf(stderr, "collecting: looking at %p\n", u);*/
+	/*
 	lua_pushstring(L,"tolua_gc");
 	lua_rawget(L,LUA_REGISTRYINDEX);
+	*/
+	lua_pushvalue(L, lua_upvalueindex(1));
 	lua_pushlightuserdata(L,u);
 	lua_rawget(L,-2);            /* stack: gc umt    */
 	lua_getmetatable(L,1);       /* stack: gc umt mt */
 	/*fprintf(stderr, "checking type\n");*/
 	top = lua_gettop(L);
-	if (tolua_fast_isa(L,top,top-1)) /* make sure we collect correct type */
+	if (tolua_fast_isa(L,top,top-1, lua_upvalueindex(2))) /* make sure we collect correct type */
 	{
 		/*fprintf(stderr, "Found type!\n");*/
 		/* get gc function */
@@ -479,7 +505,9 @@ TOLUA_API void tolua_classevents (lua_State* L)
 	lua_rawset(L,-3);
 
 	lua_pushstring(L,"__gc");
-	lua_pushcfunction(L,class_gc_event);
+	lua_pushstring(L, "tolua_gc_event");
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	/*lua_pushcfunction(L,class_gc_event);*/
 	lua_rawset(L,-3);
 }
 

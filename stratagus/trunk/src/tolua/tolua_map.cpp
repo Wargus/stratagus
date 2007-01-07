@@ -27,10 +27,19 @@
 */
 static int tolua_newmetatable (lua_State* L, char* name)
 {
- int r = luaL_newmetatable(L,name);
+	int r = luaL_newmetatable(L,name);
+
+	#ifdef LUA_VERSION_NUM /* only lua 5.1 */
+	if (r) {
+		lua_pushvalue(L, -1);
+		lua_pushstring(L, name);
+		lua_settable(L, LUA_REGISTRYINDEX); /* reg[mt] = type_name */
+	};
+	#endif
+
 	if (r)
-	 tolua_classevents(L); /* set meta events */
- lua_pop(L,1);
+		tolua_classevents(L); /* set meta events */
+	lua_pop(L,1);
 	return r;
 }
 
@@ -152,7 +161,12 @@ static int tolua_bnd_takeownership (lua_State* L)
 		{
 			lua_pop(L,1);             /* clear metatable off stack */
 			/* force garbage collection to avoid C to reuse a to-be-collected address */
+			#ifdef LUA_VERSION_NUM
+			lua_gc(L, LUA_GCCOLLECT, 0);
+			#else
 			lua_setgcthreshold(L,0);
+			#endif
+
 			success = tolua_register_gc(L,1);
 		}
 	}
@@ -169,7 +183,11 @@ static int tolua_bnd_releaseownership (lua_State* L)
 	{
 		void* u = *((void**)lua_touserdata(L,1));
 		/* force garbage collection to avoid releasing a to-be-collected address */
+		#ifdef LUA_VERSION_NUM
+		lua_gc(L, LUA_GCCOLLECT, 0);
+		#else
 		lua_setgcthreshold(L,0);
+		#endif
 		lua_pushstring(L,"tolua_gc");
 		lua_rawget(L,LUA_REGISTRYINDEX);
 		lua_pushlightuserdata(L,u);
@@ -204,11 +222,10 @@ static int tolua_bnd_cast (lua_State* L)
 
 	void* v;
 	const char* s;
-	if (lua_getmetatable(L, 1)) {
-		/* lua_pop(L, 1); */
-		v = tolua_tousertype(L,1,NULL);
-	} else {
+	if (lua_islightuserdata(L, 1)) {
 		v = tolua_touserdata(L, 1, NULL);
+	} else {
+		v = tolua_tousertype(L, 1, 0);
 	};
 
 	s = tolua_tostring(L,2,NULL);
@@ -232,6 +249,38 @@ static int tolua_bnd_inherit (lua_State* L) {
 	return 0;
 };
 
+#ifdef LUA_VERSION_NUM /* lua 5.1 */
+static int tolua_bnd_setpeer(lua_State* L) {
+
+	/* stack: userdata, table */
+	if (!lua_isuserdata(L, -2)) {
+		lua_pushstring(L, "Invalid argument #1 to setpeer: userdata expected.");
+		lua_error(L);
+	};
+	
+	if (lua_isnil(L, -1)) {
+
+		lua_pop(L, 1);
+		lua_pushvalue(L, TOLUA_NOPEER);
+	};
+	lua_setfenv(L, -2);
+
+	return 0;
+};
+
+static int tolua_bnd_getpeer(lua_State* L) {
+
+	/* stack: userdata */
+	lua_getfenv(L, -1);
+	if (lua_rawequal(L, -1, TOLUA_NOPEER)) {
+		lua_pop(L, 1);
+		lua_pushnil(L);
+	};
+	return 1;
+};
+#endif
+
+/* static int class_gc_event (lua_State* L); */
 
 TOLUA_API void tolua_open (lua_State* L)
 {
@@ -242,12 +291,14 @@ TOLUA_API void tolua_open (lua_State* L)
  {
   lua_pushstring(L,"tolua_opened"); lua_pushboolean(L,1); lua_rawset(L,LUA_REGISTRYINDEX);
 
+  #ifndef LUA_VERSION_NUM /* only prior to lua 5.1 */
   /* create peer object table */
   lua_pushstring(L, "tolua_peers"); lua_newtable(L);
   /* make weak key metatable for peers indexed by userdata object */
   lua_newtable(L); lua_pushliteral(L, "__mode"); lua_pushliteral(L, "k"); lua_rawset(L, -3);                /* stack: string peers mt */
   lua_setmetatable(L, -2);   /* stack: string peers */
   lua_rawset(L,LUA_REGISTRYINDEX);
+  #endif
 
   /* create object ptr -> udata mapping table */
   lua_pushstring(L,"tolua_ubox"); lua_newtable(L);
@@ -260,6 +311,15 @@ TOLUA_API void tolua_open (lua_State* L)
   lua_pushstring(L,"tolua_super"); lua_newtable(L); lua_rawset(L,LUA_REGISTRYINDEX);
   lua_pushstring(L,"tolua_gc"); lua_newtable(L);lua_rawset(L,LUA_REGISTRYINDEX);
 
+  /* create gc_event closure */
+  lua_pushstring(L, "tolua_gc_event");
+  lua_pushstring(L, "tolua_gc");
+  lua_rawget(L, LUA_REGISTRYINDEX);
+  lua_pushstring(L, "tolua_super");
+  lua_rawget(L, LUA_REGISTRYINDEX);
+  lua_pushcclosure(L, class_gc_event, 2);
+  lua_rawset(L, LUA_REGISTRYINDEX);
+
   tolua_newmetatable(L,"tolua_commonclass");
 
   tolua_module(L,NULL,0);
@@ -271,6 +331,11 @@ TOLUA_API void tolua_open (lua_State* L)
   tolua_function(L,"releaseownership",tolua_bnd_releaseownership);
   tolua_function(L,"cast",tolua_bnd_cast);
   tolua_function(L,"inherit", tolua_bnd_inherit);
+  #ifdef LUA_VERSION_NUM /* lua 5.1 */
+  tolua_function(L, "setpeer", tolua_bnd_setpeer);
+  tolua_function(L, "getpeer", tolua_bnd_getpeer);
+  #endif
+
   tolua_endmodule(L);
   tolua_endmodule(L);
  }
@@ -426,6 +491,30 @@ TOLUA_API void tolua_module (lua_State* L, char* name, int hasvar)
 }
 #endif
 
+static void push_collector(lua_State* L, const char* type, lua_CFunction col) {
+
+	/* push collector function, but only if it's not NULL, or if there's no
+	   collector already */
+	if (!col) return;
+	luaL_getmetatable(L,type);
+	lua_pushstring(L,".collector");
+	/*
+	if (!col) {
+		lua_pushvalue(L, -1);
+		lua_rawget(L, -3);
+		if (!lua_isnil(L, -1)) {
+			lua_pop(L, 3);
+			return;
+		};
+		lua_pop(L, 1);
+	};
+	//	*/
+	lua_pushcfunction(L,col);
+
+	lua_rawset(L,-3);
+	lua_pop(L, 1);
+};
+
 /* Map C class
 	* It maps a C class, setting the appropriate inheritance and super classes.
 */
@@ -443,20 +532,30 @@ TOLUA_API void tolua_cclass (lua_State* L, char* lname, char* name, char* base, 
 	mapsuper(L,name,base);
 
 	lua_pushstring(L,lname);
+	
+	push_collector(L, name, col);
+	/*
 	luaL_getmetatable(L,name);
 	lua_pushstring(L,".collector");
 	lua_pushcfunction(L,col);
 
-	lua_rawset(L,-3);              /* store collector function into metatable */
+	lua_rawset(L,-3);
+	*/
+	
+	luaL_getmetatable(L,name);
 	lua_rawset(L,-3);              /* assign class metatable to module */
 
 	/* now we also need to store the collector table for the const
 	   instances of the class */
+	push_collector(L, cname, col);
+	/*
 	luaL_getmetatable(L,cname);
 	lua_pushstring(L,".collector");
 	lua_pushcfunction(L,col);
 	lua_rawset(L,-3);
-	lua_pop(L,1);                  /* get rid of metatable for const object */
+	lua_pop(L,1);
+	*/
+	
 
 }
 
@@ -592,4 +691,14 @@ TOLUA_API void tolua_array (lua_State* L, char* name, lua_CFunction get, lua_CFu
  lua_rawset(L,-3);                  /* store variable */
 	lua_pop(L,1);                      /* pop .get table */
 }
+
+
+TOLUA_API void tolua_dobuffer(lua_State* L, char* B, unsigned int size, const char* name) {
+
+ #ifdef LUA_VERSION_NUM /* lua 5.1 */
+ luaL_loadbuffer(L, B, size, name) || lua_pcall(L, 0, 0, 0);
+ #else
+ lua_dobuffer(L, B, size, name);
+ #endif
+};
 
