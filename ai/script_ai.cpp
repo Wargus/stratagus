@@ -387,21 +387,6 @@ static int CclDefineAi(lua_State *l)
 	lua_rawset(l, 4);
 	lua_pop(l, 1);
 
-// Get name of function
-	lua_pushstring(l, "debug");
-	lua_gettable(l, LUA_GLOBALSINDEX);
-	Assert(!lua_isnil(l, -1));
-	lua_pushstring(l, "getinfo");
-	lua_gettable(l, -2);
-	Assert(lua_isfunction(l, -1));
-	lua_pushvalue(l, 3);
-	lua_call(l, 1, 1);
-	lua_pushstring(l, "name");
-	lua_gettable(l, -2);
-	aitype->FunctionName = LuaToString(l, -1);
-	lua_pop(l, 2); // FIXME : check if this value is correct.
-	// We can have opcode of this function with string.dump(function)
-	// Problems are for sub functions...
 	return 0;
 }
 
