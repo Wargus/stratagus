@@ -127,7 +127,7 @@ function AddMenuHelpers(menu)
        lister = ListFilesInDirectory
     end
     fileslist = lister(path)
-    for i,f in fileslist do
+    for i,f in ipairs(fileslist) do
       if (string.find(f, filter)) then
         mapslist[u] = f
         u = u + 1
