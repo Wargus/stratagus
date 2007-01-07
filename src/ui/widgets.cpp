@@ -925,22 +925,24 @@ void MultiLineLabel::wordWrap()
 	std::string::size_type pos, lastPos;
 	std::string substr;
 	bool done = false;
+	bool first = true;
 
 	this->mTextRows.clear();
 
 	while (!done) {
 		if (str.find('\n') != std::string::npos || font->getWidth(str) > lineWidth) {
 			// string too wide or has a newline, split it up
-			lastPos = -1;
+			first = true;
+			lastPos = 0;
 			while (1) {
 				// look for any whitespace
-				pos = str.find_first_of(" \t\n", lastPos + 1);
+				pos = str.find_first_of(" \t\n", first ? 0 : lastPos + 1);
 				if (pos != std::string::npos) {
 					// found space, now check width
 					substr = str.substr(0, pos);
 					if (font->getWidth(substr) > lineWidth) {
 						// sub-string is too big, use last good position
-						if (lastPos == -1) {
+						if (first) {
 							// didn't find a good last position
 							substr = str.substr(0, pos);
 							this->mTextRows.push_back(substr);
@@ -973,7 +975,7 @@ void MultiLineLabel::wordWrap()
 					}
 				} else {
 					// no space found
-					if (lastPos == -1) {
+					if (first) {
 						// didn't find a good last position, we're done
 						this->mTextRows.push_back(str);
 						done = true;
@@ -986,6 +988,7 @@ void MultiLineLabel::wordWrap()
 					}
 				}
 				lastPos = pos;
+				first = false;
 			}
 		} else {
 			// string small enough
