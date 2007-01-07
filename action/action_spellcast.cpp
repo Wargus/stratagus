@@ -120,7 +120,7 @@ static void SpellMoveToTarget(CUnit *unit)
 		unit->SubAction++; // cast the spell
 		return;
 	} else if (!goal && MapDistanceToUnit(unit->Orders[0]->X,
-			unit->Orders[0]->Y, unit) <= unit->Orders[0]->Range) {
+			unit->Orders[0]->Y, unit) <= (unit->Orders[0] ? unit->Orders[0]->Range : 1)) {
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit,
 			unit->Orders[0]->X +
