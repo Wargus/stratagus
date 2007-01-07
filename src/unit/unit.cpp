@@ -1311,8 +1311,8 @@ bool CUnit::IsVisibleAsGoal(const CPlayer *player) const
 			(!player->IsBothSharedVision(Player))) {
 		return false;
 	}
-	if (IsVisible(player) || player->Type == PlayerComputer ||
-			UnitVisibleOnRadar(player, this)) {
+	if ((player->Type == PlayerComputer && !this->Type->PermanentCloak) ||
+			IsVisible(player) || UnitVisibleOnRadar(player, this)) {
 		return !Removed && !Destroyed && Orders[0]->Action != UnitActionDie;
 	} else {
 		return Type->VisibleUnderFog &&
