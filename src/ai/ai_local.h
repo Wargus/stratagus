@@ -69,7 +69,6 @@ public:
 #endif
 
 	std::string Script;       /// Main script
-	std::string FunctionName; /// Name of the function
 };
 
 /**
