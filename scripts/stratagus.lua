@@ -49,7 +49,7 @@ SetGameName("bos")
 -------------------------------------------------------------------------------
 playlist = {}
 local musiclist = ListFilesInDirectory("music/")
-for i,f in musiclist do
+for i,f in ipairs(musiclist) do
   if(string.find(f, ".ogg$") or string.find(f, ".wav$") or string.find(f, ".mp3$")) then 
     print("Added music file:" .. f) 
     playlist[i] = f
