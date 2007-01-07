@@ -166,11 +166,11 @@ local f
 local ff
 
 list = ListDirsInDirectory("units/")
-for i,f in list do
+for i,f in ipairs(list) do
   if not(string.find(f, "^%.")) then
      local subdirlist = ListFilesInDirectory("units/" .. f)
-     for i, ff in subdirlist do
-        if(string.find(ff, "^unit-.*%.lua$")) then
+     for ii,ff in ipairs(subdirlist) do
+        if (string.find(ff, "^unit-.*%.lua$")) then
           print("Loading unit: " .. ff)
           Load("units/"..f.."/"..ff)
         end
