@@ -1,16 +1,36 @@
 <!--#set var="title" value="Bos Development"-->
 <!--#include file="header.shtml" -->
 
+
 <h2>Before you start</h2>
+<p>
 Before any development, feature request or bug report, 
-you should get and use the development version of the <a href="http://www.stratagus.org">Stratagus engine</a> 
-and of Bos. 
-
-The <a href="download.shtml">Download</a> section explains how to get the development version of Bos.
-
+you should get and use the development version of the Bos. 
+The next section explains how to get the development version. 
+</p>
 <p>
 Before starting a new development, contact us to check if it fits in the game 
-and if nobody else is working on it.      
+and if nobody else is working on it.
+</p>
+
+<h2>Development version</h2>
+The game is continuously evolving. You can get the latest version with <a href="http://subversion.tigris.org/">subversion</a>:
+ <pre>  svn co svn://bos.seul.org/svn/bos/data.bos/trunk data.bos</pre>
+
+<p>You will also need the latest development version of the engine:<br>
+ <pre>  svn co svn://bos.seul.org/svn/bos/stratagus/trunk engine</pre>
+
+<p>To start the game run :<br>
+ <pre>  ./stratagus -d path/to/data.bos</pre>
+
+<p>See <a href="http://bos.seul.org/wiki/index.php/Bos/FAQ">bos FAQ</a> and the documentation next to the sources for more information.
+
+<p>You can browse the source code via <a href="http://svn.seul.org/websvn/listing.php?repname=bos&path=%2F&sc=0">websvn</a>.</p>
+
+<p>Old development done before december 17th 2004 can be found in the 
+<a href="http://savannah.nongnu.org/cvs/?group=stratagus-bos">CVS repository</a>.
+
+
 
 <h2>Contact</h2>
 Discussion and work on the game happens mostly on <a href="irc://sterling.freenode.net/bos">irc</a>. 
