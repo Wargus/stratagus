@@ -183,6 +183,11 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 	CUnit *temp;
 	CUnit *goal;
 
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
+
 	// Cowards don't attack unless ordered.
 	if (unit->Type->CanAttack && !unit->Type->Coward) {
 		// Normal units react in reaction range.
@@ -197,6 +202,8 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 				unit->SavedOrder.X = unit->X;
 				unit->SavedOrder.Y = unit->Y;
 				unit->SavedOrder.Goal = NoUnitP;
+			} else {
+				unit->Wait = 15;
 			}
 		// Removed units can only attack in AttackRange, from bunker
 		} else if ((goal = AttackUnitsInRange(unit))) {
@@ -219,6 +226,8 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 					goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 			}
 			return;
+		} else {
+			unit->Wait = 15;
 		}
 	}
 
