@@ -92,7 +92,6 @@ void AnimateActionSpellCast(CUnit *unit)
 */
 static void SpellMoveToTarget(CUnit *unit)
 {
-	SpellType *spell;
 	CUnit *goal;
 	int err;
 
@@ -120,35 +119,23 @@ static void SpellMoveToTarget(CUnit *unit)
 		unit->SubAction++; // cast the spell
 		return;
 	} else if (!goal && MapDistanceToUnit(unit->Orders[0]->X,
-			unit->Orders[0]->Y, unit) <= (unit->Orders[0] ? unit->Orders[0]->Range : 1)) {
+			unit->Orders[0]->Y, unit) <= unit->Orders[0]->Range) {
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit,
-			unit->Orders[0]->X +
-				unit->Orders[0]->Arg1.Spell->Range - unit->X,
-			unit->Orders[0]->Y +
-				unit->Orders[0]->Arg1.Spell->Range - unit->Y);
+			unit->Orders[0]->X + unit->Orders[0]->Arg1.Spell->Range - unit->X,
+			unit->Orders[0]->Y + unit->Orders[0]->Arg1.Spell->Range - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
-	} else if (err) {
+	} else if (err == PF_UNREACHABLE) {
 		//
-		// Target self-> we don't really have to get in range,
-		// just as close as possible, since the spell is centered
-		// on the caster anyway.
+		// goal/spot unreachable and out of range -- give up
 		//
-		if ((spell = unit->Orders[0]->Arg1.Spell)->Target == TargetSelf) {
-			DebugPrint("Increase range for spellcast.");
-			unit->Orders[0]->Range++;
-		} else {
-			//
-			// goal/spot out of range -- give up
-			//
-			unit->Orders[0]->Action = UnitActionStill;
-			unit->State = unit->SubAction = 0;
+		unit->Orders[0]->Action = UnitActionStill;
+		unit->State = unit->SubAction = 0;
 
-			if (unit->Orders[0]->Goal) { // Release references
-				unit->Orders[0]->Goal->RefsDecrease();
-				unit->Orders[0]->Goal = NoUnitP;
-			}
+		if (unit->Orders[0]->Goal) { // Release references
+			unit->Orders[0]->Goal->RefsDecrease();
+			unit->Orders[0]->Goal = NoUnitP;
 		}
 	}
 	Assert(!unit->Type->Vanishes && !unit->Destroyed);
@@ -163,6 +150,11 @@ void HandleActionSpellCast(CUnit *unit)
 {
 	int flags;
 	const SpellType *spell;
+
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
 
 	switch (unit->SubAction) {
 		case 0:
