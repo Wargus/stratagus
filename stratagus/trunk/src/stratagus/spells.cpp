@@ -678,6 +678,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 				//
 				x = unit->X;
 				y = unit->Y;
+				unit->Remove(NULL);
 				unit->Release();
 				cansummon = 1;
 				break;
