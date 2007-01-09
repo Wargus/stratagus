@@ -208,14 +208,6 @@ class CAllow {
 public:
 	CAllow() { this->Clear(); }
 
-	void RevertUpgrades() {
-		for (int i = 0; i < UpgradeMax; i++) {
-			if (Upgrades[i] == 'R') {
-				Upgrades[i] = 'A';
-			}
-		}
-	}
-
 	void Clear() {
 		memset(Units, 0, sizeof(Units));
 		memset(Upgrades, 0, sizeof(Upgrades));
