@@ -1,0 +1,337 @@
+﻿# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Stratagus traduction\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-12-09 18:54-0600\n"
+"PO-Revision-Date: 2006-03-23 14:12+0100\n"
+"Last-Translator: Alexander Petkov <sasho_manga_fen@yahoo.com>\n"
+"Language-Team: Bulgarian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Bulgarian\n"
+"X-Poedit-Country: BULGARIA\n"
+
+#: src/action/action_build.cpp:119
+msgid "You cannot reach building place"
+msgstr "Не правилно място да строене"
+
+#: src/action/action_build.cpp:177
+#, c-format
+msgid "You cannot build %s here"
+msgstr "Не можете да стоите %s тук"
+
+#: src/action/action_build.cpp:197
+#, c-format
+msgid "Not enough resources to build %s"
+msgstr "Няма достатъчно ресурси за строене %s"
+
+#: src/action/action_build.cpp:215
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Не може да строите повече единици %s"
+
+#: src/action/action_build.cpp:255
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Не мога да пусна сградата %s"
+
+#: src/action/action_build.cpp:515
+#, c-format
+msgid "New %s done"
+msgstr "Новата %s Завършена?e"
+
+#: src/action/action_repair.cpp:84
+#, c-format
+msgid "We need more %s for repair!"
+msgstr "Има нужда от %s За поправка"
+
+#: src/action/action_research.cpp:103
+#, c-format
+msgid "%s: complete"
+msgstr "%s: Завършено"
+
+#: src/action/action_returngoods.cpp:68
+msgid "No Resources to Return."
+msgstr "Няма ресурси за връщане."
+
+#: src/action/action_spellcast.cpp:181
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: Няма достатъчно мана: %s"
+
+#: src/action/action_spellcast.cpp:185
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: Не мога да хвърля магията: %s"
+
+#: src/action/action_train.cpp:170
+#, c-format
+msgid "New %s ready"
+msgstr "Новият %s Е готов?"
+
+#: src/action/action_train.cpp:217
+#, c-format
+msgid "Unable to train %s"
+msgstr "Не мога да обуча %s"
+
+#: src/action/action_upgradeto.cpp:199
+#, c-format
+msgid "Upgrade to %s canceled"
+msgstr "Ъпгрейда на %s Отказ?"
+
+#: src/action/action_upgradeto.cpp:207
+#, c-format
+msgid "Upgrade to %s complete"
+msgstr "Ъпгрейда на %s Завършен"
+
+#: src/action/command.cpp:1315
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Играча \"%s\" напусна играта"
+
+#: src/action/command.cpp:1317
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Играча \"%s\" Беше убит"
+
+#: src/editor/editloop.cpp:1338
+msgid "Unit can't be placed here."
+msgstr "Единицата не може да бъде поставена тук"
+
+#: src/editor/editloop.cpp:1393
+msgid "Map saved"
+msgstr "Картата запазена"
+
+#: src/editor/editloop.cpp:1425
+msgid "Mirror editing enabled: 2-side"
+msgstr "Mirror editing enabled: 2-side"
+
+#: src/editor/editloop.cpp:1428
+msgid "Mirror editing enabled: 4-side"
+msgstr "Mirror editing enabled: 4-side"
+
+#: src/editor/editloop.cpp:1431
+msgid "Mirror editing disabled"
+msgstr "Mirror editing disabled"
+
+#: src/editor/editloop.cpp:1451
+msgid "Unit deleted"
+msgstr "Единицата изтрита"
+
+#: src/editor/editloop.cpp:1478
+#: src/editor/editloop.cpp:1487
+msgid "Unit owner modified"
+msgstr "Unit owner modified"
+
+#: src/editor/editloop.cpp:1816
+msgid "Select mode"
+msgstr "Селектиране"
+
+#: src/editor/editloop.cpp:1826
+msgid "Unit mode"
+msgstr "Unit mode"
+
+#: src/editor/editloop.cpp:1836
+msgid "Tile mode"
+msgstr "Tile mode"
+
+#: src/editor/editloop.cpp:1846
+msgid "Set start location mode"
+msgstr "Set start location mode"
+
+#: src/network/commands.cpp:837
+msgid "No sync info for this replay !"
+msgstr "No sync info for this replay !"
+
+#: src/network/commands.cpp:839
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Replay got out of sync (%lu) !"
+
+#: src/network/commands.cpp:848
+msgid "Replay got out of sync !"
+msgstr "Replay got out of sync !"
+
+#: src/network/commands.cpp:959
+#: src/network/commands.cpp:974
+msgid "End of replay"
+msgstr "Край на Replay"
+
+#: src/network/network.cpp:963
+#, c-format
+msgid "%s Sent Bad Command"
+msgstr "%s Sent Bad Command"
+
+#: src/network/network.cpp:1060
+msgid "Network out of sync"
+msgstr "Network out of sync"
+
+#: src/network/network.cpp:1297
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "En attente de joueurs \"%s\": %d:%02d"
+
+#: src/network/network.cpp:1313
+msgid "Timed out"
+msgstr "Timed out"
+
+#: src/stratagus/mainloop.cpp:448
+#, c-format
+msgid "You have lost!\n"
+msgstr "Ти загуби!\n"
+
+#: src/stratagus/mainloop.cpp:449
+msgid "You have lost!"
+msgstr "Ти загуби!"
+
+#: src/stratagus/mainloop.cpp:452
+#, c-format
+msgid "You have won!\n"
+msgstr "Ти победи!\n"
+
+#: src/stratagus/mainloop.cpp:453
+msgid "You have won!"
+msgstr "Ти победи!"
+
+#: src/stratagus/stratagus.cpp:575
+#: src/stratagus/stratagus.cpp:664
+msgid "Do it! Do it now!"
+msgstr "Do it! Do it now!!"
+
+#: src/stratagus/stratagus.cpp:819
+#, c-format
+msgid "Thanks for playing Stratagus.\n"
+msgstr "Благодаря ви, че играхте Stratagus.\n"
+
+#: src/ui/botpanel.cpp:740
+#: src/ui/botpanel.cpp:805
+msgid "Select Target"
+msgstr "Select Target"
+
+#: src/ui/botpanel.cpp:868
+msgid "Select Location"
+msgstr "Select Location"
+
+#: src/ui/botpanel.cpp:887
+msgid "Unit training queue is full"
+msgstr "Unit training queue is full"
+
+#: src/ui/interface.cpp:94
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "MESSAGE:%s~!_"
+
+#: src/ui/interface.cpp:244
+msgid "Sound is on."
+msgstr "Звука включен."
+
+#: src/ui/interface.cpp:246
+msgid "Sound is off."
+msgstr "Звука изключен."
+
+#: src/ui/interface.cpp:259
+msgid "Music is off."
+msgstr "Музиката изключена."
+
+#: src/ui/interface.cpp:262
+msgid "Music is on."
+msgstr "Музиката включена."
+
+#: src/ui/interface.cpp:274
+#: src/ui/interface.cpp:288
+#: src/ui/interface.cpp:300
+#: src/ui/interface.cpp:312
+#: src/ui/interface.cpp:324
+#: src/ui/interface.cpp:336
+#: src/ui/interface.cpp:348
+#: src/ui/interface.cpp:365
+#: src/ui/interface.cpp:382
+#: src/ui/interface.cpp:394
+#: src/ui/interface.cpp:406
+#: src/ui/interface.cpp:418
+#: src/ui/mouse.cpp:1779
+msgid "Game Paused"
+msgstr "Пауза на играта"
+
+#: src/ui/interface.cpp:276
+msgid "Game Resumed"
+msgstr "Паузата на играта махната"
+
+#: src/ui/interface.cpp:449
+msgid "Big map enabled"
+msgstr "Big map enabled"
+
+#: src/ui/interface.cpp:458
+msgid "Returning to old map"
+msgstr "Returning to old map"
+
+#: src/ui/interface.cpp:469
+msgid "Faster"
+msgstr "По бързо"
+
+#: src/ui/interface.cpp:485
+msgid "Slower"
+msgstr "Бавно"
+
+#: src/ui/interface.cpp:540
+msgid "Terrain displayed."
+msgstr "Terrain displayed."
+
+#: src/ui/interface.cpp:542
+msgid "Terrain hidden."
+msgstr "Terrain hidden."
+
+#: src/ui/interface.cpp:575
+msgid "Grab mouse toggled."
+msgstr "Grab mouse toggled."
+
+#: src/ui/interface.cpp:1090
+msgid "Screenshot made."
+msgstr "Screenshot made."
+
+#: src/ui/mainscr.cpp:772
+msgid "Production"
+msgstr "Production"
+
+#: src/ui/mainscr.cpp:1046
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Last message repeated ~<%d~> times"
+
+#: src/ui/mainscr.cpp:1120
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<?v?Event: %s~>"
+
+#: src/ui/menus.cpp:1398
+#: src/ui/menus.cpp:1541
+#, c-format
+msgid "Saved game to: %s"
+msgstr "Запазване на играта: %s"
+
+#: src/ui/menus.cpp:1485
+#, c-format
+msgid "Loaded game: %s"
+msgstr "Играта заредена: %s"
+
+#: src/ui/mouse.cpp:1937
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Вие имате ~<%d~> %ss"
+
+#: src/ui/mouse.cpp:1941
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "Вие имате ~<%d~> %s(s)"
+
+#: src/unit/unit.cpp:2972
+#, c-format
+msgid "%s attacked"
+msgstr "%s Атакуван"
+

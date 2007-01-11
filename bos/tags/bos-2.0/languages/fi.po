@@ -1,0 +1,322 @@
+﻿# translation of fi.po to Kimmo Kalevi Merikivi
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Kimmo Merikivi <kimmo.merikivi@pp1.inet.fi>, 2005.
+msgid ""
+msgstr ""
+"Project-Id-Version: fi\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-12-09 18:54-0600\n"
+"PO-Revision-Date: 2005-12-10 18:14+0200\n"
+"Last-Translator: Kimmo Merikivi <kimmo.merikivi@pp1.inet.fi>\n"
+"Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11\n"
+
+#: src/action/action_build.cpp:119
+msgid "You cannot reach building place"
+msgstr "Et voi päästä rakennuspaikalle"
+
+#: src/action/action_build.cpp:177
+#, c-format
+msgid "You cannot build %s here"
+msgstr "Et voi rakentaa rakennusta %s tähan"
+
+#: src/action/action_build.cpp:197
+#, c-format
+msgid "Not enough resources to build %s"
+msgstr "Ei tarpeeksi resursseja rakennuksen %s rakentamiseen"
+
+#: src/action/action_build.cpp:215
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Ei voida tuottaa enemman yksiköitä %s"
+
+#: src/action/action_build.cpp:255
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Rakennusta %s ei pystytty luomaan"
+
+#: src/action/action_build.cpp:515
+#, c-format
+msgid "New %s done"
+msgstr "Uusi %s on valmis"
+
+#: src/action/action_repair.cpp:84
+#, c-format
+msgid "We need more %s for repair!"
+msgstr "Tarvitaan enemmän resurssia %s korjaamiseen!"
+
+#: src/action/action_research.cpp:103
+#, c-format
+msgid "%s: complete"
+msgstr "%s: Valmis"
+
+#: src/action/action_returngoods.cpp:68
+msgid "No Resources to Return."
+msgstr "Ei resursseja palautettavaksi"
+
+#: src/action/action_spellcast.cpp:181
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: Ei tarpeeksi manaa loitsuun %s"
+
+#: src/action/action_spellcast.cpp:185
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: Ei voitu tehdä loitsua %s"
+
+#: src/action/action_train.cpp:170
+#, c-format
+msgid "New %s ready"
+msgstr "Uusi %s valmis"
+
+#: src/action/action_train.cpp:217
+#, c-format
+msgid "Unable to train %s"
+msgstr "Ei pystytty kouluttamaan %s"
+
+#: src/action/action_upgradeto.cpp:199
+#, c-format
+msgid "Upgrade to %s canceled"
+msgstr "Päivitys rakennukseksi %s keskeytetty"
+
+#: src/action/action_upgradeto.cpp:207
+#, c-format
+msgid "Upgrade to %s complete"
+msgstr "Päivitys %s-muotoon valmis"
+
+#: src/action/command.cpp:1315
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Pelaaja \"%s\" on lähtenyt pelistä"
+
+#: src/action/command.cpp:1317
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Pelaaja \"%s\" on tapettu "
+
+#: src/editor/editloop.cpp:1338
+msgid "Unit can't be placed here."
+msgstr "Yksikköä ei voi sijoittaa tähan."
+
+#: src/editor/editloop.cpp:1393
+msgid "Map saved"
+msgstr "Kartta tallennettu"
+
+#: src/editor/editloop.cpp:1425
+msgid "Mirror editing enabled: 2-side"
+msgstr "Kaksisivuinen peilaustila"
+
+#: src/editor/editloop.cpp:1428
+msgid "Mirror editing enabled: 4-side"
+msgstr "Nelisivuinen peilaustila"
+
+#: src/editor/editloop.cpp:1431
+msgid "Mirror editing disabled"
+msgstr "Ei peilaustilaa"
+
+#: src/editor/editloop.cpp:1451
+msgid "Unit deleted"
+msgstr "Yksikkö poistettu"
+
+#: src/editor/editloop.cpp:1478 src/editor/editloop.cpp:1487
+msgid "Unit owner modified"
+msgstr "Yksikön omistajaa vaihdettu"
+
+#: src/editor/editloop.cpp:1816
+msgid "Select mode"
+msgstr "Valintatila"
+
+#: src/editor/editloop.cpp:1826
+msgid "Unit mode"
+msgstr "Yksikkötila"
+
+#: src/editor/editloop.cpp:1836
+msgid "Tile mode"
+msgstr "Maastotila"
+
+#: src/editor/editloop.cpp:1846
+msgid "Set start location mode"
+msgstr "Aloituspistetila"
+
+#: src/network/commands.cpp:837
+msgid "No sync info for this replay !"
+msgstr "Ei sykronointiinformaatiota tähan uudelleenpelaukseen!"
+
+#: src/network/commands.cpp:839
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Uudelleenpelaus ei enää synkronoidu (%lu)!"
+
+#: src/network/commands.cpp:848
+msgid "Replay got out of sync !"
+msgstr "Uudelleenpelaus ei synkronoidu"
+
+#: src/network/commands.cpp:959 src/network/commands.cpp:974
+msgid "End of replay"
+msgstr "Uudelleenpelauksen loppu"
+
+#: src/network/network.cpp:963
+#, c-format
+msgid "%s Sent Bad Command"
+msgstr "%s lähetti huonon komennon"
+
+#: src/network/network.cpp:1060
+msgid "Network out of sync"
+msgstr "Verkko ei synkronoidu"
+
+#: src/network/network.cpp:1297
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Odotetaan pelaajaa \"%s\": %d:%02d"
+
+#: src/network/network.cpp:1313
+msgid "Timed out"
+msgstr "Aikaraja"
+
+#: src/stratagus/mainloop.cpp:448
+#, c-format
+msgid "You have lost!\n"
+msgstr "Olet hävinnyt!\n"
+
+#: src/stratagus/mainloop.cpp:449
+msgid "You have lost!"
+msgstr "Olet hävinnyt!"
+
+#: src/stratagus/mainloop.cpp:452
+#, c-format
+msgid "You have won!\n"
+msgstr "Olet voittanut!\n"
+
+#: src/stratagus/mainloop.cpp:453
+msgid "You have won!"
+msgstr "Olet voittanut!"
+
+#: src/stratagus/stratagus.cpp:575 src/stratagus/stratagus.cpp:664
+msgid "Do it! Do it now!"
+msgstr "Tee se! Tee se nyt!"
+
+#: src/stratagus/stratagus.cpp:819
+#, c-format
+msgid "Thanks for playing Stratagus.\n"
+msgstr "Kiitos, että pelasit Stratagusta.\n"
+
+#: src/ui/botpanel.cpp:740 src/ui/botpanel.cpp:805
+msgid "Select Target"
+msgstr "Valitse kohde"
+
+#: src/ui/botpanel.cpp:868
+msgid "Select Location"
+msgstr "Valitse sijainti"
+
+#: src/ui/botpanel.cpp:887
+msgid "Unit training queue is full"
+msgstr "Yksiköiden valmistusjono täyttyi"
+
+#: src/ui/interface.cpp:94
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "VIESTI:%s~!_"
+
+#: src/ui/interface.cpp:244
+msgid "Sound is on."
+msgstr "Ääni paalla."
+
+#: src/ui/interface.cpp:246
+msgid "Sound is off."
+msgstr "Ääni pois."
+
+#: src/ui/interface.cpp:259
+msgid "Music is off."
+msgstr "Musiikki pois."
+
+#: src/ui/interface.cpp:262
+msgid "Music is on."
+msgstr "Musiikki päällä."
+
+#: src/ui/interface.cpp:274 src/ui/interface.cpp:288 src/ui/interface.cpp:300
+#: src/ui/interface.cpp:312 src/ui/interface.cpp:324 src/ui/interface.cpp:336
+#: src/ui/interface.cpp:348 src/ui/interface.cpp:365 src/ui/interface.cpp:382
+#: src/ui/interface.cpp:394 src/ui/interface.cpp:406 src/ui/interface.cpp:418
+#: src/ui/mouse.cpp:1779
+msgid "Game Paused"
+msgstr "Peli pysäytetty"
+
+#: src/ui/interface.cpp:276
+msgid "Game Resumed"
+msgstr "Peliä jatketaan"
+
+#: src/ui/interface.cpp:449
+msgid "Big map enabled"
+msgstr "Suuri karttatila päälla"
+
+#: src/ui/interface.cpp:458
+msgid "Returning to old map"
+msgstr "Palataan vanhaan karttatilaan"
+
+#: src/ui/interface.cpp:469
+msgid "Faster"
+msgstr "Nopeammin"
+
+#: src/ui/interface.cpp:485
+msgid "Slower"
+msgstr "Hitaammin"
+
+#: src/ui/interface.cpp:540
+msgid "Terrain displayed."
+msgstr "Maasto näytetaan"
+
+#: src/ui/interface.cpp:542
+msgid "Terrain hidden."
+msgstr "Maasto piilotettu"
+
+#: src/ui/interface.cpp:575
+msgid "Grab mouse toggled."
+msgstr "Hiiri pysyy ikkunan sisässä"
+
+#: src/ui/interface.cpp:1090
+msgid "Screenshot made."
+msgstr "Kuvankaappaus tehty"
+
+#: src/ui/mainscr.cpp:772
+msgid "Production"
+msgstr "Tuotanto"
+
+#: src/ui/mainscr.cpp:1046
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Viimeinen viesti näytetty ~<%d~> kertaa"
+
+#: src/ui/mainscr.cpp:1120
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Tapahtuma: %s~>"
+
+#: src/ui/menus.cpp:1398 src/ui/menus.cpp:1541
+#, c-format
+msgid "Saved game to: %s"
+msgstr "Tallennettu peli tiedostoon: %s"
+
+#: src/ui/menus.cpp:1485
+#, c-format
+msgid "Loaded game: %s"
+msgstr "Ladattu tallennus %s"
+
+#: src/ui/mouse.cpp:1937
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Sinulla on ~<%d~> %ss"
+
+#: src/ui/mouse.cpp:1941
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "Sinulla on ~<%d~> %s"
+
+#: src/unit/unit.cpp:2972
+#, c-format
+msgid "%s attacked"
+msgstr "%s hyökkäyksen kohteena!"

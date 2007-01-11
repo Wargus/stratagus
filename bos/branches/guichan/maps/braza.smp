@@ -1,0 +1,17 @@
+--            ____            
+--           / __ )____  _____
+--          / __  / __ \/ ___/
+--         / /_/ / /_/ (__  ) 
+--        /_____/\____/____/  
+--
+--  Invasion - Battle of Survival                  
+--   A GPL'd futuristic RTS game
+--
+-- Stratagus Map Presentation
+-- File generated automatically from braza.pud.
+-- Copyright 2005 François Beerten
+-- File licensed under the GNU GPL version 2.
+
+DefinePlayerTypes("person","person")
+PresentMap("big", 2, 128, 128, 121776720)
+DefineMapSetup("maps/braza.sms")
