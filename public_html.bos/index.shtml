@@ -5,7 +5,7 @@
       <h2>About</h2>
       <p>Invasion - Battle of Survival is a real-time strategy game
 using the <a href="http://www.stratagus.org/">Stratagus</a> game
-engine. <br>
+engine. 
       </p>
 
 <p>
@@ -15,6 +15,13 @@ the package for the full copyright notice.
 </p>
 
       <h2>News</h2>
+      <h3>Merge of the Stratagus engine into the BOS project.</h3>
+<p>To speed up the development, the Stratagus engine gets merged 
+into the BOS project. Due to the merge, the subversion URL changed. 
+You can find all details in the <a href="http://bos.seul.org/development.shtml">
+development</a> page.
+</p>
+
       <h3>Invasion - Battle of Survival 2.0.1 has been released !</h3>
 <p>Get it from the <a href="http://bos.seul.org/download.shtml">download section</a>.
 </p>

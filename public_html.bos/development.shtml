@@ -15,13 +15,13 @@ and if nobody else is working on it.
 
 <h2>Development version</h2>
 The game is continuously evolving. You can get the latest version with <a href="http://subversion.tigris.org/">subversion</a>:
- <pre>  svn co svn://bos.seul.org/svn/bos/data.bos/trunk data.bos</pre>
+ <pre>  svn co svn://bos.seul.org/svn/bos/bos/trunk bos</pre>
 
-<p>You will also need the latest development version of the engine:<br>
- <pre>  svn co svn://bos.seul.org/svn/bos/stratagus/trunk engine</pre>
+<p>Before playing you'll have to compile the engine. This can be done easily with scons. To build a debug version (recommended for development) run:<br>
+ <pre>  scons debug=1</pre>
 
-<p>To start the game run :<br>
- <pre>  ./stratagus -d path/to/data.bos</pre>
+<p>Finally, you can run the game with :<br>
+ <pre>  ./stratagus</pre>
 
 <p>See <a href="http://bos.seul.org/wiki/index.php/Bos/FAQ">bos FAQ</a> and the documentation next to the sources for more information.
 
