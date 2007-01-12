@@ -10,7 +10,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ inline char *new_strdup(const char *str)
 extern char NameLine[];
 
 #ifndef STRATAGUS_LIB_PATH
-#define STRATAGUS_LIB_PATH  "data"      /// Where to find the data files
+#define STRATAGUS_LIB_PATH  "."      /// Where to find the data files
 #endif
 
 #ifndef STRATAGUS_HOME_PATH
