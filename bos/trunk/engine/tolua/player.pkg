@@ -1,0 +1,57 @@
+enum PlayerTypes {
+	PlayerNeutral = 2,
+	PlayerNobody  = 3,
+	PlayerComputer = 4,
+	PlayerPerson = 5,
+	PlayerRescuePassive = 6,
+	PlayerRescueActive = 7,
+};
+
+class CPlayer
+{
+	int Index;
+	string Name;
+	
+	int Type;
+
+	int StartX;
+	int StartY;
+
+	int Resources[MaxCosts];
+	int Incomes[MaxCosts];
+	const int Revenue[MaxCosts];
+
+	const int UnitTypesCount[UnitTypeMax];
+
+	CUnit *Units[UnitMax];
+	int TotalNumUnits;
+	int NumBuildings;
+	int Supply;
+	int Demand;
+
+	int UnitLimit;
+	int BuildingLimit;
+	int TotalUnitLimit;
+
+	int Score;
+	int TotalUnits;
+	int TotalBuildings;
+	int TotalResources[MaxCosts];
+	int TotalRazings;
+	int TotalKills;
+	
+	bool IsEnemy(const CPlayer *x) const;
+	bool IsEnemy(const CUnit *x) const;
+	bool IsAllied(const CPlayer *x) const;
+	bool IsAllied(const CUnit *x) const;
+	bool IsSharedVision(const CPlayer *x) const;
+	bool IsSharedVision(const CUnit *x) const;
+	bool IsBothSharedVision(const CPlayer *x) const;
+	bool IsBothSharedVision(const CUnit *x) const;
+	bool IsTeamed(const CPlayer *x) const;
+	bool IsTeamed(const CUnit *x) const;
+};
+
+extern CPlayer Players[PlayerMax];
+extern CPlayer *ThisPlayer;
+

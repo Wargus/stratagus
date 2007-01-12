@@ -1,0 +1,20 @@
+class CFont
+{
+	static CFont *New(const std::string ident, CGraphic *g);
+	static CFont *Get(const std::string ident);
+
+	int Height();
+	int Width(const std::string text);
+};
+
+
+#define MaxFontColors 9
+
+class CFontColor
+{
+	static CFontColor *New(const std::string ident);
+	static CFontColor *Get(const std::string ident);
+
+	CColor Colors[MaxFontColors];
+};
+
