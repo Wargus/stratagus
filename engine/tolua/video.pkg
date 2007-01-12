@@ -1,0 +1,38 @@
+class CVideo
+{
+public:
+	int Width;
+	int Height;
+	int Depth;
+	bool FullScreen;
+	bool ResizeScreen(int width, int height);
+};
+
+CVideo Video;
+void ToggleFullScreen(void);
+
+class CGraphic
+{
+public:
+	static CGraphic *New(const std::string file, int w = 0, int h = 0);
+	static void Free(CGraphic *);
+	void Load();
+	void Resize(int w, int h);
+};
+
+class CPlayerColorGraphic : public CGraphic
+{
+public:
+	static CPlayerColorGraphic *New(const std::string file, int w = 0, int h = 0);
+};
+
+class CColor {
+	CColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0,
+		unsigned char a = 0);
+
+	unsigned char R;
+	unsigned char G;
+	unsigned char B;
+	unsigned char A;
+};
+

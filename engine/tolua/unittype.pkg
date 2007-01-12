@@ -1,0 +1,15 @@
+class CUnitType
+{
+	std::string Ident;
+	std::string Name;
+	tolua_readonly int Slot;
+
+	int MinAttackRange;
+	int ClicksToExplode;
+
+	int Supply;
+	int Demand;
+};
+
+CUnitType *UnitTypeByIdent(const std::string ident);
+
