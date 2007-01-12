@@ -62,17 +62,18 @@ if not optionsChanged:
    optionsChanged  = not filecmp.cmp('build_options.py', 'build_options_OLD_FOR_CHECK.py', False)
    os.remove('build_options_OLD_FOR_CHECK.py')
 
+engineSourceDir = 'engine'
+
 def globSources(sourceDirs):
   sources = []
   sourceDirs = Split(sourceDirs)
   for d in sourceDirs:
-    sources.append(glob.glob('engine/' + d + '/*.cpp'))
+    sources.append(glob.glob(engineSourceDir + '/' + d + '/*.cpp'))
   sources = Flatten(sources)
   targetsources = []
   for s in sources:
-    targetsources.append('build' + s[6:])
+    targetsources.append('build' + s[len(engineSourceDir):])
   return targetsources
-
 
 sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua")
 sourcesEngine.append(globSources("guichan guichan/sdl guichan/widgets"))
@@ -186,9 +187,9 @@ def AutoConfigureIfNeeded():
 AutoConfigureIfNeeded()
 
 # Stratagus build specifics
-env.Append(CPPPATH='engine/include')
-env.Append(CPPPATH='engine/guichan/include')
-BuildDir('build', 'engine', duplicate = 0)
+env.Append(CPPPATH=engineSourceDir+'/include')
+env.Append(CPPPATH=engineSourceDir+'/guichan/include')
+BuildDir('build', engineSourceDir, duplicate = 0)
 if env['debug'] or ARGUMENTS.has_key('DEBUG') or env['profile']:
     env.Append(CPPDEFINES = 'DEBUG')
     env.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
