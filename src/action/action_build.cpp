@@ -283,9 +283,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	
 	// Must place after previous for map flags
 	build->Place(x, y);
-	if (!type->BuilderOutside) {
-		build->CurrentSightRange = 1;
-	}
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type->Slot]--;
@@ -301,6 +298,8 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	if (!type->BuilderOutside) {
 		// Place the builder inside the building
 		build->Data.Built.Worker = unit;
+		// HACK: allows the unit to be removed
+		build->CurrentSightRange = 1;
 		unit->Remove(build);
 		build->CurrentSightRange = 0;
 		unit->X = x;
@@ -454,7 +453,10 @@ void HandleActionBuilt(CUnit *unit)
 			worker->Orders[0]->Action = UnitActionStill;
 			unit->Data.Built.Worker = NoUnitP;
 			worker->SubAction = 0;
+			// HACK: make sure the sight is updated correctly
+			unit->CurrentSightRange = 1;
 			DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
+			unit->CurrentSightRange = 0;
 		}
 
 		// Player gets back 75% of the original cost for a building.
@@ -492,6 +494,8 @@ void HandleActionBuilt(CUnit *unit)
 			} else {
 				worker->Orders[0]->Action = UnitActionStill;
 				worker->SubAction = 0;
+				// HACK: make sure the sight is updated correctly
+				unit->CurrentSightRange = 1;
 				DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
 				//
 				// If we can harvest from the new building, do it.
