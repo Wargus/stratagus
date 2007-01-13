@@ -1164,7 +1164,6 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 				dest->RefsIncrease();
 			}
 		} else {
-			order->Range = 1;
 			order->X = x;
 			order->Y = y;
 		}
