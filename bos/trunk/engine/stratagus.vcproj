@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="src\include,include,src\guichan\include"
+				AdditionalIncludeDirectories="..\include;include;guichan\include"
 				PreprocessorDefinitions="_DEBUG;DEBUG;USE_WIN32;USE_VORBIS;USE_THEORA;HAVE_STRNLEN;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -79,7 +79,7 @@
 				OutputFile=".\Debug/stratagus.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="lib"
+				AdditionalLibraryDirectories="..\lib"
 				IgnoreDefaultLibraryNames="MSVCRT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/stratagus.pdb"
@@ -148,7 +148,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="src\include,include,src\guichan\include"
+				AdditionalIncludeDirectories="..\include;include;guichan\include"
 				PreprocessorDefinitions="NDEBUG;USE_WIN32;USE_VORBIS;USE_THEORA;HAVE_STRNLEN;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -178,7 +178,7 @@
 				OutputFile=".\Release/stratagus.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="lib"
+				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				StackReserveSize="33554432"
@@ -226,7 +226,7 @@
 					Name="action"
 					>
 					<File
-						RelativePath="src\action\action_attack.cpp"
+						RelativePath="action\action_attack.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -248,7 +248,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_board.cpp"
+						RelativePath="action\action_board.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -270,7 +270,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_build.cpp"
+						RelativePath="action\action_build.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -292,7 +292,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_die.cpp"
+						RelativePath="action\action_die.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -314,7 +314,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_follow.cpp"
+						RelativePath="action\action_follow.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -336,7 +336,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_move.cpp"
+						RelativePath="action\action_move.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -358,7 +358,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_patrol.cpp"
+						RelativePath="action\action_patrol.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -380,7 +380,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_repair.cpp"
+						RelativePath="action\action_repair.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -402,7 +402,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_research.cpp"
+						RelativePath="action\action_research.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -424,7 +424,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_resource.cpp"
+						RelativePath="action\action_resource.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -446,7 +446,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_returngoods.cpp"
+						RelativePath="action\action_returngoods.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -468,7 +468,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_spellcast.cpp"
+						RelativePath="action\action_spellcast.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -490,7 +490,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_stand.cpp"
+						RelativePath="action\action_stand.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -512,7 +512,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_still.cpp"
+						RelativePath="action\action_still.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -534,7 +534,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_train.cpp"
+						RelativePath="action\action_train.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -556,7 +556,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_unload.cpp"
+						RelativePath="action\action_unload.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -578,7 +578,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\action_upgradeto.cpp"
+						RelativePath="action\action_upgradeto.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -600,7 +600,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\actions.cpp"
+						RelativePath="action\actions.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -622,7 +622,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\action\command.cpp"
+						RelativePath="action\command.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -648,7 +648,7 @@
 					Name="ai"
 					>
 					<File
-						RelativePath="src\ai\ai.cpp"
+						RelativePath="ai\ai.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -670,7 +670,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ai\ai_building.cpp"
+						RelativePath="ai\ai_building.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -692,7 +692,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ai\ai_force.cpp"
+						RelativePath="ai\ai_force.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -714,7 +714,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ai\ai_magic.cpp"
+						RelativePath="ai\ai_magic.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -736,7 +736,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ai\ai_plan.cpp"
+						RelativePath="ai\ai_plan.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -758,7 +758,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ai\ai_resource.cpp"
+						RelativePath="ai\ai_resource.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -780,7 +780,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ai\script_ai.cpp"
+						RelativePath="ai\script_ai.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -806,7 +806,7 @@
 					Name="editor"
 					>
 					<File
-						RelativePath="src\editor\editloop.cpp"
+						RelativePath="editor\editloop.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -828,7 +828,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\editor\editor.cpp"
+						RelativePath="editor\editor.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -850,7 +850,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\editor\edmap.cpp"
+						RelativePath="editor\edmap.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -872,7 +872,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\editor\script_editor.cpp"
+						RelativePath="editor\script_editor.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -898,7 +898,7 @@
 					Name="game"
 					>
 					<File
-						RelativePath="src\game\game.cpp"
+						RelativePath="game\game.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -920,7 +920,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\game\loadgame.cpp"
+						RelativePath="game\loadgame.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -942,7 +942,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\game\savegame.cpp"
+						RelativePath="game\savegame.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -964,7 +964,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\game\trigger.cpp"
+						RelativePath="game\trigger.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -990,7 +990,7 @@
 					Name="guichan"
 					>
 					<File
-						RelativePath="src\guichan\cliprectangle.cpp"
+						RelativePath="guichan\cliprectangle.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1012,7 +1012,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\color.cpp"
+						RelativePath="guichan\color.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1034,7 +1034,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\defaultfont.cpp"
+						RelativePath="guichan\defaultfont.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1056,7 +1056,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\exception.cpp"
+						RelativePath="guichan\exception.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1078,7 +1078,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\focushandler.cpp"
+						RelativePath="guichan\focushandler.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1100,7 +1100,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\gfont.cpp"
+						RelativePath="guichan\gfont.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1122,7 +1122,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\graphics.cpp"
+						RelativePath="guichan\graphics.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1144,7 +1144,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\gui.cpp"
+						RelativePath="guichan\gui.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1166,7 +1166,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\guichan.cpp"
+						RelativePath="guichan\guichan.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1188,7 +1188,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\image.cpp"
+						RelativePath="guichan\image.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1210,7 +1210,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\imagefont.cpp"
+						RelativePath="guichan\imagefont.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1232,7 +1232,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\key.cpp"
+						RelativePath="guichan\key.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1254,7 +1254,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\keyinput.cpp"
+						RelativePath="guichan\keyinput.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1276,7 +1276,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\mouseinput.cpp"
+						RelativePath="guichan\mouseinput.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1298,7 +1298,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\rectangle.cpp"
+						RelativePath="guichan\rectangle.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1320,7 +1320,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\guichan\widget.cpp"
+						RelativePath="guichan\widget.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1345,7 +1345,7 @@
 						Name="sdl"
 						>
 						<File
-							RelativePath="src\guichan\sdl\gsdl.cpp"
+							RelativePath="guichan\sdl\gsdl.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1367,7 +1367,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\sdl\sdlgraphics.cpp"
+							RelativePath="guichan\sdl\sdlgraphics.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1389,7 +1389,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\sdl\sdlimageloader.cpp"
+							RelativePath="guichan\sdl\sdlimageloader.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1411,7 +1411,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\sdl\sdlinput.cpp"
+							RelativePath="guichan\sdl\sdlinput.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1437,7 +1437,7 @@
 						Name="widgets"
 						>
 						<File
-							RelativePath="src\guichan\widgets\button.cpp"
+							RelativePath="guichan\widgets\button.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1459,7 +1459,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\checkbox.cpp"
+							RelativePath="guichan\widgets\checkbox.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1481,7 +1481,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\container.cpp"
+							RelativePath="guichan\widgets\container.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1503,7 +1503,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\dropdown.cpp"
+							RelativePath="guichan\widgets\dropdown.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1525,7 +1525,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\icon.cpp"
+							RelativePath="guichan\widgets\icon.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1547,7 +1547,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\label.cpp"
+							RelativePath="guichan\widgets\label.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1569,7 +1569,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\listbox.cpp"
+							RelativePath="guichan\widgets\listbox.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1591,7 +1591,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\radiobutton.cpp"
+							RelativePath="guichan\widgets\radiobutton.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1613,7 +1613,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\scrollarea.cpp"
+							RelativePath="guichan\widgets\scrollarea.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1635,7 +1635,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\slider.cpp"
+							RelativePath="guichan\widgets\slider.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1657,7 +1657,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\textbox.cpp"
+							RelativePath="guichan\widgets\textbox.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1679,7 +1679,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\textfield.cpp"
+							RelativePath="guichan\widgets\textfield.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1701,7 +1701,7 @@
 							</FileConfiguration>
 						</File>
 						<File
-							RelativePath="src\guichan\widgets\window.cpp"
+							RelativePath="guichan\widgets\window.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
@@ -1728,7 +1728,7 @@
 					Name="map"
 					>
 					<File
-						RelativePath="src\map\map.cpp"
+						RelativePath="map\map.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1750,7 +1750,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\map_draw.cpp"
+						RelativePath="map\map_draw.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1772,7 +1772,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\map_fog.cpp"
+						RelativePath="map\map_fog.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1794,7 +1794,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\map_radar.cpp"
+						RelativePath="map\map_radar.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1816,7 +1816,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\map_save.cpp"
+						RelativePath="map\map_save.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1838,7 +1838,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\minimap.cpp"
+						RelativePath="map\minimap.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1860,7 +1860,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\script_map.cpp"
+						RelativePath="map\script_map.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1882,7 +1882,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\script_tileset.cpp"
+						RelativePath="map\script_tileset.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1904,7 +1904,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\map\tileset.cpp"
+						RelativePath="map\tileset.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1930,7 +1930,7 @@
 					Name="network"
 					>
 					<File
-						RelativePath="src\network\commands.cpp"
+						RelativePath="network\commands.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1952,7 +1952,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\network\lowlevel.cpp"
+						RelativePath="network\lowlevel.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1974,7 +1974,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\network\netconnect.cpp"
+						RelativePath="network\netconnect.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1996,7 +1996,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\network\network.cpp"
+						RelativePath="network\network.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2022,7 +2022,7 @@
 					Name="pathfinder"
 					>
 					<File
-						RelativePath="src\pathfinder\astar.cpp"
+						RelativePath="pathfinder\astar.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2044,7 +2044,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\pathfinder\pathfinder.cpp"
+						RelativePath="pathfinder\pathfinder.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2066,7 +2066,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\pathfinder\script_pathfinder.cpp"
+						RelativePath="pathfinder\script_pathfinder.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2092,7 +2092,7 @@
 					Name="sound"
 					>
 					<File
-						RelativePath="src\sound\music.cpp"
+						RelativePath="sound\music.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2114,7 +2114,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\sound\ogg.cpp"
+						RelativePath="sound\ogg.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2136,7 +2136,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\sound\script_sound.cpp"
+						RelativePath="sound\script_sound.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2158,7 +2158,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\sound\sound.cpp"
+						RelativePath="sound\sound.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2180,7 +2180,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\sound\sound_id.cpp"
+						RelativePath="sound\sound_id.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2202,7 +2202,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\sound\sound_server.cpp"
+						RelativePath="sound\sound_server.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2224,7 +2224,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\sound\unitsound.cpp"
+						RelativePath="sound\unitsound.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2246,7 +2246,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\sound\wav.cpp"
+						RelativePath="sound\wav.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2272,7 +2272,7 @@
 					Name="stratagus"
 					>
 					<File
-						RelativePath="src\stratagus\construct.cpp"
+						RelativePath="stratagus\construct.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2294,7 +2294,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\groups.cpp"
+						RelativePath="stratagus\groups.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2316,7 +2316,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\iolib.cpp"
+						RelativePath="stratagus\iolib.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2338,7 +2338,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\mainloop.cpp"
+						RelativePath="stratagus\mainloop.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2360,7 +2360,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\missile.cpp"
+						RelativePath="stratagus\missile.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2382,7 +2382,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\player.cpp"
+						RelativePath="stratagus\player.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2404,7 +2404,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\script.cpp"
+						RelativePath="stratagus\script.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2426,7 +2426,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\script_missile.cpp"
+						RelativePath="stratagus\script_missile.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2448,7 +2448,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\script_player.cpp"
+						RelativePath="stratagus\script_player.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2470,7 +2470,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\script_spell.cpp"
+						RelativePath="stratagus\script_spell.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2492,7 +2492,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\selection.cpp"
+						RelativePath="stratagus\selection.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2514,7 +2514,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\spells.cpp"
+						RelativePath="stratagus\spells.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2536,7 +2536,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\stratagus.cpp"
+						RelativePath="stratagus\stratagus.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2558,7 +2558,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\translate.cpp"
+						RelativePath="stratagus\translate.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2580,7 +2580,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\stratagus\util.cpp"
+						RelativePath="stratagus\util.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2606,7 +2606,7 @@
 					Name="tolua"
 					>
 					<File
-						RelativePath="src\tolua\tolua.cpp"
+						RelativePath="tolua\tolua.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2628,7 +2628,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\tolua\tolua_event.cpp"
+						RelativePath="tolua\tolua_event.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2650,7 +2650,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\tolua\tolua_is.cpp"
+						RelativePath="tolua\tolua_is.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2672,7 +2672,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\tolua\tolua_map.cpp"
+						RelativePath="tolua\tolua_map.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2694,7 +2694,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\tolua\tolua_push.cpp"
+						RelativePath="tolua\tolua_push.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2716,7 +2716,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\tolua\tolua_to.cpp"
+						RelativePath="tolua\tolua_to.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2742,7 +2742,7 @@
 					Name="ui"
 					>
 					<File
-						RelativePath="src\ui\botpanel.cpp"
+						RelativePath="ui\botpanel.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2764,7 +2764,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\button_checks.cpp"
+						RelativePath="ui\button_checks.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2786,7 +2786,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\icons.cpp"
+						RelativePath="ui\icons.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2808,7 +2808,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\interface.cpp"
+						RelativePath="ui\interface.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2830,7 +2830,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\mainscr.cpp"
+						RelativePath="ui\mainscr.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2852,7 +2852,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\menu_proc.cpp"
+						RelativePath="ui\menu_proc.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2874,7 +2874,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\mouse.cpp"
+						RelativePath="ui\mouse.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2896,7 +2896,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\script_ui.cpp"
+						RelativePath="ui\script_ui.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2918,7 +2918,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\ui.cpp"
+						RelativePath="ui\ui.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2940,7 +2940,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\ui\widgets.cpp"
+						RelativePath="ui\widgets.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2966,7 +2966,7 @@
 					Name="unit"
 					>
 					<File
-						RelativePath="src\unit\depend.cpp"
+						RelativePath="unit\depend.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2988,7 +2988,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\script_unit.cpp"
+						RelativePath="unit\script_unit.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3010,7 +3010,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\script_unittype.cpp"
+						RelativePath="unit\script_unittype.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3032,7 +3032,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\unit.cpp"
+						RelativePath="unit\unit.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3054,7 +3054,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\unit_cache.cpp"
+						RelativePath="unit\unit_cache.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3076,7 +3076,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\unit_draw.cpp"
+						RelativePath="unit\unit_draw.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3098,7 +3098,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\unit_find.cpp"
+						RelativePath="unit\unit_find.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3120,7 +3120,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\unittype.cpp"
+						RelativePath="unit\unittype.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3142,7 +3142,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\unit\upgrade.cpp"
+						RelativePath="unit\upgrade.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3168,7 +3168,7 @@
 					Name="video"
 					>
 					<File
-						RelativePath="src\video\cursor.cpp"
+						RelativePath="video\cursor.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3190,7 +3190,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\font.cpp"
+						RelativePath="video\font.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3212,7 +3212,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\graphic.cpp"
+						RelativePath="video\graphic.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3234,7 +3234,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\linedraw.cpp"
+						RelativePath="video\linedraw.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3256,7 +3256,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\movie.cpp"
+						RelativePath="video\movie.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3278,7 +3278,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\png.cpp"
+						RelativePath="video\png.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3300,7 +3300,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\sdl.cpp"
+						RelativePath="video\sdl.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3322,7 +3322,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\sprite.cpp"
+						RelativePath="video\sprite.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3344,7 +3344,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="src\video\video.cpp"
+						RelativePath="video\video.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3373,206 +3373,206 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="src\ai\ai_local.h"
+				RelativePath="ai\ai_local.h"
 				>
 			</File>
 			<File
-				RelativePath="src\guichan\include\guichan.h"
+				RelativePath="guichan\include\guichan.h"
 				>
 			</File>
 			<File
-				RelativePath="src\video\intern_video.h"
+				RelativePath="video\intern_video.h"
 				>
 			</File>
 			<File
-				RelativePath="src\tolua\tolua++.h"
+				RelativePath="tolua\tolua++.h"
 				>
 			</File>
 			<File
-				RelativePath="src\tolua\tolua_event.h"
+				RelativePath="tolua\tolua_event.h"
 				>
 			</File>
 			<Filter
 				Name="include"
 				>
 				<File
-					RelativePath="src\include\actions.h"
+					RelativePath="include\actions.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\ai.h"
+					RelativePath="include\ai.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\animation.h"
+					RelativePath="include\animation.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\commands.h"
+					RelativePath="include\commands.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\construct.h"
+					RelativePath="include\construct.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\cursor.h"
+					RelativePath="include\cursor.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\depend.h"
+					RelativePath="include\depend.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\editor.h"
+					RelativePath="include\editor.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\font.h"
+					RelativePath="include\font.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\icons.h"
+					RelativePath="include\icons.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\interface.h"
+					RelativePath="include\interface.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\iocompat.h"
+					RelativePath="include\iocompat.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\iolib.h"
+					RelativePath="include\iolib.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\map.h"
+					RelativePath="include\map.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\menus.h"
+					RelativePath="include\menus.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\minimap.h"
+					RelativePath="include\minimap.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\missile.h"
+					RelativePath="include\missile.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\movie.h"
+					RelativePath="include\movie.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\myendian.h"
+					RelativePath="include\myendian.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\net_lowlevel.h"
+					RelativePath="include\net_lowlevel.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\netconnect.h"
+					RelativePath="include\netconnect.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\network.h"
+					RelativePath="include\network.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\pathfinder.h"
+					RelativePath="include\pathfinder.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\player.h"
+					RelativePath="include\player.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\include\results.h"
+					RelativePath=".\include\results.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\script.h"
+					RelativePath="include\script.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\script_sound.h"
+					RelativePath="include\script_sound.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\settings.h"
+					RelativePath="include\settings.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\sound.h"
+					RelativePath="include\sound.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\sound_server.h"
+					RelativePath="include\sound_server.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\spells.h"
+					RelativePath="include\spells.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\stratagus.h"
+					RelativePath="include\stratagus.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\tileset.h"
+					RelativePath="include\tileset.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\translate.h"
+					RelativePath="include\translate.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\trigger.h"
+					RelativePath="include\trigger.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\ui.h"
+					RelativePath="include\ui.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\unit.h"
+					RelativePath="include\unit.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\unitsound.h"
+					RelativePath="include\unitsound.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\unittype.h"
+					RelativePath="include\unittype.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\upgrade.h"
+					RelativePath="include\upgrade.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\upgrade_structs.h"
+					RelativePath="include\upgrade_structs.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\util.h"
+					RelativePath="include\util.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\video.h"
+					RelativePath="include\video.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\wav.h"
+					RelativePath="include\wav.h"
 					>
 				</File>
 				<File
-					RelativePath="src\include\widgets.h"
+					RelativePath="include\widgets.h"
 					>
 				</File>
 			</Filter>
@@ -3580,126 +3580,126 @@
 				Name="guichan."
 				>
 				<File
-					RelativePath="src\guichan\include\guichan\actionlistener.h"
+					RelativePath="guichan\include\guichan\actionlistener.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\allegro.h"
+					RelativePath="guichan\include\guichan\allegro.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\basiccontainer.h"
+					RelativePath="guichan\include\guichan\basiccontainer.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\cliprectangle.h"
+					RelativePath="guichan\include\guichan\cliprectangle.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\color.h"
+					RelativePath="guichan\include\guichan\color.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\defaultfont.h"
+					RelativePath="guichan\include\guichan\defaultfont.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\exception.h"
+					RelativePath="guichan\include\guichan\exception.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\focushandler.h"
+					RelativePath="guichan\include\guichan\focushandler.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\font.h"
+					RelativePath="guichan\include\guichan\font.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\graphics.h"
+					RelativePath="guichan\include\guichan\graphics.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\gsdl.h"
+					RelativePath="guichan\include\guichan\gsdl.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\gui.h"
+					RelativePath="guichan\include\guichan\gui.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\image.h"
+					RelativePath="guichan\include\guichan\image.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\imagefont.h"
+					RelativePath="guichan\include\guichan\imagefont.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\imageloader.h"
+					RelativePath="guichan\include\guichan\imageloader.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\input.h"
+					RelativePath="guichan\include\guichan\input.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\key.h"
+					RelativePath="guichan\include\guichan\key.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\keyinput.h"
+					RelativePath="guichan\include\guichan\keyinput.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\keylistener.h"
+					RelativePath="guichan\include\guichan\keylistener.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\listmodel.h"
+					RelativePath="guichan\include\guichan\listmodel.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\mouseinput.h"
+					RelativePath="guichan\include\guichan\mouseinput.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\mouselistener.h"
+					RelativePath="guichan\include\guichan\mouselistener.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\platform.h"
+					RelativePath="guichan\include\guichan\platform.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\rectangle.h"
+					RelativePath="guichan\include\guichan\rectangle.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\widget.h"
+					RelativePath="guichan\include\guichan\widget.h"
 					>
 				</File>
 				<File
-					RelativePath="src\guichan\include\guichan\x.h"
+					RelativePath="guichan\include\guichan\x.h"
 					>
 				</File>
 				<Filter
 					Name="sdl."
 					>
 					<File
-						RelativePath="src\guichan\include\guichan\sdl\sdlgraphics.h"
+						RelativePath="guichan\include\guichan\sdl\sdlgraphics.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\sdl\sdlimageloader.h"
+						RelativePath="guichan\include\guichan\sdl\sdlimageloader.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\sdl\sdlinput.h"
+						RelativePath="guichan\include\guichan\sdl\sdlinput.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\sdl\sdlpixel.h"
+						RelativePath="guichan\include\guichan\sdl\sdlpixel.h"
 						>
 					</File>
 				</Filter>
@@ -3707,55 +3707,55 @@
 					Name="widgets."
 					>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\button.h"
+						RelativePath="guichan\include\guichan\widgets\button.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\checkbox.h"
+						RelativePath="guichan\include\guichan\widgets\checkbox.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\container.h"
+						RelativePath="guichan\include\guichan\widgets\container.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\dropdown.h"
+						RelativePath="guichan\include\guichan\widgets\dropdown.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\icon.h"
+						RelativePath="guichan\include\guichan\widgets\icon.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\label.h"
+						RelativePath="guichan\include\guichan\widgets\label.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\listbox.h"
+						RelativePath="guichan\include\guichan\widgets\listbox.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\radiobutton.h"
+						RelativePath="guichan\include\guichan\widgets\radiobutton.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\scrollarea.h"
+						RelativePath="guichan\include\guichan\widgets\scrollarea.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\slider.h"
+						RelativePath="guichan\include\guichan\widgets\slider.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\textbox.h"
+						RelativePath="guichan\include\guichan\widgets\textbox.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\textfield.h"
+						RelativePath="guichan\include\guichan\widgets\textfield.h"
 						>
 					</File>
 					<File
-						RelativePath="src\guichan\include\guichan\widgets\window.h"
+						RelativePath="guichan\include\guichan\widgets\window.h"
 						>
 					</File>
 				</Filter>
@@ -3766,11 +3766,11 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="contrib\stratagus.ico"
+				RelativePath="stratagus.ico"
 				>
 			</File>
 			<File
-				RelativePath="src\stratagus.rc"
+				RelativePath="stratagus.rc"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
