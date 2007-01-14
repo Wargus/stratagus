@@ -235,15 +235,15 @@ static void ApplyReplaySettings(void)
 		GameSettings.NetGameType = SettingsMultiPlayerGame;
 
 		ReplayGameType = ReplayMultiPlayer;
-		for (int i = 0; i < PlayerMax; ++i) {
-			GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
-			GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
-		}
-
 		NetLocalPlayerNumber = CurrentReplay->LocalPlayer;
 	} else {
 		GameSettings.NetGameType = SettingsSinglePlayerGame;
 		ReplayGameType = ReplaySinglePlayer;
+	}
+
+	for (int i = 0; i < PlayerMax; ++i) {
+		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
+		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
 	}
 
 	if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), CurrentReplay->MapPath.c_str()) != 0) {
