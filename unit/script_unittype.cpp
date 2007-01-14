@@ -247,7 +247,7 @@ static int CclDefineUnitType(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
-			type->Name = new_strdup(LuaToString(l, -1));
+			type->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
