@@ -838,6 +838,27 @@ static int CclSetPlayerData(lua_State *l)
 }
 
 /**
+**  Get ai player algo.
+**
+**  @param l  Lua state.
+*/
+static int CclGetAiType(lua_State *l)
+{
+	CPlayer *p;
+
+	if (lua_gettop(l) < 1) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushvalue(l, 1);
+	p = CclGetPlayer(l);
+	lua_pop(l, 1);
+
+   	lua_pushstring(l, p->AiName.c_str());
+
+	return 1;
+}
+
+/**
 **  Set ai player algo.
 **
 **  @param l  Lua state.
@@ -893,6 +914,7 @@ void PlayerCclRegister(void)
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
 	lua_register(Lua, "SetPlayerData", CclSetPlayerData);
 	lua_register(Lua, "SetAiType", CclSetAiType);
+	lua_register(Lua, "GetAiType", CclGetAiType);
 }
 
 //@}
