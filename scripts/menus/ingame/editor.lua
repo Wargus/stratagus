@@ -137,7 +137,7 @@ function RunEditorPlayerPropertiesMenu()
 
   menu:addSmallButton(_("OK"), 0, 455, 440, function() menu:stop() end)
 
-  for i=0,15 do
+  for i=0,7 do
     local l = Label(tostring(i))
     l:setFont(Fonts["game"])
     l:adjustSize()
@@ -150,7 +150,7 @@ function RunEditorPlayerPropertiesMenu()
   menu:add(l, 40, 40 + (22 * 0))
 
   local types = {_("Elites")}
-  for i=0,14 do
+  for i=0,7 do
     local d = menu:addDropDown(types, 40, 40 + (22 * (i + 1)),
       function() end)
     d:getListBox():setWidth(80)
@@ -164,7 +164,7 @@ function RunEditorPlayerPropertiesMenu()
 
   local types = {_("Person"), _("Computer"), _("Rescue (Passive)"),
     _("Rescue (Active)"), _("Neutral"), _("Nobody")}
-  for i=0,14 do
+  for i=0,7 do
     local d = menu:addDropDown(types, 130, 40 + (22 * (i + 1)),
       function() end)
     d:getListBox():setWidth(150)
@@ -176,12 +176,27 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 290, 40 + (22 * 0))
 
-  local types = {_("Default")}
-  for i=0,14 do
+  local aiiname
+  local types = {}
+  local itypes = {}
+  local i=1
+  for aiiname in AiList do
+    types[i] = AiList[aiiname][1]
+    itypes[i - 1] = aiiname
+    i = i + 1
+  end
+  local dropdownids = {}
+  for i=0,7 do
     local d = menu:addDropDown(types, 290, 40 + (22 * (i + 1)),
-      function() end)
+      function(dd)
+        print(dropdownids[dd], itypes[dd:getSelected()])
+        SetAiType(dropdownids[dd], itypes[dd:getSelected()])
+      end)
+    print(i, GetAiType(i))
+    d:setSelected(1)
     d:getListBox():setWidth(120)
     d:setWidth(80)
+    dropdownids[d] = i
   end
 
   local l = Label(_("Titanium"))
@@ -189,7 +204,7 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 420, 40 + (22 * 0))
 
-  for i=0,14 do
+  for i=0,7 do
     local d = menu:addTextInputField("" .. 1, 420, 40 + (22 * (i + 1)), 60)
   end
 
@@ -198,7 +213,7 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 490, 40 + (22 * 0))
 
-  for i=0,14 do
+  for i=0,7 do
     local d = menu:addTextInputField("" .. 1, 490, 40 + (22 * (i + 1)), 60)
   end
 
@@ -207,7 +222,7 @@ function RunEditorPlayerPropertiesMenu()
   l:adjustSize()
   menu:add(l, 560, 40 + (22 * 0))
 
-  for i=0,14 do
+  for i=0,7 do
     local d = menu:addTextInputField("" .. 1, 560, 40 + (22 * (i + 1)), 60)
   end
 
