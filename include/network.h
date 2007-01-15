@@ -114,13 +114,6 @@ enum _extended_message_type_ {
 };
 
 /**
-**  Network acknowledge message.
-*/
-typedef struct _ack_message_ {
-	unsigned char Type;  /// Acknowledge message type
-} Acknowledge;
-
-/**
 **  Network command message.
 */
 struct NetworkCommand {
