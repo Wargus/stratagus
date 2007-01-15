@@ -523,6 +523,7 @@ void CreateGame(const char *filename, CMap *map)
 	if (SaveGameLoading) {
 		SaveGameLoading = 0;
 		// Load game, already created game with Init/LoadModules
+		CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		return;
 	}
 
