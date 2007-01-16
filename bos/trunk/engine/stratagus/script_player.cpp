@@ -913,8 +913,8 @@ void PlayerCclRegister(void)
 	// player member access functions
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
 	lua_register(Lua, "SetPlayerData", CclSetPlayerData);
-	lua_register(Lua, "SetAiType", CclSetAiType);
 	lua_register(Lua, "GetAiType", CclGetAiType);
+	lua_register(Lua, "SetAiType", CclSetAiType);
 }
 
 //@}
