@@ -10,7 +10,7 @@
 //
 /**@name translate.h - The translate headerfile. */
 //
-//      (c) Copyright 2005 by Jimmy Salmon
+//      (c) Copyright 2005-2007 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -47,11 +47,11 @@ extern std::string GameTranslation;
 	/// Translate a string
 extern const char *Translate(const char *str);
 	/// Add a translation
-extern void AddTranslation(const char *str1, const char *str2);
+extern void AddTranslation(const std::string &str1, const std::string &str2);
 	/// Load a .po file
-extern void LoadPO(const char *file);
+extern void LoadPO(const std::string &file);
 	/// Set the stratagus and game translations
-extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
+extern void SetTranslationsFiles(const std::string &stratagusfile, const std::string &gamefile);
 
 
 //@}

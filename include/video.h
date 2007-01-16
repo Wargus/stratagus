@@ -10,7 +10,7 @@
 //
 /**@name video.h - The video headerfile. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -387,7 +387,7 @@ extern void SetClipping(int left, int top, int right, int bottom);
 extern void RealizeVideoMemory(void);
 
 	/// Save a screenshot to a PNG file
-extern void SaveScreenshotPNG(const char *name);
+extern void SaveScreenshotPNG(const std::string &name);
 
 	/// Set the current callbacks
 extern void SetCallbacks(const EventCallback *callbacks);
