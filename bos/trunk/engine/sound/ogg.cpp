@@ -10,7 +10,7 @@
 //
 /**@name ogg.cpp - ogg support */
 //
-//      (c) Copyright 2005 by Nehal Mistry
+//      (c) Copyright 2005-2007 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -389,7 +389,7 @@ CSampleVorbis::~CSampleVorbis()
 **
 **  @return       Returns the loaded sample.
 */
-CSample *LoadVorbis(const char *name, int flags)
+CSample *LoadVorbis(const std::string &name, int flags)
 {
 	CSample *sample;
 	OggData *data;
@@ -397,8 +397,8 @@ CSample *LoadVorbis(const char *name, int flags)
 	vorbis_info *info;
 
 	f = new CFile;
-	if (f->open(name, CL_OPEN_READ) == -1) {
-		fprintf(stderr, "Can't open file `%s'\n", name);
+	if (f->open(name.c_str(), CL_OPEN_READ) == -1) {
+		fprintf(stderr, "Can't open file `%s'\n", name.c_str());
 		delete f;
 		return NULL;
 	}

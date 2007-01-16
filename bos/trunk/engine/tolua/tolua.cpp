@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 01/15/07 21:55:41.
+** Generated automatically by tolua++-1.0.92 on 01/15/07 22:19:03.
 */
 
 #ifndef __cplusplus
@@ -38,9 +38,9 @@ extern char NetworkMapName[256];
 void NetworkGamePrepareGameSettings(void);
 #include "editor.h"
 bool IsReplayGame();
-void StartMap(const char *str, bool clean = true);
-void StartReplay(const char *str, bool reveal = false);
-void StartSavedGame(const char *str);
+void StartMap(const string &str, bool clean = true);
+void StartReplay(const string &str, bool reveal = false);
+void StartSavedGame(const string &str);
 int SaveReplay(const std::string &filename);
 #include "results.h"
 void StopGame(GameResults result);
@@ -15015,7 +15015,7 @@ static int tolua_stratagus_StartMap00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
      !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -15023,7 +15023,7 @@ static int tolua_stratagus_StartMap00(lua_State* tolua_S)
  else
 #endif
  {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const string str = ((const string)  tolua_tocppstring(tolua_S,1,0));
   bool clean = ((bool)  tolua_toboolean(tolua_S,2,true));
   {
    StartMap(str,clean);
@@ -15045,7 +15045,7 @@ static int tolua_stratagus_StartReplay00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
      !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -15053,7 +15053,7 @@ static int tolua_stratagus_StartReplay00(lua_State* tolua_S)
  else
 #endif
  {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const string str = ((const string)  tolua_tocppstring(tolua_S,1,0));
   bool reveal = ((bool)  tolua_toboolean(tolua_S,2,false));
   {
    StartReplay(str,reveal);
@@ -15075,14 +15075,14 @@ static int tolua_stratagus_StartSavedGame00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const string str = ((const string)  tolua_tocppstring(tolua_S,1,0));
   {
    StartSavedGame(str);
   }
