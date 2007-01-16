@@ -856,7 +856,7 @@ static int CclGetAiType(lua_State *l)
 	p = CclGetPlayer(l);
 	lua_pop(l, 1);
 
-   	lua_pushstring(l, p->AiName.c_str());
+	lua_pushstring(l, p->AiName.c_str());
 
 	return 1;
 }
