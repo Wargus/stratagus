@@ -10,7 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -93,41 +93,41 @@ GameResults GameResult;                      /// Outcome of the game
 **  @param mapname  map filename
 **  @param map      map loaded
 */
-static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map)
+static void LoadStratagusMap(const std::string &smpname, const std::string &mapname, CMap *map)
 {
 	char mapfull[PATH_MAX];
 	CFile file;
 
 	// Try the same directory as the smp file first
-	strcpy_s(mapfull, sizeof(mapfull), smpname);
+	strcpy_s(mapfull, sizeof(mapfull), smpname.c_str());
 	char *p = strrchr(mapfull, '/');
 	if (!p) {
 		p = mapfull;
 	} else {
 		++p;
 	}
-	strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname);
+	strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname.c_str());
 
 	if (file.open(mapfull, CL_OPEN_READ) == -1) {
 		// Not found, try StratagusLibPath and the smp's dir
 		strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
 		strcat_s(mapfull, sizeof(mapfull), "/");
-		strcat_s(mapfull, sizeof(mapfull), smpname);
+		strcat_s(mapfull, sizeof(mapfull), smpname.c_str());
 		char *p = strrchr(mapfull, '/');
 		if (!p) {
 			p = mapfull;
 		} else {
 			++p;
 		}
-		strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname);
+		strcpy_s(p, sizeof(mapfull) - (p - mapfull), mapname.c_str());
 		if (file.open(mapfull, CL_OPEN_READ) == -1) {
 			// Not found again, try StratagusLibPath
 			strcpy_s(mapfull, sizeof(mapfull), StratagusLibPath.c_str());
 			strcat_s(mapfull, sizeof(mapfull), "/");
-			strcat_s(mapfull, sizeof(mapfull), mapname);
+			strcat_s(mapfull, sizeof(mapfull), mapname.c_str());
 			if (file.open(mapfull, CL_OPEN_READ) == -1) {
 				// Not found, try mapname by itself as a last resort
-				strcpy_s(mapfull, sizeof(mapfull), mapname);
+				strcpy_s(mapfull, sizeof(mapfull), mapname.c_str());
 			} else {
 				file.close();
 			}
@@ -153,12 +153,12 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 #if 0
 	// Not true if multiplayer levels!
 	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
+		fprintf(stderr, "%s: invalid Stratagus map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
 #endif
 	if (!Map.Info.MapWidth || !Map.Info.MapHeight) {
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
+		fprintf(stderr, "%s: invalid Stratagus map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
 	Map.Info.Filename = mapname;
@@ -333,14 +333,15 @@ int SaveStratagusMap(const std::string &mapname, CMap *map, int writeTerrain)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-static void LoadMap(const char *filename, CMap *map)
+static void LoadMap(const std::string &filename, CMap *map)
 {
 	const char *tmp;
+	const char *name = filename.c_str();
 
-	tmp = strrchr(filename, '.');
+	tmp = strrchr(name, '.');
 	if (tmp) {
 		if (!strcmp(tmp, ".gz")) {
-			while (tmp - 1 > filename && *--tmp != '.') {
+			while (tmp - 1 > name && *--tmp != '.') {
 			}
 		}
 		if (!strcmp(tmp, ".smp") || !strcmp(tmp, ".smp.gz")) {
@@ -499,7 +500,7 @@ static void GameTypeManTeamVsMachine(void)
 **
 **  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
-void CreateGame(const char *filename, CMap *map)
+void CreateGame(const std::string &filename, CMap *map)
 {
 	int i;
 
@@ -513,12 +514,11 @@ void CreateGame(const char *filename, CMap *map)
 	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 	
-	if (Map.Info.Filename.empty() && filename) {
+	if (Map.Info.Filename.empty() && !filename.empty()) {
 		char path[PATH_MAX];
 		
-		Assert(filename);
-		LibraryFileName(filename, path, sizeof(path));
-		if(strcasestr(filename, ".smp")) {
+		LibraryFileName(filename.c_str(), path, sizeof(path));
+		if (strcasestr(filename.c_str(), ".smp")) {
 			LuaLoadFile(path);
 		}
 	}
@@ -532,9 +532,9 @@ void CreateGame(const char *filename, CMap *map)
 		CreatePlayer(playertype);
 	}
 
-	if (filename) {
+	if (!filename.empty()) {
 		if (CurrentMapPath != filename) {
-			strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename);
+			strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename.c_str());
 		}
 
 		//

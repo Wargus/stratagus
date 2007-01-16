@@ -10,7 +10,7 @@
 //
 /**@name wav.cpp - wav support */
 //
-//      (c) Copyright 2003-2005 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
+//      (c) Copyright 2003-2007 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -184,7 +184,7 @@ CSampleWav::~CSampleWav()
 **
 **  @todo         Add ADPCM loading support!
 */
-CSample *LoadWav(const char *name, int flags)
+CSample *LoadWav(const std::string &name, int flags)
 {
 	CSample *sample;
 	WavData *data;
@@ -194,8 +194,8 @@ CSample *LoadWav(const char *name, int flags)
 	unsigned int t;
 
 	f = new CFile;
-	if (f->open(name, CL_OPEN_READ) == -1) {
-		printf("Can't open file `%s'\n", name);
+	if (f->open(name.c_str(), CL_OPEN_READ) == -1) {
+		printf("Can't open file `%s'\n", name.c_str());
 		delete f;
 		return NULL;
 	}

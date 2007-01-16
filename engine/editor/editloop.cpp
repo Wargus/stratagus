@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1983,7 +1983,7 @@ void CEditor::Init(void)
 			Map.Fields[i].Flags = Map.Tileset.FlagsTable[0x50];
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
-		CreateGame(NULL, &Map);
+		CreateGame("", &Map);
 	} else {
 		CreateGame(CurrentMapPath, &Map);
 	}

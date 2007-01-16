@@ -537,7 +537,7 @@ static void ExpandPath(char *newpath, const char *path)
 
 extern gcn::Gui *Gui;
 
-void StartMap(const char *filename, bool clean = true) 
+void StartMap(const std::string &filename, bool clean) 
 {
 	std::string nc, rc;
 
@@ -576,24 +576,24 @@ void StartMap(const char *filename, bool clean = true)
 	delete container;
 }
 
-void StartSavedGame(const char *filename) 
+void StartSavedGame(const std::string &filename) 
 {
 	char path[512];
 
 	SaveGameLoading = 1;
 	CleanPlayers();
-	ExpandPath(path, filename);
+	ExpandPath(path, filename.c_str());
 	LoadGame(path);
 
 	StartMap(filename, false);
 }
 	
-void StartReplay(const char *filename, bool reveal)
+void StartReplay(const std::string &filename, bool reveal)
 {
 	char replay[PATH_MAX];
 
 	CleanPlayers();
-	ExpandPath(replay, filename);
+	ExpandPath(replay, filename.c_str());
 	LoadReplay(replay);
 
 	ReplayRevealMap = reveal;

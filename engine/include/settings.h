@@ -10,7 +10,7 @@
 //
 /**@name settings.h - The game settings headerfile. */
 //
-//      (c) Copyright 2000-2006 by Andreas Arens and Jimmy Salmon
+//      (c) Copyright 2000-2007 by Andreas Arens and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ extern Settings GameSettings;  /// Game settings
 	/// Show stats
 extern void ShowStats();
 	/// Create a game
-extern void CreateGame(const char *filename, CMap *map);
+extern void CreateGame(const std::string &filename, CMap *map);
 	/// Init Setting to default values
 extern void InitSettings(void);
 

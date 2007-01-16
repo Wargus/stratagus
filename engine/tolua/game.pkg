@@ -2,15 +2,14 @@ $bool IsReplayGame();
 bool IsReplayGame();
 
 
-$void StartMap(const char *str, bool clean = true);
-void StartMap(const char *str, bool clean = true);
-$void StartReplay(const char *str, bool reveal = false);
-void StartReplay(const char *str, bool reveal = false);
-$void StartSavedGame(const char *str);
-void StartSavedGame(const char *str);
+$void StartMap(const string &str, bool clean = true);
+void StartMap(const string str, bool clean = true);
+$void StartReplay(const string &str, bool reveal = false);
+void StartReplay(const string str, bool reveal = false);
+$void StartSavedGame(const string &str);
+void StartSavedGame(const string str);
 
 $int SaveReplay(const std::string &filename);
-
 int SaveReplay(const std::string filename);
 
 $#include "results.h"
