@@ -97,7 +97,7 @@ void LoadPO(const std::string &file)
 	LibraryFileName(file.c_str(), fullfile, sizeof(fullfile));
 	fd = fopen(fullfile, "rb");
 	if (!fd) {
-		fprintf(stderr, "Could not open file: %s\n", file);
+		fprintf(stderr, "Could not open file: %s\n", file.c_str());
 		return;
 	}
 

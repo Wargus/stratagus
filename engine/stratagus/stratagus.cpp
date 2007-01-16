@@ -551,7 +551,7 @@ void StartMap(const std::string &filename, bool clean)
 	InterfaceState = IfaceStateNormal;
 
 	//  Create the game.
-	DebugPrint("Creating game with map: %s\n" _C_ filename);
+	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
 	if (clean) {
 		CleanPlayers();
 	}
