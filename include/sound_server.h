@@ -10,7 +10,7 @@
 //
 /**@name sound_server.h - The sound server header file. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi, and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -83,9 +83,8 @@ extern std::string CurrentMusicFile;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CSample *LoadWav(const char *name, int flags);    /// Load a wav file
-extern CSample *LoadVorbis(const char *name, int flags); /// Load a vorbis file
-extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
+extern CSample *LoadWav(const std::string &name, int flags);    /// Load a wav file
+extern CSample *LoadVorbis(const std::string &name, int flags); /// Load a vorbis file
 
 	/// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);

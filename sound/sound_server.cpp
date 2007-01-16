@@ -10,7 +10,7 @@
 //
 /**@name sound_server.cpp - The sound server (hardware layer and so on) */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Fabrice Rossi, and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -644,7 +644,7 @@ int PlayMusic(CSample *sample)
 */
 int PlayMusic(const std::string &file)
 {
-	char buffer[PATH_MAX];
+	char name[PATH_MAX];
 	CSample *sample;
 
 	if (!SoundEnabled() || !IsMusicEnabled()) {
@@ -653,7 +653,7 @@ int PlayMusic(const std::string &file)
 
 	CurrentMusicFile.clear();
 
-	char *name = LibraryFileName(file.c_str(), buffer, sizeof(buffer));
+	LibraryFileName(file.c_str(), name, sizeof(name));
 
 	DebugPrint("play music %s\n" _C_ name);
 
