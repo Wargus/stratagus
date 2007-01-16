@@ -63,7 +63,10 @@
 */
 static CPlayer *CclGetPlayer(lua_State *l)
 {
-	return &Players[(int)LuaToNumber(l, -1)];
+	int i = (int)LuaToNumber(l, -1);
+	if ( (i < 0)  || (i > PlayerMax) )
+		return NULL;
+	return &Players[i];
 }
 
 /**
