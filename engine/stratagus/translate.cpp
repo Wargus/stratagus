@@ -10,7 +10,7 @@
 //
 /**@name translate.cpp - Translate languages. */
 //
-//      (c) Copyright 2005 by Jimmy Salmon
+//      (c) Copyright 2005-2007 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 #include "iolib.h"
 
 /*----------------------------------------------------------------------------
--- Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 typedef std::map<std::string, std::string> EntriesType;
@@ -71,7 +71,7 @@ const char *Translate(const char *str)
 /**
 **  Add a translation
 */
-void AddTranslation(const char *str1, const char *str2)
+void AddTranslation(const std::string &str1, const std::string &str2)
 {
 	Entries[str1] = str2;
 }
@@ -79,7 +79,7 @@ void AddTranslation(const char *str1, const char *str2)
 /**
 **  Load a .po file
 */
-void LoadPO(const char *file)
+void LoadPO(const std::string &file)
 {
 	FILE *fd;
 	char buf[4096];
@@ -90,11 +90,11 @@ void LoadPO(const char *file)
 	char *currmsg = NULL;
 	char fullfile[1024];
 
-	if (!file || !*file) {
+	if (file.empty()) {
 		return;
 	}
 
-	LibraryFileName(file, fullfile, sizeof(fullfile));
+	LibraryFileName(file.c_str(), fullfile, sizeof(fullfile));
 	fd = fopen(fullfile, "rb");
 	if (!fd) {
 		fprintf(stderr, "Could not open file: %s\n", file);
@@ -184,11 +184,12 @@ void LoadPO(const char *file)
 	fclose(fd);
 }
 
-/** Set the stratagus and game translations
+/**
+**  Set the stratagus and game translations
 **
-** Those filenames will be saved in the preferences when SavePreferences will be called.
-**/
-void SetTranslationsFiles(const char *stratagusfile, const char *gamefile)
+**  Those filenames will be saved in the preferences when SavePreferences will be called.
+*/
+void SetTranslationsFiles(const std::string &stratagusfile, const std::string &gamefile)
 {
 	LoadPO(stratagusfile);
 	LoadPO(gamefile);

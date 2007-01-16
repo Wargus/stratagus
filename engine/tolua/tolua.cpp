@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Sun Jan  7 19:56:28 2007.
+** Generated automatically by tolua++-1.0.92 on 01/15/07 21:55:41.
 */
 
 #ifndef __cplusplus
@@ -15835,16 +15835,16 @@ static int tolua_stratagus_AddTranslation00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* str1 = ((const char*)  tolua_tostring(tolua_S,1,0));
-  const char* str2 = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const string str1 = ((const string)  tolua_tocppstring(tolua_S,1,0));
+  const string str2 = ((const string)  tolua_tocppstring(tolua_S,2,0));
   {
    AddTranslation(str1,str2);
   }
@@ -15865,14 +15865,14 @@ static int tolua_stratagus_LoadPO00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* file = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const string file = ((const string)  tolua_tocppstring(tolua_S,1,0));
   {
    LoadPO(file);
   }
@@ -15893,16 +15893,16 @@ static int tolua_stratagus_SetTranslationsFiles00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* stratagusfile = ((const char*)  tolua_tostring(tolua_S,1,0));
-  const char* gamefile = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const string stratagusfile = ((const string)  tolua_tocppstring(tolua_S,1,0));
+  const string gamefile = ((const string)  tolua_tocppstring(tolua_S,2,0));
   {
    SetTranslationsFiles(stratagusfile,gamefile);
   }

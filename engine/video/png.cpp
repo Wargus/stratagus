@@ -10,7 +10,7 @@
 //
 /**@name png.cpp - The png graphic file loader. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -313,7 +313,7 @@ done:   /* Clean up and return */
 **
 **  @param name  PNG filename to save.
 */
-void SaveScreenshotPNG(const char *name)
+void SaveScreenshotPNG(const std::string &name)
 {
 	FILE *fp;
 	png_structp png_ptr;
@@ -325,7 +325,7 @@ void SaveScreenshotPNG(const char *name)
 
 	bpp = TheScreen->format->BytesPerPixel;
 
-	fp = fopen(name, "wb");
+	fp = fopen(name.c_str(), "wb");
 	if (fp == NULL) {
 		return;
 	}
