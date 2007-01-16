@@ -189,7 +189,6 @@ function RunEditorPlayerPropertiesMenu()
   for i=0,7 do
     local d = menu:addDropDown(types, 290, 40 + (22 * (i + 1)),
       function(dd)
-        print(dropdownids[dd], itypes[dd:getSelected()])
         SetAiType(dropdownids[dd], itypes[dd:getSelected()])
       end)
     print(i, GetAiType(i))
