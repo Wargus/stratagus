@@ -10,7 +10,7 @@
 //
 /**@name player.cpp - The players. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ int NoRescueCheck;               /// Disable rescue check
 SDL_Color *PlayerColorsRGB[PlayerMax];
 Uint32 *PlayerColors[PlayerMax];
 
-char *PlayerColorNames[PlayerMax];
+std::string PlayerColorNames[PlayerMax];
 
 /**
 **  Which indexes to replace with player color
@@ -794,7 +794,7 @@ void DebugPlayers(void)
 			case 7: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %s\n" _C_ i _C_ PlayerColorNames[i] _C_
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name.c_str() _C_ playertype _C_

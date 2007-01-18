@@ -10,7 +10,7 @@
 //
 /**@name interface.cpp - The interface. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -779,7 +779,7 @@ static int InputKey(int key)
 					}
 				}
 				sprintf(ChatMessage, "~%s~<%s>~> %s",
-					PlayerColorNames[ThisPlayer->Index],
+					PlayerColorNames[ThisPlayer->Index].c_str(),
 					ThisPlayer->Name.c_str(), Input);
 				// FIXME: only to selected players ...
 				NetworkChatMessage(ChatMessage);

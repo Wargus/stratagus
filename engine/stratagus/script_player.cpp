@@ -10,7 +10,7 @@
 //
 /**@name script_player.cpp - The player ccl functions. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -586,8 +586,7 @@ static int CclDefinePlayerColors(lua_State *l)
 	args = luaL_getn(l, 1);
 	for (i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
-		delete[] PlayerColorNames[i / 2];
-		PlayerColorNames[i / 2] = new_strdup(LuaToString(l, -1));
+		PlayerColorNames[i / 2] = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++i;
 		lua_rawgeti(l, 1, i + 1);
