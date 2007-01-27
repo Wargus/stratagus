@@ -469,13 +469,16 @@ function RunEditorMenu(s)
   local maptext = menu:writeText(selectedmap .. "                       ", sx+50, sy*3+30)
   menu:writeText(_("Players:"), sx, sy*3+50)
   local players = menu:writeText("             ", sx+70, sy*3+50)
-  menu:writeText(_("Description:"), sx, sy*3+70)
-  local descr = menu:writeText("                                        ", sx+20, sy*3+90)
+  menu:writeText(_("Size:"), sx, sy*3+70)
+  local mapsize = menu:writeText("       ", sx+70, sy*3+70)
+  menu:writeText(_("Description:"), sx, sy*3+90)
+  local descr = menu:writeText("                                        ", sx+20, sy*3+110)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
     numplayers = nplayers
     players:setCaption(""..nplayers)
+	mapsize:setCaption(""..h.."x"..w)
     descr:setCaption(description)
     OldPresentMap(description, nplayers, w, h, id)
   end
