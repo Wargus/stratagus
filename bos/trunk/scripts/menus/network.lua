@@ -410,8 +410,10 @@ function RunCreateMultiGameMenu(s)
   maptext:setWidth(sx * 9 - 50 - 20)
   menu:writeText(_("Players:"), sx, sy*3+50)
   players = menu:writeText(numplayers, sx+70, sy*3+50)
-  menu:writeText(_("Description:"), sx, sy*3+70)
-  descr = menu:writeText(description, sx+20, sy*3+90)
+  menu:writeText(_("Size:"), sx, sy*3+70)
+  mapsize = menu:writeText("       ", sx+70, sy*3+70)
+  menu:writeText(_("Description:"), sx, sy*3+90)
+  descr = menu:writeText(description, sx+20, sy*3+110)
   descr:setWidth(sx * 9 - 20 - 20)
 
   local OldPresentMap = PresentMap
@@ -420,6 +422,7 @@ function RunCreateMultiGameMenu(s)
     numplayers = nplayers
     players:setCaption(""..numplayers)
     players:adjustSize()
+	mapsize:setCaption(""..h.."x"..w)
     description = desc
     descr:setCaption(description)
     OldPresentMap(description, nplayers, w, h, id)
