@@ -55,9 +55,10 @@ local editor_types = {
 
   "unit-apcs",
   "unit-medic",
-  "unit-bazoo",
   "unit-assault",
+  "unit-bazoo",
   "unit-grenadier",
+  "unit-dorcoz",
   "unit-engineer",
   "unit-harvester",
   "unit-msilo",
@@ -75,6 +76,7 @@ local editor_types = {
   "unit-tank",
   "unit-artil",
   "unit-chopper",
+  "unit-bomber",
 
   "unit-gold-mine",
   "unit-tree",
