@@ -323,27 +323,30 @@ function RunStartGameMenu(s)
   menu:writeText(_("File:"), sx, sy*3+30)
   local maptext = menu:writeText(selectedmap, sx+50, sy*3+30)
   maptext:setWidth(sx * 9 - 50 - 20)
-  menu:writeText(_("Players:"), sx, sy*3+50)
-  local players = menu:writeText("             ", sx+70, sy*3+50)
-  menu:writeText(_("Description:"), sx, sy*3+70)
-  local descr = menu:writeText("No map", sx+20, sy*3+90)
+  menu:writeText(_("Size:"), sx, sy*3+50)
+  local mapsize = menu:writeText("       ", sx+50, sy*3+50)
+  mapsize:setWidth(sx * 9 - 50 - 20)
+  menu:writeText(_("Players:"), sx, sy*3+70)
+  local players = menu:writeText("             ", sx+70, sy*3+70)
+  menu:writeText(_("Description:"), sx, sy*3+90)
+  local descr = menu:writeText("No map", sx+20, sy*3+110)
   descr:setWidth(sx * 9 - 20 - 20)
 
-  local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+120,
+  local fow = menu:addCheckBox(_("Fog of war"), sx, sy*3+140,
     function(f) GameSettings.NoFogOfWar = not f:isMarked() end)
   fow:setMarked(preferences.FogOfWar)
-  local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150,
+  local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+160,
     function(f) GameSettings.RevealMap = bool2int(f:isMarked()) end)
   
   ResetMapOptions()
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
+  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
     function(dd) GameSettings.Difficulty = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Map richness:"), sx, sy*11+25)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25,
     function(dd) GameSettings.MapRichness = (5 - dd:getSelected()*2) end)
   menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50,
     function(dd) GameSettings.Resources = (5 - dd:getSelected()*2) end)
 
   local OldPresentMap = PresentMap
@@ -351,6 +354,7 @@ function RunStartGameMenu(s)
     numplayers = nplayers
     players:setCaption(""..nplayers)
     descr:setCaption(description)
+	mapsize:setCaption(""..h.."x"..w)
     OldPresentMap(description, nplayers, w, h, id)
   end
  
