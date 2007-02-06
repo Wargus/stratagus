@@ -4,7 +4,7 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---            Bos Wars
+--  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
 --	unit-buggy.lua	-	Define the buggy unit.

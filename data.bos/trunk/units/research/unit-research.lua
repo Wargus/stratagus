@@ -4,12 +4,12 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---            Bos Wars
+--  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
 --	unit-research.lua	-	Define the research facility
 --
---	(c) Copyright 2001-2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by

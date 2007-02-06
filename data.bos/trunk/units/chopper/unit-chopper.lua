@@ -4,7 +4,7 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---            Bos Wars
+--  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
 --	unit-chopper.lua	-	Define the chopper unit.

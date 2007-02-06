@@ -4,7 +4,7 @@
 --         / /_/ / /_/ (__  )
 --        /_____/\____/____/
 --
---                Bos Wars
+--      Invasion - Battle of Survival
 --       A GPL'd futuristic RTS game
 --
 --      credits.lua - Credits menu.
@@ -126,12 +126,12 @@ function RunCreditsMenu(s)
      "  Chris Hopp", -- small_fire.png
      "",
      "",
-     _("The Bos Wars and the Stratagus teams thank"),
+     _("The Bos and the Stratagus Team thanks"),
      _("everybody who has contributed"),
      _("patches, bug reports, ideas.")
   }
 
-  menu = BosMenu(_("Bos Wars Credits"))
+  menu = BosMenu(_("Battle of Survival Credits"))
 
   local sw = ScrollingWidget(400, Video.Height * 12 / 20)
   menu:add(sw, Video.Width / 2 - 200, Video.Height / 20 * 3)

@@ -4,7 +4,7 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---            Bos Wars
+--  Invasion - Battle of Survival                  
 --   A GPL'd futuristic RTS game
 --
 --	stratagus.lua	-	The craft configuration language.
@@ -28,7 +28,7 @@
 --	$Id$
 
 
-print("Bos Wars default config file loading ...\n")
+print("Battle of Survival default config file loading ...\n")
 
 -------------------------------------------------------------------------------
 --	Config-Part

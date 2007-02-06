@@ -316,8 +316,8 @@ msgid "patches, bug reports, ideas."
 msgstr "paikkaukset, bugi-ilmoitukset, ideat"
 
 #: scripts/menus/credits.lua:133
-msgid "Bos Wars Credits"
-msgstr "Bos Wars -tekijät"
+msgid "Battle of Survival Credits"
+msgstr "Battle of Survival -tekijät"
 
 #: scripts/guichan.lua:194
 msgid "~!Exit"
