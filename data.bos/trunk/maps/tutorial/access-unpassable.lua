@@ -1,11 +1,10 @@
-
 --            ____
 --           / __ )____  _____
 --          / __  / __ \/ ___/
 --         / /_/ / /_/ (__  )
 --        /_____/\____/____/
 --
---  Invasion - Battle of Survival
+--            Bos Wars
 --   A GPL'd futuristic RTS game
 --
 --  (c) Copyright 2005-2006 by Francois Beerten et al.

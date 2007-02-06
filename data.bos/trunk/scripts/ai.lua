@@ -4,7 +4,7 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---  Invasion - Battle of Survival                  
+--            Bos Wars                  
 --   A GPL'd futuristic RTS game
 --
 --	ai.lua		-	Define the AI.
@@ -40,6 +40,12 @@ AiList = {}
 -- fun           : main AI function
 -- initfun       : initialization function, can be obmitted
 function RegisterAi(internal_name, name, fun, initfun)
+print("RegisterAi")
+local t = debug.getinfo(fun)
+for k,v in pairs(t) do print(tostring(k) .. " = " .. tostring(v)) end
+print("----------")
+local t = debug.getinfo(print)
+for k,v in pairs(t) do print(tostring(k) .. " = " .. tostring(v)) end
   DefineAi("ai-" .. internal_name, "ai-" .. internal_name, fun)
   AiList[name] = {internal_name, name, fun, initfun}
 end

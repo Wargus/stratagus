@@ -4,12 +4,12 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---  Invasion - Battle of Survival                  
+--            Bos Wars
 --   A GPL'd futuristic RTS game
 --
 --	unit-rocksfield.lua	-	Define the rocks-field.
 --
---	(c) Copyright 1998 - 2005 by Lutz Sammer, Crestez Leonard, François Beerten
+--	(c) Copyright 1998-2005 by Lutz Sammer, Crestez Leonard, François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by

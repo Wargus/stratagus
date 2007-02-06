@@ -4,7 +4,7 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---  Invasion - Battle of Survival                  
+--            Bos Wars
 --   A GPL'd futuristic RTS game
 --
 --      winter.lua - Define the winter tileset.

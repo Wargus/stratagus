@@ -4,7 +4,7 @@
 --         / /_/ / /_/ (__  ) 
 --        /_____/\____/____/  
 --
---  Invasion - Battle of Survival                  
+--            Bos Wars
 --   A GPL'd futuristic RTS game
 --
 --	unit-gturret.lua	-	Define the gun turret unit.

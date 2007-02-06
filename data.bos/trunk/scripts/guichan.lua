@@ -4,8 +4,8 @@
 --         / /_/ / /_/ (__  )
 --        /_____/\____/____/
 --
---      Invasion - Battle of Survival
---       A GPL'd futuristic RTS game
+--            Bos Wars
+--   A GPL'd futuristic RTS game
 --
 --      guichan.lua - The main UI lua script.
 --
