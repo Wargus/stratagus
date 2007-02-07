@@ -2,18 +2,24 @@
 <!--#set var="title" value="Bos"-->
 <!--#include file="header.shtml" -->
       
-<h2>The Invasion Team</h2>
+<h2>The Bos Wars Team</h2>
 
-Bos is an open source project open to everybody. 
+Bos Wars is an open source project open to everybody. 
 The currently active members are:
 <ul>
-<li>François Beerten "feb", project manager</li> 
-<li>Loïs Taulelle "GruiicK", maps and campaigns creator</li>
-<li>Tejay Penfold "TimberDragon", 3d specialist</li>
+<li>Fran&ccedil;ois Beerten "feb", project leader</li>
+<li>Jimmy Salmon "jim4", programmer</li>
+<li>Lois Taulelle "GruiicK", maps and campaigns creator</li>
 <li>Frank Loeffler "gorm", script writer and blender specialist</li>
+<li>Nehal Mistry "Nehal", programmer</li>
 </ul> 
+
+<h3>Past contributors</h3>
 <p>
-Tina Petersen "p0ng" started the project. She unfortunatly passed away in 2003.
+<ul>
+<li>Tejay Penfold "TimberDragon", 3d specialist</li>
+<li>Tina Petersen "p0ng" started the project. She unfortunatly passed away in 2003.</li>
+</ul>
 <p>
 Every contributor becomes in a sense a member of the project. 
 For a detailed list of the contributions, check the svn and cvs repositories.
