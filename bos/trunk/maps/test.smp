@@ -1,11 +1,11 @@
---            ____            
---           / __ )____  _____
---          / __  / __ \/ ___/
---         / /_/ / /_/ (__  ) 
---        /_____/\____/____/  
---
---  Invasion - Battle of Survival                  
---   A GPL'd futuristic RTS game
+--     ____                _       __               
+--    / __ )____  _____   | |     / /___ ___________
+--   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+--  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+-- /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+--                                              
+--       A futuristic real-time strategy game.
+--          This file is part of Bos Wars.
 --
 -- Stratagus Map Presentation
 -- File generated automatically from test.pud.
