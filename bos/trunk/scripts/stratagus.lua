@@ -28,7 +28,7 @@
 --	$Id$
 
 
-print("Battle of Survival default config file loading ...\n")
+print("Bos Wars default config file loading ...\n")
 
 -------------------------------------------------------------------------------
 --	Config-Part
@@ -42,7 +42,7 @@ SetTitleScreens(
 )
 
 --	Set the game name
-SetGameName("bos")
+SetGameName("boswars")
 
 -------------------------------------------------------------------------------
 --	Music play list -	Insert your titles here

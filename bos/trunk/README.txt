@@ -1,15 +1,14 @@
-Invasion - Battle Of Survival
------------------------------
+Bos Wars
+--------
 
 About
 -----
-Invasion - Battle of Survival is a real-time strategy game using the
-Stratagus game engine. 
+Bos Wars is a futuristic real-time strategy game. 
 
 
 Copyright and Licence
 ---------------------
-This work, Invasion - Battle of Survival, is copyrighted in 2004-2007 by
+This work, Bos Wars, is copyrighted in 2004-2007 by
 Tina Petersen Jensen, Francois Beerten et al.
 
 Read the file COPYRIGHT.txt for the detailed copyright notice.
@@ -19,10 +18,9 @@ How to install
 -------------
 
 Unpack the game data in a games directory:
-> tar -xzvf Invasion-bos.tgz
+> tar -xzvf boswars.tgz
 
-You also need to get version 2.2.1 of the Stratagus engine available at
-http://www.stratagus.org.
+
 
 
 How to start the game
@@ -45,7 +43,7 @@ http://savannah.nongnu.org/bugs/?group=stratagus-bos
 
 Have fun,
 
-The BOS team.
+The Bos Wars team.
 
  
 

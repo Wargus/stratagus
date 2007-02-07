@@ -268,7 +268,7 @@ msgid "patches, bug reports, ideas."
 msgstr ""
 
 #: scripts/menus/credits.lua:134
-msgid "Battle of Survival Credits"
+msgid "Bos Wars Credits"
 msgstr ""
 
 #: scripts/menus/ingame/editor.lua:45
