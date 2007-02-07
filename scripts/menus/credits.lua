@@ -9,7 +9,7 @@
 --
 --      credits.lua - Credits menu.
 --
---      (c) Copyright 2005-2006 by Francois Beerten
+--      (c) Copyright 2005-2007 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -52,8 +52,7 @@ function RunCreditsMenu(s)
      "  Tina Petersen",
      "  Brian Pedersen",
      " ",
-     _("powered by STRATAGUS"),
-     _("Stratagus Programmers:"),
+     _("Engine Programmers:"),
      "  Andreas 'Ari' Arens",
      "  Lutz 'Johns' Sammer",
      "  Edgar 'Froese' Toernig",
@@ -126,12 +125,12 @@ function RunCreditsMenu(s)
      "  Chris Hopp", -- small_fire.png
      "",
      "",
-     _("The Bos and the Stratagus Team thanks"),
+     _("The Bos Wars Team thanks"),
      _("everybody who has contributed"),
      _("patches, bug reports, ideas.")
   }
 
-  menu = BosMenu(_("Battle of Survival Credits"))
+  menu = BosMenu(_("Bos Wars Credits"))
 
   local sw = ScrollingWidget(400, Video.Height * 12 / 20)
   menu:add(sw, Video.Width / 2 - 200, Video.Height / 20 * 3)
