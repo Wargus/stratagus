@@ -9,7 +9,7 @@
 --
 --      network.lua - The multiplayer UI.
 --
---      (c) Copyright 2005-2006 by François Beerten
+--      (c) Copyright 2005-2007 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ function addPlayersList(menu, numplayers)
   local numplayers_text
 
   menu:writeLargeText(_("Players"), sx * 11, sy*3)
-  for i=1,8 do
+  for i=1,7 do
     players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
     players_state[i] = menu:writeText("Preparing", sx * 11 + 80, sy*4 + i*18)
   end
@@ -90,7 +90,7 @@ function addPlayersList(menu, numplayers)
     local ready_players = 0
     players_state[1]:setCaption("Creator")
     players_name[1]:setCaption(Hosts[0].PlyName)
-    for i=2,8 do
+    for i=2,7 do
       if Hosts[i-1].PlyName == "" then
         players_name[i]:setCaption("")
         players_state[i]:setCaption("")

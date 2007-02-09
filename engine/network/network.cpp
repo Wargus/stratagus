@@ -10,7 +10,7 @@
 //
 /**@name network.cpp - The network. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 2000-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -746,7 +746,7 @@ static void NetworkRemovePlayer(int player)
 */
 void NetworkEvent(void)
 {
-	char buf[1024];
+	unsigned char buf[1024];
 	NetworkPacket *packet;
 	int player;
 	int i;
@@ -771,7 +771,6 @@ void NetworkEvent(void)
 		return;
 	}
 
-	packet = (NetworkPacket *)buf;
 #ifdef DEBUG
 	++NetworkReceivedPackets;
 #endif
@@ -784,6 +783,8 @@ void NetworkEvent(void)
 			return;
 		}
 	}
+
+	packet = (NetworkPacket *)buf;
 
 	//
 	// Minimal checks for good/correct packet.
