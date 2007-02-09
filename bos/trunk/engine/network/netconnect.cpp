@@ -757,7 +757,7 @@ breakout:
 				continue;
 			}
 
-			if (n != CInitMessage::Size()) {
+			if (n != (int)CInitMessage::Size()) {
 				DebugPrint("Unexpected message size\n");
 				continue;
 			}
@@ -1107,7 +1107,7 @@ void NetworkProcessServerRequest(void)
 					n = NetworkSendICMessage(Hosts[i].Host, Hosts[i].Port, &message);
 					DebugPrint("Sending InitReply Message AreYouThere: (%d) to %d.%d.%d.%d:%d (%ld:%ld)\n" _C_
 						n _C_ NIPQUAD(ntohl(Hosts[i].Host)) _C_ ntohs(Hosts[i].Port) _C_
-						FrameCounter _C_ ServerSetupState.LastFrame[i]);
+						FrameCounter _C_ (unsigned long)ServerSetupState.LastFrame[i]);
 				}
 			}
 		}
@@ -2057,7 +2057,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size)
 {
 	CInitMessage msg;
 
-	if (size != CInitMessage::Size()) {
+	if (size != (int)CInitMessage::Size()) {
 		// FIXME: could be a bad packet
 		if (NetConnectRunning == 2 && NetLocalState == ccs_started) {
 			// Client has acked ready to start and receives first real network packet.
