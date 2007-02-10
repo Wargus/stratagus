@@ -1,10 +1,30 @@
 <!--#set var="title" value="Bos"-->
 <!--#include file="header.shtml" -->
 
-      <h2>Downloads</h2>
+<h2>Downloads</h2>
 
-The engine and the game are evolving a lot. Therefore, <em><font color="red">the game will work only 
-with the version of the Stratagus engine matching the release !</font></em>
+<h3>Current Release</h3>
+
+<script type="text/javascript">
+<!--
+function switchMenu(obj)
+{
+	var el = document.getElementById(obj);
+	if ( el.style.display != 'none' ) {
+	el.style.display = 'none';
+	} else {
+		el.style.display = '';
+	}
+}
+//-->
+</script>
+
+<h3><a href="#" onclick="switchMenu('old')" title="Old Releases">Old Releases</a></h3>
+
+<div id="old" style="display: none;">
+Note that any Bos Wars version after 2.0.1 has its own modified version of
+the engine, and therefore does NOT require stratagus.
+
 
 <h3>Release 2.0.1 (2006/12/17)</h3>
 This version of Invasion - Battle of Survival works with version 2.2.1 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
@@ -39,7 +59,7 @@ The packages include a pre-compiled binary of the stratagus engine.
 <ul>
 <li>Linux: <a href="files/bos_1_1.tar.gz">bos_1_1.tar.gz</a></li>
 <li>Debian Linux: <a href="http://packages.debian.org/unstable/games/bos">bos</a> 
-      package in debian unstable by David Martï¿½ez Moreno.
+      package in debian unstable by David Martïnez Moreno.
 <li>Windows: <a href="files/BattleOfSurvival-1.1.exe">BattleOfSurvival-1.1.exe</a></li>
 </ul>
 
@@ -58,7 +78,7 @@ The first version of <a
  href="http://sourceforge.net/project/showfiles.php?group_id=84903">release
 2.0 of the Stratagus engine</a>. The release includes only the data files, you'll need 
 to download the stratagus engine too.
-</p>
-
+<p/>
+</div>
 
 <!--#include file="footer.shtml" -->

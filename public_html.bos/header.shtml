@@ -1,26 +1,38 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <title>Invasion - Battle of Survival</title>
-  <link rel="shortcut icon" href="favicon.ico">
-</head>
-<body style="background-color: rgb(240, 240, 240);">
-<table border="1" align="center" cellpadding="6"
- cellspacing="0">
-  <tbody>
-    <tr>
-      <td>
-      <center><img src="images/logo.png" width="534" height="189"> </center>
-      <br>
+	<title>Bos Wars</title>
+	<link rel="shortcut icon" href="favicon.ico">
+	<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
 
-<p>
-<center>
-<div align=center style="width: 90%; font-size: 18px; font-family: arial, sans-serif; border-color: black; border-style: solid; border-width: 1px;">
-<a href="index.shtml">Home</a> | 
-<a href="download.shtml">Download</a> | 
-<a href="screenshots.shtml">Screenshots</a> | 
-<a href="development.shtml">Development</a>
-</div>
+	<style type="text/css">
+	body {
+		font-family: verdana, arial, helvetica, sans-serif;
+	}
+	a.topbar {
+		text-align: center;
+		padding: 1px;
+		width: 1px;
+	}
+	table.maintable {
+		font-size: 14px;
+	}
+	h2 {
+		font-size: 22px;
+	}
+	</style>
+</head>
+
+<body style="background-color: rgb(240, 240, 240);">
+<table class=maintable border="1" align="center" cellpadding="6" cellspacing="0" width="99%"><tr><td>
+
+<center><img src="images/logo.png" width="544" height="157" alt="Bos Wars Logo"><p/></center>
+
+<center style="font-size: 20px;">
+	<a class=topbar href="index.shtml">Home</a> |  
+	<a class=topbar href="download.shtml">Download</a> | 
+	<a class=topbar href="screenshots.shtml">Screenshots</a> | 
+	<a class=topbar href="development.shtml">Development</a>
 </center>
-</p>
+<p/>
 

@@ -1,12 +1,11 @@
 
-      <br>
-      <br>
-      <p>&copy;2004-2007 <a href="team.shtml">Invasion Team</a> |
- <a href="http://savannah.nongnu.org/projects/stratagus-bos/">Project Page</a> |
- <a href="http://www.stratagus.org/">Stratagus</a> </p>
-      </td>
-    </tr>
-  </tbody>
+
+<p>&copy;2004-2007 <a href="team.shtml">Bos Wars Team</a> |
+<a href="http://savannah.nongnu.org/projects/stratagus-bos/">Project Page</a> |
+<a href="http://www.stratagus.org/">Stratagus</a></p>
+
+</td>
+</tr>
 </table>
 <!-- $Id: footer.shtml,v 1.1 2004/07/27 19:08:53 feb Exp $ -->
 </body>

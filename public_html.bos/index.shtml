@@ -2,27 +2,28 @@
 <!--#set var="title" value="Bos"-->
 <!--#include file="header.shtml" -->
 
-      <h2>About</h2>
-      <p>Invasion - Battle of Survival is a real-time strategy game
-using the <a href="http://www.stratagus.org/">Stratagus</a> game
-engine. 
-      </p>
+<h2>About</h2>
+<p>Bos Wars is a real-time strategy game that uses a modified version of the
+<a href="http://www.stratagus.org/">Stratagus</a> game engine.</p>
 
-<p>
-Invasion - Battle of Survival is copyrighted in 2004-2007 by 
-Tina Petersen Jensen, Francois Beerten et al. See COPYRIGHT.txt in 
-the package for the full copyright notice.
-</p>
+<p>Bos Wars is copyrighted in 2004-2007 by Tina Petersen Jensen, François 
+Beerten et al. See COPYRIGHT.txt in the package for the full
+copyright notice.</p>
 
-      <h2>News</h2>
-      <h3>Merge of the Stratagus engine into the BOS project.</h3>
-<p>To speed up the development, the Stratagus engine gets merged 
-into the BOS project. Due to the merge, the subversion URL changed. 
+<h2>News</h2>
+
+<h3>Feb 9, 2007 - Project renamed to Bos Wars.</h3>
+<p>Invasion - Battle of Survival has been renamed to Bos Wars due
+to popular demand.</p>
+
+<h3>Merge of the Stratagus engine into the BOS project.</h3>
+<p>To speed up development, the Stratagus engine has been merged 
+into the BOS project. Due to the merge, the subversion URL has changed.
 You can find all details in the <a href="http://bos.seul.org/development.shtml">
 development</a> page.
 </p>
 
-      <h3>Invasion - Battle of Survival 2.0.1 has been released !</h3>
+<h3>Invasion - Battle of Survival 2.0.1 has been released !</h3>
 <p>Get it from the <a href="http://bos.seul.org/download.shtml">download section</a>.
 </p>
 <p>
@@ -31,9 +32,9 @@ image-based map system, new units, new set elements, internationalisation, ...
 Version 2.0.1 fixes a few bugs.
 </p>
 
-      <h2>Project<br>
-      </h2>
-      The project is kindly hosted by <a href="http://www.seul.org">Seul</a> and Savannah. 
+<h2>Project<br>
+</h2>
+The project is kindly hosted by <a href="http://www.seul.org">Seul</a> and Savannah. 
 Please report bugs in the <a href="http://savannah.nongnu.org/bugs/?group=stratagus-bos">Bug
 Tracker</a>. You can also talk with the Bos and Stratagus team on irc in the 
 <a href="irc://sterling.freenode.net/bos">#bos</a> and 
