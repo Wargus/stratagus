@@ -15,7 +15,7 @@ find scripts -name "*.lua.new" -exec rm "{}" \;
 # using xgettext
 touch bos.pot
 find scripts \( -name .svn -prune \) -o -type d -exec bash -c 'xgettext -j -F -o bos.pot -L Python --from-code=UTF-8 --copyright-holder="BOS" -k_ {}/*.lua' \;
-sed -e 's/SOME DESCRIPTIVE TITLE/BOS Battle of Survival translation template/g' \
+sed -e 's/SOME DESCRIPTIVE TITLE/BOS Bos Wars translation template/g' \
     -e 's/Copyright (C) YEAR BOS/Copyright (C) YEAR BOS, but note that this file was automatically generated/g' \
     -e "s/YEAR/`date|awk '{print $6}'`/g" \
     -e 's/same license as the PACKAGE package/GPL, see the README/g' \

@@ -13,7 +13,7 @@ compose     : Bash script to compose the many output images into two
 
 The model and the script are distributed unter the GPL (look below).
 
-It is a model used for creating a unit of the game 'Battle of Survival'.
+It is a model used for creating a unit of the game 'Bos Wars'.
 http://bos.seul.org/
 It is not needed for playing, it was/is just used for development purposes.
 
