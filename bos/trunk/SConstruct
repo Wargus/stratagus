@@ -201,7 +201,7 @@ if env['profile']:
     env.Append(LINKFLAGS = Split('-pg'))
 
 # Targets
-Default(env.Program('stratagus', sourcesEngine))
+Default(env.Program('boswars', sourcesEngine))
 
 
 
