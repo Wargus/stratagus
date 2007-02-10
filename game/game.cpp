@@ -138,7 +138,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	}
 
 	if (LcmPreventRecurse) {
-		fprintf(stderr, "recursive use of load Stratagus map!\n");
+		fprintf(stderr, "recursive use of load map!\n");
 		ExitFatal(-1);
 	}
 	InitPlayers();
@@ -152,12 +152,12 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 #if 0
 	// Not true if multiplayer levels!
 	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapname.c_str());
+		fprintf(stderr, "%s: invalid map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
 #endif
 	if (!Map.Info.MapWidth || !Map.Info.MapHeight) {
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapname.c_str());
+		fprintf(stderr, "%s: invalid map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
 	Map.Info.Filename = mapname;
