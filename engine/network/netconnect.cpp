@@ -102,7 +102,7 @@ CServerSetup ServerSetupState;
 CServerSetup LocalSetupState;
 
 
-unsigned char *CNetworkHost::Serialize()
+unsigned char *CNetworkHost::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
 	unsigned char *p = buf;
@@ -129,7 +129,7 @@ void CNetworkHost::Deserialize(const unsigned char *p)
 	memcpy(this->PlyName, p, sizeof(this->PlyName));
 }
 
-unsigned char *CServerSetup::Serialize()
+unsigned char *CServerSetup::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CServerSetup::Size()];
 	unsigned char *p = buf;
@@ -181,7 +181,7 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	}
 }
 
-unsigned char *CInitMessage::Serialize()
+unsigned char *CInitMessage::Serialize() const
 {
 	unsigned char *buf = new unsigned char[CInitMessage::Size()];
 	unsigned char *p = buf;
