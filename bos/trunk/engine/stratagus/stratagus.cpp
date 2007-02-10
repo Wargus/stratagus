@@ -45,12 +45,12 @@
 **
 ** @section Informations Informations
 **
-** Visit the http://stratagus.org web page for the latest news and
+** Visit the http://www.boswars.org web page for the latest news and
 ** ../doc/readme.html for other documentations.
 **
 ** @section Modules Modules
 **
-** This are the main modules of the Stratagus engine.
+** This are the main modules of the engine.
 **
 ** @subsection Map Map
 **
@@ -230,7 +230,7 @@ char LocalPlayerName[16];            /// Name of local player
 
 	/// Name, Version, Copyright
 char NameLine[] =
-	"Stratagus V" VERSION ", (c) 1998-2006 by The Stratagus Project.";
+	"Bos Wars V" VERSION ", (c) 1998-2007 by the Bos Wars and Stratagus Project.";
 
 static char *MapName;                /// Filename of the map to load
 std::string CompileOptions;          /// Compile options.
@@ -672,7 +672,7 @@ static void PrintHeader(void)
 {
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, and others.\n"
-		"\t(http://stratagus.org)"
+		"\t(http://www.boswars.org)"
 		"\nCompile options %s", NameLine, CompileOptions.c_str());
 }
 
@@ -774,7 +774,7 @@ static void Usage(void)
 {
 	PrintHeader();
 	printf(
-"\n\nUsage: stratagus [OPTIONS] [map.smp|map.smp.gz]\n\
+"\n\nUsage: boswars [OPTIONS]\n\
 \t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
 \t-d datapath\tpath to stratagus data\n\
 \t-e\t\tStart editor\n\
