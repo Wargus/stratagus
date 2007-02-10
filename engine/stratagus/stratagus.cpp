@@ -688,8 +688,8 @@ static int main1(int argc, char **argv)
 	printf(
 	"\n"
 	"\n"
-	"Stratagus may be copied only under the terms of the GNU General Public License\n"
-	"which may be found in the Stratagus source kit.\n"
+	"Bos Wars may be copied only under the terms of the GNU General Public License\n"
+	"which may be found in the Bos Wars source kit.\n"
 	"\n"
 	"DISCLAIMER:\n"
 	"This software is provided as-is.  The author(s) can not be held liable for any\n"
@@ -752,7 +752,7 @@ void Exit(int err)
 	lua_close(Lua);
 #endif
 
-	fprintf(stdout, _("Thanks for playing Stratagus.\n"));
+	fprintf(stdout, _("Thanks for playing Bos Wars.\n"));
 	exit(err);
 }
 
