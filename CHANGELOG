@@ -23,8 +23,9 @@ Development Version:
 - Fix map lake.smp (Francois Beerten)
 - Fix extra OK button in sound options menu (Francois Beerten)
 
-The Stratagus engine got merged into Bos Wars. The file doc/ChangeLog.html 
-contains the list of changes made in Stratagus before the merge.
+The Stratagus engine got merged into Bos Wars. 
+The file doc/stratagus-changeLog.html contains the list of changes 
+made in Stratagus before the merge.
 
 Change log for Invasion: Battle of Survival
 -------------------------------------------

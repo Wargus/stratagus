@@ -5,7 +5,6 @@ About
 -----
 Bos Wars is a futuristic real-time strategy game. 
 
-
 Copyright and Licence
 ---------------------
 This work, Bos Wars, is copyrighted in 2004-2007 by
@@ -13,21 +12,10 @@ Tina Petersen Jensen, Francois Beerten et al.
 
 Read the file COPYRIGHT.txt for the detailed copyright notice.
 
-
-How to install
+Documentation
 -------------
-
-Unpack the game data in a games directory:
-> tar -xzvf boswars.tgz
-
-
-
-
-How to start the game
----------------------
-Execute the folowing command in the stratagus directory:
-> ./stratagus -d path-to-games-directory/data.bos
-
+The documentation can be read with any web browser by pointing it
+the doc/index.html file.
 
 How to contact us
 -----------------
