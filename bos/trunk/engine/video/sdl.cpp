@@ -303,7 +303,7 @@ void InitVideoSdl(void)
 		signal(SIGABRT, CleanExit);
 #endif
 		// Set WindowManager Title
-		SDL_WM_SetCaption("Stratagus", "Stratagus");
+		SDL_WM_SetCaption("Bos Wars", "Bos Wars");
 	}
 
 	// Initialize the display
