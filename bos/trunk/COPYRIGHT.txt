@@ -265,4 +265,10 @@ removed from this list. The exception does not apply if a file from this
 list is replaced or changed. In that case, the file has to be removed from 
 the list and sources provided.
 
+The Bos Wars engine is based on the Stratagus engine. The engine is 
+distributed under the GNU General Public License version 2.
+
+The engine uses the SDL library, see doc/README-SDL.txt for the SDL copyright.
+The engine also includes Guichan: doc/guichan-copyright.txt.
+
 This text forms the copyright notice and may not be altered.
