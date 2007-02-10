@@ -1286,7 +1286,7 @@ void CInfoPanel::Draw(void)
 		x = UI.InfoPanel.X + 16;
 		y = UI.InfoPanel.Y + 8;
 
-		VideoDrawText(x, y, GameFont, "Stratagus");
+		VideoDrawText(x, y, GameFont, "Bos Wars");
 		y += 16;
 		VideoDrawText(x, y, GameFont, "Cycle:");
 		VideoDrawNumber(x + 48, y, GameFont, GameCycle);
