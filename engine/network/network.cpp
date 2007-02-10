@@ -396,11 +396,11 @@ unsigned char *CNetworkPacket::Serialize(int numcommands) const
 	return buf;
 }
 
-int CNetworkPacket::Deserialize(unsigned char *p, int len)
+int CNetworkPacket::Deserialize(unsigned char *p, unsigned int len)
 {
 	// check min and max size
-	if (len < (int)CNetworkPacket::Size(1) ||
-			len > (int)CNetworkPacket::Size(MaxNetworkCommands)) {
+	if (len < CNetworkPacket::Size(1) ||
+			len > CNetworkPacket::Size(MaxNetworkCommands)) {
 		return -1;
 	}
 

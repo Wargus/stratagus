@@ -220,7 +220,7 @@ public:
 class CNetworkPacket {
 public:
 	unsigned char *Serialize(int numcommands) const;
-	int Deserialize(unsigned char *p, int len);
+	int Deserialize(unsigned char *p, unsigned int len);
 	static size_t Size(int numcommands) {
 		return CNetworkPacketHeader::Size() + numcommands * CNetworkCommand::Size();
 	}
