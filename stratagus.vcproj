@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="stratagus"
+	Name="boswars"
 	ProjectGUID="{2EEA7F48-45B3-4771-AA26-E2D4628E77AF}"
 	RootNamespace="stratagus"
 	>
@@ -76,7 +76,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib user32.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib theora_static.lib"
-				OutputFile=".\Debug/stratagus.exe"
+				OutputFile=".\Debug/boswars.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
@@ -175,7 +175,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib user32.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib theora_static.lib"
-				OutputFile=".\Release/stratagus.exe"
+				OutputFile=".\Release/boswars.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
