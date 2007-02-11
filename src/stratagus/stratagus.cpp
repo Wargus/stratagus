@@ -955,6 +955,7 @@ int main(int argc, char **argv)
 #ifdef USE_MNG
 		"MNG "
 #endif
+		""
 	;
 
 #ifdef USE_BEOS
