@@ -334,7 +334,7 @@ function RunEndGameMenu()
       _("~!Surrender"), "s", GameDefeat) end)
   menu:addButton(_("~!Quit to Menu"), "q", 16, 40 + (36 * 2),
     RunQuitToMenuConfirmMenu)
-  menu:addButton(_("E~!xit Program"), "x", 16, 40 + (36 * 3),
+  menu:addButton(_("E~!xit Bos Wars"), "x", 16, 40 + (36 * 3),
     RunExitConfirmMenu)
   menu:addButton(_("Previous (~<Esc~>)"), "escape", 16, 248,
     function() menu:stop() end)
@@ -359,7 +359,7 @@ function RunExitConfirmMenu()
   local height = 11
 
   height = height + menu:addMultiLineLabel(
-    _("Are you sure you want to exit Stratagus?"), 128, 11):getHeight()
+    _("Are you sure you want to exit Bos Wars?"), 128, 11):getHeight()
   menu:addButton(_("E~!xit Program"), "x", 16, height + 29,
     function() Exit(0) end)
   menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
@@ -374,7 +374,7 @@ function RunHelpMenu()
   menu:addLabel(_("Help Menu"), 128, 11)
   menu:addButton(_("Keystroke ~!Help"), "h", 16, 40 + (36 * 0),
     function() RunKeystrokeHelpMenu() end)
-  menu:addButton(_("Stratagus ~!Tips"), "t", 16, 40 + (36 * 1),
+  menu:addButton(_("Bos Wars ~!Tips"), "t", 16, 40 + (36 * 1),
     function() RunTipsMenu() end)
   menu:addButton(_("Previous (~<Esc~>)"), "escape", 128 - (224 / 2), 248,
     function() menu:stop() end)
@@ -487,7 +487,7 @@ function RunTipsMenu()
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
     (Video.Height - menu:getHeight()) / 2)
 
-  menu:addLabel(_("Stratagus Tips"), 192, 11)
+  menu:addLabel(_("Bos Wars Tips"), 192, 11)
 
   local l = MultiLineLabel()
   l:setFont(Fonts["game"])
