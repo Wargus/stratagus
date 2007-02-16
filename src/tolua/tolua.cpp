@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.7 on Fri Jan  5 20:09:47 2007.
+** Generated automatically by tolua++-1.0.7 on Thu Feb 15 22:51:25 2007.
 */
 
 #ifndef __cplusplus
@@ -16074,6 +16074,34 @@ static int tolua_stratagus_SaveGame00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: DeleteSaveGame */
+#ifndef TOLUA_DISABLE_tolua_stratagus_DeleteSaveGame00
+static int tolua_stratagus_DeleteSaveGame00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string filename = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+ {
+  DeleteSaveGame(filename);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DeleteSaveGame'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Translate */
 #ifndef TOLUA_DISABLE_tolua_stratagus__00
 static int tolua_stratagus__00(lua_State* tolua_S)
@@ -17169,6 +17197,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_variable(tolua_S,"StratagusTranslation",tolua_get_StratagusTranslation,tolua_set_StratagusTranslation);
  tolua_variable(tolua_S,"GameTranslation",tolua_get_GameTranslation,tolua_set_GameTranslation);
  tolua_function(tolua_S,"SaveGame",tolua_stratagus_SaveGame00);
+ tolua_function(tolua_S,"DeleteSaveGame",tolua_stratagus_DeleteSaveGame00);
  tolua_function(tolua_S,"_",tolua_stratagus__00);
  tolua_function(tolua_S,"Exit",tolua_stratagus_Exit00);
  tolua_endmodule(tolua_S);

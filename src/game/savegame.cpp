@@ -322,4 +322,22 @@ void SaveGame(const std::string &filename)
 	file.close();
 }
 
+/**
+**  Delete save game
+**
+**  @param filename  Name of file to delete
+*/
+void DeleteSaveGame(const std::string &filename)
+{
+	// Security check
+	if (filename.find_first_of("/\\") != std::string::npos) {
+		return;
+	}
+
+	std::string fullpath = GetSaveDir() + filename;
+	if (unlink(fullpath.c_str()) == -1) {
+		fprintf(stderr, "delete failed for %s", fullpath.c_str());
+	}
+}
+
 //@}
