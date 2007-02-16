@@ -10,7 +10,7 @@
 //
 /**@name cursor.cpp - The cursors. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Nehal Mistry,
+//      (c) Copyright 1998-2007 by Lutz Sammer, Nehal Mistry,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -174,14 +174,14 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 	}
 
 	if (x > x1) {
+		w = x - x1 + 1;
 		x = x1;
-		w = CursorStartX - x + 1;
 	} else {
 		w = x1 - x + 1;
 	}
 	if (y > y1) {
+		h = y - y1 + 1;
 		y = y1;
-		h = CursorStartY - y + 1;
 	} else {
 		h = y1 - y + 1;
 	}
@@ -286,7 +286,10 @@ void DrawCursor(void)
 	// Selecting rectangle
 	if (CursorState == CursorStateRectangle &&
 			(CursorStartX != CursorX || CursorStartY != CursorY)) {
-		DrawVisibleRectangleCursor(CursorStartX, CursorStartY, CursorX, CursorY);
+		DrawVisibleRectangleCursor(
+			CursorStartScrMapX + UI.MouseViewport->X - TileSizeX * UI.MouseViewport->MapX - UI.MouseViewport->OffsetX,
+			CursorStartScrMapY + UI.MouseViewport->Y - TileSizeY * UI.MouseViewport->MapY - UI.MouseViewport->OffsetY,
+			CursorX, CursorY);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
 		// Selecting position for building
 		DrawBuildingCursor();
