@@ -9,7 +9,7 @@
 --
 --	stratagus.lua	-	The craft configuration language.
 --
---	(c) Copyright 1998-2006 by Crestez Leonard and Francois Beerten
+--	(c) Copyright 1998-2007 by Crestez Leonard and Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -37,8 +37,7 @@ print("Bos Wars default config file loading ...\n")
 --	Enter your default title screen.
 
 SetTitleScreens(
-      {Image="video/stratagus_intro.ogg"},
-      {Image="video/bos_intro.ogg"}
+      {Image="video/boswars_intro.ogg"}
 )
 
 --	Set the game name
