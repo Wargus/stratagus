@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development Version:
+- Added autopackage configuration files (Francois Beerten)
 - Fixed network incompatibility between different architectures (Jimmy Salmon)
 - Renamed the project into Bos Wars (Francois Beerten)
 - Initialize the replay log when loading a saved game (Jimmy Salmon)
