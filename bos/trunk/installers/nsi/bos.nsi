@@ -27,7 +27,7 @@ Var STARTMENU_FOLDER
 !insertmacro MUI_PAGE_INSTFILES
 
 ;!define MUI_FINISHPAGE_TEXT ""
-!define MUI_FINISHPAGE_RUN "$INSTDIR\stratagus.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\boswars.exe"
 ;!define MUI_FINISHPAGE_RUN_TEXT ""
 !insertmacro MUI_PAGE_FINISH
 
@@ -40,11 +40,11 @@ Var STARTMENU_FOLDER
 Section "${NAME}" SecDummy
   SectionIn RO
   SetOutPath "$INSTDIR"
-  File /r "bos\*.*"
+  File /r "boswars\*.*"
   WriteRegStr HKCU "Software\${NAME}" "" $INSTDIR
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\${NAME}.lnk" "$INSTDIR\stratagus.exe"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\${NAME}.lnk" "$INSTDIR\boswars.exe"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\uninstall.exe"
   !insertmacro MUI_STARTMENU_WRITE_END
   WriteUninstaller "$INSTDIR\Uninstall.exe"
