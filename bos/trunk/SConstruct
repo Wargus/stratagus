@@ -50,7 +50,7 @@ def DefineOptions(filename, args):
 
 
 opts = DefineOptions("build_options.py", ARGUMENTS)
-env = Environment() # for an unknown reason Environment(options=opts) doesnt work well
+env = Environment(ENV = {'PATH':os.environ['PATH']}) # for an unknown reason Environment(options=opts) doesnt work well
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
 optionsChanged = True
