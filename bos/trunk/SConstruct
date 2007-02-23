@@ -45,6 +45,7 @@ def DefineOptions(filename, args):
    opts.Add('debug', 'Build with debugging options', 0)
    opts.Add('opengl', 'Build with opengl support', 0)
    opts.Add('profile', 'Build with profiling support', 0)
+   opts.Add('static', 'Link stdc++, lua, ogg, theora and vorbis statically', 0)
    return opts
 
 
@@ -206,6 +207,19 @@ else:
 if env['profile']:
     env.Append(CCFLAGS = Split('-pg'))
     env.Append(LINKFLAGS = Split('-pg'))
+
+if env['static']:
+    statics = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 ogg vorbis theora'
+    statics = statics.split(' ')
+    if os.access('libstdc++.a', os.F_OK) == 0:
+       l = os.popen(env['CXX'] + ' -print-file-name=libstdc++.a').readlines()
+       os.symlink(l[0][:-1], os.path.join(os.curdir, 'libstdc++.a'))
+    LINKFLAGS = '-L. -Wl,-Bstatic -lstdc++ '
+    for i in statics:
+       if i in env['LIBS']:
+          LINKFLAGS += '-l%s ' % i
+    LINKFLAGS += '-Wl,-Bdynamic'
+    env['LINKFLAGS'].append(LINKFLAGS.split())
 
 # Targets
 Default(env.Program('boswars', sourcesEngine))
