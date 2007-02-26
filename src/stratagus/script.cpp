@@ -169,6 +169,26 @@ static int report(int status)
 	return status;
 }
 
+static int luatraceback(lua_State *L) 
+{
+	lua_pushliteral(L, "debug");
+	lua_gettable(L, LUA_GLOBALSINDEX);
+	if (!lua_istable(L, -1)) {
+		lua_pop(L, 1);
+		return 1;
+	}
+	lua_pushliteral(L, "traceback");
+	lua_gettable(L, -2);
+	if (!lua_isfunction(L, -1)) {
+		lua_pop(L, 2);
+		return 1;
+	}
+	lua_pushvalue(L, 1);  // pass error message
+	lua_pushnumber(L, 2);  // skip this function and traceback
+	lua_call(L, 2, 1);  // call debug.traceback
+	return 1;
+}
+
 /**
 **  Call a lua function
 **
@@ -182,14 +202,13 @@ int LuaCall(int narg, int clear)
 	int status;
 	int base;
 
-	base = lua_gettop(Lua) - narg;      // function index
-	lua_pushliteral(Lua, "_TRACEBACK");
-	lua_rawget(Lua, LUA_GLOBALSINDEX);  // get traceback function
-	lua_insert(Lua, base);              // put it under chunk and args
+	base = lua_gettop(Lua) - narg;  // function index
+	lua_pushcfunction(Lua, luatraceback);  // push traceback function
+	lua_insert(Lua, base);  // put it under chunk and args
 	signal(SIGINT, laction);
 	status = lua_pcall(Lua, narg, (clear ? 0 : LUA_MULTRET), base);
 	signal(SIGINT, SIG_DFL);
-	lua_remove(Lua, base);              // remove traceback function
+	lua_remove(Lua, base);  // remove traceback function
 
 	return report(status);
 }
@@ -1838,6 +1857,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	std::vector<FileList> flp;
 	int n;
 	int i;
+	int j;
 	int pathtype;
 #ifndef WIN32
 	const char *s;
@@ -1877,11 +1897,12 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	lua_pop(l, 1);
 	lua_newtable(l);
 	n = ReadDataDirectory(directory, NULL, flp);
-	for (i = 0; i < n; i++) {
+	for (i = 0, j = 0; i < n; i++) {
 		if ((flp[i].type & mask) == type) {
-			lua_pushnumber(l, i + 1);
+			lua_pushnumber(l, j + 1);
 			lua_pushstring(l, flp[i].name);
 			lua_settable(l, 1);
+			++j;
 		}
 		delete[] flp[i].name;
 	}
@@ -2325,7 +2346,7 @@ static int CclGetCompileFeature(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	str = LuaToString(l, 1);
-	if (strstr(CompileOptions.c_str(), str)) {
+	if (CompileOptions.find(str) != std::string::npos) {
 		DebugPrint("I have %s\n" _C_ str);
 		lua_pushboolean(l, 1);
 	} else {
