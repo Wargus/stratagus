@@ -58,7 +58,6 @@ TOLUA_API void tolua_pushusertype (lua_State* L, void* value, const char* type)
   lua_pushstring(L,"tolua_ubox");
   lua_rawget(L,-2);        /* stack: mt ubox */
   if (lua_isnil(L, -1)) {
-
 	  lua_pop(L, 1);
 	  lua_pushstring(L, "tolua_ubox");
 	  lua_rawget(L, LUA_REGISTRYINDEX);
@@ -75,8 +74,13 @@ TOLUA_API void tolua_pushusertype (lua_State* L, void* value, const char* type)
    lua_rawset(L,-3);                      /* stack: mt newud ubox */
    lua_pop(L,1);                          /* stack: mt newud */
    /*luaL_getmetatable(L,type);*/
-   lua_pushvalue(L, -2);
-   lua_setmetatable(L,-2);
+   lua_pushvalue(L, -2);			/* stack: mt newud mt */
+   lua_setmetatable(L,-2);			/* stack: mt newud */
+
+   #ifdef LUA_VERSION_NUM
+   lua_pushvalue(L, TOLUA_NOPEER);
+   lua_setfenv(L, -2);
+   #endif
   }
   else
   {
