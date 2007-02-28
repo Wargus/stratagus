@@ -28,7 +28,7 @@ http://www.boswars.org
 # prepareBuild will set up apbuild and run configure for you. If you
 # need to pass arguments to configure, just add them to prepareBuild:
 # prepareBuild --enable-foo --disable-bar
-scons CXX=/home/feb/.local/bin/apg++
+scons CXX=apg++ static=1 debug=0
 echo $build_root
 mkdir $build_root/bin
 install -m 755 boswars $build_root/bin/boswars-engine
