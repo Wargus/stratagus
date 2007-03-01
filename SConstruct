@@ -100,7 +100,11 @@ def CheckLuaLib(env, conf):
     found = 1
   if not found and conf.CheckLibWithHeader('lua50', 'lua.h', 'c'):
     found =1
+  if not found and conf.CheckLibWithHeader('lua51', 'lua.h', 'c'):
+    found =1
   if not found and conf.CheckLibWithHeader('lua5.0', 'lua.h', 'c'):
+    found =1
+  if not found and conf.CheckLibWithHeader('lua5.1', 'lua.h', 'c'):
     found =1
   if not found:
     return 0
@@ -110,6 +114,10 @@ def CheckLuaLib(env, conf):
   if conf.CheckLibWithHeader('lualib50', 'lualib.h', 'c'):
      return 1
   if conf.CheckLibWithHeader('lualib5.0', 'lualib.h', 'c'):
+     return 1
+  if conf.CheckLibWithHeader('lualib51', 'lualib.h', 'c'):
+     return 1
+  if conf.CheckLibWithHeader('lualib5.1', 'lualib.h', 'c'):
      return 1
   return 0
 
