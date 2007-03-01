@@ -55,6 +55,9 @@ fi
 if test -d /usr/include/lua50; then
 	CPPFLAGS="$CPPFLAGS -I/usr/include/lua50"
 fi
+if test -d /usr/include/lua51; then
+	CPPFLAGS="$CPPFLAGS -I/usr/include/lua51"
+fi
 
 dnl --- EXTRA DIRS -------------
 AC_ARG_WITH(extra-includes, 
@@ -202,8 +205,8 @@ if test "$ARCH" = "linux"; then
 	LDFLAGS="$LDFLAGS -ldl"
 fi
 AC_CHECK_HEADER(lua.h,, AC_MSG_ERROR(could not find lua.h))
-AC_SEARCH_LIBS(lua_getfenv, lua lua50 lua5.0, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lua5 is required))
-AC_SEARCH_LIBS(luaopen_base, lualib lualib50 lualib5.0, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lualib5 is required))
+AC_SEARCH_LIBS(lua_getfenv, lua lua50 lua5.0 lua51 lua5.1, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lua5 is required))
+AC_SEARCH_LIBS(luaopen_base, lualib lualib50 lualib5.0 lualib51 lualib5.1, LDFLAGS="$LDFLAGS $LIBS", AC_MSG_ERROR(Lualib5 is required))
 
 dnl --- SDL --------------------
 AC_CHECK_PROGS(SDLCONFIG, sdl-config)
