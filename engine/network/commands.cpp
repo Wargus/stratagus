@@ -420,24 +420,8 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	if (!LogFile) {
 		char buf[PATH_MAX];
-		char logsdir[PATH_MAX];
 
-#ifdef USE_WIN32
-		strcpy_s(logsdir, sizeof(logsdir), GameName.c_str());
-		mkdir(logsdir);
-		strcat_s(logsdir, sizeof(logsdir), "/logs");
-		mkdir(logsdir);
-#else
-		sprintf(logsdir, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
-		mkdir(logsdir, 0777);
-		strcat_s(logsdir, sizeof(logsdir), "/");
-		strcat_s(logsdir, sizeof(logsdir), GameName.c_str());
-		mkdir(logsdir, 0777);
-		strcat_s(logsdir, sizeof(logsdir), "/logs");
-		mkdir(logsdir, 0777);
-#endif
-
-		sprintf(buf, "%s/log_of_stratagus_%d.log", logsdir, ThisPlayer->Index);
+		sprintf(buf, "%slogs/log_of_stratagus_%d.log", UserDirectory.c_str(), ThisPlayer->Index);
 		LogFile = new CFile;
 		if (LogFile->open(buf, CL_OPEN_WRITE) == -1) {
 			// don't retry for each command

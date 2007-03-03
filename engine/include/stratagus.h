@@ -71,7 +71,7 @@
 #define access _access
 #define write _write
 #include <direct.h>
-#define mkdir _mkdir
+#define mkdir(dir, parmissions) _mkdir(dir)
 
 #endif  // } _MSC_VER
 
@@ -201,7 +201,7 @@ extern char NameLine[];
 
 #define PlayerMax    8                  /// How many players are supported
 #define UnitTypeMax  257                /// How many unit types supported
-#define UpgradeMax   256                /// How many upgrades supported
+#define UpgradeMax   8                  /// How many upgrades supported
 #define UnitMax      2048               /// How many units supported
 
 /*----------------------------------------------------------------------------
@@ -263,7 +263,7 @@ public:
 };
 
 extern TitleScreen **TitleScreens;          /// File for title screen
-extern std::string GameName;                /// Name of the game
+extern std::string UserDirectory;           /// Directory containing user settings and data
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused
 extern std::string StratagusLibPath;        /// Location of stratagus data

@@ -40,9 +40,6 @@ SetTitleScreens(
       {Image="video/boswars_intro.ogg"}
 )
 
---	Set the game name
-SetGameName("boswars")
-
 -------------------------------------------------------------------------------
 --	Music play list -	Insert your titles here
 -------------------------------------------------------------------------------

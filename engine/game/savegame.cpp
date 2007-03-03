@@ -222,30 +222,13 @@ char *SaveGlobal(lua_State *l, bool is_root)
 }
 
 /**
-** Get the save directory and create dirs if needed
+** Get the save directory
 */
 static std::string GetSaveDir()
 {
 	std::string dir;
 
-#ifdef USE_WIN32
-	dir = GameName;
-	mkdir(dir.c_str());
-	dir += "/save";
-	mkdir(dir.c_str());
-	dir += "/";
-#else
-	dir = getenv("HOME");
-	dir += "/";
-	dir += STRATAGUS_HOME_PATH;
-	mkdir(dir.c_str(), 0777);
-	dir += "/";
-	dir += GameName;
-	mkdir(dir.c_str(), 0777);
-	dir += "/save";
-	mkdir(dir.c_str(), 0777);
-	dir += "/";
-#endif
+	dir = UserDirectory + "save/";
 
 	return dir;
 }
