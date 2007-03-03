@@ -220,6 +220,8 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "util.h"
 #include "guichan.h"
 
+extern void CreateUserDirectories(void);
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -514,21 +516,9 @@ void CleanGame(void)
 
 static void ExpandPath(char *newpath, const char *path)
 {
-#ifndef WIN32
-	char *s;
-#endif
-
 	if (*path == '~') {
 		++path;
-#ifndef WIN32
-		if ((s = getenv("HOME")) && !GameName.empty()) {
-			sprintf(newpath, "%s/%s/%s/%s",
-				s, STRATAGUS_HOME_PATH, GameName.c_str(), path);
-		} else
-#endif
-		{
-			sprintf(newpath, "%s/%s", GameName.c_str(), path);
-		}
+		sprintf(newpath, "%s%s", UserDirectory.c_str(), path);
 	} else {
 		sprintf(newpath, "%s/%s", StratagusLibPath.c_str(), path);
 	}
@@ -612,7 +602,7 @@ int SaveReplay(const std::string &filename)
 	FILE *fd;
 	char *buf;
 	std::stringstream logfile;
-	std::string str;
+	std::string destination;
 	struct stat sb;
 
 	if (filename.find_first_of("\\/") != std::string::npos) {
@@ -620,14 +610,9 @@ int SaveReplay(const std::string &filename)
 		return -1;
 	}
 
-#ifdef WIN32
-	logfile << GameName << "/logs/";
-#else
-	logfile << getenv("HOME") << "/" << STRATAGUS_HOME_PATH << "/" << GameName << "/logs/";
-#endif
-	str = logfile.str();
+	destination = UserDirectory + "logs/" + filename;
 
-	logfile << "log_of_stratagus_" << ThisPlayer->Index << ".log";
+	logfile << UserDirectory << "logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");
@@ -647,11 +632,9 @@ int SaveReplay(const std::string &filename)
 	fread(buf, sb.st_size, 1, fd);
 	fclose(fd);
 
-	str += filename;
-
-	fd = fopen(str.c_str(), "wb");
+	fd = fopen(destination.c_str(), "wb");
 	if (!fd) {
-		fprintf(stderr, "Can't save to `%s'\n", str.c_str());
+		fprintf(stderr, "Can't save to `%s'\n", destination.c_str());
 		delete[] buf;
 		return -1;
 	}
@@ -992,6 +975,8 @@ int main(int argc, char **argv)
 
 	// Init the random number generator.
 	InitSyncRand();
+
+	CreateUserDirectories();
 
 	// Init CCL and load configurations!
 	InitCcl();
