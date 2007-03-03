@@ -2482,13 +2482,11 @@ void CreateUserDirectories(void)
 	std::string s;
 	s = getenv("HOME");
 	if (!s.empty()) {
-		UserDirectory = s + "/" + STRATAGUS_HOME_PATH + "/";
-		mkdir(UserDirectory.c_str(), 0777);
-		 
+		UserDirectory = s + "/";
 	}
 	#endif
 	
-	UserDirectory += "boswars/";
+	UserDirectory += STRATAGUS_HOME_PATH;
 	mkdir(UserDirectory.c_str(), 0777);
 	
 	// Create specific subdirectories

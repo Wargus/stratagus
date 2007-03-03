@@ -185,11 +185,11 @@ extern char NameLine[];
 
 #ifndef STRATAGUS_HOME_PATH
 #ifdef __APPLE__
-#define STRATAGUS_HOME_PATH "Library/Stratagus"
+#define STRATAGUS_HOME_PATH "Library/boswars/"
+#elif USE_WIN32
+#define STRATAGUS_HOME_PATH "boswars/"
 #else
- #define _VERSION_STRING1(m,n,p) m "-" #n "." #p
- #define _VERSION_STRING(m,n,p) _VERSION_STRING1(m,n,p)
- #define STRATAGUS_HOME_PATH _VERSION_STRING(".stratagus",StratagusMajorVersion,StratagusMinorVersion)
+ #define STRATAGUS_HOME_PATH ".boswars/"
 #endif
 #endif
 
