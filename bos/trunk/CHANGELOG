@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development Version:
+- Fixed default trigger to correctly check for enemy units (Jimmy Salmon)
 - Added a script that generates all the distribution packages (Francois
 Beerten)
 - Added static building option (Francois Beerten)
