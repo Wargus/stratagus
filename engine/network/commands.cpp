@@ -9,7 +9,7 @@
 //
 /**@name commands.cpp - Global command handler - network support. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
+//      (c) Copyright 2000-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
