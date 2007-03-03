@@ -79,7 +79,7 @@
 lua_State *Lua;                       /// Structure to work with lua files.
 
 char *CclStartFile;                   /// CCL start file
-std::string GameName;                 /// Game Preferences
+std::string UserDirectory;
 int CclInConfigFile;                  /// True while config file parsing
 int SaveGameLoading;                  /// If a Saved Game is Loading
 std::string CurrentLuaFile;           /// Lua file currently being interpreted
@@ -1857,9 +1857,6 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	int i;
 	int j;
 	int pathtype;
-#ifndef WIN32
-	const char *s;
-#endif
 
 	LuaCheckArgs(l, 1);
 	userdir = lua_tostring(l, 1);
@@ -1880,15 +1877,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 
 	if (pathtype == 1) {
 		++userdir;
-#ifndef WIN32
-		if ((s = getenv("HOME")) && !GameName.empty()) {
-			sprintf(directory, "%s/%s/%s/%s",
-				s, STRATAGUS_HOME_PATH, GameName.c_str(), userdir);
-		} else
-#endif
-		{
-			sprintf(directory, "%s/%s", GameName.c_str(), userdir);
-		}
+		sprintf(directory, "%s/%s", UserDirectory.c_str(), userdir);
 	} else {
 		sprintf(directory, "%s/%s", StratagusLibPath.c_str(), userdir);
 	}
@@ -1943,26 +1932,6 @@ static int CclGameCycle(lua_State *l)
 {
 	lua_pushnumber(l, GameCycle);
 	return 1;
-}
-
-/**
-**  Return of game name.
-**
-**  @param l  Lua state.
-*/
-static int CclSetGameName(lua_State *l)
-{
-	int args;
-
-	args = lua_gettop(l);
-	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
-		LuaError(l, "incorrect argument");
-	}
-	if (args == 1 && !lua_isnil(l, 1)) {
-		GameName = lua_tostring(l, 1);
-	}
-
-	return 0;
 }
 
 /**
@@ -2440,7 +2409,6 @@ void InitCcl(void)
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
 	lua_register(Lua, "GameCycle", CclGameCycle);
-	lua_register(Lua, "SetGameName", CclSetGameName);
 	lua_register(Lua, "SetGameCycle", CclSetGameCycle);
 	lua_register(Lua, "SetGamePaused", CclSetGamePaused);
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
@@ -2501,30 +2469,49 @@ void InitCcl(void)
 }
 
 /**
+** Create directories containing user settings and data.
+**
+** More specifically: logs, saved games, preferences
+*/
+void CreateUserDirectories(void)
+{
+	std::string directory;
+	UserDirectory = "";
+
+	#ifndef USE_WIN32
+	std::string s;
+	s = getenv("HOME");
+	if (!s.empty()) {
+		UserDirectory = s + "/" + STRATAGUS_HOME_PATH + "/";
+		mkdir(UserDirectory.c_str(), 0777);
+		 
+	}
+	#endif
+	
+	UserDirectory += "boswars/";
+	mkdir(UserDirectory.c_str(), 0777);
+	
+	// Create specific subdirectories
+	directory = UserDirectory + "logs/";
+	mkdir(directory.c_str(), 0777);
+	directory = UserDirectory + "save/";
+	mkdir(directory.c_str(), 0777);
+}
+
+/**
 **  Save user preferences
 */
 void SavePreferences(void)
 {
 	FILE *fd;
-	char buf[PATH_MAX];
+	std::string path;
 
 	lua_pushstring(Lua, "preferences");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
-#ifdef USE_WIN32
-		strcpy_s(buf, sizeof(buf), GameName.c_str());
-		mkdir(buf);
-		strcat_s(buf, sizeof(buf), "/preferences.lua");
-#else
-		sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
-		mkdir(buf, 0777);
-		strcat_s(buf, sizeof(buf), "/");
-		strcat_s(buf, sizeof(buf), GameName.c_str());
-		mkdir(buf, 0777);
-		strcat_s(buf, sizeof(buf), "/preferences.lua");
-#endif
+		path = UserDirectory + "preferences.lua";
 
-		fd = fopen(buf, "w");
+		fd = fopen(path.c_str(), "w");
 		if (!fd) {
 			return;
 		}
