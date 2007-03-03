@@ -9,7 +9,7 @@
 //
 /**@name trigger.cpp - The trigger handling. */
 //
-//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -464,7 +464,8 @@ static int CclGetNumOpponents(lua_State *l)
 	n = 0;
 	for (i = 0; i < PlayerMax; ++i) {
 		// This player is our enemy and has units left.
-		if ((Players[i].Enemy & (1 << plynr)) && Players[i].TotalNumUnits) {
+		if (((Players[plynr].Enemy & (1 << i)) || (Players[i].Enemy & (1 << plynr))) &&
+				Players[i].TotalNumUnits) {
 			++n;
 		}
 	}
