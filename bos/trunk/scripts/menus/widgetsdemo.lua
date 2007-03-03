@@ -103,7 +103,7 @@ function RunWidgetsMenu(s)
   menu:add(sw, 20, 380)
   sw:setBackgroundColor(dark)
   sw:setActionCallback(function() sw:restart() end)
-  for i,f in iparis({"Jarod", "was", "here", " ", ":)"}) do
+  for i,f in ipairs({"Jarod", "was", "here", " ", ":)"}) do
     sw:add(Label(f), 0, 20 * i + 50)
   end
   
