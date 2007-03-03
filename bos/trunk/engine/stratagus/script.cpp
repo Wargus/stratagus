@@ -9,7 +9,7 @@
 //
 /**@name script.cpp - The configuration language. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
