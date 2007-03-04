@@ -129,9 +129,9 @@ distclean:	clean
 depend:
 	@echo -n >.depend
 	@echo
-	@for i in $(SRC) ; do\
-	echo -e "\rMaking dependencies for $$i";\
-	$(CXX) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.cpp/\.o/g'`\
+	@for i in $(SRC) ; do \
+	echo -e "\rMaking dependencies for $$i"; \
+	$(CXX) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.cpp/\.o/g'` \
 	-MM $(CPPFLAGS) $$i >>.depend; done
 	@echo
 
