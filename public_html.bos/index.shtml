@@ -3,18 +3,24 @@
 <!--#include file="header.shtml" -->
 
 <h2>About</h2>
-<p>Bos Wars is a real-time strategy game that uses a modified version of the
-<a href="http://www.stratagus.org/">Stratagus</a> game engine.</p>
+<p>Bos Wars is a futuristic real-time strategy game. 
+It uses a modified version of the 
+<a href="http://www.stratagus.org/">Stratagus</a> game engine.
+</p>
 
-<p>Bos Wars is copyrighted in 2004-2007 by Tina Petersen Jensen, François 
+<p>Bos Wars is copyrighted in 2004-2007 by Tina Petersen Jensen, Fran&ccedil;ois 
 Beerten et al. See COPYRIGHT.txt in the package for the full
 copyright notice.</p>
 
 <h2>News</h2>
 
-<h3>Feb 9, 2007 - Project renamed to Bos Wars.</h3>
-<p>Invasion - Battle of Survival has been renamed to Bos Wars due
-to popular demand.</p>
+<h3>First release of Bos Wars.</h3>
+<p><a href="download.shtml">Bos Wars 2.3</a> has been released. This is the 
+first version with the new name and that integrates the engine.
+</p>
+
+<h3>Project renamed to Bos Wars.</h3>
+<p>Invasion - Battle of Survival has been renamed to Bos Wars.</p>
 
 <h3>Merge of the Stratagus engine into the BOS project.</h3>
 <p>To speed up development, the Stratagus engine has been merged 
@@ -23,22 +29,12 @@ You can find all details in the <a href="http://bos.seul.org/development.shtml">
 development</a> page.
 </p>
 
-<h3>Invasion - Battle of Survival 2.0.1 has been released !</h3>
-<p>Get it from the <a href="http://bos.seul.org/download.shtml">download section</a>.
-</p>
-<p>
-Invasion - Battle of Survival 2.0 integrates new features like Guichan menus, improved UI, 
-image-based map system, new units, new set elements, internationalisation, ...
-Version 2.0.1 fixes a few bugs.
-</p>
-
 <h2>Project<br>
 </h2>
 The project is kindly hosted by <a href="http://www.seul.org">Seul</a> and Savannah. 
 Please report bugs in the <a href="http://savannah.nongnu.org/bugs/?group=stratagus-bos">Bug
-Tracker</a>. You can also talk with the Bos and Stratagus team on irc in the 
-<a href="irc://sterling.freenode.net/bos">#bos</a> and 
-<a href="irc://sterling.freenode.net/stratagus">#stratagus</a> channels
+Tracker</a>. You can also talk with the Bos Wars team on irc in the 
+<a href="irc://sterling.freenode.net/bos">#bos</a> channel
 hosted by <a href="http://www.freenode.net">freenode</a>.
 
 <!--#include file="footer.shtml" -->
