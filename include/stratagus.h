@@ -71,9 +71,17 @@
 #define access _access
 #define write _write
 #include <direct.h>
-#define mkdir(dir, parmissions) _mkdir(dir)
+#define makedir(dir, permissions) _mkdir(dir)
 
 #endif  // } _MSC_VER
+
+#ifdef __GNUC__
+#ifdef USE_WIN32
+#define makedir(dir, permissions) mkdir(dir)
+#else 
+#define makedir(dir, permissions) mkdir(dir, permissions)
+#endif
+#endif
 
 /*============================================================================
 ==  Debug definitions
