@@ -2487,13 +2487,13 @@ void CreateUserDirectories(void)
 	#endif
 	
 	UserDirectory += STRATAGUS_HOME_PATH;
-	mkdir(UserDirectory.c_str(), 0777);
+	makedir(UserDirectory.c_str(), 0777);
 	
 	// Create specific subdirectories
 	directory = UserDirectory + "logs/";
-	mkdir(directory.c_str(), 0777);
+	makedir(directory.c_str(), 0777);
 	directory = UserDirectory + "save/";
-	mkdir(directory.c_str(), 0777);
+	makedir(directory.c_str(), 0777);
 }
 
 /**
