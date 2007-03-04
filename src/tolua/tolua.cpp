@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 02/26/07 21:08:38.
+** Generated automatically by tolua++-1.0.92 on 03/04/07 09:26:25.
 */
 
 #ifndef __cplusplus
@@ -34,7 +34,7 @@ using std::vector;
 using namespace gcn;
 #include "network.h"
 int GetNetworkState() {return (int)NetLocalState;}
-extern char NetworkMapName[256];
+extern string NetworkMapName;
 void NetworkGamePrepareGameSettings(void);
 #include "editor.h"
 bool IsReplayGame();
@@ -11783,7 +11783,7 @@ static int tolua_set_stratagus_Hosts(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_NetworkMapName
 static int tolua_get_NetworkMapName(lua_State* tolua_S)
 {
-  tolua_pushstring(tolua_S,(const char*)NetworkMapName);
+  tolua_pushcppstring(tolua_S,(const char*)NetworkMapName);
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -11794,10 +11794,11 @@ static int tolua_set_NetworkMapName(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
   tolua_Error tolua_err;
-  if (!tolua_istable(tolua_S,2,0,&tolua_err))
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
- strncpy(NetworkMapName,tolua_tostring(tolua_S,2,0),256-1);
+  NetworkMapName = ((string)  tolua_tocppstring(tolua_S,2,0))
+;
  return 0;
 }
 #endif //#ifndef TOLUA_DISABLE

@@ -40,8 +40,8 @@ struct NetworkHost {
 };
 extern NetworkHost Hosts[PlayerMax];
 
-$extern char NetworkMapName[256];
-char NetworkMapName[256];
+$extern string NetworkMapName;
+string NetworkMapName;
 
 $void NetworkGamePrepareGameSettings(void);
 void NetworkGamePrepareGameSettings(void);

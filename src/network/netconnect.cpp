@@ -89,7 +89,7 @@ static int NetStateMsgCnt;              /// Number of consecutive msgs of same t
 static unsigned char LastStateMsgType;  /// Subtype of last InitConfig message sent
 static unsigned long NetLastPacketSent; /// Tick the last network packet was sent
 static unsigned long NetworkServerIP;   /// Network Client: IP of server to join
-char NetworkMapName[256];               /// Name of the map recieved with ICMMap
+std::string NetworkMapName;             /// Name of the map recieved with ICMMap
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
@@ -1102,7 +1102,7 @@ static void ClientParseConnected(const InitMessage *msg)
 				NetLocalState = ccs_badmap;
 				break;
 			}
-			strncpy_s(NetworkMapName, sizeof(NetworkMapName), msg->u.MapPath, _TRUNCATE);
+			NetworkMapName = msg->u.MapPath;
 			std::string mappath = StratagusLibPath + "/" + NetworkMapName;
 			LoadStratagusMapInfo(mappath);
 			if (ntohl(msg->MapUID) != Map.Info.MapUID) {
@@ -1478,7 +1478,8 @@ static void ServerParseWaiting(const int h)
 			// this code path happens until client acknowledges the map
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
-			strncpy_s(message.u.MapPath, sizeof(message.u.MapPath), NetworkMapName, sizeof(NetworkMapName));
+			memset(message.u.MapPath, 0, sizeof(message.u.MapPath));
+			strncpy_s(message.u.MapPath, sizeof(message.u.MapPath), NetworkMapName.c_str(), NetworkMapName.size());
 			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
