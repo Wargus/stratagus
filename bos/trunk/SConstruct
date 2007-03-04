@@ -153,12 +153,12 @@ def AutoConfigure(env):
      Exit(1)
 
   # Check for optional libraries #
-  if conf.CheckLib('ogg'):
-     env.Append(CPPDEFINES = 'USE_OGG')
   if conf.CheckLib('vorbis'):
      env.Append(CPPDEFINES = 'USE_VORBIS')
   if conf.CheckLib('theora'):
      env.Append(CPPDEFINES = 'USE_THEORA')
+  if conf.CheckLib('ogg'):
+     env.Append(CPPDEFINES = 'USE_OGG')
   if env['opengl'] == 1:
      CheckOpenGL(env, conf)
   
@@ -209,7 +209,7 @@ if env['profile']:
     env.Append(LINKFLAGS = Split('-pg'))
 
 if env['static']:
-    statics = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 ogg vorbis theora'
+    statics = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
     statics = statics.split(' ')
     if os.access('libstdc++.a', os.F_OK) == 0:
        l = os.popen(env['CXX'] + ' -print-file-name=libstdc++.a').readlines()
@@ -218,6 +218,7 @@ if env['static']:
     for i in statics:
        if i in env['LIBS']:
           LINKFLAGS += '-l%s ' % i
+          env['LIBS'].remove(i)
     LINKFLAGS += '-Wl,-Bdynamic'
     env['LINKFLAGS'].append(LINKFLAGS.split())
 
