@@ -1,0 +1,15 @@
+--     ____                _       __               
+--    / __ )____  _____   | |     / /___ ___________
+--   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+--  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
+-- /_____/\____/____/     |__/|__/\__,_/_/  /____/  
+--                                              
+--       A futuristic real-time strategy game.
+--          This file is part of Bos Wars.
+--
+-- Stratagus Map Presentation
+-- Copyright 2005-2006 by Francois Beerten
+
+PresentMap("Cold Antarticum", 4, 64, 64, 440283939)
+DefinePlayerTypes("person", "person", "person", "person")
+DefineMapSetup("maps/antarticum/setup.sms")
