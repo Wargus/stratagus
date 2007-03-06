@@ -32,9 +32,6 @@
 
 //@{
 
-/// @todo this only the start of the new user interface
-/// @todo all user interface variables should go here and be configurable
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
