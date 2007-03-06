@@ -8,7 +8,7 @@
 <ul>
 <li>Linux: <a href="releases/boswars-2.3-linux.tar.gz">boswars-2.3-linux.tar.gz</a></li>
 <li>Windows (installer): <a href="releases/BosWars-2.3.exe">BosWars-2.3.exe</a> </li>
-<li>Windows (zip): <a href="releases/boswars-2.3-win32.zip">boswars-2.3-win32.zip</a></li>
+<!--<li>Windows (zip): <a href="releases/boswars-2.3-win32.zip">boswars-2.3-win32.zip</a></li>-->
 <li>Source (tar): <a href="releases/boswars-2.3-src.tar.gz">boswars-2.3-src.tar.gz</a></li>
 <li>Source (zip): <a href="releases/boswars-2.3-src.zip">boswars-2.3-src.zip</a></li>
 </ul>
