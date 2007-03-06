@@ -87,12 +87,6 @@
 **    Size of a shadow sprite frame in pixels. All frames of a sprite
 **    have the same size. Also all sprites (tilesets) must have the
 **    same size.
-**
-**    @todo
-**      Need ::TilesetByName, ...
-**      Only fixed number of constructions supported, more than
-**      a single construction frame is not supported, animated
-**      constructions aren't supported.
 */
 
 /*----------------------------------------------------------------------------

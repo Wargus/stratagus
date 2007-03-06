@@ -183,7 +183,7 @@
 **
 **  Contains the binary angle (0-255) in which the direction the
 **  unit looks. 0, 32, 64, 128, 160, 192, 224, 256 corresponds to
-**  0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°, 360° or north,
+**  0, 45, 90, 135, 180, 225, 270, 315, 360 or north,
 **  north-east, east, south-east, south, south-west, west,
 **  north-west, north. Currently only 8 directions are used, this
 **  is more for the future.
@@ -213,8 +213,7 @@
 **
 **  CUnit::Destroyed
 **
-** @todo docu.
-**  If you need more informations, please send me an email or write it self.
+**  Unit is destroyed. pending reference.
 **
 **  CUnit::Removed
 **
@@ -267,7 +266,6 @@
 **
 **  This values hold the amount of resources in a resource or in
 **  in a harvester.
-**  @todo continue documentation
 **
 **  CUnit::SubAction
 **
@@ -288,7 +286,6 @@
 **
 **  CUnit::Reset
 **
-**  @todo continue documentation
 **
 **  CUnit::Blink
 **
@@ -344,9 +341,6 @@
 **  CUnit::Goal
 **
 **  Generic goal pointer. Used by teleporters to point to circle of power.
-**
-**
-** @todo continue documentation
 **
 */
 

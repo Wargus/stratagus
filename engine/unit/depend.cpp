@@ -383,41 +383,11 @@ static int CclDefineDependency(lua_State *l)
 }
 
 /**
-**  Get the dependency.
-**
-**  @todo not written.
-**
-**  @param l  Lua state.
-*/
-static int CclGetDependency(lua_State *l)
-{
-	DebugPrint("FIXME: write this %p\n" _C_ l);
-
-	return 0;
-}
-
-/**
-**  Check the dependency.
-**
-**  @todo not written.
-**
-**  @param l  Lua state.
-*/
-static int CclCheckDependency(lua_State *l)
-{
-	DebugPrint("FIXME: write this %p\n" _C_ l);
-
-	return 0;
-}
-
-/**
 **  Register CCL features for dependencies.
 */
 void DependenciesCclRegister(void)
 {
 	lua_register(Lua, "DefineDependency", CclDefineDependency);
-	lua_register(Lua, "GetDependency", CclGetDependency);
-	lua_register(Lua, "CheckDependency", CclCheckDependency);
 }
 
 //@}
