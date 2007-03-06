@@ -85,11 +85,6 @@
 ** background music support, voices and sound effects.
 ** Following low level backends are supported: OSS and SDL.
 **
-** @todo adpcm file format support for sound effects
-** @todo better separation of low and high level, assembler mixing
-** support.
-** @todo Streaming support of ogg/mp3 files.
-**
 ** @see sound.h @see sound.cpp
 ** @see script_sound.cpp @see sound_id.cpp @see sound_server.cpp
 ** @see unitsound.cpp

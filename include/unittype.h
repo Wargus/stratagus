@@ -122,9 +122,6 @@
 **    Corpse unit-type pointer, only this should be used during run
 **    time. Many unit-types can share the same corpse.
 **
-**
-**  @todo continue this documentation
-**
 **  CUnitType::Construction
 **
 **    What is shown in construction phase.
@@ -629,7 +626,6 @@ class CUnitType;
 **  Decoration for userdefined variable.
 **
 **    It is used to show variables graphicly.
-**  @todo add more stuff in this struct.
 */
 class CDecoVar {
 public:
@@ -807,7 +803,6 @@ public:
 };
 
 	/// Base structure of unit-type
-	/// @todo n0body: AutoBuildRate not implemented.
 class CUnitType {
 public:
 	CUnitType() : Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
