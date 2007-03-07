@@ -9,7 +9,7 @@
 --
 --      options.lua - The option menus
 --
---      (c) Copyright 2005-2006 by Francois Beerten
+--      (c) Copyright 2005-2007 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -256,6 +256,7 @@ function RunLanguageOptionsMenu(s)
   AddLanguage("Deutsch", "de", 4.5)
   AddLanguage("Polski", "pl", 5.5)
   AddLanguage("Dansk", "da", 6.5)
+  AddLanguage("Türkçe", "tr", 7.5)
 
   menu:addButton(_("~!OK"), "o", Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
