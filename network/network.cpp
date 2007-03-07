@@ -1063,7 +1063,7 @@ void NetworkEvent(void)
 			NetworkIn[packet.Header.Cycle][player][i].Data = *nc;
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
-			DebugPrint("%s sent bad command: 0x%x" _C_ 
+			DebugPrint("%s sent bad command: 0x%x\n" _C_ 
 				Players[player].Name.c_str() _C_ 
 				packet.Header.Type[i] & 0x7F);
 		}
