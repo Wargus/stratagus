@@ -1,0 +1,320 @@
+# translation of engine.po to
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Murat Şenel <muratasenel@gmail.com>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: engine\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-12-12 21:22-0800\n"
+"PO-Revision-Date: 2007-03-07 00:55+0200\n"
+"Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
+"Language-Team:  <tr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: src/action/action_build.cpp:119
+msgid "You cannot reach building place"
+msgstr "İnşa yerine ulaşamazsınız"
+
+#: src/action/action_build.cpp:177
+#, c-format
+msgid "You cannot build %s here"
+msgstr "%s burada inşa edilemez"
+
+#: src/action/action_build.cpp:197
+#, c-format
+msgid "Not enough resources to build %s"
+msgstr "%s inşa etmek için gerekli kaynaklar yok"
+
+#: src/action/action_build.cpp:215
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Daha fazla %s birimi inşa edilemiyor"
+
+#: src/action/action_build.cpp:255
+#, c-format
+msgid "Unable to create building %s"
+msgstr "%s binası inşa edilemiyor"
+
+#: src/action/action_build.cpp:515
+#, c-format
+msgid "New %s done"
+msgstr "Yeni %s tamamlandı"
+
+#: src/action/action_repair.cpp:84
+#, c-format
+msgid "We need more %s for repair!"
+msgstr "Tamir için daha fazla %s gerekiyor!"
+
+#: src/action/action_research.cpp:103
+#, c-format
+msgid "%s: complete"
+msgstr "%s: tamamlandı"
+
+#: src/action/action_returngoods.cpp:68
+msgid "No Resources to Return."
+msgstr "Geri Dönmek için Yeterli Kaynak Yok."
+
+#: src/action/action_spellcast.cpp:181
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: büyü için gereken mana yok: %s"
+
+#: src/action/action_spellcast.cpp:185
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: büyü yapılamıyor: %s"
+
+#: src/action/action_train.cpp:170
+#, c-format
+msgid "New %s ready"
+msgstr "Yeni %s hazır"
+
+#: src/action/action_train.cpp:217
+#, c-format
+msgid "Unable to train %s"
+msgstr "%s eğitimi yapılamıyor"
+
+#: src/action/action_upgradeto.cpp:199
+#, c-format
+msgid "Upgrade to %s canceled"
+msgstr "%s yükseltmesi iptal edildi"
+
+#: src/action/action_upgradeto.cpp:207
+#, c-format
+msgid "Upgrade to %s complete"
+msgstr "%s yükseltmesi tamamlandı"
+
+#: src/action/command.cpp:1319
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Oyuncu \"%s\" oynu terk etti"
+
+#: src/action/command.cpp:1321
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Oyuncu \"%s\" öldürüldü"
+
+#: src/editor/editloop.cpp:508 src/editor/editloop.cpp:592
+msgid "~!OK"
+msgstr "~!Tamam"
+
+#: src/editor/editloop.cpp:516 src/editor/editloop.cpp:600
+msgid "~!Cancel"
+msgstr "~!İptal et"
+
+#: src/editor/editloop.cpp:583
+msgid "Artificial Intelligence"
+msgstr "Yapay Zeka"
+
+#: src/editor/editloop.cpp:1376
+msgid "Unit can't be placed here."
+msgstr "Birlik buraya yerleştirilemez."
+
+#: src/editor/editloop.cpp:1448
+msgid "Mirror editing enabled: 2-side"
+msgstr "Yansı düzenlemesi etkinleştirildi: 2-taraf"
+
+#: src/editor/editloop.cpp:1451
+msgid "Mirror editing enabled: 4-side"
+msgstr "Yansı düzenlemesi etkinleştirildi: 4-taraf"
+
+#: src/editor/editloop.cpp:1454
+msgid "Mirror editing disabled"
+msgstr "Yansı düzenlemesi kapatıldı"
+
+#: src/editor/editloop.cpp:1474
+msgid "Unit deleted"
+msgstr "Birlik silindi"
+
+#: src/editor/editloop.cpp:1497 src/editor/editloop.cpp:1506
+msgid "Unit owner modified"
+msgstr "Birliğin sahibi değiştirildi"
+
+#: src/editor/editloop.cpp:1831
+msgid "Select mode"
+msgstr "Seçme modu"
+
+#: src/editor/editloop.cpp:1841
+msgid "Unit mode"
+msgstr "Birlik modu"
+
+#: src/editor/editloop.cpp:1852
+msgid "Tile mode"
+msgstr "Döşeme modu"
+
+#: src/editor/editloop.cpp:1863
+msgid "Set start location mode"
+msgstr "Başlangıç noktası belirleme modu"
+
+#: src/network/commands.cpp:824
+msgid "No sync info for this replay !"
+msgstr "Yeniden oynatma için bir eşzamanlama yok!"
+
+#: src/network/commands.cpp:826
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Yeniden oynatma eşzamanlamayı aştı (%lu) !"
+
+#: src/network/commands.cpp:835
+msgid "Replay got out of sync !"
+msgstr "Yeniden oynatma eşzamanlamayı aştı !"
+
+#: src/network/commands.cpp:946 src/network/commands.cpp:961
+msgid "End of replay"
+msgstr "Yeniden oynatma sonu"
+
+#: src/network/network.cpp:928
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s hatalı komut gönderdi"
+
+#: src/network/network.cpp:1022
+msgid "Network out of sync"
+msgstr "Ağ eşzamanlama hatasına uğradı"
+
+#: src/network/network.cpp:1256
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "\"%s\" oyuncusu bekleniyor: %d:%02d"
+
+#: src/network/network.cpp:1272
+msgid "Timed out"
+msgstr "Süre bitti"
+
+#: src/stratagus/player.cpp:553
+msgid "Building Limit Reached"
+msgstr "İnşa Üst Sınırına Ulaşıldı"
+
+#: src/stratagus/player.cpp:557
+msgid "Unit Limit Reached"
+msgstr "Birlik Sınırına Ulaşıldı"
+
+#: src/stratagus/player.cpp:561
+msgid "Insufficient Supply, increase Supply."
+msgstr "Yetersiz Kaynak, Kaynağınızı arttırın."
+
+#: src/stratagus/player.cpp:565
+msgid "Total Unit Limit Reached"
+msgstr "Toplam Birlik Üst Sınırına Ulaşıldı"
+
+#: src/stratagus/player.cpp:569
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "Bu birlik türü için %d sınırına ulaşıldı"
+
+#: src/stratagus/player.cpp:575
+msgid "Cannot create more units."
+msgstr "Daha fazla birlik oluşturulamıyor."
+
+#: src/stratagus/stratagus.cpp:548 src/stratagus/stratagus.cpp:681
+msgid "Do it! Do it now!"
+msgstr "Yap! Şimdi yap!"
+
+#: src/stratagus/stratagus.cpp:812
+#, c-format
+msgid "Thanks for playing Stratagus.\n"
+msgstr "Stratagus oynadığınız için teşekkür ederiz.\n"
+
+#: src/ui/botpanel.cpp:724 src/ui/botpanel.cpp:789
+msgid "Select Target"
+msgstr "Hedef Seçin"
+
+#: src/ui/botpanel.cpp:852
+msgid "Select Location"
+msgstr "Yer Seçin"
+
+#: src/ui/botpanel.cpp:871
+msgid "Unit training queue is full"
+msgstr "Birlik eğitim sırası doldu"
+
+#: src/ui/interface.cpp:95
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "MESAJ:%s~!_"
+
+#: src/ui/interface.cpp:247
+msgid "Sound is on."
+msgstr "Ses açık."
+
+#: src/ui/interface.cpp:249
+msgid "Sound is off."
+msgstr "Ses kapalı."
+
+#: src/ui/interface.cpp:264
+msgid "Music is off."
+msgstr "Müzik açık."
+
+#: src/ui/interface.cpp:267
+msgid "Music is on."
+msgstr "Müzik kapalı."
+
+#: src/ui/interface.cpp:280 src/ui/mouse.cpp:1736
+msgid "Game Paused"
+msgstr "Oyun Durduruldu"
+
+#: src/ui/interface.cpp:282
+msgid "Game Resumed"
+msgstr "Oyun Yeniden Başlatıldı"
+
+#: src/ui/interface.cpp:313
+msgid "Big map enabled"
+msgstr "Büyük harita etkinleştirildi"
+
+#: src/ui/interface.cpp:322
+msgid "Returning to old map"
+msgstr "Eski haritaya geri dönülüyor"
+
+#: src/ui/interface.cpp:333
+msgid "Faster"
+msgstr "Daha hızlı"
+
+#: src/ui/interface.cpp:349
+msgid "Slower"
+msgstr "Daha yavaş"
+
+#: src/ui/interface.cpp:404
+msgid "Terrain displayed."
+msgstr "Arazi gösteriliyor."
+
+#: src/ui/interface.cpp:406
+msgid "Terrain hidden."
+msgstr "Arazi gösterilmiyor."
+
+#: src/ui/interface.cpp:439
+msgid "Grab mouse toggled."
+msgstr "Fare geçişi."
+
+#: src/ui/interface.cpp:914
+msgid "Screenshot made."
+msgstr "Ekran görüntüsü alındı."
+
+#: src/ui/mainscr.cpp:971
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "~<%d~>tekrarlanan son mesaj"
+
+#: src/ui/mainscr.cpp:1047
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Olay: %s~>"
+
+#: src/ui/mouse.cpp:1904
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "~<%d~> %ss sahipsiniz"
+
+#: src/ui/mouse.cpp:1908
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "~<%d~> %s(s) sahipsiniz"
+
+#: src/unit/unit.cpp:2990
+#, c-format
+msgid "%s attacked"
+msgstr "%s saldırıldı"
+
