@@ -43,6 +43,7 @@ def DefineOptions(filename, args):
    opts.Add('CC', 'C Compiler')
    opts.Add('CXX', 'C++ Compiler')
    opts.Add('opengl', 'Build with opengl support', 0)
+   opts.Add('extrapath', 'Path to extra root directory for includes and libs', '')
    return opts
 
 
@@ -50,6 +51,7 @@ opts = DefineOptions("build_options.py", ARGUMENTS)
 env = Environment(ENV = {'PATH':os.environ['PATH']}) # for an unknown reason Environment(options=opts) doesnt work well
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
+mingw = env.Copy()
 optionsChanged = True
 if os.path.exists('build_options.py'):
    os.rename('build_options.py', 'build_options_OLD_FOR_CHECK.py')
@@ -101,7 +103,7 @@ def CheckOpenGL(env, conf):
   sourcesEngine.append(globSources("guichan/opengl"))
 
 def CheckLuaLib(env, conf):
-  if env.WhereIs('lua-config'):
+  if not 'USE_WIN32' in env['CPPDEFINES'] and env.WhereIs('lua-config'):
     env.ParseConfig('lua-config --include --libs')
   found = 0
   if conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
@@ -130,22 +132,16 @@ def CheckLuaLib(env, conf):
   return 0
 
 def AutoConfigure(env):
-  # determine compiler and linker flags for SDL
-  env.ParseConfig('sdl-config --cflags')
-  env.ParseConfig('sdl-config --libs')
   conf = Configure(env)
 
   ## check for required libs ##
-  if not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
-     print 'Did not find SDL library or headers, exiting!'
-     Exit(1)
   if not conf.CheckLibWithHeader('png', 'png.h', 'c'):
      print 'Did not find png library or headers, exiting!'
      Exit(1)
   if not conf.CheckLibWithHeader('z', 'zlib.h', 'c'):
      print 'Did not find the zlib library or headers, exiting!'
      Exit(1)
-  if not conf.CheckLib('dl'):
+  if not 'USE_WIN32' in env['CPPDEFINES'] and not conf.CheckLib('dl'):
      print 'Did not find dl library or header which is needed on some systems for lua. Exiting!'
      Exit(1)
   if not CheckLuaLib(env, conf):
@@ -171,10 +167,19 @@ def AutoConfigure(env):
      conf.CheckLib('X11')):
      env.Append(CPPDEFINES = 'HAVE_X')
 
+  # Determine compiler and linker flags for SDL. Must be done at the end 
+  # as on some platforms, SDL redefines main which conflicts with the checks.
+  if not 'USE_WIN32' in env['CPPDEFINES']:
+    env.ParseConfig('sdl-config --cflags')
+    env.ParseConfig('sdl-config --libs')
+    if not '-Dmain=SDL_main' in env['CCFLAGS'] and not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
+       print 'Did not find SDL library or headers, exiting!'
+       Exit(1)
+
   env = conf.Finish()
 
-def AutoConfigureIfNeeded():
-   cachename = "build_conf_cache.py"
+def AutoConfigureIfNeeded(env, name):
+   cachename = "build_conf_%scache.py" % name
    if os.path.exists(cachename):  
       if optionsChanged or \
          os.stat(cachename)[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
@@ -191,16 +196,31 @@ def AutoConfigureIfNeeded():
       print "Using " + cachename
       cache.Update(env)
 
+AutoConfigureIfNeeded(env, '')
 
-AutoConfigureIfNeeded()
-
-# Stratagus build specifics
-env.Append(CPPPATH=engineSourceDir+'/include')
-env.Append(CPPPATH=engineSourceDir+'/guichan/include')
+def addBosWarsPaths(env):
+   # Stratagus build specifics
+   env.Append(CPPPATH=engineSourceDir+'/include')
+   env.Append(CPPPATH=engineSourceDir+'/guichan/include')
+addBosWarsPaths(env)
 
 # define the different build environments (variants)
 release = env.Copy()
 release.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
+
+if mingw['extrapath']:
+  mingw.Tool('crossmingw', toolpath = ['tools/scons/'])
+  mingw['CPPDEFINES'] = ['USE_WIN32']
+  if mingw['extrapath'] != '':
+     x = mingw['extrapath']
+     mingw['CPPPATH'] = [x + '/include']
+     mingw['LIBPATH'] = [x + '/lib']
+  AutoConfigureIfNeeded(mingw, 'mingw')
+  addBosWarsPaths(mingw)
+  mingw.Append(LIBS = ['mingw32', 'SDLmain', 'SDL', 'wsock32', 'ws2_32'])
+  mingw.Append(LINKFLAGS = ['-mwindows'])
+else:
+  mingw = None
 
 debug = env.Copy()
 debug.Append(CPPDEFINES = 'DEBUG')
@@ -209,6 +229,7 @@ debug.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
 profile = debug.Copy()
 profile.Append(CCFLAGS = Split('-pg'))
 profile.Append(LINKFLAGS = Split('-pg'))
+
 
 staticenv = release.Copy()
 staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
@@ -230,13 +251,15 @@ def DefineVariant(venv, v, vv = None):
       vv = '-' + v
    BuildDir('build/' + v, engineSourceDir, duplicate = 0)
    r = venv.Program('boswars' + vv, buildSourcesList('build/' + v))
-   Alias(v, 'boswars-' + v)
+   Alias(v, 'boswars' + vv)
    return r 
 
 r = DefineVariant(release, 'release', '')
 Default(r)
 DefineVariant(debug, 'debug')
 DefineVariant(profile, 'profile')
-DefineVariant(staticenv, 'static')
-
+if staticenv:
+   DefineVariant(staticenv, 'static')
+if mingw:
+   DefineVariant(mingw, 'mingw', '.exe')
 
