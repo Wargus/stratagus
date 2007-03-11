@@ -230,7 +230,6 @@ profile = debug.Copy()
 profile.Append(CCFLAGS = Split('-pg'))
 profile.Append(LINKFLAGS = Split('-pg'))
 
-
 staticenv = release.Copy()
 staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
 staticlibs = staticlibs.split(' ')
