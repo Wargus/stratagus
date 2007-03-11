@@ -1,3 +1,5 @@
+# From http://www.boswars.org/wiki/index.php/Bos/CrossCompiling
+
 import os
 import os.path
 import string
