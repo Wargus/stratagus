@@ -42,10 +42,7 @@ def DefineOptions(filename, args):
    opts.Add('LINKFLAGS', 'Linker Compiler flags')
    opts.Add('CC', 'C Compiler')
    opts.Add('CXX', 'C++ Compiler')
-   opts.Add('debug', 'Build with debugging options', 0)
    opts.Add('opengl', 'Build with opengl support', 0)
-   opts.Add('profile', 'Build with profiling support', 0)
-   opts.Add('static', 'Link stdc++, lua, ogg, theora and vorbis statically', 0)
    return opts
 
 
@@ -64,7 +61,7 @@ if not optionsChanged:
 
 engineSourceDir = 'engine'
 
-def globSources(sourceDirs):
+def globSources(sourceDirs, builddir):
   sources = []
   sourceDirs = Split(sourceDirs)
   for d in sourceDirs:
@@ -72,11 +69,14 @@ def globSources(sourceDirs):
   sources = Flatten(sources)
   targetsources = []
   for s in sources:
-    targetsources.append('build' + s[len(engineSourceDir):])
+    targetsources.append(builddir + s[len(engineSourceDir):])
   return targetsources
 
-sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua")
-sourcesEngine.append(globSources("guichan guichan/sdl guichan/widgets"))
+def buildSourcesList(builddir):
+   sources = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua", builddir)
+   sources.append(globSources("guichan guichan/sdl guichan/widgets", builddir))
+   return sources
+sourcesEngine = buildSourcesList('build')
 
 def CheckOpenGL(env, conf):
   opengl = {}
@@ -197,33 +197,46 @@ AutoConfigureIfNeeded()
 # Stratagus build specifics
 env.Append(CPPPATH=engineSourceDir+'/include')
 env.Append(CPPPATH=engineSourceDir+'/guichan/include')
-BuildDir('build', engineSourceDir, duplicate = 0)
-if env['debug'] or ARGUMENTS.has_key('DEBUG') or env['profile']:
-    env.Append(CPPDEFINES = 'DEBUG')
-    env.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
-else:
-    env.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
 
-if env['profile']:
-    env.Append(CCFLAGS = Split('-pg'))
-    env.Append(LINKFLAGS = Split('-pg'))
+# define the different build environments (variants)
+release = env.Copy()
+release.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
 
-if env['static']:
-    statics = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
-    statics = statics.split(' ')
-    if os.access('libstdc++.a', os.F_OK) == 0:
-       l = os.popen(env['CXX'] + ' -print-file-name=libstdc++.a').readlines()
-       os.symlink(l[0][:-1], os.path.join(os.curdir, 'libstdc++.a'))
-    LINKFLAGS = '-L. -Wl,-Bstatic -lstdc++ '
-    for i in statics:
-       if i in env['LIBS']:
+debug = env.Copy()
+debug.Append(CPPDEFINES = 'DEBUG')
+debug.Append(CCFLAGS = Split('-g -Wsign-compare -Wall -Werror'))
+
+profile = debug.Copy()
+profile.Append(CCFLAGS = Split('-pg'))
+profile.Append(LINKFLAGS = Split('-pg'))
+
+staticenv = release.Copy()
+staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
+staticlibs = staticlibs.split(' ')
+if os.access('libstdc++.a', os.F_OK) == 0:
+     l = os.popen(static['CXX'] + ' -print-file-name=libstdc++.a').readlines()
+     os.symlink(l[0][:-1], os.path.join(os.curdir, 'libstdc++.a'))
+LINKFLAGS = '-L. -Wl,-Bstatic -lstdc++ '
+for i in staticlibs:
+    if i in staticenv['LIBS']:
           LINKFLAGS += '-l%s ' % i
-          env['LIBS'].remove(i)
-    LINKFLAGS += '-Wl,-Bdynamic'
-    env['LINKFLAGS'].append(LINKFLAGS.split())
+          staticenv['LIBS'].remove(i)
+LINKFLAGS += '-logg -Wl,-Bdynamic'
+staticenv['LINKFLAGS'].append(LINKFLAGS.split())
 
 # Targets
-Default(env.Program('boswars', sourcesEngine))
+def DefineVariant(venv, v, vv = None):
+   if vv == None:
+      vv = '-' + v
+   BuildDir('build/' + v, engineSourceDir, duplicate = 0)
+   r = venv.Program('boswars' + vv, buildSourcesList('build/' + v))
+   Alias(v, 'boswars-' + v)
+   return r 
 
+r = DefineVariant(release, 'release', '')
+Default(r)
+DefineVariant(debug, 'debug')
+DefineVariant(profile, 'profile')
+DefineVariant(staticenv, 'static')
 
 
