@@ -1,6 +1,8 @@
 Change log for Bos Wars
 -----------------------
 Development Version:
+- Add mingw cross-compiling build variant in SConstruct (Francois Beerten)
+- Add support for build variants in SConstruct (Francois Beerten)
 - Added turkish translation (Murat Senel)
 
 Version 2.3.0 (2007 3 4):
