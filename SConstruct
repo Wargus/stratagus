@@ -230,19 +230,18 @@ profile = debug.Copy()
 profile.Append(CCFLAGS = Split('-pg'))
 profile.Append(LINKFLAGS = Split('-pg'))
 
-staticenv = release.Copy()
-staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
-staticlibs = staticlibs.split(' ')
-if os.access('libstdc++.a', os.F_OK) == 0:
-     l = os.popen(staticenv['CXX'] + ' -print-file-name=libstdc++.a').readlines()
-     os.symlink(l[0][:-1], os.path.join(os.curdir, 'libstdc++.a'))
-LINKFLAGS = '-L. -Wl,-Bstatic -lstdc++ '
-for i in staticlibs:
-    if i in staticenv['LIBS']:
-          LINKFLAGS += '-l%s ' % i
-          staticenv['LIBS'].remove(i)
-LINKFLAGS += '-logg -Wl,-Bdynamic'
-staticenv['LINKFLAGS'].append(LINKFLAGS.split())
+staticenv = None
+if sys.platform.startswith('linux'):
+   staticenv = release.Copy()
+   staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
+   staticlibs = staticlibs.split(' ')
+   linkflags = '-L. -Wl,-Bstatic -lstdc++ '
+   for i in staticlibs:
+       if i in staticenv['LIBS']:
+           linkflags += '-l%s ' % i
+           staticenv['LIBS'].remove(i)
+   linkflags += '-logg -Wl,-Bdynamic'
+   staticenv['LINKFLAGS'].append(linkflags.split())
 
 # Targets
 def DefineVariant(venv, v, vv = None):
@@ -258,7 +257,11 @@ Default(r)
 DefineVariant(debug, 'debug')
 DefineVariant(profile, 'profile')
 if staticenv:
-   DefineVariant(staticenv, 'static')
+   stdlibcxx = staticenv.Command('libstdc++.a', None, 
+          Action('ln -s `%s -print-file-name=libstdc++.a`' % staticenv['CXX']))
+   # staticenv.Append(LIBS = [stdlibcxx])   <= does not work with scons 0.96.1
+   prog = DefineVariant(staticenv, 'static')
+   staticenv.Depends(prog, stdlibcxx)
 if mingw:
    DefineVariant(mingw, 'mingw', '.exe')
 
