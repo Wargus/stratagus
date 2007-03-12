@@ -234,7 +234,7 @@ staticenv = release.Copy()
 staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
 staticlibs = staticlibs.split(' ')
 if os.access('libstdc++.a', os.F_OK) == 0:
-     l = os.popen(static['CXX'] + ' -print-file-name=libstdc++.a').readlines()
+     l = os.popen(staticenv['CXX'] + ' -print-file-name=libstdc++.a').readlines()
      os.symlink(l[0][:-1], os.path.join(os.curdir, 'libstdc++.a'))
 LINKFLAGS = '-L. -Wl,-Bstatic -lstdc++ '
 for i in staticlibs:
