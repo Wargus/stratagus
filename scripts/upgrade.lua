@@ -76,9 +76,6 @@ DefineAllow("upgrade-ddril", "AAAAAAAA")
 DefineAllow("upgrade-pdril", "AAAAAAAA")
 
 
-
-DefineAllow("unit-gold-mine", "AAAAAAAA")
-
 DefineAllow("unit-dead-body", "AAAAAAAA")
 DefineAllow("unit-destroyed-1x1-place", "AAAAAAAA")
 DefineAllow("unit-destroyed-2x2-place", "AAAAAAAA")
