@@ -9,7 +9,7 @@
 --
 --	buttons.lua	-	Define the general unit-buttons.
 --
---	(c) Copyright 2001-2006 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+--	(c) Copyright 2001-2007 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 --				Francois Beerten and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
@@ -156,12 +156,13 @@ DefineButton({
 	Pos = 9, Level = 3, Icon = "icon-cancel", Action = "button",
 	Value = 0, Key = "\027", Hint = "~<ESC~> CANCEL",
 	ForUnit = {"unit-engineer"}})
+
 -- buildings commands ---------------------------------------------------------
 
 DefineButton({
 	Pos = 1, Level = 0, Icon = "icon-engineer",
 	Action = "train-unit", Value = "unit-engineer",
-	Allowed = "check-no-research", Key = "e", Hint = "TRAIN ~!ENGINEER",
+	Key = "e", Hint = "TRAIN ~!ENGINEER",
 	ForUnit = {"unit-vault"}})
 
 DefineButton({
@@ -195,45 +196,7 @@ DefineButton({
 	ForUnit = {"unit-vfac"}})
 
 
--- upgrades -------------------------------------------------------------------
-
-DefineButton({
-	Pos = 1, Level = 0, Icon = "icon-expl",
-	Action = "research", Value = "upgrade-expl",
-	Allowed = "check-single-research",
-	Key = "e", Hint = "RESEARCH ~!EXPLOSIVES",
-	ForUnit = {"unit-rfac"}})
-
-DefineButton({
-	Pos = 1, Level = 0, Icon = "icon-expl2",
-	Action = "research", Value = "upgrade-expl2",
-	Allowed = "check-single-research",
-	Key = "e", Hint = "RESEARCH ~!EXPLOSIVES LVL 2",
-	ForUnit = {"unit-rfac"}})
-
-DefineButton({
-	Pos = 2, Level = 0, Icon = "icon-tdril",
-	Action = "research", Value = "upgrade-tdril",
-	Allowed = "check-single-research",
-	Key = "d", Hint = "RESEARCH TITANIUM ~!DRILL",
-	ForUnit = {"unit-rfac"}})
-
-DefineButton({
-	Pos = 2, Level = 0, Icon = "icon-ddril",
-	Action = "research", Value = "upgrade-ddril",
-	Allowed = "check-single-research",
-	Key = "d", Hint = "RESEARCH DIAMOND ~!DRILL",
-	ForUnit = {"unit-rfac"}})
-
-DefineButton({
-	Pos = 2, Level = 0, Icon = "icon-pdril",
-	Action = "research", Value = "upgrade-pdril",
-	Allowed = "check-single-research",
-	Key = "d", Hint = "RESEARCH POWER ~!DRILL",
-	ForUnit = {"unit-rfac"}})
-
-
--- town hall upgrades ---------------------------------------------------------
+-- vault actions ---------------------------------------------------------
 
 DefineButton({
 	Pos = 5, Level = 0, Icon = "icon-harvest",

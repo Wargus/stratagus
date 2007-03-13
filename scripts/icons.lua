@@ -70,37 +70,6 @@ DefineIcon({
 	Frame = 0,
 	File = "units/missilesilo/missile_silo_i.png"})
 
--- upgrades
-DefineIcon({
-	Name = "icon-expl",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/research/res_expl.png"})
-
-DefineIcon({
-	Name = "icon-expl2",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/research/res_expl2.png"})
-
-DefineIcon({
-	Name = "icon-tdril",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/research/res_tdril.png"})
-
-DefineIcon({
-	Name = "icon-ddril",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/research/res_ddril.png"})
-
-DefineIcon({
-	Name = "icon-pdril",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/research/res_pdril.png"})
-
 DefineIcon({
 	Name = "icon-build-lvl1",
 	Size = {46, 38},
