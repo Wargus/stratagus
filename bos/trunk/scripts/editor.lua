@@ -9,7 +9,7 @@
 --
 --	editor.lua	-	Editor configuration and functions.
 --
---	(c) Copyright 2002-2005 by Lutz Sammer, François Beerten and Jimmy Salmon
+--	(c) Copyright 2002-2005 by Lutz Sammer, Franï¿½is Beerten and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -78,7 +78,6 @@ local editor_types = {
   "unit-chopper",
   "unit-bomber",
 
-  "unit-gold-mine",
   "unit-tree",
   "unit-tree02",
   "unit-tree03",
