@@ -9,7 +9,8 @@
 --
 --	units.lua	-	Define the used unit-types.
 --
---	(c) Copyright 1998 - 2004 by Lutz Sammer and Crestez Leonard
+--	(c) Copyright 1998 - 2007 by Lutz Sammer, Crestez Leonard
+--                               and Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -153,6 +154,11 @@ DefineUnitType("unit-revealer", {
 	Priority = 0, DecayRate = 1, Type = "land",
 	Building = true, Revealer = true})
 
+DefineAllow("unit-dead-body", "AAAAAAAA")
+DefineAllow("unit-destroyed-1x1-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-2x2-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-3x3-place", "AAAAAAAA")
+DefineAllow("unit-destroyed-4x4-place", "AAAAAAAA")
 
 -- Load production buildings
 Load("units/vault/vault.lua")
