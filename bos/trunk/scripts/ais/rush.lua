@@ -84,12 +84,10 @@ local ai_funcs = {
 
   function() return AiForce(0, {"unit-assault", 20}) end,
   function() return AiNeed("unit-rfac") end,
-  function() return AiResearch("upgrade-expl") end,
   function() return AiForce(1, {"unit-assault", 20, "unit-grenadier", 8}) end,
   function() return AiWaitForce(1) end, 
   function() return AiAttackWithForce(1) end,
 
-  function() return AiResearch("upgrade-expl2") end,
   function() return AiLoop(ai_loop_funcs, ai_loop_pos) end,
 }
 

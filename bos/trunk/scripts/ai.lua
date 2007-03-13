@@ -63,11 +63,6 @@ DefineAiHelper(
    "unit-buggy", "unit-rtank", "unit-tank"},
   {"train", "unit-dev-yard", "unit-jet", "unit-bomber", "unit-chopper"},
   --
-  -- Building can research which spells or upgrades.
-  --
-  {"research", "unit-rfac", "upgrade-expl", "upgrade-expl2",
-   "upgrade-tdril", "upgrade-pdril", "upgrade-ddril"},
-  --
   -- Unit can repair which units.
   --
   {"repair", "unit-engineer",
