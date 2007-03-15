@@ -800,7 +800,7 @@ extern unsigned int UnitSlotFree;        /// First free unit slot
 extern CUnit *Units[MAX_UNIT_SLOTS]; /// Units used
 extern int NumUnits;                 /// Number of units used
 
-// in unit_draw.c
+// in unit_draw.cpp
 /// @todo could be moved into the user interface ?
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
 extern int XpDamage;                    /// unit XP adds more damage to attacks
@@ -809,7 +809,7 @@ extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled
 extern const CViewport *CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const CUnit *);
-extern void (*DrawSelection)(Uint32, int, int, int, int);
+extern void DrawSelection(Uint32 color, int x1, int y1, int x2, int y2);
 extern int MaxSelectable;                  /// How many units could be selected
 
 extern CUnit **Selected;                    /// currently selected units
@@ -941,7 +941,7 @@ extern void InitUnits(void);
 	/// Clean unit module
 extern void CleanUnits(void);
 
-// in unitcache.c
+// in unitcache.cpp
 	/// Insert new unit into cache
 extern void UnitCacheInsert(CUnit *unit);
 	/// Remove unit from cache
@@ -953,21 +953,7 @@ extern int UnitCacheOnTile(int x, int y, CUnit **table);
 	/// Initialize unit-cache
 extern void InitUnitCache(void);
 
-// in unit_draw.c
-//--------------------
-	/// Draw nothing around unit
-extern void DrawSelectionNone(Uint32, int, int, int, int);
-	/// Draw circle around unit
-extern void DrawSelectionCircle(Uint32, int, int, int, int);
-	/// Draw circle filled with alpha around unit
-extern void DrawSelectionCircleWithTrans(Uint32, int, int, int, int);
-	/// Draw rectangle around unit
-extern void DrawSelectionRectangle(Uint32, int, int, int, int);
-	/// Draw rectangle filled with alpha around unit
-extern void DrawSelectionRectangleWithTrans(Uint32, int, int, int, int);
-	/// Draw corners around unit
-extern void DrawSelectionCorners(Uint32, int, int, int, int);
-
+// in unit_draw.cpp
 	/// Register CCL decorations features
 extern void DecorationCclRegister(void);
 	/// Load the decorations (health,mana) of units
@@ -983,7 +969,7 @@ extern int FindAndSortUnits(const CViewport *vp, CUnit **table);
 	/// Show a unit's orders.
 extern void ShowOrder(const CUnit *unit);
 
-// in unit_find.c
+// in unit_find.cpp
 	/// Select unit on X,Y of type naval,fly,land
 extern CUnit *UnitCacheOnXY(int x, int y, unsigned type);
 	/// Find all units of this type
@@ -1007,8 +993,7 @@ extern CUnit *AttackUnitsInRange(const CUnit *unit);
 	/// Find best enemy in reaction range to attack
 extern CUnit *AttackUnitsInReactRange(const CUnit *unit);
 
-// in groups.c
-
+// in groups.cpp
 	/// Initialize data structures for groups
 extern void InitGroups(void);
 	/// Save groups
@@ -1033,8 +1018,7 @@ extern void RemoveUnitFromGroups(CUnit *unit);
 	/// Register CCL group features
 extern void GroupCclRegister(void);
 
-// in selection.c
-
+// in selection.cpp
 	/// Check if unit is the currently only selected
 #define IsOnlySelected(unit) (NumSelected == 1 && Selected[0] == (unit))
 
@@ -1088,8 +1072,7 @@ extern void CleanSelections(void);
 	/// Register CCL selection features
 extern void SelectionCclRegister(void);
 
-// in ccl_unit.c
-
+// in script_unit.cpp
 	/// Parse order
 extern void CclParseOrder(lua_State *l, COrder *order);
 	/// register CCL units features
