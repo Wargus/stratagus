@@ -1332,35 +1332,6 @@ void SelectedUnitChanged(void)
 }
 
 /**
-**  Set selection style.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSelectionStyle(lua_State *l)
-{
-	const char *style;
-
-	LuaCheckArgs(l, 1);
-
-	style = LuaToString(l, 1);
-	if (!strcmp(style, "rectangle")) {
-		DrawSelection = DrawSelectionRectangle;
-	} else if (!strcmp(style, "alpha-rectangle")) {
-		DrawSelection = DrawSelectionRectangleWithTrans;
-	} else if (!strcmp(style, "circle")) {
-		DrawSelection = DrawSelectionCircle;
-	} else if (!strcmp(style, "alpha-circle")) {
-		DrawSelection = DrawSelectionCircleWithTrans;
-	} else if (!strcmp(style, "corners")) {
-		DrawSelection = DrawSelectionCorners;
-	} else {
-		LuaError(l, "Unsupported selection style");
-	}
-
-	return 0;
-}
-
-/**
 **  Add a new message.
 **
 **  @param l  Lua state.
@@ -1452,11 +1423,6 @@ void UserInterfaceCclRegister(void)
 
 	lua_register(Lua, "PresentMap", CclPresentMap);
 	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
-
-	//
-	// Look and feel of units
-	//
-	lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
 
 	lua_register(Lua, "SetGroupKeys", CclSetGroupKeys);
 }
