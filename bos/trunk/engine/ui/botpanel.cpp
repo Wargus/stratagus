@@ -123,12 +123,6 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 			case ButtonTrain:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
-			case ButtonResearch:
-				ba->Value = UpgradeIdByIdent(value);
-				break;
-			case ButtonUpgradeTo:
-				ba->Value = UnitTypeIdByIdent(value);
-				break;
 			case ButtonBuild:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
@@ -379,13 +373,9 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 	switch (button->Action) {
 		case ButtonBuild:
 		case ButtonTrain:
-		case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
 			stats = &UnitTypes[button->Value]->Stats[ThisPlayer->Index];
 			SetCosts(0, UnitTypes[button->Value]->Demand, stats->Costs);
-			break;
-		case ButtonResearch:
-			SetCosts(0, 0, AllUpgrades[button->Value]->Costs);
 			break;
 		case ButtonSpellCast:
 			SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
@@ -409,7 +399,6 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 **  @return 1 if button is allowed, 0 else.
 **
 **  @todo FIXME: better check. (dependancy, resource, ...)
-**  @todo FIXME: make difference with impossible and not yet researched.
 */
 static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 {
@@ -470,13 +459,8 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 				break;
 			}
 			// FALL THROUGH
-		case ButtonUpgradeTo:
-		case ButtonResearch:
 		case ButtonBuild:
 			res = CheckDependByIdent(unit->Player, buttonaction->ValueStr);
-			if (res && !strncmp(buttonaction->ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(unit->Player, buttonaction->ValueStr) == 'A';
-			}
 			break;
 		case ButtonSpellCast:
 			res = SpellIsAvailable(unit->Player, buttonaction->Value);
@@ -486,10 +470,6 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			break;
 		case ButtonCancel:
 			res = true;
-			break;
-		case ButtonCancelUpgrade:
-			res = unit->Orders[0]->Action == UnitActionUpgradeTo ||
-				unit->Orders[0]->Action == UnitActionResearch;
 			break;
 		case ButtonCancelTrain:
 			res = unit->Orders[0]->Action == UnitActionTrain;
@@ -590,12 +570,6 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 	if (unit->Orders[0]->Action == UnitActionBuilt) {
 		// Trick 17 to get the cancel-build button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
-	} else if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
-		// Trick 17 to get the cancel-upgrade button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else if (unit->Orders[0]->Action == UnitActionResearch) {
-		// Trick 17 to get the cancel-upgrade button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
 		sprintf(unit_ident, ",%s,", unit->Type->Ident.c_str());
 	}
@@ -810,14 +784,6 @@ void CButtonPanel::DoClicked(int button)
 			break;
 
 		case ButtonCancel:
-		case ButtonCancelUpgrade:
-			if (NumSelected == 1) {
-				if (Selected[0]->Orders[0]->Action == UnitActionUpgradeTo) {
-					SendCommandCancelUpgradeTo(Selected[0]);
-				} else if (Selected[0]->Orders[0]->Action == UnitActionResearch) {
-					SendCommandCancelResearch(Selected[0]);
-				}
-			}
 			UI.StatusLine.Clear();
 			ClearCosts();
 			CurrentButtonLevel = 0;
@@ -872,28 +838,6 @@ void CButtonPanel::DoClicked(int button)
 					!Selected[0]->Player->CheckUnitType(type)) {
 				//PlayerSubUnitType(player,type);
 				SendCommandTrainUnit(Selected[0], type,
-					!(KeyModifiers & ModifierShift));
-				UI.StatusLine.Clear();
-				ClearCosts();
-			}
-			break;
-
-		case ButtonUpgradeTo:
-			// FIXME: store pointer in button table!
-			type = UnitTypes[CurrentButtons[button].Value];
-			if (!Selected[0]->Player->CheckUnitType(type)) {
-				//PlayerSubUnitType(player,type);
-				SendCommandUpgradeTo(Selected[0],type,
-					!(KeyModifiers & ModifierShift));
-				UI.StatusLine.Clear();
-				ClearCosts();
-			}
-			break;
-		case ButtonResearch:
-			i = CurrentButtons[button].Value;
-			if (!Selected[0]->Player->CheckCosts(AllUpgrades[i]->Costs)) {
-				//PlayerSubCosts(player,Upgrades[i].Costs);
-				SendCommandResearch(Selected[0], AllUpgrades[i],
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				ClearCosts();

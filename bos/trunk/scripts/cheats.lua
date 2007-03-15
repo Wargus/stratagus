@@ -60,8 +60,6 @@ function HandleCheats(str)
     end
     SetSpeedBuild(10)
     SetSpeedTrain(10)
-    SetSpeedUpgrade(10)
-    SetSpeedResearch(10)
     AddMessage("FAST DEBUG SPEED")
 
   elseif (str == "normal debug") then
@@ -71,8 +69,6 @@ function HandleCheats(str)
     end
     SetSpeedBuild(1)
     SetSpeedTrain(1)
-    SetSpeedUpgrade(1)
-    SetSpeedResearch(1)
     AddMessage("NORMAL DEBUG SPEED")
 
   elseif (str == "speed cheat") then
@@ -84,8 +80,6 @@ function HandleCheats(str)
       end
       SetSpeedBuild(1)
       SetSpeedTrain(1)
-      SetSpeedUpgrade(1)
-      SetSpeedResearch(1)
       AddMessage("NO SO!")
     else
       speedcheat = true
@@ -95,8 +89,6 @@ function HandleCheats(str)
       end
       SetSpeedBuild(10)
       SetSpeedTrain(10)
-      SetSpeedUpgrade(10)
-      SetSpeedResearch(10)
       for i = 1,table.getn(resources) do
         SetPlayerData(GetThisPlayer(), "Resources", resources[i],
           GetPlayerData(GetThisPlayer(), "Resources", resources[i]) + 32000)

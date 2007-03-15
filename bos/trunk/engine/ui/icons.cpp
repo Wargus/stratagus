@@ -108,7 +108,7 @@ CIcon *CIcon::Get(const std::string &ident)
 {
 	CIcon *icon = Icons[ident];
 	if (!icon) {
-		DebugPrint("icon not found: %s" _C_ ident.c_str());
+		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
 	}
 	return icon;
 }

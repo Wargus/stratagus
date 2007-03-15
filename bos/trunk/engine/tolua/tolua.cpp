@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 02/08/07 22:13:16.
+** Generated automatically by tolua++-1.0.92 on 03/14/07 20:15:00.
 */
 
 #ifndef __cplusplus
@@ -286,68 +286,67 @@ static int tolua_collect_Slider (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"CPlayerColorGraphic");
- tolua_usertype(tolua_S,"MenuScreen");
- tolua_usertype(tolua_S,"BasicContainer");
- tolua_usertype(tolua_S,"vector<CUIButton>");
- tolua_usertype(tolua_S,"CFontColor");
  tolua_usertype(tolua_S,"CMap");
+ tolua_usertype(tolua_S,"LuaActionListener");
+ tolua_usertype(tolua_S,"ImageRadioButton");
+ tolua_usertype(tolua_S,"CNetworkHost");
+ tolua_usertype(tolua_S,"vector<CUIButton>");
+ tolua_usertype(tolua_S,"CEditor");
+ tolua_usertype(tolua_S,"SettingsPresets");
+ tolua_usertype(tolua_S,"CFontColor");
+ tolua_usertype(tolua_S,"Settings");
+ tolua_usertype(tolua_S,"CPreference");
+ tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"gcn::Graphics");
+ tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CIcon");
+ tolua_usertype(tolua_S,"CUnitType");
+ tolua_usertype(tolua_S,"CMapInfo");
+ tolua_usertype(tolua_S,"TextField");
+ tolua_usertype(tolua_S,"CFont");
  tolua_usertype(tolua_S,"CUIButton");
+ tolua_usertype(tolua_S,"CMapArea");
  tolua_usertype(tolua_S,"CheckBox");
- tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"ImageWidget");
  tolua_usertype(tolua_S,"CPlayer");
  tolua_usertype(tolua_S,"CUnit");
+ tolua_usertype(tolua_S,"Window");
  tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
+ tolua_usertype(tolua_S,"CStatusLine");
+ tolua_usertype(tolua_S,"CServerSetup");
+ tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"MenuScreen");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"ButtonStyle");
+ tolua_usertype(tolua_S,"ListBox");
  tolua_usertype(tolua_S,"DropDownWidget");
+ tolua_usertype(tolua_S,"CFiller");
+ tolua_usertype(tolua_S,"MultiLineLabel");
  tolua_usertype(tolua_S,"CPieMenu");
  tolua_usertype(tolua_S,"ScrollArea");
- tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"Button");
+ tolua_usertype(tolua_S,"DropDown");
  tolua_usertype(tolua_S,"CInfoPanel");
+ tolua_usertype(tolua_S,"Container");
+ tolua_usertype(tolua_S,"ButtonWidget");
+ tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"CVideo");
+ tolua_usertype(tolua_S,"ImageCheckBox");
  tolua_usertype(tolua_S,"ScrollingWidget");
  tolua_usertype(tolua_S,"CGraphic");
  tolua_usertype(tolua_S,"StatBoxWidget");
- tolua_usertype(tolua_S,"CUITimer");
- tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Label");
- tolua_usertype(tolua_S,"Settings");
- tolua_usertype(tolua_S,"CResourceInfo");
- tolua_usertype(tolua_S,"vector<CFiller>");
- tolua_usertype(tolua_S,"CUnitType");
- tolua_usertype(tolua_S,"CMapInfo");
- tolua_usertype(tolua_S,"CFont");
- tolua_usertype(tolua_S,"CServerSetup");
- tolua_usertype(tolua_S,"MultiLineLabel");
- tolua_usertype(tolua_S,"ImageWidget");
- tolua_usertype(tolua_S,"SettingsPresets");
- tolua_usertype(tolua_S,"gcn::Graphics");
- tolua_usertype(tolua_S,"CStatusLine");
- tolua_usertype(tolua_S,"ListBox");
- tolua_usertype(tolua_S,"Window");
- tolua_usertype(tolua_S,"CPreference");
- tolua_usertype(tolua_S,"CFiller");
+ tolua_usertype(tolua_S,"BasicContainer");
  tolua_usertype(tolua_S,"vector<string>");
- tolua_usertype(tolua_S,"CUpgrade");
- tolua_usertype(tolua_S,"Container");
- tolua_usertype(tolua_S,"ButtonWidget");
- tolua_usertype(tolua_S,"CVideo");
- tolua_usertype(tolua_S,"ImageCheckBox");
- tolua_usertype(tolua_S,"LuaActionListener");
- tolua_usertype(tolua_S,"ImageRadioButton");
- tolua_usertype(tolua_S,"CEditor");
- tolua_usertype(tolua_S,"CUserInterface");
- tolua_usertype(tolua_S,"CNetworkHost");
- tolua_usertype(tolua_S,"TextField");
- tolua_usertype(tolua_S,"CMapArea");
+ tolua_usertype(tolua_S,"CResourceInfo");
+ tolua_usertype(tolua_S,"CUITimer");
  tolua_usertype(tolua_S,"RadioButton");
- tolua_usertype(tolua_S,"CMinimap");
- tolua_usertype(tolua_S,"Button");
- tolua_usertype(tolua_S,"DropDown");
+ tolua_usertype(tolua_S,"ImageButton");
+ tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Slider");
 }
 
@@ -3346,66 +3345,6 @@ static int tolua_set_CUserInterface_TrainingButtons(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->TrainingButtons = *((vector<CUIButton>*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: UpgradingButton of class  CUserInterface */
-#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_UpgradingButton_ptr
-static int tolua_get_CUserInterface_UpgradingButton_ptr(lua_State* tolua_S)
-{
-  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UpgradingButton'",NULL);
-#endif
-  tolua_pushusertype(tolua_S,(void*)self->UpgradingButton,"CUIButton");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: UpgradingButton of class  CUserInterface */
-#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_UpgradingButton_ptr
-static int tolua_set_CUserInterface_UpgradingButton_ptr(lua_State* tolua_S)
-{
-  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'UpgradingButton'",NULL);
-  if (!tolua_isusertype(tolua_S,2,"CUIButton",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->UpgradingButton = ((CUIButton*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: ResearchingButton of class  CUserInterface */
-#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_ResearchingButton_ptr
-static int tolua_get_CUserInterface_ResearchingButton_ptr(lua_State* tolua_S)
-{
-  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResearchingButton'",NULL);
-#endif
-  tolua_pushusertype(tolua_S,(void*)self->ResearchingButton,"CUIButton");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: ResearchingButton of class  CUserInterface */
-#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_ResearchingButton_ptr
-static int tolua_set_CUserInterface_ResearchingButton_ptr(lua_State* tolua_S)
-{
-  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResearchingButton'",NULL);
-  if (!tolua_isusertype(tolua_S,2,"CUIButton",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->ResearchingButton = ((CUIButton*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -12578,148 +12517,6 @@ static int tolua_set_stratagus_CFontColor_Colors(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: New of class  CUpgrade */
-#ifndef TOLUA_DISABLE_tolua_stratagus_CUpgrade_New00
-static int tolua_stratagus_CUpgrade_New00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"CUpgrade",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  {
-   CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::New(ident);
-   tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'New'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Get of class  CUpgrade */
-#ifndef TOLUA_DISABLE_tolua_stratagus_CUpgrade_Get00
-static int tolua_stratagus_CUpgrade_Get00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"CUpgrade",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const std::string ident = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  {
-   CUpgrade* tolua_ret = (CUpgrade*)  CUpgrade::Get(ident);
-   tolua_pushusertype(tolua_S,(void*)tolua_ret,"CUpgrade");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: Costs of class  CUpgrade */
-#ifndef TOLUA_DISABLE_tolua_get_stratagus_CUpgrade_Costs
-static int tolua_get_stratagus_CUpgrade_Costs(lua_State* tolua_S)
-{
- int tolua_index;
-  CUpgrade* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (CUpgrade*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
-  tolua_Error tolua_err;
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=MaxCosts)
-  tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
- tolua_pushnumber(tolua_S,(lua_Number)self->Costs[tolua_index]);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Costs of class  CUpgrade */
-#ifndef TOLUA_DISABLE_tolua_set_stratagus_CUpgrade_Costs
-static int tolua_set_stratagus_CUpgrade_Costs(lua_State* tolua_S)
-{
- int tolua_index;
-  CUpgrade* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (CUpgrade*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
-  tolua_Error tolua_err;
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=MaxCosts)
-  tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
-  self->Costs[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: Icon of class  CUpgrade */
-#ifndef TOLUA_DISABLE_tolua_get_CUpgrade_Icon_ptr
-static int tolua_get_CUpgrade_Icon_ptr(lua_State* tolua_S)
-{
-  CUpgrade* self = (CUpgrade*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Icon'",NULL);
-#endif
-  tolua_pushusertype(tolua_S,(void*)self->Icon,"CIcon");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Icon of class  CUpgrade */
-#ifndef TOLUA_DISABLE_tolua_set_CUpgrade_Icon_ptr
-static int tolua_set_CUpgrade_Icon_ptr(lua_State* tolua_S)
-{
-  CUpgrade* self = (CUpgrade*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Icon'",NULL);
-  if (!tolua_isusertype(tolua_S,2,"CIcon",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->Icon = ((CIcon*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: Index of class  CPlayer */
 #ifndef TOLUA_DISABLE_tolua_get_CPlayer_Index
 static int tolua_get_CPlayer_Index(lua_State* tolua_S)
@@ -16070,32 +15867,25 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
     110,115, 44, 32,109,116, 41, 10,109,116, 32, 61, 32,123, 32,
      95, 95,105,110,100,101,120, 32, 61, 32,102,117,110, 99,116,
     105,111,110, 40,116, 44, 32,107,101,121, 41, 32,114,101,116,
-    117,114,110, 32, 67, 85,112,103,114, 97,100,101, 58, 71,101,
-    116, 40,107,101,121, 41, 32,101,110,100, 32,125, 10, 85,112,
-    103,114, 97,100,101,115, 32, 61, 32,123,125, 10,115,101,116,
-    109,101,116, 97,116, 97, 98,108,101, 40, 85,112,103,114, 97,
-    100,101,115, 44, 32,109,116, 41, 10,109,116, 32, 61, 32,123,
-     32, 95, 95,105,110,100,101,120, 32, 61, 32,102,117,110, 99,
-    116,105,111,110, 40,116, 44, 32,107,101,121, 41, 32,114,101,
-    116,117,114,110, 32, 67, 70,111,110,116, 58, 71,101,116, 40,
-    107,101,121, 41, 32,101,110,100, 32,125, 10, 70,111,110,116,
-    115, 32, 61, 32,123,125, 10,115,101,116,109,101,116, 97,116,
-     97, 98,108,101, 40, 70,111,110,116,115, 44, 32,109,116, 41,
-     10,109,116, 32, 61, 32,123, 32, 95, 95,105,110,100,101,120,
-     32, 61, 32,102,117,110, 99,116,105,111,110, 40,116, 44, 32,
-    107,101,121, 41, 32,114,101,116,117,114,110, 32, 67, 70,111,
-    110,116, 67,111,108,111,114, 58, 71,101,116, 40,107,101,121,
-     41, 32,101,110,100, 32,125, 10, 70,111,110,116, 67,111,108,
-    111,114,115, 32, 61, 32,123,125, 10,115,101,116,109,101,116,
-     97,116, 97, 98,108,101, 40, 70,111,110,116, 67,111,108,111,
-    114,115, 44, 32,109,116, 41, 10,109,116, 32, 61, 32,123, 32,
-     95, 95,105,110,100,101,120, 32, 61, 32,102,117,110, 99,116,
-    105,111,110, 40,116, 44, 32,107,101,121, 41, 32,114,101,116,
-    117,114,110, 32, 85,110,105,116, 84,121,112,101, 66,121, 73,
-    100,101,110,116, 40,107,101,121, 41, 32,101,110,100, 32,125,
-     10, 85,110,105,116, 84,121,112,101,115, 32, 61, 32,123,125,
-     10,115,101,116,109,101,116, 97,116, 97, 98,108,101, 40, 85,
-    110,105,116, 84,121,112,101,115, 44, 32,109,116, 41,32
+    117,114,110, 32, 67, 70,111,110,116, 58, 71,101,116, 40,107,
+    101,121, 41, 32,101,110,100, 32,125, 10, 70,111,110,116,115,
+     32, 61, 32,123,125, 10,115,101,116,109,101,116, 97,116, 97,
+     98,108,101, 40, 70,111,110,116,115, 44, 32,109,116, 41, 10,
+    109,116, 32, 61, 32,123, 32, 95, 95,105,110,100,101,120, 32,
+     61, 32,102,117,110, 99,116,105,111,110, 40,116, 44, 32,107,
+    101,121, 41, 32,114,101,116,117,114,110, 32, 67, 70,111,110,
+    116, 67,111,108,111,114, 58, 71,101,116, 40,107,101,121, 41,
+     32,101,110,100, 32,125, 10, 70,111,110,116, 67,111,108,111,
+    114,115, 32, 61, 32,123,125, 10,115,101,116,109,101,116, 97,
+    116, 97, 98,108,101, 40, 70,111,110,116, 67,111,108,111,114,
+    115, 44, 32,109,116, 41, 10,109,116, 32, 61, 32,123, 32, 95,
+     95,105,110,100,101,120, 32, 61, 32,102,117,110, 99,116,105,
+    111,110, 40,116, 44, 32,107,101,121, 41, 32,114,101,116,117,
+    114,110, 32, 85,110,105,116, 84,121,112,101, 66,121, 73,100,
+    101,110,116, 40,107,101,121, 41, 32,101,110,100, 32,125, 10,
+     85,110,105,116, 84,121,112,101,115, 32, 61, 32,123,125, 10,
+    115,101,116,109,101,116, 97,116, 97, 98,108,101, 40, 85,110,
+    105,116, 84,121,112,101,115, 44, 32,109,116, 41,32
    };
    tolua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 1");
    lua_settop(tolua_S, top);
@@ -16302,8 +16092,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"MaxSelectedTextY",tolua_get_CUserInterface_MaxSelectedTextY,tolua_set_CUserInterface_MaxSelectedTextY);
    tolua_variable(tolua_S,"SingleTrainingButton",tolua_get_CUserInterface_SingleTrainingButton_ptr,tolua_set_CUserInterface_SingleTrainingButton_ptr);
    tolua_variable(tolua_S,"TrainingButtons",tolua_get_CUserInterface_TrainingButtons,tolua_set_CUserInterface_TrainingButtons);
-   tolua_variable(tolua_S,"UpgradingButton",tolua_get_CUserInterface_UpgradingButton_ptr,tolua_set_CUserInterface_UpgradingButton_ptr);
-   tolua_variable(tolua_S,"ResearchingButton",tolua_get_CUserInterface_ResearchingButton_ptr,tolua_set_CUserInterface_ResearchingButton_ptr);
    tolua_variable(tolua_S,"TransportingButtons",tolua_get_CUserInterface_TransportingButtons,tolua_set_CUserInterface_TransportingButtons);
    tolua_variable(tolua_S,"CompletedBarColorRGB",tolua_get_CUserInterface_CompletedBarColorRGB,tolua_set_CUserInterface_CompletedBarColorRGB);
    tolua_variable(tolua_S,"CompletedBarShadow",tolua_get_CUserInterface_CompletedBarShadow,tolua_set_CUserInterface_CompletedBarShadow);
@@ -16895,13 +16683,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,"New",tolua_stratagus_CFontColor_New00);
    tolua_function(tolua_S,"Get",tolua_stratagus_CFontColor_Get00);
    tolua_array(tolua_S,"Colors",tolua_get_stratagus_CFontColor_Colors,tolua_set_stratagus_CFontColor_Colors);
-  tolua_endmodule(tolua_S);
-  tolua_cclass(tolua_S,"CUpgrade","CUpgrade","",NULL);
-  tolua_beginmodule(tolua_S,"CUpgrade");
-   tolua_function(tolua_S,"New",tolua_stratagus_CUpgrade_New00);
-   tolua_function(tolua_S,"Get",tolua_stratagus_CUpgrade_Get00);
-   tolua_array(tolua_S,"Costs",tolua_get_stratagus_CUpgrade_Costs,tolua_set_stratagus_CUpgrade_Costs);
-   tolua_variable(tolua_S,"Icon",tolua_get_CUpgrade_Icon_ptr,tolua_set_CUpgrade_Icon_ptr);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"PlayerNeutral",PlayerNeutral);
   tolua_constant(tolua_S,"PlayerNobody",PlayerNobody);

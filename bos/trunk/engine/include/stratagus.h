@@ -209,7 +209,6 @@ extern char NameLine[];
 
 #define PlayerMax    8                  /// How many players are supported
 #define UnitTypeMax  257                /// How many unit types supported
-#define UpgradeMax   8                  /// How many upgrades supported
 #define UnitMax      2048               /// How many units supported
 
 /*----------------------------------------------------------------------------
@@ -278,8 +277,6 @@ extern std::string StratagusLibPath;        /// Location of stratagus data
 
 extern int SpeedBuild;                      /// Speed factor for building
 extern int SpeedTrain;                      /// Speed factor for training
-extern int SpeedUpgrade;                    /// Speed factor for upgrading
-extern int SpeedResearch;                   /// Speed factor for researching
 
 extern bool UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
 
@@ -315,10 +312,6 @@ extern void ShowLoadProgress(const char *fmt, ...);
 #define CancelBuildingCostsFactor  75
 	/// How many resources the player gets back if canceling training
 #define CancelTrainingCostsFactor  100
-	/// How many resources the player gets back if canceling research
-#define CancelResearchCostsFactor  100
-	/// How many resources the player gets back if canceling upgrade
-#define CancelUpgradeCostsFactor   100
 
 extern std::string CompileOptions;
 //@}

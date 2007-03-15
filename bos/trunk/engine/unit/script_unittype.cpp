@@ -1384,10 +1384,6 @@ static int CclDefineAnimations(lua_State *l)
 			anims->Repair = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Train")) {
 			anims->Train = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Research")) {
-			anims->Research = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Upgrade")) {
-			anims->Upgrade = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Build")) {
 			anims->Build = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Harvest_", 8)) {
@@ -1769,24 +1765,10 @@ void UpdateUnitVariables(const CUnit *unit)
 	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;
 	unit->Variable[TRANSPORT_INDEX].Max = unit->Type->MaxOnBoard;
 
-	// Research.
-	if (unit->Orders[0]->Action == UnitActionResearch) {
-		unit->Variable[RESEARCH_INDEX].Value =
-			unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID];
-		unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
-	}
-
 	// Training
 	if (unit->Orders[0]->Action == UnitActionTrain) {
 		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
 		unit->Variable[TRAINING_INDEX].Max =
-			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[TimeCost];
-	}
-
-	// UpgradeTo
-	if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
-		unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
-		unit->Variable[UPGRADINGTO_INDEX].Max =
 			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[TimeCost];
 	}
 
@@ -1885,7 +1867,7 @@ void UpdateUnitVariables(const CUnit *unit)
 void InitDefinedVariables()
 {
 	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
-		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
+		"Training", "GiveResource", "CarryResource",
 		"Xp", "Kill", "Supply", "Demand", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
 		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",

@@ -94,7 +94,6 @@ void CleanModules(void)
 	CleanUnits();
 	CleanSelections();
 	CleanGroups();
-	CleanUpgrades();
 	CleanDependencies();
 	CleanButtons();
 	CleanMissileTypes();
@@ -137,7 +136,6 @@ void InitModules(void)
 	InitSelections();
 	InitGroups();
 	InitSpells();
-	InitUpgrades();
 	InitDependencies();
 
 	InitButtons();

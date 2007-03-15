@@ -21,10 +21,6 @@ mt = { __index = function(t, key) return CIcon:Get(key) end }
 Icons = {}
 setmetatable(Icons, mt)
 
-mt = { __index = function(t, key) return CUpgrade:Get(key) end }
-Upgrades = {}
-setmetatable(Upgrades, mt)
-
 mt = { __index = function(t, key) return CFont:Get(key) end }
 Fonts = {}
 setmetatable(Fonts, mt)
@@ -57,7 +53,6 @@ $pfile "ui.pkg"
 $pfile "network.pkg"
 $pfile "video.pkg"
 $pfile "font.pkg"
-$pfile "upgrade.pkg"
 $pfile "player.pkg"
 $pfile "unittype.pkg"
 $pfile "unit.pkg"

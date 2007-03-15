@@ -278,8 +278,6 @@ static void (*HandleActionTable[256])(CUnit *) = {
 	HandleActionDie,
 	HandleActionSpellCast,
 	HandleActionTrain,
-	HandleActionUpgradeTo,
-	HandleActionResearch,
 	HandleActionBuilt,
 	HandleActionBoard,
 	HandleActionUnload,
@@ -288,7 +286,6 @@ static void (*HandleActionTable[256])(CUnit *) = {
 	HandleActionRepair,
 	HandleActionResource,
 	HandleActionReturnGoods,
-	HandleActionTransformInto,
 	HandleActionNotWritten,
 
 	// Enough for the future ?

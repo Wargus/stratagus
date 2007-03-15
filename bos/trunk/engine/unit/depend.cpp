@@ -80,10 +80,6 @@ void AddDependency(const char *target, const char *required, int count,
 		// target string refers to unit-xxx
 		rule.Type = DependRuleUnitType;
 		rule.Kind.UnitType = UnitTypeByIdent(target);
-	} else if (!strncmp(target, "upgrade-", 8)) {
-		// target string refers to upgrade-XXX
-		rule.Type = DependRuleUpgrade;
-		rule.Kind.Upgrade = CUpgrade::Get(target);
 	} else {
 		DebugPrint("dependency target `%s' should be unit-type or upgrade\n" _C_
 			target);
@@ -95,8 +91,7 @@ void AddDependency(const char *target, const char *required, int count,
 	//  Find correct hash slot.
 	//
 	if ((node = DependHash[hash])) {  // find correct entry
-		while (node->Type != rule.Type ||
-				node->Kind.Upgrade != rule.Kind.Upgrade) {
+		while (node->Type != rule.Type) {
 			if (!node->Next) {  // end of list
 				temp = new DependRule;
 				temp->Next = NULL;
@@ -137,10 +132,6 @@ void AddDependency(const char *target, const char *required, int count,
 		// required string refers to unit-xxx
 		temp->Type = DependRuleUnitType;
 		temp->Kind.UnitType = UnitTypeByIdent(required);
-	} else if (!strncmp(required, "upgrade-", 8)) {
-		// required string refers to upgrade-XXX
-		temp->Type = DependRuleUpgrade;
-		temp->Kind.Upgrade = CUpgrade::Get(required);
 	} else {
 		DebugPrint("dependency required `%s' should be unit-type or upgrade\n" _C_
 			required);
@@ -184,7 +175,7 @@ void AddDependency(const char *target, const char *required, int count,
 **  Check if this upgrade or unit is available.
 **
 **  @param player  For this player available.
-**  @param target  Unit or Upgrade.
+**  @param target  Unit.
 **
 **  @return        True if available, false otherwise.
 */
@@ -205,13 +196,6 @@ bool CheckDependByIdent(const CPlayer *player, const std::string &target)
 			return false;
 		}
 		rule.Type = DependRuleUnitType;
-	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
-		// target string refers to upgrade-XXX
-		rule.Kind.Upgrade = CUpgrade::Get(target);
-		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
-			return false;
-		}
-		rule.Type = DependRuleUpgrade;
 	} else {
 		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
@@ -223,8 +207,7 @@ bool CheckDependByIdent(const CPlayer *player, const std::string &target)
 	i = (int)(long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash));
 
 	if ((node = DependHash[i])) {  // find correct entry
-		while (node->Type != rule.Type ||
-				node->Kind.Upgrade != rule.Kind.Upgrade) {
+		while (node->Type != rule.Type) {
 			if (!node->Next) {  // end of list
 				return true;
 			}
@@ -246,12 +229,6 @@ bool CheckDependByIdent(const CPlayer *player, const std::string &target)
 				case DependRuleUnitType:
 					i = player->HaveUnitTypeByType(temp->Kind.UnitType);
 					if (temp->Count ? i < temp->Count : i) {
-						goto try_or;
-					}
-					break;
-				case DependRuleUpgrade:
-					i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
-					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
 					break;

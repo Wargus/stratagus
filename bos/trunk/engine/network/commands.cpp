@@ -845,14 +845,6 @@ static void DoNextReplay(void)
 		SendCommandTrainUnit(UnitSlots[unit], UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-train")) {
 		SendCommandCancelTraining(UnitSlots[unit], num, (val && *val) ? UnitTypeByIdent(val) : NULL);
-	} else if (!strcmp(action, "upgrade-to")) {
-		SendCommandUpgradeTo(UnitSlots[unit], UnitTypeByIdent(val), flags);
-	} else if (!strcmp(action, "cancel-upgrade-to")) {
-		SendCommandCancelUpgradeTo(UnitSlots[unit]);
-	} else if (!strcmp(action, "research")) {
-		SendCommandResearch(UnitSlots[unit], CUpgrade::Get(val), flags);
-	} else if (!strcmp(action, "cancel-research")) {
-		SendCommandCancelResearch(UnitSlots[unit]);
 	} else if (!strcmp(action, "spell-cast")) {
 		SendCommandSpellCast(UnitSlots[unit], posx, posy, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {
@@ -1265,74 +1257,6 @@ void SendCommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 }
 
 /**
-** Send command: Building starts upgrading to.
-**
-** @param unit     pointer to unit.
-** @param what     pointer to unit-type of the unit upgrade.
-** @param flush    Flag flush all pending commands.
-*/
-void SendCommandUpgradeTo(CUnit *unit, CUnitType *what, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("upgrade-to", unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
-		CommandUpgradeTo(unit, what, flush);
-	} else {
-		NetworkSendCommand(MessageCommandUpgrade, unit, 0, 0, NoUnitP, what, flush);
-	}
-}
-
-/**
-** Send command: Cancel building upgrading to.
-**
-** @param unit  Pointer to unit.
-*/
-void SendCommandCancelUpgradeTo(CUnit *unit)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("cancel-upgrade-to", unit, FlushCommands,
-			-1, -1, NoUnitP, NULL, -1);
-		CommandCancelUpgradeTo(unit);
-	} else {
-		NetworkSendCommand(MessageCommandCancelUpgrade, unit,
-			0, 0, NoUnitP, NULL, FlushCommands);
-	}
-}
-
-/**
-** Send command: Building/unit research.
-**
-** @param unit     pointer to unit.
-** @param what     research-type of the research.
-** @param flush    Flag flush all pending commands.
-*/
-void SendCommandResearch(CUnit *unit, CUpgrade *what, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("research", unit, flush, -1, -1, NoUnitP, what->Ident.c_str(), -1);
-		CommandResearch(unit, what, flush);
-	} else {
-		NetworkSendCommand(MessageCommandResearch, unit,
-			what->ID, 0, NoUnitP, NULL, flush);
-	}
-}
-
-/**
-** Send command: Cancel Building/unit research.
-**
-** @param unit pointer to unit.
-*/
-void SendCommandCancelResearch(CUnit *unit)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("cancel-research", unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
-		CommandCancelResearch(unit);
-	} else {
-		NetworkSendCommand(MessageCommandCancelResearch, unit,
-			0, 0, NoUnitP, NULL, FlushCommands);
-	}
-}
-
-/**
 ** Send command: Unit spell cast on position/unit.
 **
 ** @param unit      pointer to unit.
@@ -1603,26 +1527,6 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 					NULL, (short)x);
 				CommandCancelTraining(unit, (short)x, NULL);
 			}
-			break;
-		case MessageCommandUpgrade:
-			CommandLog("upgrade-to", unit, status, -1, -1, NoUnitP,
-				UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandUpgradeTo(unit, UnitTypes[dstnr], status);
-			break;
-		case MessageCommandCancelUpgrade:
-			CommandLog("cancel-upgrade-to", unit, FlushCommands, -1, -1, NoUnitP,
-				NULL, -1);
-			CommandCancelUpgradeTo(unit);
-			break;
-		case MessageCommandResearch:
-			CommandLog("research", unit, status, -1, -1, NoUnitP,
-				AllUpgrades[x]->Ident.c_str(), -1);
-			CommandResearch(unit, AllUpgrades[x], status);
-			break;
-		case MessageCommandCancelResearch:
-			CommandLog("cancel-research", unit, FlushCommands, -1, -1, NoUnitP,
-				NULL, -1);
-			CommandCancelResearch(unit);
 			break;
 		default:
 			id = (msgnr&0x7f) - MessageCommandSpellCast;

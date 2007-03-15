@@ -40,7 +40,6 @@ class CPlayer;
 class CFile;
 class CUnit;
 class CUnitType;
-class CUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -86,11 +85,6 @@ extern void AiCanNotReach(CUnit *unit,
 extern void AiCanNotMove(CUnit *unit);
 	/// Called if AI unit has completed training
 extern void AiTrainingComplete(CUnit *unit, CUnit *what);
-	/// Called if AI unit has completed upgrade to
-extern void AiUpgradeToComplete(CUnit *unit,
-	const CUnitType *what);
-	/// Called if AI unit has completed research
-extern void AiResearchComplete(CUnit *unit, const CUpgrade *what);
 
 //@}
 

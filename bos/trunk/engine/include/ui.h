@@ -562,10 +562,6 @@ public:
 	int TrainingTextX;                  /// Multiple Training X Text position
 	int TrainingTextY;                  /// Multiple Training Y Text position
 
-	CUIButton *UpgradingButton;         /// Button info for upgrade
-
-	CUIButton *ResearchingButton;       /// Button info for researching
-
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
 	// Completed bar

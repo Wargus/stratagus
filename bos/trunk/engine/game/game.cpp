@@ -664,11 +664,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	PlayersInitAi();
 
 	//
-	// Upgrades
-	//
-	InitUpgrades();
-
-	//
 	// Dependencies
 	//
 	InitDependencies();

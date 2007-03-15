@@ -1009,7 +1009,7 @@ SpellType *SpellTypeByIdent(const std::string &ident)
 // ****************************************************************************
 
 /**
-**  Check if spell is research for player \p player.
+**  Check if spell is available for player \p player.
 **  @param player    player for who we want to know if he knows the spell.
 **  @param spellid   id of the spell to check.
 **
@@ -1020,7 +1020,7 @@ bool SpellIsAvailable(const CPlayer *player, int spellid)
 	int dependencyId;
 	dependencyId = SpellTypeTable[spellid]->DependencyId;
 
-	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
+	return dependencyId == -1;
 }
 
 /**
@@ -1033,7 +1033,7 @@ bool SpellIsAvailable(const CPlayer *player, int spellid)
 **  @param y         Y coord of target spot when/if target does not exist
 **
 **  @return          =!0 if spell should/can casted, 0 if not
-**  @note caster must know the spell, and spell must be researched.
+**  @note caster must know the spell, and spell must be available.
 */
 int CanCastSpell(const CUnit *caster, const SpellType *spell,
 	const CUnit *target, int x, int y)

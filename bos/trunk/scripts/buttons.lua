@@ -36,11 +36,6 @@ DefineButton( { Pos = 9, Level = 9, Icon = "icon-cancel",
   ForUnit = {"*"} } )
 
 DefineButton( { Pos = 9, Level = 0, Icon = "icon-cancel",
-  Action = "cancel-upgrade",
-  Key = "\027", Hint = "~<ESC~> CANCEL UPGRADE",
-  ForUnit = {"cancel-upgrade"} } )
-
-DefineButton( { Pos = 9, Level = 0, Icon = "icon-cancel",
   Action = "cancel-train-unit",
   Key = "\027", Hint = "~<ESC~> CANCEL UNIT TRAINING",
   ForUnit = {"*"} } )

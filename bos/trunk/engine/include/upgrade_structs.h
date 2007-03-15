@@ -136,59 +136,9 @@ public:
 	int Costs[MaxCosts];            /// current costs of the unit
 };
 
-/**
-**  The main useable upgrades.
-*/
-class CUpgrade {
-public:
-	CUpgrade(const std::string &ident);
-	~CUpgrade();
-
-	static CUpgrade *New(const std::string &ident);
-	static CUpgrade *Get(const std::string &ident);
-
-	void SetIcon(CIcon *icon);
-
-	std::string Ident;                /// identifier
-	int   ID;                         /// numerical id
-	int   Costs[MaxCosts];            /// costs for the upgrade
-		// TODO: not used by buttons
-	CIcon *Icon;                      /// icon to display to the user
-};
-
 /*----------------------------------------------------------------------------
 --  upgrades and modifiers
 ----------------------------------------------------------------------------*/
-
-/**
-**  This is the modifier of an upgrade.
-**  This do the real action of an upgrade, an upgrade can have multiple
-**  modifiers.
-*/
-class CUpgradeModifier {
-public:
-	CUpgradeModifier() : UpgradeId(0), ConvertTo(NULL)
-	{
-		memset(ChangeUnits, 0, sizeof(ChangeUnits));
-		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
-		memset(ApplyTo, 0, sizeof(ApplyTo));
-	}
-
-	int UpgradeId;                      /// used to filter required modifier
-
-	CUnitStats Modifier;                 /// modifier of unit stats.
-
-	// allow/forbid bitmaps -- used as chars for example:
-	// `?' -- leave as is, `F' -- forbid, `A' -- allow
-	// TODO: see below allow more semantics?
-	// TODO: pointers or ids would be faster and less memory use
-	int  ChangeUnits[UnitTypeMax];      /// add/remove allowed units
-	char ChangeUpgrades[UpgradeMax];    /// allow/forbid upgrades
-	char ApplyTo[UnitTypeMax];          /// which unit types are affected
-
-	CUnitType *ConvertTo;               /// convert to this unit-type.
-
-};
 
 /**
 **  Allow what a player can do. Every #CPlayer has an own allow struct.
@@ -207,47 +157,12 @@ class CAllow {
 public:
 	CAllow() { this->Clear(); }
 
-	void RevertUpgrades() {
-		for (int i = 0; i < UpgradeMax; i++) {
-			if (Upgrades[i] == 'R') {
-				Upgrades[i] = 'A';
-			}
-		}
-	}
-
 	void Clear() {
 		memset(Units, 0, sizeof(Units));
-		memset(Upgrades, 0, sizeof(Upgrades));
 	}
 
-	int  Units[UnitTypeMax];        /// maximum amount of units allowed
-	char Upgrades[UpgradeMax];      /// upgrades allowed/disallowed
+	int Units[UnitTypeMax];        /// maximum amount of units allowed
 };
-
-/**
-**  Upgrade timer used in the player structure.
-**  Every player has an own UpgradeTimers struct.
-*/
-class CUpgradeTimers {
-public:
-	CUpgradeTimers() { this->Clear(); }
-
-	void Clear() {
-		memset(Upgrades, 0, sizeof(Upgrades));
-	}
-
-	/**
-	**  all 0 at the beginning, all upgrade actions do increment values in
-	**  this struct.
-	*/
-	int Upgrades[UpgradeMax];       /// counter for each upgrade
-};
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern std::vector<CUpgrade *> AllUpgrades;  /// the main user usable upgrades
 
 //@}
 

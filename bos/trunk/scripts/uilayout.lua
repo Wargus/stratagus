@@ -63,7 +63,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   {
   Ident = "panel-building-contents",
   Pos = {info_panel_x, info_panel_y}, DefaultFont = "game",
-  Condition = {ShowOpponent = false, HideNeutral = true, Build = "false", Supply = "only", Training = "false", UpgradeTo = "false"},
+  Condition = {ShowOpponent = false, HideNeutral = true, Build = "false", Supply = "only", Training = "false"},
 -- FIXME more condition. not town hall.
   Contents = {
 -- Food building
@@ -98,23 +98,11 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	},
 	{ Pos = {50, 154}, Condition = {Build = "only"}, More = {"Text", "% Complete"}},
 	{ Pos = {107, 78}, Condition = {Build = "only"}, More = {"Icon", {Unit = "Worker"}}},
--- Research
-	{ Pos = {14, 141}, Condition = {Research = "only"},
-		More = {"CompleteBar", {Variable = "Research", Width = 136, Height = 12}}
-	},
-	{ Pos = {64, 106}, Condition = {Research = "only"}, More = {"Text", "Researching"}},
-	{ Pos = {44, 141}, Condition = {Research = "only"}, More = {"Text", "% Complete"}},
 -- Training
 	{ Pos = {14, 141}, Condition = {Training = "only"},
 		More = {"CompleteBar", {Variable = "Training", Width = 136, Height = 12}}
 	},
 	{ Pos = {44, 141}, Condition = {Training = "only"}, More = {"Text", "% Complete"}},
--- Upgrading To
-	{ Pos = {14, 141}, Condition = {UpgradeTo = "only"},
-		More = {"CompleteBar", {Variable = "UpgradeTo", Width = 136, Height = 12}}
-	},
-	{ Pos = {37,  86}, More = {"Text", "Upgrading:"}, Condition = {UpgradeTo = "only"} },
-	{ Pos = {44, 141}, More = {"Text", "% Complete"}, Condition = {UpgradeTo = "only"} },
 -- Mana
 	{ Pos = {16, 141}, Condition = {Mana = "only"},
 		More = {"CompleteBar", {Variable = "Mana", Height = 16, Width = 140, Border = true}}
@@ -234,18 +222,6 @@ AddTrainingButton(Video.Width - 200 + 43, 152 + 91)
 AddTrainingButton(Video.Width - 200 + 58, 152 + 91)
 AddTrainingButton(Video.Width - 200 + 73, 152 + 91)
 AddTrainingButton(Video.Width - 200 + 88, 152 + 91)
-
-b = CUIButton:new()
-b.X = Video.Width - 200 + 13
-b.Y = 152 + 91
-b.Style = FindButtonStyle("icon")
-UI.UpgradingButton = b
-
-b = CUIButton:new()
-b.X = Video.Width - 200 + 13
-b.Y = 152 + 91
-b.Style = FindButtonStyle("icon")
-UI.ResearchingButton = b
 
 function AddTransportingButton(x, y)
 	b = CUIButton:new_local()

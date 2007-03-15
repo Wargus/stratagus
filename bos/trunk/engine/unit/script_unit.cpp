@@ -169,10 +169,6 @@ void CclParseOrder(lua_State *l, COrder *order)
 			order->Action = UnitActionSpellCast;
 		} else if (!strcmp(value, "action-train")) {
 			order->Action = UnitActionTrain;
-		} else if (!strcmp(value, "action-upgrade-to")) {
-			order->Action = UnitActionUpgradeTo;
-		} else if (!strcmp(value, "action-research")) {
-			order->Action = UnitActionResearch;
 		} else if (!strcmp(value, "action-built")) {
 			order->Action = UnitActionBuilt;
 		} else if (!strcmp(value, "action-board")) {
@@ -264,12 +260,6 @@ void CclParseOrder(lua_State *l, COrder *order)
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			order->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1));
-			lua_pop(l, 1);
-
-		} else if (!strcmp(value, "upgrade")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.Upgrade = CUpgrade::Get(LuaToString(l, -1));
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "mine")) {
@@ -389,65 +379,6 @@ static void CclParseResWorker(lua_State *l, CUnit *unit)
 		} else if (!strcmp(value, "done-harvesting")) {
 			unit->Data.ResWorker.DoneHarvesting = 1;
 			--j;
-		}
-	}
-}
-
-/**
-**  Parse research
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResearch(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = luaL_getn(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ident")) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			unit->Data.Research.Upgrade = CUpgrade::Get(value);
-		}
-	}
-}
-
-/**
-**  Parse upgrade to
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseUpgradeTo(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = luaL_getn(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.UpgradeTo.Ticks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		}
 	}
 }
@@ -804,14 +735,6 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "data-res-worker")) {
 			lua_pushvalue(l, j + 1);
 			CclParseResWorker(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-research")) {
-			lua_pushvalue(l, j + 1);
-			CclParseResearch(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-upgrade-to")) {
-			lua_pushvalue(l, j + 1);
-			CclParseUpgradeTo(l, unit);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-train")) {
 			lua_pushvalue(l, j + 1);

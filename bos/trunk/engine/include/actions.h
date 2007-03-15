@@ -45,7 +45,6 @@ enum _diplomacy_ {
 
 class CUnit;
 class CUnitType;
-class CUpgrade;
 class SpellType;
 class COrder;
 class CAnimation;
@@ -114,17 +113,8 @@ extern void CommandTrainUnit(CUnit *unit, CUnitType *what,
 	/// Prepare command cancel training
 extern void CommandCancelTraining(CUnit *unit, int slot,
 	const CUnitType *type);
-	/// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit *unit, CUnitType *what,
-	int flush);
 	/// immediate transforming into type.
 extern void CommandTransformIntoType(CUnit *unit, CUnitType *type);
-	/// Prepare command cancel upgrade to
-extern void CommandCancelUpgradeTo(CUnit *unit);
-	/// Prepare command research
-extern void CommandResearch(CUnit *unit, CUpgrade *what, int flush);
-	/// Prepare command cancel research
-extern void CommandCancelResearch(CUnit *unit);
 	/// Prepare command spellcast
 extern void CommandSpellCast(CUnit *unit, int x, int y,
 	CUnit *dest, SpellType *spell, int flush);
@@ -179,14 +169,6 @@ extern void HandleActionBuild(CUnit *unit);
 extern void HandleActionBuilt(CUnit *unit);
 	/// Handle command train
 extern void HandleActionTrain(CUnit *unit);
-	/// Handle command upgrade to
-extern void HandleActionUpgradeTo(CUnit *unit);
-	/// Handle command transform into
-extern void HandleActionTransformInto(CUnit *unit);
-	/// Handle command upgrade
-extern void HandleActionUpgrade(CUnit *unit);
-	/// Handle command research
-extern void HandleActionResearch(CUnit *unit);
 	/// Handle command spellcast
 extern void HandleActionSpellCast(CUnit *unit);
 
