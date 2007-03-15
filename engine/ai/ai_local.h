@@ -47,7 +47,6 @@
 
 class CUnit;
 class CUnitType;
-class CUpgrade;
 class CPlayer;
 
 /**
@@ -218,8 +217,6 @@ public:
 	std::vector<AiTransportRequest> TransportRequests;/// Requests for transport
 	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
-	std::vector<CUnitType *> UpgradeToRequests;     /// Upgrade to unit-type requested and priority list
-	std::vector<CUpgrade *> ResearchRequests;       /// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;        /// What the resource manager should build
 	int LastRepairBuilding;                         /// Last building checked for repair in this turn
 	unsigned TriedRepairWorkers[UnitMax];           /// No. workers that failed trying to repair a building
@@ -230,7 +227,7 @@ public:
 **
 **  Contains informations needed for the AI. If the AI needs an unit or
 **  building or upgrade or spell, it could lookup in this tables to find
-**  where it could be trained, built or researched.
+**  where it could be trained or built.
 */
 class AiHelper {
 public:
@@ -244,16 +241,6 @@ public:
 	** units/buildings which could build this unit.
 	*/
 	std::vector<std::vector<CUnitType *> > Build;
-	/**
-	** The index is the upgrade that should be made, giving a table of all
-	** units/buildings which could do the upgrade.
-	*/
-	std::vector<std::vector<CUnitType *> > Upgrade;
-	/**
-	** The index is the research that should be made, giving a table of all
-	** units/buildings which could research this upgrade.
-	*/
-	std::vector<std::vector<CUnitType *> > Research;
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
@@ -290,10 +277,6 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 	/// Add unit-type request to resource manager
 extern void AiAddUnitTypeRequest(CUnitType *type, int count);
-	/// Add upgrade-to request to resource manager
-extern void AiAddUpgradeToRequest(CUnitType *type);
-	/// Add research request to resource manager
-extern void AiAddResearchRequest(CUpgrade *upgrade);
 	/// Periodic called resource manager handler
 extern void AiResourceManager(void);
 	/// Ask the ai to explore around x,y

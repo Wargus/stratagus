@@ -105,8 +105,7 @@ public:
 class CAnimations {
 public:
 	CAnimations() : Start(NULL), Still(NULL), Death(NULL), Attack(NULL),
-		Move(NULL), Repair(NULL), Train(NULL), Research(NULL),
-		Upgrade(NULL), Build(NULL)
+		Move(NULL), Repair(NULL), Train(NULL), Build(NULL)
 	{
 		memset(Harvest, 0, sizeof(Harvest));
 	}
@@ -118,8 +117,6 @@ public:
 	CAnimation *Move;
 	CAnimation *Repair;
 	CAnimation *Train;
-	CAnimation *Research;
-	CAnimation *Upgrade;
 	CAnimation *Build;
 	CAnimation *Harvest[MaxCosts];
 };

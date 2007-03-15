@@ -895,13 +895,6 @@ void UnitLost(CUnit *unit)
 		}
 	}
 
-	//
-	//  Handle research cancels.
-	//
-	if (unit->Orders[0]->Action == UnitActionResearch) {
-		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID] = 0;
-	}
-
 	DebugPrint("Lost %s(%d)\n" _C_ unit->Type->Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
@@ -1034,8 +1027,7 @@ static void UnitFillSeenValues(CUnit *unit)
 	unit->Seen.IY = unit->IY;
 	unit->Seen.IX = unit->IX;
 	unit->Seen.Frame = unit->Frame;
-	unit->Seen.State = (unit->Orders[0]->Action == UnitActionBuilt) |
-			((unit->Orders[0]->Action == UnitActionUpgradeTo) << 1);
+	unit->Seen.State = (unit->Orders[0]->Action == UnitActionBuilt);
 	if (unit->Orders[0]->Action == UnitActionDie) {
 		unit->Seen.State = 3;
 	}
@@ -3505,12 +3497,6 @@ void SaveOrder(const COrder *order, CFile *file)
 		case UnitActionTrain:
 			file->printf("\"action-train\",");
 			break;
-		case UnitActionUpgradeTo:
-			file->printf("\"action-upgrade-to\",");
-			break;
-		case UnitActionResearch:
-			file->printf("\"action-research\",");
-			break;
 		case UnitActionBuilt:
 			file->printf("\"action-built\",");
 			break;
@@ -3568,11 +3554,6 @@ void SaveOrder(const COrder *order, CFile *file)
 		case UnitActionSpellCast:
 			if (order->Arg1.Spell) {
 				file->printf(" \"spell\", \"%s\",", order->Arg1.Spell->Ident.c_str());
-			}
-			break;
-		case UnitActionResearch:
-			if (order->Arg1.Upgrade) {
-				file->printf(" \"upgrade\", \"%s\",", order->Arg1.Upgrade->Ident.c_str());
 			}
 			break;
 		case UnitActionResource :
@@ -3800,16 +3781,6 @@ void SaveUnit(const CUnit *unit, CFile *file)
 				file->printf("}");
 				break;
 			}
-		case UnitActionResearch:
-			file->printf(",\n  \"data-research\", {");
-			file->printf("\"ident\", \"%s\",", unit->Data.Research.Upgrade->Ident.c_str());
-			file->printf("}");
-			break;
-		case UnitActionUpgradeTo:
-			file->printf(",\n  \"data-upgrade-to\", {");
-			file->printf("\"ticks\", %d,", unit->Data.UpgradeTo.Ticks);
-			file->printf("}");
-			break;
 		case UnitActionTrain:
 			file->printf(",\n  \"data-train\", {");
 			file->printf("\"ticks\", %d, ", unit->Data.Train.Ticks);

@@ -106,8 +106,6 @@ static void MapAnimSounds(CUnitType *type)
 	MapAnimSounds2(type->Animations->Move);
 	MapAnimSounds2(type->Animations->Repair);
 	MapAnimSounds2(type->Animations->Train);
-	MapAnimSounds2(type->Animations->Research);
-	MapAnimSounds2(type->Animations->Upgrade);
 	MapAnimSounds2(type->Animations->Build);
 	for (i = 0; i < MaxCosts; ++i) {
 		MapAnimSounds2(type->Animations->Harvest[i]);

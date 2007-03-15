@@ -1181,16 +1181,10 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonReturn;
 			} else if (!strcmp(value, "cast-spell")) {
 				ba.Action = ButtonSpellCast;
-			} else if (!strcmp(value, "research")) {
-				ba.Action = ButtonResearch;
-			} else if (!strcmp(value, "upgrade-to")) {
-				ba.Action = ButtonUpgradeTo;
 			} else if (!strcmp(value, "unload")) {
 				ba.Action = ButtonUnload;
 			} else if (!strcmp(value, "cancel")) {
 				ba.Action = ButtonCancel;
-			} else if (!strcmp(value, "cancel-upgrade")) {
-				ba.Action = ButtonCancelUpgrade;
 			} else if (!strcmp(value, "cancel-train-unit")) {
 				ba.Action = ButtonCancelTrain;
 			} else if (!strcmp(value, "cancel-build")) {
@@ -1215,8 +1209,6 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckTrue;
 			} else if (!strcmp(value, "check-false")) {
 				ba.Allowed = ButtonCheckFalse;
-			} else if (!strcmp(value, "check-upgrade")) {
-				ba.Allowed = ButtonCheckUpgrade;
 			} else if (!strcmp(value, "check-units-or")) {
 				ba.Allowed = ButtonCheckUnitsOr;
 			} else if (!strcmp(value, "check-units-and")) {
@@ -1227,16 +1219,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckNoNetwork;
 			} else if (!strcmp(value, "check-no-work")) {
 				ba.Allowed = ButtonCheckNoWork;
-			} else if (!strcmp(value, "check-no-research")) {
-				ba.Allowed = ButtonCheckNoResearch;
 			} else if (!strcmp(value, "check-attack")) {
 				ba.Allowed = ButtonCheckAttack;
-			} else if (!strcmp(value, "check-upgrade-to")) {
-				ba.Allowed = ButtonCheckUpgradeTo;
-			} else if (!strcmp(value, "check-research")) {
-				ba.Allowed = ButtonCheckResearch;
-			} else if (!strcmp(value, "check-single-research")) {
-				ba.Allowed = ButtonCheckSingleResearch;
 			} else {
 				LuaError(l, "Unsupported action: %s" _C_ value);
 			}

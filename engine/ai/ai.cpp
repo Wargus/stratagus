@@ -123,14 +123,6 @@
 ** ::AiTrainingComplete()
 **
 ** Called if AI unit has completed training a new unit.
-**
-** ::AiUpgradeToComplete()
-**
-** Called if AI unit has completed upgrade to new unit-type.
-**
-** ::AiResearchComplete()
-**
-** Called if AI unit has completed research of an upgrade or spell.
 */
 
 /*----------------------------------------------------------------------------
@@ -282,42 +274,6 @@ static void AiCheckUnits(void)
 			counter[t] -= x;
 		}
 	}
-
-	//
-	//  Look if some upgrade-to are missing.
-	//
-	n = AiPlayer->UpgradeToRequests.size();
-	for (i = 0; i < n; ++i) {
-		t = AiPlayer->UpgradeToRequests[i]->Slot;
-		x = 1;
-
-		//
-		//  Add equivalent units
-		//
-		e = unit_types_count[t];
-		if (t < (int)AiHelpers.Equiv.size()) {
-			for (j = 0; j < (int)AiHelpers.Equiv[t].size(); ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
-			}
-		}
-
-		if (x > e + counter[t]) {  // Request it.
-			AiAddUpgradeToRequest(AiPlayer->UpgradeToRequests[i]);
-			counter[t] += x - e - counter[t];
-		}
-		counter[t] -= x;
-	}
-
-	//
-	//  Look if some researches are missing.
-	//
-	n = (int)AiPlayer->ResearchRequests.size();
-	for (i = 0; i < n; ++i) {
-		if (UpgradeIdAllowed(AiPlayer->Player,
-				AiPlayer->ResearchRequests[i]->ID) == 'A') {
-			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
-		}
-	}
 }
 
 /*----------------------------------------------------------------------------
@@ -444,18 +400,6 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	for (i = 0; i < (int)ai->UnitTypeRequests.size(); ++i) {
 		file->printf("\"%s\", ", ai->UnitTypeRequests[i].Type->Ident.c_str());
 		file->printf("%d, ", ai->UnitTypeRequests[i].Count);
-	}
-	file->printf("},\n");
-
-	file->printf("  \"upgrade\", {");
-	for (i = 0; i < (int)ai->UpgradeToRequests.size(); ++i) {
-		file->printf("\"%s\", ", ai->UpgradeToRequests[i]->Ident.c_str());
-	}
-	file->printf("},\n");
-
-	file->printf("  \"research\", {");
-	for (i = 0; i < (int)ai->ResearchRequests.size(); ++i) {
-		file->printf("\"%s\", ", ai->ResearchRequests[i]->Ident.c_str());
 	}
 	file->printf("},\n");
 
@@ -614,8 +558,6 @@ void FreeAi()
 	//
 	AiHelpers.Train.clear();
 	AiHelpers.Build.clear();
-	AiHelpers.Upgrade.clear();
-	AiHelpers.Research.clear();
 	AiHelpers.Repair.clear();
 	AiHelpers.UnitLimit.clear();
 	AiHelpers.Equiv.clear();
@@ -1089,38 +1031,6 @@ void AiTrainingComplete(CUnit *unit, CUnit *what)
 	AiPlayer = unit->Player->Ai;
 	AiCleanForces();
 	AiAssignToForce(what);
-}
-
-/**
-**  Called if upgrading of an unit is completed.
-**
-**  @param unit Pointer to unit working.
-**  @param what Pointer to the new unit-type.
-*/
-void AiUpgradeToComplete(CUnit *unit, const CUnitType *what)
-{
-	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
-		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
-		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
-
-	Assert(unit->Player->Type != PlayerPerson);
-}
-
-/**
-**  Called if reseaching of an unit is completed.
-**
-**  @param unit  Pointer to unit working.
-**  @param what  Pointer to the new upgrade.
-*/
-void AiResearchComplete(CUnit *unit, const CUpgrade *what)
-{
-	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
-		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_
-		what->Ident.c_str() _C_ unit->X _C_ unit->Y);
-
-	Assert(unit->Player->Type != PlayerPerson);
-
-	// FIXME: upgrading knights -> paladins, must rebuild lists!
 }
 
 /**

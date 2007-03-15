@@ -46,7 +46,6 @@ enum ReplayType {
 
 class CFile;
 class CUnitType;
-class CUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -126,15 +125,6 @@ extern void SendCommandTrainUnit(CUnit *unit,
 	/// Send cancel training command
 extern void SendCommandCancelTraining(CUnit *unit, int slot,
 	const CUnitType *type);
-	/// Send upgrade to command
-extern void SendCommandUpgradeTo(CUnit *unit,
-	CUnitType *what, int flush);
-	/// Send cancel upgrade to command
-extern void SendCommandCancelUpgradeTo(CUnit *unit);
-	/// Send research command
-extern void SendCommandResearch(CUnit *unit, CUpgrade *what, int flush);
-	/// Send cancel research command
-extern void SendCommandCancelResearch(CUnit *unit);
 	/// Send spell cast command
 extern void SendCommandSpellCast(CUnit *unit, int x, int y,
 	CUnit *dest, int spellid, int flush);

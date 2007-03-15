@@ -7,7 +7,7 @@
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
-/**@name depend.h - The units/upgrade dependencies headerfile. */
+/**@name depend.h - The units dependencies headerfile. */
 //
 //      (c) Copyright 2000-2004 by Vladi Belperchinov-Shabanski
 //
@@ -43,9 +43,9 @@
 **
 **  typedef struct _depend_rule_ DependRule;
 **
-**  This structure is used define the requirements of upgrades or
+**  This structure is used define the requirements of 
 **  unit-types. The structure is used to define the base (the wanted)
-**  upgrade or unit-type and the requirements upgrades or unit-types.
+**  unit-type and the requirements unit-types.
 **  The requirements could be combination of and-rules and or-rules.
 **
 **  This structure is very complex because nearly everything has two
@@ -55,7 +55,7 @@
 **
 **  DependRule::Next
 **
-**    Next rule in hash chain for the base upgrade/unit-type.
+**    Next rule in hash chain for the base unit-type.
 **    Next and-rule for the requirements.
 **
 **  DependRule::Count
@@ -79,13 +79,9 @@
 **
 **    An unit-type pointer.
 **
-**  DependRule::Kind::Upgrade
-**
-**    An upgrade pointer.
-**
 **  DependRule::Rule
 **
-**    For the base upgrade/unit-type the rules which must be meet.
+**    For the base unit-type the rules which must be met.
 **    For the requirements alternative or-rules.
 **
 */
@@ -96,11 +92,9 @@
 
 class CPlayer;
 class CUnitType;
-class CUpgrade;
 
 enum {
 	DependRuleUnitType,  /// Kind is an unit-type
-	DependRuleUpgrade,   /// Kind is an upgrade
 };
 
 	/// Dependency rule
@@ -108,10 +102,9 @@ class DependRule {
 public:
 	DependRule *Next;         /// next hash chain, or rules
 	unsigned char Count;      /// how many required
-	char Type;                /// an unit-type or upgrade
+	char Type;                /// a unit-type
 	union {
 		CUnitType *UnitType;  /// unit-type pointer
-		CUpgrade  *Upgrade;   /// upgrade pointer
 	} Kind;                   /// required object
 	DependRule *Rule;         /// requirements, and rule
 };

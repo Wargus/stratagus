@@ -251,13 +251,6 @@ void SavePlayers(CFile *file)
 
 		// Allow saved by allow.
 
-		file->printf("\n  \"timers\", {");
-		for (j = 0; j < UpgradeMax; ++j) {
-			if (j) {
-				file->printf(" ");
-			}
-			file->printf("%d,", Players[i].UpgradeTimers.Upgrades[j]);
-		}
 		file->printf("})\n\n");
 	}
 
@@ -481,12 +474,6 @@ void CPlayer::Clear()
 	TotalRazings = 0;
 	TotalKills = 0;
 	Color = 0;
-	// Allow has already been initialised by DefineAllow and DefineUnitAllow.
-	// Thus we cannot simply clear it.
-	// But we have to revert upgrades that could have happened during a
-	// the previous game.
-	Allow.RevertUpgrades();
-	UpgradeTimers.Clear();
 }
 
 /*----------------------------------------------------------------------------

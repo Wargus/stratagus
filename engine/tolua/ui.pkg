@@ -135,8 +135,6 @@ class CUserInterface
 
 	CUIButton *SingleTrainingButton;
 	vector<CUIButton> TrainingButtons;
-	CUIButton *UpgradingButton;
-	CUIButton *ResearchingButton;
 	vector<CUIButton> TransportingButtons;
 
 	CColor CompletedBarColorRGB;

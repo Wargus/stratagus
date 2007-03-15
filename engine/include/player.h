@@ -246,7 +246,7 @@
 **
 **  CPlayer::Allow
 **
-**    Contains which unit-types and upgrades are allowed for the
+**    Contains which unit-types are allowed for the
 **    player. Possible values are:
 **    @li  `A' -- allowed,
 **    @li  `F' -- forbidden,
@@ -254,14 +254,6 @@
 **    @li  `Q' -- acquired but forbidden (does it make sense?:))
 **    @li  `E' -- enabled, allowed by level but currently forbidden
 **    @see CAllow
-**
-**  CPlayer::UpgradeTimers
-**
-**    Timer for the upgrades. One timer for all possible upgrades.
-**    Initial 0 counted up by the upgrade action, until it reaches
-**    the upgrade time.
-**    @see _upgrade_timers_
-**    @note it is planned to combine research for faster upgrades.
 */
 
 /*----------------------------------------------------------------------------
@@ -336,9 +328,8 @@ public:
 
 	CUnitColors UnitColors; /// Unit colors for new units
 
-	// Upgrades/Allows:
-	CAllow Allow;                 /// Allowed for player
-	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
+	// Allows:
+	CAllow Allow;           /// Allowed for player
 
 
 	/// Change player name

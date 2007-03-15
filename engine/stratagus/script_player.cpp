@@ -311,19 +311,6 @@ static int CclPlayer(lua_State *l)
 			b = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			player->Color = Video.MapRGB(TheScreen->format, r, g, b);
-		} else if (!strcmp(value, "timers")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			if (subargs != UpgradeMax) {
-				LuaError(l, "Wrong upgrade timer length: %d" _C_ i);
-			}
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				player->UpgradeTimers.Upgrades[k] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
 		} else {
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
