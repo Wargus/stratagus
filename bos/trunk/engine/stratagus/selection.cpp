@@ -9,7 +9,7 @@
 //
 /**@name selection.cpp - The units' selection. */
 //
-//      (c) Copyright 1999-2005 by Patrice Fortier, Lutz Sammer, and
+//      (c) Copyright 1999-2007 by Patrice Fortier, Lutz Sammer, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -135,32 +135,6 @@ void UnSelectAll(void)
 }
 
 /**
-**  Handle a suicide unit click
-**
-**  @param unit  suicide unit.
-*/
-static void HandleSuicideClick(CUnit *unit)
-{
-	static int NumClicks = 0;
-
-	Assert(unit->Type->ClicksToExplode);
-	if (GameObserve) {
-		return;
-	}
-
-	if (NumSelected == 1 && Selected[0] == unit) {
-		NumClicks++;
-	} else {
-		NumClicks = 1;
-	}
-
-	if (NumClicks == unit->Type->ClicksToExplode) {
-		SendCommandDismiss(unit);
-		NumClicks = 0;
-	}
-}
-
-/**
 **  Replace a group of selected units by an other group of units.
 **
 **  @param units  Array of units to be selected.
@@ -174,14 +148,6 @@ void ChangeSelectedUnits(CUnit **units,int count)
 
 	Assert(count <= MaxSelectable);
 
-	if (count == 1 && units[0]->Type->ClicksToExplode &&
-		!units[0]->Type->IsNotSelectable) {
-		HandleSuicideClick(units[0]);
-		if (units[0]->Orders[0]->Action == UnitActionDie) {
-			NetworkSendSelection(units, count);
-			return ;
-		}
-	}
 	UnSelectAll();
 	NetworkSendSelection(units, count);
 	for (n = i = 0; i < count; ++i) {
@@ -397,10 +363,6 @@ int SelectUnitsByType(CUnit *base)
 	vp = UI.MouseViewport;
 	r = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
-
-	if (base->Type->ClicksToExplode) {
-		HandleSuicideClick(base);
-	}
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
