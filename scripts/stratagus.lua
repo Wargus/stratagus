@@ -52,7 +52,6 @@ for i,f in ipairs(musiclist) do
   end
 end
 
-SetSelectionStyle("corners")
 Preference.ShowSightRange = false
 Preference.ShowAttackRange = false
 Preference.ShowReactionRange = false

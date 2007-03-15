@@ -104,16 +104,6 @@ unsigned long ShowOrdersCount;    /// Show orders for some time
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?
 
-/**
-**  Show that units are selected.
-**
-**  @param color    FIXME
-**  @param x1,y1    Coordinates of the top left corner.
-**  @param x2,y2    Coordinates of the bottom right corner.
-*/
-void (*DrawSelection)(Uint32 color, int x1, int y1,
-	int x2, int y2) = DrawSelectionNone;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -186,87 +176,15 @@ void DrawUnitSelection(const CUnit *unit)
 }
 
 /**
-**  Don't show selected units.
-**
-**  @param color  Color to draw, nothing in this case.
-**  @param x1,y1  Coordinates of the top left corner.
-**  @param x2,y2  Coordinates of the bottom right corner.
-*/
-void DrawSelectionNone(Uint32 color, int x1, int y1,
-	int x2, int y2)
-{
-}
-
-/**
-**  Show selected units with circle.
-**
-**  @param color  Color to draw circle
-**  @param x1,y1  Coordinates of the top left corner.
-**  @param x2,y2  Coordinates of the bottom right corner.
-*/
-void DrawSelectionCircle(Uint32 color, int x1, int y1,
-	int x2, int y2)
-{
-	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		s_min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
-}
-
-/**
-**  Show selected units with circle.
-**
-**  @param color  Color to draw and fill circle.
-**  @param x1,y1  Coordinates of the top left corner.
-**  @param x2,y2  Coordinates of the bottom right corner.
-*/
-void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
-	int x2, int y2)
-{
-	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		s_min((x2 - x1) / 2, (y2 - y1) / 2), 95);
-	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		s_min((x2 - x1) / 2, (y2 - y1) / 2));
-}
-
-/**
-**  Draw selected rectangle around the unit.
-**
-**  @param color  Color to draw rectangle.
-**  @param x1,y1  Coordinates of the top left corner.
-**  @param x2,y2  Coordinates of the bottom right corner.
-*/
-void DrawSelectionRectangle(Uint32 color, int x1, int y1,
-	int x2, int y2)
-{
-	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
-}
-
-/**
-**  Draw selected rectangle around the unit.
-**
-**  @param color  Color to draw and fill rectangle.
-**  @param x1,y1  Coordinates of the top left corner.
-**  @param x2,y2  Coordinates of the bottom right corner.
-*/
-void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
-	int x2, int y2)
-{
-	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
-	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
-		x2 - x1 - 2, y2 - y1 - 2, 75);
-}
-
-/**
 **  Draw selected corners around the unit.
 **
 **  @param color  Color to draw corners.
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCorners(Uint32 color, int x1, int y1,
-	int x2, int y2)
+void DrawSelection(Uint32 color, int x1, int y1, int x2, int y2)
 {
 #define CORNER_PIXELS 6
-
 	Video.DrawVLineClip(color, x1, y1, CORNER_PIXELS);
 	Video.DrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1);
 
@@ -278,6 +196,7 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1,
 
 	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
 	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
+#undef CORNER_PIXELS
 }
 
 
