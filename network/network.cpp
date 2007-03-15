@@ -1041,12 +1041,6 @@ void NetworkEvent(void)
 				allowed = true;
 				break;
 			case MessageCommandDismiss:
-				// Allow to explode critters.
-				if ((UnitSlots[ntohs(nc->Unit)]->Player->Index == PlayerNumNeutral) &&
-					UnitSlots[ntohs(nc->Unit)]->Type->ClicksToExplode) {
-					allowed = true;
-					break;
-				}
 				// Fall through!
 			default:
 				if (UnitSlots[ntohs(nc->Unit)]->Player->Index == player ||

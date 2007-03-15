@@ -5,7 +5,6 @@ class CUnitType
 	tolua_readonly int Slot;
 
 	int MinAttackRange;
-	int ClicksToExplode;
 
 	int Supply;
 	int Demand;
