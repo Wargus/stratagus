@@ -9,7 +9,7 @@
 //
 /**@name lowlevel.cpp - The network lowlevel. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2000-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -93,20 +93,10 @@ int NetInit(void)
 	WSADATA wsaData;
 
 	// Start up the windows networking
-	// ARI: well, I need winsock2 for SIO_GET_INTERFACE_LIST..
-	// some day this needs to be rewritten using wsock32.dll's WsControl(),
-	// so that we can support Windows 95 with only winsock 1.1..
-	// For now ws2_32.dll has to do..
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
 		fprintf(stderr, "Couldn't initialize Winsock 2\n");
 		return -1;
 	}
-#if 0 // sorry, Winsock 1 not sufficient yet //
-	if (WSAStartup(MAKEWORD(1, 1), &wsaData)) {
-		fprintf(stderr, "Couldn't initialize Winsock 1.1\n");
-		return -1;
-	}
-#endif
 	return 0;
 }
 
