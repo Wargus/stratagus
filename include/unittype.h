@@ -9,7 +9,7 @@
 //
 /**@name unittype.h - The unit-types headerfile. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -513,9 +513,9 @@ CUnitType *UnitTypeByIdent(const std::string &ident);
 */
 class MissileConfig {
 public:
-	MissileConfig() : Name(NULL), Missile(NULL) {}
+	MissileConfig() : Missile(NULL) {}
 
-	char *Name;              /// Config missile name
+	std::string Name;        /// Config missile name
 	MissileType *Missile;    /// Identifier to use to run time
 };
 
@@ -805,8 +805,7 @@ class CUnitType {
 public:
 	CUnitType() : Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 		ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
-		Animations(NULL), StillFrame(0),
-		CorpseName(NULL), CorpseType(NULL),
+		Animations(NULL), StillFrame(0), CorpseType(NULL),
 		Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
 		BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
@@ -859,7 +858,7 @@ public:
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
 
-	char *CorpseName;               /// Corpse type name
+	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
 
 	// this is taken from the UDTA section
