@@ -9,7 +9,7 @@
 //
 /**@name missile.h - The missile headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2007 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -362,14 +362,6 @@ enum _missile_class_ {
 	MissileClassHit,
 	/// Missile flies from x,y to x1,y1 using a parabolic path
 	MissileClassParabolic,
-	/// Missile wait on x,y until a non-air unit comes by, the explodes.
-	MissileClassLandMine,
-	/// Missile appears at x,y, is whirlwind
-	MissileClassWhirlwind,
-	/// Missile surround x,y
-	MissileClassFlameShield,
-	/// Missile is death coil.
-	MissileClassDeathCoil
 };
 
 	/// Base structure of missile-types
@@ -517,22 +509,6 @@ class MissileParabolic : public Missile {
 public:
 	virtual void Action();
 };
-class MissileLandMine : public Missile {
-public:
-	virtual void Action();
-};
-class MissileWhirlwind : public Missile {
-public:
-	virtual void Action();
-};
-class MissileFlameShield : public Missile {
-public:
-	virtual void Action();
-};
-class MissileDeathCoil : public Missile {
-public:
-	virtual void Action();
-};
 
 class BurningBuildingFrame {
 public:
@@ -552,12 +528,12 @@ extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning b
 --  Functions
 ----------------------------------------------------------------------------*/
 
-// In ccl_missile.c
+// In script_missile.cpp
 
 	/// register ccl features
 extern void MissileCclRegister(void);
 
-// In missile.c
+// In missile.cpp
 
 	/// load all missile sprites
 extern void LoadMissileSprites();
@@ -595,8 +571,6 @@ extern void CleanMissileTypes(void);
 extern void InitMissiles(void);
 	/// Clean missiles
 extern void CleanMissiles(void);
-
-
 
 //@}
 
