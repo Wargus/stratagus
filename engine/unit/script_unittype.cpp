@@ -575,8 +575,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->SeaUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RandomMovementProbability")) {
 			type->RandomMovementProbability = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "ClicksToExplode")) {
-			type->ClicksToExplode = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {

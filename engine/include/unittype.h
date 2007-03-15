@@ -248,11 +248,6 @@
 **    When the unit is idle this is the probability that it will
 **    take a step in a random direction, in percents.
 **
-**  CUnitType::ClicksToExplode
-**
-**    If this is non-zero, then after that many clicks the unit will
-**    commit suicide. Doesn't work with resource workers/resources.
-**
 **  CUnitType::Building
 **
 **    Unit is a Building
@@ -811,7 +806,7 @@ public:
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
 		BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 		CanCastSpell(NULL), AutoCastActive(NULL), AutoBuildRate(0),
-		RandomMovementProbability(0), ClicksToExplode(0),
+		RandomMovementProbability(0),
 		CanTransport(NULL), MaxOnBoard(0), StartingResources(0),
 		UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
 		MouseAction(0), Points(0), CanTarget(0),
@@ -884,7 +879,6 @@ public:
 	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.
-	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
 	char *CanTransport;             /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int StartingResources;          /// Amount of Resources on build
