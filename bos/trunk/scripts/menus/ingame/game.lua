@@ -468,7 +468,7 @@ local tips = {
 
 
   "Keep all engineers working. Use ALT-I to find idle engineers.",
-  "You can make units automatically cast spells by selecting a unit, holding down CTRL and clicking on the spell icon.  CTRL click again to turn off.",
+  "You can make units automatically perform special actions by selecting a unit, holding down CTRL and clicking on the icon.  CTRL click again to turn off.",
 
   -- Shift tips
   "You can give an unit an order which is executed after it finishes the current work, if you hold the SHIFT key.",
