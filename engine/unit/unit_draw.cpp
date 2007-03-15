@@ -9,7 +9,7 @@
 //
 /**@name unit_draw.cpp - The draw routines for units. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1136,10 +1136,8 @@ void CUnit::Draw() const
 */
 static int DrawLevelCompare(const void *v1, const void *v2) {
 
-	const CUnit *c1;
-	const CUnit *c2;
-	int drawlevel1;
-	int drawlevel2;
+	const CUnit *c1, *c2;
+	int drawlevel1, drawlevel2;
 	int diffpos;
 
 	c1 = *(CUnit **)v1;
@@ -1155,6 +1153,7 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 	} else {
 		drawlevel2 = c2->Type->DrawLevel;
 	}
+
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
@@ -1175,16 +1174,13 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 */
 int FindAndSortUnits(const CViewport *vp, CUnit **table)
 {
-	int i;
-	int n;
-
 	//
 	//  Select all units touching the viewpoint.
 	//
-	n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	int n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
-	for (i = 0; i < n; i++) {
+	for (int i = 0; i < n; i++) {
 		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
 		}
