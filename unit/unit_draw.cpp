@@ -425,7 +425,7 @@ static int CclShowHealthBar(lua_State *l)
 **  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
 **    OffsetPercent = {50, 100},
 **    Method = {"sprite", {0}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
+**  For index Mana, Transport, Training, Resource.
 **  Except for ressource which have HideNeutral = false.
 **
 **  @param l  Lua state
@@ -436,11 +436,7 @@ static int CclShowManaDot(lua_State *l)
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
 		"DefineDecorations({Index = \"Transport\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"Research\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
 		"DefineDecorations({Index = \"Training\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
 		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
@@ -463,7 +459,7 @@ static int CclShowManaDot(lua_State *l)
 **  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
 **    OffsetPercent = {50, 100},
 **    Method = {"bar", {Width = 3, BorderSize = 1}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
+**  For index Mana, Transport, Training, Resource.
 **
 **  @param l  Lua state
 */
@@ -473,11 +469,7 @@ static int CclShowManaHorizontal(lua_State *l)
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
 		"DefineDecorations({Index = \"Transport\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"Research\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
 		"DefineDecorations({Index = \"Training\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
 		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
@@ -499,7 +491,7 @@ static int CclShowManaHorizontal(lua_State *l)
 **  Equivalent of
 **  DefineDecorations({Index = "Mana", HideNeutral = true,
 **    Method = {"bar", {Width = 3, BorderSize = 1, Orientation = "vertical"}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
+**  For index Mana, Transport, Training, Resource.
 **
 **  @param l  Lua state
 */
@@ -509,11 +501,7 @@ static int CclShowManaVertical(lua_State *l)
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
 		"DefineDecorations({Index = \"Transport\", HideNeutral = true,"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"Research\", HideNeutral = true,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
 		"DefineDecorations({Index = \"Training\", HideNeutral = true,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true,"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
 		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false,"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
@@ -1062,14 +1050,6 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 			e_color = color = ColorGray;
 			break;
 
-		case UnitActionUpgradeTo:
-			e_color = color = ColorGray;
-			break;
-
-		case UnitActionResearch:
-			e_color = color = ColorGray;
-			break;
-
 		case UnitActionBuild:
 			DrawSelection(ColorGray, x2 - order->Type->BoxWidth / 2,
 				y2 - order->Type->BoxHeight / 2,
@@ -1381,8 +1361,7 @@ void CUnit::Draw() const
 		x = this->IX;
 		x += CurrentViewport->Map2ViewportX(this->X);
 		y += CurrentViewport->Map2ViewportY(this->Y);
-		state = (this->Orders[0]->Action == UnitActionBuilt) |
-			((this->Orders[0]->Action == UnitActionUpgradeTo) << 1);
+		state = (this->Orders[0]->Action == UnitActionBuilt);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
 		if (state == 2) {

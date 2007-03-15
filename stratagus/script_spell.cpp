@@ -749,12 +749,6 @@ static int CclDefineSpell(lua_State *l)
 			if (!spell->SoundWhenCast.Sound) {
 				spell->SoundWhenCast.Name.clear();
 			}
-		} else if (!strcmp(value, "depend-upgrade")) {
-			value = LuaToString(l, i + 1);
-			spell->DependencyId = UpgradeIdByIdent(value);
-			if (spell->DependencyId == -1) {
-				lua_pushfstring(l, "Bad upgrade name: %s", value);
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

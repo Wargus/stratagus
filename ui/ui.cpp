@@ -74,7 +74,6 @@ CUserInterface::CUserInterface() :
 	SingleTrainingButton(NULL),
 	SingleTrainingFont(0), SingleTrainingTextX(0), SingleTrainingTextY(0),
 	TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
-	UpgradingButton(NULL), ResearchingButton(NULL),
 	CompletedBarColor(0), CompletedBarShadow(0),
 	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
 	SelectedViewport(NULL), NumViewports(0),
@@ -267,8 +266,6 @@ void CleanUserInterface(void)
 	UI.SingleTrainingText.clear();
 	UI.TrainingButtons.clear();
 	UI.TrainingText.clear();
-	delete UI.UpgradingButton;
-	delete UI.ResearchingButton;
 	UI.TransportingButtons.clear();
 
 	// Button Panel

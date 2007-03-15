@@ -93,10 +93,6 @@ enum _message_type_ {
 	MessageCommandReturn,          /// Unit command return goods
 	MessageCommandTrain,           /// Unit command train
 	MessageCommandCancelTrain,     /// Unit command cancel training
-	MessageCommandUpgrade,         /// Unit command upgrade
-	MessageCommandCancelUpgrade,   /// Unit command cancel upgrade
-	MessageCommandResearch,        /// Unit command research
-	MessageCommandCancelResearch,  /// Unit command cancel research
 
 	MessageExtendedCommand,        /// Command is the next byte
 

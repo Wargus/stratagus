@@ -214,24 +214,6 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonUpgradeTo :
-			{
-				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
-
-				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Upgrade, upgradeToType->Slot, *j);
-				}
-				break;
-			}
-			case ButtonResearch :
-			{
-				int researchId = UpgradeIdByIdent(button.ValueStr);
-
-				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Research, researchId, *j);
-				}
-				break;
-			}
 			default:
 				break;
 		}
@@ -271,15 +253,11 @@ static int CclDefineAiHelper(lua_State *l)
 		++k;
 
 		//
-		// Type build,train,research/upgrade.
+		// Type build,train.
 		//
 		if (!strcmp(value, "build")) {
 			what = -1;
 		} else if (!strcmp(value, "train")) {
-			what = -1;
-		} else if (!strcmp(value, "upgrade")) {
-			what = -1;
-		} else if (!strcmp(value, "research")) {
 			what = -1;
 		} else if (!strcmp(value, "unit-limit")) {
 			what = -1;
@@ -426,45 +404,6 @@ static AiRequestType *FindInUnitTypeRequests(const CUnitType *type)
 		}
 	}
 	return NULL;
-}
-
-/**
-**  Find unit-type in upgrade-to table.
-**
-**  @param type  Unit-type to be found.
-*/
-static int FindInUpgradeToRequests(const CUnitType *type)
-{
-	int i;
-	int n;
-
-	n = AiPlayer->UpgradeToRequests.size();
-	for (i = 0; i < n; ++i) {
-		if (AiPlayer->UpgradeToRequests[i] == type) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-/**
-**  Append unit-type to request table.
-**
-**  @param type  Unit-type to be appended.
-*/
-static void InsertUpgradeToRequests(CUnitType *type)
-{
-	AiPlayer->UpgradeToRequests.push_back(type);
-}
-
-/**
-**  Append unit-type to request table.
-**
-**  @param upgrade  Upgrade to be appended.
-*/
-static void InsertResearchRequests(CUpgrade *upgrade)
-{
-	AiPlayer->ResearchRequests.push_back(upgrade);
 }
 
 //----------------------------------------------------------------------------
@@ -630,13 +569,6 @@ static int CclAiWait(lua_State *l)
 					return 1;
 				}
 			}
-		}
-		//
-		// Look if we have an upgrade-to request.
-		//
-		if (FindInUpgradeToRequests(type)) {
-			lua_pushboolean(l, 1);
-			return 1;
 		}
 		DebugPrint("Broken? waiting on %s which wasn't requested.\n" _C_ type->Ident.c_str());
 		lua_pushboolean(l, 0);
@@ -862,47 +794,6 @@ static int CclAiSleep(lua_State *l)
 }
 
 /**
-**  Research an upgrade.
-**
-**  @param l  Lua state.
-*/
-static int CclAiResearch(lua_State *l)
-{
-	const char *str;
-	CUpgrade *upgrade;
-
-	LuaCheckArgs(l, 1);
-	if ((str = LuaToString(l, 1))) {
-		upgrade = CUpgrade::Get(str);
-	} else {
-		LuaError(l, "Upgrade needed");
-		upgrade = 0;
-	}
-
-	InsertResearchRequests(upgrade);
-
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
-**  Upgrade an unit to an new unit-type.
-**
-**  @param l  Lua state.
-*/
-static int CclAiUpgradeTo(lua_State *l)
-{
-	CUnitType *type;
-
-	LuaCheckArgs(l, 1);
-	type = CclGetUnitType(l);
-	InsertUpgradeToRequests(type);
-
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
 **  Return the player of the running AI.
 **
 **  @param l  Lua state.
@@ -995,18 +886,6 @@ static int CclAiDump(lua_State *l)
 	printf("UnitTypeRequests(%d):\n", n);
 	for (i = 0; i < n; ++i) {
 		printf("%s ", AiPlayer->UnitTypeRequests[i].Type->Ident.c_str());
-	}
-	printf("\n");
-	n = (int)AiPlayer->UpgradeToRequests.size();
-	printf("UpgradeToRequests(%d):\n", n);
-	for (i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->UpgradeToRequests[i]->Ident.c_str());
-	}
-	printf("\n");
-	n = (int)AiPlayer->ResearchRequests.size();
-	printf("ResearchRequests(%d):\n", n);
-	for (i = 0; i < n; ++i) {
-		printf("%s ", AiPlayer->ResearchRequests[i]->Ident.c_str());
 	}
 	printf("\n");
 
@@ -1392,32 +1271,6 @@ static int CclDefineAiPlayer(lua_State *l)
 				ai->UnitTypeRequests[i].Count = count;
 				++i;
 			}
-		} else if (!strcmp(value, "upgrade")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				const char *ident;
-
-				lua_rawgeti(l, j + 1, k + 1);
-				ident = LuaToString(l, -1);
-				lua_pop(l, 1);
-				ai->UpgradeToRequests.push_back(UnitTypeByIdent(ident));
-			}
-		} else if (!strcmp(value, "research")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				const char *ident;
-
-				lua_rawgeti(l, j + 1, k + 1);
-				ident = LuaToString(l, -1);
-				lua_pop(l, 1);
-				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
-			}
 		} else if (!strcmp(value, "building")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -1501,8 +1354,6 @@ void AiCclRegister(void)
 
 	lua_register(Lua, "AiAttackWithForce", CclAiAttackWithForce);
 	lua_register(Lua, "AiSleep", CclAiSleep);
-	lua_register(Lua, "AiResearch", CclAiResearch);
-	lua_register(Lua, "AiUpgradeTo", CclAiUpgradeTo);
 
 	lua_register(Lua, "AiPlayer", CclAiPlayer);
 	lua_register(Lua, "AiSetReserve", CclAiSetReserve);

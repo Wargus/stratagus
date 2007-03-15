@@ -2161,34 +2161,6 @@ static int CclSetSpeedTrain(lua_State *l)
 }
 
 /**
-**  For debug increase upgrading speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedUpgrade(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	SpeedUpgrade = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, SpeedUpgrade);
-	return 1;
-}
-
-/**
-**  For debug increase researching speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedResearch(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	SpeedResearch = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, SpeedResearch);
-	return 1;
-}
-
-/**
 **  For debug increase all speeds.
 **
 **  @param l  Lua state.
@@ -2204,7 +2176,7 @@ static int CclSetSpeeds(lua_State *l)
 		SpeedResourcesHarvest[i] = s;
 		SpeedResourcesReturn[i] = s;
 	}
-	SpeedBuild = SpeedTrain = SpeedUpgrade = SpeedResearch = s;
+	SpeedBuild = SpeedTrain = s;
 
 	lua_pushnumber(l, s);
 	return 1;
@@ -2422,8 +2394,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
 	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
 	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
-	lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
-	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
@@ -2553,11 +2523,9 @@ void LoadCcl(void)
 */
 void SaveCcl(CFile *file)
 {
-	int i;
-
 	file->printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
 
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		file->printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
 			DefaultResourceNames[i], SpeedResourcesHarvest[i]);
 		file->printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
@@ -2565,8 +2533,6 @@ void SaveCcl(CFile *file)
 	}
 	file->printf("SetSpeedBuild(%d)\n", SpeedBuild);
 	file->printf("SetSpeedTrain(%d)\n", SpeedTrain);
-	file->printf("SetSpeedUpgrade(%d)\n", SpeedUpgrade);
-	file->printf("SetSpeedResearch(%d)\n", SpeedResearch);
 }
 
 //@}

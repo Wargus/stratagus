@@ -284,7 +284,6 @@ void SaveGame(const std::string &filename)
 
 	SaveCcl(&file);
 	SaveUnitTypes(&file);
-	SaveUpgrades(&file);
 	SavePlayers(&file);
 	Map.Save(&file);
 	SaveUnits(&file);

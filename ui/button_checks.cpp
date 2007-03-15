@@ -78,19 +78,6 @@ bool ButtonCheckFalse(const CUnit *unit, const ButtonAction *button)
 }
 
 /**
-**  Check for button enabled, if upgrade is ready.
-**
-**  @param unit    Pointer to unit for button.
-**  @param button  Pointer to button to check/enable.
-**
-**  @return        True if enabled.
-*/
-bool ButtonCheckUpgrade(const CUnit *unit, const ButtonAction *button)
-{
-	return UpgradeIdentAllowed(unit->Player, button->AllowStr) == 'R';
-}
-
-/**
 **  Check for button enabled, if any unit is available.
 **
 **  @param unit    Pointer to unit for button.
@@ -172,7 +159,7 @@ bool ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 
 /**
 **  Check for button enabled, if the unit isn't working.
-**  Working is training, upgrading, researching.
+**  Working is training.
 **
 **  @param unit    Pointer to unit for button.
 **  @param button  Pointer to button to check/enable.
@@ -181,40 +168,7 @@ bool ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 */
 bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 {
-	return unit->Orders[0]->Action != UnitActionTrain &&
-		unit->Orders[0]->Action != UnitActionUpgradeTo &&
-		unit->Orders[0]->Action != UnitActionResearch;
-}
-
-/**
-**  Check for button enabled, if the unit isn't researching.
-**
-**  @param unit    Pointer to unit for button.
-**  @param button  Pointer to button to check/enable.
-**
-**  @return        True if enabled.
-*/
-bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
-{
-	return unit->Orders[0]->Action != UnitActionUpgradeTo &&
-		unit->Orders[0]->Action != UnitActionResearch;
-}
-
-/**
-**  Check for button enabled, if all requirements for an upgrade to unit
-**  are met.
-**
-**  @param unit    Pointer to unit for button.
-**  @param button  Pointer to button to check/enable.
-**
-**  @return        True if enabled.
-*/
-bool ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
-{
-	if (unit->Orders[0]->Action != UnitActionStill) {
-		return false;
-	}
-	return CheckDependByIdent(unit->Player, button->ValueStr);
+	return unit->Orders[0]->Action != UnitActionTrain;
 }
 
 /**
@@ -228,53 +182,6 @@ bool ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
 bool ButtonCheckAttack(const CUnit *unit, const ButtonAction *button)
 {
 	return unit->Type->CanAttack;
-}
-
-/**
-**  Check if all requirements for upgrade research are met.
-**
-**  @param unit    Pointer to unit for button.
-**  @param button  Pointer to button to check/enable.
-**
-**  @return        True if enabled.
-*/
-bool ButtonCheckResearch(const CUnit *unit, const ButtonAction *button)
-{
-	// don't show any if working
-	if (!ButtonCheckNoWork(unit, button)) {
-		return false;
-	}
-
-	// check if allowed
-	if (!CheckDependByIdent(unit->Player, button->ValueStr)) {
-		return false;
-	}
-	if (!strncmp(button->ValueStr.c_str(), "upgrade-", 8) &&
-			UpgradeIdentAllowed(unit->Player, button->ValueStr) != 'A') {
-		return false;
-	}
-	return true;
-}
-
-/**
-**  Check if all requirements for upgrade research are met only one
-**  running research allowed.
-**
-**  @param unit    Pointer to unit for button.
-**  @param button  Pointer to button to check/enable.
-**
-**  @return        True if enabled.
-*/
-bool ButtonCheckSingleResearch(const CUnit *unit,
-	const ButtonAction *button)
-{
-	if (ButtonCheckResearch(unit, button)) {
-		if (!unit->Player->UpgradeTimers.Upgrades[
-				UpgradeIdByIdent(button->ValueStr)]) {
-			return true;
-		}
-	}
-	return false;
 }
 
 //@}

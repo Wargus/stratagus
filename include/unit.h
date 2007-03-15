@@ -363,7 +363,6 @@ class SpellType;
 class CUnitColors;
 class CConstructionFrame;
 class CVariable;
-class CUpgrade;
 class CBuildRestrictionOnTop;
 class CFile;
 struct lua_State;
@@ -396,8 +395,6 @@ typedef enum _unit_action_ {
 	UnitActionSpellCast,    /// unit casts spell
 
 	UnitActionTrain,        /// building is training
-	UnitActionUpgradeTo,    /// building is upgrading itself
-	UnitActionResearch,     /// building is researching spell
 	UnitActionBuilt,      /// building is under construction
 
 // Compound actions
@@ -453,7 +450,6 @@ public:
 		} Patrol;                     /// position.
 		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
 		SpellType *Spell;             /// spell when casting.
-		CUpgrade *Upgrade;            /// upgrade.
 	} Arg1;             /// Extra command argument.
 };
 
@@ -682,12 +678,6 @@ public:
 	struct _order_repair_ {
 		int Cycles;                 /// Cycles unit has been repairing for
 	} Repair; /// Repairing unit
-	struct _order_research_ {
-		CUpgrade *Upgrade;          /// Upgrade researched
-	} Research; /// Research action
-	struct _order_upgradeto_ {
-		int Ticks; /// Ticks to complete
-	} UpgradeTo; /// Upgrade to action
 	struct _order_train_ {
 		int Ticks;                  /// Ticks to complete
 	} Train; /// Train units action

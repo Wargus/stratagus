@@ -647,36 +647,6 @@ static void DrawUnitInfo(CUnit *unit)
 			}
 			return;
 		}
-
-		//
-		//  Building upgrading to better type.
-		//
-		if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
-			if (UI.UpgradingButton) {
-				unit->Orders[0]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
-					UI.UpgradingButton->Style,
-					(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
-						ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.UpgradingButton->X, UI.UpgradingButton->Y, "");
-			}
-			return;
-		}
-
-		//
-		//  Building research new technology.
-		//
-		if (unit->Orders[0]->Action == UnitActionResearch) {
-			if (UI.ResearchingButton) {
-				unit->Data.Research.Upgrade->Icon->DrawUnitIcon(unit->Player,
-					UI.ResearchingButton->Style,
-					(ButtonAreaUnderCursor == ButtonAreaResearching &&
-						ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.ResearchingButton->X, UI.ResearchingButton->Y, "");
-			}
-			return;
-		}
 	}
 
 	//
@@ -1249,9 +1219,7 @@ void CInfoPanel::Draw(void)
 					ThisPlayer->IsAllied(Selected[0]) ||
 					ReplayRevealMap) {
 				if (Selected[0]->Orders[0]->Action == UnitActionBuilt ||
-					Selected[0]->Orders[0]->Action == UnitActionResearch ||
-					Selected[0]->Orders[0]->Action == UnitActionUpgradeTo ||
-					Selected[0]->Orders[0]->Action == UnitActionTrain) {
+						Selected[0]->Orders[0]->Action == UnitActionTrain) {
 					i = 3;
 				} else if (Selected[0]->Stats->Variables[MANA_INDEX].Max) {
 					i = 2;

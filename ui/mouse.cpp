@@ -519,20 +519,6 @@ static void HandleMouseOn(int x, int y)
 					}
 				}
 			}
-		} else if (Selected[0]->Orders[0]->Action == UnitActionUpgradeTo) {
-			if (OnButton(x, y, UI.UpgradingButton)) {
-				ButtonAreaUnderCursor = ButtonAreaUpgrading;
-				ButtonUnderCursor = 0;
-				CursorOn = CursorOnButton;
-				return;
-			}
-		} else if (Selected[0]->Orders[0]->Action == UnitActionResearch) {
-			if (OnButton(x, y, UI.ResearchingButton)) {
-				ButtonAreaUnderCursor = ButtonAreaResearching;
-				ButtonUnderCursor = 0;
-				CursorOn = CursorOnButton;
-				return;
-			}
 		}
 	}
 	if (NumSelected == 1) {
@@ -1565,30 +1551,6 @@ void UIHandleButtonDown(unsigned button)
 						SendCommandCancelTraining(Selected[0],
 							ButtonUnderCursor,
 							Selected[0]->Orders[ButtonUnderCursor]->Type);
-					}
-				}
-			//
-			//  clicked on upgrading button
-			//
-			} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
-				if (!GameObserve && !GamePaused &&
-						ThisPlayer->IsTeamed(Selected[0])) {
-					if (ButtonUnderCursor == 0 && NumSelected == 1) {
-						DebugPrint("Cancel upgrade %s\n" _C_
-							Selected[0]->Type->Ident.c_str());
-						SendCommandCancelUpgradeTo(Selected[0]);
-					}
-				}
-			//
-			//  clicked on researching button
-			//
-			} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
-				if (!GameObserve && !GamePaused &&
-						ThisPlayer->IsTeamed(Selected[0])) {
-					if (ButtonUnderCursor == 0 && NumSelected == 1) {
-						DebugPrint("Cancel research %s\n" _C_
-							Selected[0]->Type->Ident.c_str());
-						SendCommandCancelResearch(Selected[0]);
 					}
 				}
 			//

@@ -65,10 +65,7 @@ enum ButtonCmd {
 	ButtonTrain,          /// order train
 	ButtonStandGround,    /// order stand ground
 	ButtonReturn,         /// order return goods
-	ButtonResearch,       /// order reseach
-	ButtonUpgradeTo,      /// order upgrade
 	ButtonCancel,         /// cancel
-	ButtonCancelUpgrade,  /// cancel upgrade
 	ButtonCancelTrain,    /// cancel training
 	ButtonCancelBuild,    /// cancel building
 };
@@ -100,8 +97,6 @@ public:
 enum _button_area_ {
 	ButtonAreaSelected,      /// Selected button
 	ButtonAreaTraining,      /// Training button
-	ButtonAreaUpgrading,     /// Upgrading button
-	ButtonAreaResearching,   /// Researching button
 	ButtonAreaTransporting,  /// Transporting button
 	ButtonAreaButton,        /// Button panel button
 	ButtonAreaMenu,          /// Menu button
@@ -370,9 +365,6 @@ extern bool ButtonCheckTrue(const CUnit *unit,
 	/// Check is always false
 extern bool ButtonCheckFalse(const CUnit *unit,
 	const ButtonAction *button);
-	/// Check if allowed upgrade is ready
-extern bool ButtonCheckUpgrade(const CUnit *unit,
-	const ButtonAction *button);
 	/// Check if allowed units exists
 extern bool ButtonCheckUnitsOr(const CUnit *unit,
 	const ButtonAction *button);
@@ -385,23 +377,11 @@ extern bool ButtonCheckNetwork(const CUnit *unit,
 	/// Check if don't have network play
 extern bool ButtonCheckNoNetwork(const CUnit *unit,
 	const ButtonAction *button);
-	/// Check if unit isn't working (train,upgrade,research)
+	/// Check if unit isn't working (train)
 extern bool ButtonCheckNoWork(const CUnit *unit,
-	const ButtonAction *button);
-	/// Check if unit isn't researching or upgrading
-extern bool ButtonCheckNoResearch(const CUnit *unit,
 	const ButtonAction *button);
 	/// Check if all requirements for an attack to are meet
 extern bool ButtonCheckAttack(const CUnit *unit,
-	const ButtonAction *button);
-	/// Check if all requirements for an upgrade to are meet
-extern bool ButtonCheckUpgradeTo(const CUnit *unit,
-	const ButtonAction *button);
-	/// Check if all requirements for a research are meet
-extern bool ButtonCheckResearch(const CUnit *unit,
-	const ButtonAction *button);
-	/// Check if all requirements for a single research are meet
-extern bool ButtonCheckSingleResearch(const CUnit *unit,
 	const ButtonAction *button);
 
 //
