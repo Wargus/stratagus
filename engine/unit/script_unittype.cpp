@@ -9,7 +9,7 @@
 //
 /**@name script_unittype.cpp - The unit-type ccl functions. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -437,7 +437,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "PersonReactionRange")) {
 			type->ReactRangePerson = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Missile")) {
-			type->Missile.Name = new_strdup(LuaToString(l, -1));
+			type->Missile.Name = LuaToString(l, -1);
 			type->Missile.Missile = NULL;
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
@@ -457,14 +457,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Supply")) {
 			type->Supply = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
-			if (redefine) {
-				delete[] type->CorpseName;
-			}
-			type->CorpseName = new_strdup(LuaToString(l, -1));
+			type->CorpseName = LuaToString(l, -1);
 			type->CorpseType = NULL;
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
-			type->Explosion.Name = new_strdup(LuaToString(l, -1));
+			type->Explosion.Name = LuaToString(l, -1);
 			type->Explosion.Missile = NULL;
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);

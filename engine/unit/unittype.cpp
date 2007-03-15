@@ -9,7 +9,7 @@
 //
 /**@name unittype.cpp - The unit types. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -461,13 +461,13 @@ void LoadUnitTypes(void)
 		// Lookup missiles.
 		//
 		type->Missile.Missile = MissileTypeByIdent(type->Missile.Name);
-		if (type->Explosion.Name) {
+		if (!type->Explosion.Name.empty()) {
 			type->Explosion.Missile = MissileTypeByIdent(type->Explosion.Name);
 		}
 		//
 		// Lookup corpse.
 		//
-		if (type->CorpseName) {
+		if (!type->CorpseName.empty()) {
 			type->CorpseType = UnitTypeByIdent(type->CorpseName);
 		}
 
@@ -562,9 +562,6 @@ void CleanUnitTypes(void)
 			delete *b;
 		}
 		type->BuildingRules.clear();
-		delete[] type->Missile.Name;
-		delete[] type->Explosion.Name;
-		delete[] type->CorpseName;
 		delete[] type->CanCastSpell;
 		delete[] type->AutoCastActive;
 
