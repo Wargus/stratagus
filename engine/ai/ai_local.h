@@ -9,7 +9,7 @@
 //
 /**@name ai_local.h - The local AI header file. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2007 by Lutz Sammer and Antonis Chaniotis.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -225,7 +225,7 @@ public:
 /**
 **  AI Helper.
 **
-**  Contains informations needed for the AI. If the AI needs an unit or
+**  Contains informations needed for the AI. If the AI needs a unit or
 **  building or upgrade or spell, it could lookup in this tables to find
 **  where it could be trained or built.
 */

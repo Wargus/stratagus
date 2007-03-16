@@ -9,7 +9,7 @@
 //
 /**@name unit_find.cpp - The find/select for units. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@
 ** @param y       Map Y tile position.
 ** @param type    UnitType::UnitType, naval,fly,land.
 **
-** @return        Unit, if an unit of correct type is on the field.
+** @return        Unit, if a unit of correct type is on the field.
 */
 CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 {

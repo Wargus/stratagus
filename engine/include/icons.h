@@ -9,7 +9,7 @@
 //
 /**@name icons.h - The icons headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2007 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ public:
 
 	/// Draw icon
 	void DrawIcon(const CPlayer *player, int x, int y) const;
-	/// Draw icon of an unit
+	/// Draw icon of a unit
 	void DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 		unsigned flags, int x, int y, const std::string &text) const;
 

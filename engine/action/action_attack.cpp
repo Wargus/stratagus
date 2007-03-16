@@ -9,7 +9,7 @@
 //
 /**@name action_attack.cpp - The attack action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ void AnimateActionAttack(CUnit *unit)
 **
 **  @warning  The caller must check, if he likes the restored SavedOrder!
 **
-**  @todo     If an unit enters an building, than the attack choose an
+**  @todo     If a unit enters an building, than the attack choose an
 **            other goal, perhaps it is better to wait for the goal?
 **
 **  @param unit  Unit using the goal.

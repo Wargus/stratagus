@@ -116,7 +116,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /**
-**  Show selection marker around an unit.
+**  Show selection marker around a unit.
 **
 **  @param unit  Pointer to unit.
 */
@@ -598,7 +598,7 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 }
 
 /**
-**  Get the location of an unit's order.
+**  Get the location of a unit's order.
 **
 **  @param unit   Pointer to unit.
 **  @param order  Pointer to order.
@@ -762,7 +762,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 }
 
 /**
-**  Show the current order of an unit.
+**  Show the current order of a unit.
 **
 **  @param unit  Pointer to the unit.
 */
@@ -803,7 +803,7 @@ void ShowOrder(const CUnit *unit)
 }
 
 /**
-**  Draw additional informations of an unit.
+**  Draw additional informations of a unit.
 **
 **  @param unit  Unit pointer of drawn unit.
 **  @param type  Unit-type pointer.

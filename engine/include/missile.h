@@ -198,7 +198,7 @@
 **  This structure contains all information about a missile in game.
 **  A missile could have different effects, based on its missile-type.
 **  Missiles could be saved and stored with CCL. See (missile).
-**  Currently only a tile, an unit or a missile could be placed on the map.
+**  Currently only a tile, a unit or a missile could be placed on the map.
 **
 **
 **  The missile structure members:

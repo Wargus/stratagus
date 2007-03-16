@@ -9,7 +9,7 @@
 //
 /**@name command.cpp - Give units a command. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ static void ReleaseOrder(COrder *order)
 }
 
 /**
-**  Release all orders of an unit.
+**  Release all orders of a unit.
 **
 **  @param unit  Pointer to unit.
 */
@@ -497,7 +497,7 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 }
 
 /**
-**  Let an unit patrol from current to new position
+**  Let a unit patrol from current to new position
 **
 **  FIXME: want to support patroling between units.
 **
@@ -664,7 +664,7 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 }
 
 /**
-**  Cancel the building construction, or kill an unit.
+**  Cancel the building construction, or kill a unit.
 **
 **  @param unit  pointer to unit.
 */
@@ -764,7 +764,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 }
 
 /**
-**  Building starts training an unit.
+**  Building starts training a unit.
 **
 **  @param unit   pointer to unit.
 **  @param type   unit type to train.
@@ -808,7 +808,7 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 }
 
 /**
-**  Cancel the training of an unit.
+**  Cancel the training of a unit.
 **
 **  @param unit  pointer to unit.
 **  @param slot  slot number to cancel.
@@ -930,7 +930,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 			// Unit::Refs is used as timeout counter.
 			//
 			if (dest->Destroyed) {
-				// FIXME: where check if spell needs an unit as destination?
+				// FIXME: where check if spell needs a unit as destination?
 				// FIXME: dest->Type is now set to 0. maybe we shouldn't bother.
 				order->X = dest->X /*+ dest->Type->TileWidth / 2*/  - order->Range;
 				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;

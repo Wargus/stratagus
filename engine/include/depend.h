@@ -9,7 +9,7 @@
 //
 /**@name depend.h - The units dependencies headerfile. */
 //
-//      (c) Copyright 2000-2004 by Vladi Belperchinov-Shabanski
+//      (c) Copyright 2000-2007 by Vladi Belperchinov-Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@
 **
 **  DependRule::Type
 **
-**    Type of the rule, DependRuleUnitType for an unit-type,
+**    Type of the rule, DependRuleUnitType for a unit-type,
 **    DependRuleUpgrade for an upgrade.
 **
 **  DependRule::Kind
@@ -94,7 +94,7 @@ class CPlayer;
 class CUnitType;
 
 enum {
-	DependRuleUnitType,  /// Kind is an unit-type
+	DependRuleUnitType,  /// Kind is a unit-type
 };
 
 	/// Dependency rule

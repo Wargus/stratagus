@@ -351,13 +351,13 @@ public:
 
 	/// Add costs to the resources
 	void AddCosts(const int *costs);
-	/// Add costs for an unit-type to the resources
+	/// Add costs for a unit-type to the resources
 	void AddUnitType(const CUnitType *type);
 	/// Add a factor of costs to the resources
 	void AddCostsFactor(const int *costs, int factor);
 	/// Remove costs from the resources
 	void SubCosts(const int *costs);
-	/// Remove costs for an unit-type from the resources
+	/// Remove costs for a unit-type from the resources
 	void SubUnitType(const CUnitType *type);
 	/// Remove a factor of costs from the resources
 	void SubCostsFactor(const int *costs, int factor);

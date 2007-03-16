@@ -9,7 +9,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Valery Shchedrin, and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Valery Shchedrin, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -282,7 +282,7 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 }
 
 /**
-**  Get unit from an unit depending of the relation.
+**  Get unit from a unit depending of the relation.
 **
 **  @param unit  unit reference.
 **  @param e     relation with unit.
