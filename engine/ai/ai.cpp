@@ -9,7 +9,7 @@
 //
 /**@name ai.cpp - The computer player AI main file. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Ludovic Pollet, and
+//      (c) Copyright 2000-2007 by Lutz Sammer, Ludovic Pollet, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -508,7 +508,6 @@ void AiInit(CPlayer *player)
 
 	pai->Collect[GoldCost] = 50;
 	pai->Collect[WoodCost] = 50;
-	pai->Collect[OilCost] = 0;
 
 	player->Ai = pai;
 }

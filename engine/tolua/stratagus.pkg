@@ -34,7 +34,7 @@ UnitTypes = {}
 setmetatable(UnitTypes, mt)
 $]
 
-#define MaxCosts 7
+#define MaxCosts 3
 #define FoodCost MaxCosts
 #define ScoreCost MaxCosts + 1
 #define MaxResourceInfo MaxCosts + 2
