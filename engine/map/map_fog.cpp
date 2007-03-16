@@ -9,7 +9,7 @@
 //
 /**@name map_fog.cpp - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Vladi Shabanski,
+//      (c) Copyright 1999-2007 by Lutz Sammer, Vladi Shabanski,
 //                                 Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -97,7 +97,7 @@ unsigned short CMap::IsTileVisible(const CPlayer *player, int x, int y) const
 	unsigned short visiontype;
 	unsigned short *visible;
 
-	visible = this->Fields[y * this->Info.MapWidth + x].Visible;
+	visible = this->Field(x, y)->Visible;
 	visiontype = visible[player->Index];
 
 	if (visiontype > 1) {

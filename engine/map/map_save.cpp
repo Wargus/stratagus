@@ -9,7 +9,7 @@
 //
 /**@name map_save.cpp - Saving the map. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ void CMap::Save(CFile *file) const
 		for (w = 0; w < this->Info.MapWidth; ++w) {
 			CMapField* mf;
 
-			mf = &this->Fields[h * this->Info.MapWidth + w];
+			mf = this->Field(w, h);
 			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
 			for (i = 0; i < PlayerMax; ++i) {
 				if (mf->Visible[i] == 1) {

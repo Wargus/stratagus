@@ -102,8 +102,8 @@ void CMap::Reveal(void)
 	for (x = 0; x < this->Info.MapWidth; ++x) {
 		for (y = 0; y < this->Info.MapHeight; ++y) {
 			for (p = 0; p < PlayerMax; ++p) {
-				if (!this->Fields[x + y * this->Info.MapWidth].Visible[p]) {
-					this->Fields[x + y * this->Info.MapWidth].Visible[p] = 1;
+				if (!this->Field(x, y)->Visible[p]) {
+					this->Field(x, y)->Visible[p] = 1;
 				}
 			}
 			MarkSeenTile(x, y);
@@ -144,7 +144,7 @@ void CMap::Reveal(void)
 bool CMap::WaterOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldWaterAllowed) != 0;
+	return (this->Field(tx, ty)->Flags & MapFieldWaterAllowed) != 0;
 }
 
 /**
@@ -158,7 +158,7 @@ bool CMap::WaterOnMap(int tx, int ty) const
 bool CMap::CoastOnMap(int tx, int ty) const
 {
 	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldCoastAllowed) != 0;
+	return (this->Field(tx, ty)->Flags & MapFieldCoastAllowed) != 0;
 
 }
 
