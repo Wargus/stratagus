@@ -173,7 +173,7 @@ void MapMarkTileSight(const CPlayer *player, int x, int y)
 
 	unsigned short *v;
 
-	v = &Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index];
+	v = &Map.Field(x, y)->Visible[player->Index];
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
 		if (!Map.NoFogOfWar || *v == 0) {
@@ -203,7 +203,7 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 
 	unsigned short *v;
 
-	v = &Map.Fields[x + y * Map.Info.MapWidth].Visible[player->Index];
+	v = &Map.Field(x, y)->Visible[player->Index];
 	switch (*v) {
 		case 0:  // Unexplored
 		case 1:

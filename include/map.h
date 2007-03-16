@@ -271,6 +271,10 @@ public:
 	/// Save the map.
 	void Save(CFile *file) const;
 
+	/// Get the MapField at location x,y
+	inline CMapField *Field(int x, int y) {
+		return &this->Fields[x + y * this->Info.MapWidth];
+	}
 //
 //  Tile type.
 //
@@ -323,7 +327,7 @@ extern int ReplayRevealMap;
 ----------------------------------------------------------------------------*/
 
 //
-// in map_fog.c
+// in map_fog.cpp
 //
 /// Function to (un)mark the vision table.
 typedef void MapMarkerFunc(const CPlayer *player, int x, int y);
@@ -349,7 +353,7 @@ extern void InitVisionTable(void);
 extern void FreeVisionTable(void);
 
 //
-// in map_radar.c
+// in map_radar.cpp
 //
 
 	/// Check if a unit is visible on radar
@@ -366,7 +370,7 @@ extern void MapMarkTileRadarJammer(const CPlayer *player, int x, int y);
 extern void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y);
 
 //
-// in script_map.c
+// in script_map.cpp
 //
 	/// Set a tile
 extern void SetTile(int tile, int w, int h, int value = 0);
@@ -395,7 +399,7 @@ extern int UnitCanBeAt(const CUnit *unit, int x, int y);
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
 
-// in unit.c
+// in unit.cpp
 
 /// Mark on vision table the Sight of the unit.
 void MapMarkUnitSight(CUnit *unit);
@@ -407,24 +411,31 @@ void MapUnmarkUnitSight(CUnit *unit);
 ----------------------------------------------------------------------------*/
 
 	/// Can a unit with 'mask' enter the field
-#define CanMoveToMask(x, y, mask) \
-	!(Map.Fields[(x) + (y) * Map.Info.MapWidth].Flags & (mask))
+inline bool CanMoveToMask(int x, int y, int mask) {
+	return !(Map.Field(x, y)->Flags & mask);
+}
 
-#define MapMarkSight(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileSight)
-#define MapUnmarkSight(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileSight)
+inline void MapMarkSight(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapMarkTileSight);
+}
+inline void MapUnmarkSight(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapUnmarkTileSight);
+}
 
 	/// Handle Marking and Unmarking of radar vision
-#define MapMarkRadar(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileRadar)
-#define MapUnmarkRadar(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileRadar)
+inline void MapMarkRadar(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapMarkTileRadar);
+}
+inline void MapUnmarkRadar(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapUnmarkTileRadar);
+}
 	/// Handle Marking and Unmarking of radar vision
-#define MapMarkRadarJammer(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileRadarJammer)
-#define MapUnmarkRadarJammer(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileRadarJammer)
+inline void MapMarkRadarJammer(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapMarkTileRadarJammer);
+}
+inline void MapUnmarkRadarJammer(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapUnmarkTileRadarJammer);
+}
 
 //@}
 

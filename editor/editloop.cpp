@@ -199,7 +199,7 @@ void EditTile(int x, int y, int tile)
 	//
 	// Change the flags
 	//
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf = Map.Field(x, y);
 	mf->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable);
 
@@ -1043,9 +1043,9 @@ static void DrawEditorInfo(void)
 	//
 	// Flags info
 	//
-	flags = Map.Fields[x + y * Map.Info.MapWidth].Flags;
+	flags = Map.Field(x, y)->Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-		Map.Fields[x + y * Map.Info.MapWidth].Value, flags,
+		Map.Field(x, y)->Value, flags,
 		flags & MapFieldUnpassable   ? 'u' : '-',
 		flags & MapFieldNoBuilding   ? 'n' : '-',
 		flags & MapFieldLandAllowed  ? 'L' : '-',
@@ -1060,7 +1060,7 @@ static void DrawEditorInfo(void)
 	//
 	// Tile info
 	//
-	tile = Map.Fields[x + y * Map.Info.MapWidth].Tile;
+	tile = Map.Field(x, y)->Tile;
 
 	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
 		if (tile == Map.Tileset.Table[i]) {

@@ -177,7 +177,7 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 		return 0;
 	}
 
-	return !(Map.Fields[x + y * Map.Info.MapWidth].Flags & mask);
+	return !(Map.Field(x, y)->Flags & mask);
 }
 
 /**
@@ -233,7 +233,7 @@ void PreprocessMap(void)
 
 	for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			mf = Map.Fields + ix + iy * Map.Info.MapWidth;
+			mf = Map.Field(ix, iy);
 			mf->SeenTile = mf->Tile;
 		}
 	}

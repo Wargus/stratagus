@@ -92,12 +92,11 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 		if ((unsigned)x < (unsigned)Map.Info.MapWidth && (unsigned)y < (unsigned)Map.Info.MapHeight) {
 			if (worker && x == worker->X && y == worker->Y) {
 				surrounding[surroundingnb++] = 1;
-			} else if (Map.Fields[x + y * Map.Info.MapWidth].Flags &
-					(MapFieldUnpassable | MapFieldBuilding)) {
+			} else if (Map.Field(x, y)->Flags & (MapFieldUnpassable | MapFieldBuilding)) {
 				surrounding[surroundingnb++] = 0;
 			} else{
 				// Can pass there
-				surrounding[surroundingnb++] = (Map.Fields[x + y * Map.Info.MapWidth].Flags &
+				surrounding[surroundingnb++] = (Map.Field(x, y)->Flags &
 					(MapFieldWaterAllowed + MapFieldCoastAllowed + MapFieldLandAllowed)) != 0;;
 			}
 		} else {
