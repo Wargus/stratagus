@@ -56,7 +56,7 @@ void UnitCacheInsert(CUnit *unit)
 	Assert(!unit->Removed);
 
 	for (int i = 0; i < unit->Type->TileHeight; ++i) {
-		CMapField *mf = Map.Fields + (i + unit->Y) * Map.Info.MapWidth + unit->X;
+		CMapField *mf = Map.Field(unit->X, unit->Y + i);
 		for (int j = 0; j < unit->Type->TileWidth; ++j) {
 			mf[j].UnitCache.push_back(unit);
 		}
@@ -73,7 +73,7 @@ void UnitCacheRemove(CUnit *unit)
 	Assert(!unit->Removed);
 
 	for (int i = 0; i < unit->Type->TileHeight; ++i) {
-		CMapField *mf = Map.Fields + (i + unit->Y) * Map.Info.MapWidth + unit->X;
+		CMapField *mf = Map.Field(unit->X, unit->Y + i);
 		for (int j = 0; j < unit->Type->TileWidth; ++j) {
 			for (std::vector<CUnit *>::iterator k = mf[j].UnitCache.begin(); k != mf[j].UnitCache.end(); ++k) {
 				if (*k == unit) {
@@ -127,7 +127,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 
 	n = 0;
 	for (i = y1; i < y2; ++i) {
-		mf = &Map.Fields[i * Map.Info.MapWidth + x1];
+		mf = Map.Field(x1, i);
 		for (j = x1; j < x2; ++j) {
 			for (size_t k = 0, end = mf->UnitCache.size(); k < end; ++k) {
 				//
@@ -172,7 +172,7 @@ int UnitCacheOnTile(int x, int y, CUnit **table)
 	// so there is no need for Cache Locks.
 	//
 	int n = 0;
-	CMapField *mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	CMapField *mf = Map.Field(x, y);
 	std::vector<CUnit *>::iterator i, end;
 
 	for (i = mf->UnitCache.begin(), end = mf->UnitCache.end(); i != end; ++i) {

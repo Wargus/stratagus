@@ -99,7 +99,7 @@ static unsigned QuadFromTile(int x, int y)
 	//
 	// find the abstact tile number
 	//
-	tile = Map.Fields[y * Map.Info.MapWidth + x].Tile;
+	tile = Map.Field(x, y)->Tile;
 	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
 		if (tile == Map.Tileset.Table[i]) {
 			break;
@@ -420,7 +420,7 @@ void ChangeTile(int x, int y, int tile)
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 	Assert(tile >= 0 && tile < Map.Tileset.NumTiles);
 
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf = Map.Field(x, y);
 	mf->Tile = mf->SeenTile = Map.Tileset.Table[tile];
 }
 
@@ -448,7 +448,7 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 	//
 	// Change the flags
 	//
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf = Map.Field(x, y);
 	mf->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable);
 

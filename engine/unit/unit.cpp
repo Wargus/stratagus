@@ -571,7 +571,7 @@ void MarkUnitFieldFlags(const CUnit *unit)
 	flags = type->FieldFlags;
 	for (h = type->TileHeight; h--;) {
 		for (w = type->TileWidth; w--;) {
-			Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags |= flags;
+			Map.Field(x + w, y + h)->Flags |= flags;
 		}
 	}
 }
@@ -598,13 +598,12 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 	flags = type->FieldFlags;
 	for (h = type->TileHeight; h--;) {
 		for (w = type->TileWidth; w--;) {
-			Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags &= ~flags;
+			Map.Field(x + w, y + h)->Flags &= ~flags;
 
 			int n = UnitCacheOnTile(x + w, y + h, table);
 			while (n--) {
 				if (table[n] != unit && table[n]->Orders[0]->Action != UnitActionDie) {
-					Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags |=
-						table[n]->Type->FieldFlags;
+					Map.Field(x + w, y + h)->Flags |= table[n]->Type->FieldFlags;
 				}
 			}
 		}
@@ -1208,7 +1207,7 @@ void UnitCountSeen(CUnit *unit)
 			for (x = 0; x < unit->Type->TileWidth; ++x) {
 				for (y = 0; y < unit->Type->TileHeight; ++y) {
 					//  Icky ugly code trick. With NoFogOfWar we have to be > 0;
-					if (Map.Fields[(unit->Y + y) * Map.Info.MapWidth + unit->X + x].Visible[p] >
+					if (Map.Field(unit->X + x, unit->Y + y)->Visible[p] >
 							1 - (Map.NoFogOfWar ? 1 : 0)) {
 						newv++;
 					}
@@ -2097,8 +2096,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 		// Need at least one coast tile
 		for (h = type->TileHeight; h--;) {
 			for (w = type->TileWidth; w--;) {
-				if (Map.Fields[x + w + (y + h) * Map.Info.MapWidth].Flags &
-						MapFieldCoastAllowed) {
+				if (Map.Field(x + w, y + h)->Flags & MapFieldCoastAllowed) {
 					h = w = 0;
 					success = 1;
 				}
@@ -2144,7 +2142,7 @@ bool CanBuildOn(int x, int y, int mask)
 	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		return false;
 	}
-	return (Map.Fields[x + y * Map.Info.MapWidth].Flags & mask) ? false : true;
+	return (Map.Field(x, y)->Flags & mask) ? false : true;
 }
 
 /**

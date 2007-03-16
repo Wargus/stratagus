@@ -1010,6 +1010,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 	int x;
 	int y;
 	int i;
+	CMapField *mf;
 
 	//
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
@@ -1037,15 +1038,15 @@ void CommandSharedVision(int player, bool state, int opponent)
 		//
 		for (x = 0; x < Map.Info.MapWidth; ++x) {
 			for (y = 0; y < Map.Info.MapHeight; ++y) {
-				i = x + y * Map.Info.MapWidth;
-				if (Map.Fields[i].Visible[player] && !Map.Fields[i].Visible[opponent]) {
-					Map.Fields[i].Visible[opponent] = 1;
+				mf = Map.Field(x, y);
+				if (mf->Visible[player] && !mf->Visible[opponent]) {
+					mf->Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Index) {
 						Map.MarkSeenTile(x, y);
 					}
 				}
-				if (Map.Fields[i].Visible[opponent] && !Map.Fields[i].Visible[player]) {
-					Map.Fields[i].Visible[player] = 1;
+				if (mf->Visible[opponent] && !mf->Visible[player]) {
+					mf->Visible[player] = 1;
 					if (player == ThisPlayer->Index) {
 						Map.MarkSeenTile(x, y);
 					}
