@@ -260,8 +260,8 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 					int tile;
 					int n;
 			
-					tile = map->Fields[j+i*map->Info.MapWidth].Tile;
-					for (n=0; n < map->Tileset.NumTiles && tile != map->Tileset.Table[n]; ++n) {
+					tile = map->Field(j, i)->Tile;
+					for (n = 0; n < map->Tileset.NumTiles && tile != map->Tileset.Table[n]; ++n) {
 					}
 					f->printf("SetTile(%3d, %d, %d)\n", n, j, i);
 				}

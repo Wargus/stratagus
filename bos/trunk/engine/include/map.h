@@ -9,7 +9,7 @@
 //
 /**@name map.h - The map headerfile. */
 //
-//      (c) Copyright 1998-2006 by Vladi Shabanski, Lutz Sammer, and
+//      (c) Copyright 1998-2007 by Vladi Shabanski, Lutz Sammer, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -272,13 +272,13 @@ public:
 	void Save(CFile *file) const;
 
 	/// Get the MapField at location x,y
-	inline CMapField *Field(int x, int y) {
+	inline CMapField *Field(int x, int y) const {
 		return &this->Fields[x + y * this->Info.MapWidth];
 	}
+
 //
 //  Tile type.
 //
-
 	/// Returns true, if water on the map tile field
 	bool WaterOnMap(int x, int y) const;
 	/// Returns true, if coast on the map tile field
