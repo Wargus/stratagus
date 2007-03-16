@@ -98,7 +98,7 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 			} else{
 				// Can pass there
 				surrounding[surroundingnb++] = (Map.Fields[x + y * Map.Info.MapWidth].Flags &
-						(MapFieldWaterAllowed + MapFieldCoastAllowed + MapFieldLandAllowed)) != 0;;
+					(MapFieldWaterAllowed + MapFieldCoastAllowed + MapFieldLandAllowed)) != 0;;
 			}
 		} else {
 			surrounding[surroundingnb++] = 0;
@@ -468,17 +468,15 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type, int *dx, int
 			type->Name.c_str());
 		return 1;
 	}
-	//
-	// Platforms can only be built on oil patches
-	//
-//	if (type->GivesResource != OilCost &&
-//			AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 1)) {
-//		return 1;
-//	}
-	// FIXME: Should do this if all units can't build better!
-	return AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 0);
 
-	// return 0;
+	// First try to find a place with free surroundings
+	if (AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 1)) {
+		return 1;
+	}
+
+	// FIXME: Should do this if all units can't build better!
+	// No place with free surroundings, try anything
+	return AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 0);
 }
 
 //@}
