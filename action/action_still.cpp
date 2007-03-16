@@ -9,7 +9,7 @@
 //
 /**@name action_still.cpp - The stand still action. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -51,63 +51,6 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Move in a random direction
-**
-**  @return  true if the unit moves, false otherwise
-*/
-static bool MoveRandomly(CUnit *unit)
-{
-	if (unit->Type->RandomMovementProbability &&
-			((SyncRand() % 100) <= unit->Type->RandomMovementProbability)) {
-		// pick random location
-		int x = unit->X;
-		int y = unit->Y;
-		switch ((SyncRand() >> 12) & 15) {
-			case 0: x++; break;
-			case 1: y++; break;
-			case 2: x--; break;
-			case 3: y--; break;
-			case 4: x++; y++; break;
-			case 5: x--; y++; break;
-			case 6: y--; x++; break;
-			case 7: x--; y--; break;
-			default:
-				break;
-		}
-
-		// restrict to map
-		if (x < 0) {
-			x = 0;
-		} else if (x >= Map.Info.MapWidth) {
-			x = Map.Info.MapWidth - 1;
-		}
-		if (y < 0) {
-			y = 0;
-		} else if (y >= Map.Info.MapHeight) {
-			y = Map.Info.MapHeight - 1;
-		}
-
-		// move if possible
-		if (x != unit->X || y != unit->Y) {
-			UnmarkUnitFieldFlags(unit);
-			if (UnitCanBeAt(unit, x, y)) {
-				// FIXME: Don't use pathfinder for this, costs too much cpu.
-				unit->Orders[0]->Action = UnitActionMove;
-				Assert(!unit->Orders[0]->Goal);
-				unit->Orders[0]->Goal = NoUnitP;
-				unit->Orders[0]->Range = 0;
-				unit->Orders[0]->X = x;
-				unit->Orders[0]->Y = y;
-				unit->State = 0;
-			}
-			MarkUnitFieldFlags(unit);
-		}
-		return true;
-	}
-	return false;
-}
 
 /**
 **  Auto cast a spell if possible
@@ -260,7 +203,7 @@ void ActionStillGeneric(CUnit *unit, bool stand_ground)
 		return;
 	}
 
-	if (MoveRandomly(unit) || AutoCast(unit) || AutoRepair(unit)) {
+	if (AutoCast(unit) || AutoRepair(unit)) {
 		return;
 	}
 
