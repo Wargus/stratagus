@@ -284,7 +284,7 @@ void CMap::Clean(void)
 	memset(this->Visible, 0, sizeof(this->Visible));
 	this->NoFogOfWar = false;
 	this->Tileset.Clear();
-	memset(this->TileModelsFileName, 0, sizeof(this->TileModelsFileName));
+	this->TileModelsFileName.clear();
 	this->TileGraphic = NULL;
 
 	FlagRevealMap = 0;
