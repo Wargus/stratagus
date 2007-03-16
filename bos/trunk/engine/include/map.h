@@ -132,7 +132,7 @@
 **    Tileset data for the map. See ::CTileset. This contains all
 **    information about the tile.
 **
-**  CMap::TileModelsFileName[]
+**  CMap::TileModelsFileName
 **
 **    Lua filename that loads all tilemodels
 **
@@ -290,17 +290,17 @@ private:
 	void InitFogOfWar(void);
 
 public:
-	CMapField *Fields;              /// fields on map
-	unsigned *Visible[PlayerMax];  /// visible bit-field
+	CMapField *Fields;                /// fields on map
+	unsigned *Visible[PlayerMax];     /// visible bit-field
 
-	bool NoFogOfWar;           /// fog of war disabled
+	bool NoFogOfWar;                  /// fog of war disabled
 
-	CTileset Tileset;          /// tileset data
-	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels
-	CGraphic *TileGraphic;     /// graphic for all the tiles
+	CTileset Tileset;                 /// tileset data
+	std::string TileModelsFileName;   /// lua filename that loads all tilemodels
+	CGraphic *TileGraphic;            /// graphic for all the tiles
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 
-	CMapInfo Info;             /// descriptive information
+	CMapInfo Info;                    /// descriptive information
 };
 
 /*----------------------------------------------------------------------------
