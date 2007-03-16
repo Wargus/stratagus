@@ -9,7 +9,7 @@
 //
 /**@name upgrade_structs.h - The upgrade/allow headerfile. */
 //
-//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and
+//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -60,11 +60,6 @@ enum CostType {
 // standard
 	GoldCost,                               /// gold  resource
 	WoodCost,                               /// wood  resource
-	OilCost,                                /// oil   resource
-// extensions
-	Cost4,                                  /// resource 4
-	Cost5,                                  /// resource 5
-	Cost6,                                  /// resource 6
 
 	MaxCosts                                /// how many different costs
 };

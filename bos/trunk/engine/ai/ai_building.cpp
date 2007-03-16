@@ -9,7 +9,7 @@
 //
 /**@name ai_building.cpp - AI building functions. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer
+//      (c) Copyright 2001-2007 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -471,10 +471,10 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type, int *dx, int
 	//
 	// Platforms can only be built on oil patches
 	//
-	if (type->GivesResource != OilCost &&
-			AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 1)) {
-		return 1;
-	}
+//	if (type->GivesResource != OilCost &&
+//			AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 1)) {
+//		return 1;
+//	}
 	// FIXME: Should do this if all units can't build better!
 	return AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 0);
 

@@ -131,12 +131,12 @@ SetFogOfWarOpacity(128)
 --	Define default resources
 -------------------------------------------------------------------------------
 
-DefineDefaultIncomes(0, 100, 100, 100, 100, 100, 100)
-DefineDefaultActions("stop", "mine", "harvest", "drill", "mine", "mine", "mine")
+DefineDefaultIncomes(0, 100, 100)
+DefineDefaultActions("stop", "mine", "harvest")
 
-DefineDefaultResourceNames("time", "titanium", "crystal", "gas", "ore", "stone", "coal")
+DefineDefaultResourceNames("time", "titanium", "crystal")
 
-DefineDefaultResourceAmounts("titanium", 150, "crystal", 150, "gas", 150)
+DefineDefaultResourceAmounts("titanium", 150, "crystal", 150)
 
 DefinePlayerColorIndex(208, 4)
 
