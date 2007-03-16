@@ -245,9 +245,6 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[GoldCost], 
 				Players[i].Resources[GoldCost]);
-			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[OilCost], 
-				Players[i].Resources[OilCost]);
 			f->printf("SetAiType(%d, \"%s\")\n",
 				i, Players[i].AiName.c_str());
 		}
