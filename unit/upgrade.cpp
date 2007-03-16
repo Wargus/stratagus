@@ -9,7 +9,7 @@
 //
 /**@name upgrade.cpp - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -213,7 +213,7 @@ int UnitTypeIdByIdent(const std::string &ident)
 // all the following functions are just map handlers, no specific notes
 
 /**
-**  Change allow for an unit-type.
+**  Change allow for a unit-type.
 **
 **  @param player  Player to change
 **  @param id      unit type id

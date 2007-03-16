@@ -9,7 +9,7 @@
 //
 /**@name action_move.cpp - The move action. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -182,7 +182,7 @@ int DoActionMove(CUnit *unit)
 /**
 **  Unit move action:
 **
-**  Move to a place or to an unit (can move).
+**  Move to a place or to a unit (can move).
 **  Tries 10x to reach the target, note this are the complete tries.
 **  If the target entered another unit, move to it's position.
 **  If the target unit is destroyed, continue to move to it's last position.

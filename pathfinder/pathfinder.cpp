@@ -11,7 +11,7 @@
 //
 //      I use breadth-first.
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Russell Smith
+//      (c) Copyright 1998-2007 by Lutz Sammer, Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 /**
 **  Find new path.
 **
-**  The destination could be an unit or a field.
+**  The destination could be a unit or a field.
 **  Range gives how far we must reach the goal.
 **
 **  @note  The destination could become negative coordinates!

@@ -9,7 +9,7 @@
 //
 /**@name actions.h - The actions headerfile. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ extern unsigned SyncHash;  /// Hash calculated to find sync failures
 ----------------------------------------------------------------------------*/
 
 /**
-**  This functions gives an unit a new command. If the command is given
+**  This function gives a unit a new command. If the command is given
 **  by the user the function with Send prefix should be used.
 */
 
@@ -182,7 +182,7 @@ extern int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scal
 extern int UnitShowAnimation(CUnit *unit, const CAnimation *anim);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions(void);
-	/// Unload an unit.
+	/// Unload a unit.
 extern int UnloadUnit(CUnit *unit);
 //@}
 

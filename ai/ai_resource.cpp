@@ -9,7 +9,7 @@
 //
 /**@name ai_resource.cpp - AI resource manager. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2007 by Lutz Sammer and Antonis Chaniotis.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -165,7 +165,7 @@ static int AiCheckSupply(const PlayerAi *pai, const CUnitType *type)
 }
 
 /**
-**  Check if the costs for an unit-type are available for the AI.
+**  Check if the costs for a unit-type are available for the AI.
 **
 **  Take reserve and already used resources into account.
 **
@@ -420,7 +420,7 @@ int AiCountUnitBuilders(CUnitType *type)
 		return 0;
 	}
 	//
-	// Check if we have a place for building or an unit to build.
+	// Check if we have a place for building or a unit to build.
 	//
 	if (type->Building) {
 		n = AiHelpers.Build.size();
@@ -451,7 +451,7 @@ int AiCountUnitBuilders(CUnitType *type)
 }
 
 /**
-**  Check if we can make an unit-type.
+**  Check if we can make a unit-type.
 **
 **  @param type  Unit-type that must be made.
 **
@@ -480,7 +480,7 @@ static int AiMakeUnit(CUnitType *type)
 		type = UnitTypes[usableTypes[currentType]];
 
 		//
-		// Check if we have a place for building or an unit to build.
+		// Check if we have a place for building or a unit to build.
 		//
 		if (type->Building) {
 			n = AiHelpers.Build.size();
@@ -853,7 +853,7 @@ static void AiCollectResources(void)
 			}
 
 			//
-			// We just moved an unit. Adjust priority & retry
+			// We just moved a unit. Adjust priority & retry
 			//
 			if (unit) {
 				// i got a new unit.
@@ -1022,7 +1022,7 @@ static int AiRepairUnit(CUnit *unit)
 }
 
 /**
-**  Look through the units, if an unit must be repaired.
+**  Look through the units, if a unit must be repaired.
 */
 static void AiCheckRepair(void)
 {

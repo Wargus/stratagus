@@ -97,11 +97,11 @@
 **
 ** ::AiHelpMe()
 **
-** Called if an unit owned by the AI is attacked.
+** Called if a unit owned by the AI is attacked.
 **
 ** ::AiUnitKilled()
 **
-** Called if an unit owned by the AI is killed.
+** Called if a unit owned by the AI is killed.
 **
 ** ::AiNeedMoreSupply()
 **
@@ -110,7 +110,7 @@
 **
 ** ::AiWorkComplete()
 **
-** Called if an unit has completed its work.
+** Called if a unit has completed its work.
 **
 ** ::AiCanNotBuild()
 **
@@ -742,7 +742,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 }
 
 /**
-**  Called if an unit is killed.
+**  Called if a unit is killed.
 **
 **  @param unit  Pointer to unit.
 */
@@ -961,7 +961,7 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 }
 
 /**
-**  Called if an unit can't move. Try to move unit in the way
+**  Called if a unit can't move. Try to move unit in the way
 **
 **  @param unit  Pointer to unit what builds the building.
 */
@@ -1012,7 +1012,7 @@ void AiNeedMoreSupply(const CUnit *unit, const CUnitType *what)
 }
 
 /**
-**  Called if training of an unit is completed.
+**  Called if training of a unit is completed.
 **
 **  @param unit  Pointer to unit making.
 **  @param what  Pointer to new ready trained unit.

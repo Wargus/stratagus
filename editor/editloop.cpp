@@ -976,7 +976,7 @@ static void DrawMapCursor(void)
 			PopClipping();
 		} else {
 			//
-			// If there is an unit under the cursor, it's selection thing
+			// If there is a unit under the cursor, it's selection thing
 			//  is drawn somewhere else (Check DrawUnitSelection.)
 			//
 			if (!UnitUnderCursor) {
@@ -1894,7 +1894,7 @@ static void EditorCallbackMouse(int x, int y)
 		CursorOn = CursorOnMap;
 
 		//
-		// Look if there is an unit under the cursor.
+		// Look if there is a unit under the cursor.
 		// FIXME: use Viewport2MapX Viewport2MapY
 		//
 		UnitUnderCursor = UnitOnScreen(NULL,

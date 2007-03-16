@@ -585,7 +585,7 @@ void CPlayer::AddCosts(const int *costs)
 }
 
 /**
-**  Add the costs of an unit type to resources
+**  Add the costs of a unit type to resources
 **
 **  @param type    Type of unit.
 */

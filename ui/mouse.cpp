@@ -9,7 +9,7 @@
 //
 /**@name mouse.cpp - The mouse handling. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1393,7 +1393,7 @@ void UIHandleButtonDown(unsigned button)
 		// to redraw the cursor immediately (and avoid up to 1 sec delay
 		if (CursorBuilding) {
 			// Possible Selected[0] was removed from map
-			// need to make sure there is an unit to build
+			// need to make sure there is a unit to build
 			if (Selected[0] && (MouseButtons & LeftButton) &&
 					UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {// enter select mode
 				int explored;

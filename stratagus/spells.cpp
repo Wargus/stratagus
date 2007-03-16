@@ -9,7 +9,7 @@
 //
 /**@name spells.cpp - The spell cast action. */
 //
-//      (c) Copyright 1998-2006 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2007 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -757,8 +757,8 @@ static Target *NewTargetPosition(int x, int y)
 **  @param caster      Pointer to caster unit.
 **  @param spell       Pointer to the spell to cast.
 **  @param target      Pointer to target unit, or 0 if it is a position spell.
-**  @param x           X position, or -1 if it is an unit spell.
-**  @param y           Y position, or -1 if it is an unit spell.
+**  @param x           X position, or -1 if it is a unit spell.
+**  @param y           Y position, or -1 if it is a unit spell.
 **  @param condition   Pointer to condition info.
 **
 **  @return            1 if passed, 0 otherwise.
@@ -771,7 +771,7 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 	if (caster->Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
 		return 0;
 	}
-	if (spell->Target == TargetUnit) { // Casting an unit spell without a target.
+	if (spell->Target == TargetUnit) { // Casting a unit spell without a target.
 		if ((!target) || target->Destroyed || target->Orders[0]->Action == UnitActionDie) {
 			return 0;
 		}

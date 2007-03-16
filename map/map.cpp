@@ -181,7 +181,7 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 }
 
 /**
-**  Can an unit of unit-type be placed at this point.
+**  Can a unit of unit-type be placed at this point.
 **
 **  @param type  unit-type to be checked.
 **  @param x     X map tile position.
@@ -208,7 +208,7 @@ int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 }
 
 /**
-**  Can an unit be placed to this point.
+**  Can a unit be placed to this point.
 **
 **  @param unit  unit to be checked.
 **  @param x     X map tile position.
