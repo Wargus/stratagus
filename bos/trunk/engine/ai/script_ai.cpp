@@ -9,7 +9,7 @@
 //
 /**@name script_ai.cpp - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Ludovic Pollet,
+//      (c) Copyright 2000-2007 by Lutz Sammer, Ludovic Pollet,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -533,7 +533,7 @@ static int CclAiSet(lua_State *l)
 }
 
 /**
-**  Wait for an unit.
+**  Wait for a unit.
 **
 **  @param l  Lua State.
 **

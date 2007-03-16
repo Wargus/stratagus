@@ -9,7 +9,7 @@
 //
 /**@name unit.cpp - The units. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ void CUnit::RefsDecrease()
 }
 
 /**
-**  Release an unit.
+**  Release a unit.
 **
 **  The unit is only released, if all references are dropped.
 */
@@ -659,7 +659,7 @@ static void RemoveUnitFromContainer(CUnit *unit)
 
 
 /**
-**  Affect Tile coord of an unit (with units inside) to tile (x, y).
+**  Affect Tile coord of a unit (with units inside) to tile (x, y).
 **
 **  @param unit    unit to move.
 **  @param x       X map tile position.
@@ -1051,7 +1051,7 @@ void UnitGoesUnderFog(CUnit *unit, const CPlayer *player)
 		//
 		// Icky yucky icky Seen.Destroyed trickery.
 		// We track for each player if he's seen the unit as destroyed.
-		// Remember, an unit is marked Destroyed when it's gone as in
+		// Remember, a unit is marked Destroyed when it's gone as in
 		// completely gone, the corpses vanishes. In that case the unit
 		// only survives since some players did NOT see the unit destroyed.
 		// Keeping trackof that is hard, mostly due to complex shared vision
@@ -1071,7 +1071,7 @@ void UnitGoesUnderFog(CUnit *unit, const CPlayer *player)
 }
 
 /**
-**  This function should get called when an unit goes out of fog of war.
+**  This function should get called when a unit goes out of fog of war.
 **
 **  @param unit    The unit that goes out of fog.
 **  @param player  The player the unit goes out of fog for.
@@ -1172,8 +1172,8 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y)
 }
 
 /**
-**  Recalculates an units visiblity count. This happens really often,
-**  Like every time an unit moves. It's really fast though, since we
+**  Recalculates a units visiblity count. This happens really often,
+**  Like every time a unit moves. It's really fast though, since we
 **  have per-tile counts.
 **
 **  @param unit    pointer to the unit to check if seen
@@ -2244,7 +2244,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 **  Range is not circular, but square.
 **  Player is ignored if nil(search the entire map)
 **  Use rvresult if you search for a tile that doesn't
-**  match resmask. Like for a tile where an unit can go
+**  match resmask. Like for a tile where a unit can go
 **  with it's movement mask.
 **
 **  @return            True if wood was found.
@@ -2746,7 +2746,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 }
 
 /**
-**  Let an unit die.
+**  Let a unit die.
 **
 **  @param unit    Unit to be destroyed.
 */
@@ -3567,7 +3567,7 @@ void SaveOrder(const COrder *order, CFile *file)
 }
 
 /**
-**  Save the state of an unit to file.
+**  Save the state of a unit to file.
 **
 **  @param unit    Unit pointer to be saved.
 **  @param file    Output file.

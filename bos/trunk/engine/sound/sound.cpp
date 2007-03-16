@@ -9,7 +9,7 @@
 //
 /**@name sound.cpp - The sound. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -277,7 +277,7 @@ static char CalculateStereo(const CUnit *unit)
 }
 
 /**
-**  Ask to the sound server to play a sound attached to an unit. The
+**  Ask to the sound server to play a sound attached to a unit. The
 **  sound server may discard the sound if needed (e.g., when the same
 **  unit is already speaking).
 **
@@ -303,7 +303,7 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 }
 
 /**
-**  Ask to the sound server to play a sound attached to an unit. The
+**  Ask to the sound server to play a sound attached to a unit. The
 **  sound server may discard the sound if needed (e.g., when the same
 **  unit is already speaking).
 **

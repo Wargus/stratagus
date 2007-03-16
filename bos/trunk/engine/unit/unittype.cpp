@@ -214,7 +214,7 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 }
 
 /**
-**  Save state of an unit-stats to file.
+**  Save state of a unit-stats to file.
 **
 **  @param stats  Unit-stats to save.
 **  @param ident  Unit-type ident.

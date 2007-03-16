@@ -446,7 +446,7 @@ static void HandleBuffs(CUnit *unit, int amount)
 }
 
 /**
-**  Handle the action of an unit.
+**  Handle the action of a unit.
 **
 **  @param unit  Pointer to handled unit.
 */

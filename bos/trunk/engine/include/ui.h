@@ -9,7 +9,7 @@
 //
 /**@name ui.h - The user interface header file. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -142,7 +142,7 @@ public:
 **
 **  CViewport::Unit
 **
-**    Viewport is bound to an unit. If the unit moves the viewport
+**    Viewport is bound to a unit. If the unit moves the viewport
 **    changes the position together with the unit.
 **    @todo binding to a group.
 */

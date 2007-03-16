@@ -13,7 +13,7 @@
 //      Sort of trivial implementation, since most queries are on a single tile.
 //      Unit is just inserted in a double linked list for every tile it's on.
 //
-//      (c) Copyright 2004-2006 by Crestez Leonard and Jimmy Salmon
+//      (c) Copyright 2004-2007 by Crestez Leonard and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 int UnitCacheOnTile(int x, int y, CUnit **table)
 {
 	//
-	// Unlike in UnitCacheSelect, there's no way an unit can show up twice,
+	// Unlike in UnitCacheSelect, there's no way a unit can show up twice,
 	// so there is no need for Cache Locks.
 	//
 	int n = 0;
