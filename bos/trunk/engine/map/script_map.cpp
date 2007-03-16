@@ -401,9 +401,9 @@ void SetTile(int tile, int w, int h, int value)
 	}
 
 	if (Map.Fields) {
-		Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
-		Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
-		Map.Fields[w + h * Map.Info.MapWidth].Cost = 
+		Map.Field(w, h)->Tile = Map.Tileset.Table[tile];
+		Map.Field(w, h)->Flags = Map.Tileset.FlagsTable[tile];
+		Map.Field(w, h)->Cost = 
 			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
 	}
 }
