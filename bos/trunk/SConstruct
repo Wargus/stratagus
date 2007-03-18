@@ -103,8 +103,11 @@ def CheckOpenGL(env, conf):
   sourcesEngine.append(globSources("guichan/opengl"))
 
 def CheckLuaLib(env, conf):
-  if not 'USE_WIN32' in env['CPPDEFINES'] and env.WhereIs('lua-config'):
-    env.ParseConfig('lua-config --include --libs')
+  if not 'USE_WIN32' in env['CPPDEFINES']:
+    if env.WhereIs('lua-config'):
+       env.ParseConfig('lua-config --include --libs')
+    elif env.WhereIs('pkg-config'):
+       env.ParseConfig('pkg-config --cflags --libs lua5.1')
   found = 0
   if conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
     found = 1
