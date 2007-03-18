@@ -820,6 +820,10 @@ public:
 		memset(CanStore, 0, sizeof(CanStore));
 		memset(ResInfo, 0, sizeof(ResInfo));
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
+		memset(ProductionRate, 0, sizeof(ProductionRate));
+		memset(MaxUtilizationRate, 0, sizeof(MaxUtilizationRate));
+		memset(ProductionCosts, 0, sizeof(ProductionCosts));
+		memset(StorageCapacity, 0, sizeof(StorageCapacity));
 		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	}
 
@@ -927,10 +931,15 @@ public:
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
-	CUnitSound Sound;               /// Sounds for events
+	CUnitSound Sound;                   /// Sounds for events
 
-	int Supply;                     /// Food supply
-	int Demand;                     /// Food demand
+	int Supply;                         /// Food supply
+	int Demand;                         /// Food demand
+
+	int ProductionRate[MaxCosts];       /// Rate that resources are produced
+	int MaxUtilizationRate[MaxCosts];   /// Max resource rate that can be used
+	int ProductionCosts[MaxCosts];      /// Total cost to produce this type
+	int StorageCapacity[MaxCosts];      /// Storage capacity of resources
 
 // --- FILLED UP ---
 

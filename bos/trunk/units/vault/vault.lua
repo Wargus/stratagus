@@ -76,6 +76,7 @@ DefineUnitType("unit-vault", {
 	Corpse = "build-dead-vault", Type = "land",
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	CanStore = {"crystal", "titanium"},
+	StorageCapacity = {"titanium", 10000, "crystal", 2000},
 	Sounds = {
 		"selected", "dev-selected",
 		"ready", "dev-ready",

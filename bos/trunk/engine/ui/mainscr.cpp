@@ -722,6 +722,11 @@ void DrawResources(void)
 			UI.Resources[ScoreCost].TextY + (v > 99999) * 3,
 			v > 99999 ? SmallFont : GameFont, v);
 	}
+
+	for (i = 1; i < MaxCosts; ++i) {
+		sprintf(tmp, "%d/%d", ThisPlayer->UtilizationRate[i], ThisPlayer->ProductionRate[i]);
+		VideoDrawText(400 +  50 * (i - 1), 1, GameFont, tmp);
+	}
 }
 
 /*----------------------------------------------------------------------------

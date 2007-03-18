@@ -314,9 +314,9 @@ UI.Resources[FoodCost].TextY = 1
 -- score
 UI.Resources[ScoreCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
 UI.Resources[ScoreCost].IconFrame = 4
-UI.Resources[ScoreCost].IconX = 67 + 300
+UI.Resources[ScoreCost].IconX = 67 + 250
 UI.Resources[ScoreCost].IconY = 0
-UI.Resources[ScoreCost].TextX = 85 + 300
+UI.Resources[ScoreCost].TextX = 85 + 250
 UI.Resources[ScoreCost].TextY = 1
 
 UI.PieMenu.G = CGraphic:New("ui/rosace1.png")
