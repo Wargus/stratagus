@@ -9,7 +9,7 @@
 --
 --	unit-generator.lua	-	Define the generator
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001-2007 by François Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ DefineUnitType("unit-gen", {
 	Corpse = "build-dead-gen", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
+	ProductionRate = {"titanium", 50},
 	Sounds = {
 		"selected", "gen-selected",
 		"ready", "gen-ready",

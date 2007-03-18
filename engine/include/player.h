@@ -301,6 +301,11 @@ public:
 	int Incomes[MaxCosts];        /// income of the resources
 	int Revenue[MaxCosts];        /// income rate of the resources
 
+	int ProductionRate[MaxCosts];     /// Rate that resources are produced
+	int UtilizationRate[MaxCosts];    /// Rate that resources are used
+	int StoredResources[MaxCosts];    /// Amount of resources in storage
+	int StorageCapacity[MaxCosts];    /// Storage capacity of resources
+
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
 
