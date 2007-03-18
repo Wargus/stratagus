@@ -343,7 +343,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 	if (!type->Vanishes && Orders[0]->Action != UnitActionDie) {
 		PlayerSlot = player->Units + player->TotalNumUnits++;
 		if (!SaveGameLoading) {
-			// If unit is dieing, it's already been lost by all players
+			// If unit is dying, it's already been lost by all players
 			// don't count again
 			if (type->Building) {
 				player->TotalBuildings++;
@@ -973,9 +973,13 @@ void UpdateForNewUnit(const CUnit *unit, int upgrade)
 	// Update resources
 	//
 	for (u = 1; u < MaxCosts; ++u) {
-		if (player->Incomes[u] < unit->Type->ImproveIncomes[u]) {
-			player->Incomes[u] = unit->Type->ImproveIncomes[u];
+		if (player->Incomes[u] < type->ImproveIncomes[u]) {
+			player->Incomes[u] = type->ImproveIncomes[u];
 		}
+	}
+	for (u = 1; u < MaxCosts; ++u) {
+		player->ProductionRate[u] += type->ProductionRate[u];
+		player->StorageCapacity[u] += type->StorageCapacity[u];
 	}
 }
 

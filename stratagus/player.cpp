@@ -124,6 +124,7 @@ void SavePlayers(CFile *file)
 {
 	int j;
 	Uint8 r, g, b;
+	CPlayer *p;
 
 	file->printf("\n--------------------------------------------\n");
 	file->printf("--- MODULE: players $Id$\n\n");
@@ -132,92 +133,98 @@ void SavePlayers(CFile *file)
 	//  Dump all players
 	//
 	for (int i = 0; i < NumPlayers; ++i) {
+		p = &Players[i];
 		file->printf("Player(%d,\n", i);
-		file->printf("  \"name\", \"%s\",\n", Players[i].Name.c_str());
+		file->printf("  \"name\", \"%s\",\n", p->Name.c_str());
 		file->printf("  \"type\", ");
-		switch (Players[i].Type) {
+		switch (p->Type) {
 			case PlayerNeutral:       file->printf("\"neutral\",");         break;
 			case PlayerNobody:        file->printf("\"nobody\",");          break;
 			case PlayerComputer:      file->printf("\"computer\",");        break;
 			case PlayerPerson:        file->printf("\"person\",");          break;
 			case PlayerRescuePassive: file->printf("\"rescue-passive\",");break;
 			case PlayerRescueActive:  file->printf("\"rescue-active\","); break;
-			default:                  file->printf("%d,",Players[i].Type);break;
+			default:                  file->printf("%d,",p->Type);break;
 		}
-		file->printf(" \"ai-name\", \"%s\",\n", Players[i].AiName.c_str());
-		file->printf("  \"team\", %d,", Players[i].Team);
+		file->printf(" \"ai-name\", \"%s\",\n", p->AiName.c_str());
+		file->printf("  \"team\", %d,", p->Team);
 
 		file->printf(" \"enemy\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			file->printf("%c",(Players[i].Enemy & (1 << j)) ? 'X' : '_');
+			file->printf("%c",(p->Enemy & (1 << j)) ? 'X' : '_');
 		}
 		file->printf("\", \"allied\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			file->printf("%c", (Players[i].Allied & (1 << j)) ? 'X' : '_');
+			file->printf("%c", (p->Allied & (1 << j)) ? 'X' : '_');
 		}
 		file->printf("\", \"shared-vision\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			file->printf("%c", (Players[i].SharedVision & (1 << j)) ? 'X' : '_');
+			file->printf("%c", (p->SharedVision & (1 << j)) ? 'X' : '_');
 		}
-		file->printf("\",\n  \"start\", {%d, %d},\n", Players[i].StartX,
-			Players[i].StartY);
+		file->printf("\",\n  \"start\", {%d, %d},\n", p->StartX,
+			p->StartY);
 
 		// Resources
 		file->printf("  \"resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
-				if (j == MaxCosts / 2) {
-					file->printf("\n ");
-				} else {
-					file->printf(" ");
-				}
+				file->printf(" ");
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j],
-				Players[i].Resources[j]);
+				p->Resources[j]);
 		}
 		// Last Resources
 		file->printf("},\n  \"last-resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
-				if (j == MaxCosts / 2) {
-					file->printf("\n ");
-				} else {
-					file->printf(" ");
-				}
+				file->printf(" ");
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j],
-				Players[i].LastResources[j]);
+				p->LastResources[j]);
 		}
 		// Incomes
 		file->printf("},\n  \"incomes\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
-				if (j == MaxCosts / 2) {
-					file->printf("\n ");
-				} else {
-					file->printf(" ");
-				}
+				file->printf(" ");
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j],
-				Players[i].Incomes[j]);
+				p->Incomes[j]);
 		}
 		// Revenue
 		file->printf("},\n  \"revenue\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
-				if (j == MaxCosts / 2) {
-					file->printf("\n ");
-				} else {
-					file->printf(" ");
-				}
+				file->printf(" ");
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j],
-				Players[i].Revenue[j]);
+				p->Revenue[j]);
 		}
+
+		// ProductionRate done by load units.
+		// UtilizationRate
+		file->printf("},\n  \"utilization-rate\", {");
+		for (j = 0; j < MaxCosts; ++j) {
+			if (j) {
+				file->printf(" ");
+			}
+			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+				p->UtilizationRate[j]);
+		}
+		// StoredResources
+		file->printf("},\n  \"stored-resources\", {");
+		for (j = 0; j < MaxCosts; ++j) {
+			if (j) {
+				file->printf(" ");
+			}
+			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+				p->StoredResources[j]);
+		}
+		// StorageCapacity done by load units.
 
 		// UnitTypesCount done by load units.
 
-		file->printf("},\n  \"%s\",\n", Players[i].AiEnabled ?
+		file->printf("},\n  \"%s\",\n", p->AiEnabled ?
 			"ai-enabled" : "ai-disabled");
 
 		// Ai done by load ais.
@@ -225,26 +232,26 @@ void SavePlayers(CFile *file)
 		// TotalNumUnits done by load units.
 		// NumBuildings done by load units.
 
-		file->printf(" \"supply\", %d,", Players[i].Supply);
-		file->printf(" \"unit-limit\", %d,", Players[i].UnitLimit);
-		file->printf(" \"building-limit\", %d,", Players[i].BuildingLimit);
-		file->printf(" \"total-unit-limit\", %d,", Players[i].TotalUnitLimit);
+		file->printf(" \"supply\", %d,", p->Supply);
+		file->printf(" \"unit-limit\", %d,", p->UnitLimit);
+		file->printf(" \"building-limit\", %d,", p->BuildingLimit);
+		file->printf(" \"total-unit-limit\", %d,", p->TotalUnitLimit);
 
-		file->printf("\n  \"score\", %d,", Players[i].Score);
-		file->printf("\n  \"total-units\", %d,", Players[i].TotalUnits);
-		file->printf("\n  \"total-buildings\", %d,", Players[i].TotalBuildings);
+		file->printf("\n  \"score\", %d,", p->Score);
+		file->printf("\n  \"total-units\", %d,", p->TotalUnits);
+		file->printf("\n  \"total-buildings\", %d,", p->TotalBuildings);
 		file->printf("\n  \"total-resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("%d,", Players[i].TotalResources[j]);
+			file->printf("%d,", p->TotalResources[j]);
 		}
 		file->printf("},");
-		file->printf("\n  \"total-razings\", %d,", Players[i].TotalRazings);
-		file->printf("\n  \"total-kills\", %d,", Players[i].TotalKills);
+		file->printf("\n  \"total-razings\", %d,", p->TotalRazings);
+		file->printf("\n  \"total-kills\", %d,", p->TotalKills);
 
-		SDL_GetRGB(Players[i].Color, TheScreen->format, &r, &g, &b);
+		SDL_GetRGB(p->Color, TheScreen->format, &r, &g, &b);
 		file->printf("\n  \"color\", { %d, %d, %d },", r, g, b);
 
 		// UnitColors done by init code.
@@ -455,6 +462,10 @@ void CPlayer::Clear()
 	memset(LastResources, 0, sizeof(LastResources));
 	memset(Incomes, 0, sizeof(Incomes));
 	memset(Revenue, 0, sizeof(Revenue));
+	memset(ProductionRate, 0, sizeof(ProductionRate));
+	memset(UtilizationRate, 0, sizeof(UtilizationRate));
+	memset(StoredResources, 0, sizeof(StoredResources));
+	memset(StorageCapacity, 0, sizeof(StorageCapacity));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	AiEnabled = 0;
 	Ai = 0;
