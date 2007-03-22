@@ -217,7 +217,7 @@ DefineButton({
 -- spells ----------------------------------------------------------
 
 DefineButton({
-	Pos = 3, Level = 0, Icon = "icon-expl2",
+	Pos = 3, Level = 0, Icon = "icon-attack",
 	Action = "cast-spell", Value = "spell-nuke",
 	Allowed = "check-true", Key = "n", Hint = "~!NUKE EM",
 	ForUnit = {"unit-msilo"}})
