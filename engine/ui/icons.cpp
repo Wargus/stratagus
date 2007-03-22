@@ -123,12 +123,10 @@ void IconConfig::Load()
 	Assert(!Name.empty());
 
 	Icon = CIcon::Get(Name);
-#if 0
 	if (!Icon) {
 		printf("Can't find icon %s\n", Name.c_str());
 		ExitFatal(-1);
 	}
-#endif
 };
 
 /**
