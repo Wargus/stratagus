@@ -124,7 +124,7 @@ void IconConfig::Load()
 
 	Icon = CIcon::Get(Name);
 	if (!Icon) {
-		printf("Can't find icon %s\n", Name.c_str());
+		fprintf(stderr, "Can't find icon %s\n", Name.c_str());
 		ExitFatal(-1);
 	}
 };
