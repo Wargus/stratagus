@@ -9,7 +9,7 @@
 --
 --	unit-artil.lua	-	Define the artil unit.
 --
---	(c) Copyright 2005 by François Beerten.
+--	(c) Copyright 2005 by Franï¿½is Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -90,7 +90,6 @@ DefineUnitType("unit-artil", {
 })
 
 DefineAllow("unit-artil", "AAAAAAAA")
-DefineDependency("unit-artil", {"unit-vfac"})
 
 DefineCommonButtons({"unit-artil"})
 

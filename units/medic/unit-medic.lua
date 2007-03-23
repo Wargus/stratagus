@@ -9,7 +9,7 @@
 --
 --	unit-medic.lua	-	Define the used elites unit-types.
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -110,7 +110,6 @@ DefineUnitType("unit-medic", {
 DefineHumanCorpse("medic")
 
 DefineAllow("unit-medic", "AAAAAAAA")
-DefineDependency("unit-medic", {"unit-hosp"})
 
 DefineButton({
         Pos = 1, Level = 0, Icon = "icon-medic",
