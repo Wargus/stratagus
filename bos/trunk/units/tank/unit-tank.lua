@@ -9,7 +9,7 @@
 --
 --	unit-tank.lua	-	Define the tank unit.
 --
---	(c) Copyright 2005 by François Beerten.
+--	(c) Copyright 2005 by Franï¿½is Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -82,7 +82,6 @@ DefineUnitType("unit-tank", {
 })
 
 DefineAllow("unit-tank", "AAAAAAAA")
-DefineDependency("unit-tank", {"unit-vfac"})
 
 DefineButton({
 	Pos = 4, Level = 0, Icon = "icon-tank", Action = "train-unit",
