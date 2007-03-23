@@ -124,8 +124,7 @@ int main(int argc, char *argv[])
 	SDL_Color bg = {255, 25, 255, 255};
 	unsigned short str[2];
 	int i, j, k;
-	int width, maxy, miny;
-	int ascent;
+	int width, height;
 	int w, y1, y2;
 	char fname[100];
 	SDL_Surface *ss[Y + 1];
@@ -145,24 +144,10 @@ int main(int argc, char *argv[])
 	// Find max char size
 	GetWidth(font, '@', &w, &y1, &y2);
 	width = w;
-	maxy = y1;
-	miny = y2;
-	GetWidth(font, 506 + ' ', &w, &y1, &y2);
-	if (w > width) width = w;
-	if (y1 > maxy) maxy = y1;
-	if (y2 > miny) miny = y2;
-	GetWidth(font, 420 + ' ', &w, &y1, &y2);
-	if (w > width) width = w;
-	if (y1 > maxy) maxy = y1;
-	if (y2 < miny) miny = y2;
-	GetWidth(font, 430 + ' ', &w, &y1, &y2);
-	if (w > width) width = w;
-	if (y1 > maxy) maxy = y1;
-	if (y2 < miny) miny = y2;
+	height = TTF_FontAscent(font) - TTF_FontDescent(font) + 1;
 
-	ascent = TTF_FontAscent(font);
 	VideoWidth = width * X;
-	VideoHeight = Y * (maxy - miny + 2);
+	VideoHeight = Y * (height + 2);
 	str[1] = '\0';
 	memset(ss, 0, sizeof(ss));
 
@@ -197,8 +182,8 @@ int main(int argc, char *argv[])
 	SDL_LockSurface(s);
 	for (j = 0; j < Y; ++j) {
 		SDL_LockSurface(ss[j]);
-		for (i = ascent - maxy; i < ascent - miny + 2; ++i) {
-			memcpy((Uint8 *)s->pixels + (j * (maxy - miny + 2) + (i - (ascent - maxy))) * s->pitch,
+		for (i = 0; i < height; ++i) {
+			memcpy((Uint8 *)s->pixels + (j * (height + 2) + i) * s->pitch,
 				(Uint8 *)ss[j]->pixels + i * ss[j]->pitch, ss[j]->w * 4);
 		}
 		SDL_UnlockSurface(ss[j]);
