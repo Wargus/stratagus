@@ -144,9 +144,10 @@ def AutoConfigure(env):
   if not conf.CheckLibWithHeader('z', 'zlib.h', 'c'):
      print 'Did not find the zlib library or headers, exiting!'
      Exit(1)
-  if not 'USE_WIN32' in env['CPPDEFINES'] and not conf.CheckLib('dl'):
-     print 'Did not find dl library or header which is needed on some systems for lua. Exiting!'
-     Exit(1)
+  if not 'USE_WIN32' in env['CPPDEFINES'] and not sys.platform.startswith('freebsd'):
+     if not conf.CheckLib('dl'):
+        print 'Did not find dl library or header which is needed on some systems for lua. Exiting!'
+        Exit(1)
   if not CheckLuaLib(env, conf):
      print 'Did not find required lua library. Exiting!'
      Exit(1)
