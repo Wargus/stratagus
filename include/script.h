@@ -9,7 +9,7 @@
 //
 /**@name script.h - The clone configuration language headerfile. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+
+#include <string>
 
 #ifdef __cplusplus
 extern "C" {
@@ -260,8 +262,8 @@ struct _StringDesc_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char *CclStartFile;   /// CCL start file
-extern int CclInConfigFile;  /// True while config file parsing
+extern std::string CclStartFile;   /// CCL start file
+extern int CclInConfigFile;        /// True while config file parsing
 
 /*----------------------------------------------------------------------------
 --  Functions

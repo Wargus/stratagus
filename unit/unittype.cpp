@@ -76,12 +76,12 @@ int DefaultIncomes[MaxCosts];
 /**
 **  Default action for the resources.
 */
-char *DefaultActions[MaxCosts];
+std::string DefaultActions[MaxCosts];
 
 /**
 **  Default names for the resources.
 */
-char *DefaultResourceNames[MaxCosts];
+std::string DefaultResourceNames[MaxCosts];
 
 /**
 **  Default amounts for the resources.
@@ -239,7 +239,7 @@ static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int
 		if (j) {
 			file->printf(" ");
 		}
-		file->printf("\"%s\", %d,", DefaultResourceNames[j], stats->Costs[j]);
+		file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), stats->Costs[j]);
 	}
 
 	file->printf("})\n");

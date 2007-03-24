@@ -170,7 +170,7 @@ void SavePlayers(CFile *file)
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->Resources[j]);
 		}
 		// Last Resources
@@ -179,7 +179,7 @@ void SavePlayers(CFile *file)
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->LastResources[j]);
 		}
 		// Incomes
@@ -188,7 +188,7 @@ void SavePlayers(CFile *file)
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->Incomes[j]);
 		}
 		// Revenue
@@ -197,7 +197,7 @@ void SavePlayers(CFile *file)
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->Revenue[j]);
 		}
 
@@ -208,7 +208,7 @@ void SavePlayers(CFile *file)
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->UtilizationRate[j]);
 		}
 		// StoredResources
@@ -217,7 +217,7 @@ void SavePlayers(CFile *file)
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->StoredResources[j]);
 		}
 		// StorageCapacity done by load units.
@@ -563,7 +563,7 @@ int CPlayer::CheckCosts(const int *costs) const
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Resources[i] < costs[i]) {
 			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
-				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
+				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(), DefaultResourceNames[i].c_str());
 
 			err |= 1 << i;
 		}

@@ -105,12 +105,12 @@ extern int DefaultIncomes[MaxCosts];
 /**
 **  Default action for the resources.
 */
-extern char *DefaultActions[MaxCosts];
+extern std::string DefaultActions[MaxCosts];
 
 /**
 **  Default names for the resources.
 */
-extern char *DefaultResourceNames[MaxCosts];
+extern std::string DefaultResourceNames[MaxCosts];
 
 /**
 **  Default amounts for the resources.

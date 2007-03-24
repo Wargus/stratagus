@@ -79,8 +79,6 @@ int NetConnectRunning;                 /// Network menu: Setup mode active
 NetworkState NetStates[PlayerMax];     /// Network menu: Server: Client Host states
 unsigned char NetLocalState;           /// Network menu: Local Server/Client connect state;
 int NetLocalHostsSlot;                 /// Network menu: Slot # in Hosts array of local client
-char NetTriesText[32];                 /// Network menu: Client tries count text
-char NetServerText[64];                /// Network menu: Text describing the Network Server IP
 int NetLocalPlayerNumber;              /// Player number of local client
 
 static int NetStateMsgCnt;              /// Number of consecutive msgs of same type sent
@@ -399,7 +397,6 @@ int NetworkSetupServerAddress(const std::string &serveraddr)
 	DebugPrint("SELECTED SERVER: %s (%d.%d.%d.%d)\n" _C_ serveraddr.c_str() _C_
 		NIPQUAD(ntohl(addr)));
 
-	sprintf(NetServerText, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
 	return 0;
 }
 
@@ -463,7 +460,7 @@ void NetworkInitServerConnect(int openslots)
 	}
 
 	// preset the server (initially always slot 0)
-	memcpy(Hosts[0].PlyName, LocalPlayerName, sizeof(Hosts[0].PlyName) - 1);
+	memcpy(Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[0].PlyName) - 1);
 	
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
@@ -922,7 +919,6 @@ void NetworkProcessClientRequest(void)
 
 	memset(&message, 0, sizeof(message));
 changed:
-	sprintf(NetTriesText, "Connected try %d of 20", NetStateMsgCnt);
 	switch (NetLocalState) {
 		case ccs_disconnected:
 			message.Type = MessageInitHello;
@@ -950,10 +946,9 @@ changed:
 			if (NetStateMsgCnt < 48) { // 48 retries = 24 seconds
 				message.Type = MessageInitHello;
 				message.SubType = ICMHello;
-				memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, sizeof(message.u.Hosts[0].PlyName) - 1);
+				memcpy(message.u.Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(message.u.Hosts[0].PlyName) - 1);
 				message.MapUID = 0L;
 				NetworkSendRateLimitedClientMessage(&message, 500);
-				sprintf(NetTriesText, "Connecting try %d of 48", NetStateMsgCnt);
 			} else {
 				NetLocalState = ccs_unreachable;
 				NetConnectRunning = 0; // End the menu..
@@ -1208,7 +1203,7 @@ static void ClientParseConnecting(const CInitMessage *msg)
 					}
 				} else {
 					Hosts[i].PlyNr = i;
-					memcpy(Hosts[i].PlyName, LocalPlayerName, sizeof(Hosts[i].PlyName) - 1);
+					memcpy(Hosts[i].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[i].PlyName) - 1);
 				}
 			}
 			break;
@@ -1371,7 +1366,7 @@ static void ClientParseSynced(const CInitMessage *msg)
 			Hosts[HostsCount].Host = 0;
 			Hosts[HostsCount].Port = 0;
 			Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-			memcpy(Hosts[HostsCount].PlyName, LocalPlayerName, sizeof(Hosts[HostsCount].PlyName) - 1);
+			memcpy(Hosts[HostsCount].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[HostsCount].PlyName) - 1);
 
 			NetLocalState = ccs_goahead;
 			NetStateMsgCnt = 0;
@@ -1406,7 +1401,7 @@ static void ClientParseAsync(const CInitMessage *msg)
 					}
 				} else {
 					Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-					memcpy(Hosts[i].PlyName, LocalPlayerName, sizeof(Hosts[i].PlyName) - 1);
+					memcpy(Hosts[i].PlyName, LocalPlayerName.c_str(), sizeof(Hosts[i].PlyName) - 1);
 				}
 			}
 			NetLocalState = ccs_synced;
@@ -1543,7 +1538,7 @@ static void ServerParseHello(int h, const CInitMessage *msg)
 	message.Type = MessageInitReply;
 	message.SubType = ICMWelcome; // Acknowledge: Client is welcome
 	message.u.Hosts[0].PlyNr = htons(h); // Host array slot number
-	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, sizeof(message.u.Hosts[0].PlyName) - 1); // Name of server player
+	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName.c_str(), sizeof(message.u.Hosts[0].PlyName) - 1); // Name of server player
 	message.MapUID = 0L;
 	for (i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 		if (i != h) {

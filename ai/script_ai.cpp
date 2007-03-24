@@ -872,7 +872,7 @@ static int CclAiDump(lua_State *l)
 	//
 	printf("------\n");
 	for (i = 0; i < MaxCosts; ++i) {
-		printf("%s(%4d) ", DefaultResourceNames[i], AiPlayer->Player->Resources[i]);
+		printf("%s(%4d) ", DefaultResourceNames[i].c_str(), AiPlayer->Player->Resources[i]);
 	}
 	printf("\n");
 	printf("%d:", AiPlayer->Player->Index);
@@ -922,14 +922,14 @@ static int CclAiDump(lua_State *l)
 **
 **  @param name  Resource name.
 **
-**  @return   The number of the resource in DefaultResourceNames
+**  @return      The number of the resource in DefaultResourceNames
 */
 static int DefaultResourceNumber(const char *name)
 {
 	int i;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(DefaultResourceNames[i], name)) {
+		if (DefaultResourceNames[i] == name) {
 			return i;
 		}
 	}

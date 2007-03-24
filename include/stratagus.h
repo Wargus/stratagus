@@ -185,7 +185,7 @@ inline char *new_strdup(const char *str)
 #endif
 
 	/// Text string: Name, Version, Copyright
-extern char NameLine[];
+extern std::string NameLine;
 
 #ifndef STRATAGUS_LIB_PATH
 #define STRATAGUS_LIB_PATH  "."      /// Where to find the data files

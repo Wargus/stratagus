@@ -340,32 +340,32 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 
 	file->printf("  \"reserve\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Reserve[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Reserve[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"used\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Used[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Used[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"needed\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Needed[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Needed[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"collect\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Collect[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Collect[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"need-mask\", {");
 	for (i = 0; i < MaxCosts; ++i) {
 		if (ai->NeededMask & (1 << i)) {
-			file->printf("\"%s\", ", DefaultResourceNames[i]);
+			file->printf("\"%s\", ", DefaultResourceNames[i].c_str());
 		}
 	}
 	file->printf("},\n");

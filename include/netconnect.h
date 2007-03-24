@@ -32,6 +32,8 @@
 
 //@{
 
+#include <string>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -199,11 +201,11 @@ enum _net_client_con_state_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::string NetworkArg;  /// Network command line argument
-extern int NetPlayers;    /// Network players
-extern int NetworkPort;   /// Local network port to use
+extern std::string NetworkArg;        /// Network command line argument
+extern int NetPlayers;                /// Network players
+extern int NetworkPort;               /// Local network port to use
 
-extern char LocalPlayerName[16];  /// Name of local player
+extern std::string LocalPlayerName;   /// Name of local player
 
 extern int HostsCount;                /// Number of hosts.
 extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.
@@ -212,8 +214,6 @@ extern int NetConnectRunning;              /// Network menu: Setup mode active
 extern NetworkState NetStates[PlayerMax];  /// Network menu: Server: Client Host states
 extern unsigned char NetLocalState;        /// Network menu: Local Server/Client connect state
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
-extern char NetTriesText[32];              /// Network menu: Client tries count text
-extern char NetServerText[64];             /// Network menu: Text describing the Network Server IP
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
@@ -223,20 +223,20 @@ extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client 
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void NetworkServerStartGame(void);   /// Server user has finally hit the start game button
+extern void NetworkServerStartGame(void);       /// Server user has finally hit the start game button
 extern void NetworkGamePrepareGameSettings(void);
-extern void NetworkConnectSetupGame(void);  /// Assign Player slot, evaluate Setup state..
+extern void NetworkConnectSetupGame(void);      /// Assign Player slot, evaluate Setup state..
 
-extern void NetworkInitClientConnect(void);  /// Setup network connect state machine for clients
-extern void NetworkExitClientConnect(void);  /// Terminate network connect state machine for clients
-extern void NetworkInitServerConnect(int openslots);  /// Setup network connect state machine for the server
-extern void NetworkExitServerConnect(void);  /// Terminate network connect state machine for the server
+extern void NetworkInitClientConnect(void);     /// Setup network connect state machine for clients
+extern void NetworkExitClientConnect(void);     /// Terminate network connect state machine for clients
+extern void NetworkInitServerConnect(int openslots); /// Setup network connect state machine for the server
+extern void NetworkExitServerConnect(void);     /// Terminate network connect state machine for the server
 extern int NetworkParseSetupEvent(const unsigned char *buf, int size);  /// Parse a network connect event
 extern int NetworkSetupServerAddress(const std::string &serveraddr);  /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest(void);  /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest(void);  /// Menu Loop: Send out server request messages
-extern void NetworkServerResyncClients(void);  /// Menu Loop: Server: Mark clients state to send stateinfo message
-extern void NetworkDetachFromServer(void);  /// Menu Loop: Client: Send GoodBye to the server and detach
+extern void NetworkServerResyncClients(void);   /// Menu Loop: Server: Mark clients state to send stateinfo message
+extern void NetworkDetachFromServer(void);      /// Menu Loop: Client: Send GoodBye to the server and detach
 
 //@}
 
