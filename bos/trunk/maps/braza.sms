@@ -13,11 +13,11 @@
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-SetStartView(0, 100, 55)
+SetStartView(0, 116, 120)
 SetPlayerData(0, "Resources", "titanium", 1000)
 SetPlayerData(0, "Resources", "crystal", 2000)
 SetAiType(0, "ai-rush")
-SetStartView(1, 115, 116)
+SetStartView(1, 18, 7)
 SetPlayerData(1, "Resources", "titanium", 1000)
 SetPlayerData(1, "Resources", "crystal", 2000)
 SetAiType(1, "ai-rush")
