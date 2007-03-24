@@ -78,7 +78,7 @@
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
-char *CclStartFile;                   /// CCL start file
+std::string CclStartFile;             /// CCL start file
 std::string UserDirectory;
 int CclInConfigFile;                  /// True while config file parsing
 int SaveGameLoading;                  /// If a Saved Game is Loading
@@ -2009,11 +2009,8 @@ static int CclGetGameSpeed(lua_State *l)
 */
 static int CclSetLocalPlayerName(lua_State *l)
 {
-	const char *str;
-
 	LuaCheckArgs(l, 1);
-	str = LuaToString(l, 1);
-	strncpy_s(LocalPlayerName, sizeof(LocalPlayerName), str, _TRUNCATE);
+	LocalPlayerName = LuaToString(l, 1);
 	return 0;
 }
 
@@ -2025,7 +2022,7 @@ static int CclSetLocalPlayerName(lua_State *l)
 static int CclGetLocalPlayerName(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, LocalPlayerName);
+	lua_pushstring(l, LocalPlayerName.c_str());
 	return 1;
 }
 
@@ -2099,7 +2096,7 @@ static int CclSetSpeedResourcesHarvest(lua_State *l)
 	LuaCheckArgs(l, 2);
 	resource = LuaToString(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(resource, DefaultResourceNames[i])) {
+		if (resource == DefaultResourceNames[i]) {
 			SpeedResourcesHarvest[i] = LuaToNumber(l, 2);
 			return 0;
 		}
@@ -2122,7 +2119,7 @@ static int CclSetSpeedResourcesReturn(lua_State *l)
 	LuaCheckArgs(l, 2);
 	resource = LuaToString(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(resource, DefaultResourceNames[i])) {
+		if (resource == DefaultResourceNames[i]) {
 			SpeedResourcesReturn[i] = LuaToNumber(l, 2);
 			return 0;
 		}
@@ -2210,12 +2207,11 @@ static int CclDefineDefaultActions(lua_State *l)
 	int args;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		delete[] DefaultActions[i];
-		DefaultActions[i] = NULL;
+		DefaultActions[i].clear();
 	}
 	args = lua_gettop(l);
 	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultActions[i] = new_strdup(LuaToString(l, i + 1));
+		DefaultActions[i] = LuaToString(l, i + 1);
 	}
 	return 0;
 }
@@ -2231,12 +2227,11 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	int args;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		delete[] DefaultResourceNames[i];
-		DefaultResourceNames[i] = NULL;
+		DefaultResourceNames[i].clear();
 	}
 	args = lua_gettop(l);
 	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResourceNames[i] = new_strdup(LuaToString(l, i + 1));
+		DefaultResourceNames[i] = LuaToString(l, i + 1);
 	}
 	return 0;
 }
@@ -2260,7 +2255,7 @@ static int CclDefineDefaultResourceAmounts(lua_State *l)
 	for (j = 0; j < args; ++j) {
 		value = LuaToString(l, j + 1);
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(value, DefaultResourceNames[i])) {
+			if (value == DefaultResourceNames[i]) {
 				++j;
 				DefaultResourceAmounts[i] = LuaToNumber(l, j + 1);
 				break;
@@ -2504,7 +2499,7 @@ void LoadCcl(void)
 	//  Load and evaluate configuration file
 	//
 	CclInConfigFile = 1;
-	file = LibraryFileName(CclStartFile, buf, sizeof(buf));
+	file = LibraryFileName(CclStartFile.c_str(), buf, sizeof(buf));
 	if (access(buf, R_OK)) {
 		printf("Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
@@ -2527,9 +2522,9 @@ void SaveCcl(CFile *file)
 
 	for (int i = 0; i < MaxCosts; ++i) {
 		file->printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
-			DefaultResourceNames[i], SpeedResourcesHarvest[i]);
+			DefaultResourceNames[i].c_str(), SpeedResourcesHarvest[i]);
 		file->printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
-			DefaultResourceNames[i], SpeedResourcesReturn[i]);
+			DefaultResourceNames[i].c_str(), SpeedResourcesReturn[i]);
 	}
 	file->printf("SetSpeedBuild(%d)\n", SpeedBuild);
 	file->printf("SetSpeedTrain(%d)\n", SpeedTrain);

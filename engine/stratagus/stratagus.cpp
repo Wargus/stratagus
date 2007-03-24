@@ -223,10 +223,10 @@ extern void CreateUserDirectories(void);
 
 TitleScreen **TitleScreens;          /// Title screens to show at startup
 std::string StratagusLibPath;        /// Path for data directory
-char LocalPlayerName[16];            /// Name of local player
+std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
-char NameLine[] =
+std::string NameLine =
 	"Bos Wars V" VERSION ", (c) 1998-2007 by the Bos Wars and Stratagus Project.";
 
 static char *MapName;                /// Filename of the map to load
@@ -649,7 +649,7 @@ static void PrintHeader(void)
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, and others.\n"
 		"\t(http://www.boswars.org)"
-		"\nCompile options %s", NameLine, CompileOptions.c_str());
+		"\nCompile options %s", NameLine.c_str(), CompileOptions.c_str());
 }
 
 /**
@@ -828,14 +828,14 @@ int main(int argc, char **argv)
 	EditorStartFile = "scripts/editor.lua";
 
 	//  Default player name to username on unix systems.
-	memset(LocalPlayerName, 0, sizeof(LocalPlayerName));
+	LocalPlayerName.clear();
 #ifdef USE_WIN32
-	strcpy_s(LocalPlayerName, sizeof(LocalPlayerName), "Anonymous");
+	LocalPlayerName = "Anonymous";
 #else
 	if (getenv("USER")) {
-		strncpy(LocalPlayerName, getenv("USER"), sizeof(LocalPlayerName) - 1);
+		LocalPlayerName = getenv("USER");
 	} else {
-		strcpy_s(LocalPlayerName, sizeof(LocalPlayerName), "Anonymous");
+		LocalPlayerName = "Anonymous";
 	}
 #endif
 
@@ -877,7 +877,7 @@ int main(int argc, char **argv)
 				NetworkArg = optarg;
 				continue;
 			case 'N':
-				strncpy_s(LocalPlayerName, sizeof(LocalPlayerName), optarg, _TRUNCATE);
+				LocalPlayerName = optarg;
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);

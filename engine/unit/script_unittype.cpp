@@ -99,7 +99,7 @@ unsigned CclGetResourceByName(lua_State *l)
 
 	value = LuaToString(l, -1);
 	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(value, DefaultResourceNames[i])) {
+		if (value == DefaultResourceNames[i]) {
 			return i;
 		}
 	}
@@ -896,7 +896,7 @@ static int CclDefineUnitType(lua_State *l)
 					lua_pop(l, 1);
 					++k;
 					for (res = 0; res < MaxCosts; ++res) {
-						if (!strcmp(name, DefaultResourceNames[res])) {
+						if (name == DefaultResourceNames[res]) {
 							break;
 						}
 					}
@@ -1017,7 +1017,7 @@ static int CclDefineUnitStats(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						stats->Costs[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -1391,7 +1391,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 static int ResourceIndex(lua_State *l, const char *resource)
 {
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (!strcmp(resource, DefaultResourceNames[res])) {
+		if (resource == DefaultResourceNames[res]) {
 			return res;
 		}
 	}

@@ -174,7 +174,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->Resources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -197,7 +197,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->LastResources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -220,7 +220,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->Incomes[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -243,7 +243,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->Revenue[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -266,7 +266,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->UtilizationRate[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -289,7 +289,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->StoredResources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -714,7 +714,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
@@ -770,7 +770,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
@@ -819,7 +819,7 @@ static int CclSetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 4);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
@@ -852,7 +852,7 @@ static int CclSetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
