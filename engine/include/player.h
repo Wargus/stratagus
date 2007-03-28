@@ -280,6 +280,8 @@ class CFile;
 	///  Player structure
 class CPlayer
 {
+private:
+	std::map<int, int*> UnitsConsumingResources;
 public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
@@ -306,7 +308,10 @@ public:
 	int StoredResources[MaxCosts];    /// Amount of resources in storage
 	int StorageCapacity[MaxCosts];    /// Storage capacity of resources
 
-	std::map<int, int*> UnitsConsumingResources;
+	void SaveUnitsConsumingResources(CFile *file);
+	void AddToUnitsConsumingResources(int slot, int costs[MaxCosts]);
+	void RemoveFromUnitsConsumingResources(int slot);
+	void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts]);
 
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type

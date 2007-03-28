@@ -114,6 +114,69 @@ void CleanPlayers(void)
 }
 
 /**
+** Save the list of units of a player that consume resources
+**
+**  @param file  Output file.
+*/
+void CPlayer::SaveUnitsConsumingResources(CFile *file)
+{
+	std::map<int, int*>::iterator i;
+	for (i = UnitsConsumingResources.begin(); i != UnitsConsumingResources.end(); ++i) {
+		file->printf("AddToUnitsConsumingResources(%d, {", (*i).first);
+		for (int j = 0; j < MaxCosts; ++j) {
+		file->printf("%d%s ", ((*i).second)[j], j ? "," : "");
+		}
+		file->printf("})\n");
+	}
+}
+
+/**
+**  Add to UnitsConsumingResources
+*/
+void CPlayer::AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
+{
+	Assert(UnitsConsumingResources[slot] == NULL);
+
+	int *c = new int[MaxCosts];
+	UnitsConsumingResources[slot] = c;
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		c[i] = costs[i];
+		UtilizationRate[i] += c[i];
+	}
+}
+
+/**
+**  Remove from UnitsConsumingResources
+*/
+void CPlayer::RemoveFromUnitsConsumingResources(int slot)
+{
+	int *costs = UnitsConsumingResources[slot];
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		UtilizationRate[i] -= costs[i];
+	}
+
+	delete[] costs;
+	UnitsConsumingResources.erase(slot);
+}
+
+/**
+**  Update costs for unit in UnitsConsumingResources
+*/
+void CPlayer::UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
+{
+	int *c = UnitsConsumingResources[slot];
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		UtilizationRate[i] -= c[i];
+		c[i] = costs[i];
+		UtilizationRate[i] += c[i];
+	}
+}
+
+
+/**
 **  Save state of players to file.
 **
 **  @param file  Output file.
@@ -255,10 +318,12 @@ void SavePlayers(CFile *file)
 		file->printf("\n  \"color\", { %d, %d, %d },", r, g, b);
 
 		// UnitColors done by init code.
-
 		// Allow saved by allow.
 
 		file->printf("})\n\n");
+
+		// Dump the list of units of a player that consume resources
+		p->SaveUnitsConsumingResources(file);
 	}
 
 	DebugPrint("FIXME: must save unit-stats?\n");

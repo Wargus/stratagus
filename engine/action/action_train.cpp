@@ -157,7 +157,7 @@ void HandleActionTrain(CUnit *unit)
 			nunit->X = unit->X;
 			nunit->Y = unit->Y;
 
-			RemoveFromUnitsConsumingResources(unit->Slot);
+			player->RemoveFromUnitsConsumingResources(unit->Slot);
 
 			// New unit might supply food
 			UpdateForNewUnit(nunit, 0);

@@ -830,7 +830,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 
 	if (slot == -1) {
 		if (unit->Orders[0]->Action == UnitActionTrain) {
-			RemoveFromUnitsConsumingResources(unit->Slot);
+			unit->Player->RemoveFromUnitsConsumingResources(unit->Slot);
 		}
 
 		// Cancel All training
@@ -865,7 +865,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 	
 		if (!slot) { // Canceled in work slot
 			unit->Data.Train.Ticks = 0;
-			RemoveFromUnitsConsumingResources(unit->Slot);
+			unit->Player->RemoveFromUnitsConsumingResources(unit->Slot);
 		}
 		RemoveOrder(unit, slot);
 
