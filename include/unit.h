@@ -920,10 +920,6 @@ extern bool CanMove(const CUnit *unit);
 
 	/// Add to UnitsConsumingResources
 void AddToUnitsConsumingResources(int slot, int costs[MaxCosts]);
-	/// Update costs for unit in UnitsConsumingResources
-void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts]);
-	/// Remove from UnitsConsumingResources
-void RemoveFromUnitsConsumingResources(int slot);
 
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit *unit);
