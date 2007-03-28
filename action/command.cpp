@@ -134,6 +134,9 @@ static void RemoveOrder(CUnit *unit, int order)
 	if (unit->OrderCount > 1) {
 		unit->Orders.pop_back();
 		--unit->OrderCount;
+		if (order == 0) {
+			unit->SubAction = 0;
+		}
 	} else {
 		Assert(i == 0);
 		unit->Orders[0]->Init();
@@ -826,6 +829,10 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 	//
 
 	if (slot == -1) {
+		if (unit->Orders[0]->Action == UnitActionTrain) {
+			RemoveFromUnitsConsumingResources(unit->Slot);
+		}
+
 		// Cancel All training
 		while (unit->Orders[0]->Action == UnitActionTrain) {
 			unit->Player->AddCostsFactor(
@@ -855,10 +862,10 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 		unit->Player->AddCostsFactor(
 			unit->Orders[slot]->Type->Stats[unit->Player->Index].Costs,
 			CancelTrainingCostsFactor);
-
 	
 		if (!slot) { // Canceled in work slot
 			unit->Data.Train.Ticks = 0;
+			RemoveFromUnitsConsumingResources(unit->Slot);
 		}
 		RemoveOrder(unit, slot);
 

@@ -9,7 +9,7 @@
 //
 /**@name action_train.cpp - The building train action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -103,6 +103,8 @@ void HandleActionTrain(CUnit *unit)
 	if (!unit->SubAction) {
 		unit->Data.Train.Ticks = 0;
 		unit->SubAction = 1;
+		AddToUnitsConsumingResources(unit->Slot,
+			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs);
 	}
 
 	unit->Type->Animations->Train ?
@@ -154,6 +156,8 @@ void HandleActionTrain(CUnit *unit)
 			// no need to add the unit only to be removed.
 			nunit->X = unit->X;
 			nunit->Y = unit->Y;
+
+			RemoveFromUnitsConsumingResources(unit->Slot);
 
 			// New unit might supply food
 			UpdateForNewUnit(nunit, 0);

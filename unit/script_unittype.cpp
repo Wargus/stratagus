@@ -418,7 +418,7 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, -1, k + 1);
-				type->StorageCapacity[res] = LuaToNumber(l, -1);
+				type->StorageCapacity[res] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "ImproveProduction")) {

@@ -689,43 +689,17 @@ void DrawResources(void)
 {
 	char tmp[128];
 	int i;
-	int v;
 
-	// Draw all icons of resource.
-	for (i = 0; i <= ScoreCost; ++i) {
-		if (UI.Resources[i].G) {
-			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
-				UI.Resources[i].IconX, UI.Resources[i].IconY);
-		}
-	}
-	for (i = 0; i < MaxCosts; ++i) {
-		if (UI.Resources[i].TextX != -1) {
-			v = ThisPlayer->Resources[i];
-			VideoDrawNumber(UI.Resources[i].TextX,
-				UI.Resources[i].TextY + (v > 99999) * 3,
-				v > 99999 ? SmallFont : GameFont, v);
-		}
-	}
-	if (UI.Resources[FoodCost].TextX != -1) {
-		sprintf(tmp, "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
-		if (ThisPlayer->Supply < ThisPlayer->Demand) {
-			VideoDrawReverseText(UI.Resources[FoodCost].TextX,
-				UI.Resources[FoodCost].TextY, GameFont, tmp);
-		} else {
-			VideoDrawText(UI.Resources[FoodCost].TextX,
-				UI.Resources[FoodCost].TextY, GameFont, tmp);
-		}
-	}
-	if (UI.Resources[ScoreCost].TextX != -1) {
-		v = ThisPlayer->Score;
-		VideoDrawNumber(UI.Resources[ScoreCost].TextX,
-			UI.Resources[ScoreCost].TextY + (v > 99999) * 3,
-			v > 99999 ? SmallFont : GameFont, v);
+	for (i = 1; i < MaxCosts; ++i) {
+		sprintf(tmp, "%d/%d", ThisPlayer->UtilizationRate[i],
+			ThisPlayer->ProductionRate[i]);
+		VideoDrawText(50 +  80 * (i - 1), 1, GameFont, tmp);
 	}
 
 	for (i = 1; i < MaxCosts; ++i) {
-		sprintf(tmp, "%d/%d", ThisPlayer->UtilizationRate[i], ThisPlayer->ProductionRate[i]);
-		VideoDrawText(400 +  50 * (i - 1), 1, GameFont, tmp);
+		sprintf(tmp, "%d/%d", ThisPlayer->StoredResources[i] / CYCLES_PER_SECOND,
+			ThisPlayer->StorageCapacity[i] / CYCLES_PER_SECOND);
+		VideoDrawText(250 +  80 * (i - 1), 1, GameFont, tmp);
 	}
 }
 
