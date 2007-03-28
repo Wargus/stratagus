@@ -87,6 +87,8 @@ static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
 static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
 static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound played
 
+std::map<int, int*> UnitsConsumingResources[PlayerMax];
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -3441,6 +3443,72 @@ bool CUnit::IsUnusable() const
 		this->Orders[0]->Action == UnitActionBuilt || this->Destroyed;
 }
 
+/**
+**  Add to UnitsConsumingResources
+*/
+void AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
+{
+	CPlayer *p = UnitSlots[slot]->Player;
+
+	Assert(UnitsConsumingResources[p->Index][slot] == NULL);
+
+	int *c = new int[MaxCosts];
+	UnitsConsumingResources[p->Index][slot] = c;
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		c[i] = costs[i];
+		p->UtilizationRate[i] += c[i];
+	}
+}
+
+/**
+**  Update costs for unit in UnitsConsumingResources
+*/
+void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
+{
+	CPlayer *p = UnitSlots[slot]->Player;
+	int *c = UnitsConsumingResources[p->Index][slot];
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		p->UtilizationRate[i] -= c[i];
+		c[i] = costs[i];
+		p->UtilizationRate[i] += c[i];
+	}
+}
+
+/**
+**  Remove from UnitsConsumingResources
+*/
+void RemoveFromUnitsConsumingResources(int slot)
+{
+	CPlayer *p = UnitSlots[slot]->Player;
+	int *costs = UnitsConsumingResources[p->Index][slot];
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		p->UtilizationRate[i] -= costs[i];
+	}
+
+	delete[] costs;
+	UnitsConsumingResources[p->Index].erase(slot);
+}
+
+/**
+**
+*/
+static void SaveUnitsConsumingResources(CFile *file)
+{
+	for (int j = 0; j < PlayerMax; ++j) {
+		std::map<int, int*>::iterator i;
+		for (i = UnitsConsumingResources[j].begin(); i != UnitsConsumingResources[j].end(); ++i) {
+			file->printf("AddToUnitsConsumingResources(%d, {", (*i).first);
+			for (int j = 0; j < MaxCosts; ++j) {
+				file->printf("%d%s ", ((*i).second)[j], j ? "," : "");
+			}
+			file->printf("})\n");
+		}
+	}
+}
+
 /*----------------------------------------------------------------------------
 --  SAVE/LOAD
 ----------------------------------------------------------------------------*/
@@ -3844,6 +3912,7 @@ void SaveUnits(CFile *file)
 		SaveUnit(*table, file);
 	}
 
+	SaveUnitsConsumingResources(file);
 }
 
 /*----------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -350,6 +350,7 @@
 
 #include <vector>
 #include "SDL.h"
+#include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -916,6 +917,13 @@ extern int CanTransport(const CUnit *transporter, const CUnit *unit);
 
 	/// Check if unit can move.
 extern bool CanMove(const CUnit *unit);
+
+	/// Add to UnitsConsumingResources
+void AddToUnitsConsumingResources(int slot, int costs[MaxCosts]);
+	/// Update costs for unit in UnitsConsumingResources
+void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts]);
+	/// Remove from UnitsConsumingResources
+void RemoveFromUnitsConsumingResources(int slot);
 
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit *unit);
