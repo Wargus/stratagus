@@ -550,6 +550,7 @@ void CPlayer::Clear()
 	TotalRazings = 0;
 	TotalKills = 0;
 	Color = 0;
+	UnitsConsumingResources.clear();
 }
 
 /*----------------------------------------------------------------------------
