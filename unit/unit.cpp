@@ -87,7 +87,6 @@ static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
 static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
 static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound played
 
-std::map<int, int*> UnitsConsumingResources[PlayerMax];
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -3450,10 +3449,10 @@ void AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
 {
 	CPlayer *p = UnitSlots[slot]->Player;
 
-	Assert(UnitsConsumingResources[p->Index][slot] == NULL);
+	Assert(p->UnitsConsumingResources[slot] == NULL);
 
 	int *c = new int[MaxCosts];
-	UnitsConsumingResources[p->Index][slot] = c;
+	p->UnitsConsumingResources[slot] = c;
 
 	for (int i = 0; i < MaxCosts; ++i) {
 		c[i] = costs[i];
@@ -3467,7 +3466,7 @@ void AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
 void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
 {
 	CPlayer *p = UnitSlots[slot]->Player;
-	int *c = UnitsConsumingResources[p->Index][slot];
+	int *c = p->UnitsConsumingResources[slot];
 
 	for (int i = 0; i < MaxCosts; ++i) {
 		p->UtilizationRate[i] -= c[i];
@@ -3482,14 +3481,14 @@ void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
 void RemoveFromUnitsConsumingResources(int slot)
 {
 	CPlayer *p = UnitSlots[slot]->Player;
-	int *costs = UnitsConsumingResources[p->Index][slot];
+	int *costs = p->UnitsConsumingResources[slot];
 
 	for (int i = 0; i < MaxCosts; ++i) {
 		p->UtilizationRate[i] -= costs[i];
 	}
 
 	delete[] costs;
-	UnitsConsumingResources[p->Index].erase(slot);
+	p->UnitsConsumingResources.erase(slot);
 }
 
 /**
@@ -3497,9 +3496,11 @@ void RemoveFromUnitsConsumingResources(int slot)
 */
 static void SaveUnitsConsumingResources(CFile *file)
 {
+	CPlayer *p;
 	for (int j = 0; j < PlayerMax; ++j) {
+		p = &Players[j];
 		std::map<int, int*>::iterator i;
-		for (i = UnitsConsumingResources[j].begin(); i != UnitsConsumingResources[j].end(); ++i) {
+		for (i = p->UnitsConsumingResources.begin(); i != p->UnitsConsumingResources.end(); ++i) {
 			file->printf("AddToUnitsConsumingResources(%d, {", (*i).first);
 			for (int j = 0; j < MaxCosts; ++j) {
 				file->printf("%d%s ", ((*i).second)[j], j ? "," : "");
