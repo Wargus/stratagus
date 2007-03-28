@@ -346,6 +346,13 @@ static void HandleBuffs(CUnit *unit, int amount)
 	}
 }
 
+
+static void RunAction(unsigned char action, CUnit *unit)
+{
+	HandleActionTable[action](unit);
+}
+
+
 /**
 **  Handle the action of a unit.
 **
@@ -358,7 +365,7 @@ static void HandleUnitAction(CUnit *unit)
 	//
 	if (!unit->Anim.Unbreakable) {
 		if (unit->CriticalOrder.Action != UnitActionStill) {
-			HandleActionTable[unit->CriticalOrder.Action](unit);
+			RunAction(unit->CriticalOrder.Action, unit);
 			unit->CriticalOrder.Action = UnitActionStill;
 		}
 
@@ -420,9 +427,9 @@ static void HandleUnitAction(CUnit *unit)
 	}
 
 	//
-	// Select action. FIXME: should us function pointers in unit structure.
+	// Select action.
 	//
-	HandleActionTable[unit->Orders[0]->Action](unit);
+	RunAction(unit->Orders[0]->Action, unit);
 }
 
 /**
