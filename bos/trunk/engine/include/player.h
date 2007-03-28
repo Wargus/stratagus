@@ -306,6 +306,8 @@ public:
 	int StoredResources[MaxCosts];    /// Amount of resources in storage
 	int StorageCapacity[MaxCosts];    /// Storage capacity of resources
 
+	std::map<int, int*> UnitsConsumingResources;
+
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
 
