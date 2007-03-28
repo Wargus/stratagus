@@ -698,8 +698,32 @@ void PlayersInitAi(void)
 void PlayersEachCycle(void)
 {
 	for (int player = 0; player < NumPlayers; ++player) {
-		if (Players[player].AiEnabled) {
-			AiEachCycle(&Players[player]);
+		CPlayer *p = &Players[player];
+
+		// Update rate based economy
+		for (int res = 0; res < MaxCosts; ++res) {
+			int rate = p->ProductionRate[res] - p->UtilizationRate[res];
+			if (rate > 0) {
+				if (p->StoredResources[res] < p->StorageCapacity[res]) {
+					p->StoredResources[res] += rate;
+					if (p->StoredResources[res] > p->StorageCapacity[res]) {
+						p->StoredResources[res] = p->StorageCapacity[res];
+					}
+				}
+			} else if (rate < 0) {
+				if (p->StoredResources[res]) {
+					p->StoredResources[res] -= rate;
+					if (p->StoredResources[res] < 0) {
+						// shouldn't happen?
+						p->StoredResources[res] = 0;
+					}
+				}
+			}
+		}
+
+		// Ai
+		if (p->AiEnabled) {
+			AiEachCycle(p);
 		}
 	}
 }
