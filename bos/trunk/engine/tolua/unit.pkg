@@ -20,6 +20,5 @@ class CPreference
 CPreference Preference;
 
 void AddToUnitsConsumingResources(int slot, int costs[MaxCosts]);
-void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts]);
-void RemoveFromUnitsConsumingResources(int slot);
+
 

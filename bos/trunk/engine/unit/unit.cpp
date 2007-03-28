@@ -3448,67 +3448,9 @@ bool CUnit::IsUnusable() const
 void AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
 {
 	CPlayer *p = UnitSlots[slot]->Player;
-
-	Assert(p->UnitsConsumingResources[slot] == NULL);
-
-	int *c = new int[MaxCosts];
-	p->UnitsConsumingResources[slot] = c;
-
-	for (int i = 0; i < MaxCosts; ++i) {
-		c[i] = costs[i];
-		p->UtilizationRate[i] += c[i];
-	}
+	p->AddToUnitsConsumingResources(slot, costs);
 }
 
-/**
-**  Update costs for unit in UnitsConsumingResources
-*/
-void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
-{
-	CPlayer *p = UnitSlots[slot]->Player;
-	int *c = p->UnitsConsumingResources[slot];
-
-	for (int i = 0; i < MaxCosts; ++i) {
-		p->UtilizationRate[i] -= c[i];
-		c[i] = costs[i];
-		p->UtilizationRate[i] += c[i];
-	}
-}
-
-/**
-**  Remove from UnitsConsumingResources
-*/
-void RemoveFromUnitsConsumingResources(int slot)
-{
-	CPlayer *p = UnitSlots[slot]->Player;
-	int *costs = p->UnitsConsumingResources[slot];
-
-	for (int i = 0; i < MaxCosts; ++i) {
-		p->UtilizationRate[i] -= costs[i];
-	}
-
-	delete[] costs;
-	p->UnitsConsumingResources.erase(slot);
-}
-
-/**
-**
-*/
-static void SaveUnitsConsumingResources(CFile *file)
-{
-	CPlayer *p;
-	for (int j = 0; j < PlayerMax; ++j) {
-		p = &Players[j];
-		std::map<int, int*>::iterator i;
-		for (i = p->UnitsConsumingResources.begin(); i != p->UnitsConsumingResources.end(); ++i) {
-			file->printf("AddToUnitsConsumingResources(%d, {", (*i).first);
-			for (int j = 0; j < MaxCosts; ++j) {
-				file->printf("%d%s ", ((*i).second)[j], j ? "," : "");
-			}
-			file->printf("})\n");
-		}
-	}
-}
 
 /*----------------------------------------------------------------------------
 --  SAVE/LOAD
@@ -3912,8 +3854,6 @@ void SaveUnits(CFile *file)
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		SaveUnit(*table, file);
 	}
-
-	SaveUnitsConsumingResources(file);
 }
 
 /*----------------------------------------------------------------------------
