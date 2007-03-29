@@ -114,7 +114,7 @@ void CleanPlayers(void)
 }
 
 /**
-** Save the list of units of a player that consume resources
+**  Save the list of units of a player that consume resources
 **
 **  @param file  Output file.
 */
@@ -124,7 +124,7 @@ void CPlayer::SaveUnitsConsumingResources(CFile *file)
 	for (i = UnitsConsumingResources.begin(); i != UnitsConsumingResources.end(); ++i) {
 		file->printf("AddToUnitsConsumingResources(%d, {", (*i).first);
 		for (int j = 0; j < MaxCosts; ++j) {
-		file->printf("%d%s ", ((*i).second)[j], j ? "," : "");
+			file->printf("%s%d", (j ? ", " : ""), ((*i).second)[j]);
 		}
 		file->printf("})\n");
 	}
@@ -315,12 +315,12 @@ void SavePlayers(CFile *file)
 		file->printf("\n  \"total-kills\", %d,", p->TotalKills);
 
 		SDL_GetRGB(p->Color, TheScreen->format, &r, &g, &b);
-		file->printf("\n  \"color\", { %d, %d, %d },", r, g, b);
+		file->printf("\n  \"color\", { %d, %d, %d }", r, g, b); // no comma after last parameter
 
 		// UnitColors done by init code.
 		// Allow saved by allow.
 
-		file->printf("})\n\n");
+		file->printf(")\n\n");
 
 		// Dump the list of units of a player that consume resources
 		p->SaveUnitsConsumingResources(file);
