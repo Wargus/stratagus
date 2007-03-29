@@ -201,6 +201,10 @@ void LoadGame(const std::string &filename)
 	LuaLoadFile(filename);
 	CclGarbageCollect(0);
 
+	for (int i = 0; i < NumPlayers; ++i) {
+		Players[i].RebuildUnitsConsumingResourcesList();
+	}
+
 	game_cycle = GameCycle;
 	syncrand = SyncRandSeed;
 	synchash = SyncHash;

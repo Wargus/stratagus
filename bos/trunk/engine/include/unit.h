@@ -918,9 +918,6 @@ extern int CanTransport(const CUnit *transporter, const CUnit *unit);
 	/// Check if unit can move.
 extern bool CanMove(const CUnit *unit);
 
-	/// Add to UnitsConsumingResources
-void AddToUnitsConsumingResources(int slot, int costs[MaxCosts]);
-
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit *unit);
 	/// Save an order

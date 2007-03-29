@@ -308,10 +308,10 @@ public:
 	int StoredResources[MaxCosts];    /// Amount of resources in storage
 	int StorageCapacity[MaxCosts];    /// Storage capacity of resources
 
-	void SaveUnitsConsumingResources(CFile *file);
 	void AddToUnitsConsumingResources(int slot, int costs[MaxCosts]);
 	void RemoveFromUnitsConsumingResources(int slot);
 	void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts]);
+	void RebuildUnitsConsumingResourcesList();
 
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
