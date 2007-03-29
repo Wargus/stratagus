@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Wed Mar 28 23:41:31 2007.
+** Generated automatically by tolua++-1.0.92 on Thu Mar 29 23:28:22 2007.
 */
 
 #ifndef __cplusplus
@@ -14139,62 +14139,6 @@ static int tolua_set_Preference(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: AddToUnitsConsumingResources */
-#ifndef TOLUA_DISABLE_tolua_stratagus_AddToUnitsConsumingResources00
-static int tolua_stratagus_AddToUnitsConsumingResources00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_istable(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  int slot = ((int)  tolua_tonumber(tolua_S,1,0));
-#ifdef __cplusplus
-  int* costs = new int[MaxCosts];
-#else
-  int* costs = (int*) malloc((MaxCosts)*sizeof(int));
-#endif
-  {
-#ifndef TOLUA_RELEASE
-   if (!tolua_isnumberarray(tolua_S,2,MaxCosts,0,&tolua_err))
-    goto tolua_lerror;
-   else
-#endif
-   {
-    int i;
-    for(i=0; i<MaxCosts;i++)
-    costs[i] = ((int)  tolua_tofieldnumber(tolua_S,2,i+1,0));
-   }
-  }
-  {
-   AddToUnitsConsumingResources(slot,costs);
-  }
-  {
-   int i;
-   for(i=0; i<MaxCosts;i++)
-    tolua_pushfieldnumber(tolua_S,2,i+1,(lua_Number) costs[i]);
-  }
-#ifdef __cplusplus
-  delete [] costs;
-#else
-  free(costs);
-#endif
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'AddToUnitsConsumingResources'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* function: GetEffectsVolume */
 #ifndef TOLUA_DISABLE_tolua_stratagus_GetEffectsVolume00
 static int tolua_stratagus_GetEffectsVolume00(lua_State* tolua_S)
@@ -16784,7 +16728,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"ShowOrders",tolua_get_CPreference_unsigned_ShowOrders,tolua_set_CPreference_unsigned_ShowOrders);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"Preference",tolua_get_Preference,tolua_set_Preference);
-  tolua_function(tolua_S,"AddToUnitsConsumingResources",tolua_stratagus_AddToUnitsConsumingResources00);
   tolua_function(tolua_S,"GetEffectsVolume",tolua_stratagus_GetEffectsVolume00);
   tolua_function(tolua_S,"SetEffectsVolume",tolua_stratagus_SetEffectsVolume00);
   tolua_function(tolua_S,"GetMusicVolume",tolua_stratagus_GetMusicVolume00);
