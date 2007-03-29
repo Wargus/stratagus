@@ -3442,15 +3442,6 @@ bool CUnit::IsUnusable() const
 		this->Orders[0]->Action == UnitActionBuilt || this->Destroyed;
 }
 
-/**
-**  Add to UnitsConsumingResources
-*/
-void AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
-{
-	CPlayer *p = UnitSlots[slot]->Player;
-	p->AddToUnitsConsumingResources(slot, costs);
-}
-
 
 /*----------------------------------------------------------------------------
 --  SAVE/LOAD

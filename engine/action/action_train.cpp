@@ -103,7 +103,7 @@ void HandleActionTrain(CUnit *unit)
 	if (!unit->SubAction) {
 		unit->Data.Train.Ticks = 0;
 		unit->SubAction = 1;
-		AddToUnitsConsumingResources(unit->Slot,
+		unit->Player->AddToUnitsConsumingResources(unit->Slot,
 			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs);
 	}
 

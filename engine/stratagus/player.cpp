@@ -114,23 +114,6 @@ void CleanPlayers(void)
 }
 
 /**
-**  Save the list of units of a player that consume resources
-**
-**  @param file  Output file.
-*/
-void CPlayer::SaveUnitsConsumingResources(CFile *file)
-{
-	std::map<int, int*>::iterator i;
-	for (i = UnitsConsumingResources.begin(); i != UnitsConsumingResources.end(); ++i) {
-		file->printf("AddToUnitsConsumingResources(%d, {", (*i).first);
-		for (int j = 0; j < MaxCosts; ++j) {
-			file->printf("%s%d", (j ? ", " : ""), ((*i).second)[j]);
-		}
-		file->printf("})\n");
-	}
-}
-
-/**
 **  Add to UnitsConsumingResources
 */
 void CPlayer::AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
@@ -175,6 +158,23 @@ void CPlayer::UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
 	}
 }
 
+/** 
+**  Go through the list of units owned by the player and rebuild
+** the UnitsConsumingResources list.
+*/
+void CPlayer::RebuildUnitsConsumingResourcesList()
+{
+	CUnit *u;
+
+	UnitsConsumingResources.clear();
+	for (int i = 0; i < TotalNumUnits; ++i) {
+		u = Units[i];
+		if (u->Orders[0]->Action == UnitActionTrain && !u->SubAction) {
+			AddToUnitsConsumingResources(u->Slot, 
+				u->Orders[0]->Type->Stats[u->Player->Index].Costs);
+		}
+	}
+}
 
 /**
 **  Save state of players to file.
@@ -321,9 +321,6 @@ void SavePlayers(CFile *file)
 		// Allow saved by allow.
 
 		file->printf(")\n\n");
-
-		// Dump the list of units of a player that consume resources
-		p->SaveUnitsConsumingResources(file);
 	}
 
 	DebugPrint("FIXME: must save unit-stats?\n");
