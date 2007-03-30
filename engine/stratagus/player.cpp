@@ -166,7 +166,6 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 {
 	CUnit *u;
 
-	UnitsConsumingResources.clear();
 	for (int i = 0; i < TotalNumUnits; ++i) {
 		u = Units[i];
 		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
@@ -174,6 +173,24 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 				u->Orders[0]->Type->Stats[u->Player->Index].Costs);
 		}
 	}
+}
+
+/**
+**  Clear all resource state variables.
+*/
+void CPlayer::ClearResourceVariables()
+{
+	std::map<int, int*>::iterator i;
+	for (i = UnitsConsumingResources.begin(); i != UnitsConsumingResources.end(); ++i) {
+		delete[] (*i).second;
+	}
+	
+	UnitsConsumingResources.clear();
+	memset(ProductionRate, 0, sizeof(ProductionRate));
+	memset(UtilizationRate, 0, sizeof(UtilizationRate));
+	memset(StoredResources, 0, sizeof(StoredResources));
+	memset(StorageCapacity, 0, sizeof(StorageCapacity));
+
 }
 
 /**
@@ -524,10 +541,6 @@ void CPlayer::Clear()
 	memset(LastResources, 0, sizeof(LastResources));
 	memset(Incomes, 0, sizeof(Incomes));
 	memset(Revenue, 0, sizeof(Revenue));
-	memset(ProductionRate, 0, sizeof(ProductionRate));
-	memset(UtilizationRate, 0, sizeof(UtilizationRate));
-	memset(StoredResources, 0, sizeof(StoredResources));
-	memset(StorageCapacity, 0, sizeof(StorageCapacity));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	AiEnabled = 0;
 	Ai = 0;
@@ -547,7 +560,7 @@ void CPlayer::Clear()
 	TotalRazings = 0;
 	TotalKills = 0;
 	Color = 0;
-	UnitsConsumingResources.clear();
+	ClearResourceVariables();
 }
 
 /*----------------------------------------------------------------------------
