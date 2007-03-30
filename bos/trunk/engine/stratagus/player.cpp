@@ -169,7 +169,7 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 	UnitsConsumingResources.clear();
 	for (int i = 0; i < TotalNumUnits; ++i) {
 		u = Units[i];
-		if (u->Orders[0]->Action == UnitActionTrain && !u->SubAction) {
+		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
 			AddToUnitsConsumingResources(u->Slot, 
 				u->Orders[0]->Type->Stats[u->Player->Index].Costs);
 		}
