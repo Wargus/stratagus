@@ -160,15 +160,14 @@ void CPlayer::UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
 
 /** 
 **  Go through the list of units owned by the player and rebuild
-** the UnitsConsumingResources list.
+**  the UnitsConsumingResources list.
 */
 void CPlayer::RebuildUnitsConsumingResourcesList()
 {
-	CUnit *u;
-
 	for (int i = 0; i < TotalNumUnits; ++i) {
-		u = Units[i];
-		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
+		CUnit *u = Units[i];
+		if ((u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) ||
+				u->Orders[0]->Action == UnitActionBuilt) {
 			AddToUnitsConsumingResources(u->Slot, 
 				u->Orders[0]->Type->Stats[u->Player->Index].Costs);
 		}
