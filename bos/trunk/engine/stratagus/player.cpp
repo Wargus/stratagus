@@ -166,10 +166,12 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 {
 	for (int i = 0; i < TotalNumUnits; ++i) {
 		CUnit *u = Units[i];
-		if ((u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) ||
-				u->Orders[0]->Action == UnitActionBuilt) {
-			AddToUnitsConsumingResources(u->Slot, 
+		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
+			AddToUnitsConsumingResources(u->Slot,
 				u->Orders[0]->Type->Stats[u->Player->Index].Costs);
+		} else if (u->Orders[0]->Action == UnitActionBuilt) {
+			AddToUnitsConsumingResources(u->Slot,
+				u->Type->Stats[u->Player->Index].Costs);
 		}
 	}
 }
