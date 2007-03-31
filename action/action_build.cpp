@@ -242,8 +242,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	y = unit->Orders[0]->Y;
 	type = unit->Orders[0]->Type;
 
-	unit->Player->SubUnitType(type);
-
 	build = MakeUnit(type, unit->Player);
 	
 	// If unable to make unit, stop, and report message
@@ -259,6 +257,10 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		return;
 	}
 	
+	unit->Player->SubUnitType(type);
+	build->Player->AddToUnitsConsumingResources(build->Slot,
+		build->Type->Stats[build->Player->Index].Costs);
+
 	build->Constructed = 1;
 	build->CurrentSightRange = 0;
 
@@ -463,6 +465,8 @@ void HandleActionBuilt(CUnit *unit)
 
 		// Player gets back 75% of the original cost for a building.
 		unit->Player->AddCostsFactor(unit->Stats->Costs, CancelBuildingCostsFactor);
+		unit->Player->RemoveFromUnitsConsumingResources(unit->Slot);
+
 		// Cancel building
 		LetUnitDie(unit);
 		return;
