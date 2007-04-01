@@ -516,10 +516,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->DecayRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Points")) {
 			type->Points = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Demand")) {
-			type->Demand = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Supply")) {
-			type->Supply = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
 			type->CorpseType = NULL;
@@ -1840,19 +1836,6 @@ void UpdateUnitVariables(const CUnit *unit)
 		unit->Variable[CARRYRESOURCE_INDEX].Max = unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity;
 	}
 
-	// Supply
-	unit->Variable[SUPPLY_INDEX].Value = unit->Type->Supply;
-	unit->Variable[SUPPLY_INDEX].Max = unit->Player->Supply;
-	if (unit->Player->Supply < unit->Type->Supply) { // Come with 1st supply building.
-		unit->Variable[SUPPLY_INDEX].Value = unit->Variable[SUPPLY_INDEX].Max;
-	}
-	unit->Variable[SUPPLY_INDEX].Enable = unit->Type->Supply > 0;
-
-	// Demand
-	unit->Variable[DEMAND_INDEX].Value = unit->Type->Demand;
-	unit->Variable[DEMAND_INDEX].Max = unit->Player->Demand;
-	unit->Variable[DEMAND_INDEX].Enable = unit->Type->Demand > 0;
-
 	// SightRange
 	unit->Variable[SIGHTRANGE_INDEX].Value = type->Variable[SIGHTRANGE_INDEX].Value;
 	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
@@ -1926,7 +1909,7 @@ void InitDefinedVariables()
 {
 	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
 		"Training", "GiveResource", "CarryResource",
-		"Xp", "Kill", "Supply", "Demand", "Armor", "SightRange",
+		"Xp", "Kill", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
 		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
 		"UnholyArmor", "Slot"

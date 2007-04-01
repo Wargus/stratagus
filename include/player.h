@@ -324,8 +324,6 @@ public:
 	CUnit *Units[UnitMax]; /// units of this player
 	int    TotalNumUnits;  /// total # units for units' list
 	int    NumBuildings;   /// # buildings
-	int    Supply;         /// supply available/produced
-	int    Demand;         /// demand of player
 
 	int    UnitLimit;       /// # food units allowed
 	int    BuildingLimit;   /// # buildings allowed

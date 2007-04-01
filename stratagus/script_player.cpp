@@ -329,10 +329,6 @@ static int CclPlayer(lua_State *l)
 		} else if (!strcmp(value, "ai-disabled")) {
 			player->AiEnabled = 0;
 			--j;
-		} else if (!strcmp(value, "supply")) {
-			player->Supply = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "demand")) {
-			player->Demand = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-limit")) {
 			player->UnitLimit = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "building-limit")) {
@@ -762,12 +758,6 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "NumBuildings")) {
 		lua_pushnumber(l, p->NumBuildings);
 		return 1;
-	} else if (!strcmp(data, "Supply")) {
-		lua_pushnumber(l, p->Supply);
-		return 1;
-	} else if (!strcmp(data, "Demand")) {
-		lua_pushnumber(l, p->Demand);
-		return 1;
 	} else if (!strcmp(data, "UnitLimit")) {
 		lua_pushnumber(l, p->UnitLimit);
 		return 1;
@@ -854,8 +844,6 @@ static int CclSetPlayerData(lua_State *l)
 // } else if (!strcmp(data, "AiEnabled")) {
 // } else if (!strcmp(data, "TotalNumUnits")) {
 // } else if (!strcmp(data, "NumBuildings")) {
-// } else if (!strcmp(data, "Supply")) {
-// } else if (!strcmp(data, "Demand")) {
 	} else if (!strcmp(data, "UnitLimit")) {
 		p->UnitLimit = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "BuildingLimit")) {

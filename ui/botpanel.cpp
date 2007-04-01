@@ -375,7 +375,7 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 		case ButtonTrain:
 			// FIXME: store pointer in button table!
 			stats = &UnitTypes[button->Value]->Stats[ThisPlayer->Index];
-			SetCosts(0, UnitTypes[button->Value]->Demand, stats->Costs);
+			SetCosts(0, 0, stats->Costs);
 			break;
 		case ButtonSpellCast:
 			SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);

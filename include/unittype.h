@@ -356,17 +356,9 @@
 **
 **  CUnitType::Weapon
 **
-**    Currently sound for weapon
+**    Current sound for weapon
 **
 **  @todo temporary solution
-**
-**  CUnitType::Supply
-**
-**    How much food does this unit supply.
-**
-**  CUnitType::Demand
-**
-**    Food demand
 **
 **  CUnitType::ImproveIncomes[::MaxCosts]
 **
@@ -585,8 +577,6 @@ enum {
 	CARRYRESOURCE_INDEX,
 	XP_INDEX,
 	KILL_INDEX,
-	SUPPLY_INDEX,
-	DEMAND_INDEX,
 	ARMOR_INDEX,
 	SIGHTRANGE_INDEX,
 	ATTACKRANGE_INDEX,
@@ -812,7 +802,7 @@ public:
 		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
 		SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 		Indestructible(0), Teleporter(0),
-		GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
+		GivesResource(0), FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(_Costs, 0, sizeof(_Costs));
@@ -932,9 +922,6 @@ public:
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;                   /// Sounds for events
-
-	int Supply;                         /// Food supply
-	int Demand;                         /// Food demand
 
 	int ProductionRate[MaxCosts];       /// Rate that resources are produced
 	int MaxUtilizationRate[MaxCosts];   /// Max resource rate that can be used

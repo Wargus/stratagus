@@ -429,7 +429,6 @@ void SavePlayers(CFile *file)
 		// TotalNumUnits done by load units.
 		// NumBuildings done by load units.
 
-		file->printf(" \"supply\", %d,", p->Supply);
 		file->printf(" \"unit-limit\", %d,", p->UnitLimit);
 		file->printf(" \"building-limit\", %d,", p->BuildingLimit);
 		file->printf(" \"total-unit-limit\", %d,", p->TotalUnitLimit);
@@ -608,8 +607,6 @@ void CreatePlayer(int type)
 
 	memset(player->UnitTypesCount, 0, sizeof(player->UnitTypesCount));
 
-	player->Supply = 0;
-	player->Demand = 0;
 	player->NumBuildings = 0;
 	player->TotalNumUnits = 0;
 	player->Score = 0;
@@ -664,8 +661,6 @@ void CPlayer::Clear()
 	memset(Units, 0, sizeof(Units));
 	TotalNumUnits = 0;
 	NumBuildings = 0;
-	Supply = 0;
-	Demand = 0;
 	// FIXME: can't clear limits since it's initialized already
 //	UnitLimit = 0;
 //	BuildingLimit = 0;
@@ -717,10 +712,6 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 		if (!type->Building && (this->TotalNumUnits - this->NumBuildings) >= this->UnitLimit) {
 			Notify(NotifyYellow, -1, -1, _("Unit Limit Reached"));
 			return -2;
-		}
-		if (this->Demand + type->Demand > this->Supply && type->Demand) {
-			Notify(NotifyYellow, -1, -1, _("Insufficient Supply, increase Supply."));
-			return -3;
 		}
 		if (this->TotalNumUnits >= this->TotalUnitLimit) {
 			Notify(NotifyYellow, -1, -1, _("Total Unit Limit Reached"));
