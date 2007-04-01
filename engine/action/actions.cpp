@@ -404,6 +404,11 @@ static void HandleUnitAction(CUnit *unit)
 				}
 			}
 
+			if ((unit->Orders[0]->Action == UnitActionBuild && !unit->Type->BuilderOutside && unit->SubAction == 40) ||
+					(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 2)) {
+				unit->Player->RemoveFromUnitsConsumingResources(unit);
+			}
+
 			//
 			// Shift queue with structure assignment.
 			//

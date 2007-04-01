@@ -197,6 +197,17 @@ void HandleActionRepair(CUnit *unit)
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+
+					if (goal->Orders[0]->Action == UnitActionBuilt) {
+						int costs[MaxCosts];
+						for (int i = 0; i < MaxCosts; ++i) {
+							costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
+								unit->Orders[0]->Goal->Type->Stats[unit->Orders[0]->Goal->Player->Index].Costs[i]);
+						}
+						unit->Player->AddToUnitsConsumingResources(unit, costs);
+					} else {
+						unit->Player->AddToUnitsConsumingResources(unit, unit->Type->MaxUtilizationRate);
+					}
 				} else if (err < 0) {
 					if (goal) { // release reference
 						goal->RefsDecrease();
@@ -244,7 +255,7 @@ void HandleActionRepair(CUnit *unit)
 					RepairUnit(unit, goal);
 					goal = unit->Orders[0]->Goal;
 				} else if (goal && MapDistanceBetweenUnits(unit, goal) > unit->Type->RepairRange) {
-					// If goal has move, chase after it
+					// If goal has moved, chase after it
 					unit->State = 0;
 					unit->SubAction = 0;
 				}
@@ -254,6 +265,7 @@ void HandleActionRepair(CUnit *unit)
 				// Target is fine, choose new one.
 				//
 				if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
+					unit->Player->RemoveFromUnitsConsumingResources(unit);
 					if (goal) { // release reference
 						goal->RefsDecrease();
 						unit->Orders[0]->Goal = NULL;

@@ -236,7 +236,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	int y;
 	CUnitType *type;
 	CUnit *build;
-	const CUnitStats *stats;
 
 	x = unit->Orders[0]->X;
 	y = unit->Orders[0]->Y;
@@ -297,8 +296,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type->Slot]--;
 
-	stats = build->Stats;
-
 	// Make sure the bulding doesn't cancel itself out right away.
 	build->Data.Built.Progress = 100;
 	build->Variable[HP_INDEX].Value = 1;
@@ -329,6 +326,13 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		build->RefsIncrease();
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
+
+		int costs[MaxCosts];
+		for (int i = 0; i < MaxCosts; ++i) {
+			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
+				build->Type->Stats[build->Player->Index].Costs[i]);
+		}
+		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	}
 	UpdateConstructionFrame(build);
 }

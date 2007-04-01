@@ -177,13 +177,29 @@ void CPlayer::UpdateUnitsConsumingResources(CUnit *unit, int costs[MaxCosts])
 void CPlayer::RebuildUnitsConsumingResourcesList()
 {
 	for (int i = 0; i < TotalNumUnits; ++i) {
+		int costs[MaxCosts];
 		CUnit *u = Units[i];
+
 		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
-			AddToUnitsConsumingResources(u,
-				u->Orders[0]->Type->Stats[u->Player->Index].Costs);
+			for (int i = 0; i < MaxCosts; ++i) {
+				costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
+					u->Orders[0]->Type->Stats[u->Player->Index].Costs[i]);
+			}
+			AddToUnitsConsumingResources(u, costs);
 		} else if (u->Orders[0]->Action == UnitActionBuilt) {
-			AddToUnitsConsumingResources(u,
-				u->Type->Stats[u->Player->Index].Costs);
+			if (!u->Type->BuilderOutside) {
+				for (int i = 0; i < MaxCosts; ++i) {
+					costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
+						u->Orders[0]->Goal->Type->Stats[u->Orders[0]->Goal->Player->Index].Costs[i]);
+				}
+				u->Orders[0]->Goal->Player->AddToUnitsConsumingResources(u->Orders[0]->Goal, costs);
+			} else {
+				for (int i = 0; i < MaxCosts; ++i) {
+					costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
+						u->Orders[0]->Goal->Type->Stats[u->Orders[0]->Goal->Player->Index].Costs[i]);
+				}
+				AddToUnitsConsumingResources(u, costs);
+			}
 		}
 	}
 }
@@ -234,7 +250,8 @@ static int BaseEfficiency(CPlayer *p)
 static int MaxRate(CUnit *unit, int res)
 {
 	if (unit->Orders[0]->Action == UnitActionTrain ||
-			unit->Orders[0]->Action == UnitActionBuild) {
+			unit->Orders[0]->Action == UnitActionBuild ||
+			unit->Orders[0]->Action == UnitActionRepair) {
 		return unit->Type->MaxUtilizationRate[res];
 	} else if (unit->Orders[0]->Action == UnitActionBuilt) {
 		if (!unit->Type->BuilderOutside) {
