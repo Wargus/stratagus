@@ -9,7 +9,7 @@
 --
 --	unit-dorcoz.lua	- Define the dorcoz unit.
 --
---	(c) Copyright 2003 - 2005 by François Beerten
+--	(c) Copyright 2003 - 2005 by Franï¿½is Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ DefineUnitType("unit-dorcoz", {
         HitPoints = 100, DrawLevel = 40, TileSize = {1, 1}, BoxSize = {31, 31},
         SightRange = 7, ComputerReactionRange = 7, PersonReactionRange = 7,
         Armor = 2, BasicDamage = 6, PiercingDamage = 3, Missile = "missile-dorcoz",
-        MaxAttackRange = 7, Priority = 60, Points = 50, Demand = 1,
+        MaxAttackRange = 7, Priority = 60, Points = 50,
         Corpse = "unit-dead-body", Type = "land", RightMouseAction = "attack",
         CanAttack = true, CanTargetLand = true, CanTargetAir = true,
         LandUnit = true, organic = true,

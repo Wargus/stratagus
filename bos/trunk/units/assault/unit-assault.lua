@@ -9,7 +9,7 @@
 --
 --	unit-assault.lua	-	Define the assault unit
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ DefineUnitType("unit-assault", {
 	SightRange = 6, ComputerReactionRange = 6, PersonReactionRange = 6,
 	Armor = 3, BasicDamage = 4, PiercingDamage = 0, Missile = "missile-none",
 	MaxAttackRange = 5, Priority = 60, Points = 50,
-	Corpse = "unit-dead-body1", Type = "land", Demand = 0,
+	Corpse = "unit-dead-body1", Type = "land",
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	LandUnit = true, organic = true, SelectableByRectangle = true,
 	Sounds = {

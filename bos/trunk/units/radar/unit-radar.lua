@@ -9,7 +9,7 @@
 --
 --	radar.lua	-	Define the radar unit.
 --
---	(c) Copyright 2004-2005 by François Beerten.
+--	(c) Copyright 2004-2005 by Franï¿½is Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ DefineUnitType("unit-radar", {
 	Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {32, 28},
 	SightRange = 3, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,
-	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Points = 10, ExplodeWhenKilled = "missile-64x64-explosion",
 	Corpse = "radar_destroyed", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,

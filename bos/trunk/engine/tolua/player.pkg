@@ -26,8 +26,6 @@ class CPlayer
 	CUnit *Units[UnitMax];
 	int TotalNumUnits;
 	int NumBuildings;
-	int Supply;
-	int Demand;
 
 	int UnitLimit;
 	int BuildingLimit;

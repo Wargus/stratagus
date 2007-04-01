@@ -9,7 +9,7 @@
 --
 --	unit-vault.lua	-	Define the vault unit.
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ DefineUnitType("unit-vault", {
 	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {6, 6}, BoxSize = {196, 164},
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
-	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
+	Points = 200, ExplodeWhenKilled = "missile-288x288-explosion",
 	Corpse = "build-dead-vault", Type = "land",
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	CanStore = {"crystal", "titanium"},

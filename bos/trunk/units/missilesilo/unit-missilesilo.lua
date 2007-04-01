@@ -9,7 +9,7 @@
 --
 --	unit-missilesilo.lua	-	Define the missile silo unit
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ DefineUnitType("unit-msilo", {
 	Points = 100, ExplodeWhenKilled = "missile-160x128-explosion",
 	Corpse = "build-dead-msilo", Type = land,
 	MaxMana = 1000, CanCastSpell = {"spell-nuke"},
-	Demand = 400, Building = true, BuilderOutside = true,
+	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	})
 DefineAnimations("animations-dead-msilo", {

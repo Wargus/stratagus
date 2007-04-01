@@ -9,7 +9,7 @@
 --
 --	unit-bazoo.lua	-	Define the bazoo
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ DefineUnitType("unit-bazoo", {
 	Armor = 2, BasicDamage = 5, PiercingDamage = 15, Missile = "missile-bazoo",
 	MaxAttackRange = 6, Priority = 60, Points = 50,
 	Corpse = "unit-dead-body4",
-	Type = "land", Demand = 0, 
+	Type = "land",
 	RightMouseAction = "attack",
 	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	LandUnit = true, organic = true, SelectableByRectangle = true,

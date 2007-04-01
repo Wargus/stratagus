@@ -92,7 +92,7 @@ DefineUnitType("unit-buggy", {
 	SightRange = 7, ComputerReactionRange = 7, PersonReactionRange = 7,
 	Armor = 3 , BasicDamage = 5, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
-	Points = 100, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Points = 100, ExplodeWhenKilled = "missile-64x64-explosion",
 	Corpse = "buggy_destroyed", Type = "land",
 	MaxAttackRange = 6, CanAttack = true, CanTargetLand = true,
 	RightMouseAction = "attack",

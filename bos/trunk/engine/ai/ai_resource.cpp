@@ -116,55 +116,6 @@ static int AiCheckCosts(const int *costs)
 }
 
 /**
-**  Check if the AI player needs food.
-**
-**  It counts buildings in progress and units in training queues.
-**
-**  @param pai   AI player.
-**  @param type  Unit-type that should be build.
-**
-**  @return      True if enought, false otherwise.
-**
-**  @todo  The number of food currently trained can be stored global
-**         for faster use.
-*/
-static int AiCheckSupply(const PlayerAi *pai, const CUnitType *type)
-{
-	int remaining;
-	const AiBuildQueue *queue;
-	int i;
-
-	//
-	// Count food supplies under construction.
-	//
-	remaining = 0;
-	for (i = 0; i < (int)pai->UnitTypeBuilt.size(); ++i) {
-		queue = &pai->UnitTypeBuilt[i];
-		if (queue->Type->Supply) {
-			remaining += queue->Made * queue->Type->Supply;
-		}
-	}
-
-	//
-	// We are already out of food.
-	//
-	remaining += pai->Player->Supply - pai->Player->Demand - type->Demand;
-	if (remaining < 0) {
-		return 0;
-	}
-	//
-	// Count what we train.
-	//
-	for (i = 0; i < (int)pai->UnitTypeBuilt.size(); ++i) {
-		queue = &pai->UnitTypeBuilt[i];
-		if ((remaining -= queue->Made * queue->Type->Demand) < 0) {
-			return 0;
-		}
-	}
-	return 1;
-}
-
-/**
 **  Check if the costs for a unit-type are available for the AI.
 **
 **  Take reserve and already used resources into account.
@@ -293,68 +244,6 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	}
 
 	return 0;
-}
-
-/**
-**  Build new units to reduce the food shortage.
-*/
-static void AiRequestSupply(void)
-{
-	int i;
-	int n;
-	int c;
-	CUnitType *type;
-	AiBuildQueue *queue;
-	int counter[UnitTypeMax];
-	unsigned int needmask;
-
-	//
-	// Don't request supply if we're sleeping.  When the script starts it may
-	// request a better unit than the one we pick here.  If we only have enough
-	// resources for one unit we don't want to build the wrong one.
-	//
-	if (AiPlayer->SleepCycles != 0) {
-		return;
-	}
-
-	//
-	// Count the already made build requests.
-	//
-	memset(counter, 0, sizeof(counter));
-	for (i = 0; i < (int)AiPlayer->UnitTypeBuilt.size(); ++i) {
-		queue = &AiPlayer->UnitTypeBuilt[i];
-		counter[queue->Type->Slot] += queue->Want;
-	}
-
-	//
-	// Check if we can build this?
-	//
-	n = AiHelpers.UnitLimit[0].size();
-	needmask = 0;
-	for (i = 0; i < n; ++i) {
-		type = AiHelpers.UnitLimit[0][i];
-		if (counter[type->Slot]) { // Already ordered.
-			return;
-		}
-
-		//
-		// Check if resources available.
-		//
-		if ((c = AiCheckUnitTypeCosts(type))) {
-			needmask |= c;
-		} else {
-			if (AiMakeUnit(type)) {
-				AiBuildQueue newqueue;
-				newqueue.Type = type;
-				newqueue.Want = 1;
-				newqueue.Made = 1;
-				AiPlayer->UnitTypeBuilt.insert(
-					AiPlayer->UnitTypeBuilt.begin(), newqueue);
-				return ;
-			}
-		}
-		AiPlayer->NeededMask |= needmask;
-	}
 }
 
 /**
@@ -529,14 +418,6 @@ static void AiCheckingWork(void)
 	CUnitType *type;
 	AiBuildQueue *queue;
 
-	// Suppy has the highest priority
-	if (AiPlayer->NeedSupply) {
-		if (!(!AiPlayer->UnitTypeBuilt.empty() &&
-				AiPlayer->UnitTypeBuilt[0].Type->Supply)) {
-			AiPlayer->NeedSupply = false;
-			AiRequestSupply();
-		}
-	}
 	//
 	// Look to the build requests, what can be done.
 	//
@@ -550,13 +431,6 @@ static void AiCheckingWork(void)
 			// FIXME: must check if requirements are fulfilled.
 			// Buildings can be destroyed.
 
-			//
-			// Check if we have enough food.
-			//
-			if (type->Demand && !AiCheckSupply(AiPlayer, type)) {
-				AiPlayer->NeedSupply = true;
-				AiRequestSupply();
-			}
 			//
 			// Check limits, AI should be broken if reached.
 			//
@@ -1131,12 +1005,6 @@ void AiResourceManager(void)
 	// Check if something needs to be build / trained.
 	//
 	AiCheckingWork();
-	//
-	// Look if we can build a farm in advance.
-	//
-	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
-		AiRequestSupply();
-	}
 	//
 	// Collect resources.
 	//
