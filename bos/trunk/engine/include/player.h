@@ -280,8 +280,6 @@ class CFile;
 	///  Player structure
 class CPlayer
 {
-private:
-	std::map<int, int*> UnitsConsumingResources;
 public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
@@ -303,14 +301,17 @@ public:
 	int Incomes[MaxCosts];        /// income of the resources
 	int Revenue[MaxCosts];        /// income rate of the resources
 
-	int ProductionRate[MaxCosts];     /// Rate that resources are produced
-	int UtilizationRate[MaxCosts];    /// Rate that resources are used
-	int StoredResources[MaxCosts];    /// Amount of resources in storage
-	int StorageCapacity[MaxCosts];    /// Storage capacity of resources
+	std::map<CUnit *, int *> UnitsConsumingResourcesActual;
+	std::map<CUnit *, int *> UnitsConsumingResourcesRequested;
+	int ProductionRate[MaxCosts];           /// Rate that resources are produced
+	int ActualUtilizationRate[MaxCosts];    /// Rate that resources are used
+	int RequestedUtilizationRate[MaxCosts]; /// Rate that resources are used
+	int StoredResources[MaxCosts];          /// Amount of resources in storage
+	int StorageCapacity[MaxCosts];          /// Storage capacity of resources
 
-	void AddToUnitsConsumingResources(int slot, int costs[MaxCosts]);
-	void RemoveFromUnitsConsumingResources(int slot);
-	void UpdateUnitsConsumingResources(int slot, int costs[MaxCosts]);
+	void AddToUnitsConsumingResources(CUnit *unit, int costs[MaxCosts]);
+	void RemoveFromUnitsConsumingResources(CUnit *unit);
+	void UpdateUnitsConsumingResources(CUnit *unit, int costs[MaxCosts]);
 	void RebuildUnitsConsumingResourcesList();
 	void ClearResourceVariables();
 
