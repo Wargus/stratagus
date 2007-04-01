@@ -229,6 +229,7 @@ void CPlayer::ClearResourceVariables()
 
 }
 
+// p(type) = total production(type) + min(storage(type), storagerate(type))
 static int AvailableResourcesRate(int type, CPlayer *p)
 {
 	// FIXME: change 50 to rate we can get resources out of storage
@@ -236,11 +237,13 @@ static int AvailableResourcesRate(int type, CPlayer *p)
 	return p->ProductionRate[type] + std::min<int>(p->StoredResources[type], RateFromStorage);
 }
 
+// f(type) = min(p(type)/ total needs(type), 1.0)
 static int SpecificEfficiency(int type, CPlayer *p)
 {
-	return std::min<int>(100 * AvailableResourcesRate(type, p) / p->RequestedUtilizationRate[type], 100);
+	return std::min<int>((100 * AvailableResourcesRate(type, p) + 50) / p->RequestedUtilizationRate[type], 100);
 }
 
+// base efficiency = min(f(energy), f(magma))
 static int BaseEfficiency(CPlayer *p)
 {
 	// FIXME: hardcoded 1 and 2 for resources
@@ -278,6 +281,7 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 	}
 	Assert(usedtypes > 0);
 
+	// if unit requires both types:
 	if (usedtypes > 1) {
 		// unit effective rate(type) = unit max rate(type) * base efficiency
 		int be = BaseEfficiency(unit->Player);
@@ -291,7 +295,7 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 		int ue = UniqueEfficiency(unit->Player);
 		costs[0] = 0;
 		for (i = 1; i < MaxCosts; ++i) {
-			costs[i] = unit->Type->MaxUtilizationRate[i] * ue / 100;
+			costs[i] = MaxRate(unit, i) * ue / 100;
 		}
 #endif
 	}
