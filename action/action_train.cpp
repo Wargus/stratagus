@@ -103,8 +103,13 @@ void HandleActionTrain(CUnit *unit)
 	if (!unit->SubAction) {
 		unit->Data.Train.Ticks = 0;
 		unit->SubAction = 1;
-		unit->Player->AddToUnitsConsumingResources(unit->Slot,
-			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs);
+
+		int costs[MaxCosts];
+		for (int i = 0; i < MaxCosts; ++i) {
+			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
+				unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[1]);
+		}
+		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	}
 
 	unit->Type->Animations->Train ?
@@ -117,6 +122,7 @@ void HandleActionTrain(CUnit *unit)
 
 	player = unit->Player;
 	unit->Data.Train.Ticks += SpeedTrain;
+
 	// FIXME: Should count down
 	if (unit->Data.Train.Ticks >=
 			unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost]) {
@@ -157,7 +163,7 @@ void HandleActionTrain(CUnit *unit)
 			nunit->X = unit->X;
 			nunit->Y = unit->Y;
 
-			player->RemoveFromUnitsConsumingResources(unit->Slot);
+			player->RemoveFromUnitsConsumingResources(unit);
 
 			// New unit might supply food
 			UpdateForNewUnit(nunit, 0);

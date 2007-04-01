@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <algorithm>
 
 #include "stratagus.h"
 #include "video.h"
@@ -116,45 +117,56 @@ void CleanPlayers(void)
 /**
 **  Add to UnitsConsumingResources
 */
-void CPlayer::AddToUnitsConsumingResources(int slot, int costs[MaxCosts])
+void CPlayer::AddToUnitsConsumingResources(CUnit *unit, int costs[MaxCosts])
 {
-	Assert(UnitsConsumingResources[slot] == NULL);
+	Assert(UnitsConsumingResourcesActual[unit] == NULL);
+	Assert(UnitsConsumingResourcesRequested[unit] == NULL);
 
-	int *c = new int[MaxCosts];
-	UnitsConsumingResources[slot] = c;
+	int *c;
+	
+	c = new int[MaxCosts];
+	memcpy(c, costs, MaxCosts * sizeof(int));
+	this->UnitsConsumingResourcesActual[unit] = c;
+	c = new int[MaxCosts];
+	memcpy(c, costs, MaxCosts * sizeof(int));
+	this->UnitsConsumingResourcesRequested[unit] = c;
 
 	for (int i = 0; i < MaxCosts; ++i) {
-		c[i] = costs[i];
-		UtilizationRate[i] += c[i];
+		this->ActualUtilizationRate[i] += costs[i];
+		this->RequestedUtilizationRate[i] += costs[i];
 	}
 }
 
 /**
 **  Remove from UnitsConsumingResources
 */
-void CPlayer::RemoveFromUnitsConsumingResources(int slot)
+void CPlayer::RemoveFromUnitsConsumingResources(CUnit *unit)
 {
-	int *costs = UnitsConsumingResources[slot];
+	int *cactual = UnitsConsumingResourcesActual[unit];
+	int *crequested = UnitsConsumingResourcesRequested[unit];
 
 	for (int i = 0; i < MaxCosts; ++i) {
-		UtilizationRate[i] -= costs[i];
+		this->ActualUtilizationRate[i] -= cactual[i];
+		this->RequestedUtilizationRate[i] -= crequested[i];
 	}
 
-	delete[] costs;
-	UnitsConsumingResources.erase(slot);
+	delete[] cactual;
+	this->UnitsConsumingResourcesActual.erase(unit);
+	delete[] crequested;
+	this->UnitsConsumingResourcesRequested.erase(unit);
 }
 
 /**
 **  Update costs for unit in UnitsConsumingResources
 */
-void CPlayer::UpdateUnitsConsumingResources(int slot, int costs[MaxCosts])
+void CPlayer::UpdateUnitsConsumingResources(CUnit *unit, int costs[MaxCosts])
 {
-	int *c = UnitsConsumingResources[slot];
+	int *c = UnitsConsumingResourcesActual[unit];
 
 	for (int i = 0; i < MaxCosts; ++i) {
-		UtilizationRate[i] -= c[i];
+		this->ActualUtilizationRate[i] -= c[i];
 		c[i] = costs[i];
-		UtilizationRate[i] += c[i];
+		this->ActualUtilizationRate[i] += c[i];
 	}
 }
 
@@ -167,10 +179,10 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 	for (int i = 0; i < TotalNumUnits; ++i) {
 		CUnit *u = Units[i];
 		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
-			AddToUnitsConsumingResources(u->Slot,
+			AddToUnitsConsumingResources(u,
 				u->Orders[0]->Type->Stats[u->Player->Index].Costs);
 		} else if (u->Orders[0]->Action == UnitActionBuilt) {
-			AddToUnitsConsumingResources(u->Slot,
+			AddToUnitsConsumingResources(u,
 				u->Type->Stats[u->Player->Index].Costs);
 		}
 	}
@@ -181,17 +193,91 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 */
 void CPlayer::ClearResourceVariables()
 {
-	std::map<int, int*>::iterator i;
-	for (i = UnitsConsumingResources.begin(); i != UnitsConsumingResources.end(); ++i) {
+	std::map<CUnit *, int *>::iterator i;
+	for (i = UnitsConsumingResourcesActual.begin();
+			i != UnitsConsumingResourcesActual.end(); ++i) {
 		delete[] (*i).second;
 	}
-	
-	UnitsConsumingResources.clear();
+	for (i = UnitsConsumingResourcesRequested.begin();
+			i != UnitsConsumingResourcesRequested.end(); ++i) {
+		delete[] (*i).second;
+	}
+
+	UnitsConsumingResourcesActual.clear();
+	UnitsConsumingResourcesRequested.clear();
 	memset(ProductionRate, 0, sizeof(ProductionRate));
-	memset(UtilizationRate, 0, sizeof(UtilizationRate));
+	memset(ActualUtilizationRate, 0, sizeof(ActualUtilizationRate));
+	memset(RequestedUtilizationRate, 0, sizeof(RequestedUtilizationRate));
 	memset(StoredResources, 0, sizeof(StoredResources));
 	memset(StorageCapacity, 0, sizeof(StorageCapacity));
 
+}
+
+static int AvailableResourcesRate(int type, CPlayer *p)
+{
+	// FIXME: change 50 to rate we can get resources out of storage
+	int RateFromStorage = 50;
+	return p->ProductionRate[type] + std::min<int>(p->StoredResources[type], RateFromStorage);
+}
+
+static int SpecificEfficiency(int type, CPlayer *p)
+{
+	return std::min<int>(100 * AvailableResourcesRate(type, p) / p->RequestedUtilizationRate[type], 100);
+}
+
+static int BaseEfficiency(CPlayer *p)
+{
+	// FIXME: hardcoded 1 and 2 for resources
+	return std::min<int>(SpecificEfficiency(1, p), SpecificEfficiency(2, p));
+}
+
+static int MaxRate(CUnit *unit, int res)
+{
+	if (unit->Orders[0]->Action == UnitActionTrain ||
+			unit->Orders[0]->Action == UnitActionBuild) {
+		return unit->Type->MaxUtilizationRate[res];
+	} else if (unit->Orders[0]->Action == UnitActionBuilt) {
+		if (!unit->Type->BuilderOutside) {
+			return unit->Data.Built.Worker->Type->MaxUtilizationRate[res];
+		} else {
+			Assert(0);
+			return 0;
+		}
+	}
+	Assert(0);
+	return 0;
+}
+
+static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
+{
+	int i;
+	int usedtypes = 0;
+	int *c = unit->Player->UnitsConsumingResourcesRequested[unit];
+
+	for (i = 1; i < MaxCosts; ++i) {
+		if (c[i] != 0) {
+			++usedtypes;
+		}
+	}
+	Assert(usedtypes > 0);
+
+	if (usedtypes > 1) {
+		// unit effective rate(type) = unit max rate(type) * base efficiency
+		int be = BaseEfficiency(unit->Player);
+		costs[0] = 0;
+		for (i = 1; i < MaxCosts; ++i) {
+			costs[i] = MaxRate(unit, i) * be / 100;
+		}
+	} else {
+		// unit effective rate(type) = unit max rate(type) * unique efficiency(type)
+#if 0
+		int ue = UniqueEfficiency(unit->Player);
+		costs[0] = 0;
+		for (i = 1; i < MaxCosts; ++i) {
+			costs[i] = unit->Type->MaxUtilizationRate[i] * ue / 100;
+		}
+#endif
+	}
 }
 
 /**
@@ -283,14 +369,23 @@ void SavePlayers(CFile *file)
 		}
 
 		// ProductionRate done by load units.
-		// UtilizationRate
-		file->printf("},\n  \"utilization-rate\", {");
+		// ActualUtilizationRate
+		file->printf("},\n  \"actual-utilization-rate\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				file->printf(" ");
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				p->UtilizationRate[j]);
+				p->ActualUtilizationRate[j]);
+		}
+		// RequestedUtilizationRate
+		file->printf("},\n  \"requested-utilization-rate\", {");
+		for (j = 0; j < MaxCosts; ++j) {
+			if (j) {
+				file->printf(" ");
+			}
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
+				p->RequestedUtilizationRate[j]);
 		}
 		// StoredResources
 		file->printf("},\n  \"stored-resources\", {");
@@ -779,7 +874,7 @@ void PlayersEachCycle(void)
 
 		// Update rate based economy
 		for (int res = 0; res < MaxCosts; ++res) {
-			int rate = p->ProductionRate[res] - p->UtilizationRate[res];
+			int rate = p->ProductionRate[res] - p->ActualUtilizationRate[res];
 			if (rate > 0) {
 				if (p->StoredResources[res] < p->StorageCapacity[res]) {
 					p->StoredResources[res] += rate;
@@ -788,14 +883,18 @@ void PlayersEachCycle(void)
 					}
 				}
 			} else if (rate < 0) {
-				if (p->StoredResources[res]) {
-					p->StoredResources[res] -= rate;
-					if (p->StoredResources[res] < 0) {
-						// shouldn't happen?
-						p->StoredResources[res] = 0;
-					}
-				}
+				rate = -rate;
+//				Assert(p->StoredResources[res] >= rate);
+				p->StoredResources[res] -= rate;
 			}
+		}
+
+		// Recalculate costs
+		std::map<CUnit *, int *>::iterator it;
+		for (it = p->UnitsConsumingResourcesActual.begin(); it != p->UnitsConsumingResourcesActual.end(); ++it) {
+			int costs[MaxCosts];
+			CalculateCosts((*it).first, costs);
+			p->UpdateUnitsConsumingResources((*it).first, costs);
 		}
 
 		// Ai

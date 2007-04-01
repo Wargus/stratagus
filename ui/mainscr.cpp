@@ -691,7 +691,7 @@ void DrawResources(void)
 	int i;
 
 	for (i = 1; i < MaxCosts; ++i) {
-		sprintf(tmp, "%d/%d", ThisPlayer->UtilizationRate[i],
+		sprintf(tmp, "%d/%d", ThisPlayer->ActualUtilizationRate[i],
 			ThisPlayer->ProductionRate[i]);
 		VideoDrawText(50 +  80 * (i - 1), 1, GameFont, tmp);
 	}

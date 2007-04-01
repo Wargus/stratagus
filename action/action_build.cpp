@@ -258,8 +258,14 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	}
 	
 	unit->Player->SubUnitType(type);
-	build->Player->AddToUnitsConsumingResources(build->Slot,
-		build->Type->Stats[build->Player->Index].Costs);
+	if (!type->BuilderOutside) {
+		int costs[MaxCosts];
+		for (int i = 0; i < MaxCosts; ++i) {
+			costs[i] = std::min<int>(type->MaxUtilizationRate[i],
+				build->Type->Stats[build->Player->Index].Costs[i]);
+		}
+		build->Player->AddToUnitsConsumingResources(build, costs);
+	}
 
 	build->Constructed = 1;
 	build->CurrentSightRange = 0;
@@ -465,7 +471,9 @@ void HandleActionBuilt(CUnit *unit)
 
 		// Player gets back 75% of the original cost for a building.
 		unit->Player->AddCostsFactor(unit->Stats->Costs, CancelBuildingCostsFactor);
-		unit->Player->RemoveFromUnitsConsumingResources(unit->Slot);
+		if (!unit->Type->BuilderOutside) {
+			unit->Player->RemoveFromUnitsConsumingResources(unit);
+		}
 
 		// Cancel building
 		LetUnitDie(unit);
@@ -537,6 +545,9 @@ void HandleActionBuilt(CUnit *unit)
 		}
 
 		UpdateForNewUnit(unit, 0);
+		if (!unit->Type->BuilderOutside) {
+			unit->Player->RemoveFromUnitsConsumingResources(unit);
+		}
 
 		// Set the direction of the building if it supports them
 		if (unit->Type->NumDirections > 1) {
