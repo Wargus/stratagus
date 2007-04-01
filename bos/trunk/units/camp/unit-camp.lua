@@ -76,6 +76,7 @@ DefineUnitType("unit-camp", {
 	Points = 160, ExplodeWhenKilled = "missile-160x128-explosion",
 	Corpse = "build-dead-camp", Type = "land",
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
+	MaxUtilizationRate = {"titanium", 20, "crystal", 20},
 	Sounds = {
 		"selected", "camp-selected",
 		"ready", "camp-ready",

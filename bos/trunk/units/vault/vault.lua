@@ -77,6 +77,7 @@ DefineUnitType("unit-vault", {
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
 	CanStore = {"crystal", "titanium"},
 	StorageCapacity = {"titanium", 10000, "crystal", 2000},
+	MaxUtilizationRate = {"titanium", 30, "crystal", 30},
 	Sounds = {
 		"selected", "dev-selected",
 		"ready", "dev-ready",
