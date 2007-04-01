@@ -397,6 +397,7 @@ static void BuildBuilding(CUnit *unit)
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
 		}
+		unit->Player->RemoveFromUnitsConsumingResources(unit);
 	}
 }
 
