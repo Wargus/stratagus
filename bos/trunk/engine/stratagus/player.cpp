@@ -125,14 +125,14 @@ void CPlayer::AddToUnitsConsumingResources(CUnit *unit, int costs[MaxCosts])
 	int *c;
 	
 	c = new int[MaxCosts];
-	memcpy(c, costs, MaxCosts * sizeof(int));
+	memset(c, 0, MaxCosts * sizeof(int));
 	this->UnitsConsumingResourcesActual[unit] = c;
+	// no need to change ActualUtilizationRate here
+
 	c = new int[MaxCosts];
 	memcpy(c, costs, MaxCosts * sizeof(int));
 	this->UnitsConsumingResourcesRequested[unit] = c;
-
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->ActualUtilizationRate[i] += costs[i];
 		this->RequestedUtilizationRate[i] += costs[i];
 	}
 }
@@ -903,6 +903,9 @@ void PlayersEachCycle(void)
 				rate = -rate;
 //				Assert(p->StoredResources[res] >= rate);
 				p->StoredResources[res] -= rate;
+				if (p->StoredResources[res] < 0) {
+					p->StoredResources[res] = 0;
+				}
 			}
 		}
 
