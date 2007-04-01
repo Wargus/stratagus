@@ -1825,8 +1825,9 @@ void UpdateUnitVariables(const CUnit *unit)
 	// Training
 	if (unit->Orders[0]->Action == UnitActionTrain) {
 		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
-		unit->Variable[TRAINING_INDEX].Max =
-			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[TimeCost];
+		int *costs = unit->Orders[0]->Type->Stats[unit->Player->Index].Costs;
+		int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+		unit->Variable[TRAINING_INDEX].Max = cost;
 	}
 
 	// Resources.
