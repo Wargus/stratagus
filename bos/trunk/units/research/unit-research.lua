@@ -63,7 +63,7 @@ MakeSound("rfac-help", GetCurrentLuaPath().."/research.facility.underattack.wav"
 MakeSound("rfac-dead", GetCurrentLuaPath().."/sfx_rfac.die.wav")
 
 DefineUnitType("unit-rfac", {
-	Name = "Research Facility",
+	Name = "Power Plant",
 	Image = {"file", GetCurrentLuaPath().."/research_facility.png", "size", {128, 128}},
 	Shadow = {"file", GetCurrentLuaPath().."/research_facility_s.png", "size", {128, 128}},
 	Animations = "animations-rfac", Icon = "icon-rfac",
@@ -72,9 +72,10 @@ DefineUnitType("unit-rfac", {
 	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize = {4, 4}, BoxSize = {124, 124},
 	SightRange = 1, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
-	Demand = 300, Points = 200, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = "build-dead-research", Type = "land",
+	Points = 200, ExplodeWhenKilled = "missile-160x128-explosion",
+	Corpse = "build-dead-generator", Type = "land",
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
+	ProductionRate = {"titanium", 50},
 	Sounds = {
 		"selected", "rfac-selected",
 		"ready", "rfac-ready",
@@ -87,8 +88,8 @@ DefineAnimations("animations-research", {
         "frame 1", "wait 200", "frame 2", "wait 200",  "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-research", {
-	Name = "RsearchCrater",
+DefineUnitType("build-dead-power-plant", {
+	Name = "PowerPlantCrater",
 	Image = {"file", GetCurrentLuaPath().."/research_c.png", "size", {128, 128}},
 	Animations = "animations-research", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
@@ -101,7 +102,7 @@ DefineAllow("unit-rfac", "AAAAAAAA")
 
 DefineButton({
 	Pos = 6, Level = 1, Icon = "icon-rfac_b", Action = "build",
-	Value = "unit-rfac", Key = "f", Hint = "BUILD RESEARCH ~!FACILITY",
+	Value = "unit-rfac", Key = "p", Hint = "BUILD ~!POWER PLANT",
 	ForUnit = {"unit-engineer"}})
 
 

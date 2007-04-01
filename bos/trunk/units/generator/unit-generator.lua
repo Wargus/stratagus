@@ -9,7 +9,7 @@
 --
 --	unit-generator.lua	-	Define the generator
 --
---	(c) Copyright 2001-2007 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001-2007 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ MakeSound("gen-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
 MakeSound("gen-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
 
 DefineUnitType("unit-gen", {
-	Name = "Generator",
+	Name = "Magma Pump",
 	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
 	Shadow = {"file", GetCurrentLuaPath().."/generator_s.png", "size", {64, 64}},
 	Animations = "animations-gen", Icon = "icon-gen",
@@ -77,7 +77,7 @@ DefineUnitType("unit-gen", {
 	Corpse = "build-dead-gen", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
-	ProductionRate = {"titanium", 50},
+	ProductionRate = {"crystal", 5},
 	Sounds = {
 		"selected", "gen-selected",
 		"ready", "gen-ready",
@@ -92,7 +92,7 @@ DefineAnimations("animations-dead-gen", {
     })
 
 DefineUnitType("build-dead-gen", {
-	Name = "GenCrater",
+	Name = "Pump Crater",
 	Image = {"file", GetCurrentLuaPath().."/generator_c.png", "size", {64, 64}},
 	Animations = "animations-dead-gen", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
@@ -107,6 +107,6 @@ DefineAllow("unit-gen", "AAAAAAAA")
 
 DefineButton({
 	Pos = 2, Level = 1, Icon = "icon-gen_b", Action = "build",
-	Value = "unit-gen", Key = "g", Hint = "BUILD ~!GENERATOR",
+	Value = "unit-gen", Key = "m", Hint = "BUILD ~!MAGMA PUMP",
 	ForUnit = {"unit-engineer"}})
 
