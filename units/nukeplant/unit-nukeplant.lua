@@ -9,7 +9,7 @@
 --
 --	unit-nukeplant.lua	-	Define the nukeplant
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ DefineUnitType("unit-nuke", {
 	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize  = {7, 5}, BoxSize = {224, 160},
 	SightRange = 3, Armor = 15 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 50, AnnoyComputerFactor = 55,
-	Points = 200, Supply = 2500, ExplodeWhenKilled = "missile-160x128-explosion",
+	Points = 200, ExplodeWhenKilled = "missile-160x128-explosion",
 	Corpse = "build-dead-nuke", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,

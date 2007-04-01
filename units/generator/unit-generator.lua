@@ -73,7 +73,7 @@ DefineUnitType("unit-gen", {
 	Speed = 0, HitPoints = 250, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},
 	SightRange = 1, Armor = 10 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
-	Points = 100, Supply = 125, ExplodeWhenKilled = "missile-160x128-explosion",
+	Points = 100, ExplodeWhenKilled = "missile-160x128-explosion",
 	Corpse = "build-dead-gen", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,

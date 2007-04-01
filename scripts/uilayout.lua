@@ -59,21 +59,6 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	}
 
   } },
--- Supply Building constructed.----------------
-  {
-  Ident = "panel-building-contents",
-  Pos = {info_panel_x, info_panel_y}, DefaultFont = "game",
-  Condition = {ShowOpponent = false, HideNeutral = true, Build = "false", Supply = "only", Training = "false"},
--- FIXME more condition. not town hall.
-  Contents = {
--- Food building
-        -- { Pos = {16, 71}, More = {"Text", "Usage"} },
-	{ Pos = {16, 86}, More = {"Text", {Text = "Supply : ", Variable = "Supply",
-					Component = "Max"}} },
-	{ Pos = {16, 102}, More = {"Text", {Text = "Demand : ", Variable = "Demand",
-					Component = "Max"}} },
--- FIXME COLOR when Demand >= Supply
-  } },
 -- All own unit -----------------
   {
   Ident = "panel-all-unit-contents",

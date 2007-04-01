@@ -9,7 +9,7 @@
 --
 --	unit-developmentyard.lua	-	Define the development yard
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2007 by Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -60,12 +60,11 @@ DefineUnitType("unit-dev-yard", {
  {256, 256}},
 	Animations = "animations-dev-yard", Icon = "icon-dev",
 	Costs = {"time", 300, "titanium", 500, "crystal", 800},
-	Demand = 200,
 	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-dev-yard",
 	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {7, 6}, BoxSize = {224, 196},
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
-	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
+	Points = 200, ExplodeWhenKilled = "missile-288x288-explosion",
 	Corpse = "build-dead-devyard", Type = "land",
 	VisibleUnderFog = true,	Building = true, BuilderOutside = true,
 	Sounds = {

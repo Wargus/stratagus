@@ -9,7 +9,7 @@
 --
 --	camera.lua	-	Define the camera unit.
 --
---	(c) Copyright 2004 by gorm.
+--	(c) Copyright 2004-2007 by gorm.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ DefineUnitType("unit-cam", {
 	Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {28, 28},
 	SightRange = 15, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,
-	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Points = 10, ExplodeWhenKilled = "missile-64x64-explosion",
 	Corpse = "camera_destroyed", Type = "land",
 	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,

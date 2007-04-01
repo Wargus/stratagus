@@ -118,55 +118,6 @@ static std::vector<CUnitType *> getReparableUnits()
 }
 
 /**
-**  Get sorted list of unittype with Supply not null.
-**
-**  @note Better (supply / cost) first.
-*/
-static std::vector<CUnitType *> getSupplyUnits()
-{
-	std::vector<CUnitType *> res;
-	std::vector<CUnitType *> sorted_res;
-
-
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType *type = *i;
-
-		if (type->Supply > 0) {
-			res.push_back(type);
-		}
-	}
-	// Now, sort them, best first.
-	while (!res.empty()) {
-		float bestscore;
-		CUnitType *besttype;
-
-		bestscore = 0;
-		for (std::vector<CUnitType *>::const_iterator i = res.begin(); i != res.end(); ++i) {
-			CUnitType *type = *i;
-			float score;
-			unsigned int cost = 0;
-
-			for (unsigned j = 0; j < MaxCosts; ++j) {
-				cost += type->_Costs[j];
-			}
-			score = ((float) type->Supply) / cost;
-			if (score > bestscore) {
-				bestscore = score;
-				besttype = type;
-			}
-		}
-		sorted_res.push_back(besttype);
-		for (std::vector<CUnitType *>::iterator i = res.begin(); i != res.end(); ++i) {
-			if (*i == besttype) {
-				i = res.erase(i);
-				break;
-			}
-		}
-	}
-	return sorted_res;
-}
-
-/**
 **  Init AiHelper.
 **
 **  @param aiHelper  variable to initialise.
@@ -178,11 +129,6 @@ static void InitAiHelper(AiHelper &aiHelper)
 	extern std::vector<ButtonAction *> UnitButtonTable;
 
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
-	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
-
-	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
-		AiHelperInsert(aiHelper.UnitLimit, 0, *i);
-	}
 
 	for (int i = 0; i < (int)UnitButtonTable.size(); ++i) {
 		const ButtonAction &button = *UnitButtonTable[i];
@@ -1187,9 +1133,6 @@ static int CclDefineAiPlayer(lua_State *l)
 				lua_pop(l, 1);
 				ai->NeededMask |= (1 << DefaultResourceNumber(type));
 			}
-		} else if (!strcmp(value, "need-supply")) {
-			ai->NeedSupply = true;
-			--j;
 		} else if (!strcmp(value, "exploration")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

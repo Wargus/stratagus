@@ -9,7 +9,7 @@
 --
 --	unit-harvester.lua	-	Define the harvester unit
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ DefineUnitType("unit-harvester", {
 	SightRange = 5, ComputerReactionRange = 6, PersonReactionRange = 4,
 	Armor = 25, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	MaxAttackRange = 0, Priority = 50, Points = 30, Type = "land",
-	Demand = 50, RightMouseAction = "harvest", CanAttack = true, CanTargetLand = true,
+	RightMouseAction = "harvest", CanAttack = true, CanTargetLand = true,
 	LandUnit = true, Coward = true,
 	CanGatherResources = {{
 		"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",

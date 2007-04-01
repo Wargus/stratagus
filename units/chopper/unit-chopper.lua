@@ -9,7 +9,7 @@
 --
 --	unit-chopper.lua	-	Define the chopper unit.
 --
---	(c) Copyright 2005-2006 by Francois Beerten.
+--	(c) Copyright 2005-2007 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -69,12 +69,12 @@ DefineUnitType("unit-chopper", {
 	Speed = 40, HitPoints = 50, DrawLevel = 125, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
-	Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Points = 15, ExplodeWhenKilled = "missile-64x64-explosion",
 	Type = "fly",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	AirUnit = true, SelectableByRectangle = true, 
-	Demand = 0, CanAttack = true, CanTargetLand = true, CanTargetAir = true,
+	CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	NumDirections = 8, MaxAttackRange = 7,
 	Sounds = {
 		"selected", "grenadier-selected",

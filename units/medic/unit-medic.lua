@@ -9,7 +9,7 @@
 --
 --	unit-medic.lua	-	Define the used elites unit-types.
 --
---	(c) Copyright 2001 - 2005 by Fran�is Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2007 by Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ DefineUnitType("unit-medic", {
 	MaxAttackRange = 1, Priority = 60, Points = 50,
 	Corpse = "unit-dead-body5",
 	Type = "land", CanTargetLand = true,
-	LandUnit = true, Demand = 0, organic = true,
+	LandUnit = true, organic = true,
 	SelectableByRectangle = true,
 	CanCastSpell = {"spell-healing"},
 	AutoCastActive = {"spell-healing"},

@@ -9,7 +9,7 @@
 --
 --	unit-grenadier.lua	-	Define the grenadier
 --
---	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by Franï¿½is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ DefineUnitType("unit-grenadier", {
 	Armor = 2, BasicDamage = 15, PiercingDamage = 15, Missile = "missile-grenadier",
 	MaxAttackRange = 5, Priority = 60, Points = 50, Corpse = "unit-dead-body3",
 	Type = "land", CanAttack = true, CanTargetLand = true,
-	LandUnit = true, organic = true, Demand = 0, SelectableByRectangle = true,
+	LandUnit = true, organic = true, SelectableByRectangle = true,
 	Sounds = {
 		"selected", "grenadier-selected",
 		"acknowledge", "grenadier-acknowledge",

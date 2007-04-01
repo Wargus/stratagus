@@ -48,7 +48,7 @@ DefineUnitType("unit-tree03", {
 	NeutralMinimapColor = {73, 159, 9},
 	SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
-	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Points = 10, ExplodeWhenKilled = "missile-64x64-explosion",
 	Corpse = "unit-destroyed-1x1-place",
 	Type = "land",
 	Building = true, BuilderOutside = true,

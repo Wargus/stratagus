@@ -9,7 +9,7 @@
 --
 --	unit-tank.lua	-	Define the tank unit.
 --
---	(c) Copyright 2005 by Fran�is Beerten.
+--	(c) Copyright 2005-2007 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -66,12 +66,12 @@ DefineUnitType("unit-tank", {
 	Speed = 12, HitPoints = 200, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 6, Armor = 20, BasicDamage = 10, PiercingDamage = 40,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
-	Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Points = 15, ExplodeWhenKilled = "missile-64x64-explosion",
 	Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
-	Demand = 0, CanAttack = true, CanTargetLand = true, CanTargetAir = true,
+	 CanAttack = true, CanTargetLand = true, CanTargetAir = true,
 	NumDirections = 8, MaxAttackRange = 6,
 	Sounds = {
 		"selected", "assault-selected",

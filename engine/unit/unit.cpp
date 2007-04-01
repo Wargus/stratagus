@@ -355,7 +355,6 @@ void CUnit::AssignToPlayer(CPlayer *player)
 		*PlayerSlot = this;
 
 		player->UnitTypesCount[type->Slot]++;
-		player->Demand += type->Demand; // food needed
 	}
 
 
@@ -864,16 +863,9 @@ void UnitLost(CUnit *unit)
 
 
 	//
-	//  Handle unit demand. (Currently only food supported.)
-	//
-	player->Demand -= type->Demand;
-
-	//
 	//  Update information.
 	//
 	if (unit->Orders[0]->Action != UnitActionBuilt) {
-		player->Supply -= type->Supply;
-
 		//
 		//  Handle income improvements, look if a player loses a building
 		//  which have given him a better income, find the next best
@@ -961,14 +953,6 @@ void UpdateForNewUnit(const CUnit *unit, int upgrade)
 
 	player = unit->Player;
 	type = unit->Type;
-
-	//
-	// Handle unit supply. (Currently only food supported.)
-	// Note an upgraded unit can't give more supply.
-	//
-	if (!upgrade) {
-		player->Supply += type->Supply;
-	}
 
 	//
 	// Update resources
@@ -1478,8 +1462,6 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	if (Type->GivesResource) {
 		DebugPrint("Resource transfer not supported\n");
 	}
-	newplayer->Demand += Type->Demand;
-	newplayer->Supply += Type->Supply;
 	if (Type->Building) {
 		newplayer->NumBuildings++;
 	}
