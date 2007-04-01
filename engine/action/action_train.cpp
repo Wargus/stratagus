@@ -107,9 +107,19 @@ void HandleActionTrain(CUnit *unit)
 		int costs[MaxCosts];
 		for (int i = 0; i < MaxCosts; ++i) {
 			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
-				unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[1]);
+				unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[i]);
 		}
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
+	} else {
+		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
+		int cost = costs[1] ? costs[1] : costs[2];
+		unit->Data.Train.Ticks += cost * SpeedTrain;
+
+		costs = unit->Orders[0]->Type->Stats[unit->Player->Index].Costs;
+		cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+		if (unit->Data.Train.Ticks > cost) {
+			unit->Data.Train.Ticks = cost;
+		}
 	}
 
 	unit->Type->Animations->Train ?
@@ -121,17 +131,15 @@ void HandleActionTrain(CUnit *unit)
 	}
 
 	player = unit->Player;
-	unit->Data.Train.Ticks += SpeedTrain;
 
-	// FIXME: Should count down
-	if (unit->Data.Train.Ticks >=
-			unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost]) {
+	int *costs = unit->Orders[0]->Type->Stats[unit->Player->Index].Costs;
+	int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+	if (unit->Data.Train.Ticks >= cost) {
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
-			unit->Data.Train.Ticks =
-				unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
+			unit->Data.Train.Ticks = cost;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -145,8 +153,7 @@ void HandleActionTrain(CUnit *unit)
 				AiNeedMoreSupply(unit, unit->Orders[0]->Type);
 			}
 
-			unit->Data.Train.Ticks =
-				unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
+			unit->Data.Train.Ticks = cost;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
