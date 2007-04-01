@@ -74,6 +74,8 @@ DefineUnitType("unit-engineer", {
 	Shadow = {"file", GetCurrentLuaPath().."/unit_engineer_s.png", "size", {56, 56}},
 	DrawLevel = 19, Animations = "animations-engineer", Icon = "icon-engineer",
 	Costs = {"time", 50, "titanium", 50, "crystal", 100},
+	ProductionCosts = {"titanium", 500, "crystal", 10},
+	MaxUtilizationRate = {"titanium", 30, "crystal", 30},
 	Speed = 8, HitPoints = 30, DrawLevel = 25,
 	TileSize = {1, 1}, BoxSize = {17, 28},
 	SightRange = 5, ComputerReactionRange = 6, PersonReactionRange = 4,
