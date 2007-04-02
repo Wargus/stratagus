@@ -361,15 +361,6 @@ void SavePlayers(CFile *file)
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->Resources[j]);
 		}
-		// Last Resources
-		file->printf("},\n  \"last-resources\", {");
-		for (j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				file->printf(" ");
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				p->LastResources[j]);
-		}
 		// Incomes
 		file->printf("},\n  \"incomes\", {");
 		for (j = 0; j < MaxCosts; ++j) {
@@ -378,15 +369,6 @@ void SavePlayers(CFile *file)
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->Incomes[j]);
-		}
-		// Revenue
-		file->printf("},\n  \"revenue\", {");
-		for (j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				file->printf(" ");
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				p->Revenue[j]);
 		}
 
 		// ProductionRate done by load units.
@@ -652,9 +634,7 @@ void CPlayer::Clear()
 	StartX = 0;
 	StartY = 0;
 	memset(Resources, 0, sizeof(Resources));
-	memset(LastResources, 0, sizeof(LastResources));
 	memset(Incomes, 0, sizeof(Incomes));
-	memset(Revenue, 0, sizeof(Revenue));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	AiEnabled = 0;
 	Ai = 0;
@@ -926,16 +906,6 @@ void PlayersEachCycle(void)
 */
 void PlayersEachSecond(int player)
 {
-	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
-		for (int res = 0; res < MaxCosts; ++res) {
-			Players[player].Revenue[res] =
-				Players[player].Resources[res] -
-				Players[player].LastResources[res];
-			Players[player].Revenue[res] *= 6;  // estimate per minute
-			Players[player].LastResources[res] =
-				Players[player].Resources[res];
-		}
-	}
 	if (Players[player].AiEnabled) {
 		AiEachSecond(&Players[player]);
 	}

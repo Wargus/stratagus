@@ -75,7 +75,6 @@ DefineUnitType("unit-vault", {
 	Points = 200, ExplodeWhenKilled = "missile-288x288-explosion",
 	Corpse = "build-dead-vault", Type = "land",
 	Building = true, BuilderOutside = true, VisibleUnderFog = true,
-	CanStore = {"crystal", "titanium"},
 	StorageCapacity = {"titanium", 10000, "crystal", 2000},
 	MaxUtilizationRate = {"titanium", 30, "crystal", 30},
 	Sounds = {
