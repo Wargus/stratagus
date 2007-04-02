@@ -85,13 +85,11 @@ DefineUnitType("unit-harvester", {
 	MaxAttackRange = 0, Priority = 50, Points = 30, Type = "land",
 	RightMouseAction = "harvest", CanAttack = true, CanTargetLand = true,
 	LandUnit = true, Coward = true,
-	CanGatherResources = {{
-		"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",
-		"resource-id", "titanium",
+	CanGatherResources = {
+		{"resource-id", "titanium",
 		"resource-step", 2,
 		"harvest-from-outside"}, 
-		{"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",
-		"resource-id", "crystal",
+		{"resource-id", "crystal",
 		"resource-step", 2,
 		"harvest-from-outside"}},
 	SelectableByRectangle = true,

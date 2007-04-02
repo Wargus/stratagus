@@ -426,12 +426,6 @@
 **
 **    The resource this is for. Mostly redundant.
 **
-**  ResourceInfo::FinalResource
-**
-**    The resource is converted to this at the depot. Usefull for
-**    a fisherman who harvests fish, but it all turns to food at the
-**    depot.
-**
 **  ResourceInfo::ResourceStep
 **
 **    The unit makes so-caled mining cycles. Each mining cycle
@@ -483,20 +477,12 @@ public:
 
 class ResourceInfo {
 public:
-	ResourceInfo() : HarvestFromOutside(0), ResourceStep(0),
-		ResourceId(0), FinalResource(0),
-		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
+	ResourceInfo() : HarvestFromOutside(0), ResourceStep(0), ResourceId(0)
 	{}
 
-	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
-	std::string FileWhenEmpty;      /// Change the graphic when the unit is empty.
 	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
 	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
-	unsigned FinalResource;         /// Convert resource when delivered.
-	//  Runtime info:
-	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 };
 
 /**
