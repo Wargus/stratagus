@@ -58,8 +58,8 @@ enum CostType {
 	TimeCost,                               /// time in game cycles
 
 // standard
-	GoldCost,                               /// gold  resource
-	WoodCost,                               /// wood  resource
+	EnergyCost,                             /// energy resource
+	MagmaCost,                              /// magma resource
 
 	MaxCosts                                /// how many different costs
 };

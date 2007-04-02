@@ -506,8 +506,8 @@ void AiInit(CPlayer *player)
 	pai->AiType = ait;
 	pai->Script = ait->Script;
 
-	pai->Collect[GoldCost] = 50;
-	pai->Collect[WoodCost] = 50;
+	pai->Collect[EnergyCost] = 50;
+	pai->Collect[MagmaCost] = 50;
 
 	player->Ai = pai;
 }

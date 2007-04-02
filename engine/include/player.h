@@ -118,12 +118,10 @@
 **
 **    How many resources the player owns. Needed for building
 **    units and structures.
-**    @see _costs_, TimeCost, GoldCost, WoodCost, MaxCosts.
 **
 **  CPlayer::Incomes[::MaxCosts]
 **
 **    Income of the resources, when they are delivered at a store.
-**    @see _costs_, TimeCost, GoldCost, WoodCost, MaxCosts.
 **
 **  CPlayer::LastResources[::MaxCosts]
 **
@@ -220,7 +218,6 @@
 **  CPlayer::TotalResources[::MaxCosts]
 **
 **    Total number of resources collected.
-**    @see _costs_, TimeCost, GoldCost, WoodCost, MaxCosts.
 **
 **  CPlayer::TotalRazings
 **
