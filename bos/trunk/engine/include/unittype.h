@@ -296,10 +296,6 @@
 **    Says what color a unit will have when it's neutral and
 **    is displayed on the minimap.
 **
-**  CUnitType::CanStore[::MaxCosts]
-**
-**    What resource types we can store here.
-**
 **  CUnitType::Vanishes
 **
 **    Corpes & destroyed places
@@ -769,7 +765,6 @@ public:
 	{
 		memset(_Costs, 0, sizeof(_Costs));
 		memset(RepairCosts, 0, sizeof(RepairCosts));
-		memset(CanStore, 0, sizeof(CanStore));
 		memset(ResInfo, 0, sizeof(ResInfo));
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
 		memset(ProductionRate, 0, sizeof(ProductionRate));
@@ -877,7 +872,6 @@ public:
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
 
-	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.

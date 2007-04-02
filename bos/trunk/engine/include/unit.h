@@ -968,8 +968,6 @@ extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
 extern CUnit *ResourceOnMap(int tx, int ty, int resource);
-	/// Return resource deposit, if on map tile
-extern CUnit *ResourceDepositOnMap(int tx, int ty, int resource);
 
 	/// Find best enemy in numeric range to attack
 extern CUnit *AttackUnitsInDistance(const CUnit *unit, int range);

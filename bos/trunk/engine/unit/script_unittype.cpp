@@ -717,16 +717,6 @@ static int CclDefineUnitType(lua_State *l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "CanHarvest")) {
 			type->CanHarvest = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "CanStore")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				type->CanStore[CclGetResourceByName(l)] = 1;
-				lua_pop(l, 1);
-			}
 		} else if (!strcmp(value, "Vanishes")) {
 			type->Vanishes = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanCastSpell")) {
