@@ -35,7 +35,7 @@ DefineIcon({
 
 -- Note: the name of the unit is hardcoded as unit-gold-mine in the editor.
 DefineUnitType("unit-gold-mine", {
-	Name = "Titanium Field",
+	Name = "Energy Field",
 	Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
 	Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
 	Animations = "animations-building", Icon = "icon-rocks_field",
@@ -46,7 +46,7 @@ DefineUnitType("unit-gold-mine", {
 	SightRange = 1, Speed = 0, HitPoints = 25500, Priority = 0,
 	Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Corpse = "unit-destroyed-4x4-place", ExplodeWhenKilled = "missile-explosion",
-	Type = "land", Building = true, GivesResource = "titanium", CanHarvest = true
+	Type = "land", Building = true, GivesResource = "energy", CanHarvest = true
     --[[
 	Sounds = {
 		"selected", "gold-mine-selected",

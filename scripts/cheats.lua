@@ -31,13 +31,13 @@ speedcheat = false
 godcheat = false
 
 function HandleCheats(str)
-  local resources = { "titanium", "crystal" }
+  local resources = { "energy", "magma" }
 
   if (str == "rich") then
-    SetPlayerData(GetThisPlayer(), "Resources", "titanium",
-      GetPlayerData(GetThisPlayer(), "Resources", "titanium") + 12000)
-    SetPlayerData(GetThisPlayer(), "Resources", "crystal",
-      GetPlayerData(GetThisPlayer(), "Resources", "crystal") + 5000)
+    SetPlayerData(GetThisPlayer(), "Resources", "energy",
+      GetPlayerData(GetThisPlayer(), "Resources", "energy") + 12000)
+    SetPlayerData(GetThisPlayer(), "Resources", "magma",
+      GetPlayerData(GetThisPlayer(), "Resources", "magma") + 5000)
     AddMessage("!!! :)")
 
   elseif (str == "reveal") then

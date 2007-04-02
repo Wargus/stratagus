@@ -85,5 +85,5 @@ for i = 1, 13 do
         Armor = 999, Missile = "missile-none",
         Priority = 0, Corpse = "unit-destroyed-1x1-place",
         Type = "land", Building = true, VisibleUnderFog = true,
-        GivesResource = "crystal", CanHarvest = true})
+        GivesResource = "magma", CanHarvest = true})
 end

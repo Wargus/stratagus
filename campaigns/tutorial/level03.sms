@@ -46,8 +46,8 @@ AddTrigger(
 
 AddTrigger(
     function() 
-       local t = GetPlayerData(GetThisPlayer(), "Resources", "titanium")
-       local c = GetPlayerData(GetThisPlayer(), "Resources", "crystal")
+       local t = GetPlayerData(GetThisPlayer(), "Resources", "energy")
+       local c = GetPlayerData(GetThisPlayer(), "Resources", "magma")
        return (t > 1099 and c > 2199) end,
     function() return StopGame(GameVictory) end)
   

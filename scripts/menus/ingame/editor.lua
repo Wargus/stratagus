@@ -197,7 +197,7 @@ function RunEditorPlayerPropertiesMenu()
     dropdownids[d] = i
   end
 
-  local l = Label(_("Titanium"))
+  local l = Label(_("Energy"))
   l:setFont(Fonts["game"])
   l:adjustSize()
   menu:add(l, 420, 40 + (22 * 0))
@@ -206,7 +206,7 @@ function RunEditorPlayerPropertiesMenu()
     local d = menu:addTextInputField("" .. 1, 420, 40 + (22 * (i + 1)), 60)
   end
 
-  local l = Label(_("Crystal"))
+  local l = Label(_("Magma"))
   l:setFont(Fonts["game"])
   l:adjustSize()
   menu:add(l, 490, 40 + (22 * 0))

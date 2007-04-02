@@ -63,7 +63,7 @@ DefineUnitType("unit-rock-1", {
 	Type = "land",
 	Building = true,
 	NumDirections = 1,
-	GivesResource = "titanium", 
+	GivesResource = "energy", 
 	CanHarvest = true,
 	Sounds = {}
 })
@@ -100,7 +100,7 @@ DefineUnitType("unit-rock-2", {
 	Type = "land",
 	Building = true,
 	NumDirections = 1,
-	GivesResource = "titanium", 
+	GivesResource = "energy", 
 	CanHarvest = true,
 	Sounds = {}
 })
@@ -137,7 +137,7 @@ DefineUnitType("unit-rock-3", {
 	Type = "land",
 	Building = true,
 	NumDirections = 1,
-	GivesResource = "titanium", 
+	GivesResource = "energy", 
 	CanHarvest = true,
 	Sounds = {}
 })
@@ -174,7 +174,7 @@ DefineUnitType("unit-rock-4", {
 	Type = "land",
 	Building = true,
 	NumDirections = 1,
-	GivesResource = "titanium", 
+	GivesResource = "energy", 
 	CanHarvest = true,
 	Sounds = {}
 })
@@ -211,7 +211,7 @@ DefineUnitType("unit-rock-5", {
 	Type = "land",
 	Building = true,
 	NumDirections = 1,
-	GivesResource = "titanium", 
+	GivesResource = "energy", 
 	CanHarvest = true,
 	Sounds = {}
 })
@@ -248,7 +248,7 @@ DefineUnitType("unit-rock-6", {
 	Type = "land",
 	Building = true,
 	NumDirections = 1,
-	GivesResource = "titanium", 
+	GivesResource = "energy", 
 	CanHarvest = true,
 	Sounds = {}
 })

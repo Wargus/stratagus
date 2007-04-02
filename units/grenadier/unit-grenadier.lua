@@ -64,7 +64,7 @@ DefineUnitType("unit-grenadier", {
 	Image = {"file", GetCurrentLuaPath().."/unit_grenadier.png", "size", {64, 64}},
 	Shadow  = {"file", GetCurrentLuaPath().."/unit_grenadier_s.png", "size", {64, 64}},
 	Animations = "animations-grenadier", Icon = "icon-grenadier",
-	Costs = {"time", 40, "titanium", 25, "crystal", 100},
+	Costs = {"time", 40, "energy", 25, "magma", 100},
 	Speed = 10, HitPoints = 50, DrawLevel = 25,
 	TileSize = {1, 1}, BoxSize = {17, 28}, SightRange = 6,
 	ComputerReactionRange = 6, PersonReactionRange = 6,
