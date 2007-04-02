@@ -185,29 +185,6 @@ static int CclPlayer(lua_State *l)
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
-		} else if (!strcmp(value, "last-resources")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-
-				for (i = 0; i < MaxCosts; ++i) {
-					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->LastResources[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
 		} else if (!strcmp(value, "incomes")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -223,29 +200,6 @@ static int CclPlayer(lua_State *l)
 					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->Incomes[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
-		} else if (!strcmp(value, "revenue")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-
-				for (i = 0; i < MaxCosts; ++i) {
-					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->Revenue[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}

@@ -19,7 +19,6 @@ class CPlayer
 
 	int Resources[MaxCosts];
 	int Incomes[MaxCosts];
-	const int Revenue[MaxCosts];
 
 	const int UnitTypesCount[UnitTypeMax];
 

@@ -123,16 +123,6 @@
 **
 **    Income of the resources, when they are delivered at a store.
 **
-**  CPlayer::LastResources[::MaxCosts]
-**
-**    Keeps track of resources in time (used for calculating
-**    CPlayer::Revenue, see below)
-**
-**  CPlayer::Revenue[::MaxCosts]
-**
-**    Production of resources per minute (or estimates)
-**    Used just as information (statistics) for the player...
-**
 **  CPlayer::UnitTypesCount[::UnitTypeMax]
 **
 **    Total count for each different unit type. Used by the AI and
@@ -294,9 +284,7 @@ public:
 	int StartY;  /// map tile start Y position
 
 	int Resources[MaxCosts];      /// resources in store
-	int LastResources[MaxCosts];  /// last values for revenue
 	int Incomes[MaxCosts];        /// income of the resources
-	int Revenue[MaxCosts];        /// income rate of the resources
 
 	std::map<CUnit *, int *> UnitsConsumingResourcesActual;
 	std::map<CUnit *, int *> UnitsConsumingResourcesRequested;
