@@ -261,33 +261,6 @@ CUnit *ResourceOnMap(int tx, int ty, int resource)
 	return NoUnitP;
 }
 
-/**
-**  Resource deposit on map tile
-**
-**  @param tx        X position on map, tile-based.
-**  @param ty        Y position on map, tile-based.
-**  @param resource  resource type.
-**
-**  @return          Returns the deposit if found, or NoUnitP.
-*/
-CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
-{
-	CUnit *table[UnitMax];
-	int i;
-	int n;
-
-	n = UnitCacheOnTile(tx, ty, table);
-	for (i = 0; i < n; ++i) {
-		if (table[i]->IsUnusable()) {
-			continue;
-		}
-		if (table[i]->Type->CanStore[resource]) {
-			return table[i];
-		}
-	}
-	return NoUnitP;
-}
-
 /*----------------------------------------------------------------------------
 --  Finding units for attack
 ----------------------------------------------------------------------------*/
