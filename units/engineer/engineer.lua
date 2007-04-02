@@ -86,12 +86,10 @@ DefineUnitType("unit-engineer", {
 	CanGatherResources = {{
 		"file-when-loaded", GetCurrentLuaPath().."/unit_engineer.png",
 		"resource-id", "titanium",
-		"wait-at-resource", 7,
 		"resource-step", 1,
 		"harvest-from-outside"}, 
 		{"file-when-loaded", GetCurrentLuaPath().."/unit_engineer.png",
 			"resource-id", "crystal",
-			"wait-at-resource", 7,
 			"resource-step", 1,
 			"harvest-from-outside"}},
 	organic = true, SelectableByRectangle = true,
