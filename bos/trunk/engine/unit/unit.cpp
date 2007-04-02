@@ -1470,6 +1470,7 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	UpdateForNewUnit(this, 1);
 }
 
+#if 0
 /**
 **  Change the owner of all units of a player.
 **
@@ -1497,6 +1498,7 @@ static void ChangePlayerOwner(CPlayer *oldplayer, CPlayer *newplayer)
 		unit->RescuedFrom = oldplayer;
 	}
 }
+#endif
 
 /**
 **  Rescue units.
@@ -1561,7 +1563,7 @@ void RescueUnits(void)
 						//  City center converts complete player
 						//  FIXME: what unit should we use here?
 						//
-						if (???) {
+						if (0) {
 							ChangePlayerOwner(p, around[i]->Player);
 							break;
 						}
