@@ -9,7 +9,7 @@
 //
 /**@name botpanel.cpp - The bottom panel. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2007 by Lutz Sammer, Vladi Belperchinov-Shabanski,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -219,7 +219,6 @@ static int GetButtonStatus(const ButtonAction *button)
 			action = UnitActionPatrol;
 			break;
 		case ButtonHarvest:
-		case ButtonReturn:
 			action = UnitActionResource;
 			break;
 		default:
@@ -420,6 +419,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 		case ButtonStandGround:
 		case ButtonButton:
 		case ButtonMove:
+		case ButtonHarvest:
 			res = true;
 			break;
 		case ButtonRepair:
@@ -427,22 +427,6 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			break;
 		case ButtonPatrol:
 			res = CanMove(unit);
-			break;
-		case ButtonHarvest:
-			if (!unit->CurrentResource ||
-					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
-					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
-						unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
-				res = true;
-			}
-			break;
-		case ButtonReturn:
-			if (!(!unit->CurrentResource ||
-					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
-					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
-						unit->Type->ResInfo[unit->CurrentResource]->LoseResources))) {
-				res = true;
-			}
 			break;
 		case ButtonAttack:
 			res = ButtonCheckAttack(unit, buttonaction);
@@ -760,12 +744,6 @@ void CButtonPanel::DoClicked(int button)
 			CurrentButtonLevel = 9; // level 9 is cancel-only
 			UI.ButtonPanel.Update();
 			UI.StatusLine.Set(_("Select Target"));
-			break;
-		case ButtonReturn:
-			for (i = 0; i < NumSelected; ++i) {
-				SendCommandReturnGoods(Selected[i], NoUnitP,
-					!(KeyModifiers & ModifierShift));
-			}
 			break;
 		case ButtonStop:
 			for (i = 0; i < NumSelected; ++i) {

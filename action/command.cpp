@@ -725,48 +725,6 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 }
 
 /**
-**  Let unit returning goods.
-**
-**  @param unit   pointer to unit.
-**  @param goal   bring goods to this depot.
-**  @param flush  if true, flush command queue.
-*/
-void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
-{
-	COrder *order;
-
-	//
-	// Check if unit is still valid and Goal still alive? (NETWORK!)
-	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
-		if (!unit->Type->Building && !unit->Type->Harvester && !unit->ResourcesHeld) {
-			ClearSavedAction(unit);
-			return;
-		}
-
-		if (unit->Type->Building) {
-			// FIXME: should find a better way for pending orders.
-			order = &unit->NewOrder;
-			ReleaseOrder(order);
-		} else if (!(order = GetNextOrder(unit, flush))) {
-			return;
-		}
-		order->Init();
-
-		order->Action = UnitActionReturnGoods;
-		//
-		// Destination could be killed. NETWORK!
-		//
-		if (goal && !goal->Destroyed) {
-			order->Goal = goal;
-			goal->RefsIncrease();
-		}
-		order->Range = 1;
-	}
-	ClearSavedAction(unit);
-}
-
-/**
 **  Building starts training a unit.
 **
 **  @param unit   pointer to unit.
@@ -876,24 +834,6 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 			SelectedUnitChanged();
 		}
 	}
-}
-
-/**
-**  Immediate transforming unit into type.
-**
-**  @param unit   pointer to unit.
-**  @param type   upgrade to type
-*/
-void CommandTransformIntoType(CUnit *unit, CUnitType *type)
-{
-	COrder *order;
-
-	Assert(unit->CriticalOrder.Action == UnitActionStill);
-	order = &unit->CriticalOrder;
-	order->Init();
-
-	order->Action = UnitActionTransformInto;
-	order->Type = type;
 }
 
 /**

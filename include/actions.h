@@ -104,17 +104,12 @@ extern void CommandDismiss(CUnit *unit);
 	/// Prepare command resource
 extern void CommandResource(CUnit *unit, CUnit *dest,
 	int flush);
-	/// Prepare command return
-extern void CommandReturnGoods(CUnit *unit, CUnit *goal,
-	int flush);
 	/// Prepare command train
 extern void CommandTrainUnit(CUnit *unit, CUnitType *what,
 	int flush);
 	/// Prepare command cancel training
 extern void CommandCancelTraining(CUnit *unit, int slot,
 	const CUnitType *type);
-	/// immediate transforming into type.
-extern void CommandTransformIntoType(CUnit *unit, CUnitType *type);
 	/// Prepare command spellcast
 extern void CommandSpellCast(CUnit *unit, int x, int y,
 	CUnit *dest, SpellType *spell, int flush);
@@ -159,8 +154,6 @@ extern void HandleActionBoard(CUnit *unit);
 extern void HandleActionUnload(CUnit *unit);
 	/// Handle command resource
 extern void HandleActionResource(CUnit *unit);
-	/// Handle command return
-extern void HandleActionReturnGoods(CUnit *unit);
 	/// Handle command die
 extern void HandleActionDie(CUnit *unit);
 	/// Handle command build
