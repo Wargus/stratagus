@@ -9,7 +9,7 @@
 //
 /**@name script_ui.cpp - The ui ccl functions. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      (c) Copyright 1999-2007 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1177,8 +1177,6 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonStandGround;
 			} else if (!strcmp(value, "attack-ground")) {
 				ba.Action = ButtonAttackGround;
-			} else if (!strcmp(value, "return-goods")) {
-				ba.Action = ButtonReturn;
 			} else if (!strcmp(value, "cast-spell")) {
 				ba.Action = ButtonSpellCast;
 			} else if (!strcmp(value, "unload")) {

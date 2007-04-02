@@ -2362,12 +2362,10 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	int ep;
 	int i;
 	int w;
-	int n;
 	unsigned char *m;
 	unsigned char *matrix;
-	const CUnit *destu;
-	CUnit *mine;
-	CUnit *bestmine;
+	CUnit *res;
+	CUnit *bestres;
 	int destx;
 	int desty;
 	int bestd;
@@ -2379,19 +2377,15 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 		Map.Info.MapWidth * Map.Info.MapHeight / 4 : range * range * 5;
 	points = new p[size];
 
-	// Find the nearest gold depot
-	if ((destu = FindDeposit(unit, x, y,range,resource))) {
-		NearestOfUnit(destu, x, y, &destx, &desty);
-	}
 	bestd = 99999;
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
 	w = Map.Info.MapWidth + 2;
 	matrix += w + w + 2;
-	//  Unit movement mask
+	// Unit movement mask
 	mask = unit->Type->MovementMask;
-	//  Ignore all units along the way. Might seem wierd, but otherwise
-	//  peasants would lock at a mine with a lot of workers.
+	// Ignore all units along the way. Might seem weird, but otherwise
+	// peasants would lock at a resource with a lot of workers.
 	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit);
 	points[0].X = x;
 	points[0].Y = y;
@@ -2399,7 +2393,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
-	bestmine = NoUnitP;
+	bestres = NoUnitP;
 
 	//
 	// Pop a point from stack, push all neighbors which could be entered.
@@ -2421,24 +2415,15 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 				}
 
 				//
-				// Look if there is a mine
+				// Look if there is a resource
 				//
-				if ((mine = ResourceOnMap(x, y, resource)) &&
-						mine->Type->CanHarvest &&
-						(mine->Player->Index == PlayerMax - 1 ||
-							mine->Player == unit->Player ||
-							(unit->IsAllied(mine) && mine->IsAllied(unit)))) {
-					if (destu) {
-						n = (abs(destx - x) > abs(desty - y)) ? abs(destx - x) : abs(desty - y);
-						if (n < bestd) {
-							bestd = n;
-							bestmine = mine;
-						}
-						*m = 99;
-					} else { // no goal take the first
-						delete[] points;
-						return mine;
-					}
+				if ((res = ResourceOnMap(x, y, resource)) &&
+						res->Type->CanHarvest &&
+						(res->Player->Index == PlayerMax - 1 ||
+							res->Player == unit->Player ||
+							(unit->IsAllied(res) && res->IsAllied(unit)))) {
+					delete[] points;
+					return res;
 				}
 
 				if (CanMoveToMask(x, y, mask)) { // reachable
@@ -2463,129 +2448,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 		// Take best of this frame, if any.
 		if (bestd != 99999) {
 			delete[] points;
-			return bestmine;
-		}
-		++cdist;
-		if (rp == wp || cdist >= range) { // unreachable, no more points available
-			break;
-		}
-		// Continue with next set.
-		ep = wp;
-	}
-	delete[] points;
-	return NoUnitP;
-}
-
-/**
-**  Find deposit. This will find a deposit for a resource
-**
-**  @param unit        The unit that wants to find a resource.
-**  @param x           Closest to x
-**  @param y           Closest to y
-**  @param range       Maximum distance to the deposit.
-**  @param resource    Resource to find deposit from.
-**
-**  @note This will return a reachable allied depot.
-**
-**  @return            NoUnitP or deposit unit
-*/
-CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
-{
-	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
-	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
-	int size;
-	int rx;
-	int ry;
-	int mask;
-	int wp;
-	int rp;
-	int ep;
-	int i;
-	int w;
-	int nodes_searched;
-	unsigned char *m;
-	unsigned char *matrix;
-	CUnit *depot;
-	int destx;
-	int desty;
-	int cdist;
-
-	nodes_searched = 0;
-
-	destx = x;
-	desty = y;
-	size = (Map.Info.MapWidth * Map.Info.MapHeight / 4 < range * range * 5) ?
-		Map.Info.MapWidth * Map.Info.MapHeight / 4 : range * range * 5;
-	points = new p[size];
-
-	// Make movement matrix. FIXME: can create smaller matrix.
-	matrix = CreateMatrix();
-	w = Map.Info.MapWidth + 2;
-	matrix += w + w + 2;
-	//  Unit movement mask
-	mask = unit->Type->MovementMask;
-	//  Ignore all units along the way. Might seem wierd, but otherwise
-	//  peasants would lock at a mine with a lot of workers.
-	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit | MapFieldBuilding);
-	points[0].X = x;
-	points[0].Y = y;
-	rp = 0;
-	matrix[x + y * w] = 1; // mark start point
-	ep = wp = 1; // start with one point
-	cdist = 0; // current distance is 0
-
-	//
-	// Pop a point from stack, push all neighbors which could be entered.
-	//
-	for (;;) {
-		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				++nodes_searched;
-				//  Make sure we don't leave the map.
-				if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
-					continue;
-				}
-				m = matrix + x + y * w;
-				//  Check if visited or unexplored
-				if (*m || !Map.IsFieldExplored(unit->Player, x, y)) {
-					continue;
-				}
-				//
-				// Look if there is a deposit
-				//
-				if ((depot = ResourceDepositOnMap(x, y, resource)) &&
-						((unit->IsAllied(depot) && depot->IsAllied(unit)) ||
-							(unit->Player == depot->Player))) {
-					delete[] points;
-					return depot;
-				}
-				if (CanMoveToMask(x, y, mask)) { // reachable
-					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-					if (wp == ep) {
-						//  We are out of points, give up!
-						DebugPrint("Ran out of points the hard way, beware.\n");
-						break;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
+			return bestres;
 		}
 		++cdist;
 		if (rp == wp || cdist >= range) { // unreachable, no more points available
@@ -3506,12 +3369,6 @@ void SaveOrder(const COrder *order, CFile *file)
 		case UnitActionResource:
 			file->printf("\"action-resource\",");
 			break;
-		case UnitActionReturnGoods:
-			file->printf("\"action-return-goods\",");
-			break;
-		case UnitActionTransformInto:
-			file->printf("\"action-transform-into\",");
-			break;
 		default:
 			DebugPrint("Unknown action in order\n");
 	}
@@ -3541,10 +3398,6 @@ void SaveOrder(const COrder *order, CFile *file)
 			if (order->Arg1.Spell) {
 				file->printf(" \"spell\", \"%s\",", order->Arg1.Spell->Ident.c_str());
 			}
-			break;
-		case UnitActionResource :
-		case UnitActionReturnGoods :
-			file->printf(" \"mine\", %d,", order->Arg1.ResourcePos);
 			break;
 		default:
 			break;
@@ -3736,11 +3589,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 			}
 			break;
 		case UnitActionResource:
-			file->printf(", \"data-res-worker\", {\"time-to-harvest\", %d,", unit->Data.ResWorker.TimeToHarvest);
-			if (unit->Data.ResWorker.DoneHarvesting) {
-				file->printf(" \"done-harvesting\",");
-			}
-			file->printf("}");
+			file->printf(", \"data-res-worker\", {\"time-to-harvest\", %d,}", unit->Data.ResWorker.TimeToHarvest);
 			break;
 		case UnitActionBuilt:
 			{

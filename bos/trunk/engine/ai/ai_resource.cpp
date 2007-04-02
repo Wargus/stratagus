@@ -520,7 +520,6 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 */
 static void AiCollectResources(void)
 {
-	CUnit *units_with_resource[UnitMax][MaxCosts]; // Worker with resource
 	CUnit *units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
 	CUnit *units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];
@@ -583,16 +582,6 @@ static void AiCollectResources(void)
 		// Ignore busy units. ( building, fighting, ... )
 		//
 		if (!unit->IsIdle()) {
-			continue;
-		}
-
-		//
-		// Send workers with resources back home.
-		//
-		if (unit->ResourcesHeld && c) {
-			units_with_resource[num_units_with_resource[c]++][c] = unit;
-			CommandReturnGoods(unit, 0, FlushCommands);
-			total_harvester++;
 			continue;
 		}
 

@@ -108,11 +108,6 @@ DefineButton({
 	Action = "harvest", Key = "h", Hint = "~!HARVEST CRYSTALS",
 	ForUnit = {"unit-harvester"}})
 
-DefineButton({
-	Pos = 6, Level = 0, Icon = "icon-return-goods-peasant",
-	Action = "return-goods", Key = "g", Hint = "~!GO BACK WITH RESOURCES",
-	ForUnit = {"unit-engineer", "unit-harvester"}})
-
 -- build basic/advanced structs -----------------------------------------------
 
 DefineButton({

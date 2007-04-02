@@ -442,25 +442,9 @@
 **    it does some sort of animation and gains ResourceStep
 **    resources. You can stop after any number of steps.
 **    when the quantity in the harvester reaches the maximum
-**    (ResourceCapacity) it will return home. I this is 0 then
+**    (ResourceCapacity) it will return home. If this is 0 then
 **    it's considered infinity, and ResourceCapacity will now
 **    be the limit.
-**
-**  ResourceInfo::ResourceCapacity
-**
-**    Maximum amount of resources a harvester can carry. The
-**    actual amount can be modified while unloading.
-**
-**  ResourceInfo::LoseResources
-**
-**    Special lossy behaviour for loaded harvesters. Harvesters
-**    with loads other than 0 and ResourceCapacity will lose their
-**    cargo on any new order.
-**
-**  ResourceInfo::WaitAtDepot
-**
-**    Cycles the unit waits while inside the depot to unload.
-**
 */
 
 /*----------------------------------------------------------------------------
@@ -504,8 +488,8 @@ public:
 class ResourceInfo {
 public:
 	ResourceInfo() : HarvestFromOutside(0), WaitAtResource(0), ResourceStep(0),
-		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
-		LoseResources(0), SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
+		ResourceId(0), FinalResource(0),
+		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
 
 	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
@@ -513,11 +497,8 @@ public:
 	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
 	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
 	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
-	int      ResourceCapacity;      /// Max amount of resources to carry.
-	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 	unsigned FinalResource;         /// Convert resource when delivered.
-	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty

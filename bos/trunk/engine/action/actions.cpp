@@ -254,7 +254,7 @@ static void HandleActionNone(CUnit *unit)
 **
 **  @note can move function into unit structure.
 */
-static void (*HandleActionTable[256])(CUnit *) = {
+static void (*HandleActionTable[])(CUnit *) = {
 	HandleActionNone,
 	HandleActionStill,
 	HandleActionStandGround,
@@ -272,7 +272,6 @@ static void (*HandleActionTable[256])(CUnit *) = {
 	HandleActionBuild,
 	HandleActionRepair,
 	HandleActionResource,
-	HandleActionReturnGoods,
 };
 
 /**
@@ -396,12 +395,6 @@ static void HandleUnitAction(CUnit *unit)
 				// Still shouldn't have a reference unless attacking
 				Assert(!(unit->Orders[0]->Action == UnitActionStill && !unit->SubAction));
 				unit->Orders[0]->Goal->RefsDecrease();
-			}
-			if (unit->CurrentResource) {
-				if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
-					unit->ResourcesHeld < unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
-					unit->ResourcesHeld = 0;
-				}
 			}
 
 			if ((unit->Orders[0]->Action == UnitActionBuild && !unit->Type->BuilderOutside && unit->SubAction == 40) ||
