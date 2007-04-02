@@ -88,12 +88,10 @@ DefineUnitType("unit-harvester", {
 	CanGatherResources = {{
 		"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",
 		"resource-id", "titanium",
-		"wait-at-resource", 2,
 		"resource-step", 2,
 		"harvest-from-outside"}, 
 		{"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",
 		"resource-id", "crystal",
-		"wait-at-resource", 2,
 		"resource-step", 2,
 		"harvest-from-outside"}},
 	SelectableByRectangle = true,
