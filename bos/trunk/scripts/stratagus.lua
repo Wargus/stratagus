@@ -134,9 +134,9 @@ SetFogOfWarOpacity(128)
 DefineDefaultIncomes(0, 100, 100)
 DefineDefaultActions("stop", "mine", "harvest")
 
-DefineDefaultResourceNames("time", "titanium", "crystal")
+DefineDefaultResourceNames("time", "energy", "magma")
 
-DefineDefaultResourceAmounts("titanium", 150, "crystal", 150)
+DefineDefaultResourceAmounts("energy", 150, "magma", 150)
 
 DefinePlayerColorIndex(208, 4)
 

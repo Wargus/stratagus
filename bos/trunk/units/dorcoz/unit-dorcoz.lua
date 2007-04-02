@@ -57,7 +57,7 @@ DefineUnitType("unit-dorcoz", {
         Name = "Dorcoz",
         Image = {"file", "units/dorcoz/unit_dorcoz.png", "size", {64, 64}},
         Animations = "animations-dorcoz", Icon = "icon-dorcoz",
-        Costs = {"time", 100, "titanium", 50, "crystal", 300}, Speed = 10,
+        Costs = {"time", 100, "energy", 50, "magma", 300}, Speed = 10,
         HitPoints = 100, DrawLevel = 40, TileSize = {1, 1}, BoxSize = {31, 31},
         SightRange = 7, ComputerReactionRange = 7, PersonReactionRange = 7,
         Armor = 2, BasicDamage = 6, PiercingDamage = 3, Missile = "missile-dorcoz",

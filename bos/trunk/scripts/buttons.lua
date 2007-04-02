@@ -99,13 +99,13 @@ DefineButton({
 
 DefineButton({
 	Pos = 5, Level = 0, Icon = "icon-harvest",
-	Action = "harvest", Key = "h", Hint = "~!MINE TITANIUM",
+	Action = "harvest", Key = "h", Hint = "~!HARVEST RESOURCE",
 	ForUnit = {"unit-engineer"}})
 
 -- TODO !!!!!
 DefineButton({
 	Pos = 5, Level = 0, Icon = "icon-harvest",
-	Action = "harvest", Key = "h", Hint = "~!HARVEST CRYSTALS",
+	Action = "harvest", Key = "h", Hint = "~!HARVEST RESOURCE",
 	ForUnit = {"unit-harvester"}})
 
 -- build basic/advanced structs -----------------------------------------------
