@@ -128,12 +128,12 @@ static int StartGathering(CUnit *unit)
 	Assert(MapDistanceBetweenUnits(unit, goal) <= 1);
 
 	//
-	// Update the heading of a harvesting unit to looks straight at the resource.
+	// Update the heading of a harvesting unit to look straight at the resource.
 	//
 	if (goal) {
 		UnitHeadingFromDeltaXY(unit,
-			2 * (goal->X - unit->X) + goal->Type->TileWidth,
-			2 * (goal->Y - unit->Y) + goal->Type->TileHeight);
+			(goal->X - unit->X) + goal->Type->TileWidth / 2,
+			(goal->Y - unit->Y) + goal->Type->TileHeight / 2);
 	}
 
 	//
