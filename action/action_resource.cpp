@@ -132,8 +132,8 @@ static int StartGathering(CUnit *unit)
 	//
 	if (goal) {
 		UnitHeadingFromDeltaXY(unit,
-			(goal->X - unit->X) + goal->Type->TileWidth / 2,
-			(goal->Y - unit->Y) + goal->Type->TileHeight / 2);
+			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 	}
 
 	//
