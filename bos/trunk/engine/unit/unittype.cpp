@@ -398,9 +398,6 @@ void InitUnitTypes(int reset_player_stats)
 */
 void LoadUnitTypeSprite(CUnitType *type)
 {
-	ResourceInfo *resinfo;
-	int i;
-
 	if (!type->ShadowFile.empty()) {
 		type->ShadowSprite = CGraphic::ForceNew(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
@@ -409,29 +406,6 @@ void LoadUnitTypeSprite(CUnitType *type)
 			type->ShadowSprite->Flip();
 		}
 		type->ShadowSprite->MakeShadow();
-	}
-
-	if (type->Harvester) {
-		for (i = 0; i < MaxCosts; ++i) {
-			if ((resinfo = type->ResInfo[i])) {
-				if (!resinfo->FileWhenLoaded.empty()) {
-					resinfo->SpriteWhenLoaded = CPlayerColorGraphic::New(resinfo->FileWhenLoaded,
-						type->Width, type->Height);
-					resinfo->SpriteWhenLoaded->Load();
-					if (type->Flip) {
-						resinfo->SpriteWhenLoaded->Flip();
-					}
-				}
-				if (!resinfo->FileWhenEmpty.empty()) {
-					resinfo->SpriteWhenEmpty = CPlayerColorGraphic::New(resinfo->FileWhenEmpty,
-						type->Width, type->Height);
-					resinfo->SpriteWhenEmpty->Load();
-					if (type->Flip) {
-						resinfo->SpriteWhenEmpty->Flip();
-					}
-				}
-			}
-		}
 	}
 
 	if (!type->File.empty()) {
@@ -567,12 +541,6 @@ void CleanUnitTypes(void)
 
 		for (res = 0; res < MaxCosts; ++res) {
 			if (type->ResInfo[res]) {
-				if (type->ResInfo[res]->SpriteWhenLoaded) {
-					CGraphic::Free(type->ResInfo[res]->SpriteWhenLoaded);
-				}
-				if (type->ResInfo[res]->SpriteWhenEmpty) {
-					CGraphic::Free(type->ResInfo[res]->SpriteWhenEmpty);
-				}
 				delete type->ResInfo[res];
 			}
 		}

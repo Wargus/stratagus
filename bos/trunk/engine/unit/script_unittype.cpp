@@ -699,28 +699,13 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						res->ResourceStep = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "final-resource")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->FinalResource = CclGetResourceByName(l);
-						lua_pop(l, 1);
 					} else if (!strcmp(value, "harvest-from-outside")) {
 						res->HarvestFromOutside = 1;
 						--k;
-					} else if (!strcmp(value, "file-when-empty")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->FileWhenEmpty = LuaToString(l, -1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "file-when-loaded")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->FileWhenLoaded = LuaToString(l, -1);
-						lua_pop(l, 1);
 					} else {
 					   printf("\n%s\n", type->Name.c_str());
 					   LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
-				}
-				if (!res->FinalResource) {
-					res->FinalResource = res->ResourceId;
 				}
 				Assert(res->ResourceId);
 				lua_pop(l, 1);

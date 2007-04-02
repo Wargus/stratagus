@@ -83,15 +83,13 @@ DefineUnitType("unit-engineer", {
 	MaxAttackRange = 1, Priority = 50, Points = 30, Corpse = "unit-dead-body2",
 	Type = "land", RightMouseAction = "harvest", RepairRange = 1,
 	CanTargetLand = true, LandUnit = true, Coward = true,
-	CanGatherResources = {{
-		"file-when-loaded", GetCurrentLuaPath().."/unit_engineer.png",
-		"resource-id", "titanium",
+	CanGatherResources = {
+		{"resource-id", "titanium",
 		"resource-step", 1,
 		"harvest-from-outside"}, 
-		{"file-when-loaded", GetCurrentLuaPath().."/unit_engineer.png",
-			"resource-id", "crystal",
-			"resource-step", 1,
-			"harvest-from-outside"}},
+		{"resource-id", "crystal",
+		"resource-step", 1,
+		"harvest-from-outside"}},
 	organic = true, SelectableByRectangle = true,
 	Sounds = {
 		"selected", "engineer-selected",

@@ -1013,8 +1013,6 @@ void CUnit::Draw() const
 	int frame;
 	int state;
 	int constructed;
-	CPlayerColorGraphic *sprite;
-	ResourceInfo *resinfo;
 	CConstructionFrame *cframe;
 	CUnitType *type;
 
@@ -1077,23 +1075,6 @@ void CUnit::Draw() const
 	DrawUnitSelection(this);
 
 	//
-	// Adjust sprite for Harvesters.
-	//
-	sprite = type->Sprite;
-	if (type->Harvester && this->CurrentResource) {
-		resinfo = type->ResInfo[this->CurrentResource];
-		if (this->ResourcesHeld) {
-			if (resinfo->SpriteWhenLoaded) {
-				sprite = resinfo->SpriteWhenLoaded;
-			}
-		} else {
-			if (resinfo->SpriteWhenEmpty) {
-				sprite = resinfo->SpriteWhenEmpty;
-			}
-		}
-	}
-
-	//
 	// Now draw!
 	// Buildings under construction/upgrade/ready.
 	//
@@ -1108,11 +1089,11 @@ void CUnit::Draw() const
 	//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
-		DrawUnitType(type, sprite,
+		DrawUnitType(type, type->Sprite,
 			this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index,
 			frame < 0 ? -1 - 1 : 1, x, y);
 	} else {
-		DrawUnitType(type, sprite,
+		DrawUnitType(type, type->Sprite,
 			this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index,
 			frame, x, y);
 	}
