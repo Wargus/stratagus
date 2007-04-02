@@ -240,11 +240,11 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 		for (i = 0; i < PlayerMax; ++i) {
 			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[WoodCost].c_str(), 
-				Players[i].Resources[WoodCost]);
+				i, DefaultResourceNames[EnergyCost].c_str(),
+				Players[i].Resources[EnergyCost]);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[GoldCost].c_str(),
-				Players[i].Resources[GoldCost]);
+				i, DefaultResourceNames[MagmaCost].c_str(), 
+				Players[i].Resources[MagmaCost]);
 			f->printf("SetAiType(%d, \"%s\")\n",
 				i, Players[i].AiName.c_str());
 		}
