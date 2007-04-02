@@ -703,10 +703,6 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						res->FinalResource = CclGetResourceByName(l);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "wait-at-resource")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->WaitAtResource = LuaToNumber(l, -1);
-						lua_pop(l, 1);
 					} else if (!strcmp(value, "harvest-from-outside")) {
 						res->HarvestFromOutside = 1;
 						--k;

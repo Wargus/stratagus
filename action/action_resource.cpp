@@ -161,8 +161,7 @@ static int StartGathering(CUnit *unit)
 		unit->Remove(goal);
 	}
 
-	unit->Data.ResWorker.TimeToHarvest = resinfo->WaitAtResource /
-		SpeedResourcesHarvest[resinfo->ResourceId];
+	unit->Data.ResWorker.TimeToHarvest = 0;
 
 	return 1;
 }
@@ -240,8 +239,7 @@ static void GatherResource(CUnit *unit)
 	unit->Data.ResWorker.TimeToHarvest--;
 
 	while (unit->Data.ResWorker.TimeToHarvest < 0) {
-		unit->Data.ResWorker.TimeToHarvest += resinfo->WaitAtResource /
-			SpeedResourcesHarvest[resinfo->ResourceId];
+		unit->Data.ResWorker.TimeToHarvest += 1; // / SpeedResourcesHarvest[resinfo->ResourceId];
 
 		//
 		// Calculate how much we can load.
