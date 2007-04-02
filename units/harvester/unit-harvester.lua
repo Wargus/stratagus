@@ -9,7 +9,7 @@
 --
 --	unit-harvester.lua	-	Define the harvester unit
 --
---	(c) Copyright 2001 - 2005 by Fran�is Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2007 by Fran�is Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -88,16 +88,12 @@ DefineUnitType("unit-harvester", {
 	CanGatherResources = {{
 		"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",
 		"resource-id", "titanium",
-		"resource-capacity", 100,
 		"wait-at-resource", 2,
-		"wait-at-depot", 1,
 		"resource-step", 2,
 		"harvest-from-outside"}, 
 		{"file-when-loaded", GetCurrentLuaPath().."/unit_harv.png",
 		"resource-id", "crystal",
-		"resource-capacity", 100,
 		"wait-at-resource", 2,
-		"wait-at-depot", 1,
 		"resource-step", 2,
 		"harvest-from-outside"}},
 	SelectableByRectangle = true,

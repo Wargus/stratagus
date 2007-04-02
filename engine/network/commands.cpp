@@ -839,8 +839,6 @@ static void DoNextReplay(void)
 		SendCommandDismiss(UnitSlots[unit]);
 	} else if (!strcmp(action, "resource")) {
 		SendCommandResource(UnitSlots[unit], dunit, flags);
-	} else if (!strcmp(action, "return")) {
-		SendCommandReturnGoods(UnitSlots[unit], dunit, flags);
 	} else if (!strcmp(action, "train")) {
 		SendCommandTrainUnit(UnitSlots[unit], UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-train")) {
@@ -1204,23 +1202,6 @@ void SendCommandResource(CUnit *unit, CUnit *dest, int flush)
 }
 
 /**
-** Send command: Unit return goods.
-**
-** @param unit    pointer to unit.
-** @param goal    pointer to destination of the goods. (NULL=search best)
-** @param flush   Flag flush all pending commands.
-*/
-void SendCommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
-{
-	if (!IsNetworkGame()) {
-		CommandLog("return", unit, flush, -1, -1, goal, NULL, -1);
-		CommandReturnGoods(unit, goal, flush);
-	} else {
-		NetworkSendCommand(MessageCommandReturn, unit, 0, 0, goal, 0, flush);
-	}
-}
-
-/**
 ** Send command: Building/unit train new unit.
 **
 ** @param unit    pointer to unit.
@@ -1501,15 +1482,6 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			}
 			CommandLog("resource", unit, status, -1, -1, dest, NULL, -1);
 			CommandResource(unit, dest, status);
-			break;
-		case MessageCommandReturn:
-			dest = NoUnitP;
-			if (dstnr != (unsigned short)0xFFFF) {
-				dest = UnitSlots[dstnr];
-				Assert(dest && dest->Type);
-			}
-			CommandLog("return", unit, status, -1, -1, dest, NULL, -1);
-			CommandReturnGoods(unit, dest, status);
 			break;
 		case MessageCommandTrain:
 			CommandLog("train", unit, status, -1, -1, NoUnitP,

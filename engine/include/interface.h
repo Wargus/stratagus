@@ -9,7 +9,7 @@
 //
 /**@name interface.h - The user interface header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -64,7 +64,6 @@ enum ButtonCmd {
 	ButtonButton,         /// choose other button set
 	ButtonTrain,          /// order train
 	ButtonStandGround,    /// order stand ground
-	ButtonReturn,         /// order return goods
 	ButtonCancel,         /// cancel
 	ButtonCancelTrain,    /// cancel training
 	ButtonCancelBuild,    /// cancel building

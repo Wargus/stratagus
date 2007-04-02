@@ -707,17 +707,6 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						res->WaitAtResource = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "wait-at-depot")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->WaitAtDepot = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "resource-capacity")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->ResourceCapacity = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "lose-resources")) {
-						res->LoseResources = 1;
-						--k;
 					} else if (!strcmp(value, "harvest-from-outside")) {
 						res->HarvestFromOutside = 1;
 						--k;
@@ -1830,10 +1819,6 @@ void UpdateUnitVariables(const CUnit *unit)
 	if (unit->Type->GivesResource) {
 		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
 		unit->Variable[GIVERESOURCE_INDEX].Max = 0x7FFFFFFF;
-	}
-	if (unit->Type->Harvester && unit->CurrentResource) {
-		unit->Variable[CARRYRESOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[CARRYRESOURCE_INDEX].Max = unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity;
 	}
 
 	// SightRange

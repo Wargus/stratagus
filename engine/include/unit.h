@@ -406,8 +406,6 @@ typedef enum _unit_action_ {
 
 	UnitActionRepair,       /// unit repairing
 	UnitActionResource,     /// unit harvesting resources
-	UnitActionReturnGoods,  /// unit returning any resource
-	UnitActionTransformInto /// unit transform into type.
 } UnitAction;
 
 /**
@@ -449,7 +447,6 @@ public:
 			int X;                    /// X position for patroling.
 			int Y;                    /// Y position for patroling.
 		} Patrol;                     /// position.
-		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
 		SpellType *Spell;             /// spell when casting.
 	} Arg1;             /// Extra command argument.
 };
@@ -674,7 +671,6 @@ public:
 	} Resource; /// Resource still
 	struct _order_resource_worker_ {
 		int TimeToHarvest;          /// how much time until we harvest some more.
-		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
 	} ResWorker; /// Worker harvesting
 	struct _order_repair_ {
 		int Cycles;                 /// Cycles unit has been repairing for
@@ -875,8 +871,6 @@ extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, 
 
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource);
-	/// Find nearest deposit
-extern CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource);
 	/// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 

@@ -148,18 +148,6 @@ DefineIcon({
 	File = "general/commands.png"})
 
 DefineIcon({
-	Name = "icon-return-goods-peasant",
-	Size = {46, 38},
-	Frame = 9,
-	File = "general/commands.png"})
-
-DefineIcon({
-	Name = "icon-return-goods-peon",
-	Size = {46, 38},
-	Frame = 9,
-	File = "general/commands.png"})
-
-DefineIcon({
 	Name = "icon-stand-ground",
 	Size = {46, 38},
 	Frame = 10,

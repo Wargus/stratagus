@@ -9,7 +9,7 @@
 //
 /**@name commands.h - The commands header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -115,9 +115,6 @@ extern void SendCommandBuildBuilding(CUnit *unit, int x, int y,
 extern void SendCommandDismiss(CUnit *unit);
 	/// Send harvest command
 extern void SendCommandResource(CUnit *unit, CUnit *dest,
-	int flush);
-	/// Send return goods command
-extern void SendCommandReturnGoods(CUnit *unit, CUnit *dest,
 	int flush);
 	/// Send train command
 extern void SendCommandTrainUnit(CUnit *unit,

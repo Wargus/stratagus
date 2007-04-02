@@ -9,7 +9,7 @@
 //
 /**@name script_unit.cpp - The unit ccl functions. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -183,10 +183,6 @@ void CclParseOrder(lua_State *l, COrder *order)
 			order->Action = UnitActionRepair;
 		} else if (!strcmp(value, "action-resource")) {
 			order->Action = UnitActionResource;
-		} else if (!strcmp(value, "action-return-goods")) {
-			order->Action = UnitActionReturnGoods;
-		} else if (!strcmp(value, "action-transform-into")) {
-			order->Action = UnitActionTransformInto;
 		} else if (!strcmp(value, "range")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -260,12 +256,6 @@ void CclParseOrder(lua_State *l, COrder *order)
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			order->Arg1.Spell = SpellTypeByIdent(LuaToString(l, -1));
-			lua_pop(l, 1);
-
-		} else if (!strcmp(value, "mine")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.ResourcePos = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 
 		} else {
@@ -347,6 +337,8 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 				cframe = cframe->Next;
 			}
 			unit->Data.Built.Frame = cframe;
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -376,9 +368,8 @@ static void CclParseResWorker(lua_State *l, CUnit *unit)
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.ResWorker.TimeToHarvest = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "done-harvesting")) {
-			unit->Data.ResWorker.DoneHarvesting = 1;
-			--j;
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -408,6 +399,8 @@ static void CclParseTrain(lua_State *l, CUnit *unit)
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.Train.Ticks = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -452,6 +445,8 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 			}
 			unit->Data.Move.Length = subargs;
 			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -760,7 +755,7 @@ static int CclUnit(lua_State *l)
 				DefineVariableField(l, unit->Variable + i, j + 1);
 				continue;
 			}
-		   LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
