@@ -1556,14 +1556,16 @@ void RescueUnits(void)
 				for (i = 0; i < n; ++i) {
 					if (around[i]->Type->CanAttack &&
 							unit->IsAllied(around[i])) {
+#if 0
 						//
 						//  City center converts complete player
-						//  NOTE: I use a trick here, centers could
-						//        store gold. FIXME!!!
-						if (unit->Type->CanStore[GoldCost]) {
+						//  FIXME: what unit should we use here?
+						//
+						if (???) {
 							ChangePlayerOwner(p, around[i]->Player);
 							break;
 						}
+#endif
 						unit->RescuedFrom = unit->Player;
 						unit->ChangeOwner(around[i]->Player);
 						unit->Blink = 5;
