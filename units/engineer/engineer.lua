@@ -79,12 +79,7 @@ DefineUnitType("unit-engineer", {
 	Armor = 1, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	MaxAttackRange = 1, Priority = 50, Points = 30, Corpse = "unit-dead-body2",
 	Type = "land", RightMouseAction = "harvest", RepairRange = 1,
-	CanTargetLand = true, LandUnit = true, Coward = true,
-	CanGatherResources = {
-		{"resource-id", "energy",
-		"resource-step", 1}, 
-		{"resource-id", "magma",
-		"resource-step", 1}},
+	CanTargetLand = true, LandUnit = true, Coward = true, Harvester = true,
 	organic = true, SelectableByRectangle = true,
 	Sounds = {
 		"selected", "engineer-selected",

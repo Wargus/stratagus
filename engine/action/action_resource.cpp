@@ -99,10 +99,8 @@ static int MoveToResource(CUnit *unit)
 static int StartGathering(CUnit *unit)
 {
 	CUnit *goal;
-	ResourceInfo *resinfo;
 
 	Assert(!unit->IX && !unit->IY);
-	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 	goal = unit->Orders[0]->Goal;
 
 	//
@@ -176,8 +174,6 @@ static void AnimateActionHarvest(CUnit *unit)
 */
 static void LoseResource(CUnit *unit, const CUnit *source)
 {
-	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
-
 	unit->Orders[0]->Goal->RefsDecrease();
 	unit->Orders[0]->Goal = NoUnitP;
 
@@ -211,7 +207,6 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 static void GatherResource(CUnit *unit)
 {
 	CUnit *source = NoUnitP;
-	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 	int addload = 1;
 	int visible = 0;
 
@@ -220,16 +215,12 @@ static void GatherResource(CUnit *unit)
 	unit->Data.ResWorker.TimeToHarvest--;
 
 	while (unit->Data.ResWorker.TimeToHarvest < 0) {
-		unit->Data.ResWorker.TimeToHarvest += 1; // / SpeedResourcesHarvest[resinfo->ResourceId];
+		unit->Data.ResWorker.TimeToHarvest += 1; // / SpeedResourcesHarvest;
 
 		//
 		// Calculate how much we can load.
 		//
-		if (resinfo->ResourceStep) {
-			addload = resinfo->ResourceStep;
-		} else {
-			addload = source->ResourcesHeld;
-		}
+		addload = 1;
 
 		source = unit->Orders[0]->Goal;
 		Assert(source);

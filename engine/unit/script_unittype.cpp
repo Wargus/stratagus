@@ -215,7 +215,6 @@ static int CclDefineUnitType(lua_State *l)
 {
 	const char *value;
 	CUnitType *type;
-	ResourceInfo *res;
 	const char *str;
 	int i;
 	int redefine;
@@ -673,41 +672,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->AttackFromTransporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coward")) {
 			type->Coward = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "CanGatherResources")) {
-			int args;
-			int j;
-
-			args = luaL_getn(l, -1);
-			for (j = 0; j < args; ++j) {
-				lua_rawgeti(l, -1, j + 1);
-				res = new ResourceInfo;
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				subargs = luaL_getn(l, -1);
-				for (k = 0; k < subargs; ++k) {
-					lua_rawgeti(l, -1, k + 1);
-					value = LuaToString(l, -1);
-					lua_pop(l, 1);
-					++k;
-					if (!strcmp(value, "resource-id")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->ResourceId = CclGetResourceByName(l);
-						lua_pop(l, 1);
-						type->ResInfo[res->ResourceId] = res;
-					} else if (!strcmp(value, "resource-step")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->ResourceStep = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-					} else {
-					   printf("\n%s\n", type->Name.c_str());
-					   LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				}
-				Assert(res->ResourceId);
-				lua_pop(l, 1);
-			}
-			type->Harvester = 1;
+		} else if (!strcmp(value, "Harvester")) {
+			type->Harvester = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "GivesResource")) {
 			lua_pushvalue(l, -1);
 			type->GivesResource = CclGetResourceByName(l);

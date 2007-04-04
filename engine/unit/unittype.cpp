@@ -496,7 +496,6 @@ void CleanUnitTypes(void)
 {
 	CUnitType *type;
 	int j;
-	int res;
 
 	DebugPrint("FIXME: icon, sounds not freed.\n");
 
@@ -538,12 +537,6 @@ void CleanUnitTypes(void)
 		type->BuildingRules.clear();
 		delete[] type->CanCastSpell;
 		delete[] type->AutoCastActive;
-
-		for (res = 0; res < MaxCosts; ++res) {
-			if (type->ResInfo[res]) {
-				delete type->ResInfo[res];
-			}
-		}
 
 		CGraphic::Free(type->Sprite);
 		CGraphic::Free(type->ShadowSprite);

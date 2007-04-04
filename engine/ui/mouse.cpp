@@ -148,7 +148,7 @@ void DoRightButton(int sx, int sy)
 		}
 		// tell to go and harvest from a unit
 		if (dest->Type->Harvester && (res = unit->Type->GivesResource) &&
-				dest->Type->ResInfo[res] && unit->Type->CanHarvest) {
+				unit->Type->CanHarvest) {
 			unit->Blink = 4;
 			SendCommandResource(dest, unit, flush);
 			return;
@@ -242,7 +242,7 @@ void DoRightButton(int sx, int sy)
 			if (type->Harvester) {
 				if (dest) {
 					// Go and harvest from a unit
-					if ((res = dest->Type->GivesResource) && type->ResInfo[res] &&
+					if ((res = dest->Type->GivesResource) && type->Harvester &&
 							dest->Type->CanHarvest &&
 							(dest->Player == unit->Player ||
 								(dest->Player->Index == PlayerNumNeutral))) {
@@ -336,7 +336,7 @@ void DoRightButton(int sx, int sy)
 		// Manage harvester from the destination side.
 		if (dest && dest->Type->Harvester) {
 			// tell to go and harvest from a building
-			if ((res = type->GivesResource) && dest->Type->ResInfo[res] &&
+			if ((res = type->GivesResource) && dest->Type->Harvester &&
 					type->CanHarvest && dest->Player == unit->Player) {
 				unit->Blink = 4;
 				SendCommandResource(dest, unit, flush);
@@ -1014,7 +1014,7 @@ static int SendResource(int sx, int sy)
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
 		if (unit->Type->Harvester) {
-			if (dest && (res = dest->Type->GivesResource) && unit->Type->ResInfo[res] &&
+			if (dest && (res = dest->Type->GivesResource) && unit->Type->Harvester &&
 					dest->Type->CanHarvest &&
 					(dest->Player == unit->Player ||
 						(dest->Player->Index == PlayerMax - 1))) {
