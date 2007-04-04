@@ -2422,7 +2422,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 				// Look if there is a resource
 				//
 				if ((res = ResourceOnMap(x, y, resource)) &&
-						res->Type->CanHarvest &&
+						res->Type->CanHarvestFrom &&
 						(res->Player->Index == PlayerMax - 1 ||
 							res->Player == unit->Player ||
 							(unit->IsAllied(res) && res->IsAllied(unit)))) {

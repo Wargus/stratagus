@@ -250,7 +250,7 @@ CUnit *ResourceOnMap(int tx, int ty, int resource)
 
 	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
-		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvest ||
+		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvestFrom ||
 				table[i]->ResourcesHeld == 0) {
 			continue;
 		}
