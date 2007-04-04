@@ -1290,20 +1290,6 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 }
 
 /**
-**  Find the index of a resource
-*/
-static int ResourceIndex(lua_State *l, const char *resource)
-{
-	for (int res = 0; res < MaxCosts; ++res) {
-		if (resource == DefaultResourceNames[res]) {
-			return res;
-		}
-	}
-	LuaError(l, "Resource not found: %s" _C_ resource);
-	return 0;
-}
-
-/**
 **  Define a unit-type animation set.
 **
 **  @param l  Lua state.
