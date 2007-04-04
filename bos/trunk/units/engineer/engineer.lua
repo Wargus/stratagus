@@ -82,19 +82,16 @@ DefineUnitType("unit-engineer", {
 	CanTargetLand = true, LandUnit = true, Coward = true,
 	CanGatherResources = {
 		{"resource-id", "energy",
-		"resource-step", 1,
-		"harvest-from-outside"}, 
+		"resource-step", 1}, 
 		{"resource-id", "magma",
-		"resource-step", 1,
-		"harvest-from-outside"}},
+		"resource-step", 1}},
 	organic = true, SelectableByRectangle = true,
 	Sounds = {
 		"selected", "engineer-selected",
 		"acknowledge", "engineer-acknowledge",
 		"ready", "engineer-ready",
 		"repair", "engineer-repair",
-		"harvest", "magma", "engineer-harvest",
-		"harvest", "energy", "engineer-harvest",
+		"harvest", "engineer-harvest",
 		"help", "engineer-help",
 		"dead", "engineer-die"}
 	})

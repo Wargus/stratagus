@@ -83,18 +83,15 @@ DefineUnitType("unit-harvester", {
 	LandUnit = true, Coward = true,
 	CanGatherResources = {
 		{"resource-id", "energy",
-		"resource-step", 2,
-		"harvest-from-outside"}, 
+		"resource-step", 2}, 
 		{"resource-id", "magma",
-		"resource-step", 2,
-		"harvest-from-outside"}},
+		"resource-step", 2}},
 	SelectableByRectangle = true,
 	Sounds = {
 		"selected", "harvester-selected",
 		"acknowledge", "harvester-acknowledge",
 		"ready", "harvester-ready",
-		"harvest", "magma", "harvester-harvest",
-		"harvest", "energy", "harvester-harvest",
+		"harvest", "harvester-harvest",
 		"help", "harvester-help",
 		"dead", "harvester-die"}
 	})
