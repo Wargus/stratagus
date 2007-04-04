@@ -413,11 +413,6 @@
 **    The standard animation is used only when building/repairing.
 **
 **
-**  ResourceInfo::HarvestFromOutside
-**
-**    Unit will harvest from the outside. The unit will use it's
-**    Attack animation (seems it turned into a generic Action anim.)
-**
 **  ResourceInfo::ResourceId
 **
 **    The resource this is for. Mostly redundant.
@@ -473,10 +468,9 @@ public:
 
 class ResourceInfo {
 public:
-	ResourceInfo() : HarvestFromOutside(0), ResourceStep(0), ResourceId(0)
+	ResourceInfo() : ResourceStep(0), ResourceId(0)
 	{}
 
-	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
 	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 };

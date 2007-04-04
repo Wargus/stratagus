@@ -151,16 +151,6 @@ static int StartGathering(CUnit *unit)
 	// Activate the resource
 	goal->Data.Resource.Active++;
 
-	//
-	// Place unit inside the resource
-	//
-	if (!resinfo->HarvestFromOutside) {
-		goal->RefsDecrease();
-		unit->Orders[0]->Goal = NoUnitP;
-
-		unit->Remove(goal);
-	}
-
 	unit->Data.ResWorker.TimeToHarvest = 0;
 
 	return 1;
@@ -188,13 +178,8 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 {
 	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
-	Assert((unit->Container && !resinfo->HarvestFromOutside) ||
-		(!unit->Container && resinfo->HarvestFromOutside));
-
-	if (resinfo->HarvestFromOutside) {
-		unit->Orders[0]->Goal->RefsDecrease();
-		unit->Orders[0]->Goal = NoUnitP;
-	}
+	unit->Orders[0]->Goal->RefsDecrease();
+	unit->Orders[0]->Goal = NoUnitP;
 
 	//
 	// Dump the unit outside and look for something to do.
@@ -230,11 +215,7 @@ static void GatherResource(CUnit *unit)
 	int addload = 1;
 	int visible = 0;
 
-	if (resinfo->HarvestFromOutside) {
-		AnimateActionHarvest(unit);
-	} else {
-		unit->Anim.CurrAnim = NULL;
-	}
+	AnimateActionHarvest(unit);
 
 	unit->Data.ResWorker.TimeToHarvest--;
 
@@ -250,11 +231,7 @@ static void GatherResource(CUnit *unit)
 			addload = source->ResourcesHeld;
 		}
 
-		if (resinfo->HarvestFromOutside) {
-			source = unit->Orders[0]->Goal;
-		} else {
-			source = unit->Container;
-		}
+		source = unit->Orders[0]->Goal;
 		Assert(source);
 
 		//
@@ -273,7 +250,7 @@ static void GatherResource(CUnit *unit)
 		// End of resource: destroy the resource.
 		//
 		if (!visible || source->ResourcesHeld == 0) {
-			if (resinfo->HarvestFromOutside && unit->Anim.Unbreakable) {
+			if (unit->Anim.Unbreakable) {
 				// Continue until the animation is breakable
 				unit->Data.ResWorker.TimeToHarvest = 0;
 				return;
