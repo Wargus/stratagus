@@ -284,12 +284,7 @@
 **
 **  CUnitType::Harvester
 **
-**    Unit is a resource worker. Faster than examining ResInfo
-**
-**  CUnitType::ResInfo[::MaxCosts]
-**
-**    Information about resource harvesting. If NULL, it can't
-**    harvest it.
+**    Unit is a resource worker.
 **
 **  CUnitType::NeutralMinimapColorRGB
 **
@@ -392,40 +387,6 @@
 **
 **    Sprite images of the player colors.  This image is drawn
 **    over CUnitType::Sprite.  Used with OpenGL only.
-**
-**
-*/
-/**
-**
-**  @class ResourceInfo unittype.h
-**
-** \#include "unittype.h"
-**
-**    This class contains information about how a unit will harvest a resource.
-**
-**  ResourceInfo::FileWhenLoaded
-**
-**    The harvester's animation file will change when it's loaded.
-**
-**  ResourceInfo::FileWhenEmpty;
-**
-**    The harvester's animation file will change when it's empty.
-**    The standard animation is used only when building/repairing.
-**
-**
-**  ResourceInfo::ResourceId
-**
-**    The resource this is for. Mostly redundant.
-**
-**  ResourceInfo::ResourceStep
-**
-**    The unit makes so-caled mining cycles. Each mining cycle
-**    it does some sort of animation and gains ResourceStep
-**    resources. You can stop after any number of steps.
-**    when the quantity in the harvester reaches the maximum
-**    (ResourceCapacity) it will return home. If this is 0 then
-**    it's considered infinity, and ResourceCapacity will now
-**    be the limit.
 */
 
 /*----------------------------------------------------------------------------
@@ -464,15 +425,6 @@ public:
 
 	std::string Name;        /// Config missile name
 	MissileType *Missile;    /// Identifier to use to run time
-};
-
-class ResourceInfo {
-public:
-	ResourceInfo() : ResourceStep(0), ResourceId(0)
-	{}
-
-	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
-	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 };
 
 /**
@@ -759,7 +711,6 @@ public:
 	{
 		memset(_Costs, 0, sizeof(_Costs));
 		memset(RepairCosts, 0, sizeof(RepairCosts));
-		memset(ResInfo, 0, sizeof(ResInfo));
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
 		memset(ProductionRate, 0, sizeof(ProductionRate));
 		memset(MaxUtilizationRate, 0, sizeof(MaxUtilizationRate));
@@ -867,8 +818,7 @@ public:
 	unsigned Teleporter : 1;            /// Can teleport other units.
 
 	int GivesResource;                  /// The resource this unit gives.
-	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
-	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
+	std::vector<CBuildRestriction *> BuildingRules;/// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;                   /// Sounds for events

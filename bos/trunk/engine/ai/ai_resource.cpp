@@ -589,7 +589,7 @@ static void AiCollectResources(void)
 		// Look what the unit can do
 		//
 		for (c = 0; c < MaxCosts; ++c) {
-			if (unit->Type->ResInfo[c]) {
+			if (unit->Type->Harvester) {
 				units_unassigned[num_units_unassigned[c]++][c] = unit;
 			}
 		}
@@ -668,7 +668,7 @@ static void AiCollectResources(void)
 
 					// remove it from other ressources
 					for (j = 0; j < MaxCosts; ++j) {
-						if (j == c || !unit->Type->ResInfo[j]) {
+						if (j == c || !unit->Type->Harvester) {
 							continue;
 						}
 						for (k = 0; k < num_units_unassigned[j]; ++k) {
@@ -701,7 +701,7 @@ static void AiCollectResources(void)
 						unit = units_assigned[k][src_c];
 
 						// unit can't harvest : next one
-						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(unit, c)) {
+						if (!unit->Type->Harvester || !AiAssignHarvester(unit, c)) {
 							unit = NoUnitP;
 							continue;
 						}

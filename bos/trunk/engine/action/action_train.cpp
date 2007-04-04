@@ -70,10 +70,6 @@ static int CanHandleOrder(CUnit *unit, COrder *order)
 		if (!unit->Type->Harvester) {
 			return 0;
 		}
-		//  Also check if new unit can harvest this specific resource.
-		if (order->Goal && !unit->Type->ResInfo[order->Goal->Type->GivesResource]) {
-			return 0;
-		}
 		return 1;
 	}
 	if (order->Action == UnitActionAttack && !unit->Type->CanAttack) {

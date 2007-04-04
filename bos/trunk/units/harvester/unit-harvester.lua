@@ -80,12 +80,7 @@ DefineUnitType("unit-harvester", {
 	Armor = 25, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	MaxAttackRange = 0, Priority = 50, Points = 30, Type = "land",
 	RightMouseAction = "harvest", CanAttack = true, CanTargetLand = true,
-	LandUnit = true, Coward = true,
-	CanGatherResources = {
-		{"resource-id", "energy",
-		"resource-step", 2}, 
-		{"resource-id", "magma",
-		"resource-step", 2}},
+	LandUnit = true, Coward = true, Harvester = true,
 	SelectableByRectangle = true,
 	Sounds = {
 		"selected", "harvester-selected",
