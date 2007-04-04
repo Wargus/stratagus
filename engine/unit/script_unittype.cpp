@@ -678,8 +678,8 @@ static int CclDefineUnitType(lua_State *l)
 			lua_pushvalue(l, -1);
 			type->GivesResource = CclGetResourceByName(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "CanHarvest")) {
-			type->CanHarvest = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "CanHarvestFrom")) {
+			type->CanHarvestFrom = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Vanishes")) {
 			type->Vanishes = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanCastSpell")) {
@@ -1795,7 +1795,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	type->BoolFlag[CANATTACK_INDEX]             = type->CanAttack;
 	type->BoolFlag[BUILDEROUTSIDE_INDEX]        = type->BuilderOutside;
 	type->BoolFlag[BUILDERLOST_INDEX]           = type->BuilderLost;
-	type->BoolFlag[CANHARVEST_INDEX]            = type->CanHarvest;
+	type->BoolFlag[CANHARVESTFROM_INDEX]            = type->CanHarvestFrom;
 	type->BoolFlag[HARVESTER_INDEX]             = type->Harvester;
 	type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX] = type->SelectableByRectangle;
 	type->BoolFlag[ISNOTSELECTABLE_INDEX]       = type->IsNotSelectable;
@@ -1820,7 +1820,7 @@ void InitDefinedVariables()
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
 		"\"VisibleUnderFog\", \"AttackFromTransporter\","
 		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
-		"\"BuilderOutside\", \"BuilderLost\", \"CanHarvest\", \"Harvester\","
+		"\"BuilderOutside\", \"BuilderLost\", \"CanHarvestFrom\", \"Harvester\","
 		"\"SelectableByRectangle\", \"IsNotSelectable\", \"Decoration\","
 		"\"Indestructible\", \"Teleporter\")";
 	int i;

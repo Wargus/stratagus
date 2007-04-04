@@ -148,7 +148,7 @@ void DoRightButton(int sx, int sy)
 		}
 		// tell to go and harvest from a unit
 		if (dest->Type->Harvester && (res = unit->Type->GivesResource) &&
-				unit->Type->CanHarvest) {
+				unit->Type->CanHarvestFrom) {
 			unit->Blink = 4;
 			SendCommandResource(dest, unit, flush);
 			return;
@@ -243,7 +243,7 @@ void DoRightButton(int sx, int sy)
 				if (dest) {
 					// Go and harvest from a unit
 					if ((res = dest->Type->GivesResource) && type->Harvester &&
-							dest->Type->CanHarvest &&
+							dest->Type->CanHarvestFrom &&
 							(dest->Player == unit->Player ||
 								(dest->Player->Index == PlayerNumNeutral))) {
 						dest->Blink = 4;
@@ -337,7 +337,7 @@ void DoRightButton(int sx, int sy)
 		if (dest && dest->Type->Harvester) {
 			// tell to go and harvest from a building
 			if ((res = type->GivesResource) && dest->Type->Harvester &&
-					type->CanHarvest && dest->Player == unit->Player) {
+					type->CanHarvestFrom && dest->Player == unit->Player) {
 				unit->Blink = 4;
 				SendCommandResource(dest, unit, flush);
 				continue;
@@ -347,7 +347,7 @@ void DoRightButton(int sx, int sy)
 		// Manage new order.
 		if (!CanMove(unit)) {
 			// Go and harvest from a unit
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest &&
+			if (dest && dest->Type->GivesResource && dest->Type->CanHarvestFrom &&
 					(dest->Player == unit->Player || dest->Player->Index == PlayerNumNeutral)) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, flush);
@@ -1015,7 +1015,7 @@ static int SendResource(int sx, int sy)
 		unit = Selected[i];
 		if (unit->Type->Harvester) {
 			if (dest && (res = dest->Type->GivesResource) && unit->Type->Harvester &&
-					dest->Type->CanHarvest &&
+					dest->Type->CanHarvestFrom &&
 					(dest->Player == unit->Player ||
 						(dest->Player->Index == PlayerMax - 1))) {
 				dest->Blink = 4;
@@ -1025,7 +1025,7 @@ static int SendResource(int sx, int sy)
 			}
 		}
 		if (!CanMove(unit)) {
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
+			if (dest && dest->Type->GivesResource && dest->Type->CanHarvestFrom) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
