@@ -9,7 +9,7 @@
 --
 --	unit-rocks.lua	-	Define the rocks units.
 --
---	(c) Copyright 2005 by Loïs Taulelle.
+--	(c) Copyright 2005 - 2007 by Loïs Taulelle.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ DefineUnitType("unit-rock-1", {
 	Building = true,
 	NumDirections = 1,
 	GivesResource = "energy", 
-	CanHarvest = true,
+	CanHarvestFrom = true,
 	Sounds = {}
 })
 
@@ -101,7 +101,7 @@ DefineUnitType("unit-rock-2", {
 	Building = true,
 	NumDirections = 1,
 	GivesResource = "energy", 
-	CanHarvest = true,
+	CanHarvestFrom = true,
 	Sounds = {}
 })
 
@@ -138,7 +138,7 @@ DefineUnitType("unit-rock-3", {
 	Building = true,
 	NumDirections = 1,
 	GivesResource = "energy", 
-	CanHarvest = true,
+	CanHarvestFrom = true,
 	Sounds = {}
 })
 
@@ -175,7 +175,7 @@ DefineUnitType("unit-rock-4", {
 	Building = true,
 	NumDirections = 1,
 	GivesResource = "energy", 
-	CanHarvest = true,
+	CanHarvestFrom = true,
 	Sounds = {}
 })
 
@@ -212,7 +212,7 @@ DefineUnitType("unit-rock-5", {
 	Building = true,
 	NumDirections = 1,
 	GivesResource = "energy", 
-	CanHarvest = true,
+	CanHarvestFrom = true,
 	Sounds = {}
 })
 
@@ -249,7 +249,7 @@ DefineUnitType("unit-rock-6", {
 	Building = true,
 	NumDirections = 1,
 	GivesResource = "energy", 
-	CanHarvest = true,
+	CanHarvestFrom = true,
 	Sounds = {}
 })
 

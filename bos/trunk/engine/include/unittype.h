@@ -269,6 +269,7 @@
 **    Maximum units on board (for transporters), and resources
 **
 **  CUnitType::StartingResources
+**
 **    Amount of Resources a unit has when It's Built
 **
 **  CUnitType::GivesResource
@@ -276,11 +277,9 @@
 **    This equals to the resource Id of the resource given
 **    or 0 (TimeCost) for other buildings.
 **
-**  CUnitType::CanHarvest
+**  CUnitType::CanHarvestFrom
 **
-**    Resource can be harvested. It's false for things like
-**    oil patches.
-**  @todo crappy name.
+**    Resource can be harvested from.
 **
 **  CUnitType::Harvester
 **
@@ -461,7 +460,7 @@ enum {
 	CANATTACK_INDEX,
 	BUILDEROUTSIDE_INDEX,
 	BUILDERLOST_INDEX,
-	CANHARVEST_INDEX,
+	CANHARVESTFROM_INDEX,
 	HARVESTER_INDEX,
 	SELECTABLEBYRECTANGLE_INDEX,
 	ISNOTSELECTABLE_INDEX,
@@ -702,7 +701,7 @@ public:
 		ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 		Coward(0), AttackFromTransporter(0),
 		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
-		BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
+		BuilderOutside(0), BuilderLost(0), CanHarvestFrom(0), Harvester(0),
 		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
 		SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 		Indestructible(0), Teleporter(0),
@@ -805,7 +804,7 @@ public:
 	unsigned CanAttack : 1;         /// Unit can attack.
 	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
-	unsigned CanHarvest : 1;        /// Resource can be harvested.
+	unsigned CanHarvestFrom : 1;    /// Resource can be harvested.
 	unsigned Harvester : 1;         /// unit is a resource harvester.
 	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
 	CVariable *Variable;            /// Array of user defined variables.
