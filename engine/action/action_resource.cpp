@@ -173,8 +173,8 @@ static int StartGathering(CUnit *unit)
 */
 static void AnimateActionHarvest(CUnit *unit)
 {
-	Assert(unit->Type->Animations->Harvest[unit->CurrentResource]);
-	UnitShowAnimation(unit, unit->Type->Animations->Harvest[unit->CurrentResource]);
+	Assert(unit->Type->Animations->Harvest);
+	UnitShowAnimation(unit, unit->Type->Animations->Harvest);
 }
 
 /**

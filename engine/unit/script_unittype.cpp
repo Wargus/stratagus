@@ -844,23 +844,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Repair.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "harvest")) {
-					int res;
-					const char *name;
-
 					lua_rawgeti(l, -1, k + 1);
-					name = LuaToString(l, -1 );
-					lua_pop(l, 1);
-					++k;
-					for (res = 0; res < MaxCosts; ++res) {
-						if (name == DefaultResourceNames[res]) {
-							break;
-						}
-					}
-					if (res == MaxCosts) {
-						LuaError(l, "Resource not found: %s" _C_ value);
-					}
-					lua_rawgeti(l, -1, k + 1);
-					type->Sound.Harvest[res].Name = LuaToString(l, -1);
+					type->Sound.Harvest.Name = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "help")) {
 					lua_rawgeti(l, -1, k + 1);
@@ -1365,7 +1350,6 @@ static int CclDefineAnimations(lua_State *l)
 	const char *name;
 	const char *value;
 	CAnimations *anims;
-	int res;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -1399,9 +1383,8 @@ static int CclDefineAnimations(lua_State *l)
 			anims->Train = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Build")) {
 			anims->Build = ParseAnimation(l, -1);
-		} else if (!strncmp(value, "Harvest_", 8)) {
-			res = ResourceIndex(l, value + 8);
-			anims->Harvest[res] = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Harvest")) {
+			anims->Harvest = ParseAnimation(l, -1);
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);
 		}

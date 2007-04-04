@@ -9,7 +9,7 @@
 //
 /**@name unitsound.cpp - The unit sounds. */
 //
-//      (c) Copyright 1999-2005 by Fabrice Rossi and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Fabrice Rossi and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -93,8 +93,6 @@ static void MapAnimSounds2(CAnimation *anim)
 */
 static void MapAnimSounds(CUnitType *type)
 {
-	int i;
-
 	if (!type->Animations) {
 		return;
 	}
@@ -107,9 +105,7 @@ static void MapAnimSounds(CUnitType *type)
 	MapAnimSounds2(type->Animations->Repair);
 	MapAnimSounds2(type->Animations->Train);
 	MapAnimSounds2(type->Animations->Build);
-	for (i = 0; i < MaxCosts; ++i) {
-		MapAnimSounds2(type->Animations->Harvest[i]);
-	}
+	MapAnimSounds2(type->Animations->Harvest);
 }
 
 /**
@@ -120,7 +116,6 @@ static void MapAnimSounds(CUnitType *type)
 void MapUnitSounds(void)
 {
 	CUnitType *type;
-	int j;
 
 	if (SoundEnabled()) {
 		//
@@ -155,11 +150,9 @@ void MapUnitSounds(void)
 				type->Sound.Repair.Sound =
 					SoundForName(type->Sound.Repair.Name);
 			}
-			for (j = 0; j < MaxCosts; ++j) {
-				if (!type->Sound.Harvest[j].Name.empty()) {
-					type->Sound.Harvest[j].Sound =
-						SoundForName(type->Sound.Harvest[j].Name);
-				}
+			if (!type->Sound.Harvest.Name.empty()) {
+				type->Sound.Harvest.Sound =
+					SoundForName(type->Sound.Harvest.Name);
 			}
 			if (!type->Sound.Help.Name.empty()) {
 				type->Sound.Help.Sound =
