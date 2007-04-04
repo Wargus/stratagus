@@ -2492,7 +2492,7 @@ CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 
 	for (i = 0; i < nunits; ++i) {
 		unit = player->Units[i];
-		if (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed) {
+		if (unit->Type->Harvester && !unit->Removed) {
 			if (unit->Orders[0]->Action == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return unit;
