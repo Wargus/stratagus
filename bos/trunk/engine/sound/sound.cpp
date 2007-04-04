@@ -198,7 +198,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit *unit, UnitVoiceGroup voice)
 		case VoiceRepairing:
 			return unit->Type->Sound.Repair.Sound;
 		case VoiceHarvesting:
-			return unit->Type->Sound.Harvest[unit->CurrentResource].Sound;
+			return unit->Type->Sound.Harvest.Sound;
 	}
 
 	return NO_SOUND;

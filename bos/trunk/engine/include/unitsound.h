@@ -9,7 +9,7 @@
 //
 /**@name unitsound.h - The unit sounds headerfile. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1999-2007 by Lutz Sammer, Fabrice Rossi,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -69,7 +69,7 @@ public:
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Ready;              /// unit training... ready
 	SoundConfig Repair;             /// unit repairing
-	SoundConfig Harvest[MaxCosts];  /// unit harvesting
+	SoundConfig Harvest;            /// unit harvesting
 	SoundConfig Help;               /// unit is attacked
 	SoundConfig Dead;               /// unit is killed
 };
