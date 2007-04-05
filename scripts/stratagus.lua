@@ -81,9 +81,6 @@ DefineDecorations({Index = "Training", HideNeutral = true, CenterX = true,
 DefineDecorations({Index = "GiveResource", HideNeutral = false, CenterX = true,
   OffsetPercent = {50, 100},Method = {"sprite", {"sprite-mana"}},
   ShowWhenMax = false})
-DefineDecorations({Index = "CarryResource", HideNeutral = false, CenterX = true,
-  OffsetPercent = {50, 100},Method = {"sprite", {"sprite-mana"}},
-  ShowWhenMax = false})
 
 -------------------------------------------------------------------------------
 --	Game modification

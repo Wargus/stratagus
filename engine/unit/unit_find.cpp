@@ -242,7 +242,7 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 **
 **  @return          Returns the deposit if found, or NoUnitP.
 */
-CUnit *ResourceOnMap(int tx, int ty, int resource)
+CUnit *ResourceOnMap(int tx, int ty)
 {
 	CUnit *table[UnitMax];
 	int i;
@@ -254,7 +254,7 @@ CUnit *ResourceOnMap(int tx, int ty, int resource)
 				table[i]->ResourcesHeld == 0) {
 			continue;
 		}
-		if (table[i]->Type->GivesResource == resource) {
+		if (table[i]->Type->GivesResource) {
 			return table[i];
 		}
 	}

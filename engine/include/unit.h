@@ -542,7 +542,6 @@ public:
 		Moving = 0;
 		ReCast = 0;
 		memset(&Anim, 0, sizeof(Anim));
-		CurrentResource = 0;
 		OrderCount = 0;
 		OrderFlush = 0;
 		Orders.clear();
@@ -639,8 +638,6 @@ public:
 		int Unbreakable;                            /// Unbreakable
 	} Anim;
 
-	unsigned char CurrentResource;
-
 	char OrderCount;            /// how many orders in queue
 	char OrderFlush;            /// cancel current order, take next
 	std::vector<COrder *> Orders; /// orders to process
@@ -669,9 +666,6 @@ public:
 	struct _order_resource_ {
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
-	struct _order_resource_worker_ {
-		int TimeToHarvest;          /// how much time until we harvest some more.
-	} ResWorker; /// Worker harvesting
 	struct _order_repair_ {
 		int Cycles;                 /// Cycles unit has been repairing for
 	} Repair; /// Repairing unit
@@ -870,7 +864,7 @@ extern bool CanBuildOn(int x, int y, int mask);
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
 
 	/// Find resource
-extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource);
+extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range);
 	/// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 
@@ -967,7 +961,7 @@ extern CUnit *UnitOnMapTile(int tx, int ty);
 extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
-extern CUnit *ResourceOnMap(int tx, int ty, int resource);
+extern CUnit *ResourceOnMap(int tx, int ty);
 
 	/// Find best enemy in numeric range to attack
 extern CUnit *AttackUnitsInDistance(const CUnit *unit, int range);

@@ -344,37 +344,6 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 }
 
 /**
-**  Parse res worker data
-**
-**  @param l     Lua state.
-**  @param unit  Unit pointer which should be filled with the data.
-*/
-static void CclParseResWorker(lua_State *l, CUnit *unit)
-{
-	const char *value;
-	int args;
-	int j;
-
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	args = luaL_getn(l, -1);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		++j;
-		if (!strcmp(value, "time-to-harvest")) {
-			lua_rawgeti(l, -1, j + 1);
-			unit->Data.ResWorker.TimeToHarvest = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-}
-
-/**
 **  Parse stored data for train order
 **
 **  @param l     Lua state.
@@ -647,10 +616,6 @@ static int CclUnit(lua_State *l)
 			unit->LastGroup = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "resources-held")) {
 			unit->ResourcesHeld = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "current-resource")) {
-			lua_pushvalue(l, j + 1);
-			unit->CurrentResource = CclGetResourceByName(l);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "sub-action")) {
 			unit->SubAction = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "wait")) {
@@ -726,10 +691,6 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "data-built")) {
 			lua_pushvalue(l, j + 1);
 			CclParseBuilt(l, unit);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "data-res-worker")) {
-			lua_pushvalue(l, j + 1);
-			CclParseResWorker(l, unit);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-train")) {
 			lua_pushvalue(l, j + 1);
