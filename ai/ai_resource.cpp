@@ -461,6 +461,7 @@ static void AiCheckingWork(void)
 --  WORKERS/RESOURCES
 ----------------------------------------------------------------------------*/
 
+#if 0
 /**
 **  Assign worker to gather a certain resource.
 **
@@ -511,6 +512,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	// Failed.
 	return 0;
 }
+#endif
 
 /**
 **  Assign workers to collect resources.
@@ -520,6 +522,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 */
 static void AiCollectResources(void)
 {
+#if 0
 	CUnit *units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
 	CUnit *units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];
@@ -733,6 +736,7 @@ static void AiCollectResources(void)
 
 	// Unassigned units there can't be assigned ( ie : they can't move to ressource )
 	// IDEA : use transporter here.
+#endif
 }
 
 /*----------------------------------------------------------------------------
