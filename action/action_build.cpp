@@ -276,7 +276,8 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		b = static_cast<CBuildRestrictionOnTop *> (OnTopDetails(build, ontop->Type));
 		Assert(b);
 		if (b->ReplaceOnBuild) {
-			build->ResourcesHeld = ontop->ResourcesHeld; // We capture the value of what is beneath.
+			// We capture the value of what is beneath.
+			memcpy(build->ResourcesHeld, ontop->ResourcesHeld, sizeof(build->ResourcesHeld));
 			ontop->Remove(NULL); // Destroy building beneath
 			UnitLost(ontop);
 			UnitClearOrders(ontop);
@@ -528,9 +529,15 @@ void HandleActionBuilt(CUnit *unit)
 		if (type->GivesResource) {
 			// Set to Zero as it's part of a union
 			unit->Data.Resource.Active = 0;
+			int i;
+			for (i = 1; i < MaxCosts; ++i) {
+				if (type->StartingResources[i] != 0) {
+					break;
+				}
+			}
 			// Has StartingResources, Use those
-			if (type->StartingResources) {
-				unit->ResourcesHeld = type->StartingResources;
+			if (i != MaxCosts) {
+				memcpy(unit->ResourcesHeld, type->StartingResources, sizeof(unit->ResourcesHeld));
 			}
 		}
 

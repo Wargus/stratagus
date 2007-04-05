@@ -444,7 +444,14 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "MaxOnBoard")) {
 			type->MaxOnBoard = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartingResources")) {
-			type->StartingResources = LuaToNumber(l, -1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != MaxCosts) {
+				LuaError(l, "incorrect argument");
+			}
+			for (k = 0; k < MaxCosts; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				type->StartingResources[k] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "RegenerationRate")) {
 			type->Variable[HP_INDEX].Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnPercent")) {
@@ -1721,7 +1728,14 @@ void UpdateUnitVariables(const CUnit *unit)
 
 	// Resources.
 	if (unit->Type->GivesResource) {
-		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
+		int i;
+		for (i = 1; i < MaxCosts; ++i) {
+			if (unit->ResourcesHeld[i] != 0) {
+				break;
+			}
+		}
+		Assert(i != MaxCosts);
+		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld[i];
 		unit->Variable[GIVERESOURCE_INDEX].Max = 0x7FFFFFFF;
 	}
 
