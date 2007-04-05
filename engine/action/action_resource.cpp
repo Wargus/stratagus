@@ -163,14 +163,20 @@ static void AnimateActionHarvest(CUnit *unit)
 **  @param source  resource the unit is harvesting from
 **  @param amount  returns the harvest amount
 */
-static void CalculateHarvestAmount(CUnit *unit, CUnit *source, int &amount)
+static void CalculateHarvestAmount(CUnit *unit, CUnit *source, int amount[MaxCosts])
 {
+	int i;
+
 	// FIXME: use SpeedResourcesHarvest
-	amount = 1;
+	for (i = 1; i < MaxCosts; ++i) {
+		amount[i] = 1;
+	}
 
 	// Don't load more than there is.
-	if (amount > source->ResourcesHeld) {
-		amount = source->ResourcesHeld;
+	for (i = 1; i < MaxCosts; ++i) {
+		if (amount[i] > source->ResourcesHeld[i]) {
+			amount[i] = source->ResourcesHeld[i];
+		}
 	}
 }
 
@@ -207,21 +213,36 @@ static void FindNewResource(CUnit *unit)
 static void GatherResource(CUnit *unit)
 {
 	CUnit *source = unit->Orders[0]->Goal;
-	int amount = 1;
+	int amount[MaxCosts] = {1, 1, 1};
 	bool visible = source->IsVisibleAsGoal(unit->Player);
+	int i;
 
 	AnimateActionHarvest(unit);
 
+	for (i = 1; i < MaxCosts; ++i) {
+		if (source->ResourcesHeld[i] != 0) {
+			break;
+		}
+	}
+
 	// Calculate how much we can harvest.
-	if (visible && source->ResourcesHeld != 0) {
+	if (visible && i != MaxCosts) {
 		CalculateHarvestAmount(unit, source, amount);
-		source->ResourcesHeld -= amount;
+		for (i = 1; i < MaxCosts; ++i) {
+			source->ResourcesHeld[i] -= amount[i];
+		}
+	}
+
+	for (i = 1; i < MaxCosts; ++i) {
+		if (source->ResourcesHeld[i] != 0) {
+			break;
+		}
 	}
 
 	//
 	// End of resource: destroy the resource.
 	//
-	if (!visible || source->ResourcesHeld == 0) {
+	if (!visible || i == MaxCosts) {
 		if (unit->Anim.Unbreakable) {
 			// Wait until the animation finishes
 			return;
