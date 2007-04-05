@@ -695,9 +695,6 @@ static void DrawPlayers(void)
 	y = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
 	for (i = 0; i < PlayerMax; ++i) {
-		if (i == PlayerMax / 2) {
-			y += 20;
-		}
 		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
 		}
@@ -1716,10 +1713,6 @@ static void EditorCallbackMouse(int x, int y)
 		bx = UI.InfoPanel.X + 8;
 		by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 		for (i = 0; i < PlayerMax; ++i) {
-			if (i == PlayerMax / 2) {
-				bx = UI.InfoPanel.X + 8;
-				by += 20;
-			}
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
 				if (Map.Info.PlayerType[i] != PlayerNobody) {
 					sprintf(buf,"Select player #%d",i);
