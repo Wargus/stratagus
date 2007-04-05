@@ -461,7 +461,7 @@ public:
 	virtual void action(const std::string &eventId) {
 		int amount = atoi(editResourceTextField->getText().c_str());
 		for (int i = 1; i < MaxCosts; ++i) {
-			UnitUnderCursor->ResourcesHeld[i] = amount;
+			UnitUnderCursor->ResourcesHeld[i] = amount * CYCLES_PER_SECOND;
 		}
 		editResourceMenu->stop();
 	}
@@ -499,7 +499,7 @@ static void EditorEditResource(void)
 	editResourceMenu->add(editResourceLabel, 288 / 2 - editResourceLabel->getWidth() / 2, 11);
 
 	char buf[30];
-	sprintf(buf, "%d", UnitUnderCursor->ResourcesHeld[1]);
+	sprintf(buf, "%d", UnitUnderCursor->ResourcesHeld[1] / CYCLES_PER_SECOND);
 	editResourceTextField = new gcn::TextField(buf);
 	editResourceTextField->setBaseColor(gcn::Color(200, 200, 120));
 	editResourceTextField->setForegroundColor(gcn::Color(200, 200, 120));
@@ -1098,7 +1098,7 @@ static void ShowUnitInfo(const CUnit *unit)
 		unit->Type->Name.c_str(), unit->Player->Index,
 		unit->Active ? "active" : "passive");
 	if (unit->Type->GivesResource) {
-		sprintf(buf + i," Amount %d", unit->ResourcesHeld[1]);
+		sprintf(buf + i," Amount %d", unit->ResourcesHeld[1] / CYCLES_PER_SECOND);
 	}
 	UI.StatusLine.Set(buf);
 }

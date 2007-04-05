@@ -277,7 +277,7 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 			if (Units[i]->Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, {");
 				for (j = 0; j < MaxCosts; ++j) {
-					f->printf("%s%d", (j ? ", " : ""), Units[i]->ResourcesHeld[j]);
+					f->printf("%s%d", (j ? ", " : ""), Units[i]->ResourcesHeld[j] / CYCLES_PER_SECOND);
 				}
 				f->printf("})\n");
 			}
