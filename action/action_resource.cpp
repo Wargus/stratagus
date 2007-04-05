@@ -168,8 +168,26 @@ static void CalculateHarvestAmount(CUnit *unit, CUnit *source, int amount[MaxCos
 	int i;
 
 	// FIXME: use SpeedResourcesHarvest
-	for (i = 1; i < MaxCosts; ++i) {
-		amount[i] = 1;
+	amount[0] = 0;
+	if (source->ResourcesHeld[1] == 0) {
+		amount[1] = 0;
+		amount[2] = unit->Type->MaxUtilizationRate[2];
+	} else if (source->ResourcesHeld[2] == 0) {
+		amount[1] = unit->Type->MaxUtilizationRate[1];
+		amount[2] = 0;
+	} else {
+		int f = 100 * source->ResourcesHeld[1] * unit->Type->MaxUtilizationRate[2] /
+			(source->ResourcesHeld[2] * unit->Type->MaxUtilizationRate[1]);
+		if (f > 100) {
+			amount[1] = unit->Type->MaxUtilizationRate[1];
+			amount[2] = unit->Type->MaxUtilizationRate[2] * 100 / f;
+		} else if (f < 100) {
+			amount[1] = unit->Type->MaxUtilizationRate[1] * f / 100;
+			amount[2] = unit->Type->MaxUtilizationRate[2];
+		} else {
+			amount[1] = unit->Type->MaxUtilizationRate[1];
+			amount[2] = unit->Type->MaxUtilizationRate[2];
+		}
 	}
 
 	// Don't load more than there is.

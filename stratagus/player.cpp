@@ -371,7 +371,15 @@ void SavePlayers(CFile *file)
 				p->Incomes[j]);
 		}
 
-		// ProductionRate done by load units.
+		// ProductionRate
+		file->printf("},\n  \"production-rate\", {");
+		for (j = 0; j < MaxCosts; ++j) {
+			if (j) {
+				file->printf(" ");
+			}
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
+				p->ProductionRate[j]);
+		}
 		// ActualUtilizationRate
 		file->printf("},\n  \"actual-utilization-rate\", {");
 		for (j = 0; j < MaxCosts; ++j) {
@@ -399,7 +407,15 @@ void SavePlayers(CFile *file)
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->StoredResources[j]);
 		}
-		// StorageCapacity done by load units.
+		// StorageCapacity
+		file->printf("},\n  \"storage-capacity\", {");
+		for (j = 0; j < MaxCosts; ++j) {
+			if (j) {
+				file->printf(" ");
+			}
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
+				p->StorageCapacity[j]);
+		}
 
 		// UnitTypesCount done by load units.
 
