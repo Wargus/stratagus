@@ -615,7 +615,14 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "last-group")) {
 			unit->LastGroup = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "resources-held")) {
-			unit->ResourcesHeld = LuaToNumber(l, j + 1);
+			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != MaxCosts) {
+				LuaError(l, "incorrect argument");
+			}
+			for (i = 0; i < MaxCosts; ++i) {
+				lua_rawgeti(l, j + 1, i + 1);
+				unit->ResourcesHeld[i] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "sub-action")) {
 			unit->SubAction = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "wait")) {
@@ -863,19 +870,25 @@ static int CclCreateUnit(lua_State *l)
 static int CclSetResourcesHeld(lua_State *l)
 {
 	CUnit *unit;
-	int value;
 
 	LuaCheckArgs(l, 2);
 
 	if (lua_isnil(l, 1)) {
 		return 0;
 	}
+	if (!lua_istable(l, 2) || luaL_getn(l, 2) != MaxCosts) {
+		LuaError(l, "incorrect argument");
+	}
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	value = LuaToNumber(l, 2);
-	unit->ResourcesHeld = value;
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		lua_rawgeti(l, 2, i + 1);
+		unit->ResourcesHeld[i] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	}
 
 	return 0;
 }

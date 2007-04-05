@@ -693,7 +693,7 @@ public:
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
 		BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 		CanCastSpell(NULL), AutoCastActive(NULL), AutoBuildRate(0),
-		CanTransport(NULL), MaxOnBoard(0), StartingResources(0),
+		CanTransport(NULL), MaxOnBoard(0),
 		UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
 		MouseAction(0), Points(0), CanTarget(0),
 		Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
@@ -709,6 +709,7 @@ public:
 	{
 		memset(_Costs, 0, sizeof(_Costs));
 		memset(RepairCosts, 0, sizeof(RepairCosts));
+		memset(StartingResources, 0, sizeof(StartingResources));
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
 		memset(ProductionRate, 0, sizeof(ProductionRate));
 		memset(MaxUtilizationRate, 0, sizeof(MaxUtilizationRate));
@@ -768,7 +769,7 @@ public:
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	char *CanTransport;             /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
-	int StartingResources;          /// Amount of Resources on build
+	int StartingResources[MaxCosts];/// Amount of starting resources
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval
 	int DecayRate;                  /// Decay rate in 1/6 seconds

@@ -534,7 +534,7 @@ public:
 		TTL = 0;
 		GroupId = 0;
 		LastGroup = 0;
-		ResourcesHeld = 0;
+		memset(ResourcesHeld, 0, sizeof(ResourcesHeld));
 		SubAction = 0;
 		Wait = 0;
 		State = 0;
@@ -622,7 +622,7 @@ public:
 	int GroupId;        /// unit belongs to this group id
 	int LastGroup;      /// unit belongs to this last group
 
-	int ResourcesHeld;      /// Resources Held by a unit
+	int ResourcesHeld[MaxCosts];/// Resources held by a unit
 
 	unsigned SubAction : 8; /// sub-action of unit
 	unsigned Wait;          /// action counter

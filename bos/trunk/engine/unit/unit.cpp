@@ -896,7 +896,7 @@ void UnitLost(CUnit *unit)
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
-				temp->ResourcesHeld = unit->ResourcesHeld;
+				memcpy(temp->ResourcesHeld, unit->ResourcesHeld, sizeof(temp->ResourcesHeld));
 			}
 		}
 	}
@@ -2649,7 +2649,7 @@ void LetUnitDie(CUnit *unit)
 			unit->Orders[0]->Action == UnitActionBuilt &&
 			unit->Data.Built.Worker) {
 		// Restore value for oil-patch
-		unit->ResourcesHeld = unit->Data.Built.Worker->ResourcesHeld;
+		memcpy(unit->ResourcesHeld, unit->Data.Built.Worker->ResourcesHeld, sizeof(unit->ResourcesHeld));
 	}
 
 	// Transporters lose their units and building their workers
@@ -3519,7 +3519,11 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	file->printf("\"group-id\", %d,\n  ", unit->GroupId);
 	file->printf("\"last-group\", %d,\n  ", unit->LastGroup);
 
-	file->printf("\"resources-held\", %d,\n  ", unit->ResourcesHeld);
+	file->printf("\"resources-held\", {");
+	for (i = 0; i < MaxCosts; ++i) {
+		file->printf("%s%d", (i ? ", " : ""), unit->ResourcesHeld[i]);
+	}
+	file->printf("},\n  ");
 
 	file->printf("\"sub-action\", %d, ", unit->SubAction);
 	file->printf("\"wait\", %d, ", unit->Wait);
