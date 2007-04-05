@@ -1735,7 +1735,7 @@ void UpdateUnitVariables(const CUnit *unit)
 			}
 		}
 		Assert(i != MaxCosts);
-		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld[i];
+		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld[i] / CYCLES_PER_SECOND;
 		unit->Variable[GIVERESOURCE_INDEX].Max = 0x7FFFFFFF;
 	}
 

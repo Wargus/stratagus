@@ -208,6 +208,29 @@ static int CclPlayer(lua_State *l)
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
+		} else if (!strcmp(value, "production-rate")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = luaL_getn(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+
+				for (i = 0; i < MaxCosts; ++i) {
+					if (value == DefaultResourceNames[i]) {
+						lua_rawgeti(l, j + 1, k + 1);
+						player->ProductionRate[i] = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						break;
+					}
+				}
+				if (i == MaxCosts) {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
 		} else if (!strcmp(value, "actual-utilization-rate")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -269,6 +292,29 @@ static int CclPlayer(lua_State *l)
 					if (value == DefaultResourceNames[i]) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->StoredResources[i] = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						break;
+					}
+				}
+				if (i == MaxCosts) {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
+		} else if (!strcmp(value, "storage-capacity")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = luaL_getn(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+
+				for (i = 0; i < MaxCosts; ++i) {
+					if (value == DefaultResourceNames[i]) {
+						lua_rawgeti(l, j + 1, k + 1);
+						player->StorageCapacity[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 						break;
 					}

@@ -886,7 +886,7 @@ static int CclSetResourcesHeld(lua_State *l)
 
 	for (int i = 0; i < MaxCosts; ++i) {
 		lua_rawgeti(l, 2, i + 1);
-		unit->ResourcesHeld[i] = LuaToNumber(l, -1);
+		unit->ResourcesHeld[i] = LuaToNumber(l, -1) * CYCLES_PER_SECOND;
 		lua_pop(l, 1);
 	}
 

@@ -891,7 +891,12 @@ void UnitLost(CUnit *unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
-		if (b->ReplaceOnDie && (unit->Type->GivesResource && unit->ResourcesHeld != 0)) {
+		for (i = 0; i < MaxCosts; ++i) {
+			if (unit->ResourcesHeld[i] != 0) {
+				break;
+			}
+		}
+		if (b->ReplaceOnDie && (unit->Type->GivesResource && i != MaxCosts)) {
 			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
