@@ -2349,7 +2349,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 **
 **  @return            NoUnitP or resource unit
 */
-CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource)
+CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2421,7 +2421,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 				//
 				// Look if there is a resource
 				//
-				if ((res = ResourceOnMap(x, y, resource)) &&
+				if ((res = ResourceOnMap(x, y)) &&
 						res->Type->CanHarvestFrom &&
 						(res->Player->Index == PlayerMax - 1 ||
 							res->Player == unit->Player ||
@@ -3520,10 +3520,6 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	file->printf("\"last-group\", %d,\n  ", unit->LastGroup);
 
 	file->printf("\"resources-held\", %d,\n  ", unit->ResourcesHeld);
-	if (unit->CurrentResource) {
-		file->printf("\"current-resource\", \"%s\",\n  ",
-			DefaultResourceNames[unit->CurrentResource].c_str());
-	}
 
 	file->printf("\"sub-action\", %d, ", unit->SubAction);
 	file->printf("\"wait\", %d, ", unit->Wait);
@@ -3591,9 +3587,6 @@ void SaveUnit(const CUnit *unit, CFile *file)
 			if (unit->Type->GivesResource) {
 				file->printf(", \"resource-active\", %d", unit->Data.Resource.Active);
 			}
-			break;
-		case UnitActionResource:
-			file->printf(", \"data-res-worker\", {\"time-to-harvest\", %d,}", unit->Data.ResWorker.TimeToHarvest);
 			break;
 		case UnitActionBuilt:
 			{

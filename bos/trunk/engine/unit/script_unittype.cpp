@@ -1534,6 +1534,7 @@ static int CclDefineDecorations(lua_State *l)
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Index")) {
 				tmp.Index = GetVariableIndex(LuaToString(l, -1));
+				Assert(tmp.Index != -1);
 			} else if (!strcmp(key, "Offset")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // X
@@ -1796,7 +1797,7 @@ void UpdateUnitVariables(const CUnit *unit)
 void InitDefinedVariables()
 {
 	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
-		"Training", "GiveResource", "CarryResource",
+		"Training", "GiveResource",
 		"Xp", "Kill", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
 		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",

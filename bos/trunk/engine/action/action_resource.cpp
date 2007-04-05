@@ -66,14 +66,10 @@
 **
 **  @param unit  Pointer to unit.
 **
-**  @return      TRUE if reached, otherwise FALSE.
+**  @return      -1 if unreachable, 0 if moving, 1 if reached.
 */
 static int MoveToResource(CUnit *unit)
 {
-	CUnit *goal;
-
-	goal = unit->Orders[0]->Goal;
-	Assert(goal);
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			return -1;
@@ -81,7 +77,7 @@ static int MoveToResource(CUnit *unit)
 			break;
 		default:
 			// Goal gone or something.
-			if (unit->Anim.Unbreakable || goal->IsVisibleAsGoal(unit->Player)) {
+			if (unit->Anim.Unbreakable || unit->Orders[0]->Goal->IsVisibleAsGoal(unit->Player)) {
 				return 0;
 			}
 			break;
@@ -96,12 +92,11 @@ static int MoveToResource(CUnit *unit)
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
-static int StartGathering(CUnit *unit)
+static bool StartGathering(CUnit *unit)
 {
-	CUnit *goal;
+	CUnit *goal = unit->Orders[0]->Goal;
 
 	Assert(!unit->IX && !unit->IY);
-	goal = unit->Orders[0]->Goal;
 
 	//
 	// Target is gone, stop getting resources.
@@ -110,7 +105,7 @@ static int StartGathering(CUnit *unit)
 		goal->RefsDecrease();
 		// Find an alternative, but don't look too far.
 		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
-		if ((goal = UnitFindResource(unit, unit->X, unit->Y, 10, unit->CurrentResource))) {
+		if ((goal = UnitFindResource(unit, unit->X, unit->Y, 10))) {
 			unit->SubAction = SUB_START_RESOURCE;
 			unit->Orders[0]->Goal = goal;
 			goal->RefsIncrease();
@@ -119,7 +114,7 @@ static int StartGathering(CUnit *unit)
 			unit->Orders[0]->Goal = NoUnitP;
 			unit->SubAction = 0;
 		}
-		return 0;
+		return false;
 	}
 
 	// FIXME: 0 can happen, if placed too near by map maker.
@@ -128,14 +123,12 @@ static int StartGathering(CUnit *unit)
 	//
 	// Update the heading of a harvesting unit to look straight at the resource.
 	//
-	if (goal) {
-		UnitHeadingFromDeltaXY(unit,
-			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
-	}
+	UnitHeadingFromDeltaXY(unit,
+		goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+		goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 
 	//
-	// If resource is still under construction, wait!
+	// If resource has too many harvesting it or is still under construction, wait!
 	//
 	if ((goal->Type->MaxOnBoard && goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
 			goal->Orders[0]->Action == UnitActionBuilt) {
@@ -143,15 +136,13 @@ static int StartGathering(CUnit *unit)
 		// FIXME: Could we somehow find another resource?
 		// However the CPU usage is really low (no pathfinding stuff).
 		unit->Wait = 10;
-		return 0;
+		return false;
 	}
 
 	// Activate the resource
 	goal->Data.Resource.Active++;
 
-	unit->Data.ResWorker.TimeToHarvest = 0;
-
-	return 1;
+	return true;
 }
 
 /**
@@ -166,27 +157,36 @@ static void AnimateActionHarvest(CUnit *unit)
 }
 
 /**
-**  Find something else to do when the resource is exhausted.
-**  This is called from GatherResorce when the resource is empty.
+**  Calculate how much the unit can harvest from a resource
 **
-**  @param unit    pointer to harvester unit.
-**  @param source  pointer to resource unit.
+**  @param unit    harvester unit
+**  @param source  resource the unit is harvesting from
+**  @param amount  returns the harvest amount
 */
-static void LoseResource(CUnit *unit, const CUnit *source)
+static void CalculateHarvestAmount(CUnit *unit, CUnit *source, int &amount)
+{
+	// FIXME: use SpeedResourcesHarvest
+	amount = 1;
+
+	// Don't load more than there is.
+	if (amount > source->ResourcesHeld) {
+		amount = source->ResourcesHeld;
+	}
+}
+
+/**
+**  Find something else to do when the resource is exhausted.
+**  This is called from GatherResource when the resource is empty.
+**
+**  @param unit  harvester unit.
+*/
+static void FindNewResource(CUnit *unit)
 {
 	unit->Orders[0]->Goal->RefsDecrease();
 	unit->Orders[0]->Goal = NoUnitP;
 
-	//
-	// Dump the unit outside and look for something to do.
-	//
-	if (unit->Container) {
-		DropOutOnSide(unit, LookingW, source->Type->TileWidth,
-			source->Type->TileHeight);
-	}
 	unit->Orders[0]->X = unit->Orders[0]->Y = -1;
-	if ((unit->Orders[0]->Goal = UnitFindResource(unit, unit->X, unit->Y,
-			10, unit->CurrentResource))) {
+	if ((unit->Orders[0]->Goal = UnitFindResource(unit, unit->X, unit->Y, 10))) {
 		DebugPrint("Unit %d found another resource.\n" _C_ unit->Slot);
 		unit->SubAction = SUB_START_RESOURCE;
 		unit->State = 0;
@@ -206,65 +206,36 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 */
 static void GatherResource(CUnit *unit)
 {
-	CUnit *source = NoUnitP;
-	int addload = 1;
-	int visible = 0;
+	CUnit *source = unit->Orders[0]->Goal;
+	int amount = 1;
+	bool visible = source->IsVisibleAsGoal(unit->Player);
 
 	AnimateActionHarvest(unit);
 
-	unit->Data.ResWorker.TimeToHarvest--;
+	// Calculate how much we can harvest.
+	if (visible && source->ResourcesHeld != 0) {
+		CalculateHarvestAmount(unit, source, amount);
+		source->ResourcesHeld -= amount;
+	}
 
-	while (unit->Data.ResWorker.TimeToHarvest < 0) {
-		unit->Data.ResWorker.TimeToHarvest += 1; // / SpeedResourcesHarvest;
-
-		//
-		// Calculate how much we can load.
-		//
-		addload = 1;
-
-		source = unit->Orders[0]->Goal;
-		Assert(source);
-
-		//
-		// Target is not dead, getting resources.
-		//
-		visible = source->IsVisibleAsGoal(unit->Player);
-		if (visible) {
-			// Don't load more than there is.
-			if (addload > source->ResourcesHeld) {
-				addload = source->ResourcesHeld;
-			}
-			source->ResourcesHeld -= addload;
+	//
+	// End of resource: destroy the resource.
+	//
+	if (!visible || source->ResourcesHeld == 0) {
+		if (unit->Anim.Unbreakable) {
+			// Wait until the animation finishes
+			return;
 		}
 
-		//
-		// End of resource: destroy the resource.
-		//
-		if (!visible || source->ResourcesHeld == 0) {
-			if (unit->Anim.Unbreakable) {
-				// Continue until the animation is breakable
-				unit->Data.ResWorker.TimeToHarvest = 0;
-				return;
-			}
+		DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 
-			DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
+		// Find a new resource to harvest
+		FindNewResource(unit);
 
-			//
-			// Improved version of DropOutAll.
-			//
-			LoseResource(unit, source);
-			CUnit *uins = source->UnitInside;
-			for (int i = source->InsideCount; i; --i, uins = uins->NextContained) {
-				if (uins->Orders[0]->Action == UnitActionResource) {
-					LoseResource(uins, source);
-				}
-			}
-
-			// Don't destroy the resource twice.
-			// This only happens when it's empty.
-			if (visible) {
-				LetUnitDie(source);
-			}
+		// Don't destroy the resource twice.
+		// This only happens when it's empty.
+		if (visible) {
+			LetUnitDie(source);
 		}
 	}
 }
@@ -295,8 +266,6 @@ void ResourceGiveUp(CUnit *unit)
 */
 void HandleActionResource(CUnit *unit)
 {
-	int ret;
-
 	if (unit->Wait) {
 		// FIXME: show idle animation while we wait?
 		unit->Wait--;
@@ -305,8 +274,7 @@ void HandleActionResource(CUnit *unit)
 
 	// Let's start mining.
 	if (unit->SubAction == SUB_START_RESOURCE) {
-		unit->CurrentResource = unit->Orders[0]->Goal->Type->GivesResource;
-		if (unit->CurrentResource) {
+		if (unit->Orders[0]->Goal->Type->GivesResource) {
 			NewResetPath(unit);
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
 		} else {
@@ -318,17 +286,16 @@ void HandleActionResource(CUnit *unit)
 	// Move to the resource location.
 	if (unit->SubAction >= SUB_MOVE_TO_RESOURCE &&
 			unit->SubAction < SUB_UNREACHABLE_RESOURCE) {
+		int ret = MoveToResource(unit);
 		// -1 failure, 0 not yet reached, 1 reached
-		if ((ret = MoveToResource(unit))) {
-			if (ret == -1) {
-				// Can't Reach
-				unit->SubAction++;
-				unit->Wait = 10;
-				return;
-			} else {
-				// Reached
-				unit->SubAction = SUB_START_GATHERING;
-			}
+		if (ret == -1) {
+			// Can't Reach
+			unit->SubAction++;
+			unit->Wait = 10;
+			return;
+		} else if (ret == 1) {
+			// Reached
+			unit->SubAction = SUB_START_GATHERING;
 		} else {
 			// Move along.
 			return;
