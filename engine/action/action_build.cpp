@@ -256,7 +256,6 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		return;
 	}
 	
-	unit->Player->SubUnitType(type);
 	if (!type->BuilderOutside) {
 		int costs[MaxCosts];
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -475,8 +474,6 @@ void HandleActionBuilt(CUnit *unit)
 			unit->CurrentSightRange = 0;
 		}
 
-		// Player gets back 75% of the original cost for a building.
-		unit->Player->AddCostsFactor(unit->Stats->Costs, CancelBuildingCostsFactor);
 		if (!unit->Type->BuilderOutside) {
 			unit->Player->RemoveFromUnitsConsumingResources(unit);
 		}

@@ -814,7 +814,6 @@ void CButtonPanel::DoClicked(int button)
 					Selected[0]->Y, _("Unit training queue is full"));
 			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
 					!Selected[0]->Player->CheckUnitType(type)) {
-				//PlayerSubUnitType(player,type);
 				SendCommandTrainUnit(Selected[0], type,
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();

@@ -230,7 +230,7 @@ extern std::string NameLine;
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
 
 /*----------------------------------------------------------------------------
---  stratagus.c
+--  stratagus.cpp
 ----------------------------------------------------------------------------*/
 
 class CFont;
@@ -283,9 +283,11 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
+extern std::string CompileOptions;          /// Compile options
+extern int SaveGameLoading;                 /// Save game is in progress of loading
+
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern void SaveGame(const std::string &filename); /// Save game
-extern int SaveGameLoading;                 /// Save game is in progress of loading
 struct lua_State;
 extern char *SaveGlobal(lua_State *l, bool is_root); /// For saving lua state
 
@@ -302,18 +304,6 @@ extern void GameMainLoop(void);             /// Game main loop
 	/// Show load progress
 extern void ShowLoadProgress(const char *fmt, ...);
 
-/*============================================================================
-==  Misc
-============================================================================*/
-
-// @todo configurable. maybe we could move it into one big global
-// @todo settings struct?
-	/// How many resources the player gets back if canceling building
-#define CancelBuildingCostsFactor  75
-	/// How many resources the player gets back if canceling training
-#define CancelTrainingCostsFactor  100
-
-extern std::string CompileOptions;
 //@}
 
 #endif // !__STRATAGUS_H__

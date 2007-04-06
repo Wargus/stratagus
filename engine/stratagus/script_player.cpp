@@ -162,29 +162,6 @@ static int CclPlayer(lua_State *l)
 			lua_rawgeti(l, j + 1, 2);
 			player->StartY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "resources")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-
-				for (i = 0; i < MaxCosts; ++i) {
-					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->Resources[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
 		} else if (!strcmp(value, "incomes")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -726,22 +703,6 @@ static int CclGetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, p->Name.c_str());
 		return 1;
-	} else if (!strcmp(data, "Resources")) {
-		const char *res;
-		int i;
-
-		LuaCheckArgs(l, 3);
-		res = LuaToString(l, 3);
-		for (i = 0; i < MaxCosts; ++i) {
-			if (res == DefaultResourceNames[i]) {
-				break;
-			}
-		}
-		if (i == MaxCosts) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res);
-		}
-		lua_pushnumber(l, p->Resources[i]);
-		return 1;
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		CUnitType *type;
 
@@ -825,21 +786,6 @@ static int CclSetPlayerData(lua_State *l)
 
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
-	} else if (!strcmp(data, "Resources")) {
-		const char *res;
-		int i;
-
-		LuaCheckArgs(l, 4);
-		res = LuaToString(l, 3);
-		for (i = 0; i < MaxCosts; ++i) {
-			if (res == DefaultResourceNames[i]) {
-				break;
-			}
-		}
-		if (i == MaxCosts) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res);
-		}
-		p->Resources[i] = LuaToNumber(l, 4);
 // } else if (!strcmp(data, "UnitTypesCount")) {
 // } else if (!strcmp(data, "AiEnabled")) {
 // } else if (!strcmp(data, "TotalNumUnits")) {

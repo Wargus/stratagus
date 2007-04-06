@@ -283,7 +283,6 @@ public:
 	int StartX;  /// map tile start X position
 	int StartY;  /// map tile start Y position
 
-	int Resources[MaxCosts];      /// resources in store
 	int Incomes[MaxCosts];        /// income of the resources
 
 	std::map<CUnit *, int *> UnitsConsumingResourcesActual;
@@ -345,19 +344,6 @@ public:
 	int CheckCosts(const int *costs) const;
 	/// Check if enough resources are available for a new unit-type
 	int CheckUnitType(const CUnitType *type) const;
-
-	/// Add costs to the resources
-	void AddCosts(const int *costs);
-	/// Add costs for a unit-type to the resources
-	void AddUnitType(const CUnitType *type);
-	/// Add a factor of costs to the resources
-	void AddCostsFactor(const int *costs, int factor);
-	/// Remove costs from the resources
-	void SubCosts(const int *costs);
-	/// Remove costs for a unit-type from the resources
-	void SubUnitType(const CUnitType *type);
-	/// Remove a factor of costs from the resources
-	void SubCostsFactor(const int *costs, int factor);
 
 	/// Does the player have units of that type
 	int HaveUnitTypeByType(const CUnitType *type) const;
