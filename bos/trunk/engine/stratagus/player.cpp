@@ -352,15 +352,6 @@ void SavePlayers(CFile *file)
 		file->printf("\",\n  \"start\", {%d, %d},\n", p->StartX,
 			p->StartY);
 
-		// Resources
-		file->printf("  \"resources\", {");
-		for (j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				file->printf(" ");
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				p->Resources[j]);
-		}
 		// Incomes
 		file->printf("},\n  \"incomes\", {");
 		for (j = 0; j < MaxCosts; ++j) {
@@ -649,7 +640,6 @@ void CPlayer::Clear()
 	SharedVision = 0;
 	StartX = 0;
 	StartY = 0;
-	memset(Resources, 0, sizeof(Resources));
 	memset(Incomes, 0, sizeof(Incomes));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	AiEnabled = 0;
@@ -674,17 +664,6 @@ void CPlayer::Clear()
 /*----------------------------------------------------------------------------
 --  Resource management
 ----------------------------------------------------------------------------*/
-
-/**
-**  Change the player resource.
-**
-**  @param resource  Resource to change.
-**  @param value     How many of this resource.
-*/
-void CPlayer::SetResource(int resource, int value)
-{
-	this->Resources[resource] = value;
-}
 
 /**
 **  Check if the unit-type didn't break any unit limits.
@@ -741,9 +720,10 @@ int CPlayer::CheckCosts(const int *costs) const
 {
 	int err = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (this->Resources[i] < costs[i]) {
+		if (costs[i] != 0 && this->ProductionRate[i] == 0 && this->StoredResources[i] == 0) {
 			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
-				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(), DefaultResourceNames[i].c_str());
+				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(),
+				DefaultResourceNames[i].c_str());
 
 			err |= 1 << i;
 		}
@@ -761,77 +741,6 @@ int CPlayer::CheckCosts(const int *costs) const
 int CPlayer::CheckUnitType(const CUnitType *type) const
 {
 	return this->CheckCosts(type->Stats[this->Index].Costs);
-}
-
-/**
-**  Add costs to the resources
-**
-**  @param costs   How many costs.
-*/
-void CPlayer::AddCosts(const int *costs)
-{
-	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] += costs[i];
-	}
-}
-
-/**
-**  Add the costs of a unit type to resources
-**
-**  @param type    Type of unit.
-*/
-void CPlayer::AddUnitType(const CUnitType *type)
-{
-	// FIXME: a player could make money by upgrading and than cancel
-	AddCosts(type->Stats[this->Index].Costs);
-}
-
-/**
-**  Add a factor of costs to the resources
-**
-**  @param costs   How many costs.
-**  @param factor  Factor of the costs to apply.
-*/
-void CPlayer::AddCostsFactor(const int *costs, int factor)
-{
-	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] += costs[i] * factor / 100;
-	}
-}
-
-/**
-**  Subtract costs from the resources
-**
-**  @param costs   How many costs.
-*/
-void CPlayer::SubCosts(const int *costs)
-{
-	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] -= costs[i];
-	}
-}
-
-/**
-**  Substract the costs of new unit from resources
-**
-**  @param type    Type of unit.
-*/
-void CPlayer::SubUnitType(const CUnitType *type)
-{
-	this->SubCosts(type->Stats[this->Index].Costs);
-}
-
-/**
-**  Substract a factor of costs from the resources
-**
-**  @param costs   How many costs.
-**  @param factor  Factor of the costs to apply.
-*/
-void CPlayer::SubCostsFactor(const int *costs, int factor)
-{
-	for (int i = 1; i < MaxCosts; ++i) {
-		this->Resources[i] -= costs[i] * 100 / factor;
-	}
 }
 
 /**

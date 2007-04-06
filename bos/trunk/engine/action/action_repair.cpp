@@ -79,7 +79,8 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		// Check if enough resources are available
 		//
 		for (i = 1; i < MaxCosts; ++i) {
-			if (player->Resources[i] < goal->Type->RepairCosts[i]) {
+			if (goal->Type->ProductionCosts[i] != 0 && player->ProductionRate[i] == 0 &&
+					player->StoredResources[i] == 0) {
 				snprintf(buf, 100, _("We need more %s for repair!"),
 					DefaultResourceNames[i].c_str());
 				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
@@ -100,7 +101,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		//
 		// Subtract the resources
 		//
-		player->SubCosts(goal->Type->RepairCosts);
+		//player->SubCosts(goal->Type->RepairCosts);
 
 		goal->Variable[HP_INDEX].Value += goal->Type->RepairHP;
 		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {

@@ -817,10 +817,6 @@ static int CclAiDump(lua_State *l)
 	// Script
 	//
 	printf("------\n");
-	for (i = 0; i < MaxCosts; ++i) {
-		printf("%s(%4d) ", DefaultResourceNames[i].c_str(), AiPlayer->Player->Resources[i]);
-	}
-	printf("\n");
 	printf("%d:", AiPlayer->Player->Index);
 #if 0
 	gh_display(gh_car(AiPlayer->Script));
@@ -1065,24 +1061,6 @@ static int CclDefineAiPlayer(lua_State *l)
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				ai->Reserve[DefaultResourceNumber(type)] = num;
-			}
-		} else if (!strcmp(value, "used")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				const char *type;
-				int num;
-
-				lua_rawgeti(l, j + 1, k + 1);
-				type = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				num = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				ai->Used[DefaultResourceNumber(type)] = num;
 			}
 		} else if (!strcmp(value, "needed")) {
 			if (!lua_istable(l, j + 1)) {
