@@ -57,8 +57,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int AiMakeUnit(CUnitType *type);
-
 /**
 **  Check if the costs are available for the AI.
 **
@@ -70,45 +68,12 @@ static int AiMakeUnit(CUnitType *type);
 */
 static int AiCheckCosts(const int *costs)
 {
-	int i;
-	int j;
-	int k;
-	int err;
-	const int *resources;
-	const int *reserve;
-	int *used;
-	int nunits;
-	CUnit **units;
-	const int *building_costs;
+	int err = 0;
 
-
-	// FIXME: the used costs shouldn't be calculated here
-	used = AiPlayer->Used;
-	for (j = 1; j < MaxCosts; ++j) {
-		used[j] = 0;
-	}
-
-	nunits = AiPlayer->Player->TotalNumUnits;
-	units = AiPlayer->Player->Units;
-	for (i = 0; i < nunits; ++i) {
-		for (k = 0; k < units[i]->OrderCount; ++k) {
-			if (units[i]->Orders[k]->Action == UnitActionBuild) {
-				building_costs =
-					units[i]->Orders[k]->Type->Stats[AiPlayer->Player->Index].Costs;
-				for (j = 1; j < MaxCosts; ++j) {
-					used[j] += building_costs[j];
-				}
-			}
-		}
-	}
-
-
-	err = 0;
-	resources = AiPlayer->Player->Resources;
-	reserve = AiPlayer->Reserve;
-	for (i = 1; i < MaxCosts; ++i) {
-		if (resources[i] - used[i] < costs[i] - reserve[i]) {
-			err |= 1 << i;
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (costs[i] && AiPlayer->Player->ProductionRate[i] == 0 &&
+				AiPlayer->Player->StoredResources[i] == 0) {
+			err |= (1 << i);
 		}
 	}
 
@@ -897,7 +862,7 @@ static void AiCheckRepair(void)
 	int j;
 	int k;
 	int n;
-	int repair_flag;
+	bool repair_flag;
 	CUnit *unit;
 
 	n = AiPlayer->Player->TotalNumUnits;
@@ -914,7 +879,7 @@ static void AiCheckRepair(void)
 
 	for (i = k; i < n; ++i) {
 		unit = AiPlayer->Player->Units[i];
-		repair_flag = 1;
+		repair_flag = true;
 		// Unit damaged?
 		// Don't repair attacked unit ( wait 5 sec before repairing )
 		if (unit->Type->RepairHP &&
@@ -932,9 +897,9 @@ static void AiCheckRepair(void)
 			// Must check, if there are enough resources
 			//
 			for (j = 1; j < MaxCosts; ++j) {
-				if (unit->Stats->Costs[j] &&
-						AiPlayer->Player->Resources[j] < 99) {
-					repair_flag = 0;
+				if (unit->Stats->Costs[j] && AiPlayer->Player->ProductionRate[j] == 0 &&
+						AiPlayer->Player->StoredResources[j] == 0) {
+					repair_flag = false;
 				}
 			}
 

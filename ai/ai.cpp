@@ -344,12 +344,6 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	}
 	file->printf("},\n");
 
-	file->printf("  \"used\", {");
-	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Used[i]);
-	}
-	file->printf("},\n");
-
 	file->printf("  \"needed\", {");
 	for (i = 0; i < MaxCosts; ++i) {
 		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Needed[i]);

@@ -762,8 +762,6 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 
 		order->Action = UnitActionTrain;
 		order->Type = type;
-		// FIXME: if you give quick an other order, the resources are lost!
-		unit->Player->SubUnitType(type);
 	}
 	ClearSavedAction(unit);
 }
@@ -793,9 +791,6 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 
 		// Cancel All training
 		while (unit->Orders[0]->Action == UnitActionTrain) {
-			unit->Player->AddCostsFactor(
-				unit->Orders[0]->Type->Stats[unit->Player->Index].Costs,
-				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
 		}
 		unit->Data.Train.Ticks = 0;
@@ -817,10 +812,6 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 
 		DebugPrint("Cancel training\n");
 
-		unit->Player->AddCostsFactor(
-			unit->Orders[slot]->Type->Stats[unit->Player->Index].Costs,
-			CancelTrainingCostsFactor);
-	
 		if (!slot) { // Canceled in work slot
 			unit->Data.Train.Ticks = 0;
 			unit->Player->RemoveFromUnitsConsumingResources(unit);

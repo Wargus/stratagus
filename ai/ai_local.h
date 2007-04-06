@@ -186,7 +186,6 @@ public:
 		LastRepairBuilding(0)
 	{
 		memset(Reserve, 0, sizeof(Reserve));
-		memset(Used, 0, sizeof(Used));
 		memset(Needed, 0, sizeof(Needed));
 		memset(Collect, 0, sizeof(Collect));
 		memset(TriedRepairWorkers, 0, sizeof(TriedRepairWorkers));
@@ -206,7 +205,6 @@ public:
 
 	// resource manager
 	int Reserve[MaxCosts]; /// Resources to keep in reserve
-	int Used[MaxCosts];    /// Used resources
 	int Needed[MaxCosts];  /// Needed resources
 	int Collect[MaxCosts]; /// Collect % of resources
 	int NeededMask;        /// Mask for needed resources

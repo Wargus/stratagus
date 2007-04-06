@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/01/07 21:08:59.
+** Generated automatically by tolua++-1.0.92 on 04/05/07 21:27:37.
 */
 
 #ifndef __cplusplus
@@ -12667,58 +12667,6 @@ static int tolua_set_CPlayer_StartY(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: Resources of class  CPlayer */
-#ifndef TOLUA_DISABLE_tolua_get_stratagus_CPlayer_Resources
-static int tolua_get_stratagus_CPlayer_Resources(lua_State* tolua_S)
-{
- int tolua_index;
-  CPlayer* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (CPlayer*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
-  tolua_Error tolua_err;
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=MaxCosts)
-  tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
- tolua_pushnumber(tolua_S,(lua_Number)self->Resources[tolua_index]);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Resources of class  CPlayer */
-#ifndef TOLUA_DISABLE_tolua_set_stratagus_CPlayer_Resources
-static int tolua_set_stratagus_CPlayer_Resources(lua_State* tolua_S)
-{
- int tolua_index;
-  CPlayer* self;
- lua_pushstring(tolua_S,".self");
- lua_rawget(tolua_S,1);
- self = (CPlayer*)  lua_touserdata(tolua_S,-1);
-#ifndef TOLUA_RELEASE
- {
-  tolua_Error tolua_err;
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
- }
-#endif
- tolua_index = (int)tolua_tonumber(tolua_S,2,0);
-#ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=MaxCosts)
-  tolua_error(tolua_S,"array indexing out of range.",NULL);
-#endif
-  self->Resources[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: Incomes of class  CPlayer */
 #ifndef TOLUA_DISABLE_tolua_get_stratagus_CPlayer_Incomes
 static int tolua_get_stratagus_CPlayer_Incomes(lua_State* tolua_S)
@@ -16525,7 +16473,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Type",tolua_get_CPlayer_Type,tolua_set_CPlayer_Type);
    tolua_variable(tolua_S,"StartX",tolua_get_CPlayer_StartX,tolua_set_CPlayer_StartX);
    tolua_variable(tolua_S,"StartY",tolua_get_CPlayer_StartY,tolua_set_CPlayer_StartY);
-   tolua_array(tolua_S,"Resources",tolua_get_stratagus_CPlayer_Resources,tolua_set_stratagus_CPlayer_Resources);
    tolua_array(tolua_S,"Incomes",tolua_get_stratagus_CPlayer_Incomes,tolua_set_stratagus_CPlayer_Incomes);
    tolua_array(tolua_S,"UnitTypesCount",tolua_get_stratagus_CPlayer_UnitTypesCount,NULL);
    tolua_array(tolua_S,"Units",tolua_get_stratagus_CPlayer_Units,tolua_set_stratagus_CPlayer_Units);
