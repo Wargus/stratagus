@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/05/07 21:27:37.
+** Generated automatically by tolua++-1.0.92 on Fri Apr  6 22:13:23 2007.
 */
 
 #ifndef __cplusplus
@@ -12719,6 +12719,110 @@ static int tolua_set_stratagus_CPlayer_Incomes(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: StoredResources of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_CPlayer_StoredResources
+static int tolua_get_stratagus_CPlayer_StoredResources(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPlayer* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPlayer*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->StoredResources[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: StoredResources of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_CPlayer_StoredResources
+static int tolua_set_stratagus_CPlayer_StoredResources(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPlayer* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPlayer*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->StoredResources[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: StorageCapacity of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_CPlayer_StorageCapacity
+static int tolua_get_stratagus_CPlayer_StorageCapacity(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPlayer* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPlayer*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->StorageCapacity[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: StorageCapacity of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_CPlayer_StorageCapacity
+static int tolua_set_stratagus_CPlayer_StorageCapacity(lua_State* tolua_S)
+{
+ int tolua_index;
+  CPlayer* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CPlayer*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->StorageCapacity[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: UnitTypesCount of class  CPlayer */
 #ifndef TOLUA_DISABLE_tolua_get_stratagus_CPlayer_UnitTypesCount
 static int tolua_get_stratagus_CPlayer_UnitTypesCount(lua_State* tolua_S)
@@ -15664,6 +15768,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   } /* end of embedded lua code */
 
   tolua_constant(tolua_S,"MaxCosts",MaxCosts);
+  tolua_constant(tolua_S,"EnergyCost",EnergyCost);
+  tolua_constant(tolua_S,"MagmaCost",MagmaCost);
   tolua_constant(tolua_S,"FoodCost",FoodCost);
   tolua_constant(tolua_S,"ScoreCost",ScoreCost);
   tolua_constant(tolua_S,"MaxResourceInfo",MaxResourceInfo);
@@ -16474,6 +16580,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"StartX",tolua_get_CPlayer_StartX,tolua_set_CPlayer_StartX);
    tolua_variable(tolua_S,"StartY",tolua_get_CPlayer_StartY,tolua_set_CPlayer_StartY);
    tolua_array(tolua_S,"Incomes",tolua_get_stratagus_CPlayer_Incomes,tolua_set_stratagus_CPlayer_Incomes);
+   tolua_array(tolua_S,"StoredResources",tolua_get_stratagus_CPlayer_StoredResources,tolua_set_stratagus_CPlayer_StoredResources);
+   tolua_array(tolua_S,"StorageCapacity",tolua_get_stratagus_CPlayer_StorageCapacity,tolua_set_stratagus_CPlayer_StorageCapacity);
    tolua_array(tolua_S,"UnitTypesCount",tolua_get_stratagus_CPlayer_UnitTypesCount,NULL);
    tolua_array(tolua_S,"Units",tolua_get_stratagus_CPlayer_Units,tolua_set_stratagus_CPlayer_Units);
    tolua_variable(tolua_S,"TotalNumUnits",tolua_get_CPlayer_TotalNumUnits,tolua_set_CPlayer_TotalNumUnits);
