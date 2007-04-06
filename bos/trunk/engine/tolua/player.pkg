@@ -18,6 +18,8 @@ class CPlayer
 	int StartY;
 
 	int Incomes[MaxCosts];
+	int StoredResources[MaxCosts];
+	int StorageCapacity[MaxCosts];
 
 	const int UnitTypesCount[UnitTypeMax];
 

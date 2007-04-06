@@ -34,11 +34,9 @@ function HandleCheats(str)
   local resources = { "energy", "magma" }
 
   if (str == "rich") then
-    SetPlayerData(GetThisPlayer(), "Resources", "energy",
-      GetPlayerData(GetThisPlayer(), "Resources", "energy") + 12000)
-    SetPlayerData(GetThisPlayer(), "Resources", "magma",
-      GetPlayerData(GetThisPlayer(), "Resources", "magma") + 5000)
-    AddMessage("!!! :)")
+    ThisPlayer.StoredResources[EnergyCost] = ThisPlayer.StorageCapacity[EnergyCost]
+    ThisPlayer.StoredResources[MagmaCost] = ThisPlayer.StorageCapacity[MagmaCost]
+    AddMessage("Jackpot !")
 
   elseif (str == "reveal") then
     RevealMap()
