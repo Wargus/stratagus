@@ -690,13 +690,13 @@ void DrawResources(void)
 	for (i = 1; i < MaxCosts; ++i) {
 		sprintf(tmp, "%d/%d", ThisPlayer->ActualUtilizationRate[i],
 			ThisPlayer->ProductionRate[i]);
-		VideoDrawText(50 +  80 * (i - 1), 1, GameFont, tmp);
+		VideoDrawText(50 +  90 * (i - 1), 1, GameFont, tmp);
 	}
 
 	for (i = 1; i < MaxCosts; ++i) {
 		sprintf(tmp, "%d/%d", ThisPlayer->StoredResources[i] / CYCLES_PER_SECOND,
 			ThisPlayer->StorageCapacity[i] / CYCLES_PER_SECOND);
-		VideoDrawText(250 +  80 * (i - 1), 1, GameFont, tmp);
+		VideoDrawText(250 +  90 * (i - 1), 1, GameFont, tmp);
 	}
 }
 
