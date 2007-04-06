@@ -35,6 +35,8 @@ setmetatable(UnitTypes, mt)
 $]
 
 #define MaxCosts 3
+#define EnergyCost 1
+#define MagmaCost 2
 #define FoodCost MaxCosts
 #define ScoreCost MaxCosts + 1
 #define MaxResourceInfo MaxCosts + 2
