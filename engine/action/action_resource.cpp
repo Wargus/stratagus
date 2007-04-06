@@ -237,36 +237,32 @@ static void GatherResource(CUnit *unit)
 
 	AnimateActionHarvest(unit);
 
-	for (i = 1; i < MaxCosts; ++i) {
-		if (source->ResourcesHeld[i] != 0) {
-			break;
-		}
-	}
-
 	// Calculate how much we can harvest.
-	if (visible && i != MaxCosts) {
+	if (visible && UnitHoldsResources(source)) {
 		CalculateHarvestAmount(unit, source, amount);
 		for (i = 1; i < MaxCosts; ++i) {
+			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
+			unit->Data.Harvest.CurrentProduction[i] = amount[i];
+			unit->Player->ProductionRate[i] += unit->Data.Harvest.CurrentProduction[i];
 			source->ResourcesHeld[i] -= amount[i];
-		}
-	}
-
-	for (i = 1; i < MaxCosts; ++i) {
-		if (source->ResourcesHeld[i] != 0) {
-			break;
 		}
 	}
 
 	//
 	// End of resource: destroy the resource.
 	//
-	if (!visible || i == MaxCosts) {
+	if (!visible || !UnitHoldsResources(source)) {
 		if (unit->Anim.Unbreakable) {
 			// Wait until the animation finishes
 			return;
 		}
 
 		DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
+
+		for (i = 1; i < MaxCosts; ++i) {
+			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
+			unit->Data.Harvest.CurrentProduction[i] = 0;
+		}
 
 		// Find a new resource to harvest
 		FindNewResource(unit);
@@ -284,7 +280,7 @@ static void GatherResource(CUnit *unit)
 **
 **  @param unit  Pointer to unit.
 */
-void ResourceGiveUp(CUnit *unit)
+static void ResourceGiveUp(CUnit *unit)
 {
 	DebugPrint("Unit %d gave up on resource gathering.\n" _C_ unit->Slot);
 	if (unit->Orders[0]->Goal) {
@@ -313,7 +309,7 @@ void HandleActionResource(CUnit *unit)
 
 	// Let's start mining.
 	if (unit->SubAction == SUB_START_RESOURCE) {
-		if (unit->Orders[0]->Goal->Type->GivesResource) {
+		if (unit->Orders[0]->Goal->Type->CanHarvestFrom) {
 			NewResetPath(unit);
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
 		} else {
@@ -335,6 +331,7 @@ void HandleActionResource(CUnit *unit)
 		} else if (ret == 1) {
 			// Reached
 			unit->SubAction = SUB_START_GATHERING;
+			memset(unit->Data.Harvest.CurrentProduction, 0, sizeof(unit->Data.Harvest.CurrentProduction));
 		} else {
 			// Move along.
 			return;

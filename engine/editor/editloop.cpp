@@ -319,7 +319,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 
 	}
 	if (unit != NoUnitP) {
-		if (type->GivesResource) {
+		if (type->CanHarvestFrom) {
 			memcpy(unit->ResourcesHeld, DefaultResourceAmounts, sizeof(unit->ResourcesHeld));
 		}
 	} else {
@@ -494,7 +494,7 @@ static void EditorEditResource(void)
 	editResourceMenu->setBorderSize(1);
 	editResourceMenu->setDrawMenusUnder(false);
 
-	std::string s(std::string("Amount of ") + DefaultResourceNames[UnitUnderCursor->Type->GivesResource] + ":");
+	std::string s(std::string("Amount of ") + DefaultResourceNames[1] + ":");
 	editResourceLabel = new gcn::Label(s);
 	editResourceMenu->add(editResourceLabel, 288 / 2 - editResourceLabel->getWidth() / 2, 11);
 
@@ -1094,7 +1094,7 @@ static void ShowUnitInfo(const CUnit *unit)
 	i = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
 		unit->Type->Name.c_str(), unit->Player->Index,
 		unit->Active ? "active" : "passive");
-	if (unit->Type->GivesResource) {
+	if (unit->Type->CanHarvestFrom) {
 		sprintf(buf + i," Amount %d", unit->ResourcesHeld[1] / CYCLES_PER_SECOND);
 	}
 	UI.StatusLine.Set(buf);
@@ -1325,7 +1325,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	//
 	if (Editor.State == EditorSelecting) {
 		if ((MouseButtons & RightButton && UnitUnderCursor)) {
-			if (UnitUnderCursor->Type->GivesResource) {
+			if (UnitUnderCursor->Type->CanHarvestFrom) {
 				EditorEditResource();
 			} else {
 				EditorEditAiProperties();

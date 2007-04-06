@@ -236,11 +236,10 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 /**
 **  Resource on map tile
 **
-**  @param tx        X position on map, tile-based.
-**  @param ty        Y position on map, tile-based.
-**  @param resource  resource type.
+**  @param tx  X position on map, tile-based.
+**  @param ty  Y position on map, tile-based.
 **
-**  @return          Returns the deposit if found, or NoUnitP.
+**  @return    Returns the resource if found, or NoUnitP.
 */
 CUnit *ResourceOnMap(int tx, int ty)
 {
@@ -251,12 +250,10 @@ CUnit *ResourceOnMap(int tx, int ty)
 	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvestFrom ||
-				table[i]->ResourcesHeld == 0) {
+				!UnitHoldsResources(table[i])) {
 			continue;
 		}
-		if (table[i]->Type->GivesResource) {
-			return table[i];
-		}
+		return table[i];
 	}
 	return NoUnitP;
 }

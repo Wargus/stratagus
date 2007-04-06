@@ -663,6 +663,9 @@ public:
 	struct _order_build_ {
 		int Cycles;                 /// Cycles unit has been building for
 	} Build; /// ActionBuild
+	struct _order_harvest_ {
+		int CurrentProduction[MaxCosts];
+	} Harvest; /// Harvest
 	struct _order_resource_ {
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
@@ -863,6 +866,8 @@ extern bool CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
 
+	/// Holds resources
+extern bool UnitHoldsResources(const CUnit *unit);
 	/// Find resource
 extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range);
 	/// Find the next idle worker

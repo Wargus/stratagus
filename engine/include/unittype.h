@@ -272,11 +272,6 @@
 **
 **    Amount of Resources a unit has when It's Built
 **
-**  CUnitType::GivesResource
-**
-**    This equals to the resource Id of the resource given
-**    or 0 (TimeCost) for other buildings.
-**
 **  CUnitType::CanHarvestFrom
 **
 **    Resource can be harvested from.
@@ -704,7 +699,7 @@ public:
 		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
 		SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 		Indestructible(0), Teleporter(0),
-		GivesResource(0), FieldFlags(0), MovementMask(0),
+		FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(_Costs, 0, sizeof(_Costs));
@@ -816,7 +811,6 @@ public:
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
 
-	int GivesResource;                  /// The resource this unit gives.
 	std::vector<CBuildRestriction *> BuildingRules;/// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 

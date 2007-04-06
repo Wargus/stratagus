@@ -46,7 +46,7 @@ DefineUnitType("unit-gold-mine", {
 	SightRange = 1, Speed = 0, HitPoints = 25500, Priority = 0,
 	Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Corpse = "unit-destroyed-4x4-place", ExplodeWhenKilled = "missile-explosion",
-	Type = "land", Building = true, GivesResource = "energy", CanHarvestFrom = true
+	Type = "land", Building = true, CanHarvestFrom = true
     --[[
 	Sounds = {
 		"selected", "gold-mine-selected",

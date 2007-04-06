@@ -681,10 +681,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->Coward = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Harvester")) {
 			type->Harvester = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "GivesResource")) {
-			lua_pushvalue(l, -1);
-			type->GivesResource = CclGetResourceByName(l);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "CanHarvestFrom")) {
 			type->CanHarvestFrom = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Vanishes")) {
@@ -1727,7 +1723,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	}
 
 	// Resources.
-	if (unit->Type->GivesResource) {
+	if (unit->Type->CanHarvestFrom) {
 		int i;
 		for (i = 1; i < MaxCosts; ++i) {
 			if (unit->ResourcesHeld[i] != 0) {
