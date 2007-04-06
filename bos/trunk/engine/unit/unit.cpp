@@ -891,12 +891,7 @@ void UnitLost(CUnit *unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
-		for (i = 0; i < MaxCosts; ++i) {
-			if (unit->ResourcesHeld[i] != 0) {
-				break;
-			}
-		}
-		if (b->ReplaceOnDie && (unit->Type->GivesResource && i != MaxCosts)) {
+		if (b->ReplaceOnDie && (unit->Type->CanHarvestFrom && UnitHoldsResources(unit))) {
 			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NoUnitP) {
 				DebugPrint("Unable to allocate Unit");
@@ -1464,7 +1459,7 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	//
 	//  Must change food/gold and other.
 	//
-	if (Type->GivesResource) {
+	if (Type->CanHarvestFrom) {
 		DebugPrint("Resource transfer not supported\n");
 	}
 	if (Type->Building) {
@@ -2341,6 +2336,23 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 }
 
 /**
+**  Check if a unit holds any resources
+**
+**  @param unit  Unit to check
+**
+**  @return      True if the unit holds resources, false if it doesn't
+*/
+bool UnitHoldsResources(const CUnit *unit)
+{
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (unit->ResourcesHeld[i] != 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
 **  Find Resource.
 **
 **  @param unit        The unit that wants to find a resource.
@@ -2650,7 +2662,7 @@ void LetUnitDie(CUnit *unit)
 	// During resource build, the worker holds the resource amount,
 	// but if canceling building the platform, the worker is already
 	// outside.
-	if (type->GivesResource &&
+	if (type->CanHarvestFrom &&
 			unit->Orders[0]->Action == UnitActionBuilt &&
 			unit->Data.Built.Worker) {
 		// Restore value for oil-patch
@@ -3592,8 +3604,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	//
 	switch (unit->Orders[0]->Action) {
 		case UnitActionStill:
-			// FIXME: support other resource types
-			if (unit->Type->GivesResource) {
+			if (unit->Type->CanHarvestFrom) {
 				file->printf(", \"resource-active\", %d", unit->Data.Resource.Active);
 			}
 			break;
@@ -3627,6 +3638,13 @@ void SaveUnit(const CUnit *unit, CFile *file)
 			file->printf("\"ticks\", %d, ", unit->Data.Train.Ticks);
 			file->printf("}");
 			break;
+		case UnitActionResource:
+			file->printf(",\n  \"data-harvest\", {");
+			file->printf("\"current-production\", {");
+			for (i = 0; i < MaxCosts; ++i) {
+				file->printf("%s%d", (i ? ", " : ""), unit->Data.Harvest.CurrentProduction[i]);
+			}
+			file->printf("}}");
 		default:
 			file->printf(",\n  \"data-move\", {");
 			if (unit->Data.Move.Fast) {

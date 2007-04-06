@@ -113,7 +113,6 @@ void DoRightButton(int sx, int sy)
 	int action;             // default action for unit.
 	int acknowledged;       // to play sound
 	int flush;              // append command to old command.
-	int res;                // resource id for harvester.
 	unsigned int spellnum;  // spell id for spell cast
 
 	// No unit selected
@@ -147,8 +146,7 @@ void DoRightButton(int sx, int sy)
 			return;
 		}
 		// tell to go and harvest from a unit
-		if (dest->Type->Harvester && (res = unit->Type->GivesResource) &&
-				unit->Type->CanHarvestFrom) {
+		if (dest->Type->Harvester && unit->Type->CanHarvestFrom) {
 			unit->Blink = 4;
 			SendCommandResource(dest, unit, flush);
 			return;
@@ -242,8 +240,7 @@ void DoRightButton(int sx, int sy)
 			if (type->Harvester) {
 				if (dest) {
 					// Go and harvest from a unit
-					if ((res = dest->Type->GivesResource) && type->Harvester &&
-							dest->Type->CanHarvestFrom &&
+					if (dest->Type->CanHarvestFrom && type->Harvester &&
 							(dest->Player == unit->Player ||
 								(dest->Player->Index == PlayerNumNeutral))) {
 						dest->Blink = 4;
@@ -336,8 +333,8 @@ void DoRightButton(int sx, int sy)
 		// Manage harvester from the destination side.
 		if (dest && dest->Type->Harvester) {
 			// tell to go and harvest from a building
-			if ((res = type->GivesResource) && dest->Type->Harvester &&
-					type->CanHarvestFrom && dest->Player == unit->Player) {
+			if (type->CanHarvestFrom && dest->Type->Harvester &&
+					dest->Player == unit->Player) {
 				unit->Blink = 4;
 				SendCommandResource(dest, unit, flush);
 				continue;
@@ -347,7 +344,7 @@ void DoRightButton(int sx, int sy)
 		// Manage new order.
 		if (!CanMove(unit)) {
 			// Go and harvest from a unit
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvestFrom &&
+			if (dest && dest->Type->CanHarvestFrom &&
 					(dest->Player == unit->Player || dest->Player->Index == PlayerNumNeutral)) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, flush);
@@ -1001,7 +998,6 @@ static int SendResource(int sx, int sy)
 	int i;
 	int x;
 	int y;
-	int res;
 	CUnit *unit;
 	CUnit *dest;
 	int ret;
@@ -1014,8 +1010,7 @@ static int SendResource(int sx, int sy)
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
 		if (unit->Type->Harvester) {
-			if (dest && (res = dest->Type->GivesResource) && unit->Type->Harvester &&
-					dest->Type->CanHarvestFrom &&
+			if (dest && dest->Type->CanHarvestFrom && unit->Type->Harvester &&
 					(dest->Player == unit->Player ||
 						(dest->Player->Index == PlayerMax - 1))) {
 				dest->Blink = 4;
@@ -1025,7 +1020,7 @@ static int SendResource(int sx, int sy)
 			}
 		}
 		if (!CanMove(unit)) {
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvestFrom) {
+			if (dest && dest->Type->CanHarvestFrom) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
