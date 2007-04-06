@@ -274,7 +274,7 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 				Units[i]->Type->Ident.c_str(),
 				Units[i]->Player->Index,
 				Units[i]->X, Units[i]->Y);
-			if (Units[i]->Type->GivesResource) {
+			if (Units[i]->Type->CanHarvestFrom) {
 				f->printf("SetResourcesHeld(unit, {");
 				for (j = 0; j < MaxCosts; ++j) {
 					f->printf("%s%d", (j ? ", " : ""), Units[i]->ResourcesHeld[j] / CYCLES_PER_SECOND);

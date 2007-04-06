@@ -375,6 +375,44 @@ static void CclParseTrain(lua_State *l, CUnit *unit)
 }
 
 /**
+**  Parse stored data for harvest order
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseHarvest(lua_State *l, CUnit *unit)
+{
+	const char *value;
+	int args;
+	int j;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = luaL_getn(l, -1);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "current-production")) {
+			lua_rawgeti(l, -1, j + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != MaxCosts) {
+				LuaError(l, "incorrect argument");
+			}
+			for (int i = 0; i < MaxCosts; ++i) {
+				lua_rawgeti(l, -1, i + 1);
+				unit->Data.Harvest.CurrentProduction[i] = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			}
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
 **  Parse stored data for move order
 **
 **  @param l     Lua state.
@@ -702,6 +740,10 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "data-train")) {
 			lua_pushvalue(l, j + 1);
 			CclParseTrain(l, unit);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "data-harvest")) {
+			lua_pushvalue(l, j + 1);
+			CclParseHarvest(l, unit);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "data-move")) {
 			lua_pushvalue(l, j + 1);

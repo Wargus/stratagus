@@ -782,7 +782,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 		if (type->Building && !unit->IsVisibleOnMap(ThisPlayer)) {
 			continue;
 		}
-		if ((type->GivesResource && !unit->Removed)) { // no built resources.
+		if ((type->CanHarvestFrom && !unit->Removed)) { // no built resources.
 			SelectSingleUnit(unit);
 			return 1;
 		}

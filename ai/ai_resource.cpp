@@ -490,7 +490,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	}
 	exploremask = 0;
 	for (i = UnitTypes.begin(); i != UnitTypes.end(); i++) {
-		if (*i && (*i)->GivesResource == resource) {
+		if (*i && (*i)->CanHarvestFrom) {
 			switch ((*i)->UnitType) {
 			case UnitTypeLand:
 				exploremask |= MapFieldLandUnit;

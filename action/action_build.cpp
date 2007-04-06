@@ -526,7 +526,7 @@ void HandleActionBuilt(CUnit *unit)
 			}
 		}
 
-		if (type->GivesResource) {
+		if (type->CanHarvestFrom) {
 			// Set to Zero as it's part of a union
 			unit->Data.Resource.Active = 0;
 			int i;
