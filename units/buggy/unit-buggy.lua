@@ -86,7 +86,7 @@ DefineUnitType("unit-buggy", {
 	Animations = "animations-buggy", Icon = "icon-buggy",
 	Flip = false,
 	ProductionCosts = {"energy", 100, "magma", 200},--"time", 100, 
-	RepairHp = 1, RepairCosts = {"magma", 3},
+	RepairHp = 1,
 	Speed = 20, HitPoints = 40, DrawLevel = 25, TileSize  = {1, 1},
 	BoxSize = {62, 62},
 	SightRange = 7, ComputerReactionRange = 7, PersonReactionRange = 7,

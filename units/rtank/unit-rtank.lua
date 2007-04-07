@@ -62,7 +62,7 @@ DefineUnitType("unit-rtank", {
 	Animations = "animations-rtank", Icon = "icon-rtank",
 	Flip = false,
 	ProductionCosts = {"energy", 100, "magma", 150},--"time", 100, 
-	RepairHp = 1, RepairCosts = {"magma", 6},
+	RepairHp = 1,
 	Speed = 20, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,

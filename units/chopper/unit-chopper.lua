@@ -65,7 +65,6 @@ DefineUnitType("unit-chopper", {
 	Animations = "animations-chopper", Icon = "icon-chopper",
 	Flip = false,
 	ProductionCosts = {"energy", 150, "magma", 450},--"time", 100, 
-	RepairCosts = {"magma", 6},
 	Speed = 40, HitPoints = 50, DrawLevel = 125, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,

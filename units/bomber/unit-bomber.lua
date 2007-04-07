@@ -66,7 +66,6 @@ DefineUnitType("unit-bomber", {
 	Animations = "animations-bomber", Icon = "icon-bomber",
 	Flip = false,
 	ProductionCosts = {"energy", 200, "magma", 450},--"time", 100, 
-	RepairCosts = {"magma", 6},
 	Speed = 20, HitPoints = 50, DrawLevel = 125, TileSize  = {2, 2}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 50, PiercingDamage = 30,
 	Missile = "missile-bomber", Priority = 20, AnnoyComputerFactor = 65,

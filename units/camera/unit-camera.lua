@@ -79,7 +79,7 @@ DefineUnitType("unit-cam", {
 	Shadow = {"file", "units/camera/camera_s.png", "size", {64, 64}, "offset", {16,0}},
 	Animations = "animations-cam", Icon = "icon-cam",
 	ProductionCosts = {"energy", 7, "magma", 35},--"time", 20, 
-	RepairHp = 1, RepairCosts = {"magma", 3}, Construction = "construction-cam",
+	RepairHp = 1, Construction = "construction-cam",
 	Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {28, 28},
 	SightRange = 15, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,

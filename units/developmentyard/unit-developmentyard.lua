@@ -60,7 +60,7 @@ DefineUnitType("unit-dev-yard", {
  {256, 256}},
 	Animations = "animations-dev-yard", Icon = "icon-dev",
 	ProductionCosts = {"energy", 500, "magma", 800},--"time", 300, 
-	RepairHp = 4, RepairCosts = {"energy", 4}, Construction = "construction-dev-yard",
+	RepairHp = 4, Construction = "construction-dev-yard",
 	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {7, 6}, BoxSize = {224, 196},
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,

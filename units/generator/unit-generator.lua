@@ -69,7 +69,7 @@ DefineUnitType("unit-gen", {
 	Shadow = {"file", GetCurrentLuaPath().."/generator_s.png", "size", {64, 64}},
 	Animations = "animations-gen", Icon = "icon-gen",
 	ProductionCosts = {"energy", 250, "magma", 50},--"time", 75, 
-	RepairHp = 2, RepairCosts = {"energy", 2}, Construction = "construction-gen",
+	RepairHp = 2, Construction = "construction-gen",
 	Speed = 0, HitPoints = 250, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},
 	SightRange = 1, Armor = 10 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
