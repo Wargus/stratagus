@@ -16841,7 +16841,7 @@ unit= CreateUnit("unit-crystal-field11", 7, {35, 98})
 SetResourcesHeld(unit, 25000)
 unit= CreateUnit("unit-crystal-field11", 7, {33, 97})
 SetResourcesHeld(unit, 25000)
-unit= CreateUnit("unit-gold-mine", 7, {101, 108})
-unit= CreateUnit("unit-gold-mine", 7, {30, 22})
+unit= CreateUnit("unit-rocksfield", 7, {101, 108})
+unit= CreateUnit("unit-rocksfield", 7, {30, 22})
 
 

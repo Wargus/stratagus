@@ -4149,9 +4149,9 @@ SetTile(80, 63, 63)
 
 --allow
 -- place units
-unit= CreateUnit("unit-gold-mine", 7, {14, 15})
+unit= CreateUnit("unit-rocksfield", 7, {14, 15})
 SetResourcesHeld(unit, 25000)
-unit= CreateUnit("unit-gold-mine", 7, {48, 38})
+unit= CreateUnit("unit-rocksfield", 7, {48, 38})
 SetResourcesHeld(unit, 25000)
 unit= CreateUnit("unit-crystal-field6", 7, {53, 43})
 SetResourcesHeld(unit, 25000)

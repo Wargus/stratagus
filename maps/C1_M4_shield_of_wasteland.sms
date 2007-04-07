@@ -16437,7 +16437,7 @@ SetTile(114, 127, 127)
 
 --allow
 -- place units
-unit= CreateUnit("unit-gold-mine", 7, {10, 25})
+unit= CreateUnit("unit-rocksfield", 7, {10, 25})
 SetResourcesHeld(unit, 25000)
 unit= CreateUnit("unit-crystal-field6", 7, {29, 9})
 SetResourcesHeld(unit, 2500)
@@ -16590,7 +16590,7 @@ SetResourcesHeld(unit, 2500)
 unit= CreateUnit("unit-cam", 0, {6, 36})
 unit= CreateUnit("unit-rock-4", 7, {4, 50})
 SetResourcesHeld(unit, 25000)
-unit= CreateUnit("unit-gold-mine", 7, {33, 121})
+unit= CreateUnit("unit-rocksfield", 7, {33, 121})
 SetResourcesHeld(unit, 25000)
 unit= CreateUnit("unit-crystal-field6", 7, {25, 72})
 SetResourcesHeld(unit, 2500)
