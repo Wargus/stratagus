@@ -38,6 +38,11 @@ function HandleCheats(str)
     ThisPlayer.StoredResources[MagmaCost] = ThisPlayer.StorageCapacity[MagmaCost]
     AddMessage("Jackpot !")
 
+  elseif (str == "poor") then
+    ThisPlayer.StoredResources[EnergyCost] = 0
+    ThisPlayer.StoredResources[MagmaCost] = 0
+    AddMessage("Bankruptcy !")
+
   elseif (str == "reveal") then
     RevealMap()
 
