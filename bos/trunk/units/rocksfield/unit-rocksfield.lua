@@ -9,7 +9,7 @@
 --
 --	unit-rocksfield.lua	-	Define the rocks-field.
 --
---	(c) Copyright 1998 - 2005 by Lutz Sammer, Crestez Leonard, François Beerten
+--	(c) Copyright 1998 - 2007 by Lutz Sammer, Crestez Leonard, Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ DefineUnitType("unit-rocksfield", {
 	Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
 	Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
 	Animations = "animations-building", Icon = "icon-rocks_field",
-	ProductionCosts = {},--[["time", 150},]] VisibleUnderFog = true,
+	ProductionCosts = {}, VisibleUnderFog = true,
 	Construction = "construction-rocksfield",
 	NeutralMinimapColor = {196, 196, 196},
 	DrawLevel = 40, TileSize = {4, 4}, BoxSize = {96, 96},
@@ -52,13 +52,5 @@ DefineUnitType("unit-rocksfield", {
 	Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Corpse = "unit-destroyed-4x4-place", ExplodeWhenKilled = "missile-explosion",
 	Type = "land", Building = true, CanHarvestFrom = true
-    --[[
-	Sounds = {
-		"selected", "gold-mine-selected",
-		"acknowledge", "gold-mine-acknowledge",
-		"ready", "gold-mine-ready",
-		"help", "gold-mine-help",
-		"dead", "building destroyed"}
-    ]]
     })
 

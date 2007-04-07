@@ -9,7 +9,7 @@
 --
 --	unit-dorcoz.lua	- Define the dorcoz unit.
 --
---	(c) Copyright 2003 - 2005 by Fran�is Beerten
+--	(c) Copyright 2003 - 2007 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ DefineAnimations("animations-dorcoz", {
         "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2",
         "frame 20", "move 4", "unbreakable end", "wait 2", },
     Attack = {"unbreakable begin",
-        "frame 25", --[["sound dorcoz-attack",]] "attack", "wait 1",
+        "frame 25", "attack", "wait 1",
         "frame 0", "unbreakable end", "wait 49", },
     Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5",
         "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
@@ -50,7 +50,7 @@ DefineIcon({
 DefineMissileType("missile-dorcoz", {
         File = "units/dorcoz/mis_plasma_sml.png",
         Size = {32, 32}, Frames = 5, NumDirections = 5,
-        --[[ImpactSound = "fireball hit",]] DrawLevel = 50,
+        DrawLevel = 50,
         Class = "missile-class-point-to-point", Sleep = 1, Speed = 32, Range = 1})
 
 DefineUnitType("unit-dorcoz", {
@@ -67,14 +67,7 @@ DefineUnitType("unit-dorcoz", {
         LandUnit = true, organic = true,
         SelectableByRectangle = true,
         RightMouseAction = "attack"
-        --[[
-        Sounds = {
-                "selected", "dorcoz-selected",
-                "acknowledge", "dorcoz-acknowledge",
-                "ready", "dorcoz-ready",
-                "help", "basic terras voices help 1",
-                "dead", "basic terras voices dead"}
-        ]]
+
         })
 
 DefineAllow("unit-dorcoz", "AAAAAAAA")
