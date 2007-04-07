@@ -48,7 +48,7 @@ DefineUnitType("unit-morel-1", {
 	Animations = "animations-morels", 
 	Icon = "icon-morel-1",
 	Construction = "construction-morels",
-	Costs = {"time", 150},
+	ProductionCosts = {},--"time", 150
 	HitPoints = 50, 
 	DrawLevel = 2, 
 	VisibleUnderFog = true,
@@ -83,7 +83,7 @@ DefineUnitType("unit-morel-2", {
 	Animations = "animations-morels", 
 	Icon = "icon-morel-2",
 	Construction = "construction-morels",
-	Costs = {"time", 150},
+	ProductionCosts = {},--"time", 150
 	HitPoints = 50, 
 	DrawLevel = 2, 
 	VisibleUnderFog = true,
@@ -118,7 +118,7 @@ DefineUnitType("unit-morel-3", {
 	Animations = "animations-morels", 
 	Icon = "icon-morel-3",
 	Construction = "construction-morels",
-	Costs = {"time", 150},
+	ProductionCosts = {},--"time", 150
 	HitPoints = 50, 
 	DrawLevel = 2, 
 	VisibleUnderFog = true,
@@ -153,7 +153,7 @@ DefineUnitType("unit-morel-4", {
 	Animations = "animations-morels", 
 	Icon = "icon-morel-4",
 	Construction = "construction-morels",
-	Costs = {"time", 150},
+	ProductionCosts = {},--"time", 150
 	HitPoints = 50, 
 	DrawLevel = 2, 
 	VisibleUnderFog = true,
@@ -188,7 +188,7 @@ DefineUnitType("unit-morel-5", {
 	Animations = "animations-morels", 
 	Icon = "icon-morel-5",
 	Construction = "construction-morels",
-	Costs = {"time", 150},
+	ProductionCosts = {},--"time", 150
 	HitPoints = 50, 
 	DrawLevel = 2, 
 	VisibleUnderFog = true,
@@ -223,7 +223,7 @@ DefineUnitType("unit-morel-6", {
 	Animations = "animations-morels", 
 	Icon = "icon-morel-6",
 	Construction = "construction-morels",
-	Costs = {"time", 150},
+	ProductionCosts = {},--"time", 150
 	HitPoints = 50, 
 	DrawLevel = 2, 
 	VisibleUnderFog = true,
@@ -258,7 +258,7 @@ DefineUnitType("unit-morel-7", {
 	Animations = "animations-morels", 
 	Icon = "icon-morel-7",
 	Construction = "construction-morels",
-	Costs = {"time", 150},
+	ProductionCosts = {},--"time", 150
 	HitPoints = 50, 
 	DrawLevel = 2, 
 	VisibleUnderFog = true,

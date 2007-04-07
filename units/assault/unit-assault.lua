@@ -67,7 +67,7 @@ DefineUnitType("unit-assault", {
 	Image = {"file", GetCurrentLuaPath().."/unit_assault.png", "size", {64, 64}},
 	Shadow = {"file", GetCurrentLuaPath().."/unit_assault_s.png", "size", {64, 64}},
 	Animations = "animations-assault", Icon = "icon-assault",
-	Costs = {"time", 30, "energy", 25, "magma", 50},
+	ProductionCosts = {"energy", 25, "magma", 50},--"time", 30, 
 	Speed = 10, HitPoints = 30, DrawLevel = 25,
 	TileSize = {1, 1}, BoxSize = {17, 28},
 	RightMouseAction = "attack",

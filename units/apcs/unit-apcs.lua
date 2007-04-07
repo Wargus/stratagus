@@ -64,7 +64,7 @@ DefineUnitType("unit-apcs", {
 	Image = {"file", GetCurrentLuaPath().."/unit_apcs.png", "size", {96, 96}},
 	Shadow = {"file", GetCurrentLuaPath().."/unit_apcs_s.png", "size", {96, 96}},
 	Animations = "animations-apcs", Icon = "icon-apcs",
-	Costs = {"time", 100, "energy", 200, "magma", 50},
+	ProductionCosts = {"energy", 200, "magma", 50},--"time", 100, 
 	Speed = 15, HitPoints = 200, DrawLevel = 25, TileSize = {1, 1},
 	BoxSize = {96, 96}, SightRange = 5,
 	ComputerReactionRange = 5, PersonReactionRange = 5,

@@ -64,7 +64,7 @@ DefineUnitType("unit-chopper", {
 	Shadow = {"file", "units/chopper/unit_chopper_s.png", "size", {128, 128}, "offset", {5,128}}, 
 	Animations = "animations-chopper", Icon = "icon-chopper",
 	Flip = false,
-	Costs = {"time", 100, "energy", 150, "magma", 450},
+	ProductionCosts = {"energy", 150, "magma", 450},--"time", 100, 
 	RepairCosts = {"magma", 6},
 	Speed = 40, HitPoints = 50, DrawLevel = 125, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,

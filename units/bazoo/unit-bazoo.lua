@@ -64,7 +64,7 @@ DefineUnitType("unit-bazoo", {
 	Image = {"file", GetCurrentLuaPath().."/unit_bazoo.png", "size", {64, 64}},
 	Shadow = {"file", GetCurrentLuaPath().."/unit_bazoo_s.png", "size", {64, 64}},
 	Animations = "animations-bazoo", Icon = "icon-bazoo",
-	Costs = {"time", 40, "energy", 50, "magma", 100},
+	ProductionCosts = {"energy", 50, "magma", 100},--"time", 40, 
 	Speed = 8, HitPoints = 50, DrawLevel = 25,
 	TileSize = {1, 1}, BoxSize = {17, 28},
 	SightRange = 7, ComputerReactionRange = 6, PersonReactionRange = 6,

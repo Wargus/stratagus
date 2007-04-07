@@ -112,9 +112,6 @@ void UpdateStats(int reset)
 			// LUDO : FIXME : reset loading of player stats !
 			for (player = 0; player < PlayerMax; ++player) {
 				stats = &type->Stats[player];
-				for (i = 0; i < MaxCosts; ++i) {
-					stats->Costs[i] = type->_Costs[i];
-				}
 				if (!stats->Variables) {
 					stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
 				}
@@ -224,25 +221,15 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int plynr,
 	CFile *file)
 {
-	int j;
-
 	Assert(plynr < PlayerMax);
 	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
-	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) {
+	for (int j = 0; j < UnitTypeVar.NumberVariable; ++j) {
 		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
 			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
 			stats->Variables[j].Max, stats->Variables[j].Increase,
 			stats->Variables[j].Enable ? ", Enable = true" : "");
 	}
-	file->printf("\"costs\", {");
-	for (j = 0; j < MaxCosts; ++j) {
-		if (j) {
-			file->printf(" ");
-		}
-		file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), stats->Costs[j]);
-	}
-
-	file->printf("})\n");
+	file->printf(")\n");
 }
 
 /**

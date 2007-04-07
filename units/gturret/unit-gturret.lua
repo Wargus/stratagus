@@ -66,7 +66,7 @@ DefineUnitType("unit-gturret", {
 	Image = {"file", "units/gturret/gturret.png", "size", {96, 96}},
 	Shadow = {"file", "units/gturret/gturret_s.png", "size", {96, 96}},
 	Animations = "animations-gturret", Icon = "icon-gturret",
-	Costs = {"time", 130, "energy", 250, "magma", 50}, 
+	ProductionCosts = {"energy", 250, "magma", 50},--"time", 130, 
 	RepairHp = 2, RepairCosts = {"energy", 2}, Construction = "construction-gturret",
 	Speed = 0, HitPoints = 160, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},
 	SightRange = 6, ComputerReactionRange = 6, PersonReactionRange = 6, Armor = 10,

@@ -80,7 +80,7 @@ DefineUnitType("unit-cannon", {
 	Offset ={0, -20},
 	Shadow = {"file", "units/cannon/cannon_s.png", "size", {128, 128}},
 	Animations = "animations-cannon", Icon = "icon-cannon",
-	Costs = {"time", 970, "energy", 2950, "magma", 3950}, 
+	ProductionCosts = {"energy", 2950, "magma", 3950},--"time", 970, 
 	RepairHp = 2, RepairCosts = {"energy", 2}, 
         Construction = "construction-cannon",
 	Speed = 0, HitPoints = 160, DrawLevel = 25, TileSize  = {2, 2}, 

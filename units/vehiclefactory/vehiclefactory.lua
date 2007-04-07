@@ -65,7 +65,7 @@ DefineUnitType("unit-vfac", {
 	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 254}},
 	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 254}},
 	Animations = "animations-vfac", Icon = "icon-vfac",
-	Costs = {"time", 200, "energy", 750, "magma", 100},
+	ProductionCosts = {"energy", 750, "magma", 100},--"time", 200, 
 	RepairHp = 2, RepairCosts = {"energy", 2}, Construction = "construction-vfac",
 	Speed = 0, HitPoints = 550, DrawLevel = 25, TileSize = {7, 5},
 	BoxSize = {220, 156}, SightRange = 2, Armor = 30, BasicDamage = 0,

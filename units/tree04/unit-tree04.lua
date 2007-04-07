@@ -41,7 +41,7 @@ DefineUnitType("unit-tree04", {
 	Offset = {0, -24},
 	Shadow = {"file", "units/tree04/tree04_s.png", "size", {128, 128}},
 	Animations = "animations-tree04", Icon = "icon-tree",
-	Costs = {"time", 1},
+	ProductionCosts = {},--"time", 1
 	Construction = "construction-tree",
 	Speed = 0, HitPoints = 50, DrawLevel = 25, 
 	TileSize  = {1, 1}, BoxSize = {32, 32},

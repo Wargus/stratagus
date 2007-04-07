@@ -71,7 +71,7 @@ DefineUnitType("unit-artil", {
 	Shadow = {"file", "units/artil/unit_artil_s.png", "size", {160, 160}},
 	Animations = "animations-artil", Icon = "icon-artil",
 	Flip = false,
-	Costs = {"time", 200, "energy", 300, "magma", 300},
+	ProductionCosts = {"energy", 300, "magma", 300},--"time", 200, 
 	RepairHp = 1, RepairCosts = {"magma", 6},
 	Speed = 10, HitPoints = 250, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 5, Armor = 25, BasicDamage = 10, PiercingDamage = 50,

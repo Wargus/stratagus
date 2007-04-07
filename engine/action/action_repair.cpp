@@ -110,7 +110,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 	} else {
 		// hp is the current damage taken by the unit.
 		hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-			(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
+			(goal->Type->ProductionCosts[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
@@ -122,7 +122,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
 		goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
-			(goal->Stats->Costs[TimeCost] * 600) - hp;
+			(goal->Type->ProductionCosts[TimeCost] * 600) - hp;
 		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
 			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
 		}
@@ -203,7 +203,7 @@ void HandleActionRepair(CUnit *unit)
 						int costs[MaxCosts];
 						for (int i = 0; i < MaxCosts; ++i) {
 							costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
-								unit->Orders[0]->Goal->Type->Stats[unit->Orders[0]->Goal->Player->Index].Costs[i]);
+								unit->Orders[0]->Goal->Type->ProductionCosts[i]);
 						}
 						unit->Player->AddToUnitsConsumingResources(unit, costs);
 					} else {

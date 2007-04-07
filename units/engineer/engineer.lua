@@ -70,7 +70,6 @@ DefineUnitType("unit-engineer", {
 	Image = {"file", GetCurrentLuaPath().."/unit_engineer.png", "size", {56, 56}},
 	Shadow = {"file", GetCurrentLuaPath().."/unit_engineer_s.png", "size", {56, 56}},
 	DrawLevel = 19, Animations = "animations-engineer", Icon = "icon-engineer",
-	Costs = {"time", 50, "energy", 50, "magma", 100},
 	ProductionCosts = {"energy", 500, "magma", 10},
 	MaxUtilizationRate = {"energy", 30, "magma", 30},
 	Speed = 8, HitPoints = 30, DrawLevel = 25,

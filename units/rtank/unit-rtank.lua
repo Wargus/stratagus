@@ -61,7 +61,7 @@ DefineUnitType("unit-rtank", {
 	Shadow = {"file", "units/rtank/unit_rtank_s.png", "size", {96, 96}},
 	Animations = "animations-rtank", Icon = "icon-rtank",
 	Flip = false,
-	Costs = {"time", 100, "energy", 100, "magma", 150},
+	ProductionCosts = {"energy", 100, "magma", 150},--"time", 100, 
 	RepairHp = 1, RepairCosts = {"magma", 6},
 	Speed = 20, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
