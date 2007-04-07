@@ -86,12 +86,12 @@ DefineUnitType("unit-hosp", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
-    Sounds =  {
-		"selected", "hosp-selected",
-		"ready", "hosp-ready",
-		"help", "hosp-help",
-		"dead", "hosp-dead"}
-	})
+    Sounds = {
+        "selected", "hosp-selected",
+        "ready", "hosp-ready",
+        "help", "hosp-help",
+        "dead", "hosp-dead"}
+})
 
 DefineAnimations("animations-hosp2", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -115,12 +115,12 @@ DefineUnitType("build-dead-hosp", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 DefineAllow("unit-hosp", "AAAAAAAA")
 
 DefineButton({
-	Pos = 2, Level = 2, Icon = "icon-hosp_b", Action = "build",
-	Value = "unit-hosp", Key = "h", Hint = "BUILD ~!HOSPITAL",
-	ForUnit = {"unit-engineer"}})
+    Pos = 2, Level = 2, Icon = "icon-hosp_b", Action = "build",
+    Value = "unit-hosp", Key = "h", Hint = "BUILD ~!HOSPITAL",
+    ForUnit = {"unit-engineer"}})

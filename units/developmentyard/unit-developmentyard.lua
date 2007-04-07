@@ -82,12 +82,12 @@ DefineUnitType("unit-dev-yard", {
     VisibleUnderFog = true,
     Building = true,
     BuilderOutside = true,
-    Sounds =  {
-		"selected", "dev-selected",
-		"ready", "dev-ready",
-		"help", "dev-help",
-		"dead", "dev-dead"}
-	})
+    Sounds = {
+        "selected", "dev-selected",
+        "ready", "dev-ready",
+        "help", "dev-help",
+        "dead", "dev-dead"}
+})
 
 DefineAnimations("animations-devyard", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -112,12 +112,13 @@ DefineUnitType("build-dead-devyard", {
     Type = "land",
     Building = true,
     Vanishes = true,
-    Sounds =  {}})
+    Sounds = {}
+})
 
 DefineAllow("unit-dev-yard", "AAAAAAAA")
 
 DefineButton({
-	Pos = 7, Level = 2, Icon = "icon-dev_b", Action = "build",
-	Value = "unit-dev-yard", Key = "d", Hint = "BUILD ~!DEVELOPMENT YARD",
-	ForUnit = {"unit-engineer"}})
+    Pos = 7, Level = 2, Icon = "icon-dev_b", Action = "build",
+    Value = "unit-dev-yard", Key = "d", Hint = "BUILD ~!DEVELOPMENT YARD",
+    ForUnit = {"unit-engineer"}})
 

@@ -92,12 +92,12 @@ DefineUnitType("unit-gen", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     ProductionRate = {"magma", 5},
-    Sounds =  {
-		"selected", "gen-selected",
-		"ready", "gen-ready",
-		"help", "gen-help",
-		"dead", "gen-dead"}
-	})
+    Sounds = {
+        "selected", "gen-selected",
+        "ready", "gen-ready",
+        "help", "gen-help",
+        "dead", "gen-dead"}
+})
 
 DefineAnimations("animations-dead-gen", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -122,15 +122,15 @@ DefineUnitType("build-dead-gen", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 
 
 DefineAllow("unit-gen", "AAAAAAAA")
 
 DefineButton({
-	Pos = 2, Level = 1, Icon = "icon-gen_b", Action = "build",
-	Value = "unit-gen", Key = "m", Hint = "BUILD ~!MAGMA PUMP",
-	ForUnit = {"unit-engineer"}})
+    Pos = 2, Level = 1, Icon = "icon-gen_b", Action = "build",
+    Value = "unit-gen", Key = "m", Hint = "BUILD ~!MAGMA PUMP",
+    ForUnit = {"unit-engineer"}})
 

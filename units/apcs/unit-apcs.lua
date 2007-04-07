@@ -93,12 +93,12 @@ DefineUnitType("unit-apcs", {
     CanTargetLand = true,
     CanTargetAir = true,
     SelectableByRectangle = true,
-    Sounds =  {
-		"selected", "apcs-selected",
-		"acknowledge", "apcs-acknowledge",
-		"ready", "apcs-ready",
-		"help", "apcs-help",
-		"dead", "apcs-die"}
-	})
+    Sounds = {
+        "selected", "apcs-selected",
+        "acknowledge", "apcs-acknowledge",
+        "ready", "apcs-ready",
+        "help", "apcs-help",
+        "dead", "apcs-die"}
+})
 
 DefineAllow("unit-apcs", "AAAAAAAA")

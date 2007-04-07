@@ -115,13 +115,13 @@ DefineUnitType("unit-medic", {
     SelectableByRectangle = true,
     CanCastSpell = {"spell-healing"},
     AutoCastActive = {"spell-healing"},
-    Sounds =  {
-		"selected", "medic-selected",
-		"acknowledge", "medic-acknowledge",
-		"ready", "medic-ready",
-		"help", "medic-help",
-		"dead", "medic-die"}
-	})
+    Sounds = {
+        "selected", "medic-selected",
+        "acknowledge", "medic-acknowledge",
+        "ready", "medic-ready",
+        "help", "medic-help",
+        "dead", "medic-die"}
+})
 DefineHumanCorpse("medic")
 
 DefineAllow("unit-medic", "AAAAAAAA")

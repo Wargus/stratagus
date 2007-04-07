@@ -99,15 +99,15 @@ DefineUnitType("unit-engineer", {
     Harvester = true,
     organic = true,
     SelectableByRectangle = true,
-    Sounds =  {
-		"selected", "engineer-selected",
-		"acknowledge", "engineer-acknowledge",
-		"ready", "engineer-ready",
-		"repair", "engineer-repair",
-		"harvest", "engineer-harvest",
-		"help", "engineer-help",
-		"dead", "engineer-die"}
-	})
+    Sounds = {
+        "selected", "engineer-selected",
+        "acknowledge", "engineer-acknowledge",
+        "ready", "engineer-ready",
+        "repair", "engineer-repair",
+        "harvest", "engineer-harvest",
+        "help", "engineer-help",
+        "dead", "engineer-die"}
+})
 DefineHumanCorpse("engineer", {56, 56})
 
 DefineAllow("unit-engineer", "AAAAAAAA")

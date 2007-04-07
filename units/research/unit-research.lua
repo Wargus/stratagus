@@ -91,12 +91,12 @@ DefineUnitType("unit-rfac", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     ProductionRate = {"energy", 50},
-    Sounds =  {
-		"selected", "rfac-selected",
-		"ready", "rfac-ready",
-		"help", "rfac-help",
-		"dead", "rfac-dead"}
-	})
+    Sounds = {
+        "selected", "rfac-selected",
+        "ready", "rfac-ready",
+        "help", "rfac-help",
+        "dead", "rfac-dead"}
+})
 
 DefineAnimations("animations-research", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -120,14 +120,14 @@ DefineUnitType("build-dead-power-plant", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 DefineAllow("unit-rfac", "AAAAAAAA")
 
 DefineButton({
-	Pos = 6, Level = 1, Icon = "icon-rfac_b", Action = "build",
-	Value = "unit-rfac", Key = "p", Hint = "BUILD ~!POWER PLANT",
-	ForUnit = {"unit-engineer"}})
+    Pos = 6, Level = 1, Icon = "icon-rfac_b", Action = "build",
+    Value = "unit-rfac", Key = "p", Hint = "BUILD ~!POWER PLANT",
+    ForUnit = {"unit-engineer"}})
 
 

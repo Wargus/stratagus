@@ -56,6 +56,9 @@ def parseKvList(kvlist):
             key = i
     return key
 
+def replaceTabs(s):
+    return s.replace('\t', ' ' * 4)
+
 class ParsedScript:
     def __init__(self, path):
         self.path = path
@@ -75,7 +78,7 @@ class ParsedUnit:
         for k in self.orderedkeys[:-1]:
             f.write('    ' + k + ' = ' + self.stats[k] + ',\n')
         k = self.orderedkeys[-1]
-        f.write('    ' + k + ' = ' + self.stats[k])
+        f.write('    ' + k + ' = ' + self.stats[k] + '\n')
     def regenerate(self, f):
         f.write('DefineUnitType("' + self.internalname + '", {\n')
         self.regenerateStats(f)
@@ -95,7 +98,8 @@ def stripComments(s):
 
 def parseDefineUnitType(text):
     unit = ParsedUnit()
-    body, unit.rest = text.split('})', 1)
+    body, rest = text.split('})', 1)
+    unit.rest = replaceTabs(rest)
     body = stripComments(body)
     internalname, stats = body.split(', {', 1)
     unit.internalname = internalname.strip().strip('"')
@@ -103,12 +107,12 @@ def parseDefineUnitType(text):
     prevKey = stats[0].strip()
     for x in stats[1:-1]:
         x = x.split(',')
-        unit.stats[prevKey] = ','.join(x[:-1]).strip()
+        unit.stats[prevKey] = replaceTabs(','.join(x[:-1]).strip())
         unit.orderedkeys.append(prevKey)
         prevKey = x[-1].strip()
     if len(stats) > 2:
         unit.orderedkeys.append(prevKey)
-        unit.stats[prevKey] = stats[-1]
+        unit.stats[prevKey] = replaceTabs(stats[-1].strip())
     return unit
     
 def parseScript(path):

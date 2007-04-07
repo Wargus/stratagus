@@ -101,10 +101,10 @@ DefineUnitType("unit-cam", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
-    Sounds =  {"selected", "camera-selected",
-		"ready", "camera-ready",
-		"help", "camera-help"
-		}
+    Sounds = {"selected", "camera-selected",
+        "ready", "camera-ready",
+        "help", "camera-help"
+        }
 })
 
 DefineUnitType("camera_destroyed", {
@@ -124,15 +124,15 @@ DefineUnitType("camera_destroyed", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
+    Vanishes = true
 })
 
 DefineAllow("unit-cam", "AAAAAAAA")
 
 DefineButton({
-	Pos = 5, Level = 1, Icon = "icon-cam_b", Action = "build",
-	Value = "unit-cam", Key = "c", Hint = "BUILD ~!CAMERA",
-	ForUnit = {"unit-engineer"}})
+    Pos = 5, Level = 1, Icon = "icon-cam_b", Action = "build",
+    Value = "unit-cam", Key = "c", Hint = "BUILD ~!CAMERA",
+    ForUnit = {"unit-engineer"}})
 
 
 

@@ -89,11 +89,11 @@ DefineUnitType("unit-radar", {
     VisibleUnderFog = true,
     NumDirections = 1,
     RadarRange = 40,
-    Sounds =  {
-		"selected", "radar-selected",
-		"ready", "radar-ready",
-		"help", "radar-help"
-		}
+    Sounds = {
+        "selected", "radar-selected",
+        "ready", "radar-ready",
+        "help", "radar-help"
+        }
 })
 
 DefineUnitType("radar_destroyed", {
@@ -113,15 +113,15 @@ DefineUnitType("radar_destroyed", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
+    Vanishes = true
 })
 
 DefineAllow("unit-radar", "AAAAAAAA")
 
 DefineButton({
-	Pos = 4, Level = 1, Icon = "icon-radar_b", Action = "build",
-	Value = "unit-radar", Key = "r", Hint = "BUILD ~!RADAR",
-	ForUnit = {"unit-engineer"}})
+    Pos = 4, Level = 1, Icon = "icon-radar_b", Action = "build",
+    Value = "unit-radar", Key = "r", Hint = "BUILD ~!RADAR",
+    ForUnit = {"unit-engineer"}})
 
 
 

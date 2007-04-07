@@ -100,12 +100,12 @@ DefineUnitType("unit-harvester", {
     Coward = true,
     Harvester = true,
     SelectableByRectangle = true,
-    Sounds =  {
-		"selected", "harvester-selected",
-		"acknowledge", "harvester-acknowledge",
-		"ready", "harvester-ready",
-		"harvest", "harvester-harvest",
-		"help", "harvester-help",
-		"dead", "harvester-die"}
-	})
+    Sounds = {
+        "selected", "harvester-selected",
+        "acknowledge", "harvester-acknowledge",
+        "ready", "harvester-ready",
+        "harvest", "harvester-harvest",
+        "help", "harvester-help",
+        "dead", "harvester-die"}
+})
 DefineAllow("unit-harvester", "AAAAAAAA")

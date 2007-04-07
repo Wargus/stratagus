@@ -89,20 +89,20 @@ DefineUnitType("unit-rtank", {
     CanTargetAir = true,
     NumDirections = 8,
     MaxAttackRange = 7,
-    Sounds =  {
-		"selected", "grenadier-selected",
-		"acknowledge", "grenadier-acknowledge",
-		"ready", "rtank-ready",
-		"help", "rtank-help"
-		}
+    Sounds = {
+        "selected", "grenadier-selected",
+        "acknowledge", "grenadier-acknowledge",
+        "ready", "rtank-ready",
+        "help", "rtank-help"
+        }
 })
 
 DefineAllow("unit-rtank", "AAAAAAAA")
 
 DefineButton({
-	Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",
-	Value = "unit-rtank", Key = "r", Hint = "BUILD ~!ROCKET TANK",
-	ForUnit = {"unit-vfac"}})
+    Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",
+    Value = "unit-rtank", Key = "r", Hint = "BUILD ~!ROCKET TANK",
+    ForUnit = {"unit-vfac"}})
 
 DefineCommonButtons({"unit-rtank"})
 

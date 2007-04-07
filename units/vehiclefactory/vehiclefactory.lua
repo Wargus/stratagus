@@ -88,12 +88,12 @@ DefineUnitType("unit-vfac", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
-    Sounds =  {
-		"selected", "vfac-selected",
-		"ready", "vfac-ready",
-		"help", "vfac-help",
-		"dead", "vfac-dead"}
-	})
+    Sounds = {
+        "selected", "vfac-selected",
+        "ready", "vfac-ready",
+        "help", "vfac-help",
+        "dead", "vfac-dead"}
+})
 
 DefineAnimations("animations-vfac2", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -118,12 +118,12 @@ DefineUnitType("build-dead-vfac", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 DefineAllow("unit-vfac", "AAAAAAAA")
 
 DefineButton({
-	Pos = 3, Level = 2, Icon = "icon-vfac_b", Action = "build",
-	Value = "unit-vfac", Key = "v", Hint = "BUILD ~!VEHICLE FACTORY",
-	ForUnit = {"unit-engineer"}})
+    Pos = 3, Level = 2, Icon = "icon-vfac_b", Action = "build",
+    Value = "unit-vfac", Key = "v", Hint = "BUILD ~!VEHICLE FACTORY",
+    ForUnit = {"unit-engineer"}})

@@ -85,8 +85,8 @@ DefineUnitType("unit-msilo", {
     CanCastSpell = {"spell-nuke"},
     Building = true,
     BuilderOutside = true,
-    VisibleUnderFog =  true,
-	})
+    VisibleUnderFog = true,
+})
 DefineAnimations("animations-dead-msilo", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
@@ -110,12 +110,13 @@ DefineUnitType("build-dead-msilo", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true})
+    Vanishes = true
+})
 
 DefineAllow("unit-msilo", "AAAAAAAA")
 
 DefineButton({
-	Pos = 4, Level = 3, Icon = "icon-msilo_b", Action = "build",
-	Value = "unit-msilo", Key = "m", Hint = "BUILD ~!MISSILE SILO",
-	ForUnit = {"unit-engineer"}})
+    Pos = 4, Level = 3, Icon = "icon-msilo_b", Action = "build",
+    Value = "unit-msilo", Key = "m", Hint = "BUILD ~!MISSILE SILO",
+    ForUnit = {"unit-engineer"}})
 

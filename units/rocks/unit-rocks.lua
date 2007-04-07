@@ -64,14 +64,14 @@ DefineUnitType("unit-rock-1", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-rock-1",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/rocks/rock_1i.png"})
+    Name = "icon-rock-1",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/rocks/rock_1i.png"})
 
 DefineAllow("unit-rock-1", "AAAAAAAA")
 
@@ -100,14 +100,14 @@ DefineUnitType("unit-rock-2", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-rock-2",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/rocks/rock_2i.png"})
+    Name = "icon-rock-2",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/rocks/rock_2i.png"})
 
 DefineAllow("unit-rock-2", "AAAAAAAA")
 
@@ -136,14 +136,14 @@ DefineUnitType("unit-rock-3", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-rock-3",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/rocks/rock_3i.png"})
+    Name = "icon-rock-3",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/rocks/rock_3i.png"})
 
 DefineAllow("unit-rock-3", "AAAAAAAA")
 
@@ -172,14 +172,14 @@ DefineUnitType("unit-rock-4", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-rock-4",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/rocks/rock_4i.png"})
+    Name = "icon-rock-4",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/rocks/rock_4i.png"})
 
 DefineAllow("unit-rock-4", "AAAAAAAA")
 
@@ -208,14 +208,14 @@ DefineUnitType("unit-rock-5", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-rock-5",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/rocks/rock_5i.png"})
+    Name = "icon-rock-5",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/rocks/rock_5i.png"})
 
 DefineAllow("unit-rock-5", "AAAAAAAA")
 
@@ -244,14 +244,14 @@ DefineUnitType("unit-rock-6", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-rock-6",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/rocks/rock_6i.png"})
+    Name = "icon-rock-6",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/rocks/rock_6i.png"})
 
 DefineAllow("unit-rock-6", "AAAAAAAA")
 

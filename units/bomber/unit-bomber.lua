@@ -91,20 +91,20 @@ DefineUnitType("unit-bomber", {
     CanTargetLand = true,
     NumDirections = 8,
     MaxAttackRange = 1,
-    Sounds =  {
-		"selected", "grenadier-selected",
-		"acknowledge", "grenadier-acknowledge",
-		"ready", "bomber-ready",
-		"help", "bomber-help"
-		}
+    Sounds = {
+        "selected", "grenadier-selected",
+        "acknowledge", "grenadier-acknowledge",
+        "ready", "bomber-ready",
+        "help", "bomber-help"
+        }
 })
 
 DefineAllow("unit-bomber", "AAAAAAAA")
 
 DefineButton({
-	Pos = 2, Level = 0, Icon = "icon-bomber", Action = "train-unit",
-	Value = "unit-bomber", Key = "b", Hint = "BUILD ~!BOMBER",
-	ForUnit = {"unit-dev-yard"}})
+    Pos = 2, Level = 0, Icon = "icon-bomber", Action = "train-unit",
+    Value = "unit-bomber", Key = "b", Hint = "BUILD ~!BOMBER",
+    ForUnit = {"unit-dev-yard"}})
 
 DefineCommonButtons({"unit-bomber"})
 

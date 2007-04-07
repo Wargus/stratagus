@@ -71,7 +71,7 @@ DefineUnitType("unit-antharus", {
     BuilderOutside = true,
     VisibleUnderFog = false,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineAllow("unit-antharus", "FFFFFFFF")

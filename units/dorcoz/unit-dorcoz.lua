@@ -76,18 +76,15 @@ DefineUnitType("unit-dorcoz", {
     Points = 50,
     Corpse = "unit-dead-body",
     Type = "land",
-    RightMouseAction =  "attack"
-
-        ,
+    RightMouseAction = "attack",
     CanAttack = true,
     CanTargetLand = true,
     CanTargetAir = true,
     LandUnit = true,
     organic = true,
     SelectableByRectangle = true,
-    RightMouseAction =  "attack"
-
-        })
+    RightMouseAction = "attack"
+})
 
 DefineAllow("unit-dorcoz", "AAAAAAAA")
 

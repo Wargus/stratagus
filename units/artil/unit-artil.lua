@@ -98,10 +98,10 @@ DefineUnitType("unit-artil", {
     CanTargetLand = true,
     NumDirections = 8,
     MaxAttackRange = 8,
-    Sounds =  {
-		"ready", "artil-ready",
-		"help", "artil-help"
-		}
+    Sounds = {
+        "ready", "artil-ready",
+        "help", "artil-help"
+        }
 })
 
 DefineAllow("unit-artil", "AAAAAAAA")
@@ -109,8 +109,8 @@ DefineAllow("unit-artil", "AAAAAAAA")
 DefineCommonButtons({"unit-artil"})
 
 DefineButton({
-	Pos = 6, Level = 0, Icon = "icon-artil", Action = "train-unit",
-	Value = "unit-artil", Key = "l", Hint = "BUILD ARTI~!L",
-	ForUnit = {"unit-vfac"}})
+    Pos = 6, Level = 0, Icon = "icon-artil", Action = "train-unit",
+    Value = "unit-artil", Key = "l", Hint = "BUILD ARTI~!L",
+    ForUnit = {"unit-vfac"}})
 
 

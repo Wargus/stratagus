@@ -92,12 +92,12 @@ DefineUnitType("unit-vault", {
     VisibleUnderFog = true,
     StorageCapacity = {"energy", 10000, "magma", 2000},
     MaxUtilizationRate = {"energy", 30, "magma", 30},
-    Sounds =  {
-		"selected", "dev-selected",
-		"ready", "dev-ready",
-		"help", "dev-help",
-		"dead", "dev-dead"}
-	})
+    Sounds = {
+        "selected", "dev-selected",
+        "ready", "dev-ready",
+        "help", "dev-help",
+        "dead", "dev-dead"}
+})
 
 DefineAnimations("animations-vault2", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -121,8 +121,8 @@ DefineUnitType("build-dead-vault", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 
 DefineAllow("unit-vault", "AAAAAAAA")
