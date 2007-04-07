@@ -65,8 +65,10 @@ static void UpdateConstructionFrame(CUnit *unit)
 	CConstructionFrame *tmp;
 	int percent;
 
-	percent = unit->Data.Built.Progress /
-		((unit->Type->ProductionCosts[TimeCost] ? unit->Type->ProductionCosts[TimeCost] : 1) * 6);
+	int *costs = unit->Type->ProductionCosts;
+	int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+	percent = unit->Data.Built.Progress * 100 / cost;
+
 	cframe = tmp = unit->Type->Construction->Frames;
 	while (tmp) {
 		if (percent < tmp->Percent) {
@@ -108,9 +110,9 @@ static void MoveToLocation(CUnit *unit)
 			// Some tries to reach the goal
 			//
 			if (unit->SubAction++ < 10) {
-				// To keep the load low, retry each 1/4 second.
+				// To keep the load low, retry each 10 cycles
 				// NOTE: we can already inform the AI about this problem?
-				unit->Wait = CYCLES_PER_SECOND / 4 + unit->SubAction;
+				unit->Wait = 10;
 				return;
 			}
 
@@ -159,7 +161,6 @@ static CUnit *CheckCanBuild(CUnit *unit)
 
 	//
 	// Check if the building could be built there.
-	// if on NULL, really attempt to build here
 	//
 	if ((ontop = CanBuildUnitType(unit, type, x, y, 1)) == NULL) {
 		//
@@ -183,7 +184,6 @@ static CUnit *CheckCanBuild(CUnit *unit)
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
 		}
-
 		return NULL;
 	}
 
@@ -246,17 +246,19 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	// If unable to make unit, stop, and report message
 	if (build == NoUnitP) {
 		unit->Orders[0]->Action = UnitActionStill;
+		unit->SubAction = 0;
 
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			_("Unable to create building %s"), type->Name.c_str());
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		
+
 		return;
 	}
-	
+
 	if (!type->BuilderOutside) {
+		// Start using resources
 		int costs[MaxCosts];
 		for (int i = 0; i < MaxCosts; ++i) {
 			costs[i] = std::min<int>(type->MaxUtilizationRate[i],
@@ -272,7 +274,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	if (ontop != unit) {
 		CBuildRestrictionOnTop *b;
 
-		b = static_cast<CBuildRestrictionOnTop *> (OnTopDetails(build, ontop->Type));
+		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(build, ontop->Type));
 		Assert(b);
 		if (b->ReplaceOnBuild) {
 			// We capture the value of what is beneath.
@@ -296,8 +298,8 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type->Slot]--;
 
-	// Make sure the bulding doesn't cancel itself out right away.
-	build->Data.Built.Progress = 100;
+	// Make sure the building doesn't cancel itself out right away.
+	build->Data.Built.Progress = 0;
 	build->Variable[HP_INDEX].Value = 1;
 	UpdateConstructionFrame(build);
 
@@ -322,11 +324,11 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		unit->SubAction = 40;
 		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
 		UnitUpdateHeading(unit);
-		unit->Data.Build.Cycles = 0;
 		build->RefsIncrease();
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
 
+		// Start using resources
 		int costs[MaxCosts];
 		for (int i = 0; i < MaxCosts; ++i) {
 			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
@@ -346,15 +348,38 @@ static void BuildBuilding(CUnit *unit)
 {
 	CUnit *goal;
 	int hp;
-	int animlength;
+	int *pcosts;
+	int pcost;
 
-	UnitShowAnimation(unit, unit->Type->Animations->Build);
-	unit->Data.Build.Cycles++;
-	if (unit->Anim.Unbreakable) {
-		return ;
-	}
 	goal = unit->Orders[0]->Goal;
 	Assert(goal);
+
+	pcosts = unit->Orders[0]->Type->ProductionCosts;
+	pcost = CYCLES_PER_SECOND * (pcosts[1] ? pcosts[1] : pcosts[2]);
+
+	if (goal->Orders[0]->Action != UnitActionDie) {
+		// hp is the current damage taken by the unit.
+		hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) / pcost - goal->Variable[HP_INDEX].Value;
+
+		// Update build progress
+		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
+		int cost = costs[1] ? costs[1] : costs[2];
+		goal->Data.Built.Progress += cost * SpeedBuild;
+		if (goal->Data.Built.Progress > pcost) {
+			goal->Data.Built.Progress = pcost;
+		}
+
+		// Keep the same level of damage while increasing HP.
+		goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) / pcost - hp;
+		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
+			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
+		}
+	}
+
+	UnitShowAnimation(unit, unit->Type->Animations->Build);
+	if (unit->Anim.Unbreakable) {
+		return;
+	}
 
 	if (goal->Orders[0]->Action == UnitActionDie) {
 		goal->RefsDecrease();
@@ -367,29 +392,11 @@ static void BuildBuilding(CUnit *unit)
 		return;
 	}
 
-	// hp is the current damage taken by the unit.
-	hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-		((goal->Type->ProductionCosts[TimeCost] ? goal->Type->ProductionCosts[TimeCost] : 1) * 600) - goal->Variable[HP_INDEX].Value;
 	//
-	// Calculate the length of the attack (repair) anim.
+	// Building is finished
 	//
-	animlength = unit->Data.Build.Cycles;
-	unit->Data.Build.Cycles = 0;
-
-	// FIXME: implement this below:
-	// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
-	goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
-	// Keep the same level of damage while increasing HP.
-	goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-		((goal->Type->ProductionCosts[TimeCost] ? goal->Type->ProductionCosts[TimeCost] : 1) * 600) - hp;
-	if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
-		goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
-	}
-
-	//
-	// Building is gone or finished
-	//
-	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
+	if (goal->Data.Built.Progress >= pcost ||
+			goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
 		goal->RefsDecrease();
 		unit->Orders[0]->Goal = NULL;
 		unit->Orders[0]->Action = UnitActionStill;
@@ -423,6 +430,7 @@ void HandleActionBuild(CUnit *unit)
 	}
 }
 
+
 /**
 **  Unit under Construction
 **
@@ -431,31 +439,27 @@ void HandleActionBuild(CUnit *unit)
 void HandleActionBuilt(CUnit *unit)
 {
 	CUnit *worker;
-	CUnitType *type;
-	int n;
-	int progress;
+	CUnitType *type = unit->Type;
+	int hp;
+	int progress = 0;
 
-	type = unit->Type;
+	int *pcosts = type->ProductionCosts;
+	int pcost = CYCLES_PER_SECOND * (pcosts[1] ? pcosts[1] : pcosts[2]);
 
-	// n is the current damage taken by the unit.
-	n = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) /
-		((unit->Type->ProductionCosts[TimeCost] ? unit->Type->ProductionCosts[TimeCost] : 1) * 600) - unit->Variable[HP_INDEX].Value;
-	// This below is most often 0
-	if (type->BuilderOutside) {
-		progress = unit->Type->AutoBuildRate;
-	} else {
-		progress = 100;
-		// FIXME: implement this below:
-		// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
-	}
-	// Building speeds increase or decrease.
-	progress *= SpeedBuild;
-	unit->Data.Built.Progress += progress;
-	// Keep the same level of damage while increasing HP.
-	unit->Variable[HP_INDEX].Value = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) /
-		((type->ProductionCosts[TimeCost] ? type->ProductionCosts[TimeCost] : 1) * 600) - n;
-	if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
-		unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
+	// hp is the current damage taken by the unit.
+	hp = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - unit->Variable[HP_INDEX].Value;
+
+	if (!type->BuilderOutside) {
+		progress = 1;
+
+		// Building speeds increase or decrease.
+		progress *= SpeedBuild;
+		unit->Data.Built.Progress += progress;
+		// Keep the same level of damage while increasing HP.
+		unit->Variable[HP_INDEX].Value = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - hp;
+		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
+			unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
+		}
 	}
 
 	//
@@ -486,7 +490,7 @@ void HandleActionBuilt(CUnit *unit)
 	//
 	// Check if building ready. Note we can both build and repair.
 	//
-	if (unit->Data.Built.Progress >= unit->Type->ProductionCosts[TimeCost] * 600 ||
+	if (unit->Data.Built.Progress >= pcost ||
 			unit->Variable[HP_INDEX].Value >= unit->Stats->Variables[HP_INDEX].Max) {
 		DebugPrint("Building ready.\n");
 		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
