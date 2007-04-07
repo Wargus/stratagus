@@ -1617,8 +1617,10 @@ void UpdateUnitVariables(const CUnit *unit)
 
 	// Build
 	if (unit->Orders[0]->Action == UnitActionBuilt) {
+		const int *pcosts = type->ProductionCosts;
+		int pcost = CYCLES_PER_SECOND * (pcosts[1] ? pcosts[1] : pcosts[2]);
 		unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
-		unit->Variable[BUILD_INDEX].Max = type->ProductionCosts[TimeCost] * 600;
+		unit->Variable[BUILD_INDEX].Max = pcost;
 
 		// This should happen when building unit with several peons
 		// Maybe also with only one.
