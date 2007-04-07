@@ -581,8 +581,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->BuilderOutside = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuilderLost")) {
 			type->BuilderLost = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "AutoBuildRate")) {
-			type->AutoBuildRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ShoreBuilding")) {
 			type->ShoreBuilding = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "LandUnit")) {

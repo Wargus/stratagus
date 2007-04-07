@@ -252,10 +252,12 @@ static int BaseEfficiency(CPlayer *p)
 static int MaxRate(CUnit *unit, int res)
 {
 	if (unit->Orders[0]->Action == UnitActionTrain ||
-			unit->Orders[0]->Action == UnitActionBuild ||
-			unit->Orders[0]->Action == UnitActionRepair) {
+			unit->Orders[0]->Action == UnitActionBuild) {
 		return std::min<int>(unit->Type->MaxUtilizationRate[res],
-				unit->Orders[0]->Type->ProductionCosts[res]);
+			unit->Orders[0]->Type->ProductionCosts[res]);
+	} else if (unit->Orders[0]->Action == UnitActionRepair) {
+		return std::min<int>(unit->Type->MaxUtilizationRate[res],
+			unit->Orders[0]->Goal->Type->ProductionCosts[res]);
 	} else if (unit->Orders[0]->Action == UnitActionBuilt) {
 		if (!unit->Type->BuilderOutside) {
 			return std::min<int>(unit->Data.Built.Worker->Type->MaxUtilizationRate[res],

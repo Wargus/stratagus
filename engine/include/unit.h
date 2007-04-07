@@ -660,9 +660,6 @@ public:
 		int Cancel;                 /// Cancel construction
 		CConstructionFrame *Frame;   /// Construction frame
 	} Built; /// ActionBuilt,...
-	struct _order_build_ {
-		int Cycles;                 /// Cycles unit has been building for
-	} Build; /// ActionBuild
 	struct _order_harvest_ {
 		int CurrentProduction[MaxCosts];
 	} Harvest; /// Harvest

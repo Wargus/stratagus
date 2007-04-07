@@ -2021,8 +2021,6 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 
 /**
 **  Can build unit here.
-**  Hall to near to goldmine.
-**  Refinery or shipyard to near to oil patch.
 **
 **  @param unit  Unit doing the building
 **  @param type  unit-type to be checked.
@@ -2034,9 +2032,6 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 {
 	CUnit *ontoptarget;
-	int w;
-	int h;
-	int success;
 
 	//
 	//  Can't build outside the map
@@ -2050,14 +2045,15 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 
 	// Must be checked before oil!
 	if (type->ShoreBuilding) {
-		success = 0;
+		bool success = false;
 
 		// Need at least one coast tile
-		for (h = type->TileHeight; h--;) {
-			for (w = type->TileWidth; w--;) {
+		for (int h = type->TileHeight; h--;) {
+			for (int w = type->TileWidth; w--;) {
 				if (Map.Field(x + w, y + h)->Flags & MapFieldCoastAllowed) {
 					h = w = 0;
-					success = 1;
+					success = true;
+					break;
 				}
 			}
 		}
@@ -2069,13 +2065,12 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 	if (type->BuildingRules.empty()) {
 		return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 	}
+
 	ontoptarget = NULL;
 	for (std::vector<CBuildRestriction *>::const_iterator ib = type->BuildingRules.begin();
-		ib != type->BuildingRules.end(); ++ib) {
-		const CBuildRestriction *b = *ib;
-
+			ib != type->BuildingRules.end(); ++ib) {
 		// All checks processed, did we really have success
-		if (b->Check(type, x, y, ontoptarget)) {
+		if ((*ib)->Check(type, x, y, ontoptarget)) {
 			// We passed a full ruleset return
 			if (unit == NULL) {
 				return ontoptarget ? ontoptarget : (CUnit *)1;
@@ -2105,7 +2100,7 @@ bool CanBuildOn(int x, int y, int mask)
 }
 
 /**
-**  Can build unit-type on this point.
+**  Can build unit-type at this point.
 **
 **  @param unit  Worker that want to build the building or NULL.
 **  @param type  Building unit-type.
@@ -2114,12 +2109,9 @@ bool CanBuildOn(int x, int y, int mask)
 **  @param real  Really build, or just placement
 **
 **  @return      OnTop, parent unit, builder on true, NULL false.
-**
 */
 CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real)
 {
-	int w;
-	int h;
 	int j;
 	int testmask;
 	CPlayer *player;
@@ -2130,7 +2122,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 	if (ontop == NULL) {
 		return NULL;
 	}
-	if (ontop != (CUnit *) 1 && ontop != unit) {
+	if (ontop != (CUnit *)1 && ontop != unit) {
 		return ontop;
 	}
 
@@ -2148,8 +2140,8 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 		player = unit->Player;
 	}
 
-	for (h = type->TileHeight; h--;) {
-		for (w = type->TileWidth; w--;) {
+	for (int h = type->TileHeight; h--;) {
+		for (int w = type->TileWidth; w--;) {
 			if (player && !real) {
 				testmask = MapFogFilterFlags(player, x + w, y + h, type->MovementMask);
 			} else {
