@@ -810,7 +810,7 @@ void CUnit::Remove(CUnit *host)
 /**
 **  Update information for lost units.
 **
-**  @param unit    Pointer to unit.
+**  @param unit  Pointer to unit.
 **
 **  @note Also called by ChangeUnitOwner
 */
@@ -820,7 +820,6 @@ void UnitLost(CUnit *unit)
 	CBuildRestrictionOnTop *b;
 	const CUnitType *type;
 	CPlayer *player;
-	int i;
 
 	Assert(unit);
 
@@ -858,32 +857,6 @@ void UnitLost(CUnit *unit)
 
 		if (unit->Orders[0]->Action != UnitActionBuilt) {
 			player->UnitTypesCount[type->Slot]--;
-		}
-	}
-
-
-	//
-	//  Update information.
-	//
-	if (unit->Orders[0]->Action != UnitActionBuilt) {
-		//
-		//  Handle income improvements, look if a player loses a building
-		//  which have given him a better income, find the next best
-		//  income.
-		//
-		for (i = 1; i < MaxCosts; ++i) {
-			if (player->Incomes[i] && type->ImproveIncomes[i] == player->Incomes[i]) {
-				int m;
-				int j;
-
-				m = DefaultIncomes[i];
-				for (j = 0; j < player->TotalNumUnits; ++j) {
-					if (m < player->Units[j]->Type->ImproveIncomes[i]) {
-						m = player->Units[j]->Type->ImproveIncomes[i];
-					}
-				}
-				player->Incomes[i] = m;
-			}
 		}
 	}
 
@@ -957,11 +930,6 @@ void UpdateForNewUnit(const CUnit *unit, int upgrade)
 	//
 	// Update resources
 	//
-	for (u = 1; u < MaxCosts; ++u) {
-		if (player->Incomes[u] < type->ImproveIncomes[u]) {
-			player->Incomes[u] = type->ImproveIncomes[u];
-		}
-	}
 	for (u = 1; u < MaxCosts; ++u) {
 		player->ProductionRate[u] += type->ProductionRate[u];
 		player->StorageCapacity[u] += type->StorageCapacity[u];

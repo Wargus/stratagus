@@ -353,18 +353,8 @@ void SavePlayers(CFile *file)
 		file->printf("\",\n  \"start\", {%d, %d},\n", p->StartX,
 			p->StartY);
 
-		// Incomes
-		file->printf("},\n  \"incomes\", {");
-		for (j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				file->printf(" ");
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				p->Incomes[j]);
-		}
-
 		// ProductionRate
-		file->printf("},\n  \"production-rate\", {");
+		file->printf("  \"production-rate\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				file->printf(" ");
@@ -588,13 +578,6 @@ void CreatePlayer(int type)
 		}
 	}
 
-	//
-	//  Initial default incomes.
-	//
-	for (i = 0; i < MaxCosts; ++i) {
-		player->Incomes[i] = DefaultIncomes[i];
-	}
-
 	memset(player->UnitTypesCount, 0, sizeof(player->UnitTypesCount));
 
 	player->NumBuildings = 0;
@@ -641,7 +624,6 @@ void CPlayer::Clear()
 	SharedVision = 0;
 	StartX = 0;
 	StartY = 0;
-	memset(Incomes, 0, sizeof(Incomes));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	AiEnabled = 0;
 	Ai = 0;
