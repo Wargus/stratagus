@@ -71,7 +71,7 @@ DefineUnitType("unit-apcs", {
 	Armor = 10, BasicDamage = 5, PiercingDamage = 5, Missile = "missile-none",
 	MaxAttackRange = 4, Priority = 60, Points = 50,
 	CanTransport = {"organic", "only"}, AttackFromTransporter = true, MaxOnBoard = 6,
-	Type = "land", RepairHp = 2, RepairCosts = {"energy", 2},
+	Type = "land", RepairHp = 2,
 	RightMouseAction = "attack",
 	ExplodeWhenKilled = "missile-160x128-explosion",
 	LandUnit = true,

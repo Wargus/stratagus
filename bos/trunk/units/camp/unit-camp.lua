@@ -68,7 +68,7 @@ DefineUnitType("unit-camp", {
 	Shadow = {"file", GetCurrentLuaPath().."/training_camp_s.png", "size", {224, 224}},
 	Animations = "animations-camp", Icon = "icon-camp",
 	ProductionCosts = {"energy", 300, "magma", 150},--"time", 100, 
-	RepairHp = 2, RepairCosts = {"energy", 2},
+	RepairHp = 2,
 	Construction = "construction-camp", Speed = 0, HitPoints = 500,
 	DrawLevel = 25, TileSize = {7, 5}, BoxSize = {220, 156},
 	SightRange = 1, Armor = 25, BasicDamage = 0, PiercingDamage = 0,

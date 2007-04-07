@@ -65,7 +65,7 @@ DefineUnitType("unit-radar", {
 	Shadow = {"file", "units/radar/radar_s.png", "size", {64, 64}},
 	Animations = "animations-radar", Icon = "icon-radar",
 	ProductionCosts = {"energy", 7, "magma", 35},--"time", 20, 
-	RepairHp = 1, RepairCosts = {"magma", 3}, Construction = "construction-radar",
+	RepairHp = 1, Construction = "construction-radar",
 	Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {32, 28},
 	SightRange = 3, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,

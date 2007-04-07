@@ -72,7 +72,7 @@ DefineUnitType("unit-artil", {
 	Animations = "animations-artil", Icon = "icon-artil",
 	Flip = false,
 	ProductionCosts = {"energy", 300, "magma", 300},--"time", 200, 
-	RepairHp = 1, RepairCosts = {"magma", 6},
+	RepairHp = 1,
 	Speed = 10, HitPoints = 250, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 5, Armor = 25, BasicDamage = 10, PiercingDamage = 50,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,

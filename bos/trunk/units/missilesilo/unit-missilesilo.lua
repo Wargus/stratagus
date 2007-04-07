@@ -62,7 +62,7 @@ DefineUnitType("unit-msilo", {
 	Shadow = {"file", GetCurrentLuaPath().."/missile_silo_s.png", "size", {256, 256}},
 	Animations = "animations-msilo", Icon = "icon-msilo",
 	ProductionCosts = {"energy", 10000, "magma", 10000},--"time", 2000, 
-	RepairHp = 2, RepairCosts = {"energy", 2},
+	RepairHp = 2,
 	Construction = "construction-msilo",
 	Speed = 0, HitPoints = 450, DrawLevel = 25, 
 	TileSize = {5, 5}, BoxSize = {168, 168},

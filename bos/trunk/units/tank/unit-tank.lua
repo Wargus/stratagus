@@ -62,7 +62,7 @@ DefineUnitType("unit-tank", {
 	Animations = "animations-tank", Icon = "icon-tank",
 	Flip = false,
 	ProductionCosts = {"energy", 200, "magma", 100},--"time", 150, 
-	RepairHp = 1, RepairCosts = {"magma", 6},
+	RepairHp = 1,
 	Speed = 12, HitPoints = 200, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
 	SightRange = 6, Armor = 20, BasicDamage = 10, PiercingDamage = 40,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,

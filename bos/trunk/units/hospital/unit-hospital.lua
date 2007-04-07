@@ -64,7 +64,7 @@ DefineUnitType("unit-hosp", {
 	Shadow = {"file", GetCurrentLuaPath().."/hospital_s.png", "size", {256, 256}},
 	Animations = "animations-hosp", Icon = "icon-hosp",
 	ProductionCosts = {"energy", 500, "magma", 100},--"time", 125, 
-	RepairHp = 2, RepairCosts = {"energy", 2}, Construction = "construction-hosp",
+	RepairHp = 2, Construction = "construction-hosp",
 	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize = {6, 5},
 	BoxSize = {192, 160}, SightRange = 2, Armor = 30, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
