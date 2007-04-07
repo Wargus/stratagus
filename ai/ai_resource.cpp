@@ -91,7 +91,7 @@ static int AiCheckCosts(const int *costs)
 */
 static int AiCheckUnitTypeCosts(const CUnitType *type)
 {
-	return AiCheckCosts(type->Stats[AiPlayer->Player->Index].Costs);
+	return AiCheckCosts(type->ProductionCosts);
 }
 
 /**
@@ -897,7 +897,7 @@ static void AiCheckRepair(void)
 			// Must check, if there are enough resources
 			//
 			for (j = 1; j < MaxCosts; ++j) {
-				if (unit->Stats->Costs[j] && AiPlayer->Player->ProductionRate[j] == 0 &&
+				if (unit->Type->ProductionCosts[j] && AiPlayer->Player->ProductionRate[j] == 0 &&
 						AiPlayer->Player->StoredResources[j] == 0) {
 					repair_flag = false;
 				}

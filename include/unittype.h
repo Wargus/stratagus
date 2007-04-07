@@ -135,10 +135,6 @@
 **    Maximum hit points
 **
 **
-**  CUnitType::_Costs[::MaxCosts]
-**
-**    How many resources needed
-**
 **  CUnitType::RepairHP
 **
 **    The HP given to a unit each cycle it's repaired.
@@ -702,7 +698,6 @@ public:
 		FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
-		memset(_Costs, 0, sizeof(_Costs));
 		memset(RepairCosts, 0, sizeof(RepairCosts));
 		memset(StartingResources, 0, sizeof(StartingResources));
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
@@ -743,7 +738,6 @@ public:
 	// this is taken from the UDTA section
 	CConstruction *Construction;    /// What is shown in construction phase
 
-	int _Costs[MaxCosts];           /// How many resources needed
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 

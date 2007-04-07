@@ -66,7 +66,7 @@ static void UpdateConstructionFrame(CUnit *unit)
 	int percent;
 
 	percent = unit->Data.Built.Progress /
-		(unit->Type->Stats[unit->Player->Index].Costs[TimeCost] * 6);
+		((unit->Type->ProductionCosts[TimeCost] ? unit->Type->ProductionCosts[TimeCost] : 1) * 6);
 	cframe = tmp = unit->Type->Construction->Frames;
 	while (tmp) {
 		if (percent < tmp->Percent) {
@@ -260,7 +260,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		int costs[MaxCosts];
 		for (int i = 0; i < MaxCosts; ++i) {
 			costs[i] = std::min<int>(type->MaxUtilizationRate[i],
-				build->Type->Stats[build->Player->Index].Costs[i]);
+				build->Type->ProductionCosts[i]);
 		}
 		build->Player->AddToUnitsConsumingResources(build, costs);
 	}
@@ -330,7 +330,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		int costs[MaxCosts];
 		for (int i = 0; i < MaxCosts; ++i) {
 			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
-				build->Type->Stats[build->Player->Index].Costs[i]);
+				build->Type->ProductionCosts[i]);
 		}
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	}
@@ -369,7 +369,7 @@ static void BuildBuilding(CUnit *unit)
 
 	// hp is the current damage taken by the unit.
 	hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-		(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
+		((goal->Type->ProductionCosts[TimeCost] ? goal->Type->ProductionCosts[TimeCost] : 1) * 600) - goal->Variable[HP_INDEX].Value;
 	//
 	// Calculate the length of the attack (repair) anim.
 	//
@@ -381,7 +381,7 @@ static void BuildBuilding(CUnit *unit)
 	goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 	// Keep the same level of damage while increasing HP.
 	goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-		(goal->Stats->Costs[TimeCost] * 600) - hp;
+		((goal->Type->ProductionCosts[TimeCost] ? goal->Type->ProductionCosts[TimeCost] : 1) * 600) - hp;
 	if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
 		goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
 	}
@@ -439,7 +439,7 @@ void HandleActionBuilt(CUnit *unit)
 
 	// n is the current damage taken by the unit.
 	n = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) /
-		(unit->Stats->Costs[TimeCost] * 600) - unit->Variable[HP_INDEX].Value;
+		((unit->Type->ProductionCosts[TimeCost] ? unit->Type->ProductionCosts[TimeCost] : 1) * 600) - unit->Variable[HP_INDEX].Value;
 	// This below is most often 0
 	if (type->BuilderOutside) {
 		progress = unit->Type->AutoBuildRate;
@@ -453,7 +453,7 @@ void HandleActionBuilt(CUnit *unit)
 	unit->Data.Built.Progress += progress;
 	// Keep the same level of damage while increasing HP.
 	unit->Variable[HP_INDEX].Value = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) /
-		(type->Stats[unit->Player->Index].Costs[TimeCost] * 600) - n;
+		((type->ProductionCosts[TimeCost] ? type->ProductionCosts[TimeCost] : 1) * 600) - n;
 	if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
 		unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
 	}
@@ -486,7 +486,7 @@ void HandleActionBuilt(CUnit *unit)
 	//
 	// Check if building ready. Note we can both build and repair.
 	//
-	if (unit->Data.Built.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
+	if (unit->Data.Built.Progress >= unit->Type->ProductionCosts[TimeCost] * 600 ||
 			unit->Variable[HP_INDEX].Value >= unit->Stats->Variables[HP_INDEX].Max) {
 		DebugPrint("Building ready.\n");
 		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
