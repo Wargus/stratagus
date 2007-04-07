@@ -40,17 +40,30 @@ DefineConstruction("construction-rocksfield", {
 })
 
 DefineUnitType("unit-rocksfield", {
-	Name = "Energy Field",
-	Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
-	Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
-	Animations = "animations-building", Icon = "icon-rocks_field",
-	ProductionCosts = {}, VisibleUnderFog = true,
-	Construction = "construction-rocksfield",
-	NeutralMinimapColor = {196, 196, 196},
-	DrawLevel = 40, TileSize = {4, 4}, BoxSize = {96, 96},
-	SightRange = 1, Speed = 0, HitPoints = 25500, Priority = 0,
-	Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Corpse = "unit-destroyed-4x4-place", ExplodeWhenKilled = "missile-explosion",
-	Type = "land", Building = true, CanHarvestFrom = true
+    Name = "Energy Field",
+    Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
+    Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
+    Animations = "animations-building",
+    Icon = "icon-rocks_field",
+    ProductionCosts = {},
+    VisibleUnderFog = true,
+    Construction = "construction-rocksfield",
+    NeutralMinimapColor = {196, 196, 196},
+    DrawLevel = 40,
+    TileSize = {4, 4},
+    BoxSize = {96, 96},
+    SightRange = 1,
+    Speed = 0,
+    HitPoints = 25500,
+    Priority = 0,
+    Armor = 20,
+    BasicDamage = 0,
+    PiercingDamage = 0,
+    Missile = "missile-none",
+    Corpse = "unit-destroyed-4x4-place",
+    ExplodeWhenKilled = "missile-explosion",
+    Type = "land",
+    Building = true,
+    CanHarvestFrom =  true
     })
 

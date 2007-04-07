@@ -59,19 +59,34 @@ MakeSound("hosp-help", GetCurrentLuaPath().."/hospital.underattack.wav")
 MakeSound("hosp-dead", GetCurrentLuaPath().."/sfx_hosp.die.wav")
 
 DefineUnitType("unit-hosp", {
-	Name = "Hospital",
-	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {256, 256}},
-	Shadow = {"file", GetCurrentLuaPath().."/hospital_s.png", "size", {256, 256}},
-	Animations = "animations-hosp", Icon = "icon-hosp",
-	ProductionCosts = {"energy", 500, "magma", 100},--"time", 125, 
-	RepairHp = 2, Construction = "construction-hosp",
-	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize = {6, 5},
-	BoxSize = {192, 160}, SightRange = 2, Armor = 30, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
-	AnnoyComputerFactor = 45, Points = 200,
-	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = "build-dead-hosp",
-	Type = "land", Building = true, BuilderOutside = true, VisibleUnderFog = true,
-	Sounds = {
+    Name = "Hospital",
+    Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {256, 256}},
+    Shadow = {"file", GetCurrentLuaPath().."/hospital_s.png", "size", {256, 256}},
+    Animations = "animations-hosp",
+    Icon = "icon-hosp",
+    ProductionCosts = {"energy", 500, "magma", 100},
+    RepairHp = 2,
+    Construction = "construction-hosp",
+    Speed = 0,
+    HitPoints = 350,
+    DrawLevel = 25,
+    TileSize = {6, 5},
+    BoxSize = {192, 160},
+    SightRange = 2,
+    Armor = 30,
+    BasicDamage = 0,
+    PiercingDamage = 0,
+    Missile = "missile-none",
+    Priority = 35,
+    AnnoyComputerFactor = 45,
+    Points = 200,
+    ExplodeWhenKilled = "missile-160x128-explosion",
+    Corpse = "build-dead-hosp",
+    Type = "land",
+    Building = true,
+    BuilderOutside = true,
+    VisibleUnderFog = true,
+    Sounds =  {
 		"selected", "hosp-selected",
 		"ready", "hosp-ready",
 		"help", "hosp-help",
@@ -84,13 +99,23 @@ DefineAnimations("animations-hosp2", {
     })
 
 DefineUnitType("build-dead-hosp", {
-	Name = "HospCrater",
-	Image = {"file", GetCurrentLuaPath().."/hospital_c.png", "size", {256, 256}},
-	Animations = "animations-hosp2", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {6, 5},
-	BoxSize = {124, 92}, SightRange = 1, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, Type = "land", Building = true, Vanishes = true
+    Name = "HospCrater",
+    Image = {"file", GetCurrentLuaPath().."/hospital_c.png", "size", {256, 256}},
+    Animations = "animations-hosp2",
+    Icon = "icon-cancel",
+    Speed = 0,
+    HitPoints = 999,
+    DrawLevel = 10,
+    TileSize = {6, 5},
+    BoxSize = {124, 92},
+    SightRange = 1,
+    BasicDamage = 0,
+    PiercingDamage = 0,
+    Missile = "missile-none",
+    Priority = 0,
+    Type = "land",
+    Building = true,
+    Vanishes =  true
 	})
 
 DefineAllow("unit-hosp", "AAAAAAAA")

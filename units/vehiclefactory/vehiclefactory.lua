@@ -61,19 +61,34 @@ MakeSound("vfac-help", GetCurrentLuaPath().."/vehicle.factory.underattack.wav")
 MakeSound("vfac-dead", GetCurrentLuaPath().."/sfx_vfac.die.wav")
 
 DefineUnitType("unit-vfac", {
-	Name = "Vehicle Factory",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 254}},
-	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 254}},
-	Animations = "animations-vfac", Icon = "icon-vfac",
-	ProductionCosts = {"energy", 750, "magma", 100},--"time", 200, 
-	RepairHp = 2, Construction = "construction-vfac",
-	Speed = 0, HitPoints = 550, DrawLevel = 25, TileSize = {7, 5},
-	BoxSize = {220, 156}, SightRange = 2, Armor = 30, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
-	AnnoyComputerFactor = 45, Points = 200,
-	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = "build-dead-vfac",
-	Type = "land",  Building = true, BuilderOutside = true, VisibleUnderFog = true,
-	Sounds = {
+    Name = "Vehicle Factory",
+    Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 254}},
+    Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 254}},
+    Animations = "animations-vfac",
+    Icon = "icon-vfac",
+    ProductionCosts = {"energy", 750, "magma", 100},
+    RepairHp = 2,
+    Construction = "construction-vfac",
+    Speed = 0,
+    HitPoints = 550,
+    DrawLevel = 25,
+    TileSize = {7, 5},
+    BoxSize = {220, 156},
+    SightRange = 2,
+    Armor = 30,
+    BasicDamage = 0,
+    PiercingDamage = 0,
+    Missile = "missile-none",
+    Priority = 35,
+    AnnoyComputerFactor = 45,
+    Points = 200,
+    ExplodeWhenKilled = "missile-160x128-explosion",
+    Corpse = "build-dead-vfac",
+    Type = "land",
+    Building = true,
+    BuilderOutside = true,
+    VisibleUnderFog = true,
+    Sounds =  {
 		"selected", "vfac-selected",
 		"ready", "vfac-ready",
 		"help", "vfac-help",
@@ -87,13 +102,23 @@ DefineAnimations("animations-vfac2", {
     })
 
 DefineUnitType("build-dead-vfac", {
-	Name = "FactoryCrater",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_c.png", "size", {256, 254}},
-	Animations = "animations-vfac2", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {7, 5},
-	BoxSize = {220, 156}, SightRange = 1, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, Type = "land", Building = true, Vanishes = true
+    Name = "FactoryCrater",
+    Image = {"file", GetCurrentLuaPath().."/vehicle_c.png", "size", {256, 254}},
+    Animations = "animations-vfac2",
+    Icon = "icon-cancel",
+    Speed = 0,
+    HitPoints = 999,
+    DrawLevel = 10,
+    TileSize = {7, 5},
+    BoxSize = {220, 156},
+    SightRange = 1,
+    BasicDamage = 0,
+    PiercingDamage = 0,
+    Missile = "missile-none",
+    Priority = 0,
+    Type = "land",
+    Building = true,
+    Vanishes =  true
 	})
 
 DefineAllow("unit-vfac", "AAAAAAAA")
