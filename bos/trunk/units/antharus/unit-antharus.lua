@@ -45,22 +45,33 @@ DefineConstruction("construction-antharus", {
 })
 
 DefineUnitType("unit-antharus", {
-	Name = "Antharus",
-	Image = {"file", "units/antharus/antharus.png", "size", {132, 100}},
-	Animations = "animations-antharus", Icon = "icon-antharus",
-	ProductionCosts = {}, --"time", 1
-	Construction = "construction-antharus",
-	Speed = 0, HitPoints = 50, DrawLevel = 25, 
-	TileSize  = {2, 2}, BoxSize = {32, 32},
-	SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
-	Points = 10, ExplodeWhenKilled = "missile-64x64-explosion",
-	Corpse = "unit-destroyed-1x1-place",
-	Type = "land",
-	Building = true, BuilderOutside = true,
-	VisibleUnderFog = false,
-	NumDirections = 1,
-	Sounds = {}
+    Name = "Antharus",
+    Image = {"file", "units/antharus/antharus.png", "size", {132, 100}},
+    Animations = "animations-antharus",
+    Icon = "icon-antharus",
+    ProductionCosts = {},
+    Construction = "construction-antharus",
+    Speed = 0,
+    HitPoints = 50,
+    DrawLevel = 25,
+    TileSize = {2, 2},
+    BoxSize = {32, 32},
+    SightRange = 1,
+    Armor = 0,
+    BasicDamage = 0,
+    PiercingDamage = 0,
+    Missile = "missile-none",
+    Priority = 0,
+    AnnoyComputerFactor = 0,
+    Points = 10,
+    ExplodeWhenKilled = "missile-64x64-explosion",
+    Corpse = "unit-destroyed-1x1-place",
+    Type = "land",
+    Building = true,
+    BuilderOutside = true,
+    VisibleUnderFog = false,
+    NumDirections = 1,
+    Sounds =  {}
 })
 
 DefineAllow("unit-antharus", "FFFFFFFF")

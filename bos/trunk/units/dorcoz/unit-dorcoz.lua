@@ -54,19 +54,38 @@ DefineMissileType("missile-dorcoz", {
         Class = "missile-class-point-to-point", Sleep = 1, Speed = 32, Range = 1})
 
 DefineUnitType("unit-dorcoz", {
-        Name = "Dorcoz",
-        Image = {"file", "units/dorcoz/unit_dorcoz.png", "size", {64, 64}},
-        Animations = "animations-dorcoz", Icon = "icon-dorcoz",
-        ProductionCosts = {"energy", 50, "magma", 300}, Speed = 10,--"time", 100, 
-        HitPoints = 100, DrawLevel = 40, TileSize = {1, 1}, BoxSize = {31, 31},
-        SightRange = 7, ComputerReactionRange = 7, PersonReactionRange = 7,
-        Armor = 2, BasicDamage = 6, PiercingDamage = 3, Missile = "missile-dorcoz",
-        MaxAttackRange = 7, Priority = 60, Points = 50,
-        Corpse = "unit-dead-body", Type = "land", RightMouseAction = "attack",
-        CanAttack = true, CanTargetLand = true, CanTargetAir = true,
-        LandUnit = true, organic = true,
-        SelectableByRectangle = true,
-        RightMouseAction = "attack"
+    Name = "Dorcoz",
+    Image = {"file", "units/dorcoz/unit_dorcoz.png", "size", {64, 64}},
+    Animations = "animations-dorcoz",
+    Icon = "icon-dorcoz",
+    ProductionCosts = {"energy", 50, "magma", 300},
+    Speed = 10,
+    HitPoints = 100,
+    DrawLevel = 40,
+    TileSize = {1, 1},
+    BoxSize = {31, 31},
+    SightRange = 7,
+    ComputerReactionRange = 7,
+    PersonReactionRange = 7,
+    Armor = 2,
+    BasicDamage = 6,
+    PiercingDamage = 3,
+    Missile = "missile-dorcoz",
+    MaxAttackRange = 7,
+    Priority = 60,
+    Points = 50,
+    Corpse = "unit-dead-body",
+    Type = "land",
+    RightMouseAction =  "attack"
+
+        ,
+    CanAttack = true,
+    CanTargetLand = true,
+    CanTargetAir = true,
+    LandUnit = true,
+    organic = true,
+    SelectableByRectangle = true,
+    RightMouseAction =  "attack"
 
         })
 
