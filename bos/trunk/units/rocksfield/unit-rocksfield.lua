@@ -39,9 +39,7 @@ DefineConstruction("construction-rocksfield", {
         }
 })
 
--- FIXME: the name of the unit is hardcoded as unit-gold-mine in the editor.
---        It must be removed and/or renamed
-DefineUnitType("unit-gold-mine", {
+DefineUnitType("unit-rocksfield", {
 	Name = "Energy Field",
 	Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
 	Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
