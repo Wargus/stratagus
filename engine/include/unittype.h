@@ -140,10 +140,6 @@
 **    The HP given to a unit each cycle it's repaired.
 **    If zero, unit cannot be repaired
 **
-**    CUnitType::RepairCosts[::MaxCosts]
-**
-**    Costs per repair cycle to fix a unit.
-**
 **  CUnitType::TileWidth
 **
 **    Tile size on map width
@@ -340,10 +336,6 @@
 **    Current sound for weapon
 **
 **  @todo temporary solution
-**
-**  CUnitType::ImproveIncomes[::MaxCosts]
-**
-**    Gives the player an improved income.
 **
 **  CUnitType::FieldFlags
 **
@@ -698,14 +690,12 @@ public:
 		FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
-		memset(RepairCosts, 0, sizeof(RepairCosts));
 		memset(StartingResources, 0, sizeof(StartingResources));
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
 		memset(ProductionRate, 0, sizeof(ProductionRate));
 		memset(MaxUtilizationRate, 0, sizeof(MaxUtilizationRate));
 		memset(ProductionCosts, 0, sizeof(ProductionCosts));
 		memset(StorageCapacity, 0, sizeof(StorageCapacity));
-		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	}
 
 	std::string Ident;              /// Identifier
@@ -735,11 +725,9 @@ public:
 	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
 
-	// this is taken from the UDTA section
 	CConstruction *Construction;    /// What is shown in construction phase
 
 	int RepairHP;                   /// Amount of HP per repair
-	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
 	int TileWidth;                  /// Tile size on map width
 	int TileHeight;                 /// Tile size on map height
@@ -816,8 +804,6 @@ public:
 	int StorageCapacity[MaxCosts];      /// Storage capacity of resources
 
 // --- FILLED UP ---
-
-	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 
 	unsigned FieldFlags;            /// Unit map field flags
 	unsigned MovementMask;          /// Unit check this map flags for move

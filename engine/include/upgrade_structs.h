@@ -98,11 +98,6 @@ extern int DefaultResourcesMedium[MaxCosts];
 extern int DefaultResourcesHigh[MaxCosts];
 
 /**
-**  Default incomes for a new player.
-*/
-extern int DefaultIncomes[MaxCosts];
-
-/**
 **  Default action for the resources.
 */
 extern std::string DefaultActions[MaxCosts];

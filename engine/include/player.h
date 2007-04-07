@@ -114,15 +114,6 @@
 **    Ignored if game starts with level settings. Used to place
 **    the initial workers if you play with 1 or 3 workers.
 **
-**  CPlayer::Resources[::MaxCosts]
-**
-**    How many resources the player owns. Needed for building
-**    units and structures.
-**
-**  CPlayer::Incomes[::MaxCosts]
-**
-**    Income of the resources, when they are delivered at a store.
-**
 **  CPlayer::UnitTypesCount[::UnitTypeMax]
 **
 **    Total count for each different unit type. Used by the AI and
@@ -282,8 +273,6 @@ public:
 
 	int StartX;  /// map tile start X position
 	int StartY;  /// map tile start Y position
-
-	int Incomes[MaxCosts];        /// income of the resources
 
 	std::map<CUnit *, int *> UnitsConsumingResourcesActual;
 	std::map<CUnit *, int *> UnitsConsumingResourcesRequested;

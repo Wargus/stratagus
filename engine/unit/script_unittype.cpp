@@ -404,22 +404,6 @@ static int CclDefineUnitType(lua_State *l)
 				type->StorageCapacity[res] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "ImproveProduction")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int res;
-
-				lua_rawgeti(l, -1, k + 1);
-				res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, -1, k + 1);
-				type->ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
 			type->Construction = ConstructionByIdent(LuaToString(l, -1));
