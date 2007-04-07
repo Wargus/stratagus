@@ -33,14 +33,21 @@ DefineIcon({
         Frame = 0,
         File = "units/rocksfield/ico_rocks_field.png"})
 
--- Note: the name of the unit is hardcoded as unit-gold-mine in the editor.
+DefineConstruction("construction-rocksfield", {
+        Constructions = {
+                {Percent = 0, File = "main", Frame = 0},
+        }
+})
+
+-- FIXME: the name of the unit is hardcoded as unit-gold-mine in the editor.
+--        It must be removed and/or renamed
 DefineUnitType("unit-gold-mine", {
 	Name = "Energy Field",
 	Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
 	Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
 	Animations = "animations-building", Icon = "icon-rocks_field",
 	ProductionCosts = {},--[["time", 150},]] VisibleUnderFog = true,
-	Construction = "construction-land2",
+	Construction = "construction-rocksfield",
 	NeutralMinimapColor = {196, 196, 196},
 	DrawLevel = 40, TileSize = {4, 4}, BoxSize = {96, 96},
 	SightRange = 1, Speed = 0, HitPoints = 25500, Priority = 0,
