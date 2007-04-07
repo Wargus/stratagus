@@ -398,7 +398,7 @@ static void HandleUnitAction(CUnit *unit)
 			}
 
 			if ((unit->Orders[0]->Action == UnitActionBuild && !unit->Type->BuilderOutside && unit->SubAction == 40) ||
-					(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 2)) {
+					(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20)) {
 				unit->Player->RemoveFromUnitsConsumingResources(unit);
 			} else if (unit->Orders[0]->Action == UnitActionResource && unit->SubAction >= 55) {
 				for (int u = 1; u < MaxCosts; ++u) {

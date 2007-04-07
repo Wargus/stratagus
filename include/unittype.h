@@ -675,7 +675,7 @@ public:
 		BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
 		BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-		CanCastSpell(NULL), AutoCastActive(NULL), AutoBuildRate(0),
+		CanCastSpell(NULL), AutoCastActive(NULL),
 		CanTransport(NULL), MaxOnBoard(0),
 		UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
 		MouseAction(0), Points(0), CanTarget(0),
@@ -743,7 +743,6 @@ public:
 	int RepairRange;                /// Units repair range.
 	char *CanCastSpell;             /// Unit is able to use spells.
 	char *AutoCastActive;           /// Default value for autocast.
-	int AutoBuildRate;              /// The rate at which the building builds itself
 	char *CanTransport;             /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int StartingResources[MaxCosts];/// Amount of starting resources
