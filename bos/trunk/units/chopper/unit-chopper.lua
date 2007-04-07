@@ -91,20 +91,20 @@ DefineUnitType("unit-chopper", {
     CanTargetAir = true,
     NumDirections = 8,
     MaxAttackRange = 7,
-    Sounds =  {
-		"selected", "grenadier-selected",
-		"acknowledge", "grenadier-acknowledge",
-		"ready", "chopper-ready",
-		"help", "chopper-help"
-	}
+    Sounds = {
+        "selected", "grenadier-selected",
+        "acknowledge", "grenadier-acknowledge",
+        "ready", "chopper-ready",
+        "help", "chopper-help"
+    }
 })
 
 DefineAllow("unit-chopper", "AAAAAAAA")
 
 DefineButton({
-	Pos = 3, Level = 0, Icon = "icon-chopper", Action = "train-unit",
-	Value = "unit-chopper", Key = "c", Hint = "BUILD ~!CHOPPER",
-	ForUnit = {"unit-dev-yard"}})
+    Pos = 3, Level = 0, Icon = "icon-chopper", Action = "train-unit",
+    Value = "unit-chopper", Key = "c", Hint = "BUILD ~!CHOPPER",
+    ForUnit = {"unit-dev-yard"}})
 
 DefineCommonButtons({"unit-chopper"})
 

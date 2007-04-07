@@ -86,12 +86,12 @@ DefineUnitType("unit-nuke", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
-    Sounds =  {
-		"selected", "nuke-selected",
-		"ready", "nuke-ready",
-		"help", "nuke-help",
-		"dead", "nuke-dead"}
-	})
+    Sounds = {
+        "selected", "nuke-selected",
+        "ready", "nuke-ready",
+        "help", "nuke-help",
+        "dead", "nuke-dead"}
+})
 
 DefineAnimations("animations-nukebuild", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -116,13 +116,13 @@ DefineUnitType("build-dead-nuke", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 
 DefineAllow("unit-nuke", "AAAAAAAA")
 
 DefineButton({
-	Pos = 7, Level = 1, Icon = "icon-nuke", Action = "build",
-	Value = "unit-nuke", Key = "n", Hint = "BUILD ~!Nuclear Power Plant",
-	ForUnit = {"unit-engineer"}})
+    Pos = 7, Level = 1, Icon = "icon-nuke", Action = "build",
+    Value = "unit-nuke", Key = "n", Hint = "BUILD ~!Nuclear Power Plant",
+    ForUnit = {"unit-engineer"}})

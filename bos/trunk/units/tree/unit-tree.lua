@@ -76,7 +76,7 @@ DefineUnitType("unit-tree", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineAllow("unit-tree", "AAAAAAAA")

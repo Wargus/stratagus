@@ -83,9 +83,9 @@ DefineUnitType("buggy_destroyed", {
     Priority = 0,
     Type = "land",
     Vanishes = true,
-    Sounds =  {
-		"dead", "grenade-impact",
-	}
+    Sounds = {
+        "dead", "grenade-impact",
+    }
 })
 
 DefineUnitType("unit-buggy", {
@@ -122,18 +122,18 @@ DefineUnitType("unit-buggy", {
     LandUnit = true,
     SelectableByRectangle = true,
     VisibleUnderFog = true,
-    Sounds =  {
-		"selected",    "buggy-selected",
-		"acknowledge", "buggy-acknowledge",
-		"ready",       "buggy-ready",
-		"help",        "buggy-help",
-		"dead",        "buggy-die"}
+    Sounds = {
+        "selected",    "buggy-selected",
+        "acknowledge", "buggy-acknowledge",
+        "ready",       "buggy-ready",
+        "help",        "buggy-help",
+        "dead",        "buggy-die"}
 })
 
 DefineAllow("unit-buggy", "AAAAAAAA")
 
 DefineButton({
-	Pos = 3, Level = 0, Icon = "icon-buggy", Action = "train-unit",
-	Value = "unit-buggy", Key = "b", Hint = "BUILD ~!BUGGY",
-	ForUnit = {"unit-vfac"}})
+    Pos = 3, Level = 0, Icon = "icon-buggy", Action = "train-unit",
+    Value = "unit-buggy", Key = "b", Hint = "BUILD ~!BUGGY",
+    ForUnit = {"unit-vfac"}})
 

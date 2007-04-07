@@ -91,12 +91,12 @@ DefineUnitType("unit-camp", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     MaxUtilizationRate = {"energy", 20, "magma", 20},
-    Sounds =  {
-		"selected", "camp-selected",
-		"ready", "camp-ready",
-		"help", "camp-help",
-		"dead", "camp-dead"}
-	})
+    Sounds = {
+        "selected", "camp-selected",
+        "ready", "camp-ready",
+        "help", "camp-help",
+        "dead", "camp-dead"}
+})
 
 DefineAnimations("animations-dead-camp", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
@@ -121,14 +121,14 @@ DefineUnitType("build-dead-camp", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 DefineAllow("unit-camp", "AAAAAAAA")
 
 DefineButton({
-	Pos = 1, Level = 2, Icon = "icon-camp_b", Action = "build",
-	Value = "unit-camp", Key = "c", Hint = "BUILD TRAINING ~!CAMP",
-	ForUnit = {"unit-engineer"}})
+    Pos = 1, Level = 2, Icon = "icon-camp_b", Action = "build",
+    Value = "unit-camp", Key = "c", Hint = "BUILD TRAINING ~!CAMP",
+    ForUnit = {"unit-engineer"}})
 
 

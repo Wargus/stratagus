@@ -63,14 +63,14 @@ DefineUnitType("unit-morel-1", {
     Type = "land",
     Building = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-morel-1",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/morels/morel_1i.png"})
+    Name = "icon-morel-1",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/morels/morel_1i.png"})
 
 DefineAllow("unit-morel-1", "AAAAAAAA")
 
@@ -98,14 +98,14 @@ DefineUnitType("unit-morel-2", {
     Type = "land",
     Building = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-morel-2",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/morels/morel_2i.png"})
+    Name = "icon-morel-2",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/morels/morel_2i.png"})
 
 DefineAllow("unit-morel-2", "AAAAAAAA")
 
@@ -133,14 +133,14 @@ DefineUnitType("unit-morel-3", {
     Type = "land",
     Building = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-morel-3",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/morels/morel_3i.png"})
+    Name = "icon-morel-3",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/morels/morel_3i.png"})
 
 DefineAllow("unit-morel-3", "AAAAAAAA")
 
@@ -168,14 +168,14 @@ DefineUnitType("unit-morel-4", {
     Type = "land",
     Building = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-morel-4",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/morels/morel_4i.png"})
+    Name = "icon-morel-4",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/morels/morel_4i.png"})
 
 DefineAllow("unit-morel-4", "AAAAAAAA")
 
@@ -203,14 +203,14 @@ DefineUnitType("unit-morel-5", {
     Type = "land",
     Building = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-morel-5",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/morels/morel_5i.png"})
+    Name = "icon-morel-5",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/morels/morel_5i.png"})
 
 DefineAllow("unit-morel-5", "AAAAAAAA")
 
@@ -238,14 +238,14 @@ DefineUnitType("unit-morel-6", {
     Type = "land",
     Building = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-morel-6",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/morels/morel_6i.png"})
+    Name = "icon-morel-6",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/morels/morel_6i.png"})
 
 DefineAllow("unit-morel-6", "AAAAAAAA")
 
@@ -273,14 +273,14 @@ DefineUnitType("unit-morel-7", {
     Type = "land",
     Building = true,
     NumDirections = 1,
-    Sounds =  {}
+    Sounds = {}
 })
 
 DefineIcon({
-	Name = "icon-morel-7",
-	Size = {46, 38},
-	Frame = 0,
-	File = "units/morels/morel_7i.png"})
+    Name = "icon-morel-7",
+    Size = {46, 38},
+    Frame = 0,
+    File = "units/morels/morel_7i.png"})
 
 DefineAllow("unit-morel-7", "AAAAAAAA")
 

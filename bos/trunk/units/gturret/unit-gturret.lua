@@ -98,11 +98,11 @@ DefineUnitType("unit-gturret", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
-    Sounds =  {
-		"selected", "gturret-selected",
-		"ready", "gturret-ready",
-		"help", "gturret-help"
-		}
+    Sounds = {
+        "selected", "gturret-selected",
+        "ready", "gturret-ready",
+        "help", "gturret-help"
+        }
 })
 
 MakeSound("gturret-selected", GetCurrentLuaPath().."/gturret_select.wav")
@@ -133,16 +133,16 @@ DefineUnitType("build-dead-gturret", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 
 DefineAllow("unit-gturret", "AAAAAAAA")
 
 DefineButton({
-	Pos = 2, Level = 3, Icon = "icon-gturret_b", Action = "build",
-	Value = "unit-gturret", Key = "g", Hint = "BUILD ~!GUN TURRET",
-	ForUnit = {"unit-engineer"}})
+    Pos = 2, Level = 3, Icon = "icon-gturret_b", Action = "build",
+    Value = "unit-gturret", Key = "g", Hint = "BUILD ~!GUN TURRET",
+    ForUnit = {"unit-engineer"}})
 -- DefineButton for the 'stop' and 'attack' actions are defined in buttons.lua.
 
 

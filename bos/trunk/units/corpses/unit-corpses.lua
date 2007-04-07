@@ -51,7 +51,7 @@ DefineUnitType("build-dead-body2", {
     Priority = 0,
     Type = "land",
     Building = true,
-    Vanishes =  true
-	})
+    Vanishes = true
+})
 
 

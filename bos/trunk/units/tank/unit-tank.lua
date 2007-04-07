@@ -89,20 +89,20 @@ DefineUnitType("unit-tank", {
     CanTargetAir = true,
     NumDirections = 8,
     MaxAttackRange = 6,
-    Sounds =  {
-		"selected", "assault-selected",
-		"acknowledge", "assault-acknowledge",
-		"ready", "tank-ready",
-		"help", "tank-help"
-		}
+    Sounds = {
+        "selected", "assault-selected",
+        "acknowledge", "assault-acknowledge",
+        "ready", "tank-ready",
+        "help", "tank-help"
+        }
 })
 
 DefineAllow("unit-tank", "AAAAAAAA")
 
 DefineButton({
-	Pos = 4, Level = 0, Icon = "icon-tank", Action = "train-unit",
-	Value = "unit-tank", Key = "t", Hint = "BUILD ~!TANK",
-	ForUnit = {"unit-vfac"}})
+    Pos = 4, Level = 0, Icon = "icon-tank", Action = "train-unit",
+    Value = "unit-tank", Key = "t", Hint = "BUILD ~!TANK",
+    ForUnit = {"unit-vfac"}})
 
 DefineCommonButtons({"unit-tank"})
 

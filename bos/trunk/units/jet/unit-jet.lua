@@ -91,21 +91,21 @@ DefineUnitType("unit-jet", {
     CanTargetAir = true,
     NumDirections = 8,
     MaxAttackRange = 5,
-    Sounds =  {
-		"selected", "grenadier-selected",
-		"acknowledge", "grenadier-acknowledge",
-		"ready", "jet-ready",
-		"help", "jet-help"
-		}
+    Sounds = {
+        "selected", "grenadier-selected",
+        "acknowledge", "grenadier-acknowledge",
+        "ready", "jet-ready",
+        "help", "jet-help"
+        }
 })
 
 DefineAllow("unit-jet", "AAAAAAAA")
 
 
 DefineButton({
-	Pos = 1, Level = 0, Icon = "icon-jet", Action = "train-unit",
-	Value = "unit-jet", Key = "j", Hint = "BUILD ~!JET FIGHTER",
-	ForUnit = {"unit-dev-yard"}})
+    Pos = 1, Level = 0, Icon = "icon-jet", Action = "train-unit",
+    Value = "unit-jet", Key = "j", Hint = "BUILD ~!JET FIGHTER",
+    ForUnit = {"unit-dev-yard"}})
 
 DefineCommonButtons({"unit-jet"})
 

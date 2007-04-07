@@ -90,13 +90,13 @@ DefineUnitType("unit-bazoo", {
     LandUnit = true,
     organic = true,
     SelectableByRectangle = true,
-    Sounds =  {
-		"selected", "bazoo-selected",
-		"acknowledge", "bazoo-acknowledge",
-		"ready", "bazoo-ready",
-		"help", "bazoo-help",
-		"dead", "bazoo-die"}
-	})
+    Sounds = {
+        "selected", "bazoo-selected",
+        "acknowledge", "bazoo-acknowledge",
+        "ready", "bazoo-ready",
+        "help", "bazoo-help",
+        "dead", "bazoo-die"}
+})
 DefineHumanCorpse("bazoo")
 
 DefineAllow("unit-bazoo", "AAAAAAAA")

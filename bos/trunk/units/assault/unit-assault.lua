@@ -93,13 +93,13 @@ DefineUnitType("unit-assault", {
     LandUnit = true,
     organic = true,
     SelectableByRectangle = true,
-    Sounds =  {
-		"selected", "assault-selected",
-		"acknowledge", "assault-acknowledge",
-		"ready", "assault-ready",
-		"help", "assault-help",
-		"dead", "assault-die"}
-	})
+    Sounds = {
+        "selected", "assault-selected",
+        "acknowledge", "assault-acknowledge",
+        "ready", "assault-ready",
+        "help", "assault-help",
+        "dead", "assault-die"}
+})
 DefineHumanCorpse("assault")
 
 DefineAllow("unit-assault", "AAAAAAAA")
