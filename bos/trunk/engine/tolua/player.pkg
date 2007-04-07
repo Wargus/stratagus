@@ -17,7 +17,6 @@ class CPlayer
 	int StartX;
 	int StartY;
 
-	int Incomes[MaxCosts];
 	int StoredResources[MaxCosts];
 	int StorageCapacity[MaxCosts];
 

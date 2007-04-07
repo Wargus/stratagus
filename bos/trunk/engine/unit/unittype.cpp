@@ -69,11 +69,6 @@ std::vector<CUnitType *> UnitTypes;   /// unit-types definition
 std::map<std::string, CUnitType *> UnitTypeMap;
 
 /**
-**  Default incomes for a new player.
-*/
-int DefaultIncomes[MaxCosts];
-
-/**
 **  Default action for the resources.
 */
 std::string DefaultActions[MaxCosts];
@@ -224,10 +219,11 @@ static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int
 	Assert(plynr < PlayerMax);
 	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
 	for (int j = 0; j < UnitTypeVar.NumberVariable; ++j) {
-		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
+		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s}%s\n  ",
 			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
 			stats->Variables[j].Max, stats->Variables[j].Increase,
-			stats->Variables[j].Enable ? ", Enable = true" : "");
+			stats->Variables[j].Enable ? ", Enable = true" : "",
+			j != UnitTypeVar.NumberVariable - 1 ? "," : "");
 	}
 	file->printf(")\n");
 }

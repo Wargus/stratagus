@@ -2180,23 +2180,6 @@ static int CclSetSpeeds(lua_State *l)
 }
 
 /**
-**  Define default incomes for a new player.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultIncomes(lua_State *l)
-{
-	int i;
-	int args;
-
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultIncomes[i] = LuaToNumber(l, i + 1);
-	}
-	return 0;
-}
-
-/**
 **  Define default action for the resources.
 **
 **  @param l  Lua state.
@@ -2393,7 +2376,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
-	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
