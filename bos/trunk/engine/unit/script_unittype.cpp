@@ -340,22 +340,6 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
-		} else if (!strcmp(value, "Costs")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int res;
-
-				lua_rawgeti(l, -1, k + 1);
-				res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, -1, k + 1);
-				type->_Costs[res] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
 		} else if (!strcmp(value, "ProductionRate")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -908,53 +892,22 @@ static int CclDefineUnitStats(lua_State *l)
 		value = LuaToString(l, j + 1);
 		++j;
 
-		if (!strcmp(value, "costs")) {
-			int subargs;
-			int k;
-
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
+		i = GetVariableIndex(value);
+		if (i != -1) { // valid index
+			if (lua_istable(l, j + 1)) {
+				DefineVariableField(l, stats->Variables + i, j + 1);
+			} else if (lua_isnumber(l, -1)) {
+				stats->Variables[i].Enable = 1;
+				stats->Variables[i].Value = LuaToNumber(l, j + 1);
+				stats->Variables[i].Max = LuaToNumber(l, j + 1);
+			} else { // Error
+				LuaError(l, "incorrect argument for the variable in unittype");
 			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-
-				for (i = 0; i < MaxCosts; ++i) {
-					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						stats->Costs[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
-				   // This leaves half initialized stats
-				   LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
-		} else {
-			i = GetVariableIndex(value);
-			if (i != -1) { // valid index
-				if (lua_istable(l, j + 1)) {
-					DefineVariableField(l, stats->Variables + i, j + 1);
-				} else if (lua_isnumber(l, -1)) {
-					stats->Variables[i].Enable = 1;
-					stats->Variables[i].Value = LuaToNumber(l, j + 1);
-					stats->Variables[i].Max = LuaToNumber(l, j + 1);
-				} else { // Error
-					LuaError(l, "incorrect argument for the variable in unittype");
-				}
-				continue;
-			}
-
-
-		   // This leaves a half initialized unit
-		   LuaError(l, "Unsupported tag: %s" _C_ value);
+			continue;
 		}
+
+		// This leaves a half initialized unit
+		LuaError(l, "Unsupported tag: %s" _C_ value);
 	}
 	return 0;
 }
@@ -1699,7 +1652,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	// Build
 	if (unit->Orders[0]->Action == UnitActionBuilt) {
 		unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
-		unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Index].Costs[TimeCost] * 600;
+		unit->Variable[BUILD_INDEX].Max = type->ProductionCosts[TimeCost] * 600;
 
 		// This should happen when building unit with several peons
 		// Maybe also with only one.
@@ -1717,7 +1670,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	// Training
 	if (unit->Orders[0]->Action == UnitActionTrain) {
 		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
-		int *costs = unit->Orders[0]->Type->Stats[unit->Player->Index].Costs;
+		int *costs = unit->Orders[0]->Type->ProductionCosts;
 		int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
 		unit->Variable[TRAINING_INDEX].Max = cost;
 	}

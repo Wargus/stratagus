@@ -103,7 +103,7 @@ void HandleActionTrain(CUnit *unit)
 		int costs[MaxCosts];
 		for (int i = 0; i < MaxCosts; ++i) {
 			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
-				unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[i]);
+				unit->Orders[0]->Type->ProductionCosts[i]);
 		}
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	} else {
@@ -111,7 +111,7 @@ void HandleActionTrain(CUnit *unit)
 		int cost = costs[1] ? costs[1] : costs[2];
 		unit->Data.Train.Ticks += cost * SpeedTrain;
 
-		costs = unit->Orders[0]->Type->Stats[unit->Player->Index].Costs;
+		costs = unit->Orders[0]->Type->ProductionCosts;
 		cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
 		if (unit->Data.Train.Ticks > cost) {
 			unit->Data.Train.Ticks = cost;
@@ -128,7 +128,7 @@ void HandleActionTrain(CUnit *unit)
 
 	player = unit->Player;
 
-	int *costs = unit->Orders[0]->Type->Stats[unit->Player->Index].Costs;
+	int *costs = unit->Orders[0]->Type->ProductionCosts;
 	int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
 	if (unit->Data.Train.Ticks >= cost) {
 		//

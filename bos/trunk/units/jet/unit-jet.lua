@@ -64,7 +64,7 @@ DefineUnitType("unit-jet", {
                   "offset", {5, 128}},
 	Animations = "animations-jet", Icon = "icon-jet",
 	Flip = false,
-	Costs = {"time", 100, "energy", 200, "magma", 500},
+	ProductionCosts = {"energy", 200, "magma", 500},--"time", 100, 
 	RepairCosts = {"magma", 6},
 	Speed = 60, HitPoints = 50, DrawLevel = 125, TileSize  = {3, 3}, 
 	BoxSize = {64, 64},

@@ -88,7 +88,7 @@ DefineUnitType("unit-medic", {
 	Image = {"file", "units/medic/unit_medic.png", "size", {64, 64}},
 	Shadow = {"file", "units/medic/unit_medic_s.png", "size", {64, 64}},
 	Animations = "animations-medic", Icon = "icon-medic",
-	Costs = {"time", 50, "energy", 25, "magma", 150},
+	ProductionCosts = {"energy", 25, "magma", 150},--"time", 50, 
 	Speed = 15, HitPoints = 100, MaxMana = 100, CanCastSpell = {SpellHealing},
 	DrawLevel = 25, TileSize = {1, 1}, BoxSize = {17, 28},
 	SightRange = 3, ComputerReactionRange = 6, PersonReactionRange = 6,

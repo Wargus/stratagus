@@ -67,7 +67,7 @@ DefineUnitType("unit-vault", {
 	Image = {"file", "units/vault/vault.png", "size", {236, 208}},
 	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {236, 208}},
 	Animations = "animations-vault", Icon = "icon-vault",
-	Costs = {"time", 150, "energy", 1000, "magma", 1000},
+	ProductionCosts = {"energy", 1000, "magma", 1000},--"time", 150, 
 	RepairHp = 4, RepairCosts = {"energy", 4}, Construction = "construction-vault",
 	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {6, 6}, BoxSize = {196, 164},
 	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,

@@ -183,20 +183,20 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
 			for (int i = 0; i < MaxCosts; ++i) {
 				costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
-					u->Orders[0]->Type->Stats[u->Player->Index].Costs[i]);
+					u->Orders[0]->Type->ProductionCosts[i]);
 			}
 			AddToUnitsConsumingResources(u, costs);
 		} else if (u->Orders[0]->Action == UnitActionBuilt) {
 			if (!u->Type->BuilderOutside) {
 				for (int i = 0; i < MaxCosts; ++i) {
 					costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
-						u->Orders[0]->Goal->Type->Stats[u->Orders[0]->Goal->Player->Index].Costs[i]);
+						u->Orders[0]->Goal->Type->ProductionCosts[i]);
 				}
 				u->Orders[0]->Goal->Player->AddToUnitsConsumingResources(u->Orders[0]->Goal, costs);
 			} else {
 				for (int i = 0; i < MaxCosts; ++i) {
 					costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
-						u->Orders[0]->Goal->Type->Stats[u->Orders[0]->Goal->Player->Index].Costs[i]);
+						u->Orders[0]->Goal->Type->ProductionCosts[i]);
 				}
 				AddToUnitsConsumingResources(u, costs);
 			}
@@ -246,8 +246,7 @@ static int SpecificEfficiency(int type, CPlayer *p)
 // base efficiency = min(f(energy), f(magma))
 static int BaseEfficiency(CPlayer *p)
 {
-	// FIXME: hardcoded 1 and 2 for resources
-	return std::min<int>(SpecificEfficiency(1, p), SpecificEfficiency(2, p));
+	return std::min<int>(SpecificEfficiency(EnergyCost, p), SpecificEfficiency(MagmaCost, p));
 }
 
 static int MaxRate(CUnit *unit, int res)
@@ -255,10 +254,12 @@ static int MaxRate(CUnit *unit, int res)
 	if (unit->Orders[0]->Action == UnitActionTrain ||
 			unit->Orders[0]->Action == UnitActionBuild ||
 			unit->Orders[0]->Action == UnitActionRepair) {
-		return unit->Type->MaxUtilizationRate[res];
+		return std::min<int>(unit->Type->MaxUtilizationRate[res],
+				unit->Orders[0]->Type->ProductionCosts[res]);
 	} else if (unit->Orders[0]->Action == UnitActionBuilt) {
 		if (!unit->Type->BuilderOutside) {
-			return unit->Data.Built.Worker->Type->MaxUtilizationRate[res];
+			return std::min<int>(unit->Data.Built.Worker->Type->MaxUtilizationRate[res],
+				unit->Data.Built.Worker->Type->ProductionCosts[res]);
 		} else {
 			Assert(0);
 			return 0;
@@ -740,7 +741,7 @@ int CPlayer::CheckCosts(const int *costs) const
 */
 int CPlayer::CheckUnitType(const CUnitType *type) const
 {
-	return this->CheckCosts(type->Stats[this->Index].Costs);
+	return this->CheckCosts(type->ProductionCosts);
 }
 
 /**

@@ -72,7 +72,7 @@ DefineUnitType("unit-harvester", {
 	Image = {"file", GetCurrentLuaPath().."/unit_harv.png", "size", {96, 96}},
 	Shadow = {"file", GetCurrentLuaPath().."/unit_harv_s.png", "size", {96, 96}},
 	DrawLevel = 25, Animations = "animations-harvester", Icon = "icon-harvester",
-	Costs = {'time', 75, 'energy', 250, 'magma', 100},
+	ProductionCosts = {"energy", 250, "magma", 100},--"time", 75, 
 	RepairHp = 2, RepairCosts = {"energy", 2},
 	ExplodeWhenKilled = "missile-160x128-explosion",
 	Speed = 10, HitPoints = 200, DrawLevel = 40, TileSize = {1, 1}, BoxSize = {63, 63},

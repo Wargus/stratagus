@@ -364,17 +364,13 @@ void CButtonPanel::Draw(void)
 */
 void UpdateStatusLineForButton(const ButtonAction *button)
 {
-	const CUnitStats *stats;
-
 	Assert(button);
 	UI.StatusLine.Set(button->Hint);
 
 	switch (button->Action) {
 		case ButtonBuild:
 		case ButtonTrain:
-			// FIXME: store pointer in button table!
-			stats = &UnitTypes[button->Value]->Stats[ThisPlayer->Index];
-			SetCosts(0, 0, stats->Costs);
+			SetCosts(0, 0, UnitTypes[button->Value]->ProductionCosts);
 			break;
 		case ButtonSpellCast:
 			SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);

@@ -67,7 +67,7 @@ DefineUnitType("unit-rfac", {
 	Image = {"file", GetCurrentLuaPath().."/research_facility.png", "size", {128, 128}},
 	Shadow = {"file", GetCurrentLuaPath().."/research_facility_s.png", "size", {128, 128}},
 	Animations = "animations-rfac", Icon = "icon-rfac",
-	Costs = {"time", 125, "energy", 300, "magma", 300},
+	ProductionCosts = {"energy", 300, "magma", 300},--"time", 125, 
 	RepairHp = 2, RepairCosts = {"energy", 2}, Construction = "construction-rfac",
 	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize = {4, 4}, BoxSize = {124, 124},
 	SightRange = 1, Armor = 30, BasicDamage = 0, PiercingDamage = 0,

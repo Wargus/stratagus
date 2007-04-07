@@ -48,7 +48,7 @@ DefineUnitType("unit-antharus", {
 	Name = "Antharus",
 	Image = {"file", "units/antharus/antharus.png", "size", {132, 100}},
 	Animations = "animations-antharus", Icon = "icon-antharus",
-	Costs = {"time", 1},
+	ProductionCosts = {}, --"time", 1
 	Construction = "construction-antharus",
 	Speed = 0, HitPoints = 50, DrawLevel = 25, 
 	TileSize  = {2, 2}, BoxSize = {32, 32},

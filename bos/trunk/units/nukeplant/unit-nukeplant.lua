@@ -63,7 +63,7 @@ DefineUnitType("unit-nuke", {
 	Image = {"file", GetCurrentLuaPath().."/nukeplant.png", "size", {256, 256}},
 	Shadow = {"file", GetCurrentLuaPath().."/nukeplant_s.png", "size", {256, 256}},
 	Animations = "animations-nuke", Icon = "icon-nuke",
-	Costs = {"time", 500, "energy", 3000, "magma", 750},
+	ProductionCosts = {"energy", 3000, "magma", 750},--"time", 500, 
 	RepairHp = 2, RepairCosts = {"energy", 5}, Construction = "construction-nuke",
 	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize  = {7, 5}, BoxSize = {224, 160},
 	SightRange = 3, Armor = 15 , BasicDamage = 0, PiercingDamage = 0,

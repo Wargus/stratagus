@@ -39,7 +39,7 @@ DefineUnitType("unit-gold-mine", {
 	Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
 	Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
 	Animations = "animations-building", Icon = "icon-rocks_field",
-	Costs = {"time", 150}, VisibleUnderFog = true,
+	ProductionCosts = {},--[["time", 150},]] VisibleUnderFog = true,
 	Construction = "construction-land2",
 	NeutralMinimapColor = {196, 196, 196},
 	DrawLevel = 40, TileSize = {4, 4}, BoxSize = {96, 96},
