@@ -551,22 +551,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->RepairRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RepairHp")) {
 			type->RepairHP = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "RepairCosts")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int res;
-
-				lua_rawgeti(l, -1, k + 1);
-				res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, -1, k + 1);
-				type->RepairCosts[res] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
 		} else if (!strcmp(value, "CanTargetLand")) {
 			if (LuaToBoolean(l, -1)) {
 				type->CanTarget |= CanTargetLand;
