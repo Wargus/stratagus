@@ -2575,6 +2575,23 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 }
 
 /**
+**  Check if a unit should be removed from UnitsConsumingResources
+*/
+void UnitRemoveConsumingResources(CUnit *unit)
+{
+	if ((unit->Orders[0]->Action == UnitActionBuild && !unit->Type->BuilderOutside && unit->SubAction == 40) ||
+			(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20)) {
+		unit->Player->RemoveFromUnitsConsumingResources(unit);
+	} else if (unit->Orders[0]->Action == UnitActionResource && unit->SubAction >= 55) {
+		for (int u = 1; u < MaxCosts; ++u) {
+			unit->Player->ProductionRate[u] -= unit->Data.Harvest.CurrentProduction[u];
+		}
+	} else if (unit->Orders[0]->Action == UnitActionTrain && unit->SubAction != 0) {
+		unit->Player->RemoveFromUnitsConsumingResources(unit);
+	}
+}
+
+/**
 **  Let a unit die.
 **
 **  @param unit    Unit to be destroyed.
@@ -2618,6 +2635,8 @@ void LetUnitDie(CUnit *unit)
 		unit->Goal->Release();
 		unit->Goal = NULL;
 	}
+
+	UnitRemoveConsumingResources(unit);
 
 	// During resource build, the worker holds the resource amount,
 	// but if canceling building the platform, the worker is already
