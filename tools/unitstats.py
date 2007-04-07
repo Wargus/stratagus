@@ -45,8 +45,6 @@ def findallscripts():
         scripts.extend(findunitscripts(u))
     return scripts
 
-#print findallscripts()
-
 def parseKvList(kvlist):
     d = {}
     key = kvlist[0]
@@ -136,7 +134,7 @@ def parseAllScripts():
     return units, scripts
 
 def generateStatsFile(units):
-    rawcsvfile = file('stats.csv', 'w')
+    rawcsvfile = file('unitstats.csv', 'wb')
     statsfile = csv.DictWriter(rawcsvfile, importantkeys, extrasaction='ignore')
     title = {}
     for i in importantkeys:
@@ -151,8 +149,22 @@ def regenerateScripts(scripts):
         f = file(i.path, 'wt')
         i.regenerate(f)
 
+def readUnitStats():
+    rawcsvfile = file('unitstats.csv', 'rb')
+    stats = csv.DictReader(rawcsvfile)
+    newstats = {}
+    for r in stats:
+        newstats[r['Name']] = r
+    return newstats
 def updateUnitStats(units):
-    pass
+    stats = readUnitStats()
+    for unit in units:
+        name = unit.stats['Name']
+        if stats.has_key('Name'):
+            up = stats[name]
+            for k in up.keys():
+                if unit.stats.has_key(k):
+                    unit.stats[k] = up[k]
 
 Usage = """
     Unit stats generation tool.
