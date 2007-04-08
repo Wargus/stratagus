@@ -2633,6 +2633,13 @@ void LetUnitDie(CUnit *unit)
 	}
 
 	UnitRemoveConsumingResources(unit);
+	for (int u = 0; u < MaxCosts; ++u) {
+		unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u];
+		unit->Player->StorageCapacity[u] -= unit->Type->StorageCapacity[u];
+		if (unit->Player->StoredResources[u] > unit->Player->StorageCapacity[u]) {
+			unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
+		}
+	}
 
 	// During resource build, the worker holds the resource amount,
 	// but if canceling building the platform, the worker is already
