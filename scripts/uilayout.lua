@@ -268,20 +268,20 @@ UI.Timer.Y = UI.MapArea.Y + 15
 UI.Timer.Font = Fonts["game"]
 
 -- energy
-UI.Resources[1].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
-UI.Resources[1].IconFrame = 0
-UI.Resources[1].IconX = 67 + 0
-UI.Resources[1].IconY = 0
-UI.Resources[1].TextX = 85 + 0
-UI.Resources[1].TextY = 1
+UI.Resources[0].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[0].IconFrame = 0
+UI.Resources[0].IconX = 67 + 0
+UI.Resources[0].IconY = 0
+UI.Resources[0].TextX = 85 + 0
+UI.Resources[0].TextY = 1
 
 -- magma
-UI.Resources[2].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
-UI.Resources[2].IconFrame = 1
-UI.Resources[2].IconX = 67 + 75
-UI.Resources[2].IconY = 0
-UI.Resources[2].TextX = 85 + 75
-UI.Resources[2].TextY = 1
+UI.Resources[1].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[1].IconFrame = 1
+UI.Resources[1].IconX = 67 + 75
+UI.Resources[1].IconY = 0
+UI.Resources[1].TextX = 85 + 75
+UI.Resources[1].TextY = 1
 
 -- score
 UI.Resources[ScoreCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
