@@ -188,25 +188,6 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	}
 
 	//
-	// Check if enough resources for the building.
-	//
-	if (unit->Player->CheckUnitType(type)) {
-		// FIXME: Better tell what is missing?
-		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-			_("Not enough resources to build %s"), type->Name.c_str());
-		if (unit->Player->AiEnabled) {
-			AiCanNotBuild(unit, type);
-		}
-
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
-		return NULL;
-	}
-
-	//
 	// Check if hiting any limits for the building.
 	//
 	if (unit->Player->CheckLimits(type) < 0) {

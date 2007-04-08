@@ -693,42 +693,6 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 }
 
 /**
-**  Check if enough resources for are available.
-**
-**  @param costs   How many costs.
-**
-**  @return        False if all enough, otherwise a bit mask.
-**
-**  @note The return values of the PlayerCheck functions are inconsistent.
-*/
-int CPlayer::CheckCosts(const int *costs) const
-{
-	int err = 0;
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (costs[i] != 0 && this->ProductionRate[i] == 0 && this->StoredResources[i] == 0) {
-			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
-				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(),
-				DefaultResourceNames[i].c_str());
-
-			err |= 1 << i;
-		}
-	}
-	return err;
-}
-
-/**
-**  Check if enough resources for new unit is available.
-**
-**  @param type    Type of unit.
-**
-**  @return        False if all enough, otherwise a bit mask.
-*/
-int CPlayer::CheckUnitType(const CUnitType *type) const
-{
-	return this->CheckCosts(type->ProductionCosts);
-}
-
-/**
 **  Have unit of type.
 **
 **  @param type    Type of unit.
