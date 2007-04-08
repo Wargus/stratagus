@@ -426,16 +426,14 @@ static void AiCheckingWork(void)
 --  WORKERS/RESOURCES
 ----------------------------------------------------------------------------*/
 
-#if 0
 /**
-**  Assign worker to gather a certain resource.
+**  Assign worker to gather a resource.
 **
 **  @param unit      pointer to the unit.
-**  @param resource  resource identification.
 **
 **  @return          1 if the worker was assigned, 0 otherwise.
 */
-static int AiAssignHarvester(CUnit *unit, int resource)
+static int AiAssignHarvester(CUnit *unit)
 {
 	std::vector<CUnitType *>::iterator i;
 	int exploremask;
@@ -449,7 +447,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	//
 	// Find a resource to harvest from.
 	//
-	if ((dest = UnitFindResource(unit, unit->X, unit->Y, 1000, resource))) {
+	if ((dest = UnitFindResource(unit, unit->X, unit->Y, 1000))) {
 		CommandResource(unit, dest, FlushCommands);
 		return 1;
 	}
@@ -477,231 +475,22 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	// Failed.
 	return 0;
 }
-#endif
 
 /**
 **  Assign workers to collect resources.
-**
-**  If we have a shortage of a resource, let many workers collecting this.
-**  If no shortage, split workers to all resources.
 */
 static void AiCollectResources(void)
 {
-#if 0
-	CUnit *units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
-	CUnit *units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
-	int num_units_with_resource[MaxCosts];
-	int num_units_assigned[MaxCosts];
-	int num_units_unassigned[MaxCosts];
-	int total; // Total of workers
-	int c;
-	int src_c;
-	int i;
-	int j;
-	int k;
-	int n;
-	CUnit **units;
-	CUnit *unit;
-	int percent[MaxCosts];
-	int percent_total;
+	for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
+		CUnit *unit = AiPlayer->Player->Units[i];
 
-	int priority_resource[MaxCosts];
-	int priority_needed[MaxCosts];
-	int wanted[MaxCosts];
-	int total_harvester;
-
-	//
-	// Collect statistics about the current assignment
-	//
-	percent_total = 100;
-	for (c = 0; c < MaxCosts; ++c) {
-		num_units_with_resource[c] = 0;
-		num_units_assigned[c] = 0;
-		num_units_unassigned[c] = 0;
-		percent[c] = AiPlayer->Collect[c];
-		if ((AiPlayer->NeededMask & (1 << c))) { // Double percent if needed
-			percent_total += percent[c];
-			percent[c] <<= 1;
-		}
-	}
-
-	total_harvester = 0;
-
-	n = AiPlayer->Player->TotalNumUnits;
-	units = AiPlayer->Player->Units;
-	for (i = 0; i < n; ++i) {
-		unit = units[i];
-		if (!unit->Type->Harvester) {
+		// Ignore non-harvesters or busy units. (building, fighting, harvesting, ... )
+		if (!unit->Type->Harvester || !unit->IsIdle()) {
 			continue;
 		}
 
-		c = unit->CurrentResource;
-
-		//
-		// See if it's assigned already
-		//
-		if (unit->Orders[0]->Action == UnitActionResource && unit->OrderCount == 1 && c) {
-			units_assigned[num_units_assigned[c]++][c] = unit;
-			total_harvester++;
-			continue;
-		}
-
-		//
-		// Ignore busy units. ( building, fighting, ... )
-		//
-		if (!unit->IsIdle()) {
-			continue;
-		}
-
-		//
-		// Look what the unit can do
-		//
-		for (c = 0; c < MaxCosts; ++c) {
-			if (unit->Type->Harvester) {
-				units_unassigned[num_units_unassigned[c]++][c] = unit;
-			}
-		}
-		++total_harvester;
+		AiAssignHarvester(unit);
 	}
-
-	total = 0;
-	for (c = 0; c < MaxCosts; ++c) {
-		total += num_units_assigned[c] + num_units_with_resource[c];
-	}
-
-	//
-	// Turn percent values into harvester numbers.
-	//
-
-	// Wanted needs to be representative.
-	if (total_harvester < 5) {
-		total_harvester = 5;
-	}
-
-	for (c = 0; c < MaxCosts; ++c ) {
-		if (percent[c]) {
-			wanted[c] = 1 + (percent[c] * total_harvester) / percent_total;
-		} else {
-			wanted[c] = 0;
-		}
-	}
-
-	//
-	// Initialise priority & mapping
-	//
-	for (c = 0; c < MaxCosts; ++c) {
-		priority_resource[c] = c;
-		priority_needed[c] = wanted[c] - num_units_assigned[c] - num_units_with_resource[c];
-	}
-
-	do {
-		//
-		// sort resources by priority
-		//
-		for (i = 0; i < MaxCosts; ++i) {
-			for (j = i + 1; j < MaxCosts; ++j) {
-				if (priority_needed[j] > priority_needed[i]) {
-					c = priority_needed[j];
-					priority_needed[j] = priority_needed[i];
-					priority_needed[i] = c;
-					c = priority_resource[j];
-					priority_resource[j] = priority_resource[i];
-					priority_resource[i] = c;
-				}
-			}
-		}
-
-		//
-		// Try to complete each ressource in the priority order
-		//
-		unit = NoUnitP;
-		for (i = 0; i < MaxCosts; ++i) {
-			c = priority_resource[i];
-
-			//
-			// If there is a free worker for c, take it.
-			//
-			if (num_units_unassigned[c]) {
-				// Take the unit.
-				j = 0;
-				while (j < num_units_unassigned[c] && !AiAssignHarvester(units_unassigned[j][c], c)) {
-					// can't assign to c => remove from units_unassigned !
-					units_unassigned[j][c] = units_unassigned[--num_units_unassigned[c]][c];
-				}
-
-				// unit is assigned
-				if (j < num_units_unassigned[c]) {
-					unit = units_unassigned[j][c];
-					units_unassigned[j][c] = units_unassigned[--num_units_unassigned[c]][c];
-
-					// remove it from other ressources
-					for (j = 0; j < MaxCosts; ++j) {
-						if (j == c || !unit->Type->Harvester) {
-							continue;
-						}
-						for (k = 0; k < num_units_unassigned[j]; ++k) {
-							if (units_unassigned[k][j] == unit) {
-								units_unassigned[k][j] = units_unassigned[--num_units_unassigned[j]][j];
-								break;
-							}
-						}
-					}
-				}
-			}
-
-			//
-			// Else : Take from already assigned worker with lower priority.
-			//
-			if (!unit) {
-				// Take from lower priority only (i+1).
-				for (j = i + 1; j < MaxCosts; ++j) {
-					// Try to move worker from src_c to c
-					src_c = priority_resource[j];
-
-					// Don't complete with lower priority ones...
-					if (wanted[src_c] > wanted[c] ||
-							(wanted[src_c] == wanted[c] &&
-								num_units_assigned[src_c] <= num_units_assigned[c] + 1)) {
-						continue;
-					}
-
-					for (k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
-						unit = units_assigned[k][src_c];
-
-						// unit can't harvest : next one
-						if (!unit->Type->Harvester || !AiAssignHarvester(unit, c)) {
-							unit = NoUnitP;
-							continue;
-						}
-
-						// Remove from src_c
-						units_assigned[k][src_c] = units_assigned[--num_units_assigned[src_c]][src_c];
-
-						// j need one more
-						priority_needed[j]++;
-					}
-				}
-			}
-
-			//
-			// We just moved a unit. Adjust priority & retry
-			//
-			if (unit) {
-				// i got a new unit.
-				priority_needed[i]--;
-
-				// Add to the assigned
-				units_assigned[num_units_assigned[c]++][c] = unit;
-
-				// Recompute priority now
-				break;
-			}
-		}
-	} while (unit);
-
-	// Unassigned units there can't be assigned ( ie : they can't move to ressource )
-	// IDEA : use transporter here.
-#endif
 }
 
 /*----------------------------------------------------------------------------
