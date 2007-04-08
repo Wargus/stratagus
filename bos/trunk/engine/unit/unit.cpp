@@ -2322,7 +2322,7 @@ bool UnitHoldsResources(const CUnit *unit)
 **
 **  @return            NoUnitP or resource unit
 */
-CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range)
+CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2394,7 +2394,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range)
 				//
 				// Look if there is a resource
 				//
-				if ((res = ResourceOnMap(x, y)) &&
+				if ((res = ResourceOnMap(x, y, resource)) &&
 						res->Type->CanHarvestFrom &&
 						(res->Player->Index == PlayerMax - 1 ||
 							res->Player == unit->Player ||

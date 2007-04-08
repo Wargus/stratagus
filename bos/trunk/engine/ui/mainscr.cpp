@@ -267,8 +267,15 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 			break;
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
+				int i;
+				for (i = 0; i < MaxCosts; ++i) {
+					if (unit->ResourcesHeld[i] != 0) {
+						break;
+					}
+				}
+				Assert(i != MaxCosts);
 				val.type = USTRINT_STR;
-				val.s = DefaultResourceNames[1].c_str();
+				val.s = DefaultResourceNames[i].c_str();
 			} else {
 				val.type = USTRINT_STR;
 				val.s = UnitTypeVar.VariableName[index];
