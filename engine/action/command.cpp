@@ -743,8 +743,7 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 		// Check if enough resources remains? (NETWORK!)
 		// FIXME: wrong if append to message queue!!!
 		//
-		if (unit->Player->CheckLimits(type) < 0 ||
-				unit->Player->CheckUnitType(type)) {
+		if (unit->Player->CheckLimits(type) < 0 ) {
 			return;
 		}
 

@@ -329,11 +329,6 @@ public:
 	/// Check if the unit-type didn't break any unit limits and supply/demand
 	int CheckLimits(const CUnitType *type) const;
 
-	/// Check if enough resources are available for costs
-	int CheckCosts(const int *costs) const;
-	/// Check if enough resources are available for a new unit-type
-	int CheckUnitType(const CUnitType *type) const;
-
 	/// Does the player have units of that type
 	int HaveUnitTypeByType(const CUnitType *type) const;
 	/// Does the player have units of that type

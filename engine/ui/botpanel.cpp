@@ -787,14 +787,12 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonBuild:
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
-			if (!Selected[0]->Player->CheckUnitType(type)) {
-				UI.StatusLine.Set(_("Select Location"));
-				ClearCosts();
-				CursorBuilding = type;
-				// FIXME: check is this =9 necessary?
-				CurrentButtonLevel = 9; // level 9 is cancel-only
-				UI.ButtonPanel.Update();
-			}
+			UI.StatusLine.Set(_("Select Location"));
+			ClearCosts();
+			CursorBuilding = type;
+			// FIXME: check is this =9 necessary?
+			CurrentButtonLevel = 9; // level 9 is cancel-only
+			UI.ButtonPanel.Update();
 			break;
 
 		case ButtonTrain:
@@ -808,8 +806,7 @@ void CButtonPanel::DoClicked(int button)
 					!EnableTrainingQueue) {
 				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->X,
 					Selected[0]->Y, _("Unit training queue is full"));
-			} else if (Selected[0]->Player->CheckLimits(type) >= 0 &&
-					!Selected[0]->Player->CheckUnitType(type)) {
+			} else if (Selected[0]->Player->CheckLimits(type) >= 0) {
 				SendCommandTrainUnit(Selected[0], type,
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
