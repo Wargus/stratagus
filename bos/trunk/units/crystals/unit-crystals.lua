@@ -9,7 +9,7 @@
 --
 --	unit-crystals.lua - Define the crystals.
 --
---	(c) Copyright 1998 - 2007 by Lutz Sammer, Crestez Leonard, François Beerten
+--	(c) Copyright 1998 - 2007 by Lutz Sammer, Crestez Leonard, Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -85,5 +85,7 @@ for i = 1, 13 do
         Armor = 999, Missile = "missile-none",
         Priority = 0, Corpse = "unit-destroyed-1x1-place",
         Type = "land", Building = true, VisibleUnderFog = true,
-        CanHarvestFrom = true})
+        CanHarvestFrom = true,
+        ProductionCosts = {"energy", 1000 * i}
+    })
 end

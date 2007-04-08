@@ -9,7 +9,7 @@
 --
 --	unit-rocks.lua	-	Define the rocks units.
 --
---	(c) Copyright 2005 - 2007 by Loïs Taulelle.
+--	(c) Copyright 2005 - 2007 by Loï¿½ Taulelle.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ DefineUnitType("unit-rock-1", {
     Animations = "animations-rocks",
     Icon = "icon-rock-1",
     Construction = "construction-rocks",
-    ProductionCosts = {},
+    ProductionCosts = {"magma", 10000},
     HitPoints = 3000,
     DrawLevel = 2,
     VisibleUnderFog = true,
@@ -84,7 +84,7 @@ DefineUnitType("unit-rock-2", {
     Animations = "animations-rocks",
     Icon = "icon-rock-2",
     Construction = "construction-rocks",
-    ProductionCosts = {},
+    ProductionCosts = {"magma", 20000},
     HitPoints = 2500,
     DrawLevel = 2,
     VisibleUnderFog = true,
@@ -120,7 +120,7 @@ DefineUnitType("unit-rock-3", {
     Animations = "animations-rocks",
     Icon = "icon-rock-3",
     Construction = "construction-rocks",
-    ProductionCosts = {},
+    ProductionCosts = {"magma", 30000},
     HitPoints = 2500,
     DrawLevel = 2,
     VisibleUnderFog = true,
@@ -156,7 +156,7 @@ DefineUnitType("unit-rock-4", {
     Animations = "animations-rocks",
     Icon = "icon-rock-4",
     Construction = "construction-rocks",
-    ProductionCosts = {},
+    ProductionCosts = {"magma", 40000},
     HitPoints = 2500,
     DrawLevel = 2,
     VisibleUnderFog = true,
@@ -192,7 +192,7 @@ DefineUnitType("unit-rock-5", {
     Animations = "animations-rocks",
     Icon = "icon-rock-5",
     Construction = "construction-rocks",
-    ProductionCosts = {},
+    ProductionCosts = {"magma", 50000},
     HitPoints = 1500,
     DrawLevel = 2,
     VisibleUnderFog = true,
@@ -228,7 +228,7 @@ DefineUnitType("unit-rock-6", {
     Animations = "animations-rocks",
     Icon = "icon-rock-6",
     Construction = "construction-rocks",
-    ProductionCosts = {},
+    ProductionCosts = {"magma", 60000},
     HitPoints = 1500,
     DrawLevel = 2,
     VisibleUnderFog = true,
