@@ -283,14 +283,6 @@ UI.Resources[2].IconY = 0
 UI.Resources[2].TextX = 85 + 75
 UI.Resources[2].TextY = 1
 
--- food
-UI.Resources[FoodCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
-UI.Resources[FoodCost].IconFrame = 3
-UI.Resources[FoodCost].IconX = 67 + 150
-UI.Resources[FoodCost].IconY = 0
-UI.Resources[FoodCost].TextX = 85 + 150
-UI.Resources[FoodCost].TextY = 1
-
 -- score
 UI.Resources[ScoreCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
 UI.Resources[ScoreCost].IconFrame = 4

@@ -66,7 +66,7 @@ static void UpdateConstructionFrame(CUnit *unit)
 	int percent;
 
 	int *costs = unit->Type->ProductionCosts;
-	int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+	int cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
 	percent = unit->Data.Built.Progress * 100 / cost;
 
 	cframe = tmp = unit->Type->Construction->Frames;
@@ -355,7 +355,7 @@ static void BuildBuilding(CUnit *unit)
 	Assert(goal);
 
 	pcosts = unit->Orders[0]->Type->ProductionCosts;
-	pcost = CYCLES_PER_SECOND * (pcosts[1] ? pcosts[1] : pcosts[2]);
+	pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
 
 	if (goal->Orders[0]->Action != UnitActionDie) {
 		// hp is the current damage taken by the unit.
@@ -363,7 +363,7 @@ static void BuildBuilding(CUnit *unit)
 
 		// Update build progress
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[1] ? costs[1] : costs[2];
+		int cost = costs[0] ? costs[0] : costs[1];
 		goal->Data.Built.Progress += cost * SpeedBuild;
 		if (goal->Data.Built.Progress > pcost) {
 			goal->Data.Built.Progress = pcost;
@@ -444,7 +444,7 @@ void HandleActionBuilt(CUnit *unit)
 	int progress = 0;
 
 	int *pcosts = type->ProductionCosts;
-	int pcost = CYCLES_PER_SECOND * (pcosts[1] ? pcosts[1] : pcosts[2]);
+	int pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
 
 	// hp is the current damage taken by the unit.
 	hp = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - unit->Variable[HP_INDEX].Value;
@@ -531,7 +531,7 @@ void HandleActionBuilt(CUnit *unit)
 			// Set to Zero as it's part of a union
 			unit->Data.Resource.Active = 0;
 			int i;
-			for (i = 1; i < MaxCosts; ++i) {
+			for (i = 0; i < MaxCosts; ++i) {
 				if (type->StartingResources[i] != 0) {
 					break;
 				}

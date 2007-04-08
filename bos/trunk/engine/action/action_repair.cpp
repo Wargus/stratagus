@@ -194,7 +194,7 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 {
 	CPlayer *player = unit->Player;
 	int *pcosts = goal->Type->ProductionCosts;
-	int pcost = CYCLES_PER_SECOND * (pcosts[1] ? pcosts[1] : pcosts[2]);
+	int pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
 
 	if (goal->Orders[0]->Action != UnitActionBuilt) {
 		Assert(goal->Variable[HP_INDEX].Max);
@@ -202,7 +202,7 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 		//
 		// Check if enough resources are available
 		//
-		for (int i = 1; i < MaxCosts; ++i) {
+		for (int i = 0; i < MaxCosts; ++i) {
 			if (goal->Type->ProductionCosts[i] != 0 && player->ProductionRate[i] == 0 &&
 					player->StoredResources[i] == 0) {
 				char buf[100];
@@ -226,7 +226,7 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 		}
 
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[1] ? costs[1] : costs[2];
+		int cost = costs[0] ? costs[0] : costs[1];
 
 		int hp = goal->Variable[HP_INDEX].Max * cost / pcost;
 		goal->Variable[HP_INDEX].Value += hp;
@@ -239,7 +239,7 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 
 		// Update build progress
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[1] ? costs[1] : costs[2];
+		int cost = costs[0] ? costs[0] : costs[1];
 		goal->Data.Built.Progress += cost * SpeedBuild;
 		if (goal->Data.Built.Progress > pcost) {
 			goal->Data.Built.Progress = pcost;

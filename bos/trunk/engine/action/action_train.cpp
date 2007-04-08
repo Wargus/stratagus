@@ -108,11 +108,11 @@ void HandleActionTrain(CUnit *unit)
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	} else {
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[1] ? costs[1] : costs[2];
+		int cost = costs[0] ? costs[0] : costs[1];
 		unit->Data.Train.Ticks += cost * SpeedTrain;
 
 		costs = unit->Orders[0]->Type->ProductionCosts;
-		cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+		cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
 		if (unit->Data.Train.Ticks > cost) {
 			unit->Data.Train.Ticks = cost;
 		}
@@ -129,7 +129,7 @@ void HandleActionTrain(CUnit *unit)
 	player = unit->Player;
 
 	int *costs = unit->Orders[0]->Type->ProductionCosts;
-	int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+	int cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
 	if (unit->Data.Train.Ticks >= cost) {
 		//
 		// Check if there are still unit slots.

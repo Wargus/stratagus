@@ -920,17 +920,13 @@ void UnitClearOrders(CUnit *unit)
 */
 void UpdateForNewUnit(const CUnit *unit, int upgrade)
 {
-	const CUnitType *type;
-	CPlayer *player;
-	int u;
-
-	player = unit->Player;
-	type = unit->Type;
+	const CUnitType *type = unit->Type;
+	CPlayer *player = unit->Player;
 
 	//
 	// Update resources
 	//
-	for (u = 1; u < MaxCosts; ++u) {
+	for (int u = 0; u < MaxCosts; ++u) {
 		player->ProductionRate[u] += type->ProductionRate[u];
 		player->StorageCapacity[u] += type->StorageCapacity[u];
 	}
@@ -2583,7 +2579,7 @@ void UnitRemoveConsumingResources(CUnit *unit)
 			(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20)) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
 	} else if (unit->Orders[0]->Action == UnitActionResource && unit->SubAction >= 55) {
-		for (int u = 1; u < MaxCosts; ++u) {
+		for (int u = 0; u < MaxCosts; ++u) {
 			unit->Player->ProductionRate[u] -= unit->Data.Harvest.CurrentProduction[u];
 		}
 	} else if (unit->Orders[0]->Action == UnitActionTrain && unit->SubAction != 0) {

@@ -460,7 +460,7 @@ class CEditResourceOKActionListener : public gcn::ActionListener
 public:
 	virtual void action(const std::string &eventId) {
 		int amount = atoi(editResourceTextField->getText().c_str());
-		for (int i = 1; i < MaxCosts; ++i) {
+		for (int i = 0; i < MaxCosts; ++i) {
 			UnitUnderCursor->ResourcesHeld[i] = amount * CYCLES_PER_SECOND;
 		}
 		editResourceMenu->stop();

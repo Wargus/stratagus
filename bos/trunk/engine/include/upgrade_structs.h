@@ -55,17 +55,13 @@ class CIcon;
 **  Indices into costs/resource/income array.
 */
 enum CostType {
-	TimeCost,                               /// time in game cycles
-
-// standard
 	EnergyCost,                             /// energy resource
 	MagmaCost,                              /// magma resource
 
 	MaxCosts                                /// how many different costs
 };
 
-#define FoodCost MaxCosts
-#define ScoreCost (MaxCosts + 1)
+#define ScoreCost MaxCosts
 
 /**
 **  Speed factor for harvesting resources
