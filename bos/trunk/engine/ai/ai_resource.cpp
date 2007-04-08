@@ -189,19 +189,14 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 		}
 	}
 
-	for (i = 0; i < num; ++i) {
-		unit = table[i];
+	// Try one worker at random to save cpu
+	unit = table[SyncRand() % num];
 
-		// Find a place to build.
-		if (!AiFindBuildingPlace(unit, building, &x, &y)) {
-			continue;
-		}
-
+	// Find a place to build.
+	if (AiFindBuildingPlace(unit, building, &x, &y)) {
 		CommandBuildBuilding(unit, x, y, building, FlushCommands);
-
 		return 1;
 	}
-
 	return 0;
 }
 
