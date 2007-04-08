@@ -168,30 +168,29 @@ static void CalculateHarvestAmount(CUnit *unit, CUnit *source, int amount[MaxCos
 	int i;
 
 	// FIXME: use SpeedResourcesHarvest
-	amount[0] = 0;
-	if (source->ResourcesHeld[1] == 0) {
+	if (source->ResourcesHeld[0] == 0) {
+		amount[0] = 0;
+		amount[1] = unit->Type->MaxUtilizationRate[2];
+	} else if (source->ResourcesHeld[1] == 0) {
+		amount[0] = unit->Type->MaxUtilizationRate[1];
 		amount[1] = 0;
-		amount[2] = unit->Type->MaxUtilizationRate[2];
-	} else if (source->ResourcesHeld[2] == 0) {
-		amount[1] = unit->Type->MaxUtilizationRate[1];
-		amount[2] = 0;
 	} else {
-		int f = 100 * source->ResourcesHeld[1] * unit->Type->MaxUtilizationRate[2] /
-			(source->ResourcesHeld[2] * unit->Type->MaxUtilizationRate[1]);
+		int f = 100 * source->ResourcesHeld[0] * unit->Type->MaxUtilizationRate[1] /
+			(source->ResourcesHeld[1] * unit->Type->MaxUtilizationRate[0]);
 		if (f > 100) {
-			amount[1] = unit->Type->MaxUtilizationRate[1];
-			amount[2] = unit->Type->MaxUtilizationRate[2] * 100 / f;
+			amount[0] = unit->Type->MaxUtilizationRate[0];
+			amount[1] = unit->Type->MaxUtilizationRate[1] * 100 / f;
 		} else if (f < 100) {
-			amount[1] = unit->Type->MaxUtilizationRate[1] * f / 100;
-			amount[2] = unit->Type->MaxUtilizationRate[2];
-		} else {
+			amount[0] = unit->Type->MaxUtilizationRate[0] * f / 100;
 			amount[1] = unit->Type->MaxUtilizationRate[1];
-			amount[2] = unit->Type->MaxUtilizationRate[2];
+		} else {
+			amount[0] = unit->Type->MaxUtilizationRate[0];
+			amount[1] = unit->Type->MaxUtilizationRate[1];
 		}
 	}
 
 	// Don't load more than there is.
-	for (i = 1; i < MaxCosts; ++i) {
+	for (i = 0; i < MaxCosts; ++i) {
 		if (amount[i] > source->ResourcesHeld[i]) {
 			amount[i] = source->ResourcesHeld[i];
 		}
@@ -231,7 +230,7 @@ static void FindNewResource(CUnit *unit)
 static void GatherResource(CUnit *unit)
 {
 	CUnit *source = unit->Orders[0]->Goal;
-	int amount[MaxCosts] = {1, 1, 1};
+	int amount[MaxCosts] = {1, 1};
 	bool visible = source->IsVisibleAsGoal(unit->Player);
 	int i;
 
@@ -240,7 +239,7 @@ static void GatherResource(CUnit *unit)
 	// Calculate how much we can harvest.
 	if (visible && UnitHoldsResources(source)) {
 		CalculateHarvestAmount(unit, source, amount);
-		for (i = 1; i < MaxCosts; ++i) {
+		for (i = 0; i < MaxCosts; ++i) {
 			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
 			unit->Data.Harvest.CurrentProduction[i] = amount[i];
 			unit->Player->ProductionRate[i] += unit->Data.Harvest.CurrentProduction[i];
@@ -259,7 +258,7 @@ static void GatherResource(CUnit *unit)
 
 		DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 
-		for (i = 1; i < MaxCosts; ++i) {
+		for (i = 0; i < MaxCosts; ++i) {
 			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
 			unit->Data.Harvest.CurrentProduction[i] = 0;
 		}

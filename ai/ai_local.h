@@ -185,9 +185,7 @@ public:
 		LastExplorationGameCycle(0), LastCanNotMoveGameCycle(0),
 		LastRepairBuilding(0)
 	{
-		memset(Reserve, 0, sizeof(Reserve));
 		memset(Needed, 0, sizeof(Needed));
-		memset(Collect, 0, sizeof(Collect));
 		memset(TriedRepairWorkers, 0, sizeof(TriedRepairWorkers));
 	}
 
@@ -204,9 +202,7 @@ public:
 	AiForce Force[AI_MAX_ATTACKING_FORCES]; /// Forces controlled by AI
 
 	// resource manager
-	int Reserve[MaxCosts]; /// Resources to keep in reserve
 	int Needed[MaxCosts];  /// Needed resources
-	int Collect[MaxCosts]; /// Collect % of resources
 	int NeededMask;        /// Mask for needed resources
 	bool NeedSupply;       /// Flag need food
 

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/06/07 22:10:19.
+** Generated automatically by tolua++-1.0.92 on 04/07/07 19:08:05.
 */
 
 #ifndef __cplusplus
@@ -15718,7 +15718,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"MaxCosts",MaxCosts);
   tolua_constant(tolua_S,"EnergyCost",EnergyCost);
   tolua_constant(tolua_S,"MagmaCost",MagmaCost);
-  tolua_constant(tolua_S,"FoodCost",FoodCost);
   tolua_constant(tolua_S,"ScoreCost",ScoreCost);
   tolua_constant(tolua_S,"MaxResourceInfo",MaxResourceInfo);
   tolua_constant(tolua_S,"PlayerMax",PlayerMax);

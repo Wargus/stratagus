@@ -1618,7 +1618,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	// Build
 	if (unit->Orders[0]->Action == UnitActionBuilt) {
 		const int *pcosts = type->ProductionCosts;
-		int pcost = CYCLES_PER_SECOND * (pcosts[1] ? pcosts[1] : pcosts[2]);
+		int pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
 		unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
 		unit->Variable[BUILD_INDEX].Max = pcost;
 
@@ -1639,14 +1639,14 @@ void UpdateUnitVariables(const CUnit *unit)
 	if (unit->Orders[0]->Action == UnitActionTrain) {
 		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
 		int *costs = unit->Orders[0]->Type->ProductionCosts;
-		int cost = CYCLES_PER_SECOND * (costs[1] ? costs[1] : costs[2]);
+		int cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
 		unit->Variable[TRAINING_INDEX].Max = cost;
 	}
 
 	// Resources.
 	if (unit->Type->CanHarvestFrom) {
 		int i;
-		for (i = 1; i < MaxCosts; ++i) {
+		for (i = 0; i < MaxCosts; ++i) {
 			if (unit->ResourcesHeld[i] != 0) {
 				break;
 			}

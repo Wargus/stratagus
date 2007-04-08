@@ -70,7 +70,7 @@ static int AiCheckCosts(const int *costs)
 {
 	int err = 0;
 
-	for (int i = 1; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		if (costs[i] && AiPlayer->Player->ProductionRate[i] == 0 &&
 				AiPlayer->Player->StoredResources[i] == 0) {
 			err |= (1 << i);
@@ -896,7 +896,7 @@ static void AiCheckRepair(void)
 			//
 			// Must check, if there are enough resources
 			//
-			for (j = 1; j < MaxCosts; ++j) {
+			for (j = 0; j < MaxCosts; ++j) {
 				if (unit->Type->ProductionCosts[j] && AiPlayer->Player->ProductionRate[j] == 0 &&
 						AiPlayer->Player->StoredResources[j] == 0) {
 					repair_flag = false;

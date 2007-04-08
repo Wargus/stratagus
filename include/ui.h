@@ -467,7 +467,7 @@ public:
 	int TextX;                        /// text X position
 	int TextY;                        /// text Y position
 };
-#define MaxResourceInfo  MaxCosts + 2 /// +2 for food and score
+#define MaxResourceInfo  MaxCosts + 1 /// +2 for score
 
 class CInfoPanel
 {

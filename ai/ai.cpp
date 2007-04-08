@@ -338,21 +338,9 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 		file->printf("},\n");
 	}
 
-	file->printf("  \"reserve\", {");
-	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Reserve[i]);
-	}
-	file->printf("},\n");
-
 	file->printf("  \"needed\", {");
 	for (i = 0; i < MaxCosts; ++i) {
 		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Needed[i]);
-	}
-	file->printf("},\n");
-
-	file->printf("  \"collect\", {");
-	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Collect[i]);
 	}
 	file->printf("},\n");
 
@@ -499,9 +487,6 @@ void AiInit(CPlayer *player)
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;
-
-	pai->Collect[EnergyCost] = 50;
-	pai->Collect[MagmaCost] = 50;
 
 	player->Ai = pai;
 }

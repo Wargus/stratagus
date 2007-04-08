@@ -34,12 +34,11 @@ UnitTypes = {}
 setmetatable(UnitTypes, mt)
 $]
 
-#define MaxCosts 3
-#define EnergyCost 1
-#define MagmaCost 2
-#define FoodCost MaxCosts
-#define ScoreCost MaxCosts + 1
-#define MaxResourceInfo MaxCosts + 2
+#define MaxCosts 2
+#define EnergyCost 0
+#define MagmaCost 1
+#define ScoreCost MaxCosts
+#define MaxResourceInfo MaxCosts + 1
 #define PlayerMax 16
 #define UnitMax 2048
 
