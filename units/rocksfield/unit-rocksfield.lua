@@ -40,12 +40,12 @@ DefineConstruction("construction-rocksfield", {
 })
 
 DefineUnitType("unit-rocksfield", {
-    Name = "Energy Field",
+    Name = "Rocks Field",
     Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
     Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
     Animations = "animations-building",
     Icon = "icon-rocks_field",
-    ProductionCosts = {},
+    ProductionCosts = {"magma", 340},
     VisibleUnderFog = true,
     Construction = "construction-rocksfield",
     NeutralMinimapColor = {196, 196, 196},
