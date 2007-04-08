@@ -307,6 +307,10 @@ void CUnit::Init(CUnitType *type)
 
 	Removed = 1;
 
+	for (int i = 0; i < MaxCosts; ++i) {
+		ResourcesHeld[i] = type->ProductionCosts[i];
+	}
+
 	Assert(Orders.empty());
 
 	Orders.push_back(new COrder);
