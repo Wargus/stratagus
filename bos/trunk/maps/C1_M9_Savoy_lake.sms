@@ -14,36 +14,36 @@
 
 -- player configuration
 SetStartView(0, 21, 20)
-SetPlayerData(0, "Resources", "energy", 5000)
-SetPlayerData(0, "Resources", "magma", 5000)
+Players[0].StoredResources[EnergyCost] = 5000
+Players[0].StoredResources[MagmaCost] = 5000
 SetAiType(0, "ai-rush")
 SetStartView(1, 0, 0)
-SetPlayerData(1, "Resources", "energy", 5000)
-SetPlayerData(1, "Resources", "magma", 5000)
+Players[1].StoredResources[EnergyCost] = 5000
+Players[1].StoredResources[MagmaCost] = 5000
 SetAiType(1, "ai-rush")
 SetStartView(2, 0, 0)
-SetPlayerData(2, "Resources", "energy", 1000)
-SetPlayerData(2, "Resources", "magma", 2000)
+Players[2].StoredResources[EnergyCost] = 1000
+Players[2].StoredResources[MagmaCost] = 2000
 SetAiType(2, "ai-rush")
 SetStartView(3, 0, 0)
-SetPlayerData(3, "Resources", "energy", 1000)
-SetPlayerData(3, "Resources", "magma", 2000)
+Players[3].StoredResources[EnergyCost] = 1000
+Players[3].StoredResources[MagmaCost] = 2000
 SetAiType(3, "ai-rush")
 SetStartView(4, 0, 0)
-SetPlayerData(4, "Resources", "energy", 1000)
-SetPlayerData(4, "Resources", "magma", 2000)
+Players[4].StoredResources[EnergyCost] = 1000
+Players[4].StoredResources[MagmaCost] = 2000
 SetAiType(4, "ai-rush")
 SetStartView(5, 0, 0)
-SetPlayerData(5, "Resources", "energy", 1000)
-SetPlayerData(5, "Resources", "magma", 2000)
+Players[5].StoredResources[EnergyCost] = 1000
+Players[5].StoredResources[MagmaCost] = 2000
 SetAiType(5, "ai-rush")
 SetStartView(6, 0, 0)
-SetPlayerData(6, "Resources", "energy", 1000)
-SetPlayerData(6, "Resources", "magma", 2000)
+Players[6].StoredResources[EnergyCost] = 1000
+Players[6].StoredResources[MagmaCost] = 2000
 SetAiType(6, "ai-rush")
 SetStartView(7, 0, 0)
-SetPlayerData(7, "Resources", "energy", 1000)
-SetPlayerData(7, "Resources", "magma", 2000)
+Players[7].StoredResources[EnergyCost] = 1000
+Players[7].StoredResources[MagmaCost] = 2000
 SetAiType(7, "ai-rush")
 
 -- load tilemodels
@@ -16438,39 +16438,22 @@ SetTile(112, 127, 127)
 --allow
 -- place units
 unit= CreateUnit("unit-crystal-field13", 7, {124, 93})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {112, 4})
-SetResourcesHeld(unit, 2500)
 unit= CreateUnit("unit-crystal-field6", 7, {117, 5})
-SetResourcesHeld(unit, 2500)
 unit= CreateUnit("unit-crystal-field6", 7, {126, 8})
-SetResourcesHeld(unit, 2500)
 unit= CreateUnit("unit-crystal-field6", 7, {120, 6})
-SetResourcesHeld(unit, 2500)
 unit= CreateUnit("unit-crystal-field13", 7, {15, 48})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {113, 114})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {111, 113})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {109, 112})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {106, 111})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-rocksfield", 7, {80, 105})
-SetResourcesHeld(unit, 350000)
 unit= CreateUnit("unit-rocksfield", 7, {17, 27})
-SetResourcesHeld(unit, 350000)
 unit= CreateUnit("unit-crystal-field6", 7, {6, 18})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {8, 20})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {10, 22})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {4, 16})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-crystal-field6", 7, {4, 15})
-SetResourcesHeld(unit, 250000)
 unit= CreateUnit("unit-vault", 0, {15, 20})
 unit= CreateUnit("unit-camp", 0, {34, 26})
 unit= CreateUnit("unit-rfac", 0, {8, 7})
