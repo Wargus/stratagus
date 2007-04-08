@@ -134,7 +134,7 @@ int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 		// Those can't attack anyway.
 		//
 		if (dest->Removed || dest->Variable[INVISIBLE_INDEX].Value ||
-			dest->Orders[0]->Action == UnitActionDie) {
+				dest->Orders[0]->Action == UnitActionDie) {
 			continue;
 		}
 
@@ -172,9 +172,6 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	int x;
 	int y;
 
-#ifdef DEBUG
-	unit = NoUnitP;
-#endif
 	//
 	// Remove all workers on the way building something
 	//
@@ -182,8 +179,8 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		for (x = 0; x < unit->OrderCount; ++x) {
-			if (unit->Orders[x]->Action == UnitActionBuild
-				|| unit->Orders[x]->Action == UnitActionRepair) {
+			if (unit->Orders[x]->Action == UnitActionBuild ||
+					unit->Orders[x]->Action == UnitActionRepair) {
 				break;
 			}
 		}
@@ -193,12 +190,9 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	}
 
 	for (i = 0; i < num; ++i) {
-
 		unit = table[i];
 
-		//
-		// Find place on that could be build.
-		//
+		// Find a place to build.
 		if (!AiFindBuildingPlace(unit, building, &x, &y)) {
 			continue;
 		}
@@ -228,10 +222,6 @@ static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 	int nunits;
 	int i;
 	int num;
-
-#ifdef DEBUG
-	unit = NoUnitP;
-#endif
 
 	//
 	// Remove all units already doing something.
@@ -429,28 +419,45 @@ static void AiCheckingWork(void)
 /**
 **  Assign worker to gather a resource.
 **
-**  @param unit      pointer to the unit.
+**  @param unit  pointer to the unit.
 **
-**  @return          1 if the worker was assigned, 0 otherwise.
+**  @return      1 if the worker was assigned, 0 otherwise.
 */
 static int AiAssignHarvester(CUnit *unit)
 {
 	std::vector<CUnitType *>::iterator i;
 	int exploremask;
 	CUnit *dest;
+	int res;
 
 	// It can't.
 	if (unit->Removed) {
 		return 0;
 	}
 
+	// See which resource we need most
+	res = -1;
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (unit->Player->ProductionRate[i] == 0) {
+			res = i;
+			if (unit->Player->StoredResources[i] == 0) {
+				break;
+			}
+		}
+	}
+
 	//
 	// Find a resource to harvest from.
 	//
-	if ((dest = UnitFindResource(unit, unit->X, unit->Y, 1000))) {
+	dest = UnitFindResource(unit, unit->X, unit->Y, 1000, res);
+	if (!dest && res != -1) {
+		dest = UnitFindResource(unit, unit->X, unit->Y, 1000, -1);
+	}
+	if (dest) {
 		CommandResource(unit, dest, FlushCommands);
 		return 1;
 	}
+
 	exploremask = 0;
 	for (i = UnitTypes.begin(); i != UnitTypes.end(); i++) {
 		if (*i && (*i)->CanHarvestFrom) {
@@ -643,12 +650,11 @@ static int AiRepairUnit(CUnit *unit)
 }
 
 /**
-**  Look through the units, if a unit must be repaired.
+**  Check if there's a unit that should be repaired.
 */
 static void AiCheckRepair(void)
 {
 	int i;
-	int j;
 	int k;
 	int n;
 	bool repair_flag;
@@ -657,12 +663,10 @@ static void AiCheckRepair(void)
 	n = AiPlayer->Player->TotalNumUnits;
 	k = 0;
 	// Selector for next unit
-	for (i = n; (i > 0); --i) {
+	for (i = n - 1; i; --i) {
 		unit = AiPlayer->Player->Units[i];
-		if (unit) {
-			if (UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
-				k = i + 1;
-			}
+		if (UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
+			k = i + 1;
 		}
 	}
 
@@ -670,25 +674,24 @@ static void AiCheckRepair(void)
 		unit = AiPlayer->Player->Units[i];
 		repair_flag = true;
 		// Unit damaged?
-		// Don't repair attacked unit ( wait 5 sec before repairing )
+		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit->Type->RepairHP &&
 				unit->Orders[0]->Action != UnitActionBuilt &&
 				unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max &&
 				unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
-			//
 			// FIXME: Repair only units under control
-			//
 			if (EnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max)) {
 				continue;
 			}
 			//
-			// Must check, if there are enough resources
+			// Must check if there are enough resources
 			//
-			for (j = 0; j < MaxCosts; ++j) {
+			for (int j = 0; j < MaxCosts; ++j) {
 				if (unit->Type->ProductionCosts[j] && AiPlayer->Player->ProductionRate[j] == 0 &&
 						AiPlayer->Player->StoredResources[j] == 0) {
 					repair_flag = false;
+					break;
 				}
 			}
 
@@ -752,6 +755,7 @@ void AiResourceManager(void)
 	// Check if something needs to be build / trained.
 	//
 	AiCheckingWork();
+
 	//
 	// Collect resources.
 	//

@@ -866,7 +866,7 @@ extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, 
 	/// Holds resources
 extern bool UnitHoldsResources(const CUnit *unit);
 	/// Find resource
-extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range);
+extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource = -1);
 	/// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 
@@ -965,7 +965,7 @@ extern CUnit *UnitOnMapTile(int tx, int ty);
 extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
-extern CUnit *ResourceOnMap(int tx, int ty);
+extern CUnit *ResourceOnMap(int tx, int ty, int resource = -1);
 
 	/// Find best enemy in numeric range to attack
 extern CUnit *AttackUnitsInDistance(const CUnit *unit, int range);
