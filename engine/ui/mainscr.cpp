@@ -687,16 +687,16 @@ void DrawResources(void)
 	char tmp[128];
 	int i;
 
-	for (i = 1; i < MaxCosts; ++i) {
+	for (i = 0; i < MaxCosts; ++i) {
 		sprintf(tmp, "%d/%d", ThisPlayer->ActualUtilizationRate[i],
 			ThisPlayer->ProductionRate[i]);
-		VideoDrawText(50 +  90 * (i - 1), 1, GameFont, tmp);
+		VideoDrawText(50 +  90 * i, 1, GameFont, tmp);
 	}
 
-	for (i = 1; i < MaxCosts; ++i) {
+	for (i = 0; i < MaxCosts; ++i) {
 		sprintf(tmp, "%d/%d", ThisPlayer->StoredResources[i] / CYCLES_PER_SECOND,
 			ThisPlayer->StorageCapacity[i] / CYCLES_PER_SECOND);
-		VideoDrawText(250 +  90 * (i - 1), 1, GameFont, tmp);
+		VideoDrawText(250 +  90 * i, 1, GameFont, tmp);
 	}
 }
 
@@ -1065,17 +1065,14 @@ void CStatusLine::Clear(void)
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-static int CostsMana;                        /// mana cost to display in status line
-static int Costs[MaxCosts + 1];              /// costs to display in status line
+static int CostsMana;                    /// mana cost to display in status line
+static int Costs[MaxCosts];              /// costs to display in status line
 
 /**
 **  Draw costs in status line.
 **
 **  @todo FIXME : make DrawCosts more configurable.
-**  @todo FIXME : 'time' resource should be shown too.
 **  @todo FIXME : remove hardcoded image for mana.
-**
-**  @internal MaxCost == FoodCost.
 */
 void DrawCosts(void)
 {
@@ -1088,13 +1085,13 @@ void DrawCosts(void)
 		x += 60;
 	}
 
-	for (int i = 1; i <= MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (UI.Resources[i].G) {
 				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 					x, UI.StatusLine.TextY);
 			}
-			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont,Costs[i]);
+			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, Costs[i]);
 			x += 60;
 			if (x > Video.Width - 60) {
 				break;
@@ -1110,15 +1107,14 @@ void DrawCosts(void)
 **  @param food   Food costs.
 **  @param costs  Resource costs, NULL pointer if all are zero.
 */
-void SetCosts(int mana, int food, const int *costs)
+void SetCosts(int mana, const int *costs)
 {
 	CostsMana = mana;
 	if (costs) {
 		memcpy(Costs, costs, MaxCosts * sizeof(*costs));
 	} else {
-		memset(Costs, 0, sizeof (Costs));
+		memset(Costs, 0, sizeof(Costs));
 	}
-	Costs[FoodCost] = food;
 }
 
 /**
@@ -1126,7 +1122,7 @@ void SetCosts(int mana, int food, const int *costs)
 */
 void ClearCosts(void)
 {
-	SetCosts(0, 0, NULL);
+	SetCosts(0, NULL);
 }
 
 /*----------------------------------------------------------------------------

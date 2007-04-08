@@ -277,7 +277,7 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 	int usedtypes = 0;
 	int *c = unit->Player->UnitsConsumingResourcesRequested[unit];
 
-	for (i = 1; i < MaxCosts; ++i) {
+	for (i = 0; i < MaxCosts; ++i) {
 		if (c[i] != 0) {
 			++usedtypes;
 		}
@@ -289,7 +289,7 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 		// unit effective rate(type) = unit max rate(type) * base efficiency
 		int be = BaseEfficiency(unit->Player);
 		costs[0] = 0;
-		for (i = 1; i < MaxCosts; ++i) {
+		for (i = 0; i < MaxCosts; ++i) {
 			costs[i] = MaxRate(unit, i) * be / 100;
 		}
 	} else {
@@ -297,7 +297,7 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 #if 0
 		int ue = UniqueEfficiency(unit->Player);
 		costs[0] = 0;
-		for (i = 1; i < MaxCosts; ++i) {
+		for (i = 0; i < MaxCosts; ++i) {
 			costs[i] = MaxRate(unit, i) * ue / 100;
 		}
 #endif
@@ -704,7 +704,7 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 int CPlayer::CheckCosts(const int *costs) const
 {
 	int err = 0;
-	for (int i = 1; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		if (costs[i] != 0 && this->ProductionRate[i] == 0 && this->StoredResources[i] == 0) {
 			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
 				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(),

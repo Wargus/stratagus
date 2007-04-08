@@ -754,53 +754,6 @@ static int CclAiPlayer(lua_State *l)
 }
 
 /**
-**  Set AI player resource reserve.
-**
-**  @param l  Lua state.
-**
-**  @return     Old resource vector
-*/
-static int CclAiSetReserve(lua_State *l)
-{
-	int i;
-
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_newtable(l);
-	for (i = 0; i < MaxCosts; ++i) {
-		lua_pushnumber(l, AiPlayer->Reserve[i]);
-		lua_rawseti(l, -2, i + 1);
-	}
-	for (i = 0; i < MaxCosts; ++i) {
-		lua_rawgeti(l, 1, i + 1);
-		AiPlayer->Reserve[i] = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-	}
-	return 1;
-}
-
-/**
-**  Set AI player resource collect percent.
-**
-**  @param l  Lua state.
-*/
-static int CclAiSetCollect(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	for (int i = 0; i < MaxCosts; ++i) {
-		lua_rawgeti(l, 1, i + 1);
-		AiPlayer->Collect[i] = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-	}
-	return 0;
-}
-
-/**
 **  Dump some AI debug informations.
 **
 **  @param l  Lua state.
@@ -1044,24 +997,6 @@ static int CclDefineAiPlayer(lua_State *l)
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
-		} else if (!strcmp(value, "reserve")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				const char *type;
-				int num;
-
-				lua_rawgeti(l, j + 1, k + 1);
-				type = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				num = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				ai->Reserve[DefaultResourceNumber(type)] = num;
-			}
 		} else if (!strcmp(value, "needed")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -1079,24 +1014,6 @@ static int CclDefineAiPlayer(lua_State *l)
 				num = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				ai->Needed[DefaultResourceNumber(type)] = num;
-			}
-		} else if (!strcmp(value, "collect")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				const char *type;
-				int num;
-
-				lua_rawgeti(l, j + 1, k + 1);
-				type = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				num = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				ai->Collect[DefaultResourceNumber(type)] = num;
 			}
 		} else if (!strcmp(value, "need-mask")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1277,8 +1194,6 @@ void AiCclRegister(void)
 	lua_register(Lua, "AiSleep", CclAiSleep);
 
 	lua_register(Lua, "AiPlayer", CclAiPlayer);
-	lua_register(Lua, "AiSetReserve", CclAiSetReserve);
-	lua_register(Lua, "AiSetCollect", CclAiSetCollect);
 
 	lua_register(Lua, "AiDump", CclAiDump);
 

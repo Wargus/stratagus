@@ -370,10 +370,10 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 	switch (button->Action) {
 		case ButtonBuild:
 		case ButtonTrain:
-			SetCosts(0, 0, UnitTypes[button->Value]->ProductionCosts);
+			SetCosts(0, UnitTypes[button->Value]->ProductionCosts);
 			break;
 		case ButtonSpellCast:
-			SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
+			SetCosts(SpellTypeTable[button->Value]->ManaCost, NULL);
 			break;
 		default:
 			ClearCosts();
