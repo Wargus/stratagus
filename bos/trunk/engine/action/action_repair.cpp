@@ -282,15 +282,13 @@ static void RepairUnit(CUnit *unit)
 		NewResetPath(unit);
 	}
 
+	// If goal has moved, chase after it
 	if (goal && !inrange) {
-		// If goal has moved, chase after it
 		unit->State = 0;
 		unit->SubAction = 0;
 	}
 
-	//
-	// Target is fine, choose new one.
-	//
+	// Done repairing
 	if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
 		if (goal) { // release reference
