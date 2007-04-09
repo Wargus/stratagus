@@ -259,8 +259,10 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 static void RepairUnit(CUnit *unit)
 {
 	CUnit *goal = unit->Orders[0]->Goal;
+	bool visible = goal->IsVisibleAsGoal(unit->Player);
+	bool inrange = MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange;
 
-	if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange) {
+	if (goal && visible && inrange) {
 		DoRepair(unit, goal);
 		goal = unit->Orders[0]->Goal;
 	}
@@ -271,24 +273,20 @@ static void RepairUnit(CUnit *unit)
 	}
 
 	// Check if goal is gone.
-	if (goal) {
-		if (!goal->IsVisibleAsGoal(unit->Player)) {
-			DebugPrint("repair goal is gone\n");
-			unit->Orders[0]->X = goal->X;
-			unit->Orders[0]->Y = goal->Y;
-			goal->RefsDecrease();
-			// FIXME: should I clear this here?
-			unit->Orders[0]->Goal = goal = NULL;
-			NewResetPath(unit);
-		}
+	if (goal && !visible) {
+		DebugPrint("repair goal is gone\n");
+		unit->Orders[0]->X = goal->X;
+		unit->Orders[0]->Y = goal->Y;
+		goal->RefsDecrease();
+		unit->Orders[0]->Goal = goal = NoUnitP;
+		NewResetPath(unit);
 	}
 
-	if (goal && MapDistanceBetweenUnits(unit, goal) > unit->Type->RepairRange) {
+	if (goal && !inrange) {
 		// If goal has moved, chase after it
 		unit->State = 0;
 		unit->SubAction = 0;
 	}
-
 
 	//
 	// Target is fine, choose new one.
@@ -299,6 +297,7 @@ static void RepairUnit(CUnit *unit)
 			goal->RefsDecrease();
 			unit->Orders[0]->Goal = NULL;
 		}
+		// FIXME: auto-repair, find a new target
 		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = unit->State = 0;
 		if (unit->Selected) { // update display for new action
@@ -306,8 +305,6 @@ static void RepairUnit(CUnit *unit)
 		}
 		return;
 	}
-
-	// FIXME: automatic repair
 }
 
 /**
