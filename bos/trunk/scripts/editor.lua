@@ -9,7 +9,7 @@
 --
 --	editor.lua	-	Editor configuration and functions.
 --
---	(c) Copyright 2002-2005 by Lutz Sammer, Fran�is Beerten and Jimmy Salmon
+--	(c) Copyright 2002-2007 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ SetEditorStartUnit("unit-start-location")
 -- FIXME: this is only a temporary hack, for better sorted units.
 local editor_types = {
   "unit-vault",
+  "unit-hotspot",
 
   "unit-apcs",
   "unit-medic",
