@@ -92,6 +92,7 @@ DefineUnitType("unit-gen", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     ProductionRate = {"magma", 5},
+    BuildingRules = {{"ontop", {Type = "unit-hotspot"}}},
     Sounds = {
         "selected", "gen-selected",
         "ready", "gen-ready",
