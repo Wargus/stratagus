@@ -9,7 +9,7 @@
 --
 --	icons.lua	-	Define the icons.
 --
---	(c) Copyright 2003-2006 by Jimmy Salmon and Crestez Leonard.
+--	(c) Copyright 2003-2007 by Jimmy Salmon and Crestez Leonard.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ DefineIcon({
 	Name = "icon-gen_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/generator/generator_i.png"})
+	File = "units/magmapump/generator_i.png"})
 
 DefineIcon({
 	Name = "icon-camp_b",
