@@ -189,12 +189,15 @@ static int AnimateActionRepair(CUnit *unit)
 **
 **  @param unit  unit repairing
 **  @param goal  unit being repaired
+**
+**  @return      true if goal is healed, false otherwise
 */
-static void DoRepair(CUnit *unit, CUnit *goal)
+static bool DoRepair(CUnit *unit, CUnit *goal)
 {
 	CPlayer *player = unit->Player;
 	int *pcosts = goal->Type->ProductionCosts;
 	int pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
+	bool healed = false;
 
 	if (goal->Orders[0]->Action != UnitActionBuilt) {
 		Assert(goal->Variable[HP_INDEX].Max);
@@ -221,7 +224,7 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 					}
 				}
 				// FIXME: We shouldn't animate if no resources are available.
-				return;
+				return false;
 			}
 		}
 
@@ -230,8 +233,9 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 
 		int hp = goal->Variable[HP_INDEX].Max * cost / pcost;
 		goal->Variable[HP_INDEX].Value += hp;
-		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
+		if (goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
 			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
+			healed = true;
 		}
 	} else {
 		// hp is the current damage taken by the unit.
@@ -247,10 +251,12 @@ static void DoRepair(CUnit *unit, CUnit *goal)
 
 		// Keep the same level of damage while increasing HP.
 		goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) / pcost - hp;
-		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
+		if (goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
 			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
+			healed = true;
 		}
 	}
+	return healed;
 }
 
 /**
@@ -261,9 +267,10 @@ static void RepairUnit(CUnit *unit)
 	CUnit *goal = unit->Orders[0]->Goal;
 	bool visible = goal->IsVisibleAsGoal(unit->Player);
 	bool inrange = MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange;
+	bool healed = false;
 
 	if (goal && visible && inrange) {
-		DoRepair(unit, goal);
+		healed = DoRepair(unit, goal);
 		goal = unit->Orders[0]->Goal;
 	}
 
@@ -283,13 +290,14 @@ static void RepairUnit(CUnit *unit)
 	}
 
 	// If goal has moved, chase after it
-	if (goal && !inrange) {
+	if (goal && !inrange && !healed) {
+		unit->Player->RemoveFromUnitsConsumingResources(unit);
 		unit->State = 0;
 		unit->SubAction = 0;
 	}
 
 	// Done repairing
-	if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
+	if (!goal || healed) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
 		if (goal) { // release reference
 			goal->RefsDecrease();
