@@ -8,9 +8,9 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	unit-tree.lua	-	Define the radar unit.
+--	unit-tree.lua	-	Define the tree unit.
 --
---	(c) Copyright 2005-2006 by Francois Beerten.
+--	(c) Copyright 2005-2007 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ DefineUnitType("unit-tree04", {
     Shadow = {"file", "units/tree04/tree04_s.png", "size", {128, 128}},
     Animations = "animations-tree04",
     Icon = "icon-tree",
-    ProductionCosts = {},
+    ProductionCosts = {"energy", 5000},
     Construction = "construction-tree",
     Speed = 0,
     HitPoints = 50,
@@ -65,6 +65,7 @@ DefineUnitType("unit-tree04", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     NumDirections = 1,
+    CanHarvestFrom = true,
     Sounds = {}
 })
 
