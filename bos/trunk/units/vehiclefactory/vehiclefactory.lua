@@ -88,6 +88,7 @@ DefineUnitType("unit-vfac", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    MaxUtilizationRate = {"energy", 30, "magma", 30},
     Sounds = {
         "selected", "vfac-selected",
         "ready", "vfac-ready",

@@ -86,6 +86,7 @@ DefineUnitType("unit-hosp", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    MaxUtilizationRate = {"energy", 30, "magma", 30},
     Sounds = {
         "selected", "hosp-selected",
         "ready", "hosp-ready",
