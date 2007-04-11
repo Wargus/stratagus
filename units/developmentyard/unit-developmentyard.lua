@@ -82,6 +82,7 @@ DefineUnitType("unit-dev-yard", {
     VisibleUnderFog = true,
     Building = true,
     BuilderOutside = true,
+    MaxUtilizationRate = {"energy", 30, "magma", 30},
     Sounds = {
         "selected", "dev-selected",
         "ready", "dev-ready",
