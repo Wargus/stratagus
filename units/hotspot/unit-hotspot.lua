@@ -39,13 +39,19 @@ DefineIcon({
         Frame = 0,
         File = "units/hotspot/hotspot_i.png"})
 
+DefineConstruction("construction-hotspot", {
+        Constructions = {
+                {Percent = 0, File = "main", Frame = 0},
+        }
+})
+
 DefineUnitType("unit-hotspot", {
     Name = "Hot Spot",
     Image = {"file", "units/hotspot/hotspot.png", "size", {64, 64}},
     Offset = {0, 0},
     Animations = "animations-hotspot",
     Icon = "icon-hotspot",
-    Construction = "construction-tree",
+    Construction = "construction-hotspot",
     Speed = 0,
     HitPoints = 1,
     Indestructible = 1,
