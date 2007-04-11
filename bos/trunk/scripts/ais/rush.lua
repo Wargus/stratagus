@@ -47,8 +47,8 @@ function AiLoop(loop_funcs, loop_pos)
 end
 
 function InitAiScripts_rush()
-  ai_pos      = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-  ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+  ai_pos      = {1, 1, 1, 1, 1, 1, 1, 1}
+  ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1}
 end
 
 local ai_loop_funcs = {
@@ -66,7 +66,7 @@ local ai_funcs = {
   function() AiDebug(false) return false end,
   function() return AiSleep(AiGetSleepCycles()) end,
   function() return AiNeed("unit-vault") end,
-  function() return AiNeed("unit-gen") end,
+  function() return AiNeed("unit-magmapump") end,
   function() return AiSet("unit-engineer", 10) end,
   function() return AiWait("unit-vault") end,
 

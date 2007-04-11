@@ -64,7 +64,7 @@ local editor_types = {
   "unit-harvester",
   "unit-msilo",
   "unit-dev-yard",
-  "unit-gen",
+  "unit-magmapump",
   "unit-camp",
   "unit-rfac",
   "unit-hosp",

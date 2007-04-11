@@ -29,10 +29,10 @@
 
 -- Build buttons
 DefineIcon({
-	Name = "icon-gen_b",
+	Name = "icon-magmapump_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/magmapump/generator_i.png"})
+	File = "units/magmapump/magmapump_i.png"})
 
 DefineIcon({
 	Name = "icon-camp_b",

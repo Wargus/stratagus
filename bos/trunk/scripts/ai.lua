@@ -49,7 +49,7 @@ DefineAiHelper(
   -- Unit can build which buildings.
   --
   {"build", "unit-engineer",
-   "unit-msilo", "unit-dev-yard", "unit-gen", "unit-camp",
+   "unit-msilo", "unit-dev-yard", "unit-magmapump", "unit-camp",
    "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
    "unit-cam", "unit-cannon", "unit-nuke", "unit-radar"},
   --
@@ -66,13 +66,13 @@ DefineAiHelper(
   -- Unit can repair which units.
   --
   {"repair", "unit-engineer",
-   "unit-msilo", "unit-dev-yard", "unit-gen", "unit-camp", "unit-apcs",
+   "unit-msilo", "unit-dev-yard", "unit-magmapump", "unit-camp", "unit-apcs",
    "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
    "unit-nuke", "unit-radar"},
   --
   -- Reduce unit limits.
   --
-  {"unit-limit", "unit-gen", "food"})
+  {"unit-limit", "unit-magmapump", "food"})
 
 -- Execute all AI init scripts
 function InitAiScripts()
