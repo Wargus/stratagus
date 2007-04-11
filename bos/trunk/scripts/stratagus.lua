@@ -78,9 +78,6 @@ DefineDecorations({Index = "Transport", HideNeutral = true, CenterX = true,
 DefineDecorations({Index = "Training", HideNeutral = true, CenterX = true,
   OffsetPercent = {50, 100},Method = {"sprite", {"sprite-mana"}},
   ShowWhenMax = false})
-DefineDecorations({Index = "GiveResource", HideNeutral = false, CenterX = true,
-  OffsetPercent = {50, 100},Method = {"sprite", {"sprite-mana"}},
-  ShowWhenMax = false})
 
 -------------------------------------------------------------------------------
 --	Game modification
