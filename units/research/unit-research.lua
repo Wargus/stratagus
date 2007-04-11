@@ -85,7 +85,7 @@ DefineUnitType("unit-rfac", {
     AnnoyComputerFactor = 45,
     Points = 200,
     ExplodeWhenKilled = "missile-160x128-explosion",
-    Corpse = "build-dead-generator",
+    Corpse = "build-dead-magmapump",
     Type = "land",
     Building = true,
     BuilderOutside = true,

@@ -7,7 +7,7 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	unit-generator.lua	-	Define the generator
+--	unit-magmapump.lua	-	Define the magmapump
 --
 --	(c) Copyright 2001-2007 by Fran�is Beerten, Lutz Sammer and Crestez Leonard
 --
@@ -28,12 +28,12 @@
 --	$Id$
 
 DefineIcon({
-	Name = "icon-gen",
+	Name = "icon-magmapump",
 	Size = {46, 38},
 	Frame = 0,
-	File = GetCurrentLuaPath().."/generator_i.png"})
+	File = GetCurrentLuaPath().."/magmapump_i.png"})
 
-DefineConstruction("construction-gen", {
+DefineConstruction("construction-magmapump", {
 	Constructions = {
 		{Percent = 0, File = "main", Frame = 32},
 		{Percent = 10, File = "main", Frame = 33},
@@ -45,7 +45,7 @@ DefineConstruction("construction-gen", {
 	}
     })
 
-DefineAnimations("animations-gen", {
+DefineAnimations("animations-magmapump", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
         "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2",
@@ -58,20 +58,20 @@ DefineAnimations("animations-gen", {
         "frame 27", "wait 2", "wait 2", },
     })
 
-MakeSound("gen-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
-MakeSound("gen-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
-MakeSound("gen-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
-MakeSound("gen-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
+MakeSound("magmapump-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
+MakeSound("magmapump-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
+MakeSound("magmapump-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
+MakeSound("magmapump-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
 
-DefineUnitType("unit-gen", {
+DefineUnitType("unit-magmapump", {
     Name = "Magma Pump",
-    Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
-    Shadow = {"file", GetCurrentLuaPath().."/generator_s.png", "size", {64, 64}},
-    Animations = "animations-gen",
-    Icon = "icon-gen",
+    Image = {"file", GetCurrentLuaPath().."/magmapump.png", "size", {64, 64}},
+    Shadow = {"file", GetCurrentLuaPath().."/magmapump_s.png", "size", {64, 64}},
+    Animations = "animations-magmapump",
+    Icon = "icon-magmapump",
     ProductionCosts = {"energy", 250, "magma", 50},
     RepairHp = 2,
-    Construction = "construction-gen",
+    Construction = "construction-magmapump",
     Speed = 0,
     HitPoints = 250,
     DrawLevel = 25,
@@ -86,7 +86,7 @@ DefineUnitType("unit-gen", {
     AnnoyComputerFactor = 45,
     Points = 100,
     ExplodeWhenKilled = "missile-160x128-explosion",
-    Corpse = "build-dead-gen",
+    Corpse = "build-dead-magmapump",
     Type = "land",
     Building = true,
     BuilderOutside = true,
@@ -94,22 +94,22 @@ DefineUnitType("unit-gen", {
     ProductionRate = {"magma", 5},
     BuildingRules = {{"ontop", {Type = "unit-hotspot"}}},
     Sounds = {
-        "selected", "gen-selected",
-        "ready", "gen-ready",
-        "help", "gen-help",
-        "dead", "gen-dead"}
+        "selected", "magmapump-selected",
+        "ready", "magmapump-ready",
+        "help", "magmapump-help",
+        "dead", "magmapump-dead"}
 })
 
-DefineAnimations("animations-dead-gen", {
+DefineAnimations("animations-dead-magmapump", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
         "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-gen", {
+DefineUnitType("build-dead-magmapump", {
     Name = "Pump Crater",
-    Image = {"file", GetCurrentLuaPath().."/generator_c.png", "size", {64, 64}},
-    Animations = "animations-dead-gen",
+    Image = {"file", GetCurrentLuaPath().."/magmapump_c.png", "size", {64, 64}},
+    Animations = "animations-dead-magmapump",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,
@@ -128,10 +128,10 @@ DefineUnitType("build-dead-gen", {
 
 
 
-DefineAllow("unit-gen", "AAAAAAAA")
+DefineAllow("unit-magmapump", "AAAAAAAA")
 
 DefineButton({
-    Pos = 2, Level = 1, Icon = "icon-gen_b", Action = "build",
-    Value = "unit-gen", Key = "m", Hint = "BUILD ~!MAGMA PUMP",
+    Pos = 2, Level = 1, Icon = "icon-magmapump_b", Action = "build",
+    Value = "unit-magmapump", Key = "m", Hint = "BUILD ~!MAGMA PUMP",
     ForUnit = {"unit-engineer"}})
 
