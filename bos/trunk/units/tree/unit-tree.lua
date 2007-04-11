@@ -7,9 +7,9 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	unit-tree.lua	-	Define the radar unit.
+--	unit-tree.lua	-	Define the tree unit.
 --
---	(c) Copyright 2005-2006 by Francois Beerten.
+--	(c) Copyright 2005-2007 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ DefineUnitType("unit-tree", {
     Icon = "icon-tree",
     ProductionCosts = {},
     Construction = "construction-tree",
+    ProductionCosts = {"energy", 5000},
     Speed = 0,
     HitPoints = 50,
     DrawLevel = 25,
@@ -76,6 +77,7 @@ DefineUnitType("unit-tree", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     NumDirections = 1,
+    CanHarvestFrom = true,
     Sounds = {}
 })
 
