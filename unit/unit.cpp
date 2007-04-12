@@ -325,9 +325,6 @@ void CUnit::Init(CUnitType *type)
 	SavedOrder.Action = UnitActionStill;
 	SavedOrder.X = SavedOrder.Y = -1;
 	Assert(!SavedOrder.Goal);
-	CriticalOrder.Action = UnitActionStill;
-	CriticalOrder.X = CriticalOrder.Y = -1;
-	Assert(!CriticalOrder.Goal);
 }
 
 /**
@@ -3580,8 +3577,6 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	}
 	file->printf("},\n  \"saved-order\", ");
 	SaveOrder(&unit->SavedOrder, file);
-	file->printf(",\n  \"critical-order\", ");
-	SaveOrder(&unit->CriticalOrder, file);
 	file->printf(",\n  \"new-order\", ");
 	SaveOrder(&unit->NewOrder, file);
 
