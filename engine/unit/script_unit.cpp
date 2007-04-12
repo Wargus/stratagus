@@ -721,10 +721,6 @@ static int CclUnit(lua_State *l)
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
 			}
-		} else if (!strcmp(value, "critical-order")) {
-			lua_pushvalue(l, j + 1);
-			CclParseOrder(l, &unit->CriticalOrder);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);
 			CclParseOrder(l, &unit->SavedOrder);

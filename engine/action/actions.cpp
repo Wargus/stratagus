@@ -363,11 +363,6 @@ static void HandleUnitAction(CUnit *unit)
 	// If current action is breakable proceed with next one.
 	//
 	if (!unit->Anim.Unbreakable) {
-		if (unit->CriticalOrder.Action != UnitActionStill) {
-			RunAction(unit->CriticalOrder.Action, unit);
-			unit->CriticalOrder.Action = UnitActionStill;
-		}
-
 		//
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.

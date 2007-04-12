@@ -547,7 +547,6 @@ public:
 		Orders.clear();
 		SavedOrder.Init();
 		NewOrder.Init();
-		CriticalOrder.Init();
 		AutoCastSpell = NULL;
 		AutoRepair = 0;
 		memset(&Data, 0, sizeof(Data));
@@ -643,7 +642,6 @@ public:
 	std::vector<COrder *> Orders; /// orders to process
 	COrder SavedOrder;           /// order to continue after current
 	COrder NewOrder;             /// order for new trained units
-	COrder CriticalOrder;        /// order to do as possible in breakable animation.
 	char *AutoCastSpell;        /// spells to auto cast
 	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 
