@@ -370,6 +370,9 @@ struct lua_State;
 class CViewport;
 class CAnimation;
 
+	/// Called whenever the selected unit was updated
+extern void SelectedUnitChanged(void);
+
 /**
 **  Unit references over network, or for memory saving.
 */
@@ -559,8 +562,8 @@ public:
 	CUnit **UnitSlot;     /// Slot pointer of Units
 	CUnit **PlayerSlot;   /// Slot pointer of Player->Units
 
-	CUnit        *Next;          /// Generic link pointer (on map)
-	unsigned      CacheLock : 1; /// Used to lock unit out of the cache.
+	CUnit   *Next;          /// Generic link pointer (on map)
+	unsigned CacheLock : 1; /// Used to lock unit out of the cache.
 
 	int    InsideCount;   /// Number of units inside.
 	int    BoardCount;    /// Number of units transported inside.
@@ -569,8 +572,8 @@ public:
 	CUnit *NextContained; /// Next unit in the container.
 	CUnit *PrevContained; /// Previous unit in the container.
 
-	int X; /// Map position X
-	int Y; /// Map position Y
+	int X;                /// Map position X
+	int Y;                /// Map position Y
 
 	CUnitType  *Type;              /// Pointer to unit-type (peon,...)
 	CPlayer    *Player;            /// Owner of this unit
@@ -600,7 +603,7 @@ public:
 							     /// NULL if the unit was not rescued.
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
-	struct _seen_stuff_ {
+	struct _unit_seen_ {
 		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player
 		int                 Frame;                   /// last seen frame/stage of buildings
 		CUnitType          *Type;                    /// Pointer to last seen unit-type
@@ -611,15 +614,15 @@ public:
 		unsigned            Constructed : 1;         /// Unit seen construction
 		unsigned            State : 3;               /// Unit seen build/upgrade state
 		unsigned            Destroyed : PlayerMax;   /// Unit seen destroyed or not
-		CConstructionFrame  *CFrame;                  /// Seen construction frame
+		CConstructionFrame *CFrame;                  /// Seen construction frame
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.
 
-	unsigned long TTL;  /// time to live
+	unsigned long TTL;   /// time to live
 
-	int GroupId;        /// unit belongs to this group id
-	int LastGroup;      /// unit belongs to this last group
+	int GroupId;         /// unit belongs to this group id
+	int LastGroup;       /// unit belongs to this last group
 
 	int ResourcesHeld[MaxCosts];/// Resources held by a unit
 
@@ -631,19 +634,19 @@ public:
 	unsigned ReCast : 1;    /// Recast again next cycle
 
 	struct _unit_anim_ {
-		const CAnimation *Anim;                     /// Anim
-		const CAnimation *CurrAnim;                 /// CurrAnim
-		int Wait;                                   /// Wait
-		int Unbreakable;                            /// Unbreakable
+		const CAnimation *Anim;     /// Anim
+		const CAnimation *CurrAnim; /// CurrAnim
+		int Wait;                   /// Wait
+		int Unbreakable;            /// Unbreakable
 	} Anim;
 
-	char OrderCount;            /// how many orders in queue
-	char OrderFlush;            /// cancel current order, take next
+	char OrderCount;              /// how many orders in queue
+	char OrderFlush;              /// cancel current order, take next
 	std::vector<COrder *> Orders; /// orders to process
-	COrder SavedOrder;           /// order to continue after current
-	COrder NewOrder;             /// order for new trained units
-	char *AutoCastSpell;        /// spells to auto cast
-	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
+	COrder SavedOrder;            /// order to continue after current
+	COrder NewOrder;              /// order for new trained units
+	char *AutoCastSpell;          /// spells to auto cast
+	unsigned AutoRepair : 1;      /// True if unit tries to repair on still action.
 
 	union _order_data_ {
 	struct _order_move_ {
@@ -656,7 +659,7 @@ public:
 		CUnit *Worker;              /// Worker building this unit
 		int Progress;               /// Progress counter, in 1/100 cycles.
 		int Cancel;                 /// Cancel construction
-		CConstructionFrame *Frame;   /// Construction frame
+		CConstructionFrame *Frame;  /// Construction frame
 	} Built; /// ActionBuilt,...
 	struct _order_harvest_ {
 		int CurrentProduction[MaxCosts];
@@ -664,9 +667,6 @@ public:
 	struct _order_resource_ {
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
-	struct _order_repair_ {
-		int Cycles;                 /// Cycles unit has been repairing for
-	} Repair; /// Repairing unit
 	struct _order_train_ {
 		int Ticks;                  /// Ticks to complete
 	} Train; /// Train units action
@@ -677,6 +677,14 @@ public:
 
 	inline bool IsIdle() const {
 		return Orders[0]->Action == UnitActionStill && OrderCount == 1;
+	}
+
+	inline void ClearAction() {
+		Orders[0]->Action = UnitActionStill;
+		SubAction = 0;
+		if (Selected) {
+			SelectedUnitChanged();
+		}
 	}
 
 	/// Increase a unit's reference count
@@ -736,12 +744,12 @@ public:
 	bool IsUnusable() const;
 };
 
-#define NoUnitP (CUnit *)0         /// return value: for no unit found
-#define InfiniteDistance INT_MAX /// the distance is unreachable
+#define NoUnitP (CUnit *)0        /// return value: for no unit found
+#define InfiniteDistance INT_MAX  /// the distance is unreachable
 
-#define FlushCommands 1          /// Flush commands in queue
+#define FlushCommands 1           /// Flush commands in queue
 
-#define MAX_UNIT_SLOTS 65535     /// Maximal number of used slots
+#define MAX_UNIT_SLOTS 65535      /// Maximal number of used slots
 
 /**
 **  Returns unit number (unique to this unit)
@@ -749,7 +757,7 @@ public:
 #define UnitNumber(unit) ((unit)->Slot)
 
 /**
-** How many groups supported
+**  How many groups supported
 */
 #define NUM_GROUPS 10
 
@@ -760,11 +768,11 @@ class CPreference {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowOrders(0) {};
-public:
+
 	bool ShowSightRange;     /// Show right range.
 	bool ShowReactionRange;  /// Show reaction range.
 	bool ShowAttackRange;    /// Show attack range.
-	int ShowOrders;          /// How many second show orders of unit on map.
+	int  ShowOrders;         /// How many second show orders of unit on map.
 };
 
 extern CPreference Preference;
@@ -786,10 +794,10 @@ extern int XpDamage;                    /// unit XP adds more damage to attacks
 extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled
-extern const CViewport *CurrentViewport; /// CurrentViewport
+extern const CViewport *CurrentViewport;/// CurrentViewport
 extern void DrawUnitSelection(const CUnit *);
 extern void DrawSelection(Uint32 color, int x1, int y1, int x2, int y2);
-extern int MaxSelectable;                  /// How many units could be selected
+extern int MaxSelectable;                   /// How many units could be selected
 
 extern CUnit **Selected;                    /// currently selected units
 extern CUnit **TeamSelected[PlayerMax];     /// teams currently selected units
@@ -805,9 +813,9 @@ extern CUnit *ReleasedTail;                 /// Tail of the released unit list.
 
 	/// Prepare unit memory allocator
 extern void InitUnitsMemory(void);
-	///  Mark the field with the FieldFlags.
+	/// Mark the field with the FieldFlags.
 void MarkUnitFieldFlags(const CUnit *unit);
-	///  Unmark the field with the FieldFlags.
+	/// Unmark the field with the FieldFlags.
 void UnmarkUnitFieldFlags(const CUnit *unit);
 	/// Update unit->CurrentSightRange.
 void UpdateUnitSightRange(CUnit *unit);

@@ -222,16 +222,12 @@ void HandleActionMove(CUnit *unit)
 			}
 			// FALL THROUGH
 		case PF_REACHED:
-			unit->SubAction = 0;
 			// Release target, if any.
 			if ((goal = unit->Orders[0]->Goal)) {
 				goal->RefsDecrease();
 				unit->Orders[0]->Goal = NoUnitP;
 			}
-			unit->Orders[0]->Action = UnitActionStill;
-			if (unit->Selected) { // update display for new action
-				SelectedUnitChanged();
-			}
+			unit->ClearAction();
 			return;
 
 		default:

@@ -9,7 +9,7 @@
 //
 /**@name action_patrol.cpp - The patrol action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -131,9 +131,8 @@ void HandleActionPatrol(CUnit *unit)
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				// Save current command to come back.
 				unit->SavedOrder = *unit->Orders[0];
-				unit->Orders[0]->Action = UnitActionStill;
+				unit->ClearAction();
 				unit->Orders[0]->Goal = NoUnitP;
-				unit->SubAction = 0;
 			}
 		}
 	}

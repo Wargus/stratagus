@@ -249,26 +249,15 @@ static int BaseEfficiency(CPlayer *p)
 	return std::min<int>(SpecificEfficiency(EnergyCost, p), SpecificEfficiency(MagmaCost, p));
 }
 
+static int UniqueEfficiency(CPlayer *p)
+{
+	return 0;
+}
+
 static int MaxRate(CUnit *unit, int res)
 {
-	if (unit->Orders[0]->Action == UnitActionTrain ||
-			unit->Orders[0]->Action == UnitActionBuild) {
-		return std::min<int>(unit->Type->MaxUtilizationRate[res],
-			unit->Orders[0]->Type->ProductionCosts[res]);
-	} else if (unit->Orders[0]->Action == UnitActionRepair) {
-		return std::min<int>(unit->Type->MaxUtilizationRate[res],
-			unit->Orders[0]->Goal->Type->ProductionCosts[res]);
-	} else if (unit->Orders[0]->Action == UnitActionBuilt) {
-		if (!unit->Type->BuilderOutside) {
-			return std::min<int>(unit->Data.Built.Worker->Type->MaxUtilizationRate[res],
-				unit->Data.Built.Worker->Type->ProductionCosts[res]);
-		} else {
-			Assert(0);
-			return 0;
-		}
-	}
-	Assert(0);
-	return 0;
+	int *costs = unit->Player->UnitsConsumingResourcesRequested[unit];
+	return costs[res];
 }
 
 static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
@@ -288,19 +277,15 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 	if (usedtypes > 1) {
 		// unit effective rate(type) = unit max rate(type) * base efficiency
 		int be = BaseEfficiency(unit->Player);
-		costs[0] = 0;
 		for (i = 0; i < MaxCosts; ++i) {
 			costs[i] = MaxRate(unit, i) * be / 100;
 		}
 	} else {
 		// unit effective rate(type) = unit max rate(type) * unique efficiency(type)
-#if 0
 		int ue = UniqueEfficiency(unit->Player);
-		costs[0] = 0;
 		for (i = 0; i < MaxCosts; ++i) {
 			costs[i] = MaxRate(unit, i) * ue / 100;
 		}
-#endif
 	}
 }
 
