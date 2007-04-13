@@ -85,7 +85,7 @@ local ai_funcs = {
   function() return AiAttackWithForce(1) end,
 
   function() return AiForce(0, {"unit-assault", 20}) end,
-  function() return AiNeed("unit-rfac") end,
+  function() return AiNeed("unit-powerplant") end,
   function() return AiForce(1, {"unit-assault", 20, "unit-grenadier", 8}) end,
   function() return AiWaitForce(1) end, 
   function() return AiAttackWithForce(1) end,
