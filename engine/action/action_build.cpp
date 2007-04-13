@@ -351,7 +351,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 */
 static void BuildBuilding(CUnit *unit)
 {
-	CUnit *goal = goal = unit->Orders[0]->Goal;
+	CUnit *goal = unit->Orders[0]->Goal;
 	int pcost = GetProductionCost(unit->Orders[0]->Type);
 
 	if (goal->Orders[0]->Action != UnitActionDie) {
@@ -431,7 +431,6 @@ void HandleActionBuild(CUnit *unit)
 void HandleActionBuilt(CUnit *unit)
 {
 	CUnit *worker;
-	int progress = 0;
 	int pcost = GetProductionCost(unit->Type);
 
 	// hp is the current damage taken by the unit.
