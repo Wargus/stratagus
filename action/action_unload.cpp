@@ -364,8 +364,7 @@ static void LeaveTransporter(CUnit *unit)
 		unit->Orders[0]->Y = unit->Y;
 		unit->SubAction = 0;
 	} else {
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
+		unit->ClearAction();
 	}
 }
 
@@ -392,8 +391,7 @@ void HandleActionUnload(CUnit *unit)
 				if (!ClosestFreeDropZone(unit, unit->Orders[0]->X, unit->Orders[0]->Y,
 						&x, &y)) {
 					// Sorry... I give up.
-					unit->Orders[0]->Action = UnitActionStill;
-					unit->SubAction = 0;
+					unit->ClearAction();
 					return;
 				}
 				unit->Orders[0]->X = x;
@@ -409,8 +407,7 @@ void HandleActionUnload(CUnit *unit)
 				if ((i = MoveToDropZone(unit))) {
 					if (i == PF_REACHED) {
 						if (++unit->SubAction == 1) {
-							unit->Orders[0]->Action = UnitActionStill;
-							unit->SubAction = 0;
+							unit->ClearAction();
 						}
 					} else {
 						unit->SubAction = 2;

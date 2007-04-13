@@ -56,6 +56,16 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Get the production cost of a unit type
+**  Use the energy cost if it's not 0, otherwise use magma cost
+*/
+static int GetProductionCost(CUnitType *type)
+{
+	int *costs = type->ProductionCosts;
+	return costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
+}
+
+/**
 **  Unit can handle order.
 **
 **  @param unit   Newly trained unit.
@@ -82,6 +92,37 @@ static int CanHandleOrder(CUnit *unit, COrder *order)
 }
 
 /**
+**  Calculate how many resources the unit needs to request
+**
+**  @param utype  building unit type
+**  @param btype  unit type being trained
+**  @param costs  returns the resource amount
+*/
+static void CalculateTrainAmount(CUnitType *utype, CUnitType *btype, int costs[MaxCosts])
+{
+	if (btype->ProductionCosts[EnergyCost] == 0) {
+		costs[EnergyCost] = 0;
+		costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+	} else if (btype->ProductionCosts[MagmaCost] == 0) {
+		costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+		costs[MagmaCost] = 0;
+	} else {
+		int f = 100 * btype->ProductionCosts[EnergyCost] * utype->MaxUtilizationRate[MagmaCost] /
+			(btype->ProductionCosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
+		if (f > 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
+		} else if (f < 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		} else {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		}
+	}
+}
+
+/**
 **  Unit trains unit!
 **
 **  @param unit  Unit that trains.
@@ -92,6 +133,7 @@ void HandleActionTrain(CUnit *unit)
 	const CUnitType *type;
 	CPlayer *player;
 	int food;
+	int pcost = GetProductionCost(unit->Orders[0]->Type);
 
 	//
 	// First entry
@@ -101,20 +143,14 @@ void HandleActionTrain(CUnit *unit)
 		unit->SubAction = 1;
 
 		int costs[MaxCosts];
-		for (int i = 0; i < MaxCosts; ++i) {
-			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
-				unit->Orders[0]->Type->ProductionCosts[i]);
-		}
+		CalculateTrainAmount(unit->Type, unit->Orders[0]->Type, costs);
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	} else {
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[0] ? costs[0] : costs[1];
+		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
 		unit->Data.Train.Ticks += cost * SpeedTrain;
-
-		costs = unit->Orders[0]->Type->ProductionCosts;
-		cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
-		if (unit->Data.Train.Ticks > cost) {
-			unit->Data.Train.Ticks = cost;
+		if (unit->Data.Train.Ticks > pcost) {
+			unit->Data.Train.Ticks = pcost;
 		}
 	}
 
@@ -128,14 +164,12 @@ void HandleActionTrain(CUnit *unit)
 
 	player = unit->Player;
 
-	int *costs = unit->Orders[0]->Type->ProductionCosts;
-	int cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
-	if (unit->Data.Train.Ticks >= cost) {
+	if (unit->Data.Train.Ticks >= pcost) {
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
-			unit->Data.Train.Ticks = cost;
+			unit->Data.Train.Ticks = pcost;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -149,7 +183,7 @@ void HandleActionTrain(CUnit *unit)
 				AiNeedMoreSupply(unit, unit->Orders[0]->Type);
 			}
 
-			unit->Data.Train.Ticks = cost;
+			unit->Data.Train.Ticks = pcost;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -160,7 +194,7 @@ void HandleActionTrain(CUnit *unit)
 			nunit->Y = unit->Y;
 			type = unit->Type;
 
-			// Some guy made DropOutOnSide set unit to belong to the building
+			// DropOutOnSide set unit to belong to the building
 			// training it. This was an ugly hack, setting X and Y is enough,
 			// no need to add the unit only to be removed.
 			nunit->X = unit->X;
@@ -187,8 +221,7 @@ void HandleActionTrain(CUnit *unit)
 				AiTrainingComplete(unit, nunit);
 			}
 
-			unit->Orders[0]->Action = UnitActionStill;
-			unit->SubAction = 0;
+			unit->ClearAction();
 
 			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
 				DebugPrint("Wrong order for unit\n");

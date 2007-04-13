@@ -55,6 +55,16 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Get the production cost of a unit type
+**  Use the energy cost if it's not 0, otherwise use magma cost
+*/
+static int GetProductionCost(CUnitType *type)
+{
+	int *costs = type->ProductionCosts;
+	return costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
+}
+
+/**
 **  Update construction frame
 **
 **  @param unit  The building under construction.
@@ -63,12 +73,9 @@ static void UpdateConstructionFrame(CUnit *unit)
 {
 	CConstructionFrame *cframe;
 	CConstructionFrame *tmp;
-	int percent;
+	int percent = unit->Data.Built.Progress * 100 / GetProductionCost(unit->Type);
 
-	int *costs = unit->Type->ProductionCosts;
-	int cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
-	percent = unit->Data.Built.Progress * 100 / cost;
-
+	// Find which construction frame to use
 	cframe = tmp = unit->Type->Construction->Frames;
 	while (tmp) {
 		if (percent < tmp->Percent) {
@@ -77,6 +84,8 @@ static void UpdateConstructionFrame(CUnit *unit)
 		cframe = tmp;
 		tmp = tmp->Next;
 	}
+
+	// Update the frame
 	if (cframe != unit->Data.Built.Frame) {
 		unit->Data.Built.Frame = cframe;
 		if (unit->Frame < 0) {
@@ -89,6 +98,8 @@ static void UpdateConstructionFrame(CUnit *unit)
 
 /**
 **  Move to build location
+**
+**  @param unit  Unit to move
 */
 static void MoveToLocation(CUnit *unit)
 {
@@ -122,11 +133,7 @@ static void MoveToLocation(CUnit *unit)
 				AiCanNotReach(unit, unit->Orders[0]->Type);
 			}
 
-			unit->Orders[0]->Action = UnitActionStill;
-			unit->SubAction = 0;
-			if (unit->Selected) { // update display for new action
-				SelectedUnitChanged();
-			}
+			unit->ClearAction();
 			return;
 
 		case PF_REACHED:
@@ -141,6 +148,8 @@ static void MoveToLocation(CUnit *unit)
 
 /**
 **  Check if the unit can build
+**
+**  @param unit  Unit to check
 */
 static CUnit *CheckCanBuild(CUnit *unit)
 {
@@ -179,11 +188,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
 		return NULL;
 	}
 
@@ -197,15 +202,42 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
 		return NULL;
 	}
 
 	return ontop;
+}
+
+/**
+**  Calculate how many resources the unit needs to request
+**
+**  @param utype  builder unit type
+**  @param btype  unit type being built
+**  @param costs  returns the resource amount
+*/
+static void CalculateBuildAmount(CUnitType *utype, CUnitType *btype, int costs[MaxCosts])
+{
+	if (btype->ProductionCosts[EnergyCost] == 0) {
+		costs[EnergyCost] = 0;
+		costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+	} else if (btype->ProductionCosts[MagmaCost] == 0) {
+		costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+		costs[MagmaCost] = 0;
+	} else {
+		int f = 100 * btype->ProductionCosts[EnergyCost] * utype->MaxUtilizationRate[MagmaCost] /
+			(btype->ProductionCosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
+		if (f > 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
+		} else if (f < 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		} else {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		}
+	}
 }
 
 /**
@@ -226,25 +258,21 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	
 	// If unable to make unit, stop, and report message
 	if (build == NoUnitP) {
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-
+		// FIXME: Should we retry this?
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			_("Unable to create building %s"), type->Name.c_str());
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
 
+		unit->ClearAction();
 		return;
 	}
 
 	if (!type->BuilderOutside) {
 		// Start using resources
 		int costs[MaxCosts];
-		for (int i = 0; i < MaxCosts; ++i) {
-			costs[i] = std::min<int>(type->MaxUtilizationRate[i],
-				build->Type->ProductionCosts[i]);
-		}
+		CalculateBuildAmount(build->Type, build->Type, costs);
 		build->Player->AddToUnitsConsumingResources(build, costs);
 	}
 
@@ -294,9 +322,8 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		build->CurrentSightRange = 0;
 		unit->X = x;
 		unit->Y = y;
-		unit->Orders[0]->Action = UnitActionStill;
+		unit->ClearAction();
 		unit->Orders[0]->Goal = NULL;
-		unit->SubAction = 0;
 	} else {
 		unit->Orders[0]->Goal = build;
 		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
@@ -311,10 +338,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 
 		// Start using resources
 		int costs[MaxCosts];
-		for (int i = 0; i < MaxCosts; ++i) {
-			costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
-				build->Type->ProductionCosts[i]);
-		}
+		CalculateBuildAmount(unit->Type, build->Type, costs);
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	}
 	UpdateConstructionFrame(build);
@@ -323,28 +347,20 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 /**
 **  Build the building
 **
-**  @param unit  worker which build.
+**  @param unit  Unit doing the building
 */
 static void BuildBuilding(CUnit *unit)
 {
-	CUnit *goal;
-	int hp;
-	int *pcosts;
-	int pcost;
-
-	goal = unit->Orders[0]->Goal;
-	Assert(goal);
-
-	pcosts = unit->Orders[0]->Type->ProductionCosts;
-	pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
+	CUnit *goal = goal = unit->Orders[0]->Goal;
+	int pcost = GetProductionCost(unit->Orders[0]->Type);
 
 	if (goal->Orders[0]->Action != UnitActionDie) {
 		// hp is the current damage taken by the unit.
-		hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) / pcost - goal->Variable[HP_INDEX].Value;
+		int hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) / pcost - goal->Variable[HP_INDEX].Value;
 
 		// Update build progress
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[0] ? costs[0] : costs[1];
+		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
 		goal->Data.Built.Progress += cost * SpeedBuild;
 		if (goal->Data.Built.Progress > pcost) {
 			goal->Data.Built.Progress = pcost;
@@ -365,11 +381,8 @@ static void BuildBuilding(CUnit *unit)
 	if (goal->Orders[0]->Action == UnitActionDie) {
 		goal->RefsDecrease();
 		unit->Orders[0]->Goal = NULL;
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = unit->State = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
+		unit->State = 0;
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
 		return;
 	}
@@ -381,11 +394,8 @@ static void BuildBuilding(CUnit *unit)
 			goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
 		goal->RefsDecrease();
 		unit->Orders[0]->Goal = NULL;
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = unit->State = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
+		unit->State = 0;
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
 	}
 }
@@ -393,7 +403,7 @@ static void BuildBuilding(CUnit *unit)
 /**
 **  Unit builds a building.
 **
-**  @param unit  Unit that builds a building.
+**  @param unit  Unit that builds a building
 */
 void HandleActionBuild(CUnit *unit)
 {
@@ -416,27 +426,26 @@ void HandleActionBuild(CUnit *unit)
 /**
 **  Unit under Construction
 **
-**  @param unit  Unit that is built.
+**  @param unit  Unit that is being built
 */
 void HandleActionBuilt(CUnit *unit)
 {
 	CUnit *worker;
-	CUnitType *type = unit->Type;
-	int hp;
 	int progress = 0;
-
-	int *pcosts = type->ProductionCosts;
-	int pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
+	int pcost = GetProductionCost(unit->Type);
 
 	// hp is the current damage taken by the unit.
-	hp = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - unit->Variable[HP_INDEX].Value;
+	int hp = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - unit->Variable[HP_INDEX].Value;
 
-	if (!type->BuilderOutside) {
-		progress = 1;
+	if (!unit->Type->BuilderOutside) {
+		// Update build progress
+		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
+		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
+		unit->Data.Built.Progress += cost * SpeedBuild;
+		if (unit->Data.Built.Progress > pcost) {
+			unit->Data.Built.Progress = pcost;
+		}
 
-		// Building speeds increase or decrease.
-		progress *= SpeedBuild;
-		unit->Data.Built.Progress += progress;
 		// Keep the same level of damage while increasing HP.
 		unit->Variable[HP_INDEX].Value = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) / pcost - hp;
 		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
@@ -445,18 +454,17 @@ void HandleActionBuilt(CUnit *unit)
 	}
 
 	//
-	// Check if construction should be canceled...
+	// Check if construction should be canceled
 	//
 	if (unit->Data.Built.Cancel || unit->Data.Built.Progress < 0) {
 		DebugPrint("%s canceled.\n" _C_ unit->Type->Name.c_str());
 		// Drop out unit
 		if ((worker = unit->Data.Built.Worker)) {
-			worker->Orders[0]->Action = UnitActionStill;
+			worker->ClearAction();
 			unit->Data.Built.Worker = NoUnitP;
-			worker->SubAction = 0;
 			// HACK: make sure the sight is updated correctly
 			unit->CurrentSightRange = 1;
-			DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
+			DropOutOnSide(worker, LookingW, unit->Type->TileWidth, unit->Type->TileHeight);
 			unit->CurrentSightRange = 0;
 		}
 
@@ -478,28 +486,27 @@ void HandleActionBuilt(CUnit *unit)
 		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
 			unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
 		}
-		unit->Orders[0]->Action = UnitActionStill;
+		unit->ClearAction();
 		// HACK: the building is ready now
-		unit->Player->UnitTypesCount[type->Slot]++;
+		unit->Player->UnitTypesCount[unit->Type->Slot]++;
 		unit->Constructed = 0;
 		if (unit->Frame < 0) {
-			unit->Frame = -1;
+			unit->Frame = -unit->Type->StillFrame - 1;
 		} else {
-			unit->Frame = 0;
+			unit->Frame = unit->Type->StillFrame;
 		}
 
 		if ((worker = unit->Data.Built.Worker)) {
 			// Bye bye worker.
-			if (type->BuilderLost) {
+			if (unit->Type->BuilderLost) {
 				// FIXME: enough?
 				LetUnitDie(worker);
 			// Drop out the worker.
 			} else {
-				worker->Orders[0]->Action = UnitActionStill;
-				worker->SubAction = 0;
+				worker->ClearAction();
 				// HACK: make sure the sight is updated correctly
 				unit->CurrentSightRange = 1;
-				DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
+				DropOutOnSide(worker, LookingW, unit->Type->TileWidth, unit->Type->TileHeight);
 				//
 				// If we can harvest from the new building, do it.
 				//
@@ -509,23 +516,23 @@ void HandleActionBuilt(CUnit *unit)
 			}
 		}
 
-		if (type->CanHarvestFrom) {
-			// Set to Zero as it's part of a union
+		if (unit->Type->CanHarvestFrom) {
+			// Set to 0 as it's part of a union
 			unit->Data.Resource.Active = 0;
 			int i;
 			for (i = 0; i < MaxCosts; ++i) {
-				if (type->StartingResources[i] != 0) {
+				if (unit->Type->StartingResources[i] != 0) {
 					break;
 				}
 			}
-			// Has StartingResources, Use those
+			// Has StartingResources, use those
 			if (i != MaxCosts) {
-				memcpy(unit->ResourcesHeld, type->StartingResources, sizeof(unit->ResourcesHeld));
+				memcpy(unit->ResourcesHeld, unit->Type->StartingResources, sizeof(unit->ResourcesHeld));
 			}
 		}
 
 		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
-			_("New %s done"), type->Name.c_str());
+			_("New %s done"), unit->Type->Name.c_str());
 		if (unit->Player == ThisPlayer) {
 			if (unit->Type->Sound.Ready.Sound) {
 				PlayUnitSound(unit, VoiceReady);
@@ -550,9 +557,7 @@ void HandleActionBuilt(CUnit *unit)
 			UnitUpdateHeading(unit);
 		}
 
-		if (IsOnlySelected(unit)) {
-			SelectedUnitChanged();
-		} else if (unit->Player == ThisPlayer) {
+		if (IsOnlySelected(unit) || unit->Player == ThisPlayer) {
 			SelectedUnitChanged();
 		}
 		unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;

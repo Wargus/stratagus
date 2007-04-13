@@ -385,7 +385,7 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, -1, k + 1);
-				type->ProductionCosts[res] = LuaToNumber(l, -1);
+				type->ProductionCosts[res] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "StorageCapacity")) {
@@ -1639,7 +1639,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	if (unit->Orders[0]->Action == UnitActionTrain) {
 		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
 		int *costs = unit->Orders[0]->Type->ProductionCosts;
-		int cost = CYCLES_PER_SECOND * (costs[0] ? costs[0] : costs[1]);
+		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
 		unit->Variable[TRAINING_INDEX].Max = cost;
 	}
 

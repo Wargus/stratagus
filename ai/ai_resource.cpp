@@ -189,6 +189,11 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 		}
 	}
 
+	if (num == 0) {
+		// No workers available to build
+		return 0;
+	}
+
 	// Try one worker at random to save cpu
 	unit = table[SyncRand() % num];
 

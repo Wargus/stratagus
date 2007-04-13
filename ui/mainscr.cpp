@@ -1098,7 +1098,7 @@ void DrawCosts(void)
 				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 					x, UI.StatusLine.TextY);
 			}
-			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, Costs[i]);
+			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, Costs[i] / CYCLES_PER_SECOND);
 			x += 60;
 			if (x > Video.Width - 60) {
 				break;
