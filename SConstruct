@@ -116,9 +116,9 @@ def CheckLuaLib(env, conf):
   if not found and conf.CheckLibWithHeader('lua5.0', 'lua.h', 'c'):
     found =1
   if not found and conf.CheckLibWithHeader('lua51', 'lua.h', 'c'):
-    found =1
+    return 1
   if not found and conf.CheckLibWithHeader('lua5.1', 'lua.h', 'c'):
-    found =1
+    return 1
   if not found:
     return 0
 
@@ -127,10 +127,6 @@ def CheckLuaLib(env, conf):
   if conf.CheckLibWithHeader('lualib50', 'lualib.h', 'c'):
      return 1
   if conf.CheckLibWithHeader('lualib5.0', 'lualib.h', 'c'):
-     return 1
-  if conf.CheckLibWithHeader('lualib51', 'lualib.h', 'c'):
-     return 1
-  if conf.CheckLibWithHeader('lualib5.1', 'lualib.h', 'c'):
      return 1
   return 0
 
@@ -237,7 +233,7 @@ profile.Append(LINKFLAGS = Split('-pg'))
 staticenv = None
 if sys.platform.startswith('linux'):
    staticenv = release.Copy()
-   staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib51 lualib5.0 lualib5.1 vorbis theora ogg'
+   staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib5.0 vorbis theora ogg'
    staticlibs = staticlibs.split(' ')
    linkflags = '-L. -Wl,-Bstatic -lstdc++ '
    for i in staticlibs:
