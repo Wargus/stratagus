@@ -1641,7 +1641,7 @@ void UIHandleButtonUp(unsigned button)
 	// SHIFT toggles select/unselect a single unit and
 	// add the content of the rectangle to the selectection
 	// ALT takes group of unit
-	// CTRL takes all units of same type (st*rcr*ft)
+	// CTRL takes all units of same type
 	if (CursorState == CursorStateRectangle &&
 			!(MouseButtons & LeftButton)) { // leave select mode
 		int num;
