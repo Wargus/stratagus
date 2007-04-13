@@ -2496,7 +2496,6 @@ CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 **  Unit on map screen.
 **
 **  Select units on screen. (x, y are in pixels relative to map 0,0).
-**  Not GAMEPLAY safe, uses ReplayRevealMap
 **
 **  More units on same position.
 **    Cycle through units. ounit is the old one.
@@ -2525,6 +2524,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 	if (!ounit) { // no old on this position
 		flag = 1;
 	}
+	// FIXME: this doesn't always select the top most unit
 	for (table = Units + (NumUnits - 1); table > Units; --table) {
 		unit = *table;
 		if (!unit->IsVisibleAsGoal(ThisPlayer) && !ReplayRevealMap) {
