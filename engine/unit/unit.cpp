@@ -2525,7 +2525,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 	if (!ounit) { // no old on this position
 		flag = 1;
 	}
-	for (table = Units; table < Units + NumUnits; ++table) {
+	for (table = Units + (NumUnits - 1); table > Units; --table) {
 		unit = *table;
 		if (!unit->IsVisibleAsGoal(ThisPlayer) && !ReplayRevealMap) {
 			continue;
