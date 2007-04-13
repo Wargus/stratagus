@@ -55,7 +55,40 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Calculate how many resources the unit needs to request
+**
+**  @param utype  unit type doing the repairing
+**  @param rtype  unit type being repaired
+**  @param costs  returns the resource amount
+*/
+static void CalculateRepairAmount(CUnitType *utype, CUnitType *rtype, int costs[MaxCosts])
+{
+	if (rtype->ProductionCosts[EnergyCost] == 0) {
+		costs[EnergyCost] = 0;
+		costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+	} else if (rtype->ProductionCosts[MagmaCost] == 0) {
+		costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+		costs[MagmaCost] = 0;
+	} else {
+		int f = 100 * rtype->ProductionCosts[EnergyCost] * utype->MaxUtilizationRate[MagmaCost] /
+			(rtype->ProductionCosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
+		if (f > 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
+		} else if (f < 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		} else {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		}
+	}
+}
+
+/**
 **  Move to build location
+**
+**  @param unit  Unit to move
 */
 static void MoveToLocation(CUnit *unit)
 {
@@ -97,11 +130,7 @@ static void MoveToLocation(CUnit *unit)
 				goal->RefsDecrease();
 				unit->Orders[0]->Goal = NoUnitP;
 			}
-			unit->Orders[0]->Action = UnitActionStill;
-			unit->SubAction = 0;
-			if (unit->Selected) { // update display for new action
-				SelectedUnitChanged();
-			}
+			unit->ClearAction();
 			return;
 
 		case PF_REACHED:
@@ -146,26 +175,16 @@ static void MoveToLocation(CUnit *unit)
 			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 
-		if (goal->Orders[0]->Action == UnitActionBuilt) {
-			int costs[MaxCosts];
-			for (int i = 0; i < MaxCosts; ++i) {
-				costs[i] = std::min<int>(unit->Type->MaxUtilizationRate[i],
-					unit->Orders[0]->Goal->Type->ProductionCosts[i]);
-			}
-			unit->Player->AddToUnitsConsumingResources(unit, costs);
-		} else {
-			unit->Player->AddToUnitsConsumingResources(unit, unit->Type->MaxUtilizationRate);
-		}
+		int costs[MaxCosts];
+		CalculateRepairAmount(unit->Type, unit->Orders[0]->Goal->Type, costs);
+		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	} else if (err < 0) {
 		if (goal) { // release reference
 			goal->RefsDecrease();
 			unit->Orders[0]->Goal = NoUnitP;
 		}
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->State = unit->SubAction = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
+		unit->State = 0;
 		return;
 	}
 
@@ -196,7 +215,7 @@ static bool DoRepair(CUnit *unit, CUnit *goal)
 {
 	CPlayer *player = unit->Player;
 	int *pcosts = goal->Type->ProductionCosts;
-	int pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
+	int pcost = CYCLES_PER_SECOND * (pcosts[EnergyCost] ? pcosts[EnergyCost] : pcosts[MagmaCost]);
 	bool healed = false;
 
 	if (goal->Orders[0]->Action != UnitActionBuilt) {
@@ -217,11 +236,8 @@ static bool DoRepair(CUnit *unit, CUnit *goal)
 					// FIXME: callback to AI?
 					goal->RefsDecrease();
 					unit->Orders[0]->Goal = NULL;
-					unit->Orders[0]->Action = UnitActionStill;
-					unit->State = unit->SubAction = 0;
-					if (unit->Selected) { // update display for new action
-						SelectedUnitChanged();
-					}
+					unit->ClearAction();
+					unit->State = 0;
 				}
 				// FIXME: We shouldn't animate if no resources are available.
 				return false;
@@ -229,7 +245,7 @@ static bool DoRepair(CUnit *unit, CUnit *goal)
 		}
 
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[0] ? costs[0] : costs[1];
+		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
 
 		int hp = goal->Variable[HP_INDEX].Max * cost / pcost;
 		goal->Variable[HP_INDEX].Value += hp;
@@ -243,7 +259,7 @@ static bool DoRepair(CUnit *unit, CUnit *goal)
 
 		// Update build progress
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[0] ? costs[0] : costs[1];
+		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
 		goal->Data.Built.Progress += cost * SpeedBuild;
 		if (goal->Data.Built.Progress > pcost) {
 			goal->Data.Built.Progress = pcost;
@@ -261,6 +277,8 @@ static bool DoRepair(CUnit *unit, CUnit *goal)
 
 /**
 **  Repair unit
+**
+**  @param unit  Unit that's doing the repairing
 */
 static void RepairUnit(CUnit *unit)
 {
@@ -304,11 +322,8 @@ static void RepairUnit(CUnit *unit)
 			unit->Orders[0]->Goal = NULL;
 		}
 		// FIXME: auto-repair, find a new target
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = unit->State = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
+		unit->State = 0;
 		return;
 	}
 }
@@ -316,7 +331,7 @@ static void RepairUnit(CUnit *unit)
 /**
 **  Unit repairs
 **
-**  @param unit  Unit, for that the attack is handled.
+**  @param unit  Unit that's doing the repairing
 */
 void HandleActionRepair(CUnit *unit)
 {

@@ -110,9 +110,8 @@ static bool StartGathering(CUnit *unit)
 			unit->Orders[0]->Goal = goal;
 			goal->RefsIncrease();
 		} else {
-			unit->Orders[0]->Action = UnitActionStill;
+			unit->ClearAction();
 			unit->Orders[0]->Goal = NoUnitP;
-			unit->SubAction = 0;
 		}
 		return false;
 	}
@@ -165,32 +164,32 @@ static void AnimateActionHarvest(CUnit *unit)
 */
 static void CalculateHarvestAmount(CUnit *unit, CUnit *source, int amount[MaxCosts])
 {
-	int i;
+	CUnitType *type = unit->Type;
 
 	// FIXME: use SpeedResourcesHarvest
-	if (source->ResourcesHeld[0] == 0) {
-		amount[0] = 0;
-		amount[1] = unit->Type->MaxUtilizationRate[1];
-	} else if (source->ResourcesHeld[1] == 0) {
-		amount[0] = unit->Type->MaxUtilizationRate[0];
-		amount[1] = 0;
+	if (source->ResourcesHeld[EnergyCost] == 0) {
+		amount[EnergyCost] = 0;
+		amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost];
+	} else if (source->ResourcesHeld[MagmaCost] == 0) {
+		amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost];
+		amount[MagmaCost] = 0;
 	} else {
-		int f = 100 * source->ResourcesHeld[0] * unit->Type->MaxUtilizationRate[1] /
-			(source->ResourcesHeld[1] * unit->Type->MaxUtilizationRate[0]);
+		int f = 100 * source->ResourcesHeld[EnergyCost] * type->MaxUtilizationRate[MagmaCost] /
+			(source->ResourcesHeld[MagmaCost] * type->MaxUtilizationRate[EnergyCost]);
 		if (f > 100) {
-			amount[0] = unit->Type->MaxUtilizationRate[0];
-			amount[1] = unit->Type->MaxUtilizationRate[1] * 100 / f;
+			amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost];
+			amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost] * 100 / f;
 		} else if (f < 100) {
-			amount[0] = unit->Type->MaxUtilizationRate[0] * f / 100;
-			amount[1] = unit->Type->MaxUtilizationRate[1];
+			amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost] * f / 100;
+			amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost];
 		} else {
-			amount[0] = unit->Type->MaxUtilizationRate[0];
-			amount[1] = unit->Type->MaxUtilizationRate[1];
+			amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost];
+			amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost];
 		}
 	}
 
 	// Don't load more than there is.
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		if (amount[i] > source->ResourcesHeld[i]) {
 			amount[i] = source->ResourcesHeld[i];
 		}
@@ -216,8 +215,7 @@ static void FindNewResource(CUnit *unit)
 		unit->Orders[0]->Goal->RefsIncrease();
 	} else {
 		DebugPrint("Unit %d did not find another resource.\n" _C_ unit->Slot);
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
+		unit->ClearAction();
 		unit->State = 0;
 	}
 }
@@ -286,9 +284,7 @@ static void ResourceGiveUp(CUnit *unit)
 		unit->Orders[0]->Goal->RefsDecrease();
 		unit->Orders[0]->Goal = NULL;
 	}
-	unit->Orders[0]->Init();
-	unit->Orders[0]->Action = UnitActionStill;
-	unit->SubAction = 0;
+	unit->ClearAction();
 }
 
 /**

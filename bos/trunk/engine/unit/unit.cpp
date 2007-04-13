@@ -2506,7 +2506,7 @@ CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 **  @param x      X pixel position.
 **  @param y      Y pixel position.
 **
-**  @return       An unit on x, y position.
+**  @return       A unit on x, y position.
 */
 CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 {
@@ -2562,7 +2562,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 		} else if (!funit) {
 			funit = unit;
 		}
-		nunit=unit;
+		nunit = unit;
 	}
 
 	if (flag && funit) {
