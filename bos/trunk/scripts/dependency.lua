@@ -29,7 +29,7 @@
 --      $Id: upgrade.lua 198 2005-08-19 16:44:05Z gruiick $
 
 DefineDependency("unit-hosp", {"unit-vault", "unit-camp"})
-DefineDependency("unit-vfac", {"unit-vault", "unit-rfac"})
-DefineDependency("unit-msilo", {"unit-vault", "unit-rfac", "unit-dev-yard"})
+DefineDependency("unit-vfac", {"unit-vault", "unit-powerplant"})
+DefineDependency("unit-msilo", {"unit-vault", "unit-powerplant", "unit-dev-yard"})
 
 

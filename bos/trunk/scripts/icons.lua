@@ -47,10 +47,10 @@ DefineIcon({
 	File = "units/developmentyard/development_yard_i.png"})
 
 DefineIcon({
-	Name = "icon-rfac_b",
+	Name = "icon-powerplant_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/research/research_facility_i.png"})
+	File = "units/powerplant/powerplant_i.png"})
 
 DefineIcon({
 	Name = "icon-hosp_b",

@@ -66,7 +66,7 @@ local editor_types = {
   "unit-dev-yard",
   "unit-magmapump",
   "unit-camp",
-  "unit-rfac",
+  "unit-powerplant",
   "unit-hosp",
   "unit-vfac",
   "unit-gturret",
