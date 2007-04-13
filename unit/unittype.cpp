@@ -360,14 +360,23 @@ static int GetStillFrame(CUnitType *type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
+	CUnitType *type;
+
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		Assert(UnitTypes[i]->Slot == (int)i);
+		type = UnitTypes[i];
+		Assert(type->Slot == (int)i);
 
 		//  Add idents to hash.
-		UnitTypeMap[UnitTypes[i]->Ident] = UnitTypes[i];
+		UnitTypeMap[type->Ident] = UnitTypes[i];
 
 		// Determine still frame
-		UnitTypes[i]->StillFrame = GetStillFrame(UnitTypes[i]);
+		type->StillFrame = GetStillFrame(type);
+
+		// Lookup BuildingTypes
+		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
+			b < type->BuildingRules.end(); ++b) {
+			(*b)->Init();
+		}
 	}
 
 	// LUDO : called after game is loaded -> don't reset stats !
@@ -426,13 +435,6 @@ void LoadUnitTypes(void)
 		//
 		if (!type->CorpseName.empty()) {
 			type->CorpseType = UnitTypeByIdent(type->CorpseName);
-		}
-
-		//
-		// Lookup BuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-			b < type->BuildingRules.end(); ++b) {
-			(*b)->Init();
 		}
 
 		//
