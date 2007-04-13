@@ -57,10 +57,10 @@ DefineAnimations("animations-powerplant", {
              "frame 17", "wait 3", "frame 16", "wait 3", "frame 15", "wait 3", },
     })
 
-MakeSound("rfac-selected", GetCurrentLuaPath().."/sfx_rfac.select.wav")
-MakeSound("rfac-ready", GetCurrentLuaPath().."/research.facility.completed.wav")
-MakeSound("rfac-help", GetCurrentLuaPath().."/research.facility.underattack.wav")
-MakeSound("rfac-dead", GetCurrentLuaPath().."/sfx_rfac.die.wav")
+MakeSound("powerplant-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
+MakeSound("powerplant-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
+MakeSound("powerplant-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
+MakeSound("powerplant-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
 
 DefineUnitType("unit-powerplant", {
     Name = "Power Plant",
@@ -92,10 +92,10 @@ DefineUnitType("unit-powerplant", {
     VisibleUnderFog = true,
     ProductionRate = {"energy", 50},
     Sounds = {
-        "selected", "rfac-selected",
-        "ready", "rfac-ready",
-        "help", "rfac-help",
-        "dead", "rfac-dead"}
+        "selected", "powerplant-selected",
+        "ready", "powerplant-ready",
+        "help", "powerplant-help",
+        "dead", "powerplant-dead"}
 })
 
 DefineAnimations("animations-powerplant", {
