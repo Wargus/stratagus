@@ -871,7 +871,7 @@ static int CclCreateUnit(lua_State *l)
 	playerno = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	if (playerno == -1) {
-		printf("CreateUnit: You cannot use 'any in create-unit, specify a player\n");
+		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
 		LuaError(l, "bad player");
 		return 0;
 	}
