@@ -28,12 +28,12 @@
 --	$Id$
 
 DefineIcon({
-	Name = "icon-rfac",
+	Name = "icon-powerplant",
 	Size = {46, 38},
 	Frame = 0,
-	File = GetCurrentLuaPath().."/research_facility_i.png"})
+	File = GetCurrentLuaPath().."/powerplant_i.png"})
 
-DefineConstruction("construction-rfac", {
+DefineConstruction("construction-powerplant", {
 	Constructions = {
 		{Percent = 0, File = "main", Frame = 0},
 		{Percent = 10, File = "main", Frame = 1},
@@ -48,7 +48,7 @@ DefineConstruction("construction-rfac", {
 	}
     })
 
-DefineAnimations("animations-rfac", {
+DefineAnimations("animations-powerplant", {
     Still = {"frame 10", "wait 3", "frame 11", "wait 3", "frame 12", "wait 3",
             "frame 13", "wait 3", "frame 14", "wait 3", "frame 13", "wait 3",
             "frame 12", "wait 3", "frame 11", "wait 3", "frame 10", "wait 3", },
@@ -62,15 +62,15 @@ MakeSound("rfac-ready", GetCurrentLuaPath().."/research.facility.completed.wav")
 MakeSound("rfac-help", GetCurrentLuaPath().."/research.facility.underattack.wav")
 MakeSound("rfac-dead", GetCurrentLuaPath().."/sfx_rfac.die.wav")
 
-DefineUnitType("unit-rfac", {
+DefineUnitType("unit-powerplant", {
     Name = "Power Plant",
-    Image = {"file", GetCurrentLuaPath().."/research_facility.png", "size", {128, 128}},
-    Shadow = {"file", GetCurrentLuaPath().."/research_facility_s.png", "size", {128, 128}},
-    Animations = "animations-rfac",
-    Icon = "icon-rfac",
+    Image = {"file", GetCurrentLuaPath().."/powerplant.png", "size", {128, 128}},
+    Shadow = {"file", GetCurrentLuaPath().."/powerplant_s.png", "size", {128, 128}},
+    Animations = "animations-powerplant",
+    Icon = "icon-powerplant",
     ProductionCosts = {"energy", 300, "magma", 300},
     RepairHp = 2,
-    Construction = "construction-rfac",
+    Construction = "construction-powerplant",
     Speed = 0,
     HitPoints = 350,
     DrawLevel = 25,
@@ -85,7 +85,7 @@ DefineUnitType("unit-rfac", {
     AnnoyComputerFactor = 45,
     Points = 200,
     ExplodeWhenKilled = "missile-160x128-explosion",
-    Corpse = "build-dead-magmapump",
+    Corpse = "build-dead-powerplant",
     Type = "land",
     Building = true,
     BuilderOutside = true,
@@ -98,15 +98,15 @@ DefineUnitType("unit-rfac", {
         "dead", "rfac-dead"}
 })
 
-DefineAnimations("animations-research", {
+DefineAnimations("animations-powerplant", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200",  "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-power-plant", {
+DefineUnitType("build-dead-powerplant", {
     Name = "PowerPlantCrater",
-    Image = {"file", GetCurrentLuaPath().."/research_c.png", "size", {128, 128}},
-    Animations = "animations-research",
+    Image = {"file", GetCurrentLuaPath().."/powerplant_c.png", "size", {128, 128}},
+    Animations = "animations-powerplant",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,
@@ -123,11 +123,11 @@ DefineUnitType("build-dead-power-plant", {
     Vanishes = true
 })
 
-DefineAllow("unit-rfac", "AAAAAAAA")
+DefineAllow("unit-powerplant", "AAAAAAAA")
 
 DefineButton({
-    Pos = 6, Level = 1, Icon = "icon-rfac_b", Action = "build",
-    Value = "unit-rfac", Key = "p", Hint = "BUILD ~!POWER PLANT",
+    Pos = 6, Level = 1, Icon = "icon-powerplant_b", Action = "build",
+    Value = "unit-powerplant", Key = "p", Hint = "BUILD ~!POWER PLANT",
     ForUnit = {"unit-engineer"}})
 
 
