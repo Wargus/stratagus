@@ -9,7 +9,7 @@
 //
 /**@name results.h - The game results headerfile. */
 //
-//      (c) Copyright 2002-2006 by Lutz Sammer, Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2002-2007 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
-//
-//      $Id: results.h 7561 2006-09-23 21:23:56Z feber $
 
 #ifndef __RESULTS_H__
 #define __RESULTS_H__
