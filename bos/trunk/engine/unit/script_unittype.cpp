@@ -820,64 +820,6 @@ static int CclDefineUnitType(lua_State *l)
 	return 0;
 }
 
-/**
-**  Parse unit-stats.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineUnitStats(lua_State *l)
-{
-	const char *value;
-	CUnitType *type;
-	CUnitStats *stats;
-	int i;
-	int args;
-	int j;
-
-	args = lua_gettop(l);
-	j = 0;
-
-	type = UnitTypeByIdent(LuaToString(l, j + 1));
-	Assert(type);
-	++j;
-
-	i = LuaToNumber(l, j + 1);
-	Assert(i < PlayerMax);
-	++j;
-
-	stats = &type->Stats[i];
-	if (!stats->Variables) {
-		stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
-	}
-
-	//
-	// Parse the list: (still everything could be changed!)
-	//
-	for (; j < args; ++j) {
-
-		value = LuaToString(l, j + 1);
-		++j;
-
-		i = GetVariableIndex(value);
-		if (i != -1) { // valid index
-			if (lua_istable(l, j + 1)) {
-				DefineVariableField(l, stats->Variables + i, j + 1);
-			} else if (lua_isnumber(l, -1)) {
-				stats->Variables[i].Enable = 1;
-				stats->Variables[i].Value = LuaToNumber(l, j + 1);
-				stats->Variables[i].Max = LuaToNumber(l, j + 1);
-			} else { // Error
-				LuaError(l, "incorrect argument for the variable in unittype");
-			}
-			continue;
-		}
-
-		// This leaves a half initialized unit
-		LuaError(l, "Unsupported tag: %s" _C_ value);
-	}
-	return 0;
-}
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -1756,7 +1698,6 @@ void InitDefinedVariables()
 void UnitTypeCclRegister(void)
 {
 	lua_register(Lua, "DefineUnitType", CclDefineUnitType);
-	lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
 	lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
 	lua_register(Lua, "DefineVariables", CclDefineVariables);
 	lua_register(Lua, "DefineDecorations", CclDefineDecorations);

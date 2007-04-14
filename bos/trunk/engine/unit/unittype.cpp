@@ -206,52 +206,6 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 }
 
 /**
-**  Save state of a unit-stats to file.
-**
-**  @param stats  Unit-stats to save.
-**  @param ident  Unit-type ident.
-**  @param plynr  Player number.
-**  @param file   Output file.
-*/
-static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int plynr,
-	CFile *file)
-{
-	Assert(plynr < PlayerMax);
-	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
-	for (int j = 0; j < UnitTypeVar.NumberVariable; ++j) {
-		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s}%s\n  ",
-			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
-			stats->Variables[j].Max, stats->Variables[j].Increase,
-			stats->Variables[j].Enable ? ", Enable = true" : "",
-			j != UnitTypeVar.NumberVariable - 1 ? "," : "");
-	}
-	file->printf(")\n");
-}
-
-/**
-**  Save state of the unit-type table to file.
-**
-**  @param file  Output file.
-*/
-void SaveUnitTypes(CFile *file)
-{
-	int j;
-
-	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: unittypes $Id$\n\n");
-
-	// Save all stats
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		file->printf("\n");
-		for (j = 0; j < PlayerMax; ++j) {
-			if (Players[j].Type != PlayerNobody) {
-				SaveUnitStats(&UnitTypes[i]->Stats[j], UnitTypes[i]->Ident, j, file);
-			}
-		}
-	}
-}
-
-/**
 **  Find unit-type by identifier.
 **
 **  @param ident  The unit-type identifier.
