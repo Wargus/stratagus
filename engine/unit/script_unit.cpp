@@ -76,20 +76,6 @@ static int CclSetXpDamage(lua_State *l)
 }
 
 /**
-**  Set training queue
-**
-**  @param l  Lua state.
-**
-**  @return  The old state of the training queue
-*/
-static int CclSetTrainingQueue(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	EnableTrainingQueue = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
 **  Set capture buildings
 **
 **  @param l  Lua state.
@@ -100,20 +86,6 @@ static int CclSetBuildingCapture(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	EnableBuildingCapture = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
-**  Set reveal attacker
-**
-**  @param l  Lua state.
-**
-**  @return   The old state of the flag
-*/
-static int CclSetRevealAttacker(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	RevealAttacker = LuaToBoolean(l, 1);
 	return 0;
 }
 
@@ -1285,9 +1257,7 @@ static int CclSlotUsage(lua_State *l)
 void UnitCclRegister(void)
 {
 	lua_register(Lua, "SetXPDamage", CclSetXpDamage);
-	lua_register(Lua, "SetTrainingQueue", CclSetTrainingQueue);
 	lua_register(Lua, "SetBuildingCapture", CclSetBuildingCapture);
-	lua_register(Lua, "SetRevealAttacker", CclSetRevealAttacker);
 
 	lua_register(Lua, "Unit", CclUnit);
 
