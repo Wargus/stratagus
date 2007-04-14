@@ -25,8 +25,8 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 
-#ifndef __PATH_FINDER_H__
-#define __PATH_FINDER_H__
+#ifndef __PATHFINDER_H__
+#define __PATHFINDER_H__
 
 //@{
 
@@ -72,7 +72,7 @@ extern int AStarFixedUnitCrossingCost;
 	/// cost associated to move on a tile occupied by a moving unit
 extern int AStarMovingUnitCrossingCost;
 	/// Whether to have knowledge of terrain that we haven't visited yet
-extern int AStarKnowUnknown;
+extern bool AStarKnowUnseenTerrain;
 	/// Cost of using a square we haven't seen before.
 extern int AStarUnknownTerrainCost;
 
@@ -100,7 +100,7 @@ extern int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
 	int minrange, int maxrange);
 
 //
-// in astar.c
+// in astar.cpp
 //
 	/// Returns the next element of the path
 extern int NextPathElement(CUnit *unit, int *xdp, int *ydp);
@@ -114,12 +114,16 @@ extern void FreeAStar(void);
 	/// Find and a* path for a unit
 extern int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh,
 	int minrange, int maxrange, char *path);
-//
-// in ccl_pathfinder.c
-//
-	/// register ccl features
-extern void PathfinderCclRegister(void);
+
+extern void SetAStarFixedUnitCrossingCost(int cost);
+extern int GetAStarFixedUnitCrossingCost();
+
+extern void SetAStarMovingUnitCrossingCost(int cost);
+extern int GetAStarMovingUnitCrossingCost();
+
+extern void SetAStarUnknownTerrainCost(int cost);
+extern int GetAStarUnknownTerrainCost();
 
 //@}
 
-#endif // !__PATH_FINDER_H__
+#endif // !__PATHFINDER_H__
