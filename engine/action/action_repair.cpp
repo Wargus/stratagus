@@ -55,37 +55,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Calculate how many resources the unit needs to request
-**
-**  @param utype  unit type doing the repairing
-**  @param rtype  unit type being repaired
-**  @param costs  returns the resource amount
-*/
-static void CalculateRepairAmount(CUnitType *utype, CUnitType *rtype, int costs[MaxCosts])
-{
-	if (rtype->ProductionCosts[EnergyCost] == 0) {
-		costs[EnergyCost] = 0;
-		costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-	} else if (rtype->ProductionCosts[MagmaCost] == 0) {
-		costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-		costs[MagmaCost] = 0;
-	} else {
-		int f = 100 * rtype->ProductionCosts[EnergyCost] * utype->MaxUtilizationRate[MagmaCost] /
-			(rtype->ProductionCosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
-		if (f > 100) {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
-		} else if (f < 100) {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-		} else {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-		}
-	}
-}
-
-/**
 **  Move to build location
 **
 **  @param unit  Unit to move
@@ -176,7 +145,7 @@ static void MoveToLocation(CUnit *unit)
 			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 
 		int costs[MaxCosts];
-		CalculateRepairAmount(unit->Type, unit->Orders[0]->Goal->Type, costs);
+		CalculateRequestedAmount(unit->Type, unit->Orders[0]->Goal->Type->ProductionCosts, costs);
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	} else if (err < 0) {
 		if (goal) { // release reference
@@ -215,7 +184,7 @@ static bool DoRepair(CUnit *unit, CUnit *goal)
 {
 	CPlayer *player = unit->Player;
 	int *pcosts = goal->Type->ProductionCosts;
-	int pcost = CYCLES_PER_SECOND * (pcosts[EnergyCost] ? pcosts[EnergyCost] : pcosts[MagmaCost]);
+	int pcost = pcosts[EnergyCost] ? pcosts[EnergyCost] : pcosts[MagmaCost];
 	bool healed = false;
 
 	if (goal->Orders[0]->Action != UnitActionBuilt) {

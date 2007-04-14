@@ -453,6 +453,9 @@ extern void PlayersEachSecond(int player);
 extern void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite);
 #endif
 
+	/// Calculate how many resources the unit needs to request
+void CalculateRequestedAmount(CUnitType *utype, int bcosts[MaxCosts], int costs[MaxCosts]);
+
 	/// Output debug informations for players
 extern void DebugPlayers(void);
 

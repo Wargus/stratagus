@@ -170,6 +170,43 @@ void CPlayer::UpdateUnitsConsumingResources(CUnit *unit, int costs[MaxCosts])
 	}
 }
 
+/**
+**  Calculate how many resources the unit needs to request
+**
+**  @param utype   builder unit type
+**  @param bcosts  costs of unit type being built or harvested
+**  @param costs   returns the resource amount
+*/
+void CalculateRequestedAmount(CUnitType *utype, int bcosts[MaxCosts], int costs[MaxCosts])
+{
+	if (bcosts[EnergyCost] == 0) {
+		costs[EnergyCost] = 0;
+		costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+	} else if (bcosts[MagmaCost] == 0) {
+		costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+		costs[MagmaCost] = 0;
+	} else {
+		int f = 100 * bcosts[EnergyCost] * utype->MaxUtilizationRate[MagmaCost] /
+			(bcosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
+		if (f > 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
+		} else if (f < 100) {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		} else {
+			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
+			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
+		}
+	}
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (costs[i] > bcosts[i]) {
+			costs[i] = bcosts[i];
+		}
+	}
+}
+
 /** 
 **  Go through the list of units owned by the player and rebuild
 **  the UnitsConsumingResources list.
@@ -178,28 +215,17 @@ void CPlayer::RebuildUnitsConsumingResourcesList()
 {
 	for (int i = 0; i < TotalNumUnits; ++i) {
 		int costs[MaxCosts];
-		CUnit *u = Units[i];
+		CUnit *unit = Units[i];
 
-		if (u->Orders[0]->Action == UnitActionTrain && u->SubAction > 0) {
-			for (int i = 0; i < MaxCosts; ++i) {
-				costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
-					u->Orders[0]->Type->ProductionCosts[i]);
-			}
-			AddToUnitsConsumingResources(u, costs);
-		} else if (u->Orders[0]->Action == UnitActionBuilt) {
-			if (!u->Type->BuilderOutside) {
-				for (int i = 0; i < MaxCosts; ++i) {
-					costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
-						u->Orders[0]->Goal->Type->ProductionCosts[i]);
-				}
-				u->Orders[0]->Goal->Player->AddToUnitsConsumingResources(u->Orders[0]->Goal, costs);
-			} else {
-				for (int i = 0; i < MaxCosts; ++i) {
-					costs[i] = std::min<int>(u->Type->MaxUtilizationRate[i],
-						u->Orders[0]->Goal->Type->ProductionCosts[i]);
-				}
-				AddToUnitsConsumingResources(u, costs);
-			}
+		if (unit->Orders[0]->Action == UnitActionTrain && unit->SubAction != 0) {
+			CalculateRequestedAmount(unit->Type, unit->Orders[0]->Type->ProductionCosts, costs);
+			AddToUnitsConsumingResources(unit, costs);
+		} else if (unit->Orders[0]->Action == UnitActionBuilt) {
+			CalculateRequestedAmount(unit->Type, unit->Type->ProductionCosts, costs);
+			unit->Player->AddToUnitsConsumingResources(unit, costs);
+		} else if (unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20) {
+			CalculateRequestedAmount(unit->Type, unit->Orders[0]->Goal->Type->ProductionCosts, costs);
+			AddToUnitsConsumingResources(unit, costs);
 		}
 	}
 }
