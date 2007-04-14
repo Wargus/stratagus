@@ -78,7 +78,6 @@ CUnit *ReleasedTail;                      /// List tail of released units.
 CUnit *Units[MAX_UNIT_SLOTS];             /// Array of used slots
 int NumUnits;                             /// Number of slots used
 
-int XpDamage;                             /// Hit point regeneration for all units
 bool EnableBuildingCapture;               /// Config: capture buildings enabled
 
 static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
@@ -1219,13 +1218,6 @@ bool CUnit::IsVisible(const CPlayer *player) const
 */
 bool CUnit::IsVisibleAsGoal(const CPlayer *player) const
 {
-	//
-	// Invisibility
-	//
-	if (Variable[INVISIBLE_INDEX].Value && (player != Player) &&
-			(!player->IsBothSharedVision(Player))) {
-		return false;
-	}
 	if (IsVisible(player) || player->Type == PlayerComputer ||
 			UnitVisibleOnRadar(player, this)) {
 		return !Removed && !Destroyed && Orders[0]->Action != UnitActionDie;
@@ -1246,14 +1238,6 @@ bool CUnit::IsVisibleAsGoal(const CPlayer *player) const
 */
 bool CUnit::IsVisibleOnMap(const CPlayer *player) const
 {
-	//
-	// Invisible units.
-	//
-	if (Variable[INVISIBLE_INDEX].Value && player != Player &&
-			!player->IsBothSharedVision(Player)) {
-		return false;
-	}
-
 	return !Removed && !Destroyed &&
 		Orders[0]->Action != UnitActionDie && IsVisible(player);
 }
@@ -1268,13 +1252,6 @@ bool CUnit::IsVisibleOnMap(const CPlayer *player) const
 */
 bool CUnit::IsVisibleOnMinimap() const
 {
-	//
-	// Invisible units.
-	//
-	if (Variable[INVISIBLE_INDEX].Value && (ThisPlayer != Player) &&
-			(!ThisPlayer->IsBothSharedVision(Player))) {
-		return false;
-	}
 	if (IsVisible(ThisPlayer) || ReplayRevealMap ||
 			UnitVisibleOnRadar(ThisPlayer, this)) {
 		return !Removed && !Destroyed && (Orders[0]->Action != UnitActionDie);
@@ -1313,12 +1290,6 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 		// MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
 		// so don't show anything until first real map-draw.
 		DebugPrint("FIXME: ThisPlayer not set yet?!\n");
-		return false;
-	}
-
-	// Those are never ever visible.
-	if (Variable[INVISIBLE_INDEX].Value && ThisPlayer != Player &&
-			!ThisPlayer->IsBothSharedVision(Player)) {
 		return false;
 	}
 
@@ -2739,8 +2710,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 
 	Assert(damage != 0 && target->Orders[0]->Action != UnitActionDie && !target->Type->Vanishes);
 
-	if (target->Variable[UNHOLYARMOR_INDEX].Value > 0 || target->Type->Indestructible) {
-		// vladi: units with active UnholyArmour are invulnerable
+	if (target->Type->Indestructible) {
 		return;
 	}
 
@@ -2803,12 +2773,6 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			} else {
 				attacker->Player->TotalKills++;
 			}
-			if (UseHPForXp) {
-				attacker->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
-			} else {
-				attacker->Variable[XP_INDEX].Max += target->Type->Points;
-			}
-			attacker->Variable[XP_INDEX].Value = attacker->Variable[XP_INDEX].Max;
 			attacker->Variable[KILL_INDEX].Value++;
 			attacker->Variable[KILL_INDEX].Max++;
 			attacker->Variable[KILL_INDEX].Enable = 1;
@@ -2817,10 +2781,6 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		return;
 	}
 	target->Variable[HP_INDEX].Value -= damage;
-	if (UseHPForXp && attacker && target->IsEnemy(attacker)) {
-		attacker->Variable[XP_INDEX].Value += damage;
-		attacker->Variable[XP_INDEX].Max += damage;
-	}
 
 	// FIXME: this is dumb. I made repairers capture. crap.
 	// david: capture enemy buildings
@@ -3725,7 +3685,6 @@ void CleanUnits(void)
 
 	InitUnitsMemory();
 
-	XpDamage = 0;
 	HelpMeLastCycle = 0;
 }
 

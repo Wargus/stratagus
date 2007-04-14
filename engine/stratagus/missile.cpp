@@ -295,25 +295,18 @@ static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>:
 **
 **  @param attacker_stats  Attacker attributes.
 **  @param goal_stats      Goal attributes.
-**  @param bloodlust       If attacker has bloodlust
-**  @param xp              Experience of attacker.
 **
 **  @return                damage inflicted to goal.
 */
 static int CalculateDamageStats(const CUnitStats *attacker_stats,
-	const CUnitStats *goal_stats, int bloodlust, int xp)
+	const CUnitStats *goal_stats)
 {
 	int damage;
 	int basic_damage;
 	int piercing_damage;
 
-	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value +
-		isqrt(xp / 100) * XpDamage;
+	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value;
 	piercing_damage = attacker_stats->Variables[PIERCINGDAMAGE_INDEX].Value;
-	if (bloodlust) {
-		basic_damage *= 2;
-		piercing_damage *= 2;
-	}
 
 	damage = (basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) > 1 ?
 		(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) : 1;
@@ -340,8 +333,7 @@ static int CalculateDamage(const CUnit *attacker, const CUnit *goal)
 	Assert(goal);
 
 	if (!Damage) { // Use old method.
-		return CalculateDamageStats(attacker->Stats, goal->Stats,
-			attacker->Variable[XP_INDEX].Value, attacker->Variable[BLOODLUST_INDEX].Value);
+		return CalculateDamageStats(attacker->Stats, goal->Stats);
 	}
 	Assert(Damage);
 

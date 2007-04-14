@@ -240,11 +240,6 @@
 **
 **  This is 1 if the unit is on board a transporter.
 **
-**
-**  CUnit::XP
-**
-**  Number of XP of the unit.
-**
 **  CUnit::Kills
 **
 **  How many units have been killed by the unit.
@@ -788,7 +783,6 @@ extern int NumUnits;                 /// Number of units used
 // in unit_draw.cpp
 /// @todo could be moved into the user interface ?
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
-extern int XpDamage;                    /// unit XP adds more damage to attacks
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern const CViewport *CurrentViewport;/// CurrentViewport
 extern void DrawUnitSelection(const CUnit *);

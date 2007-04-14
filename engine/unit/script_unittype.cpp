@@ -1602,10 +1602,9 @@ void UpdateUnitVariables(const CUnit *unit)
 
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
-		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
-			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
-			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX) {
+		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX ||
+				i == BASICDAMAGE_INDEX || i == MANA_INDEX ||
+				i == KILL_INDEX || i == HP_INDEX) {
 			continue;
 		}
 		unit->Variable[i].Value = 0;
@@ -1616,7 +1615,7 @@ void UpdateUnitVariables(const CUnit *unit)
 	// Build
 	if (unit->Orders[0]->Action == UnitActionBuilt) {
 		const int *pcosts = type->ProductionCosts;
-		int pcost = CYCLES_PER_SECOND * (pcosts[0] ? pcosts[0] : pcosts[1]);
+		int pcost = CYCLES_PER_SECOND * (pcosts[EnergyCost] ? pcosts[EnergyCost] : pcosts[MagmaCost]);
 		unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
 		unit->Variable[BUILD_INDEX].Max = pcost;
 
@@ -1726,11 +1725,9 @@ void UpdateUnitVariables(const CUnit *unit)
 void InitDefinedVariables()
 {
 	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
-		"Training", "GiveResource",
-		"Xp", "Kill", "Armor", "SightRange",
+		"Training", "GiveResource", "Kill", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
-		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
-		"UnholyArmor", "Slot"
+		"RadarJammerRange", "AutoRepairRange", "Slot"
 		}; // names of the variable.
 	const char *boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
