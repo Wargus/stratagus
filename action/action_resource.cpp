@@ -156,51 +156,10 @@ static void AnimateActionHarvest(CUnit *unit)
 }
 
 /**
-**  Calculate how much the unit can harvest from a resource
-**
-**  @param unit    harvester unit
-**  @param source  resource the unit is harvesting from
-**  @param amount  returns the harvest amount
-*/
-static void CalculateHarvestAmount(CUnit *unit, CUnit *source, int amount[MaxCosts])
-{
-	CUnitType *type = unit->Type;
-
-	// FIXME: use SpeedResourcesHarvest
-	if (source->ResourcesHeld[EnergyCost] == 0) {
-		amount[EnergyCost] = 0;
-		amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost];
-	} else if (source->ResourcesHeld[MagmaCost] == 0) {
-		amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost];
-		amount[MagmaCost] = 0;
-	} else {
-		int f = 100 * source->ResourcesHeld[EnergyCost] * type->MaxUtilizationRate[MagmaCost] /
-			(source->ResourcesHeld[MagmaCost] * type->MaxUtilizationRate[EnergyCost]);
-		if (f > 100) {
-			amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost];
-			amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost] * 100 / f;
-		} else if (f < 100) {
-			amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost] * f / 100;
-			amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost];
-		} else {
-			amount[EnergyCost] = type->MaxUtilizationRate[EnergyCost];
-			amount[MagmaCost] = type->MaxUtilizationRate[MagmaCost];
-		}
-	}
-
-	// Don't load more than there is.
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (amount[i] > source->ResourcesHeld[i]) {
-			amount[i] = source->ResourcesHeld[i];
-		}
-	}
-}
-
-/**
 **  Find something else to do when the resource is exhausted.
 **  This is called from GatherResource when the resource is empty.
 **
-**  @param unit  harvester unit.
+**  @param unit  Harvester unit
 */
 static void FindNewResource(CUnit *unit)
 {
@@ -223,7 +182,7 @@ static void FindNewResource(CUnit *unit)
 /**
 **  Gather the resource
 **
-**  @param unit  Pointer to unit.
+**  @param unit  Harvester unit
 */
 static void GatherResource(CUnit *unit)
 {
@@ -236,7 +195,7 @@ static void GatherResource(CUnit *unit)
 
 	// Calculate how much we can harvest.
 	if (visible && UnitHoldsResources(source)) {
-		CalculateHarvestAmount(unit, source, amount);
+		CalculateRequestedAmount(unit->Type, source->ResourcesHeld, amount);
 		for (i = 0; i < MaxCosts; ++i) {
 			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
 			unit->Data.Harvest.CurrentProduction[i] = amount[i];

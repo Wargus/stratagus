@@ -92,37 +92,6 @@ static int CanHandleOrder(CUnit *unit, COrder *order)
 }
 
 /**
-**  Calculate how many resources the unit needs to request
-**
-**  @param utype  building unit type
-**  @param btype  unit type being trained
-**  @param costs  returns the resource amount
-*/
-static void CalculateTrainAmount(CUnitType *utype, CUnitType *btype, int costs[MaxCosts])
-{
-	if (btype->ProductionCosts[EnergyCost] == 0) {
-		costs[EnergyCost] = 0;
-		costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-	} else if (btype->ProductionCosts[MagmaCost] == 0) {
-		costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-		costs[MagmaCost] = 0;
-	} else {
-		int f = 100 * btype->ProductionCosts[EnergyCost] * utype->MaxUtilizationRate[MagmaCost] /
-			(btype->ProductionCosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
-		if (f > 100) {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
-		} else if (f < 100) {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-		} else {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-		}
-	}
-}
-
-/**
 **  Unit trains unit!
 **
 **  @param unit  Unit that trains.
@@ -143,7 +112,7 @@ void HandleActionTrain(CUnit *unit)
 		unit->SubAction = 1;
 
 		int costs[MaxCosts];
-		CalculateTrainAmount(unit->Type, unit->Orders[0]->Type, costs);
+		CalculateRequestedAmount(unit->Type, unit->Orders[0]->Type->ProductionCosts, costs);
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	} else {
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];

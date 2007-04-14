@@ -210,37 +210,6 @@ static CUnit *CheckCanBuild(CUnit *unit)
 }
 
 /**
-**  Calculate how many resources the unit needs to request
-**
-**  @param utype  builder unit type
-**  @param btype  unit type being built
-**  @param costs  returns the resource amount
-*/
-static void CalculateBuildAmount(CUnitType *utype, CUnitType *btype, int costs[MaxCosts])
-{
-	if (btype->ProductionCosts[EnergyCost] == 0) {
-		costs[EnergyCost] = 0;
-		costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-	} else if (btype->ProductionCosts[MagmaCost] == 0) {
-		costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-		costs[MagmaCost] = 0;
-	} else {
-		int f = 100 * btype->ProductionCosts[EnergyCost] * utype->MaxUtilizationRate[MagmaCost] /
-			(btype->ProductionCosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
-		if (f > 100) {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
-		} else if (f < 100) {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-		} else {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
-		}
-	}
-}
-
-/**
 **  Start building
 */
 static void StartBuilding(CUnit *unit, CUnit *ontop)
@@ -272,7 +241,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	if (!type->BuilderOutside) {
 		// Start using resources
 		int costs[MaxCosts];
-		CalculateBuildAmount(build->Type, build->Type, costs);
+		CalculateRequestedAmount(build->Type, build->Type->ProductionCosts, costs);
 		build->Player->AddToUnitsConsumingResources(build, costs);
 	}
 
@@ -325,79 +294,19 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		unit->ClearAction();
 		unit->Orders[0]->Goal = NULL;
 	} else {
+		// Use repair to do the building
+		unit->Orders[0]->Action = UnitActionRepair;
 		unit->Orders[0]->Goal = build;
 		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
-		// FIXME: Should have a BuildRange?
 		unit->Orders[0]->Range = unit->Type->RepairRange;
-		unit->SubAction = 40;
+		unit->SubAction = 0;
 		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
 		UnitUpdateHeading(unit);
 		build->RefsIncrease();
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
-
-		// Start using resources
-		int costs[MaxCosts];
-		CalculateBuildAmount(unit->Type, build->Type, costs);
-		unit->Player->AddToUnitsConsumingResources(unit, costs);
 	}
 	UpdateConstructionFrame(build);
-}
-
-/**
-**  Build the building
-**
-**  @param unit  Unit doing the building
-*/
-static void BuildBuilding(CUnit *unit)
-{
-	CUnit *goal = unit->Orders[0]->Goal;
-	int pcost = GetProductionCost(unit->Orders[0]->Type);
-
-	if (goal->Orders[0]->Action != UnitActionDie) {
-		// hp is the current damage taken by the unit.
-		int hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) / pcost - goal->Variable[HP_INDEX].Value;
-
-		// Update build progress
-		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
-		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
-		goal->Data.Built.Progress += cost * SpeedBuild;
-		if (goal->Data.Built.Progress > pcost) {
-			goal->Data.Built.Progress = pcost;
-		}
-
-		// Keep the same level of damage while increasing HP.
-		goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) / pcost - hp;
-		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
-			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
-		}
-	}
-
-	UnitShowAnimation(unit, unit->Type->Animations->Build);
-	if (unit->Anim.Unbreakable) {
-		return;
-	}
-
-	if (goal->Orders[0]->Action == UnitActionDie) {
-		goal->RefsDecrease();
-		unit->Orders[0]->Goal = NULL;
-		unit->ClearAction();
-		unit->State = 0;
-		unit->Player->RemoveFromUnitsConsumingResources(unit);
-		return;
-	}
-
-	//
-	// Building is finished
-	//
-	if (goal->Data.Built.Progress >= pcost ||
-			goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
-		goal->RefsDecrease();
-		unit->Orders[0]->Goal = NULL;
-		unit->ClearAction();
-		unit->State = 0;
-		unit->Player->RemoveFromUnitsConsumingResources(unit);
-	}
 }
 
 /**
@@ -416,9 +325,6 @@ void HandleActionBuild(CUnit *unit)
 		if ((ontop = CheckCanBuild(unit))) {
 			StartBuilding(unit, ontop);
 		}
-	}
-	if (unit->SubAction == 40) {
-		BuildBuilding(unit);
 	}
 }
 
