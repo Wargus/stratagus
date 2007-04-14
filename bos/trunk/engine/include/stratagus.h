@@ -276,8 +276,6 @@ extern std::string StratagusLibPath;        /// Location of stratagus data
 extern int SpeedBuild;                      /// Speed factor for building
 extern int SpeedTrain;                      /// Speed factor for training
 
-extern bool UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
-
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
