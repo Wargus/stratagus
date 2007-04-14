@@ -1252,8 +1252,6 @@ static int CclDefineAnimations(lua_State *l)
 			anims->Repair = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Train")) {
 			anims->Train = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Build")) {
-			anims->Build = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Harvest")) {
 			anims->Harvest = ParseAnimation(l, -1);
 		} else {
