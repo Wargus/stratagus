@@ -61,6 +61,7 @@ $pfile "sound.pkg"
 $pfile "editor.pkg"
 $pfile "game.pkg"
 $pfile "map.pkg"
+$pfile "pathfinder.pkg"
 
 extern const char *Translate(const char *str);
 extern void AddTranslation(const string str1, const string str2);

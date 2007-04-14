@@ -149,7 +149,11 @@ function InitGameVariables()
    InitAiScripts()
 end
 
-AStar("fixed-unit-cost", 1000, "moving-unit-cost", 4, "dont-know-unseen-terrain", "unseen-terrain-cost", 2)
+--  Pathfinder
+AStarFixedUnitCrossingCost = 1000
+AStarMovingUnitCrossingCost = 4
+AStarKnowUnseenTerrain = false
+AStarUnknownTerrainCost = 2
 
 --	Maximum number of selectable units
 SetMaxSelectable(24)
