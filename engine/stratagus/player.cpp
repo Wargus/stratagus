@@ -269,7 +269,8 @@ static int SpecificEfficiency(int type, CPlayer *p)
 	if (p->RequestedUtilizationRate[type] == 0) {
 		return 100;
 	}
-	return std::min<int>((100 * AvailableResourcesRate(type, p) + 50) / p->RequestedUtilizationRate[type], 100);
+	return std::min<int>((100 * AvailableResourcesRate(type, p) +
+		p->RequestedUtilizationRate[type] / 2) / p->RequestedUtilizationRate[type], 100);
 }
 
 // base efficiency = min(f(energy), f(magma))
