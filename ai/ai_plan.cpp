@@ -78,8 +78,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 		// unusable unit ?
 		// if (unit->IsUnusable()) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
-		// Invisible and not Visible
-		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
+		if (unit->Removed ||
 				//(!UnitVisible(unit, source->Player)) ||
 				unit->Orders[0]->Action == UnitActionDie) {
 			continue;

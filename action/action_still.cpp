@@ -126,8 +126,7 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 	CUnit *goal;
 
 	// Cowards don't attack unless ordered.
-	if (unit->Type->CanAttack && !unit->Type->Coward &&
-			unit->Variable[INVISIBLE_INDEX].Value == 0) {
+	if (unit->Type->CanAttack && !unit->Type->Coward) {
 		// Normal units react in reaction range.
 		if (CanMove(unit) && !unit->Removed && !stand_ground) {
 			if ((goal = AttackUnitsInReactRange(unit))) {

@@ -62,20 +62,6 @@
 extern unsigned CclGetResourceByName(lua_State *l);
 
 /**
-**  Set xp damage
-**
-**  @param l  Lua state.
-**
-**  @return   The old state of the xp damage
-*/
-static int CclSetXpDamage(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	XpDamage = LuaToBoolean(l, 1);
-	return 0;
-}
-
-/**
 **  Set capture buildings
 **
 **  @param l  Lua state.
@@ -1256,7 +1242,6 @@ static int CclSlotUsage(lua_State *l)
 */
 void UnitCclRegister(void)
 {
-	lua_register(Lua, "SetXPDamage", CclSetXpDamage);
 	lua_register(Lua, "SetBuildingCapture", CclSetBuildingCapture);
 
 	lua_register(Lua, "Unit", CclUnit);

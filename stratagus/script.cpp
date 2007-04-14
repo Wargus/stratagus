@@ -85,7 +85,6 @@ std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
-bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 NumberDesc *Damage;                   /// Damage calculation for missile.
 
 static int NumberCounter = 0; /// Counter for lua function.
@@ -2025,21 +2024,6 @@ static int CclGetLocalPlayerName(lua_State *l)
 	return 1;
 }
 
-
-/**
-**  Affect UseHPForXp.
-**
-**  @param l  Lua state.
-**
-**  @return 0.
-*/
-static int ScriptSetUseHPForXp(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	UseHPForXp = LuaToBoolean(l, 1);
-	return 0;
-}
-
 /**
 **  Removes Randomization of Player position in Multiplayer mode
 **
@@ -2372,7 +2356,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
 	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
-	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);

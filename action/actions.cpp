@@ -136,12 +136,6 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 
 			case AnimationWait:
 				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait << scale >> 8;
-				if (unit->Variable[SLOW_INDEX].Value) { // unit is slowed down
-					unit->Anim.Wait <<= 1;
-				}
-				if (unit->Variable[HASTE_INDEX].Value && unit->Anim.Wait > 1) { // unit is accelerated
-					unit->Anim.Wait >>= 1;
-				}
 				if (unit->Anim.Wait <= 0)
 					unit->Anim.Wait = 1;
 				break;
@@ -175,7 +169,6 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 				} else {
 					FireMissile(unit);
 				}
-				unit->Variable[INVISIBLE_INDEX].Value = 0; // unit is invisible until attacks
 				break;
 
 			case AnimationRotate:
@@ -321,16 +314,6 @@ static void HandleBuffs(CUnit *unit, int amount)
 			LetUnitDie(unit);
 		}
 	}
-
-	//
-	//  decrease spells effects time.
-	//
-
-	unit->Variable[BLOODLUST_INDEX].Increase = -amount;
-	unit->Variable[HASTE_INDEX].Increase = -amount;
-	unit->Variable[SLOW_INDEX].Increase = -amount;
-	unit->Variable[INVISIBLE_INDEX].Increase = -amount;
-	unit->Variable[UNHOLYARMOR_INDEX].Increase = -amount;
 
 	// User defined variables
 	for (int i = 0; i < UnitTypeVar.NumberVariable; i++) {

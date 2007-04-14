@@ -546,12 +546,6 @@ int Polymorph::Cast(CUnit *caster, const SpellType *spell,
 		} else {
 			caster->Player->TotalKills++;
 		}
-		if (UseHPForXp) {
-			caster->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
-		} else {
-			caster->Variable[XP_INDEX].Max += target->Type->Points;
-		}
-		caster->Variable[XP_INDEX].Value = caster->Variable[XP_INDEX].Max;
 		caster->Variable[KILL_INDEX].Value++;
 		caster->Variable[KILL_INDEX].Max++;
 		caster->Variable[KILL_INDEX].Enable = 1;
@@ -618,12 +612,6 @@ int Capture::Cast(CUnit *caster, const SpellType *spell,
 		} else {
 			caster->Player->TotalKills++;
 		}
-		if (UseHPForXp) {
-			caster->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
-		} else {
-			caster->Variable[XP_INDEX].Max += target->Type->Points;
-		}
-		caster->Variable[XP_INDEX].Value = caster->Variable[XP_INDEX].Max;
 		caster->Variable[KILL_INDEX].Value++;
 		caster->Variable[KILL_INDEX].Max++;
 		caster->Variable[KILL_INDEX].Enable = 1;
@@ -1091,7 +1079,6 @@ int SpellCast(CUnit *caster, const SpellType *spell, CUnit *target,
 	int cont;             // Should we recast the spell.
 	int mustSubtractMana; // false if action which have their own calculation is present.
 
-	caster->Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
 		x = target->X;
 		y = target->Y;
