@@ -95,7 +95,7 @@ static int AStarMatrixSize;
 /// see pathfinder.h
 int AStarFixedUnitCrossingCost = MaxMapWidth * MaxMapHeight;
 int AStarMovingUnitCrossingCost = 5;
-int AStarKnowUnknown = 0;
+bool AStarKnowUnseenTerrain = false;
 int AStarUnknownTerrainCost = 2;
 
 /**
@@ -294,7 +294,7 @@ static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask) {
 	for (i = ex; i < ex + unit->Type->TileWidth; i++) {
 		for (j = ey; j < ey + unit->Type->TileHeight; j++) {
 			flag = Map.Field(i, j)->Flags & mask;
-			if (flag && (AStarKnowUnknown || Map.IsFieldExplored(unit->Player, i, j)) ) {
+			if (flag && (AStarKnowUnseenTerrain || Map.IsFieldExplored(unit->Player, i, j)) ) {
 				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
@@ -316,7 +316,7 @@ static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask) {
 				}
 			}
 			// Add cost of crossing unknown tiles if required
-			if (!AStarKnowUnknown && !Map.IsFieldExplored(unit->Player, i, j) ) {
+			if (!AStarKnowUnseenTerrain && !Map.IsFieldExplored(unit->Player, i, j) ) {
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
@@ -818,5 +818,38 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 	}
 	return result;
 }
+
+// AStarFixedUnitCrossingCost
+void SetAStarFixedUnitCrossingCost(int cost) {
+	if (cost <= 3) {
+		fprintf(stderr, "AStarFixedUnitCrossingCost must be greater than 3\n");
+	}
+}
+int GetAStarFixedUnitCrossingCost() {
+	return AStarFixedUnitCrossingCost;
+}
+
+// AStarMovingUnitCrossingCost
+void SetAStarMovingUnitCrossingCost(int cost) {
+	if (cost <= 3) {
+		fprintf(stderr, "AStarMovingUnitCrossingCost must be greater than 3\n");
+	}
+}
+int GetAStarMovingUnitCrossingCost() {
+	return AStarMovingUnitCrossingCost;
+}
+
+// AStarUnknownTerrainCost
+void SetAStarUnknownTerrainCost(int cost) {
+	if (cost < 0) {
+		fprintf(stderr, "AStarUnknownTerrainCost must be non-negative\n");
+		return;
+	}
+	AStarUnknownTerrainCost = cost;
+}
+int GetAStarUnknownTerrainCost() {
+	return AStarUnknownTerrainCost;
+}
+
 
 //@}

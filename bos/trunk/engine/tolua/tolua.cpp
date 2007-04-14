@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/07/07 19:08:05.
+** Generated automatically by tolua++-1.0.92 on 04/13/07 21:43:32.
 */
 
 #ifndef __cplusplus
@@ -45,6 +45,7 @@ int SaveReplay(const std::string &filename);
 #include "results.h"
 void StopGame(GameResults result);
 #include "settings.h"
+#include "pathfinder.h"
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -15421,6 +15422,105 @@ static int tolua_stratagus_SetTile00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: AStarFixedUnitCrossingCost */
+#ifndef TOLUA_DISABLE_tolua_get_AStarFixedUnitCrossingCost
+static int tolua_get_AStarFixedUnitCrossingCost(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)GetAStarFixedUnitCrossingCost());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: AStarFixedUnitCrossingCost */
+#ifndef TOLUA_DISABLE_tolua_set_AStarFixedUnitCrossingCost
+static int tolua_set_AStarFixedUnitCrossingCost(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  SetAStarFixedUnitCrossingCost(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: AStarMovingUnitCrossingCost */
+#ifndef TOLUA_DISABLE_tolua_get_AStarMovingUnitCrossingCost
+static int tolua_get_AStarMovingUnitCrossingCost(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)GetAStarMovingUnitCrossingCost());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: AStarMovingUnitCrossingCost */
+#ifndef TOLUA_DISABLE_tolua_set_AStarMovingUnitCrossingCost
+static int tolua_set_AStarMovingUnitCrossingCost(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  SetAStarMovingUnitCrossingCost(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: AStarKnowUnseenTerrain */
+#ifndef TOLUA_DISABLE_tolua_get_AStarKnowUnseenTerrain
+static int tolua_get_AStarKnowUnseenTerrain(lua_State* tolua_S)
+{
+  tolua_pushboolean(tolua_S,(bool)AStarKnowUnseenTerrain);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: AStarKnowUnseenTerrain */
+#ifndef TOLUA_DISABLE_tolua_set_AStarKnowUnseenTerrain
+static int tolua_set_AStarKnowUnseenTerrain(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  AStarKnowUnseenTerrain = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: AStarUnknownTerrainCost */
+#ifndef TOLUA_DISABLE_tolua_get_AStarUnknownTerrainCost
+static int tolua_get_AStarUnknownTerrainCost(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)GetAStarUnknownTerrainCost());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: AStarUnknownTerrainCost */
+#ifndef TOLUA_DISABLE_tolua_set_AStarUnknownTerrainCost
+static int tolua_set_AStarUnknownTerrainCost(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  SetAStarUnknownTerrainCost(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Translate */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Translate00
 static int tolua_stratagus_Translate00(lua_State* tolua_S)
@@ -16674,6 +16774,10 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"Map",tolua_get_Map,tolua_set_Map);
   tolua_function(tolua_S,"SetTile",tolua_stratagus_SetTile00);
+  tolua_variable(tolua_S,"AStarFixedUnitCrossingCost",tolua_get_AStarFixedUnitCrossingCost,tolua_set_AStarFixedUnitCrossingCost);
+  tolua_variable(tolua_S,"AStarMovingUnitCrossingCost",tolua_get_AStarMovingUnitCrossingCost,tolua_set_AStarMovingUnitCrossingCost);
+  tolua_variable(tolua_S,"AStarKnowUnseenTerrain",tolua_get_AStarKnowUnseenTerrain,tolua_set_AStarKnowUnseenTerrain);
+  tolua_variable(tolua_S,"AStarUnknownTerrainCost",tolua_get_AStarUnknownTerrainCost,tolua_set_AStarUnknownTerrainCost);
   tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
   tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
   tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
