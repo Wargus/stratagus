@@ -108,8 +108,8 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 			Variable = "Level", Format = "Level ~<%d~>"}}
 	},
 	{ Pos = {114, 52},
-		More = {"FormattedText2", {Centered = true,
-			Variable1 = "Xp", Variable2 = "Kill", Format = "XP:~<%d~> Kills:~<%d~>"}}
+		More = {"FormattedText", {Centered = true,
+			Variable = "Kill", Format = "Kills:~<%d~>"}}
 	},
 	{ Pos = {16, 84}, Condition = {Armor = "only"},
 		More = {"Text", {Text = "Armor: ", Variable = "Armor", Stat = true}}
