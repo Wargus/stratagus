@@ -313,9 +313,6 @@ black oil patch.
 <dd>Identifier to reference the icon shown in game for this unit-type.
 F.E. "icon-knight", "icon-gold-mine".
 </dd>
-<dt>Portrait = {main-file, other-file, ...}</dt>
-<dd>The first file is the main animation.  It will randomly play one of the other files.
-</dd>
 <dt>Sounds = {event, "sound-name", ...}</dt>
 <dd>The following events are supported:
 <dl><dd>
@@ -393,59 +390,12 @@ F.E.: Costs = {"time", 200, "gold", 2000, "wood", 1000, "oil", 200}
     known spell(in order of spell definition) instead of attacking a hostile unit.
     </dd>
 </dl></dd>
-<dt>CanGatherResources = {flag, value}</dt>
-<dd>This will begin a block of resoure gathering information. The folowing tags are available in this section:
-<dl>
-    <dt>"resource-id", ressource-name</dt>
-    <dd>The resource identification. Has to be a resource-name defined before.
-    </dd>
-    <dt>"final-resource", ressource-name</dt>
-    <dd>The resource is converted to this at the depot. Usefull for a fisherman who harvests fish,
-    but it all turns to food at the depot. Warning: curently ignored by the Ai.
-    </dd>
-    <dt>"wait-at-resource", number</dt>
-    <dd>Cycles the unit waits while inside at a resource to get one resource step
-    (see below). This is completely independent of animation length and such.
-    </dd>
-    <dt>"wait-at-depot", number</dt>
-    <dd>Cycles the unit waits while inside the depot to unload.
-    </dd>
-    <dt>"resource-step", number</dt>
-    <dd>The unit makes so-caled mining cycles. Each mining cycle it does some sort
-    of animation and gains resource-step resources. You can stop after any number of
-    steps. When the quantity in the harvester reaches the maximum (resource-capacity)
-    it will return home. If this is not included then it's considered infinity, and
-    resource-capacity will be the limit.
-    </dd>
-    <dt>"resource-capacity", number</dt>
-    <dd>Maximum amount of resources a harvester can carry. The actual amount can be
-    modified while unloading, with improve-incomes.
-    </dd>
-    <dt>"file-when-loaded", filename</dt>
-    <dd>The harvester's animation file will change when it's loaded.
-    </dd>
-    <dt>"file-when-empty", filename</dt>
-    <dd>The harvester's animation file will change when it's empty.The standard animation
-    is used only when building/repairing.
-    </dd>
-    <dt>"harvest-from-outside"</dt>
-    <dd>Unit will harvest from the outside. The unit will use it's attack animation
-    (seems it turned into a generic Action anim.)
-    </dd>
-    <dt>"lose-resources"</dt>
-    <dd>Special lossy behaviour for loaded harvesters. Harvesters with loads other
-    than 0 and ResourceCapacity will lose their cargo on any new order.
-    </dd>
-    <dt>"terrain-harvester"</dt>
-    <dd>The unit will harvest terrain. For now this only works for wood.</dd>
-</dl></dd>
 <dt>GivesResource = resource-name</dt>
 <dd>This will make the unit (normally a building) a resource (sugar mine, geyser, etc).
 It's followed by a resource ident F.E. "gives-resource", "gold"
 </dd>
-<dt>CanHarvest = boolean</dt>
-<dd>This is a flag for harvestable resource buildings. You can ommit it, and give every
-race a building that is built on top of this (see below) and has the can-harvest flag.
+<dt>CanHarvestFrom = boolean</dt>
+<dd>This is a flag for harvestable resource buildings.
 </dd>
 <dt>CanStore = {resource-name, ...}</dt>
 <dd>This flag makes the unit a resource storage, units will come here and unload their cargo.
@@ -534,20 +484,6 @@ list of spell names. Spells have to be declared already. Since some spells also
 rely on units being defined this can lead to a chicken and egg problem. It's
 better to declare an unit type in advance with just DefineUnitType( "unit-whatever", {}).
 Please see the documentation on spells. F.E. CanCastSpell = {"spell-healing", "spell-exorcism"}
-</dd>
-<dt>Supply = number</dt>
-<dd>This is the amount of food supplied by the unit. Food is a global per-player
-counter that signifies the maximum amount of units.
-</dd>
-<dt>Demand = number</dt>
-<dd>This is the amount of food required by the unit. It should be 0 for buildings.
-It can have values greater than one, for bigger units.
-</dd>
-<dt>ImproveProduction = {resource-name, amount, ...}</dt>
-<dd>Define the production increase from defaults that this unit adds. The
-values are treated like percents. Improvement from multiple buildings do
-not stack, but the maximum is what matters.
-F.E.: ImproveProduction = {"gold", 20, "wood", 5} will give 120% gold and 105% wood.
 </dd>
 <dt>RepairRange = number</dt>
 <dd>Range that a unit can repair from, eg. RepairRange = 1.
