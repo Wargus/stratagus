@@ -263,9 +263,12 @@ static int AvailableResourcesRate(int type, CPlayer *p)
 	return p->ProductionRate[type] + std::min<int>(p->StoredResources[type], RateFromStorage);
 }
 
-// f(type) = min(p(type)/ total needs(type), 1.0)
+// f(type) = min(p(type)/ total requested(type), 1.0)
 static int SpecificEfficiency(int type, CPlayer *p)
 {
+	if (p->RequestedUtilizationRate[type] == 0) {
+		return 100;
+	}
 	return std::min<int>((100 * AvailableResourcesRate(type, p) + 50) / p->RequestedUtilizationRate[type], 100);
 }
 
@@ -275,9 +278,34 @@ static int BaseEfficiency(CPlayer *p)
 	return std::min<int>(SpecificEfficiency(EnergyCost, p), SpecificEfficiency(MagmaCost, p));
 }
 
-static int UniqueEfficiency(CPlayer *p)
+// total p(type) - total requested(type) * base efficiency
+static int ExtraProduction(int type, CPlayer *p, int be)
 {
-	return 0;
+	return 100 * AvailableResourcesRate(type, p) - p->RequestedUtilizationRate[type] * be;
+}
+
+// sum of needs(type) of all units who only require this resource)
+static int UniqueNeeds(int type, CPlayer *p)
+{
+	// FIXME: this doesn't have to be recalculated every time
+	std::map<CUnit *, int *>::iterator i = p->UnitsConsumingResourcesRequested.begin();
+	std::map<CUnit *, int *>::iterator end = p->UnitsConsumingResourcesRequested.end();
+	int type2 = (type == EnergyCost ? MagmaCost : EnergyCost);
+	int needs = 0;
+
+	for (; i != end; ++i) {
+		if ((*i).second[type] != 0 && (*i).second[type2] == 0) {
+			needs += (*i).second[type];
+		}
+	}
+	return needs;
+}
+
+// min(extra production(type) / unique needs(type) + base efficiency, 1)
+static int UniqueEfficiency(int type, CPlayer *p)
+{
+	int be = BaseEfficiency(p);
+	return std::min<int>(ExtraProduction(type, p, be) / UniqueNeeds(type, p) + be, 100);
 }
 
 static int MaxRate(CUnit *unit, int res)
@@ -290,11 +318,13 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 {
 	int i;
 	int usedtypes = 0;
+	int type = -1;
 	int *c = unit->Player->UnitsConsumingResourcesRequested[unit];
 
 	for (i = 0; i < MaxCosts; ++i) {
 		if (c[i] != 0) {
 			++usedtypes;
+			type = i;
 		}
 	}
 	Assert(usedtypes > 0);
@@ -308,7 +338,7 @@ static void CalculateCosts(CUnit *unit, int costs[MaxCosts])
 		}
 	} else {
 		// unit effective rate(type) = unit max rate(type) * unique efficiency(type)
-		int ue = UniqueEfficiency(unit->Player);
+		int ue = UniqueEfficiency(type, unit->Player);
 		for (i = 0; i < MaxCosts; ++i) {
 			costs[i] = MaxRate(unit, i) * ue / 100;
 		}
