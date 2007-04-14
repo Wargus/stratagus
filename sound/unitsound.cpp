@@ -33,30 +33,11 @@
 --  Include
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
-
-#include "unitsound.h"
-#include "video.h"
 #include "sound.h"
+#include "sound_server.h"
 #include "unittype.h"
 #include "animation.h"
-#include "player.h"
-#include "unit.h"
-#include "sound_server.h"
-#include "tileset.h"
-#include "map.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -74,13 +55,11 @@ void LoadUnitSounds(void)
 */
 static void MapAnimSounds2(CAnimation *anim)
 {
-	int i;
-
 	while (anim) {
 		if (anim->Type == AnimationSound) {
 			anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name);
 		} else if (anim->Type == AnimationRandomSound) {
-			for (i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
+			for (int i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
 				anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i]);
 			}
 		}
@@ -110,18 +89,16 @@ static void MapAnimSounds(CUnitType *type)
 /**
 **  Map the sounds of all unit-types to the correct sound id.
 **  And overwrite the sound ranges. @todo the sound ranges should be
-**  configurable by user with CCL.
+**  configurable by user with lua.
 */
 void MapUnitSounds(void)
 {
-	CUnitType *type;
-
 	if (SoundEnabled()) {
 		//
 		// Parse all units sounds.
 		//
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-			type = UnitTypes[i];
+			CUnitType *type = UnitTypes[i];
 
 			MapAnimSounds(type);
 
