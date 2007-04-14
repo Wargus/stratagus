@@ -104,7 +104,6 @@ static void MapAnimSounds(CUnitType *type)
 	MapAnimSounds2(type->Animations->Move);
 	MapAnimSounds2(type->Animations->Repair);
 	MapAnimSounds2(type->Animations->Train);
-	MapAnimSounds2(type->Animations->Build);
 	MapAnimSounds2(type->Animations->Harvest);
 }
 

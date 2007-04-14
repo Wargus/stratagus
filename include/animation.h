@@ -103,7 +103,7 @@ public:
 class CAnimations {
 public:
 	CAnimations() : Start(NULL), Still(NULL), Death(NULL), Attack(NULL),
-		Move(NULL), Repair(NULL), Train(NULL), Build(NULL), Harvest(NULL)
+		Move(NULL), Repair(NULL), Train(NULL), Harvest(NULL)
 	{
 	}
 
@@ -114,7 +114,6 @@ public:
 	CAnimation *Move;
 	CAnimation *Repair;
 	CAnimation *Train;
-	CAnimation *Build;
 	CAnimation *Harvest;
 };
 
