@@ -83,11 +83,6 @@ DefineDecorations({Index = "Training", HideNeutral = true, CenterX = true,
 --	Game modification
 -------------------------------------------------------------------------------
 
---	Enable XP to add more damage to attacks?
-SetXPDamage(true)
-
--------------------------------------------------------------------------------
-
 --  Fighters move by default.
 RightButtonMoves();
 
