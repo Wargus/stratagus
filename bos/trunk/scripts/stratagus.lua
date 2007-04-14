@@ -86,12 +86,6 @@ DefineDecorations({Index = "Training", HideNeutral = true, CenterX = true,
 --	Enable XP to add more damage to attacks?
 SetXPDamage(true)
 
---	Edit this to enable/disable the training queues.
-SetTrainingQueue(true)
-
---	Always reveal the attacker.
-SetRevealAttacker(true)
-
 -------------------------------------------------------------------------------
 
 --  Fighters move by default.

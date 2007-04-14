@@ -433,12 +433,6 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			}
 			break;
 		case ButtonTrain:
-			// Check if building queue is enabled
-			if (!EnableTrainingQueue &&
-					unit->Orders[0]->Action == UnitActionTrain) {
-				break;
-			}
-			// FALL THROUGH
 		case ButtonBuild:
 			res = CheckDependByIdent(unit->Player, buttonaction->ValueStr);
 			break;
@@ -801,12 +795,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: Johns: I want to place commands in queue, even if not
 			// FIXME:        enough resources are available.
 			// FIXME: training queue full check is not correct for network.
-			// FIXME: this can be correct written, with a little more code.
-			if (Selected[0]->Orders[0]->Action == UnitActionTrain &&
-					!EnableTrainingQueue) {
-				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->X,
-					Selected[0]->Y, _("Unit training queue is full"));
-			} else if (Selected[0]->Player->CheckLimits(type) >= 0) {
+			if (Selected[0]->Player->CheckLimits(type) >= 0) {
 				SendCommandTrainUnit(Selected[0], type,
 					!(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();

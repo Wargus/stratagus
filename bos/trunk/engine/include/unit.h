@@ -789,9 +789,7 @@ extern int NumUnits;                 /// Number of units used
 /// @todo could be moved into the user interface ?
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
 extern int XpDamage;                    /// unit XP adds more damage to attacks
-extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
-extern bool RevealAttacker;             /// Config: reveal attacker enabled
 extern const CViewport *CurrentViewport;/// CurrentViewport
 extern void DrawUnitSelection(const CUnit *);
 extern void DrawSelection(Uint32 color, int x1, int y1, int x2, int y2);

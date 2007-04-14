@@ -79,9 +79,7 @@ CUnit *Units[MAX_UNIT_SLOTS];             /// Array of used slots
 int NumUnits;                             /// Number of slots used
 
 int XpDamage;                             /// Hit point regeneration for all units
-bool EnableTrainingQueue;                 /// Config: training queues enabled
 bool EnableBuildingCapture;               /// Config: capture buildings enabled
-bool RevealAttacker;                      /// Config: reveal attacker enabled
 
 static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
 static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
@@ -2889,10 +2887,11 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	//
 	if (attacker && !type->Coward) {
 		if (type->CanAttack) {
-			if (RevealAttacker && CanTarget(target->Type, attacker->Type)) {
-				// Reveal Unit that is attacking
+			if (CanTarget(target->Type, attacker->Type)) {
+				// Attack unit that is attacking
 				goal = attacker;
 			} else {
+				// Check for any other units in range
 				goal = AttackUnitsInReactRange(target);
 			}
 			if (goal) {

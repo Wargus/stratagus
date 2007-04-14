@@ -747,13 +747,6 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 			return;
 		}
 
-		//
-		// Not already training?
-		//
-		if (!EnableTrainingQueue && unit->Orders[0]->Action == UnitActionTrain) {
-			DebugPrint("Unit queue full!\n");
-			return;
-		}
 		if (!(order = GetNextOrder(unit, 0))) {
 			return;
 		}
