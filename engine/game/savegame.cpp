@@ -283,7 +283,6 @@ void SaveGame(const std::string &filename)
 	file.printf("SetGameCycle(%lu)\n", GameCycle);
 
 	SaveCcl(&file);
-	SaveUnitTypes(&file);
 	SavePlayers(&file);
 	Map.Save(&file);
 	SaveUnits(&file);
