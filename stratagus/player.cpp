@@ -190,9 +190,9 @@ void CalculateRequestedAmount(CUnitType *utype, int bcosts[MaxCosts], int costs[
 			(bcosts[MagmaCost] * utype->MaxUtilizationRate[EnergyCost]);
 		if (f > 100) {
 			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
-			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost] * 100 / f;
+			costs[MagmaCost] = (utype->MaxUtilizationRate[MagmaCost] * 100 + f / 2) / f;
 		} else if (f < 100) {
-			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost] * f / 100;
+			costs[EnergyCost] = (utype->MaxUtilizationRate[EnergyCost] * f + 50) / 100;
 			costs[MagmaCost] = utype->MaxUtilizationRate[MagmaCost];
 		} else {
 			costs[EnergyCost] = utype->MaxUtilizationRate[EnergyCost];
