@@ -198,6 +198,7 @@ void LoadGame(const std::string &filename)
 
 	CclGarbageCollect(0);
 	InitVisionTable();
+	InitUnitTypes(1);
 	LuaLoadFile(filename);
 	CclGarbageCollect(0);
 
