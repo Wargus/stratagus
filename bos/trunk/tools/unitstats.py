@@ -163,10 +163,8 @@ def readUnitStats():
     return newstats
 def updateUnitStats(units):
     stats = readUnitStats()
-    print stats
     for unit in units:
         name = unit.stats['Name']
-        print name, stats[name]
         if stats.has_key(name):
             up = stats[name]
             for k in up.keys():
@@ -203,7 +201,6 @@ def main(args):
     elif args[1] == 'tupdate':
         updateUnitStats([units[0]])
         regenerateScripts(scripts)
-        print units[0]
     else:
         printUsage(args)
         return
