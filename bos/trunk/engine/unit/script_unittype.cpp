@@ -1374,12 +1374,10 @@ static int CclDefineDecorations(lua_State *l)
 		int OffsetY;
 		int OffsetXPercent;
 		int OffsetYPercent;
-		char IsCenteredInX;
-		char IsCenteredInY;
-		char ShowIfNotEnable;
-		char ShowWhenNull;
-		char HideHalf;
-		char ShowWhenMax;
+		bool IsCenteredInX;
+		bool IsCenteredInY;
+		bool ShowIfNotEnable;
+		bool ShowWhenMax;
 		bool ShowOnlySelected;
 		bool HideNeutral;
 		bool HideAllied;
@@ -1417,10 +1415,6 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.IsCenteredInY = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowIfNotEnable")) {
 				tmp.ShowIfNotEnable = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "ShowWhenNull")) {
-				tmp.ShowWhenNull = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "HideHalf")) {
-				tmp.HideHalf = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowWhenMax")) {
 				tmp.ShowWhenMax = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "ShowOnlySelected")) {
@@ -1437,51 +1431,7 @@ static int CclDefineDecorations(lua_State *l)
 				lua_rawgeti(l, -2, 2); // Data
 				Assert(lua_istable(l, -1));
 				key = LuaToString(l, -2);
-				if (!strcmp(key, "bar")) {
-					CDecoVarBar *decovarbar = new CDecoVarBar;
-					lua_pushnil(l);
-					while (lua_next(l, -2)) {
-						key = LuaToString(l, -2);
-						if (!strcmp(key, "Height")) {
-							decovarbar->Height = LuaToNumber(l, -1);
-						} else if (!strcmp(key, "Width")) {
-							decovarbar->Width = LuaToNumber(l, -1);
-						} else if (!strcmp(key, "Orientation")) {
-							key = LuaToString(l, -1);;
-							if (!strcmp(key, "horizontal")) {
-								decovarbar->IsVertical = 0;
-							} else if (!strcmp(key, "vertical")) {
-								decovarbar->IsVertical = 1;
-							} else { // Error
-								LuaError(l, "invalid Orientation '%s' for bar in DefineDecorations" _C_ key);
-							}
-						} else if (!strcmp(key, "SEToNW")) {
-							decovarbar->SEToNW = LuaToBoolean(l, -1);
-						} else if (!strcmp(key, "BorderSize")) {
-							decovarbar->BorderSize = LuaToNumber(l, -1);
-						} else if (!strcmp(key, "ShowFullBackground")) {
-							decovarbar->ShowFullBackground = LuaToBoolean(l, -1);
-#if 0 // FIXME Color configuration
-						} else if (!strcmp(key, "Color")) {
-							decovar->Color = // FIXME
-						} else if (!strcmp(key, "BColor")) {
-							decovar->BColor = // FIXME
-#endif
-						} else {
-							LuaError(l, "'%s' invalid for Method bar" _C_ key);
-						}
-						lua_pop(l, 1); // Pop value
-					}
-					decovar = decovarbar;
-				} else if (!strcmp(key, "text")) {
-					CDecoVarText *decovartext = new CDecoVarText;
-					lua_rawgeti(l, -1, 1);
-
-					decovartext->Font = CFont::Get(LuaToString(l, -1));
-					lua_pop(l, 1);
-// FIXME : More arguments ? color...
-					decovar = decovartext;
-				} else if (!strcmp(key, "sprite")) {
+				if (!strcmp(key, "sprite")) {
 					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
 					lua_rawgeti(l, -1, 1);
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1));
@@ -1492,14 +1442,6 @@ static int CclDefineDecorations(lua_State *l)
 					lua_pop(l, 1);
 					// FIXME : More arguments ?
 					decovar = decovarspritebar;
-				} else if (!strcmp(key, "static-sprite")) {
-					CDecoVarStaticSprite *decovarstaticsprite = new CDecoVarStaticSprite;
-					lua_rawgeti(l, -1, 1); // sprite
-					lua_rawgeti(l, -2, 2); // frame
-					decovarstaticsprite->NSprite = GetSpriteIndex(LuaToString(l, -2));
-					decovarstaticsprite->n = LuaToNumber(l, -1);
-					lua_pop(l, 2);
-					decovar = decovarstaticsprite;
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
 				}
@@ -1517,8 +1459,6 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->IsCenteredInX = tmp.IsCenteredInX;
 		decovar->IsCenteredInY = tmp.IsCenteredInY;
 		decovar->ShowIfNotEnable = tmp.ShowIfNotEnable;
-		decovar->ShowWhenNull = tmp.ShowWhenNull;
-		decovar->HideHalf = tmp.HideHalf;
 		decovar->ShowWhenMax = tmp.ShowWhenMax;
 		decovar->ShowOnlySelected = tmp.ShowOnlySelected;
 		decovar->HideNeutral = tmp.HideNeutral;
