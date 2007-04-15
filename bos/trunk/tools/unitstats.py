@@ -139,7 +139,8 @@ def parseAllScripts():
 
 def generateStatsFile(units):
     rawcsvfile = file('unitstats.csv', 'wb')
-    statsfile = csv.DictWriter(rawcsvfile, importantkeys, extrasaction='ignore')
+    statsfile = csv.DictWriter(rawcsvfile, importantkeys, extrasaction='ignore',
+                               delimiter=';', quotechar="'")
     title = {}
     for i in importantkeys:
         title[i]=i
@@ -155,19 +156,21 @@ def regenerateScripts(scripts):
 
 def readUnitStats():
     rawcsvfile = file('unitstats.csv', 'rb')
-    stats = csv.DictReader(rawcsvfile)
+    stats = csv.DictReader(rawcsvfile, delimiter=';', quotechar="'")
     newstats = {}
     for r in stats:
         newstats[r['Name']] = r
     return newstats
 def updateUnitStats(units):
     stats = readUnitStats()
+    print stats
     for unit in units:
         name = unit.stats['Name']
-        if stats.has_key('Name'):
+        print name, stats[name]
+        if stats.has_key(name):
             up = stats[name]
             for k in up.keys():
-                if unit.stats.has_key(k):
+                if unit.stats.has_key(k) and k != 'Name':
                     unit.stats[k] = up[k]
 
 Usage = """
@@ -178,6 +181,9 @@ Usage = """
         csv
         regenerate
         update
+    
+    When updating, the unitstats.csv file should use the semicolon (;) as
+    delimiter and single quote (') as string quote.
 """
 def printUsage(args):
     print Usage % args[0]
@@ -194,6 +200,10 @@ def main(args):
     elif args[1] == 'update':
         updateUnitStats(units)
         regenerateScripts(scripts)
+    elif args[1] == 'tupdate':
+        updateUnitStats([units[0]])
+        regenerateScripts(scripts)
+        print units[0]
     else:
         printUsage(args)
         return
