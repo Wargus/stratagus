@@ -66,8 +66,10 @@ local ai_funcs = {
   function() AiDebug(false) return false end,
   function() return AiSleep(AiGetSleepCycles()) end,
   function() return AiNeed("unit-magmapump") end,
-  function() return AiSet("unit-engineer", 10) end,
+  function() return AiNeed("unit-powerplant") end,
   function() return AiWait("unit-magmapump") end,
+  function() return AiWait("unit-powerplant") end,
+  function() return AiSet("unit-engineer", 10) end,
   function() return AiNeed("unit-vault") end,
   function() return AiWait("unit-vault") end,
 
