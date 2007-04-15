@@ -95,8 +95,6 @@ void UpdateStats(int reset)
 {
 	CUnitType *type;
 	CUnitStats *stats;
-	int player;
-	unsigned i;
 
 	//
 	//  Update players stats
@@ -105,12 +103,12 @@ void UpdateStats(int reset)
 		type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
-			for (player = 0; player < PlayerMax; ++player) {
+			for (int player = 0; player < PlayerMax; ++player) {
 				stats = &type->Stats[player];
 				if (!stats->Variables) {
 					stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
 				}
-				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
+				for (int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 					stats->Variables[i] = type->Variable[i];
 				}
 			}
