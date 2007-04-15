@@ -325,95 +325,6 @@ void CleanDecorations(void)
 }
 
 /**
-**  Draw bar for variables.
-**
-**  @param x       X screen pixel position
-**  @param y       Y screen pixel position
-**  @param unit    Unit pointer
-**  @todo fix color configuration.
-*/
-void CDecoVarBar::Draw(int x, int y, const CUnit *unit) const
-{
-	int height;
-	int width;
-	int h;
-	int w;
-	char b;        // BorderSize.
-	Uint32 bcolor; // Border color.
-	Uint32 color;  // inseide color.
-	int f;         // 100 * value / max.
-
-	Assert(unit);
-	Assert(unit->Type);
-	Assert(unit->Variable[this->Index].Max);
-	height = this->Height;
-	if (height == 0) { // Default value
-		height = unit->Type->BoxHeight; // Better size ? {,Box, Tile}
-	}
-	width = this->Width;
-	if (width == 0) { // Default value
-		width = unit->Type->BoxWidth; // Better size ? {,Box, Tile}
-	}
-	if (this->IsVertical)  { // Vertical
-		w = width;
-		h = unit->Variable[this->Index].Value * height / unit->Variable[this->Index].Max;
-	} else {
-		w = unit->Variable[this->Index].Value * width / unit->Variable[this->Index].Max;
-		h = height;
-	}
-
-	if (this->IsCenteredInX) {
-		x -= w / 2;
-	}
-	if (this->IsCenteredInY) {
-		y -= h / 2;
-	}
-
-	b = this->BorderSize;
-	// Could depend of (value / max)
-	f = unit->Variable[this->Index].Value * 100 / unit->Variable[this->Index].Max;
-	bcolor = ColorBlack; // Deco->Data.Bar.BColor
-	color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);
-	// Deco->Data.Bar.Color
-	if (b) {
-		if (this->ShowFullBackground) {
-			Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + width, 2 * b + height);
-		} else {
-			if (this->SEToNW) {
-				Video.FillRectangleClip(bcolor, x - b - w + width, y - b - h + height,
-					2 * b + w, 2 * b + h);
-			} else {
-				Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + w, 2 * b + h);
-			}
-		}
-	}
-	if (this->SEToNW) {
-		Video.FillRectangleClip(color, x - w + width, y - h + height, w, h);
-	} else {
-		Video.FillRectangleClip(color, x, y, w, h);
-	}
-}
-
-/**
-**  Print variable values (and max....).
-**
-**  @param x       X screen pixel position
-**  @param y       Y screen pixel position
-**  @param unit    Unit pointer
-**  @todo fix font/color configuration.
-*/
-void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
-{
-	if (this->IsCenteredInX) {
-		x -= 2; // GameFont->Width(buf) / 2, with buf = str(Value)
-	}
-	if (this->IsCenteredInY) {
-		y -= this->Font->Height() / 2;
-	}
-	VideoDrawNumberClip(x, y, this->Font, unit->Variable[this->Index].Value);
-}
-
-/**
 **  Draw a sprite with is like a bar (several stages)
 **
 **  @param x       X screen pixel position
@@ -424,7 +335,7 @@ void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
 void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 {
 	int n;                   // frame of the sprite to show.
-	CGraphic *sprite;         // the sprite to show.
+	CGraphic *sprite;        // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
 
 	Assert(unit);
@@ -446,33 +357,6 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 		y -= sprite->Height / 2;
 	}
 	sprite->DrawFrameClip(n, x, y);
-}
-
-/**
-**  Draw a static sprite.
-**
-**  @param x       X screen pixel position
-**  @param y       Y screen pixel position
-**  @param unit    Unit pointer
-**
-**  @todo fix sprite configuration configuration.
-*/
-void CDecoVarStaticSprite::Draw(int x, int y, const CUnit *unit) const
-{
-	CGraphic *sprite;         // the sprite to show.
-	Decoration *decosprite;  // Info on the sprite.
-
-	decosprite = &DecoSprite.SpriteArray[(int)this->NSprite];
-	sprite = decosprite->Sprite;
-	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
-	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
-	if (this->IsCenteredInX) {
-		x -= sprite->Width / 2;
-	}
-	if (this->IsCenteredInY) {
-		y -= sprite->Height / 2;
-	}
-	sprite->DrawFrameClip(this->n, x, y);
 }
 
 
@@ -499,7 +383,7 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 	UpdateUnitVariables(unit);
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
-		i < UnitTypeVar.DecoVar.end(); ++i) {
+			i < UnitTypeVar.DecoVar.end(); ++i) {
 		int value;
 		int max;
 
@@ -507,8 +391,7 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 		max = unit->Variable[(*i)->Index].Max;
 		Assert(value <= max);
 
-		if (!((value == 0 && !(*i)->ShowWhenNull) || (value == max && !(*i)->ShowWhenMax) ||
-				((*i)->HideHalf && value != 0 && value != max) ||
+		if (!((value == max && !(*i)->ShowWhenMax) ||
 				(!(*i)->ShowIfNotEnable && !unit->Variable[(*i)->Index].Enable) ||
 				((*i)->ShowOnlySelected && !unit->Selected) ||
 				(unit->Player->Type == PlayerNeutral && (*i)->HideNeutral) ||
