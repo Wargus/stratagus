@@ -662,7 +662,7 @@ static void AiCheckRepair(void)
 	n = AiPlayer->Player->TotalNumUnits;
 	k = 0;
 	// Selector for next unit
-	for (i = n - 1; i; --i) {
+	for (i = n - 1; i >= 0; --i) {
 		unit = AiPlayer->Player->Units[i];
 		if (UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
 			k = i + 1;
