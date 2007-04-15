@@ -92,7 +92,8 @@ DefineUnitType("unit-magmapump", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     ProductionRate = {"magma", 5},
-    BuildingRules = {{"ontop", {Type = "unit-hotspot"}}},
+    BuildingRules = {{"ontop",
+    {Type = "unit-hotspot"}}},
     Sounds = {
         "selected", "magmapump-selected",
         "ready", "magmapump-ready",
