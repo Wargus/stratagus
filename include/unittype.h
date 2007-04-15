@@ -478,9 +478,7 @@ class CUnitType;
 
 
 /**
-**  Decoration for userdefined variable.
-**
-**    It is used to show variables graphicly.
+**  Decoration for user defined variable.
 */
 class CDecoVar {
 public:
@@ -499,46 +497,16 @@ public:
 	int OffsetXPercent;         /// Percent offset (TileWidth) in X coord.
 	int OffsetYPercent;         /// Percent offset (TileHeight) in Y coord.
 
-	char IsCenteredInX;         /// if true, use center of deco instead of left border
-	char IsCenteredInY;         /// if true, use center of deco instead of upper border
+	bool IsCenteredInX;         /// if true, use center of deco instead of left border
+	bool IsCenteredInY;         /// if true, use center of deco instead of upper border
 
-	char ShowIfNotEnable;       /// if false, Show only if var is enable
-	char ShowWhenNull;          /// if false, don't show if var is null (F.E poison)
-	char HideHalf;              /// if true, don't show when 0 < var < max.
-	char ShowWhenMax;           /// if false, don't show if var is to max. (Like mana)
+	bool ShowIfNotEnable;       /// if false, Show only if var is enable
+	bool ShowWhenMax;           /// if false, don't show if var is to max. (Like mana)
 	bool ShowOnlySelected;      /// if true, show only for selected units.
 
 	bool HideNeutral;           /// if true, don't show for neutral unit.
 	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent;          /// if true, show for opponent unit.
-};
-
-class CDecoVarBar : public CDecoVar
-{
-public:
-	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnit *unit) const;
-
-	char IsVertical;            /// if true, vertical bar, else horizontal.
-	char SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
-	int Height;                 /// Height of the bar.
-	int Width;                  /// Width of the bar.
-	char ShowFullBackground;    /// if true, show background like value equal to max.
-	char BorderSize;            /// Size of the border, 0 for no border.
-// FIXME color depend of percent (red, Orange, Yellow, Green...)
-	Uint32 Color;               /// Color of bar.
-	Uint32 BColor;              /// Color of background.
-};
-
-class CDecoVarText : public CDecoVar
-{
-public:
-	CDecoVarText() : Font(NULL) {};
-	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnit *unit) const;
-
-	CFont *Font;                   /// Font to use to display value.
-// FIXME : Add Color, format
 };
 
 /// Sprite contains frame from full (left)to empty state (right).
@@ -551,19 +519,6 @@ public:
 
 	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 // FIXME Sprite info. better way ?
-};
-
-/// use to show specific frame in a sprite.
-class CDecoVarStaticSprite : public CDecoVar
-{
-public:
-	CDecoVarStaticSprite() : NSprite(-1), n(0) {}
-	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnit *unit) const;
-
-// FIXME Sprite info. and Replace n with more appropriate var.
-	char NSprite;               /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
-	int n;                      /// identifiant in SpellSprite
 };
 
 typedef enum {
