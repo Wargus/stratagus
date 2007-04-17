@@ -465,7 +465,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 */
 static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 {
-	char unit_ident[128];
+	std::string unit_ident;
 	int z;
 	ButtonAction *res;
 	bool allow;         // button is available for at least 1 unit.
@@ -476,7 +476,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 	}
 
 	// FIXME: hardcoded race name
-	sprintf(unit_ident,	",elites-group,");
+	unit_ident = ",elites-group,";
 
 	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
@@ -520,7 +520,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 {
 	int allow;
-	char unit_ident[128];
+	std::string unit_ident;
 	ButtonAction *buttonaction;
 	ButtonAction *res;
 	int z;
@@ -537,9 +537,9 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 	//
 	if (unit->Orders[0]->Action == UnitActionBuilt) {
 		// Trick 17 to get the cancel-build button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
+		unit_ident = ",cancel-build,";
 	} else {
-		sprintf(unit_ident, ",%s,", unit->Type->Ident.c_str());
+		unit_ident = "," + unit->Type->Ident + ",";
 	}
 
 	for (z = 0; z < (int)UnitButtonTable.size(); ++z) {
