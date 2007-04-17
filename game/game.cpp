@@ -51,7 +51,6 @@
 #include "font.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "depend.h"
 #include "interface.h"
 #include "cursor.h"
 #include "spells.h"
@@ -650,11 +649,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	//
 	DebugPlayers();
 	PlayersInitAi();
-
-	//
-	// Dependencies
-	//
-	InitDependencies();
 
 	//
 	// Buttons (botpanel)

@@ -49,7 +49,6 @@
 #include "ui.h"
 #include "player.h"
 #include "spells.h"
-#include "depend.h"
 #include "sound.h"
 #include "map.h"
 #include "commands.h"
@@ -434,7 +433,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			break;
 		case ButtonTrain:
 		case ButtonBuild:
-			res = CheckDependByIdent(unit->Player, buttonaction->ValueStr);
+			res = true;
 			break;
 		case ButtonSpellCast:
 			res = SpellIsAvailable(unit->Player, buttonaction->Value);

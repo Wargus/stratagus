@@ -42,7 +42,6 @@
 #include "construct.h"
 #include "unittype.h"
 #include "upgrade.h"
-#include "depend.h"
 #include "interface.h"
 #include "missile.h"
 #include "tileset.h"
@@ -94,7 +93,6 @@ void CleanModules(void)
 	CleanUnits();
 	CleanSelections();
 	CleanGroups();
-	CleanDependencies();
 	CleanButtons();
 	CleanMissileTypes();
 	CleanMissiles();
@@ -136,7 +134,6 @@ void InitModules(void)
 	InitSelections();
 	InitGroups();
 	InitSpells();
-	InitDependencies();
 
 	InitButtons();
 	InitTriggers();

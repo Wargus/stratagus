@@ -2878,28 +2878,6 @@
 					Name="unit"
 					>
 					<File
-						RelativePath="unit\depend.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-					</File>
-					<File
 						RelativePath="unit\script_unit.cpp"
 						>
 						<FileConfiguration
@@ -3329,10 +3307,6 @@
 				</File>
 				<File
 					RelativePath="include\cursor.h"
-					>
-				</File>
-				<File
-					RelativePath="include\depend.h"
 					>
 				</File>
 				<File
