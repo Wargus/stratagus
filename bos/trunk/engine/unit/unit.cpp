@@ -2543,18 +2543,22 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 /**
 **  Check if a unit should be removed from UnitsConsumingResources
 */
-void UnitRemoveConsumingResources(CUnit *unit)
+bool UnitRemoveConsumingResources(CUnit *unit)
 {
 	if ((unit->Orders[0]->Action == UnitActionBuild && !unit->Type->BuilderOutside && unit->SubAction == 40) ||
 			(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20)) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
+		return true;
 	} else if (unit->Orders[0]->Action == UnitActionResource && unit->SubAction >= 55) {
 		for (int u = 0; u < MaxCosts; ++u) {
 			unit->Player->ProductionRate[u] -= unit->Data.Harvest.CurrentProduction[u];
 		}
+		return true;
 	} else if (unit->Orders[0]->Action == UnitActionTrain && unit->SubAction != 0) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
+		return true;
 	}
+	return false;
 }
 
 /**
@@ -2602,12 +2606,13 @@ void LetUnitDie(CUnit *unit)
 		unit->Goal = NULL;
 	}
 
-	UnitRemoveConsumingResources(unit);
-	for (int u = 0; u < MaxCosts; ++u) {
-		unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u];
-		unit->Player->StorageCapacity[u] -= unit->Type->StorageCapacity[u];
-		if (unit->Player->StoredResources[u] > unit->Player->StorageCapacity[u]) {
-			unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
+	if (UnitRemoveConsumingResources(unit)) {
+		for (int u = 0; u < MaxCosts; ++u) {
+			unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u];
+			unit->Player->StorageCapacity[u] -= unit->Type->StorageCapacity[u];
+			if (unit->Player->StoredResources[u] > unit->Player->StorageCapacity[u]) {
+				unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
+			}
 		}
 	}
 

@@ -873,7 +873,7 @@ extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	/// @todo more docu
 extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
 	/// Check if a unit should be removed from UnitsConsumingResources
-extern void UnitRemoveConsumingResources(CUnit *unit);
+extern bool UnitRemoveConsumingResources(CUnit *unit);
 
 	/// Let a unit die
 extern void LetUnitDie(CUnit *unit);
