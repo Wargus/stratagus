@@ -1225,28 +1225,22 @@ static int CclDefineButton(lua_State *l)
 		} else if (!strcmp(value, "AllowArg")) {
 			int subargs;
 			int k;
+			std::string allowstr;
 
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			s1 = new_strdup("");
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
-				int news1len = strlen(s1) + strlen(s2) + 2;
-				char *news1 = new char[news1len];
-				strcpy_s(news1, news1len, s1);
-				strcat_s(news1, news1len, s2);
-				delete[] s1;
-				s1 = news1;
+				allowstr += s1;
 				if (k != subargs - 1) {
-					strcat_s(s1, news1len, ",");
+					allowstr += ",";
 				}
 			}
-			ba.AllowStr = s1;
-			delete[] s1;
+			ba.AllowStr = allowstr;
 		} else if (!strcmp(value, "Key")) {
 			ba.Key = *LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
@@ -1254,28 +1248,23 @@ static int CclDefineButton(lua_State *l)
 		} else if (!strcmp(value, "ForUnit")) {
 			int subargs;
 			int k;
+			std::string umask;
 
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			// FIXME: ba.UnitMask shouldn't be a string
-			s1 = new_strdup(",");
+			umask = ",";
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
-				int news1len = strlen(s1) + strlen(s2) + 2;
-				char *news1 = new char[news1len];
-				strcpy_s(news1, news1len, s1);
-				strcat_s(news1, news1len, s2);
-				strcat_s(news1, news1len, ",");
-				delete[] s1;
-				s1 = news1;
+				umask += s2;
+				umask += ",";
 			}
-			ba.UnitMask = s1;
-			delete[] s1;
-			if (!strncmp(ba.UnitMask.c_str(), ",*,", 3)) {
+			ba.UnitMask = umask;
+			if (ba.UnitMask.compare(0, 3, ",*,") == 0) {
 				ba.UnitMask = "*";
 			}
 		} else {

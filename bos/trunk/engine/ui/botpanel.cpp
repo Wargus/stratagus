@@ -95,7 +95,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
 	const std::string &allow, int key, const std::string &hint, const std::string &umask)
 {
-	char buf[2048];
+	std::string buf;
 	ButtonAction *ba;
 
 	ba = new ButtonAction;
@@ -140,14 +140,9 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	ba->Hint = hint;
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
-	if (umask[0] == '*') {
-		strcpy_s(buf, sizeof(buf), umask.c_str());
-	} else {
-		sprintf(buf, ",%s,", umask.c_str());
-	}
-	ba->UnitMask = buf;
+	ba->UnitMask = umask;
 	UnitButtonTable.push_back(ba);
-	// FIXME: check if already initited
+	// FIXME: check if already initialized
 	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end
 	return 1;
 }
@@ -490,7 +485,7 @@ static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 
 		// any unit or unit in list
 		if (UnitButtonTable[z]->UnitMask[0] != '*' &&
-				!strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
+				UnitButtonTable[z]->UnitMask.find(unit_ident) == std::string::npos) {
 			continue;
 		}
 		allow = true;
@@ -560,7 +555,7 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 
 		// any unit or unit in list
 		if (buttonaction->UnitMask[0] != '*' &&
-				!strstr(buttonaction->UnitMask.c_str(), unit_ident)) {
+				buttonaction->UnitMask.find(unit_ident) == std::string::npos) {
 			continue;
 		}
 		allow = IsButtonAllowed(unit, buttonaction);
