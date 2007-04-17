@@ -2157,6 +2157,10 @@ void EditorMainLoop(void)
 */
 void StartEditor(const char *filename)
 {
+	std::string nc, rc;
+
+	GetDefaultTextColors(nc, rc);
+
 	if (filename) {
 		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
 			filename = NULL;
@@ -2183,6 +2187,8 @@ void StartEditor(const char *filename)
 	CleanPlayers();
 	CleanEditResource();
 	CleanEditAi();
+
+	SetDefaultTextColors(nc, rc);
 }
 
 //@}

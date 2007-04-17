@@ -1876,9 +1876,9 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 	int distance = 0;
 
 	if (this->DistanceType == LessThanEqual ||
-		this->DistanceType == GreaterThan ||
-		this->DistanceType == Equal ||
-		this->DistanceType == NotEqual) {
+			this->DistanceType == GreaterThan ||
+			this->DistanceType == Equal ||
+			this->DistanceType == NotEqual) {
 		x1 = x - this->Distance > 0 ? x - this->Distance : 0;
 		y1 = y - this->Distance > 0 ? y - this->Distance : 0;
 		x2 = x + type->TileWidth + this->Distance < Map.Info.MapWidth ?
@@ -1954,7 +1954,7 @@ bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&
 		n = UnitCacheOnTile(x1, y1, table);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type == this->Parent &&
-				table[i]->X == x1 && table[i]->Y == y1) {
+					table[i]->X == x1 && table[i]->Y == y1) {
 				return true;
 			}
 		}
@@ -1973,10 +1973,10 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 	n = UnitCacheOnTile(x, y, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type == this->Parent &&
-			table[i]->X == x && table[i]->Y == y &&
-			table[i]->Orders[0]->Action != UnitActionBuilt &&
-			!table[i]->Destroyed &&
-			table[i]->Orders[0]->Action != UnitActionDie) {
+				table[i]->X == x && table[i]->Y == y &&
+				table[i]->Orders[0]->Action != UnitActionBuilt &&
+				!table[i]->Destroyed &&
+				table[i]->Orders[0]->Action != UnitActionDie) {
 			ontoptarget = table[i];
 			return true;
 		}
