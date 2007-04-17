@@ -48,7 +48,6 @@
 #include "iolib.h"
 #include "script.h"
 #include "missile.h"
-#include "depend.h"
 #include "upgrade.h"
 #include "construct.h"
 #include "unit.h"
@@ -2380,7 +2379,6 @@ void InitCcl(void)
 	DecorationCclRegister();
 	UnitTypeCclRegister();
 	UpgradesCclRegister();
-	DependenciesCclRegister();
 	SelectionCclRegister();
 	GroupCclRegister();
 	UnitCclRegister();

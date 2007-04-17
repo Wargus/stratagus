@@ -45,7 +45,6 @@
 
 #include "upgrade.h"
 #include "player.h"
-#include "depend.h"
 #include "interface.h"
 #include "map.h"
 #include "script.h"
