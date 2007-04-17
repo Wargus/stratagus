@@ -43,7 +43,6 @@
 #include "ai_local.h"
 #include "actions.h"
 #include "map.h"
-#include "depend.h"
 #include "pathfinder.h"
 #include "player.h"
 
@@ -149,18 +148,7 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType *unittype, int *usableTypes)
 	// 1 - Find equivalents
 	usableTypesCount = AiFindUnitTypeEquiv(unittype,  usableTypes);
 
-	// 2 - Remove unavailable unittypes
-	for (i = 0; i < usableTypesCount; ) {
-		if (!CheckDependByIdent(AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
-			// Not available, remove it
-			usableTypes[i] = usableTypes[usableTypesCount - 1];
-			--usableTypesCount;
-		} else {
-			++i;
-		}
-	}
-
-	// 3 - Sort by level
+	// 2 - Sort by level
 	playerid = AiPlayer->Player->Index;
 
 	// We won't have usableTypesCount>4, so simple sort should do it

@@ -47,7 +47,6 @@
 #include "unittype.h"
 #include "unit.h"
 #include "upgrade.h"
-#include "depend.h"
 #include "interface.h"
 #include "missile.h"
 #include "tileset.h"
