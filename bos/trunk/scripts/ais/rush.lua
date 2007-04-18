@@ -49,6 +49,7 @@ end
 function InitAiScripts_rush()
   ai_pos      = {1, 1, 1, 1, 1, 1, 1, 1}
   ai_loop_pos = {1, 1, 1, 1, 1, 1, 1, 1}
+  hotspotexists = nil
 end
 
 local ai_loop_funcs = {
@@ -62,12 +63,31 @@ local ai_loop_funcs = {
   function() ai_loop_pos[player] = 0; return false end,
 }
 
+local function HotSpotExists()
+  if (hotspotexists == nil) then
+    local hotspot = UnitTypeByIdent("unit-hotspot")
+    local count = Players[7].UnitTypesCount[hotspot.Slot]
+    hotspotexists = (count ~= 0)
+  end
+  return hotspotexists
+end
+
 local ai_funcs = {
   function() AiDebug(false) return false end,
   function() return AiSleep(AiGetSleepCycles()) end,
-  function() return AiNeed("unit-magmapump") end,
+  function()
+    if (HotSpotExists()) then
+      AiNeed("unit-magmapump")
+    end
+    return false
+  end,
   function() return AiNeed("unit-powerplant") end,
-  function() return AiWait("unit-magmapump") end,
+  function()
+    if (HotSpotExists()) then
+      return AiWait("unit-magmapump")
+    end
+    return false
+  end,
   function() return AiWait("unit-powerplant") end,
   function() return AiSet("unit-engineer", 10) end,
   function() return AiNeed("unit-vault") end,
