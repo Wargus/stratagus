@@ -48,13 +48,13 @@ campaign_steps = {
       "for our base.\n"..
       "-- End of transmission 2. Sergeant TJ --"),
   CreateMapStep("campaigns/tutorial/level03.smp", 
-      "Harvest 200 crystals and 100 titanium",
+      "Harvest 200 energy and 100 magma",
       "News from the Front:\n\n"..
       "The abandoned vault has few resources left. "..
       "For the extension of the base, we need 200 "..
-      "more crystals and 100 titanium. "..
+      "more energy and 100 magma. "..
       "Our engineer detected large amounts of "..
-      "titanium in the rocks.\n".. 
+      "magma in the rocks.\n".. 
       "-- End of transmission. Sergeant TJ --"),
 
 }

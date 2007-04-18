@@ -35,8 +35,8 @@ unit= CreateUnit("unit-buggy", 0, {23, 44})
 unit= CreateUnit("unit-engineer", 0, {25, 44})
 
 DisallowAllUnits()
-DefineAllow("unit-engineer", "AAAAAAAAAAAA")
-DefineAllow("unit-gen", "AAAAAAAAAAAA")
+DefineAllow("unit-engineer", "AAAAAAAA")
+DefineAllow("unit-powerplant", "AAAAAAAA")
 
 function GetOwnUnitsAmount(type)
    return GetPlayerData(GetThisPlayer(), "UnitTypesCount", type)
@@ -48,7 +48,7 @@ AddTrigger(
 AddTrigger(
     function() 
        local e = GetOwnUnitsAmount("unit-engineer")
-       local g = GetOwnUnitsAmount("unit-gen")
+       local g = GetOwnUnitsAmount("unit-powerplant")
        return (e == 3 and g == 1) end,
     function() return StopGame(GameVictory) end)
 

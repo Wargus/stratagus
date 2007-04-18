@@ -9,7 +9,7 @@
 --
 --  level03.sms  -  Tutorial map 3.
 --
---  (c) Copyright 2006 by Francois Berteen
+--  (c) Copyright 2006-2007 by Francois Berteen
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@ CreateUnit("unit-engineer", 0, {21, 38})
 CreateUnit("unit-engineer", 0, {21, 39})
 
 DisallowAllUnits()
-DefineAllow("unit-engineer", "AAAAAAAAAAAA")
-DefineAllow("unit-gen", "AAAAAAAAAAAA")
+DefineAllow("unit-engineer", "AAAAAAAA")
+DefineAllow("unit-powerplant", "AAAAAAAA")
 
 AddTrigger(
     function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
@@ -46,13 +46,13 @@ AddTrigger(
 
 AddTrigger(
     function() 
-       local t = GetPlayerData(GetThisPlayer(), "Resources", "energy")
-       local c = GetPlayerData(GetThisPlayer(), "Resources", "magma")
-       return (t > 1099 and c > 2199) end,
+       local t = ThisPlayer.StoredResources[EnergyCost]
+       local c = ThisPlayer.StoredResources[MagmaCost]
+       return (t >= 1100 and c >= 2200) end,
     function() return StopGame(GameVictory) end)
   
 AddCampaignMessage(1,  
-  "To Harvest Titanium or Crystal, first select your engineer. Then, "..
+  "To harvest energy or magma, first select your engineer. Then, "..
   "start harvesting, either by right-clicking on the Titanium Spike, "..
   "or by selecting the pick-axe from the menu on the right and then "..
   "left-clicking on the target, or by typing 'h', and then left-clicking."
