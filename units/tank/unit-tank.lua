@@ -97,7 +97,7 @@ DefineUnitType("unit-tank", {
         }
 })
 
-DefineAllow("unit-tank", "AAAAAAAA")
+DefineAllow("unit-tank", AllowAll)
 
 DefineButton({
     Pos = 4, Level = 0, Icon = "icon-tank", Action = "train-unit",

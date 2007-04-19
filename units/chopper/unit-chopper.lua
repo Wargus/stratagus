@@ -99,7 +99,7 @@ DefineUnitType("unit-chopper", {
     }
 })
 
-DefineAllow("unit-chopper", "AAAAAAAA")
+DefineAllow("unit-chopper", AllowAll)
 
 DefineButton({
     Pos = 3, Level = 0, Icon = "icon-chopper", Action = "train-unit",

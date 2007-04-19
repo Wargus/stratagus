@@ -122,7 +122,7 @@ DefineUnitType("build-dead-vfac", {
     Vanishes = true
 })
 
-DefineAllow("unit-vfac", "AAAAAAAA")
+DefineAllow("unit-vfac", AllowAll)
 
 DefineButton({
     Pos = 3, Level = 2, Icon = "icon-vfac_b", Action = "build",

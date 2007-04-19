@@ -35,8 +35,8 @@ unit= CreateUnit("unit-buggy", 0, {23, 44})
 unit= CreateUnit("unit-engineer", 0, {25, 44})
 
 DisallowAllUnits()
-DefineAllow("unit-engineer", "AAAAAAAA")
-DefineAllow("unit-powerplant", "AAAAAAAA")
+DefineAllow("unit-engineer", AllowAll)
+DefineAllow("unit-powerplant", AllowAll)
 
 function GetOwnUnitsAmount(type)
    return GetPlayerData(GetThisPlayer(), "UnitTypesCount", type)

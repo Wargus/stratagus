@@ -77,7 +77,7 @@ DefineUnitType("unit-hotspot", {
     Sounds = {}
 })
 
-DefineAllow("unit-hotspot", "AAAAAAAA")
+DefineAllow("unit-hotspot", AllowAll)
 
 
 

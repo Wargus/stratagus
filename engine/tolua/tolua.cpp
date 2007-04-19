@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/13/07 21:43:32.
+** Generated automatically by tolua++-1.0.92 on 04/18/07 20:01:02.
 */
 
 #ifndef __cplusplus
@@ -15821,6 +15821,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"ScoreCost",ScoreCost);
   tolua_constant(tolua_S,"MaxResourceInfo",MaxResourceInfo);
   tolua_constant(tolua_S,"PlayerMax",PlayerMax);
+  tolua_constant(tolua_S,"PlayerNumNeutral",PlayerNumNeutral);
   tolua_constant(tolua_S,"UnitMax",UnitMax);
   tolua_constant(tolua_S,"NoButton",NoButton);
   tolua_constant(tolua_S,"LeftButton",LeftButton);

@@ -116,7 +116,7 @@ DefineUnitType("build-dead-devyard", {
     Sounds = {}
 })
 
-DefineAllow("unit-dev-yard", "AAAAAAAA")
+DefineAllow("unit-dev-yard", AllowAll)
 
 DefineButton({
     Pos = 7, Level = 2, Icon = "icon-dev_b", Action = "build",

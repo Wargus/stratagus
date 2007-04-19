@@ -116,7 +116,7 @@ DefineUnitType("radar_destroyed", {
     Vanishes = true
 })
 
-DefineAllow("unit-radar", "AAAAAAAA")
+DefineAllow("unit-radar", AllowAll)
 
 DefineButton({
     Pos = 4, Level = 1, Icon = "icon-radar_b", Action = "build",

@@ -123,7 +123,7 @@ DefineUnitType("build-dead-powerplant", {
     Vanishes = true
 })
 
-DefineAllow("unit-powerplant", "AAAAAAAA")
+DefineAllow("unit-powerplant", AllowAll)
 
 DefineButton({
     Pos = 6, Level = 1, Icon = "icon-powerplant_b", Action = "build",

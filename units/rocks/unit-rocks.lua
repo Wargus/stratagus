@@ -73,7 +73,7 @@ DefineIcon({
     Frame = 0,
     File = "units/rocks/rock_1i.png"})
 
-DefineAllow("unit-rock-1", "AAAAAAAA")
+DefineAllow("unit-rock-1", AllowAll)
 
 -- rock-2
 
@@ -109,7 +109,7 @@ DefineIcon({
     Frame = 0,
     File = "units/rocks/rock_2i.png"})
 
-DefineAllow("unit-rock-2", "AAAAAAAA")
+DefineAllow("unit-rock-2", AllowAll)
 
 -- rock-3
 
@@ -145,7 +145,7 @@ DefineIcon({
     Frame = 0,
     File = "units/rocks/rock_3i.png"})
 
-DefineAllow("unit-rock-3", "AAAAAAAA")
+DefineAllow("unit-rock-3", AllowAll)
 
 -- rock-4
 
@@ -181,7 +181,7 @@ DefineIcon({
     Frame = 0,
     File = "units/rocks/rock_4i.png"})
 
-DefineAllow("unit-rock-4", "AAAAAAAA")
+DefineAllow("unit-rock-4", AllowAll)
 
 -- rock-5
 
@@ -217,7 +217,7 @@ DefineIcon({
     Frame = 0,
     File = "units/rocks/rock_5i.png"})
 
-DefineAllow("unit-rock-5", "AAAAAAAA")
+DefineAllow("unit-rock-5", AllowAll)
 
 -- rock-6
 
@@ -253,6 +253,6 @@ DefineIcon({
     Frame = 0,
     File = "units/rocks/rock_6i.png"})
 
-DefineAllow("unit-rock-6", "AAAAAAAA")
+DefineAllow("unit-rock-6", AllowAll)
 
 

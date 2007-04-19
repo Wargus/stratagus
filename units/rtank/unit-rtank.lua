@@ -97,7 +97,7 @@ DefineUnitType("unit-rtank", {
         }
 })
 
-DefineAllow("unit-rtank", "AAAAAAAA")
+DefineAllow("unit-rtank", AllowAll)
 
 DefineButton({
     Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",

@@ -124,7 +124,7 @@ DefineUnitType("unit-medic", {
 })
 DefineHumanCorpse("medic")
 
-DefineAllow("unit-medic", "AAAAAAAA")
+DefineAllow("unit-medic", AllowAll)
 
 DefineButton({
         Pos = 1, Level = 0, Icon = "icon-medic",

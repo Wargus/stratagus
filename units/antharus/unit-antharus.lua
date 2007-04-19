@@ -74,7 +74,7 @@ DefineUnitType("unit-antharus", {
     Sounds = {}
 })
 
-DefineAllow("unit-antharus", "FFFFFFFF")
+DefineAllow("unit-antharus", ForbidAll)
 
 
 

@@ -129,7 +129,7 @@ DefineUnitType("build-dead-magmapump", {
 
 
 
-DefineAllow("unit-magmapump", "AAAAAAAA")
+DefineAllow("unit-magmapump", AllowAll)
 
 DefineButton({
     Pos = 2, Level = 1, Icon = "icon-magmapump_b", Action = "build",
