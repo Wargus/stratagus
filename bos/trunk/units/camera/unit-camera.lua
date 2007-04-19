@@ -127,7 +127,7 @@ DefineUnitType("camera_destroyed", {
     Vanishes = true
 })
 
-DefineAllow("unit-cam", "AAAAAAAA")
+DefineAllow("unit-cam", AllowAll)
 
 DefineButton({
     Pos = 5, Level = 1, Icon = "icon-cam_b", Action = "build",

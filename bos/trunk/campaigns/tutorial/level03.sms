@@ -37,8 +37,8 @@ CreateUnit("unit-engineer", 0, {21, 38})
 CreateUnit("unit-engineer", 0, {21, 39})
 
 DisallowAllUnits()
-DefineAllow("unit-engineer", "AAAAAAAA")
-DefineAllow("unit-powerplant", "AAAAAAAA")
+DefineAllow("unit-engineer", AllowAll)
+DefineAllow("unit-powerplant", AllowAll)
 
 AddTrigger(
     function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,

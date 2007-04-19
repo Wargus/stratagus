@@ -86,7 +86,7 @@ DefineUnitType("unit-dorcoz", {
     RightMouseAction = "attack"
 })
 
-DefineAllow("unit-dorcoz", "AAAAAAAA")
+DefineAllow("unit-dorcoz", AllowAll)
 
 DefineButton({
         Pos = 4, Level = 0, Icon = "icon-dorcoz",

@@ -39,7 +39,8 @@ $]
 #define MagmaCost 1
 #define ScoreCost MaxCosts
 #define MaxResourceInfo MaxCosts + 1
-#define PlayerMax 16
+#define PlayerMax 9
+#define PlayerNumNeutral (PlayerMax - 1)
 #define UnitMax 2048
 
 #define NoButton 0

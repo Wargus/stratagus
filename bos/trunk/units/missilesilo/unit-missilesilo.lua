@@ -113,7 +113,7 @@ DefineUnitType("build-dead-msilo", {
     Vanishes = true
 })
 
-DefineAllow("unit-msilo", "AAAAAAAA")
+DefineAllow("unit-msilo", AllowAll)
 
 DefineButton({
     Pos = 4, Level = 3, Icon = "icon-msilo_b", Action = "build",

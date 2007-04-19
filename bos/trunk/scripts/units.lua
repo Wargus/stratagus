@@ -31,6 +31,9 @@
 -- Load the animations for the units.
 Load("scripts/anim.lua")
 
+AllowAll = "AAAAAAAAA"
+ForbidAll = "FFFFFFFFF"
+
 AllowedUnits = {}
 
 local oldDefineAllow = DefineAllow
@@ -52,7 +55,7 @@ end
 
 function AllowAllUnits()
    for unit, default in pairs(AllowedUnits) do
-      DefineAllow(unit, "AAAAAAAA")
+      DefineAllow(unit, AllowAll)
    end
 end
 
@@ -154,11 +157,11 @@ DefineUnitType("unit-revealer", {
 	Priority = 0, DecayRate = 1, Type = "land",
 	Building = true, Revealer = true})
 
-DefineAllow("unit-dead-body", "AAAAAAAA")
-DefineAllow("unit-destroyed-1x1-place", "AAAAAAAA")
-DefineAllow("unit-destroyed-2x2-place", "AAAAAAAA")
-DefineAllow("unit-destroyed-3x3-place", "AAAAAAAA")
-DefineAllow("unit-destroyed-4x4-place", "AAAAAAAA")
+DefineAllow("unit-dead-body", AllowAll)
+DefineAllow("unit-destroyed-1x1-place", AllowAll)
+DefineAllow("unit-destroyed-2x2-place", AllowAll)
+DefineAllow("unit-destroyed-3x3-place", AllowAll)
+DefineAllow("unit-destroyed-4x4-place", AllowAll)
 
 -- Load production buildings
 Load("units/vault/vault.lua")

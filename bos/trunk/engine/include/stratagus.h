@@ -205,7 +205,7 @@ extern std::string NameLine;
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-#define PlayerMax    8                  /// How many players are supported
+#define PlayerMax    9                  /// How many players are supported
 #define UnitTypeMax  257                /// How many unit types supported
 #define UnitMax      2048               /// How many units supported
 

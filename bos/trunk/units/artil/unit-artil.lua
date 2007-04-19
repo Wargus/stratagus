@@ -104,7 +104,7 @@ DefineUnitType("unit-artil", {
         }
 })
 
-DefineAllow("unit-artil", "AAAAAAAA")
+DefineAllow("unit-artil", AllowAll)
 
 DefineCommonButtons({"unit-artil"})
 

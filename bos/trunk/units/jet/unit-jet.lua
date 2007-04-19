@@ -99,7 +99,7 @@ DefineUnitType("unit-jet", {
         }
 })
 
-DefineAllow("unit-jet", "AAAAAAAA")
+DefineAllow("unit-jet", AllowAll)
 
 
 DefineButton({

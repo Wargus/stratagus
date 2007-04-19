@@ -124,7 +124,7 @@ DefineUnitType("build-dead-camp", {
     Vanishes = true
 })
 
-DefineAllow("unit-camp", "AAAAAAAA")
+DefineAllow("unit-camp", AllowAll)
 
 DefineButton({
     Pos = 1, Level = 2, Icon = "icon-camp_b", Action = "build",

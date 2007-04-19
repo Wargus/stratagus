@@ -72,7 +72,7 @@ DefineIcon({
     Frame = 0,
     File = "units/morels/morel_1i.png"})
 
-DefineAllow("unit-morel-1", "AAAAAAAA")
+DefineAllow("unit-morel-1", AllowAll)
 
 -- morel-2
 
@@ -107,7 +107,7 @@ DefineIcon({
     Frame = 0,
     File = "units/morels/morel_2i.png"})
 
-DefineAllow("unit-morel-2", "AAAAAAAA")
+DefineAllow("unit-morel-2", AllowAll)
 
 -- morel-3
 
@@ -142,7 +142,7 @@ DefineIcon({
     Frame = 0,
     File = "units/morels/morel_3i.png"})
 
-DefineAllow("unit-morel-3", "AAAAAAAA")
+DefineAllow("unit-morel-3", AllowAll)
 
 -- morel-4
 
@@ -177,7 +177,7 @@ DefineIcon({
     Frame = 0,
     File = "units/morels/morel_4i.png"})
 
-DefineAllow("unit-morel-4", "AAAAAAAA")
+DefineAllow("unit-morel-4", AllowAll)
 
 -- morel-5
 
@@ -212,7 +212,7 @@ DefineIcon({
     Frame = 0,
     File = "units/morels/morel_5i.png"})
 
-DefineAllow("unit-morel-5", "AAAAAAAA")
+DefineAllow("unit-morel-5", AllowAll)
 
 -- morel-6
 
@@ -247,7 +247,7 @@ DefineIcon({
     Frame = 0,
     File = "units/morels/morel_6i.png"})
 
-DefineAllow("unit-morel-6", "AAAAAAAA")
+DefineAllow("unit-morel-6", AllowAll)
 
 -- morel-7
 
@@ -282,5 +282,5 @@ DefineIcon({
     Frame = 0,
     File = "units/morels/morel_7i.png"})
 
-DefineAllow("unit-morel-7", "AAAAAAAA")
+DefineAllow("unit-morel-7", AllowAll)
 
