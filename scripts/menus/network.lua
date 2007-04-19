@@ -79,18 +79,18 @@ function addPlayersList(menu, numplayers)
   local numplayers_text
 
   menu:writeLargeText(_("Players"), sx * 11, sy*3)
-  for i=1,7 do
+  for i=1,8 do
     players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
     players_state[i] = menu:writeText("Preparing", sx * 11 + 80, sy*4 + i*18)
   end
-  numplayers_text = menu:writeText("Open slots : " .. numplayers - 1, sx *11, sy*4 + 144)
+  numplayers_text = menu:writeText("Open slots : " .. numplayers - 1, sx *11, sy*4 + 162)
 
   local function updatePlayers()
     local connected_players = 0
     local ready_players = 0
     players_state[1]:setCaption("Creator")
     players_name[1]:setCaption(Hosts[0].PlyName)
-    for i=2,7 do
+    for i=2,8 do
       if Hosts[i-1].PlyName == "" then
         players_name[i]:setCaption("")
         players_state[i]:setCaption("")
