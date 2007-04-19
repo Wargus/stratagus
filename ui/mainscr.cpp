@@ -1113,7 +1113,6 @@ void DrawCosts(void)
 **  Set costs in status line.
 **
 **  @param mana   Mana costs.
-**  @param food   Food costs.
 **  @param costs  Resource costs, NULL pointer if all are zero.
 */
 void SetCosts(int mana, const int *costs)

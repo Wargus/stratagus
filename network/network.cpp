@@ -436,8 +436,8 @@ int CNetworkPacket::Deserialize(unsigned char *p, unsigned int len)
 /**
 **  Send message to all clients.
 **
-**  @param buf  Buffer of outgoing message.
-**  @param len  Buffer length.
+**  @param packet       Packet to send.
+**  @param numcommands  Number of commands.
 */
 static void NetworkBroadcast(const CNetworkPacket *packet, int numcommands)
 {
