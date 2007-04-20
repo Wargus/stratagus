@@ -114,8 +114,6 @@ SetFogOfWarOpacity(128)
 --	Define default resources
 -------------------------------------------------------------------------------
 
-DefineDefaultActions("mine", "harvest")
-
 DefineDefaultResourceNames("energy", "magma")
 
 DefineDefaultResourceAmounts("energy", 150, "magma", 150)

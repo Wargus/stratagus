@@ -69,11 +69,6 @@ std::vector<CUnitType *> UnitTypes;   /// unit-types definition
 std::map<std::string, CUnitType *> UnitTypeMap;
 
 /**
-**  Default action for the resources.
-*/
-std::string DefaultActions[MaxCosts];
-
-/**
 **  Default names for the resources.
 */
 std::string DefaultResourceNames[MaxCosts];
