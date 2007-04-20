@@ -421,21 +421,6 @@ void HandleActionBuilt(CUnit *unit)
 			}
 		}
 
-		if (unit->Type->CanHarvestFrom) {
-			// Set to 0 as it's part of a union
-			unit->Data.Resource.Active = 0;
-			int i;
-			for (i = 0; i < MaxCosts; ++i) {
-				if (unit->Type->StartingResources[i] != 0) {
-					break;
-				}
-			}
-			// Has StartingResources, use those
-			if (i != MaxCosts) {
-				memcpy(unit->ResourcesHeld, unit->Type->StartingResources, sizeof(unit->ResourcesHeld));
-			}
-		}
-
 		unit->Player->Notify(NotifyGreen, unit->X, unit->Y,
 			_("New %s done"), unit->Type->Name.c_str());
 		if (unit->Player == ThisPlayer) {

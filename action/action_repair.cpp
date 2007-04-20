@@ -182,36 +182,12 @@ static int AnimateActionRepair(CUnit *unit)
 */
 static bool DoRepair(CUnit *unit, CUnit *goal)
 {
-	CPlayer *player = unit->Player;
 	int *pcosts = goal->Type->ProductionCosts;
 	int pcost = pcosts[EnergyCost] ? pcosts[EnergyCost] : pcosts[MagmaCost];
 	bool healed = false;
 
 	if (goal->Orders[0]->Action != UnitActionBuilt) {
 		Assert(goal->Variable[HP_INDEX].Max);
-
-		//
-		// Check if enough resources are available
-		//
-		for (int i = 0; i < MaxCosts; ++i) {
-			if (goal->Type->ProductionCosts[i] != 0 && player->ProductionRate[i] == 0 &&
-					player->StoredResources[i] == 0) {
-				char buf[100];
-				snprintf(buf, sizeof(buf) - 1, _("We need more %s for repair!"),
-					DefaultResourceNames[i].c_str());
-				buf[sizeof(buf) - 1] = '\0';
-				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
-				if (player->AiEnabled) {
-					// FIXME: callback to AI?
-					goal->RefsDecrease();
-					unit->Orders[0]->Goal = NULL;
-					unit->ClearAction();
-					unit->State = 0;
-				}
-				// FIXME: We shouldn't animate if no resources are available.
-				return false;
-			}
-		}
 
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
 		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
