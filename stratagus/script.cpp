@@ -2162,26 +2162,6 @@ static int CclSetSpeeds(lua_State *l)
 }
 
 /**
-**  Define default action for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultActions(lua_State *l)
-{
-	int i;
-	int args;
-
-	for (i = 0; i < MaxCosts; ++i) {
-		DefaultActions[i].clear();
-	}
-	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultActions[i] = LuaToString(l, i + 1);
-	}
-	return 0;
-}
-
-/**
 **  Define default names for the resources.
 **
 **  @param l  Lua state.
@@ -2357,7 +2337,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
-	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);

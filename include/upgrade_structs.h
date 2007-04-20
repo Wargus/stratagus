@@ -92,11 +92,6 @@ extern int DefaultResourcesMedium[MaxCosts];
 extern int DefaultResourcesHigh[MaxCosts];
 
 /**
-**  Default action for the resources.
-*/
-extern std::string DefaultActions[MaxCosts];
-
-/**
 **  Default names for the resources.
 */
 extern std::string DefaultResourceNames[MaxCosts];
