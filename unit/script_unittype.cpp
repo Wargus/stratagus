@@ -340,70 +340,46 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
-		} else if (!strcmp(value, "ProductionRate")) {
-			if (!lua_istable(l, -1)) {
+		} else if (!strcmp(value, "EnergyValue")) {
+			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int res;
-
-				lua_rawgeti(l, -1, k + 1);
-				res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, -1, k + 1);
-				type->ProductionRate[res] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "MaxUtilizationRate")) {
-			if (!lua_istable(l, -1)) {
+			type->ProductionCosts[EnergyCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MagmaValue")) {
+			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int res;
-
-				lua_rawgeti(l, -1, k + 1);
-				res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, -1, k + 1);
-				type->MaxUtilizationRate[res] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "ProductionCosts")) {
-			if (!lua_istable(l, -1)) {
+			type->ProductionCosts[MagmaCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MaxEnergyUtilizationRate")) {
+			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int res;
-
-				lua_rawgeti(l, -1, k + 1);
-				res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, -1, k + 1);
-				type->ProductionCosts[res] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "StorageCapacity")) {
-			if (!lua_istable(l, -1)) {
+			type->MaxUtilizationRate[EnergyCost] = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MaxMagmaUtilizationRate")) {
+			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int res;
-
-				lua_rawgeti(l, -1, k + 1);
-				res = CclGetResourceByName(l);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, -1, k + 1);
-				type->StorageCapacity[res] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
-				lua_pop(l, 1);
+			type->MaxUtilizationRate[MagmaCost] = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "EnergyProductionRate")) {
+			if (!lua_isnumber(l, -1)) {
+				LuaError(l, "incorrect argument");
 			}
+			type->ProductionRate[EnergyCost] = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MagmaProductionRate")) {
+			if (!lua_isnumber(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			type->ProductionRate[MagmaCost] = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "EnergyStorageCapacity")) {
+			if (!lua_isnumber(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			type->StorageCapacity[EnergyCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MagmaStorageCapacity")) {
+			if (!lua_isnumber(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			type->StorageCapacity[MagmaCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
 			type->Construction = ConstructionByIdent(LuaToString(l, -1));
