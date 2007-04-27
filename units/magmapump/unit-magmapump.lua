@@ -69,7 +69,8 @@ DefineUnitType("unit-magmapump", {
     Shadow = {"file", GetCurrentLuaPath().."/magmapump_s.png", "size", {64, 64}},
     Animations = "animations-magmapump",
     Icon = "icon-magmapump",
-    ProductionCosts = {"energy", 250, "magma", 50},
+    EnergyValue = 250,
+    MagmaValue = 50,
     RepairHp = 2,
     Construction = "construction-magmapump",
     Speed = 0,
@@ -91,7 +92,7 @@ DefineUnitType("unit-magmapump", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
-    ProductionRate = {"magma", 5},
+    MagmaProductionRate = 5,
     BuildingRules = {{"ontop",
     {Type = "unit-hotspot"}}},
     Sounds = {

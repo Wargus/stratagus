@@ -86,6 +86,6 @@ for i = 1, 13 do
         Priority = 0, Corpse = "unit-destroyed-1x1-place",
         Type = "land", Building = true, VisibleUnderFog = true,
         CanHarvestFrom = true,
-        ProductionCosts = {"energy", 1000 * i}
+        EnergyValue = 1000 * i,
     })
 end

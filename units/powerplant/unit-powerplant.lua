@@ -68,7 +68,8 @@ DefineUnitType("unit-powerplant", {
     Shadow = {"file", GetCurrentLuaPath().."/powerplant_s.png", "size", {128, 128}},
     Animations = "animations-powerplant",
     Icon = "icon-powerplant",
-    ProductionCosts = {"energy", 300, "magma", 300},
+    EnergyValue = 300,
+    MagmaValue = 300,
     RepairHp = 2,
     Construction = "construction-powerplant",
     Speed = 0,
@@ -90,7 +91,7 @@ DefineUnitType("unit-powerplant", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
-    ProductionRate = {"energy", 50},
+    EnergyProductionRate = 50,
     Sounds = {
         "selected", "powerplant-selected",
         "ready", "powerplant-ready",

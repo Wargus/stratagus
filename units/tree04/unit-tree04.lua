@@ -42,7 +42,7 @@ DefineUnitType("unit-tree04", {
     Shadow = {"file", "units/tree04/tree04_s.png", "size", {128, 128}},
     Animations = "animations-tree04",
     Icon = "icon-tree",
-    ProductionCosts = {"energy", 5000},
+    EnergyValue = 5000,
     Construction = "construction-tree",
     Speed = 0,
     HitPoints = 50,
