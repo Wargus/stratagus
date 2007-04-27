@@ -23,9 +23,13 @@ import os
 import sys
 import csv
 
-importantkeys = ['Name', 'ProductionCosts', 'MaxUtilizationRate', 
-    'ProductionRate', 'HitPoints', 'SightRange', 'Armor', 'BasicDamage', 
-    'PiercingDamage', 'MaxAttackRange']
+importantkeys = ['Name', 
+                 'EnergyValue', 'MagmaValue',
+                 'MaxEnergyUtilizationRate', 'MaxMagmaUtilizationRate',
+                 'EnergyProductionRate', 'MagmaProductionRate',
+                 'EnergyStorageCapacity', 'MagmaStorageCapacity',
+                 'HitPoints', 'SightRange', 'Armor', 'BasicDamage', 
+                 'PiercingDamage', 'MaxAttackRange']
 
 def findunits():
     u = os.listdir('units')
