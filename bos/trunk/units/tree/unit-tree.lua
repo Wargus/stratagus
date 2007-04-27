@@ -54,7 +54,7 @@ DefineUnitType("unit-tree", {
     Animations = "animations-tree",
     Icon = "icon-tree",
     Construction = "construction-tree",
-    ProductionCosts = {"energy", 5000},
+    EnergyValue = 5000,
     Speed = 0,
     HitPoints = 50,
     DrawLevel = 25,
