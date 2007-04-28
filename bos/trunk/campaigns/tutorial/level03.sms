@@ -41,13 +41,13 @@ DefineAllow("unit-engineer", AllowAll)
 DefineAllow("unit-powerplant", AllowAll)
 
 AddTrigger(
-    function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
+    function() return ThisPlayer.TotalNumUnits == 0 end,
     function() return StopGame(GameDefeat) end)
 
 AddTrigger(
     function() 
-       local t = ThisPlayer.StoredResources[EnergyCost]
-       local c = ThisPlayer.StoredResources[MagmaCost]
+       local t = ThisPlayer.EnergyStored
+       local c = ThisPlayer.MagmaStored
        return (t >= 1100 and c >= 2200) end,
     function() return StopGame(GameVictory) end)
   
