@@ -258,10 +258,6 @@
 **
 **    Maximum units on board (for transporters), and resources
 **
-**  CUnitType::StartingResources
-**
-**    Amount of Resources a unit has when It's Built
-**
 **  CUnitType::CanHarvestFrom
 **
 **    Resource can be harvested from.
@@ -637,7 +633,6 @@ public:
 		FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
-		memset(StartingResources, 0, sizeof(StartingResources));
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
 		memset(ProductionRate, 0, sizeof(ProductionRate));
 		memset(MaxUtilizationRate, 0, sizeof(MaxUtilizationRate));
@@ -692,7 +687,6 @@ public:
 	char *AutoCastActive;           /// Default value for autocast.
 	char *CanTransport;             /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
-	int StartingResources[MaxCosts];/// Amount of starting resources
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval
 	int DecayRate;                  /// Decay rate in 1/6 seconds
