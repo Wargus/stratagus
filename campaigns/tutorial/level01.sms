@@ -36,7 +36,7 @@ unit= CreateUnit("unit-engineer", 0, {5, 59})
 
 DisallowAllUnits()
 AddTrigger(
-    function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
+    function() return ThisPlayer.TotalNumUnits == 0 end,
     function() return StopGame(GameDefeat) end)
 
 AddTrigger(
