@@ -280,6 +280,21 @@ public:
 	int StoredResources[MaxCosts];          /// Amount of resources in storage
 	int StorageCapacity[MaxCosts];          /// Storage capacity of resources
 
+	inline void SetEnergyProductionRate(int v) { ProductionRate[EnergyCost] = v; }
+	inline int GetEnergyProductionRate() { return ProductionRate[EnergyCost]; }
+	inline void SetMagmaProductionRate(int v) { ProductionRate[MagmaCost] = v; }
+	inline int GetMagmaProductionRate() { return ProductionRate[MagmaCost]; }
+
+	inline void SetEnergyStored(int v) { StoredResources[EnergyCost] = CYCLES_PER_SECOND * v; }
+	inline int GetEnergyStored() { return StoredResources[EnergyCost] / CYCLES_PER_SECOND; }
+	inline void SetMagmaStored(int v) { StoredResources[MagmaCost] = CYCLES_PER_SECOND * v; }
+	inline int GetMagmaStored() { return StoredResources[MagmaCost] / CYCLES_PER_SECOND; }
+
+	inline void SetEnergyStorageCapacity(int v) { StorageCapacity[EnergyCost] = CYCLES_PER_SECOND * v; }
+	inline int GetEnergyStorageCapacity() { return StorageCapacity[EnergyCost] / CYCLES_PER_SECOND; }
+	inline void SetMagmaStorageCapacity(int v) { StorageCapacity[MagmaCost] = CYCLES_PER_SECOND * v; }
+	inline int GetMagmaStorageCapacity() { return StorageCapacity[MagmaCost] / CYCLES_PER_SECOND; }
+
 	void AddToUnitsConsumingResources(CUnit *unit, int costs[MaxCosts]);
 	void RemoveFromUnitsConsumingResources(CUnit *unit);
 	void UpdateUnitsConsumingResources(CUnit *unit, int costs[MaxCosts]);

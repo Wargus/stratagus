@@ -344,42 +344,42 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->ProductionCosts[EnergyCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
+			type->SetEnergyValue(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "MagmaValue")) {
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->ProductionCosts[MagmaCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
+			type->SetMagmaValue(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "MaxEnergyUtilizationRate")) {
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->MaxUtilizationRate[EnergyCost] = LuaToNumber(l, -1);
+			type->SetMaxEnergyUtilizationRate(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "MaxMagmaUtilizationRate")) {
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->MaxUtilizationRate[MagmaCost] = LuaToNumber(l, -1);
+			type->SetMaxMagmaUtilizationRate(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "EnergyProductionRate")) {
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->ProductionRate[EnergyCost] = LuaToNumber(l, -1);
+			type->SetEnergyProductionRate(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "MagmaProductionRate")) {
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->ProductionRate[MagmaCost] = LuaToNumber(l, -1);
+			type->SetMagmaProductionRate(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "EnergyStorageCapacity")) {
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->StorageCapacity[EnergyCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
+			type->SetEnergyStorageCapacity(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "MagmaStorageCapacity")) {
 			if (!lua_isnumber(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			type->StorageCapacity[MagmaCost] = CYCLES_PER_SECOND * LuaToNumber(l, -1);
+			type->SetMagmaStorageCapacity(LuaToNumber(l, -1));
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
 			type->Construction = ConstructionByIdent(LuaToString(l, -1));
@@ -387,15 +387,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {
 			type->MaxOnBoard = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "StartingResources")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != MaxCosts) {
-				LuaError(l, "incorrect argument");
-			}
-			for (k = 0; k < MaxCosts; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				type->StartingResources[k] = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			}
 		} else if (!strcmp(value, "RegenerationRate")) {
 			type->Variable[HP_INDEX].Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnPercent")) {
