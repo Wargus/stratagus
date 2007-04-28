@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/18/07 20:01:02.
+** Generated automatically by tolua++-1.0.92 on 04/27/07 17:45:31.
 */
 
 #ifndef __cplusplus
@@ -13688,6 +13688,254 @@ static int tolua_set_CUnitType_MinAttackRange(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: MaxEnergyUtilizationRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_MaxEnergyUtilizationRate
+static int tolua_get_CUnitType_MaxEnergyUtilizationRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxEnergyUtilizationRate'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetMaxEnergyUtilizationRate());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MaxEnergyUtilizationRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_MaxEnergyUtilizationRate
+static int tolua_set_CUnitType_MaxEnergyUtilizationRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxEnergyUtilizationRate'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetMaxEnergyUtilizationRate(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MaxMagmaUtilizationRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_MaxMagmaUtilizationRate
+static int tolua_get_CUnitType_MaxMagmaUtilizationRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxMagmaUtilizationRate'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetMaxMagmaUtilizationRate());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MaxMagmaUtilizationRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_MaxMagmaUtilizationRate
+static int tolua_set_CUnitType_MaxMagmaUtilizationRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MaxMagmaUtilizationRate'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetMaxMagmaUtilizationRate(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EnergyProductionRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_EnergyProductionRate
+static int tolua_get_CUnitType_EnergyProductionRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EnergyProductionRate'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetEnergyProductionRate());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: EnergyProductionRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_EnergyProductionRate
+static int tolua_set_CUnitType_EnergyProductionRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EnergyProductionRate'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetEnergyProductionRate(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MagmaProductionRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_MagmaProductionRate
+static int tolua_get_CUnitType_MagmaProductionRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MagmaProductionRate'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetMagmaProductionRate());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MagmaProductionRate of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_MagmaProductionRate
+static int tolua_set_CUnitType_MagmaProductionRate(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MagmaProductionRate'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetMagmaProductionRate(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EnergyValue of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_EnergyValue
+static int tolua_get_CUnitType_EnergyValue(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EnergyValue'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetEnergyValue());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: EnergyValue of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_EnergyValue
+static int tolua_set_CUnitType_EnergyValue(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EnergyValue'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetEnergyValue(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MagmaValue of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_MagmaValue
+static int tolua_get_CUnitType_MagmaValue(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MagmaValue'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetMagmaValue());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MagmaValue of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_MagmaValue
+static int tolua_set_CUnitType_MagmaValue(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MagmaValue'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetMagmaValue(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EnergyStorageCapacity of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_EnergyStorageCapacity
+static int tolua_get_CUnitType_EnergyStorageCapacity(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EnergyStorageCapacity'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetEnergyStorageCapacity());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: EnergyStorageCapacity of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_EnergyStorageCapacity
+static int tolua_set_CUnitType_EnergyStorageCapacity(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'EnergyStorageCapacity'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetEnergyStorageCapacity(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MagmaStorageCapacity of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_MagmaStorageCapacity
+static int tolua_get_CUnitType_MagmaStorageCapacity(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MagmaStorageCapacity'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GetMagmaStorageCapacity());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MagmaStorageCapacity of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_MagmaStorageCapacity
+static int tolua_set_CUnitType_MagmaStorageCapacity(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MagmaStorageCapacity'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->SetMagmaStorageCapacity(((int)  tolua_tonumber(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: UnitTypeByIdent */
 #ifndef TOLUA_DISABLE_tolua_stratagus_UnitTypeByIdent00
 static int tolua_stratagus_UnitTypeByIdent00(lua_State* tolua_S)
@@ -16661,6 +16909,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Name",tolua_get_CUnitType_Name,tolua_set_CUnitType_Name);
    tolua_variable(tolua_S,"Slot",tolua_get_CUnitType_Slot,NULL);
    tolua_variable(tolua_S,"MinAttackRange",tolua_get_CUnitType_MinAttackRange,tolua_set_CUnitType_MinAttackRange);
+   tolua_variable(tolua_S,"MaxEnergyUtilizationRate",tolua_get_CUnitType_MaxEnergyUtilizationRate,tolua_set_CUnitType_MaxEnergyUtilizationRate);
+   tolua_variable(tolua_S,"MaxMagmaUtilizationRate",tolua_get_CUnitType_MaxMagmaUtilizationRate,tolua_set_CUnitType_MaxMagmaUtilizationRate);
+   tolua_variable(tolua_S,"EnergyProductionRate",tolua_get_CUnitType_EnergyProductionRate,tolua_set_CUnitType_EnergyProductionRate);
+   tolua_variable(tolua_S,"MagmaProductionRate",tolua_get_CUnitType_MagmaProductionRate,tolua_set_CUnitType_MagmaProductionRate);
+   tolua_variable(tolua_S,"EnergyValue",tolua_get_CUnitType_EnergyValue,tolua_set_CUnitType_EnergyValue);
+   tolua_variable(tolua_S,"MagmaValue",tolua_get_CUnitType_MagmaValue,tolua_set_CUnitType_MagmaValue);
+   tolua_variable(tolua_S,"EnergyStorageCapacity",tolua_get_CUnitType_EnergyStorageCapacity,tolua_set_CUnitType_EnergyStorageCapacity);
+   tolua_variable(tolua_S,"MagmaStorageCapacity",tolua_get_CUnitType_MagmaStorageCapacity,tolua_set_CUnitType_MagmaStorageCapacity);
   tolua_endmodule(tolua_S);
   tolua_function(tolua_S,"UnitTypeByIdent",tolua_stratagus_UnitTypeByIdent00);
   tolua_cclass(tolua_S,"CUnit","CUnit","",NULL);
