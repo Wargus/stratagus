@@ -346,7 +346,7 @@ Returns the number of opponent's for the given player.
 <h4>Example</h4>
 <pre>
 -- You win when you have no opponents left.
-if (GetNumOpponents(GetThisPlayer()) == 0) then
+if (GetNumOpponents(ThisPlayer.Index) == 0) then
      ActionVictory()
 </pre>
 
@@ -432,7 +432,7 @@ unit-name    Unit type of this name
 <pre>
 -- True when the player on the console has at least 8 archers in the rectangle
 -- (10 10) to (12 14).
-GetNumUnitsAt(GetThisPlayer(), "unit-archer", {10, 10}, {12, 14}) >= 8
+GetNumUnitsAt(ThisPlayer.Index, "unit-archer", {10, 10}, {12, 14}) >= 8
 </pre>
 
 <hr>

@@ -41,7 +41,7 @@ AddTrigger(
 
 AddTrigger(
     function() local x
-               x = GetNumUnitsAt(GetThisPlayer(), "units", {22 - 3, 38 - 3}, {28 + 3, 44 + 3}) 
+               x = GetNumUnitsAt(ThisPlayer.Index, "units", {22 - 3, 38 - 3}, {28 + 3, 44 + 3}) 
                return x == 2 end,
     function() return StopGame(GameVictory) end)
 

@@ -161,7 +161,7 @@ function SinglePlayerTriggers()
     function() return StopGame(GameDefeat) end)
 
   AddTrigger(
-    function() return GetNumOpponents(GetThisPlayer()) == 0 end,
+    function() return GetNumOpponents(ThisPlayer.Index) == 0 end,
     function() return StopGame(GameVictory) end)   
 end
 
