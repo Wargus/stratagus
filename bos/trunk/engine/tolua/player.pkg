@@ -17,8 +17,12 @@ class CPlayer
 	int StartX;
 	int StartY;
 
-	int StoredResources[MaxCosts];
-	int StorageCapacity[MaxCosts];
+	tolua_property__s int EnergyProductionRate;
+	tolua_property__s int MagmaProductionRate;
+	tolua_property__s int EnergyStored;
+	tolua_property__s int MagmaStored;
+	tolua_property__s int EnergyStorageCapacity;
+	tolua_property__s int MagmaStorageCapacity;
 
 	const int UnitTypesCount[UnitTypeMax];
 

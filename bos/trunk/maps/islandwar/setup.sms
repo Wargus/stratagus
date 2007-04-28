@@ -13,12 +13,12 @@
 
 -- player configuration
 SetStartView(0, 9, 18)
-Players[0].StoredResources[MagmaCost] = 20000
-Players[0].StoredResources[EnergyCost] = 10500
+Players[0].MagmaStored = 700
+Players[0].EnergyStored = 350
 SetAiType(0, "ai-rush")
 SetStartView(1, 42, 44)
-Players[1].StoredResources[MagmaCost] = 20000
-Players[1].StoredResources[EnergyCost] = 10500
+Players[1].MagmaStored = 700
+Players[1].EnergyStored = 350
 SetAiType(1, "ai-rush")
 SetStartView(2, 0, 0)
 SetAiType(2, "ai-rush")
