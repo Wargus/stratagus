@@ -259,12 +259,12 @@ function RunResultsMenu()
   menu:writeText(_("Razings"), sx*12, sy*7)
 
   for i=0,7 do
-    if (GetPlayerData(i, "TotalUnits") > 0 ) then
-      menu:writeText(i .. " ".. GetPlayerData(i, "Name"), sx*3, sy*(8+i))
-      menu:writeText(GetPlayerData(i, "TotalUnits"), sx*6, sy*(8+i))
-      menu:writeText(GetPlayerData(i, "TotalBuildings"), sx*8, sy*(8+i))
-      menu:writeText(GetPlayerData(i, "TotalKills"), sx*10, sy*(8+i))
-      menu:writeText(GetPlayerData(i, "TotalRazings"), sx*12, sy*(8+i))     
+    if (Players[i].TotalUnits > 0) then
+      menu:writeText(i .. " ".. Players[i].Name, sx*3, sy*(8+i))
+      menu:writeText(Players[i].TotalUnits, sx*6, sy*(8+i))
+      menu:writeText(Players[i].TotalBuildings, sx*8, sy*(8+i))
+      menu:writeText(Players[i].TotalKills, sx*10, sy*(8+i))
+      menu:writeText(Players[i].TotalRazings, sx*12, sy*(8+i))     
     end
   end
 
