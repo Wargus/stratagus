@@ -92,10 +92,8 @@ function HandleCheats(str)
       end
       SetSpeedBuild(10)
       SetSpeedTrain(10)
-      for i = 1,table.getn(resources) do
-        SetPlayerData(GetThisPlayer(), "Resources", resources[i],
-          GetPlayerData(GetThisPlayer(), "Resources", resources[i]) + 32000)
-      end
+      ThisPlayer.EnergyStored = ThisPlayer.EnergyStored + 32000
+      ThisPlayer.MagmaStored = ThisPlayer.MagmaStored + 32000
       AddMessage("SO!")
     end
 

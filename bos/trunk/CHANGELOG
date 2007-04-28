@@ -1,6 +1,8 @@
 Change log for Bos Wars
 -----------------------
 Development Version:
+- Removed GetPlayerData and SetPlayerData, use tolua instead (Jimmy Salmon)
+- New resource based economy (Jimmy Salmon, Francois Beerten)
 - Fix SConstruct for lua 5.1 (Francois Beerten)
 - Add unitstats.py tool that parses all unit stats and generates CSV file
 with all important stats or regenerates the scripts (Francois Beerten)

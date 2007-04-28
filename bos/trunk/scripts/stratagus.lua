@@ -157,7 +157,7 @@ SetAllPlayersTotalUnitLimit(400)
 
 function SinglePlayerTriggers()
   AddTrigger(
-    function() return GetPlayerData(GetThisPlayer(),"TotalNumUnits") == 0 end,
+    function() return ThisPlayer.TotalNumUnits == 0 end,
     function() return StopGame(GameDefeat) end)
 
   AddTrigger(
