@@ -322,6 +322,11 @@ public:
 	int    TotalRazings;
 	int    TotalKills;      /// How many unit killed
 
+	inline void SetTotalEnergy(int v) { TotalResources[EnergyCost] = CYCLES_PER_SECOND * v; }
+	inline int GetTotalEnergy() { return TotalResources[EnergyCost] / CYCLES_PER_SECOND; }
+	inline void SetTotalMagma(int v) { TotalResources[MagmaCost] = CYCLES_PER_SECOND * v; }
+	inline int GetTotalMagma() { return TotalResources[MagmaCost] / CYCLES_PER_SECOND; }
+
 	Uint32 Color;           /// color of units on minimap
 
 	CUnitColors UnitColors; /// Unit colors for new units

@@ -798,6 +798,7 @@ void PlayersEachCycle(void)
 					p->StoredResources[res] = 0;
 				}
 			}
+			p->TotalResources[res] += p->ProductionRate[res];
 		}
 
 		// Recalculate costs

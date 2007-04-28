@@ -37,7 +37,8 @@ class CPlayer
 	int Score;
 	int TotalUnits;
 	int TotalBuildings;
-	int TotalResources[MaxCosts];
+	tolua_property__s int TotalEnergy;
+	tolua_property__s int TotalMagma;
 	int TotalRazings;
 	int TotalKills;
 	
