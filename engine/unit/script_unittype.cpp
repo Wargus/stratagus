@@ -813,113 +813,6 @@ CUnitType *CclGetUnitType(lua_State *l)
 	return NULL;
 }
 
-/**
-**  Get unit-type structure.
-**
-**  @param l  Lua state.
-**
-**  @return   Unit-type structure.
-*/
-static int CclUnitType(lua_State *l)
-{
-	const char *str;
-	CUnitType *type;
-	LuaUserData *data;
-
-	LuaCheckArgs(l, 1);
-
-	str = LuaToString(l, 1);
-	type = UnitTypeByIdent(str);
-	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
-	data->Type = LuaUnitType;
-	data->Data = type;
-	return 1;
-}
-
-/**
-**  Get all unit-type structures.
-**
-**  @param l  Lua state.
-**
-**  @return   An array of all unit-type structures.
-*/
-static int CclUnitTypeArray(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-
-	lua_newtable(l);
-
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
-		data->Type = LuaUnitType;
-		data->Data = UnitTypes[i];
-		lua_rawseti(l, 1, i + 1);
-	}
-	return 1;
-}
-
-/**
-**  Get the ident of the unit-type structure.
-**
-**  @param l  Lua state.
-**
-**  @return   The identifier of the unit-type.
-*/
-static int CclGetUnitTypeIdent(lua_State *l)
-{
-	const CUnitType *type;
-
-	LuaCheckArgs(l, 1);
-
-	type = CclGetUnitType(l);
-	if (type) {
-		lua_pushstring(l, type->Ident.c_str());
-	} else {
-		LuaError(l, "unit '%s' not defined" _C_ LuaToString(l, -1));
-	}
-	return 1;
-}
-
-/**
-**  Get the name of the unit-type structure.
-**
-**  @param l  Lua state.
-**
-**  @return   The name of the unit-type.
-*/
-static int CclGetUnitTypeName(lua_State *l)
-{
-	const CUnitType *type;
-
-	LuaCheckArgs(l, 1);
-
-	type = CclGetUnitType(l);
-	lua_pushstring(l, type->Name.c_str());
-	return 1;
-}
-
-/**
-**  Set the name of the unit-type structure.
-**
-**  @param l  Lua state.
-**
-**  @return   The name of the unit-type.
-*/
-static int CclSetUnitTypeName(lua_State *l)
-{
-	CUnitType *type;
-
-	LuaCheckArgs(l, 2);
-
-	lua_pushvalue(l, 1);
-	type = CclGetUnitType(l);
-	lua_pop(l, 1);
-	type->Name = LuaToString(l, 2);
-
-	lua_pushvalue(l, 2);
-	return 1;
-}
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -1610,13 +1503,6 @@ void UnitTypeCclRegister(void)
 	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
 
 	InitDefinedVariables();
-
-	lua_register(Lua, "UnitType", CclUnitType);
-	lua_register(Lua, "UnitTypeArray", CclUnitTypeArray);
-	// unit type structure access
-	lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
-	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
-	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
 
 	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
 }

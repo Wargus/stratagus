@@ -485,7 +485,7 @@ void SavePlayers(CFile *file)
 	//
 	//  Dump local variables
 	//
-	file->printf("SetThisPlayer(%d)\n\n", ThisPlayer->Index);
+	file->printf("ThisPlayer = Players[%d]\n\n", ThisPlayer->Index);
 }
 
 /**

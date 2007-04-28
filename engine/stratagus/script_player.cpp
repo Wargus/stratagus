@@ -392,39 +392,6 @@ static int CclChangeUnitsOwner(lua_State *l)
 }
 
 /**
-**  Get ThisPlayer.
-**
-**  @param l  Lua state.
-*/
-static int CclGetThisPlayer(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	if (ThisPlayer) {
-		lua_pushnumber(l, ThisPlayer - Players);
-	} else {
-		lua_pushnumber(l, 0);
-	}
-	return 1;
-}
-
-/**
-**  Set ThisPlayer.
-**
-**  @param l  Lua state.
-*/
-static int CclSetThisPlayer(lua_State *l)
-{
-	int plynr;
-
-	LuaCheckArgs(l, 1);
-	plynr = LuaToNumber(l, 1);
-	ThisPlayer = &Players[plynr];
-
-	lua_pushnumber(l, plynr);
-	return 1;
-}
-
-/**
 **  Set MaxSelectable
 **
 **  @param l  Lua state.
@@ -710,8 +677,6 @@ void PlayerCclRegister(void)
 {
 	lua_register(Lua, "Player", CclPlayer);
 	lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);
-	lua_register(Lua, "GetThisPlayer", CclGetThisPlayer);
-	lua_register(Lua, "SetThisPlayer", CclSetThisPlayer);
 
 	lua_register(Lua, "SetMaxSelectable", CclSetMaxSelectable);
 

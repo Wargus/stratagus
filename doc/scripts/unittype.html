@@ -34,11 +34,6 @@
 <a href="#DefineVariables">DefineVariables</a>
 <a href="#DefineUnitStats">DefineUnitStats</a>
 <a href="#DefineUnitType">DefineUnitType</a>
-<a href="#GetUnitTypeIdent">GetUnitTypeIdent</a>
-<a href="#GetUnitTypeName">GetUnitTypeName</a>
-<a href="#SetUnitTypeName">SetUnitTypeName</a>
-<a href="#UnitType">UnitType</a>
-<a href="#UnitTypeArray">UnitTypeArray</a>
 <hr>
 <h2>Intro - Introduction to unit-type functions and variables</h2>
 
@@ -642,92 +637,6 @@ DefineUnitType("unit-footman", { Name = "Footman",
     (get-unit-type-ident (unit-type "unit-peon"))<p>
     Get the identifier of the unit type peon.<p>
 -->
-
-<a name="GetUnitTypeIdent"></a>
-<h3>GetUnitTypeIdent(unit-type)</h3>
-
-Get the ident of the unit-type structure.
-
-<dl>
-<dt>unit-type</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    GetUnitTypeIdent(unit-type)
-</pre>
-
-<a name="GetUnitTypeName"></a>
-<h3>GetUnitTypeName(unit-type)</h3>
-
-Get the name of the unit-type structure.
-
-
-<dl>
-<dt>unit-type</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    GetUnitTypeName(unit-type)
-</pre>
-
-<a name="SetUnitTypeName"></a>
-<h3>SetUnitTypeName(unit-type, name)</h3>
-
-Set the name of the unit-type structure.
-
-
-<dl>
-<dt>unit-type</dt>
-<dd>.
-</dd>
-<dt>name</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    SetUnitTypeName(unit-type, name)
-</pre>
-
-<a name="UnitType"></a>
-<h3>UnitType(ident)</h3>
-
-Get unit-type structure.
-
-
-<dl>
-<dt>ident</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    UnitType("unit-great-hall")
-</pre>
-
-<a name="UnitTypeArray"></a>
-<h3>UnitTypeArray()</h3>
-
-Get all unit-type structures.
-
-
-<h4>Example</h4>
-
-<pre>
-    UnitTypeArray()
-</pre>
 
 <hr>
 Last changed: $Id$<br>
