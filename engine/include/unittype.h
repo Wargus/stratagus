@@ -749,6 +749,26 @@ public:
 	int ProductionCosts[MaxCosts];      /// Total cost to produce this type
 	int StorageCapacity[MaxCosts];      /// Storage capacity of resources
 
+	inline void SetEnergyProductionRate(int v) { ProductionRate[EnergyCost] = v; }
+	inline int GetEnergyProductionRate() { return ProductionRate[EnergyCost]; }
+	inline void SetMagmaProductionRate(int v) { ProductionRate[MagmaCost] = v; }
+	inline int GetMagmaProductionRate() { return ProductionRate[MagmaCost]; }
+
+	inline void SetMaxEnergyUtilizationRate(int v) { MaxUtilizationRate[EnergyCost] = v; }
+	inline int GetMaxEnergyUtilizationRate() { return MaxUtilizationRate[EnergyCost]; }
+	inline void SetMaxMagmaUtilizationRate(int v) { MaxUtilizationRate[MagmaCost] = v; }
+	inline int GetMaxMagmaUtilizationRate() { return MaxUtilizationRate[MagmaCost]; }
+
+	inline void SetEnergyValue(int v) { ProductionCosts[EnergyCost] = CYCLES_PER_SECOND * v; }
+	inline int GetEnergyValue() { return ProductionCosts[EnergyCost] / CYCLES_PER_SECOND; }
+	inline void SetMagmaValue(int v) { ProductionCosts[MagmaCost] = CYCLES_PER_SECOND * v; }
+	inline int GetMagmaValue() { return ProductionCosts[MagmaCost] / CYCLES_PER_SECOND; }
+
+	inline void SetEnergyStorageCapacity(int v) { StorageCapacity[EnergyCost] = CYCLES_PER_SECOND * v; }
+	inline int GetEnergyStorageCapacity() { return StorageCapacity[EnergyCost] / CYCLES_PER_SECOND; }
+	inline void SetMagmaStorageCapacity(int v) { StorageCapacity[MagmaCost] = CYCLES_PER_SECOND * v; }
+	inline int GetMagmaStorageCapacity() { return StorageCapacity[MagmaCost] / CYCLES_PER_SECOND; }
+
 // --- FILLED UP ---
 
 	unsigned FieldFlags;            /// Unit map field flags
