@@ -35,7 +35,6 @@
 <a href="#ActionStartTimer">ActionStartTimer</a>
 <a href="#ActionStopTimer">ActionStopTimer</a>
 <a href="#ActionVictory">ActionVictory</a>
-<a href="#ActionWait">ActionWait</a>
 <a href="#AddTrigger">AddTrigger</a>
 <a href="#IfNearUnit">IfNearUnit</a>
 <a href="#GetNumOpponents">GetNumOpponents</a>
@@ -236,34 +235,6 @@ AddTrigger(
   function() return IfOpponents("this", "==", 0) end,
   function() return ActionVictory() end)
 </pre>
-
-<a name="ActionWait"></a>
-<h3>ActionWait(time-ms)</h3>
- 
-Causes the trigger to wait a number of milliseconds before reexamine this trigger.
-
-
-<dl>
-  <dt>time-ms</dt>
-  <dd>Minimum number of milliseconds to wait.</dd>
-</dl>
-
-<!-- IT IS A BAD EXAMPLE NOW.
-<h4>Example</h4>
-<pre>
--- Adds a trigger. If the player on the console has killed all his 
--- opponents the message "Hello" appears then two seconds later the message
--- "World" appears.
-AddTrigger(
-  function() return IfOpponents("this", "==", 0) end,
-  {
-    function() return AddMessage("Hello") end,
-    function() return ActionWait(2000) end,
-    function() return AddMessage("World") end
-  }
-)
-</pre>
--->
 
 <a name="AddTrigger"></a>
 <h3>AddTrigger(condition, action)</h3>
