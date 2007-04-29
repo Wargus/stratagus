@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 04/28/07 12:46:03.
+** Generated automatically by tolua++-1.0.92 on 04/28/07 20:38:49.
 */
 
 #ifndef __cplusplus
@@ -46,6 +46,15 @@ int SaveReplay(const std::string &filename);
 void StopGame(GameResults result);
 #include "settings.h"
 #include "pathfinder.h"
+int GetNumOpponents(int player);
+int GetTimer();
+void ActionVictory();
+void ActionDefeat();
+void ActionDraw();
+void ActionSetTimer(int cycles, bool increasing);
+void ActionStartTimer();
+void ActionStopTimer();
+void SetTrigger(int trigger);
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -15891,6 +15900,250 @@ static int tolua_set_AStarUnknownTerrainCost(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: GetNumOpponents */
+#ifndef TOLUA_DISABLE_tolua_stratagus_GetNumOpponents00
+static int tolua_stratagus_GetNumOpponents00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int player = ((int)  tolua_tonumber(tolua_S,1,0));
+  {
+   int tolua_ret = (int)  GetNumOpponents(player);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetNumOpponents'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetTimer */
+#ifndef TOLUA_DISABLE_tolua_stratagus_GetTimer00
+static int tolua_stratagus_GetTimer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   int tolua_ret = (int)  GetTimer();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetTimer'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ActionVictory */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ActionVictory00
+static int tolua_stratagus_ActionVictory00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ActionVictory();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ActionVictory'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ActionDefeat */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ActionDefeat00
+static int tolua_stratagus_ActionDefeat00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ActionDefeat();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ActionDefeat'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ActionDraw */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ActionDraw00
+static int tolua_stratagus_ActionDraw00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ActionDraw();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ActionDraw'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ActionSetTimer */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ActionSetTimer00
+static int tolua_stratagus_ActionSetTimer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int cycles = ((int)  tolua_tonumber(tolua_S,1,0));
+  bool increasing = ((bool)  tolua_toboolean(tolua_S,2,0));
+  {
+   ActionSetTimer(cycles,increasing);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ActionSetTimer'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ActionStartTimer */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ActionStartTimer00
+static int tolua_stratagus_ActionStartTimer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ActionStartTimer();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ActionStartTimer'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ActionStopTimer */
+#ifndef TOLUA_DISABLE_tolua_stratagus_ActionStopTimer00
+static int tolua_stratagus_ActionStopTimer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ActionStopTimer();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ActionStopTimer'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetTrigger */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetTrigger00
+static int tolua_stratagus_SetTrigger00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int trigger = ((int)  tolua_tonumber(tolua_S,1,0));
+  {
+   SetTrigger(trigger);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetTrigger'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Translate */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Translate00
 static int tolua_stratagus_Translate00(lua_State* tolua_S)
@@ -17163,6 +17416,15 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"AStarMovingUnitCrossingCost",tolua_get_AStarMovingUnitCrossingCost,tolua_set_AStarMovingUnitCrossingCost);
   tolua_variable(tolua_S,"AStarKnowUnseenTerrain",tolua_get_AStarKnowUnseenTerrain,tolua_set_AStarKnowUnseenTerrain);
   tolua_variable(tolua_S,"AStarUnknownTerrainCost",tolua_get_AStarUnknownTerrainCost,tolua_set_AStarUnknownTerrainCost);
+  tolua_function(tolua_S,"GetNumOpponents",tolua_stratagus_GetNumOpponents00);
+  tolua_function(tolua_S,"GetTimer",tolua_stratagus_GetTimer00);
+  tolua_function(tolua_S,"ActionVictory",tolua_stratagus_ActionVictory00);
+  tolua_function(tolua_S,"ActionDefeat",tolua_stratagus_ActionDefeat00);
+  tolua_function(tolua_S,"ActionDraw",tolua_stratagus_ActionDraw00);
+  tolua_function(tolua_S,"ActionSetTimer",tolua_stratagus_ActionSetTimer00);
+  tolua_function(tolua_S,"ActionStartTimer",tolua_stratagus_ActionStartTimer00);
+  tolua_function(tolua_S,"ActionStopTimer",tolua_stratagus_ActionStopTimer00);
+  tolua_function(tolua_S,"SetTrigger",tolua_stratagus_SetTrigger00);
   tolua_function(tolua_S,"Translate",tolua_stratagus_Translate00);
   tolua_function(tolua_S,"AddTranslation",tolua_stratagus_AddTranslation00);
   tolua_function(tolua_S,"LoadPO",tolua_stratagus_LoadPO00);
