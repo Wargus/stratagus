@@ -34,13 +34,13 @@ function HandleCheats(str)
   local resources = { "energy", "magma" }
 
   if (str == "rich") then
-    ThisPlayer.StoredResources[EnergyCost] = ThisPlayer.StorageCapacity[EnergyCost]
-    ThisPlayer.StoredResources[MagmaCost] = ThisPlayer.StorageCapacity[MagmaCost]
+    ThisPlayer.EnergyStored = ThisPlayer.EnergyStorageCapacity
+    ThisPlayer.MagmaStored = ThisPlayer.MagmaStorageCapacity
     AddMessage("Jackpot !")
 
   elseif (str == "poor") then
-    ThisPlayer.StoredResources[EnergyCost] = 0
-    ThisPlayer.StoredResources[MagmaCost] = 0
+    ThisPlayer.EnergyStored = 0
+    ThisPlayer.MagmaStored = 0
     AddMessage("Bankruptcy !")
 
   elseif (str == "reveal") then
