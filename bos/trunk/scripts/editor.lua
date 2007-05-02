@@ -53,6 +53,7 @@ SetEditorStartUnit("unit-start-location")
 local editor_types = {
   "unit-vault",
   "unit-hotspot",
+  "unit-weakhotspot",
 
   "unit-apcs",
   "unit-medic",
