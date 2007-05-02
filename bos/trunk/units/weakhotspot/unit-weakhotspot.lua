@@ -58,7 +58,7 @@ DefineUnitType("unit-weakhotspot", {
     DrawLevel = 25,
     TileSize = {2, 2},
     BoxSize = {64, 64},
-    NeutralMinimapColor = {250, 9, 9},
+    NeutralMinimapColor = {175, 9, 149},
     SightRange = 0,
     Armor = 0,
     BasicDamage = 0,

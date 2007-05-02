@@ -58,7 +58,7 @@ DefineUnitType("unit-hotspot", {
     DrawLevel = 25,
     TileSize = {2, 2},
     BoxSize = {64, 64},
-    NeutralMinimapColor = {250, 9, 9},
+    NeutralMinimapColor = {250, 29, 209},
     SightRange = 0,
     Armor = 0,
     BasicDamage = 0,
