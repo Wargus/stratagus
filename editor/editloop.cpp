@@ -696,21 +696,21 @@ static void DrawPlayers(void)
 
 	for (i = 0; i < PlayerMax; ++i) {
 		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.DrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
+			Video.DrawRectangle(ColorWhite, x + i * 20, y, 20, 20);
 		}
 		Video.DrawRectangle(
 			i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody ?
 				ColorWhite : ColorGray,
-			x + i % 8 * 20, y, 19, 19);
+			x + i * 20, y, 19, 19);
 		if (Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.FillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
+			Video.FillRectangle(Players[i].Color, x + 1 + i * 20, y + 1,
 				17, 17);
 		}
 		if (i == Editor.SelectedPlayer) {
-			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
+			Video.DrawRectangle(ColorGreen, x + 1 + i * 20, y + 1, 17, 17);
 		}
 		sprintf(buf, "%d", i);
-		VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
+		VideoDrawTextCentered(x + i * 20 + 9, y + 3, SmallFont, buf);
 	}
 	
 	x = UI.InfoPanel.X + 4;
