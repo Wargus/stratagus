@@ -124,6 +124,7 @@ local neutral_types = {
   "unit-weakhotspot",
 }
 
+EditorNeutralTypes:clear()
 for key,value in ipairs(neutral_types) do
   EditorNeutralTypes:push_back(value)
 end
