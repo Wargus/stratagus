@@ -124,6 +124,8 @@ public:
 
 static EditorSliderListener *editorSliderListener;
 
+std::vector<std::string> EditorNeutralTypes;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -296,6 +298,10 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 	CBuildRestrictionOnTop *b;
+
+	if (std::find(EditorNeutralTypes.begin(), EditorNeutralTypes.end(), type->Ident) != EditorNeutralTypes.end()) {
+		player = &Players[PlayerNumNeutral];
+	}
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	unit = MakeUnitAndPlace(x, y, type, player);
