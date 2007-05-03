@@ -1,5 +1,8 @@
 $#include "editor.h"
 
+$extern vector<string> EditorNeutralTypes;
+vector<string> EditorNeutralTypes;
+
 enum EditorRunningType {
 	EditorNotRunning = 0,    /// Not Running
 	EditorStarted = 1,       /// Editor Enabled at all

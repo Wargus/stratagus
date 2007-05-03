@@ -1,6 +1,8 @@
 Change log for Bos Wars
 -----------------------
 Development Version:
+- Added EditorNeutralTypes for unit types that should always be assigned to
+the neutral player (Jimmy Salmon)
 - Removed GetPlayerData and SetPlayerData, use tolua instead (Jimmy Salmon)
 - New resource based economy (Jimmy Salmon, Francois Beerten)
 - Fix SConstruct for lua 5.1 (Francois Beerten)
