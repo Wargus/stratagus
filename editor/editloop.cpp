@@ -2080,7 +2080,7 @@ void EditorMainLoop(void)
 	editorSliderListener = new EditorSliderListener();
 
 	editorSlider = new gcn::Slider();
-	editorSlider->setBaseColor(gcn::Color(38, 38, 78, 130));
+	editorSlider->setBaseColor(gcn::Color(38, 38, 78));
 	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setBackgroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setSize(176, 16);
