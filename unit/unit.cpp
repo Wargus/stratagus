@@ -2494,7 +2494,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 		flag = 1;
 	}
 	// FIXME: this doesn't always select the top most unit
-	for (table = Units + (NumUnits - 1); table > Units; --table) {
+	for (table = Units + (NumUnits - 1); table >= Units; --table) {
 		unit = *table;
 		if (!unit->IsVisibleAsGoal(ThisPlayer) && !ReplayRevealMap) {
 			continue;
