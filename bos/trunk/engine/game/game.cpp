@@ -236,8 +236,10 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
 	
 		f->printf("-- player configuration\n");
-		for (i = 0; i < PlayerMax; ++i) {
+		for (i = 0; i < PlayerMax - 1; ++i) {
 			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
+			f->printf("Players[%d].EnergyStored = %d\n", i, Players[i].GetEnergyStored());
+			f->printf("Players[%d].MagmaStored = %d\n", i, Players[i].GetMagmaStored());
 			f->printf("SetAiType(%d, \"%s\")\n",
 				i, Players[i].AiName.c_str());
 		}
