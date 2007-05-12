@@ -263,10 +263,13 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 
 		f->printf("-- place units\n");
 		for (i = 0; i < NumUnits; ++i) {
-			f->printf("unit= CreateUnit(\"%s\", %d, {%d, %d})\n",
-				Units[i]->Type->Ident.c_str(),
-				Units[i]->Player->Index,
-				Units[i]->X, Units[i]->Y);
+			f->printf("CreateUnit(\"%s\", ", Units[i]->Type->Ident.c_str());
+			if (Units[i]->Player->Index == PlayerMax - 1) {
+				f->printf("PlayerNumNeutral");
+			} else {
+				f->printf("%d", Units[i]->Player->Index);
+			}
+			f->printf(", {%d, %d})\n", Units[i]->X, Units[i]->Y);
 		}
 		f->printf("\n\n");
 	} catch (const FileException &) {
