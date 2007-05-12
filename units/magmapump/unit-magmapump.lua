@@ -94,7 +94,8 @@ DefineUnitType("unit-magmapump", {
     VisibleUnderFog = true,
     MagmaProductionRate = 5,
     BuildingRules = {{"ontop",
-    {Type = "unit-hotspot"}}},
+    {Type = "unit-hotspot"}},{"ontop",
+    {Type = "unit-weakhotspot"}}},
     Sounds = {
         "selected", "magmapump-selected",
         "ready", "magmapump-ready",
