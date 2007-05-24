@@ -512,7 +512,6 @@ end
 Load("scripts/menus/network.lua")
 Load("scripts/menus/options.lua")
 Load("scripts/menus/credits.lua")
-Load("scripts/menus/widgetsdemo.lua")
 Load("scripts/menus/ingame/game.lua")
 Load("scripts/menus/ingame/editor.lua")
 Load("scripts/menus/campaigns.lua")
