@@ -89,12 +89,6 @@ static void MoveToLocation(CUnit *unit)
 				return;
 			}
 
-			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
-				_("You cannot reach building place"));
-			if (unit->Player->AiEnabled) {
-				AiCanNotReach(unit, unit->Orders[0]->Type);
-			}
-
 			if (goal) { // release reference
 				goal->RefsDecrease();
 				unit->Orders[0]->Goal = NoUnitP;
