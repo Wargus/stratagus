@@ -17,9 +17,6 @@ function HandleIngameCommandKey(key, ctrl, alt, shift)
   elseif ((key == "s" and alt) or key == "f11") then
     if (not IsNetworkGame()) then SetGamePaused(true) end
     RunSaveMenu()
-  elseif ((key == "l" and alt) or key == "f12") then
-    if (not IsNetworkGame()) then SetGamePaused(true) end
-    RunLoadMenu()
   elseif (key == "q" and (ctrl or alt)) then
     if (not IsNetworkGame()) then SetGamePaused(true) end
     RunQuitToMenuConfirmMenu()
