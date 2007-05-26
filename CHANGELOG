@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development Version:
+- Added support for compressed textures with OpenGL (Jimmy Salmon)
 - Added EditorNeutralTypes for unit types that should always be assigned to
 the neutral player (Jimmy Salmon)
 - Removed GetPlayerData and SetPlayerData, use tolua instead (Jimmy Salmon)
