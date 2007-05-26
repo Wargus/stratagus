@@ -328,7 +328,11 @@ extern SDL_Surface *TheScreen;
 #ifdef USE_OPENGL
 	/// Max texture size supported on the video card
 extern GLint GLMaxTextureSize;
+	/// Is OpenGL texture compression supported
+extern bool GLTextureCompressionSupported;
 #endif
+	/// Use OpenGL texture compression
+extern bool UseGLTextureCompression;
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 #define RMASK 0xff000000
@@ -446,6 +450,17 @@ extern void VideoDrawPixel(Uint32 color, int x, int y);
 	/// Draw translucent pixel unclipped.
 extern void VideoDrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha);
+#endif
+
+#ifdef USE_OPENGL
+// ARB_texture_compression
+extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
+extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
+extern PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
+extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 #endif
 
 //@}

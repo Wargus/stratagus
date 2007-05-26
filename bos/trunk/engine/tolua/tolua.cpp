@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 05/02/07 19:39:27.
+** Generated automatically by tolua++-1.0.92 on 05/25/07 21:07:55.
 */
 
 #ifndef __cplusplus
@@ -12288,6 +12288,30 @@ static int tolua_set_CColor_unsigned_A(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: UseGLTextureCompression */
+#ifndef TOLUA_DISABLE_tolua_get_UseGLTextureCompression
+static int tolua_get_UseGLTextureCompression(lua_State* tolua_S)
+{
+  tolua_pushboolean(tolua_S,(bool)UseGLTextureCompression);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: UseGLTextureCompression */
+#ifndef TOLUA_DISABLE_tolua_set_UseGLTextureCompression
+static int tolua_set_UseGLTextureCompression(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  UseGLTextureCompression = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: New of class  CFont */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CFont_New00
 static int tolua_stratagus_CFont_New00(lua_State* tolua_S)
@@ -17244,6 +17268,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"B",tolua_get_CColor_unsigned_B,tolua_set_CColor_unsigned_B);
    tolua_variable(tolua_S,"A",tolua_get_CColor_unsigned_A,tolua_set_CColor_unsigned_A);
   tolua_endmodule(tolua_S);
+  tolua_variable(tolua_S,"UseGLTextureCompression",tolua_get_UseGLTextureCompression,tolua_set_UseGLTextureCompression);
   tolua_cclass(tolua_S,"CFont","CFont","",NULL);
   tolua_beginmodule(tolua_S,"CFont");
    tolua_function(tolua_S,"New",tolua_stratagus_CFont_New00);

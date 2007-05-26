@@ -908,7 +908,14 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 			tp += 4;
 		}
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+
+	GLint internalformat = GL_RGBA;
+	if (GLTextureCompressionSupported && UseGLTextureCompression) {
+		internalformat = GL_COMPRESSED_RGBA;
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+
 #ifdef DEBUG
 	int x;
 	if ((x = glGetError())) {
