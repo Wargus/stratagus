@@ -162,15 +162,6 @@
 #include <ctype.h>
 #include <sstream>
 
-#ifdef USE_BEOS
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-extern void beos_init(int argc, char **argv);
-
-#endif
-
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -797,13 +788,6 @@ int main(int argc, char **argv)
 #endif
 		""
 	;
-
-#ifdef USE_BEOS
-	//
-	//  Parse arguments for BeOS
-	//
-	beos_init(argc, argv);
-#endif
 
 	//
 	//  Setup some defaults.

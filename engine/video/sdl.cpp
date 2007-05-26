@@ -51,14 +51,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
-#include "SDL.h"
-#ifdef USE_OPENGL
-#include "SDL_opengl.h"
-#endif
-
-#ifdef USE_BEOS
-#include <sys/socket.h>
-#endif
 
 #ifdef USE_WIN32
 #include "net_lowlevel.h"
@@ -89,20 +81,33 @@ SDL_Surface *TheScreen; /// Internal screen
 static SDL_Rect Rects[100];
 static int NumRects;
 #else
-GLint GLMaxTextureSize;   /// Max texture size supported on the video card
+GLint GLMaxTextureSize;             /// Max texture size supported on the video card
+bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
 #endif
+bool UseGLTextureCompression;       /// Use OpenGL texture compression
 
 static std::map<int, std::string> Key2Str;
 
-static int FrameTicks; /// Frame length in ms
+static int FrameTicks;     /// Frame length in ms
 static int FrameRemainder; /// Frame remainder 0.1 ms
-static int FrameFraction; /// Frame fractional term
+static int FrameFraction;  /// Frame fractional term
 
 const EventCallback *Callbacks;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+#ifdef USE_OPENGL
+// ARB_texture_compression
+PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
+PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
+PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
+PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
+PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
+PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
+PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
+#endif
 
 /*----------------------------------------------------------------------------
 --  Sync
@@ -140,10 +145,85 @@ void SetVideoSync(void)
 
 #ifdef USE_OPENGL
 /**
-**  Initialize open gl for doing 2d with 3d.
+**  Check if an extension is supported
+*/
+static bool IsExtensionSupported(const char *extension)
+{
+	const GLubyte *extensions = NULL;
+	const GLubyte *start;
+	GLubyte *ptr, *terminator;
+	int len;
+
+	// Extension names should not have spaces.
+	ptr = (GLubyte *)strchr(extension, ' ');
+	if (ptr || *extension == '\0') {
+		return false;
+	}
+
+	extensions = glGetString(GL_EXTENSIONS);
+	len = strlen(extension);
+	start = extensions;
+	while (true) {
+		ptr = (GLubyte *)strstr((const char *)start, extension);
+		if (!ptr) {
+			break;
+		}
+
+		terminator = ptr + len;
+		if (ptr == start || *(ptr - 1) == ' ') {
+			if (*terminator == ' ' || *terminator == '\0') {
+				return true;
+			}
+		}
+		start = terminator;
+	}
+	return false;
+}
+
+/**
+**  Initialize OpenGL extensions
+*/
+static void InitOpenGLExtensions()
+{
+	// ARB_texture_compression
+	if (IsExtensionSupported("GL_ARB_texture_compression"))
+	{
+		glCompressedTexImage3DARB =
+			(PFNGLCOMPRESSEDTEXIMAGE3DARBPROC)SDL_GL_GetProcAddress("glCompressedTexImage3DARB");
+		glCompressedTexImage2DARB =
+			(PFNGLCOMPRESSEDTEXIMAGE2DARBPROC)SDL_GL_GetProcAddress("glCompressedTexImage2DARB");
+		glCompressedTexImage1DARB =
+			(PFNGLCOMPRESSEDTEXIMAGE1DARBPROC)SDL_GL_GetProcAddress("glCompressedTexImage1DARB");
+		glCompressedTexSubImage3DARB =
+			(PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC)SDL_GL_GetProcAddress("glCompressedTexSubImage3DARB");
+		glCompressedTexSubImage2DARB =
+			(PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC)SDL_GL_GetProcAddress("glCompressedTexSubImage2DARB");
+		glCompressedTexSubImage1DARB =
+			(PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC)SDL_GL_GetProcAddress("glCompressedTexSubImage1DARB");
+		glGetCompressedTexImageARB =
+			(PFNGLGETCOMPRESSEDTEXIMAGEARBPROC)SDL_GL_GetProcAddress("glGetCompressedTexImageARB");
+
+		if (glCompressedTexImage3DARB && glCompressedTexImage2DARB &&
+			glCompressedTexImage1DARB && glCompressedTexSubImage3DARB &&
+			glCompressedTexSubImage2DARB && glCompressedTexSubImage1DARB &&
+			glGetCompressedTexImageARB)
+		{
+			GLTextureCompressionSupported = true;
+		}
+		else
+		{
+			GLTextureCompressionSupported = false;
+		}
+	}
+}
+
+/**
+**  Initialize OpenGL
 */
 static void InitOpenGL(void)
 {
+	InitOpenGLExtensions();
+
 	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

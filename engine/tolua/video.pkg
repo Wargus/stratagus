@@ -36,3 +36,5 @@ class CColor {
 	unsigned char A;
 };
 
+extern bool UseGLTextureCompression;
+

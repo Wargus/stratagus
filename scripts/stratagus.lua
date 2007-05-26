@@ -110,6 +110,9 @@ SetMinimapTerrain(true)
 --  Set Fog of War opacity
 SetFogOfWarOpacity(128)
 
+--  Use OpenGL texture compression if supported
+UseGLTextureCompression = false
+
 -------------------------------------------------------------------------------
 --	Define default resources
 -------------------------------------------------------------------------------
