@@ -9,7 +9,7 @@
 //
 /**@name sound_id.cpp - The sound id. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2007 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -142,5 +142,15 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 
 	return sound;
 }
+
+#ifdef DEBUG
+void FreeSounds()
+{
+	std::map<std::string, CSound *>::iterator i;
+	for (i = SoundMap.begin(); i != SoundMap.end(); ++i) {
+		delete (*i).second;
+	}
+}
+#endif
 
 //@}

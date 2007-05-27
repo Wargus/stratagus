@@ -438,15 +438,14 @@ CSound *RegisterSound(const char *files[], unsigned number)
 	id = new CSound;
 	if (number > 1) { // load a sound group
 		id->Sound.OneGroup = new CSample *[number];
+		id->Number = number;
 		for (i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {
-				delete[] id->Sound.OneGroup;
 				delete id;
 				return NO_SOUND;
 			}
 		}
-		id->Number = number;
 	} else { // load an unique sound
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
@@ -527,5 +526,20 @@ void InitSoundClient(void)
 	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
 	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);
 }
+
+
+CSound::~CSound()
+{
+	if (this->Number == ONE_SOUND) {
+		delete Sound.OneSound;
+	} else if (this->Number == TWO_GROUPS) {
+	} else {
+		for (int i = 0; i < this->Number; ++i) {
+			delete this->Sound.OneGroup[i];
+		}
+		delete[] this->Sound.OneGroup;
+	}
+}
+
 
 //@}
