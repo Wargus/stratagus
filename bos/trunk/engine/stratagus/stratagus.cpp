@@ -716,6 +716,8 @@ void Exit(int err)
 	CleanModules();
 	FreeSounds();
 	FreeGraphics();
+	FreePlayerColors();
+	freeGuichan();
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));

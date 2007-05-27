@@ -452,6 +452,9 @@ extern int PlayerColorIndexCount;
 extern void InitPlayers(void);
 	/// Clean up players
 extern void CleanPlayers(void);
+#ifdef DEBUG
+extern void FreePlayerColors();
+#endif
 	/// Save players
 extern void SavePlayers(CFile *file);
 
