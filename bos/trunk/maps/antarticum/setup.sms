@@ -94,11 +94,5 @@ unit= CreateUnit("unit-rock-3", PlayerNumNeutral, {31, 30})
 unit= CreateUnit("unit-rock-5", PlayerNumNeutral, {33, 31})
 unit= CreateUnit("unit-rock-2", PlayerNumNeutral, {32, 30})
 unit= CreateUnit("unit-rock-6", PlayerNumNeutral, {29, 30})
-unit= CreateUnit("unit-crystal-field1", PlayerNumNeutral, {31, 29})
-unit= CreateUnit("unit-crystal-field4", PlayerNumNeutral, {32, 32})
-unit= CreateUnit("unit-crystal-field7", PlayerNumNeutral, {30, 30})
-unit= CreateUnit("unit-crystal-field11", PlayerNumNeutral, {33, 29})
-unit= CreateUnit("unit-crystal-field12", PlayerNumNeutral, {31, 31})
-unit= CreateUnit("unit-crystal-field13", PlayerNumNeutral, {30, 32})
 
 
