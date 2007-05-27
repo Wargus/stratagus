@@ -88,6 +88,10 @@ static struct {
 
 static void ChannelFinished(int channel);
 
+static int *MixerBuffer;
+static int MixerBufferSize;
+
+
 /*----------------------------------------------------------------------------
 --  Mixers
 ----------------------------------------------------------------------------*/
@@ -306,28 +310,25 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 */
 static void MixIntoBuffer(void *buffer, int samples)
 {
-	static int *mixer_buffer = NULL;
-	static int mixer_buffer_size = 0;
-
-	if (samples > mixer_buffer_size) {
-		delete[] mixer_buffer;
-		mixer_buffer = new int[samples];
-		mixer_buffer_size = samples;
+	if (samples > MixerBufferSize) {
+		delete[] MixerBuffer;
+		MixerBuffer = new int[samples];
+		MixerBufferSize = samples;
 	}
 
 	// FIXME: can save the memset here, if first channel sets the values
-	memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
+	memset(MixerBuffer, 0, samples * sizeof(*MixerBuffer));
 
 	if (EffectsEnabled) {
 		// Add channels to mixer buffer
-		MixChannelsToStereo32(mixer_buffer, samples);
+		MixChannelsToStereo32(MixerBuffer, samples);
 	}
 	if (MusicEnabled) {
 		// Add music to mixer buffer
-		MixMusicToStereo32(mixer_buffer, samples);
+		MixMusicToStereo32(MixerBuffer, samples);
 	}
 
-	ClipMixToStereo16(mixer_buffer, samples, (short *)buffer);
+	ClipMixToStereo16(MixerBuffer, samples, (short *)buffer);
 }
 
 /**
@@ -826,6 +827,8 @@ void QuitSound(void)
 {
 	SDL_CloseAudio();
 	SoundInitialized = false;
+	delete[] MixerBuffer;
+	MixerBuffer = NULL;
 }
 
 //@}
