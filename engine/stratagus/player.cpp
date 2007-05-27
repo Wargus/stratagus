@@ -106,13 +106,26 @@ void InitPlayers(void)
 void CleanPlayers(void)
 {
 	ThisPlayer = NULL;
-	for (int i = 0; i < PlayerMax; i++) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		Players[i].Clear();
 	}
 	NumPlayers = 0;
 
 	NoRescueCheck = 0;
 }
+
+#ifdef DEBUG
+void FreePlayerColors()
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		delete[] Players[i].UnitColors.Colors;
+		delete[] PlayerColorsRGB[i];
+		PlayerColorsRGB[i] = NULL;
+		delete[] PlayerColors[i];
+		PlayerColors[i] = NULL;
+	}
+}
+#endif
 
 /**
 **  Add to UnitsConsumingResources
