@@ -130,9 +130,6 @@ As a special exception the sources are not required for the following files:
   units/chopper/unit_chopper.png
   units/chopper/unit_chopper_s.png
   units/corpses/build-dead-2.png
-  units/crystals/ico_crys.png
-  units/crystals/res_crys.png
-  units/crystals/res_crys_s.png
   units/dorcoz/ico_dorcoz.png
   units/dorcoz/mis_plasma_sml.png
   units/dorcoz/unit_dorcoz.png

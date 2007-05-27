@@ -97,19 +97,6 @@ local editor_types = {
   "unit-morel-5",
   "unit-morel-6",
   "unit-morel-7",
-  "unit-crystal-field1",
-  "unit-crystal-field2",
-  "unit-crystal-field3",
-  "unit-crystal-field4",
-  "unit-crystal-field5",
-  "unit-crystal-field6",
-  "unit-crystal-field7",
-  "unit-crystal-field8",
-  "unit-crystal-field9",
-  "unit-crystal-field10",
-  "unit-crystal-field11",   
-  "unit-crystal-field12",
-  "unit-crystal-field13",
   "unit-antharus"
 }
 
