@@ -103,7 +103,6 @@ void CleanModules(void)
 	CleanSpells();
 	FreeVisionTable();
 	FreeAStar();
-	InitDefinedVariables(); // internal script. should be to a better place, don't find for restart.
 }
 
 /**
