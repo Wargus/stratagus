@@ -452,6 +452,10 @@ extern void VideoDrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha);
 #endif
 
+#ifdef DEBUG
+extern void FreeGraphics();
+#endif
+
 #ifdef USE_OPENGL
 // ARB_texture_compression
 extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
