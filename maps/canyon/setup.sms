@@ -121,10 +121,5 @@ unit= CreateUnit("unit-tree03", PlayerNumNeutral, {12, 9})
 unit= CreateUnit("unit-tree03", PlayerNumNeutral, {14, 8})
 unit= CreateUnit("unit-tree03", PlayerNumNeutral, {12, 11})
 unit= CreateUnit("unit-tree04", PlayerNumNeutral, {13, 12})
-unit= CreateUnit("unit-crystal-field2", PlayerNumNeutral, {20, 57})
-unit= CreateUnit("unit-crystal-field2", PlayerNumNeutral, {36, 52})
-unit= CreateUnit("unit-crystal-field2", PlayerNumNeutral, {42, 45})
-unit= CreateUnit("unit-crystal-field10", PlayerNumNeutral, {62, 32})
-unit= CreateUnit("unit-crystal-field6", PlayerNumNeutral, {61, 33})
 
 
