@@ -713,6 +713,7 @@ void Exit(int err)
 	ExitNetwork1();
 #ifdef DEBUG
 	FreeSounds();
+	FreeGraphics();
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
