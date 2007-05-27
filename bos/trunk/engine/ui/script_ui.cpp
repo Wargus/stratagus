@@ -1132,7 +1132,6 @@ static int CclDefineButton(lua_State *l)
 {
 	char buf[64];
 	const char *value;
-	char *s1;
 	const char *s2;
 	ButtonAction ba;
 
@@ -1196,11 +1195,11 @@ static int CclDefineButton(lua_State *l)
 			}
 			if (lua_isnumber(l, -1)) {
 				sprintf(buf, "%ld", (long int)lua_tonumber(l, -1));
-				s1 = new_strdup(buf);
+				s2 = buf;
 			} else {
-				s1 = new_strdup(lua_tostring(l, -1));
+				s2 = lua_tostring(l, -1);
 			}
-			ba.ValueStr = s1;
+			ba.ValueStr = s2;
 		} else if (!strcmp(value, "Allowed")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "check-true")) {
@@ -1235,7 +1234,7 @@ static int CclDefineButton(lua_State *l)
 				lua_rawgeti(l, -1, k + 1);
 				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
-				allowstr += s1;
+				allowstr += s2;
 				if (k != subargs - 1) {
 					allowstr += ",";
 				}
