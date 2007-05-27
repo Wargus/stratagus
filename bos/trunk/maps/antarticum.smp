@@ -3,5 +3,5 @@
 -- File licensed under the GNU GPL version 2.
 
 DefinePlayerTypes("person", "person", "person", "person")
-PresentMap("Cold Antarticum", 3, 64, 64, 440283940)
+PresentMap("Cold Antarticum", 4, 64, 64, 440283940)
 DefineMapSetup(GetCurrentLuaPath().."/antarticum/setup.sms")
