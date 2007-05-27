@@ -81,6 +81,7 @@ void InitButtons(void)
 	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		UnitButtonTable[z]->Icon.Load();
 	}
+	delete[] CurrentButtons;
 	CurrentButtons = NULL;
 }
 
