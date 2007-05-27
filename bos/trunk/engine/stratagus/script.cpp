@@ -127,18 +127,21 @@ static void laction(int i)
 }
 
 /**
-**  Print error message and exit.
+**  Print error message and possibly exit.
 **
 **  @param pname  Source of the error.
 **  @param msg    error message to print.
+**  @param exit   exit the program
 */
-static void l_message(const char *pname, const char *msg)
+static void l_message(const char *pname, const char *msg, bool exit)
 {
 	if (pname) {
 		fprintf(stderr, "%s: ", pname);
 	}
 	fprintf(stderr, "%s\n", msg);
-	exit(1);
+	if (exit) {
+		::exit(1);
+	}
 }
 
 /**
@@ -146,10 +149,11 @@ static void l_message(const char *pname, const char *msg)
 **  if status is different of 0.
 **
 **  @param status  status of the last lua call. (0: success)
+**  @param exit    exit the program on error
 **
 **  @return        0 in success, else exit.
 */
-static int report(int status)
+static int report(int status, bool exit)
 {
 	const char *msg;
 
@@ -158,7 +162,7 @@ static int report(int status)
 		if (msg == NULL) {
 			msg = "(error with no message)";
 		}
-		l_message(NULL, msg);
+		l_message(NULL, msg, exit);
 		lua_pop(Lua, 1);
 	}
 	return status;
@@ -205,7 +209,7 @@ int LuaCall(int narg, int clear)
 	signal(SIGINT, SIG_DFL);
 	lua_remove(Lua, base);  // remove traceback function
 
-	return report(status);
+	return report(status, true);
 }
 
 /**
@@ -283,7 +287,7 @@ int LuaLoadFile(const std::string &file)
 	if (!(status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(), file.c_str()))) {
 		LuaCall(0, 1);
 	} else {
-		report(status);
+		report(status, true);
 	}
 	CurrentLuaFile = PreviousLuaFile;
 
@@ -2285,7 +2289,7 @@ int CclCommand(const char *command)
 	if (!(status = luaL_loadbuffer(Lua, command, strlen(command), command))) {
 		LuaCall(0, 1);
 	} else {
-		report(status);
+		report(status, false);
 	}
 	return status;
 }

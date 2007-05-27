@@ -463,12 +463,9 @@ static int MenuLoop(const char *filename, CMap *map)
 	// FIXME delete this when switching to full guichan GUI
 	LibraryFileName("scripts/guichan.lua", buf, sizeof(buf));
 	status = LuaLoadFile(buf);
-	if (status == 0) {
-		CleanModules();
-		InitDefinedVariables();
-	}
 
-	freeGuichan();
+	// We clean up later in Exit
+
 	return status;
 }
 
@@ -971,6 +968,7 @@ int main(int argc, char **argv)
 
 	main1(argc, argv);
 
+	Exit(0);
 	return 0;
 }
 
