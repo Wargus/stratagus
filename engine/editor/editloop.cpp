@@ -130,6 +130,8 @@ std::vector<std::string> EditorNeutralTypes;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+extern void InitDefinedVariables();
+
 /*----------------------------------------------------------------------------
 --  Edit
 ----------------------------------------------------------------------------*/
@@ -2136,6 +2138,7 @@ void EditorMainLoop(void)
 		}
 
 		CleanModules();
+		InitDefinedVariables();
 
 		LoadCcl(); // Reload the main config file
 

@@ -436,6 +436,7 @@ void PreMenuSetup(void)
 	UI.Load();
 }
 
+extern void InitDefinedVariables();
 /**
 **  Run the guichan main menus loop.
 **
@@ -464,6 +465,7 @@ static int MenuLoop(const char *filename, CMap *map)
 	status = LuaLoadFile(buf);
 	if (status == 0) {
 		CleanModules();
+		InitDefinedVariables();
 	}
 
 	freeGuichan();
@@ -471,7 +473,6 @@ static int MenuLoop(const char *filename, CMap *map)
 }
 
 extern void CleanMissiles();
-extern void InitDefinedVariables();
 extern void CleanTriggers();
 /**
 **  Cleanup game.
