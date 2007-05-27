@@ -211,7 +211,7 @@ int LuaCall(int narg, int clear)
 /**
 **  Load a file into a buffer
 */
-static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
+static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 {
 	CFile fp;
 	int size;
@@ -220,12 +220,11 @@ static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
 	int read;
 	char *buf;
 
-	*buffer = NULL;
-	*buffersize = 0;
+	buffer.clear();
 
-	if (fp.open(file, CL_OPEN_READ) == -1) {
+	if (fp.open(file.c_str(), CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file '%s': %s\n",
-			file, strerror(errno));
+			file.c_str(), strerror(errno));
 		return;
 	}
 
@@ -256,8 +255,8 @@ static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
 	}
 	fp.close();
 
-	*buffer = buf;
-	*buffersize = location;
+	buffer.assign(buf, location);
+	delete[] buf;
 }
 
 /**
@@ -271,23 +270,21 @@ int LuaLoadFile(const std::string &file)
 {
 	int status;
 	std::string PreviousLuaFile;
-	char *buf;
-	int size;
+	std::string buf;
 
 	PreviousLuaFile = CurrentLuaFile;
 	CurrentLuaFile = file;
 
-	LuaLoadBuffer(file.c_str(), &buf, &size);
-	if (!buf) {
+	LuaLoadBuffer(file, buf);
+	if (buf.empty()) {
 		return -1;
 	}
 
-	if (!(status = luaL_loadbuffer(Lua, buf, size, file.c_str()))) {
+	if (!(status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(), file.c_str()))) {
 		LuaCall(0, 1);
 	} else {
 		report(status);
 	}
-	delete[] buf;
 	CurrentLuaFile = PreviousLuaFile;
 
 	return status;
@@ -356,15 +353,13 @@ static int CclLoad(lua_State *l)
 static int CclLoadBuffer(lua_State *l)
 {
 	char file[1024];
-	char *buf;
-	int size;
+	std::string buf;
 
 	LuaCheckArgs(l, 1);
 	LibraryFileName(LuaToString(l, 1), file, sizeof(file));
-	LuaLoadBuffer(file, &buf, &size);
-	if (buf) {
-		lua_pushstring(l, buf);
-		delete[] buf; // Lua creates an internal copy
+	LuaLoadBuffer(file, buf);
+	if (!buf.empty()) {
+		lua_pushstring(l, buf.c_str());
 		return 1;
 	}
 	return 0;
