@@ -712,6 +712,8 @@ void Exit(int err)
 
 	ExitNetwork1();
 #ifdef DEBUG
+	CleanUnits();
+	CleanSelections();
 	FreeSounds();
 	FreeGraphics();
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
