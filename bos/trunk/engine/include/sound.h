@@ -80,6 +80,12 @@ public:
 */
 class CSound {
 public:
+	CSound() : Range(0), Number(0)
+	{
+		memset(&Sound, 0, sizeof(Sound));
+	}
+	~CSound();
+
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
@@ -190,6 +196,9 @@ extern CSound *SoundForName(const std::string &sound_name);
 extern CSound *MakeSound(const std::string &sound_name, const char *file[], int nb);
 	/// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
+#ifdef DEBUG
+extern void FreeSounds();
+#endif
 
 
 //@}
