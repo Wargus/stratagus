@@ -163,8 +163,10 @@ def readUnitStats():
     stats = csv.DictReader(rawcsvfile, delimiter=';', quotechar="'")
     newstats = {}
     for r in stats:
-        newstats[r['Name']] = r
+        newstats['"%s"' % r['Name']] = r
     return newstats
+def removeCommas(old):
+    return ''.join(old.split(','))
 def updateUnitStats(units):
     stats = readUnitStats()
     for unit in units:
@@ -173,7 +175,7 @@ def updateUnitStats(units):
             up = stats[name]
             for k in up.keys():
                 if unit.stats.has_key(k) and k != 'Name':
-                    unit.stats[k] = up[k]
+                    unit.stats[k] = removeCommas(up[k])
 
 Usage = """
     Unit stats generation tool.
