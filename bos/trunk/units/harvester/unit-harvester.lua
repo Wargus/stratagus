@@ -76,6 +76,8 @@ DefineUnitType("unit-harvester", {
     Icon = "icon-harvester",
     EnergyValue = 3200,
     MagmaValue = 1600,
+    MaxEnergyUtilizationRate = 40,
+    MaxMagmaUtilizationRate = 20,
     RepairHp = 2,
     ExplodeWhenKilled = "missile-160x128-explosion",
     Speed = 10,
