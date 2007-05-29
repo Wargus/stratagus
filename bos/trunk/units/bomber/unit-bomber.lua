@@ -9,7 +9,7 @@
 --
 --	unit-bomber.lua	-	Define the bomber unit.
 --
---	(c) Copyright 2005-2006 by Francois Beerten.
+--	(c) Copyright 2005-2007 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ MakeSound("bomber-ready", GetCurrentLuaPath().."/bomber.ready.wav")
 MakeSound("bomber-help", GetCurrentLuaPath().."/bomber.underattack.wav")
 
 DefineUnitType("unit-bomber", {
-    Name = "bomber Construction",
+    Name = "Bomber",
     Image = {"file", "units/bomber/unit_bomber.png", "size", {128, 128}},
     Shadow = {"file", "units/bomber/unit_bomber_s.png", "size", {128, 128}, "offset", {5, 128}},
     Animations = "animations-bomber",
