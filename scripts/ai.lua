@@ -31,7 +31,7 @@
 -- The list of registered AIs in BOS
 -- Every AI has an entry name: {internal_name, name, fun, initfun}
 -- See at RegisterAi() for a description what these are
-AiList = {}
+local AiList = {}
 
 -- Function to register an AI to BOS
 -- Parameters:

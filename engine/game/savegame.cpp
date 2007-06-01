@@ -150,9 +150,9 @@ char *SaveGlobal(lua_State *l, bool is_root)
 				}
 				break;
 			case LUA_TFUNCTION:
-			// Could be done with string.dump(function)
-			// and debug.getinfo(function).name (coulb be nil for anonymous function)
-			// But not usefull yet.
+				// Could be done with string.dump(function)
+				// and debug.getinfo(function).name (coulb be nil for anonymous function)
+				// But not useful yet.
 				value = NULL;
 				break;
 			case LUA_TUSERDATA:
@@ -178,6 +178,8 @@ char *SaveGlobal(lua_State *l, bool is_root)
 		if (value == NULL) {
 			if (!is_root) {
 				lua_pop(l, 2); // pop the key and the table
+				Assert(res == NULL);
+				delete[] res;
 				return NULL;
 			}
 			continue;
