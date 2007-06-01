@@ -88,12 +88,12 @@ char *SaveGlobal(lua_State *l, bool is_root)
 	const char *key;
 	char *value;
 	char *res;
-	int first;
+	bool first;
 	char *tmp;
 	int b;
 
 //	Assert(!is_root || !lua_gettop(l));
-	first = 1;
+	first = true;
 	res = NULL;
 	if (is_root) {
 		lua_pushstring(l, "_G");// global table in lua.
@@ -167,9 +167,7 @@ char *SaveGlobal(lua_State *l, bool is_root)
 
 		// Check the validity of the key (only [a-zA-z_])
 		if (type_key == LUA_TSTRING) {
-			int i;
-
-			for (i = 0; key[i]; ++i) {
+			for (int i = 0; key[i]; ++i) {
 				if (!isalnum(key[i]) && key[i] != '_') {
 					delete[] value;
 					value = NULL;
@@ -188,7 +186,7 @@ char *SaveGlobal(lua_State *l, bool is_root)
 			continue;
 		}
 		if (first) {
-			first = 0;
+			first = false;
 			if (type_key == LUA_TSTRING) {
 				res = strdcat3(key, "=", value);
 				delete[] value;
@@ -203,8 +201,12 @@ char *SaveGlobal(lua_State *l, bool is_root)
 				tmp = res;
 				res = strdcat3(res, sep, value);
 				delete[] tmp;
+				delete[] value;
 			} else {
+				tmp = res;
 				res = strdcat3(res, sep, value);
+				delete[] tmp;
+				delete[] value;
 			}
 		}
 		tmp = res;
