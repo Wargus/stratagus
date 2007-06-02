@@ -9,7 +9,7 @@
 --
 --	unit-nukeplant.lua	-	Define the nukeplant
 --
---	(c) Copyright 2001 - 2005 by Fran�is Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2007 by François Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ DefineUnitType("unit-nuke", {
     Icon = "icon-nuke",
     EnergyValue = 1600,
     MagmaValue = 270,
+    EnergyProductionRate = 30,
     RepairHp = 2,
     Construction = "construction-nuke",
     Speed = 0,
