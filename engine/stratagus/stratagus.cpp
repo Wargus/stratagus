@@ -196,6 +196,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "network.h"
 #include "netconnect.h"
 #include "ai.h"
+#include "missile.h"
 #include "commands.h"
 #include "results.h"
 #include "editor.h"
@@ -222,6 +223,8 @@ std::string NameLine =
 
 static char *MapName;                /// Filename of the map to load
 std::string CompileOptions;          /// Compile options.
+
+static std::vector<gcn::Container *> Containers;
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
@@ -514,6 +517,7 @@ void StartMap(const std::string &filename, bool clean)
 
 	gcn::Widget *oldTop = Gui->getTop();
 	gcn::Container *container = new gcn::Container();
+	Containers.push_back(container);
 	container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	container->setOpaque(false);
 	Gui->setTop(container);
@@ -544,6 +548,7 @@ void StartMap(const std::string &filename, bool clean)
 	SetDefaultTextColors(nc, rc);
 
 	Gui->setTop(oldTop);
+	Containers.erase(std::find(Containers.begin(), Containers.end(), container));
 	delete container;
 }
 
@@ -711,9 +716,14 @@ void Exit(int err)
 	ExitNetwork1();
 #ifdef DEBUG
 	CleanModules();
+	FreeBurningBuildingFrames();
 	FreeSounds();
 	FreeGraphics();
 	FreePlayerColors();
+	FreeButtonStyles();
+	for (size_t i = 0; i < Containers.size(); ++i) {
+		delete Containers[i];
+	}
 	freeGuichan();
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
 		FrameCounter _C_ SlowFrameCounter _C_
