@@ -288,6 +288,17 @@ void CleanUserInterface(void)
 	}
 }
 
+#ifdef DEBUG
+void FreeButtonStyles()
+{
+	std::map<std::string, ButtonStyle *>::iterator i;
+	for (i = ButtonStyleHash.begin(); i != ButtonStyleHash.end(); ++i) {
+		delete (*i).second;
+	}
+	ButtonStyleHash.clear();
+}
+#endif
+
 /**
 **  Takes coordinates of a pixel in stratagus's window and computes
 **  the map viewport which contains this pixel.

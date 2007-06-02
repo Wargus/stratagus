@@ -1321,10 +1321,7 @@ static int CclAddMessage(lua_State *l)
 static int CclSetGroupKeys(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	if (UiGroupKeys != DefaultGroupKeys) {
-		delete[] UiGroupKeys;
-	}
-	UiGroupKeys = new_strdup(LuaToString(l, 1));
+	UiGroupKeys = LuaToString(l, 1);
 	return 0;
 }
 
