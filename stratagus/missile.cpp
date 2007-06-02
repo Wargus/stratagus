@@ -1230,6 +1230,17 @@ void CleanMissiles(void)
 	LocalMissiles.clear();
 }
 
+#ifdef DEBUG
+void FreeBurningBuildingFrames()
+{
+	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
+		i != BurningBuildingFrames.end(); ++i) {
+		delete *i;
+	}
+	BurningBuildingFrames.clear();
+}
+#endif
+
 /*----------------------------------------------------------------------------
 --    Functions (Spells Controllers/Callbacks) TODO: move to another file?
 ----------------------------------------------------------------------------*/

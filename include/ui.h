@@ -642,8 +642,7 @@ extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 extern bool RightButtonAttacks;         /// right button attacks
 extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 
-extern char DefaultGroupKeys[];         /// Default group keys
-extern char *UiGroupKeys;               /// Up to 11 keys used for group selection
+extern std::string UiGroupKeys;         /// Up to 11 keys used for group selection
 
 // only exported to save them
 
@@ -657,6 +656,9 @@ extern void InitUserInterface(void);
 extern void SaveUserInterface(CFile *file);
 	/// Clean up the ui module
 extern void CleanUserInterface(void);
+#ifdef DEBUG
+extern void FreeButtonStyles();
+#endif
 	/// Register ccl features
 extern void UserInterfaceCclRegister(void);
 

@@ -1401,15 +1401,15 @@ static void EditorCallbackButtonDown(unsigned button)
 */
 static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
-	char *ptr;
+	size_t p;
 
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
 	}
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
-	if ((ptr = strchr(UiGroupKeys, key))) {
-		key = '0' + ptr - UiGroupKeys;
+	if ((p = UiGroupKeys.find(key)) != std::string::npos) {
+		key = '0' + p;
 		if (key > '9') {
 			key = SDLK_BACKQUOTE;
 		}

@@ -69,8 +69,8 @@ static int SavedMapPositionY[3];     /// Saved map position Y
 static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
-char DefaultGroupKeys[] = "0123456789`";/// Default group keys
-char *UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
+std::string DefaultGroupKeys = "0123456789`";/// Default group keys
+std::string UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
 bool GameRunning;                    /// Current running state
 bool GamePaused;                     /// Current pause state
 bool GameObserve;                    /// Observe mode
@@ -488,11 +488,11 @@ bool HandleCommandKey(int key)
 */
 static bool CommandKey(int key)
 {
-	char *ptr;
+	size_t p;
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
-	if ((ptr = strchr(UiGroupKeys, key))) {
-		key = '0' + ptr - UiGroupKeys;
+	if ((p = UiGroupKeys.find(key)) != std::string::npos) {
+		key = '0' + p;
 		if (key > '9') {
 			key = SDLK_BACKQUOTE;
 		}
