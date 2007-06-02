@@ -196,6 +196,8 @@ void CUnit::Release()
 	Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 	Type = 0;  // for debugging.
 
+	delete[] AutoCastSpell;
+	delete[] Variable;
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
 		delete *order;
 	}
