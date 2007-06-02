@@ -45,7 +45,7 @@ DefineUnitType("unit-rocksfield", {
     Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
     Animations = "animations-building",
     Icon = "icon-rocks_field",
-    MagmaValue = 90000,
+    MagmaValue = 9000,
     VisibleUnderFog = true,
     Construction = "construction-rocksfield",
     NeutralMinimapColor = {196, 196, 196},
