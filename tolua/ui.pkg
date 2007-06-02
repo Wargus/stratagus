@@ -22,7 +22,7 @@ class CUIButton
 
 $[
 CUIButton.SetCallback = function(w, f)
-  w.Callback = LuaActionListener:new_local(f)
+  w.Callback = LuaActionListener:new(f)
 end
 $]
 
