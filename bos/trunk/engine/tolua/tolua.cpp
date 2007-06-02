@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/01/07 23:06:18.
+** Generated automatically by tolua++-1.0.92 on 06/02/07 14:35:33.
 */
 
 #ifndef __cplusplus
@@ -16544,8 +16544,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
      97,108,108, 98, 97, 99,107, 32, 61, 32,102,117,110, 99,116,
     105,111,110, 40,119, 44, 32,102, 41, 10,119, 46, 67, 97,108,
     108, 98, 97, 99,107, 32, 61, 32, 76,117, 97, 65, 99,116,105,
-    111,110, 76,105,115,116,101,110,101,114, 58,110,101,119, 95,
-    108,111, 99, 97,108, 40,102, 41, 10,101,110,100,32
+    111,110, 76,105,115,116,101,110,101,114, 58,110,101,119, 40,
+    102, 41, 10,101,110,100,32
    };
    tolua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 2");
    lua_settop(tolua_S, top);
