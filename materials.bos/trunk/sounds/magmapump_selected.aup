@@ -1,0 +1,29 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="magmapump_selected_data" version="1.3.0" audacityversion="1.3.2-beta" sel0="0.0000000000" sel1="8.4299319728" vpos="0" h="0.0000000000" zoom="123.6071659135" rate="11025">
+	<tags title="" artist="" album="" track="-1" year="" genre="-1" comments="" id3v2="1"/>
+	<wavetrack name="heart-beat" channel="2" linked="0" offset="0.00000000" rate="11025" gain="0.707946" pan="0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="524288" sampleformat="131073" numsamples="92610">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000923.au" len="92610" min="-1" max="0.999969" rms="0.188542"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="beam01" channel="2" linked="0" offset="0.00000000" rate="11025" gain="0.501187" pan="0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="0"/>
+			<envelope numpoints="0"/>
+		</waveclip>
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="524288" sampleformat="131073" numsamples="92940">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000035.au" len="92940" min="-1" max="0.999969" rms="0.292958"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+</project>
