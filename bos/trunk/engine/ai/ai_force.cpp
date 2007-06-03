@@ -363,9 +363,7 @@ void AiAssignFreeUnitsToForce(void)
 	// Try to assign the remaining units.
 	//
 	for (i = 0; i < n; ++i) {
-		if (table[i]->Active) {
-			AiAssignToForce(table[i]);
-		}
+		AiAssignToForce(table[i]);
 	}
 }
 
