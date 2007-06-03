@@ -58,7 +58,7 @@ DefineAnimations("animations-magmapump", {
         "frame 27", "wait 2", "wait 2", },
     })
 
-MakeSound("magmapump-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
+MakeSound("magmapump-selected", GetCurrentLuaPath().."/magmapump.select.wav")
 MakeSound("magmapump-ready", GetCurrentLuaPath().."/magmapump.completed.wav")
 MakeSound("magmapump-help", GetCurrentLuaPath().."/magmapump.underattack.wav")
 MakeSound("magmapump-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
