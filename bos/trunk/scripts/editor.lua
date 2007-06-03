@@ -28,6 +28,10 @@
 --	$Id$
 
 
+Load("scripts/uilayout.lua")
+
+HandleCommandKey = HandleEditorIngameCommandKey
+
 -- Set which icons to display
 SetEditorSelectIcon("icon-patrol")
 SetEditorUnitsIcon("icon-assault")

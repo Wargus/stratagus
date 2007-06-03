@@ -495,10 +495,8 @@ function RunEditorMenu(s)
   browser:setActionCallback(selectMap)
 
   function starteditorbutton(s)
-    UI.MenuButton:SetCallback(function() RunEditorIngameMenu() end)
-    HandleCommandKey = HandleEditorIngameCommandKey
     StartEditor(selectedmap)
-    UI.MenuButton:SetCallback(function() RunGameMenu() end)
+    Load("scripts/uilayout.lua")
     HandleCommandKey = HandleIngameCommandKey
     menu:stop()
   end
