@@ -197,15 +197,6 @@ static void AiCheckUnits(void)
 		counter[queue->Type->Slot] += queue->Want;
 	}
 
-	//
-	//  Remove non active units.
-	//
-	for (i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
-		const CUnit *unit = AiPlayer->Player->Units[i];
-		if (!unit->Active) {
-			counter[unit->Type->Slot]--;
-		}
-	}
 	unit_types_count = AiPlayer->Player->UnitTypesCount;
 
 	//

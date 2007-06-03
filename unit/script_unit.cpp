@@ -477,7 +477,6 @@ static int CclUnit(lua_State *l)
 			unit = UnitSlots[slot];
 			unit->Init(type);
 			unit->Seen.Type = seentype;
-			unit->Active = 0;
 			unit->Removed = 0;
 			Assert(unit->Slot == slot);
 		} else if (!strcmp(value, "next")) {
@@ -598,9 +597,6 @@ static int CclUnit(lua_State *l)
 			--j;
 		} else if (!strcmp(value, "seen-state")) {
 			unit->Seen.State = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "active")) {
-			unit->Active = 1;
-			--j;
 		} else if (!strcmp(value, "resource-active")) {
 			unit->Data.Resource.Active = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "ttl")) {
