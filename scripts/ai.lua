@@ -33,6 +33,10 @@
 -- See at RegisterAi() for a description what these are
 local AiList = {}
 
+function GetAiList()
+  return AiList
+end
+
 -- Function to register an AI to BOS
 -- Parameters:
 -- internal_name : Internal name of the Ai (without leading "ai-"
