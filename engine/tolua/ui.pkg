@@ -217,6 +217,8 @@ class Widget
 	virtual void setY(int y);
 	virtual int getY() const;
 	virtual void setPosition(int x, int y);
+	virtual void setBorderSize(int width);
+	virtual unsigned int getBorderSize() const;
 	virtual void setEnabled(bool enabled);
 	virtual bool isEnabled() const;
 	virtual void setVisible(bool visible);
@@ -228,13 +230,10 @@ class Widget
 	virtual const Color &getForegroundColor() const;
 	virtual void setBackgroundColor(const Color color);
 	virtual const Color &getBackgroundColor() const;
+	virtual void setDisabledColor(const Color color);
+	virtual const Color &getDisabledColor() const;
 
 	static void setGlobalFont(CFont *font);
-	virtual void setForegroundColor(const Color color);
-	virtual void setBackgroundColor(const Color color);
-	virtual void setBaseColor(const Color color);
-	virtual void setSize(int width, int height);
-	virtual void setBorderSize(int width);
 	virtual void setFont(CFont *font);
 
 	virtual int getHotKey() const;

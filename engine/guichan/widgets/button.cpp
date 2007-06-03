@@ -122,8 +122,16 @@ namespace gcn
             shadowColor = faceColor + 0x303030;      
             shadowColor.a = alpha;
         }
+        else if (isEnabled())
+        {
+            highlightColor = faceColor + 0x303030;
+            highlightColor.a = alpha;
+            shadowColor = faceColor - 0x303030;
+            shadowColor.a = alpha;
+        }
         else
         {
+            faceColor = getDisabledColor();
             highlightColor = faceColor + 0x303030;
             highlightColor.a = alpha;
             shadowColor = faceColor - 0x303030;

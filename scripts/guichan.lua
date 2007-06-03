@@ -28,9 +28,10 @@
 --      $Id$
 
 -- Global useful objects for menus  ----------
-dark = Color(38, 38, 78, 130)
-clear = Color(200, 200, 120)
+dark = Color(38, 38, 78, 128)
+clear = Color(200, 200, 128)
 black = Color(0, 0, 0)
+disabled = Color(112, 112, 112, 128)
 
 bckground = CGraphic:New("graphics/screens/menu.png")
 bckground:Load()
@@ -86,6 +87,7 @@ function AddMenuHelpers(menu)
     b:setSize(size[1], size[2])
     b:setBackgroundColor(dark)
     b:setBaseColor(dark)
+    b:setDisabledColor(disabled)
     self:add(b, x, y)
     return b
   end
