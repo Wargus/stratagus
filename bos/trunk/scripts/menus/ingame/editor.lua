@@ -32,6 +32,10 @@ function HandleEditorIngameCommandKey(key, ctrl, alt, shift)
     RunEditorIngameMenu()
   elseif ((key == "s" and alt) or key == "f11") then
     RunEditorSaveMenu()
+  elseif (key == "f5") then
+    RunEditorMapPropertiesMenu()
+  elseif (key == "f6") then
+    RunEditorPlayerPropertiesMenu()
   else
     return false
   end
@@ -180,8 +184,9 @@ function RunEditorPlayerPropertiesMenu()
   local types = {}
   local itypes = {}
   local i=1
-  for aiiname in AiList do
-    types[i] = AiList[aiiname][1]
+  local ailist = GetAiList()
+  for aiiname in ailist do
+    types[i] = ailist[aiiname][1]
     itypes[i - 1] = aiiname
     i = i + 1
   end
