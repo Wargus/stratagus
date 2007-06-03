@@ -12,8 +12,9 @@
  * Command line : text2wave file.txt -o output.wav
 (from the Festival toolbox)
 
+ => /!\ edit and USE make_building_voices.sh /!\
+
  * Using Audacity to correct sounds :
--> bitrate = 16bits
--> sample rate = 22k
--> apply Compressor effect with -14dB gain
+(verify : bitrate = 16bits, sample rate = 22k)
+-> apply Compressor effect with Threshold = -14dB, ratio = 2:1, attack = 0,2s, normalize to 0 selected
 
