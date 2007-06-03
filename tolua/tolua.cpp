@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/02/07 22:25:49.
+** Generated automatically by tolua++-1.0.92 on 06/03/07 14:14:38.
 */
 
 #ifndef __cplusplus
@@ -1223,9 +1223,65 @@ static int tolua_set_CFiller_Y(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: clear of class  vector<CFiller> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__clear00
-static int tolua_stratagus_vector_CFiller__clear00(lua_State* tolua_S)
+/* method: new of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__new00
+static int tolua_stratagus_vector_CFiller__new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   vector<CFiller>* tolua_ret = (vector<CFiller>*)  new vector<CFiller>();
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"vector<CFiller>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__new00_local
+static int tolua_stratagus_vector_CFiller__new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   vector<CFiller>* tolua_ret = (vector<CFiller>*)  new vector<CFiller>();
+   tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"vector<CFiller>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: delete of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__delete00
+static int tolua_stratagus_vector_CFiller__delete00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -1239,48 +1295,14 @@ static int tolua_stratagus_vector_CFiller__clear00(lua_State* tolua_S)
  {
   vector<CFiller>* self = (vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
 #endif
-  {
-   self->clear();
-  }
+  delete self;
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'clear'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: size of class  vector<CFiller> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__size00
-static int tolua_stratagus_vector_CFiller__size00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const vector<CFiller>",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const vector<CFiller>* self = (const vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'size'",NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->size();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'size'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1398,6 +1420,187 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: at of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__at00
+static int tolua_stratagus_vector_CFiller__at00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CFiller>* self = (const vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'at'",NULL);
+#endif
+  {
+   const CFiller& tolua_ret = (const CFiller&)  self->at(index);
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const CFiller");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'at'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: at of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__at01
+static int tolua_stratagus_vector_CFiller__at01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<CFiller>* self = (vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'at'",NULL);
+#endif
+  {
+   CFiller& tolua_ret = (CFiller&)  self->at(index);
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"CFiller");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_CFiller__at00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: front of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__front00
+static int tolua_stratagus_vector_CFiller__front00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CFiller>* self = (const vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'front'",NULL);
+#endif
+  {
+   const CFiller& tolua_ret = (const CFiller&)  self->front();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const CFiller");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'front'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: front of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__front01
+static int tolua_stratagus_vector_CFiller__front01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<CFiller>* self = (vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'front'",NULL);
+#endif
+  {
+   CFiller& tolua_ret = (CFiller&)  self->front();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"CFiller");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_CFiller__front00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: back of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__back00
+static int tolua_stratagus_vector_CFiller__back00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CFiller>* self = (const vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'back'",NULL);
+#endif
+  {
+   const CFiller& tolua_ret = (const CFiller&)  self->back();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const CFiller");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'back'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: back of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__back01
+static int tolua_stratagus_vector_CFiller__back01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<CFiller>* self = (vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'back'",NULL);
+#endif
+  {
+   CFiller& tolua_ret = (CFiller&)  self->back();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"CFiller");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_CFiller__back00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: push_back of class  vector<CFiller> */
 #ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__push_back00
 static int tolua_stratagus_vector_CFiller__push_back00(lua_State* tolua_S)
@@ -1431,65 +1634,9 @@ static int tolua_stratagus_vector_CFiller__push_back00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: new of class  vector<CFiller> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__new00
-static int tolua_stratagus_vector_CFiller__new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   vector<CFiller>* tolua_ret = (vector<CFiller>*)  new vector<CFiller>();
-   tolua_pushusertype(tolua_S,(void*)tolua_ret,"vector<CFiller>");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  vector<CFiller> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__new00_local
-static int tolua_stratagus_vector_CFiller__new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   vector<CFiller>* tolua_ret = (vector<CFiller>*)  new vector<CFiller>();
-   tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"vector<CFiller>");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: delete of class  vector<CFiller> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__delete00
-static int tolua_stratagus_vector_CFiller__delete00(lua_State* tolua_S)
+/* method: pop_back of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__pop_back00
+static int tolua_stratagus_vector_CFiller__pop_back00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -1503,34 +1650,71 @@ static int tolua_stratagus_vector_CFiller__delete00(lua_State* tolua_S)
  {
   vector<CFiller>* self = (vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'pop_back'",NULL);
 #endif
-  delete self;
+  {
+   self->pop_back();
+  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'pop_back'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: clear of class  vector<CUIButton> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__clear00
-static int tolua_stratagus_vector_CUIButton__clear00(lua_State* tolua_S)
+/* method: assign of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__assign00
+static int tolua_stratagus_vector_CFiller__assign00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const CFiller",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  vector<CFiller>* self = (vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+  int num = ((int)  tolua_tonumber(tolua_S,2,0));
+  const CFiller* val = ((const CFiller*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'assign'",NULL);
+#endif
+  {
+   self->assign(num,*val);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'assign'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: clear of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__clear00
+static int tolua_stratagus_vector_CFiller__clear00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CFiller>",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+  vector<CFiller>* self = (vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'",NULL);
 #endif
@@ -1547,21 +1731,53 @@ static int tolua_stratagus_vector_CUIButton__clear00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: size of class  vector<CUIButton> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__size00
-static int tolua_stratagus_vector_CUIButton__size00(lua_State* tolua_S)
+/* method: empty of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__empty00
+static int tolua_stratagus_vector_CFiller__empty00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"const vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const vector<CFiller>",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const vector<CUIButton>* self = (const vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+  const vector<CFiller>* self = (const vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'empty'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->empty();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'empty'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: size of class  vector<CFiller> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CFiller__size00
+static int tolua_stratagus_vector_CFiller__size00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CFiller>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CFiller>* self = (const vector<CFiller>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'size'",NULL);
 #endif
@@ -1574,6 +1790,91 @@ static int tolua_stratagus_vector_CUIButton__size00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'size'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__new00
+static int tolua_stratagus_vector_CUIButton__new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   vector<CUIButton>* tolua_ret = (vector<CUIButton>*)  new vector<CUIButton>();
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"vector<CUIButton>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__new00_local
+static int tolua_stratagus_vector_CUIButton__new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   vector<CUIButton>* tolua_ret = (vector<CUIButton>*)  new vector<CUIButton>();
+   tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"vector<CUIButton>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: delete of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__delete00
+static int tolua_stratagus_vector_CUIButton__delete00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
+#endif
+  delete self;
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1691,6 +1992,187 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: at of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__at00
+static int tolua_stratagus_vector_CUIButton__at00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CUIButton>* self = (const vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'at'",NULL);
+#endif
+  {
+   const CUIButton& tolua_ret = (const CUIButton&)  self->at(index);
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const CUIButton");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'at'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: at of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__at01
+static int tolua_stratagus_vector_CUIButton__at01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'at'",NULL);
+#endif
+  {
+   CUIButton& tolua_ret = (CUIButton&)  self->at(index);
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"CUIButton");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_CUIButton__at00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: front of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__front00
+static int tolua_stratagus_vector_CUIButton__front00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CUIButton>* self = (const vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'front'",NULL);
+#endif
+  {
+   const CUIButton& tolua_ret = (const CUIButton&)  self->front();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const CUIButton");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'front'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: front of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__front01
+static int tolua_stratagus_vector_CUIButton__front01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'front'",NULL);
+#endif
+  {
+   CUIButton& tolua_ret = (CUIButton&)  self->front();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"CUIButton");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_CUIButton__front00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: back of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__back00
+static int tolua_stratagus_vector_CUIButton__back00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CUIButton>* self = (const vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'back'",NULL);
+#endif
+  {
+   const CUIButton& tolua_ret = (const CUIButton&)  self->back();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const CUIButton");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'back'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: back of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__back01
+static int tolua_stratagus_vector_CUIButton__back01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'back'",NULL);
+#endif
+  {
+   CUIButton& tolua_ret = (CUIButton&)  self->back();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"CUIButton");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_CUIButton__back00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: push_back of class  vector<CUIButton> */
 #ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__push_back00
 static int tolua_stratagus_vector_CUIButton__push_back00(lua_State* tolua_S)
@@ -1724,65 +2206,9 @@ static int tolua_stratagus_vector_CUIButton__push_back00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: new of class  vector<CUIButton> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__new00
-static int tolua_stratagus_vector_CUIButton__new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   vector<CUIButton>* tolua_ret = (vector<CUIButton>*)  new vector<CUIButton>();
-   tolua_pushusertype(tolua_S,(void*)tolua_ret,"vector<CUIButton>");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  vector<CUIButton> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__new00_local
-static int tolua_stratagus_vector_CUIButton__new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   vector<CUIButton>* tolua_ret = (vector<CUIButton>*)  new vector<CUIButton>();
-   tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"vector<CUIButton>");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: delete of class  vector<CUIButton> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__delete00
-static int tolua_stratagus_vector_CUIButton__delete00(lua_State* tolua_S)
+/* method: pop_back of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__pop_back00
+static int tolua_stratagus_vector_CUIButton__pop_back00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -1796,34 +2222,71 @@ static int tolua_stratagus_vector_CUIButton__delete00(lua_State* tolua_S)
  {
   vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'pop_back'",NULL);
 #endif
-  delete self;
+  {
+   self->pop_back();
+  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'pop_back'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: clear of class  vector<string> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__clear00
-static int tolua_stratagus_vector_string__clear00(lua_State* tolua_S)
+/* method: assign of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__assign00
+static int tolua_stratagus_vector_CUIButton__assign00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const CUIButton",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+  int num = ((int)  tolua_tonumber(tolua_S,2,0));
+  const CUIButton* val = ((const CUIButton*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'assign'",NULL);
+#endif
+  {
+   self->assign(num,*val);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'assign'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: clear of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__clear00
+static int tolua_stratagus_vector_CUIButton__clear00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<CUIButton>",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  vector<CUIButton>* self = (vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'",NULL);
 #endif
@@ -1840,21 +2303,53 @@ static int tolua_stratagus_vector_string__clear00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: size of class  vector<string> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__size00
-static int tolua_stratagus_vector_string__size00(lua_State* tolua_S)
+/* method: empty of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__empty00
+static int tolua_stratagus_vector_CUIButton__empty00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const vector<CUIButton>",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  const vector<CUIButton>* self = (const vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'empty'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->empty();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'empty'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: size of class  vector<CUIButton> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_CUIButton__size00
+static int tolua_stratagus_vector_CUIButton__size00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<CUIButton>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<CUIButton>* self = (const vector<CUIButton>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'size'",NULL);
 #endif
@@ -1867,6 +2362,91 @@ static int tolua_stratagus_vector_string__size00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'size'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__new00
+static int tolua_stratagus_vector_string__new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   vector<string>* tolua_ret = (vector<string>*)  new vector<string>();
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"vector<string>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__new00_local
+static int tolua_stratagus_vector_string__new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   vector<string>* tolua_ret = (vector<string>*)  new vector<string>();
+   tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"vector<string>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: delete of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__delete00
+static int tolua_stratagus_vector_string__delete00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
+#endif
+  delete self;
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1968,6 +2548,187 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: at of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__at00
+static int tolua_stratagus_vector_string__at00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'at'",NULL);
+#endif
+  {
+   const string tolua_ret = (const string)  self->at(index);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'at'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: at of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__at01
+static int tolua_stratagus_vector_string__at01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  int index = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'at'",NULL);
+#endif
+  {
+   string tolua_ret = (string)  self->at(index);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_string__at00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: front of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__front00
+static int tolua_stratagus_vector_string__front00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'front'",NULL);
+#endif
+  {
+   const string tolua_ret = (const string)  self->front();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'front'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: front of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__front01
+static int tolua_stratagus_vector_string__front01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'front'",NULL);
+#endif
+  {
+   string tolua_ret = (string)  self->front();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_string__front00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: back of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__back00
+static int tolua_stratagus_vector_string__back00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'back'",NULL);
+#endif
+  {
+   const string tolua_ret = (const string)  self->back();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'back'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: back of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__back01
+static int tolua_stratagus_vector_string__back01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'back'",NULL);
+#endif
+  {
+   string tolua_ret = (string)  self->back();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_vector_string__back00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: push_back of class  vector<string> */
 #ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__push_back00
 static int tolua_stratagus_vector_string__push_back00(lua_State* tolua_S)
@@ -2001,65 +2762,9 @@ static int tolua_stratagus_vector_string__push_back00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: new of class  vector<string> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__new00
-static int tolua_stratagus_vector_string__new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"vector<string>",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   vector<string>* tolua_ret = (vector<string>*)  new vector<string>();
-   tolua_pushusertype(tolua_S,(void*)tolua_ret,"vector<string>");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  vector<string> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__new00_local
-static int tolua_stratagus_vector_string__new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"vector<string>",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   vector<string>* tolua_ret = (vector<string>*)  new vector<string>();
-   tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"vector<string>");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: delete of class  vector<string> */
-#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__delete00
-static int tolua_stratagus_vector_string__delete00(lua_State* tolua_S)
+/* method: pop_back of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__pop_back00
+static int tolua_stratagus_vector_string__pop_back00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -2073,14 +2778,147 @@ static int tolua_stratagus_vector_string__delete00(lua_State* tolua_S)
  {
   vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'pop_back'",NULL);
 #endif
-  delete self;
+  {
+   self->pop_back();
+  }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'pop_back'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: assign of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__assign00
+static int tolua_stratagus_vector_string__assign00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+  int num = ((int)  tolua_tonumber(tolua_S,2,0));
+  const string val = ((const string)  tolua_tocppstring(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'assign'",NULL);
+#endif
+  {
+   self->assign(num,val);
+   tolua_pushcppstring(tolua_S,(const char*)val);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'assign'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: clear of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__clear00
+static int tolua_stratagus_vector_string__clear00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  vector<string>* self = (vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'clear'",NULL);
+#endif
+  {
+   self->clear();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'clear'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: empty of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__empty00
+static int tolua_stratagus_vector_string__empty00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'empty'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->empty();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'empty'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: size of class  vector<string> */
+#ifndef TOLUA_DISABLE_tolua_stratagus_vector_string__size00
+static int tolua_stratagus_vector_string__size00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const vector<string>",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const vector<string>* self = (const vector<string>*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'size'",NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->size();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'size'.",&tolua_err);
  return 0;
 #endif
 }
@@ -16564,16 +17402,25 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"vector_CFiller_","vector<CFiller>","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"vector_CFiller_");
-   tolua_function(tolua_S,"clear",tolua_stratagus_vector_CFiller__clear00);
-   tolua_function(tolua_S,"size",tolua_stratagus_vector_CFiller__size00);
-   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CFiller___geti00);
-   tolua_function(tolua_S,".seti",tolua_stratagus_vector_CFiller___seti00);
-   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CFiller___geti01);
-   tolua_function(tolua_S,"push_back",tolua_stratagus_vector_CFiller__push_back00);
    tolua_function(tolua_S,"new",tolua_stratagus_vector_CFiller__new00);
    tolua_function(tolua_S,"new_local",tolua_stratagus_vector_CFiller__new00_local);
    tolua_function(tolua_S,".call",tolua_stratagus_vector_CFiller__new00_local);
    tolua_function(tolua_S,"delete",tolua_stratagus_vector_CFiller__delete00);
+   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CFiller___geti00);
+   tolua_function(tolua_S,".seti",tolua_stratagus_vector_CFiller___seti00);
+   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CFiller___geti01);
+   tolua_function(tolua_S,"at",tolua_stratagus_vector_CFiller__at00);
+   tolua_function(tolua_S,"at",tolua_stratagus_vector_CFiller__at01);
+   tolua_function(tolua_S,"front",tolua_stratagus_vector_CFiller__front00);
+   tolua_function(tolua_S,"front",tolua_stratagus_vector_CFiller__front01);
+   tolua_function(tolua_S,"back",tolua_stratagus_vector_CFiller__back00);
+   tolua_function(tolua_S,"back",tolua_stratagus_vector_CFiller__back01);
+   tolua_function(tolua_S,"push_back",tolua_stratagus_vector_CFiller__push_back00);
+   tolua_function(tolua_S,"pop_back",tolua_stratagus_vector_CFiller__pop_back00);
+   tolua_function(tolua_S,"assign",tolua_stratagus_vector_CFiller__assign00);
+   tolua_function(tolua_S,"clear",tolua_stratagus_vector_CFiller__clear00);
+   tolua_function(tolua_S,"empty",tolua_stratagus_vector_CFiller__empty00);
+   tolua_function(tolua_S,"size",tolua_stratagus_vector_CFiller__size00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"vector_CUIButton_","vector<CUIButton>","",tolua_collect_vector_CUIButton_);
@@ -16581,16 +17428,25 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"vector_CUIButton_","vector<CUIButton>","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"vector_CUIButton_");
-   tolua_function(tolua_S,"clear",tolua_stratagus_vector_CUIButton__clear00);
-   tolua_function(tolua_S,"size",tolua_stratagus_vector_CUIButton__size00);
-   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CUIButton___geti00);
-   tolua_function(tolua_S,".seti",tolua_stratagus_vector_CUIButton___seti00);
-   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CUIButton___geti01);
-   tolua_function(tolua_S,"push_back",tolua_stratagus_vector_CUIButton__push_back00);
    tolua_function(tolua_S,"new",tolua_stratagus_vector_CUIButton__new00);
    tolua_function(tolua_S,"new_local",tolua_stratagus_vector_CUIButton__new00_local);
    tolua_function(tolua_S,".call",tolua_stratagus_vector_CUIButton__new00_local);
    tolua_function(tolua_S,"delete",tolua_stratagus_vector_CUIButton__delete00);
+   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CUIButton___geti00);
+   tolua_function(tolua_S,".seti",tolua_stratagus_vector_CUIButton___seti00);
+   tolua_function(tolua_S,".geti",tolua_stratagus_vector_CUIButton___geti01);
+   tolua_function(tolua_S,"at",tolua_stratagus_vector_CUIButton__at00);
+   tolua_function(tolua_S,"at",tolua_stratagus_vector_CUIButton__at01);
+   tolua_function(tolua_S,"front",tolua_stratagus_vector_CUIButton__front00);
+   tolua_function(tolua_S,"front",tolua_stratagus_vector_CUIButton__front01);
+   tolua_function(tolua_S,"back",tolua_stratagus_vector_CUIButton__back00);
+   tolua_function(tolua_S,"back",tolua_stratagus_vector_CUIButton__back01);
+   tolua_function(tolua_S,"push_back",tolua_stratagus_vector_CUIButton__push_back00);
+   tolua_function(tolua_S,"pop_back",tolua_stratagus_vector_CUIButton__pop_back00);
+   tolua_function(tolua_S,"assign",tolua_stratagus_vector_CUIButton__assign00);
+   tolua_function(tolua_S,"clear",tolua_stratagus_vector_CUIButton__clear00);
+   tolua_function(tolua_S,"empty",tolua_stratagus_vector_CUIButton__empty00);
+   tolua_function(tolua_S,"size",tolua_stratagus_vector_CUIButton__size00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"vector_string_","vector<string>","",tolua_collect_vector_string_);
@@ -16598,16 +17454,25 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"vector_string_","vector<string>","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"vector_string_");
-   tolua_function(tolua_S,"clear",tolua_stratagus_vector_string__clear00);
-   tolua_function(tolua_S,"size",tolua_stratagus_vector_string__size00);
-   tolua_function(tolua_S,".geti",tolua_stratagus_vector_string___geti00);
-   tolua_function(tolua_S,".seti",tolua_stratagus_vector_string___seti00);
-   tolua_function(tolua_S,".geti",tolua_stratagus_vector_string___geti01);
-   tolua_function(tolua_S,"push_back",tolua_stratagus_vector_string__push_back00);
    tolua_function(tolua_S,"new",tolua_stratagus_vector_string__new00);
    tolua_function(tolua_S,"new_local",tolua_stratagus_vector_string__new00_local);
    tolua_function(tolua_S,".call",tolua_stratagus_vector_string__new00_local);
    tolua_function(tolua_S,"delete",tolua_stratagus_vector_string__delete00);
+   tolua_function(tolua_S,".geti",tolua_stratagus_vector_string___geti00);
+   tolua_function(tolua_S,".seti",tolua_stratagus_vector_string___seti00);
+   tolua_function(tolua_S,".geti",tolua_stratagus_vector_string___geti01);
+   tolua_function(tolua_S,"at",tolua_stratagus_vector_string__at00);
+   tolua_function(tolua_S,"at",tolua_stratagus_vector_string__at01);
+   tolua_function(tolua_S,"front",tolua_stratagus_vector_string__front00);
+   tolua_function(tolua_S,"front",tolua_stratagus_vector_string__front01);
+   tolua_function(tolua_S,"back",tolua_stratagus_vector_string__back00);
+   tolua_function(tolua_S,"back",tolua_stratagus_vector_string__back01);
+   tolua_function(tolua_S,"push_back",tolua_stratagus_vector_string__push_back00);
+   tolua_function(tolua_S,"pop_back",tolua_stratagus_vector_string__pop_back00);
+   tolua_function(tolua_S,"assign",tolua_stratagus_vector_string__assign00);
+   tolua_function(tolua_S,"clear",tolua_stratagus_vector_string__clear00);
+   tolua_function(tolua_S,"empty",tolua_stratagus_vector_string__empty00);
+   tolua_function(tolua_S,"size",tolua_stratagus_vector_string__size00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"CButtonPanel","CButtonPanel","",NULL);
   tolua_beginmodule(tolua_S,"CButtonPanel");
