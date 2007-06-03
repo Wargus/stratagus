@@ -554,70 +554,6 @@ static void CleanEditAi()
 	editAiCancelButton = NULL;
 }
 
-class CEditAiOKActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		UnitUnderCursor->Active = editAiCheckBox->isMarked() ? 1 : 0;
-		editAiMenu->stop();
-	}
-};
-static CEditAiOKActionListener EditAiOKListener;
-
-class CEditAiCancelActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		editAiMenu->stop();
-	}
-};
-static CEditAiCancelActionListener EditAiCancelListener;
-
-/**
-**  Edit ai properties
-*/
-static void EditorEditAiProperties(void)
-{
-	CleanEditAi();
-
-	editAiMenu = new MenuScreen();
-
-	editAiMenu->setOpaque(true);
-	editAiMenu->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editAiMenu->setSize(288, 128);
-	editAiMenu->setPosition((Video.Width - editAiMenu->getWidth()) / 2,
-		(Video.Height - editAiMenu->getHeight()) / 2);
-	editAiMenu->setBorderSize(1);
-	editAiMenu->setDrawMenusUnder(false);
-
-	editAiLabel = new gcn::Label(_("Artificial Intelligence"));
-	editAiMenu->add(editAiLabel, 288 / 2 - editAiLabel->getWidth() / 2, 11);
-
-	editAiCheckBox = new gcn::CheckBox("Active", UnitUnderCursor->Active);
-	editAiCheckBox->setBaseColor(gcn::Color(200, 200, 120));
-	editAiCheckBox->setForegroundColor(gcn::Color(200, 200, 120));
-	editAiCheckBox->setBackgroundColor(gcn::Color(38, 38, 78));
-	editAiMenu->add(editAiCheckBox, 100, 34);
-
-	editAiOKButton = new gcn::Button(_("~!OK"));
-	editAiOKButton->setHotKey("o");
-	editAiOKButton->setSize(106, 28);
-	editAiOKButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editAiOKButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editAiOKButton->addActionListener(&EditAiOKListener);
-	editAiMenu->add(editAiOKButton, 24, 88);
-
-	editAiCancelButton = new gcn::Button(_("~!Cancel"));
-	editAiCancelButton->setHotKey("c");
-	editAiCancelButton->setSize(106, 28);
-	editAiCancelButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editAiCancelButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editAiCancelButton->addActionListener(&EditAiCancelListener);
-	editAiMenu->add(editAiCancelButton, 154, 88);
-
-	editAiMenu->run(false);
-}
-
 /*----------------------------------------------------------------------------
 --  Display
 ----------------------------------------------------------------------------*/
@@ -1099,11 +1035,10 @@ static void ShowUnitInfo(const CUnit *unit)
 	char buf[256];
 	int i;
 
-	i = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
-		unit->Type->Name.c_str(), unit->Player->Index,
-		unit->Active ? "active" : "passive");
+	i = sprintf(buf, "#%d '%s' Player:#%d", UnitNumber(unit),
+		unit->Type->Name.c_str(), unit->Player->Index);
 	if (unit->Type->CanHarvestFrom) {
-		sprintf(buf + i," Amount %d", unit->ResourcesHeld[1] / CYCLES_PER_SECOND);
+		sprintf(buf + i, " Amount %d", unit->ResourcesHeld[1] / CYCLES_PER_SECOND);
 	}
 	UI.StatusLine.Set(buf);
 }
@@ -1335,8 +1270,6 @@ static void EditorCallbackButtonDown(unsigned button)
 		if ((MouseButtons & RightButton && UnitUnderCursor)) {
 			if (UnitUnderCursor->Type->CanHarvestFrom) {
 				EditorEditResource();
-			} else {
-				EditorEditAiProperties();
 			}
 			return;
 		}

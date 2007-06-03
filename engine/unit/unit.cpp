@@ -302,7 +302,6 @@ void CUnit::Init(CUnitType *type)
 			memset(AutoCastSpell, 0, SpellTypeTable.size());
 		}
 	}
-	Active = 1;
 
 	Removed = 1;
 
@@ -3471,9 +3470,6 @@ void SaveUnit(const CUnit *unit, CFile *file)
 		file->printf(" \"seen-constructed\",");
 	}
 	file->printf(" \"seen-state\", %d, ", unit->Seen.State);
-	if (unit->Active) {
-		file->printf(" \"active\",");
-	}
 	file->printf("\"ttl\", %lu, ", unit->TTL);
 
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {

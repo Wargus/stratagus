@@ -521,7 +521,6 @@ public:
 		Selected = 0;
 		TeamSelected = 0;
 		Constructed = 0;
-		Active = 0;
 		Boarded = 0;
 		RescuedFrom = NULL;
 		memset(VisCount, 0, sizeof(VisCount));
@@ -590,7 +589,6 @@ public:
 	unsigned TeamSelected;  /// unit is selected by a team member.
 
 	unsigned Constructed : 1;    /// Unit is in construction
-	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 							     /// NULL if the unit was not rescued.
