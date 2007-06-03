@@ -236,6 +236,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <map>
 #include <string>
 #include "upgrade_structs.h"
 #include "video.h"
