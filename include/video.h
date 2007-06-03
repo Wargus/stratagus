@@ -37,7 +37,7 @@
 class CFont;
 #endif
 
-#include "guichan.h"
+#include "guichan/image.h"
 
 class CGraphic : public gcn::Image {
 protected:

@@ -211,12 +211,13 @@
 //  Includes
 //----------------------------------------------------------------------------
 
+#include "stratagus.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-
-#include "stratagus.h"
+#include <list>
 
 #include "net_lowlevel.h"
 #include "unit.h"

@@ -313,6 +313,16 @@ namespace gcn
         return mBackgroundColor;
     }
 
+    void Widget::setDisabledColor(const Color& color)
+    {
+        mDisabledColor = color;
+    }
+
+    const Color& Widget::getDisabledColor() const
+    {
+        return mDisabledColor;
+    }
+
     void Widget::_setFocusHandler(FocusHandler* focusHandler)
     {
         if (mFocusHandler)
