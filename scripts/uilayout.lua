@@ -140,8 +140,10 @@ end
 
 UI.Fillers:clear()
 AddFiller("elites/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
-AddFiller("elites/ui/ui_" .. Video.Width .. "_bpanel.png",
-	Video.Width - 200, 336 - 8 - 8)
+if (Editor.Running == EditorNotRunning) then
+  AddFiller("elites/ui/ui_" .. Video.Width .. "_bpanel.png",
+    Video.Width - 200, 336 - 8 - 8)
+end
 
 b = CFiller:new_local()
 b.G = CGraphic:New("elites/ui/ui_info.png", 200, 176)
@@ -299,7 +301,11 @@ UI.MenuButton.X = Video.Width - 130
 UI.MenuButton.Y = 0
 UI.MenuButton.Text = "Menu (~<F10~>)"
 UI.MenuButton.Style = FindButtonStyle("network")
-UI.MenuButton:SetCallback(function() RunGameMenu() end)
+if (Editor.Running == EditorNotRunning) then
+  UI.MenuButton:SetCallback(function() RunGameMenu() end)
+else
+  UI.MenuButton:SetCallback(function() RunEditorIngameMenu() end)
+end
 
 UI.NetworkMenuButton.X = Video.Width - 200
 UI.NetworkMenuButton.Y = 0

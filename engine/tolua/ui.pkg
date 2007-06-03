@@ -51,15 +51,26 @@ class vector
 {
 	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, string)
 
-	void clear();
-	int size() const;
+	vector();
+	~vector();
 
 	const T& operator[](int index) const;
 	T& operator[](int index);
-	void push_back(T val);
+	const T& at(int index) const;
+	T& at(int index);
 
-	vector();
-	~vector();
+	const T& front() const;
+	T& front();
+	const T& back() const;
+	T& back();
+
+	void push_back(T val);
+	void pop_back();
+
+	void assign(int num, const T& val);
+	void clear();
+	bool empty() const;
+	int size() const;
 };
 
 
