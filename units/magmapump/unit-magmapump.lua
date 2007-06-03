@@ -59,8 +59,8 @@ DefineAnimations("animations-magmapump", {
     })
 
 MakeSound("magmapump-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
-MakeSound("magmapump-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
-MakeSound("magmapump-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
+MakeSound("magmapump-ready", GetCurrentLuaPath().."/magma.pump.completed.wav")
+MakeSound("magmapump-help", GetCurrentLuaPath().."/magma.pump.underattack.wav")
 MakeSound("magmapump-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
 
 DefineUnitType("unit-magmapump", {
