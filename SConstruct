@@ -100,7 +100,7 @@ def CheckOpenGL(env, conf):
          print("Can't find OpenGL libs. Exiting")
          sys.exit(1)
   env.Append(CPPDEFINES = 'USE_OPENGL')
-  sourcesEngine.append(globSources("guichan/opengl"))
+  sourcesEngine.append(globSources("guichan/opengl", 'build'))
 
 def CheckLuaLib(env, conf):
   if not 'USE_WIN32' in env['CPPDEFINES']:
@@ -155,7 +155,7 @@ def AutoConfigure(env):
      env.Append(CPPDEFINES = 'USE_THEORA')
   if conf.CheckLib('ogg'):
      env.Append(CPPDEFINES = 'USE_OGG')
-  if env['opengl'] == 1:
+  if int(env['opengl']) == 1:
      CheckOpenGL(env, conf)
   
   # check for optional functions
