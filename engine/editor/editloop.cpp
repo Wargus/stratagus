@@ -1954,7 +1954,7 @@ void CEditor::Init(void)
 	RecalculateShownUnits();
 
 	ButtonPanelWidth = 200;
-	ButtonPanelHeight = 144;
+	ButtonPanelHeight = 160 + (Video.Height - 480);
 
 	EditorCallbacks.ButtonPressed = EditorCallbackButtonDown;
 	EditorCallbacks.ButtonReleased = EditorCallbackButtonUp;
