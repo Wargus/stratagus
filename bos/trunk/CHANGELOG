@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development Version:
+- Add Pitcher and Rafflesia plants (Xavier Paz, François Beerten)
 - Rebalanced unit characteristics (François Beerten)
 - Removed the crystals (François Beerten)
 - Added support for compressed textures with OpenGL (Jimmy Salmon)

@@ -101,7 +101,9 @@ local editor_types = {
   "unit-morel-5",
   "unit-morel-6",
   "unit-morel-7",
-  "unit-antharus"
+  "unit-antharus",
+  "unit-pitcher",
+  "unit-rafflesia"
 }
 
 Editor.UnitTypes:clear()
