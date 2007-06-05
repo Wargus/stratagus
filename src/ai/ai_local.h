@@ -78,7 +78,7 @@ class AiRequestType {
 public:
 	AiRequestType() : Count(0), Type(NULL) {}
 
-	int Count;           /// elements in table
+	unsigned int Count;  /// elements in table
 	CUnitType *Type;     /// the type
 };
 
@@ -89,7 +89,7 @@ class AiUnitType {
 public:
 	AiUnitType() : Want(0), Type(NULL) {}
 
-	int Want;        /// number of this unit-type wanted
+	unsigned int Want; /// number of this unit-type wanted
 	CUnitType *Type; /// unit-type self
 };
 
@@ -110,18 +110,19 @@ enum AiForceRole {
 class AiForce {
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false), Role(0),
-		State(0), GoalX(0), GoalY(0), MustTransport(false) {}
+		State(AiForceRoleDefend), GoalX(0), GoalY(0) {}
 
+	/**
+	**  Reset the force. But don't change its role and its demand.
+	*/
 	void Reset() {
 		Completed = false;
 		Defending = false;
 		Attacking = false;
-		Role = 0;
-		UnitTypes.clear();
+		//UnitTypes.clear();
 		Units.clear();
 		State = 0;
 		GoalX = GoalY = 0;
-		MustTransport = false;
 	}
 
 	bool Completed;     /// Flag saying force is complete build
@@ -135,10 +136,9 @@ public:
 	//
 	// If attacking
 	//
-	int State;         /// Attack state
+	unsigned int State;/// Attack state
 	int GoalX;         /// Attack point X tile map position
 	int GoalY;         /// Attack point Y tile map position
-	bool MustTransport;/// Flag must use transporter
 };
 
 /**
@@ -150,8 +150,8 @@ class AiBuildQueue {
 public:
 	AiBuildQueue() : Want(0), Made(0), Type(NULL) {}
 
-	int Want;           /// requested number
-	int Made;           /// built number
+	unsigned int Want;  /// requested number
+	unsigned int Made;  /// built number
 	CUnitType *Type;    /// unit-type
 };
 
@@ -165,17 +165,6 @@ public:
 	int X;              /// x pos on map
 	int Y;              /// y pos on map
 	int Mask;           /// mask ( ex: MapFieldLandUnit )
-};
-
-/**
-**  AI transport request
-*/
-class AiTransportRequest {
-public:
-	AiTransportRequest() : Unit(NULL) {}
-
-	CUnit *Unit;
-	COrder Order;
 };
 
 /**
@@ -217,7 +206,6 @@ public:
 
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
 	unsigned long LastExplorationGameCycle;         /// When did the last explore occur?
-	std::vector<AiTransportRequest> TransportRequests;/// Requests for transport
 	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;     /// Upgrade to unit-type requested and priority list
@@ -297,13 +285,13 @@ extern void AiAddUpgradeToRequest(CUnitType *type);
 	/// Add research request to resource manager
 extern void AiAddResearchRequest(CUpgrade *upgrade);
 	/// Periodic called resource manager handler
-extern void AiResourceManager(void);
+extern void AiResourceManager();
 	/// Ask the ai to explore around x,y
 extern void AiExplore(int x, int y, int exploreMask);
 	/// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
 	/// Remove any equivalence between unittypes
-extern void AiResetUnitTypeEquiv(void);
+extern void AiResetUnitTypeEquiv();
 	/// Finds all equivalents units to a given one
 extern int AiFindUnitTypeEquiv(const CUnitType *i, int *result);
 	/// Finds all available equivalents units to a given one, in the prefered order
@@ -321,17 +309,13 @@ extern int AiFindBuildingPlace(const CUnit *worker,
 // Forces
 //
 	/// Cleanup units in force
-extern void AiCleanForces(void);
+extern void AiCleanForces();
 	/// Assign a new unit to a force
 extern void AiAssignToForce(CUnit *unit);
 	/// Assign a free units to a force
-extern void AiAssignFreeUnitsToForce(void);
-	/// Attack with force at position
-extern void AiAttackWithForceAt(int force, int x, int y);
-	/// Attack with force
-extern void AiAttackWithForce(int force);
+extern void AiAssignFreeUnitsToForce();
 	/// Periodic called force manager handler
-extern void AiForceManager(void);
+extern void AiForceManager();
 
 //
 // Plans
@@ -341,13 +325,13 @@ extern int AiFindWall(AiForce *force);
 	/// Plan the an attack
 extern int AiPlanAttack(AiForce *force);
 	/// Send explorers around the map
-extern void AiSendExplorers(void);
+extern void AiSendExplorers();
 
 //
 // Magic
 //
 	/// Check for magic
-extern void AiCheckMagic(void);
+extern void AiCheckMagic();
 
 //@}
 

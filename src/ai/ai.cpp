@@ -152,6 +152,7 @@
 #include "actions.h"
 #include "map.h"
 #include "pathfinder.h"
+#include "ai.h"
 #include "ai_local.h"
 #include "iolib.h"
 
@@ -173,7 +174,7 @@ PlayerAi *AiPlayer;             /// Current AI player
 /**
 **  Execute the AI Script.
 */
-static void AiExecuteScript(void)
+static void AiExecuteScript()
 {
 	PlayerAi *pai = AiPlayer;
 
@@ -190,7 +191,7 @@ static void AiExecuteScript(void)
 /**
 **  Check if everything is fine, send new requests to resource manager.
 */
-static void AiCheckUnits(void)
+static void AiCheckUnits()
 {
 	int counter[UnitTypeMax];
 	int attacking[UnitTypeMax];
@@ -378,8 +379,8 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 			file->printf(" %d, \"%s\",", UnitNumber(aiunit),
 				aiunit->Type->Ident.c_str());
 		}
-		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
-			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY, ai->Force[i].MustTransport);
+		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d",
+			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY);
 		file->printf("},\n");
 	}
 
@@ -430,16 +431,6 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 		file->printf("},\n");
 	}
 	file->printf("  \"last-exploration-cycle\", %lu,\n", ai->LastExplorationGameCycle);
-	if (!ai->TransportRequests.empty()) {
-		file->printf("  \"transport\", {");
-		for (i = 0; i < (int)ai->TransportRequests.size(); ++i) {
-			AiTransportRequest *ptr = &ai->TransportRequests[i];
-			file->printf("{%d, ", UnitNumber(ptr->Unit));
-			SaveOrder(&ptr->Order, file);
-			file->printf("}, ");
-		}
-		file->printf("},\n");
-	}
 	file->printf("  \"last-can-not-move-cycle\", %lu,\n", ai->LastCanNotMoveGameCycle);
 	file->printf("  \"unit-type\", {");
 	for (i = 0; i < (int)ai->UnitTypeRequests.size(); ++i) {
@@ -577,7 +568,7 @@ void AiInit(CPlayer *player)
 /**
 **  Initialize global structures of the AI
 */
-void InitAiModule(void)
+void InitAiModule()
 {
 	AiResetUnitTypeEquiv();
 }
@@ -586,7 +577,7 @@ void InitAiModule(void)
 /**
 **  Cleanup the AI in order to enable to restart a game.
 */
-void CleanAi(void)
+void CleanAi()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Ai) {
@@ -607,7 +598,7 @@ void FreeAi()
 	//
 	//  Free AiTypes.
 	//
-	for (int i = 0; i < (int)AiTypes.size(); ++i) {
+	for (unsigned int i = 0; i < AiTypes.size(); ++i) {
 		CAiType *aitype = AiTypes[i];
 
 		delete aitype;
@@ -753,6 +744,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 	PlayerAi *pai;
 	CUnit *aiunit;
 	int force;
+	int x, y;
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
 		defender->Player->Index _C_ UnitNumber(defender) _C_
@@ -778,7 +770,7 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 			// FIXME, send the force for help
 			continue;
 		}
-		for (int i = 0; i < (int)pai->Force[force].Units.size(); ++i) {
+		for (unsigned int i = 0; i < pai->Force[force].Units.size(); ++i) {
 			aiunit = pai->Force[force].Units[i];
 			if (defender == aiunit) {
 				return;
@@ -790,19 +782,20 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 	//  Send force 0 defending, also send force 1 if this is home.
 	//
 	if (attacker) {
-		AiAttackWithForceAt(0, attacker->X, attacker->Y);
-		if (!pai->Force[1].Attacking) {  // none attacking
-			pai->Force[1].Defending = true;
-			AiAttackWithForceAt(1, attacker->X, attacker->Y);
-		}
+		x = attacker->X;
+		y = attacker->Y;
 	} else {
-		AiAttackWithForceAt(0, defender->X, defender->Y);
-		if (!pai->Force[1].Attacking) {  // none attacking
-			pai->Force[1].Defending = true;
-			AiAttackWithForceAt(1, defender->X, defender->Y);
+		x = defender->X;
+		y = defender->Y;
+	}
+	for (unsigned int i = 0; i < AI_MAX_FORCES; ++i) {
+		AiForce &aiForce = pai->Force[i];
+
+		if (aiForce.Role == AiForceRoleDefend && !aiForce.Attacking) {  // none attacking
+			aiForce.Defending = true;
+			AiAttackWithForceAt(i, x, y);
 		}
 	}
-	pai->Force[0].Defending = true;
 }
 
 /**
@@ -1135,16 +1128,6 @@ void AiResearchComplete(CUnit *unit, const CUpgrade *what)
 */
 void AiEachCycle(CPlayer *player)
 {
-	AiPlayer = player->Ai;
-
-	for (int i = 0; i < (int)AiPlayer->TransportRequests.size(); ++i) {
-		AiTransportRequest *aitr = &AiPlayer->TransportRequests[i];
-		aitr->Unit->RefsDecrease();
-		if (aitr->Order.Goal) {
-			aitr->Order.Goal->RefsDecrease();
-		}
-	}
-	AiPlayer->TransportRequests.clear();
 }
 
 /**

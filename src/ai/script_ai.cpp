@@ -630,7 +630,7 @@ static int CclAiWait(lua_State *l)
 	const CUnitType *type;
 	const int *unit_types_count;
 	int j;
-	int n;
+	unsigned int n;
 
 	LuaCheckArgs(l, 1);
 	type = CclGetUnitType(l);
@@ -836,27 +836,6 @@ static int CclAiWaitForce(lua_State *l)
 #endif
 
 	lua_pushboolean(l, 1);
-	return 1;
-}
-
-/**
-**  Attack with force.
-**
-**  @param l  Lua state.
-*/
-static int CclAiAttackWithForce(lua_State *l)
-{
-	int force;
-
-	LuaCheckArgs(l, 1);
-	force = LuaToNumber(l, 1);
-	if (force < 0 || force >= AI_MAX_FORCES) {
-		LuaError(l, "Force out of range: %d" _C_ force);
-	}
-
-	AiAttackWithForce(force);
-
-	lua_pushboolean(l, 0);
 	return 1;
 }
 
@@ -1239,10 +1218,6 @@ static int CclDefineAiPlayer(lua_State *l)
 					lua_rawgeti(l, j + 1, k + 1);
 					ai->Force[i].GoalY = LuaToNumber(l, -1);
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "must-transport")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					ai->Force[i].MustTransport = LuaToNumber(l, -1) ? true : false;
-					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -1367,29 +1342,6 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 		} else if (!strcmp(value, "last-exploration-cycle")) {
 			ai->LastExplorationGameCycle = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "transport")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				int unit;
-				AiTransportRequest queue;
-
-				lua_rawgeti(l, j + 1, k + 1);
-				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-					LuaError(l, "incorrect argument");
-				}
-				lua_rawgeti(l, -1, 1);
-				unit = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				queue.Unit = UnitSlots[unit];
-				lua_rawgeti(l, -1, 2);
-				CclParseOrder(l, &queue.Order);
-				lua_pop(l, 1);
-				lua_pop(l, 1);
-				ai->TransportRequests.push_back(queue);
-			}
 		} else if (!strcmp(value, "last-can-not-move-cycle")) {
 			ai->LastCanNotMoveGameCycle = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-type")) {
@@ -1524,7 +1476,6 @@ void AiCclRegister(void)
 	lua_register(Lua, "AiCheckForce", CclAiCheckForce);
 	lua_register(Lua, "AiWaitForce", CclAiWaitForce);
 
-	lua_register(Lua, "AiAttackWithForce", CclAiAttackWithForce);
 	lua_register(Lua, "AiSleep", CclAiSleep);
 	lua_register(Lua, "AiResearch", CclAiResearch);
 	lua_register(Lua, "AiUpgradeTo", CclAiUpgradeTo);
