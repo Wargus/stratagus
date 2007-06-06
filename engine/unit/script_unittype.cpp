@@ -598,6 +598,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Coward = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Harvester")) {
 			type->Harvester = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Neutral")) {
+			type->Neutral = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanHarvestFrom")) {
 			type->CanHarvestFrom = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Vanishes")) {

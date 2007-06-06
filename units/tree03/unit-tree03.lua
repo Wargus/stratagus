@@ -66,6 +66,7 @@ DefineUnitType("unit-tree03", {
     VisibleUnderFog = true,
     NumDirections = 1,
     CanHarvestFrom = true,
+    Neutral = true,
     Sounds = {}
 })
 

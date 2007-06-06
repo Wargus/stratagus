@@ -61,6 +61,7 @@ DefineUnitType("unit-morel-1", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })
@@ -95,6 +96,7 @@ DefineUnitType("unit-morel-2", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })
@@ -129,6 +131,7 @@ DefineUnitType("unit-morel-3", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })
@@ -163,6 +166,7 @@ DefineUnitType("unit-morel-4", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })
@@ -197,6 +201,7 @@ DefineUnitType("unit-morel-5", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })
@@ -231,6 +236,7 @@ DefineUnitType("unit-morel-6", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })
@@ -265,6 +271,7 @@ DefineUnitType("unit-morel-7", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })
