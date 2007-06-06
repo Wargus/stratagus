@@ -127,6 +127,7 @@ public:
 #ifdef USE_OPENGL
 	friend void MakeFontColorTextures(CFont *font);
 	friend void CleanFonts(void);
+	friend void ReloadFonts(void);
 #endif
 };
 
@@ -365,6 +366,8 @@ extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 #ifdef USE_OPENGL
 	/// Reload OpenGL graphics
 extern void ReloadGraphics(void);
+	/// Reload OpenGL
+extern void ReloadOpenGL();
 #endif
 
 	/// Initializes video synchronization.

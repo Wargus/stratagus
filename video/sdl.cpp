@@ -245,6 +245,14 @@ static void InitOpenGL(void)
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &GLMaxTextureSize);
 }
+
+void ReloadOpenGL()
+{
+	InitOpenGL();
+	ReloadGraphics();
+	ReloadFonts();
+	UI.Minimap.Reload();
+}
 #endif
 
 #if defined(DEBUG) && !defined(USE_WIN32)
@@ -884,10 +892,7 @@ void ToggleFullScreen(void)
 	SDL_ShowCursor(SDL_DISABLE);
 
 #ifdef USE_OPENGL
-	InitOpenGL();
-	ReloadGraphics();
-	ReloadFonts();
-	UI.Minimap.Reload();
+	ReloadOpenGL();
 #else
 	SDL_LockSurface(TheScreen);
 	memcpy(TheScreen->pixels, pixels, framesize);
