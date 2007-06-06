@@ -77,7 +77,8 @@ function DefinePlantType(internalname, name, image_size,
        VisibleUnderFog = true,
        NumDirections = 1,
        CanHarvestFrom = true,
-       Sounds = {}
+       Sounds = {},
+       Neutral = true
    })
    DefineAllow(internalname, AllowAll)
 end
