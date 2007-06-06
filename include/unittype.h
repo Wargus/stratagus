@@ -627,9 +627,9 @@ public:
 		Coward(0), AttackFromTransporter(0),
 		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 		BuilderOutside(0), BuilderLost(0), CanHarvestFrom(0), Harvester(0),
-		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
-		SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
+		Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 		Indestructible(0), Teleporter(0),
+		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
 		FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
@@ -723,15 +723,17 @@ public:
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
 	unsigned CanHarvestFrom : 1;    /// Resource can be harvested.
 	unsigned Harvester : 1;         /// unit is a resource harvester.
-	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
-	CVariable *Variable;            /// Array of user defined variables.
-	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
+	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
 	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
+
+	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
+	CVariable *Variable;            /// Array of user defined variables.
+	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
 
 	std::vector<CBuildRestriction *> BuildingRules;/// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
