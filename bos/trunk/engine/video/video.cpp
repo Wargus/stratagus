@@ -240,6 +240,9 @@ bool CVideo::ResizeScreen(int w, int h)
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,
 			TheScreen->flags);
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+#ifdef USE_OPENGL
+		ReloadOpenGL();
+#endif
 		return true;
 	}
 	return false;

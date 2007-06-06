@@ -832,7 +832,10 @@ void ReloadFonts(void)
 		CFont *font = AllFonts[i];
 		if (font->G) {
 			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
-				CGraphic::Free(FontColorGraphics[font][AllFontColors[j]]);
+				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+				glDeleteTextures(g->NumTextures, g->Textures);
+				delete[] g->Textures;
+				delete g;
 			}
 			FontColorGraphics[font].clear();
 			MakeFontColorTextures(font);
