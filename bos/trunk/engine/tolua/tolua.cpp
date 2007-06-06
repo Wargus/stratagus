@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/03/07 14:14:38.
+** Generated automatically by tolua++-1.0.92 on 06/05/07 20:02:37.
 */
 
 #ifndef __cplusplus
@@ -37,7 +37,6 @@ int GetNetworkState() {return (int)NetLocalState;}
 extern string NetworkMapName;
 void NetworkGamePrepareGameSettings(void);
 #include "editor.h"
-extern vector<string> EditorNeutralTypes;
 bool IsReplayGame();
 void StartMap(const string &str, bool clean = true);
 void StartReplay(const string &str, bool reveal = false);
@@ -15615,30 +15614,6 @@ static int tolua_stratagus_StopChannel00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: EditorNeutralTypes */
-#ifndef TOLUA_DISABLE_tolua_get_EditorNeutralTypes
-static int tolua_get_EditorNeutralTypes(lua_State* tolua_S)
-{
-  tolua_pushusertype(tolua_S,(void*)&EditorNeutralTypes,"vector<string>");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: EditorNeutralTypes */
-#ifndef TOLUA_DISABLE_tolua_set_EditorNeutralTypes
-static int tolua_set_EditorNeutralTypes(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!tolua_isusertype(tolua_S,2,"vector<string>",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  EditorNeutralTypes = *((vector<string>*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: UnitTypes of class  CEditor */
 #ifndef TOLUA_DISABLE_tolua_get_CEditor_UnitTypes
 static int tolua_get_CEditor_UnitTypes(lua_State* tolua_S)
@@ -18243,7 +18218,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"SetChannelVolume",tolua_stratagus_SetChannelVolume00);
   tolua_function(tolua_S,"SetChannelStereo",tolua_stratagus_SetChannelStereo00);
   tolua_function(tolua_S,"StopChannel",tolua_stratagus_StopChannel00);
-  tolua_variable(tolua_S,"EditorNeutralTypes",tolua_get_EditorNeutralTypes,tolua_set_EditorNeutralTypes);
   tolua_constant(tolua_S,"EditorNotRunning",EditorNotRunning);
   tolua_constant(tolua_S,"EditorStarted",EditorStarted);
   tolua_constant(tolua_S,"EditorCommandLine",EditorCommandLine);

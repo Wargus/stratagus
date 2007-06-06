@@ -73,6 +73,7 @@ DefineUnitType("unit-hotspot", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    Neutral = true,
     NumDirections = 1,
     Sounds = {}
 })

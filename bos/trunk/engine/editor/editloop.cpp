@@ -124,8 +124,6 @@ public:
 
 static EditorSliderListener *editorSliderListener;
 
-std::vector<std::string> EditorNeutralTypes;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -301,7 +299,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 	CUnit *unit;
 	CBuildRestrictionOnTop *b;
 
-	if (std::find(EditorNeutralTypes.begin(), EditorNeutralTypes.end(), type->Ident) != EditorNeutralTypes.end()) {
+	if (type->Neutral) {
 		player = &Players[PlayerNumNeutral];
 	}
 

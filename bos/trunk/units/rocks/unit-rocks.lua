@@ -64,6 +64,7 @@ DefineUnitType("unit-rock-1", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
+    Neutral = true,
     Sounds = {}
 })
 
@@ -100,6 +101,7 @@ DefineUnitType("unit-rock-2", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
+    Neutral = true,
     Sounds = {}
 })
 
@@ -136,6 +138,7 @@ DefineUnitType("unit-rock-3", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
+    Neutral = true,
     Sounds = {}
 })
 
@@ -172,6 +175,7 @@ DefineUnitType("unit-rock-4", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
+    Neutral = true,
     Sounds = {}
 })
 
@@ -208,6 +212,7 @@ DefineUnitType("unit-rock-5", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
+    Neutral = true,
     Sounds = {}
 })
 
@@ -244,6 +249,7 @@ DefineUnitType("unit-rock-6", {
     Building = true,
     NumDirections = 1,
     CanHarvestFrom = true,
+    Neutral = true,
     Sounds = {}
 })
 

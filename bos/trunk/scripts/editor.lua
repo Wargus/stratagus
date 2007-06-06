@@ -111,14 +111,3 @@ for key,value in ipairs(editor_types) do
   Editor.UnitTypes:push_back(value)
 end
 
-
-local neutral_types = {
-  "unit-hotspot",
-  "unit-weakhotspot",
-}
-
-EditorNeutralTypes:clear()
-for key,value in ipairs(neutral_types) do
-  EditorNeutralTypes:push_back(value)
-end
-
