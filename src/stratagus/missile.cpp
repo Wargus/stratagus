@@ -354,7 +354,7 @@ static int CalculateDamage(const CUnit *attacker, const CUnit *goal)
 
 	if (!Damage) { // Use old method.
 		return CalculateDamageStats(attacker->Stats, goal->Stats,
-			attacker->Variable[XP_INDEX].Value, attacker->Variable[BLOODLUST_INDEX].Value);
+			attacker->Variable[BLOODLUST_INDEX].Value, attacker->Variable[XP_INDEX].Value);
 	}
 	Assert(Damage);
 
