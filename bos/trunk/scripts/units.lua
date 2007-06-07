@@ -147,16 +147,6 @@ DefineUnitType("unit-destroyed-4x4-place", { Name = "Destroyed 4x4 Place",
 	Priority = 0, Type = "land",
 	Building = true, VisibleUnderFog = true, Vanishes = true})
 
-DefineUnitType("unit-revealer", {
-	Name = "Dummy unit",
-	Animations = "animations-building", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 0,
-	TileSize = {1, 1}, BoxSize = {1, 1},
-	SightRange = 12,
-	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, DecayRate = 1, Type = "land",
-	Building = true, Revealer = true})
-
 DefineAllow("unit-dead-body", AllowAll)
 DefineAllow("unit-destroyed-1x1-place", AllowAll)
 DefineAllow("unit-destroyed-2x2-place", AllowAll)
