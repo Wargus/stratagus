@@ -175,7 +175,7 @@ function RunEditorPlayerPropertiesMenu()
   local itypes = {}
   local i = 1
   local ailist = GetAiList()
-  for aiiname in ailist do
+  for aiiname,x in pairs(ailist) do
     types[i] = ailist[aiiname][1]
     itypes[i - 1] = aiiname
     i = i + 1
