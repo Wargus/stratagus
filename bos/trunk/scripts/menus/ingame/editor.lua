@@ -133,13 +133,11 @@ end
 
 function RunEditorPlayerPropertiesMenu()
   local menu = BosGameMenu()
-  menu:setSize(640, 480)
+  menu:setSize(500, 310)
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
     (Video.Height - menu:getHeight()) / 2)
 
-  menu:addLabel(_("Player Properties"), 640 / 2, 11)
-
-  menu:addSmallButton(_("OK"), 0, 455, 440, function() menu:stop() end)
+  menu:addLabel(_("Player Properties"), 500 / 2, 11)
 
   for i=0,7 do
     local l = Label(tostring(i))
@@ -148,86 +146,87 @@ function RunEditorPlayerPropertiesMenu()
     menu:add(l, 12, 40 + (22 * (i + 1)))
   end
 
-  local l = Label(_("Race"))
-  l:setFont(Fonts["game"])
-  l:adjustSize()
-  menu:add(l, 40, 40 + (22 * 0))
-
-  local types = {_("Elites")}
-  for i=0,7 do
-    local d = menu:addDropDown(types, 40, 40 + (22 * (i + 1)),
-      function() end)
-    d:getListBox():setWidth(80)
-    d:setWidth(80)
-  end
-
   local l = Label(_("Type"))
   l:setFont(Fonts["game"])
   l:adjustSize()
-  menu:add(l, 130, 40 + (22 * 0))
+  menu:add(l, 50, 40 + (22 * 0))
 
   local types = {_("Person"), _("Computer"), _("Rescue (Passive)"),
     _("Rescue (Active)"), _("Neutral"), _("Nobody")}
+  local pt =  { 5, 4, 5, 1, 0, 2, 3 }; pt[0] = 5
+  local pt2 = { 4, 6, 7, 2, 3 }; pt2[0] = 5
+  local typeWidgets = {}
   for i=0,7 do
-    local d = menu:addDropDown(types, 130, 40 + (22 * (i + 1)),
+    local d = menu:addDropDown(types, 50, 40 + (22 * (i + 1)),
       function() end)
     d:getListBox():setWidth(150)
     d:setWidth(150)
+    d:setSelected(pt[Map.Info.PlayerType[i]])
+    typeWidgets[i] = d
   end
 
   local l = Label(_("AI"))
   l:setFont(Fonts["game"])
   l:adjustSize()
-  menu:add(l, 290, 40 + (22 * 0))
+  menu:add(l, 210, 40 + (22 * 0))
 
   local aiiname
   local types = {}
   local itypes = {}
-  local i=1
+  local i = 1
   local ailist = GetAiList()
   for aiiname in ailist do
     types[i] = ailist[aiiname][1]
     itypes[i - 1] = aiiname
     i = i + 1
   end
-  local dropdownids = {}
+  local aiWidgets = {}
   for i=0,7 do
-    local d = menu:addDropDown(types, 290, 40 + (22 * (i + 1)),
-      function(dd)
-        SetAiType(dropdownids[dd], itypes[dd:getSelected()])
-      end)
+    local d = menu:addDropDown(types, 210, 40 + (22 * (i + 1)),
+      function(dd) end)
     d:setSelected(1)
     d:getListBox():setWidth(120)
     d:setWidth(80)
-    dropdownids[d] = i
+    aiWidgets[i] = d
   end
 
   local l = Label(_("Energy"))
   l:setFont(Fonts["game"])
   l:adjustSize()
-  menu:add(l, 420, 40 + (22 * 0))
+  menu:add(l, 340, 40 + (22 * 0))
 
+  local energyWidgets = {}
   for i=0,7 do
-    local d = menu:addTextInputField("" .. 1, 420, 40 + (22 * (i + 1)), 60)
+    local d = menu:addTextInputField("" .. Players[i].EnergyStored,
+      340, 40 + (22 * (i + 1)), 60)
+    energyWidgets[i] = d
   end
 
   local l = Label(_("Magma"))
   l:setFont(Fonts["game"])
   l:adjustSize()
-  menu:add(l, 490, 40 + (22 * 0))
+  menu:add(l, 410, 40 + (22 * 0))
 
+  local magmaWidgets = {}
   for i=0,7 do
-    local d = menu:addTextInputField("" .. 1, 490, 40 + (22 * (i + 1)), 60)
+    local d = menu:addTextInputField("" .. Players[i].MagmaStored,
+      410, 40 + (22 * (i + 1)), 60)
+    magmaWidgets[i] = d
   end
 
-  local l = Label(_("Energy"))
-  l:setFont(Fonts["game"])
-  l:adjustSize()
-  menu:add(l, 560, 40 + (22 * 0))
+  menu:addSmallButton(_("~!OK"), "o", (500 - (106 * 2)) / 4, 270,
+    function()
+      for i=0,7 do
+        Map.Info.PlayerType[i] = pt2[typeWidgets[i]:getSelected()]
+        Players[i].AiName = itypes[aiWidgets[i]:getSelected()]
+        Players[i].EnergyStored = tonumber(energyWidgets[i]:getText())
+        Players[i].MagmaStored = tonumber(magmaWidgets[i]:getText())
+      end
+      menu:stop()
+    end)
 
-  for i=0,7 do
-    local d = menu:addTextInputField("" .. 1, 560, 40 + (22 * (i + 1)), 60)
-  end
+  menu:addSmallButton(_("~!Cancel"), "c", (500 - (500 - (106 * 2)) / 4) - 106, 270,
+    function() menu:stop() end)
 
   menu:run(false)
 end
