@@ -1672,12 +1672,12 @@ static void EditorCallbackMouse(int x, int y)
 		i = Editor.UnitIndex;
 		by = UI.ButtonPanel.Y + 24;
 		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
-			if (i >= (int) Editor.ShownUnitTypes.size()) {
+			if (i >= (int)Editor.ShownUnitTypes.size()) {
 				break;
 			}
 			bx = UI.ButtonPanel.X + 10;
 			while (bx < UI.ButtonPanel.X + 146) {
-				if (i >= (int) Editor.ShownUnitTypes.size()) {
+				if (i >= (int)Editor.ShownUnitTypes.size()) {
 					break;
 				}
 				if (bx < x && x < bx + IconWidth &&
