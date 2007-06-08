@@ -7,17 +7,16 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
--- Stratagus Map generated automatically from a pud.
--- Original file: C1_M4_shield_of_wasteland.pud
--- Copyright 2005 François Beerten
+-- Stratagus Map Setup 
+-- Copyright 2005-2007 Loïs Taulelle, François Beerten
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-SetStartView(0, 0, 0)
+SetStartView(0, 16, 19)
 Players[0].EnergyStored = 2000
 Players[0].MagmaStored = 2000
 SetAiType(0, "ai-rush")
-SetStartView(1, 0, 0)
+SetStartView(1, 4, 89)
 Players[1].EnergyStored = 2000
 Players[1].MagmaStored = 2000
 SetAiType(1, "ai-rush")
@@ -16437,44 +16436,41 @@ SetTile(114, 127, 127)
 
 --allow
 -- place units
-unit= CreateUnit("unit-rocksfield", PlayerNumNeutral, {10, 25})
-unit= CreateUnit("unit-cam", 0, {6, 36})
-unit= CreateUnit("unit-rock-4", PlayerNumNeutral, {4, 50})
-unit= CreateUnit("unit-rocksfield", PlayerNumNeutral, {33, 121})
-unit= CreateUnit("unit-vault", 1, {2, 86})
-unit= CreateUnit("unit-assault", 1, {13, 97})
-unit= CreateUnit("unit-assault", 1, {11, 97})
-unit= CreateUnit("unit-cam", 1, {31, 78})
-unit= CreateUnit("unit-apcs", 0, {25, 36})
-unit= CreateUnit("unit-bazoo", 0, {23, 34})
-unit= CreateUnit("unit-bazoo", 0, {24, 33})
-unit= CreateUnit("unit-bazoo", 0, {25, 32})
-unit= CreateUnit("unit-assault", 0, {27, 38})
-unit= CreateUnit("unit-assault", 0, {28, 37})
-unit= CreateUnit("unit-assault", 0, {29, 36})
-unit= CreateUnit("unit-camp", 0, {17, 31})
-unit= CreateUnit("unit-magmapump", 0, {2, 38})
-unit= CreateUnit("unit-magmapump", 0, {4, 36})
-unit= CreateUnit("unit-magmapump", 0, {6, 34})
-unit= CreateUnit("unit-engineer", 0, {23, 21})
-unit= CreateUnit("unit-engineer", 1, {6, 106})
-unit= CreateUnit("unit-grenadier", 0, {4, 28})
-unit= CreateUnit("unit-grenadier", 0, {3, 28})
-unit= CreateUnit("unit-camp", 1, {15, 97})
-unit= CreateUnit("unit-magmapump", 1, {2, 96})
-unit= CreateUnit("unit-magmapump", 1, {0, 98})
-unit= CreateUnit("unit-magmapump", 1, {2, 100})
-unit= CreateUnit("unit-grenadier", 1, {16, 109})
-unit= CreateUnit("unit-grenadier", 1, {19, 90})
-unit= CreateUnit("unit-apcs", 1, {10, 94})
-unit= CreateUnit("unit-bazoo", 1, {9, 91})
-unit= CreateUnit("unit-bazoo", 1, {11, 91})
-unit= CreateUnit("unit-bazoo", 1, {13, 91})
-unit= CreateUnit("unit-assault", 1, {9, 97})
-unit= CreateUnit("unit-engineer", 0, {6, 49})
-unit= CreateUnit("unit-vault", 0, {14, 16})
-unit= CreateUnit("unit-grenadier", 0, {5, 28})
-unit= CreateUnit("unit-engineer", 1, {18, 81})
-unit= CreateUnit("unit-rock-1", PlayerNumNeutral, {4, 108})
-
+CreateUnit("unit-rocksfield", PlayerNumNeutral, {10, 25})
+CreateUnit("unit-cam", 0, {6, 36})
+CreateUnit("unit-rock-4", PlayerNumNeutral, {4, 50})
+CreateUnit("unit-rocksfield", PlayerNumNeutral, {33, 121})
+CreateUnit("unit-vault", 1, {2, 86})
+CreateUnit("unit-assault", 1, {13, 97})
+CreateUnit("unit-assault", 1, {11, 97})
+CreateUnit("unit-cam", 1, {31, 78})
+CreateUnit("unit-apcs", 0, {25, 36})
+CreateUnit("unit-bazoo", 0, {23, 34})
+CreateUnit("unit-bazoo", 0, {24, 33})
+CreateUnit("unit-bazoo", 0, {25, 32})
+CreateUnit("unit-assault", 0, {27, 38})
+CreateUnit("unit-assault", 0, {28, 37})
+CreateUnit("unit-assault", 0, {29, 36})
+CreateUnit("unit-camp", 0, {17, 31})
+CreateUnit("unit-engineer", 0, {23, 21})
+CreateUnit("unit-engineer", 1, {6, 106})
+CreateUnit("unit-grenadier", 0, {4, 28})
+CreateUnit("unit-grenadier", 0, {3, 28})
+CreateUnit("unit-camp", 1, {15, 97})
+CreateUnit("unit-grenadier", 1, {16, 109})
+CreateUnit("unit-grenadier", 1, {19, 90})
+CreateUnit("unit-apcs", 1, {10, 94})
+CreateUnit("unit-bazoo", 1, {9, 91})
+CreateUnit("unit-bazoo", 1, {11, 91})
+CreateUnit("unit-bazoo", 1, {13, 91})
+CreateUnit("unit-assault", 1, {9, 97})
+CreateUnit("unit-engineer", 0, {6, 49})
+CreateUnit("unit-vault", 0, {14, 16})
+CreateUnit("unit-grenadier", 0, {5, 28})
+CreateUnit("unit-engineer", 1, {18, 81})
+CreateUnit("unit-rock-1", PlayerNumNeutral, {4, 108})
+CreateUnit("unit-hotspot", PlayerNumNeutral, {13, 77})
+CreateUnit("unit-hotspot", PlayerNumNeutral, {6, 58})
+CreateUnit("unit-weakhotspot", PlayerNumNeutral, {26, 15})
+CreateUnit("unit-weakhotspot", PlayerNumNeutral, {2, 113})
 
