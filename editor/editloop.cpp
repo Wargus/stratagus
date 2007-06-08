@@ -2101,6 +2101,8 @@ void StartEditor(const char *filename)
 
 	GetDefaultTextColors(nc, rc);
 
+	DebugPrint("StartEditor - %s\n" _C_ filename ? filename : "new map");
+
 	if (filename) {
 		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
 			filename = NULL;
