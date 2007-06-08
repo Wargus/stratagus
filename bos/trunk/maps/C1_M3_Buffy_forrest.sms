@@ -7,17 +7,16 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
--- Stratagus Map generated automatically from a pud.
--- Original file: C1_M3_Buffy_forrest.pud
--- Copyright 2005 François Beerten
+-- Stratagus Map Setup 
+-- Copyright 2005-2007 Loïs Taulelle, François Beerten
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-SetStartView(0, 0, 0)
+SetStartView(0, 12, 103)
 Players[0].EnergyStored = 1000
 Players[0].MagmaStored = 2000
 SetAiType(0, "ai-rush")
-SetStartView(1, 0, 0)
+SetStartView(1, 109, 11)
 Players[1].EnergyStored = 1000
 Players[1].MagmaStored = 2000
 SetAiType(1, "ai-rush")
@@ -16437,26 +16436,28 @@ SetTile(96, 127, 127)
 
 --allow
 -- place units
-unit= CreateUnit("unit-rocksfield", PlayerNumNeutral, {118, 41})
-unit= CreateUnit("unit-rocksfield", PlayerNumNeutral, {23, 108})
-unit= CreateUnit("unit-rocksfield", PlayerNumNeutral, {12, 0})
-unit= CreateUnit("unit-rocksfield", PlayerNumNeutral, {0, 11})
-unit= CreateUnit("unit-engineer", 1, {105, 9})
-unit= CreateUnit("unit-vault", 1, {107, 8})
-unit= CreateUnit("unit-camp", 1, {115, 15})
-unit= CreateUnit("unit-assault", 1, {117, 20})
-unit= CreateUnit("unit-assault", 1, {113, 16})
-unit= CreateUnit("unit-magmapump", 1, {114, 6})
-unit= CreateUnit("unit-magmapump", 1, {116, 6})
-unit= CreateUnit("unit-gturret", 1, {96, 23})
-unit= CreateUnit("unit-engineer", 0, {14, 106})
-unit= CreateUnit("unit-magmapump", 0, {9, 109})
-unit= CreateUnit("unit-magmapump", 0, {11, 111})
-unit= CreateUnit("unit-vault", 0, {9, 101})
-unit= CreateUnit("unit-assault", 0, {1, 94})
-unit= CreateUnit("unit-engineer", 0, {14, 98})
-unit= CreateUnit("unit-rocksfield", PlayerNumNeutral, {62, 71})
-unit= CreateUnit("unit-camp", 0, {2, 95})
-unit= CreateUnit("unit-assault", 0, {8, 97})
-
+CreateUnit("unit-rocksfield", PlayerNumNeutral, {118, 41})
+CreateUnit("unit-rocksfield", PlayerNumNeutral, {23, 108})
+CreateUnit("unit-rocksfield", PlayerNumNeutral, {12, 0})
+CreateUnit("unit-rocksfield", PlayerNumNeutral, {0, 11})
+CreateUnit("unit-engineer", 1, {105, 9})
+CreateUnit("unit-vault", 1, {107, 8})
+CreateUnit("unit-camp", 1, {115, 15})
+CreateUnit("unit-assault", 1, {117, 20})
+CreateUnit("unit-assault", 1, {113, 16})
+CreateUnit("unit-gturret", 1, {96, 23})
+CreateUnit("unit-engineer", 0, {14, 106})
+CreateUnit("unit-vault", 0, {9, 101})
+CreateUnit("unit-assault", 0, {1, 94})
+CreateUnit("unit-engineer", 0, {14, 98})
+CreateUnit("unit-rocksfield", PlayerNumNeutral, {62, 71})
+CreateUnit("unit-camp", 0, {2, 95})
+CreateUnit("unit-assault", 0, {8, 97})
+CreateUnit("unit-hotspot", PlayerNumNeutral, {19, 95})
+CreateUnit("unit-hotspot", PlayerNumNeutral, {105, 35})
+CreateUnit("unit-hotspot", PlayerNumNeutral, {63, 72})
+CreateUnit("unit-magmapump", 0, {19, 95})
+CreateUnit("unit-magmapump", 1, {105, 35})
+CreateUnit("unit-powerplant", 1, {114, 10})
+CreateUnit("unit-powerplant", 0, {5, 101})
 
