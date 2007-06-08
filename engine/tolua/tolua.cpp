@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/05/07 20:02:37.
+** Generated automatically by tolua++-1.0.92 on 06/07/07 20:16:51.
 */
 
 #ifndef __cplusplus
@@ -13462,6 +13462,36 @@ static int tolua_set_CPlayer_Type(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: AiName of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_get_CPlayer_AiName
+static int tolua_get_CPlayer_AiName(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'AiName'",NULL);
+#endif
+  tolua_pushcppstring(tolua_S,(const char*)self->AiName);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: AiName of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_set_CPlayer_AiName
+static int tolua_set_CPlayer_AiName(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'AiName'",NULL);
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->AiName = ((string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: StartX of class  CPlayer */
 #ifndef TOLUA_DISABLE_tolua_get_CPlayer_StartX
 static int tolua_get_CPlayer_StartX(lua_State* tolua_S)
@@ -16558,6 +16588,58 @@ static int tolua_get_CMapInfo_MapHeight(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: PlayerType of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_CMapInfo_PlayerType
+static int tolua_get_stratagus_CMapInfo_PlayerType(lua_State* tolua_S)
+{
+ int tolua_index;
+  CMapInfo* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CMapInfo*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=PlayerMax)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->PlayerType[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: PlayerType of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_CMapInfo_PlayerType
+static int tolua_set_stratagus_CMapInfo_PlayerType(lua_State* tolua_S)
+{
+ int tolua_index;
+  CMapInfo* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CMapInfo*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=PlayerMax)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->PlayerType[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Info of class  CMap */
 #ifndef TOLUA_DISABLE_tolua_get_CMap_Info
 static int tolua_get_CMap_Info(lua_State* tolua_S)
@@ -18120,6 +18202,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Index",tolua_get_CPlayer_Index,tolua_set_CPlayer_Index);
    tolua_variable(tolua_S,"Name",tolua_get_CPlayer_Name,tolua_set_CPlayer_Name);
    tolua_variable(tolua_S,"Type",tolua_get_CPlayer_Type,tolua_set_CPlayer_Type);
+   tolua_variable(tolua_S,"AiName",tolua_get_CPlayer_AiName,tolua_set_CPlayer_AiName);
    tolua_variable(tolua_S,"StartX",tolua_get_CPlayer_StartX,tolua_set_CPlayer_StartX);
    tolua_variable(tolua_S,"StartY",tolua_get_CPlayer_StartY,tolua_set_CPlayer_StartY);
    tolua_variable(tolua_S,"EnergyProductionRate",tolua_get_CPlayer_EnergyProductionRate,tolua_set_CPlayer_EnergyProductionRate);
@@ -18277,6 +18360,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Description",tolua_get_CMapInfo_Description,tolua_set_CMapInfo_Description);
    tolua_variable(tolua_S,"MapWidth",tolua_get_CMapInfo_MapWidth,NULL);
    tolua_variable(tolua_S,"MapHeight",tolua_get_CMapInfo_MapHeight,NULL);
+   tolua_array(tolua_S,"PlayerType",tolua_get_stratagus_CMapInfo_PlayerType,tolua_set_stratagus_CMapInfo_PlayerType);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"CMap","CMap","",NULL);
   tolua_beginmodule(tolua_S,"CMap");

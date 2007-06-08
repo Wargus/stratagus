@@ -13,6 +13,7 @@ class CPlayer
 	string Name;
 	
 	int Type;
+	string AiName;
 
 	int StartX;
 	int StartY;
