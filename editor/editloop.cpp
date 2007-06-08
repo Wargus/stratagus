@@ -1062,7 +1062,7 @@ void EditorUpdateDisplay(void)
 			UI.Fillers[i].X, UI.Fillers[i].Y);
 	}
 
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == CursorOnMap && Gui->getTop() == editorContainer) {
 		DrawMapCursor(); // cursor on map
 	}
 
