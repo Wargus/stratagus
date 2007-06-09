@@ -497,6 +497,7 @@ void CleanGame(void)
 	CleanReplayLog();
 	FreeVisionTable();
 	FreeAStar();
+	CursorBuilding = NULL;
 }
 
 static void ExpandPath(char *newpath, const char *path)

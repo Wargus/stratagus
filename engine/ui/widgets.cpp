@@ -1475,6 +1475,7 @@ int MenuScreen::run(bool loop)
 
 	CursorState = CursorStatePoint;
 	GameCursor = UI.Point.Cursor;
+	CursorOn = CursorOnUnknown;
 
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();
