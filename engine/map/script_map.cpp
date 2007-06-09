@@ -55,7 +55,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Parse a stratagus map.
+**  Parse a map.
 **
 **  @param l  Lua state.
 */
@@ -63,16 +63,14 @@ static int CclStratagusMap(lua_State *l)
 {
 	const char *value;
 	int args;
-	int j;
 	int subargs;
-	int k;
 
 	//
 	//  Parse the list: (still everything could be changed!)
 	//
 
 	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		value = LuaToString(l, j + 1);
 		++j;
 
@@ -93,7 +91,7 @@ static int CclStratagusMap(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
+			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
@@ -246,23 +244,6 @@ static int CclCenterMap(lua_State *l)
 }
 
 /**
-**  Define the starting viewpoint for a given player.
-**
-**  @param l  Lua state.
-*/
-static int CclSetStartView(lua_State *l)
-{
-	int p;
-
-	LuaCheckArgs(l, 3);
-	p = LuaToNumber(l, 1);
-	Players[p].StartX = LuaToNumber(l, 2);
-	Players[p].StartY = LuaToNumber(l, 3);
-
-	return 0;
-}
-
-/**
 **  Show Map Location
 **
 **  @param l  Lua state.
@@ -342,8 +323,8 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i > 255) {
 		PrintFunction();
-		fprintf(stdout, "Opacity should be 0 - 256\n");
-		i = 100;
+		fprintf(stdout, "Opacity should be 0 - 255\n");
+		i = 128;
 	}
 	FogOfWarOpacity = i;
 
@@ -396,7 +377,7 @@ void SetTile(int tile, int w, int h, int value)
 		return;
 	}
 	if (value < 0 || value >= 256) {
-		fprintf(stderr, "Invalid tile number: %d\n", tile);
+		fprintf(stderr, "Invalid tile value: %d\n", value);
 		return;
 	}
 
@@ -424,7 +405,7 @@ static int CclDefinePlayerTypes(lua_State *l)
 		LuaError(l, "Not enough players");
 	}
 
-	for (i = 0; i < numplayers && i < PlayerMax; i++) {
+	for (i = 0; i < numplayers && i < PlayerMax; ++i) {
 		if (lua_isnil(l, i + 1)) {
 			numplayers = i;
 			break;
@@ -446,11 +427,12 @@ static int CclDefinePlayerTypes(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
-	for (i = numplayers; i < PlayerMax - 1; i++) {
+	for (i = numplayers; i < PlayerMax - 1; ++i) {
 		Map.Info.PlayerType[i] = PlayerNobody;
 	}
-	if (numplayers < PlayerMax)
-		Map.Info.PlayerType[PlayerMax-1] = PlayerNeutral;
+	if (numplayers < PlayerMax) {
+		Map.Info.PlayerType[PlayerMax - 1] = PlayerNeutral;
+	}
 	return 0;
 }
 
@@ -461,11 +443,9 @@ static int CclDefinePlayerTypes(lua_State *l)
 */
 static int CclLoadTileModels(lua_State *l)
 {
-	char buf[1024];
+	char buf[PATH_MAX];
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	Map.TileModelsFileName = LuaToString(l, 1);
 	LibraryFileName(Map.TileModelsFileName.c_str(), buf, sizeof(buf));
 	if (LuaLoadFile(buf) == -1) {
@@ -482,7 +462,6 @@ void MapCclRegister(void)
 	lua_register(Lua, "StratagusMap", CclStratagusMap);
 	lua_register(Lua, "RevealMap", CclRevealMap);
 	lua_register(Lua, "CenterMap", CclCenterMap);
-	lua_register(Lua, "SetStartView", CclSetStartView);
 	lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
 
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);

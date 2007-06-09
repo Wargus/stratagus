@@ -272,6 +272,7 @@ public:
 
 	int StartX;  /// map tile start X position
 	int StartY;  /// map tile start Y position
+	inline void SetStartView(int x, int y) { StartX = x; StartY = y; }
 
 	std::map<CUnit *, int *> UnitsConsumingResourcesActual;
 	std::map<CUnit *, int *> UnitsConsumingResourcesRequested;
