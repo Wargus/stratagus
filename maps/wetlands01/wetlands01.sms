@@ -16,35 +16,35 @@
 SetStartView(0, 9, 38)
 Players[0].EnergyStored = 1500
 Players[0].MagmaStored = 1500
-SetAiType(0, "ai-rush")
+Players[0].AiType = "ai-rush"
 SetStartView(1, 93, 108)
 Players[1].EnergyStored = 1500
 Players[1].MagmaStored = 1500
-SetAiType(1, "ai-rush")
+Players[1].AiType = "ai-rush"
 SetStartView(2, 0, 0)
 Players[2].EnergyStored = 0
 Players[2].MagmaStored = 0
-SetAiType(2, "ai-rush")
+Players[2].AiType = "ai-rush"
 SetStartView(3, 0, 0)
 Players[3].EnergyStored = 0
 Players[3].MagmaStored = 0
-SetAiType(3, "ai-rush")
+Players[3].AiType = "ai-rush"
 SetStartView(4, 0, 0)
 Players[4].EnergyStored = 0
 Players[4].MagmaStored = 0
-SetAiType(4, "ai-rush")
+Players[4].AiType = "ai-rush"
 SetStartView(5, 0, 0)
 Players[5].EnergyStored = 0
 Players[5].MagmaStored = 0
-SetAiType(5, "ai-rush")
+Players[5].AiType = "ai-rush"
 SetStartView(6, 0, 0)
 Players[6].EnergyStored = 0
 Players[6].MagmaStored = 0
-SetAiType(6, "ai-rush")
+Players[6].AiType = "ai-rush"
 SetStartView(7, 0, 0)
 Players[7].EnergyStored = 0
 Players[7].MagmaStored = 0
-SetAiType(7, "ai-rush")
+Players[7].AiType = "ai-rush"
 
 -- load tilesets
 LoadTileModels("maps/wetlands01/terrain.lua")

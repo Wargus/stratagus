@@ -16,23 +16,23 @@
 SetStartView(0, 9, 18)
 Players[0].MagmaStored = 700
 Players[0].EnergyStored = 350
-SetAiType(0, "ai-rush")
+Players[0].AiType = "ai-rush"
 SetStartView(1, 42, 44)
 Players[1].MagmaStored = 700
 Players[1].EnergyStored = 350
-SetAiType(1, "ai-rush")
+Players[1].AiType = "ai-rush"
 SetStartView(2, 0, 0)
-SetAiType(2, "ai-rush")
+Players[2].AiType = "ai-rush"
 SetStartView(3, 0, 0)
-SetAiType(3, "ai-rush")
+Players[3].AiType = "ai-rush"
 SetStartView(4, 0, 0)
-SetAiType(4, "ai-rush")
+Players[4].AiType = "ai-rush"
 SetStartView(5, 0, 0)
-SetAiType(5, "ai-rush")
+Players[5].AiType = "ai-rush"
 SetStartView(6, 0, 0)
-SetAiType(6, "ai-rush")
+Players[6].AiType = "ai-rush"
 SetStartView(7, 16, 22)
-SetAiType(7, "ai-rush")
+Players[7].AiType = "ai-rush"
 
 -- load tilesets
 LoadTileModels("maps/islandwar/terrain.lua")
