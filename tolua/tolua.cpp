@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/07/07 20:16:51.
+** Generated automatically by tolua++-1.0.92 on 06/09/07 10:14:59.
 */
 
 #ifndef __cplusplus
@@ -13552,6 +13552,41 @@ static int tolua_set_CPlayer_StartY(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetStartView of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPlayer_SetStartView00
+static int tolua_stratagus_CPlayer_SetStartView00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+  int y = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetStartView'",NULL);
+#endif
+  {
+   self->SetStartView(x,y);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetStartView'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: EnergyProductionRate of class  CPlayer */
 #ifndef TOLUA_DISABLE_tolua_get_CPlayer_EnergyProductionRate
 static int tolua_get_CPlayer_EnergyProductionRate(lua_State* tolua_S)
@@ -18205,6 +18240,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"AiName",tolua_get_CPlayer_AiName,tolua_set_CPlayer_AiName);
    tolua_variable(tolua_S,"StartX",tolua_get_CPlayer_StartX,tolua_set_CPlayer_StartX);
    tolua_variable(tolua_S,"StartY",tolua_get_CPlayer_StartY,tolua_set_CPlayer_StartY);
+   tolua_function(tolua_S,"SetStartView",tolua_stratagus_CPlayer_SetStartView00);
    tolua_variable(tolua_S,"EnergyProductionRate",tolua_get_CPlayer_EnergyProductionRate,tolua_set_CPlayer_EnergyProductionRate);
    tolua_variable(tolua_S,"MagmaProductionRate",tolua_get_CPlayer_MagmaProductionRate,tolua_set_CPlayer_MagmaProductionRate);
    tolua_variable(tolua_S,"EnergyStored",tolua_get_CPlayer_EnergyStored,tolua_set_CPlayer_EnergyStored);
