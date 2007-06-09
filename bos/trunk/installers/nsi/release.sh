@@ -6,6 +6,9 @@ rm -rf boswars/installers
 rm -rf boswars/engine
 
 cp engine/Release/boswars.exe boswars
+cp installers/nsi/msvcp80.dll boswars
+cp installers/nsi/msvcr80.dll boswars
+cp installers/nsi/Microsoft.VC80.CRT.manifest boswars
 
 echo "Creating installer"
 "c:/Program Files/NSIS/makensis.exe" /NOCD installers/nsi/bos.nsi
