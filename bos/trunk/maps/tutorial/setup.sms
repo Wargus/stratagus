@@ -16,35 +16,35 @@
 SetStartView(0, 23, 39)
 Players[0].MagmaStored = 2000
 Players[0].EnergyStored = 1000
-SetAiType(0, "ai-rush")
+Players[0].AiType = "ai-rush"
 SetStartView(1, 60, 3)
 Players[1].MagmaStored = 2000
 Players[1].EnergyStored = 1000
-SetAiType(1, "ai-rush")
+Players[1].AiType = "ai-rush"
 SetStartView(2, 0, 0)
 Players[2].MagmaStored = 2000
 Players[2].EnergyStored = 1000
-SetAiType(2, "ai-rush")
+Players[2].AiType = "ai-rush"
 SetStartView(3, 0, 0)
 Players[3].MagmaStored = 2000
 Players[3].EnergyStored = 1000
-SetAiType(3, "ai-rush")
+Players[3].AiType = "ai-rush"
 SetStartView(4, 0, 0)
 Players[4].MagmaStored = 2000
 Players[4].EnergyStored = 1000
-SetAiType(4, "ai-rush")
+Players[4].AiType = "ai-rush"
 SetStartView(5, 0, 0)
 Players[5].MagmaStored = 2000
 Players[5].EnergyStored = 1000
-SetAiType(5, "ai-rush")
+Players[5].AiType = "ai-rush"
 SetStartView(6, 0, 0)
 Players[6].MagmaStored = 2000
 Players[6].EnergyStored = 1000
-SetAiType(6, "ai-rush")
+Players[6].AiType = "ai-rush"
 SetStartView(7, 0, 0)
 Players[7].MagmaStored = 2000
 Players[7].EnergyStored = 1000
-SetAiType(7, "ai-rush")
+Players[7].AiType = "ai-rush"
 
 -- load tilesets
 LoadTileModels("maps/tutorial/terrain.lua")

@@ -240,8 +240,7 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
 			f->printf("Players[%d].EnergyStored = %d\n", i, Players[i].GetEnergyStored());
 			f->printf("Players[%d].MagmaStored = %d\n", i, Players[i].GetMagmaStored());
-			f->printf("SetAiType(%d, \"%s\")\n",
-				i, Players[i].AiName.c_str());
+			f->printf("Players[%d].AiType = \"%s\")\n", i, Players[i].AiName.c_str());
 		}
 		f->printf("\n");
 

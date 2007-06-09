@@ -627,50 +627,6 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 // ----------------------------------------------------------------------------
 
 /**
-**  Get ai player algo.
-**
-**  @param l  Lua state.
-*/
-static int CclGetAiType(lua_State *l)
-{
-	CPlayer *p;
-
-	if (lua_gettop(l) < 1) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_pushvalue(l, 1);
-	p = CclGetPlayer(l);
-	lua_pop(l, 1);
-
-	lua_pushstring(l, p->AiName.c_str());
-
-	return 1;
-}
-
-/**
-**  Set ai player algo.
-**
-**  @param l  Lua state.
-*/
-static int CclSetAiType(lua_State *l)
-{
-	CPlayer *p;
-
-	if (lua_gettop(l) < 2) {
-		LuaError(l, "incorrect argument");
-	}
-	lua_pushvalue(l, 1);
-	p = CclGetPlayer(l);
-	lua_pop(l, 1);
-
-	p->AiName = LuaToString(l, 2);
-
-	return 0;
-}
-
-// ----------------------------------------------------------------------------
-
-/**
 **  Register CCL features for players.
 */
 void PlayerCclRegister(void)
@@ -696,10 +652,6 @@ void PlayerCclRegister(void)
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
 
 	lua_register(Lua, "NewColors", CclNewPlayerColors);
-
-	// player member access functions
-	lua_register(Lua, "GetAiType", CclGetAiType);
-	lua_register(Lua, "SetAiType", CclSetAiType);
 }
 
 //@}
