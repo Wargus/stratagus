@@ -12,35 +12,35 @@
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-SetStartView(0, 0, 0)
+Players[0]:SetStartView(0, 0)
 Players[0].EnergyStored = 1000
 Players[0].MagmaStored = 2000
 Players[0].AiType = "ai-rush"
-SetStartView(1, 0, 0)
+Players[1]:SetStartView(0, 0)
 Players[1].EnergyStored = 1000
 Players[1].MagmaStored = 2000
 Players[1].AiType = "ai-rush"
-SetStartView(2, 0, 0)
+Players[2]:SetStartView(0, 0)
 Players[2].EnergyStored = 1000
 Players[2].MagmaStored = 2000
 Players[2].AiType = "ai-rush"
-SetStartView(3, 0, 0)
+Players[3]:SetStartView(0, 0)
 Players[3].EnergyStored = 3000
 Players[3].MagmaStored = 5000
 Players[3].AiType = "ai-passive"
-SetStartView(4, 0, 0)
+Players[4]:SetStartView(0, 0)
 Players[4].EnergyStored = 1000
 Players[4].MagmaStored = 2000
 Players[4].AiType = "ai-rush"
-SetStartView(5, 0, 0)
+Players[5]:SetStartView(0, 0)
 Players[5].EnergyStored = 1000
 Players[5].MagmaStored = 2000
 Players[5].AiType = "ai-rush"
-SetStartView(6, 0, 0)
+Players[6]:SetStartView(0, 0)
 Players[6].EnergyStored = 1000
 Players[6].MagmaStored = 2000
 Players[6].AiType = "ai-rush"
-SetStartView(7, 0, 0)
+Players[7]:SetStartView(0, 0)
 Players[7].EnergyStored = 1000
 Players[7].MagmaStored = 2000
 Players[7].AiType = "ai-rush"
