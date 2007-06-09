@@ -17,6 +17,7 @@ class CPlayer
 
 	int StartX;
 	int StartY;
+	void SetStartView(int x, int y);
 
 	tolua_property__s int EnergyProductionRate;
 	tolua_property__s int MagmaProductionRate;

@@ -13,25 +13,25 @@
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-SetStartView(0, 9, 18)
+Players[0]:SetStartView(9, 18)
 Players[0].MagmaStored = 700
 Players[0].EnergyStored = 350
 Players[0].AiType = "ai-rush"
-SetStartView(1, 42, 44)
+Players[1]:SetStartView(42, 44)
 Players[1].MagmaStored = 700
 Players[1].EnergyStored = 350
 Players[1].AiType = "ai-rush"
-SetStartView(2, 0, 0)
+Players[2]:SetStartView(0, 0)
 Players[2].AiType = "ai-rush"
-SetStartView(3, 0, 0)
+Players[3]:SetStartView(0, 0)
 Players[3].AiType = "ai-rush"
-SetStartView(4, 0, 0)
+Players[4]:SetStartView(0, 0)
 Players[4].AiType = "ai-rush"
-SetStartView(5, 0, 0)
+Players[5]:SetStartView(0, 0)
 Players[5].AiType = "ai-rush"
-SetStartView(6, 0, 0)
+Players[6]:SetStartView(0, 0)
 Players[6].AiType = "ai-rush"
-SetStartView(7, 16, 22)
+Players[7]:SetStartView(16, 22)
 Players[7].AiType = "ai-rush"
 
 -- load tilesets
