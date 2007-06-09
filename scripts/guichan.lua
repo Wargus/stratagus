@@ -378,7 +378,7 @@ function RunStartGameMenu(s)
   end
   menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("~!Start"), "s", Video.Width /2 + 50 ,  Video.Height - 100,
+  menu:addButton(_("~!Start"), "s", Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)
 
   menu:run()
@@ -409,7 +409,7 @@ function RunReplayMenu(s)
 
   menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("~!Start"), "s", Video.Width /2 + 50 ,  Video.Height - 100,
+  menu:addButton(_("~!Start"), "s", Video.Width / 2 + 50 ,  Video.Height - 100,
                  startreplaybutton)
 
   menu:run()
@@ -450,7 +450,7 @@ function RunLoadGameMenu(s)
   end
   menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("~!Start"), "s", Video.Width /2 + 50 ,  Video.Height - 100,
+  menu:addButton(_("~!Start"), "s", Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)
 
   DisallowAllUnits()
@@ -458,6 +458,73 @@ function RunLoadGameMenu(s)
 end
 
 function RunEditorMenu(s)
+  local menu
+  local x = Video.Width / 2 - 100
+
+  menu = BosMenu(_("Editor"))
+
+  menu:addButton(_("Create ~!New Map"), "n", x, 260,
+    function() RunEditorNewMenu(); menu:stop() end)
+  menu:addButton(_("~!Load Map"), "l", x, 300,
+    function() RunEditorLoadMenu(); menu:stop() end)
+
+  menu:addButton(_("~!Cancel"), "c", x, Video.Height - 100,
+    function() menu:stop() end)
+
+  menu:run()
+end
+
+function RunEditorNewMenu()
+  local menu
+  local sy = Video.Height / 20
+  local xsize
+  local ysize
+  local defaultSize = {64, 64}
+
+  menu = BosMenu(_("Editor"))
+
+  function starteditorbutton(s)
+    -- FIXME: select tileset or image based map
+    LoadTileModels("scripts/tilesets/desert.lua")
+
+    local n = tonumber(xsize:getText())
+    if (n == nil) then n = 64 end
+    Map.Info.MapWidth = n
+    local n = tonumber(ysize:getText())
+    if (n == nil) then n = 64 end
+    Map.Info.MapHeight = n
+
+    StartEditor(nil)
+    Load("scripts/uilayout.lua")
+    HandleCommandKey = HandleIngameCommandKey
+    menu:stop()
+  end
+
+  local l = Label(_("Size:"))
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, Video.Width / 2 - 50, 8 * sy)
+
+  xsize = menu:addTextInputField(tostring(defaultSize[1]),
+    Video.Width / 2 + 10, 8 * sy, 40)
+
+  local l = Label("x")
+  l:setFont(Fonts["game"])
+  l:adjustSize()
+  menu:add(l, Video.Width / 2 + 57, 8 * sy)
+
+  ysize = menu:addTextInputField(tostring(defaultSize[2]),
+    Video.Width / 2 + 10 + 60, 8 * sy, 40)
+
+  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+    function() menu:stop() end)
+  menu:addButton(_("Start ~!Editor"), "e", Video.Width / 2 + 50, Video.Height - 100,
+    starteditorbutton)
+
+  menu:run()
+end
+
+function RunEditorLoadMenu()
   local menu
   local sx = Video.Width / 20
   local sy = Video.Height / 20

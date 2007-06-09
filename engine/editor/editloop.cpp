@@ -2112,8 +2112,21 @@ void StartEditor(const char *filename)
 		// new map, choose some default values
 		strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), "");
 		Map.Info.Description.clear();
-		Map.Info.MapWidth = 64;
-		Map.Info.MapHeight = 64;
+		// Make sure we have good values
+		if (Map.Info.MapWidth < 32) {
+			fprintf(stderr, "Invalid map width, using default value\n");
+			Map.Info.MapWidth = 32;
+		} else if (Map.Info.MapWidth > 256) {
+			fprintf(stderr, "Invalid map width, using default value\n");
+			Map.Info.MapWidth = 256;
+		}
+		if (Map.Info.MapHeight < 32) {
+			fprintf(stderr, "Invalid map height, using default value\n");
+			Map.Info.MapHeight = 32;
+		}else if (Map.Info.MapHeight > 256) {
+			fprintf(stderr, "Invalid map height, using default value\n");
+			Map.Info.MapHeight = 256;
+		}
 	}
 	
 	// Run the editor.
