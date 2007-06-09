@@ -48,6 +48,7 @@
 #include "map.h"
 #include "interface.h"
 #include "ui.h"
+#include "editor.h"
 
 #include "intern_video.h"
 
@@ -231,8 +232,10 @@ static void DrawBuildingCursor(void)
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = (CanBuildHere(NoUnitP, CursorBuilding, mx, my) != NULL);
-		ontop = NULL;
+		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mx, my)) != NULL);
+		if (!Editor.Running) {
+			ontop = NULL;
+		}
 	}
 
 	mask = CursorBuilding->MovementMask;
