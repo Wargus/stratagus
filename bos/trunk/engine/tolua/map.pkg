@@ -1,8 +1,8 @@
 class CMapInfo
 {
 	string Description;
-	tolua_readonly int MapWidth;
-	tolua_readonly int MapHeight;
+	int MapWidth;
+	int MapHeight;
 	int PlayerType[PlayerMax];
 };
 
