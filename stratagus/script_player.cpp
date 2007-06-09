@@ -54,21 +54,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Get a player pointer
-**
-**  @param l  Lua state.
-**
-**  @return   The player pointer
-*/
-static CPlayer *CclGetPlayer(lua_State *l)
-{
-	int i = (int)LuaToNumber(l, -1);
-	if ( (i < 0)  || (i > PlayerMax) )
-		return NULL;
-	return &Players[i];
-}
-
-/**
 **  Parse the player configuration.
 **
 **  @param l  Lua state.
