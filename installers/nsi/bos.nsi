@@ -3,7 +3,7 @@
 !define NAME "Bos Wars"
 
 Name "${NAME}"
-OutFile "BosWars-2.3.exe"
+OutFile "BosWars-2.4.exe"
 
 ;!define MUI_ICON "stratagus.ico"
 ;!define MUI_UNICON "stratagus.ico"
