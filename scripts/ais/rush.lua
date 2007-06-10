@@ -66,7 +66,7 @@ local ai_loop_funcs = {
 local function HotSpotExists()
   if (hotspotexists == nil) then
     local hotspot = UnitTypeByIdent("unit-hotspot")
-    local count = Players[7].UnitTypesCount[hotspot.Slot]
+    local count = Players[PlayerNumNeutral].UnitTypesCount[hotspot.Slot]
     hotspotexists = (count ~= 0)
   end
   return hotspotexists
