@@ -15,35 +15,35 @@
 Players[0]:SetStartView(21, 20)
 Players[0].EnergyStored = 5000
 Players[0].MagmaStored = 5000
-Players[0].AiType = "ai-rush"
+Players[0].AiName = "ai-rush"
 Players[1]:SetStartView(89, 114)
 Players[1].EnergyStored = 5000
 Players[1].MagmaStored = 5000
-Players[1].AiType = "ai-rush"
+Players[1].AiName = "ai-rush"
 Players[2]:SetStartView(0, 0)
 Players[2].EnergyStored = 1000
 Players[2].MagmaStored = 2000
-Players[2].AiType = "ai-rush"
+Players[2].AiName = "ai-rush"
 Players[3]:SetStartView(0, 0)
 Players[3].EnergyStored = 1000
 Players[3].MagmaStored = 2000
-Players[3].AiType = "ai-rush"
+Players[3].AiName = "ai-rush"
 Players[4]:SetStartView(0, 0)
 Players[4].EnergyStored = 1000
 Players[4].MagmaStored = 2000
-Players[4].AiType = "ai-rush"
+Players[4].AiName = "ai-rush"
 Players[5]:SetStartView(0, 0)
 Players[5].EnergyStored = 1000
 Players[5].MagmaStored = 2000
-Players[5].AiType = "ai-rush"
+Players[5].AiName = "ai-rush"
 Players[6]:SetStartView(0, 0)
 Players[6].EnergyStored = 1000
 Players[6].MagmaStored = 2000
-Players[6].AiType = "ai-rush"
+Players[6].AiName = "ai-rush"
 Players[7]:SetStartView(0, 0)
 Players[7].EnergyStored = 1000
 Players[7].MagmaStored = 2000
-Players[7].AiType = "ai-rush"
+Players[7].AiName = "ai-rush"
 
 -- load tilemodels
 LoadTileModels("scripts/tilesets/desert.lua")
