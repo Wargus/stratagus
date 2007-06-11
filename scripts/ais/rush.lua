@@ -146,7 +146,7 @@ local ai_funcs = {
 }
 
 function AiRush()
-    print(AiPlayer() .. " position ".. ai_pos[AiPlayer() + 1]);
+--    print(AiPlayer() .. " position ".. ai_pos[AiPlayer() + 1]);
     return AiLoop(ai_funcs, ai_pos)
 end
 
