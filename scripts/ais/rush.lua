@@ -72,30 +72,60 @@ local function HotSpotExists()
   return hotspotexists
 end
 
+local function GetBuildOrder()
+  local order = {}
+
+  if (not HotSpotExists()) then
+    order[1] = "unit-powerplant"
+    order[2] = nil
+  end
+
+  if (Players[AiPlayer()].MagmaStored < 300) then
+    order[1] = "unit-magmapump"
+    order[2] = "unit-powerplant"
+  else
+    order[1] = "unit-powerplant"
+    order[2] = "unit-magmapump"
+  end
+
+  return order
+end
+
 local ai_funcs = {
   function() AiDebug(false) return false end,
   function() return AiSleep(AiGetSleepCycles()) end,
   function()
-    if (HotSpotExists()) then
-      AiNeed("unit-magmapump")
-    end
-    return false
+    order = GetBuildOrder()
+    return AiNeed(order[1])
   end,
-  function() return AiNeed("unit-powerplant") end,
   function()
-    if (HotSpotExists()) then
-      return AiWait("unit-magmapump")
-    end
-    return false
+    order = GetBuildOrder()
+    return AiWait(order[1])
   end,
-  function() return AiWait("unit-powerplant") end,
-  function() return AiSet("unit-engineer", 10) end,
+  function()
+    order = GetBuildOrder()
+    if (order[2] ~= nil) then
+      return AiNeed(order[2])
+    else
+      return false
+    end
+  end,
+  function()
+    order = GetBuildOrder()
+    if (order[2] ~= nil) then
+      return AiWait(order[2])
+    else
+      return false
+    end
+  end,
+  function() return AiSet("unit-engineer", 2) end,
   function() return AiNeed("unit-vault") end,
   function() return AiWait("unit-vault") end,
 
   function() return AiNeed("unit-camp") end,
   function() return AiWait("unit-camp") end,
   function() return AiForce(0, {"unit-assault", 10}) end,
+  function() return AiSet("unit-engineer", 3) end,
   function() return AiWaitForce(0) end, 
   function() return AiNeed("unit-camp") end,
   function() return AiSleep(125*GameSettings.Difficulty) end,
@@ -116,7 +146,7 @@ local ai_funcs = {
 }
 
 function AiRush()
---    print(AiPlayer() .. " position ".. ai_pos[AiPlayer() + 1]);
+    print(AiPlayer() .. " position ".. ai_pos[AiPlayer() + 1]);
     return AiLoop(ai_funcs, ai_pos)
 end
 
