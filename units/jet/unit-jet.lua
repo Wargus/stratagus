@@ -71,7 +71,7 @@ DefineUnitType("unit-jet", {
     HitPoints = 50,
     DrawLevel = 125,
     TileSize = {3, 3},
-    BoxSize = {64, 64},
+    BoxSize = {96, 96},
     SightRange = 7,
     Armor = 20,
     BasicDamage = 5,
