@@ -30,7 +30,7 @@
 --
 
 -- AI
---SetAiType(1, "ai-rush")
+--Players[1].AiName = "ai-rush"
 
 -- Units
 AllowDefaultUnits()
