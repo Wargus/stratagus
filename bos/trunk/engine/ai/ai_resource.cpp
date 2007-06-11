@@ -378,34 +378,32 @@ static void AiCheckingWork(void)
 	int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
 		queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		if (queue->Want > queue->Made) {
-			type = queue->Type;
+		type = queue->Type;
 
-			//
-			// FIXME: must check if requirements are fulfilled.
-			// Buildings can be destroyed.
+		//
+		// FIXME: must check if requirements are fulfilled.
+		// Buildings can be destroyed.
 
+		//
+		// Check limits, AI should be broken if reached.
+		//
+		if (queue->Want > queue->Made && AiPlayer->Player->CheckLimits(type) < 0) {
+			continue;
+		}
+		//
+		// Check if resources available.
+		//
+		if ((c = AiCheckUnitTypeCosts(type))) {
+			AiPlayer->NeededMask |= c;
 			//
-			// Check limits, AI should be broken if reached.
-			//
-			if (AiPlayer->Player->CheckLimits(type) < 0) {
-				continue;
-			}
-			//
-			// Check if resources available.
-			//
-			if ((c = AiCheckUnitTypeCosts(type))) {
-				AiPlayer->NeededMask |= c;
-				//
-				// NOTE: we can continue and build things with lesser
-				//  resource or other resource need!
-				continue;
-			} else {
-				if (AiMakeUnit(type)) {
-					// AiRequestSupply can change UnitTypeBuilt so recalculate queue
-					queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-					++queue->Made;
-				}
+			// NOTE: we can continue and build things with lesser
+			//  resource or other resource need!
+			continue;
+		} else if (queue->Want > queue->Made) {
+			if (AiMakeUnit(type)) {
+				// AiRequestSupply can change UnitTypeBuilt so recalculate queue
+				queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
+				++queue->Made;
 			}
 		}
 	}
@@ -418,29 +416,31 @@ static void AiCheckingWork(void)
 /**
 **  Assign worker to gather a resource.
 **
-**  @param unit  pointer to the unit.
+**  @param unit      Unit to be assigned.
+**  @param resource  Resource to find, -1 for any
 **
-**  @return      1 if the worker was assigned, 0 otherwise.
+**  @return          1 if the worker was assigned, 0 otherwise.
 */
-static int AiAssignHarvester(CUnit *unit)
+static int AiAssignHarvester(CUnit *unit, int resource)
 {
 	std::vector<CUnitType *>::iterator i;
 	int exploremask;
 	CUnit *dest;
-	int res;
+	int res = resource;
 
 	// It can't.
 	if (unit->Removed) {
 		return 0;
 	}
 
-	// See which resource we need most
-	res = -1;
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (unit->Player->ProductionRate[i] == 0) {
-			res = i;
-			if (unit->Player->StoredResources[i] == 0) {
-				break;
+	if (res == -1) {
+		// No resource specified, see which resource we need most
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (unit->Player->ProductionRate[i] == 0) {
+				res = i;
+				if (unit->Player->StoredResources[i] == 0) {
+					break;
+				}
 			}
 		}
 	}
@@ -487,15 +487,66 @@ static int AiAssignHarvester(CUnit *unit)
 */
 static void AiCollectResources(void)
 {
-	for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
+	int i;
+	int needed = -1;
+	std::vector<CUnit *> harvesters;
+
+	// Check if we need a resource
+	if (AiPlayer->NeededMask) {
+		int n = AiPlayer->NeededMask;
+		while (n != 0) {
+			n >>= 1;
+			++needed;
+		}
+	}
+
+	// Build a list of all harvesters
+	for (i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
 		CUnit *unit = AiPlayer->Player->Units[i];
 
-		// Ignore non-harvesters or busy units. (building, fighting, harvesting, ... )
-		if (!unit->Type->Harvester || !unit->IsIdle()) {
+		// Ignore non-harvesters
+		if (!unit->Type->Harvester) {
 			continue;
 		}
 
-		AiAssignHarvester(unit);
+		harvesters.push_back(unit);
+	}
+
+	// If we need a resource, pick one unit to harvest it
+	if (needed != -1) {
+		int best = -1;
+		for (i = 0; i < (int)harvesters.size(); ++i) {
+			// Idle units are always best
+			if (harvesters[i]->IsIdle()) {
+				best = i;
+				break;
+			}
+			// Unit harvesting the wrong resource
+			if (harvesters[i]->Orders[0]->Action == UnitActionResource &&
+					harvesters[i]->Data.Harvest.CurrentProduction[needed] == 0) {
+				best = i;
+			}
+		}
+
+		if (best == -1) {
+			// No best unit found, pick one at random
+			best = SyncRand() % harvesters.size();
+		}
+
+		if (AiAssignHarvester(harvesters[best], needed)) {
+			harvesters.erase(harvesters.begin() + best);
+		}
+	}
+
+	// Assign one random idle harvester at a time
+	std::vector<CUnit *> idleHarvesters;
+	for (i = 0; i < (int)harvesters.size(); ++i) {
+		if (harvesters[i]->IsIdle()) {
+			idleHarvesters.push_back(harvesters[i]);
+		}
+	}
+	if (idleHarvesters.size() > 0) {
+		AiAssignHarvester(idleHarvesters[SyncRand() % idleHarvesters.size()], -1);
 	}
 }
 
@@ -669,6 +720,7 @@ static void AiCheckRepair(void)
 		}
 	}
 
+
 	for (i = k; i < n; ++i) {
 		unit = AiPlayer->Player->Units[i];
 		repair_flag = true;
@@ -701,6 +753,31 @@ static void AiCheckRepair(void)
 				AiRepairUnit(unit);
 				AiPlayer->LastRepairBuilding = UnitNumber(unit);
 				return;
+			}
+		}
+
+		// Building under construction but no worker
+		if (unit->Orders[0]->Action == UnitActionBuilt) {
+			int j;
+			for (j = 0; j < AiPlayer->Player->TotalNumUnits; ++j) {
+				COrder *order = AiPlayer->Player->Units[j]->Orders[0];
+				if (order->Action == UnitActionRepair && order->Goal == unit) {
+					break;
+				}
+			}
+			if (j == AiPlayer->Player->TotalNumUnits) {
+				// Make sure we have enough resources first
+				for (j = 0; j < MaxCosts; ++j) {
+					// FIXME: the resources don't necessarily have to be in storage
+					if (AiPlayer->Player->StoredResources[j] < unit->Type->ProductionCosts[j]) {
+						break;
+					}
+				}
+				if (j == MaxCosts) {
+					AiRepairUnit(unit);
+					AiPlayer->LastRepairBuilding = UnitNumber(unit);
+					return;
+				}
 			}
 		}
 	}
