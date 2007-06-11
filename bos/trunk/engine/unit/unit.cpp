@@ -2607,9 +2607,13 @@ void LetUnitDie(CUnit *unit)
 		unit->Goal = NULL;
 	}
 
-	if (UnitRemoveConsumingResources(unit) || unit->Orders[0]->Action != UnitActionBuilt) {
+	if (UnitRemoveConsumingResources(unit)) {
 		for (int u = 0; u < MaxCosts; ++u) {
 			unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u];
+		}
+	}
+	if (unit->Orders[0]->Action != UnitActionBuilt) {
+		for (int u = 0; u < MaxCosts; ++u) {
 			unit->Player->StorageCapacity[u] -= unit->Type->StorageCapacity[u];
 			if (unit->Player->StoredResources[u] > unit->Player->StorageCapacity[u]) {
 				unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
