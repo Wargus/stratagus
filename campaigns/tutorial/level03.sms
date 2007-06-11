@@ -41,15 +41,15 @@ DefineAllow("unit-engineer", AllowAll)
 DefineAllow("unit-powerplant", AllowAll)
 
 AddTrigger(
-    function() return ThisPlayer.TotalNumUnits == 0 end,
-    function() return StopGame(GameDefeat) end)
+  function() return ThisPlayer.TotalNumUnits == 0 end,
+  function() return StopGame(GameDefeat) end)
 
 AddTrigger(
-    function() 
-       local t = ThisPlayer.EnergyStored
-       local c = ThisPlayer.MagmaStored
-       return (t >= 1100 and c >= 2200) end,
-    function() return StopGame(GameVictory) end)
+  function() 
+    local t = ThisPlayer.EnergyStored
+    local c = ThisPlayer.MagmaStored
+    return (t >= 1100 and c >= 2200) end,
+  function() return StopGame(GameVictory) end)
   
 AddCampaignMessage(1,  
   "To harvest energy or magma, first select your engineer. Then, "..

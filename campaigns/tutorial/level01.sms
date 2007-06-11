@@ -36,20 +36,22 @@ unit= CreateUnit("unit-engineer", 0, {5, 59})
 
 DisallowAllUnits()
 AddTrigger(
-    function() return ThisPlayer.TotalNumUnits == 0 end,
-    function() return StopGame(GameDefeat) end)
+  function() return ThisPlayer.TotalNumUnits == 0 end,
+  function() return StopGame(GameDefeat) end)
 
 AddTrigger(
-    function() local x
-               x = GetNumUnitsAt(ThisPlayer.Index, "units", {22 - 3, 38 - 3}, {28 + 3, 44 + 3}) 
-               return x == 2 end,
-    function() return StopGame(GameVictory) end)
+  function()
+    local x
+    x = GetNumUnitsAt(ThisPlayer.Index, "units",
+      {22 - 3, 38 - 3}, {28 + 3, 44 + 3}) 
+    return x == 2 end,
+  function() return StopGame(GameVictory) end)
 
-SetStartView(0, 6, 56)
+Players[0]:SetStartView(6, 56)
 AddCampaignMessage(1, 
-   "To move your units effectively, first select them all by"..
-   "holding down the left mouse button while dragging a box around " ..
-   "the units. Next right click in the center "..
-   "of the map to order them to move."
+  "To move your units effectively, first select them all by"..
+  "holding down the left mouse button while dragging a box around " ..
+  "the units. Next right click in the center "..
+  "of the map to order them to move."
 )
 

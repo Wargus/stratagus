@@ -39,18 +39,18 @@ DefineAllow("unit-engineer", AllowAll)
 DefineAllow("unit-powerplant", AllowAll)
 
 function GetOwnUnitsAmount(type)
-   return ThisPlayer.UnitTypesCount[UnitTypeByIdent(type).Slot]
+  return ThisPlayer.UnitTypesCount[UnitTypeByIdent(type).Slot]
 end
 AddTrigger(
-    function() return ThisPlayer.TotalNumUnits == 0 end,
-    function() return StopGame(GameDefeat) end)
+  function() return ThisPlayer.TotalNumUnits == 0 end,
+  function() return StopGame(GameDefeat) end)
 
 AddTrigger(
-    function() 
-       local e = GetOwnUnitsAmount("unit-engineer")
-       local g = GetOwnUnitsAmount("unit-powerplant")
-       return (e == 3 and g == 1) end,
-    function() return StopGame(GameVictory) end)
+  function() 
+    local e = GetOwnUnitsAmount("unit-engineer")
+    local g = GetOwnUnitsAmount("unit-powerplant")
+    return (e == 3 and g == 1) end,
+  function() return StopGame(GameVictory) end)
 
 AddCampaignFinalAssault(4000,
   "Commander LL says:  Too late !"
