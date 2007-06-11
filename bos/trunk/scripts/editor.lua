@@ -83,6 +83,7 @@ local editor_types = {
   "unit-artil",
   "unit-chopper",
   "unit-bomber",
+  "unit-jet",
 
   "unit-tree",
   "unit-tree02",
