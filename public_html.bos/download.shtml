@@ -6,11 +6,11 @@
 <h3>Version 2.3 (2007/3/4)</h3> 
 
 <ul>
-<li>Linux: <a href="releases/boswars-2.3-linux.tar.gz">boswars-2.3-linux.tar.gz</a></li>
-<li>Windows (installer): <a href="releases/BosWars-2.3.exe">BosWars-2.3.exe</a> </li>
-<!--<li>Windows (zip): <a href="releases/boswars-2.3-win32.zip">boswars-2.3-win32.zip</a></li>-->
-<li>Source (tar): <a href="releases/boswars-2.3-src.tar.gz">boswars-2.3-src.tar.gz</a></li>
-<li>Source (zip): <a href="releases/boswars-2.3-src.zip">boswars-2.3-src.zip</a></li>
+<li>Linux: <a href="dist/releases/boswars-2.3-linux.tar.gz">boswars-2.3-linux.tar.gz</a></li>
+<li>Windows (installer): <a href="dist/releases/BosWars-2.3.exe">BosWars-2.3.exe</a> </li>
+<!--<li>Windows (zip): <a href="dist/releases/boswars-2.3-win32.zip">boswars-2.3-win32.zip</a></li>-->
+<li>Source (tar): <a href="dist/releases/boswars-2.3-src.tar.gz">boswars-2.3-src.tar.gz</a></li>
+<li>Source (zip): <a href="dist/releases/boswars-2.3-src.zip">boswars-2.3-src.zip</a></li>
 </ul>
 
 <h2>Old Releases: "Invasion - Battle of Survival"</h2>
@@ -19,8 +19,8 @@
 This version of Invasion - Battle of Survival works with version 2.2.1 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
 
 <ul>
-<li>Linux: <a href="releases/bos_2_0_1.tar.gz">bos_2_0_1.tar.gz</a></li>
-<li>Windows: <a href="releases/BattleOfSurvival-2.0.1.exe">BattleOfSurvival-2.0.1.exe</a> 
+<li>Linux: <a href="dist/releases/bos_2_0_1.tar.gz">bos_2_0_1.tar.gz</a></li>
+<li>Windows: <a href="dist/releases/BattleOfSurvival-2.0.1.exe">BattleOfSurvival-2.0.1.exe</a> 
  (<a href="http://www.strategyinformer.com/pc/invasionbattleofsurvival/full-game/9953.html">mirror</a>)</li>
 </ul>
 
@@ -28,16 +28,16 @@ This version of Invasion - Battle of Survival works with version 2.2.1 of the <a
 This version of Invasion - Battle of Survival works with version 2.2 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
 
 <ul>
-<li>Linux: <a href="releases/bos_2_0.tar.gz">bos_2_0.tar.gz</a></li>
-<li>Windows: <a href="releases/BattleOfSurvival-2.0.exe">BattleOfSurvival-2.0.exe</a></li>
+<li>Linux: <a href="dist/releases/bos_2_0.tar.gz">bos_2_0.tar.gz</a></li>
+<li>Windows: <a href="dist/releases/BattleOfSurvival-2.0.exe">BattleOfSurvival-2.0.exe</a></li>
 </ul>
 
 <h3>Version 2.0 Alpha (2006/11/2)</h3>
 This version of Invasion - Battle of Survival works with version 2.2 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
 
 <ul>
-<li>Linux: <a href="releases/bos-2.0alpha.tar.gz">bos-2.0alpha.tar.gz</a></li>
-<li>Windows: <a href="releases/BattleOfSurvival-2.0alpha.exe">BattleOfSurvival-2.0alpha.exe</a></li>
+<li>Linux: <a href="dist/releases/bos-2.0alpha.tar.gz">bos-2.0alpha.tar.gz</a></li>
+<li>Windows: <a href="dist/releases/BattleOfSurvival-2.0alpha.exe">BattleOfSurvival-2.0alpha.exe</a></li>
 </ul>
 
 
@@ -46,25 +46,27 @@ This version of Invasion - Battle of Survival works with version 2.1 of the <a h
 The packages include a pre-compiled binary of the stratagus engine.
 
 <ul>
-<li>Linux: <a href="releases/bos_1_1.tar.gz">bos_1_1.tar.gz</a></li>
+<li>Linux: <a href="dist/releases/bos_1_1.tar.gz">bos_1_1.tar.gz</a></li>
 <li>Debian Linux: <a href="http://packages.debian.org/unstable/games/bos">bos</a> 
       package in debian unstable by David Martïnez Moreno.
-<li>Windows: <a href="releases/BattleOfSurvival-1.1.exe">BattleOfSurvival-1.1.exe</a></li>
+<li>Windows: 
+   <a href="dist/releases/BattleOfSurvival-1.1.exe">
+    BattleOfSurvival-1.1.exe</a></li>
 </ul>
 
 <h3>Version 1.1 pre 1</h3>
 This version of Invasion - Battle of Survival works with version 2.1 of the Stratagus engine.
 
 <ul>
-<li>Linux: <a href="releases/bos_1_1pre1.tgz">bos_1_1pre1.tgz</a>
-<li>Windows: <a href="releases/BattleOfSurvival-1.1pre1.exe">BattleOfSurvival-1.1pre1.exe</a>
+<li>Linux: <a href="dist/releases/bos_1_1pre1.tgz">bos_1_1pre1.tgz</a>
+<li>Windows: <a href="dist/releases/BattleOfSurvival-1.1pre1.exe">BattleOfSurvival-1.1pre1.exe</a>
 </ul>
 
 <h3>Version 1.0</h3>
 This version of Invasion - Battle of Survival works with version 2.0 of the Stratagus engine.
 
 <ul>
-<li>Linux: <a href="releases/bos_1_0.tgz">bos_1_0.tgz</a>
+<li>Linux: <a href="dist/releases/bos_1_0.tgz">bos_1_0.tgz</a>
 </ul>
 
 <p/>
