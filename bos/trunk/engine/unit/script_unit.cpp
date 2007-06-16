@@ -841,7 +841,7 @@ static int CclCreateUnit(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(unit, ix, iy) ||
-			(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ix, iy, 0))) {
+				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ix, iy, 0))) {
 			unit->Place(ix, iy);
 		} else {
 			unit->X = ix;
