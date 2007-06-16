@@ -661,6 +661,9 @@ public:
 	struct _order_train_ {
 		int Ticks;                  /// Ticks to complete
 	} Train; /// Train units action
+	struct _order_repair_ {
+		int Progress;               /// Progress counter
+	} Repair; /// Repair
 	} Data; /// Storage room for different commands
 
 	CUnit *Goal; /// Generic goal pointer
