@@ -134,6 +134,7 @@ static void MoveToLocation(CUnit *unit)
 			goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 		unit->State = 0;
 		unit->SubAction = 20;
+		unit->Data.Repair.Progress = 0;
 		UnitHeadingFromDeltaXY(unit,
 			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
@@ -185,8 +186,14 @@ static bool DoRepair(CUnit *unit, CUnit *goal)
 
 		int *costs = unit->Player->UnitsConsumingResourcesActual[unit];
 		int cost = costs[EnergyCost] ? costs[EnergyCost] : costs[MagmaCost];
+		int step = pcost / goal->Variable[HP_INDEX].Max;
+		int hp = 0;
 
-		int hp = goal->Variable[HP_INDEX].Max * cost / pcost;
+		unit->Data.Repair.Progress += cost;
+		while (unit->Data.Repair.Progress > step) {
+			unit->Data.Repair.Progress -= step;
+			++hp;
+		}
 		goal->Variable[HP_INDEX].Value += hp;
 		if (goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
 			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
