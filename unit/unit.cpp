@@ -2473,7 +2473,6 @@ CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 CUnit *UnitOnScreen(int x, int y)
 {
 	CUnit *bestUnit = NULL;
-	int bestDrawLevel = -1;
 
 	for (int i = 0; i < NumUnits; ++i) {
 		CUnit *unit = Units[i];
