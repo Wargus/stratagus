@@ -48,7 +48,7 @@ campaign_steps = {
       "for our base.\n"..
       "-- End of transmission 2. Sergeant TJ --"),
   CreateMapStep("campaigns/tutorial/level03.smp", 
-      "Harvest 200 energy and 100 magma",
+      "Harvest till you have 3000 energy and 1700 magma",
       "News from the Front:\n\n"..
       "The abandoned vault has few resources left. "..
       "For the extension of the base, we need 200 "..
