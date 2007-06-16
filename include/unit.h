@@ -872,7 +872,7 @@ extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		const CPlayer *player, int x, int y, int *px, int *py);
 
 	/// @todo more docu
-extern CUnit *UnitOnScreen(CUnit *unit, int x, int y);
+extern CUnit *UnitOnScreen(int x, int y);
 	/// Check if a unit should be removed from UnitsConsumingResources
 extern bool UnitRemoveConsumingResources(CUnit *unit);
 

@@ -1833,7 +1833,7 @@ static void EditorCallbackMouse(int x, int y)
 		// Look if there is a unit under the cursor.
 		// FIXME: use Viewport2MapX Viewport2MapY
 		//
-		UnitUnderCursor = UnitOnScreen(NULL,
+		UnitUnderCursor = UnitOnScreen(
 			CursorX - UI.MouseViewport->X +
 				UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
 			CursorY - UI.MouseViewport->Y +

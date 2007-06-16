@@ -738,7 +738,7 @@ void UIHandleMouseMove(int x, int y)
 		const CViewport *vp = UI.MouseViewport;
 		if (Map.IsFieldExplored(ThisPlayer, vp->Viewport2MapX(x), vp->Viewport2MapY(y)) ||
 				ReplayRevealMap) {
-			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
+			UnitUnderCursor = UnitOnScreen(x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
@@ -1705,7 +1705,7 @@ void UIHandleButtonUp(unsigned button)
 			if (Map.IsFieldVisible(ThisPlayer,
 					UI.MouseViewport->Viewport2MapX(CursorX),
 					UI.MouseViewport->Viewport2MapY(CursorY)) || ReplayRevealMap) {
-				unit = UnitOnScreen(unit,
+				unit = UnitOnScreen(
 					CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
 					CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
 			}
