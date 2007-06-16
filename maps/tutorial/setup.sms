@@ -14,16 +14,16 @@
 
 -- player configuration
 Players[0]:SetStartView(23, 39)
-Players[0].MagmaStored = 2000
-Players[0].EnergyStored = 1000
+Players[0].MagmaStored = 1000
+Players[0].EnergyStored = 1200
 Players[0].AiName = "ai-default"
 Players[1]:SetStartView(60, 3)
-Players[1].MagmaStored = 2000
-Players[1].EnergyStored = 1000
+Players[1].MagmaStored = 1000
+Players[1].EnergyStored = 1200
 Players[1].AiName = "ai-default"
 Players[2]:SetStartView(0, 0)
-Players[2].MagmaStored = 2000
-Players[2].EnergyStored = 1000
+Players[2].MagmaStored = 1000
+Players[2].EnergyStored = 1200
 Players[2].AiName = "ai-default"
 Players[3]:SetStartView(0, 0)
 Players[3].MagmaStored = 2000

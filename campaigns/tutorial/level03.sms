@@ -48,14 +48,15 @@ AddTrigger(
   function() 
     local t = ThisPlayer.EnergyStored
     local c = ThisPlayer.MagmaStored
-    return (t >= 1100 and c >= 2200) end,
+    return (t >= 3000 and c >= 1700) end,
   function() return StopGame(GameVictory) end)
   
 AddCampaignMessage(1,  
   "To harvest energy or magma, first select your engineer. Then, "..
-  "start harvesting, either by right-clicking on the Titanium Spike, "..
+  "start harvesting, either by right-clicking on the target, "..
   "or by selecting the pick-axe from the menu on the right and then "..
-  "left-clicking on the target, or by typing 'h', and then left-clicking."
+  "left-clicking on the target, or by typing 'h', and then left-clicking. "..
+  "Harvest trees for energy or rocks for magma."
 )
 
 AddCampaignMessage(1000,
