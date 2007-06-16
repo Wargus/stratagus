@@ -34,7 +34,7 @@ with scons. To build a debug version (recommended for development) run:<br>
 <pre>  svn co svn://bos.seul.org/svn/bos/materials.bos/trunk materials.bos</pre>
 
 <p>The sources of the web pages can be found here:<p>
-<pre>  svn co svn://bos.seul.org/svn/bos/public_html.bos/trunk public_html.bos</pre>
+<pre>  svn co svn://bos.seul.org/svn/bos/public_html.bos public_html.bos</pre>
 
 <p>Old development done before december 17th 2004 can be found in the 
 <a href="http://savannah.nongnu.org/cvs/?group=stratagus-bos">CVS repository</a>.
