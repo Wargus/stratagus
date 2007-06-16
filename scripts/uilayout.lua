@@ -44,7 +44,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	{ Pos = {14, 56}, Condition = {ShowOpponent = false, HideNeutral = true},
 		More = {"LifeBar", {Variable = "HitPoints", Height = 7, Width = 45}}
 	},
-	{ Pos = {38, 57}, Condition = {ShowOpponent = false, HideNeutral = true},
+	{ Pos = {38, 62}, Condition = {ShowOpponent = false, HideNeutral = true},
 		More = {"FormattedText2", {
 			Font = "small", Variable = "HitPoints", Format = "%d/%d",
 			Component1 = "Value", Component2 = "Max", Centered = true}}
