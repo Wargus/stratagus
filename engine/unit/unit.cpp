@@ -2463,48 +2463,29 @@ CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
   ----------------------------------------------------------------------------*/
 
 /**
-**  Unit on map screen.
+**  Select unit on screen. (x, y are in pixels relative to map 0,0).
 **
-**  Select units on screen. (x, y are in pixels relative to map 0,0).
+**  @param x  X pixel position.
+**  @param y  Y pixel position.
 **
-**  More units on same position.
-**    Cycle through units. ounit is the old one.
-**    First take highest unit.
-**
-**  @param ounit  Old selected unit.
-**  @param x      X pixel position.
-**  @param y      Y pixel position.
-**
-**  @return       A unit on x, y position.
+**  @return   Unit on x, y position.
 */
-CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
+CUnit *UnitOnScreen(int x, int y)
 {
-	CUnit **table;
-	CUnit *unit;
-	CUnit *nunit;
-	CUnit *funit; // first possible unit
-	CUnitType *type;
-	int flag; // flag take next unit
-	int gx;
-	int gy;
+	CUnit *bestUnit = NULL;
+	int bestDrawLevel = -1;
 
-	funit = NULL;
-	nunit = NULL;
-	flag = 0;
-	if (!ounit) { // no old on this position
-		flag = 1;
-	}
-	// FIXME: this doesn't always select the top most unit
-	for (table = Units + (NumUnits - 1); table >= Units; --table) {
-		unit = *table;
+	for (int i = 0; i < NumUnits; ++i) {
+		CUnit *unit = Units[i];
+		CUnitType *type = unit->Type;
+		int gx, gy;
+
+		// Must be visible
 		if (!unit->IsVisibleAsGoal(ThisPlayer) && !ReplayRevealMap) {
 			continue;
 		}
-		type = unit->Type;
 
-		//
-		// Check if mouse is over the unit.
-		//
+		// Mouse is in the unit's box
 		gx = unit->X * TileSizeX + unit->IX;
 		if (x + (type->BoxWidth - type->TileWidth * TileSizeX) / 2 < gx) {
 			continue;
@@ -2521,24 +2502,13 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 			continue;
 		}
 
-		//
 		// This could be taken.
-		//
-		if (flag) {
-			return unit;
+		if (!bestUnit || unit->Type->DrawLevel > bestUnit->Type->DrawLevel) {
+			bestUnit = unit;
 		}
-		if (unit == ounit) {
-			flag = 1;
-		} else if (!funit) {
-			funit = unit;
-		}
-		nunit = unit;
 	}
 
-	if (flag && funit) {
-		return funit;
-	}
-	return nunit;
+	return bestUnit;
 }
 
 /**
