@@ -7,8 +7,8 @@ SoftwareVersion: 2.3
 DisplayName: Bos Wars
 RootName: @boswars.org/boswars:$SOFTWAREVERSION
 Summary: A futuristic real-time strategy game.
-Maintainer: Francois Beerten <feb@boswars.org>
-Packager: Francois Beerten <feb@boswars.org>
+Maintainer: Francois Beerten
+Packager: Francois Beerten
 PackageVersion: 1
 CPUArchitectures: x86
 AutopackageTarget: 1.0
