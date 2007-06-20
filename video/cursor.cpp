@@ -233,7 +233,7 @@ static void DrawBuildingCursor(void)
 		}
 	} else {
 		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mx, my)) != NULL);
-		if (!Editor.Running) {
+		if (!Editor.Running || (Editor.Running && ontop == (CUnit *)1)) {
 			ontop = NULL;
 		}
 	}
