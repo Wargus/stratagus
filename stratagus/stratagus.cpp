@@ -535,8 +535,6 @@ void StartMap(const std::string &filename, bool clean)
 
 	CreateGame(filename, &Map);
 
-	UI.StatusLine.Set(NameLine);
-
 	//  Play the game.
 	GameMainLoop();
 
