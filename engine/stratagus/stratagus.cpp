@@ -498,6 +498,7 @@ void CleanGame(void)
 	FreeVisionTable();
 	FreeAStar();
 	CursorBuilding = NULL;
+	UnitUnderCursor = NULL;
 }
 
 static void ExpandPath(char *newpath, const char *path)
@@ -555,7 +556,7 @@ void StartSavedGame(const std::string &filename)
 {
 	char path[512];
 
-	SaveGameLoading = 1;
+	SaveGameLoading = true;
 	CleanPlayers();
 	ExpandPath(path, filename.c_str());
 	LoadGame(path);

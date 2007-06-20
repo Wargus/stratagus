@@ -630,7 +630,7 @@ public:
 		Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 		Indestructible(0), Teleporter(0),
 		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
-		FieldFlags(0), MovementMask(0),
+		ProductionEfficiency(100), FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
@@ -744,6 +744,7 @@ public:
 	int MaxUtilizationRate[MaxCosts];   /// Max resource rate that can be used
 	int ProductionCosts[MaxCosts];      /// Total cost to produce this type
 	int StorageCapacity[MaxCosts];      /// Storage capacity of resources
+	unsigned ProductionEfficiency : 8;  /// Production efficiency
 
 	inline void SetEnergyProductionRate(int v) { ProductionRate[EnergyCost] = v; }
 	inline int GetEnergyProductionRate() { return ProductionRate[EnergyCost]; }

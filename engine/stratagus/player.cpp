@@ -419,24 +419,6 @@ void SavePlayers(CFile *file)
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				p->ProductionRate[j]);
 		}
-		// ActualUtilizationRate
-		file->printf("},\n  \"actual-utilization-rate\", {");
-		for (j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				file->printf(" ");
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				p->ActualUtilizationRate[j]);
-		}
-		// RequestedUtilizationRate
-		file->printf("},\n  \"requested-utilization-rate\", {");
-		for (j = 0; j < MaxCosts; ++j) {
-			if (j) {
-				file->printf(" ");
-			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				p->RequestedUtilizationRate[j]);
-		}
 		// StoredResources
 		file->printf("},\n  \"stored-resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {

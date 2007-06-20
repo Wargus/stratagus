@@ -252,6 +252,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	if (ontop != unit) {
 		CBuildRestrictionOnTop *b;
 
+		build->ProductionEfficiency = ontop->Type->ProductionEfficiency;
 		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(build, ontop->Type));
 		Assert(b);
 		if (b->ReplaceOnBuild) {
