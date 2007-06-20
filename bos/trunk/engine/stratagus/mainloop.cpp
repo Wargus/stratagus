@@ -278,6 +278,8 @@ void GameMainLoop(void)
 
 	MultiPlayerReplayEachCycle();
 
+	CclCommand("GameStarting()");
+
 	while (GameRunning) {
 
 		// Can't find a better place.
