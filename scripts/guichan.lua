@@ -300,10 +300,33 @@ function RunMap(map, objective, fow, revealmap)
 end
 
 
+-- Callback right before the game starts
+function GameStarting()
+  local i
+  local factor
+
+  for i=0,7 do
+    -- resources can be 1,3,5 - low,medium,high
+    if (GameSettings.Resources == 1) then
+      factor = 0.5
+    elseif (GameSettings.Resources == 3) then
+      factor = 1
+    else
+      factor = 10
+    end
+    Players[i].MagmaStored = Players[i].MagmaStored * factor
+    Players[i].EnergyStored = Players[i].EnergyStored * factor
+  end
+
+  -- FIXME: get the version from somewhere else
+  UI.StatusLine:Set("Bos Wars V" .. "2.3.0" ..
+    ", (c) 1998-2007 by the Bos Wars and Stratagus Project.")
+end
+
+
 function ResetMapOptions()
-  GameSettings.Difficulty = 5
-  GameSettings.MapRichness = 5
-  GameSettings.Resources = 5
+  GameSettings.Difficulty = 3
+  GameSettings.Resources = 3
   GameSettings.NoFogOfWar = false
   GameSettings.RevealMap = 0
 end
@@ -318,6 +341,7 @@ function RunStartGameMenu(s)
   local sx = Video.Width / 20
   local sy = Video.Height / 20
   local selectedmap = "islandwar.smp"
+  local d
 
   menu = BosMenu(_("Start Game"))
 
@@ -342,14 +366,13 @@ function RunStartGameMenu(s)
   
   ResetMapOptions()
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
+  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
     function(dd) GameSettings.Difficulty = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Map richness:"), sx, sy*11+25)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25,
-    function(dd) GameSettings.MapRichness = (5 - dd:getSelected()*2) end)
-  menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50,
+  d:setSelected(1)
+  menu:writeText(_("Starting resources:"), sx, sy*11+25)
+  d = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25,
     function(dd) GameSettings.Resources = (5 - dd:getSelected()*2) end)
+  d:setSelected(1)
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)

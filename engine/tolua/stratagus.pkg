@@ -32,6 +32,9 @@ setmetatable(FontColors, mt)
 mt = { __index = function(t, key) return UnitTypeByIdent(key) end }
 UnitTypes = {}
 setmetatable(UnitTypes, mt)
+
+function GameStarting()
+end
 $]
 
 #define MaxCosts 2

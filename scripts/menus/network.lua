@@ -188,8 +188,6 @@ function RunJoiningMapMenu(s)
     GameSettings.RevealMap = ServerSetupState.RevealMap
     difficulty:setSelected((5 - ServerSetupState.Difficulty) / 2)
     GameSettings.Difficulty = ServerSetupState.Difficulty
-    richness:setSelected((5 - ServerSetupState.MapRichness) / 2)
-    GameSettings.MapRichness = ServerSetupState.MapRichness
     resources:setSelected((5 - ServerSetupState.ResourcesOption) / 2)
     GameSettings.Resources = ServerSetupState.ResourcesOption
     updatePlayersList()
@@ -339,15 +337,8 @@ function RunServerMultiGameMenu(map, description, numplayers)
       ServerSetupState.Difficulty = GameSettings.Difficulty
       NetworkServerResyncClients()
     end)
-  menu:writeText(_("Map richness:"), sx, sy*11+25)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-    function(dd)
-      GameSettings.MapRichness = 5 - dd:getSelected()*2
-      ServerSetupState.MapRichness = GameSettings.MapRichness
-      NetworkServerResyncClients()
-    end)
-  menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
+  menu:writeText(_("Starting resources:"), sx, sy*11+25)
+  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25 + 7,
     function(dd)
       GameSettings.Resources = 5 - dd:getSelected()*2
       ServerSetupState.ResourcesOption = GameSettings.Resources
@@ -360,7 +351,6 @@ function RunServerMultiGameMenu(map, description, numplayers)
   NetworkInitServerConnect(numplayers)
   ServerSetupState.FogOfWar = 1
   ServerSetupState.Difficulty = 5
-  ServerSetupState.MapRichness = 5
   ServerSetupState.ResourcesOption = 5
 
   menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 250, Video.Height - 100,
