@@ -695,6 +695,8 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				LuaError(l, "Unsupported flag tag for can-target-flag: %s" _C_ value);
 			}
+		} else if (!strcmp(value, "ProductionEfficiency")) {
+			type->ProductionEfficiency = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "IsNotSelectable")) {
 			type->IsNotSelectable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SelectableByRectangle")) {

@@ -495,7 +495,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	int i;
 
 	if (SaveGameLoading) {
-		SaveGameLoading = 0;
+		SaveGameLoading = false;
 		// Load game, already created game with Init/LoadModules
 		CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		return;

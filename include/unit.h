@@ -530,6 +530,7 @@ public:
 		GroupId = 0;
 		LastGroup = 0;
 		memset(ResourcesHeld, 0, sizeof(ResourcesHeld));
+		ProductionEfficiency = 100;
 		SubAction = 0;
 		Wait = 0;
 		State = 0;
@@ -586,10 +587,10 @@ public:
 	unsigned Destroyed : 1; /// unit is destroyed pending reference
 	unsigned Removed : 1;   /// unit is removed (not on map)
 	unsigned Selected : 1;  /// unit is selected
-	unsigned TeamSelected;  /// unit is selected by a team member.
 
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
+	unsigned TeamSelected;       /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 							     /// NULL if the unit was not rescued.
 	/* Seen stuff. */
@@ -615,7 +616,8 @@ public:
 	int GroupId;         /// unit belongs to this group id
 	int LastGroup;       /// unit belongs to this last group
 
-	int ResourcesHeld[MaxCosts];/// Resources held by a unit
+	int ResourcesHeld[MaxCosts];       /// Resources held by a unit
+	unsigned ProductionEfficiency : 8; /// Production efficiency
 
 	unsigned SubAction : 8; /// sub-action of unit
 	unsigned Wait;          /// action counter
@@ -874,7 +876,7 @@ extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	/// @todo more docu
 extern CUnit *UnitOnScreen(int x, int y);
 	/// Check if a unit should be removed from UnitsConsumingResources
-extern bool UnitRemoveConsumingResources(CUnit *unit);
+extern void UnitRemoveConsumingResources(CUnit *unit);
 
 	/// Let a unit die
 extern void LetUnitDie(CUnit *unit);

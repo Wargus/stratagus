@@ -283,7 +283,7 @@ void GameMainLoop(void)
 	while (GameRunning) {
 
 		// Can't find a better place.
-		SaveGameLoading = 0;
+		SaveGameLoading = false;
 		//
 		// Game logic part
 		//

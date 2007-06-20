@@ -41,6 +41,9 @@ class CPlayer;
 --  General/Map functions
 ----------------------------------------------------------------------------*/
 
+	/// save the upgrades
+extern void SaveUpgrades(CFile *file);
+
 	/// Register CCL features for upgrades
 extern void UpgradesCclRegister(void);
 

@@ -926,7 +926,7 @@ void UpdateForNewUnit(const CUnit *unit, int upgrade)
 	// Update resources
 	//
 	for (int u = 0; u < MaxCosts; ++u) {
-		player->ProductionRate[u] += type->ProductionRate[u];
+		player->ProductionRate[u] += type->ProductionRate[u] * unit->ProductionEfficiency / 100;
 		player->StorageCapacity[u] += type->StorageCapacity[u];
 	}
 }
@@ -2513,22 +2513,18 @@ CUnit *UnitOnScreen(int x, int y)
 /**
 **  Check if a unit should be removed from UnitsConsumingResources
 */
-bool UnitRemoveConsumingResources(CUnit *unit)
+void UnitRemoveConsumingResources(CUnit *unit)
 {
 	if ((unit->Orders[0]->Action == UnitActionBuild && !unit->Type->BuilderOutside && unit->SubAction == 40) ||
 			(unit->Orders[0]->Action == UnitActionRepair && unit->SubAction == 20)) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
-		return true;
 	} else if (unit->Orders[0]->Action == UnitActionResource && unit->SubAction >= 55) {
 		for (int u = 0; u < MaxCosts; ++u) {
 			unit->Player->ProductionRate[u] -= unit->Data.Harvest.CurrentProduction[u];
 		}
-		return true;
 	} else if (unit->Orders[0]->Action == UnitActionTrain && unit->SubAction != 0) {
 		unit->Player->RemoveFromUnitsConsumingResources(unit);
-		return true;
 	}
-	return false;
 }
 
 /**
@@ -2576,13 +2572,10 @@ void LetUnitDie(CUnit *unit)
 		unit->Goal = NULL;
 	}
 
-	if (UnitRemoveConsumingResources(unit)) {
-		for (int u = 0; u < MaxCosts; ++u) {
-			unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u];
-		}
-	}
+	UnitRemoveConsumingResources(unit);
 	if (unit->Orders[0]->Action != UnitActionBuilt) {
 		for (int u = 0; u < MaxCosts; ++u) {
+			unit->Player->ProductionRate[u] -= unit->Type->ProductionRate[u] * unit->ProductionEfficiency / 100;
 			unit->Player->StorageCapacity[u] -= unit->Type->StorageCapacity[u];
 			if (unit->Player->StoredResources[u] > unit->Player->StorageCapacity[u]) {
 				unit->Player->StoredResources[u] = unit->Player->StorageCapacity[u];
@@ -3460,6 +3453,8 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	}
 	file->printf("},\n  ");
 
+	file->printf("\"production-efficiency\", %d, ", unit->ProductionEfficiency);
+
 	file->printf("\"sub-action\", %d, ", unit->SubAction);
 	file->printf("\"wait\", %d, ", unit->Wait);
 	file->printf("\"state\", %d,", unit->State);
@@ -3561,6 +3556,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 				file->printf("%s%d", (i ? ", " : ""), unit->Data.Harvest.CurrentProduction[i]);
 			}
 			file->printf("}}");
+			break;
 		default:
 			file->printf(",\n  \"data-move\", {");
 			if (unit->Data.Move.Fast) {

@@ -187,7 +187,7 @@ void LoadGame(const std::string &filename)
 
 	// log will be enabled if found in the save game
 	CommandLogDisabled = 1;
-	SaveGameLoading = 1;
+	SaveGameLoading = true;
 
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
