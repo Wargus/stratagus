@@ -75,6 +75,7 @@ DefineUnitType("unit-weakhotspot", {
     VisibleUnderFog = true,
     Neutral = true,
     NumDirections = 1,
+    ProductionEfficiency = 50,
     Sounds = {}
 })
 

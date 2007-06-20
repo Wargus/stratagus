@@ -280,7 +280,7 @@ extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
 extern std::string CompileOptions;          /// Compile options
-extern int SaveGameLoading;                 /// Save game is in progress of loading
+extern bool SaveGameLoading;                /// Save game is in progress of loading
 
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern void SaveGame(const std::string &filename); /// Save game

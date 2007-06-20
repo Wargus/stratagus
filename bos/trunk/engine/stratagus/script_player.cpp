@@ -170,52 +170,6 @@ static int CclPlayer(lua_State *l)
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
-		} else if (!strcmp(value, "actual-utilization-rate")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-
-				for (i = 0; i < MaxCosts; ++i) {
-					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->ActualUtilizationRate[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
-		} else if (!strcmp(value, "requested-utilization-rate")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-
-				for (i = 0; i < MaxCosts; ++i) {
-					if (value == DefaultResourceNames[i]) {
-						lua_rawgeti(l, j + 1, k + 1);
-						player->RequestedUtilizationRate[i] = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						break;
-					}
-				}
-				if (i == MaxCosts) {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
 		} else if (!strcmp(value, "stored-resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/19/07 19:08:32.
+** Generated automatically by tolua++-1.0.92 on 06/19/07 22:47:37.
 */
 
 #ifndef __cplusplus

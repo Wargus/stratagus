@@ -38,6 +38,8 @@ bckground:Load()
 bckground:Resize(Video.Width, Video.Height)
 backgroundWidget = ImageWidget(bckground)
 
+local SavedGame = false
+
 function AddMenuHelpers(menu)
   function menu:addCentered(widget, x, y)
     self:add(widget, x - widget:getWidth() / 2, y)
@@ -305,17 +307,19 @@ function GameStarting()
   local i
   local factor
 
-  for i=0,7 do
-    -- resources can be 1,3,5 - low,medium,high
-    if (GameSettings.Resources == 1) then
-      factor = 0.5
-    elseif (GameSettings.Resources == 3) then
-      factor = 1
-    else
-      factor = 10
+  if (not SavedGame) then
+    for i=0,7 do
+      -- resources can be 1,3,5 - low,medium,high
+      if (GameSettings.Resources == 1) then
+        factor = 0.5
+      elseif (GameSettings.Resources == 3) then
+        factor = 1
+      else
+        factor = 10
+      end
+      Players[i].MagmaStored = Players[i].MagmaStored * factor
+      Players[i].EnergyStored = Players[i].EnergyStored * factor
     end
-    Players[i].MagmaStored = Players[i].MagmaStored * factor
-    Players[i].EnergyStored = Players[i].EnergyStored * factor
   end
 
   -- FIXME: get the version from somewhere else
@@ -452,7 +456,9 @@ function RunLoadGameMenu(s)
       loop = true
       while (loop) do
         InitGameVariables()
+        SavedGame = true
         StartSavedGame("~save/" .. browser:getSelectedItem())
+        SavedGame = false
         if (GameResult ~= GameRestart) then
           loop = false
         end

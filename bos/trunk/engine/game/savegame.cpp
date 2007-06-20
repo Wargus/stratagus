@@ -9,7 +9,7 @@
 //
 /**@name savegame.cpp - Save game. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2007 by Lutz Sammer, Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -286,6 +286,7 @@ void SaveGame(const std::string &filename)
 	file.printf("SetGameCycle(%lu)\n", GameCycle);
 
 	SaveCcl(&file);
+	SaveUpgrades(&file);
 	SavePlayers(&file);
 	Map.Save(&file);
 	SaveUnits(&file);

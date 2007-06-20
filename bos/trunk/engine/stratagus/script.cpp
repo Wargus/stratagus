@@ -79,7 +79,7 @@ lua_State *Lua;                       /// Structure to work with lua files.
 std::string CclStartFile;             /// CCL start file
 std::string UserDirectory;
 int CclInConfigFile;                  /// True while config file parsing
-int SaveGameLoading;                  /// If a Saved Game is Loading
+bool SaveGameLoading;                 /// If a Saved Game is Loading
 std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
