@@ -691,22 +691,30 @@ static void DrawUnitInfo(CUnit *unit)
 */
 void DrawResources(void)
 {
+	char names[][128]={"Energy", "Magma"};
 	char tmp[128];
+	int totalproduction = 0;
+	int totalrequested = 0;
 	int i;
+	int p = 0;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		sprintf(tmp, "%d/%d/%d", 
+		sprintf(tmp, "%s:+%d-%d %d/%d",
+			names[i],
 			ThisPlayer->ProductionRate[i],
 			ThisPlayer->RequestedUtilizationRate[i],
-			ThisPlayer->ActualUtilizationRate[i]);
-		VideoDrawText(50 +  90 * i, 1, GameFont, tmp);
+			ThisPlayer->StoredResources[i] / CYCLES_PER_SECOND / 100,
+			ThisPlayer->StorageCapacity[i] / CYCLES_PER_SECOND / 100);
+		VideoDrawText(40 +  220 * i, 1, GameFont, tmp);
+		totalproduction += ThisPlayer->ProductionRate[i];
+		totalrequested += ThisPlayer->RequestedUtilizationRate[i];
 	}
 
-	for (i = 0; i < MaxCosts; ++i) {
-		sprintf(tmp, "%d/%d", ThisPlayer->StoredResources[i] / CYCLES_PER_SECOND,
-			ThisPlayer->StorageCapacity[i] / CYCLES_PER_SECOND);
-		VideoDrawText(250 +  90 * i, 1, GameFont, tmp);
+	if (totalproduction + totalrequested) {
+		p = 100 - abs(totalproduction - totalrequested) * 100 / (totalproduction + totalrequested);
 	}
+	sprintf(tmp, "%d%%", p);
+	VideoDrawText(480, 1, GameFont, tmp);
 }
 
 /*----------------------------------------------------------------------------
