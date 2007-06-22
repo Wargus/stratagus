@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	unit-hotspot.lua	-	Define the hot spot unit.
+--	unit-weakhotspot.lua	-	Define the hot spot unit.
 --
 --	(c) Copyright 2007 by Francois Beerten.
 --
