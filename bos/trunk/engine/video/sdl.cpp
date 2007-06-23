@@ -560,6 +560,9 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 						DoTogglePause = false;
 						UiTogglePause();
 					}
+#ifdef USE_OPENGL
+					Video.ResizeScreen(Video.Width, Video.Height);
+#endif
 				}
 			}
 			break;
