@@ -513,7 +513,7 @@ static void AiCollectResources(void)
 	}
 
 	// If we need a resource, pick one unit to harvest it
-	if (needed != -1) {
+	if (needed != -1 && harvesters.size() != 0) {
 		int best = -1;
 		for (i = 0; i < (int)harvesters.size(); ++i) {
 			// Idle units are always best
