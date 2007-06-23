@@ -1981,8 +1981,10 @@ static int CclSetVideoSyncSpeed(lua_State *l)
 static int CclSetGameSpeed(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	VideoSyncSpeed = LuaToNumber(l, 1) * 100 / CYCLES_PER_SECOND;
-	SetVideoSync();
+	if (FastForwardCycle < GameCycle) {
+		VideoSyncSpeed = LuaToNumber(l, 1) * 100 / CYCLES_PER_SECOND;
+		SetVideoSync();
+	}
 	return 0;
 }
 

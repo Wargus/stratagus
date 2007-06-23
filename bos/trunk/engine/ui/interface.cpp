@@ -327,6 +327,9 @@ static void UiToggleBigMap(void)
 */
 static void UiIncreaseGameSpeed(void)
 {
+	if (FastForwardCycle >= GameCycle) {
+		return;
+	}
 	VideoSyncSpeed += 10;
 	SetVideoSync();
 	UI.StatusLine.Set(_("Faster"));
@@ -337,6 +340,9 @@ static void UiIncreaseGameSpeed(void)
 */
 static void UiDecreaseGameSpeed(void)
 {
+	if (FastForwardCycle >= GameCycle) {
+		return;
+	}
 	if (VideoSyncSpeed <= 10) {
 		if (VideoSyncSpeed > 1) {
 			--VideoSyncSpeed;
