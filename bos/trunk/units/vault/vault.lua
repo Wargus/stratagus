@@ -58,8 +58,8 @@ DefineConstruction("construction-vault", {
 })
 
 MakeSound("dev-selected", GetCurrentLuaPath().."/sfx_fort.select.wav")
-MakeSound("dev-ready", GetCurrentLuaPath().."/elite.fort.completed.wav")
-MakeSound("dev-help", GetCurrentLuaPath().."/elite.fort.underattack.wav")
+MakeSound("dev-ready", GetCurrentLuaPath().."/vault.completed.wav")
+MakeSound("dev-help", GetCurrentLuaPath().."/vault.underattack.wav")
 MakeSound("dev-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
 
 DefineUnitType("unit-vault", {
