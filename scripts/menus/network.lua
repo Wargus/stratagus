@@ -81,7 +81,8 @@ function addPlayersList(menu, numplayers)
   menu:writeLargeText(_("Players"), sx * 11, sy*3)
   for i=1,8 do
     players_name[i] = menu:writeText("Player"..i, sx * 11, sy*4 + i*18)
-    players_state[i] = menu:writeText("Preparing", sx * 11 + 80, sy*4 + i*18)
+    players_name[i]:setWidth(80)
+    players_state[i] = menu:writeText("Preparing", sx * 11 + 85, sy*4 + i*18)
   end
   numplayers_text = menu:writeText("Open slots : " .. numplayers - 1, sx *11, sy*4 + 162)
 
