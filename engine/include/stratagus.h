@@ -168,7 +168,7 @@ inline char *new_strdup(const char *str)
 	/// Stratagus major version
 #define StratagusMajorVersion  2
 	/// Stratagus minor version (maximal 99)
-#define StratagusMinorVersion  3
+#define StratagusMinorVersion  4
 	/// Stratagus patch level (maximal 99)
 #define StratagusPatchLevel    0
 	/// Stratagus version (1,2,3) -> 10203
