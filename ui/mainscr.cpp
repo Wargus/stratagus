@@ -705,7 +705,7 @@ void DrawResources(void)
 			ThisPlayer->RequestedUtilizationRate[i],
 			ThisPlayer->StoredResources[i] / CYCLES_PER_SECOND / 100,
 			ThisPlayer->StorageCapacity[i] / CYCLES_PER_SECOND / 100);
-		VideoDrawText(40 +  160 * i, 1, GameFont, tmp);
+		VideoDrawText(40 +  176 * i, 1, GameFont, tmp);
 		totalproduction += ThisPlayer->ProductionRate[i];
 		totalrequested += ThisPlayer->RequestedUtilizationRate[i];
 	}
