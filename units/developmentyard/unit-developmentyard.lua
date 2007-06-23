@@ -92,7 +92,7 @@ DefineUnitType("unit-dev-yard", {
         "dead", "dev-dead"}
 })
 
-DefineAnimations("animations-devyard", {
+DefineAnimations("animations-dead-devyard", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
         "unbreakable end", "wait 1", },
@@ -100,7 +100,7 @@ DefineAnimations("animations-devyard", {
 DefineUnitType("build-dead-devyard", {
     Name = "DevelopmentyardCrater",
     Image = {"file", GetCurrentLuaPath().."/development_yard_c.png", "size", {256, 256}},
-    Animations = "animations-devyard",
+    Animations = "animations-dead-devyard",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,
