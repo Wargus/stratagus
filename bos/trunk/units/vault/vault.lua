@@ -102,7 +102,7 @@ DefineUnitType("unit-vault", {
         "dead", "dev-dead"}
 })
 
-DefineAnimations("animations-vault2", {
+DefineAnimations("animations-dead-vault", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200",  "unbreakable end", "wait 1", },
     })
@@ -110,7 +110,7 @@ DefineAnimations("animations-vault2", {
 DefineUnitType("build-dead-vault", {
     Name = "vaultCrater",
     Image = {"file", GetCurrentLuaPath().."/vault_c.png", "size", {236, 208}},
-    Animations = "animations-vault2",
+    Animations = "animations-dead-vault",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,

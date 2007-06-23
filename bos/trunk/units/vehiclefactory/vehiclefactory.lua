@@ -98,7 +98,7 @@ DefineUnitType("unit-vfac", {
         "dead", "vfac-dead"}
 })
 
-DefineAnimations("animations-vfac2", {
+DefineAnimations("animations-dead-vfac", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
         "unbreakable end", "wait 1", },
@@ -107,7 +107,7 @@ DefineAnimations("animations-vfac2", {
 DefineUnitType("build-dead-vfac", {
     Name = "FactoryCrater",
     Image = {"file", GetCurrentLuaPath().."/vehicle_c.png", "size", {256, 254}},
-    Animations = "animations-vfac2",
+    Animations = "animations-dead-vfac",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,

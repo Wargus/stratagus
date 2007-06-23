@@ -99,7 +99,7 @@ DefineUnitType("unit-powerplant", {
         "dead", "powerplant-dead"}
 })
 
-DefineAnimations("animations-powerplant", {
+DefineAnimations("animations-dead-powerplant", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200",  "unbreakable end", "wait 1", },
     })
@@ -107,7 +107,7 @@ DefineAnimations("animations-powerplant", {
 DefineUnitType("build-dead-powerplant", {
     Name = "PowerPlantCrater",
     Image = {"file", GetCurrentLuaPath().."/powerplant_c.png", "size", {128, 128}},
-    Animations = "animations-powerplant",
+    Animations = "animations-dead-powerplant",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,

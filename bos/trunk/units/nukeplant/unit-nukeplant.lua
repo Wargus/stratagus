@@ -95,7 +95,7 @@ DefineUnitType("unit-nuke", {
         "dead", "nuke-dead"}
 })
 
-DefineAnimations("animations-nukebuild", {
+DefineAnimations("animations-dead-nuke", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
         "unbreakable end", "wait 1", },
@@ -104,7 +104,7 @@ DefineAnimations("animations-nukebuild", {
 DefineUnitType("build-dead-nuke", {
     Name = "NuclearplantCrater",
     Image = {"file", GetCurrentLuaPath().."/nukeplant_c.png", "size", {256, 256}},
-    Animations = "animations-nukebuild",
+    Animations = "animations-dead-nuke",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,
