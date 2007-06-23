@@ -147,12 +147,8 @@ function RunJoiningMapMenu(s)
   local difficulty = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
     function(dd) end)
   difficulty:setEnabled(false)
-  menu:writeText(_("Map richness:"), sx, sy*11+25)
-  local richness = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 110, sy*11+25 + 7,
-    function(dd) end)
-  richness:setEnabled(false)
-  menu:writeText(_("Starting resources:"), sx, sy*11+50)
-  local resources = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+50 + 7,
+  menu:writeText(_("Starting resources:"), sx, sy*11+25)
+  local resources = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25 + 7,
     function(dd) end)
   resources:setEnabled(false)
 
