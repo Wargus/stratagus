@@ -303,6 +303,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   local sx = Video.Width / 20
   local sy = Video.Height / 20
   local startgame
+  local d
 
   menu = BosMenu(_("Create MultiPlayer game"))
 
@@ -331,19 +332,21 @@ function RunServerMultiGameMenu(map, description, numplayers)
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, revealMapCb)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
+  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
     function(dd)
       GameSettings.Difficulty = 5 - dd:getSelected()*2
       ServerSetupState.Difficulty = GameSettings.Difficulty
       NetworkServerResyncClients()
     end)
+  d:setSelected(1)
   menu:writeText(_("Starting resources:"), sx, sy*11+25)
-  menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25 + 7,
+  d = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25 + 7,
     function(dd)
       GameSettings.Resources = 5 - dd:getSelected()*2
       ServerSetupState.ResourcesOption = GameSettings.Resources
       NetworkServerResyncClients()
     end)
+  d:setSelected(1)
 
   local updatePlayers = addPlayersList(menu, numplayers)
 
