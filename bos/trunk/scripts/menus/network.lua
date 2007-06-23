@@ -144,11 +144,11 @@ function RunJoiningMapMenu(s)
   revealmap:setEnabled(false)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  local difficulty = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
+  local difficulty = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
     function(dd) end)
   difficulty:setEnabled(false)
   menu:writeText(_("Starting resources:"), sx, sy*11+25)
-  local resources = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25 + 7,
+  local resources = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25,
     function(dd) end)
   resources:setEnabled(false)
 
@@ -328,7 +328,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, revealMapCb)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11 + 7,
+  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
     function(dd)
       GameSettings.Difficulty = 5 - dd:getSelected()*2
       ServerSetupState.Difficulty = GameSettings.Difficulty
@@ -336,7 +336,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
     end)
   d:setSelected(1)
   menu:writeText(_("Starting resources:"), sx, sy*11+25)
-  d = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25 + 7,
+  d = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25,
     function(dd)
       GameSettings.Resources = 5 - dd:getSelected()*2
       ServerSetupState.ResourcesOption = GameSettings.Resources
@@ -349,8 +349,8 @@ function RunServerMultiGameMenu(map, description, numplayers)
   NetworkMapName = map
   NetworkInitServerConnect(numplayers)
   ServerSetupState.FogOfWar = 1
-  ServerSetupState.Difficulty = 5
-  ServerSetupState.ResourcesOption = 5
+  ServerSetupState.Difficulty = 3
+  ServerSetupState.ResourcesOption = 3
 
   menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
