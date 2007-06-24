@@ -406,11 +406,19 @@ static void AiCheckingWork(void)
 			// NOTE: we can continue and build things with lesser
 			//  resource or other resource need!
 			continue;
-		} else if (queue->Want > queue->Made) {
+		} else if (queue->Want > queue->Made && queue->Wait <= GameCycle) {
 			if (AiMakeUnit(type)) {
 				// AiRequestSupply can change UnitTypeBuilt so recalculate queue
 				queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 				++queue->Made;
+				queue->Wait = 0;
+			} else if (queue->Type->Building) {
+				// Finding a building place is costly, don't try again for a while
+				if (queue->Wait == 0) {
+					queue->Wait = GameCycle + 150;
+				} else {
+					queue->Wait = GameCycle + 450;
+				}
 			}
 		}
 	}
