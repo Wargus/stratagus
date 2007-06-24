@@ -94,6 +94,8 @@ end
 local ai_funcs = {
   function() AiDebug(false) return false end,
   function() return AiSleep(AiGetSleepCycles()) end,
+
+  -- Build magma pump or power plant first depending on resources
   function()
     order = GetBuildOrder()
     return AiNeed(order[1])
@@ -118,25 +120,32 @@ local ai_funcs = {
       return false
     end
   end,
+
   function() return AiSet("unit-engineer", 2) end,
   function() return AiNeed("unit-vault") end,
+  function() return AiNeed("unit-magmapump") end,
   function() return AiWait("unit-vault") end,
 
   function() return AiNeed("unit-camp") end,
   function() return AiWait("unit-camp") end,
-  function() return AiForce(0, {"unit-assault", 10}) end,
   function() return AiSet("unit-engineer", 3) end,
+
+  -- Defense
+  function() return AiForce(0, {"unit-assault", 4}) end,
   function() return AiWaitForce(0) end, 
+
+  function() return AiNeed("unit-powerplant") end,
+  function() return AiNeed("unit-magmapump") end,
   function() return AiNeed("unit-camp") end,
-  function() return AiSleep(125*GameSettings.Difficulty) end,
-  function() return AiNeed("unit-camp") end,
-  
+  function() return AiSleep(150*GameSettings.Difficulty) end,
+
+  -- Attack wave
   function() return AiForce(1, {"unit-assault", 10}) end,
   function() return AiWaitForce(1) end,
   function() return AiSleep(50*GameSettings.Difficulty) end, 
   function() return AiAttackWithForce(1) end,
 
-  function() return AiForce(0, {"unit-assault", 20}) end,
+  -- Bigger attack wave
   function() return AiNeed("unit-powerplant") end,
   function() return AiForce(1, {"unit-assault", 20, "unit-grenadier", 8}) end,
   function() return AiWaitForce(1) end, 
