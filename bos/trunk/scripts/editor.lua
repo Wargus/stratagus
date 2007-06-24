@@ -72,6 +72,7 @@ local editor_types = {
   "unit-magmapump",
   "unit-camp",
   "unit-powerplant",
+  "unit-nuke",
   "unit-hosp",
   "unit-vfac",
   "unit-gturret",
