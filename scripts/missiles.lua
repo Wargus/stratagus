@@ -34,7 +34,7 @@
 DefineMissileType("missile-nuke", {
 	File = "elites/missile/nuke.png",
 	Size = {128, 128}, Frames = 5, NumDirections = 8,
-	ImpactSound = "dev-dead", DrawLevel = 300,
+	ImpactSound = "vault-dead", DrawLevel = 300,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 64, Range = 1,
 	ImpactMissile = "missile-288x288-explosion"})
 
