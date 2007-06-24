@@ -68,7 +68,7 @@ local editor_types = {
   "unit-engineer",
   "unit-harvester",
   "unit-msilo",
-  "unit-dev-yard",
+  "unit-aircraftfactory",
   "unit-magmapump",
   "unit-camp",
   "unit-powerplant",
