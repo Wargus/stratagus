@@ -1853,7 +1853,9 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit *unit, const CUnitType *parent)
 	return NULL;
 }
 
-// Run Distance Checking
+/**
+**  Check And Restriction
+*/
 bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
 {
 	for (std::vector<CBuildRestriction*>::const_iterator i = _or_list.begin();
@@ -1865,6 +1867,9 @@ bool CBuildRestrictionAnd::Check(const CUnitType *type, int x, int y, CUnit *&on
 	return true;
 }
 
+/**
+**  Check Distance Restriction
+*/
 bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
 {
 	CUnit *table[UnitMax];
@@ -1938,7 +1943,9 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 	return false;
 }
 
-// Check AddOn Restriction
+/**
+**  Check AddOn Restriction
+*/
 bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
 {
 	CUnit *table[UnitMax];
@@ -1963,26 +1970,32 @@ bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&
 	return false;
 }
 
-
-// Check AddOn Restriction
+/**
+**  Check OnTop Restriction
+*/
 bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const
 {
 	CUnit *table[UnitMax];
 	int n;
 	int i;
 
+	ontoptarget = NULL;
 	n = UnitCacheOnTile(x, y, table);
 	for (i = 0; i < n; ++i) {
-		if (table[i]->Type == this->Parent &&
-				table[i]->X == x && table[i]->Y == y &&
-				table[i]->Orders[0]->Action != UnitActionBuilt &&
-				!table[i]->Destroyed &&
+		if (table[i]->X == x && table[i]->Y == y && !table[i]->Destroyed &&
 				table[i]->Orders[0]->Action != UnitActionDie) {
-			ontoptarget = table[i];
-			return true;
+			if (table[i]->Type == this->Parent &&
+					table[i]->Orders[0]->Action != UnitActionBuilt) {
+				// Available to build on
+				ontoptarget = table[i];
+			} else {
+				// Something else is built on this already
+				ontoptarget = NULL;
+				return false;
+			}
 		}
 	}
-	return false;
+	return ontoptarget != NULL;
 }
 
 
