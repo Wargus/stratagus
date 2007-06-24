@@ -17,7 +17,7 @@ Players[0]:SetStartView(8, 10)
 Players[0].EnergyStored = 6000
 Players[0].MagmaStored = 4000
 Players[0].AiName = "ai-default"
-Players[1]:SetStartView(111, 107)
+Players[1]:SetStartView(122, 104)
 Players[1].EnergyStored = 6000
 Players[1].MagmaStored = 4000
 Players[1].AiName = "ai-default"
