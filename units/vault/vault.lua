@@ -57,10 +57,10 @@ DefineConstruction("construction-vault", {
         }
 })
 
-MakeSound("dev-selected", GetCurrentLuaPath().."/sfx_fort.select.wav")
-MakeSound("dev-ready", GetCurrentLuaPath().."/vault.completed.wav")
-MakeSound("dev-help", GetCurrentLuaPath().."/vault.underattack.wav")
-MakeSound("dev-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
+MakeSound("vault-selected", GetCurrentLuaPath().."/sfx_fort.select.wav")
+MakeSound("vault-ready", GetCurrentLuaPath().."/vault.completed.wav")
+MakeSound("vault-help", GetCurrentLuaPath().."/vault.underattack.wav")
+MakeSound("vault-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
 
 DefineUnitType("unit-vault", {
     Name = "Vault",
@@ -96,10 +96,10 @@ DefineUnitType("unit-vault", {
     MaxEnergyUtilizationRate = 40,
     MaxMagmaUtilizationRate = 20,
     Sounds = {
-        "selected", "dev-selected",
-        "ready", "dev-ready",
-        "help", "dev-help",
-        "dead", "dev-dead"}
+        "selected", "vault-selected",
+        "ready", "vault-ready",
+        "help", "vault-help",
+        "dead", "vault-dead"}
 })
 
 DefineAnimations("animations-dead-vault", {

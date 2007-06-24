@@ -53,7 +53,7 @@ DefineAiHelper(
   -- Unit can build which buildings.
   --
   {"build", "unit-engineer",
-   "unit-msilo", "unit-dev-yard", "unit-magmapump", "unit-camp",
+   "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp",
    "unit-powerplant", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
    "unit-cam", "unit-cannon", "unit-nuke", "unit-radar"},
   --
@@ -65,12 +65,12 @@ DefineAiHelper(
   {"train", "unit-hosp", "unit-medic"},
   {"train", "unit-vfac", "unit-apcs", "unit-harvester", "unit-artil",
    "unit-buggy", "unit-rtank", "unit-tank"},
-  {"train", "unit-dev-yard", "unit-jet", "unit-bomber", "unit-chopper"},
+  {"train", "unit-aircraftfactory", "unit-jet", "unit-bomber", "unit-chopper"},
   --
   -- Unit can repair which units.
   --
   {"repair", "unit-engineer",
-   "unit-msilo", "unit-dev-yard", "unit-magmapump", "unit-camp", "unit-apcs",
+   "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp", "unit-apcs",
    "unit-powerplant", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
    "unit-nuke", "unit-radar"},
   --
