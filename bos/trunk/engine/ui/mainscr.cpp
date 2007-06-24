@@ -791,6 +791,13 @@ void MessagesDisplay::UpdateMessages()
 */
 void MessagesDisplay::DrawMessages()
 {
+	// background so the text is easier to read
+	if (MessagesCount) {
+		Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
+		Video.FillTransRectangleClip(color, UI.MapArea.X + 8, UI.MapArea.Y + 8,
+			UI.MapArea.EndX - UI.MapArea.X - 16, MessagesCount * (GameFont->Height() + 1) - MessagesScrollY, 0x80);
+	}
+
 	// Draw message line(s)
 	for (int z = 0; z < MessagesCount; ++z) {
 		if (z == 0) {
