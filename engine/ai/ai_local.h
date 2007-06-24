@@ -315,6 +315,9 @@ extern void AiForceManager(void);
 extern int AiPlanAttack(AiForce *force);
 	/// Send explorers around the map
 extern void AiSendExplorers(void);
+	/// Enemy units in distance
+extern int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type,
+	int x, int y, unsigned range);
 
 //
 // Magic
