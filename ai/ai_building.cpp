@@ -57,17 +57,17 @@
 **  0: the building will not block any way
 **  1: all surrounding is free
 **
-**  @param worker  Worker to build.
-**  @param type    Type of building.
-**  @param x       X map tile position for the building.
-**  @param y       Y map tile position for the building.
-**  @param flag    0: only check that building will not block anything.
+**  @param worker    Worker to build.
+**  @param type      Type of building.
+**  @param x         X map tile position for the building.
+**  @param y         Y map tile position for the building.
+**  @param backupok  Location can be used as a backup
 **
-**  @return        True if the surrounding is free, false otherwise.
+**  @return          True if the surrounding is free, false otherwise.
 **
-**  @note          Can be faster written.
+**  @note            Can be faster written.
 */
-static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x, int y, int flag)
+static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x, int y, bool &backupok)
 {
 	static int dirs[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
 	int surrounding[1024]; // Max criconference for building
@@ -124,14 +124,13 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 		obstacle = !surrounding[0];
 	}
 
-	if (flag) {
-		return obstacle == 0;
-	} else if (!type->ShoreBuilding) {
-		return obstacle < 5;
+	if (!type->ShoreBuilding) {
+		backupok = obstacle < 5;
 	} else {
 		// Shore building have at least 2 obstacles : sea->ground & ground->sea
-		return obstacle < 3;
+		backupok = obstacle < 3;
 	}
+	return obstacle == 0;
 }
 
 /**
@@ -143,12 +142,11 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 **  @param oy      Original Y position to try building
 **  @param dx      Pointer for X position returned.
 **  @param dy      Pointer for Y position returned.
-**  @param flag    Flag if surrounding must be free.
 **
 **  @return        True if place found, false if no found.
 */
 static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
-	int ox, int oy, int *dx, int *dy, int flag)
+	int ox, int oy, int *dx, int *dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -169,6 +167,9 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	int w;
 	unsigned char *m;
 	unsigned char *matrix;
+	int backupx = -1;
+	int backupy = -1;
+	bool backupok;
 
 	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
 	points = new p[size];
@@ -178,12 +179,16 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	//
 	// Look if we can build at current place.
 	//
-	if (CanBuildUnitType(worker, type, x, y, 1) &&
-		(/*!flag || */AiCheckSurrounding(worker, type, x, y, flag))) {
-		*dx = x;
-		*dy = y;
-		delete[] points;
-		return 1;
+	if (CanBuildUnitType(worker, type, x, y, 1)) {
+		if (AiCheckSurrounding(worker, type, x, y, backupok)) {
+			*dx = x;
+			*dy = y;
+			delete[] points;
+			return 1;
+		} else if (backupok) {
+			backupx = x;
+			backupy = y;
+		}
 	}
 	//
 	//  Make movement matrix.
@@ -230,12 +235,16 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 				// Look if we can build here and no enemies nearby.
 				//
 				if (CanBuildUnitType(worker, type, x, y, 1) &&
-						!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8) &&
-						(/*!flag ||*/ AiCheckSurrounding(worker, type, x, y, flag))) {
-					*dx = x;
-					*dy = y;
-					delete[] points;
-					return 1;
+						!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8)) {
+					if (AiCheckSurrounding(worker, type, x, y, backupok)) {
+						*dx = x;
+						*dy = y;
+						delete[] points;
+						return 1;
+					} else if (backupok && backupx == -1) {
+						backupx = x;
+						backupy = y;
+					}
 				}
 
 				if (CanMoveToMask(x, y, mask)) { // reachable
@@ -266,6 +275,11 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 
 	delete[] points;
 
+	if (backupx != -1) {
+		*dx = backupx;
+		*dy = backupy;
+		return 1;
+	}
 	return 0;
 }
 
@@ -286,14 +300,7 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type, int *dx, int
 {
 	DebugPrint("Want to build a %s(%s)\n" _C_ type->Ident.c_str() _C_ type->Name.c_str());
 
-	// First try to find a place with free surroundings
-	if (AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 1)) {
-		return 1;
-	}
-
-	// FIXME: Should do this if all units can't build better!
-	// No place with free surroundings, try anything
-	return AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 0);
+	return AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy);
 }
 
 //@}
