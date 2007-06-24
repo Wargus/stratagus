@@ -145,11 +145,12 @@ public:
 */
 class AiBuildQueue {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(NULL) {}
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0) {}
 
 	int Want;           /// requested number
 	int Made;           /// built number
 	CUnitType *Type;    /// unit-type
+	unsigned long Wait; /// wait until this cycle
 };
 
 /**
