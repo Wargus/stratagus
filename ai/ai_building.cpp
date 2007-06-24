@@ -127,9 +127,9 @@ static int AiCheckSurrounding(const CUnit *worker, const CUnitType *type, int x,
 	if (flag) {
 		return obstacle == 0;
 	} else if (!type->ShoreBuilding) {
-		return obstacle < 2;
+		return obstacle < 5;
 	} else {
-		// Shore building haves at least 2 obstacles : sea->ground & ground->sea
+		// Shore building have at least 2 obstacles : sea->ground & ground->sea
 		return obstacle < 3;
 	}
 }
@@ -227,10 +227,11 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 				}
 
 				//
-				// Look if we can build here.
+				// Look if we can build here and no enemies nearby.
 				//
 				if (CanBuildUnitType(worker, type, x, y, 1) &&
-					(/*!flag ||*/ AiCheckSurrounding(worker, type, x, y, flag))) {
+						!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8) &&
+						(/*!flag ||*/ AiCheckSurrounding(worker, type, x, y, flag))) {
 					*dx = x;
 					*dy = y;
 					delete[] points;
