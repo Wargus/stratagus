@@ -80,7 +80,7 @@ function DefinePlantType(internalname, name, image_size,
        Sounds = {},
        Neutral = true
    })
-   DefineAllow(internalname, AllowAll)
+   DefineAllow("unit-"..internalname, AllowAll)
 end
 
 DefinePlantType("pitcher", 
