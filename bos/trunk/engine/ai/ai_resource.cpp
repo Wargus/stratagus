@@ -97,33 +97,26 @@ static int AiCheckUnitTypeCosts(const CUnitType *type)
 /**
 **  Enemy units in distance.
 **
-**  @param unit  Find in distance for this unit.
-**  @param range Distance range to look.
+**  @param player  Find enemies of this player
+**  @param type    Optional unit type to check if enemy can target this
+**  @param x       X location
+**  @param y       Y location
+**  @param range   Distance range to look.
 **
-**  @return      Number of enemy units.
+**  @return       Number of enemy units.
 */
-int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
+int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type, int x, int y, unsigned range)
 {
 	const CUnit *dest;
-	const CUnitType *type;
 	CUnit *table[UnitMax];
-	unsigned x;
-	unsigned y;
 	unsigned n;
 	unsigned i;
 	int e;
-	const CPlayer *player;
 
 	//
 	// Select all units in range.
 	//
-	x = unit->X;
-	y = unit->Y;
-	n = UnitCacheSelect(x - range, y - range, x + range + unit->Type->TileWidth,
-		y + range + unit->Type->TileHeight, table);
-
-	player = unit->Player;
-	type = unit->Type;
+	n = UnitCacheSelect(x - range, y - range, x + range, y + range, table);
 
 	//
 	// Find the enemy units which can attack
@@ -143,12 +136,26 @@ int EnemyUnitsInDistance(const CUnit *unit, unsigned range)
 		//
 		// Unit can attack back?
 		//
-		if (CanTarget(dest->Type, type)) {
+		if (!type || CanTarget(dest->Type, type)) {
 			++e;
 		}
 	}
 
 	return e;
+}
+
+/**
+**  Enemy units in distance.
+**
+**  @param unit   Find in distance for this unit.
+**  @param range  Distance range to look.
+**
+**  @return       Number of enemy units.
+*/
+int AiEnemyUnitsInDistance(const CUnit *unit, unsigned range)
+{
+	range += std::max<int>(unit->Type->TileWidth, unit->Type->TileHeight);
+	return AiEnemyUnitsInDistance(unit->Player, unit->Type, unit->X, unit->Y, range);
 }
 
 /**
@@ -732,7 +739,7 @@ static void AiCheckRepair(void)
 				unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
 			// FIXME: Repair only units under control
-			if (EnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max)) {
+			if (AiEnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max)) {
 				continue;
 			}
 			//
