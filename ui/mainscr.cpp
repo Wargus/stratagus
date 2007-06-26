@@ -737,7 +737,7 @@ class MessagesDisplay
 	int  MessagesScrollY;
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
 
-	static const int MESSAGES_TIMEOUT = (FRAMES_PER_SECOND * 5); /// Message timeout 5 seconds
+	static const int MESSAGES_TIMEOUT = 5;    /// Message timeout 5 seconds
 protected:
 	void ShiftMessages();
 	void AddMessage(const char *msg);
@@ -774,10 +774,11 @@ void MessagesDisplay::UpdateMessages()
 	}
 
 	// Scroll/remove old message line
-	if (MessagesFrameTimeout < FrameCounter) {
+	unsigned long ticks = GetTicks();
+	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
 		if (MessagesScrollY == GameFont->Height() + 1) {
-			MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT - MessagesScrollY;
+			MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
 		}
@@ -827,15 +828,16 @@ void MessagesDisplay::AddMessage(const char *msg)
 	char *ptr;
 	char *message;
 	char *next;
+	unsigned long ticks = GetTicks();
 
 	if (!MessagesCount) {
-		MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
 	}
 
 	if (MessagesCount == MESSAGES_MAX) {
 		// Out of space to store messages, can't scroll smoothly
 		ShiftMessages();
-		MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
 		MessagesScrollY = 0;
 	}
 
