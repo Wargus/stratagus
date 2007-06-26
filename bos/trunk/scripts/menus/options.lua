@@ -247,16 +247,17 @@ function RunLanguageOptionsMenu(s)
   end
      
   print(StratagusTranslation)
-  b = AddLanguage("English", "en", 1.5)
+  b = AddLanguage("English", "en", 1.0)
   if StratagusTranslation == "" then
      b:setMarked(true)
   end
-  AddLanguage("Français", "fr", 2.5)
-  AddLanguage("Suomi", "fi", 3.5)
-  AddLanguage("Deutsch", "de", 4.5)
-  AddLanguage("Polski", "pl", 5.5)
-  AddLanguage("Dansk", "da", 6.5)
-  AddLanguage("Türkçe", "tr", 7.5)
+  AddLanguage("Français", "fr", 2.0)
+  AddLanguage("Suomi", "fi", 3.0)
+  AddLanguage("Deutsch", "de", 4.0)
+  AddLanguage("Polski", "pl", 5.0)
+  AddLanguage("Dansk", "da", 6.0)
+  AddLanguage("Türkçe", "tr", 7.0)
+  AddLanguage("Español", "es", 8.0)
 
   menu:addButton(_("~!OK"), "o", Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
