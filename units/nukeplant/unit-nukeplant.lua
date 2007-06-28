@@ -66,7 +66,7 @@ DefineUnitType("unit-nuke", {
     Icon = "icon-nuke",
     EnergyValue = 1600,
     MagmaValue = 270,
-    EnergyProductionRate = 30,
+    EnergyProductionRate = 46,
     RepairHp = 2,
     Construction = "construction-nuke",
     Speed = 0,
