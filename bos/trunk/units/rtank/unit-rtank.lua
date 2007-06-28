@@ -9,7 +9,7 @@
 --
 --	unit-rtank.lua	-	Define the rocket tank unit.
 --
---	(c) Copyright 2005 by Fran�is Beerten.
+--	(c) Copyright 2005-2007 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ DefineAnimations("animations-rtank", {
         "frame 5", "sound bazoo-attack", "attack", "wait 1", 
         "frame 0", "wait 2", 
         "frame 5", "attack", "wait 1", 
-        "frame 0", "unbreakable end", "wait 60", },
+        "frame 0", "wait 59", "unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 10", "wait 5", "frame 15", "wait 5", "frame 20", "unbreakable end", "wait 20", },
     })
 

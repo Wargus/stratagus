@@ -36,7 +36,7 @@ DefineAnimations("animations-dorcoz", {
         "frame 20", "move 4", "unbreakable end", "wait 2", },
     Attack = {"unbreakable begin",
         "frame 25", "attack", "wait 1",
-        "frame 0", "unbreakable end", "wait 49", },
+        "frame 0", "wait 49", "unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5",
         "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
     })
