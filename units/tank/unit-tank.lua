@@ -40,7 +40,7 @@ DefineAnimations("animations-tank", {
         "frame 0", "move 2", "unbreakable end", "wait 1", },
     Attack = {"unbreakable begin", "frame 0", "wait 10", 
         "frame 5", "sound bazoo-attack", "attack", "wait 2", 
-        "frame 10", "wait 4", "frame 0", "unbreakable end", "wait 50", },
+        "frame 10", "wait 4", "frame 49", "unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 15", "wait 4", 
         "frame 20", "wait 2", "frame 25", "wait 2", "frame 30", "wait 2", 
         "frame 35", "unbreakable end", "wait 2", },
