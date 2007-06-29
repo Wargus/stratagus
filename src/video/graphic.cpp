@@ -80,7 +80,7 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 {
 #ifndef USE_OPENGL
 	SDL_Rect srect = {gx, gy, w, h};
-	SDL_Rect drect = {x, y};
+	SDL_Rect drect = {x, y, 0, 0};
 
 	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 #else
