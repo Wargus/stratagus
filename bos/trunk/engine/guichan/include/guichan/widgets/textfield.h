@@ -1,10 +1,10 @@
-/*      _______   __   __   __   ______   __   __   _______   __   __                 
- *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\                
- *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /                 
- *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /                  
- *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /                   
- * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /                    
- * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/                      
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\ 
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
@@ -96,7 +96,7 @@ namespace gcn
          * @return the text of the TextField.
          */
         virtual const std::string& getText() const;
-    
+
         /**
          * Draws the caret (the little marker in the text that shows where the
          * letters you type will appear). Easily overloaded if you want to
@@ -105,7 +105,7 @@ namespace gcn
          * @param graphics the Graphics object to draw with.
          * @param x the caret's x-position.
          */
-        virtual void drawCaret(Graphics* graphics, int x);    
+        virtual void drawCaret(Graphics* graphics, int x);
 
         /**
          * Adjusts the size of the TextField to fit the font size. The
@@ -137,33 +137,33 @@ namespace gcn
 
 
         // Inherited from Widget
-        
+
         virtual void fontChanged();
-        
+
         virtual void draw(Graphics* graphics);
 
         virtual void drawBorder(Graphics* graphics);
 
-        
+
         // Inherited from MouseListener
-        
+
         virtual void mousePress(int x, int y, int button);
 
 
         // Inherited from KeyListener
-        
-        virtual bool keyPress(const Key& key);   
-        
+
+        virtual bool keyPress(const Key& key);
+
     protected:
         /**
          * Scrolls the text horizontally so that the caret shows if needed.
          */
         void fixScroll();
-    
+
         std::string mText;
-        unsigned int mCaretPosition;
-        int mXScroll;        
-    };  
+        int mCaretPosition;
+        int mXScroll;
+    };
 }
 
 #endif // end GCN_TEXTFIELD_HPP
