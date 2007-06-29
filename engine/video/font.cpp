@@ -1,9 +1,9 @@
-//     ____                _       __               
+//     ____                _       __
 //    / __ )____  _____   | |     / /___ ___________
 //   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
-//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
-// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
-//                                              
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/
+//
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
@@ -88,7 +88,7 @@ CFont *LargeTitleFont;  /// Large font used in episoden titles
 ----------------------------------------------------------------------------*/
 
 void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
-	int x, int y) 
+	int x, int y)
 {
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
 	int right = (r.x + r.width - 1 < Video.Width) ? r.x + r.width - 1 : Video.Width - 1;
@@ -124,7 +124,7 @@ static void VideoDrawChar(const CGraphic *g,
 	int gx, int gy, int w, int h, int x, int y)
 {
 	SDL_Rect srect = {gx, gy, w, h};
-	SDL_Rect drect = {x, y};
+	SDL_Rect drect = {x, y, 0, 0};
 
 	SDL_SetColors(g->Surface, FontColor->Colors, 0, MaxFontColors);
 	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
@@ -337,7 +337,7 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 					DebugPrint("oops, format your ~\n");
 					return widths;
 				case '~':
-					++pos;  
+					++pos;
 					break;
 				case '!':
 					rev = FontColor;

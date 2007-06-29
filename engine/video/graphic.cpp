@@ -1,9 +1,9 @@
-//     ____                _       __               
+//     ____                _       __
 //    / __ )____  _____   | |     / /___ ___________
 //   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
-//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
-// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
-//                                              
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/
+//
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
@@ -79,7 +79,7 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 {
 #ifndef USE_OPENGL
 	SDL_Rect srect = {gx, gy, w, h};
-	SDL_Rect drect = {x, y};
+	SDL_Rect drect = {x, y, 0, 0};
 
 	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 #else
