@@ -94,7 +94,7 @@ namespace gcn
 
     void TextField::setText(const std::string& text)
     {
-        if(text.size() < mCaretPosition )
+        if ((int)text.size() < mCaretPosition )
         {
             mCaretPosition = text.size();
         }
@@ -179,19 +179,19 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::RIGHT && mCaretPosition < mText.size())
+        else if (key.getValue() == Key::RIGHT && mCaretPosition < (int)mText.size())
         {
             mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-            if (mCaretPosition > mText.size()) {
+            if (mCaretPosition > (int)mText.size()) {
                 throw GCN_EXCEPTION("Invalid UTF8.");
             }
             ret = true;
         }
 
-        else if (key.getValue() == Key::DELETE && mCaretPosition < mText.size())
+        else if (key.getValue() == Key::DELETE && mCaretPosition < (int)mText.size())
         {
 			int newpos = UTF8GetNext(mText, mCaretPosition);
-            if (mCaretPosition > mText.size()) {
+            if (mCaretPosition > (int)mText.size()) {
                 throw GCN_EXCEPTION("Invalid UTF8.");
             }
             mText.erase(mCaretPosition, newpos - mCaretPosition);
@@ -249,7 +249,7 @@ namespace gcn
         {
             mText.insert(mCaretPosition,key.toString());
             mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-            if (mCaretPosition > mText.size()) {
+            if (mCaretPosition > (int)mText.size()) {
                 throw GCN_EXCEPTION("Invalid UTF8.");
             }
             ret = true;
