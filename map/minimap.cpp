@@ -1,9 +1,9 @@
-//     ____                _       __               
+//     ____                _       __
 //    / __ )____  _____   | |     / /___ ___________
 //   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
-//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
-// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
-//                                              
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/
+//
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
@@ -172,7 +172,7 @@ void CMinimap::Create(void)
 	MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
 		W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 	MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-		W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask, 
+		W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask,
 		TheScreen->format->Bmask, 0);
 #else
 	for (MinimapTextureWidth = 1; MinimapTextureWidth < W; MinimapTextureWidth <<= 1) {
@@ -458,7 +458,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 		type = unit->Type;
 	} else {
 		type = unit->Seen.Type;
-		// This will happen for radar if the unit has not been seen and we 
+		// This will happen for radar if the unit has not been seen and we
 		// have it on radar.
 		if (!type) {
 			type = unit->Type;
@@ -505,7 +505,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 				*(Uint16 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
 					color;
 			} else {
-				*(Uint32 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] = 
+				*(Uint32 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
 					color;
 			}
 #else
@@ -558,7 +558,7 @@ void CMinimap::Update(void)
 		memcpy(MinimapSurface, MinimapTerrainSurface, MinimapTextureWidth * MinimapTextureHeight * 4);
 #endif
 	}
-	
+
 #ifndef USE_OPENGL
 	SDL_LockSurface(MinimapSurface);
 	SDL_LockSurface(MinimapTerrainSurface);
@@ -570,7 +570,7 @@ void CMinimap::Update(void)
 			} else {
 				visiontype = Map.IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 			}
-			
+
 			if ( visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1))))  {
 #ifndef USE_OPENGL
 				if (bpp == 2) {
@@ -585,8 +585,8 @@ void CMinimap::Update(void)
 					Video.MapRGB(0, 0, 0, 0);
 #endif
 			}
-			
-			
+
+
 		}
 	}
 
@@ -633,7 +633,7 @@ static void DrawEvents(void)
 void CMinimap::Draw(int vx, int vy)
 {
 #ifndef USE_OPENGL
-	SDL_Rect drect = {X, Y};
+	SDL_Rect drect = {X, Y, 0, 0};
 	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
 #else
 	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
