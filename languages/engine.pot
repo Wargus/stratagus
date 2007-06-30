@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-12-12 21:22-0800\n"
+"POT-Creation-Date: 2007-06-30 14:10-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,304 +16,267 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/action/action_build.cpp:119
+#: action/action_build.cpp:131
 msgid "You cannot reach building place"
 msgstr ""
 
-#: src/action/action_build.cpp:177
+#: action/action_build.cpp:210
 #, c-format
 msgid "You cannot build %s here"
 msgstr ""
 
-#: src/action/action_build.cpp:197
-#, c-format
-msgid "Not enough resources to build %s"
-msgstr ""
-
-#: src/action/action_build.cpp:215
+#: action/action_build.cpp:224
 #, c-format
 msgid "Can't build more units %s"
 msgstr ""
 
-#: src/action/action_build.cpp:255
+#: action/action_build.cpp:256
 #, c-format
 msgid "Unable to create building %s"
 msgstr ""
 
-#: src/action/action_build.cpp:515
+#: action/action_build.cpp:450
 #, c-format
 msgid "New %s done"
 msgstr ""
 
-#: src/action/action_repair.cpp:84
-#, c-format
-msgid "We need more %s for repair!"
-msgstr ""
-
-#: src/action/action_research.cpp:103
-#, c-format
-msgid "%s: complete"
-msgstr ""
-
-#: src/action/action_returngoods.cpp:68
-msgid "No Resources to Return."
-msgstr ""
-
-#: src/action/action_spellcast.cpp:181
+#: action/action_spellcast.cpp:172
 #, c-format
 msgid "%s: not enough mana for spell: %s"
 msgstr ""
 
-#: src/action/action_spellcast.cpp:185
+#: action/action_spellcast.cpp:176
 #, c-format
 msgid "%s: can't cast spell: %s"
 msgstr ""
 
-#: src/action/action_train.cpp:170
+#: action/action_train.cpp:185
 #, c-format
 msgid "New %s ready"
 msgstr ""
 
-#: src/action/action_train.cpp:217
+#: action/action_train.cpp:231
 #, c-format
 msgid "Unable to train %s"
 msgstr ""
 
-#: src/action/action_upgradeto.cpp:199
-#, c-format
-msgid "Upgrade to %s canceled"
-msgstr ""
-
-#: src/action/action_upgradeto.cpp:207
-#, c-format
-msgid "Upgrade to %s complete"
-msgstr ""
-
-#: src/action/command.cpp:1319
+#: action/command.cpp:1026
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr ""
 
-#: src/action/command.cpp:1321
+#: action/command.cpp:1028
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr ""
 
-#: src/editor/editloop.cpp:508 src/editor/editloop.cpp:592
+#: editor/editloop.cpp:516
 msgid "~!OK"
 msgstr ""
 
-#: src/editor/editloop.cpp:516 src/editor/editloop.cpp:600
+#: editor/editloop.cpp:524
 msgid "~!Cancel"
 msgstr ""
 
-#: src/editor/editloop.cpp:583
-msgid "Artificial Intelligence"
-msgstr ""
-
-#: src/editor/editloop.cpp:1376
+#: editor/editloop.cpp:1308
 msgid "Unit can't be placed here."
 msgstr ""
 
-#: src/editor/editloop.cpp:1448
+#: editor/editloop.cpp:1380
 msgid "Mirror editing enabled: 2-side"
 msgstr ""
 
-#: src/editor/editloop.cpp:1451
+#: editor/editloop.cpp:1383
 msgid "Mirror editing enabled: 4-side"
 msgstr ""
 
-#: src/editor/editloop.cpp:1454
+#: editor/editloop.cpp:1386
 msgid "Mirror editing disabled"
 msgstr ""
 
-#: src/editor/editloop.cpp:1474
+#: editor/editloop.cpp:1406
 msgid "Unit deleted"
 msgstr ""
 
-#: src/editor/editloop.cpp:1497 src/editor/editloop.cpp:1506
+#: editor/editloop.cpp:1429 editor/editloop.cpp:1438
 msgid "Unit owner modified"
 msgstr ""
 
-#: src/editor/editloop.cpp:1831
+#: editor/editloop.cpp:1759
 msgid "Select mode"
 msgstr ""
 
-#: src/editor/editloop.cpp:1841
+#: editor/editloop.cpp:1769
 msgid "Unit mode"
 msgstr ""
 
-#: src/editor/editloop.cpp:1852
+#: editor/editloop.cpp:1780
 msgid "Tile mode"
 msgstr ""
 
-#: src/editor/editloop.cpp:1863
+#: editor/editloop.cpp:1791
 msgid "Set start location mode"
 msgstr ""
 
-#: src/network/commands.cpp:824
+#: network/commands.cpp:796
 msgid "No sync info for this replay !"
 msgstr ""
 
-#: src/network/commands.cpp:826
+#: network/commands.cpp:798
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr ""
 
-#: src/network/commands.cpp:835
+#: network/commands.cpp:807
 msgid "Replay got out of sync !"
 msgstr ""
 
-#: src/network/commands.cpp:946 src/network/commands.cpp:961
+#: network/commands.cpp:906 network/commands.cpp:921
 msgid "End of replay"
 msgstr ""
 
-#: src/network/network.cpp:928
+#: network/network.cpp:1061
 #, c-format
 msgid "%s sent bad command"
 msgstr ""
 
-#: src/network/network.cpp:1022
+#: network/network.cpp:1158
 msgid "Network out of sync"
 msgstr ""
 
-#: src/network/network.cpp:1256
+#: network/network.cpp:1391
 #, c-format
 msgid "Waiting for player \"%s\": %d:%02d"
 msgstr ""
 
-#: src/network/network.cpp:1272
+#: network/network.cpp:1407
 msgid "Timed out"
 msgstr ""
 
-#: src/stratagus/player.cpp:553
+#: stratagus/player.cpp:706
 msgid "Building Limit Reached"
 msgstr ""
 
-#: src/stratagus/player.cpp:557
+#: stratagus/player.cpp:710
 msgid "Unit Limit Reached"
 msgstr ""
 
-#: src/stratagus/player.cpp:561
-msgid "Insufficient Supply, increase Supply."
-msgstr ""
-
-#: src/stratagus/player.cpp:565
+#: stratagus/player.cpp:714
 msgid "Total Unit Limit Reached"
 msgstr ""
 
-#: src/stratagus/player.cpp:569
+#: stratagus/player.cpp:718
 #, c-format
 msgid "Limit of %d reached for this unit type"
 msgstr ""
 
-#: src/stratagus/player.cpp:575
+#: stratagus/player.cpp:724
 msgid "Cannot create more units."
 msgstr ""
 
-#: src/stratagus/stratagus.cpp:548 src/stratagus/stratagus.cpp:681
-msgid "Do it! Do it now!"
-msgstr ""
-
-#: src/stratagus/stratagus.cpp:812
+#: stratagus/stratagus.cpp:735
 #, c-format
-msgid "Thanks for playing Stratagus.\n"
+msgid "Thanks for playing Bos Wars.\n"
 msgstr ""
 
-#: src/ui/botpanel.cpp:724 src/ui/botpanel.cpp:789
+#: ui/botpanel.cpp:666 ui/botpanel.cpp:731
 msgid "Select Target"
 msgstr ""
 
-#: src/ui/botpanel.cpp:852
+#: ui/botpanel.cpp:779
 msgid "Select Location"
 msgstr ""
 
-#: src/ui/botpanel.cpp:871
-msgid "Unit training queue is full"
-msgstr ""
-
-#: src/ui/interface.cpp:95
+#: ui/interface.cpp:94
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr ""
 
-#: src/ui/interface.cpp:247
+#: ui/interface.cpp:246
 msgid "Sound is on."
 msgstr ""
 
-#: src/ui/interface.cpp:249
+#: ui/interface.cpp:248
 msgid "Sound is off."
 msgstr ""
 
-#: src/ui/interface.cpp:264
+#: ui/interface.cpp:263
 msgid "Music is off."
 msgstr ""
 
-#: src/ui/interface.cpp:267
+#: ui/interface.cpp:266
 msgid "Music is on."
 msgstr ""
 
-#: src/ui/interface.cpp:280 src/ui/mouse.cpp:1736
+#: ui/interface.cpp:279 ui/mouse.cpp:1610
 msgid "Game Paused"
 msgstr ""
 
-#: src/ui/interface.cpp:282
+#: ui/interface.cpp:281
 msgid "Game Resumed"
 msgstr ""
 
-#: src/ui/interface.cpp:313
+#: ui/interface.cpp:312
 msgid "Big map enabled"
 msgstr ""
 
-#: src/ui/interface.cpp:322
+#: ui/interface.cpp:321
 msgid "Returning to old map"
 msgstr ""
 
-#: src/ui/interface.cpp:333
+#: ui/interface.cpp:335
 msgid "Faster"
 msgstr ""
 
-#: src/ui/interface.cpp:349
+#: ui/interface.cpp:354
 msgid "Slower"
 msgstr ""
 
-#: src/ui/interface.cpp:404
+#: ui/interface.cpp:409
 msgid "Terrain displayed."
 msgstr ""
 
-#: src/ui/interface.cpp:406
+#: ui/interface.cpp:411
 msgid "Terrain hidden."
 msgstr ""
 
-#: src/ui/interface.cpp:439
+#: ui/interface.cpp:444
 msgid "Grab mouse toggled."
 msgstr ""
 
-#: src/ui/interface.cpp:914
+#: ui/interface.cpp:919
 msgid "Screenshot made."
 msgstr ""
 
-#: src/ui/mainscr.cpp:971
+#: ui/mainscr.cpp:694
+msgid "Energy"
+msgstr ""
+
+#: ui/mainscr.cpp:694
+msgid "Magma"
+msgstr ""
+
+#: ui/mainscr.cpp:919
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr ""
 
-#: src/ui/mainscr.cpp:1047
+#: ui/mainscr.cpp:1044
 #, c-format
 msgid "~<Event: %s~>"
 msgstr ""
 
-#: src/ui/mouse.cpp:1904
+#: ui/mouse.cpp:1778
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr ""
 
-#: src/ui/mouse.cpp:1908
+#: ui/mouse.cpp:1782
 #, c-format
 msgid "You have ~<%d~> %s(s)"
 msgstr ""
 
-#: src/unit/unit.cpp:2990
+#: unit/unit.cpp:2745
 #, c-format
 msgid "%s attacked"
 msgstr ""
