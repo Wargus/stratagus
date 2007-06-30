@@ -57,19 +57,6 @@ MakeSound("grenade-impact", "sounds/grenadier_g_hit.wav")
 MakeSound("rocket-impact", "sounds/bazoo_g_hit.wav")
 
 
-
-------------------------------------------------------------------------------
---	TERRAS
---
-
--- UNITS
-
--- BUILDINGS
-
-
-
-
-
 ------------------------------------------------------------------------------
 --	Define sounds used by game
 --
@@ -77,6 +64,8 @@ MakeSound("rocket-impact", "sounds/bazoo_g_hit.wav")
 DefineGameSounds(
   "placement-error", sound_click,
   "placement-success", sound_click,
-  "click", sound_click)
+  "click", sound_click,
+  "chat-message", MakeSound("", "ui/chatmessage.wav"))
 
 sound_click = MakeSound("statsthump", "ui/click.wav")
+
