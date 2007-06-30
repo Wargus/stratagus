@@ -274,6 +274,12 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.Rescue.Sound = (CSound *)data->Data;
+		} else if (!strcmp(value, "chat-message")) {
+			if (!lua_isuserdata(l, j + 1) ||
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+				LuaError(l, "Sound id expected");
+			}
+			GameSounds.ChatMessage.Sound = (CSound *)data->Data;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

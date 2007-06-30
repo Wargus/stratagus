@@ -230,6 +230,7 @@
 #include "commands.h"
 #include "interface.h"
 #include "results.h"
+#include "sound.h"
 
 
 //----------------------------------------------------------------------------
@@ -1174,6 +1175,7 @@ static void ParseNetworkCommand(const CNetworkCommandQueue *ncq)
 			if (ncq->Type == MessageChatTerm) {
 				NetMsgBuf[ply][127] = '\0';
 				SetMessage("%s", NetMsgBuf[ply]);
+				PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
 				NetMsgBufLen[ply] = 0;
 			}
 			}
