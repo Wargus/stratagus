@@ -62,17 +62,14 @@ class LuaActionListener;
 class GameSound
 {
 public:
-	SoundConfig PlacementError;    /// used by ui
-	SoundConfig PlacementSuccess;  /// used by ui
-	SoundConfig Click;             /// used by ui
-
+	SoundConfig PlacementError;        /// used by ui
+	SoundConfig PlacementSuccess;      /// used by ui
+	SoundConfig Click;                 /// used by ui
 	SoundConfig Docking;               /// ship reaches coast
 	SoundConfig BuildingConstruction;  /// building under construction
-
-	/// @todo (Fabrice) I don't think it's the correct place to put this
-	SoundConfig WorkComplete;  /// building ready
-
-	SoundConfig Rescue;        /// rescue units
+	SoundConfig WorkComplete;          /// building ready
+	SoundConfig Rescue;                /// rescue units
+	SoundConfig ChatMessage;           /// chat message
 };
 
 /**

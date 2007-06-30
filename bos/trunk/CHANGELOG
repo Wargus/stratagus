@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Version 2.4.0 (2007 6 30):
+- Play a sound when receiving a chat message (Jimmy Salmon)
 - Fix attacks that could be shortened (Francois Beerten)
 - Add Spanish translation (Xavier Paz)
 - Renamed Development Yard into Aircraft Factory, with new voices (Loïs Taulelle)

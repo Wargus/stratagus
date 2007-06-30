@@ -520,6 +520,10 @@ void InitSoundClient(void)
 		GameSounds.Rescue.Sound =
 			SoundForName(GameSounds.Rescue.Name);
 	}
+	if (!GameSounds.ChatMessage.Sound && !GameSounds.ChatMessage.Name.empty()) {
+		GameSounds.ChatMessage.Sound =
+			SoundForName(GameSounds.ChatMessage.Name);
+	}
 
 	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + TileSizeX) / TileSizeX;
 	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + TileSizeY) / TileSizeY;
