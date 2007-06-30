@@ -141,7 +141,14 @@ end
 UI.Fillers:clear()
 AddFiller("elites/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
 if (Editor.Running == EditorNotRunning) then
-  AddFiller("elites/ui/ui_" .. Video.Width .. "_bpanel.png",
+  local w = Video.Width
+  -- FIXME: remove this when we have images for these resolutions
+  if (w == 1440 or w == 1680 or w == 1920) then
+    w = 1600
+  elseif (w == 1280) then
+    w = 1024
+  end
+  AddFiller("elites/ui/ui_" .. w .. "_bpanel.png",
     Video.Width - 200, 336 - 8 - 8)
 end
 
