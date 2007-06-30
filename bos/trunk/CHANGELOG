@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Version 2.4.0 (2007 6 30):
+- Update maps with for the new economy (Francois Beerten)
 - Play a sound when receiving a chat message (Jimmy Salmon)
 - Fix attacks that could be shortened (Francois Beerten)
 - Add Spanish translation (Xavier Paz)
