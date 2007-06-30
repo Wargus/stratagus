@@ -147,6 +147,25 @@ static void MoveToLocation(CUnit *unit)
 }
 
 /**
+**  Check if we're already building this type at this location
+*/
+static CUnit *CheckAlreadyBuilding(CUnit *unit, CUnitType *type, int x, int y)
+{
+	CUnit *table[UnitMax];
+	int n;
+
+	n = UnitCacheOnTile(x, y, table);
+	for (int i = 0; i < n; ++i) {
+		if (!table[i]->Destroyed && table[i]->Type == type &&
+				(table[i]->Player == unit->Player || unit->IsAllied(table[i])) &&
+				table[i]->Orders[0]->Action == UnitActionBuilt) {
+			return table[i];
+		}
+	}
+	return NULL;
+}
+
+/**
 **  Check if the unit can build
 **
 **  @param unit  Unit to check
@@ -172,6 +191,11 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	// Check if the building could be built there.
 	//
 	if ((ontop = CanBuildUnitType(unit, type, x, y, 1)) == NULL) {
+		if ((ontop = CheckAlreadyBuilding(unit, type, x, y)) != NULL) {
+			CommandRepair(unit, x, y, ontop, FlushCommands);
+			return NULL;
+		}
+
 		//
 		// Some tries to build the building.
 		//
