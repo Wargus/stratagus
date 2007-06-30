@@ -119,8 +119,9 @@ static int CheckForDeadGoal(CUnit *unit)
 	// If we have a saved order continue this saved order.
 	//
 	if (unit->SavedOrder.Action != UnitActionStill) {
-		*unit->Orders[0] = unit->SavedOrder;
 		unit->ClearAction();
+		*unit->Orders[0] = unit->SavedOrder;
+		unit->SavedOrder.Action = UnitActionStill;
 		unit->SavedOrder.Goal = NoUnitP;
 		// Restart order state.
 		unit->State = 0;
