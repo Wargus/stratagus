@@ -233,7 +233,13 @@ static void MoveToTarget(CUnit *unit)
 		return;
 	}
 	goal = unit->Orders[0]->Goal;
-	if (err >= 0) {
+	if (err == 0 && !goal) {
+		if (MapDistanceToUnit(unit->Orders[0]->X, unit->Orders[0]->Y, unit) <
+				unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
+			err = PF_REACHED;
+		}
+	}
+	if (err > 0) {
 		//
 		// Nothing to do, we're on the way moving.
 		//
