@@ -78,9 +78,7 @@ local function GetBuildOrder()
   if (not HotSpotExists()) then
     order[1] = "unit-powerplant"
     order[2] = nil
-  end
-
-  if (Players[AiPlayer()].MagmaStored < 300) then
+  elseif (Players[AiPlayer()].MagmaStored < 300) then
     order[1] = "unit-magmapump"
     order[2] = "unit-powerplant"
   else
