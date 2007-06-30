@@ -1384,8 +1384,10 @@ void UIHandleButtonDown(unsigned button)
 						(explored || ReplayRevealMap)) {
 					PlayGameSound(GameSounds.PlacementSuccess.Sound,
 						MaxSampleVolume);
-					SendCommandBuildBuilding(Selected[0], x, y, CursorBuilding,
-						!(KeyModifiers & ModifierShift));
+					for (int i = 0; i < NumSelected; ++i) {
+						SendCommandBuildBuilding(Selected[i], x, y, CursorBuilding,
+							!(KeyModifiers & ModifierShift));
+					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 						CancelBuildingMode();
 					}
