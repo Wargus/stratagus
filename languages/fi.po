@@ -1,4 +1,4 @@
-﻿# translation of fi.po to Kimmo Kalevi Merikivi
+# translation of fi.po to Kimmo Kalevi Merikivi
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-09 18:54-0600\n"
+"POT-Creation-Date: 2007-06-30 14:10-0700\n"
 "PO-Revision-Date: 2005-12-10 18:14+0200\n"
 "Last-Translator: Kimmo Merikivi <kimmo.merikivi@pp1.inet.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
@@ -16,307 +16,268 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11\n"
 
-#: src/action/action_build.cpp:119
+#: action/action_build.cpp:131
 msgid "You cannot reach building place"
 msgstr "Et voi päästä rakennuspaikalle"
 
-#: src/action/action_build.cpp:177
+#: action/action_build.cpp:210
 #, c-format
 msgid "You cannot build %s here"
 msgstr "Et voi rakentaa rakennusta %s tähan"
 
-#: src/action/action_build.cpp:197
-#, c-format
-msgid "Not enough resources to build %s"
-msgstr "Ei tarpeeksi resursseja rakennuksen %s rakentamiseen"
-
-#: src/action/action_build.cpp:215
+#: action/action_build.cpp:224
 #, c-format
 msgid "Can't build more units %s"
 msgstr "Ei voida tuottaa enemman yksiköitä %s"
 
-#: src/action/action_build.cpp:255
+#: action/action_build.cpp:256
 #, c-format
 msgid "Unable to create building %s"
 msgstr "Rakennusta %s ei pystytty luomaan"
 
-#: src/action/action_build.cpp:515
+#: action/action_build.cpp:450
 #, c-format
 msgid "New %s done"
 msgstr "Uusi %s on valmis"
 
-#: src/action/action_repair.cpp:84
-#, c-format
-msgid "We need more %s for repair!"
-msgstr "Tarvitaan enemmän resurssia %s korjaamiseen!"
-
-#: src/action/action_research.cpp:103
-#, c-format
-msgid "%s: complete"
-msgstr "%s: Valmis"
-
-#: src/action/action_returngoods.cpp:68
-msgid "No Resources to Return."
-msgstr "Ei resursseja palautettavaksi"
-
-#: src/action/action_spellcast.cpp:181
+#: action/action_spellcast.cpp:172
 #, c-format
 msgid "%s: not enough mana for spell: %s"
 msgstr "%s: Ei tarpeeksi manaa loitsuun %s"
 
-#: src/action/action_spellcast.cpp:185
+#: action/action_spellcast.cpp:176
 #, c-format
 msgid "%s: can't cast spell: %s"
 msgstr "%s: Ei voitu tehdä loitsua %s"
 
-#: src/action/action_train.cpp:170
+#: action/action_train.cpp:185
 #, c-format
 msgid "New %s ready"
 msgstr "Uusi %s valmis"
 
-#: src/action/action_train.cpp:217
+#: action/action_train.cpp:231
 #, c-format
 msgid "Unable to train %s"
 msgstr "Ei pystytty kouluttamaan %s"
 
-#: src/action/action_upgradeto.cpp:199
-#, c-format
-msgid "Upgrade to %s canceled"
-msgstr "Päivitys rakennukseksi %s keskeytetty"
-
-#: src/action/action_upgradeto.cpp:207
-#, c-format
-msgid "Upgrade to %s complete"
-msgstr "Päivitys %s-muotoon valmis"
-
-#: src/action/command.cpp:1315
+#: action/command.cpp:1026
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr "Pelaaja \"%s\" on lähtenyt pelistä"
 
-#: src/action/command.cpp:1317
+#: action/command.cpp:1028
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr "Pelaaja \"%s\" on tapettu "
 
-#: src/editor/editloop.cpp:1338
+#: editor/editloop.cpp:516
+msgid "~!OK"
+msgstr ""
+
+#: editor/editloop.cpp:524
+msgid "~!Cancel"
+msgstr ""
+
+#: editor/editloop.cpp:1308
 msgid "Unit can't be placed here."
 msgstr "Yksikköä ei voi sijoittaa tähan."
 
-#: src/editor/editloop.cpp:1393
-msgid "Map saved"
-msgstr "Kartta tallennettu"
-
-#: src/editor/editloop.cpp:1425
+#: editor/editloop.cpp:1380
 msgid "Mirror editing enabled: 2-side"
 msgstr "Kaksisivuinen peilaustila"
 
-#: src/editor/editloop.cpp:1428
+#: editor/editloop.cpp:1383
 msgid "Mirror editing enabled: 4-side"
 msgstr "Nelisivuinen peilaustila"
 
-#: src/editor/editloop.cpp:1431
+#: editor/editloop.cpp:1386
 msgid "Mirror editing disabled"
 msgstr "Ei peilaustilaa"
 
-#: src/editor/editloop.cpp:1451
+#: editor/editloop.cpp:1406
 msgid "Unit deleted"
 msgstr "Yksikkö poistettu"
 
-#: src/editor/editloop.cpp:1478 src/editor/editloop.cpp:1487
+#: editor/editloop.cpp:1429 editor/editloop.cpp:1438
 msgid "Unit owner modified"
 msgstr "Yksikön omistajaa vaihdettu"
 
-#: src/editor/editloop.cpp:1816
+#: editor/editloop.cpp:1759
 msgid "Select mode"
 msgstr "Valintatila"
 
-#: src/editor/editloop.cpp:1826
+#: editor/editloop.cpp:1769
 msgid "Unit mode"
 msgstr "Yksikkötila"
 
-#: src/editor/editloop.cpp:1836
+#: editor/editloop.cpp:1780
 msgid "Tile mode"
 msgstr "Maastotila"
 
-#: src/editor/editloop.cpp:1846
+#: editor/editloop.cpp:1791
 msgid "Set start location mode"
 msgstr "Aloituspistetila"
 
-#: src/network/commands.cpp:837
+#: network/commands.cpp:796
 msgid "No sync info for this replay !"
 msgstr "Ei sykronointiinformaatiota tähan uudelleenpelaukseen!"
 
-#: src/network/commands.cpp:839
+#: network/commands.cpp:798
 #, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Uudelleenpelaus ei enää synkronoidu (%lu)!"
 
-#: src/network/commands.cpp:848
+#: network/commands.cpp:807
 msgid "Replay got out of sync !"
 msgstr "Uudelleenpelaus ei synkronoidu"
 
-#: src/network/commands.cpp:959 src/network/commands.cpp:974
+#: network/commands.cpp:906 network/commands.cpp:921
 msgid "End of replay"
 msgstr "Uudelleenpelauksen loppu"
 
-#: src/network/network.cpp:963
-#, c-format
-msgid "%s Sent Bad Command"
+#: network/network.cpp:1061
+#, fuzzy, c-format
+msgid "%s sent bad command"
 msgstr "%s lähetti huonon komennon"
 
-#: src/network/network.cpp:1060
+#: network/network.cpp:1158
 msgid "Network out of sync"
 msgstr "Verkko ei synkronoidu"
 
-#: src/network/network.cpp:1297
+#: network/network.cpp:1391
 #, c-format
 msgid "Waiting for player \"%s\": %d:%02d"
 msgstr "Odotetaan pelaajaa \"%s\": %d:%02d"
 
-#: src/network/network.cpp:1313
+#: network/network.cpp:1407
 msgid "Timed out"
 msgstr "Aikaraja"
 
-#: src/stratagus/mainloop.cpp:448
+#: stratagus/player.cpp:706
+msgid "Building Limit Reached"
+msgstr ""
+
+#: stratagus/player.cpp:710
+msgid "Unit Limit Reached"
+msgstr ""
+
+#: stratagus/player.cpp:714
+msgid "Total Unit Limit Reached"
+msgstr ""
+
+#: stratagus/player.cpp:718
 #, c-format
-msgid "You have lost!\n"
-msgstr "Olet hävinnyt!\n"
+msgid "Limit of %d reached for this unit type"
+msgstr ""
 
-#: src/stratagus/mainloop.cpp:449
-msgid "You have lost!"
-msgstr "Olet hävinnyt!"
+#: stratagus/player.cpp:724
+#, fuzzy
+msgid "Cannot create more units."
+msgstr "Ei voida tuottaa enemman yksiköitä %s"
 
-#: src/stratagus/mainloop.cpp:452
-#, c-format
-msgid "You have won!\n"
-msgstr "Olet voittanut!\n"
-
-#: src/stratagus/mainloop.cpp:453
-msgid "You have won!"
-msgstr "Olet voittanut!"
-
-#: src/stratagus/stratagus.cpp:575 src/stratagus/stratagus.cpp:664
-msgid "Do it! Do it now!"
-msgstr "Tee se! Tee se nyt!"
-
-#: src/stratagus/stratagus.cpp:819
-#, c-format
-msgid "Thanks for playing Stratagus.\n"
+#: stratagus/stratagus.cpp:735
+#, fuzzy, c-format
+msgid "Thanks for playing Bos Wars.\n"
 msgstr "Kiitos, että pelasit Stratagusta.\n"
 
-#: src/ui/botpanel.cpp:740 src/ui/botpanel.cpp:805
+#: ui/botpanel.cpp:666 ui/botpanel.cpp:731
 msgid "Select Target"
 msgstr "Valitse kohde"
 
-#: src/ui/botpanel.cpp:868
+#: ui/botpanel.cpp:779
 msgid "Select Location"
 msgstr "Valitse sijainti"
 
-#: src/ui/botpanel.cpp:887
-msgid "Unit training queue is full"
-msgstr "Yksiköiden valmistusjono täyttyi"
-
-#: src/ui/interface.cpp:94
+#: ui/interface.cpp:94
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "VIESTI:%s~!_"
 
-#: src/ui/interface.cpp:244
+#: ui/interface.cpp:246
 msgid "Sound is on."
 msgstr "Ääni paalla."
 
-#: src/ui/interface.cpp:246
+#: ui/interface.cpp:248
 msgid "Sound is off."
 msgstr "Ääni pois."
 
-#: src/ui/interface.cpp:259
+#: ui/interface.cpp:263
 msgid "Music is off."
 msgstr "Musiikki pois."
 
-#: src/ui/interface.cpp:262
+#: ui/interface.cpp:266
 msgid "Music is on."
 msgstr "Musiikki päällä."
 
-#: src/ui/interface.cpp:274 src/ui/interface.cpp:288 src/ui/interface.cpp:300
-#: src/ui/interface.cpp:312 src/ui/interface.cpp:324 src/ui/interface.cpp:336
-#: src/ui/interface.cpp:348 src/ui/interface.cpp:365 src/ui/interface.cpp:382
-#: src/ui/interface.cpp:394 src/ui/interface.cpp:406 src/ui/interface.cpp:418
-#: src/ui/mouse.cpp:1779
+#: ui/interface.cpp:279 ui/mouse.cpp:1610
 msgid "Game Paused"
 msgstr "Peli pysäytetty"
 
-#: src/ui/interface.cpp:276
+#: ui/interface.cpp:281
 msgid "Game Resumed"
 msgstr "Peliä jatketaan"
 
-#: src/ui/interface.cpp:449
+#: ui/interface.cpp:312
 msgid "Big map enabled"
 msgstr "Suuri karttatila päälla"
 
-#: src/ui/interface.cpp:458
+#: ui/interface.cpp:321
 msgid "Returning to old map"
 msgstr "Palataan vanhaan karttatilaan"
 
-#: src/ui/interface.cpp:469
+#: ui/interface.cpp:335
 msgid "Faster"
 msgstr "Nopeammin"
 
-#: src/ui/interface.cpp:485
+#: ui/interface.cpp:354
 msgid "Slower"
 msgstr "Hitaammin"
 
-#: src/ui/interface.cpp:540
+#: ui/interface.cpp:409
 msgid "Terrain displayed."
 msgstr "Maasto näytetaan"
 
-#: src/ui/interface.cpp:542
+#: ui/interface.cpp:411
 msgid "Terrain hidden."
 msgstr "Maasto piilotettu"
 
-#: src/ui/interface.cpp:575
+#: ui/interface.cpp:444
 msgid "Grab mouse toggled."
 msgstr "Hiiri pysyy ikkunan sisässä"
 
-#: src/ui/interface.cpp:1090
+#: ui/interface.cpp:919
 msgid "Screenshot made."
 msgstr "Kuvankaappaus tehty"
 
-#: src/ui/mainscr.cpp:772
-msgid "Production"
-msgstr "Tuotanto"
+#: ui/mainscr.cpp:694
+msgid "Energy"
+msgstr ""
 
-#: src/ui/mainscr.cpp:1046
+#: ui/mainscr.cpp:694
+msgid "Magma"
+msgstr ""
+
+#: ui/mainscr.cpp:919
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Viimeinen viesti näytetty ~<%d~> kertaa"
 
-#: src/ui/mainscr.cpp:1120
+#: ui/mainscr.cpp:1044
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Tapahtuma: %s~>"
 
-#: src/ui/menus.cpp:1398 src/ui/menus.cpp:1541
-#, c-format
-msgid "Saved game to: %s"
-msgstr "Tallennettu peli tiedostoon: %s"
-
-#: src/ui/menus.cpp:1485
-#, c-format
-msgid "Loaded game: %s"
-msgstr "Ladattu tallennus %s"
-
-#: src/ui/mouse.cpp:1937
+#: ui/mouse.cpp:1778
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Sinulla on ~<%d~> %ss"
 
-#: src/ui/mouse.cpp:1941
+#: ui/mouse.cpp:1782
 #, c-format
 msgid "You have ~<%d~> %s(s)"
 msgstr "Sinulla on ~<%d~> %s"
 
-#: src/unit/unit.cpp:2972
+#: unit/unit.cpp:2745
 #, c-format
 msgid "%s attacked"
 msgstr "%s hyökkäyksen kohteena!"
