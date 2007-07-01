@@ -185,13 +185,14 @@ static int WriteMapPresentation(const std::string &mapname, CMap *map, char *map
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
 
 		f->printf("DefinePlayerTypes(");
-		f->printf("\"%s\"", type[map->Info.PlayerType[0]]);
 		while (topplayer > 0 && map->Info.PlayerType[topplayer] == PlayerNobody) {
 			--topplayer;
 		}
-		for (i = 1; i <= topplayer; ++i) {
-			f->printf(", \"%s\"", type[map->Info.PlayerType[i]]);
-			++numplayers;
+		for (i = 0; i <= topplayer; ++i) {
+			f->printf("%s\"%s\"", (i ? ", " : ""), type[map->Info.PlayerType[i]]);
+			if (map->Info.PlayerType[i] == PlayerPerson) {
+				++numplayers;
+			}
 		}
 		f->printf(")\n");
 	
