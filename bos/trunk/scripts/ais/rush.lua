@@ -32,7 +32,7 @@ local player
 local ai_pos
 local ai_loop_pos
 
-function AiLoop(loop_funcs, loop_pos)
+local function AiLoop(loop_funcs, loop_pos)
   local ret
 
   player = AiPlayer() + 1
