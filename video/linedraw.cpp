@@ -1390,14 +1390,14 @@ void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
 
-	glVertex2i(x + w - 1, y);
+	glVertex2i(x + w - 1, y + 1);
 	glVertex2i(x + w - 1, y + h);
 
-	glVertex2i(x + w, y + h - 1);
+	glVertex2i(x + w - 1, y + h - 1);
 	glVertex2i(x, y + h - 1);
 
-	glVertex2i(x, y + h);
-	glVertex2i(x, y);
+	glVertex2i(x, y + h - 1);
+	glVertex2i(x, y + 1);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 }
