@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 06/19/07 22:47:37.
+** Generated automatically by tolua++-1.0.92 on 07/01/07 19:36:46.
 */
 
 #ifndef __cplusplus
@@ -18427,6 +18427,14 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"MapRichness",tolua_get_Settings_MapRichness,tolua_set_Settings_MapRichness);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"GameSettings",tolua_get_GameSettings,tolua_set_GameSettings);
+  tolua_constant(tolua_S,"SettingsPresetMapDefault",SettingsPresetMapDefault);
+  tolua_constant(tolua_S,"SettingsGameTypeMapDefault",SettingsGameTypeMapDefault);
+  tolua_constant(tolua_S,"SettingsGameTypeMelee",SettingsGameTypeMelee);
+  tolua_constant(tolua_S,"SettingsGameTypeFreeForAll",SettingsGameTypeFreeForAll);
+  tolua_constant(tolua_S,"SettingsGameTypeTopVsBottom",SettingsGameTypeTopVsBottom);
+  tolua_constant(tolua_S,"SettingsGameTypeLeftVsRight",SettingsGameTypeLeftVsRight);
+  tolua_constant(tolua_S,"SettingsGameTypeManVsMachine",SettingsGameTypeManVsMachine);
+  tolua_constant(tolua_S,"SettingsGameTypeManTeamVsMachine",SettingsGameTypeManTeamVsMachine);
   tolua_cclass(tolua_S,"CMapInfo","CMapInfo","",NULL);
   tolua_beginmodule(tolua_S,"CMapInfo");
    tolua_variable(tolua_S,"Description",tolua_get_CMapInfo_Description,tolua_set_CMapInfo_Description);

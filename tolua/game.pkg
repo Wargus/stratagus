@@ -56,3 +56,15 @@ class Settings {
 };
 
 extern Settings GameSettings;
+
+#define SettingsPresetMapDefault -1
+
+enum GameTypes {
+	SettingsGameTypeMapDefault = SettingsPresetMapDefault,
+	SettingsGameTypeMelee = 0,
+	SettingsGameTypeFreeForAll,
+	SettingsGameTypeTopVsBottom,
+	SettingsGameTypeLeftVsRight,
+	SettingsGameTypeManVsMachine,
+	SettingsGameTypeManTeamVsMachine,
+};
