@@ -10,7 +10,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Valery Shchedrin, and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Valery Shchedrin, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -283,7 +283,7 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 }
 
 /**
-**  Get unit from an unit depending of the relation.
+**  Get unit from a unit depending of the relation.
 **
 **  @param unit  unit reference.
 **  @param e     relation with unit.
@@ -776,17 +776,7 @@ void DrawResources(void)
 --  MESSAGE
 ----------------------------------------------------------------------------*/
 
-#define MESSAGES_TIMEOUT (FRAMES_PER_SECOND * 5) /// Message timeout 5 seconds
-
-static unsigned long MessagesFrameTimeout;       /// Frame to expire message
-
-
 #define MESSAGES_MAX  10                         /// How many can be displayed
-
-static char Messages[MESSAGES_MAX][128];         /// Array of messages
-static int  MessagesCount;                       /// Number of messages
-static int  MessagesSameCount;                   /// Counts same message repeats
-static int  MessagesScrollY;                     /// Used for smooth scrolling
 
 static char MessagesEvent[MESSAGES_MAX][64];     /// Array of event messages
 static int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
@@ -794,11 +784,30 @@ static int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
 static int  MessagesEventCount;                  /// Number of event messages
 static int  MessagesEventIndex;                  /// FIXME: docu
 
+class MessagesDisplay
+{
+	char Messages[MESSAGES_MAX][128];         /// Array of messages
+	int  MessagesCount;                       /// Number of messages
+	int  MessagesSameCount;                   /// Counts same message repeats
+	int  MessagesScrollY;
+	unsigned long MessagesFrameTimeout;       /// Frame to expire message
+
+	static const int MESSAGES_TIMEOUT = 5;    /// Message timeout 5 seconds
+protected:
+	void ShiftMessages();
+	void AddMessage(const char *msg);
+	int CheckRepeatMessage(const char *msg);
+public:
+	void UpdateMessages();
+	void AddUniqueMessage(char *s);
+	void DrawMessages();
+	void CleanMessages();
+};
 
 /**
 **  Shift messages array by one.
 */
-static void ShiftMessages(void)
+void MessagesDisplay::ShiftMessages()
 {
 	if (MessagesCount) {
 		--MessagesCount;
@@ -809,36 +818,22 @@ static void ShiftMessages(void)
 }
 
 /**
-**  Shift messages events array by one.
-*/
-static void ShiftMessagesEvent(void)
-{
-	if (MessagesEventCount) {
-		--MessagesEventCount;
-		for (int z = 0; z < MessagesEventCount; ++z) {
-			MessagesEventX[z] = MessagesEventX[z + 1];
-			MessagesEventY[z] = MessagesEventY[z + 1];
-			strcpy_s(MessagesEvent[z], sizeof(MessagesEvent[z]), MessagesEvent[z + 1]);
-		}
-	}
-}
-
-/**
 **  Update messages
 **
 **  @todo FIXME: make scroll speed configurable.
 */
-void UpdateMessages(void)
+void MessagesDisplay::UpdateMessages()
 {
 	if (!MessagesCount) {
 		return;
 	}
 
 	// Scroll/remove old message line
-	if (MessagesFrameTimeout < FrameCounter) {
+	unsigned long ticks = GetTicks();
+	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
 		if (MessagesScrollY == GameFont->Height() + 1) {
-			MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT - MessagesScrollY;
+			MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
 		}
@@ -850,8 +845,15 @@ void UpdateMessages(void)
 **
 **  @todo FIXME: make message font configurable.
 */
-void DrawMessages(void)
+void MessagesDisplay::DrawMessages()
 {
+	// background so the text is easier to read
+	if (MessagesCount) {
+		Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
+		Video.FillTransRectangleClip(color, UI.MapArea.X + 8, UI.MapArea.Y + 8,
+			UI.MapArea.EndX - UI.MapArea.X - 16, MessagesCount * (GameFont->Height() + 1) - MessagesScrollY, 0x80);
+	}
+
 	// Draw message line(s)
 	for (int z = 0; z < MessagesCount; ++z) {
 		if (z == 0) {
@@ -876,20 +878,21 @@ void DrawMessages(void)
 **
 **  @param msg  Message to add.
 */
-static void AddMessage(const char *msg)
+void MessagesDisplay::AddMessage(const char *msg)
 {
 	char *ptr;
 	char *message;
 	char *next;
+	unsigned long ticks = GetTicks();
 
 	if (!MessagesCount) {
-		MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
 	}
 
 	if (MessagesCount == MESSAGES_MAX) {
 		// Out of space to store messages, can't scroll smoothly
 		ShiftMessages();
-		MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
 		MessagesScrollY = 0;
 	}
 
@@ -952,7 +955,7 @@ static void AddMessage(const char *msg)
 **
 **  @return     non-zero to skip this message
 */
-static int CheckRepeatMessage(const char *msg)
+int MessagesDisplay::CheckRepeatMessage(const char *msg)
 {
 	if (MessagesCount < 1) {
 		return 0;
@@ -975,6 +978,40 @@ static int CheckRepeatMessage(const char *msg)
 }
 
 /**
+**  Add a new message to display only if it differs from the preceeding one.
+*/
+void MessagesDisplay::AddUniqueMessage(char *s)
+{
+	if (CheckRepeatMessage(s)) {
+		return;
+	}
+	AddMessage(s);
+}
+
+/**
+**  Cleanup messages.
+*/
+void MessagesDisplay::CleanMessages(void)
+{
+	MessagesCount = 0;
+	MessagesSameCount = 0;
+	MessagesEventCount = 0;
+	MessagesEventIndex = 0;
+	MessagesScrollY = 0;
+}
+
+MessagesDisplay allmessages;
+
+void UpdateMessages() {
+	allmessages.UpdateMessages();
+}
+
+void CleanMessages()
+{
+	allmessages.CleanMessages();
+}
+
+/**
 **  Set message to display.
 **
 **  @param fmt  To be displayed in text overlay.
@@ -988,10 +1025,27 @@ void SetMessage(const char *fmt, ...)
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
-	if (CheckRepeatMessage(temp)) {
-		return;
+	allmessages.AddUniqueMessage(temp);
+}
+
+void DrawMessages()
+{
+	allmessages.DrawMessages();
+}
+
+/**
+**  Shift messages events array by one.
+*/
+void ShiftMessagesEvent(void)
+{
+	if (MessagesEventCount) {
+		--MessagesEventCount;
+		for (int z = 0; z < MessagesEventCount; ++z) {
+			MessagesEventX[z] = MessagesEventX[z + 1];
+			MessagesEventY[z] = MessagesEventY[z + 1];
+			strcpy_s(MessagesEvent[z], sizeof(MessagesEvent[z]), MessagesEvent[z + 1]);
+		}
 	}
-	AddMessage(temp);
 }
 
 /**
@@ -1013,9 +1067,7 @@ void SetMessageEvent(int x, int y, const char *fmt, ...)
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
-	if (CheckRepeatMessage(temp) == 0) {
-		AddMessage(temp);
-	}
+	allmessages.AddUniqueMessage(temp);
 
 	if (MessagesEventCount == MESSAGES_MAX) {
 		ShiftMessagesEvent();
@@ -1048,17 +1100,6 @@ void CenterOnMessage(void)
 	++MessagesEventIndex;
 }
 
-/**
-**  Cleanup messages.
-*/
-void CleanMessages(void)
-{
-	MessagesCount = 0;
-	MessagesSameCount = 0;
-	MessagesEventCount = 0;
-	MessagesEventIndex = 0;
-	MessagesScrollY = 0;
-}
 
 /*----------------------------------------------------------------------------
 --  STATUS LINE
@@ -1105,8 +1146,8 @@ void CStatusLine::Clear(void)
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-static int CostsMana;                        /// mana cost to display in status line
-static int Costs[MaxCosts + 1];              /// costs to display in status line
+static int CostsMana;                    /// mana cost to display in status line
+static int Costs[MaxCosts + 1];          /// costs to display in status line
 
 /**
 **  Draw costs in status line.
@@ -1128,13 +1169,13 @@ void DrawCosts(void)
 		x += 60;
 	}
 
-	for (int i = 1; i <= MaxCosts; ++i) {
+	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (UI.Resources[i].G) {
 				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 					x, UI.StatusLine.TextY);
 			}
-			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont,Costs[i]);
+			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, Costs[i]);
 			x += 60;
 			if (x > Video.Width - 60) {
 				break;
@@ -1156,7 +1197,7 @@ void SetCosts(int mana, int food, const int *costs)
 	if (costs) {
 		memcpy(Costs, costs, MaxCosts * sizeof(*costs));
 	} else {
-		memset(Costs, 0, sizeof (Costs));
+		memset(Costs, 0, sizeof(Costs));
 	}
 	Costs[FoodCost] = food;
 }

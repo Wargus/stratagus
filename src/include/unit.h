@@ -10,7 +10,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -810,7 +810,6 @@ extern int NumUnits;                 /// Number of units used
 // in unit_draw.c
 /// @todo could be moved into the user interface ?
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
-extern int XpDamage;                    /// unit XP adds more damage to attacks
 extern bool EnableTrainingQueue;        /// Config: training queues enabled
 extern bool EnableBuildingCapture;      /// Config: building capture enabled
 extern bool RevealAttacker;             /// Config: reveal attacker enabled

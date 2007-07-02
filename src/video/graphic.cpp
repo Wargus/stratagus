@@ -667,6 +667,7 @@ void CGraphic::Free(CGraphic *g)
 			for (i = 0; i < PlayerMax; ++i) {
 				if (cg->PlayerColorTextures[i]) {
 					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
+					delete[] cg->PlayerColorTextures[i];
 				}
 			}
 		}

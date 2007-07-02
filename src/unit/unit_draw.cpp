@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.cpp - The draw routines for units. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /**
-**  Show selection marker around an unit.
+**  Show selection marker around a unit.
 **
 **  @param unit  Pointer to unit.
 */
@@ -263,8 +263,7 @@ void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCorners(Uint32 color, int x1, int y1,
-	int x2, int y2)
+void DrawSelectionCorners(Uint32 color, int x1, int y1, int x2, int y2)
 {
 #define CORNER_PIXELS 6
 
@@ -279,6 +278,7 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1,
 
 	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
 	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
+#undef CORNER_PIXELS
 }
 
 
@@ -370,349 +370,13 @@ static int CclDefineSprites(lua_State *l)
 }
 
 /**
-**  Define mana sprite.
-**  Equivalent of
-**  DefineSprites({Name = "sprite-mana",
-**    File = file, Offset = {hotx, hoty}, Size = {w, h}})
-**
-**  @param l  Lua state
-*/
-static int CclManaSprite(lua_State *l)
-{
-	char buffer[1024]; // lua equivalent.
-
-	LuaCheckArgs(l, 5);
-
-	sprintf(buffer, "DefineSprites({Name = \"%s\", File = \"%s\", "
-		"Offset = {%i, %i}, Size = {%i, %i}})",
-		"sprite-mana", LuaToString(l, 1),
-		(int) LuaToNumber(l, 2), (int) LuaToNumber(l, 3),
-		(int) LuaToNumber(l, 4), (int) LuaToNumber(l, 5));
-
-	DebugPrint("instead of ManaSprite, you should write instead :\n%s\n" _C_ buffer);
-
-	CclCommand(buffer);
-	return 0;
-}
-
-/**
-**  Define health sprite.
-**
-**  @param l  Lua state
-*/
-static int CclHealthSprite(lua_State *l)
-{
-	char buffer[1024]; // lua equivalent.
-
-	LuaCheckArgs(l, 5);
-
-	sprintf(buffer, "DefineSprites({Name = \"%s\", File = \"%s\", "
-		"Offset = {%i, %i}, Size = {%i, %i}})",
-		"sprite-health", LuaToString(l, 1),
-		(int) LuaToNumber(l, 2), (int) LuaToNumber(l, 3),
-		(int )LuaToNumber(l, 4), (int) LuaToNumber(l, 5));
-
-	DebugPrint("instead of HealthSprite, you should write instead :\n%s\n" _C_ buffer);
-
-	CclCommand(buffer);
-	return 0;
-}
-
-#if 1 // To be deleted ? DefineDecoration do that.
-
-/**
-**  Enable display health as health-sprite.
-**  Equivalent of
-**  DefineDecorations({Index = "HitPoints", HideNeutral = true, CenterX = true,
-**    OffsetPercent = {50, 100}, Offset = {0, -7},
-**    Method = {"sprite", {1}}})
-**
-**  @param l  Lua state
-*/
-static int CclShowHealthDot(lua_State *l)
-{
-	const char *lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"sprite\", {\"sprite-health\"}}})";
-
-	LuaCheckArgs(l, 0);
-
-	DebugPrint("instead of ShowHealthDot, you should write instead :\n%s\n" _C_ lua_equiv);
-
-	CclCommand(lua_equiv);
-	return 0;
-}
-
-/**
-**  Enable display health as health-bar.
-**  Equivalent of
-**  DefineDecorations({Index = "HitPoints", HideNeutral = true, CenterX = true,
-**    OffsetPercent = {50, 100}, Offset = {0, -7},
-**    Method = {"bar", {Width = 3, BorderSize = 1}}})
-**
-**  @param l  Lua state
-*/
-static int CclShowHealthHorizontal(lua_State *l)
-{
-	const char *lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Offset = {0, -7},"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1}}})";
-
-	LuaCheckArgs(l, 0);
-
-	DebugPrint("instead of ShowHealthHorizontal, you should write instead :\n%s\n" _C_ lua_equiv);
-
-	CclCommand(lua_equiv);
-	return 0;
-}
-
-/**
-**  Enable display health as health-bar.
-**  Equivalent of
-**  DefineDecorations({Index = "HitPoints", HideNeutral = true,
-**    Offset = {-7, 0},
-**    Method = {"bar", {Width = 3, BorderSize = 1, Orientation = "vertical"}}})
-**
-**  @param l  Lua state
-*/
-static int CclShowHealthVertical(lua_State *l)
-{
-	const char *lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true,"
-		"Offset = {-7, 0},"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})";
-
-	LuaCheckArgs(l, 0);
-
-	DebugPrint("instead of ShowHealthVertical, you should write instead :\n%s\n" _C_ lua_equiv);
-
-	CclCommand(lua_equiv);
-	return 0;
-}
-
-/**
-**  Enable display health as health-bar.
-**
-**  Equivalent of ShowHealthVertical()
-**
-**  @param l  Lua state
-*/
-static int CclShowHealthBar(lua_State *l)
-{
-	return CclShowHealthVertical(l);
-}
-
-/**
-**  Enable display mana as mana-sprite.
-**
-**  Equivalent of
-**  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
-**    OffsetPercent = {50, 100},
-**    Method = {"sprite", {0}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
-**  Except for ressource which have HideNeutral = false.
-**
-**  @param l  Lua state
-*/
-static int CclShowManaDot(lua_State *l)
-{
-	char lua_equiv[] = "DefineDecorations({Index = \"Mana\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"Transport\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"Research\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"Training\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"CarryResource\", HideNeutral = false, CenterX = true,"
-		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n";
-
-
-	LuaCheckArgs(l, 0);
-
-	DebugPrint("instead of ShowManaDot, you should write instead :\n%s\n" _C_ lua_equiv);
-
-	CclCommand(lua_equiv);
-	return 0;
-}
-
-/**
-**  Enable display mana as horizontal bar.
-**
-**  Equivalent of
-**  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
-**    OffsetPercent = {50, 100},
-**    Method = {"bar", {Width = 3, BorderSize = 1}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
-**
-**  @param l  Lua state
-*/
-static int CclShowManaHorizontal(lua_State *l)
-{
-	char lua_equiv[] = "DefineDecorations({Index = \"Mana\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"Transport\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"Research\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"Training\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"CarryResource\", HideNeutral = false, CenterX = true,"
-		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n";
-
-
-	LuaCheckArgs(l, 0);
-
-	DebugPrint("instead of ShowManaHorizontal, you should write instead :\n%s\n" _C_ lua_equiv);
-
-	CclCommand(lua_equiv);
-	return 0;
-}
-
-/**
-**  Enable display mana as vertical bar.
-**
-**  Equivalent of
-**  DefineDecorations({Index = "Mana", HideNeutral = true,
-**    Method = {"bar", {Width = 3, BorderSize = 1, Orientation = "vertical"}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
-**
-**  @param l  Lua state
-*/
-static int CclShowManaVertical(lua_State *l)
-{
-	char lua_equiv[] = "DefineDecorations({Index = \"Mana\", HideNeutral = true"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"Transport\", HideNeutral = true,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"Research\", HideNeutral = true,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"Training\", HideNeutral = true,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"CarryResource\", HideNeutral = false,"
-		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n";
-
-
-	LuaCheckArgs(l, 0);
-
-	DebugPrint("instead of ShowManaVertical, you should write instead :\n%s\n" _C_ lua_equiv);
-
-	CclCommand(lua_equiv);
-	return 0;
-}
-
-/**
-**  Enable display mana as mana-bar.
-**
-**  Equivalent of ShowManaVertical()
-**
-**  @param l  Lua state
-*/
-static int CclShowManaBar(lua_State *l)
-{
-	return CclShowManaVertical(l);
-}
-
-/**
-**  Enable energy bars and dots only for selected units
-**
-**  @param l  Lua state
-*/
-static int CclShowEnergySelected(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
-		i < UnitTypeVar.DecoVar.end(); ++i) {
-		(*i)->ShowOnlySelected = true;
-	}
-	return 0;
-}
-
-/**
-**  Enable display of full bars/dots.
-**
-**  @param l  Lua state
-*/
-static int CclShowFull(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
-		i < UnitTypeVar.DecoVar.end(); ++i) {
-		(*i)->ShowWhenMax = 1;
-	}
-	return 0;
-}
-
-/**
-**  Disable display of full bars/dots.
-**
-**  @param l  Lua state
-*/
-static int CclShowNoFull(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	for (std::vector<CDecoVar *>::iterator i = UnitTypeVar.DecoVar.begin();
-		i < UnitTypeVar.DecoVar.end(); ++i) {
-		(*i)->ShowWhenMax = 0;
-	}
-	return 0;
-}
-
-/**
-**  Draw decorations always on top.
-**
-**  @param l  Lua state
-*/
-static int CclDecorationOnTop(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	// FIXME: not implemented
-	return 0;
-}
-
-#endif
-
-/**
 **  Register CCL features for decorations.
 */
-void DecorationCclRegister(void)
+void DecorationCclRegister()
 {
 	memset(&DecoSprite, 0, sizeof(DecoSprite));
 
 	lua_register(Lua, "DefineSprites", CclDefineSprites);
-#if 1 // to be removed.
-	lua_register(Lua, "ManaSprite", CclManaSprite);
-	lua_register(Lua, "HealthSprite", CclHealthSprite);
-#endif
-
-#if 1 // To be deleted ? alredy Replaced by DefineDecoration
-	// These fonctions ara aliases to DefineDecorations
-	lua_register(Lua, "ShowHealthBar", CclShowHealthBar);
-	lua_register(Lua, "ShowHealthDot", CclShowHealthDot);
-// adicionado por protoman
-	lua_register(Lua, "ShowHealthVertical", CclShowHealthVertical);
-	lua_register(Lua, "ShowHealthHorizontal", CclShowHealthHorizontal);
-	lua_register(Lua, "ShowManaVertical", CclShowManaVertical);
-	lua_register(Lua, "ShowManaHorizontal", CclShowManaHorizontal);
-// fim
-
-	lua_register(Lua, "ShowManaBar", CclShowManaBar);
-	lua_register(Lua, "ShowManaDot", CclShowManaDot);
-	lua_register(Lua, "ShowEnergySelectedOnly", CclShowEnergySelected);
-	lua_register(Lua, "ShowFull", CclShowFull);
-	lua_register(Lua, "ShowNoFull", CclShowNoFull);
-	lua_register(Lua, "DecorationOnTop", CclDecorationOnTop);
-#endif
 }
 
 /**
@@ -842,7 +506,7 @@ void CDecoVarText::Draw(int x, int y, const CUnit *unit) const
 void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 {
 	int n;                   // frame of the sprite to show.
-	CGraphic *sprite;         // the sprite to show.
+	CGraphic *sprite;        // the sprite to show.
 	Decoration *decosprite;  // Info on the sprite.
 
 	Assert(unit);
@@ -1016,7 +680,7 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 }
 
 /**
-**  Get the location of an unit's order.
+**  Get the location of a unit's order.
 **
 **  @param unit   Pointer to unit.
 **  @param order  Pointer to order.
@@ -1188,7 +852,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 }
 
 /**
-**  Show the current order of an unit.
+**  Show the current order of a unit.
 **
 **  @param unit  Pointer to the unit.
 */
@@ -1229,7 +893,7 @@ void ShowOrder(const CUnit *unit)
 }
 
 /**
-**  Draw additional informations of an unit.
+**  Draw additional informations of a unit.
 **
 **  @param unit  Unit pointer of drawn unit.
 **  @param type  Unit-type pointer.
@@ -1597,21 +1261,18 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 **  Find all units to draw in viewport.
 **
 **  @param vp     Viewport to be drawn.
-**  @param table  Table of units to return in sorted order 
+**  @param table  Table of units to return in sorted order
 **
 */
 int FindAndSortUnits(const CViewport *vp, CUnit **table)
 {
-	int i;
-	int n;
-
 	//
 	//  Select all units touching the viewpoint.
 	//
-	n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	unsigned int n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
-	for (i = 0; i < n; i++) {
+	for (unsigned int i = 0; i < n; i++) {
 		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
 		}

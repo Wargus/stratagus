@@ -79,7 +79,6 @@ CUnit *ReleasedTail;                      /// List tail of released units.
 CUnit *Units[MAX_UNIT_SLOTS];             /// Array of used slots
 int NumUnits;                             /// Number of slots used
 
-int XpDamage;                             /// Hit point regeneration for all units
 bool EnableTrainingQueue;                 /// Config: training queues enabled
 bool EnableBuildingCapture;               /// Config: capture buildings enabled
 bool RevealAttacker;                      /// Config: reveal attacker enabled
@@ -3963,7 +3962,6 @@ void CleanUnits(void)
 
 	InitUnitsMemory();
 
-	XpDamage = 0;
 	HelpMeLastCycle = 0;
 }
 

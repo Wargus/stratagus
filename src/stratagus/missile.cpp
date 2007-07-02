@@ -10,7 +10,7 @@
 //
 /**@name missile.cpp - The missiles. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -314,14 +314,13 @@ static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>:
 **  @return                damage inflicted to goal.
 */
 static int CalculateDamageStats(const CUnitStats *attacker_stats,
-	const CUnitStats *goal_stats, int bloodlust, int xp)
+	const CUnitStats *goal_stats, int bloodlust)
 {
 	int damage;
 	int basic_damage;
 	int piercing_damage;
 
-	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value +
-		isqrt(xp / 100) * XpDamage;
+	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value;
 	piercing_damage = attacker_stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 	if (bloodlust) {
 		basic_damage *= 2;
@@ -354,7 +353,7 @@ static int CalculateDamage(const CUnit *attacker, const CUnit *goal)
 
 	if (!Damage) { // Use old method.
 		return CalculateDamageStats(attacker->Stats, goal->Stats,
-			attacker->Variable[BLOODLUST_INDEX].Value, attacker->Variable[XP_INDEX].Value);
+			attacker->Variable[BLOODLUST_INDEX].Value);
 	}
 	Assert(Damage);
 
@@ -414,11 +413,11 @@ void FireMissile(CUnit *unit)
 				if (Map.HumanWallOnMap(dx, dy)) {
 					Map.HitWall(dx, dy,
 						CalculateDamageStats(unit->Stats,
-							UnitTypeHumanWall->Stats, unit->Variable[BLOODLUST_INDEX].Value, unit->Variable[XP_INDEX].Value));
+							UnitTypeHumanWall->Stats, unit->Variable[BLOODLUST_INDEX].Value));
 				} else {
 					Map.HitWall(dx, dy,
 						CalculateDamageStats(unit->Stats,
-							UnitTypeOrcWall->Stats, unit->Variable[BLOODLUST_INDEX].Value, unit->Variable[XP_INDEX].Value));
+							UnitTypeOrcWall->Stats, unit->Variable[BLOODLUST_INDEX].Value));
 				}
 				return;
 			}
@@ -886,7 +885,7 @@ static void MissileHitsWall(const Missile *missile, int x, int y, int splash)
 		Assert(Map.OrcWallOnMap(x, y));
 		stats = UnitTypeOrcWall->Stats;
 	}
-	Map.HitWall(x, y, CalculateDamageStats(missile->SourceUnit->Stats, stats, 0, 0) / splash);
+	Map.HitWall(x, y, CalculateDamageStats(missile->SourceUnit->Stats, stats, 0) / splash);
 
 }
 
