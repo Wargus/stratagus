@@ -84,7 +84,7 @@ function addPlayersList(menu, numplayers)
     players_name[i]:setWidth(80)
     players_state[i] = menu:writeText("Preparing", sx * 11 + 85, sy*4 + i*18)
   end
-  numplayers_text = menu:writeText("Open slots : " .. numplayers - 1, sx *11, sy*4 + 162)
+  numplayers_text = menu:writeText("Open slots: " .. numplayers - 1, sx *11, sy*4 + 162)
 
   local function updatePlayers()
     local connected_players = 0
@@ -145,13 +145,18 @@ function RunJoiningMapMenu(s)
   revealmap:setEnabled(false)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  local difficulty = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
+  local difficulty = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 150, sy*11,
     function(dd) end)
   difficulty:setEnabled(false)
   menu:writeText(_("Starting resources:"), sx, sy*11+25)
   local resources = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25,
     function(dd) end)
   resources:setEnabled(false)
+  menu:writeText(_("Game type:"), sx, sy*11+50)
+  local gametype = menu:addDropDown({_("Map Default"), _("Melee"), _("Free For All"), _("Top vs Bottom"), _("Left vs Right"), _("Man vs Machine")}, sx + 150, sy*11+50,
+    function(dd) end)
+  gametype:setEnabled(false)
+  gametype:setSize(140, gametype:getHeight())
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
@@ -187,6 +192,12 @@ function RunJoiningMapMenu(s)
     GameSettings.Difficulty = ServerSetupState.Difficulty
     resources:setSelected((5 - ServerSetupState.ResourcesOption) / 2)
     GameSettings.Resources = ServerSetupState.ResourcesOption
+    if (ServerSetupState.GameTypeOption == 255) then
+      gametype:setSelected(0)
+    else
+      gametype:setSelected(ServerSetupState.GameTypeOption + 1)
+    end
+    GameSettings.GameType = ServerSetupState.GameTypeOption
     updatePlayersList()
     state = GetNetworkState()
     -- FIXME: don't use numbers
@@ -329,7 +340,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   local revealmap = menu:addCheckBox(_("Reveal map"), sx, sy*3+150, revealMapCb)
   
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
+  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 150, sy*11,
     function(dd)
       GameSettings.Difficulty = 5 - dd:getSelected()*2
       ServerSetupState.Difficulty = GameSettings.Difficulty
@@ -344,6 +355,16 @@ function RunServerMultiGameMenu(map, description, numplayers)
       NetworkServerResyncClients()
     end)
   d:setSelected(1)
+  menu:writeText(_("Game type:"), sx, sy*11+50)
+  d = menu:addDropDown({_("Map Default"), _("Melee"), _("Free For All"), _("Top vs Bottom"), _("Left vs Right"), _("Man vs Machine")}, sx + 150, sy*11+50,
+    function(dd)
+      GameSettings.GameType = dd:getSelected() - 1
+      ServerSetupState.GameTypeOption = GameSettings.GameType
+      NetworkServerResyncClients()
+    end)
+  d:setSelected(0)
+  d:setSize(140, d:getHeight())
+
 
   local updatePlayers = addPlayersList(menu, numplayers)
 
@@ -352,6 +373,7 @@ function RunServerMultiGameMenu(map, description, numplayers)
   ServerSetupState.FogOfWar = 1
   ServerSetupState.Difficulty = 3
   ServerSetupState.ResourcesOption = 3
+  ServerSetupState.GameTypeOption = SettingsGameTypeMapDefault
 
   menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)

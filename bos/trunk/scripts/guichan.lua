@@ -29,6 +29,7 @@
 
 -- Global useful objects for menus  ----------
 dark = Color(38, 38, 78, 128)
+darkNoAlpha = Color(38, 38, 78)
 clear = Color(200, 200, 128)
 black = Color(0, 0, 0)
 disabled = Color(112, 112, 112, 128)
@@ -175,9 +176,9 @@ function AddMenuHelpers(menu)
     dd:setFont(Fonts["game"])
     dd:setList(list)
     dd:setActionCallback(function(s) callback(dd, s) end)
-    dd:setBaseColor(dark)
+    dd:setBaseColor(darkNoAlpha)
     dd:setForegroundColor(clear)
-    dd:setBackgroundColor(dark)
+    dd:setBackgroundColor(darkNoAlpha)
     self:add(dd, x, y)
     return dd
   end
@@ -329,8 +330,9 @@ end
 
 
 function ResetMapOptions()
-  GameSettings.Difficulty = 3
   GameSettings.Resources = 3
+  GameSettings.Difficulty = 3
+  GameSettings.GameType = SettingsGameTypeMapDefault
   GameSettings.NoFogOfWar = false
   GameSettings.RevealMap = 0
 end
@@ -370,13 +372,18 @@ function RunStartGameMenu(s)
   
   ResetMapOptions()
   menu:writeText(_("Difficulty:"), sx, sy*11)
-  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 90, sy*11,
+  d = menu:addDropDown({_("easy"), _("normal"), _("hard")}, sx + 150, sy*11,
     function(dd) GameSettings.Difficulty = (5 - dd:getSelected()*2) end)
   d:setSelected(1)
   menu:writeText(_("Starting resources:"), sx, sy*11+25)
   d = menu:addDropDown({_("high"), _("normal"), _("low")}, sx + 150, sy*11+25,
     function(dd) GameSettings.Resources = (5 - dd:getSelected()*2) end)
   d:setSelected(1)
+  menu:writeText(_("Game type:"), sx, sy*11+50)
+  d = menu:addDropDown({_("Map Default"), _("Melee"), _("Free For All"), _("Top vs Bottom"), _("Left vs Right"), _("Man vs Machine")}, sx + 150, sy*11+50,
+    function(dd) GameSettings.GameType = dd:getSelected() - 1 end)
+  d:setSelected(0)
+  d:setSize(140, d:getHeight())
 
   local OldPresentMap = PresentMap
   PresentMap = function(description, nplayers, w, h, id)
