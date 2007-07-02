@@ -253,16 +253,19 @@ function RunLanguageOptionsMenu(s)
   local offy = (Video.Height - 352) / 2
 
   menu = BosMenu(_("Language Selection"))
-  local function AddLanguage(language, po, h)
+  local function AddLanguage(language, po, h, enginepo, bospo)
+    if enginepo == nil then
+      enginepo = "languages/" .. po .. ".po"
+      bospo = "languages/bos-" .. po .. ".po"
+    end
     local function SetLanguage()
-      SetTranslationsFiles("languages/" .. po .. ".po",
-                          "languages/bos-" .. po .. ".po") 
+      SetTranslationsFiles(enginepo, bospo) 
       preferences.StratagusTranslation = StratagusTranslation
       preferences.GameTranslation = GameTranslation
       SavePreferences()
     end      
     local rb = menu:addRadioButton(language, "lang", offx, offy + 36 * h, SetLanguage)
-    if StratagusTranslation == ("languages/" .. po .. ".po") then
+    if StratagusTranslation == enginepo then
       rb:setMarked(true)
     end
     return rb

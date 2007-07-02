@@ -72,7 +72,11 @@ const char *Translate(const char *str)
 */
 void AddTranslation(const std::string &str1, const std::string &str2)
 {
-	Entries[str1] = str2;
+	if (str2.empty()) {
+		Entries[str1] = str1;
+	} else {
+		Entries[str1] = str2;
+	}
 }
 
 /**
