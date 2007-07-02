@@ -272,7 +272,8 @@ function RunLanguageOptionsMenu(s)
   end
      
   print(StratagusTranslation)
-  b = AddLanguage("English", "en", 1.0)
+  b = AddLanguage("English", "en", 1.0, 
+        "languages/engine.pot", "languages/bos.pot")
   if StratagusTranslation == "" then
      b:setMarked(true)
   end
