@@ -136,7 +136,6 @@ msgid "End of replay"
 msgstr "Fin du Replay"
 
 #: network/network.cpp:1061
-#, fuzzy, c-format
 msgid "%s sent bad command"
 msgstr "%s envoie une mauvaise commande"
 
@@ -171,14 +170,12 @@ msgid "Limit of %d reached for this unit type"
 msgstr "Limite de %d atteinte pour ce type d'unité"
 
 #: stratagus/player.cpp:724
-#, fuzzy
 msgid "Cannot create more units."
-msgstr "Ne peut créer plus d'unités %s"
+msgstr "Ne peut créer plus d'unités."
 
 #: stratagus/stratagus.cpp:735
-#, fuzzy, c-format
 msgid "Thanks for playing Bos Wars.\n"
-msgstr "Merci d'avoir joué à Stratagus.\n"
+msgstr "Merci d'avoir joué à Bos Wars.\n"
 
 #: ui/botpanel.cpp:666 ui/botpanel.cpp:731
 msgid "Select Target"

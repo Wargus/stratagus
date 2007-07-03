@@ -206,14 +206,12 @@ msgid "Editor"
 msgstr "Éditeur"
 
 #: scripts/guichan.lua:502
-#, fuzzy
 msgid "Create ~!New Map"
-msgstr "Crer une ~!Partie"
+msgstr "Créer une nouvelle carte"
 
 #: scripts/guichan.lua:504
-#, fuzzy
 msgid "~!Load Map"
-msgstr "~!Charger une partie"
+msgstr "~!Charger une carte"
 
 #: scripts/guichan.lua:507 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
@@ -294,7 +292,7 @@ msgstr "Son :"
 #: scripts/menus/credits.lua:55
 #, fuzzy
 msgid "Engine Programmers:"
-msgstr "Programmeurs de Stratagus :"
+msgstr "Programmeurs du moteur :"
 
 #: scripts/menus/credits.lua:112
 msgid "Patches"
@@ -307,7 +305,7 @@ msgstr "Stratagus Media Project Graphics"
 #: scripts/menus/credits.lua:128
 #, fuzzy
 msgid "The Bos Wars Team thanks"
-msgstr "Les équipes de BoS et de Stratagus remercie"
+msgstr "L'équipe de Bos Wars remercie"
 
 #: scripts/menus/credits.lua:129
 msgid "everybody who has contributed"
@@ -536,9 +534,8 @@ msgid "Are you sure you want to surrender to your enemies?"
 msgstr "Êtes-vous sûr de vouloir vous rendre à vos ennemis ?"
 
 #: scripts/menus/ingame/game.lua:337
-#, fuzzy
 msgid "E~!xit Bos Wars"
-msgstr "Quitter le ~!Programme"
+msgstr "Quitter ~!Bos Wars"
 
 #: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
 msgid "Cancel (~<Esc~>)"
@@ -547,7 +544,7 @@ msgstr "Annuler (~<Echap~>)"
 #: scripts/menus/ingame/game.lua:362
 #, fuzzy
 msgid "Are you sure you want to exit Bos Wars?"
-msgstr "Êtes-vous sûr de vouloir de sortir de Stratagus ?"
+msgstr "Êtes-vous sûr de vouloir de sortir de Bos Wars?"
 
 #: scripts/menus/ingame/game.lua:363
 msgid "E~!xit Program"
@@ -562,9 +559,8 @@ msgid "Keystroke ~!Help"
 msgstr "Aide pour les ~!Raccourcis"
 
 #: scripts/menus/ingame/game.lua:377
-#, fuzzy
 msgid "Bos Wars ~!Tips"
-msgstr "Bos Wars: Crédits"
+msgstr "Bos Wars Astuces"
 
 #: scripts/menus/ingame/game.lua:455
 msgid "Keystroke Help Menu"
@@ -573,7 +569,7 @@ msgstr "Menu d'Aide des Raccourcis"
 #: scripts/menus/ingame/game.lua:490
 #, fuzzy
 msgid "Bos Wars Tips"
-msgstr "Bos Wars: Crédits"
+msgstr "Bos Wars Astuces"
 
 #: scripts/menus/ingame/game.lua:521
 msgid "Show tips at startup"
