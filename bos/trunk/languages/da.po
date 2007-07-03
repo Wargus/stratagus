@@ -174,9 +174,8 @@ msgid "Cannot create more units."
 msgstr "Kan ikke lave flere enheder."
 
 #: stratagus/stratagus.cpp:735
-#, fuzzy, c-format
 msgid "Thanks for playing Bos Wars.\n"
-msgstr "Tak for at du spillede Stratagus.\n"
+msgstr "Tak for at du spillede Bos Wars.\n"
 
 #: ui/botpanel.cpp:666 ui/botpanel.cpp:731
 msgid "Select Target"
@@ -249,11 +248,11 @@ msgstr "Skærmbillede lavet."
 
 #: ui/mainscr.cpp:694
 msgid "Energy"
-msgstr ""
+msgstr "Energi"
 
 #: ui/mainscr.cpp:694
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: ui/mainscr.cpp:919
 #, c-format

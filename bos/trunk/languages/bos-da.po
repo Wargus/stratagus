@@ -147,37 +147,37 @@ msgstr "lav"
 #: scripts/guichan.lua:382 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
-msgstr ""
+msgstr "Spil type:"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
-msgstr ""
+msgstr "Kort Standard"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
-msgstr ""
+msgstr "Melee"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
-msgstr ""
+msgstr "Frit for alle"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
-msgstr ""
+msgstr "Top imod Bund"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
-msgstr ""
+msgstr "Venstre mod Højre"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
-msgstr ""
+msgstr "Menneske imod Maskine"
 
 #: scripts/guichan.lua:413 scripts/guichan.lua:444 scripts/guichan.lua:487
 #: scripts/guichan.lua:555 scripts/guichan.lua:606
@@ -203,14 +203,12 @@ msgid "Editor"
 msgstr "Editor"
 
 #: scripts/guichan.lua:502
-#, fuzzy
 msgid "Create ~!New Map"
-msgstr "Opret ~!Spil"
+msgstr "Opret ~!Nyt Kort"
 
 #: scripts/guichan.lua:504
-#, fuzzy
 msgid "~!Load Map"
-msgstr "~!Hent Spil"
+msgstr "~!Hent Kort"
 
 #: scripts/guichan.lua:507 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
@@ -289,9 +287,8 @@ msgid "Sound:"
 msgstr "Lyd:"
 
 #: scripts/menus/credits.lua:55
-#, fuzzy
 msgid "Engine Programmers:"
-msgstr "Stratagus programmører:"
+msgstr "Spil motor programmører:"
 
 #: scripts/menus/credits.lua:112
 msgid "Patches"
@@ -302,9 +299,8 @@ msgid "Stratagus Media Project Graphics"
 msgstr "Stratagus Media Projekt Grafik"
 
 #: scripts/menus/credits.lua:128
-#, fuzzy
 msgid "The Bos Wars Team thanks"
-msgstr "Bos og Stratagus Teamet takker"
+msgstr "Bos Wars Teamet takker"
 
 #: scripts/menus/credits.lua:129
 msgid "everybody who has contributed"
@@ -413,7 +409,7 @@ msgstr "Energi"
 
 #: scripts/menus/ingame/editor.lua:207
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: scripts/menus/ingame/game.lua:58
 msgid "Game Menu"
@@ -533,18 +529,16 @@ msgid "Are you sure you want to surrender to your enemies?"
 msgstr "Er du sikker på at du vil overgive dig til dine fjender?"
 
 #: scripts/menus/ingame/game.lua:337
-#, fuzzy
 msgid "E~!xit Bos Wars"
-msgstr "A~!fslut Program"
+msgstr "A~!fslut Bos Wars"
 
 #: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
 msgid "Cancel (~<Esc~>)"
 msgstr "Fortryd (~<Esc~>)"
 
 #: scripts/menus/ingame/game.lua:362
-#, fuzzy
 msgid "Are you sure you want to exit Bos Wars?"
-msgstr "Er du sikker på at du vil afslutte Stratagus?"
+msgstr "Er du sikker på at du vil afslutte Bos Wars?"
 
 #: scripts/menus/ingame/game.lua:363
 msgid "E~!xit Program"
@@ -559,18 +553,16 @@ msgid "Keystroke ~!Help"
 msgstr "Tasteturtryk ~!Hjælp"
 
 #: scripts/menus/ingame/game.lua:377
-#, fuzzy
 msgid "Bos Wars ~!Tips"
-msgstr "Bos Wars Kredittere"
+msgstr "Bos Wars ~!tips"
 
 #: scripts/menus/ingame/game.lua:455
 msgid "Keystroke Help Menu"
 msgstr "Tastaturtryk Hjælpe Menu"
 
 #: scripts/menus/ingame/game.lua:490
-#, fuzzy
 msgid "Bos Wars Tips"
-msgstr "Bos Wars Kredittere"
+msgstr "Bos Wars Tips"
 
 #: scripts/menus/ingame/game.lua:521
 msgid "Show tips at startup"
@@ -626,7 +618,7 @@ msgstr "Server forsvundet"
 
 #: scripts/menus/network.lua:269
 msgid "Incompatible engine version"
-msgstr "Inkompatibel motor version"
+msgstr "Inkompatibel spil motor version"
 
 #: scripts/menus/network.lua:272
 msgid "Incompatible netowrk version"
@@ -670,7 +662,7 @@ msgstr "Opret ~!Spil"
 
 #: scripts/menus/network.lua:472
 msgid "MultiPlayer"
-msgstr "FlereSpillere"
+msgstr "Flere Spillere"
 
 #: scripts/menus/network.lua:474
 msgid "Nickname :"
