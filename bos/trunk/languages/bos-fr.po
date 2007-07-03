@@ -150,37 +150,37 @@ msgstr "basse"
 #: scripts/guichan.lua:382 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
-msgstr ""
+msgstr "Type de partie:"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
-msgstr ""
+msgstr "Valeur par défaut"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
-msgstr ""
+msgstr "Mêlée"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
-msgstr ""
+msgstr "Chacun pour soi"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
-msgstr ""
+msgstr "Haut contre bas"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
-msgstr ""
+msgstr "Droite contre gauche"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
-msgstr ""
+msgstr "Humains contre l'ordinnateur"
 
 #: scripts/guichan.lua:413 scripts/guichan.lua:444 scripts/guichan.lua:487
 #: scripts/guichan.lua:555 scripts/guichan.lua:606
@@ -416,7 +416,7 @@ msgstr "Énergie"
 
 #: scripts/menus/ingame/editor.lua:207
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: scripts/menus/ingame/game.lua:58
 msgid "Game Menu"
