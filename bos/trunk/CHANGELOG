@@ -1,19 +1,20 @@
 Change log for Bos Wars
 -----------------------
-Version 2.4.0 (2007 6 30):
+Version 2.4.0 prerelease (2007 7 3):
 - Added game types (Jimmy Salmon)
 - Added support for widescreen resolutions (Jimmy Salmon)
-- Update maps with for the new economy (Francois Beerten)
+- Update maps for the new economy (Francois Beerten)
 - Play a sound when receiving a chat message (Jimmy Salmon)
 - Fix attacks that could be shortened (Francois Beerten)
 - Add Spanish translation (Xavier Paz)
 - Renamed Development Yard into Aircraft Factory, with new voices (Loïs Taulelle)
-- Added ProductionEfficiency (Jimmy Salmon)
+- Added ProductionEfficiency for hotspots (Jimmy Salmon)
 - Fixed starting resources game option (Jimmy Salmon)
 - Fixed several editor bugs (Jimmy Salmon)
 - Add Pitcher and Rafflesia plants (Xavier Paz, François Beerten)
 - Rebalanced unit characteristics (François Beerten)
 - Removed the crystals (François Beerten)
+- Make trees harvestable (Francois Beerten)
 - Added support for compressed textures with OpenGL (Jimmy Salmon)
 - Added EditorNeutralTypes for unit types that should always be assigned to
 the neutral player (Jimmy Salmon)
