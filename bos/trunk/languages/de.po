@@ -34,7 +34,7 @@ msgid "Can't build more units %s"
 msgstr "Kann nicht mehr Einheiten %s bauen"
 
 #: action/action_build.cpp:256
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to create building %s"
 msgstr "Nicht in der Lage, Gebäude zu errichten %s"
 
@@ -54,12 +54,12 @@ msgid "%s: can't cast spell: %s"
 msgstr "%s: Kann Spell nicht casten: %s"
 
 #: action/action_train.cpp:185
-#, fuzzy, c-format
+#, c-format
 msgid "New %s ready"
 msgstr "%s einsatzbereit"
 
 #: action/action_train.cpp:231
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to train %s"
 msgstr "Nicht in der Lage, %s auszubilden"
 
@@ -86,17 +86,14 @@ msgid "Unit can't be placed here."
 msgstr "Einheit kann hier nicht platziert werden."
 
 #: editor/editloop.cpp:1380
-#, fuzzy
 msgid "Mirror editing enabled: 2-side"
 msgstr "Spiegel-Editieren aktiviert: 2-seitig"
 
 #: editor/editloop.cpp:1383
-#, fuzzy
 msgid "Mirror editing enabled: 4-side"
 msgstr "Spiegel-Editieren aktiviert: 4-seitig"
 
 #: editor/editloop.cpp:1386
-#, fuzzy
 msgid "Mirror editing disabled"
 msgstr "Spiegel-Editieren deaktiviert"
 
@@ -125,17 +122,15 @@ msgid "Set start location mode"
 msgstr "Startpunkt-Setzen-Modus"
 
 #: network/commands.cpp:796
-#, fuzzy
 msgid "No sync info for this replay !"
-msgstr "Keine Synchronisationsdaten für diese Aufnahme gefunden"
+msgstr "Keine Synchronisationsdaten für diese Aufnahme gefunden !"
 
 #: network/commands.cpp:798
-#, fuzzy, c-format
+#, c-format
 msgid "Replay got out of sync (%lu) !"
 msgstr "Aufnahme hat Synchronisation verloren (%lu) !"
 
 #: network/commands.cpp:807
-#, fuzzy
 msgid "Replay got out of sync !"
 msgstr "Aufnahme hat Synchronisation verloren !"
 
@@ -144,12 +139,11 @@ msgid "End of replay"
 msgstr "Ende der Aufnahme"
 
 #: network/network.cpp:1061
-#, fuzzy, c-format
+#, c-format
 msgid "%s sent bad command"
 msgstr "%s hat ein schlechtes Kommando gesendet"
 
 #: network/network.cpp:1158
-#, fuzzy
 msgid "Network out of sync"
 msgstr "Netzwerk hat Synchronisation verloren"
 
@@ -180,14 +174,13 @@ msgid "Limit of %d reached for this unit type"
 msgstr ""
 
 #: stratagus/player.cpp:724
-#, fuzzy
 msgid "Cannot create more units."
-msgstr "Kann nicht mehr Einheiten %s bauen"
+msgstr "Kann nicht mehr Einheiten bauen"
 
 #: stratagus/stratagus.cpp:735
-#, fuzzy, c-format
+#, c-format
 msgid "Thanks for playing Bos Wars.\n"
-msgstr "Danke, dass Sie Stratagus gespielt haben.\n"
+msgstr "Danke, dass Sie Bos Wars gespielt haben.\n"
 
 #: ui/botpanel.cpp:666 ui/botpanel.cpp:731
 msgid "Select Target"
@@ -252,7 +245,7 @@ msgstr "Terrain versteckt."
 
 #: ui/interface.cpp:444
 msgid "Grab mouse toggled."
-msgstr ""
+msgstr "Maus fesseln umgeschaltet"
 
 #: ui/interface.cpp:919
 msgid "Screenshot made."
@@ -260,11 +253,11 @@ msgstr "Screenshot erstellt."
 
 #: ui/mainscr.cpp:694
 msgid "Energy"
-msgstr ""
+msgstr "Energie"
 
 #: ui/mainscr.cpp:694
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: ui/mainscr.cpp:919
 #, c-format
