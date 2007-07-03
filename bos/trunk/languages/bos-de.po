@@ -148,37 +148,37 @@ msgstr "niedrige"
 #: scripts/guichan.lua:382 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
-msgstr ""
+msgstr "Spieltyp:"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
-msgstr ""
+msgstr "Kartenstandart"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
-msgstr ""
+msgstr "Nahkampf"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
-msgstr ""
+msgstr "Offen für alle"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
-msgstr ""
+msgstr "Oben gegen Unten"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
-msgstr ""
+msgstr "Links gegen Rechts"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
-msgstr ""
+msgstr "Mensch gegen Maschine"
 
 #: scripts/guichan.lua:413 scripts/guichan.lua:444 scripts/guichan.lua:487
 #: scripts/guichan.lua:555 scripts/guichan.lua:606
@@ -204,14 +204,12 @@ msgid "Editor"
 msgstr "Editor"
 
 #: scripts/guichan.lua:502
-#, fuzzy
 msgid "Create ~!New Map"
-msgstr "Spiel erstellen (~!G)"
+msgstr "~!Neue Karte erstellen"
 
 #: scripts/guichan.lua:504
-#, fuzzy
 msgid "~!Load Map"
-msgstr "~!Spiel laden"
+msgstr "Karte ~!laden"
 
 #: scripts/guichan.lua:507 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
@@ -290,9 +288,8 @@ msgid "Sound:"
 msgstr "Sound:"
 
 #: scripts/menus/credits.lua:55
-#, fuzzy
 msgid "Engine Programmers:"
-msgstr "Stratagus Programmierer:"
+msgstr "Engine Programmierer:"
 
 #: scripts/menus/credits.lua:112
 msgid "Patches"
@@ -303,13 +300,12 @@ msgid "Stratagus Media Project Graphics"
 msgstr "Stratagus Media Project Graphics"
 
 #: scripts/menus/credits.lua:128
-#, fuzzy
 msgid "The Bos Wars Team thanks"
-msgstr "Die Teams von Bos und Stratagus danken allen,"
+msgstr "Das Bos Wars Team dankt"
 
 #: scripts/menus/credits.lua:129
 msgid "everybody who has contributed"
-msgstr "die mit Patches,"
+msgstr "allen, die mit Patches,"
 
 #: scripts/menus/credits.lua:130
 msgid "patches, bug reports, ideas."
@@ -534,18 +530,16 @@ msgid "Are you sure you want to surrender to your enemies?"
 msgstr "Bist Du sicher, dass Du Dich Deinen Gegnern ergeben willst?"
 
 #: scripts/menus/ingame/game.lua:337
-#, fuzzy
 msgid "E~!xit Bos Wars"
-msgstr "Programm beenden (~!x)"
+msgstr "Bos Wars beenden (~!x)"
 
 #: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
 msgid "Cancel (~<Esc~>)"
 msgstr "Abbrechen (~<ESC~>)"
 
 #: scripts/menus/ingame/game.lua:362
-#, fuzzy
 msgid "Are you sure you want to exit Bos Wars?"
-msgstr "Bist Du sicher, dass Du Stratagus beenden willst?"
+msgstr "Bist Du sicher, dass Du Bos Wars beenden willst?"
 
 #: scripts/menus/ingame/game.lua:363
 msgid "E~!xit Program"
@@ -560,18 +554,16 @@ msgid "Keystroke ~!Help"
 msgstr "Tasten~!hilfe"
 
 #: scripts/menus/ingame/game.lua:377
-#, fuzzy
 msgid "Bos Wars ~!Tips"
-msgstr "Bos Wars Credits"
+msgstr "Bos Wars ~!Tipps"
 
 #: scripts/menus/ingame/game.lua:455
 msgid "Keystroke Help Menu"
 msgstr "Tastenbelegungshilfemenü"
 
 #: scripts/menus/ingame/game.lua:490
-#, fuzzy
 msgid "Bos Wars Tips"
-msgstr "Bos Wars Credits"
+msgstr "Bos Wars Tipps"
 
 #: scripts/menus/ingame/game.lua:521
 msgid "Show tips at startup"
