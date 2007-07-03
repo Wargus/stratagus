@@ -251,11 +251,11 @@ msgstr "Capture d'écran sauvegardé."
 
 #: ui/mainscr.cpp:694
 msgid "Energy"
-msgstr ""
+msgstr "Energie"
 
 #: ui/mainscr.cpp:694
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: ui/mainscr.cpp:919
 #, c-format
