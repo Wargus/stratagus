@@ -3,6 +3,16 @@
 
 <h2>Bos Wars Downloads</h2>
 
+<h3>Version pre2.4 (2007/3/4)</h3> 
+
+<ul>
+<li>Linux: <a href="dist/releases/boswars-pre2.4-linux.tar.gz">boswars-pre2.4-linux.tar.gz</a></li>
+<li>Windows (installer): <a href="dist/releases/BosWars-pre2.4.exe">BosWars-pre2.4.exe</a> </li>
+<li>Source (tar): <a href="dist/releases/boswars-pre2.4-src.tar.gz">boswars-pre2.4-src.tar.gz</a></li>
+<li>Source (zip): <a href="dist/releases/boswars-pre2.4-src.zip">boswars-pre2.4-src.zip</a></li>
+</ul>
+
+
 <h3>Version 2.3 (2007/3/4)</h3> 
 
 <ul>
@@ -48,7 +58,7 @@ The packages include a pre-compiled binary of the stratagus engine.
 <ul>
 <li>Linux: <a href="dist/releases/bos_1_1.tar.gz">bos_1_1.tar.gz</a></li>
 <li>Debian Linux: <a href="http://packages.debian.org/unstable/games/bos">bos</a> 
-      package in debian unstable by David Martïnez Moreno.
+      package in debian unstable by David Martï¿½ez Moreno.
 <li>Windows: 
    <a href="dist/releases/BattleOfSurvival-1.1.exe">
     BattleOfSurvival-1.1.exe</a></li>
