@@ -63,4 +63,3 @@ Section "Uninstall"
   DeleteRegKey /ifempty HKCU "Software\${NAME}"
 SectionEnd
 
-!system "rmdir /Q /S ${WGTMP}"
