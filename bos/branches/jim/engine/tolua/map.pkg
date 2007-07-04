@@ -1,0 +1,17 @@
+class CMapInfo
+{
+	string Description;
+	int MapWidth;
+	int MapHeight;
+	int PlayerType[PlayerMax];
+};
+
+class CMap
+{
+	CMapInfo Info;
+};
+
+extern CMap Map;
+
+void SetTile(int tile, int w, int h, int value = 0);
+

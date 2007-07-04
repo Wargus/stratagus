@@ -1,0 +1,22 @@
+$int GetNumOpponents(int player);
+int GetNumOpponents(int player);
+
+$int GetTimer();
+int GetTimer();
+
+$void ActionVictory();
+void ActionVictory();
+$void ActionDefeat();
+void ActionDefeat();
+$void ActionDraw();
+void ActionDraw();
+
+$void ActionSetTimer(int cycles, bool increasing);
+void ActionSetTimer(int cycles, bool increasing);
+$void ActionStartTimer();
+void ActionStartTimer();
+$void ActionStopTimer();
+void ActionStopTimer();
+
+$void SetTrigger(int trigger);
+void SetTrigger(int trigger);
