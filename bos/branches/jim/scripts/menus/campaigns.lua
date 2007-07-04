@@ -123,7 +123,7 @@ function RunCampaignsMenu(s)
 
   ResetMapOptions()
   local browser = menu:addBrowser("campaigns/", "^%a",
-                                 Video.Width / 2 - 150, 100, 300, 200,
+                                 Video.Width / 2 - 150, 100, 300, 200, nil,
                                  ListDirsInDirectory)
   function startgamebutton(s)
     print("Starting campaign")

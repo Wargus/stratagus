@@ -122,29 +122,109 @@ function AddMenuHelpers(menu)
     return bq
   end
 
-  function menu:addBrowser(path, filter, x, y, w, h, lister)
-    local mapslist = {}
-    local u = 1
-    local fileslist
-    local i
-    local f
-    if lister == nil then
-       lister = ListFilesInDirectory
+  function menu:addBrowser(path, filter, x, y, w, h, default, lister)
+    -- Create a list of all dirs and files in a directory
+    local function listFiles(path)
+      local dirlist = {}
+      local i
+      local f
+      local u = 1
+
+      if (lister ~= nil) then
+        local fileslist = lister(path)
+        for i,f in ipairs(fileslist) do
+          if (string.find(f, filter)) then
+            dirlist[u] = f
+            u = u + 1
+          end
+        end
+      else
+        local dirs = ListDirsInDirectory(path)
+        for i,f in ipairs(dirs) do
+          dirlist[u] = f .. "/"
+          u = u + 1
+        end
+
+        local fileslist = ListFilesInDirectory(path)
+        for i,f in ipairs(fileslist) do
+          if (string.find(f, filter)) then
+            dirlist[u] = f
+            u = u + 1
+          end
+        end
+      end
+
+      return dirlist
     end
-    fileslist = lister(path)
-    for i,f in ipairs(fileslist) do
-      if (string.find(f, filter)) then
-        mapslist[u] = f
-        u = u + 1
+
+    local bq = self:addListBox(x, y, w, h, {})
+    bq.origpath = path
+    bq.actioncb = nil
+
+    local function updateList()
+      bq.itemslist = listFiles(bq.path)
+      if (bq.path ~= bq.origpath) then
+        table.insert(bq.itemslist, 1, "../")
+      end
+      bq:setList(bq.itemslist)
+    end
+
+    -- Change to the default directory and select the default file
+    if (default == nil) then
+      bq.path = path
+      updateList()
+    else
+      local i
+      for i = string.len(default) - 1, 1, -1 do
+        if (string.sub(default, i, i) == "/") then
+          bq.path = string.sub(default, 1, i)
+          updateList()
+
+          local f = string.sub(default, i + 1)
+          for i = 1, table.getn(bq.itemslist) do
+            if (bq.itemslist[i] == f) then
+              bq:setSelected(i - 1)
+            end
+          end
+          break
+        end
       end
     end
 
-    local bq = self:addListBox(x, y, w, h, mapslist)
-    bq.getSelectedItem = function(self)
+    function bq:getSelectedItem()
       if (self:getSelected() < 0) then
         return self.itemslist[1]
       end
       return self.itemslist[self:getSelected() + 1]
+    end
+
+    -- If a directory was clicked change dirs
+    -- Otherwise call the user's callback
+    local function cb(s)
+      local f = bq:getSelectedItem()
+      if (f == "../") then
+        local i
+        for i = string.len(bq.path) - 1, 1, -1 do
+          if (string.sub(bq.path, i, i) == "/") then
+            bq.path = string.sub(bq.path, 1, i)
+            updateList()
+            break
+          end
+        end
+      elseif (string.sub(f, string.len(f)) == '/') then
+        bq.path = bq.path .. f
+        updateList()
+      else
+        if (bq.actioncb ~= nil) then
+          bq:actioncb(s)
+        end
+      end
+    end
+    bq:setActionCallback(cb)
+
+    bq.oldSetActionCallback = bq.setActionCallback
+    function bq:setActionCallback(cb)
+      bq.actioncb = cb
     end
 
     return bq
@@ -395,7 +475,7 @@ function RunStartGameMenu(s)
   end
  
   Load("maps/"..selectedmap)
-  local browser = menu:addBrowser("maps/", "^.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11)
+  local browser = menu:addBrowser("maps/", "^.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
   local function cb(s)
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
@@ -589,7 +669,7 @@ function RunEditorLoadMenu()
   end
 
   Load("maps/"..selectedmap)
-  local browser = menu:addBrowser("maps/", "^.*%.smp$", sx*10, sy*2+20, sx*8, sy*11)
+  local browser = menu:addBrowser("maps/", "^.*%.smp$", sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
   local function selectMap(s)
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())

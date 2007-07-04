@@ -1,5 +1,8 @@
 Change log for Bos Wars
 -----------------------
+SVN:
+- Added the ability to change directories in the file browser (Jimmy Salmon)
+
 Version 2.4.0 prerelease (2007 7 3):
 - Added game types (Jimmy Salmon)
 - Added support for widescreen resolutions (Jimmy Salmon)
