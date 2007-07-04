@@ -1865,10 +1865,8 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	}
 
 	// security: disallow all special characters
-	for (i = pathtype; i < n; i++) {
-		if (!(isalnum(userdir[i]) || userdir[i]=='/')) {
-			LuaError(l, "Forbidden directory");
-		}
+	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
+		LuaError(l, "Forbidden directory");
 	}
 
 	if (pathtype == 1) {
@@ -1880,7 +1878,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	lua_pop(l, 1);
 	lua_newtable(l);
 	n = ReadDataDirectory(directory, NULL, flp);
-	for (i = 0, j = 0; i < n; i++) {
+	for (i = 0, j = 0; i < n; ++i) {
 		if ((flp[i].type & mask) == type) {
 			lua_pushnumber(l, j + 1);
 			lua_pushstring(l, flp[i].name);
