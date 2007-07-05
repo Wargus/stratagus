@@ -10,7 +10,7 @@
 //
 /**@name depend.h - The units/upgrade dependencies headerfile. */
 //
-//      (c) Copyright 2000-2004 by Vladi Belperchinov-Shabanski
+//      (c) Copyright 2000-2007 by Vladi Belperchinov-Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -122,16 +122,12 @@ public:
 ----------------------------------------------------------------------------*/
 
 	/// Register CCL features for dependencies
-extern void DependenciesCclRegister(void);
+extern void DependenciesCclRegister();
 	/// Init the dependencies
-extern void InitDependencies(void);
+extern void InitDependencies();
 	/// Cleanup dependencies module
 extern void CleanDependencies();
 
-
-	/// Add a new dependency
-extern void AddDependency(const char *target, const char *required, int count,
-	int or_flag);
 	/// Check a dependency by identifier
 extern bool CheckDependByIdent(const CPlayer *player, const std::string &target);
 

@@ -1566,7 +1566,7 @@ void RescueUnits(void)
 	if (NoRescueCheck) {  // all possible units are rescued
 		return;
 	}
-	NoRescueCheck = 1;
+	NoRescueCheck = true;
 
 	//
 	//  Look if player could be rescued.
@@ -1576,7 +1576,7 @@ void RescueUnits(void)
 			continue;
 		}
 		if (p->TotalNumUnits) {
-			NoRescueCheck = 0;
+			NoRescueCheck = false;
 			// NOTE: table is changed.
 			l = p->TotalNumUnits;
 			memcpy(table, p->Units, l * sizeof(CUnit *));

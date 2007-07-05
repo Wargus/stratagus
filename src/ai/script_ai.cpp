@@ -81,7 +81,7 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 static std::vector<CUnitType *> getUnitTypeFromString(const std::string& list)
 {
 	std::vector<CUnitType *> res;
-	
+
 	if (list == "*") {
 		return UnitTypes;
 	}
@@ -489,7 +489,7 @@ static void InsertResearchRequests(CUpgrade *upgrade)
 static int CclAiGetRace(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, PlayerRaces.Name[AiPlayer->Player->Race]);
+	lua_pushstring(l, PlayerRaces.Name[AiPlayer->Player->Race].c_str());
 	return 1;
 }
 

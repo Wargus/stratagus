@@ -491,10 +491,8 @@ CSound *RegisterTwoGroups(CSound *first, CSound *second)
 /**
 **  Lookup the sound id's for the game sounds.
 */
-void InitSoundClient(void)
+void InitSoundClient()
 {
-	int i;
-
 	if (!SoundEnabled()) { // No sound enabled
 		return;
 	}
@@ -519,14 +517,14 @@ void InitSoundClient(void)
 		GameSounds.BuildingConstruction.Sound =
 			SoundForName(GameSounds.BuildingConstruction.Name);
 	}
-	for (i = 0; i < PlayerRaces.Count; ++i) {
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
 		if (!GameSounds.WorkComplete[i].Sound &&
 				!GameSounds.WorkComplete[i].Name.empty()) {
 			GameSounds.WorkComplete[i].Sound =
 				SoundForName(GameSounds.WorkComplete[i].Name);
 		}
 	}
-	for (i = 0; i < PlayerRaces.Count; ++i) {
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
 		if (!GameSounds.Rescue[i].Sound && !GameSounds.Rescue[i].Name.empty()) {
 			GameSounds.Rescue[i].Sound =
 				SoundForName(GameSounds.Rescue[i].Name);

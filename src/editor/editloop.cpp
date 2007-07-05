@@ -682,7 +682,7 @@ static void DrawTileIcons(void)
 /**
 **  Draw a table with the players
 */
-static void DrawPlayers(void) 
+static void DrawPlayers(void)
 {
 	int x;
 	int y;
@@ -713,12 +713,12 @@ static void DrawPlayers(void)
 		sprintf(buf, "%d", i);
 		VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
 	}
-	
+
 	x = UI.InfoPanel.X + 4;
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
-		i = sprintf(buf,"Plyr %d %s ", Editor.SelectedPlayer,
-				PlayerRaces.Name[Map.Info.PlayerSide[Editor.SelectedPlayer]]);
+		i = sprintf(buf, "Plyr %d %s ", Editor.SelectedPlayer,
+				PlayerRaces.Name[Map.Info.PlayerSide[Editor.SelectedPlayer]].c_str());
 		// Players[SelectedPlayer].RaceName);
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
@@ -1302,7 +1302,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		}
 		return;
 	}
-	
+
 	// Click on player area
 	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Cursor on player icons
@@ -2180,7 +2180,7 @@ void StartEditor(const char *filename)
 		Map.Info.MapWidth = 64;
 		Map.Info.MapHeight = 64;
 	}
-	
+
 	// Run the editor.
 	EditorMainLoop();
 

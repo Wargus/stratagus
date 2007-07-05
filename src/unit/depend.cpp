@@ -10,7 +10,7 @@
 //
 /**@name depend.cpp - The units/upgrade dependencies */
 //
-//      (c) Copyright 2000-2006 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 2000-2007 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -66,7 +66,7 @@ static DependRule *DependHash[101];
 **  @param count     Amount of the required needed.
 **  @param or_flag   Start of or rule.
 */
-void AddDependency(const char *target, const char *required, int count,
+static void AddDependency(const std::string &target, const std::string required, int count,
 	int or_flag)
 {
 	DependRule rule;
@@ -77,17 +77,17 @@ void AddDependency(const char *target, const char *required, int count,
 	//
 	//  Setup structure.
 	//
-	if (!strncmp(target, "unit-", 5)) {
+	if (!strncmp(target.c_str(), "unit-", 5)) {
 		// target string refers to unit-xxx
 		rule.Type = DependRuleUnitType;
 		rule.Kind.UnitType = UnitTypeByIdent(target);
-	} else if (!strncmp(target, "upgrade-", 8)) {
+	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 	} else {
 		DebugPrint("dependency target `%s' should be unit-type or upgrade\n" _C_
-			target);
+			target.c_str());
 		return;
 	}
 	hash = (int)(long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash));
@@ -134,17 +134,17 @@ void AddDependency(const char *target, const char *required, int count,
 	//
 	//  Setup structure.
 	//
-	if (!strncmp(required, "unit-", 5)) {
+	if (!strncmp(required.c_str(), "unit-", 5)) {
 		// required string refers to unit-xxx
 		temp->Type = DependRuleUnitType;
 		temp->Kind.UnitType = UnitTypeByIdent(required);
-	} else if (!strncmp(required, "upgrade-", 8)) {
+	} else if (!strncmp(required.c_str(), "upgrade-", 8)) {
 		// required string refers to upgrade-XXX
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
 	} else {
 		DebugPrint("dependency required `%s' should be unit-type or upgrade\n" _C_
-			required);
+			required.c_str());
 		delete temp;
 		return;
 	}

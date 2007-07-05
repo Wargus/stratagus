@@ -120,9 +120,11 @@ static int CclPlayer(lua_State *l)
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "race")) {
+			unsigned int i;
+
 			value = LuaToString(l, j + 1);
 			for (i = 0; i < PlayerRaces.Count; ++i) {
-				if (!strcmp(value, PlayerRaces.Name[i])) {
+				if (!strcmp(value, PlayerRaces.Name[i].c_str())) {
 					player->Race = i;
 					break;
 				}
@@ -599,9 +601,9 @@ static int CclDefineRaceNames(lua_State *l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			i = PlayerRaces.Count++;
-			PlayerRaces.Name[i] = NULL;
-			PlayerRaces.Display[i] = NULL;
-			PlayerRaces.Visible[i] = 0;
+			PlayerRaces.Name[i].clear();
+			PlayerRaces.Display[i].clear();
+			PlayerRaces.Visible[i] = false;
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -650,8 +652,7 @@ static int CclDefinePlayerColors(lua_State *l)
 	args = luaL_getn(l, 1);
 	for (i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
-		delete[] PlayerColorNames[i / 2];
-		PlayerColorNames[i / 2] = new_strdup(LuaToString(l, -1));
+		PlayerColorNames[i / 2] = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++i;
 		lua_rawgeti(l, 1, i + 1);
@@ -741,7 +742,7 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushstring(l, p->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "RaceName")) {
-		lua_pushstring(l, PlayerRaces.Name[p->Race]);
+		lua_pushstring(l, PlayerRaces.Name[p->Race].c_str());
 		return 1;
 	} else if (!strcmp(data, "Resources")) {
 		const char *res;
@@ -849,13 +850,13 @@ static int CclSetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
-		int i;
+		unsigned int i;
 		const char *racename;
 
 		racename = LuaToString(l, 3);
 		p->Race = 0;
 		for (i = 0; i < PlayerRaces.Count; ++i) {
-			if (!strcmp(racename, PlayerRaces.Name[i])) {
+			if (!strcmp(racename, PlayerRaces.Name[i].c_str())) {
 				p->Race = i;
 				break;
 			}

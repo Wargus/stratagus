@@ -234,7 +234,7 @@ static int CclDefineGameSounds(lua_State *l)
 {
 	//FIXME: should allow to define ALL the game sounds
 	const char *value;
-	int i;
+	unsigned int i;
 	int args;
 	int j;
 	LuaUserData *data;
@@ -272,7 +272,7 @@ static int CclDefineGameSounds(lua_State *l)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			for (i = 0; i < PlayerRaces.Count; ++i) {
-				if (!strcmp(PlayerRaces.Name[i], value)) {
+				if (!strcmp(PlayerRaces.Name[i].c_str(), value)) {
 					break;
 				}
 			}
@@ -294,7 +294,7 @@ static int CclDefineGameSounds(lua_State *l)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			for (i = 0; i < PlayerRaces.Count; ++i) {
-				if (!strcmp(PlayerRaces.Name[i], value)) {
+				if (!strcmp(PlayerRaces.Name[i].c_str(), value)) {
 					break;
 				}
 			}

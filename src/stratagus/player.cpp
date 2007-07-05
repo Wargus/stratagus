@@ -63,7 +63,7 @@ CPlayer Players[PlayerMax];       /// All players in play
 CPlayer *ThisPlayer;              /// Player on this computer
 PlayerRace PlayerRaces;          /// Player races
 
-int NoRescueCheck;               /// Disable rescue check
+bool NoRescueCheck;               /// Disable rescue check
 
 /**
 **  Colors used for minimap.
@@ -71,7 +71,7 @@ int NoRescueCheck;               /// Disable rescue check
 SDL_Color *PlayerColorsRGB[PlayerMax];
 Uint32 *PlayerColors[PlayerMax];
 
-char *PlayerColorNames[PlayerMax];
+std::string PlayerColorNames[PlayerMax];
 
 /**
 **  Which indexes to replace with player color
@@ -104,25 +104,24 @@ void InitPlayers(void)
 /**
 **  Clean up players.
 */
-void CleanPlayers(void)
+void CleanPlayers()
 {
 	ThisPlayer = NULL;
-	for (int i = 0; i < PlayerMax; i++) {
+	for (unsigned int i = 0; i < PlayerMax; i++) {
 		Players[i].Clear();
 	}
 	NumPlayers = 0;
-
-	NoRescueCheck = 0;
+	NoRescueCheck = false;
 }
 
 /**
 **  Clean up the PlayerRaces names.
 */
-void CleanRaces(void)
+void CleanRaces()
 {
-	for (int p = 0; p < PlayerRaces.Count; ++p) {
-		delete[] PlayerRaces.Name[p];
-		delete[] PlayerRaces.Display[p];
+	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
+		PlayerRaces.Name[i].clear();
+		PlayerRaces.Display[i].clear();
 	}
 	PlayerRaces.Count = 0;
 }
@@ -158,7 +157,7 @@ void SavePlayers(CFile *file)
 			case PlayerRescueActive:  file->printf("\"rescue-active\","); break;
 			default:                  file->printf("%d,",Players[i].Type);break;
 		}
-		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race]);
+		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race].c_str());
 		file->printf(" \"ai-name\", \"%s\",\n", Players[i].AiName.c_str());
 		file->printf("  \"team\", %d,", Players[i].Team);
 
@@ -453,8 +452,8 @@ void CreatePlayer(int type)
 */
 void CPlayer::SetSide(int side)
 {
-	Assert(side >= 0 && side < PlayerRaces.Count);
-	Assert(PlayerRaces.Name[side]);
+	Assert((unsigned int) side < PlayerRaces.Count);
+	Assert(!PlayerRaces.Name[side].empty());
 
 	this->Race = side;
 }
@@ -472,10 +471,10 @@ void CPlayer::SetName(const std::string &name)
 /**
 **  Clear all player data excepts members which don't change.
 **
-**  The fields that are not cleared are 
+**  The fields that are not cleared are
 **  UnitLimit, BuildingLimit, TotalUnitLimit and Allow.
 */
-void CPlayer::Clear() 
+void CPlayer::Clear()
 {
 	Index = 0;
 	Name.clear();
@@ -818,11 +817,11 @@ void DebugPlayers(void)
 			case 7: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i] _C_
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name.c_str() _C_ playertype _C_
-			PlayerRaces.Name[Players[i].Race] _C_
+			PlayerRaces.Name[Players[i].Race].c_str() _C_
 			Players[i].AiName.c_str());
 	}
 #endif

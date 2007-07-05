@@ -10,7 +10,7 @@
 //
 /**@name unittype.h - The unit-types headerfile. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -378,7 +378,7 @@
 **
 **  CUnitType::Weapon
 **
-**    Currently sound for weapon
+**    Current sound for weapon
 **
 **  @todo temporary solution
 **
@@ -535,9 +535,9 @@ CUnitType *UnitTypeByIdent(const std::string &ident);
 */
 class MissileConfig {
 public:
-	MissileConfig() : Name(NULL), Missile(NULL) {}
+	MissileConfig() : Missile(NULL) {}
 
-	char *Name;              /// Config missile name
+	std::string Name;        /// Config missile name
 	MissileType *Missile;    /// Identifier to use to run time
 };
 
@@ -663,7 +663,7 @@ public:
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnit *unit) const = 0;
 
-	int Index;                  /// Index of the variable. @see DefineVariables
+	unsigned int Index;         /// Index of the variable. @see DefineVariables
 
 	int OffsetX;                /// Offset in X coord.
 	int OffsetY;                /// Offset in Y coord.
@@ -671,13 +671,13 @@ public:
 	int OffsetXPercent;         /// Percent offset (TileWidth) in X coord.
 	int OffsetYPercent;         /// Percent offset (TileHeight) in Y coord.
 
-	char IsCenteredInX;         /// if true, use center of deco instead of left border
-	char IsCenteredInY;         /// if true, use center of deco instead of upper border
+	bool IsCenteredInX;         /// if true, use center of deco instead of left border
+	bool IsCenteredInY;         /// if true, use center of deco instead of upper border
 
-	char ShowIfNotEnable;       /// if false, Show only if var is enable
-	char ShowWhenNull;          /// if false, don't show if var is null (F.E poison)
-	char HideHalf;              /// if true, don't show when 0 < var < max.
-	char ShowWhenMax;           /// if false, don't show if var is to max. (Like mana)
+	bool ShowIfNotEnable;       /// if false, Show only if var is enable
+	bool ShowWhenNull;          /// if false, don't show if var is null (F.E poison)
+	bool HideHalf;              /// if true, don't show when 0 < var < max.
+	bool ShowWhenMax;           /// if false, don't show if var is to max. (Like mana)
 	bool ShowOnlySelected;      /// if true, show only for selected units.
 
 	bool HideNeutral;           /// if true, don't show for neutral unit.
@@ -691,11 +691,11 @@ public:
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnit *unit) const;
 
-	char IsVertical;            /// if true, vertical bar, else horizontal.
-	char SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
+	bool IsVertical;            /// if true, vertical bar, else horizontal.
+	bool SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
 	int Height;                 /// Height of the bar.
 	int Width;                  /// Width of the bar.
-	char ShowFullBackground;    /// if true, show background like value equal to max.
+	bool ShowFullBackground;    /// if true, show background like value equal to max.
 	char BorderSize;            /// Size of the border, 0 for no border.
 // FIXME color depend of percent (red, Orange, Yellow, Green...)
 	Uint32 Color;               /// Color of bar.
@@ -792,25 +792,25 @@ public:
 
 class CBuildRestrictionAddOn : public CBuildRestriction {
 public:
-	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), ParentName(NULL), Parent(NULL) {};
-	virtual ~CBuildRestrictionAddOn() {delete[] this->ParentName;};
+	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), Parent(NULL) {};
+	virtual ~CBuildRestrictionAddOn() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
 	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
 
 	int OffsetX;         /// offset from the main building to place this
 	int OffsetY;         /// offset from the main building to place this
-	char *ParentName;    /// building that is unit is an addon too.
+	std::string ParentName; /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
 };
 
 class CBuildRestrictionOnTop : public CBuildRestriction {
 public:
-	CBuildRestrictionOnTop() : ParentName(NULL), Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
-	virtual ~CBuildRestrictionOnTop() {delete[] this->ParentName;};
+	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
+	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
 	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
 
-	char *ParentName;    /// building that is unit is an addon too.
+	std::string ParentName;  /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
 	int ReplaceOnDie;    /// recreate the parent on destruction
 	int ReplaceOnBuild;  /// remove the parent, or just build over it.
@@ -818,14 +818,14 @@ public:
 
 class CBuildRestrictionDistance : public CBuildRestriction {
 public:
-	CBuildRestrictionDistance() : Distance(0), RestrictTypeName(NULL), RestrictType(NULL) {};
-	virtual ~CBuildRestrictionDistance() {delete [] this->RestrictTypeName;};
+	CBuildRestrictionDistance() : Distance(0), RestrictType(NULL) {};
+	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
 	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
 
 	int Distance;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
-	char *RestrictTypeName;
+	std::string RestrictTypeName;
 	CUnitType *RestrictType;
 };
 
@@ -835,8 +835,7 @@ class CUnitType {
 public:
 	CUnitType() : Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 		ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
-		Animations(NULL), StillFrame(0),
-		CorpseName(NULL), CorpseType(NULL),
+		Animations(NULL), StillFrame(0), CorpseType(NULL),
 		Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
 		BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
@@ -900,10 +899,9 @@ public:
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
 
-	char *CorpseName;               /// Corpse type name
+	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
 
-	// this is taken from the UDTA section
 	CConstruction *Construction;    /// What is shown in construction phase
 
 	int _Costs[MaxCosts];           /// How many resources needed

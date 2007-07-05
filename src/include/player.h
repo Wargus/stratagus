@@ -417,14 +417,12 @@ class PlayerRace {
 public:
 	PlayerRace() : Count(0) {
 		memset(Visible, 0, sizeof(Visible));
-		memset(Name, 0, sizeof(Name));
-		memset(Display, 0, sizeof(Display));
 	}
 
-	char  Visible[MAX_RACES];  /// race should be visible in pulldown
-	char *Name[MAX_RACES];     /// race names
-	char *Display[MAX_RACES];  /// text to display in pulldown
-	int   Count;               /// number of races
+	bool Visible[MAX_RACES];        /// race should be visible in pulldown
+	std::string Name[MAX_RACES];     /// race names
+	std::string Display[MAX_RACES];  /// text to display in pulldown
+	unsigned int   Count;            /// number of races
 };
 
 
@@ -498,10 +496,10 @@ enum NotifyType {
 extern int NumPlayers;             /// How many player slots used
 extern CPlayer Players[PlayerMax];  /// All players
 extern CPlayer *ThisPlayer;         /// Player on local computer
-extern int NoRescueCheck;          /// Disable rescue check
+extern bool NoRescueCheck;          /// Disable rescue check
 extern SDL_Color *PlayerColorsRGB[PlayerMax]; /// Player colors
 extern Uint32 *PlayerColors[PlayerMax];       /// Player colors
-extern char *PlayerColorNames[PlayerMax];  /// Player color names
+extern std::string PlayerColorNames[PlayerMax];  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races
 
@@ -516,11 +514,11 @@ extern int PlayerColorIndexCount;
 ----------------------------------------------------------------------------*/
 
 	/// Init players
-extern void InitPlayers(void);
+extern void InitPlayers();
 	/// Clean up players
-extern void CleanPlayers(void);
+extern void CleanPlayers();
 	/// Clean up races
-extern void CleanRaces(void);
+extern void CleanRaces();
 	/// Save players
 extern void SavePlayers(CFile *file);
 
@@ -529,9 +527,9 @@ extern void CreatePlayer(int type);
 
 
 	/// Initialize the computer opponent AI
-extern void PlayersInitAi(void);
+extern void PlayersInitAi();
 	/// Called each game cycle for player handlers (AI)
-extern void PlayersEachCycle(void);
+extern void PlayersEachCycle();
 	/// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 
@@ -541,10 +539,10 @@ extern void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite);
 #endif
 
 	/// Output debug informations for players
-extern void DebugPlayers(void);
+extern void DebugPlayers();
 
 	/// register ccl features
-extern void PlayerCclRegister(void);
+extern void PlayerCclRegister();
 
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) \
