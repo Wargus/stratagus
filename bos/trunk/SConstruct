@@ -80,6 +80,63 @@ def buildSourcesList(builddir):
    return sources
 sourcesEngine = buildSourcesList('build')
 
+def ParseConfig(env, command, function=None):
+    import string
+
+    """
+    Copied from the scons, copyright 2001-2004 The SCons Foundation.
+    Adapted by Francois Beerten to use the exit value of pkg-config.
+    """
+    # the default parse function
+    def parse_conf(env, output):
+        dict = {
+           'ASFLAGS'       : [],
+           'CCFLAGS'       : [],
+           'CPPFLAGS'      : [],
+           'CPPPATH'       : [],
+           'LIBPATH'       : [],
+           'LIBS'          : [],
+           'LINKFLAGS'     : [],
+        }
+        static_libs = []
+
+        params = string.split(output)
+        for arg in params:
+            if arg[0] != '-':
+                static_libs.append(arg)
+            elif arg[:2] == '-L':
+                dict['LIBPATH'].append(arg[2:])
+            elif arg[:2] == '-l':
+                dict['LIBS'].append(arg[2:])
+            elif arg[:2] == '-I':
+                dict['CPPPATH'].append(arg[2:])
+            elif arg[:4] == '-Wa,':
+                dict['ASFLAGS'].append(arg)
+            elif arg[:4] == '-Wl,':
+                dict['LINKFLAGS'].append(arg)
+            elif arg[:4] == '-Wp,':
+                dict['CPPFLAGS'].append(arg)
+            elif arg == '-pthread':
+                dict['CCFLAGS'].append(arg)
+                dict['LINKFLAGS'].append(arg)
+            else:
+                dict['CCFLAGS'].append(arg)
+        apply(env.Append, (), dict)
+        return static_libs
+
+     if function is None:
+         function = parse_conf
+     if type(command) is type([]):
+         command = string.join(command)
+     command = env.subst(command)
+     _, f, _ = os.popen3(command)
+     read = f.read()
+     exitcode = f.close()
+     if exitcode == None:
+         return (0, function(env, read))
+     else:
+         return (exitcode, [])
+
 def CheckOpenGL(env, conf):
   opengl = {}
   opengl['linux'] = { 
@@ -104,31 +161,40 @@ def CheckOpenGL(env, conf):
 
 def CheckLuaLib(env, conf):
   if not 'USE_WIN32' in env['CPPDEFINES']:
-    if env.WhereIs('lua-config'):
-       env.ParseConfig('lua-config --include --libs')
-    elif env.WhereIs('pkg-config'):
-       env.ParseConfig('pkg-config --cflags --libs lua5.1')
+     if env.WhereIs('lua-config'):
+        env.ParseConfig('lua-config --include --libs')
+     elif env.WhereIs('pkg-config'):
+        for packagename in ['lua5.1', 'lua51', 'lua']:
+           exitcode, _ = ParseConfig(env, 'pkg-config --cflags --libs ' + packagename)
+           if exitcode == 0:
+              break
   found = 0
   if conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
-    found = 1
+    found = 'lua'
   if not found and conf.CheckLibWithHeader('lua50', 'lua.h', 'c'):
-    found =1
+    found = 'lua50'
   if not found and conf.CheckLibWithHeader('lua5.0', 'lua.h', 'c'):
-    found =1
+    found = 'lua5.0'
   if not found and conf.CheckLibWithHeader('lua51', 'lua.h', 'c'):
     return 1
   if not found and conf.CheckLibWithHeader('lua5.1', 'lua.h', 'c'):
     return 1
-  if not found:
+  if found == 0:
     return 0
 
+  lualibfound = 0
+  if conf.CheckFunc('luaopen_base'):
+     return 1
   if conf.CheckLibWithHeader('lualib', 'lualib.h', 'c'):
-     return 1
-  if conf.CheckLibWithHeader('lualib50', 'lualib.h', 'c'):
-     return 1
-  if conf.CheckLibWithHeader('lualib5.0', 'lualib.h', 'c'):
-     return 1
-  return 0
+     lualibfound = 1
+  elif conf.CheckLibWithHeader('lualib50', 'lualib.h', 'c'):
+     lualibfound = 1
+  elif conf.CheckLibWithHeader('lualib5.0', 'lualib.h', 'c'):
+     lualibfound = 1
+  # the lua library should be after lualib
+  env["LIBS"].remove(found)
+  env.Append(LIBS = found)
+  return lualibfound and found != 0
 
 def AutoConfigure(env):
   conf = Configure(env)
