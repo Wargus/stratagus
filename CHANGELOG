@@ -1,7 +1,8 @@
 Change log for Bos Wars
 -----------------------
 Version 2.4.0:
-- Add detection of strnlen availability in SConstruct (Francois Beerten)
+- Improve the detection of lua in SConstruct (Francois Beerten)
+- Add detection of strnlen in SConstruct (Francois Beerten)
 
 Version 2.4.0 prerelease (2007 7 3):
 - Added game types (Jimmy Salmon)
