@@ -124,18 +124,18 @@ def ParseConfig(env, command, function=None):
         apply(env.Append, (), dict)
         return static_libs
 
-     if function is None:
-         function = parse_conf
-     if type(command) is type([]):
-         command = string.join(command)
-     command = env.subst(command)
-     _, f, _ = os.popen3(command)
-     read = f.read()
-     exitcode = f.close()
-     if exitcode == None:
-         return (0, function(env, read))
-     else:
-         return (exitcode, [])
+    if function is None:
+        function = parse_conf
+    if type(command) is type([]):
+        command = string.join(command)
+    command = env.subst(command)
+    _, f, _ = os.popen3(command)
+    read = f.read()
+    exitcode = f.close()
+    if exitcode == None:
+        return (0, function(env, read))
+    else:
+        return (exitcode, [])
 
 def CheckOpenGL(env, conf):
   opengl = {}
