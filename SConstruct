@@ -161,6 +161,8 @@ def AutoConfigure(env):
   # check for optional functions
   if conf.CheckFunc('strcasestr'):
      env.Append(CPPDEFINES = 'HAVE_STRCASESTR')
+  if conf.CheckFunc('strnlen'):
+     env.Append(CPPDEFINES = 'HAVE_STRNLEN')
 
   # check for optional headers
   if (conf.CheckHeader('X11/Xlib.h') and conf.CheckHeader('X11/Xatom.h') and
