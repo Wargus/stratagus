@@ -10,7 +10,7 @@
 //
 /**@name mouse.cpp - The mouse handling. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -325,29 +325,25 @@ void DoRightButton(int sx, int sy)
 					}
 					continue;
 				}
-
-				if (Map.WallOnMap(x, y)) {
-					if (unit->Player->Race == PlayerRaceHuman &&
-							Map.OrcWallOnMap(x, y)) {
-						SendCommandAttack(unit, x, y, NoUnitP, flush);
-						continue;
-					}
-					if (unit->Player->Race == PlayerRaceOrc &&
-							Map.HumanWallOnMap(x, y)) {
-						SendCommandAttack(unit, x, y, NoUnitP, flush);
-						continue;
-					}
-				}
-
 				if ((dest->Player == unit->Player || unit->IsAllied(dest)) &&
 						dest != unit) {
 					dest->Blink = 4;
 					SendCommandFollow(unit, dest, flush);
 					continue;
 				}
-
 			}
-
+			if (Map.WallOnMap(x, y)) {
+				if (unit->Player->Race == PlayerRaceHuman &&
+						Map.OrcWallOnMap(x, y)) {
+					SendCommandAttack(unit, x, y, NoUnitP, flush);
+					continue;
+				}
+				if (unit->Player->Race == PlayerRaceOrc &&
+						Map.HumanWallOnMap(x, y)) {
+					SendCommandAttack(unit, x, y, NoUnitP, flush);
+					continue;
+				}
+			}
 			// empty space
 			if ((KeyModifiers & ModifierControl)) {
 				if (RightButtonAttacks) {
