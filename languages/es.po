@@ -82,15 +82,15 @@ msgstr "La Unidad no se puede situar alli."
 
 #: editor/editloop.cpp:1380
 msgid "Mirror editing enabled: 2-side"
-msgstr "Mirror editing enabled: 2-side"
+msgstr "Edicion mirror disponible: 2 lados"
 
 #: editor/editloop.cpp:1383
 msgid "Mirror editing enabled: 4-side"
-msgstr "Mirror editing enabled: 4-side"
+msgstr "Edicion mirror disponible : 4 lados"
 
 #: editor/editloop.cpp:1386
 msgid "Mirror editing disabled"
-msgstr "Mirror editing deshabilitado"
+msgstr "Edicion mirror deshabilitada"
 
 #: editor/editloop.cpp:1406
 msgid "Unit deleted"
@@ -98,11 +98,11 @@ msgstr "Unidad eliminada"
 
 #: editor/editloop.cpp:1429 editor/editloop.cpp:1438
 msgid "Unit owner modified"
-msgstr "Propietarioa de la Unidad modificado"
+msgstr "Propietario de la Unidad modificado"
 
 #: editor/editloop.cpp:1759
 msgid "Select mode"
-msgstr "Selecciona modo"
+msgstr "Modo Seleccion"
 
 #: editor/editloop.cpp:1769
 msgid "Unit mode"
@@ -173,9 +173,9 @@ msgid "Cannot create more units."
 msgstr "No se pueden crear mas unidades."
 
 #: stratagus/stratagus.cpp:735
-#, fuzzy, c-format
+#, c-format
 msgid "Thanks for playing Bos Wars.\n"
-msgstr "Gracias por jugar a Stratagus.\n"
+msgstr "Gracias por jugar a Bos Wars.\n"
 
 #: ui/botpanel.cpp:666 ui/botpanel.cpp:731
 msgid "Select Target"
@@ -216,7 +216,7 @@ msgstr "Volver a la Partida"
 
 #: ui/interface.cpp:312
 msgid "Big map enabled"
-msgstr "Habilitar Grandes Mapas"
+msgstr "Habilitar Mapa Grande"
 
 #: ui/interface.cpp:321
 msgid "Returning to old map"
@@ -248,11 +248,11 @@ msgstr "se ha realizado un captura de pantalla."
 
 #: ui/mainscr.cpp:694
 msgid "Energy"
-msgstr ""
+msgstr "Energia"
 
 #: ui/mainscr.cpp:694
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: ui/mainscr.cpp:919
 #, c-format

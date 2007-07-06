@@ -64,7 +64,7 @@ msgstr "Razings"
 
 #: scripts/guichan.lua:276
 msgid "~!Continue"
-msgstr "~!Continua"
+msgstr "~!Continuar"
 
 #: scripts/guichan.lua:352
 msgid "Start Game"
@@ -147,37 +147,37 @@ msgstr "baja"
 #: scripts/guichan.lua:382 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
-msgstr ""
+msgstr "Tipo de partida"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
-msgstr ""
+msgstr "Valores por Defecto del Mapa"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
-msgstr ""
+msgstr "Melee"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
-msgstr ""
+msgstr "Libre para Todos"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
-msgstr ""
+msgstr "Arriba vs Abajo"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
-msgstr ""
+msgstr "Izquierda vs Derecha"
 
 #: scripts/guichan.lua:383 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
-msgstr ""
+msgstr "Humano vs Maquina "
 
 #: scripts/guichan.lua:413 scripts/guichan.lua:444 scripts/guichan.lua:487
 #: scripts/guichan.lua:555 scripts/guichan.lua:606
@@ -413,7 +413,7 @@ msgstr "Energia"
 
 #: scripts/menus/ingame/editor.lua:207
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: scripts/menus/ingame/game.lua:58
 msgid "Game Menu"
@@ -559,18 +559,16 @@ msgid "Keystroke ~!Help"
 msgstr "~!Ayuda del teclado"
 
 #: scripts/menus/ingame/game.lua:377
-#, fuzzy
 msgid "Bos Wars ~!Tips"
-msgstr "Creditos de Bos Wars"
+msgstr "Consejos de Bos Wars"
 
 #: scripts/menus/ingame/game.lua:455
 msgid "Keystroke Help Menu"
 msgstr "Menu de Ayuda del teclado"
 
 #: scripts/menus/ingame/game.lua:490
-#, fuzzy
 msgid "Bos Wars Tips"
-msgstr "Creditos de Bos Wars"
+msgstr "Consejos de Bos Wars"
 
 #: scripts/menus/ingame/game.lua:521
 msgid "Show tips at startup"
@@ -578,11 +576,11 @@ msgstr "Mostrar consejos al inicio"
 
 #: scripts/menus/ingame/game.lua:529
 msgid "~!Previous Tip"
-msgstr " ~!Siguiente Consejo"
+msgstr " ~!Anterior"
 
 #: scripts/menus/ingame/game.lua:531
 msgid "~!Next Tip"
-msgstr "~!Anterior Consejo"
+msgstr "~!Siguiente"
 
 #: scripts/menus/ingame/game.lua:543
 msgid "Objectives"
