@@ -3314,9 +3314,7 @@ int ViewPointDistanceToUnit(const CUnit *dest)
 */
 int CanTarget(const CUnitType *source, const CUnitType *dest)
 {
-	int i;
-
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
+	for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
 		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
 			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
 				return 0;
@@ -3348,8 +3346,6 @@ int CanTarget(const CUnitType *source, const CUnitType *dest)
 */
 int CanTransport(const CUnit *transporter, const CUnit *unit)
 {
-	int i;
-
 	if (!transporter->Type->CanTransport) {
 		return 0;
 	}
@@ -3371,7 +3367,7 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 	if (!transporter->IsTeamed(unit)) {
 		return 0;
 	}
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
+	for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
 		if (transporter->Type->CanTransport[i] != CONDITION_TRUE) {
 			if ((transporter->Type->CanTransport[i] == CONDITION_ONLY) ^
 					unit->Type->BoolFlag[i]) {
@@ -3732,9 +3728,9 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	}
 	file->printf("\"ttl\", %lu, ", unit->TTL);
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) {
 			file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
-				UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
+				UnitTypeVar.VariableName[i].c_str(), unit->Variable[i].Value, unit->Variable[i].Max,
 				unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
 	}
 

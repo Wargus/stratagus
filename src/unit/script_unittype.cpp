@@ -218,7 +218,7 @@ static int CclDefineUnitType(lua_State *l)
 	CUnitType *type;
 	ResourceInfo *res;
 	const char *str;
-	int i;
+	unsigned int i;
 	int redefine;
 	int subargs;
 	int k;
@@ -357,12 +357,12 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			subargs = luaL_getn(l, -1);
 			type->Portrait.Num = subargs;
-			type->Portrait.Files = new char *[type->Portrait.Num * sizeof(char *)];
+			type->Portrait.Files = new std::string[type->Portrait.Num];
 			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
 			memset(type->Portrait.Mngs, 0, type->Portrait.Num * sizeof(Mng *));
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				type->Portrait.Files[k] = new_strdup(LuaToString(l, -1));
+				type->Portrait.Files[k] = LuaToString(l, -1);
 				lua_pop(l, 1);
 			}
 #endif
@@ -462,7 +462,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "PersonReactionRange")) {
 			type->ReactRangePerson = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Missile")) {
-			type->Missile.Name = new_strdup(LuaToString(l, -1));
+			type->Missile.Name = LuaToString(l, -1);
 			type->Missile.Missile = NULL;
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
@@ -629,7 +629,7 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 				for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-					if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
+					if (!strcmp(value, UnitTypeVar.BoolFlagName[i].c_str())) {
 						lua_rawgeti(l, -1, k + 1);
 						value = LuaToString(l, -1);
 						lua_pop(l, 1);
@@ -813,7 +813,7 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 				++k;
 				for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-					if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
+					if (!strcmp(value, UnitTypeVar.BoolFlagName[i].c_str())) {
 						lua_rawgeti(l, -1, k + 1);
 						value = LuaToString(l, -1);
 						lua_pop(l, 1);
@@ -892,7 +892,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else {
 			i = GetVariableIndex(value);
-			if (i != -1) { // valid index
+			if (i != (unsigned int) -1) { // valid index
 				if (lua_isboolean(l, -1)) {
 					type->Variable[i].Enable = LuaToBoolean(l, -1);
 				} else if (lua_istable(l, -1)) {
@@ -907,7 +907,7 @@ static int CclDefineUnitType(lua_State *l)
 				continue;
 			}
 			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined bool flags
-				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
+				if (!strcmp(value, UnitTypeVar.BoolFlagName[i].c_str())) {
 					type->BoolFlag[i] = LuaToBoolean(l, -1);
 					break;
 				}
@@ -1474,8 +1474,8 @@ void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
 */
 int GetVariableIndex(const char *varname)
 {
-	for (int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-		if (!strcmp(varname, UnitTypeVar.VariableName[i])) {
+	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		if (!strcmp(varname, UnitTypeVar.VariableName[i].c_str())) {
 			return i;
 		}
 	}
@@ -1490,7 +1490,7 @@ int GetVariableIndex(const char *varname)
 static int CclDefineVariables(lua_State *l)
 {
 	const char *str;
-	int i;
+	unsigned int i;
 	int j;
 	int args;
 
@@ -1498,19 +1498,20 @@ static int CclDefineVariables(lua_State *l)
 	for (j = 0; j < args; ++j) {
 		str = LuaToString(l, j + 1);
 		i = GetVariableIndex(str);
-		if (i == -1) { // new variable.
+		if (i == (unsigned int) -1) { // new variable.
 			i = UnitTypeVar.NumberVariable;
-			char **v = new char *[i + 1];
-			memcpy(v, UnitTypeVar.VariableName, i * sizeof(char *));
-			delete[] UnitTypeVar.VariableName;
-			UnitTypeVar.VariableName = v;
-			UnitTypeVar.VariableName[i] = new_strdup(str);
 
+			std::string *v = new std::string[i + 1];
 			CVariable *t = new CVariable[i + 1];
-			for (int x = 0; x < i; ++x) {
+
+			for (unsigned int x = 0; x < i; ++x) {
 				t[x] = UnitTypeVar.Variable[x];
+				v[x] = UnitTypeVar.VariableName[x];
 			}
+			v[i] = str;
+			delete[] UnitTypeVar.VariableName;
 			delete[] UnitTypeVar.Variable;
+			UnitTypeVar.VariableName = v;
 			UnitTypeVar.Variable = t;
 			UnitTypeVar.NumberVariable++;
 		} else {
@@ -1533,30 +1534,31 @@ static int CclDefineVariables(lua_State *l)
 static int CclDefineBoolFlags(lua_State *l)
 {
 	const char *str;    // Name of the bool flags to define.
-	int i;              // iterator for flags.
-	int j;              // iterator for arguments.
+	unsigned int i;     // iterator for flags.
 	int args;           // number of arguments.
-	int old;            // Old number of defined bool flags
+	unsigned int old;   // Old number of defined bool flags
 
 	old = UnitTypeVar.NumberBoolFlag;
 	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		str = LuaToString(l, j + 1);
 		for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-			if (!strcmp(str, UnitTypeVar.BoolFlagName[i])) {
+			if (!strcmp(str, UnitTypeVar.BoolFlagName[i].c_str())) {
 				DebugPrint("Warning, Bool flags already defined\n");
 				break;
 			}
 		}
 		if (i != UnitTypeVar.NumberBoolFlag) {
-			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ UnitTypeVar.BoolFlagName[i]);
+			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ UnitTypeVar.BoolFlagName[i].c_str());
 			continue;
 		}
-		char **b = new char *[UnitTypeVar.NumberBoolFlag + 1];
-		memcpy(b, UnitTypeVar.BoolFlagName, UnitTypeVar.NumberBoolFlag * sizeof(char *));
+		std::string *b = new std::string[UnitTypeVar.NumberBoolFlag + 1];
+		for (unsigned int j = 0; j < i; ++j) {
+			b[j] = UnitTypeVar.BoolFlagName[j];
+		}
 		delete[] UnitTypeVar.BoolFlagName;
 		UnitTypeVar.BoolFlagName = b;
-		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = new_strdup(str);
+		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = str;
 	}
 	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
@@ -1874,7 +1876,7 @@ void UpdateUnitVariables(const CUnit *unit)
 		if (unit->Variable[i].Value > unit->Variable[i].Max) {
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
 						" value = %d, max = %d\n"
-						_C_ type->Ident.c_str() _C_ unit->Slot _C_ UnitTypeVar.VariableName[i]
+						_C_ type->Ident.c_str() _C_ unit->Slot _C_ UnitTypeVar.VariableName[i].c_str()
 						_C_ unit->Variable[i].Value _C_ unit->Variable[i].Max);
 		}
 #endif
@@ -1932,9 +1934,9 @@ void InitDefinedVariables()
 	int i;
 
 	// Variables.
-	UnitTypeVar.VariableName = new char *[NVARALREADYDEFINED];
+	UnitTypeVar.VariableName = new std::string[NVARALREADYDEFINED];
 	for (i = 0; i < NVARALREADYDEFINED; ++i) {
-		UnitTypeVar.VariableName[i] = new_strdup(var[i]);
+		UnitTypeVar.VariableName[i] = var[i];
 	}
 	UnitTypeVar.Variable = new CVariable[i];
 	UnitTypeVar.NumberVariable = i;

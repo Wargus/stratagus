@@ -502,7 +502,7 @@ char Ccl2Condition(lua_State *l, const char *value)
 static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 {
 	const char *value;
-	int i;
+	unsigned int i;
 	int args;
 	int j;
 
@@ -548,7 +548,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			lua_pop(l, 1);
 		} else {
 			for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
-				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
+				if (!strcmp(value, UnitTypeVar.BoolFlagName[i].c_str())) {
 					lua_rawgeti(l, -1, j + 1);
 					condition->BoolFlag[i] = Ccl2Condition(l, LuaToString(l, -1));
 					lua_pop(l, 1);
@@ -559,7 +559,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 				continue;
 			}
 			i = GetVariableIndex(value);
-			if (i != -1) { // Valid index.
+			if (i != (unsigned int) -1) { // Valid index.
 				lua_rawgeti(l, -1, j + 1);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "Table expected in variable in condition");

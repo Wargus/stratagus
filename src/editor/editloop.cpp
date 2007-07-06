@@ -2013,7 +2013,7 @@ void CEditor::Init(void)
 
 	CalculateMaxIconSize();
 
-	if (StartUnitName) {
+	if (!StartUnitName.empty()) {
 		StartUnit = UnitTypeByIdent(StartUnitName);
 	}
 	Select.Icon = NULL;

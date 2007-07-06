@@ -86,7 +86,7 @@ static void UnitRotate(CUnit *unit, int rotate)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowAnimation(CUnit *unit, const CAnimation *anim) 
+int UnitShowAnimation(CUnit *unit, const CAnimation *anim)
 {
 	return UnitShowAnimationScaled(unit, anim, 8);
 }
@@ -408,10 +408,6 @@ static void HandleRegenerations(CUnit *unit)
 */
 static void HandleBuffs(CUnit *unit, int amount)
 {
-	int deadunit;
-	int i;        // iterator for variables.
-
-	deadunit = 0;
 	//
 	// Look if the time to live is over.
 	//
@@ -429,7 +425,6 @@ static void HandleBuffs(CUnit *unit, int amount)
 	//
 	//  decrease spells effects time.
 	//
-
 	unit->Variable[BLOODLUST_INDEX].Increase = -amount;
 	unit->Variable[HASTE_INDEX].Increase = -amount;
 	unit->Variable[SLOW_INDEX].Increase = -amount;
@@ -437,7 +432,7 @@ static void HandleBuffs(CUnit *unit, int amount)
 	unit->Variable[UNHOLYARMOR_INDEX].Increase = -amount;
 
 	// User defined variables
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) {
 		if (unit->Variable[i].Enable && unit->Variable[i].Increase) {
 			unit->Variable[i].Value += unit->Variable[i].Increase;
 			if (unit->Variable[i].Value <= 0) {
@@ -450,7 +445,7 @@ static void HandleBuffs(CUnit *unit, int amount)
 }
 
 /**
-**  Handle the action of an unit.
+**  Handle the action of a unit.
 **
 **  @param unit  Pointer to handled unit.
 */

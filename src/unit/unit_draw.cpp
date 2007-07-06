@@ -88,11 +88,11 @@ public:
 
 
 /**
-**	Structure grouping all Sprites for decoration.
+**  Structure grouping all Sprites for decoration.
 */
 class DecoSpriteType {
 public:
-	std::vector<char *> Name;            /// Name of the sprite.
+	std::vector<std::string> Name;       /// Name of the sprite.
 	std::vector<Decoration> SpriteArray; /// Sprite to display variable.
 };
 
@@ -292,8 +292,8 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1, int x2, int y2)
 int GetSpriteIndex(const char *SpriteName)
 {
 	Assert(SpriteName);
-	for (int i = 0; i < (int)DecoSprite.Name.size(); ++i) {
-		if (!strcmp(SpriteName, DecoSprite.Name[i])) {
+	for (unsigned int i = 0; i < DecoSprite.Name.size(); ++i) {
+		if (!strcmp(SpriteName, DecoSprite.Name[i].c_str())) {
 			return i;
 		}
 	}
@@ -354,7 +354,7 @@ static int CclDefineSprites(lua_State *l)
 		index = GetSpriteIndex(name);
 		if (index == -1) { // new sprite.
 			index = DecoSprite.SpriteArray.size();
-			DecoSprite.Name.push_back(new_strdup(name));
+			DecoSprite.Name.push_back(name);
 			DecoSprite.SpriteArray.push_back(deco);
 		} else {
 			DecoSprite.SpriteArray[index].File.clear();
@@ -395,10 +395,9 @@ void LoadDecorations(void)
 /**
 **  Clean decorations.
 */
-void CleanDecorations(void)
+void CleanDecorations()
 {
-	for (int i = 0; i < (int)DecoSprite.SpriteArray.size(); ++i) {
-		delete[] DecoSprite.Name[i];
+	for (unsigned int i = 0; i < DecoSprite.SpriteArray.size(); ++i) {
 		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);
 	}
 

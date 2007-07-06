@@ -107,27 +107,22 @@ int DefaultResourceAmounts[MaxCosts];
 */
 void UpdateStats(int reset)
 {
-	CUnitType *type;
-	CUnitStats *stats;
-	int player;
-	unsigned i;
-
 	//
 	//  Update players stats
 	//
 	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		type = UnitTypes[j];
+		CUnitType *type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
-			for (player = 0; player < PlayerMax; ++player) {
-				stats = &type->Stats[player];
-				for (i = 0; i < MaxCosts; ++i) {
+			for (int player = 0; player < PlayerMax; ++player) {
+				CUnitStats *stats = &type->Stats[player];
+				for (unsigned int i = 0; i < MaxCosts; ++i) {
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (!stats->Variables) {
 					stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
 				}
-				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
+				for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) {
 					stats->Variables[i] = type->Variable[i];
 				}
 			}
@@ -233,24 +228,21 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int plynr,
 	CFile *file)
 {
-	int j;
-
 	Assert(plynr < PlayerMax);
 	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
-	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) {
+	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
-			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
-			stats->Variables[j].Max, stats->Variables[j].Increase,
-			stats->Variables[j].Enable ? ", Enable = true" : "");
+			UnitTypeVar.VariableName[i].c_str(), stats->Variables[i].Value,
+			stats->Variables[i].Max, stats->Variables[i].Increase,
+			stats->Variables[i].Enable ? ", Enable = true" : "");
 	}
 	file->printf("\"costs\", {");
-	for (j = 0; j < MaxCosts; ++j) {
-		if (j) {
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (i) {
 			file->printf(" ");
 		}
-		file->printf("\"%s\", %d,", DefaultResourceNames[j], stats->Costs[j]);
+		file->printf("\"%s\", %d,", DefaultResourceNames[i], stats->Costs[i]);
 	}
-
 	file->printf("})\n");
 }
 
@@ -622,12 +614,6 @@ void CleanUnitTypes(void)
 	UnitTypes.clear();
 	UnitTypeMap.clear();
 
-	for (j = 0; j < UnitTypeVar.NumberBoolFlag; ++j) { // User defined flags
-		delete[] UnitTypeVar.BoolFlagName[j];
-	}
-	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
-		delete[] UnitTypeVar.VariableName[j];
-	}
 	delete[] UnitTypeVar.BoolFlagName;
 	UnitTypeVar.BoolFlagName = NULL;
 	UnitTypeVar.NumberBoolFlag = 0;

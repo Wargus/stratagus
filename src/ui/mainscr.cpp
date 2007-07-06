@@ -169,8 +169,6 @@ static void UiDrawManaBar(const CUnit *unit, int x, int y)
 */
 static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 {
-	int i;
-
 	Assert(unit);
 	if (!condition) {
 		return true;
@@ -182,7 +180,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 		return false;
 	}
 	if (condition->BoolFlags) {
-		for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
+		for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
 			if (condition->BoolFlags[i] != CONDITION_TRUE) {
 				if ((condition->BoolFlags[i] == CONDITION_ONLY) ^ unit->Type->BoolFlag[i]) {
 					return false;
@@ -191,7 +189,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 		}
 	}
 	if (condition->Variables) {
-		for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit->Variable[i].Enable) {
 					return false;
@@ -226,7 +224,7 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 	CVariable *var;
 
 	Assert(unit);
-	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) index < UnitTypeVar.NumberVariable);
 
 	switch (t) {
 		case 0: // Unit:
@@ -275,7 +273,7 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 				val.s = DefaultResourceNames[unit->CurrentResource];
 			} else {
 				val.type = USTRINT_STR;
-				val.s = UnitTypeVar.VariableName[index];
+				val.s = UnitTypeVar.VariableName[index].c_str();
 			}
 			break;
 	}
@@ -334,7 +332,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 	Assert(font);
 
 	Assert(unit || this->Index == -1);
-	Assert(this->Index == -1 || (0 <= this->Index && this->Index < UnitTypeVar.NumberVariable));
+	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.NumberVariable));
 
 	if (this->Text) {
 		text = EvalString(this->Text);
@@ -404,7 +402,7 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) cons
 	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
 
-	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) this->Index < UnitTypeVar.NumberVariable);
 	usi1 = GetComponent(unit, this->Index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
 		sprintf(buf, this->Format, usi1.s);
@@ -488,7 +486,7 @@ void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
 void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	Assert(unit);
-	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) this->Index < UnitTypeVar.NumberVariable);
 	if (!unit->Variable[this->Index].Max) {
 		return;
 	}
@@ -526,7 +524,7 @@ void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	Assert(unit);
-	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) this->Index < UnitTypeVar.NumberVariable);
 	if (!unit->Variable[this->Index].Max) {
 		return;
 	}

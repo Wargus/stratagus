@@ -408,11 +408,9 @@ int SpawnMissile::Cast(CUnit *caster, const SpellType *spell,
 int AdjustVariable::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
-	int i;
-	CUnit *unit;    // unit to modify.
+	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		CUnit *unit = (this->Var[i].TargetIsCaster) ? caster : target;
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-		unit = (this->Var[i].TargetIsCaster) ? caster : target;
 		if (!unit) {
 			continue;
 		}
@@ -788,8 +786,6 @@ static Target *NewTargetPosition(int x, int y)
 static int PassCondition(const CUnit *caster, const SpellType *spell, const CUnit *target,
 	int x, int y, const ConditionInfo *condition)
 {
-	int i;
-
 	if (caster->Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
 		return 0;
 	}
@@ -801,8 +797,7 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 	if (!condition) { // no condition, pass.
 		return 1;
 	}
-
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) { // for custom variables
+	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) { // for custom variables
 		const CUnit *unit;
 
 		unit = (condition->Variable[i].ConditionApplyOnCaster) ? caster : target;
@@ -845,7 +840,7 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 	if (!target) {
 		return 1;
 	}
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
+	for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
 		if (condition->BoolFlag[i] != CONDITION_TRUE) {
 			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
 				return 0;

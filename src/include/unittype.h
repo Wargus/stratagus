@@ -889,7 +889,7 @@ public:
 	IconConfig Icon;                /// Icon to display for this unit
 #ifdef USE_MNG
 	struct _portrait_ {
-		char **Files;
+		std::string *Files;
 		int Num;
 		Mng **Mngs;
 		int CurrMng;
@@ -1023,13 +1023,13 @@ public:
 	CUnitTypeVar() : BoolFlagName(NULL), NumberBoolFlag(0),
 		VariableName(NULL), Variable(NULL), NumberVariable(0) {}
 
-	char **BoolFlagName;                /// Array of name of user defined bool flag.
-	int NumberBoolFlag;                 /// Number of user defined bool flag.
+	std::string *BoolFlagName;          /// Array of name of user defined bool flag.
+	unsigned int NumberBoolFlag;        /// Number of user defined bool flag.
 
-	char **VariableName;                /// Array of names of user defined variables.
+	std::string *VariableName;          /// Array of names of user defined variables.
 	CVariable *Variable;                /// Array of user defined variables (default value for unittype).
 //	EventType *Event;                   /// Array of functions sets to call when en event occurs.
-	int NumberVariable;                 /// Number of defined variables.
+	unsigned int NumberVariable;        /// Number of defined variables.
 
 	std::vector<CDecoVar *> DecoVar;    /// Array to describe how showing variable.
 };

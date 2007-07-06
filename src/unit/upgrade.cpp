@@ -496,7 +496,7 @@ static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *
 						unit->Orders[j]->Type == src) {
 						if (j == 0) {
 							// Must Adjust Ticks to the fraction that was trained
-							unit->Data.Train.Ticks = 
+							unit->Data.Train.Ticks =
 								unit->Data.Train.Ticks *
 								dst->Stats[player->Index].Costs[TimeCost] /
 								src->Stats[player->Index].Costs[TimeCost];
@@ -520,7 +520,6 @@ static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *
 static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 {
 	int z;                      // iterator on upgrade or unittype.
-	int j;                      // iterator on cost or variable.
 	int pn;                     // player number.
 	int varModified;            // 0 if variable is not modified.
 	int numunits;               // number of unit of the current type.
@@ -576,12 +575,12 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 				}
 			}
 			// upgrade costs :)
-			for (j = 0; j < MaxCosts; ++j) {
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				UnitTypes[z]->Stats[pn].Costs[j] += um->Modifier.Costs[j];
 			}
 
 			varModified = 0;
-			for (j = 0; j < UnitTypeVar.NumberVariable; j++) {
+			for (unsigned int j = 0; j < UnitTypeVar.NumberVariable; j++) {
 				varModified |= um->Modifier.Variables[j].Value
 					| um->Modifier.Variables[j].Max
 					| um->Modifier.Variables[j].Increase;
@@ -608,7 +607,7 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 					if (unit->Player->Index != player->Index) {
 						continue;
 					}
-					for (j = 0; j < UnitTypeVar.NumberVariable; j++) {
+					for (unsigned int j = 0; j < UnitTypeVar.NumberVariable; j++) {
 						unit->Variable[j].Value += um->Modifier.Variables[j].Value;
 						if (unit->Variable[j].Value < 0) {
 							unit->Variable[j].Value = 0;

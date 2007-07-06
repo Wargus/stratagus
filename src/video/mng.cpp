@@ -294,14 +294,14 @@ void Mng::Draw(int x, int y)
 **
 **  @param name  Name of the MNG file
 */
-int Mng::Load(const char *name)
+int Mng::Load(const std::string &name)
 {
 	mng_retcode myretcode;
 	char buf[PATH_MAX];
 
-	LibraryFileName(name, buf, sizeof(buf));
+	LibraryFileName(name.c_str(), buf, sizeof(buf));
 
-	this->name = new_strdup(buf);
+	this->name = buf;
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
 	if (handle == MNG_NULL) {
 		return -1;

@@ -500,7 +500,6 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 {
 	ConditionPanel *condition; // Condition parsed
 	const char *key;           // key of lua table.
-	int i;                     // iterator for flags and variable.
 
 	Assert(lua_istable(l, -1));
 
@@ -516,8 +515,10 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 			} else if (!strcmp(key, "ShowOpponent")) {
 				condition->ShowOpponent = LuaToBoolean(l, -1);
 		} else {
+			unsigned int i;
+
 			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-				if (!strcmp(key, UnitTypeVar.BoolFlagName[i])) {
+				if (!strcmp(key, UnitTypeVar.BoolFlagName[i].c_str())) {
 					if (!condition->BoolFlags) {
 						condition->BoolFlags = new char[UnitTypeVar.NumberBoolFlag];
 						memset(condition->BoolFlags, 0, UnitTypeVar.NumberBoolFlag * sizeof(char));
@@ -530,7 +531,7 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 				continue;
 			}
 			i = GetVariableIndex(key);
-			if (i != -1) {
+			if (i != (unsigned int) -1) {
 				if (!condition->Variables) {
 					condition->Variables = new char[UnitTypeVar.NumberVariable];
 					memset(condition->Variables, 0, UnitTypeVar.NumberVariable * sizeof(char));

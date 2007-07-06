@@ -161,11 +161,11 @@ class Mng {
 public:
 	Mng();
 	~Mng();
-	int Load(const char *name);
+	int Load(const std::string &name);
 	void Reset();
 	void Draw(int x, int y);
 
-	char *name;
+	std::string name;
 	FILE *fd;
 	mng_handle handle;
 	SDL_Surface *surface;
