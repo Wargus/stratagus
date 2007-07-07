@@ -41,7 +41,7 @@ function RunBriefingMenu(objectivestext, briefingtext)
   menu = BosMenu(_("Briefing"))
   local text = briefingtext .. 
       "\n\n" ..
-      _("Objectives :") ..
+      _("Objectives:") ..
       "         \n" ..
       objectivestext
   local t= MultiLineLabel(text)
@@ -54,7 +54,7 @@ function RunBriefingMenu(objectivestext, briefingtext)
   t:setBackgroundColor(dark)
   menu:add(t, Video.Width / 2 - 200, Video.Height / 20 * 3)
 
-  menu:addButton(_("Start"), "s", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("~!Start"), "s", Video.Width / 2 - 100, Video.Height - 100,
                  function() menu:stop() end)
 
   menu:run()
