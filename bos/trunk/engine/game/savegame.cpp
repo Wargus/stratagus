@@ -283,7 +283,7 @@ void SaveGame(const std::string &filename)
 	file.printf("} )\n\n");
 
 	// FIXME: probably not the right place for this
-	file.printf("SetGameCycle(%lu)\n", GameCycle);
+	file.printf("GameCycle = %lu\n", GameCycle);
 
 	SaveCcl(&file);
 	SaveUpgrades(&file);

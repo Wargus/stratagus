@@ -47,7 +47,6 @@
 <a href="#DefineRanks">DefineRanks</a>
 <a href="#Diplomacy">Diplomacy</a>
 <a href="#StratagusMap">StratagusMap</a>
-<a href="#GameCycle">GameCycle</a>
 <a href="#GetUnitVariable">GetUnitVariable</a>
 <a href="#GetCurrentLuaPath">GetCurrentLuaPath</a>
 <a href="#Group">Group</a>
@@ -66,7 +65,6 @@
 <a href="#Selection">Selection</a>
 <a href="#SetDefaultMap">SetDefaultMap</a>
 <a href="#SetDiplomacy">SetDiplomacy</a>
-<a href="#SetGameCycle">SetGameCycle</a>
 <a href="#SetGameName">SetGameName</a>
 <a href="#SetGamePaused">SetGamePaused</a>
 <a href="#SetGroupId">SetGroupId</a>
@@ -578,17 +576,6 @@ StratagusMap(
 }})
 </pre>
 
-<a name="GameCycle"></a>
-<h3>GameCycle()</h3>
-
-Returns the current game cycle.
-
-<h4>Example</h4>
-
-<pre>
-    cycle = GameCycle()
-</pre>
-
 <a name="GetCurrentLuaPath">
 <h3>GetCurrentLuaPath()</h3>
 
@@ -1044,25 +1031,6 @@ Alters the diplomacy setting between two players. eg enemy, allied
 <pre>
     -- Sets player 1 to be an enemy of player 0.
     SetDiplomacy(0, "enemy", 1)
-</pre>
-
-<a name="SetGameCycle"></a>
-<h3>SetGameCycle(cycle)</h3>
-
-Set the current game cycle number.
-
-
-<dl>
-<dt>cycle</dt>
-<dd>The game cycle number.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    -- Set the game cycle number to 100.
-    SetGameCycle(100)
 </pre>
 
 <a name="SetGameName"></a>

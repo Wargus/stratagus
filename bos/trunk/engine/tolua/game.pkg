@@ -32,6 +32,8 @@ extern bool GameRunning;
 extern bool GamePaused;
 extern bool GameObserve;
 
+extern unsigned long GameCycle;
+
 
 $#include "settings.h"
 
