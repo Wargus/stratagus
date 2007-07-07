@@ -1491,8 +1491,7 @@ void RescueUnits(void)
 				//  Look if ally near the unit.
 				//
 				for (i = 0; i < n; ++i) {
-					if (around[i]->Type->CanAttack &&
-							unit->IsAllied(around[i])) {
+					if (unit->IsAllied(around[i])) {
 #if 0
 						//
 						//  City center converts complete player

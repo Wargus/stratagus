@@ -1916,31 +1916,6 @@ static int CclListDirsInDirectory(lua_State *l)
 }
 
 /**
-**  Return the stratagus game-cycle
-**
-**  @param l  Lua state.
-**
-**  @return   Current game cycle.
-*/
-static int CclGameCycle(lua_State *l)
-{
-	lua_pushnumber(l, GameCycle);
-	return 1;
-}
-
-/**
-**  Set the stratagus game-cycle
-**
-**  @param l  Lua state.
-*/
-static int CclSetGameCycle(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	GameCycle = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
 **  Set the game paused or unpaused
 **
 **  @param l  Lua state.
@@ -2319,8 +2294,6 @@ void InitCcl(void)
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
-	lua_register(Lua, "GameCycle", CclGameCycle);
-	lua_register(Lua, "SetGameCycle", CclSetGameCycle);
 	lua_register(Lua, "SetGamePaused", CclSetGamePaused);
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
 	lua_register(Lua, "SetGameSpeed", CclSetGameSpeed);
