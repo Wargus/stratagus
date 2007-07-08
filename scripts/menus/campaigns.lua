@@ -33,11 +33,11 @@ function RunBriefingMenu(objectivestext, briefingtext)
   local b
 
   if objectivestext == nil then
-    current_objective = default_objective
+    SetObjectives(default_objective)
     return
   end
 
-  current_objective = objectivestext
+  SetObjectives(objectivestext)
   menu = BosMenu(_("Briefing"))
   local text = briefingtext .. 
       "\n\n" ..

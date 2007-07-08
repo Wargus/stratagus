@@ -281,9 +281,9 @@ end
 
 function RunMap(map, objective, fow, revealmap)
   if objective == nil then
-    current_objective = default_objective
+    SetObjectives(default_objective)
   else
-    current_objective = objective
+    SetObjectives(objective)
   end
   loop = true
   while (loop) do
@@ -300,6 +300,27 @@ function RunMap(map, objective, fow, revealmap)
     end
   end
   RunResultsMenu()
+end
+
+current_objectives = ""
+function ClearObjectives()
+  current_objectives = ""
+end
+
+function AddObjective(objective)
+  if (current_objectives ~= "") then
+    current_objectives = current_objective .. "\n" .. objective
+  else
+    current_objectives = objective
+  end
+end
+
+function SetObjectives(objectives)
+  current_objectives = objectives
+end
+
+function GetObjectives()
+  return current_objectives
 end
 
 
