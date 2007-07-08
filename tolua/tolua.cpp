@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 07/07/07 13:24:33.
+** Generated automatically by tolua++-1.0.92 on 07/07/07 19:15:00.
 */
 
 #ifndef __cplusplus
@@ -15679,6 +15679,32 @@ static int tolua_stratagus_StopChannel00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: StopAllChannels */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StopAllChannels00
+static int tolua_stratagus_StopAllChannels00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   StopAllChannels();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StopAllChannels'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: UnitTypes of class  CEditor */
 #ifndef TOLUA_DISABLE_tolua_get_CEditor_UnitTypes
 static int tolua_get_CEditor_UnitTypes(lua_State* tolua_S)
@@ -18397,6 +18423,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"SetChannelVolume",tolua_stratagus_SetChannelVolume00);
   tolua_function(tolua_S,"SetChannelStereo",tolua_stratagus_SetChannelStereo00);
   tolua_function(tolua_S,"StopChannel",tolua_stratagus_StopChannel00);
+  tolua_function(tolua_S,"StopAllChannels",tolua_stratagus_StopAllChannels00);
   tolua_constant(tolua_S,"EditorNotRunning",EditorNotRunning);
   tolua_constant(tolua_S,"EditorStarted",EditorStarted);
   tolua_constant(tolua_S,"EditorCommandLine",EditorCommandLine);
