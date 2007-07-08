@@ -10,9 +10,8 @@
 #(Parameter.set 'Audio_Required_Rate 22050)
 #(set! voice_default 'voice_us1_mbrola)
 
-# TODO
 # text2wave file.txt -o output.wav
-# use a $LIST for buildings, generate 2 texts : 
+# use a list for buildings, generate 2 texts for each : 
 # - "$BUILDING construction completed."
 # - "$BUILDING under attack!"
 
