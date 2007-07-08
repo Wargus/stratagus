@@ -93,6 +93,8 @@ extern void SetChannelFinishedCallback(int channel, void (*callback)(int channel
 extern CSample *GetChannelSample(int channel);
 	/// Stop a channel
 extern void StopChannel(int channel);
+	/// Stop all channels
+extern void StopAllChannels();
 
 	/// Load a sample
 extern CSample *LoadSample(const std::string &name);
