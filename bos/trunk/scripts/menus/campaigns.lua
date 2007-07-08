@@ -28,9 +28,10 @@
 --      $Id$
 
 
-function RunBriefingMenu(objectivestext, briefingtext)
+function RunBriefingMenu(objectivestext, briefingtext, briefingsound)
   local menu
   local b
+  local channel = nil
 
   if objectivestext == nil then
     SetObjectives(default_objective)
@@ -55,7 +56,14 @@ function RunBriefingMenu(objectivestext, briefingtext)
   menu:add(t, Video.Width / 2 - 200, Video.Height / 20 * 3)
 
   menu:addButton(_("~!Start"), "s", Video.Width / 2 - 100, Video.Height - 100,
-                 function() menu:stop() end)
+    function()
+      if (channel ~= nil) then StopChannel(channel) end
+      menu:stop()
+    end)
+
+  if (briefingsound ~= nil) then
+    channel = PlaySoundFile(briefingsound, function() channel = nil end)
+  end
 
   menu:run()
 end
@@ -84,9 +92,9 @@ function AddCampaignFinalAssault(when, text)
 end
 
 
-function CreateMapStep(map, objectivestext, briefingtext)
+function CreateMapStep(map, objectivestext, briefingtext, briefingsound)
    function RunCampaignMap()
-     RunBriefingMenu(objectivestext, briefingtext)
+     RunBriefingMenu(objectivestext, briefingtext, briefingsound)
      Load(map) -- Needed to force the load of the presentation
      RunMap(map, objectivestext) 
    end
