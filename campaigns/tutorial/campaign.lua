@@ -36,7 +36,8 @@ campaign_steps = {
     "We've received unconfirmed reports about an enemy attack on our "..
     "new base E418. We are no longer receiving radio transmissions so "..
     "we need you to go investigate.\n\n"..
-    "-- End transmission --"),
+    "-- End transmission --",
+    "campaigns/tutorial/level01.wav"),
 --[[
   CreateMapStep("campaigns/tutorial/level02.smp",
     "Train 2 engineers and build 1 power plant",
