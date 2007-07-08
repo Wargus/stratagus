@@ -36,8 +36,13 @@ CreateUnit("unit-vault", 1, {22, 38})
 
 DisallowAllUnits()
 
+local function Play(sound)
+  StopAllChannels()
+  PlaySoundFile("campaigns/tutorial/" .. sound, function() end)
+end
 
-function GetOwnUnitsAmount(type)
+
+local function GetOwnUnitsAmount(type)
   return ThisPlayer.UnitTypesCount[UnitTypeByIdent(type).Slot]
 end
 
@@ -51,6 +56,8 @@ AddTrigger(
     AddMessage("Your new orders are to build 2 power plants and a magma pump.")
     AddMessage("You'll need to gather some resources first. Use your engineer to harvest some energy from the trees or magma from the rocks.")
     AddMessage("-- End transmission --")
+    Play("level01-01.wav")
+    SetObjectives("Build 2 power plants and a magma pump")
 
     DefineAllow("unit-powerplant", AllowAll)
     DefineAllow("unit-magmapump", AllowAll)
@@ -88,6 +95,9 @@ function AddTrigger3()
       AddMessage("Nice work. Now that we've got some resources to work with we should concentrate on building some defenses.")
       AddMessage("Your next objective is to build a training camp then some assault units.")
       AddMessage("-- End transmission --")
+      Play("level01-03.wav")
+      SetObjectives("Build a training camp and 3 assault units")
+
       DefineAllow("unit-camp", AllowAll)
       DefineAllow("unit-assault", AllowAll)
       AddTrigger4()
@@ -104,6 +114,9 @@ function AddTrigger4()
       AddMessage("Now that you have a training camp you can start training assault units.")
       AddMessage("Click on the training camp then train 3 assault units.")
       AddMessage("-- End transmission --")
+      Play("level01-04.wav")
+      SetObjectives("Train 3 assault units")
+
       AddTrigger5()
       return false
     end)
@@ -117,6 +130,7 @@ function AddTrigger5()
       AddMessage("-- Incoming transmission from Central Command: --")
       AddMessage("Excellent work. The base is now in good enough shape to be able to defend itself from future attacks.")
       AddMessage("-- End transmission --")
+      Play("level01-05.wav")
       AddTrigger6(GameCycle)
       return false
     end)
