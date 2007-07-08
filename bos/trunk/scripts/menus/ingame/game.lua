@@ -548,7 +548,7 @@ function RunObjectivesMenu()
   l:setLineWidth(356)
   menu:add(l, 14, 36)
 
-  l:setCaption(current_objective)
+  l:setCaption(GetObjectives())
 
   menu:addButton(_("~!OK"), "o", 80, 256 - 40,
     function() menu:stop() end)
