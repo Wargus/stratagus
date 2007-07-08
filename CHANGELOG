@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Version 2.4.0:
+- Added new tutorial (Jimmy Salmon)
 - Fixed clipped rectangle drawing with OpenGL (Jimmy Salmon)
 - Highlight selected listbox item so it's easier to see (Nehal Mistry)
 - Improve the detection of lua in SConstruct (Francois Beerten)
