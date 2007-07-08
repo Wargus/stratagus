@@ -283,10 +283,10 @@ void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle& rectangle)
 		return;
 	}
 
-    int x1 = area.x > top.x ? area.x : top.x;
-    int y1 = area.y > top.y ? area.y : top.y;
-    int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
-    int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
+	int x1 = area.x > top.x ? area.x : top.x;
+	int y1 = area.y > top.y ? area.y : top.y;
+	int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
+	int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
 
 	Video.DrawTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
 		x1, y1, x2 - x1, y2 - y1, mColor.a);
@@ -305,10 +305,10 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
 		return;
 	}
 
-    int x1 = area.x > top.x ? area.x : top.x;
-    int y1 = area.y > top.y ? area.y : top.y;
-    int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
-    int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
+	int x1 = area.x > top.x ? area.x : top.x;
+	int y1 = area.y > top.y ? area.y : top.y;
+	int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
+	int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
 
 	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
 		x1, y1, x2 - x1, y2 - y1, c.a);
