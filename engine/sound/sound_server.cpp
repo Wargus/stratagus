@@ -494,6 +494,22 @@ void StopChannel(int channel)
 }
 
 /**
+**  Stop all channels
+*/
+void StopAllChannels()
+{
+	SDL_LockAudio();
+
+	for (int i = 0; i < MaxChannels; ++i) {
+		if (Channels[i].Playing) {
+			ChannelFinished(i);
+		}
+	}
+
+	SDL_UnlockAudio();
+}
+
+/**
 **  Load a sample
 **
 **  @param name  File name of sample (short version).
