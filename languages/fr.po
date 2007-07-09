@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stratagus traduction\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-30 14:10-0700\n"
+"POT-Creation-Date: 2007-07-09 21:41+0200\n"
 "PO-Revision-Date: 2005-12-31 14:12+0100\n"
 "Last-Translator: Francois Beerten\n"
 "Language-Team: FRENCH\n"
@@ -136,6 +136,7 @@ msgid "End of replay"
 msgstr "Fin du Replay"
 
 #: network/network.cpp:1061
+#, c-format
 msgid "%s sent bad command"
 msgstr "%s envoie une mauvaise commande"
 
@@ -174,6 +175,7 @@ msgid "Cannot create more units."
 msgstr "Ne peut créer plus d'unités."
 
 #: stratagus/stratagus.cpp:735
+#, c-format
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Merci d'avoir joué à Bos Wars.\n"
 
@@ -274,7 +276,7 @@ msgstr "Vous avez ~<%d~> %ss"
 msgid "You have ~<%d~> %s(s)"
 msgstr "Vous avez ~<%d~> %s(s)"
 
-#: unit/unit.cpp:2745
+#: unit/unit.cpp:2744
 #, c-format
 msgid "%s attacked"
 msgstr "%s attaqué"

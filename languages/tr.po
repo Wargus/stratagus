@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: engine\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-30 14:10-0700\n"
+"POT-Creation-Date: 2007-07-09 21:41+0200\n"
 "PO-Revision-Date: 2007-03-07 00:55+0200\n"
 "Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
 "Language-Team:  <tr@li.org>\n"
@@ -276,7 +276,7 @@ msgstr "~<%d~> %ss sahipsiniz"
 msgid "You have ~<%d~> %s(s)"
 msgstr "~<%d~> %s(s) sahipsiniz"
 
-#: unit/unit.cpp:2745
+#: unit/unit.cpp:2744
 #, c-format
 msgid "%s attacked"
 msgstr "%s saldırıldı"

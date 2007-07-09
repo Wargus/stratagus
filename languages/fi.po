@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-30 14:10-0700\n"
+"POT-Creation-Date: 2007-07-09 21:41+0200\n"
 "PO-Revision-Date: 2005-12-10 18:14+0200\n"
 "Last-Translator: Kimmo Merikivi <kimmo.merikivi@pp1.inet.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
@@ -277,7 +277,7 @@ msgstr "Sinulla on ~<%d~> %ss"
 msgid "You have ~<%d~> %s(s)"
 msgstr "Sinulla on ~<%d~> %s"
 
-#: unit/unit.cpp:2745
+#: unit/unit.cpp:2744
 #, c-format
 msgid "%s attacked"
 msgstr "%s hyökkäyksen kohteena!"

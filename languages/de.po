@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-30 14:10-0700\n"
+"POT-Creation-Date: 2007-07-09 21:41+0200\n"
 "PO-Revision-Date: 2006-05-05 18:31+0200\n"
 "Last-Translator: Dirk\n"
 "Language-Team:  <de@li.org>\n"
@@ -279,7 +279,7 @@ msgstr "Sie haben ~<%d~> %ss"
 msgid "You have ~<%d~> %s(s)"
 msgstr "Sie haben ~<%d~> %s(s)"
 
-#: unit/unit.cpp:2745
+#: unit/unit.cpp:2744
 #, c-format
 msgid "%s attacked"
 msgstr "%s wird attackiert"
