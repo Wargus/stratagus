@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-fi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-01 20:30-0700\n"
+"POT-Creation-Date: 2007-07-09 21:41+0200\n"
 "PO-Revision-Date: 2006-04-30 21:17+0300\n"
 "Last-Translator: Kimmo Merikivi <kimmo.merikivi@pp1.inet.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
@@ -67,153 +67,153 @@ msgstr "Tuhotut rakennukset"
 msgid "~!Continue"
 msgstr ""
 
-#: scripts/guichan.lua:352
+#: scripts/guichan.lua:373
 msgid "Start Game"
 msgstr "Aloita peli"
 
-#: scripts/guichan.lua:354 scripts/guichan.lua:572
+#: scripts/guichan.lua:375 scripts/guichan.lua:593
 #: scripts/menus/network.lua:130 scripts/menus/network.lua:318
 msgid "Map"
 msgstr "Kartta"
 
-#: scripts/guichan.lua:355 scripts/guichan.lua:573
+#: scripts/guichan.lua:376 scripts/guichan.lua:594
 #: scripts/menus/network.lua:131 scripts/menus/network.lua:319
 #: scripts/menus/network.lua:420
 msgid "File:"
 msgstr "Tiedosto:"
 
-#: scripts/guichan.lua:358 scripts/guichan.lua:539 scripts/guichan.lua:577
+#: scripts/guichan.lua:379 scripts/guichan.lua:560 scripts/guichan.lua:598
 #: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:425
 #, fuzzy
 msgid "Size:"
 msgstr "Tiedosto:"
 
-#: scripts/guichan.lua:361 scripts/guichan.lua:575
+#: scripts/guichan.lua:382 scripts/guichan.lua:596
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:322
 #: scripts/menus/network.lua:423
 msgid "Players:"
 msgstr "Pelaajat:"
 
-#: scripts/guichan.lua:363 scripts/guichan.lua:579
+#: scripts/guichan.lua:384 scripts/guichan.lua:600
 #: scripts/menus/network.lua:136 scripts/menus/network.lua:324
 #: scripts/menus/network.lua:427
 msgid "Description:"
 msgstr "Kuvaus:"
 
-#: scripts/guichan.lua:367 scripts/menus/network.lua:140
+#: scripts/guichan.lua:388 scripts/menus/network.lua:140
 #: scripts/menus/network.lua:333
 msgid "Fog of war"
 msgstr "Sumu"
 
-#: scripts/guichan.lua:370 scripts/guichan.lua:433
+#: scripts/guichan.lua:391 scripts/guichan.lua:454
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:340
 msgid "Reveal map"
 msgstr "Paljasta kartta"
 
-#: scripts/guichan.lua:374 scripts/menus/network.lua:147
+#: scripts/guichan.lua:395 scripts/menus/network.lua:147
 #: scripts/menus/network.lua:342
 msgid "Difficulty:"
 msgstr "Vaikeustaso:"
 
-#: scripts/guichan.lua:375 scripts/menus/network.lua:148
+#: scripts/guichan.lua:396 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "easy"
 msgstr "helppo"
 
-#: scripts/guichan.lua:375 scripts/guichan.lua:379
+#: scripts/guichan.lua:396 scripts/guichan.lua:400
 #: scripts/menus/network.lua:148 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:343 scripts/menus/network.lua:351
 msgid "normal"
 msgstr "tavallinen"
 
-#: scripts/guichan.lua:375 scripts/menus/network.lua:148
+#: scripts/guichan.lua:396 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "hard"
 msgstr "vaikea"
 
-#: scripts/guichan.lua:378 scripts/menus/network.lua:151
+#: scripts/guichan.lua:399 scripts/menus/network.lua:151
 #: scripts/menus/network.lua:350
 msgid "Starting resources:"
 msgstr "Aloitusresurssit:"
 
-#: scripts/guichan.lua:379 scripts/menus/network.lua:152
+#: scripts/guichan.lua:400 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "high"
 msgstr "korkea"
 
-#: scripts/guichan.lua:379 scripts/menus/network.lua:152
+#: scripts/guichan.lua:400 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "low"
 msgstr "matala"
 
-#: scripts/guichan.lua:382 scripts/menus/network.lua:155
+#: scripts/guichan.lua:403 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
 msgstr ""
 
-#: scripts/guichan.lua:383 scripts/menus/network.lua:156
+#: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
 msgstr ""
 
-#: scripts/guichan.lua:383 scripts/menus/network.lua:156
+#: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
 msgstr ""
 
-#: scripts/guichan.lua:383 scripts/menus/network.lua:156
+#: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
 msgstr ""
 
-#: scripts/guichan.lua:383 scripts/menus/network.lua:156
+#: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
 msgstr ""
 
-#: scripts/guichan.lua:383 scripts/menus/network.lua:156
+#: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
 msgstr ""
 
-#: scripts/guichan.lua:383 scripts/menus/network.lua:156
+#: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
 msgstr ""
 
-#: scripts/guichan.lua:413 scripts/guichan.lua:444 scripts/guichan.lua:487
-#: scripts/guichan.lua:555 scripts/guichan.lua:606
-#: scripts/menus/campaigns.lua:133 scripts/menus/credits.lua:143
+#: scripts/guichan.lua:434 scripts/guichan.lua:465 scripts/guichan.lua:508
+#: scripts/guichan.lua:576 scripts/guichan.lua:627
+#: scripts/menus/campaigns.lua:141 scripts/menus/credits.lua:143
 msgid "~!Main Menu"
 msgstr ""
 
-#: scripts/guichan.lua:415 scripts/guichan.lua:446 scripts/guichan.lua:489
-#: scripts/menus/campaigns.lua:135
+#: scripts/guichan.lua:436 scripts/guichan.lua:467 scripts/guichan.lua:510
+#: scripts/menus/campaigns.lua:58 scripts/menus/campaigns.lua:143
 msgid "~!Start"
 msgstr "~!Aloita"
 
-#: scripts/guichan.lua:424
+#: scripts/guichan.lua:445
 msgid "Show a Replay"
 msgstr "Näytä uudelleenpelaus"
 
-#: scripts/guichan.lua:457
+#: scripts/guichan.lua:478
 msgid "Load Game"
 msgstr "Lataa peli"
 
-#: scripts/guichan.lua:500 scripts/guichan.lua:520 scripts/guichan.lua:570
+#: scripts/guichan.lua:521 scripts/guichan.lua:541 scripts/guichan.lua:591
 msgid "Editor"
 msgstr "Editori"
 
-#: scripts/guichan.lua:502
+#: scripts/guichan.lua:523
 msgid "Create ~!New Map"
 msgstr ""
 
-#: scripts/guichan.lua:504
+#: scripts/guichan.lua:525
 #, fuzzy
 msgid "~!Load Map"
 msgstr "~!Lataa peli"
 
-#: scripts/guichan.lua:507 scripts/menus/ingame/editor.lua:125
+#: scripts/guichan.lua:528 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
 #: scripts/menus/network.lua:177 scripts/menus/network.lua:243
 #: scripts/menus/network.lua:304 scripts/menus/network.lua:378
@@ -221,57 +221,53 @@ msgstr "~!Lataa peli"
 msgid "~!Cancel"
 msgstr ""
 
-#: scripts/guichan.lua:557 scripts/guichan.lua:608 scripts/guichan.lua:637
+#: scripts/guichan.lua:578 scripts/guichan.lua:629 scripts/guichan.lua:658
 msgid "Start ~!Editor"
 msgstr "Käynnistä ~!editori"
 
-#: scripts/guichan.lua:628 scripts/menus/network.lua:381
+#: scripts/guichan.lua:649 scripts/menus/network.lua:381
 msgid "~!Start Game"
 msgstr "~!Aloita"
 
-#: scripts/guichan.lua:629
+#: scripts/guichan.lua:650
 msgid "~!Load Game"
 msgstr "~!Lataa peli"
 
-#: scripts/guichan.lua:630
+#: scripts/guichan.lua:651
 msgid "~!Campaigns"
 msgstr "~!Kampaniat"
 
-#: scripts/guichan.lua:631
+#: scripts/guichan.lua:652
 msgid "Show ~!Replay"
 msgstr "Näytä ~!uudelleenpelaus"
 
-#: scripts/guichan.lua:633
+#: scripts/guichan.lua:654
 msgid "~!MultiPlayer"
 msgstr "~!Moninpeli"
 
-#: scripts/guichan.lua:634
+#: scripts/guichan.lua:655
 msgid "~!Options"
 msgstr "~!Asetukset"
 
-#: scripts/guichan.lua:636
+#: scripts/guichan.lua:657
 #, fuzzy
 msgid "Cre~!dits"
 msgstr "~!Tekijät"
 
-#: scripts/guichan.lua:639
+#: scripts/guichan.lua:660
 #, fuzzy
 msgid "E~!xit"
 msgstr "~!Lopeta"
 
-#: scripts/menus/campaigns.lua:41
+#: scripts/menus/campaigns.lua:42
 msgid "Briefing"
 msgstr ""
 
-#: scripts/menus/campaigns.lua:44
-msgid "Objectives :"
+#: scripts/menus/campaigns.lua:45
+msgid "Objectives:"
 msgstr ""
 
-#: scripts/menus/campaigns.lua:57
-msgid "Start"
-msgstr "Aloita"
-
-#: scripts/menus/campaigns.lua:122
+#: scripts/menus/campaigns.lua:130
 msgid "List of Campaigns"
 msgstr "Lista kampanioista"
 
@@ -373,7 +369,7 @@ msgstr "Kuvaus:"
 #: scripts/menus/ingame/game.lua:527 scripts/menus/ingame/game.lua:553
 #: scripts/menus/network.lua:67 scripts/menus/options.lua:65
 #: scripts/menus/options.lua:142 scripts/menus/options.lua:241
-#: scripts/menus/options.lua:284
+#: scripts/menus/options.lua:288
 msgid "~!OK"
 msgstr "~!Valmis"
 
@@ -729,31 +725,34 @@ msgstr "Grafiikka-asetukset"
 msgid "Language Selection"
 msgstr "Kielen valinta"
 
-#: scripts/menus/options.lua:291
+#: scripts/menus/options.lua:295
 msgid "Sound"
 msgstr "Ääni"
 
-#: scripts/menus/options.lua:292
+#: scripts/menus/options.lua:296
 msgid "Video"
 msgstr "Grafiikka"
 
-#: scripts/menus/options.lua:293
+#: scripts/menus/options.lua:297
 msgid "Speed"
 msgstr "Nopeus"
 
-#: scripts/menus/options.lua:294
+#: scripts/menus/options.lua:298
 msgid "Language"
 msgstr "Kieli"
 
-#: scripts/menus/options.lua:296
+#: scripts/menus/options.lua:300
 #, fuzzy
 msgid "~!Main menu"
 msgstr "~!Liity peliin"
 
-#: scripts/menus/options.lua:304
+#: scripts/menus/options.lua:308
 msgid "Options"
 msgstr "Asetukset"
 
 #: scripts/stratagus.lua:232
 msgid "Eliminate your enemies."
 msgstr ""
+
+#~ msgid "Start"
+#~ msgstr "Aloita"
