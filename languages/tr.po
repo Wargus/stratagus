@@ -1,3 +1,4 @@
+# translation of tr.po to
 # translation of engine.po to
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -5,10 +6,10 @@
 # Murat Şenel <muratasenel@gmail.com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: engine\n"
+"Project-Id-Version: tr\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-07-09 21:41+0200\n"
-"PO-Revision-Date: 2007-03-07 00:55+0200\n"
+"PO-Revision-Date: 2007-07-10 00:08+0300\n"
 "Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
 "Language-Team:  <tr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -175,9 +176,9 @@ msgid "Cannot create more units."
 msgstr "Daha fazla birlik oluşturulamıyor."
 
 #: stratagus/stratagus.cpp:735
-#, fuzzy, c-format
+#, c-format
 msgid "Thanks for playing Bos Wars.\n"
-msgstr "Stratagus oynadığınız için teşekkür ederiz.\n"
+msgstr "Bos Wars oynadığınız için teşekkür ederiz.\n"
 
 #: ui/botpanel.cpp:666 ui/botpanel.cpp:731
 msgid "Select Target"
@@ -250,11 +251,11 @@ msgstr "Ekran görüntüsü alındı."
 
 #: ui/mainscr.cpp:694
 msgid "Energy"
-msgstr ""
+msgstr "Enerji"
 
 #: ui/mainscr.cpp:694
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: ui/mainscr.cpp:919
 #, c-format
@@ -280,3 +281,4 @@ msgstr "~<%d~> %s(s) sahipsiniz"
 #, c-format
 msgid "%s attacked"
 msgstr "%s saldırıldı"
+

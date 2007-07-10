@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: bos-tr\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-07-09 21:41+0200\n"
-"PO-Revision-Date: 2007-03-07 01:00+0200\n"
+"PO-Revision-Date: 2007-07-10 00:16+0300\n"
 "Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
 "Language-Team:  <tr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -149,37 +149,37 @@ msgstr "düşük"
 #: scripts/guichan.lua:403 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
-msgstr ""
+msgstr "Oyun türü:"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
-msgstr ""
+msgstr "Ön Tanımlı Harita"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
-msgstr ""
+msgstr "Meydan Savaşı"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
-msgstr ""
+msgstr "Herkese Serbest"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
-msgstr ""
+msgstr "Üst, Alta Karşı"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
-msgstr ""
+msgstr "Sol, Sağa Karşı"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
-msgstr ""
+msgstr "İnsan, Makineye Karşı"
 
 #: scripts/guichan.lua:434 scripts/guichan.lua:465 scripts/guichan.lua:508
 #: scripts/guichan.lua:576 scripts/guichan.lua:627
@@ -205,14 +205,12 @@ msgid "Editor"
 msgstr "Düzenleyici"
 
 #: scripts/guichan.lua:523
-#, fuzzy
 msgid "Create ~!New Map"
-msgstr "Yeni Oyun ~!Yarat"
+msgstr "Oluştur ~!Yeni Harita"
 
 #: scripts/guichan.lua:525
-#, fuzzy
 msgid "~!Load Map"
-msgstr "~!Kayıtlı Oyun Yükle"
+msgstr "~!Harita Yükle"
 
 #: scripts/guichan.lua:528 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
@@ -263,9 +261,8 @@ msgid "Briefing"
 msgstr "Özet"
 
 #: scripts/menus/campaigns.lua:45
-#, fuzzy
 msgid "Objectives:"
-msgstr "Görevler :"
+msgstr "Görevler:"
 
 #: scripts/menus/campaigns.lua:130
 msgid "List of Campaigns"
@@ -288,9 +285,8 @@ msgid "Sound:"
 msgstr "Ses:"
 
 #: scripts/menus/credits.lua:55
-#, fuzzy
 msgid "Engine Programmers:"
-msgstr "Stratagus Programcıları:"
+msgstr "Oyun Motoru Programcıları:"
 
 #: scripts/menus/credits.lua:112
 msgid "Patches"
@@ -301,9 +297,8 @@ msgid "Stratagus Media Project Graphics"
 msgstr "Stratagus Media Project Graphics"
 
 #: scripts/menus/credits.lua:128
-#, fuzzy
 msgid "The Bos Wars Team thanks"
-msgstr "Bos ve Stratagus Takımı teşekkür eder"
+msgstr "Bos Wars Takımı teşekkür eder"
 
 #: scripts/menus/credits.lua:129
 msgid "everybody who has contributed"
@@ -315,7 +310,7 @@ msgstr "yamalar, hata raporları, fikirler."
 
 #: scripts/menus/credits.lua:133
 msgid "Bos Wars Credits"
-msgstr ""
+msgstr "Bos Wars Ekibi"
 
 #: scripts/menus/ingame/editor.lua:49
 msgid "Editor Menu"
@@ -412,7 +407,7 @@ msgstr "Enerji"
 
 #: scripts/menus/ingame/editor.lua:207
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: scripts/menus/ingame/game.lua:58
 msgid "Game Menu"
@@ -532,18 +527,16 @@ msgid "Are you sure you want to surrender to your enemies?"
 msgstr "Düşmanınıza teslim olmak istediğinizden emin misiniz?"
 
 #: scripts/menus/ingame/game.lua:337
-#, fuzzy
 msgid "E~!xit Bos Wars"
-msgstr "~!Programdan Çık"
+msgstr "~Ç!ık Bos Wars"
 
 #: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
 msgid "Cancel (~<Esc~>)"
 msgstr "İptal et (~<Esc~>)"
 
 #: scripts/menus/ingame/game.lua:362
-#, fuzzy
 msgid "Are you sure you want to exit Bos Wars?"
-msgstr "Stratagus'tan çıkmak istediğinize emin misiniz?"
+msgstr "Bos Wars oyunundan çıkmak istediğinize emin misiniz?"
 
 #: scripts/menus/ingame/game.lua:363
 msgid "E~!xit Program"
@@ -559,7 +552,7 @@ msgstr "Kontrol ~!Yardımı"
 
 #: scripts/menus/ingame/game.lua:377
 msgid "Bos Wars ~!Tips"
-msgstr ""
+msgstr "Bos Wars ~!İpuçları"
 
 #: scripts/menus/ingame/game.lua:455
 msgid "Keystroke Help Menu"
@@ -567,7 +560,7 @@ msgstr "Kontrol Yardım Menüsü"
 
 #: scripts/menus/ingame/game.lua:490
 msgid "Bos Wars Tips"
-msgstr ""
+msgstr "Bos Wars İpuçları"
 
 #: scripts/menus/ingame/game.lua:521
 msgid "Show tips at startup"
@@ -737,5 +730,3 @@ msgstr "Seçenekler"
 msgid "Eliminate your enemies."
 msgstr "Düşmanlarınızı yok edin."
 
-#~ msgid "Start"
-#~ msgstr "Başlat"
