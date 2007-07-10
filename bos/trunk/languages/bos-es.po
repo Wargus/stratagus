@@ -204,11 +204,11 @@ msgstr "Editor"
 
 #: scripts/guichan.lua:523
 msgid "Create ~!New Map"
-msgstr "Crear ~!Juego"
+msgstr "Crear ~!Mappa"
 
 #: scripts/guichan.lua:525
 msgid "~!Load Map"
-msgstr "~!Cargar Partida"
+msgstr "~!Cargar Mappa"
 
 #: scripts/guichan.lua:528 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
@@ -284,7 +284,7 @@ msgstr "Sonido:"
 
 #: scripts/menus/credits.lua:55
 msgid "Engine Programmers:"
-msgstr "Programadores de Stratagus:"
+msgstr "Programadores del motor del Juego:"
 
 #: scripts/menus/credits.lua:112
 msgid "Patches"
@@ -296,7 +296,7 @@ msgstr "Stratagus Media Project Graphics"
 
 #: scripts/menus/credits.lua:128
 msgid "The Bos Wars Team thanks"
-msgstr "El Jefe y el equipo de Bos Wars agradecen"
+msgstr "El equipo de Bos Wars agradecen"
 
 #: scripts/menus/credits.lua:129
 msgid "everybody who has contributed"
