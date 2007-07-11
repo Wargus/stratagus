@@ -54,7 +54,7 @@
 **  @param oldtiles  Number of old tiles.
 **  @param newtiles  Number of new tiles.
 */
-static void ExtendTilesetTables(CTileset *tileset, int oldtiles, int newtiles)
+static void ExtendTilesetTables(CTileset *tileset, unsigned int oldtiles, unsigned int newtiles)
 {
 	unsigned short *newtable;
 	TileInfo *newtileinfo;
@@ -95,25 +95,25 @@ static void ExtendTilesetTables(CTileset *tileset, int oldtiles, int newtiles)
 */
 static int TilesetParseName(lua_State *l, CTileset *tileset)
 {
-	char *ident;
-	int i;
-	
-	ident = new_strdup(LuaToString(l, -1));
+	const char *ident;
+	unsigned int i;
+
+	ident = LuaToString(l, -1);
 	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
-		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
-			delete[] ident;
+		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName.c_str())) {
 			return i;
 		}
 	}
 
 	// Can't find it, then we add another solid terrain type.
 	SolidTerrainInfo *s = new SolidTerrainInfo[tileset->NumTerrainTypes + 1];
-	memcpy(s, tileset->SolidTerrainTypes, tileset->NumTerrainTypes * sizeof(SolidTerrainInfo));
+	for (unsigned int j = 0; j < tileset->NumTerrainTypes; ++j) {
+		s[j] = tileset->SolidTerrainTypes[j];
+	}
 	delete[] tileset->SolidTerrainTypes;
 	tileset->SolidTerrainTypes = s;
 	tileset->SolidTerrainTypes[tileset->NumTerrainTypes].TerrainName = ident;
 	++tileset->NumTerrainTypes;
-	
 	return i;
 }
 
@@ -565,8 +565,8 @@ static int CclDefineTileset(lua_State *l)
 /**
 ** Build tileset tables like HumanWallTable or MixedLookupTable
 **
-** Called after LoadTileset and only for tilesets that have wall, 
-** trees and rocks. This function will be deleted when removing 
+** Called after LoadTileset and only for tilesets that have wall,
+** trees and rocks. This function will be deleted when removing
 ** support of walls and alike in the tileset.
 */
 static int CclBuildTilesetTables(lua_State *l)
@@ -935,11 +935,11 @@ static int CclSetTileFlags(lua_State *l)
 	}
 
 	tilenumber = LuaToNumber(l, 1);
-	
+
 	if (tilenumber >= Map.Tileset.NumTiles) {
 		LuaError(l, "Accessed a tile that's not defined");
 	}
-	
+
 	j = 0;
 	flags = 0;
 	ParseTilesetTileFlags(l, &flags, &j);

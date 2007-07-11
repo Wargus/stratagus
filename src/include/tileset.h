@@ -231,7 +231,7 @@ struct TileInfo {
 
 	/// Definition for a terrain type
 struct SolidTerrainInfo {
-	char *TerrainName;  /// Name of the terrain
+	std::string TerrainName;  /// Name of the terrain
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 };
 
@@ -252,9 +252,6 @@ public:
 		Tiles = NULL;
 		delete[] TileTypeTable;
 		TileTypeTable = NULL;
-		for (int i = 0; i < NumTerrainTypes; ++i) {
-			delete[] SolidTerrainTypes[i].TerrainName;
-		}
 		delete[] SolidTerrainTypes;
 		SolidTerrainTypes = NULL;
 		NumTerrainTypes = 0;
@@ -288,7 +285,7 @@ public:
 	// TODO: currently hardcoded
 	unsigned char *TileTypeTable;   /// For fast lookup of tile type
 
-	int NumTerrainTypes;                 /// Number of different terrain types
+	unsigned int NumTerrainTypes;                 /// Number of different terrain types
 	SolidTerrainInfo *SolidTerrainTypes; /// Information about solid terrains.
 
 	unsigned TopOneTree;     /// Tile for one tree top
@@ -312,10 +309,9 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void LoadTileset(void);   /// Load tileset definition
-extern void CleanTilesets(void); /// Cleanup the tileset module
-
-extern void TilesetCclRegister(void); /// Register CCL features for tileset
+extern void LoadTileset();   /// Load tileset definition
+extern void CleanTilesets(); /// Cleanup the tileset module
+extern void TilesetCclRegister(); /// Register CCL features for tileset
 
 //@}
 
