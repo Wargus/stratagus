@@ -86,7 +86,7 @@ msgstr "Tiedosto:"
 #: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:425
 #, fuzzy
 msgid "Size:"
-msgstr "Tiedosto:"
+msgstr "Koko:"
 
 #: scripts/guichan.lua:382 scripts/guichan.lua:596
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:322
@@ -103,12 +103,12 @@ msgstr "Kuvaus:"
 #: scripts/guichan.lua:388 scripts/menus/network.lua:140
 #: scripts/menus/network.lua:333
 msgid "Fog of war"
-msgstr "Sumu"
+msgstr "Fog of war"
 
 #: scripts/guichan.lua:391 scripts/guichan.lua:454
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:340
 msgid "Reveal map"
-msgstr "Paljasta kartta"
+msgstr "Näytä kartta"
 
 #: scripts/guichan.lua:395 scripts/menus/network.lua:147
 #: scripts/menus/network.lua:342
@@ -124,7 +124,7 @@ msgstr "helppo"
 #: scripts/menus/network.lua:148 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:343 scripts/menus/network.lua:351
 msgid "normal"
-msgstr "tavallinen"
+msgstr "normaali"
 
 #: scripts/guichan.lua:396 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
@@ -149,31 +149,31 @@ msgstr "matala"
 #: scripts/guichan.lua:403 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
-msgstr ""
+msgstr "Pelityyppi:"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
-msgstr ""
+msgstr "Oletus"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
-msgstr ""
+msgstr "Kaksintaistelu"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
-msgstr ""
+msgstr "Vapaa"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
-msgstr ""
+msgstr "Pohjoinen vs. etelä"
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
-msgid "Left vs Right"
+msgid "Itä vs. etelä"
 msgstr ""
 
 #: scripts/guichan.lua:404 scripts/menus/network.lua:156
@@ -185,7 +185,7 @@ msgstr ""
 #: scripts/guichan.lua:576 scripts/guichan.lua:627
 #: scripts/menus/campaigns.lua:141 scripts/menus/credits.lua:143
 msgid "~!Main Menu"
-msgstr ""
+msgstr "Päävalikko"
 
 #: scripts/guichan.lua:436 scripts/guichan.lua:467 scripts/guichan.lua:510
 #: scripts/menus/campaigns.lua:58 scripts/menus/campaigns.lua:143
@@ -194,7 +194,7 @@ msgstr "~!Aloita"
 
 #: scripts/guichan.lua:445
 msgid "Show a Replay"
-msgstr "Näytä uudelleenpelaus"
+msgstr "Näytä uusinta"
 
 #: scripts/guichan.lua:478
 msgid "Load Game"
@@ -206,12 +206,12 @@ msgstr "Editori"
 
 #: scripts/guichan.lua:523
 msgid "Create ~!New Map"
-msgstr ""
+msgstr "Luo uusi kartta"
 
 #: scripts/guichan.lua:525
 #, fuzzy
 msgid "~!Load Map"
-msgstr "~!Lataa peli"
+msgstr "~!Lataa kartta"
 
 #: scripts/guichan.lua:528 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:304
@@ -219,7 +219,7 @@ msgstr "~!Lataa peli"
 #: scripts/menus/network.lua:304 scripts/menus/network.lua:378
 #: scripts/menus/network.lua:453 scripts/menus/network.lua:500
 msgid "~!Cancel"
-msgstr ""
+msgstr "Peruuta"
 
 #: scripts/guichan.lua:578 scripts/guichan.lua:629 scripts/guichan.lua:658
 msgid "Start ~!Editor"
@@ -235,11 +235,11 @@ msgstr "~!Lataa peli"
 
 #: scripts/guichan.lua:651
 msgid "~!Campaigns"
-msgstr "~!Kampaniat"
+msgstr "~!Kampanjat"
 
 #: scripts/guichan.lua:652
 msgid "Show ~!Replay"
-msgstr "Näytä ~!uudelleenpelaus"
+msgstr "Näytä ~!uusinta"
 
 #: scripts/guichan.lua:654
 msgid "~!MultiPlayer"
@@ -261,15 +261,15 @@ msgstr "~!Lopeta"
 
 #: scripts/menus/campaigns.lua:42
 msgid "Briefing"
-msgstr ""
+msgstr "Pohjustus"
 
 #: scripts/menus/campaigns.lua:45
 msgid "Objectives:"
-msgstr ""
+msgstr "Tehtävänanto:"
 
 #: scripts/menus/campaigns.lua:130
 msgid "List of Campaigns"
-msgstr "Lista kampanioista"
+msgstr "Lista kampanjoista"
 
 #: scripts/menus/credits.lua:36
 msgid "Graphics:"
@@ -281,7 +281,7 @@ msgstr "Skriptaus:"
 
 #: scripts/menus/credits.lua:47
 msgid "Maps and campaigns:"
-msgstr "Kartat ja kampaniat:"
+msgstr "Kartat ja kampanjat:"
 
 #: scripts/menus/credits.lua:51
 msgid "Sound:"
@@ -290,11 +290,11 @@ msgstr "Äänet:"
 #: scripts/menus/credits.lua:55
 #, fuzzy
 msgid "Engine Programmers:"
-msgstr "Strataguksen ohjelmoijat:"
+msgstr "Pelimoottorin ohjelmoijat:"
 
 #: scripts/menus/credits.lua:112
 msgid "Patches"
-msgstr "Korjaukset:"
+msgstr "Paikkaukset:"
 
 #: scripts/menus/credits.lua:121
 msgid "Stratagus Media Project Graphics"
@@ -303,11 +303,11 @@ msgstr "Stratagus Media Projectin grafiikat"
 #: scripts/menus/credits.lua:128
 #, fuzzy
 msgid "The Bos Wars Team thanks"
-msgstr "Bos Wars -tekijät"
+msgstr "Bos Wars -tiimi kiittää"
 
 #: scripts/menus/credits.lua:129
 msgid "everybody who has contributed"
-msgstr ""
+msgstr "kaikkia projektiin osallistujia"
 
 #: scripts/menus/credits.lua:130
 msgid "patches, bug reports, ideas."
@@ -324,40 +324,40 @@ msgstr "Editori"
 
 #: scripts/menus/ingame/editor.lua:50 scripts/menus/ingame/game.lua:59
 msgid "Save (~<F11~>)"
-msgstr ""
+msgstr "Tallennus (~<F11~>)"
 
 #: scripts/menus/ingame/editor.lua:52
 msgid "Map Properties (~<F5~>)"
-msgstr ""
+msgstr "Kartan ominaisuudet (~<F5~>)"
 
 #: scripts/menus/ingame/editor.lua:54
 msgid "Player Properties (~<F6~>)"
-msgstr ""
+msgstr "Pelaajien ominaisuudet"
 
 #: scripts/menus/ingame/editor.lua:57
 #, fuzzy
 msgid "~!Exit to menu"
-msgstr "~!Lopeta"
+msgstr "~!Palaa menuun"
 
 #: scripts/menus/ingame/editor.lua:59
 msgid "Return to the Editor (~<Esc~>)"
-msgstr ""
+msgstr "Palaa editoriin"
 
 #: scripts/menus/ingame/editor.lua:68
 msgid "Save Map"
-msgstr ""
+msgstr "Tallenna kartta"
 
 #: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
 msgid "Save"
-msgstr ""
+msgstr "Tallenna"
 
 #: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/game.lua:112
 msgid "Cancel"
-msgstr ""
+msgstr "Peruuta"
 
 #: scripts/menus/ingame/editor.lua:99
 msgid "Map Properties"
-msgstr ""
+msgstr "Kartan ominaisuudet"
 
 #: scripts/menus/ingame/editor.lua:101
 #, fuzzy
@@ -375,53 +375,53 @@ msgstr "~!Valmis"
 
 #: scripts/menus/ingame/editor.lua:140
 msgid "Player Properties"
-msgstr ""
+msgstr "Pelaajien ominaisuudet"
 
 #: scripts/menus/ingame/editor.lua:149
 msgid "Type"
-msgstr ""
+msgstr "Tyyppi"
 
 #: scripts/menus/ingame/editor.lua:154
 #, fuzzy
 msgid "Person"
-msgstr "Pelaajat"
+msgstr "Pelaaja"
 
 #: scripts/menus/ingame/editor.lua:154
 msgid "Computer"
-msgstr ""
+msgstr "Tietokone"
 
 #: scripts/menus/ingame/editor.lua:154
 msgid "Rescue (Passive)"
-msgstr ""
+msgstr "Pelastettava (passiivinen)"
 
 #: scripts/menus/ingame/editor.lua:155
 msgid "Rescue (Active)"
-msgstr ""
+msgstr "Pelastettava (aktiivinen)"
 
 #: scripts/menus/ingame/editor.lua:155
 msgid "Neutral"
-msgstr ""
+msgstr "Puolueeton"
 
 #: scripts/menus/ingame/editor.lua:155
 msgid "Nobody"
-msgstr ""
+msgstr "Ei kukaan"
 
 #: scripts/menus/ingame/editor.lua:168
 msgid "AI"
-msgstr ""
+msgstr "Tietokone"
 
 #: scripts/menus/ingame/editor.lua:195
 msgid "Energy"
-msgstr ""
+msgstr "Energia"
 
 #: scripts/menus/ingame/editor.lua:207
 msgid "Magma"
-msgstr ""
+msgstr "Magma"
 
 #: scripts/menus/ingame/game.lua:58
 #, fuzzy
 msgid "Game Menu"
-msgstr "Pelin nopeus"
+msgstr "Pelivalikko"
 
 #: scripts/menus/ingame/game.lua:64
 #, fuzzy
@@ -430,25 +430,25 @@ msgstr "Asetukset"
 
 #: scripts/menus/ingame/game.lua:66
 msgid "Help (~<F1~>)"
-msgstr ""
+msgstr "Ohje"
 
 #: scripts/menus/ingame/game.lua:68
 msgid "~!Objectives"
-msgstr ""
+msgstr "Tehtävänanto" 
 
 #: scripts/menus/ingame/game.lua:70
 #, fuzzy
 msgid "~!End Game"
-msgstr "~!Lataa peli"
+msgstr "~!Lopeta peli"
 
 #: scripts/menus/ingame/game.lua:72
 msgid "Return to Game (~<Esc~>)"
-msgstr ""
+msgstr "Jatka peliä"
 
 #: scripts/menus/ingame/game.lua:81
 #, fuzzy
 msgid "Save Game"
-msgstr "Aloita peli"
+msgstr "Tallenna peli"
 
 #: scripts/menus/ingame/game.lua:121 scripts/menus/options.lua:158
 msgid "Sound Options"
@@ -461,7 +461,7 @@ msgstr "Asetukset"
 
 #: scripts/menus/ingame/game.lua:131
 msgid "Sound (~<F7~>)"
-msgstr ""
+msgstr "Äänet"
 
 #: scripts/menus/ingame/game.lua:133
 msgid "Game (~<F9~>)"
@@ -469,22 +469,22 @@ msgstr ""
 
 #: scripts/menus/ingame/game.lua:135
 msgid "~!Diplomacy"
-msgstr ""
+msgstr "Diplomatia"
 
 #: scripts/menus/ingame/game.lua:137 scripts/menus/ingame/game.lua:339
 #: scripts/menus/ingame/game.lua:379 scripts/menus/ingame/game.lua:456
 msgid "Previous (~<Esc~>)"
-msgstr ""
+msgstr "Aikaisempi"
 
 #: scripts/menus/ingame/game.lua:149
 #, fuzzy
 msgid "Fog of War Enabled"
-msgstr "Sumu"
+msgstr "Fog of War käytössä"
 
 #: scripts/menus/ingame/game.lua:157
 #, fuzzy
 msgid "Show command key"
-msgstr "Näytä uudelleenpelaus"
+msgstr "Näytä näppäin"
 
 #: scripts/menus/ingame/game.lua:161 scripts/menus/options.lua:40
 msgid "Game Speed"
@@ -500,70 +500,70 @@ msgstr "nopea"
 
 #: scripts/menus/ingame/game.lua:198
 msgid "Diplomacy"
-msgstr ""
+msgstr "Diplomatia"
 
 #: scripts/menus/ingame/game.lua:200
 msgid "Allied"
-msgstr ""
+msgstr "Liittoutunut"
 
 #: scripts/menus/ingame/game.lua:201
 msgid "Enemy"
-msgstr ""
+msgstr "Vihollinen"
 
 #: scripts/menus/ingame/game.lua:202
 msgid "Shared Vision"
-msgstr ""
+msgstr "Jaettu näkyvyys"
 
 #: scripts/menus/ingame/game.lua:312
 msgid "Are you sure you want to restart the game?"
-msgstr ""
+msgstr "Haluatko varmasti käynnistää pelin uudelleen?"
 
 #: scripts/menus/ingame/game.lua:313 scripts/menus/ingame/game.lua:326
 #, fuzzy
 msgid "~!Restart Game"
-msgstr "~!Aloita"
+msgstr "~!Aloita alusta"
 
 #: scripts/menus/ingame/game.lua:318
 msgid "Are you sure you want to quit to the main menu?"
-msgstr ""
+msgstr "Haluatko varmasti palata päävalikkoon?"
 
 #: scripts/menus/ingame/game.lua:319 scripts/menus/ingame/game.lua:335
 msgid "~!Quit to Menu"
-msgstr ""
+msgstr "Palaa menun"
 
 #: scripts/menus/ingame/game.lua:325
 #, fuzzy
 msgid "End Game"
-msgstr "Lataa peli"
+msgstr "Lopeta peli"
 
 #: scripts/menus/ingame/game.lua:331 scripts/menus/ingame/game.lua:334
 msgid "~!Surrender"
-msgstr ""
+msgstr "Antaudu"
 
 #: scripts/menus/ingame/game.lua:333
 msgid "Are you sure you want to surrender to your enemies?"
-msgstr ""
+msgstr "Haluatko varmasti antautua vihollisillesi?"
 
 #: scripts/menus/ingame/game.lua:337
 #, fuzzy
 msgid "E~!xit Bos Wars"
-msgstr "~!Lopeta"
+msgstr "~!Lopeta peli"
 
 #: scripts/menus/ingame/game.lua:352 scripts/menus/ingame/game.lua:365
 msgid "Cancel (~<Esc~>)"
-msgstr ""
+msgstr "Peruuta"
 
 #: scripts/menus/ingame/game.lua:362
 msgid "Are you sure you want to exit Bos Wars?"
-msgstr ""
+msgstr "Haluatko varmasti poistua pelistä?"
 
 #: scripts/menus/ingame/game.lua:363
 msgid "E~!xit Program"
-msgstr "~!Lopeta"
+msgstr "~!Lopeta peli"
 
 #: scripts/menus/ingame/game.lua:374
 msgid "Help Menu"
-msgstr ""
+msgstr "Ohjevalikko"
 
 #: scripts/menus/ingame/game.lua:375
 msgid "Keystroke ~!Help"
@@ -572,7 +572,7 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:377
 #, fuzzy
 msgid "Bos Wars ~!Tips"
-msgstr "Bos Wars -tekijät"
+msgstr "Bos Warsin tekijät"
 
 #: scripts/menus/ingame/game.lua:455
 msgid "Keystroke Help Menu"
@@ -581,27 +581,27 @@ msgstr ""
 #: scripts/menus/ingame/game.lua:490
 #, fuzzy
 msgid "Bos Wars Tips"
-msgstr "Bos Wars -tekijät"
+msgstr "Bos Warsin tekijät"
 
 #: scripts/menus/ingame/game.lua:521
 msgid "Show tips at startup"
-msgstr ""
+msgstr "Näytä vinkkejä alussa"
 
 #: scripts/menus/ingame/game.lua:529
 msgid "~!Previous Tip"
-msgstr ""
+msgstr "Aikaisempi vinkki"
 
 #: scripts/menus/ingame/game.lua:531
 msgid "~!Next Tip"
-msgstr ""
+msgstr "Seuraava vinkki"
 
 #: scripts/menus/ingame/game.lua:543
 msgid "Objectives"
-msgstr ""
+msgstr "Tehtävänanto"
 
 #: scripts/menus/network.lua:55
 msgid "Error"
-msgstr ""
+msgstr "Virhe"
 
 #: scripts/menus/network.lua:81
 msgid "Players"
@@ -617,7 +617,7 @@ msgstr "~!Valmis"
 
 #: scripts/menus/network.lua:219 scripts/menus/network.lua:260
 msgid "Cannot reach server"
-msgstr ""
+msgstr "En saa yhteyttä palvelimeen"
 
 #: scripts/menus/network.lua:235
 msgid "Joining game"
@@ -625,19 +625,19 @@ msgstr "Liitytään peliin"
 
 #: scripts/menus/network.lua:257
 msgid "Map not available"
-msgstr ""
+msgstr "Karttaa ei löydy"
 
 #: scripts/menus/network.lua:263
 msgid "Server is full"
-msgstr ""
+msgstr "Palvelin on täynnä"
 
 #: scripts/menus/network.lua:266
 msgid "Server gone"
-msgstr ""
+msgstr "Palvelin meni nurin"
 
 #: scripts/menus/network.lua:269
 msgid "Incompatible engine version"
-msgstr ""
+msgstr "Epäyhteensopiva pelimoottorin versio"
 
 #: scripts/menus/network.lua:272
 msgid "Incompatible netowrk version"
@@ -658,7 +658,7 @@ msgstr "~!Liity peliin"
 #: scripts/menus/network.lua:293
 #, fuzzy
 msgid "Invalid server name"
-msgstr "IP-osoite tai palvelimen nimi:"
+msgstr "Virheellinen palvelimen nimi"
 
 #: scripts/menus/network.lua:316 scripts/menus/network.lua:418
 msgid "Create MultiPlayer game"
@@ -695,7 +695,7 @@ msgstr "Nopeusasetukset"
 
 #: scripts/menus/options.lua:78
 msgid "Effects Volume"
-msgstr "Efektien äänenvoimakkuus"
+msgstr "Efektien voimakkuus"
 
 #: scripts/menus/options.lua:94 scripts/menus/options.lua:126
 msgid "min"
@@ -711,7 +711,7 @@ msgstr "Päällä"
 
 #: scripts/menus/options.lua:110
 msgid "Music Volume"
-msgstr "Musiikin äänenvoimakkuus"
+msgstr "Musiikin voimakkuus"
 
 #: scripts/menus/options.lua:225
 msgid "Fullscreen"
@@ -727,7 +727,7 @@ msgstr "Kielen valinta"
 
 #: scripts/menus/options.lua:295
 msgid "Sound"
-msgstr "Ääni"
+msgstr "Äänet"
 
 #: scripts/menus/options.lua:296
 msgid "Video"
@@ -752,7 +752,7 @@ msgstr "Asetukset"
 
 #: scripts/stratagus.lua:232
 msgid "Eliminate your enemies."
-msgstr ""
+msgstr "Tuhoa vastustajat."
 
 #~ msgid "Start"
 #~ msgstr "Aloita"
