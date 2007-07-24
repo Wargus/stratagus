@@ -10,7 +10,7 @@
 //
 /**@name font.cpp - The color fonts. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -544,58 +544,47 @@ static void FormatNumber(int number, char *buf)
 }
 
 /**
-**  Return the first occurance of c in [s- s + maxlen]
+**  Return the index of first occurance of c in [s- s + maxlen]
 **
 **  @param s       original string.
-**  @param c       charrater to find.
-**  @param maxlen  size limit of the search. (0 means unlimited).
+**  @param c       character to find.
+**  @param maxlen  size limit of the search. (0 means unlimited). (in char if font == NULL else in pixels).
 **  @param font    if specified use font->Width() instead of strlen.
 **
 **  @return computed value.
 */
-static char *strchrlen(char *s, char c, int maxlen, CFont *font)
+static int strchrlen(const std::string& s, char c, unsigned int maxlen, CFont *font)
 {
-	char *res;
+	int res;
 
-	Assert(s);
-	Assert(0 <= maxlen);
+	if (s.empty()) {
+		return 0;
+	}
+	res = s.find(c);
+	res = (res == -1) ? s.size() : res -1;
 
-	res = strchr(s, c);
-
-	if (!maxlen) {
+	if (!maxlen || (!font && (unsigned int) res < maxlen) || (font && (unsigned int) font->Width(s.substr(0, res)) < maxlen)) {
 		return res;
 	}
-	if (!font &&
-			(s + maxlen < res || (!res && strlen(s) >= (unsigned)maxlen))) {
-		c = s[maxlen];
-		s[maxlen] = '\0';
-		res = strrchr(s, ' ');
-		s[maxlen] = c;
-		if (!res) {
-			fprintf(stderr, "line too long: \"%s\"\n", s);
-			res = s + maxlen;
+	if (!font) {
+		res = s.rfind(' ', maxlen);
+		if (res == -1) {
+			// line too long
+			return maxlen;
+		} else {
+			return res;
 		}
-	} else if (font) {
-		char *end;
-
-		if (!res) {
-			res = s + strlen(s);
+	} else {
+		res = s.rfind(' ', res);
+		while (res != -1 && (unsigned int) font->Width(s.substr(0, res)) > maxlen) {
+			res = s.rfind(' ', res - 1);
 		}
-		end = res;
-		c = *end;
-		*end = '\0';
-		while (font->Width(s) > maxlen) {
-			res = strrchr(s, ' ');
-			*end = c;
-			end = res;
-			if (!res) {
-				fprintf(stderr, "line too long: \"%s\"\n", s);
-				return strchr(s, '\n');
-			}
-			c = *end;
-			*end = '\0';
+		if (res == -1) {
+			// Line too long.
+			// FIXME.
+		} else {
+			return res;
 		}
-		*end = c;
 	}
 	return res;
 }
@@ -605,37 +594,27 @@ static char *strchrlen(char *s, char c, int maxlen, CFont *font)
 **
 **  @param line    line number.
 **  @param s       multiline string.
-**  @param maxlen  max length of the string.
+**  @param maxlen  max length of the string (0 : unlimited) (in char if font == NULL else in pixels).
 **  @param font    if specified use font->Width() instead of strlen.
 **
 **  @return computed value.
 */
-char *GetLineFont(int line, char *s, int maxlen, CFont *font)
+std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, CFont *font)
 {
-	int i;
-	char *res;
-	char *tmp;
+	unsigned int res;
+	std::string s1 = s;
 
 	Assert(0 < line);
-	Assert(s);
-	Assert(0 <= maxlen);
 
-	res = s;
-	for (i = 1; i < line; ++i) {
-		res = strchrlen(res, '\n', maxlen, font);
-		if (!res) {
-			return NULL;
+	for (unsigned int i = 1; i < line; ++i) {
+		res = strchrlen(s1, '\n', maxlen, font);
+		if (!res || res >= s1.size()) {
+			return "";
 		}
-		while (*res == '\n' || *res == ' ') {
-			++res;
-		}
+		s1 = s1.substr(res + 1);
 	}
-	res = new_strdup(res);
-	tmp = strchrlen(res, '\n', maxlen, font);
-	if (tmp) {
-		*tmp = '\0';
-	}
-	return res;
+	res = strchrlen(s1, '\n', maxlen, font);
+	return s1.substr(0, res);
 }
 
 /**

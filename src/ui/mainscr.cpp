@@ -321,7 +321,7 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 */
 void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 {
-	char *text;             // Optional text to display.
+	std::string text;       // Optional text to display.
 	CFont *font;            // Font to use.
 	int x;                  // X coordinate to display.
 	int y;                  // Y coordinate to display.
@@ -342,7 +342,6 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 			VideoDrawText(x, y, font, text);
 		}
 		x += font->Width(text);
-		delete[] text;
 	}
 
 	if (this->ShowName) {

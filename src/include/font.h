@@ -85,9 +85,9 @@ public:
 	virtual int getHeight() const { return Height(); }
 	virtual int getWidth(const std::string &text) const
 		{ return Width(text.c_str()); }
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text, 
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text,
 		int x, int y);
-	
+
 	void MeasureWidths();
 
 	std::string Ident;    /// Ident of the font.
@@ -148,7 +148,7 @@ extern void SetDefaultTextColors(const std::string &normal, const std::string &r
 	/// Get the default text colors for normal and reverse text
 extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
 	///  Return the 'line' line of the string 's'.
-extern char *GetLineFont(int line, char *s, int maxlen, CFont *font);
+extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, CFont *font);
 	/// Draw text unclipped
 extern int VideoDrawText(int x, int y, CFont *font, const std::string &text);
 	/// Draw text unclipped

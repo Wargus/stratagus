@@ -169,7 +169,7 @@ static int report(int status)
 	return status;
 }
 
-static int luatraceback(lua_State *L) 
+static int luatraceback(lua_State *L)
 {
 	lua_pushliteral(L, "debug");
 	lua_gettable(L, LUA_GLOBALSINDEX);
@@ -948,7 +948,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
-	char *s;
+	std::string s;
 	char *s2;
 	int a;
 	int b;
@@ -1018,19 +1018,16 @@ int EvalNumber(const NumberDesc *number)
 			}
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
 			if (number->D.VideoTextLength.String != NULL &&
-					(s = EvalString(number->D.VideoTextLength.String)) != NULL) {
-				a = number->D.VideoTextLength.Font->Width(s);
-				delete s;
-				return a;
+					!(s = EvalString(number->D.VideoTextLength.String)).empty()) {
+				return number->D.VideoTextLength.Font->Width(s);
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_StringFind : // strchr(s, c) - s
 			if (number->D.StringFind.String != NULL &&
-					(s = EvalString(number->D.StringFind.String)) != NULL) {
-				s2 = strchr(s, number->D.StringFind.C);
-				a = s2 ? s2 - s : -1;
-				delete s;
+					!(s = EvalString(number->D.StringFind.String)).empty()) {
+				s2 = strchr(s.c_str(), number->D.StringFind.C);
+				a = s2 ? s2 - s.c_str() : -1;
 				return a;
 			} else { // ERROR.
 				return 0;
@@ -1048,14 +1045,11 @@ int EvalNumber(const NumberDesc *number)
 **
 **  @todo Manage better the error.
 */
-char *EvalString(const StringDesc *s)
+std::string EvalString(const StringDesc *s)
 {
-	char *res;   // Result string.
-	int i;       // Iterator.
-	char *tmp1;  // Temporary string.
-	char *tmp2;  // Temporary string.
+	std::string res;    // Result string.
+	std::string tmp1;   // Temporary string.
 	const CUnit *unit;  // Temporary unit
-	char *str;
 
 	Assert(s);
 	switch (s->e) {
@@ -1064,38 +1058,28 @@ char *EvalString(const StringDesc *s)
 		case EString_Dir :     // directly a string.
 			return new_strdup(s->D.Val);
 		case EString_Concat :     // a + b -> "ab"
-			tmp1 = EvalString(s->D.Concat.Strings[0]);
-			if (!tmp1) {
-				tmp1 = new char[1];
-				tmp1[0] = '\0';
-			}
-			res = tmp1;
-			for (i = 1; i < s->D.Concat.n; i++) {
-				tmp2 = EvalString(s->D.Concat.Strings[i]);
-				if (tmp2) {
-					res = strdcat(tmp1, tmp2);
-					delete[] tmp1;
-					delete[] tmp2;
-					tmp1 = res;
-				}
+			res = EvalString(s->D.Concat.Strings[0]);
+			for (int i = 1; i < s->D.Concat.n; i++) {
+				res += EvalString(s->D.Concat.Strings[i]);
 			}
 			return res;
 		case EString_String :     // 42 -> "42".
-			res = new char[10]; // Should be enough ?
-			sprintf(res, "%d", EvalNumber(s->D.Number));
-			return res;
+		{
+			char buffer[10]; // Should be enough ?
+			sprintf(buffer, "%d", EvalNumber(s->D.Number));
+			return buffer;
+		}
 		case EString_InverseVideo : // "a" -> "~<a~>"
 			tmp1 = EvalString(s->D.String);
 			// FIXME replace existing "~<" by "~>" in tmp1.
-			res = strdcat3("~<", tmp1, "~>");
-			delete[] tmp1;
+			res = std::string("~<") + tmp1 + "~>";
 			return res;
 		case EString_UnitName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
-				return new_strdup(unit->Type->Name.c_str());
+				return unit->Type->Name;
 			} else { // ERROR.
-				return NULL;
+				return "";
 			}
 		case EString_If : // cond ? True : False;
 			if (EvalNumber(s->D.If.Cond)) {
@@ -1103,45 +1087,35 @@ char *EvalString(const StringDesc *s)
 			} else if (s->D.If.False) {
 				return EvalString(s->D.If.False);
 			} else {
-				str = new char[1];
-				str[0] = '\0';
-				return str;
+				return "";
 			}
 		case EString_SubString : // substring(s, begin, end)
 			if (s->D.SubString.String != NULL &&
-					(tmp1 = EvalString(s->D.SubString.String)) != NULL) {
+					!(tmp1 = EvalString(s->D.SubString.String)).empty()) {
 				int begin;
 				int end;
 
 				begin = EvalNumber(s->D.SubString.Begin);
-				if ((unsigned) begin > strlen(tmp1) && begin > 0) {
-					delete[] tmp1;
-					str = new char[1];
-					str[0] = '\0';
-					return str;
+				if ((unsigned) begin > tmp1.size() && begin > 0) {
+					return "";
 				}
-				res = new_strdup(tmp1 + begin);
-				delete[] tmp1;
+				res = tmp1.c_str() + begin;
 				if (s->D.SubString.End) {
 					end = EvalNumber(s->D.SubString.End);
 				} else {
 					end = -1;
 				}
-				if ((unsigned)end < strlen(res) && end >= 0) {
+				if ((unsigned)end < res.size() && end >= 0) {
 					res[end] = '\0';
 				}
 				return res;
 			} else { // ERROR.
-				str = new char[1];
-				str[0] = '\0';
-				return str;
+				return "";
 			}
 		case EString_Line : // line n of the string
 			if (s->D.Line.String == NULL ||
-					(tmp1 = EvalString(s->D.Line.String)) == NULL) {
-				str = new char[1];
-				str[0] = '\0';
-				return str; // ERROR.
+					(tmp1 = EvalString(s->D.Line.String)).empty()) {
+				return ""; // ERROR.
 			} else {
 				int line;
 				int maxlen;
@@ -1149,10 +1123,7 @@ char *EvalString(const StringDesc *s)
 
 				line = EvalNumber(s->D.Line.Line);
 				if (line <= 0) {
-					delete[] tmp1;
-					str = new char[1];
-					str[0] = '\0';
-					return str;
+					return "";
 				}
 				if (s->D.Line.MaxLen) {
 					maxlen = EvalNumber(s->D.Line.MaxLen);
@@ -1164,12 +1135,6 @@ char *EvalString(const StringDesc *s)
 				}
 				font = s->D.Line.Font;
 				res = GetLineFont(line, tmp1, maxlen, font);
-				delete[] tmp1;
-				if (!res) { // ERROR.
-					str = new char[1];
-					str[0] = '\0';
-					res = str;
-				}
 				return res;
 			}
 	}
@@ -2386,7 +2351,7 @@ static int CclLoadMap(lua_State *l)
 	LuaCheckArgs(l, 1);
 	name = LuaToString(l, 1);
 
-	// TODO Check if there a map has already been loaded. 
+	// TODO Check if there a map has already been loaded.
 	//  If true, memory needs to be freed.
 
 	//MAPTODO load stratagus map !!!!!!!!!!!
@@ -2533,9 +2498,8 @@ void SavePreferences(void)
 			return;
 		}
 
-		char *s = SaveGlobal(Lua, false);
-		fprintf(fd, "preferences = {\n%s}\n", s);
-		delete[] s;
+		std::string s = SaveGlobal(Lua, false);
+		fprintf(fd, "preferences = {\n%s}\n", s.c_str());
 
 		fclose(fd);
 	}

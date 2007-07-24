@@ -211,48 +211,6 @@ unsigned int strcat_s(char *dst, size_t dstsize, const char *src)
 }
 #endif
 
-/**
-**  String duplicate/concatenate (two arguments)
-**
-**  @param l  Left string
-**  @param r  Right string
-**
-**  @return   Allocated combined string (must be freed).
-*/
-char *strdcat(const char *l, const char *r)
-{
-	int len = strlen(l) + strlen(r) + 1;
-	char *res = new char[len];
-
-	if (res) {
-		strcpy_s(res, len, l);
-		strcat_s(res, len, r);
-	}
-	return res;
-}
-
-/**
-**  String duplicate/concatenate (three arguments)
-**
-**  @param l  Left string
-**  @param m  Middle string
-**  @param r  Right string
-**
-**  @return   Allocated combined string (must be freeded).
-*/
-char *strdcat3(const char *l, const char *m, const char *r)
-{
-	int len = strlen(l) + strlen(m) + strlen(r) + 1;
-	char *res = new char[len];
-
-	if (res) {
-		strcpy_s(res, len, l);
-		strcat_s(res, len, m);
-		strcat_s(res, len, r);
-	}
-	return res;
-}
-
 #if !defined(HAVE_STRCASESTR)
 /**
 **  Case insensitive version of strstr

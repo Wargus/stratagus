@@ -288,7 +288,7 @@ StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string descript
 StringDesc *NewStringDesc(const char *s);            /// Create a StringDesc with const string.
 extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.
 extern CUnit *EvalUnit(const UnitDesc *unitdesc);    /// Evaluate the unit.
-char *EvalString(const StringDesc *s);               /// Evaluate the string.
+std::string EvalString(const StringDesc *s);         /// Evaluate the string.
 
 void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (no pointer itself).
 void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).

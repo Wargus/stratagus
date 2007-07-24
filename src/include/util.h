@@ -63,11 +63,6 @@ extern unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t
 extern unsigned int strcat_s(char *dst, size_t dstsize, const char *src);
 #endif
 
-	/// strdup + strcat
-extern char *strdcat(const char *l, const char *r);
-	/// strdup + strcat + strcat
-extern char *strdcat3(const char *l, const char *m, const char *r);
-
 #ifndef HAVE_STRCASESTR
 	/// case insensitive strstr
 extern char *strcasestr(const char *str, const char *substr);
