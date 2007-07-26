@@ -10,7 +10,7 @@
 //
 /**@name ui.h - The user interface header file. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -296,15 +296,15 @@ public:
 */
 class CContentTypeFormattedText : public CContentType {
 public:
-	CContentTypeFormattedText() : Format(NULL), Font(NULL), Centered(0),
+	CContentTypeFormattedText() : Font(NULL), Centered(false),
 		Index(-1), Component(VariableValue) {}
-	virtual ~CContentTypeFormattedText() { delete[] this->Format; }
+	virtual ~CContentTypeFormattedText() {}
 
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
-	char *Format;                /// Text to display
+	std::string Format;          /// Text to display
 	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
+	bool Centered;               /// if true, center the display.
 	int Index;                   /// Index of the variable to show.
 	EnumVariable Component;      /// Component of the variable.
 };
@@ -314,15 +314,15 @@ public:
 */
 class CContentTypeFormattedText2 : public CContentType {
 public:
-	CContentTypeFormattedText2() : Format(NULL), Font(NULL), Centered(0),
+	CContentTypeFormattedText2() : Font(NULL), Centered(false),
 		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
-	virtual ~CContentTypeFormattedText2() { delete[] Format; }
+	virtual ~CContentTypeFormattedText2() {}
 
 	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
 
-	char *Format;                /// Text to display
+	std::string Format;          /// Text to display
 	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
+	bool Centered;               /// if true, center the display.
 	int Index1;                  /// Index of the variable1 to show.
 	EnumVariable Component1;     /// Component of the variable1.
 	int Index2;                  /// Index of the variable to show.

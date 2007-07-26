@@ -10,7 +10,7 @@
 //
 /**@name construct.cpp - The constructions. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -73,27 +73,27 @@ void InitConstructions(void)
 */
 void LoadConstructions(void)
 {
-	const char *file;
 	std::vector<CConstruction *>::iterator i;
 
 	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
 		if ((*i)->Ident.empty()) {
 			continue;
 		}
-		file = (*i)->File.File.c_str();
+		std::string file = (*i)->File.File;
+
 		(*i)->Width = (*i)->File.Width;
 		(*i)->Height = (*i)->File.Height;
-		if (file && *file) {
-			ShowLoadProgress("Construction %s", file);
+		if (!file.empty()) {
+			ShowLoadProgress("Construction %s", file.c_str());
 			(*i)->Sprite = CPlayerColorGraphic::New(file, (*i)->Width, (*i)->Height);
 			(*i)->Sprite->Load();
 			(*i)->Sprite->Flip();
 		}
-		file = (*i)->ShadowFile.File.c_str();
+		file = (*i)->ShadowFile.File;
 		(*i)->ShadowWidth = (*i)->ShadowFile.Width;
 		(*i)->ShadowHeight = (*i)->ShadowFile.Height;
-		if (file && *file) {
-			ShowLoadProgress("Construction %s", file);
+		if (!file.empty()) {
+			ShowLoadProgress("Construction %s", file.c_str());
 			(*i)->ShadowSprite = CGraphic::ForceNew(file,
 				(*i)->ShadowWidth, (*i)->ShadowHeight);
 			(*i)->ShadowSprite->Load();
@@ -164,8 +164,6 @@ static int CclDefineConstruction(lua_State *l)
 	std::string str;
 	CConstruction *construction;
 	std::vector<CConstruction *>::iterator i;
-	int subargs;
-	int k;
 
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
@@ -175,7 +173,6 @@ static int CclDefineConstruction(lua_State *l)
 	// Slot identifier
 
 	str = LuaToString(l, 1);
-
 	for (i = Constructions.begin(); i != Constructions.end(); ++i) {
 		if ((*i)->Ident == str) {
 			// Redefine
@@ -200,14 +197,12 @@ static int CclDefineConstruction(lua_State *l)
 
 		if ((files = !strcmp(value, "Files")) ||
 				!strcmp(value, "ShadowFiles")) {
-			char *file;
+			std::string file;
 			int w;
 			int h;
 
-			file = NULL;
 			w = 0;
 			h = 0;
-
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -216,7 +211,7 @@ static int CclDefineConstruction(lua_State *l)
 				value = LuaToString(l, -2);
 
 				if (!strcmp(value, "File")) {
-					file = new_strdup(LuaToString(l, -1));
+					file = LuaToString(l, -1);
 				} else if (!strcmp(value, "Size")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
@@ -242,8 +237,9 @@ static int CclDefineConstruction(lua_State *l)
 				construction->ShadowFile.Height = h;
 			}
 		} else if (!strcmp(value, "Constructions")) {
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
+			const unsigned int subargs = luaL_getn(l, -1);
+
+			for (unsigned int k = 0; k < subargs; ++k) {
 				int percent;
 				ConstructionFileType file;
 				int frame;
@@ -295,7 +291,6 @@ static int CclDefineConstruction(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
-
 	return 0;
 }
 

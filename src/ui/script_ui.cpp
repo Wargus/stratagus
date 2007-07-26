@@ -10,7 +10,7 @@
 //
 /**@name script_ui.cpp - The ui ccl functions. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      (c) Copyright 1999-2007 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -611,7 +611,7 @@ static CContentType *CclParseContent(lua_State *l)
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					key = LuaToString(l, -2);
 					if (!strcmp(key, "Format")) {
-						contentformattedtext->Format = new_strdup(LuaToString(l, -1));
+						contentformattedtext->Format = LuaToString(l, -1);
 					} else if (!strcmp(key, "Font")) {
 						contentformattedtext->Font = CFont::Get(LuaToString(l, -1));
 					} else if (!strcmp(key, "Variable")) {
@@ -635,7 +635,7 @@ static CContentType *CclParseContent(lua_State *l)
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					key = LuaToString(l, -2);
 						if (!strcmp(key, "Format")) {
-							contentformattedtext2->Format = new_strdup(LuaToString(l, -1));
+							contentformattedtext2->Format = LuaToString(l, -1);
 						} else if (!strcmp(key, "Font")) {
 							contentformattedtext2->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(key, "Variable")) {
@@ -1148,8 +1148,6 @@ static int CclDefineButton(lua_State *l)
 {
 	char buf[64];
 	const char *value;
-	char *s1;
-	const char *s2;
 	ButtonAction ba;
 
 	LuaCheckArgs(l, 1);
@@ -1220,11 +1218,10 @@ static int CclDefineButton(lua_State *l)
 			}
 			if (lua_isnumber(l, -1)) {
 				sprintf(buf, "%ld", (long int)lua_tonumber(l, -1));
-				s1 = new_strdup(buf);
+				ba.ValueStr = buf;
 			} else {
-				s1 = new_strdup(lua_tostring(l, -1));
+				ba.ValueStr = lua_tostring(l, -1);
 			}
-			ba.ValueStr = s1;
 		} else if (!strcmp(value, "Allowed")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "check-true")) {
@@ -1257,58 +1254,40 @@ static int CclDefineButton(lua_State *l)
 				LuaError(l, "Unsupported action: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "AllowArg")) {
-			int subargs;
-			int k;
-
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			s1 = new_strdup("");
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
+			std::string s;
+			const unsigned int subargs = luaL_getn(l, -1);
+
+			for (unsigned int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				s2 = LuaToString(l, -1);
+
+				s += LuaToString(l, -1);
 				lua_pop(l, 1);
-				int news1len = strlen(s1) + strlen(s2) + 2;
-				char *news1 = new char[news1len];
-				strcpy_s(news1, news1len, s1);
-				strcat_s(news1, news1len, s2);
-				delete[] s1;
-				s1 = news1;
 				if (k != subargs - 1) {
-					strcat_s(s1, news1len, ",");
+					s += ",";
 				}
 			}
-			ba.AllowStr = s1;
-			delete[] s1;
+			ba.AllowStr = s;
 		} else if (!strcmp(value, "Key")) {
 			ba.Key = *LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
 			ba.Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "ForUnit")) {
-			int subargs;
-			int k;
-
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			// FIXME: ba.UnitMask shouldn't be a string
-			s1 = new_strdup(",");
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
+			std::string s = ",";
+			const unsigned subargs = luaL_getn(l, -1);
+			for (unsigned int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				s2 = LuaToString(l, -1);
+				s += LuaToString(l, -1);
+				s += ",";
 				lua_pop(l, 1);
-				int news1len = strlen(s1) + strlen(s2) + 2;
-				char *news1 = new char[news1len];
-				strcpy_s(news1, news1len, s1);
-				strcat_s(news1, news1len, s2);
-				strcat_s(news1, news1len, ",");
-				delete[] s1;
-				s1 = news1;
 			}
-			ba.UnitMask = s1;
-			delete[] s1;
+			ba.UnitMask = s;
 			if (!strncmp(ba.UnitMask.c_str(), ",*,", 3)) {
 				ba.UnitMask = "*";
 			}
@@ -1319,7 +1298,6 @@ static int CclDefineButton(lua_State *l)
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
-
 	return 0;
 }
 

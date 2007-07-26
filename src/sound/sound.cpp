@@ -10,7 +10,7 @@
 //
 /**@name sound.cpp - The sound. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -435,7 +435,7 @@ void SetSoundRange(CSound *sound, unsigned char range)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-CSound *RegisterSound(const char *files[], unsigned number)
+CSound *RegisterSound(const std::string files[], unsigned number)
 {
 	unsigned i;
 	CSound *id;

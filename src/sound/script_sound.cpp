@@ -10,7 +10,7 @@
 //
 /**@name script_sound.cpp - The sound ccl functions. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -120,10 +120,6 @@ static int CclMakeSound(lua_State *l)
 {
 	CSound *id;
 	std::string c_name;
-	const char *c_file;
-	char **c_files;
-	int args;
-	int j;
 	LuaUserData *data;
 
 	LuaCheckArgs(l, 2);
@@ -131,23 +127,20 @@ static int CclMakeSound(lua_State *l)
 	c_name = LuaToString(l, 1);
 	if (lua_isstring(l, 2)) {
 		// only one file
-		c_file = LuaToString(l, 2);
+		const std::string c_file = LuaToString(l, 2);
 		id = MakeSound(c_name, &c_file, 1);
 	} else if (lua_istable(l, 2)) {
 		// several files
-		args = luaL_getn(l, 2);
-		c_files = new char *[args];
-		for (j = 0; j < args; ++j) {
+		unsigned int args = luaL_getn(l, 2);
+		std::string c_files[args];
+
+		for (unsigned int j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
-			c_files[j] = new_strdup(LuaToString(l, -1));
+			c_files[j] = LuaToString(l, -1);
 			lua_pop(l, 1);
 		}
 		// FIXME: check size before casting
-		id = MakeSound(c_name, (const char **)c_files, (unsigned char)args);
-		for (j = 0; j < args; ++j) {
-			delete[] c_files[j];
-		}
-		delete[] c_files;
+		id = MakeSound(c_name, c_files, (unsigned char)args);
 	} else {
 		LuaError(l, "string or table expected");
 		return 0;

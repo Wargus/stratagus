@@ -10,7 +10,7 @@
 //
 /**@name sound_id.cpp - The sound id. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2007 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ CSound *SoundForName(const std::string &name)
 **
 **  @return      the sound id of the created group
 */
-CSound *MakeSound(const std::string &name, const char *file[], int nb)
+CSound *MakeSound(const std::string &name, const std::string file[], int nb)
 {
 	CSound *sound;
 

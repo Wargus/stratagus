@@ -10,7 +10,7 @@
 //
 /**@name master.cpp - The master server. */
 //
-//      (c) Copyright 2003-2005 by Tom Zickel and Jimmy Salmon
+//      (c) Copyright 2003-2007 by Tom Zickel and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@
 static Socket MetaServerFildes;  // This is a TCP socket.
 int MetaServerInUse;
 
-char *MasterHost;       /// Metaserver Address
+std::string MasterHost; /// Metaserver Address
 int MasterPort;         /// Metaserver Port
 
 /*----------------------------------------------------------------------------
@@ -80,10 +80,8 @@ int CclSetMetaServer(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 
-	delete[] MasterHost;
-	MasterHost = new_strdup(LuaToString(l, 1));	
+	MasterHost = LuaToString(l, 1);
 	MasterPort = LuaToNumber(l, 2);
-
 	return 0;
 }
 

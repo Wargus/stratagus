@@ -10,7 +10,7 @@
 //
 /**@name master.h - The master server headerfile. */
 //
-//      (c) Copyright 2003-2005 by Tom Zickel and Jimmy Salmon
+//      (c) Copyright 2003-2007 by Tom Zickel and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ struct lua_State;
 
 extern int MetaServerInUse;
 
-extern char *MasterHost;
+extern std::string MasterHost;
 extern int MasterPort;
 
 extern int MetaInit(void);

@@ -10,7 +10,7 @@
 //
 /**@name script_player.cpp - The player ccl functions. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -611,12 +611,12 @@ static int CclDefineRaceNames(lua_State *l)
 				if (!strcmp(value, "name")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
-					PlayerRaces.Name[i] = new_strdup(LuaToString(l, -1));
+					PlayerRaces.Name[i] = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "display")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
-					PlayerRaces.Display[i] = new_strdup(LuaToString(l, -1));
+					PlayerRaces.Display[i] = LuaToString(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "visible")) {
 					PlayerRaces.Visible[i] = 1;

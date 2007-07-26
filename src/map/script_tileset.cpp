@@ -10,7 +10,7 @@
 //
 /**@name script_tileset.cpp - The tileset ccl functions. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2000-2007 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -470,7 +470,7 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->SolidTerrainTypes[0].TerrainName = new_strdup("unused");
+	tileset->SolidTerrainTypes[0].TerrainName = "unused";
 	tileset->NumTerrainTypes = 1;
 
 	//

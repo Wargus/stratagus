@@ -404,9 +404,9 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) cons
 	Assert((unsigned int) this->Index < UnitTypeVar.NumberVariable);
 	usi1 = GetComponent(unit, this->Index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
-		sprintf(buf, this->Format, usi1.s);
+		sprintf(buf, this->Format.c_str(), usi1.s);
 	} else {
-		sprintf(buf, this->Format, usi1.i);
+		sprintf(buf, this->Format.c_str(), usi1.i);
 	}
 
 	if (this->Centered) {
@@ -440,15 +440,15 @@ void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) con
 	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
 	if (usi1.type == USTRINT_STR) {
 		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, this->Format, usi1.s, usi2.s);
+			sprintf(buf, this->Format.c_str(), usi1.s, usi2.s);
 		} else {
-			sprintf(buf, this->Format, usi1.s, usi2.i);
+			sprintf(buf, this->Format.c_str(), usi1.s, usi2.i);
 		}
 	} else {
 		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, this->Format, usi1.i, usi2.s);
+			sprintf(buf, this->Format.c_str(), usi1.i, usi2.s);
 		} else {
-			sprintf(buf, this->Format, usi1.i, usi2.i);
+			sprintf(buf, this->Format.c_str(), usi1.i, usi2.i);
 		}
 	}
 	if (this->Centered) {

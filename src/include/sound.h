@@ -10,7 +10,7 @@
 //
 /**@name sound.h - The sound header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL)
 extern void SetSoundRange(CSound *sound, unsigned char range);
 
 	/// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const char *files[], unsigned number);
+extern CSound *RegisterSound(const std::string files[], unsigned int number);
 
 	///  Create a special sound group with two sounds
 extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
@@ -190,7 +190,7 @@ extern void MapSound(const std::string &sound_name, CSound *id);
 	/// Get the sound id bound to an identifier
 extern CSound *SoundForName(const std::string &sound_name);
 	/// Make a sound bound to identifier
-extern CSound *MakeSound(const std::string &sound_name, const char *file[], int nb);
+extern CSound *MakeSound(const std::string &sound_name, const std::string file[], int nb);
 	/// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
 
