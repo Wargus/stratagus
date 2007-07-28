@@ -326,7 +326,7 @@ DefineVariant(debug, 'debug')
 DefineVariant(profile, 'profile')
 if staticenv:
    stdlibcxx = staticenv.Command('libstdc++.a', None, 
-          Action('ln -s `%s -print-file-name=libstdc++.a`' % staticenv['CXX']))
+          Action('ln -sf `%s -print-file-name=libstdc++.a`' % staticenv['CXX']))
    # staticenv.Append(LIBS = [stdlibcxx])   <= does not work with scons 0.96.1
    prog = DefineVariant(staticenv, 'static')
    staticenv.Depends(prog, stdlibcxx)
