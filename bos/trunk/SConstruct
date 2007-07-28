@@ -309,7 +309,10 @@ if sys.platform.startswith('linux'):
            linkflags += '-l%s ' % i
            staticenv['LIBS'].remove(i)
    linkflags += '-logg -Wl,-Bdynamic'
-   staticenv['LINKFLAGS'].append(linkflags.split())
+   # To successfully link with static libraries with GCC 4.1.2,
+   # the static libs must be at the end. This trick enforces it.
+   staticenv['STATICLINKFLAGS'] = linkflags.split()
+   staticenv['LINKCOM'] += ' $STATICLINKFLAGS'
 
 # Targets
 def DefineVariant(venv, v, vv = None):
