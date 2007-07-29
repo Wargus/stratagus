@@ -264,7 +264,7 @@ function RunLanguageOptionsMenu(s)
       preferences.GameTranslation = GameTranslation
       SavePreferences()
     end      
-    local rb = menu:addRadioButton(language, "lang", offx, offy + 36 * h, SetLanguage)
+    local rb = menu:addRadioButton(language, "lang", offx, offy + 32 * h, SetLanguage)
     if StratagusTranslation == enginepo then
       rb:setMarked(true)
     end
@@ -284,6 +284,7 @@ function RunLanguageOptionsMenu(s)
   AddLanguage("Dansk", "da", 6.0)
   AddLanguage("Türkçe", "tr", 7.0)
   AddLanguage("Español", "es", 8.0)
+  AddLanguage("Czech", "cs", 9.0)
 
   menu:addButton(_("~!OK"), "o", Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
