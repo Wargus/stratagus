@@ -1,0 +1,284 @@
+# translation of engine.pot to Czech
+# Copyright (C) 2007 GNU GPL version 2 or later
+# This file is distributed under the same license as the BOS package.
+# Radim Luža, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-07-09 21:41+0200\n"
+"PO-Revision-Date: 2007-07-27 00:22+0100\n"
+"Last-Translator: Radim Luža <radimluza@seznam.cz>\n"
+"Language-Team: Czech\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+
+#: action/action_build.cpp:131
+msgid "You cannot reach building place"
+msgstr "Nelze se dostat k místu stavby"
+
+#: action/action_build.cpp:210
+#, c-format
+msgid "You cannot build %s here"
+msgstr "%s zde nelze postavit"
+
+#: action/action_build.cpp:224
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Nelze postavit více jednotek %s"
+
+#: action/action_build.cpp:256
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Nelze postavit budovu %s"
+
+#: action/action_build.cpp:450
+#, c-format
+msgid "New %s done"
+msgstr "Dokončení %s"
+
+#: action/action_spellcast.cpp:172
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: nedostatek s síly pro kouzlo: %s"
+
+#: action/action_spellcast.cpp:176
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: nelze vyvolat kouzlo: %s"
+
+#: action/action_train.cpp:185
+#, c-format
+msgid "New %s ready"
+msgstr "Nový(á) %s připraven(a)"
+
+#: action/action_train.cpp:231
+#, c-format
+msgid "Unable to train %s"
+msgstr "Nelze vycvičit %s"
+
+#: action/command.cpp:1026
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Hráč \"%s\" opustil hru"
+
+#: action/command.cpp:1028
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Hráč \"%s\" byl zničen"
+
+#: editor/editloop.cpp:516
+msgid "~!OK"
+msgstr ""
+
+#: editor/editloop.cpp:524
+msgid "~!Cancel"
+msgstr "Zrušit (~!c)"
+
+#: editor/editloop.cpp:1308
+msgid "Unit can't be placed here."
+msgstr "Jednotka zde nemůže být umístěna"
+
+#: editor/editloop.cpp:1380
+msgid "Mirror editing enabled: 2-side"
+msgstr "Mirror editing povoleno: 2-strany"
+
+#: editor/editloop.cpp:1383
+msgid "Mirror editing enabled: 4-side"
+msgstr "Mirror editing povoleno: 4-strany"
+
+#: editor/editloop.cpp:1386
+msgid "Mirror editing disabled"
+msgstr "Mirror editing zakázáno"
+
+#: editor/editloop.cpp:1406
+msgid "Unit deleted"
+msgstr "Jednotka smazána"
+
+#: editor/editloop.cpp:1429 editor/editloop.cpp:1438
+msgid "Unit owner modified"
+msgstr "Vlastník jednotky změněn"
+
+#: editor/editloop.cpp:1759
+msgid "Select mode"
+msgstr "Režim výběru"
+
+#: editor/editloop.cpp:1769
+msgid "Unit mode"
+msgstr "Režim jednotek"
+
+#: editor/editloop.cpp:1780
+msgid "Tile mode"
+msgstr "\"Dláždicí\" režim"
+
+#: editor/editloop.cpp:1791
+msgid "Set start location mode"
+msgstr "Režim nastavení výchozí pozice"
+
+#: network/commands.cpp:796
+msgid "No sync info for this replay !"
+msgstr "Chybí synchronizační info pro tento záznam !"
+
+#: network/commands.cpp:798
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Záznam se dostal mimo synchronizaci (%lu) !"
+
+#: network/commands.cpp:807
+msgid "Replay got out of sync !"
+msgstr "Záznam se dostal mimo synchronizaci !"
+
+#: network/commands.cpp:906 network/commands.cpp:921
+msgid "End of replay"
+msgstr "Konec záznamu"
+
+#: network/network.cpp:1061
+#, fuzzy, c-format
+msgid "%s sent bad command"
+msgstr "%s poslal neplatný příkaz"
+
+#: network/network.cpp:1158
+msgid "Network out of sync"
+msgstr "Výpadek synchronizace sítě"
+
+#: network/network.cpp:1391
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Čeká se na hráče \"%s\": %d:%02d"
+
+#: network/network.cpp:1407
+msgid "Timed out"
+msgstr "Vypršení času"
+
+#: stratagus/player.cpp:706
+msgid "Building Limit Reached"
+msgstr "Dosažen limit budov"
+
+#: stratagus/player.cpp:710
+msgid "Unit Limit Reached"
+msgstr "Dosažen limit jednotek"
+
+#: stratagus/player.cpp:714
+msgid "Total Unit Limit Reached"
+msgstr "Dosažen celkový limit jednotek"
+
+#: stratagus/player.cpp:718
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "Limit %d dosažen pro tento typ jednotky"
+
+#: stratagus/player.cpp:724
+#, fuzzy
+msgid "Cannot create more units."
+msgstr "Nelze vytvořit více jednotek %s."
+
+#: stratagus/stratagus.cpp:735
+#, fuzzy, c-format
+msgid "Thanks for playing Bos Wars.\n"
+msgstr "Děkujeme, že jste hrál(a) Bos Wars.\n"
+
+#: ui/botpanel.cpp:666 ui/botpanel.cpp:731
+msgid "Select Target"
+msgstr "Vyberte Cíl"
+
+#: ui/botpanel.cpp:779
+msgid "Select Location"
+msgstr "Vyberte Umístění"
+
+#: ui/interface.cpp:94
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "ZPRÁVA:%s~!_"
+
+#: ui/interface.cpp:246
+msgid "Sound is on."
+msgstr "Zvuk je zapnut."
+
+#: ui/interface.cpp:248
+msgid "Sound is off."
+msgstr "Zvuk je vypnut."
+
+#: ui/interface.cpp:263
+msgid "Music is off."
+msgstr "Hudba je vypnuta."
+
+#: ui/interface.cpp:266
+msgid "Music is on."
+msgstr "Hudba je zapnuta."
+
+#: ui/interface.cpp:279 ui/mouse.cpp:1610
+msgid "Game Paused"
+msgstr "Hra pozastavena"
+
+#: ui/interface.cpp:281
+msgid "Game Resumed"
+msgstr "Hra pokračuje"
+
+#: ui/interface.cpp:312
+msgid "Big map enabled"
+msgstr "Velká mapa povolena"
+
+#: ui/interface.cpp:321
+msgid "Returning to old map"
+msgstr "Navráceno ke staré mapě"
+
+#: ui/interface.cpp:335
+msgid "Faster"
+msgstr "Rychleji"
+
+#: ui/interface.cpp:354
+msgid "Slower"
+msgstr "Pomaleji"
+
+#: ui/interface.cpp:409
+msgid "Terrain displayed."
+msgstr "Terén zobrazen."
+
+#: ui/interface.cpp:411
+msgid "Terrain hidden."
+msgstr "Terén skryt."
+
+#: ui/interface.cpp:444
+msgid "Grab mouse toggled."
+msgstr "Zachytávání myši přepnuto."
+
+#: ui/interface.cpp:919
+msgid "Screenshot made."
+msgstr "Screenshot pořízen."
+
+#: ui/mainscr.cpp:694
+msgid "Energy"
+msgstr "Energie"
+
+#: ui/mainscr.cpp:694
+msgid "Magma"
+msgstr ""
+
+#: ui/mainscr.cpp:919
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Poslední zpráva opakována ~<%d~>-krát"
+
+#: ui/mainscr.cpp:1044
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Událost: %s~>"
+
+#: ui/mouse.cpp:1778
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Máte ~<%d~> %ss"
+
+#: ui/mouse.cpp:1782
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "Máte ~<%d~> %s(s)"
+
+#: unit/unit.cpp:2744
+#, c-format
+msgid "%s attacked"
+msgstr "%s napaden"
