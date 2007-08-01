@@ -89,7 +89,7 @@ DefineUnitType("unit-rtank", {
     CanTargetLand = true,
     CanTargetAir = true,
     NumDirections = 8,
-    MaxAttackRange = 7,
+    MaxAttackRange = 6,
     Sounds = {
         "selected", "grenadier-selected",
         "acknowledge", "grenadier-acknowledge",
