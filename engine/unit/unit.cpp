@@ -441,7 +441,7 @@ static CUnit *GetFirstContainer(const CUnit *unit)
 	while (unit->Container) {
 		unit = unit->Container;
 	}
-	return (CUnit *)unit;
+	return const_cast<CUnit *>(unit);
 }
 
 /**
