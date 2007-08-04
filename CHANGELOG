@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Version 2.4.0:
+- Fixed bug loading a save game where a unit contains a unit that hasn't been loaded yet (Jimmy Salmon)
 - Add Czech translation (Radim Luža)
 - Added new tutorial (Jimmy Salmon)
 - Fixed clipped rectangle drawing with OpenGL (Jimmy Salmon)
