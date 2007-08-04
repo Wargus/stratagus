@@ -184,6 +184,7 @@ void LoadGame(const std::string &filename)
 	unsigned long game_cycle;
 	unsigned syncrand;
 	unsigned synchash;
+	int i;
 
 	// log will be enabled if found in the save game
 	CommandLogDisabled = 1;
@@ -198,8 +199,17 @@ void LoadGame(const std::string &filename)
 	LuaLoadFile(filename);
 	CclGarbageCollect(0);
 
-	for (int i = 0; i < NumPlayers; ++i) {
+	for (i = 0; i < NumPlayers; ++i) {
 		Players[i].RebuildUnitsConsumingResourcesList();
+	}
+
+	// Place units
+	for (i = 0; i < NumUnits; ++i) {
+		CUnit *unit = Units[i];
+		if (!unit->Removed) {
+			unit->Removed = 1;
+			unit->Place(unit->X, unit->Y);
+		}
 	}
 
 	game_cycle = GameCycle;
