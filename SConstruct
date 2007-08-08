@@ -303,12 +303,12 @@ if sys.platform.startswith('linux'):
    staticenv = release.Copy()
    staticlibs = 'lua lua50 lua5.0 lua5.1 lua51 lualib lualib50 lualib5.0 vorbis theora ogg'
    staticlibs = staticlibs.split(' ')
-   linkflags = '-L. -Wl,-Bstatic -lstdc++ '
+   linkflags = '-L. -static-libgcc -Wl,-Bstatic -lstdc++ '
    for i in staticlibs:
        if i in staticenv['LIBS']:
            linkflags += '-l%s ' % i
            staticenv['LIBS'].remove(i)
-   linkflags += '-logg -Wl,-Bdynamic'
+   linkflags += '-Wl,-Bdynamic'
    # To successfully link with static libraries with GCC 4.1.2,
    # the static libs must be at the end. This trick enforces it.
    staticenv['STATICLINKFLAGS'] = linkflags.split()
