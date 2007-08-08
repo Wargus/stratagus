@@ -1,0 +1,20 @@
+class CUnitType
+{
+	std::string Ident;
+	std::string Name;
+	tolua_readonly int Slot;
+
+	int MinAttackRange;
+
+	tolua_property__s int MaxEnergyUtilizationRate;
+	tolua_property__s int MaxMagmaUtilizationRate;
+	tolua_property__s int EnergyProductionRate;
+	tolua_property__s int MagmaProductionRate;
+	tolua_property__s int EnergyValue;
+	tolua_property__s int MagmaValue;
+	tolua_property__s int EnergyStorageCapacity;
+	tolua_property__s int MagmaStorageCapacity;
+};
+
+CUnitType *UnitTypeByIdent(const std::string ident);
+
