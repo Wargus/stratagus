@@ -240,9 +240,10 @@ def AutoConfigure(env):
   if not 'USE_WIN32' in env['CPPDEFINES']:
     env.ParseConfig('sdl-config --cflags')
     env.ParseConfig('sdl-config --libs')
-    if not '-Dmain=SDL_main' in env['CCFLAGS'] and not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
-       print 'Did not find SDL library or headers, exiting!'
-       Exit(1)
+    if sys.platform != "darwin" and not '-Dmain=SDL_main' in env['CCFLAGS']:
+       if not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
+          print 'Did not find SDL library or headers, exiting!'
+          Exit(1)
 
   env = conf.Finish()
 
