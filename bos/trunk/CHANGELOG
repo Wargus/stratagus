@@ -1,5 +1,8 @@
 Change log for Bos Wars
 -----------------------
+Development version:
+- Fixed compilation on OS X (Francois Beerten)
+
 Version 2.4.0 (2007 8 6):
 - Fixed bug loading a save game where a unit contains a unit that hasn't been loaded yet (Jimmy Salmon)
 - Add Czech translation (Radim Luža)
