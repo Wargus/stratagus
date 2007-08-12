@@ -2,7 +2,7 @@
 
 echo "Exporting svn"
 svn export . boswars
-rm -rf boswars/installers
+rm -rf boswars/tools/installers
 rm -rf boswars/engine
 
 cp engine/Release/boswars.exe boswars
