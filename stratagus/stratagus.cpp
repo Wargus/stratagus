@@ -131,7 +131,7 @@
 ** @subsection CCL CCL
 **
 ** CCL is Craft Configuration Language, which is used to
-** configure and customize Stratagus.
+** configure and customize the engine.
 **
 ** @see script.h @see script.cpp
 **
@@ -641,7 +641,7 @@ int SaveReplay(const std::string &filename)
 static void PrintHeader(void)
 {
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
-		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, and others.\n"
+		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Francois Beerten and others.\n"
 		"\t(http://www.boswars.org)"
 		"\nCompile options %s", NameLine.c_str(), CompileOptions.c_str());
 }
@@ -659,7 +659,7 @@ static int main1(int argc, char **argv)
 	"\n"
 	"\n"
 	"Bos Wars may be copied only under the terms of the GNU General Public License\n"
-	"which may be found in the Bos Wars source kit.\n"
+	"which must be distributed with this program.\n"
 	"\n"
 	"DISCLAIMER:\n"
 	"This software is provided as-is.  The author(s) can not be held liable for any\n"
@@ -756,15 +756,13 @@ static void Usage(void)
 	printf(
 "\n\nUsage: boswars [OPTIONS]\n\
 \t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
-\t-d datapath\tpath to stratagus data\n\
-\t-e\t\tStart editor\n\
+\t-d datapath\tpath to Bos Wars data\n\
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tDisable command log\n\
 \t-P port\t\tNetwork port to use\n\
 \t-n server\tNetwork server host preset\n\
 \t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
 \t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
-\t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
 \t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
@@ -772,7 +770,6 @@ static void Usage(void)
 \t-F\t\tFull screen video mode\n\
 \t-S\t\tSync speed (100 = 30 frames/s)\n\
 \t-W\t\tWindowed video mode\n\
-map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 ");
 }
 
@@ -842,7 +839,7 @@ int main(int argc, char **argv)
 	//  Parse commandline
 	//
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:ef:hln:P:s:t:v:wD:N:E:FL:S:U:W?")) {
+		switch (getopt(argc, argv, "c:d:hln:P:s:v:D:N:E:FL:S:U:W?")) {
 			case 'c':
 				CclStartFile = optarg;
 				continue;
@@ -858,9 +855,6 @@ int main(int argc, char **argv)
 				delete[] libpath;
 				continue;
 			}
-			case 'e':
-				Editor.Running = EditorCommandLine;
-				continue;
 			case 'E':
 				EditorStartFile = optarg;
 				continue;
