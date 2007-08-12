@@ -99,7 +99,7 @@ def filterEngineSources(files):
 def buildPackages():
   name = 'boswars-' + buildVersionName() + '-%s'
 
-  os.chdir('..')
+  os.chdir('../..')
   files = listFiles()
   files = filterDirectories(files)
 
