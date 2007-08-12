@@ -89,9 +89,11 @@ def buildVersionName():
 
 def filterDirectories(files):
    return [x for x in files if not x.endswith('/')]
-def filterEngineSources(files):
+def filterSources(files):
+   buildfiles = ['SConstruct', 'bos.sln']
    def isGoodFile(f):
-     return not f.startswith('engine/') and not f.startswith('installers')
+     return (not f.startswith('engine/') and not f.startswith('tools/') and
+             f not in buildfiles)
    return [x for x in files if isGoodFile(x)]
    
 
@@ -109,7 +111,7 @@ def buildPackages():
 
   # create binary packages
   #os.popen('scons static=1 debug=0 CXX=apg++')
-  binarydistfiles = filterEngineSources(files)
+  binarydistfiles = filterSources(files)
   linuxfiles = binarydistfiles[:]
   linuxfiles.append('boswars')
   createTarArchive(name % 'linux', linuxfiles)
