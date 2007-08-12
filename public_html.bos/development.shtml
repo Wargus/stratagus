@@ -19,7 +19,7 @@ The game is continuously evolving. You can get the latest version with <a href="
 
 <p>Before playing you'll have to compile the engine. This can be done easily 
 with scons. To build a debug version (recommended for development) run:<br>
-<pre>  scons debug=1</pre>
+<pre>  scons debug</pre>
 
 <p>Finally, you can run the game with :<br>
 <pre>  ./boswars</pre>
