@@ -471,10 +471,8 @@ extern void PlayersEachCycle(void);
 	/// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 
-#ifndef USE_OPENGL
 	/// Change current color set to new player of the sprite
 extern void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite);
-#endif
 
 	/// Calculate how many resources the unit needs to request
 void CalculateRequestedAmount(CUnitType *utype, int bcosts[MaxCosts], int costs[MaxCosts]);

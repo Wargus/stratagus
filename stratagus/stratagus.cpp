@@ -793,9 +793,6 @@ int main(int argc, char **argv)
 #ifdef USE_THEORA
 		"THEORA "
 #endif
-#ifdef USE_OPENGL
-		"OPENGL "
-#endif
 		""
 	;
 
