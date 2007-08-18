@@ -64,16 +64,14 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_OPENGL
 static GLuint MinimapTexture;
-static unsigned char *MinimapSurface;
-static unsigned char *MinimapTerrainSurface;
+static unsigned char *MinimapSurfaceGL;
+static unsigned char *MinimapTerrainSurfaceGL;
 static int MinimapTextureWidth;
 static int MinimapTextureHeight;
-#else
 static SDL_Surface *MinimapSurface;        /// generated minimap
 static SDL_Surface *MinimapTerrainSurface; /// generated minimap terrain
-#endif
+
 static int *Minimap2MapX;                  /// fast conversion table
 static int *Minimap2MapY;                  /// fast conversion table
 static int Map2MinimapX[MaxMapWidth];      /// fast conversion table
@@ -100,7 +98,6 @@ int NumMinimapEvents;
 ----------------------------------------------------------------------------*/
 
 
-#ifdef USE_OPENGL
 /**
 **  Create the minimap texture
 */
@@ -115,9 +112,8 @@ static void CreateMinimapTexture(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
 		MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-		MinimapSurface);
+		MinimapSurfaceGL);
 }
-#endif
 
 /**
 **  Create a mini-map from the tiles of the map.
@@ -167,30 +163,29 @@ void CMinimap::Create(void)
 	}
 
 	// Palette updated from UpdateMinimapTerrain()
-#ifndef USE_OPENGL
-	SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
-	MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-		W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
-	MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-		W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask,
-		TheScreen->format->Bmask, 0);
-#else
-	for (MinimapTextureWidth = 1; MinimapTextureWidth < W; MinimapTextureWidth <<= 1) {
+	if (!UseOpenGL) {
+		SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
+		MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+			W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
+		MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+			W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask,
+			TheScreen->format->Bmask, 0);
+	} else {
+		for (MinimapTextureWidth = 1; MinimapTextureWidth < W; MinimapTextureWidth <<= 1) {
+		}
+		for (MinimapTextureHeight = 1; MinimapTextureHeight < H; MinimapTextureHeight <<= 1) {
+		}
+		MinimapTerrainSurfaceGL = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
+		MinimapSurfaceGL = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
+		memset(MinimapSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
+		CreateMinimapTexture();
 	}
-	for (MinimapTextureHeight = 1; MinimapTextureHeight < H; MinimapTextureHeight <<= 1) {
-	}
-	MinimapTerrainSurface = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
-	MinimapSurface = new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4];
-	memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
-	CreateMinimapTexture();
-#endif
 
 	UpdateTerrain();
 
 	NumMinimapEvents = 0;
 }
 
-#ifdef USE_OPENGL
 /**
 **  Reload OpenGL minimap
 */
@@ -198,7 +193,6 @@ void CMinimap::Reload(void)
 {
 	CreateMinimapTexture();
 }
-#endif
 
 /**
 **  Update a mini-map from the tiles of the map.
@@ -224,86 +218,86 @@ void CMinimap::UpdateTerrain(void)
 	}
 	bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
-#ifndef USE_OPENGL
-	if (bpp == 1) {
-		SDL_SetPalette(MinimapTerrainSurface, SDL_LOGPAL,
-			Map.TileGraphic->Surface->format->palette->colors, 0, 256);
+	if (!UseOpenGL) {
+		if (bpp == 1) {
+			SDL_SetPalette(MinimapTerrainSurface, SDL_LOGPAL,
+				Map.TileGraphic->Surface->format->palette->colors, 0, 256);
+		}
 	}
-#endif
 
 	tilepitch = Map.TileGraphic->Surface->w / TileSizeX;
 
-#ifndef USE_OPENGL
-	SDL_LockSurface(MinimapTerrainSurface);
-#endif
-	SDL_LockSurface(Map.TileGraphic->Surface);
+	if (!UseOpenGL) {
+		SDL_LockSurface(MinimapTerrainSurface);
+	} else {
+		SDL_LockSurface(Map.TileGraphic->Surface);
+	}
+
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
 	for (my = YOffset; my < H - YOffset; ++my) {
 		for (mx = XOffset; mx < W - XOffset; ++mx) {
 			int tile;
-#ifdef USE_OPENGL
 			Uint32 c;
-#endif
 
 			tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
 
 			xofs = TileSizeX * (tile % tilepitch);
 			yofs = TileSizeY * (tile / tilepitch);
 
-#ifndef USE_OPENGL
-			if (bpp == 1) {
-				((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
-					((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						Map.TileGraphic->Surface->pitch];
-			} else if (bpp == 3) {
-				Uint8 *d;
-				Uint8 *s;
+			if (!UseOpenGL) {
+				if (bpp == 1) {
+					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
+						((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch];
+				} else if (bpp == 3) {
+					Uint8 *d;
+					Uint8 *s;
 
-				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
+					d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
+					s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch];
+					*d++ = *s++;
+					*d++ = *s++;
+					*d++ = *s++;
+				} else {
+					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
+						*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch];
+				}
+			} else {
+				if (bpp == 1) {
+					SDL_Color color;
+
+					color = Map.TileGraphic->Surface->format->palette->colors[
+						((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch]];
+					c = Video.MapRGB(0, color.r, color.g, color.b);
+				} else {
+					SDL_PixelFormat *f;
+
+					f = Map.TileGraphic->Surface->format;
+					c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
 						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
 						Map.TileGraphic->Surface->pitch];
-				*d++ = *s++;
-				*d++ = *s++;
-				*d++ = *s++;
-			} else {
-				*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
-					*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-						Map.TileGraphic->Surface->pitch];
+					c = Video.MapRGB(0,
+						((c & f->Rmask) >> f->Rshift),
+						((c & f->Gmask) >> f->Gshift),
+						((c & f->Bmask) >> f->Bshift));
+				}
+				*(Uint32 *)&(MinimapTerrainSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = c;
 			}
-#else
-			if (bpp == 1) {
-				SDL_Color color;
-
-				color = Map.TileGraphic->Surface->format->palette->colors[
-					((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						Map.TileGraphic->Surface->pitch]];
-				c = Video.MapRGB(0, color.r, color.g, color.b);
-			} else {
-				SDL_PixelFormat *f;
-
-				f = Map.TileGraphic->Surface->format;
-				c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-					(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-					Map.TileGraphic->Surface->pitch];
-				c = Video.MapRGB(0,
-					((c & f->Rmask) >> f->Rshift),
-					((c & f->Gmask) >> f->Gshift),
-					((c & f->Bmask) >> f->Bshift));
-			}
-			*(Uint32 *)&(MinimapTerrainSurface[(mx + my * MinimapTextureWidth) * 4]) = c;
-#endif
 		}
 	}
 
-#ifndef USE_OPENGL
-	SDL_UnlockSurface(MinimapTerrainSurface);
-#endif
+	if (!UseOpenGL) {
+		SDL_UnlockSurface(MinimapTerrainSurface);
+	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
@@ -326,8 +320,14 @@ void CMinimap::UpdateXY(int tx, int ty)
 	int tilepitch;
 	int bpp;
 
-	if (!MinimapTerrainSurface) {
-		return;
+	if (!UseOpenGL) {
+		if (!MinimapTerrainSurface) {
+			return;
+		}
+	} else {
+		if (!MinimapTerrainSurfaceGL) {
+			return;
+		}
 	}
 
 	scalex = MinimapScaleX / MINIMAP_FAC;
@@ -345,9 +345,9 @@ void CMinimap::UpdateXY(int tx, int ty)
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
-#ifndef USE_OPENGL
-	SDL_LockSurface(MinimapTerrainSurface);
-#endif
+	if (!UseOpenGL) {
+		SDL_LockSurface(MinimapTerrainSurface);
+	}
 	SDL_LockSurface(Map.TileGraphic->Surface);
 
 	ty *= Map.Info.MapWidth;
@@ -362,9 +362,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 
 		for (mx = XOffset; mx < W - XOffset; ++mx) {
 			int tile;
-#ifdef USE_OPENGL
 			Uint32 c;
-#endif
 
 			x = Minimap2MapX[mx];
 			if (x < tx) {
@@ -382,58 +380,58 @@ void CMinimap::UpdateXY(int tx, int ty)
 			xofs = TileSizeX * (tile % tilepitch);
 			yofs = TileSizeY * (tile / tilepitch);
 
-#ifndef USE_OPENGL
-			if (bpp == 1) {
-				((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
-					((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						Map.TileGraphic->Surface->pitch];
-			} else if (bpp == 3) {
-				Uint8 *d;
-				Uint8 *s;
+			if (!UseOpenGL) {
+				if (bpp == 1) {
+					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
+						((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch];
+				} else if (bpp == 3) {
+					Uint8 *d;
+					Uint8 *s;
 
-				d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-				s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
-						Map.TileGraphic->Surface->pitch];
-				*d++ = *s++;
-				*d++ = *s++;
-				*d++ = *s++;
+					d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
+					s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch];
+					*d++ = *s++;
+					*d++ = *s++;
+					*d++ = *s++;
+				} else {
+					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
+						*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch];
+				}
 			} else {
-				*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
-					*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+				if (bpp == 1) {
+					SDL_Color color;
+
+					color = Map.TileGraphic->Surface->format->palette->colors[
+						((Uint8 *)Map.TileGraphic->Surface->pixels)[
+							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							Map.TileGraphic->Surface->pitch]];
+					c = Video.MapRGB(0, color.r, color.g, color.b);
+				} else {
+					SDL_PixelFormat *f;
+
+					f = Map.TileGraphic->Surface->format;
+					c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
+						(xofs + 7 + (mx % scalex) * 8) * 4 + (yofs + 6 + (my % scaley) * 8) *
 						Map.TileGraphic->Surface->pitch];
+					c = Video.MapRGB(0,
+						((c & f->Rmask) >> f->Rshift),
+						((c & f->Gmask) >> f->Gshift),
+						((c & f->Bmask) >> f->Bshift));
+				}
+				*(Uint32 *)&(MinimapTerrainSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = c;
 			}
-#else
-			if (bpp == 1) {
-				SDL_Color color;
-
-				color = Map.TileGraphic->Surface->format->palette->colors[
-					((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
-						Map.TileGraphic->Surface->pitch]];
-				c = Video.MapRGB(0, color.r, color.g, color.b);
-			} else {
-				SDL_PixelFormat *f;
-
-				f = Map.TileGraphic->Surface->format;
-				c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-					(xofs + 7 + (mx % scalex) * 8) * 4 + (yofs + 6 + (my % scaley) * 8) *
-					Map.TileGraphic->Surface->pitch];
-				c = Video.MapRGB(0,
-					((c & f->Rmask) >> f->Rshift),
-					((c & f->Gmask) >> f->Gshift),
-					((c & f->Bmask) >> f->Bshift));
-			}
-			*(Uint32 *)&(MinimapTerrainSurface[(mx + my * MinimapTextureWidth) * 4]) = c;
-#endif
 		}
 	}
 
-#ifndef USE_OPENGL
-	SDL_UnlockSurface(MinimapTerrainSurface);
-#endif
+	if (!UseOpenGL) {
+		SDL_UnlockSurface(MinimapTerrainSurface);
+	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
@@ -449,10 +447,8 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 	int h;
 	int h0;
 	Uint32 color;
-#ifndef USE_OPENGL
 	SDL_Color c;
 	int bpp;
-#endif
 
 	if (Editor.Running || ReplayRevealMap || unit->IsVisible(ThisPlayer)) {
 		type = unit->Type;
@@ -493,24 +489,24 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;
 	}
-#ifndef USE_OPENGL
-	bpp = MinimapSurface->format->BytesPerPixel;
-	SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
-#endif
+	if (!UseOpenGL) {
+		bpp = MinimapSurface->format->BytesPerPixel;
+		SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
+	}
 	while (w-- >= 0) {
 		h = h0;
 		while (h-- >= 0) {
-#ifndef USE_OPENGL
-			if (bpp == 2) {
-				*(Uint16 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
-					color;
+			if (!UseOpenGL) {
+				if (bpp == 2) {
+					*(Uint16 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
+						color;
+				} else {
+					*(Uint32 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
+						color;
+				}
 			} else {
-				*(Uint32 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
-					color;
+				*(Uint32 *)&(MinimapSurfaceGL[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
 			}
-#else
-			*(Uint32 *)&(MinimapSurface[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
-#endif
 		}
 	}
 }
@@ -526,9 +522,7 @@ void CMinimap::Update(void)
 	int my;
 	int n;
 	int visiontype; // 0 unexplored, 1 explored, >1 visible.
-#ifndef USE_OPENGL
 	int bpp;
-#endif
 
 	red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
 	if (red_phase_changed) {
@@ -537,32 +531,32 @@ void CMinimap::Update(void)
 
 	// Clear Minimap background if not transparent
 	if (!Transparent) {
-#ifndef USE_OPENGL
-		SDL_FillRect(MinimapSurface, NULL, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
-#else
-		memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
-#endif
+		if (!UseOpenGL) {
+			SDL_FillRect(MinimapSurface, NULL, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
+		} else {
+			memset(MinimapSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
+		}
 	}
 
-#ifndef USE_OPENGL
-	bpp = MinimapSurface->format->BytesPerPixel;
-#endif
+	if (!UseOpenGL) {
+		bpp = MinimapSurface->format->BytesPerPixel;
+	}
 
 	//
 	// Draw the terrain
 	//
 	if (WithTerrain) {
-#ifndef USE_OPENGL
-		SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
-#else
-		memcpy(MinimapSurface, MinimapTerrainSurface, MinimapTextureWidth * MinimapTextureHeight * 4);
-#endif
+		if (!UseOpenGL) {
+			SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
+		} else {
+			memcpy(MinimapSurfaceGL, MinimapTerrainSurfaceGL, MinimapTextureWidth * MinimapTextureHeight * 4);
+		}
 	}
 
-#ifndef USE_OPENGL
-	SDL_LockSurface(MinimapSurface);
-	SDL_LockSurface(MinimapTerrainSurface);
-#endif
+	if (!UseOpenGL) {
+		SDL_LockSurface(MinimapSurface);
+		SDL_LockSurface(MinimapTerrainSurface);
+	}
 	for (my = 0; my < H; ++my) {
 		for (mx = 0; mx < W; ++mx) {
 			if (ReplayRevealMap) {
@@ -572,27 +566,27 @@ void CMinimap::Update(void)
 			}
 
 			if ( visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1))))  {
-#ifndef USE_OPENGL
-				if (bpp == 2) {
-					*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
-						ColorBlack;
+				if (!UseOpenGL) {
+					if (bpp == 2) {
+						*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
+							ColorBlack;
+					} else {
+						*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
+							ColorBlack;
+					}
 				} else {
-					*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
-						ColorBlack;
+					*(Uint32 *)&(MinimapSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) =
+						Video.MapRGB(0, 0, 0, 0);
 				}
-#else
-				*(Uint32 *)&(MinimapSurface[(mx + my * MinimapTextureWidth) * 4]) =
-					Video.MapRGB(0, 0, 0, 0);
-#endif
 			}
 
 
 		}
 	}
 
-#ifndef USE_OPENGL
-	SDL_UnlockSurface(MinimapTerrainSurface);
-#endif
+	if (!UseOpenGL) {
+		SDL_UnlockSurface(MinimapTerrainSurface);
+	}
 
 
 	//
@@ -605,9 +599,9 @@ void CMinimap::Update(void)
 		}
 	}
 
-#ifndef USE_OPENGL
-	SDL_UnlockSurface(MinimapSurface);
-#endif
+	if (!UseOpenGL) {
+		SDL_UnlockSurface(MinimapSurface);
+	}
 }
 
 /**
@@ -632,25 +626,25 @@ static void DrawEvents(void)
 */
 void CMinimap::Draw(int vx, int vy)
 {
-#ifndef USE_OPENGL
-	SDL_Rect drect = {X, Y, 0, 0};
-	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
-#else
-	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
-		GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurface);
+	if (!UseOpenGL) {
+		SDL_Rect drect = {X, Y, 0, 0};
+		SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
+	} else {
+		glBindTexture(GL_TEXTURE_2D, MinimapTexture);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
+			GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL);
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex2i(X, Y);
-	glTexCoord2f(0.0f, (float)H / MinimapTextureHeight);
-	glVertex2i(X, Y + H);
-	glTexCoord2f((float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight);
-	glVertex2i(X + W, Y + H);
-	glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
-	glVertex2i(X + W, Y);
-	glEnd();
-#endif
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex2i(X, Y);
+		glTexCoord2f(0.0f, (float)H / MinimapTextureHeight);
+		glVertex2i(X, Y + H);
+		glTexCoord2f((float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight);
+		glVertex2i(X + W, Y + H);
+		glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
+		glVertex2i(X + W, Y);
+		glEnd();
+	}
 
 	DrawEvents();
 }
@@ -697,20 +691,24 @@ int CMinimap::Screen2MapY(int y)
 */
 void CMinimap::Destroy(void)
 {
-#ifndef USE_OPENGL
-	SDL_FreeSurface(MinimapTerrainSurface);
-#else
-	delete[] MinimapTerrainSurface;
-#endif
-	MinimapTerrainSurface = NULL;
-	if (MinimapSurface) {
-#ifndef USE_OPENGL
-		SDL_FreeSurface(MinimapSurface);
-#else
-		glDeleteTextures(1, &MinimapTexture);
-		delete[] MinimapSurface;
-#endif
-		MinimapSurface = NULL;
+	if (!UseOpenGL) {
+		SDL_FreeSurface(MinimapTerrainSurface);
+		MinimapTerrainSurface = NULL;
+	} else {
+		delete[] MinimapTerrainSurfaceGL;
+		MinimapTerrainSurfaceGL = NULL;
+	}
+	if (!UseOpenGL) {
+		if (MinimapSurface) {
+			SDL_FreeSurface(MinimapSurface);
+			MinimapSurface = NULL;
+		}
+	} else {
+		if (MinimapSurfaceGL) {
+			glDeleteTextures(1, &MinimapTexture);
+			delete[] MinimapSurfaceGL;
+			MinimapSurfaceGL = NULL;
+		}
 	}
 	delete[] Minimap2MapX;
 	Minimap2MapX = NULL;

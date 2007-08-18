@@ -156,8 +156,6 @@ def CheckOpenGL(env, conf):
      if not conf.CheckLib('GL'):
          print("Can't find OpenGL libs. Exiting")
          sys.exit(1)
-  env.Append(CPPDEFINES = 'USE_OPENGL')
-  sourcesEngine.append(globSources("guichan/opengl", 'build'))
 
 def CheckLuaLib(env, conf):
   if not 'USE_WIN32' in env['CPPDEFINES']:
@@ -213,6 +211,9 @@ def AutoConfigure(env):
   if not CheckLuaLib(env, conf):
      print 'Did not find required lua library. Exiting!'
      Exit(1)
+  if not CheckOpenGL(env, conf):
+     print 'Did not find required OpenGL library. Exiting!'
+     Exit(1)
 
   # Check for optional libraries #
   if conf.CheckLib('vorbis'):
@@ -221,9 +222,7 @@ def AutoConfigure(env):
      env.Append(CPPDEFINES = 'USE_THEORA')
   if conf.CheckLib('ogg'):
      env.Append(CPPDEFINES = 'USE_OGG')
-  if int(env['opengl']) == 1:
-     CheckOpenGL(env, conf)
-  
+
   # check for optional functions
   if conf.CheckFunc('strcasestr'):
      env.Append(CPPDEFINES = 'HAVE_STRCASESTR')

@@ -72,10 +72,8 @@ int *VisionLookup;
 
 static unsigned short *VisibleTable;
 
-#ifndef USE_OPENGL
 static SDL_Surface *OnlyFogSurface;
 static CGraphic *AlphaFogG;
-#endif
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -369,37 +367,34 @@ void UpdateFogOfWarChange(void)
 **  @param x  X position into video memory
 **  @param y  Y position into video memory
 */
-#ifndef USE_OPENGL
 void VideoDrawOnlyFog(int x, int y)
 {
-	int oldx;
-	int oldy;
-	SDL_Rect srect;
-	SDL_Rect drect;
+	if (!UseOpenGL) {
+		int oldx;
+		int oldy;
+		SDL_Rect srect;
+		SDL_Rect drect;
 
-	srect.x = 0;
-	srect.y = 0;
-	srect.w = OnlyFogSurface->w;
-	srect.h = OnlyFogSurface->h;
+		srect.x = 0;
+		srect.y = 0;
+		srect.w = OnlyFogSurface->w;
+		srect.h = OnlyFogSurface->h;
 
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
+		oldx = x;
+		oldy = y;
+		CLIP_RECTANGLE(x, y, srect.w, srect.h);
+		srect.x += x - oldx;
+		srect.y += y - oldy;
 
-	drect.x = x;
-	drect.y = y;
+		drect.x = x;
+		drect.y = y;
 
-	SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
+		SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
+	} else {
+		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
+			x, y, TileSizeX, TileSizeY);
+	}
 }
-#else
-void VideoDrawOnlyFog(int x, int y)
-{
-	Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-		x, y, TileSizeX, TileSizeY);
-}
-#endif
 
 /*----------------------------------------------------------------------------
 --  Old version correct working but not 100% original
@@ -516,11 +511,11 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 		if (tile && tile != tile2) {
-#ifdef USE_OPENGL
-			Map.FogGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
-#else
-			AlphaFogG->DrawFrameClip(tile, dx, dy);
-#endif
+			if (UseOpenGL) {
+				Map.FogGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
+			} else {
+				AlphaFogG->DrawFrameClip(tile, dx, dy);
+			}
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
@@ -607,82 +602,80 @@ void CViewport::DrawMapFogOfWar() const
 */
 void CMap::InitFogOfWar(void)
 {
-#ifndef USE_OPENGL
 	Uint8 r, g, b;
 	Uint32 color;
 	SDL_Surface *s;
-#endif
 
 	FogGraphic->Load();
 
-#ifndef USE_OPENGL
-	if (!AlphaFogG) {
-		//
-		// Generate Only Fog surface.
-		//
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
-			32, RMASK, GMASK, BMASK, AMASK);
+	if (!UseOpenGL) {
+		if (!AlphaFogG) {
+			//
+			// Generate Only Fog surface.
+			//
+			s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
+				32, RMASK, GMASK, BMASK, AMASK);
 
-		// FIXME: Make the color configurable
-		SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
-		color = Video.MapRGB(s->format, r, g, b);
+			// FIXME: Make the color configurable
+			SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
+			color = Video.MapRGB(s->format, r, g, b);
 
-		SDL_FillRect(s, NULL, color);
-		OnlyFogSurface = SDL_DisplayFormat(s);
-		SDL_SetAlpha(OnlyFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
-		SDL_FreeSurface(s);
+			SDL_FillRect(s, NULL, color);
+			OnlyFogSurface = SDL_DisplayFormat(s);
+			SDL_SetAlpha(OnlyFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+			SDL_FreeSurface(s);
 
-		//
-		// Generate Alpha Fog surface.
-		//
-		if (FogGraphic->Surface->format->BytesPerPixel == 1) {
-			s = SDL_DisplayFormat(FogGraphic->Surface);
-			SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
-		} else {
-			int i;
-			int j;
-			Uint32 c;
-			Uint8 a;
-			SDL_PixelFormat *f;
+			//
+			// Generate Alpha Fog surface.
+			//
+			if (FogGraphic->Surface->format->BytesPerPixel == 1) {
+				s = SDL_DisplayFormat(FogGraphic->Surface);
+				SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+			} else {
+				int i;
+				int j;
+				Uint32 c;
+				Uint8 a;
+				SDL_PixelFormat *f;
 
-			// Copy the top row to a new surface
-			f = FogGraphic->Surface->format;
-			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, TileSizeY,
-				f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
-			SDL_LockSurface(s);
-			SDL_LockSurface(FogGraphic->Surface);
-			for (i = 0; i < s->h; ++i) {
-				memcpy((Uint8 *)s->pixels + i * s->pitch,
-					(Uint8 *)FogGraphic->Surface->pixels + i * FogGraphic->Surface->pitch,
-					FogGraphic->Surface->w * f->BytesPerPixel);
-			}
-			SDL_UnlockSurface(s);
-			SDL_UnlockSurface(FogGraphic->Surface);
-
-			// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
-			SDL_LockSurface(s);
-			for (j = 0; j < s->h; ++j) {
-				for (i = 0; i < s->w; ++i) {
-					c = *(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch];
-					Video.GetRGBA(c, s->format, &r, &g, &b, &a);
-					if (a) {
-						c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
-						*(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch] = c;
-					}
-
+				// Copy the top row to a new surface
+				f = FogGraphic->Surface->format;
+				s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, TileSizeY,
+					f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
+				SDL_LockSurface(s);
+				SDL_LockSurface(FogGraphic->Surface);
+				for (i = 0; i < s->h; ++i) {
+					memcpy((Uint8 *)s->pixels + i * s->pitch,
+						(Uint8 *)FogGraphic->Surface->pixels + i * FogGraphic->Surface->pitch,
+						FogGraphic->Surface->w * f->BytesPerPixel);
 				}
+				SDL_UnlockSurface(s);
+				SDL_UnlockSurface(FogGraphic->Surface);
+
+				// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
+				SDL_LockSurface(s);
+				for (j = 0; j < s->h; ++j) {
+					for (i = 0; i < s->w; ++i) {
+						c = *(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch];
+						Video.GetRGBA(c, s->format, &r, &g, &b, &a);
+						if (a) {
+							c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
+							*(Uint32 *)&((Uint8*)s->pixels)[i * 4 + j * s->pitch] = c;
+						}
+
+					}
+				}
+				SDL_UnlockSurface(s);
 			}
-			SDL_UnlockSurface(s);
+			AlphaFogG = CGraphic::New("");
+			AlphaFogG->Surface = s;
+			AlphaFogG->Width = TileSizeX;
+			AlphaFogG->Height = TileSizeY;
+			AlphaFogG->GraphicWidth = s->w;
+			AlphaFogG->GraphicHeight = s->h;
+			AlphaFogG->NumFrames = 1;
 		}
-		AlphaFogG = CGraphic::New("");
-		AlphaFogG->Surface = s;
-		AlphaFogG->Width = TileSizeX;
-		AlphaFogG->Height = TileSizeY;
-		AlphaFogG->GraphicWidth = s->w;
-		AlphaFogG->GraphicHeight = s->h;
-		AlphaFogG->NumFrames = 1;
 	}
-#endif
 
 	delete[] VisibleTable;
 	VisibleTable = new unsigned short[Info.MapWidth * Info.MapHeight];
@@ -699,14 +692,14 @@ void CMap::CleanFogOfWar(void)
 	CGraphic::Free(Map.FogGraphic);
 	FogGraphic = NULL;
 
-#ifndef USE_OPENGL
-	if (OnlyFogSurface) {
-		SDL_FreeSurface(OnlyFogSurface);
-		OnlyFogSurface = NULL;
+	if (!UseOpenGL) {
+		if (OnlyFogSurface) {
+			SDL_FreeSurface(OnlyFogSurface);
+			OnlyFogSurface = NULL;
+		}
+		CGraphic::Free(AlphaFogG);
+		AlphaFogG = NULL;
 	}
-	CGraphic::Free(AlphaFogG);
-	AlphaFogG = NULL;
-#endif
 }
 
 /**

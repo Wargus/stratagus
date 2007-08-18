@@ -195,9 +195,11 @@ if (preferences == nil) then
     TipNumber = 0,
     ShowTips = true,
     GrabMouse = false,
+    UseOpenGL = false,
   }
 end
 
+UseOpenGL = preferences.UseOpenGL
 SetVideoResolution(preferences.VideoWidth, preferences.VideoHeight)
 SetVideoFullScreen(preferences.VideoFullScreen)
 SetLocalPlayerName(preferences.PlayerName)

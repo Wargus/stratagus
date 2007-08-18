@@ -67,13 +67,11 @@ static CFontColor *ReverseTextColor;       /// Reverse text color
 static std::string DefaultNormalColorIndex;     /// Default normal color index
 static std::string DefaultReverseColorIndex;    /// Default reverse color index
 
-#ifdef USE_OPENGL
 /**
 **  Font color graphics
 **  Usage: FontColorGraphics[CFont *font][CFontColor *color]
 */
 static std::map<CFont *, std::map<CFontColor *, CGraphic *> > FontColorGraphics;
-#endif
 
 // FIXME: remove these
 CFont *SmallFont;       /// Small font used in stats
@@ -119,23 +117,19 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-#ifndef USE_OPENGL
 static void VideoDrawChar(const CGraphic *g,
 	int gx, int gy, int w, int h, int x, int y)
 {
-	SDL_Rect srect = {gx, gy, w, h};
-	SDL_Rect drect = {x, y, 0, 0};
+	if (!UseOpenGL) {
+		SDL_Rect srect = {gx, gy, w, h};
+		SDL_Rect drect = {x, y, 0, 0};
 
-	SDL_SetColors(g->Surface, FontColor->Colors, 0, MaxFontColors);
-	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
-}
-#else
-static void VideoDrawChar(const CGraphic *g,
-	int gx, int gy, int w, int h, int x, int y)
-{
+		SDL_SetColors(g->Surface, FontColor->Colors, 0, MaxFontColors);
+		SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
+	} else {
 	g->DrawSub(gx, gy, w, h, x, y);
+	}
 }
-#endif
 
 /**
 **  Set the default text colors.
@@ -322,11 +316,12 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 		DrawChar = VideoDrawChar;
 	}
 
-#ifndef USE_OPENGL
-	g = font->G;
-#else
-	g = FontColorGraphics[font][FontColor];
-#endif
+	if (!UseOpenGL) {
+		g = font->G;
+	} else {
+		g = FontColorGraphics[font][FontColor];
+	}
+
 	rev = NULL;
 	widths = 0;
 	pos = 0;
@@ -342,26 +337,26 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 				case '!':
 					rev = FontColor;
 					FontColor = ReverseTextColor;
-#ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
+					if (UseOpenGL) {
+						g = FontColorGraphics[font][FontColor];
+					}
 					++pos;
 					continue;
 				case '<':
 					LastTextColor = FontColor;
 					FontColor = ReverseTextColor;
-#ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
+					if (UseOpenGL) {
+						g = FontColorGraphics[font][FontColor];
+					}
 					++pos;
 					continue;
 				case '>':
 					rev = LastTextColor;  // swap last and current color
 					LastTextColor = FontColor;
 					FontColor = rev;
-#ifdef USE_OPENGL
-					g = FontColorGraphics[font][FontColor];
-#endif
+					if (UseOpenGL) {
+						g = FontColorGraphics[font][FontColor];
+					}
 					++pos;
 					continue;
 
@@ -382,9 +377,9 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 					CFontColor *fc = CFontColor::Get(color);
 					if (fc) {
 						FontColor = fc;
-#ifdef USE_OPENGL
-						g = FontColorGraphics[font][fc];
-#endif
+						if (UseOpenGL) {
+							g = FontColorGraphics[font][fc];
+						}
 					}
 					delete[] color;
 					continue;
@@ -406,9 +401,9 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 		widths += w + 1;
 		if (rev) {
 			FontColor = rev;
-#ifdef USE_OPENGL
-			g = FontColorGraphics[font][FontColor];
-#endif
+			if (UseOpenGL) {
+				g = FontColorGraphics[font][FontColor];
+			}
 			rev = NULL;
 		}
 	}
@@ -761,7 +756,6 @@ void CFont::MeasureWidths()
 **
 **  @param font  Font number
 */
-#ifdef USE_OPENGL
 void MakeFontColorTextures(CFont *font)
 {
 	SDL_Surface *s;
@@ -794,7 +788,6 @@ void MakeFontColorTextures(CFont *font)
 		MakeTexture(newg);
 	}
 }
-#endif
 
 /**
 **  Load all fonts.
@@ -808,9 +801,9 @@ void LoadFonts(void)
 			ShowLoadProgress("Fonts %s", g->File.c_str());
 			g->Load();
 			AllFonts[i]->MeasureWidths();
-#ifdef USE_OPENGL
-			MakeFontColorTextures(AllFonts[i]);
-#endif
+			if (UseOpenGL) {
+				MakeFontColorTextures(AllFonts[i]);
+			}
 		}
 	}
 
@@ -822,7 +815,6 @@ void LoadFonts(void)
 	LargeTitleFont = CFont::Get("large-title");
 }
 
-#ifdef USE_OPENGL
 /**
 **  Reload OpenGL fonts
 */
@@ -841,7 +833,6 @@ void ReloadFonts(void)
 		}
 	}
 }
-#endif
 
 /**
 **  Create a new font
@@ -946,23 +937,23 @@ void CleanFonts(void)
 	for (i = 0; i < (int)AllFonts.size(); ++i) {
 		CFont *font = AllFonts[i];
 
-#ifdef USE_OPENGL
-		if (!FontColorGraphics[font].empty()) {
-			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
-				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
-				glDeleteTextures(g->NumTextures, g->Textures);
-				delete[] g->Textures;
-				delete g;
+		if (UseOpenGL) {
+			if (!FontColorGraphics[font].empty()) {
+				for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+					CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+					glDeleteTextures(g->NumTextures, g->Textures);
+					delete[] g->Textures;
+					delete g;
+				}
+				FontColorGraphics[font].clear();
 			}
-			FontColorGraphics[font].clear();
 		}
-#endif
 
 		delete font;
 	}
-#ifdef USE_OPENGL
-	FontColorGraphics.clear();
-#endif
+	if (UseOpenGL) {
+		FontColorGraphics.clear();
+	}
 	AllFonts.clear();
 	Fonts.clear();
 
