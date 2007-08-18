@@ -45,9 +45,7 @@ public:
 	void UpdateTerrain(void);
 	void Update(void);
 	void Create(void);
-#ifdef USE_OPENGL
 	void Reload(void);
-#endif
 	void Destroy(void);
 	void Draw(int vx, int vy);
 	void DrawCursor(int vx, int vy);

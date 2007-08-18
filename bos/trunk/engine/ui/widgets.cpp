@@ -93,16 +93,18 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 */
 void initGuichan(int width, int height)
 {
-#ifdef USE_OPENGL
-	MyOpenGLGraphics *graphics = new MyOpenGLGraphics();
-#else
-	gcn::SDLGraphics *graphics = new gcn::SDLGraphics();
+	gcn::Graphics *graphics;
 
-	// Set the target for the graphics object to be the screen.
-	// In other words, we will draw to the screen.
-	// Note, any surface will do, it doesn't have to be the screen.
-	graphics->setTarget(TheScreen);
-#endif
+	if (UseOpenGL) {
+		graphics = new MyOpenGLGraphics();
+	} else {
+		graphics = new gcn::SDLGraphics();
+
+		// Set the target for the graphics object to be the screen.
+		// In other words, we will draw to the screen.
+		// Note, any surface will do, it doesn't have to be the screen.
+		((gcn::SDLGraphics *)graphics)->setTarget(TheScreen);
+	}
 
 	Input = new gcn::SDLInput();
 	
@@ -225,7 +227,6 @@ LuaActionListener::~LuaActionListener()
 ----------------------------------------------------------------------------*/
 
 
-#ifdef USE_OPENGL
 void MyOpenGLGraphics::_beginDraw()
 {
 	gcn::Rectangle area(0, 0, Video.Width, Video.Height);
@@ -313,7 +314,6 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
 	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
 		x1, y1, x2 - x1, y2 - y1, c.a);
 }
-#endif
 
 
 /*----------------------------------------------------------------------------

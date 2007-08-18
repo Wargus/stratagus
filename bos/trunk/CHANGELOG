@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development version:
+- Using OpenGL is a run-time option (Jimmy Salmon)
 - Fixed compilation on OS X (Francois Beerten)
 
 Version 2.4.0 (2007 8 6):
