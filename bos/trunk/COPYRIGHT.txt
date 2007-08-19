@@ -265,7 +265,21 @@ the list and sources provided.
 The Bos Wars engine is based on the Stratagus engine. The engine is 
 distributed under the GNU General Public License version 2.
 
-The engine uses the SDL library, see doc/README-SDL.txt for the SDL copyright.
-The engine also includes Guichan: doc/guichan-copyright.txt.
+The engine includes the following elements which have their own 
+licence and copyrights:
+* Guichan from http://guichan.sourceforge.net/. 
+  Details in doc/guichan-copyright.txt.
+* Tolua++ from http://www.codenix.com/~tolua/. 
+  Details in doc/tolua-copyright.txt.
+
+The binary packages with static builds can also include the following elements:
+* SDL from http://www.libsdl.org/.
+  Details in doc/README-SDL.txt.
+* Lua from http://lua.org 
+  Details in doc/lua-copyright.txt.
+* Vorbis, Ogg and Theora from http://xiph.org/. 
+  Details in doc/xiph-copyright.txt.
+* libstdc++ and libgcc_p from ftp://gcc.gnu.org/pub/gcc/releases/. 
+  Details in doc/gcclibs-copyright.txt.
 
 This text forms the copyright notice and may not be altered.
