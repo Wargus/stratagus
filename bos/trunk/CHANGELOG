@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development version:
+- Added the ability to change directories in the file browser (Jimmy Salmon)
 - Using OpenGL is a run-time option (Jimmy Salmon)
 - Fixed compilation on OS X (Francois Beerten)
 
