@@ -230,7 +230,7 @@ function BuildVideoOptionsMenu(menu)
     end)
   fullScreen:setMarked(Video.FullScreen)
 
-  useopengl = menu:addCheckBox(_("Use OpenGL"), x1, offy + 36 * 6.5,
+  useopengl = menu:addCheckBox(_("Use OpenGL (restart required)"), x1, offy + 36 * 6.5,
     function()
       preferences.UseOpenGL = useopengl:isMarked()
       SavePreferences()
