@@ -41,15 +41,11 @@ extern bool UseOpenGL;
 
 class CGraphic : public gcn::Image {
 protected:
-	CGraphic() : Surface(NULL),
+	CGraphic() : Surface(NULL), SurfaceFlip(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		Refs(1), Resized(false)
+		Refs(1), Resized(false),
+		TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
 	{
-		SurfaceFlip = NULL;
-		TextureWidth = 0.f;
-		TextureHeight = 0.f;
-		Textures = NULL;
-		NumTextures = 0;
 	}
 	~CGraphic() {}
 
@@ -109,7 +105,7 @@ public:
 	GLfloat TextureWidth;      /// Width of the texture
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint *Textures;          /// Texture names
-	int NumTextures;
+	int NumTextures;           /// Number of textures
 
 	friend void MakeFontColorTextures(CFont *font);
 	friend void CleanFonts(void);
