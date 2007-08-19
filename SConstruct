@@ -156,6 +156,7 @@ def CheckOpenGL(env, conf):
      if not conf.CheckLib('GL'):
          print("Can't find OpenGL libs. Exiting")
          sys.exit(1)
+  return True
 
 def CheckLuaLib(env, conf):
   if not 'USE_WIN32' in env['CPPDEFINES']:
