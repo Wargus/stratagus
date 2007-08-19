@@ -630,15 +630,34 @@ void CGraphic::Load()
 }
 
 /**
+**  Free a SDL surface
+**
+**  @param surface  SDL surface to free
+*/
+static void FreeSurface(SDL_Surface **surface)
+{
+	if (!*surface) {
+		return;
+	}
+
+	unsigned char *pixels = NULL;
+
+	if ((*surface)->flags & SDL_PREALLOC) {
+		pixels = (unsigned char *)(*surface)->pixels;
+	}
+
+	SDL_FreeSurface(*surface);
+	delete[] pixels;
+	*surface = NULL;
+}
+
+/**
 **  Free a graphic
 **
 **  @param g  Pointer to the graphic
 */
 void CGraphic::Free(CGraphic *g)
 {
-	int i;
-	unsigned char *pixels;
-
 	if (!g) {
 		return;
 	}
@@ -655,7 +674,7 @@ void CGraphic::Free(CGraphic *g)
 			}
 			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 			if (cg) {
-				for (i = 0; i < PlayerMax; ++i) {
+				for (int i = 0; i < PlayerMax; ++i) {
 					if (cg->PlayerColorTextures[i]) {
 						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
 						delete[] cg->PlayerColorTextures[i];
@@ -666,26 +685,8 @@ void CGraphic::Free(CGraphic *g)
 			Graphics.remove(g);
 		}
 
-		if (g->Surface) {
-			if (g->Surface->flags & SDL_PREALLOC) {
-				pixels = (unsigned char *)g->Surface->pixels;
-			} else {
-				pixels = NULL;
-			}
-			SDL_FreeSurface(g->Surface);
-			delete[] pixels;
-		}
-		if (!UseOpenGL) {
-			if (g->SurfaceFlip) {
-				if (g->SurfaceFlip->flags & SDL_PREALLOC) {
-					pixels = (unsigned char *)g->SurfaceFlip->pixels;
-				} else {
-					pixels = NULL;
-				}
-				SDL_FreeSurface(g->SurfaceFlip);
-				delete[] pixels;
-			}
-		}
+		FreeSurface(&g->Surface);
+		FreeSurface(&g->SurfaceFlip);
 
 		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);
@@ -699,24 +700,20 @@ void CGraphic::Free(CGraphic *g)
 */
 void ReloadGraphics(void)
 {
-	if (!UseOpenGL) {
-		return;
-	} else {
-		std::list<CGraphic *>::iterator i;
-		for (i = Graphics.begin(); i != Graphics.end(); ++i) {
-			if ((*i)->Textures) {
-				delete[] (*i)->Textures;
-				(*i)->Textures = NULL;
-				MakeTexture(*i);
-			}
-			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
-			if (cg) {
-				for (int j = 0; j < PlayerMax; ++j) {
-					if (cg->PlayerColorTextures[j]) {
-						delete[] cg->PlayerColorTextures[j];
-						cg->PlayerColorTextures[j] = NULL;
-						MakePlayerColorTexture(cg, j);
-					}
+	std::list<CGraphic *>::iterator i;
+	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
+		if ((*i)->Textures) {
+			delete[] (*i)->Textures;
+			(*i)->Textures = NULL;
+			MakeTexture(*i);
+		}
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
+		if (cg) {
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (cg->PlayerColorTextures[j]) {
+					delete[] cg->PlayerColorTextures[j];
+					cg->PlayerColorTextures[j] = NULL;
+					MakePlayerColorTexture(cg, j);
 				}
 			}
 		}
@@ -730,52 +727,52 @@ void CGraphic::Flip()
 {
 	if (UseOpenGL) {
 		return;
-	} else {
-		int i;
-		int j;
-		SDL_Surface *s;
-
-		if (SurfaceFlip) {
-			return;
-		}
-
-		s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
-		if (Surface->flags & SDL_SRCCOLORKEY) {
-			SDL_SetColorKey(SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-				Surface->format->colorkey);
-		}
-
-		SDL_LockSurface(Surface);
-		SDL_LockSurface(s);
-		switch (s->format->BytesPerPixel) {
-			case 1:
-				for (i = 0; i < s->h; ++i) {
-					for (j = 0; j < s->w; ++j) {
-						((char *)s->pixels)[j + i * s->pitch] =
-							((char *)Surface->pixels)[s->w - j - 1 + i * Surface->pitch];
-					}
-				}
-				break;
-			case 3:
-				for (i = 0; i < s->h; ++i) {
-					for (j = 0; j < s->w; ++j) {
-						memcpy(&((char *)s->pixels)[j + i * s->pitch],
-							&((char *)Surface->pixels)[(s->w - j - 1) * 3 + i * Surface->pitch], 3);
-					}
-				}
-				break;
-			case 4:
-				for (i = 0; i < s->h; ++i) {
-					for (j = 0; j < s->w; ++j) {
-						*(Uint32 *)&((char *)s->pixels)[j * 4 + i * s->pitch] =
-							*(Uint32 *)&((char *)Surface->pixels)[(s->w - j - 1) * 4 + i * Surface->pitch];
-					}
-				}
-				break;
-		}
-		SDL_UnlockSurface(Surface);
-		SDL_UnlockSurface(s);
 	}
+
+	int i;
+	int j;
+	SDL_Surface *s;
+
+	if (SurfaceFlip) {
+		return;
+	}
+
+	s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
+	if (Surface->flags & SDL_SRCCOLORKEY) {
+		SDL_SetColorKey(SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
+			Surface->format->colorkey);
+	}
+
+	SDL_LockSurface(Surface);
+	SDL_LockSurface(s);
+	switch (s->format->BytesPerPixel) {
+		case 1:
+			for (i = 0; i < s->h; ++i) {
+				for (j = 0; j < s->w; ++j) {
+					((char *)s->pixels)[j + i * s->pitch] =
+						((char *)Surface->pixels)[s->w - j - 1 + i * Surface->pitch];
+				}
+			}
+			break;
+		case 3:
+			for (i = 0; i < s->h; ++i) {
+				for (j = 0; j < s->w; ++j) {
+					memcpy(&((char *)s->pixels)[j + i * s->pitch],
+						&((char *)Surface->pixels)[(s->w - j - 1) * 3 + i * Surface->pitch], 3);
+				}
+			}
+			break;
+		case 4:
+			for (i = 0; i < s->h; ++i) {
+				for (j = 0; j < s->w; ++j) {
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + i * s->pitch] =
+						*(Uint32 *)&((char *)Surface->pixels)[(s->w - j - 1) * 4 + i * Surface->pitch];
+				}
+			}
+			break;
+	}
+	SDL_UnlockSurface(Surface);
+	SDL_UnlockSurface(s);
 }
 
 /**
@@ -1021,30 +1018,10 @@ void CGraphic::Resize(int w, int h)
 	// Resizing the same image multiple times looks horrible
 	// If the image has already been resized then get a clean copy first
 	if (Resized) {
-		if (Surface) {
-			if (Surface->flags & SDL_PREALLOC) {
-				pixels = (unsigned char *)Surface->pixels;
-			} else {
-				pixels = NULL;
-			}
-			SDL_FreeSurface(Surface);
-			delete[] pixels;
-		}
-		if (!UseOpenGL) {
-			if (SurfaceFlip) {
-				if (SurfaceFlip->flags & SDL_PREALLOC) {
-					pixels = (unsigned char *)SurfaceFlip->pixels;
-				} else {
-					pixels = NULL;
-				}
-				SDL_FreeSurface(SurfaceFlip);
-				delete[] pixels;
-			}
-			SurfaceFlip = NULL;
-		}
+		FreeSurface(&Surface);
+		FreeSurface(&SurfaceFlip);
 
 		this->Width = this->Height = 0;
-		this->Surface = NULL;
 		this->Load();
 
 		Resized = false;
