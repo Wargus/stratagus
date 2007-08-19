@@ -496,7 +496,7 @@ function RunStartGameMenu(s)
   end
  
   Load("maps/"..selectedmap)
-  local browser = menu:addBrowser("maps/", "^.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
+  local browser = menu:addBrowser("maps/", "^%w.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
   local function cb(s)
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
@@ -690,7 +690,7 @@ function RunEditorLoadMenu()
   end
 
   Load("maps/"..selectedmap)
-  local browser = menu:addBrowser("maps/", "^.*%.smp$", sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
+  local browser = menu:addBrowser("maps/", "^%w.*%.smp$", sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
   local function selectMap(s)
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())

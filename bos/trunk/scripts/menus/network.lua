@@ -441,7 +441,7 @@ function RunCreateMultiGameMenu(s)
   end
 
   Load(mapfile)
-  local browser = menu:addBrowser("maps/", "^.*%.smp$", sx*10, sy*2+20, sx*8, sy*11, mapfile)
+  local browser = menu:addBrowser("maps/", "^%w.*%.smp$", sx*10, sy*2+20, sx*8, sy*11, mapfile)
   local function cb(s)
     mapfile = "maps/" .. browser:getSelectedItem()
     print(browser:getSelectedItem())
