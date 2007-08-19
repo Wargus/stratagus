@@ -42,7 +42,6 @@ def DefineOptions(filename, args):
    opts.Add('LINKFLAGS', 'Linker Compiler flags')
    opts.Add('CC', 'C Compiler')
    opts.Add('CXX', 'C++ Compiler')
-   opts.Add('opengl', 'Build with opengl support', 0)
    opts.Add('extrapath', 'Path to extra root directory for includes and libs', '')
    return opts
 
