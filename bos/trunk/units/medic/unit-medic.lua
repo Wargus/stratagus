@@ -96,7 +96,7 @@ DefineUnitType("unit-medic", {
     EnergyValue = 2500,
     MagmaValue = 2000,
     Speed = 15,
-    HitPoints = 100,
+    HitPoints = 25,
     MaxMana = 100,
     CanCastSpell = {"spell-healing"},
     DrawLevel = 25,
