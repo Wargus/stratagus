@@ -9,7 +9,7 @@
 --
 --      guichan.lua - The main UI lua script.
 --
---      (c) Copyright 2005-2006 by François Beerten
+--      (c) Copyright 2005-2007 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -128,28 +128,24 @@ function AddMenuHelpers(menu)
       local dirlist = {}
       local i
       local f
-      local u = 1
 
       if (lister ~= nil) then
         local fileslist = lister(path)
         for i,f in ipairs(fileslist) do
           if (string.find(f, filter)) then
-            dirlist[u] = f
-            u = u + 1
+            table.insert(dirlist, f)
           end
         end
       else
         local dirs = ListDirsInDirectory(path)
         for i,f in ipairs(dirs) do
-          dirlist[u] = f .. "/"
-          u = u + 1
+          table.insert(dirlist, f .. "/")
         end
 
         local fileslist = ListFilesInDirectory(path)
         for i,f in ipairs(fileslist) do
           if (string.find(f, filter)) then
-            dirlist[u] = f
-            u = u + 1
+            table.insert(dirlist, f)
           end
         end
       end
