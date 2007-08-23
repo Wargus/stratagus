@@ -256,11 +256,13 @@ end
 function RunLanguageOptionsMenu(s)
   local menu 
   local b
-  local offx = (Video.Width - 352) / 2 + 100
-  local offy = (Video.Height - 352) / 2
+  local stepx = Video.Width / 6 
+  local offy = (Video.Height - 300) / 2
+  local offx = stepx * 2
+  local i = 0
 
   menu = BosMenu(_("Language Selection"))
-  local function AddLanguage(language, po, h, enginepo, bospo)
+  local function AddLanguage(language, po, enginepo, bospo)
     if enginepo == nil then
       enginepo = "languages/" .. po .. ".po"
       bospo = "languages/bos-" .. po .. ".po"
@@ -271,7 +273,13 @@ function RunLanguageOptionsMenu(s)
       preferences.GameTranslation = GameTranslation
       SavePreferences()
     end      
-    local rb = menu:addRadioButton(language, "lang", offx, offy + 32 * h, SetLanguage)
+    local rb = menu:addRadioButton(language, "lang", 
+                                   offx, offy + i * 36, SetLanguage)
+    i = i + 1
+    if i > 5 then
+       i = 0
+       offx = stepx + offx
+    end
     if StratagusTranslation == enginepo then
       rb:setMarked(true)
     end
@@ -279,19 +287,20 @@ function RunLanguageOptionsMenu(s)
   end
      
   print(StratagusTranslation)
-  b = AddLanguage("English", "en", 1.0, 
+  b = AddLanguage("English", "en", 
         "languages/engine.pot", "languages/bos.pot")
   if StratagusTranslation == "" then
      b:setMarked(true)
   end
-  AddLanguage("Français", "fr", 2.0)
-  AddLanguage("Suomi", "fi", 3.0)
-  AddLanguage("Deutsch", "de", 4.0)
-  AddLanguage("Polski", "pl", 5.0)
-  AddLanguage("Dansk", "da", 6.0)
-  AddLanguage("Türkçe", "tr", 7.0)
-  AddLanguage("Español", "es", 8.0)
-  AddLanguage("Czech", "cs", 9.0)
+  AddLanguage("Français", "fr")
+  AddLanguage("Suomi", "fi")
+  AddLanguage("Deutsch", "de")
+  AddLanguage("Polski", "pl")
+  AddLanguage("Dansk", "da")
+  AddLanguage("Türkçe", "tr")
+  AddLanguage("Español", "es")
+  AddLanguage("Czech", "cs")
+  AddLanguage("Português", "pt")
 
   menu:addButton(_("~!OK"), "o", Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
