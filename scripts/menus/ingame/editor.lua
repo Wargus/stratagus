@@ -69,7 +69,7 @@ function RunEditorSaveMenu()
 
   local t = menu:addTextInputField("map.smp", 16, 40, 224)
 
-  local browser = menu:addBrowser("maps/", ".smp$", 16, 70, 224, 166)
+  local browser = menu:addMapBrowser("maps/", 16, 70, 224, 166)
   local function cb(s)
     t:setText(browser:getSelectedItem())
   end

@@ -129,25 +129,14 @@ function AddMenuHelpers(menu)
       local i
       local f
 
-      if (lister ~= nil) then
-        local fileslist = lister(path)
-        for i,f in ipairs(fileslist) do
+      if lister == nil then
+        lister = ListFilesInDirectory
+      end
+      local fileslist = lister(path)
+      for i,f in ipairs(fileslist) do
           if (string.find(f, filter)) then
             table.insert(dirlist, f)
           end
-        end
-      else
-        local dirs = ListDirsInDirectory(path)
-        for i,f in ipairs(dirs) do
-          table.insert(dirlist, f .. "/")
-        end
-
-        local fileslist = ListFilesInDirectory(path)
-        for i,f in ipairs(fileslist) do
-          if (string.find(f, filter)) then
-            table.insert(dirlist, f)
-          end
-        end
       end
 
       return dirlist
@@ -224,6 +213,25 @@ function AddMenuHelpers(menu)
     end
 
     return bq
+  end
+
+  function menu:addMapBrowser(path, x, y, w, h, default)
+    local function listFilesAndDirs(path)
+        local dirlist = {}
+        local dirs = ListDirsInDirectory(path)
+        for i,f in ipairs(dirs) do
+          table.insert(dirlist, f .. "/")
+        end
+
+        local fileslist = ListFilesInDirectory(path)
+        for i,f in ipairs(fileslist) do
+          if (string.find(f, "^%w.*%.smp$")) then
+            table.insert(dirlist, f)
+          end
+        end
+        return dirlist
+    end
+    return self:addBrowser(path, ".*", x, y, w, h, default, listFilesAndDirs)
   end
 
   function menu:addCheckBox(caption, x, y, callback)
@@ -492,7 +500,8 @@ function RunStartGameMenu(s)
   end
  
   Load("maps/"..selectedmap)
-  local browser = menu:addBrowser("maps/", "^%w.*%.smp$",  sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
+  local browser = menu:addMapBrowser("maps/", sx*10, sy*2+20, sx*8, sy*11,
+                                     "maps/"..selectedmap)
   local function cb(s)
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
@@ -686,7 +695,8 @@ function RunEditorLoadMenu()
   end
 
   Load("maps/"..selectedmap)
-  local browser = menu:addBrowser("maps/", "^%w.*%.smp$", sx*10, sy*2+20, sx*8, sy*11, "maps/"..selectedmap)
+  local browser = menu:addMapBrowser("maps/", sx*10, sy*2+20, sx*8, sy*11, 
+                                     "maps/"..selectedmap)
   local function selectMap(s)
     maptext:setCaption(browser:getSelectedItem())
     Load("maps/" .. browser:getSelectedItem())
