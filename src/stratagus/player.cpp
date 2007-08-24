@@ -10,7 +10,7 @@
 //
 /**@name player.cpp - The players. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ void SavePlayers(CFile *file)
 					file->printf(" ");
 				}
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				Players[i].Resources[j]);
 		}
 		// Last Resources
@@ -199,7 +199,7 @@ void SavePlayers(CFile *file)
 					file->printf(" ");
 				}
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				Players[i].LastResources[j]);
 		}
 		// Incomes
@@ -212,7 +212,7 @@ void SavePlayers(CFile *file)
 					file->printf(" ");
 				}
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				Players[i].Incomes[j]);
 		}
 		// Revenue
@@ -225,7 +225,7 @@ void SavePlayers(CFile *file)
 					file->printf(" ");
 				}
 			}
-			file->printf("\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
 				Players[i].Revenue[j]);
 		}
 
@@ -589,7 +589,7 @@ int CPlayer::CheckCosts(const int *costs) const
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Resources[i] < costs[i]) {
 			Notify(NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
-				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
+				DefaultResourceNames[i].c_str(), DefaultActions[i].c_str(), DefaultResourceNames[i].c_str());
 
 			err |= 1 << i;
 		}

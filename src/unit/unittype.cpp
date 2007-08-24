@@ -85,12 +85,12 @@ int DefaultIncomes[MaxCosts];
 /**
 **  Default action for the resources.
 */
-char *DefaultActions[MaxCosts];
+std::string DefaultActions[MaxCosts];
 
 /**
 **  Default names for the resources.
 */
-char *DefaultResourceNames[MaxCosts];
+std::string DefaultResourceNames[MaxCosts];
 
 /**
 **  Default amounts for the resources.
@@ -241,7 +241,7 @@ static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int
 		if (i) {
 			file->printf(" ");
 		}
-		file->printf("\"%s\", %d,", DefaultResourceNames[i], stats->Costs[i]);
+		file->printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats->Costs[i]);
 	}
 	file->printf("})\n");
 }
@@ -515,17 +515,13 @@ void LoadUnitTypes(void)
 */
 static void CleanAnimation(CAnimation *anim)
 {
-	int i;
 	CAnimation *ptr;
 
 	ptr = anim;
 	while (ptr->Type != AnimationNone) {
 		if (ptr->Type == AnimationSound) {
-			delete[] ptr->D.Sound.Name;
+			delete ptr->D.Sound.Name;
 		} else if (ptr->Type == AnimationRandomSound) {
-			for (i = 0; i < ptr->D.RandomSound.NumSounds; ++i) {
-				delete[] ptr->D.RandomSound.Name[i];
-			}
 			delete[] ptr->D.RandomSound.Name;
 			delete[] ptr->D.RandomSound.Sound;
 		}

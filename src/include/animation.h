@@ -10,7 +10,7 @@
 //
 /**@name animation.h - The animations headerfile. */
 //
-//      (c) Copyright 2005 by Jimmy Salmon
+//      (c) Copyright 2005-2007 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -75,13 +75,13 @@ public:
 			int MaxWait;
 		} RandomWait;
 		struct {
-			char *Name;
+			std::string *Name;
 			CSound *Sound;
 		} Sound;
 		struct {
-			char **Name;
+			std::string *Name;
 			CSound **Sound;
-			int NumSounds;
+			unsigned int NumSounds;
 		} RandomSound;
 		struct {
 			int Rotate;

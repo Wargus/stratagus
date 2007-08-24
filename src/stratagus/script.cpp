@@ -10,7 +10,7 @@
 //
 /**@name script.cpp - The configuration language. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -2091,19 +2091,17 @@ static int CclSetGodMode(lua_State *l)
 */
 static int CclSetSpeedResourcesHarvest(lua_State *l)
 {
-	int i;
-	const char *resource;
-
 	LuaCheckArgs(l, 2);
-	resource = LuaToString(l, 1);
-	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(resource, DefaultResourceNames[i])) {
+
+	const std::string resource = LuaToString(l, 1);
+
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (resource == DefaultResourceNames[i]) {
 			SpeedResourcesHarvest[i] = LuaToNumber(l, 2);
 			return 0;
 		}
 	}
-	LuaError(l, "Resource not found: %s" _C_ resource);
-
+	LuaError(l, "Resource not found: %s" _C_ resource.c_str());
 	return 0;
 }
 
@@ -2114,19 +2112,15 @@ static int CclSetSpeedResourcesHarvest(lua_State *l)
 */
 static int CclSetSpeedResourcesReturn(lua_State *l)
 {
-	int i;
-	const char *resource;
-
 	LuaCheckArgs(l, 2);
-	resource = LuaToString(l, 1);
-	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(resource, DefaultResourceNames[i])) {
+	const std::string resource = LuaToString(l, 1);
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (resource == DefaultResourceNames[i]) {
 			SpeedResourcesReturn[i] = LuaToNumber(l, 2);
 			return 0;
 		}
 	}
-	LuaError(l, "Resource not found: %s" _C_ resource);
-
+	LuaError(l, "Resource not found: %s" _C_ resource.c_str());
 	return 0;
 }
 
@@ -2232,16 +2226,14 @@ static int CclDefineDefaultIncomes(lua_State *l)
 */
 static int CclDefineDefaultActions(lua_State *l)
 {
-	int i;
-	int args;
+	unsigned int args;
 
-	for (i = 0; i < MaxCosts; ++i) {
-		delete[] DefaultActions[i];
-		DefaultActions[i] = NULL;
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		DefaultActions[i].clear();
 	}
 	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultActions[i] = new_strdup(LuaToString(l, i + 1));
+	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
+		DefaultActions[i] = LuaToString(l, i + 1);
 	}
 	return 0;
 }
@@ -2253,16 +2245,14 @@ static int CclDefineDefaultActions(lua_State *l)
 */
 static int CclDefineDefaultResourceNames(lua_State *l)
 {
-	int i;
-	int args;
+	unsigned int args;
 
-	for (i = 0; i < MaxCosts; ++i) {
-		delete[] DefaultResourceNames[i];
-		DefaultResourceNames[i] = NULL;
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		DefaultResourceNames[i].clear();
 	}
 	args = lua_gettop(l);
-	for (i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultResourceNames[i] = new_strdup(LuaToString(l, i + 1));
+	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
+		DefaultResourceNames[i] = LuaToString(l, i + 1);
 	}
 	return 0;
 }
@@ -2274,26 +2264,24 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 */
 static int CclDefineDefaultResourceAmounts(lua_State *l)
 {
-	int i;
-	int j;
-	const char *value;
-	int args;
+	const unsigned int args = lua_gettop(l);
 
-	args = lua_gettop(l);
 	if (args & 1) {
 		LuaError(l, "incorrect argument");
 	}
-	for (j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
+	for (unsigned int j = 0; j < args; ++j) {
+		const std::string value = LuaToString(l, j + 1);
+		unsigned int i;
+
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(value, DefaultResourceNames[i])) {
+			if (value == DefaultResourceNames[i]) {
 				++j;
 				DefaultResourceAmounts[i] = LuaToNumber(l, j + 1);
 				break;
 			}
 		}
 		if (i == MaxCosts) {
-			LuaError(l, "Resource not found: %s" _C_ value);
+			LuaError(l, "Resource not found: %s" _C_ value.c_str());
 		}
 	}
 	return 0;
@@ -2536,15 +2524,13 @@ void LoadCcl(void)
 */
 void SaveCcl(CFile *file)
 {
-	int i;
-
 	file->printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
 
-	for (i = 0; i < MaxCosts; ++i) {
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		file->printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
-			DefaultResourceNames[i], SpeedResourcesHarvest[i]);
+			DefaultResourceNames[i].c_str(), SpeedResourcesHarvest[i]);
 		file->printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
-			DefaultResourceNames[i], SpeedResourcesReturn[i]);
+			DefaultResourceNames[i].c_str(), SpeedResourcesReturn[i]);
 	}
 	file->printf("SetSpeedBuild(%d)\n", SpeedBuild);
 	file->printf("SetSpeedTrain(%d)\n", SpeedTrain);

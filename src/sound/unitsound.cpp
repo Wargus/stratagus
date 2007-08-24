@@ -10,7 +10,7 @@
 //
 /**@name unitsound.cpp - The unit sounds. */
 //
-//      (c) Copyright 1999-2005 by Fabrice Rossi and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Fabrice Rossi and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -75,14 +75,12 @@ void LoadUnitSounds(void)
 */
 static void MapAnimSounds2(CAnimation *anim)
 {
-	int i;
-
 	while (anim) {
 		if (anim->Type == AnimationSound) {
-			anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name);
+			anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name->c_str());
 		} else if (anim->Type == AnimationRandomSound) {
-			for (i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
-				anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i]);
+			for (unsigned int i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
+				anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i].c_str());
 			}
 		}
 		anim = anim->Next;

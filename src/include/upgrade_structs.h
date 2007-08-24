@@ -10,7 +10,7 @@
 //
 /**@name upgrade_structs.h - The upgrade/allow headerfile. */
 //
-//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and
+//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -111,12 +111,12 @@ extern int DefaultIncomes[MaxCosts];
 /**
 **  Default action for the resources.
 */
-extern char *DefaultActions[MaxCosts];
+extern std::string DefaultActions[MaxCosts];
 
 /**
 **  Default names for the resources.
 */
-extern char *DefaultResourceNames[MaxCosts];
+extern std::string DefaultResourceNames[MaxCosts];
 
 /**
 **  Default amounts for the resources.

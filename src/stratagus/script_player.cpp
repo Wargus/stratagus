@@ -185,7 +185,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->Resources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -208,7 +208,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->LastResources[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -231,7 +231,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->Incomes[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -254,7 +254,7 @@ static int CclPlayer(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
 						player->Revenue[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -745,18 +745,18 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.Name[p->Race].c_str());
 		return 1;
 	} else if (!strcmp(data, "Resources")) {
-		const char *res;
-		int i;
-
 		LuaCheckArgs(l, 3);
-		res = LuaToString(l, 3);
+
+		const std::string res = LuaToString(l, 3);;
+		unsigned int i;
+
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
 		if (i == MaxCosts) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
 		}
 		lua_pushnumber(l, p->Resources[i]);
 		return 1;
@@ -801,18 +801,18 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushnumber(l, p->TotalBuildings);
 		return 1;
 	} else if (!strcmp(data, "TotalResources")) {
-		const char *res;
-		int i;
-
 		LuaCheckArgs(l, 3);
-		res = LuaToString(l, 3);
+
+		const std::string res = LuaToString(l, 3);
+		unsigned int i;
+
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
 		if (i == MaxCosts) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
 		}
 		lua_pushnumber(l, p->TotalResources[i]);
 		return 1;
@@ -865,18 +865,18 @@ static int CclSetPlayerData(lua_State *l)
 			LuaError(l, "invalid race name '%s'" _C_ racename);
 		}
 	} else if (!strcmp(data, "Resources")) {
-		const char *res;
+		LuaCheckArgs(l, 4);
+
+		const std::string res = LuaToString(l, 3);
 		int i;
 
-		LuaCheckArgs(l, 4);
-		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
 		if (i == MaxCosts) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
 		}
 		p->Resources[i] = LuaToNumber(l, 4);
 // } else if (!strcmp(data, "UnitTypesCount")) {
@@ -898,18 +898,18 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "TotalBuildings")) {
 		p->TotalBuildings = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "TotalResources")) {
-		const char *res;
-		int i;
-
 		LuaCheckArgs(l, 3);
-		res = LuaToString(l, 3);
+
+		const std::string res = LuaToString(l, 3);
+		unsigned int i;
+
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(res, DefaultResourceNames[i])) {
+			if (res == DefaultResourceNames[i]) {
 				break;
 			}
 		}
 		if (i == MaxCosts) {
-			LuaError(l, "Invalid resource \"%s\"" _C_ res);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res.c_str());
 		}
 		p->TotalResources[i] = LuaToNumber(l, 4);
 	} else if (!strcmp(data, "TotalRazings")) {

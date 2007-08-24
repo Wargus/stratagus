@@ -3740,7 +3740,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	file->printf("\"resources-held\", %d,\n  ", unit->ResourcesHeld);
 	if (unit->CurrentResource) {
 		file->printf("\"current-resource\", \"%s\",\n  ",
-			DefaultResourceNames[unit->CurrentResource]);
+			DefaultResourceNames[unit->CurrentResource].c_str());
 	}
 
 	file->printf("\"sub-action\", %d, ", unit->SubAction);

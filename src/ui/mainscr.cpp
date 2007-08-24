@@ -267,10 +267,10 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
-				val.s = DefaultResourceNames[unit->Type->GivesResource];
+				val.s = DefaultResourceNames[unit->Type->GivesResource].c_str();
 			} else if (index == CARRYRESOURCE_INDEX) {
 				val.type = USTRINT_STR;
-				val.s = DefaultResourceNames[unit->CurrentResource];
+				val.s = DefaultResourceNames[unit->CurrentResource].c_str();
 			} else {
 				val.type = USTRINT_STR;
 				val.s = UnitTypeVar.VariableName[index].c_str();

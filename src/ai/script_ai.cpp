@@ -10,7 +10,7 @@
 //
 /**@name script_ai.cpp - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Ludovic Pollet,
+//      (c) Copyright 2000-2007 by Lutz Sammer, Ludovic Pollet,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -984,7 +984,7 @@ static int CclAiDump(lua_State *l)
 	//
 	printf("------\n");
 	for (i = 0; i < MaxCosts; ++i) {
-		printf("%s(%4d) ", DefaultResourceNames[i], AiPlayer->Player->Resources[i]);
+		printf("%s(%4d) ", DefaultResourceNames[i].c_str(), AiPlayer->Player->Resources[i]);
 	}
 	printf("\n");
 	printf("%d:", AiPlayer->Player->Index);
@@ -1048,12 +1048,10 @@ static int CclAiDump(lua_State *l)
 **
 **  @return   The number of the resource in DefaultResourceNames
 */
-static int DefaultResourceNumber(const char *name)
+static int DefaultResourceNumber(const std::string& name)
 {
-	int i;
-
-	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(DefaultResourceNames[i], name)) {
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (DefaultResourceNames[i] == name) {
 			return i;
 		}
 	}

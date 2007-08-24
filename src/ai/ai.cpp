@@ -10,7 +10,7 @@
 //
 /**@name ai.cpp - The computer player AI main file. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Ludovic Pollet, and
+//      (c) Copyright 2000-2007 by Lutz Sammer, Ludovic Pollet, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -386,32 +386,32 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 
 	file->printf("  \"reserve\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Reserve[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Reserve[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"used\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Used[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Used[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"needed\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Needed[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Needed[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"collect\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Collect[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai->Collect[i]);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"need-mask\", {");
 	for (i = 0; i < MaxCosts; ++i) {
 		if (ai->NeededMask & (1 << i)) {
-			file->printf("\"%s\", ", DefaultResourceNames[i]);
+			file->printf("\"%s\", ", DefaultResourceNames[i].c_str());
 		}
 	}
 	file->printf("},\n");

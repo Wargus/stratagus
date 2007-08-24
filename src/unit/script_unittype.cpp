@@ -95,16 +95,14 @@ int GetSpriteIndex(const char *SpriteName);
 */
 unsigned CclGetResourceByName(lua_State *l)
 {
-	int i;
-	const char *value;
+	const std::string value = LuaToString(l, -1);
 
-	value = LuaToString(l, -1);
-	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(value, DefaultResourceNames[i])) {
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (value == DefaultResourceNames[i]) {
 			return i;
 		}
 	}
-	LuaError(l, "Unsupported resource tag: %s" _C_ value);
+	LuaError(l, "Unsupported resource tag: %s" _C_ value.c_str());
 	return 0xABCDEF;
 }
 
@@ -861,14 +859,13 @@ static int CclDefineUnitType(lua_State *l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "harvest")) {
 					int res;
-					const char *name;
 
 					lua_rawgeti(l, -1, k + 1);
-					name = LuaToString(l, -1 );
+					const std::string name = LuaToString(l, -1);
 					lua_pop(l, 1);
 					++k;
 					for (res = 0; res < MaxCosts; ++res) {
-						if (!strcmp(name, DefaultResourceNames[res])) {
+						if (name == DefaultResourceNames[res]) {
 							break;
 						}
 					}
@@ -989,7 +986,7 @@ static int CclDefineUnitStats(lua_State *l)
 				++k;
 
 				for (i = 0; i < MaxCosts; ++i) {
-					if (!strcmp(value, DefaultResourceNames[i])) {
+					if (!strcmp(value, DefaultResourceNames[i].c_str())) {
 						lua_rawgeti(l, j + 1, k + 1);
 						stats->Costs[i] = LuaToNumber(l, -1);
 						lua_pop(l, 1);
@@ -1215,27 +1212,33 @@ static void FixLabels(lua_State *l)
 static void ParseAnimationFrame(lua_State *l, const char *str,
 	CAnimation *anim)
 {
-	char *op1;
-	char *op2;
+	std::string op1(str);
+	std::string all2;
+	char* op2;
+	int index;
 
-	op1 = new_strdup(str);
-	op2 = strchr(op1, ' ');
+	index = op1.find(' ');
+
+	if (index != -1) {
+		all2 = op1.substr(index + 1);
+		op1 = op1.substr(0, index);
+	}
+	op2 = (char *) all2.c_str();
 	if (op2) {
 		while (*op2 == ' ') {
 			*op2++ = '\0';
 		}
 	}
-
-	if (!strcmp(op1, "frame")) {
+	if (op1 == "frame") {
 		anim->Type = AnimationFrame;
 		anim->D.Frame.Frame = atoi(op2);
-	} else if (!strcmp(op1, "exact-frame")) {
+	} else if (op1 == "exact-frame") {
 		anim->Type = AnimationExactFrame;
 		anim->D.Frame.Frame = atoi(op2);
-	} else if (!strcmp(op1, "wait")) {
+	} else if (op1 == "wait") {
 		anim->Type = AnimationWait;
 		anim->D.Wait.Wait = atoi(op2);
-	} else if (!strcmp(op1, "random-wait")) {
+	} else if (op1 == "random-wait") {
 		anim->Type = AnimationRandomWait;
 		anim->D.RandomWait.MinWait = atoi(op2);
 		op2 = strchr(op2, ' ');
@@ -1243,10 +1246,10 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 			++op2;
 		}
 		anim->D.RandomWait.MaxWait = atoi(op2);
-	} else if (!strcmp(op1, "sound")) {
+	} else if (op1 == "sound") {
 		anim->Type = AnimationSound;
-		anim->D.Sound.Name = new_strdup(op2);
-	} else if (!strcmp(op1, "random-sound")) {
+		anim->D.Sound.Name = new std::string(op2);
+	} else if (op1 == "random-sound") {
 		int count;
 		char *next;
 
@@ -1260,9 +1263,11 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 				}
 			}
 			++count;
-			char **newname = new char *[count];
+			std::string *newname = new std::string[count];
 			if (anim->D.RandomSound.Name) {
-				memcpy(newname, anim->D.RandomSound.Name, (count - 1) * sizeof(char *));
+				for (unsigned int i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
+					newname[i] = anim->D.RandomSound.Name[i];
+				}
 				delete[] anim->D.RandomSound.Name;
 			}
 			anim->D.RandomSound.Name = newname;
@@ -1271,18 +1276,18 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 		}
 		anim->D.RandomSound.NumSounds = count;
 		anim->D.RandomSound.Sound = new CSound *[count];
-	} else if (!strcmp(op1, "attack")) {
+	} else if (op1 == "attack") {
 		anim->Type = AnimationAttack;
-	} else if (!strcmp(op1, "rotate")) {
+	} else if (op1 == "rotate") {
 		anim->Type = AnimationRotate;
 		anim->D.Rotate.Rotate = atoi(op2);
-	} else if (!strcmp(op1, "random-rotate")) {
+	} else if (op1 == "random-rotate") {
 		anim->Type = AnimationRandomRotate;
 		anim->D.Rotate.Rotate = atoi(op2);
-	} else if (!strcmp(op1, "move")) {
+	} else if (op1 == "move") {
 		anim->Type = AnimationMove;
 		anim->D.Move.Move = atoi(op2);
-	} else if (!strcmp(op1, "unbreakable")) {
+	} else if (op1 == "unbreakable") {
 		anim->Type = AnimationUnbreakable;
 		if (!strcmp(op2, "begin")) {
 			anim->D.Unbreakable.Begin = 1;
@@ -1291,13 +1296,13 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 		} else {
 			LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
 		}
-	} else if (!strcmp(op1, "label")) {
+	} else if (op1 == "label") {
 		anim->Type = AnimationLabel;
 		AddLabel(l, anim, op2);
-	} else if (!strcmp(op1, "goto")) {
+	} else if (op1 == "goto") {
 		anim->Type = AnimationGoto;
 		FindLabelLater(l, &anim->D.Goto.Goto, op2);
-	} else if (!strcmp(op1, "random-goto")) {
+	} else if (op1 == "random-goto") {
 		char *label;
 
 		anim->Type = AnimationRandomGoto;
@@ -1312,10 +1317,8 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 		anim->D.RandomGoto.Random = atoi(op2);
 		FindLabelLater(l, &anim->D.RandomGoto.Goto, label);
 	} else {
-		LuaError(l, "Unknown animation: %s" _C_ op1);
+		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
-
-	delete[] op1;
 }
 
 /**
@@ -1362,8 +1365,8 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 */
 static int ResourceIndex(lua_State *l, const char *resource)
 {
-	for (int res = 0; res < MaxCosts; ++res) {
-		if (!strcmp(resource, DefaultResourceNames[res])) {
+	for (unsigned int res = 0; res < MaxCosts; ++res) {
+		if (!strcmp(resource, DefaultResourceNames[res].c_str())) {
 			return res;
 		}
 	}

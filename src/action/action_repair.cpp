@@ -10,7 +10,7 @@
 //
 /**@name action_repair.cpp - The repair action. */
 //
-//      (c) Copyright 1999-2005 by Vladi Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Vladi Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		for (i = 1; i < MaxCosts; ++i) {
 			if (player->Resources[i] < goal->Type->RepairCosts[i]) {
 				snprintf(buf, 100, _("We need more %s for repair!"),
-					DefaultResourceNames[i]);
+					DefaultResourceNames[i].c_str());
 				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
 				if (player->AiEnabled) {
 					// FIXME: call back to AI?

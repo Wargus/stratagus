@@ -10,7 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -241,13 +241,13 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 		for (i = 0; i < PlayerMax; ++i) {
 			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[WoodCost],
+				i, DefaultResourceNames[WoodCost].c_str(),
 				Players[i].Resources[WoodCost]);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[GoldCost],
+				i, DefaultResourceNames[GoldCost].c_str(),
 				Players[i].Resources[GoldCost]);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-				i, DefaultResourceNames[OilCost],
+				i, DefaultResourceNames[OilCost].c_str(),
 				Players[i].Resources[OilCost]);
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 				i, PlayerRaces.Name[Players[i].Race].c_str());
@@ -267,7 +267,7 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 					int n;
 
 					tile = map->Fields[j+i*map->Info.MapWidth].Tile;
-					for (n=0; n < map->Tileset.NumTiles && tile != map->Tileset.Table[n]; ++n) {
+					for (n = 0; n < map->Tileset.NumTiles && tile != map->Tileset.Table[n]; ++n) {
 					}
 					f->printf("SetTile(%3d, %d, %d)\n", n, j, i);
 				}
