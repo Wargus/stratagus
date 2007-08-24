@@ -220,7 +220,9 @@ function AddMenuHelpers(menu)
         local dirlist = {}
         local dirs = ListDirsInDirectory(path)
         for i,f in ipairs(dirs) do
-          table.insert(dirlist, f .. "/")
+          if (string.find(f, "^%a")) then
+            table.insert(dirlist, f .. "/")
+          end
         end
 
         local fileslist = ListFilesInDirectory(path)
