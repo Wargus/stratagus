@@ -164,13 +164,12 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 
 
 // Write the map presentation file
-static int WriteMapPresentation(const std::string &mapname, CMap *map, char *mapsetup)
+static int WriteMapPresentation(const std::string &mapname, CMap *map)
 {
 	FileWriter *f = NULL;
 	int i;
 	int topplayer;
 	int numplayers;
-	char *mapsetupname;
 	const char *type[] = {"", "", "neutral", "nobody", 
 		"computer", "person", "rescue-passive", "rescue-active"};
 	
@@ -200,11 +199,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap *map, char *map
 			map->Info.Description.c_str(), numplayers, map->Info.MapWidth, map->Info.MapHeight,
 			map->Info.MapUID + 1);
 
-		mapsetupname = strrchr(mapsetup, '/');
-		if (!mapsetupname) {
-			mapsetupname = mapsetup;
-		}
-		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
+		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"/setup.sms\")\n");
 	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
 		delete f;
@@ -295,26 +290,27 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 */
 int SaveStratagusMap(const std::string &mapname, CMap *map, int writeTerrain)
 {
-	char mapsetup[PATH_MAX];
+	std::string mappresentation;
+	std::string mapsetup;
 	char *extension;
 
 	if (!map->Info.MapWidth || !map->Info.MapHeight) {
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapname.c_str());
+		fprintf(stderr, "%s: invalid Bos Wars map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
 
-	strcpy_s(mapsetup, sizeof(mapsetup), mapname.c_str());
-	extension = strstr(mapsetup, ".smp");
-	if (!extension) {
-		fprintf(stderr, "%s: invalid Statagus map filename\n", mapname.c_str());
+	if (mapname.find(".map") == mapname.npos) {
+		fprintf(stderr, "%s: invalid Bos Wars map filename\n", mapname.c_str());
 	}
-	memcpy(extension, ".sms", 4 * sizeof(char));
 
-	if (WriteMapPresentation(mapname, map, mapsetup) == -1) {
+	makedir(mapname.c_str(), 0777);
+	mappresentation = mapname + std::string("/presentation.smp");
+	mapsetup = mapname + std::string("/setup.sms");
+	if (WriteMapPresentation(mappresentation, map) == -1) {
 		return -1;
 	}
 
-	return WriteMapSetup(mapsetup, map, writeTerrain);
+	return WriteMapSetup(mapsetup.c_str(), map, writeTerrain);
 }
 
 

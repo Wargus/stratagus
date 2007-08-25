@@ -67,7 +67,7 @@ function RunEditorSaveMenu()
 
   menu:addLabel(_("Save Map"), 128, 11)
 
-  local t = menu:addTextInputField("map.smp", 16, 40, 224)
+  local t = menu:addTextInputField("new.map", 16, 40, 224)
 
   local browser = menu:addMapBrowser("maps/", 16, 70, 224, 166)
   local function cb(s)
