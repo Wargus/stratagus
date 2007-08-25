@@ -292,7 +292,6 @@ int SaveStratagusMap(const std::string &mapname, CMap *map, int writeTerrain)
 {
 	std::string mappresentation;
 	std::string mapsetup;
-	char *extension;
 
 	if (!map->Info.MapWidth || !map->Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Bos Wars map\n", mapname.c_str());
