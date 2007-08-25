@@ -410,7 +410,7 @@ function RunCreateMultiGameMenu(s)
   local menu
   local map = _("No Map")
   local description = _("No map")
-  local mapfile = "maps/islandwar.smp"
+  local mapfile = "maps/islandwar.map"
   local numplayers = 3
   local sx = Video.Width / 20
   local sy = Video.Height / 20
@@ -440,13 +440,13 @@ function RunCreateMultiGameMenu(s)
     OldPresentMap(description, nplayers, w, h, id)
   end
 
-  Load(mapfile)
+  Load(mapfile .. '/presentation.smp')
   local browser = menu:addMapBrowser("maps/", sx*10, sy*2+20, sx*8, sy*11, mapfile)
   local function cb(s)
-    mapfile = "maps/" .. browser:getSelectedItem()
-    print(browser:getSelectedItem())
+    mapfile = "maps/" .. browser:getSelectedMap()
+    print(browser:getSelectedMap())
     Load(mapfile)
-    maptext:setCaption(mapfile)
+    maptext:setCaption(browser:getSelectedItem())
   end
   browser:setActionCallback(cb)
   
@@ -455,7 +455,7 @@ function RunCreateMultiGameMenu(s)
   menu:addButton(_("Create ~!Game"), "g", Video.Width / 2 + 50, Video.Height - 100,
     function(s)    
       print (description)
-      RunServerMultiGameMenu(mapfile, description, numplayers)
+      RunServerMultiGameMenu("maps/"..browser:getSelectedMap(), description, numplayers)
       menu:stop()
     end
   )
