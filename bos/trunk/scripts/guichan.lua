@@ -231,12 +231,10 @@ function AddMenuHelpers(menu)
         return dirlist
     end
     local browser = self:addBrowser(path, listFilesAndDirs, x, y, w, h, default)
-
-    local getSelectedItem = browser.getSelectedItem
-    local function getMap()
-       return getSelectedItem(browser) .. "/presentation.smp"
+    local function getMap(browser)
+       return browser:getSelectedItem() .. "/presentation.smp"
     end
-    browser.getSelectedItem = getMap
+    browser.getSelectedMap = getMap
     return browser
   end
 
@@ -457,7 +455,7 @@ function RunStartGameMenu(s)
   local players
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local selectedmap = "islandwar.smp"
+  local selectedmap = "islandwar.map"
   local d
 
   menu = BosMenu(_("Start Game"))
@@ -505,12 +503,12 @@ function RunStartGameMenu(s)
     OldPresentMap(description, nplayers, w, h, id)
   end
  
-  Load("maps/"..selectedmap)
+  Load("maps/"..selectedmap..'/presentation.smp')
   local browser = menu:addMapBrowser("maps/", sx*10, sy*2+20, sx*8, sy*11,
                                      "maps/"..selectedmap)
   local function cb(s)
     maptext:setCaption(browser:getSelectedItem())
-    Load("maps/" .. browser:getSelectedItem())
+    Load("maps/" .. browser:getSelectedMap())
     selectedmap = browser:getSelectedItem()
   end
   browser:setActionCallback(cb)
@@ -518,7 +516,8 @@ function RunStartGameMenu(s)
   AllowAllUnits()
   local function startgamebutton(s)
     print("Starting map -------")
-    RunMap("maps/" .. selectedmap, nil, fow:isMarked(), revealmap:isMarked())
+    RunMap("maps/" .. browser:getSelectedMap(), nil, fow:isMarked(),
+           revealmap:isMarked())
     PresentMap = OldPresentMap
     menu:stop()
   end
@@ -678,7 +677,7 @@ function RunEditorLoadMenu()
   local menu
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local selectedmap = "islandwar.smp"
+  local selectedmap = "islandwar.map"
   local numplayers = 2
 
   menu = BosMenu(_("Editor"))
@@ -702,18 +701,18 @@ function RunEditorLoadMenu()
     OldPresentMap(description, nplayers, w, h, id)
   end
 
-  Load("maps/"..selectedmap)
+  Load("maps/"..selectedmap..'/presentation.smp')
   local browser = menu:addMapBrowser("maps/", sx*10, sy*2+20, sx*8, sy*11, 
                                      "maps/"..selectedmap)
   local function selectMap(s)
     maptext:setCaption(browser:getSelectedItem())
-    Load("maps/" .. browser:getSelectedItem())
+    Load("maps/" .. browser:getSelectedMap())
     selectedmap = browser:getSelectedItem()
   end
   browser:setActionCallback(selectMap)
 
   function starteditorbutton(s)
-    StartEditor(selectedmap)
+    StartEditor(browser:getSelectedMap())
     Load("scripts/uilayout.lua")
     HandleCommandKey = HandleIngameCommandKey
     menu:stop()
