@@ -13,4 +13,4 @@
 
 DefinePlayerTypes("person", "person")
 PresentMap("Fishing trip anyone", 2, 64, 64, 6228340)
-DefineMapSetup("maps/islandwar/setup.sms")
+DefineMapSetup(GetCurrentLuaPath() .. "/setup.sms")

@@ -35,7 +35,7 @@ Players[7]:SetStartView(16, 22)
 Players[7].AiName = "ai-default"
 
 -- load tilesets
-LoadTileModels("maps/islandwar/terrain.lua")
+LoadTileModels(GetCurrentLuaPath() .. "/terrain.lua")
 
 -- place units
 unit= CreateUnit("unit-tree", PlayerNumNeutral, {11, 9})
