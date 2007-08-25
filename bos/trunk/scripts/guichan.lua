@@ -41,6 +41,25 @@ backgroundWidget = ImageWidget(bckground)
 
 local SavedGame = false
 
+function FilterList(originallist, pattern)
+  local filteredlist = {}
+  local k, v
+  for k, v in ipairs(originallist) do
+    if (string.find(v, pattern)) then
+      table.insert(filteredlist, v)
+    end
+  end
+  return filteredlist  
+end
+
+function CreateFilteringLister(pattern, lister)
+  function ListFilteredItems(path)
+     return FilterList(lister(path), pattern)
+  end
+  return ListFilteredItems
+end
+
+
 function AddMenuHelpers(menu)
   function menu:addCentered(widget, x, y)
     self:add(widget, x - widget:getWidth() / 2, y)
@@ -122,32 +141,13 @@ function AddMenuHelpers(menu)
     return bq
   end
 
-  function menu:addBrowser(path, filter, x, y, w, h, default, lister)
-    -- Create a list of all dirs and files in a directory
-    local function listFiles(path)
-      local dirlist = {}
-      local i
-      local f
-
-      if lister == nil then
-        lister = ListFilesInDirectory
-      end
-      local fileslist = lister(path)
-      for i,f in ipairs(fileslist) do
-          if (string.find(f, filter)) then
-            table.insert(dirlist, f)
-          end
-      end
-
-      return dirlist
-    end
-
+  function menu:addBrowser(path, lister, x, y, w, h, default)
     local bq = self:addListBox(x, y, w, h, {})
     bq.origpath = path
     bq.actioncb = nil
 
     local function updateList()
-      bq.itemslist = listFiles(bq.path)
+      bq.itemslist = lister(bq.path)
       if (bq.path ~= bq.origpath) then
         table.insert(bq.itemslist, 1, "../")
       end
@@ -233,7 +233,7 @@ function AddMenuHelpers(menu)
         end
         return dirlist
     end
-    return self:addBrowser(path, ".*", x, y, w, h, default, listFilesAndDirs)
+    return self:addBrowser(path, listFilesAndDirs, x, y, w, h, default)
   end
 
   function menu:addCheckBox(caption, x, y, callback)
@@ -537,7 +537,8 @@ function RunReplayMenu(s)
   -- Stratagus should store complete starting conditions in the log.
   AllowAllUnits()
 
-  local browser = menu:addBrowser("~logs/", ".log$", 300, 100, 300, 200)
+  local lister = CreateFilteringLister(".log$",  ListFilesInDirectory)
+  local browser = menu:addBrowser("~logs/", lister, 300, 100, 300, 200)
   local reveal = menu:addCheckBox(_("Reveal map"), 100, 250, function() end)
 
   function startreplaybutton(s)
@@ -563,9 +564,10 @@ function RunLoadGameMenu(s)
   local b
 
   menu = BosMenu(_("Load Game"))
-  local browser = menu:addBrowser("~save", ".sav.gz$", 
+  local lister = CreateFilteringLister(".sav.gz$",  ListFilesInDirectory)
+  local browser = menu:addBrowser("~save", lister, 
                                  Video.Width / 2 - 150, 100, 300, 200)
-    function startgamebutton(s)
+  function startgamebutton(s)
       print("Starting saved game")
       currentCampaign = nil
       loop = true
