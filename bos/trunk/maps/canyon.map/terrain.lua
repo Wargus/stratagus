@@ -28,8 +28,8 @@
 -- $Id$
 
 
-DefineImageTilemodels("maps/canyon/terrain.png", 64, 64)
+DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 64, 64)
 
-Load("maps/canyon/access-unpassable.lua")
+Load(GetCurrentLuaPath().."/access-unpassable.lua")
 
 RepeatMap(64, 64, 64, 64)
