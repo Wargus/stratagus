@@ -220,20 +220,24 @@ function AddMenuHelpers(menu)
         local dirlist = {}
         local dirs = ListDirsInDirectory(path)
         for i,f in ipairs(dirs) do
-          if (string.find(f, "^%a")) then
-            table.insert(dirlist, f .. "/")
-          end
-        end
-
-        local fileslist = ListFilesInDirectory(path)
-        for i,f in ipairs(fileslist) do
-          if (string.find(f, "^%w.*%.smp$")) then
+          if (string.find(f, "^%w.*%.map$")) then
             table.insert(dirlist, f)
+          else
+            if (string.find(f, "^%a")) then
+              table.insert(dirlist, f .. "/")
+            end
           end
         end
         return dirlist
     end
-    return self:addBrowser(path, listFilesAndDirs, x, y, w, h, default)
+    local browser = self:addBrowser(path, listFilesAndDirs, x, y, w, h, default)
+
+    local getSelectedItem = browser.getSelectedItem
+    local function getMap()
+       return getSelectedItem(browser) .. "/presentation.smp"
+    end
+    browser.getSelectedItem = getMap
+    return browser
   end
 
   function menu:addCheckBox(caption, x, y, callback)
