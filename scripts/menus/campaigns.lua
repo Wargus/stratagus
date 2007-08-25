@@ -130,9 +130,9 @@ function RunCampaignsMenu(s)
   menu = BosMenu(_("List of Campaigns"))
 
   ResetMapOptions()
-  local browser = menu:addBrowser("campaigns/", "^%a",
-                                 Video.Width / 2 - 150, 100, 300, 200, nil,
-                                 ListDirsInDirectory)
+  local lister = CreateFilteringLister("^%a",  ListDirsInDirectory)
+  local browser = menu:addBrowser("campaigns/", lister,
+                                 Video.Width / 2 - 150, 100, 300, 200)
   function startgamebutton(s)
     print("Starting campaign")
     RunCampaign("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
