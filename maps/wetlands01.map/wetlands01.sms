@@ -47,7 +47,7 @@ Players[7].MagmaStored = 0
 Players[7].AiName = "ai-default"
 
 -- load tilesets
-LoadTileModels("maps/wetlands01/terrain.lua")
+LoadTileModels(GetCurrentLuaPath().."/terrain.lua")
 
 -- place units
 CreateUnit("unit-tree", PlayerNumNeutral, {70, 82})

@@ -47,7 +47,7 @@ Players[7].MagmaStored = 2000
 Players[7].AiName = "ai-default"
 
 -- load tilesets
-LoadTileModels("maps/river/terrain.lua")
+LoadTileModels(GetCurrentLuaPath().."/terrain.lua")
 
 -- place units
 CreateUnit("unit-engineer", 1, {57, 51})

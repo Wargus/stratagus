@@ -31,7 +31,7 @@
 
 DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 16, 16*7)
 
-Load("maps/tutorial/access-unpassable.lua")
+Load(GetCurrentLuaPath().."/access-unpassable.lua")
 
 function DefinePatch(r, w, h)
   local f = function(x, y)

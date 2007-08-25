@@ -29,7 +29,7 @@
 --  Define level 03 Map Presentation
 --
 
-Load("maps/tutorial/setup.sms")
+Load("maps/tutorial.map/setup.sms")
 
 CreateUnit("unit-buggy", 0, {23, 44})
 CreateUnit("unit-engineer", 0, {25, 44})
