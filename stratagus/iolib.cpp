@@ -236,7 +236,7 @@ void CFile::flush()
 **  @param format  String Format.
 **  @param ...     Parameter List.
 */
-int CFile::printf(char *format, ...)
+int CFile::printf(const char *format, ...)
 {
 	int n;
 	int size;

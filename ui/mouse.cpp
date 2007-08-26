@@ -1822,7 +1822,6 @@ void DrawPieMenu(void)
 	const ButtonAction *buttons;
 	CViewport *vp;
 	CPlayer *player;
-	char buf[2] = "?";
 
 	if (CursorState != CursorStatePieMenu)
 		return;
@@ -1856,13 +1855,12 @@ void DrawPieMenu(void)
 
 			// Tutorial show command key in icons
 			if (UI.ButtonPanel.ShowCommandKey) {
-				char *text;
+				std::string text("?");
 
 				if (CurrentButtons[i].Key == 27) {
 					text = "ESC";
 				} else {
-					buf[0] = toupper(CurrentButtons[i].Key);
-					text = buf;
+					text[0] = toupper(CurrentButtons[i].Key);
 				}
 				VideoDrawTextClip(x + 4, y + 4, GameFont, text);
 			}

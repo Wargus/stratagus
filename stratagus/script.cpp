@@ -1345,7 +1345,7 @@ static int AliasUnitVar(lua_State *l, const char *s)
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
-		char *sloc[] = {"Unit", "Initial", "Type", NULL};
+		const char *sloc[] = {"Unit", "Initial", "Type", NULL};
 		int i;
 		const char *key;
 
