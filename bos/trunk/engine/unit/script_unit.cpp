@@ -518,6 +518,16 @@ static int CclUnit(lua_State *l)
 			lua_rawgeti(l, j + 1, 2);
 			unit->Y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "seen-tile")) {
+			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, j + 1, 1);
+			unit->Seen.X = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 2);
+			unit->Seen.Y = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
@@ -595,6 +605,16 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "seen-constructed")) {
 			unit->Seen.Constructed = 1;
 			--j;
+		} else if (!strcmp(value, "seen-cframe")) {
+			int frame;
+			CConstructionFrame *cframe;
+
+			frame = LuaToNumber(l, j + 1);
+			cframe = unit->Type->Construction->Frames;
+			while (frame--) {
+				cframe = cframe->Next;
+			}
+			unit->Seen.CFrame = cframe;
 		} else if (!strcmp(value, "seen-state")) {
 			unit->Seen.State = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "resource-active")) {

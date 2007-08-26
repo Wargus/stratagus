@@ -202,8 +202,6 @@ static int CclMissile(lua_State *l)
 	int args;
 	int j;
 
-	DebugPrint("FIXME: not finished\n");
-
 	missile = NULL;
 	type = NULL;
 	x = dx = y = dy = sx = sy = -1;
@@ -307,6 +305,8 @@ static int CclMissile(lua_State *l)
 			lua_rawgeti(l, j + 1, 2);
 			missile->TotalStep = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	// we need to reinitialize position parameters - that's because of
