@@ -82,7 +82,8 @@ function RunSaveMenu()
 
   local t = menu:addTextInputField("game.sav", 16, 40, 224)
 
-  local browser = menu:addBrowser("~save", ".sav.gz$", 16, 70, 224, 166)
+  local lister = CreateFilteringLister(".sav.gz$", ListFilesInDirectory)
+  local browser = menu:addBrowser("~save", lister, 16, 70, 224, 166)
   local function cb(s)
     t:setText(browser:getSelectedItem())
   end
