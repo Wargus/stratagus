@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development version:
+- Fixed load/save bug (Jimmy Salmon)
 - Move to new map layout (Francois Beerten)
 - Added Portuguese translation (Giovanni Oliveira)
 - Made the language options menu more dynamic (Francois Beerten)
