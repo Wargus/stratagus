@@ -135,6 +135,7 @@ function RunCampaignsMenu(s)
                                  Video.Width / 2 - 150, 100, 300, 200)
   function startgamebutton(s)
     print("Starting campaign")
+    position = nil
     RunCampaign("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()
   end
