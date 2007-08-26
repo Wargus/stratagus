@@ -3378,6 +3378,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	}
 
 	file->printf("\"tile\", {%d, %d}, ", unit->X, unit->Y);
+	file->printf("\"seen-tile\", {%d, %d}, ", unit->Seen.X, unit->Seen.Y);
 	file->printf("\"refs\", %d, ", unit->Refs);
 #if 0
 	// latimerius: why is this so complex?
@@ -3447,6 +3448,17 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	if (unit->Seen.Constructed) {
 		file->printf(" \"seen-constructed\",");
 	}
+
+	if (unit->Seen.CFrame) {
+		CConstructionFrame *cframe = unit->Type->Construction->Frames;
+		int frame = 0;
+		while (cframe != unit->Seen.CFrame) {
+			cframe = cframe->Next;
+			++frame;
+		}
+		file->printf(" \"seen-cframe\", %d,", frame);
+	}
+
 	file->printf(" \"seen-state\", %d, ", unit->Seen.State);
 	file->printf("\"ttl\", %lu, ", unit->TTL);
 
