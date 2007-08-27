@@ -146,8 +146,7 @@ def CheckOpenGL(env, conf):
       'LIBS': ['opengl3']}
   opengl['darwin'] = {
       'LIBS': ['GL'],
-      'LIBPATH': ['/System/Library/Frameworks/OpenGL.framework/Libraries/'],
-      'FRAMEWORK': ['OpenGL']}
+      'LIBPATH': ['/System/Library/Frameworks/OpenGL.framework/Libraries/']}
   platform = sys.platform
   if sys.platform[:5] == 'linux':
      platform = 'linux'
