@@ -8,7 +8,6 @@
 <ul>
 <li>Linux: <a href="dist/releases/boswars-2.4-linux.tar.gz">boswars-2.4-linux.tar.gz</a></li>
 <li>Windows (installer): <a href="dist/releases/BosWars-2.4.exe">BosWars-2.4.exe</a> </li>
-<li>Mac OS X: <a href="dist/releases/boswars-2.4-osx.dmg">boswars-2.4-osx.dmg</a></li>
 <li>Source (tar): <a href="dist/releases/boswars-2.4-src.tar.gz">boswars-2.4-src.tar.gz</a></li>
 <li>Source (zip): <a href="dist/releases/boswars-2.4-src.zip">boswars-2.4-src.zip</a></li>
 </ul>
