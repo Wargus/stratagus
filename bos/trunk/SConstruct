@@ -144,17 +144,23 @@ def CheckOpenGL(env, conf):
       'CPPPATH': ['/usr/include']}
   opengl['cygwin'] = {
       'LIBS': ['opengl3']}
+  opengl['darwin'] = {
+      'LIBS': ['GL'],
+      'LIBPATH': ['/System/Library/Frameworks/OpenGL.framework/Libraries/'],
+      'FRAMEWORK': ['OpenGL']}
   platform = sys.platform
   if sys.platform[:5] == 'linux':
      platform = 'linux'
-  for key in opengl[platform].keys():
+  glconfig = opengl.get(platform, {})
+  for key in glconfig:
       if key != 'LIBS':
          for i in opengl[platform][key]:
             env[key].append(i)
-  for lib in opengl[platform]['LIBS']:
-     if not conf.CheckLib('GL'):
-         print("Can't find OpenGL libs. Exiting")
-         sys.exit(1)
+  if 'LIBS' in glconfig:
+     for lib in glconfig['LIBS']:
+         if not conf.CheckLib(lib):
+             print("Can't find OpenGL libs. Exiting")
+             sys.exit(1)
   return True
 
 def CheckLuaLib(env, conf):
