@@ -246,7 +246,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	unit->Player->SubUnitType(type);
 
 	build = MakeUnit(type, unit->Player);
-	
+
 	// If unable to make unit, stop, and report message
 	if (build == NoUnitP) {
 		unit->Orders[0]->Action = UnitActionStill;
@@ -256,10 +256,10 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
-		
+
 		return;
 	}
-	
+
 	build->Constructed = 1;
 	build->CurrentSightRange = 0;
 
@@ -280,7 +280,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
 	build->Orders[0]->Action = UnitActionBuilt;
-	
+
 	// Must place after previous for map flags
 	build->Place(x, y);
 
@@ -490,6 +490,7 @@ void HandleActionBuilt(CUnit *unit)
 			if (type->BuilderLost) {
 				// FIXME: enough?
 				LetUnitDie(worker);
+				worker = NULL;
 			// Drop out the worker.
 			} else {
 				worker->Orders[0]->Action = UnitActionStill;
