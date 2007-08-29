@@ -68,7 +68,7 @@ The packages include a pre-compiled binary of the stratagus engine.
 <ul>
   <li>Linux: <a href="dist/releases/bos_1_1.tar.gz">bos_1_1.tar.gz</a></li>
   <li>Debian Linux: <a href="http://packages.debian.org/unstable/games/bos">bos</a> 
-      package in debian unstable by David Mart&iacute;nez Moreno.
+      package in debian unstable by David Mart&iacute;nez Moreno.</li>
   <li>Windows: <a href="dist/releases/BattleOfSurvival-1.1.exe">BattleOfSurvival-1.1.exe</a></li>
 </ul>
 
@@ -76,15 +76,15 @@ The packages include a pre-compiled binary of the stratagus engine.
 This version of Invasion - Battle of Survival works with version 2.1 of the Stratagus engine.
 
 <ul>
-  <li>Linux: <a href="dist/releases/bos_1_1pre1.tgz">bos_1_1pre1.tgz</a>
-  <li>Windows: <a href="dist/releases/BattleOfSurvival-1.1pre1.exe">BattleOfSurvival-1.1pre1.exe</a>
+  <li>Linux: <a href="dist/releases/bos_1_1pre1.tgz">bos_1_1pre1.tgz</a> </li>
+  <li>Windows: <a href="dist/releases/BattleOfSurvival-1.1pre1.exe">BattleOfSurvival-1.1pre1.exe</a> </li>
 </ul>
 
 <h2>Version 1.0</h2>
 This version of Invasion - Battle of Survival works with version 2.0 of the Stratagus engine.
 
 <ul>
-  <li>Linux: <a href="dist/releases/bos_1_0.tgz">bos_1_0.tgz</a>
+  <li>Linux: <a href="dist/releases/bos_1_0.tgz">bos_1_0.tgz</a> </li>
 </ul>
 
 <p/>
