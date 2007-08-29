@@ -15,19 +15,21 @@ and if nobody else is working on it.
 </p>
 
 <h1>Development version</h1>
-The game is continuously evolving. You can get the latest version with <a href="http://subversion.tigris.org/">subversion</a>:
+<p>The game is continuously evolving. You can get the latest version with 
+<a href="http://subversion.tigris.org/">subversion</a>:</p>
 <pre>  svn co svn://bos.seul.org/svn/bos/bos/trunk boswars</pre>
 
 <p>Before playing you'll have to compile the engine. This can be done easily 
-with scons. To build a debug version (recommended for development) run:<br>
+with scons. To build a debug version (recommended for development) run:</p>
 <pre>  scons debug</pre>
 
-<p>Finally, you can run the game with :<br>
+<p>Finally, you can run the game with :</p>
 <pre>  ./boswars</pre>
 
-<p>You can also compile using visual c++ by opening up the bos.sln file.
+<p>You can also compile using visual c++ by opening up the bos.sln file.</p>
 
-<p>See the <a href="http://bos.seul.org/wiki/index.php/Bos/FAQ">Bos Wars FAQ</a> and the documentation next to the sources for more information.
+<p>See the <a href="http://www.boswars.org/wiki/index.php/Bos/FAQ">Bos Wars FAQ</a> 
+and the documentation next to the sources for more information.</p>
 
 <p>You can browse the source code via <a href="http://www.seul.org/viewcvs/viewcvs.cgi/bos/trunk/?root=BosWars">viewcvs</a>.</p>
 
@@ -38,18 +40,17 @@ with scons. To build a debug version (recommended for development) run:<br>
 <pre>  svn co svn://bos.seul.org/svn/bos/public_html.bos public_html.bos</pre>
 
 <p>Old development done before december 17th 2004 can be found in the 
-<a href="http://savannah.nongnu.org/cvs/?group=stratagus-bos">CVS repository</a>.
+<a href="http://savannah.nongnu.org/cvs/?group=stratagus-bos">CVS repository</a>.</p>
 
 <h1>Contact</h1>
-Discussion and work on the game happens mostly on <a href="irc://sterling.freenode.net/bos">irc</a>. 
+<p>Discussion and work on the game happens mostly on <a href="irc://sterling.freenode.net/bos">irc</a>. 
 Logs of the #bos irc channel are available at 
 <a href="http://colabti.de/irclogger/irclogger_logs/bos">http://colabti.de/irclogger/irclogger_logs/bos</a>.
-<p>
+</p>
 
-You can also reach us via the <a href="http://archives.seul.org/bos/dev/">bos-dev</a> mailing list. 
+<p>You can also reach us via the <a href="http://archives.seul.org/bos/dev/">bos-dev</a> mailing list. </p>
 
-<p>
-Designs and some documentation are written in the <a href="/wiki">Bos Wiki</a>. 
-Don't hesitate to add your comments and ideas. 
+<p>Designs and some documentation are written in the <a href="/wiki">Bos Wiki</a>. 
+Don't hesitate to add your comments and ideas. </p>
 
 <!--#include file="footer.shtml" -->

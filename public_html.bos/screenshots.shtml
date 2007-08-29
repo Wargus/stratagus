@@ -2,41 +2,42 @@
 <!--#set var="title" value=" - screenshots"-->
 <!--#include file="header.shtml" -->
  
-      <h1>Screenshots</h1>
-      <h2>Bos Wars 2.4</h2>
-      <center>
-      <a href="images/boswars-2.4-0.jpg"><img src="images/boswars-2.4-0s.jpg" /></a>
-      </center>
-      <h2>BOS 2.0.1</h2>
-      <p>To give you an idea of the changes:</p>
-      <center>
-      <a href="images/bos-pre2.2-0.jpg"><img src="images/bos-pre2.2-0s.jpg" /></a>
-      <a href="images/bos-pre2.2-1.jpg"><img src="images/bos-pre2.2-1s.jpg" /></a>
-      <a href="images/bos-pre2.2-2.jpg"><img src="images/bos-pre2.2-2s.jpg" /></a>
-      <br>
-      <a href="images/screen18.png"><img src="images/screen18s.png" /></a>
-      <a href="images/screen23.png"><img src="images/screen23s.png" /></a>
-      <a href="images/pre-2.2.png"><img src="images/pre-2.2s.png" /></a>
-      </center>
-      <p>Among the new features you will get:
-	<ul>
-	<li>New units</li>
-	<li>More detailed maps based on full image. 
-	    This uses the new lua map format in stratagus 2.2</li>
-        <li>Improved UI</li>
-        <li>New menu system</li>
-	</ul>
-	</p> 
-      <h2>BOS 1.0</h2>
-      <center> <a href="images/screen01.png">
-	<img src="images/screen01s.png" width="320" height="240" /></a>  
-      <a href="images/screen02.png"><img src="images/screen02s.png"
- width="320" height="240" /> </a></center>
-     <h2>Movies</h2>
-     <ul>
-     <li>Little intro or teaser by TimberDragon 
-        <a href="files/bos-intro1.avi">bos-intro1.avi</a>.</li>
-     </ul>
- 
+<h1>Screenshots</h1>
+<h2>Bos Wars 2.4</h2>
+<div class="center">
+  <a href="images/boswars-2.4-0.jpg"><img src="images/boswars-2.4-0s.jpg" /></a>
+</div>
 
+<h2>BOS 2.0.1</h2>
+<p>To give you an idea of the changes:</p>
+<div class="center">
+  <a href="images/bos-pre2.2-0.jpg"><img src="images/bos-pre2.2-0s.jpg" alt="bos-pre2.2-0.jpg" /></a>
+  <a href="images/bos-pre2.2-1.jpg"><img src="images/bos-pre2.2-1s.jpg" alt="bos-pre2.2-1.jpg" /></a>
+  <a href="images/bos-pre2.2-2.jpg"><img src="images/bos-pre2.2-2s.jpg" alt="bos-pre2.2-2.jpg" /></a>
+<br />
+  <a href="images/screen18.png"><img src="images/screen18s.png" alt="screen18.png" /></a>
+  <a href="images/screen23.png"><img src="images/screen23s.png" alt="screen23.png" /></a>
+  <a href="images/pre-2.2.png"><img src="images/pre-2.2s.png" alt="pre-2.2.png" /></a>
+</div>
+
+<p>Among the new features you will get:</p>
+<ul>
+  <li>New units</li>
+  <li>More detailed maps based on full image. This uses the new lua map format in stratagus 2.2</li>
+  <li>Improved UI</li>
+  <li>New menu system</li>
+</ul>
+
+
+<h2>BOS 1.0</h2>
+<div class="center"> 
+  <a href="images/screen01.png"><img src="images/screen01s.png" width="320" height="240" alt="screen01.png" /></a>
+  <a href="images/screen02.png"><img src="images/screen02s.png" width="320" height="240" alt="screen02.png" /></a>
+</div>
+
+<h2>Movies</h2>
+<ul>
+  <li>Little intro or teaser by TimberDragon <a href="files/bos-intro1.avi">bos-intro1.avi</a>.</li>
+</ul>
+ 
 <!--#include file="footer.shtml" -->
