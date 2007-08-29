@@ -1,8 +1,8 @@
-
-<!--#set var="title" value="Bos"-->
+<!--#set var="CUR" value="team" -->
+<!--#set var="title" value=" - Team"-->
 <!--#include file="header.shtml" -->
       
-<h2>The Bos Wars Team</h2>
+<h1>The Bos Wars Team</h1>
 
 Bos Wars is an open source project open to everybody. 
 The currently active members are:
@@ -17,7 +17,7 @@ The currently active members are:
 The members with an asterisk (*) can be contacted by email. Their 
 email address is "&lt;nickname&gt;@boswars.org".
 
-<h3>Past contributors</h3>
+<h1>Past contributors</h1>
 <p>
 <ul>
 <li>Tejay Penfold "TimberDragon", 3d specialist</li>

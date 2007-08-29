@@ -1,0 +1,14 @@
+	body {
+		font-family: verdana, arial, helvetica, sans-serif;
+	}
+	a.topbar {
+		text-align: center;
+		padding: 1px;
+		width: 1px;
+	}
+	table.maintable {
+		font-size: 14px;
+	}
+	h2 {
+		font-size: 22px;
+	}

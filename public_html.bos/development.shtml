@@ -1,7 +1,8 @@
-<!--#set var="title" value="Bos Wars Development"-->
+<!--#set var="CUR" value="development" -->
+<!--#set var="title" value=" - development"-->
 <!--#include file="header.shtml" -->
 
-<h2>Before you start</h2>
+<h1>Before you start</h1>
 <p>
 Before any development, feature request or bug report, 
 you should get and use the development version of Bos Wars. 
@@ -13,9 +14,9 @@ Before starting a new development, contact us to check if it fits in the game
 and if nobody else is working on it.
 </p>
 
-<h2>Development version</h2>
+<h1>Development version</h1>
 The game is continuously evolving. You can get the latest version with <a href="http://subversion.tigris.org/">subversion</a>:
-<pre>  svn co svn://bos.seul.org/svn/bos/bos/trunk bos</pre>
+<pre>  svn co svn://bos.seul.org/svn/bos/bos/trunk boswars</pre>
 
 <p>Before playing you'll have to compile the engine. This can be done easily 
 with scons. To build a debug version (recommended for development) run:<br>
@@ -39,7 +40,7 @@ with scons. To build a debug version (recommended for development) run:<br>
 <p>Old development done before december 17th 2004 can be found in the 
 <a href="http://savannah.nongnu.org/cvs/?group=stratagus-bos">CVS repository</a>.
 
-<h2>Contact</h2>
+<h1>Contact</h1>
 Discussion and work on the game happens mostly on <a href="irc://sterling.freenode.net/bos">irc</a>. 
 Logs of the #bos irc channel are available at 
 <a href="http://colabti.de/irclogger/irclogger_logs/bos">http://colabti.de/irclogger/irclogger_logs/bos</a>.

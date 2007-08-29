@@ -1,21 +1,22 @@
-<!--#set var="title" value="Bos Development"-->
+<!--#set var="CUR" value="screenshots" -->
+<!--#set var="title" value=" - screenshots"-->
 <!--#include file="header.shtml" -->
  
-      <h2>Screenshots</h2>
-      <h3>Bos Wars 2.4</h3>
+      <h1>Screenshots</h1>
+      <h2>Bos Wars 2.4</h2>
       <center>
-      <a href="images/boswars-2.4-0.jpg"><img src="images/boswars-2.4-0s.jpg"></a>
+      <a href="images/boswars-2.4-0.jpg"><img src="images/boswars-2.4-0s.jpg" /></a>
       </center>
-      <h3>BOS 2.0.1</h3>
+      <h2>BOS 2.0.1</h2>
       <p>To give you an idea of the changes:</p>
       <center>
-      <a href="images/bos-pre2.2-0.jpg"><img src="images/bos-pre2.2-0s.jpg"></a>
-      <a href="images/bos-pre2.2-1.jpg"><img src="images/bos-pre2.2-1s.jpg"></a>
-      <a href="images/bos-pre2.2-2.jpg"><img src="images/bos-pre2.2-2s.jpg"></a>
+      <a href="images/bos-pre2.2-0.jpg"><img src="images/bos-pre2.2-0s.jpg" /></a>
+      <a href="images/bos-pre2.2-1.jpg"><img src="images/bos-pre2.2-1s.jpg" /></a>
+      <a href="images/bos-pre2.2-2.jpg"><img src="images/bos-pre2.2-2s.jpg" /></a>
       <br>
-      <a href="images/screen18.png"><img src="images/screen18s.png"></a>
-      <a href="images/screen23.png"><img src="images/screen23s.png"></a>
-      <a href="images/pre-2.2.png"><img src="images/pre-2.2s.png"></a>
+      <a href="images/screen18.png"><img src="images/screen18s.png" /></a>
+      <a href="images/screen23.png"><img src="images/screen23s.png" /></a>
+      <a href="images/pre-2.2.png"><img src="images/pre-2.2s.png" /></a>
       </center>
       <p>Among the new features you will get:
 	<ul>
@@ -26,16 +27,16 @@
         <li>New menu system</li>
 	</ul>
 	</p> 
-      <h3>BOS 1.0</h3>
+      <h2>BOS 1.0</h2>
       <center> <a href="images/screen01.png">
-	<img src="images/screen01s.png" width="320" height="240"></a>  
+	<img src="images/screen01s.png" width="320" height="240" /></a>  
       <a href="images/screen02.png"><img src="images/screen02s.png"
- width="320" height="240"> </a></center>
-     <h3>Movies</h3>
+ width="320" height="240" /> </a></center>
+     <h2>Movies</h2>
      <ul>
      <li>Little intro or teaser by TimberDragon 
         <a href="files/bos-intro1.avi">bos-intro1.avi</a>.</li>
-     </lu>
+     </ul>
  
 
 <!--#include file="footer.shtml" -->

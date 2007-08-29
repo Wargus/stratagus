@@ -1,8 +1,8 @@
-
-<!--#set var="title" value="Bos"-->
+<!--#set var="CUR" value="index" -->
+<!--#set var="title" value=" - home page"-->
 <!--#include file="header.shtml" -->
 
-<h2>About</h2>
+<h1>About</h1>
 <p>
 Bos Wars is a futuristic real-time strategy game. It is possible to 
 play against human opponents over LAN, internet, or against the computer. 
@@ -15,9 +15,9 @@ Bos Wars aims to create a completely original and fun open source RTS game.
 Beerten et al. See COPYRIGHT.txt in the package for the full
 copyright notice.</p>
 
-<h2>News</h2>
-<ul>
-<h3>Version 2.4</h3>
+<h1>News</h1>
+
+<h2>Version 2.4</h2>
 <p><a href="download.shtml">Bos Wars 2.4</a> has been released ! 
 This new version features a brand new rate-based economy that completely 
 replaces the old system of harvesting resources.  The new system uses 
@@ -28,7 +28,7 @@ tutorial, new translations, and several bug fixes.
 Happy gaming.
 </p>
 
-<h3>Preliminary 2.4 version.</h3>
+<h2>Preliminary 2.4 version.</h2>
 <p>The preliminary version of <a href="download.shtml">Bos Wars 2.4</a> is ready ! 
 This version introduces a completely new rate-based economy. Energy is produced by 
 power plants and magma by magma pumps. Building also consume resources 
@@ -41,13 +41,13 @@ Tell us your gaming experience and about eventual bugs.
 We wait for your feedback before the final 2.4 version. Happy gaming.
 </p>
 
-<h3>New gameplay and help wanted.</h3>
+<h2>New gameplay and help wanted.</h2>
 <p>The next release will have a completely new gameplay. The economy system 
 switches to a rate based economy. For this release and the next ones, all help
 is welcome. Graphics, modeling, bug hunting, programming, documentation, beta testing 
 and so on, all need help.
 </p>
-<h3>First release of Bos Wars.</h3>
+<h2>First release of Bos Wars.</h2>
 <p><a href="download.shtml">Bos Wars 2.3</a> has been released. This is the 
 first version with the new name and that integrates the engine. This version
 also supports Lua 5.1.
@@ -57,23 +57,24 @@ Development will now concentrate on new gameplay mechanics.
 After that, new maps and campaigns can be created.
 </p>
 
-<h3>Project renamed to Bos Wars.</h3>
+<h2>Project renamed to Bos Wars.</h2>
 <p>Invasion - Battle of Survival has been renamed to Bos Wars.</p>
 
-<h3>Merge of the Stratagus engine into the BOS project.</h3>
+<h2>Merge of the Stratagus engine into the BOS project.</h2>
 <p>To speed up development, the Stratagus engine has been merged 
 into the BOS project. Due to the merge, the subversion URL has changed.
-You can find all details in the <a href="http://bos.seul.org/development.shtml">
+You can find all details in the <a href="development.shtml">
 development</a> page.
 </p>
-</ul>
 
-<h2>Project<br>
-</h2>
+
+<h1>Project</h1>
+<p>
 The project is kindly hosted by <a href="http://www.seul.org">Seul</a> and Savannah. 
 Please report bugs in the <a href="http://savannah.nongnu.org/bugs/?group=stratagus-bos">Bug
 Tracker</a>. You can also talk with the Bos Wars team on irc in the 
 <a href="irc://sterling.freenode.net/bos">#bos</a> channel
 hosted by <a href="http://www.freenode.net">freenode</a>.
+</p>
 
 <!--#include file="footer.shtml" -->

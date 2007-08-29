@@ -1,0 +1,202 @@
+/* $Id$ */
+/* guichan.css */
+
+html {
+	overflow-x: auto;
+	overflow-y: scroll;
+}
+
+body	{
+	background: #3e3c55;
+	color: #f4e020;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font: 14px Verdana, Helvetica, Arial, sans-serif;
+	padding-bottom: 25px;
+	}
+
+#logo {
+	width:100%;
+	text-align: center;
+  }
+
+#logo img {
+	border-style: none;
+}
+
+#wrapper	{
+	margin: 10px auto;
+	padding: 0 0 10px 0;
+	width: 70%;	
+	min-width: 600px;
+}
+
+/* Menu (id=header) */
+#header {
+	float:left;
+   display: block;
+	width:100%;
+	background: #3e3c55;
+	line-height:normal;
+	border-bottom: 3px solid black;
+	}
+
+#header ul {
+	list-style:none;
+	display: inline;
+	padding:10px 10px 0;
+	margin: 0;
+	}
+
+#header li {
+	float:left;
+	list-style-type: none;
+	display: inline;
+	margin: 0;
+	background: url("images/guichan/right.png") no-repeat right top;
+	}
+
+#header a {
+	float: left;
+	text-decoration: none;
+	font: 100% Verdana, Helvetica, Arial, sans-serif;
+	/*font-weight: bold;*/
+	color: #f4e020;
+	padding: 5px 15px;
+	background: url("images/guichan/left.png") no-repeat left top;
+	}
+#header a:hover {
+	color: white;
+	}
+
+#header #current {
+	background-image:url("images/guichan/right_on.png");
+	}
+#header #current a {
+	background-image:url("images/guichan/left_on.png");
+	padding-bottom:5px;
+	}
+#header #current a:hover {
+	color: #f4e020;
+	}
+
+/* Main body */
+#text {	
+	padding: 20pt;
+	border-bottom: 2px solid black;
+	border-left: 2px solid black;
+	border-right: 2px solid black;
+	clear: both;
+	text-align: justify;
+	}
+
+h1 {
+	background: #283c78;
+	color: #f4e020;
+	border: solid black 1px;
+	padding: 5px;
+	margin-bottom: 30px;
+	font-weight: normal;
+	font-size: 100%;
+	text-align: left;
+	clear: left;  
+	}
+
+h1:first-letter {
+	color: #a8a8a8;
+	}
+
+h2 {
+	background: #283c78;
+	color: #f4e020;
+	border: solid black 1px;
+	padding: 4px;
+	margin-left: 15px;
+	margin-bottom: 15px;
+	font-weight: normal;
+	font-size: 100%;
+	text-align: left;
+	clear: left;  
+	}
+
+h2:first-letter {
+	color: #a8a8a8;
+	}
+
+/* Default paragraph style*/
+p {
+	margin: 1em 0em;
+	margin-left: 1.5em;
+	text-align: justify;
+	line-height: 1.5em;
+	}
+
+pre {
+	color: white;
+	font-size: 100%;
+	font-family: courier, fixed, monospace;
+	text-decoration: none;
+	margin-left: +5%;
+	padding: 5px;
+	background-color: #656099;
+	border: 1px solid black;
+	}
+
+/* links */
+a {
+	color:#a8a8a8;
+	}
+
+a:hover {
+	color: white;
+	}
+
+a:link img {
+	border: none;
+	}
+
+/* footer */
+#footer {
+	display: block;
+	width: 70%;
+	min-width: 600px;
+	margin-top: 2px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 2px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background: #283c78;
+	line-height: normal;
+	border: 2px solid black;
+	text-align: center;
+	}
+
+#footer ul {
+	list-style: none;
+	display: inline;
+	margin: 0px;
+	padding: 0;
+	}
+
+#footer li {
+	float: none;
+	list-style-type: none;
+	display: inline;
+	margin: 5px;
+	}
+
+#footer a {
+	text-decoration:none;
+	font: 100% Verdana, Helvetica, Arial, sans-serif;
+	color: #f4e020;
+	}
+
+#footer a:first-letter {
+	color: #a8a8a8;
+	}
+
+#footer a:hover {
+	color: white;
+	}
