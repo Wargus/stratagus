@@ -1,0 +1,200 @@
+/* $Id: original.css 9082 2007-08-29 19:32:42Z gruiick $ */
+/* assault.css */
+html {
+	overflow-x: auto;
+	overflow-y: scroll;
+}
+
+body	{
+	background: black url("images/assault.png") no-repeat right top fixed;
+	color: white;
+	margin: 40px;
+	margin-top: 5px;
+	padding: 0;
+	padding-left: 5px;
+	font: 14px Verdana, Helvetica, Arial, sans-serif;
+	border-left: solid 1px lime;
+	min-width: 600px;
+	max-width: 760px;
+	}
+
+#logo {
+	width:550px;
+	height: auto;
+	text-align: left;
+	float: left;
+  }
+
+#logo img {
+	border-style: none;
+	}
+
+#wrapper {
+	margin: 0px auto;
+	padding: 0;
+	width: 100%;
+	}
+
+/* Header's menu */
+#header {
+	display: block;
+	width: 50%;
+	line-height: normal;
+	margin-top: 20px;
+	margin-left: 540px;
+	margin-right: auto;
+	padding-top: 30px;
+	text-align: left;
+	}
+
+#header ul {
+	list-style:none;
+	padding:10px 10px 0;
+	margin: 0;
+	}
+
+#header li {
+	float: none;
+	list-style-type: none;
+	margin: 0;
+	font: 140% Verdana, Helvetica, Arial, sans-serif;
+	}
+
+#header a {
+        text-decoration:none;
+        font-weight:bold;
+        color: lime;
+        padding:5px 15px;
+	}
+#header a:hover {
+	color: white;
+        font-weight:bold;
+	}
+
+#header #current {
+	}
+#header #current a {
+	}
+#header #current a:hover {
+	color: lime;
+	}
+
+/* Main body */
+#text {	
+	margin: 0;
+	padding: 0.5em;
+	clear: both;
+	text-align: justify;
+	}
+
+h1 {
+	padding-bottom: 0.5em;
+	font-weight: bold;
+	font-size: 150%;
+	text-align: left;
+	}
+h1 span {
+	color: lawngreen;
+	margin: 5px;
+	margin-left: -50px;
+	padding: 0px;
+	padding-left: 100px;
+	padding-right: 5px;
+	border-bottom: solid 1px lime; 
+}
+
+h2 {
+	margin-bottom: 0.5em;
+	font-weight: bold;
+	font-size: 120%;
+	text-align: left;
+	}
+
+h2 span {
+	color: lime;
+	border-bottom: solid 1px lime; 
+	margin-left: -25px;
+	padding-left: 110px;
+	padding-right: 5px;
+	}
+
+/* Default paragraph style*/
+p {
+	margin: 0;
+	text-align: justify;
+	line-height: 1.3em;
+	padding-bottom: 1em;
+	}
+
+pre {
+	color: white;
+	background: #303030;
+	font-size: 100%;
+	font-family: courier, fixed, monospace;
+	text-decoration: none;
+	margin-left: +1em;
+	padding: 5px;
+	}
+
+.center {
+	display: block;
+	text-align: center;
+	}
+
+/* links */
+
+a {
+	color: dodgerblue;
+	}
+
+a:hover {
+        color: white;
+        }
+
+a:link img {
+	border: none;
+	}
+
+img {
+	border: none;
+	}
+
+/* footer */
+#footer {
+	display: block;
+	width: 550px;
+	position: absolute;
+	top: 170px;
+	left: 400px;
+	width: auto;
+	padding: 0.5em;
+	line-height: normal;
+	float: right;
+	}
+
+#footer ul {
+	list-style: none;
+	display: inline;
+	margin: 0;
+	padding: 0;
+	}
+
+#footer li {
+	float: none;
+	list-style-type: none;
+	display: inline;
+	margin: 0;
+	padding-right: 10px;
+	font: 100% Verdana, Helvetica, Arial, sans-serif;
+	font-weight:bold;
+	}
+
+#footer a {
+	color: lime;
+	font-weight:bold;
+	}
+
+#footer a:hover {
+	color: white;
+	font-weight:bold;
+	}

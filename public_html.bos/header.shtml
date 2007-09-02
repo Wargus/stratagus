@@ -5,7 +5,8 @@
 	<link rel="shortcut icon" href="favicon.ico" />
 	<!--<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />-->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="stylesheet" href="original.css" title="original look" type="text/css" media="screen" />
+	<link rel="stylesheet" href="assault.css" title="assault" type="text/css" media="screen" />
+	<link rel="alternate stylesheet" href="original.css" title="original look" type="text/css" media="screen" />
 	<link rel="alternate stylesheet" href="bw-rounded.css" title="rounded look" type="text/css" media="screen" />
 	<link rel="alternate stylesheet" href="guichan.css" title="guichan look" type="text/css" media="screen" />
 	<link rel="alternate stylesheet" href="simple.css" title="simple look" type="text/css" media="screen" />
@@ -18,7 +19,7 @@ Don't ask us what Bos means because we haven't figure it out either.
 The game features a wide variety of units although all you have to do is use tanks to win. 
 Have fun!!-->
 
-<div id="logo"><img src="images/logo.png" width="544" height="157" alt="Bos Wars Logo" /></div>
+<div id="logo"><img src="images/logo-dark.png" width="544" height="157" alt="Bos Wars Logo" /></div>
 
 <div id="wrapper">
 

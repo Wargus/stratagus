@@ -2,13 +2,13 @@
 <!--#set var="title" value=" - screenshots"-->
 <!--#include file="header.shtml" -->
  
-<h1>Screenshots</h1>
-<h2>Bos Wars 2.4</h2>
+<h1><span>Screenshots</span></h1>
+<h2><span>Bos Wars 2.4</span></h2>
 <div class="center">
   <a href="images/boswars-2.4-0.jpg"><img src="images/boswars-2.4-0s.jpg" alt="boswars-2.4-0.jpg" /></a>
 </div>
 
-<h2>BOS 2.0.1</h2>
+<h2><span>BOS 2.0.1</span></h2>
 <p>To give you an idea of the changes:</p>
 <div class="center">
   <a href="images/bos-pre2.2-0.jpg"><img src="images/bos-pre2.2-0s.jpg" alt="bos-pre2.2-0.jpg" /></a>
@@ -29,13 +29,13 @@
 </ul>
 
 
-<h2>BOS 1.0</h2>
+<h2><span>BOS 1.0</span></h2>
 <div class="center"> 
   <a href="images/screen01.png"><img src="images/screen01s.png" width="320" height="240" alt="screen01.png" /></a>
   <a href="images/screen02.png"><img src="images/screen02s.png" width="320" height="240" alt="screen02.png" /></a>
 </div>
 
-<h2>Movies</h2>
+<h2><span>Movies</span></h2>
 <ul>
   <li>Little intro or teaser by TimberDragon <a href="files/bos-intro1.avi">bos-intro1.avi</a>.</li>
 </ul>
