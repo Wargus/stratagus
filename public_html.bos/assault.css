@@ -32,7 +32,6 @@ body	{
 #wrapper {
 	margin: 0px auto;
 	padding: 0;
-	width: 100%;
 	}
 
 /* Header's menu */
@@ -43,7 +42,7 @@ body	{
 	margin-top: 20px;
 	margin-left: 540px;
 	margin-right: auto;
-	padding-top: 30px;
+	padding-top: 14px;
 	text-align: left;
 	}
 
