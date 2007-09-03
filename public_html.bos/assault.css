@@ -8,8 +8,7 @@ html {
 body	{
 	background: black url("images/assault.png") no-repeat right top fixed;
 	color: white;
-	margin: 40px;
-	margin-top: 5px;
+	margin: 5px 40px 40px 40px;
 	padding: 0;
 	padding-left: 5px;
 	font: 14px Verdana, Helvetica, Arial, sans-serif;
@@ -37,18 +36,15 @@ body	{
 /* Header's menu */
 #header {
 	display: block;
-	width: 50%;
 	line-height: normal;
-	margin-top: 20px;
-	margin-left: 540px;
-	margin-right: auto;
-	padding-top: 14px;
+	margin: 0px auto auto auto;
+	padding-top: 24px;
 	text-align: left;
 	}
 
 #header ul {
 	list-style:none;
-	padding:10px 10px 0;
+	padding-top: 0px;
 	margin: 0;
 	}
 
@@ -163,8 +159,8 @@ img {
 	display: block;
 	width: 550px;
 	position: absolute;
-	top: 170px;
-	left: 400px;
+	top: 140px;
+	left: 48px;
 	width: auto;
 	padding: 0.5em;
 	line-height: normal;
