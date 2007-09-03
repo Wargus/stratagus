@@ -1,0 +1,7 @@
+$#include "pathfinder.h"
+
+extern tolua_property__s int AStarFixedUnitCrossingCost;
+extern tolua_property__s int AStarMovingUnitCrossingCost;
+extern bool AStarKnowUnseenTerrain;
+extern tolua_property__s int AStarUnknownTerrainCost;
+
