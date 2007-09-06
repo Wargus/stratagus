@@ -787,12 +787,20 @@ void CGraphic::UseDisplayFormat()
 	SDL_Surface *s;
 
 	s = Surface;
-	Surface = SDL_DisplayFormat(s);
+	if (s->format->Amask != 0) {
+		Surface = SDL_DisplayFormatAlpha(s);
+	} else {
+		Surface = SDL_DisplayFormat(s);
+	}
 	SDL_FreeSurface(s);
 
 	if (SurfaceFlip) {
 		s = SurfaceFlip;
-		SurfaceFlip = SDL_DisplayFormat(s);
+		if (s->format->Amask != 0) {
+			SurfaceFlip = SDL_DisplayFormatAlpha(s);
+		} else {
+			SurfaceFlip = SDL_DisplayFormat(s);
+		}
 		SDL_FreeSurface(s);
 	}
 }
