@@ -776,6 +776,28 @@ void CGraphic::Flip()
 }
 
 /**
+**  Convert the SDL surface to the display format
+*/
+void CGraphic::UseDisplayFormat()
+{
+	if (UseOpenGL) {
+		return;
+	}
+
+	SDL_Surface *s;
+
+	s = Surface;
+	Surface = SDL_DisplayFormat(s);
+	SDL_FreeSurface(s);
+
+	if (SurfaceFlip) {
+		s = SurfaceFlip;
+		SurfaceFlip = SDL_DisplayFormat(s);
+		SDL_FreeSurface(s);
+	}
+}
+
+/**
 **  Find the next power of 2 >= x
 */
 static int PowerOf2(int x)

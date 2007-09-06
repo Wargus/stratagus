@@ -157,22 +157,27 @@ void CUserInterface::Load(void)
 	//
 	for (i = 0; i < (int)Fillers.size(); ++i) {
 		Fillers[i].G->Load();
+		Fillers[i].G->UseDisplayFormat();
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load();
+			Resources[i].G->UseDisplayFormat();
 		}
 	}
 
 	if (InfoPanel.G) {
 		InfoPanel.G->Load();
+		InfoPanel.G->UseDisplayFormat();
 	}
 	if (ButtonPanel.G) {
 		ButtonPanel.G->Load();
+		ButtonPanel.G->UseDisplayFormat();
 	}
 	if (PieMenu.G) {
 		PieMenu.G->Load();
+		PieMenu.G->UseDisplayFormat();
 	}
 
 	//
