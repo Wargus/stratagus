@@ -105,6 +105,7 @@ void LoadCursors()
 		if ((*i).G && !(*i).G->IsLoaded()) {
 			ShowLoadProgress("Cursor %s", (*i).G->File.c_str());
 			(*i).G->Load();
+			(*i).G->UseDisplayFormat();
 		}
 	}
 }
