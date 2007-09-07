@@ -38,6 +38,7 @@ function DefineImageTilemodels(terrain, imgx, imgy)
    DefineTileset(
      "name",  "Image terrain",
      "image", terrain,
+     "imagemap", true,
      -- Slots descriptions
      "slots", {
        "solid", { "light-grass", "land",
