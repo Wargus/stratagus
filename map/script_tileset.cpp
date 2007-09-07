@@ -420,6 +420,8 @@ static int CclDefineTileset(lua_State *l)
 			Map.Tileset.Name = LuaToString(l, j);
 		} else if (!strcmp(value, "image")) {
 			Map.Tileset.ImageFile = LuaToString(l, j);
+		} else if (!strcmp(value, "imagemap")) {
+			Map.Tileset.ImageMap = LuaToBoolean(l, j);
 		} else if (!strcmp(value, "size")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");

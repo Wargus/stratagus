@@ -179,6 +179,7 @@ public:
 	void Clear() {
 		Name.clear();
 		ImageFile.clear();
+		ImageMap = false;
 		NumTiles = 0;
 		TileSizeX = 0;
 		TileSizeY = 0;
@@ -199,6 +200,7 @@ public:
 	}
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
+	bool ImageMap;              /// File is an image map
 
 	int NumTiles;               /// Number of tiles in the tables
 	int TileSizeX;              /// Size of a tile in X

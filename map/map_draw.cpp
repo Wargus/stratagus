@@ -245,38 +245,43 @@ void CViewport::Center(int x, int y, int offsetx, int offsety)
 */
 void CViewport::DrawMapBackgroundInViewport() const
 {
-	int ex = this->EndX;
-	int sy = this->MapY * Map.Info.MapWidth;
-	int dy = this->Y - this->OffsetY;
-	int ey = this->EndY;
+	if (Map.Tileset.ImageMap) {
+		Map.TileGraphic->DrawSubClip(this->MapX * TileSizeX + this->OffsetX, this->MapY * TileSizeY + this->OffsetY,
+			this->EndX - this->X, this->EndY - this->Y, this->X, this->Y);
+	} else {
+		int ex = this->EndX;
+		int sy = this->MapY * Map.Info.MapWidth;
+		int dy = this->Y - this->OffsetY;
+		int ey = this->EndY;
 
-	while (dy <= ey && (sy / Map.Info.MapWidth) < Map.Info.MapHeight) {
-		if (sy / Map.Info.MapWidth < 0) {
-			sy += Map.Info.MapWidth;
-			dy += TileSizeY;
-			continue;
-		}
-
-		int sx = this->MapX + sy;
-		int dx = this->X - this->OffsetX;
-		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
-			if (sx - sy < 0) {
-				++sx;
-				dx += TileSizeX;
+		while (dy <= ey && (sy / Map.Info.MapWidth) < Map.Info.MapHeight) {
+			if (sy / Map.Info.MapWidth < 0) {
+				sy += Map.Info.MapWidth;
+				dy += TileSizeY;
 				continue;
 			}
 
-			if (ReplayRevealMap) {
-				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].Tile, dx, dy);
-			} else {
-				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].SeenTile, dx, dy);
-			}
+			int sx = this->MapX + sy;
+			int dx = this->X - this->OffsetX;
+			while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+				if (sx - sy < 0) {
+					++sx;
+					dx += TileSizeX;
+					continue;
+				}
 
-			++sx;
-			dx += TileSizeX;
+				if (ReplayRevealMap) {
+					Map.TileGraphic->DrawFrameClip(Map.Fields[sx].Tile, dx, dy);
+				} else {
+					Map.TileGraphic->DrawFrameClip(Map.Fields[sx].SeenTile, dx, dy);
+				}
+
+				++sx;
+				dx += TileSizeX;
+			}
+			sy += Map.Info.MapWidth;
+			dy += TileSizeY;
 		}
-		sy += Map.Info.MapWidth;
-		dy += TileSizeY;
 	}
 }
 
