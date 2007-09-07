@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Version ?:
+- Faster map drawing when using an image map (Jimmy Salmon)
 - Convert some images to display format for faster drawing (Jimmy Salmon)
 
 Version 2.4.1 (2007 9 2):
