@@ -383,48 +383,13 @@ function RunHelpMenu()
   menu:run(false)
 end
 
-local keystrokes = {
-  {"Alt-F", "- toggle full screen"},
-  {"Alt-G", "- toggle grab mouse"},
-  {"Ctrl-S", "- mute sound"},
-  {"Ctrl-M", "- mute music"},
-  {"+", "- increase game speed"},
-  {"-", "- decrease game speed"},
-  {"Ctrl-P", "- pause game"},
-  {"PAUSE", "- pause game"},
-  {"PRINT", "- make screen shot"},
-  {"Alt-H", "- help menu"},
-  {"Alt-R", "- restart game"},
-  {"Alt-Q", "- quit to main menu"},
-  {"Alt-X", "- quit game"},
-  {"Alt-B", "- toggle expand map"},
-  {"Alt-M", "- game menu"},
-  {"ENTER", "- write a message"},
-  {"SPACE", "- goto last event"},
-  {"TAB", "- hide/unhide terrain"},
-  {"Ctrl-T", "- track unit"},
-  {"Alt-I", "- find idle peon"},
-  {"Alt-C", "- center on selected unit"},
-  {"Alt-V", "- next view port"},
-  {"Ctrl-V", "- previous view port"},
-  {"^", "- select nothing"},
-  {"#", "- select group"},
-  {"##", "- center on group"},
-  {"Ctrl-#", "- define group"},
-  {"Shift-#", "- add to group"},
-  {"Alt-#", "- add to alternate group"},
-  {"F2-F4", "- recall map position"},
-  {"Shift F2-F4", "- save map postition"},
-  {"F5", "- game options"},
-  {"F7", "- sound options"},
-  {"F8", "- speed options"},
-  {"F9", "- preferences"},
-  {"F10", "- game menu"},
-  {"F11", "- save game"},
-  {"F12", "- load game"},
-}
-
 function RunKeystrokeHelpMenu()
+  local lang = string.sub(StratagusTranslation, 11, 12)
+  Load("scripts/menus/ingame/keystrokes-" .. lang .. ".lua")
+  if (keystrokes == nil) then
+    Load("scripts/menus/ingame/keystrokes-en.lua")
+  end
+
   local menu = BosGameMenu()
   menu:setSize(352, 352)
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
@@ -455,34 +420,18 @@ function RunKeystrokeHelpMenu()
 
   menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
   menu:addButton(_("Previous (~<Esc~>)"), "escape", (352 / 2) - (224 / 2), 352 - 40,
-    function() menu:stop() end)
+    function() menu:stop(); keystrokes = nil end)
 
   menu:run(false)
 end
 
-local tips = {
-  "You can select all of your currently visible units of the same type by holding down the CTRL key and selecting a unit or by \"double clicking\" on a unit.",
-  "The more engineers you have collecting resources, the faster your economy will grow.",
-
-  "Use your engineers to repair damaged buildings.",
-  "Explore your surroundings early in the game.",
-
-
-  "Keep all engineers working. Use ALT-I to find idle engineers.",
-  "You can make units automatically perform special actions by selecting a unit, holding down CTRL and clicking on the icon.  CTRL click again to turn off.",
-
-  -- Shift tips
-  "You can give an unit an order which is executed after it finishes the current work, if you hold the SHIFT key.",
-  "You can give way points, if you press the SHIFT key, while you click right for the move command.",
-  "You can order an engineer to build one building after the other, if you hold the SHIFT key, while you place the building.",
-  "You can build many of the same building, if you hold the ALT and SHIFT keys while you place the buildings.",
-
-  "Use CTRL-V or ALT-V to cycle through the viewport configuration, you can than monitor your base and lead an attack.",
-
-  "Know a useful tip?  Then add it here!",
-}
-
 function RunTipsMenu()
+  local lang = string.sub(StratagusTranslation, 11, 12)
+  Load("scripts/menus/ingame/tips-" .. lang .. ".lua")
+  if (tips == nil) then
+    Load("scripts/menus/ingame/tips-en.lua")
+  end
+
   local menu = BosGameMenu()
   menu:setSize(384, 256)
   menu:setPosition((Video.Width - menu:getWidth()) / 2,
@@ -526,7 +475,7 @@ function RunTipsMenu()
     end)
   showtips:setMarked(preferences.ShowTips)
   menu:addSmallButton(_("~!OK"), "o", 14, 256 - 40,
-    function() l:nextTip(); menu:stop() end)
+    function() l:nextTip(); menu:stop(); tips = nil end)
   menu:addSmallButton(_("~!Previous Tip"), "p", 14 + 106 + 11, 256 - 40,
     function() l:prevTip(); l:updateCaption() end)
   menu:addSmallButton(_("~!Next Tip"), "n", 14 + 106 + 11 + 106 + 11, 256 - 40,
