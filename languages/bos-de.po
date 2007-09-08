@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-08 08:42-0700\n"
+"POT-Creation-Date: 2007-09-08 08:54-0700\n"
 "PO-Revision-Date: 2006-05-05 18:34+0200\n"
 "Last-Translator: Dirk\n"
 "Language-Team:  <de@li.org>\n"
@@ -357,7 +357,7 @@ msgstr "Kartenbeschreibung:"
 
 #: scripts/menus/ingame/editor.lua:118 scripts/menus/ingame/editor.lua:219
 #: scripts/menus/ingame/game.lua:181 scripts/menus/ingame/game.lua:255
-#: scripts/menus/ingame/game.lua:496 scripts/menus/ingame/game.lua:522
+#: scripts/menus/ingame/game.lua:534 scripts/menus/ingame/game.lua:560
 #: scripts/menus/network.lua:67 scripts/menus/options.lua:65
 #: scripts/menus/options.lua:142 scripts/menus/options.lua:248
 #: scripts/menus/options.lua:305
@@ -457,7 +457,7 @@ msgid "~!Diplomacy"
 msgstr "~!Diplomatie"
 
 #: scripts/menus/ingame/game.lua:138 scripts/menus/ingame/game.lua:340
-#: scripts/menus/ingame/game.lua:380 scripts/menus/ingame/game.lua:422
+#: scripts/menus/ingame/game.lua:380 scripts/menus/ingame/game.lua:460
 msgid "Previous (~<Esc~>)"
 msgstr "Zurück (~<Esc~>)"
 
@@ -553,94 +553,400 @@ msgstr "Tasten~!hilfe"
 msgid "Bos Wars ~!Tips"
 msgstr "Bos Wars ~!Tipps"
 
+#: scripts/menus/ingame/game.lua:387
+msgid "Alt-F"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:387
+#, fuzzy
+msgid "- toggle full screen"
+msgstr "Vollbild"
+
+#: scripts/menus/ingame/game.lua:388
+msgid "Alt-G"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:388
+msgid "- toggle grab mouse"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:389
+msgid "Ctrl-S"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:389
+msgid "- mute sound"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:390
+msgid "Ctrl-M"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:390
+msgid "- mute music"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:391
+msgid "+"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:391
+msgid "- increase game speed"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:392
+msgid "-"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:392
+msgid "- decrease game speed"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:393
+msgid "Ctrl-P"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:393 scripts/menus/ingame/game.lua:394
+msgid "- pause game"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:394
+msgid "PAUSE"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:395
+msgid "PRINT"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:395
+msgid "- make screen shot"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:396
+msgid "Alt-H"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:396
+#, fuzzy
+msgid "- help menu"
+msgstr "Hilfemenü"
+
+#: scripts/menus/ingame/game.lua:397
+msgid "Alt-R"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:397
+#, fuzzy
+msgid "- restart game"
+msgstr "Spiel neu sta~!rten"
+
+#: scripts/menus/ingame/game.lua:398
+msgid "Alt-Q"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:398
+#, fuzzy
+msgid "- quit to main menu"
+msgstr "E~!nde zum Menü"
+
+#: scripts/menus/ingame/game.lua:399
+msgid "Alt-X"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:399
+msgid "- quit game"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:400
+msgid "Alt-B"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:400
+msgid "- toggle expand map"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:401
+msgid "Alt-M"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:401 scripts/menus/ingame/game.lua:422
+#, fuzzy
+msgid "- game menu"
+msgstr "Spielmenü"
+
+#: scripts/menus/ingame/game.lua:402
+msgid "ENTER"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:402
+msgid "- write a message"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:403
+msgid "SPACE"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:403
+msgid "- goto last event"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:404
+msgid "TAB"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:404
+msgid "- hide/unhide terrain"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:405
+msgid "Ctrl-T"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:405
+msgid "- track unit"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:406
+msgid "Alt-I"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:406
+msgid "- find idle peon"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:407
+msgid "Alt-C"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:407
+msgid "- center on selected unit"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:408
+msgid "Alt-V"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:408
+msgid "- next view port"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:409
+msgid "Ctrl-V"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:409
+msgid "- previous view port"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:410
+msgid "^"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:410
+msgid "- select nothing"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:411
+msgid "#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:411
+msgid "- select group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:412
+msgid "##"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:412
+msgid "- center on group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:413
+msgid "Ctrl-#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:413
+msgid "- define group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:414
+msgid "Shift-#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:414
+msgid "- add to group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:415
+msgid "Alt-#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:415
+msgid "- add to alternate group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:416
+msgid "F2-F4"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:416
+msgid "- recall map position"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:417
+msgid "Shift F2-F4"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:417
+msgid "- save map postition"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:418
+msgid "F5"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:418
+#, fuzzy
+msgid "- game options"
+msgstr "Spieloptionen"
+
+#: scripts/menus/ingame/game.lua:419
+msgid "F7"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:419
+#, fuzzy
+msgid "- sound options"
+msgstr "Soundoptionen"
+
+#: scripts/menus/ingame/game.lua:420
+msgid "F8"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:420
+#, fuzzy
+msgid "- speed options"
+msgstr "Geschwindigkeitsoptionen"
+
 #: scripts/menus/ingame/game.lua:421
+msgid "F9"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:421
+msgid "- preferences"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:422
+msgid "F10"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:423
+msgid "F11"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:423
+#, fuzzy
+msgid "- save game"
+msgstr "Spiel speichern"
+
+#: scripts/menus/ingame/game.lua:424
+msgid "F12"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:424
+#, fuzzy
+msgid "- load game"
+msgstr "Spiel laden"
+
+#: scripts/menus/ingame/game.lua:459
 msgid "Keystroke Help Menu"
 msgstr "Tastenbelegungshilfemenü"
 
-#: scripts/menus/ingame/game.lua:429
+#: scripts/menus/ingame/game.lua:467
 msgid ""
 "You can select all of your currently visible units of the same type by "
 "holding down the CTRL key and selecting a unit or by \"double clicking\" on "
 "a unit."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:430
+#: scripts/menus/ingame/game.lua:468
 msgid ""
 "The more engineers you have collecting resources, the faster your economy "
 "will grow."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:432
+#: scripts/menus/ingame/game.lua:470
 msgid "Use your engineers to repair damaged buildings."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:433
+#: scripts/menus/ingame/game.lua:471
 #, fuzzy
 msgid "Explore your surroundings early in the game."
 msgstr "Bist Du sicher, dass Du das Spiel neu starten willst?"
 
-#: scripts/menus/ingame/game.lua:436
+#: scripts/menus/ingame/game.lua:474
 msgid "Keep all engineers working. Use ALT-I to find idle engineers."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:437
+#: scripts/menus/ingame/game.lua:475
 msgid ""
 "You can make units automatically perform special actions by selecting a "
 "unit, holding down CTRL and clicking on the icon.  CTRL click again to turn "
 "off."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:440
+#: scripts/menus/ingame/game.lua:478
 msgid ""
 "You can give an unit an order which is executed after it finishes the "
 "current work, if you hold the SHIFT key."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:441
+#: scripts/menus/ingame/game.lua:479
 msgid ""
 "You can give way points, if you press the SHIFT key, while you click right "
 "for the move command."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:442
+#: scripts/menus/ingame/game.lua:480
 msgid ""
 "You can order an engineer to build one building after the other, if you hold "
 "the SHIFT key, while you place the building."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:443
+#: scripts/menus/ingame/game.lua:481
 msgid ""
 "You can build many of the same building, if you hold the ALT and SHIFT keys "
 "while you place the buildings."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:445
+#: scripts/menus/ingame/game.lua:483
 msgid ""
 "Use CTRL-V or ALT-V to cycle through the viewport configuration, you can "
 "than monitor your base and lead an attack."
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:447
+#: scripts/menus/ingame/game.lua:485
 msgid "Know a useful tip?  Then add it here!"
 msgstr ""
 
-#: scripts/menus/ingame/game.lua:459
+#: scripts/menus/ingame/game.lua:497
 msgid "Bos Wars Tips"
 msgstr "Bos Wars Tipps"
 
-#: scripts/menus/ingame/game.lua:490
+#: scripts/menus/ingame/game.lua:528
 msgid "Show tips at startup"
 msgstr "Tipps beim Start zeigen"
 
-#: scripts/menus/ingame/game.lua:498
+#: scripts/menus/ingame/game.lua:536
 msgid "~!Previous Tip"
 msgstr "~!Vorheriger Tipp"
 
-#: scripts/menus/ingame/game.lua:500
+#: scripts/menus/ingame/game.lua:538
 msgid "~!Next Tip"
 msgstr "~!Nächster Tipp"
 
-#: scripts/menus/ingame/game.lua:512
+#: scripts/menus/ingame/game.lua:550
 msgid "Objectives"
 msgstr "Ziele"
 
