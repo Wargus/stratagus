@@ -425,12 +425,31 @@ function RunKeystrokeHelpMenu()
   menu:run(false)
 end
 
+function InitTips(tips)
+  table.insert(tips, _("You can select all of your currently visible units of the same type by holding down the CTRL key and selecting a unit or by \"double clicking\" on a unit."))
+  table.insert(tips, _("The more engineers you have collecting resources, the faster your economy will grow."))
+
+  table.insert(tips, _("Use your engineers to repair damaged buildings."))
+  table.insert(tips, _("Explore your surroundings early in the game."))
+
+
+  table.insert(tips, _("Keep all engineers working. Use ALT-I to find idle engineers."))
+  table.insert(tips, _("You can make units automatically perform special actions by selecting a unit, holding down CTRL and clicking on the icon.  CTRL click again to turn off."))
+
+  -- Shift tips
+  table.insert(tips, _("You can give an unit an order which is executed after it finishes the current work, if you hold the SHIFT key."))
+  table.insert(tips, _("You can give way points, if you press the SHIFT key, while you click right for the move command."))
+  table.insert(tips, _("You can order an engineer to build one building after the other, if you hold the SHIFT key, while you place the building."))
+  table.insert(tips, _("You can build many of the same building, if you hold the ALT and SHIFT keys while you place the buildings."))
+
+  table.insert(tips, _("Use CTRL-V or ALT-V to cycle through the viewport configuration, you can than monitor your base and lead an attack."))
+
+  table.insert(tips, _("Know a useful tip?  Then add it here!"))
+end
+
 function RunTipsMenu()
-  local lang = string.sub(StratagusTranslation, 11, 12)
-  Load("scripts/menus/ingame/tips-" .. lang .. ".lua")
-  if (tips == nil) then
-    Load("scripts/menus/ingame/tips-en.lua")
-  end
+  local tips = {}
+  InitTips(tips)
 
   local menu = BosGameMenu()
   menu:setSize(384, 256)
@@ -475,7 +494,7 @@ function RunTipsMenu()
     end)
   showtips:setMarked(preferences.ShowTips)
   menu:addSmallButton(_("~!OK"), "o", 14, 256 - 40,
-    function() l:nextTip(); menu:stop(); tips = nil end)
+    function() l:nextTip(); menu:stop() end)
   menu:addSmallButton(_("~!Previous Tip"), "p", 14 + 106 + 11, 256 - 40,
     function() l:prevTip(); l:updateCaption() end)
   menu:addSmallButton(_("~!Next Tip"), "n", 14 + 106 + 11 + 106 + 11, 256 - 40,
