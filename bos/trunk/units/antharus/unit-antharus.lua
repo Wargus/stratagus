@@ -69,6 +69,7 @@ DefineUnitType("unit-antharus", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = false,
+    CanHarvestFrom = true,
     NumDirections = 1,
     Sounds = {},
     Neutral = true

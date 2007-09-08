@@ -9,7 +9,7 @@
 --
 --	unit-morels.lua	-	Define the morels units.
 --
---	(c) Copyright 2005 by Loïs Taulelle, Graphics by TimberDragon.
+--	(c) Copyright 2005-2007 by Loï¿½s Taulelle, Graphics by TimberDragon.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ DefineUnitType("unit-morel-1", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    CanHarvestFrom = true,
     Neutral = true,
     NumDirections = 1,
     Sounds = {}
@@ -96,6 +97,7 @@ DefineUnitType("unit-morel-2", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    CanHarvestFrom = true,
     Neutral = true,
     NumDirections = 1,
     Sounds = {}
@@ -131,6 +133,7 @@ DefineUnitType("unit-morel-3", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    CanHarvestFrom = true,
     Neutral = true,
     NumDirections = 1,
     Sounds = {}
@@ -166,6 +169,7 @@ DefineUnitType("unit-morel-4", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    CanHarvestFrom = true,
     Neutral = true,
     NumDirections = 1,
     Sounds = {}
@@ -201,6 +205,7 @@ DefineUnitType("unit-morel-5", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    CanHarvestFrom = true,
     Neutral = true,
     NumDirections = 1,
     Sounds = {}
@@ -236,6 +241,7 @@ DefineUnitType("unit-morel-6", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    CanHarvestFrom = true,
     Neutral = true,
     NumDirections = 1,
     Sounds = {}
@@ -271,6 +277,7 @@ DefineUnitType("unit-morel-7", {
     Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
+    CanHarvestFrom = true,
     Neutral = true,
     NumDirections = 1,
     Sounds = {}
