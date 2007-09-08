@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
-Version ?:
+Development version:
+- Morels and antharus are harvestable (Francois Beerten)
 - Localized tips and keystroke help menus (Jimmy Salmon)
 - Faster map drawing when using an image map (Jimmy Salmon)
 - Convert some images to display format for faster drawing (Jimmy Salmon)
