@@ -9,7 +9,7 @@
 //
 /**@name movie.cpp - Movie playback functions. */
 //
-//      (c) Copyright 2005 by Nehal Mistry and Jimmy Salmon
+//      (c) Copyright 2005-2007 by Nehal Mistry and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@
 ----------------------------------------------------------------------------*/
 
 extern SDL_Surface *TheScreen;
-static int MovieStop;
+static bool MovieStop;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -71,7 +71,7 @@ static int MovieStop;
 
 static void MovieCallbackButtonPressed(unsigned dummy)
 {
-	MovieStop = 1;
+	MovieStop = true;
 }
 
 static void MovieCallbackButtonReleased(unsigned dummy)
@@ -80,7 +80,7 @@ static void MovieCallbackButtonReleased(unsigned dummy)
 
 static void MovieCallbackKeyPressed(unsigned dummya, unsigned dummyb)
 {
-	MovieStop = 1;
+	MovieStop = true;
 }
 
 
@@ -257,7 +257,7 @@ int PlayMovie(const std::string &name)
 	Invalidate();
 	RealizeVideoMemory();
 
-	MovieStop = 0;
+	MovieStop = false;
 	start_ticks = SDL_GetTicks();
 	need_data = 1;
 	while (!MovieStop) {

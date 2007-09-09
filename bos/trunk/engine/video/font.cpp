@@ -9,7 +9,7 @@
 //
 /**@name font.cpp - The color fonts. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ static void VideoDrawChar(const CGraphic *g,
 		SDL_SetColors(g->Surface, FontColor->Colors, 0, MaxFontColors);
 		SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
 	} else {
-	g->DrawSub(gx, gy, w, h, x, y);
+		g->DrawSub(gx, gy, w, h, x, y);
 	}
 }
 
@@ -291,15 +291,15 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 **  @param y     Y screen position
 **  @param font  Font number
 **  @param text  Text to be displayed.
-**  @param clip  Flag if TRUE clip, otherwise not.
+**  @param clip  Flag to clip the text.
 **
 **  @return      The length of the printed text.
 */
 static int DoDrawText(int x, int y, CFont *font, const std::string &text,
-	int clip)
+	bool clip)
 {
 	int w;
-	int widths;
+	int width;
 	CFontColor *rev;
 	char *color;
 	const char *p;
@@ -323,14 +323,14 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 	}
 
 	rev = NULL;
-	widths = 0;
+	width = 0;
 	pos = 0;
 	while (GetUTF8(text, pos, utf8)) {
 		if (utf8 == '~') {
 			switch (text[pos]) {
 				case '\0':  // wrong formatted string.
 					DebugPrint("oops, format your ~\n");
-					return widths;
+					return width;
 				case '~':
 					++pos;
 					break;
@@ -367,7 +367,7 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 					}
 					if (!*p) {
 						DebugPrint("oops, format your ~\n");
-						return widths;
+						return width;
 					}
 					color = new char[p - (text.c_str() + pos) + 1];
 					memcpy(color, text.c_str() + pos, p - (text.c_str() + pos));
@@ -393,12 +393,12 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 		if (c >= 0 && c < ipr * font->G->GraphicHeight / font->G->Height) {
 			w = font->CharWidth[c];
 			DrawChar(g, (c % ipr) * font->G->Width, (c / ipr) * font->G->Height,
-				w, font->G->Height, x + widths, y);
+				w, font->G->Height, x + width, y);
 		} else {
 			w = font->CharWidth[0];
-			DrawChar(g, 0, 0, w, font->G->Height, x + widths, y);
+			DrawChar(g, 0, 0, w, font->G->Height, x + width, y);
 		}
-		widths += w + 1;
+		width += w + 1;
 		if (rev) {
 			FontColor = rev;
 			if (UseOpenGL) {
@@ -408,7 +408,7 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 		}
 	}
 
-	return widths;
+	return width;
 }
 
 /**
@@ -425,7 +425,7 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 */
 int VideoDrawText(int x, int y, CFont *font, const std::string &text)
 {
-	return DoDrawText(x, y, font, text, 0);
+	return DoDrawText(x, y, font, text, false);
 }
 
 /**
@@ -442,7 +442,7 @@ int VideoDrawText(int x, int y, CFont *font, const std::string &text)
 */
 int VideoDrawTextClip(int x, int y, CFont *font, const std::string &text)
 {
-	return DoDrawText(x, y, font, text, 1);
+	return DoDrawText(x, y, font, text, true);
 }
 
 /**
@@ -459,13 +459,13 @@ int VideoDrawTextClip(int x, int y, CFont *font, const std::string &text)
 */
 int VideoDrawReverseText(int x, int y, CFont *font, const std::string &text)
 {
-	int w;
+	int width;
 
 	FontColor = ReverseTextColor;
-	w = VideoDrawText(x, y, font, text);
+	width = VideoDrawText(x, y, font, text);
 	FontColor = DefaultTextColor;
 
-	return w;
+	return width;
 }
 
 /**
@@ -482,13 +482,13 @@ int VideoDrawReverseText(int x, int y, CFont *font, const std::string &text)
 */
 int VideoDrawReverseTextClip(int x, int y, CFont *font, const std::string &text)
 {
-	int w;
+	int width;
 
 	FontColor = ReverseTextColor;
-	w = VideoDrawTextClip(x, y, font, text);
+	width = VideoDrawTextClip(x, y, font, text);
 	FontColor = DefaultTextColor;
 
-	return w;
+	return width;
 }
 
 /**
@@ -709,7 +709,6 @@ int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number)
 */
 void CFont::MeasureWidths()
 {
-	// FIXME: todo.. can this be optimized?
 	const unsigned char *sp;
 	const unsigned char *lp;
 	const unsigned char *gp;
