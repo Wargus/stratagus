@@ -861,10 +861,6 @@ extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int r
 	/// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 
-	/// Find the neareast piece of terrain with specific flags.
-extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-		const CPlayer *player, int x, int y, int *px, int *py);
-
 	/// @todo more docu
 extern CUnit *UnitOnScreen(int x, int y);
 	/// Check if a unit should be removed from UnitsConsumingResources
