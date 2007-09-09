@@ -1450,6 +1450,23 @@ void RescueUnits(void)
 	}
 }
 
+/**
+**  Check if a unit holds any resources
+**
+**  @param unit  Unit to check
+**
+**  @return      True if the unit holds resources, false if it doesn't
+*/
+bool UnitHoldsResources(const CUnit *unit)
+{
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (unit->ResourcesHeld[i] != 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 /*----------------------------------------------------------------------------
 --  Unit headings
 ----------------------------------------------------------------------------*/
@@ -2089,143 +2106,6 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, 
 /*----------------------------------------------------------------------------
   -- Finding units
   ----------------------------------------------------------------------------*/
-
-/**
-**  Find the closest piece of terrain with the given flags.
-**
-**  @param movemask    The movement mask to reach that location.
-**  @param resmask     Result tile mask.
-**  @param rvresult    Return a tile that doesn't match.
-**  @param range       Maximum distance for the search.
-**  @param player      Only search fields explored by player
-**  @param x           Map X start position for the search.
-**  @param y           Map Y start position for the search.
-**
-**  @param px          OUT: Map X position of tile.
-**  @param py          OUT: Map Y position of tile.
-**
-**  @note Movement mask can be 0xFFFFFFFF to have no effect
-**  Range is not circular, but square.
-**  Player is ignored if nil(search the entire map)
-**  Use rvresult if you search for a tile that doesn't
-**  match resmask. Like for a tile where a unit can go
-**  with it's movement mask.
-**
-**  @return            True if wood was found.
-*/
-int FindTerrainType(int movemask, int resmask, int rvresult, int range,
-	const CPlayer *player, int x, int y, int *px, int *py)
-{
-	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
-	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
-	int size;
-	int rx;
-	int ry;
-	int wp;
-	int rp;
-	int ep;
-	int i;
-	int w;
-	unsigned char *m;
-	unsigned char *matrix;
-	int destx;
-	int desty;
-	int cdist;
-
-	destx = x;
-	desty = y;
-	size = (Map.Info.MapWidth * Map.Info.MapHeight / 4 < range * range * 5) ?
-		Map.Info.MapWidth * Map.Info.MapHeight / 4 : range * range * 5;
-	points = new p[size];
-
-	// Make movement matrix. FIXME: can create smaller matrix.
-	matrix = CreateMatrix();
-	w = Map.Info.MapWidth + 2;
-	matrix += w + w + 2;
-	points[0].X = x;
-	points[0].Y = y;
-	rp = 0;
-	matrix[x + y * w] = 1; // mark start point
-	ep = wp = 1; // start with one point
-	cdist = 0; // current distance is 0
-
-	//
-	// Pop a point from stack, push all neighbors which could be entered.
-	//
-	for (;;) {
-		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				//  Make sure we don't leave the map.
-				if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
-					continue;
-				}
-				m = matrix + x + y * w;
-				//  Check if visited or unexplored
-				if (*m || (player && !Map.IsFieldExplored(player, x, y))) {
-					continue;
-				}
-				// Look if found what was required.
-				if (rvresult ? CanMoveToMask(x, y, resmask) : !CanMoveToMask(x, y, resmask)) {
-					*px = x;
-					*py = y;
-					delete[] points;
-					return 1;
-				}
-				if (CanMoveToMask(x, y, movemask)) { // reachable
-					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-					if (wp == ep) {
-						//  We are out of points, give up!
-						DebugPrint("Ran out of points the hard way, beware.\n");
-						break;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
-			}
-		}
-		++cdist;
-		if (rp == wp || cdist >= range) { // unreachable, no more points available
-			break;
-		}
-		// Continue with next set.
-		ep = wp;
-	}
-	delete[] points;
-	return 0;
-}
-
-/**
-**  Check if a unit holds any resources
-**
-**  @param unit  Unit to check
-**
-**  @return      True if the unit holds resources, false if it doesn't
-*/
-bool UnitHoldsResources(const CUnit *unit)
-{
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (unit->ResourcesHeld[i] != 0) {
-			return true;
-		}
-	}
-	return false;
-}
 
 /**
 **  Find Resource.
@@ -3180,7 +3060,7 @@ bool CUnit::IsUnusable() const
 */
 std::string UnitReference(const CUnit *unit)
 {
-	std::stringstream ss;
+	std::ostringstream ss;
 	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase <<
 		std::hex << UnitNumber(unit);
 	return ss.str();
