@@ -387,13 +387,10 @@ void LoadUnitTypes(void)
 		//
 		// Load Sprite
 		//
-#ifndef DYNAMIC_LOAD
 		if (!type->Sprite) {
 			ShowLoadProgress("Unit \"%s\"", type->Name.c_str());
 			LoadUnitTypeSprite(type);
 		}
-#endif
-		// FIXME: should i copy the animations of same graphics?
 	}
 }
 
