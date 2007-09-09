@@ -3010,6 +3010,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\unit\unit_manager.cpp"
+						>
+					</File>
+					<File
 						RelativePath="unit\unittype.cpp"
 						>
 						<FileConfiguration
@@ -3427,6 +3431,10 @@
 				</File>
 				<File
 					RelativePath="include\unit.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\unit_manager.h"
 					>
 				</File>
 				<File

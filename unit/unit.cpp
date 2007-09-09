@@ -43,12 +43,13 @@
 
 #include "stratagus.h"
 
+#include "unit.h"
+#include "unit_manager.h"
 #include "video.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "animation.h"
 #include "player.h"
-#include "unit.h"
 #include "tileset.h"
 #include "map.h"
 #include "actions.h"
@@ -70,11 +71,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CUnit *UnitSlots[MAX_UNIT_SLOTS];         /// All possible units
-unsigned int UnitSlotFree;                /// First free unit slot
-CUnit *ReleasedHead;                      /// List of released units.
-CUnit *ReleasedTail;                      /// List tail of released units.
-
 CUnit *Units[MAX_UNIT_SLOTS];             /// Array of used slots
 int NumUnits;                             /// Number of slots used
 
@@ -90,18 +86,6 @@ static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound pla
 ----------------------------------------------------------------------------*/
 
 static void RemoveUnitFromContainer(CUnit *unit);
-
-/**
-**  Initial memory allocation for units.
-*/
-void InitUnitsMemory(void)
-{
-	// Initialize the "list" of free unit slots
-	memset(UnitSlots, 0, MAX_UNIT_SLOTS * sizeof(*UnitSlots));
-	UnitSlotFree = 0;
-	ReleasedTail = ReleasedHead = NULL; // list of unfreed units.
-	NumUnits = 0;
-}
 
 /**
 **  Increase a unit's reference count.
@@ -185,16 +169,7 @@ void CUnit::Release()
 	*UnitSlot = temp;
 	Units[NumUnits] = NULL;
 
-	if (ReleasedHead) {
-		ReleasedTail->Next = this;
-		ReleasedTail = this;
-		Next = 0;
-	} else {
-		ReleasedHead = ReleasedTail = this;
-		Next = 0;
-	}
-	Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
-	Type = 0;  // for debugging.
+	Type = NULL;  // for debugging.
 
 	delete[] AutoCastSpell;
 	delete[] Variable;
@@ -202,54 +177,8 @@ void CUnit::Release()
 		delete *order;
 	}
 	Orders.clear();
-}
 
-/**
-**  Allocate Unit
-**
-**  Allocates memory for a new unit, It will recycle free slots
-**
-**  @return  Pointer to memory allocated for new unit, memory is zero'd
-*/
-static CUnit *AllocUnit(void)
-{
-	CUnit *unit;
-	CUnit **slot;
-	//
-	// Game unit limit reached.
-	//
-	if (NumUnits >= UnitMax) {
-		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
-		return NoUnitP;
-	}
-
-	//
-	// Can use released unit?
-	//
-	if (ReleasedHead && (unsigned)ReleasedHead->Refs < GameCycle) {
-		unit = ReleasedHead;
-		ReleasedHead = unit->Next;
-		if (ReleasedHead == 0) { // last element
-			DebugPrint("Released unit queue emptied\n");
-			ReleasedTail = ReleasedHead = 0;
-		}
-		DebugPrint("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_ unit->Slot);
-		slot = UnitSlots + unit->Slot;
-		unit->Init();
-	} else {
-		//
-		// Allocate structure
-		//
-		if (MAX_UNIT_SLOTS <= UnitSlotFree) { // should not happen!
-			DebugPrint("Maximum of units reached\n");
-			return NoUnitP;
-		}
-		slot = UnitSlots + UnitSlotFree;
-		UnitSlotFree++;
-		*slot = unit = new CUnit;
-	}
-	unit->Slot = slot - UnitSlots; // back index
-	return unit;
+	UnitManager.ReleaseUnit(this);
 }
 
 /**
@@ -386,7 +315,15 @@ CUnit *MakeUnit(CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 
-	unit = AllocUnit();
+	//
+	// Game unit limit reached.
+	//
+	if (NumUnits >= UnitMax) {
+		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
+		return NoUnitP;
+	}
+
+	unit = UnitManager.AllocUnit();
 	if (unit == NoUnitP) {
 		return NoUnitP;
 	}
@@ -670,14 +607,13 @@ static void RemoveUnitFromContainer(CUnit *unit)
 static void UnitInXY(CUnit *unit, int x, int y)
 {
 	CUnit *unit_inside;      // iterator on units inside unit.
-	int i;                  // number of units inside to process.
 
 	Assert(unit);
 	unit->X = x;
 	unit->Y = y;
 
 	unit_inside = unit->UnitInside;
-	for (i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (int i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
 		UnitInXY(unit_inside, x, y);
 	}
 }
@@ -3379,7 +3315,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 
 	file->printf("\"tile\", {%d, %d}, ", unit->X, unit->Y);
 	file->printf("\"seen-tile\", {%d, %d}, ", unit->Seen.X, unit->Seen.Y);
-	file->printf("\"refs\", %d, ", unit->Refs);
+	file->printf("\"refs\", %lu, ", unit->Refs);
 #if 0
 	// latimerius: why is this so complex?
 	// JOHNS: An unit can be owned by a new player and have still the old stats
@@ -3614,26 +3550,13 @@ void SaveUnit(const CUnit *unit, CFile *file)
 /**
 **  Save state of units to file.
 **
-**  @param file    Output file.
+**  @param file  Output file.
 */
 void SaveUnits(CFile *file)
 {
-	CUnit **table;
-	CUnit *unit;
+	UnitManager.Save(file);
 
-	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: units $Id$\n\n");
-
-	file->printf("-- Unit slot usage bitmap\n");
-	file->printf("SlotUsage(%d", UnitSlotFree);
-	//  Save the Unit allocator state, sadly. I don't want to do this!
-	for (unit = ReleasedHead; unit; unit = unit->Next) {
-		file->printf(", {Slot = %d, FreeCycle = %d}", unit->Slot, unit->Refs);
-		DebugPrint("{Slot = %d, FreeCycle = %d}\n" _C_ unit->Slot _C_ unit->Refs);
-	}
-	file->printf(")\n");
-
-	for (table = Units; table < &Units[NumUnits]; ++table) {
+	for (CUnit **table = Units; table < &Units[NumUnits]; ++table) {
 		SaveUnit(*table, file);
 	}
 }
@@ -3647,6 +3570,8 @@ void SaveUnits(CFile *file)
 */
 void InitUnits(void)
 {
+	NumUnits = 0;
+	UnitManager.Init();
 }
 
 /**
@@ -3655,7 +3580,6 @@ void InitUnits(void)
 void CleanUnits(void)
 {
 	CUnit **table;
-	CUnit *unit;
 
 	//
 	//  Free memory for all units in unit table.
@@ -3670,16 +3594,9 @@ void CleanUnits(void)
 		delete *table;
 		*table = NULL;
 	}
+	NumUnits = 0;
 
-	//
-	//  Release memory of units in release queue.
-	//
-	while ((unit = ReleasedHead)) {
-		ReleasedHead = unit->Next;
-		delete unit;
-	}
-
-	InitUnitsMemory();
+	UnitManager.Init();
 
 	HelpMeLastCycle = 0;
 }

@@ -183,6 +183,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "SDL.h"
 
 #include "stratagus.h"
+#include "unit_manager.h"
 #include "video.h"
 #include "font.h"
 #include "cursor.h"
@@ -694,7 +695,7 @@ static int main1(int argc, char **argv)
 	// memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 
-	InitUnitsMemory();  // Units memory management
+	UnitManager.Init(); // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
 	MenuLoop(MapName, &Map);

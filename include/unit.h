@@ -550,8 +550,8 @@ public:
 	}
 
 	// @note int is faster than shorts
-	int     Refs;         /// Reference counter
-	int     Slot;         /// Assigned slot number
+	unsigned long Refs;   /// Reference counter
+	int Slot;             /// Assigned slot number
 	CUnit **UnitSlot;     /// Slot pointer of Units
 	CUnit **PlayerSlot;   /// Slot pointer of Player->Units
 
@@ -777,9 +777,6 @@ extern CPreference Preference;
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern CUnit *UnitSlots[MAX_UNIT_SLOTS]; /// All possible units
-extern unsigned int UnitSlotFree;        /// First free unit slot
-
 extern CUnit *Units[MAX_UNIT_SLOTS]; /// Units used
 extern int NumUnits;                 /// Number of units used
 
@@ -797,15 +794,10 @@ extern CUnit **TeamSelected[PlayerMax];     /// teams currently selected units
 extern int     NumSelected;                 /// how many units selected
 extern int     TeamNumSelected[PlayerMax];  /// Number of Units a team member has selected
 
-extern CUnit *ReleasedHead;                 /// Head of the released unit list.
-extern CUnit *ReleasedTail;                 /// Tail of the released unit list.
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-	/// Prepare unit memory allocator
-extern void InitUnitsMemory(void);
 	/// Mark the field with the FieldFlags.
 void MarkUnitFieldFlags(const CUnit *unit);
 	/// Unmark the field with the FieldFlags.
