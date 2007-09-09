@@ -51,6 +51,7 @@
 #include "spells.h"
 #include "font.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "player.h"
 
 /*----------------------------------------------------------------------------

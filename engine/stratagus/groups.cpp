@@ -9,7 +9,7 @@
 //
 /**@name groups.cpp - The units' groups handling. */
 //
-//      (c) Copyright 1999-2005 by Patrice Fortier, Lutz Sammer,
+//      (c) Copyright 1999-2007 by Patrice Fortier, Lutz Sammer,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "script.h"
 #include "player.h"

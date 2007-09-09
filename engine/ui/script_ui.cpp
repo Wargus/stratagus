@@ -47,6 +47,7 @@
 #include "font.h"
 #include "util.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "spells.h"
 
