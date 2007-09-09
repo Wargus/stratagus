@@ -86,6 +86,7 @@
     the following packages: <i>liblualib50-dev libtheora-dev libogg-dev libpng12-dev libsdl1.2-dev
     libvorbis-dev libzzip-dev libx11-dev x11proto-core-dev gnulib.</i>
     The toLua tool is currently not available as a package from the distributions.
+    You can use liblua5.1-dev instead of liblualib50-dev if you want.
     </p>
 
     <h2>Building</h2>
@@ -94,7 +95,7 @@
 	<ul>
 	    <li><a href="http://www.boswars.org/download.shtml">
 		Download</a> the source code.</li>
-	    <li>Extract the source stratagus-DATE.tar.gz with 
+	    <li>Extract the source boswars-version.tar.gz with 
 	    'tar -xzvf boswars-DATE.tar.gz'</li>
 	</ul>
 	Alternatively you can get the latest <a href="http://www.boswars.org/development.shtml">
@@ -113,15 +114,18 @@
 	    <li><b>On Posix systems like Linux</b> 
 	        using <a href="http://www.scons.org">scons</a>:
 		<ul>
-		<li>Run 'scons'.
+		<li>Run 'scons'.</li>
 		</ul>
+	    </li>
 	    <li><b>Microsoft Visual Studio 2005:</b>
 	    <ul>
 		<li><a href="http://www.boswars.org/dev/msvc-libs.zip">
-		Download</a> the VC++ libraries and extract them into the root
-    		stratagus directory.
-		<li>Open the workspace file boswars.sln and compile.
+		Download</a> the precompiled VC++ libraries and extract them into the root
+    		boswars directory. You can also fetch all the libs and 
+    		compile them manually if you want.</li>
+		<li>Open the workspace file boswars.sln and compile.</li>
 	    </ul>
+	    </li>
 	</ul>
 
 	<br>
