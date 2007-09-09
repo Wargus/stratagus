@@ -221,6 +221,7 @@
 
 #include "net_lowlevel.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "map.h"
 #include "actions.h"

@@ -42,6 +42,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "interface.h"
 #include "map.h"
 #include "tileset.h"

@@ -39,6 +39,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "animation.h"
 #include "upgrade.h"
@@ -1214,6 +1215,7 @@ static int CclSlotUsage(lua_State *l)
 	unsigned int i;
 	const char *key;
 	int unit_index;
+	unsigned long cycle;
 
 	args = lua_gettop(l);
 	if (args == 0) {
@@ -1233,18 +1235,14 @@ static int CclSlotUsage(lua_State *l)
 				unit_index = LuaToNumber(l, -1);
 			} else if (!strcmp(key, "FreeCycle")) {
 				if (unit_index != -1) {
-					UnitSlots[unit_index]->Refs = LuaToNumber(l, -1);
+					cycle = LuaToNumber(l, -1);
 				}
 			} else {
 				LuaError(l, "Wrong key %s" _C_ key);
 			}
 		}
-		if (ReleasedHead) {
-			ReleasedTail->Next = UnitSlots[unit_index];
-			ReleasedTail = UnitSlots[unit_index];
-		} else {
-			ReleasedHead = ReleasedTail = UnitSlots[unit_index];
-		}
+		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
+		UnitSlots[unit_index]->Refs = cycle;
 	}
 	return 0;
 }
