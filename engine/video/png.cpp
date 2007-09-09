@@ -317,7 +317,6 @@ void SaveScreenshotPNG(const std::string &name)
 	FILE *fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
-	unsigned char *row;
 	int i;
 	int j;
 	int bpp;
@@ -356,11 +355,7 @@ void SaveScreenshotPNG(const std::string &name)
 		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 		PNG_FILTER_TYPE_DEFAULT);
 
-	png_set_bgr(png_ptr);
-
 	Video.LockScreen();
-
-	row = new unsigned char[Video.Width * 3];
 
 	png_write_info(png_ptr, info_ptr);
 
@@ -374,43 +369,23 @@ void SaveScreenshotPNG(const std::string &name)
 		glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE,
 			pixels);
 		for (i = 0; i < Video.Height; ++i) {
-			unsigned char *src;
-			unsigned char *dst;
-
-			src = pixels + (Video.Height - 1 - i) * Video.Width * 3;
-			dst = row;
-
-			// Convert bgr to rgb
-			for (j = 0; j < Video.Width; ++j) {
-				dst[0] = src[2];
-				dst[1] = src[1];
-				dst[2] = src[0];
-				dst += 3;
-				src += 3;
-			}
-			png_write_row(png_ptr, row);
+			png_write_row(png_ptr, pixels + (Video.Height - 1 - i) * Video.Width * 3);
 		}
 		delete[] pixels;
 	} else {
+		unsigned char *row = new unsigned char[Video.Width * 3];
+		SDL_PixelFormat *fmt = TheScreen->format;
+
 		for (i = 0; i < Video.Height; ++i) {
 			switch (Video.Depth) {
-				case 15: {
-					Uint16 c;
-					for (j = 0; j < Video.Width; ++j) {
-						c = ((Uint16 *)TheScreen->pixels)[j + i * Video.Width];
-						row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
-						row[j * 3 + 1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
-						row[j * 3 + 2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
-					}
-					break;
-				}
+				case 15:
 				case 16: {
 					Uint16 c;
 					for (j = 0; j < Video.Width; ++j) {
 						c = ((Uint16 *)TheScreen->pixels)[j + i * Video.Width];
-						row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
-						row[j * 3 + 1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
-						row[j * 3 + 2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
+						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
+						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
+						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
 					}
 					break;
 				}
@@ -426,15 +401,17 @@ void SaveScreenshotPNG(const std::string &name)
 					Uint32 c;
 					for (j = 0; j < Video.Width; ++j) {
 						c = ((Uint32 *)TheScreen->pixels)[j + i * Video.Width];
-						row[j * 3 + 0] = ((c >> 0) & 0xff);
-						row[j * 3 + 1] = ((c >> 8) & 0xff);
-						row[j * 3 + 2] = ((c >> 16) & 0xff);
+						row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
+						row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
+						row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
 					}
 					break;
 				}
 			}
 			png_write_row(png_ptr, row);
 		}
+
+		delete[] row;
 	}
 
 	png_write_end(png_ptr, info_ptr);
@@ -443,8 +420,6 @@ void SaveScreenshotPNG(const std::string &name)
 
 	/* clean up after the write, and free any memory allocated */
 	png_destroy_write_struct(&png_ptr, &info_ptr);
-
-	delete[] row;
 
 	fclose(fp);
 }
