@@ -7,7 +7,7 @@
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
-/**@name actions.h - The actions headerfile. */
+/**@name unit_manager.h - Unit manager header. */
 //
 //      (c) Copyright 2007 by Jimmy Salmon
 //
