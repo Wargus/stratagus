@@ -744,66 +744,6 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 	}
 }
 
-#if 0
-/**
-**  Draw the sprite with the player colors
-**
-**  @param type      Unit type
-**  @param sprite    Original sprite
-**  @param player    Player number
-**  @param frame     Frame number to draw.
-**  @param x         X position.
-**  @param y         Y position.
-*/
-void DrawUnitPlayerColor(const CUnitType *type, CGraphic *sprite,
-	int player, int frame, int x, int y)
-{
-	int f;
-
-	if (type->Flip) {
-		if (frame < 0) {
-			f = -frame - 1;
-		} else {
-			f = frame;
-		}
-	} else {
-		int row;
-
-		row = type->NumDirections / 2 + 1;
-		if (frame < 0) {
-			f = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
-		} else {
-			f = (frame / row) * type->NumDirections + frame % row;
-		}
-	}
-	if (!sprite->PlayerColorTextures[player]) {
-		MakePlayerColorTexture(sprite, player, &Players[player].UnitColors);
-	}
-
-	// FIXME: move this calculation to high level.
-	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
-	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
-
-	if (type->Flip) {
-		if (frame < 0) {
-			VideoDrawClipX(glsprite[player], -frame - 1, x, y);
-		} else {
-			VideoDrawClip(glsprite[player], frame, x, y);
-		}
-	} else {
-		int row;
-
-		row = type->NumDirections / 2 + 1;
-		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
-		} else {
-			frame = (frame / row) * type->NumDirections + frame % row;
-		}
-		VideoDrawClip(glsprite[player], frame, x, y);
-	}
-}
-#endif
-
 /**
 **  Draw construction shadow.
 **
@@ -883,10 +823,6 @@ static void DrawConstruction(const CUnit *unit, const CConstructionFrame *cframe
 }
 
 /**
-**  Units on map:
-*/
-
-/**
 **  Draw unit on map.
 */
 void CUnit::Draw() const
@@ -932,12 +868,6 @@ void CUnit::Draw() const
 		state = this->Seen.State;
 		cframe = this->Seen.CFrame;
 	}
-
-#ifdef DYNAMIC_LOAD
-	if (!type->Sprite) {
-		LoadUnitTypeSprite(type);
-	}
-#endif
 
 	if (!this->IsVisible(ThisPlayer) && frame == UnitNotSeen) {
 		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
@@ -1028,8 +958,7 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 **  Find all units to draw in viewport.
 **
 **  @param vp     Viewport to be drawn.
-**  @param table  Table of units to return in sorted order 
-**
+**  @param table  Table of units to return in sorted order
 */
 int FindAndSortUnits(const CViewport *vp, CUnit **table)
 {
@@ -1039,7 +968,7 @@ int FindAndSortUnits(const CViewport *vp, CUnit **table)
 	int n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
-	for (int i = 0; i < n; i++) {
+	for (int i = 0; i < n; ++i) {
 		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
 		}
