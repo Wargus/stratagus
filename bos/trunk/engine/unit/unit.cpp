@@ -2439,11 +2439,6 @@ void LetUnitDie(CUnit *unit)
 	unit->State = 0;
 	unit->Orders[0]->Action = UnitActionDie;
 	if (type->CorpseType) {
-#ifdef DYNAMIC_LOAD
-		if (!type->Sprite) {
-			LoadUnitTypeSprite(type);
-		}
-#endif
 		unit->IX = (type->CorpseType->Width - type->CorpseType->Sprite->Width) / 2;
 		unit->IY = (type->CorpseType->Height - type->CorpseType->Sprite->Height) / 2;
 

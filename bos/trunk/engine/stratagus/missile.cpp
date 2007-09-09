@@ -106,11 +106,9 @@ void MissileType::LoadMissileSprite()
 */
 void LoadMissileSprites(void)
 {
-#ifndef DYNAMIC_LOAD
 	for (std::vector<MissileType*>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
 		(*i)->LoadMissileSprite();
 	}
-#endif
 }
 /**
 **  Get Missile type by identifier.
@@ -507,12 +505,6 @@ static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 */
 void MissileType::DrawMissileType(int frame, int x, int y) const
 {
-#ifdef DYNAMIC_LOAD
-	if (!this->G->IsLoaded()) {
-		LoadMissileSprite(this);
-	}
-#endif
-
 	if (this->Flip) {
 		if (frame < 0) {
 			if (this->Transparency == 50) {
@@ -556,14 +548,6 @@ void Missile::DrawMissile() const
 	Assert(this->Type);
 	Assert(CurrentViewport);
 
-	// FIXME: I should copy SourcePlayer for second level missiles.
-	if (this->SourceUnit && this->SourceUnit->Player) {
-#ifdef DYNAMIC_LOAD
-		if (!this->Type->Sprite) {
-			LoadMissileSprite(this->Type);
-		}
-#endif
-	}
 	vp = CurrentViewport;
 	x = this->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
 	y = this->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;

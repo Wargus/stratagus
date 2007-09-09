@@ -608,9 +608,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	UnitUnderCursor = NoUnitP;
 
 	InitMissileTypes();
-#ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
-#endif
 	InitConstructions();
 	LoadConstructions();
 	LoadUnitTypes();

@@ -211,11 +211,6 @@ static void DrawBuildingCursor(void)
 	//
 	//  Draw building
 	//
-#ifdef DYNAMIC_LOAD
-	if (!CursorBuilding->G->IsLoaded()) {
-		LoadUnitTypeSprite(CursorBuilding);
-	}
-#endif
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 	DrawShadow(NULL, CursorBuilding, CursorBuilding->StillFrame, x, y);

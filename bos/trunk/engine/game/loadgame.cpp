@@ -153,9 +153,7 @@ void LoadModules(void)
 	LoadIcons();
 	LoadCursors();
 	UI.Load();
-#ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
-#endif
 	LoadConstructions();
 	LoadDecorations();
 	LoadUnitTypes();
