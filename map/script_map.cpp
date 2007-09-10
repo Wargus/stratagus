@@ -49,6 +49,7 @@
 #include "ui.h"
 #include "player.h"
 #include "iolib.h"
+#include "version.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
