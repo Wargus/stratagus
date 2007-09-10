@@ -28,8 +28,10 @@
 --	$Id$
 --
 
-function DefineImageTilemodels(terrain, imgx, imgy)
+function DefineImageTilemodels(terrain, imgx, imgy, fullTerrainImage)
    local til = {}
+
+   fullTerrainImage = fullTerrainImage or false
 
    for i = 0, imgx * imgy - 1 do
       til[i + 1] = i
@@ -38,7 +40,7 @@ function DefineImageTilemodels(terrain, imgx, imgy)
    DefineTileset(
      "name",  "Image terrain",
      "image", terrain,
-     "imagemap", true,
+     "imagemap", fullTerrainImage,
      -- Slots descriptions
      "slots", {
        "solid", { "light-grass", "land",

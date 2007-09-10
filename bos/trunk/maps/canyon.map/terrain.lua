@@ -28,7 +28,7 @@
 -- $Id$
 
 
-DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 64, 64)
+DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 64, 64, true)
 
 Load(GetCurrentLuaPath().."/access-unpassable.lua")
 
