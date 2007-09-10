@@ -43,24 +43,8 @@
 
 #include "stratagus.h"
 #include "iocompat.h"
-#include "map.h"
 #include "util.h"
 #include "iolib.h"
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
 
 CFile::CFile()
 {
@@ -390,30 +374,6 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	}
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
-	}
-
-	// Try in map directory
-	if (*CurrentMapPath) {
-		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
-			strcpy_s(buffer, buffersize, CurrentMapPath);
-			if ((s = strrchr(buffer, '/'))) {
-				s[1] = '\0';
-			}
-			strcat_s(buffer, buffersize, file);
-		} else {
-			strcpy_s(buffer, buffersize, StratagusLibPath.c_str());
-			if (*buffer) {
-				strcat_s(buffer, buffersize, "/");
-			}
-			strcat_s(buffer, buffersize, CurrentMapPath);
-			if ((s = strrchr(buffer, '/'))) {
-				s[1] = '\0';
-			}
-			strcat_s(buffer, buffersize, file);
-		}
-		if (FindFileWithExtension(buffer, buffersize)) {
-			return buffer;
-		}
 	}
 
 	//  In user home directory
