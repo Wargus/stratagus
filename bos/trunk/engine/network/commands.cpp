@@ -55,6 +55,7 @@
 #include "iocompat.h"
 #include "settings.h"
 #include "spells.h"
+#include "version.h"
 
 //----------------------------------------------------------------------------
 // Declaration

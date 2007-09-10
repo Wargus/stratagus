@@ -61,6 +61,7 @@
 #include "commands.h"
 #include "script.h"
 #include "actions.h"
+#include "version.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -154,30 +154,6 @@ inline char *new_strdup(const char *str)
 /*----------------------------------------------------------------------------
 --  General
 ----------------------------------------------------------------------------*/
-
-#define VERSION  "2.4.1"                 /// Engine version shown
-
-#ifndef StratagusMajorVerion
-	/// Stratagus major version
-#define StratagusMajorVersion  2
-	/// Stratagus minor version (maximal 99)
-#define StratagusMinorVersion  4
-	/// Stratagus patch level (maximal 99)
-#define StratagusPatchLevel    1
-	/// Stratagus version (1,2,3) -> 10203
-#define StratagusVersion \
-	(StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 \
-		+ StratagusPatchLevel)
-
-	/// Stratagus printf format string
-#define StratagusFormatString   "%d.%d.%d"
-	/// Stratagus printf format arguments
-#define StratagusFormatArgs(v)  (v) / 10000, ((v) / 100) % 100, (v) % 100
-#endif
-
-	/// Text string: Name, Version, Copyright
-extern std::string NameLine;
-
 #ifndef STRATAGUS_LIB_PATH
 #define STRATAGUS_LIB_PATH  "."      /// Where to find the data files
 #endif
