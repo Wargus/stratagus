@@ -28,8 +28,6 @@
 #ifndef __VERSION_H__
 #define __VERSION_H__
 
-#define VERSION  "2.4.1"                 /// Engine version shown
-
 #ifndef StratagusMajorVerion
 	/// Stratagus major version
 #define StratagusMajorVersion  2
@@ -46,5 +44,13 @@
 	/// Stratagus printf format arguments
 #define StratagusFormatArgs(v)  (v) / 10000, ((v) / 100) % 100, (v) % 100
 #endif
+
+// Macros to do stringification of macros with numerical values
+// See http://gcc.gnu.org/onlinedocs/cpp/Stringification.html for more details.
+#define SN(x) STRINGIFY(x)
+#define STRINGIFY(x) #x
+
+/// Engine version shown at startup and in some files.
+#define VERSION  SN(StratagusMajorVersion) "." SN(StratagusMinorVersion) "." SN(StratagusPatchLevel)
 
 #endif
