@@ -207,6 +207,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "iolib.h"
 #include "util.h"
 #include "guichan.h"
+#include "version.h"
 
 extern void CreateUserDirectories(void);
 
@@ -219,7 +220,7 @@ std::string StratagusLibPath;        /// Path for data directory
 std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
-std::string NameLine =
+static std::string NameLine =
 	"Bos Wars V" VERSION ", (c) 1998-2007 by the Bos Wars and Stratagus Project.";
 
 static char *MapName;                /// Filename of the map to load
