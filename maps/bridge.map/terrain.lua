@@ -28,7 +28,7 @@
 -- $Id$
 
 
-DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 128, 128)
+DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 128, 128, true)
 
 print(GetCurrentLuaPath().."/access-water.lua")
 Load(GetCurrentLuaPath().."/access-water.lua")
