@@ -86,7 +86,7 @@ DefineUnitType("unit-assault", {
     MaxAttackRange = 5,
     Priority = 60,
     Points = 50,
-    Corpse = "unit-rock-1",
+    Corpse = "unit-dead-body1",
     Type = "land",
     CanAttack = true,
     CanTargetLand = true,

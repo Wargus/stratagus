@@ -88,7 +88,7 @@ DefineUnitType("unit-engineer", {
     MaxAttackRange = 1,
     Priority = 50,
     Points = 30,
-    Corpse = "unit-rock-1",
+    Corpse = "unit-dead-body2",
     Type = "land",
     RightMouseAction = "harvest",
     RepairRange = 1,
@@ -107,6 +107,6 @@ DefineUnitType("unit-engineer", {
         "help", "engineer-help",
         "dead", "engineer-die"}
 })
---DefineHumanCorpse("engineer", {56, 56})
+DefineHumanCorpse("engineer", {56, 56})
 
 DefineAllow("unit-engineer", AllowAll)
