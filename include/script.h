@@ -52,6 +52,7 @@ extern "C" {
 
 class CUnit;
 class CFile;
+class CFont;
 
 typedef struct _lua_user_data_ {
 	int Type;

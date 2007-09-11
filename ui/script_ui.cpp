@@ -50,6 +50,7 @@
 #include "unit_manager.h"
 #include "unittype.h"
 #include "spells.h"
+#include "title.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

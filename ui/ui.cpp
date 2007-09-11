@@ -48,6 +48,7 @@
 #include "menus.h"
 #include "iolib.h"
 #include "unit.h"
+#include "title.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
