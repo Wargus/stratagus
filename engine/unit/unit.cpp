@@ -536,7 +536,7 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 		for (w = type->TileWidth; w--;) {
 			Map.Field(x + w, y + h)->Flags &= ~flags;
 
-			int n = UnitCacheOnTile(x + w, y + h, table);
+			int n = UnitCacheOnTile(x + w, y + h, table, UnitMax);
 			while (n--) {
 				if (table[n] != unit && table[n]->Orders[0]->Action != UnitActionDie) {
 					Map.Field(x + w, y + h)->Flags |= table[n]->Type->FieldFlags;
@@ -998,7 +998,7 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y)
 	CUnit *units[UnitMax];
 	CUnit *unit;
 
-	n = UnitCacheOnTile(x, y, units);
+	n = UnitCacheOnTile(x, y, units, UnitMax);
 	while (n) {
 		unit = units[--n];
 		//
@@ -1031,7 +1031,7 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y)
 	CUnit *units[UnitMax];
 	CUnit *unit;
 
-	n = UnitCacheOnTile(x, y, units);
+	n = UnitCacheOnTile(x, y, units, UnitMax);
 	while (n) {
 		unit = units[--n];
 		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
@@ -1416,12 +1416,12 @@ void RescueUnits(void)
 					n = UnitCacheSelect(
 							unit->X - 1, unit->Y - 1,
 							unit->X + unit->Type->TileWidth + 1,
-							unit->Y + unit->Type->TileHeight + 1, around);
+							unit->Y + unit->Type->TileHeight + 1, around, UnitMax);
 				} else {
 					n = UnitCacheSelect(
 							unit->X - 2, unit->Y - 2,
 							unit->X + unit->Type->TileWidth + 2,
-							unit->Y + unit->Type->TileHeight + 2, around);
+							unit->Y + unit->Type->TileHeight + 2, around, UnitMax);
 				}
 				//
 				//  Look if ally near the unit.
@@ -1854,7 +1854,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 			y + type->TileHeight + this->Distance + 1 : Map.Info.MapHeight;
 		distance = this->Distance - 1;
 	}
-	n = UnitCacheSelect(x1, y1, x2, y2, table);
+	n = UnitCacheSelect(x1, y1, x2, y2, table, UnitMax);
 
 	switch (this->DistanceType) {
 		case GreaterThan :
@@ -1911,7 +1911,7 @@ bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&
 	y1 = y - this->OffsetY < 0 ? -1 : y - this->OffsetY;
 	y1 = y1 >= Map.Info.MapHeight ? -1 : y1;
 	if (!(x1 == -1 || y1 == -1)) {
-		n = UnitCacheOnTile(x1, y1, table);
+		n = UnitCacheOnTile(x1, y1, table, UnitMax);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type == this->Parent &&
 					table[i]->X == x1 && table[i]->Y == y1) {
@@ -1932,7 +1932,7 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 	int i;
 
 	ontoptarget = NULL;
-	n = UnitCacheOnTile(x, y, table);
+	n = UnitCacheOnTile(x, y, table, UnitMax);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->X == x && table[i]->Y == y && !table[i]->Destroyed &&
 				table[i]->Orders[0]->Action != UnitActionDie) {

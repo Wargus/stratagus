@@ -291,7 +291,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 void CViewport::Draw() const
 {
 	CUnit *table[UnitMax];
-	Missile *missiletable[MAX_MISSILES * 9];
+	Missile *missiletable[MAX_MISSILES];
 	int nunits;
 	int nmissiles;
 	int i;
@@ -304,8 +304,8 @@ void CViewport::Draw() const
 	//
 	// We find and sort units after draw level.
 	//
-	nunits = FindAndSortUnits(this, table);
-	nmissiles = FindAndSortMissiles(this, missiletable);
+	nunits = FindAndSortUnits(this, table, UnitMax);
+	nmissiles = FindAndSortMissiles(this, missiletable, MAX_MISSILES);
 
 	i = 0;
 	j = 0;

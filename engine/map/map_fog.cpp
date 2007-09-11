@@ -145,7 +145,7 @@ int MapFogFilterFlags(CPlayer *player, int x, int y, int mask)
 		return mask;
 	}
 
-	nunits = UnitCacheOnTile(x, y, table);
+	nunits = UnitCacheOnTile(x, y, table, UnitMax);
 	fogmask = -1;
 	unitcount = 0;
 	while (unitcount < nunits) {

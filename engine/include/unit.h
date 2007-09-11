@@ -917,9 +917,9 @@ extern void UnitCacheInsert(CUnit *unit);
 	/// Remove unit from cache
 extern void UnitCacheRemove(CUnit *unit);
 	/// Select units in range
-extern int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table);
+extern int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table, int tablesize);
 	/// Select units on tile
-extern int UnitCacheOnTile(int x, int y, CUnit **table);
+extern int UnitCacheOnTile(int x, int y, CUnit **table, int tablesize);
 	/// Initialize unit-cache
 extern void InitUnitCache(void);
 
@@ -935,7 +935,7 @@ extern void CleanDecorations(void);
 extern void DrawShadow(const CUnit *unit, const CUnitType *type,
 	int frame, int x, int y);
 	/// Draw all units visible on map in viewport
-extern int FindAndSortUnits(const CViewport *vp, CUnit **table);
+extern int FindAndSortUnits(const CViewport *vp, CUnit **table, int tablesize);
 	/// Show a unit's orders.
 extern void ShowOrder(const CUnit *unit);
 
@@ -943,9 +943,9 @@ extern void ShowOrder(const CUnit *unit);
 	/// Select unit on X,Y of type naval,fly,land
 extern CUnit *UnitCacheOnXY(int x, int y, unsigned type);
 	/// Find all units of this type
-extern int FindUnitsByType(const CUnitType *type, CUnit **table);
+extern int FindUnitsByType(const CUnitType *type, CUnit **table, int tablesize);
 	/// Find all units of this type of the player
-extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **);
+extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **, int);
 	/// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(int tx, int ty);
 	/// Return possible attack target on that map area
