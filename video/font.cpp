@@ -85,6 +85,16 @@ CFont *LargeTitleFont;  /// Large font used in episoden titles
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
+int CFont::Height() const
+{
+	return G->Height;
+}
+
+bool CFont::IsLoaded() const
+{
+	return G && G->IsLoaded();
+}
+
 void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 	int x, int y)
 {
