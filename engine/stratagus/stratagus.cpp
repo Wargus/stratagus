@@ -208,6 +208,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "util.h"
 #include "guichan.h"
 #include "version.h"
+#include "title.h"
 
 extern void CreateUserDirectories(void);
 
@@ -215,7 +216,6 @@ extern void CreateUserDirectories(void);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-TitleScreen **TitleScreens;          /// Title screens to show at startup
 std::string StratagusLibPath;        /// Path for data directory
 std::string LocalPlayerName;         /// Name of local player
 
@@ -247,145 +247,6 @@ unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 /*============================================================================
 ==  MAIN
 ============================================================================*/
-
-static bool WaitNoEvent;                     /// Flag got an event
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackButtonPressed(unsigned dummy)
-{
-	WaitNoEvent = false;
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackButtonReleased(unsigned dummy)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyPressed(unsigned dummy1, unsigned dummy2)
-{
-	WaitNoEvent = false;
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyReleased(unsigned dummy1, unsigned dummy2)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyRepeated(unsigned dummy1, unsigned dummy2)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackMouse(int x, int y)
-{
-}
-
-/**
-**  Callback for exit.
-*/
-static void WaitCallbackExit(void)
-{
-}
-
-/**
-**  Show a title image
-*/
-static void ShowTitleImage(TitleScreen *t)
-{
-	const EventCallback *old_callbacks;
-	EventCallback callbacks;
-	CGraphic *g;
-
-	WaitNoEvent = true;
-
-	callbacks.ButtonPressed = WaitCallbackButtonPressed;
-	callbacks.ButtonReleased = WaitCallbackButtonReleased;
-	callbacks.MouseMoved = WaitCallbackMouse;
-	callbacks.MouseExit = WaitCallbackExit;
-	callbacks.KeyPressed = WaitCallbackKeyPressed;
-	callbacks.KeyReleased = WaitCallbackKeyReleased;
-	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
-	callbacks.NetworkEvent = NetworkEvent;
-
-	old_callbacks = GetCallbacks();
-	SetCallbacks(&callbacks);
-
-	g = CGraphic::New(t->File);
-	g->Load();
-	g->Resize(Video.Width, Video.Height);
-
-	int timeout = t->Timeout * CYCLES_PER_SECOND;
-	if (!timeout) {
-		timeout = -1;
-	}
-
-	while (timeout-- && WaitNoEvent) {
-		g->DrawSubClip(0, 0, g->Width, g->Height,
-			(Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
-		TitleScreenLabel **labels = t->Labels;
-		if (labels && labels[0] && labels[0]->Font &&
-				labels[0]->Font->IsLoaded()) {
-			for (int j = 0; labels[j]; ++j) {
-				// offsets are for 640x480, scale up to actual resolution
-				int x = labels[j]->Xofs * Video.Width / 640;
-				int y = labels[j]->Yofs * Video.Width / 640;
-				if (labels[j]->Flags & TitleFlagCenter) {
-					x -= labels[j]->Font->Width(labels[j]->Text) / 2;
-				}
-				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
-			}
-		}
-
-		Invalidate();
-		RealizeVideoMemory();
-		WaitEventsOneFrame();
-	}
-
-	SetCallbacks(old_callbacks);
-	CGraphic::Free(g);
-}
-
-/**
-**  Show the title screens
-*/
-static void ShowTitleScreens(void)
-{
-	if (!TitleScreens) {
-		return;
-	}
-
-	SetVideoSync();
-
-	for (int i = 0; TitleScreens[i]; ++i) {
-		if (!TitleScreens[i]->Music.empty()) {
-			if (TitleScreens[i]->Music == "none" ||
-					PlayMusic(TitleScreens[i]->Music) == -1) {
-				StopMusic();
-			}
-		}
-
-		if (PlayMovie(TitleScreens[i]->File)) {
-			ShowTitleImage(TitleScreens[i]);
-		}
-
-		Video.ClearScreen();
-	}
-	Invalidate();
-}
 
 /**
 **  Show load progress.

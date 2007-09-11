@@ -200,43 +200,6 @@ inline char *new_strdup(const char *str)
 --  stratagus.cpp
 ----------------------------------------------------------------------------*/
 
-class CFont;
-
-enum {
-	TitleFlagCenter = 1 << 0,  /// Center Text
-};
-
-class TitleScreenLabel {
-public:
-	TitleScreenLabel() : Font(0), Xofs(0), Yofs(0), Flags(0) {}
-
-	std::string Text;
-	CFont *Font;
-	int Xofs;
-	int Yofs;
-	int Flags;
-};
-
-class TitleScreen {
-public:
-	TitleScreen() : Timeout(0), Iterations(0), Labels(NULL) {}
-	~TitleScreen() {
-		if (this->Labels) {
-			for (int i = 0; this->Labels[i]; ++i) {
-				delete this->Labels[i];
-			}
-			delete[] this->Labels;
-		}
-	}
-
-	std::string File;
-	std::string Music;
-	int Timeout;
-	int Iterations;
-	TitleScreenLabel **Labels;
-};
-
-extern TitleScreen **TitleScreens;          /// File for title screen
 extern std::string UserDirectory;           /// Directory containing user settings and data
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused

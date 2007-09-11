@@ -2470,6 +2470,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\stratagus\title.cpp"
+						>
+					</File>
+					<File
 						RelativePath="stratagus\translate.cpp"
 						>
 						<FileConfiguration
@@ -3411,6 +3415,10 @@
 				</File>
 				<File
 					RelativePath="include\tileset.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\title.h"
 					>
 				</File>
 				<File
