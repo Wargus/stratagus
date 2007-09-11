@@ -329,7 +329,6 @@ class CFile;
 ----------------------------------------------------------------------------*/
 
 #define MAX_MISSILES 2048        /// maximum number of missiles
-#define MAX_LOCAL_MISSILES 4096  /// maximum number of local missiles
 
 /**
 **  Missile-type-class typedef
@@ -549,7 +548,7 @@ extern Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx,
 	/// fire a missile
 extern void FireMissile(CUnit *unit);
 
-extern int FindAndSortMissiles(const CViewport *vp, Missile **table);
+extern int FindAndSortMissiles(const CViewport *vp, Missile **table, int tablesize);
 
 	/// handle all missiles
 extern void MissileActions(void);

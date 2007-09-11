@@ -87,7 +87,7 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 	n = UnitCacheSelect(unit->X - range, unit->Y - range,
 		unit->X + unit->Type->TileWidth + range,
 		unit->Y + unit->Type->TileHeight + range,
-		table);
+		table, UnitMax);
 	for (int i = 0; i < n; ++i) {
 		if (table[i]->IsTeamed(unit) &&
 				table[i]->Type->RepairHP &&

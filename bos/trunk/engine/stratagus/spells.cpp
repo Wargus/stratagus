@@ -131,7 +131,7 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
+		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table, UnitMax);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
 					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
@@ -203,7 +203,7 @@ int AreaAdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 		y - spell->Range,
 		x + spell->Range + caster->Type->Width,
 		y + spell->Range + caster->Type->Height,
-		units);
+		units, UnitMax);
 	hp = this->HP;
 	mana = this->Mana;
 	caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
@@ -654,7 +654,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 	ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		n = UnitCacheSelect(x - 1, y - 1, x + 2, y + 2, table);
+		n = UnitCacheSelect(x - 1, y - 1, x + 2, y + 2, table, UnitMax);
 		cansummon = 0;
 		while (n) {
 			n--;
@@ -878,7 +878,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit *caster, const SpellType *spell
 	//
 	nunits = UnitCacheSelect(caster->X - range, caster->Y - range,
 		caster->X + range + caster->Type->TileWidth,
-		caster->Y + range + caster->Type->TileHeight, table);
+		caster->Y + range + caster->Type->TileHeight, table, UnitMax);
 	//
 	//  Check every unit if it is hostile
 	//

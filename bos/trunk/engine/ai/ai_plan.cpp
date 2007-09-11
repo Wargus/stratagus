@@ -71,7 +71,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 	int n;
 	int i;
 
-	n = UnitCacheOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table, UnitMax);
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];

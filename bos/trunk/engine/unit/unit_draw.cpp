@@ -957,16 +957,17 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 /**
 **  Find all units to draw in viewport.
 **
-**  @param vp     Viewport to be drawn.
-**  @param table  Table of units to return in sorted order
+**  @param vp         Viewport to be drawn.
+**  @param table      Table of units to return in sorted order
+**  @param tablesize  Size of table array
 */
-int FindAndSortUnits(const CViewport *vp, CUnit **table)
+int FindAndSortUnits(const CViewport *vp, CUnit **table, int tablesize)
 {
 	//
 	//  Select all units touching the viewpoint.
 	//
 	int n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
-		vp->MapY + vp->MapHeight + 1, table);
+		vp->MapY + vp->MapHeight + 1, table, tablesize);
 
 	for (int i = 0; i < n; ++i) {
 		if (!table[i]->IsVisibleInViewport(vp)) {

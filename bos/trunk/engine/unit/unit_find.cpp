@@ -88,7 +88,7 @@ CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 	CUnit *table[UnitMax];
 	int n;
 
-	n = UnitCacheOnTile(x, y, table);
+	n = UnitCacheOnTile(x, y, table, UnitMax);
 	while (n--) {
 		if ((unsigned)table[n]->Type->UnitType == type) {
 			break;
@@ -104,18 +104,19 @@ CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 /**
 **  Find all units of type.
 **
-**  @param type   type of unit requested
-**  @param table  table in which we have to store the units
+**  @param type       type of unit requested
+**  @param table      table in which we have to store the units
+**  @param tablesize  size of table array
 **
 **  @return       Returns the number of units found.
 */
-int FindUnitsByType(const CUnitType *type, CUnit **table)
+int FindUnitsByType(const CUnitType *type, CUnit **table, int tablesize)
 {
 	CUnit *unit;
 	int i;
 	int num;
 
-	for (num = i = 0; i < NumUnits; ++i) {
+	for (num = i = 0; i < NumUnits && num < tablesize; ++i) {
 		unit = Units[i];
 		if (unit->Type == type && !unit->IsUnusable()) {
 			table[num++] = unit;
@@ -127,14 +128,15 @@ int FindUnitsByType(const CUnitType *type, CUnit **table)
 /**
 **  Find all units of type.
 **
-**  @param player  we're looking for the units of this player
-**  @param type    type of unit requested
-**  @param table   table in which we have to store the units
+**  @param player     we're looking for the units of this player
+**  @param type       type of unit requested
+**  @param table      table in which we have to store the units
+**  @param tablesize  size of table array
 **
 **  @return        Returns the number of units found.
 */
 int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
-	CUnit **table)
+	CUnit **table, int tablesize)
 {
 	CUnit *unit;
 	int num;
@@ -144,7 +146,7 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 
 	nunits = player->TotalNumUnits;
 	typecount = player->UnitTypesCount[type->Slot];
-	for (num = 0, i = 0; i < nunits && typecount; ++i) {
+	for (num = 0, i = 0; i < nunits && typecount && num < tablesize; ++i) {
 		unit = player->Units[i];
 		if (unit->Type == type) {
 			if (!unit->IsUnusable()) {
@@ -170,7 +172,7 @@ CUnit *UnitOnMapTile(int tx, int ty)
 	int n;
 	int i;
 
-	n = UnitCacheOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table, UnitMax);
 	for (i = 0; i < n; ++i) {
 		// Note: this is less restrictive than UnitActionDie...
 		// Is it normal?
@@ -203,7 +205,7 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 	int n;
 	int i;
 
-	n = UnitCacheSelect(x1, y1, x2, y2, table);
+	n = UnitCacheSelect(x1, y1, x2, y2, table, UnitMax);
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
@@ -248,7 +250,7 @@ CUnit *ResourceOnMap(int tx, int ty, int resource)
 	int i;
 	int n;
 
-	n = UnitCacheOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table, UnitMax);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvestFrom) {
 			continue;
@@ -337,13 +339,13 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 		y = u->Container->Y;
 		n = UnitCacheSelect(x - missile_range, y - missile_range,
 			x + missile_range + u->Container->Type->TileWidth,
-			y + missile_range + u->Container->Type->TileHeight, table);
+			y + missile_range + u->Container->Type->TileHeight, table, UnitMax);
 	} else {
 		x = u->X;
 		y = u->Y;
 		n = UnitCacheSelect(x - missile_range, y - missile_range,
 			x + missile_range + u->Type->TileWidth,
-			y + missile_range + u->Type->TileHeight, table);
+			y + missile_range + u->Type->TileHeight, table, UnitMax);
 	}
 
 	if (!n) {
@@ -621,7 +623,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 	y = unit->Y;
 	type = unit->Type;
 	n = UnitCacheSelect(x - range, y - range, x + range + type->TileWidth,
-		y + range + type->TileHeight, table);
+		y + range + type->TileHeight, table, UnitMax);
 	
 	if (range > 25 && n > 9) {
 		referenceunit = unit;
