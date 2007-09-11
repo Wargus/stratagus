@@ -85,7 +85,7 @@ public:
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 
-	inline bool IsLoaded() { return Surface != NULL; }
+	inline bool IsLoaded() const { return Surface != NULL; }
 
 	//guichan
 	virtual void *_getData() const { return Surface; }
