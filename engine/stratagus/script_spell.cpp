@@ -9,7 +9,7 @@
 //
 /**@name script_spell.cpp - The spell script functions.. */
 //
-//      (c) Copyright 1998-2005 by Joris Dauphin and Crestez Leonard
+//      (c) Copyright 1998-2007 by Joris Dauphin and Crestez Leonard
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@
 
 #include "stratagus.h"
 #include "spells.h"
-#include "script_sound.h"
 #include "sound.h"
 #include "script.h"
 #include "missile.h"
