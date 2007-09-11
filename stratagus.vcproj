@@ -3458,6 +3458,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\version.h"
+					>
+				</File>
+				<File
 					RelativePath="include\video.h"
 					>
 				</File>
