@@ -51,6 +51,7 @@
 
 class CUnit;
 class CFile;
+class CFont;
 class LuaActionListener;
 
 /*----------------------------------------------------------------------------
