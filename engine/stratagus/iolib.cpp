@@ -365,8 +365,6 @@ static int FindFileWithExtension(char *file, size_t filesize)
 */
 char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 {
-	char *s;
-
 	// Absolute path or in current directory.
 	strcpy_s(buffer, buffersize, file);
 	if (*buffer == '/') {
