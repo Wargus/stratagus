@@ -53,7 +53,6 @@
 #include "unit.h"
 #include "map.h"
 #include "tileset.h"
-#include "script_sound.h"
 #include "ui.h"
 #include "interface.h"
 #include "font.h"

@@ -3390,10 +3390,6 @@
 					>
 				</File>
 				<File
-					RelativePath="include\script_sound.h"
-					>
-				</File>
-				<File
 					RelativePath="include\settings.h"
 					>
 				</File>
