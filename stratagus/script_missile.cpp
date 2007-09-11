@@ -42,7 +42,6 @@
 #include "tileset.h"
 #include "unittype.h"
 #include "missile.h"
-#include "script_sound.h"
 #include "script.h"
 #include "unit.h"
 #include "unit_manager.h"

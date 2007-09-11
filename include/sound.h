@@ -198,6 +198,12 @@ extern void FreeSounds();
 #endif
 
 
+// script_sound.cpp
+
+	/// register ccl features
+extern void SoundCclRegister(void);
+
+
 //@}
 
 #endif  // !__SOUND_H__
