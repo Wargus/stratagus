@@ -154,7 +154,7 @@ static CUnit *CheckAlreadyBuilding(CUnit *unit, CUnitType *type, int x, int y)
 	CUnit *table[UnitMax];
 	int n;
 
-	n = UnitCacheOnTile(x, y, table);
+	n = UnitCacheOnTile(x, y, table, UnitMax);
 	for (int i = 0; i < n; ++i) {
 		if (!table[i]->Destroyed && table[i]->Type == type &&
 				(table[i]->Player == unit->Player || unit->IsAllied(table[i])) &&

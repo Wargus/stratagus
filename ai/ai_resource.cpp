@@ -116,7 +116,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type, int x, 
 	//
 	// Select all units in range.
 	//
-	n = UnitCacheSelect(x - range, y - range, x + range, y + range, table);
+	n = UnitCacheSelect(x - range, y - range, x + range, y + range, table, UnitMax);
 
 	//
 	// Find the enemy units which can attack
@@ -181,7 +181,7 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building)
 	//
 	// Remove all workers on the way building something
 	//
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table, UnitMax);
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		for (x = 0; x < unit->OrderCount; ++x) {
@@ -232,7 +232,7 @@ static int AiTrainUnit(const CUnitType *type, CUnitType *what)
 	//
 	// Remove all units already doing something.
 	//
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table, UnitMax);
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (unit->IsIdle()) {
@@ -606,7 +606,7 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	// FIXME: too many workers repair the same building!
 
 	// Selection of mining workers.
-	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
+	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table, UnitMax);
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (unit->Type->RepairRange &&

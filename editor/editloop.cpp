@@ -310,7 +310,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 		int n;
 		CUnit *table[UnitMax];
 
-		n = UnitCacheOnTile(x, y, table);
+		n = UnitCacheOnTile(x, y, table, UnitMax);
 		while (n--) {
 			if (table[n]->Type == b->Parent) {
 				// We capture the value of what is beneath.

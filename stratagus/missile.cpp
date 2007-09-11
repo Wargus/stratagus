@@ -586,12 +586,13 @@ static int MissileDrawLevelCompare(const void *v1, const void *v2)
 /**
 **  Sort visible missiles on map for display.
 **
-**  @param vp     Viewport pointer.
-**  @param table  OUT : array of missile to display sorted by DrawLevel.
+**  @param vp         Viewport pointer.
+**  @param table      OUT : array of missile to display sorted by DrawLevel.
+**  @param tablesize  Size of table array
 **
-**  @return       number of missiles, (size of table).
+**  @return           number of missiles returned in table
 */
-int FindAndSortMissiles(const CViewport *vp, Missile **table)
+int FindAndSortMissiles(const CViewport *vp, Missile **table, int tablesize)
 {
 	int nmissiles;
 	std::vector<Missile *>::const_iterator i;
@@ -600,7 +601,7 @@ int FindAndSortMissiles(const CViewport *vp, Missile **table)
 	// Loop through global missiles, then through locals.
 	//
 	nmissiles = 0;
-	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
+	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end() && nmissiles < tablesize; ++i) {
 		if ((*i)->Delay || (*i)->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -610,7 +611,7 @@ int FindAndSortMissiles(const CViewport *vp, Missile **table)
 		}
 	}
 
-	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
+	for (i = LocalMissiles.begin(); i != LocalMissiles.end() && nmissiles < tablesize; ++i) {
 		if ((*i)->Delay || (*i)->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -871,7 +872,7 @@ void MissileHit(Missile *missile)
 	// Hits all units in range.
 	//
 	i = missile->Type->Range;
-	n = UnitCacheSelect(x - i + 1, y - i + 1, x + i, y + i, table);
+	n = UnitCacheSelect(x - i + 1, y - i + 1, x + i, y + i, table, UnitMax);
 	Assert(missile->SourceUnit != NULL);
 	for (i = 0; i < n; ++i) {
 		goal = table[i];

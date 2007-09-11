@@ -88,15 +88,16 @@ void UnitCacheRemove(CUnit *unit)
 /**
 **  Select units in rectangle range.
 **
-**  @param x1     Left column of selection rectangle
-**  @param y1     Top row of selection rectangle
-**  @param x2     Right column of selection rectangle
-**  @param y2     Bottom row of selection rectangle
-**  @param table  All units in the selection rectangle
+**  @param x1         Left column of selection rectangle
+**  @param y1         Top row of selection rectangle
+**  @param x2         Right column of selection rectangle
+**  @param y2         Bottom row of selection rectangle
+**  @param table      All units in the selection rectangle
+**  @param tablesize  Size of table array
 **
-**  @return       Returns the number of units found
+**  @return           Returns the number of units found
 */
-int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
+int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table, int tablesize)
 {
 	int i;
 	int j;
@@ -106,7 +107,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 
 	// Optimize small searches.
 	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
-		return UnitCacheOnTile(x1, y1, table);
+		return UnitCacheOnTile(x1, y1, table, tablesize);
 	}
 
 	//
@@ -126,10 +127,10 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 	}
 
 	n = 0;
-	for (i = y1; i < y2; ++i) {
+	for (i = y1; i < y2 && n < tablesize; ++i) {
 		mf = Map.Field(x1, i);
-		for (j = x1; j < x2; ++j) {
-			for (size_t k = 0, end = mf->UnitCache.size(); k < end; ++k) {
+		for (j = x1; j < x2 && n < tablesize; ++j) {
+			for (size_t k = 0, end = mf->UnitCache.size(); k < end && n < tablesize; ++k) {
 				//
 				// To avoid getting a unit in multiple times we use a cache lock.
 				// It should only be used in here, unless you somehow want the unit
@@ -159,13 +160,14 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table)
 /**
 **  Select units on map tile.
 **
-**  @param x      Map X tile position
-**  @param y      Map Y tile position
-**  @param table  All units in the selection rectangle
+**  @param x          Map X tile position
+**  @param y          Map Y tile position
+**  @param table      All units in the selection rectangle
+**  @param tablesize  Size of table array
 **
 **  @return       Returns the number of units found
 */
-int UnitCacheOnTile(int x, int y, CUnit **table)
+int UnitCacheOnTile(int x, int y, CUnit **table, int tablesize)
 {
 	//
 	// Unlike in UnitCacheSelect, there's no way a unit can show up twice,
@@ -175,7 +177,7 @@ int UnitCacheOnTile(int x, int y, CUnit **table)
 	CMapField *mf = Map.Field(x, y);
 	std::vector<CUnit *>::iterator i, end;
 
-	for (i = mf->UnitCache.begin(), end = mf->UnitCache.end(); i != end; ++i) {
+	for (i = mf->UnitCache.begin(), end = mf->UnitCache.end(); i != end && n < tablesize; ++i) {
 		Assert(!(*i)->Removed);
 		table[n++] = *i;
 	}
