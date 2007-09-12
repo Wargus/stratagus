@@ -66,9 +66,6 @@ void InitConstructions(void)
 
 /**
 **  Load the graphics for the constructions.
-**
-**  HELPME: who make this better terrain depended and extendable
-**  HELPME: filename constuction.
 */
 void LoadConstructions(void)
 {
