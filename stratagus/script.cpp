@@ -968,11 +968,11 @@ int EvalNumber(const NumberDesc *number)
 		case ENumber_Min :     // a <= b ? a : b
 			a = EvalNumber(number->D.BinOp.Left);
 			b = EvalNumber(number->D.BinOp.Right);
-			return (a <= b ? a : b);
+			return std::min(a, b);
 		case ENumber_Max :     // a >= b ? a : b
 			a = EvalNumber(number->D.BinOp.Left);
 			b = EvalNumber(number->D.BinOp.Right);
-			return (a >= b ? a : b);
+			return std::max(a, b);
 		case ENumber_Gt  :     // a > b  ? 1 : 0
 			a = EvalNumber(number->D.BinOp.Left);
 			b = EvalNumber(number->D.BinOp.Right);

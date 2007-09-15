@@ -63,12 +63,6 @@
 #include "actions.h"
 
 /*----------------------------------------------------------------------------
--- Definitons
-----------------------------------------------------------------------------*/
-static inline int s_min(int a, int b) { return a < b ? a : b; }
-static inline int s_max(int a, int b) { return a > b ? a : b; }
-
-/*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
@@ -478,18 +472,18 @@ int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	//  Avoid div by 0 errors too!
 	castcount = 0;
 	if (hp) {
-		castcount = s_max(castcount, diffHP / abs(hp) + (((hp < 0) &&
+		castcount = std::max(castcount, diffHP / abs(hp) + (((hp < 0) &&
 			(diffHP % (-hp) > 0)) ? 1 : 0));
 	}
 	if (mana) {
-		castcount = s_max(castcount, diffMana / abs(mana) + (((mana < 0) &&
+		castcount = std::max(castcount, diffMana / abs(mana) + (((mana < 0) &&
 			(diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
-		castcount = s_min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
+		castcount = std::min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
 	}
 	if (this->MaxMultiCast) {
-		castcount = s_min(castcount, this->MaxMultiCast);
+		castcount = std::min(castcount, this->MaxMultiCast);
 	}
 
 	caster->Variable[MANA_INDEX].Value -= castcount * manacost;

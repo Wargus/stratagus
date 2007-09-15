@@ -282,14 +282,14 @@ static int SpecificEfficiency(int type, CPlayer *p)
 	if (p->RequestedUtilizationRate[type] == 0) {
 		return 100;
 	}
-	return std::min<int>((100 * AvailableResourcesRate(type, p) +
+	return std::min((100 * AvailableResourcesRate(type, p) +
 		p->RequestedUtilizationRate[type] / 2) / p->RequestedUtilizationRate[type], 100);
 }
 
 // base efficiency = min(f(energy), f(magma))
 static int BaseEfficiency(CPlayer *p)
 {
-	return std::min<int>(SpecificEfficiency(EnergyCost, p), SpecificEfficiency(MagmaCost, p));
+	return std::min(SpecificEfficiency(EnergyCost, p), SpecificEfficiency(MagmaCost, p));
 }
 
 // total p(type) - total requested(type) * base efficiency
@@ -319,7 +319,7 @@ static int UniqueNeeds(int type, CPlayer *p)
 static int UniqueEfficiency(int type, CPlayer *p)
 {
 	int be = BaseEfficiency(p);
-	return std::min<int>(ExtraProduction(type, p, be) / UniqueNeeds(type, p) + be, 100);
+	return std::min(ExtraProduction(type, p, be) / UniqueNeeds(type, p) + be, 100);
 }
 
 static int MaxRate(CUnit *unit, int res)

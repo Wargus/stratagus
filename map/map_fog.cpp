@@ -34,24 +34,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
 #include "player.h"
 #include "unittype.h"
 #include "unit.h"
 #include "map.h"
-#include "tileset.h"
-#include "minimap.h"
-#include "font.h"
 #include "ui.h"
 #include "../video/intern_video.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -91,7 +80,6 @@ static CGraphic *AlphaFogG;
 */
 unsigned short CMap::IsTileVisible(const CPlayer *player, int x, int y) const
 {
-	int i;
 	unsigned short visiontype;
 	unsigned short *visible;
 
@@ -108,7 +96,7 @@ unsigned short CMap::IsTileVisible(const CPlayer *player, int x, int y) const
 		return 0;
 	}
 
-	for (i = 0; i < PlayerMax ; ++i) {
+	for (int i = 0; i < PlayerMax ; ++i) {
 		if (player->SharedVision & (1 << i) &&
 				(Players[i].SharedVision & (1 << player->Index))) {
 			if (visible[i] > 1) {
@@ -217,6 +205,7 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 			if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
 				Map.MarkSeenTile(x, y);
 			}
+            // FALL THROUGH
 		default:  // seen -> seen
 			--*v;
 			break;
@@ -331,18 +320,12 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 */
 void UpdateFogOfWarChange(void)
 {
-	int x;
-	int y;
-	int w;
-
-	DebugPrint("\n");
 	//
 	//  Mark all explored fields as visible again.
 	//
 	if (Map.NoFogOfWar) {
-		w = Map.Info.MapWidth;
-		for (y = 0; y < Map.Info.MapHeight; ++y) {
-			for (x = 0; x < Map.Info.MapWidth; ++x) {
+		for (int y = 0; y < Map.Info.MapHeight; ++y) {
+			for (int x = 0; x < Map.Info.MapWidth; ++x) {
 				if (Map.IsFieldExplored(ThisPlayer, x, y)) {
 					Map.MarkSeenTile(x, y);
 				}
@@ -352,7 +335,7 @@ void UpdateFogOfWarChange(void)
 	//
 	//  Global seen recount.
 	//
-	for (x = 0; x < NumUnits; ++x) {
+	for (int x = 0; x < NumUnits; ++x) {
 		UnitCountSeen(Units[x]);
 	}
 }
@@ -533,15 +516,11 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 */
 void CViewport::DrawMapFogOfWar() const
 {
-	int sx;
-	int sy;
-	int dx;
-	int ex;
-	int dy;
-	int ey;
+	int sx, sy;
+	int dx, dy;
+	int ex, ey;
 	int p;
-	int my;
-	int mx;
+	int mx, my;
 
 	// flags must redraw or not
 	if (ReplayRevealMap) {
@@ -549,30 +528,20 @@ void CViewport::DrawMapFogOfWar() const
 	}
 	p = ThisPlayer->Index;
 
-	sx = MapX - 1;
-	if (sx < 0) {
-		sx = 0;
-	}
-	ex = MapX + MapWidth + 1;
-	if (ex > Map.Info.MapWidth) {
-		ex = Map.Info.MapWidth;
-	}
-	my = MapY - 1;
-	if (my < 0) {
-		my = 0;
-	}
-	ey = MapY + MapHeight + 1;
-	if (ey > Map.Info.MapHeight) {
-		ey = Map.Info.MapHeight;
-	}
-	// Update for visibility all tile in viewport
+    sx = std::max(MapX - 1, 0);
+    ex = std::min(MapX + MapWidth + 1, Map.Info.MapWidth);
+    my = std::max(MapY - 1, 0);
+    ey = std::min(MapY + MapHeight + 1, Map.Info.MapHeight);
+
+    // Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 	for (; my < ey; ++my) {
 		for (mx = sx; mx < ex; ++mx) {
 			VisibleTable[my * Map.Info.MapWidth + mx] = Map.IsTileVisible(ThisPlayer, mx, my);
 		}
 	}
-	ex = EndX;
+
+    ex = EndX;
 	sy = MapY * Map.Info.MapWidth;
 	dy = Y - OffsetY;
 	ey = EndY;
@@ -726,7 +695,7 @@ void InitVisionTable(void)
 	VisionTable[2] = new unsigned char[MaxMapWidth * MaxMapWidth];
 
 	VisionLookup = new int[MaxMapWidth + 2];
-#ifndef SQUAREVISION
+
 	visionlist = new int[MaxMapWidth * MaxMapWidth];
 	//*2 as diagonal distance is longer
 
@@ -803,44 +772,6 @@ void InitVisionTable(void)
 	}
 
 	delete[] visionlist;
-#else
-	// Find maximum distance in corner of map.
-	maxsize = MaxMapWidth;
-	maxsearchsize = isqrt(MaxMapWidth / 2);
-	// Mark 1, It's a special case
-	// Only Horizontal is marked
-	VisionTable[0][0] = 1;
-	VisionTable[1][0] = 0;
-	VisionTable[2][0] = 0;
-	VisionTable[0][1] = 1;
-	VisionTable[1][1] = 1;
-	VisionTable[2][1] = 0;
-
-	// Mark VisionLookup
-	VisionLookup[0] = 0;
-	VisionLookup[1] = 0;
-	i = 2;
-	VisionTablePosition = 1;
-	while (i <= maxsearchsize) {
-		++VisionTablePosition;
-		VisionLookup[i] = VisionTablePosition;
-		// Setup Vision Start
-		VisionTable[0][VisionTablePosition] = i;
-		VisionTable[1][VisionTablePosition] = 0;
-		VisionTable[2][VisionTablePosition] = 0;
-		// Do Horizontal
-		++VisionTablePosition;
-		VisionTable[0][VisionTablePosition] = i;
-		VisionTable[1][VisionTablePosition] = 1;
-		VisionTable[2][VisionTablePosition] = 0;
-		// Do Vertical
-		++VisionTablePosition;
-		VisionTable[0][VisionTablePosition] = i - 1;
-		VisionTable[1][VisionTablePosition] = 0;
-		VisionTable[2][VisionTablePosition] = 1;
-		i++;
-	}
-#endif
 }
 
 /**

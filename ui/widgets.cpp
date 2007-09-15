@@ -242,8 +242,8 @@ void MyOpenGLGraphics::drawImage(const gcn::Image* image, int srcX, int srcY,
 	int dstX, int dstY, int width, int height)
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
-	int right = (r.x + r.width - 1 < Video.Width) ? r.x + r.width - 1 : Video.Width - 1;
-	int bottom = (r.y + r.height - 1 < Video.Height) ? r.y + r.height - 1 : Video.Height - 1;
+	int right = std::min(r.x + r.width - 1, Video.Width - 1);
+	int bottom = std::min(r.y + r.height - 1, Video.Height - 1);
 
 	if (r.x > right || r.y > bottom) {
 		return;
@@ -284,10 +284,10 @@ void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle& rectangle)
 		return;
 	}
 
-	int x1 = area.x > top.x ? area.x : top.x;
-	int y1 = area.y > top.y ? area.y : top.y;
-	int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
-	int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
+	int x1 = std::max(area.x, top.x);
+	int y1 = std::max(area.y, top.y);
+	int x2 = std::min(area.x + area.width, top.x + top.width);
+	int y2 = std::min(area.y + area.height, top.y + top.height);
 
 	Video.DrawTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
 		x1, y1, x2 - x1, y2 - y1, mColor.a);
@@ -306,10 +306,10 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
 		return;
 	}
 
-	int x1 = area.x > top.x ? area.x : top.x;
-	int y1 = area.y > top.y ? area.y : top.y;
-	int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
-	int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
+	int x1 = std::max(area.x, top.x);
+	int y1 = std::max(area.y, top.y);
+	int x2 = std::min(area.x + area.width, top.x + top.width);
+	int y2 = std::min(area.y + area.height, top.y + top.height);
 
 	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
 		x1, y1, x2 - x1, y2 - y1, c.a);
