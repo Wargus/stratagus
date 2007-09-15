@@ -33,15 +33,8 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <string.h>
-
 #include "stratagus.h"
 #include "map.h"
-#include "tileset.h"
-#include "player.h"
-#include "unit.h"
-#include "ui.h"
 #include "iolib.h"
 #include "version.h"
 
@@ -54,16 +47,12 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Save the complete map.
+**  Save the complete map.
 **
-** @param file Output file.
+**  @param file  Output file.
 */
 void CMap::Save(CFile *file) const
 {
-	int w;
-	int h;
-	int i;
-
 	file->printf("\n--- -----------------------------------------\n");
 	file->printf("--- MODULE: map $Id$\n");
 
@@ -82,14 +71,14 @@ void CMap::Save(CFile *file) const
 	file->printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
 
 	file->printf("  \"map-fields\", {\n");
-	for (h = 0; h < this->Info.MapHeight; ++h) {
+	for (int h = 0; h < this->Info.MapHeight; ++h) {
 		file->printf("  -- %d\n", h);
-		for (w = 0; w < this->Info.MapWidth; ++w) {
+		for (int w = 0; w < this->Info.MapWidth; ++w) {
 			CMapField* mf;
 
 			mf = this->Field(w, h);
 			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
-			for (i = 0; i < PlayerMax; ++i) {
+			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf->Visible[i] == 1) {
 					file->printf(" \"explored\", %d,", i);
 				}

@@ -388,11 +388,11 @@ extern void LoadStratagusMapInfo(const std::string &mapname);
 extern void FreeMapInfo(CMapInfo *info);
 
 	/// Returns true, if the unit-type(mask can enter field with bounds check
-extern int CheckedCanMoveToMask(int x, int y, int mask);
+extern bool CheckedCanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
-extern int UnitTypeCanBeAt(const CUnitType *type, int x, int y);
+extern bool UnitTypeCanBeAt(const CUnitType *type, int x, int y);
 	/// Returns true, if the unit can enter the field
-extern int UnitCanBeAt(const CUnit *unit, int x, int y);
+extern bool UnitCanBeAt(const CUnit *unit, int x, int y);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);

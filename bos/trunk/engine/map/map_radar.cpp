@@ -9,7 +9,7 @@
 //
 /**@name map_radar.cpp - The map radar handling. */
 //
-//      (c) Copyright 2004-2006 by Russell Smith and Jimmy Salmon.
+//      (c) Copyright 2004-2007 by Russell Smith and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,19 +33,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
 #include "player.h"
 #include "unittype.h"
 #include "unit.h"
 #include "map.h"
-#include "tileset.h"
-#include "minimap.h"
-#include "font.h"
-#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
