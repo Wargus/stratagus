@@ -1146,22 +1146,13 @@ void CGraphic::Resize(int w, int h)
 			}
 		}
 
+		int Rmask = Surface->format->Rmask;
+		int Gmask = Surface->format->Gmask;
+		int Bmask = Surface->format->Bmask;
+		int Amask = Surface->format->Amask;
+
 		SDL_UnlockSurface(Surface);
 		SDL_FreeSurface(Surface);
-
-		int Rmask, Gmask, Bmask, Amask;
-		if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
-			Rmask = 0x000000FF;
-			Gmask = 0x0000FF00;
-			Bmask = 0x00FF0000;
-			Amask = (bpp == 4) ? 0xFF000000 : 0;
-		} else {
-			int s = (bpp == 4) ? 0 : 8;
-			Rmask = 0xFF000000 >> s;
-			Gmask = 0x00FF0000 >> s;
-			Bmask = 0x0000FF00 >> s;
-			Amask = 0x000000FF >> s;
-		}
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
 			Rmask, Gmask, Bmask, Amask);
