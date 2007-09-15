@@ -9,7 +9,7 @@
 //
 /**@name script_tileset.cpp - The tileset ccl functions. */
 //
-//      (c) Copyright 2000-2006 by Lutz Sammer, Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2000-2007 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,7 +35,6 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "stratagus.h"
 #include "script.h"
@@ -94,13 +93,11 @@ static void ExtendTilesetTables(CTileset *tileset, int oldtiles, int newtiles)
 */
 static int TilesetParseName(lua_State *l, CTileset *tileset)
 {
-	char *ident;
-	int i;
+	const char *ident;
 	
-	ident = new_strdup(LuaToString(l, -1));
-	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
+	ident = LuaToString(l, -1);
+	for (int i = 0; i < tileset->NumTerrainTypes; ++i) {
 		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
-			delete[] ident;
 			return i;
 		}
 	}
@@ -110,10 +107,10 @@ static int TilesetParseName(lua_State *l, CTileset *tileset)
 	memcpy(s, tileset->SolidTerrainTypes, tileset->NumTerrainTypes * sizeof(SolidTerrainInfo));
 	delete[] tileset->SolidTerrainTypes;
 	tileset->SolidTerrainTypes = s;
-	tileset->SolidTerrainTypes[tileset->NumTerrainTypes].TerrainName = ident;
+	tileset->SolidTerrainTypes[tileset->NumTerrainTypes].TerrainName = new_strdup(ident);
 	++tileset->NumTerrainTypes;
 	
-	return i;
+	return tileset->NumTerrainTypes - 1;
 }
 
 /**
@@ -335,7 +332,6 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 	const char *value;
 	int index;
 	int args;
-	int j;
 
 	index = 0;
 	tileset->Table = new unsigned short[16];
@@ -365,7 +361,7 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 	//  Parse the list: (still everything could be changed!)
 	//
 	args = luaL_getn(l, t);
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, t, j + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
@@ -399,9 +395,7 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 */
 static int CclDefineTileset(lua_State *l)
 {
-	const char *value;
 	int args;
-	int j;
 
 	Map.Tileset.Clear();
 
@@ -412,8 +406,8 @@ static int CclDefineTileset(lua_State *l)
 	//  Parse the list: (still everything could be changed!)
 	//
 	args = lua_gettop(l);
-	for (j = 1; j < args; ++j) {
-		value = LuaToString(l, j);
+	for (int j = 1; j < args; ++j) {
+		const char *value = LuaToString(l, j);
 		++j;
 
 		if (!strcmp(value, "name")) {

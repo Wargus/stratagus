@@ -34,20 +34,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "stratagus.h"
 #include "unittype.h"
 #include "map.h"
-#include "tileset.h"
 #include "minimap.h"
 #include "player.h"
 #include "unit.h"
-#include "pathfinder.h"
 #include "ui.h"
-#include "editor.h"
 #include "script.h"
 
 /*----------------------------------------------------------------------------
@@ -71,18 +66,13 @@ char CurrentMapPath[1024];       /// Path of the current map
 */
 void CMap::MarkSeenTile(int x, int y)
 {
-	int tile;
-	int seentile;
-	CMapField *mf;
+	CMapField *mf = this->Field(x, y);
 
-	mf = this->Fields + x + y * this->Info.MapWidth;
-	//
-	//  Nothing changed? Seeing already the correct tile.
-	//
-	if ((tile = mf->Tile) == (seentile = mf->SeenTile)) {
+	// Nothing changed? Already seeing the correct tile.
+	if (mf->Tile == mf->SeenTile) {
 		return;
 	}
-	mf->SeenTile = tile;
+	mf->SeenTile = mf->Tile;
 
 	UI.Minimap.UpdateXY(x, y);
 }
@@ -93,15 +83,13 @@ void CMap::MarkSeenTile(int x, int y)
 void CMap::Reveal(void)
 {
 	int x;
-	int y;
-	int p;  // iterator on player.
 
 	//
 	//  Mark every explored tile as visible. 1 turns into 2.
 	//
 	for (x = 0; x < this->Info.MapWidth; ++x) {
-		for (y = 0; y < this->Info.MapHeight; ++y) {
-			for (p = 0; p < PlayerMax; ++p) {
+		for (int y = 0; y < this->Info.MapHeight; ++y) {
+			for (int p = 0; p < PlayerMax; ++p) {
 				if (!this->Field(x, y)->Visible[p]) {
 					this->Field(x, y)->Visible[p] = 1;
 				}
@@ -117,7 +105,7 @@ void CMap::Reveal(void)
 		//  Reveal neutral buildings. Gold mines:)
 		//
 		if (Units[x]->Player->Type == PlayerNeutral) {
-			for (p = 0; p < PlayerMax; ++p) {
+			for (int p = 0; p < PlayerMax; ++p) {
 				if (Players[p].Type != PlayerNobody &&
 						(!(Units[x]->Seen.ByPlayer & (1 << p)))) {
 					UnitGoesOutOfFog(Units[x], Players + p);
@@ -171,10 +159,10 @@ bool CMap::CoastOnMap(int tx, int ty) const
 **
 **  @return      True if could be entered, false otherwise.
 */
-int CheckedCanMoveToMask(int x, int y, int mask)
+bool CheckedCanMoveToMask(int x, int y, int mask)
 {
 	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
-		return 0;
+		return false;
 	}
 
 	return !(Map.Field(x, y)->Flags & mask);
@@ -189,22 +177,17 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 **
 **  @return      True if could be entered, false otherwise.
 */
-int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
+bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 {
-	int addx;  // iterator
-	int addy;  // iterator
-	int mask;  // movement mask of the unit.
-
 	Assert(type);
-	mask = type->MovementMask;
-	for (addx = 0; addx < type->TileWidth; addx++) {
-		for (addy = 0; addy < type->TileHeight; addy++) {
-			if (!CheckedCanMoveToMask(x + addx, y + addy, mask)) {
-				return 0;
+	for (int addx = 0; addx < type->TileWidth; ++addx) {
+		for (int addy = 0; addy < type->TileHeight; ++addy) {
+			if (!CheckedCanMoveToMask(x + addx, y + addy, type->MovementMask)) {
+				return false;
 			}
 		}
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -216,7 +199,7 @@ int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 **
 **  @return      True if could be placeded, false otherwise.
 */
-int UnitCanBeAt(const CUnit *unit, int x, int y)
+bool UnitCanBeAt(const CUnit *unit, int x, int y)
 {
 	Assert(unit);
 	return UnitTypeCanBeAt(unit->Type, x, y);
@@ -227,13 +210,9 @@ int UnitCanBeAt(const CUnit *unit, int x, int y)
 */
 void PreprocessMap(void)
 {
-	int ix;
-	int iy;
-	CMapField *mf;
-
-	for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
-		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			mf = Map.Field(ix, iy);
+	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
+		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
+			CMapField *mf = Map.Field(ix, iy);
 			mf->SeenTile = mf->Tile;
 		}
 	}

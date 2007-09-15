@@ -9,7 +9,7 @@
 //
 /**@name map_draw.cpp - The map drawing. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,17 +33,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stratagus.h"
 #include "unit.h"
 #include "tileset.h"
 #include "video.h"
 #include "map.h"
-#include "player.h"
-#include "pathfinder.h"
 #include "ui.h"
 #include "missile.h"
 #include "unittype.h"
