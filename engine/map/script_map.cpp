@@ -35,20 +35,17 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "stratagus.h"
 #include "unit.h"
-#include "unittype.h"
 #include "script.h"
 #include "map.h"
 #include "tileset.h"
 #include "minimap.h"
-#include "actions.h"
-#include "results.h"
 #include "ui.h"
 #include "player.h"
 #include "iolib.h"
+#include "video.h"
 #include "version.h"
 
 /*----------------------------------------------------------------------------
@@ -245,37 +242,6 @@ static int CclCenterMap(lua_State *l)
 }
 
 /**
-**  Show Map Location
-**
-**  @param l  Lua state.
-*/
-static int CclShowMapLocation(lua_State *l)
-{
-	CUnit *target;
-	const char *unitname;
-
-	// Put a unit on map, use its properties, except for
-	// what is listed below
-
-	LuaCheckArgs(l, 4);
-	unitname = LuaToString(l, 5);
-	target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
-	if (target != NoUnitP) {
-		target->Orders[0]->Action = UnitActionStill;
-		target->Variable[HP_INDEX].Value = 0;
-		target->X = LuaToNumber(l, 1);
-		target->Y = LuaToNumber(l, 2);
-		target->TTL = GameCycle + LuaToNumber(l, 4);
-		target->CurrentSightRange = LuaToNumber(l, 3);
-		MapMarkUnitSight(target);
-	} else {
-		DebugPrint("Unable to allocate Unit");
-	}
-
-	return 0;
-}
-
-/**
 **  Set fog of war on/off.
 **
 **  @param l  Lua state.
@@ -463,7 +429,6 @@ void MapCclRegister(void)
 	lua_register(Lua, "StratagusMap", CclStratagusMap);
 	lua_register(Lua, "RevealMap", CclRevealMap);
 	lua_register(Lua, "CenterMap", CclCenterMap);
-	lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
 
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
