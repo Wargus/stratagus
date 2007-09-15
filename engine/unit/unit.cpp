@@ -1837,21 +1837,17 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 			this->DistanceType == GreaterThan ||
 			this->DistanceType == Equal ||
 			this->DistanceType == NotEqual) {
-		x1 = x - this->Distance > 0 ? x - this->Distance : 0;
-		y1 = y - this->Distance > 0 ? y - this->Distance : 0;
-		x2 = x + type->TileWidth + this->Distance < Map.Info.MapWidth ?
-			x + type->TileWidth + this->Distance : Map.Info.MapWidth;
-		y2 = y + type->TileHeight + this->Distance < Map.Info.MapHeight ?
-			y + type->TileHeight + this->Distance : Map.Info.MapHeight;
+		x1 = std::max(x - this->Distance, 0);
+		y1 = std::max(y - this->Distance, 0);
+		x2 = std::min(x + type->TileWidth + this->Distance, Map.Info.MapWidth);
+		y2 = std::min(y + type->TileHeight + this->Distance, Map.Info.MapHeight);
 		distance = this->Distance;
 	} else if (this->DistanceType == LessThan ||
 			this->DistanceType == GreaterThanEqual) {
-		x1 = x - this->Distance - 1 > 0 ? x - this->Distance - 1 : 0;
-		y1 = y - this->Distance - 1 > 0 ? y - this->Distance - 1 : 0;
-		x2 = x + type->TileWidth + this->Distance + 1 < Map.Info.MapWidth ?
-			x + type->TileWidth + this->Distance + 1 : Map.Info.MapWidth;
-		y2 = y + type->TileHeight + this->Distance + 1 < Map.Info.MapHeight ?
-			y + type->TileHeight + this->Distance + 1 : Map.Info.MapHeight;
+		x1 = std::max(x - this->Distance - 1, 0);
+		y1 = std::max(y - this->Distance - 1, 0);
+		x2 = std::min(x + type->TileWidth + this->Distance + 1, Map.Info.MapWidth);
+		y2 = std::min(y + type->TileHeight + this->Distance + 1, Map.Info.MapHeight);
 		distance = this->Distance - 1;
 	}
 	n = UnitCacheSelect(x1, y1, x2, y2, table, UnitMax);
@@ -2149,8 +2145,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 
 	destx = x;
 	desty = y;
-	size = (Map.Info.MapWidth * Map.Info.MapHeight / 4 < range * range * 5) ?
-		Map.Info.MapWidth * Map.Info.MapHeight / 4 : range * range * 5;
+	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
 	points = new p[size];
 
 	bestd = 99999;

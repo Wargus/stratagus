@@ -1186,8 +1186,7 @@ void CInfoPanel::Draw(void)
 			//  If there are more units selected draw their pictures and a health bar
 			//
 			DrawInfoPanelBackground(0);
-			for (i = 0; i < (NumSelected > (int)UI.SelectedButtons.size() ?
-					(int)UI.SelectedButtons.size() : NumSelected); ++i) {
+			for (i = 0; i < std::min(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
 				Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer,
 					UI.SelectedButtons[i].Style,
 					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?

@@ -70,8 +70,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 	sy2 = sy;
 	for (j = 0; j < th; ++j) {
 		minh = sy2 / GLMaxTextureSize * GLMaxTextureSize;
-		maxh = minh + GLMaxTextureSize > g->GraphicHeight ?
-			g->GraphicHeight : minh + GLMaxTextureSize;
+		maxh = std::min(minh + GLMaxTextureSize, g->GraphicHeight);
 		if (sy > minh) {
 			h = ey - sy;
 		} else {
@@ -84,8 +83,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 		sx2 = sx;
 		for (i = 0; i < tw; ++i) {
 			minw = sx2 / GLMaxTextureSize * GLMaxTextureSize;
-			maxw = minw + GLMaxTextureSize > g->GraphicWidth ?
-				g->GraphicWidth : minw + GLMaxTextureSize;
+			maxw = std::min(minw + GLMaxTextureSize, g->GraphicWidth);
 			if (sx > minw) {
 				w = ex - sx;
 			} else {

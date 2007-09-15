@@ -99,8 +99,8 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 	int x, int y)
 {
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
-	int right = (r.x + r.width - 1 < Video.Width) ? r.x + r.width - 1 : Video.Width - 1;
-	int bottom = (r.y + r.height - 1 < Video.Height) ? r.y + r.height - 1 : Video.Height - 1;
+	int right = std::min(r.x + r.width - 1, Video.Width - 1);
+	int bottom = std::min(r.y + r.height - 1, Video.Height - 1);
 
 	if (r.x > right || r.y > bottom) {
 		return;

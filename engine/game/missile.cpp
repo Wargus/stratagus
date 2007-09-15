@@ -306,8 +306,7 @@ static int CalculateDamageStats(const CUnitStats *attacker_stats,
 	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value;
 	piercing_damage = attacker_stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 
-	damage = (basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) > 1 ?
-		(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) : 1;
+	damage = std::max(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value, 1);
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);

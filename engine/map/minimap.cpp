@@ -665,7 +665,7 @@ int CMinimap::Screen2MapX(int x)
 	if (tx < 0) {
 		return 0;
 	}
-	return tx < Map.Info.MapWidth ? tx : Map.Info.MapWidth - 1;
+	return std::min(tx, Map.Info.MapWidth - 1);
 }
 
 /**
@@ -683,7 +683,7 @@ int CMinimap::Screen2MapY(int y)
 	if (ty < 0) {
 		return 0;
 	}
-	return ty < Map.Info.MapHeight ? ty : Map.Info.MapHeight - 1;
+	return std::min(ty, Map.Info.MapHeight - 1);
 }
 
 /**

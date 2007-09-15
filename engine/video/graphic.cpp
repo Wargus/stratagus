@@ -851,10 +851,8 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	ckey = f->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	maxw = g->GraphicWidth - ow > GLMaxTextureSize ?
-		GLMaxTextureSize : g->GraphicWidth - ow;
-	maxh = g->GraphicHeight - oh > GLMaxTextureSize ?
-		GLMaxTextureSize : g->GraphicHeight - oh;
+	maxw = std::min(g->GraphicWidth - ow, GLMaxTextureSize);
+	maxh = std::min(g->GraphicHeight - oh, GLMaxTextureSize);
 	w = PowerOf2(maxw);
 	h = PowerOf2(maxh);
 	tex = new unsigned char[w * h * 4];
