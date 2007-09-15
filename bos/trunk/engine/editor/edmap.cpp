@@ -652,7 +652,7 @@ void CEditor::CreateRandomMap(void) const
 {
 	int mz;
 
-	mz = Map.Info.MapWidth > Map.Info.MapHeight ? Map.Info.MapWidth : Map.Info.MapHeight;
+	mz = std::max(Map.Info.MapWidth, Map.Info.MapHeight);
 
 	// make water-base
 	TileFill(0, 0, WATER_TILE, mz * 3);

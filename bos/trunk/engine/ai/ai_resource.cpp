@@ -154,7 +154,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type, int x, 
 */
 int AiEnemyUnitsInDistance(const CUnit *unit, unsigned range)
 {
-	range += std::max<int>(unit->Type->TileWidth, unit->Type->TileHeight);
+	range += std::max(unit->Type->TileWidth, unit->Type->TileHeight);
 	return AiEnemyUnitsInDistance(unit->Player, unit->Type, unit->X, unit->Y, range);
 }
 

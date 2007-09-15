@@ -113,7 +113,7 @@ bool CViewport::IsInsideMapArea(int x, int y) const
 int CViewport::Viewport2MapX(int x) const
 {
 	int r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
-	return r < Map.Info.MapWidth ? r : Map.Info.MapWidth - 1;
+	return std::min(r, Map.Info.MapWidth - 1);
 }
 
 /**
@@ -128,7 +128,7 @@ int CViewport::Viewport2MapX(int x) const
 int CViewport::Viewport2MapY(int y) const
 {
 	int r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
-	return r < Map.Info.MapHeight ? r : Map.Info.MapHeight - 1;
+	return std::min(r, Map.Info.MapHeight - 1);
 }
 
 /**

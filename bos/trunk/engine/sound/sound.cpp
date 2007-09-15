@@ -527,8 +527,8 @@ void InitSoundClient(void)
 
 	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + TileSizeX) / TileSizeX;
 	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + TileSizeY) / TileSizeY;
-	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
-	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);
+	DistanceSilent = 3 * std::max(MapWidth, MapHeight);
+	ViewPointOffset = std::max(MapWidth / 2, MapHeight / 2);
 }
 
 

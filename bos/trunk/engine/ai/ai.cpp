@@ -866,16 +866,13 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 		by1 = by0 + blocker->Type->TileHeight - 1;;
 
 		// Check for collision
-#define int_min(a,b)  ((a)<(b)?(a):(b))
-#define int_max(a,b)  ((a)>(b)?(a):(b))
 		if (!((ux0 == bx1 + 1 || ux1 == bx0 - 1) &&
-					(int_max(by0, uy0) <= int_min(by1, uy1))) &&
-				!((uy0 == by1 + 1 || uy1 == by0 - 1) &&
-					(int_max(bx0, ux0) <= int_min(bx1, ux1)))) {
+				(std::max(by0, uy0) <= std::min(by1, uy1))) &&
+			!((uy0 == by1 + 1 || uy1 == by0 - 1) &&
+				(std::max(bx0, ux0) <= std::min(bx1, ux1))))
+		{
 			continue;
 		}
-#undef int_min
-#undef int_max
 
 		if (unit == blocker) {
 			continue;
