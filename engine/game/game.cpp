@@ -346,8 +346,51 @@ static void LoadMap(const std::string &filename, CMap *map)
 	ExitFatal(-1);
 }
 
+/**
+**  Set the game paused or unpaused
+**
+**  @param paused  True to pause game, false to unpause.
+*/
+void SetGamePaused(bool paused)
+{
+	GamePaused = paused;
+}
+
+/**
+**  Get the game paused or unpaused
+**
+**  @return  True if the game is paused, false otherwise
+*/
+bool GetGamePaused()
+{
+	return GamePaused;
+}
+
+/**
+**  Set the game speed
+**
+**  @param speed  New game speed.
+*/
+void SetGameSpeed(int speed)
+{
+	if (FastForwardCycle < GameCycle) {
+		VideoSyncSpeed = speed * 100 / CYCLES_PER_SECOND;
+		SetVideoSync();
+	}
+}
+
+/**
+**  Get the game speed
+**
+**  @return  Game speed
+*/
+int GetGameSpeed()
+{
+	return CYCLES_PER_SECOND * VideoSyncSpeed / 100;
+}
+
 /*----------------------------------------------------------------------------
---  Game creation
+--  Game types
 ----------------------------------------------------------------------------*/
 
 /**
@@ -475,6 +518,10 @@ static void GameTypeManTeamVsMachine(void)
 		}
 	}
 }
+
+/*----------------------------------------------------------------------------
+--  Game creation
+----------------------------------------------------------------------------*/
 
 /**
 **  CreateGame.
