@@ -1339,35 +1339,6 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 	UpdateForNewUnit(this, 1);
 }
 
-#if 0
-/**
-**  Change the owner of all units of a player.
-**
-**  @param oldplayer    Old owning player.
-**  @param newplayer    New owning player.
-*/
-static void ChangePlayerOwner(CPlayer *oldplayer, CPlayer *newplayer)
-{
-	CUnit *table[UnitMax];
-	CUnit *unit;
-	int i;
-	int n;
-
-	// NOTE: table is changed.
-	n = oldplayer->TotalNumUnits;
-	memcpy(table, oldplayer->Units, n * sizeof(CUnit *));
-	for (i = 0; i < n; ++i) {
-		unit = table[i];
-		// Don't save the unit again(can happen when inside a town hall)
-		if (unit->Player == newplayer) {
-			continue;
-		}
-		unit->ChangeOwner(newplayer);
-		unit->Blink = 5;
-		unit->RescuedFrom = oldplayer;
-	}
-}
-#endif
 
 /**
 **  Rescue units.
@@ -1426,16 +1397,6 @@ void RescueUnits(void)
 				//
 				for (i = 0; i < n; ++i) {
 					if (unit->IsAllied(around[i])) {
-#if 0
-						//
-						//  City center converts complete player
-						//  FIXME: what unit should we use here?
-						//
-						if (0) {
-							ChangePlayerOwner(p, around[i]->Player);
-							break;
-						}
-#endif
 						unit->RescuedFrom = unit->Player;
 						unit->ChangeOwner(around[i]->Player);
 						unit->Blink = 5;
