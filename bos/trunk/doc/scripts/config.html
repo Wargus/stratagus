@@ -34,7 +34,6 @@
 <a href="#DefineDecorations">DefineDecorations</a>
 <a href="#DefineDefaultActions">DefineDefaultActions</a>
 <a href="#DefineDefaultIncomes">DefineDefaultIncomes</a>
-<a href="#DefineDefaultResourceAmounts">DefineDefaultResourceAmounts</a>
 <a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
 <a href="#DefineSprites">DefinesSprites</a>
 <a href="#GetVideoFullScreen">GetVideoFullScreen</a>
@@ -202,29 +201,6 @@ When collecting gold for example you get 100 gold for a single pickup.
     -- Define 7 default incomes
     -- Resources "time", "gold", "wood", "oil", "ore", "stone", "coal"
     DefineDefaultIncomes(0, 100, 100, 100, 100, 100, 100)
-</pre>
-
-<a name="DefineDefaultResourceAmounts"></a>
-<h3>DefineDefaultResourceAmounts("name", amount ...)</h3>
-
-Defines the default amounts to give to a resource producing unit when placing it for the first
-time in the editor.
-
-<dl>
-<dt>"name"</dt>
-<dd>The name of the resource for the default to be applied to</dd>
-<dt>amount</dt>
-<dd>The amount to set the default too.</dd>
-<dt><i>RETURNS</i></dt>
-<dd>Nothing</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    DefineDefaultResourceAmounts(
-        "gold", 100000,
-        "oil", 50000)
 </pre>
 
 <a name="DefineDefaultResourceNames"></a>

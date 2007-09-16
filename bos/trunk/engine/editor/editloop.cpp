@@ -324,11 +324,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 		}
 
 	}
-	if (unit != NoUnitP) {
-		if (type->CanHarvestFrom) {
-			memcpy(unit->ResourcesHeld, DefaultResourceAmounts, sizeof(unit->ResourcesHeld));
-		}
-	} else {
+	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate Unit");
 	}
 }
@@ -441,96 +437,6 @@ static void RecalculateShownUnits(void)
 	Editor.SelectedUnitIndex = -1;
 }
 
-static MenuScreen *editResourceMenu;
-static gcn::Label *editResourceLabel;
-static gcn::TextField *editResourceTextField;
-static gcn::Button *editResourceOKButton;
-static gcn::Button *editResourceCancelButton;
-
-static void CleanEditResource()
-{
-	delete editResourceMenu;
-	editResourceMenu = NULL;
-	delete editResourceLabel;
-	editResourceLabel = NULL;
-	delete editResourceTextField;
-	editResourceTextField = NULL;
-	delete editResourceOKButton;
-	editResourceOKButton = NULL;
-	delete editResourceCancelButton;
-	editResourceCancelButton = NULL;
-}
-
-class CEditResourceOKActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		int amount = atoi(editResourceTextField->getText().c_str());
-		for (int i = 0; i < MaxCosts; ++i) {
-			UnitUnderCursor->ResourcesHeld[i] = amount * CYCLES_PER_SECOND;
-		}
-		editResourceMenu->stop();
-	}
-};
-static CEditResourceOKActionListener EditResourceOKListener;
-
-class CEditResourceCancelActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		editResourceMenu->stop();
-	}
-};
-static CEditResourceCancelActionListener EditResourceCancelListener;
-
-/**
-**  Edit resource properties
-*/
-static void EditorEditResource(void)
-{
-	CleanEditResource();
-
-	editResourceMenu = new MenuScreen();
-
-	editResourceMenu->setOpaque(true);
-	editResourceMenu->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editResourceMenu->setSize(288, 128);
-	editResourceMenu->setPosition((Video.Width - editResourceMenu->getWidth()) / 2,
-		(Video.Height - editResourceMenu->getHeight()) / 2);
-	editResourceMenu->setBorderSize(1);
-	editResourceMenu->setDrawMenusUnder(false);
-
-	std::string s(std::string("Amount of ") + DefaultResourceNames[1] + ":");
-	editResourceLabel = new gcn::Label(s);
-	editResourceMenu->add(editResourceLabel, 288 / 2 - editResourceLabel->getWidth() / 2, 11);
-
-	char buf[30];
-	sprintf(buf, "%d", UnitUnderCursor->ResourcesHeld[1] / CYCLES_PER_SECOND);
-	editResourceTextField = new gcn::TextField(buf);
-	editResourceTextField->setBaseColor(gcn::Color(200, 200, 120));
-	editResourceTextField->setForegroundColor(gcn::Color(200, 200, 120));
-	editResourceTextField->setBackgroundColor(gcn::Color(38, 38, 78));
-	editResourceTextField->setSize(212, 20);
-	editResourceMenu->add(editResourceTextField, 40, 46);
-
-	editResourceOKButton = new gcn::Button(_("~!OK"));
-	editResourceOKButton->setHotKey("o");
-	editResourceOKButton->setSize(106, 28);
-	editResourceOKButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editResourceOKButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editResourceOKButton->addActionListener(&EditResourceOKListener);
-	editResourceMenu->add(editResourceOKButton, 24, 88);
-
-	editResourceCancelButton = new gcn::Button(_("~!Cancel"));
-	editResourceCancelButton->setHotKey("c");
-	editResourceCancelButton->setSize(106, 28);
-	editResourceCancelButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editResourceCancelButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editResourceCancelButton->addActionListener(&EditResourceCancelListener);
-	editResourceMenu->add(editResourceCancelButton, 154, 88);
-
-	editResourceMenu->run(false);
-}
 
 static MenuScreen *editAiMenu;
 static gcn::Label *editAiLabel;
@@ -1032,11 +938,13 @@ static void ShowUnitInfo(const CUnit *unit)
 {
 	char buf[256];
 	int i;
+	int res;
 
+	res = UnitUnderCursor->Type->ProductionCosts[0] ? 0 : 1;
 	i = sprintf(buf, "#%d '%s' Player:#%d", UnitNumber(unit),
 		unit->Type->Name.c_str(), unit->Player->Index);
 	if (unit->Type->CanHarvestFrom) {
-		sprintf(buf + i, " Amount %d", unit->ResourcesHeld[1] / CYCLES_PER_SECOND);
+		sprintf(buf + i, " Amount of %s: %d", DefaultResourceNames[res].c_str(), unit->ResourcesHeld[res] / CYCLES_PER_SECOND);
 	}
 	UI.StatusLine.Set(buf);
 }
@@ -1257,18 +1165,6 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (Editor.CursorUnitIndex != -1) {
 			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
-			return;
-		}
-	}
-
-	//
-	// Right click on a resource
-	//
-	if (Editor.State == EditorSelecting) {
-		if ((MouseButtons & RightButton && UnitUnderCursor)) {
-			if (UnitUnderCursor->Type->CanHarvestFrom) {
-				EditorEditResource();
-			}
 			return;
 		}
 	}
@@ -1935,13 +1831,14 @@ void CEditor::Init(void)
 			// Set SelectedPlayer to a valid player
 			if (Editor.SelectedPlayer == PlayerNumNeutral) {
 				Editor.SelectedPlayer = i;
+				break;
 			}
 		}
 	}
 
 	CalculateMaxIconSize();
 
-	if (StartUnitName) {
+	if (!StartUnitName.empty()) {
 		StartUnit = UnitTypeByIdent(StartUnitName);
 	}
 	Select.Icon = NULL;
@@ -2140,7 +2037,6 @@ void StartEditor(const char *filename)
 
 	CleanGame();
 	CleanPlayers();
-	CleanEditResource();
 	CleanEditAi();
 
 	SetDefaultTextColors(nc, rc);
