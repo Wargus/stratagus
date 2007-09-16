@@ -45,7 +45,6 @@
 #include "player.h"
 #include "unit.h"
 #include "actions.h"
-#include "missile.h"
 #include "sound.h"
 #include "ai.h"
 #include "interface.h"
