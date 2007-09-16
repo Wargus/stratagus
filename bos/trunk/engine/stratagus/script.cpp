@@ -551,64 +551,6 @@ static int CclListDirsInDirectory(lua_State *l)
 }
 
 /**
-**  Set the game paused or unpaused
-**
-**  @param l  Lua state.
-*/
-static int CclSetGamePaused(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_isnumber(l, 1) && !lua_isboolean(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	if (lua_isboolean(l, 1)) {
-		GamePaused = lua_toboolean(l, 1) ? true : false;
-	} else {
-		GamePaused = lua_tonumber(l, 1) ? true : false;
-	}
-	return 0;
-}
-
-/**
-**  Set the video sync speed
-**
-**  @param l  Lua state.
-*/
-static int CclSetVideoSyncSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	VideoSyncSpeed = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the game speed
-**
-**  @param l  Lua state.
-*/
-static int CclSetGameSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (FastForwardCycle < GameCycle) {
-		VideoSyncSpeed = LuaToNumber(l, 1) * 100 / CYCLES_PER_SECOND;
-		SetVideoSync();
-	}
-	return 0;
-}
-
-/**
-**  Get the game speed
-**
-**  @param l  Lua state.
-*/
-static int CclGetGameSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-	return 1;
-}
-
-/**
 **  Set the local player name
 **
 **  @param l  Lua state.
@@ -704,12 +646,11 @@ static int CclSetSpeedResourcesHarvest(lua_State *l)
 */
 static int CclSetSpeedResourcesReturn(lua_State *l)
 {
-	int i;
 	const char *resource;
 
 	LuaCheckArgs(l, 2);
 	resource = LuaToString(l, 1);
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		if (resource == DefaultResourceNames[i]) {
 			SpeedResourcesReturn[i] = LuaToNumber(l, 2);
 			return 0;
@@ -755,12 +696,11 @@ static int CclSetSpeedTrain(lua_State *l)
 */
 static int CclSetSpeeds(lua_State *l)
 {
-	int i;
 	int s;
 
 	LuaCheckArgs(l, 1);
 	s = LuaToNumber(l, 1);
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		SpeedResourcesHarvest[i] = s;
 		SpeedResourcesReturn[i] = s;
 	}
@@ -803,10 +743,8 @@ static int CclGetCompileFeature(lua_State *l)
 
 	str = LuaToString(l, 1);
 	if (CompileOptions.find(str) != std::string::npos) {
-		DebugPrint("I have %s\n" _C_ str);
 		lua_pushboolean(l, 1);
 	} else {
-		DebugPrint("I don't have %s\n" _C_ str);
 		lua_pushboolean(l, 0);
 	}
 
@@ -814,7 +752,7 @@ static int CclGetCompileFeature(lua_State *l)
 }
 
 /**
-**  Get a value from the Stratagus syncronized random number generator.
+**  Get a value from the Stratagus synchronized random number generator.
 **
 **  @param l  Lua state.
 */
@@ -824,31 +762,6 @@ static int CclSyncRand(lua_State *l)
 
 	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
 	return 1;
-}
-
-/*............................................................................
-..  Tables
-............................................................................*/
-
-/**
-**  Load a map. (Try in library path first)
-**
-**  @param l  Lua state.
-*/
-static int CclLoadMap(lua_State *l)
-{
-	const char *name;
-
-	LuaCheckArgs(l, 1);
-	name = LuaToString(l, 1);
-
-	// TODO Check if there a map has already been loaded. 
-	//  If true, memory needs to be freed.
-
-	//MAPTODO load stratagus map !!!!!!!!!!!
-
-	LuaError(l, "unknown map format");
-	return 0;
 }
 
 /*............................................................................
@@ -897,10 +810,6 @@ void InitCcl(void)
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
-	lua_register(Lua, "SetGamePaused", CclSetGamePaused);
-	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
-	lua_register(Lua, "SetGameSpeed", CclSetGameSpeed);
-	lua_register(Lua, "GetGameSpeed", CclGetGameSpeed);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
 	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
 	lua_register(Lua, "SetGodMode", CclSetGodMode);
@@ -943,27 +852,26 @@ void InitCcl(void)
 
 	EditorCclRegister();
 
-	lua_register(Lua, "LoadMap", CclLoadMap);
 	lua_register(Lua, "SyncRand", CclSyncRand);
 }
 
 /**
-** Create directories containing user settings and data.
+**  Create directories containing user settings and data.
 **
-** More specifically: logs, saved games, preferences
+**  More specifically: logs, saved games, preferences
 */
 void CreateUserDirectories(void)
 {
 	std::string directory;
 	UserDirectory = "";
 
-	#ifndef USE_WIN32
+#ifndef USE_WIN32
 	std::string s;
 	s = getenv("HOME");
 	if (!s.empty()) {
 		UserDirectory = s + "/";
 	}
-	#endif
+#endif
 	
 	UserDirectory += STRATAGUS_HOME_PATH;
 	makedir(UserDirectory.c_str(), 0777);
@@ -1006,21 +914,20 @@ void SavePreferences(void)
 */
 void LoadCcl(void)
 {
-	char *file;
 	char buf[PATH_MAX];
 
 	//
 	//  Load and evaluate configuration file
 	//
 	CclInConfigFile = 1;
-	file = LibraryFileName(CclStartFile.c_str(), buf, sizeof(buf));
+	LibraryFileName(CclStartFile.c_str(), buf, sizeof(buf));
 	if (access(buf, R_OK)) {
 		printf("Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress("Script %s\n", file);
-	LuaLoadFile(file);
+	ShowLoadProgress("Script %s\n", buf);
+	LuaLoadFile(buf);
 	CclInConfigFile = 0;
 	CclGarbageCollect(0);  // Cleanup memory after load
 }
