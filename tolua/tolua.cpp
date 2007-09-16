@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 08/18/07 15:49:02.
+** Generated automatically by tolua++-1.0.92 on 09/16/07 14:27:37.
 */
 
 #ifndef __cplusplus
@@ -16163,11 +16163,66 @@ static int tolua_set_GameRunning(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: SetGamePaused */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetGamePaused00
+static int tolua_stratagus_SetGamePaused00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isboolean(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  bool paused = ((bool)  tolua_toboolean(tolua_S,1,0));
+  {
+   SetGamePaused(paused);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetGamePaused'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetGamePaused */
+#ifndef TOLUA_DISABLE_tolua_stratagus_GetGamePaused00
+static int tolua_stratagus_GetGamePaused00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   bool tolua_ret = (bool)  GetGamePaused();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetGamePaused'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: GamePaused */
 #ifndef TOLUA_DISABLE_tolua_get_GamePaused
 static int tolua_get_GamePaused(lua_State* tolua_S)
 {
-  tolua_pushboolean(tolua_S,(bool)GamePaused);
+  tolua_pushboolean(tolua_S,(bool)GetGamePaused());
  return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
@@ -16181,7 +16236,88 @@ static int tolua_set_GamePaused(lua_State* tolua_S)
   if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  GamePaused = ((bool)  tolua_toboolean(tolua_S,2,0))
+  SetGamePaused(((bool)  tolua_toboolean(tolua_S,2,0))
+)
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetGameSpeed */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetGameSpeed00
+static int tolua_stratagus_SetGameSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  int speed = ((int)  tolua_tonumber(tolua_S,1,0));
+  {
+   SetGameSpeed(speed);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetGameSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetGameSpeed */
+#ifndef TOLUA_DISABLE_tolua_stratagus_GetGameSpeed00
+static int tolua_stratagus_GetGameSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   int tolua_ret = (int)  GetGameSpeed();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetGameSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: GameSpeed */
+#ifndef TOLUA_DISABLE_tolua_get_GameSpeed
+static int tolua_get_GameSpeed(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)GetGameSpeed());
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GameSpeed */
+#ifndef TOLUA_DISABLE_tolua_set_GameSpeed
+static int tolua_set_GameSpeed(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  SetGameSpeed(((int)  tolua_tonumber(tolua_S,2,0))
+)
 ;
  return 0;
 }
@@ -18478,7 +18614,12 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"GameResult",tolua_get_GameResult,tolua_set_GameResult);
   tolua_function(tolua_S,"StopGame",tolua_stratagus_StopGame00);
   tolua_variable(tolua_S,"GameRunning",tolua_get_GameRunning,tolua_set_GameRunning);
+  tolua_function(tolua_S,"SetGamePaused",tolua_stratagus_SetGamePaused00);
+  tolua_function(tolua_S,"GetGamePaused",tolua_stratagus_GetGamePaused00);
   tolua_variable(tolua_S,"GamePaused",tolua_get_GamePaused,tolua_set_GamePaused);
+  tolua_function(tolua_S,"SetGameSpeed",tolua_stratagus_SetGameSpeed00);
+  tolua_function(tolua_S,"GetGameSpeed",tolua_stratagus_GetGameSpeed00);
+  tolua_variable(tolua_S,"GameSpeed",tolua_get_GameSpeed,tolua_set_GameSpeed);
   tolua_variable(tolua_S,"GameObserve",tolua_get_GameObserve,tolua_set_GameObserve);
   tolua_variable(tolua_S,"GameCycle",tolua_get_unsigned_GameCycle,tolua_set_unsigned_GameCycle);
   #ifdef __cplusplus
