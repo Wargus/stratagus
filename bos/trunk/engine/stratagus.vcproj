@@ -2842,6 +2842,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\unit\unit_save.cpp"
+						>
+					</File>
+					<File
 						RelativePath="unit\unittype.cpp"
 						>
 						<FileConfiguration
