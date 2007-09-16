@@ -73,11 +73,6 @@ std::map<std::string, CUnitType *> UnitTypeMap;
 */
 std::string DefaultResourceNames[MaxCosts];
 
-/**
-**  Default amounts for the resources.
-*/
-int DefaultResourceAmounts[MaxCosts];
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

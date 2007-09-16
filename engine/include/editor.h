@@ -32,7 +32,6 @@
 
 #include <vector>
 #include <string>
-#include "player.h"
 #include "icons.h"
 
 /*----------------------------------------------------------------------------
@@ -57,15 +56,12 @@ enum EditorStateType {
 
 class CEditor {
 public:
-	CEditor() : TerrainEditable(true),
-		StartUnitName(NULL), StartUnit(NULL),
+	CEditor() : TerrainEditable(true), StartUnit(NULL),
 		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
-		CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
+		CursorPlayer(-1), SelectedPlayer(-1),
 		MapLoaded(false), WriteCompressedMaps(true)
 		{};
-	~CEditor() {
-		delete[] StartUnitName;
-	};
+	~CEditor() {};
 
 	void Init();
 	/// Make random map
@@ -78,7 +74,7 @@ public:
 	bool TerrainEditable;        /// Is the terrain editable ?
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.
-	char *StartUnitName;         /// name of the Unit used to display the start location.
+	std::string StartUnitName;   /// name of the Unit used to display the start location.
 	const CUnitType *StartUnit;  /// Unit used to display the start location.
 
 	int UnitIndex;               /// Unit icon draw index.

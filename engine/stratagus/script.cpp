@@ -2155,38 +2155,6 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 }
 
 /**
-**  Define default names for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourceAmounts(lua_State *l)
-{
-	int i;
-	int j;
-	const char *value;
-	int args;
-
-	args = lua_gettop(l);
-	if (args & 1) {
-		LuaError(l, "incorrect argument");
-	}
-	for (j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		for (i = 0; i < MaxCosts; ++i) {
-			if (value == DefaultResourceNames[i]) {
-				++j;
-				DefaultResourceAmounts[i] = LuaToNumber(l, j + 1);
-				break;
-			}
-		}
-		if (i == MaxCosts) {
-			LuaError(l, "Resource not found: %s" _C_ value);
-		}
-	}
-	return 0;
-}
-
-/**
 **  Compiled with sound.
 **
 **  @param l  Lua state.
@@ -2309,7 +2277,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
-	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);

@@ -79,8 +79,7 @@ static int CclSetEditorUnitsIcon(lua_State *l)
 static int CclSetEditorStartUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	delete[] Editor.StartUnitName;
-	Editor.StartUnitName = new_strdup(LuaToString(l, 1));
+	Editor.StartUnitName = LuaToString(l, 1);
 	return 0;
 }
 

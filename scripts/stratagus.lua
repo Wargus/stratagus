@@ -119,8 +119,6 @@ UseGLTextureCompression = false
 
 DefineDefaultResourceNames("energy", "magma")
 
-DefineDefaultResourceAmounts("energy", 150, "magma", 150)
-
 DefinePlayerColorIndex(208, 4)
 
 DefinePlayerColors({
