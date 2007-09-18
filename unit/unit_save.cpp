@@ -64,8 +64,8 @@ std::string UnitReference(const CUnit *unit)
 /**
 **  Save an order.
 **
-**  @param order    Order who should be saved.
-**  @param file     Output file.
+**  @param order  Order who should be saved.
+**  @param file   Output file.
 */
 void SaveOrder(const COrder *order, CFile *file)
 {

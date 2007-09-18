@@ -37,28 +37,47 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "stratagus.h"
+#include "unit_cache.h"
 #include "unit.h"
 #include "unittype.h"
-#include "map.h"
+
+
+CUnitCache UnitCache;
+
+
+/**
+**  Initialize unit-cache.
+**
+**  @param mapWidth   Map width
+**  @param mapHeight  Map height
+*/
+void CUnitCache::Init(int mapWidth, int mapHeight)
+{
+	width = mapWidth;
+	height = mapHeight;
+
+	cache.clear();
+	cache.resize(width);
+	for (int i = 0; i < width; ++i) {
+		cache[i].resize(height);
+	}
+}
 
 /**
 **  Insert new unit into cache.
 **
 **  @param unit  Unit pointer to place in cache.
 */
-void UnitCacheInsert(CUnit *unit)
+void CUnitCache::Insert(CUnit *unit)
 {
 	Assert(!unit->Removed);
 
-	for (int i = 0; i < unit->Type->TileHeight; ++i) {
-		CMapField *mf = Map.Field(unit->X, unit->Y + i);
-		for (int j = 0; j < unit->Type->TileWidth; ++j) {
-			mf[j].UnitCache.push_back(unit);
+	for (int i = 0; i < unit->Type->TileWidth; ++i) {
+		for (int j = 0; j < unit->Type->TileHeight; ++j) {
+			cache[unit->X + i][unit->Y + j].push_back(unit);
 		}
 	}
 }
@@ -68,16 +87,15 @@ void UnitCacheInsert(CUnit *unit)
 **
 **  @param unit  Unit pointer to remove from cache.
 */
-void UnitCacheRemove(CUnit *unit)
+void CUnitCache::Remove(CUnit *unit)
 {
 	Assert(!unit->Removed);
 
-	for (int i = 0; i < unit->Type->TileHeight; ++i) {
-		CMapField *mf = Map.Field(unit->X, unit->Y + i);
-		for (int j = 0; j < unit->Type->TileWidth; ++j) {
-			for (std::vector<CUnit *>::iterator k = mf[j].UnitCache.begin(); k != mf[j].UnitCache.end(); ++k) {
+	for (int i = 0; i < unit->Type->TileWidth; ++i) {
+		for (int j = 0; j < unit->Type->TileHeight; ++j) {
+			for (std::vector<CUnit *>::iterator k = cache[i][j].begin(); k != cache[i][j].end(); ++k) {
 				if (*k == unit) {
-					mf[j].UnitCache.erase(k);
+					cache[unit->X + i][unit->Y + j].erase(k);
 					break;
 				}
 			}
@@ -97,61 +115,46 @@ void UnitCacheRemove(CUnit *unit)
 **
 **  @return           Returns the number of units found
 */
-int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table, int tablesize)
+int CUnitCache::Select(int x1, int y1, int x2, int y2, CUnit **table, int tablesize)
 {
 	int i;
 	int j;
 	int n;
-	CMapField *mf;
 	CUnit *unit;
+	bool unitAdded[UnitMax];
 
 	// Optimize small searches.
 	if (x1 >= x2 - 1 && y1 >= y2 - 1) {
-		return UnitCacheOnTile(x1, y1, table, tablesize);
+		return UnitCache.Select(x1, y1, table, tablesize);
 	}
 
 	//
 	//  Reduce to map limits. FIXME: should the caller check?
 	//
-	if (x1 < 0) {
-		x1 = 0;
-	}
-	if (y1 < 0) {
-		y1 = 0;
-	}
-	if (x2 > Map.Info.MapWidth) {
-		x2 = Map.Info.MapWidth;
-	}
-	if (y2 > Map.Info.MapHeight) {
-		y2 = Map.Info.MapHeight;
-	}
+	x1 = std::max(x1, 0);
+	y1 = std::max(y1, 0);
+	x2 = std::min(x2, width - 1);
+	y2 = std::min(y2, height - 1);
 
+	memset(unitAdded, 0, sizeof(unitAdded));
 	n = 0;
-	for (i = y1; i < y2 && n < tablesize; ++i) {
-		mf = Map.Field(x1, i);
-		for (j = x1; j < x2 && n < tablesize; ++j) {
-			for (size_t k = 0, end = mf->UnitCache.size(); k < end && n < tablesize; ++k) {
+
+	for (i = x1; i <= x2 && n < tablesize; ++i) {
+		for (j = y1; j <= y2 && n < tablesize; ++j) {
+			for (size_t k = 0, end = cache[i][j].size(); k < end && n < tablesize; ++k) {
 				//
 				// To avoid getting a unit in multiple times we use a cache lock.
 				// It should only be used in here, unless you somehow want the unit
 				// to be out of cache.
 				//
-				unit = mf->UnitCache[k];
-				if (!unit->CacheLock && !unit->Type->Revealer) {
+				unit = cache[i][j][k];
+				if (!unitAdded[unit->Slot] && !unit->Type->Revealer) {
 					Assert(!unit->Removed);
-					unit->CacheLock = 1;
+					unitAdded[unit->Slot] = true;
 					table[n++] = unit;
 				}
 			}
-			++mf;
 		}
-	}
-
-	//
-	// Clean the cache locks, restore to original situation.
-	//
-	for (i = 0; i < n; ++i) {
-		table[i]->CacheLock = 0;
 	}
 
 	return n;
@@ -165,19 +168,18 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table, int tablesize
 **  @param table      All units in the selection rectangle
 **  @param tablesize  Size of table array
 **
-**  @return       Returns the number of units found
+**  @return           Returns the number of units found
 */
-int UnitCacheOnTile(int x, int y, CUnit **table, int tablesize)
+int CUnitCache::Select(int x, int y, CUnit **table, int tablesize)
 {
 	//
 	// Unlike in UnitCacheSelect, there's no way a unit can show up twice,
 	// so there is no need for Cache Locks.
 	//
 	int n = 0;
-	CMapField *mf = Map.Field(x, y);
 	std::vector<CUnit *>::iterator i, end;
 
-	for (i = mf->UnitCache.begin(), end = mf->UnitCache.end(); i != end && n < tablesize; ++i) {
+	for (i = cache[x][y].begin(), end = cache[x][y].end(); i != end && n < tablesize; ++i) {
 		Assert(!(*i)->Removed);
 		table[n++] = *i;
 	}
@@ -185,9 +187,3 @@ int UnitCacheOnTile(int x, int y, CUnit **table, int tablesize)
 	return n;
 }
 
-/**
-**  Initialize unit-cache.
-*/
-void InitUnitCache(void)
-{
-}
