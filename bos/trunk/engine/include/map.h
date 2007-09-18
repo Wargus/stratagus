@@ -195,7 +195,6 @@ public:
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
-	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
 };
 
 // Not used until now:
