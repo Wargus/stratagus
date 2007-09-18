@@ -38,6 +38,7 @@
 
 #include "stratagus.h"
 #include "unittype.h"
+#include "unit_cache.h"
 #include "video.h"
 #include "map.h"
 #include "tileset.h"
@@ -310,7 +311,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 		int n;
 		CUnit *table[UnitMax];
 
-		n = UnitCacheOnTile(x, y, table, UnitMax);
+		n = UnitCache.Select(x, y, table, UnitMax);
 		while (n--) {
 			if (table[n]->Type == b->Parent) {
 				// We capture the value of what is beneath.
@@ -1805,7 +1806,7 @@ void CEditor::Init(void)
 		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
 		memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
-		InitUnitCache();
+		UnitCache.Init(Map.Info.MapWidth, Map.Info.MapHeight);
 
 		for (i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			Map.Fields[i].Tile = Map.Fields[i].SeenTile = 0;

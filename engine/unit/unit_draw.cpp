@@ -48,6 +48,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "tileset.h"
 #include "map.h"
 #include "construct.h"
@@ -959,7 +960,7 @@ int FindAndSortUnits(const CViewport *vp, CUnit **table, int tablesize)
 	//
 	//  Select all units touching the viewpoint.
 	//
-	int n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	int n = UnitCache.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table, tablesize);
 
 	for (int i = 0; i < n; ++i) {

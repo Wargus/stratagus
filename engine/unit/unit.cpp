@@ -43,6 +43,7 @@
 
 #include "unit.h"
 #include "unit_manager.h"
+#include "unit_cache.h"
 #include "video.h"
 #include "unitsound.h"
 #include "unittype.h"
@@ -62,8 +63,6 @@
 #include "script.h"
 #include "editor.h"
 #include "spells.h"
-#include "construct.h"
-#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -534,7 +533,7 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 		for (w = type->TileWidth; w--;) {
 			Map.Field(x + w, y + h)->Flags &= ~flags;
 
-			int n = UnitCacheOnTile(x + w, y + h, table, UnitMax);
+			int n = UnitCache.Select(x + w, y + h, table, UnitMax);
 			while (n--) {
 				if (table[n] != unit && table[n]->Orders[0]->Action != UnitActionDie) {
 					Map.Field(x + w, y + h)->Flags |= table[n]->Type->FieldFlags;
@@ -627,14 +626,14 @@ static void UnitInXY(CUnit *unit, int x, int y)
 void CUnit::MoveToXY(int x, int y)
 {
 	MapUnmarkUnitSight(this);
-	UnitCacheRemove(this);
+	UnitCache.Remove(this);
 	UnmarkUnitFieldFlags(this);
 
 	Assert(UnitCanBeAt(this, x, y));
 	// Move the unit.
 	UnitInXY(this, x, y);
 
-	UnitCacheInsert(this);
+	UnitCache.Insert(this);
 	MarkUnitFieldFlags(this);
 	//  Recalculate the seen count.
 	UnitCountSeen(this);
@@ -663,7 +662,7 @@ void CUnit::Place(int x, int y)
 	// Pathfinding info.
 	MarkUnitFieldFlags(this);
 	// Tha cache list.
-	UnitCacheInsert(this);
+	UnitCache.Insert(this);
 	//  Calculate the seen count.
 	UnitCountSeen(this);
 	// Vision
@@ -709,7 +708,7 @@ void CUnit::Remove(CUnit *host)
 		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ Slot);
 		return;
 	}
-	UnitCacheRemove(this);
+	UnitCache.Remove(this);
 	MapUnmarkUnitSight(this);
 	UnmarkUnitFieldFlags(this);
 	if (host) {
@@ -996,7 +995,7 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y)
 	CUnit *units[UnitMax];
 	CUnit *unit;
 
-	n = UnitCacheOnTile(x, y, units, UnitMax);
+	n = UnitCache.Select(x, y, units, UnitMax);
 	while (n) {
 		unit = units[--n];
 		//
@@ -1029,7 +1028,7 @@ void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y)
 	CUnit *units[UnitMax];
 	CUnit *unit;
 
-	n = UnitCacheOnTile(x, y, units, UnitMax);
+	n = UnitCache.Select(x, y, units, UnitMax);
 	while (n) {
 		unit = units[--n];
 		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
@@ -1382,12 +1381,12 @@ void RescueUnits(void)
 				}
 
 				if (unit->Type->UnitType == UnitTypeLand) {
-					n = UnitCacheSelect(
+					n = UnitCache.Select(
 							unit->X - 1, unit->Y - 1,
 							unit->X + unit->Type->TileWidth + 1,
 							unit->Y + unit->Type->TileHeight + 1, around, UnitMax);
 				} else {
-					n = UnitCacheSelect(
+					n = UnitCache.Select(
 							unit->X - 2, unit->Y - 2,
 							unit->X + unit->Type->TileWidth + 2,
 							unit->Y + unit->Type->TileHeight + 2, around, UnitMax);
@@ -1809,7 +1808,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 		y2 = std::min(y + type->TileHeight + this->Distance + 1, Map.Info.MapHeight);
 		distance = this->Distance - 1;
 	}
-	n = UnitCacheSelect(x1, y1, x2, y2, table, UnitMax);
+	n = UnitCache.Select(x1, y1, x2, y2, table, UnitMax);
 
 	switch (this->DistanceType) {
 		case GreaterThan :
@@ -1866,7 +1865,7 @@ bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&
 	y1 = y - this->OffsetY < 0 ? -1 : y - this->OffsetY;
 	y1 = y1 >= Map.Info.MapHeight ? -1 : y1;
 	if (!(x1 == -1 || y1 == -1)) {
-		n = UnitCacheOnTile(x1, y1, table, UnitMax);
+		n = UnitCache.Select(x1, y1, table, UnitMax);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type == this->Parent &&
 					table[i]->X == x1 && table[i]->Y == y1) {
@@ -1887,7 +1886,7 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 	int i;
 
 	ontoptarget = NULL;
-	n = UnitCacheOnTile(x, y, table, UnitMax);
+	n = UnitCache.Select(x, y, table, UnitMax);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->X == x && table[i]->Y == y && !table[i]->Destroyed &&
 				table[i]->Orders[0]->Action != UnitActionDie) {
@@ -2405,7 +2404,7 @@ void LetUnitDie(CUnit *unit)
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
 	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
 		unit->Removed = 0;
-		UnitCacheInsert(unit);
+		UnitCache.Insert(unit);
 	}
 	MapMarkUnitSight(unit);
 }

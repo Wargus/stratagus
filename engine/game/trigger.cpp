@@ -41,6 +41,7 @@
 #include "stratagus.h"
 #include "script.h"
 #include "unittype.h"
+#include "unit_cache.h"
 #include "player.h"
 #include "trigger.h"
 #include "results.h"
@@ -230,7 +231,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	// FIXME: I hope SelectUnits checks bounds?
 	// FIXME: Yes, but caller should check.
 	// NOTE: +1 right,bottom isn't inclusive :(
-	an = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
+	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	//
 	// Count the requested units
 	//
@@ -305,11 +306,11 @@ static int CclIfNearUnit(lua_State *l)
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
-			an = UnitCacheSelect(unit->X - 1, unit->Y - 1,
+			an = UnitCache.Select(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
 				unit->Y + unit->Type->TileHeight + 1, around, UnitMax);
 		} else {
-			an = UnitCacheSelect(unit->X - 2, unit->Y - 2,
+			an = UnitCache.Select(unit->X - 2, unit->Y - 2,
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around, UnitMax);
 		}
@@ -399,11 +400,11 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
-			an = UnitCacheSelect(unit->X - 1, unit->Y - 1,
+			an = UnitCache.Select(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
 				unit->Y + unit->Type->TileHeight + 1, around, UnitMax);
 		} else {
-			an = UnitCacheSelect(unit->X - 2, unit->Y - 2,
+			an = UnitCache.Select(unit->X - 2, unit->Y - 2,
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around, UnitMax);
 		}

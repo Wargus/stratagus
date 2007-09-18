@@ -42,6 +42,7 @@
 #include "minimap.h"
 #include "player.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "ui.h"
 #include "script.h"
 
@@ -245,7 +246,7 @@ void CMap::Create()
 	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	this->Visible[0] = new unsigned[this->Info.MapWidth * this->Info.MapHeight / 2];
 	memset(this->Visible[0], 0, this->Info.MapWidth * this->Info.MapHeight / 2 * sizeof(unsigned));
-	InitUnitCache();
+	UnitCache.Init(this->Info.MapWidth, this->Info.MapHeight);
 }
 
 /**
