@@ -93,7 +93,8 @@ void CUnitCache::Remove(CUnit *unit)
 
 	for (int i = 0; i < unit->Type->TileWidth; ++i) {
 		for (int j = 0; j < unit->Type->TileHeight; ++j) {
-			for (std::vector<CUnit *>::iterator k = cache[i][j].begin(); k != cache[i][j].end(); ++k) {
+			for (std::vector<CUnit *>::iterator k = cache[unit->X + i][unit->Y + j].begin();
+					k != cache[unit->X + i][unit->Y + j].end(); ++k) {
 				if (*k == unit) {
 					cache[unit->X + i][unit->Y + j].erase(k);
 					break;
