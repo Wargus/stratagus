@@ -42,6 +42,7 @@
 #include "animation.h"
 #include "actions.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "tileset.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -84,7 +85,7 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 	CUnit *table[UnitMax];
 	int n;
 
-	n = UnitCacheSelect(unit->X - range, unit->Y - range,
+	n = UnitCache.Select(unit->X - range, unit->Y - range,
 		unit->X + unit->Type->TileWidth + range,
 		unit->Y + unit->Type->TileHeight + range,
 		table, UnitMax);

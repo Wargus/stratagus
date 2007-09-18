@@ -42,6 +42,7 @@
 #include "animation.h"
 #include "player.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "sound.h"
 #include "actions.h"
 #include "map.h"
@@ -154,7 +155,7 @@ static CUnit *CheckAlreadyBuilding(CUnit *unit, CUnitType *type, int x, int y)
 	CUnit *table[UnitMax];
 	int n;
 
-	n = UnitCacheOnTile(x, y, table, UnitMax);
+	n = UnitCache.Select(x, y, table, UnitMax);
 	for (int i = 0; i < n; ++i) {
 		if (!table[i]->Destroyed && table[i]->Type == type &&
 				(table[i]->Player == unit->Player || unit->IsAllied(table[i])) &&

@@ -53,6 +53,7 @@
 #include "stratagus.h"
 
 #include "unittype.h"
+#include "unit_cache.h"
 #include "upgrade.h"
 #include "spells.h"
 #include "sound.h"
@@ -125,7 +126,7 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table, UnitMax);
+		n = UnitCache.Select(xmin, ymin, xmax + 1, ymax + 1, table, UnitMax);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
 					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
@@ -193,7 +194,7 @@ int AreaAdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	int mana;
 
 	// Get all the units around the unit
-	nunits = UnitCacheSelect(x - spell->Range,
+	nunits = UnitCache.Select(x - spell->Range,
 		y - spell->Range,
 		x + spell->Range + caster->Type->Width,
 		y + spell->Range + caster->Type->Height,
@@ -648,7 +649,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 	ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		n = UnitCacheSelect(x - 1, y - 1, x + 2, y + 2, table, UnitMax);
+		n = UnitCache.Select(x - 1, y - 1, x + 2, y + 2, table, UnitMax);
 		cansummon = 0;
 		while (n) {
 			n--;
@@ -870,7 +871,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit *caster, const SpellType *spell
 	//
 	// Select all units aroung the caster
 	//
-	nunits = UnitCacheSelect(caster->X - range, caster->Y - range,
+	nunits = UnitCache.Select(caster->X - range, caster->Y - range,
 		caster->X + range + caster->Type->TileWidth,
 		caster->Y + range + caster->Type->TileHeight, table, UnitMax);
 	//

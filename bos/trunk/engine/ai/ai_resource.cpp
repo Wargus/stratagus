@@ -39,6 +39,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "unittype.h"
 #include "upgrade.h"
 #include "map.h"
@@ -116,7 +117,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type, int x, 
 	//
 	// Select all units in range.
 	//
-	n = UnitCacheSelect(x - range, y - range, x + range, y + range, table, UnitMax);
+	n = UnitCache.Select(x - range, y - range, x + range, y + range, table, UnitMax);
 
 	//
 	// Find the enemy units which can attack

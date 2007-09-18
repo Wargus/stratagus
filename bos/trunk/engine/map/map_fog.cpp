@@ -38,6 +38,7 @@
 #include "player.h"
 #include "unittype.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "map.h"
 #include "ui.h"
 #include "../video/intern_video.h"
@@ -133,7 +134,7 @@ int MapFogFilterFlags(CPlayer *player, int x, int y, int mask)
 		return mask;
 	}
 
-	nunits = UnitCacheOnTile(x, y, table, UnitMax);
+	nunits = UnitCache.Select(x, y, table, UnitMax);
 	fogmask = -1;
 	unitcount = 0;
 	while (unitcount < nunits) {

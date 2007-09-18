@@ -38,6 +38,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "script.h"
 #include "map.h"
 #include "tileset.h"
@@ -112,7 +113,7 @@ static int CclStratagusMap(lua_State *l)
 					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 					Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
 					memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
-					InitUnitCache();
+					UnitCache.Init(Map.Info.MapWidth, Map.Info.MapHeight);
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
 					Map.NoFogOfWar = false;

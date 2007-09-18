@@ -39,6 +39,7 @@
 #include "stratagus.h"
 #include "missile.h"
 #include "unittype.h"
+#include "unit_cache.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "actions.h"
@@ -71,7 +72,7 @@ static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 	int n;
 	int i;
 
-	n = UnitCacheOnTile(tx, ty, table, UnitMax);
+	n = UnitCache.Select(tx, ty, table, UnitMax);
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];

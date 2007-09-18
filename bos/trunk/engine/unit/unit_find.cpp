@@ -47,6 +47,7 @@
 #include "player.h"
 #include "missile.h"
 #include "unit.h"
+#include "unit_cache.h"
 #include "interface.h"
 #include "tileset.h"
 #include "map.h"
@@ -88,7 +89,7 @@ CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 	CUnit *table[UnitMax];
 	int n;
 
-	n = UnitCacheOnTile(x, y, table, UnitMax);
+	n = UnitCache.Select(x, y, table, UnitMax);
 	while (n--) {
 		if ((unsigned)table[n]->Type->UnitType == type) {
 			break;
@@ -172,7 +173,7 @@ CUnit *UnitOnMapTile(int tx, int ty)
 	int n;
 	int i;
 
-	n = UnitCacheOnTile(tx, ty, table, UnitMax);
+	n = UnitCache.Select(tx, ty, table, UnitMax);
 	for (i = 0; i < n; ++i) {
 		// Note: this is less restrictive than UnitActionDie...
 		// Is it normal?
@@ -205,7 +206,7 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 	int n;
 	int i;
 
-	n = UnitCacheSelect(x1, y1, x2, y2, table, UnitMax);
+	n = UnitCache.Select(x1, y1, x2, y2, table, UnitMax);
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
@@ -250,7 +251,7 @@ CUnit *ResourceOnMap(int tx, int ty, int resource)
 	int i;
 	int n;
 
-	n = UnitCacheOnTile(tx, ty, table, UnitMax);
+	n = UnitCache.Select(tx, ty, table, UnitMax);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvestFrom) {
 			continue;
@@ -337,13 +338,13 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 	if (u->Removed) {
 		x = u->Container->X;
 		y = u->Container->Y;
-		n = UnitCacheSelect(x - missile_range, y - missile_range,
+		n = UnitCache.Select(x - missile_range, y - missile_range,
 			x + missile_range + u->Container->Type->TileWidth,
 			y + missile_range + u->Container->Type->TileHeight, table, UnitMax);
 	} else {
 		x = u->X;
 		y = u->Y;
-		n = UnitCacheSelect(x - missile_range, y - missile_range,
+		n = UnitCache.Select(x - missile_range, y - missile_range,
 			x + missile_range + u->Type->TileWidth,
 			y + missile_range + u->Type->TileHeight, table, UnitMax);
 	}
@@ -622,7 +623,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 	x = unit->X;
 	y = unit->Y;
 	type = unit->Type;
-	n = UnitCacheSelect(x - range, y - range, x + range + type->TileWidth,
+	n = UnitCache.Select(x - range, y - range, x + range + type->TileWidth,
 		y + range + type->TileHeight, table, UnitMax);
 	
 	if (range > 25 && n > 9) {

@@ -40,6 +40,7 @@
 #include "stratagus.h"
 #include "unit.h"
 #include "unit_manager.h"
+#include "unit_cache.h"
 #include "unittype.h"
 #include "animation.h"
 #include "upgrade.h"
@@ -978,7 +979,7 @@ static int CclOrderUnit(lua_State *l)
 	}
 	order = LuaToString(l, 5);
 
-	an = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
+	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	for (j = 0; j < an; ++j) {
 		unit = table[j];
 		if (unittype == ANY_UNIT ||
@@ -1097,7 +1098,7 @@ static int CclKillUnitAt(lua_State *l)
 	y2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	an = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
+	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	for (j = s = 0; j < an && s < q; ++j) {
 		unit = table[j];
 		if (unittype == ANY_UNIT ||

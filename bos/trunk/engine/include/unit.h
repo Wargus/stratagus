@@ -496,7 +496,6 @@ public:
 		UnitSlot = NULL;
 		PlayerSlot = NULL;
 		Next = NULL;
-		CacheLock = 0;
 		InsideCount = 0;
 		BoardCount = 0;
 		UnitInside = NULL;
@@ -556,7 +555,6 @@ public:
 	CUnit **PlayerSlot;   /// Slot pointer of Player->Units
 
 	CUnit   *Next;          /// Generic link pointer (on map)
-	unsigned CacheLock : 1; /// Used to lock unit out of the cache.
 
 	int    InsideCount;   /// Number of units inside.
 	int    BoardCount;    /// Number of units transported inside.
@@ -910,18 +908,6 @@ extern void SaveUnits(CFile *file);
 extern void InitUnits(void);
 	/// Clean unit module
 extern void CleanUnits(void);
-
-// in unitcache.cpp
-	/// Insert new unit into cache
-extern void UnitCacheInsert(CUnit *unit);
-	/// Remove unit from cache
-extern void UnitCacheRemove(CUnit *unit);
-	/// Select units in range
-extern int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table, int tablesize);
-	/// Select units on tile
-extern int UnitCacheOnTile(int x, int y, CUnit **table, int tablesize);
-	/// Initialize unit-cache
-extern void InitUnitCache(void);
 
 // in unit_draw.cpp
 	/// Register CCL decorations features

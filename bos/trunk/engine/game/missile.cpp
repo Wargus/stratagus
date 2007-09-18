@@ -51,6 +51,7 @@
 #include "map.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "unit_cache.h"
 #include "player.h"
 #include "unit.h"
 #include "missile.h"
@@ -871,7 +872,7 @@ void MissileHit(Missile *missile)
 	// Hits all units in range.
 	//
 	i = missile->Type->Range;
-	n = UnitCacheSelect(x - i + 1, y - i + 1, x + i, y + i, table, UnitMax);
+	n = UnitCache.Select(x - i + 1, y - i + 1, x + i, y + i, table, UnitMax);
 	Assert(missile->SourceUnit != NULL);
 	for (i = 0; i < n; ++i) {
 		goal = table[i];
