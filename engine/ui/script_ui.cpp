@@ -58,13 +58,6 @@
 std::string ClickMissile;        /// FIXME:docu
 std::string DamageMissile;       /// FIXME:docu
 
-typedef struct _info_text_ {
-	char *Text;                  /// FIXME:docu
-	CFont *Font;                 /// FIXME:docu
-	int X;                       /// FIXME:docu
-	int Y;                       /// FIXME:docu
-} InfoText;                      /// FIXME:docu
-
 std::map<std::string, ButtonStyle *> ButtonStyleHash;
 
 static int HandleCount = 1;     /// Lua handler count
