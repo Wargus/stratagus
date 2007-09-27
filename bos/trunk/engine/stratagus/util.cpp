@@ -75,6 +75,16 @@ int SyncRand(void)
 	return val;
 }
 
+/**
+**  Synchronized random number.
+**
+**  @param max  Max value of random number to return
+*/
+int SyncRand(int max)
+{
+	return SyncRand() % max;
+}
+
 
 /*----------------------------------------------------------------------------
 --  Math

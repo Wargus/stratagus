@@ -51,7 +51,6 @@
 <a href="#SetClickMissile">SetClickMissile</a>
 <a href="#SetCurrentChapter">SetCurrentChapter</a>
 <a href="#SetCurrentTip">SetCurrentTip</a>
-<a href="#SetDamageFormula">SetDamageFormula</a>
 <a href="#SetDamageMissile">SetDamageMissile</a>
 <a href="#SetDoubleClickDelay">SetDoubleClickDelay</a>
 <a href="#SetEditorSelectIcon">SetEditorSelectIcon</a>
@@ -599,28 +598,6 @@ are defined, it defaults to Tip 0.
     -- Set Tip to No 10
     SetCurrentTip(10)
 </pre>
-
-<a name="SetDamageFormula"></a>
-<h3>SetDamageFormula(NumberDesc)</h3>
-
-Sets the formula to compute damage for missile that the unit fire on goal.
-
-<dl>
-  <dt>NumberDesc</dt>
-  <dd>Number description. See Trigger for a explanation.</dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
---
---  Damage is random between 51-100% of
---  Max(0, Attacker->BasicDamage - Defender->Armor) + Attacker->PiercingDamage.
---
-  SetDamageFormula(Div(Mul(Add(51, Rand(50)),
-				  Add(Max(0, Sub( AttackerVar("BasicDamage"), DefenderVar("Armor"))),
-					  AttackerVar("PiercingDamage"))), 100))
-</pre>
-
 
 <a name="SetDamageMissile"></a>
 <h3>SetDamageMissile("missile-type")</h3>
