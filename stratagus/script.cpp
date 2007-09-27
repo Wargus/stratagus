@@ -242,7 +242,7 @@ static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 **
 **  @param file  File to load and execute
 **
-**  @return      0 in success, else exit.
+**  @return      0 for success, else exit.
 */
 int LuaLoadFile(const std::string &file)
 {

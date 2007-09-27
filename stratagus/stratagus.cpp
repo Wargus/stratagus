@@ -204,6 +204,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "movie.h"
 #include "pathfinder.h"
 #include "widgets.h"
+#include "trigger.h"
 #include "iolib.h"
 #include "util.h"
 #include "guichan.h"
@@ -223,7 +224,7 @@ std::string LocalPlayerName;         /// Name of local player
 static std::string NameLine =
 	"Bos Wars V" VERSION ", (c) 1998-2007 by the Bos Wars and Stratagus Project.";
 
-static char *MapName;                /// Filename of the map to load
+static std::string MapName;          /// Filename of the map to load
 std::string CompileOptions;          /// Compile options.
 
 static std::vector<gcn::Container *> Containers;
@@ -300,16 +301,15 @@ void PreMenuSetup(void)
 	UI.Load();
 }
 
-extern void InitDefinedVariables();
 /**
 **  Run the guichan main menus loop.
 **
 **  @param filename  map filename
 **  @param map       map loaded
 **
-**  @return      0 in success, else exit.
+**  @return          0 for success, else exit.
 */
-static int MenuLoop(const char *filename, CMap *map)
+static int MenuLoop(const std::string &filename, CMap *map)
 {
 	char buf[1024];
 	int status;
@@ -324,6 +324,8 @@ static int MenuLoop(const char *filename, CMap *map)
 	CursorState = CursorStatePoint;
 	GameCursor = UI.Point.Cursor;
 
+	// FIXME: filename isn't used
+
 	// FIXME delete this when switching to full guichan GUI
 	LibraryFileName("scripts/guichan.lua", buf, sizeof(buf));
 	status = LuaLoadFile(buf);
@@ -333,8 +335,6 @@ static int MenuLoop(const char *filename, CMap *map)
 	return status;
 }
 
-extern void CleanMissiles();
-extern void CleanTriggers();
 /**
 **  Cleanup game.
 **
@@ -362,13 +362,12 @@ void CleanGame(void)
 	UnitUnderCursor = NULL;
 }
 
-static void ExpandPath(char *newpath, const char *path)
+static void ExpandPath(std::string &newpath, const std::string &path)
 {
-	if (*path == '~') {
-		++path;
-		sprintf(newpath, "%s%s", UserDirectory.c_str(), path);
+	if (path[0] == '~') {
+		newpath = UserDirectory + path.substr(1);
 	} else {
-		sprintf(newpath, "%s/%s", StratagusLibPath.c_str(), path);
+		newpath = StratagusLibPath + "/" + path;
 	}
 }
 
@@ -415,11 +414,11 @@ void StartMap(const std::string &filename, bool clean)
 
 void StartSavedGame(const std::string &filename) 
 {
-	char path[512];
+	std::string path;
 
 	SaveGameLoading = true;
 	CleanPlayers();
-	ExpandPath(path, filename.c_str());
+	ExpandPath(path, filename);
 	LoadGame(path);
 
 	StartMap(filename, false);
@@ -427,10 +426,10 @@ void StartSavedGame(const std::string &filename)
 	
 void StartReplay(const std::string &filename, bool reveal)
 {
-	char replay[PATH_MAX];
+	std::string replay;
 
 	CleanPlayers();
-	ExpandPath(replay, filename.c_str());
+	ExpandPath(replay, filename);
 	LoadReplay(replay);
 
 	ReplayRevealMap = reveal;
@@ -449,7 +448,7 @@ int SaveReplay(const std::string &filename)
 {
 	FILE *fd;
 	char *buf;
-	std::stringstream logfile;
+	std::ostringstream logfile;
 	std::string destination;
 	struct stat sb;
 
@@ -517,16 +516,16 @@ static int main1(int argc, char **argv)
 {
 	PrintHeader();
 	printf(
-	"\n"
-	"\n"
-	"Bos Wars may be copied only under the terms of the GNU General Public License\n"
-	"which must be distributed with this program.\n"
-	"\n"
-	"DISCLAIMER:\n"
-	"This software is provided as-is.  The author(s) can not be held liable for any\n"
-	"damage that might arise from the use of this software.\n"
-	"Use it at your own risk.\n"
-	"\n");
+		"\n"
+		"\n"
+		"Bos Wars may be copied only under the terms of the GNU General Public License\n"
+		"which must be distributed with this program.\n"
+		"\n"
+		"DISCLAIMER:\n"
+		"This software is provided as-is.  The author(s) can not be held liable for any\n"
+		"damage that might arise from the use of this software.\n"
+		"Use it at your own risk.\n"
+		"\n");
 
 	// Setup video display
 	InitVideo();
@@ -615,23 +614,23 @@ static void Usage(void)
 {
 	PrintHeader();
 	printf(
-"\n\nUsage: boswars [OPTIONS]\n\
-\t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
-\t-d datapath\tpath to Bos Wars data\n\
-\t-h\t\tHelp shows this page\n\
-\t-l\t\tDisable command log\n\
-\t-P port\t\tNetwork port to use\n\
-\t-n server\tNetwork server host preset\n\
-\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
-\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
-\t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
-\t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
-\t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
-\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
-\t-F\t\tFull screen video mode\n\
-\t-S\t\tSync speed (100 = 30 frames/s)\n\
-\t-W\t\tWindowed video mode\n\
-");
+		"\n\nUsage: boswars [OPTIONS]\n\
+		\t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
+		\t-d datapath\tpath to Bos Wars data\n\
+		\t-h\t\tHelp shows this page\n\
+		\t-l\t\tDisable command log\n\
+		\t-P port\t\tNetwork port to use\n\
+		\t-n server\tNetwork server host preset\n\
+		\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
+		\t-U update\tNetwork update rate in # frames (default 5=6x per s)\n\
+		\t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
+		\t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
+		\t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
+		\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
+		\t-F\t\tFull screen video mode\n\
+		\t-S\t\tSync speed (100 = 30 frames/s)\n\
+		\t-W\t\tWindowed video mode\n\
+		");
 }
 
 /**
@@ -642,8 +641,6 @@ static void Usage(void)
 */
 int main(int argc, char **argv)
 {
-	char *p;
-
 	CompileOptions =
 #ifdef DEBUG
 		"DEBUG "
@@ -704,7 +701,7 @@ int main(int argc, char **argv)
 			case 'd':
 			{
 				char *libpath = new_strdup(optarg);
-				for (p = libpath; *p; ++p) {
+				for (char *p = libpath; *p; ++p) {
 					if (*p == '\\') {
 						*p = '/';
 					}
@@ -806,11 +803,10 @@ int main(int argc, char **argv)
 	}
 
 	if (argc - optind) {
+		size_t index;
 		MapName = argv[optind];
-		for (p = MapName; *p; ++p) {
-			if (*p == '\\') {
-				*p = '/';
-			}
+		while ((index = MapName.find('\\')) != std::string::npos) {
+			MapName[index] = '/';
 		}
 		--argc;
 	}
