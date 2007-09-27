@@ -67,6 +67,7 @@
 #include "pathfinder.h"
 #include "editor.h"
 #include "sound.h"
+#include "script.h"
 
 #include <guichan.h>
 void DrawGuichanWidgets();
