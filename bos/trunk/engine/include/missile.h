@@ -365,16 +365,7 @@ enum _missile_class_ {
 	/// Base structure of missile-types
 class MissileType {
 public:
-	MissileType() : Transparency(0), Width(0), Height(0),
-		DrawLevel(0), SpriteFrames(0), NumDirections(0),
-		Flip(false), CanHitOwner(false), FriendlyFire(false),
-		Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
-		Range(0), SplashFactor(0), ImpactMissile(NULL),
-		SmokeMissile(NULL), G(NULL)
-	{
-		FiredSound.Sound = NULL;
-		ImpactSound.Sound = NULL;
-	};
+	MissileType(const std::string &ident);
 	~MissileType();
 
 	/// load the graphics for a missile type

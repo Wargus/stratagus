@@ -116,7 +116,7 @@ void LoadMissileSprites(void)
 **
 **  @return       Missile type pointer.
 */
-MissileType *MissileTypeByIdent(const std::string& ident)
+MissileType *MissileTypeByIdent(const std::string &ident)
 {
 	return MissileTypeMap[ident];
 }
@@ -128,18 +128,19 @@ MissileType *MissileTypeByIdent(const std::string& ident)
 **
 **  @return       New allocated (zeroed) missile-type pointer.
 */
-MissileType *NewMissileTypeSlot(const std::string& ident)
+MissileType *NewMissileTypeSlot(const std::string &ident)
 {
 	MissileType *mtype;
 
-	mtype = new MissileType;
-	mtype->Ident = ident;
+	mtype = new MissileType(ident);
 	MissileTypeMap[ident] = mtype;
 	MissileTypes.push_back(mtype);
 	return mtype;
 }
 
-
+/**
+**  Constructor
+*/
 Missile::Missile() :
 	SourceX(0), SourceY(0), X(0), Y(0),	DX(0), DY(0),
 	Type(NULL), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
@@ -154,18 +155,17 @@ Missile::Missile() :
 /**
 **  Initialize a new made missile.
 **
-**  @param mtype    Type pointer of missile.
-**  @param sx       Missile x start point in pixel.
-**  @param sy       Missile y start point in pixel.
-**  @param dx       Missile x destination point in pixel.
-**  @param dy       Missile y destination point in pixel.
+**  @param mtype  Type pointer of missile.
+**  @param sx     Missile x start point in pixel.
+**  @param sy     Missile y start point in pixel.
+**  @param dx     Missile x destination point in pixel.
+**  @param dy     Missile y destination point in pixel.
 **
-**  @return         created missile.
+**  @return       created missile.
 */
 Missile *Missile::Init(MissileType *mtype, int sx, int sy, int dx, int dy)
 {
 	Missile *missile = NULL;
-
 
 	switch (mtype->Class) {
 		case MissileClassNone :
@@ -199,6 +199,7 @@ Missile *Missile::Init(MissileType *mtype, int sx, int sy, int dx, int dy)
 			missile = new MissileParabolic;
 			break;
 	}
+
 	missile->X = sx - mtype->Width / 2;
 	missile->Y = sy - mtype->Height / 2;
 	missile->DX = dx - mtype->Width / 2;
@@ -423,12 +424,16 @@ void FireMissile(CUnit *unit)
 static void GetMissileMapArea(const Missile *missile, int *sx, int *sy,
 	int *ex, int *ey)
 {
-#define Bound(x, y) (x) < 0 ? 0 : ((x) > (y) ? (y) : (x))
-	*sx = Bound(missile->X / TileSizeX, Map.Info.MapWidth - 1);
-	*sy = Bound(missile->Y / TileSizeY, Map.Info.MapHeight - 1);
-	*ex = Bound((missile->X + missile->Type->Width) / TileSizeX, Map.Info.MapWidth - 1);
-	*ey = Bound((missile->Y + missile->Type->Height) / TileSizeY, Map.Info.MapHeight - 1);
-#undef Bound
+#define BoundX(x) std::min(std::max(0, x), Map.Info.MapWidth - 1)
+#define BoundY(y) std::min(std::max(0, y), Map.Info.MapHeight - 1)
+
+	*sx = BoundX(missile->X / TileSizeX);
+	*sy = BoundY(missile->Y / TileSizeY);
+	*ex = BoundX((missile->X + missile->Type->Width + TileSizeX - 1) / TileSizeX);
+	*ey = BoundY((missile->Y + missile->Type->Height + TileSizeY - 1) / TileSizeY);
+
+#undef BoundX
+#undef BoundY
 }
 
 /**
@@ -445,16 +450,14 @@ static int MissileVisibleInViewport(const CViewport *vp, const Missile *missile)
 	int max_x;
 	int min_y;
 	int max_y;
-	int x;
-	int y;
 
 	GetMissileMapArea(missile, &min_x, &min_y, &max_x, &max_y);
 	if (!vp->AnyMapAreaVisibleInViewport(min_x, min_y, max_x, max_y)) {
 		return 0;
 	}
 
-	for (x = min_x; x <= max_x; ++x) {
-		for (y = min_y; y <= max_y; ++y) {
+	for (int x = min_x; x <= max_x; ++x) {
+		for (int y = min_y; y <= max_y; ++y) {
 			if (ReplayRevealMap || Map.IsFieldVisible(ThisPlayer, x, y)) {
 				return 1;
 			}
@@ -930,8 +933,6 @@ static void NextMissileFrameCycle(Missile *missile)
 	int totalx;
 	int dx;
 	int f;
-	int i;
-	int j;
 
 	neg = 0;
 	if (missile->SpriteFrame < 0) {
@@ -942,7 +943,7 @@ static void NextMissileFrameCycle(Missile *missile)
 	dx = abs(missile->X - missile->SourceX);
 	f = missile->Type->SpriteFrames / (missile->Type->NumDirections / 2 + 1);
 	f = 2 * f - 1;
-	for (i = 1, j = 1; i <= f; ++i) {
+	for (int i = 1, j = 1; i <= f; ++i) {
 		if (dx * f / i < totalx) {
 			if ((i - 1) * 2 < f) {
 				j = i - 1;
@@ -1021,11 +1022,8 @@ void MissileActions(void)
 */
 int ViewPointDistanceToMissile(const Missile *missile)
 {
-	int x;
-	int y;
-
-	x = (missile->X + missile->Type->Width / 2) / TileSizeX;
-	y = (missile->Y + missile->Type->Height / 2) / TileSizeY;  // pixel -> tile
+	int x = (missile->X + missile->Type->Width / 2) / TileSizeX;
+	int y = (missile->Y + missile->Type->Height / 2) / TileSizeY;  // pixel -> tile
 
 	return ViewPointDistance(x, y);
 }
@@ -1126,17 +1124,23 @@ void MissileType::Init(void)
 */
 void InitMissileTypes(void)
 {
-#if 0
-	// Rehash.
-	for (std::vector<MissileType*>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
-		MissileTypeMap[(*i)->Ident] = *i;
-	}
-#endif
 	for (std::vector<MissileType*>::iterator i = MissileTypes.begin(); i != MissileTypes.end(); ++i) {
 		(*i)->Init();
-
 	}
 }
+
+/**
+**  Constructor.
+*/
+MissileType::MissileType(const std::string &ident) :
+	Ident(ident), Transparency(0), Width(0), Height(0),
+	DrawLevel(0), SpriteFrames(0), NumDirections(0),
+	Flip(false), CanHitOwner(false), FriendlyFire(false),
+	Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
+	Range(0), SplashFactor(0), ImpactMissile(NULL),
+	SmokeMissile(NULL), G(NULL)
+{
+};
 
 /**
 **  Destructor.
@@ -1186,7 +1190,7 @@ void CleanMissiles(void)
 void FreeBurningBuildingFrames()
 {
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-		i != BurningBuildingFrames.end(); ++i) {
+			i != BurningBuildingFrames.end(); ++i) {
 		delete *i;
 	}
 	BurningBuildingFrames.clear();
