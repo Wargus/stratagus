@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 09/16/07 14:27:37.
+** Generated automatically by tolua++-1.0.92 on 09/26/07 19:59:36.
 */
 
 #ifndef __cplusplus
@@ -17572,6 +17572,57 @@ static int tolua_stratagus__00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: SyncRand */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SyncRand00
+static int tolua_stratagus_SyncRand00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   int tolua_ret = (int)  SyncRand();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SyncRand'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SyncRand */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SyncRand01
+static int tolua_stratagus_SyncRand01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  int max = ((int)  tolua_tonumber(tolua_S,1,0));
+  {
+   int tolua_ret = (int)  SyncRand(max);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_stratagus_SyncRand00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: Exit */
 #ifndef TOLUA_DISABLE_tolua_stratagus_Exit00
 static int tolua_stratagus_Exit00(lua_State* tolua_S)
@@ -18687,6 +18738,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"GameTranslation",tolua_get_GameTranslation,tolua_set_GameTranslation);
   tolua_function(tolua_S,"SaveGame",tolua_stratagus_SaveGame00);
   tolua_function(tolua_S,"_",tolua_stratagus__00);
+  tolua_function(tolua_S,"SyncRand",tolua_stratagus_SyncRand00);
+  tolua_function(tolua_S,"SyncRand",tolua_stratagus_SyncRand01);
   tolua_function(tolua_S,"Exit",tolua_stratagus_Exit00);
  tolua_endmodule(tolua_S);
  return 1;

@@ -78,8 +78,6 @@ static std::map<std::string, MissileType *> MissileTypeMap;
 
 std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
 
-extern NumberDesc *Damage;                   /// Damage calculation for missile.
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -292,57 +290,26 @@ static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>:
 **  @todo NOTE: lower damage for hidden targets.
 **  @todo NOTE: lower damage for targets on higher ground.
 **
-**  @param attacker_stats  Attacker attributes.
-**  @param goal_stats      Goal attributes.
+**  @param attacker  Attacker.
+**  @param goal      Goal unit.
 **
-**  @return                damage inflicted to goal.
+**  @return          damage inflicted on goal.
 */
-static int CalculateDamageStats(const CUnitStats *attacker_stats,
-	const CUnitStats *goal_stats)
+static int CalculateDamage(const CUnit *attacker, const CUnit *goal)
 {
 	int damage;
 	int basic_damage;
 	int piercing_damage;
 
-	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value;
-	piercing_damage = attacker_stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+	basic_damage = attacker->Stats->Variables[BASICDAMAGE_INDEX].Value;
+	piercing_damage = attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 
-	damage = std::max(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value, 1);
+	damage = std::max(basic_damage - goal->Stats->Variables[ARMOR_INDEX].Value, 1);
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);
 
 	return damage;
-}
-
-/**
-**  Calculate damage.
-**
-**  @param attacker  Attacker.
-**  @param goal      Goal unit.
-**
-**  @return          damage produces on goal.
-*/
-static int CalculateDamage(const CUnit *attacker, const CUnit *goal)
-{
-	int res;
-
-	Assert(attacker);
-	Assert(goal);
-
-	if (!Damage) { // Use old method.
-		return CalculateDamageStats(attacker->Stats, goal->Stats);
-	}
-	Assert(Damage);
-
-	UpdateUnitVariables((CUnit *)attacker);
-	UpdateUnitVariables((CUnit *)goal);
-	TriggerData.Attacker = (CUnit *)attacker;
-	TriggerData.Defender = (CUnit *)goal;
-	res = EvalNumber(Damage);
-	TriggerData.Attacker = NULL;
-	TriggerData.Defender = NULL;
-	return res;
 }
 
 /**
