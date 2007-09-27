@@ -232,8 +232,6 @@ static std::vector<gcn::Container *> Containers;
 --  Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
 
-int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
-int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
 int SpeedBuild = 1;                  /// speed factor for building
 int SpeedTrain = 1;                  /// speed factor for training
 
