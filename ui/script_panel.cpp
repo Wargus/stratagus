@@ -43,6 +43,7 @@
 #include "interface.h"
 #include "ui.h"
 #include "spells.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -59,8 +60,300 @@ typedef struct {
 	union {const char *s; int i;};
 	UStrIntType type;
 } UStrInt;
-/// Get component for unit variable.
-extern UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t);
+
+/**
+**  All possible value for a number.
+*/
+enum ENumber
+{
+	ENumber_Lua,         /// a lua function.
+	ENumber_Dir,         /// directly a number.
+	ENumber_Add,         /// a + b.
+	ENumber_Sub,         /// a - b.
+	ENumber_Mul,         /// a * b.
+	ENumber_Div,         /// a / b.
+	ENumber_Min,         /// Min(a, b).
+	ENumber_Max,         /// Max(a, b).
+	ENumber_Rand,        /// Rand(a) : number in [0..a-1].
+
+	ENumber_Gt,          /// a  > b.
+	ENumber_GtEq,        /// a >= b.
+	ENumber_Lt,          /// a  < b.
+	ENumber_LtEq,        /// a <= b.
+	ENumber_Eq,          /// a == b.
+	ENumber_NEq,         /// a <> b.
+
+	ENumber_VideoTextLength, /// VideoTextLength(font, string).
+	ENumber_StringFind,      /// strchr(string, char) - s.
+
+
+	ENumber_UnitStat     /// Property of Unit.
+// FIXME: add others.
+};
+
+/**
+**  All possible value for a unit.
+*/
+enum EUnit
+{
+	EUnit_Ref           /// Unit direct reference.
+// FIXME: add others.
+};
+
+/**
+**  All possible value for a string.
+*/
+enum EString
+{
+	EString_Lua,          /// a lua function.
+	EString_Dir,          /// directly a string.
+	EString_Concat,       /// a + b [+ c ...].
+	EString_String,       /// Convert number in string.
+	EString_InverseVideo, /// Inverse video for the string ("a" -> "~<a~>").
+	EString_If,           /// If cond then String1 else String2.
+	EString_UnitName,     /// UnitType Name.
+	EString_SubString,    /// SubString.
+	EString_Line          /// line n of the string.
+// FIXME: add others.
+};
+
+/**
+**  Enumeration to know which variable to be selected.
+*/
+enum EnumVariable
+{
+	VariableValue = 0,  /// Value of the variable.
+	VariableMax,        /// Max of the variable.
+	VariableIncrease,   /// Increase value of the variable.
+	VariableDiff,       /// (Max - Value)
+	VariablePercent,    /// (100 * Value / Max)
+	VariableName        /// Name of the variable.
+};
+
+/**
+**  Enumeration of unit
+*/
+enum EnumUnit
+{
+	UnitRefItSelf = 0,      /// unit.
+	UnitRefInside,          /// unit->Inside.
+	UnitRefContainer,       /// Unit->Container.
+	UnitRefWorker,          /// unit->Data.Built.Worker
+	UnitRefGoal,            /// unit->Goal
+};
+
+struct NumberDesc;
+struct UnitDesc;
+struct StringDesc;
+
+void FreeStringDesc(StringDesc *s);
+
+/**
+**  For Bin operand  a ?? b
+*/
+struct BinaryOp
+{
+	NumberDesc *Left;           /// Left operand.
+	NumberDesc *Right;          /// Right operand.
+};
+
+/**
+**  Number description.
+*/
+struct NumberDesc
+{
+	ENumber e;       /// which number.
+	union {
+		unsigned int Index; /// index of the lua function.
+		int Val;       /// Direct value.
+		NumberDesc *N; /// Other number.
+		BinaryOp BinOp;   /// For binary operand.
+		struct {
+			UnitDesc *Unit;            /// Which unit.
+			int Index;                 /// Which index variable.
+			EnumVariable Component;    /// Which component.
+			int Loc;                   /// Location of Variables[].
+		} UnitStat;
+		struct {
+			StringDesc *String; /// String.
+			CFont *Font;        /// Font.
+		} VideoTextLength;
+		struct {
+			StringDesc *String; /// String.
+			char C;             /// Char.
+		} StringFind;
+
+	} D;
+};
+
+/**
+**  Unit description.
+*/
+struct UnitDesc
+{
+	EUnit e;       /// which unit;
+	union {
+		CUnit **AUnit; /// Adress of the unit.
+	} D;
+};
+
+/**
+**  String description.
+*/
+struct StringDesc {
+	EString e;       /// which number.
+	union {
+		unsigned int Index; /// index of the lua function.
+		char *Val;       /// Direct value.
+		struct {
+			StringDesc **Strings;  /// Array of operands.
+			int n;                 /// number of operand to concat
+		} Concat; /// for Concat two string.
+		NumberDesc *Number;  /// Number.
+		StringDesc *String;  /// String.
+		UnitDesc *Unit;      /// Unit desciption.
+		struct {
+			NumberDesc *Cond;  /// Branch condition.
+			StringDesc *True;  /// String if Cond is true.
+			StringDesc *False; /// String if Cond is false.
+		} If; /// conditional string.
+		struct {
+			StringDesc *String;  /// Original string.
+			NumberDesc *Begin;   /// Begin of result string.
+			NumberDesc *End;     /// End of result string.
+		} SubString; /// For extract a substring
+		struct {
+			StringDesc *String;  /// Original string.
+			NumberDesc *Line;    /// Line number.
+			NumberDesc *MaxLen;  /// Max lenght of line.
+			CFont *Font;         /// Font to consider (else (-1) consider just char).
+		} Line; /// For specific line.
+	} D;
+};
+
+/**
+**  Show simple text followed by variable value.
+*/
+class CContentTypeText : public CContentType {
+public:
+	CContentTypeText() : Text(NULL), Font(NULL), Centered(0), Index(-1),
+		Component(VariableValue), ShowName(0), Stat(0) {}
+	virtual ~CContentTypeText() {
+		FreeStringDesc(Text);
+		delete Text;
+	}
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+
+	StringDesc *Text;            /// Text to display.
+	CFont *Font;                 /// Font to use.
+	char Centered;               /// if true, center the display.
+	int Index;                   /// Index of the variable to show, -1 if not.
+	EnumVariable Component;      /// Component of the variable.
+	char ShowName;               /// If true, Show name's unit.
+	char Stat;                   /// true to special display.(value or value + diff)
+};
+
+/**
+**  Show formatted text with variable value.
+*/
+class CContentTypeFormattedText : public CContentType {
+public:
+	CContentTypeFormattedText() : Format(NULL), Font(NULL), Centered(0),
+		Index(-1), Component(VariableValue) {}
+	virtual ~CContentTypeFormattedText() { delete[] this->Format; }
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+
+	char *Format;                /// Text to display
+	CFont *Font;                 /// Font to use.
+	char Centered;               /// if true, center the display.
+	int Index;                   /// Index of the variable to show.
+	EnumVariable Component;      /// Component of the variable.
+};
+
+/**
+**  Show formatted text with variable value.
+*/
+class CContentTypeFormattedText2 : public CContentType {
+public:
+	CContentTypeFormattedText2() : Format(NULL), Font(NULL), Centered(0),
+		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
+	virtual ~CContentTypeFormattedText2() { delete[] Format; }
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+
+	char *Format;                /// Text to display
+	CFont *Font;                 /// Font to use.
+	char Centered;               /// if true, center the display.
+	int Index1;                  /// Index of the variable1 to show.
+	EnumVariable Component1;     /// Component of the variable1.
+	int Index2;                  /// Index of the variable to show.
+	EnumVariable Component2;     /// Component of the variable.
+};
+
+/**
+**  Show icon of the unit
+*/
+class CContentTypeIcon : public CContentType {
+public:
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+
+	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
+};
+
+/**
+**  Show bar which change color depend of value.
+*/
+class CContentTypeLifeBar : public CContentType {
+public:
+	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+
+	int Index;           /// Index of the variable to show, -1 if not.
+	int Width;           /// Width of the bar.
+	int Height;          /// Height of the bar.
+#if 0 // FIXME : something for color and value parametrisation (not implemented)
+	Color *colors;       /// array of color to show (depend of value)
+	int *values;         /// list of percentage to change color.
+#endif
+};
+
+/**
+**  Show bar.
+*/
+class CContentTypeCompleteBar : public CContentType {
+public:
+	CContentTypeCompleteBar() : Index(-1), Width(0), Height(0), Border(0) {}
+
+	virtual void Draw(const CUnit *unit, CFont *defaultfont) const;
+
+	int Index;           /// Index of the variable to show, -1 if not.
+	int Width;           /// Width of the bar.
+	int Height;          /// Height of the bar.
+	char Border;         /// True for additional border.
+#if 0 // FIXME : something for color parametrisations (not implemented)
+// take UI.CompletedBar color for the moment.
+	Color colors;        /// Color to show (depend of value)
+#endif
+};
+
+
+UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t);
+
+EnumVariable Str2EnumVariable(lua_State *l, const char *s);
+NumberDesc *CclParseNumberDesc(lua_State *l);
+UnitDesc *CclParseUnitDesc(lua_State *l);
+StringDesc *CclParseStringDesc(lua_State *l);
+
+StringDesc *NewStringDesc(const char *s);
+int EvalNumber(const NumberDesc *numberdesc);
+CUnit *EvalUnit(const UnitDesc *unitdesc);
+char *EvalString(const StringDesc *s);
+
+void FreeNumberDesc(NumberDesc *number);
+void FreeUnitDesc(UnitDesc *unitdesc);
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -469,7 +762,7 @@ static int CclDefinePanelContents(lua_State *l)
 **  @param l       lua state.
 **  @param binop   Where to stock info (must be malloced)
 */
-static void ParseBinOp(lua_State *l, BinOp *binop)
+static void ParseBinOp(lua_State *l, BinaryOp *binop)
 {
 	Assert(l);
 	Assert(binop);
@@ -1760,6 +2053,358 @@ static int CclStringFind(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	return Alias(l, "StringFind");
+}
+
+/**
+**  Get unit from a unit depending of the relation.
+**
+**  @param unit  unit reference.
+**  @param e     relation with unit.
+**
+**  @return      The desired unit.
+*/
+const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
+{
+	Assert(unit);
+	switch (e) {
+		case UnitRefItSelf:
+			return unit;
+		case UnitRefInside:
+			return unit->UnitInside;
+		case UnitRefContainer:
+			return unit->Container;
+		case UnitRefWorker :
+			if (unit->Orders[0]->Action == UnitActionBuilt) {
+				return unit->Data.Built.Worker;
+			} else {
+				return NoUnitP;
+			}
+		case UnitRefGoal:
+			return unit->Goal;
+		default:
+			Assert(0);
+	}
+	return NoUnitP;
+}
+
+/**
+**  Return the value corresponding.
+**
+**  @param unit   Unit.
+**  @param index  Index of the variable.
+**  @param e      Component of the variable.
+**  @param t      Which var use (0:unit, 1:Type, 2:Stats)
+**
+**  @return       Value corresponding
+*/
+UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
+{
+	UStrInt val;
+	CVariable *var;
+
+	Assert(unit);
+	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+
+	switch (t) {
+		case 0: // Unit:
+			var = &unit->Variable[index];
+			break;
+		case 1: // Type:
+			var = &unit->Type->Variable[index];
+			break;
+		case 2: // Stats:
+			var = &unit->Stats->Variables[index];
+			break;
+		default:
+			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
+			var = &unit->Variable[index];
+			break;
+	}
+
+	switch (e) {
+		case VariableValue:
+			val.type = USTRINT_INT;
+			val.i = var->Value;
+			break;
+		case VariableMax:
+			val.type = USTRINT_INT;
+			val.i = var->Max;
+			break;
+		case VariableIncrease:
+			val.type = USTRINT_INT;
+			val.i = var->Increase;
+			break;
+		case VariableDiff:
+			val.type = USTRINT_INT;
+			val.i = var->Max - var->Value;
+			break;
+		case VariablePercent:
+			Assert(unit->Variable[index].Max != 0);
+			val.type = USTRINT_INT;
+			val.i = 100 * var->Value / var->Max;
+			break;
+		case VariableName:
+			if (index == GIVERESOURCE_INDEX) {
+				int i;
+				for (i = 0; i < MaxCosts; ++i) {
+					if (unit->ResourcesHeld[i] != 0) {
+						break;
+					}
+				}
+				Assert(i != MaxCosts);
+				val.type = USTRINT_STR;
+				val.s = DefaultResourceNames[i].c_str();
+			} else {
+				val.type = USTRINT_STR;
+				val.s = UnitTypeVar.VariableName[index];
+			}
+			break;
+	}
+	return val;
+}
+
+/**
+**  Draw text with variable.
+**
+**  @param unit         unit with variable to show.
+**  @param defaultfont  default font if no specific font in extra data.
+*/
+void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
+{
+	char *text;             // Optional text to display.
+	CFont *font;            // Font to use.
+	int x;                  // X coordinate to display.
+	int y;                  // Y coordinate to display.
+
+	x = this->PosX;
+	y = this->PosY;
+	font = this->Font ? this->Font : defaultfont;
+	Assert(font);
+
+	Assert(unit || this->Index == -1);
+	Assert(this->Index == -1 || (0 <= this->Index && this->Index < UnitTypeVar.NumberVariable));
+
+	if (this->Text) {
+		text = EvalString(this->Text);
+		if (this->Centered) {
+			VideoDrawTextCentered(x, y, font, text);
+		} else {
+			VideoDrawText(x, y, font, text);
+		}
+		x += font->Width(text);
+		delete[] text;
+	}
+
+	if (this->ShowName) {
+		VideoDrawTextCentered(x, y, font, unit->Type->Name);
+		return;
+	}
+
+	if (this->Index != -1) {
+		if (!this->Stat) {
+			EnumVariable component = this->Component;
+			switch (component) {
+				case VariableValue:
+				case VariableMax:
+				case VariableIncrease:
+				case VariableDiff:
+				case VariablePercent:
+					VideoDrawNumber(x, y, font, GetComponent(unit, this->Index, component, 0).i);
+					break;
+				case VariableName:
+					VideoDrawText(x, y, font, GetComponent(unit, this->Index, component, 0).s);
+					break;
+				default:
+					Assert(0);
+			}
+		} else {
+			int value = unit->Type->Variable[this->Index].Value;
+			int diff = unit->Stats->Variables[this->Index].Value - value;
+
+			if (!diff) {
+				VideoDrawNumber(x, y, font, value);
+			} else {
+				char buf[64];
+				sprintf(buf, diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
+				VideoDrawText(x, y, font, buf);
+			}
+		}
+	}
+}
+
+/**
+**  Draw formatted text with variable value.
+**
+**  @param unit         unit with variable to show.
+**  @param defaultfont  default font if no specific font in extra data.
+**
+**  @note text is limited to 256 chars. (enough?)
+**  @note text must have exactly 1 %d.
+**  @bug if text format is incorrect.
+*/
+void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) const
+{
+	CFont *font;
+	char buf[256];
+	UStrInt usi1;
+
+	Assert(unit);
+	font = this->Font ? this->Font : defaultfont;
+	Assert(font);
+
+	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	usi1 = GetComponent(unit, this->Index, this->Component, 0);
+	if (usi1.type == USTRINT_STR) {
+		sprintf(buf, this->Format, usi1.s);
+	} else {
+		sprintf(buf, this->Format, usi1.i);
+	}
+
+	if (this->Centered) {
+		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
+	} else {
+		VideoDrawText(this->PosX, this->PosY, font, buf);
+	}
+}
+
+/**
+**  Draw formatted text with variable value.
+**
+**  @param unit         unit with variable to show.
+**  @param defaultfont  default font if no specific font in extra data.
+**
+**  @note text is limited to 256 chars. (enough?)
+**  @note text must have exactly 2 %d.
+**  @bug if text format is incorrect.
+*/
+void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) const
+{
+	CFont *font;
+	char buf[256];
+	UStrInt usi1, usi2;
+
+	Assert(unit);
+	font = this->Font ? this->Font : defaultfont;
+	Assert(font);
+
+	usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
+	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
+	if (usi1.type == USTRINT_STR) {
+		if (usi2.type == USTRINT_STR) {
+			sprintf(buf, this->Format, usi1.s, usi2.s);
+		} else {
+			sprintf(buf, this->Format, usi1.s, usi2.i);
+		}
+	} else {
+		if (usi2.type == USTRINT_STR) {
+			sprintf(buf, this->Format, usi1.i, usi2.s);
+		} else {
+			sprintf(buf, this->Format, usi1.i, usi2.i);
+		}
+	}
+	if (this->Centered) {
+		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
+	} else {
+		VideoDrawText(this->PosX, this->PosY, font, buf);
+	}
+}
+
+/**
+**  Draw icon for unit.
+**
+**  @param unit         unit with icon to show.
+**  @param defaultfont  unused.
+*/
+void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
+{
+	Assert(unit);
+	unit = GetUnitRef(unit, this->UnitRef);
+	if (unit && unit->Type->Icon.Icon) {
+		unit->Type->Icon.Icon->DrawIcon(unit->Player, this->PosX, this->PosY);
+	}
+}
+
+/**
+**  Draw life bar of a unit using selected variable.
+**  Placed under icons on top-panel.
+**
+**  @param unit         Pointer to unit.
+**  @param defaultfont  FIXME: docu
+**
+**  @todo Color and percent value Parametrisation.
+*/
+void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
+{
+	Assert(unit);
+	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	if (!unit->Variable[this->Index].Max) {
+		return;
+	}
+
+	Uint32 color;
+	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
+
+	if (f > 75) {
+		color = ColorDarkGreen;
+	} else if (f > 50) {
+		color = ColorYellow;
+	} else if (f > 25) {
+		color = ColorOrange;
+	} else {
+		color = ColorRed;
+	}
+
+	// Border
+	Video.FillRectangleClip(ColorBlack, this->PosX - 1, this->PosY - 1,
+		this->Width + 2, this->Height + 2);
+
+	Video.FillRectangleClip(color, this->PosX, this->PosY,
+		(f * this->Width) / 100, this->Height);
+}
+
+/**
+**  Draw life bar of a unit using selected variable.
+**  Placed under icons on top-panel.
+**
+**  @param unit         Pointer to unit.
+**  @param defaultfont  FIXME: docu
+**
+**  @todo Color and percent value Parametrisation.
+*/
+void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
+{
+	Assert(unit);
+	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
+	if (!unit->Variable[this->Index].Max) {
+		return;
+	}
+
+	int x = this->PosX;
+	int y = this->PosY;
+	int w = this->Width;
+	int h = this->Height;
+
+	Assert(w > 0);
+	Assert(h > 4);
+
+	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
+
+	if (!this->Border) {
+		Video.FillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
+		if (UI.CompletedBarShadow) {
+			// Shadow
+			Video.DrawVLine(ColorGray, x + f * w / 100, y, h);
+			Video.DrawHLine(ColorGray, x, y + h, f * w / 100);
+
+			// |~  Light
+			Video.DrawVLine(ColorWhite, x, y, h);
+			Video.DrawHLine(ColorWhite, x, y, f * w / 100);
+		}
+	} else {
+		Video.DrawRectangleClip(ColorGray, x,     y,     w + 4, h );
+		Video.DrawRectangleClip(ColorBlack,x + 1, y + 1, w + 2, h - 2);
+		Video.FillRectangleClip(ColorBlue, x + 2, y + 2, f * w / 100, h - 4);
+	}
 }
 
 /**

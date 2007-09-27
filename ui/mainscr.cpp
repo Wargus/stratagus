@@ -161,27 +161,26 @@ static void UiDrawManaBar(const CUnit *unit, int x, int y)
 **  Tell if we can show the content.
 **  verify each sub condition for that.
 **
-**  @param condition   condition to verify.
-**  @param unit        unit that certain condition can refer.
+**  @param condition  condition to verify.
+**  @param unit       unit that certain condition can refer.
 **
-**  @return            0 if we can't show the content, else 1.
+**  @return           if we can show the content or not.
 */
 static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 {
-	int i;
-
-	Assert(unit);
 	if (!condition) {
 		return true;
 	}
+
 	if ((condition->ShowOnlySelected && !unit->Selected) ||
 			(unit->Player->Type == PlayerNeutral && condition->HideNeutral) ||
 			(ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent) ||
 			(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
 		return false;
 	}
+
 	if (condition->BoolFlags) {
-		for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
+		for (int i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
 			if (condition->BoolFlags[i] != CONDITION_TRUE) {
 				if ((condition->BoolFlags[i] == CONDITION_ONLY) ^ unit->Type->BoolFlag[i]) {
 					return false;
@@ -189,8 +188,9 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 			}
 		}
 	}
+
 	if (condition->Variables) {
-		for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		for (int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit->Variable[i].Enable) {
 					return false;
@@ -198,371 +198,9 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 			}
 		}
 	}
+
 	return true;
 }
-
-typedef enum {
-	USTRINT_STR, USTRINT_INT
-} UStrIntType;
-typedef struct {
-	union {const char *s; int i;};
-	UStrIntType type;
-} UStrInt;
-
-/**
-**  Return the value corresponding.
-**
-**  @param unit   Unit.
-**  @param index  Index of the variable.
-**  @param e      Component of the variable.
-**  @param t      Which var use (0:unit, 1:Type, 2:Stats)
-**
-**  @return       Value corresponding
-*/
-UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
-{
-	UStrInt val;
-	CVariable *var;
-
-	Assert(unit);
-	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-
-	switch (t) {
-		case 0: // Unit:
-			var = &unit->Variable[index];
-			break;
-		case 1: // Type:
-			var = &unit->Type->Variable[index];
-			break;
-		case 2: // Stats:
-			var = &unit->Stats->Variables[index];
-			break;
-		default:
-			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
-			var = &unit->Variable[index];
-			break;
-	}
-
-	switch (e) {
-		case VariableValue:
-			val.type = USTRINT_INT;
-			val.i = var->Value;
-			break;
-		case VariableMax:
-			val.type = USTRINT_INT;
-			val.i = var->Max;
-			break;
-		case VariableIncrease:
-			val.type = USTRINT_INT;
-			val.i = var->Increase;
-			break;
-		case VariableDiff:
-			val.type = USTRINT_INT;
-			val.i = var->Max - var->Value;
-			break;
-		case VariablePercent:
-			Assert(unit->Variable[index].Max != 0);
-			val.type = USTRINT_INT;
-			val.i = 100 * var->Value / var->Max;
-			break;
-		case VariableName:
-			if (index == GIVERESOURCE_INDEX) {
-				int i;
-				for (i = 0; i < MaxCosts; ++i) {
-					if (unit->ResourcesHeld[i] != 0) {
-						break;
-					}
-				}
-				Assert(i != MaxCosts);
-				val.type = USTRINT_STR;
-				val.s = DefaultResourceNames[i].c_str();
-			} else {
-				val.type = USTRINT_STR;
-				val.s = UnitTypeVar.VariableName[index];
-			}
-			break;
-	}
-	return val;
-}
-
-/**
-**  Get unit from a unit depending of the relation.
-**
-**  @param unit  unit reference.
-**  @param e     relation with unit.
-**
-**  @return      The desired unit.
-*/
-const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
-{
-	Assert(unit);
-	switch (e) {
-		case UnitRefItSelf:
-			return unit;
-		case UnitRefInside:
-			return unit->UnitInside;
-		case UnitRefContainer:
-			return unit->Container;
-		case UnitRefWorker :
-			if (unit->Orders[0]->Action == UnitActionBuilt) {
-				return unit->Data.Built.Worker;
-			} else {
-				return NoUnitP;
-			}
-		case UnitRefGoal:
-			return unit->Goal;
-		default:
-			Assert(0);
-	}
-	return NoUnitP;
-}
-
-
-/**
-**  Draw text with variable.
-**
-**  @param unit         unit with variable to show.
-**  @param defaultfont  default font if no specific font in extra data.
-*/
-void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
-{
-	char *text;             // Optional text to display.
-	CFont *font;            // Font to use.
-	int x;                  // X coordinate to display.
-	int y;                  // Y coordinate to display.
-
-	x = this->PosX;
-	y = this->PosY;
-	font = this->Font ? this->Font : defaultfont;
-	Assert(font);
-
-	Assert(unit || this->Index == -1);
-	Assert(this->Index == -1 || (0 <= this->Index && this->Index < UnitTypeVar.NumberVariable));
-
-	if (this->Text) {
-		text = EvalString(this->Text);
-		if (this->Centered) {
-			VideoDrawTextCentered(x, y, font, text);
-		} else {
-			VideoDrawText(x, y, font, text);
-		}
-		x += font->Width(text);
-		delete[] text;
-	}
-
-	if (this->ShowName) {
-		VideoDrawTextCentered(x, y, font, unit->Type->Name);
-		return;
-	}
-
-	if (this->Index != -1) {
-		if (!this->Stat) {
-			EnumVariable component = this->Component;
-			switch (component) {
-				case VariableValue:
-				case VariableMax:
-				case VariableIncrease:
-				case VariableDiff:
-				case VariablePercent:
-					VideoDrawNumber(x, y, font, GetComponent(unit, this->Index, component, 0).i);
-					break;
-				case VariableName:
-					VideoDrawText(x, y, font, GetComponent(unit, this->Index, component, 0).s);
-					break;
-				default:
-					Assert(0);
-			}
-		} else {
-			int value = unit->Type->Variable[this->Index].Value;
-			int diff = unit->Stats->Variables[this->Index].Value - value;
-
-			if (!diff) {
-				VideoDrawNumber(x, y, font, value);
-			} else {
-				char buf[64];
-				sprintf(buf, diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
-				VideoDrawText(x, y, font, buf);
-			}
-		}
-	}
-}
-
-/**
-**  Draw formatted text with variable value.
-**
-**  @param unit         unit with variable to show.
-**  @param defaultfont  default font if no specific font in extra data.
-**
-**  @note text is limited to 256 chars. (enough?)
-**  @note text must have exactly 1 %d.
-**  @bug if text format is incorrect.
-*/
-void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) const
-{
-	CFont *font;
-	char buf[256];
-	UStrInt usi1;
-
-	Assert(unit);
-	font = this->Font ? this->Font : defaultfont;
-	Assert(font);
-
-	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
-	usi1 = GetComponent(unit, this->Index, this->Component, 0);
-	if (usi1.type == USTRINT_STR) {
-		sprintf(buf, this->Format, usi1.s);
-	} else {
-		sprintf(buf, this->Format, usi1.i);
-	}
-
-	if (this->Centered) {
-		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
-	} else {
-		VideoDrawText(this->PosX, this->PosY, font, buf);
-	}
-}
-
-/**
-**  Draw formatted text with variable value.
-**
-**  @param unit         unit with variable to show.
-**  @param defaultfont  default font if no specific font in extra data.
-**
-**  @note text is limited to 256 chars. (enough?)
-**  @note text must have exactly 2 %d.
-**  @bug if text format is incorrect.
-*/
-void CContentTypeFormattedText2::Draw(const CUnit *unit, CFont *defaultfont) const
-{
-	CFont *font;
-	char buf[256];
-	UStrInt usi1, usi2;
-
-	Assert(unit);
-	font = this->Font ? this->Font : defaultfont;
-	Assert(font);
-
-	usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
-	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
-	if (usi1.type == USTRINT_STR) {
-		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, this->Format, usi1.s, usi2.s);
-		} else {
-			sprintf(buf, this->Format, usi1.s, usi2.i);
-		}
-	} else {
-		if (usi2.type == USTRINT_STR) {
-			sprintf(buf, this->Format, usi1.i, usi2.s);
-		} else {
-			sprintf(buf, this->Format, usi1.i, usi2.i);
-		}
-	}
-	if (this->Centered) {
-		VideoDrawTextCentered(this->PosX, this->PosY, font, buf);
-	} else {
-		VideoDrawText(this->PosX, this->PosY, font, buf);
-	}
-}
-
-/**
-**  Draw icon for unit.
-**
-**  @param unit         unit with icon to show.
-**  @param defaultfont  unused.
-*/
-void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
-{
-	Assert(unit);
-	unit = GetUnitRef(unit, this->UnitRef);
-	if (unit && unit->Type->Icon.Icon) {
-		unit->Type->Icon.Icon->DrawIcon(unit->Player, this->PosX, this->PosY);
-	}
-}
-
-/**
-**  Draw life bar of a unit using selected variable.
-**  Placed under icons on top-panel.
-**
-**  @param unit         Pointer to unit.
-**  @param defaultfont  FIXME: docu
-**
-**  @todo Color and percent value Parametrisation.
-*/
-void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
-{
-	Assert(unit);
-	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
-	if (!unit->Variable[this->Index].Max) {
-		return;
-	}
-
-	Uint32 color;
-	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
-
-	if (f > 75) {
-		color = ColorDarkGreen;
-	} else if (f > 50) {
-		color = ColorYellow;
-	} else if (f > 25) {
-		color = ColorOrange;
-	} else {
-		color = ColorRed;
-	}
-
-	// Border
-	Video.FillRectangleClip(ColorBlack, this->PosX - 1, this->PosY - 1,
-		this->Width + 2, this->Height + 2);
-
-	Video.FillRectangleClip(color, this->PosX, this->PosY,
-		(f * this->Width) / 100, this->Height);
-}
-
-/**
-**  Draw life bar of a unit using selected variable.
-**  Placed under icons on top-panel.
-**
-**  @param unit         Pointer to unit.
-**  @param defaultfont  FIXME: docu
-**
-**  @todo Color and percent value Parametrisation.
-*/
-void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
-{
-	Assert(unit);
-	Assert(0 <= this->Index && this->Index < UnitTypeVar.NumberVariable);
-	if (!unit->Variable[this->Index].Max) {
-		return;
-	}
-
-	int x = this->PosX;
-	int y = this->PosY;
-	int w = this->Width;
-	int h = this->Height;
-
-	Assert(w > 0);
-	Assert(h > 4);
-
-	int f = (100 * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
-
-	if (!this->Border) {
-		Video.FillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
-		if (UI.CompletedBarShadow) {
-			// Shadow
-			Video.DrawVLine(ColorGray, x + f * w / 100, y, h);
-			Video.DrawHLine(ColorGray, x, y + h, f * w / 100);
-
-			// |~  Light
-			Video.DrawVLine(ColorWhite, x, y, h);
-			Video.DrawHLine(ColorWhite, x, y, f * w / 100);
-		}
-	} else {
-		Video.DrawRectangleClip(ColorGray, x,     y,     w + 4, h );
-		Video.DrawRectangleClip(ColorBlack,x + 1, y + 1, w + 2, h - 2);
-		Video.FillRectangleClip(ColorBlue, x + 2, y + 2, f * w / 100, h - 4);
-	}
-}
-
-
 
 /**
 **  Draw the unit info into top-panel.
@@ -691,7 +329,7 @@ static void DrawUnitInfo(CUnit *unit)
 */
 void DrawResources(void)
 {
-	const char *names[]={_("Energy"), _("Magma")};
+	const char *names[] = {_("Energy"), _("Magma")};
 	char tmp[128];
 	int totalproduction = 0;
 	int totalrequested = 0;
@@ -1097,8 +735,8 @@ static int Costs[MaxCosts];              /// costs to display in status line
 /**
 **  Draw costs in status line.
 **
-**  @todo FIXME : make DrawCosts more configurable.
-**  @todo FIXME : remove hardcoded image for mana.
+**  @todo FIXME: make DrawCosts more configurable.
+**  @todo FIXME: remove hardcoded image for mana.
 */
 void DrawCosts(void)
 {
