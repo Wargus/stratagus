@@ -599,51 +599,6 @@ static int CclSetGodMode(lua_State *l)
 }
 
 /**
-**  Set resource harvesting speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedResourcesHarvest(lua_State *l)
-{
-	int i;
-	const char *resource;
-
-	LuaCheckArgs(l, 2);
-	resource = LuaToString(l, 1);
-	for (i = 0; i < MaxCosts; ++i) {
-		if (resource == DefaultResourceNames[i]) {
-			SpeedResourcesHarvest[i] = LuaToNumber(l, 2);
-			return 0;
-		}
-	}
-	LuaError(l, "Resource not found: %s" _C_ resource);
-
-	return 0;
-}
-
-/**
-**  Set resource returning speed.
-**
-**  @param l  Lua state.
-*/
-static int CclSetSpeedResourcesReturn(lua_State *l)
-{
-	const char *resource;
-
-	LuaCheckArgs(l, 2);
-	resource = LuaToString(l, 1);
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (resource == DefaultResourceNames[i]) {
-			SpeedResourcesReturn[i] = LuaToNumber(l, 2);
-			return 0;
-		}
-	}
-	LuaError(l, "Resource not found: %s" _C_ resource);
-
-	return 0;
-}
-
-/**
 **  For debug increase building speed.
 **
 **  @param l  Lua state.
@@ -682,10 +637,6 @@ static int CclSetSpeeds(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	s = LuaToNumber(l, 1);
-	for (int i = 0; i < MaxCosts; ++i) {
-		SpeedResourcesHarvest[i] = s;
-		SpeedResourcesReturn[i] = s;
-	}
 	SpeedBuild = SpeedTrain = s;
 
 	lua_pushnumber(l, s);
@@ -783,8 +734,6 @@ void InitCcl(void)
 	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
 	lua_register(Lua, "SetGodMode", CclSetGodMode);
 
-	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
-	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
 	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
 	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
@@ -907,12 +856,6 @@ void SaveCcl(CFile *file)
 {
 	file->printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
 
-	for (int i = 0; i < MaxCosts; ++i) {
-		file->printf("SetSpeedResourcesHarvest(\"%s\", %d)\n",
-			DefaultResourceNames[i].c_str(), SpeedResourcesHarvest[i]);
-		file->printf("SetSpeedResourcesReturn(\"%s\", %d)\n",
-			DefaultResourceNames[i].c_str(), SpeedResourcesReturn[i]);
-	}
 	file->printf("SetSpeedBuild(%d)\n", SpeedBuild);
 	file->printf("SetSpeedTrain(%d)\n", SpeedTrain);
 }
