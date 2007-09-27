@@ -52,16 +52,6 @@ enum CostType {
 #define ScoreCost MaxCosts
 
 /**
-**  Speed factor for harvesting resources
-*/
-extern int SpeedResourcesHarvest[MaxCosts];
-
-/**
-**  Speed factor for returning resources
-*/
-extern int SpeedResourcesReturn[MaxCosts];
-
-/**
 **  Default resources for a new player.
 */
 extern int DefaultResources[MaxCosts];
