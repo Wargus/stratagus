@@ -57,19 +57,11 @@ function HandleCheats(str)
     RevealMap()
 
   elseif (str == "fast debug") then
-    for i = 1,table.getn(resources) do
-      SetSpeedResourcesHarvest(resources[i], 10)
-      SetSpeedResourcesReturn(resources[i], 10)
-    end
     SetSpeedBuild(10)
     SetSpeedTrain(10)
     AddMessage("FAST DEBUG SPEED")
 
   elseif (str == "normal debug") then
-    for i = 1,table.getn(resources) do
-      SetSpeedResourcesHarvest(resources[i], 1)
-      SetSpeedResourcesReturn(resources[i], 1)
-    end
     SetSpeedBuild(1)
     SetSpeedTrain(1)
     AddMessage("NORMAL DEBUG SPEED")
@@ -77,19 +69,11 @@ function HandleCheats(str)
   elseif (str == "speed cheat") then
     if (speedcheat) then
       speedcheat = false
-      for i = 1,table.getn(resources) do
-        SetSpeedResourcesHarvest(resources[i], 1)
-        SetSpeedResourcesReturn(resources[i], 1)
-      end
       SetSpeedBuild(1)
       SetSpeedTrain(1)
       AddMessage("NO SO!")
     else
       speedcheat = true
-      for i = 1,table.getn(resources) do
-        SetSpeedResourcesHarvest(resources[i], 10)
-        SetSpeedResourcesReturn(resources[i], 10)
-      end
       SetSpeedBuild(10)
       SetSpeedTrain(10)
       ThisPlayer.EnergyStored = ThisPlayer.EnergyStored + 32000
