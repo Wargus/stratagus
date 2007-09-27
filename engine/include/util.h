@@ -38,6 +38,7 @@ extern unsigned SyncRandSeed;               /// Sync random seed value
 
 extern void InitSyncRand(void);             /// Initialize the syncron rand
 extern int SyncRand(void);                  /// Syncron rand
+extern int SyncRand(int max);               /// Syncron rand
 
 /*----------------------------------------------------------------------------
 --  Math

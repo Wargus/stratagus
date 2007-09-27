@@ -79,5 +79,8 @@ extern void SaveGame(const std::string filename);
 
 extern const char *Translate @ _(const char *str);
 
+extern int SyncRand(void);
+extern int SyncRand(int max);
+
 void Exit(int err);
 

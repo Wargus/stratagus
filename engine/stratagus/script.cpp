@@ -75,8 +75,6 @@ std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
-NumberDesc *Damage;                   /// Damage calculation for missile.
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -587,22 +585,6 @@ static int CclNoRandomPlacementMultiplayer(lua_State *l)
 }
 
 /**
-**  Set damage computation method.
-**
-**  @param l  Lua state.
-*/
-static int CclSetDamageFormula(lua_State *l)
-{
-	Assert(l);
-	if (Damage) {
-		FreeNumberDesc(Damage);
-		delete Damage;
-	}
-	Damage = CclParseNumberDesc(l);
-	return 0;
-}
-
-/**
 **  Set God mode.
 **
 **  @param l  Lua state.
@@ -751,19 +733,6 @@ static int CclGetCompileFeature(lua_State *l)
 	return 1;
 }
 
-/**
-**  Get a value from the Stratagus synchronized random number generator.
-**
-**  @param l  Lua state.
-*/
-static int CclSyncRand(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-
-	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
-	return 1;
-}
-
 /*............................................................................
 ..  Commands
 ............................................................................*/
@@ -819,7 +788,6 @@ void InitCcl(void)
 	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
 	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
-	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
@@ -851,8 +819,6 @@ void InitCcl(void)
 	SpellCclRegister();
 
 	EditorCclRegister();
-
-	lua_register(Lua, "SyncRand", CclSyncRand);
 }
 
 /**
