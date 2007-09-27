@@ -42,6 +42,7 @@
 #include "network.h"
 #include "netconnect.h"
 #include "editor.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
