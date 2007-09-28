@@ -926,14 +926,12 @@ extern int FindAndSortUnits(const CViewport *vp, CUnit **table, int tablesize);
 extern void ShowOrder(const CUnit *unit);
 
 // in unit_find.cpp
-	/// Select unit on X,Y of type naval,fly,land
-extern CUnit *UnitCacheOnXY(int x, int y, unsigned type);
 	/// Find all units of this type
 extern int FindUnitsByType(const CUnitType *type, CUnit **table, int tablesize);
 	/// Find all units of this type of the player
 extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **, int);
 	/// Return any unit on that map tile
-extern CUnit *UnitOnMapTile(int tx, int ty);
+extern CUnit *UnitOnMapTile(int tx, int ty, unsigned type = (unsigned)-1);
 	/// Return possible attack target on that map area
 extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
 

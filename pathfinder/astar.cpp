@@ -299,7 +299,7 @@ static int CostMoveTo(const CUnit *unit, int ex, int ey, int mask) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
 				}
-				goal = UnitCacheOnXY(i, j, unit->Type->UnitType);
+				goal = UnitOnMapTile(i, j, unit->Type->UnitType);
 				if (!goal) {
 					// Shouldn't happen, mask says there is something on this tile
 					Assert(0);
