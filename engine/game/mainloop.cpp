@@ -63,7 +63,7 @@
 #include "trigger.h"
 #include "results.h"
 #include "settings.h"
-#include "commands.h"
+#include "replay.h"
 #include "pathfinder.h"
 #include "editor.h"
 #include "sound.h"

@@ -59,7 +59,7 @@
 #include "video.h"
 #include "upgrade_structs.h"
 #include "player.h"
-
+#include "replay.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -748,7 +748,7 @@ void InitCcl(void)
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
 	AliasRegister();
-	NetworkCclRegister();
+	ReplayCclRegister();
 	IconCclRegister();
 	MissileCclRegister();
 	PlayerCclRegister();

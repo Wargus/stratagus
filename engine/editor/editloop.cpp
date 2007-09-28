@@ -56,7 +56,7 @@
 #include "sound.h"
 #include "iolib.h"
 #include "iocompat.h"
-#include "commands.h"
+#include "replay.h"
 #include "guichan.h"
 
 #include "script.h"

@@ -56,7 +56,7 @@
 #include "results.h"
 #include "video.h"
 #include "iolib.h"
-#include "commands.h"
+#include "replay.h"
 #include "ai.h"
 #include "widgets.h"
 

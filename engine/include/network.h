@@ -254,8 +254,7 @@ extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 	int arg3, int arg4, int status);
 	/// Send Selections to Team
 extern void NetworkSendSelection(CUnit **units, int count);
-	/// Register ccl functions related to network
-extern void NetworkCclRegister(void);
+
 //@}
 
 #endif // !__NETWORK_H__

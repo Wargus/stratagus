@@ -198,7 +198,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "netconnect.h"
 #include "ai.h"
 #include "missile.h"
-#include "commands.h"
+#include "replay.h"
 #include "results.h"
 #include "editor.h"
 #include "movie.h"

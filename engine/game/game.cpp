@@ -62,7 +62,7 @@
 #include "settings.h"
 #include "results.h"
 #include "trigger.h"
-#include "commands.h"
+#include "replay.h"
 #include "iolib.h"
 #include "iocompat.h"
 
