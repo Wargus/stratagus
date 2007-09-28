@@ -229,6 +229,7 @@
 #include "network.h"
 #include "netconnect.h"
 #include "commands.h"
+#include "replay.h"
 #include "interface.h"
 #include "results.h"
 #include "sound.h"
