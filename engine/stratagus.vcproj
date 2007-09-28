@@ -2706,6 +2706,10 @@
 					Name="unit"
 					>
 					<File
+						RelativePath=".\unit\build.cpp"
+						>
+					</File>
+					<File
 						RelativePath="unit\script_unit.cpp"
 						>
 						<FileConfiguration

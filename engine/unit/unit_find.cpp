@@ -76,33 +76,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Select unit on X,Y of type naval,fly,land.
-**
-** @param x       Map X tile position.
-** @param y       Map Y tile position.
-** @param type    UnitType::UnitType, naval,fly,land.
-**
-** @return        Unit, if a unit of correct type is on the field.
-*/
-CUnit *UnitCacheOnXY(int x, int y, unsigned type)
-{
-	CUnit *table[UnitMax];
-	int n;
-
-	n = UnitCache.Select(x, y, table, UnitMax);
-	while (n--) {
-		if ((unsigned)table[n]->Type->UnitType == type) {
-			break;
-		}
-	}
-	if (n > -1) {
-		return table[n];
-	} else {
-		return NoUnitP;
-	}
-}
-
-/**
 **  Find all units of type.
 **
 **  @param type       type of unit requested
@@ -113,12 +86,10 @@ CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 */
 int FindUnitsByType(const CUnitType *type, CUnit **table, int tablesize)
 {
-	CUnit *unit;
-	int i;
-	int num;
+	int num = 0;
 
-	for (num = i = 0; i < NumUnits && num < tablesize; ++i) {
-		unit = Units[i];
+	for (int i = 0; i < NumUnits && num < tablesize; ++i) {
+		CUnit *unit = Units[i];
 		if (unit->Type == type && !unit->IsUnusable()) {
 			table[num++] = unit;
 		}
@@ -139,16 +110,12 @@ int FindUnitsByType(const CUnitType *type, CUnit **table, int tablesize)
 int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 	CUnit **table, int tablesize)
 {
-	CUnit *unit;
-	int num;
-	int nunits;
-	int typecount;
-	int i;
+	int nunits = player->TotalNumUnits;
+	int typecount = player->UnitTypesCount[type->Slot];
+	int num = 0;
 
-	nunits = player->TotalNumUnits;
-	typecount = player->UnitTypesCount[type->Slot];
-	for (num = 0, i = 0; i < nunits && typecount && num < tablesize; ++i) {
-		unit = player->Units[i];
+	for (int i = 0; i < nunits && typecount && num < tablesize; ++i) {
+		CUnit *unit = player->Units[i];
 		if (unit->Type == type) {
 			if (!unit->IsUnusable()) {
 				table[num++] = unit;
@@ -160,24 +127,27 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 }
 
 /**
-**  Unit on map tile, no special prefered.
+**  Unit on map tile.
 **
-**  @param tx  X position on map, tile-based.
-**  @param ty  Y position on map, tile-based.
+**  @param tx    X position on map, tile-based.
+**  @param ty    Y position on map, tile-based.
+**  @param type  UnitTypeType, (unsigned)-1 for any type.
 **
-**  @return    Returns first found unit on tile.
+**  @return      Returns first found unit on tile.
 */
-CUnit *UnitOnMapTile(int tx, int ty)
+CUnit *UnitOnMapTile(int tx, int ty, unsigned type)
 {
 	CUnit *table[UnitMax];
 	int n;
-	int i;
 
 	n = UnitCache.Select(tx, ty, table, UnitMax);
-	for (i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		// Note: this is less restrictive than UnitActionDie...
 		// Is it normal?
 		if (table[i]->Type->Vanishes) {
+			continue;
+		}
+		if (type != (unsigned)-1 && (unsigned)table[i]->Type->UnitType != type) {
 			continue;
 		}
 		return table[i];
@@ -200,22 +170,17 @@ CUnit *UnitOnMapTile(int tx, int ty)
 CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 {
 	CUnit *table[UnitMax];
-	CUnit *unit;
-	CUnit *best;
-	const CUnitType *type;
+	CUnit *best = NoUnitP;
 	int n;
-	int i;
 
 	n = UnitCache.Select(x1, y1, x2, y2, table, UnitMax);
-	best = NoUnitP;
-	for (i = 0; i < n; ++i) {
-		unit = table[i];
+	for (int i = 0; i < n; ++i) {
+		CUnit *unit = table[i];
 		if (!unit->IsVisibleAsGoal(source->Player)) {
 			continue;
 		}
-		type = unit->Type;
-		if (x2 < unit->X || x1 >= unit->X + type->TileWidth ||
-				y2 < unit->Y || y1 >= unit->Y + type->TileHeight) {
+		if (x2 < unit->X || x1 >= unit->X + unit->Type->TileWidth ||
+				y2 < unit->Y || y1 >= unit->Y + unit->Type->TileHeight) {
 			continue;
 		}
 		if (!CanTarget(source->Type, unit->Type)) {
@@ -248,11 +213,10 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 CUnit *ResourceOnMap(int tx, int ty, int resource)
 {
 	CUnit *table[UnitMax];
-	int i;
 	int n;
 
 	n = UnitCache.Select(tx, ty, table, UnitMax);
-	for (i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvestFrom) {
 			continue;
 		}
@@ -728,15 +692,13 @@ CUnit *AttackUnitsInRange(const CUnit *unit)
 CUnit *AttackUnitsInReactRange(const CUnit *unit)
 {
 	int range;
-	const CUnitType *type;
 
-	type = unit->Type;
 	Assert(unit->Type->CanAttack);
 
 	if (unit->Player->Type == PlayerPerson) {
-		range = type->ReactRangePerson;
+		range = unit->Type->ReactRangePerson;
 	} else {
-		range = type->ReactRangeComputer;
+		range = unit->Type->ReactRangeComputer;
 	}
 
 	return AttackUnitsInDistance(unit, range);

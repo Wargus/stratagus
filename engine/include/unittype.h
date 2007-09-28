@@ -517,11 +517,11 @@ public:
 // FIXME Sprite info. better way ?
 };
 
-typedef enum {
+enum UnitTypeType {
 	UnitTypeLand,               /// Unit lives on land
 	UnitTypeFly,                /// Unit lives in air
 	UnitTypeNaval,              /// Unit lives on water
-} UnitTypeType;
+};
 
 enum DistanceTypeType {
 	Equal,
