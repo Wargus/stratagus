@@ -896,6 +896,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\game\replay.cpp"
+						>
+					</File>
+					<File
 						RelativePath="game\savegame.cpp"
 						>
 						<FileConfiguration
@@ -3215,6 +3219,10 @@
 				</File>
 				<File
 					RelativePath="include\player.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\replay.h"
 					>
 				</File>
 				<File

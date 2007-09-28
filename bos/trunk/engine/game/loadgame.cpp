@@ -53,7 +53,7 @@
 #include "trigger.h"
 #include "actions.h"
 #include "minimap.h"
-#include "commands.h"
+#include "replay.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "font.h"

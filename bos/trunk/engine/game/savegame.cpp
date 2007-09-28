@@ -58,7 +58,7 @@
 #include "settings.h"
 #include "iolib.h"
 #include "spells.h"
-#include "commands.h"
+#include "replay.h"
 #include "script.h"
 #include "actions.h"
 #include "version.h"
