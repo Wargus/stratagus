@@ -206,10 +206,10 @@ static void DrawTrainingUnits(const CUnit *unit)
 static void DrawTransportingUnits(const CUnit *unit)
 {
 	const CUnit *insideUnit = unit->UnitInside;
-	size_t currentButton = 0;
+	int currentButton = 0;
 
 	for (int i = 0; i < unit->InsideCount; ++i, insideUnit = insideUnit->NextContained) {
-		if (insideUnit->Boarded && currentButton < UI.TransportingButtons.size()) {
+		if (insideUnit->Boarded && currentButton < (int)UI.TransportingButtons.size()) {
 			CUIButton *button = &UI.TransportingButtons[currentButton];
 			bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == currentButton);
 
