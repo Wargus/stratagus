@@ -123,7 +123,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 end
 
 
-DefineElitePanels(Video.Width - 200, 152)
+--DefineElitePanels(Video.Width - 200, 152)
 
 
 UI.NormalFontColor = "light-blue"

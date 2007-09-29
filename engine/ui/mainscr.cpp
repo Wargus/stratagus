@@ -39,6 +39,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
+#include <sstream>
 
 #include "stratagus.h"
 #include "video.h"
@@ -158,163 +159,134 @@ static void UiDrawManaBar(const CUnit *unit, int x, int y)
 }
 
 /**
-**  Tell if we can show the content.
-**  verify each sub condition for that.
-**
-**  @param condition  condition to verify.
-**  @param unit       unit that certain condition can refer.
-**
-**  @return           if we can show the content or not.
+**  Draw training units
 */
-static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
+static void DrawTrainingUnits(const CUnit *unit)
 {
-	if (!condition) {
-		return true;
-	}
+	if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
+		if (!UI.SingleTrainingText.empty()) {
+			VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
+				UI.SingleTrainingFont, UI.SingleTrainingText);
+		}
+		if (UI.SingleTrainingButton) {
+			CUIButton *button = UI.SingleTrainingButton;
+			bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0);
 
-	if ((condition->ShowOnlySelected && !unit->Selected) ||
-			(unit->Player->Type == PlayerNeutral && condition->HideNeutral) ||
-			(ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent) ||
-			(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
-		return false;
-	}
+			unit->Orders[0]->Type->Icon.Icon->DrawUnitIcon(unit->Player, button->Style,
+				mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
+				button->X, button->Y, "");
+		}
+	} else {
+		if (!UI.TrainingText.empty()) {
+			VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
+				UI.TrainingFont, UI.TrainingText);
+		}
+		if (!UI.TrainingButtons.empty()) {
+			size_t currentButton = 0;
 
-	if (condition->BoolFlags) {
-		for (int i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-			if (condition->BoolFlags[i] != CONDITION_TRUE) {
-				if ((condition->BoolFlags[i] == CONDITION_ONLY) ^ unit->Type->BoolFlag[i]) {
-					return false;
+			for (int i = 0; i < unit->OrderCount; ++i) {
+				if (unit->Orders[i]->Action == UnitActionTrain && currentButton < UI.TrainingButtons.size()) {
+					CUIButton *button = &UI.TrainingButtons[i];
+					bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == i);
+
+					unit->Orders[i]->Type->Icon.Icon->DrawUnitIcon(unit->Player, button->Style,
+						mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
+						button->X, button->Y, "");
+
+					currentButton++;
 				}
 			}
 		}
 	}
-
-	if (condition->Variables) {
-		for (int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit->Variable[i].Enable) {
-					return false;
-				}
-			}
-		}
-	}
-
-	return true;
 }
 
 /**
-**  Draw the unit info into top-panel.
+**  Draw transporting units
+*/
+static void DrawTransportingUnits(const CUnit *unit)
+{
+	const CUnit *insideUnit = unit->UnitInside;
+	size_t currentButton = 0;
+
+	for (int i = 0; i < unit->InsideCount; ++i, insideUnit = insideUnit->NextContained) {
+		if (insideUnit->Boarded && currentButton < UI.TransportingButtons.size()) {
+			CUIButton *button = &UI.TransportingButtons[currentButton];
+			bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == currentButton);
+
+			insideUnit->Type->Icon.Icon->DrawUnitIcon(unit->Player, button->Style,
+				mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
+				button->X, button->Y, "");
+
+			UiDrawLifeBar(insideUnit, button->X, button->Y);
+
+			if (insideUnit->Type->CanCastSpell && insideUnit->Variable[MANA_INDEX].Max) {
+				UiDrawManaBar(insideUnit, button->X, button->Y);
+			}
+
+			if (mouseOver) {
+				UI.StatusLine.Set(insideUnit->Type->Name);
+			}
+
+			++currentButton;
+		}
+	}
+}
+
+/**
+**  Draw the unit info in the info panel.
+**  Called when a single unit is selected or the mouse hovers over a unit.
 **
 **  @param unit  Pointer to unit.
 */
 static void DrawUnitInfo(CUnit *unit)
 {
-	int i;
-	CUnitType *type;
-	const CUnitStats *stats;
-	int x;
-	int y;
-	CUnit *uins;
+	int x = UI.InfoPanel.X;
+	int y = UI.InfoPanel.Y;
+	bool isEnemy = unit->IsEnemy(ThisPlayer);
+	bool isNeutral = (unit->Player->Type == PlayerNeutral);
 
-	Assert(unit);
 	UpdateUnitVariables(unit);
-	for (i = 0; i < (int)UI.InfoPanelContents.size(); ++i) {
-		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
-			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();
-					content != UI.InfoPanelContents[i]->Contents.end(); ++content) {
-				if (CanShowContent((*content)->Condition, unit)) {
-					(*content)->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
-				}
-			}
+
+	// Draw icon and life bar
+	if (UI.SingleSelectedButton) {
+		CUIButton *button = UI.SingleSelectedButton;
+		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0);
+
+		unit->Type->Icon.Icon->DrawUnitIcon(unit->Player, button->Style,
+			mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
+			button->X, button->Y, "");
+		if (!isNeutral) {
+			UiDrawLifeBar(unit, button->X, button->Y);
 		}
 	}
 
-	type = unit->Type;
-	stats = unit->Stats;
-	Assert(type);
-	Assert(stats);
-
-	// Draw IconUnit
-	if (UI.SingleSelectedButton) {
-		x = UI.SingleSelectedButton->X;
-		y = UI.SingleSelectedButton->Y;
-		type->Icon.Icon->DrawUnitIcon(unit->Player, UI.SingleSelectedButton->Style,
-			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
-				(IconActive | (MouseButtons & LeftButton)) : 0,
-			x, y, "");
+	// Unit type name
+	if (!isNeutral) {
+		VideoDrawTextCentered(x + 114, y + 25, GameFont, unit->Type->Name);
 	}
 
-	x = UI.InfoPanel.X;
-	y = UI.InfoPanel.Y;
+	// Hit points
+	if (!isEnemy && !isNeutral) {
+		std::ostringstream os;
+		os << unit->Variable[HP_INDEX].Value << "/" << unit->Variable[HP_INDEX].Max;
+		VideoDrawTextCentered(x + 38, y + 62, SmallFont, os.str());
+	}
 
 	//
-	//  Show progress if they are selected.
+	//  Show extra info if only one unit is selected.
 	//
 	if (NumSelected == 1 && Selected[0] == unit) {
-		//
-		//  Building training units.
-		//
+		// Training units.
 		if (unit->Orders[0]->Action == UnitActionTrain) {
-			if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
-				if (!UI.SingleTrainingText.empty()) {
-					VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
-						UI.SingleTrainingFont, UI.SingleTrainingText);
-				}
-				if (UI.SingleTrainingButton) {
-					unit->Orders[0]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
-						UI.SingleTrainingButton->Style,
-						(ButtonAreaUnderCursor == ButtonAreaTraining &&
-							ButtonUnderCursor == 0) ?
-							(IconActive | (MouseButtons & LeftButton)) : 0,
-						UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
-				}
-			} else {
-				if (!UI.TrainingText.empty()) {
-					VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
-						UI.TrainingFont, UI.TrainingText);
-				}
-				if (!UI.TrainingButtons.empty()) {
-					for (i = 0; i < unit->OrderCount &&
-							i < (int)UI.TrainingButtons.size(); ++i) {
-						if (unit->Orders[i]->Action == UnitActionTrain) {
-							unit->Orders[i]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
-								 UI.TrainingButtons[i].Style,
-								(ButtonAreaUnderCursor == ButtonAreaTraining &&
-									ButtonUnderCursor == i) ?
-									(IconActive | (MouseButtons & LeftButton)) : 0,
-								UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
-						}
-					}
-				}
-			}
+			DrawTrainingUnits(unit);
 			return;
 		}
-	}
 
-	//
-	//  Transporting units.
-	//
-	if (type->CanTransport && unit->BoardCount) {
-		int j;
-
-		uins = unit->UnitInside;
-		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
-			if (uins->Boarded && j < (int)UI.TransportingButtons.size()) {
-				uins->Type->Icon.Icon->DrawUnitIcon(unit->Player, UI.TransportingButtons[j].Style,
-					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, "");
-				UiDrawLifeBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-					UiDrawManaBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-				}
-				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
-					UI.StatusLine.Set(uins->Type->Name);
-				}
-				++j;
-			}
+		// Transporting units.
+		if (unit->Type->CanTransport && unit->BoardCount) {
+			DrawTransportingUnits(unit);
+			return;
 		}
-		return;
 	}
 }
 
@@ -793,131 +765,105 @@ void ClearCosts(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Draw info panel background.
-**
-**  @param frame  frame nr. of the info panel background.
+**  Draw info panel with more than one unit selected
 */
-static void DrawInfoPanelBackground(unsigned frame)
+static void DrawInfoPanelMultipleSelected()
 {
-	if (UI.InfoPanel.G) {
-		UI.InfoPanel.G->DrawFrameClip(frame,
-			UI.InfoPanel.X, UI.InfoPanel.Y);
+	// Draw icons and a health bar
+	for (int i = 0; i < std::min(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
+		CUIButton *button = &UI.SelectedButtons[i];
+		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i);
+
+		Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer, button->Style,
+			mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
+			button->X, button->Y, "");
+		UiDrawLifeBar(Selected[i], button->X, button->Y);
+
+		if (mouseOver) {
+			UI.StatusLine.Set(Selected[i]->Type->Name);
+		}
+	}
+
+	// Selected more than we can display
+	if (NumSelected > (int)UI.SelectedButtons.size()) {
+		std::ostringstream os;
+		os << "+" << (unsigned)(NumSelected - UI.SelectedButtons.size());
+
+		VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
+			UI.MaxSelectedFont, os.str());
 	}
 }
 
 /**
+**  Draw info panel with one unit selected
+*/
+static void DrawInfoPanelSingleSelected()
+{
+	DrawUnitInfo(Selected[0]);
+	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
+		UI.StatusLine.Set(Selected[0]->Type->Name);
+	}
+}
+
+/**
+**  Draw info panel with no units selected
+*/
+static void DrawInfoPanelNoneSelected()
+{
+	// Check if a unit is under the cursor
+	if (UnitUnderCursor && UnitUnderCursor->IsVisible(ThisPlayer)) {
+		DrawUnitInfo(UnitUnderCursor);
+		return;
+	}
+
+	std::string nc;
+	std::string rc;
+	int x = UI.InfoPanel.X + 16;
+	int y = UI.InfoPanel.Y + 8;
+
+	VideoDrawText(x, y, GameFont, "Bos Wars");
+	y += 16;
+	VideoDrawText(x, y, GameFont, "Cycle:");
+	VideoDrawNumber(x + 48, y, GameFont, GameCycle);
+	VideoDrawNumber(x + 110, y, GameFont,
+		CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+	y += 20;
+
+	GetDefaultTextColors(nc, rc);
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].Type != PlayerNobody) {
+			if (ThisPlayer->Allied & (1 << Players[i].Index)) {
+				SetDefaultTextColors(FontGreen, rc);
+			} else if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
+				SetDefaultTextColors(FontRed, rc);
+			} else {
+				SetDefaultTextColors(nc, rc);
+			}
+
+			VideoDrawNumber(x + 15, y, GameFont, i);
+
+			Video.DrawRectangle(ColorWhite,x, y, 12, 12);
+			Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
+
+			VideoDrawText(x + 27, y, GameFont,Players[i].Name);
+			VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);
+			y += 14;
+		}
+	}
+	SetDefaultTextColors(nc, rc);
+}
+
+/**
 **  Draw info panel.
-**
-**  Panel:
-**    neutral      - neutral or opponent
-**    normal       - not 1,3,4
-**    magic unit   - magic units
-**    construction - under construction
 */
 void CInfoPanel::Draw(void)
 {
-	int i;
-
-	if (NumSelected) {
-		if (NumSelected > 1) {
-			//
-			//  If there are more units selected draw their pictures and a health bar
-			//
-			DrawInfoPanelBackground(0);
-			for (i = 0; i < std::min(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
-				Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer,
-					UI.SelectedButtons[i].Style,
-					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, "");
-				UiDrawLifeBar(Selected[i],
-					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
-
-				if (ButtonAreaUnderCursor == ButtonAreaSelected &&
-						ButtonUnderCursor == i) {
-					UI.StatusLine.Set(Selected[i]->Type->Name);
-				}
-			}
-			if (NumSelected > (int)UI.SelectedButtons.size()) {
-				char buf[5];
-
-				sprintf(buf, "+%u", static_cast<unsigned int> (NumSelected - UI.SelectedButtons.size()));
-				VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
-					UI.MaxSelectedFont, buf);
-			}
-			return;
-		} else {
-			// FIXME: not correct for enemy's units
-			if (Selected[0]->Player == ThisPlayer ||
-					ThisPlayer->IsTeamed(Selected[0]) ||
-					ThisPlayer->IsAllied(Selected[0]) ||
-					ReplayRevealMap) {
-				if (Selected[0]->Orders[0]->Action == UnitActionBuilt ||
-						Selected[0]->Orders[0]->Action == UnitActionTrain) {
-					i = 3;
-				} else if (Selected[0]->Stats->Variables[MANA_INDEX].Max) {
-					i = 2;
-				} else {
-					i = 1;
-				}
-			} else {
-				i = 0;
-			}
-			DrawInfoPanelBackground(i);
-			DrawUnitInfo(Selected[0]);
-			if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-				UI.StatusLine.Set(Selected[0]->Type->Name);
-			}
-			return;
-		}
-	}
-
-	//  Nothing selected
-
-	DrawInfoPanelBackground(0);
-	if (UnitUnderCursor && UnitUnderCursor->IsVisible(ThisPlayer)) {
-		// FIXME: not correct for enemies units
-		DrawUnitInfo(UnitUnderCursor);
+	if (NumSelected > 1) {
+		DrawInfoPanelMultipleSelected();
+	} else if (NumSelected == 1) {
+		DrawInfoPanelSingleSelected();
 	} else {
-		int x;
-		int y;
-		std::string nc;
-		std::string rc;
-		// FIXME: need some cool ideas for this.
-
-		x = UI.InfoPanel.X + 16;
-		y = UI.InfoPanel.Y + 8;
-
-		VideoDrawText(x, y, GameFont, "Bos Wars");
-		y += 16;
-		VideoDrawText(x, y, GameFont, "Cycle:");
-		VideoDrawNumber(x + 48, y, GameFont, GameCycle);
-		VideoDrawNumber(x + 110, y, GameFont,
-			CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-		y += 20;
-
-		GetDefaultTextColors(nc, rc);
-		for (i = 0; i < PlayerMax - 1; ++i) {
-			if (Players[i].Type != PlayerNobody) {
-				if (ThisPlayer->Allied & (1 << Players[i].Index)) {
-					SetDefaultTextColors(FontGreen, rc);
-				} else if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
-					SetDefaultTextColors(FontRed, rc);
-				} else {
-					SetDefaultTextColors(nc, rc);
-				}
-
-				VideoDrawNumber(x + 15, y, GameFont, i);
-
-				Video.DrawRectangle(ColorWhite,x, y, 12, 12);
-				Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
-
-				VideoDrawText(x + 27, y, GameFont,Players[i].Name);
-				VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);
-				y += 14;
-			}
-		}
-		SetDefaultTextColors(nc, rc);
+		DrawInfoPanelNoneSelected();
 	}
 }
 
