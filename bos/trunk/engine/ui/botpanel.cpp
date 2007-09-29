@@ -302,7 +302,7 @@ static void DrawPopup()
 	CUIButton *uibutton = &UI.ButtonPanel.Buttons[ButtonUnderCursor];
 	int popupWidth = 140;
 	int popupHeight = 115;
-	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 128);
+	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 200);
 	std::string nc, rc;
 	CUnitType *type;
 
