@@ -39,6 +39,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <vector>
+#include <sstream>
 
 #include "stratagus.h"
 
@@ -52,6 +53,8 @@
 #include "sound.h"
 #include "map.h"
 #include "commands.h"
+#include "video.h"
+#include "font.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -286,6 +289,96 @@ static int GetButtonStatus(const ButtonAction *button)
 }
 
 /**
+**  Draw popup
+*/
+static void DrawPopup()
+{
+	ButtonAction *button = &CurrentButtons[ButtonUnderCursor];
+
+	if (button->Action != ButtonBuild && button->Action != ButtonTrain) {
+		return;
+	}
+
+	CUIButton *uibutton = &UI.ButtonPanel.Buttons[ButtonUnderCursor];
+	int popupWidth = 140;
+	int popupHeight = 115;
+	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 128);
+	std::string nc, rc;
+	CUnitType *type;
+
+	int x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+	int y = uibutton->Y - popupHeight - 10;
+	type = UnitTypes[button->Value];
+
+	Video.FillRectangle(backgroundColor, x, y, popupWidth, popupHeight);
+	Video.DrawRectangle(ColorBlack, x, y, popupWidth, popupHeight);
+
+	GetDefaultTextColors(nc, rc);
+	SetDefaultTextColors("black", "red");
+
+	// Name
+	VideoDrawText(x + 5, y + 3, SmallFont, type->Name);
+	Video.DrawHLine(ColorBlack, x, y + 15, popupWidth);
+
+	y += 20;
+
+	// Costs
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (type->ProductionCosts[i]) {
+			if (UI.Resources[i].G) {
+				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
+					x + 5 + 60 * i, y);
+			}
+			VideoDrawNumber(x + 20 + 60 * i, y, SmallFont, type->ProductionCosts[i] / CYCLES_PER_SECOND);
+		}
+	}
+	y += 15;
+
+	// Hit Points
+	std::ostringstream hitPoints;
+	hitPoints << "Hit Points: " << type->Variable[HP_INDEX].Value;
+	VideoDrawText(x + 5, y, SmallFont, hitPoints.str());
+	y += 15;
+
+	if (type->CanAttack) {
+		// Damage
+		int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
+		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value + type->Variable[BASICDAMAGE_INDEX].Value;
+		std::ostringstream damage;
+		damage << "Damage: " << min_damage << "-" << max_damage;
+		VideoDrawText(x + 5, y, SmallFont, damage.str());
+		y += 15;
+
+		// Attack Range
+		std::ostringstream attackRange;
+		attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
+		VideoDrawText(x + 5, y, SmallFont, attackRange.str());
+		y += 15;
+	}
+
+	// Armor
+	std::ostringstream armor;
+	armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
+	VideoDrawText(x + 5, y, SmallFont, armor.str());
+	y += 15;
+
+	if (type->Variable[RADAR_INDEX].Value) {
+		// Radar Range
+		std::ostringstream radarRange;
+		radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
+		VideoDrawText(x + 5, y, SmallFont, radarRange.str());
+	} else {
+		// Sight Range
+		std::ostringstream sightRange;
+		sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
+		VideoDrawText(x + 5, y, SmallFont, sightRange.str());
+	}
+	y += 15;
+
+	SetDefaultTextColors(nc, rc);
+}
+
+/**
 **  Draw button panel.
 **
 **  Draw all action buttons.
@@ -316,11 +409,12 @@ void CButtonPanel::Draw(void)
 	//
 	//  Draw all buttons.
 	//
-	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
+	for (size_t i = 0; i < UI.ButtonPanel.Buttons.size(); ++i) {
 		if (buttons[i].Pos == -1) {
 			continue;
 		}
 		Assert(buttons[i].Pos == i + 1);
+
 		//
 		//  Tutorial show command key in icons
 		//
@@ -347,6 +441,7 @@ void CButtonPanel::Draw(void)
 		//
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 				ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			DrawPopup();
 			UpdateStatusLineForButton(&buttons[i]);
 		}
 	}
