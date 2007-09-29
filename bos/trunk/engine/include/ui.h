@@ -222,73 +222,6 @@ public:
 	int ScrollPaddingBottom;        /// Scrollable area past the bottom of map
 };
 
-/**
-**  Condition to show panel content.
-*/
-class ConditionPanel {
-public:
-	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
-		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
-		Variables(NULL) {}
-	~ConditionPanel() {
-		delete[] BoolFlags;
-		delete[] Variables;
-	}
-
-	bool ShowOnlySelected;      /// if true, show only for selected unit.
-
-	bool HideNeutral;           /// if true, don't show for neutral unit.
-	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
-	bool ShowOpponent;          /// if true, show for opponent unit.
-
-	char *BoolFlags;            /// array of condition about user flags.
-	char *Variables;            /// array of variable to verify (enable and max > 0)
-};
-
-/**
-**  Infos to display the contents of panel.
-*/
-class CContentType {
-public:
-	CContentType() : PosX(0), PosY(0), Condition(NULL) {}
-	virtual ~CContentType() { delete Condition; }
-
-		/// Tell how show the variable Index.
-	virtual void Draw(const CUnit *unit, CFont *defaultfont) const = 0;
-
-	int PosX;             /// X coordinate where to display.
-	int PosY;             /// Y coordinate where to display.
-
-	ConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
-};
-
-/**
-**  Info for the panel.
-*/
-class CUnitInfoPanel {
-public:
-	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
-		Contents(), Condition(NULL) {}
-	~CUnitInfoPanel() {
-		for (std::vector<CContentType *>::iterator content = Contents.begin();
-				content != Contents.end(); ++content) {
-			delete *content;
-		}
-		delete Condition;
-	}
-
-
-	std::string Name;      /// Ident of the panel.
-	int PosX;              /// X coordinate of the panel.
-	int PosY;              /// Y coordinate of the panel.
-	CFont *DefaultFont;    /// Default font for content.
-
-	std::vector<CContentType *>Contents; /// Array of contents to display.
-
-	ConditionPanel *Condition; /// Condition to show the panel; if NULL, no condition.
-};
-
-
 class CFiller
 {
 public:
@@ -362,11 +295,10 @@ public:
 class CInfoPanel
 {
 public:
-	CInfoPanel() : G(NULL), X(0), Y(0) {}
+	CInfoPanel() : X(0), Y(0) {}
 
 	void Draw();
 
-	CGraphic *G;
 	int X;
 	int Y;
 };
@@ -431,7 +363,6 @@ public:
 	CResourceInfo Resources[MaxResourceInfo];/// Icon+Text of all resources
 
 	CInfoPanel InfoPanel;               /// Info panel
-	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
 
 	CUIButton *SingleSelectedButton;    /// Button for single selected unit
 
@@ -553,9 +484,6 @@ extern void FreeButtonStyles();
 #endif
 	/// Register ccl features
 extern void UserInterfaceCclRegister(void);
-
-	/// Register panel functions
-extern void PanelRegister(void);
 
 	/// Find a button style
 extern ButtonStyle *FindButtonStyle(const std::string &style);

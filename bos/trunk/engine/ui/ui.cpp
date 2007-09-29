@@ -168,10 +168,6 @@ void CUserInterface::Load(void)
 		}
 	}
 
-	if (InfoPanel.G) {
-		InfoPanel.G->Load();
-		InfoPanel.G->UseDisplayFormat();
-	}
 	if (ButtonPanel.G) {
 		ButtonPanel.G->Load();
 		ButtonPanel.G->UseDisplayFormat();
@@ -257,14 +253,6 @@ void CleanUserInterface(void)
 	for (i = 0; i <= ScoreCost; ++i) {
 		CGraphic::Free(UI.Resources[i].G);
 	}
-
-	// Info Panel
-	CGraphic::Free(UI.InfoPanel.G);
-	for (std::vector<CUnitInfoPanel *>::iterator panel = UI.InfoPanelContents.begin();
-			panel != UI.InfoPanelContents.end(); ++panel) {
-		delete *panel;
-	}
-	UI.InfoPanelContents.clear();
 
 	delete UI.SingleSelectedButton;
 	UI.SelectedButtons.clear();
