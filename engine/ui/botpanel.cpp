@@ -294,15 +294,33 @@ static int GetButtonStatus(const ButtonAction *button)
 static void DrawPopup()
 {
 	ButtonAction *button = &CurrentButtons[ButtonUnderCursor];
+	CUIButton *uibutton = &UI.ButtonPanel.Buttons[ButtonUnderCursor];
+	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 200);
 
+	// Draw hint
 	if (button->Action != ButtonBuild && button->Action != ButtonTrain) {
+		int popupWidth = SmallFont->Width(button->Hint) + 10;
+		int popupHeight = 19;
+		int x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+		int y = uibutton->Y - popupHeight - 10;
+		std::string nc, rc;
+
+		GetDefaultTextColors(nc, rc);
+		SetDefaultTextColors("black", "red");
+
+		// Background
+		Video.FillRectangle(backgroundColor, x, y, popupWidth, popupHeight);
+		Video.DrawRectangle(ColorBlack, x, y, popupWidth, popupHeight);
+
+		// Hint
+		VideoDrawText(x + 5, y + 3, SmallFont, button->Hint);
+
+		SetDefaultTextColors(nc, rc);
 		return;
 	}
 
-	CUIButton *uibutton = &UI.ButtonPanel.Buttons[ButtonUnderCursor];
 	int popupWidth = 140;
 	int popupHeight = 115;
-	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 200);
 	std::string nc, rc;
 	CUnitType *type;
 
@@ -310,11 +328,12 @@ static void DrawPopup()
 	int y = uibutton->Y - popupHeight - 10;
 	type = UnitTypes[button->Value];
 
-	Video.FillRectangle(backgroundColor, x, y, popupWidth, popupHeight);
-	Video.DrawRectangle(ColorBlack, x, y, popupWidth, popupHeight);
-
 	GetDefaultTextColors(nc, rc);
 	SetDefaultTextColors("black", "red");
+
+	// Background
+	Video.FillRectangle(backgroundColor, x, y, popupWidth, popupHeight);
+	Video.DrawRectangle(ColorBlack, x, y, popupWidth, popupHeight);
 
 	// Name
 	VideoDrawText(x + 5, y + 3, SmallFont, type->Name);
