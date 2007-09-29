@@ -409,7 +409,7 @@ void CButtonPanel::Draw(void)
 	//
 	//  Draw all buttons.
 	//
-	for (size_t i = 0; i < UI.ButtonPanel.Buttons.size(); ++i) {
+	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
 		if (buttons[i].Pos == -1) {
 			continue;
 		}
