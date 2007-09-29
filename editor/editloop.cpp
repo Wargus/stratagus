@@ -994,14 +994,6 @@ void EditorUpdateDisplay(void)
 			UI.SelectedViewport->MapY);
 	}
 	//
-	// Info panel
-	//
-	if (UI.InfoPanel.G) {
-		UI.InfoPanel.G->DrawSub(0, 0,
-			UI.InfoPanel.G->Width, UI.InfoPanel.G->Height,
-			UI.InfoPanel.X, UI.InfoPanel.Y);
-	}
-	//
 	// Button panel
 	//
 	if (UI.ButtonPanel.G) {

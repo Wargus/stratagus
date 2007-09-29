@@ -2636,10 +2636,6 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\ui\script_panel.cpp"
-						>
-					</File>
-					<File
 						RelativePath="ui\script_ui.cpp"
 						>
 						<FileConfiguration
