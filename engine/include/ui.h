@@ -554,8 +554,8 @@ extern void FreeButtonStyles();
 	/// Register ccl features
 extern void UserInterfaceCclRegister(void);
 
-	/// Register alias functions
-extern void AliasRegister(void);
+	/// Register panel functions
+extern void PanelRegister(void);
 
 	/// Find a button style
 extern ButtonStyle *FindButtonStyle(const std::string &style);
