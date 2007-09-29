@@ -46,6 +46,31 @@
 #include "video.h"
 
 /*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct NumberDesc;
+struct UnitDesc;
+struct StringDesc;
+struct UStrInt;
+enum EnumVariable;
+
+static UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t);
+
+static EnumVariable Str2EnumVariable(lua_State *l, const char *s);
+static NumberDesc *CclParseNumberDesc(lua_State *l);
+static UnitDesc *CclParseUnitDesc(lua_State *l);
+static StringDesc *CclParseStringDesc(lua_State *l);
+
+static int EvalNumber(const NumberDesc *numberdesc);
+static CUnit *EvalUnit(const UnitDesc *unitdesc);
+static char *EvalString(const StringDesc *s);
+
+static void FreeNumberDesc(NumberDesc *number);
+static void FreeUnitDesc(UnitDesc *unitdesc);
+static void FreeStringDesc(StringDesc *s);
+
+/*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
@@ -53,13 +78,13 @@ static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
 
 /// Useful for getComponent.
-typedef enum {
+enum UStrIntType {
 	USTRINT_STR, USTRINT_INT
-} UStrIntType;
-typedef struct {
+};
+struct UStrInt {
 	union {const char *s; int i;};
 	UStrIntType type;
-} UStrInt;
+};
 
 /**
 **  All possible value for a number.
@@ -141,12 +166,6 @@ enum EnumUnit
 	UnitRefWorker,          /// unit->Data.Built.Worker
 	UnitRefGoal,            /// unit->Goal
 };
-
-struct NumberDesc;
-struct UnitDesc;
-struct StringDesc;
-
-void FreeStringDesc(StringDesc *s);
 
 /**
 **  For Bin operand  a ?? b
@@ -339,22 +358,6 @@ public:
 #endif
 };
 
-
-UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t);
-
-EnumVariable Str2EnumVariable(lua_State *l, const char *s);
-NumberDesc *CclParseNumberDesc(lua_State *l);
-UnitDesc *CclParseUnitDesc(lua_State *l);
-StringDesc *CclParseStringDesc(lua_State *l);
-
-StringDesc *NewStringDesc(const char *s);
-int EvalNumber(const NumberDesc *numberdesc);
-CUnit *EvalUnit(const UnitDesc *unitdesc);
-char *EvalString(const StringDesc *s);
-
-void FreeNumberDesc(NumberDesc *number);
-void FreeUnitDesc(UnitDesc *unitdesc);
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -368,7 +371,7 @@ void FreeUnitDesc(UnitDesc *unitdesc);
 **  @return  Corresponding value.
 **  @note    Stop on error.
 */
-EnumVariable Str2EnumVariable(lua_State *l, const char *s)
+static EnumVariable Str2EnumVariable(lua_State *l, const char *s)
 {
 	static struct {
 		const char *s;
@@ -813,7 +816,7 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 **
 **  @return   unit referernce definition.
 */
-UnitDesc *CclParseUnitDesc(lua_State *l)
+static UnitDesc *CclParseUnitDesc(lua_State *l)
 {
 	UnitDesc *res;  // Result
 
@@ -913,7 +916,7 @@ static char *CallLuaStringFunction(unsigned int handler)
 **
 **  @return   number.
 */
-NumberDesc *CclParseNumberDesc(lua_State *l)
+static NumberDesc *CclParseNumberDesc(lua_State *l)
 {
 	NumberDesc *res;
 	int nargs;
@@ -1045,33 +1048,13 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 }
 
 /**
-**  Create a StringDesc with const string.
-**
-**  @param s  direct value for the StringDesc
-**
-**  @return   the new StringDesc.
-*/
-StringDesc *NewStringDesc(const char *s)
-{
-	StringDesc *res;
-
-	if (!s) {
-		return NULL;
-	}
-	res = new StringDesc;
-	res->e = EString_Dir;
-	res->D.Val = new_strdup(s);
-	return res;
-}
-
-/**
 **  Return String description.
 **
 **  @param l  lua state.
 **
 **  @return   String description.
 */
-StringDesc *CclParseStringDesc(lua_State *l)
+static StringDesc *CclParseStringDesc(lua_State *l)
 {
 	StringDesc *res;      // Result.
 	int nargs;            // Size of table.
@@ -1185,7 +1168,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 **
 **  @return          the result unit.
 */
-CUnit *EvalUnit(const UnitDesc *unitdesc)
+static CUnit *EvalUnit(const UnitDesc *unitdesc)
 {
 	Assert(unitdesc);
 
@@ -1210,7 +1193,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 **
 **  @todo Manage better the error (div/0, unit==NULL, ...).
 */
-int EvalNumber(const NumberDesc *number)
+static int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
 	char *s;
@@ -1313,7 +1296,7 @@ int EvalNumber(const NumberDesc *number)
 **
 **  @todo Manage better the error.
 */
-char *EvalString(const StringDesc *s)
+static char *EvalString(const StringDesc *s)
 {
 	char *res;   // Result string.
 	int i;       // Iterator.
@@ -1447,13 +1430,9 @@ char *EvalString(const StringDesc *s)
 **
 **  @param unitdesc  struct to free
 */
-void FreeUnitDesc(UnitDesc *unitdesc)
+static void FreeUnitDesc(UnitDesc *unitdesc)
 {
-#if 0 // Nothing to free mow.
-	if (!unitdesc) {
-		return;
-	}
-#endif
+	// Nothing to free mow.
 }
 
 /**
@@ -1461,7 +1440,7 @@ void FreeUnitDesc(UnitDesc *unitdesc)
 **
 **  @param number  struct to free
 */
-void FreeNumberDesc(NumberDesc *number)
+static void FreeNumberDesc(NumberDesc *number)
 {
 	if (number == 0) {
 		return;
@@ -1512,13 +1491,12 @@ void FreeNumberDesc(NumberDesc *number)
 **
 **  @param s  struct to free
 */
-void FreeStringDesc(StringDesc *s)
+static void FreeStringDesc(StringDesc *s)
 {
-	int i;
-
-	if (s == 0) {
+	if (!s) {
 		return;
 	}
+
 	switch (s->e) {
 		case EString_Lua :     // a lua function.
 			// FIXME: when lua table should be freed ?
@@ -1527,7 +1505,7 @@ void FreeStringDesc(StringDesc *s)
 			delete[] s->D.Val;
 			break;
 		case EString_Concat :  // "a" + "b" -> "ab"
-			for (i = 0; i < s->D.Concat.n; i++) {
+			for (int i = 0; i < s->D.Concat.n; i++) {
 				FreeStringDesc(s->D.Concat.Strings[i]);
 				delete s->D.Concat.Strings[i];
 			}
@@ -1893,8 +1871,6 @@ static int CclNotEqual(lua_State *l)
 	return Alias(l, "NotEqual");
 }
 
-
-
 /**
 **  Return equivalent lua table for Concat.
 **  {"Concat", {arg1}}
@@ -1924,6 +1900,7 @@ static int CclString(lua_State *l)
 	LuaCheckArgs(l, 1);
 	return Alias(l, "String");
 }
+
 /**
 **  Return equivalent lua table for InverseVideo.
 **  {"InverseVideo", {arg1}}
@@ -1937,6 +1914,7 @@ static int CclInverseVideo(lua_State *l)
 	LuaCheckArgs(l, 1);
 	return Alias(l, "InverseVideo");
 }
+
 /**
 **  Return equivalent lua table for UnitName.
 **  {"UnitName", {arg1}}
@@ -1950,6 +1928,7 @@ static int CclUnitName(lua_State *l)
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitName");
 }
+
 /**
 **  Return equivalent lua table for If.
 **  {"If", {arg1}}
@@ -2063,7 +2042,7 @@ static int CclStringFind(lua_State *l)
 **
 **  @return      The desired unit.
 */
-const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
+static const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 {
 	Assert(unit);
 	switch (e) {
@@ -2097,7 +2076,7 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 **
 **  @return       Value corresponding
 */
-UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
+static UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 {
 	UStrInt val;
 	CVariable *var;
@@ -2410,7 +2389,7 @@ void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
 /**
 **  Register alias functions
 */
-void AliasRegister()
+void PanelRegister()
 {
 	lua_register(Lua, "DefinePanelContents", CclDefinePanelContents);
 

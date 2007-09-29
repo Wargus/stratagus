@@ -747,7 +747,7 @@ void InitCcl(void)
 	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
-	AliasRegister();
+	PanelRegister();
 	ReplayCclRegister();
 	IconCclRegister();
 	MissileCclRegister();
