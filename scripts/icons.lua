@@ -73,19 +73,19 @@ DefineIcon({
 DefineIcon({
 	Name = "icon-build-lvl1",
 	Size = {46, 38},
-	Frame = 3,
+	Frame = 1,
 	File = "units/engineer/engineer_icons.png"})
 
 DefineIcon({
 	Name = "icon-build-lvl2",
 	Size = {46, 38},
-	Frame = 4,
+	Frame = 2,
 	File = "units/engineer/engineer_icons.png"})
 
 DefineIcon({
 	Name = "icon-build-lvl3",
 	Size = {46, 38},
-	Frame = 5,
+	Frame = 3,
 	File = "units/engineer/engineer_icons.png"})
 
 --
