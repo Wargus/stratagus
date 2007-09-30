@@ -1198,12 +1198,16 @@ bool CUnit::IsVisibleOnMinimap() const
 bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 {
 	//
-	// Check if it's at least inside the damn viewport.
+	// Check if the graphic is inside the viewport.
 	//
-	if ((X + Type->TileWidth < vp->MapX) ||
-			(X > vp->MapX + vp->MapWidth) ||
-			(Y + Type->TileHeight < vp->MapY) ||
-			(Y > vp->MapY + vp->MapHeight)) {
+	int x = X * TileSizeX + IX - (Type->Width - Type->TileWidth * TileSizeX) / 2 + Type->OffsetX;
+	int y = Y * TileSizeY + IY - (Type->Height - Type->TileHeight * TileSizeY) / 2 + Type->OffsetY;
+
+	if (x + Type->Width < vp->MapX * TileSizeX + vp->OffsetX ||
+			x > vp->MapX * TileSizeX + vp->OffsetX + (vp->EndX - vp->X) ||
+			y + Type->Height < vp->MapY * TileSizeY + vp->OffsetY ||
+			y > vp->MapY * TileSizeY + vp->OffsetY + (vp->EndY - vp->Y))
+	{
 		return false;
 	}
 
