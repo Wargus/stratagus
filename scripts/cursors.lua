@@ -96,7 +96,7 @@ DefineCursor({
 
 DefineCursor({
    Name = "cursor-point",
-   File = "elites/ui/elites_claw.png",
+   File = "graphics/ui/elites_claw.png",
    HotSpot = {1, 1}, 
    Size = {28, 32}})
 
