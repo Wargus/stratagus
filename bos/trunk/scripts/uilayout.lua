@@ -139,7 +139,7 @@ function AddFiller(file, x, y)
 end
 
 UI.Fillers:clear()
-AddFiller("elites/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
+AddFiller("graphics/ui/ui_minimap.png", Video.Width - 200, 24 - 8)
 if (Editor.Running == EditorNotRunning) then
   local w = Video.Width
   -- FIXME: remove this when we have images for these resolutions
@@ -148,12 +148,12 @@ if (Editor.Running == EditorNotRunning) then
   elseif (w == 1280) then
     w = 1024
   end
-  AddFiller("elites/ui/ui_" .. w .. "_bpanel.png",
+  AddFiller("graphics/ui/ui_" .. w .. "_bpanel.png",
     Video.Width - 200, 336 - 8 - 8)
 end
 
 b = CFiller:new_local()
-b.G = CGraphic:New("elites/ui/ui_info.png", 200, 176)
+b.G = CGraphic:New("graphics/ui/ui_info.png", 200, 176)
 b.X = Video.Width - 200
 b.Y = 152
 UI.Fillers:push_back(b)
@@ -277,7 +277,7 @@ UI.Timer.Y = UI.MapArea.Y + 15
 UI.Timer.Font = Fonts["game"]
 
 -- energy
-UI.Resources[0].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[0].G = CGraphic:New("graphics/ui/ui_res_icons.png", 14, 14)
 UI.Resources[0].IconFrame = 0
 UI.Resources[0].IconX = 67 + 0
 UI.Resources[0].IconY = 0
@@ -285,7 +285,7 @@ UI.Resources[0].TextX = 85 + 0
 UI.Resources[0].TextY = 1
 
 -- magma
-UI.Resources[1].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[1].G = CGraphic:New("graphics/ui/ui_res_icons.png", 14, 14)
 UI.Resources[1].IconFrame = 1
 UI.Resources[1].IconX = 67 + 75
 UI.Resources[1].IconY = 0
@@ -293,7 +293,7 @@ UI.Resources[1].TextX = 85 + 75
 UI.Resources[1].TextY = 1
 
 -- score
-UI.Resources[ScoreCost].G = CGraphic:New("elites/ui/ui_res_icons.png", 14, 14)
+UI.Resources[ScoreCost].G = CGraphic:New("graphics/ui/ui_res_icons.png", 14, 14)
 UI.Resources[ScoreCost].IconFrame = 4
 UI.Resources[ScoreCost].IconX = 67 + 250
 UI.Resources[ScoreCost].IconY = 0
