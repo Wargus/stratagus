@@ -9,7 +9,7 @@
 --
 --	missiles.lua	-	Define the used missiles.
 --
---	(c) Copyright 1998-2004 by Lutz Sammer, Fabrice Rossi and Crestez Leonard
+--	(c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -32,21 +32,21 @@
 -------------------------------------------------------------------------------Y
 
 DefineMissileType("missile-nuke", {
-	File = "elites/missile/nuke.png",
+	File = "graphics/missiles/nuke.png",
 	Size = {128, 128}, Frames = 5, NumDirections = 8,
 	ImpactSound = "vault-dead", DrawLevel = 300,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 64, Range = 1,
 	ImpactMissile = "missile-288x288-explosion"})
 
 DefineMissileType("missile-grenadier", {
-	File =  "elites/missile/grenade.png",
+	File =  "graphics/missiles/grenade.png",
 	Size = {32, 32}, Frames = 5, NumDirections = 8,
 	ImpactSound = "grenade-impact", DrawLevel = 50,
 	Class = "missile-class-parabolic", Sleep = 1, Speed = 16, Range = 2,
 	ImpactMissile = "missile-64x64-explosion"})
 
 DefineMissileType("missile-bazoo", {
-	File = "elites/missile/rocket.png",
+	File = "graphics/missiles/rocket.png",
 	Size = {32, 32}, Frames = 5, NumDirections = 8,
 	ImpactSound = "rocket-impact", DrawLevel = 50,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 16, Range = 2,
