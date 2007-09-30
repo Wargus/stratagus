@@ -74,19 +74,19 @@ DefineIcon({
 	Name = "icon-build-lvl1",
 	Size = {46, 38},
 	Frame = 3,
-	File = "elites/units/engineer_icons.png"})
+	File = "units/engineer/engineer_icons.png"})
 
 DefineIcon({
 	Name = "icon-build-lvl2",
 	Size = {46, 38},
 	Frame = 4,
-	File = "elites/units/engineer_icons.png"})
+	File = "units/engineer/engineer_icons.png"})
 
 DefineIcon({
 	Name = "icon-build-lvl3",
 	Size = {46, 38},
 	Frame = 5,
-	File = "elites/units/engineer_icons.png"})
+	File = "units/engineer/engineer_icons.png"})
 
 --
 --  MISC
