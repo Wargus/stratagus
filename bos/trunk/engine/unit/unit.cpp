@@ -1718,8 +1718,8 @@ void DropOutAll(const CUnit *source)
 **  @param range       Maximum distance to the resource.
 **  @param resource    The resource id.
 **
-**  @note This will return an usable resource building that
-**  belongs to "player" or is neutral.
+**  @note This will return an usable resource building that doesn't
+**  belong to the player or one of his allies.
 **
 **  @return            NoUnitP or resource unit
 */
@@ -1796,9 +1796,8 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 				//
 				if ((res = ResourceOnMap(x, y, resource)) &&
 						res->Type->CanHarvestFrom &&
-						(res->Player->Index == PlayerMax - 1 ||
-							res->Player == unit->Player ||
-							(unit->IsAllied(res) && res->IsAllied(unit)))) {
+						res->Player != unit->Player &&
+						!(unit->IsAllied(res) && res->IsAllied(unit))) {
 					delete[] points;
 					return res;
 				}
