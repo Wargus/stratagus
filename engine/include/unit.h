@@ -712,6 +712,8 @@ public:
 	bool IsVisible(const CPlayer *player) const;
 	/// Returns true, if unit is visible as a goal.
 	bool IsVisibleAsGoal(const CPlayer *player) const;
+	/// Returns true, if the unit is alive and on the map.
+	bool IsAliveOnMap() const;
 	/// Returns true, if unit is Visible for game logic on the map.
 	bool IsVisibleOnMap(const CPlayer *player) const;
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.

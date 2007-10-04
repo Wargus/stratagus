@@ -188,7 +188,7 @@ static void GatherResource(CUnit *unit)
 {
 	CUnit *source = unit->Orders[0]->Goal;
 	int amount[MaxCosts] = {1, 1};
-	bool visible = source->IsVisibleAsGoal(unit->Player);
+	bool visible = source->IsAliveOnMap();
 	int i;
 
 	AnimateActionHarvest(unit);

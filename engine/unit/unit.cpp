@@ -1151,6 +1151,17 @@ bool CUnit::IsVisibleAsGoal(const CPlayer *player) const
 }
 
 /**
+**  Returns true if unit is alive and on the map.
+**  Another unit can interact only with alive map units.
+**
+**  @return        True if alive, false otherwise.
+*/
+bool CUnit::IsAliveOnMap() const
+{
+	return !Removed && !Destroyed && Orders[0]->Action != UnitActionDie;
+}
+
+/**
 **  Returns true, if unit is visible for this player on the map.
 **  The unit has to be out of fog of war and alive
 **
