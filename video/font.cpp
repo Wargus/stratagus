@@ -548,63 +548,6 @@ static void FormatNumber(int number, char *buf)
 }
 
 /**
-**  Return the first occurance of c in [s- s + maxlen]
-**
-**  @param s       original string.
-**  @param c       charrater to find.
-**  @param maxlen  size limit of the search. (0 means unlimited).
-**  @param font    if specified use font->Width() instead of strlen.
-**
-**  @return computed value.
-*/
-static char *strchrlen(char *s, char c, int maxlen, CFont *font)
-{
-	char *res;
-
-	Assert(s);
-	Assert(0 <= maxlen);
-
-	res = strchr(s, c);
-
-	if (!maxlen) {
-		return res;
-	}
-	if (!font &&
-			(s + maxlen < res || (!res && strlen(s) >= (unsigned)maxlen))) {
-		c = s[maxlen];
-		s[maxlen] = '\0';
-		res = strrchr(s, ' ');
-		s[maxlen] = c;
-		if (!res) {
-			fprintf(stderr, "line too long: \"%s\"\n", s);
-			res = s + maxlen;
-		}
-	} else if (font) {
-		char *end;
-
-		if (!res) {
-			res = s + strlen(s);
-		}
-		end = res;
-		c = *end;
-		*end = '\0';
-		while (font->Width(s) > maxlen) {
-			res = strrchr(s, ' ');
-			*end = c;
-			end = res;
-			if (!res) {
-				fprintf(stderr, "line too long: \"%s\"\n", s);
-				return strchr(s, '\n');
-			}
-			c = *end;
-			*end = '\0';
-		}
-		*end = c;
-	}
-	return res;
-}
-
-/**
 **  Draw number with font at x,y unclipped.
 **
 **  @param x       X screen position
