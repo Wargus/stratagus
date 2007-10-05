@@ -102,7 +102,8 @@ extern void InitCcl(void);                  /// Initialise ccl
 extern void LoadCcl(void);                  /// Load ccl config file
 extern void SaveCcl(CFile *file);           /// Save CCL module
 extern void SavePreferences(void);          /// Save user preferences
-extern int CclCommand(const std::string &command); /// Execute a ccl command
+extern char *SaveGlobal(lua_State *l, bool is_root); /// For saving lua state
+extern int CclCommand(const std::string &command);   /// Execute a ccl command
 
 //@}
 

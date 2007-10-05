@@ -770,6 +770,160 @@ void InitCcl(void)
 }
 
 /**
+**  For saving lua state (table, number, string, bool, not function).
+**
+**  @param l        lua_State to save.
+**  @param is_root  true for the main call, 0 for recursif call.
+**
+**  @return  NULL if nothing could be saved.
+**           else a string that could be executed in lua to restore lua state
+**  @todo    do the output prettier (adjust indentation, newline)
+*/
+char *SaveGlobal(lua_State *l, bool is_root)
+{
+	int type_key;
+	int type_value;
+	const char *sep;
+	const char *key;
+	char *value;
+	char *res;
+	bool first;
+	char *tmp;
+	int b;
+
+//	Assert(!is_root || !lua_gettop(l));
+	first = true;
+	res = NULL;
+	if (is_root) {
+		lua_pushstring(l, "_G");// global table in lua.
+		lua_gettable(l, LUA_GLOBALSINDEX);
+	}
+	sep = is_root ? "" : ", ";
+	Assert(lua_istable(l, -1));
+	lua_pushnil(l);
+	while (lua_next(l, -2)) {
+		type_key = lua_type(l, -2);
+		type_value = lua_type(l, -1);
+		key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
+		if (!strcmp(key, "_G") || (is_root &&
+				(!strcmp(key, "assert") || !strcmp(key, "gcinfo") || !strcmp(key, "getfenv") ||
+				!strcmp(key, "unpack") || !strcmp(key, "tostring") || !strcmp(key, "tonumber") ||
+				!strcmp(key, "setmetatable") || !strcmp(key, "require") || !strcmp(key, "pcall") ||
+				!strcmp(key, "rawequal") || !strcmp(key, "collectgarbage") || !strcmp(key, "type") ||
+				!strcmp(key, "getmetatable") || !strcmp(key, "next") || !strcmp(key, "print") ||
+				!strcmp(key, "xpcall") || !strcmp(key, "rawset") || !strcmp(key, "setfenv") ||
+				!strcmp(key, "rawget") || !strcmp(key, "newproxy") || !strcmp(key, "ipairs") ||
+				!strcmp(key, "loadstring") || !strcmp(key, "dofile") || !strcmp(key, "_TRACEBACK") ||
+				!strcmp(key, "_VERSION") || !strcmp(key, "pairs") || !strcmp(key, "__pow") ||
+				!strcmp(key, "error") || !strcmp(key, "loadfile") || !strcmp(key, "arg") ||
+				!strcmp(key, "_LOADED") || !strcmp(key, "loadlib") || !strcmp(key, "string") ||
+				!strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug") ||
+				!strcmp(key, "coroutine") || !strcmp(key, "Icons") || !strcmp(key, "Upgrades") ||
+				!strcmp(key, "Fonts") || !strcmp(key, "FontColors")
+				// other string to protected ?
+				))) {
+			lua_pop(l, 1); // pop the value
+			continue;
+		}
+		switch (type_value) {
+			case LUA_TNIL:
+				value = new_strdup("nil");
+				break;
+			case LUA_TNUMBER:
+				value = new_strdup(lua_tostring(l, -1)); // let lua do the conversion
+				break;
+			case LUA_TBOOLEAN:
+				b = lua_toboolean(l, -1);
+				value = new_strdup(b ? "true" : "false");
+				break;
+			case LUA_TSTRING:
+				value = strdcat3("\"", lua_tostring(l, -1), "\"");
+				break;
+			case LUA_TTABLE:
+				lua_pushvalue(l, -1);
+				tmp = SaveGlobal(l, false);
+				value = NULL;
+				if (tmp != NULL) {
+					value = strdcat3("{", tmp, "}");
+					delete[] tmp;
+				}
+				break;
+			case LUA_TFUNCTION:
+				// Could be done with string.dump(function)
+				// and debug.getinfo(function).name (coulb be nil for anonymous function)
+				// But not useful yet.
+				value = NULL;
+				break;
+			case LUA_TUSERDATA:
+			case LUA_TTHREAD:
+			case LUA_TLIGHTUSERDATA:
+			case LUA_TNONE:
+			default : // no other cases
+				value = NULL;
+				break;
+		}
+		lua_pop(l, 1); /* pop the value */
+
+		// Check the validity of the key (only [a-zA-z_])
+		if (type_key == LUA_TSTRING) {
+			for (int i = 0; key[i]; ++i) {
+				if (!isalnum(key[i]) && key[i] != '_') {
+					delete[] value;
+					value = NULL;
+					break;
+				}
+			}
+		}
+		if (value == NULL) {
+			if (!is_root) {
+				lua_pop(l, 2); // pop the key and the table
+				Assert(res == NULL);
+				delete[] res;
+				return NULL;
+			}
+			continue;
+		}
+		if (type_key == LUA_TSTRING && !strcmp(key, value)) {
+			continue;
+		}
+		if (first) {
+			first = false;
+			if (type_key == LUA_TSTRING) {
+				res = strdcat3(key, "=", value);
+				delete[] value;
+			} else {
+				res = value;
+			}
+		} else {
+			if (type_key == LUA_TSTRING) {
+				tmp = value;
+				value = strdcat3(key, "=", value);
+				delete[] tmp;
+				tmp = res;
+				res = strdcat3(res, sep, value);
+				delete[] tmp;
+				delete[] value;
+			} else {
+				tmp = res;
+				res = strdcat3(res, sep, value);
+				delete[] tmp;
+				delete[] value;
+			}
+		}
+		tmp = res;
+		res = strdcat3("", res, "\n");
+		delete[] tmp;
+	}
+	lua_pop(l, 1); // pop the table
+//	Assert(!is_root || !lua_gettop(l));
+	if (!res) {
+		res = new char[1];
+		res[0] = '\0';
+	}
+	return res;
+}
+
+/**
 **  Create directories containing user settings and data.
 **
 **  More specifically: logs, saved games, preferences
