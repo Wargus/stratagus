@@ -143,7 +143,7 @@ void InitIcons(void)
 */
 void LoadIcons(void)
 {
-	for (std::vector<CIcon *>::size_type i = 0; i < AllIcons.size(); ++i) {
+	for (size_t i = 0; i < AllIcons.size(); ++i) {
 		CIcon *icon = AllIcons[i];
 		icon->G->Load();
 		ShowLoadProgress("Icons %s", icon->G->File.c_str());

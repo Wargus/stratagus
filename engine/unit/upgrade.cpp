@@ -81,7 +81,7 @@ void SaveUpgrades(CFile *file)
 	//
 	//  Save the allow
 	//
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		file->printf("DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident.c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (p) {

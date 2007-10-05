@@ -532,13 +532,12 @@ int NetSocketSetReady(SocketSet *set, int timeout)
 	int retval;
 	struct timeval tv;
 	fd_set mask;
-	std::vector<Socket>::size_type i;
 
 	// Check the file descriptors for available data
 	do {
 		// Set up the mask of file descriptors
 		FD_ZERO(&mask);
-		for (i = 0; i < set->Sockets.size(); ++i) {
+		for (size_t i = 0; i < set->Sockets.size(); ++i) {
 			FD_SET(set->Sockets[i], &mask);
 		}
 
@@ -554,7 +553,7 @@ int NetSocketSetReady(SocketSet *set, int timeout)
 	} while (retval == -1 && errno == EINTR);
 #endif
 
-	for (i = 0; i < set->Sockets.size(); ++i) {
+	for (size_t i = 0; i < set->Sockets.size(); ++i) {
 		set->SocketReady[i] = FD_ISSET(set->Sockets[i], &mask);
 	}
 
@@ -571,9 +570,7 @@ int NetSocketSetReady(SocketSet *set, int timeout)
 */
 int NetSocketSetSocketReady(SocketSet *set, Socket socket)
 {
-	std::vector<Socket>::size_type i;
-
-	for (i = 0; i < set->Sockets.size(); ++i) {
+	for (size_t i = 0; i < set->Sockets.size(); ++i) {
 		if (set->Sockets[i] == socket) {
 			return set->SocketReady[i];
 		}

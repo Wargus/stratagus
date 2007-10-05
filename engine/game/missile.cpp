@@ -260,7 +260,7 @@ Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 **  @param missiles  Missile pointer.
 **  @param i         FIXME: docu
 */
-static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>::size_type i)
+static void FreeMissile(std::vector<Missile *> &missiles, size_t i)
 {
 	Missile *missile;
 	CUnit *unit;
@@ -970,8 +970,7 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 	//
 	// NOTE: missiles[??] could be modified!!! Yes (freed)
 	//
-	for (std::vector<Missile *>::size_type i = 0;
-			i != missiles.size();) {
+	for (size_t i = 0; i != missiles.size(); ) {
 
 		if (missiles[i]->Delay) {
 			missiles[i]->Delay--;
