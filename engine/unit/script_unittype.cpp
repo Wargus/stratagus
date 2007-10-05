@@ -65,26 +65,23 @@ std::map<std::string, CAnimations *> AnimationMap;/// Animation map
 
 CUnitTypeVar UnitTypeVar;    /// Variables for UnitType and unit.
 
-#define MAX_LABELS 20
-#define MAX_LABEL_LENGTH 256
-
-static struct {
+struct LabelsStruct {
 	CAnimation *Anim;
-	char Name[MAX_LABEL_LENGTH];
-} Labels[MAX_LABELS];
-static int NumLabels;
+	std::string Name;
+};
+static std::vector<LabelsStruct> Labels;
 
-static struct {
+struct LabelsLaterStruct {
 	CAnimation **Anim;
-	char Name[MAX_LABEL_LENGTH];
-} LabelsLater[MAX_LABELS];
-static int NumLabelsLater;
+	std::string Name;
+};
+static std::vector<LabelsLaterStruct> LabelsLater;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int GetSpriteIndex(const char *SpriteName);
+extern int GetSpriteIndex(const std::string &spriteName);
 
 /**
 **  Get the resource ID from a SCM object.
@@ -95,11 +92,10 @@ int GetSpriteIndex(const char *SpriteName);
 */
 unsigned CclGetResourceByName(lua_State *l)
 {
-	int i;
 	const char *value;
 
 	value = LuaToString(l, -1);
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		if (value == DefaultResourceNames[i]) {
 			return i;
 		}
@@ -118,12 +114,12 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 {
 	const char *value;
 	int args;
-	int i;
-	CBuildRestrictionAnd &andlist = *new CBuildRestrictionAnd();
+	CBuildRestrictionAnd *andlist = new CBuildRestrictionAnd();
+
 	args = luaL_getn(l, -1);
 	Assert(!(args & 1)); // must be even
 
-	for (i = 0; i < args; ++i) {
+	for (int i = 0; i < args; ++i) {
 		lua_rawgeti(l, -1, i + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
@@ -166,7 +162,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules distance tag: %s" _C_ value);
 				}
 			}
-			andlist.push_back(b);
+			andlist->push_back(b);
 		} else if (!strcmp(value, "addon")) {
 			CBuildRestrictionAddOn *b = new CBuildRestrictionAddOn;
 
@@ -182,7 +178,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
 				}
 			}
-			andlist.push_back(b);
+			andlist->push_back(b);
 		} else if (!strcmp(value, "ontop")) {
 			CBuildRestrictionOnTop *b = new CBuildRestrictionOnTop;
 
@@ -198,13 +194,13 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules ontop tag: %s" _C_ value);
 				}
 			}
-			andlist.push_back(b);
+			andlist->push_back(b);
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
-	blist.push_back(&andlist);
+	blist.push_back(andlist);
 }
 
 /**
@@ -533,7 +529,7 @@ static int CclDefineUnitType(lua_State *l)
 			subargs = luaL_getn(l, -1);
 			// Free any old restrictions if they are redefined
 			for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-				b != type->BuildingRules.end(); ++b) {
+					b != type->BuildingRules.end(); ++b) {
 				delete *b;
 			}
 			type->BuildingRules.clear();
@@ -801,12 +797,9 @@ static int CclDefineUnitType(lua_State *l)
 */
 CUnitType *CclGetUnitType(lua_State *l)
 {
-	const char *str;
-
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
-		str = LuaToString(l, -1);
-		return UnitTypeByIdent(str);
+		return UnitTypeByIdent(LuaToString(l, -1));
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData *data;
 		data = (LuaUserData *)lua_touserdata(l, -1);
@@ -823,41 +816,37 @@ CUnitType *CclGetUnitType(lua_State *l)
 /**
 **  Add a label
 */
-static void AddLabel(lua_State *l, CAnimation *anim, char *label)
+static void AddLabel(lua_State *l, CAnimation *anim, const std::string &name)
 {
-	if (NumLabels == MAX_LABELS) {
-		LuaError(l, "Too many labels: %s" _C_ label);
-	}
-	Labels[NumLabels].Anim = anim;
-	strcpy_s(Labels[NumLabels].Name, sizeof(Labels[NumLabels].Name), label);
-	++NumLabels;
+	LabelsStruct label;
+	label.Anim = anim;
+	label.Name = name;
+	Labels.push_back(label);
 }
 
 /**
 **  Find a label
 */
-static CAnimation *FindLabel(lua_State *l, char *label)
+static CAnimation *FindLabel(lua_State *l, const std::string &name)
 {
-	for (int i = 0; i < NumLabels; ++i) {
-		if (!strcmp(Labels[i].Name, label)) {
+	for (int i = 0; i < (int)Labels.size(); ++i) {
+		if (Labels[i].Name == name) {
 			return Labels[i].Anim;
 		}
 	}
-	LuaError(l, "Label not found: %s" _C_ label);
+	LuaError(l, "Label not found: %s" _C_ name.c_str());
 	return NULL;
 }
 
 /**
 **  Find a label later
 */
-static void FindLabelLater(lua_State *l, CAnimation **anim, char *label)
+static void FindLabelLater(lua_State *l, CAnimation **anim, const std::string &name)
 {
-	if (NumLabelsLater == MAX_LABELS) {
-		LuaError(l, "Too many gotos: %s" _C_ label);
-	}
-	LabelsLater[NumLabelsLater].Anim = anim;
-	strcpy_s(LabelsLater[NumLabelsLater].Name, sizeof(LabelsLater[NumLabelsLater].Name), label);
-	++NumLabelsLater;
+	LabelsLaterStruct label;
+	label.Anim = anim;
+	label.Name = name;
+	LabelsLater.push_back(label);
 }
 
 /**
@@ -865,7 +854,7 @@ static void FindLabelLater(lua_State *l, CAnimation **anim, char *label)
 */
 static void FixLabels(lua_State *l)
 {
-	for (int i = 0; i < NumLabelsLater; ++i) {
+	for (int i = 0; i < (int)LabelsLater.size(); ++i) {
 		*LabelsLater[i].Anim = FindLabel(l, LabelsLater[i].Name);
 	}
 }
@@ -996,7 +985,8 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	args = luaL_getn(l, idx);
 	anim = new CAnimation[args + 1];
 	tail = NULL;
-	NumLabels = NumLabelsLater = 0;
+	Labels.clear();
+	LabelsLater.clear();
 
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, idx, j + 1);
@@ -1299,8 +1289,8 @@ static int CclDefineDecorations(lua_State *l)
 				if (!strcmp(key, "sprite")) {
 					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
 					lua_rawgeti(l, -1, 1);
-					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1));
-					if (decovarspritebar->NSprite == -1) {
+					decovarspritebar->SpriteIndex = GetSpriteIndex(LuaToString(l, -1));
+					if (decovarspritebar->SpriteIndex == -1) {
 						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_
 							LuaToString(l, -1));
 					}

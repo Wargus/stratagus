@@ -196,13 +196,9 @@ static int CclDefineConstruction(lua_State *l)
 
 		if ((files = !strcmp(value, "Files")) ||
 				!strcmp(value, "ShadowFiles")) {
-			char *file;
-			int w;
-			int h;
-
-			file = NULL;
-			w = 0;
-			h = 0;
+			const char *file = NULL;
+			int w = 0;
+			int h = 0;
 
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -212,7 +208,7 @@ static int CclDefineConstruction(lua_State *l)
 				value = LuaToString(l, -2);
 
 				if (!strcmp(value, "File")) {
-					file = new_strdup(LuaToString(l, -1));
+					file = LuaToString(l, -1);
 				} else if (!strcmp(value, "Size")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
