@@ -216,8 +216,6 @@ extern bool SaveGameLoading;                /// Save game is in progress of load
 
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern void SaveGame(const std::string &filename); /// Save game
-struct lua_State;
-extern char *SaveGlobal(lua_State *l, bool is_root); /// For saving lua state
 
 extern void Exit(int err);                  /// Exit stratagus
 extern void ExitFatal(int err);             /// Exit stratagus with fatal error
