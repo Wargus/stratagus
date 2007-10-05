@@ -273,20 +273,17 @@ int LuaLoadFile(const std::string &file)
 */
 static int CclGetCurrentLuaPath(lua_State *l)
 {
-	char *path;
-	char *seperator;
-
 	LuaCheckArgs(l, 0);
-	path = new_strdup(CurrentLuaFile.c_str());
-	Assert(path);
-	seperator = strrchr(path, '/');
-	if (seperator) {
-		*seperator = 0;
-		lua_pushstring(l, path);
+
+	std::string path = CurrentLuaFile;
+	size_t index = path.rfind('/');
+
+	if (index != std::string::npos) {
+		path = path.substr(0, index);
+		lua_pushstring(l, path.c_str());
 	} else {
 		lua_pushstring(l, "");
 	}
-	delete[] path;
 	return 1;
 }
 

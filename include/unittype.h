@@ -381,6 +381,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CUnit;
+class CUnitType;
 class CPlayerColorGraphic;
 class CConstruction;
 class CAnimations;
@@ -469,9 +471,6 @@ enum {
 	NVARALREADYDEFINED,
 };
 
-class CUnit;
-class CUnitType;
-
 
 /**
 **  Decoration for user defined variable.
@@ -509,11 +508,11 @@ public:
 class CDecoVarSpriteBar : public CDecoVar
 {
 public:
-	CDecoVarSpriteBar() : NSprite(-1) {};
+	CDecoVarSpriteBar() : SpriteIndex(-1) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnit *unit) const;
 
-	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
+	char SpriteIndex; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 // FIXME Sprite info. better way ?
 };
 

@@ -700,14 +700,11 @@ int main(int argc, char **argv)
 				continue;
 			case 'd':
 			{
-				char *libpath = new_strdup(optarg);
-				for (char *p = libpath; *p; ++p) {
-					if (*p == '\\') {
-						*p = '/';
-					}
+				StratagusLibPath = optarg;
+				size_t index;
+				while ((index = StratagusLibPath.find('\\')) != std::string::npos) {
+					StratagusLibPath[index] = '/';
 				}
-				StratagusLibPath = libpath;
-				delete[] libpath;
 				continue;
 			}
 			case 'E':
