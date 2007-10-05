@@ -769,6 +769,41 @@ void InitCcl(void)
 	EditorCclRegister();
 }
 
+static char *LuaEscape(const char *str)
+{
+	const unsigned char *src;
+	char *dst;
+	char *escapedString;
+	int size = 0;
+
+	for (src = (const unsigned char *)str; *src; ++src) {
+		if (*src == '"' || *src == '\\') { // " -> \"
+			size += 2;
+		} else if (*src < 32 || *src > 127) { // 0xA -> \010
+			size += 4;
+		} else {
+			++size;
+		}
+	}
+
+	escapedString = new char[size + 1];
+	for (src = (const unsigned char *)str, dst = escapedString; *src; ++src) {
+		if (*src == '"' || *src == '\\') { // " -> \"
+			*dst++ = '\\';
+			*dst++ = *src;
+		} else if (*src < 32 || *src > 127) { // 0xA -> \010
+			*dst++ = '\\';
+			sprintf(dst, "%03d", *src);
+			dst += 3;
+		} else {
+			*dst++ = *src;
+		}
+	}
+	*dst = '\0';
+
+	return escapedString;
+}
+
 /**
 **  For saving lua state (table, number, string, bool, not function).
 **
@@ -837,8 +872,12 @@ char *SaveGlobal(lua_State *l, bool is_root)
 				value = new_strdup(b ? "true" : "false");
 				break;
 			case LUA_TSTRING:
-				value = strdcat3("\"", lua_tostring(l, -1), "\"");
+			{
+				char *escapedString = LuaEscape(lua_tostring(l, -1));
+				value = strdcat3("\"", escapedString, "\"");
+				delete[] escapedString;
 				break;
+			}
 			case LUA_TTABLE:
 				lua_pushvalue(l, -1);
 				tmp = SaveGlobal(l, false);
