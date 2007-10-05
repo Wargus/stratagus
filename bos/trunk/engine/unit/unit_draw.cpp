@@ -83,8 +83,8 @@ public:
 */
 class DecoSpriteType {
 public:
-	std::vector<char *> Name;            /// Name of the sprite.
-	std::vector<Decoration> SpriteArray; /// Sprite to display variable.
+	std::vector<std::string> Name;            /// Name of the sprite.
+	std::vector<Decoration> SpriteArray;      /// Sprite to display variable.
 };
 
 static DecoSpriteType DecoSprite; /// All sprite's infos.
@@ -114,12 +114,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 */
 void DrawUnitSelection(const CUnit *unit)
 {
-	int x;
-	int y;
-	CUnitType *type;
 	Uint32 color;
-
-	type = unit->Type;
 
 	// FIXME: make these colors customizable with scripts.
 
@@ -158,12 +153,14 @@ void DrawUnitSelection(const CUnit *unit)
 		return;
 	}
 
-	x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
+	const CUnitType *type = unit->Type;
+	int x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
 		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
 		(type->Width - type->Sprite->Width) / 2;
-	y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
-		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
+	int y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
+		type->TileHeight * TileSizeY / 2 - type->BoxHeight / 2 -
 		(type->Height - type->Sprite->Height) / 2;
+
 	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
 }
 
@@ -176,61 +173,59 @@ void DrawUnitSelection(const CUnit *unit)
 */
 void DrawSelection(Uint32 color, int x1, int y1, int x2, int y2)
 {
-#define CORNER_PIXELS 6
-	Video.DrawVLineClip(color, x1, y1, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1);
+	const int cornerPixels = 6;
 
-	Video.DrawVLineClip(color, x2, y1, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y1, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x1, y1, cornerPixels);
+	Video.DrawHLineClip(color, x1 + 1, y1, cornerPixels - 1);
 
-	Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x1, y2, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x2, y1, cornerPixels);
+	Video.DrawHLineClip(color, x2 - cornerPixels + 1, y1, cornerPixels - 1);
 
-	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
-#undef CORNER_PIXELS
+	Video.DrawVLineClip(color, x1, y2 - cornerPixels + 1, cornerPixels);
+	Video.DrawHLineClip(color, x1, y2, cornerPixels - 1);
+
+	Video.DrawVLineClip(color, x2, y2 - cornerPixels + 1, cornerPixels);
+	Video.DrawHLineClip(color, x2 - cornerPixels + 1, y2, cornerPixels - 1);
 }
 
 
 /**
-**  Return the index of the sprite named SpriteName.
+**  Return the index of the sprite.
 **
-**  @param SpriteName    Name of the sprite.
+**  @param spriteName  Name of the sprite.
 **
-**  @return              Index of the sprite. -1 if not found.
+**  @return            Index of the sprite. -1 if not found.
 */
-int GetSpriteIndex(const char *SpriteName)
+int GetSpriteIndex(const std::string &spriteName)
 {
-	Assert(SpriteName);
+	int index = -1;
+
 	for (int i = 0; i < (int)DecoSprite.Name.size(); ++i) {
-		if (!strcmp(SpriteName, DecoSprite.Name[i])) {
-			return i;
+		if (spriteName == DecoSprite.Name[i]) {
+			index = i;
+			break;
 		}
 	}
-	return -1;
+	return index;
 }
 
 /**
 **  Define the sprite to show variables.
 **
-**  @param l    Lua_state
+**  @param l  Lua_state
 */
 static int CclDefineSprites(lua_State *l)
 {
-	const char *name;     // name of the current sprite.
-	int args;             // number of arguments.
-	int i;                // iterator on argument.
-	const char *key;      // Current key of the lua table.
-	int index;            // Index of the Sprite.
+	int args;
 
 	args = lua_gettop(l);
-	for (i = 0; i < args; ++i) {
+	for (int i = 0; i < args; ++i) {
 		Decoration deco;
+		const char *name = NULL;
 
 		lua_pushnil(l);
-		name = 0;
 		while (lua_next(l, i + 1)) {
-			key = LuaToString(l, -2); // key name
+			const char *key = LuaToString(l, -2); // key name
 			if (!strcmp(key, "Name")) {
 				name = LuaToString(l, -1);
 			} else if (!strcmp(key, "File")) {
@@ -258,23 +253,24 @@ static int CclDefineSprites(lua_State *l)
 			}
 			lua_pop(l, 1); // pop the value;
 		}
-		if (name == 0) {
+		if (name == NULL) {
 			LuaError(l, "CclDefineSprites requires the Name flag for sprite.");
 		}
-		index = GetSpriteIndex(name);
+
+		int index = GetSpriteIndex(name);
 		if (index == -1) { // new sprite.
 			index = DecoSprite.SpriteArray.size();
-			DecoSprite.Name.push_back(new_strdup(name));
+			DecoSprite.Name.push_back(name);
 			DecoSprite.SpriteArray.push_back(deco);
 		} else {
-			DecoSprite.SpriteArray[index].File.clear();
 			DecoSprite.SpriteArray[index] = deco;
 		}
+
 		// Now verify validity.
 		if (DecoSprite.SpriteArray[index].File.empty()) {
 			LuaError(l, "CclDefineSprites requires the File flag for sprite.");
 		}
-		// FIXME check if file is valid with good size ?
+		// FIXME: check if file is valid with good size ?
 	}
 	return 0;
 }
@@ -284,8 +280,6 @@ static int CclDefineSprites(lua_State *l)
 */
 void DecorationCclRegister(void)
 {
-	memset(&DecoSprite, 0, sizeof(DecoSprite));
-
 	lua_register(Lua, "DefineSprites", CclDefineSprites);
 }
 
@@ -307,8 +301,7 @@ void LoadDecorations(void)
 */
 void CleanDecorations(void)
 {
-	for (int i = 0; i < (int)DecoSprite.SpriteArray.size(); ++i) {
-		delete[] DecoSprite.Name[i];
+	for (size_t i = 0; i < DecoSprite.SpriteArray.size(); ++i) {
 		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);
 	}
 
@@ -326,18 +319,17 @@ void CleanDecorations(void)
 */
 void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 {
-	int n;                   // frame of the sprite to show.
-	CGraphic *sprite;        // the sprite to show.
-	Decoration *decosprite;  // Info on the sprite.
+	int n;
+	CGraphic *sprite;
+	Decoration *decosprite;
 
-	Assert(unit);
 	Assert(unit->Variable[this->Index].Max);
-	Assert(this->NSprite != -1);
+	Assert(this->SpriteIndex != -1);
 
-	decosprite = &DecoSprite.SpriteArray[(int)this->NSprite];
+	decosprite = &DecoSprite.SpriteArray[(int)this->SpriteIndex];
 	sprite = decosprite->Sprite;
-	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
-	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
+	x += decosprite->HotX; // in addition of OffsetX... Useful?
+	y += decosprite->HotY; // in addition of OffsetY... Useful?
 
 	n = sprite->NumFrames - 1;
 	n -= (n * unit->Variable[this->Index].Value) / unit->Variable[this->Index].Max;
@@ -351,9 +343,7 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnit *unit) const
 	sprite->DrawFrameClip(n, x, y);
 }
 
-
 extern void UpdateUnitVariables(const CUnit *unit);
-
 
 /**
 **  Draw decoration (invis, for the unit.)
@@ -366,9 +356,7 @@ extern void UpdateUnitVariables(const CUnit *unit);
 static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int y)
 {
 #ifdef REFS_DEBUG
-	//
 	// Show the number of references.
-	//
 	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit->Refs);
 #endif
 
@@ -396,23 +384,21 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 				unit);
 		}
 	}
+
 	//
 	// Draw group number
 	//
 	if (unit->Selected && unit->GroupId != 0) {
-		char buf[2];
 		int num;
-		int f;
+		int width;
 
 		for (num = 0; !(unit->GroupId & (1 << num)); ++num) {
 			;
 		}
-		buf[0] = num + '0';
-		buf[1] = '\0';
-		f = GameFont->Width(buf);
-		x += (type->TileWidth * TileSizeX + type->BoxWidth) / 2 - f;
-		f = GameFont->Height();
-		y += (type->TileHeight * TileSizeY + type->BoxHeight) / 2 - f;
+		width = GameFont->Width(std::string(1, '0' + num));
+		x += (type->TileWidth * TileSizeX + type->BoxWidth) / 2 - width;
+		width = GameFont->Height();
+		y += (type->TileHeight * TileSizeY + type->BoxHeight) / 2 - width;
 		VideoDrawNumberClip(x, y, GameFont, num);
 	}
 }
@@ -445,10 +431,8 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 
 	// Draw normal shadow sprite if available
 	if (type->ShadowSprite) {
-		x -= (type->ShadowWidth -
-			type->TileWidth * TileSizeX) / 2;
-		y -= (type->ShadowHeight -
-			type->TileHeight * TileSizeY) / 2;
+		x -= (type->ShadowWidth - type->TileWidth * TileSizeX) / 2;
+		y -= (type->ShadowHeight - type->TileHeight * TileSizeY) / 2;
 		x += type->OffsetX + type->ShadowOffsetX;
 		y += type->OffsetY + type->ShadowOffsetY;
 
@@ -459,9 +443,7 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 				type->ShadowSprite->DrawFrameClip(frame, x, y);
 			}
 		} else {
-			int row;
-
-			row = type->NumDirections / 2 + 1;
+			int row = type->NumDirections / 2 + 1;
 			if (frame < 0) {
 				frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 			} else {
@@ -525,11 +507,11 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 	int y2;
 	Uint32 color;
 	Uint32 e_color;
-	int dest;
+	bool dest;
 
 	GetOrderPosition(unit, order, &x2, &y2);
 
-	dest = 0;
+	dest = false;
 	switch (order->Action) {
 		case UnitActionNone:
 			e_color = color = ColorGray;
@@ -546,22 +528,20 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 		case UnitActionFollow:
 		case UnitActionMove:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionPatrol:
 			Video.DrawLineClip(ColorGreen, x1, y1, x2, y2);
 			e_color = color = ColorBlue;
-			x1 = CurrentViewport->Map2ViewportX(
-				order->Arg1.Patrol.X) + TileSizeX / 2;
-			y1 = CurrentViewport->Map2ViewportY(
-				order->Arg1.Patrol.Y) + TileSizeY / 2;
-			dest = 1;
+			x1 = CurrentViewport->Map2ViewportX(order->Arg1.Patrol.X) + TileSizeX / 2;
+			y1 = CurrentViewport->Map2ViewportY(order->Arg1.Patrol.Y) + TileSizeY / 2;
+			dest = true;
 			break;
 
 		case UnitActionRepair:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionAttackGround:
@@ -575,17 +555,17 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 				e_color = ColorRed;
 			}
 			color = ColorRed;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionBoard:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionUnload:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionDie:
@@ -594,7 +574,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 
 		case UnitActionSpellCast:
 			e_color = color = ColorBlue;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionTrain:
@@ -607,7 +587,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 				x2 + order->Type->BoxWidth / 2,
 				y2 + order->Type->BoxHeight / 2);
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionBuilt:
@@ -616,7 +596,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 
 		case UnitActionResource:
 			e_color = color = ColorYellow;
-			dest = 1;
+			dest = true;
 			break;
 
 		default:
@@ -624,6 +604,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 			DebugPrint("Unknown action %d\n" _C_ order->Action);
 			break;
 	}
+
 	Video.FillCircleClip(color, x1, y1, 2);
 	if (dest) {
 		Video.DrawLineClip(color, x1, y1, x2, y2);
