@@ -89,7 +89,7 @@ void UpdateStats(int reset)
 	//
 	//  Update players stats
 	//
-	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
+	for (size_t j = 0; j < UnitTypes.size(); ++j) {
 		type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
@@ -304,7 +304,7 @@ void InitUnitTypes(int reset_player_stats)
 {
 	CUnitType *type;
 
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
 		Assert(type->Slot == (int)i);
 
@@ -358,7 +358,7 @@ void LoadUnitTypes(void)
 {
 	CUnitType *type;
 
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
 
 		//
@@ -438,7 +438,7 @@ void CleanUnitTypes(void)
 
 	// Clean all unit-types
 
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
 
 		Assert(!type->Ident.empty());

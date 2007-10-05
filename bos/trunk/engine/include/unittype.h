@@ -570,40 +570,40 @@ public:
 
 class CBuildRestrictionAddOn : public CBuildRestriction {
 public:
-	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), ParentName(NULL), Parent(NULL) {};
-	virtual ~CBuildRestrictionAddOn() {delete[] this->ParentName;};
+	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), Parent(NULL) {};
+	virtual ~CBuildRestrictionAddOn() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
 	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
 
-	int OffsetX;         /// offset from the main building to place this
-	int OffsetY;         /// offset from the main building to place this
-	char *ParentName;    /// building that is unit is an addon too.
-	CUnitType *Parent;   /// building that is unit is an addon too.
+	int OffsetX;            /// offset from the main building to place this
+	int OffsetY;            /// offset from the main building to place this
+	std::string ParentName; /// building that is unit is an addon too.
+	CUnitType *Parent;      /// building that is unit is an addon too.
 };
 
 class CBuildRestrictionOnTop : public CBuildRestriction {
 public:
-	CBuildRestrictionOnTop() : ParentName(NULL), Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
-	virtual ~CBuildRestrictionOnTop() {delete[] this->ParentName;};
+	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
+	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
 	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
 
-	char *ParentName;    /// building that is unit is an addon too.
-	CUnitType *Parent;   /// building that is unit is an addon too.
-	int ReplaceOnDie;    /// recreate the parent on destruction
-	int ReplaceOnBuild;  /// remove the parent, or just build over it.
+	std::string ParentName; /// building that is unit is an addon too.
+	CUnitType *Parent;      /// building that is unit is an addon too.
+	int ReplaceOnDie;       /// recreate the parent on destruction
+	int ReplaceOnBuild;     /// remove the parent, or just build over it.
 };
 
 class CBuildRestrictionDistance : public CBuildRestriction {
 public:
-	CBuildRestrictionDistance() : Distance(0), RestrictTypeName(NULL), RestrictType(NULL) {};
-	virtual ~CBuildRestrictionDistance() {delete [] this->RestrictTypeName;};
+	CBuildRestrictionDistance() : Distance(0), RestrictType(NULL) {};
+	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
 	virtual bool Check(const CUnitType *type, int x, int y, CUnit *&ontoptarget) const;
 
 	int Distance;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
-	char *RestrictTypeName;
+	std::string RestrictTypeName;
 	CUnitType *RestrictType;
 };
 
