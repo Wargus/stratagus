@@ -605,44 +605,6 @@ static char *strchrlen(char *s, char c, int maxlen, CFont *font)
 }
 
 /**
-**  Return the 'line' line of the string 's'.
-**
-**  @param line    line number.
-**  @param s       multiline string.
-**  @param maxlen  max length of the string.
-**  @param font    if specified use font->Width() instead of strlen.
-**
-**  @return computed value.
-*/
-char *GetLineFont(int line, char *s, int maxlen, CFont *font)
-{
-	int i;
-	char *res;
-	char *tmp;
-
-	Assert(0 < line);
-	Assert(s);
-	Assert(0 <= maxlen);
-
-	res = s;
-	for (i = 1; i < line; ++i) {
-		res = strchrlen(res, '\n', maxlen, font);
-		if (!res) {
-			return NULL;
-		}
-		while (*res == '\n' || *res == ' ') {
-			++res;
-		}
-	}
-	res = new_strdup(res);
-	tmp = strchrlen(res, '\n', maxlen, font);
-	if (tmp) {
-		*tmp = '\0';
-	}
-	return res;
-}
-
-/**
 **  Draw number with font at x,y unclipped.
 **
 **  @param x       X screen position

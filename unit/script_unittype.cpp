@@ -157,7 +157,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 						b->DistanceType = NotEqual;
 					}
 				} else if (!strcmp(value, "Type")) {
-					b->RestrictTypeName = new_strdup(LuaToString(l, -1));
+					b->RestrictTypeName = LuaToString(l, -1);
 				} else {
 					LuaError(l, "Unsupported BuildingRules distance tag: %s" _C_ value);
 				}
@@ -173,7 +173,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (!strcmp(value, "OffsetY")) {
 					b->OffsetY = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "Type")) {
-					b->ParentName = new_strdup(LuaToString(l, -1));
+					b->ParentName = LuaToString(l, -1);
 				} else {
 					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
 				}
@@ -185,7 +185,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "Type")) {
-					b->ParentName = new_strdup(LuaToString(l, -1));
+					b->ParentName = LuaToString(l, -1);
 				} else if (!strcmp(value, "ReplaceOnDie")) {
 					b->ReplaceOnDie = LuaToBoolean(l, -1);
 				} else if (!strcmp(value, "ReplaceOnBuild")) {
@@ -1188,7 +1188,7 @@ static int CclDefineBoolFlags(lua_State *l)
 		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = new_strdup(str);
 	}
 	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
+		for (size_t i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
 			unsigned char *b;
 
 			b = new unsigned char[UnitTypeVar.NumberBoolFlag];

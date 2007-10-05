@@ -286,7 +286,7 @@ void CMap::Clean(void)
 void LoadStratagusMapInfo(const std::string &mapname) 
 {
 	// Set the default map setup by replacing .smp with .sms
-	std::string::size_type loc = mapname.find(".smp");
+	size_t loc = mapname.find(".smp");
 	if (loc != std::string::npos) {
 		Map.Info.Filename = mapname;
 		Map.Info.Filename.replace(loc, 4, ".sms");

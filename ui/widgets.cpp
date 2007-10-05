@@ -950,7 +950,7 @@ void MultiLineLabel::wordWrap()
 	gcn::Font *font = this->getFont();
 	int lineWidth = this->getLineWidth();
 	std::string str = this->getCaption();
-	std::string::size_type pos, lastPos;
+	size_t pos, lastPos;
 	std::string substr;
 	bool done = false;
 	bool first = true;
