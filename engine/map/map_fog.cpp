@@ -254,7 +254,7 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 	// Mark vertical sight for unit (don't remark self) (above unit)
 	for (my = y - range; my < y; ++my) {
 		for (mx = x; mx < x + w; ++mx) {
-			if (my >= 0 && my < Map.Info.MapWidth) {
+			if (my >= 0 && my < Map.Info.MapHeight) {
 				marker(player, mx, my);
 			}
 		}
@@ -263,7 +263,7 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 	// Mark vertical sight for unit (don't remark self) (below unit)
 	for (my = y + h; my < y + range + h; ++my) {
 		for (mx = x; mx < x + w; ++mx) {
-			if (my >= 0 && my < Map.Info.MapWidth) {
+			if (my >= 0 && my < Map.Info.MapHeight) {
 				marker(player, mx, my);
 			}
 		}
