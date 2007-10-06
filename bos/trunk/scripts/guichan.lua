@@ -499,7 +499,7 @@ function RunStartGameMenu(s)
     numplayers = nplayers
     players:setCaption(""..nplayers)
     descr:setCaption(description)
-	mapsize:setCaption(""..h.."x"..w)
+	mapsize:setCaption(""..w.."x"..h)
     OldPresentMap(description, nplayers, w, h, id)
   end
  
