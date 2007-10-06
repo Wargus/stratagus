@@ -30,35 +30,8 @@
 
 
 function DefineElitePanels(info_panel_x, info_panel_y) 
-   local min_damage = Max(1, Div(ActiveUnitVar("PiercingDamage"), 2))
-   local max_damage = Add(ActiveUnitVar("PiercingDamage"), ActiveUnitVar("BasicDamage"))
-   local damage_bonus = Sub(ActiveUnitVar("PiercingDamage", "Value", "Type"),
-                            ActiveUnitVar("PiercingDamage", "Value", "Initial"))
-
    DefinePanelContents(
 -- Default presentation. ------------------------
-  {
-  Ident = "panel-general-contents",
-  Pos = {info_panel_x, info_panel_y}, DefaultFont = "game",
-  Contents = {
-	{ Pos = {14, 56}, Condition = {ShowOpponent = false, HideNeutral = true},
-		More = {"LifeBar", {Variable = "HitPoints", Height = 7, Width = 45}}
-	},
-	{ Pos = {38, 62}, Condition = {ShowOpponent = false, HideNeutral = true},
-		More = {"FormattedText2", {
-			Font = "small", Variable = "HitPoints", Format = "%d/%d",
-			Component1 = "Value", Component2 = "Max", Centered = true}}
-	},
-	{ Pos = {114, 25}, More = {"Text", {ShowName = true}} }, -- FIXME:split for long name
-	--{ Pos = {10, 158}, More = {"Text", {Variable = "Slot"}},
-	--	Condition = {Slot = "only"} }, -- DEBUG ONLY.
--- Resource Left
-	{ Pos = {76, 86}, Condition = {ShowOpponent = false, GiveResource = "only"},
-		More = {"FormattedText2", {Format = "%s: %d", Variable = "GiveResource",
-					Component1 = "Name", Component2 = "Value", Centered = true}}
-	}
-
-  } },
 -- All own unit -----------------
   {
   Ident = "panel-all-unit-contents",
@@ -66,17 +39,6 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   DefaultFont = "game",
   Condition = {ShowOpponent = false, HideNeutral = true, Build = "false"},
   Contents = {
-         { Pos = {16, 138}, Condition = {BasicDamage = "only"},
-            More = {"Text", {Text = Concat("Damage: ", String(min_damage), 
-                                           "-", String(max_damage),
-                                           If(Equal(0, damage_bonus), "",
-                                              InverseVideo(Concat("+", String(damage_bonus)))) 
-                                          )}}
-        },
-	{ Pos = {16, 111}, Condition = {AttackRange = "only"},
-		More = {"Text", {
-			 Text = "Range: ", Variable = "AttackRange" , Stat = true}}
-	},
 -- Construction
 	{ Pos = {12, 153}, Condition = {Build = "only"},
 		More = {"CompleteBar", {Variable = "Build", Width = 152, Height = 12}}
@@ -94,32 +56,8 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	},
 	{ Pos = {86, 141}, More = {"Text", {Variable = "Mana"}}, Condition = {Mana = "only"} },
 
-  } },
--- Attack Unit -----------------------------
-  {
-  Ident = "panel-attack-unit-contents",
-  Pos = {info_panel_x, info_panel_y},
-  DefaultFont = "game",
-  Condition = {ShowOpponent = false, HideNeutral = true, Building = "false", Build = "false"},
-  Contents = {
--- Unit caracteristics
-	{ Pos = {114, 37},
-		More = {"FormattedText", {Centered = true, 
-			Variable = "Level", Format = "Level ~<%d~>"}}
-	},
-	{ Pos = {114, 52},
-		More = {"FormattedText", {Centered = true,
-			Variable = "Kill", Format = "Kills:~<%d~>"}}
-	},
-	{ Pos = {16, 84}, Condition = {Armor = "only"},
-		More = {"Text", {Text = "Armor: ", Variable = "Armor", Stat = true}}
-	},
-	{ Pos = {16, 125}, Condition = {SightRange = "only"},
-		More = {"Text", {Text = "Sight: ", Variable = "SightRange", Stat = true}}
-	},
-	{ Pos = {16, 97}, Condition = {Speed = "only"},
-		More = {"Text", {Text = "Speed: ", Variable = "Speed", Stat = true}}
-	} } })
+  } }
+  )
 end
 
 
