@@ -43,6 +43,8 @@ def DefineOptions(filename, args):
    opts.Add('CC', 'C Compiler')
    opts.Add('CXX', 'C++ Compiler')
    opts.Add('extrapath', 'Path to extra root directory for includes and libs', '')
+   opts.Add('MINGWCPPPATH', 'Additional include path for crosscompilation', [])
+   opts.Add('MINGWLIBPATH', 'Additional lib path for crosscompilation', [])
    return opts
 
 
@@ -148,9 +150,12 @@ def CheckOpenGL(env, conf):
       'LIBS': ['GL'],
       'LIBPATH': ['/System/Library/Frameworks/OpenGL.framework/Libraries/']}
   platform = sys.platform
-  if sys.platform[:5] == 'linux':
-     platform = 'linux'
-  glconfig = opengl.get(platform, {})
+  if 'USE_WIN32' in env['CPPDEFINES']:
+     glconfig = {'LIBS': ['opengl32']}
+  else:
+     if sys.platform[:5] == 'linux':
+        platform = 'linux'
+     glconfig = opengl.get(platform, {})
   for key in glconfig:
       if key != 'LIBS':
          for i in opengl[platform][key]:
@@ -288,6 +293,8 @@ if mingw['extrapath']:
      x = mingw['extrapath']
      mingw['CPPPATH'] = [x + '/include']
      mingw['LIBPATH'] = [x + '/lib']
+  mingw.Append(CPPPATH = mingw['MINGWCPPPATH'])
+  mingw.Append(LIBPATH = mingw['MINGWLIBPATH'])
   AutoConfigureIfNeeded(mingw, 'mingw')
   addBosWarsPaths(mingw)
   mingw.Append(LIBS = ['mingw32', 'SDLmain', 'SDL', 'wsock32', 'ws2_32'])
