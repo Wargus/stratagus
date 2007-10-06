@@ -338,12 +338,6 @@ static void DrawUnitInfo(CUnit *unit)
 	//  Show extra info if only one unit is selected.
 	//
 	if (NumSelected == 1 && Selected[0] == unit) {
-		// My unit stats
-		if (!isEnemy && !isNeutral && !unit->Type->CanHarvestFrom &&
-				unit->Orders[0]->Action != UnitActionBuilt) {
-			DrawUnitStats(unit);
-		}
-
 		// Training units.
 		if (unit->Orders[0]->Action == UnitActionTrain) {
 			DrawTrainingUnits(unit);
@@ -354,6 +348,12 @@ static void DrawUnitInfo(CUnit *unit)
 		if (unit->Type->CanTransport && unit->BoardCount) {
 			DrawTransportingUnits(unit);
 			return;
+		}
+
+		// My unit stats
+		if (!isEnemy && !isNeutral && !unit->Type->CanHarvestFrom &&
+				unit->Orders[0]->Action != UnitActionBuilt) {
+			DrawUnitStats(unit);
 		}
 	}
 }
