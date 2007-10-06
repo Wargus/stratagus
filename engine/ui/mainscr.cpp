@@ -172,10 +172,17 @@ static void DrawUnitStats(const CUnit *unit)
 	armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
 	VideoDrawText(x + 16, y + 84, GameFont, armor.str());
 
-	// Sight
-	std::ostringstream sight;
-	sight << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
-	VideoDrawText(x + 16, y + 97, GameFont, sight.str());
+	if (type->Variable[RADAR_INDEX].Value) {
+		// Radar Range
+		std::ostringstream radarRange;
+		radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
+		VideoDrawText(x + 16, y + 97, GameFont, radarRange.str());
+	} else {
+		// Sight Range
+		std::ostringstream sightRange;
+		sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
+		VideoDrawText(x + 16, y + 97, GameFont, sightRange.str());
+	}
 
 	if (type->CanAttack) {
 		// Kills
@@ -332,7 +339,8 @@ static void DrawUnitInfo(CUnit *unit)
 	//
 	if (NumSelected == 1 && Selected[0] == unit) {
 		// My unit stats
-		if (!isEnemy && !isNeutral && !unit->Type->CanHarvestFrom) {
+		if (!isEnemy && !isNeutral && !unit->Type->CanHarvestFrom &&
+				unit->Orders[0]->Action != UnitActionBuilt) {
 			DrawUnitStats(unit);
 		}
 
