@@ -159,6 +159,45 @@ static void UiDrawManaBar(const CUnit *unit, int x, int y)
 }
 
 /**
+**  Draw unit stats
+*/
+static void DrawUnitStats(const CUnit *unit)
+{
+	int x = UI.InfoPanel.X;
+	int y = UI.InfoPanel.Y;
+	CUnitType *type = unit->Type;
+
+	// Armor
+	std::ostringstream armor;
+	armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
+	VideoDrawText(x + 16, y + 84, GameFont, armor.str());
+
+	// Sight
+	std::ostringstream sight;
+	sight << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
+	VideoDrawText(x + 16, y + 97, GameFont, sight.str());
+
+	if (type->CanAttack) {
+		// Kills
+		std::ostringstream kills;
+		kills << "Kills: ~<" << type->Variable[KILL_INDEX].Value << "~>";
+		VideoDrawTextCentered(x + 114, y + 52, GameFont, kills.str());
+
+		// Attack Range
+		std::ostringstream attackRange;
+		attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
+		VideoDrawText(x + 16, y + 111, GameFont, attackRange.str());
+
+		// Damage
+		int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
+		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value + type->Variable[BASICDAMAGE_INDEX].Value;
+		std::ostringstream damage;
+		damage << "Damage: " << min_damage << "-" << max_damage;
+		VideoDrawText(x + 16, y + 125, GameFont, damage.str());
+	}
+}
+
+/**
 **  Draw training units
 */
 static void DrawTrainingUnits(const CUnit *unit)
@@ -261,9 +300,7 @@ static void DrawUnitInfo(CUnit *unit)
 	}
 
 	// Unit type name
-	if (!isNeutral) {
-		VideoDrawTextCentered(x + 114, y + 25, GameFont, unit->Type->Name);
-	}
+	VideoDrawTextCentered(x + 114, y + 25, GameFont, unit->Type->Name);
 
 	// Hit points
 	if (!isEnemy && !isNeutral) {
@@ -272,10 +309,33 @@ static void DrawUnitInfo(CUnit *unit)
 		VideoDrawTextCentered(x + 38, y + 62, SmallFont, os.str());
 	}
 
+	// Resource amount
+	if (unit->Type->CanHarvestFrom) {
+		std::string resourceName;
+		int amount = 0;
+
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (unit->ResourcesHeld[i] != 0) {
+				resourceName = DefaultResourceNames[i];
+				amount = unit->ResourcesHeld[i] / CYCLES_PER_SECOND;
+				break;
+			}
+		}
+
+		std::ostringstream os;
+		os << resourceName << ": " << amount;
+		VideoDrawTextCentered(x + 76, y + 86, GameFont, os.str());
+	}
+
 	//
 	//  Show extra info if only one unit is selected.
 	//
 	if (NumSelected == 1 && Selected[0] == unit) {
+		// My unit stats
+		if (!isEnemy && !isNeutral && !unit->Type->CanHarvestFrom) {
+			DrawUnitStats(unit);
+		}
+
 		// Training units.
 		if (unit->Orders[0]->Action == UnitActionTrain) {
 			DrawTrainingUnits(unit);
