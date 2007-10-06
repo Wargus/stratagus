@@ -71,7 +71,7 @@ def shlib_emitter(target, source, env):
   return (target, source)
 
 
-shlib_action = SCons.Action.CommandGenerator(shlib_generator)
+shlib_action = SCons.Action.CommandGeneratorAction(shlib_generator)
 
 res_action = SCons.Action.Action('$RCCOM', '$RCCOMSTR')
 
