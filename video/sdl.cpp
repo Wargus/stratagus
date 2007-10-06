@@ -563,7 +563,6 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 		case SDL_KEYDOWN:
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
 				event->key.keysym.sym, event->key.keysym.unicode);
-			printf("key down: 0x%x %c 0x%x\n", event->key.keysym.sym, event->key.keysym.sym, event->key.keysym.unicode);
 			break;
 
 		case SDL_KEYUP:
