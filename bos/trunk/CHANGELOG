@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 Development version:
+- Add "A Bridge Too Far" map (TimberDragon, Francois Beerten)
 - Fix crash with non-square maps (Francois Beerten)
 - Escape lua strings when saving (Jimmy Salmon)
 - Added popups for button panel buttons (Jimmy Salmon)
