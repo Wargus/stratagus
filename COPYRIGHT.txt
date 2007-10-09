@@ -51,13 +51,7 @@ As a special exception the sources are not required for the following files:
   graphics/elites/ui/ui_minimap.png
   graphics/general/magnifying_glass.png
   graphics/general/ui_buttons.png
-  graphics/missiles/big_fire.png
-  graphics/missiles/expl_160x128x1.png
-  graphics/missiles/expl_288x288x1.png
-  graphics/missiles/expl_64x64x1.png
-  graphics/missiles/explosion.png
   graphics/missiles/green_cross.png
-  graphics/missiles/small_fire.png
   graphics/neutral/units/corpses.png
   graphics/screens/defeat.png
   graphics/screens/menu.png
