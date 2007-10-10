@@ -2,8 +2,9 @@
 #
 # $Id$
 # GPL v2 or later, see COPYRIGHT.txt from Bos Wars
+# This file is part of Bos Wars, tools section
 #
-# generate voiced briefings for Bos Wars
+# generate voiced briefings for Bos Wars, using festival TTS and mbrola voices
 
 VOICE="voice_us1_mbrola"
 

@@ -2,8 +2,9 @@
 #
 # $Id$
 # GPL v2 or later, see COPYRIGHT.txt from Bos Wars
+# This file is part of Bos Wars, tools section
 #
-# generate building voices for Bos Wars
+# generate building voices for Bos Wars, with festival TTS and mbrola voices
 
 # My ~/.festivalrc :
 #(Parameter.set 'Audio_Method 'linux16audio)
