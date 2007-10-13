@@ -27,6 +27,12 @@
 --
 --	$Id$
 
+function DefineIcon(arg)
+	local icon = CIcon:New(arg.Name)
+	icon.G = CGraphic:New(arg.File, arg.Size[1], arg.Size[2])
+	icon.Frame = arg.Frame
+end
+
 -- Build buttons
 DefineIcon({
 	Name = "icon-magmapump_b",

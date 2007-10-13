@@ -214,7 +214,6 @@ SetGrabMouse(preferences.GrabMouse)
 
 
 --; Uses Stratagus Library path!
-Load("scripts/bos.lua")
 Load("scripts/icons.lua")
 Load("scripts/sound.lua")
 Load("scripts/missiles.lua")
