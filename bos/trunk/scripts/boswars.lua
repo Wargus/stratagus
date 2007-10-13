@@ -107,9 +107,6 @@ SetHoldClickDelay(1000)
 --	Enable minimap terrain by default.
 SetMinimapTerrain(true)
 
---  Set Fog of War opacity
-SetFogOfWarOpacity(128)
-
 --  Use OpenGL texture compression if supported
 UseGLTextureCompression = false
 

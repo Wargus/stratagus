@@ -47,7 +47,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int FogOfWarOpacity;                 /// Fog of war Opacity.
+static int FogOfWarOpacity = 128;                 /// Fog of war Opacity.
 CGraphic *CMap::FogGraphic;
 
 /**
@@ -586,7 +586,6 @@ void CMap::InitFogOfWar(void)
 			s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
 				32, RMASK, GMASK, BMASK, AMASK);
 
-			// FIXME: Make the color configurable
 			SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
 			color = Video.MapRGB(s->format, r, g, b);
 
