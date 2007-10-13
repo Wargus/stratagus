@@ -615,7 +615,7 @@ static void Usage(void)
 	PrintHeader();
 	printf(
 		"\n\nUsage: boswars [OPTIONS]\n\
-		\t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
+		\t-c file.lua\tconfiguration start file (default boswars.lua)\n\
 		\t-d datapath\tpath to Bos Wars data\n\
 		\t-h\t\tHelp shows this page\n\
 		\t-l\t\tDisable command log\n\
@@ -673,7 +673,7 @@ int main(int argc, char **argv)
 	Assert(pathPtr);
 	StratagusLibPath = pathPtr;
 #endif
-	CclStartFile = "scripts/stratagus.lua";
+	CclStartFile = "scripts/boswars.lua";
 	EditorStartFile = "scripts/editor.lua";
 
 	//  Default player name to username on unix systems.
