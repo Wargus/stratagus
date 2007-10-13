@@ -279,31 +279,6 @@ static int CclSetMinimapTerrain(lua_State *l)
 }
 
 /**
-**  Fog of war opacity.
-**
-**  @param l  Lua state.
-*/
-static int CclSetFogOfWarOpacity(lua_State *l)
-{
-	int i;
-
-	LuaCheckArgs(l, 1);
-	i = LuaToNumber(l, 1);
-	if (i < 0 || i > 255) {
-		PrintFunction();
-		fprintf(stdout, "Opacity should be 0 - 255\n");
-		i = 128;
-	}
-	FogOfWarOpacity = i;
-
-	if (!CclInConfigFile) {
-		Map.Init();
-	}
-
-	return 0;
-}
-
-/**
 **  Define Fog graphics
 **
 **  @param l  Lua state.
@@ -436,7 +411,6 @@ void MapCclRegister(void)
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
-	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 
 	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
