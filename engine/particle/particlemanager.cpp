@@ -56,11 +56,28 @@ void CParticleManager::init()
 
 void CParticleManager::exit()
 {
+	ParticleManager.clear();
+
 	CExplosion::exit();
 	CFlameParticle::exit();
 	CFlashParticle::exit();
 	CChunkParticle::exit();
 	CSmokeParticle::exit();
+}
+
+void CParticleManager::clear()
+{
+	std::vector<CParticle *>::iterator i = particles.begin();
+	while (i != particles.end()) {
+		delete *i;
+	}
+	particles.clear();
+
+	i = new_particles.begin();
+	while (i != new_particles.end()) {
+		delete *i;
+	}
+	new_particles.clear();
 }
 
 void CParticleManager::draw()
@@ -76,6 +93,9 @@ void CParticleManager::update()
 	static unsigned long lastTicks = 0;
 	unsigned long ticks = GetTicks() - lastTicks;
 	std::vector<CParticle *>::iterator i;
+
+	particles.insert(particles.end(), new_particles.begin(), new_particles.end());
+	new_particles.clear();
 
 	i = particles.begin();
 	while (i != particles.end()) {
@@ -93,7 +113,7 @@ void CParticleManager::update()
 
 void CParticleManager::add(CParticle *particle)
 {
-	particles.push_back(particle);
+	new_particles.push_back(particle);
 }
 
 //@}

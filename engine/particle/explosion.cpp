@@ -42,8 +42,10 @@ CExplosion::CExplosion(CPosition position) :
 	CFlameParticle *flame = new CFlameParticle(position);
 	ParticleManager.add(flame);
 
-	CChunkParticle *chunk = new CChunkParticle(position);
-	ParticleManager.add(chunk);
+	for (int i = 0; i < 8; ++i) {
+		CChunkParticle *chunk = new CChunkParticle(position);
+		ParticleManager.add(chunk);
+	}
 
 	destroy();
 }

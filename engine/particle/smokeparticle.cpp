@@ -61,7 +61,7 @@ int CSmokeParticle::numFrames = 26;
 CSmokeParticle::CSmokeParticle(CPosition position) :
 	CParticle(position), frame(0), currTicks(0)
 {
-	int size = 5;
+	int size = 2;
 
 	if (MyRand() % 2 == 0) {
 		g = lightSmoke[size];
@@ -114,7 +114,7 @@ void CSmokeParticle::draw()
 
 void CSmokeParticle::update(int ticks)
 {
-	const int ticksPerFrame = 45;
+	const int ticksPerFrame = 60;
 	currTicks += ticks;
 	while (currTicks > ticksPerFrame) {
 		currTicks -= ticksPerFrame;
@@ -122,10 +122,11 @@ void CSmokeParticle::update(int ticks)
 	}
 	if (frame >= numFrames) {
 		destroy();
+		return;
 	}
 
 	// smoke rises
-	const int smokeRisePerSecond = 32;
+	const int smokeRisePerSecond = 22;
 	pos.y -= ticks / 1000.f * smokeRisePerSecond;
 }
 
