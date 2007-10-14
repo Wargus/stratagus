@@ -76,7 +76,7 @@ def globSources(sourceDirs, builddir):
   return targetsources
 
 def buildSourcesList(builddir):
-   sources = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua", builddir)
+   sources = globSources("action ai editor game map network particle pathfinder sound stratagus ui unit video tolua", builddir)
    sources.append(globSources("guichan guichan/sdl guichan/widgets", builddir))
    return sources
 sourcesEngine = buildSourcesList('build')
