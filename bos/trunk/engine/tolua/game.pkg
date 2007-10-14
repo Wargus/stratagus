@@ -75,3 +75,8 @@ enum GameTypes {
 	SettingsGameTypeManVsMachine,
 	SettingsGameTypeManTeamVsMachine,
 };
+
+$extern int AlliedUnitRecyclingEfficiency[MaxCosts];
+$extern int EnemyUnitRecyclingEfficiency[MaxCosts];
+int AlliedUnitRecyclingEfficiency[MaxCosts];
+int EnemyUnitRecyclingEfficiency[MaxCosts];
