@@ -68,6 +68,7 @@
 #include "editor.h"
 #include "sound.h"
 #include "script.h"
+#include "particle.h"
 
 #include <guichan.h>
 void DrawGuichanWidgets();
@@ -274,6 +275,8 @@ void GameMainLoop(void)
 	GameCursor = UI.Point.Cursor;
 	GameRunning = true;
 
+	CParticleManager::init();
+
 	showtip = false;
 	RealVideoSyncSpeed = VideoSyncSpeed;
 
@@ -292,7 +295,7 @@ void GameMainLoop(void)
 			SinglePlayerReplayEachCycle();
 			++GameCycle;
 			MultiPlayerReplayEachCycle();
-			NetworkCommands(); // Get network commands
+			NetworkCommands();  // Get network commands
 			UnitActions();      // handle units
 			MissileActions();   // handle missiles
 			PlayersEachCycle(); // handle players
@@ -340,10 +343,11 @@ void GameMainLoop(void)
 			}
 		}
 
-		TriggersEachCycle();  // handle triggers
-		UpdateMessages();     // update messages
+		TriggersEachCycle();      // handle triggers
+		UpdateMessages();         // update messages
+		ParticleManager.update(); // handle particles
 
-		CheckMusicFinished(); // Check for next song
+		CheckMusicFinished();     // Check for next song
 
 		//
 		// Map scrolling
@@ -388,6 +392,8 @@ void GameMainLoop(void)
 	}
 	NetworkQuit();
 	EndReplayLog();
+
+	CParticleManager::exit();
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

@@ -41,6 +41,7 @@
 #include "ui.h"
 #include "missile.h"
 #include "unittype.h"
+#include "particle.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -319,7 +320,11 @@ void CViewport::Draw() const
 	for (; j < nmissiles; ++j) {
 		missiletable[j]->DrawMissile();
 	}
+
+	ParticleManager.draw();
+
 	this->DrawMapFogOfWar();
+
 	//
 	// Draw orders of selected units.
 	// Drawn here so that they are shown even when the unit is out of the screen.
