@@ -29,23 +29,38 @@
 
 //@{
 
+#include <sstream>
+
 #include "stratagus.h"
 #include "particle.h"
 #include "video.h"
 
 
-CGraphic *CFlameParticle::explosion0;
-CGraphic *CFlameParticle::explosion1;
+static const int NumExplosions = 7;
+static const int Sizes[][2] = {
+	{ 13, 18 },
+	{ 27, 36 },
+	{ 41, 54 },
+	{ 54, 73 },
+	{ 68, 91 },
+	{ 82, 109 },
+	{ 96, 128 },
+};
+
+CGraphic *CFlameParticle::explosion0[NumExplosions];
+CGraphic *CFlameParticle::explosion1[NumExplosions];
 
 
 CFlameParticle::CFlameParticle(CPosition position) :
 	CParticle(position), frame(0), currTicks(0)
 {
+	int size = 2;
+
 	if (MyRand() % 2 == 0) {
-		g = explosion0;
+		g = explosion0[size];
 		numFrames = 16;
 	} else {
-		g = explosion1;
+		g = explosion1[size];
 		numFrames = 15;
 	}
 }
@@ -57,25 +72,33 @@ CFlameParticle::~CFlameParticle()
 
 void CFlameParticle::init()
 {
-	if (!explosion0) {
-		explosion0 = CGraphic::New("graphics/particle/explosion0-7.png", 96, 128);
-		explosion0->Load();
-	}
-	if (!explosion1) {
-		explosion1 = CGraphic::New("graphics/particle/explosion1-7.png", 128, 96);
-		explosion1->Load();
+	for (int i = 0; i < NumExplosions; ++i) {
+		if (!explosion0[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/explosion0-" << i + 1 << ".png";
+			explosion0[i] = CGraphic::New(os.str(), Sizes[i][0], Sizes[i][1]);
+			explosion0[i]->Load();
+		}
+		if (!explosion1[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/explosion1-" << i + 1 << ".png";
+			explosion1[i] = CGraphic::New(os.str(), Sizes[i][1], Sizes[i][0]);
+			explosion1[i]->Load();
+		}
 	}
 }
 
 void CFlameParticle::exit()
 {
-	if (explosion0) {
-		CGraphic::Free(explosion0);
-		explosion0 = NULL;
-	}
-	if (explosion1) {
-		CGraphic::Free(explosion1);
-		explosion1 = NULL;
+	for (int i = 0; i < NumExplosions; ++i) {
+		if (explosion0[i]) {
+			CGraphic::Free(explosion0[i]);
+			explosion0[i] = NULL;
+		}
+		if (explosion1[i]) {
+			CGraphic::Free(explosion1[i]);
+			explosion1[i] = NULL;
+		}
 	}
 }
 
