@@ -209,9 +209,6 @@ static void GatherResource(CUnit *unit)
 		for (i = 0; i < MaxCosts; ++i) {
 			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
 			unit->Data.Harvest.CurrentProduction[i] = amount[i] * efficiency[i] / 100;
-			if (unit->Player == ThisPlayer) {
-				printf("amount %d %d\n", amount[i], efficiency[i]);
-			}
 			unit->Player->ProductionRate[i] += unit->Data.Harvest.CurrentProduction[i];
 			source->ResourcesHeld[i] -= amount[i];
 		}
