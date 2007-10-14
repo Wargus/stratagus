@@ -57,6 +57,9 @@
 #define SUB_START_GATHERING 55
 #define SUB_GATHER_RESOURCE 60
 
+int AlliedUnitRecyclingEfficiency[MaxCosts] = {0, 50};
+int EnemyUnitRecyclingEfficiency[MaxCosts] = {0, 40};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -190,15 +193,25 @@ static void GatherResource(CUnit *unit)
 	int amount[MaxCosts] = {1, 1};
 	bool visible = source->IsAliveOnMap();
 	int i;
+	const int totalEfficiency[MaxCosts] = {100, 100};
+	const int *efficiency = totalEfficiency;
 
 	AnimateActionHarvest(unit);
 
 	// Calculate how much we can harvest.
 	if (visible && UnitHoldsResources(source)) {
+		if (unit->Player == source->Player || unit->Player->IsAllied(source)) {
+			efficiency = AlliedUnitRecyclingEfficiency;
+		} else if (unit->Player->IsEnemy(source)) {
+			efficiency = EnemyUnitRecyclingEfficiency;
+		}
 		CalculateRequestedAmount(unit->Type, source->ResourcesHeld, amount);
 		for (i = 0; i < MaxCosts; ++i) {
 			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
-			unit->Data.Harvest.CurrentProduction[i] = amount[i];
+			unit->Data.Harvest.CurrentProduction[i] = amount[i] * efficiency[i] / 100;
+			if (unit->Player == ThisPlayer) {
+				printf("amount %d %d\n", amount[i], efficiency[i]);
+			}
 			unit->Player->ProductionRate[i] += unit->Data.Harvest.CurrentProduction[i];
 			source->ResourcesHeld[i] -= amount[i];
 		}

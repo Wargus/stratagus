@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 09/26/07 19:59:36.
+** Generated automatically by tolua++-1.0.92 on Sun Oct 14 18:53:38 2007.
 */
 
 #ifndef __cplusplus
@@ -45,6 +45,8 @@ int SaveReplay(const std::string &filename);
 #include "results.h"
 void StopGame(GameResults result);
 #include "settings.h"
+extern int AlliedUnitRecyclingEfficiency[MaxCosts];
+extern int EnemyUnitRecyclingEfficiency[MaxCosts];
 #include "pathfinder.h"
 int GetNumOpponents(int player);
 int GetTimer();
@@ -16777,6 +16779,94 @@ static int tolua_set_GameSettings(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: AlliedUnitRecyclingEfficiency */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_AlliedUnitRecyclingEfficiency
+static int tolua_get_stratagus_AlliedUnitRecyclingEfficiency(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)AlliedUnitRecyclingEfficiency[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: AlliedUnitRecyclingEfficiency */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_AlliedUnitRecyclingEfficiency
+static int tolua_set_stratagus_AlliedUnitRecyclingEfficiency(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  AlliedUnitRecyclingEfficiency[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: EnemyUnitRecyclingEfficiency */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_EnemyUnitRecyclingEfficiency
+static int tolua_get_stratagus_EnemyUnitRecyclingEfficiency(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)EnemyUnitRecyclingEfficiency[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: EnemyUnitRecyclingEfficiency */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_EnemyUnitRecyclingEfficiency
+static int tolua_set_stratagus_EnemyUnitRecyclingEfficiency(lua_State* tolua_S)
+{
+ int tolua_index;
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=MaxCosts)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  EnemyUnitRecyclingEfficiency[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Description of class  CMapInfo */
 #ifndef TOLUA_DISABLE_tolua_get_CMapInfo_Description
 static int tolua_get_CMapInfo_Description(lua_State* tolua_S)
@@ -18704,6 +18794,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"SettingsGameTypeLeftVsRight",SettingsGameTypeLeftVsRight);
   tolua_constant(tolua_S,"SettingsGameTypeManVsMachine",SettingsGameTypeManVsMachine);
   tolua_constant(tolua_S,"SettingsGameTypeManTeamVsMachine",SettingsGameTypeManTeamVsMachine);
+  tolua_array(tolua_S,"AlliedUnitRecyclingEfficiency",tolua_get_stratagus_AlliedUnitRecyclingEfficiency,tolua_set_stratagus_AlliedUnitRecyclingEfficiency);
+  tolua_array(tolua_S,"EnemyUnitRecyclingEfficiency",tolua_get_stratagus_EnemyUnitRecyclingEfficiency,tolua_set_stratagus_EnemyUnitRecyclingEfficiency);
   tolua_cclass(tolua_S,"CMapInfo","CMapInfo","",NULL);
   tolua_beginmodule(tolua_S,"CMapInfo");
    tolua_variable(tolua_S,"Description",tolua_get_CMapInfo_Description,tolua_set_CMapInfo_Description);
