@@ -3096,6 +3096,34 @@
 						</FileConfiguration>
 					</File>
 				</Filter>
+				<Filter
+					Name="particle"
+					>
+					<File
+						RelativePath=".\particle\chunkparticle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\particle\explosion.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\particle\flameparticle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\particle\particle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\particle\particlemanager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\particle\smokeparticle.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -3207,6 +3235,10 @@
 				</File>
 				<File
 					RelativePath="include\network.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\particle.h"
 					>
 				</File>
 				<File
