@@ -79,7 +79,8 @@ void CSmokeParticle::exit()
 
 void CSmokeParticle::draw()
 {
-	g->DrawFrameClip(frame, pos.x - g->Width / 2, pos.y - g->Height / 2);
+	g->DrawFrameClip(frame, static_cast<int>(pos.x - g->Width / 2),
+		static_cast<int>(pos.y - g->Height / 2));
 }
 
 void CSmokeParticle::update(int ticks)
