@@ -47,11 +47,13 @@ struct CPosition
 class CParticle
 {
 public:
-	CParticle(CPosition position);
-	virtual ~CParticle();
+	CParticle(CPosition position) :
+		pos(position), destroyed(false)
+	{}
+	virtual ~CParticle() {}
 
-	virtual void draw();
-	virtual void update(int ticks);
+	virtual void draw() {}
+	virtual void update(int ticks) {}
 
 	inline void destroy() { destroyed = true; }
 	inline bool isDestroyed() { return destroyed; }
