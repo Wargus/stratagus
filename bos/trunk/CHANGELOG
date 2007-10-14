@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Allow recycling of friendly and ennemy buildings (Francois Beerten)
 - Replaced fire and explosion graphics (TimberDragon)
 - Add "A Bridge Too Far" map (TimberDragon, Francois Beerten)
 - Fix crash with non-square maps (Francois Beerten)

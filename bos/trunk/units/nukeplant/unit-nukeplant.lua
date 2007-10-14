@@ -88,6 +88,7 @@ DefineUnitType("unit-nuke", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "nuke-selected",
         "ready", "nuke-ready",

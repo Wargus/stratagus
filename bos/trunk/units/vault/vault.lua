@@ -95,6 +95,7 @@ DefineUnitType("unit-vault", {
     MagmaStorageCapacity = 2000,
     MaxEnergyUtilizationRate = 40,
     MaxMagmaUtilizationRate = 20,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "vault-selected",
         "ready", "vault-ready",

@@ -87,6 +87,7 @@ DefineUnitType("unit-msilo", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    CanHarvestFrom = true,
 })
 DefineAnimations("animations-dead-msilo", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 

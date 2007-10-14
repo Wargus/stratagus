@@ -113,6 +113,7 @@ DefineUnitType("unit-cannon", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "cannon-selected",
         "help", "cannon-help",

@@ -92,6 +92,7 @@ DefineUnitType("unit-powerplant", {
     BuilderOutside = true,
     VisibleUnderFog = true,
     EnergyProductionRate = 20,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "powerplant-selected",
         "ready", "powerplant-ready",

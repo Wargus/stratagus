@@ -89,6 +89,7 @@ DefineUnitType("unit-hosp", {
     VisibleUnderFog = true,
     MaxEnergyUtilizationRate = 20,
     MaxMagmaUtilizationRate = 10,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "hosp-selected",
         "ready", "hosp-ready",
