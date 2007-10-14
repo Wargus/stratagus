@@ -124,6 +124,18 @@ public:
 	virtual void update(int ticks);
 
 protected:
+	CPosition initialPos;
+	int initialVelocity;
+	float trajectoryAngle;
+	int nextSmokeTicks;
+	int lifetime;
+	int age;
+	float height;
+
+	struct {
+		float x;
+		float y;
+	} direction;
 };
 
 
@@ -178,9 +190,11 @@ public:
 	void update();
 
 	void add(CParticle *particle);
+	void clear();
 
 private:
 	std::vector<CParticle *> particles;
+	std::vector<CParticle *> new_particles;
 };
 
 extern CParticleManager ParticleManager;

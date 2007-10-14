@@ -29,15 +29,33 @@
 
 //@{
 
+#include <math.h>
+
 #include "stratagus.h"
 #include "particle.h"
 
 
+static const int gravity = 32 * 12;
+
+static inline float deg2rad(int degrees) {
+	return degrees * (3.1415926535f / 180);
+}
+
+
 CChunkParticle::CChunkParticle(CPosition position) :
-	CParticle(position)
+	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0), height(0.f)
 {
-	CSmokeParticle *smoke = new CSmokeParticle(position);
-	ParticleManager.add(smoke);
+	float radians = deg2rad(MyRand() % 360);
+	direction.x = cos(radians);
+	direction.y = sin(radians);
+
+	const int maxVelocity = 400;
+	initialVelocity = MyRand() % maxVelocity;
+
+	int minTrajectoryAngle = 80;
+	trajectoryAngle = deg2rad(MyRand() % (90 - minTrajectoryAngle) + minTrajectoryAngle);
+
+	lifetime = (int)(1000 * (initialVelocity * sin(trajectoryAngle) / gravity) * 2);
 }
 
 CChunkParticle::~CChunkParticle()
@@ -54,14 +72,53 @@ void CChunkParticle::exit()
 	// FIXME: free graphic
 }
 
+float screenPos(float posy, float height)
+{
+	return posy - height * 0.2f;
+}
+
 void CChunkParticle::draw()
 {
 	// FIXME: draw particle
+//	g->DrawFrameClip(frame, static_cast<int>(pos.x - g->Width / 2.f),
+//		static_cast<int>(screenPos(pos.y - g->Height / 2.f, height)));
+}
+
+float getHorizontalPosition(int initialVelocity, float trajectoryAngle, float time)
+{
+    return (initialVelocity * cos(trajectoryAngle)) * time;
+}
+
+float getVerticalPosition(int initialVelocity, float trajectoryAngle, float time)
+{
+    return (initialVelocity * sin(trajectoryAngle)) * time - (gravity / 2.0f) * (time * time);
 }
 
 void CChunkParticle::update(int ticks)
 {
-	// FIXME: move in an arc, periodically add smoke
+	age += ticks;
+	if (age >= lifetime) {
+		destroy();
+		return;
+	}
+
+	const int minSmokeTicks = 150;
+	const int randSmokeTicks = 50;
+
+	if (age > nextSmokeTicks) {
+		CSmokeParticle *smoke = new CSmokeParticle(CPosition(pos.x, screenPos(pos.y, height)));
+		ParticleManager.add(smoke);
+
+		nextSmokeTicks += MyRand() % randSmokeTicks + minSmokeTicks;
+	}
+
+	float time = age / 1000.f;
+
+	float distance = getHorizontalPosition(initialVelocity, trajectoryAngle, time);
+	pos.x = initialPos.x + distance * direction.x;
+	pos.y = initialPos.y + distance * direction.y;
+
+	height = getVerticalPosition(initialVelocity, trajectoryAngle, time);
 }
 
 //@}
