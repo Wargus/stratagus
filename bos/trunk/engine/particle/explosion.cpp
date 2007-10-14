@@ -36,6 +36,9 @@
 CExplosion::CExplosion(CPosition position) :
 	CParticle(position)
 {
+	CFlashParticle *flash = new CFlashParticle(position);
+	ParticleManager.add(flash);
+
 	CFlameParticle *flame = new CFlameParticle(position);
 	ParticleManager.add(flame);
 

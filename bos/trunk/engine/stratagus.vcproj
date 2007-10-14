@@ -3112,6 +3112,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\particle\flashparticle.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\particle\particle.cpp"
 						>
 					</File>
