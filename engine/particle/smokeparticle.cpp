@@ -29,23 +29,44 @@
 
 //@{
 
+#include <sstream>
+#include <iomanip>
+
 #include "stratagus.h"
 #include "particle.h"
 #include "video.h"
 
 
-CGraphic *CSmokeParticle::lightSmoke;
-CGraphic *CSmokeParticle::darkSmoke;
+static const int NumSmokes = 12;
+static const int Sizes[][2] = {
+	{  4,  4 },
+	{  8,  8 },
+	{ 12, 12 },
+	{ 16, 16 },
+	{ 20, 20 },
+	{ 24, 24 },
+	{ 28, 28 },
+	{ 32, 32 },
+	{ 36, 36 },
+	{ 40, 40 },
+	{ 44, 44 },
+	{ 48, 48 },
+};
+
+CGraphic *CSmokeParticle::lightSmoke[NumSmokes];
+CGraphic *CSmokeParticle::darkSmoke[NumSmokes];
 int CSmokeParticle::numFrames = 26;
 
 
 CSmokeParticle::CSmokeParticle(CPosition position) :
 	CParticle(position), frame(0), currTicks(0)
 {
+	int size = 5;
+
 	if (MyRand() % 2 == 0) {
-		g = lightSmoke;
+		g = lightSmoke[size];
 	} else {
-		g = darkSmoke;
+		g = darkSmoke[size];
 	}
 }
 
@@ -55,25 +76,33 @@ CSmokeParticle::~CSmokeParticle()
 
 void CSmokeParticle::init()
 {
-	if (!lightSmoke) {
-		lightSmoke = CGraphic::New("graphics/particle/smokelight48.png", 48, 48);
-		lightSmoke->Load();
-	}
-	if (!darkSmoke) {
-		darkSmoke = CGraphic::New("graphics/particle/smokedark48.png", 48, 48);
-		darkSmoke->Load();
+	for (int i = 0; i < NumSmokes; ++i) {
+		if (!lightSmoke[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/smokelight" << std::setfill('0') << std::setw(2) << (i + 1) * 4 << ".png";
+			lightSmoke[i] = CGraphic::New(os.str(), Sizes[i][0], Sizes[i][1]);
+			lightSmoke[i]->Load();
+		}
+		if (!darkSmoke[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/smokedark" << std::setfill('0') << std::setw(2) << (i + 1) * 4 << ".png";
+			darkSmoke[i] = CGraphic::New(os.str(), Sizes[i][0], Sizes[i][1]);
+			darkSmoke[i]->Load();
+		}
 	}
 }
 
 void CSmokeParticle::exit()
 {
-	if (lightSmoke) {
-		CGraphic::Free(lightSmoke);
-		lightSmoke = NULL;
-	}
-	if (darkSmoke) {
-		CGraphic::Free(darkSmoke);
-		darkSmoke = NULL;
+	for (int i = 0; i < NumSmokes; ++i) {
+		if (lightSmoke[i]) {
+			CGraphic::Free(lightSmoke[i]);
+			lightSmoke[i] = NULL;
+		}
+		if (darkSmoke[i]) {
+			CGraphic::Free(darkSmoke[i]);
+			darkSmoke[i] = NULL;
+		}
 	}
 }
 
