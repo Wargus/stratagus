@@ -146,8 +146,8 @@ protected:
 	int currTicks;
 
 	static int numFrames;
-	static CGraphic *lightSmoke;
-	static CGraphic *darkSmoke;
+	static CGraphic *lightSmoke[];
+	static CGraphic *darkSmoke[];
 };
 
 
