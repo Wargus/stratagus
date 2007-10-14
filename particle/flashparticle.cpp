@@ -7,7 +7,7 @@
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
-/**@name flameparticle.cpp - The flame particle. */
+/**@name flashparticle.cpp - The flash particle. */
 //
 //      (c) Copyright 2007 by Jimmy Salmon
 //
@@ -34,66 +34,50 @@
 #include "video.h"
 
 
-CGraphic *CFlameParticle::explosion0;
-CGraphic *CFlameParticle::explosion1;
+CGraphic *CFlashParticle::flash;
+int CFlashParticle::numFrames = 24;
 
 
-CFlameParticle::CFlameParticle(CPosition position) :
-	CParticle(position), frame(0), currTicks(0)
-{
-	if (MyRand() % 2 == 0) {
-		g = explosion0;
-		numFrames = 16;
-	} else {
-		g = explosion1;
-		numFrames = 15;
-	}
-}
-
-
-CFlameParticle::~CFlameParticle()
+CFlashParticle::CFlashParticle(CPosition position) :
+	CParticle(position), frame(numFrames - 1), currTicks(0)
 {
 }
 
-void CFlameParticle::init()
+CFlashParticle::~CFlashParticle()
 {
-	if (!explosion0) {
-		explosion0 = CGraphic::New("graphics/particle/explosion0-7.png", 96, 128);
-		explosion0->Load();
-	}
-	if (!explosion1) {
-		explosion1 = CGraphic::New("graphics/particle/explosion1-7.png", 128, 96);
-		explosion1->Load();
+}
+
+void CFlashParticle::init()
+{
+	if (!flash) {
+		flash = CGraphic::New("graphics/particle/flash.png", 240, 194);
+		flash->Load();
 	}
 }
 
-void CFlameParticle::exit()
+void CFlashParticle::exit()
 {
-	if (explosion0) {
-		CGraphic::Free(explosion0);
-		explosion0 = NULL;
-	}
-	if (explosion1) {
-		CGraphic::Free(explosion1);
-		explosion1 = NULL;
+	if (flash) {
+		CGraphic::Free(flash);
+		flash = NULL;
 	}
 }
 
-void CFlameParticle::draw()
+void CFlashParticle::draw()
 {
-	g->DrawFrameClip(frame, static_cast<int>(pos.x - g->Width / 2.f),
-		static_cast<int>(pos.y - g->Height / 2.f));
+	flash->DrawFrameClip(frame, static_cast<int>(pos.x - flash->Width / 2.f),
+		static_cast<int>(pos.y - flash->Height / 2.f));
 }
 
-void CFlameParticle::update(int ticks)
+void CFlashParticle::update(int ticks)
 {
-	const int ticksPerFrame = 33;
+	const int ticksPerFrame = 22;
 	currTicks += ticks;
 	while (currTicks > ticksPerFrame) {
 		currTicks -= ticksPerFrame;
-		++frame;
+		--frame;
 	}
-	if (frame >= numFrames) {
+	if (frame < 0) {
 		destroy();
 	}
 }

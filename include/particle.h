@@ -86,6 +86,28 @@ protected:
 };
 
 
+// Flash particle
+class CFlashParticle : public CParticle
+{
+public:
+	CFlashParticle(CPosition position);
+	virtual ~CFlashParticle();
+
+	static void init();
+	static void exit();
+
+	virtual void draw();
+	virtual void update(int ticks);
+
+protected:
+	int frame;
+	int currTicks;
+
+	static CGraphic *flash;
+	static int numFrames;
+};	
+
+
 // Chunk particle
 class CChunkParticle : public CParticle
 {
