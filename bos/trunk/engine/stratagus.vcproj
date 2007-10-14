@@ -3116,10 +3116,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\particle\particle.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\particle\particlemanager.cpp"
 						>
 					</File>
