@@ -83,8 +83,8 @@ protected:
 	int numFrames;
 	int currTicks;
 
-	static CGraphic *explosion0;
-	static CGraphic *explosion1;
+	static CGraphic *explosion0[];
+	static CGraphic *explosion1[];
 };
 
 
