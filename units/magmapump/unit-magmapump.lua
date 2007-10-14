@@ -96,6 +96,7 @@ DefineUnitType("unit-magmapump", {
     BuildingRules = {{"ontop",
     {Type = "unit-hotspot"}},{"ontop",
     {Type = "unit-weakhotspot"}}},
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "magmapump-selected",
         "ready", "magmapump-ready",

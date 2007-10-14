@@ -90,6 +90,7 @@ DefineUnitType("unit-radar", {
     VisibleUnderFog = true,
     NumDirections = 1,
     RadarRange = 40,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "radar-selected",
         "ready", "radar-ready",

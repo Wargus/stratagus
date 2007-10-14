@@ -91,6 +91,7 @@ DefineUnitType("unit-aircraftfactory", {
     BuilderOutside = true,
     MaxEnergyUtilizationRate = 60,
     MaxMagmaUtilizationRate = 30,
+    CanHarvestFrom = true,
     Sounds = {
 --        "selected", "aircraftfactory-selected",
 --        "dead", "aircraftfactory-dead",

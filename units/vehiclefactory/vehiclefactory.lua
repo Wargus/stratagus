@@ -91,6 +91,7 @@ DefineUnitType("unit-vfac", {
     VisibleUnderFog = true,
     MaxEnergyUtilizationRate = 60,
     MaxMagmaUtilizationRate = 30,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "vfac-selected",
         "ready", "vfac-ready",

@@ -102,6 +102,7 @@ DefineUnitType("unit-cam", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    CanHarvestFrom = true,
     Sounds = {"selected", "camera-selected",
         "ready", "camera-ready",
         "help", "camera-help"

@@ -93,6 +93,7 @@ DefineUnitType("unit-camp", {
     VisibleUnderFog = true,
     MaxEnergyUtilizationRate = 40,
     MaxMagmaUtilizationRate = 20,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "camp-selected",
         "ready", "camp-ready",
