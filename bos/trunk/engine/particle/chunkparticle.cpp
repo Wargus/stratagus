@@ -33,6 +33,7 @@
 
 #include "stratagus.h"
 #include "particle.h"
+#include "video.h"
 
 
 static const int gravity = 32 * 12;
@@ -52,7 +53,7 @@ CChunkParticle::CChunkParticle(CPosition position) :
 	const int maxVelocity = 400;
 	initialVelocity = MyRand() % maxVelocity;
 
-	int minTrajectoryAngle = 80;
+	int minTrajectoryAngle = 77;
 	trajectoryAngle = deg2rad(MyRand() % (90 - minTrajectoryAngle) + minTrajectoryAngle);
 
 	lifetime = (int)(1000 * (initialVelocity * sin(trajectoryAngle) / gravity) * 2);
@@ -64,12 +65,10 @@ CChunkParticle::~CChunkParticle()
 
 void CChunkParticle::init()
 {
-	// FIXME: load graphic
 }
 
 void CChunkParticle::exit()
 {
-	// FIXME: free graphic
 }
 
 float screenPos(float posy, float height)
@@ -79,9 +78,9 @@ float screenPos(float posy, float height)
 
 void CChunkParticle::draw()
 {
-	// FIXME: draw particle
-//	g->DrawFrameClip(frame, static_cast<int>(pos.x - g->Width / 2.f),
-//		static_cast<int>(screenPos(pos.y - g->Height / 2.f, height)));
+	Uint32 color = ColorBlack;
+
+	Video.DrawRectangleClip(color, (int)pos.x - 1, (int)screenPos(pos.y, height) - 1, 2, 2);
 }
 
 float getHorizontalPosition(int initialVelocity, float trajectoryAngle, float time)
