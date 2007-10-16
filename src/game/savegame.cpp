@@ -248,7 +248,6 @@ void SaveGame(const std::string &filename)
 	time_t now;
 	CFile file;
 	std::string s;
-	char *s1;
 	std::string fullpath;
 
 	fullpath = GetSaveDir() + filename;
@@ -259,8 +258,9 @@ void SaveGame(const std::string &filename)
 
 	time(&now);
 	s = ctime(&now);
-	if ((s1 = strchr(s.c_str(), '\n'))) {
-		*s1 = '\0';
+	size_t pos = s.find('\n');
+	if (pos != std::string::npos) {
+		s.erase(pos);
 	}
 
 	//

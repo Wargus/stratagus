@@ -949,7 +949,6 @@ int EvalNumber(const NumberDesc *number)
 {
 	CUnit *unit;
 	std::string s;
-	char *s2;
 	int a;
 	int b;
 
@@ -1023,12 +1022,11 @@ int EvalNumber(const NumberDesc *number)
 			} else { // ERROR.
 				return 0;
 			}
-		case ENumber_StringFind : // strchr(s, c) - s
+		case ENumber_StringFind : // s.find(c)
 			if (number->D.StringFind.String != NULL &&
 					!(s = EvalString(number->D.StringFind.String)).empty()) {
-				s2 = strchr(s.c_str(), number->D.StringFind.C);
-				a = s2 ? s2 - s.c_str() : -1;
-				return a;
+				size_t pos = s.find(number->D.StringFind.C);
+				return pos != std::string::npos ? (int)pos : -1;
 			} else { // ERROR.
 				return 0;
 			}

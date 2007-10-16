@@ -131,16 +131,17 @@ static int CclMakeSound(lua_State *l)
 		id = MakeSound(c_name, &c_file, 1);
 	} else if (lua_istable(l, 2)) {
 		// several files
-		unsigned int args = luaL_getn(l, 2);
-		std::string c_files[args];
+		int args = luaL_getn(l, 2);
+		std::string *c_files = new std::string[args];
 
-		for (unsigned int j = 0; j < args; ++j) {
+		for (int j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
 			c_files[j] = LuaToString(l, -1);
 			lua_pop(l, 1);
 		}
 		// FIXME: check size before casting
-		id = MakeSound(c_name, c_files, (unsigned char)args);
+		id = MakeSound(c_name, c_files, args);
+		delete[] c_files;
 	} else {
 		LuaError(l, "string or table expected");
 		return 0;
