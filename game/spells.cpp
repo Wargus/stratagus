@@ -744,26 +744,24 @@ static Target *NewTargetPosition(int x, int y)
 **  @param y           Y position, or -1 if it is a unit spell.
 **  @param condition   Pointer to condition info.
 **
-**  @return            1 if passed, 0 otherwise.
+**  @return            true if passed, false otherwise.
 */
-static int PassCondition(const CUnit *caster, const SpellType *spell, const CUnit *target,
+static bool PassCondition(const CUnit *caster, const SpellType *spell, const CUnit *target,
 	int x, int y, const ConditionInfo *condition)
 {
-	int i;
-
 	if (caster->Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
-		return 0;
+		return false;
 	}
 	if (spell->Target == TargetUnit) { // Casting a unit spell without a target.
 		if ((!target) || target->Destroyed || target->Orders[0]->Action == UnitActionDie) {
-			return 0;
+			return false;
 		}
 	}
 	if (!condition) { // no condition, pass.
-		return 1;
+		return true;
 	}
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) { // for custom variables
+	for (int i = 0; i < UnitTypeVar.NumberVariable; i++) { // for custom variables
 		const CUnit *unit;
 
 		unit = (condition->Variable[i].ConditionApplyOnCaster) ? caster : target;
@@ -773,20 +771,20 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 		}
 		if (condition->Variable[i].Enable != CONDITION_TRUE) {
 			if ((condition->Variable[i].Enable == CONDITION_ONLY) ^ (unit->Variable[i].Enable)) {
-				return 0;
+				return false;
 			}
 		}
 	// Value and Max
 		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 		if (condition->Variable[i].MaxValue != -1 &&
 			condition->Variable[i].MaxValue <= unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 
 		if (condition->Variable[i].MinMax >= unit->Variable[i].Max) {
-			return 0;
+			return false;
 		}
 
 		if (!unit->Variable[i].Max) {
@@ -795,44 +793,47 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 	// Percent
 		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max
 			>= 100 * unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 		if (condition->Variable[i].MaxValuePercent * unit->Variable[i].Max
 			<= 100 * unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 	}
 
 	if (!target) {
-		return 1;
-	}
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
-		if (condition->BoolFlag[i] != CONDITION_TRUE) {
-			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
-				return 0;
-			}
-		}
+		return true;
 	}
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^
 				// own units could be not allied ?
 				(caster->IsAllied(target) || target->Player == caster->Player)) {
-			return 0;
+			return false;
 		}
 	}
 	if (condition->Opponent != CONDITION_TRUE) {
 		if ((condition->Opponent == CONDITION_ONLY) ^
 				(caster->IsEnemy(target) && 1)) {
-			return 0;
+			return false;
+		}
+	}
+	if (condition->TargetSelf != CONDITION_TRUE) {
+		if ((condition->TargetSelf == CONDITION_ONLY) ^ (caster == target)) {
+			return false;
+		}
+	}
+	if (condition->Building != CONDITION_TRUE) {
+		if ((condition->Building == CONDITION_ONLY) ^ (target->Type->Building)) {
+			return false;
+		}
+	}
+	if (condition->Organic != CONDITION_TRUE) {
+		if ((condition->Organic == CONDITION_ONLY) ^ (target->Type->Organic)) {
+			return false;
 		}
 	}
 
-	if (condition->TargetSelf != CONDITION_TRUE) {
-		if ((condition->TargetSelf == CONDITION_ONLY) ^ (caster == target)) {
-			return 0;
-		}
-	}
-	return 1;
+	return true;
 }
 
 /**
@@ -1018,11 +1019,11 @@ bool SpellIsAvailable(const CPlayer *player, int spellid)
 **  @return          =!0 if spell should/can casted, 0 if not
 **  @note caster must know the spell, and spell must be available.
 */
-int CanCastSpell(const CUnit *caster, const SpellType *spell,
+bool CanCastSpell(const CUnit *caster, const SpellType *spell,
 	const CUnit *target, int x, int y)
 {
 	if (spell->Target == TargetUnit && target == NULL) {
-		return 0;
+		return false;
 	}
 	return PassCondition(caster, spell, target, x, y, spell->Condition);
 }

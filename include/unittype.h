@@ -317,7 +317,7 @@
 **
 **    Selectable with mouse rectangle
 **
-**    CUnitType::Teleporter
+**  CUnitType::Teleporter
 **
 **    Can teleport other units.
 **
@@ -419,33 +419,6 @@ public:
 	int Value;         /// Current (or initial) value of the variable (or initial value).
 	char Increase;     /// Number to increase(decrease) Value by second.
 	char Enable;       /// True if the unit doesn't have this variable. (f.e shield)
-};
-
-// Index for boolflag aready defined
-enum {
-	COWARD_INDEX,
-	BUILDING_INDEX,
-	FLIP_INDEX,
-	REVEALER_INDEX,
-	LANDUNIT_INDEX,
-	AIRUNIT_INDEX,
-	SEAUNIT_INDEX,
-	EXPLODEWHENKILLED_INDEX,
-	VISIBLEUNDERFOG_INDEX,
-	ATTACKFROMTRANSPORTER_INDEX,
-	VANISHES_INDEX,
-	GROUNDATTACK_INDEX,
-	SHOREBUILDING_INDEX,
-	CANATTACK_INDEX,
-	BUILDEROUTSIDE_INDEX,
-	BUILDERLOST_INDEX,
-	CANHARVESTFROM_INDEX,
-	HARVESTER_INDEX,
-	SELECTABLEBYRECTANGLE_INDEX,
-	ISNOTSELECTABLE_INDEX,
-	DECORATION_INDEX,
-	INDESTRUCTIBLE_INDEX,
-	TELEPORTER_INDEX,
 };
 
 // Index for variable already defined.
@@ -618,7 +591,7 @@ public:
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
 		BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 		CanCastSpell(NULL), AutoCastActive(NULL),
-		CanTransport(NULL), MaxOnBoard(0),
+		CanTransport(false), MaxOnBoard(0),
 		UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
 		MouseAction(0), Points(0), CanTarget(0),
 		Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
@@ -627,8 +600,7 @@ public:
 		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 		BuilderOutside(0), BuilderLost(0), CanHarvestFrom(0), Harvester(0),
 		Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-		Indestructible(0), Teleporter(0),
-		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
+		Indestructible(0), Teleporter(0), Organic(0), Variable(NULL),
 		ProductionEfficiency(100), FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
@@ -684,7 +656,7 @@ public:
 	int RepairRange;                /// Units repair range.
 	char *CanCastSpell;             /// Unit is able to use spells.
 	char *AutoCastActive;           /// Default value for autocast.
-	char *CanTransport;             /// Can transport units with this flag.
+	bool CanTransport;              /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval
@@ -729,10 +701,9 @@ public:
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
+	unsigned Organic : 1;               /// Can be transported or healed by a medic
 
-	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
 	CVariable *Variable;            /// Array of user defined variables.
-	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
 
 	std::vector<CBuildRestriction *> BuildingRules;/// Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
@@ -792,11 +763,7 @@ extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
 */
 class CUnitTypeVar {
 public:
-	CUnitTypeVar() : BoolFlagName(NULL), NumberBoolFlag(0),
-		VariableName(NULL), Variable(NULL), NumberVariable(0) {}
-
-	char **BoolFlagName;                /// Array of name of user defined bool flag.
-	int NumberBoolFlag;                 /// Number of user defined bool flag.
+	CUnitTypeVar() : VariableName(NULL), Variable(NULL), NumberVariable(0) {}
 
 	char **VariableName;                /// Array of names of user defined variables.
 	CVariable *Variable;                /// Array of user defined variables (default value for unittype).
