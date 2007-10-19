@@ -2477,15 +2477,6 @@ int ViewPointDistanceToUnit(const CUnit *dest)
 */
 int CanTarget(const CUnitType *source, const CUnitType *dest)
 {
-	int i;
-
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
-		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
-			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
-				return 0;
-			}
-		}
-	}
 	if (dest->UnitType == UnitTypeLand) {
 		if (dest->ShoreBuilding) {
 			return source->CanTarget & (CanTargetLand | CanTargetSea);
@@ -2511,8 +2502,6 @@ int CanTarget(const CUnitType *source, const CUnitType *dest)
 */
 int CanTransport(const CUnit *transporter, const CUnit *unit)
 {
-	int i;
-
 	if (!transporter->Type->CanTransport) {
 		return 0;
 	}
@@ -2534,13 +2523,10 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 	if (!transporter->IsTeamed(unit)) {
 		return 0;
 	}
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
-		if (transporter->Type->CanTransport[i] != CONDITION_TRUE) {
-			if ((transporter->Type->CanTransport[i] == CONDITION_ONLY) ^
-					unit->Type->BoolFlag[i]) {
-				return 0;
-			}
-		}
+	// Only organic units
+	// FIXME: should we add a CanBeTransported flag instead?
+	if (!unit->Type->Organic) {
+		return 0;
 	}
 	return 1;
 }

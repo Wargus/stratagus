@@ -300,11 +300,11 @@ public:
 class ConditionInfo {
 public:
 	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
-		BoolFlag(NULL), Variable(NULL) {};
+		Building(0), Organic(0), Variable(NULL) {};
 	~ConditionInfo() {
-		delete[] BoolFlag;
 		delete[] Variable;
 	};
+
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
 	//
@@ -314,7 +314,9 @@ public:
 	char Alliance;          /// Target is allied. (neutral is neither allied, nor opponent)
 	char Opponent;          /// Target is opponent. (neutral is neither allied, nor opponent)
 	char TargetSelf;        /// Target is the same as the caster.
-	char *BoolFlag;         /// User defined boolean flag.
+
+	char Building;          /// Target is a building
+	char Organic;           /// Target is organic
 
 	ConditionInfoVariable *Variable;
 	//
@@ -402,8 +404,8 @@ extern void CleanSpells(void);
 	/// return 1 if spell is availible, 0 if not (must upgrade)
 extern bool SpellIsAvailable(const CPlayer *player, int SpellId);
 
-	/// returns != 0 if spell can be casted (enough mana, valid target)
-extern int CanCastSpell(const CUnit *caster, const SpellType *spell,
+	/// returns true if spell can be casted (enough mana, valid target)
+extern bool CanCastSpell(const CUnit *caster, const SpellType *spell,
 	const CUnit *target, int x, int y);
 
 	/// cast spell on target unit or place at x,y

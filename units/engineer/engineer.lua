@@ -96,7 +96,7 @@ DefineUnitType("unit-engineer", {
     LandUnit = true,
     Coward = true,
     Harvester = true,
-    organic = true,
+    Organic = true,
     SelectableByRectangle = true,
     Sounds = {
         "selected", "engineer-selected",

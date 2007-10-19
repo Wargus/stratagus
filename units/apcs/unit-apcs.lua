@@ -82,7 +82,7 @@ DefineUnitType("unit-apcs", {
     MaxAttackRange = 4,
     Priority = 60,
     Points = 50,
-    CanTransport = {"organic", "only"},
+    CanTransport = true,
     AttackFromTransporter = true,
     MaxOnBoard = 6,
     Type = "land",

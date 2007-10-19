@@ -556,39 +556,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {
-			//  Warning: CanTransport should only be used AFTER all bool flags
-			//  have been defined.
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			if (type->MaxOnBoard == 0) { // set default value.
-				type->MaxOnBoard = 1;
-			}
-			if (!type->CanTransport) {
-				type->CanTransport = new char[UnitTypeVar.NumberBoolFlag];
-				memset(type->CanTransport, 0, UnitTypeVar.NumberBoolFlag * sizeof(char));
-			}
-			// FIXME : add flag for kill/unload units inside.
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-					if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
-						lua_rawgeti(l, -1, k + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						type->CanTransport[i] = Ccl2Condition(l, value);
-						break;
-					}
-				}
-				if (i != UnitTypeVar.NumberBoolFlag) {
-					continue;
-				}
-				LuaError(l, "Unsupported flag tag for CanTransport: %s" _C_ value);
-			}
+			type->CanTransport = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AttackFromTransporter")) {
 			type->AttackFromTransporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coward")) {
@@ -664,34 +632,6 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 				type->AutoCastActive[spell->Slot] = 1;
 			}
-		} else if (!strcmp(value, "CanTargetFlag")) {
-			//
-			// Warning: can-target-flag should only be used AFTER all bool flags
-			// have been defined.
-			//
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-					if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
-						lua_rawgeti(l, -1, k + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						type->CanTargetFlag[i] = Ccl2Condition(l, value);
-						break;
-					}
-				}
-				if (i != UnitTypeVar.NumberBoolFlag) {
-					continue;
-				}
-				LuaError(l, "Unsupported flag tag for can-target-flag: %s" _C_ value);
-			}
 		} else if (!strcmp(value, "ProductionEfficiency")) {
 			type->ProductionEfficiency = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "IsNotSelectable")) {
@@ -700,6 +640,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->SelectableByRectangle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Teleporter")) {
 			type->Teleporter = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Organic")) {
+			type->Organic = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -759,16 +701,8 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				continue;
 			}
-			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined bool flags
-				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
-					type->BoolFlag[i] = LuaToBoolean(l, -1);
-					break;
-				}
-			}
-			if (i == UnitTypeVar.NumberBoolFlag) {
-				printf("\n%s\n", type->Name.c_str());
-				LuaError(l, "Unsupported tag: %s" _C_ value);
-			}
+			printf("\n%s\n", type->Name.c_str());
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -1155,61 +1089,6 @@ static int CclDefineVariables(lua_State *l)
 }
 
 /**
-**  Define boolean flag.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineBoolFlags(lua_State *l)
-{
-	const char *str;    // Name of the bool flags to define.
-	int i;              // iterator for flags.
-	int j;              // iterator for arguments.
-	int args;           // number of arguments.
-	int old;            // Old number of defined bool flags
-
-	old = UnitTypeVar.NumberBoolFlag;
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
-		str = LuaToString(l, j + 1);
-		for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-			if (!strcmp(str, UnitTypeVar.BoolFlagName[i])) {
-				DebugPrint("Warning, Bool flags already defined\n");
-				break;
-			}
-		}
-		if (i != UnitTypeVar.NumberBoolFlag) {
-			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ UnitTypeVar.BoolFlagName[i]);
-			continue;
-		}
-		char **b = new char *[UnitTypeVar.NumberBoolFlag + 1];
-		memcpy(b, UnitTypeVar.BoolFlagName, UnitTypeVar.NumberBoolFlag * sizeof(char *));
-		delete[] UnitTypeVar.BoolFlagName;
-		UnitTypeVar.BoolFlagName = b;
-		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = new_strdup(str);
-	}
-	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
-		for (size_t i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-			unsigned char *b;
-
-			b = new unsigned char[UnitTypeVar.NumberBoolFlag];
-			memcpy(b, UnitTypes[i]->BoolFlag, old * sizeof(char *));
-			delete[] UnitTypes[i]->BoolFlag;
-			UnitTypes[i]->BoolFlag = b;
-			memset(UnitTypes[i]->BoolFlag + old, 0,
-				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->BoolFlag));
-
-			b = new unsigned char[UnitTypeVar.NumberBoolFlag];
-			memcpy(b, UnitTypes[i]->CanTargetFlag, old * sizeof(char *));
-			delete[] UnitTypes[i]->CanTargetFlag;
-			UnitTypes[i]->CanTargetFlag = b;
-			memset(UnitTypes[i]->CanTargetFlag + old, 0,
-				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->CanTargetFlag));
-		}
-	}
-	return 0;
-}
-
-/**
 **  Define Decorations for user variables
 **
 **  @param l  Lua state.
@@ -1428,32 +1307,6 @@ void UpdateUnitVariables(const CUnit *unit)
 #endif
 		Assert(unit->Variable[i].Value <= unit->Variable[i].Max);
 	}
-
-	// BoolFlag
-
-	type->BoolFlag[COWARD_INDEX]                = type->Coward;
-	type->BoolFlag[BUILDING_INDEX]              = type->Building;
-	type->BoolFlag[FLIP_INDEX]                  = type->Flip;
-	type->BoolFlag[REVEALER_INDEX]              = type->Revealer;
-	type->BoolFlag[LANDUNIT_INDEX]              = type->LandUnit;
-	type->BoolFlag[AIRUNIT_INDEX]               = type->AirUnit;
-	type->BoolFlag[SEAUNIT_INDEX]               = type->SeaUnit;
-	type->BoolFlag[EXPLODEWHENKILLED_INDEX]     = type->ExplodeWhenKilled;
-	type->BoolFlag[VISIBLEUNDERFOG_INDEX]       = type->VisibleUnderFog;
-	type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX] = type->AttackFromTransporter;
-	type->BoolFlag[VANISHES_INDEX]              = type->Vanishes;
-	type->BoolFlag[GROUNDATTACK_INDEX]          = type->GroundAttack;
-	type->BoolFlag[SHOREBUILDING_INDEX]         = type->ShoreBuilding;
-	type->BoolFlag[CANATTACK_INDEX]             = type->CanAttack;
-	type->BoolFlag[BUILDEROUTSIDE_INDEX]        = type->BuilderOutside;
-	type->BoolFlag[BUILDERLOST_INDEX]           = type->BuilderLost;
-	type->BoolFlag[CANHARVESTFROM_INDEX]            = type->CanHarvestFrom;
-	type->BoolFlag[HARVESTER_INDEX]             = type->Harvester;
-	type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX] = type->SelectableByRectangle;
-	type->BoolFlag[ISNOTSELECTABLE_INDEX]       = type->IsNotSelectable;
-	type->BoolFlag[DECORATION_INDEX]            = type->Decoration;
-	type->BoolFlag[INDESTRUCTIBLE_INDEX]        = type->Indestructible;
-	type->BoolFlag[TELEPORTER_INDEX]            = type->Teleporter;
 }
 
 /**
@@ -1464,15 +1317,7 @@ void InitDefinedVariables()
 	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
 		"Training", "GiveResource", "Kill", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
-		"RadarJammerRange", "AutoRepairRange", "Slot"
-		}; // names of the variable.
-	const char *boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
-		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
-		"\"VisibleUnderFog\", \"AttackFromTransporter\","
-		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
-		"\"BuilderOutside\", \"BuilderLost\", \"CanHarvestFrom\", \"Harvester\","
-		"\"SelectableByRectangle\", \"IsNotSelectable\", \"Decoration\","
-		"\"Indestructible\", \"Teleporter\")";
+		"RadarJammerRange", "AutoRepairRange", "Slot"};
 	int i;
 
 	// Variables.
@@ -1482,9 +1327,6 @@ void InitDefinedVariables()
 	}
 	UnitTypeVar.Variable = new CVariable[i];
 	UnitTypeVar.NumberVariable = i;
-
-	// Boolflags.
-	CclCommand(boolflag);
 }
 
 /**
@@ -1493,7 +1335,6 @@ void InitDefinedVariables()
 void UnitTypeCclRegister(void)
 {
 	lua_register(Lua, "DefineUnitType", CclDefineUnitType);
-	lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
 	lua_register(Lua, "DefineVariables", CclDefineVariables);
 	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
 

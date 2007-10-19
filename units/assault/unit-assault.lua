@@ -92,7 +92,7 @@ DefineUnitType("unit-assault", {
     CanTargetLand = true,
     CanTargetAir = true,
     LandUnit = true,
-    organic = true,
+    Organic = true,
     SelectableByRectangle = true,
     Sounds = {
         "selected", "assault-selected",

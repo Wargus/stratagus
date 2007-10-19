@@ -223,10 +223,6 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 	}
 	type->Slot = UnitTypes.size();
 	type->Ident = ident;
-	type->BoolFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
-	memset(type->BoolFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
-	type->CanTargetFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
-	memset(type->CanTargetFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
 	type->Variable = new CVariable[UnitTypeVar.NumberVariable];
 	memcpy(type->Variable, UnitTypeVar.Variable,
 		UnitTypeVar.NumberVariable * sizeof(*type->Variable));
@@ -445,9 +441,6 @@ void CleanUnitTypes(void)
 		Assert(!type->Name.empty());
 
 		delete[] type->Variable;
-		delete[] type->BoolFlag;
-		delete[] type->CanTargetFlag;
-		delete[] type->CanTransport;
 
 		for (j = 0; j < PlayerMax; j++) {
 			delete[] type->Stats[j].Variables;
@@ -470,15 +463,9 @@ void CleanUnitTypes(void)
 	UnitTypes.clear();
 	UnitTypeMap.clear();
 
-	for (j = 0; j < UnitTypeVar.NumberBoolFlag; ++j) { // User defined flags
-		delete[] UnitTypeVar.BoolFlagName[j];
-	}
 	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
 		delete[] UnitTypeVar.VariableName[j];
 	}
-	delete[] UnitTypeVar.BoolFlagName;
-	UnitTypeVar.BoolFlagName = NULL;
-	UnitTypeVar.NumberBoolFlag = 0;
 	delete[] UnitTypeVar.VariableName;
 	UnitTypeVar.VariableName = NULL;
 	delete[] UnitTypeVar.Variable;

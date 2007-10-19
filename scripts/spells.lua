@@ -27,7 +27,6 @@
 --
 --	$Id$
 
-DefineBoolFlags("organic")
 DefineVariables("Speed")
 DefineVariables("Level")
 
