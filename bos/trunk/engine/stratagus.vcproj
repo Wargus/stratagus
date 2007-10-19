@@ -75,7 +75,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib user32.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib theora_static.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib winmm.lib user32.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libpng.lib luad.lib ogg_static.lib vorbis_static.lib theora_static.lib"
 				OutputFile=".\Debug/boswars.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

@@ -88,7 +88,7 @@ DefineUnitType("unit-grenadier", {
     CanAttack = true,
     CanTargetLand = true,
     LandUnit = true,
-    organic = true,
+    Organic = true,
     SelectableByRectangle = true,
     Sounds = {
         "selected", "grenadier-selected",
