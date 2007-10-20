@@ -392,6 +392,7 @@ static void HandleUnitAction(CUnit *unit)
 			// Note subaction 0 should reset.
 			//
 			unit->SubAction = unit->State = 0;
+			unit->Wait = 0;
 
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
