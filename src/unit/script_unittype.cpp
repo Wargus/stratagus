@@ -1605,12 +1605,12 @@ static int CclDefineDecorations(lua_State *l)
 		int OffsetY;
 		int OffsetXPercent;
 		int OffsetYPercent;
-		char IsCenteredInX;
-		char IsCenteredInY;
-		char ShowIfNotEnable;
-		char ShowWhenNull;
-		char HideHalf;
-		char ShowWhenMax;
+		bool IsCenteredInX;
+		bool IsCenteredInY;
+		bool ShowIfNotEnable;
+		bool ShowWhenNull;
+		bool HideHalf;
+		bool ShowWhenMax;
 		bool ShowOnlySelected;
 		bool HideNeutral;
 		bool HideAllied;

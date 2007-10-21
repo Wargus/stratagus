@@ -277,6 +277,8 @@ void GameMainLoop(void)
 	showtip = false;
 	RealVideoSyncSpeed = VideoSyncSpeed;
 
+	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
+
 	MultiPlayerReplayEachCycle();
 
 	while (GameRunning) {
@@ -387,6 +389,7 @@ void GameMainLoop(void)
 	NetworkQuit();
 	EndReplayLog();
 
+	GameCycle = 0;
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 	GamePaused = false;

@@ -157,7 +157,7 @@ inline char *new_strdup(const char *str)
 --  General
 ----------------------------------------------------------------------------*/
 
-#define VERSION  "2.2.4"                 /// Engine version shown
+#define VERSION  "2.2.5"                 /// Engine version shown
 
 #ifndef StratagusMajorVerion
 	/// Stratagus major version
@@ -165,7 +165,7 @@ inline char *new_strdup(const char *str)
 	/// Stratagus minor version (maximal 99)
 #define StratagusMinorVersion  2
 	/// Stratagus patch level (maximal 99)
-#define StratagusPatchLevel    3
+#define StratagusPatchLevel    5
 	/// Stratagus version (1,2,3) -> 10203
 #define StratagusVersion \
 	(StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 \

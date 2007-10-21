@@ -560,6 +560,7 @@ void CreateGame(const char *filename, CMap *map)
 		InitUnitTypes(1);
 		LoadMap(filename, map);
 	}
+	CclCommand("if (MapLoaded ~= nil) then MapLoaded() end");
 
 	GameCycle = 0;
 	FastForwardCycle = 0;
@@ -571,7 +572,7 @@ void CreateGame(const char *filename, CMap *map)
 		InitNetwork2();
 	} else {
 		if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {
-		  ThisPlayer->SetName(LocalPlayerName);
+			ThisPlayer->SetName(LocalPlayerName);
 		}
 	}
 

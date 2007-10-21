@@ -278,7 +278,7 @@ static bool AiCheckBelongsToForce(unsigned int force, const CUnitType *type)
 	CUnit *aiunit;
 	AiUnitType *aitype;
 	unsigned int counter[UnitTypeMax + 1];
-	int flag;
+	bool flag;
 	unsigned int i;
 
 	memset(counter, 0, sizeof(counter));
@@ -293,7 +293,7 @@ static bool AiCheckBelongsToForce(unsigned int force, const CUnitType *type)
 	//
 	// Look what should be in the force.
 	//
-	flag = 0;
+	flag = false;
 	AiPlayer->Force[force].Completed = true;
 	for (i = 0; i < AiPlayer->Force[force].UnitTypes.size(); ++i) {
 		aitype = &AiPlayer->Force[force].UnitTypes[i];
@@ -302,7 +302,7 @@ static bool AiCheckBelongsToForce(unsigned int force, const CUnitType *type)
 				if (aitype->Want - 1 > counter[aitype->Type->Slot]) {
 					AiPlayer->Force[force].Completed = false;
 				}
-				flag = 1;
+				flag = true;
 			} else {
 				AiPlayer->Force[force].Completed = false;
 			}
