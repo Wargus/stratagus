@@ -229,20 +229,18 @@ static void MoveToTarget(CUnit *unit)
 	//
 	// Look if we have reached the target.
 	//
-	if (CheckForTargetInRange(unit)) {
-		return;
-	}
 	goal = unit->Orders[0]->Goal;
 	if (err == 0 && !goal) {
+		// Check if we're in range when attacking a location and we are waiting
 		if (MapDistanceToUnit(unit->Orders[0]->X, unit->Orders[0]->Y, unit) <
 				unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			err = PF_REACHED;
 		}
 	}
-	if (err > 0) {
-		//
-		// Nothing to do, we're on the way moving.
-		//
+	if (err >= 0) {
+		if (CheckForTargetInRange(unit)) {
+			return;
+		}
 		return;
 	}
 	if (err == PF_REACHED) {
@@ -278,7 +276,7 @@ static void MoveToTarget(CUnit *unit)
 	// Unreachable.
 	//
 	if (err == PF_UNREACHABLE) {
-		unit->State = unit->SubAction = 0;
+		unit->State = 0;
 		if (!goal) {
 			//
 			// When attack-moving we have to allow a bigger range
@@ -287,6 +285,7 @@ static void MoveToTarget(CUnit *unit)
 					unit->Orders[0]->Range < Map.Info.MapHeight) {
 				// Try again with more range
 				unit->Orders[0]->Range++;
+				unit->Wait = 5;
 				return;
 			}
 		}
