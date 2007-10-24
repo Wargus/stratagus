@@ -237,6 +237,16 @@ void DoRightButton(int sx, int sy)
 		//  Handle resource workers.
 		//
 		if (action == MouseActionHarvest) {
+			// Go and repair
+			if (type->RepairRange && dest &&
+					dest->Type->RepairHP &&
+					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
+					(dest->Player == unit->Player || unit->IsAllied(dest))) {
+				dest->Blink = 4;
+				SendCommandRepair(unit, x, y, dest, flush);
+				continue;
+			}
+			// Harvest
 			if (type->Harvester) {
 				if (dest) {
 					// Go and harvest from a unit
@@ -248,15 +258,6 @@ void DoRightButton(int sx, int sy)
 						continue;
 					}
 				}
-			}
-			// Go and repair
-			if (type->RepairRange && dest &&
-					dest->Type->RepairHP &&
-					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
-					(dest->Player == unit->Player || unit->IsAllied(dest))) {
-				dest->Blink = 4;
-				SendCommandRepair(unit, x, y, dest, flush);
-				continue;
 			}
 			// Follow another unit
 			if (UnitUnderCursor && dest && dest != unit &&
