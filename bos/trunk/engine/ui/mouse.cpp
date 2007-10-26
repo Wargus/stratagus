@@ -1011,9 +1011,7 @@ static int SendResource(int sx, int sy)
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
 		if (unit->Type->Harvester) {
-			if (dest && dest->Type->CanHarvestFrom && unit->Type->Harvester &&
-					(dest->Player == unit->Player ||
-						(dest->Player->Index == PlayerMax - 1))) {
+			if (dest && dest->Type->CanHarvestFrom && unit->Type->Harvester) {
 				dest->Blink = 4;
 				SendCommandResource(Selected[i],dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
