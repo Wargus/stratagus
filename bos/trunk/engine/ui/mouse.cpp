@@ -275,7 +275,7 @@ void DoRightButton(int sx, int sy)
 		//  Fighters
 		//
 		if (action == MouseActionSpellCast || action == MouseActionAttack) {
-			if (dest) {
+			if (dest && unit->Orders[0]->Action != UnitActionBuilt) {
 				if (unit->IsEnemy(dest)) {
 					dest->Blink = 4;
 					if (action == MouseActionSpellCast) {
