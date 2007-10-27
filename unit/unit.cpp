@@ -2651,8 +2651,10 @@ bool CUnit::IsUnusable() const
 */
 void InitUnits(void)
 {
-	NumUnits = 0;
-	UnitManager.Init();
+	if (!SaveGameLoading) {
+		NumUnits = 0;
+		UnitManager.Init();
+	}
 }
 
 /**
