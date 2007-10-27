@@ -194,6 +194,7 @@ void HandleActionTrain(CUnit *unit)
 				unit->ClearAction();
 			} else {
 				unit->OrderFlush = 1;
+				unit->SubAction = 0;
 			}
 
 			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
