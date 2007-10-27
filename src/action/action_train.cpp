@@ -119,12 +119,14 @@ void HandleActionTrain(CUnit *unit)
 	// FIXME: Should count down
 	if (unit->Data.Train.Ticks >=
 			unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost]) {
+
+		unit->Data.Train.Ticks =
+			unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
+
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
-			unit->Data.Train.Ticks =
-				unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -175,7 +177,11 @@ void HandleActionTrain(CUnit *unit)
 				AiTrainingComplete(unit, nunit);
 			}
 
-			unit->Orders[0]->Action = UnitActionStill;
+			if (unit->OrderCount == 1) {
+				unit->Orders[0]->Action = UnitActionStill;
+			} else {
+				unit->OrderFlush = 1;
+			}
 			unit->SubAction = 0;
 
 			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
