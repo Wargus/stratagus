@@ -133,11 +133,12 @@ void HandleActionTrain(CUnit *unit)
 	player = unit->Player;
 
 	if (unit->Data.Train.Ticks >= pcost) {
+		unit->Data.Train.Ticks = pcost;
+
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
-			unit->Data.Train.Ticks = pcost;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -189,7 +190,11 @@ void HandleActionTrain(CUnit *unit)
 				AiTrainingComplete(unit, nunit);
 			}
 
-			unit->ClearAction();
+			if (unit->OrderCount == 1) {
+				unit->ClearAction();
+			} else {
+				unit->OrderFlush = 1;
+			}
 
 			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
 				DebugPrint("Wrong order for unit\n");
