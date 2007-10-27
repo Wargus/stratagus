@@ -317,7 +317,7 @@ static void DrawUnitInfo(CUnit *unit)
 	}
 
 	// Resource amount
-	if (unit->Type->CanHarvestFrom) {
+	if (unit->Type->CanHarvestFrom && isNeutral) {
 		std::string resourceName;
 		int amount = 0;
 
@@ -351,7 +351,7 @@ static void DrawUnitInfo(CUnit *unit)
 		}
 
 		// My unit stats
-		if (!isEnemy && !isNeutral && !unit->Type->CanHarvestFrom &&
+		if (!isEnemy && !isNeutral &&
 				unit->Orders[0]->Action != UnitActionBuilt) {
 			DrawUnitStats(unit);
 		}
