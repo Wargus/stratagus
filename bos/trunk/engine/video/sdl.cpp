@@ -431,6 +431,7 @@ void InitVideoSdl(void)
 		InitOpenGL();
 	}
 
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	InitKey2Str();
 
 	ColorBlack = Video.MapRGB(TheScreen->format, 0, 0, 0);
