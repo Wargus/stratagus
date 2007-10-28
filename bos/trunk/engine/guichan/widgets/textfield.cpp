@@ -230,7 +230,7 @@ namespace gcn
 					mSelectStart = mCaretPosition;
 					mSelectEndOffset = 0;
 				}
-			} else {
+			} else if (!key.isShiftPressed()) {
 				mSelectEndOffset = 0;
 			}
 
@@ -251,7 +251,7 @@ namespace gcn
 					mSelectStart = mCaretPosition;
 					mSelectEndOffset = 0;
 				}
-			} else {
+			} else if (!key.isShiftPressed()) {
 				mSelectEndOffset = 0;
 			}
 
