@@ -32,12 +32,14 @@
 #include "stratagus.h"
 #include "particle.h"
 #include "video.h"
+#include "ui.h"
 
 
 CParticleManager ParticleManager;
 
 
-CParticleManager::CParticleManager()
+CParticleManager::CParticleManager() :
+	vp(NULL)
 {
 }
 
@@ -67,25 +69,28 @@ void CParticleManager::exit()
 
 void CParticleManager::clear()
 {
-	std::vector<CParticle *>::iterator i = particles.begin();
-	while (i != particles.end()) {
+	std::vector<CParticle *>::iterator i;
+	for (i = particles.begin(); i != particles.end(); ++i) {
 		delete *i;
 	}
 	particles.clear();
 
-	i = new_particles.begin();
-	while (i != new_particles.end()) {
+	for (i = new_particles.begin(); i != new_particles.end(); ++i) {
 		delete *i;
 	}
 	new_particles.clear();
 }
 
-void CParticleManager::draw()
+void CParticleManager::draw(const CViewport *vp)
 {
+	this->vp = vp;
+
 	std::vector<CParticle *>::iterator i;
 	for (i = particles.begin(); i != particles.end(); ++i) {
 		(*i)->draw();
 	}
+
+	this->vp = NULL;
 }
 
 void CParticleManager::update()
@@ -114,6 +119,36 @@ void CParticleManager::update()
 void CParticleManager::add(CParticle *particle)
 {
 	new_particles.push_back(particle);
+}
+
+void CParticleManager::add(int type, CPosition &pos)
+{
+	switch (type) {
+		case PARTICLE_EXPLOSION:
+			add(new CExplosion(pos));
+			break;
+		default:
+			DebugPrint("Unknown ParticleType: %d\n" _C_ type);
+			break;
+	}
+}
+
+CPosition CParticleManager::getScreenPos(const CPosition &pos)
+{
+	int x = pos.x;
+	int y = pos.y;
+	vp->MapPixel2Viewport(x, y);
+	return CPosition(x, y);
+}
+
+int CParticleManager::getType(const std::string &name)
+{
+	if (name == "explosion") {
+		return PARTICLE_EXPLOSION;
+	}
+
+	DebugPrint("Unknown type: %s\n" _C_ name.c_str());
+	return PARTICLE_NONE;
 }
 
 //@}

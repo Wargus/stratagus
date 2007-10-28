@@ -50,7 +50,7 @@ DefineMissileType("missile-bazoo", {
 	Size = {32, 32}, Frames = 5, NumDirections = 8,
 	ImpactSound = "rocket-impact", DrawLevel = 50,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 16, Range = 2,
-	ImpactMissile = "missile-64x64-explosion"})
+	ImpactParticle = "explosion"})
 
 DefineMissileType("missile-64x64-explosion", {
 	File = "missiles/expl_64x64x1.png",
