@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Increase the damage of nuke missiles (Francois Beerten)
 - Abort with an error when using an unknown unittype in ai scripts (Francois Beerten)
 - Fix bug with buildings under construction that could attack (Francois Beerten)
 - Allow recycling of friendly and ennemy buildings (Francois Beerten)
