@@ -33,6 +33,7 @@
 #include <vector>
 
 class CGraphic;
+class CViewport;
 
 
 struct CPosition
@@ -177,6 +178,11 @@ public:
 	virtual void update(int ticks);
 };
 
+enum {
+	PARTICLE_NONE,
+	PARTICLE_EXPLOSION,
+};
+
 class CParticleManager
 {
 public:
@@ -186,15 +192,20 @@ public:
 	static void init();
 	static void exit();
 
-	void draw();
+	void draw(const CViewport *vp);
 	void update();
 
 	void add(CParticle *particle);
+	void add(int type, CPosition &pos);
 	void clear();
+	
+	CPosition getScreenPos(const CPosition &pos);
+	int getType(const std::string &name);
 
 private:
 	std::vector<CParticle *> particles;
 	std::vector<CParticle *> new_particles;
+	const CViewport *vp;
 };
 
 extern CParticleManager ParticleManager;

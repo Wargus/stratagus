@@ -153,6 +153,15 @@ int CViewport::Map2ViewportY(int y) const
 }
 
 /**
+**  Convert map pixel coordinates into viewport coordinates.
+*/
+void CViewport::MapPixel2Viewport(int &x, int &y) const
+{
+	x = x + this->X - (this->MapX * TileSizeX + this->OffsetX);
+	y = y + this->Y - (this->MapY * TileSizeY + this->OffsetY);
+}
+
+/**
 **  Change viewpoint of map viewport v to x,y.
 **
 **  @param x        X map tile position.
@@ -321,7 +330,7 @@ void CViewport::Draw() const
 		missiletable[j]->DrawMissile();
 	}
 
-	ParticleManager.draw();
+	ParticleManager.draw(this);
 
 	this->DrawMapFogOfWar();
 

@@ -71,24 +71,25 @@ void CChunkParticle::exit()
 {
 }
 
-float screenPos(float posy, float height)
+static float calculateScreenPos(float posy, float height)
 {
 	return posy - height * 0.2f;
 }
 
 void CChunkParticle::draw()
 {
+	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	Uint32 color = ColorBlack;
 
-	Video.DrawRectangleClip(color, (int)pos.x - 1, (int)screenPos(pos.y, height) - 1, 2, 2);
+	Video.DrawRectangleClip(color, (int)screenPos.x - 1, (int)calculateScreenPos(screenPos.y, height) - 1, 2, 2);
 }
 
-float getHorizontalPosition(int initialVelocity, float trajectoryAngle, float time)
+static float getHorizontalPosition(int initialVelocity, float trajectoryAngle, float time)
 {
     return (initialVelocity * cos(trajectoryAngle)) * time;
 }
 
-float getVerticalPosition(int initialVelocity, float trajectoryAngle, float time)
+static float getVerticalPosition(int initialVelocity, float trajectoryAngle, float time)
 {
     return (initialVelocity * sin(trajectoryAngle)) * time - (gravity / 2.0f) * (time * time);
 }
@@ -105,7 +106,7 @@ void CChunkParticle::update(int ticks)
 	const int randSmokeTicks = 50;
 
 	if (age > nextSmokeTicks) {
-		CSmokeParticle *smoke = new CSmokeParticle(CPosition(pos.x, screenPos(pos.y, height)));
+		CSmokeParticle *smoke = new CSmokeParticle(CPosition(pos.x, calculateScreenPos(pos.y, height)));
 		ParticleManager.add(smoke);
 
 		nextSmokeTicks += MyRand() % randSmokeTicks + minSmokeTicks;

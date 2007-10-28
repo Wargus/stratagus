@@ -402,6 +402,7 @@ public:
 	MissileType *ImpactMissile;/// missile produces an impact
 	std::string SmokeName;     /// impact missile-type name
 	MissileType *SmokeMissile; /// Trailling missile
+	int ImpactParticle;        /// impact particle system
 
 // --- FILLED UP ---
 	CGraphic *G;         /// missile graphic

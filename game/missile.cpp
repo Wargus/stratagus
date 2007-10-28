@@ -58,7 +58,7 @@
 #include "sound.h"
 #include "ui.h"
 #include "iolib.h"
-
+#include "particle.h"
 #include "util.h"
 #include "trigger.h"
 
@@ -804,6 +804,9 @@ void MissileHit(Missile *missile)
 	if (missile->Type->ImpactMissile) {
 		MakeMissile(missile->Type->ImpactMissile, x, y, x, y);
 	}
+	if (missile->Type->ImpactParticle) {
+		ParticleManager.add(missile->Type->ImpactParticle, CPosition(x, y));
+	}
 
 	if (!missile->SourceUnit) {  // no owner - green-cross ...
 		return;
@@ -1137,7 +1140,7 @@ MissileType::MissileType(const std::string &ident) :
 	Flip(false), CanHitOwner(false), FriendlyFire(false),
 	Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
 	Range(0), SplashFactor(0), ImpactMissile(NULL),
-	SmokeMissile(NULL), G(NULL)
+	SmokeMissile(NULL), ImpactParticle(PARTICLE_NONE), G(NULL)
 {
 };
 
