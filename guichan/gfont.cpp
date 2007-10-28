@@ -80,18 +80,20 @@ namespace gcn
     int Font::getStringIndexAt(const std::string& text, int x)
     {
         unsigned int i;
+        unsigned int nexti;
         int size = 0;
     
         i = 0;
         while (i < text.size())
         {
-            size = getWidth(text.substr(0,i+1));
-      
+            nexti = GetNext(text, i);
+            size = getWidth(text.substr(0, nexti));
+
             if (size > x)
             {
                 return i;
             }
-            i = GetNext(text, i);
+            i = nexti;
         }
     
         return text.size();    
