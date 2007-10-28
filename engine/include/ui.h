@@ -160,6 +160,8 @@ public:
 	int Map2ViewportX(int x) const;
 	/// Convert map tile to screen Y pixel
 	int Map2ViewportY(int y) const;
+	/// Convert map pixel coordinates into viewport coordinates
+	void MapPixel2Viewport(int &x, int &y) const;
 
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(int x, int y, int offsetx, int offsety);

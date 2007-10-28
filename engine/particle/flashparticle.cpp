@@ -65,8 +65,9 @@ void CFlashParticle::exit()
 
 void CFlashParticle::draw()
 {
-	flash->DrawFrameClip(frame, static_cast<int>(pos.x - flash->Width / 2.f),
-		static_cast<int>(pos.y - flash->Height / 2.f));
+	CPosition screenPos = ParticleManager.getScreenPos(pos);
+	flash->DrawFrameClip(frame, static_cast<int>(screenPos.x - flash->Width / 2.f),
+		static_cast<int>(screenPos.y - flash->Height / 2.f));
 }
 
 void CFlashParticle::update(int ticks)

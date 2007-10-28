@@ -108,8 +108,9 @@ void CSmokeParticle::exit()
 
 void CSmokeParticle::draw()
 {
-	g->DrawFrameClip(frame, static_cast<int>(pos.x - g->Width / 2.f),
-		static_cast<int>(pos.y - g->Height / 2.f));
+	CPosition screenPos = ParticleManager.getScreenPos(pos);
+	g->DrawFrameClip(frame, static_cast<int>(screenPos.x - g->Width / 2.f),
+		static_cast<int>(screenPos.y - g->Height / 2.f));
 }
 
 void CSmokeParticle::update(int ticks)
