@@ -201,7 +201,7 @@ namespace gcn
 
 	void TextField::mouseMotion(int x, int y)
 	{
-		if (isDragged())
+		if (isDragged() && mClickButton == MouseInput::LEFT)
 		{
 			mCaretPosition = getFont()->getStringIndexAt(mText, x + mXScroll);
 			mSelectEndOffset = mCaretPosition - mSelectStart;
@@ -357,7 +357,7 @@ namespace gcn
             if (mCaretPosition > (int)mText.size()) {
                 throw GCN_EXCEPTION("Invalid UTF8.");
             }
-			mSelectStart = 0;
+			mSelectStart = mCaretPosition;
 			mSelectEndOffset = 0;
             ret = true;
         }
