@@ -85,7 +85,7 @@ namespace gcn
         i = 0;
         while (i < text.size())
         {
-            size = getWidth(text.substr(0,i));
+            size = getWidth(text.substr(0,i+1));
       
             if (size > x)
             {
