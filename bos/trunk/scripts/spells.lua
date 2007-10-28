@@ -7,9 +7,9 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	stratagus.lua	-	The craft configuration language.
+--	spells.lua	-	Special commands aka spells.
 --
---	(c) Copyright 1998-2004 by Crestez Leonard
+--	(c) Copyright 1998-2007 by Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ DefineSpell("spell-nuke",
 			"end-point", {"base", "target", "add-x", 0, "add-y", 32}},
 		{"demolish" ,
 			"range", 4,
-			"damage", 250}},
+			"damage", 5000}},
     -- FIXME: bazoo-attack isn't defined yet
 	"sound-when-cast", "bazoo-attack",
 	"autocast", {"range", 128}
