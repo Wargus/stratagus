@@ -28,12 +28,12 @@
 --	$Id: unit-nukeplant.lua 287 2005-11-24 21:55:35Z feb $
 
 DefineIcon({
-	Name = "icon-nuke",
+	Name = "icon-nukepowerplant",
 	Size = {46, 38},
 	Frame = 0,
 	File = GetCurrentLuaPath().."/nukeplant_i.png"})
 
-DefineConstruction("construction-nuke", {
+DefineConstruction("construction-nukepowerplant", {
 	Constructions = {
                 {Percent = 0, File = "main", Frame = 0},
                 {Percent = 10, File = "main", Frame = 1},
@@ -48,7 +48,7 @@ DefineConstruction("construction-nuke", {
 	}
     })
 
-DefineAnimations("animations-nuke", {
+DefineAnimations("animations-nukepowerplant", {
     Still = {"frame 10", "wait 20", "frame 11", "wait 20", "frame 12", "wait 20", 
         "frame 13", "wait 20", "frame 14", "wait 20", "wait 20", },
     })
@@ -58,17 +58,17 @@ MakeSound("nuke-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
 MakeSound("nuke-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
 MakeSound("nuke-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
 
-DefineUnitType("unit-nuke", {
-    Name = "nukeplant",
+DefineUnitType("unit-nukepowerplant", {
+    Name = "Nuclear Power Plant",
     Image = {"file", GetCurrentLuaPath().."/nukeplant.png", "size", {256, 256}},
     Shadow = {"file", GetCurrentLuaPath().."/nukeplant_s.png", "size", {256, 256}},
-    Animations = "animations-nuke",
-    Icon = "icon-nuke",
+    Animations = "animations-nukepowerplant",
+    Icon = "icon-nukepowerplant",
     EnergyValue = 1600,
     MagmaValue = 270,
     EnergyProductionRate = 46,
     RepairHp = 2,
-    Construction = "construction-nuke",
+    Construction = "construction-nukepowerplant",
     Speed = 0,
     HitPoints = 350,
     DrawLevel = 25,
@@ -83,7 +83,7 @@ DefineUnitType("unit-nuke", {
     AnnoyComputerFactor = 55,
     Points = 200,
     ExplodeWhenKilled = "missile-160x128-explosion",
-    Corpse = "build-dead-nuke",
+    Corpse = "build-dead-nukepowerplant",
     Type = "land",
     Building = true,
     BuilderOutside = true,
@@ -96,16 +96,16 @@ DefineUnitType("unit-nuke", {
         "dead", "nuke-dead"}
 })
 
-DefineAnimations("animations-dead-nuke", {
+DefineAnimations("animations-dead-nukepowerplant", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
         "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-nuke", {
+DefineUnitType("build-dead-nukepowerplant", {
     Name = "NuclearplantCrater",
     Image = {"file", GetCurrentLuaPath().."/nukeplant_c.png", "size", {256, 256}},
-    Animations = "animations-dead-nuke",
+    Animations = "animations-dead-nukepowerplant",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,
@@ -123,9 +123,10 @@ DefineUnitType("build-dead-nuke", {
 })
 
 
-DefineAllow("unit-nuke", AllowAll)
+DefineAllow("unit-nukepowerplant", AllowAll)
 
 DefineButton({
-    Pos = 7, Level = 1, Icon = "icon-nuke", Action = "build",
-    Value = "unit-nuke", Key = "n", Hint = "BUILD ~!Nuclear Power Plant",
+    Pos = 7, Level = 1, Icon = "icon-nukepowerplant", Action = "build",
+    Value = "unit-nukepowerplant", Key = "n", 
+    Hint = "BUILD ~!Nuclear Power Plant",
     ForUnit = {"unit-engineer"}})

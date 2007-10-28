@@ -55,7 +55,7 @@ DefineAiHelper(
   {"build", "unit-engineer",
    "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp",
    "unit-powerplant", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
-   "unit-cam", "unit-cannon", "unit-nuke", "unit-radar"},
+   "unit-cam", "unit-cannon", "unit-nukepowerplant", "unit-radar"},
   --
   -- Building can train which units.
   --
@@ -72,7 +72,7 @@ DefineAiHelper(
   {"repair", "unit-engineer",
    "unit-msilo", "unit-aircraftfactory", "unit-magmapump", "unit-camp", "unit-apcs",
    "unit-powerplant", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret",
-   "unit-nuke", "unit-radar"},
+   "unit-nukepowerplant", "unit-radar"},
   --
   -- Reduce unit limits.
   --
