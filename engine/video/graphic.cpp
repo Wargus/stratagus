@@ -856,6 +856,7 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	w = PowerOf2(maxw);
 	h = PowerOf2(maxh);
 	tex = new unsigned char[w * h * 4];
+	memset(tex, 0, w * h * 4);
 	if (g->Surface->flags & SDL_SRCALPHA) {
 		alpha = f->alpha;
 	} else {
