@@ -9,7 +9,7 @@
 --
 --	unit-vault.lua	-	Define the vault unit.
 --
---	(c) Copyright 2001 - 2005 by Fran�is Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2007 by Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ DefineUnitType("unit-vault", {
     RepairHp = 4,
     Construction = "construction-vault",
     Speed = 0,
-    HitPoints = 1800,
+    HitPoints = 600,
     DrawLevel = 25,
     TileSize = {6, 6},
     BoxSize = {196, 164},

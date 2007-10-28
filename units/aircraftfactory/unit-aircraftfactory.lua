@@ -71,7 +71,7 @@ DefineUnitType("unit-aircraftfactory", {
     RepairHp = 4,
     Construction = "construction-aircraftfactory",
     Speed = 0,
-    HitPoints = 1800,
+    HitPoints = 500,
     DrawLevel = 25,
     TileSize = {7, 6},
     BoxSize = {224, 196},
