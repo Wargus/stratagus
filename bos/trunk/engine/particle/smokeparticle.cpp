@@ -25,7 +25,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id: commands.cpp 9147 2007-09-28 17:18:24Z jim4 $
+//      $Id$
 
 //@{
 
