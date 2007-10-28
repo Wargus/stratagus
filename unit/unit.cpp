@@ -1807,7 +1807,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 				//
 				if ((res = ResourceOnMap(x, y, resource)) &&
 						res->Type->CanHarvestFrom &&
-						unit->Player->Type == PlayerNeutral) {
+						res->Player->Type == PlayerNeutral) {
 					delete[] points;
 					return res;
 				}
