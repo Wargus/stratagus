@@ -26,7 +26,7 @@ For any questions, remarks or thanks you can contact us at:
 http://bos.seul.org/ 
 
 Or discuss with the team on irc on the channel #bos at
-freenode.net.
+irc.freenode.net.
 
 Please report bugs in our bug tracker:
 http://savannah.nongnu.org/bugs/?group=stratagus-bos
