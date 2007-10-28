@@ -82,6 +82,7 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 }
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
+	Input->processKeyRepeat();
 	HandleKeyModifiersDown(key, keychar);
 }
 
