@@ -18,7 +18,7 @@ Read the file COPYRIGHT.txt for the detailed copyright notice.
 Documentation
 -------------
 The documentation can be read with any web browser by pointing it
-the doc/index.html file.
+to the doc/index.html file.
 
 How to contact us
 -----------------
@@ -35,8 +35,3 @@ http://savannah.nongnu.org/bugs/?group=stratagus-bos
 Have fun,
 
 The Bos Wars team.
-
- 
-
-
-
