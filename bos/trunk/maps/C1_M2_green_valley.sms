@@ -8,7 +8,7 @@
 --          This file is part of Bos Wars.
 --
 -- Stratagus Map Setup
--- Copyright 2005-2007 Loïs Taulelle, François Beerten
+-- Copyright 2005-2007 Loï¿½s Taulelle, Franï¿½ois Beerten
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
@@ -16902,5 +16902,5 @@ CreateUnit("unit-tree03", PlayerNumNeutral, {82, 119})
 CreateUnit("unit-tree03", PlayerNumNeutral, {77, 120})
 CreateUnit("unit-tree03", PlayerNumNeutral, {82, 117})
 CreateUnit("unit-tree03", PlayerNumNeutral, {82, 116})
-CreateUnit("unit-nuke", 3, {102, 17})
+CreateUnit("unit-nukepowerplant", 3, {102, 17})
 

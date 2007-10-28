@@ -8,7 +8,7 @@
 --          This file is part of Bos Wars.
 --
 -- Stratagus Map Setup
--- Copyright 2005-2007 Loïs Taulelle, François Beerten
+-- Copyright 2005-2007 Loï¿½s Taulelle, Franï¿½ois Beerten
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
@@ -65640,7 +65640,7 @@ CreateUnit("unit-camp", 1, {163, 155})
 CreateUnit("unit-camp", 1, {163, 172})
 CreateUnit("unit-vfac", 1, {176, 172})
 CreateUnit("unit-hosp", 1, {179, 165})
-CreateUnit("unit-nuke", 1, {176, 158})
+CreateUnit("unit-nukepowerplant", 1, {176, 158})
 CreateUnit("unit-rocksfield", PlayerNumNeutral, {7, 12})
 CreateUnit("unit-magmapump", 0, {24, 3})
 CreateUnit("unit-apcs", 0, {122, 3})
@@ -65714,7 +65714,7 @@ CreateUnit("unit-magmapump", 1, {159, 164})
 CreateUnit("unit-hotspot", PlayerNumNeutral, {24, 3})
 CreateUnit("unit-hotspot", PlayerNumNeutral, {8, 19})
 CreateUnit("unit-weakhotspot", PlayerNumNeutral, {82, 96})
-CreateUnit("unit-nuke", 0, {0, 8})
+CreateUnit("unit-nukepowerplant", 0, {0, 8})
 CreateUnit("unit-harvester", 0, {12, 16})
 CreateUnit("unit-hotspot", PlayerNumNeutral, {28, 1})
 CreateUnit("unit-hotspot", PlayerNumNeutral, {52, 33})
