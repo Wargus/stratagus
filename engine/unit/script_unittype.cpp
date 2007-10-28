@@ -731,18 +731,21 @@ static int CclDefineUnitType(lua_State *l)
 */
 CUnitType *CclGetUnitType(lua_State *l)
 {
+	CUnitType *unittype = NULL;
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
-		return UnitTypeByIdent(LuaToString(l, -1));
+		unittype = UnitTypeByIdent(LuaToString(l, -1));
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData *data;
 		data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
-			return (CUnitType *)data->Data;
+			unittype = (CUnitType *)data->Data;
 		}
 	}
-	LuaError(l, "CclGetUnitType: not a unit-type");
-	return NULL;
+	if (!unittype) {
+		LuaError(l, "CclGetUnitType: not a unit-type");
+	}
+	return unittype;
 }
 
 // ----------------------------------------------------------------------------
