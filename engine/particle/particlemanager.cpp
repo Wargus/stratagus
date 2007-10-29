@@ -135,8 +135,8 @@ void CParticleManager::add(int type, CPosition &pos)
 
 CPosition CParticleManager::getScreenPos(const CPosition &pos)
 {
-	int x = pos.x;
-	int y = pos.y;
+	int x = (int)pos.x;
+	int y = (int)pos.y;
 	vp->MapPixel2Viewport(x, y);
 	return CPosition(x, y);
 }
