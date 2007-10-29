@@ -805,7 +805,8 @@ void MissileHit(Missile *missile)
 		MakeMissile(missile->Type->ImpactMissile, x, y, x, y);
 	}
 	if (missile->Type->ImpactParticle) {
-		ParticleManager.add(missile->Type->ImpactParticle, CPosition(x, y));
+		CPosition position(x, y);
+		ParticleManager.add(missile->Type->ImpactParticle, position);
 	}
 
 	if (!missile->SourceUnit) {  // no owner - green-cross ...
