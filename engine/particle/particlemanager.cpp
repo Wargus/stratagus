@@ -39,7 +39,7 @@ CParticleManager ParticleManager;
 
 
 CParticleManager::CParticleManager() :
-	vp(NULL)
+	vp(NULL), lastTicks(0)
 {
 }
 
@@ -95,7 +95,6 @@ void CParticleManager::draw(const CViewport *vp)
 
 void CParticleManager::update()
 {
-	static unsigned long lastTicks = 0;
 	unsigned long ticks = GetTicks() - lastTicks;
 	std::vector<CParticle *>::iterator i;
 
