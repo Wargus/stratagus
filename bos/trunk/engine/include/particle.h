@@ -206,6 +206,7 @@ private:
 	std::vector<CParticle *> particles;
 	std::vector<CParticle *> new_particles;
 	const CViewport *vp;
+	unsigned long lastTicks;
 };
 
 extern CParticleManager ParticleManager;
