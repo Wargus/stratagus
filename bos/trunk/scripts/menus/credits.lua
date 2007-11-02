@@ -119,8 +119,7 @@ function RunCreditsMenu(s)
      "  Alexander MacLean",
      "",
      _("Stratagus Media Project Graphics"),
-      -- land construction site-summer-01.png; big_fire.png; explosion.png; green_cross.png; winter, big fire
-     "  Paolo D'Inca", 
+     "  Paolo D'Inca", -- green_cross.png
      "  Rick Elliot", -- cursor arrows
      "  Chris Hopp", -- small_fire.png
      "",
