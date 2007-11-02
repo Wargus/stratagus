@@ -293,7 +293,6 @@ public:
 	int TextX;                        /// text X position
 	int TextY;                        /// text Y position
 };
-#define MaxResourceInfo  MaxCosts + 1 /// +2 for score
 
 class CInfoPanel
 {
@@ -363,7 +362,7 @@ public:
 
 	std::vector<CFiller> Fillers;       /// Filler graphics
 
-	CResourceInfo Resources[MaxResourceInfo];/// Icon+Text of all resources
+	CResourceInfo Resources[MaxCosts];/// Icon+Text of all resources
 
 	CInfoPanel InfoPanel;               /// Info panel
 

@@ -161,7 +161,7 @@ void CUserInterface::Load(void)
 		Fillers[i].G->UseDisplayFormat();
 	}
 
-	for (i = 0; i <= ScoreCost; ++i) {
+	for (i = 0; i < MaxCosts; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load();
 			Resources[i].G->UseDisplayFormat();
@@ -250,7 +250,7 @@ void CleanUserInterface(void)
 	UI.Fillers.clear();
 
 	// Resource Icons
-	for (i = 0; i <= ScoreCost; ++i) {
+	for (i = 0; i < MaxCosts; ++i) {
 		CGraphic::Free(UI.Resources[i].G);
 	}
 

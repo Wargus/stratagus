@@ -135,7 +135,7 @@ class CUserInterface
 	
 	vector<CFiller> Fillers;
 
-	CResourceInfo Resources[MaxResourceInfo];
+	CResourceInfo Resources[MaxCosts];
 	CInfoPanel InfoPanel;
 	CUIButton *SingleSelectedButton;
 
