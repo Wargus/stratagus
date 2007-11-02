@@ -230,14 +230,6 @@ UI.Resources[1].IconY = 0
 UI.Resources[1].TextX = 85 + 75
 UI.Resources[1].TextY = 1
 
--- score
-UI.Resources[ScoreCost].G = CGraphic:New("graphics/ui/ui_res_icons.png", 14, 14)
-UI.Resources[ScoreCost].IconFrame = 4
-UI.Resources[ScoreCost].IconX = 67 + 250
-UI.Resources[ScoreCost].IconY = 0
-UI.Resources[ScoreCost].TextX = 85 + 250
-UI.Resources[ScoreCost].TextY = 1
-
 UI.PieMenu.G = CGraphic:New("ui/rosace1.png")
 UI.PieMenu.MouseButton = MiddleButton
 UI.PieMenu:SetRadius(70)
