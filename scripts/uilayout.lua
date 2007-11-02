@@ -9,7 +9,7 @@
 --
 --      uilayout.lua - Define the ingame layout and user interface
 --
---      (c) Copyright 2001-2006 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
+--      (c) Copyright 2001-2007 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
 --                                 and Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
