@@ -121,7 +121,6 @@ function RunCreditsMenu(s)
      _("Stratagus Media Project Graphics"),
      "  Paolo D'Inca", -- green_cross.png
      "  Rick Elliot", -- cursor arrows
-     "  Chris Hopp", -- small_fire.png
      "",
      "",
      _("The Bos Wars Team thanks"),
