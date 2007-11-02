@@ -49,8 +49,6 @@ enum CostType {
 	MaxCosts                                /// how many different costs
 };
 
-#define ScoreCost MaxCosts
-
 /**
 **  Default resources for a new player.
 */

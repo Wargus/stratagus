@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Sun Oct 14 18:53:38 2007.
+** Generated automatically by tolua++-1.0.92 on Fri Nov  2 19:59:57 2007.
 */
 
 #ifndef __cplusplus
@@ -3926,7 +3926,7 @@ static int tolua_get_stratagus_CUserInterface_Resources(lua_State* tolua_S)
 #endif
  tolua_index = (int)tolua_tonumber(tolua_S,2,0);
 #ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=MaxResourceInfo)
+ if (tolua_index<0 || tolua_index>=MaxCosts)
   tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
  tolua_pushusertype(tolua_S,(void*)&self->Resources[tolua_index],"CResourceInfo");
@@ -3952,7 +3952,7 @@ static int tolua_set_stratagus_CUserInterface_Resources(lua_State* tolua_S)
 #endif
  tolua_index = (int)tolua_tonumber(tolua_S,2,0);
 #ifndef TOLUA_RELEASE
- if (tolua_index<0 || tolua_index>=MaxResourceInfo)
+ if (tolua_index<0 || tolua_index>=MaxCosts)
   tolua_error(tolua_S,"array indexing out of range.",NULL);
 #endif
   self->Resources[tolua_index] = *((CResourceInfo*)  tolua_tousertype(tolua_S,3,0));
@@ -17790,8 +17790,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"MaxCosts",MaxCosts);
   tolua_constant(tolua_S,"EnergyCost",EnergyCost);
   tolua_constant(tolua_S,"MagmaCost",MagmaCost);
-  tolua_constant(tolua_S,"ScoreCost",ScoreCost);
-  tolua_constant(tolua_S,"MaxResourceInfo",MaxResourceInfo);
   tolua_constant(tolua_S,"PlayerMax",PlayerMax);
   tolua_constant(tolua_S,"PlayerNumNeutral",PlayerNumNeutral);
   tolua_constant(tolua_S,"UnitMax",UnitMax);
