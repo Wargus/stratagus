@@ -9,7 +9,7 @@
 --
 --	unit-antharus.lua	-	Define the antharus unit.
 --
---	(c) Copyright 2005 by Fran�is Beerten.
+--	(c) Copyright 2005-2007 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ DefineUnitType("unit-antharus", {
     Speed = 0,
     HitPoints = 50,
     DrawLevel = 25,
+    EnergyValue = 5000,
     TileSize = {2, 2},
     BoxSize = {64, 64},
     SightRange = 1,
