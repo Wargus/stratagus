@@ -133,6 +133,11 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 			case AnimationExactFrame:
 				unit->Frame = unit->Anim.Anim->D.Frame.Frame;
 				break;
+			case AnimationRandomFrame:
+				unit->Frame = unit->Anim.Anim->D.RandomFrame.MinFrame +
+					SyncRand() % (unit->Anim.Anim->D.RandomFrame.MaxFrame - unit->Anim.Anim->D.RandomFrame.MinFrame + 1);
+				UnitUpdateHeading(unit);
+				break;
 
 			case AnimationWait:
 				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait << scale >> 8;
