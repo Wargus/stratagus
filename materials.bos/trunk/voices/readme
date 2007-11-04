@@ -1,7 +1,16 @@
 
+ $Id$
+
+# little manual for helping generating voices
+
  * Voices have been generated using : 
-- festival (http://www.cstr.ed.ac.uk/projects/festival) 
+- festival TTS (http://www.cstr.ed.ac.uk/projects/festival)
+or
+- espeak TTS (http://espeak.sourceforge.net/)
+and
 - US1 MBROLA voice (http://www.cstr.ed.ac.uk/projects/festival/mbrola.html)
+
+=*= Using festival =*=
 
  * ~/.festivalrc
 (Parameter.set 'Audio_Method 'linux16audio)
@@ -14,7 +23,15 @@
 
  => /!\ edit and USE make_building_voices.sh /!\
 
- * Using Audacity to correct sounds :
+ * You can use Audacity to correct sounds :
 (verify : bitrate = 16bits, sample rate = 22k)
 -> apply Compressor effect with Threshold = -14dB, ratio = 2:1, attack = 0,2s, normalize to 0 selected
+
+=*= Using espeak =*=
+
+ * first install mbrola bin in /usr/local/mbrola (with a symbolic link in /usr/local/bin)
+ * then install needed voices in /usr/local/share/mbrola/voices/ (create dir, if necessary)
+ * See http://espeak.sourceforge.net/mbrola.html for more informations
+
+ * then use espeak+mbrola.sh or other scripts using espeak
 

@@ -22,11 +22,12 @@ esac
 FILE="$1"
 
 # which level are we processing ?
-# /!\ assuming files are *.txt
-#echo "${FILE%.txt}"
+# /!\ assuming file is a .txt
+#echo "${1%%.txt}"
 OUTPUT="${1%%.txt}"
 
 echo "Processing $1"
+
 # core "code"
 espeak -a 200 -s 160 -v mb-$VOICE -f $FILE | $MB_BIN -v 3 -e $MB_VOICE_PATH/$VOICE/$VOICE - $OUTPUT.wav
 
