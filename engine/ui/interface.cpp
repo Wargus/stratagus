@@ -59,7 +59,6 @@
 #include "replay.h"
 #include "ai.h"
 #include "widgets.h"
-#include "particle.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -819,6 +819,14 @@ static void ParseAnimationFrame(lua_State *l, const char *str,
 	} else if (!strcmp(op1, "exact-frame")) {
 		anim->Type = AnimationExactFrame;
 		anim->D.Frame.Frame = atoi(op2);
+	} else if (!strcmp(op1, "random-frame")) {
+		anim->Type = AnimationRandomFrame;
+		anim->D.RandomFrame.MinFrame = atoi(op2);
+		op2 = strchr(op2, ' ');
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.RandomFrame.MaxFrame = atoi(op2);
 	} else if (!strcmp(op1, "wait")) {
 		anim->Type = AnimationWait;
 		anim->D.Wait.Wait = atoi(op2);
