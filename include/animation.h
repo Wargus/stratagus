@@ -41,6 +41,7 @@ typedef enum AnimationType {
 	AnimationNone,
 	AnimationFrame,
 	AnimationExactFrame,
+	AnimationRandomFrame,
 	AnimationWait,
 	AnimationRandomWait,
 	AnimationSound,
@@ -64,6 +65,10 @@ public:
 		struct {
 			int Frame;
 		} Frame;
+		struct {
+			int MinFrame;
+			int MaxFrame;
+		} RandomFrame;
 		struct {
 			int Wait;
 		} Wait;
