@@ -36,33 +36,25 @@
 #include "video.h"
 
 
-static const int NumExplosions = 7;
+static const int NumExplosions = 9;
 static const int Sizes[][2] = {
-	{ 13, 18 },
-	{ 27, 36 },
-	{ 41, 54 },
-	{ 54, 73 },
-	{ 68, 91 },
-	{ 82, 109 },
-	{ 96, 128 },
+	{ 128, 96 },
+	{  54, 73 },
+	{  13, 18 },
 };
 
-CGraphic *CFlameParticle::explosion0[NumExplosions];
-CGraphic *CFlameParticle::explosion1[NumExplosions];
+CGraphic *CFlameParticle::large[NumExplosions];
+CGraphic *CFlameParticle::medium[NumExplosions];
+CGraphic *CFlameParticle::small[NumExplosions];
 
 
 CFlameParticle::CFlameParticle(CPosition position) :
 	CParticle(position), frame(0), currTicks(0)
 {
-	int size = 2;
-
-	if (MyRand() % 2 == 0) {
-		g = explosion0[size];
-		numFrames = 16;
-	} else {
-		g = explosion1[size];
-		numFrames = 15;
-	}
+	int explosion = MyRand() % NumExplosions;
+	// FIXME: use different size explosions
+	g = large[explosion];
+	numFrames = 14;
 }
 
 
@@ -73,17 +65,23 @@ CFlameParticle::~CFlameParticle()
 void CFlameParticle::init()
 {
 	for (int i = 0; i < NumExplosions; ++i) {
-		if (!explosion0[i]) {
+		if (!large[i]) {
 			std::ostringstream os;
-			os << "graphics/particle/explosion0-" << i + 1 << ".png";
-			explosion0[i] = CGraphic::New(os.str(), Sizes[i][0], Sizes[i][1]);
-			explosion0[i]->Load();
+			os << "graphics/particle/large0" << i + 1 << ".png";
+			large[i] = CGraphic::New(os.str(), Sizes[0][0], Sizes[0][1]);
+			large[i]->Load();
 		}
-		if (!explosion1[i]) {
+		if (!medium[i]) {
 			std::ostringstream os;
-			os << "graphics/particle/explosion1-" << i + 1 << ".png";
-			explosion1[i] = CGraphic::New(os.str(), Sizes[i][1], Sizes[i][0]);
-			explosion1[i]->Load();
+			os << "graphics/particle/medium0" << i + 1 << ".png";
+			medium[i] = CGraphic::New(os.str(), Sizes[1][0], Sizes[1][1]);
+			medium[i]->Load();
+		}
+		if (!small[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/small0" << i + 1 << ".png";
+			small[i] = CGraphic::New(os.str(), Sizes[2][0], Sizes[2][1]);
+			small[i]->Load();
 		}
 	}
 }
@@ -91,13 +89,17 @@ void CFlameParticle::init()
 void CFlameParticle::exit()
 {
 	for (int i = 0; i < NumExplosions; ++i) {
-		if (explosion0[i]) {
-			CGraphic::Free(explosion0[i]);
-			explosion0[i] = NULL;
+		if (large[i]) {
+			CGraphic::Free(large[i]);
+			large[i] = NULL;
 		}
-		if (explosion1[i]) {
-			CGraphic::Free(explosion1[i]);
-			explosion1[i] = NULL;
+		if (medium[i]) {
+			CGraphic::Free(medium[i]);
+			medium[i] = NULL;
+		}
+		if (small[i]) {
+			CGraphic::Free(small[i]);
+			small[i] = NULL;
 		}
 	}
 }
