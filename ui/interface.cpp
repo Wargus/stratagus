@@ -508,9 +508,11 @@ static bool CommandKey(int key)
 	switch (key) {
 		case 'a': {
 			CViewport *vp = GetViewport(CursorX, CursorY);
-			int x = CursorX - vp->X + vp->MapX * TileSizeX + vp->OffsetX;
-			int y = CursorY - vp->Y + vp->MapY * TileSizeY + vp->OffsetY;
-			ParticleManager.add(new CExplosion(CPosition(x, y)));
+			if (vp) {
+				int x = CursorX - vp->X + vp->MapX * TileSizeX + vp->OffsetX;
+				int y = CursorY - vp->Y + vp->MapY * TileSizeY + vp->OffsetY;
+				ParticleManager.add(new CExplosion(CPosition(x, y)));
+			}
 			break;
 		}
 

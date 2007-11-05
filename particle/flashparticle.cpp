@@ -35,12 +35,13 @@
 
 
 CGraphic *CFlashParticle::flash;
-int CFlashParticle::numFrames = 24;
+int CFlashParticle::numFrames = 20;
 
 
 CFlashParticle::CFlashParticle(CPosition position) :
 	CParticle(position), frame(numFrames - 1), currTicks(0)
 {
+	// FIXME: smaller explosions shouldn't use all the frames
 }
 
 CFlashParticle::~CFlashParticle()
