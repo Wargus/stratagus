@@ -211,49 +211,51 @@ namespace gcn
     bool TextField::keyPress(const Key& key)
     {
         bool ret = false;
-		unsigned int selFirst;
-		unsigned int selLen;
+        unsigned int selFirst;
+        unsigned int selLen;
 
-		getTextSelectionPositions(&selFirst, &selLen);
+        getTextSelectionPositions(&selFirst, &selLen);
 
         if (key.getValue() == Key::LEFT)
         {
-			if (mCaretPosition > 0) {
-				mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
-				if (mCaretPosition < 0) {
-					throw GCN_EXCEPTION("Invalid UTF8.");
-				}
+            if (mCaretPosition > 0) {
+                mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
+                if (mCaretPosition < 0) {
+                    throw GCN_EXCEPTION("Invalid UTF8.");
+                }
 
-				if (key.isShiftPressed()) {
-					--mSelectEndOffset;
-				} else {
-					mSelectStart = mCaretPosition;
-					mSelectEndOffset = 0;
-				}
-			} else if (!key.isShiftPressed()) {
-				mSelectEndOffset = 0;
-			}
+                if (key.isShiftPressed()) {
+                    --mSelectEndOffset;
+                } else {
+                    mSelectStart = mCaretPosition;
+                    mSelectEndOffset = 0;
+                }
+            } else if (!key.isShiftPressed()) {
+                mSelectStart = mCaretPosition;
+                mSelectEndOffset = 0;
+            }
 
             ret = true;
         }
 
         else if (key.getValue() == Key::RIGHT)
         {
-			if (mCaretPosition < (int)mText.size()) {
-				mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-				if (mCaretPosition > (int)mText.size()) {
-					throw GCN_EXCEPTION("Invalid UTF8.");
-				}
+            if (mCaretPosition < (int)mText.size()) {
+                mCaretPosition = UTF8GetNext(mText, mCaretPosition);
+                if (mCaretPosition > (int)mText.size()) {
+                    throw GCN_EXCEPTION("Invalid UTF8.");
+                }
 
-				if (key.isShiftPressed()) {
-					++mSelectEndOffset;
-				} else {
-					mSelectStart = mCaretPosition;
-					mSelectEndOffset = 0;
-				}
-			} else if (!key.isShiftPressed()) {
-				mSelectEndOffset = 0;
-			}
+                if (key.isShiftPressed()) {
+                    ++mSelectEndOffset;
+                } else {
+                    mSelectStart = mCaretPosition;
+                    mSelectEndOffset = 0;
+                }
+            } else if (!key.isShiftPressed()) {
+                mSelectStart = mCaretPosition;
+                mSelectEndOffset = 0;
+            }
 
             ret = true;
         }
@@ -352,6 +354,13 @@ namespace gcn
 
         else if (key.isCharacter())
         {
+            if (selLen > 0) {
+                mText.erase(selFirst, selLen);
+                mCaretPosition = selFirst;
+                mSelectStart = selFirst;
+                mSelectEndOffset = 0;
+            }
+
             mText.insert(mCaretPosition,key.toString());
             mCaretPosition = UTF8GetNext(mText, mCaretPosition);
             if (mCaretPosition > (int)mText.size()) {
