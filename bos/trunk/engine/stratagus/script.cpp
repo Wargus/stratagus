@@ -1026,7 +1026,7 @@ void LoadCcl(void)
 	CclInConfigFile = 1;
 	LibraryFileName(CclStartFile.c_str(), buf, sizeof(buf));
 	if (access(buf, R_OK)) {
-		printf("Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
+		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
 	}
 
