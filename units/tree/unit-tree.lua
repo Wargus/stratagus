@@ -46,38 +46,6 @@ DefineConstruction("construction-tree", {
 	}
 })
 
-DefineAnimations("animations-tree_destroyed", {
-    Death = {"unbreakable begin", 
-       "random-goto 3 T99", 
-       "random-goto 30 T88", 
-       "label T00", "frame 4", "wait 2500", "goto T3",
-       "label T88", "frame 7", "wait 2500", "goto T3", 
-       "label T99", "frame 0", "wait 2500", "goto T3",
-       "label T3", "wait 2500", "unbreakable end"},
-    })
-DefineUnitType("tree_destroyed", {
-    Name = "DestroyedTree",
-    Image = {"file", "units/tree/stumps8.png", "size", {64, 64}},
-    Shadow = {"file", "units/tree/stumps8.png", "size", {64, 64}},
-    Animations = "animations-tree_destroyed",
-    Icon = "icon-cancel",
-    Flip = false,
-    Speed = 0,
-    HitPoints = 999,
-    DrawLevel = 1,
-    TileSize = {1, 1},
-    BoxSize = {62, 62},
-    SightRange = 2,
-    BasicDamage = 0,
-    PiercingDamage = 0,
-    Missile = "missile-none",
-    Priority = 0,
-    Type = "land",
-    Vanishes = true,
-})
-
-
-
 DefineUnitType("unit-tree", {
     Name = "Tree",
     Image = {"file", "units/tree/tree01.png", "size", {105, 105}},
@@ -102,7 +70,7 @@ DefineUnitType("unit-tree", {
     AnnoyComputerFactor = 0,
     Points = 10,
     ExplodeWhenKilled = "missile-64x64-explosion",
-    Corpse = "tree_destroyed",
+    Corpse = "unit-destroyed-1x1-place",
     Type = "land",
     Building = true,
     BuilderOutside = true,
