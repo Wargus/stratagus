@@ -59,6 +59,7 @@
 #include "replay.h"
 #include "ai.h"
 #include "widgets.h"
+#include "particle.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -505,6 +506,14 @@ static bool CommandKey(int key)
 	}
 
 	switch (key) {
+		case 'a': {
+			CViewport *vp = GetViewport(CursorX, CursorY);
+			int x = CursorX - vp->X + vp->MapX * TileSizeX + vp->OffsetX;
+			int y = CursorY - vp->Y + vp->MapY * TileSizeY + vp->OffsetY;
+			ParticleManager.add(new CExplosion(CPosition(x, y)));
+			break;
+		}
+
 		// Return enters chat/input mode.
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: // RETURN
