@@ -269,7 +269,7 @@ function RunJoiningGameMenu(s)
       ErrorMenu(_("Incompatible engine version"))
       menu:stop(1)
     elseif (state == 17) then -- ccs_incompatiblenetwork
-      ErrorMenu(_("Incompatible netowrk version"))
+      ErrorMenu(_("Incompatible network version"))
       menu:stop(1)
     end
   end
