@@ -36,7 +36,6 @@
 CExplosion::CExplosion(CPosition position) :
 	CParticle(position)
 {
-	ParticleManager.setLowDetail(true);
 	if (!ParticleManager.getLowDetail()) {
 		CFlashParticle *flash = new CFlashParticle(position);
 		ParticleManager.add(flash);
