@@ -36,13 +36,20 @@
 CExplosion::CExplosion(CPosition position) :
 	CParticle(position)
 {
-	CFlashParticle *flash = new CFlashParticle(position);
-	ParticleManager.add(flash);
+	ParticleManager.setLowDetail(true);
+	if (!ParticleManager.getLowDetail()) {
+		CFlashParticle *flash = new CFlashParticle(position);
+		ParticleManager.add(flash);
+	}
 
 	CFlameParticle *flame = new CFlameParticle(position);
 	ParticleManager.add(flame);
 
-	for (int i = 0; i < 8; ++i) {
+	int numChunks = 8;
+	if (ParticleManager.getLowDetail()) {
+		numChunks /= 2;
+	}
+	for (int i = 0; i < numChunks; ++i) {
 		CChunkParticle *chunk = new CChunkParticle(position);
 		ParticleManager.add(chunk);
 	}
