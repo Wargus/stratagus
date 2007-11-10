@@ -203,11 +203,15 @@ public:
 	CPosition getScreenPos(const CPosition &pos);
 	int getType(const std::string &name);
 
+	inline void setLowDetail(bool detail) { lowDetail = detail; }
+	inline bool getLowDetail() const { return lowDetail; }
+
 private:
 	std::vector<CParticle *> particles;
 	std::vector<CParticle *> new_particles;
 	const CViewport *vp;
 	unsigned long lastTicks;
+	bool lowDetail;
 };
 
 extern CParticleManager ParticleManager;
