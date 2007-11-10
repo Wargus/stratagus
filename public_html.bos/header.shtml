@@ -29,6 +29,7 @@ Have fun!!-->
 	<li <!--#if expr="${CUR}=download"-->id="current"<!--#endif -->><a href="download.shtml">Download</a></li> 
 	<li <!--#if expr="${CUR}=screenshots"-->id="current"<!--#endif -->><a href="screenshots.shtml">Screenshots</a></li> 
 	<li <!--#if expr="${CUR}=development"-->id="current"<!--#endif -->><a href="development.shtml">Development</a></li>
+	<li><a href="http://www.seul.org/viewcvs/viewcvs.cgi/*checkout*/bos/trunk/doc/faq.html?root=BosWars">F.A.Q.</a></li>
 </ul>
 </div>
 
