@@ -102,7 +102,7 @@ void CleanModules(void)
 	CleanReplayLog();
 	CleanSpells();
 	FreeVisionTable();
-	FreeAStar();
+	FreePathfinder();
 }
 
 /**
@@ -158,7 +158,7 @@ void LoadModules(void)
 	LoadDecorations();
 	LoadUnitTypes();
 
-	InitAStar();
+	InitPathfinder();
 
 	LoadUnitSounds();
 	MapUnitSounds();
