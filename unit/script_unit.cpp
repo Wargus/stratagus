@@ -48,6 +48,7 @@
 #include "script.h"
 #include "spells.h"
 #include "pathfinder.h"
+#include "map.h"
 #include "trigger.h"
 #include "actions.h"
 #include "construct.h"
