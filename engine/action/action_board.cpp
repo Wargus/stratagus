@@ -44,6 +44,7 @@
 #include "actions.h"
 #include "interface.h"
 #include "pathfinder.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

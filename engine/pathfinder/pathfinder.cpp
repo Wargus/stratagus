@@ -41,10 +41,6 @@
 #include "unit.h"
 #include "pathfinder.h"
 
-#ifndef MAX_PATH_LENGTH
-#define MAX_PATH_LENGTH  9 /// Maximal path part returned.
-#endif
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -59,13 +55,27 @@
 */
 static unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
 
+static int STDCALL CostMoveTo(int x, int y, void *data);
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------
---  PATH-FINDER LOW-LEVEL
-----------------------------------------------------------------------------*/
+/**
+**  Init the pathfinder
+*/
+void InitPathfinder()
+{
+	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight, CostMoveTo);
+}
+
+/**
+**  Free the pathfinder
+*/
+void FreePathfinder()
+{
+	FreeAStar();
+}
 
 /**
 **  Initialize a matrix
@@ -141,7 +151,9 @@ unsigned char *MakeMatrix(void)
 */
 int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, int range)
 {
-	int i = AStarFindPath(src, x, y, w, h, minrange, range, NULL);
+	int i = AStarFindPath(src->X, src->Y, x, y, w, h,
+		src->Type->TileWidth, src->Type->TileHeight, minrange, range, NULL, 0, (void *)src);
+
 	switch (i) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
@@ -183,6 +195,72 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 	}
 
 	return depth;
+}
+
+/**
+**  Compute the cost of crossing tile (dx,dy)
+**
+**  @param data  user data.
+**  @param x     X tile where to move.
+**  @param y     Y tile where to move.
+**
+**  @return      -1 -> impossible to cross.
+**                0 -> no induced cost, except move
+**               >0 -> costly tile
+*/
+static int STDCALL CostMoveTo(int x, int y, void *data)
+{
+	int i;
+	int j;
+	int flag;
+	int cost = 0;
+	CUnit *goal;
+	const CUnit *unit = (const CUnit *)data;
+	int mask = unit->Type->MovementMask;
+
+	cost = 0;
+
+	// Doesn't cost anything to move to ourselves :)
+	// Used when marking goals mainly.  Could cause speed problems
+	if (unit->X == x && unit->Y == y) {
+		return 0;
+	}
+
+	// verify each tile of the unit.
+	for (i = x; i < x + unit->Type->TileWidth; ++i) {
+		for (j = y; j < y + unit->Type->TileHeight; ++j) {
+			flag = Map.Field(i, j)->Flags & mask;
+			if (flag && (AStarKnowUnseenTerrain || Map.IsFieldExplored(unit->Player, i, j))) {
+				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
+					// we can't cross fixed units and other unpassable things
+					return -1;
+				}
+				goal = UnitOnMapTile(i, j, unit->Type->UnitType);
+				if (!goal) {
+					// Shouldn't happen, mask says there is something on this tile
+					Assert(0);
+					return -1;
+				}
+				if (goal->Moving)  {
+					// moving unit are crossable
+					cost += AStarMovingUnitCrossingCost;
+				} else {
+					// for non moving unit Always Fail
+					// FIXME: Need support for moving a fixed unit to add cost
+					return -1;
+					//cost += AStarFixedUnitCrossingCost;
+				}
+			}
+			// Add cost of crossing unknown tiles if required
+			if (!AStarKnowUnseenTerrain && !Map.IsFieldExplored(unit->Player, i, j)) {
+				// Tend against unknown tiles.
+				cost += AStarUnknownTerrainCost;
+			}
+			// Add tile movement cost
+			cost += Map.Field(i, j)->Cost;
+		}
+	}
+	return cost;
 }
 
 /*----------------------------------------------------------------------------
@@ -239,7 +317,8 @@ int NewPath(CUnit *unit)
 		gy = unit->Orders[0]->Y;
 	}
 	path = unit->Data.Move.Path;
-	i = AStarFindPath(unit, gx, gy, gw, gh, minrange, maxrange, path);
+	i = AStarFindPath(unit->X, unit->Y, gx, gy, gw, gh,
+		unit->Type->TileWidth, unit->Type->TileHeight, minrange, maxrange, path, MAX_PATH_LENGTH, unit);
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;
 	}
@@ -258,6 +337,84 @@ int NewPath(CUnit *unit)
 		}
 	}
 	return i;
+}
+
+/**
+**  Returns the next element of a path.
+**
+**  @param unit  Unit that wants the path element.
+**  @param pxd   Pointer for the x direction.
+**  @param pyd   Pointer for the y direction.
+**
+**  @return >0 remaining path length, 0 wait for path, -1
+**  reached goal, -2 can't reach the goal.
+*/
+int NextPathElement(CUnit *unit, int *pxd, int *pyd)
+{
+	int result;
+
+	// Attempt to use path cache
+	// FIXME: If there is a goal, it may have moved, ruining the cache
+	*pxd = 0;
+	*pyd = 0;
+
+	// Goal has moved, need to recalculate path or no cached path
+	if (unit->Data.Move.Length <= 0 ||
+		(unit->Orders[0]->Goal && (unit->Orders[0]->Goal->X != unit->Orders[0]->X ||
+			unit->Orders[0]->Goal->Y != unit->Orders[0]->Y))) {
+		result = NewPath(unit);
+
+		if (result == PF_UNREACHABLE) {
+			unit->Data.Move.Length = 0;
+			return result;
+		}
+		if (result == PF_REACHED) {
+			return result;
+		}
+		if (unit->Goal) {
+			// Update Orders
+			unit->Orders[0]->X = unit->Goal->X;
+			unit->Orders[0]->Y = unit->Goal->Y;
+		}
+	}
+
+	*pxd = Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+	*pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+	result = unit->Data.Move.Length;
+	unit->Data.Move.Length--;
+	if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
+		// If obstructing unit is moving, wait for a bit.
+		if (unit->Data.Move.Fast) {
+			unit->Data.Move.Fast--;
+			AstarDebugPrint("WAIT at %d\n" _C_ unit->Data.Move.Fast);
+			result = PF_WAIT;
+		} else {
+			unit->Data.Move.Fast = 10;
+			AstarDebugPrint("SET WAIT to 10\n");
+			result = PF_WAIT;
+		}
+		if (unit->Data.Move.Fast == 0 && result != 0) {
+			AstarDebugPrint("WAIT expired\n");
+			result = NewPath(unit);
+			if (result > 0) {
+				*pxd = Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+				*pyd = Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length - 1]];
+				if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
+					// There may be unit in the way, Astar may allow you to walk onto it.
+					result = PF_UNREACHABLE;
+					*pxd = 0;
+					*pyd = 0;
+				} else {
+					result = unit->Data.Move.Length;
+					unit->Data.Move.Length--;
+				}
+			}
+		}
+	}
+	if (result != PF_WAIT) {
+		unit->Data.Move.Fast = 0;
+	}
+	return result;
 }
 
 //@}

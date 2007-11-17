@@ -210,6 +210,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "guichan.h"
 #include "version.h"
 #include "title.h"
+#include "map.h"
 
 extern void CreateUserDirectories(void);
 
@@ -357,7 +358,7 @@ void CleanGame(void)
 	Map.Clean();
 	CleanReplayLog();
 	FreeVisionTable();
-	FreeAStar();
+	FreePathfinder();
 	CursorBuilding = NULL;
 	UnitUnderCursor = NULL;
 }

@@ -719,7 +719,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	// Various hacks wich must be done after the map is loaded.
 	//
 	// FIXME: must be done after map is loaded
-	InitAStar();
+	InitPathfinder();
 	//
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.

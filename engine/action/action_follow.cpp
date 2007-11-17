@@ -41,6 +41,7 @@
 #include "unit.h"
 #include "unittype.h"
 #include "pathfinder.h"
+#include "map.h"
 #include "interface.h"
 #include "actions.h"
 
