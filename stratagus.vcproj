@@ -2942,6 +2942,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\video\glgraphicdraw.cpp"
+						>
+					</File>
+					<File
 						RelativePath="video\graphic.cpp"
 						>
 						<FileConfiguration
@@ -3031,28 +3035,6 @@
 					</File>
 					<File
 						RelativePath="video\sdl.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="video\sprite.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
