@@ -45,6 +45,7 @@ struct Node {
 	char Direction;     /// Direction for trace back
 	char InGoal;        /// is this point in the goal
 	int CostFromStart;  /// Real costs to reach this point
+	int CostToGoal;     /// Estimated cost to goal
 };
 
 struct Open {
@@ -55,11 +56,7 @@ struct Open {
 };
 
 /// heuristic cost function for a*
-#define AStarCosts(sx,sy,ex,ey) (abs(sx-ex)+abs(sy-ey))
-// Other heuristic functions
-// #define AStarCosts(sx,sy,ex,ey) 0
-// #define AStarCosts(sx,sy,ex,ey) isqrt((abs(sx-ex)*abs(sx-ex))+(abs(sy-ey)*abs(sy-ey)))
-// #define AStarCosts(sx,sy,ex,ey) max(abs(sx-ex),abs(sy-ey))
+#define AStarCosts(sx,sy,ex,ey) std::max(abs(sx - ex), abs(sy - ey))
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -91,6 +88,9 @@ int AStarUnknownTerrainCost = 2;
 
 static int AStarMapWidth;
 static int AStarMapHeight;
+
+static int AStarGoalX;
+static int AStarGoalY;
 
 /**
 **  The Open set is handled by a stored array
@@ -251,7 +251,11 @@ void FreeAStar(void)
 		delete[] AStarMatrix;
 		AStarMatrix = NULL;
 		delete[] CloseSet;
+		CloseSet = NULL;
+		CloseSetSize = 0;
 		delete[] OpenSet;
+		OpenSet = NULL;
+		OpenSetSize = 0;
 	}
 }
 
@@ -305,6 +309,10 @@ static int AStarAddNode(int x, int y, int o, int costs)
 	int bigi, smalli;
 	int midcost;
 	int midi;
+	int costToGoal;
+	int midCostToGoal;
+	int dist;
+	int midDist;
 	
 	if (OpenSetSize + 1 >= OpenSetMaxSize) {
 		fprintf(stderr, "A* internal error: raise Open Set Max Size "
@@ -312,7 +320,9 @@ static int AStarAddNode(int x, int y, int o, int costs)
 		return PF_FAILED;
 	}
 
-	
+	costToGoal = AStarMatrix[o].CostToGoal;
+	dist = abs(x - AStarGoalX) + abs(y - AStarGoalY);
+
 	// find where we should insert this node.
 	bigi = 0;
 	smalli = OpenSetSize;
@@ -321,9 +331,15 @@ static int AStarAddNode(int x, int y, int o, int costs)
 	while (bigi < smalli) {
 		midi = (smalli + bigi) >> 1;
 		midcost = OpenSet[midi].Costs;
-		if (costs > midcost) {
+		midCostToGoal = AStarMatrix[OpenSet[midi].O].CostToGoal;
+		midDist = abs(OpenSet[midi].X - AStarGoalX) + abs(OpenSet[midi].Y - AStarGoalY);
+		if (costs > midcost || (costs == midcost &&
+				(costToGoal > midCostToGoal || (costToGoal == midCostToGoal &&
+					dist > midDist)))) {
 			smalli = midi;
-		} else if (costs < midcost) {
+		} else if (costs < midcost || (costs == midcost &&
+				(costToGoal < midCostToGoal || (costToGoal == midCostToGoal &&
+					dist < midDist)))) {
 			if (bigi == midi) {
 				bigi++;
 			} else {
@@ -687,9 +703,12 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 	int shortest;
 //	int counter;
 	int new_cost;
-	int cost_to_goal;
+	int costToGoal;
 	int path_length;
 	int ret = PF_FAILED;
+
+	AStarGoalX = gx;
+	AStarGoalY = gy;
 
 	//
 	//  Check for simple cases first
@@ -704,6 +723,8 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 	//
 	//  Initialize
 	//
+	AStarCleanUp();
+
 	for (i = 0; i < AStarMapWidth * AStarMapHeight; ++i) {
 		CostMoveToCache[i] = CacheNotSet;
 	}
@@ -728,7 +749,9 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 	AStarMatrix[eo].Direction = 8;
 
 	// place start point in open, it that failed, try another pathfinder
-	if (AStarAddNode(x, y, eo, 1 + AStarCosts(x, y, gx, gy)) == PF_FAILED) {
+	costToGoal = AStarCosts(x, y, gx, gy);
+	AStarMatrix[eo].CostToGoal = costToGoal;
+	if (AStarAddNode(x, y, eo, 1 + costToGoal) == PF_FAILED) {
 		ret = PF_FAILED;
 		goto Cleanup;
 	}
@@ -751,7 +774,6 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 		x = OpenSet[shortest].X;
 		y = OpenSet[shortest].Y;
 		o = OpenSet[shortest].O;
-		cost_to_goal = OpenSet[shortest].Costs - AStarMatrix[o].CostFromStart;
 
 		AStarRemoveMinimum(shortest);
 
@@ -812,14 +834,16 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 			}
 
 			// Add a cost for walking to make paths more realistic for the user.
-			new_cost += abs(Heading2X[i]) + abs(Heading2Y[i]) + 1;
+			new_cost++;
 			eo = ey * AStarMapWidth + ex;
 			new_cost += AStarMatrix[o].CostFromStart;
 			if (AStarMatrix[eo].CostFromStart == 0) {
 				// we are sure the current node has not been already visited
 				AStarMatrix[eo].CostFromStart = new_cost;
 				AStarMatrix[eo].Direction = i;
-				if (AStarAddNode(ex, ey, eo, AStarMatrix[eo].CostFromStart + AStarCosts(ex, ey, gx, gy)) == PF_FAILED) {
+				costToGoal = AStarCosts(ex, ey, gx, gy);
+				AStarMatrix[eo].CostToGoal = costToGoal;
+				if (AStarAddNode(ex, ey, eo, AStarMatrix[eo].CostFromStart + costToGoal) == PF_FAILED) {
 					ret = PF_FAILED;
 					goto Cleanup;
 				}
@@ -833,13 +857,17 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 				// this point might be already in the OpenSet
 				j = AStarFindNode(eo);
 				if (j == -1) {
+					costToGoal = AStarCosts(ex, ey, gx, gy);
+					AStarMatrix[eo].CostToGoal = costToGoal;
 					if (AStarAddNode(ex, ey, eo,
-							AStarMatrix[eo].CostFromStart + AStarCosts(ex, ey, gx, gy)) == PF_FAILED) {
+							AStarMatrix[eo].CostFromStart + costToGoal) == PF_FAILED) {
 						ret = PF_FAILED;
 						goto Cleanup;
 					}
 				} else {
-					AStarReplaceNode(j, AStarMatrix[eo].CostFromStart + AStarCosts(ex, ey, gx, gy));
+					costToGoal = AStarCosts(ex, ey, gx, gy);
+					AStarMatrix[eo].CostToGoal = costToGoal;
+					AStarReplaceNode(j, AStarMatrix[eo].CostFromStart + costToGoal);
 				}
 				// we don't have to add this point to the close set
 			}
@@ -855,12 +883,48 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 	ret = path_length;
 
 Cleanup:
-	// let's clean up the matrix now
-	AStarCleanUp();
-
 	return ret;
 }
 
+struct StatsNode
+{
+	StatsNode() : Direction(0), InGoal(0), CostFromStart(0), Costs(0) {}
+
+	int Direction;
+	int InGoal;
+	int CostFromStart;
+	int Costs;
+	int CostToGoal;
+};
+
+StatsNode *AStarGetStats()
+{
+	StatsNode *stats = new StatsNode[AStarMapWidth * AStarMapHeight];
+	StatsNode *s = stats;
+	Node *m = AStarMatrix;
+
+	for (int j = 0; j < AStarMapHeight; ++j) {
+		for (int i = 0; i < AStarMapWidth; ++i) {
+			s->Direction = m->Direction;
+			s->InGoal = m->InGoal;
+			s->CostFromStart = m->CostFromStart;
+			s->CostToGoal = m->CostToGoal;
+			++s;
+			++m;
+		}
+	}
+
+	for (int i = 0; i < OpenSetSize; ++i) {
+		stats[OpenSet[i].O].Costs = OpenSet[i].Costs;
+	}
+
+	return stats;
+}
+
+void AStarFreeStats(StatsNode *stats)
+{
+	delete[] stats;
+}
 
 /*----------------------------------------------------------------------------
 --  Configurable costs
