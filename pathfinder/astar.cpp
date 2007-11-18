@@ -109,6 +109,80 @@ static int (STDCALL *CostMoveToCallback)(int x, int y, void *data);
 static int *CostMoveToCache;
 static const int CacheNotSet = -5;
 
+/*----------------------------------------------------------------------------
+--  Profile
+----------------------------------------------------------------------------*/
+
+#ifdef ASTAR_PROFILE
+
+#include <map>
+#include <windows.h>
+#undef max
+#undef min
+static std::map<std::string, LARGE_INTEGER> functionTimerMap;
+struct ProfileData {
+	unsigned long Calls;
+	unsigned long TotalTime;
+};
+static std::map<std::string, ProfileData> functionProfiles;
+
+inline void ProfileInit()
+{
+	functionTimerMap.clear();
+	functionProfiles.clear();
+}
+
+inline void ProfileBegin(const std::string &function)
+{
+	LARGE_INTEGER counter;
+	if (!QueryPerformanceCounter(&counter)) {
+		return;
+	}
+	functionTimerMap[function] = counter;
+}
+
+inline void ProfileEnd(const std::string &function)
+{
+	LARGE_INTEGER counter;
+	if (!QueryPerformanceCounter(&counter)) {
+		return;
+	}
+	unsigned long time = (unsigned long)(counter.QuadPart - functionTimerMap[function].QuadPart);
+	ProfileData *data = &functionProfiles[function];
+	data->Calls++;
+	data->TotalTime += time;
+}
+
+inline void ProfilePrint()
+{
+	LARGE_INTEGER frequency;
+	if (!QueryPerformanceFrequency(&frequency)) {
+		return;
+	}
+
+	std::map<std::string, ProfileData>::iterator i;
+
+	FILE *fd = fopen("profile.txt", "wb");
+	fprintf(fd, "    total\t    calls\t      per\tname\n");
+
+	for (i = functionProfiles.begin(); i != functionProfiles.end(); ++i) {
+		ProfileData *data = &i->second;
+		fprintf(fd, "%9.3f\t%9lu\t%9.3f\t%s\n",
+			(double)data->TotalTime / frequency.QuadPart * 1000.0,
+			data->Calls,
+			(double)data->TotalTime / frequency.QuadPart * 1000.0 / data->Calls,
+			i->first.c_str());
+	}
+
+	fclose(fd);
+}
+
+#else
+#define ProfileInit()
+#define ProfileBegin(f)
+#define ProfileEnd(f)
+#define ProfilePrint()
+#endif
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -117,6 +191,8 @@ static const int CacheNotSet = -5;
 // FIXME: this is duplicated from map_fog.cpp
 static void InitVisionTable(void)
 {
+	ProfileBegin("InitVisionTable");
+
 	int *visionlist;
 	int maxsize;
 	int sizex;
@@ -213,6 +289,8 @@ static void InitVisionTable(void)
 	}
 
 	delete[] visionlist;
+
+	ProfileEnd("InitVisionTable");
 }
 
 /**
@@ -240,6 +318,7 @@ void InitAStar(int mapWidth, int mapHeight, int (STDCALL *costMoveTo)(int x, int
 	CostMoveToCache = new int[AStarMapWidth * AStarMapHeight];
 
 	InitVisionTable();
+	ProfileInit();
 }
 
 /**
@@ -257,6 +336,7 @@ void FreeAStar(void)
 		OpenSet = NULL;
 		OpenSetSize = 0;
 	}
+	ProfilePrint();
 }
 
 /**
@@ -272,6 +352,8 @@ static void AStarPrepare(void)
 */
 static void AStarCleanUp()
 {
+	ProfileBegin("AStarCleanUp");
+
 	if (CloseSetSize >= Threshold) {
 		AStarPrepare();
 	} else {
@@ -280,6 +362,8 @@ static void AStarCleanUp()
 			AStarMatrix[CloseSet[i]].InGoal = 0;
 		}
 	}
+
+	ProfileEnd("AStarCleanUp");
 }
 
 /**
@@ -306,6 +390,8 @@ static void AStarRemoveMinimum(int pos)
 */
 static int AStarAddNode(int x, int y, int o, int costs)
 {
+	ProfileBegin("AStarAddNode");
+
 	int bigi, smalli;
 	int midcost;
 	int midi;
@@ -317,6 +403,7 @@ static int AStarAddNode(int x, int y, int o, int costs)
 	if (OpenSetSize + 1 >= OpenSetMaxSize) {
 		fprintf(stderr, "A* internal error: raise Open Set Max Size "
 				"(current value %d)\n", OpenSetMaxSize);
+		ProfileEnd("AStarAddNode");
 		return PF_FAILED;
 	}
 
@@ -363,6 +450,8 @@ static int AStarAddNode(int x, int y, int o, int costs)
 	OpenSet[bigi].Costs = costs;
 	++OpenSetSize;
 
+	ProfileEnd("AStarAddNode");
+
 	return 0;
 }
 
@@ -373,6 +462,8 @@ static int AStarAddNode(int x, int y, int o, int costs)
 */
 static void AStarReplaceNode(int pos, int costs)
 {
+	ProfileBegin("AStarReplaceNode");
+
 	Open node;
 
 	// Remove the outdated node
@@ -382,6 +473,8 @@ static void AStarReplaceNode(int pos, int costs)
 
 	// Re-add the node with the new cost
 	AStarAddNode(node.X, node.Y, node.O, node.Costs);
+
+	ProfileEnd("AStarReplaceNode");
 }
 
 
@@ -392,11 +485,15 @@ static void AStarReplaceNode(int pos, int costs)
 */
 static int AStarFindNode(int eo)
 {
+	ProfileBegin("AStarFindNode");
+
 	for (int i = 0; i < OpenSetSize; ++i) {
 		if (OpenSet[i].O == eo) {
+			ProfileEnd("AStarFindNode");
 			return i;
 		}
 	}
+	ProfileEnd("AStarFindNode");
 	return -1;
 }
 
@@ -436,6 +533,8 @@ static int CostMoveTo(int x, int y, void *data)
 static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 	int tilesizex, int tilesizey, int minrange, int maxrange, void *data)
 {
+	ProfileBegin("AStarMarkGoal");
+
 	int cx[4];
 	int cy[4];
 	int steps;
@@ -455,12 +554,15 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 	if (minrange == 0 && maxrange == 0 && gw == 0 && gh == 0) {
 		if (gx + tilesizex >= AStarMapWidth ||
 				gy + tilesizey >= AStarMapHeight) {
+			ProfileEnd("AStarMarkGoal");
 			return 0;
 		}
 		if (CostMoveTo(gx, gy, data) >= 0) {
 			AStarMatrix[gx + gy * AStarMapWidth].InGoal = 1;
+			ProfileEnd("AStarMarkGoal");
 			return 1;
 		} else {
+			ProfileEnd("AStarMarkGoal");
 			return 0;
 		}
 	}
@@ -604,6 +706,8 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 			++steps;
 		}
 	}
+
+	ProfileEnd("AStarMarkGoal");
 	return goal_reachable;
 }
 
@@ -614,6 +718,8 @@ static int AStarMarkGoal(int gx, int gy, int gw, int gh,
 */
 static int AStarSavePath(int startX, int startY, int endX, int endY, char *path, int pathLen)
 {
+	ProfileBegin("AStarSavePath");
+
 	int currX, currY;
 	int fullPathLength;
 	int pathPos;
@@ -647,6 +753,7 @@ static int AStarSavePath(int startX, int startY, int endX, int endY, char *path,
 		}
 	}
 
+	ProfileEnd("AStarSavePath");
 	return fullPathLength;
 }
 
@@ -657,7 +764,9 @@ static int AStarSavePath(int startX, int startY, int endX, int endY, char *path,
 int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
 	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data)
 {
+	ProfileBegin("AStarFindSimplePath");
 	if (gx == sx && gy == sy) {
+		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;
 	}
 
@@ -666,21 +775,25 @@ int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
 	int distance = isqrt(dx * dx + dy * dy);
 
 	if (minrange <= distance && distance <= maxrange) {
+		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;
 	}
 
 	if (dx <= 1 && dy <= 1) {
 		// Move to adjacent cell
 		if (CostMoveTo(gx, gy, data) == -1) {
+			ProfileEnd("AStarFindSimplePath");
 			return PF_UNREACHABLE;
 		}
 
 		if (path) {
 			path[0] = XY2Heading[gx - sx + 1][gy - sy + 1];
 		}
+		ProfileEnd("AStarFindSimplePath");
 		return 1;
 	}
 
+	ProfileEnd("AStarFindSimplePath");
 	return PF_FAILED;
 }
 
@@ -690,6 +803,8 @@ int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
 int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data)
 {
+	ProfileBegin("AStarFindPath");
+
 	int i;
 	int j;
 	int o;
@@ -883,6 +998,7 @@ int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
 	ret = path_length;
 
 Cleanup:
+	ProfileEnd("AStarFindPath");
 	return ret;
 }
 
@@ -961,6 +1077,5 @@ void SetAStarUnknownTerrainCost(int cost) {
 int GetAStarUnknownTerrainCost() {
 	return AStarUnknownTerrainCost;
 }
-
 
 //@}
