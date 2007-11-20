@@ -418,6 +418,7 @@ static int GatherResource(CUnit *unit)
 				}
 				DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 				uins = source->UnitInside;
+				bool dead = source->Orders[0]->Action == UnitActionDie;
 				//
 				// Improved version of DropOutAll that makes workers go to the depot.
 				//
@@ -430,7 +431,7 @@ static int GatherResource(CUnit *unit)
 
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
-				if (source->IsVisibleAsGoal(unit->Player)) {
+				if (!dead) {
 					LetUnitDie(source);
 					// FIXME: make the workers inside look for a new resource.
 				}
