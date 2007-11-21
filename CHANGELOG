@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fixed attack range off by 1 bug (Jimmy Salmon)
 - Updated nuclear missile graphic (TimberDragon)
 - Added guerilla map (TimberDragon)
 - Added random-frame to animations (Jimmy Salmon)
