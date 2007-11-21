@@ -101,6 +101,7 @@ void CUnit::RefsIncrease()
 void CUnit::RefsDecrease()
 {
 	RefsAssert(Refs);
+	// FIXME: shouldn't have to check this here
 	if (!SaveGameLoading) {
 		if (Destroyed) {
 			if (!--Refs) {
@@ -185,8 +186,6 @@ void CUnit::Release()
 */
 void CUnit::Init(CUnitType *type)
 {
-	Assert(type);
-
 	//  Set refs to 1. This is the "I am alive ref", lost in ReleaseUnit.
 	Refs = 1;
 
@@ -258,20 +257,15 @@ void CUnit::Init(CUnitType *type)
 */
 void CUnit::AssignToPlayer(CPlayer *player)
 {
-	CUnitType *type;  // type of unit.
-
-	Assert(player);
-	type = Type;
-
 	//
 	// Build player unit table
 	//
-	if (!type->Vanishes && Orders[0]->Action != UnitActionDie) {
+	if (!Type->Vanishes && Orders[0]->Action != UnitActionDie) {
 		PlayerSlot = player->Units + player->TotalNumUnits++;
 		if (!SaveGameLoading) {
 			// If unit is dying, it's already been lost by all players
 			// don't count again
-			if (type->Building) {
+			if (Type->Building) {
 				player->TotalBuildings++;
 			} else {
 				player->TotalUnits++;
@@ -279,21 +273,19 @@ void CUnit::AssignToPlayer(CPlayer *player)
 		}
 		*PlayerSlot = this;
 
-		player->UnitTypesCount[type->Slot]++;
+		player->UnitTypesCount[Type->Slot]++;
 	}
 
 
 	// Don't Add the building if it's dieing, used to load a save game
-	if (type->Building && Orders[0]->Action != UnitActionDie) {
+	if (Type->Building && Orders[0]->Action != UnitActionDie) {
 		player->NumBuildings++;
 	}
 	Player = player;
-	Stats = &type->Stats[Player->Index];
+	Stats = &Type->Stats[Player->Index];
 	Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.NumberVariable) {
-			Assert(Variable);
-			Assert(Stats->Variables);
 			memcpy(Variable, Stats->Variables,
 				UnitTypeVar.NumberVariable * sizeof(*Variable));
 		}
@@ -351,8 +343,6 @@ static void MapMarkUnitSightRec(const CUnit *unit, int x, int y, int width, int 
 {
 	CUnit *unit_inside;
 
-	Assert(unit);
-	Assert(f);
 	MapSight(unit->Player, x, y, width, height,
 		unit->Container ? unit->Container->CurrentSightRange : unit->CurrentSightRange, f);
 
@@ -369,13 +359,12 @@ static void MapMarkUnitSightRec(const CUnit *unit, int x, int y, int width, int 
 **
 **  @return      Container of container of ... of unit. It is not null.
 */
-static CUnit *GetFirstContainer(const CUnit *unit)
+static CUnit *GetFirstContainer(CUnit *unit)
 {
-	Assert(unit);
 	while (unit->Container) {
 		unit = unit->Container;
 	}
-	return const_cast<CUnit *>(unit);
+	return unit;
 }
 
 /**
@@ -386,12 +375,7 @@ static CUnit *GetFirstContainer(const CUnit *unit)
 */
 void MapMarkUnitSight(CUnit *unit)
 {
-	CUnit *container;  // First container of the unit.
-
-	Assert(unit);
-
-	container = GetFirstContainer(unit);
-	Assert(container->Type);
+	CUnit *container = GetFirstContainer(unit);
 
 	MapMarkUnitSightRec(unit,
 		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
@@ -418,13 +402,8 @@ void MapMarkUnitSight(CUnit *unit)
 */
 void MapUnmarkUnitSight(CUnit *unit)
 {
-	CUnit *container;  // First container of the unit.
+	CUnit *container = GetFirstContainer(unit);
 
-	Assert(unit);
-	Assert(unit->Type);
-
-	container = GetFirstContainer(unit);
-	Assert(container->Type);
 	MapMarkUnitSightRec(unit,
 		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
 		MapUnmarkTileSight);
@@ -488,21 +467,11 @@ void UpdateUnitSightRange(CUnit *unit)
 */
 void MarkUnitFieldFlags(const CUnit *unit)
 {
-	CUnitType *type; // Type of the unit.
-	unsigned flags; //
-	int h;          // Tile height of the unit.
-	int w;          // Tile width of the unit.
-	int x;          // X tile of the unit.
-	int y;          // Y tile of the unit.
+	unsigned flags = unit->Type->FieldFlags;
 
-	Assert(unit);
-	type = unit->Type;
-	x = unit->X;
-	y = unit->Y;
-	flags = type->FieldFlags;
-	for (h = type->TileHeight; h--;) {
-		for (w = type->TileWidth; w--;) {
-			Map.Field(x + w, y + h)->Flags |= flags;
+	for (int h = unit->Type->TileHeight; h--;) {
+		for (int w = unit->Type->TileWidth; w--;) {
+			Map.Field(unit->X + w, unit->Y + h)->Flags |= flags;
 		}
 	}
 }
@@ -514,27 +483,17 @@ void MarkUnitFieldFlags(const CUnit *unit)
 */
 void UnmarkUnitFieldFlags(const CUnit *unit)
 {
-	CUnitType *type; // Type of the unit.
-	unsigned flags; //
-	int h;          // Tile height of the unit.
-	int w;          // Tile width of the unit.
-	int x;          // X tile of the unit.
-	int y;          // Y tile of the unit.
+	unsigned flags = unit->Type->FieldFlags;;
 	CUnit *table[UnitMax];
 
-	Assert(unit);
-	type = unit->Type;
-	x = unit->X;
-	y = unit->Y;
-	flags = type->FieldFlags;
-	for (h = type->TileHeight; h--;) {
-		for (w = type->TileWidth; w--;) {
-			Map.Field(x + w, y + h)->Flags &= ~flags;
+	for (int h = unit->Type->TileHeight; h--;) {
+		for (int w = unit->Type->TileWidth; w--;) {
+			Map.Field(unit->X + w, unit->Y + h)->Flags &= ~flags;
 
-			int n = UnitCache.Select(x + w, y + h, table, UnitMax);
+			int n = UnitCache.Select(unit->X + w, unit->Y + h, table, UnitMax);
 			while (n--) {
 				if (table[n] != unit && table[n]->Orders[0]->Action != UnitActionDie) {
-					Map.Field(x + w, y + h)->Flags |= table[n]->Type->FieldFlags;
+					Map.Field(unit->X + w, unit->Y + h)->Flags |= table[n]->Type->FieldFlags;
 				}
 			}
 		}
@@ -548,7 +507,7 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 */
 void CUnit::AddInContainer(CUnit *host)
 {
-	Assert(host && Container == 0);
+	Assert(Container == NoUnitP);
 	Container = host;
 	if (host->InsideCount == 0) {
 		NextContained = PrevContained = this;
@@ -601,13 +560,11 @@ static void RemoveUnitFromContainer(CUnit *unit)
 */
 static void UnitInXY(CUnit *unit, int x, int y)
 {
-	CUnit *unit_inside;      // iterator on units inside unit.
+	CUnit *unit_inside = unit->UnitInside;
 
-	Assert(unit);
 	unit->X = x;
 	unit->Y = y;
 
-	unit_inside = unit->UnitInside;
 	for (int i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
 		UnitInXY(unit_inside, x, y);
 	}
@@ -679,9 +636,7 @@ void CUnit::Place(int x, int y)
 */
 CUnit *MakeUnitAndPlace(int x, int y, CUnitType *type, CPlayer *player)
 {
-	CUnit *unit;
-
-	unit = MakeUnit(type, player);
+	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != NoUnitP) {
 		unit->Place(x, y);
@@ -706,9 +661,11 @@ void CUnit::Remove(CUnit *host)
 		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ Slot);
 		return;
 	}
+
 	UnitCache.Remove(this);
 	MapUnmarkUnitSight(this);
 	UnmarkUnitFieldFlags(this);
+
 	if (host) {
 		AddInContainer(host);
 		UpdateUnitSightRange(this);
@@ -750,8 +707,6 @@ void UnitLost(CUnit *unit)
 	CBuildRestrictionOnTop *b;
 	const CUnitType *type;
 	CPlayer *player;
-
-	Assert(unit);
 
 	player = unit->Player;
 	Assert(player);  // Next code didn't support no player!
@@ -1057,8 +1012,6 @@ void UnitCountSeen(CUnit *unit)
 	int p;
 	int oldv[PlayerMax];
 	int newv;
-
-	Assert(unit->Type);
 
 	// FIXME: optimize, only work on certain players?
 	// This is for instance good for updating shared vision...
@@ -1489,13 +1442,13 @@ void UnitUpdateHeading(CUnit *unit)
 {
 	int dir;
 	int nextdir;
-	int neg;
+	bool neg;
 
 	if (unit->Frame < 0) {
 		unit->Frame = -unit->Frame - 1;
-		neg = 1;
+		neg = true;
 	} else {
-		neg = 0;
+		neg = false;
 	}
 	unit->Frame /= unit->Type->NumDirections / 2 + 1;
 	unit->Frame *= unit->Type->NumDirections / 2 + 1;
@@ -2074,11 +2027,10 @@ void LetUnitDie(CUnit *unit)
 void DestroyAllInside(CUnit *source)
 {
 	CUnit *unit;
-	int i;
 
 	// No Corpses, we are inside something, and we can't be seen
 	unit = source->UnitInside;
-	for (i = source->InsideCount; i; --i, unit = unit->NextContained) {
+	for (int i = source->InsideCount; i; --i, unit = unit->NextContained) {
 		// Transporter inside a transporter?
 		if (unit->UnitInside) {
 			DestroyAllInside(unit);
@@ -2310,12 +2262,12 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 /**
 **  Returns the map distance between two points.
 **
-**  @param x1    X map tile position.
-**  @param y1    Y map tile position.
-**  @param x2    X map tile position.
-**  @param y2    Y map tile position.
+**  @param x1  X map tile position.
+**  @param y1  Y map tile position.
+**  @param x2  X map tile position.
+**  @param y2  Y map tile position.
 **
-**  @return      The distance between in tiles.
+**  @return    The distance between in tiles.
 */
 int MapDistance(int x1, int y1, int x2, int y2)
 {
@@ -2325,13 +2277,13 @@ int MapDistance(int x1, int y1, int x2, int y2)
 /**
 **  Returns the map distance between two points with unit type.
 **
-**  @param x1      X map tile position.
-**  @param y1      Y map tile position.
-**  @param type    Unit type to take into account.
-**  @param x2      X map tile position.
-**  @param y2      Y map tile position.
+**  @param x1    X map tile position.
+**  @param y1    Y map tile position.
+**  @param type  Unit type to take into account.
+**  @param x2    X map tile position.
+**  @param y2    Y map tile position.
 **
-**  @return        The distance between in tiles.
+**  @return      The distance between in tiles.
 */
 int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2)
 {
@@ -2362,11 +2314,11 @@ int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2)
 /**
 **  Returns the map distance to unit.
 **
-**  @param x       X map tile position.
-**  @param y       Y map tile position.
-**  @param dest    Distance to this unit.
+**  @param x     X map tile position.
+**  @param y     Y map tile position.
+**  @param dest  Distance to this unit.
 **
-**  @return        The distance between in tiles.
+**  @return      The distance between in tiles.
 */
 int MapDistanceToUnit(int x, int y, const CUnit *dest)
 {
@@ -2376,10 +2328,10 @@ int MapDistanceToUnit(int x, int y, const CUnit *dest)
 /**
 **  Returns the map distance between two units.
 **
-**  @param src    Distance from this unit.
-**  @param dst    Distance  to  this unit.
+**  @param src  Distance from this unit.
+**  @param dst  Distance to this unit.
 **
-**  @return       The distance between in tiles.
+**  @return     The distance between in tiles.
 */
 int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst)
 {
@@ -2390,14 +2342,14 @@ int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst)
 /**
 **  Returns the map distance between two points with unit type.
 **
-**  @param src     src unittype
-**  @param x1      X map tile position of src (upperleft).
-**  @param y1      Y map tile position of src.
-**  @param dst     Unit type to take into account.
-**  @param x2      X map tile position of dst.
-**  @param y2      Y map tile position of dst.
+**  @param src  src unittype
+**  @param x1   X map tile position of src (upperleft).
+**  @param y1   Y map tile position of src.
+**  @param dst  Unit type to take into account.
+**  @param x2   X map tile position of dst.
+**  @param y2   Y map tile position of dst.
 **
-**  @return        The distance between the types.
+**  @return     The distance between the types.
 */
 int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1, const CUnitType *dst, int x2, int y2)
 {
@@ -2431,8 +2383,8 @@ int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1, const CUnitTyp
 /**
 **  Compute the distance from the view point to a given point.
 **
-**  @param x    X map tile position.
-**  @param y    Y map tile position.
+**  @param x  X map tile position.
+**  @param y  Y map tile position.
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
@@ -2451,17 +2403,13 @@ int ViewPointDistance(int x, int y)
 /**
 **  Compute the distance from the view point to a given unit.
 **
-**  @param dest    Distance to this unit.
+**  @param dest  Distance to this unit.
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
 int ViewPointDistanceToUnit(const CUnit *dest)
 {
-	const CViewport *vp;
-
-	// first compute the view point coordinate
-	vp = UI.SelectedViewport;
-	// then use MapDistanceToUnit
+	const CViewport *vp = UI.SelectedViewport;;
 	return MapDistanceToUnit(vp->MapX + vp->MapWidth / 2,
 		vp->MapY + vp->MapHeight / 2, dest);
 }
@@ -2469,10 +2417,10 @@ int ViewPointDistanceToUnit(const CUnit *dest)
 /**
 **  Can the source unit attack the destination unit.
 **
-**  @param source    Unit type pointer of the attacker.
-**  @param dest      Unit type pointer of the target.
+**  @param source  Unit type pointer of the attacker.
+**  @param dest    Unit type pointer of the target.
 **
-**  @return 0 if attacker can't target the unit, else a positive number.
+**  @return        0 if attacker can't target the unit, else a positive number.
 */
 int CanTarget(const CUnitType *source, const CUnitType *dest)
 {
@@ -2497,7 +2445,7 @@ int CanTarget(const CUnitType *source, const CUnitType *dest)
 **  @param transporter  Unit which is the transporter.
 **  @param unit         Unit which wants to go in the transporter.
 **
-**  @return 1 if transporter can transport unit, 0 else.
+**  @return             1 if transporter can transport unit, 0 else.
 */
 int CanTransport(const CUnit *transporter, const CUnit *unit)
 {
