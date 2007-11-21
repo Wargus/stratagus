@@ -698,7 +698,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 		if (d > range) {
 			continue;
 		}
-		if (d < attackrange && d > type->MinAttackRange) {
+		if (d <= attackrange && d >= type->MinAttackRange) {
 			cost += d * INRANGE_FACTOR;
 			cost -= INRANGE_BONUS;
 		} else {
@@ -714,7 +714,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 		//
 		// Take this target?
 		//
-		if (cost < best_cost && (d < attackrange ||
+		if (cost < best_cost && (d <= attackrange ||
 				UnitReachable(unit, dest, attackrange))) {
 			best_unit = dest;
 			best_cost = cost;
