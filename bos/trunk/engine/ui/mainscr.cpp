@@ -187,7 +187,7 @@ static void DrawUnitStats(const CUnit *unit)
 	if (type->CanAttack) {
 		// Kills
 		std::ostringstream kills;
-		kills << "Kills: ~<" << type->Variable[KILL_INDEX].Value << "~>";
+		kills << "Kills: ~<" << unit->Variable[KILL_INDEX].Value << "~>";
 		VideoDrawTextCentered(x + 114, y + 52, GameFont, kills.str());
 
 		// Attack Range
