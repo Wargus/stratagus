@@ -248,11 +248,10 @@ void DoRightButton(int sx, int sy)
 			}
 			// Harvest
 			if (type->Harvester) {
-				if (dest && dest->Player != unit->Player && !unit->IsAllied(dest)) {
+				if (dest) {
 					// Go and harvest from a unit
 					if (dest->Type->CanHarvestFrom && type->Harvester &&
-							(dest->Player == unit->Player ||
-								(dest->Player->Index == PlayerNumNeutral))) {
+							dest->Player->Index == PlayerNumNeutral) {
 						dest->Blink = 4;
 						SendCommandResource(unit, dest, flush);
 						continue;
