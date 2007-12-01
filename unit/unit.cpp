@@ -2505,7 +2505,7 @@ bool CUnit::IsEnemy(const CUnit *x) const
 */
 bool CUnit::IsAllied(const CPlayer *x) const
 {
-	return (this->Player->Allied & (1 << x->Index)) != 0;
+	return Player->IsAllied(x);
 }
 
 /**
