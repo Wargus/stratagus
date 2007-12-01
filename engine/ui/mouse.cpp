@@ -248,7 +248,7 @@ void DoRightButton(int sx, int sy)
 			}
 			// Harvest
 			if (type->Harvester) {
-				if (dest && dest->Player != unit->Player && unit->IsAllied(dest)) {
+				if (dest && dest->Player != unit->Player && !unit->IsAllied(dest)) {
 					// Go and harvest from a unit
 					if (dest->Type->CanHarvestFrom && type->Harvester &&
 							(dest->Player == unit->Player ||
