@@ -9,7 +9,7 @@
 --
 --	unit-gturret.lua	-	Define the gun turret unit.
 --
---	(c) Copyright 2004-2005 by François Beerten.
+--	(c) Copyright 2004-2007 by François Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -99,6 +99,7 @@ DefineUnitType("unit-gturret", {
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
+    CanHarvestFrom = true,
     Sounds = {
         "selected", "gturret-selected",
         "ready", "gturret-ready",
