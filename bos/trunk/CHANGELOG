@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Add missing const specifiers to fix compilation with 
+  GCC 4.2 (Loïs Taulelle, Forjan Frederic)
 - Fix compilation error in focushandler.cpp (Francois Beerten)
 - Fixed attack range off by 1 bug (Jimmy Salmon)
 - Updated nuclear missile graphic (TimberDragon)
