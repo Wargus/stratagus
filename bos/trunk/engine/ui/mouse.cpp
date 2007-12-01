@@ -286,7 +286,8 @@ void DoRightButton(int sx, int sy)
 					} else {
 						if (CanTarget(type, dest->Type)) {
 							SendCommandAttack(unit, x, y, dest, flush);
-						} else { // No valid target
+						} else { 
+							// No valid target
 							SendCommandAttack(unit, x, y, NoUnitP, flush);
 						}
 					}
