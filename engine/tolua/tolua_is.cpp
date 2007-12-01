@@ -85,7 +85,7 @@ TOLUA_API const char* tolua_typename (lua_State* L, int lo)
 	return lua_tostring(L,-1);
 }
 
-TOLUA_API void tolua_error (lua_State* L, char* msg, tolua_Error* err)
+TOLUA_API void tolua_error (lua_State* L, const char* msg, tolua_Error* err)
 {
 	if (msg[0] == '#')
 	{
