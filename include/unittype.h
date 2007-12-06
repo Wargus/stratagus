@@ -317,10 +317,6 @@
 **
 **    Selectable with mouse rectangle
 **
-**  CUnitType::Teleporter
-**
-**    Can teleport other units.
-**
 **  CUnitType::Sound
 **
 **    Sounds for events
@@ -600,7 +596,7 @@ public:
 		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 		BuilderOutside(0), BuilderLost(0), CanHarvestFrom(0), Harvester(0),
 		Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-		Indestructible(0), Teleporter(0), Organic(0), Variable(NULL),
+		Indestructible(0), Organic(0), Variable(NULL),
 		ProductionEfficiency(100), FieldFlags(0), MovementMask(0),
 		Sprite(NULL), ShadowSprite(NULL)
 	{
@@ -700,7 +696,6 @@ public:
 	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
-	unsigned Teleporter : 1;            /// Can teleport other units.
 	unsigned Organic : 1;               /// Can be transported or healed by a medic
 
 	CVariable *Variable;            /// Array of user defined variables.

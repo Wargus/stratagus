@@ -124,69 +124,6 @@ void HandleActionFollow(CUnit *unit)
 			}
 			// FALL THROUGH
 		case PF_REACHED:
-			// Handle Teleporter Units
-			// FIXME: BAD HACK
-			if ((goal = unit->Orders[0]->Goal) &&
-					goal->Type->Teleporter && goal->Goal &&
-					MapDistanceBetweenUnits(unit, goal) <= 1) {
-				CUnit *dest;
-
-				// Teleport the unit
-				unit->Remove(NULL);
-				unit->X = goal->Goal->X;
-				unit->Y = goal->Goal->Y;
-				DropOutOnSide(unit, unit->Direction, 1, 1);
-#if 0
-				// FIXME: SoundForName() should be called once
-				PlayGameSound(SoundForName("invisibility"), MaxSampleVolume);
-				// FIXME: MissileTypeByIdent() should be called once
-				MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-					unit->X * TileSizeX + TileSizeX / 2,
-					unit->Y * TileSizeY + TileSizeY / 2,
-					unit->X * TileSizeX + TileSizeX / 2,
-					unit->Y * TileSizeY + TileSizeY / 2);
-#endif
-				unit->ClearAction();
-
-				//
-				// FIXME: we must check if the units supports the new order.
-				//
-				dest = goal->Goal;
-
-				if (dest) {
-					if ((dest->NewOrder.Action == UnitActionResource &&
-								!unit->Type->Harvester) ||
-							(dest->NewOrder.Action == UnitActionAttack &&
-								!unit->Type->CanAttack) ||
-							(dest->NewOrder.Action == UnitActionBoard &&
-								unit->Type->UnitType != UnitTypeLand)) {
-						DebugPrint("Wrong order for unit\n");
-						unit->ClearAction();
-						unit->Orders[0]->Goal = NoUnitP;
-					} else {
-						if (dest->NewOrder.Goal) {
-							if (dest->NewOrder.Goal->Destroyed) {
-								// FIXME: perhaps we should use another dest?
-								DebugPrint("Destroyed unit in teleport unit\n");
-								dest->RefsDecrease();
-								dest->NewOrder.Goal = NoUnitP;
-								dest->NewOrder.Action = UnitActionStill;
-							}
-						}
-
-						*unit->Orders[0] = dest->NewOrder;
-
-						//
-						// FIXME: Pending command uses any references?
-						//
-						if (unit->Orders[0]->Goal) {
-							unit->Orders[0]->Goal->RefsIncrease();
-						}
-					}
-				}
-				return;
-			}
-
 			if (!(goal = unit->Orders[0]->Goal)) { // goal has died
 				unit->ClearAction();
 				return;
