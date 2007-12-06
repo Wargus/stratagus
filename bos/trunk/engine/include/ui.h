@@ -197,7 +197,8 @@ public:
 /**
 **  Enumeration of the different predefined viewport configurations.
 **
-**  @todo this should be later user configurable
+**  Add new types of viewports at the end of the enumeration for 
+**  backward compatibility of save games.
 */
 enum ViewportModeType {
 	VIEWPORT_SINGLE,                /// Old single viewport
