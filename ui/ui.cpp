@@ -209,7 +209,6 @@ static void SaveViewports(CFile *file, const CUserInterface *ui)
 	int i;
 	const CViewport *vp;
 
-	// FIXME: don't save the number
 	file->printf("DefineViewports(\"mode\", %d", ui->ViewportMode);
 	for (i = 0; i < ui->NumViewports; ++i) {
 		vp = &ui->Viewports[i];
