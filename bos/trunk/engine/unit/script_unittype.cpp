@@ -638,8 +638,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->IsNotSelectable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SelectableByRectangle")) {
 			type->SelectableByRectangle = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Teleporter")) {
-			type->Teleporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Organic")) {
 			type->Organic = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {

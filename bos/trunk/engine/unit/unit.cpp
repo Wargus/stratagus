@@ -1954,15 +1954,6 @@ void LetUnitDie(CUnit *unit)
 			0, 0);
 	}
 
-	// Handle Teleporter Destination Removal
-	if (type->Teleporter && unit->Goal) {
-		unit->Goal->Remove(NULL);
-		UnitLost(unit->Goal);
-		UnitClearOrders(unit->Goal);
-		unit->Goal->Release();
-		unit->Goal = NULL;
-	}
-
 	UnitRemoveConsumingResources(unit);
 	if (unit->Orders[0]->Action != UnitActionBuilt) {
 		for (int u = 0; u < MaxCosts; ++u) {
