@@ -604,7 +604,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	//
 	// Setup game types
 	//
-	// FIXME: implement more game types
 	if (GameSettings.GameType != SettingsGameTypeMapDefault) {
 		switch (GameSettings.GameType) {
 			case SettingsGameTypeMelee:
@@ -623,24 +622,6 @@ void CreateGame(const std::string &filename, CMap *map)
 				break;
 			case SettingsGameTypeManTeamVsMachine:
 				GameTypeManTeamVsMachine();
-
-			// Future game type ideas
-#if 0
-			case SettingsGameTypeOneOnOne:
-				break;
-			case SettingsGameTypeCaptureTheFlag:
-				break;
-			case SettingsGameTypeGreed:
-				break;
-			case SettingsGameTypeSlaughter:
-				break;
-			case SettingsGameTypeSuddenDeath:
-				break;
-			case SettingsGameTypeTeamMelee:
-				break;
-			case SettingsGameTypeTeamCaptureTheFlag:
-				break;
-#endif
 		}
 	}
 
