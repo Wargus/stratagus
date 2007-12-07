@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Display the Bos Wars logo image by default instead of the video 
+  (Sébastien Kerguen, Francois Beerten)
 - Add missing const specifiers to fix compilation with 
   GCC 4.2 (Loïs Taulelle, Forjan Frederic)
 - Fix compilation error in focushandler.cpp (Francois Beerten)
@@ -37,7 +39,7 @@ Version 2.4.0 (2007 8 6):
 - Fixed bug loading a save game where a unit contains a unit that hasn't been loaded yet (Jimmy Salmon)
 - Add Czech translation (Radim Luža)
 - Fix building of static builds (Francois Beerten)
-- New introduction video (Xanax)
+- New introduction video (Sébastien Kerguen)
 - Added new tutorial (Jimmy Salmon)
 - Fixed clipped rectangle drawing with OpenGL (Jimmy Salmon)
 - Highlight selected listbox item so it's easier to see (Nehal Mistry)
