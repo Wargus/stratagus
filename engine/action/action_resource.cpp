@@ -119,7 +119,7 @@ static bool StartGathering(CUnit *unit)
 		return false;
 	}
 
-	// FIXME: 0 can happen, if placed too near by map maker.
+	// 0 can happen, for example with flying units.
 	Assert(MapDistanceBetweenUnits(unit, goal) <= 1);
 
 	//
