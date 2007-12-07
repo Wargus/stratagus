@@ -54,7 +54,6 @@
 
 #include "unittype.h"
 #include "unit_cache.h"
-#include "upgrade.h"
 #include "spells.h"
 #include "sound.h"
 #include "missile.h"
