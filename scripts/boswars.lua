@@ -7,7 +7,7 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	stratagus.lua	-	The craft configuration language.
+--	boswars.lua	-	Main configuration file of Bos Wars.
 --
 --	(c) Copyright 1998-2007 by Crestez Leonard and Francois Beerten
 --
@@ -36,9 +36,11 @@ print("Bos Wars default config file loading ...\n")
 
 --	Enter your default title screen.
 
-SetTitleScreens(
-      {Image="intro/boswars_intro.ogg"}
-)
+SetTitleScreens({
+      Image="intro/logo_boswars.png",
+      --Image="intro/boswars_intro.ogg",      
+})
+
 
 -------------------------------------------------------------------------------
 --	Music play list -	Insert your titles here
