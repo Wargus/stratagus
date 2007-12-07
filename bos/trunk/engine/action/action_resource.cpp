@@ -266,7 +266,6 @@ static void ResourceGiveUp(CUnit *unit)
 void HandleActionResource(CUnit *unit)
 {
 	if (unit->Wait) {
-		// FIXME: show idle animation while we wait?
 		unit->Wait--;
 		return;
 	}
