@@ -1231,7 +1231,7 @@ static int CclSlotUsage(lua_State *l)
 	}
 	for (i = 2; i <= args; i++) {
 		unit_index = -1;
-		cycle = -1;
+		cycle = (unsigned long)-1;
 		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Slot")) {
@@ -1242,7 +1242,7 @@ static int CclSlotUsage(lua_State *l)
 				LuaError(l, "Wrong key %s" _C_ key);
 			}
 		}
-		Assert(unit_index != -1 && cycle != -1);
+		Assert(unit_index != -1 && cycle != (unsigned long)-1);
 		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
 		UnitSlots[unit_index]->Refs = cycle;
 	}
