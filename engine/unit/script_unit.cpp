@@ -1231,18 +1231,18 @@ static int CclSlotUsage(lua_State *l)
 	}
 	for (i = 2; i <= args; i++) {
 		unit_index = -1;
+		cycle = -1;
 		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Slot")) {
 				unit_index = LuaToNumber(l, -1);
 			} else if (!strcmp(key, "FreeCycle")) {
-				if (unit_index != -1) {
-					cycle = LuaToNumber(l, -1);
-				}
+				cycle = LuaToNumber(l, -1);
 			} else {
 				LuaError(l, "Wrong key %s" _C_ key);
 			}
 		}
+		Assert(unit_index != -1 && cycle != -1);
 		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
 		UnitSlots[unit_index]->Refs = cycle;
 	}
