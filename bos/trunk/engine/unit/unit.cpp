@@ -167,7 +167,7 @@ void CUnit::Release()
 	*UnitSlot = temp;
 	Units[NumUnits] = NULL;
 
-	Type = NULL;  // for debugging.
+	Type = NULL;
 
 	delete[] AutoCastSpell;
 	delete[] Variable;
@@ -1050,10 +1050,15 @@ void UnitCountSeen(CUnit *unit)
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Type != PlayerNobody) {
 			newv = unit->IsVisible(Players + p);
-			if ((!oldv[p]) &&  (newv)) {
+			if (!oldv[p] && newv) {
 				UnitGoesOutOfFog(unit, Players + p);
+				// Might have revealed a destroyed unit which caused it to
+				// be released
+				if (!unit->Type) {
+					break;
+				}
 			}
-			if ( (oldv[p]) && (!newv)) {
+			if (oldv[p] && !newv) {
 				UnitGoesUnderFog(unit, Players + p);
 			}
 		}
