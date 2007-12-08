@@ -945,10 +945,20 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	}
 	FixLabels(l);
 
+	return anim;
+}
+
+/**
+**  Add animation to AnimationsArray
+*/
+static void AddAnimationToArray(CAnimation *anim)
+{
+	if (!anim) {
+		return;
+	}
+
 	AnimationsArray[NumAnimations++] = anim;
 	Assert(NumAnimations != ANIMATIONS_MAXANIM);
-
-	return anim;
 }
 
 /**
@@ -999,6 +1009,16 @@ static int CclDefineAnimations(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
+
+	// Must add to array in a fixed order for save games
+	AddAnimationToArray(anims->Start);
+	AddAnimationToArray(anims->Still);
+	AddAnimationToArray(anims->Death);
+	AddAnimationToArray(anims->Attack);
+	AddAnimationToArray(anims->Move);
+	AddAnimationToArray(anims->Repair);
+	AddAnimationToArray(anims->Train);
+	AddAnimationToArray(anims->Harvest);
 
 	return 0;
 }
