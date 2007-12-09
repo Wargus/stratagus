@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added StretchImage option to TitleScreen (Jimmy Salmon)
+- Fixed crash disabling fog of war (Jimmy Salmon)
 - Display the Bos Wars logo image by default instead of the video 
   (Sébastien Kerguen, Francois Beerten)
 - Add missing const specifiers to fix compilation with 
