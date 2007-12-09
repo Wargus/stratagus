@@ -200,17 +200,30 @@ static void GatherResource(CUnit *unit)
 
 	// Calculate how much we can harvest.
 	if (visible && UnitHoldsResources(source)) {
+		// Determine efficiency of recycling buildings
 		if (unit->Player == source->Player || unit->Player->IsAllied(source)) {
 			efficiency = AlliedUnitRecyclingEfficiency;
 		} else if (unit->Player->IsEnemy(source)) {
 			efficiency = EnemyUnitRecyclingEfficiency;
 		}
+
+		// Calculate new resource amounts
 		CalculateRequestedAmount(unit->Type, source->ResourcesHeld, amount);
 		for (i = 0; i < MaxCosts; ++i) {
 			unit->Player->ProductionRate[i] -= unit->Data.Harvest.CurrentProduction[i];
 			unit->Data.Harvest.CurrentProduction[i] = amount[i] * efficiency[i] / 100;
 			unit->Player->ProductionRate[i] += unit->Data.Harvest.CurrentProduction[i];
 			source->ResourcesHeld[i] -= amount[i];
+		}
+
+		// Recycling loses hit points
+		if (efficiency != totalEfficiency) {
+			Assert(source->Type->ProductionCosts[1] != 0);
+			source->Variable[HP_INDEX].Value = source->Variable[HP_INDEX].Max *
+				source->ResourcesHeld[1] / source->Type->ProductionCosts[1];
+			if (source->Variable[HP_INDEX].Value == 0 && source->ResourcesHeld[1] != 0) {
+				source->Variable[HP_INDEX].Value = 1;
+			}
 		}
 	}
 
