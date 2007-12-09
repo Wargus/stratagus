@@ -207,6 +207,20 @@ static void GatherResource(CUnit *unit)
 			efficiency = EnemyUnitRecyclingEfficiency;
 		}
 
+		// Update ResourcesHeld based on HP
+		// Source might have been healed or attacked
+		// Is this the best place for this?
+		if (efficiency != totalEfficiency) {
+			int hp = source->Variable[HP_INDEX].Max *
+				source->ResourcesHeld[1] / source->Type->ProductionCosts[1];
+			if (hp != 0 && hp != source->Variable[HP_INDEX].Value) {
+				for (i = 0; i < MaxCosts; ++i) {
+					source->ResourcesHeld[i] = source->Type->ProductionCosts[i] *
+						source->Variable[HP_INDEX].Value / source->Variable[HP_INDEX].Max;
+				}
+			}
+		}
+
 		// Calculate new resource amounts
 		CalculateRequestedAmount(unit->Type, source->ResourcesHeld, amount);
 		for (i = 0; i < MaxCosts; ++i) {
@@ -218,7 +232,6 @@ static void GatherResource(CUnit *unit)
 
 		// Recycling loses hit points
 		if (efficiency != totalEfficiency) {
-			Assert(source->Type->ProductionCosts[1] != 0);
 			source->Variable[HP_INDEX].Value = source->Variable[HP_INDEX].Max *
 				source->ResourcesHeld[1] / source->Type->ProductionCosts[1];
 			if (source->Variable[HP_INDEX].Value == 0 && source->ResourcesHeld[1] != 0) {
