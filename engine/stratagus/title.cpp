@@ -100,6 +100,7 @@ static void ShowTitleImage(TitleScreen *t)
 	const EventCallback *old_callbacks;
 	EventCallback callbacks;
 	CGraphic *g;
+	int x, y;
 
 	WaitNoEvent = true;
 
@@ -117,7 +118,14 @@ static void ShowTitleImage(TitleScreen *t)
 
 	g = CGraphic::New(t->File);
 	g->Load();
-	g->Resize(Video.Width, Video.Height);
+	if (t->StretchImage) {
+		x = 0;
+		y = 0;
+		g->Resize(Video.Width, Video.Height);
+	} else {
+		x = (Video.Width - g->Width) / 2;
+		y = (Video.Height - g->Height) / 2;
+	}
 
 	int timeout = t->Timeout * CYCLES_PER_SECOND;
 	if (!timeout) {

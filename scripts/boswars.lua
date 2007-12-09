@@ -37,8 +37,9 @@ print("Bos Wars default config file loading ...\n")
 --	Enter your default title screen.
 
 SetTitleScreens({
-      Image="intro/logo_boswars.png",
-      --Image="intro/boswars_intro.ogg",      
+  Image = "intro/logo_boswars.png",
+  StretchImage = false,
+  --Image = "intro/boswars_intro.ogg",      
 })
 
 

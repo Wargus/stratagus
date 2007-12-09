@@ -233,6 +233,8 @@ static int CclSetTitleScreens(lua_State *l)
 				TitleScreens[j]->File = LuaToString(l, -1);
 			} else if (!strcmp(value, "Music")) {
 				TitleScreens[j]->Music = LuaToString(l, -1);
+			} else if (!strcmp(value, "StretchImage")) {
+				TitleScreens[j]->StretchImage = LuaToBoolean(l, -1);
 			} else if (!strcmp(value, "Timeout")) {
 				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
 			} else if (!strcmp(value, "Iterations")) {
