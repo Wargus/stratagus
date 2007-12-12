@@ -377,7 +377,7 @@ void DrawResources(void)
 	int p = 0;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		sprintf(tmp, "%s:+%d-%d %d/%d",
+		sprintf_s(tmp, sizeof(tmp), "%s:+%d-%d %d/%d",
 			names[i],
 			ThisPlayer->ProductionRate[i],
 			ThisPlayer->RequestedUtilizationRate[i],
@@ -391,7 +391,7 @@ void DrawResources(void)
 	if (totalproduction + totalrequested) {
 		p = 100 - abs(totalproduction - totalrequested) * 100 / (totalproduction + totalrequested);
 	}
-	sprintf(tmp, "%d%%", p);
+	sprintf_s(tmp, sizeof(tmp), "%d%%", p);
 	VideoDrawText(400, 1, GameFont, tmp);
 }
 
@@ -594,7 +594,7 @@ int MessagesDisplay::CheckRepeatMessage(const char *msg)
 		n = MessagesSameCount;
 		MessagesSameCount = 0;
 		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
-		sprintf(temp, _("Last message repeated ~<%d~> times"), n + 1);
+		sprintf_s(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
 		AddMessage(temp);
 	}
 	return 0;
@@ -956,9 +956,9 @@ void DrawTimer(void)
 	char buf[30];
 
 	if (hour) {
-		sprintf(buf, "%d:%02d:%02d", hour, min, sec);
+		sprintf_s(buf, sizeof(buf), "%d:%02d:%02d", hour, min, sec);
 	} else {
-		sprintf(buf, "%d:%02d", min, sec);
+		sprintf_s(buf, sizeof(buf), "%d:%02d", min, sec);
 	}
 
 	VideoDrawText(UI.Timer.X, UI.Timer.Y, UI.Timer.Font, buf);

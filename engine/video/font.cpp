@@ -537,7 +537,7 @@ static void FormatNumber(int number, char *buf)
 	int d;
 
 	sl = s = d = 0;
-	sprintf(bufs, "%d", number);
+	sprintf_s(bufs, sizeof(bufs), "%d", number);
 	sl = strlen(bufs);
 	do {
 		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {

@@ -501,9 +501,9 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 
 	if (pathtype == 1) {
 		++userdir;
-		sprintf(directory, "%s/%s", UserDirectory.c_str(), userdir);
+		sprintf_s(directory, sizeof(directory), "%s/%s", UserDirectory.c_str(), userdir);
 	} else {
-		sprintf(directory, "%s/%s", StratagusLibPath.c_str(), userdir);
+		sprintf_s(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
 	}
 	lua_pop(l, 1);
 	lua_newtable(l);
@@ -790,7 +790,7 @@ static char *LuaEscape(const char *str)
 			*dst++ = *src;
 		} else if (*src < 32 || *src > 127) { // 0xA -> \010
 			*dst++ = '\\';
-			sprintf(dst, "%03d", *src);
+			sprintf_s(dst, (size + 1) - (dst - escapedString), "%03d", *src);
 			dst += 3;
 		} else {
 			*dst++ = *src;
