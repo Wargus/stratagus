@@ -343,7 +343,7 @@ static int FindFileWithExtension(char *file, size_t filesize)
 	if (!access(file, R_OK)) {
 		return 1;
 	}
-	sprintf(buf, "%s.gz", file);
+	sprintf_s(buf, sizeof(buf), "%s.gz", file);
 	if (!access(buf, R_OK)) {
 		strcpy_s(file, filesize, buf);
 		return 1;
@@ -375,13 +375,13 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	}
 
 	//  In user home directory
-	sprintf(buffer, "%s%s", UserDirectory.c_str(), file);
+	sprintf_s(buffer, buffersize, "%s%s", UserDirectory.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
 
 	// In global shared directory
-	sprintf(buffer, "%s/%s", StratagusLibPath.c_str(), file);
+	sprintf_s(buffer, buffersize, "%s/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
@@ -389,7 +389,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "%s/graphics/%s", StratagusLibPath.c_str(), file);
+	sprintf_s(buffer, buffersize, "%s/graphics/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}
@@ -397,7 +397,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	// Support for sounds in default sounds dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "%s/sounds/%s", StratagusLibPath.c_str(), file);
+	sprintf_s(buffer, buffersize, "%s/sounds/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}

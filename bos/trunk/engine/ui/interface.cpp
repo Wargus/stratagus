@@ -92,7 +92,7 @@ static void ShowInput(void)
 {
 	char *input;
 
-	sprintf(InputStatusLine, _("MESSAGE:%s~!_"), Input);
+	sprintf_s(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), Input);
 	input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
@@ -794,7 +794,7 @@ static int InputKey(int key)
 						++p;
 					}
 				}
-				sprintf(ChatMessage, "~%s~<%s>~> %s",
+				sprintf_s(ChatMessage, sizeof(ChatMessage), "~%s~<%s>~> %s",
 					PlayerColorNames[ThisPlayer->Index].c_str(),
 					ThisPlayer->Name.c_str(), Input);
 				// FIXME: only to selected players ...
@@ -881,7 +881,7 @@ static void Screenshot(void)
 
 	for (i = 1; i <= 99; ++i) {
 		// FIXME: what if we can't write to this directory?
-		sprintf(filename, "screen%02d.png", i);
+		sprintf_s(filename, sizeof(filename), "screen%02d.png", i);
 		if (fd.open(filename, CL_OPEN_READ) == -1) {
 			break;
 		}

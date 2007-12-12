@@ -796,7 +796,7 @@ static int CclDefineButton(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isnumber(l, -1)) {
-				sprintf(buf, "%ld", (long int)lua_tonumber(l, -1));
+				sprintf_s(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
 				s2 = buf;
 			} else {
 				s2 = lua_tostring(l, -1);

@@ -321,7 +321,7 @@ static void InitKey2Str()
 	Key2Str[SDLK_DELETE] = "delete";
 
 	for (i = SDLK_KP0; i <= SDLK_KP9; ++i) {
-		sprintf(str, "kp_%d", i - SDLK_KP0);
+		sprintf_s(str, sizeof(str), "kp_%d", i - SDLK_KP0);
 		Key2Str[i] = str;
 	}
 
@@ -343,7 +343,7 @@ static void InitKey2Str()
 	Key2Str[SDLK_PAGEDOWN] = "pagedown";
 
 	for (i = SDLK_F1; i <= SDLK_F15; ++i) {
-		sprintf(str, "f%d", i - SDLK_F1 + 1);
+		sprintf_s(str, sizeof(str), "f%d", i - SDLK_F1 + 1);
 		Key2Str[i] = str;
 	}
 

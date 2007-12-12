@@ -59,6 +59,7 @@ extern long isqrt(long num);
 extern unsigned int strcpy_s(char *dst, size_t dstsize, const char *src);
 extern unsigned int strncpy_s(char *dst, size_t dstsize, const char *src, size_t count);
 extern unsigned int strcat_s(char *dst, size_t dstsize, const char *src);
+extern int sprintf_s(char *dest, size_t destSize, const char *format, ...);
 #endif
 
 	/// strdup + strcat

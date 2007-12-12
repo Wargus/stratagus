@@ -494,7 +494,7 @@ void UnitActions(void)
 			time_t now;
 			char buf[256];
 
-			sprintf(buf, "log_of_boswars_%d.log", ThisPlayer->Index);
+			sprintf(buf, sizeof(buf), "log_of_boswars_%d.log", ThisPlayer->Index);
 			logf = fopen(buf, "wb");
 			if (!logf) {
 				return;
