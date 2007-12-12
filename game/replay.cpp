@@ -413,7 +413,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	if (!LogFile) {
 		char buf[PATH_MAX];
 
-		sprintf(buf, "%slogs/log_of_stratagus_%d.log", UserDirectory.c_str(), ThisPlayer->Index);
+		sprintf_s(buf, sizeof(buf), "%slogs/log_of_stratagus_%d.log", UserDirectory.c_str(), ThisPlayer->Index);
 		LogFile = new CFile;
 		if (LogFile->open(buf, CL_OPEN_WRITE) == -1) {
 			// don't retry for each command

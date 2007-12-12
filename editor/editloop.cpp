@@ -558,14 +558,14 @@ static void DrawPlayers(void)
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i * 20, y + 1, 17, 17);
 		}
-		sprintf(buf, "%d", i);
+		sprintf_s(buf, sizeof(buf), "%d", i);
 		VideoDrawTextCentered(x + i * 20 + 9, y + 3, SmallFont, buf);
 	}
 	
 	x = UI.InfoPanel.X + 4;
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
-		i = sprintf(buf,"Plyr %d ", Editor.SelectedPlayer);
+		i = sprintf_s(buf, sizeof(buf), "Plyr %d ", Editor.SelectedPlayer);
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
@@ -887,14 +887,14 @@ static void DrawEditorInfo(void)
 		y = Viewport2MapY(UI.MouseViewport, CursorY);
 	}
 
-	sprintf(buf, "Editor (%d %d)", x, y);
+	sprintf_s(buf, sizeof(buf), "Editor (%d %d)", x, y);
 	VideoDrawText(UI.ResourceX + 2, UI.ResourceY + 2, GameFont, buf);
 
 	//
 	// Flags info
 	//
 	flags = Map.Field(x, y)->Flags;
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf_s(buf, sizeof(buf), "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
 		Map.Field(x, y)->Value, flags,
 		flags & MapFieldUnpassable   ? 'u' : '-',
 		flags & MapFieldNoBuilding   ? 'n' : '-',
@@ -920,7 +920,7 @@ static void DrawEditorInfo(void)
 
 	Assert(i != Map.Tileset.NumTiles);
 
-	sprintf(buf, "%d %s %s", tile,
+	sprintf_s(buf, sizeof(buf), "%d %s %s", tile,
 		Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].BaseTerrain].TerrainName,
 		Map.Tileset.Tiles[i].MixTerrain
 			? Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].MixTerrain].TerrainName
@@ -942,10 +942,10 @@ static void ShowUnitInfo(const CUnit *unit)
 	int res;
 
 	res = UnitUnderCursor->Type->ProductionCosts[0] ? 0 : 1;
-	i = sprintf(buf, "#%d '%s' Player:#%d", UnitNumber(unit),
+	i = sprintf_s(buf, sizeof(buf), "#%d '%s' Player:#%d", UnitNumber(unit),
 		unit->Type->Name.c_str(), unit->Player->Index);
 	if (unit->Type->CanHarvestFrom) {
-		sprintf(buf + i, " Amount of %s: %d", DefaultResourceNames[res].c_str(), unit->ResourcesHeld[res] / CYCLES_PER_SECOND);
+		sprintf_s(buf + i, sizeof(buf) - i, " Amount of %s: %d", DefaultResourceNames[res].c_str(), unit->ResourcesHeld[res] / CYCLES_PER_SECOND);
 	}
 	UI.StatusLine.Set(buf);
 }
@@ -1543,7 +1543,7 @@ static void EditorCallbackMouse(int x, int y)
 		for (i = 0; i < PlayerMax; ++i) {
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
 				if (Map.Info.PlayerType[i] != PlayerNobody) {
-					sprintf(buf,"Select player #%d",i);
+					sprintf_s(buf, sizeof(buf), "Select player #%d", i);
 					UI.StatusLine.Set(buf);
 				} else {
 					UI.StatusLine.Clear();
@@ -1571,7 +1571,7 @@ static void EditorCallbackMouse(int x, int y)
 				}
 				if (bx < x && x < bx + IconWidth &&
 						by < y && y < by + IconHeight) {
-					sprintf(buf,"%s \"%s\"",
+					sprintf_s(buf, sizeof(buf), "%s \"%s\"",
 						Editor.ShownUnitTypes[i]->Ident.c_str(),
 						Editor.ShownUnitTypes[i]->Name.c_str());
 					UI.StatusLine.Set(buf);
@@ -1869,7 +1869,7 @@ int EditorSaveMap(const char *file)
 {
 	char path[PATH_MAX];
 
-	sprintf(path, "%s/%s", StratagusLibPath.c_str(), file);
+	sprintf_s(path, sizeof(path), "%s/%s", StratagusLibPath.c_str(), file);
 	if (SaveStratagusMap(path, &Map, Editor.TerrainEditable) == -1) {
 		printf("Cannot save map\n");
 		return -1;

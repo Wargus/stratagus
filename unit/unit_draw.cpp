@@ -670,7 +670,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
-	sprintf(buf, "%d%c%c%d", unit->VisCount[ThisPlayer->Index],
+	sprintf_s(buf, sizeof(buf), "%d%c%c%d", unit->VisCount[ThisPlayer->Index],
 		unit->Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
 		unit->Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
 		unit->Refs);

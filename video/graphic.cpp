@@ -549,8 +549,9 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 		ExitFatal(-1);
 	}
 	g->File = file;
-	char *hashfile = new char[file.size() + 32];
-	sprintf(hashfile, "%s%d", file.c_str(), HashCount++);
+	int bufSize = file.size() + 32;
+	char *hashfile = new char[bufSize];
+	sprintf_s(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
 	g->HashFile = hashfile;
 	delete[] hashfile;
 	g->Width = w;
@@ -578,8 +579,9 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 		ExitFatal(-1);
 	}
 	g->File = file;
-	char *hashfile = new char[file.size() + 32];
-	sprintf(hashfile, "%s%d", file.c_str(), HashCount++);
+	size_t bufSize = file.size() + 32;
+	char *hashfile = new char[bufSize];
+	sprintf_s(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
 	g->HashFile = hashfile;
 	delete[] hashfile;
 	g->Width = w;

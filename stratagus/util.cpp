@@ -218,6 +218,29 @@ unsigned int strcat_s(char *dst, size_t dstsize, const char *src)
 	strcpy(enddst, src);
 	return 0;
 }
+
+int sprintf_s(char *dest, size_t destSize, const char *format, ...)
+{
+	va_list args;
+	int ret;
+
+	if (dest == NULL || format == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	va_start(args, format);
+	ret = vsnprintf(dest, destSize, format, args);
+	va_end(args);
+
+	if (ret < 0 || (size_t)ret >= destSize) {
+		dest[0] = '\0';
+		errno = EINVAL;
+		ret = -1;
+	}
+
+	return ret;
+}
 #endif
 
 /**
