@@ -82,3 +82,5 @@ extern int SyncRand(int max);
 
 void Exit(int err);
 
+$extern std::string CliMapName;
+extern std::string CliMapName;
