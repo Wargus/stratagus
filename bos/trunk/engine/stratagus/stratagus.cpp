@@ -225,7 +225,7 @@ std::string LocalPlayerName;         /// Name of local player
 static std::string NameLine =
 	"Bos Wars V" VERSION ", (c) 1998-2007 by the Bos Wars and Stratagus Project.";
 
-static std::string MapName;          /// Filename of the map to load
+std::string CliMapName;          /// Filename of the map given on the command line
 std::string CompileOptions;          /// Compile options.
 
 static std::vector<gcn::Container *> Containers;
@@ -558,7 +558,7 @@ static int main1(int argc, char **argv)
 	UnitManager.Init(); // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
-	MenuLoop(MapName, &Map);
+	MenuLoop(CliMapName, &Map);
 
 	return 0;
 }
@@ -802,9 +802,9 @@ int main(int argc, char **argv)
 
 	if (argc - optind) {
 		size_t index;
-		MapName = argv[optind];
-		while ((index = MapName.find('\\')) != std::string::npos) {
-			MapName[index] = '/';
+		CliMapName = argv[optind];
+		while ((index = CliMapName.find('\\')) != std::string::npos) {
+			CliMapName[index] = '/';
 		}
 		--argc;
 	}

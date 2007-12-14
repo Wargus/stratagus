@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Fri Nov  2 19:59:57 2007.
+** Generated automatically by tolua++-1.0.92 on Sat Dec 15 00:30:11 2007.
 */
 
 #ifndef __cplusplus
@@ -57,6 +57,7 @@ void ActionSetTimer(int cycles, bool increasing);
 void ActionStartTimer();
 void ActionStopTimer();
 void SetTrigger(int trigger);
+extern std::string CliMapName;
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -17741,6 +17742,30 @@ static int tolua_stratagus_Exit00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: CliMapName */
+#ifndef TOLUA_DISABLE_tolua_get_CliMapName
+static int tolua_get_CliMapName(lua_State* tolua_S)
+{
+  tolua_pushcppstring(tolua_S,(const char*)CliMapName);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: CliMapName */
+#ifndef TOLUA_DISABLE_tolua_set_CliMapName
+static int tolua_set_CliMapName(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  CliMapName = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
 {
@@ -18831,6 +18856,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"SyncRand",tolua_stratagus_SyncRand00);
   tolua_function(tolua_S,"SyncRand",tolua_stratagus_SyncRand01);
   tolua_function(tolua_S,"Exit",tolua_stratagus_Exit00);
+  tolua_variable(tolua_S,"CliMapName",tolua_get_CliMapName,tolua_set_CliMapName);
  tolua_endmodule(tolua_S);
  return 1;
 }
