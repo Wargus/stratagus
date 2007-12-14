@@ -769,6 +769,12 @@ function RunMainMenu(s)
   end
 end
 
+function RunMapFromCommandLine()
+  if (CliMapName ~= "") then
+    RunMap(CliMapName, nil, true, false)
+  end
+end
 
+RunMapFromCommandLine()
 RunMainMenu()
 
