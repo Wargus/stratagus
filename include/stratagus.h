@@ -57,6 +57,7 @@
 #define unlink _unlink
 #include <string.h>
 #define strdup _strdup
+#define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #include <io.h>
 #define access _access

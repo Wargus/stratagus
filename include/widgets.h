@@ -30,6 +30,7 @@
 
 #include <guichan.h>
 #include <guichan/gsdl.h>
+#include "font.h"
 
 typedef int lua_Object; // from tolua++.h
 
@@ -80,7 +81,10 @@ public:
 class ButtonWidget : public gcn::Button 
 {
 public:
-	ButtonWidget(const std::string &caption) : Button(caption) {}
+	ButtonWidget(const std::string &caption) : Button(caption)
+	{
+		this->setHotKey(GetHotKey(caption));
+	}
 }; 
 
 class ImageButton : public gcn::Button
