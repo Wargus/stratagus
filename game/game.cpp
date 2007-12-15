@@ -373,7 +373,7 @@ bool GetGamePaused()
 */
 void SetGameSpeed(int speed)
 {
-	if (FastForwardCycle < GameCycle) {
+	if (GameCycle == 0 || FastForwardCycle < GameCycle) {
 		VideoSyncSpeed = speed * 100 / CYCLES_PER_SECOND;
 		SetVideoSync();
 	}
