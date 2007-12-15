@@ -1,0 +1,281 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nl\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-12-15 01:30+0100\n"
+"Last-Translator: Eric Kok <erickok@gmail.com>\n"
+"Language-Team: Dutch <foppe.benedictus@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Dutch\n"
+
+#: action/action_build.cpp:131
+msgid "You cannot reach building place"
+msgstr "Je kunt bouwplaats niet bereiken"
+
+#: action/action_build.cpp:210
+#, c-format
+msgid "You cannot build %s here"
+msgstr "Je kunt %s hier niet bouwen"
+
+#: action/action_build.cpp:224
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Kan niet meer eenheden %s produceren"
+
+#: action/action_build.cpp:256
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Kan gebouw %s niet bouwen"
+
+#: action/action_build.cpp:450
+#, c-format
+msgid "New %s done"
+msgstr "Nieuwe %s gereed"
+
+#: action/action_spellcast.cpp:172
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: niet genoeg kracht voor vloek: %s"
+
+#: action/action_spellcast.cpp:176
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: kan vloek niet uitspreken: %s"
+
+#: action/action_train.cpp:185
+#, c-format
+msgid "New %s ready"
+msgstr "Nieuwe %s klaar"
+
+#: action/action_train.cpp:231
+#, c-format
+msgid "Unable to train %s"
+msgstr "Kan %s niet trainen"
+
+#: action/command.cpp:1026
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Speler \"%s\" heeft het spel verlaten"
+
+#: action/command.cpp:1028
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Speler \"%s\" is gedood"
+
+#: editor/editloop.cpp:516
+msgid "~!OK"
+msgstr "~!OK"
+
+#: editor/editloop.cpp:524
+msgid "~!Cancel"
+msgstr "~!Annuleer"
+
+#: editor/editloop.cpp:1308
+msgid "Unit can't be placed here."
+msgstr "Eenheid kan hier niet geplaatst worden."
+
+#: editor/editloop.cpp:1380
+msgid "Mirror editing enabled: 2-side"
+msgstr "Spiegelbewerken ingeschakeld: 2 kanten"
+
+#: editor/editloop.cpp:1383
+msgid "Mirror editing enabled: 4-side"
+msgstr "Spiegelbewerken ingeschakeld: 4 kanten"
+
+#: editor/editloop.cpp:1386
+msgid "Mirror editing disabled"
+msgstr "Spiegelbewerken uitgeschakeld"
+
+#: editor/editloop.cpp:1406
+msgid "Unit deleted"
+msgstr "Eenheid verwijderd"
+
+#: editor/editloop.cpp:1429
+#: editor/editloop.cpp:1438
+msgid "Unit owner modified"
+msgstr "Eenheid eigenaar veranderd"
+
+#: editor/editloop.cpp:1759
+msgid "Select mode"
+msgstr "Selecteer modus"
+
+#: editor/editloop.cpp:1769
+msgid "Unit mode"
+msgstr "Eenheid modus"
+
+#: editor/editloop.cpp:1780
+msgid "Tile mode"
+msgstr "Tegel modus"
+
+#: editor/editloop.cpp:1791
+msgid "Set start location mode"
+msgstr "Startplaats modus"
+
+#: network/commands.cpp:796
+msgid "No sync info for this replay !"
+msgstr "Geen synchronisatieinfo voor deze herhaling !"
+
+#: network/commands.cpp:798
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Herhalingsynchronisatieprobleem (%lu) !"
+
+#: network/commands.cpp:807
+msgid "Replay got out of sync !"
+msgstr "Herhalingsynchronisatieprobleem"
+
+#: network/commands.cpp:906
+#: network/commands.cpp:921
+msgid "End of replay"
+msgstr "Einde van herhaling"
+
+#: network/network.cpp:1061
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s stuurde ongeldige opdracht"
+
+#: network/network.cpp:1158
+msgid "Network out of sync"
+msgstr "Netwerksynchronisatieprobleem"
+
+#: network/network.cpp:1391
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Wacht op speler \"%s\": %d:%02d"
+
+#: network/network.cpp:1407
+msgid "Timed out"
+msgstr "Tijdslimiet verstreken"
+
+#: stratagus/player.cpp:706
+msgid "Building Limit Reached"
+msgstr "Bouwlimiet bereikt"
+
+#: stratagus/player.cpp:710
+msgid "Unit Limit Reached"
+msgstr "Eenheidlimiet bereikt"
+
+#: stratagus/player.cpp:714
+msgid "Total Unit Limit Reached"
+msgstr "Totale eenhedenlimiet bereikt"
+
+#: stratagus/player.cpp:718
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "Limiet van %d bereikt voor dit eenheidtype"
+
+#: stratagus/player.cpp:724
+msgid "Cannot create more units."
+msgstr "Kan niet meer eenheden produceren."
+
+#: stratagus/stratagus.cpp:735
+#, c-format
+msgid "Thanks for playing Bos Wars.\n"
+msgstr "Bedankt voor het spelen van Bos Wars.\n"
+
+#: ui/botpanel.cpp:666
+#: ui/botpanel.cpp:731
+msgid "Select Target"
+msgstr "Selecteer doel"
+
+#: ui/botpanel.cpp:779
+msgid "Select Location"
+msgstr "Selecteer locatie"
+
+#: ui/interface.cpp:94
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "BERICHT:%s~!_"
+
+#: ui/interface.cpp:246
+msgid "Sound is on."
+msgstr "Geluid staat aan."
+
+#: ui/interface.cpp:248
+msgid "Sound is off."
+msgstr "Geluid staat uit."
+
+#: ui/interface.cpp:263
+msgid "Music is off."
+msgstr "Muziek staat aan."
+
+#: ui/interface.cpp:266
+msgid "Music is on."
+msgstr "Muziek staat uit."
+
+#: ui/interface.cpp:279
+#: ui/mouse.cpp:1610
+msgid "Game Paused"
+msgstr "Spel gepauzeerd"
+
+#: ui/interface.cpp:281
+msgid "Game Resumed"
+msgstr "Spel hervat"
+
+#: ui/interface.cpp:312
+msgid "Big map enabled"
+msgstr "Grote kaart ingeschakeld"
+
+#: ui/interface.cpp:321
+msgid "Returning to old map"
+msgstr "Terug naar oude kaart"
+
+#: ui/interface.cpp:335
+msgid "Faster"
+msgstr "Sneller"
+
+#: ui/interface.cpp:354
+msgid "Slower"
+msgstr "Langzamer"
+
+#: ui/interface.cpp:409
+msgid "Terrain displayed."
+msgstr "Terrein getoond."
+
+#: ui/interface.cpp:411
+msgid "Terrain hidden."
+msgstr "Terrein verborgen."
+
+#: ui/interface.cpp:444
+msgid "Grab mouse toggled."
+msgstr "Muis 'vast in venster' aan/uit"
+
+#: ui/interface.cpp:919
+msgid "Screenshot made."
+msgstr "Screenshot gemaakt."
+
+#: ui/mainscr.cpp:694
+msgid "Energy"
+msgstr "Energie"
+
+#: ui/mainscr.cpp:694
+msgid "Magma"
+msgstr "Magma"
+
+#: ui/mainscr.cpp:919
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Laatste bericht ~<%d~> keren herhaald"
+
+#: ui/mainscr.cpp:1044
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Evenement: %s~>"
+
+#: ui/mouse.cpp:1778
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Je hebt  ~<%d~> %ss"
+
+#: ui/mouse.cpp:1782
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "Je hebt ~<%d~> %s(s)"
+
+#: unit/unit.cpp:2744
+#, c-format
+msgid "%s attacked"
+msgstr "%s aangevallen"
+
