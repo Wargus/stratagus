@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-15 13:05-0800\n"
+"POT-Creation-Date: 2007-12-15 14:05-0800\n"
 "PO-Revision-Date: 2006-12-12 21:22-0800\n"
 "Last-Translator: Francois Beerten\n"
 "MIME-Version: 1.0\n"
@@ -236,6 +236,30 @@ msgstr "puntero del raton mostrado."
 #: ui/interface.cpp:930
 msgid "Screenshot made."
 msgstr "se ha realizado un captura de pantalla."
+
+#: ui/mainscr.cpp:172
+msgid "Armor: "
+msgstr ""
+
+#: ui/mainscr.cpp:178
+msgid "Radar Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:183
+msgid "Sight Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:190
+msgid "Kills: "
+msgstr ""
+
+#: ui/mainscr.cpp:195
+msgid "Attack Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:202
+msgid "Damage: "
+msgstr ""
 
 #: ui/mainscr.cpp:372
 msgid "Energy"
