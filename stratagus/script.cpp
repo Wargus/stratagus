@@ -122,12 +122,12 @@ static void l_message(const char *pname, const char *msg, bool exit)
 **  Check error status, and print error message and exit
 **  if status is different of 0.
 **
-**  @param status  status of the last lua call. (0: success)
-**  @param exit    exit the program on error
+**  @param status       status of the last lua call. (0: success)
+**  @param exitOnError  exit the program on error
 **
-**  @return        0 in success, else exit.
+**  @return             0 in success, else exit.
 */
-static int report(int status, bool exit)
+static int report(int status, bool exitOnError)
 {
 	const char *msg;
 
@@ -136,7 +136,7 @@ static int report(int status, bool exit)
 		if (msg == NULL) {
 			msg = "(error with no message)";
 		}
-		l_message(NULL, msg, exit);
+		l_message(NULL, msg, exitOnError);
 		lua_pop(Lua, 1);
 	}
 	return status;
@@ -165,12 +165,13 @@ static int luatraceback(lua_State *L)
 /**
 **  Call a lua function
 **
-**  @param narg   Number of arguments
-**  @param clear  Clear the return value(s)
+**  @param narg         Number of arguments
+**  @param clear        Clear the return value(s)
+**  @param exitOnError  Exit the program when an error occurs
 **
-**  @return       0 in success, else exit.
+**  @return             0 in success, else exit.
 */
-int LuaCall(int narg, int clear)
+int LuaCall(int narg, int clear, bool exitOnError)
 {
 	int status;
 	int base;
@@ -183,7 +184,7 @@ int LuaCall(int narg, int clear)
 	signal(SIGINT, SIG_DFL);
 	lua_remove(Lua, base);  // remove traceback function
 
-	return report(status, true);
+	return report(status, exitOnError);
 }
 
 /**
