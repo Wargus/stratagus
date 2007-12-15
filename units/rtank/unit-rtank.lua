@@ -102,7 +102,7 @@ DefineAllow("unit-rtank", AllowAll)
 
 DefineButton({
     Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",
-    Value = "unit-rtank", Key = "r", Hint = "BUILD ~!ROCKET TANK",
+    Value = "unit-rtank", Hint = "BUILD ~!ROCKET TANK",
     ForUnit = {"unit-vfac"}})
 
 DefineCommonButtons({"unit-rtank"})

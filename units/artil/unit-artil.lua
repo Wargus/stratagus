@@ -111,7 +111,7 @@ DefineCommonButtons({"unit-artil"})
 
 DefineButton({
     Pos = 6, Level = 0, Icon = "icon-artil", Action = "train-unit",
-    Value = "unit-artil", Key = "l", Hint = "BUILD ARTI~!L",
+    Value = "unit-artil", Hint = "BUILD ARTI~!L",
     ForUnit = {"unit-vfac"}})
 
 

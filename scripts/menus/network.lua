@@ -64,7 +64,7 @@ function ErrorMenu(errmsg)
   l:setBackgroundColor(dark)
   menu:add(l, Video.Width / 2 - 170, Video.Height / 2 - 100)
 
-  menu:addButton(_("~!OK"), "o", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("~!OK"), Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()
@@ -174,7 +174,7 @@ function RunJoiningMapMenu(s)
   end
   menu:addCheckBox(_("~!Ready"), sx*11,  sy*14, readycb)
 
-  menu:addButton(_("~!Cancel"), "c", sx * 10 - 100, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), sx * 10 - 100, Video.Height - 100,
                  function() 
                  NetworkDetachFromServer() menu:stop() end
   )
@@ -240,7 +240,7 @@ function RunJoiningGameMenu(s)
   menu:add(sb, x-50, Video.Height/2)
   sb:setBackgroundColor(dark)
 
-  menu:addButton(_("~!Cancel"), "c", x, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
                  function() menu:stop() end)
 
   local function checkconnection() 
@@ -286,7 +286,7 @@ function RunJoinIpMenu()
   menu = BosMenu(_("Enter Server address"))
   menu:writeText(_("IP or server name :"), x, Video.Height*8/20)
   server = menu:addTextInputField("localhost", x + 60, Video.Height*9/20 + 4, 130)
-  menu:addButton(_("~!Join Game"), "j", x,  Video.Height*10/20, 
+  menu:addButton(_("~!Join Game"), x,  Video.Height*10/20, 
     function(s) 
       -- FIXME: allow port ("localhost:1234")
       if (NetworkSetupServerAddress(server:getText()) ~= 0) then
@@ -301,7 +301,7 @@ function RunJoinIpMenu()
       menu:stop() 
     end
   )
-  menu:addButton(_("~!Cancel"), "c", x, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
                  function() menu:stop() end)
   menu:run()
 end
@@ -375,11 +375,10 @@ function RunServerMultiGameMenu(map, description, numplayers)
   ServerSetupState.ResourcesOption = 3
   ServerSetupState.GameTypeOption = SettingsGameTypeMapDefault
 
-  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
 
   startgame = menu:addButton(_("~!Start Game"), 
-    "s", 
     Video.Width / 2 + 50, 
     Video.Height - 100,
     function(s)    
@@ -450,9 +449,9 @@ function RunCreateMultiGameMenu(s)
   end
   browser:setActionCallback(cb)
   
-  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop(1) end)
-  menu:addButton(_("Create ~!Game"), "g", Video.Width / 2 + 50, Video.Height - 100,
+  menu:addButton(_("Create ~!Game"), Video.Width / 2 + 50, Video.Height - 100,
     function(s)    
       print (description)
       RunServerMultiGameMenu("maps/"..browser:getSelectedMap(), description, numplayers)
@@ -476,7 +475,7 @@ function RunMultiPlayerMenu(s)
 
   ResetMapOptions()
   InitNetwork1()
-  menu:addButton(_("~!Join Game"), "j", x, Video.Height*11/20, 
+  menu:addButton(_("~!Join Game"), x, Video.Height*11/20, 
     function(s)
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())
@@ -486,7 +485,7 @@ function RunMultiPlayerMenu(s)
       RunJoinIpMenu()
       menu:stop(1)
     end)
-  menu:addButton(_("Create ~!Game"), "g", x, Video.Height*12/20, 
+  menu:addButton(_("Create ~!Game"), x, Video.Height*12/20, 
     function(s)
       if nick:getText() ~= GetLocalPlayerName() then
         SetLocalPlayerName(nick:getText())
@@ -497,7 +496,7 @@ function RunMultiPlayerMenu(s)
       menu:stop(1)
     end)
 
-  menu:addButton(_("~!Cancel"), "c", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), Video.Width / 2 - 100, Video.Height - 100,
                  function() menu:stop() end)
   menu:run()
   ExitNetwork1()

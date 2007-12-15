@@ -55,7 +55,7 @@ function RunBriefingMenu(objectivestext, briefingtext, briefingsound)
   t:setBackgroundColor(dark)
   menu:add(t, Video.Width / 2 - 200, Video.Height / 20 * 3)
 
-  menu:addButton(_("~!Start"), "s", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("~!Start"), Video.Width / 2 - 100, Video.Height - 100,
     function()
       if (channel ~= nil) then StopChannel(channel) end
       menu:stop()
@@ -139,9 +139,9 @@ function RunCampaignsMenu(s)
     RunCampaign("campaigns/" .. browser:getSelectedItem() .. "/campaign.lua")
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("~!Start"), "s", Video.Width / 2 + 50 ,  Video.Height - 100,
+  menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)
 
   menu:run()

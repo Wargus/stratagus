@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-cs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-08 08:54-0700\n"
+"POT-Creation-Date: 2007-12-15 13:05-0800\n"
 "PO-Revision-Date: 2007-07-27 17:40+0100\n"
 "Last-Translator: Radim Luža <radimluza@seznam.cz>\n"
 "Language-Team: Czech\n"
@@ -23,235 +23,239 @@ msgstr ""
 msgid "Kill them all !"
 msgstr "Zničte je všechny !"
 
-#: scripts/guichan.lua:322
+#: scripts/boswars.lua:231
+msgid "Eliminate your enemies."
+msgstr "Zlikviduj nepřátele."
+
+#: scripts/guichan.lua:321
 msgid "Empty sub menu"
 msgstr "Prázdné podmenu"
 
-#: scripts/guichan.lua:334
+#: scripts/guichan.lua:333
 msgid "Victory !"
 msgstr "Vítězství!"
 
-#: scripts/guichan.lua:337
+#: scripts/guichan.lua:336
 msgid "Draw !"
 msgstr "Nerozhodně !"
 
-#: scripts/guichan.lua:339
+#: scripts/guichan.lua:338
 msgid "Defeat !"
 msgstr "Poražen !"
 
-#: scripts/guichan.lua:345
+#: scripts/guichan.lua:344
 msgid "Results"
 msgstr "Výsledky"
 
-#: scripts/guichan.lua:348
+#: scripts/guichan.lua:347
 msgid "Player"
 msgstr "Hráč"
 
-#: scripts/guichan.lua:349
+#: scripts/guichan.lua:348
 msgid "Units"
 msgstr "Jednotky"
 
-#: scripts/guichan.lua:350
+#: scripts/guichan.lua:349
 msgid "Buildings"
 msgstr "Budovy"
 
-#: scripts/guichan.lua:351
+#: scripts/guichan.lua:350
 msgid "Kills"
 msgstr "Zabito"
 
-#: scripts/guichan.lua:352
+#: scripts/guichan.lua:351
 msgid "Razings"
 msgstr "Zbořeno"
 
-#: scripts/guichan.lua:364
+#: scripts/guichan.lua:363
 msgid "~!Continue"
 msgstr "Pokračovat (~!c)"
 
-#: scripts/guichan.lua:461
+#: scripts/guichan.lua:460
 msgid "Start Game"
 msgstr "Start hry"
 
-#: scripts/guichan.lua:463 scripts/guichan.lua:685
+#: scripts/guichan.lua:462 scripts/guichan.lua:684
 #: scripts/menus/network.lua:130 scripts/menus/network.lua:318
 msgid "Map"
 msgstr "Mapa"
 
-#: scripts/guichan.lua:464 scripts/guichan.lua:686
+#: scripts/guichan.lua:463 scripts/guichan.lua:685
 #: scripts/menus/network.lua:131 scripts/menus/network.lua:319
-#: scripts/menus/network.lua:420
+#: scripts/menus/network.lua:419
 msgid "File:"
 msgstr "Soubor:"
 
-#: scripts/guichan.lua:467 scripts/guichan.lua:652 scripts/guichan.lua:690
-#: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:425
+#: scripts/guichan.lua:466 scripts/guichan.lua:651 scripts/guichan.lua:689
+#: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:424
 msgid "Size:"
 msgstr "Rozměr:"
 
-#: scripts/guichan.lua:470 scripts/guichan.lua:688
+#: scripts/guichan.lua:469 scripts/guichan.lua:687
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:322
-#: scripts/menus/network.lua:423
+#: scripts/menus/network.lua:422
 msgid "Players:"
 msgstr "Hráči:"
 
-#: scripts/guichan.lua:472 scripts/guichan.lua:692
+#: scripts/guichan.lua:471 scripts/guichan.lua:691
 #: scripts/menus/network.lua:136 scripts/menus/network.lua:324
-#: scripts/menus/network.lua:427
+#: scripts/menus/network.lua:426
 msgid "Description:"
 msgstr "Popis:"
 
-#: scripts/guichan.lua:476 scripts/menus/network.lua:140
+#: scripts/guichan.lua:475 scripts/menus/network.lua:140
 #: scripts/menus/network.lua:333
 msgid "Fog of war"
 msgstr "Mlha války:"
 
-#: scripts/guichan.lua:479 scripts/guichan.lua:545
+#: scripts/guichan.lua:478 scripts/guichan.lua:544
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:340
 msgid "Reveal map"
 msgstr "Odhalit mapu"
 
-#: scripts/guichan.lua:483 scripts/menus/network.lua:147
+#: scripts/guichan.lua:482 scripts/menus/network.lua:147
 #: scripts/menus/network.lua:342
 msgid "Difficulty:"
 msgstr "Obtížnost:"
 
-#: scripts/guichan.lua:484 scripts/menus/network.lua:148
+#: scripts/guichan.lua:483 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "easy"
 msgstr "snadná"
 
-#: scripts/guichan.lua:484 scripts/guichan.lua:488
+#: scripts/guichan.lua:483 scripts/guichan.lua:487
 #: scripts/menus/network.lua:148 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:343 scripts/menus/network.lua:351
 msgid "normal"
 msgstr "střední"
 
-#: scripts/guichan.lua:484 scripts/menus/network.lua:148
+#: scripts/guichan.lua:483 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "hard"
 msgstr "těžká"
 
-#: scripts/guichan.lua:487 scripts/menus/network.lua:151
+#: scripts/guichan.lua:486 scripts/menus/network.lua:151
 #: scripts/menus/network.lua:350
 msgid "Starting resources:"
 msgstr "Suroviny na začátku:"
 
-#: scripts/guichan.lua:488 scripts/menus/network.lua:152
+#: scripts/guichan.lua:487 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "high"
 msgstr "velké"
 
-#: scripts/guichan.lua:488 scripts/menus/network.lua:152
+#: scripts/guichan.lua:487 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "low"
 msgstr "malé"
 
-#: scripts/guichan.lua:491 scripts/menus/network.lua:155
+#: scripts/guichan.lua:490 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
 msgstr "Typ hry:"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
 msgstr "Výchozí pro mapu"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
 msgstr "Všichni proti všem"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
 msgstr "Jak kdo chce"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
 msgstr "Horní proti Spodním"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
 msgstr "Leví proti Pravým"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
 msgstr "Lidé proti Strojům"
 
-#: scripts/guichan.lua:524 scripts/guichan.lua:556 scripts/guichan.lua:600
-#: scripts/guichan.lua:668 scripts/guichan.lua:720
-#: scripts/menus/campaigns.lua:142 scripts/menus/credits.lua:143
+#: scripts/guichan.lua:523 scripts/guichan.lua:555 scripts/guichan.lua:599
+#: scripts/guichan.lua:667 scripts/guichan.lua:719
+#: scripts/menus/campaigns.lua:142 scripts/menus/credits.lua:141
 msgid "~!Main Menu"
 msgstr "Hlavní ~!Menu"
 
-#: scripts/guichan.lua:526 scripts/guichan.lua:558 scripts/guichan.lua:602
+#: scripts/guichan.lua:525 scripts/guichan.lua:557 scripts/guichan.lua:601
 #: scripts/menus/campaigns.lua:58 scripts/menus/campaigns.lua:144
 msgid "~!Start"
 msgstr ""
 
-#: scripts/guichan.lua:535
+#: scripts/guichan.lua:534
 msgid "Show a Replay"
 msgstr "Zobrazit Záznam"
 
-#: scripts/guichan.lua:569
+#: scripts/guichan.lua:568
 msgid "Load Game"
 msgstr "Načíst hru"
 
-#: scripts/guichan.lua:613 scripts/guichan.lua:633 scripts/guichan.lua:683
+#: scripts/guichan.lua:612 scripts/guichan.lua:632 scripts/guichan.lua:682
 msgid "Editor"
 msgstr ""
 
-#: scripts/guichan.lua:615
+#: scripts/guichan.lua:614
 msgid "Create ~!New Map"
 msgstr "Vytvořit ~!Novou Mapu"
 
-#: scripts/guichan.lua:617
+#: scripts/guichan.lua:616
 msgid "~!Load Map"
 msgstr "Načíst Mapu (~!l)"
 
-#: scripts/guichan.lua:620 scripts/menus/ingame/editor.lua:125
+#: scripts/guichan.lua:619 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:305
 #: scripts/menus/network.lua:177 scripts/menus/network.lua:243
 #: scripts/menus/network.lua:304 scripts/menus/network.lua:378
-#: scripts/menus/network.lua:453 scripts/menus/network.lua:500
+#: scripts/menus/network.lua:452 scripts/menus/network.lua:499
 msgid "~!Cancel"
 msgstr "Kone~!c"
 
-#: scripts/guichan.lua:670 scripts/guichan.lua:722 scripts/guichan.lua:751
+#: scripts/guichan.lua:669 scripts/guichan.lua:721 scripts/guichan.lua:750
 msgid "Start ~!Editor"
 msgstr "Spustit ~!Editor"
 
-#: scripts/guichan.lua:742 scripts/menus/network.lua:381
+#: scripts/guichan.lua:741 scripts/menus/network.lua:381
 msgid "~!Start Game"
 msgstr "~!Start Hry"
 
-#: scripts/guichan.lua:743
+#: scripts/guichan.lua:742
 msgid "~!Load Game"
 msgstr "Načíst Hru (~!l)"
 
-#: scripts/guichan.lua:744
+#: scripts/guichan.lua:743
 msgid "~!Campaigns"
 msgstr "Tažení (~!c)"
 
-#: scripts/guichan.lua:745
+#: scripts/guichan.lua:744
 msgid "Show ~!Replay"
 msgstr "Ukázat Záznam (~!r)"
 
-#: scripts/guichan.lua:747
+#: scripts/guichan.lua:746
 msgid "~!MultiPlayer"
 msgstr ""
 
-#: scripts/guichan.lua:748
+#: scripts/guichan.lua:747
 msgid "~!Options"
 msgstr "Volby (~!o)"
 
-#: scripts/guichan.lua:750
+#: scripts/guichan.lua:749
 msgid "Cre~!dits"
 msgstr "Autoři (~!d)"
 
-#: scripts/guichan.lua:753
+#: scripts/guichan.lua:752
 msgid "E~!xit"
 msgstr "Konec (~!x)"
 
@@ -295,19 +299,19 @@ msgstr "Patche"
 msgid "Stratagus Media Project Graphics"
 msgstr ""
 
-#: scripts/menus/credits.lua:128
+#: scripts/menus/credits.lua:126
 msgid "The Bos Wars Team thanks"
 msgstr "Bos Wars tým děkuje"
 
-#: scripts/menus/credits.lua:129
+#: scripts/menus/credits.lua:127
 msgid "everybody who has contributed"
 msgstr "všem, kteří přispěli"
 
-#: scripts/menus/credits.lua:130
+#: scripts/menus/credits.lua:128
 msgid "patches, bug reports, ideas."
 msgstr "patchi, hlášením chyb, nápady."
 
-#: scripts/menus/credits.lua:133
+#: scripts/menus/credits.lua:131
 msgid "Bos Wars Credits"
 msgstr "Autoři Bos Wars"
 
@@ -991,8 +995,9 @@ msgid "Incompatible engine version"
 msgstr "Nekopatibilní verze enginu"
 
 #: scripts/menus/network.lua:272
-msgid "Incompatible netowrk version"
-msgstr ""
+#, fuzzy
+msgid "Incompatible network version"
+msgstr "Nekopatibilní verze enginu"
 
 #: scripts/menus/network.lua:286
 msgid "Enter Server address"
@@ -1002,7 +1007,7 @@ msgstr "Zadejte adresu serveru"
 msgid "IP or server name :"
 msgstr "IP nebo název serveru :"
 
-#: scripts/menus/network.lua:289 scripts/menus/network.lua:479
+#: scripts/menus/network.lua:289 scripts/menus/network.lua:478
 msgid "~!Join Game"
 msgstr "Připojit do Hry (~!j)"
 
@@ -1010,31 +1015,31 @@ msgstr "Připojit do Hry (~!j)"
 msgid "Invalid server name"
 msgstr "Nesprávné jméno serveru"
 
-#: scripts/menus/network.lua:316 scripts/menus/network.lua:418
+#: scripts/menus/network.lua:316 scripts/menus/network.lua:417
 msgid "Create MultiPlayer game"
 msgstr "Vytvořit MultiPlayer hru"
 
-#: scripts/menus/network.lua:398
+#: scripts/menus/network.lua:397
 msgid "Waiting for players"
 msgstr "Čekám na hráče"
 
-#: scripts/menus/network.lua:411
+#: scripts/menus/network.lua:410
 msgid "No Map"
 msgstr "Žádná mapa"
 
-#: scripts/menus/network.lua:412
+#: scripts/menus/network.lua:411
 msgid "No map"
 msgstr "Žádná mapa"
 
-#: scripts/menus/network.lua:455 scripts/menus/network.lua:489
+#: scripts/menus/network.lua:454 scripts/menus/network.lua:488
 msgid "Create ~!Game"
 msgstr "Vytvořit Hru (~!g)"
 
-#: scripts/menus/network.lua:472
+#: scripts/menus/network.lua:471
 msgid "MultiPlayer"
 msgstr ""
 
-#: scripts/menus/network.lua:474
+#: scripts/menus/network.lua:473
 msgid "Nickname :"
 msgstr "Přezdívka :"
 
@@ -1101,7 +1106,3 @@ msgstr "Hlavní ~!Menu"
 #: scripts/menus/options.lua:325
 msgid "Options"
 msgstr "Volby"
-
-#: scripts/stratagus.lua:234
-msgid "Eliminate your enemies."
-msgstr "Zlikviduj nepřátele."

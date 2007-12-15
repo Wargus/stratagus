@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stratagus traduction\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-09 21:41+0200\n"
+"POT-Creation-Date: 2007-12-15 13:05-0800\n"
 "PO-Revision-Date: 2006-03-23 14:12+0100\n"
 "Last-Translator: Alexander Petkov <sasho_manga_fen@yahoo.com>\n"
 "Language-Team: Bulgarian\n"
@@ -17,26 +17,26 @@ msgstr ""
 "X-Poedit-Language: Bulgarian\n"
 "X-Poedit-Country: BULGARIA\n"
 
-#: action/action_build.cpp:131
+#: action/action_build.cpp:132
 msgid "You cannot reach building place"
 msgstr "Не правилно място да строене"
 
-#: action/action_build.cpp:210
+#: action/action_build.cpp:211
 #, c-format
 msgid "You cannot build %s here"
 msgstr "Не можете да стоите %s тук"
 
-#: action/action_build.cpp:224
+#: action/action_build.cpp:225
 #, c-format
 msgid "Can't build more units %s"
 msgstr "Не може да строите повече единици %s"
 
-#: action/action_build.cpp:256
+#: action/action_build.cpp:257
 #, c-format
 msgid "Unable to create building %s"
 msgstr "Не мога да пусна сградата %s"
 
-#: action/action_build.cpp:450
+#: action/action_build.cpp:451
 #, c-format
 msgid "New %s done"
 msgstr "Новата %s Завършена?e"
@@ -56,7 +56,7 @@ msgstr "%s: Не мога да хвърля магията: %s"
 msgid "New %s ready"
 msgstr "Новият %s Е готов?"
 
-#: action/action_train.cpp:231
+#: action/action_train.cpp:236
 #, c-format
 msgid "Unable to train %s"
 msgstr "Не мога да обуча %s"
@@ -71,214 +71,210 @@ msgstr "Играча \"%s\" напусна играта"
 msgid "Player \"%s\" has been killed"
 msgstr "Играча \"%s\" Беше убит"
 
-#: editor/editloop.cpp:516
-msgid "~!OK"
-msgstr ""
-
-#: editor/editloop.cpp:524
-msgid "~!Cancel"
-msgstr ""
-
-#: editor/editloop.cpp:1308
+#: editor/editloop.cpp:1197
 msgid "Unit can't be placed here."
 msgstr "Единицата не може да бъде поставена тук"
 
-#: editor/editloop.cpp:1380
+#: editor/editloop.cpp:1269
 msgid "Mirror editing enabled: 2-side"
 msgstr "Mirror editing enabled: 2-side"
 
-#: editor/editloop.cpp:1383
+#: editor/editloop.cpp:1272
 msgid "Mirror editing enabled: 4-side"
 msgstr "Mirror editing enabled: 4-side"
 
-#: editor/editloop.cpp:1386
+#: editor/editloop.cpp:1275
 msgid "Mirror editing disabled"
 msgstr "Mirror editing disabled"
 
-#: editor/editloop.cpp:1406
+#: editor/editloop.cpp:1295
 msgid "Unit deleted"
 msgstr "Единицата изтрита"
 
-#: editor/editloop.cpp:1429 editor/editloop.cpp:1438
+#: editor/editloop.cpp:1318 editor/editloop.cpp:1327
 msgid "Unit owner modified"
 msgstr "Unit owner modified"
 
-#: editor/editloop.cpp:1759
+#: editor/editloop.cpp:1648
 msgid "Select mode"
 msgstr "Селектиране"
 
-#: editor/editloop.cpp:1769
+#: editor/editloop.cpp:1658
 msgid "Unit mode"
 msgstr "Unit mode"
 
-#: editor/editloop.cpp:1780
+#: editor/editloop.cpp:1669
 msgid "Tile mode"
 msgstr "Tile mode"
 
-#: editor/editloop.cpp:1791
+#: editor/editloop.cpp:1680
 msgid "Set start location mode"
 msgstr "Set start location mode"
 
-#: network/commands.cpp:796
-msgid "No sync info for this replay !"
-msgstr "No sync info for this replay !"
-
-#: network/commands.cpp:798
-#, c-format
-msgid "Replay got out of sync (%lu) !"
-msgstr "Replay got out of sync (%lu) !"
-
-#: network/commands.cpp:807
-msgid "Replay got out of sync !"
-msgstr "Replay got out of sync !"
-
-#: network/commands.cpp:906 network/commands.cpp:921
-msgid "End of replay"
-msgstr "Край на Replay"
-
-#: network/network.cpp:1061
-#, fuzzy, c-format
-msgid "%s sent bad command"
-msgstr "%s Sent Bad Command"
-
-#: network/network.cpp:1158
-msgid "Network out of sync"
-msgstr "Network out of sync"
-
-#: network/network.cpp:1391
-#, c-format
-msgid "Waiting for player \"%s\": %d:%02d"
-msgstr "En attente de joueurs \"%s\": %d:%02d"
-
-#: network/network.cpp:1407
-msgid "Timed out"
-msgstr "Timed out"
-
-#: stratagus/player.cpp:706
+#: game/player.cpp:706
 msgid "Building Limit Reached"
 msgstr ""
 
-#: stratagus/player.cpp:710
+#: game/player.cpp:710
 msgid "Unit Limit Reached"
 msgstr ""
 
-#: stratagus/player.cpp:714
+#: game/player.cpp:714
 msgid "Total Unit Limit Reached"
 msgstr ""
 
-#: stratagus/player.cpp:718
+#: game/player.cpp:718
 #, c-format
 msgid "Limit of %d reached for this unit type"
 msgstr ""
 
-#: stratagus/player.cpp:724
+#: game/player.cpp:724
 #, fuzzy
 msgid "Cannot create more units."
 msgstr "Не може да строите повече единици %s"
 
-#: stratagus/stratagus.cpp:735
+#: game/replay.cpp:788
+msgid "No sync info for this replay !"
+msgstr "No sync info for this replay !"
+
+#: game/replay.cpp:790
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Replay got out of sync (%lu) !"
+
+#: game/replay.cpp:799
+msgid "Replay got out of sync !"
+msgstr "Replay got out of sync !"
+
+#: game/replay.cpp:897 game/replay.cpp:911
+msgid "End of replay"
+msgstr "Край на Replay"
+
+#: network/network.cpp:1063
+#, fuzzy, c-format
+msgid "%s sent bad command"
+msgstr "%s Sent Bad Command"
+
+#: network/network.cpp:1160
+msgid "Network out of sync"
+msgstr "Network out of sync"
+
+#: network/network.cpp:1393
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "En attente de joueurs \"%s\": %d:%02d"
+
+#: network/network.cpp:1409
+msgid "Timed out"
+msgstr "Timed out"
+
+#: stratagus/stratagus.cpp:596
 #, fuzzy, c-format
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Благодаря ви, че играхте Stratagus.\n"
 
-#: ui/botpanel.cpp:666 ui/botpanel.cpp:731
+#: ui/botpanel.cpp:786 ui/botpanel.cpp:851
 msgid "Select Target"
 msgstr "Select Target"
 
-#: ui/botpanel.cpp:779
+#: ui/botpanel.cpp:899
 msgid "Select Location"
 msgstr "Select Location"
 
-#: ui/interface.cpp:94
+#: ui/interface.cpp:95
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "MESSAGE:%s~!_"
 
-#: ui/interface.cpp:246
+#: ui/interface.cpp:247
 msgid "Sound is on."
 msgstr "Звука включен."
 
-#: ui/interface.cpp:248
+#: ui/interface.cpp:249
 msgid "Sound is off."
 msgstr "Звука изключен."
 
-#: ui/interface.cpp:263
+#: ui/interface.cpp:264
 msgid "Music is off."
 msgstr "Музиката изключена."
 
-#: ui/interface.cpp:266
+#: ui/interface.cpp:267
 msgid "Music is on."
 msgstr "Музиката включена."
 
-#: ui/interface.cpp:279 ui/mouse.cpp:1610
+#: ui/interface.cpp:280 ui/mouse.cpp:1609
 msgid "Game Paused"
 msgstr "Пауза на играта"
 
-#: ui/interface.cpp:281
+#: ui/interface.cpp:282
 msgid "Game Resumed"
 msgstr "Паузата на играта махната"
 
-#: ui/interface.cpp:312
+#: ui/interface.cpp:313
 msgid "Big map enabled"
 msgstr "Big map enabled"
 
-#: ui/interface.cpp:321
+#: ui/interface.cpp:322
 msgid "Returning to old map"
 msgstr "Returning to old map"
 
-#: ui/interface.cpp:335
+#: ui/interface.cpp:336
 msgid "Faster"
 msgstr "По бързо"
 
-#: ui/interface.cpp:354
+#: ui/interface.cpp:355
 msgid "Slower"
 msgstr "Бавно"
 
-#: ui/interface.cpp:409
+#: ui/interface.cpp:410
 msgid "Terrain displayed."
 msgstr "Terrain displayed."
 
-#: ui/interface.cpp:411
+#: ui/interface.cpp:412
 msgid "Terrain hidden."
 msgstr "Terrain hidden."
 
-#: ui/interface.cpp:444
+#: ui/interface.cpp:445
 msgid "Grab mouse toggled."
 msgstr "Grab mouse toggled."
 
-#: ui/interface.cpp:919
+#: ui/interface.cpp:930
 msgid "Screenshot made."
 msgstr "Screenshot made."
 
-#: ui/mainscr.cpp:694
+#: ui/mainscr.cpp:372
 msgid "Energy"
 msgstr ""
 
-#: ui/mainscr.cpp:694
+#: ui/mainscr.cpp:372
 msgid "Magma"
 msgstr ""
 
-#: ui/mainscr.cpp:919
+#: ui/mainscr.cpp:597
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Last message repeated ~<%d~> times"
 
-#: ui/mainscr.cpp:1044
+#: ui/mainscr.cpp:722
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<?v?Event: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Вие имате ~<%d~> %ss"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
 #, c-format
 msgid "You have ~<%d~> %s(s)"
 msgstr "Вие имате ~<%d~> %s(s)"
 
-#: unit/unit.cpp:2744
+#: unit/unit.cpp:2113
 #, c-format
 msgid "%s attacked"
 msgstr "%s Атакуван"
+
+#: video/sdl.cpp:269
+msgid "esc"
+msgstr ""

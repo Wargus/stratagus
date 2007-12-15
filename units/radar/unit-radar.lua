@@ -122,7 +122,7 @@ DefineAllow("unit-radar", AllowAll)
 
 DefineButton({
     Pos = 4, Level = 1, Icon = "icon-radar_b", Action = "build",
-    Value = "unit-radar", Key = "r", Hint = "BUILD ~!RADAR",
+    Value = "unit-radar", Hint = "BUILD ~!RADAR",
     ForUnit = {"unit-engineer"}})
 
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: bos-tr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-08 08:54-0700\n"
+"POT-Creation-Date: 2007-12-15 13:05-0800\n"
 "PO-Revision-Date: 2007-07-10 00:16+0300\n"
 "Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
 "Language-Team:  <tr@li.org>\n"
@@ -24,235 +24,239 @@ msgstr ""
 msgid "Kill them all !"
 msgstr "Hepsini öldür !"
 
-#: scripts/guichan.lua:322
+#: scripts/boswars.lua:231
+msgid "Eliminate your enemies."
+msgstr "Düşmanlarınızı yok edin."
+
+#: scripts/guichan.lua:321
 msgid "Empty sub menu"
 msgstr "ALt menüyü temizle"
 
-#: scripts/guichan.lua:334
+#: scripts/guichan.lua:333
 msgid "Victory !"
 msgstr "Zafer !"
 
-#: scripts/guichan.lua:337
+#: scripts/guichan.lua:336
 msgid "Draw !"
 msgstr "Berabere !"
 
-#: scripts/guichan.lua:339
+#: scripts/guichan.lua:338
 msgid "Defeat !"
 msgstr "Yenildiniz !"
 
-#: scripts/guichan.lua:345
+#: scripts/guichan.lua:344
 msgid "Results"
 msgstr "Sonuçlar"
 
-#: scripts/guichan.lua:348
+#: scripts/guichan.lua:347
 msgid "Player"
 msgstr "Oyuncu"
 
-#: scripts/guichan.lua:349
+#: scripts/guichan.lua:348
 msgid "Units"
 msgstr "Birimler"
 
-#: scripts/guichan.lua:350
+#: scripts/guichan.lua:349
 msgid "Buildings"
 msgstr "Binalar"
 
-#: scripts/guichan.lua:351
+#: scripts/guichan.lua:350
 msgid "Kills"
 msgstr "Öldürülenler"
 
-#: scripts/guichan.lua:352
+#: scripts/guichan.lua:351
 msgid "Razings"
 msgstr "Yıkılanlar"
 
-#: scripts/guichan.lua:364
+#: scripts/guichan.lua:363
 msgid "~!Continue"
 msgstr "~!Devam et"
 
-#: scripts/guichan.lua:461
+#: scripts/guichan.lua:460
 msgid "Start Game"
 msgstr "Oyunu Başlat"
 
-#: scripts/guichan.lua:463 scripts/guichan.lua:685
+#: scripts/guichan.lua:462 scripts/guichan.lua:684
 #: scripts/menus/network.lua:130 scripts/menus/network.lua:318
 msgid "Map"
 msgstr "Harita"
 
-#: scripts/guichan.lua:464 scripts/guichan.lua:686
+#: scripts/guichan.lua:463 scripts/guichan.lua:685
 #: scripts/menus/network.lua:131 scripts/menus/network.lua:319
-#: scripts/menus/network.lua:420
+#: scripts/menus/network.lua:419
 msgid "File:"
 msgstr "Dosya:"
 
-#: scripts/guichan.lua:467 scripts/guichan.lua:652 scripts/guichan.lua:690
-#: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:425
+#: scripts/guichan.lua:466 scripts/guichan.lua:651 scripts/guichan.lua:689
+#: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:424
 msgid "Size:"
 msgstr "Boyut:"
 
-#: scripts/guichan.lua:470 scripts/guichan.lua:688
+#: scripts/guichan.lua:469 scripts/guichan.lua:687
 #: scripts/menus/network.lua:134 scripts/menus/network.lua:322
-#: scripts/menus/network.lua:423
+#: scripts/menus/network.lua:422
 msgid "Players:"
 msgstr "Oyuncular:"
 
-#: scripts/guichan.lua:472 scripts/guichan.lua:692
+#: scripts/guichan.lua:471 scripts/guichan.lua:691
 #: scripts/menus/network.lua:136 scripts/menus/network.lua:324
-#: scripts/menus/network.lua:427
+#: scripts/menus/network.lua:426
 msgid "Description:"
 msgstr "Açıklama:"
 
-#: scripts/guichan.lua:476 scripts/menus/network.lua:140
+#: scripts/guichan.lua:475 scripts/menus/network.lua:140
 #: scripts/menus/network.lua:333
 msgid "Fog of war"
 msgstr "Savaş sisi"
 
-#: scripts/guichan.lua:479 scripts/guichan.lua:545
+#: scripts/guichan.lua:478 scripts/guichan.lua:544
 #: scripts/menus/network.lua:144 scripts/menus/network.lua:340
 msgid "Reveal map"
 msgstr "Haritayı göster"
 
-#: scripts/guichan.lua:483 scripts/menus/network.lua:147
+#: scripts/guichan.lua:482 scripts/menus/network.lua:147
 #: scripts/menus/network.lua:342
 msgid "Difficulty:"
 msgstr "Zorluk:"
 
-#: scripts/guichan.lua:484 scripts/menus/network.lua:148
+#: scripts/guichan.lua:483 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "easy"
 msgstr "kolay"
 
-#: scripts/guichan.lua:484 scripts/guichan.lua:488
+#: scripts/guichan.lua:483 scripts/guichan.lua:487
 #: scripts/menus/network.lua:148 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:343 scripts/menus/network.lua:351
 msgid "normal"
 msgstr "normal"
 
-#: scripts/guichan.lua:484 scripts/menus/network.lua:148
+#: scripts/guichan.lua:483 scripts/menus/network.lua:148
 #: scripts/menus/network.lua:343
 msgid "hard"
 msgstr "zor"
 
-#: scripts/guichan.lua:487 scripts/menus/network.lua:151
+#: scripts/guichan.lua:486 scripts/menus/network.lua:151
 #: scripts/menus/network.lua:350
 msgid "Starting resources:"
 msgstr "Başlangıç kaynakları:"
 
-#: scripts/guichan.lua:488 scripts/menus/network.lua:152
+#: scripts/guichan.lua:487 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "high"
 msgstr "yüksek"
 
-#: scripts/guichan.lua:488 scripts/menus/network.lua:152
+#: scripts/guichan.lua:487 scripts/menus/network.lua:152
 #: scripts/menus/network.lua:351
 msgid "low"
 msgstr "düşük"
 
-#: scripts/guichan.lua:491 scripts/menus/network.lua:155
+#: scripts/guichan.lua:490 scripts/menus/network.lua:155
 #: scripts/menus/network.lua:358
 msgid "Game type:"
 msgstr "Oyun türü:"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Map Default"
 msgstr "Ön Tanımlı Harita"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Melee"
 msgstr "Meydan Savaşı"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Free For All"
 msgstr "Herkese Serbest"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Top vs Bottom"
 msgstr "Üst, Alta Karşı"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Left vs Right"
 msgstr "Sol, Sağa Karşı"
 
-#: scripts/guichan.lua:492 scripts/menus/network.lua:156
+#: scripts/guichan.lua:491 scripts/menus/network.lua:156
 #: scripts/menus/network.lua:359
 msgid "Man vs Machine"
 msgstr "İnsan, Makineye Karşı"
 
-#: scripts/guichan.lua:524 scripts/guichan.lua:556 scripts/guichan.lua:600
-#: scripts/guichan.lua:668 scripts/guichan.lua:720
-#: scripts/menus/campaigns.lua:142 scripts/menus/credits.lua:143
+#: scripts/guichan.lua:523 scripts/guichan.lua:555 scripts/guichan.lua:599
+#: scripts/guichan.lua:667 scripts/guichan.lua:719
+#: scripts/menus/campaigns.lua:142 scripts/menus/credits.lua:141
 msgid "~!Main Menu"
 msgstr "~!Ana Menü"
 
-#: scripts/guichan.lua:526 scripts/guichan.lua:558 scripts/guichan.lua:602
+#: scripts/guichan.lua:525 scripts/guichan.lua:557 scripts/guichan.lua:601
 #: scripts/menus/campaigns.lua:58 scripts/menus/campaigns.lua:144
 msgid "~!Start"
 msgstr "~!Başlat"
 
-#: scripts/guichan.lua:535
+#: scripts/guichan.lua:534
 msgid "Show a Replay"
 msgstr "Tekrar Oynatmayı Göster"
 
-#: scripts/guichan.lua:569
+#: scripts/guichan.lua:568
 msgid "Load Game"
 msgstr "Kayıtlı Oyun Yükle"
 
-#: scripts/guichan.lua:613 scripts/guichan.lua:633 scripts/guichan.lua:683
+#: scripts/guichan.lua:612 scripts/guichan.lua:632 scripts/guichan.lua:682
 msgid "Editor"
 msgstr "Düzenleyici"
 
-#: scripts/guichan.lua:615
+#: scripts/guichan.lua:614
 msgid "Create ~!New Map"
 msgstr "Oluştur ~!Yeni Harita"
 
-#: scripts/guichan.lua:617
+#: scripts/guichan.lua:616
 msgid "~!Load Map"
 msgstr "~!Harita Yükle"
 
-#: scripts/guichan.lua:620 scripts/menus/ingame/editor.lua:125
+#: scripts/guichan.lua:619 scripts/menus/ingame/editor.lua:125
 #: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:305
 #: scripts/menus/network.lua:177 scripts/menus/network.lua:243
 #: scripts/menus/network.lua:304 scripts/menus/network.lua:378
-#: scripts/menus/network.lua:453 scripts/menus/network.lua:500
+#: scripts/menus/network.lua:452 scripts/menus/network.lua:499
 msgid "~!Cancel"
 msgstr "~!İptal et"
 
-#: scripts/guichan.lua:670 scripts/guichan.lua:722 scripts/guichan.lua:751
+#: scripts/guichan.lua:669 scripts/guichan.lua:721 scripts/guichan.lua:750
 msgid "Start ~!Editor"
 msgstr "~!Düzenleyiciyi Başlat"
 
-#: scripts/guichan.lua:742 scripts/menus/network.lua:381
+#: scripts/guichan.lua:741 scripts/menus/network.lua:381
 msgid "~!Start Game"
 msgstr "~!Oyunu Başlat"
 
-#: scripts/guichan.lua:743
+#: scripts/guichan.lua:742
 msgid "~!Load Game"
 msgstr "~!Kayıtlı Oyun Yükle"
 
-#: scripts/guichan.lua:744
+#: scripts/guichan.lua:743
 msgid "~!Campaigns"
 msgstr "~!Kampanya"
 
-#: scripts/guichan.lua:745
+#: scripts/guichan.lua:744
 msgid "Show ~!Replay"
 msgstr "Tekrar Oynatmayı ~!Göster"
 
-#: scripts/guichan.lua:747
+#: scripts/guichan.lua:746
 msgid "~!MultiPlayer"
 msgstr "~!Çok Oyunculu"
 
-#: scripts/guichan.lua:748
+#: scripts/guichan.lua:747
 msgid "~!Options"
 msgstr "~!Seçenekler"
 
-#: scripts/guichan.lua:750
+#: scripts/guichan.lua:749
 msgid "Cre~!dits"
 msgstr "~!Hakkında"
 
-#: scripts/guichan.lua:753
+#: scripts/guichan.lua:752
 msgid "E~!xit"
 msgstr "~!Çıkış"
 
@@ -296,19 +300,19 @@ msgstr "Yamalar"
 msgid "Stratagus Media Project Graphics"
 msgstr "Stratagus Media Project Graphics"
 
-#: scripts/menus/credits.lua:128
+#: scripts/menus/credits.lua:126
 msgid "The Bos Wars Team thanks"
 msgstr "Bos Wars Takımı teşekkür eder"
 
-#: scripts/menus/credits.lua:129
+#: scripts/menus/credits.lua:127
 msgid "everybody who has contributed"
 msgstr "katkıda bulunan herkese"
 
-#: scripts/menus/credits.lua:130
+#: scripts/menus/credits.lua:128
 msgid "patches, bug reports, ideas."
 msgstr "yamalar, hata raporları, fikirler."
 
-#: scripts/menus/credits.lua:133
+#: scripts/menus/credits.lua:131
 msgid "Bos Wars Credits"
 msgstr "Bos Wars Ekibi"
 
@@ -992,7 +996,8 @@ msgid "Incompatible engine version"
 msgstr "Uygun olmayan motor sürümü"
 
 #: scripts/menus/network.lua:272
-msgid "Incompatible netowrk version"
+#, fuzzy
+msgid "Incompatible network version"
 msgstr "Uygun olmayan ağ sürümü"
 
 #: scripts/menus/network.lua:286
@@ -1003,7 +1008,7 @@ msgstr "Sunucu adresi girin"
 msgid "IP or server name :"
 msgstr "IP yada sunucu adı :"
 
-#: scripts/menus/network.lua:289 scripts/menus/network.lua:479
+#: scripts/menus/network.lua:289 scripts/menus/network.lua:478
 msgid "~!Join Game"
 msgstr "Oyuna ~!Katıl"
 
@@ -1011,31 +1016,31 @@ msgstr "Oyuna ~!Katıl"
 msgid "Invalid server name"
 msgstr "Geçersiz sunucu ismi"
 
-#: scripts/menus/network.lua:316 scripts/menus/network.lua:418
+#: scripts/menus/network.lua:316 scripts/menus/network.lua:417
 msgid "Create MultiPlayer game"
 msgstr "Çok oyunculu oyun yarat"
 
-#: scripts/menus/network.lua:398
+#: scripts/menus/network.lua:397
 msgid "Waiting for players"
 msgstr "Oyuncular bekleniyor"
 
-#: scripts/menus/network.lua:411
+#: scripts/menus/network.lua:410
 msgid "No Map"
 msgstr "Harita Yok"
 
-#: scripts/menus/network.lua:412
+#: scripts/menus/network.lua:411
 msgid "No map"
 msgstr "Harita yok"
 
-#: scripts/menus/network.lua:455 scripts/menus/network.lua:489
+#: scripts/menus/network.lua:454 scripts/menus/network.lua:488
 msgid "Create ~!Game"
 msgstr "Yeni Oyun ~!Yarat"
 
-#: scripts/menus/network.lua:472
+#: scripts/menus/network.lua:471
 msgid "MultiPlayer"
 msgstr "Çoklu Oyuncu"
 
-#: scripts/menus/network.lua:474
+#: scripts/menus/network.lua:473
 msgid "Nickname :"
 msgstr "Takma ad :"
 
@@ -1102,7 +1107,3 @@ msgstr "~!Ana menü"
 #: scripts/menus/options.lua:325
 msgid "Options"
 msgstr "Seçenekler"
-
-#: scripts/stratagus.lua:234
-msgid "Eliminate your enemies."
-msgstr "Düşmanlarınızı yok edin."

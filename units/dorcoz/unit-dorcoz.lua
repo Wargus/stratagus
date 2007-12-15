@@ -92,6 +92,6 @@ DefineAllow("unit-dorcoz", AllowAll)
 DefineButton({
         Pos = 4, Level = 0, Icon = "icon-dorcoz",
         Action = "train-unit", Value = "unit-dorcoz",
-        Key = "d", Hint = "TRAIN ~!DORCOZ",
+        Hint = "TRAIN ~!DORCOZ",
         ForUnit = {"unit-camp"}})
 

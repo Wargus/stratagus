@@ -62,7 +62,7 @@ function RunSpeedOptionsMenu(s)
   b:adjustSize();
   menu:add(b, offx + 230 - b:getWidth(), offy + 36 * 2 + 6)
 
-  menu:addButton(_("~!OK"), "o", offx + 128 - (200 / 2), offy + 245,
+  menu:addButton(_("~!OK"), offx + 128 - (200 / 2), offy + 245,
     function()
       preferences.GameSpeed = GetGameSpeed()
       SavePreferences()
@@ -139,7 +139,7 @@ function AddSoundOptions(menu, offx, offy, centerx, bottom)
   musiccheckbox:setMarked(IsMusicEnabled())
   musiccheckbox:adjustSize();
 
-  b = menu:addButton(_("~!OK"), "o", centerx, bottom - 11 - 27,
+  b = menu:addButton(_("~!OK"), centerx, bottom - 11 - 27,
     function()
       preferences.EffectsVolume = GetEffectsVolume()
       preferences.EffectsEnabled = IsEffectsEnabled()
@@ -245,7 +245,7 @@ function RunVideoOptionsMenu(s)
   while continue == 1 do
     menu = BosMenu(_("Video Options"))
     BuildVideoOptionsMenu(menu)
-    menu:addButton(_("~!OK"), "o", 
+    menu:addButton(_("~!OK"),
       Video.Width / 2 - 100, 
       Video.Height - 100, 
       function() menu:stop() end)
@@ -302,19 +302,19 @@ function RunLanguageOptionsMenu(s)
   AddLanguage("Czech", "cs")
   AddLanguage("Português", "pt")
 
-  menu:addButton(_("~!OK"), "o", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("~!OK"), Video.Width / 2 - 100, Video.Height - 100,
     function() menu:stop() end)
   menu:run()
 end
 
 function BuildOptionsMenu(menu)
   local x = Video.Width / 2 - 100
-  menu:addButton(_("Sound"), 0, x, 140, RunSoundOptionsMenu)
-  menu:addButton(_("Video"), 0, x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
-  menu:addButton(_("Speed"), 0, x, 220, RunSpeedOptionsMenu)
-  menu:addButton(_("Language"), 0, x, 260, function() RunLanguageOptionsMenu() menu:stop(1) end)
+  menu:addButton(_("Sound"), x, 140, RunSoundOptionsMenu)
+  menu:addButton(_("Video"), x, 180, function() RunVideoOptionsMenu() menu:stop(1) end)
+  menu:addButton(_("Speed"), x, 220, RunSpeedOptionsMenu)
+  menu:addButton(_("Language"), x, 260, function() RunLanguageOptionsMenu() menu:stop(1) end)
 
-  menu:addButton(_("~!Main menu"), "m", x, Video.Height - 100, function() menu:stop() end)
+  menu:addButton(_("~!Main menu"), x, Video.Height - 100, function() menu:stop() end)
 end
 
 function RunOptionsMenu(s)

@@ -101,9 +101,8 @@ function AddMenuHelpers(menu)
     return self:addLabel(text, x, y, Fonts["large"], false)
   end
 
-  function menu:addButton(caption, hotkey, x, y, callback, size)
+  function menu:addButton(caption, x, y, callback, size)
     local b = ButtonWidget(caption)
-    b:setHotKey(hotkey)
     b:setActionCallback(callback)
     if (size == nil) then size = {200, 24} end
     b:setSize(size[1], size[2])
@@ -114,8 +113,8 @@ function AddMenuHelpers(menu)
     return b
   end
 
-  function menu:addSmallButton(caption, hotkey, x, y, callback)
-    return self:addButton(caption, hotkey, x, y, callback, {106, 28})
+  function menu:addSmallButton(caption, x, y, callback)
+    return self:addButton(caption, x, y, callback, {106, 28})
   end
 
   function menu:addSlider(min, max, w, h, x, y, callback)
@@ -361,7 +360,7 @@ function RunResultsMenu()
     end
   end
 
-  menu:addButton(_("~!Continue"), "c", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("~!Continue"), Video.Width / 2 - 100, Video.Height - 100,
                  function() menu:stop() end)
 
   menu:run()
@@ -521,9 +520,9 @@ function RunStartGameMenu(s)
     PresentMap = OldPresentMap
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("~!Start"), "s", Video.Width / 2 + 50 ,  Video.Height - 100,
+  menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)
 
   menu:run()
@@ -553,9 +552,9 @@ function RunReplayMenu(s)
     menu:stop()
   end
 
-  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("~!Start"), "s", Video.Width / 2 + 50 ,  Video.Height - 100,
+  menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startreplaybutton)
 
   menu:run()
@@ -597,9 +596,9 @@ function RunLoadGameMenu(s)
       end
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("~!Start"), "s", Video.Width / 2 + 50 ,  Video.Height - 100,
+  menu:addButton(_("~!Start"), Video.Width / 2 + 50 ,  Video.Height - 100,
                  startgamebutton)
 
   DisallowAllUnits()
@@ -612,12 +611,12 @@ function RunEditorMenu(s)
 
   menu = BosMenu(_("Editor"))
 
-  menu:addButton(_("Create ~!New Map"), "n", x, 260,
+  menu:addButton(_("Create ~!New Map"), x, 260,
     function() RunEditorNewMenu(); menu:stop() end)
-  menu:addButton(_("~!Load Map"), "l", x, 300,
+  menu:addButton(_("~!Load Map"), x, 300,
     function() RunEditorLoadMenu(); menu:stop() end)
 
-  menu:addButton(_("~!Cancel"), "c", x, Video.Height - 100,
+  menu:addButton(_("~!Cancel"), x, Video.Height - 100,
     function() menu:stop() end)
 
   menu:run()
@@ -665,9 +664,9 @@ function RunEditorNewMenu()
   ysize = menu:addTextInputField(tostring(defaultSize[2]),
     Video.Width / 2 + 10 + 60, 8 * sy, 40)
 
-  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
     function() menu:stop() end)
-  menu:addButton(_("Start ~!Editor"), "e", Video.Width / 2 + 50, Video.Height - 100,
+  menu:addButton(_("Start ~!Editor"), Video.Width / 2 + 50, Video.Height - 100,
     starteditorbutton)
 
   menu:run()
@@ -717,9 +716,9 @@ function RunEditorLoadMenu()
     HandleCommandKey = HandleIngameCommandKey
     menu:stop()
   end
-  menu:addButton(_("~!Main Menu"), "m", Video.Width / 2 - 250, Video.Height - 100,
+  menu:addButton(_("~!Main Menu"), Video.Width / 2 - 250, Video.Height - 100,
                  function() menu:stop() end)
-  menu:addButton(_("Start ~!Editor"), "e", Video.Width / 2 + 50, Video.Height -100,
+  menu:addButton(_("Start ~!Editor"), Video.Width / 2 + 50, Video.Height -100,
                  starteditorbutton)
 
   menu:run()
@@ -739,22 +738,22 @@ function BuildMainMenu(menu)
   local x1 = x - 100
   local x2 = 2*x - 100
 
-  menu:addButton(_("~!Start Game"), "s", x1, ystep * 2, RunStartGameMenu)
-  menu:addButton(_("~!Load Game"), "l", x1, ystep * 3, RunLoadGameMenu)
-  menu:addButton(_("~!Campaigns"), "c", x2, ystep * 2, RunCampaignsMenu)
-  menu:addButton(_("Show ~!Replay"), "r", x2, ystep * 3, RunReplayMenu)
+  menu:addButton(_("~!Start Game"), x1, ystep * 2, RunStartGameMenu)
+  menu:addButton(_("~!Load Game"), x1, ystep * 3, RunLoadGameMenu)
+  menu:addButton(_("~!Campaigns"), x2, ystep * 2, RunCampaignsMenu)
+  menu:addButton(_("Show ~!Replay"), x2, ystep * 3, RunReplayMenu)
 
-  menu:addButton(_("~!MultiPlayer"), "m", x1, ystep * 5, RunMultiPlayerMenu)
-  menu:addButton(_("~!Options"), "o", x2, ystep * 5, function() RunOptionsMenu() menu:stop(1) end)
+  menu:addButton(_("~!MultiPlayer"), x1, ystep * 5, RunMultiPlayerMenu)
+  menu:addButton(_("~!Options"), x2, ystep * 5, function() RunOptionsMenu() menu:stop(1) end)
 
-  menu:addButton(_("Cre~!dits"), "d", x1, ystep * 6, RunCreditsMenu)
-  menu:addButton(_("Start ~!Editor"), "e", x2, ystep * 6, RunEditorMenu)
+  menu:addButton(_("Cre~!dits"), x1, ystep * 6, RunCreditsMenu)
+  menu:addButton(_("Start ~!Editor"), x2, ystep * 6, RunEditorMenu)
 
-  menu:addButton(_("E~!xit"), "x", Video.Width / 2 - 100, Video.Height - 100,
+  menu:addButton(_("E~!xit"), Video.Width / 2 - 100, Video.Height - 100,
                  function() menu:stop() end)
 
   if false then 
-     menu:addButton("~!Widgets Demo", "w", x2, ystep * 7, RunWidgetsMenu)
+     menu:addButton("~!Widgets Demo", x2, ystep * 7, RunWidgetsMenu)
   end
 end
 

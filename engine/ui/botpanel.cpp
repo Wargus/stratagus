@@ -55,6 +55,8 @@
 #include "commands.h"
 #include "video.h"
 #include "font.h"
+#include "guichan/key.h"
+#include "guichan/sdl/sdlinput.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -97,7 +99,7 @@ void InitButtons(void)
 */
 int AddButton(int pos, int level, const std::string &icon_ident,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &allow, int key, const std::string &hint, const std::string &umask)
+	const std::string &allow, const std::string &hint, const std::string &umask)
 {
 	std::string buf;
 	ButtonAction *ba;
@@ -140,6 +142,10 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 
 	ba->Allowed = func;
 	ba->AllowStr = allow;
+	int key = GetHotKey(hint);
+	if (isascii(key) && isupper(key)) {
+		key = tolower(key);
+	}
 	ba->Key = key;
 	ba->Hint = hint;
 	// FIXME: here should be added costs to the hint
@@ -438,7 +444,7 @@ void CButtonPanel::Draw(void)
 		//  Tutorial show command key in icons
 		//
 		if (ShowCommandKey) {
-			if (CurrentButtons[i].Key == 27) {
+			if (CurrentButtons[i].Key == gcn::Key::ESCAPE) {
 				strcpy_s(buf, sizeof(buf), "ESC");
 			} else {
 				buf[0] = toupper(CurrentButtons[i].Key);
@@ -924,6 +930,12 @@ void CButtonPanel::DoClicked(int button)
 */
 int CButtonPanel::DoKey(int key)
 {
+	SDL_keysym keysym;
+	memset(&keysym, 0, sizeof(keysym));
+	keysym.sym = (SDLKey)key;
+	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
+	key = k.getValue();
+
 	if (CurrentButtons) {
 		// This is required for action queues SHIFT+M should be `m'
 		if (isascii(key) && isupper(key)) {

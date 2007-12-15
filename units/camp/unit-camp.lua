@@ -131,7 +131,7 @@ DefineAllow("unit-camp", AllowAll)
 
 DefineButton({
     Pos = 1, Level = 2, Icon = "icon-camp_b", Action = "build",
-    Value = "unit-camp", Key = "c", Hint = "BUILD TRAINING ~!CAMP",
+    Value = "unit-camp", Hint = "BUILD TRAINING ~!CAMP",
     ForUnit = {"unit-engineer"}})
 
 

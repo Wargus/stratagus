@@ -129,6 +129,6 @@ DefineAllow("unit-aircraftfactory", AllowAll)
 
 DefineButton({
     Pos = 7, Level = 2, Icon = "icon-dev_b", Action = "build",
-    Value = "unit-aircraftfactory", Key = "a", Hint = "BUILD ~!AIRCRAFT FACTORY",
+    Value = "unit-aircraftfactory", Hint = "BUILD ~!AIRCRAFT FACTORY",
     ForUnit = {"unit-engineer"}})
 

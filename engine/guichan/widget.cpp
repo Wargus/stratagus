@@ -67,7 +67,7 @@
 #include "SDL.h"
 extern int Str2SdlKey(const char *str);
 
-static int convertKey(const char *key)
+int convertKey(const char *key)
 {
 	SDL_keysym keysym;
 	memset(&keysym, 0, sizeof(keysym));

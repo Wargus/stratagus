@@ -144,11 +144,11 @@ DefineAllow("unit-medic", AllowAll)
 DefineButton({
   Pos = 1, Level = 0, Icon = "icon-medic",
   Action = "train-unit", Value = "unit-medic",
-  Key = "m", Hint = "TRAIN ~!MEDIC",
+  Hint = "TRAIN ~!MEDIC",
   ForUnit = {"unit-hosp"}})
 
 DefineButton({
   Pos = 3, Level = 0, Icon = "icon-heal",
   Action = "cast-spell", Value = "spell-healing",
-  Allowed = "check-true", Key = "b", Hint = "~!BANDAGE",
+  Allowed = "check-true", Hint = "~!BANDAGE",
   ForUnit = {"unit-medic"}})
