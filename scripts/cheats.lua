@@ -106,6 +106,30 @@ function HandleCheats(str)
       SetUnitVariable(ThisPlayer.Units[i].Slot, "Mana", 255)
     end
 
+  elseif (str:sub(1, 6) == "gimme ") then
+    local arr = {}
+    for w in str:gmatch("[%w%p]+") do
+      table.insert(arr, w)
+    end
+
+    local unittype = arr[2]
+    local count = tonumber(arr[3])
+
+    if (count == nil or count < 1) then
+      count = 1
+    elseif (count > 9) then
+      count = 9
+    end
+
+    local tilex = UI.MouseViewport:Viewport2MapX(CursorX)
+    local tiley = UI.MouseViewport:Viewport2MapY(CursorY)
+
+    for i = 1, count do
+      CreateUnit(unittype, "this", {tilex, tiley})
+    end
+
+    AddMessage("Cheater!")
+
   else
     return false
   end

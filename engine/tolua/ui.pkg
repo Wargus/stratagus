@@ -38,6 +38,12 @@ class CMapArea
 	int ScrollPaddingBottom;
 };
 
+class CViewport
+{
+	int Viewport2MapX(int x);
+	int Viewport2MapY(int y);
+};
+
 class CFiller
 {
 	CFiller();
@@ -155,6 +161,7 @@ class CUserInterface
 	
 	CPieMenu PieMenu;
 
+	CViewport *MouseViewport;
 	CMapArea MapArea;
 
 	CUIButton MenuButton;
@@ -192,6 +199,9 @@ extern int GetDoubleClickDelay(void);
 extern void SetDoubleClickDelay(int delay);
 extern int GetHoldClickDelay(void);
 extern void SetHoldClickDelay(int delay);
+
+extern int CursorX;
+extern int CursorY;
 
 
 //

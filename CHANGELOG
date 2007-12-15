@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added gimme cheat (Jimmy Salmon)
 - Enable starting a map from the command line (Francois Beerten)
 - Added StretchImage option to TitleScreen (Jimmy Salmon)
 - Fixed crash disabling fog of war (Jimmy Salmon)
