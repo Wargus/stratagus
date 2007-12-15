@@ -1310,11 +1310,11 @@ void CInfoPanel::Draw(void)
 		x = UI.InfoPanel.X + 16;
 		y = UI.InfoPanel.Y + 8;
 
-		VideoDrawText(x, y, GameFont, "Stratagus");
+		VideoDrawTextClip(x, y, GameFont, "Stratagus");
 		y += 16;
-		VideoDrawText(x, y, GameFont, "Cycle:");
-		VideoDrawNumber(x + 48, y, GameFont, GameCycle);
-		VideoDrawNumber(x + 110, y, GameFont,
+		VideoDrawTextClip(x, y, GameFont, "Cycle:");
+		VideoDrawNumberClip(x + 48, y, GameFont, GameCycle);
+		VideoDrawNumberClip(x + 110, y, GameFont,
 			CYCLES_PER_SECOND * VideoSyncSpeed / 100);
 		y += 20;
 
@@ -1329,13 +1329,13 @@ void CInfoPanel::Draw(void)
 					SetDefaultTextColors(nc, rc);
 				}
 
-				VideoDrawNumber(x + 15, y, GameFont, i);
+				VideoDrawNumberClip(x + 15, y, GameFont, i);
 
-				Video.DrawRectangle(ColorWhite,x, y, 12, 12);
-				Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
+				Video.DrawRectangleClip(ColorWhite,x, y, 12, 12);
+				Video.FillRectangleClip(Players[i].Color, x + 1, y + 1, 10, 10);
 
-				VideoDrawText(x + 27, y, GameFont,Players[i].Name);
-				VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);
+				VideoDrawTextClip(x + 27, y, GameFont,Players[i].Name);
+				VideoDrawNumberClip(x + 117, y, GameFont,Players[i].Score);
 				y += 14;
 			}
 		}
