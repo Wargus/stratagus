@@ -720,12 +720,12 @@ int HandleCheats(const std::string &input)
 		return 0;
 	}
 	lua_pushstring(Lua, input.c_str());
-	LuaCall(1, 0);
+	LuaCall(1, 0, false);
 	if (lua_gettop(Lua) - base == 1) {
 		ret = LuaToBoolean(Lua, -1);
 		lua_pop(Lua, 1);
 	} else {
-		LuaError(Lua, "HandleCheats must return a boolean");
+		DebugPrint("HandleCheats must return a boolean");
 		ret = 0;
 	}
 	return ret;
