@@ -9,7 +9,7 @@
 --
 --      cheats.lua - Cheats
 --
---      (c) Copyright 2001-2006 by Lutz Sammer and Jimmy Salmon
+--      (c) Copyright 2001-2007 by Lutz Sammer and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -106,15 +106,15 @@ function HandleCheats(str)
       SetUnitVariable(ThisPlayer.Units[i].Slot, "Mana", 255)
     end
 
-  elseif (str:sub(1, 6) == "gimme ") then
+  elseif (string.sub(str, 1, 6) == "gimme ") then
     local arr = {}
-    for w in str:gmatch("[%w%p]+") do
+    string.gmatch = string.gmatch or string.gfind
+    for w in string.gmatch(str,"[%w%p]+") do
       table.insert(arr, w)
     end
 
     local unittype = arr[2]
     local count = tonumber(arr[3])
-
     if (count == nil or count < 1) then
       count = 1
     elseif (count > 9) then
