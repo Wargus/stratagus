@@ -169,37 +169,37 @@ static void DrawUnitStats(const CUnit *unit)
 
 	// Armor
 	std::ostringstream armor;
-	armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
+	armor << _("Armor: ") << type->Variable[ARMOR_INDEX].Value;
 	VideoDrawText(x + 16, y + 84, GameFont, armor.str());
 
 	if (type->Variable[RADAR_INDEX].Value) {
 		// Radar Range
 		std::ostringstream radarRange;
-		radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
+		radarRange << _("Radar Range: ") << type->Variable[RADAR_INDEX].Value;
 		VideoDrawText(x + 16, y + 97, GameFont, radarRange.str());
 	} else {
 		// Sight Range
 		std::ostringstream sightRange;
-		sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
+		sightRange << _("Sight Range: ") << type->Variable[SIGHTRANGE_INDEX].Value;
 		VideoDrawText(x + 16, y + 97, GameFont, sightRange.str());
 	}
 
 	if (type->CanAttack) {
 		// Kills
 		std::ostringstream kills;
-		kills << "Kills: ~<" << unit->Variable[KILL_INDEX].Value << "~>";
+		kills << _("Kills: ") << "~<" << unit->Variable[KILL_INDEX].Value << "~>";
 		VideoDrawTextCentered(x + 114, y + 52, GameFont, kills.str());
 
 		// Attack Range
 		std::ostringstream attackRange;
-		attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
+		attackRange << _("Attack Range: ") << type->Variable[ATTACKRANGE_INDEX].Value;
 		VideoDrawText(x + 16, y + 111, GameFont, attackRange.str());
 
 		// Damage
 		int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
 		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value + type->Variable[BASICDAMAGE_INDEX].Value;
 		std::ostringstream damage;
-		damage << "Damage: " << min_damage << "-" << max_damage;
+		damage << _("Damage: ") << min_damage << "-" << max_damage;
 		VideoDrawText(x + 16, y + 125, GameFont, damage.str());
 	}
 }
