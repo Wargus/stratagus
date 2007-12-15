@@ -770,6 +770,7 @@ function RunMainMenu(s)
 end
 
 function RunMapFromCommandLine()
+  ResetMapOptions()
   AllowAllUnits()
   if (CliMapName ~= "") then
     RunMap(CliMapName, nil, true, false)
