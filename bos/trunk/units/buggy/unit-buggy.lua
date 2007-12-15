@@ -135,6 +135,6 @@ DefineAllow("unit-buggy", AllowAll)
 
 DefineButton({
     Pos = 3, Level = 0, Icon = "icon-buggy", Action = "train-unit",
-    Value = "unit-buggy", Key = "b", Hint = "BUILD ~!BUGGY",
+    Value = "unit-buggy", Hint = "BUILD ~!BUGGY",
     ForUnit = {"unit-vfac"}})
 

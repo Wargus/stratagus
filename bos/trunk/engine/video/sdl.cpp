@@ -84,6 +84,7 @@ bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
 bool UseGLTextureCompression;       /// Use OpenGL texture compression
 
 static std::map<int, std::string> Key2Str;
+static std::map<std::string, int> Str2Key;
 
 static int FrameTicks;     /// Frame length in ms
 static int FrameRemainder; /// Frame remainder 0.1 ms
@@ -265,6 +266,8 @@ static void CleanExit(int signum)
 */
 static void InitKey2Str()
 {
+	Str2Key[_("esc")] = SDLK_ESCAPE;
+
 	if (!Key2Str.empty()) {
 		return;
 	}
@@ -345,6 +348,8 @@ static void InitKey2Str()
 	for (i = SDLK_F1; i <= SDLK_F15; ++i) {
 		sprintf_s(str, sizeof(str), "f%d", i - SDLK_F1 + 1);
 		Key2Str[i] = str;
+		sprintf_s(str, sizeof(str), "F%d", i - SDLK_F1 + 1);
+		Str2Key[str] = i;
 	}
 
 	Key2Str[SDLK_HELP] = "help";
@@ -776,10 +781,18 @@ const char *SdlKey2Str(int key)
 */
 int Str2SdlKey(const char *str)
 {
+	InitKey2Str();
+
 	std::map<int, std::string>::iterator i;
 	for (i = Key2Str.begin(); i != Key2Str.end(); ++i) {
-		if (!strcmp(str, (*i).second.c_str())) {
+		if (!strcasecmp(str, (*i).second.c_str())) {
 			return (*i).first;
+		}
+	}
+	std::map<std::string, int>::iterator i2;
+	for (i2 = Str2Key.begin(); i2 != Str2Key.end(); ++i2) {
+		if (!strcasecmp(str, (*i2).first.c_str())) {
+			return (*i2).second;
 		}
 	}
 	return 0;

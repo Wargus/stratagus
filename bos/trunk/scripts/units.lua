@@ -62,21 +62,21 @@ end
 function DefineCommonButtons(forUnits) 
    DefineButton({
         Pos = 1, Level = 0, Icon = "icon-move",
-        Action = "move", Key = "m", Hint = "~!MOVE",
+        Action = "move", Hint = "~!MOVE",
         ForUnit = forUnits})
    DefineButton({
         Pos = 2, Level = 0, Icon = "icon-stop",
-        Action = "stop", Key = "s", Hint = "~!STOP",
+        Action = "stop", Hint = "~!STOP",
         ForUnit = forUnits})
    DefineButton({
         Pos = 3, Level = 0, Icon = "icon-attack",
-        Action = "attack", Key = "a", Hint = "~!ATTACK", ForUnit = forUnits})
+        Action = "attack", Hint = "~!ATTACK", ForUnit = forUnits})
    DefineButton({
         Pos = 4, Level = 0, Icon = "icon-patrol",
-        Action = "patrol", Key = "p", Hint = "~!PATROL", ForUnit = forUnits})
+        Action = "patrol", Hint = "~!PATROL", ForUnit = forUnits})
    DefineButton({
         Pos = 5, Level = 0, Icon = "icon-stand-ground",
-        Action = "stand-ground", Key = "t", Hint = "S~!TAND GROUND", 
+        Action = "stand-ground", Hint = "S~!TAND GROUND", 
         ForUnit = forUnits})
 end
 

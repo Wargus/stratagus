@@ -126,5 +126,5 @@ DefineAllow("unit-hosp", AllowAll)
 
 DefineButton({
     Pos = 2, Level = 2, Icon = "icon-hosp_b", Action = "build",
-    Value = "unit-hosp", Key = "h", Hint = "BUILD ~!HOSPITAL",
+    Value = "unit-hosp", Hint = "BUILD ~!HOSPITAL",
     ForUnit = {"unit-engineer"}})

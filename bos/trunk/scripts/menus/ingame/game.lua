@@ -41,11 +41,11 @@ function BosGameMenu()
   -- FIXME: not a good solution
   -- default size is 200,24 but we want 224,28 so we override these functions
   menu.addButtonOrig = menu.addButton
-  function menu:addButton(caption, hotkey, x, y, callback, size)
-    return self:addButtonOrig(caption, hotkey, x, y, callback, {224, 28})
+  function menu:addButton(caption, x, y, callback, size)
+    return self:addButtonOrig(caption, x, y, callback, {224, 28})
   end
-  function menu:addSmallButton(caption, hotkey, x, y, callback)
-    return self:addButtonOrig(caption, hotkey, x, y, callback, {100, 24})
+  function menu:addSmallButton(caption, x, y, callback)
+    return self:addButtonOrig(caption, x, y, callback, {100, 24})
   end
 
   return menu
@@ -56,20 +56,20 @@ function RunGameMenu(s)
   local menu = BosGameMenu()
 
   menu:addLabel(_("Game Menu"), 128, 11)
-  local b = menu:addButton(_("Save (~<F11~>)"), "f11", 16, 40,
+  local b = menu:addButton(_("Save (~<F11~>)"), 16, 40,
     function() RunSaveMenu() end)
   if (IsReplayGame() or IsNetworkGame()) then
     b:setEnabled(false)
   end
-  menu:addButton(_("Options (~<F5~>)"), "f5", 16, 40 + (36 * 1),
+  menu:addButton(_("Options (~<F5~>)"), 16, 40 + (36 * 1),
     function() RunGameOptionsMenu() end)
-  menu:addButton(_("Help (~<F1~>)"), "f1", 16, 40 + (36 * 2),
+  menu:addButton(_("Help (~<F1~>)"), 16, 40 + (36 * 2),
     function() RunHelpMenu() end)
-  menu:addButton(_("~!Objectives"), "o", 16, 40 + (36 * 3),
+  menu:addButton(_("~!Objectives"), 16, 40 + (36 * 3),
     function() RunObjectivesMenu() end)
-  menu:addButton(_("~!End Game"), "e", 16, 40 + (36 * 4),
+  menu:addButton(_("~!End Game"), 16, 40 + (36 * 4),
     function() RunEndGameMenu() end)
-  menu:addButton(_("Return to Game (~<Esc~>)"), "escape", 16, 248,
+  menu:addButton(_("Return to Game (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -89,7 +89,7 @@ function RunSaveMenu()
   end
   browser:setActionCallback(cb)
 
-  menu:addSmallButton(_("Save"), 0, 16, 248,
+  menu:addSmallButton(_("Save"), 16, 248,
     -- FIXME: use a confirm menu if the file exists already
     function()
       local name = t:getText()
@@ -110,7 +110,7 @@ function RunSaveMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("Cancel"), 0, 16 + 12 + 106, 248,
+  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -129,13 +129,13 @@ function RunGameOptionsMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("Game Options"), 128, 11)
-  menu:addButton(_("Sound (~<F7~>)"), "f7", 16, 40 + (36 * 0),
+  menu:addButton(_("Sound (~<F7~>)"), 16, 40 + (36 * 0),
     function() RunGameSoundOptionsMenu() end)
-  menu:addButton(_("Game (~<F9~>)"), "f9", 16, 40 + (36 * 1),
+  menu:addButton(_("Game (~<F9~>)"), 16, 40 + (36 * 1),
     function() RunPreferencesMenu() end)
-  menu:addButton(_("~!Diplomacy"), "d", 16, 40 + (36 * 2),
+  menu:addButton(_("~!Diplomacy"), 16, 40 + (36 * 2),
     function() RunDiplomacyMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), "escape", 128 - (224 / 2), 248,
+  menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -178,7 +178,7 @@ function RunPreferencesMenu()
   l:adjustSize()
   menu:add(l, 230 - l:getWidth(), (36 * 4) + 6)
 
-  menu:addSmallButton(_("~!OK"), "o", 128 - (106 / 2), 245,
+  menu:addSmallButton(_("~!OK"), 128 - (106 / 2), 245,
     function()
       preferences.FogOfWar = GetFogOfWar()
       preferences.ShowCommandKey = UI.ButtonPanel.ShowCommandKey
@@ -252,7 +252,7 @@ function RunDiplomacyMenu()
     end
   end
 
-  menu:addSmallButton(_("~!OK"), "o", 75, 384 - 40,
+  menu:addSmallButton(_("~!OK"), 75, 384 - 40,
     function()
       for j=1,table.getn(allied) do
         local i = allied[j].index
@@ -302,7 +302,7 @@ function RunDiplomacyMenu()
       end
       menu:stop()
     end)
-  menu:addSmallButton(_("~!Cancel"), "c", 195, 384 - 40, function() menu:stop() end)
+  menu:addSmallButton(_("~!Cancel"), 195, 384 - 40, function() menu:stop() end)
 
   menu:run(false)
 end
@@ -311,46 +311,46 @@ end
 function RunRestartConfirmMenu()
   RunConfirmTypeMenu(
       _("Are you sure you want to restart the game?"),
-      _("~!Restart Game"), "r", GameRestart)
+      _("~!Restart Game"), GameRestart)
 end
 
 function RunQuitToMenuConfirmMenu()
   RunConfirmTypeMenu(
      _("Are you sure you want to quit to the main menu?"),
-     _("~!Quit to Menu"), "q", GameQuitToMenu)
+     _("~!Quit to Menu"), GameQuitToMenu)
 end
 
 function RunEndGameMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("End Game"), 128, 11)
-  local b = menu:addButton(_("~!Restart Game"), "r", 16, 40 + (36 * 0),
+  local b = menu:addButton(_("~!Restart Game"), 16, 40 + (36 * 0),
     RunRestartConfirmMenu)
   if (IsNetworkGame()) then
     b:setEnabled(false)
   end
-  menu:addButton(_("~!Surrender"), "s", 16, 40 + (36 * 1),
+  menu:addButton(_("~!Surrender"), 16, 40 + (36 * 1),
     function() RunConfirmTypeMenu(
       _("Are you sure you want to surrender to your enemies?"),
-      _("~!Surrender"), "s", GameDefeat) end)
-  menu:addButton(_("~!Quit to Menu"), "q", 16, 40 + (36 * 2),
+      _("~!Surrender"), GameDefeat) end)
+  menu:addButton(_("~!Quit to Menu"), 16, 40 + (36 * 2),
     RunQuitToMenuConfirmMenu)
-  menu:addButton(_("E~!xit Bos Wars"), "x", 16, 40 + (36 * 3),
+  menu:addButton(_("E~!xit Bos Wars"), 16, 40 + (36 * 3),
     RunExitConfirmMenu)
-  menu:addButton(_("Previous (~<Esc~>)"), "escape", 16, 248,
+  menu:addButton(_("Previous (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
 end
 
-function RunConfirmTypeMenu(boxtext, buttontext, hotkey, stopgametype)
+function RunConfirmTypeMenu(boxtext, buttontext, stopgametype)
   local menu = BosGameMenu()
   local height = 11
 
   height = height + menu:addMultiLineLabel(boxtext, 128, 11):getHeight()
-  menu:addButton(buttontext, hotkey, 16, height + 29,
+  menu:addButton(buttontext, 16, height + 29,
     function() StopGame(stopgametype); menu:stopAll() end)
-  menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
   menu:run(false)
 end
@@ -361,9 +361,9 @@ function RunExitConfirmMenu()
 
   height = height + menu:addMultiLineLabel(
     _("Are you sure you want to exit Bos Wars?"), 128, 11):getHeight()
-  menu:addButton(_("E~!xit Program"), "x", 16, height + 29,
+  menu:addButton(_("E~!xit Program"), 16, height + 29,
     function() Exit(0) end)
-  menu:addButton(_("Cancel (~<Esc~>)"), "escape", 16, 248,
+  menu:addButton(_("Cancel (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -373,11 +373,11 @@ function RunHelpMenu()
   local menu = BosGameMenu()
 
   menu:addLabel(_("Help Menu"), 128, 11)
-  menu:addButton(_("Keystroke ~!Help"), "h", 16, 40 + (36 * 0),
+  menu:addButton(_("Keystroke ~!Help"), 16, 40 + (36 * 0),
     function() RunKeystrokeHelpMenu() end)
-  menu:addButton(_("Bos Wars ~!Tips"), "t", 16, 40 + (36 * 1),
+  menu:addButton(_("Bos Wars ~!Tips"), 16, 40 + (36 * 1),
     function() RunTipsMenu() end)
-  menu:addButton(_("Previous (~<Esc~>)"), "escape", 128 - (224 / 2), 248,
+  menu:addButton(_("Previous (~<Esc~>)"), 128 - (224 / 2), 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -457,7 +457,7 @@ function RunKeystrokeHelpMenu()
   menu:add(s, 16, 60)
 
   menu:addLabel(_("Keystroke Help Menu"), 352 / 2, 11)
-  menu:addButton(_("Previous (~<Esc~>)"), "escape", (352 / 2) - (224 / 2), 352 - 40,
+  menu:addButton(_("Previous (~<Esc~>)"), (352 / 2) - (224 / 2), 352 - 40,
     function() menu:stop()  end)
 
   menu:run(false)
@@ -531,11 +531,11 @@ function RunTipsMenu()
       SavePreferences()
     end)
   showtips:setMarked(preferences.ShowTips)
-  menu:addSmallButton(_("~!OK"), "o", 14, 256 - 40,
+  menu:addSmallButton(_("~!OK"), 14, 256 - 40,
     function() l:nextTip(); menu:stop() end)
-  menu:addSmallButton(_("~!Previous Tip"), "p", 14 + 106 + 11, 256 - 40,
+  menu:addSmallButton(_("~!Previous Tip"), 14 + 106 + 11, 256 - 40,
     function() l:prevTip(); l:updateCaption() end)
-  menu:addSmallButton(_("~!Next Tip"), "n", 14 + 106 + 11 + 106 + 11, 256 - 40,
+  menu:addSmallButton(_("~!Next Tip"), 14 + 106 + 11 + 106 + 11, 256 - 40,
     function() l:nextTip(); l:updateCaption() end)
 
   menu:run(false)
@@ -557,7 +557,7 @@ function RunObjectivesMenu()
 
   l:setCaption(GetObjectives())
 
-  menu:addButton(_("~!OK"), "o", 80, 256 - 40,
+  menu:addButton(_("~!OK"), 80, 256 - 40,
     function() menu:stop() end)
 
   menu:run(false)

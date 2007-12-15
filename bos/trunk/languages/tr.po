@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-09 21:41+0200\n"
+"POT-Creation-Date: 2007-12-15 13:05-0800\n"
 "PO-Revision-Date: 2007-07-10 00:08+0300\n"
 "Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
 "Language-Team:  <tr@li.org>\n"
@@ -17,26 +17,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: action/action_build.cpp:131
+#: action/action_build.cpp:132
 msgid "You cannot reach building place"
 msgstr "İnşa yerine ulaşamazsınız"
 
-#: action/action_build.cpp:210
+#: action/action_build.cpp:211
 #, c-format
 msgid "You cannot build %s here"
 msgstr "%s burada inşa edilemez"
 
-#: action/action_build.cpp:224
+#: action/action_build.cpp:225
 #, c-format
 msgid "Can't build more units %s"
 msgstr "Daha fazla %s birimi inşa edilemiyor"
 
-#: action/action_build.cpp:256
+#: action/action_build.cpp:257
 #, c-format
 msgid "Unable to create building %s"
 msgstr "%s binası inşa edilemiyor"
 
-#: action/action_build.cpp:450
+#: action/action_build.cpp:451
 #, c-format
 msgid "New %s done"
 msgstr "Yeni %s tamamlandı"
@@ -56,7 +56,7 @@ msgstr "%s: büyü yapılamıyor: %s"
 msgid "New %s ready"
 msgstr "Yeni %s hazır"
 
-#: action/action_train.cpp:231
+#: action/action_train.cpp:236
 #, c-format
 msgid "Unable to train %s"
 msgstr "%s eğitimi yapılamıyor"
@@ -71,214 +71,215 @@ msgstr "Oyuncu \"%s\" oynu terk etti"
 msgid "Player \"%s\" has been killed"
 msgstr "Oyuncu \"%s\" öldürüldü"
 
-#: editor/editloop.cpp:516
-msgid "~!OK"
-msgstr "~!Tamam"
-
-#: editor/editloop.cpp:524
-msgid "~!Cancel"
-msgstr "~!İptal et"
-
-#: editor/editloop.cpp:1308
+#: editor/editloop.cpp:1197
 msgid "Unit can't be placed here."
 msgstr "Birlik buraya yerleştirilemez."
 
-#: editor/editloop.cpp:1380
+#: editor/editloop.cpp:1269
 msgid "Mirror editing enabled: 2-side"
 msgstr "Yansı düzenlemesi etkinleştirildi: 2-taraf"
 
-#: editor/editloop.cpp:1383
+#: editor/editloop.cpp:1272
 msgid "Mirror editing enabled: 4-side"
 msgstr "Yansı düzenlemesi etkinleştirildi: 4-taraf"
 
-#: editor/editloop.cpp:1386
+#: editor/editloop.cpp:1275
 msgid "Mirror editing disabled"
 msgstr "Yansı düzenlemesi kapatıldı"
 
-#: editor/editloop.cpp:1406
+#: editor/editloop.cpp:1295
 msgid "Unit deleted"
 msgstr "Birlik silindi"
 
-#: editor/editloop.cpp:1429 editor/editloop.cpp:1438
+#: editor/editloop.cpp:1318 editor/editloop.cpp:1327
 msgid "Unit owner modified"
 msgstr "Birliğin sahibi değiştirildi"
 
-#: editor/editloop.cpp:1759
+#: editor/editloop.cpp:1648
 msgid "Select mode"
 msgstr "Seçme modu"
 
-#: editor/editloop.cpp:1769
+#: editor/editloop.cpp:1658
 msgid "Unit mode"
 msgstr "Birlik modu"
 
-#: editor/editloop.cpp:1780
+#: editor/editloop.cpp:1669
 msgid "Tile mode"
 msgstr "Döşeme modu"
 
-#: editor/editloop.cpp:1791
+#: editor/editloop.cpp:1680
 msgid "Set start location mode"
 msgstr "Başlangıç noktası belirleme modu"
 
-#: network/commands.cpp:796
-msgid "No sync info for this replay !"
-msgstr "Yeniden oynatma için bir eşzamanlama yok!"
-
-#: network/commands.cpp:798
-#, c-format
-msgid "Replay got out of sync (%lu) !"
-msgstr "Yeniden oynatma eşzamanlamayı aştı (%lu) !"
-
-#: network/commands.cpp:807
-msgid "Replay got out of sync !"
-msgstr "Yeniden oynatma eşzamanlamayı aştı !"
-
-#: network/commands.cpp:906 network/commands.cpp:921
-msgid "End of replay"
-msgstr "Yeniden oynatma sonu"
-
-#: network/network.cpp:1061
-#, c-format
-msgid "%s sent bad command"
-msgstr "%s hatalı komut gönderdi"
-
-#: network/network.cpp:1158
-msgid "Network out of sync"
-msgstr "Ağ eşzamanlama hatasına uğradı"
-
-#: network/network.cpp:1391
-#, c-format
-msgid "Waiting for player \"%s\": %d:%02d"
-msgstr "\"%s\" oyuncusu bekleniyor: %d:%02d"
-
-#: network/network.cpp:1407
-msgid "Timed out"
-msgstr "Süre bitti"
-
-#: stratagus/player.cpp:706
+#: game/player.cpp:706
 msgid "Building Limit Reached"
 msgstr "İnşa Üst Sınırına Ulaşıldı"
 
-#: stratagus/player.cpp:710
+#: game/player.cpp:710
 msgid "Unit Limit Reached"
 msgstr "Birlik Sınırına Ulaşıldı"
 
-#: stratagus/player.cpp:714
+#: game/player.cpp:714
 msgid "Total Unit Limit Reached"
 msgstr "Toplam Birlik Üst Sınırına Ulaşıldı"
 
-#: stratagus/player.cpp:718
+#: game/player.cpp:718
 #, c-format
 msgid "Limit of %d reached for this unit type"
 msgstr "Bu birlik türü için %d sınırına ulaşıldı"
 
-#: stratagus/player.cpp:724
+#: game/player.cpp:724
 msgid "Cannot create more units."
 msgstr "Daha fazla birlik oluşturulamıyor."
 
-#: stratagus/stratagus.cpp:735
+#: game/replay.cpp:788
+msgid "No sync info for this replay !"
+msgstr "Yeniden oynatma için bir eşzamanlama yok!"
+
+#: game/replay.cpp:790
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Yeniden oynatma eşzamanlamayı aştı (%lu) !"
+
+#: game/replay.cpp:799
+msgid "Replay got out of sync !"
+msgstr "Yeniden oynatma eşzamanlamayı aştı !"
+
+#: game/replay.cpp:897 game/replay.cpp:911
+msgid "End of replay"
+msgstr "Yeniden oynatma sonu"
+
+#: network/network.cpp:1063
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s hatalı komut gönderdi"
+
+#: network/network.cpp:1160
+msgid "Network out of sync"
+msgstr "Ağ eşzamanlama hatasına uğradı"
+
+#: network/network.cpp:1393
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "\"%s\" oyuncusu bekleniyor: %d:%02d"
+
+#: network/network.cpp:1409
+msgid "Timed out"
+msgstr "Süre bitti"
+
+#: stratagus/stratagus.cpp:596
 #, c-format
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Bos Wars oynadığınız için teşekkür ederiz.\n"
 
-#: ui/botpanel.cpp:666 ui/botpanel.cpp:731
+#: ui/botpanel.cpp:786 ui/botpanel.cpp:851
 msgid "Select Target"
 msgstr "Hedef Seçin"
 
-#: ui/botpanel.cpp:779
+#: ui/botpanel.cpp:899
 msgid "Select Location"
 msgstr "Yer Seçin"
 
-#: ui/interface.cpp:94
+#: ui/interface.cpp:95
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "MESAJ:%s~!_"
 
-#: ui/interface.cpp:246
+#: ui/interface.cpp:247
 msgid "Sound is on."
 msgstr "Ses açık."
 
-#: ui/interface.cpp:248
+#: ui/interface.cpp:249
 msgid "Sound is off."
 msgstr "Ses kapalı."
 
-#: ui/interface.cpp:263
+#: ui/interface.cpp:264
 msgid "Music is off."
 msgstr "Müzik açık."
 
-#: ui/interface.cpp:266
+#: ui/interface.cpp:267
 msgid "Music is on."
 msgstr "Müzik kapalı."
 
-#: ui/interface.cpp:279 ui/mouse.cpp:1610
+#: ui/interface.cpp:280 ui/mouse.cpp:1609
 msgid "Game Paused"
 msgstr "Oyun Durduruldu"
 
-#: ui/interface.cpp:281
+#: ui/interface.cpp:282
 msgid "Game Resumed"
 msgstr "Oyun Yeniden Başlatıldı"
 
-#: ui/interface.cpp:312
+#: ui/interface.cpp:313
 msgid "Big map enabled"
 msgstr "Büyük harita etkinleştirildi"
 
-#: ui/interface.cpp:321
+#: ui/interface.cpp:322
 msgid "Returning to old map"
 msgstr "Eski haritaya geri dönülüyor"
 
-#: ui/interface.cpp:335
+#: ui/interface.cpp:336
 msgid "Faster"
 msgstr "Daha hızlı"
 
-#: ui/interface.cpp:354
+#: ui/interface.cpp:355
 msgid "Slower"
 msgstr "Daha yavaş"
 
-#: ui/interface.cpp:409
+#: ui/interface.cpp:410
 msgid "Terrain displayed."
 msgstr "Arazi gösteriliyor."
 
-#: ui/interface.cpp:411
+#: ui/interface.cpp:412
 msgid "Terrain hidden."
 msgstr "Arazi gösterilmiyor."
 
-#: ui/interface.cpp:444
+#: ui/interface.cpp:445
 msgid "Grab mouse toggled."
 msgstr "Fare geçişi."
 
-#: ui/interface.cpp:919
+#: ui/interface.cpp:930
 msgid "Screenshot made."
 msgstr "Ekran görüntüsü alındı."
 
-#: ui/mainscr.cpp:694
+#: ui/mainscr.cpp:372
 msgid "Energy"
 msgstr "Enerji"
 
-#: ui/mainscr.cpp:694
+#: ui/mainscr.cpp:372
 msgid "Magma"
 msgstr "Magma"
 
-#: ui/mainscr.cpp:919
+#: ui/mainscr.cpp:597
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "~<%d~>tekrarlanan son mesaj"
 
-#: ui/mainscr.cpp:1044
+#: ui/mainscr.cpp:722
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Olay: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1777
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "~<%d~> %ss sahipsiniz"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1781
 #, c-format
 msgid "You have ~<%d~> %s(s)"
 msgstr "~<%d~> %s(s) sahipsiniz"
 
-#: unit/unit.cpp:2744
+#: unit/unit.cpp:2113
 #, c-format
 msgid "%s attacked"
 msgstr "%s saldırıldı"
 
+#: video/sdl.cpp:269
+msgid "esc"
+msgstr ""
+
+#~ msgid "~!OK"
+#~ msgstr "~!Tamam"
+
+#~ msgid "~!Cancel"
+#~ msgstr "~!İptal et"

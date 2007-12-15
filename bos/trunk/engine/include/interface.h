@@ -235,7 +235,7 @@ extern void CleanButtons(void);
 	/// Make a new button
 extern int AddButton(int pos, int level, const std::string &IconIdent,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &arg, int key, const std::string &hint, const std::string &umask);
+	const std::string &arg, const std::string &hint, const std::string &umask);
 
 //
 // in mouse.cpp

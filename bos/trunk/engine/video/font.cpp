@@ -259,6 +259,50 @@ int CFont::Width(const std::string &text) const
 	return width;
 }
 
+extern int convertKey(const char *key);
+
+/**
+**  Get the hot key from a string
+*/
+int GetHotKey(const std::string &text)
+{
+	int hotkey = 0;
+	int utf8;
+	size_t pos = 0;
+
+	while (GetUTF8(text, pos, utf8)) {
+		if (utf8 == '~') {
+			if (pos >= text.size()) {
+				break;
+			}
+			if (text[pos] == '<') {
+				++pos;
+				size_t endpos = pos;
+				while (endpos < text.size()) {
+					if (text[endpos] == '~') {
+						break;
+					}
+					++endpos;
+				}
+				std::string key = text.substr(pos, endpos - pos);
+				hotkey = convertKey(key.c_str());
+				break;
+			}
+			if (text[pos] == '!') {
+				++pos;
+				if (pos >= text.size()) {
+					break;
+				}
+				GetUTF8(text, pos, utf8);
+				hotkey = utf8;
+				break;
+			}
+		}
+	}
+
+	return hotkey;
+}
+
 CFont::~CFont()
 {
 	if (G) {

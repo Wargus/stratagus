@@ -143,7 +143,7 @@ DefineAllow("unit-gturret", AllowAll)
 
 DefineButton({
     Pos = 2, Level = 3, Icon = "icon-gturret_b", Action = "build",
-    Value = "unit-gturret", Key = "g", Hint = "BUILD ~!GUN TURRET",
+    Value = "unit-gturret", Hint = "BUILD ~!GUN TURRET",
     ForUnit = {"unit-engineer"}})
 -- DefineButton for the 'stop' and 'attack' actions are defined in buttons.lua.
 

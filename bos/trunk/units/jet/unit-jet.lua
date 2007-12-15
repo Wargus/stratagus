@@ -105,7 +105,7 @@ DefineAllow("unit-jet", AllowAll)
 
 DefineButton({
     Pos = 1, Level = 0, Icon = "icon-jet", Action = "train-unit",
-    Value = "unit-jet", Key = "j", Hint = "BUILD ~!JET FIGHTER",
+    Value = "unit-jet", Hint = "BUILD ~!JET FIGHTER",
     ForUnit = {"unit-aircraftfactory"}})
 
 DefineCommonButtons({"unit-jet"})

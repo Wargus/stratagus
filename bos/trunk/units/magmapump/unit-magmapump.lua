@@ -136,6 +136,6 @@ DefineAllow("unit-magmapump", AllowAll)
 
 DefineButton({
     Pos = 2, Level = 1, Icon = "icon-magmapump_b", Action = "build",
-    Value = "unit-magmapump", Key = "m", Hint = "BUILD ~!MAGMA PUMP",
+    Value = "unit-magmapump", Hint = "BUILD ~!MAGMA PUMP",
     ForUnit = {"unit-engineer"}})
 

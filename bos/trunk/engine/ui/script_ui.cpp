@@ -842,8 +842,6 @@ static int CclDefineButton(lua_State *l)
 				}
 			}
 			ba.AllowStr = allowstr;
-		} else if (!strcmp(value, "Key")) {
-			ba.Key = *LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
 			ba.Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "ForUnit")) {
@@ -874,7 +872,7 @@ static int CclDefineButton(lua_State *l)
 		lua_pop(l, 1);
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
-		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
+		ba.Allowed, ba.AllowStr, ba.Hint, ba.UnitMask);
 
 	return 0;
 }

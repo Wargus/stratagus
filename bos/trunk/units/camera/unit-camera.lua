@@ -133,7 +133,7 @@ DefineAllow("unit-cam", AllowAll)
 
 DefineButton({
     Pos = 5, Level = 1, Icon = "icon-cam_b", Action = "build",
-    Value = "unit-cam", Key = "c", Hint = "BUILD ~!CAMERA",
+    Value = "unit-cam", Hint = "BUILD ~!CAMERA",
     ForUnit = {"unit-engineer"}})
 
 

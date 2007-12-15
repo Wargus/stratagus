@@ -127,6 +127,6 @@ DefineAllow("unit-nukepowerplant", AllowAll)
 
 DefineButton({
     Pos = 7, Level = 1, Icon = "icon-nukepowerplant", Action = "build",
-    Value = "unit-nukepowerplant", Key = "n", 
+    Value = "unit-nukepowerplant",
     Hint = "BUILD ~!Nuclear Power Plant",
     ForUnit = {"unit-engineer"}})

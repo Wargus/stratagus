@@ -165,6 +165,9 @@ extern int VideoDrawReverseNumber(int x, int y, CFont *font, int number);
 	/// Draw reverse number clipped
 extern int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number);
 
+	/// Get the hot key from a string
+extern int GetHotKey(const std::string &text);
+
 	/// Load and initialize the fonts
 extern void LoadFonts(void);
 	/// Reload OpenGL fonts

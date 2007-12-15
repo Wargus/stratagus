@@ -47,16 +47,16 @@ function RunEditorIngameMenu(s)
   local menu = BosGameMenu()
 
   menu:addLabel(_("Editor Menu"), 128, 11)
-  menu:addButton(_("Save (~<F11~>)"), "f11", 16, 40,
+  menu:addButton(_("Save (~<F11~>)"), 16, 40,
     function() RunEditorSaveMenu() end)
-  menu:addButton(_("Map Properties (~<F5~>)"), "f5", 16, 40 + (36 * 1),
+  menu:addButton(_("Map Properties (~<F5~>)"), 16, 40 + (36 * 1),
     function() RunEditorMapPropertiesMenu() end)
-  menu:addButton(_("Player Properties (~<F6~>)"), "f6", 16, 40 + (36 * 2),
+  menu:addButton(_("Player Properties (~<F6~>)"), 16, 40 + (36 * 2),
     function() RunEditorPlayerPropertiesMenu() end)
 
-  menu:addButton(_("~!Exit to menu"), "e", 16, 40 + (36 * 4),
+  menu:addButton(_("~!Exit to menu"), 16, 40 + (36 * 4),
     function() Editor.Running = EditorNotRunning; menu:stop() end)
-  menu:addButton(_("Return to the Editor (~<Esc~>)"), "escape", 16, 248,
+  menu:addButton(_("Return to the Editor (~<Esc~>)"), 16, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -75,7 +75,7 @@ function RunEditorSaveMenu()
   end
   browser:setActionCallback(cb)
 
-  menu:addSmallButton(_("Save"), 0, 16, 248,
+  menu:addSmallButton(_("Save"), 16, 248,
     -- FIXME: use a confirm menu if the file exists already
     function()
       print(t:getText())
@@ -84,7 +84,7 @@ function RunEditorSaveMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("Cancel"), 0, 16 + 12 + 106, 248,
+  menu:addSmallButton(_("Cancel"), 16 + 12 + 106, 248,
     function() menu:stop() end)
 
   menu:run(false)
@@ -115,14 +115,14 @@ function RunEditorMapPropertiesMenu()
   sizeLabel:setFont(Fonts["game"])
   menu:add(sizeLabel, 288 - ((288 - 260) / 2) - 152, 11 + (36 * 2) + 22)
 
-  menu:addSmallButton(_("~!OK"), "o", (288 - (106 * 2)) / 4, 256 - 11 - 27,
+  menu:addSmallButton(_("~!OK"), (288 - (106 * 2)) / 4, 256 - 11 - 27,
     function()
       Map.Info.Description = desc:getText()
       menu:stop()
     end
   )
 
-  menu:addSmallButton(_("~!Cancel"), "c", (288 - (288 - (106 * 2)) / 4) - 106, 256 - 11 - 27,
+  menu:addSmallButton(_("~!Cancel"), (288 - (288 - (106 * 2)) / 4) - 106, 256 - 11 - 27,
     function()
       menu:stop()
     end
@@ -216,7 +216,7 @@ function RunEditorPlayerPropertiesMenu()
     magmaWidgets[i] = d
   end
 
-  menu:addSmallButton(_("~!OK"), "o", (500 - (106 * 2)) / 4, 270,
+  menu:addSmallButton(_("~!OK"), (500 - (106 * 2)) / 4, 270,
     function()
       for i=0,7 do
         Map.Info.PlayerType[i] = pt2[typeWidgets[i]:getSelected()]
@@ -227,7 +227,7 @@ function RunEditorPlayerPropertiesMenu()
       menu:stop()
     end)
 
-  menu:addSmallButton(_("~!Cancel"), "c", (500 - (500 - (106 * 2)) / 4) - 106, 270,
+  menu:addSmallButton(_("~!Cancel"), (500 - (500 - (106 * 2)) / 4) - 106, 270,
     function() menu:stop() end)
 
   menu:run(false)
