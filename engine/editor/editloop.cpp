@@ -486,22 +486,34 @@ static void DrawTileIcons(void)
 	}
 
 	VideoDrawTextCentered(x, y, GameFont, "1x1");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 1) {
+		VideoDrawText(x + 40, y, GameFont, "x");
+	}
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "2x2");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 2) {
+		VideoDrawText(x + 40, y, GameFont, "x");
+	}
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "3x3");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 3) {
+		VideoDrawText(x + 40, y, GameFont, "x");
+	}
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "4x4");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
+	if (TileCursorSize == 4) {
+		VideoDrawText(x + 40, y, GameFont, "x");
+	}
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "Random");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
+	if (TileToolRandom) {
+		VideoDrawText(x + 40, y, GameFont, "x");
+	}
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "Filler");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
+	if (TileToolDecoration) {
+		VideoDrawText(x + 40, y, GameFont, "x");
+	}
 	y += 20;
 
 	y = UI.ButtonPanel.Y + 4;
