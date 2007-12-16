@@ -50,6 +50,15 @@ DefineTileset(
     { 125, 127, 128}},-- 070
   "solid", { "rocks", "land", "unpassable",
     { 165, 177, 178, 179}},-- 080
+  "solid", { "unused",
+    {}},-- 090
+  "solid", { "unused",
+    {}},-- 0A0
+  "solid", { "unused",
+    {}},-- 0B0
+  "solid", { "unused",
+    {}},-- 0C0
+--[[
   "solid", { "human-closed-wall", "land", "unpassable",
     {  16,   0,  52,   0,  88}},-- 090
   "solid", { "orc-closed-wall", "land", "unpassable",
@@ -58,6 +67,7 @@ DefineTileset(
     {  33,   0,  69,   0, 101}},-- 0B0
   "solid", { "orc-open-wall", "land", "unpassable",
     {  51,   0,  87,   0, 101}},-- 0C0
+]]
   "solid", { "unused",
     {}},-- 0D0
   "solid", { "unused",
