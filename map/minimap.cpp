@@ -207,11 +207,12 @@ void CMinimap::UpdateTerrain(void)
 	int xofs;
 	int yofs;
 	int bpp;
+	const int scalePrecision = 100;
 
-	if (!(scalex = (MinimapScaleX / MINIMAP_FAC))) {
+	if (!(scalex = (MinimapScaleX * scalePrecision / MINIMAP_FAC))) {
 		scalex = 1;
 	}
-	if (!(scaley = (MinimapScaleY / MINIMAP_FAC))) {
+	if (!(scaley = (MinimapScaleY * scalePrecision / MINIMAP_FAC))) {
 		scaley = 1;
 	}
 	bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
@@ -248,7 +249,8 @@ void CMinimap::UpdateTerrain(void)
 				if (bpp == 1) {
 					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
 						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch];
 				} else if (bpp == 3) {
 					Uint8 *d;
@@ -256,7 +258,8 @@ void CMinimap::UpdateTerrain(void)
 
 					d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 					s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch];
 					*d++ = *s++;
 					*d++ = *s++;
@@ -264,7 +267,8 @@ void CMinimap::UpdateTerrain(void)
 				} else {
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
 						*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch];
 				}
 			} else {
@@ -273,7 +277,8 @@ void CMinimap::UpdateTerrain(void)
 
 					color = Map.TileGraphic->Surface->format->palette->colors[
 						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch]];
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
@@ -281,7 +286,8 @@ void CMinimap::UpdateTerrain(void)
 
 					f = Map.TileGraphic->Surface->format;
 					c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+						(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
+						(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 						Map.TileGraphic->Surface->pitch];
 					c = Video.MapRGB(0,
 						((c & f->Rmask) >> f->Rshift),
@@ -317,6 +323,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 	int yofs;
 	int tilepitch;
 	int bpp;
+	const int scalePrecision = 100;
 
 	if (!UseOpenGL) {
 		if (!MinimapTerrainSurface) {
@@ -328,11 +335,11 @@ void CMinimap::UpdateXY(int tx, int ty)
 		}
 	}
 
-	scalex = MinimapScaleX / MINIMAP_FAC;
+	scalex = MinimapScaleX * scalePrecision / MINIMAP_FAC;
 	if (scalex == 0) {
 		scalex = 1;
 	}
-	scaley = MinimapScaleY / MINIMAP_FAC;
+	scaley = MinimapScaleY * scalePrecision / MINIMAP_FAC;
 	if (scaley == 0) {
 		scaley = 1;
 	}
@@ -382,7 +389,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 				if (bpp == 1) {
 					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
 						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch];
 				} else if (bpp == 3) {
 					Uint8 *d;
@@ -390,7 +398,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 
 					d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 					s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch];
 					*d++ = *s++;
 					*d++ = *s++;
@@ -398,7 +407,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 				} else {
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
 						*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch];
 				}
 			} else {
@@ -407,7 +417,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 
 					color = Map.TileGraphic->Surface->format->palette->colors[
 						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
+							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
+							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 							Map.TileGraphic->Surface->pitch]];
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
@@ -415,7 +426,8 @@ void CMinimap::UpdateXY(int tx, int ty)
 
 					f = Map.TileGraphic->Surface->format;
 					c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						(xofs + 7 + (mx % scalex) * 8) * 4 + (yofs + 6 + (my % scaley) * 8) *
+						(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * 4 +
+						(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
 						Map.TileGraphic->Surface->pitch];
 					c = Video.MapRGB(0,
 						((c & f->Rmask) >> f->Rshift),
