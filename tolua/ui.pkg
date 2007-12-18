@@ -164,6 +164,9 @@ class CUserInterface
 	CViewport *MouseViewport;
 	CMapArea MapArea;
 
+	CFont *MessageFont;
+	int MessageScrollSpeed;
+
 	CUIButton MenuButton;
 	CUIButton NetworkMenuButton;
 	CUIButton NetworkDiplomacyButton;
