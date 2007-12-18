@@ -365,7 +365,7 @@ static void DrawUnitInfo(CUnit *unit)
 /**
 **  Draw the player resource in top line.
 **
-**  @todo FIXME : make DrawResources more configurable (format, font).
+**  @todo FIXME: make DrawResources more configurable (format, font).
 */
 void DrawResources(void)
 {
@@ -405,26 +405,32 @@ static char MessagesEvent[MESSAGES_MAX][64];     /// Array of event messages
 static int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
 static int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
 static int  MessagesEventCount;                  /// Number of event messages
-static int  MessagesEventIndex;                  /// FIXME: docu
+static int  MessagesEventIndex;                  /// Current event index
 
 class MessagesDisplay
 {
+public:
+	MessagesDisplay()
+	{
+		CleanMessages();
+	}
+
+	void UpdateMessages();
+	void AddUniqueMessage(const char *s);
+	void DrawMessages();
+	void CleanMessages();
+
+protected:
+	void ShiftMessages();
+	void AddMessage(const char *msg);
+	bool CheckRepeatMessage(const char *msg);
+
+private:
 	char Messages[MESSAGES_MAX][128];         /// Array of messages
 	int  MessagesCount;                       /// Number of messages
 	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
-
-	static const int MESSAGES_TIMEOUT = 5;    /// Message timeout 5 seconds
-protected:
-	void ShiftMessages();
-	void AddMessage(const char *msg);
-	int CheckRepeatMessage(const char *msg);
-public:
-	void UpdateMessages();
-	void AddUniqueMessage(char *s);
-	void DrawMessages();
-	void CleanMessages();
 };
 
 /**
@@ -442,8 +448,6 @@ void MessagesDisplay::ShiftMessages()
 
 /**
 **  Update messages
-**
-**  @todo FIXME: make scroll speed configurable.
 */
 void MessagesDisplay::UpdateMessages()
 {
@@ -455,8 +459,8 @@ void MessagesDisplay::UpdateMessages()
 	unsigned long ticks = GetTicks();
 	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
-		if (MessagesScrollY == GameFont->Height() + 1) {
-			MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
+		if (MessagesScrollY == UI.MessageFont->Height() + 1) {
+			MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
 		}
@@ -465,8 +469,6 @@ void MessagesDisplay::UpdateMessages()
 
 /**
 **  Draw message(s).
-**
-**  @todo FIXME: make message font configurable.
 */
 void MessagesDisplay::DrawMessages()
 {
@@ -474,7 +476,7 @@ void MessagesDisplay::DrawMessages()
 	if (MessagesCount) {
 		Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
 		Video.FillTransRectangleClip(color, UI.MapArea.X + 8, UI.MapArea.Y + 8,
-			UI.MapArea.EndX - UI.MapArea.X - 16, MessagesCount * (GameFont->Height() + 1) - MessagesScrollY, 0x80);
+			UI.MapArea.EndX - UI.MapArea.X - 16, MessagesCount * (UI.MessageFont->Height() + 1) - MessagesScrollY, 0x80);
 	}
 
 	// Draw message line(s)
@@ -485,8 +487,8 @@ void MessagesDisplay::DrawMessages()
 				Video.Height - 1);
 		}
 		VideoDrawTextClip(UI.MapArea.X + 8,
-			UI.MapArea.Y + 8 + z * (GameFont->Height() + 1) - MessagesScrollY,
-			GameFont, Messages[z]);
+			UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+			UI.MessageFont, Messages[z]);
 		if (z == 0) {
 			PopClipping();
 		}
@@ -509,13 +511,13 @@ void MessagesDisplay::AddMessage(const char *msg)
 	unsigned long ticks = GetTicks();
 
 	if (!MessagesCount) {
-		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
+		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 	}
 
 	if (MessagesCount == MESSAGES_MAX) {
 		// Out of space to store messages, can't scroll smoothly
 		ShiftMessages();
-		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
+		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 		MessagesScrollY = 0;
 	}
 
@@ -542,7 +544,7 @@ void MessagesDisplay::AddMessage(const char *msg)
 		next = ptr = message + strlen(message);
 	}
 
-	while (GameFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
 		while (1) {
 			--ptr;
 			if (*ptr == ' ') {
@@ -556,7 +558,7 @@ void MessagesDisplay::AddMessage(const char *msg)
 		// No space found, wrap in the middle of a word
 		if (ptr == message) {
 			ptr = next - 1;
-			while (GameFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
 				*--ptr = '\0';
 			}
 			next = ptr + 1;
@@ -576,16 +578,16 @@ void MessagesDisplay::AddMessage(const char *msg)
 **
 **  @param msg  Message to check.
 **
-**  @return     non-zero to skip this message
+**  @return     true to skip this message
 */
-int MessagesDisplay::CheckRepeatMessage(const char *msg)
+bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 {
 	if (MessagesCount < 1) {
-		return 0;
+		return false;
 	}
 	if (!strcmp(msg, Messages[MessagesCount - 1])) {
 		++MessagesSameCount;
-		return 1;
+		return true;
 	}
 	if (MessagesSameCount > 0) {
 		char temp[128];
@@ -593,45 +595,59 @@ int MessagesDisplay::CheckRepeatMessage(const char *msg)
 
 		n = MessagesSameCount;
 		MessagesSameCount = 0;
-		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
 		sprintf_s(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
 		AddMessage(temp);
 	}
-	return 0;
+	return false;
 }
 
 /**
 **  Add a new message to display only if it differs from the preceeding one.
 */
-void MessagesDisplay::AddUniqueMessage(char *s)
+void MessagesDisplay::AddUniqueMessage(const char *s)
 {
-	if (CheckRepeatMessage(s)) {
-		return;
+	if (!CheckRepeatMessage(s)) {
+		AddMessage(s);
 	}
-	AddMessage(s);
 }
 
 /**
-**  Cleanup messages.
+**  Clean up messages.
 */
-void MessagesDisplay::CleanMessages(void)
+void MessagesDisplay::CleanMessages()
 {
 	MessagesCount = 0;
 	MessagesSameCount = 0;
+	MessagesScrollY = 0;
+	MessagesFrameTimeout = 0;
+
 	MessagesEventCount = 0;
 	MessagesEventIndex = 0;
-	MessagesScrollY = 0;
 }
 
-MessagesDisplay allmessages;
+static MessagesDisplay allmessages;
 
+/**
+**  Update messages
+*/
 void UpdateMessages() {
 	allmessages.UpdateMessages();
 }
 
+/**
+**  Clean messages
+*/
 void CleanMessages()
 {
 	allmessages.CleanMessages();
+}
+
+/**
+**  Draw messages
+*/
+void DrawMessages()
+{
+	allmessages.DrawMessages();
 }
 
 /**
@@ -649,11 +665,6 @@ void SetMessage(const char *fmt, ...)
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 	allmessages.AddUniqueMessage(temp);
-}
-
-void DrawMessages()
-{
-	allmessages.DrawMessages();
 }
 
 /**
@@ -677,9 +688,6 @@ void ShiftMessagesEvent(void)
 **  @param x    Message X map origin.
 **  @param y    Message Y map origin.
 **  @param fmt  To be displayed in text overlay.
-**
-**  @note FIXME: vladi: I know this can be just separated func w/o msg but
-**               it is handy to stick all in one call, someone?
 */
 void SetMessageEvent(int x, int y, const char *fmt, ...)
 {
@@ -776,7 +784,6 @@ static int Costs[MaxCosts];              /// costs to display in status line
 **  Draw costs in status line.
 **
 **  @todo FIXME: make DrawCosts more configurable.
-**  @todo FIXME: remove hardcoded image for mana.
 */
 void DrawCosts(void)
 {
@@ -941,8 +948,6 @@ void CInfoPanel::Draw(void)
 
 /**
 **  Draw the timer
-**
-**  @todo FIXME : make DrawTimer more configurable (Pos, format).
 */
 void DrawTimer(void)
 {
