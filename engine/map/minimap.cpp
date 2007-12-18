@@ -57,6 +57,8 @@
 	/// unit attacked are shown blinking for this amount of cycles
 #define ATTACK_BLINK_DURATION (7 * CYCLES_PER_SECOND)
 
+#define SCALE_PRECISION 100
+
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -193,6 +195,17 @@ void CMinimap::Reload(void)
 }
 
 /**
+**  Calculate the tile graphic pixel
+*/
+static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
+{
+	Uint8 *pixels = (Uint8 *)Map.TileGraphic->Surface->pixels;
+	int x = (xofs + 7 + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
+	int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
+	return &pixels[x * bpp + y * Map.TileGraphic->Surface->pitch];
+}
+
+/**
 **  Update a mini-map from the tiles of the map.
 **
 **  FIXME: this can surely be sped up??
@@ -207,12 +220,11 @@ void CMinimap::UpdateTerrain(void)
 	int xofs;
 	int yofs;
 	int bpp;
-	const int scalePrecision = 100;
 
-	if (!(scalex = (MinimapScaleX * scalePrecision / MINIMAP_FAC))) {
+	if (!(scalex = (MinimapScaleX * SCALE_PRECISION / MINIMAP_FAC))) {
 		scalex = 1;
 	}
-	if (!(scaley = (MinimapScaleY * scalePrecision / MINIMAP_FAC))) {
+	if (!(scaley = (MinimapScaleY * SCALE_PRECISION / MINIMAP_FAC))) {
 		scaley = 1;
 	}
 	bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
@@ -248,47 +260,32 @@ void CMinimap::UpdateTerrain(void)
 			if (!UseOpenGL) {
 				if (bpp == 1) {
 					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
-						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch];
+						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				} else if (bpp == 3) {
 					Uint8 *d;
 					Uint8 *s;
 
 					d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-					s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch];
+					s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					*d++ = *s++;
 					*d++ = *s++;
 					*d++ = *s++;
 				} else {
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
-						*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch];
+						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				}
 			} else {
 				if (bpp == 1) {
 					SDL_Color color;
 
 					color = Map.TileGraphic->Surface->format->palette->colors[
-						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch]];
+						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
 					SDL_PixelFormat *f;
 
 					f = Map.TileGraphic->Surface->format;
-					c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
-						(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-						Map.TileGraphic->Surface->pitch];
+					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					c = Video.MapRGB(0,
 						((c & f->Rmask) >> f->Rshift),
 						((c & f->Gmask) >> f->Gshift),
@@ -323,7 +320,6 @@ void CMinimap::UpdateXY(int tx, int ty)
 	int yofs;
 	int tilepitch;
 	int bpp;
-	const int scalePrecision = 100;
 
 	if (!UseOpenGL) {
 		if (!MinimapTerrainSurface) {
@@ -335,11 +331,11 @@ void CMinimap::UpdateXY(int tx, int ty)
 		}
 	}
 
-	scalex = MinimapScaleX * scalePrecision / MINIMAP_FAC;
+	scalex = MinimapScaleX * SCALE_PRECISION / MINIMAP_FAC;
 	if (scalex == 0) {
 		scalex = 1;
 	}
-	scaley = MinimapScaleY * scalePrecision / MINIMAP_FAC;
+	scaley = MinimapScaleY * SCALE_PRECISION / MINIMAP_FAC;
 	if (scaley == 0) {
 		scaley = 1;
 	}
@@ -388,47 +384,32 @@ void CMinimap::UpdateXY(int tx, int ty)
 			if (!UseOpenGL) {
 				if (bpp == 1) {
 					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
-						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch];
+						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				} else if (bpp == 3) {
 					Uint8 *d;
 					Uint8 *s;
 
 					d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
-					s = &((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch];
+					s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					*d++ = *s++;
 					*d++ = *s++;
 					*d++ = *s++;
 				} else {
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
-						*(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * bpp +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch];
+						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				}
 			} else {
 				if (bpp == 1) {
 					SDL_Color color;
 
 					color = Map.TileGraphic->Surface->format->palette->colors[
-						((Uint8 *)Map.TileGraphic->Surface->pixels)[
-							xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8 +
-							(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-							Map.TileGraphic->Surface->pitch]];
+						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
 					SDL_PixelFormat *f;
 
 					f = Map.TileGraphic->Surface->format;
-					c = *(Uint32 *)&((Uint8 *)Map.TileGraphic->Surface->pixels)[
-						(xofs + 7 + ((mx * scalePrecision) % scalex) / scalePrecision * 8) * 4 +
-						(yofs + 6 + ((my * scalePrecision) % scaley) / scalePrecision * 8) *
-						Map.TileGraphic->Surface->pitch];
+					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					c = Video.MapRGB(0,
 						((c & f->Rmask) >> f->Rshift),
 						((c & f->Gmask) >> f->Gshift),
