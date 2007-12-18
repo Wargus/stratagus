@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 12/14/07 20:17:25.
+** Generated automatically by tolua++-1.0.92 on 12/17/07 20:37:25.
 */
 
 #ifndef __cplusplus
@@ -4475,6 +4475,66 @@ static int tolua_set_CUserInterface_MapArea(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->MapArea = *((CMapArea*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MessageFont of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_MessageFont_ptr
+static int tolua_get_CUserInterface_MessageFont_ptr(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MessageFont'",NULL);
+#endif
+  tolua_pushusertype(tolua_S,(void*)self->MessageFont,"CFont");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MessageFont of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_MessageFont_ptr
+static int tolua_set_CUserInterface_MessageFont_ptr(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MessageFont'",NULL);
+  if (!tolua_isusertype(tolua_S,2,"CFont",0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MessageFont = ((CFont*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MessageScrollSpeed of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_get_CUserInterface_MessageScrollSpeed
+static int tolua_get_CUserInterface_MessageScrollSpeed(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MessageScrollSpeed'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->MessageScrollSpeed);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MessageScrollSpeed of class  CUserInterface */
+#ifndef TOLUA_DISABLE_tolua_set_CUserInterface_MessageScrollSpeed
+static int tolua_set_CUserInterface_MessageScrollSpeed(lua_State* tolua_S)
+{
+  CUserInterface* self = (CUserInterface*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MessageScrollSpeed'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MessageScrollSpeed = ((int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -18199,6 +18259,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"PieMenu",tolua_get_CUserInterface_PieMenu,tolua_set_CUserInterface_PieMenu);
    tolua_variable(tolua_S,"MouseViewport",tolua_get_CUserInterface_MouseViewport_ptr,tolua_set_CUserInterface_MouseViewport_ptr);
    tolua_variable(tolua_S,"MapArea",tolua_get_CUserInterface_MapArea,tolua_set_CUserInterface_MapArea);
+   tolua_variable(tolua_S,"MessageFont",tolua_get_CUserInterface_MessageFont_ptr,tolua_set_CUserInterface_MessageFont_ptr);
+   tolua_variable(tolua_S,"MessageScrollSpeed",tolua_get_CUserInterface_MessageScrollSpeed,tolua_set_CUserInterface_MessageScrollSpeed);
    tolua_variable(tolua_S,"MenuButton",tolua_get_CUserInterface_MenuButton,tolua_set_CUserInterface_MenuButton);
    tolua_variable(tolua_S,"NetworkMenuButton",tolua_get_CUserInterface_NetworkMenuButton,tolua_set_CUserInterface_NetworkMenuButton);
    tolua_variable(tolua_S,"NetworkDiplomacyButton",tolua_get_CUserInterface_NetworkDiplomacyButton,tolua_set_CUserInterface_NetworkDiplomacyButton);

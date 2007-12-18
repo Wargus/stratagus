@@ -406,6 +406,8 @@ public:
 	int NumViewports;                   /// # Viewports currently used
 	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	CMapArea MapArea;                   /// geometry of the whole map area
+	CFont *MessageFont;                 /// Font used for messages
+	int MessageScrollSpeed;             /// Scroll speed in seconds for messages
 
 	// Menu buttons
 	CUIButton MenuButton;               /// menu button

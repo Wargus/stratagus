@@ -71,13 +71,14 @@ CUserInterface::CUserInterface() :
 	MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	MouseWarpX(0), MouseWarpY(0),
 	SingleSelectedButton(NULL),
-	MaxSelectedFont(0), MaxSelectedTextX(0), MaxSelectedTextY(0),
+	MaxSelectedFont(NULL), MaxSelectedTextX(0), MaxSelectedTextY(0),
 	SingleTrainingButton(NULL),
-	SingleTrainingFont(0), SingleTrainingTextX(0), SingleTrainingTextY(0),
-	TrainingFont(0), TrainingTextX(0), TrainingTextY(0),
+	SingleTrainingFont(NULL), SingleTrainingTextX(0), SingleTrainingTextY(0),
+	TrainingFont(NULL), TrainingTextX(0), TrainingTextY(0),
 	CompletedBarColor(0), CompletedBarShadow(0),
 	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
 	SelectedViewport(NULL), NumViewports(0),
+	MessageFont(NULL), MessageScrollSpeed(5),
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
 	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 {

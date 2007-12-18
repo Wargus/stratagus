@@ -200,6 +200,9 @@ UI.MapArea.ScrollPaddingRight = 0
 UI.MapArea.ScrollPaddingTop = 0
 UI.MapArea.ScrollPaddingBottom = 0
 
+UI.MessageFont = Fonts["game"]
+UI.MessageScrollSpeed = 5
+
 UI.Minimap.X = Video.Width - 200 + 46
 UI.Minimap.Y = 24 + 17 - 8
 UI.Minimap.W = 121
