@@ -349,7 +349,12 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 	SetChannelStereo(channel, stereo);
 }
 
-
+/**
+**  Play a game sound
+**
+**  @param sound   Sound to play
+**  @param volume  Volume level to play the sound
+*/
 void PlayGameSound(CSound *sound, unsigned char volume)
 {
 	Origin source = {NULL, 0};

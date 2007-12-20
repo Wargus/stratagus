@@ -315,7 +315,7 @@ static int MenuLoop(const std::string &filename, CMap *map)
 	char buf[1024];
 	int status;
 
-	initGuichan(Video.Width, Video.Height);
+	initGuichan();
 	InterfaceState = IfaceStateMenu;
 	//  Clear screen
 	Video.ClearScreen();
