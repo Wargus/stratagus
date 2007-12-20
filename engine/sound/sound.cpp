@@ -89,7 +89,6 @@ struct SelectionHandling {
 	unsigned char HowMany; /// number of sound played in this group
 };
 
-/// FIXME: docu
 SelectionHandling SelectionHandler;
 
 static int ViewPointOffset;      /// Distance to Volume Mapping
@@ -350,9 +349,7 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 	SetChannelStereo(channel, stereo);
 }
 
-/**
-**  FIXME: docu
-*/
+
 void PlayGameSound(CSound *sound, unsigned char volume)
 {
 	Origin source = {NULL, 0};
