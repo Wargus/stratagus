@@ -305,12 +305,9 @@ void PreMenuSetup(void)
 /**
 **  Run the guichan main menus loop.
 **
-**  @param filename  map filename
-**  @param map       map loaded
-**
 **  @return          0 for success, else exit.
 */
-static int MenuLoop(const std::string &filename, CMap *map)
+static int MenuLoop()
 {
 	char buf[1024];
 	int status;
@@ -324,8 +321,6 @@ static int MenuLoop(const std::string &filename, CMap *map)
 	ButtonUnderCursor = -1;
 	CursorState = CursorStatePoint;
 	GameCursor = UI.Point.Cursor;
-
-	// FIXME: filename isn't used
 
 	// FIXME delete this when switching to full guichan GUI
 	LibraryFileName("scripts/guichan.lua", buf, sizeof(buf));
@@ -558,7 +553,7 @@ static int main1(int argc, char **argv)
 	UnitManager.Init(); // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
-	MenuLoop(CliMapName, &Map);
+	MenuLoop();
 
 	return 0;
 }
