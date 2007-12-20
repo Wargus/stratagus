@@ -7,7 +7,7 @@
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
-/**@name sprite.cpp - The general sprite functions. */
+/**@name glgraphicdraw.cpp - The general sprite functions. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
 //                                 Nehal Mistry, and Jimmy Salmon
