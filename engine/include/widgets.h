@@ -36,7 +36,7 @@ typedef int lua_Object; // from tolua++.h
 
 extern bool GuichanActive;
 
-void initGuichan(int w, int h);
+void initGuichan();
 void freeGuichan();
 void handleInput(const SDL_Event *event);
 

@@ -89,11 +89,8 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 
 /**
 **  Initializes the GUI stuff
-**
-**  @param width   FIXME: docu
-**  @param height  FIXME: docu
 */
-void initGuichan(int width, int height)
+void initGuichan()
 {
 	gcn::Graphics *graphics;
 
@@ -139,9 +136,9 @@ void freeGuichan()
 }
 
 /**
-**  FIXME: docu
+**  Handle input events
 **
-**  @param event  FIXME: docu
+**  @param event  event to handle, null if no more events for this frame
 */
 void handleInput(const SDL_Event *event) 
 {
@@ -176,8 +173,8 @@ void DrawGuichanWidgets()
 /**
 **  LuaActionListener constructor
 **
-**  @param l  FIXME: docu
-**  @param f  FIXME: docu
+**  @param l  Lua state
+**  @param f  Listener function
 */
 LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
 	luastate(l)
@@ -191,9 +188,11 @@ LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
 }
 
 /**
-**  FIXME: docu
+**  Called whan an action is recieved from a Widget. It is used
+**  to be able to recieve a notification that an action has
+**  occured.
 **
-**  @param eventId  FIXME: docu
+**  @param eventId  the identifier of the Widget
 */
 void LuaActionListener::action(const std::string &eventId) 
 {
@@ -1232,7 +1231,7 @@ void Windows::setBaseColor(const gcn::Color &color)
 
 
 /**
-**  FIXME: docu
+**  Set the list
 */
 void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 {
@@ -1269,7 +1268,7 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 
 
 /**
-**  FIXME: docu
+**  Set the list
 */
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
@@ -1365,7 +1364,7 @@ void ListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 
 
 /**
-**  FIXME: docu
+**  Set the list
 */
 void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 {
