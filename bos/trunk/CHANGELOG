@@ -2,9 +2,10 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added Swedish translation (Olov Gustavsson)
 - Made message font and scroll speed configurable (Jimmy Salmon)
 - Fixed rounding bug in minimap (Jimmy Salmon)
-- Added dutch translation (Foppe Benedictus, Eric Kok)
+- Added Dutch translation (Foppe Benedictus, Eric Kok)
 - Fixed hot keys in different languages (Jimmy Salmon)
 - Added gimme cheat (Jimmy Salmon)
 - Enable starting a map from the command line (Francois Beerten)
