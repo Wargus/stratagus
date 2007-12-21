@@ -1,0 +1,281 @@
+# Stratagus swedish translation.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Olov Gustavsson <olov.gustavsson@bredband.net>.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-09-04 23:55+0200\n"
+"PO-Revision-Date: 2007-09-10 22:18+0200\n"
+"Last-Translator: Olov Gustavsson <olov.gustavsson@bredband.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: action/action_build.cpp:131
+msgid "You cannot reach building place"
+msgstr "Du kan inte nå byggplatsen"
+
+#: action/action_build.cpp:210
+#, c-format
+msgid "You cannot build %s here"
+msgstr "Du kan inte bygga %s här"
+
+#: action/action_build.cpp:224
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Kan inte skapa flera enheter av %s"
+
+#: action/action_build.cpp:256
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Kan inte bygga %s"
+
+#: action/action_build.cpp:450
+#, c-format
+msgid "New %s done"
+msgstr "Ny %s färdig"
+
+#: action/action_spellcast.cpp:172
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: inte tillräckligt med manna till förtrollning: %s"
+
+#: action/action_spellcast.cpp:176
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: kan inte kasta förtrollning: %s"
+
+#: action/action_train.cpp:185
+#, c-format
+msgid "New %s ready"
+msgstr "Ny %s klar"
+
+#: action/action_train.cpp:231
+#, c-format
+msgid "Unable to train %s"
+msgstr "Kan inte träna %s"
+
+#: action/command.cpp:1026
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Spelaren \"%s\" har lämnat spelet"
+
+#: action/command.cpp:1028
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Spelare \"%s\" har blivit dödad"
+
+#: editor/editloop.cpp:516
+msgid "~!OK"
+msgstr "~!OK"
+
+#: editor/editloop.cpp:524
+msgid "~!Cancel"
+msgstr "Avbryt (~!C)"
+
+#: editor/editloop.cpp:1308
+msgid "Unit can't be placed here."
+msgstr "Enheten kan inte placeras här."
+
+#: editor/editloop.cpp:1380
+msgid "Mirror editing enabled: 2-side"
+msgstr "Speglade förändringar aktiverade: 2 sidor"
+
+#: editor/editloop.cpp:1383
+msgid "Mirror editing enabled: 4-side"
+msgstr "Speglade förändringar aktiverade: 4 sidor"
+
+#: editor/editloop.cpp:1386
+msgid "Mirror editing disabled"
+msgstr "Speglade förändringar avaktiverade"
+
+#: editor/editloop.cpp:1406
+msgid "Unit deleted"
+msgstr "Enhet borttagen"
+
+#: editor/editloop.cpp:1429 editor/editloop.cpp:1438
+msgid "Unit owner modified"
+msgstr "Enhetsägare ändrad"
+
+#: editor/editloop.cpp:1759
+msgid "Select mode"
+msgstr "Markeringsläge"
+
+#: editor/editloop.cpp:1769
+msgid "Unit mode"
+msgstr "Enheter"
+
+#: editor/editloop.cpp:1780
+msgid "Tile mode"
+msgstr "Terräng"
+
+#: editor/editloop.cpp:1791
+msgid "Set start location mode"
+msgstr "Sätt startplats"
+
+#: network/commands.cpp:796
+msgid "No sync info for this replay !"
+msgstr "Ingen synk information för detta svar !"
+
+#: network/commands.cpp:798
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Svaret kom ur synk (%lu) !"
+
+#: network/commands.cpp:807
+msgid "Replay got out of sync !"
+msgstr "Svaret kom ur synk !"
+
+#: network/commands.cpp:906 network/commands.cpp:921
+msgid "End of replay"
+msgstr "Slut på svaret"
+
+#: network/network.cpp:1061
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s sände felaktigt kommando"
+
+#: network/network.cpp:1158
+msgid "Network out of sync"
+msgstr "Nätverk ur synk"
+
+#: network/network.cpp:1391
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Väntar på spelare \"%s\": %d:%02d"
+
+#: network/network.cpp:1407
+msgid "Timed out"
+msgstr "För lång tid"
+
+#: stratagus/player.cpp:706
+msgid "Building Limit Reached"
+msgstr "Byggnadsbegränsning uppnådd"
+
+#: stratagus/player.cpp:710
+msgid "Unit Limit Reached"
+msgstr "Enhetsbegränsning uppnådd"
+
+#: stratagus/player.cpp:714
+msgid "Total Unit Limit Reached"
+msgstr "Total enhetsbegränsning uppnådd"
+
+#: stratagus/player.cpp:718
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "Gränsen på %d uppnådd för denna enhetstyp"
+
+#: stratagus/player.cpp:724
+msgid "Cannot create more units."
+msgstr "Kan inte skapa flera enheter."
+
+#: stratagus/stratagus.cpp:735
+#, c-format
+msgid "Thanks for playing Bos Wars.\n"
+msgstr "Tack för att du spelar Bos Wars.\n"
+
+#: ui/botpanel.cpp:666 ui/botpanel.cpp:731
+msgid "Select Target"
+msgstr "Välj mål"
+
+#: ui/botpanel.cpp:779
+msgid "Select Location"
+msgstr "Välj placering"
+
+#: ui/interface.cpp:94
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "MEDDELANDE:%s~!_"
+
+#: ui/interface.cpp:246
+msgid "Sound is on."
+msgstr "Ljudet är på."
+
+#: ui/interface.cpp:248
+msgid "Sound is off."
+msgstr "Ljudet är av."
+
+#: ui/interface.cpp:263
+msgid "Music is off."
+msgstr "Musiken är av."
+
+#: ui/interface.cpp:266
+msgid "Music is on."
+msgstr "Musiken är på."
+
+#: ui/interface.cpp:279 ui/mouse.cpp:1610
+msgid "Game Paused"
+msgstr "Spelet är pausat"
+
+#: ui/interface.cpp:281
+msgid "Game Resumed"
+msgstr "Spelet fortsätter"
+
+#: ui/interface.cpp:312
+msgid "Big map enabled"
+msgstr "Stor karta valt"
+
+#: ui/interface.cpp:321
+msgid "Returning to old map"
+msgstr "Gå tillbaka till tidigare karta"
+
+#: ui/interface.cpp:335
+msgid "Faster"
+msgstr "Fortare"
+
+#: ui/interface.cpp:354
+msgid "Slower"
+msgstr "Långsammare"
+
+#: ui/interface.cpp:409
+msgid "Terrain displayed."
+msgstr "Terrängen visas."
+
+#: ui/interface.cpp:411
+msgid "Terrain hidden."
+msgstr "Terrängen döljs."
+
+#: ui/interface.cpp:444
+msgid "Grab mouse toggled."
+msgstr "Muslåsning ändrad."
+
+#: ui/interface.cpp:919
+msgid "Screenshot made."
+msgstr "Skärmbild skapad."
+
+#: ui/mainscr.cpp:694
+msgid "Energy"
+msgstr "Energi"
+
+#: ui/mainscr.cpp:694
+msgid "Magma"
+msgstr "Magma"
+
+#: ui/mainscr.cpp:919
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Sista meddelandet upprepat ~<%d~> gånger"
+
+#: ui/mainscr.cpp:1044
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Händelse: %s~>"
+
+#: ui/mouse.cpp:1778
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Du har ~<%d~> %ser"
+
+#: ui/mouse.cpp:1782
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "Du har ~<%d~> %s(er)"
+
+#: unit/unit.cpp:2744
+#, c-format
+msgid "%s attacked"
+msgstr "%s attackerad"
