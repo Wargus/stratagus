@@ -77,8 +77,6 @@ static std::map<CFont *, std::map<CFontColor *, CGraphic *> > FontColorGraphics;
 CFont *SmallFont;       /// Small font used in stats
 CFont *GameFont;        /// Normal font used in game
 CFont *LargeFont;       /// Large font used in menus
-CFont *SmallTitleFont;  /// Small font used in episoden titles
-CFont *LargeTitleFont;  /// Large font used in episoden titles
 
 
 /*----------------------------------------------------------------------------
@@ -769,8 +767,6 @@ void LoadFonts(void)
 	SmallFont = CFont::Get("small");
 	GameFont = CFont::Get("game");
 	LargeFont = CFont::Get("large");
-	SmallTitleFont = CFont::Get("small-title");
-	LargeTitleFont = CFont::Get("large-title");
 }
 
 /**
@@ -924,8 +920,6 @@ void CleanFonts(void)
 	SmallFont = NULL;
 	GameFont = NULL;
 	LargeFont = NULL;
-	SmallTitleFont = NULL;
-	LargeTitleFont = NULL;
 }
 
 //@}
