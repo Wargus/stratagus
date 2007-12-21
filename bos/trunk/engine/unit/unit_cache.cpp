@@ -130,7 +130,7 @@ int CUnitCache::Select(int x1, int y1, int x2, int y2, CUnit **table, int tables
 	}
 
 	//
-	//  Reduce to map limits. FIXME: should the caller check?
+	//  Reduce to map limits.
 	//
 	x1 = std::max(x1, 0);
 	y1 = std::max(y1, 0);
