@@ -37,8 +37,6 @@ CFont:New("game", CGraphic:New("general/dejavusans12.png", 17, 16))
 --CFont:New("large", CGraphic:New("general/freesansbold14.png", 18, 19))
 CFont:New("large", CGraphic:New("general/dejavusans14.png", 19, 17))
 --CFont:New("large", CGraphic:New("general/dejavusansbold14.png", 22, 18))
-CFont:New("small-title", CGraphic:New("general/dejavusansbold12.png", 19, 16))
-CFont:New("large-title", CGraphic:New("general/dejavusansbold14.png", 22, 18))
 
 --	FIXME: only yellow, white, and grey are correct.
 
