@@ -67,7 +67,7 @@ void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
 static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
 
 /**
-**  FIXME: docu
+**  Draw a 16-bit pixel
 */
 static void VideoDoDrawPixel16(Uint32 color, int x, int y)
 {
@@ -75,7 +75,7 @@ static void VideoDoDrawPixel16(Uint32 color, int x, int y)
 }
 
 /**
-**  FIXME: docu
+**  Draw a 16-bit pixel
 */
 void VideoDrawPixel16(Uint32 color, int x, int y)
 {
@@ -85,7 +85,7 @@ void VideoDrawPixel16(Uint32 color, int x, int y)
 }
 
 /**
-**  FIXME: docu
+**  Draw a 32-bit pixel
 */
 static void VideoDoDrawPixel32(Uint32 color, int x, int y)
 {
@@ -93,7 +93,7 @@ static void VideoDoDrawPixel32(Uint32 color, int x, int y)
 }
 
 /**
-**  FIXME: docu
+**  Draw a 32-bit pixel
 */
 void VideoDrawPixel32(Uint32 color, int x, int y)
 {
@@ -103,7 +103,7 @@ void VideoDrawPixel32(Uint32 color, int x, int y)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent 16-bit pixel
 */
 static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
@@ -122,7 +122,7 @@ static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char al
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent 16-bit pixel
 */
 void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
@@ -132,7 +132,7 @@ void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent 32-bit pixel
 */
 static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
@@ -158,7 +158,7 @@ static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char al
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent 32-bit pixel
 */
 void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
@@ -168,7 +168,7 @@ void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 }
 
 /**
-**  FIXME: docu
+**  Draw a clipped pixel
 */
 static void VideoDoDrawPixelClip(Uint32 color, int x, int y)
 {
@@ -178,7 +178,7 @@ static void VideoDoDrawPixelClip(Uint32 color, int x, int y)
 }
 
 /**
-**  FIXME: docu
+**  Draw a clipped pixel
 */
 void DrawPixelClip(Uint32 color, int x, int y)
 {
@@ -188,7 +188,7 @@ void DrawPixelClip(Uint32 color, int x, int y)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent clipped pixel
 */
 static void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
@@ -198,7 +198,7 @@ static void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char 
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent clipped pixel
 */
 void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
@@ -208,7 +208,7 @@ void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 }
 
 /**
-**  FIXME: docu
+**  Draw a vertical line
 */
 void DrawVLine(Uint32 color, int x, int y, int height)
 {
@@ -220,7 +220,7 @@ void DrawVLine(Uint32 color, int x, int y, int height)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent vertical line
 */
 void DrawTransVLine(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
@@ -233,7 +233,7 @@ void DrawTransVLine(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a vertical line clipped
 */
 void DrawVLineClip(Uint32 color, int x, int y, int height)
 {
@@ -243,7 +243,7 @@ void DrawVLineClip(Uint32 color, int x, int y, int height)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent vertical line clipped
 */
 void DrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
@@ -256,7 +256,7 @@ void DrawTransVLineClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a horizontal line
 */
 void DrawHLine(Uint32 color, int x, int y, int width)
 {
@@ -268,7 +268,7 @@ void DrawHLine(Uint32 color, int x, int y, int width)
 }
 
 /**
-**  FIXME: docu
+**  Draw a horizontal line clipped
 */
 void DrawHLineClip(Uint32 color, int x, int y, int width)
 {
@@ -278,7 +278,7 @@ void DrawHLineClip(Uint32 color, int x, int y, int width)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent horizontal line
 */
 void DrawTransHLine(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
@@ -291,7 +291,7 @@ void DrawTransHLine(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent horizontal line clipped
 */
 void DrawTransHLineClip(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
@@ -304,7 +304,7 @@ void DrawTransHLineClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a line
 */
 void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
@@ -414,7 +414,7 @@ void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 }
 
 /**
-**  FIXME: docu
+**  Draw a line clipped
 */
 void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
@@ -524,7 +524,7 @@ void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent line
 */
 void DrawTransLine(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
@@ -534,7 +534,7 @@ void DrawTransLine(Uint32 color, int sx, int sy,
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent line clipped
 */
 void DrawTransLineClip(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
@@ -544,7 +544,7 @@ void DrawTransLineClip(Uint32 color, int sx, int sy,
 }
 
 /**
-**  FIXME: docu
+**  Draw a rectangle
 */
 void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
@@ -556,7 +556,7 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 }
 
 /**
-**  FIXME: docu
+**  Draw a rectangle clipped
 */
 void DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
 {
@@ -568,7 +568,7 @@ void DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent rectangle
 */
 void DrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
@@ -581,7 +581,7 @@ void DrawTransRectangle(Uint32 color, int x, int y,
 }
 
 /**
-**  Draw translucent rectangle clipped.
+**  Draw a transparent rectangle clipped.
 **
 **  @param color  color
 **  @param x      x coordinate on the screen
@@ -601,7 +601,7 @@ void DrawTransRectangleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled rectangle
 */
 void FillRectangle(Uint32 color, int x, int y, int w, int h)
 {
@@ -610,7 +610,7 @@ void FillRectangle(Uint32 color, int x, int y, int w, int h)
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled rectangle clipped
 */
 void FillRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
@@ -630,7 +630,7 @@ void FillRectangleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled transparent rectangle
 */
 void FillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
@@ -649,7 +649,7 @@ void FillTransRectangle(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled transparent rectangle clipped
 */
 void FillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
@@ -659,7 +659,7 @@ void FillTransRectangleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a circle
 */
 void DrawCircle(Uint32 color, int x, int y, int r)
 {
@@ -693,7 +693,7 @@ void DrawCircle(Uint32 color, int x, int y, int r)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent circle
 */
 void DrawTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
@@ -728,7 +728,7 @@ void DrawTransCircle(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a circle clipped
 */
 void DrawCircleClip(Uint32 color, int x, int y, int r)
 {
@@ -762,7 +762,7 @@ void DrawCircleClip(Uint32 color, int x, int y, int r)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent circle clipped
 */
 void DrawTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
@@ -797,7 +797,7 @@ void DrawTransCircleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled circle
 */
 void FillCircle(Uint32 color, int x, int y, int r)
 {
@@ -835,7 +835,7 @@ void FillCircle(Uint32 color, int x, int y, int r)
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled transparent circle
 */
 void FillTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
@@ -874,7 +874,7 @@ void FillTransCircle(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled circle clipped
 */
 void FillCircleClip(Uint32 color, int x, int y, int r)
 {
@@ -912,7 +912,7 @@ void FillCircleClip(Uint32 color, int x, int y, int r)
 }
 
 /**
-**  FIXME: docu
+**  Draw a filled transparent circle clipped
 */
 void FillTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
@@ -951,7 +951,7 @@ void FillTransCircleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Initialize line draw
 */
 void InitLineDraw(void)
 {
@@ -1373,7 +1373,7 @@ void DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent line
 */
 void DrawTransLine(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
@@ -1383,7 +1383,7 @@ void DrawTransLine(Uint32 color, int sx, int sy,
 }
 
 /**
-**  FIXME: docu
+**  Draw a transparent line clipped
 */
 void DrawTransLineClip(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
@@ -1913,7 +1913,7 @@ void FillTransCircleClip(Uint32 color, int x, int y,
 }
 
 /**
-**  FIXME: docu
+**  Initialize line draw
 */
 void InitLineDraw(void)
 {
