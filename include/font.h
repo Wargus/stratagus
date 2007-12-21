@@ -135,8 +135,6 @@ public:
 extern CFont *SmallFont;       /// Small font used in stats
 extern CFont *GameFont;        /// Normal font used in game
 extern CFont *LargeFont;       /// Large font used in menus
-extern CFont *SmallTitleFont;  /// Small font used in episoden titles
-extern CFont *LargeTitleFont;  /// Large font used in episoden titles
 
 /*----------------------------------------------------------------------------
 --  Functions
