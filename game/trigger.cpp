@@ -228,9 +228,6 @@ static int CclGetNumUnitsAt(lua_State *l)
 	//
 	// Get all unit types in location.
 	//
-	// FIXME: I hope SelectUnits checks bounds?
-	// FIXME: Yes, but caller should check.
-	// NOTE: +1 right,bottom isn't inclusive :(
 	an = UnitCache.Select(x1, y1, x2 + 1, y2 + 1, table, UnitMax);
 	//
 	// Count the requested units
@@ -302,9 +299,6 @@ static int CclIfNearUnit(lua_State *l)
 
 		unit = table[i];
 
-		// FIXME: I hope SelectUnits checks bounds?
-		// FIXME: Yes, but caller should check.
-		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
 			an = UnitCache.Select(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
@@ -396,9 +390,6 @@ static int CclIfRescuedNearUnit(lua_State *l)
 
 		unit = table[i];
 
-		// FIXME: I hope SelectUnits checks bounds?
-		// FIXME: Yes, but caller should check.
-		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
 			an = UnitCache.Select(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
