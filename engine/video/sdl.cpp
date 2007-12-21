@@ -610,8 +610,6 @@ const EventCallback *GetCallbacks()
 **
 **  All events available are fetched. Sound and network only if available.
 **  Returns if the time for one frame is over.
-**
-**  FIXME: the initialization could be moved out of the loop
 */
 void WaitEventsOneFrame()
 {
@@ -625,14 +623,7 @@ void WaitEventsOneFrame()
 	Uint32 ticks;
 	int interrupts;
 
-	if (!++FrameCounter) {
-		// FIXME: tests with frame counter now fails :(
-		// FIXME: Should happen in 68 years :)
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-		fprintf(stderr, "FIXME: *** round robin ***\n");
-	}
+	++FrameCounter;
 
 	ticks = SDL_GetTicks();
 	if (ticks > NextFrameTicks) { // We are too slow :(
