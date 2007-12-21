@@ -403,8 +403,6 @@ static int CclSetAllPlayersTotalUnitLimit(lua_State *l)
 **  Change the diplomacy from player to another player.
 **
 **  @param l  Lua state.
-**
-**  @return          FIXME: should return old state.
 */
 static int CclSetDiplomacy(lua_State *l)
 {
@@ -446,8 +444,6 @@ static int CclDiplomacy(lua_State *l)
 **  Change the shared vision from player to another player.
 **
 **  @param l  Lua state.
-**
-**  @return   FIXME: should return old state.
 */
 static int CclSetSharedVision(lua_State *l)
 {
