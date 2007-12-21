@@ -143,8 +143,6 @@ void CMinimap::Create(void)
 	//
 	// Calculate minimap fast lookup tables.
 	//
-	// FIXME: this needs to be recalculated during map load - the map size
-	// might have changed!
 	Minimap2MapX = new int[W * H];
 	memset(Minimap2MapX, 0, W * H * sizeof(int));
 	Minimap2MapY = new int[W * H];
@@ -207,8 +205,6 @@ static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 
 /**
 **  Update a mini-map from the tiles of the map.
-**
-**  FIXME: this can surely be sped up??
 */
 void CMinimap::UpdateTerrain(void)
 {
@@ -582,7 +578,6 @@ void CMinimap::Update(void)
 
 	//
 	// Draw units on map
-	// FIXME: We should rewrite this completely
 	//
 	for (n = 0; n < NumUnits; ++n) {
 		if (Units[n]->IsVisibleOnMinimap()) {
