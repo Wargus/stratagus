@@ -53,14 +53,14 @@ static const int Sizes[][2] = {
 	{ 48, 48 },
 };
 
-CGraphic *CSmokeParticle::lightSmoke[NumSmokes];
-CGraphic *CSmokeParticle::darkSmoke[NumSmokes];
-int CSmokeParticle::numFrames = 26;
+CGraphic *lightSmoke[NumSmokes];
+CGraphic *darkSmoke[NumSmokes];
 
 
 CSmokeParticle::CSmokeParticle(CPosition position) :
-	CParticle(position), frame(0), currTicks(0)
+	CParticle(position)
 {
+	CGraphic *g;
 	int size = 2;
 
 	if (MyRand() % 2 == 0) {
@@ -68,10 +68,12 @@ CSmokeParticle::CSmokeParticle(CPosition position) :
 	} else {
 		g = darkSmoke[size];
 	}
+	puff = new GraphicAnimation(g, 60);
 }
 
 CSmokeParticle::~CSmokeParticle()
 {
+	delete puff;
 }
 
 void CSmokeParticle::init()
@@ -109,19 +111,13 @@ void CSmokeParticle::exit()
 void CSmokeParticle::draw()
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
-	g->DrawFrameClip(frame, static_cast<int>(screenPos.x - g->Width / 2.f),
-		static_cast<int>(screenPos.y - g->Height / 2.f));
+	puff->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
 }
 
 void CSmokeParticle::update(int ticks)
 {
-	const int ticksPerFrame = 60;
-	currTicks += ticks;
-	while (currTicks > ticksPerFrame) {
-		currTicks -= ticksPerFrame;
-		++frame;
-	}
-	if (frame >= numFrames) {
+	puff->update(ticks);
+	if (puff->isFinished()) {
 		destroy();
 		return;
 	}

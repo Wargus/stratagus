@@ -43,6 +43,44 @@ struct CPosition
 	float y;
 };
 
+class Animation
+{
+public:
+	virtual ~Animation() {}
+	virtual void draw(int x, int y) = 0;
+	virtual void update(int ticks) = 0;
+	virtual bool isFinished() = 0;
+};
+
+class GraphicAnimation : public Animation
+{
+	CGraphic *g;
+	int ticksPerFrame;
+	int currentFrame;
+	int currTicks;
+public:
+	GraphicAnimation(CGraphic *g, int ticksPerFrame) :
+		g(g), ticksPerFrame(ticksPerFrame), currentFrame(0), currTicks(0) {}
+
+	virtual ~GraphicAnimation() {}
+
+	/**
+	**  Draw the current frame of the animation.
+	**  @param x x screen coordinate where to draw the animation.
+	**  @param y y screen coordinate where to draw the animation.
+	*/
+	virtual void draw(int x, int y);
+
+	/**
+	**  Update the animation.
+	**  @param ticks the number of ticks elapsed since the last call.
+	*/
+	virtual void update(int ticks);
+
+	virtual bool isFinished();
+};
+
+
 
 // Base particle class
 class CParticle
@@ -79,14 +117,7 @@ public:
 	virtual void update(int ticks);
 
 protected:
-	CGraphic *g;
-	int frame;
-	int numFrames;
-	int currTicks;
-
-	static CGraphic *large[];
-	static CGraphic *medium[];
-	static CGraphic *small[];
+	Animation *flame;
 };
 
 
@@ -102,14 +133,9 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
-
 protected:
-	int frame;
-	int currTicks;
-
-	static CGraphic *flash;
-	static int numFrames;
-};	
+	Animation *flash;
+};
 
 
 // Chunk particle
@@ -155,13 +181,7 @@ public:
 	virtual void update(int ticks);
 
 protected:
-	CGraphic *g;
-	int frame;
-	int currTicks;
-
-	static int numFrames;
-	static CGraphic *lightSmoke[];
-	static CGraphic *darkSmoke[];
+	Animation *puff;
 };
 
 
