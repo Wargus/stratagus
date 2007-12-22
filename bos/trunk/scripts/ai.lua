@@ -60,8 +60,8 @@ DefineAiHelper(
   -- Building can train which units.
   --
   {"train", "unit-vault", "unit-engineer"},
-  {"train", "unit-camp", "unit-assault", "unit-bazoo", "unit-grenadier",
-   "unit-dorcoz"},
+  {"train", "unit-camp", "unit-engineer", "unit-assault", "unit-bazoo",
+   "unit-grenadier", "unit-dorcoz"},
   {"train", "unit-hosp", "unit-medic"},
   {"train", "unit-vfac", "unit-apcs", "unit-harvester", "unit-artil",
    "unit-buggy", "unit-rtank", "unit-tank"},
