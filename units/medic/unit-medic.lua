@@ -138,7 +138,7 @@ DefineUnitType("unit-medic", {
     "dead", "medic-die"}
 })
 
-DefineHumanCorpse("medic")
+DefineHumanCorpse("medic", nil, true)
 
 DefineAllow("unit-medic", AllowAll)
 
