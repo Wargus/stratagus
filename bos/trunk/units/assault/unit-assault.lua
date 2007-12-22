@@ -68,6 +68,7 @@ DefineUnitType("unit-assault", {
     Shadow = {"file", GetCurrentLuaPath().."/unit_assault_s.png", "size", {64, 64}},
     Animations = "animations-assault",
     Icon = "icon-assault",
+    Flip = true,
     EnergyValue = 1000,
     MagmaValue = 250,
     Speed = 10,

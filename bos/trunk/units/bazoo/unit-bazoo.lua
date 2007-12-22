@@ -65,6 +65,7 @@ DefineUnitType("unit-bazoo", {
     Shadow = {"file", GetCurrentLuaPath().."/unit_bazoo_s.png", "size", {64, 64}},
     Animations = "animations-bazoo",
     Icon = "icon-bazoo",
+    Flip = true,
     EnergyValue = 1500,
     MagmaValue = 1000,
     Speed = 8,

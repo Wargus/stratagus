@@ -74,6 +74,7 @@ DefineUnitType("unit-harvester", {
     DrawLevel = 40,
     Animations = "animations-harvester",
     Icon = "icon-harvester",
+    Flip = true,
     EnergyValue = 3200,
     MagmaValue = 1600,
     MaxEnergyUtilizationRate = 40,

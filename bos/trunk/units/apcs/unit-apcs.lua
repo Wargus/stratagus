@@ -65,6 +65,7 @@ DefineUnitType("unit-apcs", {
     Shadow = {"file", GetCurrentLuaPath().."/unit_apcs_s.png", "size", {96, 96}},
     Animations = "animations-apcs",
     Icon = "icon-apcs",
+    Flip = true,
     EnergyValue = 4000,
     MagmaValue = 2000,
     Speed = 15,

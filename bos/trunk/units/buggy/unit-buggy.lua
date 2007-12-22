@@ -93,7 +93,6 @@ DefineUnitType("unit-buggy", {
     Shadow = {"file", "units/buggy/unit_buggy_s.png", "size", {64, 64}},
     Animations = "animations-buggy",
     Icon = "icon-buggy",
-    Flip = false,
     EnergyValue = 2000,
     MagmaValue = 500,
     RepairHp = 1,

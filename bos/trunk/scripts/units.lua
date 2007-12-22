@@ -105,7 +105,7 @@ end
 DefineUnitType("unit-dead-body", {
 	Name= "Dead Body",
 	Image = {"file", "neutral/units/corpses.png", "size", {72, 72}},
-	Animations = "animations-dead-body", Icon = "icon-cancel",
+	Animations = "animations-dead-body", Icon = "icon-cancel", Flip = true,
 	Speed = 0, HitPoints = 255, DrawLevel = 30, Priority = 0,
 	TileSize = {1, 1}, BoxSize = {31, 31}, SightRange = 1,
 	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
