@@ -156,6 +156,12 @@ DefineButton({
 	ForUnit = {"unit-vault"}})
 
 DefineButton({
+	Pos = 5, Level = 0, Icon = "icon-engineer",
+	Action = "train-unit", Value = "unit-engineer",
+	Hint = "TRAIN ~!ENGINEER",
+	ForUnit = {"unit-camp"}})
+
+DefineButton({
 	Pos = 1, Level = 0, Icon = "icon-assault",
 	Action = "train-unit", Value = "unit-assault",
 	Hint = "TRAIN ~!ASSAULT UNIT",
