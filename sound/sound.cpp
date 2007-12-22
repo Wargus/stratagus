@@ -67,7 +67,6 @@
 */
 GameSound GameSounds
 #ifndef laterUSE_CCL
-// FIXME: Removing this crashes?
 ={
 	SoundConfig("placement error"),
 	SoundConfig("placement success"),
@@ -101,13 +100,11 @@ int DistanceSilent;              /// silent distance
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static CSample *SimpleChooseSample(CSound *sound)
+static CSample *SimpleChooseSample(const CSound *sound)
 {
 	if (sound->Number == ONE_SOUND) {
 		return sound->Sound.OneSound;
 	} else {
-		//FIXME: check for errors
-		//FIXME: valid only in shared memory context (FrameCounter)
 		return sound->Sound.OneGroup[FrameCounter % sound->Number];
 	}
 }
@@ -135,7 +132,6 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 					SelectionHandler.Sound = sound->Sound.TwoGroups.Second;
 				}
 			} else {
-				//FIXME: checks for error
 				// check whether the second group is really a group
 				if (SelectionHandler.Sound->Number > 1) {
 					result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
@@ -429,8 +425,6 @@ void SetSoundRange(CSound *sound, unsigned char range)
 **  @param number  Number of files belonging together.
 **
 **  @return        the sound unique identifier
-**
-**  @todo FIXME: Must handle the errors better.
 */
 CSound *RegisterSound(const char *files[], unsigned number)
 {
@@ -448,7 +442,7 @@ CSound *RegisterSound(const char *files[], unsigned number)
 				return NO_SOUND;
 			}
 		}
-	} else { // load an unique sound
+	} else { // load a unique sound
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
 			delete id;

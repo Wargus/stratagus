@@ -141,8 +141,7 @@ static int CclMakeSound(lua_State *l)
 			c_files[j] = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
 		}
-		// FIXME: check size before casting
-		id = MakeSound(c_name, (const char **)c_files, (unsigned char)args);
+		id = MakeSound(c_name, (const char **)c_files, args);
 		for (j = 0; j < args; ++j) {
 			delete[] c_files[j];
 		}
@@ -231,7 +230,6 @@ static int CclPlaySound(lua_State *l)
 */
 static int CclDefineGameSounds(lua_State *l)
 {
-	//FIXME: should allow to define ALL the game sounds
 	const char *value;
 	int args;
 	int j;
@@ -298,7 +296,6 @@ static int CclSetGlobalSoundRange(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 
-	// FIXME: check for errors
 	d = LuaToNumber(l, 1);
 	if (d > 0) {
 		DistanceSilent = d;
