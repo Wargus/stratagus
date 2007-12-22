@@ -102,6 +102,7 @@ DefineUnitType("unit-medic", {
   Shadow = {"file", "units/medic/unit_medic_s.png", "size", {64, 64}},
   Animations = "animations-medic",
   Icon = "icon-medic",
+  Flip = true,
   EnergyValue = 2500,
   MagmaValue = 2000,
   Speed = 15,

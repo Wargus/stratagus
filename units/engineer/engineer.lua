@@ -69,6 +69,7 @@ DefineUnitType("unit-engineer", {
     DrawLevel = 25,
     Animations = "animations-engineer",
     Icon = "icon-engineer",
+    Flip = true,
     EnergyValue = 1600,
     MagmaValue = 800,
     MaxEnergyUtilizationRate = 40,

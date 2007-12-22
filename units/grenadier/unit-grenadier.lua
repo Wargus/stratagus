@@ -65,6 +65,7 @@ DefineUnitType("unit-grenadier", {
     Shadow = {"file", GetCurrentLuaPath().."/unit_grenadier_s.png", "size", {64, 64}},
     Animations = "animations-grenadier",
     Icon = "icon-grenadier",
+    Flip = true,
     EnergyValue = 1600,
     MagmaValue = 1350,
     Speed = 10,
