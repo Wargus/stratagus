@@ -61,7 +61,6 @@ DefineUnitType("unit-tank", {
     Shadow = {"file", "units/tank/unit_tank_s.png", "size", {96, 96}},
     Animations = "animations-tank",
     Icon = "icon-tank",
-    Flip = false,
     EnergyValue = 8000,
     MagmaValue = 5000,
     RepairHp = 1,

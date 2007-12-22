@@ -83,7 +83,6 @@ void LoadConstructions(void)
 			ShowLoadProgress("Construction %s", file);
 			(*i)->Sprite = CPlayerColorGraphic::New(file, (*i)->Width, (*i)->Height);
 			(*i)->Sprite->Load();
-			(*i)->Sprite->Flip();
 		}
 		file = (*i)->ShadowFile.File.c_str();
 		(*i)->ShadowWidth = (*i)->ShadowFile.Width;
@@ -93,7 +92,6 @@ void LoadConstructions(void)
 			(*i)->ShadowSprite = CGraphic::ForceNew(file,
 				(*i)->ShadowWidth, (*i)->ShadowHeight);
 			(*i)->ShadowSprite->Load();
-			(*i)->ShadowSprite->Flip();
 			(*i)->ShadowSprite->MakeShadow();
 		}
 	}

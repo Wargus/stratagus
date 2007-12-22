@@ -65,7 +65,6 @@ DefineUnitType("unit-bomber", {
     Shadow = {"file", "units/bomber/unit_bomber_s.png", "size", {128, 128}, "offset", {5, 128}},
     Animations = "animations-bomber",
     Icon = "icon-bomber",
-    Flip = false,
     EnergyValue = 10000,
     MagmaValue = 7000,
     Speed = 20,

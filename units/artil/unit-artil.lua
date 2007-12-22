@@ -71,7 +71,6 @@ DefineUnitType("unit-artil", {
     Shadow = {"file", "units/artil/unit_artil_s.png", "size", {160, 160}},
     Animations = "animations-artil",
     Icon = "icon-artil",
-    Flip = false,
     EnergyValue = 10000,
     MagmaValue = 10000,
     RepairHp = 1,

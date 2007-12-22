@@ -70,7 +70,6 @@ DefineUnitType("buggy_destroyed", {
     Shadow = {"file", "units/buggy/unit_buggy_s.png", "size", {64, 64}},
     Animations = "animations-dead_buggy",
     Icon = "icon-cancel",
-    Flip = false,
     Speed = 0,
     HitPoints = 999,
     DrawLevel = 10,

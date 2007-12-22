@@ -64,7 +64,6 @@ DefineUnitType("unit-jet", {
                   "offset", {5, 128}},
     Animations = "animations-jet",
     Icon = "icon-jet",
-    Flip = false,
     EnergyValue = 8000,
     MagmaValue = 3000,
     Speed = 60,

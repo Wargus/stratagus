@@ -61,7 +61,6 @@ DefineUnitType("unit-rtank", {
     Shadow = {"file", "units/rtank/unit_rtank_s.png", "size", {96, 96}},
     Animations = "animations-rtank",
     Icon = "icon-rtank",
-    Flip = false,
     EnergyValue = 6000,
     MagmaValue = 3000,
     RepairHp = 1,
