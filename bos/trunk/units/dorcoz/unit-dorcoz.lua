@@ -49,7 +49,7 @@ DefineIcon({
 
 DefineMissileType("missile-dorcoz", {
         File = "units/dorcoz/mis_plasma_sml.png",
-        Size = {32, 32}, Frames = 5, NumDirections = 5,
+        Size = {32, 32}, Frames = 5, NumDirections = 8,
         DrawLevel = 50,
         Class = "missile-class-point-to-point", Sleep = 1, Speed = 32, Range = 1})
 
