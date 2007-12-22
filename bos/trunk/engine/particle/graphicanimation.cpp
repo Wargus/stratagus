@@ -7,9 +7,9 @@
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
-/**@name flashparticle.cpp - The flash particle. */
+/**@name graphicanimation.cpp - The Graphic Animation class. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007 by Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
+//      $Id: flashparticle.cpp 9352 2007-12-22 19:44:10Z feb $
 
 //@{
 
@@ -33,48 +33,26 @@
 #include "particle.h"
 #include "video.h"
 
-static CGraphic *flashgraphic;
 
-
-CFlashParticle::CFlashParticle(CPosition position) :
-	CParticle(position)
+void GraphicAnimation::draw(int x, int y)
 {
-	flash = new GraphicAnimation(flashgraphic, 22);
-}
-
-CFlashParticle::~CFlashParticle()
-{
-	delete flash;
-}
-
-void CFlashParticle::init()
-{
-	if (!flashgraphic) {
-		flashgraphic = CGraphic::New("graphics/particle/flash.png", 240, 194);
-		flashgraphic->Load();
+	if (!isFinished()) {
+		g->DrawFrameClip(currentFrame, x - g->Width / 2, y - g->Height / 2);
 	}
 }
 
-void CFlashParticle::exit()
+void GraphicAnimation::update(int ticks)
 {
-	if (flashgraphic) {
-		CGraphic::Free(flashgraphic);
-		flashgraphic = NULL;
+	currTicks += ticks;
+	while (currTicks > ticksPerFrame) {
+		currTicks -= ticksPerFrame;
+		++currentFrame;
 	}
 }
 
-void CFlashParticle::draw()
+bool GraphicAnimation::isFinished()
 {
-	CPosition screenPos = ParticleManager.getScreenPos(pos);
-	flash->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
-}
-
-void CFlashParticle::update(int ticks)
-{
-	flash->update(ticks);
-	if (flash->isFinished()) {
-		destroy();
-	}
+	return currentFrame >= g->NumFrames;
 }
 
 //@}
