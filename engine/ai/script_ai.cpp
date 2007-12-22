@@ -255,8 +255,6 @@ static int CclDefineAiHelper(lua_State *l)
 **  Define an AI engine.
 **
 **  @param l  Lua state.
-**
-**  @return   FIXME: docu
 */
 static int CclDefineAi(lua_State *l)
 {

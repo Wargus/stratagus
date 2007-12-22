@@ -1636,9 +1636,6 @@ void UIHandleButtonUp(unsigned button)
 		}
 	}
 
-	// FIXME: should be completly rewritten
-	// FIXME: must selecting!  (lokh: what does this mean? is this done now?)
-
 	// SHIFT toggles select/unselect a single unit and
 	// add the content of the rectangle to the selectection
 	// ALT takes group of unit

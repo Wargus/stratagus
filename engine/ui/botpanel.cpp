@@ -95,7 +95,7 @@ void InitButtons(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**  FIXME: docu
+**  Add a button
 */
 int AddButton(int pos, int level, const std::string &icon_ident,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
