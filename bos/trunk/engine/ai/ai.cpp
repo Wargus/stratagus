@@ -791,7 +791,7 @@ void AiCanNotReach(CUnit *unit, const CUnitType *what)
 }
 
 /**
-**  FIXME: docu
+**  Try to move a unit that's in the way
 */
 static void AiMoveUnitInTheWay(CUnit *unit)
 {

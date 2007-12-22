@@ -1180,11 +1180,8 @@ bool CUnit::IsVisibleInViewport(const CViewport *vp) const
 		return false;
 	}
 
+	Assert(ThisPlayer);
 	if (!ThisPlayer) {
-		//FIXME: ARI: Added here for early game setup state by
-		// MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
-		// so don't show anything until first real map-draw.
-		DebugPrint("FIXME: ThisPlayer not set yet?!\n");
 		return false;
 	}
 

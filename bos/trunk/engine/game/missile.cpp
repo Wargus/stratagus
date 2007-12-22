@@ -258,7 +258,7 @@ Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 **  Free a missile.
 **
 **  @param missiles  Missile pointer.
-**  @param i         FIXME: docu
+**  @param i         Index in missiles of missile to free
 */
 static void FreeMissile(std::vector<Missile *> &missiles, size_t i)
 {
