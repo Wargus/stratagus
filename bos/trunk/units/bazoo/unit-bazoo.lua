@@ -99,6 +99,6 @@ DefineUnitType("unit-bazoo", {
         "help", "bazoo-help",
         "dead", "bazoo-die"}
 })
-DefineHumanCorpse("bazoo")
+DefineHumanCorpse("bazoo", nil, true)
 
 DefineAllow("unit-bazoo", AllowAll)

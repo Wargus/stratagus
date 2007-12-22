@@ -86,15 +86,18 @@ DefineAnimations("animations-elitecorpse1", {
         "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
     })
 
-function DefineHumanCorpse(livingunit, size)
-   if (size == nil) then
+function DefineHumanCorpse(livingunit, size, flip)
+  if (size == nil) then
     size = {64, 64}
-   end
+  end
+  if (flip == nil) then
+    flip = false
+  end
 
-   DefineUnitType("unit-dead-" .. livingunit, {
+  DefineUnitType("unit-dead-" .. livingunit, {
 	Name = livingunit .. "body",
 	Image = {"file", GetCurrentLuaPath().."/unit_" .. livingunit .. "_c.png", "size", size},
-	Animations = "animations-elitecorpse1", Icon = "icon-cancel",
+	Animations = "animations-elitecorpse1", Icon = "icon-cancel", Flip = flip,
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {1, 1},
 	BoxSize = {31, 31}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none",

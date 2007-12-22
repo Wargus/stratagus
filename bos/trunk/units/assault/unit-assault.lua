@@ -102,6 +102,6 @@ DefineUnitType("unit-assault", {
         "help", "assault-help",
         "dead", "assault-die"}
 })
-DefineHumanCorpse("assault")
+DefineHumanCorpse("assault", nil, true)
 
 DefineAllow("unit-assault", AllowAll)
