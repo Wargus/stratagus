@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Camps can train engineers (Francois Beerten)
 - Fix crash when killing a rafflesia (Francois Beerten)
 - Added Swedish translation (Olov Gustavsson)
 - Made message font and scroll speed configurable (Jimmy Salmon)
