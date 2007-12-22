@@ -39,7 +39,7 @@ int CFlashParticle::numFrames = 20;
 
 
 CFlashParticle::CFlashParticle(CPosition position) :
-	CParticle(position), frame(numFrames - 1), currTicks(0)
+	CParticle(position), frame(0), currTicks(0)
 {
 	// FIXME: smaller explosions shouldn't use all the frames
 }
@@ -77,9 +77,9 @@ void CFlashParticle::update(int ticks)
 	currTicks += ticks;
 	while (currTicks > ticksPerFrame) {
 		currTicks -= ticksPerFrame;
-		--frame;
+		++frame;
 	}
-	if (frame < 0) {
+	if (frame >= numFrames) {
 		destroy();
 	}
 }
