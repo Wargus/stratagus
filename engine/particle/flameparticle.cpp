@@ -43,23 +43,23 @@ static const int Sizes[][2] = {
 	{  13, 18 },
 };
 
-CGraphic *CFlameParticle::large[NumExplosions];
-CGraphic *CFlameParticle::medium[NumExplosions];
-CGraphic *CFlameParticle::small[NumExplosions];
+static CGraphic *large[NumExplosions];
+static CGraphic *medium[NumExplosions];
+static CGraphic *small[NumExplosions];
 
 
 CFlameParticle::CFlameParticle(CPosition position) :
-	CParticle(position), frame(0), currTicks(0)
+	CParticle(position)
 {
 	int explosion = MyRand() % NumExplosions;
 	// FIXME: use different size explosions
-	g = large[explosion];
-	numFrames = 14;
+	flame = new GraphicAnimation(large[explosion], 33);
 }
 
 
 CFlameParticle::~CFlameParticle()
 {
+	delete flame;
 }
 
 void CFlameParticle::init()
@@ -107,19 +107,13 @@ void CFlameParticle::exit()
 void CFlameParticle::draw()
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
-	g->DrawFrameClip(frame, static_cast<int>(screenPos.x - g->Width / 2.f),
-		static_cast<int>(screenPos.y - g->Height / 2.f));
+	flame->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
 }
 
 void CFlameParticle::update(int ticks)
 {
-	const int ticksPerFrame = 33;
-	currTicks += ticks;
-	while (currTicks > ticksPerFrame) {
-		currTicks -= ticksPerFrame;
-		++frame;
-	}
-	if (frame >= numFrames) {
+	flame->update(ticks);
+	if (flame->isFinished()) {
 		destroy();
 	}
 }
