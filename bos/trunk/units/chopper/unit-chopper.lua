@@ -64,7 +64,6 @@ DefineUnitType("unit-chopper", {
     Shadow = {"file", "units/chopper/unit_chopper_s.png", "size", {128, 128}, "offset", {5,128}},
     Animations = "animations-chopper",
     Icon = "icon-chopper",
-    Flip = false,
     EnergyValue = 7000,
     MagmaValue = 3000,
     Speed = 40,

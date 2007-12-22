@@ -234,7 +234,6 @@ static int CclDefineUnitType(lua_State *l)
 	}
 
 	type->NumDirections = 0;
-	type->Flip = 1;
 
 	//
 	//  Parse the list: (still everything could be changed!)

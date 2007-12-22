@@ -58,6 +58,7 @@ DefineUnitType("unit-dorcoz", {
     Image = {"file", "units/dorcoz/unit_dorcoz.png", "size", {64, 64}},
     Animations = "animations-dorcoz",
     Icon = "icon-dorcoz",
+    Flip = true,
     EnergyValue = 4500,
     MagmaValue = 2500,
     Speed = 10,

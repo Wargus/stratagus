@@ -107,7 +107,6 @@ DefineUnitType("unit-cannon", {
     CanTargetLand = true,
     CanTargetAir = false,
     NumDirections = 8,
-    Flip = false,
     Corpse = "build-dead-cannon",
     Type = "land",
     Building = true,
