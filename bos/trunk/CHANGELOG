@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Remove uncomplete Drocoz unit (Francois Beerten)
 - Don't create unnecessary flip images, saves a lot of mem (Jimmy Salmon and Francois Beerten)
 - Camps can train engineers (Francois Beerten)
 - Fix crash when killing a rafflesia (Francois Beerten)
