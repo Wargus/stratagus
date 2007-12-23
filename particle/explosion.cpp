@@ -29,6 +29,7 @@
 
 //@{
 #include <sstream>
+#include <iomanip>
 
 #include "stratagus.h"
 #include "particle.h"
@@ -68,7 +69,7 @@ static void InitFlameGraphics()
 	}
 }
 
-void FreeFlameGraphics()
+static void FreeFlameGraphics()
 {
 	for (int i = 0; i < NumExplosions; ++i) {
 		if (large[i]) {
@@ -77,6 +78,59 @@ void FreeFlameGraphics()
 		}
 	}
 }
+
+
+static const int NumSmokes = 12;
+static const int Sizes[][2] = {
+	{  4,  4 },
+	{  8,  8 },
+	{ 12, 12 },
+	{ 16, 16 },
+	{ 20, 20 },
+	{ 24, 24 },
+	{ 28, 28 },
+	{ 32, 32 },
+	{ 36, 36 },
+	{ 40, 40 },
+	{ 44, 44 },
+	{ 48, 48 },
+};
+
+CGraphic *lightSmoke[NumSmokes];
+CGraphic *darkSmoke[NumSmokes];
+
+static void InitSmokeGraphics()
+{
+	for (int i = 0; i < NumSmokes; ++i) {
+		if (!lightSmoke[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/smokelight" << std::setfill('0') << std::setw(2) << (i + 1) * 4 << ".png";
+			lightSmoke[i] = CGraphic::New(os.str(), Sizes[i][0], Sizes[i][1]);
+			lightSmoke[i]->Load();
+		}
+		if (!darkSmoke[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/smokedark" << std::setfill('0') << std::setw(2) << (i + 1) * 4 << ".png";
+			darkSmoke[i] = CGraphic::New(os.str(), Sizes[i][0], Sizes[i][1]);
+			darkSmoke[i]->Load();
+		}
+	}
+}
+
+static void FreeSmokeGraphics()
+{
+	for (int i = 0; i < NumSmokes; ++i) {
+		if (lightSmoke[i]) {
+			CGraphic::Free(lightSmoke[i]);
+			lightSmoke[i] = NULL;
+		}
+		if (darkSmoke[i]) {
+			CGraphic::Free(darkSmoke[i]);
+			darkSmoke[i] = NULL;
+		}
+	}
+}
+
 
 CExplosion::CExplosion(CPosition position) :
 	CParticle(position)
@@ -92,12 +146,23 @@ CExplosion::CExplosion(CPosition position) :
 	StaticParticle *flame = new StaticParticle(position, flameanim);
 	ParticleManager.add(flame);
 
+
+	CGraphic *smoke;
+	int size = 2;
+
+	if (MyRand() % 2 == 0) {
+		smoke = lightSmoke[size];
+	} else {
+		smoke = darkSmoke[size];
+	}
+
 	int numChunks = 8;
 	if (ParticleManager.getLowDetail()) {
 		numChunks /= 2;
 	}
 	for (int i = 0; i < numChunks; ++i) {
-		CChunkParticle *chunk = new CChunkParticle(position);
+		Animation *smokeanimation = new GraphicAnimation(smoke, 60);
+		CChunkParticle *chunk = new CChunkParticle(position, smokeanimation);
 		ParticleManager.add(chunk);
 	}
 
@@ -112,12 +177,14 @@ void CExplosion::init()
 {
 	InitFlashGraphics();
 	InitFlameGraphics();
+	InitSmokeGraphics();
 }
 
 void CExplosion::exit()
 {
 	FreeFlashGraphics();
 	FreeFlameGraphics();
+	FreeSmokeGraphics();
 }
 
 void CExplosion::draw()
