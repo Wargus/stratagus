@@ -43,8 +43,9 @@ static inline float deg2rad(int degrees) {
 }
 
 
-CChunkParticle::CChunkParticle(CPosition position) :
-	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0), height(0.f)
+CChunkParticle::CChunkParticle(CPosition position, Animation *smokeAnimation) :
+	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0), 
+	height(0.f), smokeAnimation(smokeAnimation)
 {
 	float radians = deg2rad(MyRand() % 360);
 	direction.x = cos(radians);
@@ -61,6 +62,7 @@ CChunkParticle::CChunkParticle(CPosition position) :
 
 CChunkParticle::~CChunkParticle()
 {
+	delete smokeAnimation;
 }
 
 void CChunkParticle::init()
@@ -106,7 +108,9 @@ void CChunkParticle::update(int ticks)
 	const int randSmokeTicks = 50;
 
 	if (age > nextSmokeTicks) {
-		CSmokeParticle *smoke = new CSmokeParticle(CPosition(pos.x, calculateScreenPos(pos.y, height)));
+		CPosition p(pos.x, calculateScreenPos(pos.y, height));
+		Animation *animation = smokeAnimation->clone();
+		CSmokeParticle *smoke = new CSmokeParticle(p, animation);
 		ParticleManager.add(smoke);
 
 		nextSmokeTicks += MyRand() % randSmokeTicks + minSmokeTicks;

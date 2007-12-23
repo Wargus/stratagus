@@ -50,6 +50,7 @@ public:
 	virtual void draw(int x, int y) = 0;
 	virtual void update(int ticks) = 0;
 	virtual bool isFinished() = 0;
+	virtual Animation * clone() = 0;
 };
 
 class GraphicAnimation : public Animation
@@ -78,6 +79,8 @@ public:
 	virtual void update(int ticks);
 
 	virtual bool isFinished();
+
+	virtual Animation * clone();
 };
 
 
@@ -121,7 +124,7 @@ protected:
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position);
+	CChunkParticle(CPosition position, Animation *smokeAnimation);
 	virtual ~CChunkParticle();
 
 	static void init();
@@ -138,6 +141,7 @@ protected:
 	int lifetime;
 	int age;
 	float height;
+	Animation *smokeAnimation;
 
 	struct {
 		float x;
@@ -150,11 +154,8 @@ protected:
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position);
+	CSmokeParticle(CPosition position, Animation *animation);
 	virtual ~CSmokeParticle();
-
-	static void init();
-	static void exit();
 
 	virtual void draw();
 	virtual void update(int ticks);
