@@ -7,7 +7,7 @@
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
-/**@name flameparticle.cpp - The flame particle. */
+/**@name staticparticle.cpp - The static particle. */
 //
 //      (c) Copyright 2007 by Jimmy Salmon and Francois Beerten
 //
