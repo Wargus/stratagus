@@ -33,13 +33,10 @@
 #include "particle.h"
 #include "video.h"
 
-static CGraphic *flashgraphic;
 
-
-CFlashParticle::CFlashParticle(CPosition position) :
-	CParticle(position)
+CFlashParticle::CFlashParticle(CPosition position, Animation *flash) :
+	CParticle(position), flash(flash)
 {
-	flash = new GraphicAnimation(flashgraphic, 22);
 }
 
 CFlashParticle::~CFlashParticle()
@@ -49,18 +46,10 @@ CFlashParticle::~CFlashParticle()
 
 void CFlashParticle::init()
 {
-	if (!flashgraphic) {
-		flashgraphic = CGraphic::New("graphics/particle/flash.png", 240, 194);
-		flashgraphic->Load();
-	}
 }
 
 void CFlashParticle::exit()
 {
-	if (flashgraphic) {
-		CGraphic::Free(flashgraphic);
-		flashgraphic = NULL;
-	}
 }
 
 void CFlashParticle::draw()
