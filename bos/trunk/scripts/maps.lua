@@ -9,7 +9,7 @@
 --
 --	maps.lua - Define map helper functions.
 --
---	(c) Copyright 2005 by Francois Beerten
+--	(c) Copyright 2005-2007 by Francois Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ end
 
 
 function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
-   DefineImageTilemodels(terrain, imgx, imgy)
+   DefineImageTilemodels(terrain, imgx, imgy, true)
    RepeatMap(mapx, mapy, imgx, imgy)
 end
 
