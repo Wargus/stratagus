@@ -51,7 +51,6 @@ void CParticleManager::init()
 {
 	CExplosion::init();
 	CChunkParticle::init();
-	CSmokeParticle::init();
 }
 
 void CParticleManager::exit()
@@ -60,7 +59,6 @@ void CParticleManager::exit()
 
 	CExplosion::exit();
 	CChunkParticle::exit();
-	CSmokeParticle::exit();
 }
 
 void CParticleManager::clear()
