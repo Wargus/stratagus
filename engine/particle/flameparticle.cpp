@@ -9,7 +9,7 @@
 //
 /**@name flameparticle.cpp - The flame particle. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007 by Jimmy Salmon and Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,36 +34,26 @@
 #include "video.h"
 
 
-CFlameParticle::CFlameParticle(CPosition position, Animation *flame) :
-	CParticle(position), flame(flame)
+StaticParticle::StaticParticle(CPosition position, Animation *animation) :
+	CParticle(position), animation(animation)
 {
 }
 
-
-CFlameParticle::~CFlameParticle()
+StaticParticle::~StaticParticle()
 {
-	delete flame;
+	delete animation;
 }
 
-void CFlameParticle::init()
-{
-
-}
-
-void CFlameParticle::exit()
-{
-}
-
-void CFlameParticle::draw()
+void StaticParticle::draw()
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
-	flame->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
+	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
 }
 
-void CFlameParticle::update(int ticks)
+void StaticParticle::update(int ticks)
 {
-	flame->update(ticks);
-	if (flame->isFinished()) {
+	animation->update(ticks);
+	if (animation->isFinished()) {
 		destroy();
 	}
 }
