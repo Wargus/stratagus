@@ -28,20 +28,68 @@
 //      $Id$
 
 //@{
+#include <sstream>
 
 #include "stratagus.h"
 #include "particle.h"
+#include "video.h"
 
+static CGraphic *flashgraphic;
+
+static void InitFlashGraphics()
+{
+	if (!flashgraphic) {
+		flashgraphic = CGraphic::New("graphics/particle/flash.png", 240, 194);
+		flashgraphic->Load();
+	}
+}
+
+static void FreeFlashGraphics()
+{
+	if (flashgraphic) {
+		CGraphic::Free(flashgraphic);
+		flashgraphic = NULL;
+	}
+}
+
+
+static const int NumExplosions = 9;
+static CGraphic *large[NumExplosions];
+
+static void InitFlameGraphics()
+{
+	for (int i = 0; i < NumExplosions; ++i) {
+		if (!large[i]) {
+			std::ostringstream os;
+			os << "graphics/particle/large0" << i + 1 << ".png";
+			large[i] = CGraphic::New(os.str(), 128, 96);
+			large[i]->Load();
+		}
+	}
+}
+
+void FreeFlameGraphics()
+{
+	for (int i = 0; i < NumExplosions; ++i) {
+		if (large[i]) {
+			CGraphic::Free(large[i]);
+			large[i] = NULL;
+		}
+	}
+}
 
 CExplosion::CExplosion(CPosition position) :
 	CParticle(position)
 {
 	if (!ParticleManager.getLowDetail()) {
-		CFlashParticle *flash = new CFlashParticle(position);
+		Animation *flashanim = new GraphicAnimation(flashgraphic, 22);
+		CFlashParticle *flash = new CFlashParticle(position, flashanim);
 		ParticleManager.add(flash);
 	}
 
-	CFlameParticle *flame = new CFlameParticle(position);
+	int explosion = MyRand() % NumExplosions;
+	Animation *flameanim = new GraphicAnimation(large[explosion], 33);
+	CFlameParticle *flame = new CFlameParticle(position, flameanim);
 	ParticleManager.add(flame);
 
 	int numChunks = 8;
@@ -62,10 +110,14 @@ CExplosion::~CExplosion()
 
 void CExplosion::init()
 {
+	InitFlashGraphics();
+	InitFlameGraphics();
 }
 
 void CExplosion::exit()
 {
+	FreeFlashGraphics();
+	FreeFlameGraphics();
 }
 
 void CExplosion::draw()
