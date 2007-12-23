@@ -127,9 +127,6 @@ public:
 	CChunkParticle(CPosition position, Animation *smokeAnimation);
 	virtual ~CChunkParticle();
 
-	static void init();
-	static void exit();
-
 	virtual void draw();
 	virtual void update(int ticks);
 

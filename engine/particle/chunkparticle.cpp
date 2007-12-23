@@ -65,14 +65,6 @@ CChunkParticle::~CChunkParticle()
 	delete smokeAnimation;
 }
 
-void CChunkParticle::init()
-{
-}
-
-void CChunkParticle::exit()
-{
-}
-
 static float calculateScreenPos(float posy, float height)
 {
 	return posy - height * 0.2f;

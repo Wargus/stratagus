@@ -31,7 +31,6 @@
 
 #include "stratagus.h"
 #include "particle.h"
-#include "video.h"
 
 
 StaticParticle::StaticParticle(CPosition position, Animation *animation) :
