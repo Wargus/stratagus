@@ -29,31 +29,14 @@
 
 //@{
 
-#include <sstream>
-
 #include "stratagus.h"
 #include "particle.h"
 #include "video.h"
 
 
-static const int NumExplosions = 9;
-static const int Sizes[][2] = {
-	{ 128, 96 },
-	{  54, 73 },
-	{  13, 18 },
-};
-
-static CGraphic *large[NumExplosions];
-static CGraphic *medium[NumExplosions];
-static CGraphic *small[NumExplosions];
-
-
-CFlameParticle::CFlameParticle(CPosition position) :
-	CParticle(position)
+CFlameParticle::CFlameParticle(CPosition position, Animation *flame) :
+	CParticle(position), flame(flame)
 {
-	int explosion = MyRand() % NumExplosions;
-	// FIXME: use different size explosions
-	flame = new GraphicAnimation(large[explosion], 33);
 }
 
 
@@ -64,44 +47,11 @@ CFlameParticle::~CFlameParticle()
 
 void CFlameParticle::init()
 {
-	for (int i = 0; i < NumExplosions; ++i) {
-		if (!large[i]) {
-			std::ostringstream os;
-			os << "graphics/particle/large0" << i + 1 << ".png";
-			large[i] = CGraphic::New(os.str(), Sizes[0][0], Sizes[0][1]);
-			large[i]->Load();
-		}
-		if (!medium[i]) {
-			std::ostringstream os;
-			os << "graphics/particle/medium0" << i + 1 << ".png";
-			medium[i] = CGraphic::New(os.str(), Sizes[1][0], Sizes[1][1]);
-			medium[i]->Load();
-		}
-		if (!small[i]) {
-			std::ostringstream os;
-			os << "graphics/particle/small0" << i + 1 << ".png";
-			small[i] = CGraphic::New(os.str(), Sizes[2][0], Sizes[2][1]);
-			small[i]->Load();
-		}
-	}
+
 }
 
 void CFlameParticle::exit()
 {
-	for (int i = 0; i < NumExplosions; ++i) {
-		if (large[i]) {
-			CGraphic::Free(large[i]);
-			large[i] = NULL;
-		}
-		if (medium[i]) {
-			CGraphic::Free(medium[i]);
-			medium[i] = NULL;
-		}
-		if (small[i]) {
-			CGraphic::Free(small[i]);
-			small[i] = NULL;
-		}
-	}
 }
 
 void CFlameParticle::draw()
