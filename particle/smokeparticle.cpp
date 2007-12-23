@@ -28,10 +28,6 @@
 //      $Id$
 
 //@{
-
-#include <sstream>
-#include <iomanip>
-
 #include "stratagus.h"
 #include "particle.h"
 #include "video.h"
