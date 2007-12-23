@@ -103,38 +103,17 @@ protected:
 };
 
 
-// Flame particle
-class CFlameParticle : public CParticle
+class StaticParticle : public CParticle
 {
 public:
-	CFlameParticle(CPosition position);
-	virtual ~CFlameParticle();
-
-	static void init();
-	static void exit();
+	StaticParticle(CPosition position, Animation *flame);
+	virtual ~StaticParticle();
 
 	virtual void draw();
 	virtual void update(int ticks);
 
 protected:
-	Animation *flame;
-};
-
-
-// Flash particle
-class CFlashParticle : public CParticle
-{
-public:
-	CFlashParticle(CPosition position);
-	virtual ~CFlashParticle();
-
-	static void init();
-	static void exit();
-
-	virtual void draw();
-	virtual void update(int ticks);
-protected:
-	Animation *flash;
+	Animation *animation;
 };
 
 
