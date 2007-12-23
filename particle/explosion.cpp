@@ -83,13 +83,13 @@ CExplosion::CExplosion(CPosition position) :
 {
 	if (!ParticleManager.getLowDetail()) {
 		Animation *flashanim = new GraphicAnimation(flashgraphic, 22);
-		CFlashParticle *flash = new CFlashParticle(position, flashanim);
+		StaticParticle *flash = new StaticParticle(position, flashanim);
 		ParticleManager.add(flash);
 	}
 
 	int explosion = MyRand() % NumExplosions;
 	Animation *flameanim = new GraphicAnimation(large[explosion], 33);
-	CFlameParticle *flame = new CFlameParticle(position, flameanim);
+	StaticParticle *flame = new StaticParticle(position, flameanim);
 	ParticleManager.add(flame);
 
 	int numChunks = 8;
