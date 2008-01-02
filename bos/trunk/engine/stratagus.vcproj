@@ -3090,11 +3090,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\particle\flameparticle.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\particle\flashparticle.cpp"
+						RelativePath=".\particle\graphicanimation.cpp"
 						>
 					</File>
 					<File
@@ -3103,6 +3099,10 @@
 					</File>
 					<File
 						RelativePath=".\particle\smokeparticle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\particle\staticparticle.cpp"
 						>
 					</File>
 				</Filter>
