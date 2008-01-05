@@ -158,8 +158,7 @@ static CUnit *CheckAlreadyBuilding(CUnit *unit, CUnitType *type, int x, int y)
 	n = UnitCache.Select(x, y, table, UnitMax);
 	for (int i = 0; i < n; ++i) {
 		if (!table[i]->Destroyed && table[i]->Type == type &&
-				(table[i]->Player == unit->Player || unit->IsAllied(table[i])) &&
-				table[i]->Orders[0]->Action == UnitActionBuilt) {
+				(table[i]->Player == unit->Player || unit->IsAllied(table[i]))) {
 			return table[i];
 		}
 	}
@@ -193,7 +192,12 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	//
 	if ((ontop = CanBuildUnitType(unit, type, x, y, 1)) == NULL) {
 		if ((ontop = CheckAlreadyBuilding(unit, type, x, y)) != NULL) {
-			CommandRepair(unit, x, y, ontop, FlushCommands);
+			unit->Orders[0]->Init();
+			unit->Orders[0]->Action = UnitActionRepair;
+			unit->Orders[0]->Goal = ontop;
+			unit->Orders[0]->Goal->RefsIncrease();
+			unit->Orders[0]->Range = unit->Type->RepairRange;
+			unit->SubAction = 0;
 			return NULL;
 		}
 
