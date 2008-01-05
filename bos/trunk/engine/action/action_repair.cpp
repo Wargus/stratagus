@@ -130,8 +130,8 @@ static void MoveToLocation(CUnit *unit)
 	// Have reached target?
 	// FIXME: could use return value of DoActionMove
 	//
-	if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange &&
-			goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
+	bool goalReached = goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange;
+	if (goalReached && goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 		unit->State = 0;
 		unit->SubAction = 20;
 		unit->Data.Repair.Progress = 0;
@@ -142,7 +142,7 @@ static void MoveToLocation(CUnit *unit)
 		int costs[MaxCosts];
 		CalculateRequestedAmount(unit->Type, unit->Orders[0]->Goal->Type->ProductionCosts, costs);
 		unit->Player->AddToUnitsConsumingResources(unit, costs);
-	} else if (err < 0) {
+	} else if (err < 0 || goalReached) {
 		if (goal) { // release reference
 			goal->RefsDecrease();
 			unit->Orders[0]->Goal = NoUnitP;
