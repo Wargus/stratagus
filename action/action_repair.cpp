@@ -55,6 +55,30 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Restore the saved order
+**  FIXME: this should be moved to a more central location
+**
+**  @param unit  Unit to restore
+**
+**  @return      True if the saved order was restored
+*/
+static bool RestoreSavedOrder(CUnit *unit)
+{
+	if (unit->SavedOrder.Action != UnitActionStill) {
+		unit->SubAction = 0;
+		Assert(unit->Orders[0]->Goal == NoUnitP);
+		*unit->Orders[0] = unit->SavedOrder;
+		NewResetPath(unit);
+		unit->SavedOrder.Action = UnitActionStill;
+
+		// This isn't supported
+		Assert(unit->SavedOrder.Goal == NoUnitP);
+		return true;
+	}
+	return false;
+}
+
+/**
 **  Move to build location
 **
 **  @param unit  Unit to move
@@ -147,8 +171,10 @@ static void MoveToLocation(CUnit *unit)
 			goal->RefsDecrease();
 			unit->Orders[0]->Goal = NoUnitP;
 		}
-		unit->ClearAction();
-		unit->State = 0;
+		if (!RestoreSavedOrder(unit)) {
+			unit->ClearAction();
+			unit->State = 0;
+		}
 		return;
 	}
 
@@ -267,9 +293,10 @@ static void RepairUnit(CUnit *unit)
 			goal->RefsDecrease();
 			unit->Orders[0]->Goal = NULL;
 		}
-		// FIXME: auto-repair, find a new target
-		unit->ClearAction();
-		unit->State = 0;
+		if (!RestoreSavedOrder(unit)) {
+			unit->ClearAction();
+			unit->State = 0;
+		}
 		return;
 	}
 }
