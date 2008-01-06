@@ -105,13 +105,15 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 **
 **  @return  true if the unit is repairing, false otherwise
 */
-static bool AutoRepair(CUnit *unit)
+bool AutoRepair(CUnit *unit)
 {
 	if (unit->AutoRepair && unit->Type->Variable[AUTOREPAIRRANGE_INDEX].Value) {
 		CUnit *repairedUnit = UnitToRepairInRange(unit,
 			unit->Type->Variable[AUTOREPAIRRANGE_INDEX].Value);
 		if (repairedUnit != NoUnitP) {
+			COrder order = *unit->Orders[0];
 			CommandRepair(unit, -1, -1, repairedUnit, FlushCommands);
+			unit->SavedOrder = order;
 			return true;
 		}
 	}
