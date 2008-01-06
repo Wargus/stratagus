@@ -93,6 +93,7 @@ DefineUnitType("unit-engineer", {
     Type = "land",
     RightMouseAction = "harvest",
     RepairRange = 1,
+    AutoRepairRange = 5,
     CanTargetLand = true,
     LandUnit = true,
     Coward = true,
