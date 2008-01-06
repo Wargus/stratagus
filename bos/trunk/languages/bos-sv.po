@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-09-08 08:54-0700\n"
-"PO-Revision-Date: 2007-09-10 22:40+0200\n"
+"PO-Revision-Date: 2008-01-06 22:03+0100\n"
 "Last-Translator: Olov Gustavsson <olov.gustavsson@bredband.net>\n"
 "Language-Team:\n"
 "MIME-Version: 1.0\n"
@@ -712,7 +712,7 @@ msgstr "Alt-I"
 
 #: scripts/menus/ingame/game.lua:406
 msgid "- find idle peon"
-msgstr "- hitta sysslolös ingengjör"
+msgstr "- hitta sysslolös ingenjör"
 
 #: scripts/menus/ingame/game.lua:407
 msgid "Alt-C"
@@ -877,13 +877,11 @@ msgstr ""
 msgid ""
 "The more engineers you have collecting resources, the faster your economy "
 "will grow."
-msgstr ""
-"Ju fler ingengjörer du har som samlar in resurser, ju snabbare växer "
-"din ekonomi."
+msgstr "Ju fler ingenjörer du har som samlar in resurser, ju snabbare växer din ekonomi."
 
 #: scripts/menus/ingame/game.lua:470
 msgid "Use your engineers to repair damaged buildings."
-msgstr "Använd dina ingengjörer till att reparera skadade byggnader."
+msgstr "Använd dina ingenjörer till att reparera skadade byggnader."
 
 #: scripts/menus/ingame/game.lua:471
 #, fuzzy
@@ -892,8 +890,7 @@ msgstr "Utforska din omgivning tidigt i spelet."
 
 #: scripts/menus/ingame/game.lua:474
 msgid "Keep all engineers working. Use ALT-I to find idle engineers."
-msgstr "Hålla alla dina ingengjörer sysselsatta. Använd Alt-I för att "
-"hitta sysslolösa ingengjörer."
+msgstr "Håll alla dina ingenjörer sysselsatta. Använd Alt-I för att hitta sysslolösa ingenjörer."
 
 #: scripts/menus/ingame/game.lua:475
 msgid ""
@@ -925,9 +922,7 @@ msgstr ""
 msgid ""
 "You can order an engineer to build one building after the other, if you hold "
 "the SHIFT key, while you place the building."
-msgstr ""
-"Du kan ge en ingengjör order om att bygga en till byggnad efter nuvarande "
-"om du håller ner skift när du placerar byggnaden."
+msgstr "Du kan ge en ingenjör order om att bygga en till byggnad efter nuvarande om du håller ner skift när du placerar byggnaden."
 
 #: scripts/menus/ingame/game.lua:481
 msgid ""
