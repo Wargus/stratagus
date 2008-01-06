@@ -256,8 +256,14 @@ static void GatherResource(CUnit *unit)
 			unit->Data.Harvest.CurrentProduction[i] = 0;
 		}
 
-		// Find a new resource to harvest
-		FindNewResource(unit);
+		if (unit->OrderCount == 1) {
+			// Find a new resource to harvest
+			FindNewResource(unit);
+		} else {
+			unit->Orders[0]->Goal->RefsDecrease();
+			unit->Orders[0]->Goal = NoUnitP;
+			unit->ClearAction();
+		}
 
 		// Don't destroy the resource twice.
 		// This only happens when it's empty.
