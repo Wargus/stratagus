@@ -47,6 +47,9 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+extern bool AutoRepair(CUnit *unit);
+
+
 /**
 **  Swap the patrol points.
 */
@@ -134,7 +137,13 @@ void HandleActionPatrol(CUnit *unit)
 				unit->SavedOrder = *unit->Orders[0];
 				unit->ClearAction();
 				unit->Orders[0]->Goal = NoUnitP;
+				return;
 			}
+		}
+
+		// Look for something to auto repair
+		if (AutoRepair(unit)) {
+			return;
 		}
 	}
 }

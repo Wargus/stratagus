@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Auto repair while patrolling (Jimmy Salmon)
+- Added patrol button for engineer (Jimmy Salmon)
 - Enable auto repair for engineers (Jimmy Salmon)
 - Check for queued orders after harvesting a resource (Jimmy Salmon)
 - Don't flush orders when repairing a building under construction (Jimmy Salmon)

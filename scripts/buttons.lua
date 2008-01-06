@@ -80,7 +80,7 @@ DefineButton({
 	Pos = 4, Level = 0, Icon = "icon-patrol",
 	Action = "patrol", Hint = "~!PATROL",
 	ForUnit = {"unit-assault", "unit-grenadier", "unit-bazoo",
-             "unit-apcs", "unit-buggy", "unit-dorcoz",
+             "unit-apcs", "unit-buggy", "unit-dorcoz", "unit-engineer",
              "elites-group",}})
 
 DefineButton({
@@ -93,7 +93,7 @@ DefineButton({
 -- resource specific actions ---------------------------------------------------
 
 DefineButton({
-	Pos = 4, Level = 0, Icon = "icon-repair",
+	Pos = 6, Level = 0, Icon = "icon-repair",
 	Action = "repair", Hint = "~!REPAIR BUILDINGS/VEHICLES",
 	ForUnit = {"unit-engineer"}})
 
