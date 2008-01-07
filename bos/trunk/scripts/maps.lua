@@ -65,7 +65,8 @@ end
 
 
 function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
-   DefineImageTilemodels(terrain, imgx, imgy, true)
+   fullTerrainImage = imgx == mapx and imgy == mapy
+   DefineImageTilemodels(terrain, imgx, imgy, fullTerrainImage)
    RepeatMap(mapx, mapy, imgx, imgy)
 end
 
