@@ -184,6 +184,27 @@ typedef struct _event_callback_ {
 
 } EventCallback;
 
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define RSHIFT  0
+#define GSHIFT  8
+#define BSHIFT  16
+#define ASHIFT  24
+#define RMASK   0x000000ff
+#define GMASK   0x0000ff00
+#define BMASK   0x00ff0000
+#define AMASK   0xff000000
+#else
+#define RSHIFT  24
+#define GSHIFT  16
+#define BSHIFT  8
+#define ASHIFT  0
+#define RMASK   0xff000000
+#define GMASK   0x00ff0000
+#define BMASK   0x0000ff00
+#define AMASK   0x000000ff
+#endif
+
+
 class CVideo
 {
 public:
@@ -244,26 +265,26 @@ public:
 		if (!UseOpenGL) {
 			return SDL_MapRGBA(f, r, g, b, a);
 		} else {
-			return (r | (g << 8) | (b << 16) | (a << 24));
+			return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 		}
 	}
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b) {
 		if (!UseOpenGL) {
 			SDL_GetRGB(c, f, r, g, b);
 		} else {
-			*r = (c >> 0) & 0xff;
-			*g = (c >> 8) & 0xff;
-			*b = (c >> 16) & 0xff;
+			*r = (c >> RSHIFT) & 0xff;
+			*g = (c >> GSHIFT) & 0xff;
+			*b = (c >> BSHIFT) & 0xff;
 		}
 	}
 	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
 		if (!UseOpenGL) {
 			SDL_GetRGBA(c, f, r, g, b, a);
 		} else {
-			*r = (c >> 0) & 0xff;
-			*g = (c >> 8) & 0xff;
-			*b = (c >> 16) & 0xff;
-			*a = (c >> 24) & 0xff;
+			*r = (c >> RSHIFT) & 0xff;
+			*g = (c >> GSHIFT) & 0xff;
+			*b = (c >> BSHIFT) & 0xff;
+			*a = (c >> ASHIFT) & 0xff;
 		}
 	}
 
@@ -311,18 +332,6 @@ extern GLint GLMaxTextureSize;
 extern bool GLTextureCompressionSupported;
 	/// Use OpenGL texture compression
 extern bool UseGLTextureCompression;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-#define RMASK 0xff000000
-#define GMASK 0x00ff0000
-#define BMASK 0x0000ff00
-#define AMASK 0x000000ff
-#else
-#define RMASK 0x000000ff
-#define GMASK 0x0000ff00
-#define BMASK 0x00ff0000
-#define AMASK 0xff000000
-#endif
 
 	/// initialize the video part
 extern void InitVideo(void);
