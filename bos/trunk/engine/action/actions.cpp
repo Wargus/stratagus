@@ -39,6 +39,7 @@
 #include <time.h>
 
 #include "stratagus.h"
+#include "version.h"
 #include "unittype.h"
 #include "animation.h"
 #include "player.h"
@@ -494,7 +495,7 @@ void UnitActions(void)
 			time_t now;
 			char buf[256];
 
-			sprintf(buf, sizeof(buf), "log_of_boswars_%d.log", ThisPlayer->Index);
+			sprintf_s(buf, sizeof(buf), "log_of_boswars_%d.log", ThisPlayer->Index);
 			logf = fopen(buf, "wb");
 			if (!logf) {
 				return;
