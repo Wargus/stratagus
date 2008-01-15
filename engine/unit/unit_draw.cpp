@@ -9,7 +9,7 @@
 //
 /**@name unit_draw.cpp - The draw routines for units. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2008 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -355,11 +355,6 @@ extern void UpdateUnitVariables(const CUnit *unit);
 */
 static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int y)
 {
-#ifdef REFS_DEBUG
-	// Show the number of references.
-	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit->Refs);
-#endif
-
 	UpdateUnitVariables(unit);
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
