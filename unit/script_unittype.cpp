@@ -9,7 +9,7 @@
 //
 /**@name script_unittype.cpp - The unit-type ccl functions. */
 //
-//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -53,6 +53,13 @@
 #include "unit.h"
 #include "unit_manager.h"
 #include "player.h"
+
+/*----------------------------------------------------------------------------
+--  Defines
+----------------------------------------------------------------------------*/
+
+// FIXME: make configurable
+#define MAGIC_FOR_NEW_UNITS  33         /// How many percent of max mana for new units
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -9,7 +9,7 @@
 //
 /**@name unit.cpp - The units. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ static void RemoveUnitFromContainer(CUnit *unit);
 */
 void CUnit::RefsIncrease()
 {
-	RefsAssert(Refs && !Destroyed);
+	Assert(Refs && !Destroyed);
 	if (!SaveGameLoading) {
 		++Refs;
 	}
@@ -100,7 +100,7 @@ void CUnit::RefsIncrease()
 */
 void CUnit::RefsDecrease()
 {
-	RefsAssert(Refs);
+	Assert(Refs);
 	// FIXME: shouldn't have to check this here
 	if (!SaveGameLoading) {
 		if (Destroyed) {
@@ -109,7 +109,7 @@ void CUnit::RefsDecrease()
 			}
 		} else {
 			--Refs;
-			RefsAssert(Refs);
+			Assert(Refs);
 		}
 	}
 }
@@ -150,7 +150,7 @@ void CUnit::Release()
 		}
 	}
 
-	RefsAssert(!Refs);
+	Assert(!Refs);
 
 	//
 	// No more references remaining, but the network could have an order
