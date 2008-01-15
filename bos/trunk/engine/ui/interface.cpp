@@ -9,7 +9,7 @@
 //
 /**@name interface.cpp - The interface. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -60,6 +60,19 @@
 #include "ai.h"
 #include "widgets.h"
 #include "particle.h"
+
+/*----------------------------------------------------------------------------
+--  Defines
+----------------------------------------------------------------------------*/
+
+	/// Scrolling area (<= 15 y)
+#define SCROLL_UP     15
+	/// Scrolling area (>= VideoHeight - 16 y)
+#define SCROLL_DOWN   (Video.Height - 16)
+	/// Scrolling area (<= 15 y)
+#define SCROLL_LEFT   15
+	/// Scrolling area (>= VideoWidth - 16 x)
+#define SCROLL_RIGHT  (Video.Width - 16)
 
 /*----------------------------------------------------------------------------
 --  Variables

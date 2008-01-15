@@ -9,7 +9,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -113,41 +113,17 @@
 
 #endif
 
-#ifdef REFS_DEBUG  // {
-
-	/**
-	**  Assert a condition for references
-	*/
-#define RefsAssert(cond)  do { if (!(cond)) { \
-	fprintf(stderr, "Assertion failed at %s:%d\n", __FILE__, __LINE__); \
-	abort(); } } while (0)
-
-#else  // }{ REFS_DEBUG
-
-#define RefsAssert(cond)      /* disabled */
-
-#endif  // } !REFS_DEBUG
-
 /*============================================================================
 ==  Definitions
 ============================================================================*/
 
-#include <string.h>
+#include <string>
 #include "util.h"
-
-inline char *new_strdup(const char *str)
-{
-	int len = strlen(str) + 1;
-	char *newstr = new char[len];
-	strcpy_s(newstr, len, str);
-	return newstr;
-}
+#include "translate.h"
 
 /*----------------------------------------------------------------------------
 --  Translate
 ----------------------------------------------------------------------------*/
-
-#include "translate.h"
 
 #define _(str) Translate(str)
 #define N_(str) str
@@ -169,8 +145,6 @@ inline char *new_strdup(const char *str)
 #endif
 #endif
 
-#define MAGIC_FOR_NEW_UNITS  33         /// How many percent of max mana for new units
-
 /*----------------------------------------------------------------------------
 --  Some limits
 ----------------------------------------------------------------------------*/
@@ -183,28 +157,20 @@ inline char *new_strdup(const char *str)
 --  Screen
 ----------------------------------------------------------------------------*/
 
-	/// Scrolling area (<= 15 y)
-#define SCROLL_UP     15
-	/// Scrolling area (>= VideoHeight - 16 y)
-#define SCROLL_DOWN   (Video.Height - 16)
-	/// Scrolling area (<= 15 y)
-#define SCROLL_LEFT   15
-	/// Scrolling area (>= VideoWidth - 16 x)
-#define SCROLL_RIGHT  (Video.Width - 16)
-
-	/// Frames per second to display (original 30-40)
+	/// Frames per second to display
 #define FRAMES_PER_SECOND  30  // 1/30s
-	/// Game cycles per second to simulate (original 30-40)
-#define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
+	/// Game cycles per second to simulate
+#define CYCLES_PER_SECOND  30  // 1/30s 33ms
 
 /*----------------------------------------------------------------------------
 --  stratagus.cpp
 ----------------------------------------------------------------------------*/
 
 extern std::string UserDirectory;           /// Directory containing user settings and data
+extern std::string StratagusLibPath;        /// Location of stratagus data
+
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused
-extern std::string StratagusLibPath;        /// Location of stratagus data
 
 extern int SpeedBuild;                      /// Speed factor for building
 extern int SpeedTrain;                      /// Speed factor for training
@@ -218,11 +184,11 @@ extern bool SaveGameLoading;                /// Save game is in progress of load
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern void SaveGame(const std::string &filename); /// Save game
 
-extern void Exit(int err);                  /// Exit stratagus
-extern void ExitFatal(int err);             /// Exit stratagus with fatal error
+extern void Exit(int err);                  /// Exit
+extern void ExitFatal(int err);             /// Exit with fatal error
 
 extern void UpdateDisplay(void);            /// Game display update
-extern void InitModules(void);              /// Initinalize all modules
+extern void InitModules(void);              /// Initialize all modules
 extern void LoadModules(void);              /// Load all modules
 extern void CleanModules(void);             /// Cleanup all modules
 extern void DrawMapArea(void);              /// Draw the map area

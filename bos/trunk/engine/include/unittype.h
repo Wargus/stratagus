@@ -9,7 +9,7 @@
 //
 /**@name unittype.h - The unit-types headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -742,10 +742,6 @@ public:
 	CPlayerColorGraphic *Sprite;     /// Sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 };
-
-	/// @todo ARI: should be dynamic (lua..).
-	/// How many unit-types are currently supported
-#define UnitTypeMax 257
 
 /*----------------------------------------------------------------------------
 --  Variables
