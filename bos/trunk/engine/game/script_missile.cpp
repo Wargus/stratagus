@@ -9,7 +9,7 @@
 //
 /**@name script_missile.cpp - The missile-type ccl functions. */
 //
-//      (c) Copyright 2002-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -39,8 +39,6 @@
 
 #include "stratagus.h"
 #include "video.h"
-#include "tileset.h"
-#include "unittype.h"
 #include "missile.h"
 #include "script.h"
 #include "unit.h"
@@ -65,10 +63,6 @@ static const char *MissileClassNames[] = {
 	"missile-class-fire",
 	"missile-class-hit",
 	"missile-class-parabolic",
-	"missile-class-land-mine",
-	"missile-class-whirlwind",
-	"missile-class-flame-shield",
-	"missile-class-death-coil",
 	NULL
 };
 
@@ -312,6 +306,7 @@ static int CclMissile(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+
 	// we need to reinitialize position parameters - that's because of
 	// the way InitMissile() (called from MakeLocalMissile()) computes
 	// them - it works for creating a missile during a game but breaks
@@ -332,28 +327,23 @@ static int CclMissile(lua_State *l)
 */
 static int CclDefineBurningBuilding(lua_State *l)
 {
-	const char *value;
-	BurningBuildingFrame *ptr;
-	int args;
-	int j;
-	int subargs;
-	int k;
-
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
 			i != BurningBuildingFrames.end(); ++i) {
 		delete *i;
 	}
 	BurningBuildingFrames.clear();
 
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
+	int args = lua_gettop(l);
+	for (int j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
 
-		ptr = new BurningBuildingFrame;
-		subargs = luaL_getn(l, j + 1);
-		for (k = 0; k < subargs; ++k) {
+		const char *value;
+		BurningBuildingFrame *ptr = new BurningBuildingFrame;
+		int subargs = luaL_getn(l, j + 1);
+
+		for (int k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
