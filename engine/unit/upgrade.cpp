@@ -9,7 +9,7 @@
 //
 /**@name upgrade.cpp - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2008 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,12 +33,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "stratagus.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "stratagus.h"
-
 #include <string>
 #include <vector>
 #include <map>
@@ -53,10 +52,6 @@
 #include "unittype.h"
 #include "actions.h"
 #include "iolib.h"
-
-#include "myendian.h"
-
-#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -136,14 +131,12 @@ static int CclDefineAllow(lua_State *l)
 {
 	const char *ident;
 	const char *ids;
-	int i;
 	int n;
 	int args;
-	int j;
 	int id;
 
 	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
+	for (int j = 0; j < args; ++j) {
 		ident = LuaToString(l, j + 1);
 		++j;
 		ids = LuaToString(l, j + 1);
@@ -156,7 +149,7 @@ static int CclDefineAllow(lua_State *l)
 
 		if (!strncmp(ident, "unit-", 5)) {
 			id = UnitTypeIdByIdent(ident);
-			for (i = 0; i < n; ++i) {
+			for (int i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
 					AllowUnitId(&Players[i], id, UnitMax);
 				} else if (ids[i] == 'F') {
