@@ -9,7 +9,7 @@
 --
 --	buttons.lua	-	Define the general unit-buttons.
 --
---	(c) Copyright 2001-2007 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+--	(c) Copyright 2001-2008 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 --				Francois Beerten and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ DefineButton( { Pos = 9, Level = 0, Icon = "icon-cancel",
 -- general commands -- almost all units have it -------------------------------
 
 DefineButton({
-	Pos = 4, Level = 0, Icon = "icon-attack-ground",
+	Pos = 6, Level = 0, Icon = "icon-attack-ground",
 	Action = "unload", Hint = "~!UNLOAD",
 	ForUnit = {"unit-apcs"}})
 DefineButton({
