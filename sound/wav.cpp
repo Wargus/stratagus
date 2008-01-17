@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "myendian.h"
+#include "SDL.h"
 
 #include "iolib.h"
 #include "sound_server.h"
@@ -104,8 +104,8 @@ int CSampleWavStream::Read(void *buf, int len)
 				break;
 			}
 
-			chunk.Magic = ConvertLE32(chunk.Magic);
-			chunk.Length = ConvertLE32(chunk.Length);
+			chunk.Magic = SDL_SwapLE32(chunk.Magic);
+			chunk.Length = SDL_SwapLE32(chunk.Length);
 			if (chunk.Magic != DATA) {
 				this->Data.WavFile->seek(chunk.Length, SEEK_CUR);
 				continue;
@@ -130,7 +130,7 @@ int CSampleWavStream::Read(void *buf, int len)
 
 		read >>= 1;
 		for (i = 0; i < read; ++i) {
-			((unsigned short *)sndbuf)[i] = ConvertLE16(((unsigned short *)sndbuf)[i]);
+			((unsigned short *)sndbuf)[i] = SDL_SwapLE16(((unsigned short *)sndbuf)[i]);
 		}
 
 		this->Len += comp;
@@ -202,8 +202,8 @@ CSample *LoadWav(const std::string &name, int flags)
 
 	// Convert to native format
 
-	chunk.Magic = ConvertLE32(chunk.Magic);
-	chunk.Length = ConvertLE32(chunk.Length);
+	chunk.Magic = SDL_SwapLE32(chunk.Magic);
+	chunk.Length = SDL_SwapLE32(chunk.Length);
 
 	if (chunk.Magic != RIFF) {
 		f->close();
@@ -212,7 +212,7 @@ CSample *LoadWav(const std::string &name, int flags)
 	}
 
 	f->read(&t, sizeof(t));
-	t = ConvertLE32(t);
+	t = SDL_SwapLE32(t);
 	if (t != WAVE) {
 		printf("Wrong magic %x (not %x)\n", t, WAVE);
 		f->close();
@@ -224,14 +224,14 @@ CSample *LoadWav(const std::string &name, int flags)
 
 	// Convert to native format
 
-	wavfmt.FMTchunk = ConvertLE32(wavfmt.FMTchunk);
-	wavfmt.FMTlength = ConvertLE32(wavfmt.FMTlength);
-	wavfmt.Encoding = ConvertLE16(wavfmt.Encoding);
-	wavfmt.Channels = ConvertLE16(wavfmt.Channels);
-	wavfmt.Frequency = ConvertLE32(wavfmt.Frequency);
-	wavfmt.ByteRate = ConvertLE32(wavfmt.ByteRate);
-	wavfmt.SampleSize = ConvertLE16(wavfmt.SampleSize);
-	wavfmt.BitsPerSample = ConvertLE16(wavfmt.BitsPerSample);
+	wavfmt.FMTchunk = SDL_SwapLE32(wavfmt.FMTchunk);
+	wavfmt.FMTlength = SDL_SwapLE32(wavfmt.FMTlength);
+	wavfmt.Encoding = SDL_SwapLE16(wavfmt.Encoding);
+	wavfmt.Channels = SDL_SwapLE16(wavfmt.Channels);
+	wavfmt.Frequency = SDL_SwapLE32(wavfmt.Frequency);
+	wavfmt.ByteRate = SDL_SwapLE32(wavfmt.ByteRate);
+	wavfmt.SampleSize = SDL_SwapLE16(wavfmt.SampleSize);
+	wavfmt.BitsPerSample = SDL_SwapLE16(wavfmt.BitsPerSample);
 
 	if (wavfmt.FMTchunk != FMT) {
 		printf("Wrong magic %x (not %x)\n", wavfmt.FMTchunk, FMT);
@@ -327,8 +327,8 @@ CSample *LoadWav(const std::string &name, int flags)
 					break;
 				}
 
-				chunk.Magic = ConvertLE32(chunk.Magic);
-				chunk.Length = ConvertLE32(chunk.Length);
+				chunk.Magic = SDL_SwapLE32(chunk.Magic);
+				chunk.Length = SDL_SwapLE32(chunk.Length);
 				if (chunk.Magic != DATA) {
 					f->seek(chunk.Length, SEEK_CUR);
 					continue;
@@ -357,7 +357,7 @@ CSample *LoadWav(const std::string &name, int flags)
 				read >>= 1;
 				for (i = 0; i < read; ++i) {
 					((unsigned short *)(sample->Buffer + sample->Pos + sample->Len))[i] =
-						ConvertLE16(((unsigned short *)sndbuf)[i]);
+						SDL_SwapLE16(((unsigned short *)sndbuf)[i]);
 				}
 			} else {
 				memcpy((sample->Buffer + sample->Pos + sample->Len), sndbuf, comp);

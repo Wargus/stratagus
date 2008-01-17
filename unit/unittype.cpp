@@ -9,7 +9,7 @@
 //
 /**@name unittype.cpp - The unit types. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,13 +33,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "stratagus.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-#include "stratagus.h"
-
 #include <string>
 #include <map>
 
@@ -56,10 +55,6 @@
 #include "script.h"
 #include "spells.h"
 #include "iolib.h"
-
-#include "util.h"
-
-#include "myendian.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

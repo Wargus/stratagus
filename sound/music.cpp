@@ -9,7 +9,7 @@
 //
 /**@name music.cpp - Background music support */
 //
-//      (c) Copyright 2002-2006 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 2002-2008 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,21 +33,13 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
 #include "stratagus.h"
 
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 
 #include "SDL.h"
 
-#include "iolib.h"
-#include "iocompat.h"
-#include "sound.h"
 #include "sound_server.h"
-#include "interface.h"
-#include "results.h"
-#include "util.h"
 #include "script.h"
 
 /*----------------------------------------------------------------------------
