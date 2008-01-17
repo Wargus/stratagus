@@ -9,7 +9,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,6 +28,25 @@
 //      $Id$
 
 //@{
+
+//----------------------------------------------------------------------------
+//  Documentation
+//----------------------------------------------------------------------------
+
+/**
+**  @page EditorModule Module - Editor
+**
+**  This is a very simple editor for the Stratagus engine.
+**
+**  @section Missing Missing features
+**
+**    @li Edit allow section
+**    @li Good keyboard bindings
+**    @li Script support
+**    @li Commandline support
+**    @li Cut&Paste
+**    @li More random map functions.
+*/
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -79,6 +98,8 @@ extern void CleanGame();
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+const char *EditorStartFile;  /// Editor CCL start file
 
 static int IconWidth;                       /// Icon width in panels
 static int IconHeight;                      /// Icon height in panels
