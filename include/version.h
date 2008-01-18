@@ -9,7 +9,7 @@
 //
 /**@name version.h - The version of Bos Wars. */
 //
-//      (c) Copyright 1998-2007 by Francois Beerten, Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Francois Beerten, Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@
 	/// Stratagus major version
 #define StratagusMajorVersion  2
 	/// Stratagus minor version (maximal 99)
-#define StratagusMinorVersion  4
+#define StratagusMinorVersion  5
 	/// Stratagus patch level (maximal 99)
-#define StratagusPatchLevel    1
+#define StratagusPatchLevel    0
 	/// Stratagus version (1,2,3) -> 10203
 #define StratagusVersion \
 	(StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 \
