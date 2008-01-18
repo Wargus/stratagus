@@ -9,7 +9,7 @@
 //
 /**@name network.cpp - The network. */
 //
-//      (c) Copyright 2000-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 2000-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -500,8 +500,6 @@ void InitNetwork1(void)
 {
 	int i;
 	int port;
-
-	DebugPrint("\n");
 
 	NetworkFildes = (Socket)-1;
 	NetworkInSync = 1;

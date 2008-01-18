@@ -433,7 +433,7 @@ function GameStarting()
 
   -- FIXME: get the version from somewhere else
   UI.StatusLine:Set("Bos Wars V" .. "2.4.0" ..
-    ", (c) 1998-2007 by the Bos Wars and Stratagus Project.")
+    ", (c) 1998-2008 by the Bos Wars and Stratagus Project.")
 end
 
 
