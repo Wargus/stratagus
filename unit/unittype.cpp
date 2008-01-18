@@ -412,8 +412,6 @@ void CleanUnitTypes(void)
 	CUnitType *type;
 	int j;
 
-	DebugPrint("FIXME: icon, sounds not freed.\n");
-
 	// FIXME: scheme contains references on this structure.
 	// Clean all animations.
 	for (j = 0; j < NumAnimations; ++j) {
