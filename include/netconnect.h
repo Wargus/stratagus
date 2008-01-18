@@ -9,7 +9,7 @@
 //
 /**@name netconnect.h - The network connection setup header file. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -38,11 +38,11 @@
 ----------------------------------------------------------------------------*/
 
 	/// Network protocol major version
-#define NetworkProtocolMajorVersion 0
+#define NetworkProtocolMajorVersion StratagusMajorVersion
 	/// Network protocol minor version (maximal 99)
-#define NetworkProtocolMinorVersion 9
+#define NetworkProtocolMinorVersion StratagusMinorVersion
 	/// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel   9
+#define NetworkProtocolPatchLevel   StratagusPatchLevel
 	/// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 + \
