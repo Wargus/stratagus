@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Fixed bug selecting a map in a subdir (Jimmy Salmon)
 - Fix unload button on the APC unit (llearch n'n'daCorna) 
 - Auto repair while patrolling (Jimmy Salmon)
 - Added patrol button for engineer (Jimmy Salmon)

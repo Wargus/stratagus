@@ -3182,10 +3182,6 @@
 					>
 				</File>
 				<File
-					RelativePath="include\myendian.h"
-					>
-				</File>
-				<File
 					RelativePath="include\net_lowlevel.h"
 					>
 				</File>
