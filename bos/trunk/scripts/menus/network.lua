@@ -9,7 +9,7 @@
 --
 --      network.lua - The multiplayer UI.
 --
---      (c) Copyright 2005-2007 by François Beerten
+--      (c) Copyright 2005-2008 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -442,7 +442,7 @@ function RunCreateMultiGameMenu(s)
   Load(mapfile .. '/presentation.smp')
   local browser = menu:addMapBrowser("maps/", sx*10, sy*2+20, sx*8, sy*11, mapfile)
   local function cb(s)
-    mapfile = "maps/" .. browser:getSelectedMap()
+    mapfile = browser:getSelectedMap()
     print(browser:getSelectedMap())
     Load(mapfile)
     maptext:setCaption(browser:getSelectedItem())
@@ -454,7 +454,7 @@ function RunCreateMultiGameMenu(s)
   menu:addButton(_("Create ~!Game"), Video.Width / 2 + 50, Video.Height - 100,
     function(s)    
       print (description)
-      RunServerMultiGameMenu("maps/"..browser:getSelectedMap(), description, numplayers)
+      RunServerMultiGameMenu(browser:getSelectedMap(), description, numplayers)
       menu:stop()
     end
   )

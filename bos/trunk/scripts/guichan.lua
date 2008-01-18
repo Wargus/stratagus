@@ -9,7 +9,7 @@
 --
 --      guichan.lua - The main UI lua script.
 --
---      (c) Copyright 2005-2007 by François Beerten
+--      (c) Copyright 2005-2008 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -231,7 +231,7 @@ function AddMenuHelpers(menu)
     end
     local browser = self:addBrowser(path, listFilesAndDirs, x, y, w, h, default)
     local function getMap(browser)
-       return browser:getSelectedItem() .. "/presentation.smp"
+       return browser.path .. browser:getSelectedItem() .. "/presentation.smp"
     end
     browser.getSelectedMap = getMap
     return browser
@@ -507,7 +507,7 @@ function RunStartGameMenu(s)
                                      "maps/"..selectedmap)
   local function cb(s)
     maptext:setCaption(browser:getSelectedItem())
-    Load("maps/" .. browser:getSelectedMap())
+    Load(browser:getSelectedMap())
     selectedmap = browser:getSelectedItem()
   end
   browser:setActionCallback(cb)
@@ -515,7 +515,7 @@ function RunStartGameMenu(s)
   AllowAllUnits()
   local function startgamebutton(s)
     print("Starting map -------")
-    RunMap("maps/" .. browser:getSelectedMap(), nil, fow:isMarked(),
+    RunMap(browser:getSelectedMap(), nil, fow:isMarked(),
            revealmap:isMarked())
     PresentMap = OldPresentMap
     menu:stop()
@@ -705,7 +705,7 @@ function RunEditorLoadMenu()
                                      "maps/"..selectedmap)
   local function selectMap(s)
     maptext:setCaption(browser:getSelectedItem())
-    Load("maps/" .. browser:getSelectedMap())
+    Load(browser:getSelectedMap())
     selectedmap = browser:getSelectedItem()
   end
   browser:setActionCallback(selectMap)
