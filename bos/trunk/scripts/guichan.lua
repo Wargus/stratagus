@@ -216,22 +216,26 @@ function AddMenuHelpers(menu)
 
   function menu:addMapBrowser(path, x, y, w, h, default)
     local function listFilesAndDirs(path)
-        local dirlist = {}
-        local dirs = ListDirsInDirectory(path)
-        for i,f in ipairs(dirs) do
-          if (string.find(f, "^%w.*%.map$")) then
-            table.insert(dirlist, f)
-          else
-            if (string.find(f, "^%a")) then
-              table.insert(dirlist, f .. "/")
-            end
-          end
+      local dirlist = {}
+      local filelist = {}
+      local dirs = ListDirsInDirectory(path)
+      -- Create table of dirs and files
+      for i,f in ipairs(dirs) do
+        if (string.find(f, "^%w.*%.map$")) then
+          table.insert(filelist, f)
+        elseif (string.find(f, "^%a")) then
+          table.insert(dirlist, f .. "/")
         end
-        return dirlist
+      end
+      -- Append files after dirs
+      for i,f in ipairs(filelist) do
+        table.insert(dirlist, f)
+      end
+      return dirlist
     end
     local browser = self:addBrowser(path, listFilesAndDirs, x, y, w, h, default)
     local function getMap(browser)
-       return browser.path .. browser:getSelectedItem() .. "/presentation.smp"
+      return browser.path .. browser:getSelectedItem() .. "/presentation.smp"
     end
     browser.getSelectedMap = getMap
     return browser
