@@ -29,7 +29,7 @@
 --  Define level 01 Map Presentation
 --
 
-Load("maps/tutorial.map/setup.sms")
+Load("maps/campaigns/tutorial/tutorial.map/setup.sms")
 
 CreateUnit("unit-engineer", 0, {5, 59})
 CreateUnit("unit-vault", 1, {22, 38})
