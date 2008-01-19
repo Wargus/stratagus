@@ -13,4 +13,4 @@
 
 DefinePlayerTypes("person","person","nobody","rescue-passive")
 PresentMap("Campaign_one_map_two", 3, 128, 128, -1839366288)
-DefineMapSetup("maps/C1_M2_green_valley.sms")
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")

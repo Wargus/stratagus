@@ -33,4 +33,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M5_Rochebrune.sms")
+Load("maps/campaigns/elites/Rochebrune.map/setup.sms")

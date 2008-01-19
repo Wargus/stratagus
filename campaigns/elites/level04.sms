@@ -36,4 +36,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M4_shield_of_wasteland.sms")
+Load("maps/campaigns/elites/Shield_of_Wasteland.map/setup.sms")

@@ -33,4 +33,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M9_Savoy_lake.sms")
+Load("maps/campaigns/elites/Savoy_Lake.map/setup.sms")

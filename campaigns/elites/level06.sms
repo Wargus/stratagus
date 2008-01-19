@@ -33,4 +33,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M6_Aiglier.sms")
+Load("maps/campaigns/elites/Aiglier.map/setup.sms")
