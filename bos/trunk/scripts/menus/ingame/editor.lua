@@ -78,9 +78,9 @@ function RunEditorSaveMenu()
   menu:addSmallButton(_("Save"), 16, 248,
     -- FIXME: use a confirm menu if the file exists already
     function()
-      print(t:getText())
-      EditorSaveMap("maps/"..t:getText())
-      UI.StatusLine:Set("Saved map to: " .. t:getText())
+      local mapname = browser.path .. t:getText()
+      EditorSaveMap(mapname)
+      UI.StatusLine:Set("Saved map to: " .. mapname)
       menu:stop()
     end)
 
