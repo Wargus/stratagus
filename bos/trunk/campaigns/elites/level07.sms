@@ -34,4 +34,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M7_Bellegarde.sms")
+Load("maps/campaigns/elites/Bellegarde.map/setup.sms")

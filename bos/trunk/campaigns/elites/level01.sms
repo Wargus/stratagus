@@ -36,4 +36,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M1_the_river.sms")
+Load("maps/campaigns/elites/The_River.map/setup.sms")

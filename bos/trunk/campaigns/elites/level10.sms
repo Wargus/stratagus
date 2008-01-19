@@ -34,4 +34,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M10_Fort_Savoy.sms")
+Load("maps/campaigns/elites/Fort_Savoy.map/setup.sms")

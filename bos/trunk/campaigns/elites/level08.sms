@@ -34,4 +34,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M8_Savoy_steps.sms")
+Load("maps/campaigns/elites/Savoy_Steps.map/setup.sms")

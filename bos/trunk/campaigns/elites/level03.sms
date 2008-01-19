@@ -36,4 +36,4 @@
 AllowDefaultUnits()
 
 -- Map
-Load("maps/C1_M3_Buffy_forrest.sms")
+Load("maps/campaigns/elites/Buffy_Forest.map/setup.sms")
