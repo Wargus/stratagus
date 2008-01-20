@@ -167,22 +167,6 @@ protected:
 };
 
 
-// Explosion system
-class CExplosion : public CParticle
-{
-public:
-	CExplosion(CPosition position);
-	virtual ~CExplosion();
-
-	static void init();
-	static void exit();
-
-	virtual void draw();
-	virtual void update(int ticks);
-	virtual CParticle * clone();
-};
-
-
 class CParticleManager
 {
 public:
