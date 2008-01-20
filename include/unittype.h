@@ -385,6 +385,7 @@ class CAnimations;
 class MissileType;
 class CFile;
 struct lua_State;
+class LuaCallback;
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
 
@@ -581,7 +582,8 @@ class CUnitType {
 public:
 	CUnitType() : Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 		ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
-		Animations(NULL), StillFrame(0), CorpseType(NULL),
+		Animations(NULL), StillFrame(0),
+		DeathExplosion(NULL), CorpseType(NULL),
 		Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
 		BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
 		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
@@ -606,6 +608,7 @@ public:
 		memset(ProductionCosts, 0, sizeof(ProductionCosts));
 		memset(StorageCapacity, 0, sizeof(StorageCapacity));
 	}
+	~CUnitType();
 
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
@@ -630,6 +633,8 @@ public:
 
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
+
+	LuaCallback *DeathExplosion;
 
 	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
