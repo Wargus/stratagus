@@ -177,14 +177,8 @@ void DrawGuichanWidgets()
 **  @param f  Listener function
 */
 LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
-	luastate(l)
+	callback(l, f)
 {
-	if (!lua_isfunction(l, f)) {
-		LuaError(l, "Argument isnt a function");
-		Assert(0);
-	}
-	lua_pushvalue(l, f);
-	luaref = luaL_ref(l, LUA_REGISTRYINDEX);
 }
 
 /**
@@ -196,22 +190,9 @@ LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
 */
 void LuaActionListener::action(const std::string &eventId) 
 {
-	int status;
-	int base;
-	base = lua_gettop(luastate);
-	lua_getglobal(luastate, "_TRACEBACK");
-	lua_rawgeti(luastate, LUA_REGISTRYINDEX, luaref);
-	lua_pushstring(luastate, eventId.c_str());
-	status = lua_pcall(luastate, 1, 0, base); //FIXME call error reporting function
-	if (status) {
-		const char *msg;
-		msg = lua_tostring(luastate, -1);
-		if (msg == NULL) {
-			msg = "(error with no message)";
-		}
-		fprintf(stderr, "%s\n", msg);
-		lua_pop(luastate, 1);
-	}
+	callback.pushPreamble();
+	callback.pushString(eventId.c_str());
+	callback.run();
 }
 
 /**
@@ -219,7 +200,6 @@ void LuaActionListener::action(const std::string &eventId)
 */
 LuaActionListener::~LuaActionListener()
 {
-	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }
 
 
