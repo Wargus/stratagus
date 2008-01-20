@@ -38,6 +38,7 @@
 CSmokeParticle::CSmokeParticle(CPosition position, Animation *smoke) :
 	CParticle(position), puff(smoke)
 {
+	Assert(smoke);
 }
 
 CSmokeParticle::~CSmokeParticle()
