@@ -60,9 +60,7 @@ class GraphicAnimation : public Animation
 	int currentFrame;
 	int currTicks;
 public:
-	GraphicAnimation(CGraphic *g, int ticksPerFrame) :
-		g(g), ticksPerFrame(ticksPerFrame), currentFrame(0), currTicks(0) {}
-
+	GraphicAnimation(CGraphic *g, int ticksPerFrame);
 	virtual ~GraphicAnimation() {}
 
 	/**

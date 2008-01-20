@@ -33,6 +33,12 @@
 #include "particle.h"
 #include "video.h"
 
+GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
+	g(g), ticksPerFrame(ticksPerFrame), currentFrame(0), currTicks(0)
+{
+	Assert(g);
+}
+
 
 void GraphicAnimation::draw(int x, int y)
 {
