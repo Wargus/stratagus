@@ -37,6 +37,7 @@ class LuaCallback
 {
 	lua_State *luastate;
 	int luaref;
+	int arguments;
 	int base;
 public:
 	LuaCallback(lua_State *lua, lua_Object luaref);
