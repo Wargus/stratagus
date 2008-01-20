@@ -42,7 +42,7 @@
 **  @param f  Listener function
 */
 LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
-	luastate(l)
+	luastate(l), arguments(0)
 {
 	if (!lua_isfunction(l, f)) {
 		LuaError(l, "Argument isn't a function");
@@ -61,6 +61,7 @@ void LuaCallback::pushPreamble()
 	base = lua_gettop(luastate);
 	lua_getglobal(luastate, "_TRACEBACK");
 	lua_rawgeti(luastate, LUA_REGISTRYINDEX, luaref);
+	arguments = 0;
 }
 
 
@@ -72,6 +73,7 @@ void LuaCallback::pushPreamble()
 void LuaCallback::pushInteger(int value) 
 {
 	lua_pushnumber(luastate, value);
+	arguments++;
 }
 
 
@@ -83,6 +85,7 @@ void LuaCallback::pushInteger(int value)
 void LuaCallback::pushString(const std::string &s) 
 {
 	lua_pushstring(luastate, s.c_str());
+	arguments++;
 }
 
 
@@ -91,12 +94,12 @@ void LuaCallback::pushString(const std::string &s)
 **  to be able to recieve a notification that an action has
 **  occured.
 */
-void LuaCallback::run() 
+void LuaCallback::run()
 {
 	int status;
 
 	 //FIXME call error reporting function
-	status = lua_pcall(luastate, 1, 0, base);
+	status = lua_pcall(luastate, arguments, 0, base);
 	if (status) {
 		const char *msg;
 		msg = lua_tostring(luastate, -1);
