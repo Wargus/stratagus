@@ -49,14 +49,11 @@ CParticleManager::~CParticleManager()
 
 void CParticleManager::init()
 {
-	CExplosion::init();
 }
 
 void CParticleManager::exit()
 {
 	ParticleManager.clear();
-
-	CExplosion::exit();
 }
 
 void CParticleManager::clear()

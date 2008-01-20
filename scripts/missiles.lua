@@ -32,8 +32,11 @@
 --	Define missiles
 -------------------------------------------------------------------------------Y
 local flame_graphic = CGraphic:New("graphics/particle/large01.png", 128, 96)
+flame_graphic:Load()
 local flash_graphic = CGraphic:New("graphics/particle/flash.png", 240, 194)
+flash_graphic:Load()
 local smoke_graphic = CGraphic:New("graphics/particle/smokelight12.png", 12, 12)
+smoke_graphic:Load()
 
 function addStaticParticle(graphic, ticksperframe, x, y)
    local a = GraphicAnimation(graphic, ticksperframe)
