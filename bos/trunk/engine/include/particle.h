@@ -182,10 +182,6 @@ public:
 	virtual CParticle * clone();
 };
 
-enum {
-	PARTICLE_NONE,
-	PARTICLE_EXPLOSION,
-};
 
 class CParticleManager
 {
@@ -200,11 +196,9 @@ public:
 	void update();
 
 	void add(CParticle *particle);
-	void add(int type, CPosition &pos);
 	void clear();
 	
 	CPosition getScreenPos(const CPosition &pos);
-	int getType(const std::string &name);
 
 	inline void setLowDetail(bool detail) { lowDetail = detail; }
 	inline bool getLowDetail() const { return lowDetail; }
