@@ -31,32 +31,6 @@
 -------------------------------------------------------------------------------Y
 --	Define missiles
 -------------------------------------------------------------------------------Y
-local flame_graphic = CGraphic:New("graphics/particle/large01.png", 128, 96)
-flame_graphic:Load()
-local flash_graphic = CGraphic:New("graphics/particle/flash.png", 240, 194)
-flash_graphic:Load()
-local smoke_graphic = CGraphic:New("graphics/particle/smokelight12.png", 12, 12)
-smoke_graphic:Load()
-
-function addStaticParticle(graphic, ticksperframe, x, y)
-   local a = GraphicAnimation(graphic, ticksperframe)
-   local e = StaticParticle(CPosition(x,y), a)
-   ParticleManager:add(e:clone())
-end
-
-function addChunkParticles(amount, smokegraphic, ticksperframe, x, y)
-   local smokeanimation = GraphicAnimation(smoke_graphic, ticksperframe)
-   for i = 1, amount do
-      local chunk = CChunkParticle(CPosition(x, y), smokeanimation)
-      ParticleManager:add(chunk:clone())
-   end
-end
-
-function bazooExplosion(x, y)
-   addStaticParticle(flash_graphic, 22, x, y)
-   addStaticParticle(flame_graphic, 33, x, y)
-   addChunkParticles(8, smoke_graphic, 60, x, y)
-end
 
 DefineMissileType("missile-nuke", {
 	File = "graphics/missiles/nuke.png",
