@@ -9,7 +9,7 @@
 //
 /**@name chunkparticle.cpp - The chunk particle. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007-2008 by Jimmy Salmon and Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ static inline float deg2rad(int degrees) {
 
 CChunkParticle::CChunkParticle(CPosition position, Animation *smokeAnimation) :
 	CParticle(position), initialPos(position), nextSmokeTicks(0), age(0), 
-	height(0.f), smokeAnimation(smokeAnimation)
+	height(0.f)
 {
 	float radians = deg2rad(MyRand() % 360);
 	direction.x = cos(radians);
@@ -58,6 +58,7 @@ CChunkParticle::CChunkParticle(CPosition position, Animation *smokeAnimation) :
 	trajectoryAngle = deg2rad(MyRand() % (90 - minTrajectoryAngle) + minTrajectoryAngle);
 
 	lifetime = (int)(1000 * (initialVelocity * sin(trajectoryAngle) / gravity) * 2);
+	this->smokeAnimation = smokeAnimation->clone();
 }
 
 CChunkParticle::~CChunkParticle()
@@ -115,6 +116,12 @@ void CChunkParticle::update(int ticks)
 	pos.y = initialPos.y + distance * direction.y;
 
 	height = getVerticalPosition(initialVelocity, trajectoryAngle, time);
+}
+
+
+CParticle* CChunkParticle::clone()
+{
+	return new CChunkParticle(pos, smokeAnimation);
 }
 
 //@}

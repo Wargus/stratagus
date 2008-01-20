@@ -9,7 +9,7 @@
 //
 /**@name smokeparticle.cpp - The smoke particle. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007-2008 by Jimmy Salmon and Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -62,6 +62,11 @@ void CSmokeParticle::update(int ticks)
 	// smoke rises
 	const int smokeRisePerSecond = 22;
 	pos.y -= ticks / 1000.f * smokeRisePerSecond;
+}
+
+CParticle* CSmokeParticle::clone()
+{
+	return new CSmokeParticle(pos, puff);
 }
 
 //@}

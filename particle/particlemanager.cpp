@@ -9,7 +9,7 @@
 //
 /**@name particlemanager.cpp - The particle manager. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007-2008 by Jimmy Salmon and Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

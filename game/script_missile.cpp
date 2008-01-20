@@ -44,6 +44,7 @@
 #include "unit.h"
 #include "unit_manager.h"
 #include "particle.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -161,7 +162,7 @@ static int CclDefineMissileType(lua_State *l)
 		} else if (!strcmp(value, "SmokeMissile")) {
 			mtype->SmokeName = LuaToString(l, -1);
 		} else if (!strcmp(value, "ImpactParticle")) {
-			mtype->ImpactParticle = ParticleManager.getType(LuaToString(l, -1));
+			mtype->ImpactParticle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {
 			mtype->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {

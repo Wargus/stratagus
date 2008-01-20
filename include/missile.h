@@ -9,7 +9,7 @@
 //
 /**@name missile.h - The missile headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer
+//      (c) Copyright 1998-2008 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -323,6 +323,7 @@ class CGraphic;
 class CUnit;
 class CViewport;
 class CFile;
+class LuaCallback;
 
 /*----------------------------------------------------------------------------
 --  Missile-type
@@ -402,7 +403,7 @@ public:
 	MissileType *ImpactMissile;/// missile produces an impact
 	std::string SmokeName;     /// impact missile-type name
 	MissileType *SmokeMissile; /// Trailling missile
-	int ImpactParticle;        /// impact particle system
+	LuaCallback *ImpactParticle; /// impact particle
 
 // --- FILLED UP ---
 	CGraphic *G;         /// missile graphic
