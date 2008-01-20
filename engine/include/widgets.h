@@ -31,8 +31,8 @@
 #include <guichan.h>
 #include <guichan/gsdl.h>
 #include "font.h"
+#include "luacallback.h"
 
-typedef int lua_Object; // from tolua++.h
 
 extern bool GuichanActive;
 
@@ -42,12 +42,11 @@ void handleInput(const SDL_Event *event);
 
 class LuaActionListener : public gcn::ActionListener
 {
-	lua_State *luastate;
-	int luaref;
+	LuaCallback callback;
 public:
-	LuaActionListener(lua_State *lua, lua_Object luaref);
+	LuaActionListener(lua_State *lua, lua_Object function);
 	virtual void action(const std::string &eventId);
-	~LuaActionListener();
+	virtual ~LuaActionListener();
 };
 
 class MyOpenGLGraphics : public gcn::Graphics
