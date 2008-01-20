@@ -72,6 +72,7 @@ std::string DefaultResourceNames[MaxCosts];
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
 CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
@@ -106,8 +107,26 @@ CUnitType::CUnitType() :
 CUnitType::~CUnitType()
 {
 	delete DeathExplosion;
-}
 
+	delete[] Variable;
+
+	for (int i = 0; i < PlayerMax; ++i) {
+		delete[] Stats[i].Variables;
+	}
+
+	// Free Building Restrictions if there are any
+	for (std::vector<CBuildRestriction *>::iterator b = BuildingRules.begin();
+			b != BuildingRules.end(); ++b) {
+		delete *b;
+	}
+	BuildingRules.clear();
+
+	delete[] CanCastSpell;
+	delete[] AutoCastActive;
+
+	CGraphic::Free(Sprite);
+	CGraphic::Free(ShadowSprite);
+}
 
 /**
 **  Update the player stats for changed unit types.
@@ -446,12 +465,10 @@ static void CleanAnimation(CAnimation *anim)
 */
 void CleanUnitTypes(void)
 {
-	CUnitType *type;
 	int j;
 
-	// FIXME: scheme contains references on this structure.
 	// Clean all animations.
-	for (j = 0; j < NumAnimations; ++j) {
+	for (int j = 0; j < NumAnimations; ++j) {
 		CleanAnimation(AnimationsArray[j]);
 	}
 	NumAnimations = 0;
@@ -465,29 +482,6 @@ void CleanUnitTypes(void)
 	// Clean all unit-types
 
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		type = UnitTypes[i];
-
-		Assert(!type->Ident.empty());
-		Assert(!type->Name.empty());
-
-		delete[] type->Variable;
-
-		for (j = 0; j < PlayerMax; j++) {
-			delete[] type->Stats[j].Variables;
-		}
-
-		// Free Building Restrictions if there are any
-		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-			b != type->BuildingRules.end(); ++b) {
-			delete *b;
-		}
-		type->BuildingRules.clear();
-		delete[] type->CanCastSpell;
-		delete[] type->AutoCastActive;
-
-		CGraphic::Free(type->Sprite);
-		CGraphic::Free(type->ShadowSprite);
-
 		delete UnitTypes[i];
 	}
 	UnitTypes.clear();
@@ -502,7 +496,7 @@ void CleanUnitTypes(void)
 	UnitTypeVar.Variable = NULL;
 	UnitTypeVar.NumberVariable = 0;
 	for (std::vector<CDecoVar *>::iterator it = UnitTypeVar.DecoVar.begin();
-		it != UnitTypeVar.DecoVar.end(); ++it) {
+			it != UnitTypeVar.DecoVar.end(); ++it) {
 		delete (*it);
 	}
 	UnitTypeVar.DecoVar.clear();
