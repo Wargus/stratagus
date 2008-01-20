@@ -112,34 +112,12 @@ void CParticleManager::add(CParticle *particle)
 	new_particles.push_back(particle);
 }
 
-void CParticleManager::add(int type, CPosition &pos)
-{
-	switch (type) {
-		case PARTICLE_EXPLOSION:
-			add(new CExplosion(pos));
-			break;
-		default:
-			DebugPrint("Unknown ParticleType: %d\n" _C_ type);
-			break;
-	}
-}
-
 CPosition CParticleManager::getScreenPos(const CPosition &pos)
 {
 	int x = (int)pos.x;
 	int y = (int)pos.y;
 	vp->MapPixel2Viewport(x, y);
 	return CPosition(x, y);
-}
-
-int CParticleManager::getType(const std::string &name)
-{
-	if (name == "explosion") {
-		return PARTICLE_EXPLOSION;
-	}
-
-	DebugPrint("Unknown type: %s\n" _C_ name.c_str());
-	return PARTICLE_NONE;
 }
 
 //@}
