@@ -72,6 +72,36 @@ std::string DefaultResourceNames[MaxCosts];
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+CUnitType::CUnitType() :
+	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
+	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
+	Animations(NULL), StillFrame(0),
+	DeathExplosion(NULL), CorpseType(NULL),
+	Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
+	BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
+	ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
+	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
+	CanCastSpell(NULL), AutoCastActive(NULL),
+	CanTransport(false), MaxOnBoard(0),
+	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
+	MouseAction(0), Points(0), CanTarget(0),
+	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
+	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
+	Coward(0), AttackFromTransporter(0),
+	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
+	BuilderOutside(0), BuilderLost(0), CanHarvestFrom(0), Harvester(0),
+	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
+	Indestructible(0), Organic(0), Variable(NULL),
+	ProductionEfficiency(100), FieldFlags(0), MovementMask(0),
+	Sprite(NULL), ShadowSprite(NULL)
+{
+	memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
+	memset(ProductionRate, 0, sizeof(ProductionRate));
+	memset(MaxUtilizationRate, 0, sizeof(MaxUtilizationRate));
+	memset(ProductionCosts, 0, sizeof(ProductionCosts));
+	memset(StorageCapacity, 0, sizeof(StorageCapacity));
+}
+
 
 CUnitType::~CUnitType()
 {
