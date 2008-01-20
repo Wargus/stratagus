@@ -4,4 +4,4 @@
 
 DefinePlayerTypes("person", "person", "person", "person")
 PresentMap("cross", 4, 256, 256, -131781629)
-DefineMapSetup(GetCurrentLuaPath().."/cross.sms")
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")
