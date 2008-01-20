@@ -59,7 +59,6 @@
 #include "ui.h"
 #include "iolib.h"
 #include "particle.h"
-#include "util.h"
 #include "trigger.h"
 #include "luacallback.h"
 

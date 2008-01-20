@@ -48,7 +48,6 @@
 #include "interface.h"
 #include "menus.h"
 #include "settings.h"
-#include "util.h"
 #include "version.h"
 
 
