@@ -369,7 +369,6 @@
 
 #include <vector>
 #include "upgrade_structs.h"
-#include "util.h"
 #include "unitsound.h"
 #include "icons.h"
 

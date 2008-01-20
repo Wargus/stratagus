@@ -43,7 +43,6 @@
 
 #include "stratagus.h"
 #include "iocompat.h"
-#include "util.h"
 #include "iolib.h"
 
 CFile::CFile()
