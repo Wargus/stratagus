@@ -3,7 +3,7 @@
 # 
 #  Access map creation tool
 #
-#  (c) Copyright 2006 by Francois Beerten.
+#  (c) Copyright 2006-2008 by Francois Beerten.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ header = """
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---  (c) Copyright 2005-2006 by Francois Beerten et al.
+--  (c) Copyright 2005-2008 by Francois Beerten et al.
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ def convertAccessMap(imagename, accessname):
 if __name__ == '__main__':
   if len(sys.argv) != 3:
      print 'Convert a png image into access instructions for a terrain'
-     print 'Usage: accessmap.py <image> <access type> > lua file'
+     print 'Usage: accessmap.py <image> <access type:[fast|water|unpassable]> > lua file'
      sys.exit(-2)
   convertAccessMap(sys.argv[1], sys.argv[2])
 
