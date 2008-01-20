@@ -2228,6 +2228,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\stratagus\luacallback.cpp"
+						>
+					</File>
+					<File
 						RelativePath="stratagus\script.cpp"
 						>
 						<FileConfiguration
@@ -3064,10 +3068,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\particle\explosion.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\particle\graphicanimation.cpp"
 						>
 					</File>
@@ -3159,6 +3159,10 @@
 				</File>
 				<File
 					RelativePath="include\iolib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\luacallback.h"
 					>
 				</File>
 				<File
