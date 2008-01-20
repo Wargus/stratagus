@@ -59,6 +59,7 @@
 #include "font.h"
 #include "pathfinder.h"
 #include "spells.h"
+#include "particle.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -99,6 +100,7 @@ void CleanModules(void)
 	CleanTilesets();
 	Map.Clean();
 	Map.CleanFogOfWar();
+	CParticleManager::exit();
 	CleanReplayLog();
 	CleanSpells();
 	FreeVisionTable();
