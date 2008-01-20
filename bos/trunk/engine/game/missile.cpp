@@ -61,6 +61,7 @@
 #include "particle.h"
 #include "util.h"
 #include "trigger.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -805,8 +806,10 @@ void MissileHit(Missile *missile)
 		MakeMissile(missile->Type->ImpactMissile, x, y, x, y);
 	}
 	if (missile->Type->ImpactParticle) {
-		CPosition position(x, y);
-		ParticleManager.add(missile->Type->ImpactParticle, position);
+		missile->Type->ImpactParticle->pushPreamble();
+		missile->Type->ImpactParticle->pushInteger(x);
+		missile->Type->ImpactParticle->pushInteger(y);
+		missile->Type->ImpactParticle->run();
 	}
 
 	if (!missile->SourceUnit) {  // no owner - green-cross ...
@@ -1141,7 +1144,7 @@ MissileType::MissileType(const std::string &ident) :
 	Flip(false), CanHitOwner(false), FriendlyFire(false),
 	Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
 	Range(0), SplashFactor(0), ImpactMissile(NULL),
-	SmokeMissile(NULL), ImpactParticle(PARTICLE_NONE), G(NULL)
+	SmokeMissile(NULL), ImpactParticle(NULL), G(NULL)
 {
 };
 
@@ -1151,6 +1154,7 @@ MissileType::MissileType(const std::string &ident) :
 MissileType::~MissileType()
 {
 	CGraphic::Free(this->G);
+	delete ImpactParticle;
 }
 
 /**

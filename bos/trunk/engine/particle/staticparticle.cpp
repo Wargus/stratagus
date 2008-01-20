@@ -9,7 +9,7 @@
 //
 /**@name staticparticle.cpp - The static particle. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon and Francois Beerten
+//      (c) Copyright 2007-2008 by Jimmy Salmon and Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,8 +34,9 @@
 
 
 StaticParticle::StaticParticle(CPosition position, Animation *animation) :
-	CParticle(position), animation(animation)
+	CParticle(position)
 {
+	this->animation = animation->clone();
 }
 
 StaticParticle::~StaticParticle()
@@ -55,6 +56,12 @@ void StaticParticle::update(int ticks)
 	if (animation->isFinished()) {
 		destroy();
 	}
+}
+
+CParticle* StaticParticle::clone()
+{
+	CParticle * p = new StaticParticle(pos, animation);
+	return p;
 }
 
 //@}

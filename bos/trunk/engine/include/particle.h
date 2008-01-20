@@ -9,7 +9,7 @@
 //
 /**@name particle.h - The base particle headerfile. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007-2008 by Jimmy Salmon and Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -100,6 +100,8 @@ public:
 	inline void destroy() { destroyed = true; }
 	inline bool isDestroyed() { return destroyed; }
 
+	virtual CParticle * clone() = 0;
+
 protected:
 	CPosition pos;
 	bool destroyed;
@@ -114,6 +116,7 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
+	virtual CParticle * clone();
 
 protected:
 	Animation *animation;
@@ -129,6 +132,7 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
+	virtual CParticle * clone();
 
 protected:
 	CPosition initialPos;
@@ -156,6 +160,7 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
+	virtual CParticle * clone();
 
 protected:
 	Animation *puff;
@@ -174,6 +179,7 @@ public:
 
 	virtual void draw();
 	virtual void update(int ticks);
+	virtual CParticle * clone();
 };
 
 enum {
