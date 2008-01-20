@@ -9,7 +9,7 @@
 //
 /**@name widgets.cpp - The stratagus ui widgets. */
 //
-//      (c) Copyright 2005-2006 by Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2005-2008 by Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
 }
 
 /**
-**  Called whan an action is recieved from a Widget. It is used
+**  Called when an action is recieved from a Widget. It is used
 **  to be able to recieve a notification that an action has
 **  occured.
 **
