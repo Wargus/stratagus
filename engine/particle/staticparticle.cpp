@@ -36,6 +36,7 @@
 StaticParticle::StaticParticle(CPosition position, Animation *animation) :
 	CParticle(position)
 {
+	Assert(animation);
 	this->animation = animation->clone();
 }
 
