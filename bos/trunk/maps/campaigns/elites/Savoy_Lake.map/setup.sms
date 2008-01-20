@@ -49,8 +49,8 @@ Players[7].AiName = "ai-default"
 LoadTileModels("scripts/tilesets/desert.lua")
 
 -- default to 80...
-for i = 0, 255 do
-    for j = 0, 255 do
+for i = 0, 127 do
+    for j = 0, 127 do
         SetTile(48, j, i)
     end
 end
