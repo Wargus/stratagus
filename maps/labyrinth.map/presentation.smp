@@ -4,4 +4,4 @@
 
 DefinePlayerTypes("person", "person")
 PresentMap("big", 2, 128, 128, -181927855)
-DefineMapSetup(GetCurrentLuaPath().."/laby.sms")
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")

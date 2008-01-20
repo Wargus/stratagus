@@ -4,4 +4,4 @@
 
 DefinePlayerTypes("computer", "person")
 PresentMap("test", 1, 128, 128, -1212264748)
-DefineMapSetup(GetCurrentLuaPath().."/highlands.sms")
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")

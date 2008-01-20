@@ -4,4 +4,4 @@
 
 DefinePlayerTypes("person", "person", "person", "person")
 PresentMap("Multiplayer", 4, 64, 64, 1949643979)
-DefineMapSetup(GetCurrentLuaPath().."/multiplayer.sms")
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")
