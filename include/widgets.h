@@ -9,7 +9,7 @@
 //
 /**@name widgets.h - The widgets headerfile. */
 //
-//      (c) Copyright 2005-2007 by François Beerten and Jimmy Salmon
+//      (c) Copyright 2005-2008 by Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ class LuaActionListener : public gcn::ActionListener
 	lua_State *luastate;
 	int luaref;
 public:
-	//LuaActionListener(lua_State *lua, int luaref) : luastate(lua), luaref(luaref) {}
 	LuaActionListener(lua_State *lua, lua_Object luaref);
 	virtual void action(const std::string &eventId);
 	~LuaActionListener();
