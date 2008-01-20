@@ -206,7 +206,6 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "widgets.h"
 #include "trigger.h"
 #include "iolib.h"
-#include "util.h"
 #include "guichan.h"
 #include "version.h"
 #include "title.h"

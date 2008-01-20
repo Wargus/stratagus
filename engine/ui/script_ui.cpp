@@ -45,7 +45,6 @@
 #include "map.h"
 #include "menus.h"
 #include "font.h"
-#include "util.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"

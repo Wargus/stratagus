@@ -44,7 +44,6 @@
 
 #include "sound.h"
 #include "sound_server.h"
-#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
