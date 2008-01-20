@@ -9,7 +9,8 @@
 --
 --	missiles.lua	-	Define the used missiles.
 --
---	(c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi and Crestez Leonard
+--	(c) Copyright 1998-2008 by Lutz Sammer, Fabrice Rossi,
+--                  Francois Beerten and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -30,6 +31,29 @@
 -------------------------------------------------------------------------------Y
 --	Define missiles
 -------------------------------------------------------------------------------Y
+local flame_graphic = CGraphic:New("graphics/particle/large01.png", 128, 96)
+local flash_graphic = CGraphic:New("graphics/particle/flash.png", 240, 194)
+local smoke_graphic = CGraphic:New("graphics/particle/smokelight12.png", 12, 12)
+
+function addStaticParticle(graphic, ticksperframe, x, y)
+   local a = GraphicAnimation(graphic, ticksperframe)
+   local e = StaticParticle(CPosition(x,y), a)
+   ParticleManager:add(e:clone())
+end
+
+function addChunkParticles(amount, smokegraphic, ticksperframe, x, y)
+   local smokeanimation = GraphicAnimation(smoke_graphic, ticksperframe)
+   for i = 1, amount do
+      local chunk = CChunkParticle(CPosition(x, y), smokeanimation)
+      ParticleManager:add(chunk:clone())
+   end
+end
+
+function bazooExplosion(x, y)
+   addStaticParticle(flash_graphic, 22, x, y)
+   addStaticParticle(flame_graphic, 33, x, y)
+   addChunkParticles(8, smoke_graphic, 60, x, y)
+end
 
 DefineMissileType("missile-nuke", {
 	File = "graphics/missiles/nuke.png",
@@ -50,7 +74,7 @@ DefineMissileType("missile-bazoo", {
 	Size = {32, 32}, Frames = 5, NumDirections = 8,
 	ImpactSound = "rocket-impact", DrawLevel = 50,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 16, Range = 2,
-	ImpactParticle = "explosion"})
+	ImpactParticle = bazooExplosion})
 
 DefineMissileType("missile-64x64-explosion", {
 	File = "missiles/expl_64x64x1.png",

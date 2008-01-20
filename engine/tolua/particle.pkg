@@ -1,0 +1,47 @@
+$#include "particle.h"
+
+struct CPosition
+{
+	CPosition(int x, int y) : x(x), y(y) {}
+	float x;
+	float y;
+};
+
+class GraphicAnimation : public Animation
+{
+	GraphicAnimation(CGraphic *g, int ticksPerFrame);
+	virtual Animation * clone();
+};
+
+class CParticle
+{
+	virtual CParticle* clone();
+};
+
+class StaticParticle : public CParticle
+{
+public:
+	StaticParticle(CPosition position, Animation *animation);
+};
+
+class CChunkParticle : public CParticle
+{
+public:
+	CChunkParticle(CPosition position, Animation *smokeAnimation);
+};
+
+class CSmokeParticle : public CParticle
+{
+};
+
+class CParticleManager
+{
+public:
+	CParticleManager();
+	~CParticleManager();
+
+	void add(CParticle *particle);
+};
+
+extern CParticleManager ParticleManager;
+

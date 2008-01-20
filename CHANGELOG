@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Version 2.5.0 (2008 1 19):
+- Make the particle based explosions configureable (Francois Beerten)
 - Fixed bug selecting a map in a subdir (Jimmy Salmon)
 - Fix unload button on the APC unit (llearch n'n'daCorna) 
 - Auto repair while patrolling (Jimmy Salmon)
