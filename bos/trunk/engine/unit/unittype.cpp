@@ -55,6 +55,7 @@
 #include "script.h"
 #include "spells.h"
 #include "iolib.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -71,6 +72,12 @@ std::string DefaultResourceNames[MaxCosts];
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+CUnitType::~CUnitType()
+{
+	delete DeathExplosion;
+}
+
 
 /**
 **  Update the player stats for changed unit types.

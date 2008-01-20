@@ -63,6 +63,7 @@
 #include "script.h"
 #include "editor.h"
 #include "spells.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1954,6 +1955,14 @@ void LetUnitDie(CUnit *unit)
 			unit->X * TileSizeX + type->TileWidth * TileSizeX / 2,
 			unit->Y * TileSizeY + type->TileHeight * TileSizeY / 2,
 			0, 0);
+	}
+	if (type->DeathExplosion) {
+		type->DeathExplosion->pushPreamble();
+		type->DeathExplosion->pushInteger(unit->X * TileSizeX + 
+				type->TileWidth * TileSizeX / 2);
+		type->DeathExplosion->pushInteger(unit->Y * TileSizeY + 
+				type->TileHeight * TileSizeY / 2);
+		type->DeathExplosion->run();
 	}
 
 	UnitRemoveConsumingResources(unit);
