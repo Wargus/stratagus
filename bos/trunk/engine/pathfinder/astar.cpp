@@ -326,16 +326,26 @@ void InitAStar(int mapWidth, int mapHeight, int (STDCALL *costMoveTo)(int x, int
 */
 void FreeAStar(void)
 {
-	if (AStarMatrix) {
-		delete[] AStarMatrix;
-		AStarMatrix = NULL;
-		delete[] CloseSet;
-		CloseSet = NULL;
-		CloseSetSize = 0;
-		delete[] OpenSet;
-		OpenSet = NULL;
-		OpenSetSize = 0;
-	}
+	delete[] AStarMatrix;
+	AStarMatrix = NULL;
+	delete[] CloseSet;
+	CloseSet = NULL;
+	CloseSetSize = 0;
+	delete[] OpenSet;
+	OpenSet = NULL;
+	OpenSetSize = 0;
+	delete[] CostMoveToCache;
+	CostMoveToCache = NULL;
+
+	delete[] VisionLookup;
+	VisionLookup = NULL;
+	delete[] VisionTable[0];
+	VisionTable[0] = NULL;
+	delete[] VisionTable[1];
+	VisionTable[1] = NULL;
+	delete[] VisionTable[2];
+	VisionTable[2] = NULL;
+
 	ProfilePrint();
 }
 
