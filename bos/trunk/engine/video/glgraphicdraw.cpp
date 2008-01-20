@@ -9,7 +9,7 @@
 //
 /**@name glgraphicdraw.cpp - The general sprite functions. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
+//      (c) Copyright 2000-2008 by Lutz Sammer, Stephan Rasenberg,
 //                                 Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 	sy2 = sy;
 	for (j = 0; j < th; ++j) {
 		minh = sy2 / GLMaxTextureSize * GLMaxTextureSize;
-		maxh = std::min(minh + GLMaxTextureSize, g->GraphicHeight);
+		maxh = std::min((const int)(minh + GLMaxTextureSize), g->GraphicHeight);
 		if (sy > minh) {
 			h = ey - sy;
 		} else {
@@ -83,7 +83,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 		sx2 = sx;
 		for (i = 0; i < tw; ++i) {
 			minw = sx2 / GLMaxTextureSize * GLMaxTextureSize;
-			maxw = std::min(minw + GLMaxTextureSize, g->GraphicWidth);
+			maxw = std::min((const int)(minw + GLMaxTextureSize), g->GraphicWidth);
 			if (sx > minw) {
 				w = ex - sx;
 			} else {
