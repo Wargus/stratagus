@@ -25,7 +25,6 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 --
---	$Id$
 
 DefineAnimations("animations-radar", {
     Still = {"frame 0", "wait 4", "frame 1", "wait 4", "frame 2", "wait 4",
