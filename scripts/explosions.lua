@@ -34,7 +34,18 @@ end
 
 local flash_graphic = loadgraphic("graphics/particle/flash.png", 240, 194)
 local smoke_graphic = loadgraphic("graphics/particle/smokelight12.png", 12, 12)
-local flame_graphic = loadgraphic("graphics/particle/large01.png", 128, 96)
+local largeflames = {}
+local mediumflames = {}
+local smallflames = {}
+for i = 1, 9 do
+  largeflames[i] = loadgraphic("graphics/particle/large0"..i..".png", 128, 96)
+  mediumflames[i] = loadgraphic("graphics/particle/medium0"..i..".png", 54, 73)
+  smallflames[i] = loadgraphic("graphics/particle/small0"..i..".png", 13, 18)
+end
+
+function pickRandom(list) 
+    return list[math.random(table.getn(list))] 
+end
 
 function addStaticParticle(graphic, ticksperframe, x, y)
    local a = GraphicAnimation(graphic, ticksperframe)
@@ -50,9 +61,13 @@ function addChunkParticles(amount, smokegraphic, ticksperframe, x, y)
    end
 end
 
-function bazooExplosion(x, y)
+function largeExplosion(x, y)
    addStaticParticle(flash_graphic, 22, x, y)
-   addStaticParticle(flame_graphic, 33, x, y)
-   addChunkParticles(8, smoke_graphic, 60, x, y)
+   addStaticParticle(pickRandom(largeflames), 33, x, y)
+   addChunkParticles(16, smoke_graphic, 60, x, y)
+end
+
+function bazooExplosion(x, y)
+   addStaticParticle(pickRandom(mediumflames), 33, x, y)
 end
 
