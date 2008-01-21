@@ -24,15 +24,17 @@
 --      You should have received a copy of the GNU General Public License
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
---
---	$Id: missiles.lua 9396 2008-01-20 18:15:30Z feb $
 
-local flame_graphic = CGraphic:New("graphics/particle/large01.png", 128, 96)
-flame_graphic:Load()
-local flash_graphic = CGraphic:New("graphics/particle/flash.png", 240, 194)
-flash_graphic:Load()
-local smoke_graphic = CGraphic:New("graphics/particle/smokelight12.png", 12, 12)
-smoke_graphic:Load()
+
+function loadgraphic(filename, width, height)
+   local g = CGraphic:New(filename, width, height)
+   g:Load()
+   return g
+end
+
+local flash_graphic = loadgraphic("graphics/particle/flash.png", 240, 194)
+local smoke_graphic = loadgraphic("graphics/particle/smokelight12.png", 12, 12)
+local flame_graphic = loadgraphic("graphics/particle/large01.png", 128, 96)
 
 function addStaticParticle(graphic, ticksperframe, x, y)
    local a = GraphicAnimation(graphic, ticksperframe)
