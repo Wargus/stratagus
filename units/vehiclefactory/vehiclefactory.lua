@@ -9,7 +9,7 @@
 --
 --	vehiculefactory.lua	-	Define the vehiculefactory
 --
---	(c) Copyright 2001 - 2007 by Francois Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2008 by Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ DefineUnitType("unit-vfac", {
     Priority = 35,
     AnnoyComputerFactor = 45,
     Points = 200,
-    ExplodeWhenKilled = "missile-160x128-explosion",
+    DeathExplosion = largeExplosion,
     Corpse = "build-dead-vfac",
     Type = "land",
     Building = true,
