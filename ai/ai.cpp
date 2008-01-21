@@ -409,7 +409,6 @@ static void SaveAiPlayers(CFile *file)
 void SaveAi(CFile *file)
 {
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: AI $Id$\n\n");
 
 	SaveAiPlayers(file);
 
