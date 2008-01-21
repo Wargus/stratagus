@@ -9,7 +9,7 @@
 --
 --	unit-camp.lua	-	Define the training camp
 --
---	(c) Copyright 2001 - 2007 by Francois Beerten, Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2008 by Francois Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ DefineUnitType("unit-camp", {
     Priority = 30,
     AnnoyComputerFactor = 35,
     Points = 160,
-    ExplodeWhenKilled = "missile-160x128-explosion",
+    DeathExplosion = largeExplosion,
     Corpse = "build-dead-camp",
     Type = "land",
     Building = true,
