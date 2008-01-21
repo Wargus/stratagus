@@ -82,7 +82,7 @@ DefineUnitType("unit-nukepowerplant", {
     Priority = 50,
     AnnoyComputerFactor = 55,
     Points = 200,
-    ExplodeWhenKilled = "missile-160x128-explosion",
+    DeathExplosion = nuclearExplosion,
     Corpse = "build-dead-nukepowerplant",
     Type = "land",
     Building = true,
