@@ -5,6 +5,8 @@
 Name "${NAME}"
 OutFile "BosWars-2.5.exe"
 
+RequestExecutionLevel admin
+
 ;!define MUI_ICON "stratagus.ico"
 ;!define MUI_UNICON "stratagus.ico"
 
@@ -42,6 +44,12 @@ Section "${NAME}" SecDummy
   SetOutPath "$INSTDIR"
   File /r "boswars\*.*"
   WriteRegStr HKCU "Software\${NAME}" "" $INSTDIR
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "DisplayName" "${NAME}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "DisplayVersion" "${VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "InstallLocation" $INSTDIR
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "NoRepair" 1
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\${NAME}.lnk" "$INSTDIR\boswars.exe"
@@ -61,5 +69,6 @@ Section "Uninstall"
   RMDir "$SMPROGRAMS\$MUI_TEMP"
 
   DeleteRegKey /ifempty HKCU "Software\${NAME}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
 SectionEnd
 
