@@ -9,7 +9,7 @@
 --
 --	spells.lua	-	Special commands aka spells.
 --
---	(c) Copyright 1998-2007 by Crestez Leonard
+--	(c) Copyright 1998-2008 by Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by

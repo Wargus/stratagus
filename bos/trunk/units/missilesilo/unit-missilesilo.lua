@@ -78,7 +78,7 @@ DefineUnitType("unit-msilo", {
     Priority = 20,
     AnnoyComputerFactor = 45,
     Points = 100,
-    ExplodeWhenKilled = "missile-160x128-explosion",
+    DeathExplosion = largeExplosion,
     Corpse = "build-dead-msilo",
     Type = land,
     MaxMana = 1000,

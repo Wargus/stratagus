@@ -71,3 +71,11 @@ function bazooExplosion(x, y)
    addStaticParticle(pickRandom(mediumflames), 33, x, y)
 end
 
+function nuclearExplosion(x, y)
+   addStaticParticle(flash_graphic, 22, x, y)
+   addStaticParticle(pickRandom(largeflames), 33, x+50, y+50)
+   addStaticParticle(pickRandom(largeflames), 33, x-50, y-47)
+   addStaticParticle(pickRandom(largeflames), 33, x-40, y+45)
+   addStaticParticle(pickRandom(largeflames), 33, x+47, y-53)
+   addChunkParticles(32, smoke_graphic, 60, x, y)
+end
