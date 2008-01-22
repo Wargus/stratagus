@@ -7,7 +7,7 @@
 //       A futuristic real-time strategy game.
 //          This file is part of Bos Wars.
 //
-/**@name luacallback.cpp. */
+/**@name luacallback.cpp -  Lua callback. */
 //
 //      (c) Copyright 2008 by Francois Beerten
 //
@@ -25,7 +25,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id: widgets.cpp 9391 2008-01-20 12:59:30Z feb $
 
 //@{
 

@@ -53,7 +53,7 @@
 void CMap::Save(CFile *file) const
 {
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: map $Id$\n");
+	file->printf("--- MODULE: map\n\n");
 
 	file->printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName.c_str());
 	
