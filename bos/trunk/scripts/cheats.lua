@@ -102,7 +102,7 @@ function HandleCheats(str)
 
   elseif (str == "fill mana") then
     for i = 0,ThisPlayer.TotalNumUnits-1 do
-      SetUnitVariable(ThisPlayer.Units[i].Slot, "Mana", 255)
+      SetUnitVariable(ThisPlayer.Units[i].Slot, "Mana", 999999)
     end
 
   elseif (string.sub(str, 1, 6) == "gimme ") then
