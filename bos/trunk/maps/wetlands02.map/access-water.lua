@@ -7,7 +7,7 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
--- Copyright 2008 Invasion Team
+-- Copyright 2008 llearch n'n'daCorna, Lois Taulelle.
 -- File licensed under the GNU GPL version 2 or later.
 
 -- access file from wetlands02-access-water.png
