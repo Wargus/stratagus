@@ -690,14 +690,14 @@ static int CclGetCompileFeature(lua_State *l)
 **
 **  @param command  Zero terminated command string.
 */
-int CclCommand(const std::string &command)
+int CclCommand(const std::string &command, bool exitOnError)
 {
 	int status;
 
 	if (!(status = luaL_loadbuffer(Lua, command.c_str(), command.size(), command.c_str()))) {
-		LuaCall(0, 1);
+		LuaCall(0, 1, exitOnError);
 	} else {
-		report(status, false);
+		report(status, exitOnError);
 	}
 	return status;
 }
