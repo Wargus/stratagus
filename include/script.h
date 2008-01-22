@@ -9,7 +9,7 @@
 //
 /**@name script.h - The configuration language headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ extern void LoadCcl(void);                  /// Load ccl config file
 extern void SaveCcl(CFile *file);           /// Save CCL module
 extern void SavePreferences(void);          /// Save user preferences
 extern char *SaveGlobal(lua_State *l, bool is_root); /// For saving lua state
-extern int CclCommand(const std::string &command);   /// Execute a ccl command
+extern int CclCommand(const std::string &command, bool exitOnError = true);   /// Execute a ccl command
 
 //@}
 

@@ -762,7 +762,7 @@ static int InputKey(int key)
 			if (Input[0] == '-') {
 				if (!GameObserve && !GamePaused) {
 					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
-					CclCommand(Input + 1);
+					CclCommand(Input + 1, false);
 				}
 			} else
 #endif
