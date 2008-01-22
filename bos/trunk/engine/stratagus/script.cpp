@@ -714,7 +714,11 @@ extern int tolua_stratagus_open(lua_State *tolua_S);
 static void InitLua()
 {
 	// For security we don't load all libs
+#if LUA_VERSION_NUM >= 501
 	static const luaL_Reg lualibs[] = {
+#else
+	static const luaL_reg lualibs[] = {
+#endif
 		{"", luaopen_base},
 //		{LUA_LOADLIBNAME, luaopen_package},
 		{LUA_TABLIBNAME, luaopen_table},
