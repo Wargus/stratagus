@@ -1095,7 +1095,7 @@ void SaveMissiles(CFile *file)
 	std::vector<Missile *>::const_iterator i;
 
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: missiles $Id$\n\n");
+	file->printf("--- MODULE: missiles\n\n");
 
 	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		(*i)->SaveMissile(file);

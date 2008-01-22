@@ -85,7 +85,7 @@ void InitGroups(void)
 void SaveGroups(CFile *file)
 {
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: groups $Id$\n\n");
+	file->printf("--- MODULE: groups\n\n");
 
 	for (int g = 0; g < NUM_GROUPS; ++g) {
 		file->printf("Group(%d, %d, {", g, Groups[g].NumUnits);

@@ -372,7 +372,7 @@ void SavePlayers(CFile *file)
 	CPlayer *p;
 
 	file->printf("\n--------------------------------------------\n");
-	file->printf("--- MODULE: players $Id$\n\n");
+	file->printf("--- MODULE: players\n\n");
 
 	//
 	//  Dump all players

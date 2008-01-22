@@ -25,7 +25,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id: flashparticle.cpp 9352 2007-12-22 19:44:10Z feb $
 
 //@{
 
