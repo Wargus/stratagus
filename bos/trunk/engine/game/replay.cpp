@@ -9,7 +9,7 @@
 //
 /**@name replay.cpp - Replay game. */
 //
-//      (c) Copyright 2000-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
+//      (c) Copyright 2000-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -859,7 +859,7 @@ static void DoNextReplay(void)
 		SendCommandSharedVision(posx, state, posy);
 	} else if (!strcmp(action, "input")) {
 		if (val[0] == '-') {
-			CclCommand(val + 1);
+			CclCommand(val + 1, false);
 		} else {
 			HandleCheats(val);
 		}
