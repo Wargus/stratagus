@@ -39,6 +39,7 @@
 #include <string.h>
 
 #include "SDL.h"
+#include "SDL_endian.h"
 
 #include "iolib.h"
 #include "sound_server.h"
