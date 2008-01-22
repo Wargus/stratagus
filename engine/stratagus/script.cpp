@@ -9,7 +9,7 @@
 //
 /**@name script.cpp - The configuration language. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
+//      (c) Copyright 1998-2008 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -706,21 +706,52 @@ int CclCommand(const std::string &command)
 ..  Setup
 ............................................................................*/
 
-int tolua_stratagus_open(lua_State *tolua_S);
+extern int tolua_stratagus_open(lua_State *tolua_S);
+
+/**
+**  Initialize Lua
+*/
+static void InitLua()
+{
+	// For security we don't load all libs
+	static const luaL_Reg lualibs[] = {
+		{"", luaopen_base},
+//		{LUA_LOADLIBNAME, luaopen_package},
+		{LUA_TABLIBNAME, luaopen_table},
+//		{LUA_IOLIBNAME, luaopen_io},
+//		{LUA_OSLIBNAME, luaopen_os},
+		{LUA_STRLIBNAME, luaopen_string},
+		{LUA_MATHLIBNAME, luaopen_math},
+		{LUA_DBLIBNAME, luaopen_debug},
+		{NULL, NULL}
+	};
+
+#if LUA_VERSION_NUM >= 501
+	Lua = luaL_newstate();
+#else
+	Lua = lua_open();
+#endif
+
+	for (const luaL_Reg *lib = lualibs; lib->func; ++lib) {
+#if LUA_VERSION_NUM >= 501
+		lua_pushcfunction(Lua, lib->func);
+		lua_pushstring(Lua, lib->name);
+		lua_call(Lua, 1, 0);
+#else
+		lib->func(Lua);
+#endif
+	}
+
+	tolua_stratagus_open(Lua);
+	lua_settop(Lua, 0);  // discard any results
+}
 
 /**
 **  Initialize ccl and load the config file(s).
 */
 void InitCcl(void)
 {
-	Lua = lua_open();
-	luaopen_base(Lua);
-	luaopen_table(Lua);
-	luaopen_string(Lua);
-	luaopen_math(Lua);
-	luaopen_debug(Lua);
-	tolua_stratagus_open(Lua);
-	lua_settop(Lua, 0);  // discard any results
+	InitLua();
 
 	lua_register(Lua, "CompileFeature", CclGetCompileFeature);
 	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
