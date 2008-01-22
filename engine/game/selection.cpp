@@ -1095,7 +1095,7 @@ void InitSelections(void)
 void SaveSelections(CFile *file)
 {
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: selection $Id$\n\n");
+	file->printf("--- MODULE: selection\n\n");
 
 	file->printf("SetGroupId(%d)\n", GroupId);
 	file->printf("Selection(%d, {", NumSelected);

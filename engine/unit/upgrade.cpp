@@ -70,7 +70,7 @@ static void AllowUnitId(CPlayer *player, int id, int units);
 void SaveUpgrades(CFile *file)
 {
 	file->printf("\n-- -----------------------------------------\n");
-	file->printf("-- MODULE: upgrades $Id$\n\n");
+	file->printf("-- MODULE: upgrades\n\n");
 
 	//
 	//  Save the allow
