@@ -60,6 +60,11 @@
 #include "player.h"
 #include "replay.h"
 
+// Workaround for the subtle change in name from lua 5.0 to lua 5.1.
+#if LUA_VERSION_NUM < 501
+#define luaL_Reg luaL_reg
+#endif
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -714,11 +719,7 @@ extern int tolua_stratagus_open(lua_State *tolua_S);
 static void InitLua()
 {
 	// For security we don't load all libs
-#if LUA_VERSION_NUM >= 501
 	static const luaL_Reg lualibs[] = {
-#else
-	static const luaL_reg lualibs[] = {
-#endif
 		{"", luaopen_base},
 //		{LUA_LOADLIBNAME, luaopen_package},
 		{LUA_TABLIBNAME, luaopen_table},
