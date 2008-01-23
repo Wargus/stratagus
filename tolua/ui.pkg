@@ -21,9 +21,10 @@ class CUIButton
 };
 
 $[
+_uiButtonCallbacks = {}
 CUIButton.SetCallback = function(w, f)
   w.Callback = LuaActionListener(f)
-  w._callback = w.Callback
+  table.insert(_uiButtonCallbacks, w.Callback)
 end
 $]
 
