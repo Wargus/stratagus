@@ -9,7 +9,8 @@
 --
 --      campaign.lua  -  Define the Elite campaign 1.
 --
---      (c) Copyright 2005-2006 by Lois Taulelle and François Beerten
+--      (c) Copyright 2005-2008 by Lois Taulelle, Llearch n'n'daCorna 
+--                                 and François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -47,7 +48,7 @@ local briefingtext02 =
    "strategic advantage. If you should so choose, first contact "..
    "the mercenaries, you will have the resources to complete "..
    "your quest easily. "
-local briefingtest03 = 
+local briefingtext03 = 
    "Level 3: Buffy Forest... "..
    "Your troops arrive near Buffy Forest, a small forest in the "..
    "South-Eastern Mountain region. "..
@@ -58,7 +59,7 @@ local briefingtest03 =
    "The Commander is known to be a harsh leader, and will show you no "..
    "mercy. You are strongly recommended to resist with all the forces "..
    "you command. "
-local briefingtest04 = 
+local briefingtext04 = 
    "Level 4: Shield of Wasteland... "..
    "In the Southern Mountains, your forces have found a bare plateau, "..
    "with many resources. When developed, it will become a jewel in "..
@@ -70,7 +71,7 @@ local briefingtest04 =
    "Once you have built sufficient forces, taking over the enemy "..
    "station should be within the resources you have to hand. "..
    "Good luck. You'll need it."
-local briefingtest05 = 
+local briefingtext05 = 
    "Level 5: Rochebrune... "..
    "In a barren corner of the Western Mountains, a scouting party of "..
    "your troops has run into an opposing scouting party. "..
@@ -78,14 +79,14 @@ local briefingtest05 =
    "vicious battle will ensue. "..
    "Ensure your scouts annihilate their counterparts, before "..
    "reinforcements can arrive."
-local briefingtest06 = 
+local briefingtext06 = 
    "Level 6: Aiglier... "..
    "In a sparsely resourced pass in the western mountains, your "..
    "scouts spot an enemy brigade setting up camp on the other "..
    "side, but are able to pull back before they are spotted. "..
    "They report that the brigade appears to be preparing to take "..
    "the pass. Take them out, and the mountains will be yours."
-local briefingtest07 = 
+local briefingtext07 = 
    "Level 7: Bellegarde... "..
    "A thriving fortified camp has been spotted in the nearby "..
    "lowlands of Bellegarde. Surrounded by a rocky hills, the camp "..
@@ -94,7 +95,7 @@ local briefingtest07 =
    "His reputation as an effective battlefield commander suggests "..
    "that you should not take him lightly. "..
    "Destroy the camp, and send him packing."
-local briefingtest08 = 
+local briefingtext08 = 
    "Level 8: Savoy's Steps... "..
    "Having beaten all the troops the enemy can send into your "..
    "beloved mountain home, you've ventured down towards the captured "..
@@ -104,14 +105,14 @@ local briefingtest08 =
    "Colonel $name is preparing his troops to stop you. "..
    "You just need to tear through him, and you've got the enemy on "..
    "the run."
-local briefingtest09 = 
+local briefingtext09 = 
    "Level 9: Savoy's Lake... "..
    "After the hard fighting of the Steps, your troops cheer as "..
    "you reach the Lake. They know they've almost won. "..
    "Before you can proceed to rescue the capital, you must clear "..
    "the area around Savoy's Lake. Lieutenant-General $name "..
    "is prepared to stop you."
-local briefingtest10 = 
+local briefingtext10 = 
    "Level 10: Fort Savoy "..
    "At long last, you have reach the Fort protecting the capital. "..
    "Most of the enemy forces have been destroyed, but there are "..
@@ -136,7 +137,7 @@ campaign_steps = {
       briefingtext04),
   CreateMapStep("campaigns/elites/level05.smp", 
       "Annihilate the enemy scouting party.", 
-      briefingtest05),
+      briefingtext05),
   CreateMapStep("campaigns/elites/level06.smp",
       "Take the mountain pass and destroy the enemy.",
       briefingtext06),
