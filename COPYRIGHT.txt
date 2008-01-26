@@ -49,7 +49,6 @@ As a special exception the sources are not required for the following files:
   graphics/elites/ui/ui_800_bpanel.png
   graphics/elites/ui/ui_info.png
   graphics/elites/ui/ui_minimap.png
-  graphics/general/magnifying_glass.png
   graphics/general/ui_buttons.png
   graphics/missiles/green_cross.png
   graphics/neutral/units/corpses.png
