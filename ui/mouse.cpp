@@ -762,7 +762,8 @@ void UIHandleMouseMove(int x, int y)
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			GameCursor = UI.YellowHair.Cursor;
 			if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
-				if (ThisPlayer->IsAllied(UnitUnderCursor)) {
+				if (UnitUnderCursor->Player == ThisPlayer || 
+						ThisPlayer->IsAllied(UnitUnderCursor)) {
 					GameCursor = UI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
 					GameCursor = UI.RedHair.Cursor;
