@@ -10,7 +10,7 @@ create a completely original and fun open source RTS game.
 
 Copyright and Licence
 ---------------------
-This work, Bos Wars, is copyrighted in 2004-2007 by
+This work, Bos Wars, is copyrighted in 2004-2008 by
 Tina Petersen Jensen, Francois Beerten et al.
 
 Read the file COPYRIGHT.txt for the detailed copyright notice.
