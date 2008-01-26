@@ -53,20 +53,19 @@ DefineMissileType("missile-bazoo", {
 	ImpactParticle = bazooExplosion})
 
 DefineMissileType("missile-64x64-explosion", {
-	File = "missiles/expl_64x64x1.png",
+	File = "graphics/explosions/expl_64x64x1.png",
 	Size = {64, 64}, Frames = 7, NumDirections = 1, DrawLevel = 50,
 	Class = "missile-class-stay", Sleep = 1, Speed = 16, Range = 1})
 
 DefineMissileType("missile-160x128-explosion", {
-	File = "missiles/expl_160x128x1.png",
+	File = "graphics/explosions/expl_160x128x1.png",
 	Size = {160, 128}, Frames = 20, NumDirections = 1, DrawLevel = 50,
 	Class = "missile-class-stay", Sleep = 1, Speed = 16, Range = 1})
 
 DefineMissileType("missile-288x288-explosion", {
-	File = "missiles/expl_288x288x1.png",
+	File = "graphics/explosions/expl_288x288x1.png",
 	Size = {288, 288}, Frames = 20, NumDirections = 1, DrawLevel = 300,
 	Class = "missile-class-stay", Sleep = 1, Speed = 16, Range = 15})
-
 
 DefineMissileType("missile-small-fire", {
 	File = "missiles/small_fire.png",
@@ -79,7 +78,7 @@ DefineMissileType("missile-big-fire", {
 	Class = "missile-class-fire", Sleep = 8, Speed = 16, Range = 1})
 
 DefineMissileType("missile-explosion", {
-	File = "missiles/explosion.png",
+	File = "graphics/explosions/explosion.png",
 	Size = {64, 64}, Frames = 20, NumDirections = 1, DrawLevel = 50,
 	Class = "missile-class-stay", Sleep = 1, Speed = 16, Range = 1})
 
