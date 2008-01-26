@@ -590,8 +590,6 @@ static int CclNoRandomPlacementMultiplayer(lua_State *l)
 **  Set God mode.
 **
 **  @param l  Lua state.
-**
-**  @return   The old mode.
 */
 static int CclSetGodMode(lua_State *l)
 {
@@ -601,7 +599,21 @@ static int CclSetGodMode(lua_State *l)
 }
 
 /**
-**  For debug increase building speed.
+**  Get God mode.
+**
+**  @param l  Lua state.
+**
+**  @return   God mode.
+*/
+static int CclGetGodMode(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, GodMode);
+	return 1;
+}
+
+/**
+**  Set building speed.
 **
 **  @param l  Lua state.
 */
@@ -609,13 +621,25 @@ static int CclSetSpeedBuild(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedBuild = LuaToNumber(l, 1);
+	return 0;
+}
 
+/**
+**  Get building speed.
+**
+**  @param l  Lua state.
+**
+**  @return   Building speed.
+*/
+static int CclGetSpeedBuild(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, SpeedBuild);
 	return 1;
 }
 
 /**
-**  For debug increase training speed.
+**  Set training speed.
 **
 **  @param l  Lua state.
 */
@@ -623,7 +647,19 @@ static int CclSetSpeedTrain(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedTrain = LuaToNumber(l, 1);
+	return 0;
+}
 
+/**
+**  Get training speed.
+**
+**  @param l  Lua state.
+**
+**  @return   Training speed.
+*/
+static int CclGetSpeedTrain(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, SpeedTrain);
 	return 1;
 }
@@ -635,14 +671,9 @@ static int CclSetSpeedTrain(lua_State *l)
 */
 static int CclSetSpeeds(lua_State *l)
 {
-	int s;
-
 	LuaCheckArgs(l, 1);
-	s = LuaToNumber(l, 1);
-	SpeedBuild = SpeedTrain = s;
-
-	lua_pushnumber(l, s);
-	return 1;
+	SpeedBuild = SpeedTrain = LuaToNumber(l, 1);
+	return 0;
 }
 
 /**
@@ -766,9 +797,12 @@ void InitCcl(void)
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
 	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
 	lua_register(Lua, "SetGodMode", CclSetGodMode);
+	lua_register(Lua, "GetGodMode", CclGetGodMode);
 
 	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
+	lua_register(Lua, "GetSpeedBuild", CclGetSpeedBuild);
 	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
+	lua_register(Lua, "GetSpeedTrain", CclGetSpeedTrain);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);

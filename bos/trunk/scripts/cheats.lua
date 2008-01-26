@@ -26,8 +26,6 @@
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
-speedcheat = false
-godcheat = false
 
 function HandleCheats(str)
   local resources = { "energy", "magma" }
@@ -66,18 +64,16 @@ function HandleCheats(str)
     AddMessage("NORMAL DEBUG SPEED")
 
   elseif (str == "speed cheat") then
-    if (speedcheat) then
-      speedcheat = false
+    if (GetSpeedBuild() ~= 1) then
       SetSpeedBuild(1)
       SetSpeedTrain(1)
-      AddMessage("NO SO!")
+      AddMessage("NO SPEED!")
     else
-      speedcheat = true
       SetSpeedBuild(10)
       SetSpeedTrain(10)
       ThisPlayer.EnergyStored = ThisPlayer.EnergyStored + 32000
       ThisPlayer.MagmaStored = ThisPlayer.MagmaStored + 32000
-      AddMessage("SO!")
+      AddMessage("SPEED!")
     end
 
   elseif (str == "victory") then
@@ -90,12 +86,10 @@ function HandleCheats(str)
     StopGame(GameDraw)
 
   elseif (str == "godcheat") then
-    if (godcheat) then
-      godcheat = false
+    if (GetGodMode()) then
       SetGodMode(false)
       AddMessage("God Mode OFF")
     else
-      godcheat = true
       SetGodMode(true)
       AddMessage("God Mode ON")
     end
