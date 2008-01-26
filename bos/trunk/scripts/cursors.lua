@@ -9,7 +9,7 @@
 --
 --      ui.lua - Define the widgets
 --
---      (c) Copyright 2000 - 2006 by Lutz Sammer, Francois Beerten
+--      (c) Copyright 2000 - 2008 by Lutz Sammer, Francois Beerten
 --                     and Crestez Leonard.
 --
 --      This program is free software; you can redistribute it and/or modify
@@ -29,9 +29,9 @@
 
 DefineCursor({
     Name = "cursor-glass",
-    File = "general/magnifying_glass.png",
-    HotSpot = {11, 11},
-    Size = {34, 35}})
+    File = "graphics/ui/cursor-info.png",
+    HotSpot = {1, 1},
+    Size = {28, 32}})
 
 DefineCursor({
    Name = "cursor-cross",
