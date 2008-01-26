@@ -32,15 +32,15 @@ function loadgraphic(filename, width, height)
    return g
 end
 
-local flash_graphic = loadgraphic("graphics/particle/flash.png", 240, 194)
-local smoke_graphic = loadgraphic("graphics/particle/smokelight12.png", 12, 12)
+local flash_graphic = loadgraphic("graphics/explosions/flash.png", 240, 194)
+local smoke_graphic = loadgraphic("graphics/explosions/smokelight12.png", 12, 12)
 local largeflames = {}
 local mediumflames = {}
 local smallflames = {}
 for i = 1, 9 do
-  largeflames[i] = loadgraphic("graphics/particle/large0"..i..".png", 128, 96)
-  mediumflames[i] = loadgraphic("graphics/particle/medium0"..i..".png", 54, 73)
-  smallflames[i] = loadgraphic("graphics/particle/small0"..i..".png", 13, 18)
+  largeflames[i] = loadgraphic("graphics/explosions/large0"..i..".png", 128, 96)
+  mediumflames[i] = loadgraphic("graphics/explosions/medium0"..i..".png", 54, 73)
+  smallflames[i] = loadgraphic("graphics/explosions/small0"..i..".png", 13, 18)
 end
 
 function pickRandom(list) 
