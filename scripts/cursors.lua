@@ -35,61 +35,61 @@ DefineCursor({
 
 DefineCursor({
    Name = "cursor-cross",
-   File = "general/small_green_cross.png",
+   File = "graphics/ui/cursors/small_green_cross.png",
    HotSpot = {8, 8},
    Size = {18, 18}})
 
 DefineCursor({
    Name = "cursor-scroll",
-   File = "general/cross.png",
+   File = "graphics/ui/cursors/cross.png",
    HotSpot = {15, 15},
    Size = {32, 32}})
 
 DefineCursor({
    Name = "cursor-arrow-e",
-   File = "general/arrow_E.png",
+   File = "graphics/ui/cursors/arrow_E.png",
    HotSpot = {22, 10},
    Size = {32, 24}})
 
 DefineCursor({
    Name = "cursor-arrow-ne",
-   File = "general/arrow_NE.png",
+   File = "graphics/ui/cursors/arrow_NE.png",
    HotSpot = {20, 2},
    Size = {32, 24}})
 
 DefineCursor({
    Name = "cursor-arrow-n",
-   File = "general/arrow_N.png",
+   File = "graphics/ui/cursors/arrow_N.png",
    HotSpot = {12, 2},
    Size = {32, 24}})
 
 DefineCursor({
    Name = "cursor-arrow-nw",
-   File = "general/arrow_NW.png",
+   File = "graphics/ui/cursors/arrow_NW.png",
    HotSpot = {2, 2},
    Size = {32, 24}})
 
 DefineCursor({
    Name = "cursor-arrow-w",
-   File = "general/arrow_W.png",
+   File = "graphics/ui/cursors/arrow_W.png",
    HotSpot = {4, 10},
    Size = {32, 24}})
 
 DefineCursor({
    Name = "cursor-arrow-s",
-   File = "general/arrow_S.png",
+   File = "graphics/ui/cursors/arrow_S.png",
    HotSpot = {12, 22},
    Size = {32, 24}})
 
 DefineCursor({
    Name = "cursor-arrow-sw",
-   File = "general/arrow_SW.png",
+   File = "graphics/ui/cursors/arrow_SW.png",
    HotSpot = {2, 18},
    Size = {32, 24}})
 
 DefineCursor({
    Name = "cursor-arrow-se",
-   File = "general/arrow_SE.png",
+   File = "graphics/ui/cursors/arrow_SE.png",
    HotSpot = {20, 18},
    Size = {32, 24}})
 
@@ -101,18 +101,18 @@ DefineCursor({
 
 DefineCursor({
    Name = "cursor-green-hair",
-   File = "general/green.png",
+   File = "graphics/ui/cursors/green.png",
    HotSpot = {15, 15},
    Size = {32, 32}})
 
 DefineCursor({
    Name = "cursor-yellow-hair",
-   File = "general/yellow.png",
+   File = "graphics/ui/cursors/yellow.png",
    HotSpot = {15, 15},
    Size = {32, 32}})
 
 DefineCursor({
    Name = "cursor-red-hair",
-   File = "general/red.png",
+   File = "graphics/ui/cursors/red.png",
    HotSpot = {15, 15},
    Size = {32, 32}})
