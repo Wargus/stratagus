@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Version 2.5.0 (2008 1 19):
+- Show if the user cheated on the results screen (Jimmy Salmon)
 - Make the particle based explosions configureable (Francois Beerten)
 - Fixed bug selecting a map in a subdir (Jimmy Salmon)
 - Fix unload button on the APC unit (llearch n'n'daCorna) 

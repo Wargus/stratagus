@@ -344,6 +344,10 @@ function RunResultsMenu()
     return
   end
 
+  if (Cheater) then
+    result = result .. " - " .. _("Cheater")
+  end
+
   menu = BosMenu(_("Results"), background)
   menu:writeLargeText(result, sx*6, sy*5)
 
@@ -433,6 +437,8 @@ function GameStarting()
       Players[i].EnergyStored = Players[i].EnergyStored * factor
     end
   end
+
+  Cheater = false
 
   -- FIXME: get the version from somewhere else
   UI.StatusLine:Set("Bos Wars V" .. "2.5.0" ..
