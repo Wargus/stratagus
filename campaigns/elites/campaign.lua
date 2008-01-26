@@ -91,7 +91,7 @@ local briefingtext07 =
    "A thriving fortified camp has been spotted in the nearby "..
    "lowlands of Bellegarde. Surrounded by a rocky hills, the camp "..
    "appears well prepared to fend off attackers. The enemy has "..
-   "sent Lieutenant-Colonel $NAME to organize the defenses. "..
+   "sent Lieutenant-Colonel TJ to organize the defenses. "..
    "His reputation as an effective battlefield commander suggests "..
    "that you should not take him lightly. "..
    "Destroy the camp, and send him packing."
@@ -102,7 +102,7 @@ local briefingtext08 =
    "capital city. Ripping your way through the enemy troops, you've "..
    "reached the final pass between the hills to reach the capital "..
    "city. "..
-   "Colonel $name is preparing his troops to stop you. "..
+   "Colonel TJ is preparing his troops to stop you. "..
    "You just need to tear through him, and you've got the enemy on "..
    "the run."
 local briefingtext09 = 
@@ -110,7 +110,7 @@ local briefingtext09 =
    "After the hard fighting of the Steps, your troops cheer as "..
    "you reach the Lake. They know they've almost won. "..
    "Before you can proceed to rescue the capital, you must clear "..
-   "the area around Savoy's Lake. Lieutenant-General $name "..
+   "the area around Savoy's Lake. Lieutenant-General TJ "..
    "is prepared to stop you."
 local briefingtext10 = 
    "Level 10: Fort Savoy "..
