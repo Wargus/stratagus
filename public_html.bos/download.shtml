@@ -4,6 +4,16 @@
 
 <h1><span>Bos Wars Downloads</span></h1>
 
+<h2><span>Version pre2.5 (2008/1/26)</span></h2> 
+
+<ul>
+  <li>Linux: <a href="dist/releases/boswars-pre2.5-linux.tar.gz">boswars-pre2.5-linux.tar.gz</a></li>
+  <li>Windows (installer): <a href="dist/releases/BosWars-pre2.5.exe">BosWars-2.5.exe</a> </li>
+  <li>Source (tar): <a href="dist/releases/boswars-pre2.5-src.tar.gz">boswars-2.5-src.tar.gz</a></li>
+  <li>Source (zip): <a href="dist/releases/boswars-pre2.5-src.zip">boswars-2.5-src.zip</a></li>
+</ul>
+
+
 <h2><span>Version 2.4.1 (2007/9/2)</span></h2> 
 
 <ul>
