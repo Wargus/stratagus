@@ -1,4 +1,4 @@
-This work, Bos Wars, is copyrighted in 2004-2007 by Tina Petersen Jensen, 
+This work, Bos Wars, is copyrighted in 2004-2008 by Tina Petersen Jensen, 
 Francois Beerten et al. 
 
 This game is free software; you can redistribute it and/or modify
@@ -255,8 +255,13 @@ removed from this list. The exception does not apply if a file from this
 list is replaced or changed. In that case, the file has to be removed from 
 the list and sources provided.
 
+By default, the content of Bos Wars is distributed under the GNU General 
+Public License version 2, or (at your option) any later version. 
+
 The Bos Wars engine is based on the Stratagus engine. The engine is 
-distributed under the GNU General Public License version 2.
+distributed under the GNU General Public License version 2. This implies
+that the whole project can only be distributed under the GNU General Public
+License version 2 and not later versions as long as that engine is used.
 
 The engine includes the following elements which have their own 
 licence and copyrights:
