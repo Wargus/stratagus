@@ -34,34 +34,42 @@ function HandleCheats(str)
     ThisPlayer.EnergyStored = ThisPlayer.EnergyStorageCapacity
     ThisPlayer.MagmaStored = ThisPlayer.MagmaStorageCapacity
     AddMessage("Jackpot !")
+    Cheater = true
 
   elseif (str == "poor") then
     ThisPlayer.EnergyStored = 0
     ThisPlayer.MagmaStored = 0
     AddMessage("Bankruptcy !")
+    Cheater = true
 
   elseif (str == "reveal") then
     RevealMap()
+    Cheater = true
 
   elseif (str == "fow on") then
     SetFogOfWar(true)
+    Cheater = true
 
   elseif (str == "fow off") then
     SetFogOfWar(false)
+    Cheater = true
  
   elseif (str == "see all") then
     SetFogOfWar(false)
     RevealMap()
+    Cheater = true
 
   elseif (str == "fast debug") then
     SetSpeedBuild(10)
     SetSpeedTrain(10)
     AddMessage("FAST DEBUG SPEED")
+    Cheater = true
 
   elseif (str == "normal debug") then
     SetSpeedBuild(1)
     SetSpeedTrain(1)
     AddMessage("NORMAL DEBUG SPEED")
+    Cheater = true
 
   elseif (str == "speed cheat") then
     if (GetSpeedBuild() ~= 1) then
@@ -75,15 +83,19 @@ function HandleCheats(str)
       ThisPlayer.MagmaStored = ThisPlayer.MagmaStored + 32000
       AddMessage("SPEED!")
     end
+    Cheater = true
 
   elseif (str == "victory") then
     StopGame(GameVictory)
+    Cheater = true
 
   elseif (str == "defeat") then
     StopGame(GameDefeat)
+    Cheater = true
 
   elseif (str == "draw") then
     StopGame(GameDraw)
+    Cheater = true
 
   elseif (str == "godcheat") then
     if (GetGodMode()) then
@@ -93,11 +105,13 @@ function HandleCheats(str)
       SetGodMode(true)
       AddMessage("God Mode ON")
     end
+    Cheater = true
 
   elseif (str == "fill mana") then
     for i = 0,ThisPlayer.TotalNumUnits-1 do
       SetUnitVariable(ThisPlayer.Units[i].Slot, "Mana", 999999)
     end
+    Cheater = true
 
   elseif (string.sub(str, 1, 6) == "gimme ") then
     local arr = {}
@@ -122,6 +136,7 @@ function HandleCheats(str)
     end
 
     AddMessage("Cheater!")
+    Cheater = true
 
   else
     return false
