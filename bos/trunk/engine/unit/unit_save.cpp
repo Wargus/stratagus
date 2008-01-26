@@ -263,7 +263,7 @@ void SaveUnit(const CUnit *unit, CFile *file)
 	}
 
 	if (unit->Seen.CFrame) {
-		CConstructionFrame *cframe = unit->Type->Construction->Frames;
+		CConstructionFrame *cframe = unit->Seen.Type->Construction->Frames;
 		int frame = 0;
 		while (cframe != unit->Seen.CFrame) {
 			cframe = cframe->Next;
