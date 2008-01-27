@@ -700,9 +700,16 @@ int HandleCheats(const std::string &input)
 #ifdef DEBUG
 	if (input == "ai me") {
 		if (ThisPlayer->AiEnabled) {
+			// FIXME: UnitGoesUnderFog and UnitGoesOutOfFog change unit refs
+			// for human players.  We can't switch back to a human player or
+			// we'll be using the wrong ref counts.
+#if 0
 			ThisPlayer->AiEnabled = 0;
 			ThisPlayer->Type = PlayerPerson;
 			SetMessage("AI is off, Normal Player");
+#else
+			SetMessage("Cannot disable 'ai me' cheat");
+#endif
 		} else {
 			ThisPlayer->AiEnabled = 1;
 			ThisPlayer->Type = PlayerComputer;
