@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-04 23:55+0200\n"
+"POT-Creation-Date: 2008-01-27 14:45-0800\n"
 "PO-Revision-Date: 2007-09-10 22:18+0200\n"
 "Last-Translator: Olov Gustavsson <olov.gustavsson@bredband.net>\n"
 "MIME-Version: 1.0\n"
@@ -19,263 +19,289 @@ msgstr ""
 msgid "You cannot reach building place"
 msgstr "Du kan inte nå byggplatsen"
 
-#: action/action_build.cpp:210
+#: action/action_build.cpp:214
 #, c-format
 msgid "You cannot build %s here"
 msgstr "Du kan inte bygga %s här"
 
-#: action/action_build.cpp:224
+#: action/action_build.cpp:228
 #, c-format
 msgid "Can't build more units %s"
 msgstr "Kan inte skapa flera enheter av %s"
 
-#: action/action_build.cpp:256
+#: action/action_build.cpp:260
 #, c-format
 msgid "Unable to create building %s"
 msgstr "Kan inte bygga %s"
 
-#: action/action_build.cpp:450
+#: action/action_build.cpp:454
 #, c-format
 msgid "New %s done"
 msgstr "Ny %s färdig"
 
-#: action/action_spellcast.cpp:172
+#: action/action_spellcast.cpp:171
 #, c-format
 msgid "%s: not enough mana for spell: %s"
 msgstr "%s: inte tillräckligt med manna till förtrollning: %s"
 
-#: action/action_spellcast.cpp:176
+#: action/action_spellcast.cpp:175
 #, c-format
 msgid "%s: can't cast spell: %s"
 msgstr "%s: kan inte kasta förtrollning: %s"
 
-#: action/action_train.cpp:185
+#: action/action_train.cpp:184
 #, c-format
 msgid "New %s ready"
 msgstr "Ny %s klar"
 
-#: action/action_train.cpp:231
+#: action/action_train.cpp:235
 #, c-format
 msgid "Unable to train %s"
 msgstr "Kan inte träna %s"
 
-#: action/command.cpp:1026
+#: action/command.cpp:1025
 #, c-format
 msgid "Player \"%s\" has left the game"
 msgstr "Spelaren \"%s\" har lämnat spelet"
 
-#: action/command.cpp:1028
+#: action/command.cpp:1027
 #, c-format
 msgid "Player \"%s\" has been killed"
 msgstr "Spelare \"%s\" har blivit dödad"
 
-#: editor/editloop.cpp:516
-msgid "~!OK"
-msgstr "~!OK"
-
-#: editor/editloop.cpp:524
-msgid "~!Cancel"
-msgstr "Avbryt (~!C)"
-
-#: editor/editloop.cpp:1308
+#: editor/editloop.cpp:1229
 msgid "Unit can't be placed here."
 msgstr "Enheten kan inte placeras här."
 
-#: editor/editloop.cpp:1380
+#: editor/editloop.cpp:1301
 msgid "Mirror editing enabled: 2-side"
 msgstr "Speglade förändringar aktiverade: 2 sidor"
 
-#: editor/editloop.cpp:1383
+#: editor/editloop.cpp:1304
 msgid "Mirror editing enabled: 4-side"
 msgstr "Speglade förändringar aktiverade: 4 sidor"
 
-#: editor/editloop.cpp:1386
+#: editor/editloop.cpp:1307
 msgid "Mirror editing disabled"
 msgstr "Speglade förändringar avaktiverade"
 
-#: editor/editloop.cpp:1406
+#: editor/editloop.cpp:1327
 msgid "Unit deleted"
 msgstr "Enhet borttagen"
 
-#: editor/editloop.cpp:1429 editor/editloop.cpp:1438
+#: editor/editloop.cpp:1350 editor/editloop.cpp:1359
 msgid "Unit owner modified"
 msgstr "Enhetsägare ändrad"
 
-#: editor/editloop.cpp:1759
+#: editor/editloop.cpp:1680
 msgid "Select mode"
 msgstr "Markeringsläge"
 
-#: editor/editloop.cpp:1769
+#: editor/editloop.cpp:1690
 msgid "Unit mode"
 msgstr "Enheter"
 
-#: editor/editloop.cpp:1780
+#: editor/editloop.cpp:1701
 msgid "Tile mode"
 msgstr "Terräng"
 
-#: editor/editloop.cpp:1791
+#: editor/editloop.cpp:1712
 msgid "Set start location mode"
 msgstr "Sätt startplats"
 
-#: network/commands.cpp:796
-msgid "No sync info for this replay !"
-msgstr "Ingen synk information för detta svar !"
-
-#: network/commands.cpp:798
-#, c-format
-msgid "Replay got out of sync (%lu) !"
-msgstr "Svaret kom ur synk (%lu) !"
-
-#: network/commands.cpp:807
-msgid "Replay got out of sync !"
-msgstr "Svaret kom ur synk !"
-
-#: network/commands.cpp:906 network/commands.cpp:921
-msgid "End of replay"
-msgstr "Slut på svaret"
-
-#: network/network.cpp:1061
-#, c-format
-msgid "%s sent bad command"
-msgstr "%s sände felaktigt kommando"
-
-#: network/network.cpp:1158
-msgid "Network out of sync"
-msgstr "Nätverk ur synk"
-
-#: network/network.cpp:1391
-#, c-format
-msgid "Waiting for player \"%s\": %d:%02d"
-msgstr "Väntar på spelare \"%s\": %d:%02d"
-
-#: network/network.cpp:1407
-msgid "Timed out"
-msgstr "För lång tid"
-
-#: stratagus/player.cpp:706
+#: game/player.cpp:705
 msgid "Building Limit Reached"
 msgstr "Byggnadsbegränsning uppnådd"
 
-#: stratagus/player.cpp:710
+#: game/player.cpp:709
 msgid "Unit Limit Reached"
 msgstr "Enhetsbegränsning uppnådd"
 
-#: stratagus/player.cpp:714
+#: game/player.cpp:713
 msgid "Total Unit Limit Reached"
 msgstr "Total enhetsbegränsning uppnådd"
 
-#: stratagus/player.cpp:718
+#: game/player.cpp:717
 #, c-format
 msgid "Limit of %d reached for this unit type"
 msgstr "Gränsen på %d uppnådd för denna enhetstyp"
 
-#: stratagus/player.cpp:724
+#: game/player.cpp:723
 msgid "Cannot create more units."
 msgstr "Kan inte skapa flera enheter."
 
-#: stratagus/stratagus.cpp:735
+#: game/replay.cpp:787
+msgid "No sync info for this replay !"
+msgstr "Ingen synk information för detta svar !"
+
+#: game/replay.cpp:789
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Svaret kom ur synk (%lu) !"
+
+#: game/replay.cpp:798
+msgid "Replay got out of sync !"
+msgstr "Svaret kom ur synk !"
+
+#: game/replay.cpp:896 game/replay.cpp:910
+msgid "End of replay"
+msgstr "Slut på svaret"
+
+#: network/network.cpp:1060
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s sände felaktigt kommando"
+
+#: network/network.cpp:1157
+msgid "Network out of sync"
+msgstr "Nätverk ur synk"
+
+#: network/network.cpp:1390
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Väntar på spelare \"%s\": %d:%02d"
+
+#: network/network.cpp:1406
+msgid "Timed out"
+msgstr "För lång tid"
+
+#: stratagus/stratagus.cpp:594
 #, c-format
 msgid "Thanks for playing Bos Wars.\n"
 msgstr "Tack för att du spelar Bos Wars.\n"
 
-#: ui/botpanel.cpp:666 ui/botpanel.cpp:731
+#: ui/botpanel.cpp:785 ui/botpanel.cpp:850
 msgid "Select Target"
 msgstr "Välj mål"
 
-#: ui/botpanel.cpp:779
+#: ui/botpanel.cpp:898
 msgid "Select Location"
 msgstr "Välj placering"
 
-#: ui/interface.cpp:94
+#: ui/interface.cpp:107
 #, c-format
 msgid "MESSAGE:%s~!_"
 msgstr "MEDDELANDE:%s~!_"
 
-#: ui/interface.cpp:246
+#: ui/interface.cpp:259
 msgid "Sound is on."
 msgstr "Ljudet är på."
 
-#: ui/interface.cpp:248
+#: ui/interface.cpp:261
 msgid "Sound is off."
 msgstr "Ljudet är av."
 
-#: ui/interface.cpp:263
+#: ui/interface.cpp:276
 msgid "Music is off."
 msgstr "Musiken är av."
 
-#: ui/interface.cpp:266
+#: ui/interface.cpp:279
 msgid "Music is on."
 msgstr "Musiken är på."
 
-#: ui/interface.cpp:279 ui/mouse.cpp:1610
+#: ui/interface.cpp:292 ui/mouse.cpp:1609
 msgid "Game Paused"
 msgstr "Spelet är pausat"
 
-#: ui/interface.cpp:281
+#: ui/interface.cpp:294
 msgid "Game Resumed"
 msgstr "Spelet fortsätter"
 
-#: ui/interface.cpp:312
+#: ui/interface.cpp:325
 msgid "Big map enabled"
 msgstr "Stor karta valt"
 
-#: ui/interface.cpp:321
+#: ui/interface.cpp:334
 msgid "Returning to old map"
 msgstr "Gå tillbaka till tidigare karta"
 
-#: ui/interface.cpp:335
+#: ui/interface.cpp:348
 msgid "Faster"
 msgstr "Fortare"
 
-#: ui/interface.cpp:354
+#: ui/interface.cpp:367
 msgid "Slower"
 msgstr "Långsammare"
 
-#: ui/interface.cpp:409
+#: ui/interface.cpp:422
 msgid "Terrain displayed."
 msgstr "Terrängen visas."
 
-#: ui/interface.cpp:411
+#: ui/interface.cpp:424
 msgid "Terrain hidden."
 msgstr "Terrängen döljs."
 
-#: ui/interface.cpp:444
+#: ui/interface.cpp:457
 msgid "Grab mouse toggled."
 msgstr "Muslåsning ändrad."
 
-#: ui/interface.cpp:919
+#: ui/interface.cpp:939
 msgid "Screenshot made."
 msgstr "Skärmbild skapad."
 
-#: ui/mainscr.cpp:694
+#: ui/mainscr.cpp:171
+msgid "Armor: "
+msgstr ""
+
+#: ui/mainscr.cpp:177
+msgid "Radar Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:182
+msgid "Sight Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:189
+msgid "Kills: "
+msgstr ""
+
+#: ui/mainscr.cpp:194
+msgid "Attack Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:201
+msgid "Damage: "
+msgstr ""
+
+#: ui/mainscr.cpp:371
 msgid "Energy"
 msgstr "Energi"
 
-#: ui/mainscr.cpp:694
+#: ui/mainscr.cpp:371
 msgid "Magma"
 msgstr "Magma"
 
-#: ui/mainscr.cpp:919
+#: ui/mainscr.cpp:597
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Sista meddelandet upprepat ~<%d~> gånger"
 
-#: ui/mainscr.cpp:1044
+#: ui/mainscr.cpp:729
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Händelse: %s~>"
 
-#: ui/mouse.cpp:1778
+#: ui/mouse.cpp:1774
 #, c-format
 msgid "You have ~<%d~> %ss"
 msgstr "Du har ~<%d~> %ser"
 
-#: ui/mouse.cpp:1782
+#: ui/mouse.cpp:1778
 #, c-format
 msgid "You have ~<%d~> %s(s)"
 msgstr "Du har ~<%d~> %s(er)"
 
-#: unit/unit.cpp:2744
+#: unit/unit.cpp:2118
 #, c-format
 msgid "%s attacked"
 msgstr "%s attackerad"
+
+#: video/sdl.cpp:268
+msgid "esc"
+msgstr ""
+
+#~ msgid "~!OK"
+#~ msgstr "~!OK"
+
+#~ msgid "~!Cancel"
+#~ msgstr "Avbryt (~!C)"
