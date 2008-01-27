@@ -1,9 +1,10 @@
 !include "MUI.nsh"
 
 !define NAME "Bos Wars"
+!define VERSION "2.5"
 
 Name "${NAME}"
-OutFile "BosWars-2.5.exe"
+OutFile "BosWars-${VERSION}.exe"
 
 RequestExecutionLevel admin
 
