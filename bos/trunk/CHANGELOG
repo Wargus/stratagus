@@ -2,7 +2,11 @@ Change log for Bos Wars
 -----------------------
 
 Version 2.5.0 prerelease (2008 1 26):
+- Replace magnifying glass cursor by a variant of the elites claw cursor.
+(Francois Beerten)
+- Fix screenshots at 16bpp (Jimmy Salmon)
 - Show if the user cheated on the results screen (Jimmy Salmon)
+- Add wetlands02 map (Lois Taulelle and llearch n'n'daCorna)
 - Make the particle based explosions configureable (Francois Beerten)
 - Fixed bug selecting a map in a subdir (Jimmy Salmon)
 - Fix unload button on the APC unit (llearch n'n'daCorna) 
