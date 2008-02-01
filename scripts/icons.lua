@@ -9,7 +9,7 @@
 --
 --	icons.lua	-	Define the icons.
 --
---	(c) Copyright 2003-2007 by Jimmy Salmon and Crestez Leonard.
+--	(c) Copyright 2003-2008 by Jimmy Salmon and Crestez Leonard.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -78,19 +78,19 @@ DefineIcon({
 DefineIcon({
 	Name = "icon-build-lvl1",
 	Size = {46, 38},
-	Frame = 1,
+	Frame = 0,
 	File = "units/engineer/engineer_icons.png"})
 
 DefineIcon({
 	Name = "icon-build-lvl2",
 	Size = {46, 38},
-	Frame = 2,
+	Frame = 1,
 	File = "units/engineer/engineer_icons.png"})
 
 DefineIcon({
 	Name = "icon-build-lvl3",
 	Size = {46, 38},
-	Frame = 3,
+	Frame = 2,
 	File = "units/engineer/engineer_icons.png"})
 
 --
