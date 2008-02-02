@@ -169,7 +169,7 @@ static void DrawUnitStats(const CUnit *unit)
 	// Armor
 	std::ostringstream armor;
 	armor << _("Armor: ") << type->Variable[ARMOR_INDEX].Value;
-	VideoDrawText(x + 16, y + 84, GameFont, armor.str());
+	VideoDrawText(x + 16, y + 83, GameFont, armor.str());
 
 	if (type->Variable[RADAR_INDEX].Value) {
 		// Radar Range
@@ -200,6 +200,11 @@ static void DrawUnitStats(const CUnit *unit)
 		std::ostringstream damage;
 		damage << _("Damage: ") << min_damage << "-" << max_damage;
 		VideoDrawText(x + 16, y + 125, GameFont, damage.str());
+	} else if (unit->Variable[MANA_INDEX].Max != 0) {
+		// Mana
+		std::ostringstream mana;
+		mana << _("Mana: ") << unit->Variable[MANA_INDEX].Value;
+		VideoDrawText(x + 16, y + 111, GameFont, mana.str());
 	}
 }
 
