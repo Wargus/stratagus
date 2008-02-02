@@ -770,10 +770,15 @@ static int AStarSavePath(int startX, int startY, int endX, int endY, char *path,
 **  Optimization to find a simple path
 **  Check if we're at the goal or if it's 1 tile away
 */
-int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
+static int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
 	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data)
 {
 	ProfileBegin("AStarFindSimplePath");
+	if (gw != 1 || gh != 1) {
+		ProfileEnd("AStarFindSimplePath");
+		return PF_FAILED;
+	}
+
 	if (gx == sx && gy == sy) {
 		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;

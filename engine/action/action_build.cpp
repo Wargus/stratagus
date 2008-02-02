@@ -9,7 +9,7 @@
 //
 /**@name action_build.cpp - The build building action. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, and
+//      (c) Copyright 1998-2008 by Lutz Sammer, Jimmy Salmon, and
 //                                 Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
