@@ -1668,7 +1668,6 @@ void DropOutAll(const CUnit *source)
 		unit->Orders[0]->Action = UnitActionStill;
 		unit->SubAction = 0;
 	}
-	DebugPrint("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
 }
 
 /*----------------------------------------------------------------------------

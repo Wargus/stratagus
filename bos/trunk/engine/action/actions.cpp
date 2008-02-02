@@ -9,7 +9,7 @@
 //
 /**@name actions.cpp - The actions. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Russell Smith, and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer, Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -368,13 +368,6 @@ static void HandleUnitAction(CUnit *unit)
 			// Release pending references.
 			//
 			if (unit->Orders[0]->Goal) {
-				// If mining decrease the active count on the resource.
-				if (unit->Orders[0]->Action == UnitActionResource &&
-						unit->SubAction == 60) {
-					// FIXME: SUB_GATHER_RESOURCE ?
-					unit->Orders[0]->Goal->Data.Resource.Active--;
-					Assert(unit->Orders[0]->Goal->Data.Resource.Active >= 0);
-				}
 				// Still shouldn't have a reference unless attacking
 				Assert(!(unit->Orders[0]->Action == UnitActionStill && !unit->SubAction));
 				unit->Orders[0]->Goal->RefsDecrease();

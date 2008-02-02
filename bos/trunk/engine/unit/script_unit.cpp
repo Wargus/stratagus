@@ -9,7 +9,7 @@
 //
 /**@name script_unit.cpp - The unit ccl functions. */
 //
-//      (c) Copyright 2001-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -619,8 +619,6 @@ static int CclUnit(lua_State *l)
 			unit->Seen.CFrame = cframe;
 		} else if (!strcmp(value, "seen-state")) {
 			unit->Seen.State = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "resource-active")) {
-			unit->Data.Resource.Active = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, j + 1);

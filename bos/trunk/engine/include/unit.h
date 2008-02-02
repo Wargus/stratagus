@@ -9,7 +9,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -655,9 +655,6 @@ public:
 	struct _order_harvest_ {
 		int CurrentProduction[MaxCosts];
 	} Harvest; /// Harvest
-	struct _order_resource_ {
-		int Active; /// how many units are harvesting from the resource.
-	} Resource; /// Resource still
 	struct _order_train_ {
 		int Ticks;                  /// Ticks to complete
 	} Train; /// Train units action
