@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Version 2.5.0:
+- Allow recycling buildings under construction (Jimmy Salmon)
 - Set the start position in campaign level 5 (Jimmy Salmon)
 - Fix engineer build icons. (Francois Beerten)
 
