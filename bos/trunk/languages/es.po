@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-27 14:45-0800\n"
+"POT-Creation-Date: 2008-02-02 15:52-0800\n"
 "PO-Revision-Date: 2006-12-12 21:22-0800\n"
 "Last-Translator: Francois Beerten\n"
 "MIME-Version: 1.0\n"
@@ -261,20 +261,24 @@ msgstr ""
 msgid "Damage: "
 msgstr ""
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:206
+msgid "Mana: "
+msgstr ""
+
+#: ui/mainscr.cpp:376
 msgid "Energy"
 msgstr "Energia"
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:376
 msgid "Magma"
 msgstr "Magma"
 
-#: ui/mainscr.cpp:597
+#: ui/mainscr.cpp:602
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Ultimo mensaje repetido ~<%d~> veces"
 
-#: ui/mainscr.cpp:729
+#: ui/mainscr.cpp:734
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Evento: %s~>"
@@ -289,7 +293,7 @@ msgstr "Tienes ~<%d~> %ss"
 msgid "You have ~<%d~> %s(s)"
 msgstr "Tienes ~<%d~> %s(s)"
 
-#: unit/unit.cpp:2118
+#: unit/unit.cpp:2117
 #, c-format
 msgid "%s attacked"
 msgstr "%s esta siendo atacada"

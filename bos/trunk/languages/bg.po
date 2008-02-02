@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stratagus traduction\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-27 14:45-0800\n"
+"POT-Creation-Date: 2008-02-02 15:52-0800\n"
 "PO-Revision-Date: 2006-03-23 14:12+0100\n"
 "Last-Translator: Alexander Petkov <sasho_manga_fen@yahoo.com>\n"
 "Language-Team: Bulgarian\n"
@@ -266,20 +266,24 @@ msgstr ""
 msgid "Damage: "
 msgstr ""
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:206
+msgid "Mana: "
+msgstr ""
+
+#: ui/mainscr.cpp:376
 msgid "Energy"
 msgstr ""
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:376
 msgid "Magma"
 msgstr ""
 
-#: ui/mainscr.cpp:597
+#: ui/mainscr.cpp:602
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Last message repeated ~<%d~> times"
 
-#: ui/mainscr.cpp:729
+#: ui/mainscr.cpp:734
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<?v?Event: %s~>"
@@ -294,7 +298,7 @@ msgstr "Вие имате ~<%d~> %ss"
 msgid "You have ~<%d~> %s(s)"
 msgstr "Вие имате ~<%d~> %s(s)"
 
-#: unit/unit.cpp:2118
+#: unit/unit.cpp:2117
 #, c-format
 msgid "%s attacked"
 msgstr "%s Атакуван"
