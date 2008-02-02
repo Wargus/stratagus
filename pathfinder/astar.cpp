@@ -774,20 +774,23 @@ static int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
 	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data)
 {
 	ProfileBegin("AStarFindSimplePath");
-	if (gw != 1 || gh != 1) {
-		ProfileEnd("AStarFindSimplePath");
-		return PF_FAILED;
-	}
-
-	if (gx == sx && gy == sy) {
+	// At exact destination point already
+	if (gx == sx && gy == sy && minrange == 0) {
 		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;
+	}
+
+	// Don't allow unit inside destination area
+	if (gx <= sx && sx <= gx + gw - 1 &&
+			gy <= sy && sy <= gy + gh - 1) {
+		return PF_FAILED;
 	}
 
 	int dx = abs(gx - sx);
 	int dy = abs(gy - sy);
 	int distance = isqrt(dx * dx + dy * dy);
 
+	// Within range of destination
 	if (minrange <= distance && distance <= maxrange) {
 		ProfileEnd("AStarFindSimplePath");
 		return PF_REACHED;
