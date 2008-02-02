@@ -12,7 +12,7 @@
 -- File licensed under the GNU GPL version 2.
 
 -- player configuration
-Players[0]:SetStartView(0, 0)
+Players[0]:SetStartView(45, 35)
 Players[0].EnergyStored = 1000
 Players[0].MagmaStored = 2000
 Players[0].AiName = "ai-default"
