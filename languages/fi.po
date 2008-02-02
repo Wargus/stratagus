@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-27 14:45-0800\n"
+"POT-Creation-Date: 2008-02-02 15:52-0800\n"
 "PO-Revision-Date: 2005-12-10 18:14+0200\n"
 "Last-Translator: Kimmo Merikivi <kimmo.merikivi@pp1.inet.fi>\n"
 "Language-Team: Kimmo Kalevi Merikivi <fi@li.org>\n"
@@ -265,20 +265,24 @@ msgstr ""
 msgid "Damage: "
 msgstr ""
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:206
+msgid "Mana: "
+msgstr ""
+
+#: ui/mainscr.cpp:376
 msgid "Energy"
 msgstr "Energia"
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:376
 msgid "Magma"
 msgstr "Magma"
 
-#: ui/mainscr.cpp:597
+#: ui/mainscr.cpp:602
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "Viimeisin viesti ~<%d~> kertaa"
 
-#: ui/mainscr.cpp:729
+#: ui/mainscr.cpp:734
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Tapahtuma: %s~>"
@@ -293,7 +297,7 @@ msgstr "Sinulla on ~<%d~> %ss"
 msgid "You have ~<%d~> %s(s)"
 msgstr "Sinulla on ~<%d~> %s"
 
-#: unit/unit.cpp:2118
+#: unit/unit.cpp:2117
 #, c-format
 msgid "%s attacked"
 msgstr "%s hyökkäyksen kohteena!"

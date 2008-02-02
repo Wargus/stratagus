@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-27 14:45-0800\n"
+"POT-Creation-Date: 2008-02-02 15:52-0800\n"
 "PO-Revision-Date: 2007-07-10 00:08+0300\n"
 "Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
 "Language-Team:  <tr@li.org>\n"
@@ -265,20 +265,24 @@ msgstr ""
 msgid "Damage: "
 msgstr ""
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:206
+msgid "Mana: "
+msgstr ""
+
+#: ui/mainscr.cpp:376
 msgid "Energy"
 msgstr "Enerji"
 
-#: ui/mainscr.cpp:371
+#: ui/mainscr.cpp:376
 msgid "Magma"
 msgstr "Magma"
 
-#: ui/mainscr.cpp:597
+#: ui/mainscr.cpp:602
 #, c-format
 msgid "Last message repeated ~<%d~> times"
 msgstr "~<%d~>tekrarlanan son mesaj"
 
-#: ui/mainscr.cpp:729
+#: ui/mainscr.cpp:734
 #, c-format
 msgid "~<Event: %s~>"
 msgstr "~<Olay: %s~>"
@@ -293,7 +297,7 @@ msgstr "~<%d~> %ss sahipsiniz"
 msgid "You have ~<%d~> %s(s)"
 msgstr "~<%d~> %s(s) sahipsiniz"
 
-#: unit/unit.cpp:2118
+#: unit/unit.cpp:2117
 #, c-format
 msgid "%s attacked"
 msgstr "%s saldırıldı"
