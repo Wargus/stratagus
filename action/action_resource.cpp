@@ -9,7 +9,7 @@
 //
 /**@name action_resource.cpp - The generic resource action. */
 //
-//      (c) Copyright 2001-2007 by Crestez Leonard and Jimmy Salmon
+//      (c) Copyright 2001-2008 by Crestez Leonard and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -127,21 +127,6 @@ static bool StartGathering(CUnit *unit)
 	UnitHeadingFromDeltaXY(unit,
 		goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 		goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
-
-	//
-	// If resource has too many harvesting it or is still under construction, wait!
-	//
-	if ((goal->Type->MaxOnBoard && goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
-			goal->Orders[0]->Action == UnitActionBuilt) {
-		// FIXME: Determine somehow when the resource will be free to use
-		// FIXME: Could we somehow find another resource?
-		// However the CPU usage is really low (no pathfinding stuff).
-		unit->Wait = 10;
-		return false;
-	}
-
-	// Activate the resource
-	goal->Data.Resource.Active++;
 
 	return true;
 }
