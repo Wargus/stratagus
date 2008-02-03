@@ -262,7 +262,6 @@ void GameMainLoop(void)
 	bool showtip;
 #endif
 	int player;
-	int RealVideoSyncSpeed;
 	const EventCallback *old_callbacks;
 
 	InitGameCallbacks();
@@ -277,7 +276,6 @@ void GameMainLoop(void)
 	CParticleManager::init();
 
 	showtip = false;
-	RealVideoSyncSpeed = VideoSyncSpeed;
 
 	MultiPlayerReplayEachCycle();
 
@@ -353,11 +351,6 @@ void GameMainLoop(void)
 		//
 		DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 
-		if (FastForwardCycle > GameCycle &&
-				RealVideoSyncSpeed != VideoSyncSpeed) {
-			RealVideoSyncSpeed = VideoSyncSpeed;
-			VideoSyncSpeed = 3000;
-		}
 		if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
 			//FIXME: this might be better placed somewhere at front of the
 			// program, as we now still have a game on the background and
@@ -372,9 +365,6 @@ void GameMainLoop(void)
 			RealizeVideoMemory();
 		}
 
-		if (FastForwardCycle == GameCycle) {
-			VideoSyncSpeed = RealVideoSyncSpeed;
-		}
 		if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
 			WaitEventsOneFrame();
 		}
@@ -386,9 +376,6 @@ void GameMainLoop(void)
 	//
 	// Game over
 	//
-	if (FastForwardCycle > GameCycle) {
-		VideoSyncSpeed = RealVideoSyncSpeed;
-	}
 	NetworkQuit();
 	EndReplayLog();
 
