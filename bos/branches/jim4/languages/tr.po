@@ -1,0 +1,313 @@
+# translation of tr.po to
+# translation of engine.po to
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Murat Şenel <muratasenel@gmail.com>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: tr\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-02-02 15:52-0800\n"
+"PO-Revision-Date: 2007-07-10 00:08+0300\n"
+"Last-Translator: Murat Şenel <muratasenel@gmail.com>\n"
+"Language-Team:  <tr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: action/action_build.cpp:131
+msgid "You cannot reach building place"
+msgstr "İnşa yerine ulaşamazsınız"
+
+#: action/action_build.cpp:214
+#, c-format
+msgid "You cannot build %s here"
+msgstr "%s burada inşa edilemez"
+
+#: action/action_build.cpp:228
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Daha fazla %s birimi inşa edilemiyor"
+
+#: action/action_build.cpp:260
+#, c-format
+msgid "Unable to create building %s"
+msgstr "%s binası inşa edilemiyor"
+
+#: action/action_build.cpp:454
+#, c-format
+msgid "New %s done"
+msgstr "Yeni %s tamamlandı"
+
+#: action/action_spellcast.cpp:171
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: büyü için gereken mana yok: %s"
+
+#: action/action_spellcast.cpp:175
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: büyü yapılamıyor: %s"
+
+#: action/action_train.cpp:184
+#, c-format
+msgid "New %s ready"
+msgstr "Yeni %s hazır"
+
+#: action/action_train.cpp:235
+#, c-format
+msgid "Unable to train %s"
+msgstr "%s eğitimi yapılamıyor"
+
+#: action/command.cpp:1025
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Oyuncu \"%s\" oynu terk etti"
+
+#: action/command.cpp:1027
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Oyuncu \"%s\" öldürüldü"
+
+#: editor/editloop.cpp:1229
+msgid "Unit can't be placed here."
+msgstr "Birlik buraya yerleştirilemez."
+
+#: editor/editloop.cpp:1301
+msgid "Mirror editing enabled: 2-side"
+msgstr "Yansı düzenlemesi etkinleştirildi: 2-taraf"
+
+#: editor/editloop.cpp:1304
+msgid "Mirror editing enabled: 4-side"
+msgstr "Yansı düzenlemesi etkinleştirildi: 4-taraf"
+
+#: editor/editloop.cpp:1307
+msgid "Mirror editing disabled"
+msgstr "Yansı düzenlemesi kapatıldı"
+
+#: editor/editloop.cpp:1327
+msgid "Unit deleted"
+msgstr "Birlik silindi"
+
+#: editor/editloop.cpp:1350 editor/editloop.cpp:1359
+msgid "Unit owner modified"
+msgstr "Birliğin sahibi değiştirildi"
+
+#: editor/editloop.cpp:1680
+msgid "Select mode"
+msgstr "Seçme modu"
+
+#: editor/editloop.cpp:1690
+msgid "Unit mode"
+msgstr "Birlik modu"
+
+#: editor/editloop.cpp:1701
+msgid "Tile mode"
+msgstr "Döşeme modu"
+
+#: editor/editloop.cpp:1712
+msgid "Set start location mode"
+msgstr "Başlangıç noktası belirleme modu"
+
+#: game/player.cpp:705
+msgid "Building Limit Reached"
+msgstr "İnşa Üst Sınırına Ulaşıldı"
+
+#: game/player.cpp:709
+msgid "Unit Limit Reached"
+msgstr "Birlik Sınırına Ulaşıldı"
+
+#: game/player.cpp:713
+msgid "Total Unit Limit Reached"
+msgstr "Toplam Birlik Üst Sınırına Ulaşıldı"
+
+#: game/player.cpp:717
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "Bu birlik türü için %d sınırına ulaşıldı"
+
+#: game/player.cpp:723
+msgid "Cannot create more units."
+msgstr "Daha fazla birlik oluşturulamıyor."
+
+#: game/replay.cpp:787
+msgid "No sync info for this replay !"
+msgstr "Yeniden oynatma için bir eşzamanlama yok!"
+
+#: game/replay.cpp:789
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Yeniden oynatma eşzamanlamayı aştı (%lu) !"
+
+#: game/replay.cpp:798
+msgid "Replay got out of sync !"
+msgstr "Yeniden oynatma eşzamanlamayı aştı !"
+
+#: game/replay.cpp:896 game/replay.cpp:910
+msgid "End of replay"
+msgstr "Yeniden oynatma sonu"
+
+#: network/network.cpp:1060
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s hatalı komut gönderdi"
+
+#: network/network.cpp:1157
+msgid "Network out of sync"
+msgstr "Ağ eşzamanlama hatasına uğradı"
+
+#: network/network.cpp:1390
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "\"%s\" oyuncusu bekleniyor: %d:%02d"
+
+#: network/network.cpp:1406
+msgid "Timed out"
+msgstr "Süre bitti"
+
+#: stratagus/stratagus.cpp:594
+#, c-format
+msgid "Thanks for playing Bos Wars.\n"
+msgstr "Bos Wars oynadığınız için teşekkür ederiz.\n"
+
+#: ui/botpanel.cpp:785 ui/botpanel.cpp:850
+msgid "Select Target"
+msgstr "Hedef Seçin"
+
+#: ui/botpanel.cpp:898
+msgid "Select Location"
+msgstr "Yer Seçin"
+
+#: ui/interface.cpp:107
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "MESAJ:%s~!_"
+
+#: ui/interface.cpp:259
+msgid "Sound is on."
+msgstr "Ses açık."
+
+#: ui/interface.cpp:261
+msgid "Sound is off."
+msgstr "Ses kapalı."
+
+#: ui/interface.cpp:276
+msgid "Music is off."
+msgstr "Müzik açık."
+
+#: ui/interface.cpp:279
+msgid "Music is on."
+msgstr "Müzik kapalı."
+
+#: ui/interface.cpp:292 ui/mouse.cpp:1609
+msgid "Game Paused"
+msgstr "Oyun Durduruldu"
+
+#: ui/interface.cpp:294
+msgid "Game Resumed"
+msgstr "Oyun Yeniden Başlatıldı"
+
+#: ui/interface.cpp:325
+msgid "Big map enabled"
+msgstr "Büyük harita etkinleştirildi"
+
+#: ui/interface.cpp:334
+msgid "Returning to old map"
+msgstr "Eski haritaya geri dönülüyor"
+
+#: ui/interface.cpp:348
+msgid "Faster"
+msgstr "Daha hızlı"
+
+#: ui/interface.cpp:367
+msgid "Slower"
+msgstr "Daha yavaş"
+
+#: ui/interface.cpp:422
+msgid "Terrain displayed."
+msgstr "Arazi gösteriliyor."
+
+#: ui/interface.cpp:424
+msgid "Terrain hidden."
+msgstr "Arazi gösterilmiyor."
+
+#: ui/interface.cpp:457
+msgid "Grab mouse toggled."
+msgstr "Fare geçişi."
+
+#: ui/interface.cpp:939
+msgid "Screenshot made."
+msgstr "Ekran görüntüsü alındı."
+
+#: ui/mainscr.cpp:171
+msgid "Armor: "
+msgstr ""
+
+#: ui/mainscr.cpp:177
+msgid "Radar Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:182
+msgid "Sight Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:189
+msgid "Kills: "
+msgstr ""
+
+#: ui/mainscr.cpp:194
+msgid "Attack Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:201
+msgid "Damage: "
+msgstr ""
+
+#: ui/mainscr.cpp:206
+msgid "Mana: "
+msgstr ""
+
+#: ui/mainscr.cpp:376
+msgid "Energy"
+msgstr "Enerji"
+
+#: ui/mainscr.cpp:376
+msgid "Magma"
+msgstr "Magma"
+
+#: ui/mainscr.cpp:602
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "~<%d~>tekrarlanan son mesaj"
+
+#: ui/mainscr.cpp:734
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Olay: %s~>"
+
+#: ui/mouse.cpp:1774
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "~<%d~> %ss sahipsiniz"
+
+#: ui/mouse.cpp:1778
+#, c-format
+msgid "You have ~<%d~> %s(s)"
+msgstr "~<%d~> %s(s) sahipsiniz"
+
+#: unit/unit.cpp:2117
+#, c-format
+msgid "%s attacked"
+msgstr "%s saldırıldı"
+
+#: video/sdl.cpp:268
+msgid "esc"
+msgstr ""
+
+#~ msgid "~!OK"
+#~ msgstr "~!Tamam"
+
+#~ msgid "~!Cancel"
+#~ msgstr "~!İptal et"

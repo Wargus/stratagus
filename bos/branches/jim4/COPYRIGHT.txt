@@ -1,0 +1,282 @@
+This work, Bos Wars, is copyrighted in 2004-2008 by Tina Petersen Jensen, 
+Francois Beerten et al. 
+
+This game is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or 
+(at your option) any later version.
+
+This game is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+02110-1301, USA.
+
+
+Bos Wars as a whole is distributed under the GNU general public 
+license version 2, which is available in the file LICENSE.txt.
+
+The license covers the whole game including all of the game scripts, graphics, 
+and sounds. Note that if it did not, you would have no license and thus no 
+right to use them. All the elements in Bos Wars, like for example 
+the scripts or graphics, are all built (written, drawn, rendered,...) such 
+that they link together.
+
+Bos Wars as a whole forms a copyrighted work. Any project which 
+uses *any* part of Bos Wars creates a derived work. As such the 
+conditions of the GPL apply and for instance the resulting work (as a whole) 
+must be licensed under the GPL too.
+
+The GPL defines the source of a work to be the preferred form of the work 
+for making modifications to it. This means for e.g. rendered images the 
+complete 3d-model used to generate the image (e.g. including the raw images of 
+the textures), or for music the midi files used to generate it (if done so) 
+with the addditional patch sets.
+
+The sources can be downloaded from the project website (http://bos.seul.org) or 
+got upon request.
+
+As a special exception the sources are not required for the following files:
+  graphics/elites/missile/nuke.png
+  graphics/elites/ui/ui_1024_bpanel.png
+  graphics/elites/ui/ui_1280_bpanel.png
+  graphics/elites/ui/ui_1600_bpanel.png
+  graphics/elites/ui/ui_640_bpanel.png
+  graphics/elites/ui/ui_800_bpanel.png
+  graphics/elites/ui/ui_info.png
+  graphics/elites/ui/ui_minimap.png
+  graphics/general/ui_buttons.png
+  graphics/missiles/green_cross.png
+  graphics/neutral/units/corpses.png
+  graphics/screens/defeat.png
+  graphics/screens/menu.png
+  graphics/screens/victory.png
+  graphics/tiles/desert.png
+  graphics/ui/rosace1.png
+  graphics/ui/x_startpoint.png
+  maps/antarticum/terrain.png
+  maps/battlefield/terrain.png
+  maps/bridge/terrain.png
+  maps/canyon/terrain.png
+  maps/islandwar/terrain.png
+  maps/patches/128x.png
+  maps/patches/256x.png
+  maps/patches/32x.png
+  maps/patches/512-hill-01x.png
+  maps/patches/512-hill-02x.png
+  maps/patches/512-hill-03x.png
+  maps/patches/512-hill-04x.png
+  maps/patches/512-lake-01x.png
+  maps/patches/512x.png
+  maps/patches/64x.png
+  maps/patches/terrain.png
+  maps/river/terrain.png
+  maps/tutorial/terrain.png
+  sounds/bazoo_g_hit.wav
+  sounds/grenadier_g_hit.wav
+  sounds/ui/click.wav.gz
+  units/antharus/antharus.png
+  units/antharus/icon.png
+  units/apcs/ico_apcs.png
+  units/apcs/smolder_action.wav
+  units/apcs/smolder_attack.wav
+  units/apcs/smolder.completed.wav
+  units/apcs/smolder_die.wav
+  units/apcs/smolder_select.wav
+  units/apcs/smolder.underattack.wav
+  units/apcs/unit_apcs.png
+  units/apcs/unit_apcs_s.png
+  units/artil/ico_artil.png
+  units/artil/unit_artil.png
+  units/artil/unit_artil_s.png
+  units/assault/assault_action.wav
+  units/assault/assault_attack.wav
+  units/assault/assault_die.wav
+  units/assault/assault_select.wav
+  units/assault/assault.unit.ready.wav
+  units/assault/assault.unit.underattack.wav
+  units/bazoo/bazoo_action.wav
+  units/bazoo/bazoo_attack.wav
+  units/bazoo/bazoo_die.wav
+  units/bazoo/bazoo.ready.wav
+  units/bazoo/bazoo_select.wav
+  units/bazoo/bazoo.underattack.wav
+  units/bazoo/ico_bazoo.png
+  units/bazoo/unit_bazoo_c.png
+  units/bazoo/unit_bazoo.png
+  units/bazoo/unit_bazoo_s.png
+  units/bomber/ico_bomber.png
+  units/bomber/missile.png
+  units/bomber/unit_bomber.png
+  units/bomber/unit_bomber_s.png
+  units/camera/sfx_camera.select.wav
+  units/camp/sfx_camp.die.wav
+  units/camp/sfx_camp.select.wav
+  units/camp/training.camp.completed.wav
+  units/camp/training.camp.underattack.wav
+  units/chopper/ico_chopper.png
+  units/chopper/unit_chopper.png
+  units/chopper/unit_chopper_s.png
+  units/corpses/build-dead-2.png
+  units/dorcoz/ico_dorcoz.png
+  units/dorcoz/mis_plasma_sml.png
+  units/dorcoz/unit_dorcoz.png
+  units/engineer/engineer_action.wav
+  units/engineer/engineer_attack.wav
+  units/engineer/engineer_die.wav
+  units/engineer/engineer.ready.wav
+  units/engineer/engineer_select.wav
+  units/engineer/engineer.underattack.wav
+  units/engineer/ico_engineer.png
+  units/engineer/unit_engineer_c.png
+  units/engineer/unit_engineer.png
+  units/engineer/unit_engineer_s.png
+  units/generator/power.plant.completed.wav
+  units/generator/power.plant.underattack.wav
+  units/generator/sfx_pplnt.die.wav
+  units/generator/sfx_pplnt.select.wav
+  units/grenadier/grenadier_action.wav
+  units/grenadier/grenadier_attack.wav
+  units/grenadier/grenadier_die.wav
+  units/grenadier/grenadier.ready.wav
+  units/grenadier/grenadier_select.wav
+  units/grenadier/grenadier.underattack.wav
+  units/grenadier/ico_grenadier.png
+  units/grenadier/unit_grenadier_c.png
+  units/grenadier/unit_grenadier.png
+  units/grenadier/unit_grenadier_s.png
+  units/gturret/gturret_attack.wav
+  units/gturret/gturret_select.wav
+  units/harvester/harvester_action.wav
+  units/harvester/harvester_attack.wav
+  units/harvester/harvester.completed.wav
+  units/harvester/harvester_die.wav
+  units/harvester/harvester_select.wav
+  units/harvester/harvester.underattack.wav
+  units/hospital/hospital.completed.wav
+  units/hospital/hospital.underattack.wav
+  units/hospital/sfx_hosp.die.wav
+  units/hospital/sfx_hosp.select.wav
+  units/medic/medic_action.wav
+  units/medic/medic_attack.wav
+  units/medic/medic_die.wav 
+  units/medic/medic.ready.wav
+  units/medic/medic_select.wav
+  units/medic/medic.underattack.wav
+  units/morels/morel_1i.png
+  units/morels/morel_1.png
+  units/morels/morel_1s.png
+  units/morels/morel_2i.png
+  units/morels/morel_2.png
+  units/morels/morel_2s.png
+  units/morels/morel_3i.png
+  units/morels/morel_3.png
+  units/morels/morel_3s.png
+  units/morels/morel_4i.png
+  units/morels/morel_4.png
+  units/morels/morel_4s.png
+  units/morels/morel_5i.png
+  units/morels/morel_5.png
+  units/morels/morel_5s.png
+  units/morels/morel_6i.png
+  units/morels/morel_6.png
+  units/morels/morel_6s.png
+  units/morels/morel_7i.png
+  units/morels/morel_7.png
+  units/morels/morel_7s.png
+  units/nukeplant/power.plant.completed.wav
+  units/nukeplant/power.plant.underattack.wav
+  units/nukeplant/sfx_pplnt.die.wav
+  units/nukeplant/sfx_pplnt.select.wav
+  units/radar/sfx_rdar.select.wav
+  units/research/research.completed.wav
+  units/research/research.facility.completed.wav
+  units/research/research.facility.underattack.wav
+  units/research/sfx_rfac.die.wav
+  units/research/sfx_rfac.select.wav
+  units/rocks/rock_1i.png
+  units/rocks/rock_1.png
+  units/rocks/rock_1s.png
+  units/rocks/rock_2i.png
+  units/rocks/rock_2.png
+  units/rocks/rock_2s.png
+  units/rocks/rock_3i.png
+  units/rocks/rock_3.png
+  units/rocks/rock_3s.png
+  units/rocks/rock_4i.png
+  units/rocks/rock_4.png
+  units/rocks/rock_4s.png
+  units/rocks/rock_5i.png
+  units/rocks/rock_5.png
+  units/rocks/rock_5s.png
+  units/rocks/rock_6i.png
+  units/rocks/rock_6.png
+  units/rocks/rock_6s.png
+  units/rocksfield/ico_rocks_field.png
+  units/rocksfield/rocks_field.png
+  units/rocksfield/rocks_field_s.png
+  units/rtank/ico_rtank.png
+  units/rtank/unit_rtank.png
+  units/rtank/unit_rtank_s.png
+  units/tank/ico_tank.png
+  units/tank/unit_tank.png
+  units/tank/unit_tank_s.png
+  units/tree/tree01_i.png
+  units/tree/tree01.png
+  units/tree/tree01_s.png
+  units/tree02/tree02.png
+  units/tree02/tree02_s.png
+  units/tree03/tree03.png
+  units/tree03/tree03_s.png
+  units/tree04/tree04.png
+  units/tree04/tree04_s.png
+  units/vault/elite.fort.completed.wav
+  units/vault/elite.fort.underattack.wav
+  units/vault/sfx_fort.die.wav
+  units/vault/sfx_fort.select.wav
+  units/vehiclefactory/sfx_vfac.die.wav
+  units/vehiclefactory/sfx_vfac.select.wav
+  units/vehiclefactory/vehicle_c.png
+  units/vehiclefactory/vehicle.factory.completed.wav
+  units/vehiclefactory/vehicle_factory_i.png
+  units/vehiclefactory/vehicle_factory.png
+  units/vehiclefactory/vehicle_factory_s.png
+  units/vehiclefactory/vehicle.factory.underattack.wav
+  video/bos_intro.ogg
+  video/stratagus_intro.ogg
+If a file from this list is renamed, this list should be changed accordingly. 
+If a file from this list is deleted, then it should be 
+removed from this list. The exception does not apply if a file from this
+list is replaced or changed. In that case, the file has to be removed from 
+the list and sources provided.
+
+By default, the content of Bos Wars is distributed under the GNU General 
+Public License version 2, or (at your option) any later version. 
+
+The Bos Wars engine is based on the Stratagus engine. The engine is 
+distributed under the GNU General Public License version 2. This implies
+that the whole project can only be distributed under the GNU General Public
+License version 2 and not later versions as long as that engine is used.
+
+The engine includes the following elements which have their own 
+licence and copyrights:
+* Guichan from http://guichan.sourceforge.net/. 
+  Details in doc/guichan-copyright.txt.
+* Tolua++ from http://www.codenix.com/~tolua/. 
+  Details in doc/tolua-copyright.txt.
+
+The binary packages with static builds can also include the following elements:
+* SDL from http://www.libsdl.org/.
+  Details in doc/README-SDL.txt.
+* Lua from http://lua.org 
+  Details in doc/lua-copyright.txt.
+* Vorbis, Ogg and Theora from http://xiph.org/. 
+  Details in doc/xiph-copyright.txt.
+* libstdc++ and libgcc_p from ftp://gcc.gnu.org/pub/gcc/releases/. 
+  Details in doc/gcclibs-copyright.txt.
+
+This text forms the copyright notice and may not be altered.

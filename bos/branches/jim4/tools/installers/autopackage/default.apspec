@@ -1,0 +1,71 @@
+# -*- shell-script -*-
+# This file is a part of the Bos Wars project.
+# Copyright 2007 by François Beerten.
+[Meta]
+ShortName: boswars
+SoftwareVersion: 2.3
+DisplayName: Bos Wars
+RootName: @boswars.org/boswars:$SOFTWAREVERSION
+Summary: A futuristic real-time strategy game.
+Maintainer: Francois Beerten
+Packager: Francois Beerten
+PackageVersion: 1
+CPUArchitectures: x86
+AutopackageTarget: 1.0
+Type: Application
+License: GPL
+
+[Description]
+Invasion - Battle of Survival is a real-time strategy game using the
+Stratagus game engine.
+
+For more info look at:
+
+http://www.boswars.org
+
+[BuildPrepare]
+# If you're using autotools, the default should be enough.
+# prepareBuild will set up apbuild and run configure for you. If you
+# need to pass arguments to configure, just add them to prepareBuild:
+# prepareBuild --enable-foo --disable-bar
+scons CXX=apg++ static=1 debug=0
+echo $build_root
+mkdir $build_root/bin
+install -m 755 boswars $build_root/bin/boswars-engine
+install -m 755 installers/autopackage/boswars $build_root/bin/boswars
+svn export -r BASE $source_dir $build_root/boswars
+
+
+
+[BuildUnprepare]
+# buggy code
+
+[Globals]
+
+[Prepare]
+#buggy makeinstaller
+# statically linked now. #require '@gnu.org/libstdc++' 4  
+require '@libsdl.org/sdl' 1.2
+require '@xiph.org/libogg' 0
+require '@xiph.org/libvorbis' 0 
+#require '@libpng.org/libpng' 3
+#require '@zlib.org/zlib' 1
+
+[Imports]
+# This command will tell makeinstaller what to include in the package.
+# The selection comes from the files created by 'make install' or equivalent.
+# Usually, you can leave this at the default
+# svn ls -r BASE -R $source_dir/ | grep -v "/$" |xargs -i echo $source_dir/'{}' | import
+echo '*' | import
+
+[Install]
+# See http://www.autopackage.org/api/ for details
+safeSed bin/boswars  "s|__PREFIX__|$PREFIX|"
+installData boswars
+installExe bin/*
+
+[Uninstall]
+# Leaving this at the default is safe unless you use custom commands in
+# "Install" to create files. By default, all autopackage API functions are
+# logged.
+uninstallFromLog

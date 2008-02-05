@@ -1,0 +1,1147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith, Francois Beerten
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Stratagus Configuration Language Description: Config</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Config</h1>
+<hr>
+<a href="../index.html">Bos Wars</a>
+<a href="../faq.html">FAQ</a>
+<a href="ai.html">PREV</a>
+<a href="game.html">NEXT</a>
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#AStar">AStar</a>
+<a href="#DecorationOnTop">DecorationOnTop</a>
+<a href="#DefineDecorations">DefineDecorations</a>
+<a href="#DefineDefaultActions">DefineDefaultActions</a>
+<a href="#DefineDefaultIncomes">DefineDefaultIncomes</a>
+<a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
+<a href="#DefineSprites">DefinesSprites</a>
+<a href="#GetVideoFullScreen">GetVideoFullScreen</a>
+<a href="#GetVideoResolution">GetVideoResolution</a>
+<a href="#HealthSprite">HealthSprite</a>
+<a href="#ManaSprite">ManaSprite</a>
+<a href="#RevealMap">RevealMap</a>
+<a href="#RightButtonAttacks">RightButtonAttacks</a>
+<a href="#RightButtonMoves">RightButtonMoves</a>
+<a href="#SavePreferences">SavePreferences</a>
+<a href="#SetAllPlayersBuildingLimit">SetAllPlayersBuildingLimit</a>
+<a href="#SetAllPlayersUnitLimit">SetAllPlayersUnitLimit</a>
+<a href="#SetAllPlayersTotalUnitLimit">SetAllPlayersTotalUnitLimit</a>
+<a href="#SetBuildingCapture">SetBuildingCapture</a>
+<a href="#SetClickMissile">SetClickMissile</a>
+<a href="#SetCurrentChapter">SetCurrentChapter</a>
+<a href="#SetCurrentTip">SetCurrentTip</a>
+<a href="#SetDamageMissile">SetDamageMissile</a>
+<a href="#SetDoubleClickDelay">SetDoubleClickDelay</a>
+<a href="#SetEditorSelectIcon">SetEditorSelectIcon</a>
+<a href="#SetEditorUnitsIcon">SetEditorUnitsIcon</a>
+<a href="#SetEditorStartUnit">SetEditorStartUnit</a>
+<a href="#SetFogOfWar">SetFogOfWar</a>
+<a href="#SetFogOfWarGraphics">SetFogOfWarGraphics</a>
+<a href="#SetFogOfWarOpacity">SetFogOfWarOpacity</a>
+<a href="#SetGrabMouse">SetGrabMouse</a>
+<a href="#SetGodMode">SetGodMode</a>
+<a href="#SetGroupKeys">SetGroupKeys</a>
+<a href="#SetHoldClickDelay">SetHoldClickDelay</a>
+<a href="#SetKeyScroll">SetKeyScroll</a>
+<a href="#SetKeyScrollSpeed">SetKeyScrollSpeed</a>
+<a href="#SetLeaveStops">SetLeaveStops</a>
+<a href="#SetMaxSelectable">SetMaxSelectable</a>
+<a href="#SetMetaServer">SetMetaServer</a>
+<a href="#SetMinimapTerrain">SetMinimapTerrain</a>
+<a href="#SetMouseScroll">SetMouseScroll</a>
+<a href="#SetMouseScrollSpeed">SetMouseScrollSpeed</a>
+<a href="#SetMouseScrollSpeedControl">SetMouseScrollSpeedControl</a>
+<a href="#SetMouseScrollSpeedDefault">SetMouseScrollSpeedDefault</a>
+<a href="#SetRevealAttacker">SetRevealAttacker</a>
+<a href="#SetSelectionStyle">SetSelectionStyle</a>
+<a href="#SetShowAttackRange">SetShowAttackRange</a>
+<a href="#SetShowCommandKey">SetShowCommandKey</a>
+<a href="#SetShowOrders">SetShowOrders</a>
+<a href="#SetShowReactionRange">SetShowReactionRange</a>
+<a href="#SetShowSightRange">SetShowSightRange</a>
+<a href="#SetShowTips">SetShowTips</a>
+<a href="#SetSpeedBuild">SetSpeedBuild</a>
+<a href="#SetSpeedResearch">SetSpeedResearch</a>
+<a href="#SetSpeedTrain">SetSpeedTrain</a>
+<a href="#SetSpeedUpgrade">SetSpeedUpgrade</a>
+<a href="#SetSpeeds">SetSpeeds</a>
+<a href="#SetTitleScreens">SetTitleScreens</a>
+<a href="#SetTrainingQueue">SetTrainingQueue</a>
+<a href="#SetXpDamage">SetXpDamage</a>
+<a href="#SetUseHPForXp">SetUseHPForXp</a>
+<a href="#SetVideoFullScreen">SetVideoFullScreen</a>
+<a href="#SetVideoResolution">SetVideoResolution</a>
+<a href="#ShowEnergySelectedOnly">ShowEnergySelectedOnly</a>
+<a href="#ShowFull">ShowFull</a>
+<a href="#DefineDecoration">DefineDecoration</a>
+<a href="#ShowHealthBar">ShowHealthBar</a>
+<a href="#ShowHealthDot">ShowHealthDot</a>
+<a href="#ShowHealthHorizontal">ShowHealthHorizontal</a>
+<a href="#ShowHealthVertical">ShowHealthVertical</a>
+<a href="#ShowManaBar">ShowManaBar</a>
+<a href="#ShowManaDot">ShowManaDot</a>
+<a href="#ShowManaHorizontal">ShowManaHorizontal</a>
+<a href="#ShowManaVertical">ShowManaVertical</a>
+<a href="#ShowNoFull">ShowNoFull</a>
+
+<hr>
+<h2>Intro - Introduction to config functions and variables</h2>
+
+General configurations.
+
+<h2>Functions</h2>
+<a name="AStar"></a>
+<h3>AStar(tag, value, ...)</h3>
+
+Sets variables about the pathfinder.
+What the movement cost for unseen terrian is and whether units are aware of what's under unseen terrain.
+Items can be turned on and off to give desired behaviour, however dont-know-unseen-terrain will increase
+the amount the pathfinder is used at the start of a game while the map is being discovered.  If you need
+the performance, turn it off.
+<p>
+The Cost of a move is 1 if moving straight, or 2 if moving diagonal.
+
+<dl>
+  <dt>"fixed-unit-cost", number</dt>
+  <dd>cost to move over a unit that is standing still. (must be greater than 3)
+  </dd>
+  <dt>"moving-unit-cost", number</dt>
+  <dd>cost to move over a unit that is moving to somewhere. (must be greater than 3)
+  </dd>
+  <dt>"unseen-terrain", number</dt>
+  <dd>Whether the pathfinder treats unknown terrain as visible when calculating paths or not. &lt;'dont-know-unseen-terrain|'know-unseen-terrain&gt;
+  </dd>
+  <dt>"unseen-terrain-cost", number</dt>
+  <dd>Extra cost to move on unseen terrain, makes units tend towards know areas when finding paths.
+  </dd>
+  <dt>"know-unseen-terrain"</dt>
+  <dd>consider (FIXME ? AI and human ?) know(s) all the terrain.</dd>
+  <dt>"dont-know-unseen-terrain"</dt>
+  <dd>consider (FIXME ? AI and human ?) do(es)n't know all the terrain.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "unseen-terrain-cost", 2)
+</pre>
+
+<a name="DecorationOnTop"></a>
+<h3>DecorationOnTop()</h3>
+
+Show bars and dots always on top.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<a name="DefineDefaultActions"></a>
+<h3>DefineDefaultActions("name", ...)</h3>
+
+Defines the names of the actions used to harvest/get resources. eg mine gold, or drill oil.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name to give to the action associated with the resource.</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- In the same order as resources are defined.
+    DefineDefaultActions("stop", "mine", "chop", "drill", "mine", "mine", "mine")
+</pre>
+
+<a name="DefineDefaultIncomes"></a>
+<h3>DefineDefaultIncomes([number, number, ...])</h3>
+
+Defines the amount of resource to pickup by default when harvesting/collecting.
+When collecting gold for example you get 100 gold for a single pickup.
+
+<dl>
+<dt>number</dt>
+<dd>The amount of resource to collect by default per pickup.
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Define 7 default incomes
+    -- Resources "time", "gold", "wood", "oil", "ore", "stone", "coal"
+    DefineDefaultIncomes(0, 100, 100, 100, 100, 100, 100)
+</pre>
+
+<a name="DefineDefaultResourceNames"></a>
+<h3>DefineDefaultResourceNames("name", ...)</h3>
+
+Names the resources in a given order.
+
+<dl>
+<dt>name</dt>
+<dd>Name to give to the resource
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Define Resource names
+    DefineDefaultResourceNames(
+        "time", "gold", "wood", "oil", "ore", "stone", "coal")
+</pre>
+
+
+<a name="DefineSprites"></a>
+<h3>DefineSprite({tag = value}, ...)</h3>
+
+Define sprite to be shown for variables.
+
+
+
+<dl>
+  Tag could be :
+  <dt>Name = "sprite-name"</dt>
+  <dd>name of the sprite</dd>
+  <dt>File = "filename"</dt>
+  <dd>filename containing the sprite</dd>
+  <dt>Offset = {x, y}</dt>
+  <dd>offset when drawing the sprite</dd>
+  <dt>Size = {width, height}</dt>
+  <dd>Size of the sprite (!= of size of image)</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- It is equivalent to :
+-- HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
+-- ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
+DefineSprites({Name = "sprite-health", File = "graphics/ui/health2.png", Offset = {0, -4}, Size = {31, 4}},
+    {Name = "sprite-mana", File = "graphics/ui/mana2.png", Offset = {0, -1}, Size = {31, 4}})
+</pre>
+
+<a name="GetVideoFullScreen"></a>
+<h3>GetVideoFullScreen()</h3>
+
+Check if the game is in full screen or windowed mode.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>True if full screen, false if in windowed mode</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Get Fullscreen
+    fullscreen = GetVideoFullScreen()
+</pre>
+
+<a name="GetVideoResolution"></a>
+<h3>GetVideoResolution()</h3>
+
+Get the video resolution.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Width and Height of current resolution</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Get the video resolution
+    w,h = GetVideoResolution()
+</pre>
+
+<a name="HealthSprite"></a>
+<h3>HealthSprite(file, hotx, hoty, width, height)</h3>
+
+Define health-sprite.
+
+<dl>
+  <dt>"file"</dt>
+  <dd>file where is the image.</dd>
+  <dt>hotx, hoty</dt>
+  <dd>offset from the sprite when it is drawn.</dd>
+  <dt>width, height</dt>
+  <dd>Size of the health sprite image.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+    HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
+</pre>
+
+<h4>Note</h4>
+Use <a href="#DefineSprites">DefineSprites</a> instead with Name="sprite-health".
+
+<a name="ManaSprite"></a>
+<h3>ManaSprite(file, hotx, hoty, width, height)</h3>
+
+Define mana-sprite.
+
+<dl>
+  <dt>"file"</dt>
+  <dd>file where is the image.</dd>
+  <dt>hotx, hoty</dt>
+  <dd>offset from teh sprite when it is drawn.</dd>
+  <dt>width, height</dt>
+  <dd>Size of the image.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+<h4>Example</h4>
+<pre>
+ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
+</pre>
+
+<h4>Note</h4>
+Use <a href="#DefineSprites">DefineSprites</a> instead with Name="sprite-mana".
+
+<a name="DefineDecorations"></a>
+<h3>DefineDecorations({tag = value, ...}, ...)</h3>
+Define how to show variables. 
+
+<dl>
+  <dt>Index = variable</dt>
+  <dd>
+  To which variable it applies. Variables could be
+  <dl>
+    <dt>Hitpoints</dt>
+    <dd>represent the HP of the unit.</dd>
+    <dt>Mana</dt>
+    <dd>represent the mana of the unit.</dd>
+    <dt>Transport</dt>
+    <dd>represent how many units are in the unit.</dd>
+    <dt>Ressources</dt>
+    <dd>represent ressource for gathering and gathered unit.</dd>
+    <dt>Training</dt>
+    <dd>represent the elapsed time of unit in training.</dd>
+    <dt>Research</dt>
+    <dd>represent the elapsed time for research.</dd>
+    <dt>UpgradeTo</dt>
+    <dd>represent the elapse time to evolve in the new unit.</dd>
+    <dt>variable</dt>
+    <dd>variable defined with <a href="unittype.html#DefineVariables">DefineVariables()</a></dd>
+  </dl>
+  </dd>
+  <dt>Offset = {x, y}, OffsetPercent = {xp, yp}</dt>
+  <dd>Decoration is placed at {x + weight(unit) * xp, y + height(unit) * yp} from the unit.</dd>
+  <dt>CenterX = boolean, CenterY = boolean</dt>
+  <dd>If set to true, use center of decoration instead of the upper-left corner.</dd>
+  <dt>ShowIfNotEnable = boolean</dt>
+  <dd>if false (default), show decoration only when variable is enable.</dd>
+  <dt>ShowWhenNull = boolean</dt>
+  <dd>if true, show also when variable value is 0.</dd>
+  <dt>HideHalf = boolean</dt>
+  <dd>if true, don't show when variable value is not 0 nor max.</dd>
+  <dt>ShowWhenMax = boolean</dt>
+  <dd>if false, don't show when variable value is max.</dd>
+  <dt>ShowOnlySelected = boolean</dt>
+  <dd>if true, show only when unit is selected.</dd>
+  <dt>HideNeutral = boolean</dt>
+  <dd>if true, don't show for neutral unit.</dd>
+  <dt>HideAllied = boolean</dt>
+  <dd>if true, don't show for allied unit (but show your :) ).</dd>
+  <dt>ShowOpponent = boolean</dt>
+  <dd>if true, show also for opponent unit.</dd>
+
+  <dt>Method = {method-name, {tag = value}}</dt>
+    <dd>Which method we use to show variable. It could be a bar, a sprite, a number...</dd>
+    <dl>
+      <dt>"text", {}</dt>
+      <dd>Show the value with a number</dd>
+      <dt>"static-sprite", {"sprite-name", number}</dt>
+      <dd>Use the number icon of the sprite (defined by <a href="#DefineSprites">DefineSprites()</a>)</dd>
+      <dt>"sprite", {"sprite-name"}</dt>
+      <dd>Show the p-th icon of the sprite
+		(p depands of variable percent value: from full (left) to empty (right of th image)).
+		The sprite is defined by <a href="#DefineSprites">DefineSprites()</a>.</dd>
+      <dt>"bar", {tag, value}</dt>
+      <dd>Show like a rectangular bar.</dd>
+      <dl>
+        <dt>Orientation = "vertical" or "horizontal"</dt>
+        <dd>orientation of the bar, default is horizontal</dd>
+        <dt>SEToNW = boolean</dt>
+        <dd>
+        if true, bar is growing from bottom to uppper border (for vertical bar)
+        or right to left (for horizontal bar)
+        (South-Easth to Nord-Weast).
+        </dd>
+        <dt>Height = number, Width = number</dt>
+        <dd>size of the bar, 0 assume size of the unit.</dd>
+        <dt>BorderSize = number</dt>
+        <dd>bar is surroundded with a border.</dd>
+        <dt>ShowFullBackground</dt>
+        <dd>Show badgroung like if value is max</dd>
+      </dl>
+    </dl>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Equivalent of ShowHealthDot
+DefineDecorations({Index = "HitPoints", HideNeutral = true, CenterX = true,
+  OffsetPercent = {50, 100}, Method = {"sprite", {"sprite-health"}}})
+</pre>
+
+
+<a name="RevealMap"></a>
+<h3>RevealMap()</h3>
+
+Reveal the entire map.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+<h4>Example</h4>
+<pre>
+    RevealMap()
+</pre>
+
+<a name="RightButtonAttacks"></a>
+<h3>RightButtonAttacks()</h3>
+
+If you prefer fighters are attacking by right clicking empty space.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+<h4>Example</h4>
+<pre>
+    RightButtonAttacks()
+</pre>
+
+<a name="RightButtonMoves"></a>
+<h3>RightButtonMoves()</h3>
+
+If you prefer fighters are moving by right clicking empty space.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+<h4>Example</h4>
+<pre>
+    RightButtonMoves()
+</pre>
+
+<a name="SavePreferences"></a>
+<h3>SavePreferences</h3>
+
+Save the user preferences
+
+<dl>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+    SavePreferences()
+</pre>
+
+<a name="SetAllPlayersBuildingLimit"></a>
+<h3>SetAllPlayersBuildingLimit(limit)</h3>
+
+Set the limit on the number of buildings a player is allowed to have at one time.
+
+<dl>
+  <dt>limit</dt>
+  <dd>The maximum number of buildings a player can have.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+    SetAllPlayersBuildingLimit(200)
+</pre>
+
+<a name="SetAllPlayersUnitLimit"></a>
+<h3>SetAllPlayersUnitLimit(limit)</h3>
+
+Sets the number of non-building type units a player can have.
+
+<dl>
+  <dt>limit</dt>
+  <dd>Number of non-building unit the player can have</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+    SetAllPlayersUnitLimit(200)
+</pre>
+
+<a name="SetAllPlayersTotalUnitLimit"></a>
+<h3>SetAllPlayersTotalUnitLimit(limit)</h3>
+
+Sets the total number of units a player may have, building or non-building.
+
+<dl>
+  <dt>limit</dt>
+  <dd>The number of units to set the limit to.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+    SetAllPlayersTotalUnitLimit(400)
+</pre>
+
+<a name="SetBuildingCapture"></a>
+<h3>SetBuildingCapture(boolean)</h3>
+
+Enable or disable building capture.
+
+<dl>
+  <dt>boolean</dt>
+  <dd>true or false, depending on if you want building capture enabled.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Old value of Building Capture</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+  SetBuildingCapture(true)
+</pre>
+
+<a name="SetClickMissile"></a>
+<h3>SetClickMissile("missile-type")</h3>
+
+Sets the missile to use for displaying when a player clicks on a location on the map.
+
+<dl>
+  <dt>missile-type</dt>
+  <dd>The missile to use, as defined in the missiles section</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Old value of the click missile</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+    SetClickMissile("missile-green-cross")
+</pre>
+
+<a name="SetCurrentChapter"></a>
+<h3>SetCurrentChapter(number)</h3>
+
+Sets the current chapter in a campaign.  A campaign can have any number of chapters.
+If too large a number is specified, it will default to the last chapter.
+
+<dl>
+<dt>number</dt>
+<dd>The number of the chapter to skip too as define in the campaign definition</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set to chapter 2
+	SetCurrentChapter(2)
+</pre>
+
+<a name="SetCurrentTip"></a>
+<h3>SetCurrentTip(number)</h3>
+
+Sets the number of the tip to display next. If larger than the number of tips or not tips
+are defined, it defaults to Tip 0.
+
+<dl>
+<dt>number</dt>
+<dd>The tip number to use, defaults to 0 on error</dd>
+<dt><i>RETURNS</i></dt>
+<dd>The old tip number that was set</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Tip to No 10
+    SetCurrentTip(10)
+</pre>
+
+<a name="SetDamageMissile"></a>
+<h3>SetDamageMissile("missile-type")</h3>
+
+Sets the missile to use for displaying the damage done to units.
+
+<dl>
+  <dt>"missile-type"</dt>
+  <dd>missile name to use to display the damage</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Old missile type defined as the Damage Missile</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+  SetDamageMissile("missile-hit")
+</pre>
+
+<a name="SetDoubleClickDelay"></a>
+<h3>SetDoubleClickDelay(delay)</h3>
+
+Set the delay of double clicking the mouse.
+
+<dl>
+  <dt>delay</dt>
+  <dd>The delay in ms.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+SetDoubleClickDelay(300)
+</pre>
+
+<a name="SetEditorSelectIcon"></a>
+<h3>SetEditorSelectIcon("icon-name")</h3>
+
+Set the icon that is used in the editor to indicate selection.
+
+<dl>
+  <dt>"icon-name"</dt>
+  <dd>The name of the icon.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+  -- Use "icon-human-patrol-land" for the editor's select icon.
+  SetEditorSelectIcon("icon-human-patrol-land")
+</pre>
+
+<a name="SetEditorUnitsIcon"></a>
+<h3>SetEditorUnitsIcon("icon-name")</h3>
+
+Set the icon that is used in the editory for unit selection.
+
+<dl>
+  <dt>icon</dt>
+  <dd>The name of the icon.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+  -- Use "icon-footman" for the editor's units icon.
+  SetEditorUnitsIcon("unit-footman")
+</pre>
+
+<a name="SetEditorStartUnit"></a>
+<h3>SetEditorStartUnit("unit-start")</h3>
+
+Set the unit used in the editor to show the start location.
+
+<dl>
+  <dt>unit</dt>
+  <dd>The name of the unit.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+  SetEditorStartUnit("unit-start-location")
+</pre>
+
+<a name="SetFogOfWar"></a>
+<h3>SetFogOfWar(boolean)</h3>
+
+If true, enable fog of war.
+
+<a name="SetFogOfWarGraphics"></a>
+<h3>SetFogOfWarGraphics(graphic)</h3>
+
+Set the graphics used to render the borders of the view of the units.
+
+<h4>Example</h4>
+<pre>
+  SetFogOfWarGraphics("general/fog.png")
+</pre>
+
+<a name="SetFogOfWarOpacity"></a>
+<h3>SetFogOfWarOpacity(number)</h3>
+
+Set the level of Opaqueness/transparency of the fog of war (0-255),
+128 is optimized, all other values will be much slower to render.
+
+<h4>Example</h4>
+<pre>
+  SetFogOfWarOpacity(128)
+</pre>
+
+<a name="SetGrabMouse"></a>
+<h3>SetGrabMouse(boolean)</h3>
+
+Enable/disable grabbing the mouse.
+
+<a name="SetGodMode"></a>
+<h3>SetGodMode(boolean)</h3>
+
+Enable/disable god Mode, you do 255 damage, and take 0 damage. You are still vulnerable to spells.
+
+<dl>
+<dt>boolean</dt>
+<dd>#t for on, #f for off</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set God mode on
+    SetGodMode(#t)
+</pre>
+
+<a name="SetHoldClickDelay"></a>
+<h3>SetHoldClickDelay(delay)</h3>
+
+for the wanted hold-click delay (in ms)..
+
+<h4>Example</h4>
+<pre>
+  SetHoldClickDelay(1000)
+</pre>
+
+<a name="SetKeyScroll"></a>
+<h3>SetKeyScroll(boolean)</h3>
+
+enable/disable keyboard scrolling.
+
+<a name="SetKeyScrollSpeed"></a>
+<h3>SetKeyScrollSpeed(number)</h3>
+
+Set keyboard scroll speed in frames (1 = each frame,2 each second,...)
+
+<h4>Example</h4>
+<pre>
+ SetKeyScrollSpeed(1)
+</pre>
+
+<a name="SetLeaveStops"></a>
+<h3>SetLeaveStops(boolean)</h3>
+
+Enable/disable stopping scrolling on mouse leave.
+
+<h4>Example</h4>
+<pre>
+SetLeaveStops(true)
+</pre>
+
+<a name="SetMaxSelectable"></a>
+<h3>SetMaxSelectable(number)</h3>
+
+Set the maximum number of selectable units. (must be positive value)
+
+<h4>Example</h4>
+<pre>
+SetMaxSelectable(18)
+</pre>
+
+<a name="SetMetaServer"></a>
+<h3>SetMetaServer("host", port)</h3>
+
+Set the default server for internet play. 
+If you leave this blank, The Multiplay button will default to LAN game.
+
+<h4>Example</h4>
+<pre>
+SetMetaServer("www.myserver.com", 7775)
+</pre>
+
+<a name="SetMinimapTerrain"></a>
+<h3>SetMinimapTerrain(boolean)</h3>
+
+for minimap with/without terrain.
+
+<a name="SetMouseScroll"></a>
+<h3>SetMouseScroll(boolean)</h3>
+
+enable/disable mouse scrolling.
+
+<a name="SetMouseScrollSpeed"></a>
+<h3>SetMouseScrollSpeed(number)</h3>
+
+Set mouse scroll speed in frames (1=each frame,2 each second,...)
+This is when the mouse cursor hits the border.
+
+<h4>Example</h4>
+<pre>
+  SetMouseScrollSpeed(1)
+</pre>
+
+<a name="SetMouseScrollSpeedControl"></a>
+<h3>SetMouseScrollSpeedControl(speed)</h3>
+
+Sets the speed of the mouse scrolling while control is pressed.
+
+<dl>
+<dt>speed</dt>
+<dd>Set the number of pixels to scroll per mouse move of 1 pixel. negative = reversed</dd>
+<dt><i>RETURNS</i></dt>
+<dd>The old speed that was set</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Mouse speed to 
+    SetMouseScrollSpeedControl(4)
+</pre>
+
+<a name="SetMouseScrollSpeedDefault"></a>
+<h3>SetMouseScrollSpeedDefault(speed)</h3>
+
+Sets the speed of the mouse scrolling while the middle mouse button is pressed.
+
+<dl>
+<dt>speed</dt>
+<dd>Sets the number of pixels to scroll per mouse move of 1 pixel. negative = reversed</dd>
+<dt><i>RETURNS</i></dt>
+<dd>The old speed that was set</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Speed Scroll to 5
+    SetMouseScrollSpeedDefault(5)
+</pre>
+
+<a name="SetRevealAttacker"></a>
+<h3>SetRevealAttacker(boolean)</h3>
+
+Sets if a unit will respond to the attacking unit or not.  If set to true,
+they will respond whether they can see the unit or not.  If set to false,
+they will only response if the attacker is within their reaction range.
+
+<a name="SetSelectionStyle"></a>
+<h3>SetSelectionStyle(tag)</h3>
+
+Set selection style, show what units the user had selected.
+
+<dl>
+  <dt>"rectangle"</dt>
+  <dd>Rectangle around unit</dd>
+  <dt>"circle"</dt>
+  <dd>Circle around unit</dd>
+  <dt>"alpha-rectangle"</dt>
+  <dd>Rectangle with alpha around unit</dd>
+  <dt>"alpha-circle"</dt>
+  <dd>Circle with alpha around unit</dd>
+  <dt>"corners"</dt>
+  <dd>Draw corners of rectangle</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+  SetSelectionStyle("corners")
+</pre>
+
+<a name="SetShowAttackRange"></a>
+<h3>SetShowAttackRange(boolean)</h3>
+
+Enable/disable display of attack range of the selected unit on map.
+
+<a name="SetShowCommandKey"></a>
+<h3>SetShowCommandKey(boolean)</h3>
+
+enable/disable the display of the command keys in buttons.
+
+<a name="SetShowOrders"></a>
+<h3>SetShowOrders(boolean or number)</h3>
+
+Enable/disable display of the orders of the selected unit on map.
+
+<dl>
+  <dt>true</dt>
+  <dd>to always show unit orders</dd>
+  <dt>false</dt>
+  <dd>to never show orders.</dd>
+  <dt>number</dt>
+  <dd>the number of seconds an order should be shown.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+  -- show orders for 2 seconds
+  SetShowOrders(2)
+</pre>
+
+<a name="SetShowReactionRange"></a>
+<h3>SetShowReactionRange(boolean)</h3>
+
+Enable/disable display of reaction range of the selected unit on map.
+
+<a name="SetShowSightRange"></a>
+<h3>SetShowSightRange(tag)</h3>
+
+How the sight range of the selected unit is shown on map.
+
+<dl>
+  <dt>false</dt>
+    <dd>None</dd>
+  <dt>"rectangle"</dt>
+    <dd>Alpha rectangle around unit</dd>
+  <dt>"circle"</dt>
+    <dd>Alpha circle around unit</dd>
+  <dt>true</dt>
+    <dd>Rectangle around unit</dd>
+</dl>
+
+<a name="SetShowTips"></a>
+<h3>SetShowTips(boolean)</h3>
+
+enable/disable show tips at the start of a level
+
+
+<a name="SetSpeedBuild"></a>
+<h3>SetSpeedBuild(number)</h3>
+
+Decrease the time to build a unit by this factor.
+
+<a name="SetSpeedResearch"></a>
+<h3>SetSpeedResearch(number)</h3>
+
+Decrease the time to research by this factor.
+
+<a name="SetSpeedTrain"></a>
+<h3>SetSpeedTrain(number)</h3>
+
+Decrease the time to train a unit by this factor.
+
+<a name="SetSpeedUpgrade"></a>
+<h3>SetSpeedUpgrade(number)</h3>
+
+Decrease the time to upgrade a unit by this factor.
+
+<a name="SetSpeeds"></a>
+<h3>SetSpeeds(number)</h3>
+
+Set all speeds.
+This is equivalent to
+<pre>
+  SetSpeedResourcesHarvest("all-resource", number)
+  SetSpeedResourcesReturn("all-resource", number)
+  SetSpeedBuild(number)
+  SetSpeedTrain(number)
+  SetSpeedUpgrade(number)
+  SetSpeedResearch(number)
+</pre>
+
+<a name="SetTitleScreens"></a>
+<h3>SetTitleScreens({tag = value, ...}, ...)</h3>
+
+Change the default title screens.<br>
+<br>
+Possible tags:
+
+<dl>
+  <dt>Image = "filepath"</dt>
+  <dd>Image or video to be displayed as title screen, this is the first screen
+displayed. The image should be a png file with 640x480 8-bit indexed colormap.
+  </dd>
+<dt>Music = "filepath" or "none"</dt>
+  <dd>Optional music to be played with the image or video.  Use "none" to stop
+previously playing music.
+  </dd>
+  <dt>Timeout = number</dt>
+  <dd>The number of seconds we should show this title-screen.(20 by default)</dd>
+  <dt>Label = { {Text = "text", Pos = {x, y}, Font = "font-name"}, ... }</dt>
+  <dd>Optional text to be displayed. It's a list of elements with three tags:
+  <dl>
+    <dt>Text = "text"</dt>
+    <dd>The text string to render.</dd>
+    <dt>Pos = {x, y}</dt>
+    <dd>The text coords to render.</dd>
+    <dt>Font = FIXME</dt>
+    <dd>Font to use.</dd>
+    <dt>Flags = {tag, ...}</dt>
+    <dd>The flags that tell us how should be interpretated the pos coords.
+        Possible and only value is "center".
+    </dd>
+  </dl>
+  </dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+  -- This is the default title displayed.
+  SetTitleScreens(
+		{Image = "video/int_logo_stratagus.avi", Music =  "video/int_logo_stratagus.ogg",
+		Label = {{Text = "~white~Copyright © 1998-2003 The Stratagus Project. All rights reserved.",
+                          Pos = {0, 45}, Flags = {"center"}}} },
+		{Image = "video/int_logo_bos.avi", Music =  "video/int_logo_bos.ogg"})
+</pre>
+
+<a name="SetTrainingQueue"></a>
+<h3>SetTrainingQueue(boolean)</h3>
+
+enable/disable the training queues.
+(ability to train several units in a row)
+
+<a name="SetXPDamage"></a>
+<h3>SetXPDamage(boolean)</h3>
+
+enable/disable XP to add more damage to attacks.
+FIXME : damage calculation.
+
+<a name="SetUseHPForXp"></a>
+<h3>SetUseHPForXp(boolean)</h3>
+
+How the Xp is compute :
+if it is set to true then unit gains Xp equal to damage dealt to enemy unit
+else unit gains the max HP of the  killed enemy unit.
+
+<a name="SetVideoFullScreen"></a>
+<h3>SetVideoFullScreen(boolean)</h3>
+
+Sets the video to full screen or windowed mode
+
+<dl>
+<dt>boolean</dt>
+<dd>#t, #f for true or false for full screen</dd>
+<dt><i>RETURNS</i></dt>
+<dd>the previous state of the full screen</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Fullscreen
+    SetVideoFullScreen(#t)
+</pre>
+
+<a name="SetVideoResolution"></a>
+<h3>SetVideoResolution(x, y)</h3>
+
+Sets the resolution of the video display, valid options are 640x480, 800x600, 1024x768,
+1280x960 and 1600x1200.
+
+<dl>
+<dt>x</dt>
+<dd>Resolution in x from the 640,800,1024,1280,1600 list. Must match y</dd>
+<dt>y</dt>
+<dd>Resolution in y from the 480,600,768,960,1200 list. Must match x</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Screen res to 1024x768
+    SetVideoResolution(1024, 768)
+</pre>
+
+<a name="ShowEnergySelectedOnly"></a>
+<h3>ShowEnergySelectedOnly()</h3>
+Show decoration only for selected unit.
+<br>Adjust options for<a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowFull"></a>
+<h3>ShowFull()</h3>
+Use to show bars or dots also when bar is full.
+<br>Adjust options for<a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowHealthBar"></a>
+<h3>ShowHealthBar()</h3>
+Equivalent of <a href="#ShowHealthVertical">ShowHealthVertical()</a>
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowHealthDot"></a>
+<h3>ShowHealthDot()</h3>
+Adds a health sprite to the bottom of the unit.
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowHealthHorizontal"></a>
+<h3>ShowHealthHorizontal()</h3>
+Show health bars horizontal.
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowHealthVertical"></a>
+<h3>ShowHealthVertical()</h3>
+Show health bars vertical.
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowManaBar"></a>
+<h3>ShowManaBar()</h3>
+Equivalent of <a href="#ShowManaVertical">ShowManaVertical()</a>
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowManaDot"></a>
+<h3>ShowManaDot()</h3>
+Show a mana sprite to the bottom of the unit.
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowManaHorizontal"></a>
+<h3>ShowManaHorizontal()</h3>
+Show mana bars horizontal.
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowManaVertical"></a>
+<h3>ShowManaVertical()</h3>
+Show mana bars vertical.
+<br>alias of <a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="ShowNoFull"></a>
+<h3>ShowNoFull()</h3>
+Hide decorations when value is full.
+<br>Adjust options for<a href="#DefineDecorations">DefineDecorations()</a>.
+
+<a name="SetGroupKeys"></a>
+<h3>SetGroupKeys("0123456789~")</h3>
+
+Define the key to use for group on non-us keyborads. It should be placed in
+preferences1.lua, with the key to use for group 0, 1, 2, ... 9, and the key
+to unselect all groups ( on the left of the 1 key )
+
+<dl>
+<dt>keys</dt>
+<dd>the keys to substitute to the 0 1 2 3 4... keys
+</dl>
+
+<h4>Example</h4>
+For french azerty, use :
+<pre>
+	(set-group-keys "à&amp;é\"'(-è_ç²")
+</pre>
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

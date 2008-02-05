@@ -1,0 +1,20 @@
+class CUnit
+{
+	tolua_readonly int Slot;
+
+	int X;
+	int Y;
+
+	CUnitType *Type;
+	CPlayer *Player;
+};
+
+class CPreference
+{
+	bool ShowSightRange;
+	bool ShowReactionRange;
+	bool ShowAttackRange;
+	unsigned int ShowOrders;
+};
+
+CPreference Preference;

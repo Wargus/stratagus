@@ -1,0 +1,5 @@
+#! /bin/sh
+
+PREFIX=__PREFIX__
+
+boswars-engine -d $PREFIX/share/boswars/
