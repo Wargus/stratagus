@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Version 2.5.0:
+- Remove runtime libraries from the repository (Francois Beerten)
 - Don't let an engineer build on top of itself (Jimmy Salmon)
 - Allow recycling buildings under construction (Jimmy Salmon)
 - Set the start position in campaign level 5 (Jimmy Salmon)
