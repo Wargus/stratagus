@@ -82,21 +82,6 @@
 **      If this index is 0, the tile is a solid tile.
 **      @see CTileset::TileNames
 **
-**  CTileset::TileTypeTable
-**
-**      Lookup table of the tile type. Maps the graphic file tile
-**      number back to a tile type (::TileTypeWood, ::TileTypeWater,
-**      ...)
-**
-**      @note The creation of this table is currently hardcoded in
-**      the engine. It should be calculated from the flags in the
-**      tileset configuration (CCL). And it is created for the map
-**      and not for the tileset.
-**
-**      @note I'm not sure if this table is needed in the future.
-**
-**      @see TileType.
-**
 **  CTileset::NumNames
 **
 **      Number of different tile names.
@@ -147,20 +132,6 @@
 extern int TileSizeX; /// Size of a tile in X
 extern int TileSizeY; /// Size of a tile in Y
 
-/**
-**  These are used for lookup tiles types
-**  mainly used for the FOW implementation of the seen woods/rocks
-**
-**  @todo I think this can be removed, we can use the flags?
-**  I'm not sure, if we have seen and real time to considere.
-*/
-enum TileType {
-	TileTypeUnknown,    /// Unknown tile type
-	TileTypeWood,       /// Any wood tile
-	TileTypeCoast,      /// Any coast tile
-	TileTypeWater,      /// Any water tile
-};
-
 	/// Single tile definition
 struct TileInfo {
 	unsigned char BaseTerrain; /// Basic terrain of the tile
@@ -189,8 +160,6 @@ public:
 		FlagsTable = NULL;
 		delete[] Tiles;
 		Tiles = NULL;
-		delete[] TileTypeTable;
-		TileTypeTable = NULL;
 		for (int i = 0; i < NumTerrainTypes; ++i) {
 			delete[] SolidTerrainTypes[i].TerrainName;
 		}
@@ -209,9 +178,6 @@ public:
 	unsigned short *FlagsTable; /// Flag table for editor
 
 	TileInfo *Tiles; /// Tile descriptions
-
-	// TODO: currently hardcoded
-	unsigned char *TileTypeTable;   /// For fast lookup of tile type
 
 	int NumTerrainTypes;                 /// Number of different terrain types
 	SolidTerrainInfo *SolidTerrainTypes; /// Information about solid terrains.

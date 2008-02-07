@@ -1816,6 +1816,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\map\patch_manager.cpp"
+						>
+					</File>
+					<File
 						RelativePath="map\script_map.cpp"
 						>
 						<FileConfiguration
@@ -3199,6 +3203,18 @@
 				</File>
 				<File
 					RelativePath=".\include\particle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\patch.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\patch_manager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\patch_type.h"
 					>
 				</File>
 				<File
