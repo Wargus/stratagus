@@ -652,7 +652,7 @@ void CMap::InitFogOfWar(void)
 /**
 **  Cleanup the fog of war.
 */
-void CMap::CleanFogOfWar(void)
+void CMap::CleanFogOfWar()
 {
 	delete[] VisibleTable;
 	VisibleTable = NULL;

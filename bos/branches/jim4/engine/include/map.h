@@ -134,10 +134,6 @@
 **
 **    Lua filename that loads all tilemodels
 **
-**  CMap::TileGraphic
-**
-**    Graphic for all the tiles
-**
 **  CMap::FogGraphic
 **
 **    Graphic for fog of war
@@ -155,6 +151,7 @@
 #include <vector>
 #include "iocompat.h"
 #include "tileset.h"
+#include "patch_manager.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -241,11 +238,11 @@ public:
 	/// Alocate and initialise map table.
 	void Create();
 	/// Build tables for map
-	void Init(void);
+	void Init();
 	/// Clean the map
 	void Clean();
 	/// Cleanup memory for fog of war tables
-	void CleanFogOfWar(void);
+	void CleanFogOfWar();
 
 	/// Find if a tile is visible (with shared vision).
 	unsigned short IsTileVisible(const CPlayer *player, int x, int y) const;
@@ -294,8 +291,9 @@ public:
 
 	CTileset Tileset;                 /// tileset data
 	std::string TileModelsFileName;   /// lua filename that loads all tilemodels
-	CGraphic *TileGraphic;            /// graphic for all the tiles
 	static CGraphic *FogGraphic;      /// graphic for fog of war
+
+	CPatchManager PatchManager;
 
 	CMapInfo Info;                    /// descriptive information
 };

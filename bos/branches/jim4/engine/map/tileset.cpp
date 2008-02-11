@@ -65,11 +65,6 @@ void LoadTileset(void)
 	//  Load and prepare the tileset
 	TileSizeX = Map.Tileset.TileSizeX;
 	TileSizeY = Map.Tileset.TileSizeY;
-
-	ShowLoadProgress("Tileset `%s'", Map.Tileset.ImageFile.c_str());
-	//Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile);
-	Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile, TileSizeX, TileSizeY);
-	Map.TileGraphic->Load();
 }
 
 
@@ -81,12 +76,6 @@ void LoadTileset(void)
 void CleanTilesets(void)
 {
 	Map.Tileset.Clear();
-
-	//
-	// Should this be done by the map?
-	//
-	CGraphic::Free(Map.TileGraphic);
-	Map.TileGraphic = NULL;
 }
 
 //@}

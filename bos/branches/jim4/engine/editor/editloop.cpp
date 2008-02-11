@@ -546,7 +546,8 @@ static void DrawTileIcons(void)
 				y = UI.ButtonPanel.Y + 100;
 				break;
 			}
-			Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[0x10 + i * 16], x, y);
+			// FIXME: PATCHES
+//			Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[0x10 + i * 16], x, y);
 			Video.DrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
@@ -707,7 +708,8 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 
 	x += 4;
 	y += 4;
-	Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tilenum], x, y);
+	// FIXME: PATCHES
+//	Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
 		Video.DrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
@@ -849,8 +851,9 @@ static void DrawMapCursor(void)
 					if (tx >= UI.MouseViewport->EndX) {
 						break;
 					}
-					Map.TileGraphic->DrawFrameClip(
-						Map.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
+					// FIXME: PATCHES
+//					Map.TileGraphic->DrawFrameClip(
+//						Map.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
 				}
 			}
 			Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,

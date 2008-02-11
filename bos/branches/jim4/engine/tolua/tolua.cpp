@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 01/22/08 20:55:13.
+** Generated automatically by tolua++-1.0.92 on 02/10/08 20:19:44.
 */
 
 #ifndef __cplusplus
@@ -47,6 +47,9 @@ void StopGame(GameResults result);
 #include "settings.h"
 extern int AlliedUnitRecyclingEfficiency[MaxCosts];
 extern int EnemyUnitRecyclingEfficiency[MaxCosts];
+#include "patch_type.h"
+#include "patch.h"
+#include "patch_manager.h"
 #include "pathfinder.h"
 int GetNumOpponents(int player);
 int GetTimer();
@@ -351,6 +354,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Graphics");
  tolua_usertype(tolua_S,"CColor");
  tolua_usertype(tolua_S,"CButtonPanel");
+ tolua_usertype(tolua_S,"CPatch");
  tolua_usertype(tolua_S,"ImageSlider");
  tolua_usertype(tolua_S,"ListBoxWidget");
  tolua_usertype(tolua_S,"Color");
@@ -380,15 +384,17 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"gcn::Graphics");
  tolua_usertype(tolua_S,"CStatusLine");
  tolua_usertype(tolua_S,"CMinimap");
+ tolua_usertype(tolua_S,"CPatchManager");
  tolua_usertype(tolua_S,"Window");
+ tolua_usertype(tolua_S,"CParticleManager");
  tolua_usertype(tolua_S,"CPreference");
  tolua_usertype(tolua_S,"CFiller");
- tolua_usertype(tolua_S,"CParticleManager");
- tolua_usertype(tolua_S,"vector<string>");
- tolua_usertype(tolua_S,"MultiLineLabel");
- tolua_usertype(tolua_S,"Windows");
- tolua_usertype(tolua_S,"CSmokeParticle");
  tolua_usertype(tolua_S,"CUserInterface");
+ tolua_usertype(tolua_S,"vector<string>");
+ tolua_usertype(tolua_S,"Windows");
+ tolua_usertype(tolua_S,"MultiLineLabel");
+ tolua_usertype(tolua_S,"CSmokeParticle");
+ tolua_usertype(tolua_S,"CPatchType");
  tolua_usertype(tolua_S,"Container");
  tolua_usertype(tolua_S,"ButtonWidget");
  tolua_usertype(tolua_S,"CFont");
@@ -17291,6 +17297,36 @@ static int tolua_set_CMap_Info(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: PatchManager of class  CMap */
+#ifndef TOLUA_DISABLE_tolua_get_CMap_PatchManager
+static int tolua_get_CMap_PatchManager(lua_State* tolua_S)
+{
+  CMap* self = (CMap*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'PatchManager'",NULL);
+#endif
+  tolua_pushusertype(tolua_S,(void*)&self->PatchManager,"CPatchManager");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: PatchManager of class  CMap */
+#ifndef TOLUA_DISABLE_tolua_set_CMap_PatchManager
+static int tolua_set_CMap_PatchManager(lua_State* tolua_S)
+{
+  CMap* self = (CMap*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'PatchManager'",NULL);
+  if (!tolua_isusertype(tolua_S,2,"CPatchManager",0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->PatchManager = *((CPatchManager*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Map */
 #ifndef TOLUA_DISABLE_tolua_get_Map
 static int tolua_get_Map(lua_State* tolua_S)
@@ -17344,6 +17380,546 @@ static int tolua_stratagus_SetTile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetTile'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getGraphic of class  CPatchType */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchType_getGraphic00
+static int tolua_stratagus_CPatchType_getGraphic00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatchType",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatchType* self = (const CPatchType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getGraphic'",NULL);
+#endif
+  {
+   const CGraphic* tolua_ret = (const CGraphic*)  self->getGraphic();
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"const CGraphic");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getGraphic'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getTileWidth of class  CPatchType */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchType_getTileWidth00
+static int tolua_stratagus_CPatchType_getTileWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatchType",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatchType* self = (const CPatchType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getTileWidth'",NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->getTileWidth();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getTileWidth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getTileHeight of class  CPatchType */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchType_getTileHeight00
+static int tolua_stratagus_CPatchType_getTileHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatchType",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatchType* self = (const CPatchType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getTileHeight'",NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->getTileHeight();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getTileHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getFlag of class  CPatchType */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchType_getFlag00
+static int tolua_stratagus_CPatchType_getFlag00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatchType",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatchType* self = (CPatchType*)  tolua_tousertype(tolua_S,1,0);
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+  int y = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getFlag'",NULL);
+#endif
+  {
+   unsigned short tolua_ret = (unsigned short)  self->getFlag(x,y);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getFlag'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getType of class  CPatch */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatch_getType00
+static int tolua_stratagus_CPatch_getType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatch",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatch* self = (CPatch*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getType'",NULL);
+#endif
+  {
+   CPatchType* tolua_ret = (CPatchType*)  self->getType();
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPatchType");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setPos of class  CPatch */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatch_setPos00
+static int tolua_stratagus_CPatch_setPos00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatch",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatch* self = (CPatch*)  tolua_tousertype(tolua_S,1,0);
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+  int y = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setPos'",NULL);
+#endif
+  {
+   self->setPos(x,y);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setPos'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setX of class  CPatch */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatch_setX00
+static int tolua_stratagus_CPatch_setX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatch",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatch* self = (CPatch*)  tolua_tousertype(tolua_S,1,0);
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setX'",NULL);
+#endif
+  {
+   self->setX(x);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getX of class  CPatch */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatch_getX00
+static int tolua_stratagus_CPatch_getX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatch",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatch* self = (const CPatch*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getX'",NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->getX();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: setY of class  CPatch */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatch_setY00
+static int tolua_stratagus_CPatch_setY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatch",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatch* self = (CPatch*)  tolua_tousertype(tolua_S,1,0);
+  int y = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'setY'",NULL);
+#endif
+  {
+   self->setY(y);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getY of class  CPatch */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatch_getY00
+static int tolua_stratagus_CPatch_getY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatch",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatch* self = (const CPatch*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getY'",NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->getY();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: add of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_add00
+static int tolua_stratagus_CPatchManager_add00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatchManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatchManager* self = (CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+  const std::string typeName = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  int x = ((int)  tolua_tonumber(tolua_S,3,0));
+  int y = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add'",NULL);
+#endif
+  {
+   CPatch* tolua_ret = (CPatch*)  self->add(typeName,x,y);
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPatch");
+   tolua_pushcppstring(tolua_S,(const char*)typeName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'add'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: moveToTop of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_moveToTop00
+static int tolua_stratagus_CPatchManager_moveToTop00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatchManager",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"CPatch",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatchManager* self = (CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+  CPatch* patch = ((CPatch*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'moveToTop'",NULL);
+#endif
+  {
+   self->moveToTop(patch);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'moveToTop'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: moveToBottom of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_moveToBottom00
+static int tolua_stratagus_CPatchManager_moveToBottom00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatchManager",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"CPatch",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatchManager* self = (CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+  CPatch* patch = ((CPatch*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'moveToBottom'",NULL);
+#endif
+  {
+   self->moveToBottom(patch);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'moveToBottom'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: getPatch of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_getPatch00
+static int tolua_stratagus_CPatchManager_getPatch00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatchManager",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatchManager* self = (const CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+  int x = ((int)  tolua_tonumber(tolua_S,2,0));
+  int y = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getPatch'",NULL);
+#endif
+  {
+   CPatch* tolua_ret = (CPatch*)  self->getPatch(x,y);
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPatch");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getPatch'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: newPatchType of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_newPatchType00
+static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CPatchManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_istable(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CPatchManager* self = (CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+  const std::string name = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  const std::string file = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
+  int width = ((int)  tolua_tonumber(tolua_S,4,0));
+  int height = ((int)  tolua_tonumber(tolua_S,5,0));
+#ifdef __cplusplus
+  int* flags = new int[width*height];
+#else
+  int* flags = (int*) malloc((width*height)*sizeof(int));
+#endif
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'newPatchType'",NULL);
+#endif
+  {
+#ifndef TOLUA_RELEASE
+   if (!tolua_isnumberarray(tolua_S,6,width*height,0,&tolua_err))
+    goto tolua_lerror;
+   else
+#endif
+   {
+    int i;
+    for(i=0; i<width*height;i++)
+    flags[i] = ((int)  tolua_tofieldnumber(tolua_S,6,i+1,0));
+   }
+  }
+  {
+   CPatchType* tolua_ret = (CPatchType*)  self->newPatchType(name,file,width,height,flags);
+   tolua_pushusertype(tolua_S,(void*)tolua_ret,"CPatchType");
+   tolua_pushcppstring(tolua_S,(const char*)name);
+   tolua_pushcppstring(tolua_S,(const char*)file);
+  }
+  {
+   int i;
+   for(i=0; i<width*height;i++)
+    tolua_pushfieldnumber(tolua_S,6,i+1,(lua_Number) flags[i]);
+  }
+#ifdef __cplusplus
+  delete [] flags;
+#else
+  free(flags);
+#endif
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'newPatchType'.",&tolua_err);
  return 0;
 #endif
 }
@@ -19616,9 +20192,34 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"CMap","CMap","",NULL);
   tolua_beginmodule(tolua_S,"CMap");
    tolua_variable(tolua_S,"Info",tolua_get_CMap_Info,tolua_set_CMap_Info);
+   tolua_variable(tolua_S,"PatchManager",tolua_get_CMap_PatchManager,tolua_set_CMap_PatchManager);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"Map",tolua_get_Map,tolua_set_Map);
   tolua_function(tolua_S,"SetTile",tolua_stratagus_SetTile00);
+  tolua_cclass(tolua_S,"CPatchType","CPatchType","",NULL);
+  tolua_beginmodule(tolua_S,"CPatchType");
+   tolua_function(tolua_S,"getGraphic",tolua_stratagus_CPatchType_getGraphic00);
+   tolua_function(tolua_S,"getTileWidth",tolua_stratagus_CPatchType_getTileWidth00);
+   tolua_function(tolua_S,"getTileHeight",tolua_stratagus_CPatchType_getTileHeight00);
+   tolua_function(tolua_S,"getFlag",tolua_stratagus_CPatchType_getFlag00);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"CPatch","CPatch","",NULL);
+  tolua_beginmodule(tolua_S,"CPatch");
+   tolua_function(tolua_S,"getType",tolua_stratagus_CPatch_getType00);
+   tolua_function(tolua_S,"setPos",tolua_stratagus_CPatch_setPos00);
+   tolua_function(tolua_S,"setX",tolua_stratagus_CPatch_setX00);
+   tolua_function(tolua_S,"getX",tolua_stratagus_CPatch_getX00);
+   tolua_function(tolua_S,"setY",tolua_stratagus_CPatch_setY00);
+   tolua_function(tolua_S,"getY",tolua_stratagus_CPatch_getY00);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"CPatchManager","CPatchManager","",NULL);
+  tolua_beginmodule(tolua_S,"CPatchManager");
+   tolua_function(tolua_S,"add",tolua_stratagus_CPatchManager_add00);
+   tolua_function(tolua_S,"moveToTop",tolua_stratagus_CPatchManager_moveToTop00);
+   tolua_function(tolua_S,"moveToBottom",tolua_stratagus_CPatchManager_moveToBottom00);
+   tolua_function(tolua_S,"getPatch",tolua_stratagus_CPatchManager_getPatch00);
+   tolua_function(tolua_S,"newPatchType",tolua_stratagus_CPatchManager_newPatchType00);
+  tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"AStarFixedUnitCrossingCost",tolua_get_AStarFixedUnitCrossingCost,tolua_set_AStarFixedUnitCrossingCost);
   tolua_variable(tolua_S,"AStarMovingUnitCrossingCost",tolua_get_AStarMovingUnitCrossingCost,tolua_set_AStarMovingUnitCrossingCost);
   tolua_variable(tolua_S,"AStarKnowUnseenTerrain",tolua_get_AStarKnowUnseenTerrain,tolua_set_AStarKnowUnseenTerrain);
