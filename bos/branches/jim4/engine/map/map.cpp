@@ -272,7 +272,6 @@ void CMap::Clean(void)
 	memset(this->Visible, 0, sizeof(this->Visible));
 	this->NoFogOfWar = false;
 	this->Tileset.Clear();
-	this->TileModelsFileName.clear();
 
 	this->PatchManager.clear();
 

@@ -130,10 +130,6 @@
 **    Tileset data for the map. See ::CTileset. This contains all
 **    information about the tile.
 **
-**  CMap::TileModelsFileName
-**
-**    Lua filename that loads all tilemodels
-**
 **  CMap::FogGraphic
 **
 **    Graphic for fog of war
@@ -290,7 +286,6 @@ public:
 	bool NoFogOfWar;                  /// fog of war disabled
 
 	CTileset Tileset;                 /// tileset data
-	std::string TileModelsFileName;   /// lua filename that loads all tilemodels
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 
 	CPatchManager PatchManager;

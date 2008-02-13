@@ -625,6 +625,9 @@ function RunEditorMenu(s)
   menu:addButton(_("~!Load Map"), x, 300,
     function() RunEditorLoadMenu(); menu:stop() end)
 
+  menu:addButton(_("~!Patch Editor"), x, 360,
+    function() RunPatchEditorMenu(); menu:stop() end)
+
   menu:addButton(_("~!Cancel"), x, Video.Height - 100,
     function() menu:stop() end)
 
@@ -641,9 +644,6 @@ function RunEditorNewMenu()
   menu = BosMenu(_("Editor"))
 
   function starteditorbutton(s)
-    -- FIXME: select tileset or image based map
-    LoadTileModels("scripts/tilesets/desert.lua")
-
     local n = tonumber(xsize:getText())
     if (n == nil) then n = 64 end
     Map.Info.MapWidth = n
@@ -739,6 +739,7 @@ Load("scripts/menus/options.lua")
 Load("scripts/menus/credits.lua")
 Load("scripts/menus/ingame/game.lua")
 Load("scripts/menus/ingame/editor.lua")
+Load("scripts/menus/patch.lua")
 Load("scripts/menus/campaigns.lua")
 
 function BuildMainMenu(menu)

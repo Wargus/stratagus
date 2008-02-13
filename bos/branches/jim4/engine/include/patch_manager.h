@@ -61,6 +61,8 @@ public:
 	CPatchType *newPatchType(const std::string &name, const std::string &file,
 		int tileWidth, int tileHeight, int *flags);
 
+	CPatchType *getPatchType(const std::string &name);
+
 private:
 	std::list<CPatch *> patches;
 	std::map<std::string, CPatchType *> patchTypesMap;

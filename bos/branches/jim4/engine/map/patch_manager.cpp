@@ -104,3 +104,9 @@ CPatchManager::newPatchType(const std::string &name, const std::string &file,
 	this->patchTypesMap[name] = patchType;
 	return patchType;
 }
+
+CPatchType *
+CPatchManager::getPatchType(const std::string &name)
+{
+	return this->patchTypesMap[name];
+}

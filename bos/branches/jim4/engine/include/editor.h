@@ -129,6 +129,8 @@ extern void ChangeTile(int x, int y, int tile);
 extern void EditorTileChanged(int x, int y);
 
 
+extern void StartPatchEditor(const std::string &patchName);
+
 //@}
 
 #endif // !__EDITOR_H__

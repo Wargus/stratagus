@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 02/10/08 20:19:44.
+** Generated automatically by tolua++-1.0.92 on 02/12/08 21:38:43.
 */
 
 #ifndef __cplusplus
@@ -16203,6 +16203,34 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: StartPatchEditor */
+#ifndef TOLUA_DISABLE_tolua_stratagus_StartPatchEditor00
+static int tolua_stratagus_StartPatchEditor00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string patchName = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  {
+   StartPatchEditor(patchName);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StartPatchEditor'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: IsReplayGame */
 #ifndef TOLUA_DISABLE_tolua_stratagus_IsReplayGame00
 static int tolua_stratagus_IsReplayGame00(lua_State* tolua_S)
@@ -20127,6 +20155,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_variable(tolua_S,"Editor",tolua_get_Editor,tolua_set_Editor);
   tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
   tolua_function(tolua_S,"EditorSaveMap",tolua_stratagus_EditorSaveMap00);
+  tolua_function(tolua_S,"StartPatchEditor",tolua_stratagus_StartPatchEditor00);
   tolua_function(tolua_S,"IsReplayGame",tolua_stratagus_IsReplayGame00);
   tolua_function(tolua_S,"StartMap",tolua_stratagus_StartMap00);
   tolua_function(tolua_S,"StartReplay",tolua_stratagus_StartReplay00);

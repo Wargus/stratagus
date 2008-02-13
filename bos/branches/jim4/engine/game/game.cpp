@@ -240,7 +240,6 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 		f->printf("\n");
 
 		f->printf("-- load tilesets\n");
-		f->printf("LoadTileModels(\"%s\")\n\n", map->TileModelsFileName.c_str());
 	
 		if (writeTerrain) {
 			f->printf("-- Tiles Map\n");

@@ -1407,7 +1407,7 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-static void EditorCallbackKey3(unsigned dummy1, unsigned dummy2)
+static void EditorCallbackKeyRepeated(unsigned dummy1, unsigned dummy2)
 {
 }
 
@@ -1885,7 +1885,7 @@ void CEditor::Init(void)
 	EditorCallbacks.MouseExit = EditorCallbackExit;
 	EditorCallbacks.KeyPressed = EditorCallbackKeyDown;
 	EditorCallbacks.KeyReleased = EditorCallbackKeyUp;
-	EditorCallbacks.KeyRepeated = EditorCallbackKey3;
+	EditorCallbacks.KeyRepeated = EditorCallbackKeyRepeated;
 	EditorCallbacks.NetworkEvent = NetworkEvent;
 }
 

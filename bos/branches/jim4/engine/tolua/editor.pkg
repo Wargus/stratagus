@@ -21,3 +21,5 @@ extern CEditor Editor;
 void StartEditor(const char *filename);
 int EditorSaveMap(const char *file);
 
+void StartPatchEditor(const std::string patchName);
+
