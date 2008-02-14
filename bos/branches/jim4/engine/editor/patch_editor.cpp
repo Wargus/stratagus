@@ -9,6 +9,7 @@
 #include "patch_type.h"
 #include "patch.h"
 #include "patch_manager.h"
+#include "ui.h"
 
 
 extern void DrawGuichanWidgets();
@@ -19,6 +20,8 @@ extern gcn::Gui *Gui;
 static gcn::Container *PatchEditorContainer;
 
 static CPatch *Patch;
+
+static const int PatchMenuWidth = 150;
 
 
 static void PatchEditorCallbackButtonDown(unsigned button)
@@ -108,6 +111,8 @@ static void PatchEditorCallbackMouse(int x, int y)
 {
 	HandleCursorMove(&x, &y); // Reduce to screen
 
+	GameCursor = UI.Point.Cursor;
+
 	if (HandleMouseScrollArea(x, y)) {
 		return;
 	}
@@ -142,6 +147,8 @@ static void PatchEditorUpdateDisplay()
 	DrawPatch();
 	DrawGrids();
 
+	Video.FillRectangle(ColorGray, Video.Width - PatchMenuWidth, 0, PatchMenuWidth, Video.Height);
+
 	DrawGuichanWidgets();
 
 	DrawCursor();
@@ -150,10 +157,41 @@ static void PatchEditorUpdateDisplay()
 	RealizeVideoMemory();
 }
 
+static gcn::Button *PatchNewButton(const std::string &caption)
+{
+	gcn::Color darkColor(38, 38, 78, 128);
+	gcn::Button *button;
+	
+	button = new gcn::Button(caption);
+	button->setSize(106, 28);
+	button->setBackgroundColor(darkColor);
+	button->setBaseColor(darkColor);
+	return button;
+}
+
+class PatchSaveButtonListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId) {
+	}
+};
+
+class PatchExitButtonListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId) {
+		PatchEditorRunning = false;
+	}
+};
+
 static void PatchEditorMainLoop()
 {
 	const EventCallback *old_callbacks = GetCallbacks();
 	EventCallback callbacks;
+	gcn::Button *saveButton;
+	gcn::Button *exitButton;
+	PatchSaveButtonListener *saveButtonListener;
+	PatchExitButtonListener *exitButtonListener;
 
 	callbacks.ButtonPressed = PatchEditorCallbackButtonDown;
 	callbacks.ButtonReleased = PatchEditorCallbackButtonUp;
@@ -173,6 +211,18 @@ static void PatchEditorMainLoop()
 	PatchEditorContainer->setOpaque(false);
 	Gui->setTop(PatchEditorContainer);
 
+	saveButton = PatchNewButton(_("Save"));
+	saveButtonListener = new PatchSaveButtonListener();
+	saveButton->addActionListener(saveButtonListener);
+	PatchEditorContainer->add(saveButton,
+		Video.Width - PatchMenuWidth / 2 - saveButton->getWidth() / 2, 20);
+
+	exitButton = PatchNewButton(_("Exit"));
+	exitButtonListener = new PatchExitButtonListener();
+	exitButton->addActionListener(exitButtonListener);
+	PatchEditorContainer->add(exitButton,
+		Video.Width - PatchMenuWidth / 2 - saveButton->getWidth() / 2, Video.Height - exitButton->getHeight() - 20);
+
 	Map.PatchManager.load();
 
 	PatchEditorRunning = true;
@@ -184,10 +234,14 @@ static void PatchEditorMainLoop()
 		WaitEventsOneFrame();
 	}
 
+	Map.PatchManager.clear();
+
 	SetCallbacks(old_callbacks);
 
 	Gui->setTop(oldTop);
 	delete PatchEditorContainer;
+	delete saveButton;
+	delete exitButton;
 }
 
 void StartPatchEditor(const std::string &patchName)
