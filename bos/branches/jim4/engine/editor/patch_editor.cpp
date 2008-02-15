@@ -23,6 +23,53 @@ static CPatch *Patch;
 
 static const int PatchMenuWidth = 150;
 
+static float ScrollX;
+static float ScrollY;
+
+
+static void DoScroll()
+{
+	int state = MouseScrollState | KeyScrollState;
+	static Uint32 lastTicks = GetTicks() - 1;
+
+	Uint32 ticks = GetTicks();
+	float speed = (ticks - lastTicks) / 1000.f * 400;
+	lastTicks = ticks;
+
+	if (state == ScrollNone) {
+		return;
+	}
+
+	if ((state & (ScrollLeft | ScrollRight)) &&
+			(state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
+		if (state & ScrollRight) {
+			ScrollX += speed;
+		} else {
+			ScrollX -= speed;
+		}
+	}
+	if ((state & (ScrollUp | ScrollDown)) &&
+			(state & (ScrollUp | ScrollDown)) != (ScrollUp | ScrollDown)) {
+		if (state & ScrollDown) {
+			ScrollY += speed;
+		} else {
+			ScrollY -= speed;
+		}
+	}
+
+	if (ScrollX < 0.f ||
+			Patch->getType()->getGraphic()->Width < (Video.Width - PatchMenuWidth)) {
+		ScrollX = 0.f;
+	} else if (ScrollX > Patch->getType()->getGraphic()->Width - (Video.Width - PatchMenuWidth)) {
+		ScrollX = Patch->getType()->getGraphic()->Width - (Video.Width - PatchMenuWidth);
+	}
+	if (ScrollY < 0.f ||
+			Patch->getType()->getGraphic()->Height < Video.Height) {
+		ScrollY = 0.f;
+	} else if (ScrollY > Patch->getType()->getGraphic()->Height - Video.Height) {
+		ScrollY = Patch->getType()->getGraphic()->Height - Video.Height;
+	}
+}
 
 static void PatchEditorCallbackButtonDown(unsigned button)
 {
@@ -125,7 +172,7 @@ static void PatchEditorCallbackExit(void)
 static void DrawPatch()
 {
 	const CGraphic *g = Patch->getType()->getGraphic();
-	g->DrawSubClip(0, 0, g->Width, g->Height, 0, 0);
+	g->DrawSubClip(0, 0, g->Width, g->Height, -(int)ScrollX, -(int)ScrollY);
 }
 
 static void DrawGrids()
@@ -135,10 +182,10 @@ static void DrawGrids()
 	int i;
 
 	for (i = 1; i < width; ++i) {
-		Video.DrawVLine(ColorBlack, i * TileSizeX, 0, height * TileSizeY);
+		Video.DrawVLineClip(ColorBlack, i * TileSizeX - (int)ScrollX, 0, height * TileSizeY);
 	}
 	for (i = 1; i < height; ++i) {
-		Video.DrawHLine(ColorBlack, 0, i * TileSizeY, width * TileSizeX);
+		Video.DrawHLineClip(ColorBlack, 0, i * TileSizeY - (int)ScrollY, width * TileSizeX);
 	}
 }
 
@@ -204,6 +251,9 @@ static void PatchEditorMainLoop()
 
 	SetCallbacks(&callbacks);
 
+	ScrollX = 0.f;
+	ScrollY = 0.f;
+
 	gcn::Widget *oldTop = Gui->getTop();
 
 	PatchEditorContainer = new gcn::Container();
@@ -228,13 +278,12 @@ static void PatchEditorMainLoop()
 	PatchEditorRunning = true;
 	while (PatchEditorRunning) {
 		CheckMusicFinished();
+		DoScroll();
 
 		PatchEditorUpdateDisplay();
 
 		WaitEventsOneFrame();
 	}
-
-	Map.PatchManager.clear();
 
 	SetCallbacks(old_callbacks);
 
@@ -253,4 +302,6 @@ void StartPatchEditor(const std::string &patchName)
 	}
 
 	PatchEditorMainLoop();
+
+	Map.PatchManager.clear();
 }

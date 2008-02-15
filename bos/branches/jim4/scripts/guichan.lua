@@ -620,12 +620,12 @@ function RunEditorMenu(s)
 
   menu = BosMenu(_("Editor"))
 
-  menu:addButton(_("Create ~!New Map"), x, 260,
+  menu:addButton(_("Create ~!New Map"), x, 220,
     function() RunEditorNewMenu(); menu:stop() end)
-  menu:addButton(_("~!Load Map"), x, 300,
+  menu:addButton(_("~!Load Map"), x, 260,
     function() RunEditorLoadMenu(); menu:stop() end)
 
-  menu:addButton(_("~!Patch Editor"), x, 360,
+  menu:addButton(_("~!Patch Editor"), x, 320,
     function() RunPatchEditorMenu(); menu:stop() end)
 
   menu:addButton(_("~!Cancel"), x, Video.Height - 100,
