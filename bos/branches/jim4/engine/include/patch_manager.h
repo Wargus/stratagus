@@ -7,6 +7,7 @@
 
 class CPatchType;
 class CPatch;
+class CFile;
 
 
 class CPatchManager
@@ -61,7 +62,15 @@ public:
 	CPatchType *newPatchType(const std::string &name, const std::string &file,
 		int tileWidth, int tileHeight, int *flags);
 
+	/**
+	**  Get a patch type
+	*/
 	CPatchType *getPatchType(const std::string &name);
+
+	/**
+	**  Save a patch type
+	*/
+	void savePatchType(CFile *file, CPatchType *patchType);
 
 private:
 	std::list<CPatch *> patches;

@@ -2,6 +2,7 @@
 #include "patch_manager.h"
 #include "patch_type.h"
 #include "patch.h"
+#include "iolib.h"
 
 #include <algorithm>
 
@@ -109,4 +110,21 @@ CPatchType *
 CPatchManager::getPatchType(const std::string &name)
 {
 	return this->patchTypesMap[name];
+}
+
+void
+CPatchManager::savePatchType(CFile *file, CPatchType *patchType)
+{
+	file->printf("patchType(\"%s\", \"%s\", %d, %d, {\n",
+		patchType->getName().c_str(), patchType->getGraphic()->File.c_str(),
+		patchType->getTileWidth(), patchType->getTileHeight());
+
+	for (int j = 0; j < patchType->getTileHeight(); ++j) {
+		for (int i = 0; i < patchType->getTileWidth(); ++i) {
+			file->printf(" 0x%04x,", patchType->getFlag(i, j));
+		}
+		file->printf("\n");
+	}
+
+	file->printf("})\n");
 }

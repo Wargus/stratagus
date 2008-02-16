@@ -51,6 +51,11 @@ public:
 	}
 
 	/**
+	**  Get the name
+	*/
+	inline const std::string &getName() const { return this->name; }
+
+	/**
 	**  Get the graphic
 	*/
 	inline const CGraphic *getGraphic() const { return this->graphic; }
