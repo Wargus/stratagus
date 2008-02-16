@@ -74,6 +74,12 @@ public:
 		return flags[y * this->tileWidth + x];
 	}
 
+	void setFlag(int x, int y, unsigned short flag)
+	{
+		Assert(0 <= x && x < this->tileWidth && 0 <= y && y < this->tileHeight);
+		flags[y * this->tileWidth + x] = flag;
+	}
+
 private:
 	std::string name;
 	std::string file;
