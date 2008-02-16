@@ -338,9 +338,14 @@ class PatchSaveButtonListener : public gcn::ActionListener
 public:
 	virtual void action(const std::string &eventId) {
 		CFile file;
-		file.open("test.lua", CL_OPEN_WRITE);
+		std::string name = UserDirectory + "patches/" + Patch->getType()->getName() + ".lua";
+		if (file.open(name.c_str(), CL_OPEN_WRITE) == -1) {
+			// TODO: show error
+			return;
+		}
 		Map.PatchManager.savePatchType(&file, Patch->getType());
 		file.close();
+		// TODO: show success
 	}
 };
 
@@ -348,6 +353,7 @@ class PatchExitButtonListener : public gcn::ActionListener
 {
 public:
 	virtual void action(const std::string &eventId) {
+		// TODO: prompt to save changes
 		PatchEditorRunning = false;
 	}
 };
