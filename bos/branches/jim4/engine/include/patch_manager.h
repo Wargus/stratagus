@@ -4,6 +4,7 @@
 
 #include <list>
 #include <map>
+#include <vector>
 
 class CPatchType;
 class CPatch;
@@ -43,7 +44,15 @@ public:
 	*/
 	CPatch *getPatch(int x, int y) const;
 
-	std::list<CPatch *> getPatches();
+	/**
+	**  Get all of the patches
+	*/
+	std::list<CPatch *> getPatches() const;
+
+	/**
+	**  Get all of the patch names
+	*/
+	std::vector<std::string> getPatchTypeNames() const;
 
 	/**
 	**  Load the patches used in the map

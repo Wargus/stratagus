@@ -62,18 +62,27 @@ function RunLoadPatchMenu()
   local x = Video.Width / 2 - 100
   local y = 260
   local name = ""
+  local typeNames
+  local names = {}
 
   menu = BosMenu(_("Patch Editor"))
 
+  typeNames = Map.PatchManager:getPatchTypeNames()
+  -- Convert vector to lua table
+  for i = 0, typeNames:size() - 1 do
+   table.insert(names, typeNames[i])
+  end
+
   menu:addLabel(_("Name:"), Video.Width / 2 - 30, y)
-  local nameInput = menu:addTextInputField(name,
-    Video.Width / 2, y, 100)
+  local nameDropDown = menu:addDropDown(names,
+    Video.Width / 2, y,
+    function() end)
 
   y = y + 40
 
   menu:addButton(_("Load ~!Patch"), x, Video.Height - 140,
     function()
-      name = nameInput:getText()
+      name = names[nameDropDown:getSelected() + 1]
 
       StartPatchEditor(name)
       menu:stop()

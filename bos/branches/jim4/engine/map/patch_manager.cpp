@@ -64,10 +64,24 @@ CPatchManager::getPatch(int x, int y) const
 }
 
 std::list<CPatch *>
-CPatchManager::getPatches()
+CPatchManager::getPatches() const
 {
 	return this->patches;
 }
+
+std::vector<std::string>
+CPatchManager::getPatchTypeNames() const
+{
+	std::vector<std::string> names;
+	std::map<std::string, CPatchType *>::const_iterator i;
+
+	for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
+		names.push_back(i->second->getName());
+	}
+
+	return names;
+}
+
 
 void
 CPatchManager::load()

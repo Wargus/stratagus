@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 02/12/08 21:38:43.
+** Generated automatically by tolua++-1.0.92 on 02/17/08 14:51:25.
 */
 
 #ifndef __cplusplus
@@ -17883,6 +17883,46 @@ static int tolua_stratagus_CPatchManager_getPatch00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: getPatchTypeNames of class  CPatchManager */
+#ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_getPatchTypeNames00
+static int tolua_stratagus_CPatchManager_getPatchTypeNames00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const CPatchManager",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const CPatchManager* self = (const CPatchManager*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'getPatchTypeNames'",NULL);
+#endif
+  {
+   vector<string> tolua_ret = (vector<string>)  self->getPatchTypeNames();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = new vector<string>(tolua_ret);
+    tolua_pushusertype_and_takeownership(tolua_S,tolua_obj,"vector<string>");
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(vector<string>));
+    tolua_pushusertype_and_takeownership(tolua_S,tolua_obj,"vector<string>");
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'getPatchTypeNames'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: newPatchType of class  CPatchManager */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CPatchManager_newPatchType00
 static int tolua_stratagus_CPatchManager_newPatchType00(lua_State* tolua_S)
@@ -20247,6 +20287,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_function(tolua_S,"moveToTop",tolua_stratagus_CPatchManager_moveToTop00);
    tolua_function(tolua_S,"moveToBottom",tolua_stratagus_CPatchManager_moveToBottom00);
    tolua_function(tolua_S,"getPatch",tolua_stratagus_CPatchManager_getPatch00);
+   tolua_function(tolua_S,"getPatchTypeNames",tolua_stratagus_CPatchManager_getPatchTypeNames00);
    tolua_function(tolua_S,"newPatchType",tolua_stratagus_CPatchManager_newPatchType00);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"AStarFixedUnitCrossingCost",tolua_get_AStarFixedUnitCrossingCost,tolua_set_AStarFixedUnitCrossingCost);
