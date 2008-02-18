@@ -244,7 +244,7 @@ static void PatchEditorCallbackExit(void)
 static void DrawPatch()
 {
 	const CGraphic *g = Patch->getType()->getGraphic();
-	g->DrawSubClip(0, 0, g->Width, g->Height, -(int)ScrollX, -(int)ScrollY);
+	g->DrawClip(-(int)ScrollX, -(int)ScrollY);
 }
 
 static void DrawPatchTileIcons()
@@ -261,11 +261,11 @@ static void DrawPatchTileIcons()
 			unsigned short flags = Patch->getType()->getFlag(i, j);
 			if (flags & MapFieldUnpassable) {
 				g = ImpassableSmallG;
-				g->DrawSubClip(0, 0, g->Width, g->Height, x, y);
+				g->DrawClip(x, y);
 			}
 			if (flags & MapFieldWaterAllowed) {
 				g = WaterSmallG;
-				g->DrawSubClip(0, 0, g->Width, g->Height, x + 16, y);
+				g->DrawClip(x + 16, y);
 			}
 		}
 	}
@@ -291,7 +291,7 @@ static void DrawIcons()
 	std::vector<PatchIcon>::iterator i;
 
 	for (i = PatchIcons.begin(); i != PatchIcons.end(); ++i) {
-		i->G->DrawSubClip(0, 0, i->G->Width, i->G->Height, i->X, i->Y);
+		i->G->DrawClip(i->X, i->Y);
 
 		if (i->Button == MouseOverButton) {
 			color = ColorBlue;
