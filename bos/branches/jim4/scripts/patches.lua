@@ -8,29 +8,23 @@ function patch(name, x, y)
 end
 
 
-local defaultFlags = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-}
+function LoadPatches(list, path)
+  for k,v in ipairs(list) do
+    if (string.find(v, ".lua$")) then
+      print("Loading patch: " .. v)
+      Load(path .. v)
+    end
+  end
+end
 
-patchType("te0", "patches/te_0.png", 16, 16, defaultFlags)
-patchType("te1", "patches/te_1.png", 16, 16, defaultFlags)
-patchType("te2", "patches/te_2.png", 16, 16, defaultFlags)
-patchType("te3", "patches/te_3.png", 16, 16, defaultFlags)
-patchType("te4", "patches/te_4.png", 16, 16, defaultFlags)
-patchType("te5", "patches/te_5.png", 16, 16, defaultFlags)
+local list
+local path
+
+path = "scripts/patches/"
+list = ListFilesInDirectory(path)
+LoadPatches(list, path)
+
+path = "~patches/"
+list = ListFilesInDirectory(path)
+LoadPatches(list, path)
 

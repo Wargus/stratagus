@@ -72,6 +72,13 @@ public:
 		int tileWidth, int tileHeight, int *flags);
 
 	/**
+	**  Define a new patch type.
+	**  Types should be created only once and last for the duration of the game.
+	*/
+	CPatchType *newPatchType(const std::string &name, const std::string &file,
+		int tileWidth, int tileHeight, unsigned short *flags);
+
+	/**
 	**  Get a patch type
 	*/
 	CPatchType *getPatchType(const std::string &name);

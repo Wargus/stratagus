@@ -109,6 +109,21 @@ CPatchType *
 CPatchManager::newPatchType(const std::string &name, const std::string &file,
 	int tileWidth, int tileHeight, int *flags)
 {
+	unsigned short *newFlags = new unsigned short[tileWidth * tileHeight];
+	for (int i = 0; i < tileWidth * tileHeight; ++i) {
+		newFlags[i] = flags[i];
+	}
+
+	CPatchType *patchType = newPatchType(name, file, tileWidth, tileHeight, newFlags);
+
+	delete[] newFlags;
+	return patchType;
+}
+
+CPatchType *
+CPatchManager::newPatchType(const std::string &name, const std::string &file,
+	int tileWidth, int tileHeight, unsigned short *flags)
+{
 	Assert(this->patchTypesMap[name] == NULL);
 	if (this->patchTypesMap[name] != NULL) {
 		fprintf(stderr, "Patch type already exists: %s\n", name.c_str());
@@ -117,6 +132,7 @@ CPatchManager::newPatchType(const std::string &name, const std::string &file,
 
 	CPatchType *patchType = new CPatchType(name, file, tileWidth, tileHeight, flags);
 	this->patchTypesMap[name] = patchType;
+
 	return patchType;
 }
 

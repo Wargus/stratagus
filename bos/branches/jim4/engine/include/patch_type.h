@@ -12,13 +12,11 @@ public:
 	**  Patch type constructor
 	*/
 	CPatchType(const std::string &name, const std::string &file,
-	           int tileWidth, int tileHeight, int *flags) :
+	           int tileWidth, int tileHeight, unsigned short *flags) :
 		name(name), file(file), graphic(NULL), tileWidth(tileWidth), tileHeight(tileHeight)
 	{
 		this->flags = new unsigned short[this->tileWidth * this->tileHeight];
-		for (int i = 0; i < this->tileWidth * this->tileHeight; ++i) {
-			this->flags[i] = flags[i];
-		}
+		memcpy(this->flags, flags, this->tileWidth * this->tileHeight * sizeof(unsigned short));
 	}
 
 	/**
@@ -56,6 +54,11 @@ public:
 	inline const std::string &getName() const { return this->name; }
 
 	/**
+	**  Get the file name
+	*/
+	inline const std::string &getFile() const { return this->file; }
+
+	/**
 	**  Get the graphic
 	*/
 	inline const CGraphic *getGraphic() const { return this->graphic; }
@@ -79,10 +82,21 @@ public:
 		return flags[y * this->tileWidth + x];
 	}
 
+	/**
+	**  Set the tile flag at a tile location
+	*/
 	void setFlag(int x, int y, unsigned short flag)
 	{
 		Assert(0 <= x && x < this->tileWidth && 0 <= y && y < this->tileHeight);
 		flags[y * this->tileWidth + x] = flag;
+	}
+
+	/**
+	**  Get all of the tile flags
+	*/
+	inline unsigned short *getFlags()
+	{
+		return this->flags;
 	}
 
 private:

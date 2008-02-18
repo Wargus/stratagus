@@ -1,4 +1,7 @@
 #include "stratagus.h"
+
+#include <sstream>
+
 #include "sound.h"
 #include "iolib.h"
 #include "network.h"
@@ -10,6 +13,7 @@
 #include "patch.h"
 #include "patch_manager.h"
 #include "ui.h"
+#include "font.h"
 
 
 extern void DrawGuichanWidgets();
@@ -302,6 +306,17 @@ static void DrawIcons()
 	}
 }
 
+static void DrawCoordinates()
+{
+	if (MouseOverTileX == -1) {
+		return;
+	}
+
+	std::ostringstream o;
+	o << MouseOverTileX << "," << MouseOverTileY;
+	VideoDrawTextCentered(Video.Width - PatchMenuWidth / 2, Video.Height - 15, GameFont, o.str());
+}
+
 static void PatchEditorUpdateDisplay()
 {
 	// Patch area
@@ -312,6 +327,7 @@ static void PatchEditorUpdateDisplay()
 	// Menu area
 	Video.FillRectangle(ColorGray, Video.Width - PatchMenuWidth, 0, PatchMenuWidth, Video.Height);
 	DrawIcons();
+	DrawCoordinates();
 
 	DrawGuichanWidgets();
 
@@ -474,7 +490,21 @@ static void FreeIcons()
 
 void StartPatchEditor(const std::string &patchName)
 {
-	Patch = Map.PatchManager.add(patchName, 0, 0);
+	std::string name;
+	if (patchName.substr(0, 5) != "user-") {
+		name = "user-" + patchName;
+		if (Map.PatchManager.getPatchType(name) == NULL) {
+			CPatchType *patchType = Map.PatchManager.getPatchType(patchName);
+			CPatchType *newPatchType = Map.PatchManager.newPatchType(name,
+				patchType->getFile(),
+				patchType->getTileWidth(), patchType->getTileHeight(),
+				patchType->getFlags());
+		}
+	} else {
+		name = patchName;
+	}
+
+	Patch = Map.PatchManager.add(name, 0, 0);
 	if (!Patch) {
 		fprintf(stderr, "Invalid patch name: %s\n", patchName.c_str());
 		return;
