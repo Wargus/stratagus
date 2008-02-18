@@ -8,7 +8,8 @@ function patch(name, x, y)
 end
 
 
-function LoadPatches(list, path)
+function LoadPatches(path)
+  local list = ListFilesInDirectory(path)
   for k,v in ipairs(list) do
     if (string.find(v, ".lua$")) then
       print("Loading patch: " .. v)
@@ -17,14 +18,6 @@ function LoadPatches(list, path)
   end
 end
 
-local list
-local path
-
-path = "scripts/patches/"
-list = ListFilesInDirectory(path)
-LoadPatches(list, path)
-
-path = "~patches/"
-list = ListFilesInDirectory(path)
-LoadPatches(list, path)
+LoadPatches("scripts/patches/")
+LoadPatches("~patches/")
 
