@@ -1000,10 +1000,7 @@ void EditorUpdateDisplay(void)
 	// Fillers
 	//
 	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
-		UI.Fillers[i].G->DrawSub(0, 0,
-			UI.Fillers[i].G->Width,
-			UI.Fillers[i].G->Height,
-			UI.Fillers[i].X, UI.Fillers[i].Y);
+		UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
 	}
 
 	if (CursorOn == CursorOnMap && Gui->getTop() == editorContainer) {
@@ -1032,10 +1029,7 @@ void EditorUpdateDisplay(void)
 	// Button panel
 	//
 	if (UI.ButtonPanel.G) {
-		UI.ButtonPanel.G->DrawSub(0, 0,
-			UI.ButtonPanel.G->Width,
-			UI.ButtonPanel.G->Height, UI.ButtonPanel.X,
-			UI.ButtonPanel.Y);
+		UI.ButtonPanel.G->DrawClip(UI.ButtonPanel.X, UI.ButtonPanel.Y);
 	}
 	DrawEditorPanel();
 

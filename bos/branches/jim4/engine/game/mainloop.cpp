@@ -197,10 +197,7 @@ void UpdateDisplay(void)
 
 		if (!BigMapMode) {
 			for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
-				UI.Fillers[i].G->DrawSubClip(0, 0,
-					UI.Fillers[i].G->Width,
-					UI.Fillers[i].G->Height,
-					UI.Fillers[i].X, UI.Fillers[i].Y);
+				UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
 			}
 			DrawMenuButtonArea();
 

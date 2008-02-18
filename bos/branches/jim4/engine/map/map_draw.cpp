@@ -259,7 +259,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		const CGraphic *g = patch->getType()->getGraphic();
 		int x = this->X - ((this->MapX - patch->getX()) * TileSizeX + this->OffsetX);
 		int y = this->Y - ((this->MapY - patch->getY()) * TileSizeY + this->OffsetY);
-		g->DrawSubClip(0, 0, g->Width, g->Height, x, y);
+		g->DrawClip(x, y);
 	}
 }
 

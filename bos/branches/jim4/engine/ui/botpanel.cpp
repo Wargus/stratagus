@@ -417,9 +417,7 @@ void CButtonPanel::Draw(void)
 	//  Draw background
 	//
 	if (UI.ButtonPanel.G) {
-		UI.ButtonPanel.G->DrawSubClip(0, 0,
-			UI.ButtonPanel.G->Width, UI.ButtonPanel.G->Height,
-			UI.ButtonPanel.X, UI.ButtonPanel.Y);
+		UI.ButtonPanel.G->DrawClip(UI.ButtonPanel.X, UI.ButtonPanel.Y);
 	}
 
 	// No buttons
