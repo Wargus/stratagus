@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 02/17/08 14:51:25.
+** Generated automatically by tolua++-1.0.92 on 02/23/08 19:49:33.
 */
 
 #ifndef __cplusplus
@@ -16019,36 +16019,6 @@ static int tolua_set_CEditor_UnitTypes(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: TerrainEditable of class  CEditor */
-#ifndef TOLUA_DISABLE_tolua_get_CEditor_TerrainEditable
-static int tolua_get_CEditor_TerrainEditable(lua_State* tolua_S)
-{
-  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TerrainEditable'",NULL);
-#endif
-  tolua_pushboolean(tolua_S,(bool)self->TerrainEditable);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: TerrainEditable of class  CEditor */
-#ifndef TOLUA_DISABLE_tolua_set_CEditor_TerrainEditable
-static int tolua_set_CEditor_TerrainEditable(lua_State* tolua_S)
-{
-  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TerrainEditable'",NULL);
-  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->TerrainEditable = ((bool)  tolua_toboolean(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: StartUnit of class  CEditor */
 #ifndef TOLUA_DISABLE_tolua_get_CEditor_StartUnit_ptr
 static int tolua_get_CEditor_StartUnit_ptr(lua_State* tolua_S)
@@ -16059,36 +16029,6 @@ static int tolua_get_CEditor_StartUnit_ptr(lua_State* tolua_S)
 #endif
   tolua_pushusertype(tolua_S,(void*)self->StartUnit,"const CUnitType");
  return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: WriteCompressedMaps of class  CEditor */
-#ifndef TOLUA_DISABLE_tolua_get_CEditor_WriteCompressedMaps
-static int tolua_get_CEditor_WriteCompressedMaps(lua_State* tolua_S)
-{
-  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'WriteCompressedMaps'",NULL);
-#endif
-  tolua_pushboolean(tolua_S,(bool)self->WriteCompressedMaps);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: WriteCompressedMaps of class  CEditor */
-#ifndef TOLUA_DISABLE_tolua_set_CEditor_WriteCompressedMaps
-static int tolua_set_CEditor_WriteCompressedMaps(lua_State* tolua_S)
-{
-  CEditor* self = (CEditor*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'WriteCompressedMaps'",NULL);
-  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->WriteCompressedMaps = ((bool)  tolua_toboolean(tolua_S,2,0))
-;
- return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -16119,6 +16059,122 @@ static int tolua_set_CEditor_Running(lua_State* tolua_S)
   self->Running = ((EditorRunningType) (int)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetEditorSelectIcon */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetEditorSelectIcon00
+static int tolua_stratagus_SetEditorSelectIcon00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string icon = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  {
+   SetEditorSelectIcon(icon);
+   tolua_pushcppstring(tolua_S,(const char*)icon);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetEditorSelectIcon'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetEditorUnitsIcon */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetEditorUnitsIcon00
+static int tolua_stratagus_SetEditorUnitsIcon00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string icon = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  {
+   SetEditorUnitsIcon(icon);
+   tolua_pushcppstring(tolua_S,(const char*)icon);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetEditorUnitsIcon'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetEditorPatchIcon */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetEditorPatchIcon00
+static int tolua_stratagus_SetEditorPatchIcon00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string icon = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  {
+   SetEditorPatchIcon(icon);
+   tolua_pushcppstring(tolua_S,(const char*)icon);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetEditorPatchIcon'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetEditorStartUnit */
+#ifndef TOLUA_DISABLE_tolua_stratagus_SetEditorStartUnit00
+static int tolua_stratagus_SetEditorStartUnit00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const std::string name = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
+  {
+   SetEditorStartUnit(name);
+   tolua_pushcppstring(tolua_S,(const char*)name);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetEditorStartUnit'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -16153,19 +16209,20 @@ static int tolua_stratagus_StartEditor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const std::string filename = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    StartEditor(filename);
+   tolua_pushcppstring(tolua_S,(const char*)filename);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StartEditor'.",&tolua_err);
@@ -16181,20 +16238,21 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* file = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const std::string file = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    int tolua_ret = (int)  EditorSaveMap(file);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)file);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'EditorSaveMap'.",&tolua_err);
@@ -16220,9 +16278,10 @@ static int tolua_stratagus_StartPatchEditor00(lua_State* tolua_S)
   const std::string patchName = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
   {
    StartPatchEditor(patchName);
+   tolua_pushcppstring(tolua_S,(const char*)patchName);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StartPatchEditor'.",&tolua_err);
@@ -20187,11 +20246,13 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"CEditor","CEditor","",NULL);
   tolua_beginmodule(tolua_S,"CEditor");
    tolua_variable(tolua_S,"UnitTypes",tolua_get_CEditor_UnitTypes,tolua_set_CEditor_UnitTypes);
-   tolua_variable(tolua_S,"TerrainEditable",tolua_get_CEditor_TerrainEditable,tolua_set_CEditor_TerrainEditable);
    tolua_variable(tolua_S,"StartUnit",tolua_get_CEditor_StartUnit_ptr,NULL);
-   tolua_variable(tolua_S,"WriteCompressedMaps",tolua_get_CEditor_WriteCompressedMaps,tolua_set_CEditor_WriteCompressedMaps);
    tolua_variable(tolua_S,"Running",tolua_get_CEditor_Running,tolua_set_CEditor_Running);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"SetEditorSelectIcon",tolua_stratagus_SetEditorSelectIcon00);
+  tolua_function(tolua_S,"SetEditorUnitsIcon",tolua_stratagus_SetEditorUnitsIcon00);
+  tolua_function(tolua_S,"SetEditorPatchIcon",tolua_stratagus_SetEditorPatchIcon00);
+  tolua_function(tolua_S,"SetEditorStartUnit",tolua_stratagus_SetEditorStartUnit00);
   tolua_variable(tolua_S,"Editor",tolua_get_Editor,tolua_set_Editor);
   tolua_function(tolua_S,"StartEditor",tolua_stratagus_StartEditor00);
   tolua_function(tolua_S,"EditorSaveMap",tolua_stratagus_EditorSaveMap00);

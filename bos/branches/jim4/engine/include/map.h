@@ -9,7 +9,7 @@
 //
 /**@name map.h - The map headerfile. */
 //
-//      (c) Copyright 1998-2007 by Vladi Shabanski, Lutz Sammer, and
+//      (c) Copyright 1998-2008 by Vladi Shabanski, Lutz Sammer, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -369,7 +369,7 @@ extern void MapCclRegister(void);
 // mixed sources
 //
 	/// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const std::string &filename, CMap *map, int writeTerrain);
+extern int SaveStratagusMap(const std::string &filename, CMap *map);
 
 
 	/// Load map presentation

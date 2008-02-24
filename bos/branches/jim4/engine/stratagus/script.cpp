@@ -832,8 +832,6 @@ void InitCcl(void)
 	AiCclRegister();
 	TriggerCclRegister();
 	SpellCclRegister();
-
-	EditorCclRegister();
 }
 
 static char *LuaEscape(const char *str)

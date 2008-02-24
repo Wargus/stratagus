@@ -138,9 +138,9 @@ public:
 // Variables
 //----------------------------------------------------------------------------
 
-int CommandLogDisabled;            /// True if command log is off
+bool CommandLogDisabled;           /// True if command log is off
 ReplayType ReplayGameType;         /// Replay game type
-static int DisabledLog;            /// Disabled log for replay
+static bool DisabledLog;           /// Disabled log for replay
 static CFile *LogFile;             /// Replay log file
 static unsigned long NextLogCycle; /// Next log cycle number
 static int InitReplay;             /// Initialize replay
@@ -416,7 +416,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		LogFile = new CFile;
 		if (LogFile->open(buf, CL_OPEN_WRITE) == -1) {
 			// don't retry for each command
-			CommandLogDisabled = 0;
+			CommandLogDisabled = false;
 			delete LogFile;
 			LogFile = NULL;
 			return;
@@ -663,7 +663,7 @@ static int CclReplayLog(lua_State *l)
 	if (!SaveGameLoading) {
 		ApplyReplaySettings();
 	} else {
-		CommandLogDisabled = 0;
+		CommandLogDisabled = false;
 	}
 
 	return 0;
@@ -701,8 +701,8 @@ int LoadReplay(const std::string &name)
 
 	NextLogCycle = ~0UL;
 	if (!CommandLogDisabled) {
-		CommandLogDisabled = 1;
-		DisabledLog = 1;
+		CommandLogDisabled = true;
+		DisabledLog = true;
 	}
 	GameObserve = true;
 	InitReplay = 1;
@@ -739,8 +739,8 @@ void CleanReplayLog(void)
 	ReplayStep = NULL;
 
 // if (DisabledLog) {
-		CommandLogDisabled = 0;
-		DisabledLog = 0;
+		CommandLogDisabled = false;
+		DisabledLog = false;
 // }
 	GameObserve = false;
 	NetPlayers = 0;
