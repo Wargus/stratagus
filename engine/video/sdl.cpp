@@ -9,7 +9,7 @@
 //
 /**@name sdl.cpp - SDL video support. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2008 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -238,6 +238,17 @@ static void InitOpenGL(void)
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &GLMaxTextureSize);
+	if (GLMaxTextureSize == 0) {
+		// FIXME: try to use GL_PROXY_TEXTURE_2D to get a valid size
+#if 0
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glGetTexLevelParameterfv(GL_PROXY_TEXTURE_2D, 0,
+			GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
+#endif
+		fprintf(stderr, "GL_MAX_TEXTURE_SIZE is 0, using 256 by default\n");
+		GLMaxTextureSize = 256;
+	}
 }
 
 void ReloadOpenGL()
