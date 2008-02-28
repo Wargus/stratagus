@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 01/22/08 20:55:13.
+** Generated automatically by tolua++-1.0.92 on Thu Feb 28 21:31:29 2008.
 */
 
 #ifndef __cplusplus
@@ -36,6 +36,7 @@ using namespace gcn;
 int GetNetworkState() {return (int)NetLocalState;}
 extern string NetworkMapName;
 void NetworkGamePrepareGameSettings(void);
+extern void InitVideo();
 #include "editor.h"
 bool IsReplayGame();
 void StartMap(const string &str, bool clean = true);
@@ -12801,6 +12802,32 @@ static int tolua_stratagus_NetworkGamePrepareGameSettings00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: InitVideo */
+#ifndef TOLUA_DISABLE_tolua_stratagus_InitVideo00
+static int tolua_stratagus_InitVideo00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   InitVideo();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'InitVideo'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: UseOpenGL */
 #ifndef TOLUA_DISABLE_tolua_get_UseOpenGL
 static int tolua_get_UseOpenGL(lua_State* tolua_S)
@@ -19369,6 +19396,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_array(tolua_S,"Hosts",tolua_get_stratagus_Hosts,tolua_set_stratagus_Hosts);
   tolua_variable(tolua_S,"NetworkMapName",tolua_get_NetworkMapName,tolua_set_NetworkMapName);
   tolua_function(tolua_S,"NetworkGamePrepareGameSettings",tolua_stratagus_NetworkGamePrepareGameSettings00);
+  tolua_function(tolua_S,"InitVideo",tolua_stratagus_InitVideo00);
   tolua_variable(tolua_S,"UseOpenGL",tolua_get_UseOpenGL,tolua_set_UseOpenGL);
   tolua_cclass(tolua_S,"CVideo","CVideo","",NULL);
   tolua_beginmodule(tolua_S,"CVideo");

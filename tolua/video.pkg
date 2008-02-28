@@ -1,3 +1,6 @@
+$extern void InitVideo();
+void InitVideo();
+
 extern bool UseOpenGL;
 
 class CVideo
