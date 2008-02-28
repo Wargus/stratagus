@@ -211,6 +211,7 @@ SetMusicVolume(preferences.MusicVolume)
 SetTranslationsFiles(preferences.StratagusTranslation, preferences.GameTranslation)
 SetGrabMouse(preferences.GrabMouse)
 
+InitVideo()
 
 --; Uses Stratagus Library path!
 Load("scripts/icons.lua")

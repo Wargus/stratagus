@@ -526,8 +526,7 @@ static int main1(int argc, char **argv)
 		"Use it at your own risk.\n"
 		"\n");
 
-	// Setup video display
-	InitVideo();
+	// Video display is inited by lua
 
 	// Setup sound card
 	if (!InitSound()) {

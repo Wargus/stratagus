@@ -2,6 +2,8 @@ Change log for Bos Wars
 -----------------------
 
 Version 2.5.0:
+- Fix crash where graphics were loaded before the video subsystem was
+started (Francois Beerten)
 - Remove runtime libraries from the repository (Francois Beerten)
 - Don't let an engineer build on top of itself (Jimmy Salmon)
 - Allow recycling buildings under construction (Jimmy Salmon)
