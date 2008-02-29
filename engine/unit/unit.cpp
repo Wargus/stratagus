@@ -779,6 +779,8 @@ void UnitClearOrders(CUnit *unit)
 			unit->Orders[i]->Goal = NoUnitP;
 		}
 		if (i != 0) {
+			COrder *order = unit->Orders.back();
+			delete order;
 			unit->Orders.pop_back();
 		}
 	}
