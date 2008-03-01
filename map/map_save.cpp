@@ -74,7 +74,7 @@ void CMap::Save(CFile *file) const
 			CMapField* mf;
 
 			mf = this->Field(w, h);
-			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
+			file->printf("  {");
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf->Visible[i] == 1) {
 					file->printf(" \"explored\", %d,", i);
