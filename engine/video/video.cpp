@@ -236,6 +236,9 @@ void CVideo::ClearScreen(void)
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
+		if (UseOpenGL) {
+			FreeOpenGLGraphics();
+		}
 		Width = w;
 		Height = h;
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,

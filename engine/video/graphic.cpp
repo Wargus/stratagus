@@ -697,9 +697,30 @@ void CGraphic::Free(CGraphic *g)
 }
 
 /**
+**  Free OpenGL graphics
+*/
+void FreeOpenGLGraphics()
+{
+	std::list<CGraphic *>::iterator i;
+	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
+		if ((*i)->Textures) {
+			glDeleteTextures((*i)->NumTextures, (*i)->Textures);
+		}
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
+		if (cg) {
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (cg->PlayerColorTextures[j]) {
+					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[j]);
+				}
+			}
+		}
+	}
+}
+
+/**
 **  Reload OpenGL graphics
 */
-void ReloadGraphics(void)
+void ReloadGraphics()
 {
 	std::list<CGraphic *>::iterator i;
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {

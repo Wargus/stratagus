@@ -347,8 +347,10 @@ extern void MakeTexture(CGraphic *graphic);
 	/// Make an OpenGL texture of the player color pixels only.
 extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 
+	/// Free OpenGL graphics
+extern void FreeOpenGLGraphics();
 	/// Reload OpenGL graphics
-extern void ReloadGraphics(void);
+extern void ReloadGraphics();
 	/// Reload OpenGL
 extern void ReloadOpenGL();
 
