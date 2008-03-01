@@ -64,11 +64,22 @@ static CGraphic *ImpassableG;
 static CGraphic *ImpassableSmallG;
 static CGraphic *WaterG;
 static CGraphic *WaterSmallG;
+#define NumSpeeds 7
+static CGraphic *SpeedG[NumSpeeds + 1];
+static CGraphic *SpeedSmallG[NumSpeeds + 1];
 
 enum PatchButton {
 	ButtonNone,
 	ButtonImpassable,
 	ButtonWater,
+	ButtonSpeed0,
+	ButtonSpeed1,
+	ButtonSpeed2,
+	ButtonSpeed3,
+	ButtonSpeed4,
+	ButtonSpeed5,
+	ButtonSpeed6,
+	ButtonSpeed7,
 };
 
 struct PatchIcon
@@ -297,6 +308,10 @@ static void DrawPatchTileIcons()
 				g = WaterSmallG;
 				g->DrawClip(x + 16, y);
 			}
+			if ((flags & MapFieldSpeedMask) != 3) {
+				g = SpeedSmallG[(flags & MapFieldSpeedMask)];
+				g->DrawClip(x + 16, y + 16);
+			}
 		}
 	}
 }
@@ -486,20 +501,38 @@ static void AddIcon(int x, int y, CGraphic *g, PatchButton b)
 static void LoadIcons()
 {
 	std::string patchEditorPath = "ui/patcheditor/";
+	int spacing = 15;
+	int leftX = Video.Width - PatchMenuWidth + spacing;
+	int rightX = Video.Width - 48 - spacing;
+	int topY = 100;
 
 	ImpassableG = CGraphic::New(patchEditorPath + "impassable.png");
 	ImpassableG->Load();
 	ImpassableSmallG = CGraphic::New(patchEditorPath + "impassable-small.png");
 	ImpassableSmallG->Load();
-	AddIcon(Video.Width - PatchMenuWidth + 15, 100, ImpassableG, ButtonImpassable);
+	AddIcon(leftX, topY, ImpassableG, ButtonImpassable);
 	FlagMap[ButtonImpassable] = MapFieldUnpassable;
 
 	WaterG = CGraphic::New(patchEditorPath + "water.png");
 	WaterG->Load();
 	WaterSmallG = CGraphic::New(patchEditorPath + "water-small.png");
 	WaterSmallG->Load();
-	AddIcon(Video.Width - 48 - 15, 100, WaterG, ButtonWater);
+	AddIcon(rightX, topY, WaterG, ButtonWater);
 	FlagMap[ButtonWater] = MapFieldWaterAllowed;
+
+	for (int i = 0; i <= NumSpeeds; ++i) {
+		std::ostringstream o;
+		o << patchEditorPath << "speed" << i << ".png";
+		SpeedG[i] = CGraphic::New(o.str());
+		SpeedG[i]->Load();
+		o.str(std::string());
+		o.clear();
+		o << patchEditorPath << "speed" << i << "-small.png";
+		SpeedSmallG[i] = CGraphic::New(o.str());
+		SpeedSmallG[i]->Load();
+		AddIcon((!(i & 1) ? leftX : rightX), topY + (48 + spacing) * ((i + 2) / 2), SpeedG[i], (PatchButton)(ButtonSpeed0 + i));
+		FlagMap[ButtonSpeed0 + i] = i;
+	}
 }
 
 static void FreeIcons()
