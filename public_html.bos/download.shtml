@@ -14,6 +14,14 @@
 </ul>
 
 
+<h1><span>Add-ons</span></h1>
+
+<ul>
+  <li>You can find add-ons (maps, etc.) in <a href="http://www.boswars.org/addons/">addons/</a></li>
+</ul>
+
+<h1><span>Old Versions: "Bos Wars"</span></h1>
+
 <h2><span>Version pre2.5 (2008/1/26)</span></h2> 
 
 <ul>
@@ -42,14 +50,6 @@
   <li>Source (zip): <a href="dist/releases/boswars-2.4-src.zip">boswars-2.4-src.zip</a></li>
 </ul>
 
-<h1><span>Add-ons</span></h1>
-
-<ul>
-  <li>You can find add-ons (maps, etc.) in <a href="http://www.boswars.org/addons/">addons/</a></li>
-</ul>
-
-<h1><span>Old Releases: "Bos Wars and Invasion - Battle of Survival"</span></h1>
-
 <h2><span>Version pre2.4 (2007/7/3)</span></h2> 
 
 <ul>
@@ -68,6 +68,8 @@
   <li>Source (tar): <a href="dist/releases/boswars-2.3-src.tar.gz">boswars-2.3-src.tar.gz</a></li>
   <li>Source (zip): <a href="dist/releases/boswars-2.3-src.zip">boswars-2.3-src.zip</a></li>
 </ul>
+
+<h1><span>Old Versions: "Invasion - Battle of Survival"</span></h1>
 
 <h2><span>Version 2.0.1 (2006/12/17)</span></h2>
 This version of Invasion - Battle of Survival works with version 2.2.1 of the <a href="http://www.stratagus.org">Stratagus</a> engine. 
