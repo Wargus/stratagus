@@ -1,7 +1,7 @@
 Change log for Bos Wars
 -----------------------
 
-Version 2.5.0:
+Version 2.5.0 (2008 3 1):
 - Free OpenGL textures before changing video mode since not all platforms
 destroy the OpenGL context (Jimmy Salmon)
 - Fix crash where graphics were loaded before the video subsystem was
