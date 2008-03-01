@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+
+----	(c) Copyright 2001-2008 by Lutz Sammer, Francois Beerten and Nehal Mistry
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Development for Bos Wars</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<h1>Development for Bos Wars</h1>
+<hr>
+
+This file should give you some information to help with development of Stratagus.<p>
+
+<h2>IRC - Internet Relay Chat</h2>
+
+You can try to meet other Bos Wars developers and users on the 
+<a href="http://www.freenode.net/">FreeNode</a> IRC Network, in the
+<a href="irc://irc.freenode.net/bos">#bos</a> channel.
+
+<h2>Mailing list</h2>
+
+If you want to help with development for Stratagus you should 
+<a href="http://archives.seul.org/bos/dev/">join</a> 
+the stratagus-devel mailing list.
+
+<h2>Bugs and tasks</h2>
+
+You can find <a
+href="http://savannah.nongnu.org/bugs/?group=stratagus-bos">known bugs</a>
+ on the <a
+href="http://boswars.org">project pages
+for Bos Wars</a>.<p>
+
+Before starting on a bug or task, please ask on the mailing list or in the 
+IRC channel whether anybody else is already working on it.
+
+<h2>Building Bos Wars</h2>
+
+<h3>Installing the Subversion client</h3>
+
+If you want to help develop, you should use Subversion. 
+The online book <a href="http://svnbook.red-bean.com/">Version Control with
+Subversion</a> will help you master Subversion.
+
+<h3>Getting Bos Wars from Subversion</h3>
+
+<h4>The subversion repository of Bos Wars has two main directories:</h4>
+
+<ul>
+    <li>bos - The Bos Wars sources<p>
+	The source to the Stratagus engine. The source is licenced
+	under the GNU General Public License.
+	<b>This contains the sources needed for development.</b>
+
+    <li>htdocs - The Bos Wars Website<p>
+	The website is stored in subversion for easy updating and version management
+	by multiple people.  This module is not needed unless you plan to update
+	the website 
+</ul>
+
+<h4>The bos directory is itself divided into 3 subdirectories:</h4>
+
+<ul>
+    <li>trunk - The main development branch. 
+        Almost all activity happens in this directory.
+    <li>branches - Special development branches.
+    <li>tags - Snapshots of the code of special interest like releases. 
+</ul>
+
+<h4>How do I get the latest source code of Bos Wars?</h4>
+
+For example:<p>
+<pre>
+  svn://bos.seul.org/svn/bos/bos/trunk
+</pre>
+<p>
+
+This is done only once. To update your working copy, go into 
+the directory and type 'svn up'.<p>
+
+<h3>Getting Bos Warss without Subversion</h3>
+
+Only releases are made outside of Subversion.  If you wish to be involved with
+development, you should obtain the sources via Subversion. 
+Subversion usually remains quite stable and is easier
+for you to keep up to date. Release versions of stratagus are available 
+<a href="http://www.boswars.org/download.shtml">here</a>.
+
+<h3>Building Bos Wars</h3>
+
+You can find instructions for compiling Bos Wars at 
+<a href="install.html">install.html</a>.<br>
+Since you already have a copy of the source, you may skip 
+ahead to step 2.
+
+<h2>Source code documentation</h2>
+
+The engine has tagged source documentation.<p>
+
+You need either <a href="http://www.doxygen.org">DoxyGen</a> or 
+<a href="http://www.zib.de/Visual/software/doc++/index.html">DOC++</a> 
+to generate source code documentation.
+
+<h3>Tags used in source code</h3>
+
+We use the doc++ tags:<p>
+
+Multi line source code documentation:<p>
+/** ... */<p>
+
+Single line source code documentation:<p>
+/// ... <p>
+
+Start grouping:<p>
+//@{ or /*@{*/<p>
+
+End grouping:<p>
+//@} or /*@}*/<p>
+
+
+<ul>
+    <li>@name
+    <br>Name of file or group.
+    <li>@param
+    <br>Describes function/macro parameter
+    <li>@return
+    <br>Describes function return
+    <li>@see
+    <br>Links to other section
+</ul><p>
+
+Please read the doxygen/doc++ documentation.
+
+<h2>Sending a patch</h2>
+
+Once you have completed some work, you will probably want it to be 
+included in the main Bos Wars source.<p>
+
+Follow these steps:<p>
+<ul>
+    <li>svn up
+    <li>svn diff &gt; your-nickname.diff
+    <li>upload 'your-nickname.diff' to the 
+    <a href="http://savannah.nongnu.org/patch/?group=stratagus-bos">patch tracker</a>.
+</ul>
+
+<hr>
+(C) Copyright 1998-2008 by The <a href="http://www.boswars.org">Bos Wars</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+All trademarks and copyrights on this page are owned by their respective owners.<br>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith, Fran�is Beerten
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Triggers</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Triggers</h1>
+<hr>
+<a href="../index.html">Stratagus</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="tileset.html">PREV</a> 
+<a href="ui.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#ActionDefeat">ActionDefeat</a>
+<a href="#ActionDraw">ActionDraw</a>
+<a href="#ActionSetTimer">ActionSetTimer</a>
+<a href="#ActionStartTimer">ActionStartTimer</a>
+<a href="#ActionStopTimer">ActionStopTimer</a>
+<a href="#ActionVictory">ActionVictory</a>
+<a href="#AddTrigger">AddTrigger</a>
+<a href="#IfNearUnit">IfNearUnit</a>
+<a href="#GetNumOpponents">GetNumOpponents</a>
+<a href="#IfRescuedNearUnit">IfRescuedNearUnit</a>
+<a href="#GetTimer">GetTimer</a>
+<a href="#GetNumUnitsAt">GetNumUnitsAt</a>
+<hr>
+<h2>Intro - Introduction to trigger functions and variables</h2>
+
+Everything around triggers.<br>
+Triggers are a couple of (condition, action).
+Each cycles in the game, if the condition of the active triggers is true,
+then the associated actions are executed.
+There are used for condition's victory
+and could be usefull to add special actions when an event occurs.
+<br>
+Some functions use generic data which can be compute during the game like
+dynamic attacker characteristic. So following present some generic terms
+and how to use it.
+
+<dl>
+  <dt><b>NumberDesc</b></dt>
+  <dd>Represent a number. it could be :
+  <dl>
+	<dt>number</dt>
+	<dd>direct value. Or value which are not recompute during the game.</dd>
+	<dt>a lua function</dt>
+	<dd>A Lua function (which take no argument) which returns the value.</dd>
+	<dt>Add(NumberDesc, NumberDesc)</dt>
+	<dd>the sum of two numbers.<br>
+	Note: prefer do (5 + 9) if you can.
+	      But you have to use it for Add(Defender("Armor"), 5)
+          because the left size must be recompute.
+	</dd>
+	<dt>Sub(NumberDesc, NumberDesc)</dt>
+	<dd>It is the difference between the two numbers.</dd>
+	<dt>Mul(NumberDesc, NumberDesc)</dt>
+	<dd>It is the product between the two numbers.</dd>
+	<dt>Div(NumberDesc, NumberDesc)</dt>
+	<dd>It is the division between the two numbers. If the second number is null, return 0 value.</dd>
+	<dt>Min(NumberDesc, NumberDesc)</dt>
+	<dd>It is the minimum between the two numbers.</dd>
+	<dt>Max(NumberDesc, NumberDesc)</dt>
+	<dd>It is the maximum between the two numbers.</dd>
+
+	<dt>GreaterThan(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &gt; NumberDesc2 else 0.</dd>
+	<dt>LessThan(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &lt; NumberDesc2 else 0.</dd>
+	<dt>GreaterThanOrEq(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &gt;= NumberDesc2 else 0.</dd>
+	<dt>LessThanOrEq(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &lt;= NumberDesc2 else 0.</dd>
+	<dt>Equal(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 == NumberDesc2 else 0.</dd>
+	<dt>NotEqual(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &lt;&gt; NumberDesc2 else 0.</dd>
+	<dt>VideoTextLength(Font, StringDesc)</dt>
+	<dd>Size in pixel of the text with the given font.</dd>
+	<dt>StringFind(StringDesc, 'c')</dt>
+	<dd>First occurance of the character 'c' in the text. (Pos begin at 0). return -1 in 'c' is not in the string.</dd>
+	<dt>Rand(NumberDesc)</dt>
+	<dd>It is a random value in [0..Number - 1].</dd>
+	<dt>AttackerVar("Variable" [, Component [, Location]])</dt>
+	<dd>It is the the value of the component of the variable for the attacker (See UnitDesc) unit (if any, else 0).
+	Note that Variable is defined with SetVariables(). And component is one of the following, default is "Value" :
+	<dl>
+	  <dt>"Enable"</dt>
+	  <dd>1 if enable, 0 else.</dd>
+	  <dt>"Value"</dt>
+	  <dd>Value of the variable.</dd>
+	  <dt>"Max"</dt>
+	  <dd>value of max of the variable.</dd>
+	  <dt>"Increase"</dt>
+	  <dd>Increase value of the variable.</dd>
+	</dl>
+	Location is what type of variable do you want, default is "Unit".
+	<dl>
+	  <dt>"Unit"</dt>
+	  <dd>value for unit itself.</dd>
+	  <dt>"Initial"</dt>
+	  <dd>Value initial for the unit (without upgrade).</dd>
+	  <dt>"Type"</dt>
+	  <dd>value for unit type with upgrade.</dd>
+	</dl>
+	</dd>
+	<dt>DefenderVar("Variable" [, Component [, Location]])</dt>
+	<dd>Like of  Attacker but for the Defender unit.</dd>
+	<dt>ActiveUnitVar("Variable" [, Component [, Location]])</dt>
+	<dd>Like of  Attacker but for the Active unit.</dd>
+  </dl></dd>
+  <dt><b>StringDesc</b></dt>
+  <dd>Represent a string. it could be :
+  <dl>
+	<dt>"string"</dt>
+	<dd>direct value. Or value which are not recompute during the game.</dd>
+	<dt>a lua function</dt>
+	<dd>A Lua function (which take no argument) which returns the value.</dd>
+	<dt>Concat(StringDesc, StringDesc[, StringDesc, ...])</dt>
+	<dd>Concatenation of several strings.</dd>
+	<dt>String(NumberDesc)</dt>
+	<dd>Convert a number to string.</dd>
+	<dt>InverseVideo(StringDesc)</dt>
+	<dd>Set string in InverseVideo mode.</dd>
+	<dt>UnitName(UnitDesc)</dt>
+	<dd>Name of the Unit</dd>
+	<dt>SubString(StringDesc, NumberDesc begin[, NumberDesc end])</dt>
+	<dd>Return the substring which begin at the 'begin' character ([0-lenght(s)])
+		and end at the 'end' character of the given string. default value for 'end' is the end of the initial string.</dd>
+	<dt>Line(NumberDesc line, StringDesc[, NumberDesc maxlen[, Font] ])</dt>
+	<dd>Return the line (which is a subtring) of a multi-line string, maxlen is the size maximum of the string.
+		If Font is specified, maxlen used VideoTextLenght, else it uses number of characters.</dd>
+	<dt>GameInfo("arg")</dt>
+	<dd>Represent a string of the game. "arg" could be :
+	<dl>
+	  <dt>"Tips"</dt>
+	  <dd>Current tip.</dd>
+	  <dt>"Objectives"</dt>
+	  <dd>All the objectives of the games.</dd>
+	</dl></dd>
+  </dl></dd>
+  <dt><b>UnitDesc</b></dt>
+  <dd>Represent a unit. It could be :
+  <dl>
+	<dt>"Attacker"</dt>
+	<dd>Unit which attack.</dd>
+	<dt>"Defender"</dt>
+	<dd>Unit which is attacked.</dd>
+	<dt>"Active"</dt>
+	<dd>First unit selected or unit under cursor.</dd>
+  </dl></dd>
+
+</dl>
+
+<h2>Functions</h2>
+
+<a name="ActionDefeat"></a>
+<h3>ActionDefeat()</h3>
+
+The player lose the game.
+
+
+<h4>Example</h4>
+<pre>
+-- Adds a trigger. If the player on the console has 0 units then he loses.
+AddTrigger(
+  function() return IfUnit("this", "==", 0, "all") end,
+  function() return ActionDefeat() end)
+</pre>
+
+<a name="ActionDraw"></a>
+<h3>ActionDraw()</h3>
+
+The condition player is set to draw. (NOT SUPPORTED)
+
+
+<a name="ActionSetTimer"></a>
+<h3>ActionSetTimer(cycles, increasing)</h3>
+
+Set the timer.
+
+
+<dl>
+  <dt>cycles</dt>
+  <dd>The number of cycles (default setting is 30 cycles per second).</dd>
+  <dt>increasing</dt>
+  <dd>Set this to 1 if you want the timer to increase, set it to 0 for decreasing.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
+ActionSetTimer(9000, 0)
+</pre>
+
+<a name="ActionStartTimer"></a>
+<h3>ActionStartTimer()</h3>
+
+Start the timer.
+
+
+<a name="ActionStopTimer"></a>
+<h3>ActionStopTimer()</h3>
+
+Stop the timer.
+
+
+<a name="ActionVictory"></a>
+<h3>ActionVictory()</h3>
+
+The condition player is set to victory.
+
+<h4>Example</h4>
+<pre>
+-- Adds a trigger. If the player on the console has killed all his 
+-- opponents he won.
+AddTrigger(
+  function() return IfOpponents("this", "==", 0) end,
+  function() return ActionVictory() end)
+</pre>
+
+<a name="AddTrigger"></a>
+<h3>AddTrigger(condition, action)</h3>
+
+Creates a new trigger.
+<br>FIXME: in code, action could be a table, but crash on execution..
+
+<dl>
+  <dt>condition</dt>
+  <dd>Function which must return true to execute the condition. It is tested every FIXME.</dd>
+  <dt>action</dt>
+  <dd>
+  Function executed when condition return true. The trigger remains active
+  if the action returns true and is removed if the action returns false.
+  </dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- Adds a trigger. If the player on the console has killed all his 
+-- opponents he won.
+AddTrigger(
+  function() return IfOpponents("this", "==", 0) end,
+  function() return ActionVictory() end)
+</pre>
+
+<a name="IfNearUnit"></a>
+<h3>IfNearUnit(player, op, quantity, unit1, unit2)</h3>
+ 
+Return true if the number of unit1 near of unit2 "op" quantity is true for the player.
+
+
+<dl>
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
+</pre></dd>
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
+</pre></dd>
+  <dt>quantity</dt>
+  <dd>Number to compare with number of units</dd>
+  <dt>unit1</dt>
+  <dd><pre>
+unit-name    Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre></dd>
+  <dt>unit2</dt>
+  <dd>unit-name, so unit type of this name.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- true when the player on the console has 6 archers near one of his/her circle of power.
+IfNearUnit("this", "==", 6, "unit-archer", "unit-circle-of-power")
+</pre>
+
+<a name="GetNumOpponents"></a>
+<h3>GetNumOpponents(player)</h3>
+
+Returns the number of opponent's for the given player.
+
+<dl>
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+</pre></dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- You win when you have no opponents left.
+if (GetNumOpponents(ThisPlayer.Index) == 0) then
+     ActionVictory()
+</pre>
+
+<a name="IfRescuedNearUnit"></a>
+<h3>IfRescuedNearUnit(player, op, quantity, unit1, unit2)</h3>
+ 
+Return true if the number of rescued-units of type unit1 which are currently near of unit2
+of the player "op" quantity is true.
+
+<dl>
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+"any"       Matches any player
+"this"      Player on the local computer, Human player in the campaign.
+</pre></dd>
+  <dt>op</dt>
+  <dd><pre>
+"=="         operator equal
+"&gt;"          operator greater than
+"&gt;="         operator greater than or equal
+"&lt;"          operator less than
+"&lt;="         operator less than or equal
+</pre></dd>
+  <dt>quantity</dt>
+  <dd>Number to compare with number of rescued-unit</dd>
+  <dt>unit1</dt>
+  <dd><pre>
+unit-name    Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre></dd>
+  <dt>unit2</dt>
+  <dd>unit-name, so unit type of this name.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- True when The player on the console has 1 rescued archer near the circle of power.
+IfRescuedNearUnit("this", "==", 1, "unit-archer", "unit-circle-of-power")
+</pre>
+
+
+<a name="GetTimer"></a>
+<h3>GetTimer()</h3>
+ 
+Return the number of cycles the timer ran.
+ 
+<h4>Example</h4>
+<pre>
+-- True when the timer is at 17 cycles.
+time = GetTimer() == 17
+</pre>
+
+<a name="GetNumUnitsAt"></a>
+<h3>GetNumUnitsAt(player, unit-type, {x1, y1}, {x2, y2})</h3>
+ 
+Return the number of units of type unit-type which are in the rectangle defined with (x1, y1, x2, y2)
+of the player.
+
+<dl>
+  <dt>player</dt>
+  <dd><pre>
+0 .. 16     Player number
+</pre></dd>
+  <dt>unit</dt>
+  <dd><pre>
+unit-name    Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre></dd>
+  <dt>{x1, y1}</dt>
+  <dd>Upper left corner</dd>
+  <dt>{x2, y2}</dt>
+  <dd>Lower right corner</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+-- True when the player on the console has at least 8 archers in the rectangle
+-- (10 10) to (12 14).
+GetNumUnitsAt(ThisPlayer.Index, "unit-archer", {10, 10}, {12, 14}) >= 8
+</pre>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2006 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

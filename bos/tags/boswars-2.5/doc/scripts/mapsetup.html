@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Francois Beerten
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Map Setup</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Map Setup</h1>
+<hr>
+<a href="../index.html">Stratagus</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="mappresentation.html">PREV</a> 
+<a href="research.html">NEXT</a> 
+<a href="index.html">LUA Index</a> 
+<hr>
+<a href="#SetStartView">SetStartView</a>
+<a href="#SetAiType">SetAiType</a>
+<a href="#SetHeightMap">SetHeightMap</a>
+<a href="#SetTile">SetTile</a>
+<a href="#SetTileMap">SetTileMap</a>
+<hr>
+<h2>Intro - Introduction to functions to setup maps</h2>
+
+A map is defined in 2 steps. This page documents map setup functions 
+used in the second step. 
+<p>
+The map setup functions load the actual map into the engine. This
+includes functions to load the tileset which 
+are defined in the <a href="tileset.html">Tileset page</a>.
+<p>
+Other functions defined elsewhere are useful in the map setup step:
+<a href="game.html#CreateUnit">CreateUnit</a> and 
+SetSharedVision, SetDiplomacy.
+<p>
+
+Note: This is for the new map format. Not implemented yet. 
+
+<h2>Functions</h2>
+
+<a name="SetStartView"></a>
+<h3>SetStartView(player, x, y)</h3>
+Set the location of the map stratagus will show to the given
+player when starting. This works a little bit like a special 
+CenterMap for each player.
+<dl>
+<dt>player</dt>
+<dd>number of the player</dd>
+<dt>x</dt>
+<dd>x position in tiles</dd>
+<dt>y</dt>
+<dd>y position in tiles</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    SetStartView(0, 20, 10)
+</pre>
+
+<a name="SetAiType"></a>
+<h3>SetAiType(player, ai-type)</h3>
+
+Set what kind of ai algorithm should be used. For example: an air based
+ai for a map with a lot of obstacles. Call this function only when creating 
+a game, not during the game.
+
+<p>
+<dl>
+<dt>player</dt>
+<dd>
+The player number.
+</dd>
+<dt>ai-type</dt>
+<dd>
+The name of the ai algorithm to use.
+</dd></dl>
+
+<h4>Example</h4>
+
+<pre>
+    SetAiType(0, "ai-air")
+</pre>
+
+<a name="SetHeightMap"></a>
+<h3>SetHeightMap(imagepath)</h3>
+A pixel in the heightmap represents the height of one tile. This
+function is optional. If the game doesn't need a height map, default
+values will be used.<p>
+<dl>
+  <dt>imagepath</dt>
+  <dd>Filename of the grayscale image for the heightmap. 
+   Black(0) is lowest level. White(255) is highest level.</dd>
+
+</dl>
+<p>
+Note: This is for the new map format. Not implemented yet. 
+
+
+<h4>Example</h4>
+
+<pre>
+    SetHeightMap("doomworld/doomworldheights.png")
+</pre>
+
+
+<a name="SetTile"></a>
+<h3>SetTile(tilemodel, x, y)</h3>
+
+Set a tile of the tilemodel given by tilename at the position defined
+by the x,y coordinates. SetTile can be called ingame for special effects.
+
+<h4>Example</h4>
+
+<pre>
+    -- Create a uniform desert of sand.
+    for i=0 to 32 do
+       for j=0 to 32 do
+          SetTile("sand", i, j)
+       end
+    end
+</pre>
+
+
+<a name="SetTileMap"></a>
+<h3>ApplyTileMap(tilemapfile, x, y, width, height)</h3>
+
+Apply a tilemap from a compact tilemap file to our tilemap.
+
+<dl>
+  <dt>tilemapfile</dt>
+  <dd>Path to the tilemapfile.</dd>
+</dl>
+
+<p>
+Note: This is for the new map format. Not implemented yet. 
+
+<h4>Example</h4>
+
+<pre>
+   -- Load the full map from a file
+   SetTileMap("doomworld/doomworld.tmf", 0, 0, 64, 64)
+   -- Replace the middle square with a tilemap showing a volcano
+   SetTileMap("doomworld/volcano.tmf", 25, 25, 10, 10)
+</pre>
+
+<p>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

@@ -1,0 +1,1265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Stratagus Configuration Language Description: Icon</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Game</h1>
+<hr>
+<a href="../index.html">Stratagus</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="config.html">PREV</a> 
+<a href="magic.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#AddKeystrokeHelp">AddKeystrokeHelp</a>
+<a href="#AddMessage">AddMessage</a>
+<a href="#AddObjective">AddObjective</a>
+<a href="#AddTip">AddTip</a>
+<a href="#Briefing">Briefing</a>
+<a href="#CenterMap">CenterMap</a>
+<a href="#ChangeUnitsOwner">ChangeUnitsOwner</a>
+<a href="#CreateUnit">CreateUnit</a>
+<a href="#DefineBurningBuilding">DefineBurningBuilding</a>
+<a href="#DefineCampaign">DefineCampaign</a>
+<a href="#DefineConstruction">DefineConstruction</a>
+<a href="#DefineEditorUnitTypes">DefineEditorUnitTypes</a>
+<a href="#DefinePlayerColorIndex">DefinePlayerColorIndex</a>
+<a href="#DefinePlayerColors">DefinePlayerColors</a>
+<a href="#DefineRaceNames">DefineRaceNames</a>
+<a href="#DefineRanks">DefineRanks</a>
+<a href="#Diplomacy">Diplomacy</a>
+<a href="#StratagusMap">StratagusMap</a>
+<a href="#GetUnitVariable">GetUnitVariable</a>
+<a href="#GetCurrentLuaPath">GetCurrentLuaPath</a>
+<a href="#Group">Group</a>
+<a href="#KillUnit">KillUnit</a>
+<a href="#KillUnitAt">KillUnitAt</a>
+<a href="#LibraryPath">LibraryPath</a>
+<a href="#Log">Log</a>
+<a href="#Makeunit">MakeUnit</a>
+<a href="#NewColors">NewColors</a>
+<a href="#MoveUnit">MoveUnit</a>
+<a href="#Player">Player</a>
+<a href="#RemoveObjective">RemoveObjective</a>
+<a href="#ReplayLog">ReplayLog</a>
+<a href="#ResetKeystrokeHelp">ResetKeystrokeHelp</a>
+<a href="#Selection">Selection</a>
+<a href="#SetDefaultMap">SetDefaultMap</a>
+<a href="#SetDiplomacy">SetDiplomacy</a>
+<a href="#SetGameName">SetGameName</a>
+<a href="#SetGamePaused">SetGamePaused</a>
+<a href="#SetGroupId">SetGroupId</a>
+<a href="#SetLocalPlayerName">SetLocalPlayerName</a>
+<a href="#SetObjectives">SetObjectives</a>
+<a href="#SetResourcesHeld">SetResourcesHeld</a>
+<a href="#SetSharedVision">SetSharedVision</a>
+<a href="#SetUnitVariable">SetUnitVariable</a>
+<a href="#SharedVision">SharedVision</a>
+<a href="#SyncRand">SyncRand</a>
+<a href="#Unit">Unit</a>
+<hr>
+<h2>Intro - Introduction to game functions and variables</h2>
+
+Everything around the game.
+<h2>Functions</h2>
+<a name="AddKeystrokeHelp"></a>
+<h3>AddKeystrokeHelp("key", "help")</h3>
+
+Add help text in the keystroke help menu.
+
+
+<dl>
+<dt>key</dt>
+<dd>Name of the key stroke.
+</dd>
+<dt>help</dt>
+<dd>Descriptive text telling what the keystroke does.
+</dd>
+</dl>
+
+<h4>Examples</h4>
+
+<pre>
+    AddKeystrokeHelp("+", "- increase game speed")
+    AddKeystrokeHelp("Ctrl-T", "- track unit")
+    AddKeystrokeHelp("F5", "- game options")
+    AddKeystrokeHelp("F10", "- game menu")
+</pre>
+
+<a name="AddMessage"></a>
+<h3>AddMessage(message)</h3>
+
+Add a message to be displayed.
+
+
+<dl>
+<dt>message</dt>
+<dd>Text message to display.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Adds the message.
+    AddMessage("This is a message")
+</pre>
+
+<a name="AddObjective"></a>
+<h3>AddObjective(objective position)</h3>
+
+Add an objective to the scenario objectives text list.
+
+
+<dl>
+<dt>objective</dt>
+<dd>Objective text.
+</dd>
+<dt>position</dt>
+<dd>Optional position (0 offset) to add the objective, default is at the end.
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Adds the objective text "-Build a barracks" to the end of the objectives
+    -- list and adds the objective "-Destroy all enemies" to the first position.
+    AddObjective("-Build a barracks")
+    AddObjective("-Destroy all enemies", 0)
+</pre>
+
+<a name="AddTip"></a>
+<h3>AddTip(tip)</h3>
+
+Adds a tip.  Tips are shown at the start of a level.
+
+
+<dl>
+<dt>tip</dt>
+<dd>Text of the tip.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    AddTip("You can demolish trees and rocks.")
+</pre>
+
+<a name="Briefing"></a>
+<h3>Briefing</h3>
+
+Set the briefing.
+
+Type must be "sc" or "wc2". Background and text tags are required.
+
+
+<h4>Example</h4>
+
+<pre>
+Briefing("type", "wazoogame",
+  "title", "sc",
+  "objective", "Kill all aliens on the map.",
+  "background", "campaigns/human/interface/introscreen3.png",
+  "text", "campaigns/human/level07h.txt",
+  "voice", "campaigns/human/level07h-intro1.wav",
+  "voice", "campaigns/human/level07h-intro2.wav"
+)
+</pre>
+
+<a name="CenterMap"></a>
+<h3>CenterMap(x, y)</h3>
+
+Center the current viewport at a certain location.
+
+
+<dl>
+<dt>x</dt>
+<dd>X tile location.
+</dd>
+<dt>y</dt>
+<dd>Y tile location.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Centers the current viewport at tile 17x40.
+    CenterMap(17, 40)
+</pre>
+
+<a name="ChangeUnitsOwner"></a>
+<h3>ChangeUnitsOwner({x1, y1}, {x2, y2}, oldplayer, newplayer)</h3>
+
+Changes the owner of a group of units from one player to another.
+
+
+<dl>
+<dt>{x1, y1}</dt>
+<dd>Upper left location for tilebox to check for units within.
+</dd>
+<dt>{x2, y2}</dt>
+<dd>Lower right location for tilebox to check for units within.
+</dd>
+<dt>oldplayer</dt>
+<dd>The player that currently owns the units
+</dd>
+<dt>newplayer</dt>
+<dd>The player that the units should now be owned by
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Changes the owner to player 2 for all units owned by player 3,
+    -- that are located in the area (0,0)-(10,10).
+    ChangeUnitsOwner({0, 0}, {10, 10}, 3, 2)
+</pre>
+
+<a name="CreateUnit"></a>
+<h3>CreateUnit(type, player, {x, y})</h3>
+
+Create a unit at a location.  If the location is occupied, the unit will be
+placed in the closest available spot.
+
+
+<dl>
+<dt>type</dt>
+<dd>Type of unit to create.
+</dd>
+<dt>player</dt>
+<dd>Player number that owns the unit.
+</dd>
+<dt>x</dt>
+<dd>X map tile location.
+</dd>
+<dt>y</dt>
+<dd>Y map tile location.
+</dd>
+<dt><I>RETURNS</I></dt>
+<dd>The slot number of the created unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Creates a footman for player 2 at location 31x34.
+    CreateUnit("unit-footman", 2, {31, 34})
+</pre>
+
+<a name="DefineBurningBuilding"></a>
+<h3>DefineBurningBuilding({"percent", p, "missile", m} ...)</h3>
+
+Define the burning animation for buildings. The animation will be laid over the building image.
+
+<dl>
+<dt>p</dt>
+<dd>Hit point percentage.
+</dd>
+<dt>m</dt>
+<dd>Fire missile to display.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefineBurningBuilding(
+        {"percent", 0, "missile", "missile-big-fire"},
+        {"percent", 50, "missile", "missile-small-fire"},
+        {"percent", 75}) -- no missile
+
+</pre>
+
+<a name="DefineCampaign"></a>
+<h3>DefineCampaign(ident, "name", campaign-name, [campaign-data])</h3>
+
+Define the campaign.
+
+
+<dl>
+<dt>ident</dt>
+<dd>name identifying the campaign in the scripts.
+</dd>
+<dt>campaign-name</dt>
+<dd>name of the campaigned displayed to players.
+</dd>
+<dt>campaign-data</dt>
+<dd>TODO.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefineCampaign()
+</pre>
+
+<a name="DefineConstruction"></a>
+<h3>DefineConstruction(ident ...)</h3>
+Defines a construction.<br>
+<br>
+Constructions can specify multiple files and shadow files.  Shadows are 
+optional.<br>
+<br>
+The construction frames should be ordered by increasing percentages and the
+first frame should be 0.
+
+<pre>
+DefineConstruction( ident
+  Files = {
+    File = filename,
+    Size = {x, y}},
+  ShadowFile = {{
+    Tileset = tileset,
+    File = filename,
+    Size = {x, y}}},
+  Constructions = {{
+    percent = percent,
+    file = construction-file,
+    frame = frame-number}}
+})
+</pre>
+
+<dl>
+<dt>ident</dt>
+<dd>Unique name of the construction.
+</dd>
+<dt>tileset</dt>
+<dd>Name of tileset or default to use with any tileset.
+</dd>
+<dt>filename</dt>
+<dd>Path of the graphic.
+</dd>
+<dt>percent</dt>
+<dd>Percentage of construction complete.
+</dd>
+<dt>construction-file</dt>
+<dd>Can be construction or main, specifies which image should be displayed.
+</dd>
+<dt>frame-number</dt>
+<dd>Specfies which frame number to display.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Defines construction-land with different graphics for summer and winter
+    -- tilesets.  Buildings 0-24 percent complete use frame 0 of the construction
+    -- image, 25-49 percent complete use frame 1 of the construction image, and 50-99
+    -- percent complete use the frame 1 of the main building graphic.
+    DefineConstruction("construction-land", {
+        Files= {{
+                Tileset = "desert",
+                File = "neutral/buildings/land_construction_site.png",
+                Size = {64, 64}},{
+                Tileset = "winter",
+                File = "tilesets/winter/neutral/buildings/land_construction_site.png",
+                Size = {64, 64}}},
+        Constructions = {{
+                Percent = 0,
+                File = "construction",
+                Frame = 0},{
+                Percent = 25,
+                File = "construction",
+                Frame = 1},{
+                Percent = 50,
+                File = "main",
+                Frame = 1}}
+    })
+</pre>
+
+<a name="DefineEditorUnitTypes"></a>
+<h3>DefineEditorUnitTypes({unit1, unit2, ...})</h3>
+
+Creates a sorted list of unit-types for the editor. 
+This is only a temporary hack for better sorted units.
+
+<dl>
+<dt>unit</dt>
+<dd>identifier of the unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+DefineEditorUnitTypes({
+   "unit-vault",
+   "unit-apcs",
+   "unit-medic",
+   "unit-bazoo",
+   "unit-assault",
+   "unit-grenadier",
+   "unit-camp",
+   "unit-hosp"
+})
+</pre>
+
+<a name="DefinePlayerColorIndex"></a>
+<h3>DefinePlayerColorIndex(colorstart, numcolors)</h3>
+
+Define the graphic color indexes to be replaced by the player color.
+
+<dl>
+<dt>colorstart</dt>
+<dd>Index of the first color
+</dd>
+<dt>numcolors</dt>
+<dd>Total number of colors
+</dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefinePlayerColorIndex(10, 5) -- for indexes 10-14
+</pre>
+
+<a name="DefinePlayerColors"></a>
+<h3>DefinePlayerColors({"color", {{R, G, B}, {R, G, B}, {R, G, B}, {R, G, B}}, ...})</h3>
+
+Define the player colors.  There should be 16 colors defined and 4 shades of each color.
+
+<dl>
+<dt>color</dt>
+<dd>Name of the player color
+</dd>
+<dt>R, G, B</dt>
+<dd>Red, green, blue values for each color
+</dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefinePlayerColors({
+      "red", {{164, 0, 0}, {124, 0, 0}, {92, 4, 0}, {68, 4, 0}},
+      "blue", {...},
+      ...
+    )
+</pre>
+
+<a name="DefineRaceNames"></a>
+<h3>DefineRaceNames("race", {...}, "race", {...}, ... )</h3>
+
+Define the race names.
+
+<pre>
+DefineRaceNames(
+  "race", {
+    "name", "race-name",
+    "display", "race-display-name"
+    ["visible"])
+  ["race", {...}] ...)
+</pre>
+
+<dl>
+<dt>race-name</dt>
+<dd>Internal race name used by other ccl functions.
+</dd>
+<dt>race-display-name</dt>
+<dd>Name of the race that gets displayed to the user.
+</dd>
+<dt>visible</dt>
+<dd>If specified the race will be visible in the race menus.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Defines the elites and neutral races.  The neutral race is
+    -- not visible in the race menus.
+    DefineRaceNames(
+        "race", {
+                "race", 0,
+                "name", "elites",
+                "display", "Elites",
+                "visible"},
+        "race", {
+                "race", 1,
+                "name", "neutral",
+                "display", "Neutral"}
+    )
+</pre>
+
+<a name="DefineRanks"></a>
+<h3>DefineRanks( race '(score rank [score rank] ...))</h3>
+
+Define ranks for a race.
+
+
+<dl>
+<dt>race</dt>
+<dd>The race to define the ranks for.
+</dd>
+<dt>score</dt>
+<dd>If the player's score is greater than or equal to this number then the
+rank is displayed.  Scores are expected to be sorted in increasing order.
+</dd>
+<dt>rank</dt>
+<dd>The rank that gets displayed.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Defines the ranks for the alliance race.
+    DefineRanks("alliance", {
+       0, "Pathetic",
+       3000, "Not Bad",
+       10000, Great
+    })
+</pre>
+
+<a name="Diplomacy"></a>
+<h3>Diplomacy(state, enemy)</h3>
+
+Does the same as SetDiplomacy(currentplayer, state, enemy).
+<p>
+
+See <a href="#SetDiplomacy">SetDiplomacy</a> for more details.
+
+
+<a name="StratagusMap"></a>
+<h3>StratagusMap()</h3>
+
+Needed to load/save games.
+
+<h4>Example</h4>
+
+<pre>
+StratagusMap(
+  "version", "2.1.0",
+  "description", "big brazilian forest",
+  "the-map", {
+  "terrain", {"tileset-desert", "desert"},
+  "size", {128, 128},
+  "fog-of-war",
+  "filename", "maps/braza.pud",
+  "map-fields", {
+  -- 0
+  {125, 125, "land", "block", "wood",},   {125, 125, "land", "block", "wood",},
+  {125, 125, "land", "block", "wood",},   {125, 125, "land", "block", "wood",},
+  {125, 125, "land", "block", "wood",},   {125, 125, "land", "block", "wood",},
+  {125, 125, "land", "block", "wood",},   {125, 125, "explored", 1, "land", "block", "wood",},
+  {125, 125, "explored", 1, "land", "block", "wood",}
+  .....
+}})
+</pre>
+
+<a name="GetCurrentLuaPath">
+<h3>GetCurrentLuaPath()</h3>
+
+Returns the path of the currenly interpreted lua script.
+
+<h4>Examples</h4>
+<pre>
+    print(GetCurrentLuaPath())
+    Load(GetCurrentLuaPath().."unit.lua")
+</pre>
+
+<a name="GetUnitVariable"></a>
+<h3>GetUnitVariable(unit, VariableName)</h3>
+
+Get a unit's mana.
+
+<dl>
+<dt>unit</dt>
+<dd>Unit to get info for.</dd>
+<dt>VariableName</dt>
+<dd>Name of the variable to get info for.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+-- Get mana of the unit (slot #11).
+GetUnitMana(11, "Mana");
+</pre>
+
+<a name="Group"></a>
+<h3>Group(group, quantity, {unit0, unit1, ...})</h3>
+
+Create a group of units.
+
+
+<dl>
+<dt>group</dt>
+<dd>Group number.
+</dd>
+<dt>quantity</dt>
+<dd>How much units are in the group.
+</dd>
+<dt>unitX</dt>
+<dd>unit slot number.
+</dd>
+</dl>
+
+
+<a name="KillUnit"></a>
+<h3>KillUnit(unit, player)</h3>
+
+Kill a unit.
+
+<dl>
+<dt>unit</dt>
+<dd><pre>
+"unit-name"  Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre></dd>
+<dt>player</dt>
+<dd><pre>
+0 .. 16     Player number
+"any"        Matches any player
+"all"        All players (Not used)
+"this"       Player on the local computer, Human player in the campaign.
+</pre></dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Kills a peasant of the player on the local computer.
+    KillUnit("unit-peasant", "this");
+</pre>
+
+<a name="KillUnitAt"></a>
+<h3>KillUnitAt(unit, player, quantity, location1, location2)</h3>
+
+Kills units at a specific location.
+
+
+<dl>
+<dt>unit</dt>
+<dd><pre>
+"unit-name"  Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre></dd>
+<dt>player</dt>
+<dd><pre>
+0 .. 16     Player number
+"any"        Matches any player
+"all"        All players (Not used)
+"this"       Player on the local computer, Human player in the campaign.
+</pre></dd>
+<dt>quantity</dt>
+<dd><pre>
+0 ... oo    Number for the quantity
+</pre></dd>
+<dt>location1</dt>
+<dd><pre>
+{x1, y1}    Upper left corner
+</pre></dd>
+<dt>location2</dt>
+<dd><pre>
+{x2, y2}    Lower right corner
+</pre></dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Kills any units in the rectangle (5,12) to (9,15).
+    KillUnitAt("any", "any", 9, {5, 12}, {9, 15});
+</pre>
+
+<a name="LibraryPath"></a>
+<h3>LibraryPath()</h3>
+
+Returns the Stratagus library path. The Stratagus library path points to the game data directory.
+
+<h4>Example</h4>
+
+<pre>
+    path = LibraryPath()
+</pre>
+
+<a name="ListDirectory"></a>
+<h3>ListDirectory(path)</h3>
+
+Returns a list with all files and subdirectories found in the directory pointed by path. 
+If the given path starts with '~', then the path is relative to the
+user stratagus preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre>
+    list = ListDirectory("music/")
+</pre>
+
+<a name="ListFilesInDirectory"></a>
+<h3>ListFilesInDirectory(path)</h3>
+
+Returns a list with all files found in the directory pointed by path. 
+The path is relative to the game directory. 
+If the given path starts with '~', then the path is relative to the
+stratagus' user preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre>
+    list = ListFilesInDirectory("music/")
+</pre>
+
+<a name="ListDirsInDirectory"></a>
+<h3>ListDirsInDirectory(path)</h3>
+
+Returns a list with all subdirectories found in the directory pointed by path. 
+The path is relative to the game directory.
+If the given path starts with '~', then the path is relative to the
+user stratagus preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre>
+    list = ListDirsInDirectory("music/")
+</pre>
+
+<a name="Log"></a>
+<h3>Log()</h3>
+
+Parse a log entry. Used in replay games.
+
+
+<h4>Example</h4>
+
+<pre>
+    Log({ GameCycle = 10420, UnitNumber = 252, UnitIdent = "unit-assault", 
+       Action = "move", Flush = 1, PosX = 113, PosY = 104, SyncRandSeed = 614148735 })
+</pre>
+
+<a name="MakeUnit"></a>
+<h3>MakeUnit(unittype, player)</h3>
+
+Create a unit which can later be placed on the map with <a href="#PlaceUnit">PlaceUnit</a>.
+
+
+<dl>
+<dt>unittype</dt>
+<dd>type of unit to create.</dd>
+<dt>player</dt>
+<dd>player number for who the unit is created.</dd>
+<dt><I>RETURNS</I></dt>
+<dd>The slot number of the created unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    unit = MakeUnit("unit-assault", 0)
+</pre>
+
+<a name="NewColors"></a>
+<h3>NewColors()</h3>
+
+Change players colors.
+
+<h4>Example</h4>
+
+<pre>
+    NewColors()
+</pre>
+
+<a name="MoveUnit"></a>
+<h3>MoveUnit(unit-slot, {x, y})</h3>
+
+Place a unit on map. If the location is occupied, 
+the unit will be placed in the closest available spot.
+
+
+<dl>
+<dt>unit-slot</dt>
+<dd>slot number of the unit to be placed
+</dd>
+<dt>x</dt>
+<dd>X map tile position.
+</dd>
+<dt>y</dt>
+<dd>Y map tile position.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    MoveUnit(0, {10, 12})
+</pre>
+
+<a name="Player"></a>
+<h3>Player()</h3>
+
+Used when loading games.
+
+
+<h4>Example</h4>
+
+<pre>
+Player(0,
+  "name", "feb",
+  "type", "person", "race", "elites", "ai", 0,
+  "team", 2, "enemy", "_X______________", "allied", "________________", 
+  "shared-vision", "________________",
+  "start", {0, 0},
+  "resources", {"time", 0, "titanium", 2100, "crystal", 1000,},
+  "last-resources", {"time", 0, "titanium", 2100, "crystal", 1000,},
+  "incomes", {"time", 0, "titanium", 100, "crystal", 100,},
+  "revenue", {"time", 0, "titanium", 0, "crystal", 0,},
+  "ai-disabled",
+ "supply", 1575, "unit-limit", 200, "building-limit", 200, "total-unit-limit", 400,
+  "score", 0,
+  "total-units", 16,
+  "total-buildings", 16,
+  "total-resources", {0, 100, 0, 0, 0, 0, 0,},
+  "total-razings", 0,
+  "total-kills", 0,
+  "color", { 160, 0, 0 },
+  "timers", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,}
+)
+</pre>
+
+<a name="RemoveObjective"></a>
+<h3>RemoveObjective(position)</h3>
+
+Remove an objective from the scenario objectives text list.
+
+
+<dl>
+<dt>position</dt>
+<dd>Position (0 offset) to remove from the objectives list.
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Remove the first objective from the objectives list.
+    RemoveObjective(0)
+</pre>
+
+<a name="ReplayLog"></a>
+<h3>ReplayLog()</h3>
+
+Used in replay games.
+
+
+<h4>Example</h4>
+
+<pre>
+ReplayLog( {
+  Comment1 = "Generated by Stratagus Version 2.1",
+  Comment2 = "Visit http://Stratagus.Org for more information",
+  Date = "Wed Jul 21 16:22:17 2004",
+  Map = "big",
+  MapPath = "maps/braza.pud",
+  MapId = 4047425872,
+  Type = 1,
+  Race = -1,
+  LocalPlayer = 0,
+  Players = {
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 },
+        { Race = 0, Team = 0, Type = 0 }
+  },
+  Resource = -1,
+  NumUnits = -1,
+  TileSet = -1,
+  NoFow = 0,
+  RevealMap = 0,
+  GameType = -1,
+  Opponents = -1,
+  Engine = { 2, 1, 0 },
+  Network = { 0, 9, 2 }
+} )
+</pre>
+
+<a name="ResetKeystrokeHelp"></a>
+<h3>ResetKeystrokeHelp()</h3>
+
+Clear all keystroke help menu.
+
+
+<h4>Example</h4>
+
+<pre>
+    ResetKeystrokeHelp()
+</pre>
+
+<a name="Selection"></a>
+<h3>Selection(numselected, unit0, ...)</h3>
+
+Define the current selection.
+
+
+<dl>
+<dt>numselected</dt>
+<dd>How many units are selected.
+</dd>
+<dt>unitX</dt>
+<dd>slot number of the unit to add in the selection.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    Selection(1, 0)
+</pre>
+
+<a name="SetDefaultMap"></a>
+<h3>SetDefaultMap(path)</h3>
+
+Set the default map path.
+
+
+<dl>
+<dt>path</dt>
+<dd>Path to the map.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Sets the default map to "puds/default.pud".
+    SetDefaultMap("puds/default.pud")
+</pre>
+
+<a name="SetDiplomacy"></a>
+<h3>SetDiplomacy(player, state, enemy)</h3>
+
+Alters the diplomacy setting between two players. eg enemy, allied
+
+
+<dl>
+<dt>player</dt>
+<dd>Player to effect change of diplomacy on.
+</dd>
+</dl>
+<dl>
+<dt>state</dt>
+<dd>State of relationship between players ("allied", "enemy", "neutral", "crazy").
+</dd>
+</dl>
+<dl>
+<dt>enemy</dt>
+<dd>Other player involved in diplomacy.
+</dd>
+</dl>
+
+
+<h4>Example</h4>
+
+<pre>
+    -- Sets player 1 to be an enemy of player 0.
+    SetDiplomacy(0, "enemy", 1)
+</pre>
+
+<a name="SetGameName"></a>
+<h3>SetGameName("name")</h3>
+
+Sets the name of the game so savegames, maps, settings and logs can be set
+differently for different games used.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name the game has for loading and saving files</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Name to bos, ~/.stratagus/bos is location of files
+	SetGameName("bos")
+</pre>
+
+<a name="SetGamePaused"></a>
+<h3>SetGamePaused(paused)</h3>
+
+Pause or unpause the game.
+
+
+<dl>
+<dt>paused</dt>
+<dd>true for paused, false for unpaused.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Pauses the game.
+    SetGamePaused(true)
+</pre>
+
+<a name="SetGroupId"></a>
+<h3>SetGroupId(id)</h3>
+
+Set the current group id. (Needed for load/save).
+
+
+<dl>
+<dt>id</dt>
+<dd>new group id.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    SetGroupId(0)
+</pre>
+
+<a name="SetLocalPlayerName"</a>
+<h3>SetLocalPlayerName("name")</h3>
+
+Sets the name of the player playing on this computer. Also saved in
+preferences, and a default used when the game is started.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name of the player, limited to 16 characters"</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Player Name to mr-russ
+    SetLocalPlayerName("mr-russ")
+</pre>
+
+<a name="SetObjectives"></a>
+<h3>SetObjectives(objective [objective ...])</h3>
+
+Set the mission objectives.  This will overwrite any previous objectives.
+
+<dl>
+<dt>objective</dt>
+<dd>Mission objective text.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Sets the mission objectives.
+    SetObjectives("Build 4 farms", "Mine 500 gold")
+</pre>
+
+<a name="SetSharedVision"></a>
+<h3>SetSharedVision(player, state, opponent)</h3>
+
+Sets shared vision.
+
+
+<dl>
+<dt>player</dt>
+<dd>Player number to set shared vision.
+</dd>
+<dt>state</dt>
+<dd>Use true to turn on shared vision, false to turn off.
+</dd>
+<dt>opponent</dt>
+<dd>Player number to change.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Sets shared vision for player 0 to on with player 2.
+    SetSharedVision(0, true, 2)
+</pre>
+
+<a name="SetResourcesHeld"></a>
+<h3>SetResourcesHeld(unit, resources)</h3>
+
+Set the amount of resources available in a unit. Mostly used for harvestable resources.
+
+
+<dl>
+<dt>unit</dt>
+<dd>unit identifier obtained via for example CreateUnit.
+</dd>
+<dt>resources</dt>
+<dd>amount of resources held by the unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    unit = CreateUnit("unit-crystal", {10,45})
+    SetResourcesHeld(unit, 2500)
+</pre>
+
+<a name="SetUnitVariable"></a>
+<h3>SetUnitVariable(unit, VariableName, amount)</h3>
+Set the amount of VariableName of the unit.
+<dl>
+<dt>unit</dt>
+<dd>Unit to set the info for.</dd>
+<dt>VariableName</dt>
+<dd>Variable to set.</dd>
+<dt>amount</dt>
+<dd>New amount of VariableName for the unit.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+--  Set mana of the unit (slot 11)
+SetUnitVariable(12, "Mana", 255)
+</pre>
+
+<a name="SharedVision"></a>
+<h3>SharedVision(state, opponent)</h3>
+
+Sets shared vision for the player at the computer.
+
+
+<dl>
+<dt>state</dt>
+<dd>Use true to turn on shared vision, false to turn off.
+</dd>
+<dt>opponent</dt>
+<dd>Player number to change.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Sets shared vision on with player number 3.
+    SharedVision(true, 3)
+</pre>
+
+<a name="SyncRand"></a>
+<h3>SyncRand(number)</h3>
+
+Get a value from the Stratagus syncronized random number generator.
+Used to allow the AI to make syncronized choices with multiplayer, and 
+during replays.
+
+<dl>
+<dt>number<dt>
+<dd>Number to create random from, eg 10</dd>
+<dt><i>RETURNS</i></dt>
+<dd>the number randomly generated, eg 0-9 for input 10.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    if(SyncRand(10) &lt; 5) then
+		-- Do this
+	else
+		-- Do that
+    end
+</pre>
+
+<a name="Unit"></a>
+<h3>Unit()</h3>
+
+Needed to save/load games. 
+
+<h4>Example</h4>
+
+<pre>
+Unit(0, "type", "unit-vault", "player", 0,
+  "tile", {116, 120}, "refs", 6, "stats", 0,
+  "pixel", {0, 0}, "seen-pixel", {0, 0}, "frame", 1, "not-seen", "direction", 0,
+  "attacked", 0,
+  "current-sight-range", 4, "seen-by-player", "X_______________",
+  "seen-destroyed", "________________",
+  "seen-state", 0,  "active", "mana", 0, "hp", 1800, "xp", 0, "kills", 0,
+  "ttl", 0, "bloodlust", 0, "haste", 0, "slow", 0,
+  "invisible", 0, "flame-shield", 0, "unholy-armor", 0,
+  "HitPoints", {Value = 1800, Max = 1800, Increase = 0, Enable = true},
+  "Mana", {Value = 0, Max = 0, Increase = 0, Enable = false},
+  "Transport", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "Research", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "Training", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "UpgradeTo", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "Resource", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "group-id", 0,
+  "last-group", 0,
+  "value", 0,
+  "sub-action", 0, "wait", 2, "state", 2,
+  "blink", 0, "rs", 35, "units-boarded-count", 0,"order-count", 1,
+  "order-flush", 0,
+  "order-total", 4,
+        "orders", {
+    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},},
+    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
+    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
+    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},},
+ "saved-order", 
+    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},},
+ "new-order", 
+    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},}
+)
+</pre>
+
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

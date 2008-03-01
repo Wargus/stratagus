@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Research</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Research</h1>
+<hr>
+<a href="../index.html">Stratagus</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="mapsetup.html">PREV</a> 
+<a href="savegame.html">NEXT</a> 
+<a href="index.html">LUA Index</a> 
+<hr>
+<a href="#CheckDependency">CheckDependency</a>
+<a href="#DefineAllow">DefineAllow</a>
+<a href="#DefineDependency">DefineDependency</a>
+<a href="#DefineModifier">DefineModifier</a>
+<a href="#GetDependency">GetDependency</a>
+<hr>
+<h2>Intro - Introduction to research functions and variables</h2>
+
+Everything around researching and upgrades.
+<h2>Functions</h2>
+
+<a name="CheckDependency"></a>
+<h3>CheckDependency()</h3>
+
+NOT WRITTEN YET.
+
+
+<dl>
+<dt>.</dt>
+<dd>.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    CheckDependency()
+</pre>
+
+<a name="DefineUnitAllow"></a>
+<h3>DefineUnitAllow(name, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N)</h3>
+
+Define how many units of a given type each player can have.
+
+<dl>
+<dt>name</dt>
+<dd>Name of an unit-type to be defined.
+</dd>
+<dt>N</dt>
+<dd>
+  The initial quantity of units per type at level start.
+  Each player has his quatinty, the first is for player 0 and the last
+  is for player 15.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Allow 1 catapult for the 2nd player.
+    DefineUnitAllow("unit-catapult", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+</pre>
+
+
+<a name="DefineAllow"></a>
+<h3>DefineAllow(name, str16)</h3>
+
+Define what upgrades are enabled for each player during
+a level.
+
+<dl>
+<dt>name</dt>
+<dd>Name of an upgrade to be defined.
+</dd>
+<dt>str16</dt>
+<dd>
+  The initial allow state for the upgrade at level start:
+  <ul>
+  <li>A - Allowed
+  <li>E - Enabled, allowed by level but currently forbidden
+  <li>F - Forbidden
+  <li>R - Researched or acquired
+  <li>Q - Acquired but currently forbidden (does it make sense?:)
+  </ul>
+  Each player has his own character, the first is for player 0 and the last
+  is for player 15.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Allow the metal upgrade for all 16 players.
+    DefineAllow("upgrade-metal", "AAAAAAAAAAAAAAAA")
+    --                            ^- player 0    ^- player 15
+</pre>
+
+
+
+<a name="DefineDependency"></a>
+<h3>DefineDependency( unit-type/upgrade ...)</h3>
+
+Define the dependencies for an unit-type or an upgrade. The dependency
+must be full filled before an unit or research can be used.
+<p>
+<code>DefineDependency unit-type/upgrade '( required-part )
+     ['or '( optional-or-part ) ...] )
+</code>
+
+<dl>
+<dt>required-part</dt>
+<dd><code>unit/upgrade [count]</code><p>
+   A list of unit-types or upgrades required.
+   <dl>
+   <dt>unit/upgrade</dt>
+   <dd>Unit-type name or upgrade name required.
+   </dd>
+   <dt>count</dt>
+   <dd>Optional count, how many units of the unit-type are required.
+   </dl>
+</dd>
+<dt>'or optional-or-part</dt>
+<dd><code>unit/upgrade [count]</code><p>
+    Optional list of or parts. One or list must be complete full filled.<p>
+   <dl>
+   <dt>unit/upgrade</dt>
+   <dd>Unit-type name or upgrade name required.
+   </dd>
+   <dt>count</dt>
+   <dd>Optional count, how many units of the unit-type are required.
+   </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- The second sword upgrade is only possible, if the first sword upgrade is
+    -- researched.
+    (define-dependency "upgrade-sword2" '(upgrade-sword1))
+    -- The ranger upgrade is only available if a keep or castle is available.
+    (define-dependency 'upgrade-ranger '(unit-keep) 'or '(unit-castle))
+</pre>
+
+<a name="DefineModifier"></a>
+<h3>DefineModifier("upgrade-name", {effect1, effect1-arg}, {effect2, effect2-arg}, ... )</h3>
+
+Define the effects (modifier) of an upgrade. An upgrade can have multiple
+modifiers. It can activate, enable or disable other upgrades and allows
+complex reactions.
+
+<dl>
+<dt>"upgrade-name"</dt>
+<dd>Name of the upgrade, which has this effects. All effects change
+all old units and any new unit of a player.
+</dd>
+<dt>{effectN, effectN-arg}</dt>
+<dd>A list of effects of the upgrade. Here are all possible effects:
+  <dl>
+  <dt>{"attack-range", N}</dt>
+  <dd>Increase the attack range of all units of the unit-types given with
+  '(apply-to ...). Note it can be increased with positive numbers and decreased
+  with negative numbers.
+  </dd>
+  <dt>{"sight-range", N}</dt>
+  <dd>Increase the sight range of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>{"basic-damage", N}</dt>
+  <dd>Increase the basic damage of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>{"piercing-damage", N}</dt>
+  <dd>Increase the piercing damage of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>{"armor", N}</dt>
+  <dd>Increase the armor of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>{"hit-points", N}</dt>
+  <dd>Increase the hit points of all units of the unit-types given with
+  '(apply-to ...).
+  </dd>
+  <dt>{"regeneration-rate", N}</dt>
+  <dd>Increase the amount of HP a unit gains per seconds</dt>
+  <dt>{"variable-name", N}</dt>
+  <dd>Increase the user defined variable of all units of the unit-types given with
+  '(apply-to ...). Note Variable must be defined with DefineVariables().
+  </dd>
+  <dt>{"cost", ("resource-name", N}}</dt>
+  <dd>Increase the costs for the resource type of all unit-types
+  or upgrade-ids given with '(apply-to ...).
+  </dd>
+  <dt>{"allow-unit", "unit-type", N}</dt>
+  <dd>
+      Change the state of an upgrade. N is the maximum quantity
+      of this unit per player.
+  </dd>
+  <dt>{"allow", "upgrade", 'A' or 'E' or 'F' or 'R' or 'Q'}</dt>
+  <dd>Change the state of an upgrade. state can be
+      <ul>
+      <li>A - Allowed
+      <li>E - Enabled, allowed by level but currently forbidden
+      <li>F - Forbidden
+      <li>R - Researched or acquired
+      <li>Q - Acquired but currently forbidden (does it make sense?:)
+      </ul>
+      FIXME: The correct possible changed must be described.
+  </dd>
+  <dt>{"apply-to", "unit-type" or "upgrade"}</dt>
+  <dd>The modifiers are applied to this unit-type or upgrade.</dd>
+  <dt>{"convert-to", "unit-type"}</dt>
+  <dd>All units of the unit-types given with '(apply-to ...) are converted
+  into this unit-type.
+  </dd>
+  </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+-- This is the default effect of the first sword upgrade. The piercing damage
+-- of the listed units is increased.
+DefineModifier("upgrade-sword1",
+  {"piercing-damage", 2},
+  {"apply-to", "unit-footman"}, {"apply-to", "unit-knight"}, {"apply-to", "unit-paladin"},
+  {"apply-to", "unit-dwarves"}, {"apply-to", "unit-arthor-literios"}, {"apply-to", "unit-wise-man"},
+  {"apply-to", "unit-man-of-light"}, {"apply-to", "unit-knight-rider"})
+</pre>
+
+<a name="GetDependency"></a>
+<h3>GetDependency()</h3>
+
+NOT WRITTEN YET.
+
+<h4>Example</h4>
+
+<pre>
+    GetDependency()
+</pre>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by<a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>
