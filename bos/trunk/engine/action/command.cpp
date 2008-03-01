@@ -970,15 +970,9 @@ void CommandSharedVision(int player, bool state, int opponent)
 				mf = Map.Field(x, y);
 				if (mf->Visible[player] && !mf->Visible[opponent]) {
 					mf->Visible[opponent] = 1;
-					if (opponent == ThisPlayer->Index) {
-						Map.MarkSeenTile(x, y);
-					}
 				}
 				if (mf->Visible[opponent] && !mf->Visible[player]) {
 					mf->Visible[player] = 1;
-					if (player == ThisPlayer->Index) {
-						Map.MarkSeenTile(x, y);
-					}
 				}
 			}
 		}

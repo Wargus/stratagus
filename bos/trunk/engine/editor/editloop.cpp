@@ -1525,9 +1525,6 @@ void CEditor::Init(void)
 		UnitCache.Init(Map.Info.MapWidth, Map.Info.MapHeight);
 
 		for (i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].Tile = Map.Fields[i].SeenTile = 0;
-			Map.Fields[i].Tile = Map.Fields[i].SeenTile =
-				Map.Tileset.Table[0x50];
 			Map.Fields[i].Flags = Map.Tileset.FlagsTable[0x50];
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;

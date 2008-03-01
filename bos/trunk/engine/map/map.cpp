@@ -59,25 +59,6 @@ char CurrentMapPath[1024];       /// Path of the current map
 ----------------------------------------------------------------------------*/
 
 /**
-**  Marks seen tile -- used mainly for the Fog Of War
-**
-**  @param x  Map X tile-position.
-**  @param y  Map Y tile-position.
-*/
-void CMap::MarkSeenTile(int x, int y)
-{
-	CMapField *mf = this->Field(x, y);
-
-	// Nothing changed? Already seeing the correct tile.
-	if (mf->Tile == mf->SeenTile) {
-		return;
-	}
-	mf->SeenTile = mf->Tile;
-
-	UI.Minimap.UpdateXY(x, y);
-}
-
-/**
 **  Reveal the entire map.
 */
 void CMap::Reveal(void)
@@ -94,7 +75,6 @@ void CMap::Reveal(void)
 					this->Field(x, y)->Visible[p] = 1;
 				}
 			}
-			MarkSeenTile(x, y);
 		}
 	}
 	//
@@ -203,19 +183,6 @@ bool UnitCanBeAt(const CUnit *unit, int x, int y)
 {
 	Assert(unit);
 	return UnitTypeCanBeAt(unit->Type, x, y);
-}
-
-/**
-**  Fixes initially the wood and seen tiles.
-*/
-void PreprocessMap(void)
-{
-	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
-		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			CMapField *mf = Map.Field(ix, iy);
-			mf->SeenTile = mf->Tile;
-		}
-	}
 }
 
 /**

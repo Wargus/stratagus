@@ -150,14 +150,6 @@ static int CclStratagusMap(lua_State *l)
 						args2 = luaL_getn(l, -1);
 						j2 = 0;
 
-						lua_rawgeti(l, -1, j2 + 1);
-						Map.Fields[i].Tile = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						++j2;
-						lua_rawgeti(l, -1, j2 + 1);
-						Map.Fields[i].SeenTile = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						++j2;
 						for (; j2 < args2; ++j2) {
 							lua_rawgeti(l, -1, j2 + 1);
 							value = LuaToString(l, -1);
@@ -294,41 +286,6 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 	CMap::FogGraphic = CGraphic::New(FogGraphicFile, TileSizeX, TileSizeY);
 
 	return 0;
-}
-
-/**
-**  Set a tile
-**
-**  @param tile   Tile number
-**  @param w      X coordinate
-**  @param h      Y coordinate
-**  @param value  Value of the tile
-*/
-void SetTile(int tile, int w, int h, int value)
-{
-	if (w < 0 || w >= Map.Info.MapWidth) {
-		fprintf(stderr, "Invalid map width: %d\n", w);
-		return;
-	}
-	if (h < 0 || h >= Map.Info.MapHeight) {
-		fprintf(stderr, "Invalid map height: %d\n", h);
-		return;
-	}
-	if (tile < 0 || tile >= Map.Tileset.NumTiles) {
-		fprintf(stderr, "Invalid tile number: %d\n", tile);
-		return;
-	}
-	if (value < 0 || value >= 256) {
-		fprintf(stderr, "Invalid tile value: %d\n", value);
-		return;
-	}
-
-	if (Map.Fields) {
-		Map.Field(w, h)->Tile = Map.Tileset.Table[tile];
-		Map.Field(w, h)->Flags = Map.Tileset.FlagsTable[tile];
-		Map.Field(w, h)->Cost = 
-			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
-	}
 }
 
 /**
