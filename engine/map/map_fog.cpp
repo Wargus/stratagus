@@ -166,9 +166,6 @@ void MapMarkTileSight(const CPlayer *player, int x, int y)
 			UnitsOnTileMarkSeen(player, x, y);
 		}
 		*v = 2;
-		if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
-			Map.MarkSeenTile(x, y);
-		}
 		return;
 	}
 	Assert(*v != 65535);
@@ -200,10 +197,6 @@ void MapUnmarkTileSight(const CPlayer *player, int x, int y)
 			// When there is NoFogOfWar units never get unmarked.
 			if (!Map.NoFogOfWar) {
 				UnitsOnTileUnmarkSeen(player, x, y);
-			}
-			// Check visible Tile, then deduct...
-			if (Map.IsTileVisible(ThisPlayer, x, y) > 1) {
-				Map.MarkSeenTile(x, y);
 			}
             // FALL THROUGH
 		default:  // seen -> seen
@@ -320,18 +313,6 @@ void MapSight(const CPlayer *player, int x, int y, int w, int h, int range,
 */
 void UpdateFogOfWarChange(void)
 {
-	//
-	//  Mark all explored fields as visible again.
-	//
-	if (Map.NoFogOfWar) {
-		for (int y = 0; y < Map.Info.MapHeight; ++y) {
-			for (int x = 0; x < Map.Info.MapWidth; ++x) {
-				if (Map.IsFieldExplored(ThisPlayer, x, y)) {
-					Map.MarkSeenTile(x, y);
-				}
-			}
-		}
-	}
 	//
 	//  Global seen recount.
 	//

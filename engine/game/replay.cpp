@@ -38,6 +38,7 @@
 #include "replay.h"
 #include "version.h"
 #include "iolib.h"
+#include "iocompat.h"
 #include "script.h"
 #include "unittype.h"
 #include "unit_manager.h"

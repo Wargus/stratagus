@@ -40,6 +40,7 @@
 
 #include "unittype.h"
 #include "iolib.h"
+#include "iocompat.h"
 #include "script.h"
 #include "missile.h"
 #include "upgrade.h"

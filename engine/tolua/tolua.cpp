@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 03/01/08 13:55:01.
+** Generated automatically by tolua++-1.0.92 on 03/01/08 14:24:12.
 */
 
 #ifndef __cplusplus
@@ -17465,40 +17465,6 @@ static int tolua_set_Map(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: SetTile */
-#ifndef TOLUA_DISABLE_tolua_stratagus_SetTile00
-static int tolua_stratagus_SetTile00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  int tile = ((int)  tolua_tonumber(tolua_S,1,0));
-  int w = ((int)  tolua_tonumber(tolua_S,2,0));
-  int h = ((int)  tolua_tonumber(tolua_S,3,0));
-  int value = ((int)  tolua_tonumber(tolua_S,4,0));
-  {
-   SetTile(tile,w,h,value);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetTile'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: getGraphic of class  CPatchType */
 #ifndef TOLUA_DISABLE_tolua_stratagus_CPatchType_getGraphic00
 static int tolua_stratagus_CPatchType_getGraphic00(lua_State* tolua_S)
@@ -20353,7 +20319,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"PatchManager",tolua_get_CMap_PatchManager,tolua_set_CMap_PatchManager);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"Map",tolua_get_Map,tolua_set_Map);
-  tolua_function(tolua_S,"SetTile",tolua_stratagus_SetTile00);
   tolua_cclass(tolua_S,"CPatchType","CPatchType","",NULL);
   tolua_beginmodule(tolua_S,"CPatchType");
    tolua_function(tolua_S,"getGraphic",tolua_stratagus_CPatchType_getGraphic00);

@@ -45,18 +45,6 @@
 **
 **  The map-field class members:
 **
-**  CMapField::Tile
-**
-**    Tile is number defining the graphic image display for the
-**    map-field. 65535 different tiles are supported. A tile is
-**    currently 32x32 pixels. In the future is planned to support
-**    animated tiles.
-**
-**  CMapField::SeenTile
-**
-**    This is the tile number, that the player sitting on the computer
-**    currently knows. Idea: Can be uses for illusions.
-**
 **  CMapField::Flags
 **
 **    Contains special information of that tile. What units are
@@ -97,13 +85,6 @@
 **  CMapField::RadarJammer[]
 **
 **    Jamming capabilities.
-**
-**  CMapField::UnitCache
-**
-**    Contains a vector of all units currently on this field.
-**    Note: currently units are only inserted at the insert point.
-**    This means units of the size of 2x2 fields are inserted at the
-**    top and right most map coordinate.
 */
 
 /**
@@ -145,7 +126,6 @@
 
 #include <string>
 #include <vector>
-#include "iocompat.h"
 #include "tileset.h"
 #include "patch_manager.h"
 
@@ -171,17 +151,16 @@ class CUnitType;
 ----------------------------------------------------------------------------*/
 
 	/// Describes a field of the map
-class CMapField {
+class CMapField
+{
 public:
-	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0)
+	CMapField() : Flags(0), Cost(0)
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(Radar, 0, sizeof(Radar));
 		memset(RadarJammer, 0, sizeof(RadarJammer));
 	}
 
-	unsigned short Tile;      /// graphic tile number
-	unsigned short SeenTile;  /// last seen tile (FOW)
 	unsigned short Flags;     /// field flags
 	unsigned char Cost;       /// unit cost to move in this tile
 
@@ -190,20 +169,19 @@ public:
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
 };
 
-// Not used until now:
-#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
+#define MapFieldSpeedMask    0x0007  /// Move faster on this tile
 
 #define MapFieldLandAllowed  0x0010  /// Land units allowed
 #define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
 #define MapFieldWaterAllowed 0x0040  /// Water units allowed
 #define MapFieldNoBuilding   0x0080  /// No buildings allowed
 
-#define MapFieldUnpassable 0x0100  /// Field is movement blocked
+#define MapFieldUnpassable   0x0100  /// Field is movement blocked
 
-#define MapFieldLandUnit 0x1000  /// Land unit on field
-#define MapFieldAirUnit  0x2000  /// Air unit on field
-#define MapFieldSeaUnit  0x4000  /// Water unit on field
-#define MapFieldBuilding 0x8000  /// Building on field
+#define MapFieldLandUnit     0x1000  /// Land unit on field
+#define MapFieldAirUnit      0x2000  /// Air unit on field
+#define MapFieldSeaUnit      0x4000  /// Water unit on field
+#define MapFieldBuilding     0x8000  /// Building on field
 
 /*----------------------------------------------------------------------------
 --  Map info structure
@@ -212,15 +190,16 @@ public:
 /**
 **  Get info about a map.
 */
-class CMapInfo {
+class CMapInfo
+{
 public:
-	std::string Description;     /// Map description
-	std::string Filename;        /// Map filename
-	int MapWidth;          /// Map width
-	int MapHeight;         /// Map height
+	std::string Description;    /// Map description
+	std::string Filename;       /// Map filename
+	int MapWidth;               /// Map width
+	int MapHeight;              /// Map height
 	int PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
-	unsigned int MapUID;   /// Unique Map ID (hash)
+	unsigned int MapUID;        /// Unique Map ID (hash)
 };
 
 /*----------------------------------------------------------------------------
@@ -228,7 +207,8 @@ public:
 ----------------------------------------------------------------------------*/
 
 	/// Describes the world map
-class CMap {
+class CMap
+{
 public:
 
 	/// Alocate and initialise map table.
@@ -253,8 +233,6 @@ public:
 	{
 		return IsTileVisible(player, x, y) > 1;
 	}
-	/// Mark a tile as seen by the player.
-	void MarkSeenTile(int x, int y);
 
 	/// Reveal the complete map, make everything known.
 	void Reveal(void);
@@ -360,8 +338,6 @@ extern void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y);
 //
 // in script_map.cpp
 //
-	/// Set a tile
-extern void SetTile(int tile, int w, int h, int value = 0);
 	/// register ccl features
 extern void MapCclRegister(void);
 
@@ -383,9 +359,6 @@ extern bool CheckedCanMoveToMask(int x, int y, int mask);
 extern bool UnitTypeCanBeAt(const CUnitType *type, int x, int y);
 	/// Returns true, if the unit can enter the field
 extern bool UnitCanBeAt(const CUnit *unit, int x, int y);
-
-	/// Preprocess map, for internal use.
-extern void PreprocessMap(void);
 
 // in unit.cpp
 
