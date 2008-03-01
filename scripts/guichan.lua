@@ -463,7 +463,7 @@ function RunStartGameMenu(s)
   local players
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local selectedmap = "islandwar.map"
+  local selectedmap = "test.map"
   local d
 
   menu = BosMenu(_("Start Game"))
@@ -620,10 +620,13 @@ function RunEditorMenu(s)
 
   menu = BosMenu(_("Editor"))
 
-  menu:addButton(_("Create ~!New Map"), x, 260,
+  menu:addButton(_("Create ~!New Map"), x, 220,
     function() RunEditorNewMenu(); menu:stop() end)
-  menu:addButton(_("~!Load Map"), x, 300,
+  menu:addButton(_("~!Load Map"), x, 260,
     function() RunEditorLoadMenu(); menu:stop() end)
+
+  menu:addButton(_("~!Patch Editor"), x, 320,
+    function() RunPatchEditorMenu(); menu:stop() end)
 
   menu:addButton(_("~!Cancel"), x, Video.Height - 100,
     function() menu:stop() end)
@@ -641,9 +644,6 @@ function RunEditorNewMenu()
   menu = BosMenu(_("Editor"))
 
   function starteditorbutton(s)
-    -- FIXME: select tileset or image based map
-    LoadTileModels("scripts/tilesets/desert.lua")
-
     local n = tonumber(xsize:getText())
     if (n == nil) then n = 64 end
     Map.Info.MapWidth = n
@@ -685,7 +685,7 @@ function RunEditorLoadMenu()
   local menu
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local selectedmap = "islandwar.map"
+  local selectedmap = "test.map"
   local numplayers = 2
 
   menu = BosMenu(_("Editor"))
@@ -739,6 +739,7 @@ Load("scripts/menus/options.lua")
 Load("scripts/menus/credits.lua")
 Load("scripts/menus/ingame/game.lua")
 Load("scripts/menus/ingame/editor.lua")
+Load("scripts/menus/patch.lua")
 Load("scripts/menus/campaigns.lua")
 
 function BuildMainMenu(menu)

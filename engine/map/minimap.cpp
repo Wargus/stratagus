@@ -159,12 +159,10 @@ void CMinimap::Create(void)
 
 	// Palette updated from UpdateMinimapTerrain()
 	if (!UseOpenGL) {
-		SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
 		MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-			W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
+			W, H, 32, RMASK, GMASK, BMASK, AMASK);
 		MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-			W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask,
-			TheScreen->format->Bmask, 0);
+			W, H, 32, RMASK, GMASK, BMASK, AMASK);
 	} else {
 		for (MinimapTextureWidth = 1; MinimapTextureWidth < W; MinimapTextureWidth <<= 1) {
 		}
@@ -189,6 +187,7 @@ void CMinimap::Reload(void)
 	CreateMinimapTexture();
 }
 
+#if 0
 /**
 **  Calculate the tile graphic pixel
 */
@@ -199,12 +198,17 @@ static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 	int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
 	return &pixels[x * bpp + y * Map.TileGraphic->Surface->pitch];
 }
+#endif
 
 /**
 **  Update a mini-map from the tiles of the map.
 */
 void CMinimap::UpdateTerrain(void)
 {
+#if 1
+	// FIXME: PATCHES
+	return;
+#else
 	int mx;
 	int my;
 	int scalex;
@@ -293,6 +297,7 @@ void CMinimap::UpdateTerrain(void)
 		SDL_UnlockSurface(MinimapTerrainSurface);
 	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
+#endif
 }
 
 /**
@@ -303,6 +308,10 @@ void CMinimap::UpdateTerrain(void)
 */
 void CMinimap::UpdateXY(int tx, int ty)
 {
+#if 1
+	// FIXME: PATCHES
+	return;
+#else
 	int mx;
 	int my;
 	int x;
@@ -417,6 +426,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 		SDL_UnlockSurface(MinimapTerrainSurface);
 	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
+#endif
 }
 
 /**

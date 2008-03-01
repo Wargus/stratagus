@@ -409,7 +409,7 @@ function RunCreateMultiGameMenu(s)
   local menu
   local map = _("No Map")
   local description = _("No map")
-  local mapfile = "maps/islandwar.map"
+  local mapfile = "maps/test.map"
   local numplayers = 3
   local sx = Video.Width / 20
   local sy = Video.Height / 20

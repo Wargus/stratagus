@@ -832,8 +832,6 @@ void InitCcl(void)
 	AiCclRegister();
 	TriggerCclRegister();
 	SpellCclRegister();
-
-	EditorCclRegister();
 }
 
 static char *LuaEscape(const char *str)
@@ -1054,6 +1052,8 @@ void CreateUserDirectories(void)
 	directory = UserDirectory + "logs/";
 	makedir(directory.c_str(), 0777);
 	directory = UserDirectory + "save/";
+	makedir(directory.c_str(), 0777);
+	directory = UserDirectory + "patches/";
 	makedir(directory.c_str(), 0777);
 }
 
