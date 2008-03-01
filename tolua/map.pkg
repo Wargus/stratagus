@@ -9,6 +9,7 @@ class CMapInfo
 class CMap
 {
 	CMapInfo Info;
+	CPatchManager PatchManager;
 };
 
 extern CMap Map;

@@ -63,6 +63,22 @@ static std::list<CGraphic *> Graphics;
 ----------------------------------------------------------------------------*/
 
 /**
+**  Video draw the graphic clipped.
+**
+**  @param x   X screen position
+**  @param y   Y screen position
+*/
+void CGraphic::DrawClip(int x, int y) const
+{
+	int oldx = x;
+	int oldy = y;
+	int w = Width;
+	int h = Height;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawSub(x - oldx, y - oldy, w, h, x, y);
+}
+
+/**
 **  Video draw part of graphic.
 **
 **  @param gx  X offset into object

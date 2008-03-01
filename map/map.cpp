@@ -236,7 +236,16 @@ void FreeMapInfo(CMapInfo *info)
 }
 
 /**
-**  Alocate and initialise map table
+**  Initialize the map
+*/
+void CMap::Init()
+{
+	InitFogOfWar();
+	Map.PatchManager.load();
+}
+
+/**
+**  Alocate and initialize map table
 */
 void CMap::Create()
 {
@@ -263,8 +272,8 @@ void CMap::Clean(void)
 	memset(this->Visible, 0, sizeof(this->Visible));
 	this->NoFogOfWar = false;
 	this->Tileset.Clear();
-	this->TileModelsFileName.clear();
-	this->TileGraphic = NULL;
+
+	this->PatchManager.clear();
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

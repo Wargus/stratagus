@@ -379,24 +379,6 @@ static int CclDefinePlayerTypes(lua_State *l)
 }
 
 /**
-**  Load the lua file which will define the tile models
-**
-**  @param l  Lua state.
-*/
-static int CclLoadTileModels(lua_State *l)
-{
-	char buf[PATH_MAX];
-
-	LuaCheckArgs(l, 1);
-	Map.TileModelsFileName = LuaToString(l, 1);
-	LibraryFileName(Map.TileModelsFileName.c_str(), buf, sizeof(buf));
-	if (LuaLoadFile(buf) == -1) {
-		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
-	}
-	return 0;
-}
-
-/**
 **  Register CCL features for map.
 */
 void MapCclRegister(void)
@@ -411,7 +393,6 @@ void MapCclRegister(void)
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 
-	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 }
 

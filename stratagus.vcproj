@@ -762,48 +762,8 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="editor\edmap.cpp"
+						RelativePath=".\editor\patch_editor.cpp"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="editor\script_editor.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
@@ -1814,6 +1774,10 @@
 								PreprocessorDefinitions=""
 							/>
 						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\map\patch_manager.cpp"
+						>
 					</File>
 					<File
 						RelativePath="map\script_map.cpp"
@@ -3199,6 +3163,18 @@
 				</File>
 				<File
 					RelativePath=".\include\particle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\patch.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\patch_manager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\patch_type.h"
 					>
 				</File>
 				<File

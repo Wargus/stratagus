@@ -756,7 +756,7 @@ int main(int argc, char **argv)
 				EditorStartFile = optarg;
 				continue;
 			case 'l':
-				CommandLogDisabled = 1;
+				CommandLogDisabled = true;
 				continue;
 			case 'P':
 				NetworkPort = atoi(optarg);

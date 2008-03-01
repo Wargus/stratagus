@@ -373,7 +373,7 @@ char *LibraryFileName(const char *file, char *buffer, size_t buffersize)
 	}
 
 	//  In user home directory
-	sprintf_s(buffer, buffersize, "%s%s", UserDirectory.c_str(), file);
+	sprintf_s(buffer, buffersize, "%s%s", UserDirectory.c_str(), *file == '~' ? file + 1 : file);
 	if (FindFileWithExtension(buffer, buffersize)) {
 		return buffer;
 	}

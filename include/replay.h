@@ -53,7 +53,7 @@ class CUnit;
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int CommandLogDisabled;     /// True, if command log is off
+extern bool CommandLogDisabled;    /// True, if command log is off
 extern ReplayType ReplayGameType;  /// Replay game type
 
 /*----------------------------------------------------------------------------

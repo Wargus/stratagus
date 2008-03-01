@@ -9,7 +9,7 @@
 //
 /**@name tileset.h - The tileset headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -51,10 +51,6 @@
 **
 **      Long name of the tileset. Can be used by the level editor.
 **
-**  CTileset::ImageFile
-**
-**      Name of the graphic file, containing all tiles.
-**
 **  CTileset::NumTiles
 **
 **      The number of different tiles in the tables.
@@ -69,57 +65,6 @@
 **
 **      Table of the tile flags used by the editor.
 **      @see CMapField::Flags
-**
-**  CTileset::BasicNameTable
-**
-**      Index to name of the basic tile type. FE. "light-water".
-**      If the index is 0, the tile is not used.
-**      @see CTileset::TileNames
-**
-**  CTileset::MixedNameTable
-**
-**      Index to name of the mixed tile type. FE. "light-water".
-**      If this index is 0, the tile is a solid tile.
-**      @see CTileset::TileNames
-**
-**  CTileset::TileTypeTable
-**
-**      Lookup table of the tile type. Maps the graphic file tile
-**      number back to a tile type (::TileTypeWood, ::TileTypeWater,
-**      ...)
-**
-**      @note The creation of this table is currently hardcoded in
-**      the engine. It should be calculated from the flags in the
-**      tileset configuration (CCL). And it is created for the map
-**      and not for the tileset.
-**
-**      @note I'm not sure if this table is needed in the future.
-**
-**      @see TileType.
-**
-**  CTileset::NumNames
-**
-**      Number of different tile names.
-**
-**  CTileset::TileNames
-**
-**      The different tile names. FE "light-grass", "dark-water".
-**
-**  CTileset::TopOneTree
-**
-**      The tile number of tile only containing the top part of a tree.
-**      Is created on the map by lumber chopping.
-**
-**  CTileset::MidOneTree
-**
-**      The tile number of tile only containing the connection of
-**      the top part to the bottom part of tree.
-**      Is created on the map by lumber chopping.
-**
-**  CTileset::BotOneTree
-**
-**      The tile number of tile only containing the bottom part of a
-**      tree. Is created on the map by lumber chopping.
 **
 **
 **  @struct TileInfo tileset.h
@@ -147,20 +92,6 @@
 extern int TileSizeX; /// Size of a tile in X
 extern int TileSizeY; /// Size of a tile in Y
 
-/**
-**  These are used for lookup tiles types
-**  mainly used for the FOW implementation of the seen woods/rocks
-**
-**  @todo I think this can be removed, we can use the flags?
-**  I'm not sure, if we have seen and real time to considere.
-*/
-enum TileType {
-	TileTypeUnknown,    /// Unknown tile type
-	TileTypeWood,       /// Any wood tile
-	TileTypeCoast,      /// Any coast tile
-	TileTypeWater,      /// Any water tile
-};
-
 	/// Single tile definition
 struct TileInfo {
 	unsigned char BaseTerrain; /// Basic terrain of the tile
@@ -178,8 +109,6 @@ class CTileset {
 public:
 	void Clear() {
 		Name.clear();
-		ImageFile.clear();
-		ImageMap = false;
 		NumTiles = 0;
 		TileSizeX = 0;
 		TileSizeY = 0;
@@ -189,8 +118,6 @@ public:
 		FlagsTable = NULL;
 		delete[] Tiles;
 		Tiles = NULL;
-		delete[] TileTypeTable;
-		TileTypeTable = NULL;
 		for (int i = 0; i < NumTerrainTypes; ++i) {
 			delete[] SolidTerrainTypes[i].TerrainName;
 		}
@@ -199,8 +126,6 @@ public:
 		NumTerrainTypes = 0;
 	}
 	std::string Name;           /// Nice name to display
-	std::string ImageFile;      /// File containing image data
-	bool ImageMap;              /// File is an image map
 
 	int NumTiles;               /// Number of tiles in the tables
 	int TileSizeX;              /// Size of a tile in X
@@ -209,9 +134,6 @@ public:
 	unsigned short *FlagsTable; /// Flag table for editor
 
 	TileInfo *Tiles; /// Tile descriptions
-
-	// TODO: currently hardcoded
-	unsigned char *TileTypeTable;   /// For fast lookup of tile type
 
 	int NumTerrainTypes;                 /// Number of different terrain types
 	SolidTerrainInfo *SolidTerrainTypes; /// Information about solid terrains.
