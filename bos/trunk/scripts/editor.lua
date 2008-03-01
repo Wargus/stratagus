@@ -34,6 +34,7 @@ HandleCommandKey = HandleEditorIngameCommandKey
 -- Set which icons to display
 SetEditorSelectIcon("icon-patrol")
 SetEditorUnitsIcon("icon-assault")
+SetEditorPatchIcon("icon-assault")
 
 -- Start location unit
 DefineIcon({
