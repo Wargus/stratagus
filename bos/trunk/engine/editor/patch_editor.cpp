@@ -558,7 +558,7 @@ void StartPatchEditor(const std::string &patchName)
 		name = "user-" + patchName;
 		if (Map.PatchManager.getPatchType(name) == NULL) {
 			CPatchType *patchType = Map.PatchManager.getPatchType(patchName);
-			CPatchType *newPatchType = Map.PatchManager.newPatchType(name,
+			Map.PatchManager.newPatchType(name,
 				patchType->getFile(),
 				patchType->getTileWidth(), patchType->getTileHeight(),
 				patchType->getFlags());
