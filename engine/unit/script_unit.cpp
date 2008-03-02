@@ -104,7 +104,7 @@ void CclParseOrder(lua_State *l, COrder *order)
 	//
 	// Parse the list: (still everything could be changed!)
 	//
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -181,7 +181,7 @@ void CclParseOrder(lua_State *l, COrder *order)
 		} else if (!strcmp(value, "tile")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -201,7 +201,7 @@ void CclParseOrder(lua_State *l, COrder *order)
 		} else if (!strcmp(value, "patrol")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -262,7 +262,7 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -318,7 +318,7 @@ static void CclParseTrain(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -349,7 +349,7 @@ static void CclParseHarvest(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -357,7 +357,7 @@ static void CclParseHarvest(lua_State *l, CUnit *unit)
 		++j;
 		if (!strcmp(value, "current-production")) {
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != MaxCosts) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != MaxCosts) {
 				LuaError(l, "incorrect argument");
 			}
 			for (int i = 0; i < MaxCosts; ++i) {
@@ -387,7 +387,7 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -404,7 +404,7 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, -1);
+			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				unit->Data.Move.Path[k] = LuaToNumber(l, -1);
@@ -493,7 +493,7 @@ static int CclUnit(lua_State *l)
 			int w;
 			int h;
 
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 4) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 4) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -511,7 +511,7 @@ static int CclUnit(lua_State *l)
 			MapSight(player, x, y, w, h, unit->CurrentSightRange, MapMarkTileSight);
 
 		} else if (!strcmp(value, "tile")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -521,7 +521,7 @@ static int CclUnit(lua_State *l)
 			unit->Y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "seen-tile")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -533,7 +533,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -543,7 +543,7 @@ static int CclUnit(lua_State *l)
 			unit->IY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "seen-pixel")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -627,7 +627,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "last-group")) {
 			unit->LastGroup = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "resources-held")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != MaxCosts) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != MaxCosts) {
 				LuaError(l, "incorrect argument");
 			}
 			for (i = 0; i < MaxCosts; ++i) {
@@ -672,7 +672,7 @@ static int CclUnit(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -826,7 +826,7 @@ static int CclCreateUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || luaL_getn(l, 3) != 2) {
+	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
 		LuaError(l, "incorrect argument !!");
 	}
 	lua_rawgeti(l, 3, 1);
@@ -885,7 +885,7 @@ static int CclSetResourcesHeld(lua_State *l)
 	if (lua_isnil(l, 1)) {
 		return 0;
 	}
-	if (!lua_istable(l, 2) || luaL_getn(l, 2) != MaxCosts) {
+	if (!lua_istable(l, 2) || lua_objlen(l, 2) != MaxCosts) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -944,7 +944,7 @@ static int CclOrderUnit(lua_State *l)
 	lua_rawgeti(l, 3, 2);
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (luaL_getn(l, 3) == 4) {
+	if (lua_objlen(l, 3) == 4) {
 		lua_rawgeti(l, 3, 3);
 		x2 = LuaToNumber(l, -1);
 		lua_pop(l, 1);
@@ -964,7 +964,7 @@ static int CclOrderUnit(lua_State *l)
 	lua_rawgeti(l, 4, 2);
 	dy1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (luaL_getn(l, 4) == 4) {
+	if (lua_objlen(l, 4) == 4) {
 		lua_rawgeti(l, 4, 3);
 		dx2 = LuaToNumber(l, -1);
 		lua_pop(l, 1);

@@ -115,7 +115,6 @@ function HandleCheats(str)
 
   elseif (string.sub(str, 1, 6) == "gimme ") then
     local arr = {}
-    string.gmatch = string.gmatch or string.gfind
     for w in string.gmatch(str,"[%w%p]+") do
       table.insert(arr, w)
     end

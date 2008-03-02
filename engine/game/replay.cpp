@@ -583,7 +583,7 @@ static int CclReplayLog(lua_State *l)
 		} else if (!strcmp(value, "LocalPlayer")) {
 			replay->LocalPlayer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Players")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != PlayerMax) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != PlayerMax) {
 				LuaError(l, "incorrect argument");
 			}
 			for (j = 0; j < PlayerMax; ++j) {
@@ -627,7 +627,7 @@ static int CclReplayLog(lua_State *l)
 		} else if (!strcmp(value, "MapRichness")) {
 			replay->MapRichness = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -640,7 +640,7 @@ static int CclReplayLog(lua_State *l)
 			replay->Engine[2] = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Network")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);

@@ -133,7 +133,7 @@ static int CclMakeSound(lua_State *l)
 		id = MakeSound(c_name, &c_file, 1);
 	} else if (lua_istable(l, 2)) {
 		// several files
-		args = luaL_getn(l, 2);
+		args = lua_objlen(l, 2);
 		c_files = new char *[args];
 		for (j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
