@@ -1,6 +1,10 @@
 Change log for Bos Wars
 -----------------------
 
+Development version:
+- Support lua 5.1 only (Jimmy Salmon and Francois Beerten)
+- New patch based map system (Jimmy Salmon)
+
 Version 2.5.0 (2008 3 1):
 - Free OpenGL textures before changing video mode since not all platforms
 destroy the OpenGL context (Jimmy Salmon)
