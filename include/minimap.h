@@ -9,7 +9,7 @@
 //
 /**@name minimap.h - The minimap headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -40,13 +40,12 @@ public:
 	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
 		WithTerrain(false), ShowSelected(false), Transparent(false) {}
 
-	void UpdateXY(int tx, int ty);
-	void UpdateSeenXY(int tx, int ty) {}
-	void UpdateTerrain(void);
-	void Update(void);
-	void Create(void);
-	void Reload(void);
-	void Destroy(void);
+	void UpdateTerrain();
+	void Update();
+	void Create();
+	void FreeOpenGL();
+	void Reload();
+	void Destroy();
 	void Draw(int vx, int vy);
 	void DrawCursor(int vx, int vy);
 	void AddEvent(int x, int y);

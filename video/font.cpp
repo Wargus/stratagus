@@ -9,7 +9,7 @@
 //
 /**@name font.cpp - The color fonts. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2008 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -747,7 +747,7 @@ void MakeFontColorTextures(CFont *font)
 /**
 **  Load all fonts.
 */
-void LoadFonts(void)
+void LoadFonts()
 {
 	CGraphic *g;
 
@@ -769,9 +769,25 @@ void LoadFonts(void)
 }
 
 /**
+**  Free OpenGL fonts
+*/
+void FreeOpenGLFonts()
+{
+	for (int i = 0; i < (int)AllFonts.size(); ++i) {
+		CFont *font = AllFonts[i];
+		if (font->G) {
+			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+				glDeleteTextures(g->NumTextures, g->Textures);
+			}
+		}
+	}
+}
+
+/**
 **  Reload OpenGL fonts
 */
-void ReloadFonts(void)
+void ReloadFonts()
 {
 	for (int i = 0; i < (int)AllFonts.size(); ++i) {
 		CFont *font = AllFonts[i];
@@ -883,7 +899,7 @@ CFontColor *CFontColor::Get(const std::string &ident)
 /**
 **  Clean up the font module.
 */
-void CleanFonts(void)
+void CleanFonts()
 {
 	int i;
 

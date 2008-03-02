@@ -626,8 +626,8 @@ void CreateGame(const std::string &filename, CMap *map)
 	InitUserInterface();
 	UI.Load();
 
-	UI.Minimap.Create();
 	Map.Init();
+	UI.Minimap.Create();
 
 	//
 	// Sound part

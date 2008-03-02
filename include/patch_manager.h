@@ -70,7 +70,7 @@ public:
 	/**
 	**  Get the patch at location x, y
 	*/
-	CPatch *getPatch(int x, int y) const;
+	CPatch *getPatch(int x, int y, int *xOffset = NULL, int *yOffset = NULL) const;
 
 	/**
 	**  Get all of the patches
