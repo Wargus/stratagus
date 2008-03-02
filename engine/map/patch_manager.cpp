@@ -1,3 +1,37 @@
+//     ____                _       __
+//    / __ )____  _____   | |     / /___ ___________
+//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
+//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  )
+// /_____/\____/____/     |__/|__/\__,_/_/  /____/
+//
+//       A futuristic real-time strategy game.
+//          This file is part of Bos Wars.
+//
+/**@name minimap.cpp - The patch manager. */
+//
+//      (c) Copyright 2008 by Jimmy Salmon
+//
+//      This program is free software; you can redistribute it and/or modify
+//      it under the terms of the GNU General Public License as published by
+//      the Free Software Foundation; only version 2 of the License.
+//
+//      This program is distributed in the hope that it will be useful,
+//      but WITHOUT ANY WARRANTY; without even the implied warranty of
+//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//      GNU General Public License for more details.
+//
+//      You should have received a copy of the GNU General Public License
+//      along with this program; if not, write to the Free Software
+//      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+//      02111-1307, USA.
+//
+
+//@{
+
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "stratagus.h"
 #include "patch_manager.h"
 #include "patch_type.h"
@@ -5,6 +39,10 @@
 #include "iolib.h"
 
 #include <algorithm>
+
+/*----------------------------------------------------------------------------
+-- Functions
+----------------------------------------------------------------------------*/
 
 
 CPatchManager::CPatchManager()
@@ -51,12 +89,16 @@ CPatchManager::moveToBottom(CPatch *patch)
 
 
 CPatch *
-CPatchManager::getPatch(int x, int y) const
+CPatchManager::getPatch(int x, int y, int *xOffset, int *yOffset) const
 {
 	std::list<CPatch *>::const_reverse_iterator i;
 	for (i = this->patches.rbegin(); i != this->patches.rend(); ++i) {
 		if ((*i)->getX() <= x && x < (*i)->getX() + (*i)->getType()->getTileWidth() &&
 				(*i)->getY() <= y && y < (*i)->getY() + (*i)->getType()->getTileHeight()) {
+			if (xOffset != NULL && yOffset != NULL) {
+				*xOffset = x - (*i)->getX();
+				*yOffset = y - (*i)->getY();
+			}
 			return *i;
 		}
 	}
@@ -158,3 +200,5 @@ CPatchManager::savePatchType(CFile *file, CPatchType *patchType)
 
 	file->printf("})\n");
 }
+
+//@}
