@@ -205,7 +205,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	lua_pushvalue(l, 2);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || luaL_getn(l, 3) != 2) {
+	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 3, 1);
@@ -214,7 +214,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	lua_rawgeti(l, 3, 2);
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 4) || luaL_getn(l, 4) != 2) {
+	if (!lua_istable(l, 4) || lua_objlen(l, 4) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 4, 1);
@@ -563,7 +563,7 @@ static int CclAddTrigger(lua_State *l)
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
 
-	i = luaL_getn(l, -1);
+	i = lua_objlen(l, -1);
 	if (ActiveTriggers && !ActiveTriggers[i / 2]) {
 		lua_pushnil(l);
 		lua_rawseti(l, -2, i + 1);
@@ -623,7 +623,7 @@ static int TriggerExecuteAction(int script)
 	ret = 0;
 
 	lua_rawgeti(Lua, -1, script + 1);
-	args = luaL_getn(Lua, -1);
+	args = lua_objlen(Lua, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(Lua, -1, j + 1);
 		LuaCall(0, 0);
@@ -663,7 +663,7 @@ void TriggersEachCycle(void)
 
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	triggers = luaL_getn(Lua, -1);
+	triggers = lua_objlen(Lua, -1);
 
 	if (Trigger >= triggers) {
 		Trigger = 0;
@@ -724,7 +724,7 @@ void SaveTriggers(CFile *file)
 
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	triggers = luaL_getn(Lua, -1);
+	triggers = lua_objlen(Lua, -1);
 
 	file->printf("SetActiveTriggers(");
 	for (i = 0; i < triggers; i += 2) {

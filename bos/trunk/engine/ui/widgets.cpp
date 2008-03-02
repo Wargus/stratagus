@@ -1219,7 +1219,7 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 
 	list.clear();
 
-	args = luaL_getn(lua, *lo);
+	args = lua_objlen(lua, *lo);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(lua, *lo, j + 1);
 		list.push_back(std::string(LuaToString(lua, -1)));

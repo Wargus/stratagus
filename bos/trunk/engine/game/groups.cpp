@@ -252,7 +252,7 @@ static int CclGroup(lua_State *l)
 	grp = &Groups[(int)LuaToNumber(l, 1)];
 	grp->NumUnits = LuaToNumber(l, 2);
 	i = 0;
-	args = luaL_getn(l, 3);
+	args = lua_objlen(l, 3);
 	for (j = 0; j < args; ++j) {
 		const char *str;
 
