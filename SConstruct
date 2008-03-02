@@ -8,7 +8,7 @@
 ##          This file is part of Bos Wars.
 ##
 ##      SConstruct build file. See http://www.scons.org for info about scons.
-##      (c) Copyright 2005-2007 by Francois Beerten
+##      (c) Copyright 2005-2008 by Francois Beerten
 ##
 ##      Stratagus is free software; you can redistribute it and/or modify
 ##      it under the terms of the GNU General Public License as published
@@ -168,40 +168,21 @@ def CheckOpenGL(env, conf):
 
 def CheckLuaLib(env, conf):
   if not 'USE_WIN32' in env['CPPDEFINES']:
-     if env.WhereIs('lua-config'):
-        env.ParseConfig('lua-config --include --libs')
-     elif env.WhereIs('pkg-config'):
+     if env.WhereIs('pkg-config'):
         for packagename in ['lua5.1', 'lua51', 'lua']:
            exitcode, _ = ParseConfig(env, 'pkg-config --cflags --libs ' + packagename)
            if exitcode == 0:
               break
-  found = 0
-  if conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
-    found = 'lua'
-  if not found and conf.CheckLibWithHeader('lua50', 'lua.h', 'c'):
-    found = 'lua50'
-  if not found and conf.CheckLibWithHeader('lua5.0', 'lua.h', 'c'):
-    found = 'lua5.0'
-  if not found and conf.CheckLibWithHeader('lua51', 'lua.h', 'c'):
+  if conf.CheckLibWithHeader('lua51', 'lua.h', 'c'):
     return 1
-  if not found and conf.CheckLibWithHeader('lua5.1', 'lua.h', 'c'):
+  if conf.CheckLibWithHeader('lua5.1', 'lua.h', 'c'):
     return 1
-  if found == 0:
+  if not conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
     return 0
-
-  lualibfound = 0
+  # make sure we have lualib which is included in lua 5.1
   if conf.CheckFunc('luaopen_base'):
      return 1
-  if conf.CheckLibWithHeader('lualib', 'lualib.h', 'c'):
-     lualibfound = 1
-  elif conf.CheckLibWithHeader('lualib50', 'lualib.h', 'c'):
-     lualibfound = 1
-  elif conf.CheckLibWithHeader('lualib5.0', 'lualib.h', 'c'):
-     lualibfound = 1
-  # the lua library should be after lualib
-  env["LIBS"].remove(found)
-  env.Append(LIBS = found)
-  return lualibfound and found != 0
+  return 0
 
 def AutoConfigure(env):
   conf = Configure(env)
