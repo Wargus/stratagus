@@ -9,7 +9,7 @@
 //
 /**@name video.cpp - The universal video functions. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 1999-2008 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -88,6 +88,7 @@
 #include <vector>
 
 #include "video.h"
+#include "font.h"
 #include "ui.h"
 #include "cursor.h"
 #include "iolib.h"
@@ -238,6 +239,8 @@ bool CVideo::ResizeScreen(int w, int h)
 	if (VideoValidResolution(w, h)) {
 		if (UseOpenGL) {
 			FreeOpenGLGraphics();
+			FreeOpenGLFonts();
+			UI.Minimap.FreeOpenGL();
 		}
 		Width = w;
 		Height = h;

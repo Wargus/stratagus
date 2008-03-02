@@ -488,7 +488,7 @@ static void PatchEditorMainLoop()
 	delete exitButton;
 }
 
-static void AddIcon(int x, int y, CGraphic *g, PatchButton b)
+static void PatchAddIcon(int x, int y, CGraphic *g, PatchButton b)
 {
 	PatchIcon icon;
 	icon.X = x;
@@ -498,7 +498,7 @@ static void AddIcon(int x, int y, CGraphic *g, PatchButton b)
 	PatchIcons.push_back(icon);
 }
 
-static void LoadIcons()
+static void PatchLoadIcons()
 {
 	std::string patchEditorPath = "ui/patcheditor/";
 	int spacing = 15;
@@ -510,14 +510,14 @@ static void LoadIcons()
 	ImpassableG->Load();
 	ImpassableSmallG = CGraphic::New(patchEditorPath + "impassable-small.png");
 	ImpassableSmallG->Load();
-	AddIcon(leftX, topY, ImpassableG, ButtonImpassable);
+	PatchAddIcon(leftX, topY, ImpassableG, ButtonImpassable);
 	FlagMap[ButtonImpassable] = MapFieldUnpassable;
 
 	WaterG = CGraphic::New(patchEditorPath + "water.png");
 	WaterG->Load();
 	WaterSmallG = CGraphic::New(patchEditorPath + "water-small.png");
 	WaterSmallG->Load();
-	AddIcon(rightX, topY, WaterG, ButtonWater);
+	PatchAddIcon(rightX, topY, WaterG, ButtonWater);
 	FlagMap[ButtonWater] = MapFieldWaterAllowed;
 
 	for (int i = 0; i <= NumSpeeds; ++i) {
@@ -530,12 +530,12 @@ static void LoadIcons()
 		o << patchEditorPath << "speed" << i << "-small.png";
 		SpeedSmallG[i] = CGraphic::New(o.str());
 		SpeedSmallG[i]->Load();
-		AddIcon((!(i & 1) ? leftX : rightX), topY + (48 + spacing) * ((i + 2) / 2), SpeedG[i], (PatchButton)(ButtonSpeed0 + i));
+		PatchAddIcon((!(i & 1) ? leftX : rightX), topY + (48 + spacing) * ((i + 2) / 2), SpeedG[i], (PatchButton)(ButtonSpeed0 + i));
 		FlagMap[ButtonSpeed0 + i] = i;
 	}
 }
 
-static void FreeIcons()
+static void PatchFreeIcons()
 {
 	CGraphic::Free(ImpassableG);
 	ImpassableG = NULL;
@@ -573,11 +573,11 @@ void StartPatchEditor(const std::string &patchName)
 		return;
 	}
 
-	LoadIcons();
+	PatchLoadIcons();
 
 	PatchEditorMainLoop();
 
-	FreeIcons();
+	PatchFreeIcons();
 
 	Map.PatchManager.clear();
 }
