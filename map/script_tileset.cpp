@@ -212,7 +212,7 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	len = luaL_getn(l, -1);
+	len = lua_objlen(l, -1);
 
 	// hack for sc tilesets, remove when fixed
 	if (len > 16) {
@@ -267,7 +267,7 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		LuaError(l, "incorrect argument");
 	}
 	j = 0;
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
 	basic_name = TilesetParseName(l, tileset);
@@ -287,7 +287,7 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		//
 		//  Vector: the tiles.
 		//
-		len = luaL_getn(l, -1);
+		len = lua_objlen(l, -1);
 		for (i = 0; i < len; ++i) {
 			lua_rawgeti(l, -1, i + 1);
 			tileset->Table[index + i] = LuaToNumber(l, -1);
@@ -359,7 +359,7 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 	//
 	//  Parse the list: (still everything could be changed!)
 	//
-	args = luaL_getn(l, t);
+	args = lua_objlen(l, t);
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, t, j + 1);
 		value = LuaToString(l, -1);

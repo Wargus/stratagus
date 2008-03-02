@@ -1164,7 +1164,7 @@ static int CclSelection(lua_State *l)
 	InitSelections();
 	NumSelected = LuaToNumber(l, 1);
 	i = 0;
-	args = luaL_getn(l, 2);
+	args = lua_objlen(l, 2);
 	for (j = 0; j < args; ++j) {
 		const char *str;
 

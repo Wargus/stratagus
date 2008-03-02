@@ -88,7 +88,7 @@ static int CclStratagusMap(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -134,7 +134,7 @@ static int CclStratagusMap(lua_State *l)
 						LuaError(l, "incorrect argument");
 					}
 
-					subsubargs = luaL_getn(l, -1);
+					subsubargs = lua_objlen(l, -1);
 					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
 						fprintf(stderr, "Wrong tile table length: %d\n", subsubargs);
 					}
@@ -147,7 +147,7 @@ static int CclStratagusMap(lua_State *l)
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument");
 						}
-						args2 = luaL_getn(l, -1);
+						args2 = lua_objlen(l, -1);
 						j2 = 0;
 
 						for (; j2 < args2; ++j2) {
