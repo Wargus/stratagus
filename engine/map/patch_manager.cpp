@@ -37,6 +37,7 @@
 #include "patch_type.h"
 #include "patch.h"
 #include "iolib.h"
+#include "map.h"
 
 #include <algorithm>
 
@@ -56,6 +57,26 @@ CPatchManager::~CPatchManager()
 }
 
 
+static void UpdateMapFlags(CPatchType *type, int x, int y)
+{
+	unsigned short *flags = type->getFlags();
+	for (int j = 0; j < type->getTileHeight(); ++j) {
+		if (j + y < 0) {
+			continue;
+		} else if (j + y >= Map.Info.MapHeight) {
+			break;
+		}
+		for (int i = 0; i < type->getTileWidth(); ++i) {
+			if (x + i < 0) {
+				continue;
+			} else if (x + i >= Map.Info.MapWidth) {
+				break;
+			}
+			Map.Field(x + i, y + j)->Flags = flags[j * type->getTileWidth() + i];
+		}
+	}
+}
+
 CPatch *
 CPatchManager::add(const std::string &typeName, int x, int y)
 {
@@ -68,6 +89,9 @@ CPatchManager::add(const std::string &typeName, int x, int y)
 
 	CPatch *patch = new CPatch(type, x, y);
 	this->patches.push_back(patch);
+
+	UpdateMapFlags(type, x, y);
+
 	return patch;
 }
 
