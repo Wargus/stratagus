@@ -53,7 +53,6 @@ CPatchManager::CPatchManager()
 
 CPatchManager::~CPatchManager()
 {
-	this->clear();
 }
 
 
