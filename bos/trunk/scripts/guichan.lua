@@ -463,7 +463,7 @@ function RunStartGameMenu(s)
   local players
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local selectedmap = "test.map"
+  local selectedmap = "islandwar.map"
   local d
 
   menu = BosMenu(_("Start Game"))
@@ -685,7 +685,7 @@ function RunEditorLoadMenu()
   local menu
   local sx = Video.Width / 20
   local sy = Video.Height / 20
-  local selectedmap = "test.map"
+  local selectedmap = "islandwar.map"
   local numplayers = 2
 
   menu = BosMenu(_("Editor"))
