@@ -46,8 +46,13 @@ Players[7].MagmaStored = 2000
 Players[7].EnergyStored = 1000
 Players[7].AiName = "ai-default"
 
--- load tilesets
-LoadTileModels(GetCurrentLuaPath().."/terrain.lua")
+-- patches
+Load(GetCurrentLuaPath() .. "/patch.lua")
+for i=0,3 do
+  for j=0,3 do
+    patch("battlefield.map", i*16, j*16)
+  end
+end
 
 -- place units
 CreateUnit("unit-vault", 0, {3, 17})
