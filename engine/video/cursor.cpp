@@ -9,7 +9,7 @@
 //
 /**@name cursor.cpp - The cursors. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Nehal Mistry,
+//      (c) Copyright 1998-2008 by Lutz Sammer, Nehal Mistry,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,6 @@
 #include "player.h"
 #include "unit.h"
 #include "cursor.h"
-#include "tileset.h"
 #include "map.h"
 #include "interface.h"
 #include "ui.h"

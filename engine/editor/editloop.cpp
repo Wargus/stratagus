@@ -60,7 +60,6 @@
 #include "unit_cache.h"
 #include "video.h"
 #include "map.h"
-#include "tileset.h"
 #include "minimap.h"
 #include "settings.h"
 #include "network.h"
@@ -1524,9 +1523,11 @@ void CEditor::Init(void)
 		memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
 		UnitCache.Init(Map.Info.MapWidth, Map.Info.MapHeight);
 
+#if 0
 		for (i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			Map.Fields[i].Flags = Map.Tileset.FlagsTable[0x50];
 		}
+#endif
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);
 	} else {

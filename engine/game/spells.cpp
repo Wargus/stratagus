@@ -9,7 +9,7 @@
 //
 /**@name spells.cpp - The spell cast action. */
 //
-//      (c) Copyright 1998-2007 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2008 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -57,7 +57,6 @@
 #include "sound.h"
 #include "missile.h"
 #include "map.h"
-#include "tileset.h"
 #include "ui.h"
 #include "actions.h"
 

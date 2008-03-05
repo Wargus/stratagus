@@ -9,7 +9,7 @@
 //
 /**@name script_map.cpp - The map ccl functions. */
 //
-//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@
 #include "unit_cache.h"
 #include "script.h"
 #include "map.h"
-#include "tileset.h"
 #include "minimap.h"
 #include "ui.h"
 #include "player.h"

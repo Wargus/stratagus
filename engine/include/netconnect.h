@@ -90,9 +90,9 @@ class CServerSetup {
 public:
 	unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1+1+1+1+1+1+1+1+ 1*PlayerMax + 1*PlayerMax + 4*PlayerMax; }
+	static size_t Size() { return 1+1+1+1+1+1+1+ 1*PlayerMax + 1*PlayerMax + 4*PlayerMax; }
 	void Clear() {
-		ResourcesOption = UnitsOption = FogOfWar = RevealMap = TilesetSelection =
+		ResourcesOption = UnitsOption = FogOfWar = RevealMap =
 			GameTypeOption = Difficulty = MapRichness = 0;
 		memset(CompOpt, 0, sizeof(CompOpt));
 		memset(Ready, 0, sizeof(Ready));
@@ -103,7 +103,6 @@ public:
 	Uint8  UnitsOption;           /// Unit # option
 	Uint8  FogOfWar;              /// Fog of war option
 	Uint8  RevealMap;             /// Reveal all the map
-	Uint8  TilesetSelection;      /// Tileset select option
 	Uint8  GameTypeOption;        /// Game type option
 	Uint8  Difficulty;            /// Difficulty option
 	Uint8  MapRichness;           /// Map richness option

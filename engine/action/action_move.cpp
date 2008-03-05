@@ -9,7 +9,7 @@
 //
 /**@name action_move.cpp - The move action. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@
 #include "animation.h"
 #include "player.h"
 #include "unit.h"
-#include "tileset.h"
 #include "map.h"
 #include "actions.h"
 #include "pathfinder.h"

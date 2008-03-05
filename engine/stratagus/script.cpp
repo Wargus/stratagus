@@ -796,7 +796,6 @@ void InitCcl(void)
 	IconCclRegister();
 	MissileCclRegister();
 	PlayerCclRegister();
-	TilesetCclRegister();
 	MapCclRegister();
 	ConstructionCclRegister();
 	DecorationCclRegister();

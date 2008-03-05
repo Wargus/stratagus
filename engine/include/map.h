@@ -106,11 +106,6 @@
 **
 **    Flag if true, the fog of war is disabled.
 **
-**  CMap::Tileset
-**
-**    Tileset data for the map. See ::CTileset. This contains all
-**    information about the tile.
-**
 **  CMap::FogGraphic
 **
 **    Graphic for fog of war
@@ -126,7 +121,6 @@
 
 #include <string>
 #include <vector>
-#include "tileset.h"
 #include "patch_manager.h"
 
 /*----------------------------------------------------------------------------
@@ -263,7 +257,6 @@ public:
 
 	bool NoFogOfWar;                  /// fog of war disabled
 
-	CTileset Tileset;                 /// tileset data
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 
 	CPatchManager PatchManager;
@@ -287,6 +280,9 @@ extern int *VisionLookup;
 extern int FlagRevealMap;
 	/// Flag must reveal map when in replay
 extern int ReplayRevealMap;
+
+extern int TileSizeX; /// Size of a tile in X
+extern int TileSizeY; /// Size of a tile in Y
 
 /*----------------------------------------------------------------------------
 --  Functions

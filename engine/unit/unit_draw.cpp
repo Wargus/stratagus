@@ -46,7 +46,6 @@
 #include "player.h"
 #include "unit.h"
 #include "unit_cache.h"
-#include "tileset.h"
 #include "map.h"
 #include "construct.h"
 #include "cursor.h"
