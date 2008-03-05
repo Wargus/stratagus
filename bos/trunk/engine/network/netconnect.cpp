@@ -9,7 +9,7 @@
 //
 /**@name netconnect.cpp - The network high level connection code. */
 //
-//      (c) Copyright 2001-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
+//      (c) Copyright 2001-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -135,7 +135,6 @@ unsigned char *CServerSetup::Serialize() const
 	*p++ = this->UnitsOption;
 	*p++ = this->FogOfWar;
 	*p++ = this->RevealMap;
-	*p++ = this->TilesetSelection;
 	*p++ = this->GameTypeOption;
 	*p++ = this->Difficulty;
 	*p++ = this->MapRichness;
@@ -161,7 +160,6 @@ void CServerSetup::Deserialize(const unsigned char *p)
 	this->UnitsOption = *p++;
 	this->FogOfWar = *p++;
 	this->RevealMap = *p++;
-	this->TilesetSelection = *p++;
 	this->GameTypeOption = *p++;
 	this->Difficulty = *p++;
 	this->MapRichness = *p++;

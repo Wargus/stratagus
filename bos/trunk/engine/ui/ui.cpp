@@ -9,7 +9,7 @@
 //
 /**@name ui.cpp - The user interface globals. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1999-2008 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,6 @@
 #include "font.h"
 #include "interface.h"
 #include "map.h"
-#include "tileset.h"
 #include "ui.h"
 #include "menus.h"
 #include "iolib.h"

@@ -9,7 +9,7 @@
 //
 /**@name selection.cpp - The units' selection. */
 //
-//      (c) Copyright 1999-2007 by Patrice Fortier, Lutz Sammer, and
+//      (c) Copyright 1999-2008 by Patrice Fortier, Lutz Sammer, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,6 @@
 #include "unit_cache.h"
 #include "interface.h"
 #include "map.h"
-#include "tileset.h"
 #include "ui.h"
 #include "commands.h"
 #include "network.h"

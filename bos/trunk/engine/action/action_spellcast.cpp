@@ -9,7 +9,7 @@
 //
 /**@name action_spellcast.cpp - The spell cast action. */
 //
-//      (c) Copyright 2000-2007 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 2000-2008 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@
 #include "actions.h"
 #include "pathfinder.h"
 #include "sound.h"
-#include "tileset.h"
 #include "map.h"
 #include "spells.h"
 #include "interface.h"

@@ -37,7 +37,6 @@
 
 #include "stratagus.h"
 #include "video.h"
-#include "tileset.h"
 #include "map.h"
 #include "sound.h"
 #include "unitsound.h"

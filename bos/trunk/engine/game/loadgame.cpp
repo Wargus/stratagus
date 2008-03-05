@@ -9,7 +9,7 @@
 //
 /**@name loadgame.cpp - Load game. */
 //
-//      (c) Copyright 2001-2007 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2008 by Lutz Sammer, Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@
 #include "upgrade.h"
 #include "interface.h"
 #include "missile.h"
-#include "tileset.h"
 #include "map.h"
 #include "script.h"
 #include "ui.h"
@@ -96,7 +95,6 @@ void CleanModules(void)
 	CleanButtons();
 	CleanMissileTypes();
 	CleanMissiles();
-	CleanTilesets();
 	Map.Clean();
 	Map.CleanFogOfWar();
 	CParticleManager::exit();

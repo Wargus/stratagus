@@ -9,7 +9,7 @@
 //
 /**@name map.cpp - The map. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Vladi Shabanski and
+//      (c) Copyright 1998-2008 by Lutz Sammer, Vladi Shabanski and
 //                                 Francois Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -53,6 +53,16 @@ CMap Map;                        /// The current map
 int FlagRevealMap;               /// Flag must reveal the map
 int ReplayRevealMap;             /// Reveal Map is replay
 char CurrentMapPath[1024];       /// Path of the current map
+
+/**
+** Size of a tile in X
+*/
+int TileSizeX = 32;
+
+/**
+** Size of a tile in Y
+*/
+int TileSizeY = 32;
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
@@ -232,13 +242,10 @@ void CMap::Clean(void)
 	delete[] this->Fields;
 	delete[] this->Visible[0];
 
-	// Tileset freed by Tileset?
-
 	FreeMapInfo(&this->Info);
 	this->Fields = NULL;
 	memset(this->Visible, 0, sizeof(this->Visible));
 	this->NoFogOfWar = false;
-	this->Tileset.Clear();
 
 	this->PatchManager.clear();
 

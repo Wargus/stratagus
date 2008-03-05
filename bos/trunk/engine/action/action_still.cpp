@@ -9,7 +9,7 @@
 //
 /**@name action_still.cpp - The stand still action. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@
 #include "actions.h"
 #include "unit.h"
 #include "unit_cache.h"
-#include "tileset.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "spells.h"
