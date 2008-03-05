@@ -46,7 +46,7 @@ Players[7].EnergyStored = 0
 Players[7].MagmaStored = 0
 Players[7].AiName = "ai-default"
 
--- load tilesets
+-- patches
 Load(GetCurrentLuaPath() .. "/patch.lua")
 patch("canyon.map", 0, 0)
 

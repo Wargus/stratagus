@@ -45,10 +45,9 @@ Players[7].EnergyStored = 0
 Players[7].MagmaStored = 0
 Players[7].AiName = "ai-default"
 
--- load tilesets
-DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 64, 64, true)
-Load(GetCurrentLuaPath().."/access-water.lua")
-RepeatMap(64, 64, 64, 64)
+-- patches
+Load(GetCurrentLuaPath() .. "/patch.lua")
+patch("wetlands02.map", 0, 0)
 
 -- place units
 CreateUnit("unit-hotspot", PlayerNumNeutral, {56, 15})
