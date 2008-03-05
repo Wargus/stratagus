@@ -28,7 +28,7 @@
 -- $Id: terrain.lua 253 2005-11-12 13:48:40Z feb $
 
 
-DefineImageTilemodels(GetCurrentLuaPath().."/wetlands01.png", 128, 128, true)
+DefineImageTilemodels(GetCurrentLuaPath().."/terrain.png", 128, 128, true)
 
 Load(GetCurrentLuaPath().."/access-unpassable.lua")
 
