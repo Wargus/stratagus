@@ -9,7 +9,7 @@
 //
 /**@name sound.cpp - The sound. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1998-2008 by Lutz Sammer, Fabrice Rossi,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -51,7 +51,6 @@
 #include "sound_server.h"
 #include "missile.h"
 #include "map.h"
-#include "tileset.h"
 #include "ui.h"
 #include "widgets.h"
 

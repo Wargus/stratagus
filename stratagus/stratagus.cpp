@@ -55,7 +55,7 @@
 **
 ** Handles the map. A map is made from tiles.
 **
-** @see map.h @see map.cpp @see tileset.h @see tileset.cpp
+** @see map.h @see map.cpp
 **
 ** @subsection Unit Unit
 **
@@ -353,7 +353,6 @@ void CleanGame(void)
 	CleanSelections();
 	CleanGroups();
 	CleanMissiles();
-	CleanTilesets();
 	Map.Clean();
 	CleanReplayLog();
 	FreeVisionTable();

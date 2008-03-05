@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on 03/01/08 14:24:12.
+** Generated automatically by tolua++-1.0.92 on 03/04/08 21:10:06.
 */
 
 #ifndef __cplusplus
@@ -12247,36 +12247,6 @@ static int tolua_set_CServerSetup_unsigned_RevealMap(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: TilesetSelection of class  CServerSetup */
-#ifndef TOLUA_DISABLE_tolua_get_CServerSetup_unsigned_TilesetSelection
-static int tolua_get_CServerSetup_unsigned_TilesetSelection(lua_State* tolua_S)
-{
-  CServerSetup* self = (CServerSetup*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TilesetSelection'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->TilesetSelection);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: TilesetSelection of class  CServerSetup */
-#ifndef TOLUA_DISABLE_tolua_set_CServerSetup_unsigned_TilesetSelection
-static int tolua_set_CServerSetup_unsigned_TilesetSelection(lua_State* tolua_S)
-{
-  CServerSetup* self = (CServerSetup*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'TilesetSelection'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->TilesetSelection = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: GameTypeOption of class  CServerSetup */
 #ifndef TOLUA_DISABLE_tolua_get_CServerSetup_unsigned_GameTypeOption
 static int tolua_get_CServerSetup_unsigned_GameTypeOption(lua_State* tolua_S)
@@ -20040,7 +20010,6 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"UnitsOption",tolua_get_CServerSetup_unsigned_UnitsOption,tolua_set_CServerSetup_unsigned_UnitsOption);
    tolua_variable(tolua_S,"FogOfWar",tolua_get_CServerSetup_unsigned_FogOfWar,tolua_set_CServerSetup_unsigned_FogOfWar);
    tolua_variable(tolua_S,"RevealMap",tolua_get_CServerSetup_unsigned_RevealMap,tolua_set_CServerSetup_unsigned_RevealMap);
-   tolua_variable(tolua_S,"TilesetSelection",tolua_get_CServerSetup_unsigned_TilesetSelection,tolua_set_CServerSetup_unsigned_TilesetSelection);
    tolua_variable(tolua_S,"GameTypeOption",tolua_get_CServerSetup_unsigned_GameTypeOption,tolua_set_CServerSetup_unsigned_GameTypeOption);
    tolua_variable(tolua_S,"Difficulty",tolua_get_CServerSetup_unsigned_Difficulty,tolua_set_CServerSetup_unsigned_Difficulty);
    tolua_variable(tolua_S,"MapRichness",tolua_get_CServerSetup_unsigned_MapRichness,tolua_set_CServerSetup_unsigned_MapRichness);

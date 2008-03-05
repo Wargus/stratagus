@@ -9,7 +9,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Valery Shchedrin, and
+//      (c) Copyright 1998-2008 by Lutz Sammer, Valery Shchedrin, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -53,7 +53,6 @@
 #include "interface.h"
 #include "ui.h"
 #include "map.h"
-#include "tileset.h"
 #include "trigger.h"
 #include "network.h"
 #include "menus.h"
