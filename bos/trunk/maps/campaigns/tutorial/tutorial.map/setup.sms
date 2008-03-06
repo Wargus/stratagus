@@ -46,8 +46,31 @@ Players[7].MagmaStored = 2000
 Players[7].EnergyStored = 1000
 Players[7].AiName = "ai-default"
 
--- load tilesets
-LoadTileModels(GetCurrentLuaPath().."/terrain.lua")
+-- patches
+patch("plain16", 0, 0)
+patch("smallWetPlain", 0, 0)
+patch("smallWetPlain", 8, 1)
+patch("smallWetPlain", 5, 9)
+patch("plain16", 16, 0)
+patch("plain16", 32, 0)
+patch("plain16", 48, 0)
+patch("plain16", 0, 16)
+patch("lake", 16, 16)
+patch("greenMountain", 32, 16)
+patch("plain16", 48, 16)
+patch("plain16", 0, 32)
+patch("plain16", 16, 32)
+patch("smallWetPlain", 24, 32)
+patch("dirtyPlain3", 16, 40)
+patch("lake", 32, 32)
+patch("plain16", 48, 32)
+patch("plain16", 0, 48)
+patch("dirtyPlain3", 0, 56)
+patch("dirtyPlain2", 8, 56)
+patch("dirtyPlain", 0, 48)
+patch("plain16", 16, 48)
+patch("plain16", 32, 48)
+patch("plain16", 48, 48)
 
 
 --allow
