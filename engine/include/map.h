@@ -171,6 +171,7 @@ public:
 #define MapFieldNoBuilding   0x0080  /// No buildings allowed
 
 #define MapFieldUnpassable   0x0100  /// Field is movement blocked
+#define MapFieldTransparent  0x0200  /// Field is transparent
 
 #define MapFieldLandUnit     0x1000  /// Land unit on field
 #define MapFieldAirUnit      0x2000  /// Air unit on field
