@@ -60,6 +60,8 @@ static const int PatchMenuWidth = 150;
 static float ScrollX;
 static float ScrollY;
 
+static CGraphic *TransparentG;
+static CGraphic *TransparentSmallG;
 static CGraphic *ImpassableG;
 static CGraphic *ImpassableSmallG;
 static CGraphic *WaterG;
@@ -80,6 +82,7 @@ enum PatchButton {
 	ButtonSpeed5,
 	ButtonSpeed6,
 	ButtonSpeed7,
+	ButtonTransparent,
 };
 
 struct PatchIcon
@@ -300,6 +303,11 @@ static void DrawPatchTileIcons()
 			x = i * TileSizeX - (int)ScrollX;
 
 			unsigned short flags = Patch->getType()->getFlag(i, j);
+			if (flags & MapFieldTransparent) {
+				g = TransparentSmallG;
+				g->DrawClip(x, y);
+				continue;
+			}
 			if (flags & MapFieldUnpassable) {
 				g = ImpassableSmallG;
 				g->DrawClip(x, y);
@@ -533,6 +541,13 @@ static void PatchLoadIcons()
 		PatchAddIcon((!(i & 1) ? leftX : rightX), topY + (48 + spacing) * ((i + 2) / 2), SpeedG[i], (PatchButton)(ButtonSpeed0 + i));
 		FlagMap[ButtonSpeed0 + i] = i;
 	}
+
+	TransparentG = CGraphic::New(patchEditorPath + "transparent.png");
+	TransparentG->Load();
+	TransparentSmallG = CGraphic::New(patchEditorPath + "transparent-small.png");
+	TransparentSmallG->Load();
+	PatchAddIcon(leftX, topY + (48 + spacing) * ((NumSpeeds + 3) / 2), TransparentG, ButtonTransparent);
+	FlagMap[ButtonTransparent] = MapFieldTransparent;
 }
 
 static void PatchFreeIcons()
