@@ -4,4 +4,4 @@
 
 DefinePlayerTypes("person", "person")
 PresentMap("Patches!", 2, 64, 64, 6227340)
-DefineMapSetup("/setup.sms")
+DefineMapSetup(GetCurrentLuaPath() .. "/setup.sms")

@@ -77,6 +77,7 @@ function RunLoadPatchMenu()
   local nameDropDown = menu:addDropDown(names,
     Video.Width / 2, y,
     function() end)
+  nameDropDown:setSize(130, nameDropDown:getHeight())
 
   y = y + 40
 
