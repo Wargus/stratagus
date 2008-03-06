@@ -71,7 +71,10 @@ static void UpdateMapFlags(CPatchType *type, int x, int y)
 			} else if (x + i >= Map.Info.MapWidth) {
 				break;
 			}
-			Map.Field(x + i, y + j)->Flags = flags[j * type->getTileWidth() + i];
+			unsigned short flag = flags[j * type->getTileWidth() + i];
+			if (!(flag & MapFieldTransparent)) {
+				Map.Field(x + i, y + j)->Flags = flag;
+			}
 		}
 	}
 }
