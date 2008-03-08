@@ -41,6 +41,7 @@ def DefineOptions(filename, args):
    opts.Add('LINKFLAGS', 'Linker Compiler flags')
    opts.Add('CC', 'C Compiler')
    opts.Add('CXX', 'C++ Compiler')
+   opts.Add('LINK', 'Linker')
    opts.Add('extrapath', 'Path to extra root directory for includes and libs', '')
    opts.Add('MINGWCPPPATH', 'Additional include path for crosscompilation', [])
    opts.Add('MINGWLIBPATH', 'Additional lib path for crosscompilation', [])
