@@ -109,7 +109,6 @@ static int IconHeight;                      /// Icon height in panels
 static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
-static int MirrorEdit = 0;                /// Mirror editing enabled
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 
 enum _mode_buttons_ {
@@ -194,17 +193,14 @@ void SetEditorStartUnit(const std::string &name)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Edit unit (internal, used by EditUnit()).
+**  Edit unit.
 **
 **  @param x       X map tile coordinate.
 **  @param y       Y map tile coordinate.
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
-**
-**  @todo  FIXME: Check if the player has already a start-point.
-**  @bug   This function does not support mirror editing!
 */
-static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
+static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 	CBuildRestrictionOnTop *b;
@@ -213,7 +209,6 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 		player = &Players[PlayerNumNeutral];
 	}
 
-	// FIXME: vladi: should check place when mirror editing is enabled...?
 	unit = MakeUnitAndPlace(x, y, type, player);
 	b = OnTopDetails(unit, NULL);
 	if (b && b->ReplaceOnBuild) {
@@ -237,40 +232,6 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate Unit");
 	}
-}
-
-/**
-**  Edit unit.
-**
-**  @param x       X map tile coordinate.
-**  @param y       Y map tile coordinate.
-**  @param type    Unit type to edit.
-**  @param player  Player owning the unit.
-**
-**  @todo  FIXME: Check if the player has already a start-point.
-*/
-static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
-{
-	int mx;
-	int my;
-
-	mx = Map.Info.MapWidth;
-	my = Map.Info.MapHeight;
-
-	EditUnitInternal(x, y, type, player);
-
-	if (!MirrorEdit) {
-		return;
-	}
-
-	EditUnitInternal(mx - x - 1, y, type, player);
-
-	if (MirrorEdit == 1) {
-		return;
-	}
-
-	EditUnitInternal(x, my - y - 1, type, player);
-	EditUnitInternal(mx - x - 1, my - y - 1, type, player);
 }
 
 /**
@@ -377,15 +338,10 @@ static void CleanEditAi()
 */
 static void DrawPlayers(void) 
 {
-	int x;
-	int y;
-	int i;
-	char buf[256];
+	int x = UI.InfoPanel.X + 8;
+	int y = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
-	x = UI.InfoPanel.X + 8;
-	y = UI.InfoPanel.Y + 4 + IconHeight + 10;
-
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x + i * 20, y, 20, 20);
 		}
@@ -400,34 +356,36 @@ static void DrawPlayers(void)
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i * 20, y + 1, 17, 17);
 		}
-		sprintf_s(buf, sizeof(buf), "%d", i);
-		VideoDrawTextCentered(x + i * 20 + 9, y + 3, SmallFont, buf);
+		std::ostringstream o;
+		o << i;
+		VideoDrawTextCentered(x + i * 20 + 9, y + 3, SmallFont, o.str());
 	}
 	
 	x = UI.InfoPanel.X + 4;
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
-		i = sprintf_s(buf, sizeof(buf), "Plyr %d ", Editor.SelectedPlayer);
+		std::ostringstream o;
+		o << _("Player") << " " << Editor.SelectedPlayer << " ";
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
 			case PlayerNeutral:
-				strcat_s(buf, sizeof(buf), "Neutral");
+				o << _("Neutral");
 				break;
 			case PlayerNobody:
 			default:
-				strcat_s(buf, sizeof(buf), "Nobody");
+				o << _("Nobody");
 				break;
 			case PlayerPerson:
-				strcat_s(buf, sizeof(buf), "Person");
+				o << _("Person");
 				break;
 			case PlayerComputer:
 			case PlayerRescuePassive:
 			case PlayerRescueActive:
-				strcat_s(buf, sizeof(buf), "Computer");
+				o << _("Computer");
 				break;
 		}
 
-		VideoDrawText(x, y, GameFont, buf);
+		VideoDrawText(x, y, GameFont, o.str());
 	}
 }
 
@@ -454,7 +412,7 @@ static void DrawUnitIcons(void)
 	y = UI.ButtonPanel.Y + 24;
 	i = Editor.UnitIndex;
 	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
+		if (i >= (int)Editor.ShownUnitTypes.size()) {
 			break;
 		}
 		x = UI.ButtonPanel.X + 10;
@@ -562,9 +520,7 @@ static void DrawMapCursor(void)
 				}
 				break;
 			case EditorSetStartLocation:
-				if (Editor.StartUnit) {
-					CursorBuilding = const_cast<CUnitType *> (Editor.StartUnit);
-				}
+				CursorBuilding = const_cast<CUnitType *>(Editor.StartUnit);
 				break;
 		}
 	}
@@ -608,18 +564,12 @@ static void DrawStartLocations()
 		PushClipping();
 		SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
-		const CUnitType *type = Editor.StartUnit;
 		for (int i = 0; i < PlayerMax; i++) {
 			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
 				int x = vp->Map2ViewportX(Players[i].StartX);
 				int y = vp->Map2ViewportY(Players[i].StartY);
 
-				if (type) {
-					DrawUnitType(type, type->Sprite, i, 0, x, y);
-				} else {
-					Video.DrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
-					Video.DrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
-				}
+				DrawUnitType(Editor.StartUnit, Editor.StartUnit->Sprite, i, 0, x, y);
 			}
 		}
 
@@ -698,18 +648,18 @@ static void DrawEditorInfo(void)
 */
 static void ShowUnitInfo(const CUnit *unit)
 {
-	char buf[256];
-	int i;
-	int res;
+	std::ostringstream o;
 
-	res = UnitUnderCursor->Type->ProductionCosts[0] ? 0 : 1;
-	i = sprintf_s(buf, sizeof(buf), "#%d '%s' Player:#%d", UnitNumber(unit),
-		unit->Type->Name.c_str(), unit->Player->Index);
+	o << "#" << UnitNumber(unit) << " '" << unit->Type->Name
+	  << "' - " << _("Player") << ": " << unit->Player->Index;
+
 	if (unit->Type->CanHarvestFrom) {
-		sprintf_s(buf + i, sizeof(buf) - i, " Amount of %s: %d",
-			DefaultResourceNames[res].c_str(), unit->ResourcesHeld[res] / CYCLES_PER_SECOND);
+		int res = UnitUnderCursor->Type->ProductionCosts[0] ? 0 : 1;
+		o << " - " << _("Amount of") << " " << DefaultResourceNames[res] << ": "
+		  << unit->ResourcesHeld[res] / CYCLES_PER_SECOND;
 	}
-	UI.StatusLine.Set(buf);
+
+	UI.StatusLine.Set(o.str());
 }
 
 /**
@@ -841,20 +791,24 @@ static void EditorCallbackButtonDown(unsigned button)
 		switch (ButtonUnderCursor) {
 			case SelectButton :
 				Editor.State = EditorSelecting;
+				Editor.ShowPatchOutlines = false;
 				editorSlider->setVisible(false);
 				return;
 			case UnitButton:
 				Editor.State = EditorEditUnit;
+				Editor.ShowPatchOutlines = false;
 				editorSlider->setVisible(true);
 				return;
 			case PatchButton :
 				if (EditorEditPatch) {
 					Editor.State = EditorEditPatch;
+					Editor.ShowPatchOutlines = true;
 				}
 				editorSlider->setVisible(false);
 				return;
 			case StartButton:
 				Editor.State = EditorSetStartLocation;
+				Editor.ShowPatchOutlines = false;
 				editorSlider->setVisible(false);
 				return;
 			default:
@@ -953,19 +907,10 @@ static void EditorCallbackButtonDown(unsigned button)
 */
 static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
-	size_t p;
-
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
 	}
 
-	// FIXME: don't handle unicode well. Should work on all latin keyboard.
-	if ((p = UiGroupKeys.find(key)) != std::string::npos) {
-		key = '0' + p;
-		if (key > '9') {
-			key = SDLK_BACKQUOTE;
-		}
-	}
 	switch (key) {
 		case 'f': // ALT+F, CTRL+F toggle fullscreen
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
@@ -979,27 +924,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				CycleViewportMode(-1);
 			} else {
 				CycleViewportMode(1);
-			}
-			break;
-
-		// FIXME: move to lua
-		case 'm': // CTRL+M Mirror edit
-			if (KeyModifiers & ModifierControl)  {
-				++MirrorEdit;
-				if (MirrorEdit == 3) {
-					MirrorEdit = 0;
-				}
-				switch (MirrorEdit) {
-					case 1:
-						UI.StatusLine.Set(_("Mirror editing enabled: 2-side"));
-						break;
-					case 2:
-						UI.StatusLine.Set(_("Mirror editing enabled: 4-side"));
-						break;
-					default:
-						UI.StatusLine.Set(_("Mirror editing disabled"));
-						break;
-				  }
 			}
 			break;
 
@@ -1037,18 +961,12 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_KP6:
 			KeyScrollState |= ScrollRight;
 			break;
-		case '0':
-			if (UnitUnderCursor) {
-				UnitUnderCursor->ChangeOwner(&Players[PlayerNumNeutral]);
-				UI.StatusLine.Set(_("Unit owner modified"));
-			}
-			break;
-		case '1': case '2':
+
+		case '0': case '1': case '2': // 0-8 change player owner
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
-		case '9':
-			if (UnitUnderCursor && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
-				UnitUnderCursor->ChangeOwner(&Players[(int) key - '1']);
+			if (UnitUnderCursor && Map.Info.PlayerType[(int)key - '0'] != PlayerNobody) {
+				UnitUnderCursor->ChangeOwner(&Players[(int)key - '0']);
 				UI.StatusLine.Set(_("Unit owner modified"));
 			}
 			break;
@@ -1115,7 +1033,6 @@ static void EditorCallbackMouse(int x, int y)
 	static int LastMapX;
 	static int LastMapY;
 	enum _cursor_on_ OldCursorOn;
-	char buf[256];
 
 	HandleCursorMove(&x, &y); // Reduce to screen
 
@@ -1266,8 +1183,9 @@ static void EditorCallbackMouse(int x, int y)
 		for (i = 0; i < PlayerMax; ++i) {
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
 				if (Map.Info.PlayerType[i] != PlayerNobody) {
-					sprintf_s(buf, sizeof(buf), "Select player #%d", i);
-					UI.StatusLine.Set(buf);
+					std::ostringstream o;
+					o << _("Select player #") << i;
+					UI.StatusLine.Set(o.str());
 				} else {
 					UI.StatusLine.Clear();
 				}
@@ -1294,10 +1212,10 @@ static void EditorCallbackMouse(int x, int y)
 				}
 				if (bx < x && x < bx + IconWidth &&
 						by < y && y < by + IconHeight) {
-					sprintf_s(buf, sizeof(buf), "%s \"%s\"",
-						Editor.ShownUnitTypes[i]->Ident.c_str(),
-						Editor.ShownUnitTypes[i]->Name.c_str());
-					UI.StatusLine.Set(buf);
+					std::ostringstream o;
+					o << Editor.ShownUnitTypes[i]->Ident << " \""
+					  << Editor.ShownUnitTypes[i]->Name << "\"";
+					UI.StatusLine.Set(o.str());
 					Editor.CursorUnitIndex = i;
 #if 0
 					ButtonUnderCursor = i + 100;
@@ -1590,11 +1508,11 @@ void CEditor::Init(void)
 */
 int EditorSaveMap(const std::string &file)
 {
-	std::ostringstream o;
+	std::string fullName;
 
-	o << StratagusLibPath << "/" << file;
-	if (SaveStratagusMap(o.str(), &Map) == -1) {
-		printf("Cannot save map\n");
+	fullName = StratagusLibPath + "/" + file;
+	if (SaveStratagusMap(fullName, &Map) == -1) {
+		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
 
