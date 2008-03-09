@@ -58,7 +58,8 @@ class CEditor {
 public:
 	CEditor() : StartUnit(NULL),
 		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
-		CursorPlayer(-1), SelectedPlayer(-1), MapLoaded(false)
+		CursorPlayer(-1), SelectedPlayer(-1), MapLoaded(false),
+		ShowPatchOutlines(false)
 		{};
 	~CEditor() {};
 
@@ -83,6 +84,7 @@ public:
 	bool MapLoaded;              /// Map loaded in editor
 
 	bool ShowPatchOutlines;      /// Show outlines around patches
+	Uint32 PatchOutlineColor;    /// Patch outline color
 
 	EditorRunningType Running;   /// Editor is running
 
