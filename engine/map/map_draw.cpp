@@ -43,6 +43,7 @@
 #include "patch_type.h"
 #include "patch.h"
 #include "patch_manager.h"
+#include "editor.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -259,6 +260,12 @@ void CViewport::DrawMapBackgroundInViewport() const
 		int x = this->X - ((this->MapX - patch->getX()) * TileSizeX + this->OffsetX);
 		int y = this->Y - ((this->MapY - patch->getY()) * TileSizeY + this->OffsetY);
 		g->DrawClip(x, y);
+
+		if (Editor.Running && Editor.ShowPatchOutlines) {
+			Video.DrawRectangleClip(ColorBlack, x, y,
+				patch->getType()->getTileWidth() * TileSizeX,
+				patch->getType()->getTileHeight() * TileSizeY);
+		}
 	}
 }
 

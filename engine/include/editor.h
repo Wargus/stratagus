@@ -82,6 +82,8 @@ public:
 
 	bool MapLoaded;              /// Map loaded in editor
 
+	bool ShowPatchOutlines;      /// Show outlines around patches
+
 	EditorRunningType Running;   /// Editor is running
 
 	EditorStateType State;       /// Current editor state

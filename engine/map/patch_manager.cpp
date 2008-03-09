@@ -103,6 +103,8 @@ CPatchManager::moveToTop(CPatch *patch)
 {
 	this->patches.remove(patch);
 	this->patches.push_back(patch);
+
+	// FIXME: recalculate flags
 }
 
 
@@ -111,6 +113,8 @@ CPatchManager::moveToBottom(CPatch *patch)
 {
 	this->patches.remove(patch);
 	this->patches.push_front(patch);
+
+	// FIXME: recalculate flags
 }
 
 
