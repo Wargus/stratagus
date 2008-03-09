@@ -262,7 +262,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		g->DrawClip(x, y);
 
 		if (Editor.Running && Editor.ShowPatchOutlines) {
-			Video.DrawRectangleClip(ColorBlack, x, y,
+			Video.DrawRectangleClip(Editor.PatchOutlineColor, x, y,
 				patch->getType()->getTileWidth() * TileSizeX,
 				patch->getType()->getTileHeight() * TileSizeY);
 		}

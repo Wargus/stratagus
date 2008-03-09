@@ -1455,6 +1455,7 @@ void CEditor::Init(void)
 	ReplayRevealMap = 1;
 	FlagRevealMap = 0;
 	Editor.SelectedPlayer = PlayerNumNeutral;
+	Editor.PatchOutlineColor = ColorBlack;
 
 	//
 	// Place the start points, which the loader discarded.
