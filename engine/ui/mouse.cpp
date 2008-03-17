@@ -639,6 +639,29 @@ void RestrictCursorToMinimap(void)
 }
 
 /**
+**  Use the mouse to scroll the map
+**
+**  @param x  Screen X position.
+**  @param y  Screen Y position.
+*/
+void MouseScrollMap(int x, int y)
+{
+	int speed;
+
+	if (KeyModifiers & ModifierControl) {
+		speed = UI.MouseScrollSpeedControl;
+	} else {
+		speed = UI.MouseScrollSpeedDefault;
+	}
+
+	UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
+		UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
+		UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
+	UI.MouseWarpX = CursorStartX;
+	UI.MouseWarpY = CursorStartY;
+}
+
+/**
 **  Handle movement of the cursor.
 **
 **  @param x  Screen X position.
@@ -675,19 +698,7 @@ void UIHandleMouseMove(int x, int y)
 	//  Move map.
 	//
 	if (GameCursor == UI.Scroll.Cursor) {
-		int speed;
-
-		if (KeyModifiers & ModifierControl) {
-			speed = UI.MouseScrollSpeedControl;
-		} else {
-			speed = UI.MouseScrollSpeedDefault;
-		}
-
-		UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
-			UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
-			UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
-		UI.MouseWarpX = CursorStartX;
-		UI.MouseWarpY = CursorStartY;
+		MouseScrollMap(x, y);
 		return;
 	}
 

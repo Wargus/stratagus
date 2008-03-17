@@ -58,6 +58,16 @@ public:
 	CPatch *add(const std::string &typeName, int x, int y);
 
 	/**
+	**  Remove a patch
+	*/
+	void remove(CPatch *patch);
+
+	/**
+	**  Move a patch's location
+	*/
+	void move(CPatch *patch, int x, int y);
+
+	/**
 	**  Move a patch to the top
 	*/
 	void moveToTop(CPatch *patch);
@@ -117,8 +127,12 @@ public:
 	void savePatchType(CFile *file, CPatchType *patchType);
 
 private:
+	void updateMapFlags(int x1, int y1, int x2, int y2);
+
 	std::list<CPatch *> patches;
 	std::map<std::string, CPatchType *> patchTypesMap;
+
+	std::list<CPatch *> removedPatches;
 };
 
 //@}
