@@ -60,6 +60,8 @@
 #include "unit_cache.h"
 #include "video.h"
 #include "map.h"
+#include "patch.h"
+#include "patch_type.h"
 #include "minimap.h"
 #include "settings.h"
 #include "network.h"
@@ -109,7 +111,10 @@ static int IconHeight;                      /// Icon height in panels
 static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
-static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
+static CPatch *PatchUnderCursor;            /// Patch under cursor
+static int PatchOffsetX;
+static int PatchOffsetY;
+static bool UnitPlacedThisPress = false;    /// Only allow one unit per press
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -654,10 +659,25 @@ static void ShowUnitInfo(const CUnit *unit)
 	  << "' - " << _("Player") << ": " << unit->Player->Index;
 
 	if (unit->Type->CanHarvestFrom) {
-		int res = UnitUnderCursor->Type->ProductionCosts[0] ? 0 : 1;
+		int res = unit->Type->ProductionCosts[0] ? 0 : 1;
 		o << " - " << _("Amount of") << " " << DefaultResourceNames[res] << ": "
 		  << unit->ResourcesHeld[res] / CYCLES_PER_SECOND;
 	}
+
+	UI.StatusLine.Set(o.str());
+}
+
+/**
+**  Show info about a patch.
+**
+**  @param patch  Patch pointer.
+*/
+static void ShowPatchInfo(const CPatch *patch)
+{
+	std::ostringstream o;
+
+	o << _("Patch") << ": " << PatchUnderCursor->getType()->getName() << " - ("
+	  << PatchUnderCursor->getX() << ", " << PatchUnderCursor->getY() << ")";
 
 	UI.StatusLine.Set(o.str());
 }
@@ -865,10 +885,14 @@ static void EditorCallbackButtonDown(unsigned button)
 
 		if (MouseButtons & LeftButton) {
 			if (Editor.State == EditorEditPatch) {
-				// FIXME: PATCHES
-			}
-			if (!UnitPlacedThisPress) {
-				if (Editor.State == EditorEditUnit && CursorBuilding) {
+				if (PatchUnderCursor) {
+					int tileX = UI.MouseViewport->Viewport2MapX(CursorX);
+					int tileY = UI.MouseViewport->Viewport2MapY(CursorY);
+					PatchOffsetX = tileX - PatchUnderCursor->getX();
+					PatchOffsetY = tileY - PatchUnderCursor->getY();
+				}
+			} else if (Editor.State == EditorEditUnit) {
+				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, CursorBuilding,
 							UI.MouseViewport->Viewport2MapX(CursorX),
 							UI.MouseViewport->Viewport2MapY(CursorY), 1)) {
@@ -885,8 +909,7 @@ static void EditorCallbackButtonDown(unsigned button)
 							MaxSampleVolume);
 					}
 				}
-			}
-			if (Editor.State == EditorSetStartLocation) {
+			} else if (Editor.State == EditorSetStartLocation) {
 				Players[Editor.SelectedPlayer].StartX = UI.MouseViewport->Viewport2MapX(CursorX);
 				Players[Editor.SelectedPlayer].StartY = UI.MouseViewport->Viewport2MapY(CursorY);
 			}
@@ -934,7 +957,10 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			Exit(0);
 
 		case SDLK_DELETE: // Delete
-			if (UnitUnderCursor) {
+			if (PatchUnderCursor) {
+				Map.PatchManager.remove(PatchUnderCursor);
+				PatchUnderCursor = NULL;
+			} else if (UnitUnderCursor) {
 				CUnit *unit = UnitUnderCursor;
 
 				unit->Remove(NULL);
@@ -1040,39 +1066,7 @@ static void EditorCallbackMouse(int x, int y)
 	// Move map.
 	//
 	if (GameCursor == UI.Scroll.Cursor) {
-		int xo;
-		int yo;
-
-		// FIXME: Support with CTRL for faster scrolling.
-		// FIXME: code duplication, see ../ui/mouse.c
-		xo = UI.MouseViewport->MapX;
-		yo = UI.MouseViewport->MapY;
-		if (UI.MouseScrollSpeedDefault < 0) {
-			if (x < CursorStartX) {
-				xo++;
-			} else if (x > CursorStartX) {
-				xo--;
-			}
-			if (y < CursorStartY) {
-				yo++;
-			} else if (y > CursorStartY) {
-				yo--;
-			}
-		} else {
-			if (x < CursorStartX) {
-				xo--;
-			} else if (x > CursorStartX) {
-				xo++;
-			}
-			if (y < CursorStartY) {
-				yo--;
-			} else if (y > CursorStartY) {
-				yo++;
-			}
-		}
-		UI.MouseWarpX = CursorStartX;
-		UI.MouseWarpY = CursorStartY;
-		UI.MouseViewport->Set(xo, yo, TileSizeX / 2, TileSizeY / 2);
+		MouseScrollMap(x, y);
 		return;
 	}
 
@@ -1084,7 +1078,7 @@ static void EditorCallbackMouse(int x, int y)
 		UnitPlacedThisPress = false;
 	}
 	//
-	// Drawing patches on map.
+	// Dragging patches or units on map.
 	//
 	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
 			(Editor.State == EditorEditPatch || Editor.State == EditorEditUnit)) {
@@ -1110,7 +1104,6 @@ static void EditorCallbackMouse(int x, int y)
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX,
 				UI.SelectedViewport->MapY + 1, TileSizeX / 2, TileSizeY / 2);
-
 		}
 
 		//
@@ -1118,8 +1111,11 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		RestrictCursorToViewport();
 
-		if (Editor.State == EditorEditPatch) {
-			// FIXME: PATCHES
+		if (Editor.State == EditorEditPatch && PatchUnderCursor) {
+			int tileX = UI.SelectedViewport->Viewport2MapX(CursorX);
+			int tileY = UI.SelectedViewport->Viewport2MapY(CursorY);
+			Map.PatchManager.move(PatchUnderCursor, tileX - PatchOffsetX, tileY - PatchOffsetY);
+			ShowPatchInfo(PatchUnderCursor);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, CursorBuilding,
@@ -1345,32 +1341,38 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Map
 	//
+	PatchUnderCursor = NULL;
 	UnitUnderCursor = NULL;
 	if (x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
 			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		CViewport *vp;
-
-		vp = GetViewport(x, y);
-		Assert(vp);
+		CViewport *vp = GetViewport(x, y);
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
-			DebugPrint("active viewport changed to %ld.\n" _C_
-				static_cast<long int>(UI.Viewports - vp));
 		}
 		CursorOn = CursorOnMap;
 
-		//
-		// Look if there is a unit under the cursor.
-		// FIXME: use Viewport2MapX Viewport2MapY
-		//
-		UnitUnderCursor = UnitOnScreen(
-			CursorX - UI.MouseViewport->X +
-				UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
-			CursorY - UI.MouseViewport->Y +
-				UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
-		if (UnitUnderCursor) {
-			ShowUnitInfo(UnitUnderCursor);
-			return;
+		if (Editor.State == EditorEditPatch) {
+			// Show what patch is under the cursor
+			int tileX = UI.MouseViewport->Viewport2MapX(CursorX);
+			int tileY = UI.MouseViewport->Viewport2MapY(CursorY);
+			PatchUnderCursor = Map.PatchManager.getPatch(tileX, tileY);
+
+			if (PatchUnderCursor) {
+				ShowPatchInfo(PatchUnderCursor);
+				return;
+			}
+		} else {
+			// See if there is a unit under the cursor.
+			UnitUnderCursor = UnitOnScreen(
+				CursorX - UI.MouseViewport->X +
+					UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
+				CursorY - UI.MouseViewport->Y +
+					UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
+
+			if (UnitUnderCursor) {
+				ShowUnitInfo(UnitUnderCursor);
+				return;
+			}
 		}
 	}
 	//
