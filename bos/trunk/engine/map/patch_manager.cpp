@@ -56,24 +56,20 @@ CPatchManager::~CPatchManager()
 }
 
 
-static void UpdateMapFlags(CPatchType *type, int x, int y)
+void
+CPatchManager::updateMapFlags(int x1, int y1, int x2, int y2)
 {
-	unsigned short *flags = type->getFlags();
-	for (int j = 0; j < type->getTileHeight(); ++j) {
-		if (j + y < 0) {
-			continue;
-		} else if (j + y >= Map.Info.MapHeight) {
-			break;
-		}
-		for (int i = 0; i < type->getTileWidth(); ++i) {
-			if (x + i < 0) {
-				continue;
-			} else if (x + i >= Map.Info.MapWidth) {
-				break;
-			}
-			unsigned short flag = flags[j * type->getTileWidth() + i];
-			if (!(flag & MapFieldTransparent)) {
-				Map.Field(x + i, y + j)->Flags = flag;
+	x1 = std::max(x1, 0);
+	y1 = std::max(y1, 0);
+	x2 = std::min(x2, Map.Info.MapWidth - 1);
+	y2 = std::min(y2, Map.Info.MapHeight - 1);
+
+	for (int j = y1; j <= y2; ++j) {
+		for (int i = x1; i <= x2; ++i) {
+			int offsetX, offsetY;
+			CPatch *patch = this->getPatch(i, j, &offsetX, &offsetY);
+			if (patch) {
+				Map.Field(i, j)->Flags = patch->getType()->getFlag(offsetX, offsetY);
 			}
 		}
 	}
@@ -92,11 +88,48 @@ CPatchManager::add(const std::string &typeName, int x, int y)
 	CPatch *patch = new CPatch(type, x, y);
 	this->patches.push_back(patch);
 
-	UpdateMapFlags(type, x, y);
+	updateMapFlags(x, y, x + type->getTileWidth() - 1, y + type->getTileHeight() - 1);
 
 	return patch;
 }
 
+void
+CPatchManager::remove(CPatch *patch)
+{
+	this->patches.remove(patch);
+	this->removedPatches.push_back(patch);
+
+	updateMapFlags(patch->getX(), patch->getY(),
+		patch->getX() + patch->getType()->getTileWidth(),
+		patch->getY() + patch->getType()->getTileHeight());
+}
+
+void
+CPatchManager::move(CPatch *patch, int x, int y)
+{
+	if (x != patch->getX() || y != patch->getY()) {
+		int x1, y1, x2, y2;
+
+		if (x < patch->getX()) {
+			x1 = x;
+			x2 = patch->getX() + patch->getType()->getTileWidth() - 1;
+		} else {
+			x1 = patch->getX();
+			x2 = x + patch->getType()->getTileWidth() - 1;
+		}
+		if (y < patch->getY()) {
+			y1 = y;
+			y2 = patch->getY() + patch->getType()->getTileHeight() - 1;
+		} else {
+			y1 = patch->getY();
+			y2 = y + patch->getType()->getTileHeight() - 1;
+		}
+
+		patch->setPos(x, y);
+
+		updateMapFlags(x1, y1, x2, y2);
+	}
+}
 
 void
 CPatchManager::moveToTop(CPatch *patch)
@@ -104,7 +137,9 @@ CPatchManager::moveToTop(CPatch *patch)
 	this->patches.remove(patch);
 	this->patches.push_back(patch);
 
-	// FIXME: recalculate flags
+	updateMapFlags(patch->getX(), patch->getY(),
+		patch->getX() + patch->getType()->getTileWidth() - 1,
+		patch->getY() + patch->getType()->getTileHeight() - 1);
 }
 
 
@@ -114,7 +149,9 @@ CPatchManager::moveToBottom(CPatch *patch)
 	this->patches.remove(patch);
 	this->patches.push_front(patch);
 
-	// FIXME: recalculate flags
+	updateMapFlags(patch->getX(), patch->getY(),
+		patch->getX() + patch->getType()->getTileWidth() - 1,
+		patch->getY() + patch->getType()->getTileHeight() - 1);
 }
 
 
@@ -164,15 +201,21 @@ CPatchManager::load()
 	}
 }
 
-void
-CPatchManager::clear()
+static void clearPatches(std::list<CPatch *> &patches)
 {
 	std::list<CPatch *>::iterator i;
-	for (i = this->patches.begin(); i != this->patches.end(); ++i) {
+	for (i = patches.begin(); i != patches.end(); ++i) {
 		(*i)->getType()->clean();
 		delete *i;
 	}
-	this->patches.clear();
+	patches.clear();
+}
+
+void
+CPatchManager::clear()
+{
+	clearPatches(this->patches);
+	clearPatches(this->removedPatches);
 }
 
 
