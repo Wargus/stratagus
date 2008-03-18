@@ -267,9 +267,12 @@ void CMinimap::UpdateTerrain()
 		for (int mx = XOffset; mx < W - XOffset; ++mx) {
 			CPatch *patch;
 			int xoffset, yoffset;
+			CColor color = ColorBlack;
 
 			patch = Map.PatchManager.getPatch(Minimap2MapX[mx], Minimap2MapY[my], &xoffset, &yoffset);
-			CColor color = GetColor(patch, xoffset, yoffset, mx, my, scalex, scaley);
+			if (patch) {
+				color = GetColor(patch, xoffset, yoffset, mx, my, scalex, scaley);
+			}
 			SetMinimapTerrainPixel(mx, my, color);
 		}
 	}
