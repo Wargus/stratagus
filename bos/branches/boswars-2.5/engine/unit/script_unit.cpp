@@ -612,7 +612,7 @@ static int CclUnit(lua_State *l)
 			CConstructionFrame *cframe;
 
 			frame = LuaToNumber(l, j + 1);
-			cframe = unit->Type->Construction->Frames;
+			cframe = unit->Seen.Type->Construction->Frames;
 			while (frame--) {
 				cframe = cframe->Next;
 			}
