@@ -1,0 +1,700 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Artificial Intelligence (AI)</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Artificial Intelligence (AI)</h1>
+<hr>
+<a href="../index.html">Bos Wars</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="unittype.html">PREV</a> 
+<a href="config.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#DefineAi">DefineAi</a>
+<a href="#DefineAiHelper">DefineAiHelper</a>
+<a href="#DefineAiPlayer">DefineAiPlayer</a>
+<a href="#AiCheckForce">AiCheckForce</a>
+<a href="#AiComputeGauges">AiComputeGauges</a>
+<a href="#AiDebug">AiDebug</a>
+<a href="#AiDebugPlayer">AiDebugPlayer</a>
+<a href="#AiDump">AiDump</a>
+<a href="#AiAttackWithForce">AiAttackWithForce</a>
+<a href="#AiForce">AiForce</a>
+<a href="#AiForceRole">AiForceRole</a>
+<a href="#AiGetRace">AiGetRace</a>
+<a href="#AiGetSleepCycles">AiGetSleepCycles</a>
+<a href="#AiNeed">AiNeed</a>
+<a href="#AiPlayer">AiPlayer</a>
+<a href="#AiResearch">AiResearch</a>
+<a href="#AiSet">AiSet</a>
+<a href="#AiSetCollect">AiSetCollect</a>
+<a href="#AiSetReserve">AiSetReserve</a>
+<a href="#AiSleep">AiSleep</a>
+<a href="#AiUpgradeTo">AiUpgradeTo</a>
+<a href="#AiWait">AiWait</a>
+<a href="#AiWaitForce">AiWaitForce</a>
+
+<hr>
+<h2>Intro - Introduction to AI functions and variables</h2>
+
+Everything around the control of the Stratagus AI.
+
+<p>
+Warning: The AI documentation is slightly outdated. This documentation hasn't 
+been fully converted to the lua API yet.
+<p>
+
+<h2>How does it work</h2>
+
+AI in Stratagus is script based. Each AI player keeps executing scripts.
+There are two kinds of scripts : 
+<ul>
+  <li>The main script. It starts buildings, upgrades, ...</li>
+  <li>The action/reaction scripts. They are started by the AI engine, under certain condition.<br>
+  </li>
+</ul>
+Scripts can arrange and control units using forces : <br>
+A script can ask for some type of unit in a force (using <a href="#AiForce">AiForce</a>), 
+and then wait for them to be ready (using <a href="#AiWaitForce">AiWaitForce</a>).<br>
+<br>
+<br>
+The force 0 is a special case : it holds all the unassigned units, and is used to fill other forces. 
+( when needed, units are transfered from force 0 to others ). Attacker units in force 0 won't be used for attacks<br>
+Forces from 1 to 3 are also special : They are used as the attack reserve. 
+Attack forces will only be created using units available in those forces.<br>
+<br>
+The main script is responsible for setting minimums for the forces 0 and 1. This will influence the balance
+between defend and attack for an AI player.<br>
+<br>
+
+<h2>Functions</h2>
+<a name="DefineAi"></a>
+<h3>DefineAi(name, race, class, script)</h3>
+
+This defines how a special AI works. Each level can use his own AI definition.
+
+<dl>
+<dt>name</dt>
+<dd>Unique name of this AI definitions.
+</dd>
+<dt>race</dt>
+<dd>Name of the race for what this definition can be used, if the definition
+    can be used for any race use "*".
+</dd>
+<dt>class</dt>
+<dd>Class name of this definition. Used to choose the AI for computer players.
+The puds contains numbers which are mapped by the C table AiTypeWcNames into
+internal names. Some common used names are "passive", "land-attack",
+"sea-attack", "air-attack".
+</dd>
+<dt>script</dt>
+<dd>A lua function.<p>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Defines the passive computer AI, which does nothing.
+DefineAi("passive-ai", "*", "passive", function() AiSleep(10000) end)
+</pre>
+
+<a name="DefineAiHelper"></a>
+<h3>DefineAiHelper(list)</h3>
+
+The AI is complete configurable, nothing is hardcoded. The AI knows nothing
+about any units without this table. This table defines F.E. what unit can build
+and what they can build and many other things that the AI must know.
+
+
+<dl>
+<dt>list</dt>
+<dd>A list of features:
+ <ul>
+ <li><code>{"build", "builder", "building-1", ... "building-n"}</code>
+  <dl>
+  <dt>builder</dt>
+  <dd>Name of the unit-type that can build.
+  </dd>
+  <dt>building-1</dt>
+  <dt>building-n</dt>
+  <dd>Names of the unit-types that can be builded by the builder.
+  </dd>
+  </dl>
+  <b>Note:</b> If more units can build the same buildings you need the same list
+	for all units.
+ <li><code>{"train", "trainer", "unit-1", ... "unit-n"}</code>
+  <dl>
+  <dt>trainer</dt>
+  <dd>Name of the unit-type that can train the units.
+  </dd>
+  <dt>unit-1</dt>
+  <dt>unit-n</dt>
+  <dd>Names of the unit-types that can be trained by the trainer.
+  </dd>
+  </dl>
+  <b>Note:</b> If more units can train the same unit you need the same list
+	for all units.
+ <li><code>{"upgrade", "unit", "upgraded-unit-1", ... "upgraded-unit-n"}</code>
+  <dl>
+  <dt>unit</dt>
+  <dd>Name of the unit-type that can be upgraded.
+  </dd>
+  <dt>upgraded-unit-1</dt>
+  <dt>upgraded-unit-n</dt>
+  <dd>Names of the unit-types to that the unit can be upgraded.
+  </dd>
+  </dl>
+ <li><code>{"research", "researcher", "upgrade-1", ... "spell-n"}</code>
+  <dl>
+  <dt>researcher</dt>
+  <dd>Name of the unit-type that can reasearch upgrades or spells.
+  </dd>
+  <dt>upgrade-1</dt>
+  <dt>spell-n</dt>
+  <dd>Names of the upgrades or spells that can be researched by the researcher.
+  </dd>
+  </dl>
+ <li><code>{"repair", "worker", "unit-1", ... "unit-n"}</code>
+  <dl>
+  <dt>worker</dt>
+  <dd>Name of the unit-type that can repair other units.
+  </dd>
+  <dt>unit-1</dt>
+  <dt>unit-n</dt>
+  <dd>Names of the unit-types that can be repaired by the worker.
+  </dd>
+  </dl>
+  <b>Note:</b> If more units can repair the same units you need the same list
+	for all units.
+ <li><code>{"equiv", "unit", "unit-1", ... "unit-n"}</code>
+  <dl>
+  <dt>unit</dt>
+  <dd>Name of the unit-type that have equilvalent units.
+  </dd>
+  <dt>unit-1</dt>
+  <dt>unit-n</dt>
+  <dd>Names of the unit-types that can be uses by the AI equivalent.
+  </dd>
+  </dl>
+ <li><code>{"unit-limit", "unit", "resource"}</code>
+  <dl>
+  <dt>unit</dt>
+  <dd>Name of the unit-type that must be produced to reduce the unit limit.
+  </dd>
+  <dt>resource</dt>
+  <dd>Name of the resource producing the shortage.
+  </dd>
+  </dl>
+  <i>I think we should swap the arguments: "resource" "unit".</i>
+ </ul>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+A minimal AI helper definition:
+
+<pre>
+DefineAiHelper(
+  {"build", "unit-peasant", "unit-farm"},
+  {"train", "unit-town-hall", "unit-peasant"},
+  {"upgrade", "unit-town-hall", "unit-keep"},
+  {"research", "unit-human-blacksmith", "upgrade-sword1"},
+  {"repair", "unit-peasant", "unit-town-hall"},
+  {"unit-limit", "unit-farm", "food"},
+  {"unit-equiv", "unit-town-hall", "unit-keep"})
+</pre>
+
+<p>A peasant can build a farm.
+<p>The town hall can train a peasant.
+<p>A town hall can be upgraded to a keep.
+<p>The blacksmith can reasearch the upgrade sword1.
+<p>A peasant can repair the town hall.
+<p>To fix the food shortage the AI must build farms.
+<p>For the AI is a keep equivalent to a town hall.
+
+<a name="DefineAiPlayer"></a>
+<h3>DefineAiPlayer(list, ...)</h3>
+
+Define an AI player. (NOT SUPPORTED)
+
+
+<dl>
+<dt></dt>
+<dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- FIXME:
+FIXME:
+    DefineAiPlayer()
+</pre>
+
+
+<a name="AiAttackWithForce"></a>
+<h3>AiAttackWithForce(force)</h3>
+ 
+Attack the opponent with the given force. The place is choosen by the AI. If there 	 
+are flyers, ships and land units in the force they could attack different 	 
+goals.
+
+<dl> 	 
+<dt>force</dt>
+<dd>ID of the force to which the attacking units belong. The force ids 0 to 9
+are currently supported.
+</dd>
+</dl>
+ 
+<i>The force isn't moved as a single unit: faster units attacks first, than later the
+slower units will attack.</i>
+
+<h4>Example</h4>
+
+<pre>
+   -- Force 0 is built with one assault unit. The script continues processing, when
+   -- the assault unit is ready. When ready, the script attacks the opponent
+   -- with force 0.
+   {
+     function() return AiForce(0, "unit-assault", 1) end,
+     function() return AiWaitForce(0) end,
+     function() return AiAttackWithForce(0) end
+   }
+</pre>
+
+<a name="AiCheckForce"></a>
+<h3>AiCheckForce(force)</h3>
+
+Check if a force is ready.
+
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Force 0 is build with one footman. When the force is ready, sleep for
+    -- 500 frames.
+    AiForce(0, "unit-footman", 1)
+    if (AiCheckForce(0)) then AiSleep(500) end
+</pre>
+
+<a name="AiDebug"></a>
+<h3>AiDebug(flag)</h3>
+
+Enable or disable the debug output of the AI script execution.
+
+
+<dl>
+<dt>flag</dt>
+<dd>If true enables printing of the AI commands, if false disables it.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Prints now the commands of this computer player.
+    AiDebug(true)
+</pre>
+
+<a name="AiDebugPlayer"></a>
+<h3>AiDebugPlayer(1, 2, 3, ...)</h3>
+
+Activate dump of AI forces and strategy on stdout.<br>
+Parameters are player number, or "self", for thisplayer.<br>
+"none" will stop all AI debug output.
+
+<h4>Example</h4>
+
+<pre>
+    AiDebugPlayer("self")
+</pre>
+
+<a name="AiDump"></a>
+<h3>AiDump()</h3>
+
+Dump some AI debug information.
+
+
+<h4>Example</h4>
+
+<pre>
+    -- Prints out some debug information.
+    AiDump()
+</pre>
+
+<a name="AiForce"></a>
+<h3>AiForce(force, unit-type-1, count-1, ... ,unit-type-N, count-N)</h3>
+
+Define a force, what and how many units should belong to a force. Up to 10
+forces are currently supported.
+<br>
+Force 0 is currently fixed to be the defence force. Send to a building or
+unit under attack.
+<br>
+If there are any unassigned units of the requested unit-type, than they are
+assigned to the force.
+<br>
+Note: The low-level didn't support the reduce of a force.
+
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
+</dd>
+<dt>unit-type-1</dt>
+<dt>unit-type-N</dt>
+<dd>Unit-type that should be in the force. Currently only mobile (trained) units
+are allowed.
+</dd>
+</dl>
+<dt>count-1</dt>
+<dt>count-N</dt>
+<dd>How many of this units should be in the force.
+</dd>
+</dl>
+
+<i>The unit-types should be build in a fixed order. From left to right? or from
+each unit-type one after the other?</i>
+
+<h4>Example</h4>
+
+<pre>
+    -- First the force 0 is filled up with 4 footmans and 5 bowmans, after this
+    -- force 1 is filled with 3 footmans and 2 bowmans.
+    AiForce(0, "unit-footman", 4, "unit-bowman", 5)
+    AiForce(1, "unit-footman", 3, "unit-bowman", 2)
+</pre>
+
+<a name="AiForceRole"></a>
+<h3>AiForceRole(force, role)</h3>
+
+Define the role of a force.
+
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units belong. 0 - 9 is currently
+supported.
+</dd>
+<dt>role</dt>
+<dd>The role of the force.  Can be either "attack" or "defend".
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Sets the role of force 0 to attack.
+    AiForceRole(0, "attack")
+</pre>
+
+<a name="AiGetRace"></a>
+<h3>AiGetRace()</h3>
+
+Get the race of the current AI player.
+
+
+<h4>Example</h4>
+
+<pre>
+    -- Returns the race name of the current AI player.
+    AiGetRace()
+</pre>
+
+<a name="AiGetSleepCycles"></a>
+<h3>AiGetSleepCycles()</h3>
+
+Get the number of cycles to sleep.
+
+
+<h4>Example</h4>
+
+<pre>
+    -- Returns the number of cycles to sleep.
+    AiGetSleepCycles()
+</pre>
+
+<h3>AiNeed(unit-type)</h3>
+
+Tells the AI that it should have a unit of this unit-type. The AI builds or
+trains units in this order of the AiSet/AiNeed commands. If the unit or an
+equivalent unit already exists, the AI does nothing. If the unit is lost, it is
+automatically rebuilt. If the units are requested in wrong order, the AI could 
+hang up. Resources are collected automatic and farms are automatic build, but
+additional could be requested.
+
+
+<dl>
+<dt>unit-type</dt>
+<dd>Name of the unit-type required.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- The great hall must be build before a barrack.
+  AiNeed("unit-great-hall")
+  AiNeed("unit-barrack")
+</pre>
+
+<a name="AiPlayer"></a>
+<h3>AiPlayer()</h3>
+
+Return the player of the running AI.
+
+
+<h4>Example</h4>
+
+<pre>
+    -- Returns the player of the running AI.
+    player = AiPlayer()
+</pre>
+
+<a name="AiResearch"></a>
+<h3>AiResearch(upgrade)</h3>
+
+Let the AI research an upgrade, upgrades are reseached in command order.
+And automatic researched if lost. Building orders have a higher priority.
+The script writer is responsible for the correct order. If wrong the
+AI could hang up.
+
+
+<dl>
+<dt>upgrade</dt>
+<dd>Upgrade name to be researched.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Research a better armor for land units.
+    AiResearch("upgrade-shield1")
+</pre>
+
+<a name="AiSet"></a>
+<h3>AiSet(unit-type, count)</h3>
+
+This AiNeed with a number. Tells the AI that it should have a specified number
+of a unit of this unit-type. The AI builds or trains units in this order of
+the AiSet/AiNeed commands. If the unit or an equivalent unit already exists,
+the AI does nothing. If the units are lost, they are automatic rebuild. If the
+units are requested in wrong order, the AI could hang up. Resources are
+collected automatic and farms are automatic build, but additional could be
+requested. In the opposite to AiNeed, which always inserts a request, AiSet
+modifies the last request to the new number.
+
+
+<dl>
+<dt>unit-type</dt>
+<dd>Name of the unit-type(s) required.
+</dd>
+<dt>count</dt>
+<dd>Number of unit-types(s) required.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    --  Request two assault units.
+    AiSet("unit-assault", 2)
+</pre>
+
+<a name="AiSetCollect"></a>
+<h3>AiSetCollect(time, resource1, resource2, ...)</h3>
+
+Set AI player resource collect percent.
+
+
+<dl>
+<dt>time</dt>
+<dd>Time in game cycles.
+</dd>
+<dt>resource1</dt>
+<dd>Percentage needed for the first resource.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set the collect percent to 50% gold and 50% wood.
+    AiSetCollect(0, 50, 50, 0, 0, 0, 0)
+</pre>
+
+<a name="AiSetReserve"></a>
+<h3>AiSetReserve(time, resource1, ...)</h3>
+
+Set AI player resource reserve.
+
+
+<dl>
+<dt>time</dt>
+<dd>Time in game cycles.
+</dd>
+<dt>reource1</dt>
+<dd>first resource.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set all of the reserves to 0.
+    AiSetReserve(0, 0, 0, 0, 0, 0, 0)
+</pre>
+
+<a name="AiSleep"></a>
+<h3>AiSleep(frames)</h3>
+
+Wait some frames, to let the opponent (you) recover.
+
+
+<dl>
+<dt>frames</dt>
+<dd>How many frames (~1/30s) the AI shouldn't proceed with the script.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    {
+      -- Wait 500 frames ~16s.
+      function() return AiSleep(500) end,
+    }
+</pre>
+
+<a name="AiUpgradeTo"></a>
+<h3>AiUpgradeTo(unit-type)</h3>
+
+Upgrade units to an improved type. You must give for each unit you want to
+upgrade an upgrade command. The computer automatic searches which unit it
+upgrades.
+
+
+<dl>
+<dt>unit-type</dt>
+<dd>Unit type to that a unit should be upgraded.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Upgrade a town-hall to keep.
+    AiUpgradeTo("unit-keep")
+</pre>
+
+<a name="AiWait"></a>
+<h3>AiWait(type)</h3>
+
+Waits until the *first* request of this unit-type is completed.
+Don't forget to request a unit-type, before you wait on it.
+
+<dl>
+<dt>type</dt>
+<dd>Wait for this unit type.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Proceed only if a peasant is ready.
+    AiNeed("unit-peasant")
+    AiWait("unit-peasant")
+</pre>
+
+<a name="AiWaitForce"></a>
+<h3>AiWaitForce(force)</h3>
+
+Wait until a force is complete, the forces are build in force number order.
+First 0, than 1, last 9.
+
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Force 0 is build with one footman. The script continues processing, if the
+    -- footman is ready trained.
+    AiForce(0, "unit-footman", 1)
+    AiWaitForce(0)
+</pre>
+
+<h2>Notes</h2>
+
+The current AI script support is very limited, many new functions are needed.
+If you want to write this you know who to contact.
+
+<h2>Examples</h2>
+
+<pre>
+DefineAi("wc2-example", "orc", "land-attack",
+ function()
+</pre><p style="margin-left:1cm;">
+This is the AI "wc2-example" usable for orc race and land-attack.
+</p><pre>
+     AiNeed("unit-great-hall")
+</pre><p style="margin-left:1cm;">
+The first need unit is the great-hall.
+</p><pre>
+     AiNeed("unit-peon")
+</pre><p style="margin-left:1cm;">
+The next unit should be the peon.
+</p><pre>
+     AiWait("unit-great-hall")
+</pre><p style="margin-left:1cm;">
+Now wait until the great hall is available. Could hang if no great hall can be
+build.
+</p><pre>
+     AiWait("unit-peon")
+</pre><p style="margin-left:1cm;">
+Now wait unit we have a worker to build the next things.
+</p>
+
+FIXME: need some complex examples.
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

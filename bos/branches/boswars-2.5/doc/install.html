@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+
+----	(c) Copyright 2002-2008 by Nehal Mistry, Francois Beerten.
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Installation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<h1>Installation instructions for Bos Wars</h1>
+
+    <h2>Hardware Requirements</h2>
+    <ul>
+	<li><b>Processor:</b> A 300 MHz CPU (faster recommended).<br>
+	NOTE: Bos Wars is believed to be endian and word size safe, so other
+	architectures like (big endian) PPC or (64bit) Alpha should also
+	work, at least with Linux.</li>
+
+	<li><b>Memory:</b> 128 MB of RAM (more is better).</li>
+
+	<li><b>Video Card:</b> Any graphics card that can handle 16 bpp or 32 bpp 
+	and 640x480 is supported. (OpenGL is supported, and requires a 32MB Card)</li>
+
+	<li><b>Sound Card:</b> Recommended. SDL compatible sound cards are supported.</li>
+    </ul>
+
+    <h2>Software Requirements</h2>
+    <ul>
+	<li><b>A supported operating system:</b> Linux or Microsoft Windows (98SE, 2000 or XP).
+	Possibly any other Unix/POSIX OS.
+	</li>
+
+	<li><a href="http://www.libsdl.org/index.php">SDL</a> (required).</li>
+	<li><a href="http://www.libpng.org/pub/png/">libpng</a> (required).</li>
+	<li><a href="http://www.gzip.org/zlib/">zlib</a> (required).</li>
+	<li><a href="http://www.lua.org/">Lua</a> and lualib 5.0 or later (required).</li>
+	<li><a href="http://www.xiph.org/ogg/vorbis/">libvorbis</a> (recommended).</li>
+	<li><a href="http://www.theora.org/">libtheora</a> (recommended).</li>
+	<li><a href="http://www.xipg.org/">libogg</a> (recommended).</li>
+    </ul>
+
+    <p>
+    On Debian based distributions, you can easily obtain the required dependencies by installing the following packages:
+    liblualib50 libtheora libogg libpng12 libsdl1.2 libvorbis libzziplibgl1-mesa-dev
+    </p>
+
+    <h2>Running Bos Wars</h2>
+	Run the boswars binary in the root boswars direcory.
+	By default, the engine looks in the current working directory,
+	if your data is in a different location you 
+	will need to run boswars with <i>'-d /path_to_data'</i>.<p>
+
+<h1>Build instructions for Bos Wars</h1>
+
+    <h2>Software Requirements for Development</h2>
+    In addition to the software requirements listed above, you will also need:
+    <ul>
+	<li>Compiler suite: GCC or MINGW or MSVC</li>
+	<li>The development files for the libraries listed above.</li>
+	<li><a href="http://www.codenix.com/~tolua/">toLua++</a> version 1.0.92 if you plan to change the Lua API</li>
+	<li><a href="http://scons.org">Scons</a> or the autotools.</li>
+    </ul>
+
+    <p>
+    On Debian based distributions, you can easily obtain the required dependencies by installing 
+    the following packages: <i>liblualib50-dev libtheora-dev libogg-dev libpng12-dev libsdl1.2-dev
+    libvorbis-dev libzzip-dev libx11-dev x11proto-core-dev gnulib.</i>
+    The toLua tool is currently not available as a package from the distributions.
+    You can use liblua5.1-dev instead of liblualib50-dev if you want.
+    </p>
+
+    <h2>Building</h2>
+
+    <h3>Step 1: Download and Extract:</h3>
+	<ul>
+	    <li><a href="http://www.boswars.org/download.shtml">
+		Download</a> the source code.</li>
+	    <li>Extract the source boswars-version.tar.gz with 
+	    'tar -xzvf boswars-DATE.tar.gz'</li>
+	</ul>
+	Alternatively you can get the latest <a href="http://www.boswars.org/development.shtml">
+	development version</a> from subversion.
+
+    <h3>Step 2: Generate toLua binding</h3>
+	If you changed one of the pkg files in engine/tolua, you must rerun
+	the tolua++ tool in the engine/tolua directory:
+	<pre>
+		tolua++ -L stratagus.lua -o tolua.cpp stratagus.pkg
+	</pre>
+	If you did not change the pkg files, you can safely skip this step.
+
+    <h3>Step 3: Compile:</h3>
+	<ul>
+	    <li><b>On Posix systems like Linux</b> 
+	        using <a href="http://www.scons.org">scons</a>:
+		<ul>
+		<li>Run 'scons'.</li>
+		</ul>
+	    </li>
+	    <li><b>Microsoft Visual Studio 2005:</b>
+	    <ul>
+		<li><a href="http://www.boswars.org/dev/msvc-libs.zip">
+		Download</a> the precompiled VC++ libraries and extract them into the root
+    		boswars directory. You can also fetch all the libs and 
+    		compile them manually if you want.</li>
+		<li>Open the workspace file boswars.sln and compile.</li>
+	    </ul>
+	    </li>
+	</ul>
+
+	<br>
+
+<hr>
+(C) Copyright 1998-2008 by The <a href="http://boswars.org">Bos Wars</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+All trademarks and copyrights on this page are owned by their respective owners.<br>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+
+----	(c) Copyright 2001-2008 by Lutz Sammer, Francois Beerten
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>FAQ for Bos Wars</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<h1>FAQ for Bos Wars</h1>
+<hr>
+
+    <b>Q: Does Bos Wars work with ALSA?</b><br>
+    A: Yes, if you compiled SDL with ALSA support.<p>
+
+    <b>Q: Does Bos Wars support LAN/Internet play?</b><br>
+    A: Yes.<p>
+
+    <b>Q: How do I play multiplayer?</b><br>
+    A: Find the hostname or the IP address of someone you want to play with and connect to him.<p>
+
+    <b>Q: What ports does the Bos Wars network protocol use?</b><br>
+    A: Bos Wars uses UDP with port 6660 by default, you may start boswars 
+    with '-Pxxxx' flag to use port xxxx instead.<p>
+
+    <b>Q: Does Bos Wars support a game server, meta server, lobby or 
+          anything like that ?</b><br>
+    A: Not yet, but this is a planned feature.<p>
+    
+    <b>Q: How can I get the group keys to work on a non-us keyboard?</b><br>
+    A: In "~/.boswars/preferences.lua", replace the digits in
+    <i>GroupKeys = "0123456789"</i> by the characters output by
+    hitting the digit keys of your keyboard without holding the shift key
+    down. 
+    Characters which are not ANSI 7 bit need to be encoded with their UTF-8 
+    character code.<p>
+
+    <b>Q: Bos Wars runs really slow in large resolutions, what can I do?</b><br>
+    A: The engine has to update the whole screen every frame.
+    Use OpenGL or play with a smaller screen resolution.<p>
+
+    <b>Q: What should I do if my question isn't answered here?</b><br>
+    A: Read the included documentation and look in the FAQ on our 
+    <a href="http://www.boswars.org/wiki/index.php/Bos/FAQ">wiki</a>.
+    If after that you still haven't found an answer to your question, 
+    ask on our mailing list or on our IRC channel.<p>
+
+<hr>
+(C) Copyright 1998-2008 by The <a href="http://boswars.org">Bos Wars</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+All trademarks and copyrights on this page are owned by their respective owners.<br>
+</body>
+</html>

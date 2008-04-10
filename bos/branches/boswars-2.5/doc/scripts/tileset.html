@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2007 by Russell Smith, Francois beerten
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Tileset</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Tileset</h1>
+<hr>
+<a href="../index.html">Stratagus</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="sound.html">PREV</a> 
+<a href="triggers.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#DefineTileset">DefineTileset</a>
+<a href="#DefineTileModel">DefineTileModel</a>
+<a href="#LoadTileModels">LoadTileModels</a>
+<hr>
+<h2>Intro - Introduction to tileset functions and variables</h2>
+
+A Tileset defines a set of tilemodels that can be used in a tiled map. 
+The map is thus devided in tiles.
+<p>
+
+Properties of tilemodels:
+<ul>
+    <li> a graphic (or more if animated)
+    <li> Name
+    <li> Allowed tilemodel neighbours
+    <li> Speed (aka cost) modifiers
+    <li> Category (like 'land', 'water', 'beach', 'lava', 'walkable', ...)
+    <li> Ressources and how it can be harvested
+    <li> Destruction: how the tile can be destroyed. When destroyed the tile transforms into another tilemodel.
+</ul>
+
+<p>
+Note: This is the for the new map format. Not implented yet. 
+
+<h2>Functions</h2>
+<a name="DefineTileset"></a>
+<h3>DefineTileSet(name, width, height)</h3>
+
+    Define a tileset to which tilemodels can be added. 
+    The width and height define the size of each tile.
+    <p>
+
+    This could also be defined in own levels. <p>
+    
+    Note: This is the for the new map format. Not implented yet.
+<dl>
+<dt>name</dt>
+<dd>Name of the tilemodel as exposed to the user in the editor and used in the scripts.
+</dd>
+<dt>width</dt>
+<dd>width of the tiles. Most of the times, people use 32 pixels tiles.
+</dd>
+<dt>height</dt>
+<dd>height of the tiles. Most of the times, people use 32 pixels tiles.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefineTileset("desert", 32, 32)
+</pre>
+
+
+<a name="DefineTileModel"></a>
+<h3>DefineTileModel(...)</h3>
+
+    Define a tile model which is used in the tilemap.
+    <p>
+    
+    <p>
+    Note: This is the for the new map format. Not implented yet.
+<dl>
+    <dt>name</dt>
+      <dd>Name of the tilemodel as exposed to the user in the editor</dd>
+    <dt>tileset</dt>
+      <dd>Name of the tileset this tilemodel is part of.</dd>
+    <dt>imagepath<br>
+    </dt>
+    <dd>Filename of the image with graphics of tiles.</dd>
+    
+    <dt>imageposition</dt>
+      <dd>Position of the tile graphic in the graphic file.<br>
+    </dd>
+    <dt>categories = {category1, category2, ...}<br>
+    </dt>
+      <dd>Bool strings defined by DefineBool that identifies the categories
+         of this tylemodel. Examples: water, space, beach, land, grass. A tilemodel
+         will often be part of generic categories and more specific ones. For
+         example ground and grass. The categories allows to specify generic
+	 behaviours and special ones. Building restrictions will use the
+	 categories. </dd>
+
+    <dt>neighbours = {{N-neighbour}, {E-neighbour}, ...}</dt>
+      <dd>Names of the categories of tilemodels which can be used next to
+	this tilemodel.&nbsp; Each list is for a seperate direction:
+	north, east, south, west. This is useful only for the editor.<br>
+        <br>
+	Note: the current tilemodel can't be it's neighbour if it's not in one
+	of the categories listed here.</dd>
+    <dt>accessmodifier = {unitboolflag=modifier, unitboolflag2=modifier2, ...}</dt>
+      <dd>Speed modification in percents for units with the given
+	boolflag.&nbsp; Use 0 for unaccessible tiles.</dd>
+    <dt>harvest = {harvested= tilemodel, resource-name = quantity} </dt>
+      <dd><span style="font-style: italic;">harvested</span>: tilemodel
+	the tile transforms into when completely harvested.<br>
+
+        <span style="font-style: italic;">resource-name</span>: Name of
+	 the resource available and in what quantity. <br>
+	Of course, harvest list isnt needed when the tile cannot be harvested.</dd>
+    <dt>destruction = {destroyed = tilemodel, damage = damage-value}</dt>
+      <dd><span style="font-style: italic;">destroyed</span>: tilemodel
+	the tile transforms into when destroyed.<br>
+       	<span style="font-style: italic;">damage</span>: damage required
+       	to destroy this tile.<br>
+	Of course destruction list isn't needed when the tile cant be destroyed.<br>
+    </dd>
+  </dl>
+
+
+
+<h4>Example</h4>
+
+<pre>
+    DefineTileModel("oily-sand", "desert", 
+        "graphics/tilesets/desert.png", 12, 
+        categories = {"land", "buildable"},
+        neighbours = {{"sand","beach-N"},{"sand","beach-E"},{"sand","beach-S"},{"sand","beach-W"}}
+        accessmodier = {groundtroups=50, ships=0, camels=200},
+        harvest= {harvested-tile="sand", oil=23},
+        destruction = {destroyed="sand", damage=100}
+    )
+</pre>
+
+<a name="LoadTileModels"></a>
+<h3>LoadTileModels(luafile)</h3>
+
+    Load the configuration scripts for the tilemodels.
+    <p>
+    Note: This function is used in the map files. 
+    <p>
+    
+<dl>
+<dt>luafile</dt>
+<dd>The path to the lua file to load which will define the tilemodels.
+</dd>
+</dl>
+
+
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>
