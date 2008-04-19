@@ -9,7 +9,7 @@
 --
 --	editor.lua	-	Editor configuration and functions.
 --
---	(c) Copyright 2002-2007 by Lutz Sammer, Francois Beerten and Jimmy Salmon
+--	(c) Copyright 2002-2008 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -76,6 +76,7 @@ local editor_types = {
   "unit-hosp",
   "unit-vfac",
   "unit-gturret",
+  "unit-biggunturret",
   "unit-cam",
   "unit-radar",
   "unit-buggy",

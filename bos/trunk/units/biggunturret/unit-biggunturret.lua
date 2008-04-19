@@ -7,9 +7,9 @@
 --       A futuristic real-time strategy game.
 --          This file is part of Bos Wars.
 --
---	unit-gturret.lua	-	Define the gun turret unit.
+--	unit-biggunturret.lua	-	Define the big gun turret unit.
 --
---	(c) Copyright 2004-2008 by François Beerten.
+--	(c) Copyright 2004-2008 by Francois Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 --      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
-DefineAnimations("animations-gturret", {
+DefineAnimations("animations-biggunturret", {
     Still = {"frame 5", "wait 1", },
     Attack = {"unbreakable begin", "frame 10", "wait 1", "frame 15", "sound gturret-attack", "attack", "wait 1",
         "frame 20", "unbreakable end", "wait 1", },
@@ -34,18 +34,18 @@ DefineAnimations("animations-gturret", {
     })
 
 DefineIcon({
-	Name = "icon-gturret",
+	Name = "icon-biggunturret",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/gturret/gturret_i.png"})
+	File = "units/biggunturret/gturret_i.png"})
 
 DefineIcon({
-	Name = "icon-gturret_b",
+	Name = "icon-biggunturret_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "units/gturret/gturret_i.png"})
+	File = "units/biggunturret/gturret_i.png"})
 
-DefineConstruction("construction-gturret", {
+DefineConstruction("construction-biggunturret", {
 	Constructions = {
 		{Percent = 0, File = "main", Frame = 0},
 		{Percent = 10, File = "main", Frame = 0},
@@ -60,18 +60,18 @@ DefineConstruction("construction-gturret", {
 	}
 })
 
-DefineUnitType("unit-gturret", {
-    Name = "Gun Turret",
-    Image = {"file", "units/gturret/gturret.png", "size", {96, 96}},
-    Shadow = {"file", "units/gturret/gturret_s.png", "size", {96, 96}},
-    Animations = "animations-gturret",
+DefineUnitType("unit-biggunturret", {
+    Name = "Big gun Turret",
+    Image = {"file", "units/biggunturret/gturret.png", "size", {96, 96}},
+    Shadow = {"file", "units/biggunturret/gturret_s.png", "size", {96, 96}},
+    Animations = "animations-biggunturret",
     Icon = "icon-gturret",
-    EnergyValue = 4000,
-    MagmaValue = 500,
-    RepairHp = 2,
-    Construction = "construction-gturret",
+    EnergyValue = 8000,
+    MagmaValue = 2000,
+    RepairHp = 20,
+    Construction = "construction-biggunturret",
     Speed = 0,
-    HitPoints = 160,
+    HitPoints = 260,
     DrawLevel = 25,
     TileSize = {2, 2},
     BoxSize = {60, 60},
@@ -79,8 +79,8 @@ DefineUnitType("unit-gturret", {
     ComputerReactionRange = 6,
     PersonReactionRange = 6,
     Armor = 10,
-    BasicDamage = 4,
-    PiercingDamage = 0,
+    BasicDamage = 8,
+    PiercingDamage = 1,
     MaxAttackRange = 6,
     Missile = "missile-none",
     Priority = 20,
@@ -92,34 +92,24 @@ DefineUnitType("unit-gturret", {
     CanTargetLand = true,
     CanTargetAir = true,
     NumDirections = 8,
-    Corpse = "build-dead-gturret",
+    Corpse = "build-dead-biggunturret",
     Type = "land",
     Building = true,
     BuilderOutside = true,
     VisibleUnderFog = true,
     CanHarvestFrom = true,
-    Sounds = {
-        "selected", "gturret-selected",
-        "ready", "gturret-ready",
-        "help", "gturret-help"
-        }
 })
 
-MakeSound("gturret-selected", GetCurrentLuaPath().."/gturret_select.wav")
-MakeSound("gturret-attack", GetCurrentLuaPath().."/gturret_attack.wav")
-MakeSound("gturret-ready", GetCurrentLuaPath().."/gturret.completed.wav")
-MakeSound("gturret-help", GetCurrentLuaPath().."/gturret.underattack.wav")
-
-DefineAnimations("animations-dead-gturret", {
+DefineAnimations("animations-dead-biggunturret", {
     Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
         "frame 1", "wait 200", "frame 2", "wait 200", "frame 2", "wait 1", 
         "unbreakable end", "wait 1", },
     })
 
-DefineUnitType("build-dead-gturret", {
+DefineUnitType("build-dead-biggunturret", {
     Name = "GturretCrater",
-    Image = {"file", GetCurrentLuaPath().."/gturret_c.png", "size", {96, 96}},
-    Animations = "animations-dead-gturret",
+    Image = {"file", "units/gturret/gturret_c.png", "size", {96, 96}},
+    Animations = "animations-dead-biggunturret",
     Icon = "icon-cancel",
     Speed = 0,
     HitPoints = 999,
@@ -137,12 +127,23 @@ DefineUnitType("build-dead-gturret", {
 })
 
 
-DefineAllow("unit-gturret", AllowAll)
+DefineAllow("unit-biggunturret", AllowAll)
 
 DefineButton({
-    Pos = 1, Level = 3, Icon = "icon-gturret_b", Action = "build",
-    Value = "unit-gturret", Hint = "BUILD ~!GUN TURRET",
+    Pos = 2, Level = 3, Icon = "icon-biggunturret_b", Action = "build",
+    Value = "unit-biggunturret", Hint = "BUILD ~!BIG GUN TURRET",
     ForUnit = {"unit-engineer"}})
--- DefineButton for the 'stop' and 'attack' actions are defined in buttons.lua.
 
+-- DefineButton for the 'stop' and 'attack' actions like those
+-- defined in buttons.lua.
+DefineButton({
+    Pos = 2, Level = 0, Icon = "icon-stop",
+    Action = "stop", Hint = "~!STOP",
+    ForUnit = {"unit-biggunturret"}})
+
+
+DefineButton({
+    Pos = 3, Level = 0, Icon = "icon-attack",
+    Action = "attack", Hint = "~!ATTACK",
+    ForUnit = {"unit-biggunturret"}})
 
