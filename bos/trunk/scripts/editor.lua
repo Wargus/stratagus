@@ -31,10 +31,16 @@ Load("scripts/uilayout.lua")
 
 HandleCommandKey = HandleEditorIngameCommandKey
 
+DefineIcon({
+  Name = "icon-editor-patch",
+  Size = {46, 38},
+  Frame = 0,
+  File = "graphics/ui/editor_patch.png"})
+
 -- Set which icons to display
 SetEditorSelectIcon("icon-patrol")
 SetEditorUnitsIcon("icon-assault")
-SetEditorPatchIcon("icon-assault")
+SetEditorPatchIcon("icon-editor-patch")
 
 -- Start location unit
 DefineIcon({
