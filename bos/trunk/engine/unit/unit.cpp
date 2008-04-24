@@ -866,7 +866,11 @@ static void UnitFillSeenValues(CUnit *unit)
 	}
 	unit->Seen.Type = unit->Type;
 	unit->Seen.Constructed = unit->Constructed;
-	unit->Seen.CFrame = unit->Data.Built.Frame;
+	if (unit->Orders[0]->Action == UnitActionBuilt) {
+		unit->Seen.CFrame = unit->Data.Built.Frame;
+	} else {
+		unit->Seen.CFrame = NULL;
+	}
 }
 
 /**
