@@ -458,8 +458,10 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 	int id;
 	int status;
 
+	Assert(unum < UnitSlotFree);
 	unit = UnitSlots[unum];
 	Assert(unit);
+
 	//
 	// Check if unit is already killed?
 	//
