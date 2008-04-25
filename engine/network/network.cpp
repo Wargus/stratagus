@@ -899,7 +899,6 @@ void NetworkEvent(void)
 	int player;
 	int i;
 	int commands;
-	bool allowed;
 	unsigned long n;
 
 	if (!IsNetworkGame()) {
@@ -961,15 +960,19 @@ void NetworkEvent(void)
 	// Parse the packet commands.
 	//
 	for (i = 0; i < commands; ++i) {
-		const CNetworkCommand *nc;
-
-		nc = &packet.Command[i];
+		const CNetworkCommand *nc = &packet.Command[i];
+		bool validCommand = false;
 
 		//
 		// Handle some messages.
 		//
 		if (packet.Header.Type[i] == MessageQuit) {
-			PlayerQuit[nc->X] = 1;
+			int player = ntohs(nc->X);
+
+			if (player >= 0 && player < NumPlayers) {
+				PlayerQuit[player] = 1;
+				validCommand = true;
+			}
 		}
 
 		if (packet.Header.Type[i] == MessageResend) {
@@ -1027,11 +1030,11 @@ void NetworkEvent(void)
 		switch (packet.Header.Type[i] & 0x7F) {
 			case MessageExtendedCommand:
 				// FIXME: ensure the sender is part of the command
-				allowed = true;
+				validCommand = true;
 				break;
 			case MessageSync:
 				// Sync does not matter
-				allowed = true;
+				validCommand = true;
 				break;
 			case MessageQuit:
 			case MessageQuitAck:
@@ -1039,20 +1042,26 @@ void NetworkEvent(void)
 			case MessageChat:
 			case MessageChatTerm:
 				// FIXME: ensure it's from the right player
-				allowed = true;
+				validCommand = true;
 				break;
 			case MessageCommandDismiss:
 				// Fall through!
 			default:
-				if (UnitSlots[ntohs(nc->Unit)]->Player->Index == player ||
-						Players[player].IsTeamed(UnitSlots[ntohs(nc->Unit)])) {
-					allowed = true;
+			{
+				unsigned int slot = ntohs(nc->Unit);
+
+				if (slot >= 0 && slot < UnitSlotFree &&
+						(UnitSlots[slot]->Player->Index == player ||
+							Players[player].IsTeamed(UnitSlots[slot]))) {
+					validCommand = true;
 				} else {
-					allowed = false;
+					validCommand = false;
 				}
+			}
 		}
 
-		if (allowed) {
+		// FIXME: not all values in nc have been validated
+		if (validCommand) {
 			NetworkIn[packet.Header.Cycle][player][i].Time = n;
 			NetworkIn[packet.Header.Cycle][player][i].Type = packet.Header.Type[i];
 			NetworkIn[packet.Header.Cycle][player][i].Data = *nc;
