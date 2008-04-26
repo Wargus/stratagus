@@ -342,13 +342,13 @@ static void DrawUnitInfo(CUnit *unit)
 	//
 	if (NumSelected == 1 && Selected[0] == unit) {
 		// Training units.
-		if (unit->Orders[0]->Action == UnitActionTrain) {
+		if (!isEnemy && unit->Orders[0]->Action == UnitActionTrain) {
 			DrawTrainingUnits(unit);
 			return;
 		}
 
 		// Transporting units.
-		if (unit->Type->CanTransport && unit->BoardCount) {
+		if (!isEnemy && unit->Type->CanTransport && unit->BoardCount) {
 			DrawTransportingUnits(unit);
 			return;
 		}
