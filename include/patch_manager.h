@@ -122,9 +122,14 @@ public:
 	CPatchType *getPatchType(const std::string &name);
 
 	/**
+	**  Save all of the patches
+	*/
+	void savePatches(CFile *file) const;
+
+	/**
 	**  Save a patch type
 	*/
-	void savePatchType(CFile *file, CPatchType *patchType);
+	void savePatchType(CFile *file, CPatchType *patchType) const;
 
 private:
 	void updateMapFlags(int x1, int y1, int x2, int y2);

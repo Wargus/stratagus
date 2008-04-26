@@ -34,6 +34,7 @@
 
 #include "stratagus.h"
 #include "map.h"
+#include "patch_manager.h"
 #include "iolib.h"
 #include "version.h"
 
@@ -120,6 +121,8 @@ void CMap::Save(CFile *file) const
 		}
 	}
 	file->printf("}})\n");
+
+	PatchManager.savePatches(file);
 }
 
 //@}

@@ -398,16 +398,13 @@ static void DrawPlayers(void)
 /**
 **  Draw unit icons.
 */
-static void DrawUnitIcons(void)
+static void DrawUnitIcons()
 {
 	int x;
 	int y;
 	int i;
 	CIcon *icon;
 
-	//
-	// Draw the unit selection buttons.
-	//
 	x = UI.InfoPanel.X + 10;
 	y = UI.InfoPanel.Y + 140;
 
@@ -426,6 +423,53 @@ static void DrawUnitIcons(void)
 				break;
 			}
 			icon = Editor.ShownUnitTypes[i]->Icon.Icon;
+			icon->DrawIcon(Players + Editor.SelectedPlayer, x, y);
+
+			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
+			if (i == Editor.SelectedUnitIndex) {
+				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
+					icon->G->Width - 2, icon->G->Height - 2);
+			}
+			if (i == Editor.CursorUnitIndex) {
+				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
+					icon->G->Width + 2, icon->G->Height + 2);
+			}
+
+			x += IconWidth + 8;
+			++i;
+		}
+		y += IconHeight + 2;
+	}
+}
+
+/**
+**  Draw patch icons.
+*/
+static void DrawPatchIcons()
+{
+	int x;
+	int y;
+	int i;
+	CIcon *icon;
+
+	x = UI.InfoPanel.X + 10;
+	y = UI.InfoPanel.Y + 140;
+
+	//
+	//  Draw the patch icons.
+	//
+	y = UI.ButtonPanel.Y + 24;
+	i = Editor.UnitIndex;
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
+		if (i >= (int)Editor.ShownPatchTypes.size()) {
+			break;
+		}
+		x = UI.ButtonPanel.X + 10;
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - IconWidth) {
+			if (i >= (int) Editor.ShownPatchTypes.size()) {
+				break;
+			}
+			icon = Editor.ShownPatchTypes[i]->Icon.Icon;
 			icon->DrawIcon(Players + Editor.SelectedPlayer, x, y);
 
 			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
@@ -489,6 +533,7 @@ static void DrawEditorPanel(void)
 		case EditorSelecting:
 			break;
 		case EditorEditPatch:
+			DrawPatchIcons();
 			break;
 		case EditorSetStartLocation:
 			DrawPlayers();
