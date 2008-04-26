@@ -68,6 +68,8 @@ public:
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
 
+	std::vector<const CUnitType *> ShownPatchTypes; /// Shown editor patch-type table.
+
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.
 	IconConfig Patch;            /// Editor's patch icon.
