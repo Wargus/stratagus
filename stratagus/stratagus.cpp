@@ -160,6 +160,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <sstream>
+#include <algorithm>
 
 #ifndef _MSC_VER
 #include <unistd.h>
