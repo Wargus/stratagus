@@ -239,9 +239,8 @@ CPatchType *
 CPatchManager::newPatchType(const std::string &name, const std::string &file,
 	int tileWidth, int tileHeight, unsigned short *flags)
 {
-	Assert(this->patchTypesMap[name] == NULL);
+	// Loading a game might redefine a patch, just ignore it
 	if (this->patchTypesMap[name] != NULL) {
-		fprintf(stderr, "Patch type already exists: %s\n", name.c_str());
 		return this->patchTypesMap[name];
 	}
 
@@ -258,7 +257,26 @@ CPatchManager::getPatchType(const std::string &name)
 }
 
 void
-CPatchManager::savePatchType(CFile *file, CPatchType *patchType)
+CPatchManager::savePatches(CFile *file) const
+{
+	std::map<std::string, bool> patchTypeSaved;
+	std::list<CPatch *>::const_iterator i;
+
+	for (i = this->patches.begin(); i != this->patches.end(); ++i) {
+		const std::string &name = (*i)->getType()->getName();
+
+		if (!patchTypeSaved[name]) {
+			this->savePatchType(file, (*i)->getType());
+			patchTypeSaved[name] = true;
+		}
+
+		file->printf("patch(\"%s\", %d, %d)\n",
+			name.c_str(), (*i)->getX(), (*i)->getY());
+	}
+}
+
+void
+CPatchManager::savePatchType(CFile *file, CPatchType *patchType) const
 {
 	file->printf("patchType(\"%s\", \"%s\", %d, %d, {\n",
 		patchType->getName().c_str(), patchType->getGraphic()->File.c_str(),
