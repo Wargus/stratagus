@@ -9,7 +9,7 @@
 --
 --	ai.lua		-	Define the AI.
 --
---	(c) Copyright 2000-2007 by Lutz Sammer, Frank Loeffler
+--	(c) Copyright 2000-2008 by Lutz Sammer, Frank Loeffler
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -64,7 +64,8 @@ DefineAiHelper(
   {"train", "unit-hosp", "unit-medic"},
   {"train", "unit-vfac", "unit-apcs", "unit-harvester", "unit-artil",
    "unit-buggy", "unit-rtank", "unit-tank"},
-  {"train", "unit-aircraftfactory", "unit-jet", "unit-bomber", "unit-chopper"},
+  {"train", "unit-aircraftfactory", "unit-jet", "unit-bomber", "unit-chopper",
+   "unit-heli"},
   --
   -- Unit can repair which units.
   --
