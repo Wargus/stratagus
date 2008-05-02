@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Add the heli unit (Johannes Engelhardt and Francois Beerten)
 - Add the big gun turret (Johannes Engelhardt and Francois Beerten)
 - Support lua 5.1 only (Jimmy Salmon and Francois Beerten)
 - New patch based map system (Jimmy Salmon)
