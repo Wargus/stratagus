@@ -115,6 +115,7 @@ static CPatch *PatchUnderCursor;            /// Patch under cursor
 static int PatchOffsetX;
 static int PatchOffsetY;
 static bool UnitPlacedThisPress = false;    /// Only allow one unit per press
+static bool UpdateMinimapTerrain = false;   /// Terrain has changed, minimap needs updating
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -1200,6 +1201,7 @@ static void EditorCallbackMouse(int x, int y)
 			// Drag patch under cursor
 			Map.PatchManager.move(PatchUnderCursor, tileX - PatchOffsetX, tileY - PatchOffsetY);
 			ShowPatchInfo(PatchUnderCursor);
+			UpdateMinimapTerrain = true;
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, CursorBuilding, tileX, tileY, 1)) {
@@ -1423,6 +1425,7 @@ static void EditorCallbackMouse(int x, int y)
 				PatchUnderCursor = Map.PatchManager.add(Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType->getName(), tileX, tileY);
 				PatchOffsetX = 0;
 				PatchOffsetY = 0;
+				UpdateMinimapTerrain = true;
 			} else {
 				// Show what patch is under the cursor
 				PatchUnderCursor = Map.PatchManager.getPatch(tileX, tileY);
@@ -1684,6 +1687,11 @@ static void EditorMainLoop(void)
 		while (Editor.Running) {
 			CheckMusicFinished();
 
+			if (UpdateMinimapTerrain && FrameCounter % FRAMES_PER_SECOND == 0) {
+				UI.Minimap.UpdateTerrain();
+				UpdateMinimapTerrain = false;
+			}
+			// FIXME: only update if something changed
 			UI.Minimap.Update();
 
 			EditorUpdateDisplay();
