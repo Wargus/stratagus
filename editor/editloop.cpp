@@ -118,6 +118,7 @@ static bool UnitPlacedThisPress = false;    /// Only allow one unit per press
 static bool UpdateMinimap = false;          /// Update units on the minimap
 static bool UpdateMinimapTerrain = false;   /// Terrain has changed, minimap needs updating
 static bool DraggingPatch = false;          /// The user is currently dragging a patch
+static int VisibleIcons;                    /// Number of icons that are visible at a time
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -131,13 +132,11 @@ static gcn::Container *editorContainer;
 static gcn::Slider *editorUnitSlider;
 static gcn::Slider *editorPatchSlider;
 
-static int CalculateVisibleIcons(void);
-
 class EditorUnitSliderListener : public gcn::ActionListener
 {
 public:
 	virtual void action(const std::string &eventId) {
-		int iconsPerStep = CalculateVisibleIcons();
+		int iconsPerStep = VisibleIcons;
 		int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		double value = editorUnitSlider->getValue();
 		for (int i = 1; i <= steps; ++i) {
@@ -155,7 +154,7 @@ class EditorPatchSliderListener : public gcn::ActionListener
 {
 public:
 	virtual void action(const std::string &eventId) {
-		int iconsPerStep = CalculateVisibleIcons();
+		int iconsPerStep = VisibleIcons;
 		int steps = (Editor.ShownPatchTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		double value = editorPatchSlider->getValue();
 		for (int i = 1; i <= steps; ++i) {
@@ -269,7 +268,7 @@ static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 **
 **  @return  Number of icons that can be displayed.
 */
-static int CalculateVisibleIcons(void)
+static int CalculateVisibleIcons()
 {
 	int i;
 	int x;
@@ -294,7 +293,7 @@ static int CalculateVisibleIcons(void)
 **  Calculate the max height and the max width of icons,
 **  and assign them to IconHeight and IconWidth
 */
-static void CalculateMaxIconSize(void)
+static void CalculateMaxIconSize()
 {
 	const CUnitType *type;
 	const CIcon *icon;
@@ -318,7 +317,7 @@ static void CalculateMaxIconSize(void)
 /**
 **  Recalculate the shown units.
 */
-static void RecalculateShownUnits(void)
+static void RecalculateShownUnits()
 {
 	const CUnitType *type;
 
@@ -330,8 +329,7 @@ static void RecalculateShownUnits(void)
 	}
 
 	if (Editor.UnitIndex >= (int)Editor.ShownUnitTypes.size()) {
-		int count = CalculateVisibleIcons();
-		Editor.UnitIndex = Editor.ShownUnitTypes.size() / count * count;
+		Editor.UnitIndex = Editor.ShownUnitTypes.size() / VisibleIcons * VisibleIcons;
 	}
 	// Quick & dirty make them invalid
 	Editor.CursorUnitIndex = -1;
@@ -366,7 +364,7 @@ static void CleanEditAi()
 /**
 **  Draw a table with the players
 */
-static void DrawPlayers(void) 
+static void DrawPlayers() 
 {
 	int x = UI.InfoPanel.X + 8;
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 10;
@@ -517,7 +515,7 @@ static void DrawPatchIcons()
 /**
 **  Draw the editor panels.
 */
-static void DrawEditorPanel(void)
+static void DrawEditorPanel()
 {
 	int x;
 	int y;
@@ -575,7 +573,7 @@ static void DrawEditorPanel(void)
 **
 **  @todo support for bigger cursors (2x2, 3x3 ...)
 */
-static void DrawMapCursor(void)
+static void DrawMapCursor()
 {
 	int x;
 	int y;
@@ -657,7 +655,7 @@ static void DrawStartLocations()
 **
 **  If cursor is on map or minimap show information about the current tile.
 */
-static void DrawEditorInfo(void)
+static void DrawEditorInfo()
 {
 #if 0
 	int tile;
@@ -746,8 +744,8 @@ static void ShowPatchInfo(const CPatch *patch)
 {
 	std::ostringstream o;
 
-	o << _("Patch") << ": " << PatchUnderCursor->getType()->getName() << " - ("
-	  << PatchUnderCursor->getX() << ", " << PatchUnderCursor->getY() << ")";
+	o << _("Patch") << ": " << patch->getType()->getName() << " - ("
+	  << patch->getX() << ", " << patch->getY() << ")";
 
 	UI.StatusLine.Set(o.str());
 }
@@ -755,7 +753,7 @@ static void ShowPatchInfo(const CPatch *patch)
 /**
 **  Update editor display.
 */
-static void EditorUpdateDisplay(void)
+static void EditorUpdateDisplay()
 {
 	DrawMapArea();
 
@@ -1479,7 +1477,7 @@ static void EditorCallbackMouse(int x, int y)
 /**
 **  Callback for exit.
 */
-static void EditorCallbackExit(void)
+static void EditorCallbackExit()
 {
 }
 
@@ -1521,7 +1519,7 @@ static void CleanPatchIcons()
 /**
 **  Create editor.
 */
-void CEditor::Init(void)
+void CEditor::Init()
 {
 	int i;
 	char *file;
@@ -1597,7 +1595,11 @@ void CEditor::Init(void)
 		}
 	}
 
+	ButtonPanelWidth = 200;
+	ButtonPanelHeight = 160 + (Video.Height - 480);
+
 	CalculateMaxIconSize();
+	VisibleIcons = CalculateVisibleIcons();
 
 	if (!StartUnitName.empty()) {
 		StartUnit = UnitTypeByIdent(StartUnitName);
@@ -1612,9 +1614,6 @@ void CEditor::Init(void)
 	CreatePatchIcons();
 
 	RecalculateShownUnits();
-
-	ButtonPanelWidth = 200;
-	ButtonPanelHeight = 160 + (Video.Height - 480);
 
 	EditorCallbacks.ButtonPressed = EditorCallbackButtonDown;
 	EditorCallbacks.ButtonReleased = EditorCallbackButtonUp;
@@ -1656,7 +1655,7 @@ int EditorSaveMap(const std::string &file)
 /**
 **  Editor main event loop.
 */
-static void EditorMainLoop(void)
+static void EditorMainLoop()
 {
 	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();
