@@ -54,7 +54,7 @@ public:
 	/**
 	**  Get the patch type
 	*/
-	inline CPatchType *getType() { return this->type; }
+	inline CPatchType *getType() const { return this->type; }
 
 	/**
 	**  Set the position of the patch
