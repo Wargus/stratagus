@@ -577,6 +577,20 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 }
 
 /**
+**  Clone a graphic
+*/
+CGraphic *CGraphic::Clone() const
+{
+	CGraphic *g = CGraphic::ForceNew(this->File, this->Width, this->Height);
+
+	if (this->IsLoaded()) {
+		g->Load();
+	}
+
+	return g;
+}
+
+/**
 **  Make a new player color graphic object.  Don't reuse a graphic from the
 **  hash table.
 **
@@ -635,7 +649,7 @@ void CGraphic::Load()
 		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.c_str());
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
 			Width, Height, GraphicWidth, GraphicHeight);
-		ExitFatal(1);
+		ExitFatal(-1);
 	}
 
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;

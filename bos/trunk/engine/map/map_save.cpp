@@ -122,7 +122,7 @@ void CMap::Save(CFile *file) const
 	}
 	file->printf("}})\n");
 
-	PatchManager.savePatches(file);
+	file->printf("%s", PatchManager.savePatches());
 }
 
 //@}

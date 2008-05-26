@@ -125,17 +125,18 @@ enum _mode_buttons_ {
 
 extern gcn::Gui *Gui;
 static gcn::Container *editorContainer;
-static gcn::Slider *editorSlider;
+static gcn::Slider *editorUnitSlider;
+static gcn::Slider *editorPatchSlider;
 
-static int CalculateUnitIcons(void);
+static int CalculateVisibleIcons(void);
 
-class EditorSliderListener : public gcn::ActionListener
+class EditorUnitSliderListener : public gcn::ActionListener
 {
 public:
 	virtual void action(const std::string &eventId) {
-		int iconsPerStep = CalculateUnitIcons();
+		int iconsPerStep = CalculateVisibleIcons();
 		int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
-		double value = editorSlider->getValue();
+		double value = editorUnitSlider->getValue();
 		for (int i = 1; i <= steps; ++i) {
 			if (value <= (double)i / steps) {
 				Editor.UnitIndex = iconsPerStep * (i - 1);
@@ -145,7 +146,25 @@ public:
 	}
 };
 
-static EditorSliderListener *editorSliderListener;
+static EditorUnitSliderListener *editorUnitSliderListener;
+
+class EditorPatchSliderListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId) {
+		int iconsPerStep = CalculateVisibleIcons();
+		int steps = (Editor.ShownPatchTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		double value = editorPatchSlider->getValue();
+		for (int i = 1; i <= steps; ++i) {
+			if (value <= (double)i / steps) {
+				Editor.PatchIndex = iconsPerStep * (i - 1);
+				break;
+			}
+		}
+	}
+};
+
+static EditorPatchSliderListener *editorPatchSliderListener;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -240,11 +259,11 @@ static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 }
 
 /**
-**  Calculate the number of unit icons that can be displayed
+**  Calculate the number of icons that can be displayed
 **
-**  @return  Number of unit icons that can be displayed.
+**  @return  Number of icons that can be displayed.
 */
-static int CalculateUnitIcons(void)
+static int CalculateVisibleIcons(void)
 {
 	int i;
 	int x;
@@ -305,7 +324,7 @@ static void RecalculateShownUnits(void)
 	}
 
 	if (Editor.UnitIndex >= (int)Editor.ShownUnitTypes.size()) {
-		int count = CalculateUnitIcons();
+		int count = CalculateVisibleIcons();
 		Editor.UnitIndex = Editor.ShownUnitTypes.size() / count * count;
 	}
 	// Quick & dirty make them invalid
@@ -450,7 +469,7 @@ static void DrawPatchIcons()
 	int x;
 	int y;
 	int i;
-	CIcon *icon;
+	CGraphic *g;
 
 	x = UI.InfoPanel.X + 10;
 	y = UI.InfoPanel.Y + 140;
@@ -459,7 +478,7 @@ static void DrawPatchIcons()
 	//  Draw the patch icons.
 	//
 	y = UI.ButtonPanel.Y + 24;
-	i = Editor.UnitIndex;
+	i = Editor.PatchIndex;
 	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
 		if (i >= (int)Editor.ShownPatchTypes.size()) {
 			break;
@@ -469,17 +488,17 @@ static void DrawPatchIcons()
 			if (i >= (int) Editor.ShownPatchTypes.size()) {
 				break;
 			}
-			icon = Editor.ShownPatchTypes[i]->Icon.Icon;
-			icon->DrawIcon(Players + Editor.SelectedPlayer, x, y);
+			g = Editor.ShownPatchTypes[i].G;
+			g->DrawClip(x, y);
 
-			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
-			if (i == Editor.SelectedUnitIndex) {
+			Video.DrawRectangleClip(ColorGray, x, y, IconWidth, IconHeight);
+			if (i == Editor.SelectedPatchIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-					icon->G->Width - 2, icon->G->Height - 2);
+					IconWidth - 2, IconHeight - 2);
 			}
-			if (i == Editor.CursorUnitIndex) {
+			if (i == Editor.CursorPatchIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-					icon->G->Width + 2, icon->G->Height + 2);
+					IconWidth + 2, IconHeight + 2);
 			}
 
 			x += IconWidth + 8;
@@ -817,6 +836,8 @@ static void EditorCallbackButtonUp(unsigned button)
 	if ((1 << button) == LeftButton) {
 		UnitPlacedThisPress = false;
 	}
+
+	Editor.SelectedPatchIndex = -1;
 }
 
 /**
@@ -826,6 +847,13 @@ static void EditorCallbackButtonUp(unsigned button)
 */
 static void EditorCallbackButtonDown(unsigned button)
 {
+	if ((button >> MouseHoldShift) != 0) {
+		// Ignore repeated events when holding down a button
+		return;
+	}
+
+	Editor.SelectedPatchIndex = -1;
+
 	//
 	// Click on menu button
 	//
@@ -835,6 +863,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		GameMenuButtonClicked = true;
 		return;
 	}
+
 	//
 	// Click on minimap
 	//
@@ -848,6 +877,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		}
 		return;
 	}
+
 	//
 	// Click on mode area
 	//
@@ -857,41 +887,37 @@ static void EditorCallbackButtonDown(unsigned button)
 			case SelectButton :
 				Editor.State = EditorSelecting;
 				Editor.ShowPatchOutlines = false;
-				editorSlider->setVisible(false);
+				editorUnitSlider->setVisible(false);
+				editorPatchSlider->setVisible(false);
 				return;
 			case UnitButton:
 				Editor.State = EditorEditUnit;
 				Editor.ShowPatchOutlines = false;
-				editorSlider->setVisible(true);
+				editorUnitSlider->setVisible(true);
+				editorPatchSlider->setVisible(false);
 				return;
 			case PatchButton :
 				if (EditorEditPatch) {
 					Editor.State = EditorEditPatch;
 					Editor.ShowPatchOutlines = true;
 				}
-				editorSlider->setVisible(false);
+				editorUnitSlider->setVisible(false);
+				editorPatchSlider->setVisible(true);
 				return;
 			case StartButton:
 				Editor.State = EditorSetStartLocation;
 				Editor.ShowPatchOutlines = false;
-				editorSlider->setVisible(false);
+				editorUnitSlider->setVisible(false);
+				editorPatchSlider->setVisible(false);
 				return;
 			default:
 				break;
 		}
 	}
-	//
-	// Click on patch area
-	//
-	if (CursorOn == CursorOnButton && ButtonUnderCursor >= 100 &&
-			Editor.State == EditorEditPatch) {
-		// FIXME: PATCHES
-//		switch (ButtonUnderCursor) {
-//		}
-		return;
-	}
 	
+	//
 	// Click on player area
+	//
 	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Cursor on player icons
 		if (Editor.CursorPlayer != -1) {
@@ -911,6 +937,17 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (Editor.CursorUnitIndex != -1) {
 			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+			return;
+		}
+	}
+
+	//
+	// Click on patch area
+	//
+	if (Editor.State == EditorEditPatch) {
+		// Cursor on patch icons
+		if (Editor.CursorPatchIndex != -1) {
+			Editor.SelectedPatchIndex = Editor.CursorPatchIndex;
 			return;
 		}
 	}
@@ -1156,19 +1193,17 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		RestrictCursorToViewport();
 
-		if (Editor.State == EditorEditPatch && PatchUnderCursor) {
-			int tileX = UI.SelectedViewport->Viewport2MapX(CursorX);
-			int tileY = UI.SelectedViewport->Viewport2MapY(CursorY);
+		int tileX = UI.SelectedViewport->Viewport2MapX(CursorX);
+		int tileY = UI.SelectedViewport->Viewport2MapY(CursorY);
+
+		if (Editor.State == EditorEditPatch && PatchUnderCursor != NULL) {
+			// Drag patch under cursor
 			Map.PatchManager.move(PatchUnderCursor, tileX - PatchOffsetX, tileY - PatchOffsetY);
 			ShowPatchInfo(PatchUnderCursor);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
-				if (CanBuildUnitType(NULL, CursorBuilding,
-					UI.SelectedViewport->Viewport2MapX(CursorX),
-					UI.SelectedViewport->Viewport2MapY(CursorY), 1)) {
-					EditUnit(UI.SelectedViewport->Viewport2MapX(CursorX),
-						UI.SelectedViewport->Viewport2MapY(CursorY),
-						CursorBuilding, Players + Editor.SelectedPlayer);
+				if (CanBuildUnitType(NULL, CursorBuilding, tileX, tileY, 1)) {
+					EditUnit(tileX, tileY, CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}
@@ -1198,6 +1233,7 @@ static void EditorCallbackMouse(int x, int y)
 	CursorOn = CursorOnUnknown;
 	Editor.CursorPlayer = -1;
 	Editor.CursorUnitIndex = -1;
+	Editor.CursorPatchIndex = -1;
 	ButtonUnderCursor = -1;
 
 	//
@@ -1275,47 +1311,29 @@ static void EditorCallbackMouse(int x, int y)
 	// Handle patch area
 	//
 	if (Editor.State == EditorEditPatch) {
-#if 0
-		i = 0;
-		bx = UI.InfoPanel.X + 4;
-		by = UI.InfoPanel.Y + 4 + IconHeight + 10;
-
-		while (i < 6) {
-			if (bx < x && x < bx + 100 && by < y && y < by + 18) {
-				ButtonUnderCursor = i + 300;
-				CursorOn = CursorOnButton;
-				return;
+		i = Editor.PatchIndex;
+		by = UI.ButtonPanel.Y + 24;
+		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
+			if (i >= (int)Editor.ShownPatchTypes.size()) {
+				break;
 			}
-			++i;
-			by += 20;
-		}
-
-		i = 0;
-		by = UI.ButtonPanel.Y + 4;
-		while (by < UI.ButtonPanel.Y + 100) {
-			bx = UI.ButtonPanel.X + 4;
-			while (bx < UI.ButtonPanel.X + 144) {
-				if (!Map.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
-					by = UI.ButtonPanel.Y + 100;
+			bx = UI.ButtonPanel.X + 10;
+			while (bx < UI.ButtonPanel.X + 146) {
+				if (i >= (int)Editor.ShownPatchTypes.size()) {
 					break;
 				}
-				if (bx < x && x < bx + TileSizeX &&
-						by < y && y < by + TileSizeY) {
-					int j;
-
-					// FIXME: i is wrong, must find the solid type
-					j = Map.Tileset.Tiles[i * 16 + 16].BaseTerrain;
-					//MAPTODO UI.StatusLine.Set(Map.Tileset.SolidTerrainTypes[j].TerrainName);
-					ButtonUnderCursor = i + 100;
-					CursorOn = CursorOnButton;
+				if (bx < x && x < bx + IconWidth &&
+						by < y && y < by + IconHeight) {
+					UI.StatusLine.Set(Editor.ShownPatchTypes[i].PatchType->getName());
+					Editor.CursorPatchIndex = i;
+					PatchUnderCursor = NULL;
 					return;
 				}
-				bx += TileSizeX+2;
-				++i;
+				bx += IconWidth + 8;
+				i++;
 			}
-			by += TileSizeY+2;
+			by += IconHeight + 2;
 		}
-#endif
 	}
 
 	//
@@ -1397,11 +1415,18 @@ static void EditorCallbackMouse(int x, int y)
 		CursorOn = CursorOnMap;
 
 		if (Editor.State == EditorEditPatch) {
-			// Show what patch is under the cursor
 			int tileX = UI.MouseViewport->Viewport2MapX(CursorX);
 			int tileY = UI.MouseViewport->Viewport2MapY(CursorY);
-			PatchUnderCursor = Map.PatchManager.getPatch(tileX, tileY);
 
+			if (Editor.SelectedPatchIndex != -1) {
+				// Create a new patch
+				PatchUnderCursor = Map.PatchManager.add(Editor.ShownPatchTypes[Editor.SelectedPatchIndex].PatchType->getName(), tileX, tileY);
+				PatchOffsetX = 0;
+				PatchOffsetY = 0;
+			} else {
+				// Show what patch is under the cursor
+				PatchUnderCursor = Map.PatchManager.getPatch(tileX, tileY);
+			}
 			if (PatchUnderCursor) {
 				ShowPatchInfo(PatchUnderCursor);
 				return;
@@ -1437,6 +1462,32 @@ static void EditorCallbackMouse(int x, int y)
 */
 static void EditorCallbackExit(void)
 {
+}
+
+/**
+**  Create the patch icons
+*/
+static int CreatePatchIcons()
+{
+	std::vector<std::string> patchTypeNames;
+	std::vector<std::string>::iterator i;
+
+	// Load all of the patch types
+	Map.PatchManager.loadAll();
+
+	// Create icons out of the patch graphics
+	patchTypeNames = Map.PatchManager.getPatchTypeNames();
+	for (i = patchTypeNames.begin(); i != patchTypeNames.end(); ++i) {
+		CPatchType *patchType = Map.PatchManager.getPatchType(*i);
+		CGraphic *g = patchType->getGraphic()->Clone();
+
+		g->Resize(IconWidth, IconHeight);
+
+		CPatchIcon patchIcon(patchType, g);
+		Editor.ShownPatchTypes.push_back(patchIcon);
+	}
+	
+	return 0;
 }
 
 /**
@@ -1503,6 +1554,7 @@ void CEditor::Init(void)
 	FlagRevealMap = 0;
 	Editor.SelectedPlayer = PlayerNumNeutral;
 	Editor.PatchOutlineColor = ColorBlack;
+	Editor.SelectedPatchIndex = -1;
 
 	//
 	// Place the start points, which the loader discarded.
@@ -1528,6 +1580,8 @@ void CEditor::Init(void)
 	Units.Load();
 	Patch.Icon = NULL;
 	Patch.Load();
+
+	CreatePatchIcons();
 
 	RecalculateShownUnits();
 
@@ -1589,17 +1643,27 @@ static void EditorMainLoop(void)
 	editorContainer->setOpaque(false);
 	Gui->setTop(editorContainer);
 
-	editorSliderListener = new EditorSliderListener();
+	editorUnitSliderListener = new EditorUnitSliderListener();
+	editorPatchSliderListener = new EditorPatchSliderListener();
 
-	editorSlider = new gcn::Slider();
-	editorSlider->setBaseColor(gcn::Color(38, 38, 78));
-	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
-	editorSlider->setBackgroundColor(gcn::Color(200, 200, 120));
-	editorSlider->setSize(176, 16);
-	editorSlider->setVisible(false);
-	editorSlider->addActionListener(editorSliderListener);
+	editorUnitSlider = new gcn::Slider();
+	editorUnitSlider->setBaseColor(gcn::Color(38, 38, 78));
+	editorUnitSlider->setForegroundColor(gcn::Color(200, 200, 120));
+	editorUnitSlider->setBackgroundColor(gcn::Color(200, 200, 120));
+	editorUnitSlider->setSize(176, 16);
+	editorUnitSlider->setVisible(false);
+	editorUnitSlider->addActionListener(editorUnitSliderListener);
 
-	editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+	editorPatchSlider = new gcn::Slider();
+	editorPatchSlider->setBaseColor(gcn::Color(38, 38, 78));
+	editorPatchSlider->setForegroundColor(gcn::Color(200, 200, 120));
+	editorPatchSlider->setBackgroundColor(gcn::Color(200, 200, 120));
+	editorPatchSlider->setSize(176, 16);
+	editorPatchSlider->setVisible(false);
+	editorPatchSlider->addActionListener(editorPatchSliderListener);
+
+	editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+	editorContainer->add(editorPatchSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
 
 	while (1) {
 		Editor.MapLoaded = false;
@@ -1664,8 +1728,10 @@ static void EditorMainLoop(void)
 	SetCallbacks(old_callbacks);
 	Gui->setTop(oldTop);
 	delete editorContainer;
-	delete editorSliderListener;
-	delete editorSlider;
+	delete editorUnitSliderListener;
+	delete editorPatchSliderListener;
+	delete editorUnitSlider;
+	delete editorPatchSlider;
 }
 
 /**
