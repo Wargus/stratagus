@@ -115,7 +115,9 @@ static CPatch *PatchUnderCursor;            /// Patch under cursor
 static int PatchOffsetX;
 static int PatchOffsetY;
 static bool UnitPlacedThisPress = false;    /// Only allow one unit per press
+static bool UpdateMinimap = false;          /// Update units on the minimap
 static bool UpdateMinimapTerrain = false;   /// Terrain has changed, minimap needs updating
+static bool DraggingPatch = false;          /// The user is currently dragging a patch
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -235,6 +237,11 @@ static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 	}
 
 	unit = MakeUnitAndPlace(x, y, type, player);
+	if (unit == NoUnitP) {
+		DebugPrint("Unable to allocate Unit");
+		return;
+	}
+
 	b = OnTopDetails(unit, NULL);
 	if (b && b->ReplaceOnBuild) {
 		int n;
@@ -252,11 +259,9 @@ static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 				break;
 			}
 		}
+	}
 
-	}
-	if (unit == NoUnitP) {
-		DebugPrint("Unable to allocate Unit");
-	}
+	UpdateMinimap = true;
 }
 
 /**
@@ -836,6 +841,7 @@ static void EditorCallbackButtonUp(unsigned button)
 	}
 	if ((1 << button) == LeftButton) {
 		UnitPlacedThisPress = false;
+		DraggingPatch = false;
 	}
 
 	Editor.SelectedPatchIndex = -1;
@@ -973,6 +979,7 @@ static void EditorCallbackButtonDown(unsigned button)
 					int tileY = UI.MouseViewport->Viewport2MapY(CursorY);
 					PatchOffsetX = tileX - PatchUnderCursor->getX();
 					PatchOffsetY = tileY - PatchUnderCursor->getY();
+					DraggingPatch = true;
 				}
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
@@ -1043,6 +1050,8 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			if (PatchUnderCursor) {
 				Map.PatchManager.remove(PatchUnderCursor);
 				PatchUnderCursor = NULL;
+				UI.StatusLine.Set(_("Patch deleted"));
+				UpdateMinimapTerrain = true;
 			} else if (UnitUnderCursor) {
 				CUnit *unit = UnitUnderCursor;
 
@@ -1051,6 +1060,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				UnitClearOrders(unit);
 				unit->Release();
 				UI.StatusLine.Set(_("Unit deleted"));
+				UpdateMinimap = true;
 			}
 			break;
 
@@ -1077,6 +1087,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			if (UnitUnderCursor && Map.Info.PlayerType[(int)key - '0'] != PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(&Players[(int)key - '0']);
 				UI.StatusLine.Set(_("Unit owner modified"));
+				UpdateMinimap = true;
 			}
 			break;
 
@@ -1326,7 +1337,12 @@ static void EditorCallbackMouse(int x, int y)
 				}
 				if (bx < x && x < bx + IconWidth &&
 						by < y && y < by + IconHeight) {
-					UI.StatusLine.Set(Editor.ShownPatchTypes[i].PatchType->getName());
+					CPatchType *patchType = Editor.ShownPatchTypes[i].PatchType;
+					std::ostringstream ostr;
+					ostr << patchType->getName() << " ("
+					     << patchType->getTileWidth() << "x"
+						 << patchType->getTileHeight() << ")";
+					UI.StatusLine.Set(ostr.str());
 					Editor.CursorPatchIndex = i;
 					PatchUnderCursor = NULL;
 					return;
@@ -1470,7 +1486,7 @@ static void EditorCallbackExit(void)
 /**
 **  Create the patch icons
 */
-static int CreatePatchIcons()
+static void CreatePatchIcons()
 {
 	std::vector<std::string> patchTypeNames;
 	std::vector<std::string>::iterator i;
@@ -1489,8 +1505,17 @@ static int CreatePatchIcons()
 		CPatchIcon patchIcon(patchType, g);
 		Editor.ShownPatchTypes.push_back(patchIcon);
 	}
-	
-	return 0;
+}
+
+/**
+**  Clean up the patch icons
+*/
+static void CleanPatchIcons()
+{
+	for (size_t i = 0; i < Editor.ShownPatchTypes.size(); ++i) {
+		CGraphic::Free(Editor.ShownPatchTypes[i].G);
+	}
+	Editor.ShownPatchTypes.clear();
 }
 
 /**
@@ -1668,6 +1693,8 @@ static void EditorMainLoop(void)
 	editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
 	editorContainer->add(editorPatchSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
 
+	UpdateMinimap = true;
+
 	while (1) {
 		Editor.MapLoaded = false;
 		Editor.Running = EditorEditing;
@@ -1687,12 +1714,17 @@ static void EditorMainLoop(void)
 		while (Editor.Running) {
 			CheckMusicFinished();
 
-			if (UpdateMinimapTerrain && FrameCounter % FRAMES_PER_SECOND == 0) {
-				UI.Minimap.UpdateTerrain();
-				UpdateMinimapTerrain = false;
+			if (FrameCounter % FRAMES_PER_SECOND == 0) {
+				if (UpdateMinimapTerrain && !DraggingPatch) {
+					UI.Minimap.UpdateTerrain();
+					UpdateMinimapTerrain = false;
+					UpdateMinimap = true;
+				}
+				if (UpdateMinimap) {
+					UI.Minimap.Update();
+					UpdateMinimap = false;
+				}
 			}
-			// FIXME: only update if something changed
-			UI.Minimap.Update();
 
 			EditorUpdateDisplay();
 
@@ -1791,6 +1823,7 @@ void StartEditor(const std::string &filename)
 	Video.ClearScreen();
 	Invalidate();
 
+	CleanPatchIcons();
 	CleanGame();
 	CleanPlayers();
 	CleanEditAi();
