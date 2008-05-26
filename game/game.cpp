@@ -237,6 +237,10 @@ int WriteMapSetup(const char *mapSetup, CMap *map)
 		}
 		f->printf("\n");
 
+		f->printf("-- patches\n");
+		f->printf("%s", Map.PatchManager.savePatches(true).c_str());
+		f->printf("\n");
+
 		f->printf("-- place units\n");
 		for (i = 0; i < NumUnits; ++i) {
 			f->printf("CreateUnit(\"%s\", ", Units[i]->Type->Ident.c_str());

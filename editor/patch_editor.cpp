@@ -412,7 +412,7 @@ public:
 			// TODO: show error
 			return;
 		}
-		Map.PatchManager.savePatchType(&file, Patch->getType());
+		file.printf("%s", Map.PatchManager.savePatchType(Patch->getType()).c_str());
 		file.close();
 		// TODO: show success
 	}

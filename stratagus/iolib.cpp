@@ -509,15 +509,31 @@ int ReadDataDirectory(const char *dirname, int (*filter)(char *, FileList *),
 
 void FileWriter::printf(const char *format, ...) 
 {
-	// FIXME: hardcoded size
-	char buf[1024];
+	char static_buf[1024];
+	char *buf = static_buf;
+	int ret;
+	int buf_size = sizeof(static_buf);
 	
 	va_list ap;
 	va_start(ap, format);
-	buf[sizeof(buf) - 1] = '\0';
-	vsnprintf(buf, sizeof(buf) - 1, format, ap);
+	buf[buf_size - 1] = '\0';
+	ret = vsnprintf(buf, buf_size - 1, format, ap);
+	while (ret == -1 || ret >= buf_size - 1) {
+		buf_size <<= 1;
+		buf = new char[buf_size];
+		if (!buf) {
+			fprintf(stderr, "Out of memory\n");
+			ExitFatal(-1);
+		}
+		buf[buf_size - 1] = '\0';
+		ret = vsnprintf(buf, buf_size - 1, format, ap);
+	}
 	va_end(ap);
 	write(buf, strlen(buf));
+
+	if (buf != static_buf) {
+		delete[] buf;
+	}
 }
 
 

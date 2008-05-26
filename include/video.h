@@ -77,6 +77,8 @@ public:
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 
+	CGraphic *Clone() const;
+
 	static void Free(CGraphic *g);
 
 	void Load();

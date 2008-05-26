@@ -98,6 +98,11 @@ public:
 	void load();
 
 	/**
+	**  Load all patches
+	*/
+	void loadAll();
+
+	/**
 	**  Clear the patches used in the map
 	*/
 	void clear();
@@ -124,12 +129,12 @@ public:
 	/**
 	**  Save all of the patches
 	*/
-	void savePatches(CFile *file) const;
+	std::string savePatches(bool patchesOnly = false) const;
 
 	/**
 	**  Save a patch type
 	*/
-	void savePatchType(CFile *file, CPatchType *patchType) const;
+	std::string savePatchType(CPatchType *patchType) const;
 
 private:
 	void updateMapFlags(int x1, int y1, int x2, int y2);
@@ -138,6 +143,8 @@ private:
 	std::map<std::string, CPatchType *> patchTypesMap;
 
 	std::list<CPatch *> removedPatches;
+
+	bool loadedAll;
 };
 
 //@}
