@@ -519,6 +519,9 @@ void FileWriter::printf(const char *format, ...)
 	buf[buf_size - 1] = '\0';
 	ret = vsnprintf(buf, buf_size - 1, format, ap);
 	while (ret == -1 || ret >= buf_size - 1) {
+		if (buf != static_buf) {
+			delete[] buf;
+		}
 		buf_size <<= 1;
 		buf = new char[buf_size];
 		if (!buf) {
