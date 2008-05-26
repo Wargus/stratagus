@@ -40,13 +40,16 @@
 #include "map.h"
 
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
 
-CPatchManager::CPatchManager()
+CPatchManager::CPatchManager() :
+	loadedAll(false)
 {
 }
 
@@ -201,6 +204,18 @@ CPatchManager::load()
 	}
 }
 
+void
+CPatchManager::loadAll()
+{
+	std::map<std::string, CPatchType *>::const_iterator i;
+
+	for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
+		i->second->load();
+	}
+
+	loadedAll = true;
+}
+
 static void clearPatches(std::list<CPatch *> &patches)
 {
 	std::list<CPatch *>::iterator i;
@@ -216,6 +231,14 @@ CPatchManager::clear()
 {
 	clearPatches(this->patches);
 	clearPatches(this->removedPatches);
+
+	if (loadedAll) {
+		std::map<std::string, CPatchType *>::const_iterator i;
+
+		for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
+			i->second->clean();
+		}
+	}
 }
 
 
@@ -256,40 +279,52 @@ CPatchManager::getPatchType(const std::string &name)
 	return this->patchTypesMap[name];
 }
 
-void
-CPatchManager::savePatches(CFile *file) const
+std::string
+CPatchManager::savePatches(bool patchesOnly) const
 {
 	std::map<std::string, bool> patchTypeSaved;
 	std::list<CPatch *>::const_iterator i;
+	std::ostringstream ostr;
 
 	for (i = this->patches.begin(); i != this->patches.end(); ++i) {
 		const std::string &name = (*i)->getType()->getName();
 
-		if (!patchTypeSaved[name]) {
-			this->savePatchType(file, (*i)->getType());
+		if (!patchesOnly && !patchTypeSaved[name]) {
+			ostr << this->savePatchType((*i)->getType());
 			patchTypeSaved[name] = true;
 		}
 
-		file->printf("patch(\"%s\", %d, %d)\n",
-			name.c_str(), (*i)->getX(), (*i)->getY());
+		ostr << "patch(\"" << name << "\", "
+		     << (*i)->getX() << ", " << (*i)->getY() << ")\n";
 	}
+
+	return ostr.str();
 }
 
-void
-CPatchManager::savePatchType(CFile *file, CPatchType *patchType) const
+std::string
+CPatchManager::savePatchType(CPatchType *patchType) const
 {
-	file->printf("patchType(\"%s\", \"%s\", %d, %d, {\n",
-		patchType->getName().c_str(), patchType->getGraphic()->File.c_str(),
-		patchType->getTileWidth(), patchType->getTileHeight());
+	std::ostringstream ostr;
+
+	ostr << "patchType(\"" << patchType->getName() << "\", \""
+	     << patchType->getGraphic()->File << "\", "
+	     << patchType->getTileWidth() << ", "
+	     << patchType->getTileHeight() << ", {\n";
 
 	for (int j = 0; j < patchType->getTileHeight(); ++j) {
 		for (int i = 0; i < patchType->getTileWidth(); ++i) {
-			file->printf(" 0x%04x,", patchType->getFlag(i, j));
+			std::ostringstream flag;
+			flag << " 0x"
+			     << std::hex << std::setw(4) << std::setfill('0')
+				 << patchType->getFlag(i, j);
+			ostr << flag.str() << ",";
 		}
-		file->printf("\n");
+		ostr << "\n";
 	}
 
-	file->printf("})\n");
+	ostr << "})\n";
+
+	return ostr.str();
 }
 
 //@}

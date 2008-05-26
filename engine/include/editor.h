@@ -39,6 +39,7 @@
 ----------------------------------------------------------------------------*/
 
 class CUnitType;
+class CPatchType;
 
 enum EditorRunningType {
 	EditorNotRunning = 0,    /// Not Running
@@ -54,10 +55,21 @@ enum EditorStateType {
 	EditorSetStartLocation   /// Set the start location
 };
 
+struct CPatchIcon
+{
+	CPatchIcon(CPatchType *patchType, CGraphic *g) :
+		PatchType(patchType), G(g)
+	{}
+
+	CPatchType *PatchType;
+	CGraphic *G;
+};
+
 class CEditor {
 public:
 	CEditor() : StartUnit(NULL),
 		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
+		PatchIndex(0), CursorPatchIndex(-1), SelectedPatchIndex(-1),
 		CursorPlayer(-1), SelectedPlayer(-1), MapLoaded(false),
 		ShowPatchOutlines(false)
 		{};
@@ -68,7 +80,7 @@ public:
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
 
-	std::vector<const CUnitType *> ShownPatchTypes; /// Shown editor patch-type table.
+	std::vector<CPatchIcon> ShownPatchTypes;        /// Shown editor patch-type table.
 
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.
@@ -79,6 +91,10 @@ public:
 	int UnitIndex;               /// Unit icon draw index.
 	int CursorUnitIndex;         /// Unit icon under cursor.
 	int SelectedUnitIndex;       /// Unit type to draw.
+
+	int PatchIndex;              /// Patch icon draw index.
+	int CursorPatchIndex;        /// Patch icon under cursor.
+	int SelectedPatchIndex;      /// Patch type to draw.
 
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
