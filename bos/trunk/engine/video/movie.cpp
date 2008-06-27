@@ -297,6 +297,7 @@ int PlayMovie(const std::string &name)
 #else
 
 #include <string>
+#include <string.h>
 
 /**
 **  Play a video file.
