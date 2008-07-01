@@ -13,7 +13,8 @@ class CPlayer
 	string Name;
 	
 	int Type;
-
+	int Race;
+	string AiName;
 	int StartX;
 	int StartY;
 

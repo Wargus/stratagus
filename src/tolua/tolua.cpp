@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.91 on 06/03/07 22:35:53.
+** Generated automatically by tolua++-1.0.91 on 06/29/08 11:12:37.
 */
 
 #ifndef __cplusplus
@@ -317,6 +317,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Widget");
  tolua_usertype(tolua_S,"Label");
  tolua_usertype(tolua_S,"Settings");
+ tolua_usertype(tolua_S,"CTileset");
  tolua_usertype(tolua_S,"CResourceInfo");
  tolua_usertype(tolua_S,"vector<CFiller>");
  tolua_usertype(tolua_S,"CUnitType");
@@ -12863,6 +12864,66 @@ static int tolua_set_CPlayer_Type(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Race of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_get_CPlayer_Race
+static int tolua_get_CPlayer_Race(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Race'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->Race);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Race of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_set_CPlayer_Race
+static int tolua_set_CPlayer_Race(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Race'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Race = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: AiName of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_get_CPlayer_AiName
+static int tolua_get_CPlayer_AiName(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'AiName'",NULL);
+#endif
+  tolua_pushcppstring(tolua_S,(const char*)self->AiName);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: AiName of class  CPlayer */
+#ifndef TOLUA_DISABLE_tolua_set_CPlayer_AiName
+static int tolua_set_CPlayer_AiName(lua_State* tolua_S)
+{
+  CPlayer* self = (CPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'AiName'",NULL);
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->AiName = ((string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: StartX of class  CPlayer */
 #ifndef TOLUA_DISABLE_tolua_get_CPlayer_StartX
 static int tolua_get_CPlayer_StartX(lua_State* tolua_S)
@@ -14059,6 +14120,36 @@ static int tolua_set_CUnitType_ClicksToExplode(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: GivesResource of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_get_CUnitType_GivesResource
+static int tolua_get_CUnitType_GivesResource(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GivesResource'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->GivesResource);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: GivesResource of class  CUnitType */
+#ifndef TOLUA_DISABLE_tolua_set_CUnitType_GivesResource
+static int tolua_set_CUnitType_GivesResource(lua_State* tolua_S)
+{
+  CUnitType* self = (CUnitType*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'GivesResource'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->GivesResource = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Supply of class  CUnitType */
 #ifndef TOLUA_DISABLE_tolua_get_CUnitType_Supply
 static int tolua_get_CUnitType_Supply(lua_State* tolua_S)
@@ -14281,6 +14372,66 @@ static int tolua_set_CUnit_Player_ptr(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Active of class  CUnit */
+#ifndef TOLUA_DISABLE_tolua_get_CUnit_Active
+static int tolua_get_CUnit_Active(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Active'",NULL);
+#endif
+  tolua_pushboolean(tolua_S,(bool)self->Active);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Active of class  CUnit */
+#ifndef TOLUA_DISABLE_tolua_set_CUnit_Active
+static int tolua_set_CUnit_Active(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Active'",NULL);
+  if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Active = ((bool)  tolua_toboolean(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: ResourcesHeld of class  CUnit */
+#ifndef TOLUA_DISABLE_tolua_get_CUnit_ResourcesHeld
+static int tolua_get_CUnit_ResourcesHeld(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResourcesHeld'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->ResourcesHeld);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: ResourcesHeld of class  CUnit */
+#ifndef TOLUA_DISABLE_tolua_set_CUnit_ResourcesHeld
+static int tolua_set_CUnit_ResourcesHeld(lua_State* tolua_S)
+{
+  CUnit* self = (CUnit*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ResourcesHeld'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ResourcesHeld = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: ShowSightRange of class  CPreference */
 #ifndef TOLUA_DISABLE_tolua_get_CPreference_ShowSightRange
 static int tolua_get_CPreference_ShowSightRange(lua_State* tolua_S)
@@ -14420,6 +14571,30 @@ static int tolua_set_Preference(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   Preference = *((CPreference*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: UnitUnderCursor */
+#ifndef TOLUA_DISABLE_tolua_get_UnitUnderCursor_ptr
+static int tolua_get_UnitUnderCursor_ptr(lua_State* tolua_S)
+{
+  tolua_pushusertype(tolua_S,(void*)UnitUnderCursor,"CUnit");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: UnitUnderCursor */
+#ifndef TOLUA_DISABLE_tolua_set_UnitUnderCursor_ptr
+static int tolua_set_UnitUnderCursor_ptr(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!tolua_isusertype(tolua_S,2,"CUnit",0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  UnitUnderCursor = ((CUnit*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -15020,9 +15195,9 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
  else
 #endif
  {
-  const char* file = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
   {
-   int tolua_ret = (int)  EditorSaveMap(file);
+   int tolua_ret = (int)  EditorSaveMap(filename);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -15782,6 +15957,23 @@ static int tolua_get_CMapInfo_MapWidth(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* set function: MapWidth of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CMapInfo_MapWidth
+static int tolua_set_CMapInfo_MapWidth(lua_State* tolua_S)
+{
+  CMapInfo* self = (CMapInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapWidth'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MapWidth = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: MapHeight of class  CMapInfo */
 #ifndef TOLUA_DISABLE_tolua_get_CMapInfo_MapHeight
 static int tolua_get_CMapInfo_MapHeight(lua_State* tolua_S)
@@ -15792,6 +15984,105 @@ static int tolua_get_CMapInfo_MapHeight(lua_State* tolua_S)
 #endif
   tolua_pushnumber(tolua_S,(lua_Number)self->MapHeight);
  return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: MapHeight of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_set_CMapInfo_MapHeight
+static int tolua_set_CMapInfo_MapHeight(lua_State* tolua_S)
+{
+  CMapInfo* self = (CMapInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'MapHeight'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->MapHeight = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: PlayerType of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_get_stratagus_CMapInfo_PlayerType
+static int tolua_get_stratagus_CMapInfo_PlayerType(lua_State* tolua_S)
+{
+ int tolua_index;
+  CMapInfo* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CMapInfo*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=PlayerMax)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+ tolua_pushnumber(tolua_S,(lua_Number)self->PlayerType[tolua_index]);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: PlayerType of class  CMapInfo */
+#ifndef TOLUA_DISABLE_tolua_set_stratagus_CMapInfo_PlayerType
+static int tolua_set_stratagus_CMapInfo_PlayerType(lua_State* tolua_S)
+{
+ int tolua_index;
+  CMapInfo* self;
+ lua_pushstring(tolua_S,".self");
+ lua_rawget(tolua_S,1);
+ self = (CMapInfo*)  lua_touserdata(tolua_S,-1);
+#ifndef TOLUA_RELEASE
+ {
+  tolua_Error tolua_err;
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in array indexing.",&tolua_err);
+ }
+#endif
+ tolua_index = (int)tolua_tonumber(tolua_S,2,0);
+#ifndef TOLUA_RELEASE
+ if (tolua_index<0 || tolua_index>=PlayerMax)
+  tolua_error(tolua_S,"array indexing out of range.",NULL);
+#endif
+  self->PlayerType[tolua_index] = ((int)  tolua_tonumber(tolua_S,3,0));
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Name of class  CTileset */
+#ifndef TOLUA_DISABLE_tolua_get_CTileset_Name
+static int tolua_get_CTileset_Name(lua_State* tolua_S)
+{
+  CTileset* self = (CTileset*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
+#endif
+  tolua_pushcppstring(tolua_S,(const char*)self->Name);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Name of class  CTileset */
+#ifndef TOLUA_DISABLE_tolua_set_CTileset_Name
+static int tolua_set_CTileset_Name(lua_State* tolua_S)
+{
+  CTileset* self = (CTileset*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Name = ((string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -15820,6 +16111,36 @@ static int tolua_set_CMap_Info(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->Info = *((CMapInfo*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Tileset of class  CMap */
+#ifndef TOLUA_DISABLE_tolua_get_CMap_Tileset
+static int tolua_get_CMap_Tileset(lua_State* tolua_S)
+{
+  CMap* self = (CMap*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Tileset'",NULL);
+#endif
+  tolua_pushusertype(tolua_S,(void*)&self->Tileset,"CTileset");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Tileset of class  CMap */
+#ifndef TOLUA_DISABLE_tolua_set_CMap_Tileset
+static int tolua_set_CMap_Tileset(lua_State* tolua_S)
+{
+  CMap* self = (CMap*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Tileset'",NULL);
+  if (!tolua_isusertype(tolua_S,2,"CTileset",0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Tileset = *((CTileset*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -17094,6 +17415,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Index",tolua_get_CPlayer_Index,tolua_set_CPlayer_Index);
    tolua_variable(tolua_S,"Name",tolua_get_CPlayer_Name,tolua_set_CPlayer_Name);
    tolua_variable(tolua_S,"Type",tolua_get_CPlayer_Type,tolua_set_CPlayer_Type);
+   tolua_variable(tolua_S,"Race",tolua_get_CPlayer_Race,tolua_set_CPlayer_Race);
+   tolua_variable(tolua_S,"AiName",tolua_get_CPlayer_AiName,tolua_set_CPlayer_AiName);
    tolua_variable(tolua_S,"StartX",tolua_get_CPlayer_StartX,tolua_set_CPlayer_StartX);
    tolua_variable(tolua_S,"StartY",tolua_get_CPlayer_StartY,tolua_set_CPlayer_StartY);
    tolua_array(tolua_S,"Resources",tolua_get_stratagus_CPlayer_Resources,tolua_set_stratagus_CPlayer_Resources);
@@ -17134,6 +17457,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Slot",tolua_get_CUnitType_Slot,NULL);
    tolua_variable(tolua_S,"MinAttackRange",tolua_get_CUnitType_MinAttackRange,tolua_set_CUnitType_MinAttackRange);
    tolua_variable(tolua_S,"ClicksToExplode",tolua_get_CUnitType_ClicksToExplode,tolua_set_CUnitType_ClicksToExplode);
+   tolua_variable(tolua_S,"GivesResource",tolua_get_CUnitType_GivesResource,tolua_set_CUnitType_GivesResource);
    tolua_variable(tolua_S,"Supply",tolua_get_CUnitType_Supply,tolua_set_CUnitType_Supply);
    tolua_variable(tolua_S,"Demand",tolua_get_CUnitType_Demand,tolua_set_CUnitType_Demand);
   tolua_endmodule(tolua_S);
@@ -17145,6 +17469,8 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Y",tolua_get_CUnit_Y,tolua_set_CUnit_Y);
    tolua_variable(tolua_S,"Type",tolua_get_CUnit_Type_ptr,tolua_set_CUnit_Type_ptr);
    tolua_variable(tolua_S,"Player",tolua_get_CUnit_Player_ptr,tolua_set_CUnit_Player_ptr);
+   tolua_variable(tolua_S,"Active",tolua_get_CUnit_Active,tolua_set_CUnit_Active);
+   tolua_variable(tolua_S,"ResourcesHeld",tolua_get_CUnit_ResourcesHeld,tolua_set_CUnit_ResourcesHeld);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"CPreference","CPreference","",NULL);
   tolua_beginmodule(tolua_S,"CPreference");
@@ -17154,6 +17480,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"ShowOrders",tolua_get_CPreference_unsigned_ShowOrders,tolua_set_CPreference_unsigned_ShowOrders);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"Preference",tolua_get_Preference,tolua_set_Preference);
+  tolua_variable(tolua_S,"UnitUnderCursor",tolua_get_UnitUnderCursor_ptr,tolua_set_UnitUnderCursor_ptr);
   tolua_function(tolua_S,"GetEffectsVolume",tolua_stratagus_GetEffectsVolume00);
   tolua_function(tolua_S,"SetEffectsVolume",tolua_stratagus_SetEffectsVolume00);
   tolua_function(tolua_S,"GetMusicVolume",tolua_stratagus_GetMusicVolume00);
@@ -17243,12 +17570,18 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"CMapInfo","CMapInfo","",NULL);
   tolua_beginmodule(tolua_S,"CMapInfo");
    tolua_variable(tolua_S,"Description",tolua_get_CMapInfo_Description,tolua_set_CMapInfo_Description);
-   tolua_variable(tolua_S,"MapWidth",tolua_get_CMapInfo_MapWidth,NULL);
-   tolua_variable(tolua_S,"MapHeight",tolua_get_CMapInfo_MapHeight,NULL);
+   tolua_variable(tolua_S,"MapWidth",tolua_get_CMapInfo_MapWidth,tolua_set_CMapInfo_MapWidth);
+   tolua_variable(tolua_S,"MapHeight",tolua_get_CMapInfo_MapHeight,tolua_set_CMapInfo_MapHeight);
+   tolua_array(tolua_S,"PlayerType",tolua_get_stratagus_CMapInfo_PlayerType,tolua_set_stratagus_CMapInfo_PlayerType);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"CTileset","CTileset","",NULL);
+  tolua_beginmodule(tolua_S,"CTileset");
+   tolua_variable(tolua_S,"Name",tolua_get_CTileset_Name,tolua_set_CTileset_Name);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"CMap","CMap","",NULL);
   tolua_beginmodule(tolua_S,"CMap");
    tolua_variable(tolua_S,"Info",tolua_get_CMap_Info,tolua_set_CMap_Info);
+   tolua_variable(tolua_S,"Tileset",tolua_get_CMap_Tileset,tolua_set_CMap_Tileset);
   tolua_endmodule(tolua_S);
   tolua_variable(tolua_S,"Map",tolua_get_Map,tolua_set_Map);
   tolua_function(tolua_S,"SetTile",tolua_stratagus_SetTile00);

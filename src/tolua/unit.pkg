@@ -7,6 +7,8 @@ class CUnit
 
 	CUnitType *Type;
 	CPlayer *Player;
+	bool Active;
+	int ResourcesHeld;
 };
 
 class CPreference
@@ -18,3 +20,5 @@ class CPreference
 };
 
 CPreference Preference;
+
+CUnit *UnitUnderCursor;

@@ -134,48 +134,4 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 	}
 }
 
-#if 0
-/**
-** Process a menu.
-**
-** @param menu_id The menu number to process
-** @param loop Indicates to setup handlers and really 'Process'
-**
-** @todo FIXME: This function is called from the event handler!!
-*/
-void ProcessMenu(const char *menu_id, int loop)
-{
-	int oldncr;
-
-	CancelBuildingMode();
-
-	// Recursion protection:
-	if (loop) {
-		InterfaceState = IfaceStateMenu;
-	}
-
-	ButtonUnderCursor = -1;
-
-	if (loop) {
-		while (CurrentMenu != NULL) {
-			CheckMusicFinished();
-
-			InterfaceState = IfaceStateNormal;
-			UpdateDisplay();
-			InterfaceState = IfaceStateMenu;
-
-			RealizeVideoMemory();
-			oldncr = NetConnectRunning;
-//			WaitEventsOneFrame(&MenuCallbacks);
-			if (NetConnectRunning == 2) {
-				NetworkProcessClientRequest();
-			}
-			if (NetConnectRunning == 1) {
-				NetworkProcessServerRequest();
-			}
-		}
-	}
-}
-#endif
-
 //@}

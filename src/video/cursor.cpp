@@ -290,7 +290,7 @@ void DrawCursor(void)
 			CursorStartScrMapX + UI.MouseViewport->X - TileSizeX * UI.MouseViewport->MapX - UI.MouseViewport->OffsetX,
 			CursorStartScrMapY + UI.MouseViewport->Y - TileSizeY * UI.MouseViewport->MapY - UI.MouseViewport->OffsetY,
 			CursorX, CursorY);
-	} else if (CursorBuilding && CursorOn == CursorOnMap) {
+	} else if (CursorBuilding && CursorOn == CursorOnMap && !GamePaused) {
 		// Selecting position for building
 		DrawBuildingCursor();
 	}

@@ -1,13 +1,21 @@
 class CMapInfo
 {
 	string Description;
-	tolua_readonly int MapWidth;
-	tolua_readonly int MapHeight;
+	int MapWidth;
+	int MapHeight;
+	int PlayerType[PlayerMax];
 };
+
+class CTileset
+{
+	string Name;
+};
+
 
 class CMap
 {
 	CMapInfo Info;
+	CTileset Tileset;
 };
 
 extern CMap Map;

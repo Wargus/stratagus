@@ -19,5 +19,4 @@ class CEditor
 extern CEditor Editor;
 
 void StartEditor(const char *filename);
-int EditorSaveMap(const char *file);
-
+int EditorSaveMap(const char *filename);

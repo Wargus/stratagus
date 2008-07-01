@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2008 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -436,177 +436,7 @@ static void RecalculateShownUnits(void)
 	Editor.SelectedUnitIndex = -1;
 }
 
-static MenuScreen *editResourceMenu;
-static gcn::Label *editResourceLabel;
-static gcn::TextField *editResourceTextField;
-static gcn::Button *editResourceOKButton;
-static gcn::Button *editResourceCancelButton;
 
-static void CleanEditResource()
-{
-	delete editResourceMenu;
-	editResourceMenu = NULL;
-	delete editResourceLabel;
-	editResourceLabel = NULL;
-	delete editResourceTextField;
-	editResourceTextField = NULL;
-	delete editResourceOKButton;
-	editResourceOKButton = NULL;
-	delete editResourceCancelButton;
-	editResourceCancelButton = NULL;
-}
-
-class CEditResourceOKActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		UnitUnderCursor->ResourcesHeld = atoi(editResourceTextField->getText().c_str());
-		editResourceMenu->stop();
-	}
-};
-static CEditResourceOKActionListener EditResourceOKListener;
-
-class CEditResourceCancelActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		editResourceMenu->stop();
-	}
-};
-static CEditResourceCancelActionListener EditResourceCancelListener;
-
-/**
-**  Edit resource properties
-*/
-static void EditorEditResource(void)
-{
-	CleanEditResource();
-
-	editResourceMenu = new MenuScreen();
-
-	editResourceMenu->setOpaque(true);
-	editResourceMenu->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editResourceMenu->setSize(288, 128);
-	editResourceMenu->setPosition((Video.Width - editResourceMenu->getWidth()) / 2,
-		(Video.Height - editResourceMenu->getHeight()) / 2);
-	editResourceMenu->setBorderSize(1);
-	editResourceMenu->setDrawMenusUnder(false);
-
-	std::string s(std::string("Amount of ") + DefaultResourceNames[UnitUnderCursor->Type->GivesResource] + ":");
-	editResourceLabel = new gcn::Label(s);
-	editResourceMenu->add(editResourceLabel, 288 / 2 - editResourceLabel->getWidth() / 2, 11);
-
-	char buf[30];
-	sprintf(buf, "%d", UnitUnderCursor->ResourcesHeld);
-	editResourceTextField = new gcn::TextField(buf);
-	editResourceTextField->setBaseColor(gcn::Color(200, 200, 120));
-	editResourceTextField->setForegroundColor(gcn::Color(200, 200, 120));
-	editResourceTextField->setBackgroundColor(gcn::Color(38, 38, 78));
-	editResourceTextField->setSize(212, 20);
-	editResourceMenu->add(editResourceTextField, 40, 46);
-
-	editResourceOKButton = new gcn::Button(_("~!OK"));
-	editResourceOKButton->setHotKey("o");
-	editResourceOKButton->setSize(106, 28);
-	editResourceOKButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editResourceOKButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editResourceOKButton->addActionListener(&EditResourceOKListener);
-	editResourceMenu->add(editResourceOKButton, 24, 88);
-
-	editResourceCancelButton = new gcn::Button(_("~!Cancel"));
-	editResourceCancelButton->setHotKey("c");
-	editResourceCancelButton->setSize(106, 28);
-	editResourceCancelButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editResourceCancelButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editResourceCancelButton->addActionListener(&EditResourceCancelListener);
-	editResourceMenu->add(editResourceCancelButton, 154, 88);
-
-	editResourceMenu->run(false);
-}
-
-static MenuScreen *editAiMenu;
-static gcn::Label *editAiLabel;
-static gcn::CheckBox *editAiCheckBox;
-static gcn::Button *editAiOKButton;
-static gcn::Button *editAiCancelButton;
-
-static void CleanEditAi()
-{
-	delete editAiMenu;
-	editAiMenu = NULL;
-	delete editAiLabel;
-	editAiLabel = NULL;
-	delete editAiCheckBox;
-	editAiCheckBox = NULL;
-	delete editAiOKButton;
-	editAiOKButton = NULL;
-	delete editAiCancelButton;
-	editAiCancelButton = NULL;
-}
-
-class CEditAiOKActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		UnitUnderCursor->Active = editAiCheckBox->isMarked() ? 1 : 0;
-		editAiMenu->stop();
-	}
-};
-static CEditAiOKActionListener EditAiOKListener;
-
-class CEditAiCancelActionListener : public gcn::ActionListener
-{
-public:
-	virtual void action(const std::string &eventId) {
-		editAiMenu->stop();
-	}
-};
-static CEditAiCancelActionListener EditAiCancelListener;
-
-/**
-**  Edit ai properties
-*/
-static void EditorEditAiProperties(void)
-{
-	CleanEditAi();
-
-	editAiMenu = new MenuScreen();
-
-	editAiMenu->setOpaque(true);
-	editAiMenu->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editAiMenu->setSize(288, 128);
-	editAiMenu->setPosition((Video.Width - editAiMenu->getWidth()) / 2,
-		(Video.Height - editAiMenu->getHeight()) / 2);
-	editAiMenu->setBorderSize(1);
-	editAiMenu->setDrawMenusUnder(false);
-
-	editAiLabel = new gcn::Label(_("Artificial Intelligence"));
-	editAiMenu->add(editAiLabel, 288 / 2 - editAiLabel->getWidth() / 2, 11);
-
-	editAiCheckBox = new gcn::CheckBox("Active", UnitUnderCursor->Active);
-	editAiCheckBox->setBaseColor(gcn::Color(200, 200, 120));
-	editAiCheckBox->setForegroundColor(gcn::Color(200, 200, 120));
-	editAiCheckBox->setBackgroundColor(gcn::Color(38, 38, 78));
-	editAiMenu->add(editAiCheckBox, 100, 34);
-
-	editAiOKButton = new gcn::Button(_("~!OK"));
-	editAiOKButton->setHotKey("o");
-	editAiOKButton->setSize(106, 28);
-	editAiOKButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editAiOKButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editAiOKButton->addActionListener(&EditAiOKListener);
-	editAiMenu->add(editAiOKButton, 24, 88);
-
-	editAiCancelButton = new gcn::Button(_("~!Cancel"));
-	editAiCancelButton->setHotKey("c");
-	editAiCancelButton->setSize(106, 28);
-	editAiCancelButton->setBackgroundColor(gcn::Color(38, 38, 78, 130));
-	editAiCancelButton->setBaseColor(gcn::Color(38, 38, 78, 130));
-	editAiCancelButton->addActionListener(&EditAiCancelListener);
-	editAiMenu->add(editAiCancelButton, 154, 88);
-
-	editAiMenu->run(false);
-}
 
 /*----------------------------------------------------------------------------
 --  Display
@@ -1128,7 +958,7 @@ void EditorUpdateDisplay(void)
 			UI.Fillers[i].X, UI.Fillers[i].Y);
 	}
 
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == CursorOnMap && !GamePaused) {
 		DrawMapCursor(); // cursor on map
 	}
 
@@ -1222,6 +1052,10 @@ static void EditorCallbackButtonUp(unsigned button)
 */
 static void EditorCallbackButtonDown(unsigned button)
 {
+	if (GamePaused) {
+		return;
+	}
+
 	//
 	// Click on menu button
 	//
@@ -1332,11 +1166,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	//
 	if (Editor.State == EditorSelecting) {
 		if ((MouseButtons & RightButton && UnitUnderCursor)) {
-			if (UnitUnderCursor->Type->GivesResource) {
-				EditorEditResource();
-			} else {
-				EditorEditAiProperties();
-			}
+			CclCommand("if (EditUnitProperties ~= nil) then EditUnitProperties() end;");
 			return;
 		}
 	}
@@ -1456,12 +1286,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				  }
 			}
 			break;
-
-		case 'x': // ALT+X, CTRL+X: Exit editor
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
-				break;
-			}
-			Exit(0);
 
 		case SDLK_DELETE: // Delete
 			if (UnitUnderCursor) {
@@ -2135,7 +1959,7 @@ void EditorMainLoop(void)
 
 			WaitEventsOneFrame();
 		}
-
+		CursorBuilding = NULL;
 		if (!Editor.MapLoaded) {
 			break;
 		}
@@ -2176,9 +2000,9 @@ void StartEditor(const char *filename)
 	if (!filename) {
 		// new map, choose some default values
 		strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), "");
-		Map.Info.Description.clear();
-		Map.Info.MapWidth = 64;
-		Map.Info.MapHeight = 64;
+//		Map.Info.Description.clear();
+//		Map.Info.MapWidth = 64;
+//		Map.Info.MapHeight = 64;
 	}
 
 	// Run the editor.
@@ -2192,8 +2016,6 @@ void StartEditor(const char *filename)
 
 	CleanGame();
 	CleanPlayers();
-	CleanEditResource();
-	CleanEditAi();
 }
 
 //@}

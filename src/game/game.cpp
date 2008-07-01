@@ -205,7 +205,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap *map, char *map
 		if (!mapsetupname) {
 			mapsetupname = mapsetup;
 		}
-		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
+//		f->printf("DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
 	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
 		delete f;
@@ -239,6 +239,9 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 
 		f->printf("-- player configuration\n");
 		for (i = 0; i < PlayerMax; ++i) {
+			if (Players[i].Type == PlayerNobody) {
+				continue;
+			}
 			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[WoodCost].c_str(),
@@ -266,17 +269,18 @@ int WriteMapSetup(const char *mapsetup, CMap *map, int writeTerrain)
 					int tile;
 					int n;
 
-					tile = map->Fields[j+i*map->Info.MapWidth].Tile;
+					tile = map->Fields[j + i * map->Info.MapWidth].Tile;
 					for (n = 0; n < map->Tileset.NumTiles && tile != map->Tileset.Table[n]; ++n) {
 					}
-					f->printf("SetTile(%3d, %d, %d)\n", n, j, i);
+					const int value = map->Fields[j + i * map->Info.MapWidth].Value;
+					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
 				}
 			}
 		}
 
 		f->printf("-- place units\n");
 		for (i = 0; i < NumUnits; ++i) {
-			f->printf("unit= CreateUnit(\"%s\", %d, {%d, %d})\n",
+			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
 				Units[i]->Type->Ident.c_str(),
 				Units[i]->Player->Index,
 				Units[i]->X, Units[i]->Y);
