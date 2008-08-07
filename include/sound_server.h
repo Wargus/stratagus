@@ -9,7 +9,7 @@
 //
 /**@name sound_server.h - The sound server header file. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi, and
+//      (c) Copyright 1998-2008 by Lutz Sammer, Fabrice Rossi, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -68,13 +68,6 @@ enum _play_audio_flags_ {
 	PlayAudioLoadInMemory = 4,  /// Preload file into memory
 	PlayAudioLoadOnDemand = 8,  /// Load only if needed.
 };
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-	/// Current music file
-extern std::string CurrentMusicFile;
 
 /*----------------------------------------------------------------------------
 --  Functions
