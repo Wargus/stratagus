@@ -9,7 +9,7 @@
 //
 /**@name sound_server.cpp - The sound server (hardware layer and so on) */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi, and
+//      (c) Copyright 1998-2008 by Lutz Sammer, Fabrice Rossi, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -76,9 +76,6 @@ struct SoundChannel {
 
 static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
-
-// FIXME: move out of sound_server.cpp
-std::string CurrentMusicFile;    /// Current music filename
 
 static struct {
 	CSample *Sample;       /// Music sample
@@ -642,7 +639,6 @@ int PlayMusic(CSample *sample)
 		StopMusic();
 		MusicChannel.Sample = sample;
 		MusicPlaying = true;
-		CurrentMusicFile.clear();
 		return 0;
 	} else {
 		DebugPrint("Could not play sample\n");
@@ -666,8 +662,6 @@ int PlayMusic(const std::string &file)
 		return -1;
 	}
 
-	CurrentMusicFile.clear();
-
 	LibraryFileName(file.c_str(), name, sizeof(name));
 
 	DebugPrint("play music %s\n" _C_ name);
@@ -684,7 +678,6 @@ int PlayMusic(const std::string &file)
 		StopMusic();
 		MusicChannel.Sample = sample;
 		MusicPlaying = true;
-		CurrentMusicFile = file;
 		return 0;
 	} else {
 		DebugPrint("Could not play %s\n" _C_ file.c_str());
