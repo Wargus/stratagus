@@ -162,14 +162,25 @@ CPatch *
 CPatchManager::getPatch(int x, int y, int *xOffset, int *yOffset) const
 {
 	std::list<CPatch *>::const_reverse_iterator i;
+
+	// Search the patches from top to bottom
 	for (i = this->patches.rbegin(); i != this->patches.rend(); ++i) {
+		// See if the patch is at location x,y
 		if ((*i)->getX() <= x && x < (*i)->getX() + (*i)->getType()->getTileWidth() &&
 				(*i)->getY() <= y && y < (*i)->getY() + (*i)->getType()->getTileHeight()) {
-			if (xOffset != NULL && yOffset != NULL) {
-				*xOffset = x - (*i)->getX();
-				*yOffset = y - (*i)->getY();
+			int xPatchOffset = x - (*i)->getX();
+			int yPatchOffset = y - (*i)->getY();
+			unsigned short flag = (*i)->getType()->getFlag(xPatchOffset, yPatchOffset);
+
+			// Make sure the patch tile isn't transparent
+			if (!(flag & MapFieldTransparent)) {
+				if (xOffset != NULL && yOffset != NULL) {
+					*xOffset = xPatchOffset;
+					*yOffset = yPatchOffset;
+				}
+
+				return *i;
 			}
-			return *i;
 		}
 	}
 	return NULL;
