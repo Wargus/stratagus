@@ -26,6 +26,6 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/game
-MSRC =   game.cpp loadgame.cpp savegame.cpp trigger.cpp
+MSRC =   game.cpp loadgame.cpp savegame.cpp trigger.cpp replay.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

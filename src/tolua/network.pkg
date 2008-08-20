@@ -15,7 +15,7 @@ int GetNetworkState();
 void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
-class ServerSetup {
+class CServerSetup {
 	unsigned char ResourcesOption;
 	unsigned char UnitsOption;
 	unsigned char FogOfWar;
@@ -27,18 +27,18 @@ class ServerSetup {
 	unsigned CompOpt[PlayerMax];
 	unsigned Ready[PlayerMax];
 	unsigned Race[PlayerMax];
-	unsigned long LastFrame[PlayerMax];
+	unsigned int LastFrame[PlayerMax];
 };
-extern ServerSetup LocalSetupState;
-extern ServerSetup ServerSetupState;
+extern CServerSetup LocalSetupState;
+extern CServerSetup ServerSetupState;
 extern int NetLocalHostsSlot;
-struct NetworkHost {
+struct CNetworkHost {
 	unsigned long  Host;         /// Host address
 	unsigned short Port;         /// Port on host
 	unsigned short PlyNr;        /// Player nummer
 	char           PlyName[16];  /// Name of player
 };
-extern NetworkHost Hosts[PlayerMax];
+extern CNetworkHost Hosts[PlayerMax];
 
 $extern string NetworkMapName;
 string NetworkMapName;

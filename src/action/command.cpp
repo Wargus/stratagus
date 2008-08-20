@@ -56,20 +56,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Release an order.
-**
-**  @param order  Pointer to order.
-*/
-static void ReleaseOrder(COrder *order)
-{
-	if (order->Goal) {
-		order->Goal->RefsDecrease();
-		order->Goal = NoUnitP;
-	}
-}
-
-/**
-**  Release all orders of an unit.
+**  Release all orders of a unit.
 **
 **  @param unit  Pointer to unit.
 */
@@ -79,7 +66,7 @@ static void ReleaseOrders(CUnit *unit)
 
 	if ((n = unit->OrderCount) > 1) {
 		while (--n) {
-			ReleaseOrder(unit->Orders[n]);
+			unit->Orders[n]->Release();
 			delete unit->Orders[n];
 			unit->Orders.pop_back();
 		}
@@ -135,11 +122,13 @@ static void RemoveOrder(CUnit *unit, int order)
 	if (unit->OrderCount > 1) {
 		unit->Orders.pop_back();
 		--unit->OrderCount;
+		if (order == 0) {
+			unit->SubAction = 0;
+		}
 	} else {
 		Assert(i == 0);
 		unit->Orders[0]->Init();
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
+		unit->ClearAction();
 	}
 }
 
@@ -153,8 +142,7 @@ static void RemoveOrder(CUnit *unit, int order)
 */
 static void ClearSavedAction(CUnit *unit)
 {
-	ReleaseOrder(&unit->SavedOrder);
-
+	unit->SavedOrder.Release();
 	unit->SavedOrder.Init();
 	unit->SavedOrder.Action = UnitActionStill; // clear saved action
 }
@@ -179,8 +167,8 @@ void CommandStopUnit(CUnit *unit)
 	order->Init();
 
 	order->Action = UnitActionStill;
-	ReleaseOrder(&unit->SavedOrder);
-	ReleaseOrder(&unit->NewOrder);
+	unit->SavedOrder.Release();
+	unit->NewOrder.Release();
 	unit->SavedOrder = unit->NewOrder = *order;
 }
 
@@ -256,7 +244,7 @@ void CommandStandGround(CUnit *unit, int flush)
 	if (unit->Type->Building) {
 		// FIXME: should find a better way for pending orders.
 		order = &unit->NewOrder;
-		ReleaseOrder(order);
+		order->Release();
 	} else if (!(order = GetNextOrder(unit, flush))) {
 		return;
 	}
@@ -283,7 +271,7 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -328,7 +316,7 @@ void CommandMove(CUnit *unit, int x, int y, int flush)
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -361,7 +349,7 @@ void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -428,7 +416,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 		if (!unit->Type->CanAttack) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -486,7 +474,7 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -504,7 +492,7 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 }
 
 /**
-**  Let an unit patrol from current to new position
+**  Let a unit patrol from current to new position
 **
 **  FIXME: want to support patroling between units.
 **
@@ -526,7 +514,7 @@ void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -569,7 +557,7 @@ void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -642,7 +630,7 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -671,7 +659,7 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 }
 
 /**
-**  Cancel the building construction, or kill an unit.
+**  Cancel the building construction, or kill a unit.
 **
 **  @param unit  pointer to unit.
 */
@@ -710,7 +698,7 @@ void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -770,7 +758,7 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -807,7 +795,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
-			ReleaseOrder(order);
+			order->Release();
 		} else if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -1010,17 +998,7 @@ void CommandCancelUpgradeTo(CUnit *unit)
 			CancelUpgradeCostsFactor);
 
 		unit->Orders[0]->Init();
-
-		unit->Orders[0]->Action = UnitActionStill;
-
-		unit->SubAction = 0;
-
-		//
-		// Update interface.
-		//
-		if (unit->Player == ThisPlayer && unit->Selected) {
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
 	}
 	ClearSavedAction(unit);
 }
@@ -1098,17 +1076,7 @@ void CommandCancelResearch(CUnit *unit)
 		unit->Player->AddCostsFactor(upgrade->Costs,
 			CancelResearchCostsFactor);
 		unit->Orders[0]->Init();
-
-		unit->Orders[0]->Action = UnitActionStill;
-
-		unit->SubAction = 0;
-
-		//
-		// Update interface.
-		//
-		if (unit->Player == ThisPlayer && unit->Selected) {
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
 	}
 	ClearSavedAction(unit);
 }
@@ -1154,7 +1122,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 			// Unit::Refs is used as timeout counter.
 			//
 			if (dest->Destroyed) {
-				// FIXME: where check if spell needs an unit as destination?
+				// FIXME: where check if spell needs a unit as destination?
 				// FIXME: dest->Type is now set to 0. maybe we shouldn't bother.
 				order->X = dest->X /*+ dest->Type->TileWidth / 2*/  - order->Range;
 				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;
@@ -1164,6 +1132,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 				dest->RefsIncrease();
 			}
 		} else {
+			order->Range = 1;
 			order->X = x;
 			order->Y = y;
 		}
@@ -1233,6 +1202,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 	int x;
 	int y;
 	int i;
+	CMapField *mf;
 
 	//
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
@@ -1260,15 +1230,15 @@ void CommandSharedVision(int player, bool state, int opponent)
 		//
 		for (x = 0; x < Map.Info.MapWidth; ++x) {
 			for (y = 0; y < Map.Info.MapHeight; ++y) {
-				i = x + y * Map.Info.MapWidth;
-				if (Map.Fields[i].Visible[player] && !Map.Fields[i].Visible[opponent]) {
-					Map.Fields[i].Visible[opponent] = 1;
+				mf = Map.Field(x, y);
+				if (mf->Visible[player] && !mf->Visible[opponent]) {
+					mf->Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Index) {
 						Map.MarkSeenTile(x, y);
 					}
 				}
-				if (Map.Fields[i].Visible[opponent] && !Map.Fields[i].Visible[player]) {
-					Map.Fields[i].Visible[player] = 1;
+				if (mf->Visible[opponent] && !mf->Visible[player]) {
+					mf->Visible[player] = 1;
 					if (player == ThisPlayer->Index) {
 						Map.MarkSeenTile(x, y);
 					}

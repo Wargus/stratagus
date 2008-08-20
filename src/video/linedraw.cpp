@@ -64,10 +64,13 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef USE_OPENGL
-void (*VideoDrawPixel)(Uint32 color, int x, int y);
-static void (*VideoDoDrawPixel)(Uint32 color, int x, int y);
-void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
-static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
+#include "renderer.h"
+
+static Primitive16_555_t render16_555;
+static Primitive16_565_t render16_565;
+static Primitive32_t render32;
+static CPrimitives *Renderer = NULL;
+
 #endif
 
 // ===========================================================================
@@ -79,131 +82,12 @@ static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char a
 /**
 **  FIXME: docu
 */
-static void VideoDoDrawPixel16(Uint32 color, int x, int y)
-{
-	((Uint16 *)TheScreen->pixels)[x + y * Video.Width] = color;
-}
-
-/**
-**  FIXME: docu
-*/
-void VideoDrawPixel16(Uint32 color, int x, int y)
-{
-	Video.LockScreen();
-	VideoDoDrawPixel16(color, x, y);
-	Video.UnlockScreen();
-}
-
-/**
-**  FIXME: docu
-*/
-static void VideoDoDrawPixel32(Uint32 color, int x, int y)
-{
-	((Uint32 *)TheScreen->pixels)[x + y * Video.Width] = color;
-}
-
-/**
-**  FIXME: docu
-*/
-void VideoDrawPixel32(Uint32 color, int x, int y)
-{
-	Video.LockScreen();
-	VideoDoDrawPixel32(color, x, y);
-	Video.UnlockScreen();
-}
-
-/**
-**  FIXME: docu
-*/
-static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
-{
-	Uint16 *p;
-	unsigned long dp;
-
-	// Loses precision for speed
-	alpha = (255 - alpha) >> 3;
-
-	p = &((Uint16 *)TheScreen->pixels)[x + y * Video.Width];
-	color = (((color << 16) | color) & 0x07E0F81F);
-	dp = *p;
-	dp = ((dp << 16) | dp) & 0x07E0F81F;
-	dp = ((((dp - color) * alpha) >> 5) + color) & 0x07E0F81F;
-	*p = (dp >> 16) | dp;
-}
-
-/**
-**  FIXME: docu
-*/
-void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
-{
-	Video.LockScreen();
-	VideoDoDrawTransPixel16(color, x, y, alpha);
-	Video.UnlockScreen();
-}
-
-/**
-**  FIXME: docu
-*/
-static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
-{
-	unsigned long sp2;
-	unsigned long dp1;
-	unsigned long dp2;
-	Uint32 *p;
-
-	alpha = 255 - alpha;
-
-	p = &((Uint32*)TheScreen->pixels)[x + y * Video.Width];
-
-	sp2 = (color & 0xFF00FF00) >> 8;
-	color &= 0x00FF00FF;
-
-	dp1 = *p;
-	dp2 = (dp1 & 0xFF00FF00) >> 8;
-	dp1 &= 0x00FF00FF;
-
-	dp1 = ((((dp1 - color) * alpha) >> 8) + color) & 0x00FF00FF;
-	dp2 = ((((dp2 - sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
-	*p = (dp1 | (dp2 << 8));
-}
-
-/**
-**  FIXME: docu
-*/
-void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
-{
-	Video.LockScreen();
-	VideoDoDrawTransPixel32(color, x, y, alpha);
-	Video.UnlockScreen();
-}
-
-/**
-**  FIXME: docu
-*/
-static void VideoDoDrawPixelClip(Uint32 color, int x, int y)
-{
-	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
-		VideoDoDrawPixel(color, x, y);
-	}
-}
-
-/**
-**  FIXME: docu
-*/
 void CVideo::DrawPixelClip(Uint32 color, int x, int y)
 {
-	LockScreen();
-	VideoDoDrawPixelClip(color, x, y);
-	UnlockScreen();
-}
-
-/**
-**  FIXME: docu
-*/
-static void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
-{
 	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
-		VideoDoDrawTransPixel(color, x, y, alpha);
+		LockScreen();
+		Renderer->DrawPixel(color, x, y);
+		UnlockScreen();
 	}
 }
 
@@ -212,9 +96,11 @@ static void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char 
 */
 void CVideo::DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
-	LockScreen();
-	VideoDoDrawTransPixelClip(color, x, y, alpha);
-	UnlockScreen();
+	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
+		LockScreen();
+		Renderer->DrawTransPixel(color, x, y, alpha);
+		UnlockScreen();
+	}
 }
 
 /**
@@ -223,9 +109,7 @@ void CVideo::DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 void CVideo::DrawVLine(Uint32 color, int x, int y, int height)
 {
 	LockScreen();
-	for (int i = 0; i < height; ++i) {
-		VideoDoDrawPixel(color, x, y + i);
-	}
+	Renderer->DrawLine(color, x, y, x, (y + height));
 	UnlockScreen();
 }
 
@@ -236,9 +120,7 @@ void CVideo::DrawTransVLine(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
 	LockScreen();
-	for (int i = 0; i < height; ++i) {
-		VideoDoDrawTransPixel(color, x, y + i, alpha);
-	}
+	Renderer->DrawTransLine(color, x, y, x, y + height, alpha);
 	UnlockScreen();
 }
 
@@ -258,10 +140,14 @@ void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
 void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
+	if (x < ClipX1 || x > ClipX2 ||
+	 	y > ClipY2 || y + height < ClipY1) return;
+	
+	if(y < ClipY1) y = ClipY1;
+	if(y + height > ClipY2) height = ClipY2 - y;
+	
 	LockScreen();
-	for (int i = 0; i < height; ++i) {
-		VideoDoDrawTransPixelClip(color, x, y + i, alpha);
-	}
+	Renderer->DrawTransLine(color, x, y, x, y + height, alpha);
 	UnlockScreen();
 }
 
@@ -271,9 +157,7 @@ void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
 void CVideo::DrawHLine(Uint32 color, int x, int y, int width)
 {
 	LockScreen();
-	for (int i = 0; i < width; ++i) {
-		VideoDoDrawPixel(color, x + i, y);
-	}
+	Renderer->DrawLine(color, x, y, x + width, y);
 	UnlockScreen();
 }
 
@@ -294,9 +178,7 @@ void CVideo::DrawTransHLine(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
 	LockScreen();
-	for (int i = 0; i < width; ++i) {
-		VideoDoDrawTransPixel(color, x + i, y, alpha);
-	}
+	Renderer->DrawTransLine(color, x, y, x + width, y, alpha);
 	UnlockScreen();
 }
 
@@ -306,11 +188,47 @@ void CVideo::DrawTransHLine(Uint32 color, int x, int y,
 void CVideo::DrawTransHLineClip(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
+	if (y < ClipY1 || y > ClipY2 ||
+		x >ClipX2 || x + width < ClipX1) return;	
+	
+	if(x < ClipX1) x = ClipX1;
+	if(x + width > ClipX2) width = ClipX2 - x;
+	
 	LockScreen();
-	for (int i = 0; i < width; ++i) {
-		VideoDoDrawTransPixelClip(color, x + i, y, alpha);
-	}
+	Renderer->DrawTransLine(color, x, y, x + width, y, alpha);
 	UnlockScreen();
+}
+
+/** Check to see if a line intersects another */
+static inline
+bool LineIntersectLine( const int v1[2], const int v2[2], 
+				const int v3[2], const int v4[2] )
+{
+#define X 0
+#define Y 1
+    float denom = ((v4[Y] - v3[Y]) * (v2[X] - v1[X])) - ((v4[X] - v3[X]) * (v2[Y] - v1[Y]));
+
+    if ( denom < 0.000000001f && denom > -0.000000001f )
+    {
+//        if ( numerator == 0.0f && numerator2 == 0.0f )
+//        {
+ //           return false;//COINCIDENT;
+ //       }
+        return false;// PARALLEL;
+    }
+    
+    float numerator = ((v4[X] - v3[X]) * (v1[Y] - v3[Y])) - ((v4[Y] - v3[Y]) * (v1[X] - v3[X]));
+    float ua = numerator / denom;
+    
+    if(ua < 0.0f || ua > 1.0f) return false;
+    
+    float numerator2 = ((v2[X] - v1[X]) * (v1[Y] - v3[Y])) - ((v2[Y] - v1[Y]) * (v1[X] - v3[X]));
+    float ub = numerator2/ denom;
+
+	return (ub >= 0.0f && ub <= 1.0f);
+    //return (ua >= 0.0f && ua <= 1.0f && ub >= 0.0f && ub <= 1.0f);
+#undef X
+#undef Y
 }
 
 /**
@@ -318,109 +236,9 @@ void CVideo::DrawTransHLineClip(Uint32 color, int x, int y,
 */
 void CVideo::DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
-	int x;
-	int y;
-	int xlen;
-	int ylen;
-	int incr;
-
-	if (sx == dx) {
-		if (sy < dy) {
-			DrawVLine(color, sx, sy, dy - sy + 1);
-		} else {
-			DrawVLine(color, dx, dy, sy - dy + 1);
-		}
-		return;
-	}
-
-	if (sy == dy) {
-		if (sx < dx) {
-			DrawHLine(color, sx, sy, dx - sx + 1);
-		} else {
-			DrawHLine(color, dx, dy, sx - dx + 1);
-		}
-		return;
-	}
-
-	// exchange coordinates
-	if (sy > dy) {
-		int t;
-		t = dx;
-		dx = sx;
-		sx = t;
-		t = dy;
-		dy = sy;
-		sy = t;
-	}
-	ylen = dy - sy;
-
-	if (sx > dx) {
-		xlen = sx - dx;
-		incr = -1;
-	} else {
-		xlen = dx - sx;
-		incr = 1;
-	}
-
-	y = sy;
-	x = sx;
-
-	if (xlen > ylen) {
-		int p;
-
-		if (sx > dx) {
-			int t;
-			t = sx;
-			sx = dx;
-			dx = t;
-			y = dy;
-		}
-
-		p = (ylen << 1) - xlen;
-
-		LockScreen();
-		for (x = sx; x < dx; ++x) {
-			VideoDoDrawPixel(color, x, y);
-			if (p >= 0) {
-				y += incr;
-				p += (ylen - xlen) << 1;
-			} else {
-				p += (ylen << 1);
-			}
-		}
-		UnlockScreen();
-		return;
-	}
-
-	if (ylen > xlen) {
-		int p;
-
-		p = (xlen << 1) - ylen;
-
-		LockScreen();
-		for (y = sy; y < dy; ++y) {
-			VideoDoDrawPixel(color, x, y);
-			if (p >= 0) {
-				x += incr;
-				p += (xlen - ylen) << 1;
-			} else {
-				p += (xlen << 1);
-			}
-		}
-		UnlockScreen();
-		return;
-	}
-
-	// Draw a diagonal line
-	if (ylen == xlen) {
-		LockScreen();
-		while (y != dy) {
-			VideoDoDrawPixel(color, x, y);
-			x += incr;
-			++y;
-		}
-		UnlockScreen();
-	}
+	LockScreen();
+	Renderer->DrawLine(color, sx, sy, dx, dy);
+	UnlockScreen();
 }
 
 /**
@@ -428,109 +246,91 @@ void CVideo::DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 */
 void CVideo::DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
-	int x;
-	int y;
-	int xlen;
-	int ylen;
-	int incr;
+	if(dy > sy)
+		if(dy < ClipY1 || sy > ClipY2) return;
+	else
+		if(sy < ClipY1 || dy > ClipY2) return;
 
-	if (sx == dx) {
-		if (sy < dy) {
-			DrawVLineClip(color, sx, sy, dy - sy + 1);
+	if(dx > sx)
+		if(dx < ClipX1 || sx > ClipX2) return;
+	else
+		if(sx < ClipX1 || dx > ClipX2) return;
+	
+	bool s_is_on_screen = sx >= ClipX1 && sx <= ClipX2 &&
+							sy >= ClipY1 && sy <= ClipY2;
+	bool d_is_on_screen = dx >= ClipX1 && dx <= ClipX2 &&
+							dy >= ClipY1 && dy <= ClipY2;
+
+	if(!(s_is_on_screen && d_is_on_screen)) {
+	
+
+		if(!s_is_on_screen && d_is_on_screen) {
+			// exchange coordinates
+			int t = dx;
+			dx = sx;
+			sx = t;
+			t = dy;
+			dy = sy;
+			sy = t;
+			s_is_on_screen = true; 
+			d_is_on_screen = false;
+		}
+
+			const int v1[] = {sx, sy};
+			const int v2[] = {dx, dy};
+			const int v3[] = {ClipX1, ClipY1};
+			const int v4[] = {ClipX1, ClipY2};
+			const int v5[] = {ClipX2, ClipY1};
+			const int v6[] = {ClipX2, ClipY2};
+
+	
+		if(s_is_on_screen && !d_is_on_screen) {
+						
+			//Thanks for good geometric Mr. Talles :)
+			
+			if(LineIntersectLine(v1, v2, v3, v4) ||
+				LineIntersectLine(v1, v2, v5, v6))
+			{
+				const int x_max = dx <= ClipX1 ? ClipX1 : ClipX2;
+				float tmp = (dy - sy);
+				tmp /= (dx - sx);
+				tmp *= (x_max - sx);
+				tmp += sy;
+		 		dy = tmp;
+		 		dx = x_max;
+		 	} else {
+		 		const int y_max = dy <= ClipY1 ? ClipY1 : ClipY2;
+		 		float tmp = (dx - sx);
+		 		tmp /= (dy - sy);
+		 		tmp *= (y_max - sy);
+		 		tmp += sx;
+		 		dx = tmp;
+		 		dy = y_max;
+		 	}
 		} else {
-			DrawVLineClip(color, dx, dy, sy - dy + 1);
-		}
-		return;
-	}
-
-	if (sy == dy) {
-		if (sx < dx) {
-			DrawHLineClip(color, sx, sy, dx - sx + 1);
-		} else {
-			DrawHLineClip(color, dx, dy, sx - dx + 1);
-		}
-		return;
-	}
-
-	// exchange coordinates
-	if (sy > dy) {
-		int t;
-		t = dx;
-		dx = sx;
-		sx = t;
-		t = dy;
-		dy = sy;
-		sy = t;
-	}
-	ylen = dy - sy;
-
-	if (sx > dx) {
-		xlen = sx - dx;
-		incr = -1;
-	} else {
-		xlen = dx - sx;
-		incr = 1;
-	}
-
-	y = sy;
-	x = sx;
-
-	if (xlen > ylen) {
-		int p;
-
-		if (sx > dx) {
-			int t;
-			t = sx;
-			sx = dx;
-			dx = t;
-			y = dy;
-		}
-
-		p = (ylen << 1) - xlen;
-
-		LockScreen();
-		for (x = sx; x < dx; ++x) {
-			VideoDoDrawPixelClip(color, x, y);
-			if (p >= 0) {
-				y += incr;
-				p += (ylen - xlen) << 1;
-			} else {
-				p += (ylen << 1);
+			const int v7[] = {ClipX1, ClipY1};
+			const int v8[] = {ClipX2, ClipY1};
+			const int v9[] = {ClipX1, ClipY2};
+			const int v0[] = {ClipX2, ClipY2};
+					
+		 	//both are out of screen we have to check Intersection		
+			if(!LineIntersectLine(v1, v2, v3, v4) &&
+				!LineIntersectLine(v1, v2, v5, v6) &&
+				!LineIntersectLine(v1, v2, v7, v8) &&
+				!LineIntersectLine(v1, v2, v9, v0))
+			{
+				return;
 			}
-		}
-		UnlockScreen();
-		return;
+			DebugPrint("FIXME: Corrupted Line coordinates: [%d,%d]: [%d,%d]\n" 
+						_C_ sx _C_ sy _C_ dx _C_ dy);
+
+			return;//FIXME: add cliping code insteed of return
+		}				
 	}
-
-	if (ylen > xlen) {
-		int p;
-
-		p = (xlen << 1) - ylen;
-
-		LockScreen();
-		for (y = sy; y < dy; ++y) {
-			VideoDoDrawPixelClip(color, x, y);
-			if (p >= 0) {
-				x += incr;
-				p += (xlen - ylen) << 1;
-			} else {
-				p += (xlen << 1);
-			}
-		}
-		UnlockScreen();
-		return;
-	}
-
-	// Draw a diagonal line
-	if (ylen == xlen) {
-		LockScreen();
-		while (y != dy) {
-			VideoDoDrawPixelClip(color, x, y);
-			x += incr;
-			++y;
-		}
-		UnlockScreen();
-	}
+		
+	LockScreen();
+	Renderer->DrawLine(color, sx, sy, dx, dy);
+	UnlockScreen();
 }
 
 /**
@@ -539,8 +339,9 @@ void CVideo::DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 void CVideo::DrawTransLine(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
 {
-	// FIXME: trans
-	DrawLine(color, sx, sy, dx, dy);
+	LockScreen();
+	Renderer->DrawTransLine(color, sx, sy, dx, dy,alpha);
+	UnlockScreen();
 }
 
 /**
@@ -548,11 +349,9 @@ void CVideo::DrawTransLine(Uint32 color, int sx, int sy,
 */
 void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
-	DrawHLine(color, x, y, w);
-	DrawHLine(color, x, y + h - 1, w);
-
-	DrawVLine(color, x, y + 1, h - 2);
-	DrawVLine(color, x + w - 1, y + 1, h - 2);
+	LockScreen();
+	Renderer->DrawRectangle(color, x, y, w, h);
+	UnlockScreen();
 }
 
 /**
@@ -560,9 +359,14 @@ void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
 */
 void CVideo::DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
 {
-	DrawHLineClip(color, x, y, w);
-	DrawHLineClip(color, x, y + h - 1, w);
-
+	DrawTransPixelClip(color, x, y, 128);
+	DrawHLineClip(color, x + 1, y, w - 2);
+	DrawTransPixelClip(color, x + w - 1, y, 128);
+	
+	DrawTransPixelClip(color, x, y + h - 1, 128);
+	DrawHLineClip(color, x + 1, y + h - 1, w - 2);
+	DrawTransPixelClip(color, x + w - 1, y + h - 1, 128);
+	
 	DrawVLineClip(color, x, y + 1, h - 2);
 	DrawVLineClip(color, x + w - 1, y + 1, h - 2);
 }
@@ -573,11 +377,9 @@ void CVideo::DrawRectangleClip(Uint32 color, int x, int y, int w, int h)
 void CVideo::DrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	DrawTransHLine(color, x, y, w, alpha);
-	DrawTransHLine(color, x, y + h - 1, w, alpha);
-
-	DrawTransVLine(color, x, y + 1, h - 2, alpha);
-	DrawTransVLine(color, x + w - 1, y + 1, h - 2, alpha);
+	LockScreen();
+	Renderer->DrawTransRectangle(color, x, y, w, h, alpha);
+	UnlockScreen();
 }
 
 /**
@@ -593,9 +395,14 @@ void CVideo::DrawTransRectangle(Uint32 color, int x, int y,
 void CVideo::DrawTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	DrawTransHLineClip(color, x, y, w, alpha);
-	DrawTransHLineClip(color, x, y + h - 1, w, alpha);
-
+	DrawTransPixelClip(color, x, y, alpha / 2);
+	DrawTransHLineClip(color, x + 1, y, w - 2, alpha);
+	DrawTransPixelClip(color, x + w - 1, y, alpha / 2);
+	
+	DrawTransPixelClip(color, x, y + h - 1, alpha / 2);
+	DrawTransHLineClip(color, x + 1, y + h - 1, w - 2, alpha);
+	DrawTransPixelClip(color, x + w - 1, y + h - 1, alpha / 2);
+	
 	DrawTransVLineClip(color, x, y + 1, h - 2, alpha);
 	DrawTransVLineClip(color, x + w - 1, y + 1, h - 2, alpha);
 }
@@ -635,16 +442,8 @@ void CVideo::FillRectangleClip(Uint32 color, int x, int y,
 void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	int ex = x + w;
-	int ey = y + h;
-	int sx = x;
-
 	LockScreen();
-	for (; y < ey; ++y) {
-		for (x = sx; x < ex; ++x) {
-			VideoDoDrawTransPixel(color, x, y, alpha);
-		}
-	}
+	Renderer->FillTransRectangle(color, x, y, w, h, alpha);
 	UnlockScreen();
 }
 
@@ -663,32 +462,8 @@ void CVideo::FillTransRectangleClip(Uint32 color, int x, int y,
 */
 void CVideo::DrawCircle(Uint32 color, int x, int y, int r)
 {
-	int p;
-	int px;
-	int py;
-
-	p = 1 - r;
-	py = r;
-
 	LockScreen();
-	for (px = 0; px <= py + 1; ++px) {
-		VideoDoDrawPixel(color, x + px, y + py);
-		VideoDoDrawPixel(color, x + px, y - py);
-		VideoDoDrawPixel(color, x - px, y + py);
-		VideoDoDrawPixel(color, x - px, y - py);
-
-		VideoDoDrawPixel(color, x + py, y + px);
-		VideoDoDrawPixel(color, x + py, y - px);
-		VideoDoDrawPixel(color, x - py, y + px);
-		VideoDoDrawPixel(color, x - py, y - px);
-
-		if (p < 0) {
-			p += 2 * px + 3;
-		} else {
-			p += 2 * (px - py) + 5;
-			py -= 1;
-		}
-	}
+	Renderer->DrawCircle(color, x, y, r);
 	UnlockScreen();
 }
 
@@ -698,32 +473,8 @@ void CVideo::DrawCircle(Uint32 color, int x, int y, int r)
 void CVideo::DrawTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
-	int p;
-	int px;
-	int py;
-
-	p = 1 - r;
-	py = r;
-
 	LockScreen();
-	for (px = 0; px <= py + 1; ++px) {
-		VideoDoDrawTransPixel(color, x + px, y + py, alpha);
-		VideoDoDrawTransPixel(color, x + px, y - py, alpha);
-		VideoDoDrawTransPixel(color, x - px, y + py, alpha);
-		VideoDoDrawTransPixel(color, x - px, y - py, alpha);
-
-		VideoDoDrawTransPixel(color, x + py, y + px, alpha);
-		VideoDoDrawTransPixel(color, x + py, y - px, alpha);
-		VideoDoDrawTransPixel(color, x - py, y + px, alpha);
-		VideoDoDrawTransPixel(color, x - py, y - px, alpha);
-
-		if (p < 0) {
-			p += 2 * px + 3;
-		} else {
-			p += 2 * (px - py) + 5;
-			py -= 1;
-		}
-	}
+	Renderer->DrawTransCircle(color, x, y, r, alpha);
 	UnlockScreen();
 }
 
@@ -739,17 +490,22 @@ void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
 	p = 1 - r;
 	py = r;
 
+#define DoDrawPixelClip(color,x,y) \
+	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) { \
+		Renderer->DrawPixel(color, x, y); \
+	}
+
 	LockScreen();
 	for (px = 0; px <= py + 1; ++px) {
-		VideoDoDrawPixelClip(color, x + px, y + py);
-		VideoDoDrawPixelClip(color, x + px, y - py);
-		VideoDoDrawPixelClip(color, x - px, y + py);
-		VideoDoDrawPixelClip(color, x - px, y - py);
+		DoDrawPixelClip(color, x + px, y + py);
+		DoDrawPixelClip(color, x + px, y - py);
+		DoDrawPixelClip(color, x - px, y + py);
+		DoDrawPixelClip(color, x - px, y - py);
 
-		VideoDoDrawPixelClip(color, x + py, y + px);
-		VideoDoDrawPixelClip(color, x + py, y - px);
-		VideoDoDrawPixelClip(color, x - py, y + px);
-		VideoDoDrawPixelClip(color, x - py, y - px);
+		DoDrawPixelClip(color, x + py, y + px);
+		DoDrawPixelClip(color, x + py, y - px);
+		DoDrawPixelClip(color, x - py, y + px);
+		DoDrawPixelClip(color, x - py, y - px);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -759,6 +515,7 @@ void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
 		}
 	}
 	UnlockScreen();
+#undef DoDrawPixelClip
 }
 
 /**
@@ -774,17 +531,24 @@ void CVideo::DrawTransCircleClip(Uint32 color, int x, int y,
 	p = 1 - r;
 	py = r;
 
+#define DoDrawTransPixel(color,x,y, alpha) \
+	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) { \
+		Renderer->DrawTransPixel(color, x, y, alpha); \
+	}
+
+
 	LockScreen();
 	for (px = 0; px <= py + 1; ++px) {
-		VideoDoDrawTransPixelClip(color, x + px, y + py, alpha);
-		VideoDoDrawTransPixelClip(color, x + px, y - py, alpha);
-		VideoDoDrawTransPixelClip(color, x - px, y + py, alpha);
-		VideoDoDrawTransPixelClip(color, x - px, y - py, alpha);
 
-		VideoDoDrawTransPixelClip(color, x + py, y + px, alpha);
-		VideoDoDrawTransPixelClip(color, x + py, y - px, alpha);
-		VideoDoDrawTransPixelClip(color, x - py, y + px, alpha);
-		VideoDoDrawTransPixelClip(color, x - py, y - px, alpha);
+		DoDrawTransPixel(color, x + px, y + py, alpha);
+		DoDrawTransPixel(color, x + px, y - py, alpha);
+		DoDrawTransPixel(color, x - px, y + py, alpha);
+		DoDrawTransPixel(color, x - px, y - py, alpha);
+
+		DoDrawTransPixel(color, x + py, y + px, alpha);
+		DoDrawTransPixel(color, x + py, y - px, alpha);
+		DoDrawTransPixel(color, x - py, y + px, alpha);
+		DoDrawTransPixel(color, x - py, y - px, alpha);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -794,6 +558,7 @@ void CVideo::DrawTransCircleClip(Uint32 color, int x, int y,
 		}
 	}
 	UnlockScreen();
+#undef DoDrawTransPixel
 }
 
 /**
@@ -801,37 +566,9 @@ void CVideo::DrawTransCircleClip(Uint32 color, int x, int y,
 */
 void CVideo::FillCircle(Uint32 color, int x, int y, int r)
 {
-	int p;
-	int px;
-	int py;
-
-	p = 1 - r;
-	py = r;
-
-	for (px = 0; px <= py; ++px) {
-
-		// Fill up the middle half of the circle
-		DrawVLine(color, x + px, y, py + 1);
-		DrawVLine(color, x + px, y - py, py);
-		if (px) {
-			DrawVLine(color, x - px, y, py + 1);
-			DrawVLine(color, x - px, y - py, py);
-		}
-
-		if (p < 0) {
-			p += 2 * px + 3;
-		} else {
-			p += 2 * (px - py) + 5;
-			py -= 1;
-			// Fill up the left/right half of the circle
-			if (py >= px) {
-				DrawVLine(color, x + py + 1, y, px + 1);
-				DrawVLine(color, x + py + 1, y - px, px);
-				DrawVLine(color, x - py - 1, y, px + 1);
-				DrawVLine(color, x - py - 1, y - px,  px);
-			}
-		}
-	}
+	LockScreen();
+	Renderer->FillCircle(color, x, y, r);
+	UnlockScreen();
 }
 
 /**
@@ -840,37 +577,9 @@ void CVideo::FillCircle(Uint32 color, int x, int y, int r)
 void CVideo::FillTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
-	int p;
-	int px;
-	int py;
-
-	p = 1 - r;
-	py = r;
-
-	for (px = 0; px <= py; ++px) {
-
-		// Fill up the middle half of the circle
-		DrawTransVLine(color, x + px, y, py + 1, alpha);
-		DrawTransVLine(color, x + px, y - py, py, alpha);
-		if (px) {
-			DrawTransVLine(color, x - px, y, py + 1, alpha);
-			DrawTransVLine(color, x - px, y - py, py, alpha);
-		}
-
-		if (p < 0) {
-			p += 2 * px + 3;
-		} else {
-			p += 2 * (px - py) + 5;
-			py -= 1;
-			// Fill up the left/right half of the circle
-			if (py >= px) {
-				DrawTransVLine(color, x + py + 1, y, px + 1, alpha);
-				DrawTransVLine(color, x + py + 1, y - px, px, alpha);
-				DrawTransVLine(color, x - py - 1, y, px + 1, alpha);
-				DrawTransVLine(color, x - py - 1, y - px,  px, alpha);
-			}
-		}
-	}
+	LockScreen();
+	Renderer->FillTransCircle(color, x, y, r, alpha);
+	UnlockScreen();
 }
 
 /**
@@ -957,16 +666,21 @@ void InitLineDraw(void)
 {
 	switch (Video.Depth) {
 		case 16:
-			VideoDrawPixel = VideoDrawPixel16;
-			VideoDoDrawPixel = VideoDoDrawPixel16;
-			VideoDrawTransPixel = VideoDrawTransPixel16;
-			VideoDoDrawTransPixel = VideoDoDrawTransPixel16;
+			DebugPrint("Init 16bit Software Renderer\n");
+			if(TheScreen->format->Gmask == 0x7e0)
+			{
+				Renderer = &render16_565;
+			} else {
+				if(TheScreen->format->Gmask == 0x3e0) {
+					Renderer = &render16_555;
+				} else {
+					assert(0);
+				}
+			}
 			break;
 		case 32:
-			VideoDrawPixel = VideoDrawPixel32;
-			VideoDoDrawPixel = VideoDoDrawPixel32;
-			VideoDrawTransPixel = VideoDrawTransPixel32;
-			VideoDoDrawTransPixel = VideoDoDrawTransPixel32;
+			DebugPrint("Init 32bit Software Renderer\n");
+			Renderer = &render32;
 	}
 }
 

@@ -49,6 +49,7 @@
 #include "map.h"
 #include "interface.h"
 #include "ui.h"
+#include "editor.h"
 
 #include "intern_video.h"
 
@@ -114,6 +115,7 @@ void LoadCursors(const std::string &race)
 		if ((*i).G && !(*i).G->IsLoaded()) {
 			ShowLoadProgress("Cursor %s", (*i).G->File.c_str());
 			(*i).G->Load();
+			(*i).G->UseDisplayFormat();
 		}
 	}
 }
@@ -243,8 +245,10 @@ static void DrawBuildingCursor(void)
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = (CanBuildHere(NoUnitP, CursorBuilding, mx, my) != NULL);
-		ontop = NULL;
+		f = ((ontop = CanBuildHere(NoUnitP, CursorBuilding, mx, my)) != NULL);
+		if (!Editor.Running || (Editor.Running && ontop == (CUnit *)1)) {
+			ontop = NULL;
+		}
 	}
 
 	mask = CursorBuilding->MovementMask;

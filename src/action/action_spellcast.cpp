@@ -130,8 +130,8 @@ static void SpellMoveToTarget(CUnit *unit)
 		//
 		// goal/spot unreachable and out of range -- give up
 		//
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->State = unit->SubAction = 0;
+		unit->ClearAction();
+		unit->State = 0;
 
 		if (unit->Orders[0]->Goal) { // Release references
 			unit->Orders[0]->Goal->RefsDecrease();
@@ -181,8 +181,7 @@ void HandleActionSpellCast(CUnit *unit)
 				if (unit->Player->AiEnabled) {
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
-				unit->Orders[0]->Action = UnitActionStill;
-				unit->SubAction = 0;
+				unit->ClearAction();
 				if (unit->Orders[0]->Goal) {
 					unit->Orders[0]->Goal->RefsDecrease();
 					unit->Orders[0]->Goal = NoUnitP;
@@ -220,8 +219,7 @@ void HandleActionSpellCast(CUnit *unit)
 				}
 			}
 			if (!unit->ReCast && unit->Orders[0]->Action != UnitActionDie) {
-				unit->Orders[0]->Action = UnitActionStill;
-				unit->SubAction = 0;
+				unit->ClearAction();
 				if (unit->Orders[0]->Goal) {
 					unit->Orders[0]->Goal->RefsDecrease();
 					unit->Orders[0]->Goal = NoUnitP;

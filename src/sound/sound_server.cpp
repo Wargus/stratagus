@@ -27,7 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//      $Id$
 
 
 //@{
@@ -79,15 +78,15 @@ struct SoundChannel {
 static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
 
-// FIXME: move out of sound_server.cpp
-std::string CurrentMusicFile;    /// Current music filename
-
 static struct {
 	CSample *Sample;       /// Music sample
 	void (*FinishedCallback)(); /// Callback for when music finishes playing
 } MusicChannel;
 
 static void ChannelFinished(int channel);
+static int *MixerBuffer;
+static int MixerBufferSize;
+
 
 /*----------------------------------------------------------------------------
 --  Mixers
@@ -307,28 +306,25 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 */
 static void MixIntoBuffer(void *buffer, int samples)
 {
-	static int *mixer_buffer = NULL;
-	static int mixer_buffer_size = 0;
-
-	if (samples > mixer_buffer_size) {
-		delete[] mixer_buffer;
-		mixer_buffer = new int[samples];
-		mixer_buffer_size = samples;
+	if (samples > MixerBufferSize) {
+		delete[] MixerBuffer;
+		MixerBuffer = new int[samples];
+		MixerBufferSize = samples;
 	}
 
 	// FIXME: can save the memset here, if first channel sets the values
-	memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
+	memset(MixerBuffer, 0, samples * sizeof(*MixerBuffer));
 
 	if (EffectsEnabled) {
 		// Add channels to mixer buffer
-		MixChannelsToStereo32(mixer_buffer, samples);
+		MixChannelsToStereo32(MixerBuffer, samples);
 	}
 	if (MusicEnabled) {
 		// Add music to mixer buffer
-		MixMusicToStereo32(mixer_buffer, samples);
+		MixMusicToStereo32(MixerBuffer, samples);
 	}
 
-	ClipMixToStereo16(mixer_buffer, samples, (short *)buffer);
+	ClipMixToStereo16(MixerBuffer, samples, (short *)buffer);
 }
 
 /**
@@ -494,6 +490,22 @@ void StopChannel(int channel)
 }
 
 /**
+**  Stop all channels
+*/
+void StopAllChannels()
+{
+	SDL_LockAudio();
+
+	for (int i = 0; i < MaxChannels; ++i) {
+		if (Channels[i].Playing) {
+			ChannelFinished(i);
+		}
+	}
+
+	SDL_UnlockAudio();
+}
+
+/**
 **  Load a sample
 **
 **  @param name  File name of sample (short version).
@@ -632,7 +644,6 @@ int PlayMusic(CSample *sample)
 		StopMusic();
 		MusicChannel.Sample = sample;
 		MusicPlaying = true;
-		CurrentMusicFile.clear();
 		return 0;
 	} else {
 		DebugPrint("Could not play sample\n");
@@ -649,16 +660,14 @@ int PlayMusic(CSample *sample)
 */
 int PlayMusic(const std::string &file)
 {
-	char buffer[PATH_MAX];
+	char name[PATH_MAX];
 	CSample *sample;
 
 	if (!SoundEnabled() || !IsMusicEnabled()) {
 		return -1;
 	}
 
-	CurrentMusicFile.clear();
-
-	char *name = LibraryFileName(file.c_str(), buffer, sizeof(buffer));
+	LibraryFileName(file.c_str(), name, sizeof(name));
 
 	DebugPrint("play music %s\n" _C_ name);
 
@@ -679,7 +688,6 @@ int PlayMusic(const std::string &file)
 		StopMusic();
 		MusicChannel.Sample = sample;
 		MusicPlaying = true;
-		CurrentMusicFile = file;
 		return 0;
 	} else {
 		DebugPrint("Could not play %s\n" _C_ file.c_str());
@@ -837,6 +845,8 @@ void QuitSound(void)
 {
 	SDL_CloseAudio();
 	SoundInitialized = false;
+	delete[] MixerBuffer;
+	MixerBuffer = NULL;
 }
 
 //@}

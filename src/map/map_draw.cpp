@@ -48,6 +48,7 @@
 #include "ui.h"
 #include "missile.h"
 #include "unittype.h"
+#include "font.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -114,7 +115,7 @@ bool CViewport::IsInsideMapArea(int x, int y) const
 int CViewport::Viewport2MapX(int x) const
 {
 	int r = (x - this->X + this->MapX * TileSizeX + this->OffsetX) / TileSizeX;
-	return r < Map.Info.MapWidth ? r : Map.Info.MapWidth - 1;
+	return std::min(r, Map.Info.MapWidth - 1);
 }
 
 /**
@@ -129,7 +130,7 @@ int CViewport::Viewport2MapX(int x) const
 int CViewport::Viewport2MapY(int y) const
 {
 	int r = (y - this->Y + this->MapY * TileSizeY + this->OffsetY) / TileSizeY;
-	return r < Map.Info.MapHeight ? r : Map.Info.MapHeight - 1;
+	return std::min(r, Map.Info.MapHeight - 1);
 }
 
 /**
@@ -156,6 +157,15 @@ int CViewport::Map2ViewportX(int x) const
 int CViewport::Map2ViewportY(int y) const
 {
 	return this->Y + (y - this->MapY) * TileSizeY - this->OffsetY;
+}
+
+/**
+**  Convert map pixel coordinates into viewport coordinates.
+*/
+void CViewport::MapPixel2Viewport(int &x, int &y) const
+{
+	x = x + this->X - (this->MapX * TileSizeX + this->OffsetX);
+	y = y + this->Y - (this->MapY * TileSizeY + this->OffsetY);
 }
 
 /**
@@ -247,17 +257,27 @@ void CViewport::Center(int x, int y, int offsetx, int offsety)
 void CViewport::DrawMapBackgroundInViewport() const
 {
 	int ex = this->EndX;
-	int sy = this->MapY * Map.Info.MapWidth;
+	int sy = this->MapY;
 	int dy = this->Y - this->OffsetY;
 	int ey = this->EndY;
+	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
+	unsigned short int tile;
+	
+	while (sy  < 0) {
+		sy++;
+		dy += TileSizeY;
+	}
+	sy *=  Map.Info.MapWidth;
 
-	while (dy <= ey && (sy / Map.Info.MapWidth) < Map.Info.MapHeight) {
+	while (dy <= ey && sy  < map_max) {
+
+	/*
 		if (sy / Map.Info.MapWidth < 0) {
 			sy += Map.Info.MapWidth;
 			dy += TileSizeY;
 			continue;
 		}
-
+*/
 		int sx = this->MapX + sy;
 		int dx = this->X - this->OffsetX;
 		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
@@ -268,11 +288,45 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 
 			if (ReplayRevealMap) {
-				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].Tile, dx, dy);
+				tile = Map.Fields[sx].Tile;
 			} else {
-				Map.TileGraphic->DrawFrameClip(Map.Fields[sx].SeenTile, dx, dy);
+				tile = Map.Fields[sx].SeenTile;
 			}
+			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 
+#ifdef DEBUG
+			int my_mask = 0;
+			unsigned int color = 0;
+			if (Map.CheckMask(sx, MapFieldUnpassable))
+			{
+				my_mask = 1;
+			}
+			if (Map.CheckMask(sx, MapFieldNoBuilding))
+			{
+				my_mask |= 2;
+			}
+			switch(my_mask) {
+				case 1://tile only Unpassable
+					color = 0xFF0000;
+				break;
+				case 2://tile only NoBuilding
+					color = 0x00FF00;
+				break;
+				case 3://tile Unpassable and NoBuilding
+					color = 0xFF;
+				break;
+				default:
+				break;
+			}
+						
+			Video.DrawHLineClip(color, dx, dy, TileSizeX);
+			Video.DrawVLineClip(color, dx, dy, TileSizeY);
+			if ( 0 && my_mask ) {
+				VideoDrawNumber(dx + 2, dy +2, SmallFont, tile );
+				VideoDrawNumber(dx + 2, dy + SmallFont->Height() + 4,
+					 SmallFont, Map.Fields[sx].TilesetTile );
+			}
+#endif			
 			++sx;
 			dx += TileSizeX;
 		}

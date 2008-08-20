@@ -49,6 +49,7 @@
 #include "intern_video.h"
 #include "iocompat.h"
 #include "iolib.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -65,6 +66,21 @@ static std::list<CGraphic *> Graphics;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+/**
+**  Video draw the graphic clipped.
+**
+**  @param x   X screen position
+**  @param y   Y screen position
+*/
+void CGraphic::DrawClip(int x, int y) const
+{
+	int oldx = x;
+	int oldy = y;
+	int w = Width;
+	int h = Height;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawSub(x - oldx, y - oldy, w, h, x, y);
+}
 
 /**
 **  Video draw part of graphic.
@@ -163,18 +179,11 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 {
 #ifndef USE_OPENGL
-	DrawSub((frame % (Surface->w / Width)) * Width,
-		(frame / (Surface->w / Width)) * Height,
+	DrawSub(frame_map[frame].x, frame_map[frame].y,
 		Width, Height, x, y);
 #else
-	int sx, sy, ex, ey, n;
-
-	n = GraphicWidth / Width;
-	sx = (frame % n) * Width;
-	ex = sx + Width;
-	sy = (frame / n) * Height;
-	ey = sy + Height;
-	DrawTexture(this, Textures, sx, sy, ex, ey, x, y, 0);
+	DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
+	 frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 0);
 #endif
 }
 
@@ -185,21 +194,15 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 	int ox;
 	int oy;
 	int skip;
-	int w;
-	int h;
-	int sx, sy, ex, ey, n;
+	int w = Width;
+	int h = Height;
 
-	n = GraphicWidth / Width;
-	sx = (frame % n) * Width;
-	ex = sx + Width;
-	sy = (frame / n) * Height;
-	ey = sy + Height;
-
-	w = Width;
-	h = Height;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
 
-	DrawTexture(this, textures, sx + ox, sy + oy, sx + ox + w, sy + oy + h, x, y, 0);
+	DrawTexture(this, textures, frame_map[frame].x + ox, 
+								frame_map[frame].y + oy,
+	 							frame_map[frame].x + ox + w,
+	 							frame_map[frame].y + oy + h, x, y, 0);
 }
 #endif
 
@@ -213,8 +216,7 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
 {
 #ifndef USE_OPENGL
-	DrawSubClip((frame % (Surface->w / Width)) * Width,
-		(frame / (Surface->w / Width)) * Height,
+	DrawSubClip(frame_map[frame].x, frame_map[frame].y,
 		Width, Height, x, y);
 #else
 	DoDrawFrameClip(Textures, frame, x, y);
@@ -224,8 +226,7 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
 void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 {
 #ifndef USE_OPENGL
-	DrawSubTrans((frame % (Surface->w / Width)) * Width,
-		(frame / (Surface->w / Width)) * Height,
+	DrawSubTrans(frame_map[frame].x, frame_map[frame].y,
 		Width, Height, x, y, alpha);
 #else
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -238,8 +239,7 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 {
 #ifndef USE_OPENGL
-	DrawSubClipTrans((frame % (Surface->w / Width)) * Width,
-		(frame / (Surface->w / Width)) * Height,
+	DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
 		Width, Height, x, y, alpha);
 #else
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -286,9 +286,9 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 	SDL_Rect srect;
 	SDL_Rect drect;
 
-	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
-		Width)) * Width) - Width;
-	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.x = frameFlip_map[frame].x;
+	srect.y = frameFlip_map[frame].y;
+
 	srect.w = Width;
 	srect.h = Height;
 
@@ -297,14 +297,8 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 
 	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 #else
-	int sx, sy, ex, ey, n;
-
-	n = GraphicWidth / Width;
-	sx = (frame % n) * Width;
-	ex = sx + Width;
-	sy = (frame / n) * Height;
-	ey = sy + Height;
-	DrawTexture(this, Textures, sx, sy, ex, ey, x, y, 1);
+	DrawTexture(this, Textures, frame_map[frame].x, frame_map[frame].y,
+	 frame_map[frame].x +  Width, frame_map[frame].y + Height, x, y, 1);
 #endif
 }
 
@@ -315,18 +309,8 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 	int ox;
 	int oy;
 	int skip;
-	int w;
-	int h;
-	int sx, sy, ex, ey, n;
-
-	n = GraphicWidth / Width;
-	sx = (frame % n) * Width;
-	ex = sx + Width;
-	sy = (frame / n) * Height;
-	ey = sy + Height;
-
-	w = Width;
-	h = Height;
+	int w = Width;
+	int h = Height;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
 
 	if (w < Width) {
@@ -337,7 +321,10 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 		}
 	}
 
-	DrawTexture(this, textures, sx + ox, sy + oy, sx + ox + w, sy + oy + h, x, y, 1);
+	DrawTexture(this, textures, frame_map[frame].x + ox, 
+								frame_map[frame].y + oy,
+	 							frame_map[frame].x + ox + w,
+	 							frame_map[frame].y + oy + h, x, y, 1);
 }
 #endif
 
@@ -356,9 +343,9 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
 	int oldx;
 	int oldy;
 
-	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
-			Width)) * Width) - Width;
-	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.x = frameFlip_map[frame].x;
+	srect.y = frameFlip_map[frame].y;
+
 	srect.w = Width;
 	srect.h = Height;
 
@@ -384,9 +371,9 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 	SDL_Rect drect;
 	int oldalpha;
 
-	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
-		Width)) * Width) - Width;
-	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.x = frameFlip_map[frame].x;
+	srect.y = frameFlip_map[frame].y;
+
 	srect.w = Width;
 	srect.h = Height;
 
@@ -414,9 +401,8 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	int oldy;
 	int oldalpha;
 
-	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
-		Width)) * Width) - Width;
-	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.x = frameFlip_map[frame].x;
+	srect.y = frameFlip_map[frame].y;
 	srect.w = Width;
 	srect.h = Height;
 
@@ -556,13 +542,28 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 		ExitFatal(-1);
 	}
 	g->File = file;
-	char *hashfile = new char[file.size() + 32];
-	sprintf(hashfile, "%s%d", file.c_str(), HashCount++);
+	int bufSize = file.size() + 32;
+	char *hashfile = new char[bufSize];
+	snprintf(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
 	g->HashFile = hashfile;
 	delete[] hashfile;
 	g->Width = w;
 	g->Height = h;
 	GraphicHash[g->HashFile] = g;
+
+	return g;
+}
+
+/**
+**  Clone a graphic
+*/
+CGraphic *CGraphic::Clone() const
+{
+	CGraphic *g = CGraphic::ForceNew(this->File, this->Width, this->Height);
+
+	if (this->IsLoaded()) {
+		g->Load();
+	}
 
 	return g;
 }
@@ -585,8 +586,9 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 		ExitFatal(-1);
 	}
 	g->File = file;
-	char *hashfile = new char[file.size() + 32];
-	sprintf(hashfile, "%s%d", file.c_str(), HashCount++);
+	size_t bufSize = file.size() + 32;
+	char *hashfile = new char[bufSize];
+	snprintf(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
 	g->HashFile = hashfile;
 	delete[] hashfile;
 	g->Width = w;
@@ -595,6 +597,33 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 
 	return g;
 }
+
+void CGraphic::GenFramesMap()
+{
+	Assert(NumFrames != 0);
+#ifndef USE_OPENGL	
+	Assert(Surface != NULL);
+#else
+	Assert(GraphicWidth != 0);
+#endif
+	Assert(Width != 0);
+	Assert(Height != 0);
+
+	if(frame_map) delete[] frame_map;
+	
+	frame_map = new frame_pos_t[NumFrames];
+	
+	for(int frame = 0; frame < NumFrames; ++frame) {
+#ifndef USE_OPENGL
+		frame_map[frame].x = (frame % (Surface->w / Width)) * Width;
+		frame_map[frame].y = (frame / (Surface->w / Width)) * Height;
+#else
+		frame_map[frame].x = (frame % (GraphicWidth / Width)) * Width;
+		frame_map[frame].y = (frame / (GraphicWidth / Width)) * Height;
+#endif
+	}
+}
+
 
 /**
 **  Load a graphic
@@ -625,7 +654,7 @@ void CGraphic::Load()
 		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.c_str());
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
 			Width, Height, GraphicWidth, GraphicHeight);
-		ExitFatal(1);
+		ExitFatal(-1);
 	}
 
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
@@ -634,6 +663,29 @@ void CGraphic::Load()
 	MakeTexture(this);
 	Graphics.push_back(this);
 #endif
+	GenFramesMap();
+}
+
+/**
+**  Free a SDL surface
+**
+**  @param surface  SDL surface to free
+*/
+static void FreeSurface(SDL_Surface **surface)
+{
+	if (!*surface) {
+		return;
+	}
+
+	unsigned char *pixels = NULL;
+
+	if ((*surface)->flags & SDL_PREALLOC) {
+		pixels = (unsigned char *)(*surface)->pixels;
+	}
+
+	SDL_FreeSurface(*surface);
+	delete[] pixels;
+	*surface = NULL;
 }
 
 /**
@@ -643,10 +695,7 @@ void CGraphic::Load()
 */
 void CGraphic::Free(CGraphic *g)
 {
-#ifdef USE_OPENGL
-	int i;
-#endif
-	unsigned char *pixels;
+	//unsigned char *pixels;
 
 	if (!g) {
 		return;
@@ -664,7 +713,7 @@ void CGraphic::Free(CGraphic *g)
 		}
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 		if (cg) {
-			for (i = 0; i < PlayerMax; ++i) {
+			for (int i = 0; i < PlayerMax; ++i) {
 				if (cg->PlayerColorTextures[i]) {
 					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
 					delete[] cg->PlayerColorTextures[i];
@@ -674,25 +723,14 @@ void CGraphic::Free(CGraphic *g)
 
 		Graphics.remove(g);
 #endif
-
-		if (g->Surface) {
-			if (g->Surface->flags & SDL_PREALLOC) {
-				pixels = (unsigned char *)g->Surface->pixels;
-			} else {
-				pixels = NULL;
-			}
-			SDL_FreeSurface(g->Surface);
-			delete[] pixels;
-		}
+		FreeSurface(&g->Surface);
+		delete[] g->frame_map;
+		g->frame_map = NULL;		
 #ifndef USE_OPENGL
-		if (g->SurfaceFlip) {
-			if (g->SurfaceFlip->flags & SDL_PREALLOC) {
-				pixels = (unsigned char *)g->SurfaceFlip->pixels;
-			} else {
-				pixels = NULL;
-			}
-			SDL_FreeSurface(g->SurfaceFlip);
-			delete[] pixels;
+		FreeSurface(&g->SurfaceFlip);
+		if(g->frameFlip_map) {
+			delete[] g->frameFlip_map;
+		 	g->frameFlip_map = NULL;
 		}
 #endif
 
@@ -704,6 +742,27 @@ void CGraphic::Free(CGraphic *g)
 }
 
 #ifdef USE_OPENGL
+/**
+**  Free OpenGL graphics
+*/
+void FreeOpenGLGraphics(void)
+{
+	std::list<CGraphic *>::iterator i;
+	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
+		if ((*i)->Textures) {
+			glDeleteTextures((*i)->NumTextures, (*i)->Textures);
+		}
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
+		if (cg) {
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (cg->PlayerColorTextures[j]) {
+					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[j]);
+				}
+			}
+		}
+	}
+}
+
 /**
 **  Reload OpenGL graphics
 */
@@ -772,16 +831,104 @@ void CGraphic::Flip()
 			}
 			break;
 		case 4:
+		{
+			unsigned int p0 = s->pitch;
+			unsigned int p1 = Surface->pitch;
+			const int width =  s->w;
 			for (i = 0; i < s->h; ++i) {
-				for (j = 0; j < s->w; ++j) {
-					*(Uint32 *)&((char *)s->pixels)[j * 4 + i * s->pitch] =
-						*(Uint32 *)&((char *)Surface->pixels)[(s->w - j - 1) * 4 + i * Surface->pitch];
+#ifdef _MSC_VER
+				for (j = 0; j < width; ++j) {
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
 				}
+#else
+				int n = (width+7)/8;
+				switch (width & 7) {
+				case 0: do {
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;	
+				case 7:
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;	
+				case 6:
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;	
+				case 5:
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;				
+				case 4:
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;	
+				case 3:
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;	
+				case 2:
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;
+				case 1:	
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
+						*(Uint32 *)&((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
+					j++;
+					} while ( --n > 0 );
+				}
+#endif
+				p0 += s->pitch;
+				p1 += Surface->pitch;
 			}
-			break;
+		}
+		break;
 	}
 	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
+	
+	if(frameFlip_map) delete[] frameFlip_map;
+	
+	frameFlip_map = new frame_pos_t[NumFrames];
+	
+	for(int frame = 0; frame < NumFrames; ++frame) {
+		frameFlip_map[frame].x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
+									Width)) * Width) - Width;
+		frameFlip_map[frame].y = (frame / (SurfaceFlip->w / Width)) * Height;
+	}
+	
+	
+#endif
+}
+
+/**
+**  Convert the SDL surface to the display format
+*/
+void CGraphic::UseDisplayFormat()
+{
+#ifdef USE_OPENGL
+		return;
+#else
+	SDL_Surface *s;
+
+	s = Surface;
+	if (s->format->Amask != 0) {
+		Surface = SDL_DisplayFormatAlpha(s);
+	} else {
+		Surface = SDL_DisplayFormat(s);
+	}
+	SDL_FreeSurface(s);
+
+	if (SurfaceFlip) {
+		s = SurfaceFlip;
+		if (s->format->Amask != 0) {
+			SurfaceFlip = SDL_DisplayFormatAlpha(s);
+		} else {
+			SurfaceFlip = SDL_DisplayFormat(s);
+		}
+		SDL_FreeSurface(s);
+	}
 #endif
 }
 
@@ -832,13 +979,12 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	ckey = f->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	maxw = g->GraphicWidth - ow > GLMaxTextureSize ?
-		GLMaxTextureSize : g->GraphicWidth - ow;
-	maxh = g->GraphicHeight - oh > GLMaxTextureSize ?
-		GLMaxTextureSize : g->GraphicHeight - oh;
+	maxw = std::min(g->GraphicWidth - ow, GLMaxTextureSize);
+	maxh = std::min(g->GraphicHeight - oh, GLMaxTextureSize);
 	w = PowerOf2(maxw);
 	h = PowerOf2(maxh);
 	tex = new unsigned char[w * h * 4];
+	memset(tex, 0, w * h * 4);
 	if (g->Surface->flags & SDL_SRCALPHA) {
 		alpha = f->alpha;
 	} else {
@@ -910,7 +1056,14 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 			tp += 4;
 		}
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+
+	GLint internalformat = GL_RGBA;
+	if (GLTextureCompressionSupported && UseGLTextureCompression) {
+		internalformat = GL_COMPRESSED_RGBA;
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+
 #ifdef DEBUG
 	int x;
 	if ((x = glGetError())) {
@@ -1024,25 +1177,22 @@ void CGraphic::Resize(int w, int h)
 	// If the image has already been resized then get a clean copy first
 	if (Resized) {
 		if (Surface) {
-			if (Surface->flags & SDL_PREALLOC) {
-				pixels = (unsigned char *)Surface->pixels;
-			} else {
-				pixels = NULL;
-			}
-			SDL_FreeSurface(Surface);
-			delete[] pixels;
+			FreeSurface(&Surface);
+			Surface = NULL;
+		}		
+		if(frame_map) {
+			delete[] frame_map;
+			frame_map = NULL; 
 		}
 #ifndef USE_OPENGL
 		if (SurfaceFlip) {
-			if (SurfaceFlip->flags & SDL_PREALLOC) {
-				pixels = (unsigned char *)SurfaceFlip->pixels;
-			} else {
-				pixels = NULL;
-			}
-			SDL_FreeSurface(SurfaceFlip);
-			delete[] pixels;
+			FreeSurface(&SurfaceFlip);
+			SurfaceFlip = NULL;
 		}
-		SurfaceFlip = NULL;
+		if(frameFlip_map) {
+			delete[] frameFlip_map;
+		 	frameFlip_map = NULL;
+		}
 #endif
 
 		this->Width = this->Height = 0;
@@ -1056,13 +1206,13 @@ void CGraphic::Resize(int w, int h)
 	}
 
 	Resized = true;
+	Uint32 ckey = Surface->format->colorkey;
+	int useckey = Surface->flags & SDL_SRCCOLORKEY;
 
 	bpp = Surface->format->BytesPerPixel;
 	if (bpp == 1) {
 		SDL_Color pal[256];
-		Uint32 ckey;
-		int useckey;
-
+		
 		SDL_LockSurface(Surface);
 
 		pixels = (unsigned char *)Surface->pixels;
@@ -1078,15 +1228,10 @@ void CGraphic::Resize(int w, int h)
 
 		SDL_UnlockSurface(Surface);
 		memcpy(pal, Surface->format->palette->colors, sizeof(SDL_Color) * 256);
-		useckey = Surface->flags & SDL_SRCCOLORKEY;
-		ckey = Surface->format->colorkey;
 		SDL_FreeSurface(Surface);
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
 		SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
-		if (useckey) {
-			SDL_SetColorKey(Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
-		}
 	} else {
 		int ix, iy;
 		float fx, fy, fz;
@@ -1141,27 +1286,20 @@ void CGraphic::Resize(int w, int h)
 			}
 		}
 
+		int Rmask = Surface->format->Rmask;
+		int Gmask = Surface->format->Gmask;
+		int Bmask = Surface->format->Bmask;
+		int Amask = Surface->format->Amask;
+
 		SDL_UnlockSurface(Surface);
 		SDL_FreeSurface(Surface);
-
-		int Rmask, Gmask, Bmask, Amask;
-		if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
-			Rmask = 0x000000FF;
-			Gmask = 0x0000FF00;
-			Bmask = 0x00FF0000;
-			Amask = (bpp == 4) ? 0xFF000000 : 0;
-		} else {
-			int s = (bpp == 4) ? 0 : 8;
-			Rmask = 0xFF000000 >> s;
-			Gmask = 0x00FF0000 >> s;
-			Bmask = 0x0000FF00 >> s;
-			Amask = 0x000000FF >> s;
-		}
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
 			Rmask, Gmask, Bmask, Amask);
 	}
-
+	if (useckey) {
+		SDL_SetColorKey(Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+	}
 	Width = GraphicWidth = w;
 	Height = GraphicHeight = h;
 
@@ -1171,6 +1309,7 @@ void CGraphic::Resize(int w, int h)
 	Textures = NULL;
 	MakeTexture(this);
 #endif
+	GenFramesMap();
 }
 
 /**
@@ -1200,6 +1339,11 @@ bool CGraphic::TransparentPixel(int x, int y)
 			ret = true;
 		}
 	} else {
+		bool ckey = Surface->flags & SDL_SRCCOLORKEY > 0;
+		if(ckey && *p == Surface->format->colorkey)
+		{
+			ret = true;
+		} else
 		if (p[Surface->format->Ashift >> 3] == 255) {
 			ret = true;
 		}
@@ -1240,4 +1384,118 @@ void CGraphic::MakeShadow()
 #endif
 }
 
+CFiller::bits_map::~bits_map()
+{
+	if(bstore) {
+		free(bstore);
+		bstore = NULL;
+	}
+	Width = 0;
+	Height = 0;
+}
+
+void CFiller::bits_map::Init(CGraphic *g)
+{
+			SDL_Surface *s = g->Surface;
+			int bpp = s->format->BytesPerPixel;
+
+			if(bstore) 
+			{
+				free(bstore);
+				bstore = NULL;
+				Width = 0;
+				Height = 0;
+			}
+			
+			if ((bpp == 1 && !(s->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
+				return;
+			}	
+
+			Width = g->Width;
+			Height = g->Height;
+
+			size_t line = (Width + (sizeof(int) * 8) - 1) / (sizeof(int) * 8);
+			size_t size = line * Height;
+			
+			bstore = (unsigned int*)calloc(size, sizeof(unsigned int));
+
+			SDL_LockSurface(s);
+			
+			switch(s->format->BytesPerPixel)
+			{
+				case 1:
+				{
+				 	int ckey = s->format->colorkey;
+					unsigned char *ptr = (unsigned char *)s->pixels;
+					int i,j,k,p,l,lm;
+					for(i = 0; i < Height; ++i) {
+						l = i * Width;
+						lm = i * line;
+						k = 0;
+						p = 0;
+						for(j = 0; j < Width; ++j) {
+							bstore[lm + k] |= ((ptr[j + l] != ckey) ? (1 << p) : 0);
+							if(++p > 31) {
+								p = 0;
+								k++;
+							}
+						}
+					}					
+				}
+				break;
+				case 2:
+				case 3:
+				break;
+				case 4:
+					if(s->flags & SDL_SRCCOLORKEY == SDL_SRCCOLORKEY)
+					{
+				 		unsigned int ckey = s->format->colorkey;
+						unsigned int *ptr = (unsigned int *)s->pixels;
+						int i,j,k,p,l,lm;
+						for(i = 0; i < Height; ++i) {
+							l = i * Width;
+							lm = i * line;
+							k = 0;
+							p = 0;
+							for(j = 0; j < Width; ++j) {
+								bstore[lm + k] |= ((ptr[j + l] != ckey) ? (1 << p) : 0);
+								if(++p > 31) {
+									p = 0;
+									k++;
+								}
+							}
+						}
+					} else {
+						unsigned int *ptr = (unsigned int *)s->pixels;
+						int i,j,k,p,l,lm;
+						for(i = 0; i < Height; ++i) {
+							l = i * Width;
+							lm = i * line;
+							k = 0;
+							p = 0;
+							for(j = 0; j < Width; ++j) {
+								bstore[lm + k] |= ((ptr[j + l] & AMASK) ? (1 << p) : 0);
+								if(++p > 31) {
+									p = 0;
+									k++;
+								}
+							}
+						}
+					}	
+				break;
+				default:
+				break;
+			}
+				
+			SDL_UnlockSurface(s);
+}
+
+void CFiller::Load(void) {
+		if(G) {
+			G->Load();
+			map.Init(G);
+			G->UseDisplayFormat();
+		}
+}
+	
 //@}

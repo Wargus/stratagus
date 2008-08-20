@@ -63,6 +63,7 @@
 #include "commands.h"
 #include "script.h"
 #include "actions.h"
+#include "replay.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -73,166 +74,21 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  For saving lua state (table, number, string, bool, not function).
-**
-**  @param l        lua_State to save.
-**  @param is_root  true for the main call, 0 for recursif call.
-**
-**  @return  "" if nothing could be saved.
-**           else a string that could be executed in lua to restore lua state
-**  @todo    do the output prettier (adjust indentation, newline)
-*/
-std::string SaveGlobal(lua_State *l, bool is_root)
-{
-	int type_key;
-	int type_value;
-	std::string value;
-	int first;
-	std::string res;
-	std::string tmp;
-	int b;
-
-//	Assert(!is_root || !lua_gettop(l));
-	first = 1;
-	if (is_root) {
-		lua_pushstring(l, "_G");// global table in lua.
-		lua_gettable(l, LUA_GLOBALSINDEX);
-	}
-	const std::string sep = is_root ? "" : ", ";
-	Assert(lua_istable(l, -1));
-	lua_pushnil(l);
-	while (lua_next(l, -2)) {
-		type_key = lua_type(l, -2);
-		type_value = lua_type(l, -1);
-		const std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
-		if ((key == "_G") || (is_root &&
-				(key == "assert") || (key == "gcinfo") || (key == "getfenv") ||
-				(key == "unpack") || (key == "tostring") || (key == "tonumber") ||
-				(key == "setmetatable") || (key == "require") || (key == "pcall") ||
-				(key == "rawequal") || (key == "collectgarbage") || (key == "type") ||
-				(key == "getmetatable") || (key == "next") || (key == "print") ||
-				(key == "xpcall") || (key == "rawset") || (key == "setfenv") ||
-				(key == "rawget") || (key == "newproxy") || (key == "ipairs") ||
-				(key == "loadstring") || (key == "dofile") || (key == "_TRACEBACK") ||
-				(key == "_VERSION") || (key == "pairs") || (key == "__pow") ||
-				(key == "error") || (key == "loadfile") || (key == "arg") ||
-				(key == "_LOADED") || (key == "loadlib") || (key == "string") ||
-				(key == "os") || (key == "io") || (key == "debug") ||
-				(key == "coroutine") || (key == "Icons") || (key == "Upgrades") ||
-				(key == "Fonts") || (key == "FontColors") || (key == "expansion")
-				// other string to protected ?
-				)) {
-			lua_pop(l, 1); // pop the value
-			continue;
-		}
-		switch (type_value) {
-			case LUA_TNIL:
-				value = "nil";
-				break;
-			case LUA_TNUMBER:
-				value = lua_tostring(l, -1); // let lua do the conversion
-				break;
-			case LUA_TBOOLEAN:
-				b = lua_toboolean(l, -1);
-				value = b ? "true" : "false";
-				break;
-			case LUA_TSTRING:
-				value = std::string("\"") + lua_tostring(l, -1) + "\"";
-				break;
-			case LUA_TTABLE:
-				lua_pushvalue(l, -1);
-				tmp = SaveGlobal(l, false);
-				value = "";
-				if (!tmp.empty()) {
-					value = "{" + tmp + "}";
-				}
-				break;
-			case LUA_TFUNCTION:
-			// Could be done with string.dump(function)
-			// and debug.getinfo(function).name (could be nil for anonymous function)
-			// But not usefull yet.
-				value = "";
-				break;
-			case LUA_TUSERDATA:
-			case LUA_TTHREAD:
-			case LUA_TLIGHTUSERDATA:
-			case LUA_TNONE:
-			default : // no other cases
-				value = "";
-				break;
-		}
-		lua_pop(l, 1); /* pop the value */
-
-		// Check the validity of the key (only [a-zA-z_])
-		if (type_key == LUA_TSTRING) {
-			for (unsigned int i = 0; key[i]; ++i) {
-				if (!isalnum(key[i]) && key[i] != '_') {
-					value.clear();
-					break;
-				}
-			}
-		}
-		if (value.empty()) {
-			if (!is_root) {
-				lua_pop(l, 2); // pop the key and the table
-				return "";
-			}
-			continue;
-		}
-		if (type_key == LUA_TSTRING && key == value.c_str()) {
-			continue;
-		}
-		if (first) {
-			first = 0;
-			if (type_key == LUA_TSTRING) {
-				res = key + "=" + value;
-			} else {
-				res = value;
-			}
-		} else {
-			if (type_key == LUA_TSTRING) {
-				tmp = value;
-				value = key + "=" + value;
-				tmp = res;
-				res = res + sep + value;
-			} else {
-				res = res + sep + value;
-			}
-		}
-		tmp = res;
-		res += "\n";
-	}
-	lua_pop(l, 1); // pop the table
-//	Assert(!is_root || !lua_gettop(l));
-	return res;
-}
-
-/**
 ** Get the save directory and create dirs if needed
 */
 static std::string GetSaveDir()
 {
-	std::string dir;
-
-#ifdef USE_WIN32
-	dir = GameName;
-	mkdir(dir.c_str());
-	dir += "/save";
-	mkdir(dir.c_str());
+	struct stat tmp;
+	std::string dir(UserDirectory);
+	if(!GameName.empty()) {
+		dir += GameName;
+		dir += "/";
+	}
+	dir += "save";
+	if(stat(dir.c_str(), &tmp) < 0) {
+		makedir(dir.c_str(), 0777);
+	}
 	dir += "/";
-#else
-	dir = getenv("HOME");
-	dir += "/";
-	dir += STRATAGUS_HOME_PATH;
-	mkdir(dir.c_str(), 0777);
-	dir += "/";
-	dir += GameName;
-	mkdir(dir.c_str(), 0777);
-	dir += "/save";
-	mkdir(dir.c_str(), 0777);
-	dir += "/";
-#endif
-
 	return dir;
 }
 
@@ -248,9 +104,9 @@ void SaveGame(const std::string &filename)
 	time_t now;
 	CFile file;
 	std::string s;
-	std::string fullpath;
+	std::string fullpath(GetSaveDir());
 
-	fullpath = GetSaveDir() + filename;
+	fullpath += filename;
 	if (file.open(fullpath.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
 		fprintf(stderr, "Can't save to `%s'\n", filename.c_str());
 		return;
@@ -283,7 +139,7 @@ void SaveGame(const std::string &filename)
 	file.printf("} )\n\n");
 
 	// FIXME: probably not the right place for this
-	file.printf("SetGameCycle(%lu)\n", GameCycle);
+	file.printf("GameCycle = %lu\n", GameCycle);
 
 	SaveCcl(&file);
 	SaveUnitTypes(&file);

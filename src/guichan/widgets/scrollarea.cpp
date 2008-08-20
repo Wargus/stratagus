@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/exception.h"
 #include "guichan/widgets/scrollarea.h"
 
@@ -278,7 +278,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("Width should be greater then 0.");
+            //throw GCN_EXCEPTION("Width should be greater then 0.");
+            assert(!"Width should be greater then 0.");
         }
     }
 
@@ -867,7 +868,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("Only a ScrollArea's content may be moved to top.");
+            //throw GCN_EXCEPTION("Only a ScrollArea's content may be moved to top.");
+            assert(!"Only a ScrollArea's content may be moved to top.");
         }
     }
 
@@ -882,7 +884,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("Only a ScrollArea's content may be moved to bottom.");
+            //throw GCN_EXCEPTION("Only a ScrollArea's content may be moved to bottom.");
+            assert(!"Only a ScrollArea's content may be moved to bottom.");
         }
     }
 
@@ -895,7 +898,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("Called by not-child.");
+            //throw GCN_EXCEPTION("Called by not-child.");
+            assert(!"Called by not-child.");
         }
     }
 
@@ -908,7 +912,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("Widget not in scrollarea.");
+            //throw GCN_EXCEPTION("Widget not in scrollarea.");
+            assert(!"Widget not in scrollarea.");
         }    
     }
   
@@ -987,7 +992,8 @@ namespace gcn
               break;
 
           default:
-              throw GCN_EXCEPTION("Horizontal scroll policy invalid.");
+              //throw GCN_EXCEPTION("Horizontal scroll policy invalid.");
+              assert(!"Horizontal scroll policy invalid.");
         }
 
         switch (mVPolicy)
@@ -1011,7 +1017,8 @@ namespace gcn
               }
               break;
           default:
-              throw GCN_EXCEPTION("Vertical scroll policy invalid.");
+              //throw GCN_EXCEPTION("Vertical scroll policy invalid.");
+              assert(!"Vertical scroll policy invalid.");
         }
     }
 

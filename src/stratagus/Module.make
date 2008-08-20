@@ -29,6 +29,6 @@ MODULE = src/stratagus
 MSRC =   construct.cpp groups.cpp iolib.cpp mainloop.cpp missile.cpp \
          player.cpp script.cpp script_missile.cpp script_player.cpp \
          script_spell.cpp selection.cpp spells.cpp stratagus.cpp translate.cpp \
-         util.cpp
+         util.cpp luacallback.cpp title.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

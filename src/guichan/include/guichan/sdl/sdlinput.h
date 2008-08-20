@@ -105,6 +105,8 @@ namespace gcn
 
         virtual MouseInput dequeueMouseInput();
 
+		virtual void processKeyRepeat();
+
         /**
          * Converts an SDL keysym to a Key object.
          *
@@ -128,7 +130,9 @@ namespace gcn
 
         bool mMouseDown;
         bool mMouseInWindow;
-    };  
+		Key mLastKey;
+		bool mIsRepeating;
+	};  
 }
 
 #endif // end GCN_SDLINPUT_HPP

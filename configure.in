@@ -109,9 +109,9 @@ fi
 AC_ARG_ENABLE(debug,
 	[  --enable-debug	  [Enable debug (default: no)]])
 if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
-	CXXFLAGS="$CXXFLAGS -O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
+	CXXFLAGS="$CXXFLAGS -O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math -fno-exceptions"
 else
-	CXXFLAGS="$CXXFLAGS -O0 -g -fsigned-char -Wsign-compare -Werror -Wall"
+	CXXFLAGS="$CXXFLAGS -O0 -g -fsigned-char -Wsign-compare -Werror -Wall -fno-exceptions"
 	CPPFLAGS="$CPPFLAGS -DDEBUG"
 fi
 

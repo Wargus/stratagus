@@ -97,6 +97,13 @@ namespace gcn
          * @param rectangle another Rectangle.
          */
         bool intersect(const Rectangle& rectangle);
+        bool intersect(const Rectangle& rectangle) const
+        {
+ 			return !(rectangle.x > x + width ||
+		 			rectangle.y > y + height ||
+		 			x > rectangle.x + rectangle.width ||
+		 			y > rectangle.y + rectangle.height);	
+        }
 
         /**
          * Checks if a point is inside the Rectangle.

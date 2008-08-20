@@ -164,8 +164,9 @@ int DoActionMove(CUnit *unit)
 		d = unit->Data.Move.Length + 1;
 	}
 
+	unit->Data.Move.Cycles++;//reset have to be manualy controled by caller.
 	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
-			Map.Fields[unit->X + unit->Y*Map.Info.MapWidth].Cost);
+			Map.Field(unit->X, unit->Y)->Cost);
 
 	unit->IX += xd * move;
 	unit->IY += yd * move;
@@ -183,7 +184,7 @@ int DoActionMove(CUnit *unit)
 /**
 **  Unit move action:
 **
-**  Move to a place or to an unit (can move).
+**  Move to a place or to a unit (can move).
 **  Tries 10x to reach the target, note this are the complete tries.
 **  If the target entered another unit, move to it's position.
 **  If the target unit is destroyed, continue to move to it's last position.
@@ -205,7 +206,7 @@ void HandleActionMove(CUnit *unit)
 	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
 		NewResetPath(unit);
-
+		unit->Data.Move.Cycles = 0;
 		Assert(unit->State == 0);
 	}
 
@@ -223,16 +224,12 @@ void HandleActionMove(CUnit *unit)
 			}
 			// FALL THROUGH
 		case PF_REACHED:
-			unit->SubAction = 0;
 			// Release target, if any.
 			if ((goal = unit->Orders[0]->Goal)) {
 				goal->RefsDecrease();
 				unit->Orders[0]->Goal = NoUnitP;
 			}
-			unit->Orders[0]->Action = UnitActionStill;
-			if (unit->Selected) { // update display for new action
-				SelectedUnitChanged();
-			}
+			unit->ClearAction();
 			return;
 
 		default:

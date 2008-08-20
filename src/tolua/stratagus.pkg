@@ -37,6 +37,9 @@ setmetatable(FontColors, mt)
 mt = { __index = function(t, key) return UnitTypeByIdent(key) end }
 UnitTypes = {}
 setmetatable(UnitTypes, mt)
+
+function GameStarting()
+end
 $]
 
 #define MaxCosts 7
@@ -44,6 +47,7 @@ $]
 #define ScoreCost MaxCosts + 1
 #define MaxResourceInfo MaxCosts + 2
 #define PlayerMax 16
+#define PlayerNumNeutral (PlayerMax - 1)
 #define UnitMax 2048
 
 #define NoButton 0
@@ -67,6 +71,9 @@ $pfile "editor.pkg"
 $pfile "game.pkg"
 $pfile "map.pkg"
 $pfile "ai.pkg"
+$pfile "pathfinder.pkg"
+$pfile "trigger.pkg"
+$pfile "particle.pkg"
 
 extern const char *Translate(const char *str);
 extern void AddTranslation(const char *str1, const char *str2);
@@ -80,5 +87,10 @@ extern void DeleteSaveGame(const std::string filename);
 
 extern const char *Translate @ _(const char *str);
 
+extern int SyncRand(void);
+extern int SyncRand(int max);
+
 void Exit(int err);
 
+$extern std::string CliMapName;
+extern std::string CliMapName;

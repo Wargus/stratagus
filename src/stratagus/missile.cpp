@@ -61,6 +61,7 @@
 
 #include "util.h"
 #include "trigger.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -120,7 +121,7 @@ void LoadMissileSprites(void)
 **
 **  @return       Missile type pointer.
 */
-MissileType *MissileTypeByIdent(const std::string& ident)
+MissileType *MissileTypeByIdent(const std::string &ident)
 {
 	return MissileTypeMap[ident];
 }
@@ -132,18 +133,19 @@ MissileType *MissileTypeByIdent(const std::string& ident)
 **
 **  @return       New allocated (zeroed) missile-type pointer.
 */
-MissileType *NewMissileTypeSlot(const std::string& ident)
+MissileType *NewMissileTypeSlot(const std::string &ident)
 {
 	MissileType *mtype;
 
-	mtype = new MissileType;
-	mtype->Ident = ident;
+	mtype = new MissileType(ident);
 	MissileTypeMap[ident] = mtype;
 	MissileTypes.push_back(mtype);
 	return mtype;
 }
 
-
+/**
+**  Constructor
+*/
 Missile::Missile() :
 	SourceX(0), SourceY(0), X(0), Y(0),	DX(0), DY(0),
 	Type(NULL), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
@@ -158,18 +160,17 @@ Missile::Missile() :
 /**
 **  Initialize a new made missile.
 **
-**  @param mtype    Type pointer of missile.
-**  @param sx       Missile x start point in pixel.
-**  @param sy       Missile y start point in pixel.
-**  @param dx       Missile x destination point in pixel.
-**  @param dy       Missile y destination point in pixel.
+**  @param mtype  Type pointer of missile.
+**  @param sx     Missile x start point in pixel.
+**  @param sy     Missile y start point in pixel.
+**  @param dx     Missile x destination point in pixel.
+**  @param dy     Missile y destination point in pixel.
 **
-**  @return         created missile.
+**  @return       created missile.
 */
 Missile *Missile::Init(MissileType *mtype, int sx, int sy, int dx, int dy)
 {
 	Missile *missile = NULL;
-
 
 	switch (mtype->Class) {
 		case MissileClassNone :
@@ -273,7 +274,7 @@ Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 **  Free a missile.
 **
 **  @param missiles  Missile pointer.
-**  @param i         FIXME: docu
+**  @param i         Index in missiles of missile to free
 */
 static void FreeMissile(std::vector<Missile *> &missiles, std::vector<Missile*>::size_type i)
 {
@@ -327,8 +328,7 @@ static int CalculateDamageStats(const CUnitStats *attacker_stats,
 		piercing_damage *= 2;
 	}
 
-	damage = (basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) > 1 ?
-		(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) : 1;
+	damage = std::max(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value, 1);
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);
@@ -493,12 +493,16 @@ void FireMissile(CUnit *unit)
 static void GetMissileMapArea(const Missile *missile, int *sx, int *sy,
 	int *ex, int *ey)
 {
-#define Bound(x, y) (x) < 0 ? 0 : ((x) > (y) ? (y) : (x))
-	*sx = Bound(missile->X / TileSizeX, Map.Info.MapWidth - 1);
-	*sy = Bound(missile->Y / TileSizeY, Map.Info.MapHeight - 1);
-	*ex = Bound((missile->X + missile->Type->Width) / TileSizeX, Map.Info.MapWidth - 1);
-	*ey = Bound((missile->Y + missile->Type->Height) / TileSizeY, Map.Info.MapHeight - 1);
-#undef Bound
+#define BoundX(x) std::min(std::max(0, x), Map.Info.MapWidth - 1)
+#define BoundY(y) std::min(std::max(0, y), Map.Info.MapHeight - 1)
+
+	*sx = BoundX(missile->X / TileSizeX);
+	*sy = BoundY(missile->Y / TileSizeY);
+	*ex = BoundX((missile->X + missile->Type->Width + TileSizeX - 1) / TileSizeX);
+	*ey = BoundY((missile->Y + missile->Type->Height + TileSizeY - 1) / TileSizeY);
+
+#undef BoundX
+#undef BoundY
 }
 
 /**
@@ -637,12 +641,13 @@ static int MissileDrawLevelCompare(const void *v1, const void *v2)
 /**
 **  Sort visible missiles on map for display.
 **
-**  @param vp     Viewport pointer.
-**  @param table  OUT : array of missile to display sorted by DrawLevel.
+**  @param vp         Viewport pointer.
+**  @param table      OUT : array of missile to display sorted by DrawLevel.
+**  @param tablesize  Size of table array
 **
-**  @return       number of missiles, (size of table).
+**  @return           number of missiles returned in table
 */
-int FindAndSortMissiles(const CViewport *vp, Missile **table)
+int FindAndSortMissiles(const CViewport *vp, Missile **table, int tablesize)
 {
 	int nmissiles;
 	std::vector<Missile *>::const_iterator i;
@@ -651,7 +656,7 @@ int FindAndSortMissiles(const CViewport *vp, Missile **table)
 	// Loop through global missiles, then through locals.
 	//
 	nmissiles = 0;
-	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
+	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end() && nmissiles < tablesize; ++i) {
 		if ((*i)->Delay || (*i)->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -661,7 +666,7 @@ int FindAndSortMissiles(const CViewport *vp, Missile **table)
 		}
 	}
 
-	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
+	for (i = LocalMissiles.begin(); i != LocalMissiles.end() && nmissiles < tablesize; ++i) {
 		if ((*i)->Delay || (*i)->Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -917,6 +922,12 @@ void MissileHit(Missile *missile)
 	if (missile->Type->ImpactMissile) {
 		MakeMissile(missile->Type->ImpactMissile, x, y, x, y);
 	}
+	if (missile->Type->ImpactParticle) {
+		missile->Type->ImpactParticle->pushPreamble();
+		missile->Type->ImpactParticle->pushInteger(x);
+		missile->Type->ImpactParticle->pushInteger(y);
+		missile->Type->ImpactParticle->run();
+	}
 
 	if (!missile->SourceUnit) {  // no owner - green-cross ...
 		return;
@@ -956,7 +967,7 @@ void MissileHit(Missile *missile)
 	// Hits all units in range.
 	//
 	i = missile->Type->Range;
-	n = UnitCacheSelect(x - i + 1, y - i + 1, x + i, y + i, table);
+	n = Map.Select(x - i + 1, y - i + 1, x + i, y + i, table);
 	Assert(missile->SourceUnit != NULL);
 	for (i = 0; i < n; ++i) {
 		goal = table[i];
@@ -1156,11 +1167,8 @@ void MissileActions(void)
 */
 int ViewPointDistanceToMissile(const Missile *missile)
 {
-	int x;
-	int y;
-
-	x = (missile->X + missile->Type->Width / 2) / TileSizeX;
-	y = (missile->Y + missile->Type->Height / 2) / TileSizeY;  // pixel -> tile
+	int x = (missile->X + missile->Type->Width / 2) / TileSizeX;
+	int y = (missile->Y + missile->Type->Height / 2) / TileSizeY;  // pixel -> tile
 
 	return ViewPointDistance(x, y);
 }
@@ -1228,7 +1236,7 @@ void SaveMissiles(CFile *file)
 	std::vector<Missile *>::const_iterator i;
 
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: missiles $Id$\n\n");
+	file->printf("--- MODULE: missiles\n\n");
 
 	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
 		(*i)->SaveMissile(file);
@@ -1274,11 +1282,27 @@ void InitMissileTypes(void)
 }
 
 /**
+**  Constructor.
+*/
+MissileType::MissileType(const std::string &ident) :
+	Ident(ident), Transparency(0), Width(0), Height(0),
+	DrawLevel(0), SpriteFrames(0), NumDirections(0),
+	Flip(false), CanHitOwner(false), FriendlyFire(false),
+	Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
+	Range(0), SplashFactor(0), ImpactMissile(NULL),
+	SmokeMissile(NULL), ImpactParticle(NULL), G(NULL)
+{
+	FiredSound.Sound = NULL;
+	ImpactSound.Sound = NULL;
+};
+
+/**
 **  Destructor.
 */
 MissileType::~MissileType()
 {
 	CGraphic::Free(this->G);
+	delete ImpactParticle;
 }
 
 /**
@@ -1316,6 +1340,17 @@ void CleanMissiles(void)
 	}
 	LocalMissiles.clear();
 }
+
+#ifdef DEBUG
+void FreeBurningBuildingFrames()
+{
+	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
+			i != BurningBuildingFrames.end(); ++i) {
+		delete *i;
+	}
+	BurningBuildingFrames.clear();
+}
+#endif
 
 /*----------------------------------------------------------------------------
 --    Functions (Spells Controllers/Callbacks) TODO: move to another file?
@@ -1575,7 +1610,7 @@ void MissileFlameShield::Action()
 	if (this->TTL & 7) {
 		return;
 	}
-	n = UnitCacheSelect(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
+	n = Map.Select(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i] == unit) {
 			// cannot hit target unit
@@ -1587,6 +1622,20 @@ void MissileFlameShield::Action()
 	}
 }
 
+struct _MissileLandMineExp {
+	const CUnit *const source;
+	int CanHitOwner;
+	_MissileLandMineExp(const CUnit *unit, int hit):
+		 source(unit), CanHitOwner(hit) {}
+	inline bool operator() (CUnit *const unit) {
+		return (
+				!(unit == source && !CanHitOwner) &&
+				unit->Type->UnitType != UnitTypeFly &&
+				unit->Orders[0]->Action != UnitActionDie
+				);
+	}
+};
+
 /**
 **  Land mine controller.
 **  @todo start-finish-start cyclic animation.(anim scripts!)
@@ -1594,27 +1643,16 @@ void MissileFlameShield::Action()
 */
 void MissileLandMine::Action()
 {
-	CUnit *table[UnitMax];
-	int i;
-	int n;
-	int x;
-	int y;
+	int x = this->X / TileSizeX;
+	int y = this->Y / TileSizeY;
 
-	x = this->X / TileSizeX;
-	y = this->Y / TileSizeY;
-
-	n = UnitCacheOnTile(x, y, table);
-	for (i = 0; i < n; ++i) {
-		if (table[i]->Type->UnitType != UnitTypeFly &&
-				table[i]->Orders[0]->Action != UnitActionDie &&
-				!(table[i] == this->SourceUnit && !this->Type->CanHitOwner)) {
-			DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);
-			MissileHit(this);
-			this->TTL = 0;
-			return;
-		}
+	_MissileLandMineExp filter(this->SourceUnit, this->Type->CanHitOwner);
+	if(Map.Field(x,y)->UnitCache.find(filter) != NULL) {
+		DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);	
+		MissileHit(this);
+		this->TTL = 0;
+		return;	
 	}
-
 	if (!this->AnimWait--) {
 		NextMissileFrame(this, 1, 0);
 		this->AnimWait = this->Type->Sleep;
@@ -1753,7 +1791,7 @@ void MissileDeathCoil::Action()
 			x = this->DX / TileSizeX;
 			y = this->DY / TileSizeY;
 
-			n = UnitCacheSelect(x - 2, y - 2, x + 2 + 1, y + 2 + 1, table);
+			n = Map.Select(x - 2, y - 2, x + 2 + 1, y + 2 + 1, table);
 			if (n == 0) {
 				return;
 			}

@@ -33,11 +33,17 @@
 
 //@{
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#ifdef _MSC_VER
+#define STDCALL __stdcall
+#else
+#define STDCALL
+#endif
 
-#include "map.h"
+#if defined(DEBUG_ASTAR)
+#define AstarDebugPrint(x) DebugPrint(x)
+#else
+#define AstarDebugPrint(x)
+#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -75,7 +81,7 @@ extern int AStarFixedUnitCrossingCost;
 	/// cost associated to move on a tile occupied by a moving unit
 extern int AStarMovingUnitCrossingCost;
 	/// Whether to have knowledge of terrain that we haven't visited yet
-extern int AStarKnowUnknown;
+extern bool AStarKnowUnseenTerrain;
 	/// Cost of using a square we haven't seen before.
 extern int AStarUnknownTerrainCost;
 
@@ -90,12 +96,19 @@ extern const int XY2Heading[3][3];
 --  Functions
 ----------------------------------------------------------------------------*/
 
+	/// Init the pathfinder
+extern void InitPathfinder();
+	/// Free the pathfinder
+extern void FreePathfinder();
+
 	/// Create a matrix for the old pathfinder
 extern unsigned char *CreateMatrix(void);
 	/// Allocate a new matrix and initialize
 extern unsigned char *MakeMatrix(void);
 	/// Get next element of the way to goal.
 extern int NewPath(CUnit *unit);
+	/// Returns the next element of the path
+extern int NextPathElement(CUnit *unit, int *xdp, int *ydp);
 	/// Return distance to unit.
 extern int UnitReachable(const CUnit *unit, const CUnit *dst, int range);
 	/// Can the unit 'src' reach the place x,y
@@ -103,24 +116,27 @@ extern int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
 	int minrange, int maxrange);
 
 //
-// in astar.c
+// in astar.cpp
 //
-	/// Returns the next element of the path
-extern int NextPathElement(CUnit *unit, int *xdp, int *ydp);
-
 	/// Init the a* data structures
-extern void InitAStar(void);
+extern void InitAStar(int mapWidth, int mapHeight, int (STDCALL *costMoveTo)(int x, int y, void *data));
 
 	/// free the a* data structures
 extern void FreeAStar(void);
 
 	/// Find and a* path for a unit
-extern int AStarFindPath(const CUnit *unit, int gx, int gy, int gw, int gh,
-	int minrange, int maxrange, char *path);
-//
-// in ccl_pathfinder.c
-//
-	/// register ccl features
+extern int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
+	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data);
+
+extern void SetAStarFixedUnitCrossingCost(int cost);
+extern int GetAStarFixedUnitCrossingCost();
+
+extern void SetAStarMovingUnitCrossingCost(int cost);
+extern int GetAStarMovingUnitCrossingCost();
+
+extern void SetAStarUnknownTerrainCost(int cost);
+extern int GetAStarUnknownTerrainCost();
+
 extern void PathfinderCclRegister(void);
 
 //@}

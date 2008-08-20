@@ -35,20 +35,15 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include "stratagus.h"
-
 #include <stdlib.h>
 #include <string.h>
 
+#include "stratagus.h"
+
+
 #include "SDL.h"
 
-#include "iolib.h"
-#include "iocompat.h"
-#include "sound.h"
 #include "sound_server.h"
-#include "interface.h"
-#include "results.h"
-#include "util.h"
 #include "script.h"
 
 /*----------------------------------------------------------------------------

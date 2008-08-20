@@ -71,7 +71,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	j = 0;
 
 	for (j = 0; j < args; ++j) {
@@ -126,7 +126,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	j = 0;
 
 	lua_rawgeti(l, -1, j + 1);
@@ -528,7 +528,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -548,7 +548,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			lua_pop(l, 1);
 		} else {
 			for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
-				if (!strcmp(value, UnitTypeVar.BoolFlagName[i].c_str())) {
+				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
 					lua_rawgeti(l, -1, j + 1);
 					condition->BoolFlag[i] = Ccl2Condition(l, LuaToString(l, -1));
 					lua_pop(l, 1);
@@ -611,7 +611,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -715,7 +715,7 @@ static int CclDefineSpell(lua_State *l)
 			if (!lua_istable(l, i + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, i + 1);
+			subargs = lua_objlen(l, i + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, i + 1, k + 1);
 				spell->Action.push_back(CclSpellAction(l));

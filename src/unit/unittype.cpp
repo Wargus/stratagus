@@ -57,10 +57,8 @@
 #include "script.h"
 #include "spells.h"
 #include "iolib.h"
-
+#include "luacallback.h"
 #include "util.h"
-
-#include "myendian.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -101,28 +99,119 @@ int DefaultResourceAmounts[MaxCosts];
 --  Functions
 ----------------------------------------------------------------------------*/
 
+CUnitType::CUnitType() :
+	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
+	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
+	Animations(NULL), StillFrame(0),
+	DeathExplosion(NULL), CorpseType(NULL),
+	Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
+	BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
+	ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
+	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
+	CanCastSpell(NULL), AutoCastActive(NULL),
+	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),
+	CanTransport(NULL), MaxOnBoard(0),
+	StartingResources(0),
+	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
+	MouseAction(0), Points(0), CanTarget(0),
+	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
+	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
+	PermanentCloak(0), DetectCloak(0),
+	Coward(0), AttackFromTransporter(0),
+	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
+	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
+	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
+	Indestructible(0), Teleporter(0),
+	BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
+	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
+	Sprite(NULL), ShadowSprite(NULL)
+{
+#ifdef USE_MNG
+	memset(&Portrait, 0, sizeof(Portrait));
+#endif
+	memset(_Costs, 0, sizeof(_Costs));
+	memset(RepairCosts, 0, sizeof(RepairCosts));
+	memset(CanStore, 0, sizeof(CanStore));
+	memset(ResInfo, 0, sizeof(ResInfo));
+	memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
+	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
+}
+
+CUnitType::~CUnitType()
+{
+	delete DeathExplosion;
+
+	delete[] Variable;
+	delete[] BoolFlag;
+	delete[] CanTargetFlag;
+	delete[] CanTransport;
+
+	for (int i = 0; i < PlayerMax; ++i) {
+		delete[] Stats[i].Variables;
+	}
+
+	// Free Building Restrictions if there are any
+	for (std::vector<CBuildRestriction *>::iterator b = BuildingRules.begin();
+			b != BuildingRules.end(); ++b) {
+		delete *b;
+	}
+	BuildingRules.clear();
+
+	delete[] CanCastSpell;
+	delete[] AutoCastActive;
+
+	for (int res = 0; res < MaxCosts; ++res) {
+		if (this->ResInfo[res]) {
+			if (this->ResInfo[res]->SpriteWhenLoaded) {
+				CGraphic::Free(this->ResInfo[res]->SpriteWhenLoaded);
+			}
+			if (this->ResInfo[res]->SpriteWhenEmpty) {
+				CGraphic::Free(this->ResInfo[res]->SpriteWhenEmpty);
+			}
+			delete this->ResInfo[res];
+		}
+	}
+
+	CGraphic::Free(Sprite);
+	CGraphic::Free(ShadowSprite);
+#ifdef USE_MNG
+	if (type->Portrait.Num) {
+		for (j = 0; j < type->Portrait.Num; ++j) {
+			delete type->Portrait.Mngs[j];
+			delete[] type->Portrait.Files[j];
+		}
+		delete[] type->Portrait.Mngs;
+		delete[] type->Portrait.Files;
+	}
+#endif
+
+}
+
 /**
 **  Update the player stats for changed unit types.
 **  @param reset indicates wether default value should be set to each stat (level, upgrades)
 */
 void UpdateStats(int reset)
 {
+	CUnitType *type;
+	CUnitStats *stats;
+
 	//
 	//  Update players stats
 	//
 	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		CUnitType *type = UnitTypes[j];
+		type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
 			for (int player = 0; player < PlayerMax; ++player) {
-				CUnitStats *stats = &type->Stats[player];
+				stats = &type->Stats[player];
 				for (unsigned int i = 0; i < MaxCosts; ++i) {
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (!stats->Variables) {
 					stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
 				}
-				for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) {
+				for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 					stats->Variables[i] = type->Variable[i];
 				}
 			}
@@ -232,7 +321,7 @@ static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int
 	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
 	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
-			UnitTypeVar.VariableName[i].c_str(), stats->Variables[i].Value,
+			UnitTypeVar.VariableName[i], stats->Variables[i].Value,
 			stats->Variables[i].Max, stats->Variables[i].Increase,
 			stats->Variables[i].Enable ? ", Enable = true" : "");
 	}
@@ -378,14 +467,23 @@ static int GetStillFrame(CUnitType *type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		Assert(UnitTypes[i]->Slot == (int)i);
+	CUnitType *type;
+
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		type = UnitTypes[i];
+		Assert(type->Slot == (int)i);
 
 		//  Add idents to hash.
-		UnitTypeMap[UnitTypes[i]->Ident] = UnitTypes[i];
+		UnitTypeMap[type->Ident] = UnitTypes[i];
 
 		// Determine still frame
-		UnitTypes[i]->StillFrame = GetStillFrame(UnitTypes[i]);
+		type->StillFrame = GetStillFrame(type);
+
+		// Lookup BuildingTypes
+		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
+			b < type->BuildingRules.end(); ++b) {
+			(*b)->Init();
+		}
 	}
 
 	// LUDO : called after game is loaded -> don't reset stats !
@@ -491,13 +589,6 @@ void LoadUnitTypes(void)
 		}
 
 		//
-		// Lookup BuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-			b < type->BuildingRules.end(); ++b) {
-			(*b)->Init();
-		}
-
-		//
 		// Load Sprite
 		//
 #ifndef DYNAMIC_LOAD
@@ -520,8 +611,11 @@ static void CleanAnimation(CAnimation *anim)
 	ptr = anim;
 	while (ptr->Type != AnimationNone) {
 		if (ptr->Type == AnimationSound) {
-			delete ptr->D.Sound.Name;
+			delete[] ptr->D.Sound.Name;
 		} else if (ptr->Type == AnimationRandomSound) {
+			for (unsigned int i = 0; i < ptr->D.RandomSound.NumSounds; ++i) {
+				delete[] ptr->D.RandomSound.Name[i];
+			}
 			delete[] ptr->D.RandomSound.Name;
 			delete[] ptr->D.RandomSound.Sound;
 		}
@@ -535,15 +629,12 @@ static void CleanAnimation(CAnimation *anim)
 */
 void CleanUnitTypes(void)
 {
-	CUnitType *type;
-	int j;
-	int res;
 
 	DebugPrint("FIXME: icon, sounds not freed.\n");
 
 	// FIXME: scheme contains references on this structure.
 	// Clean all animations.
-	for (j = 0; j < NumAnimations; ++j) {
+	for (int j = 0; j < NumAnimations; ++j) {
 		CleanAnimation(AnimationsArray[j]);
 	}
 	NumAnimations = 0;
@@ -556,55 +647,7 @@ void CleanUnitTypes(void)
 
 	// Clean all unit-types
 
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		type = UnitTypes[i];
-
-		Assert(!type->Ident.empty());
-		Assert(!type->Name.empty());
-
-		delete[] type->Variable;
-		delete[] type->BoolFlag;
-		delete[] type->CanTargetFlag;
-		delete[] type->CanTransport;
-
-		for (j = 0; j < PlayerMax; j++) {
-			delete[] type->Stats[j].Variables;
-		}
-
-		// Free Building Restrictions if there are any
-		for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-			b != type->BuildingRules.end(); ++b) {
-			delete *b;
-		}
-		type->BuildingRules.clear();
-		delete[] type->CanCastSpell;
-		delete[] type->AutoCastActive;
-
-		for (res = 0; res < MaxCosts; ++res) {
-			if (type->ResInfo[res]) {
-				if (type->ResInfo[res]->SpriteWhenLoaded) {
-					CGraphic::Free(type->ResInfo[res]->SpriteWhenLoaded);
-				}
-				if (type->ResInfo[res]->SpriteWhenEmpty) {
-					CGraphic::Free(type->ResInfo[res]->SpriteWhenEmpty);
-				}
-				delete type->ResInfo[res];
-			}
-		}
-
-		CGraphic::Free(type->Sprite);
-		CGraphic::Free(type->ShadowSprite);
-#ifdef USE_MNG
-		if (type->Portrait.Num) {
-			for (j = 0; j < type->Portrait.Num; ++j) {
-				delete type->Portrait.Mngs[j];
-				delete[] type->Portrait.Files[j];
-			}
-			delete[] type->Portrait.Mngs;
-			delete[] type->Portrait.Files;
-		}
-#endif
-
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		delete UnitTypes[i];
 	}
 	UnitTypes.clear();
@@ -613,6 +656,9 @@ void CleanUnitTypes(void)
 	delete[] UnitTypeVar.BoolFlagName;
 	UnitTypeVar.BoolFlagName = NULL;
 	UnitTypeVar.NumberBoolFlag = 0;
+	for (unsigned int j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
+		delete[] UnitTypeVar.VariableName[j];
+	}
 	delete[] UnitTypeVar.VariableName;
 	UnitTypeVar.VariableName = NULL;
 	delete[] UnitTypeVar.Variable;

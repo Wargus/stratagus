@@ -207,6 +207,11 @@ static void AiCleanForce(unsigned int force)
 			AiPlayer->Force[force].Units.erase(
 				AiPlayer->Force[force].Units.begin() + i);
 			continue;
+		} else if (aiunit->Orders[0]->Action == UnitActionDie) {
+			aiunit->RefsDecrease();
+			AiPlayer->Force[force].Units.erase(
+				AiPlayer->Force[force].Units.begin() + i);
+			continue;
 		}
 		++i;
 	}
@@ -340,7 +345,7 @@ void AiAssignToForce(CUnit *unit)
 /**
 **  Assign free units to force.
 */
-void AiAssignFreeUnitsToForce()
+void AiAssignFreeUnitsToForce(void)
 {
 	const CUnit *aiunit;
 	CUnit *table[UnitMax];
@@ -362,7 +367,7 @@ void AiAssignFreeUnitsToForce()
 			for (i = 0; i < n; ++i) {
 				if (table[i] == aiunit) {
 					table[i] = table[--n];
-					break ;
+					//break ;
 				}
 			}
 		}
@@ -404,22 +409,53 @@ static void AiAttack(unsigned int &force, int goalX, int goalY)
 		}
 		force = f;
 	}
+
 	AiCleanForce(force);
-	if (AiPlayer->Force[force].Units.empty()) {
-		AiPlayer->Force[force].Attacking = false;
-		return ;
-	}
-	//  Send all units in the force to enemy.
-	AiPlayer->Force[force].Attacking = true;
-	AiPlayer->Force[force].State = 0;
 
-	AiPlayer->Force[force].GoalX = goalX;
-	AiPlayer->Force[force].GoalY = goalY;
-	// To avoid lot of CPU consuption, send them with a small time difference.
-	for (unsigned int i = 0; i < AiPlayer->Force[force].Units.size(); ++i) {
-		CUnit &aiunit = *AiPlayer->Force[force].Units[i];
+	AiPlayer->Force[force].Attacking = false;
+	if (!AiPlayer->Force[force].Units.empty()) {
+		AiPlayer->Force[force].Attacking = true;
 
-		aiunit.Wait = i;
+		if(goalX == -1 || goalY == -1) {
+			const CUnit *enemy = NULL;
+			const std::vector<CUnit *> &force_units = AiPlayer->Force[force].Units;
+			const size_t max_iter = force_units.size();
+			for (unsigned int iter = 0; !enemy && iter < max_iter; ++iter) {
+				CUnit *aiunit = force_units[iter];
+				if (aiunit->Type->CanAttack) {
+					enemy = AttackUnitsInDistance(aiunit, MaxMapWidth);
+				}
+			}
+			if (enemy) {
+				goalX = enemy->X;
+				goalY = enemy->Y;
+			}
+		}
+		if(goalX == -1 || goalY == -1) {
+			DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
+			if (!AiPlayer->Force[force].State &&
+					!AiPlanAttack(&AiPlayer->Force[force])) {
+				DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
+				AiPlayer->Force[force].Attacking = false;
+			}
+			return;
+		}
+		AiPlayer->Force[force].State = 0;
+		DebugPrint("%d: Attacking with force #%d\n" _C_ AiPlayer->Player->Index _C_ force);
+
+		//
+		//  Send all units in the force to enemy.
+		//
+		// To avoid lot of CPU consuption, send them with a small time difference.
+		for (unsigned int i = 0; i < AiPlayer->Force[force].Units.size(); ++i) {
+			CUnit *aiunit = AiPlayer->Force[force].Units[i];
+			aiunit->Wait = i;
+			if (aiunit->Type->CanAttack) {
+				CommandAttack(aiunit, goalX, goalY, NULL, FlushCommands);
+			} else {
+				CommandMove(aiunit, goalX, goalY, FlushCommands);
+			}
+		}
 	}
 }
 
@@ -430,13 +466,13 @@ static void AiAttack(unsigned int &force, int goalX, int goalY)
 **  @param x      X tile map position to be attacked.
 **  @param y      Y tile map position to be attacked.
 */
-void AiAttackWithForceAt(unsigned int force, unsigned int x, unsigned int y)
+void AiAttackWithForceAt(unsigned int force, int x, int y)
 {
 	if (!(force < AI_MAX_FORCES)) {
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
-	if (!(x < static_cast<unsigned int>(Map.Info.MapWidth) && y < static_cast<unsigned int>(Map.Info.MapHeight))) {
+	if (!(x < static_cast<int>(Map.Info.MapWidth) && y < static_cast<int>(Map.Info.MapHeight))) {
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ x _C_ y
 			_C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
 		return ;
@@ -458,6 +494,8 @@ void AiAttackWithForce(unsigned int force)
 	AiAttack(force, -1, -1);
 }
 
+//FIXME: rb - I don't know if AI can use transport now
+#if 0
 /**
 **  Load all unit before attack.
 **
@@ -521,7 +559,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		}
 	}
 }
-
+#endif
 
 /**
 ** Force on attack ride. We attack until there is no unit or enemy left.
@@ -536,6 +574,11 @@ static void AiForceAttacks(AiForce *force)
 	const CUnit *unit;
 	unsigned int i;
 
+	if (force->Units.empty()) {
+		force->Attacking = false;
+		return;
+	}
+#if 0
 	force->Attacking = false;
 	for (i = 0; i < force->Units.size(); ++i) {
 		aiunit = force->Units[i];
@@ -562,9 +605,11 @@ static void AiForceAttacks(AiForce *force)
 		AiGroupAttackerForTransport(*force);
 		return ;
 	}
+#endif
+
 	// Find a unit that isn't idle
 	unit = NoUnitP;
-	if (force->State == 3) {
+//	if (force->State == 3) {
 		for (i = 0; i < force->Units.size(); ++i) {
 			aiunit = force->Units[i];
 			if (!aiunit->IsIdle()) {
@@ -579,7 +624,7 @@ static void AiForceAttacks(AiForce *force)
 				}
 			}
 		}
-	}
+//	}
 	if (unit != NoUnitP) {
 		// Give idle units a new goal
 		// FIXME: may not be a good goal
@@ -608,6 +653,8 @@ static void AiForceAttacks(AiForce *force)
 			}
 		}
 	} else { // Everyone is idle, find a new target
+//FIXME: rb - I don't know if AI can use transport now
+#if 0
 		if (force->State == 3) {
 			unit = NULL;
 
@@ -643,6 +690,31 @@ static void AiForceAttacks(AiForce *force)
 			}
 		}
 		force->State = 3;
+#else
+		unit = NULL;
+		for (i = 0; i < force->Units.size(); ++i) {
+			aiunit = force->Units[i];
+			if (aiunit->Type->CanAttack) {
+				unit = AttackUnitsInDistance(aiunit, MaxMapWidth);
+				break;
+			}
+		}
+		if (!unit) {
+			// No enemy found, give up
+			// FIXME: should the force go home or keep trying to attack?
+			DebugPrint("Attack force can't find a target, giving up\n");
+			force->Attacking = false;
+			return;
+		}
+		for (i = 0; i < force->Units.size(); ++i) {
+			aiunit = force->Units[i];
+			if (aiunit->Type->CanAttack) {
+				CommandAttack(aiunit, unit->X, unit->Y, NULL, FlushCommands);
+			} else {
+				CommandMove(aiunit, unit->X, unit->Y, FlushCommands);
+			}
+		}
+#endif
 	}
 }
 

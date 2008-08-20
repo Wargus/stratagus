@@ -40,6 +40,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "animation.h"
 #include "upgrade.h"
@@ -47,6 +48,7 @@
 #include "script.h"
 #include "spells.h"
 #include "pathfinder.h"
+#include "map.h"
 #include "trigger.h"
 #include "actions.h"
 #include "construct.h"
@@ -117,6 +119,45 @@ static CUnit *CclGetUnit(lua_State *l)
 }
 
 /**
+**  Get a unit pointer from ref string
+**
+**  @param l  Lua state.
+**
+**  @return   The unit pointer
+*/
+static CUnit *CclGetUnitFromRef(lua_State *l)
+{
+	const char *const value = LuaToString(l, -1);
+	int slot = strtol(value + 1, NULL, 16);
+	Assert(UnitSlots[slot]);
+	return UnitSlots[slot];
+}
+
+/**
+**  Get a position from lua state
+**
+**  @param l  Lua state.
+**	@param x  pointer to output x position.
+**	@param y  pointer to output y position.
+**
+**  @return   The unit pointer
+*/
+template <typename T>
+static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
+{
+	if (!lua_istable(l, offset) || lua_objlen(l, offset) != 2) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_rawgeti(l, offset, 1);
+	*x = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, offset, 2);
+	*y = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+}
+
+
+/**
 **  Parse order
 **
 **  @param l      Lua state.
@@ -125,14 +166,12 @@ static CUnit *CclGetUnit(lua_State *l)
 void CclParseOrder(lua_State *l, COrder *order)
 {
 	const char *value;
-	int args;
-	int j;
 
 	//
 	// Parse the list: (still everything could be changed!)
 	//
-	args = luaL_getn(l, -1);
-	for (j = 0; j < args; ++j) {
+	const int args = lua_objlen(l, -1);
+	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
@@ -199,34 +238,15 @@ void CclParseOrder(lua_State *l, COrder *order)
 			order->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
-			int slot;
-
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
+			order->Goal = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
-
-			slot = strtol(value + 1, NULL, 16);
-			order->Goal = UnitSlots[slot];
-			if (!UnitSlots[slot]) {
-				DebugPrint("FIXME: Forward reference not supported\n");
-			}
-			//++UnitSlots[slot]->Refs;
-
 		} else if (!strcmp(value, "tile")) {
-			++j;
+			++j;			
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			order->X = LuaToNumber(l, -1);
+			CclGetPos(l, &order->X , &order->Y);
 			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			order->Y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_pop(l, 1);
-
 		} else if (!strcmp(value, "type")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -236,17 +256,8 @@ void CclParseOrder(lua_State *l, COrder *order)
 		} else if (!strcmp(value, "patrol")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			order->Arg1.Patrol.X = LuaToNumber(l, -1);
+			CclGetPos(l, &order->Arg1.Patrol.X , &order->Arg1.Patrol.Y);
 			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			order->Arg1.Patrol.Y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_pop(l, 1);
-
 		} else if (!strcmp(value, "spell")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -258,16 +269,53 @@ void CclParseOrder(lua_State *l, COrder *order)
 			lua_rawgeti(l, -1, j + 1);
 			order->Arg1.Upgrade = CUpgrade::Get(LuaToString(l, -1));
 			lua_pop(l, 1);
-
-		} else if (!strcmp(value, "mine")) {
+		} else if (!strcmp(value, "current-resource")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			order->Arg1.ResourcePos = LuaToNumber(l, -1);
+			order->CurrentResource = CclGetResourceByName(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "resource-pos")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			CclGetPos(l, &order->Arg1.Resource.Pos.X , 
+								&order->Arg1.Resource.Pos.Y);
 			lua_pop(l, 1);
 
+			//FIXME: hardcoded wood	
+			Assert(order->CurrentResource && order->CurrentResource == WoodCost);
+		} else if (!strcmp(value, "resource-mine")) {
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			order->Arg1.Resource.Mine = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "mine")) {
+			/* old save format */
+			int pos;
+			++j;
+			lua_rawgeti(l, -1, j + 1);
+			pos = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+
+			int mx = pos >> 16;
+			int my = pos & 0xFFFF;
+			CUnit *mine = NULL;
+			pos = 0;
+			do {
+				pos++;
+				mine = ResourceOnMap(mx, my, pos, true);
+			} while(!mine && pos < MaxCosts);
+			if(mine) {
+				mine->RefsIncrease();
+				order->Arg1.Resource.Mine = mine;
+				order->CurrentResource = pos;
+			} else {
+				order->CurrentResource = WoodCost;
+				order->Arg1.Resource.Pos.X = mx;
+				order->Arg1.Resource.Pos.Y = my;
+			}
 		} else {
 		   // This leaves a half initialized unit
-		   LuaError(l, "Unsupported tag: %s" _C_ value);
+		   LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -283,6 +331,7 @@ static void CclParseOrders(lua_State *l, CUnit *unit)
 	for (std::vector<COrder *>::iterator order = unit->Orders.begin();
 			order != unit->Orders.end();
 			++order) {
+		(*order)->Release();	
 		delete *order;
 	}
 	unit->Orders.clear();
@@ -309,22 +358,16 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++j;
 		if (!strcmp(value, "worker")) {
-			int slot;
-
 			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
+			unit->Data.Built.Worker = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
-			slot = strtol(value + 1, NULL, 16);
-			Assert(UnitSlots[slot]);
-			unit->Data.Built.Worker = UnitSlots[slot];
-			//++UnitSlots[slot]->Refs;
 		} else if (!strcmp(value, "progress")) {
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.Built.Progress = LuaToNumber(l, -1);
@@ -344,6 +387,41 @@ static void CclParseBuilt(lua_State *l, CUnit *unit)
 				cframe = cframe->Next;
 			}
 			unit->Data.Built.Frame = cframe;
+		} else {
+			LuaError(l, "ParseBuilt: Unsupported tag: %s" _C_ value);
+		}
+	}
+}
+
+/**
+**  Parse built
+**
+**  @param l     Lua state.
+**  @param unit  Unit pointer which should be filled with the data.
+*/
+static void CclParseResource(lua_State *l, CUnit *unit)
+{
+	const char *value;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	int args = lua_objlen(l, -1);
+	for (int j = 0; j < args; ++j) {
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++j;
+		if (!strcmp(value, "first-worker")) {
+			lua_rawgeti(l, -1, j + 1);
+			unit->Data.Resource.Workers = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "assigned")) {
+			lua_rawgeti(l, -1, j + 1);
+			unit->Data.Resource.Assigned = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseResource: Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -363,7 +441,7 @@ static void CclParseResWorker(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -376,6 +454,8 @@ static void CclParseResWorker(lua_State *l, CUnit *unit)
 		} else if (!strcmp(value, "done-harvesting")) {
 			unit->Data.ResWorker.DoneHarvesting = 1;
 			--j;
+		} else {
+			LuaError(l, "ParseResWorker: Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -395,7 +475,7 @@ static void CclParseResearch(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -406,6 +486,8 @@ static void CclParseResearch(lua_State *l, CUnit *unit)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			unit->Data.Research.Upgrade = CUpgrade::Get(value);
+		} else {
+			LuaError(l, "ParseResearch: Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -425,7 +507,7 @@ static void CclParseUpgradeTo(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -435,6 +517,8 @@ static void CclParseUpgradeTo(lua_State *l, CUnit *unit)
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.UpgradeTo.Ticks = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseUpgradeTo: Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -454,7 +538,7 @@ static void CclParseTrain(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
@@ -464,6 +548,8 @@ static void CclParseTrain(lua_State *l, CUnit *unit)
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.Train.Ticks = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseTrain: Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -483,13 +569,17 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++j;
-		if (!strcmp(value, "fast")) {
+		if (!strcmp(value, "cycles")) {
+			lua_rawgeti(l, -1, j + 1);
+			unit->Data.Move.Cycles = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "fast")) {
 			unit->Data.Move.Fast = 1;
 			--j;
 		} else if (!strcmp(value, "path")) {
@@ -500,7 +590,7 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, -1);
+			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				unit->Data.Move.Path[k] = LuaToNumber(l, -1);
@@ -508,6 +598,8 @@ static void CclParseMove(lua_State *l, CUnit *unit)
 			}
 			unit->Data.Move.Length = subargs;
 			lua_pop(l, 1);
+		} else {
+			LuaError(l, "ParseMove: Unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -588,7 +680,7 @@ static int CclUnit(lua_State *l)
 			int w;
 			int h;
 
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 4) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 4) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -611,37 +703,13 @@ static int CclUnit(lua_State *l)
 			// Radar(Jammer) not.
 
 		} else if (!strcmp(value, "tile")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			unit->X = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			unit->Y = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &unit->X , &unit->Y, j + 1);
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			unit->IX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			unit->IY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &unit->IX , &unit->IY, j + 1);
 		} else if (!strcmp(value, "seen-pixel")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			unit->Seen.IX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			unit->Seen.IY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			CclGetPos(l, &unit->Seen.IX , &unit->Seen.IY, j + 1);
 		} else if (!strcmp(value, "frame")) {
 			unit->Frame = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "seen")) {
@@ -704,6 +772,10 @@ static int CclUnit(lua_State *l)
 			--j;
 		} else if (!strcmp(value, "resource-active")) {
 			unit->Data.Resource.Active = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "data-resource")) {
+			lua_pushvalue(l, j + 1);
+			CclParseResource(l, unit);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, j + 1);
@@ -743,6 +815,10 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "boarded")) {
 			unit->Boarded = 1;
 			--j;
+		} else if (!strcmp(value, "next-worker")) {
+			lua_pushvalue(l, j + 1);
+			unit->NextWorker = CclGetUnitFromRef(l);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "units-boarded-count")) {
 			unit->BoardCount = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "units-contained")) {
@@ -752,15 +828,12 @@ static int CclUnit(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
+				CUnit *u = CclGetUnitFromRef(l);
 				lua_pop(l, 1);
-				slot = strtol(value + 1, NULL, 16);
-				UnitSlots[slot]->AddInContainer(unit);
-				Assert(UnitSlots[slot]);
-				//++UnitSlots[slot]->Refs;
+				u->AddInContainer(unit);
 			}
 		} else if (!strcmp(value, "order-count")) {
 			unit->OrderCount = LuaToNumber(l, j + 1);
@@ -829,7 +902,7 @@ static int CclUnit(lua_State *l)
 				DefineVariableField(l, unit->Variable + i, j + 1);
 				continue;
 			}
-		   LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unit: Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -918,7 +991,7 @@ static int CclCreateUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || luaL_getn(l, 3) != 2) {
+	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
 		LuaError(l, "incorrect argument !!");
 	}
 	lua_rawgeti(l, 3, 1);
@@ -933,7 +1006,7 @@ static int CclCreateUnit(lua_State *l)
 	playerno = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	if (playerno == -1) {
-		printf("CreateUnit: You cannot use 'any in create-unit, specify a player\n");
+		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
 		LuaError(l, "bad player");
 		return 0;
 	}
@@ -948,7 +1021,8 @@ static int CclCreateUnit(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(unit, ix, iy)) {
+		if (UnitCanBeAt(unit, ix, iy) ||
+				(unit->Type->Building && CanBuildUnitType(NULL, unit->Type, ix, iy, 0))) {
 			unit->Place(ix, iy);
 		} else {
 			unit->X = ix;
@@ -1029,7 +1103,7 @@ static int CclOrderUnit(lua_State *l)
 	lua_rawgeti(l, 3, 2);
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (luaL_getn(l, 3) == 4) {
+	if (lua_objlen(l, 3) == 4) {
 		lua_rawgeti(l, 3, 3);
 		x2 = LuaToNumber(l, -1);
 		lua_pop(l, 1);
@@ -1049,7 +1123,7 @@ static int CclOrderUnit(lua_State *l)
 	lua_rawgeti(l, 4, 2);
 	dy1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (luaL_getn(l, 4) == 4) {
+	if (lua_objlen(l, 4) == 4) {
 		lua_rawgeti(l, 4, 3);
 		dx2 = LuaToNumber(l, -1);
 		lua_pop(l, 1);
@@ -1062,7 +1136,7 @@ static int CclOrderUnit(lua_State *l)
 	}
 	order = LuaToString(l, 5);
 
-	an = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table);
+	an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
 	for (j = 0; j < an; ++j) {
 		unit = table[j];
 		if (unittype == ANY_UNIT ||
@@ -1181,7 +1255,7 @@ static int CclKillUnitAt(lua_State *l)
 	y2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	an = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table);
+	an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
 	for (j = s = 0; j < an && s < q; ++j) {
 		unit = table[j];
 		if (unittype == ANY_UNIT ||
@@ -1299,6 +1373,7 @@ static int CclSlotUsage(lua_State *l)
 	unsigned int i;
 	const char *key;
 	int unit_index;
+	unsigned long cycle;
 
 	args = lua_gettop(l);
 	if (args == 0) {
@@ -1312,24 +1387,20 @@ static int CclSlotUsage(lua_State *l)
 	}
 	for (i = 2; i <= args; i++) {
 		unit_index = -1;
+		cycle = (unsigned long)-1;
 		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Slot")) {
 				unit_index = LuaToNumber(l, -1);
 			} else if (!strcmp(key, "FreeCycle")) {
-				if (unit_index != -1) {
-					UnitSlots[unit_index]->Refs = LuaToNumber(l, -1);
-				}
+				cycle = LuaToNumber(l, -1);
 			} else {
 				LuaError(l, "Wrong key %s" _C_ key);
 			}
 		}
-		if (ReleasedHead) {
-			ReleasedTail->Next = UnitSlots[unit_index];
-			ReleasedTail = UnitSlots[unit_index];
-		} else {
-			ReleasedHead = ReleasedTail = UnitSlots[unit_index];
-		}
+		Assert(unit_index != -1 && cycle != (unsigned long)-1);
+		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
+		UnitSlots[unit_index]->Refs = cycle;
 	}
 	return 0;
 }

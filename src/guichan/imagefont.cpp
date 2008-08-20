@@ -57,7 +57,7 @@
  */
 
 #include <sstream>
-
+#include <assert.h>
 #include "guichan/exception.h"
 #include "guichan/imagefont.h"
 #include "guichan/image.h"
@@ -68,7 +68,8 @@ namespace gcn
     {
         if (Image::_getImageLoader() == NULL)
         {
-            throw GCN_EXCEPTION("I have no ImageLoader!");
+        	assert(!"I have no ImageLoader!");
+            //throw GCN_EXCEPTION("I have no ImageLoader!");
         }
 
         ImageLoader* imageLoader = Image::_getImageLoader();
@@ -84,7 +85,8 @@ namespace gcn
         
         if (i >= imageLoader->getWidth())
         {
-            throw GCN_EXCEPTION("Corrupt image.");
+        	assert(!"Corrupt image.");
+            //throw GCN_EXCEPTION("Corrupt image.");
         }
         
         int j = 0;
@@ -119,7 +121,8 @@ namespace gcn
     {
         if (Image::_getImageLoader() == NULL)
         {
-            throw GCN_EXCEPTION("I have no ImageLoader!");
+			assert(!"I have no ImageLoader!");
+            //throw GCN_EXCEPTION("I have no ImageLoader!");
         }
 
         ImageLoader* imageLoader = Image::_getImageLoader();
@@ -135,7 +138,8 @@ namespace gcn
         
         if (i >= imageLoader->getWidth())
         {
-            throw GCN_EXCEPTION("Corrupt image.");
+        	assert(!"Corrupt image.");        
+            //throw GCN_EXCEPTION("Corrupt image.");
         }
         
         int j = 0;
@@ -259,7 +263,8 @@ namespace gcn
                     os << " with font is corrupt near character '";
                     os << c;
                     os << "'";
-                    throw GCN_EXCEPTION(os.str());
+                    //throw GCN_EXCEPTION(os.str());
+                    assert(0);
                 }
             }            
 
@@ -282,7 +287,8 @@ namespace gcn
                 os << " with font is corrupt near character '";
                 os << c;
                 os << "'";
-                throw GCN_EXCEPTION(os.str());
+                //throw GCN_EXCEPTION(os.str());
+                assert(0);
             }            
             
             color = il->getPixel(x + w, y);

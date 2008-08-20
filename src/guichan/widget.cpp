@@ -62,12 +62,13 @@
 #include "guichan/widget.h"
 
 #include <iostream>
+#include <assert.h>
 
 #include "guichan/sdl/sdlinput.h"
 #include "SDL.h"
 extern int Str2SdlKey(const char *str);
 
-static int convertKey(const char *key)
+int convertKey(const char *key)
 {
 	SDL_keysym keysym;
 	memset(&keysym, 0, sizeof(keysym));
@@ -237,7 +238,8 @@ namespace gcn
     {
         if (mFocusHandler == NULL)
         {
-            throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            assert(!"No focushandler set (did you add the widget to the gui?).");
         }
         
         if (isFocusable())
@@ -313,6 +315,16 @@ namespace gcn
         return mBackgroundColor;
     }
 
+    void Widget::setDisabledColor(const Color& color)
+    {
+        mDisabledColor = color;
+    }
+
+    const Color& Widget::getDisabledColor() const
+    {
+        return mDisabledColor;
+    }
+
     void Widget::_setFocusHandler(FocusHandler* focusHandler)
     {
         if (mFocusHandler)
@@ -368,7 +380,8 @@ namespace gcn
     {
         if (mFocusHandler == NULL)
         {
-            throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            assert(!"No focushandler set (did you add the widget to the gui?).");
         }
                 
         if (!mEnabled || (mFocusHandler->getModalFocused() != NULL &&
@@ -484,7 +497,8 @@ namespace gcn
     {
         if (mFocusHandler == NULL)
         {
-            throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            assert(!"No focushandler set (did you add the widget to the gui?).");
         }
                 
         if (!mEnabled || (mFocusHandler->getModalFocused() != NULL &&
@@ -630,7 +644,8 @@ namespace gcn
 			mHotKey = ::convertKey(key);
             if (mHotKey == 0)
             {
-                throw GCN_EXCEPTION("Could not parse hot key");
+                //throw GCN_EXCEPTION("Could not parse hot key");
+                assert(!"Could not parse hot key");
             }
         }
     }
@@ -691,7 +706,8 @@ namespace gcn
     {
         if (mFocusHandler == NULL)
         {
-            throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+        	assert(!"No focushandler set (did you add the widget to the gui?).");
+            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
         }
         
         return mFocusHandler->isDragged(this);
@@ -701,7 +717,8 @@ namespace gcn
     {
         if (mFocusHandler == NULL)
         {
-            throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+        	assert(!"No focushandler set (did you add the widget to the gui?).");
+            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
         }
 
         mFocusHandler->requestModalFocus(this);
@@ -721,7 +738,8 @@ namespace gcn
     {
         if (mFocusHandler == NULL)
         {
-            throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
+            assert(!"No focushandler set (did you add the widget to the gui?).");
         }
 
         if (getParent() != NULL)
@@ -732,3 +750,4 @@ namespace gcn
         return mFocusHandler->getModalFocused() == this;
     }
 }
+

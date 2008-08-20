@@ -41,6 +41,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "script.h"
 #include "player.h"
@@ -86,7 +87,7 @@ void InitGroups(void)
 void SaveGroups(CFile *file)
 {
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: groups $Id$\n\n");
+	file->printf("--- MODULE: groups\n\n");
 
 	for (int g = 0; g < NUM_GROUPS; ++g) {
 		file->printf("Group(%d, %d, {", g, Groups[g].NumUnits);
@@ -253,7 +254,7 @@ static int CclGroup(lua_State *l)
 	grp = &Groups[(int)LuaToNumber(l, 1)];
 	grp->NumUnits = LuaToNumber(l, 2);
 	i = 0;
-	args = luaL_getn(l, 3);
+	args = lua_objlen(l, 3);
 	for (j = 0; j < args; ++j) {
 		const char *str;
 

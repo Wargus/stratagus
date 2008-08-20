@@ -55,6 +55,33 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Restore the saved order
+**  FIXME: this should be moved to a more central location
+**
+**  @param unit  Unit to restore
+**
+**  @return      True if the saved order was restored
+*/
+static bool RestoreSavedOrder(CUnit *unit)
+{
+	if (unit->SavedOrder.Action != UnitActionStill) {
+		unit->SubAction = 0;
+		Assert(unit->Orders[0]->Goal == NoUnitP);
+		//copy
+		*unit->Orders[0] = unit->SavedOrder;
+		
+		unit->CurrentResource = unit->SavedOrder.CurrentResource;
+		NewResetPath(unit);
+		
+		unit->SavedOrder.Action = UnitActionStill;
+		// This isn't supported
+		Assert(unit->SavedOrder.Goal == NoUnitP);
+		return true;
+	}
+	return false;
+}
+
+/**
 **  Repair a unit.
 **
 **  @param unit  unit repairing
@@ -88,10 +115,9 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 					// FIXME: call back to AI?
 					goal->RefsDecrease();
 					unit->Orders[0]->Goal = NULL;
-					unit->Orders[0]->Action = UnitActionStill;
-					unit->State = unit->SubAction = 0;
-					if (unit->Selected) { // update display for new action
-						SelectedUnitChanged();
+					if (!RestoreSavedOrder(unit)) {
+						unit->ClearAction();
+						unit->State = 0;
 					}
 				}
 				// FIXME: We shouldn't animate if no resources are available.
@@ -108,9 +134,10 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
 		}
 	} else {
+		int costs = goal->Stats->Costs[TimeCost] * 600;
 		// hp is the current damage taken by the unit.
 		hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-			(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
+			costs - goal->Variable[HP_INDEX].Value;
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
@@ -121,8 +148,9 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 		//unit->Data.Built.Worker->Type->BuilderSpeedFactor;
 		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
-		goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
-			(goal->Stats->Costs[TimeCost] * 600) - hp;
+		goal->Variable[HP_INDEX].Value = 
+			(goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
+			costs - hp;
 		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
 			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
 		}
@@ -203,10 +231,9 @@ void HandleActionRepair(CUnit *unit)
 						goal->RefsDecrease();
 						unit->Orders[0]->Goal = NoUnitP;
 					}
-					unit->Orders[0]->Action = UnitActionStill;
-					unit->State = unit->SubAction = 0;
-					if (unit->Selected) { // update display for new action
-						SelectedUnitChanged();
+					if (!RestoreSavedOrder(unit)) {
+						unit->ClearAction();
+						unit->State = 0;
 					}
 					return;
 				}
@@ -239,15 +266,17 @@ void HandleActionRepair(CUnit *unit)
 						// FIXME: should I clear this here?
 						unit->Orders[0]->Goal = goal = NULL;
 						NewResetPath(unit);
-					}
-				}
-				if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange) {
-					RepairUnit(unit, goal);
-					goal = unit->Orders[0]->Goal;
-				} else if (goal && MapDistanceBetweenUnits(unit, goal) > unit->Type->RepairRange) {
-					// If goal has move, chase after it
-					unit->State = 0;
-					unit->SubAction = 0;
+					} else {
+						int dist = MapDistanceBetweenUnits(unit, goal);
+						if (dist <= unit->Type->RepairRange) {
+							RepairUnit(unit, goal);
+							goal = unit->Orders[0]->Goal;
+						} else if (dist > unit->Type->RepairRange) {
+							// If goal has move, chase after it
+							unit->State = 0;
+							unit->SubAction = 0;
+						}
+					}					
 				}
 
 
@@ -259,10 +288,9 @@ void HandleActionRepair(CUnit *unit)
 						goal->RefsDecrease();
 						unit->Orders[0]->Goal = NULL;
 					}
-					unit->Orders[0]->Action = UnitActionStill;
-					unit->SubAction = unit->State = 0;
-					if (unit->Selected) { // update display for new action
-						SelectedUnitChanged();
+					if (!RestoreSavedOrder(unit)) {
+						unit->ClearAction();
+						unit->State = 0;
 					}
 					return;
 				}

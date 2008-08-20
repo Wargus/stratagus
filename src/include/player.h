@@ -303,7 +303,7 @@ class CFile;
 class CPlayer
 {
 public:
-	int   Index;        /// player as number
+	int Index;          /// player as number
 	std::string Name;   /// name of non computer
 
 	int   Type;         /// type of player (human,computer,...)
@@ -312,12 +312,13 @@ public:
 
 	// friend enemy detection
 	int      Team;          /// team of player
-	unsigned Enemy;         /// enemy bit field for this player
-	unsigned Allied;        /// allied bit field for this player
-	unsigned SharedVision;  /// shared vision bit field
+	unsigned int Enemy;         /// enemy bit field for this player
+	unsigned int Allied;        /// allied bit field for this player
+	unsigned int SharedVision;  /// shared vision bit field
 
 	int StartX;  /// map tile start X position
 	int StartY;  /// map tile start Y position
+	inline void SetStartView(int x, int y) { StartX = x; StartY = y; }
 
 	int Resources[MaxCosts];      /// resources in store
 	int LastResources[MaxCosts];  /// last values for revenue
@@ -514,11 +515,11 @@ extern int PlayerColorIndexCount;
 ----------------------------------------------------------------------------*/
 
 	/// Init players
-extern void InitPlayers();
+extern void InitPlayers(void);
 	/// Clean up players
-extern void CleanPlayers();
+extern void CleanPlayers(void);
 	/// Clean up races
-extern void CleanRaces();
+extern void CleanRaces(void);
 	/// Save players
 extern void SavePlayers(CFile *file);
 
@@ -527,9 +528,9 @@ extern void CreatePlayer(int type);
 
 
 	/// Initialize the computer opponent AI
-extern void PlayersInitAi();
+extern void PlayersInitAi(void);
 	/// Called each game cycle for player handlers (AI)
-extern void PlayersEachCycle();
+extern void PlayersEachCycle(void);
 	/// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 
@@ -539,10 +540,14 @@ extern void GraphicPlayerPixels(CPlayer *player, const CGraphic *sprite);
 #endif
 
 	/// Output debug informations for players
-extern void DebugPlayers();
+extern void DebugPlayers(void);
+
+#ifdef DEBUG
+void FreePlayerColors(void);
+#endif
 
 	/// register ccl features
-extern void PlayerCclRegister();
+extern void PlayerCclRegister(void);
 
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) \

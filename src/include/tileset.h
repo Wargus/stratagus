@@ -235,6 +235,10 @@ struct SolidTerrainInfo {
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 };
 
+#define MapFieldWall       0x0200  /// Field contains wall
+#define MapFieldRocks      0x0400  /// Field contains rocks
+#define MapFieldForest     0x0800  /// Field contains forest
+
 	/// Tileset definition
 class CTileset {
 public:
@@ -277,7 +281,7 @@ public:
 	int NumTiles;               /// Number of tiles in the tables
 	int TileSizeX;              /// Size of a tile in X
 	int TileSizeY;              /// Size of a tile in Y
-	unsigned short *Table;      /// Pud to internal conversion table
+	unsigned short *Table;      /// Pud to Internal conversion table
 	unsigned short *FlagsTable; /// Flag table for editor
 
 	TileInfo *Tiles; /// Tile descriptions
@@ -303,6 +307,22 @@ public:
 
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
+	
+	bool IsSeenTile(unsigned short type, unsigned short seen) const
+	{
+		if(TileTypeTable) {
+			switch (type) {
+				case MapFieldForest:
+					return TileTypeTable[seen] == TileTypeWood;
+				case MapFieldRocks:
+					return TileTypeTable[seen] == TileTypeRock;
+				default:
+					return false;
+			}
+		}
+		return false;
+	};
+	
 };
 
 /*----------------------------------------------------------------------------

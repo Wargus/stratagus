@@ -83,6 +83,7 @@ CFont *LargeFont;       /// Large font used in menus
 CFont *SmallTitleFont;  /// Small font used in episoden titles
 CFont *LargeTitleFont;  /// Large font used in episoden titles
 
+static int FormatNumber(int number, char *buf);
 
 /*----------------------------------------------------------------------------
 --  Guichan Functions
@@ -92,8 +93,8 @@ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt,
 	int x, int y)
 {
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
-	int right = (r.x + r.width - 1 < Video.Width) ? r.x + r.width - 1 : Video.Width - 1;
-	int bottom = (r.y + r.height - 1 < Video.Height) ? r.y + r.height - 1 : Video.Height - 1;
+	int right = std::min(r.x + r.width - 1, Video.Width - 1);
+	int bottom = std::min(r.y + r.height - 1, Video.Height - 1);
 
 	if (r.x > right || r.y > bottom) {
 		return;
@@ -217,6 +218,108 @@ static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 }
 
 /**
+**  Get the next utf8 character from a array of chars 
+*/
+static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
+{
+	// end of string
+	if (pos >= len) {
+		return false;
+	}
+
+	int count;
+	char c = text[pos++];
+
+	// ascii
+	if (!(c & 0x80)) {
+		utf8 = c;
+		return true;
+	}
+
+	if ((c & 0xE0) == 0xC0) {
+		utf8 = (c & 0x1F);
+		count = 1;
+	} else if ((c & 0xF0) == 0xE0) {
+		utf8 = (c & 0x0F);
+		count = 2;
+	} else if ((c & 0xF8) == 0xF0) {
+		utf8 = (c & 0x07);
+		count = 3;
+	} else if ((c & 0xFC) == 0xF8) {
+		utf8 = (c & 0x03);
+		count = 4;
+	} else if (( c & 0xFE) == 0xFC) {
+		utf8 = (c & 0x01);
+		count = 5;
+	} else {
+		DebugPrint("Invalid utf8 I %c <%s> [%lu]\n" _C_ c _C_ text _C_ pos);
+		return false;
+	}
+
+	while (count--) {
+		c = text[pos++];
+		if ((c & 0xC0) != 0x80) {
+			DebugPrint("Invalid utf8 II\n");
+			return false;
+		}
+		utf8 <<= 6;
+		utf8 |= (c & 0x3F);
+	}
+
+	return true;
+}
+
+
+int CFont::Height() const { return G->Height; }
+bool CFont::IsLoaded() const { return G && G->IsLoaded(); }
+
+/**
+**  Returns the pixel width of text.
+**
+**  @param text  Text to calculate the width of.
+**
+**  @return      The width in pixels of the text.
+*/
+int CFont::Width(const int number) const
+{
+	int width = 0;
+	//bool isformat = false;
+	int utf8;
+	size_t pos = 0;
+	char text[ sizeof(int) * 10 + 2];
+	const int len = FormatNumber(number, text) + 1;
+	
+	while (GetUTF8(text, len, pos, utf8)) {
+#if 0
+		if (utf8 == '~') {
+			//if (pos >= text.size()) {  // bad formatted string
+			if (pos >= size) {  // bad formatted string
+				break;
+			}
+			if (text[pos] == '<' || text[pos] == '>') {
+				isformat = false;
+				++pos;
+				continue;
+			}
+			if (text[pos] == '!') {
+				++pos;
+				continue;
+			}
+			if (text[pos] != '~') { // ~~ -> ~
+				isformat = !isformat;
+				continue;
+			}
+		}
+		if (!isformat) {
+#endif
+			width += this->CharWidth[utf8 - 32] + 1;
+		//}
+	}
+	return width;
+	
+}
+
+/**
 **  Returns the pixel width of text.
 **
 **  @param text  Text to calculate the width of.
@@ -254,6 +357,50 @@ int CFont::Width(const std::string &text) const
 		}
 	}
 	return width;
+}
+
+extern int convertKey(const char *key);
+
+/**
+**  Get the hot key from a string
+*/
+int GetHotKey(const std::string &text)
+{
+	int hotkey = 0;
+	int utf8;
+	size_t pos = 0;
+
+	while (GetUTF8(text, pos, utf8)) {
+		if (utf8 == '~') {
+			if (pos >= text.size()) {
+				break;
+			}
+			if (text[pos] == '<') {
+				++pos;
+				size_t endpos = pos;
+				while (endpos < text.size()) {
+					if (text[endpos] == '~') {
+						break;
+					}
+					++endpos;
+				}
+				std::string key = text.substr(pos, endpos - pos);
+				hotkey = convertKey(key.c_str());
+				break;
+			}
+			if (text[pos] == '!') {
+				++pos;
+				if (pos >= text.size()) {
+					break;
+				}
+				GetUTF8(text, pos, utf8);
+				hotkey = utf8;
+				break;
+			}
+		}
+	}
+
+	return hotkey;
 }
 
 CFont::~CFont()
@@ -524,8 +671,10 @@ int VideoDrawTextCentered(int x, int y, CFont *font, const std::string &text)
 **
 **  @param number  Number to be formatted
 **  @param buf     Buffer to save the formatted number to
+**
+**  @return      The real length of the Formated Number.
 */
-static void FormatNumber(int number, char *buf)
+static int FormatNumber(int number, char *buf)
 {
 	char bufs[sizeof(int) * 10 + 2];
 	int sl;
@@ -533,14 +682,15 @@ static void FormatNumber(int number, char *buf)
 	int d;
 
 	sl = s = d = 0;
-	sprintf(bufs, "%d", number);
-	sl = strlen(bufs);
+	sl = snprintf(bufs,sizeof(buf), "%d", number);
+	//sl = strlen(bufs);
 	do {
 		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
 			buf[d++] = ',';
 		}
 		buf[d++] = bufs[s++];
 	} while (s <= sl);
+	return d;
 }
 
 /**
@@ -804,6 +954,22 @@ void LoadFonts(void)
 
 #ifdef USE_OPENGL
 /**
+**  Free OpenGL fonts
+*/
+void FreeOpenGLFonts(void)
+{
+	for (int i = 0; i < (int)AllFonts.size(); ++i) {
+		CFont *font = AllFonts[i];
+		if (font->G) {
+			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
+				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+				glDeleteTextures(g->NumTextures, g->Textures);
+			}
+		}
+	}
+}
+
+/**
 **  Reload OpenGL fonts
 */
 void ReloadFonts(void)
@@ -812,7 +978,10 @@ void ReloadFonts(void)
 		CFont *font = AllFonts[i];
 		if (font->G) {
 			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
-				CGraphic::Free(FontColorGraphics[font][AllFontColors[j]]);
+				//CGraphic::Free(FontColorGraphics[font][AllFontColors[j]]);
+				CGraphic *g = FontColorGraphics[font][AllFontColors[j]];
+				delete[] g->Textures;
+				delete g;
 			}
 			FontColorGraphics[font].clear();
 			MakeFontColorTextures(font);

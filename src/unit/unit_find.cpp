@@ -76,33 +76,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Select unit on X,Y of type naval,fly,land.
-**
-** @param x       Map X tile position.
-** @param y       Map Y tile position.
-** @param type    UnitType::UnitType, naval,fly,land.
-**
-** @return        Unit, if an unit of correct type is on the field.
-*/
-CUnit *UnitCacheOnXY(int x, int y, unsigned type)
-{
-	CUnit *table[UnitMax];
-	int n;
-
-	n = UnitCacheOnTile(x, y, table);
-	while (n--) {
-		if ((unsigned)table[n]->Type->UnitType == type) {
-			break;
-		}
-	}
-	if (n > -1) {
-		return table[n];
-	} else {
-		return NoUnitP;
-	}
-}
-
-/**
 **  Find all units of type.
 **
 **  @param type   type of unit requested
@@ -113,10 +86,10 @@ CUnit *UnitCacheOnXY(int x, int y, unsigned type)
 int FindUnitsByType(const CUnitType *type, CUnit **table)
 {
 	CUnit *unit;
-	int i;
-	int num;
+	int i = 0;
+	int num = 0;
 
-	for (num = i = 0; i < NumUnits; ++i) {
+	for (; i < NumUnits; ++i) {
 		unit = Units[i];
 		if (unit->Type == type && !unit->IsUnusable()) {
 			table[num++] = unit;
@@ -138,14 +111,12 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 	CUnit **table)
 {
 	CUnit *unit;
-	int num;
-	int nunits;
-	int typecount;
-	int i;
+	int nunits = player->TotalNumUnits;
+	int typecount = player->UnitTypesCount[type->Slot];
+	int num = 0;
+	int i = 0;
 
-	nunits = player->TotalNumUnits;
-	typecount = player->UnitTypesCount[type->Slot];
-	for (num = 0, i = 0; i < nunits && typecount; ++i) {
+	for (; i < nunits && typecount; ++i) {
 		unit = player->Units[i];
 		if (unit->Type == type) {
 			if (!unit->IsUnusable()) {
@@ -157,32 +128,45 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 	return num;
 }
 
-/**
-**  Unit on map tile, no special prefered.
-**
-**  @param tx  X position on map, tile-based.
-**  @param ty  Y position on map, tile-based.
-**
-**  @return    Returns first found unit on tile.
-*/
-CUnit *UnitOnMapTile(int tx, int ty)
-{
-	CUnit *table[UnitMax];
-	int n;
-	int i;
-
-	n = UnitCacheOnTile(tx, ty, table);
-	for (i = 0; i < n; ++i) {
-		// Note: this is less restrictive than UnitActionDie...
-		// Is it normal?
-		if (table[i]->Type->Vanishes) {
-			continue;
-		}
-		return table[i];
+struct _UnitOnMapTile {
+	const UnitTypeType type;
+	_UnitOnMapTile(const UnitTypeType t) : type(t) {}
+	inline bool operator() (CUnit *const unit) {
+		const CUnitType *const t = unit->Type;
+		if (t->Vanishes || (type != (UnitTypeType)-1 && t->UnitType != type))
+			return false;
+		return true;
 	}
+};
 
-	return NoUnitP;
+/**
+**  Unit on map tile.
+**
+**  @param index flat index position on map, tile-based.
+**  @param type  UnitTypeType, (unsigned)-1 for any type.
+**
+**  @return      Returns first found unit on tile.
+*/
+CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
+{
+	_UnitOnMapTile filter((UnitTypeType)type);
+	return Map.Field(index)->UnitCache.find(filter);
 }
+
+/**
+**  Unit on map tile.
+**
+**  @param tx    X position on map, tile-based.
+**  @param ty    Y position on map, tile-based.
+**  @param type  UnitTypeType, (unsigned)-1 for any type.
+**
+**  @return      Returns first found unit on tile.
+*/
+CUnit *UnitOnMapTile(int tx, int ty, unsigned int type)
+{
+	return UnitOnMapTile(Map.getIndex(tx, ty), type);
+}
+
 
 /**
 **  Choose target on map area.
@@ -199,14 +183,12 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 {
 	CUnit *table[UnitMax];
 	CUnit *unit;
-	CUnit *best;
+	CUnit *best = NoUnitP;
 	const CUnitType *type;
-	int n;
-	int i;
+	int i = 0;
 
-	n = UnitCacheSelect(x1, y1, x2, y2, table);
-	best = NoUnitP;
-	for (i = 0; i < n; ++i) {
+	int n = Map.Select(x1, y1, x2, y2, table);
+	for (; i < n; ++i) {
 		unit = table[i];
 		if (!unit->IsVisibleAsGoal(source->Player)) {
 			continue;
@@ -234,33 +216,46 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 --  Finding special units
 ----------------------------------------------------------------------------*/
 
+struct _ResourceOnMap {
+	const int resource;
+	const int mine_on_top;
+	_ResourceOnMap(const int r, int on_top) : 
+		resource(r), mine_on_top(on_top) {}
+	inline bool operator () (CUnit *const unit) {
+
+		CUnitType *type = unit->Type;
+		return (type->GivesResource == resource 
+			&& unit->ResourcesHeld != 0 
+			&& (mine_on_top ? type->CanHarvest : !type->CanHarvest)
+			&& !unit->IsUnusable(true) //allow mines under construction
+			);
+	}
+};
+
 /**
 **  Resource on map tile
 **
 **  @param tx        X position on map, tile-based.
 **  @param ty        Y position on map, tile-based.
 **  @param resource  resource type.
+**  @param  mine_on_top  return mine or mining area.
 **
 **  @return          Returns the deposit if found, or NoUnitP.
 */
-CUnit *ResourceOnMap(int tx, int ty, int resource)
+CUnit *ResourceOnMap(int tx, int ty, int resource, bool mine_on_top)
 {
-	CUnit *table[UnitMax];
-	int i;
-	int n;
-
-	n = UnitCacheOnTile(tx, ty, table);
-	for (i = 0; i < n; ++i) {
-		if (table[i]->IsUnusable() || !table[i]->Type->CanHarvest ||
-				table[i]->ResourcesHeld == 0) {
-			continue;
-		}
-		if (table[i]->Type->GivesResource == resource) {
-			return table[i];
-		}
-	}
-	return NoUnitP;
+	_ResourceOnMap filter(resource, mine_on_top);
+	return Map.Field(tx,ty)->UnitCache.find(filter);
 }
+
+struct _ResourceDepositOnMap {
+	const int resource;
+	_ResourceDepositOnMap(const int r) : 
+		resource(r) {}
+	inline bool operator () (CUnit *const unit) {
+		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+	}
+};
 
 /**
 **  Resource deposit on map tile
@@ -273,20 +268,8 @@ CUnit *ResourceOnMap(int tx, int ty, int resource)
 */
 CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
 {
-	CUnit *table[UnitMax];
-	int i;
-	int n;
-
-	n = UnitCacheOnTile(tx, ty, table);
-	for (i = 0; i < n; ++i) {
-		if (table[i]->IsUnusable()) {
-			continue;
-		}
-		if (table[i]->Type->CanStore[resource]) {
-			return table[i];
-		}
-	}
-	return NoUnitP;
+	_ResourceDepositOnMap filter(resource);
+	return Map.Field(tx,ty)->UnitCache.find(filter);
 }
 
 /*----------------------------------------------------------------------------
@@ -357,13 +340,13 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 	if (u->Removed) {
 		x = u->Container->X;
 		y = u->Container->Y;
-		n = UnitCacheSelect(x - missile_range, y - missile_range,
+		n = Map.Select(x - missile_range, y - missile_range,
 			x + missile_range + u->Container->Type->TileWidth,
 			y + missile_range + u->Container->Type->TileHeight, table);
 	} else {
 		x = u->X;
 		y = u->Y;
-		n = UnitCacheSelect(x - missile_range, y - missile_range,
+		n = Map.Select(x - missile_range, y - missile_range,
 			x + missile_range + u->Type->TileWidth,
 			y + missile_range + u->Type->TileHeight, table);
 	}
@@ -642,7 +625,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 	x = unit->X;
 	y = unit->Y;
 	type = unit->Type;
-	n = UnitCacheSelect(x - range, y - range, x + range + type->TileWidth,
+	n = Map.Select(x - range, y - range, x + range + type->TileWidth,
 		y + range + type->TileHeight, table);
 	
 	if (range > 25 && n > 9) {

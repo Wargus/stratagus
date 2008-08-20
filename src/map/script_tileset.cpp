@@ -127,13 +127,11 @@ static int TilesetParseName(lua_State *l, CTileset *tileset)
 */
 static void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 {
-	int flags;
 	const char *value;
-
+	int flags = 3;
 	//
 	//  Parse the list: flags of the slot
 	//
-	flags = 3;
 	while (1) {
 		lua_rawgeti(l, -1, *j + 1);
 		if (!lua_isstring(l, -1)) {
@@ -206,7 +204,7 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 
 	//
 	//  Parse the list: (still everything could be changed!)
@@ -251,7 +249,7 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			if (luaL_getn(l, -1) != 2) {
+			if (lua_objlen(l, -1) != 2) {
 				LuaError(l, "growing-tree: Wrong table length");
 			}
 			for (i = 0; i < 2; ++i) {
@@ -303,17 +301,18 @@ static void DefineTilesetParseSpecial(lua_State *l, CTileset *tileset)
 static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 {
 	int i;
-	int f;
+	int f = 0;
 	int len;
 	int basic_name;
-	int j;
-
+	int j = 0;
+	int pud;
+	
 	ExtendTilesetTables(tileset, index, 16);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	j = 0;
+
 	lua_rawgeti(l, -1, j + 1);
 	++j;
 	basic_name = TilesetParseName(l, tileset);
@@ -328,22 +327,37 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	len = luaL_getn(l, -1);
+	len = lua_objlen(l, -1);
 
-	// hack for sc tilesets, remove when fixed
-	if (len > 16) {
-		ExtendTilesetTables(tileset, index, len);
-	}
+	for (i = 0,j = 0; i < len; ++i,++j) {
 
-	for (i = 0; i < len; ++i) {
 		lua_rawgeti(l, -1, i + 1);
-		tileset->Table[index + i] = LuaToNumber(l, -1);
+		if (lua_istable(l, -1)) {
+			int k = 0;
+			int tile_flag = 0;
+			ParseTilesetTileFlags(l, &tile_flag, &k);
+			--j;
+			lua_pop(l, 1);
+			tileset->FlagsTable[index + j] = tile_flag;
+			continue;
+		}
+		
+		pud = LuaToNumber(l, -1);
 		lua_pop(l, 1);
-		tileset->FlagsTable[index + i] = f;
-		tileset->Tiles[index + i].BaseTerrain = basic_name;
-		tileset->Tiles[index + i].MixTerrain = 0;
+		
+		// ugly hack for sc tilesets, remove when fixed
+		if (j > 15) {
+			ExtendTilesetTables(tileset, index, j);
+		}
+		
+		tileset->Table[index + j] = pud;
+		tileset->FlagsTable[index + j] = f;
+		tileset->Tiles[index + j].BaseTerrain = basic_name;
+		tileset->Tiles[index + j].MixTerrain = 0;
 	}
 	lua_pop(l, 1);
+	
+	i = j;
 	while (i < 16) {
 		tileset->Table[index + i] = 0;
 		tileset->FlagsTable[index + i] = 0;
@@ -352,10 +366,10 @@ static int DefineTilesetParseSolid(lua_State *l, CTileset *tileset, int index)
 		++i;
 	}
 
-	if (len < 16) {
+	if (j < 16) {
 		return index + 16;
 	}
-	return index + len;
+	return index + j;
 }
 
 /**
@@ -369,13 +383,14 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 {
 	int i;
 	int len;
-	int f;
+	int f = 0;
 	int basic_name;
 	int mixed_name;
 	int new_index;
 	int j;
 	int args;
-
+	int pud;
+	
 	new_index = index + 256;
 	ExtendTilesetTables(tileset, index, 256);
 
@@ -383,7 +398,7 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		LuaError(l, "incorrect argument");
 	}
 	j = 0;
-	args = luaL_getn(l, -1);
+	args = lua_objlen(l, -1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
 	basic_name = TilesetParseName(l, tileset);
@@ -403,14 +418,15 @@ static int DefineTilesetParseMixed(lua_State *l, CTileset *tileset, int index)
 		//
 		//  Vector: the tiles.
 		//
-		len = luaL_getn(l, -1);
+		len = lua_objlen(l, -1);
 		for (i = 0; i < len; ++i) {
 			lua_rawgeti(l, -1, i + 1);
-			tileset->Table[index + i] = LuaToNumber(l, -1);
+			pud = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			tileset->Table[index + i] = pud;
 			tileset->FlagsTable[index + i] = f;
 			tileset->Tiles[index + i].BaseTerrain = basic_name;
 			tileset->Tiles[index + i].MixTerrain = mixed_name;
-			lua_pop(l, 1);
 		}
 		// Fill missing slots
 		while (i < 16) {
@@ -476,7 +492,7 @@ static void DefineTilesetParseSlot(lua_State *l, CTileset *tileset, int t)
 	//
 	//  Parse the list: (still everything could be changed!)
 	//
-	args = luaL_getn(l, t);
+	args = lua_objlen(l, t);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, t, j + 1);
 		value = LuaToString(l, -1);
@@ -926,9 +942,9 @@ static int CclBuildTilesetTables(lua_State *l)
 */
 static int CclSetTileFlags(lua_State *l)
 {
-	int j;
+	int j = 0;
 	int tilenumber;
-	int flags;
+	int flags = 0;
 
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "No flags defined");
@@ -940,8 +956,6 @@ static int CclSetTileFlags(lua_State *l)
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 
-	j = 0;
-	flags = 0;
 	ParseTilesetTileFlags(l, &flags, &j);
 	Map.Tileset.FlagsTable[tilenumber] = flags;
 

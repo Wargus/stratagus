@@ -112,7 +112,7 @@ void DrawMenuButton(ButtonStyle *style, unsigned flags, int x, int y,
 		} else if (p->TextAlign == TextAlignLeft) {
 			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
 		} else {
-			VideoDrawText(x + p->TextX - style->Font->Width(text.c_str()), y + p->TextY,
+			VideoDrawText(x + p->TextX - style->Font->Width(text), y + p->TextY,
 				style->Font, text);
 		}
 

@@ -88,6 +88,8 @@ static void UpdateConstructionFrame(CUnit *unit)
 
 /**
 **  Move to build location
+**
+**  @param unit  Unit to move
 */
 static void MoveToLocation(CUnit *unit)
 {
@@ -121,11 +123,7 @@ static void MoveToLocation(CUnit *unit)
 				AiCanNotReach(unit, unit->Orders[0]->Type);
 			}
 
-			unit->Orders[0]->Action = UnitActionStill;
-			unit->SubAction = 0;
-			if (unit->Selected) { // update display for new action
-				SelectedUnitChanged();
-			}
+			unit->ClearAction();
 			return;
 
 		case PF_REACHED:
@@ -138,8 +136,21 @@ static void MoveToLocation(CUnit *unit)
 	}
 }
 
+struct CheckAlreadyBuilding {
+	const CUnit *const worker;
+	const CUnitType *const type;
+	CheckAlreadyBuilding(const CUnit *unit,	const CUnitType *t):
+			 worker(unit), type(t) {}
+	inline bool operator() (CUnit *const unit) {
+		return (!unit->Destroyed && unit->Type == type &&
+				(worker->Player == unit->Player || worker->IsAllied(unit)));
+	}
+};
+
 /**
 **  Check if the unit can build
+**
+**  @param unit  Unit to check
 */
 static CUnit *CheckCanBuild(CUnit *unit)
 {
@@ -160,9 +171,27 @@ static CUnit *CheckCanBuild(CUnit *unit)
 
 	//
 	// Check if the building could be built there.
-	// if on NULL, really attempt to build here
 	//
 	if ((ontop = CanBuildUnitType(unit, type, x, y, 1)) == NULL) {
+		CheckAlreadyBuilding filter(unit, type);
+		/*
+		 *	FIXME: rb - CheckAlreadyBuilding should be somehow
+		 *	ebabled/disable via game lua scripting
+		 */
+		if ((ontop = Map.Field(x,y)->UnitCache.find(filter)) != NULL) {
+			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n" 
+					_C_ unit->Player->Index _C_ unit->Slot 
+					_C_ ontop->Type->Name.c_str()
+					_C_ ontop->Slot);
+			unit->Orders[0]->Init();
+			unit->Orders[0]->Action = UnitActionRepair;
+			unit->Orders[0]->Goal = ontop;
+			unit->Orders[0]->Goal->RefsIncrease();
+			unit->Orders[0]->Range = unit->Type->RepairRange;
+			unit->SubAction = 0;
+			return NULL;
+		}
+
 		//
 		// Some tries to build the building.
 		//
@@ -179,12 +208,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
-
+		unit->ClearAction();
 		return NULL;
 	}
 
@@ -199,11 +223,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
 		return NULL;
 	}
 
@@ -217,11 +237,7 @@ static CUnit *CheckCanBuild(CUnit *unit)
 			AiCanNotBuild(unit, type);
 		}
 
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->ClearAction();
 		return NULL;
 	}
 
@@ -249,14 +265,14 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 
 	// If unable to make unit, stop, and report message
 	if (build == NoUnitP) {
-		unit->Orders[0]->Action = UnitActionStill;
-
+		// FIXME: Should we retry this?
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 			_("Unable to create building %s"), type->Name.c_str());
 		if (unit->Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
 
+		unit->ClearAction();
 		return;
 	}
 
@@ -283,6 +299,9 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 
 	// Must place after previous for map flags
 	build->Place(x, y);
+	if (!type->BuilderOutside) {
+		build->CurrentSightRange = 1;
+	}
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type->Slot]--;
@@ -290,32 +309,41 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	stats = build->Stats;
 
 	// Make sure the bulding doesn't cancel itself out right away.
-	build->Data.Built.Progress = 100;
+	build->Data.Built.Progress = 0;//FIXME ? 100 : 0
 	build->Variable[HP_INDEX].Value = 1;
 	UpdateConstructionFrame(build);
 
 	// We need somebody to work on it.
 	if (!type->BuilderOutside) {
+		//FIXME: cancel buld gen crash
 		// Place the builder inside the building
 		build->Data.Built.Worker = unit;
 		// HACK: allows the unit to be removed
 		build->CurrentSightRange = 1;
+		//HACK: reset anim
+		UnitShowAnimation(unit, unit->Type->Animations->Still);
 		unit->Remove(build);
 		build->CurrentSightRange = 0;
 		unit->X = x;
 		unit->Y = y;
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->Orders[0]->Goal = NULL;
-		unit->SubAction = 0;
+		unit->Orders[0]->Action = UnitActionBuild;
+		unit->Data.Build.Cycles = 0;
+		unit->SubAction = 40;
+		unit->Orders[0]->Goal = build;
+		build->RefsIncrease();
+		if (unit->Selected) {
+			SelectedUnitChanged();
+		}
 	} else {
+		// Use repair to do the building
+		unit->Orders[0]->Action = UnitActionRepair;
 		unit->Orders[0]->Goal = build;
 		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
 		// FIXME: Should have a BuildRange?
 		unit->Orders[0]->Range = unit->Type->RepairRange;
-		unit->SubAction = 40;
+		unit->SubAction = 0;
 		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
 		UnitUpdateHeading(unit);
-		unit->Data.Build.Cycles = 0;
 		build->RefsIncrease();
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
@@ -330,37 +358,41 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 */
 static void BuildBuilding(CUnit *unit)
 {
-	CUnit *goal;
-	int hp;
-	int animlength;
 
 	UnitShowAnimation(unit, unit->Type->Animations->Build);
 	unit->Data.Build.Cycles++;
 	if (unit->Anim.Unbreakable) {
 		return ;
 	}
+	
+	//
+	// Calculate the length of the attack (repair) anim.
+	//
+	//int animlength = unit->Data.Build.Cycles;
+	unit->Data.Build.Cycles = 0;
+#if 0
+	CUnit *goal;
+	int hp;
+	
+	//goal hp are mod by HandleActionBuilt
+	//and outsid builder use repair now.		
 	goal = unit->Orders[0]->Goal;
-	Assert(goal);
+	//Assert(goal);
+	if(!goal) {
+		return;
+	}
 
 	if (goal->Orders[0]->Action == UnitActionDie) {
 		goal->RefsDecrease();
 		unit->Orders[0]->Goal = NULL;
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = unit->State = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->State = 0;
+		unit->ClearAction();
 		return;
 	}
 
 	// hp is the current damage taken by the unit.
 	hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
 		(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
-	//
-	// Calculate the length of the attack (repair) anim.
-	//
-	animlength = unit->Data.Build.Cycles;
-	unit->Data.Build.Cycles = 0;
 
 	// FIXME: implement this below:
 	// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
@@ -378,18 +410,16 @@ static void BuildBuilding(CUnit *unit)
 	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
 		goal->RefsDecrease();
 		unit->Orders[0]->Goal = NULL;
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = unit->State = 0;
-		if (unit->Selected) { // update display for new action
-			SelectedUnitChanged();
-		}
+		unit->State = 0;
+		unit->ClearAction();
 	}
+#endif
 }
 
 /**
 **  Unit builds a building.
 **
-**  @param unit  Unit that builds a building.
+**  @param unit  Unit that builds a building
 */
 void HandleActionBuild(CUnit *unit)
 {
@@ -411,20 +441,23 @@ void HandleActionBuild(CUnit *unit)
 /**
 **  Unit under Construction
 **
-**  @param unit  Unit that is built.
+**  @param unit  Unit that is being built
 */
 void HandleActionBuilt(CUnit *unit)
 {
 	CUnit *worker;
 	CUnitType *type;
-	int n;
+	int n, mod;
 	int progress;
 
 	type = unit->Type;
 
+	// mod is use for round to upper
+	mod = (unit->Stats->Costs[TimeCost] * 600) - unit->Variable[HP_INDEX].Value;
+	
 	// n is the current damage taken by the unit.
-	n = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) /
-		(unit->Stats->Costs[TimeCost] * 600) - unit->Variable[HP_INDEX].Value;
+	n = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max + (mod - 1)) / mod;
+	
 	// This below is most often 0
 	if (type->BuilderOutside) {
 		progress = unit->Type->AutoBuildRate;
@@ -436,9 +469,13 @@ void HandleActionBuilt(CUnit *unit)
 	// Building speeds increase or decrease.
 	progress *= SpeedBuild;
 	unit->Data.Built.Progress += progress;
+	// mod is use for round to upper and use it as cache
+	mod = type->Stats[unit->Player->Index].Costs[TimeCost] * 600;
+	
 	// Keep the same level of damage while increasing HP.
-	unit->Variable[HP_INDEX].Value = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) /
-		(type->Stats[unit->Player->Index].Costs[TimeCost] * 600) - n;
+	unit->Variable[HP_INDEX].Value =
+	 (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max + (mod - n - 1)) /
+		(mod - n);
 	if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
 		unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
 	}
@@ -447,12 +484,12 @@ void HandleActionBuilt(CUnit *unit)
 	// Check if construction should be canceled...
 	//
 	if (unit->Data.Built.Cancel || unit->Data.Built.Progress < 0) {
-		DebugPrint("%s canceled.\n" _C_ unit->Type->Name.c_str());
+		DebugPrint("%d: %s canceled.\n" _C_ unit->Player->Index 
+				_C_ unit->Type->Name.c_str());
 		// Drop out unit
 		if ((worker = unit->Data.Built.Worker)) {
-			worker->Orders[0]->Action = UnitActionStill;
+			worker->ClearAction();
 			unit->Data.Built.Worker = NoUnitP;
-			worker->SubAction = 0;
 			// HACK: make sure the sight is updated correctly
 			unit->CurrentSightRange = 1;
 			DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
@@ -469,13 +506,15 @@ void HandleActionBuilt(CUnit *unit)
 	//
 	// Check if building ready. Note we can both build and repair.
 	//
-	if (unit->Data.Built.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
+	//if (unit->Data.Built.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
+	if (unit->Data.Built.Progress >= mod ||
 			unit->Variable[HP_INDEX].Value >= unit->Stats->Variables[HP_INDEX].Max) {
-		DebugPrint("Building ready.\n");
+		DebugPrint("%d: Building %s(%s) ready.\n" _C_ unit->Player->Index
+		_C_ unit->Type->Ident.c_str() _C_ unit->Type->Name.c_str() );
 		if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
 			unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
 		}
-		unit->Orders[0]->Action = UnitActionStill;
+		unit->ClearAction();
 		// HACK: the building is ready now
 		unit->Player->UnitTypesCount[type->Slot]++;
 		unit->Constructed = 0;
@@ -483,6 +522,16 @@ void HandleActionBuilt(CUnit *unit)
 			unit->Frame = -1;
 		} else {
 			unit->Frame = 0;
+		}
+
+		if (type->GivesResource) {
+			// Set to Zero as it's part of a union
+			//unit->Data.Resource.Active = 0;
+			memset(&unit->Data, 0, sizeof(unit->Data));
+			// Has StartingResources, Use those
+			if (type->StartingResources) {
+				unit->ResourcesHeld = type->StartingResources;
+			}
 		}
 
 		if ((worker = unit->Data.Built.Worker)) {
@@ -493,26 +542,24 @@ void HandleActionBuilt(CUnit *unit)
 				worker = NULL;
 			// Drop out the worker.
 			} else {
-				worker->Orders[0]->Action = UnitActionStill;
-				worker->SubAction = 0;
+				worker->ClearAction();
+				worker->SubAction = 0;//may be 40
 				// HACK: make sure the sight is updated correctly
 				unit->CurrentSightRange = 1;
 				DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
+				
+				CUnit *goal = worker->Orders[0]->Goal;
+				if(goal) {
+					goal->RefsDecrease();
+					worker->Orders[0]->Goal = NULL;				
+				}
+				
 				//
 				// If we can harvest from the new building, do it.
 				//
 				if (worker->Type->ResInfo[type->GivesResource]) {
 					CommandResource(worker, unit, 0);
 				}
-			}
-		}
-
-		if (type->GivesResource) {
-			// Set to Zero as it's part of a union
-			unit->Data.Resource.Active = 0;
-			// Has StartingResources, Use those
-			if (type->StartingResources) {
-				unit->ResourcesHeld = type->StartingResources;
 			}
 		}
 
@@ -552,9 +599,7 @@ void HandleActionBuilt(CUnit *unit)
 			UnitUpdateHeading(unit);
 		}
 
-		if (IsOnlySelected(unit)) {
-			SelectedUnitChanged();
-		} else if (unit->Player == ThisPlayer) {
+		if (IsOnlySelected(unit) || unit->Player == ThisPlayer) {
 			SelectedUnitChanged();
 		}
 		unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;

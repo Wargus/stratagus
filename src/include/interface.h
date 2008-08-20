@@ -235,7 +235,7 @@ extern int HoldClickDelay;
 ----------------------------------------------------------------------------*/
 
 //
-// in botpanel.c
+// in botpanel.cpp
 //
 	/// Generate all buttons
 extern void InitButtons(void);
@@ -244,10 +244,10 @@ extern void CleanButtons(void);
 	/// Make a new button
 extern int AddButton(int pos, int level, const std::string &IconIdent,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &arg, int key, const std::string &hint, const std::string &umask);
+	const std::string &arg, const std::string &hint, const std::string &umask);
 
 //
-// in mouse.c
+// in mouse.cpp
 //
 	/// Called if any mouse button is pressed down
 extern void HandleButtonDown(unsigned button);
@@ -363,7 +363,7 @@ extern void DrawPieMenu(void);
 extern int HandleMouseScrollArea(int x, int y);
 
 //
-// in button_checks.c
+// in button_checks.cpp
 //
 	/// Check is always true
 extern bool ButtonCheckTrue(const CUnit *unit,
@@ -412,6 +412,18 @@ extern bool ButtonCheckSingleResearch(const CUnit *unit,
 extern void SelectionChanged(void);
 	/// Called whenever the selected unit was updated
 extern void SelectedUnitChanged(void);
+
+//
+// in game.cpp
+//
+	/// Set the game paused or unpaused
+extern void SetGamePaused(bool paused);
+	/// Get the game paused or unpaused
+extern bool GetGamePaused();
+	/// Set the game speed
+extern void SetGameSpeed(int speed);
+	/// Get the game speed
+extern int GetGameSpeed();
 
 //@}
 

@@ -110,7 +110,7 @@ enum AiForceRole {
 class AiForce {
 public:
 	AiForce() : Completed(false), Defending(false), Attacking(false), Role(0),
-		State(AiForceRoleDefend), GoalX(0), GoalY(0) {}
+		State(AiForceRoleDefend), GoalX(0), GoalY(0), MustTransport(false) {}
 
 	/**
 	**  Reset the force. But don't change its role and its demand.
@@ -123,6 +123,7 @@ public:
 		Units.clear();
 		State = 0;
 		GoalX = GoalY = 0;
+		MustTransport = false;
 	}
 
 	bool Completed;     /// Flag saying force is complete build
@@ -139,6 +140,7 @@ public:
 	unsigned int State;/// Attack state
 	int GoalX;         /// Attack point X tile map position
 	int GoalY;         /// Attack point Y tile map position
+	bool MustTransport;/// Flag must use transporter
 };
 
 /**
@@ -148,11 +150,14 @@ public:
 */
 class AiBuildQueue {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(NULL) {}
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), X(-1), Y(-1)  {}
 
 	unsigned int Want;  /// requested number
 	unsigned int Made;  /// built number
 	CUnitType *Type;    /// unit-type
+	unsigned long Wait; /// wait until this cycle
+	short int X;              /// build near x pos on map
+	short int Y;              /// build near y pos on map
 };
 
 /**
@@ -168,14 +173,25 @@ public:
 };
 
 /**
+**  AI transport request
+*/
+class AiTransportRequest {
+public:
+	AiTransportRequest() : Unit(NULL) {}
+
+	CUnit *Unit;
+	COrder Order;
+};
+
+/**
 **  AI variables.
 */
 class PlayerAi {
 public:
-	PlayerAi() : Player(NULL), AiType(NULL), ScriptDebug(false),
+	PlayerAi() : Player(NULL), AiType(NULL),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
-		LastExplorationGameCycle(0), LastCanNotMoveGameCycle(0),
-		LastRepairBuilding(0)
+		ScriptDebug(false), LastExplorationGameCycle(0),
+		LastCanNotMoveGameCycle(0),	LastRepairBuilding(0)
 	{
 		memset(Reserve, 0, sizeof(Reserve));
 		memset(Used, 0, sizeof(Used));
@@ -188,7 +204,6 @@ public:
 	CAiType *AiType;               /// AI type of this player AI
 	// controller
 	std::string Script;            /// Script executed
-	bool ScriptDebug;              /// Flag script debuging on/off
 	unsigned long SleepCycles;     /// Cycles to sleep
 
 	// forces
@@ -203,16 +218,18 @@ public:
 	int Collect[MaxCosts]; /// Collect % of resources
 	int NeededMask;        /// Mask for needed resources
 	bool NeedSupply;       /// Flag need food
-
+	bool ScriptDebug;              /// Flag script debuging on/off
+	
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
 	unsigned long LastExplorationGameCycle;         /// When did the last explore occur?
+	std::vector<AiTransportRequest> TransportRequests;/// Requests for transport
 	unsigned long LastCanNotMoveGameCycle;          /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;    /// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;     /// Upgrade to unit-type requested and priority list
 	std::vector<CUpgrade *> ResearchRequests;       /// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;        /// What the resource manager should build
 	int LastRepairBuilding;                         /// Last building checked for repair in this turn
-	unsigned TriedRepairWorkers[UnitMax];           /// No. workers that failed trying to repair a building
+	unsigned int TriedRepairWorkers[UnitMax];           /// No. workers that failed trying to repair a building
 };
 
 /**
@@ -259,6 +276,20 @@ public:
 	** units/buildings which are equivalent.
 	*/
 	std::vector<std::vector<CUnitType *> > Equiv;
+	
+	/**
+	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
+	** units/buildings/mines which can harvest this resource.
+	*/
+	std::vector<std::vector<CUnitType *> > Refinery;
+
+	/**
+	** The index is the resource id - 1 (we can't store TIME), giving a table of all
+	** units/buildings/mines which can store this resource.
+	*/
+	std::vector<std::vector<CUnitType *> > Depots;
+
+	
 };
 
 /*----------------------------------------------------------------------------
@@ -285,37 +316,44 @@ extern void AiAddUpgradeToRequest(CUnitType *type);
 	/// Add research request to resource manager
 extern void AiAddResearchRequest(CUpgrade *upgrade);
 	/// Periodic called resource manager handler
-extern void AiResourceManager();
+extern void AiResourceManager(void);
 	/// Ask the ai to explore around x,y
 extern void AiExplore(int x, int y, int exploreMask);
 	/// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(CUnitType *a, CUnitType *b);
 	/// Remove any equivalence between unittypes
-extern void AiResetUnitTypeEquiv();
+extern void AiResetUnitTypeEquiv(void);
 	/// Finds all equivalents units to a given one
 extern int AiFindUnitTypeEquiv(const CUnitType *i, int *result);
 	/// Finds all available equivalents units to a given one, in the prefered order
 extern int AiFindAvailableUnitTypeEquiv(const CUnitType *i,
 	int *result);
+extern int AiGetBuildRequestsCount(int counter[UnitTypeMax]);
+
+extern void AiNewDepotRequest(CUnit *worker);
 
 //
 // Buildings
 //
 	/// Find nice building place
 extern int AiFindBuildingPlace(const CUnit *worker,
-	const CUnitType *type, int *dx, int *dy);
+	const CUnitType *type, int nx, int ny, int *dx, int *dy);
 
 //
 // Forces
 //
 	/// Cleanup units in force
-extern void AiCleanForces();
+extern void AiCleanForces(void);
 	/// Assign a new unit to a force
 extern void AiAssignToForce(CUnit *unit);
 	/// Assign a free units to a force
-extern void AiAssignFreeUnitsToForce();
+extern void AiAssignFreeUnitsToForce(void);
+	/// Attack with force at position
+extern void AiAttackWithForceAt(unsigned int force, int x, int y);
+	/// Attack with force
+extern void AiAttackWithForce(unsigned int force);
 	/// Periodic called force manager handler
-extern void AiForceManager();
+extern void AiForceManager(void);
 
 //
 // Plans
@@ -325,13 +363,16 @@ extern int AiFindWall(AiForce *force);
 	/// Plan the an attack
 extern int AiPlanAttack(AiForce *force);
 	/// Send explorers around the map
-extern void AiSendExplorers();
+extern void AiSendExplorers(void);
+	/// Enemy units in distance
+extern int AiEnemyUnitsInDistance(const CPlayer *player, const CUnitType *type,
+	int x, int y, unsigned range);
 
 //
 // Magic
 //
 	/// Check for magic
-extern void AiCheckMagic();
+extern void AiCheckMagic(void);
 
 //@}
 

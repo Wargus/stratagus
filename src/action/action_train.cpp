@@ -152,7 +152,7 @@ void HandleActionTrain(CUnit *unit)
 			nunit->Y = unit->Y;
 			type = unit->Type;
 
-			// Some guy made DropOutOnSide set unit to belong to the building
+			// DropOutOnSide set unit to belong to the building
 			// training it. This was an ugly hack, setting X and Y is enough,
 			// no need to add the unit only to be removed.
 			nunit->X = unit->X;
@@ -178,11 +178,11 @@ void HandleActionTrain(CUnit *unit)
 			}
 
 			if (unit->OrderCount == 1) {
-				unit->Orders[0]->Action = UnitActionStill;
+				unit->ClearAction();
 			} else {
 				unit->OrderFlush = 1;
+				unit->SubAction = 0;
 			}
-			unit->SubAction = 0;
 
 			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
 				DebugPrint("Wrong order for unit\n");

@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/image.h"
 #include "guichan/exception.h"
 
@@ -81,7 +81,8 @@ namespace gcn
     {
         if (mImageLoader == NULL)
         {
-            throw GCN_EXCEPTION("I have no ImageLoader!");
+        	assert(!"I have no ImageLoader!");
+            //throw GCN_EXCEPTION("I have no ImageLoader!");
         }
 
         mLoadedWithImageLoader = true;

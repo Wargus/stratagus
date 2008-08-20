@@ -71,13 +71,13 @@ char CurrentMapPath[1024];       /// Path of the current map
 **  @param x  Map X tile-position.
 **  @param y  Map Y tile-position.
 */
-void CMap::MarkSeenTile(int x, int y)
+void CMap::MarkSeenTile(const unsigned int index)
 {
 	int tile;
 	int seentile;
 	CMapField *mf;
 
-	mf = this->Fields + x + y * this->Info.MapWidth;
+	mf = this->Field(index);
 	//
 	//  Nothing changed? Seeing already the correct tile.
 	//
@@ -86,7 +86,12 @@ void CMap::MarkSeenTile(int x, int y)
 	}
 	mf->SeenTile = tile;
 
+	//rb - GRRRRRRRRRRRR
+	int y = index / Info.MapWidth;
+	int x = index - (y * Info.MapWidth);
+
 	if (this->Tileset.TileTypeTable) {
+
 		//  Handle wood changes. FIXME: check if for growing wood correct?
 		if (seentile != this->Tileset.RemovedTree &&
 				tile == this->Tileset.RemovedTree) {
@@ -94,7 +99,7 @@ void CMap::MarkSeenTile(int x, int y)
 		} else if (seentile == this->Tileset.RemovedTree &&
 				tile != this->Tileset.RemovedTree) {
 			FixTile(MapFieldForest, 1, x, y);
-		} else if (ForestOnMap(x, y)) {
+		} else if (ForestOnMap(index)) {
 			FixTile(MapFieldForest, 1, x, y);
 			FixNeighbors(MapFieldForest, 1, x, y);
 
@@ -105,7 +110,7 @@ void CMap::MarkSeenTile(int x, int y)
 		} else if (seentile == this->Tileset.RemovedRock &&
 				tile != Map.Tileset.RemovedRock) {
 			FixTile(MapFieldRocks, 1, x, y);
-		} else if (RockOnMap(x, y)) {
+		} else if (RockOnMap(index)) {
 			FixTile(MapFieldRocks, 1, x, y);
 			FixNeighbors(MapFieldRocks, 1, x, y);
 
@@ -137,8 +142,8 @@ void CMap::Reveal(void)
 	for (x = 0; x < this->Info.MapWidth; ++x) {
 		for (y = 0; y < this->Info.MapHeight; ++y) {
 			for (p = 0; p < PlayerMax; ++p) {
-				if (!this->Fields[x + y * this->Info.MapWidth].Visible[p]) {
-					this->Fields[x + y * this->Info.MapWidth].Visible[p] = 1;
+				if (!this->Field(x, y)->Visible[p]) {
+					this->Field(x, y)->Visible[p] = 1;
 				}
 			}
 			MarkSeenTile(x, y);
@@ -167,35 +172,6 @@ void CMap::Reveal(void)
 /*----------------------------------------------------------------------------
 --  Map queries
 ----------------------------------------------------------------------------*/
-
-/**
-**  Water on map tile.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if water, false otherwise.
-*/
-bool CMap::WaterOnMap(int tx, int ty) const
-{
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldWaterAllowed) != 0;
-}
-
-/**
-**  Coast on map tile.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if coast, false otherwise.
-*/
-bool CMap::CoastOnMap(int tx, int ty) const
-{
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldCoastAllowed) != 0;
-
-}
 
 /**
 **  Wall on map tile.
@@ -243,36 +219,6 @@ bool CMap::OrcWallOnMap(int tx, int ty) const
 }
 
 /**
-**  Forest on map tile.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if forest, false otherwise.
-*/
-bool CMap::ForestOnMap(int tx, int ty) const
-{
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldForest) != 0;
-}
-
-/**
-**  Rock on map tile.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if rock, false otherwise.
-*/
-bool CMap::RockOnMap(int tx, int ty) const
-{
-	Assert(tx >= 0 && ty >= 0 && tx < Info.MapWidth && ty < Info.MapHeight);
-
-	return (Fields[tx + ty * Info.MapWidth].Flags & MapFieldRocks) != 0;
-}
-
-/**
 **  Can move to this point, applying mask.
 **
 **  @param x     X map tile position.
@@ -281,17 +227,13 @@ bool CMap::RockOnMap(int tx, int ty) const
 **
 **  @return      True if could be entered, false otherwise.
 */
-int CheckedCanMoveToMask(int x, int y, int mask)
+bool CheckedCanMoveToMask(int x, int y, int mask)
 {
-	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
-		return 0;
-	}
-
-	return !(Map.Fields[x + y * Map.Info.MapWidth].Flags & mask);
+	return Map.Info.IsPointOnMap(x,y) && !Map.CheckMask(x, y, mask);
 }
 
 /**
-**  Can an unit of unit-type be placed at this point.
+**  Can a unit of unit-type be placed at this point.
 **
 **  @param type  unit-type to be checked.
 **  @param x     X map tile position.
@@ -299,7 +241,7 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 **
 **  @return      True if could be entered, false otherwise.
 */
-int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
+bool UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 {
 	int addx;  // iterator
 	int addy;  // iterator
@@ -307,18 +249,31 @@ int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 
 	Assert(type);
 	mask = type->MovementMask;
-	for (addx = 0; addx < type->TileWidth; addx++) {
-		for (addy = 0; addy < type->TileHeight; addy++) {
+#if 0
+	for (addx = 0; addx < type->TileWidth; ++addx) {
+		for (addy = 0; addy < type->TileHeight; ++addy) {
 			if (!CheckedCanMoveToMask(x + addx, y + addy, mask)) {
-				return 0;
+				return false;
 			}
 		}
 	}
-	return 1;
+#else
+	unsigned int index = y * Map.Info.MapWidth;
+	for (addy = 0; addy < type->TileHeight; ++addy) {
+		for (addx = 0; addx < type->TileWidth; ++addx) {
+			if(!(Map.Info.IsPointOnMap(x + addx,y + addy) && 
+				!Map.CheckMask(x + addx + index, mask))) {
+				return false;
+			}
+		}
+		index += Map.Info.MapWidth;
+	}
+#endif
+	return true;
 }
 
 /**
-**  Can an unit be placed to this point.
+**  Can a unit be placed to this point.
 **
 **  @param unit  unit to be checked.
 **  @param x     X map tile position.
@@ -326,7 +281,7 @@ int UnitTypeCanBeAt(const CUnitType *type, int x, int y)
 **
 **  @return      True if could be placeded, false otherwise.
 */
-int UnitCanBeAt(const CUnit *unit, int x, int y)
+bool UnitCanBeAt(const CUnit *unit, int x, int y)
 {
 	Assert(unit);
 	return UnitTypeCanBeAt(unit->Type, x, y);
@@ -340,13 +295,32 @@ void PreprocessMap(void)
 	int ix;
 	int iy;
 	CMapField *mf;
-
+	
+#ifdef _MSC_VER
 	for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			mf = Map.Fields + ix + iy * Map.Info.MapWidth;
 			mf->SeenTile = mf->Tile;
 		}
 	}
+#else
+	{
+		const int width = Map.Info.MapHeight * Map.Info.MapWidth;
+		int n = (width+7)/8;
+		mf = Map.Fields;
+		switch (width & 7) {
+			case 0: do {	mf->SeenTile = mf->Tile;++mf;
+			case 7:			mf->SeenTile = mf->Tile;++mf;
+			case 6:			mf->SeenTile = mf->Tile;++mf;
+			case 5:			mf->SeenTile = mf->Tile;++mf;
+			case 4:			mf->SeenTile = mf->Tile;++mf;
+			case 3:			mf->SeenTile = mf->Tile;++mf;
+			case 2:			mf->SeenTile = mf->Tile;++mf;
+			case 1:			mf->SeenTile = mf->Tile;++mf;
+				} while ( --n > 0 );
+		}		
+	}
+#endif
 
 	// it is required for fixing the wood that all tiles are marked as seen!
 	if (Map.Tileset.TileTypeTable) {
@@ -386,7 +360,6 @@ void CMap::Create()
 	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	this->Visible[0] = new unsigned[this->Info.MapWidth * this->Info.MapHeight / 2];
 	memset(this->Visible[0], 0, this->Info.MapWidth * this->Info.MapHeight / 2 * sizeof(unsigned));
-	InitUnitCache();
 }
 
 /**
@@ -427,16 +400,7 @@ void CMap::Clean(void)
 */
 bool CMap::IsSeenTile(unsigned short type, int x, int y) const
 {
-	switch (type) {
-		case MapFieldForest:
-			return this->Tileset.TileTypeTable[
-				this->Fields[x + y * this->Info.MapWidth].SeenTile] == TileTypeWood;
-		case MapFieldRocks:
-			return this->Tileset.TileTypeTable[
-				this->Fields[x + y * this->Info.MapWidth].SeenTile] == TileTypeRock;
-		default:
-			return false;
-	}
+	return this->Tileset.IsSeenTile(type, Map.Field(x,y)->SeenTile);
 }
 
 /**
@@ -459,15 +423,15 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	int flags;
 	CMapField *mf;
 
-
 	//  Outside of map or no wood.
-	if (x < 0 || y < 0 || x >= this->Info.MapWidth || y >= this->Info.MapHeight) {
+	if (!Info.IsPointOnMap(x, y))
+	{
 		return;
 	}
+	
+	mf = this->Field(x, y);
 
-	mf = this->Fields + x + y * this->Info.MapWidth;
-
-	if (seen && !IsSeenTile(type, x, y)) {
+	if (seen && !Tileset.IsSeenTile(type, mf->SeenTile)) {
 		return;
 	} else if (!seen && !(mf->Flags & type)) {
 		return;
@@ -497,45 +461,41 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	if (y - 1 < 0) {
 		ttup = 15; //Assign trees in all directions
 	} else {
+		CMapField *new_mf = (mf - this->Info.MapWidth);
 		if (seen) {
-			ttup = this->Tileset.MixedLookupTable[
-				this->Fields[x + (y - 1) * this->Info.MapWidth].SeenTile];
+			ttup = this->Tileset.MixedLookupTable[new_mf->SeenTile];
 		} else {
-			ttup = this->Tileset.MixedLookupTable[
-				this->Fields[x + (y - 1) * this->Info.MapWidth].Tile];
+			ttup = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
 	}
 	if (x + 1 >= this->Info.MapWidth) {
 		ttright = 15; //Assign trees in all directions
 	} else {
+		CMapField *new_mf = (mf + 1);
 		if (seen) {
-			ttright = this->Tileset.MixedLookupTable[
-				this->Fields[x + 1 + y  * this->Info.MapWidth].SeenTile];
+			ttright = this->Tileset.MixedLookupTable[new_mf->SeenTile];
 		} else {
-			ttright = this->Tileset.MixedLookupTable[
-				this->Fields[x + 1 + y  * this->Info.MapWidth].Tile];
+			ttright = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
 	}
 	if (y + 1 >= this->Info.MapHeight) {
 		ttdown = 15; //Assign trees in all directions
 	} else {
+		CMapField *new_mf = (mf + this->Info.MapWidth);
 		if (seen) {
-			ttdown = this->Tileset.MixedLookupTable[
-				this->Fields[x + (y + 1) * this->Info.MapWidth].SeenTile];
+			ttdown = this->Tileset.MixedLookupTable[new_mf->SeenTile];
 		} else {
-			ttdown = this->Tileset.MixedLookupTable[
-				this->Fields[x + (y + 1) * this->Info.MapWidth].Tile];
+			ttdown = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
 	}
 	if (x - 1 < 0) {
 		ttleft = 15; //Assign trees in all directions
 	} else {
+		CMapField *new_mf = (mf - 1);
 		if (seen) {
-			ttleft = this->Tileset.MixedLookupTable[
-				this->Fields[x -1 + y * this->Info.MapWidth].SeenTile];
+			ttleft = this->Tileset.MixedLookupTable[new_mf->SeenTile];
 		} else {
-			ttleft = this->Tileset.MixedLookupTable[
-				this->Fields[x -1 + y * this->Info.MapWidth].Tile];
+			ttleft = this->Tileset.MixedLookupTable[new_mf->Tile];
 		}
 	}
 
@@ -597,7 +557,7 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 		}
 	}
 
-	if (Map.IsFieldVisible(ThisPlayer, x, y)) {
+	if(mf->IsVisible(ThisPlayer, NoFogOfWar) > 0) {
 		UI.Minimap.UpdateSeenXY(x, y);
 		if (!seen) {
 			MarkSeenTile(x, y);
@@ -661,7 +621,7 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 	UI.Minimap.UpdateXY(x, y);
 	FixNeighbors(type, 0, x, y);
 
-	if (Map.IsFieldVisible(ThisPlayer, x, y)) {
+	if(mf->IsVisible(ThisPlayer, NoFogOfWar) > 0) {
 		UI.Minimap.UpdateSeenXY(x, y);
 		MarkSeenTile(x, y);
 	}
@@ -670,15 +630,16 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 /**
 **  Load the map presentation
 **
-**  @param mapname    map filename
-**/
+**  @param mapname  map filename
+*/
 void LoadStratagusMapInfo(const std::string &mapname) 
 {
 	// Set the default map setup by replacing .smp with .sms
-	char *file = new_strdup(mapname.c_str());
-	memcpy(strstr(file, ".smp"), ".sms", 4);
-	Map.Info.Filename = file;
-	delete[] file;
+	size_t loc = mapname.find(".smp");
+	if (loc != std::string::npos) {
+		Map.Info.Filename = mapname;
+		Map.Info.Filename.replace(loc, 4, ".sms");
+	}
 	
 	LuaLoadFile(mapname);
 }

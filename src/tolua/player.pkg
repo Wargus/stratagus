@@ -15,14 +15,17 @@ class CPlayer
 	int Type;
 	int Race;
 	string AiName;
+
 	int StartX;
 	int StartY;
+	void SetStartView(int x, int y);
 
 	int Resources[MaxCosts];
 	int Incomes[MaxCosts];
 	const int Revenue[MaxCosts];
 
 	const int UnitTypesCount[UnitTypeMax];
+	int AiEnabled;
 
 	CUnit *Units[UnitMax];
 	int TotalNumUnits;

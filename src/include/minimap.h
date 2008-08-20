@@ -49,6 +49,7 @@ public:
 	void Update(void);
 	void Create(void);
 #ifdef USE_OPENGL
+	void FreeOpenGL(void);
 	void Reload(void);
 #endif
 	void Destroy(void);

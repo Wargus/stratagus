@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/widgets/label.h"
 #include "guichan/exception.h"
 
@@ -112,7 +112,8 @@ namespace gcn
               textX = getWidth();
               break;
           default:
-              throw GCN_EXCEPTION("Unknown alignment.");
+              //throw GCN_EXCEPTION("Unknown alignment.");
+              assert(!"Unknown alignment.");
         }
 
         graphics->setFont(getFont());

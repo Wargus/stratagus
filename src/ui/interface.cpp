@@ -60,6 +60,20 @@
 #include "commands.h"
 #include "ai.h"
 #include "widgets.h"
+#include "replay.h"
+
+/*----------------------------------------------------------------------------
+--  Defines
+----------------------------------------------------------------------------*/
+
+	/// Scrolling area (<= 15 y)
+#define SCROLL_UP     15
+	/// Scrolling area (>= VideoHeight - 16 y)
+#define SCROLL_DOWN   (Video.Height - 16)
+	/// Scrolling area (<= 15 y)
+#define SCROLL_LEFT   15
+	/// Scrolling area (>= VideoWidth - 16 x)
+#define SCROLL_RIGHT  (Video.Width - 16)
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -70,8 +84,8 @@ static int SavedMapPositionY[3];     /// Saved map position Y
 static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
-char DefaultGroupKeys[] = "0123456789`";/// Default group keys
-char *UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
+const char DefaultGroupKeys[] = "0123456789`";/// Default group keys
+const char *UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
 bool GameRunning;                    /// Current running state
 bool GamePaused;                     /// Current pause state
 bool GameObserve;                    /// Observe mode
@@ -92,7 +106,7 @@ static void ShowInput(void)
 {
 	char *input;
 
-	sprintf(InputStatusLine, _("MESSAGE:%s~!_"), Input);
+	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), Input);
 	input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
@@ -328,6 +342,9 @@ static void UiToggleBigMap(void)
 */
 static void UiIncreaseGameSpeed(void)
 {
+	if (FastForwardCycle >= GameCycle) {
+		return;
+	}
 	VideoSyncSpeed += 10;
 	SetVideoSync();
 	UI.StatusLine.Set(_("Faster"));
@@ -338,6 +355,9 @@ static void UiIncreaseGameSpeed(void)
 */
 static void UiDecreaseGameSpeed(void)
 {
+	if (FastForwardCycle >= GameCycle) {
+		return;
+	}
 	if (VideoSyncSpeed <= 10) {
 		if (VideoSyncSpeed > 1) {
 			--VideoSyncSpeed;
@@ -682,9 +702,16 @@ int HandleCheats(const std::string &input)
 #ifdef DEBUG
 	if (input == "ai me") {
 		if (ThisPlayer->AiEnabled) {
+			// FIXME: UnitGoesUnderFog and UnitGoesOutOfFog change unit refs
+			// for human players.  We can't switch back to a human player or
+			// we'll be using the wrong ref counts.
+#if 0
 			ThisPlayer->AiEnabled = 0;
 			ThisPlayer->Type = PlayerPerson;
 			SetMessage("AI is off, Normal Player");
+#else
+			SetMessage("Cannot disable 'ai me' cheat");
+#endif
 		} else {
 			ThisPlayer->AiEnabled = 1;
 			ThisPlayer->Type = PlayerComputer;
@@ -704,12 +731,12 @@ int HandleCheats(const std::string &input)
 		return 0;
 	}
 	lua_pushstring(Lua, input.c_str());
-	LuaCall(1, 0);
+	LuaCall(1, 0, false);
 	if (lua_gettop(Lua) - base == 1) {
 		ret = LuaToBoolean(Lua, -1);
 		lua_pop(Lua, 1);
 	} else {
-		LuaError(Lua, "HandleCheats must return a boolean");
+		DebugPrint("HandleCheats must return a boolean");
 		ret = 0;
 	}
 	return ret;
@@ -744,7 +771,7 @@ static int InputKey(int key)
 			if (Input[0] == '-') {
 				if (!GameObserve && !GamePaused) {
 					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
-					CclCommand(Input + 1);
+					CclCommand(Input + 1, false);
 				}
 			} else
 #endif
@@ -778,7 +805,7 @@ static int InputKey(int key)
 						++p;
 					}
 				}
-				sprintf(ChatMessage, "~%s~<%s>~> %s",
+				snprintf(ChatMessage, sizeof(ChatMessage), "~%s~<%s>~> %s",
 					PlayerColorNames[ThisPlayer->Index].c_str(),
 					ThisPlayer->Name.c_str(), Input);
 				// FIXME: only to selected players ...
@@ -865,7 +892,7 @@ static void Screenshot(void)
 
 	for (i = 1; i <= 99; ++i) {
 		// FIXME: what if we can't write to this directory?
-		sprintf(filename, "screen%02d.png", i);
+		snprintf(filename, sizeof(filename), "screen%02d.png", i);
 		if (fd.open(filename, CL_OPEN_READ) == -1) {
 			break;
 		}

@@ -67,14 +67,23 @@
 #define unlink _unlink
 #include <string.h>
 #define strdup _strdup
+#define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #include <io.h>
 #define access _access
 #define write _write
 #include <direct.h>
-#define mkdir _mkdir
+#define makedir(dir, permissions) _mkdir(dir)
 
 #endif  // } _MSC_VER
+
+#ifdef __GNUC__
+#ifdef USE_WIN32
+#define makedir(dir, permissions) mkdir(dir)
+#else 
+#define makedir(dir, permissions) mkdir(dir, permissions)
+#endif
+#endif
 
 /*============================================================================
 ==  Debug definitions
@@ -178,10 +187,10 @@ inline char *new_strdup(const char *str)
 #endif
 
 	/// Text string: Name, Version, Copyright
-extern char NameLine[];
+extern const char NameLine[];
 
 #ifndef STRATAGUS_LIB_PATH
-#define STRATAGUS_LIB_PATH  "data"      /// Where to find the data files
+#define STRATAGUS_LIB_PATH  "."      /// Where to find the data files
 #endif
 
 #ifndef STRATAGUS_HOME_PATH
@@ -227,47 +236,11 @@ extern char NameLine[];
 --  stratagus.c
 ----------------------------------------------------------------------------*/
 
-class CFont;
-
-enum {
-	TitleFlagCenter = 1 << 0,  /// Center Text
-};
-
-class TitleScreenLabel {
-public:
-	TitleScreenLabel() : Font(0), Xofs(0), Yofs(0), Flags(0) {}
-
-	std::string Text;
-	CFont *Font;
-	int Xofs;
-	int Yofs;
-	int Flags;
-};
-
-class TitleScreen {
-public:
-	TitleScreen() : Timeout(0), Iterations(0), Labels(NULL) {}
-	~TitleScreen() {
-		if (this->Labels) {
-			for (int i = 0; this->Labels[i]; ++i) {
-				delete this->Labels[i];
-			}
-			delete[] this->Labels;
-		}
-	}
-
-	std::string File;
-	std::string Music;
-	int Timeout;
-	int Iterations;
-	TitleScreenLabel **Labels;
-};
-
-extern TitleScreen **TitleScreens;          /// File for title screen
+extern std::string UserDirectory;           /// Directory containing user settings and data
+extern std::string StratagusLibPath;        /// Location of stratagus data
 extern std::string GameName;                /// Name of the game
 extern std::string ClickMissile;            /// Missile to show when you click
 extern std::string DamageMissile;           /// Missile to show damage caused
-extern std::string StratagusLibPath;        /// Location of stratagus data
 
 extern int SpeedBuild;                      /// Speed factor for building
 extern int SpeedTrain;                      /// Speed factor for training
@@ -282,15 +255,15 @@ extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern void SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename); /// Delete save game
-extern int SaveGameLoading;                 /// Save game is in progress of loading
+extern bool SaveGameLoading;                 /// Save game is in progress of loading
 struct lua_State;
 extern std::string SaveGlobal(lua_State *l, bool is_root); /// For saving lua state
 
-extern void Exit(int err);                  /// Exit stratagus
-extern void ExitFatal(int err);             /// Exit stratagus with fatal error
+extern void Exit(int err);                  /// Exit
+extern void ExitFatal(int err);             /// Exit with fatal error
 
 extern void UpdateDisplay(void);            /// Game display update
-extern void InitModules(void);              /// Initinalize all modules
+extern void InitModules(void);              /// Initialize all modules
 extern void LoadModules(void);              /// Load all modules
 extern void CleanModules(void);             /// Cleanup all modules
 extern void DrawMapArea(void);              /// Draw the map area

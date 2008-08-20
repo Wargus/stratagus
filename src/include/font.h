@@ -60,11 +60,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "video.h"
+#include <string>
+#include "SDL.h"
+#include "guichan/font.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+class CGraphic;
 
 	/// Font definition
 class CFont : public gcn::Font {
@@ -78,14 +81,15 @@ public:
 	static CFont *New(const std::string &ident, CGraphic *g);
 	static CFont *Get(const std::string &ident);
 
-	inline int Height() const { return G->Height; }
+	int Height() const;
 	int Width(const std::string &text) const;
-	inline bool IsLoaded() { return G && G->IsLoaded(); }
+	int Width(const int number) const;
+	bool IsLoaded() const;
 
 	virtual int getHeight() const { return Height(); }
 	virtual int getWidth(const std::string &text) const
-		{ return Width(text.c_str()); }
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text,
+		{ return Width(text); }
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text, 
 		int x, int y);
 
 	void MeasureWidths();
@@ -168,9 +172,14 @@ extern int VideoDrawReverseNumber(int x, int y, CFont *font, int number);
 	/// Draw reverse number clipped
 extern int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number);
 
+	/// Get the hot key from a string
+extern int GetHotKey(const std::string &text);
+
 	/// Load and initialize the fonts
 extern void LoadFonts(void);
 #ifdef USE_OPENGL
+	/// Free OpenGL fonts
+extern void FreeOpenGLFonts(void);
 	/// Reload OpenGL fonts
 extern void ReloadFonts(void);
 #endif

@@ -94,18 +94,18 @@ int UnitShowAnimation(CUnit *unit, const CAnimation *anim)
 /**
 **  Show unit animation.
 **
-**  @param unit  Unit of the animation.
-**  @param anim  Animation script to handle.
-**  @param scale scaling factor of the wait times in animation (8 means no scaling).
+**  @param unit   Unit of the animation.
+**  @param anim   Animation script to handle.
+**  @param scale  Scaling factor of the wait times in animation (8 means no scaling).
 **
-**  @return      The flags of the current script step.
+**  @return       The flags of the current script step.
 */
 int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 {
 	int move;
 
 	// Changing animations
-	if (unit->Anim.CurrAnim != anim) {
+	if (anim && unit->Anim.CurrAnim != anim) {
 	// Assert fails when transforming unit (upgrade-to).
 		Assert(!unit->Anim.Unbreakable);
 		unit->Anim.Anim = unit->Anim.CurrAnim = anim;
@@ -198,6 +198,9 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 
 			case AnimationUnbreakable:
 				Assert(unit->Anim.Unbreakable ^ unit->Anim.Anim->D.Unbreakable.Begin);
+				/*DebugPrint("UnitShowAnimationScaled: switch Unbreakable from %s to %s\n"
+					_C_ unit->Anim.Unbreakable ? "TRUE" : "FALSE"
+					_C_ unit->Anim.Anim->D.Unbreakable.Begin ? "TRUE" : "FALSE" );*/
 				unit->Anim.Unbreakable = unit->Anim.Anim->D.Unbreakable.Begin;
 				break;
 
@@ -380,9 +383,8 @@ static void (*HandleActionTable[256])(CUnit *) = {
 */
 static void HandleRegenerations(CUnit *unit)
 {
-	int f;
+	int f = 0;
 
-	f = 0;
 	// Burn
 	if (!unit->Removed && !unit->Destroyed && unit->Variable[HP_INDEX].Max &&
 			unit->Orders[0]->Action != UnitActionBuilt &&
@@ -444,6 +446,12 @@ static void HandleBuffs(CUnit *unit, int amount)
 	}
 }
 
+static void RunAction(unsigned char action, CUnit *unit)
+{
+	HandleActionTable[action](unit);
+}
+
+
 /**
 **  Handle the action of a unit.
 **
@@ -451,8 +459,6 @@ static void HandleBuffs(CUnit *unit, int amount)
 */
 static void HandleUnitAction(CUnit *unit)
 {
-	int z;
-
 	//
 	// If current action is breakable proceed with next one.
 	//
@@ -474,28 +480,35 @@ static void HandleUnitAction(CUnit *unit)
 				// This happens, if building with ALT+SHIFT.
 				return;
 			}
-
+			COrder *order = unit->Orders[0];
 			//
 			// Release pending references.
 			//
-			if (unit->Orders[0]->Goal) {
+			if (order->Goal) {
+				CUnit *goal = order->Goal;
 				// If mining decrease the active count on the resource.
-				if (unit->Orders[0]->Action == UnitActionResource &&
-						unit->SubAction == 60) {
-					// FIXME: SUB_GATHER_RESOURCE ?
-					unit->Orders[0]->Goal->Data.Resource.Active--;
-					Assert(unit->Orders[0]->Goal->Data.Resource.Active >= 0);
+				if (order->Action == UnitActionResource) {
+					if(unit->SubAction == 60) {
+						// FIXME: SUB_GATHER_RESOURCE ?
+						goal->Data.Resource.Active--;
+						Assert(goal->Data.Resource.Active >= 0);
+					}
 				}
 				// Still shouldn't have a reference unless attacking
-				Assert(!(unit->Orders[0]->Action == UnitActionStill && !unit->SubAction));
-				unit->Orders[0]->Goal->RefsDecrease();
+				Assert(!(order->Action == UnitActionStill && !unit->SubAction));
+				goal->RefsDecrease();
+				order->Goal = NULL;
 			}
-			if (unit->CurrentResource) {
-				if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
-					unit->ResourcesHeld < unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
-					unit->ResourcesHeld = 0;
+#ifdef DEBUG
+			 else {
+				if (unit->CurrentResource && 
+					!unit->Type->ResInfo[unit->CurrentResource]->TerrainHarvester) {
+					Assert(order->Action != UnitActionResource);
 				}
 			}
+#endif
+
+			DropResource(unit);
 
 			//
 			// Shift queue with structure assignment.
@@ -503,7 +516,7 @@ static void HandleUnitAction(CUnit *unit)
 			unit->OrderCount--;
 			unit->OrderFlush = 0;
 			delete unit->Orders[0];
-			for (z = 0; z < unit->OrderCount; ++z) {
+			for (int z = 0; z < unit->OrderCount; ++z) {
 				unit->Orders[z] = unit->Orders[z + 1];
 			}
 			unit->Orders.pop_back();
@@ -521,9 +534,9 @@ static void HandleUnitAction(CUnit *unit)
 	}
 
 	//
-	// Select action. FIXME: should us function pointers in unit structure.
+	// Select action.
 	//
-	HandleActionTable[unit->Orders[0]->Action](unit);
+	RunAction(unit->Orders[0]->Action, unit);
 }
 
 /**
@@ -551,7 +564,8 @@ void UnitActions(void)
 	// Check for things that only happen every few cycles
 	// (faster in their own loops.)
 	//
-
+	//FIXME rb - why it is faseter as own loops ?
+#if 0
 	// 1) Blink flag.
 	if (blinkthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
@@ -586,6 +600,33 @@ void UnitActions(void)
 			HandleRegenerations(table[i]);
 		}
 	}
+#else
+	if (blinkthiscycle || buffsthiscycle || regenthiscycle) {
+		for (i = 0; i < tabsize; ++i) {
+			if (table[i]->Destroyed) {
+				table[i--] = table[--tabsize];
+				continue;
+			}
+			
+			// 1) Blink flag.			
+			//if (blinkthiscycle && table[i]->Blink)
+			if (table[i]->Blink)
+			{
+				--table[i]->Blink;
+			}
+			// 2) Buffs...
+			//if (buffsthiscycle)
+			{
+				HandleBuffs(table[i], CYCLES_PER_SECOND);			
+			}
+			// 3) Increase health mana, burn and stuff
+			//if (regenthiscycle)
+			{
+				HandleRegenerations(table[i]);			
+			}
+		}			
+	}
+#endif
 
 	//
 	// Do all actions
@@ -609,7 +650,7 @@ void UnitActions(void)
 			time_t now;
 			char buf[256];
 
-			sprintf(buf, "log_of_stratagus_%d.log", ThisPlayer->Index);
+			snprintf(buf, sizeof(buf), "log_of_stratagus_%d.log", ThisPlayer->Index);
 			logf = fopen(buf, "wb");
 			if (!logf) {
 				return;

@@ -21,8 +21,10 @@ class CUIButton
 };
 
 $[
+_uiButtonCallbacks = {}
 CUIButton.SetCallback = function(w, f)
-  w.Callback = LuaActionListener:new(f)
+  w.Callback = LuaActionListener(f)
+  table.insert(_uiButtonCallbacks, w.Callback)
 end
 $]
 
@@ -38,6 +40,12 @@ class CMapArea
 	int ScrollPaddingBottom;
 };
 
+class CViewport
+{
+	int Viewport2MapX(int x);
+	int Viewport2MapY(int y);
+};
+
 class CFiller
 {
 	CFiller();
@@ -51,15 +59,26 @@ class vector
 {
 	TOLUA_TEMPLATE_BIND(T, CFiller, CUIButton, string)
 
-	void clear();
-	int size() const;
+	vector();
+	~vector();
 
 	const T& operator[](int index) const;
 	T& operator[](int index);
-	void push_back(T val);
+	const T& at(int index) const;
+	T& at(int index);
 
-	vector();
-	~vector();
+	const T& front() const;
+	T& front();
+	const T& back() const;
+	T& back();
+
+	void push_back(T val);
+	void pop_back();
+
+	void assign(int num, const T& val);
+	void clear();
+	bool empty() const;
+	int size() const;
 };
 
 
@@ -88,6 +107,7 @@ class CResourceInfo
 	int IconFrame;
 	int IconX;
 	int IconY;
+	int IconWidth;
 	int TextX;
 	int TextY;
 };
@@ -146,7 +166,11 @@ class CUserInterface
 	
 	CPieMenu PieMenu;
 
+	CViewport *MouseViewport;
 	CMapArea MapArea;
+
+	CFont *MessageFont;
+	int MessageScrollSpeed;
 
 	CUIButton MenuButton;
 	CUIButton NetworkMenuButton;
@@ -184,6 +208,9 @@ extern void SetDoubleClickDelay(int delay);
 extern int GetHoldClickDelay(void);
 extern void SetHoldClickDelay(int delay);
 
+extern int CursorX;
+extern int CursorY;
+
 
 //
 //  Guichan
@@ -219,6 +246,8 @@ class Widget
 	virtual void setY(int y);
 	virtual int getY() const;
 	virtual void setPosition(int x, int y);
+	virtual void setBorderSize(int width);
+	virtual unsigned int getBorderSize() const;
 	virtual void setEnabled(bool enabled);
 	virtual bool isEnabled() const;
 	virtual void setVisible(bool visible);
@@ -230,6 +259,8 @@ class Widget
 	virtual const Color &getForegroundColor() const;
 	virtual void setBackgroundColor(const Color color);
 	virtual const Color &getBackgroundColor() const;
+	virtual void setDisabledColor(const Color color);
+	virtual const Color &getDisabledColor() const;
 
 	static void setGlobalFont(CFont *font);
 	virtual void setForegroundColor(const Color color);

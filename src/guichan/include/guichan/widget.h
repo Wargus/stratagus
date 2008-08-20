@@ -357,7 +357,21 @@ namespace gcn
          * @return the background Color.
          */
         virtual const Color& getBackgroundColor() const;    
-            
+
+        /**
+         * Sets the disabled color.
+         *
+         * @param color the disabled Color.
+         */
+        virtual void setDisabledColor(const Color& color);
+
+        /**
+         * Gets the disabled color.
+         *
+         * @return the disabled Color.
+         */
+        virtual const Color& getDisabledColor() const;    
+
         /**
          * Called when a Widget recieves a MouseInput.
          *
@@ -672,6 +686,7 @@ namespace gcn
         Color mForegroundColor;
         Color mBackgroundColor;
         Color mBaseColor;
+        Color mDisabledColor;
         FocusHandler* mFocusHandler;
         BasicContainer* mParent;
         Rectangle mDimension;

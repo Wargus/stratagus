@@ -91,7 +91,7 @@ void AnimateActionAttack(CUnit *unit)
 **
 **  @warning  The caller must check, if he likes the restored SavedOrder!
 **
-**  @todo     If an unit enters an building, than the attack choose an
+**  @todo     If a unit enters an building, than the attack choose an
 **            other goal, perhaps it is better to wait for the goal?
 **
 **  @param unit  Unit using the goal.
@@ -121,12 +121,12 @@ static int CheckForDeadGoal(CUnit *unit)
 	// If we have a saved order continue this saved order.
 	//
 	if (unit->SavedOrder.Action != UnitActionStill) {
+		unit->ClearAction();
 		*unit->Orders[0] = unit->SavedOrder;
 		unit->SavedOrder.Action = UnitActionStill;
 		unit->SavedOrder.Goal = NoUnitP;
 		// Restart order state.
 		unit->State = 0;
-		unit->SubAction = 0;
 		NewResetPath(unit);
 		return 1;
 	}
@@ -235,6 +235,13 @@ static void MoveToTarget(CUnit *unit)
 	// Look if we have reached the target.
 	//
 	goal = unit->Orders[0]->Goal;
+	if (err == 0 && !goal) {
+		// Check if we're in range when attacking a location and we are waiting
+		if (MapDistanceToUnit(unit->Orders[0]->X, unit->Orders[0]->Y, unit) <
+				unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
+			err = PF_REACHED;
+		}
+	}
 	if (err >= 0) {
 		if (CheckForTargetInRange(unit)) {
 			return;

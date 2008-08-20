@@ -48,16 +48,14 @@
 #include "interface.h"
 #include "unit.h"
 #include "iolib.h"
-
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 CTimer GameTimer;               /// The game timer
-static unsigned long WaitFrame; /// Frame to wait for
 static int Trigger;
-static int WaitTrigger;
 static bool *ActiveTriggers;
 
 /// Some data accessible for script during the game.
@@ -207,7 +205,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	lua_pushvalue(l, 2);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 3) || luaL_getn(l, 3) != 2) {
+	if (!lua_istable(l, 3) || lua_objlen(l, 3) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 3, 1);
@@ -216,7 +214,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	lua_rawgeti(l, 3, 2);
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 4) || luaL_getn(l, 4) != 2) {
+	if (!lua_istable(l, 4) || lua_objlen(l, 4) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 4, 1);
@@ -232,7 +230,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	// FIXME: I hope SelectUnits checks bounds?
 	// FIXME: Yes, but caller should check.
 	// NOTE: +1 right,bottom isn't inclusive :(
-	an = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table);
+	an = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
 	//
 	// Count the requested units
 	//
@@ -307,11 +305,11 @@ static int CclIfNearUnit(lua_State *l)
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
-			an = UnitCacheSelect(unit->X - 1, unit->Y - 1,
+			an = Map.Select(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
 				unit->Y + unit->Type->TileHeight + 1, around);
 		} else {
-			an = UnitCacheSelect(unit->X - 2, unit->Y - 2,
+			an = Map.Select(unit->X - 2, unit->Y - 2,
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around);
 		}
@@ -353,7 +351,7 @@ static int CclIfNearUnit(lua_State *l)
 }
 
 /**
-** Player has the quantity of rescued unit-type near to unit-type.
+**  Player has the quantity of rescued unit-type near to unit-type.
 */
 static int CclIfRescuedNearUnit(lua_State *l)
 {
@@ -401,11 +399,11 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
-			an = UnitCacheSelect(unit->X - 1, unit->Y - 1,
+			an = Map.Select(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
 				unit->Y + unit->Type->TileHeight + 1, around);
 		} else {
-			an = UnitCacheSelect(unit->X - 2, unit->Y - 2,
+			an = Map.Select(unit->X - 2, unit->Y - 2,
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around);
 		}
@@ -451,49 +449,37 @@ static int CclIfRescuedNearUnit(lua_State *l)
 /**
 **  Returns the number of opponents of a given player.
 */
-static int CclGetNumOpponents(lua_State *l)
+int GetNumOpponents(int player)
 {
-	int plynr;
-	int n;
-	int i;
-
-	LuaCheckArgs(l, 1);
-
-	plynr = LuaToNumber(l, 1);
+	int n = 0;
 
 	// Check the player opponents
-	n = 0;
-	for (i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		// This player is our enemy and has units left.
-		if (((Players[plynr].Enemy & (1 << i)) || (Players[i].Enemy & (1 << plynr))) &&
+		if (((Players[player].Enemy & (1 << i)) || (Players[i].Enemy & (1 << player))) &&
 				Players[i].TotalNumUnits) {
 			++n;
 		}
 	}
 
-	lua_pushnumber(l, n);
-	return 1;
+	return n;
 }
 
 /**
 **  Check the timer value
 */
-static int CclGetTimer(lua_State *l)
+int GetTimer()
 {
-	LuaCheckArgs(l, 0);
-
 	if (!GameTimer.Init) {
-		lua_pushnumber(l, 0);
-		return 1;
+		return 0;
 	}
-
-	lua_pushnumber(l, GameTimer.Cycles);
-	return 1;
+	return GameTimer.Cycles;
 }
 
 /*---------------------------------------------------------------------------
 -- Actions
 ---------------------------------------------------------------------------*/
+
 /**
 **  Stop the running game with a given result
 */
@@ -507,84 +493,53 @@ void StopGame(GameResults result)
 /**
 **  Action condition player wins.
 */
-static int CclActionVictory(lua_State *l)
+void ActionVictory()
 {
-	LuaCheckArgs(l, 0);
-
 	StopGame(GameVictory);
-	return 0;
 }
 
 /**
 **  Action condition player lose.
 */
-static int CclActionDefeat(lua_State *l)
+void ActionDefeat()
 {
-	LuaCheckArgs(l, 0);
-
 	StopGame(GameDefeat);
-	return 0;
 }
 
 /**
 **  Action condition player draw.
 */
-static int CclActionDraw(lua_State *l)
+void ActionDraw()
 {
-	LuaCheckArgs(l, 0);
-
 	StopGame(GameDraw);
-	return 0;
 }
 
 /**
 **  Action set timer
 */
-static int CclActionSetTimer(lua_State *l)
+void ActionSetTimer(int cycles, bool increasing)
 {
-	LuaCheckArgs(l, 2);
-
-	GameTimer.Cycles = LuaToNumber(l, 1);
-	GameTimer.Increasing = LuaToBoolean(l, 2);
+	GameTimer.Cycles = cycles;
+	GameTimer.Increasing = increasing;
 	GameTimer.Init = true;
 	GameTimer.LastUpdate = GameCycle;
-
-	return 0;
 }
 
 /**
 **  Action start timer
 */
-static int CclActionStartTimer(lua_State *l)
+void ActionStartTimer()
 {
-	LuaCheckArgs(l, 0);
-
 	GameTimer.Running = true;
 	GameTimer.Init = true;
-	return 0;
 }
 
 /**
 **  Action stop timer
 */
-static int CclActionStopTimer(lua_State *l)
+void ActionStopTimer()
 {
-	LuaCheckArgs(l, 0);
-
 	GameTimer.Running = false;
-	return 0;
-}
-
-/**
-**  Action wait
-*/
-static int CclActionWait(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-
-	WaitFrame = FrameCounter +
-		(FRAMES_PER_SECOND * VideoSyncSpeed / 100 * (int)LuaToNumber(l, 1) + 999) / 1000;
-	return 0;
 }
 
 /**
@@ -617,7 +572,7 @@ static int CclAddTrigger(lua_State *l)
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
 
-	i = luaL_getn(l, -1);
+	i = lua_objlen(l, -1);
 	if (ActiveTriggers && !ActiveTriggers[i / 2]) {
 		lua_pushnil(l);
 		lua_rawseti(l, -2, i + 1);
@@ -639,14 +594,9 @@ static int CclAddTrigger(lua_State *l)
 /**
 **  Set the trigger values
 */
-static int CclSetTriggers(lua_State *l)
+void SetTrigger(int trigger)
 {
-	LuaCheckArgs(l, 3);
-	Trigger = LuaToNumber(l, 1);
-	WaitTrigger = LuaToNumber(l, 2);
-	WaitFrame = LuaToNumber(l, 3);
-
-	return 0;
+	Trigger = trigger;
 }
 
 /**
@@ -682,7 +632,7 @@ static int TriggerExecuteAction(int script)
 	ret = 0;
 
 	lua_rawgeti(Lua, -1, script + 1);
-	args = luaL_getn(Lua, -1);
+	args = lua_objlen(Lua, -1);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(Lua, -1, j + 1);
 		LuaCall(0, 0);
@@ -692,10 +642,6 @@ static int TriggerExecuteAction(int script)
 			ret = 0;
 		}
 		lua_settop(Lua, base + 1);
-		if (WaitFrame > FrameCounter) {
-			lua_pop(Lua, 1);
-			return 0;
-		}
 	}
 	lua_pop(Lua, 1);
 
@@ -726,23 +672,10 @@ void TriggersEachCycle(void)
 
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	triggers = luaL_getn(Lua, -1);
+	triggers = lua_objlen(Lua, -1);
 
 	if (Trigger >= triggers) {
 		Trigger = 0;
-	}
-
-	if (WaitFrame > FrameCounter) {
-		lua_pop(Lua, 1);
-		return;
-	}
-	if (WaitFrame && WaitFrame <= FrameCounter) {
-		WaitFrame = 0;
-		if (TriggerExecuteAction(WaitTrigger + 1)) {
-			TriggerRemoveTrigger(WaitTrigger);
-		}
-		lua_pop(Lua, 1);
-		return;
 	}
 
 	if (GamePaused) {
@@ -760,14 +693,14 @@ void TriggersEachCycle(void)
 		Trigger += 2;
 	}
 	if (Trigger < triggers) {
-		WaitTrigger = Trigger;
+		int currentTrigger = Trigger;
 		Trigger += 2;
 		LuaCall(0, 0);
 		// If condition is true execute action
 		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
 			lua_settop(Lua, base + 1);
-			if (TriggerExecuteAction(WaitTrigger + 1)) {
-				TriggerRemoveTrigger(WaitTrigger);
+			if (TriggerExecuteAction(currentTrigger + 1)) {
+				TriggerRemoveTrigger(currentTrigger);
 			}
 		}
 		lua_settop(Lua, base + 1);
@@ -781,23 +714,11 @@ void TriggersEachCycle(void)
 void TriggerCclRegister(void)
 {
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
-	lua_register(Lua, "SetTriggers", CclSetTriggers);
 	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
 	// Conditions
 	lua_register(Lua, "GetNumUnitsAt", CclGetNumUnitsAt);
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
 	lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
-	lua_register(Lua, "GetNumOpponents", CclGetNumOpponents);
-	lua_register(Lua, "GetTimer", CclGetTimer);
-	// Actions
-	lua_register(Lua, "ActionVictory", CclActionVictory);
-	lua_register(Lua, "ActionDefeat", CclActionDefeat);
-	lua_register(Lua, "ActionDraw", CclActionDraw);
-	lua_register(Lua, "ActionSetTimer", CclActionSetTimer);
-	lua_register(Lua, "ActionStartTimer", CclActionStartTimer);
-	lua_register(Lua, "ActionStopTimer", CclActionStopTimer);
-	lua_register(Lua, "ActionWait", CclActionWait);
-
 }
 
 /**
@@ -812,7 +733,7 @@ void SaveTriggers(CFile *file)
 
 	lua_pushstring(Lua, "_triggers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	triggers = luaL_getn(Lua, -1);
+	triggers = lua_objlen(Lua, -1);
 
 	file->printf("SetActiveTriggers(");
 	for (i = 0; i < triggers; i += 2) {
@@ -829,7 +750,7 @@ void SaveTriggers(CFile *file)
 	}
 	file->printf(")\n");
 
-	file->printf("SetTriggers(%d, %d, %d)\n", Trigger, WaitTrigger, WaitFrame);
+	file->printf("SetTrigger(%d)\n", Trigger);
 
 	if (GameTimer.Init) {
 		file->printf("ActionSetTimer(%ld, %s)\n",
@@ -848,8 +769,6 @@ void InitTriggers(void)
 	//
 	// Setup default triggers
 	//
-	WaitFrame = 0;
-
 	// FIXME: choose the triggers for game type
 
 	lua_pushstring(Lua, "_triggers_");

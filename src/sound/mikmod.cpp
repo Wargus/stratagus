@@ -221,7 +221,7 @@ CSample *LoadMikMod(const char *name, int flags)
 	}
 	CurrentFile = f;
 
-	MikMod_Init("");
+	MikMod_Init((char*)"");
 	module = Player_LoadGeneric(&MReader, 64, 0);
 	if (!module) {
 		MikMod_Exit();

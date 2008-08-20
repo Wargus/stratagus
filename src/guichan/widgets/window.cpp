@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/widgets/window.h"
 #include "guichan/exception.h"
 #include "guichan/mouseinput.h"
@@ -263,7 +263,8 @@ namespace gcn
               textX = getWidth() - 4;
               break;
           default:
-              throw GCN_EXCEPTION("Unknown alignment.");
+              //throw GCN_EXCEPTION("Unknown alignment.");
+              assert(!"Unknown alignment.");
         }
 
         graphics->setColor(getForegroundColor());
@@ -345,7 +346,8 @@ namespace gcn
     {
         if (widget != getContent())
         {
-            throw GCN_EXCEPTION("Widget is not content of window.");      
+            //throw GCN_EXCEPTION("Widget is not content of window.");
+            assert(!"Widget is not content of window.");
         }
     }
   
@@ -353,7 +355,8 @@ namespace gcn
     {
         if (widget != getContent())
         {
-            throw GCN_EXCEPTION("Widget is not content of window");      
+            //throw GCN_EXCEPTION("Widget is not content of window"); 
+            assert(!"Widget is not content of window."); 
         }
     }
   
@@ -361,7 +364,8 @@ namespace gcn
     {
         if (widget != getContent())
         {
-            throw GCN_EXCEPTION("Widget is not content of window");      
+            //throw GCN_EXCEPTION("Widget is not content of window");
+            assert(!"Widget is not content of window.");
         }
 
         Rectangle d = getContentDimension();

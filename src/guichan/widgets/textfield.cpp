@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
 #include "guichan/widgets/textfield.h"
@@ -68,6 +68,8 @@ namespace gcn
     {
         mCaretPosition = 0;
         mXScroll = 0;
+		mSelectStart = 0;
+		mSelectEndOffset = 0;
 
         setFocusable(true);
 
@@ -81,7 +83,9 @@ namespace gcn
     {
         mCaretPosition = 0;
         mXScroll = 0;
-    
+		mSelectStart = 0;
+		mSelectEndOffset = 0;
+
         mText = text;
         adjustSize();
         setBorderSize(1);
@@ -104,6 +108,8 @@ namespace gcn
   
     void TextField::draw(Graphics* graphics)
     {
+		Font *font;
+		int x, y;
         Color faceColor = getBackgroundColor();
         graphics->setColor(faceColor);
         graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()));
@@ -114,8 +120,33 @@ namespace gcn
         }
     
         graphics->setColor(getForegroundColor());
-        graphics->setFont(getFont());
-        graphics->drawText(mText, 1 - mXScroll, 1);    
+		font = getFont();
+        graphics->setFont(font);
+
+		x = 1 - mXScroll;
+		y = 1;
+
+		if (mSelectEndOffset != 0)
+		{
+			unsigned int first;
+			unsigned int len;
+			int selX;
+			int selW;
+			std::string tmpStr;
+
+			getTextSelectionPositions(&first, &len);
+
+			tmpStr = std::string(mText.substr(0, first));
+			selX = font->getWidth(tmpStr);
+
+			tmpStr = std::string(mText.substr(first, len));
+			selW = font->getWidth(tmpStr);
+
+			graphics->setColor(Color(127, 127, 127));
+			graphics->fillRectangle(Rectangle(x + selX, y, selW, font->getHeight()));
+		}
+
+        graphics->drawText(mText, x, y);    
     }
 
     void TextField::drawBorder(Graphics* graphics)
@@ -153,6 +184,8 @@ namespace gcn
         if (hasMouse() && button == MouseInput::LEFT)
         {
             mCaretPosition = getFont()->getStringIndexAt(mText, x + mXScroll);
+			mSelectStart = mCaretPosition;
+			mSelectEndOffset = 0;
             fixScroll();
         }
         else if (hasMouse() && button == MouseInput::MIDDLE)
@@ -166,48 +199,103 @@ namespace gcn
         }
     }
 
+	void TextField::mouseMotion(int x, int y)
+	{
+		if (isDragged() && mClickButton == MouseInput::LEFT)
+		{
+			mCaretPosition = getFont()->getStringIndexAt(mText, x + mXScroll);
+			mSelectEndOffset = mCaretPosition - mSelectStart;
+		}
+	}
+
     bool TextField::keyPress(const Key& key)
     {
         bool ret = false;
+        unsigned int selFirst;
+        unsigned int selLen;
 
-        if (key.getValue() == Key::LEFT && mCaretPosition > 0)
+        getTextSelectionPositions(&selFirst, &selLen);
+
+        if (key.getValue() == Key::LEFT)
         {
-            mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
-            if (mCaretPosition < 0) {
-                throw GCN_EXCEPTION("Invalid UTF8.");
+            if (mCaretPosition > 0) {
+                mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
+                if (mCaretPosition < 0) {
+                    //throw GCN_EXCEPTION("Invalid UTF8.");
+                    assert(!"Invalid UTF8.");
+                }
+
+                if (key.isShiftPressed()) {
+                    --mSelectEndOffset;
+                } else {
+                    mSelectStart = mCaretPosition;
+                    mSelectEndOffset = 0;
+                }
+            } else if (!key.isShiftPressed()) {
+                mSelectStart = mCaretPosition;
+                mSelectEndOffset = 0;
             }
             ret = true;
         }
 
-        else if (key.getValue() == Key::RIGHT && mCaretPosition < (int)mText.size())
+        else if (key.getValue() == Key::RIGHT)
         {
-            mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-            if (mCaretPosition > (int)mText.size()) {
-                throw GCN_EXCEPTION("Invalid UTF8.");
+            if (mCaretPosition < (int)mText.size()) {
+                mCaretPosition = UTF8GetNext(mText, mCaretPosition);
+                if (mCaretPosition > (int)mText.size()) {
+                    //throw GCN_EXCEPTION("Invalid UTF8.");
+                    assert(!"Invalid UTF8.");
+                }
+
+                if (key.isShiftPressed()) {
+                    ++mSelectEndOffset;
+                } else {
+                    mSelectStart = mCaretPosition;
+                    mSelectEndOffset = 0;
+                }
+            } else if (!key.isShiftPressed()) {
+                mSelectStart = mCaretPosition;
+                mSelectEndOffset = 0;
             }
+
             ret = true;
         }
 
-        else if (key.getValue() == Key::DELETE && mCaretPosition < (int)mText.size())
+        else if (key.getValue() == Key::DELETE )
         {
-			int newpos = UTF8GetNext(mText, mCaretPosition);
-            if (mCaretPosition > (int)mText.size()) {
-                throw GCN_EXCEPTION("Invalid UTF8.");
-            }
-            mText.erase(mCaretPosition, newpos - mCaretPosition);
-            ret = true;
+			if (selLen > 0) {
+				mText.erase(selFirst, selLen);
+				mCaretPosition = selFirst;
+				mSelectStart = selFirst;
+				mSelectEndOffset = 0;
+			} else if (mCaretPosition < (int)mText.size()) {
+				int newpos = UTF8GetNext(mText, mCaretPosition);
+				if (mCaretPosition > (int)mText.size()) {
+					//throw GCN_EXCEPTION("Invalid UTF8.");
+					assert(!"Invalid UTF8.");
+				}
+				mText.erase(mCaretPosition, newpos - mCaretPosition);
+				ret = true;
+			}
         }
 
-        else if ((key.getValue() == Key::BACKSPACE || key.getValue() == 'h' - 'a' + 1) &&
-            mCaretPosition > 0)
+        else if (key.getValue() == Key::BACKSPACE || key.getValue() == 'h' - 'a' + 1)
         {
-            int newpos = UTF8GetPrev(mText, mCaretPosition);
-            if (mCaretPosition < 0) {
-                throw GCN_EXCEPTION("Invalid UTF8.");
-            }
-            mText.erase(newpos, mCaretPosition - newpos);
-			mCaretPosition = newpos;
-            ret = true;
+			if (selLen > 0) {
+				mText.erase(selFirst, selLen);
+				mCaretPosition = selFirst;
+				mSelectStart = selFirst;
+				mSelectEndOffset = 0;
+			} else if (mCaretPosition > 0) {
+				int newpos = UTF8GetPrev(mText, mCaretPosition);
+				if (mCaretPosition < 0) {
+					//throw GCN_EXCEPTION("Invalid UTF8.");
+					assert(!"Invalid UTF8.");
+				}
+				mText.erase(newpos, mCaretPosition - newpos);
+				mCaretPosition = newpos;
+				ret = true;
+			}
         }
 
         else if (key.getValue() == Key::ENTER)
@@ -218,14 +306,27 @@ namespace gcn
 
         else if (key.getValue() == Key::HOME || key.getValue() == 'a' - 'a' + 1) // ctrl-a
         {
+			if (key.isShiftPressed()) {
+				mSelectEndOffset -= mCaretPosition;
+			} else {
+				mSelectStart = 0;
+				mSelectEndOffset = 0;
+			}
             mCaretPosition = 0;
-            ret = true;
+			ret = true;
         }    
 
         else if (key.getValue() == Key::END || key.getValue() == 'e' - 'a' + 1)  //ctrl-e
         {
-            mCaretPosition = mText.size();
-            ret = true;
+			if (key.isShiftPressed()) {
+				mSelectEndOffset += mText.size() - mCaretPosition;
+			} else {
+				mSelectStart = mText.size();
+				mSelectEndOffset = 0;
+			}
+			mCaretPosition = mText.size();
+
+			ret = true;
         }    
 
         else if (key.getValue() == 'u' - 'a' + 1) // ctrl-u
@@ -237,6 +338,13 @@ namespace gcn
         else if (key.getValue() == 'v' - 'a' + 1) // ctrl-v
         {
             std::string str;
+			if (selLen > 0) {
+				mText.erase(selFirst, selLen);
+				mCaretPosition = selFirst;
+				mSelectStart = selFirst;
+				mSelectEndOffset = 0;
+			}
+
             if (GetClipboard(str) >= 0) {
                 for (size_t i = 0; i < str.size(); ++i) {
                     keyPress(Key(str[i]));
@@ -247,11 +355,21 @@ namespace gcn
 
         else if (key.isCharacter())
         {
+            if (selLen > 0) {
+                mText.erase(selFirst, selLen);
+                mCaretPosition = selFirst;
+                mSelectStart = selFirst;
+                mSelectEndOffset = 0;
+            }
+
             mText.insert(mCaretPosition,key.toString());
             mCaretPosition = UTF8GetNext(mText, mCaretPosition);
             if (mCaretPosition > (int)mText.size()) {
-                throw GCN_EXCEPTION("Invalid UTF8.");
+                //throw GCN_EXCEPTION("Invalid UTF8.");
+                assert(!"Invalid UTF8.");
             }
+			mSelectStart = mCaretPosition;
+			mSelectEndOffset = 0;
             ret = true;
         }
 
@@ -312,6 +430,20 @@ namespace gcn
     {
         return mCaretPosition;    
     }
+
+	void TextField::getTextSelectionPositions(unsigned int* first, unsigned int* len)
+	{
+		if (mSelectEndOffset < 0)
+		{
+			*first = mSelectStart + mSelectEndOffset;
+			*len = -mSelectEndOffset;
+		}
+		else
+		{
+			*first = mSelectStart;
+			*len = mSelectEndOffset;
+		}
+	}
 
     const std::string& TextField::getText() const
     {

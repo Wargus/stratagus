@@ -10,7 +10,7 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer, Francois Beerten, and
+//      (c) Copyright 1998-2008 by Lutz Sammer, Francois Beerten, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -198,6 +198,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "SDL.h"
 
 #include "stratagus.h"
+#include "unit_manager.h"
 #include "video.h"
 #include "font.h"
 #include "cursor.h"
@@ -212,6 +213,7 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "netconnect.h"
 #include "ai.h"
 #include "commands.h"
+#include "replay.h"
 #include "results.h"
 #include "editor.h"
 #include "movie.h"
@@ -220,21 +222,29 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "iolib.h"
 #include "util.h"
 #include "guichan.h"
+#include "title.h"
+#include "map.h"
+
+#if defined(_MSC_VER) && SDL_VERSION_ATLEAST(1, 2, 13)
+#define REDIRECT_OUTPUT
+#endif
+
+extern void CreateUserDirectories(void);
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-TitleScreen **TitleScreens;          /// Title screens to show at startup
 std::string StratagusLibPath;        /// Path for data directory
-char LocalPlayerName[16];            /// Name of local player
+std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
-char NameLine[] =
+const char NameLine[] =
 	"Stratagus V" VERSION ", (c) 1998-2007 by The Stratagus Project.";
 
-static char *MapName;                /// Filename of the map to load
+std::string CliMapName;          /// Filename of the map given on the command line
 std::string CompileOptions;          /// Compile options.
+static std::vector<gcn::Container *> Containers;
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
@@ -257,145 +267,6 @@ unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 /*============================================================================
 ==  MAIN
 ============================================================================*/
-
-static bool WaitNoEvent;                     /// Flag got an event
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackButtonPressed(unsigned dummy)
-{
-	WaitNoEvent = false;
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackButtonReleased(unsigned dummy)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyPressed(unsigned dummy1, unsigned dummy2)
-{
-	WaitNoEvent = false;
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyReleased(unsigned dummy1, unsigned dummy2)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyRepeated(unsigned dummy1, unsigned dummy2)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackMouse(int x, int y)
-{
-}
-
-/**
-**  Callback for exit.
-*/
-static void WaitCallbackExit(void)
-{
-}
-
-/**
-**  Show a title image
-*/
-static void ShowTitleImage(TitleScreen *t)
-{
-	const EventCallback *old_callbacks;
-	EventCallback callbacks;
-	CGraphic *g;
-
-	WaitNoEvent = true;
-
-	callbacks.ButtonPressed = WaitCallbackButtonPressed;
-	callbacks.ButtonReleased = WaitCallbackButtonReleased;
-	callbacks.MouseMoved = WaitCallbackMouse;
-	callbacks.MouseExit = WaitCallbackExit;
-	callbacks.KeyPressed = WaitCallbackKeyPressed;
-	callbacks.KeyReleased = WaitCallbackKeyReleased;
-	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
-	callbacks.NetworkEvent = NetworkEvent;
-
-	old_callbacks = GetCallbacks();
-	SetCallbacks(&callbacks);
-
-	g = CGraphic::New(t->File);
-	g->Load();
-	g->Resize(Video.Width, Video.Height);
-
-	int timeout = t->Timeout * CYCLES_PER_SECOND;
-	if (!timeout) {
-		timeout = -1;
-	}
-
-	while (timeout-- && WaitNoEvent) {
-		g->DrawSubClip(0, 0, g->Width, g->Height,
-			(Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
-		TitleScreenLabel **labels = t->Labels;
-		if (labels && labels[0] && labels[0]->Font &&
-				labels[0]->Font->IsLoaded()) {
-			for (int j = 0; labels[j]; ++j) {
-				// offsets are for 640x480, scale up to actual resolution
-				int x = labels[j]->Xofs * Video.Width / 640;
-				int y = labels[j]->Yofs * Video.Width / 640;
-				if (labels[j]->Flags & TitleFlagCenter) {
-					x -= labels[j]->Font->Width(labels[j]->Text.c_str()) / 2;
-				}
-				VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
-			}
-		}
-
-		Invalidate();
-		RealizeVideoMemory();
-		WaitEventsOneFrame();
-	}
-
-	SetCallbacks(old_callbacks);
-	CGraphic::Free(g);
-}
-
-/**
-**  Show the title screens
-*/
-static void ShowTitleScreens(void)
-{
-	if (!TitleScreens) {
-		return;
-	}
-
-	SetVideoSync();
-
-	for (int i = 0; TitleScreens[i]; ++i) {
-		if (!TitleScreens[i]->Music.empty()) {
-			if (TitleScreens[i]->Music == "none" ||
-					PlayMusic(TitleScreens[i]->Music) == -1) {
-				StopMusic();
-			}
-		}
-
-		if (PlayMovie(TitleScreens[i]->File)) {
-			ShowTitleImage(TitleScreens[i]);
-		}
-
-		Video.ClearScreen();
-	}
-	Invalidate();
-}
 
 /**
 **  Show load progress.
@@ -454,12 +325,9 @@ void PreMenuSetup(void)
 /**
 **  Run the guichan main menus loop.
 **
-**  @param filename  map filename
-**  @param map       map loaded
-**
-**  @return      0 in success, else exit.
+**  @return          0 for success, else exit.
 */
-static int MenuLoop(const char *filename, CMap *map)
+static int MenuLoop(void)
 {
 	char buf[1024];
 	int status;
@@ -477,11 +345,9 @@ static int MenuLoop(const char *filename, CMap *map)
 	// FIXME delete this when switching to full guichan GUI
 	LibraryFileName("scripts/guichan.lua", buf, sizeof(buf));
 	status = LuaLoadFile(buf);
-	if (status == 0) {
-		CleanModules();
-	}
 
-	freeGuichan();
+	// We clean up later in Exit
+
 	return status;
 }
 
@@ -510,39 +376,34 @@ void CleanGame(void)
 	Map.Clean();
 	CleanReplayLog();
 	FreeVisionTable();
-	FreeAStar();
+	FreePathfinder();
+	CursorBuilding = NULL;
+	UnitUnderCursor = NULL;
 }
 
-static void ExpandPath(char *newpath, const char *path)
+static void ExpandPath(std::string &newpath, const std::string &path)
 {
-#ifndef WIN32
-	char *s;
-#endif
-
-	if (*path == '~') {
-		++path;
-#ifndef WIN32
-		if ((s = getenv("HOME")) && !GameName.empty()) {
-			sprintf(newpath, "%s/%s/%s/%s",
-				s, STRATAGUS_HOME_PATH, GameName.c_str(), path);
-		} else
-#endif
-		{
-			sprintf(newpath, "%s/%s", GameName.c_str(), path);
-		}
+	if (path[0] == '~') {
+		newpath = UserDirectory;
+		if(!GameName.empty()) {
+			newpath += GameName;
+			newpath += "/";
+		}	
+		newpath += path.substr(1);
 	} else {
-		sprintf(newpath, "%s/%s", StratagusLibPath.c_str(), path);
+		newpath = StratagusLibPath + "/" + path;
 	}
 }
 
 extern gcn::Gui *Gui;
 
-void StartMap(const char *filename, bool clean = true) 
+void StartMap(const std::string &filename, bool clean) 
 {
 	std::string nc, rc;
 
 	gcn::Widget *oldTop = Gui->getTop();
 	gcn::Container *container = new gcn::Container();
+	Containers.push_back(container);
 	container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	container->setOpaque(false);
 	Gui->setTop(container);
@@ -551,13 +412,13 @@ void StartMap(const char *filename, bool clean = true)
 	InterfaceState = IfaceStateNormal;
 
 	//  Create the game.
-	DebugPrint("Creating game with map: %s\n" _C_ filename);
+	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
 	if (clean) {
 		CleanPlayers();
 	}
 	GetDefaultTextColors(nc, rc);
 
-	CreateGame(filename, &Map);
+	CreateGame(filename.c_str(), &Map);
 
 	UI.StatusLine.Set(NameLine);
 	SetMessage(_("Do it! Do it now!"));
@@ -574,27 +435,26 @@ void StartMap(const char *filename, bool clean = true)
 	SetDefaultTextColors(nc, rc);
 
 	Gui->setTop(oldTop);
+	Containers.erase(std::find(Containers.begin(), Containers.end(), container));
 	delete container;
 }
 
-void StartSavedGame(const char *filename) 
+void StartSavedGame(const std::string &filename) 
 {
-	char path[512];
-	std::string nc, rc;
+	std::string path;
 
-	GetDefaultTextColors(nc, rc);
-	SaveGameLoading = 1;
+	SaveGameLoading = true;
 	CleanPlayers();
 	ExpandPath(path, filename);
 	LoadGame(path);
 
 	StartMap(filename, false);
-	SetDefaultTextColors(nc, rc);
+	//SetDefaultTextColors(nc, rc);
 }
 	
-void StartReplay(const char *filename, bool reveal)
+void StartReplay(const std::string &filename, bool reveal)
 {
-	char replay[PATH_MAX];
+	std::string replay;
 
 	CleanPlayers();
 	ExpandPath(replay, filename);
@@ -616,8 +476,8 @@ int SaveReplay(const std::string &filename)
 {
 	FILE *fd;
 	char *buf;
-	std::stringstream logfile;
-	std::string str;
+	std::ostringstream logfile;
+	std::string destination;
 	struct stat sb;
 
 	if (filename.find_first_of("\\/") != std::string::npos) {
@@ -625,14 +485,9 @@ int SaveReplay(const std::string &filename)
 		return -1;
 	}
 
-#ifdef WIN32
-	logfile << GameName << "/logs/";
-#else
-	logfile << getenv("HOME") << "/" << STRATAGUS_HOME_PATH << "/" << GameName << "/logs/";
-#endif
-	str = logfile.str();
+	destination = UserDirectory + "logs/" + filename;
 
-	logfile << "log_of_stratagus_" << ThisPlayer->Index << ".log";
+	logfile << UserDirectory << "logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");
@@ -652,11 +507,9 @@ int SaveReplay(const std::string &filename)
 	fread(buf, sb.st_size, 1, fd);
 	fclose(fd);
 
-	str += filename;
-
-	fd = fopen(str.c_str(), "wb");
+	fd = fopen(destination.c_str(), "wb");
 	if (!fd) {
-		fprintf(stderr, "Can't save to `%s'\n", str.c_str());
+		fprintf(stderr, "Can't save to `%s'\n", destination.c_str());
 		delete[] buf;
 		return -1;
 	}
@@ -729,10 +582,10 @@ static int main1(int argc, char **argv)
 	// memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 
-	InitUnitsMemory();  // Units memory management
+	UnitManager.Init(); // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
-	MenuLoop(MapName, &Map);
+	MenuLoop();
 
 	return 0;
 }
@@ -750,6 +603,16 @@ void Exit(int err)
 
 	ExitNetwork1();
 #ifdef DEBUG
+	CleanModules();
+	//FreeBurningBuildingFrames();
+	//FreeSounds();
+	//FreeGraphics();
+	FreePlayerColors();
+	FreeButtonStyles();
+	for (size_t i = 0; i < Containers.size(); ++i) {
+		delete Containers[i];
+	}
+	freeGuichan();
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
@@ -801,6 +664,49 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 ");
 }
 
+#ifdef REDIRECT_OUTPUT
+
+static std::string stdoutFile;
+static std::string stderrFile;
+
+static void CleanupOutput()
+{
+	fclose(stdout);
+	fclose(stderr);
+
+	struct stat st;
+	if (stat(stdoutFile.c_str(), &st) == 0 && st.st_size == 0) {
+		unlink(stdoutFile.c_str());
+	}
+	if (stat(stderrFile.c_str(), &st) == 0 && st.st_size == 0) {
+		unlink(stderrFile.c_str());
+	}
+}
+
+static void RedirectOutput()
+{
+	char path[MAX_PATH];
+	int pathlen;
+	
+	pathlen = GetModuleFileName(NULL, path, sizeof(path));
+	while (pathlen > 0 && path[pathlen] != '\\') {
+		--pathlen;
+	}
+	path[pathlen] = '\0';
+
+	stdoutFile = std::string(path) + "\\stdout.txt";
+	stderrFile = std::string(path) + "\\stderr.txt";
+
+	if (!freopen(stdoutFile.c_str(), "w", stdout)) {
+		printf("freopen stdout failed");
+	}
+	if (!freopen(stderrFile.c_str(), "w", stderr)) {
+		printf("freopen stderr failed");
+	}
+	atexit(CleanupOutput);
+}
+#endif
+
 /**
 **  The main program: initialise, parse options and arguments.
 **
@@ -809,7 +715,9 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 */
 int main(int argc, char **argv)
 {
-	char *p;
+#ifdef REDIRECT_OUTPUT
+	RedirectOutput();
+#endif
 
 	CompileOptions =
 #ifdef DEBUG
@@ -869,14 +777,17 @@ int main(int argc, char **argv)
 	EditorStartFile = "scripts/editor.lua";
 
 	//  Default player name to username on unix systems.
-	memset(LocalPlayerName, 0, sizeof(LocalPlayerName));
+	LocalPlayerName.clear();
 #ifdef USE_WIN32
-	strcpy_s(LocalPlayerName, sizeof(LocalPlayerName), "Anonymous");
+	LocalPlayerName = "Anonymous";
 #else
-	if (getenv("USER")) {
-		strncpy(LocalPlayerName, getenv("USER"), sizeof(LocalPlayerName) - 1);
-	} else {
-		strcpy_s(LocalPlayerName, sizeof(LocalPlayerName), "Anonymous");
+	{
+		const char *tmp_name = getenv("USER");
+		if (tmp_name) {
+			LocalPlayerName = tmp_name;
+		} else {
+			LocalPlayerName = "Anonymous";
+		}
 	}
 #endif
 
@@ -892,14 +803,11 @@ int main(int argc, char **argv)
 				continue;
 			case 'd':
 			{
-				char *libpath = new_strdup(optarg);
-				for (p = libpath; *p; ++p) {
-					if (*p == '\\') {
-						*p = '/';
-					}
+				StratagusLibPath = optarg;
+				size_t index;
+				while ((index = StratagusLibPath.find('\\')) != std::string::npos) {
+					StratagusLibPath[index] = '/';
 				}
-				StratagusLibPath = libpath;
-				delete[] libpath;
 				continue;
 			}
 			case 'e':
@@ -909,7 +817,7 @@ int main(int argc, char **argv)
 				EditorStartFile = optarg;
 				continue;
 			case 'l':
-				CommandLogDisabled = 1;
+				CommandLogDisabled = true;
 				continue;
 			case 'P':
 				NetworkPort = atoi(optarg);
@@ -918,7 +826,7 @@ int main(int argc, char **argv)
 				NetworkArg = optarg;
 				continue;
 			case 'N':
-				strncpy_s(LocalPlayerName, sizeof(LocalPlayerName), optarg, _TRUNCATE);
+				LocalPlayerName = optarg;
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);
@@ -998,17 +906,18 @@ int main(int argc, char **argv)
 	}
 
 	if (argc - optind) {
-		MapName = argv[optind];
-		for (p = MapName; *p; ++p) {
-			if (*p == '\\') {
-				*p = '/';
-			}
+		size_t index;
+		CliMapName = argv[optind];
+		while ((index = CliMapName.find('\\')) != std::string::npos) {
+			CliMapName[index] = '/';
 		}
 		--argc;
 	}
 
 	// Init the random number generator.
 	InitSyncRand();
+
+	CreateUserDirectories();
 
 	// Init CCL and load configurations!
 	InitCcl();
@@ -1020,6 +929,7 @@ int main(int argc, char **argv)
 
 	main1(argc, argv);
 
+	Exit(0);
 	return 0;
 }
 

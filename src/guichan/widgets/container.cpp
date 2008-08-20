@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/exception.h"
 #include "guichan/widgets/container.h"
 
@@ -172,8 +172,8 @@ namespace gcn
                 return;
             }
         }
-
-        throw GCN_EXCEPTION("There is no such widget in this container.");
+		assert(!"There is no such widget in this container.");
+        //throw GCN_EXCEPTION("There is no such widget in this container.");
     }
 
     void Container::moveToBottom(Widget* widget)
@@ -188,8 +188,8 @@ namespace gcn
                 return;
             }
         }
-
-        throw GCN_EXCEPTION("There is no such widget in this container.");
+		assert(!"There is no such widget in this container.");
+        //throw GCN_EXCEPTION("There is no such widget in this container.");
     }
 
     void Container::_announceDeath(Widget *widget)
@@ -208,8 +208,8 @@ namespace gcn
                 return;
             }
         }
-
-        throw GCN_EXCEPTION("There is no such widget in this container.");
+		assert(!"There is no such widget in this container.");
+        //throw GCN_EXCEPTION("There is no such widget in this container.");
     }
     
     void Container::getDrawSize(int& width, int& height, Widget* widget)
@@ -266,7 +266,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("Widget not in container.");
+        	assert(!"Widget not in container.");
+            //throw GCN_EXCEPTION("Widget not in container.");
         }    
     }
   
@@ -301,8 +302,8 @@ namespace gcn
                 return;
             }
         }
-
-        throw GCN_EXCEPTION("There is no such widget in this container.");
+		assert(!"There is no such widget in this container.");
+        //throw GCN_EXCEPTION("There is no such widget in this container.");
     }
 
     void Container::clear()

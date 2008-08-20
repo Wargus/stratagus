@@ -1,3 +1,6 @@
+$extern void InitVideo();
+void InitVideo();
+
 class CVideo
 {
 public:

@@ -86,9 +86,9 @@ static int CclAStar(lua_State *l)
 				AStarMovingUnitCrossingCost = i;
 			}
 		} else if (!strcmp(value, "know-unseen-terrain")) {
-			AStarKnowUnknown = 1;
+			AStarKnowUnseenTerrain = true;
 		} else if (!strcmp(value, "dont-know-unseen-terrain")) {
-			AStarKnowUnknown = 0;
+			AStarKnowUnseenTerrain = false;
 		} else if (!strcmp(value, "unseen-terrain-cost")) {
 			++j;
 			i = LuaToNumber(l, j + 1);

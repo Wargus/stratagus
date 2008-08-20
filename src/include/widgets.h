@@ -33,8 +33,10 @@
 
 #include <guichan.h>
 #include <guichan/gsdl.h>
+#include "font.h"
 
-typedef int lua_Object; // from tolua++.h
+#include "luacallback.h"
+
 
 extern bool GuichanActive;
 
@@ -44,13 +46,11 @@ void handleInput(const SDL_Event *event);
 
 class LuaActionListener : public gcn::ActionListener
 {
-	lua_State *luastate;
-	int luaref;
+	LuaCallback callback;
 public:
-	//LuaActionListener(lua_State *lua, int luaref) : luastate(lua), luaref(luaref) {}
-	LuaActionListener(lua_State *lua, lua_Object luaref);
+	LuaActionListener(lua_State *lua, lua_Object function);
 	virtual void action(const std::string &eventId);
-	~LuaActionListener();
+	virtual ~LuaActionListener();
 };
 
 #ifdef USE_OPENGL
@@ -85,7 +85,10 @@ public:
 class ButtonWidget : public gcn::Button 
 {
 public:
-	ButtonWidget(const std::string &caption) : Button(caption) {}
+	ButtonWidget(const std::string &caption) : Button(caption)
+	{
+		this->setHotKey(GetHotKey(caption));
+	}
 }; 
 
 class ImageButton : public gcn::Button

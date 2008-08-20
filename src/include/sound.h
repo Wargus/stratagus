@@ -76,6 +76,7 @@ public:
 	SoundConfig WorkComplete[MAX_RACES];  /// building ready
 
 	SoundConfig Rescue[MAX_RACES];  /// rescue units
+	SoundConfig ChatMessage;           /// chat message
 };
 
 /**
@@ -83,6 +84,12 @@ public:
 */
 class CSound {
 public:
+	CSound() : Range(0), Number(0)
+	{
+		memset(&Sound, 0, sizeof(Sound));
+	}
+	~CSound();
+
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
@@ -158,7 +165,7 @@ extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL)
 extern void SetSoundRange(CSound *sound, unsigned char range);
 
 	/// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const std::string files[], unsigned int number);
+extern CSound *RegisterSound(const char *files[], unsigned int number);
 
 	///  Create a special sound group with two sounds
 extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
@@ -190,9 +197,18 @@ extern void MapSound(const std::string &sound_name, CSound *id);
 	/// Get the sound id bound to an identifier
 extern CSound *SoundForName(const std::string &sound_name);
 	/// Make a sound bound to identifier
-extern CSound *MakeSound(const std::string &sound_name, const std::string file[], int nb);
+extern CSound *MakeSound(const std::string &sound_name, const char *file[], int nb);
 	/// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
+#ifdef DEBUG
+extern void FreeSounds();
+#endif
+
+
+// script_sound.cpp
+
+	/// register ccl features
+extern void SoundCclRegister(void);
 
 
 //@}

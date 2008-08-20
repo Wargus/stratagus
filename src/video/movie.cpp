@@ -102,7 +102,7 @@ static void MovieCallbackMouseExit(void)
 }
 
 /**
-**  FIXME: docu
+**  Draw Ogg data to the overlay
 */
 static int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 {
@@ -148,7 +148,7 @@ static int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 }
 
 /**
-**  FIXME: docu
+**  Process Ogg data
 */
 static int TheoraProcessData(OggData *data)
 {
@@ -299,9 +299,14 @@ int PlayMovie(const std::string &name)
 #else
 
 #include <string>
+#include <string.h>
 
 /**
-**  FIXME: docu
+**  Play a video file.
+**
+**  @param name   Filename of movie file.
+**
+**  @return       Non-zero if file isn't a supported movie.
 */
 int PlayMovie(const std::string &name)
 {

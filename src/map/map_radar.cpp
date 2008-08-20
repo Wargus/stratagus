@@ -52,72 +52,63 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Find out if a unit is visible under radar (By player, or by shared vision)
-**
-**  @param pradar  Player to who has radar.
-**  @param punit   Unit to check for.
-**
-**  @return        true if radar visible, false if jammed or not radar visible.
-*/
-bool UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit)
+static inline unsigned char 
+IsTileRadarVisible(const CPlayer *const pradar,
+		const CPlayer *const punit, 
+		const CMapField *const mf)
 {
-	for (int i = punit->X; i < punit->X + punit->Type->TileWidth; ++i) {
-		for (int j = punit->Y; j < punit->Y + punit->Type->TileHeight; ++j) {
-			if (IsTileRadarVisible(pradar, punit->Player, i, j) != 0) {
-				return true;
+	if (mf->RadarJammer[punit->Index]) {
+		return 0;
+	}
+	
+	int p = pradar->Index;
+	if (pradar->SharedVision) {
+		const unsigned char *const radar = mf->Radar;
+		const unsigned char *const jamming = mf->RadarJammer;
+		unsigned char radarvision = 0;
+		// Check jamming first, if we are jammed, exit
+		for (int i = 0, mask = 1; i < PlayerMax; ++i, mask = (1 << i)) {
+			if(i != p) {
+				if (jamming[i] > 0 && (punit->SharedVision & mask) &&
+						(Players[i].SharedVision & (1 << punit->Index))) {
+					// We are jammed, return nothing
+					return 0;
+				}
+				if (radar[i] > 0 && (pradar->SharedVision & mask) &&
+						(Players[i].SharedVision & (1 << p))) {
+					radarvision |= radar[i];
+				}
 			}
 		}
+		// Can't exit until the end, as we might be jammed
+		return (radarvision | mf->Radar[p]);
 	}
+	
+	return mf->Radar[p];
+}
+
+
+bool CUnit::IsVisibleOnRadar(const CPlayer *pradar) const
+{
+	const int x_max = Type->TileWidth;
+	unsigned int index = Y * Map.Info.MapWidth;
+	int j = Type->TileHeight;
+	do {
+		const CMapField *mf = Map.Field(index + X);
+		int i = x_max;
+		do {
+			if (IsTileRadarVisible(pradar, Player, mf) != 0) {
+				return true;
+			}
+			++mf;
+		} while(--i);
+		index += Map.Info.MapWidth;
+	} while(--j);
 
 	// Can't exit till the end, as we might be be able to see a different tile
 	return false;
 }
 
-/**
-**  Find out if a unit is visible under radar (By player, or by shared vision)
-**
-**  @param pradar  Player who has radar.
-**  @param punit   Player who is being check.
-**  @param x       x tile location to check.
-**  @param y       y tile location to check.
-**
-**  @return        0 jammed or not radar visible, >0 radar visible.
-*/
-unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y)
-{
-	unsigned char radarvision;
-	unsigned char *radar;
-	unsigned char *jamming;
-
-	jamming = Map.Fields[y * Map.Info.MapWidth + x].RadarJammer;
-	if (jamming[punit->Index]) {
-		return 0;
-	}
-
-	radar = Map.Fields[y * Map.Info.MapWidth + x].Radar;
-	radarvision = radar[pradar->Index];
-
-	if (!pradar->SharedVision) {
-		return radarvision;
-	}
-
-	// Check jamming first, if we are jammed, exit
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (jamming[i] > 0 && (punit->SharedVision & (1 << i)) &&
-				(Players[i].SharedVision & (1 << punit->Index))) {
-			// We are jammed, return nothing
-			return 0;
-		}
-		if (pradar->SharedVision & (1 << i) &&
-				(Players[i].SharedVision & (1 << pradar->Index))) {
-			radarvision |= radar[i];
-		}
-	}
-
-	// Can't exit until the end, as we might be jammed
-	return radarvision;
-}
 
 /**
 **  Mark Radar Vision for a tile
@@ -126,14 +117,20 @@ unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, in
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
+void MapMarkTileRadar(const CPlayer *player, 
+	const unsigned int index)
+{
+	Assert(Map.Field(index)->Radar[player->Index] != 255);
+	Map.Field(index)->Radar[player->Index]++;
+}
+
 void MapMarkTileRadar(const CPlayer *player, int x, int y)
 {
 	Assert(0 <= x && x < Map.Info.MapWidth);
 	Assert(0 <= y && y < Map.Info.MapHeight);
-	Assert(Map.Fields[x + y * Map.Info.MapWidth].Radar[player->Index] != 255);
-
-	Map.Fields[x + y * Map.Info.MapWidth].Radar[player->Index]++;
+	MapMarkTileRadar(player, Map.getIndex(x, y));
 }
+
 
 /**
 **  Unmark Radar Vision for a tile
@@ -142,19 +139,22 @@ void MapMarkTileRadar(const CPlayer *player, int x, int y)
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapUnmarkTileRadar(const CPlayer *player, int x, int y)
+void MapUnmarkTileRadar(const CPlayer *player, const unsigned int index)
 {
-	unsigned char *v;
-
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
-
 	// Reduce radar coverage if it exists.
-	v = &Map.Fields[x + y * Map.Info.MapWidth].Radar[player->Index];
+	unsigned char *v = &(Map.Field(index)->Radar[player->Index]);
 	if (*v) {
 		--*v;
 	}
 }
+
+void MapUnmarkTileRadar(const CPlayer *player, int x, int y)
+{
+	Assert(0 <= x && x < Map.Info.MapWidth);
+	Assert(0 <= y && y < Map.Info.MapHeight);
+	MapUnmarkTileRadar(player, Map.getIndex(x, y));
+}
+
 
 /**
 **  Mark Radar Jamming Vision for a tile
@@ -163,13 +163,17 @@ void MapUnmarkTileRadar(const CPlayer *player, int x, int y)
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
+void MapMarkTileRadarJammer(const CPlayer *player, const unsigned int index)
+{
+	Assert(Map.Field(index)->RadarJammer[player->Index] != 255);
+	Map.Field(index)->RadarJammer[player->Index]++;
+}
+
 void MapMarkTileRadarJammer(const CPlayer *player, int x, int y)
 {
 	Assert(0 <= x && x < Map.Info.MapWidth);
 	Assert(0 <= y && y < Map.Info.MapHeight);
-	Assert(Map.Fields[x + y * Map.Info.MapWidth].RadarJammer[player->Index] != 255);
-
-	Map.Fields[x + y * Map.Info.MapWidth].RadarJammer[player->Index]++;
+	MapMarkTileRadarJammer(player, Map.getIndex(x, y));
 }
 
 /**
@@ -179,16 +183,21 @@ void MapMarkTileRadarJammer(const CPlayer *player, int x, int y)
 **  @param x       the X tile to mark.
 **  @param y       the Y tile to mark.
 */
-void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y)
+void MapUnmarkTileRadarJammer(const CPlayer *player, 
+	const unsigned int index)
 {
-	unsigned char *v;
-
-	Assert(0 <= x && x < Map.Info.MapWidth);
-	Assert(0 <= y && y < Map.Info.MapHeight);
-
 	// Reduce radar coverage if it exists.
-	v = &Map.Fields[x + y * Map.Info.MapWidth].RadarJammer[player->Index];
+	unsigned char *v = &(Map.Field(index)->RadarJammer[player->Index]);
 	if (*v) {
 		--*v;
 	}
 }
+
+void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y)
+{
+	Assert(0 <= x && x < Map.Info.MapWidth);
+	Assert(0 <= y && y < Map.Info.MapHeight);
+	MapUnmarkTileRadarJammer(player, Map.getIndex(x, y));
+}
+
+

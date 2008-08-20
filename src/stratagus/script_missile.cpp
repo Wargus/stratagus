@@ -46,6 +46,9 @@
 #include "script_sound.h"
 #include "script.h"
 #include "unit.h"
+#include "unit_manager.h"
+#include "particle.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -118,7 +121,7 @@ static int CclDefineMissileType(lua_State *l)
 		if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -166,6 +169,8 @@ static int CclDefineMissileType(lua_State *l)
 			mtype->ImpactName = LuaToString(l, -1);
 		} else if (!strcmp(value, "SmokeMissile")) {
 			mtype->SmokeName = LuaToString(l, -1);
+		} else if (!strcmp(value, "ImpactParticle")) {
+			mtype->ImpactParticle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {
 			mtype->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {
@@ -217,7 +222,7 @@ static int CclMissile(lua_State *l)
 		if (!strcmp(value, "type")) {
 			type = MissileTypeByIdent(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "pos")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -227,7 +232,7 @@ static int CclMissile(lua_State *l)
 			y = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "origin-pos")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -237,7 +242,7 @@ static int CclMissile(lua_State *l)
 			sy = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -299,7 +304,7 @@ static int CclMissile(lua_State *l)
 			--j;
 		} else if (!strcmp(value, "step")) {
 			Assert(missile);
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -308,8 +313,11 @@ static int CclMissile(lua_State *l)
 			lua_rawgeti(l, j + 1, 2);
 			missile->TotalStep = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+
 	// we need to reinitialize position parameters - that's because of
 	// the way InitMissile() (called from MakeLocalMissile()) computes
 	// them - it works for creating a missile during a game but breaks
@@ -350,7 +358,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 		}
 
 		ptr = new BurningBuildingFrame;
-		subargs = luaL_getn(l, j + 1);
+		subargs = lua_objlen(l, j + 1);
 		for (k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
 			value = LuaToString(l, -1);

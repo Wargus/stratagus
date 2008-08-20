@@ -114,7 +114,7 @@ public:
 
 	/// Draw icon
 	void DrawIcon(const CPlayer *player, int x, int y) const;
-	/// Draw icon of an unit
+	/// Draw icon of a unit
 	void DrawUnitIcon(const CPlayer *player, ButtonStyle *style,
 		unsigned flags, int x, int y, const std::string &text) const;
 

@@ -199,7 +199,7 @@
 **  This structure contains all information about a missile in game.
 **  A missile could have different effects, based on its missile-type.
 **  Missiles could be saved and stored with CCL. See (missile).
-**  Currently only a tile, an unit or a missile could be placed on the map.
+**  Currently only a tile, a unit or a missile could be placed on the map.
 **
 **
 **  The missile structure members:
@@ -325,6 +325,7 @@ class CGraphic;
 class CUnit;
 class CViewport;
 class CFile;
+class LuaCallback;
 
 /*----------------------------------------------------------------------------
 --  Missile-type
@@ -376,16 +377,7 @@ enum _missile_class_ {
 	/// Base structure of missile-types
 class MissileType {
 public:
-	MissileType() : Transparency(0), Width(0), Height(0),
-		DrawLevel(0), SpriteFrames(0), NumDirections(0),
-		Flip(false), CanHitOwner(false), FriendlyFire(false),
-		Class(), NumBounces(0), StartDelay(0), Sleep(0), Speed(0),
-		Range(0), SplashFactor(0), ImpactMissile(NULL),
-		SmokeMissile(NULL), G(NULL)
-	{
-		FiredSound.Sound = NULL;
-		ImpactSound.Sound = NULL;
-	};
+	MissileType(const std::string &ident);
 	~MissileType();
 
 	/// load the graphics for a missile type
@@ -422,6 +414,7 @@ public:
 	MissileType *ImpactMissile;/// missile produces an impact
 	std::string SmokeName;     /// impact missile-type name
 	MissileType *SmokeMissile; /// Trailling missile
+	LuaCallback *ImpactParticle; /// impact particle
 
 // --- FILLED UP ---
 	CGraphic *G;         /// missile graphic
@@ -575,7 +568,7 @@ extern Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx,
 	/// fire a missile
 extern void FireMissile(CUnit *unit);
 
-extern int FindAndSortMissiles(const CViewport *vp, Missile **table);
+extern int FindAndSortMissiles(const CViewport *vp, Missile **table, int tablesize = MAX_MISSILES);
 
 	/// handle all missiles
 extern void MissileActions(void);
@@ -597,7 +590,9 @@ extern void InitMissiles(void);
 	/// Clean missiles
 extern void CleanMissiles(void);
 
-
+#ifdef DEBUG
+extern void FreeBurningBuildingFrames();
+#endif
 
 //@}
 

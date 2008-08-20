@@ -142,7 +142,7 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 	CUnit *table[UnitMax];
 	int n;
 
-	n = UnitCacheSelect(unit->X - range, unit->Y - range,
+	n = Map.Select(unit->X - range, unit->Y - range,
 		unit->X + unit->Type->TileWidth + range,
 		unit->Y + unit->Type->TileHeight + range,
 		table);
@@ -162,13 +162,15 @@ static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 **
 **  @return  true if the unit is repairing, false otherwise
 */
-static bool AutoRepair(CUnit *unit)
+bool AutoRepair(CUnit *unit)
 {
 	if (unit->AutoRepair && unit->Type->Variable[AUTOREPAIRRANGE_INDEX].Value) {
 		CUnit *repairedUnit = UnitToRepairInRange(unit,
 			unit->Type->Variable[AUTOREPAIRRANGE_INDEX].Value);
 		if (repairedUnit != NoUnitP) {
+			COrder order = *unit->Orders[0];
 			CommandRepair(unit, -1, -1, repairedUnit, FlushCommands);
+			unit->SavedOrder = order;
 			return true;
 		}
 	}
@@ -227,9 +229,9 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 					goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 			}
 			return;
-		} else {
-			unit->Wait = 15;
 		}
+	} else {
+		unit->Wait = 15;
 	}
 
 	if (unit->SubAction) { // was attacking.
@@ -258,6 +260,10 @@ void ActionStillGeneric(CUnit *unit, bool stand_ground)
 		// If unit is in building or transporter it is removed.
 		return;
 	}
+
+//	if (unit->Anim.Unbreakable) { // animation can't be aborted here
+//		return;
+//	}
 
 	// Animations
 	if (unit->SubAction) { // attacking unit in attack range.

@@ -2,16 +2,15 @@ $bool IsReplayGame();
 bool IsReplayGame();
 
 
-$void StartMap(const char *str, bool clean = true);
-void StartMap(const char *str, bool clean = true);
-$void StartReplay(const char *str, bool reveal = false);
-void StartReplay(const char *str, bool reveal = false);
-$void StartSavedGame(const char *str);
-void StartSavedGame(const char *str);
+$void StartMap(const string &str, bool clean = true);
+void StartMap(const string str, bool clean = true);
+$void StartReplay(const string &str, bool reveal = false);
+void StartReplay(const string str, bool reveal = false);
+$void StartSavedGame(const string &str);
+void StartSavedGame(const string str);
 
-$extern int SaveReplay(const string &filename);
-
-extern int SaveReplay(const string filename);
+$int SaveReplay(const std::string &filename);
+int SaveReplay(const std::string filename);
 
 $#include "results.h"
 
@@ -30,8 +29,15 @@ $void StopGame(GameResults result);
 void StopGame(GameResults result);
 
 extern bool GameRunning;
-extern bool GamePaused;
+extern void SetGamePaused(bool paused);
+extern bool GetGamePaused();
+extern tolua_property__s bool GamePaused;
+extern void SetGameSpeed(int speed);
+extern int GetGameSpeed();
+extern tolua_property__s int GameSpeed;
 extern bool GameObserve;
+
+extern unsigned long GameCycle;
 
 
 $#include "settings.h"
@@ -58,3 +64,16 @@ class Settings {
 };
 
 extern Settings GameSettings;
+
+#define SettingsPresetMapDefault -1
+
+enum GameTypes {
+	SettingsGameTypeMapDefault = SettingsPresetMapDefault,
+	SettingsGameTypeMelee = 0,
+	SettingsGameTypeFreeForAll,
+	SettingsGameTypeTopVsBottom,
+	SettingsGameTypeLeftVsRight,
+	SettingsGameTypeManVsMachine,
+	SettingsGameTypeManTeamVsMachine,
+};
+

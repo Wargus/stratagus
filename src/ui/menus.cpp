@@ -51,13 +51,13 @@ static int EditorCancelled;
 /**
 ** Other client and server selection state for Multiplayer clients
 */
-ServerSetup ServerSetupState;
-ServerSetup LocalSetupState;
+//ServerSetup ServerSetupState;
+//ServerSetup LocalSetupState;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-
+#if 0
 /**
 ** Callback from netconnect loop in Client-Sync state:
 ** Compare local state with server's information
@@ -75,6 +75,7 @@ void NetClientCheckLocalState(void)
 	}
 	/* ADD HERE */
 }
+#endif
 
 #if 0
 /**

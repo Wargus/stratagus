@@ -40,7 +40,7 @@ INCLUDE_DIRS = src/include
 MODULES = src/action src/ai src/beos src/editor src/game \
           src/guichan src/map src/network src/pathfinder \
           src/sound src/stratagus src/tolua src/ui src/unit \
-          src/video
+          src/video src/particle
 
 MODULES_ALL = $(MODULES)
 

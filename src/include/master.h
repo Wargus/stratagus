@@ -58,7 +58,7 @@ extern int MasterPort;
 extern int MetaInit(void);
 extern int MetaClose(void);
 extern int MetaServerOK(char *reply);
-extern int SendMetaCommand(char *command, char *format, ...);
+extern int SendMetaCommand(const char *command, const char *format, ...);
 extern int RecvMetaReply(char **reply);
 extern int GetMetaParameter(char *reply, int pos, char **value);
 extern int CclSetMetaServer(lua_State *l);

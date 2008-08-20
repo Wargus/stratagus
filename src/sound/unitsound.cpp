@@ -77,10 +77,10 @@ static void MapAnimSounds2(CAnimation *anim)
 {
 	while (anim) {
 		if (anim->Type == AnimationSound) {
-			anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name->c_str());
+			anim->D.Sound.Sound = SoundForName(anim->D.Sound.Name);
 		} else if (anim->Type == AnimationRandomSound) {
 			for (unsigned int i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
-				anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i].c_str());
+				anim->D.RandomSound.Sound[i] = SoundForName(anim->D.RandomSound.Name[i]);
 			}
 		}
 		anim = anim->Next;

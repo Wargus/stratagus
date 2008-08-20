@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/widgets/button.h"
 #include "guichan/exception.h"
 #include "guichan/mouseinput.h"
@@ -122,8 +122,16 @@ namespace gcn
             shadowColor = faceColor + 0x303030;      
             shadowColor.a = alpha;
         }
+        else if (isEnabled())
+        {
+            highlightColor = faceColor + 0x303030;
+            highlightColor.a = alpha;
+            shadowColor = faceColor - 0x303030;
+            shadowColor.a = alpha;
+        }
         else
         {
+            faceColor = getDisabledColor();
             highlightColor = faceColor + 0x303030;
             highlightColor.a = alpha;
             shadowColor = faceColor - 0x303030;
@@ -136,10 +144,14 @@ namespace gcn
         graphics->setColor(highlightColor);
         graphics->drawLine(0, 0, getWidth() - 1, 0);
         graphics->drawLine(0, 1, 0, getHeight() - 1);
+        //graphics->drawHLine(0, 0, getWidth() - 1);
+        //graphics->drawVLine(0, 1, 0, getHeight() - 1);
     
         graphics->setColor(shadowColor);
         graphics->drawLine(getWidth() - 1, 1, getWidth() - 1, getHeight() - 1);
         graphics->drawLine(1, getHeight() - 1, getWidth() - 1, getHeight() - 1);
+        //graphics->drawVLine(getWidth() - 1, 1 , getHeight() - 1);
+        //graphics->drawHLine(1, getHeight() - 1, getWidth() - 1);
 
         graphics->setColor(getForegroundColor());
 
@@ -158,7 +170,8 @@ namespace gcn
               textX = getWidth() - 4;
               break;
           default:
-              throw GCN_EXCEPTION("Unknown alignment.");
+              //throw GCN_EXCEPTION("Unknown alignment.");
+              assert(!"Unknown alignment.");
         }
 
         graphics->setFont(getFont());
@@ -190,7 +203,7 @@ namespace gcn
         highlightColor.a = alpha;
         shadowColor = faceColor - 0x303030;
         shadowColor.a = alpha;
-        
+ 
         unsigned int i;
         for (i = 0; i < getBorderSize(); ++i)
         {

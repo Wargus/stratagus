@@ -120,6 +120,10 @@ static int CclMakeSound(lua_State *l)
 {
 	CSound *id;
 	std::string c_name;
+	const char *c_file;
+	char **c_files;
+	int args;
+	int j;
 	LuaUserData *data;
 
 	LuaCheckArgs(l, 2);
@@ -127,20 +131,21 @@ static int CclMakeSound(lua_State *l)
 	c_name = LuaToString(l, 1);
 	if (lua_isstring(l, 2)) {
 		// only one file
-		const std::string c_file = LuaToString(l, 2);
+		c_file = LuaToString(l, 2);
 		id = MakeSound(c_name, &c_file, 1);
 	} else if (lua_istable(l, 2)) {
 		// several files
-		int args = luaL_getn(l, 2);
-		std::string *c_files = new std::string[args];
-
-		for (int j = 0; j < args; ++j) {
+		args = lua_objlen(l, 2);
+		c_files = new char *[args];
+		for (j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
-			c_files[j] = LuaToString(l, -1);
+			c_files[j] = new_strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
 		}
-		// FIXME: check size before casting
-		id = MakeSound(c_name, c_files, args);
+		id = MakeSound(c_name, (const char **)c_files, args);
+		for (j = 0; j < args; ++j) {
+			delete[] c_files[j];
+		}
 		delete[] c_files;
 	} else {
 		LuaError(l, "string or table expected");
@@ -259,7 +264,7 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			GameSounds.PlacementSuccess.Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "work-complete")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -281,7 +286,7 @@ static int CclDefineGameSounds(lua_State *l)
 			lua_pop(l, 1);
 			GameSounds.WorkComplete[i].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "rescue")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -302,6 +307,12 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			lua_pop(l, 1);
 			GameSounds.Rescue[i].Sound = (CSound *)data->Data;
+		} else if (!strcmp(value, "chat-message")) {
+			if (!lua_isuserdata(l, j + 1) ||
+					(data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+				LuaError(l, "Sound id expected");
+			}
+			GameSounds.ChatMessage.Sound = (CSound *)data->Data;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

@@ -43,12 +43,19 @@ class CFont;
 #include "guichan.h"
 
 class CGraphic : public gcn::Image {
+
+	struct frame_pos_t {
+		short int x;
+		short int y;
+	};
+	
 protected:
-	CGraphic() : Surface(NULL),
+	CGraphic() : Surface(NULL),frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
 	{
 #ifndef USE_OPENGL
+		frameFlip_map = NULL;
 		SurfaceFlip = NULL;
 #else
 		TextureWidth = 0.f;
@@ -61,6 +68,7 @@ protected:
 
 public:
 	// Draw
+	void DrawClip(int x, int y) const;
 	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
@@ -90,15 +98,18 @@ public:
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 
+	CGraphic *Clone() const;
+
 	static void Free(CGraphic *g);
 
 	void Load();
 	void Flip();
+	void UseDisplayFormat();
 	void Resize(int w, int h);
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 
-	inline bool IsLoaded() { return Surface != NULL; }
+	inline bool IsLoaded() const { return Surface != NULL; }
 
 	//guichan
 #ifndef USE_OPENGL
@@ -110,9 +121,12 @@ public:
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
+	frame_pos_t *frame_map;
 #ifndef USE_OPENGL
 	SDL_Surface *SurfaceFlip;  /// Flipped surface
+	frame_pos_t *frameFlip_map;
 #endif
+	void GenFramesMap();
 	int Width;                 /// Width of a frame
 	int Height;                /// Height of a frame
 	int NumFrames;             /// Number of frames
@@ -124,12 +138,13 @@ public:
 	GLfloat TextureWidth;      /// Width of the texture
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint *Textures;          /// Texture names
-	int NumTextures;
+	int NumTextures;           /// Number of textures
 #endif
 
 #ifdef USE_OPENGL
 	friend void MakeFontColorTextures(CFont *font);
 	friend void CleanFonts(void);
+	friend void ReloadFonts(void);
 #endif
 };
 
@@ -234,6 +249,27 @@ typedef struct _event_callback_ {
 
 } EventCallback;
 
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define RSHIFT  0
+#define GSHIFT  8
+#define BSHIFT  16
+#define ASHIFT  24
+#define RMASK   0x000000ff
+#define GMASK   0x0000ff00
+#define BMASK   0x00ff0000
+#define AMASK   0xff000000
+#else
+#define RSHIFT  24
+#define GSHIFT  16
+#define BSHIFT  8
+#define ASHIFT  0
+#define RMASK   0xff000000
+#define GMASK   0x00ff0000
+#define BMASK   0x0000ff00
+#define AMASK   0x000000ff
+#endif
+
+
 class CVideo
 {
 public:
@@ -301,18 +337,18 @@ public:
 		return MapRGBA(f, r, g, b, 0xFF);
 	}
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
-		return (r | (g << 8) | (b << 16) | (a << 24));
+		return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
 	}
 	inline void GetRGB(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b) {
-		*r = (c >> 0) & 0xff;
-		*g = (c >> 8) & 0xff;
-		*b = (c >> 16) & 0xff;
+			*r = (c >> RSHIFT) & 0xff;
+			*g = (c >> GSHIFT) & 0xff;
+			*b = (c >> BSHIFT) & 0xff;
 	}
 	inline void GetRGBA(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
-		*r = (c >> 0) & 0xff;
-		*g = (c >> 8) & 0xff;
-		*b = (c >> 16) & 0xff;
-		*a = (c >> 24) & 0xff;
+			*r = (c >> RSHIFT) & 0xff;
+			*g = (c >> GSHIFT) & 0xff;
+			*b = (c >> BSHIFT) & 0xff;
+			*a = (c >> ASHIFT) & 0xff;
 	}
 #endif
 
@@ -357,18 +393,10 @@ extern SDL_Surface *TheScreen;
 #ifdef USE_OPENGL
 	/// Max texture size supported on the video card
 extern GLint GLMaxTextureSize;
-#endif
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-#define RMASK 0xff000000
-#define GMASK 0x00ff0000
-#define BMASK 0x0000ff00
-#define AMASK 0x000000ff
-#else
-#define RMASK 0x000000ff
-#define GMASK 0x0000ff00
-#define BMASK 0x00ff0000
-#define AMASK 0xff000000
+	/// Is OpenGL texture compression supported
+extern bool GLTextureCompressionSupported;
+	/// Use OpenGL texture compression
+extern bool UseGLTextureCompression;
 #endif
 
 	/// initialize the video part
@@ -388,8 +416,12 @@ extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 #endif
 
 #ifdef USE_OPENGL
+	/// Free OpenGL graphics
+extern void FreeOpenGLGraphics();
 	/// Reload OpenGL graphics
 extern void ReloadGraphics(void);
+	/// Reload OpenGL
+extern void ReloadOpenGL();
 #endif
 
 	/// Initializes video synchronization.
@@ -461,20 +493,20 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 	int ex, int ey, int x, int y, int flip);
 #endif
 
-#ifndef USE_OPENGL
-	/// Draw pixel unclipped.
-extern void (*VideoDrawPixel)(Uint32 color, int x, int y);
+#ifdef DEBUG
+extern void FreeGraphics();
+#endif
 
-	/// Draw translucent pixel unclipped.
-extern void (*VideoDrawTransPixel)(Uint32 color, int x, int y,
-	unsigned char alpha);
-#else
-	/// Draw pixel unclipped.
-extern void VideoDrawPixel(Uint32 color, int x, int y);
+#ifdef USE_OPENGL
 
-	/// Draw translucent pixel unclipped.
-extern void VideoDrawTransPixel(Uint32 color, int x, int y,
-	unsigned char alpha);
+// ARB_texture_compression
+extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
+extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
+extern PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
+extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 #endif
 
 //@}

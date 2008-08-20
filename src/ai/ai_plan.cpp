@@ -54,6 +54,42 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+struct _EnemyOnMapTile {
+	CUnit *best;
+	const CUnit *const source;
+	const int x,y;
+	_EnemyOnMapTile(const CUnit *unit, int _x, int _y): best(0), source(unit) , x(_x), y(_y) {}
+	inline bool operator() (CUnit *const unit) {
+		const CUnitType *const type = unit->Type;
+		// unusable unit ?
+		// if (unit->IsUnusable()) can't attack constructions
+		// FIXME: did SelectUnitsOnTile already filter this?
+		// Invisible and not Visible
+		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
+				//(!UnitVisible(unit, source->Player)) ||
+				unit->Orders[0]->Action == UnitActionDie) {
+			return true;
+		}
+		if (x < unit->X || x >= unit->X + type->TileWidth ||
+				y < unit->Y || y >= unit->Y + type->TileHeight) {
+			return true;
+		}
+		if (!CanTarget(source->Type, type)) {
+			return true;
+		}
+		if (!source->Player->IsEnemy(unit)) { // a friend or neutral
+			return true;
+		}
+		//
+		// Choose the best target.
+		//
+		if (!best || best->Type->Priority < type->Priority) {
+			best = unit;
+		}
+		return true;
+	}
+};
+
 /**
 **  Choose enemy on map tile.
 **
@@ -65,45 +101,9 @@
 */
 static CUnit *EnemyOnMapTile(const CUnit *source, int tx, int ty)
 {
-	CUnit *table[UnitMax];
-	CUnit *unit;
-	CUnit *best;
-	const CUnitType *type;
-	int n;
-	int i;
-
-	n = UnitCacheOnTile(tx, ty, table);
-	best = NoUnitP;
-	for (i = 0; i < n; ++i) {
-		unit = table[i];
-		// unusable unit ?
-		// if (unit->IsUnusable()) can't attack constructions
-		// FIXME: did SelectUnitsOnTile already filter this?
-		// Invisible and not Visible
-		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
-				//(!UnitVisible(unit, source->Player)) ||
-				unit->Orders[0]->Action == UnitActionDie) {
-			continue;
-		}
-		type = unit->Type;
-		if (tx < unit->X || tx >= unit->X + type->TileWidth ||
-				ty < unit->Y || ty >= unit->Y + type->TileHeight) {
-			continue;
-		}
-		if (!CanTarget(source->Type, unit->Type)) {
-			continue;
-		}
-		if (!source->Player->IsEnemy(unit)) { // a friend or neutral
-			continue;
-		}
-		//
-		// Choose the best target.
-		//
-		if (!best || best->Type->Priority < unit->Type->Priority) {
-			best = unit;
-		}
-	}
-	return best;
+	_EnemyOnMapTile filter(source, tx, ty);
+	Map.Field(tx,ty)->UnitCache.for_each(filter);
+	return filter.best;
 }
 
 /**
@@ -217,8 +217,8 @@ static void AiMarkWaterTransporter(const CUnit *unit, unsigned char *matrix)
 **
 **  @return        True if target found.
 */
-static bool AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int *dy,
-	int *ds)
+static bool AiFindTarget(const CUnit *unit,
+	 unsigned char *matrix, int *dx, int *dy, int *ds)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -278,18 +278,6 @@ static bool AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int 
 				y = ry + yoffset[i];
 				m = matrix + x + y * w;
 
-				// Check targets on tile?
-				// FIXME: the move code didn't likes a shore building as
-				//  target
-				if ((*m == 0 || *m == 66) && ((*dx == x && *dy == y) || (*dx == -1 && EnemyOnMapTile(unit, x, y)))) {
-					DebugPrint("Target found %d,%d-%d\n" _C_ x _C_ y _C_ state);
-					*dx = x;
-					*dy = y;
-					*ds = state;
-					delete[] points;
-					return true;
-				}
-
 				if (state != OnWater) {
 					if (*m) { // already checked
 						if (state == OnLand && *m == 66) { // tansporter?
@@ -303,6 +291,17 @@ static bool AiFindTarget(const CUnit *unit, unsigned char *matrix, int *dx, int 
 							}
 						}
 						continue;
+					}
+					// Check targets on tile?
+					// FIXME: the move code didn't likes a shore building as
+					//  target
+					if (EnemyOnMapTile(unit, x, y)) {
+						DebugPrint("Target found %d,%d-%d\n" _C_ x _C_ y _C_ state);
+						*dx = x;
+						*dy = y;
+						*ds = state;
+						delete[] points;
+						return 1;
 					}
 
 					if (CanMoveToMask(x, y, mask)) { // reachable
@@ -517,8 +516,8 @@ int AiPlanAttack(AiForce *force)
 	int state;
 	CUnit *transporter;
 
-	DebugPrint("Planning for force #%lu of player #%d\n" _C_
-		static_cast<long unsigned int> (force - AiPlayer->Force) _C_ AiPlayer->Player->Index);
+	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ AiPlayer->Player->Index
+	 _C_ static_cast<long unsigned int> (force - AiPlayer->Force) _C_ AiPlayer->Player->Index);
 
 	watermatrix = CreateMatrix();
 
@@ -530,7 +529,8 @@ int AiPlanAttack(AiForce *force)
 	for (i = 0; i < force->Units.size(); ++i) {
 		aiunit = force->Units[i];
 		if (aiunit->Type->CanTransport) {
-			DebugPrint("Transporter #%d\n" _C_ UnitNumber(aiunit));
+			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index
+			 _C_ UnitNumber(aiunit));
 			AiMarkWaterTransporter(aiunit, watermatrix);
 			state = 0;
 		}
@@ -545,6 +545,7 @@ int AiPlanAttack(AiForce *force)
 			CUnit *unit = AiPlayer->Player->Units[i];
 
 			if (unit->Type->CanTransport && unit->IsIdle()) {
+				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
 				AiMarkWaterTransporter(unit, watermatrix);
 				// FIXME: can be the wrong transporter.
 				transporter = unit;
@@ -553,6 +554,11 @@ int AiPlanAttack(AiForce *force)
 		}
 	}
 
+	if (state) { // Absolute no transporter
+		DebugPrint("%d: No transporter available\n" _C_ AiPlayer->Player->Index);
+		// FIXME: should tell the resource manager we need a transporter!
+		return 0;
+	}
 	//
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
@@ -560,12 +566,12 @@ int AiPlanAttack(AiForce *force)
 	for (i = 0; i < force->Units.size(); ++i) {
 		aiunit = force->Units[i];
 		if (aiunit->Type->UnitType == UnitTypeLand) {
-			DebugPrint("Land unit %d\n" _C_ UnitNumber(aiunit));
+			DebugPrint("%d: Land unit %d\n" _C_ AiPlayer->Player->Index _C_ UnitNumber(aiunit));
 			break;
 		}
 	}
 	if (i == force->Units.size()) {
-		DebugPrint("No land unit in force\n");
+		DebugPrint("%d: No land unit in force\n" _C_ AiPlayer->Player->Index);
 		return 0;
 	}
 	x = force->GoalX;
@@ -573,7 +579,7 @@ int AiPlanAttack(AiForce *force)
 	if (AiFindTarget(aiunit, watermatrix, &x, &y, &state)) {
 		if (state != 1) { // Need transporter.
 			if (transporter) {
-				DebugPrint("Assign any transporter\n");
+				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
 				force->Units.insert(force->Units.begin(), transporter);
 				transporter->RefsIncrease();
 			}
@@ -603,7 +609,7 @@ int AiPlanAttack(AiForce *force)
 					CUnit &aiunit = *AiPlayer->Player->Units[i];
 
 					if (transporterAdded != &aiunit && aiunit.Type->CanTransport && aiunit.IsIdle()) {
-						DebugPrint("Assign another transporter.\n");
+						DebugPrint("%d: Assign another transporter.\n"_C_ AiPlayer->Player->Index);
 						force->Units.insert(force->Units.begin(), &aiunit);
 						aiunit.RefsIncrease();
 						totalBoardCapacity += aiunit.Type->MaxOnBoard - aiunit.BoardCount;
@@ -614,9 +620,11 @@ int AiPlanAttack(AiForce *force)
 				}
 			}
 		}
-		DebugPrint("Can attack\n");
+		DebugPrint("%d: Can attack\n" _C_ AiPlayer->Player->Index);
 		force->GoalX = x;
 		force->GoalY = y;
+		force->MustTransport = state == 2;
+
 		force->State = 1;
 		return 1;
 	}

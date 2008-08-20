@@ -57,6 +57,7 @@
 
 class CUnit;
 class CFile;
+class CFont;
 class LuaActionListener;
 
 /*----------------------------------------------------------------------------
@@ -146,7 +147,7 @@ public:
 **
 **  CViewport::Unit
 **
-**    Viewport is bound to an unit. If the unit moves the viewport
+**    Viewport is bound to a unit. If the unit moves the viewport
 **    changes the position together with the unit.
 **    @todo binding to a group.
 */
@@ -165,6 +166,8 @@ public:
 	int Map2ViewportX(int x) const;
 	/// Convert map tile to screen Y pixel
 	int Map2ViewportY(int y) const;
+	/// Convert map pixel coordinates into viewport coordinates
+	void MapPixel2Viewport(int &x, int &y) const;
 
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(int x, int y, int offsetx, int offsety);
@@ -405,9 +408,43 @@ public:
 
 class CFiller
 {
+	struct bits_map {
+		bits_map() : Width(0), Height(0), bstore(NULL) {}
+		~bits_map();
+		
+		void Init(CGraphic *g);
+		
+		bool TransparentPixel(int x, int y)
+		{
+			if(bstore) {
+				const unsigned int x_index = x / 32;
+				y *= Width;
+				y /= 32;
+				x -= (x_index * 32);
+				return ((bstore[y + x_index] & (1 << x)) == 0);
+			}
+			return false;
+		};
+		
+		int Width;
+		int Height;
+		unsigned int *bstore; 
+	};
+	
+	bits_map map;
 public:
 	CFiller() : G(NULL), X(0), Y(0) {}
 
+	void Load(void);
+	
+	bool OnGraphic(int x, int y) {
+		x -= X;
+		y -= Y;
+		if (x >= 0 && y >= 0 && x < map.Width && y < map.Height) {
+			return !map.TransparentPixel(x, y);
+		}
+		return false;
+	}
 	CGraphic *G;         /// Graphic
 	int X;               /// X coordinate
 	int Y;               /// Y coordinate
@@ -461,13 +498,14 @@ public:
 
 class CResourceInfo {
 public:
-	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0),
+	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
 		TextX(-1), TextY(-1) {}
 
 	CGraphic *G;                      /// icon graphic
 	int IconFrame;                    /// icon frame
 	int IconX;                        /// icon X position
 	int IconY;                        /// icon Y position
+	int IconWidth;						/// icon W size
 	int TextX;                        /// text X position
 	int TextY;                        /// text Y position
 };
@@ -590,6 +628,8 @@ public:
 	int NumViewports;                   /// # Viewports currently used
 	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	CMapArea MapArea;                   /// geometry of the whole map area
+	CFont *MessageFont;                 /// Font used for messages
+	int MessageScrollSpeed;             /// Scroll speed in seconds for messages
 
 	// Menu buttons
 	CUIButton MenuButton;               /// menu button
@@ -652,8 +692,8 @@ extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
 extern bool RightButtonAttacks;         /// right button attacks
 extern ButtonAction *CurrentButtons;    /// Current Selected Buttons
 
-extern char DefaultGroupKeys[];         /// Default group keys
-extern char *UiGroupKeys;               /// Up to 11 keys used for group selection
+extern const char DefaultGroupKeys[];         /// Default group keys
+extern const char *UiGroupKeys;               /// Up to 11 keys used for group selection
 
 // only exported to save them
 
@@ -667,6 +707,9 @@ extern void InitUserInterface(void);
 extern void SaveUserInterface(CFile *file);
 	/// Clean up the ui module
 extern void CleanUserInterface(void);
+#ifdef DEBUG
+extern void FreeButtonStyles();
+#endif
 	/// Register ccl features
 extern void UserInterfaceCclRegister(void);
 
@@ -692,6 +735,8 @@ extern void CycleViewportMode(int);
 	/// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
 
+	/// Use the mouse to scroll the map
+extern void MouseScrollMap(int x, int y);
 	/// Check if mouse scrolling is enabled
 extern bool GetMouseScroll(void);
 	/// Enable/disable scrolling with the mouse

@@ -190,8 +190,8 @@ void HandleActionUpgradeTo(CUnit *unit)
 		return;
 	}
 
-	unit->Orders[0]->Action = UnitActionStill;
-	unit->SubAction = unit->State = 0;
+	unit->ClearAction();
+	unit->State = 0;
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
 		player->Notify(NotifyGreen, unit->X, unit->Y,

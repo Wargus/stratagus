@@ -53,6 +53,7 @@ extern "C" {
 
 class CUnit;
 class CFile;
+class CFont;
 
 typedef struct _lua_user_data_ {
 	int Type;
@@ -67,7 +68,7 @@ enum {
 extern lua_State *Lua;
 
 extern int LuaLoadFile(const std::string &file);
-extern int LuaCall(int narg, int clear);
+extern int LuaCall(int narg, int clear, bool exitOnError = true);
 
 #define LuaError(l, args) \
 	do { \
@@ -261,8 +262,8 @@ struct _StringDesc_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char *CclStartFile;   /// CCL start file
-extern int CclInConfigFile;  /// True while config file parsing
+extern std::string CclStartFile;   /// CCL start file
+extern int CclInConfigFile;        /// True while config file parsing
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -277,7 +278,7 @@ extern void InitCcl(void);                /// Initialise ccl
 extern void LoadCcl(void);                /// Load ccl config file
 extern void SaveCcl(CFile *file);        /// Save CCL module
 extern void SavePreferences(void);        /// Save user preferences
-extern int CclCommand(const char *command);/// Execute a ccl command
+extern int CclCommand(const std::string &command, bool exitOnError = true); 
 
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);

@@ -56,7 +56,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Parse a stratagus map.
+**  Parse a map.
 **
 **  @param l  Lua state.
 */
@@ -81,7 +81,7 @@ static int CclStratagusMap(lua_State *l)
 			char buf[32];
 
 			value = LuaToString(l, j + 1);
-			sprintf(buf, StratagusFormatString, StratagusFormatArgs(StratagusVersion));
+			snprintf(buf, sizeof(buf), StratagusFormatString, StratagusFormatArgs(StratagusVersion));
 			if (strcmp(buf, value)) {
 				fprintf(stderr, "Warning not saved with this version.\n");
 			}
@@ -93,7 +93,7 @@ static int CclStratagusMap(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -117,7 +117,6 @@ static int CclStratagusMap(lua_State *l)
 					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 					Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
 					memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
-					InitUnitCache();
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
 					Map.NoFogOfWar = false;
@@ -139,7 +138,7 @@ static int CclStratagusMap(lua_State *l)
 						LuaError(l, "incorrect argument");
 					}
 
-					subsubargs = luaL_getn(l, -1);
+					subsubargs = lua_objlen(l, -1);
 					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
 						fprintf(stderr, "Wrong tile table length: %d\n", subsubargs);
 					}
@@ -152,7 +151,7 @@ static int CclStratagusMap(lua_State *l)
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument");
 						}
-						args2 = luaL_getn(l, -1);
+						args2 = lua_objlen(l, -1);
 						j2 = 0;
 
 						lua_rawgeti(l, -1, j2 + 1);
@@ -442,11 +441,15 @@ void SetTile(int tile, int w, int h, int value)
 	}
 
 	if (Map.Fields) {
-		Map.Fields[w + h * Map.Info.MapWidth].Tile = Map.Tileset.Table[tile];
-		Map.Fields[w + h * Map.Info.MapWidth].Value = value;
-		Map.Fields[w + h * Map.Info.MapWidth].Flags = Map.Tileset.FlagsTable[tile];
-		Map.Fields[w + h * Map.Info.MapWidth].Cost = 
+		unsigned int index = w + h * Map.Info.MapWidth;
+		Map.Fields[index].Tile = Map.Tileset.Table[tile];
+		Map.Fields[index].Value = value;
+		Map.Fields[index].Flags = Map.Tileset.FlagsTable[tile];
+		Map.Fields[index].Cost = 
 			1 << (Map.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
+#ifdef DEBUG
+		Map.Fields[index].TilesetTile = tile;
+#endif			
 	}
 }
 
@@ -466,7 +469,7 @@ static int CclDefinePlayerTypes(lua_State *l)
 		LuaError(l, "Not enough players");
 	}
 
-	for (i = 0; i < numplayers && i < PlayerMax; i++) {
+	for (i = 0; i < numplayers && i < PlayerMax; ++i) {
 		if (lua_isnil(l, i + 1)) {
 			numplayers = i;
 			break;
@@ -488,7 +491,7 @@ static int CclDefinePlayerTypes(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
-	for (i = numplayers; i < PlayerMax - 1; i++) {
+	for (i = numplayers; i < PlayerMax - 1; ++i) {
 		Map.Info.PlayerType[i] = PlayerNobody;
 	}
 	if (numplayers < PlayerMax)

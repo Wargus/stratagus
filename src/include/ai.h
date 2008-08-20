@@ -65,7 +65,7 @@ extern void SaveAi(CFile *file);     /// Save the AI state
 extern void AiCclRegister(void);      /// Register ccl features
 
 	/// Attack with force at position
-extern void AiAttackWithForceAt(unsigned int force, unsigned int x, unsigned int y);
+extern void AiAttackWithForceAt(unsigned int force, int x, int y);
 	/// Attack with force
 extern void AiAttackWithForce(unsigned int force);
 

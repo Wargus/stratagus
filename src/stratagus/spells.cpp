@@ -64,12 +64,6 @@
 #include "actions.h"
 
 /*----------------------------------------------------------------------------
--- Definitons
-----------------------------------------------------------------------------*/
-static inline int s_min(int a, int b) { return a < b ? a : b; }
-static inline int s_max(int a, int b) { return a > b ? a : b; }
-
-/*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
@@ -153,7 +147,7 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
+		n = Map.Select(xmin, ymin, xmax + 1, ymax + 1, table);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
 					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
@@ -221,7 +215,7 @@ int AreaAdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	int mana;
 
 	// Get all the units around the unit
-	nunits = UnitCacheSelect(x - spell->Range,
+	nunits = Map.Select(x - spell->Range,
 		y - spell->Range,
 		x + spell->Range + caster->Type->Width,
 		y + spell->Range + caster->Type->Height,
@@ -498,18 +492,18 @@ int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 	//  Avoid div by 0 errors too!
 	castcount = 0;
 	if (hp) {
-		castcount = s_max(castcount, diffHP / abs(hp) + (((hp < 0) &&
+		castcount = std::max(castcount, diffHP / abs(hp) + (((hp < 0) &&
 			(diffHP % (-hp) > 0)) ? 1 : 0));
 	}
 	if (mana) {
-		castcount = s_max(castcount, diffMana / abs(mana) + (((mana < 0) &&
+		castcount = std::max(castcount, diffMana / abs(mana) + (((mana < 0) &&
 			(diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
-		castcount = s_min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
+		castcount = std::min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
 	}
 	if (this->MaxMultiCast) {
-		castcount = s_min(castcount, this->MaxMultiCast);
+		castcount = std::min(castcount, this->MaxMultiCast);
 	}
 
 	caster->Variable[MANA_INDEX].Value -= castcount * manacost;
@@ -686,7 +680,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 	ttl = this->TTL;
 
 	if (this->RequireCorpse) {
-		n = UnitCacheSelect(x - 1, y - 1, x + 2, y + 2, table);
+		n = Map.Select(x - 1, y - 1, x + 2, y + 2, table);
 		cansummon = 0;
 		while (n) {
 			n--;
@@ -777,25 +771,25 @@ static Target *NewTargetPosition(int x, int y)
 **  @param caster      Pointer to caster unit.
 **  @param spell       Pointer to the spell to cast.
 **  @param target      Pointer to target unit, or 0 if it is a position spell.
-**  @param x           X position, or -1 if it is an unit spell.
-**  @param y           Y position, or -1 if it is an unit spell.
+**  @param x           X position, or -1 if it is a unit spell.
+**  @param y           Y position, or -1 if it is a unit spell.
 **  @param condition   Pointer to condition info.
 **
-**  @return            1 if passed, 0 otherwise.
+**  @return            true if passed, false otherwise.
 */
-static int PassCondition(const CUnit *caster, const SpellType *spell, const CUnit *target,
+static bool PassCondition(const CUnit *caster, const SpellType *spell, const CUnit *target,
 	int x, int y, const ConditionInfo *condition)
 {
 	if (caster->Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
-		return 0;
+		return false;
 	}
-	if (spell->Target == TargetUnit) { // Casting an unit spell without a target.
+	if (spell->Target == TargetUnit) { // Casting a unit spell without a target.
 		if ((!target) || target->Destroyed || target->Orders[0]->Action == UnitActionDie) {
-			return 0;
+			return false;
 		}
 	}
 	if (!condition) { // no condition, pass.
-		return 1;
+		return true;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) { // for custom variables
 		const CUnit *unit;
@@ -807,20 +801,20 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 		}
 		if (condition->Variable[i].Enable != CONDITION_TRUE) {
 			if ((condition->Variable[i].Enable == CONDITION_ONLY) ^ (unit->Variable[i].Enable)) {
-				return 0;
+				return false;
 			}
 		}
 	// Value and Max
 		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 		if (condition->Variable[i].MaxValue != -1 &&
 			condition->Variable[i].MaxValue <= unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 
 		if (condition->Variable[i].MinMax >= unit->Variable[i].Max) {
-			return 0;
+			return false;
 		}
 
 		if (!unit->Variable[i].Max) {
@@ -829,21 +823,21 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 	// Percent
 		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max
 			>= 100 * unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 		if (condition->Variable[i].MaxValuePercent * unit->Variable[i].Max
 			<= 100 * unit->Variable[i].Value) {
-			return 0;
+			return false;
 		}
 	}
 
 	if (!target) {
-		return 1;
+		return true;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
 		if (condition->BoolFlag[i] != CONDITION_TRUE) {
 			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
-				return 0;
+				return false;
 			}
 		}
 	}
@@ -851,22 +845,21 @@ static int PassCondition(const CUnit *caster, const SpellType *spell, const CUni
 		if ((condition->Alliance == CONDITION_ONLY) ^
 				// own units could be not allied ?
 				(caster->IsAllied(target) || target->Player == caster->Player)) {
-			return 0;
+			return false;
 		}
 	}
 	if (condition->Opponent != CONDITION_TRUE) {
 		if ((condition->Opponent == CONDITION_ONLY) ^
 				(caster->IsEnemy(target) && 1)) {
-			return 0;
+			return false;
 		}
 	}
-
 	if (condition->TargetSelf != CONDITION_TRUE) {
 		if ((condition->TargetSelf == CONDITION_ONLY) ^ (caster == target)) {
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -905,7 +898,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit *caster, const SpellType *spell
 	//
 	// Select all units aroung the caster
 	//
-	nunits = UnitCacheSelect(caster->X - range, caster->Y - range,
+	nunits = Map.Select(caster->X - range, caster->Y - range,
 		caster->X + range + caster->Type->TileWidth,
 		caster->Y + range + caster->Type->TileHeight, table);
 	//
@@ -1052,11 +1045,11 @@ bool SpellIsAvailable(const CPlayer *player, int spellid)
 **  @return          =!0 if spell should/can casted, 0 if not
 **  @note caster must know the spell, and spell must be researched.
 */
-int CanCastSpell(const CUnit *caster, const SpellType *spell,
+bool CanCastSpell(const CUnit *caster, const SpellType *spell,
 	const CUnit *target, int x, int y)
 {
 	if (spell->Target == TargetUnit && target == NULL) {
-		return 0;
+		return false;
 	}
 	return PassCondition(caster, spell, target, x, y, spell->Condition);
 }

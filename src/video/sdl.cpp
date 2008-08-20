@@ -91,20 +91,32 @@ static SDL_Rect Rects[100];
 static int NumRects;
 #else
 GLint GLMaxTextureSize;   /// Max texture size supported on the video card
+bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
+bool UseGLTextureCompression;       /// Use OpenGL texture compression
 #endif
 
 static std::map<int, std::string> Key2Str;
+static std::map<std::string, int> Str2Key;
 
-static int FrameTicks; /// Frame length in ms
+static int FrameTicks;     /// Frame length in ms
 static int FrameRemainder; /// Frame remainder 0.1 ms
 static int FrameFraction; /// Frame fractional term
 
 const EventCallback *Callbacks;
 
+#ifdef USE_OPENGL
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
+// ARB_texture_compression
+PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
+PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
+PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
+PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
+PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
+PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
+PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
+#endif
 /*----------------------------------------------------------------------------
 --  Sync
 ----------------------------------------------------------------------------*/
@@ -141,10 +153,85 @@ void SetVideoSync(void)
 
 #ifdef USE_OPENGL
 /**
-**  Initialize open gl for doing 2d with 3d.
+**  Check if an extension is supported
+*/
+static bool IsExtensionSupported(const char *extension)
+{
+	const GLubyte *extensions = NULL;
+	const GLubyte *start;
+	GLubyte *ptr, *terminator;
+	int len;
+
+	// Extension names should not have spaces.
+	ptr = (GLubyte *)strchr(extension, ' ');
+	if (ptr || *extension == '\0') {
+		return false;
+	}
+
+	extensions = glGetString(GL_EXTENSIONS);
+	len = strlen(extension);
+	start = extensions;
+	while (true) {
+		ptr = (GLubyte *)strstr((const char *)start, extension);
+		if (!ptr) {
+			break;
+		}
+
+		terminator = ptr + len;
+		if (ptr == start || *(ptr - 1) == ' ') {
+			if (*terminator == ' ' || *terminator == '\0') {
+				return true;
+			}
+		}
+		start = terminator;
+	}
+	return false;
+}
+
+/**
+**  Initialize OpenGL extensions
+*/
+static void InitOpenGLExtensions()
+{
+	// ARB_texture_compression
+	if (IsExtensionSupported("GL_ARB_texture_compression"))
+	{
+		glCompressedTexImage3DARB =
+			(PFNGLCOMPRESSEDTEXIMAGE3DARBPROC)SDL_GL_GetProcAddress("glCompressedTexImage3DARB");
+		glCompressedTexImage2DARB =
+			(PFNGLCOMPRESSEDTEXIMAGE2DARBPROC)SDL_GL_GetProcAddress("glCompressedTexImage2DARB");
+		glCompressedTexImage1DARB =
+			(PFNGLCOMPRESSEDTEXIMAGE1DARBPROC)SDL_GL_GetProcAddress("glCompressedTexImage1DARB");
+		glCompressedTexSubImage3DARB =
+			(PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC)SDL_GL_GetProcAddress("glCompressedTexSubImage3DARB");
+		glCompressedTexSubImage2DARB =
+			(PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC)SDL_GL_GetProcAddress("glCompressedTexSubImage2DARB");
+		glCompressedTexSubImage1DARB =
+			(PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC)SDL_GL_GetProcAddress("glCompressedTexSubImage1DARB");
+		glGetCompressedTexImageARB =
+			(PFNGLGETCOMPRESSEDTEXIMAGEARBPROC)SDL_GL_GetProcAddress("glGetCompressedTexImageARB");
+
+		if (glCompressedTexImage3DARB && glCompressedTexImage2DARB &&
+			glCompressedTexImage1DARB && glCompressedTexSubImage3DARB &&
+			glCompressedTexSubImage2DARB && glCompressedTexSubImage1DARB &&
+			glGetCompressedTexImageARB)
+		{
+			GLTextureCompressionSupported = true;
+		}
+		else
+		{
+			GLTextureCompressionSupported = false;
+		}
+	}
+}
+
+/**
+**  Initialize OpenGL
 */
 static void InitOpenGL(void)
 {
+	InitOpenGLExtensions();
+
 	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -161,8 +248,29 @@ static void InitOpenGL(void)
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &GLMaxTextureSize);
+	if (GLMaxTextureSize == 0) {
+		// FIXME: try to use GL_PROXY_TEXTURE_2D to get a valid size
+#if 0
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glGetTexLevelParameterfv(GL_PROXY_TEXTURE_2D, 0,
+			GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
+#endif
+		fprintf(stderr, "GL_MAX_TEXTURE_SIZE is 0, using 256 by default\n");
+		GLMaxTextureSize = 256;
+	}
+}
+
+void ReloadOpenGL()
+{
+	InitOpenGL();
+	ReloadGraphics();
+	ReloadFonts();
+	UI.Minimap.Reload();
 }
 #endif
 
@@ -183,6 +291,8 @@ static void CleanExit(int signum)
 */
 static void InitKey2Str()
 {
+	Str2Key[_("esc")] = SDLK_ESCAPE;
+
 	if (!Key2Str.empty()) {
 		return;
 	}
@@ -239,7 +349,7 @@ static void InitKey2Str()
 	Key2Str[SDLK_DELETE] = "delete";
 
 	for (i = SDLK_KP0; i <= SDLK_KP9; ++i) {
-		sprintf(str, "kp_%d", i - SDLK_KP0);
+		snprintf(str, sizeof(str), "kp_%d", i - SDLK_KP0);
 		Key2Str[i] = str;
 	}
 
@@ -261,8 +371,10 @@ static void InitKey2Str()
 	Key2Str[SDLK_PAGEDOWN] = "pagedown";
 
 	for (i = SDLK_F1; i <= SDLK_F15; ++i) {
-		sprintf(str, "f%d", i - SDLK_F1 + 1);
+		snprintf(str, sizeof(str), "f%d", i - SDLK_F1 + 1);
 		Key2Str[i] = str;
+		snprintf(str, sizeof(str), "F%d", i - SDLK_F1 + 1);
+		Str2Key[str] = i;
 	}
 
 	Key2Str[SDLK_HELP] = "help";
@@ -471,6 +583,9 @@ static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 						DoTogglePause = false;
 						UiTogglePause();
 					}
+#ifdef USE_OPENGL
+						Video.ResizeScreen(Video.Width, Video.Height);
+#endif
 				}
 			}
 			break;
@@ -691,10 +806,18 @@ const char *SdlKey2Str(int key)
 */
 int Str2SdlKey(const char *str)
 {
+	InitKey2Str();
+
 	std::map<int, std::string>::iterator i;
 	for (i = Key2Str.begin(); i != Key2Str.end(); ++i) {
-		if (!strcmp(str, (*i).second.c_str())) {
+		if (!strcasecmp(str, (*i).second.c_str())) {
 			return (*i).first;
+		}
+	}
+	std::map<std::string, int>::iterator i2;
+	for (i2 = Str2Key.begin(); i2 != Str2Key.end(); ++i2) {
+		if (!strcasecmp(str, (*i2).first.c_str())) {
+			return (*i2).second;
 		}
 	}
 	return 0;
@@ -737,9 +860,9 @@ void ToggleFullScreen(void)
 	int h;
 	int bpp;
 #ifndef USE_OPENGL
-	unsigned char *pixels;
-	SDL_Color *palette;
-	int ncolors;
+	unsigned char *pixels = NULL;
+	SDL_Color *palette = NULL;
+	int ncolors = 0;
 #endif
 
 	if (!TheScreen) { // don't bother if there's no surface.
@@ -803,10 +926,7 @@ void ToggleFullScreen(void)
 	SDL_ShowCursor(SDL_DISABLE);
 
 #ifdef USE_OPENGL
-	InitOpenGL();
-	ReloadGraphics();
-	ReloadFonts();
-	UI.Minimap.Reload();
+	ReloadOpenGL();
 #else
 	SDL_LockSurface(TheScreen);
 	memcpy(TheScreen->pixels, pixels, framesize);

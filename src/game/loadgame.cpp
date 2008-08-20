@@ -61,6 +61,8 @@
 #include "font.h"
 #include "pathfinder.h"
 #include "spells.h"
+#include "replay.h"
+#include "particle.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -104,10 +106,11 @@ void CleanModules(void)
 	CleanTilesets();
 	Map.Clean();
 	Map.CleanFogOfWar();
+	CParticleManager::exit();
 	CleanReplayLog();
 	CleanSpells();
 	FreeVisionTable();
-	FreeAStar();
+	FreePathfinder();
 	InitDefinedVariables(); // internal script. should be to a better place, don't find for restart.
 }
 
@@ -168,7 +171,7 @@ void LoadModules(void)
 	LoadDecorations();
 	LoadUnitTypes();
 
-	InitAStar();
+	InitPathfinder();
 
 	LoadUnitSounds();
 	MapUnitSounds();
@@ -204,14 +207,15 @@ void LoadGame(const std::string &filename)
 	unsigned synchash;
 
 	// log will be enabled if found in the save game
-	CommandLogDisabled = 1;
-	SaveGameLoading = 1;
+	CommandLogDisabled = true;
+	SaveGameLoading = true;
 
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
 
 	CclGarbageCollect(0);
 	InitVisionTable();
+	InitUnitTypes(1);
 	LuaLoadFile(filename);
 	CclGarbageCollect(0);
 

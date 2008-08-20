@@ -135,6 +135,8 @@ namespace gcn
          */
         virtual unsigned int getCaretPosition() const;
 
+		/// Gets the currently selected text
+		virtual void getTextSelectionPositions(unsigned int* first, unsigned int* len);
 
         // Inherited from Widget
 
@@ -149,6 +151,7 @@ namespace gcn
 
         virtual void mousePress(int x, int y, int button);
 
+		virtual void mouseMotion(int x, int y);
 
         // Inherited from KeyListener
 
@@ -163,6 +166,8 @@ namespace gcn
         std::string mText;
         int mCaretPosition;
         int mXScroll;
+		int mSelectStart;
+		int mSelectEndOffset;
     };
 }
 

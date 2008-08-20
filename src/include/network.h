@@ -44,7 +44,7 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define NetworkMaxLag 250  /// Debuging network lag (# game cycles)
+//#define NetworkMaxLag 250  /// Debuging network lag (# game cycles)
 
 #define MaxNetworkCommands 9  /// Max Commands In A Packet
 
@@ -113,42 +113,68 @@ enum _extended_message_type_ {
 	ExtendedMessageDiplomacy,     /// Change diplomacy
 	ExtendedMessageSharedVision,  /// Change shared vision
 };
-
+#if 0
 /**
 **  Network acknowledge message.
 */
 typedef struct _ack_message_ {
 	unsigned char Type;  /// Acknowledge message type
 } Acknowledge;
+#endif
 
 /**
 **  Network command message.
 */
-struct NetworkCommand {
-	UnitRef Unit;         /// Command for unit
-	unsigned short X;     /// Map position X
-	unsigned short Y;     /// Map position Y
-	UnitRef Dest;         /// Destination unit
+class CNetworkCommand {
+public:
+	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
+	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
+
+	void Serialize(unsigned char *p) const;
+	void Deserialize(unsigned char *p);
+	static size_t Size() { return 2+2+2+2; }
+
+	Uint16 Unit;         /// Command for unit
+	Uint16 X;            /// Map position X
+	Uint16 Y;            /// Map position Y
+	Uint16 Dest;         /// Destination unit
 };
 
 /**
 **  Extended network command message.
 */
-struct NetworkExtendedCommand {
-	unsigned char  ExtendedType;  /// Extended network command type
-	unsigned char  Arg1;          /// Argument 1
-	unsigned short Arg2;          /// Argument 2
-	unsigned short Arg3;          /// Argument 3
-	unsigned short Arg4;          /// Argument 4
+class CNetworkExtendedCommand {
+public:
+	CNetworkExtendedCommand() : ExtendedType(0), Arg1(0), Arg2(0), Arg3(0), Arg4(0) {}
+
+	void Serialize(unsigned char *p);
+	void Deserialize(unsigned char *p);
+	static size_t Size() { return 1+1+2+2+2; }
+
+	Uint8  ExtendedType;  /// Extended network command type
+	Uint8  Arg1;          /// Argument 1
+	Uint16 Arg2;          /// Argument 2
+	Uint16 Arg3;          /// Argument 3
+	Uint16 Arg4;          /// Argument 4
 };
 
 /**
 **  Network chat message.
 */
-typedef struct _network_chat_ {
-	unsigned char Player;   /// Sending player
-	char          Text[7];  /// Message bytes
-} NetworkChat;
+class CNetworkChat {
+public:
+	CNetworkChat() {
+		Player = 0;
+		memset(Text, 0, sizeof(Text));
+	}
+
+	void Serialize(unsigned char *p);
+	void Deserialize(unsigned char *p);
+	static size_t Size() { return 1+7; }
+
+	Uint8 Player;   /// Sending player
+	char  Text[7];  /// Message bytes
+};
 
 /**
 **  Network Selection Info
@@ -163,29 +189,55 @@ typedef struct _network_selection_header_ {
 /**
 **  Network Selection Update
 */
-typedef struct _network_selection_ {
-	UnitRef Unit[4];  /// Selection Units
-} NetworkSelection;
+class CNetworkSelection {
+public:
+	CNetworkSelection() {
+		memset(Unit, 0, sizeof(Unit));
+	}
+
+	void Serialize(unsigned char *p);
+	void Deserialize(unsigned char *p);
+	static size_t Size() { return 2*4; }
+
+	Uint16 Unit[4];  /// Selection Units
+};
 
 /**
 **  Network packet header.
 **
 **  Header for the packet.
 */
-typedef struct _network_packet_header_ {
-	unsigned char Cycle;                     /// Destination game cycle
-	unsigned char Type[MaxNetworkCommands];  /// Commands in packet
-} NetworkPacketHeader;
+class CNetworkPacketHeader {
+public:
+	CNetworkPacketHeader() {
+		Cycle = 0;
+		memset(Type, 0, sizeof(Type));
+	}
+
+	void Serialize(unsigned char *p) const;
+	void Deserialize(unsigned char *p);
+	static size_t Size() { return 1 + 1 * MaxNetworkCommands; }
+
+	Uint8 Cycle;                     /// Destination game cycle
+	Uint8 Type[MaxNetworkCommands];  /// Commands in packet
+};
 
 /**
 **  Network packet.
 **
 **  This is sent over the network.
 */
-typedef struct _network_packet_ {
-	NetworkPacketHeader Header;  /// Packet Header Info
-	NetworkCommand Command[MaxNetworkCommands];
-} NetworkPacket;
+class CNetworkPacket {
+public:
+	unsigned char *Serialize(int numcommands) const;
+	int Deserialize(unsigned char *p, unsigned int len);
+	static size_t Size(int numcommands) {
+		return CNetworkPacketHeader::Size() + numcommands * CNetworkCommand::Size();
+	}
+
+	CNetworkPacketHeader Header;  /// Packet Header Info
+	CNetworkCommand Command[MaxNetworkCommands];
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -221,7 +273,7 @@ extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 	/// Send Selections to Team
 extern void NetworkSendSelection(CUnit **units, int count);
 	/// Register ccl functions related to network
-extern void NetworkCclRegister(void);
+//extern void NetworkCclRegister(void);
 //@}
 
 #endif // !__NETWORK_H__

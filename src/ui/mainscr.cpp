@@ -40,6 +40,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
+#include <sstream>
 
 #include "stratagus.h"
 #include "video.h"
@@ -273,7 +274,7 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 				val.s = DefaultResourceNames[unit->CurrentResource].c_str();
 			} else {
 				val.type = USTRINT_STR;
-				val.s = UnitTypeVar.VariableName[index].c_str();
+				val.s = UnitTypeVar.VariableName[index];
 			}
 			break;
 	}
@@ -374,7 +375,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 				VideoDrawNumber(x, y, font, value);
 			} else {
 				char buf[64];
-				sprintf(buf, diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
+				snprintf(buf,sizeof(buf), diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
 				VideoDrawText(x, y, font, buf);
 			}
 		}
@@ -783,22 +784,28 @@ static int  MessagesEventIndex;                  /// FIXME: docu
 
 class MessagesDisplay
 {
+public:
+	MessagesDisplay()
+	{
+		CleanMessages();
+	}
+
+	void UpdateMessages();
+	void AddUniqueMessage(const char *s);
+	void DrawMessages();
+	void CleanMessages();
+
+protected:
+	void ShiftMessages();
+	void AddMessage(const char *msg);
+	bool CheckRepeatMessage(const char *msg);
+
+private:
 	char Messages[MESSAGES_MAX][128];         /// Array of messages
 	int  MessagesCount;                       /// Number of messages
 	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
-
-	static const int MESSAGES_TIMEOUT = 5;    /// Message timeout 5 seconds
-protected:
-	void ShiftMessages();
-	void AddMessage(const char *msg);
-	int CheckRepeatMessage(const char *msg);
-public:
-	void UpdateMessages();
-	void AddUniqueMessage(char *s);
-	void DrawMessages();
-	void CleanMessages();
 };
 
 /**
@@ -829,8 +836,8 @@ void MessagesDisplay::UpdateMessages()
 	unsigned long ticks = GetTicks();
 	if (MessagesFrameTimeout < ticks) {
 		++MessagesScrollY;
-		if (MessagesScrollY == GameFont->Height() + 1) {
-			MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
+		if (MessagesScrollY == UI.MessageFont->Height() + 1) {
+			MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 			MessagesScrollY = 0;
 			ShiftMessages();
 		}
@@ -848,7 +855,7 @@ void MessagesDisplay::DrawMessages()
 	if (MessagesCount) {
 		Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
 		Video.FillTransRectangleClip(color, UI.MapArea.X + 8, UI.MapArea.Y + 8,
-			UI.MapArea.EndX - UI.MapArea.X - 16, MessagesCount * (GameFont->Height() + 1) - MessagesScrollY, 0x80);
+			UI.MapArea.EndX - UI.MapArea.X - 16, MessagesCount * (UI.MessageFont->Height() + 1) - MessagesScrollY, 0x80);
 	}
 
 	// Draw message line(s)
@@ -859,8 +866,8 @@ void MessagesDisplay::DrawMessages()
 				Video.Height - 1);
 		}
 		VideoDrawTextClip(UI.MapArea.X + 8,
-			UI.MapArea.Y + 8 + z * (GameFont->Height() + 1) - MessagesScrollY,
-			GameFont, Messages[z]);
+			UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+			UI.MessageFont, Messages[z]);
 		if (z == 0) {
 			PopClipping();
 		}
@@ -883,13 +890,13 @@ void MessagesDisplay::AddMessage(const char *msg)
 	unsigned long ticks = GetTicks();
 
 	if (!MessagesCount) {
-		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
+		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 	}
 
 	if (MessagesCount == MESSAGES_MAX) {
 		// Out of space to store messages, can't scroll smoothly
 		ShiftMessages();
-		MessagesFrameTimeout = ticks + MESSAGES_TIMEOUT * 1000;
+		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 		MessagesScrollY = 0;
 	}
 
@@ -916,7 +923,7 @@ void MessagesDisplay::AddMessage(const char *msg)
 		next = ptr = message + strlen(message);
 	}
 
-	while (GameFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
 		while (1) {
 			--ptr;
 			if (*ptr == ' ') {
@@ -930,7 +937,7 @@ void MessagesDisplay::AddMessage(const char *msg)
 		// No space found, wrap in the middle of a word
 		if (ptr == message) {
 			ptr = next - 1;
-			while (GameFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
 				*--ptr = '\0';
 			}
 			next = ptr + 1;
@@ -950,16 +957,16 @@ void MessagesDisplay::AddMessage(const char *msg)
 **
 **  @param msg  Message to check.
 **
-**  @return     non-zero to skip this message
+**  @return     true to skip this message
 */
-int MessagesDisplay::CheckRepeatMessage(const char *msg)
+bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 {
 	if (MessagesCount < 1) {
-		return 0;
+		return false;
 	}
 	if (!strcmp(msg, Messages[MessagesCount - 1])) {
 		++MessagesSameCount;
-		return 1;
+		return true;
 	}
 	if (MessagesSameCount > 0) {
 		char temp[128];
@@ -968,44 +975,59 @@ int MessagesDisplay::CheckRepeatMessage(const char *msg)
 		n = MessagesSameCount;
 		MessagesSameCount = 0;
 		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
-		sprintf(temp, _("Last message repeated ~<%d~> times"), n + 1);
+		snprintf(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
 		AddMessage(temp);
 	}
-	return 0;
+	return false;
 }
 
 /**
 **  Add a new message to display only if it differs from the preceeding one.
 */
-void MessagesDisplay::AddUniqueMessage(char *s)
+void MessagesDisplay::AddUniqueMessage(const char *s)
 {
-	if (CheckRepeatMessage(s)) {
-		return;
+	if (!CheckRepeatMessage(s)) {
+		AddMessage(s);
 	}
-	AddMessage(s);
 }
 
 /**
-**  Cleanup messages.
+**  Clean up messages.
 */
-void MessagesDisplay::CleanMessages(void)
+void MessagesDisplay::CleanMessages()
 {
 	MessagesCount = 0;
 	MessagesSameCount = 0;
+	MessagesScrollY = 0;
+	MessagesFrameTimeout = 0;
+
 	MessagesEventCount = 0;
 	MessagesEventIndex = 0;
-	MessagesScrollY = 0;
 }
 
-MessagesDisplay allmessages;
+static MessagesDisplay allmessages;
 
+/**
+**  Update messages
+*/
 void UpdateMessages() {
 	allmessages.UpdateMessages();
 }
 
+/**
+**  Clean messages
+*/
 void CleanMessages()
 {
 	allmessages.CleanMessages();
+}
+
+/**
+**  Draw messages
+*/
+void DrawMessages()
+{
+	allmessages.DrawMessages();
 }
 
 /**
@@ -1023,11 +1045,6 @@ void SetMessage(const char *fmt, ...)
 	temp[sizeof(temp) - 1] = '\0';
 	va_end(va);
 	allmessages.AddUniqueMessage(temp);
-}
-
-void DrawMessages()
-{
-	allmessages.DrawMessages();
 }
 
 /**
@@ -1162,18 +1179,19 @@ void DrawCosts(void)
 		// FIXME: hardcoded image!!!
 		UI.Resources[GoldCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
 
-		VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, CostsMana);
-		x += 60;
+		x += 20;
+		x += VideoDrawNumber(x, UI.StatusLine.TextY, GameFont, CostsMana);
 	}
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
+			x+= 5;
 			if (UI.Resources[i].G) {
 				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 					x, UI.StatusLine.TextY);
+				x+= 20;	
 			}
-			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, Costs[i]);
-			x += 60;
+			x += VideoDrawNumber(x, UI.StatusLine.TextY, GameFont, Costs[i]);
 			if (x > Video.Width - 60) {
 				break;
 			}
@@ -1210,7 +1228,8 @@ void ClearCosts(void)
 /*----------------------------------------------------------------------------
 --  INFO PANEL
 ----------------------------------------------------------------------------*/
-
+//FIXME rb biger change requre review.
+#if 0
 /**
 **  Draw info panel background.
 **
@@ -1342,6 +1361,116 @@ void CInfoPanel::Draw(void)
 		SetDefaultTextColors(nc, rc);
 	}
 }
+#else
+/**
+**  Draw info panel with more than one unit selected
+*/
+static void DrawInfoPanelMultipleSelected()
+{
+	// Draw icons and a health bar
+	for (int i = 0; i < std::min(NumSelected, (int)UI.SelectedButtons.size()); ++i) {
+		CUIButton *button = &UI.SelectedButtons[i];
+		bool mouseOver = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i);
+
+		Selected[i]->Type->Icon.Icon->DrawUnitIcon(ThisPlayer, button->Style,
+			mouseOver ? (IconActive | (MouseButtons & LeftButton)) : 0,
+			button->X, button->Y, "");
+		UiDrawLifeBar(Selected[i], button->X, button->Y);
+
+		if (mouseOver) {
+			UI.StatusLine.Set(Selected[i]->Type->Name);
+		}
+	}
+
+	// Selected more than we can display
+	if (NumSelected > (int)UI.SelectedButtons.size()) {
+		std::ostringstream os;
+		os << "+" << (unsigned)(NumSelected - UI.SelectedButtons.size());
+
+		VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
+			UI.MaxSelectedFont, os.str());
+	}
+}
+
+/**
+**  Draw info panel with one unit selected
+*/
+static void DrawInfoPanelSingleSelected()
+{
+	DrawUnitInfo(Selected[0]);
+	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
+		UI.StatusLine.Set(Selected[0]->Type->Name);
+	}
+}
+
+/**
+**  Draw info panel with no units selected
+*/
+static void DrawInfoPanelNoneSelected()
+{
+	// Check if a unit is under the cursor
+	if (UnitUnderCursor && UnitUnderCursor->IsVisible(ThisPlayer)) {
+		DrawUnitInfo(UnitUnderCursor);
+		return;
+	}
+
+	std::string nc;
+	std::string rc;
+	int x = UI.InfoPanel.X + 16;
+	int y = UI.InfoPanel.Y + 8;
+
+	VideoDrawText(x, y, GameFont, "Stratagus");
+	y += 16;
+	VideoDrawText(x, y, GameFont, "Cycle:");
+	VideoDrawNumber(x + 48, y, GameFont, GameCycle);
+	VideoDrawNumber(x + 110, y, GameFont,
+		CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+	y += 20;
+
+	if( y + PlayerMax * GameFont->Height() > Video.Height )
+	{
+		x = 16;
+		y = 30;
+	}
+
+	GetDefaultTextColors(nc, rc);
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].Type != PlayerNobody) {
+			if (ThisPlayer->Allied & (1 << Players[i].Index)) {
+				SetDefaultTextColors(FontGreen, rc);
+			} else if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
+				SetDefaultTextColors(FontRed, rc);
+			} else {
+				SetDefaultTextColors(nc, rc);
+			}
+
+			VideoDrawNumber(x + 15, y, GameFont, i);
+
+			Video.DrawRectangle(ColorWhite,x, y, 12, 12);
+			Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
+
+			VideoDrawText(x + 27, y, GameFont,Players[i].Name);
+			VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);
+			y += 14;
+		}
+	}
+	SetDefaultTextColors(nc, rc);
+}
+
+/**
+**  Draw info panel.
+*/
+void CInfoPanel::Draw(void)
+{
+	if (NumSelected > 1) {
+		DrawInfoPanelMultipleSelected();
+	} else if (NumSelected == 1) {
+		DrawInfoPanelSingleSelected();
+	} else {
+		DrawInfoPanelNoneSelected();
+	}
+}
+#endif
 
 /*----------------------------------------------------------------------------
 --  TIMER
@@ -1364,9 +1493,9 @@ void DrawTimer(void)
 	char buf[30];
 
 	if (hour) {
-		sprintf(buf, "%d:%02d:%02d", hour, min, sec);
+		snprintf(buf, sizeof(buf), "%d:%02d:%02d", hour, min, sec);
 	} else {
-		sprintf(buf, "%d:%02d", min, sec);
+		snprintf(buf, sizeof(buf), "%d:%02d", min, sec);
 	}
 
 	VideoDrawText(UI.Timer.X, UI.Timer.Y, UI.Timer.Font, buf);

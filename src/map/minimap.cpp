@@ -193,6 +193,14 @@ void CMinimap::Create(void)
 
 #ifdef USE_OPENGL
 /**
+**  Free OpenGL minimap
+*/
+void CMinimap::FreeOpenGL(void)
+{
+	glDeleteTextures(1, &MinimapTexture);
+}
+
+/**
 **  Reload OpenGL minimap
 */
 void CMinimap::Reload(void)
@@ -666,13 +674,10 @@ void CMinimap::Draw(int vx, int vy)
 */
 int CMinimap::Screen2MapX(int x)
 {
-	int tx;
-
-	tx = (((x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX);
-	if (tx < 0) {
-		return 0;
-	}
-	return tx < Map.Info.MapWidth ? tx : Map.Info.MapWidth - 1;
+	int tx = (((x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX);
+	tx = std::max(tx, 0);
+	tx = std::min(tx, Map.Info.MapWidth - 1);
+	return tx;
 }
 
 /**
@@ -684,13 +689,10 @@ int CMinimap::Screen2MapX(int x)
 */
 int CMinimap::Screen2MapY(int y)
 {
-	int ty;
-
-	ty = (((y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY);
-	if (ty < 0) {
-		return 0;
-	}
-	return ty < Map.Info.MapHeight ? ty : Map.Info.MapHeight - 1;
+	int ty = (((y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY);
+	ty = std::max(ty, 0);
+	ty = std::min(ty, Map.Info.MapHeight - 1);
+	return ty;
 }
 
 /**
@@ -749,11 +751,11 @@ void CMinimap::AddEvent(int x, int y)
 		return;
 	}
 
-	MinimapEvents[NumMinimapEvents].X = X + XOffset + (x * MinimapScaleX) / MINIMAP_FAC;
-	MinimapEvents[NumMinimapEvents].Y = Y + YOffset + (y * MinimapScaleY) / MINIMAP_FAC;
-	MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
+	MinimapEvent *minimapEvent = &MinimapEvents[NumMinimapEvents++];
 
-	++NumMinimapEvents;
+	minimapEvent->X = X + XOffset + (x * MinimapScaleX) / MINIMAP_FAC;
+	minimapEvent->Y = Y + YOffset + (y * MinimapScaleY) / MINIMAP_FAC;
+	minimapEvent->Size = (W < H) ? W / 3 : H / 3;
 }
 
 //@}

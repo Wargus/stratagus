@@ -213,7 +213,7 @@ static int CclDefineConstruction(lua_State *l)
 				if (!strcmp(value, "File")) {
 					file = LuaToString(l, -1);
 				} else if (!strcmp(value, "Size")) {
-					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+					if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
@@ -237,7 +237,7 @@ static int CclDefineConstruction(lua_State *l)
 				construction->ShadowFile.Height = h;
 			}
 		} else if (!strcmp(value, "Constructions")) {
-			const unsigned int subargs = luaL_getn(l, -1);
+			const unsigned int subargs = lua_objlen(l, -1);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
 				int percent;

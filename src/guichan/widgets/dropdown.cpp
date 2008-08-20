@@ -51,7 +51,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+ 
+#include <assert.h>
 #include "guichan/exception.h"
 #include "guichan/widgets/dropdown.h"
 
@@ -179,7 +180,8 @@ namespace gcn
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            assert(!"ScrollArea or ListBox is NULL.");
         }
       
         mScrollArea->logic();
@@ -190,7 +192,8 @@ namespace gcn
     {     
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+           assert(!"ScrollArea or ListBox is NULL.");
         }
 
         int h;
@@ -340,7 +343,8 @@ namespace gcn
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            assert(!"ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
         }
 
         return mListBox->getSelected();        
@@ -350,7 +354,8 @@ namespace gcn
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            assert(!"ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
         }
 
         if (selected >= 0)
@@ -363,7 +368,8 @@ namespace gcn
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            assert(!"ScrollArea or ListBox is NULL.");
         }
 
         if ((key.getValue() == Key::ENTER || key.getValue() == Key::SPACE)
@@ -406,7 +412,8 @@ namespace gcn
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            assert(!"ScrollArea or ListBox is NULL.");
         }
 
         mListBox->setListModel(listModel);
@@ -423,7 +430,8 @@ namespace gcn
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            assert(!"ScrollArea or ListBox is NULL.");
         }
       
         return mListBox->getListModel();        
@@ -475,7 +483,8 @@ namespace gcn
     {
         if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
         {
-            throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+            assert(!"ScrollArea or ListBox is NULL.");
         }
 
         int listBoxHeight = mListBox->getHeight();
@@ -539,7 +548,8 @@ namespace gcn
         {
             if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
             {
-                throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+                //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+                assert(!"ScrollArea or ListBox is NULL.");
             }
 
             if (mFocusHandler.getFocused() != NULL)
@@ -565,7 +575,8 @@ namespace gcn
         {
             if (mScrollArea == NULL || mScrollArea->getContent() == NULL)
             {
-                throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+                //throw GCN_EXCEPTION("ScrollArea or ListBox is NULL.");
+                assert(!"ScrollArea or ListBox is NULL.");
             }
                     
             if (mouseInput.y >= mOldH)
@@ -612,7 +623,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("Death announced for unknown widget..");
+            assert(!"Death announced for unknown widget..");
+            //throw GCN_EXCEPTION("Death announced for unknown widget..");
         }        
     }
 
@@ -638,7 +650,8 @@ namespace gcn
         }
         else
         {
-            throw GCN_EXCEPTION("DropDown::getDrawSize. widget is not the ScrollArea (wieeerd...)");
+			assert(!"DropDown::getDrawSize. widget is not the ScrollArea (wieeerd...)");
+            //throw GCN_EXCEPTION("DropDown::getDrawSize. widget is not the ScrollArea (wieeerd...)");
         }        
     }
 

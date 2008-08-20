@@ -55,7 +55,7 @@
 /*
  * For comments regarding functions please see the header file. 
  */
-
+#include <assert.h>
 #include "guichan/sdl/sdlinput.h"
 #include "guichan/exception.h"
 
@@ -65,6 +65,7 @@ namespace gcn
     {
         mMouseInWindow = true;
 		mMouseDown = false;
+		mIsRepeating = false;
     }
     
     bool SDLInput::isKeyQueueEmpty()
@@ -78,7 +79,8 @@ namespace gcn
     
         if (mKeyInputQueue.empty())
         {
-            throw GCN_EXCEPTION("The queue is empty.");
+        	assert(!"The queue is empty.");
+            //throw GCN_EXCEPTION("The queue is empty.");
         }
     
         keyInput = mKeyInputQueue.front();
@@ -98,7 +100,8 @@ namespace gcn
     
         if (mMouseInputQueue.empty())
         {
-            throw GCN_EXCEPTION("The queue is empty.");
+        	assert(!"The queue is empty.");
+            //throw GCN_EXCEPTION("The queue is empty.");
         }
     
         mouseInput = mMouseInputQueue.front();
@@ -106,7 +109,18 @@ namespace gcn
 
         return mouseInput;    
     }
-    
+
+	void SDLInput::processKeyRepeat()
+	{
+		KeyInput keyInput;
+
+		if (mIsRepeating) {
+			keyInput.setKey(mLastKey);
+			keyInput.setType(KeyInput::PRESS);        
+			mKeyInputQueue.push(keyInput);
+		}
+	}
+
     void SDLInput::pushInput(SDL_Event event)
     {
         KeyInput keyInput;
@@ -115,12 +129,15 @@ namespace gcn
         switch (event.type)
         {
           case SDL_KEYDOWN:
-              keyInput.setKey(convertKeyCharacter(event.key.keysym));
+			  mLastKey = convertKeyCharacter(event.key.keysym);
+			  mIsRepeating = true;
+              keyInput.setKey(mLastKey);
               keyInput.setType(KeyInput::PRESS);        
               mKeyInputQueue.push(keyInput);
               break;
 
           case SDL_KEYUP:
+			  mIsRepeating = false;
               keyInput.setKey(convertKeyCharacter(event.key.keysym));
               keyInput.setType(KeyInput::RELEASE);
               mKeyInputQueue.push(keyInput);
@@ -206,8 +223,8 @@ namespace gcn
               break;
         } 
 
-        throw GCN_EXCEPTION("Unknown SDL mouse type.");
-    
+        //throw GCN_EXCEPTION("Unknown SDL mouse type.");
+    	assert(!"Unknown SDL mouse type.");
         return 0;
     }
 

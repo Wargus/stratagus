@@ -42,10 +42,14 @@
 #include "unittype.h"
 #include "actions.h"
 #include "pathfinder.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+extern bool AutoRepair(CUnit *unit);
+
 
 /**
 **  Swap the patrol points.
@@ -61,6 +65,7 @@ static void SwapPatrolPoints(CUnit *unit)
 	unit->Orders[0]->Arg1.Patrol.Y = unit->Orders[0]->Y;
 	unit->Orders[0]->Y = tmp;
 
+	unit->Data.Move.Cycles = 0; //moving counter
 	NewResetPath(unit);
 }
 
@@ -83,6 +88,7 @@ void HandleActionPatrol(CUnit *unit)
 	}
 
 	if (!unit->SubAction) { // first entry.
+		unit->Data.Move.Cycles = 0; //moving counter
 		NewResetPath(unit);
 		unit->SubAction = 1;
 	}
@@ -128,14 +134,21 @@ void HandleActionPatrol(CUnit *unit)
 		if (unit->Type->CanAttack) {
 			const CUnit *goal = AttackUnitsInReactRange(unit);
 			if (goal) {
-				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
-				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				// Save current command to come back.
 				unit->SavedOrder = *unit->Orders[0];
-				unit->Orders[0]->Action = UnitActionStill;
+				unit->ClearAction();
+				//FIXME: rb - should we dec unit ref
 				unit->Orders[0]->Goal = NoUnitP;
-				unit->SubAction = 0;
+				
+				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
+				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
+				return;
 			}
+		}
+
+		// Look for something to auto repair
+		if (AutoRepair(unit)) {
+			return;
 		}
 	}
 }

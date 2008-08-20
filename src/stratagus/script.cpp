@@ -72,7 +72,7 @@
 #include "network.h"
 #include "spells.h"
 #include "actions.h"
-
+#include "replay.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -80,10 +80,11 @@
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
-char *CclStartFile;                   /// CCL start file
-std::string GameName;                 /// Game Preferences
+std::string CclStartFile;             /// CCL start file
+std::string UserDirectory;
+std::string GameName;
 int CclInConfigFile;                  /// True while config file parsing
-int SaveGameLoading;                  /// If a Saved Game is Loading
+bool SaveGameLoading;                 /// If a Saved Game is Loading
 std::string CurrentLuaFile;           /// Lua file currently being interpreted
 
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
@@ -132,29 +133,33 @@ static void laction(int i)
 }
 
 /**
-**  Print error message and exit.
+**  Print error message and possibly exit.
 **
 **  @param pname  Source of the error.
 **  @param msg    error message to print.
+**  @param exit   exit the program
 */
-static void l_message(const char *pname, const char *msg)
+static void l_message(const char *pname, const char *msg, bool exit)
 {
 	if (pname) {
 		fprintf(stderr, "%s: ", pname);
 	}
 	fprintf(stderr, "%s\n", msg);
-	exit(1);
+	if (exit) {
+		::exit(1);
+	}
 }
 
 /**
 **  Check error status, and print error message and exit
 **  if status is different of 0.
 **
-**  @param status  status of the last lua call. (0: success)
+**  @param status       status of the last lua call. (0: success)
+**  @param exitOnError  exit the program on error
 **
-**  @return        0 in success, else exit.
+**  @return             0 in success, else exit.
 */
-static int report(int status)
+static int report(int status, bool exitOnError)
 {
 	const char *msg;
 
@@ -163,13 +168,13 @@ static int report(int status)
 		if (msg == NULL) {
 			msg = "(error with no message)";
 		}
-		l_message(NULL, msg);
+		l_message(NULL, msg, exitOnError);
 		lua_pop(Lua, 1);
 	}
 	return status;
 }
 
-static int luatraceback(lua_State *L)
+static int luatraceback(lua_State *L) 
 {
 	lua_pushliteral(L, "debug");
 	lua_gettable(L, LUA_GLOBALSINDEX);
@@ -192,12 +197,13 @@ static int luatraceback(lua_State *L)
 /**
 **  Call a lua function
 **
-**  @param narg   Number of arguments
-**  @param clear  Clear the return value(s)
+**  @param narg         Number of arguments
+**  @param clear        Clear the return value(s)
+**  @param exitOnError  Exit the program when an error occurs
 **
-**  @return       0 in success, else exit.
+**  @return             0 in success, else exit.
 */
-int LuaCall(int narg, int clear)
+int LuaCall(int narg, int clear, bool exitOnError)
 {
 	int status;
 	int base;
@@ -210,13 +216,13 @@ int LuaCall(int narg, int clear)
 	signal(SIGINT, SIG_DFL);
 	lua_remove(Lua, base);  // remove traceback function
 
-	return report(status);
+	return report(status, exitOnError);
 }
 
 /**
 **  Load a file into a buffer
 */
-static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
+static void LuaLoadBuffer(const std::string &file, std::string &buffer)
 {
 	CFile fp;
 	int size;
@@ -225,12 +231,11 @@ static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
 	int read;
 	char *buf;
 
-	*buffer = NULL;
-	*buffersize = 0;
+	buffer.clear();
 
-	if (fp.open(file, CL_OPEN_READ) == -1) {
+	if (fp.open(file.c_str(), CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file '%s': %s\n",
-			file, strerror(errno));
+			file.c_str(), strerror(errno));
 		return;
 	}
 
@@ -261,8 +266,8 @@ static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
 	}
 	fp.close();
 
-	*buffer = buf;
-	*buffersize = location;
+	buffer.assign(buf, location);
+	delete[] buf;
 }
 
 /**
@@ -270,29 +275,27 @@ static void LuaLoadBuffer(const char *file, char **buffer, int *buffersize)
 **
 **  @param file  File to load and execute
 **
-**  @return      0 in success, else exit.
+**  @return      0 for success, else exit.
 */
 int LuaLoadFile(const std::string &file)
 {
 	int status;
 	std::string PreviousLuaFile;
-	char *buf;
-	int size;
+	std::string buf;
 
 	PreviousLuaFile = CurrentLuaFile;
 	CurrentLuaFile = file;
 
-	LuaLoadBuffer(file.c_str(), &buf, &size);
-	if (!buf) {
+	LuaLoadBuffer(file, buf);
+	if (buf.empty()) {
 		return -1;
 	}
 
-	if (!(status = luaL_loadbuffer(Lua, buf, size, file.c_str()))) {
+	if (!(status = luaL_loadbuffer(Lua, buf.c_str(), buf.size(), file.c_str()))) {
 		LuaCall(0, 1);
 	} else {
-		report(status);
+		report(status, true);
 	}
-	delete[] buf;
 	CurrentLuaFile = PreviousLuaFile;
 
 	return status;
@@ -303,20 +306,16 @@ int LuaLoadFile(const std::string &file)
 */
 static int CclGetCurrentLuaPath(lua_State *l)
 {
-	char *path;
-	char *seperator;
-
 	LuaCheckArgs(l, 0);
-	path = new_strdup(CurrentLuaFile.c_str());
-	Assert(path);
-	seperator = strrchr(path, '/');
-	if (seperator) {
-		*seperator = 0;
-		lua_pushstring(l, path);
+	std::string path = CurrentLuaFile;
+	size_t index = path.rfind('/');
+
+	if (index != std::string::npos) {
+		path = path.substr(0, index);
+		lua_pushstring(l, path.c_str());
 	} else {
 		lua_pushstring(l, "");
 	}
-	delete[] path;
 	return 1;
 }
 
@@ -361,15 +360,13 @@ static int CclLoad(lua_State *l)
 static int CclLoadBuffer(lua_State *l)
 {
 	char file[1024];
-	char *buf;
-	int size;
+	std::string buf;
 
 	LuaCheckArgs(l, 1);
 	LibraryFileName(LuaToString(l, 1), file, sizeof(file));
-	LuaLoadBuffer(file, &buf, &size);
-	if (buf) {
-		lua_pushstring(l, buf);
-		delete[] buf; // Lua creates an internal copy
+	LuaLoadBuffer(file, buf);
+	if (!buf.empty()) {
+		lua_pushstring(l, buf.c_str());
 		return 1;
 	}
 	return 0;
@@ -502,7 +499,7 @@ static void ParseBinOp(lua_State *l, BinOp *binop)
 	Assert(l);
 	Assert(binop);
 	Assert(lua_istable(l, -1));
-	Assert(luaL_getn(l, -1) == 2);
+	Assert(lua_objlen(l, -1) == 2);
 
 	lua_rawgeti(l, -1, 1); // left
 	binop->Left = CclParseNumberDesc(l);
@@ -662,7 +659,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 		res->e = ENumber_Lua;
 		res->D.Index = ParseLuaFunction(l, "_numberfunction_", &NumberCounter);
 	} else if (lua_istable(l, -1)) {
-		nargs = luaL_getn(l, -1);
+		nargs = lua_objlen(l, -1);
 		if (nargs != 2) {
 			LuaError(l, "Bad number of args in parse Number table\n");
 		}
@@ -757,7 +754,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 		} else if (!strcmp(key, "StringFind")) {
 			Assert(lua_istable(l, -1));
 			res->e = ENumber_StringFind;
-			if (luaL_getn(l, -1) != 2) {
+			if (lua_objlen(l, -1) != 2) {
 				LuaError(l, "Bad param for StringFind");
 			}
 			lua_rawgeti(l, -1, 1); // left
@@ -820,7 +817,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
 	} else if (lua_istable(l, -1)) {
-		nargs = luaL_getn(l, -1);
+		nargs = lua_objlen(l, -1);
 		if (nargs != 2) {
 			LuaError(l, "Bad number of args in parse String table\n");
 		}
@@ -832,7 +829,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			int i; // iterator.
 
 			res->e = EString_Concat;
-			res->D.Concat.n = luaL_getn(l, -1);
+			res->D.Concat.n = lua_objlen(l, -1);
 			if (res->D.Concat.n < 1) {
 				LuaError(l, "Bad number of args in Concat\n");
 			}
@@ -853,47 +850,47 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
-			if (luaL_getn(l, -1) != 2 && luaL_getn(l, -1) != 3) {
+			if (lua_objlen(l, -1) != 2 && lua_objlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in If\n");
 			}
 			lua_rawgeti(l, -1, 1); // Condition.
 			res->D.If.Cond = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // Then.
 			res->D.If.True = CclParseStringDesc(l);
-			if (luaL_getn(l, -1) == 3) {
+			if (lua_objlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // Else.
 				res->D.If.False = CclParseStringDesc(l);
 			}
 			lua_pop(l, 1); // table.
 		} else if (!strcmp(key, "SubString")) {
 			res->e = EString_SubString;
-			if (luaL_getn(l, -1) != 2 && luaL_getn(l, -1) != 3) {
+			if (lua_objlen(l, -1) != 2 && lua_objlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in SubString\n");
 			}
 			lua_rawgeti(l, -1, 1); // String.
 			res->D.SubString.String = CclParseStringDesc(l);
 			lua_rawgeti(l, -1, 2); // Begin.
 			res->D.SubString.Begin = CclParseNumberDesc(l);
-			if (luaL_getn(l, -1) == 3) {
+			if (lua_objlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // End.
 				res->D.SubString.End = CclParseNumberDesc(l);
 			}
 			lua_pop(l, 1); // table.
 		} else if (!strcmp(key, "Line")) {
 			res->e = EString_Line;
-			if (luaL_getn(l, -1) < 2 || luaL_getn(l, -1) > 4) {
+			if (lua_objlen(l, -1) < 2 || lua_objlen(l, -1) > 4) {
 				LuaError(l, "Bad number of args in Line\n");
 			}
 			lua_rawgeti(l, -1, 1); // Line.
 			res->D.Line.Line = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // String.
 			res->D.Line.String = CclParseStringDesc(l);
-			if (luaL_getn(l, -1) >= 3) {
+			if (lua_objlen(l, -1) >= 3) {
 				lua_rawgeti(l, -1, 3); // Lenght.
 				res->D.Line.MaxLen = CclParseNumberDesc(l);
 			}
 			res->D.Line.Font = NULL;
-			if (luaL_getn(l, -1) >= 4) {
+			if (lua_objlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
 				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
 				if (!res->D.Line.Font) {
@@ -1314,7 +1311,7 @@ static int AliasUnitVar(lua_State *l, const char *s)
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
-		char *sloc[] = {"Unit", "Initial", "Type", NULL};
+		const char *sloc[] = {"Unit", "Initial", "Type", NULL};
 		int i;
 		const char *key;
 
@@ -1822,9 +1819,6 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	int i;
 	int j;
 	int pathtype;
-#ifndef WIN32
-	const char *s;
-#endif
 
 	LuaCheckArgs(l, 1);
 	userdir = lua_tostring(l, 1);
@@ -1837,30 +1831,25 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	}
 
 	// security: disallow all special characters
-	for (i = pathtype; i < n; i++) {
-		if (!(isalnum(userdir[i]) || userdir[i]=='/')) {
-			LuaError(l, "Forbidden directory");
-		}
+	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
+		LuaError(l, "Forbidden directory");
 	}
 
 	if (pathtype == 1) {
 		++userdir;
-#ifndef WIN32
-		if ((s = getenv("HOME")) && !GameName.empty()) {
-			sprintf(directory, "%s/%s/%s/%s",
-				s, STRATAGUS_HOME_PATH, GameName.c_str(), userdir);
-		} else
-#endif
-		{
-			sprintf(directory, "%s/%s", GameName.c_str(), userdir);
-		}
+		std::string dir(UserDirectory);
+		if(!GameName.empty()) {
+			dir += GameName;
+			dir += "/";
+		}		
+		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
 	} else {
-		sprintf(directory, "%s/%s", StratagusLibPath.c_str(), userdir);
+		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
 	}
 	lua_pop(l, 1);
 	lua_newtable(l);
 	n = ReadDataDirectory(directory, NULL, flp);
-	for (i = 0, j = 0; i < n; i++) {
+	for (i = 0, j = 0; i < n; ++i) {
 		if ((flp[i].type & mask) == type) {
 			lua_pushnumber(l, j + 1);
 			lua_pushstring(l, flp[i].name);
@@ -1898,19 +1887,6 @@ static int CclListDirsInDirectory(lua_State *l)
 }
 
 /**
-**  Return the stratagus game-cycle
-**
-**  @param l  Lua state.
-**
-**  @return   Current game cycle.
-*/
-static int CclGameCycle(lua_State *l)
-{
-	lua_pushnumber(l, GameCycle);
-	return 1;
-}
-
-/**
 **  Return of game name.
 **
 **  @param l  Lua state.
@@ -1926,38 +1902,12 @@ static int CclSetGameName(lua_State *l)
 	if (args == 1 && !lua_isnil(l, 1)) {
 		GameName = lua_tostring(l, 1);
 	}
-
-	return 0;
-}
-
-/**
-**  Set the stratagus game-cycle
-**
-**  @param l  Lua state.
-*/
-static int CclSetGameCycle(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	GameCycle = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the game paused or unpaused
-**
-**  @param l  Lua state.
-*/
-static int CclSetGamePaused(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_isnumber(l, 1) && !lua_isboolean(l, 1)) {
-		LuaError(l, "incorrect argument");
+	
+	if(!GameName.empty()) {
+		std::string path = UserDirectory + "/" + GameName;
+		makedir(path.c_str(), 0777);
 	}
-	if (lua_isboolean(l, 1)) {
-		GamePaused = lua_toboolean(l, 1) ? true : false;
-	} else {
-		GamePaused = lua_tonumber(l, 1) ? true : false;
-	}
+
 	return 0;
 }
 
@@ -1974,42 +1924,14 @@ static int CclSetVideoSyncSpeed(lua_State *l)
 }
 
 /**
-**  Set the game speed
-**
-**  @param l  Lua state.
-*/
-static int CclSetGameSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	VideoSyncSpeed = LuaToNumber(l, 1) * 100 / CYCLES_PER_SECOND;
-	SetVideoSync();
-	return 0;
-}
-
-/**
-**  Get the game speed
-**
-**  @param l  Lua state.
-*/
-static int CclGetGameSpeed(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-	return 1;
-}
-
-/**
 **  Set the local player name
 **
 **  @param l  Lua state.
 */
 static int CclSetLocalPlayerName(lua_State *l)
 {
-	const char *str;
-
 	LuaCheckArgs(l, 1);
-	str = LuaToString(l, 1);
-	strncpy_s(LocalPlayerName, sizeof(LocalPlayerName), str, _TRUNCATE);
+	LocalPlayerName = LuaToString(l, 1);
 	return 0;
 }
 
@@ -2021,7 +1943,7 @@ static int CclSetLocalPlayerName(lua_State *l)
 static int CclGetLocalPlayerName(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, LocalPlayerName);
+	lua_pushstring(l, LocalPlayerName.c_str());
 	return 1;
 }
 
@@ -2083,6 +2005,20 @@ static int CclSetGodMode(lua_State *l)
 }
 
 /**
+**  Get God mode.
+**
+**  @param l  Lua state.
+**
+**  @return   God mode.
+*/
+static int CclGetGodMode(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, GodMode);
+	return 1;
+}
+
+/**
 **  Set resource harvesting speed.
 **
 **  @param l  Lua state.
@@ -2123,7 +2059,7 @@ static int CclSetSpeedResourcesReturn(lua_State *l)
 }
 
 /**
-**  For debug increase building speed.
+**  Set building speed.
 **
 **  @param l  Lua state.
 */
@@ -2131,13 +2067,25 @@ static int CclSetSpeedBuild(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedBuild = LuaToNumber(l, 1);
+	return 0;
+}
 
+/**
+**  Get building speed.
+**
+**  @param l  Lua state.
+**
+**  @return   Building speed.
+*/
+static int CclGetSpeedBuild(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, SpeedBuild);
 	return 1;
 }
 
 /**
-**  For debug increase training speed.
+**  Set training speed.
 **
 **  @param l  Lua state.
 */
@@ -2145,7 +2093,19 @@ static int CclSetSpeedTrain(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	SpeedTrain = LuaToNumber(l, 1);
+	return 0;
+}
 
+/**
+**  Get training speed.
+**
+**  @param l  Lua state.
+**
+**  @return   Training speed.
+*/
+static int CclGetSpeedTrain(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, SpeedTrain);
 	return 1;
 }
@@ -2308,18 +2268,6 @@ static int CclGetCompileFeature(lua_State *l)
 	return 1;
 }
 
-/**
-**  Get a value from the Stratagus syncronized random number generator.
-**
-**  @param l  Lua state.
-*/
-static int CclSyncRand(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-
-	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
-	return 1;
-}
 
 /*............................................................................
 ..  Tables
@@ -2355,14 +2303,14 @@ static int CclLoadMap(lua_State *l)
 **
 **  @param command  Zero terminated command string.
 */
-int CclCommand(const char *command)
+int CclCommand(const std::string &command, bool exitOnError)
 {
 	int status;
 
-	if (!(status = luaL_loadbuffer(Lua, command, strlen(command), command))) {
-		LuaCall(0, 1);
+	if (!(status = luaL_loadbuffer(Lua, command.c_str(), command.size(), command.c_str()))) {
+		LuaCall(0, 1, exitOnError);
 	} else {
-		report(status);
+		report(status, exitOnError);
 	}
 	return status;
 }
@@ -2371,42 +2319,63 @@ int CclCommand(const char *command)
 ..  Setup
 ............................................................................*/
 
-int tolua_stratagus_open(lua_State *tolua_S);
+extern int tolua_stratagus_open(lua_State *tolua_S);
+
+/**
+**  Initialize Lua
+*/
+static void InitLua()
+{
+	// For security we don't load all libs
+	static const luaL_Reg lualibs[] = {
+		{"", luaopen_base},
+//		{LUA_LOADLIBNAME, luaopen_package},
+		{LUA_TABLIBNAME, luaopen_table},
+//		{LUA_IOLIBNAME, luaopen_io},
+//		{LUA_OSLIBNAME, luaopen_os},
+		{LUA_STRLIBNAME, luaopen_string},
+		{LUA_MATHLIBNAME, luaopen_math},
+		{LUA_DBLIBNAME, luaopen_debug},
+		{NULL, NULL}
+	};
+
+	Lua = luaL_newstate();
+
+	for (const luaL_Reg *lib = lualibs; lib->func; ++lib) {
+		lua_pushcfunction(Lua, lib->func);
+		lua_pushstring(Lua, lib->name);
+		lua_call(Lua, 1, 0);
+	}
+
+	tolua_stratagus_open(Lua);
+	lua_settop(Lua, 0);  // discard any results
+}
 
 /**
 **  Initialize ccl and load the config file(s).
 */
 void InitCcl(void)
 {
-	Lua = lua_open();
-	luaopen_base(Lua);
-	luaopen_table(Lua);
-	luaopen_string(Lua);
-	luaopen_math(Lua);
-	luaopen_debug(Lua);
-	tolua_stratagus_open(Lua);
-	lua_settop(Lua, 0);  // discard any results
+	InitLua();
 
 	lua_register(Lua, "CompileFeature", CclGetCompileFeature);
 	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
-	lua_register(Lua, "GameCycle", CclGameCycle);
 	lua_register(Lua, "SetGameName", CclSetGameName);
-	lua_register(Lua, "SetGameCycle", CclSetGameCycle);
-	lua_register(Lua, "SetGamePaused", CclSetGamePaused);
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
-	lua_register(Lua, "SetGameSpeed", CclSetGameSpeed);
-	lua_register(Lua, "GetGameSpeed", CclGetGameSpeed);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
 	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
 	lua_register(Lua, "SetGodMode", CclSetGodMode);
+	lua_register(Lua, "GetGodMode", CclGetGodMode);
 
 	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
 	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
 	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
+	lua_register(Lua, "GetSpeedBuild", CclGetSpeedBuild);
 	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
+	lua_register(Lua, "GetSpeedTrain", CclGetSpeedTrain);
 	lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
 	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
@@ -2428,7 +2397,7 @@ void InitCcl(void)
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
 	AliasRegister();
-	NetworkCclRegister();
+	ReplayCclRegister();
 	IconCclRegister();
 	MissileCclRegister();
 	PlayerCclRegister();
@@ -2452,7 +2421,209 @@ void InitCcl(void)
 	EditorCclRegister();
 
 	lua_register(Lua, "LoadMap", CclLoadMap);
-	lua_register(Lua, "SyncRand", CclSyncRand);
+}
+
+/*
+static char *LuaEscape(const char *str)
+{
+	const unsigned char *src;
+	char *dst;
+	char *escapedString;
+	int size = 0;
+
+	for (src = (const unsigned char *)str; *src; ++src) {
+		if (*src == '"' || *src == '\\') { // " -> \"
+			size += 2;
+		} else if (*src < 32 || *src > 127) { // 0xA -> \010
+			size += 4;
+		} else {
+			++size;
+		}
+	}
+
+	escapedString = new char[size + 1];
+	for (src = (const unsigned char *)str, dst = escapedString; *src; ++src) {
+		if (*src == '"' || *src == '\\') { // " -> \"
+			*dst++ = '\\';
+			*dst++ = *src;
+		} else if (*src < 32 || *src > 127) { // 0xA -> \010
+			*dst++ = '\\';
+			snprintf(dst, (size + 1) - (dst - escapedString), "%03d", *src);
+			dst += 3;
+		} else {
+			*dst++ = *src;
+		}
+	}
+	*dst = '\0';
+
+	return escapedString;
+}
+*/
+
+/**
+**  For saving lua state (table, number, string, bool, not function).
+**
+**  @param l        lua_State to save.
+**  @param is_root  true for the main call, 0 for recursif call.
+**
+**  @return  "" if nothing could be saved.
+**           else a string that could be executed in lua to restore lua state
+**  @todo    do the output prettier (adjust indentation, newline)
+*/
+std::string SaveGlobal(lua_State *l, bool is_root)
+{
+	int type_key;
+	int type_value;
+	std::string value;
+	int first;
+	std::string res;
+	std::string tmp;
+	int b;
+
+//	Assert(!is_root || !lua_gettop(l));
+	first = 1;
+	if (is_root) {
+		lua_pushstring(l, "_G");// global table in lua.
+		lua_gettable(l, LUA_GLOBALSINDEX);
+	}
+	const std::string sep = is_root ? "" : ", ";
+	Assert(lua_istable(l, -1));
+	lua_pushnil(l);
+	while (lua_next(l, -2)) {
+		type_key = lua_type(l, -2);
+		type_value = lua_type(l, -1);
+		const std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
+		if ((key == "_G") || (is_root &&
+				(key == "assert") || (key == "gcinfo") || (key == "getfenv") ||
+				(key == "unpack") || (key == "tostring") || (key == "tonumber") ||
+				(key == "setmetatable") || (key == "require") || (key == "pcall") ||
+				(key == "rawequal") || (key == "collectgarbage") || (key == "type") ||
+				(key == "getmetatable") || (key == "next") || (key == "print") ||
+				(key == "xpcall") || (key == "rawset") || (key == "setfenv") ||
+				(key == "rawget") || (key == "newproxy") || (key == "ipairs") ||
+				(key == "loadstring") || (key == "dofile") || (key == "_TRACEBACK") ||
+				(key == "_VERSION") || (key == "pairs") || (key == "__pow") ||
+				(key == "error") || (key == "loadfile") || (key == "arg") ||
+				(key == "_LOADED") || (key == "loadlib") || (key == "string") ||
+				(key == "os") || (key == "io") || (key == "debug") ||
+				(key == "coroutine") || (key == "Icons") || (key == "Upgrades") ||
+				(key == "Fonts") || (key == "FontColors") || (key == "expansion")
+				// other string to protected ?
+				)) {
+			lua_pop(l, 1); // pop the value
+			continue;
+		}
+		switch (type_value) {
+			case LUA_TNIL:
+				value = "nil";
+				break;
+			case LUA_TNUMBER:
+				value = lua_tostring(l, -1); // let lua do the conversion
+				break;
+			case LUA_TBOOLEAN:
+				b = lua_toboolean(l, -1);
+				value = b ? "true" : "false";
+				break;
+			case LUA_TSTRING:
+				value = std::string("\"") + lua_tostring(l, -1) + "\"";
+				break;
+			case LUA_TTABLE:
+				lua_pushvalue(l, -1);
+				tmp = SaveGlobal(l, false);
+				value = "";
+				if (!tmp.empty()) {
+					value = "{" + tmp + "}";
+				}
+				break;
+			case LUA_TFUNCTION:
+			// Could be done with string.dump(function)
+			// and debug.getinfo(function).name (could be nil for anonymous function)
+			// But not usefull yet.
+				value = "";
+				break;
+			case LUA_TUSERDATA:
+			case LUA_TTHREAD:
+			case LUA_TLIGHTUSERDATA:
+			case LUA_TNONE:
+			default : // no other cases
+				value = "";
+				break;
+		}
+		lua_pop(l, 1); /* pop the value */
+
+		// Check the validity of the key (only [a-zA-z_])
+		if (type_key == LUA_TSTRING) {
+			for (unsigned int i = 0; key[i]; ++i) {
+				if (!isalnum(key[i]) && key[i] != '_') {
+					value.clear();
+					break;
+				}
+			}
+		}
+		if (value.empty()) {
+			if (!is_root) {
+				lua_pop(l, 2); // pop the key and the table
+				return "";
+			}
+			continue;
+		}
+		if (type_key == LUA_TSTRING && key == value.c_str()) {
+			continue;
+		}
+		if (first) {
+			first = 0;
+			if (type_key == LUA_TSTRING) {
+				res = key + "=" + value;
+			} else {
+				res = value;
+			}
+		} else {
+			if (type_key == LUA_TSTRING) {
+				tmp = value;
+				value = key + "=" + value;
+				tmp = res;
+				res = res + sep + value;
+			} else {
+				res = res + sep + value;
+			}
+		}
+		tmp = res;
+		res += "\n";
+	}
+	lua_pop(l, 1); // pop the table
+//	Assert(!is_root || !lua_gettop(l));
+	return res;
+}
+
+/**
+**  Create directories containing user settings and data.
+**
+**  More specifically: logs, saved games, preferences
+*/
+void CreateUserDirectories(void)
+{
+	std::string directory;
+	UserDirectory = "";
+
+#ifndef USE_WIN32
+	std::string s;
+	s = getenv("HOME");
+	if (!s.empty()) {
+		UserDirectory = s + "/";
+	}
+#endif
+	
+	UserDirectory += STRATAGUS_HOME_PATH;
+	UserDirectory += "/";
+
+	//DebugPrint("Creating User Directories: %s\n" _C_ UserDirectory.c_str());
+	
+
+	makedir(UserDirectory.c_str(), 0777);
+	
+	// Create specific subdirectories
+	//directory = UserDirectory + "patches/";
+	//makedir(directory.c_str(), 0777);
 }
 
 /**
@@ -2461,25 +2632,19 @@ void InitCcl(void)
 void SavePreferences(void)
 {
 	FILE *fd;
-	char buf[PATH_MAX];
+	std::string path;
 
 	lua_pushstring(Lua, "preferences");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
-#ifdef USE_WIN32
-		strcpy_s(buf, sizeof(buf), GameName.c_str());
-		mkdir(buf);
-		strcat_s(buf, sizeof(buf), "/preferences.lua");
-#else
-		sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
-		mkdir(buf, 0777);
-		strcat_s(buf, sizeof(buf), "/");
-		strcat_s(buf, sizeof(buf), GameName.c_str());
-		mkdir(buf, 0777);
-		strcat_s(buf, sizeof(buf), "/preferences.lua");
-#endif
+		path = UserDirectory;
+		if(!GameName.empty()) {
+			path += GameName;
+			path += "/";
+		}
+		path += "preferences.lua";
 
-		fd = fopen(buf, "w");
+		fd = fopen(path.c_str(), "w");
 		if (!fd) {
 			return;
 		}
@@ -2496,21 +2661,20 @@ void SavePreferences(void)
 */
 void LoadCcl(void)
 {
-	char *file;
 	char buf[PATH_MAX];
 
 	//
 	//  Load and evaluate configuration file
 	//
 	CclInConfigFile = 1;
-	file = LibraryFileName(CclStartFile, buf, sizeof(buf));
+	LibraryFileName(CclStartFile.c_str(), buf, sizeof(buf));
 	if (access(buf, R_OK)) {
-		printf("Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
+		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress("Script %s\n", file);
-	LuaLoadFile(file);
+	ShowLoadProgress("Script %s\n", buf);
+	LuaLoadFile(buf);
 	CclInConfigFile = 0;
 	CclGarbageCollect(0);  // Cleanup memory after load
 }

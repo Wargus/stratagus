@@ -358,6 +358,9 @@
 #include <vector>
 #include "SDL.h"
 
+#include "unittype.h"
+#include "player.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -376,6 +379,8 @@ class CFile;
 struct lua_State;
 class CViewport;
 class CAnimation;
+	/// Called whenever the selected unit was updated
+extern void SelectedUnitChanged(void);
 
 /**
 **  Unit references over network, or for memory saving.
@@ -424,30 +429,38 @@ typedef enum _unit_action_ {
 */
 class COrder {
 public:
-	COrder() : Action(UnitActionNone), Range(0), MinRange(0), Width(0),
-		Height(0), Goal(NULL), X(-1), Y(-1), Type(NULL)
+	COrder() : Range(0), MinRange(0), Width(0),
+		Height(0),Action(UnitActionNone), CurrentResource(0),
+		Goal(NULL), X(-1), Y(-1), Type(NULL)
 	{
 		memset(&Arg1, 0, sizeof(Arg1));
 	};
 
+	void Release(void);
 	void Init() {
+		Assert(Action != UnitActionResource || 
+				Action == UnitActionResource && Arg1.Resource.Mine == NULL);
 		Action = UnitActionNone;
 		Range = 0;
 		MinRange = 0;
 		Width = 0;
 		Height = 0;
+		CurrentResource = 0;
 		Assert(!Goal);
 		X = -1; Y = -1;
 		Type = NULL;
 		memset(&Arg1, 0, sizeof(Arg1));
 	};
 
-	unsigned char Action;   /// global action
 	int Range;              /// How far away
 	unsigned int  MinRange; /// How far away minimum
 	unsigned char Width;    /// Goal Width (used when Goal is not)
 	unsigned char Height;   /// Goal Height (used when Goal is not)
+	unsigned char Action;   /// global action
+	unsigned char CurrentResource;	 //used in 	UnitActionResource and 
+										//UnitActionReturnGoods
 
+	
 	CUnit *Goal;            /// goal of the order (if any)
 	int X;                  /// or X tile coordinate of destination
 	int Y;                  /// or Y tile coordinate of destination
@@ -455,13 +468,31 @@ public:
 
 	union {
 		struct {
+#ifdef __x86_64__
 			int X;                    /// X position for patroling.
 			int Y;                    /// Y position for patroling.
+#else
+			short int X;                    /// X position for patroling.
+			short int Y;                    /// Y position for patroling.
+#endif
 		} Patrol;                     /// position.
-		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
+		union {
+			struct {
+#ifdef __x86_64__
+				int X;                    /// X position for terrain resource.
+				int Y;                    /// Y position for terrain resource.
+#else
+				short int X;                    /// X position for terrain resource.
+				short int Y;                    /// Y position for terrain resource.
+#endif
+			} Pos;                     /// position.
+			CUnit *Mine;
+		} Resource;
+		//int ResourcePos;              /// ResourcePos == (X<<16 | Y).
 		SpellType *Spell;             /// spell when casting.
 		CUpgrade *Upgrade;            /// upgrade.
 	} Arg1;             /// Extra command argument.
+	
 };
 
 /**
@@ -513,13 +544,13 @@ public:
 		UnitSlot = NULL;
 		PlayerSlot = NULL;
 		Next = NULL;
-		CacheLock = 0;
 		InsideCount = 0;
 		BoardCount = 0;
 		UnitInside = NULL;
 		Container = NULL;
 		NextContained = NULL;
 		PrevContained = NULL;
+		NextWorker = NULL;
 		X = 0;
 		Y = 0;
 		Type = NULL;
@@ -569,13 +600,12 @@ public:
 	}
 
 	// @note int is faster than shorts
-	int     Refs;         /// Reference counter
+	unsigned int     Refs;         /// Reference counter
 	int     Slot;         /// Assigned slot number
 	CUnit **UnitSlot;     /// Slot pointer of Units
 	CUnit **PlayerSlot;   /// Slot pointer of Player->Units
 
 	CUnit        *Next;          /// Generic link pointer (on map)
-	unsigned      CacheLock : 1; /// Used to lock unit out of the cache.
 
 	int    InsideCount;   /// Number of units inside.
 	int    BoardCount;    /// Number of units transported inside.
@@ -583,7 +613,8 @@ public:
 	CUnit *Container;     /// Pointer to the unit containing it (or 0)
 	CUnit *NextContained; /// Next unit in the container.
 	CUnit *PrevContained; /// Previous unit in the container.
-
+	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
+	
 	int X; /// Map position X
 	int Y; /// Map position Y
 
@@ -593,30 +624,33 @@ public:
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 // DISPLAY:
+	int         Frame;      /// Image frame: <0 is mirrored
 	CUnitColors *Colors;    /// Player colors
+	
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position
-	int         Frame;      /// Image frame: <0 is mirrored
-
-	unsigned Direction : 8; /// angle (0-255) unit looking
+	unsigned char CurrentResource;
+	int ResourcesHeld;      /// Resources Held by a unit
 
 	unsigned long Attacked; /// gamecycle unit was last attacked
+	unsigned Direction : 8; /// angle (0-255) unit looking
 
 	unsigned Burning : 1;   /// unit is burning
 	unsigned Destroyed : 1; /// unit is destroyed pending reference
 	unsigned Removed : 1;   /// unit is removed (not on map)
 	unsigned Selected : 1;  /// unit is selected
-	unsigned TeamSelected;  /// unit is selected by a team member.
+	
 
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
+	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 							     /// NULL if the unit was not rescued.
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player
+		CConstructionFrame  *CFrame;                  /// Seen construction frame
 		int                 Frame;                   /// last seen frame/stage of buildings
 		CUnitType          *Type;                    /// Pointer to last seen unit-type
 		int                 X;                       /// Last unit->X Seen
@@ -626,7 +660,7 @@ public:
 		unsigned            Constructed : 1;         /// Unit seen construction
 		unsigned            State : 3;               /// Unit seen build/upgrade state
 		unsigned            Destroyed : PlayerMax;   /// Unit seen destroyed or not
-		CConstructionFrame  *CFrame;                  /// Seen construction frame
+		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player	
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.
@@ -636,14 +670,13 @@ public:
 	int GroupId;        /// unit belongs to this group id
 	int LastGroup;      /// unit belongs to this last group
 
-	int ResourcesHeld;      /// Resources Held by a unit
-
+	unsigned int Wait;          /// action counter
 	unsigned SubAction : 8; /// sub-action of unit
-	unsigned Wait;          /// action counter
 	unsigned State : 8;     /// action state
 	unsigned Blink : 3;     /// Let selection rectangle blink
 	unsigned Moving : 1;    /// The unit is moving
 	unsigned ReCast : 1;    /// Recast again next cycle
+	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 
 	struct _unit_anim_ {
 		const CAnimation *Anim;                     /// Anim
@@ -652,7 +685,6 @@ public:
 		int Unbreakable;                            /// Unbreakable
 	} Anim;
 
-	unsigned char CurrentResource;
 
 	char OrderCount;            /// how many orders in queue
 	char OrderFlush;            /// cancel current order, take next
@@ -661,10 +693,10 @@ public:
 	COrder NewOrder;             /// order for new trained units
 	COrder CriticalOrder;        /// order to do as possible in breakable animation.
 	char *AutoCastSpell;        /// spells to auto cast
-	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 
 	union _order_data_ {
 	struct _order_move_ {
+		unsigned short int Cycles;          /// how much Cycles we move.
 		char Fast;                  /// Flag fast move (one step)
 		char Length;                /// stored path length
 #define MAX_PATH_LENGTH 28          /// max length of precalculated path
@@ -680,6 +712,8 @@ public:
 		int Cycles;                 /// Cycles unit has been building for
 	} Build; /// ActionBuild
 	struct _order_resource_ {
+		CUnit *Workers; //pointer to first assigned worker to this resource.
+		int Assigned; /// how many units are assigned to harvesting from the resource.
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 	struct _order_resource_worker_ {
@@ -707,6 +741,14 @@ public:
 		return Orders[0]->Action == UnitActionStill && OrderCount == 1;
 	}
 
+	inline void ClearAction() {
+		Orders[0]->Action = UnitActionStill;
+		SubAction = 0;
+		if (Selected) {
+			SelectedUnitChanged();
+		}
+	}
+
 	/// Increase a unit's reference count
 	void RefsIncrease();
 	/// Decrease a unit's reference count
@@ -731,19 +773,82 @@ public:
 
 	/// Remove unit from map/groups/...
 	void Remove(CUnit *host);
+
+	void AssignWorkerToMine(CUnit *mine);
+	void DeAssignWorkerFromMine(CUnit *mine);
+	
 	/// Release a unit
 	void Release();
 
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer *player) const;
-	/// Returns true, if unit is visible as a goal.
-	bool IsVisibleAsGoal(const CPlayer *player) const;
-	/// Returns true, if unit is Visible for game logic on the map.
-	bool IsVisibleOnMap(const CPlayer *player) const;
+
+	inline bool IsInvisibile(const CPlayer *const player) const
+	{
+		return ((player != Player) && !!Variable[INVISIBLE_INDEX].Value &&
+				(!player->IsBothSharedVision(Player)));
+	}
+
+	/**
+	**  Returns true if unit is alive and on the map.
+	**  Another unit can interact only with alive map units.
+	**
+	**  @return        True if alive, false otherwise.
+	*/
+	inline bool IsAliveOnMap() const
+	{
+		return !Removed && !Destroyed && Orders[0]->Action != UnitActionDie;
+	}
+
+	/**
+	**  Returns true, if unit is visible as an action goal for a player
+	**  on the map.
+	**
+	**  @param player  Player to check for.
+	**
+	**  @return        True if visible, false otherwise.
+	*/
+	inline bool IsVisibleAsGoal(const CPlayer *const player) const
+	{
+		//
+		// Invisibility
+		//
+		if (IsInvisibile(player)) {
+			return false;
+		}
+		if ((player->Type == PlayerComputer && !this->Type->PermanentCloak) ||
+			VisCount[player->Index] || IsVisible(player) ||
+			IsVisibleOnRadar(player)) {
+			return IsAliveOnMap();
+		} else {
+			return Type->VisibleUnderFog &&
+				(Seen.ByPlayer & (1 << player->Index)) &&
+				!(Seen.Destroyed & (1 << player->Index));
+		}
+	}
+	
+	/**
+	**  Returns true, if unit is visible for this player on the map.
+	**  The unit has to be out of fog of war and alive
+	**
+	**  @param player  Player to check for.
+	**
+	**  @return        True if visible, false otherwise.
+	*/
+	inline bool IsVisibleOnMap(const CPlayer *player) const
+	{
+		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
+	}	
+
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
 	bool IsVisibleOnMinimap() const;
+	
+	// Returns true if unit is visible under radar (By player, or by shared vision)
+	bool IsVisibleOnRadar(const CPlayer *pradar) const;
+	
 	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
 	bool IsVisibleInViewport(const CViewport *vp) const;
+	
 	/// Returns true, if unit is visible on current map view (any viewport).
 	bool IsVisibleOnScreen() const;
 
@@ -761,10 +866,10 @@ public:
 	bool IsTeamed(const CPlayer *x) const;
 	bool IsTeamed(const CUnit *x) const;
 
-	bool IsUnusable() const;
+	bool IsUnusable(bool ignore_built_state = false) const;
 };
 
-#define NoUnitP (CUnit *)0         /// return value: for no unit found
+#define NoUnitP (CUnit *)0        /// return value: for no unit found
 #define InfiniteDistance INT_MAX /// the distance is unreachable
 
 #define FlushCommands 1          /// Flush commands in queue
@@ -777,7 +882,7 @@ public:
 #define UnitNumber(unit) ((unit)->Slot)
 
 /**
-** How many groups supported
+**  How many groups supported
 */
 #define NUM_GROUPS 10
 
@@ -788,11 +893,11 @@ class CPreference {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowOrders(0) {};
-public:
+
 	bool ShowSightRange;     /// Show right range.
 	bool ShowReactionRange;  /// Show reaction range.
 	bool ShowAttackRange;    /// Show attack range.
-	int ShowOrders;          /// How many second show orders of unit on map.
+	int  ShowOrders;         /// How many second show orders of unit on map.
 };
 
 extern CPreference Preference;
@@ -800,9 +905,6 @@ extern CPreference Preference;
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
-
-extern CUnit *UnitSlots[MAX_UNIT_SLOTS]; /// All possible units
-extern unsigned int UnitSlotFree;        /// First free unit slot
 
 extern CUnit *Units[MAX_UNIT_SLOTS]; /// Units used
 extern int NumUnits;                 /// Number of units used
@@ -823,18 +925,13 @@ extern CUnit **TeamSelected[PlayerMax];     /// teams currently selected units
 extern int     NumSelected;                 /// how many units selected
 extern int     TeamNumSelected[PlayerMax];  /// Number of Units a team member has selected
 
-extern CUnit *ReleasedHead;                 /// Head of the released unit list.
-extern CUnit *ReleasedTail;                 /// Tail of the released unit list.
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-	/// Prepare unit memory allocator
-extern void InitUnitsMemory(void);
-	///  Mark the field with the FieldFlags.
+	/// Mark the field with the FieldFlags.
 void MarkUnitFieldFlags(const CUnit *unit);
-	///  Unmark the field with the FieldFlags.
+	/// Unmark the field with the FieldFlags.
 void UnmarkUnitFieldFlags(const CUnit *unit);
 	/// Update unit->CurrentSightRange.
 void UpdateUnitSightRange(CUnit *unit);
@@ -857,8 +954,14 @@ extern void UnitGoesUnderFog(CUnit *unit, const CPlayer *player);
 extern void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player);
 	/// Marks a unit as seen
 extern void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int p);
+extern void 
+UnitsOnTileMarkSeen(const CPlayer *player, 	const unsigned int index, int p);
+
 	/// Unmarks a unit as seen
 extern void UnitsOnTileUnmarkSeen(const CPlayer *player, int x, int y, int p);
+extern void 
+UnitsOnTileUnmarkSeen(const CPlayer *player, const unsigned int index, int p);
+
 	/// Does a recount for VisCount
 extern void UnitCountSeen(CUnit *unit);
 
@@ -889,7 +992,10 @@ extern bool CanBuildOn(int x, int y, int mask);
 extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType *type, int x, int y, int real);
 
 	/// Find resource
-extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource);
+extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range,
+		 int resource, bool check_usage = false, const CUnit *destu = NULL);
+extern CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
+		 int range, int resource);		 
 	/// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource);
 	/// Find the next idle worker
@@ -912,7 +1018,23 @@ extern void DestroyAllInside(CUnit *source);
 extern void HitUnit(CUnit *attacker, CUnit *target, int damage);
 
 	/// Returns the map distance between two points
-extern int MapDistance(int x1, int y1, int x2, int y2);
+//extern int MapDistance(int x1, int y1, int x2, int y2);
+/**
+**  Returns the map distance between two points.
+**
+**  @param x1  X map tile position.
+**  @param y1  Y map tile position.
+**  @param x2  X map tile position.
+**  @param y2  Y map tile position.
+**
+**  @return    The distance between in tiles.
+*/
+static inline int MapDistance(int x1, int y1, int x2, int y2)
+{
+	return isqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+
 	/// Returns the map distance between two points with unit-type
 extern int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2);
 	/// Returns the map distance to unit
@@ -949,18 +1071,6 @@ extern void InitUnits(void);
 	/// Clean unit module
 extern void CleanUnits(void);
 
-// in unitcache.c
-	/// Insert new unit into cache
-extern void UnitCacheInsert(CUnit *unit);
-	/// Remove unit from cache
-extern void UnitCacheRemove(CUnit *unit);
-	/// Select units in range
-extern int UnitCacheSelect(int x1, int y1, int x2, int y2, CUnit **table);
-	/// Select units on tile
-extern int UnitCacheOnTile(int x, int y, CUnit **table);
-	/// Initialize unit-cache
-extern void InitUnitCache(void);
-
 // in unit_draw.c
 //--------------------
 	/// Draw nothing around unit
@@ -991,20 +1101,19 @@ extern int FindAndSortUnits(const CViewport *vp, CUnit **table);
 	/// Show a unit's orders.
 extern void ShowOrder(const CUnit *unit);
 
-// in unit_find.c
-	/// Select unit on X,Y of type naval,fly,land
-extern CUnit *UnitCacheOnXY(int x, int y, unsigned type);
+// in unit_find.cpp
 	/// Find all units of this type
 extern int FindUnitsByType(const CUnitType *type, CUnit **table);
 	/// Find all units of this type of the player
 extern int FindPlayerUnitsByType(const CPlayer *, const CUnitType *, CUnit **);
 	/// Return any unit on that map tile
-extern CUnit *UnitOnMapTile(int tx, int ty);
+extern CUnit *UnitOnMapTile(int tx, int ty, unsigned int type);// = -1);
 	/// Return possible attack target on that map area
 extern CUnit *TargetOnMap(const CUnit *unit, int x1, int y1, int x2, int y2);
 
 	/// Return resource, if on map tile
-extern CUnit *ResourceOnMap(int tx, int ty, int resource);
+extern CUnit *ResourceOnMap(int tx, int ty, int resource, 
+		bool mine_on_top = true);
 	/// Return resource deposit, if on map tile
 extern CUnit *ResourceDepositOnMap(int tx, int ty, int resource);
 

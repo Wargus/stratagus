@@ -27,6 +27,7 @@
 
 MODULE = src/unit
 MSRC =   depend.cpp script_unit.cpp script_unittype.cpp \
-         unit.cpp unit_cache.cpp unit_draw.cpp unit_find.cpp unittype.cpp upgrade.cpp
+         unit.cpp unit_cache.cpp unit_draw.cpp unit_find.cpp unittype.cpp \
+		upgrade.cpp unit_manager.cpp unit_save.cpp build.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

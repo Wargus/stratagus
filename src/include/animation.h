@@ -60,7 +60,9 @@ typedef enum AnimationType {
 
 class CAnimation {
 public:
-	CAnimation() : Type(AnimationNone), Next(NULL) {}
+	CAnimation() : Type(AnimationNone), Next(NULL) {
+		memset(&D, 0, sizeof(D));
+	}
 
 	AnimationType Type;
 	union {
@@ -75,11 +77,11 @@ public:
 			int MaxWait;
 		} RandomWait;
 		struct {
-			std::string *Name;
+			const char *Name;
 			CSound *Sound;
 		} Sound;
 		struct {
-			std::string *Name;
+			const char **Name;
 			CSound **Sound;
 			unsigned int NumSounds;
 		} RandomSound;

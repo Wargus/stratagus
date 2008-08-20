@@ -172,10 +172,10 @@ namespace gcn
 
         if (mAlpha)
         {
-            int x1 = area.x > top.x ? area.x : top.x;
-            int y1 = area.y > top.y ? area.y : top.y;
-            int x2 = area.x + area.width < top.x + top.width ? area.x + area.width : top.x + top.width;
-            int y2 = area.y + area.height < top.y + top.height ? area.y + area.height : top.y + top.height;
+			int x1 = std::max(area.x, top.x);
+			int y1 = std::max(area.y, top.y);
+			int x2 = std::min(area.x + area.width, top.x + top.width);
+			int y2 = std::min(area.y + area.height, top.y + top.height);
 
 			Video.FillTransRectangle(SDL_MapRGB(TheScreen->format, mColor.r, mColor.g, mColor.b),
 				x1, y1, x2 - x1, y2 - y1, mColor.a);
@@ -246,76 +246,13 @@ namespace gcn
             }      
             x2 = top.x + top.width -1;
         }
-    
-        int bpp = mTarget->format->BytesPerPixel;
-    
-        SDL_LockSurface(mTarget);
-
-        Uint8 *p = (Uint8 *)mTarget->pixels + y * mTarget->pitch + x1 * bpp;
-    
-        Uint32 pixel = SDL_MapRGB(mTarget->format, mColor.r, mColor.g, mColor.b);
-    
-        switch(bpp) {
-          case 1:
-          {
-              for (;x1 <= x2; ++x1)
-              { 
-                  *(p++) = pixel;
-              }
-          } break;
-      
-          case 2:
-          {
-              Uint16* q = (Uint16*)p;
-              for (;x1 <= x2; ++x1)
-              {
-                  *(q++) = pixel;
-              }
-          } break;
-        
-          case 3:  
-          {
-              if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-                  for (;x1 <= x2; ++x1)
-                  {
-                      p[0] = (pixel >> 16) & 0xff;
-                      p[1] = (pixel >> 8) & 0xff;
-                      p[2] = pixel & 0xff;
-                      p += 3;
-                  }
-              }
-              else
-              {
-                  for (;x1 <= x2; ++x1)
-                  {
-                      p[0] = pixel & 0xff;
-                      p[1] = (pixel >> 8) & 0xff;
-                      p[2] = (pixel >> 16) & 0xff;
-                      p += 3;
-                  }
-              } 
-          } break;
-  
-          case 4:
-          {
-              Uint32* q = (Uint32*)p;
-              for (;x1 <= x2; ++x1)
-              {
-                  if (mAlpha)
-                  {
-                      *q = SDLAlpha32(pixel,*q,mColor.a);
-                      q++;
-                  }
-                  else
-                  {
-                      *(q++) = pixel;
-                  }
-              }
-          } break;
-
-        } // end switch
-    
-        SDL_UnlockSurface(mTarget);    
+		Uint32 color = 
+			SDL_MapRGB(TheScreen->format, mColor.r, mColor.g, mColor.b);
+		if (mAlpha)	{
+			Video.DrawTransHLine(color, x1, y, x2 - x1, mColor.a);
+		} else {
+			Video.DrawHLine(color, x1, y, x2 - x1);
+		}		
     }
 
     void SDLGraphics::drawVLine(int x, int y1, int y2)
@@ -352,75 +289,13 @@ namespace gcn
             }      
             y2 = top.y + top.height - 1;
         }
-    
-        int bpp = mTarget->format->BytesPerPixel;
-    
-        SDL_LockSurface(mTarget);
-    
-        Uint8 *p = (Uint8 *)mTarget->pixels + y1 * mTarget->pitch + x * bpp;
-    
-        Uint32 pixel = SDL_MapRGB(mTarget->format, mColor.r, mColor.g, mColor.b);
-    
-        switch(bpp) {
-          case 1:
-          {
-              for (;y1 <= y2; ++y1)
-              { 
-                  *p = pixel;
-                  p += mTarget->pitch;
-              }
-          } break;
-      
-          case 2:
-          {
-              for (;y1 <= y2; ++y1)
-              {
-                  *(Uint16*)p = pixel;
-                  p += mTarget->pitch;
-              }
-          } break;
-        
-          case 3:  
-          {
-              if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-                  for (;y1 <= y2; ++y1)
-                  {
-                      p[0] = (pixel >> 16) & 0xff;
-                      p[1] = (pixel >> 8) & 0xff;
-                      p[2] = pixel & 0xff;
-                      p += mTarget->pitch;
-                  }
-              }
-              else
-              {
-                  for (;y1 <= y2; ++y1)
-                  {
-                      p[0] = pixel & 0xff;
-                      p[1] = (pixel >> 8) & 0xff;
-                      p[2] = (pixel >> 16) & 0xff;
-                      p += mTarget->pitch;
-                  }
-              } 
-          } break;
-  
-          case 4:
-          {
-              for (;y1 <= y2; ++y1)
-              {
-                  if (mAlpha)
-                  {
-                      *(Uint32*)p = SDLAlpha32(pixel,*(Uint32*)p,mColor.a);
-                  }
-                  else
-                  {
-                      *(Uint32*)p = pixel;
-                  }
-                  p += mTarget->pitch;
-              }
-          } break;
-        } // end switch
-    
-        SDL_UnlockSurface(mTarget);
+		Uint32 color = 
+			SDL_MapRGB(TheScreen->format, mColor.r, mColor.g, mColor.b);
+		if (mAlpha)	{
+			Video.DrawTransVLine(color, x, y1,y2 - y1, mColor.a);
+		} else {
+			Video.DrawVLine(color, x, y1, y2 - y1);
+		}
     }
 
     void SDLGraphics::drawRectangle(const Rectangle& rectangle)
@@ -434,7 +309,7 @@ namespace gcn
         drawHLine(x1, y2, x2);
 
         drawVLine(x1, y1, y2);
-        drawVLine(x2, y1, y2);    
+        drawVLine(x2, y1, y2);
     }
 
     void SDLGraphics::drawLine(int x1, int y1, int x2, int y2)

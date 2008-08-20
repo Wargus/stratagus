@@ -67,6 +67,7 @@
 #include "commands.h"
 #include "iolib.h"
 #include "iocompat.h"
+#include "replay.h"
 
 #include "script.h"
 
@@ -139,7 +140,7 @@ static void LoadStratagusMap(const char *smpname, const char *mapname, CMap *map
 	}
 
 	if (LcmPreventRecurse) {
-		fprintf(stderr, "recursive use of load Stratagus map!\n");
+		fprintf(stderr, "recursive use of load map!\n");
 		ExitFatal(-1);
 	}
 	InitPlayers();
@@ -380,8 +381,51 @@ static void LoadMap(const char *filename, CMap *map)
 	ExitFatal(-1);
 }
 
+/**
+**  Set the game paused or unpaused
+**
+**  @param paused  True to pause game, false to unpause.
+*/
+void SetGamePaused(bool paused)
+{
+	GamePaused = paused;
+}
+
+/**
+**  Get the game paused or unpaused
+**
+**  @return  True if the game is paused, false otherwise
+*/
+bool GetGamePaused()
+{
+	return GamePaused;
+}
+
+/**
+**  Set the game speed
+**
+**  @param speed  New game speed.
+*/
+void SetGameSpeed(int speed)
+{
+	if (GameCycle == 0 || FastForwardCycle < GameCycle) {
+		VideoSyncSpeed = speed * 100 / CYCLES_PER_SECOND;
+		SetVideoSync();
+	}
+}
+
+/**
+**  Get the game speed
+**
+**  @return  Game speed
+*/
+int GetGameSpeed()
+{
+	return CYCLES_PER_SECOND * VideoSyncSpeed / 100;
+}
+
 /*----------------------------------------------------------------------------
---  Game creation
+--  Game types
 ----------------------------------------------------------------------------*/
 
 /**
@@ -510,6 +554,10 @@ static void GameTypeManTeamVsMachine(void)
 	}
 }
 
+/*----------------------------------------------------------------------------
+--  Game creation
+----------------------------------------------------------------------------*/
+
 /**
 **  CreateGame.
 **
@@ -575,7 +623,7 @@ void CreateGame(const char *filename, CMap *map)
 		DebugPrint("Client setup: Calling InitNetwork2\n");
 		InitNetwork2();
 	} else {
-		if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {
+		if (!LocalPlayerName.empty() && LocalPlayerName.compare("Anonymous") != 0) {
 			ThisPlayer->SetName(LocalPlayerName);
 		}
 	}
@@ -657,8 +705,8 @@ void CreateGame(const char *filename, CMap *map)
 	InitUserInterface();
 	UI.Load();
 
-	UI.Minimap.Create();
 	Map.Init();
+	UI.Minimap.Create();
 	PreprocessMap();
 
 	//
@@ -720,7 +768,7 @@ void CreateGame(const char *filename, CMap *map)
 	// Various hacks wich must be done after the map is loaded.
 	//
 	// FIXME: must be done after map is loaded
-	InitAStar();
+	InitPathfinder();
 	//
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.

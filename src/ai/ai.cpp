@@ -98,11 +98,11 @@
 **
 ** ::AiHelpMe()
 **
-** Called if an unit owned by the AI is attacked.
+** Called if a unit owned by the AI is attacked.
 **
 ** ::AiUnitKilled()
 **
-** Called if an unit owned by the AI is killed.
+** Called if a unit owned by the AI is killed.
 **
 ** ::AiNeedMoreSupply()
 **
@@ -111,7 +111,7 @@
 **
 ** ::AiWorkComplete()
 **
-** Called if an unit has completed its work.
+** Called if a unit has completed its work.
 **
 ** ::AiCanNotBuild()
 **
@@ -174,7 +174,7 @@ PlayerAi *AiPlayer;             /// Current AI player
 /**
 **  Execute the AI Script.
 */
-static void AiExecuteScript()
+static void AiExecuteScript(void)
 {
 	PlayerAi *pai = AiPlayer;
 
@@ -191,7 +191,7 @@ static void AiExecuteScript()
 /**
 **  Check if everything is fine, send new requests to resource manager.
 */
-static void AiCheckUnits()
+static void AiCheckUnits(void)
 {
 	int counter[UnitTypeMax];
 	int attacking[UnitTypeMax];
@@ -203,17 +203,13 @@ static void AiCheckUnits()
 	int x;
 	int e;
 
-	memset(counter, 0, sizeof (counter));
-	memset(attacking,0,sizeof(attacking));
+	memset(attacking, 0, sizeof(attacking));
 
 	//
 	//  Count the already made build requests.
 	//
-	for (i = 0; i < (int)AiPlayer->UnitTypeBuilt.size(); ++i) {
-		AiBuildQueue *queue = &AiPlayer->UnitTypeBuilt[i];
-		counter[queue->Type->Slot] += queue->Want;
-	}
-
+	AiGetBuildRequestsCount(counter);
+	
 	//
 	//  Remove non active units.
 	//
@@ -335,7 +331,7 @@ static void AiCheckUnits()
 */
 static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 {
-	int i;
+	int i,s;
 
 	file->printf("DefineAiPlayer(%d,\n", plynr);
 	file->printf("  \"ai-type\", \"%s\",\n", ai->AiType->Name.c_str());
@@ -369,18 +365,20 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 		}
 
 		file->printf("\n    \"types\", { ");
-		for (j = 0; j < (int)ai->Force[i].UnitTypes.size(); ++j) {
+		s = (int)ai->Force[i].UnitTypes.size();
+		for (j = 0; j < s; ++j) {
 			const AiUnitType *aut = &ai->Force[i].UnitTypes[j];
 			file->printf("%d, \"%s\", ", aut->Want, aut->Type->Ident.c_str());
 		}
 		file->printf("},\n    \"units\", {");
-		for (j = 0; j < (int)ai->Force[i].Units.size(); ++j) {
+		s = (int)ai->Force[i].Units.size();
+		for (j = 0; j < s; ++j) {
 			const CUnit *aiunit = ai->Force[i].Units[j];
 			file->printf(" %d, \"%s\",", UnitNumber(aiunit),
 				aiunit->Type->Ident.c_str());
 		}
-		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d",
-			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY);
+		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
+			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY, ai->Force[i].MustTransport);
 		file->printf("},\n");
 	}
 
@@ -424,29 +422,44 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	//
 	if (!ai->FirstExplorationRequest.empty()) {
 		file->printf("  \"exploration\", {");
-		for (i = 0; i < (int)ai->FirstExplorationRequest.size(); ++i) {
+		s = (int)ai->FirstExplorationRequest.size();
+		for (i = 0; i < s; ++i) {
 			AiExplorationRequest *ptr = &ai->FirstExplorationRequest[i];
 			file->printf("{%d, %d, %d}, ", ptr->X, ptr->Y, ptr->Mask);
 		}
 		file->printf("},\n");
 	}
 	file->printf("  \"last-exploration-cycle\", %lu,\n", ai->LastExplorationGameCycle);
+	if (!ai->TransportRequests.empty()) {
+		file->printf("  \"transport\", {");
+		s = (int)ai->TransportRequests.size();
+		for (i = 0; i < s; ++i) {
+			AiTransportRequest *ptr = &ai->TransportRequests[i];
+			file->printf("{%d, ", UnitNumber(ptr->Unit));
+			SaveOrder(&ptr->Order, file);
+			file->printf("}, ");
+		}
+		file->printf("},\n");
+	}
 	file->printf("  \"last-can-not-move-cycle\", %lu,\n", ai->LastCanNotMoveGameCycle);
 	file->printf("  \"unit-type\", {");
-	for (i = 0; i < (int)ai->UnitTypeRequests.size(); ++i) {
+	s = (int)ai->UnitTypeRequests.size();
+	for (i = 0; i < s; ++i) {
 		file->printf("\"%s\", ", ai->UnitTypeRequests[i].Type->Ident.c_str());
 		file->printf("%d, ", ai->UnitTypeRequests[i].Count);
 	}
 	file->printf("},\n");
 
 	file->printf("  \"upgrade\", {");
-	for (i = 0; i < (int)ai->UpgradeToRequests.size(); ++i) {
+	s = (int)ai->UpgradeToRequests.size();
+	for (i = 0; i < s; ++i) {
 		file->printf("\"%s\", ", ai->UpgradeToRequests[i]->Ident.c_str());
 	}
 	file->printf("},\n");
 
 	file->printf("  \"research\", {");
-	for (i = 0; i < (int)ai->ResearchRequests.size(); ++i) {
+	s = (int)ai->ResearchRequests.size();
+	for (i = 0; i < s; ++i) {
 		file->printf("\"%s\", ", ai->ResearchRequests[i]->Ident.c_str());
 	}
 	file->printf("},\n");
@@ -455,9 +468,18 @@ static void SaveAiPlayer(CFile *file, int plynr, PlayerAi *ai)
 	//  Building queue
 	//
 	file->printf("  \"building\", {");
-	for (i = 0; i < (int)ai->UnitTypeBuilt.size(); ++i) {
+	s = (int)ai->UnitTypeBuilt.size();
+	for (i = 0; i < s; ++i) {
 		const AiBuildQueue *queue = &ai->UnitTypeBuilt[i];
-		file->printf("\"%s\", %d, %d, ", queue->Type->Ident.c_str(), queue->Made, queue->Want);
+		/* rb - for backward compatibility of save format we have to put it first */
+		if(queue->X != -1) {
+			file->printf("\"onpos\", %d, %d, ", queue->X, queue->Y);
+		}
+		/* */
+		
+		file->printf("\"%s\", %d, %d", queue->Type->Ident.c_str(), queue->Made, queue->Want);
+		if(i < s - 1)
+			file->printf(",\n");
 	}
 	file->printf("},\n");
 
@@ -494,7 +516,6 @@ static void SaveAiPlayers(CFile *file)
 void SaveAi(CFile *file)
 {
 	file->printf("\n--- -----------------------------------------\n");
-	file->printf("--- MODULE: AI $Id$\n\n");
 
 	SaveAiPlayers(file);
 
@@ -568,7 +589,7 @@ void AiInit(CPlayer *player)
 /**
 **  Initialize global structures of the AI
 */
-void InitAiModule()
+void InitAiModule(void)
 {
 	AiResetUnitTypeEquiv();
 }
@@ -577,7 +598,7 @@ void InitAiModule()
 /**
 **  Cleanup the AI in order to enable to restart a game.
 */
-void CleanAi()
+void CleanAi(void)
 {
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Ai) {
@@ -726,6 +747,13 @@ static void AiReduceMadeInBuilt(PlayerAi *pai, const CUnitType *type)
 		}
 	}
 
+	if (pai->Player == ThisPlayer) {
+		DebugPrint
+			("My guess is that you built something under ai me. naughty boy!\n");
+		return;
+	}
+
+
 	Assert(0);
 }
 
@@ -789,17 +817,17 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 		y = defender->Y;
 	}
 	for (unsigned int i = 0; i < AI_MAX_FORCES; ++i) {
-		AiForce &aiForce = pai->Force[i];
+		AiForce *aiForce = &pai->Force[i];
 
-		if (aiForce.Role == AiForceRoleDefend && !aiForce.Attacking) {  // none attacking
-			aiForce.Defending = true;
+		if (aiForce->Role == AiForceRoleDefend && !aiForce->Attacking) {  // none attacking
+			aiForce->Defending = true;
 			AiAttackWithForceAt(i, x, y);
 		}
 	}
 }
 
 /**
-**  Called if an unit is killed.
+**  Called if a unit is killed.
 **
 **  @param unit  Pointer to unit.
 */
@@ -887,7 +915,7 @@ void AiCanNotReach(CUnit *unit, const CUnitType *what)
 }
 
 /**
-**  FIXME: docu
+**  Try to move a unit that's in the way
 */
 static void AiMoveUnitInTheWay(CUnit *unit)
 {
@@ -962,16 +990,13 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 		by1 = by0 + blocker->Type->TileHeight - 1;;
 
 		// Check for collision
-#define int_min(a,b)  ((a)<(b)?(a):(b))
-#define int_max(a,b)  ((a)>(b)?(a):(b))
 		if (!((ux0 == bx1 + 1 || ux1 == bx0 - 1) &&
-					(int_max(by0, uy0) <= int_min(by1, uy1))) &&
-				!((uy0 == by1 + 1 || uy1 == by0 - 1) &&
-					(int_max(bx0, ux0) <= int_min(bx1, ux1)))) {
+				(std::max(by0, uy0) <= std::min(by1, uy1))) &&
+			!((uy0 == by1 + 1 || uy1 == by0 - 1) &&
+				(std::max(bx0, ux0) <= std::min(bx1, ux1))))
+		{
 			continue;
 		}
-#undef int_min
-#undef int_max
 
 		if (unit == blocker) {
 			continue;
@@ -1018,7 +1043,7 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 }
 
 /**
-**  Called if an unit can't move. Try to move unit in the way
+**  Called if a unit can't move. Try to move unit in the way
 **
 **  @param unit  Pointer to unit what builds the building.
 */
@@ -1069,7 +1094,7 @@ void AiNeedMoreSupply(const CUnit *unit, const CUnitType *what)
 }
 
 /**
-**  Called if training of an unit is completed.
+**  Called if training of a unit is completed.
 **
 **  @param unit  Pointer to unit making.
 **  @param what  Pointer to new ready trained unit.
@@ -1128,6 +1153,16 @@ void AiResearchComplete(CUnit *unit, const CUpgrade *what)
 */
 void AiEachCycle(CPlayer *player)
 {
+	AiPlayer = player->Ai;
+
+	for (int i = 0; i < (int)AiPlayer->TransportRequests.size(); ++i) {
+		AiTransportRequest *aitr = &AiPlayer->TransportRequests[i];
+		aitr->Unit->RefsDecrease();
+		if (aitr->Order.Goal) {
+			aitr->Order.Goal->RefsDecrease();
+		}
+	}
+	AiPlayer->TransportRequests.clear();
 }
 
 /**

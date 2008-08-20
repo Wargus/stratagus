@@ -171,9 +171,11 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+
 #include "iocompat.h"
 #include "tileset.h"
-
+#include "player.h"
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -198,8 +200,90 @@ class CUnitType;
 	/// Describes a field of the map
 class CMapField {
 public:
-	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0),
-		UnitCache()
+
+	class cache_t {
+		typedef std::vector<CUnit *>::const_iterator const_iter_t;
+		typedef std::vector<CUnit *>::iterator iter_t;		
+		std::vector<CUnit *> Units;
+		
+	public:	
+		cache_t() : Units() { Units.clear();}
+		
+		inline const_iter_t begin()
+		{
+			return Units.begin();
+		}
+		
+		inline const_iter_t end()
+		{
+			return Units.end();
+		}
+		
+		/**
+		 *  @brief Find the first unit in a tile chache for which a predicate is true.
+		 *  @param  pred   A predicate object vith bool operator()(CUnit *).
+		 *  @return   The first unit i in the cache
+		 *  such that @p pred(*i) is true, or NULL if no such iterator exists.
+		 */
+		template<typename stratagus_predicate>
+		inline CUnit *find(stratagus_predicate pred)
+		{
+			const_iter_t beg(Units.begin()), end(Units.end());
+			const_iter_t ret = std::find_if(beg, end, pred);
+			return ret != end ? (*ret) : NULL;
+		}
+
+		/**
+		 *  @brief Apply a function to every element of a cache.
+		 *  @param  functor A unary function object vith bool operator()(CUnit *).
+		 *  @return count of visited element.
+		 *
+		 *  Applies the function object @p f to each element in the cache.
+		 *  @p functor must not modify the order of the cache.
+		 *  If @p functor return false then loop is exited.
+		 */		
+		template<typename _T>
+		inline int for_each(_T &functor)
+		{
+			int count = 0;
+			iter_t i(Units.begin()), end(Units.end());
+			while(i != end && functor((*i))) 
+			{
+				++i;
+				++count;
+			}
+			return count;
+		}
+		
+		/**
+		**  Remove unit from tile cache.
+		**
+		**  @param unit  Unit pointer to remove from cache.
+		*/	
+		inline void Remove(CUnit *unit)
+		{
+			for(iter_t i(Units.begin()), end(Units.end()); i != end; ++i) {
+				if ((*i) == unit) {
+					Units.erase(i);
+					return;
+				}
+			}
+		}
+
+		/**
+		**  Insert new unit into tile cache.
+		**
+		**  @param unit  Unit pointer to place in cache.
+		*/
+		inline void Insert(CUnit *unit) {
+			Units.push_back(unit);
+		}
+	};	
+
+	CMapField() : Tile(0), SeenTile(0), Flags(0), Cost(0), Value(0), UnitCache()
+#ifdef DEBUG
+	, TilesetTile(0)
+#endif
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -218,7 +302,48 @@ public:
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
-	std::vector<CUnit *> UnitCache;       /// A unit on the map field.
+	cache_t UnitCache;						/// A unit on the map field.
+#ifdef DEBUG
+	unsigned int TilesetTile;      /// tileset tile number
+#endif
+	
+	
+	/**
+	**  Find out if a field is seen (By player, or by shared vision)
+	**  This function will return > 1 with no fog of war.
+	**
+	**  @param player		Player to check for.
+	**  @param NoFogOfWar	is fog of war is disabled.
+	**
+	**  @return        0 unexplored, 1 explored, > 1 visible.
+	*/
+	unsigned short IsVisible(const CPlayer *const player,
+				 bool NoFogOfWar = false) const
+	{
+		unsigned short visiontype = this->Visible[player->Index];
+
+		if (visiontype > 1) {
+			return visiontype;
+		}
+		if (player->SharedVision) {
+			for (int i = 0; i < PlayerMax ; ++i) {
+				if (player->SharedVision & (1 << i) &&
+						(Players[i].SharedVision & (1 << player->Index))) {
+					if (this->Visible[i] > 1) {
+						return 2;
+					}
+					visiontype |= this->Visible[i];
+				}
+			}
+		}
+
+		if (visiontype) {
+			return visiontype + (NoFogOfWar ? 1 : 0);
+		}
+		return 0;
+	}
+	
+	
 };
 
 // Not used until now:
@@ -232,9 +357,7 @@ public:
 #define MapFieldNoBuilding   0x0080  /// No buildings allowed
 
 #define MapFieldUnpassable 0x0100  /// Field is movement blocked
-#define MapFieldWall       0x0200  /// Field contains wall
-#define MapFieldRocks      0x0400  /// Field contains rocks
-#define MapFieldForest     0x0800  /// Field contains forest
+//#define MapFieldWall       0x0200  /// defined in tileset.h
 
 #define MapFieldLandUnit 0x1000  /// Land unit on field
 #define MapFieldAirUnit  0x2000  /// Air unit on field
@@ -257,6 +380,12 @@ public:
 	int PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
 	unsigned int MapUID;   /// Unique Map ID (hash)
+
+	inline bool IsPointOnMap(int x, int y) const
+	{
+		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
+	}
+
 };
 
 /*----------------------------------------------------------------------------
@@ -266,6 +395,15 @@ public:
 	/// Describes the world map
 class CMap {
 public:
+
+	inline unsigned int getIndex(int x, int y) const
+	{
+		return x + y * this->Info.MapWidth;
+	}
+	
+	inline CMapField *Field(unsigned int index) const {
+		return &this->Fields[index];
+	}
 
 	/// Alocate and initialise map table.
 	void Create();
@@ -279,25 +417,81 @@ public:
 	void ClearTile(unsigned short type, unsigned x, unsigned y);
 
 	/// Find if a tile is visible (with shared vision).
-	unsigned short IsTileVisible(const CPlayer *player, int x, int y) const;
+	unsigned short IsTileVisible(const CPlayer *const player, 
+				const unsigned int index) const
+	{
+		return	this->Fields[index].IsVisible(player, NoFogOfWar);
+	};
+
+	/// Check if a field flags.
+	bool CheckMask(const unsigned int index, const int mask) const
+	{
+		return (this->Fields[index].Flags & mask) != 0;
+	};
+
+	bool CheckMask(int x, int y, int mask) const
+	{
+		return (this->Fields[x + y * this->Info.MapWidth].Flags & mask) != 0;
+	};
 
 	/// Check if a field for the user is explored.
-	bool IsFieldExplored(const CPlayer *player, int x, int y) const
+	bool IsFieldExplored(const CPlayer *const player,
+					 const unsigned int index) const
 	{
-		return IsTileVisible(player, x, y) > 0;
-	}
+		//return IsTileVisible(player, index) > 0;	
+#if 1	
+		return !!this->Fields[index].Visible[player->Index];
+#else
+		if(!this->Fields[index].Visible[player->Index])
+			return !!this->Fields[index].IsVisible(player, NoFogOfWar);
+		return true;	
+#endif
+	};
+
 	/// Check if a field for the user is visible.
-	bool IsFieldVisible(const CPlayer *player, int x, int y) const
+	bool IsFieldVisible(const CPlayer *const player, 
+			const unsigned int index) const
 	{
-		return IsTileVisible(player, x, y) > 1;
+		return IsTileVisible(player, index) > 1;
+	};
+	
+	
+	unsigned short IsTileVisible(const CPlayer *const player,
+			int x, int y) const
+	{
+		return IsTileVisible(player, getIndex(x,y));
+	};
+	
+	/// Check if a field for the user is explored.
+	bool IsFieldExplored(const CPlayer *const player, int x, int y) const
+	{
+	 	return IsFieldExplored(player, getIndex(x,y));
 	}
+	
+	/// Check if a field for the user is visible.
+	bool IsFieldVisible(const CPlayer *const player, int x, int y) const
+	{
+		return IsTileVisible(player, getIndex(x,y)) > 1;
+	}
+	
 	/// Mark a tile as seen by the player.
-	void MarkSeenTile(int x, int y);
+	void MarkSeenTile(const unsigned int index);
+
+	/// Mark a tile as seen by the player.
+	void MarkSeenTile(int x, int y)
+	{
+		MarkSeenTile(getIndex(x,y));
+	}
 
 	/// Reveal the complete map, make everything known.
 	void Reveal(void);
 	/// Save the map.
 	void Save(CFile *file) const;
+
+	/// Get the MapField at location x,y
+	inline CMapField *Field(int x, int y) const {
+		return &this->Fields[x + y * this->Info.MapWidth];
+	}
 
 //
 // Wall
@@ -322,16 +516,102 @@ public:
 //
 
 	/// Returns true, if water on the map tile field
-	bool WaterOnMap(int x, int y) const;
+	bool WaterOnMap(const unsigned int index) const
+	{
+		return CheckMask(index, MapFieldWaterAllowed);
+	};
+
+	/**
+	**  Water on map tile.
+	**
+	**  @param tx  X map tile position.
+	**  @param ty  Y map tile position.
+	**
+	**  @return    True if water, false otherwise.
+	*/
+	bool WaterOnMap(int tx, int ty) const
+	{
+		Assert(Info.IsPointOnMap(tx, ty));
+		return WaterOnMap(getIndex(tx,ty));
+	};
+	
 	/// Returns true, if coast on the map tile field
-	bool CoastOnMap(int x, int y) const;
+	bool CoastOnMap(const unsigned int index) const
+	{
+		return CheckMask(index, MapFieldCoastAllowed);
+	};
+	
+	/**
+	**  Coast on map tile.
+	**
+	**  @param tx  X map tile position.
+	**  @param ty  Y map tile position.
+	**
+	**  @return    True if coast, false otherwise.
+	*/
+	bool CoastOnMap(int tx, int ty) const
+	{
+		Assert(Info.IsPointOnMap(tx, ty));
+		return CoastOnMap(getIndex(tx,ty));
+	};
 
 	/// Returns true, if forest on the map tile field
-	bool ForestOnMap(int x, int y) const;
+	bool ForestOnMap(const unsigned int index) const
+	{
+		return CheckMask(index, MapFieldForest);	
+	};
+
+	/**
+	**  Forest on map tile.
+	**
+	**  @param tx  X map tile position.
+	**  @param ty  Y map tile position.
+	**
+	**  @return    True if forest, false otherwise.
+	*/
+	bool ForestOnMap(int tx, int ty) const
+	{
+		Assert(Info.IsPointOnMap(tx, ty));
+		return ForestOnMap(getIndex(tx,ty));
+	};
+
 
 	/// Returns true, if rock on the map tile field
-	bool RockOnMap(int x, int y) const;
+	bool RockOnMap(const unsigned int index) const
+	{
+		return CheckMask(index, MapFieldRocks);	
+	};
 
+	/**
+	**  Rock on map tile.
+	**
+	**  @param tx  X map tile position.
+	**  @param ty  Y map tile position.
+	**
+	**  @return    True if rock, false otherwise.
+	*/
+	bool RockOnMap(int tx, int ty) const
+	{
+		Assert(Info.IsPointOnMap(tx, ty));
+		return RockOnMap(getIndex(tx,ty));
+	};
+
+//UnitCache
+
+		/// Insert new unit into cache
+	void Insert(CUnit *unit);
+
+	/// Remove unit from cache
+	void Remove(CUnit *unit);
+
+	/// Select units in rectange range
+	int Select(int x1, int y1, 
+		int x2, int y2, CUnit **table, const int tablesize = UnitMax);
+
+
+	// Select units on map tile. - helper funtion. don't use directly
+	int Select(int x, int y, CUnit *table[], 
+								const int tablesize = UnitMax);
 
 
 private:
@@ -383,12 +663,16 @@ extern int ReplayRevealMap;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
+#define MARKER_ON_INDEX
 //
 // in map_fog.c
 //
 /// Function to (un)mark the vision table.
+#ifndef MARKER_ON_INDEX
 typedef void MapMarkerFunc(const CPlayer *player, int x, int y);
+#else
+typedef void MapMarkerFunc(const CPlayer *player, const unsigned int index);
+#endif
 
 	/// Filter map flags through fog
 extern int MapFogFilterFlags(CPlayer *player, int x, int y, int mask);
@@ -418,18 +702,25 @@ extern void FreeVisionTable(void);
 // in map_radar.c
 //
 
-	/// Check if a unit is visible on radar
-extern bool UnitVisibleOnRadar(const CPlayer *pradar, const CUnit *punit);
 	/// Check if a tile is visible on radar
-extern unsigned char IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y);
+extern unsigned char 
+IsTileRadarVisible(const CPlayer *pradar, const CPlayer *punit, int x, int y);
 	/// Mark a tile as radar visible, or incrase radar vision
 extern void MapMarkTileRadar(const CPlayer *player, int x, int y);
+extern void 
+MapMarkTileRadar(const CPlayer *player, const unsigned int index);
 	/// Unmark a tile as radar visible, decrease is visible by other radar
 extern void MapUnmarkTileRadar(const CPlayer *player, int x, int y);
+extern void 
+MapUnmarkTileRadar(const CPlayer *player, const unsigned int index);
 	/// Mark a tile as radar jammed, or incrase radar jamming'ness
 extern void MapMarkTileRadarJammer(const CPlayer *player, int x, int y);
+extern void 
+MapMarkTileRadarJammer(const CPlayer *player, const unsigned int index);
 	/// Unmark a tile as jammed, decrease is jamming'ness
 extern void MapUnmarkTileRadarJammer(const CPlayer *player, int x, int y);
+extern void 
+MapUnmarkTileRadarJammer(const CPlayer *player, const unsigned int index);
 
 //
 // in map_wall.c
@@ -462,11 +753,11 @@ extern void LoadStratagusMapInfo(const std::string &mapname);
 extern void FreeMapInfo(CMapInfo *info);
 
 	/// Returns true, if the unit-type(mask can enter field with bounds check
-extern int CheckedCanMoveToMask(int x, int y, int mask);
+extern bool CheckedCanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
-extern int UnitTypeCanBeAt(const CUnitType *type, int x, int y);
+extern bool UnitTypeCanBeAt(const CUnitType *type, int x, int y);
 	/// Returns true, if the unit can enter the field
-extern int UnitCanBeAt(const CUnit *unit, int x, int y);
+extern bool UnitCanBeAt(const CUnit *unit, int x, int y);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
@@ -483,24 +774,31 @@ void MapUnmarkUnitSight(CUnit *unit);
 ----------------------------------------------------------------------------*/
 
 	/// Can a unit with 'mask' enter the field
-#define CanMoveToMask(x, y, mask) \
-	!(Map.Fields[(x) + (y) * Map.Info.MapWidth].Flags & (mask))
+inline bool CanMoveToMask(int x, int y, int mask) {
+	return !Map.CheckMask(x, y, mask);
+}
 
-#define MapMarkSight(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileSight)
-#define MapUnmarkSight(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileSight)
+inline void MapMarkSight(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapMarkTileSight);
+}
+inline void MapUnmarkSight(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapUnmarkTileSight);
+}
 
 	/// Handle Marking and Unmarking of radar vision
-#define MapMarkRadar(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileRadar)
-#define MapUnmarkRadar(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileRadar)
+inline void MapMarkRadar(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapMarkTileRadar);
+}
+inline void MapUnmarkRadar(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapUnmarkTileRadar);
+}
 	/// Handle Marking and Unmarking of radar vision
-#define MapMarkRadarJammer(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileRadarJammer)
-#define MapUnmarkRadarJammer(player, x, y, w, h, range) \
-	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileRadarJammer)
+inline void MapMarkRadarJammer(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapMarkTileRadarJammer);
+}
+inline void MapUnmarkRadarJammer(const CPlayer *player, int x, int y, int w, int h, int range) {
+	MapSight(player, x, y, w, h, range, MapUnmarkTileRadarJammer);
+}
 
 //@}
 

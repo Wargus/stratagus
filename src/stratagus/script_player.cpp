@@ -45,6 +45,7 @@
 #include "ai.h"
 #include "actions.h"
 #include "commands.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -164,7 +165,7 @@ static int CclPlayer(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "start")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -177,7 +178,7 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -200,7 +201,7 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -223,7 +224,7 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -246,7 +247,7 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -295,7 +296,7 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			if (subargs != MaxCosts) {
 				LuaError(l, "Wrong number of total-resources: %d" _C_ i);
 			}
@@ -309,7 +310,7 @@ static int CclPlayer(lua_State *l)
 			int g;
 			int b;
 
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 3) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -326,7 +327,7 @@ static int CclPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			if (subargs != UpgradeMax) {
 				LuaError(l, "Wrong upgrade timer length: %d" _C_ i);
 			}
@@ -363,7 +364,7 @@ static int CclChangeUnitsOwner(lua_State *l)
 	if (!lua_istable(l, 1) || !lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
-	if (luaL_getn(l, 1) != 2) {
+	if (lua_objlen(l, 1) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 1, 1);
@@ -373,7 +374,7 @@ static int CclChangeUnitsOwner(lua_State *l)
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	if (luaL_getn(l, 2) != 2) {
+	if (lua_objlen(l, 2) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 2, 1);
@@ -383,7 +384,7 @@ static int CclChangeUnitsOwner(lua_State *l)
 	y2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	n = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table);
+	n = Map.Select(x1, y1, x2 + 1, y2 + 1, table);
 	oldp = LuaToNumber(l, 3);
 	newp = LuaToNumber(l, 4);
 	while (n) {
@@ -599,7 +600,7 @@ static int CclDefineRaceNames(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			i = PlayerRaces.Count++;
 			PlayerRaces.Name[i].clear();
 			PlayerRaces.Display[i].clear();
@@ -649,7 +650,7 @@ static int CclDefinePlayerColors(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	args = luaL_getn(l, 1);
+	args = lua_objlen(l, 1);
 	for (i = 0; i < args; ++i) {
 		lua_rawgeti(l, 1, i + 1);
 		PlayerColorNames[i / 2] = LuaToString(l, -1);
@@ -659,13 +660,13 @@ static int CclDefinePlayerColors(lua_State *l)
 		if (!lua_istable(l, -1)) {
 			LuaError(l, "incorrect argument");
 		}
-		numcolors = luaL_getn(l, -1);
+		numcolors = lua_objlen(l, -1);
 		if (numcolors != PlayerColorIndexCount) {
 			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
 		}
 		for (j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);

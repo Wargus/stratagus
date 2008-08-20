@@ -182,9 +182,10 @@ bool ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 */
 bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 {
-	return unit->Orders[0]->Action != UnitActionTrain &&
-		unit->Orders[0]->Action != UnitActionUpgradeTo &&
-		unit->Orders[0]->Action != UnitActionResearch;
+	int action = unit->Orders[0]->Action; 
+	return action != UnitActionTrain &&
+		action != UnitActionUpgradeTo &&
+		action != UnitActionResearch;
 }
 
 /**
@@ -197,8 +198,9 @@ bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 */
 bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
 {
-	return unit->Orders[0]->Action != UnitActionUpgradeTo &&
-		unit->Orders[0]->Action != UnitActionResearch;
+	int action = unit->Orders[0]->Action;
+	return action != UnitActionUpgradeTo &&
+		action != UnitActionResearch;
 }
 
 /**

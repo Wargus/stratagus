@@ -109,7 +109,7 @@ CIcon *CIcon::Get(const std::string &ident)
 {
 	CIcon *icon = Icons[ident];
 	if (!icon) {
-		DebugPrint("icon not found: %s" _C_ ident.c_str());
+		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
 	}
 	return icon;
 }
@@ -126,7 +126,7 @@ void IconConfig::Load()
 	Icon = CIcon::Get(Name);
 #if 0
 	if (!Icon) {
-		printf("Can't find icon %s\n", Name.c_str());
+		fprintf(stderr, "Can't find icon %s\n", Name.c_str());
 		ExitFatal(-1);
 	}
 #endif

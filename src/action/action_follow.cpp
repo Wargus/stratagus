@@ -42,6 +42,7 @@
 #include "unit.h"
 #include "unittype.h"
 #include "pathfinder.h"
+#include "map.h"
 #include "interface.h"
 #include "actions.h"
 
@@ -78,11 +79,7 @@ void HandleActionFollow(CUnit *unit)
 				goal->RefsDecrease();
 			}
 			unit->Orders[0]->Goal = NoUnitP;
-			unit->SubAction = 0;
-			unit->Orders[0]->Action = UnitActionStill;
-			if (IsOnlySelected(unit)) { // update display for new action
-				SelectedUnitChanged();
-			}
+			unit->ClearAction();
 			return;
 		}
 
@@ -91,8 +88,7 @@ void HandleActionFollow(CUnit *unit)
 			if (unit->OrderCount > 1) {
 				goal->RefsDecrease();
 				unit->Orders[0]->Goal = NoUnitP;
-				unit->SubAction = 0;
-				unit->Orders[0]->Action = UnitActionStill;
+				unit->ClearAction();
 				return;
 			}
 
@@ -151,8 +147,7 @@ void HandleActionFollow(CUnit *unit)
 					unit->X * TileSizeX + TileSizeX / 2,
 					unit->Y * TileSizeY + TileSizeY / 2);
 #endif
-				unit->SubAction = 0;
-				unit->Orders[0]->Action = UnitActionStill;
+				unit->ClearAction();
 
 				//
 				// FIXME: we must check if the units supports the new order.
@@ -167,7 +162,7 @@ void HandleActionFollow(CUnit *unit)
 							(dest->NewOrder.Action == UnitActionBoard &&
 								unit->Type->UnitType != UnitTypeLand)) {
 						DebugPrint("Wrong order for unit\n");
-						unit->Orders[0]->Action = UnitActionStill;
+						unit->ClearAction();
 						unit->Orders[0]->Goal = NoUnitP;
 					} else {
 						if (dest->NewOrder.Goal) {
@@ -181,7 +176,8 @@ void HandleActionFollow(CUnit *unit)
 						}
 
 						*unit->Orders[0] = dest->NewOrder;
-
+						unit->CurrentResource = dest->CurrentResource;
+						
 						//
 						// FIXME: Pending command uses any references?
 						//
@@ -194,11 +190,7 @@ void HandleActionFollow(CUnit *unit)
 			}
 
 			if (!(goal = unit->Orders[0]->Goal)) { // goal has died
-				unit->SubAction = 0;
-				unit->Orders[0]->Action = UnitActionStill;
-				if (IsOnlySelected(unit)) { // update display for new action
-					SelectedUnitChanged();
-				}
+				unit->ClearAction();
 				return;
 			}
 			unit->Orders[0]->X = goal->X;
@@ -239,9 +231,8 @@ void HandleActionFollow(CUnit *unit)
 				// Save current command to come back.
 				unit->SavedOrder = *unit->Orders[0];
 				// This stops the follow command and the attack is executed
-				unit->Orders[0]->Action = UnitActionStill;
+				unit->ClearAction();
 				unit->Orders[0]->Goal = NoUnitP;
-				unit->SubAction = 0;
 			}
 		}
 	}

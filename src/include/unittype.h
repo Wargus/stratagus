@@ -525,6 +525,7 @@ struct lua_State;
 #ifdef USE_MNG
 class Mng;
 #endif
+class LuaCallback;
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
 
@@ -543,23 +544,24 @@ public:
 
 class ResourceInfo {
 public:
-	ResourceInfo() : HarvestFromOutside(0), WaitAtResource(0), ResourceStep(0),
+	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
-		TerrainHarvester(0), LoseResources(0),
+		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0), 
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
 
 	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
 	std::string FileWhenEmpty;      /// Change the graphic when the unit is empty.
-	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
 	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
 	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
 	int      ResourceCapacity;      /// Max amount of resources to carry.
 	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 	unsigned FinalResource;         /// Convert resource when delivered.
-	unsigned TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
-	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
+	unsigned char TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
+	unsigned char LoseResources;         /// The unit will lose it's resource when distracted.
+	unsigned char HarvestFromOutside;    /// Unit harvests without entering the building.
+	unsigned char RefineryHarvester;    /// Unit have to build Refinery buildings for harvesting.	
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
@@ -646,10 +648,10 @@ enum {
 
 class CUnit;
 class CUnitType;
-
+class CFont;
 
 /**
-**  Decoration for userdefined variable.
+**  Decoration for user defined variable.
 **
 **    It is used to show variables graphicly.
 **  @todo add more stuff in this struct.
@@ -738,11 +740,11 @@ public:
 	int n;                      /// identifiant in SpellSprite
 };
 
-typedef enum {
+enum UnitTypeType {
 	UnitTypeLand,               /// Unit lives on land
 	UnitTypeFly,                /// Unit lives in air
 	UnitTypeNaval,              /// Unit lives on water
-} UnitTypeType;
+};
 
 enum DistanceTypeType {
 	Equal,
@@ -791,6 +793,12 @@ public:
 
 
 class CBuildRestrictionAddOn : public CBuildRestriction {
+	struct functor {
+		const CUnitType *const Parent;   /// building that is unit is an addon too.	
+		const int x,y;	//functor work position
+		functor(const CUnitType *type, int _x, int _y): Parent(type), x(_x), y(_y) {}
+		inline bool operator() (CUnit *const unit);
+	};
 public:
 	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), Parent(NULL) {};
 	virtual ~CBuildRestrictionAddOn() {};
@@ -804,6 +812,13 @@ public:
 };
 
 class CBuildRestrictionOnTop : public CBuildRestriction {
+	struct functor {
+		CUnit *ontop;   /// building that is unit is an addon too.		
+		const CUnitType *const Parent;   /// building that is unit is an addon too.		
+		const int x,y;	//functor work position
+		functor(const CUnitType *type, int _x, int _y): ontop(0), Parent(type), x(_x), y(_y) {}
+		inline bool operator() (CUnit *const unit);
+	};
 public:
 	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
@@ -812,8 +827,8 @@ public:
 
 	std::string ParentName;  /// building that is unit is an addon too.
 	CUnitType *Parent;   /// building that is unit is an addon too.
-	int ReplaceOnDie;    /// recreate the parent on destruction
-	int ReplaceOnBuild;  /// remove the parent, or just build over it.
+	int ReplaceOnDie:1;    /// recreate the parent on destruction
+	int ReplaceOnBuild:1;  /// remove the parent, or just build over it.
 };
 
 class CBuildRestrictionDistance : public CBuildRestriction {
@@ -833,39 +848,8 @@ public:
 	/// @todo n0body: AutoBuildRate not implemented.
 class CUnitType {
 public:
-	CUnitType() : Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
-		ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
-		Animations(NULL), StillFrame(0), CorpseType(NULL),
-		Construction(NULL),  RepairHP(0), TileWidth(0), TileHeight(0),
-		BoxWidth(0), BoxHeight(0), NumDirections(0), MinAttackRange(0),
-		ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
-		BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-		CanCastSpell(NULL), AutoCastActive(NULL), AutoBuildRate(0),
-		RandomMovementProbability(0), ClicksToExplode(0),
-		CanTransport(NULL), MaxOnBoard(0), StartingResources(0),
-		UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
-		MouseAction(0), Points(0), CanTarget(0),
-		Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
-		ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
-		PermanentCloak(0), DetectCloak(0), Coward(0), AttackFromTransporter(0),
-		Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
-		BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
-		BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
-		SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-		Indestructible(0), Teleporter(0),
-		GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
-		Sprite(NULL), ShadowSprite(NULL)
-	{
-#ifdef USE_MNG
-		memset(&Portrait, 0, sizeof(Portrait));
-#endif
-		memset(_Costs, 0, sizeof(_Costs));
-		memset(RepairCosts, 0, sizeof(RepairCosts));
-		memset(CanStore, 0, sizeof(CanStore));
-		memset(ResInfo, 0, sizeof(ResInfo));
-		memset(&NeutralMinimapColorRGB, 0, sizeof(NeutralMinimapColorRGB));
-		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
-	}
+	CUnitType();
+	~CUnitType();
 
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
@@ -898,6 +882,8 @@ public:
 #endif
 	MissileConfig Missile;          /// Missile weapon
 	MissileConfig Explosion;        /// Missile for unit explosion
+
+	LuaCallback *DeathExplosion;
 
 	std::string CorpseName;         /// Corpse type name
 	CUnitType *CorpseType;          /// Corpse unit-type
@@ -966,15 +952,18 @@ public:
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
 	unsigned CanHarvest : 1;        /// Resource can be harvested.
 	unsigned Harvester : 1;         /// unit is a resource harvester.
-	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
-	CVariable *Variable;            /// Array of user defined variables.
-	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
+	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
 	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
+	
+	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
+	CVariable *Variable;            /// Array of user defined variables.
+	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
+
 
 	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
@@ -1023,10 +1012,10 @@ public:
 	CUnitTypeVar() : BoolFlagName(NULL), NumberBoolFlag(0),
 		VariableName(NULL), Variable(NULL), NumberVariable(0) {}
 
-	std::string *BoolFlagName;          /// Array of name of user defined bool flag.
+	const char **BoolFlagName;          /// Array of name of user defined bool flag.
 	unsigned int NumberBoolFlag;        /// Number of user defined bool flag.
 
-	std::string *VariableName;          /// Array of names of user defined variables.
+	const char **VariableName;          /// Array of names of user defined variables.
 	CVariable *Variable;                /// Array of user defined variables (default value for unittype).
 //	EventType *Event;                   /// Array of functions sets to call when en event occurs.
 	unsigned int NumberVariable;        /// Number of defined variables.

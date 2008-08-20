@@ -90,7 +90,7 @@ static void AddDependency(const std::string &target, const std::string required,
 			target.c_str());
 		return;
 	}
-	hash = (int)(long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash));
+	hash = (int)((long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
 
 	//
 	//  Find correct hash slot.
@@ -185,47 +185,24 @@ static void AddDependency(const std::string &target, const std::string required,
 **  Check if this upgrade or unit is available.
 **
 **  @param player  For this player available.
-**  @param target  Unit or Upgrade.
+**  @param rule  .
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByIdent(const CPlayer *player, const std::string &target)
+static bool CheckDependByRule(const CPlayer *player, DependRule *rule)
 {
-	DependRule rule;
 	const DependRule *node;
 	const DependRule *temp;
 	int i;
 
 	//
-	//  first have to check, if target is allowed itself
-	//
-	if (!strncmp(target.c_str(), "unit-", 5)) {
-		// target string refers to unit-XXX
-		rule.Kind.UnitType = UnitTypeByIdent(target);
-		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
-			return false;
-		}
-		rule.Type = DependRuleUnitType;
-	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
-		// target string refers to upgrade-XXX
-		rule.Kind.Upgrade = CUpgrade::Get(target);
-		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
-			return false;
-		}
-		rule.Type = DependRuleUpgrade;
-	} else {
-		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
-		return false;
-	}
-
-	//
 	//  Find rule
 	//
-	i = (int)(long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash));
+	i = (int)((long)rule->Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
 
 	if ((node = DependHash[i])) {  // find correct entry
-		while (node->Type != rule.Type ||
-				node->Kind.Upgrade != rule.Kind.Upgrade) {
+		while (node->Type != rule->Type ||
+				node->Kind.Upgrade != rule->Kind.Upgrade) {
 			if (!node->Next) {  // end of list
 				return true;
 			}
@@ -267,6 +244,66 @@ try_or:
 
 	return false;  // no rule matches
 }
+
+/**
+**  Check if this upgrade or unit is available.
+**
+**  @param player  For this player available.
+**  @param target  Unit or Upgrade.
+**
+**  @return        True if available, false otherwise.
+*/
+bool CheckDependByIdent(const CPlayer *player, const std::string &target)
+{
+	DependRule rule;
+
+	//
+	//  first have to check, if target is allowed itself
+	//
+	if (!strncmp(target.c_str(), "unit-", 5)) {
+		// target string refers to unit-XXX
+		rule.Kind.UnitType = UnitTypeByIdent(target);
+		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
+			return false;
+		}
+		rule.Type = DependRuleUnitType;
+	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
+		// target string refers to upgrade-XXX
+		rule.Kind.Upgrade = CUpgrade::Get(target);
+		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
+			return false;
+		}
+		rule.Type = DependRuleUpgrade;
+	} else {
+		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		return false;
+	}
+
+	return CheckDependByRule(player, &rule);
+}
+
+
+/**
+**  Check if this upgrade or unit is available.
+**
+**  @param player  For this player available.
+**  @param target  Unit or Upgrade.
+**
+**  @return        True if available, false otherwise.
+*/
+bool CheckDependByType(const CPlayer *player, const CUnitType *type)
+{
+	if (UnitIdAllowed(player, type->Slot) == 0) {
+		return false;
+	}
+
+	DependRule rule;
+	
+	rule.Kind.UnitType = (CUnitType *)type;
+	rule.Type = DependRuleUnitType;
+	return CheckDependByRule(player, &rule);
+}
+
 
 /**
 **  Initialize unit and upgrade dependencies.
@@ -350,7 +387,7 @@ static int CclDefineDependency(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		subargs = luaL_getn(l, j + 1);
+		subargs = lua_objlen(l, j + 1);
 
 		for (k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);

@@ -82,6 +82,7 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 }
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
+	Input->processKeyRepeat();
 	HandleKeyModifiersDown(key, keychar);
 }
 
@@ -136,9 +137,9 @@ void freeGuichan()
 }
 
 /**
-**  FIXME: docu
+**  Handle input events
 **
-**  @param event  FIXME: docu
+**  @param event  event to handle, null if no more events for this frame
 */
 void handleInput(const SDL_Event *event) 
 {
@@ -173,43 +174,26 @@ void DrawGuichanWidgets()
 /**
 **  LuaActionListener constructor
 **
-**  @param l  FIXME: docu
-**  @param f  FIXME: docu
+**  @param l  Lua state
+**  @param f  Listener function
 */
 LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
-	luastate(l)
+	callback(l, f)
 {
-	if (!lua_isfunction(l, f)) {
-		LuaError(l, "Argument isnt a function");
-		Assert(0);
-	}
-	lua_pushvalue(l, f);
-	luaref = luaL_ref(l, LUA_REGISTRYINDEX);
 }
 
 /**
-**  FIXME: docu
+**  Called when an action is recieved from a Widget. It is used
+**  to be able to recieve a notification that an action has
+**  occured.
 **
-**  @param eventId  FIXME: docu
+**  @param eventId  the identifier of the Widget
 */
 void LuaActionListener::action(const std::string &eventId) 
 {
-	int status;
-	int base;
-	base = lua_gettop(luastate);
-	lua_getglobal(luastate, "_TRACEBACK");
-	lua_rawgeti(luastate, LUA_REGISTRYINDEX, luaref);
-	lua_pushstring(luastate, eventId.c_str());
-	status = lua_pcall(luastate, 1, 0, base); //FIXME call error reporting function
-	if (status) {
-		const char *msg;
-		msg = lua_tostring(luastate, -1);
-		if (msg == NULL) {
-			msg = "(error with no message)";
-		}
-		fprintf(stderr, "%s\n", msg);
-		lua_pop(luastate, 1);
-	}
+	callback.pushPreamble();
+	callback.pushString(eventId.c_str());
+	callback.run();
 }
 
 /**
@@ -217,7 +201,6 @@ void LuaActionListener::action(const std::string &eventId)
 */
 LuaActionListener::~LuaActionListener()
 {
-	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }
 
 
@@ -242,8 +225,8 @@ void MyOpenGLGraphics::drawImage(const gcn::Image* image, int srcX, int srcY,
 	int dstX, int dstY, int width, int height)
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
-	int right = (r.x + r.width - 1 < Video.Width) ? r.x + r.width - 1 : Video.Width - 1;
-	int bottom = (r.y + r.height - 1 < Video.Height) ? r.y + r.height - 1 : Video.Height - 1;
+	int right = std::min(r.x + r.width - 1, Video.Width - 1);
+	int bottom = std::min(r.y + r.height - 1, Video.Height - 1);
 
 	if (r.x > right || r.y > bottom) {
 		return;
@@ -274,20 +257,53 @@ void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
 void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle& rectangle)
 {
 	gcn::Color c = this->getColor();
-	Video.DrawRectangle(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
-		rectangle.x + mClipStack.top().xOffset, rectangle.y + mClipStack.top().yOffset,
-		rectangle.width, rectangle.height);
+	if (c.a == 0) {
+		return;
+	}
+
+	const gcn::ClipRectangle top = mClipStack.top();
+	gcn::Rectangle area = gcn::Rectangle(rectangle.x + top.xOffset,
+								rectangle.y + top.yOffset,
+								rectangle.width, rectangle.height);
+
+	if (!area.intersect(top)) {
+		return;
+	}
+
+	int x1 = std::max(area.x, top.x);
+	int y1 = std::max(area.y, top.y);
+	int x2 = std::min(area.x + area.width, top.x + top.width);
+	int y2 = std::min(area.y + area.height, top.y + top.height);
+
+	Video.DrawTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
+		x1, y1, x2 - x1, y2 - y1, mColor.a);
 }
 
 void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
 {
-	gcn::Color c = this->getColor();
-	Video.FillRectangle(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
-		rectangle.x + mClipStack.top().xOffset, rectangle.y + mClipStack.top().yOffset,
-		rectangle.width, rectangle.height);
+	const gcn::Color c = this->getColor();
+
+	if (c.a == 0) 
+		return;
+
+	const gcn::ClipRectangle top = mClipStack.top();
+	gcn::Rectangle area = gcn::Rectangle(rectangle.x + top.xOffset,
+								rectangle.y + top.yOffset,
+								rectangle.width, rectangle.height);
+	
+	if (!area.intersect(top)) {
+		return;
+	}
+
+	int x1 = std::max(area.x, top.x);
+	int y1 = std::max(area.y, top.y);
+	int x2 = std::min(area.x + area.width, top.x + top.width);
+	int y2 = std::min(area.y + area.height, top.y + top.height);
+
+	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
+		x1, y1, x2 - x1, y2 - y1, c.a);
 }
 #endif
-
 
 /*----------------------------------------------------------------------------
 --  ImageButton
@@ -359,7 +375,8 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			textX = getWidth() - 4;
 			break;
 		default:
-			throw GCN_EXCEPTION("Unknown alignment.");
+			Assert(!"Unknown alignment.");
+			//throw GCN_EXCEPTION("Unknown alignment.");
 	}
 
 	graphics->setFont(getFont());       
@@ -867,7 +884,8 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 			textX = this->getWidth();
 			break;
 		default:
-			throw GCN_EXCEPTION("Unknown alignment.");
+			Assert(!"Unknown alignment.");
+			//throw GCN_EXCEPTION("Unknown alignment.");
 	}
 	switch (this->getVerticalAlignment()) {
 		case TOP:
@@ -880,7 +898,8 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 			textY = this->getHeight() - (int)this->mTextRows.size() * this->getFont()->getHeight();
 			break;
 		default:
-			throw GCN_EXCEPTION("Unknown alignment.");
+			Assert(!"Unknown alignment.");
+			//throw GCN_EXCEPTION("Unknown alignment.");
 	}
 
 	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
@@ -1203,7 +1222,7 @@ void Windows::setBaseColor(const gcn::Color &color)
 
 
 /**
-**  FIXME: docu
+**  Set the list
 */
 void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 {
@@ -1212,7 +1231,7 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 
 	list.clear();
 
-	args = luaL_getn(lua, *lo);
+	args = lua_objlen(lua, *lo);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(lua, *lo, j + 1);
 		list.push_back(std::string(LuaToString(lua, -1)));
@@ -1240,7 +1259,7 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 
 
 /**
-**  FIXME: docu
+**  Set the list
 */
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
@@ -1336,7 +1355,7 @@ void ListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 
 
 /**
-**  FIXME: docu
+**  Set the list
 */
 void DropDownWidget::setList(lua_State *lua, lua_Object *lo)
 {
@@ -1476,6 +1495,7 @@ int MenuScreen::run(bool loop)
 
 	CursorState = CursorStatePoint;
 	GameCursor = UI.Point.Cursor;
+	CursorOn = CursorOnUnknown;
 
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();

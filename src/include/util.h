@@ -41,6 +41,7 @@ extern unsigned SyncRandSeed;               /// Sync random seed value
 
 extern void InitSyncRand(void);             /// Initialize the syncron rand
 extern int SyncRand(void);                  /// Syncron rand
+extern int SyncRand(int max);               /// Syncron rand
 
 /*----------------------------------------------------------------------------
 --  Math
@@ -48,6 +49,12 @@ extern int SyncRand(void);                  /// Syncron rand
 
 	///  rand only used on this computer.
 #define MyRand() rand()
+
+//for 32 bit signed int
+extern inline int MyAbs(int x)
+{
+	return (x ^ (x >> 31)) - (x >> 31);
+}
 
 	/// Compute a square root using ints
 extern long isqrt(long num);

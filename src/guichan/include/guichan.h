@@ -101,7 +101,7 @@ extern "C"
      *
      * @return the version of Guichan.
      */
-    GCN_CORE_DECLSPEC extern char* gcnGuichanVersion();
+    GCN_CORE_DECLSPEC extern const char* gcnGuichanVersion();
 }
 
 #endif // end GCN_GUICHAN_HPP

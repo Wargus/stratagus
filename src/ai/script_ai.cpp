@@ -40,6 +40,7 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "upgrade.h"
 #include "script.h"
@@ -168,6 +169,61 @@ static std::vector<CUnitType *> getSupplyUnits()
 }
 
 /**
+**  Get sorted list of unittype with CanHarvest not null.
+**
+**  @note Better (MaxOnBoard / cost) first.
+*/
+static std::vector<CUnitType *> getRefineryUnits()
+{
+	std::vector<CUnitType *> res;
+
+	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+		CUnitType *type = *i;
+
+		if (type->GivesResource > 0 && type->CanHarvest) {
+			res.push_back(type);
+		}
+	}
+#if 0
+	std::vector<CUnitType *> sorted_res;
+	// Now, sort them, best first.
+	while (!res.empty()) {
+		float bestscore;
+		CUnitType *besttype;
+
+		bestscore = 0;
+		for (std::vector<CUnitType *>::const_iterator i = res.begin(); i != res.end(); ++i) {
+			CUnitType *type = *i;
+			float score;
+			unsigned int cost = 0;
+
+			for (unsigned j = 0; j < MaxCosts; ++j) {
+				cost += type->_Costs[j];
+			}
+			score = ((float) type->MaxOnBoard) / cost;
+			if (score > bestscore) {
+				bestscore = score;
+				besttype = type;
+			}
+		}
+		sorted_res.push_back(besttype);
+		for (std::vector<CUnitType *>::iterator i = res.begin(); i != res.end(); ++i) {
+			if (*i == besttype) {
+				i = res.erase(i);
+				break;
+			}
+		}
+	}
+	return sorted_res;
+#else
+	return res;
+#endif
+	
+}
+
+
+
+/**
 **  Init AiHelper.
 **
 **  @param aiHelper  variable to initialise.
@@ -180,9 +236,30 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
 	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
-
+	std::vector<CUnitType *> mineUnits = getRefineryUnits();
+	
 	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
 		AiHelperInsert(aiHelper.UnitLimit, 0, *i);
+	}
+
+	for (int i = 1; i < MaxCosts; ++i) {
+		for (std::vector<CUnitType *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
+			if ((*j)->GivesResource == i) {
+				/* HACK : we can't mine TIME then use 0 as 1 */
+				AiHelperInsert(aiHelper.Refinery, i - 1, *j);
+			}
+		}
+		
+		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); 
+			d != UnitTypes.end(); ++d) {
+			CUnitType *type = *d;
+
+			if (type->CanStore[i] > 0) {
+				/* HACK : we can't store TIME then use 0 as 1 */
+				AiHelperInsert(aiHelper.Depots, i - 1, *d);
+			}
+		}
+		
 	}
 
 	for (int i = 0; i < (int)UnitButtonTable.size(); ++i) {
@@ -264,7 +341,7 @@ static int CclDefineAiHelper(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		subargs = luaL_getn(l, j + 1);
+		subargs = lua_objlen(l, j + 1);
 		k = 0;
 		lua_rawgeti(l, j + 1, k + 1);
 		value = LuaToString(l, -1);
@@ -618,7 +695,7 @@ static int CclAiSet(lua_State *l)
 }
 
 /**
-**  Wait for an unit.
+**  Wait for a unit.
 **
 **  @param l  Lua State.
 **
@@ -710,7 +787,7 @@ static int CclAiForce(lua_State *l)
 		LuaError(l, "Force out of range: %d" _C_ force);
 	}
 
-	args = luaL_getn(l, 2);
+	args = lua_objlen(l, 2);
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, 2, j + 1);
 		type = CclGetUnitType(l);
@@ -836,6 +913,27 @@ static int CclAiWaitForce(lua_State *l)
 #endif
 
 	lua_pushboolean(l, 1);
+	return 1;
+}
+
+/**
+**  Attack with force.
+**
+**  @param l  Lua state.
+*/
+static int CclAiAttackWithForce(lua_State *l)
+{
+	int force;
+
+	LuaCheckArgs(l, 1);
+	force = LuaToNumber(l, 1);
+	if (force < 0 || force >= AI_MAX_FORCES) {
+		LuaError(l, "Force out of range: %d" _C_ force);
+	}
+
+	AiAttackWithForce(force);
+
+	lua_pushboolean(l, 0);
 	return 1;
 }
 
@@ -1046,12 +1144,12 @@ static int CclAiDump(lua_State *l)
 **
 **  @param name  Resource name.
 **
-**  @return   The number of the resource in DefaultResourceNames
+**  @return      The number of the resource in DefaultResourceNames
 */
-static int DefaultResourceNumber(const std::string& name)
+static int DefaultResourceNumber(const char *name)
 {
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		if (DefaultResourceNames[i] == name) {
+		if (DefaultResourceNames[i].compare(name) == 0) {
 			return i;
 		}
 	}
@@ -1059,6 +1157,67 @@ static int DefaultResourceNumber(const std::string& name)
 	Assert(0);
 	return -1;
 }
+
+/**
+**  Parse AiBuildQueue builing list
+**
+**  @param l     Lua state.
+**  @param ai  PlayerAi pointer which should be filled with the data.
+*/
+static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
+{
+	if (!lua_istable(l, offset)) {
+		LuaError(l, "incorrect argument");
+	}
+	
+	const char *value;
+	int made;
+	int want;
+	int x = -1,y = -1;
+	
+	const int args = lua_objlen(l, offset);
+	for (int k = 0; k < args; ++k) {
+		lua_rawgeti(l, offset, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+		
+		if (!strcmp(value, "onpos")) {
+				lua_rawgeti(l, offset, k + 1);
+				x = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				++k;
+				lua_rawgeti(l, offset, k + 1);
+				y = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+		} else {
+				
+				//lua_rawgeti(l, j + 1, k + 1);
+				//ident = LuaToString(l, -1);
+				//lua_pop(l, 1);
+				//++k;
+				lua_rawgeti(l, offset, k + 1);
+				made = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				++k;
+				lua_rawgeti(l, offset, k + 1);
+				want = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				
+				AiBuildQueue queue;
+				queue.Type = UnitTypeByIdent(value);
+				queue.Want = want;
+				queue.Made = made;
+				queue.X = x;
+				queue.Y = y;
+				
+				ai->UnitTypeBuilt.push_back(queue);
+				x = -1;
+				y = -1;
+		}
+	}
+}
+
 
 /**
 ** Define an AI player.
@@ -1121,7 +1280,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			k = 0;
 			lua_rawgeti(l, j + 1, k + 1);
 			i = LuaToNumber(l, -1);
@@ -1163,7 +1322,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					subsubargs = luaL_getn(l, -1);
+					subsubargs = lua_objlen(l, -1);
 					for (subk = 0; subk < subsubargs; ++subk) {
 						int num;
 						const char *ident;
@@ -1189,7 +1348,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					subsubargs = luaL_getn(l, -1);
+					subsubargs = lua_objlen(l, -1);
 					for (subk = 0; subk < subsubargs; ++subk) {
 						int num;
 						const char *ident;
@@ -1216,6 +1375,10 @@ static int CclDefineAiPlayer(lua_State *l)
 					lua_rawgeti(l, j + 1, k + 1);
 					ai->Force[i].GoalY = LuaToNumber(l, -1);
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "must-transport")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					ai->Force[i].MustTransport = LuaToNumber(l, -1) ? true : false;
+					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -1224,7 +1387,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				const char *type;
 				int num;
@@ -1242,7 +1405,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				const char *type;
 				int num;
@@ -1260,7 +1423,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				const char *type;
 				int num;
@@ -1278,7 +1441,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				const char *type;
 				int num;
@@ -1296,7 +1459,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				const char *type;
 
@@ -1312,7 +1475,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				int x;
 				int y;
@@ -1320,7 +1483,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				AiExplorationRequest queue;
 
 				lua_rawgeti(l, j + 1, k + 1);
-				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1);
@@ -1340,13 +1503,36 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 		} else if (!strcmp(value, "last-exploration-cycle")) {
 			ai->LastExplorationGameCycle = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "transport")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_objlen(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				int unit;
+				AiTransportRequest queue;
+
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
+					LuaError(l, "incorrect argument");
+				}
+				lua_rawgeti(l, -1, 1);
+				unit = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				queue.Unit = UnitSlots[unit];
+				lua_rawgeti(l, -1, 2);
+				CclParseOrder(l, &queue.Order);
+				lua_pop(l, 1);
+				lua_pop(l, 1);
+				ai->TransportRequests.push_back(queue);
+			}
 		} else if (!strcmp(value, "last-can-not-move-cycle")) {
 			ai->LastCanNotMoveGameCycle = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-type")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			i = 0;
 			if (subargs) {
 				ai->UnitTypeRequests.resize(subargs / 2);
@@ -1370,7 +1556,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				const char *ident;
 
@@ -1383,7 +1569,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				const char *ident;
 
@@ -1393,39 +1579,14 @@ static int CclDefineAiPlayer(lua_State *l)
 				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
 			}
 		} else if (!strcmp(value, "building")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				const char *ident;
-				int made;
-				int want;
-				AiBuildQueue queue;
-
-				lua_rawgeti(l, j + 1, k + 1);
-				ident = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				made = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				want = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				queue.Type = UnitTypeByIdent(ident);
-				queue.Want = want;
-				queue.Made = made;
-				ai->UnitTypeBuilt.push_back(queue);
-			}
+			CclParseBuildQueue(l, ai, j+1);		
 		} else if (!strcmp(value, "repair-building")) {
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "repair-workers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
+			subargs = lua_objlen(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				int num;
 				int workers;
@@ -1474,6 +1635,7 @@ void AiCclRegister(void)
 	lua_register(Lua, "AiCheckForce", CclAiCheckForce);
 	lua_register(Lua, "AiWaitForce", CclAiWaitForce);
 
+	lua_register(Lua, "AiAttackWithForce", CclAiAttackWithForce);
 	lua_register(Lua, "AiSleep", CclAiSleep);
 	lua_register(Lua, "AiResearch", CclAiResearch);
 	lua_register(Lua, "AiUpgradeTo", CclAiUpgradeTo);

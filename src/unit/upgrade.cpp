@@ -256,7 +256,7 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "cost")) {
 			int i;
 
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_objlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);

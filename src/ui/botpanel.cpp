@@ -40,6 +40,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <vector>
+#include <sstream>
 
 #include "stratagus.h"
 
@@ -54,6 +55,10 @@
 #include "sound.h"
 #include "map.h"
 #include "commands.h"
+#include "video.h"
+#include "font.h"
+#include "guichan/key.h"
+#include "guichan/sdl/sdlinput.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -83,6 +88,7 @@ void InitButtons(void)
 	for (int z = 0; z < (int)UnitButtonTable.size(); ++z) {
 		UnitButtonTable[z]->Icon.Load();
 	}
+	delete[] CurrentButtons;
 	CurrentButtons = NULL;
 }
 
@@ -95,7 +101,7 @@ void InitButtons(void)
 */
 int AddButton(int pos, int level, const std::string &icon_ident,
 	ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
-	const std::string &allow, int key, const std::string &hint, const std::string &umask)
+	const std::string &allow, const std::string &hint, const std::string &umask)
 {
 	char buf[2048];
 	ButtonAction *ba;
@@ -144,6 +150,10 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 
 	ba->Allowed = func;
 	ba->AllowStr = allow;
+	int key = GetHotKey(hint);
+	if (isascii(key) && isupper(key)) {
+		key = tolower(key);
+	}
 	ba->Key = key;
 	ba->Hint = hint;
 	// FIXME: here should be added costs to the hint
@@ -299,6 +309,188 @@ static int GetButtonStatus(const ButtonAction *button)
 }
 
 /**
+**  Draw popup
+*/
+static void DrawPopup()
+{
+	ButtonAction *button = &CurrentButtons[ButtonUnderCursor];
+	CUIButton *uibutton = &UI.ButtonPanel.Buttons[ButtonUnderCursor];
+	//Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 200);
+	//Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 255, 255, 255);
+	Uint32 backgroundColor = Video.MapRGB(TheScreen->format, 38, 38, 78);
+	CFont *font = SmallFont;
+	const int font_height = font->Height();
+	std::string nc, rc;
+	
+	//GameFont
+	// Draw hint
+	if (button->Action != ButtonBuild && button->Action != ButtonTrain) {
+		int popupWidth = font->Width(button->Hint) + 10;
+		int popupHeight = font_height + 10;//19;
+		int x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+		int y = uibutton->Y - popupHeight - 10;
+		
+		GetDefaultTextColors(nc, rc);
+		//SetDefaultTextColors("black", "red");
+		SetDefaultTextColors("white", "red");
+
+		// Background
+		Video.FillTransRectangle(backgroundColor, x, y, popupWidth, popupHeight, 128);
+		Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
+
+		// Hint
+		VideoDrawText(x + 5, y + (popupHeight - font_height)/2, font, button->Hint);
+
+		SetDefaultTextColors(nc, rc);
+		return;
+	}
+
+	const CUnitType *type = UnitTypes[button->Value];
+	const CUnitStats *stats = &type->Stats[ThisPlayer->Index];
+	int popupWidth = 5;
+	const CGraphic *G;
+	
+	//detect max Width
+	{
+		for (unsigned int i = 1; i < MaxCosts; ++i) {	
+			if (stats->Costs[i]) {
+				popupWidth += 5;
+				if(UI.Resources[i].IconWidth != -1)
+				{
+					popupWidth += (UI.Resources[i].IconWidth + 5);
+				} else {
+					G = UI.Resources[i].G;
+					if (G) {
+						popupWidth +=  (G->Width + 5);
+					}
+				}
+				popupWidth += font->Width(stats->Costs[i]);
+			}
+		}
+		if(type->Demand) {
+			popupWidth += 5;
+			if(UI.Resources[FoodCost].IconWidth != -1)
+			{
+				popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
+			} else {
+				G = UI.Resources[FoodCost].G;
+				if (G) {
+					popupWidth +=  (G->Width + 5);
+				}
+			}
+			popupWidth += font->Width(type->Demand);
+		}
+	}
+	popupWidth = std::max(popupWidth, 140);
+	
+	int popupHeight = 115;//
+	
+	int start_x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+	int y = uibutton->Y - popupHeight - 10;
+	int x = start_x;
+	
+	GetDefaultTextColors(nc, rc);
+	//SetDefaultTextColors("black", "red");
+	SetDefaultTextColors("white", "red");
+
+	// Background
+	Video.FillTransRectangle(backgroundColor, x, y,
+										 popupWidth, popupHeight, 128);
+	Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
+
+	// Name
+	VideoDrawText(x + 5, y + 5, font, type->Name);
+	Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
+
+	y += 20;
+
+	// Costs
+	for (unsigned int i = 1; i < MaxCosts; ++i) {
+		if (stats->Costs[i]) {
+			int y_offset = 0;
+			int x_offset = 0;
+			G = UI.Resources[i].G;		
+			x += 5;
+			if (G) {
+				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
+				x_offset = UI.Resources[i].IconWidth;
+				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
+				y_offset = G->Height;
+				y_offset -= font_height;
+				y_offset /= 2;
+			}
+			x += VideoDrawNumber(x, y + y_offset, font, stats->Costs[i] );
+		}
+	}
+	
+	if(type->Demand) {
+			int y_offset = 0;
+			int x_offset = 0;
+			G = UI.Resources[FoodCost].G;
+			x += 5;
+			if (G) {
+				G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
+				x_offset = UI.Resources[FoodCost].IconWidth;
+				x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
+				y_offset = G->Height;
+				y_offset -= font_height;
+				y_offset /= 2;
+			}
+			VideoDrawNumber(x, y + y_offset, font, type->Demand );
+	}
+	
+	y += 20;//15;
+	x = start_x;
+	
+	// Hit Points
+	{
+		std::ostringstream hitPoints;
+		hitPoints << "Hit Points: " << type->Variable[HP_INDEX].Value;
+		VideoDrawText(x + 5, y, font, hitPoints.str());
+		y += 15;
+	}
+	
+	if (type->CanAttack) {
+		// Damage
+		int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
+		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value + type->Variable[BASICDAMAGE_INDEX].Value;
+		std::ostringstream damage;
+		damage << "Damage: " << min_damage << "-" << max_damage;
+		VideoDrawText(x + 5, y, font, damage.str());
+		y += 15;
+
+		// Attack Range
+		std::ostringstream attackRange;
+		attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
+		VideoDrawText(x + 5, y, font, attackRange.str());
+		y += 15;
+	}
+
+	// Armor
+	{
+		std::ostringstream armor;
+		armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
+		VideoDrawText(x + 5, y, font, armor.str());
+		y += 15;
+	}
+	
+	if (type->Variable[RADAR_INDEX].Value) {
+		// Radar Range
+		std::ostringstream radarRange;
+		radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
+		VideoDrawText(x + 5, y, font, radarRange.str());
+	} else {
+		// Sight Range
+		std::ostringstream sightRange;
+		sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
+		VideoDrawText(x + 5, y, font, sightRange.str());
+	}
+	y += 15;
+
+	SetDefaultTextColors(nc, rc);
+}
+
+/**
 **  Draw button panel.
 **
 **  Draw all action buttons.
@@ -338,7 +530,7 @@ void CButtonPanel::Draw(void)
 		//  Tutorial show command key in icons
 		//
 		if (ShowCommandKey) {
-			if (CurrentButtons[i].Key == 27) {
+			if (CurrentButtons[i].Key == gcn::Key::ESCAPE) {
 				strcpy_s(buf, sizeof(buf), "ESC");
 			} else {
 				buf[0] = toupper(CurrentButtons[i].Key);
@@ -360,6 +552,7 @@ void CButtonPanel::Draw(void)
 		//
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 				ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			DrawPopup();
 			UpdateStatusLineForButton(&buttons[i]);
 		}
 	}
@@ -913,6 +1106,12 @@ void CButtonPanel::DoClicked(int button)
 */
 int CButtonPanel::DoKey(int key)
 {
+	SDL_keysym keysym;
+	memset(&keysym, 0, sizeof(keysym));
+	keysym.sym = (SDLKey)key;
+	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
+	key = k.getValue();
+
 	if (CurrentButtons) {
 		// This is required for action queues SHIFT+M should be `m'
 		if (isascii(key) && isupper(key)) {

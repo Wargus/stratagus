@@ -319,7 +319,7 @@ void CFile::flush()
 **  @param format  String Format.
 **  @param ...     Parameter List.
 */
-int CFile::printf(char *format, ...)
+int CFile::printf(const char *format, ...)
 {
 	int n;
 	int size;
@@ -704,12 +704,12 @@ public:
 		file = fopen(filename.c_str(), "wb");
 		if (!file) {
 			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
-			throw FileException();
+			//throw FileException();
 		}
 	}
 
 	virtual ~RawFileWriter() {
-		fclose(file);
+		if(file) fclose(file);
 	}
 
 	virtual int write(const char *data, unsigned int size)
@@ -727,12 +727,12 @@ public:
 		file = gzopen(filename.c_str(), "wb9");
 		if (!file) {
 			fprintf(stderr,"Can't open file '%s' for writing\n", filename.c_str());
-			throw FileException();
+			//throw FileException();
 		}
 	}
 
 	virtual ~GzFileWriter() {
-		gzclose(file);
+		if(file) gzclose(file);
 	}
 
 	virtual int write(const char *data, unsigned int size)

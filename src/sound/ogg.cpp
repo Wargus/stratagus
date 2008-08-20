@@ -49,7 +49,9 @@
 #include <theora/theora.h>
 #endif
 
-#include "myendian.h"
+#include "SDL.h"
+#include "SDL_endian.h"
+
 #include "iolib.h"
 #include "movie.h"
 #include "sound_server.h"
@@ -160,9 +162,9 @@ int OggInit(CFile *f, OggData *data)
 	int stream_start;
 	int ret;
 
-	int magic[1];
-	f->read(magic, sizeof(magic));
-	if (AccessLE32(magic) != 0x5367674F) { // "OggS" in ASCII
+	unsigned magic;
+	f->read(&magic, sizeof(magic));
+	if (SDL_SwapLE32(magic) != 0x5367674F) { // "OggS" in ASCII
 		return -1;
 	}
 	f->seek(0, SEEK_SET);

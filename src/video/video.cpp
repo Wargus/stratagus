@@ -88,8 +88,10 @@
 #include "stratagus.h"
 
 #include <vector>
+#include <string.h>
 
 #include "video.h"
+#include "font.h"
 #include "ui.h"
 #include "cursor.h"
 #include "iolib.h"
@@ -236,11 +238,19 @@ void CVideo::ClearScreen(void)
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
+#ifdef USE_OPENGL
+			FreeOpenGLGraphics();
+			FreeOpenGLFonts();
+			UI.Minimap.FreeOpenGL();
+#endif
 		Width = w;
 		Height = h;
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel,
 			TheScreen->flags);
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+#ifdef USE_OPENGL
+			ReloadOpenGL();
+#endif
 		return true;
 	}
 	return false;

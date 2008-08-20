@@ -104,20 +104,33 @@ void InitPlayers(void)
 /**
 **  Clean up players.
 */
-void CleanPlayers()
+void CleanPlayers(void)
 {
 	ThisPlayer = NULL;
-	for (unsigned int i = 0; i < PlayerMax; i++) {
+	for (unsigned int i = 0; i < PlayerMax; ++i) {
 		Players[i].Clear();
 	}
 	NumPlayers = 0;
 	NoRescueCheck = false;
 }
 
+#ifdef DEBUG
+void FreePlayerColors(void)
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		delete[] Players[i].UnitColors.Colors;
+		delete[] PlayerColorsRGB[i];
+		PlayerColorsRGB[i] = NULL;
+		delete[] PlayerColors[i];
+		PlayerColors[i] = NULL;
+	}
+}
+#endif
+
 /**
 **  Clean up the PlayerRaces names.
 */
-void CleanRaces()
+void CleanRaces(void)
 {
 	for (unsigned int i = 0; i < PlayerRaces.Count; ++i) {
 		PlayerRaces.Name[i].clear();
@@ -139,42 +152,43 @@ void SavePlayers(CFile *file)
 	Uint8 r, g, b;
 
 	file->printf("\n--------------------------------------------\n");
-	file->printf("--- MODULE: players $Id$\n\n");
+	file->printf("--- MODULE: players\n\n");
 
 	//
 	//  Dump all players
 	//
 	for (int i = 0; i < NumPlayers; ++i) {
+		CPlayer *p = &Players[i];
 		file->printf("Player(%d,\n", i);
-		file->printf("  \"name\", \"%s\",\n", Players[i].Name.c_str());
+		file->printf("  \"name\", \"%s\",\n", p->Name.c_str());
 		file->printf("  \"type\", ");
-		switch (Players[i].Type) {
+		switch (p->Type) {
 			case PlayerNeutral:       file->printf("\"neutral\",");         break;
 			case PlayerNobody:        file->printf("\"nobody\",");          break;
 			case PlayerComputer:      file->printf("\"computer\",");        break;
 			case PlayerPerson:        file->printf("\"person\",");          break;
 			case PlayerRescuePassive: file->printf("\"rescue-passive\",");break;
 			case PlayerRescueActive:  file->printf("\"rescue-active\","); break;
-			default:                  file->printf("%d,",Players[i].Type);break;
+			default:                  file->printf("%d,",p->Type);break;
 		}
-		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race].c_str());
-		file->printf(" \"ai-name\", \"%s\",\n", Players[i].AiName.c_str());
-		file->printf("  \"team\", %d,", Players[i].Team);
+		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[p->Race].c_str());
+		file->printf(" \"ai-name\", \"%s\",\n", p->AiName.c_str());
+		file->printf("  \"team\", %d,", p->Team);
 
 		file->printf(" \"enemy\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			file->printf("%c",(Players[i].Enemy & (1 << j)) ? 'X' : '_');
+			file->printf("%c",(p->Enemy & (1 << j)) ? 'X' : '_');
 		}
 		file->printf("\", \"allied\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			file->printf("%c", (Players[i].Allied & (1 << j)) ? 'X' : '_');
+			file->printf("%c", (p->Allied & (1 << j)) ? 'X' : '_');
 		}
 		file->printf("\", \"shared-vision\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			file->printf("%c", (Players[i].SharedVision & (1 << j)) ? 'X' : '_');
+			file->printf("%c", (p->SharedVision & (1 << j)) ? 'X' : '_');
 		}
-		file->printf("\",\n  \"start\", {%d, %d},\n", Players[i].StartX,
-			Players[i].StartY);
+		file->printf("\",\n  \"start\", {%d, %d},\n", p->StartX,
+			p->StartY);
 
 		// Resources
 		file->printf("  \"resources\", {");
@@ -187,7 +201,7 @@ void SavePlayers(CFile *file)
 				}
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				Players[i].Resources[j]);
+				p->Resources[j]);
 		}
 		// Last Resources
 		file->printf("},\n  \"last-resources\", {");
@@ -200,7 +214,7 @@ void SavePlayers(CFile *file)
 				}
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				Players[i].LastResources[j]);
+				p->LastResources[j]);
 		}
 		// Incomes
 		file->printf("},\n  \"incomes\", {");
@@ -213,7 +227,7 @@ void SavePlayers(CFile *file)
 				}
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				Players[i].Incomes[j]);
+				p->Incomes[j]);
 		}
 		// Revenue
 		file->printf("},\n  \"revenue\", {");
@@ -226,12 +240,12 @@ void SavePlayers(CFile *file)
 				}
 			}
 			file->printf("\"%s\", %d,", DefaultResourceNames[j].c_str(),
-				Players[i].Revenue[j]);
+				p->Revenue[j]);
 		}
 
 		// UnitTypesCount done by load units.
 
-		file->printf("},\n  \"%s\",\n", Players[i].AiEnabled ?
+		file->printf("},\n  \"%s\",\n", p->AiEnabled ?
 			"ai-enabled" : "ai-disabled");
 
 		// Ai done by load ais.
@@ -239,38 +253,37 @@ void SavePlayers(CFile *file)
 		// TotalNumUnits done by load units.
 		// NumBuildings done by load units.
 
-		file->printf(" \"supply\", %d,", Players[i].Supply);
-		file->printf(" \"unit-limit\", %d,", Players[i].UnitLimit);
-		file->printf(" \"building-limit\", %d,", Players[i].BuildingLimit);
-		file->printf(" \"total-unit-limit\", %d,", Players[i].TotalUnitLimit);
+		file->printf(" \"supply\", %d,",p->Supply);
+		file->printf(" \"unit-limit\", %d,", p->UnitLimit);
+		file->printf(" \"building-limit\", %d,", p->BuildingLimit);
+		file->printf(" \"total-unit-limit\", %d,", p->TotalUnitLimit);
 
-		file->printf("\n  \"score\", %d,", Players[i].Score);
-		file->printf("\n  \"total-units\", %d,", Players[i].TotalUnits);
-		file->printf("\n  \"total-buildings\", %d,", Players[i].TotalBuildings);
+		file->printf("\n  \"score\", %d,", p->Score);
+		file->printf("\n  \"total-units\", %d,", p->TotalUnits);
+		file->printf("\n  \"total-buildings\", %d,", p->TotalBuildings);
 		file->printf("\n  \"total-resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				file->printf(" ");
 			}
-			file->printf("%d,", Players[i].TotalResources[j]);
+			file->printf("%d,", p->TotalResources[j]);
 		}
 		file->printf("},");
-		file->printf("\n  \"total-razings\", %d,", Players[i].TotalRazings);
-		file->printf("\n  \"total-kills\", %d,", Players[i].TotalKills);
+		file->printf("\n  \"total-razings\", %d,", p->TotalRazings);
+		file->printf("\n  \"total-kills\", %d,", p->TotalKills);
 
-		SDL_GetRGB(Players[i].Color, TheScreen->format, &r, &g, &b);
+		SDL_GetRGB(p->Color, TheScreen->format, &r, &g, &b);
 		file->printf("\n  \"color\", { %d, %d, %d },", r, g, b);
 
 		// UnitColors done by init code.
-
 		// Allow saved by allow.
 
 		file->printf("\n  \"timers\", {");
 		for (j = 0; j < UpgradeMax; ++j) {
 			if (j) {
-				file->printf(" ");
+				file->printf(" ,");
 			}
-			file->printf("%d,", Players[i].UpgradeTimers.Upgrades[j]);
+			file->printf("%d", p->UpgradeTimers.Upgrades[j]);
 		}
 		file->printf("})\n\n");
 	}
@@ -471,7 +484,7 @@ void CPlayer::SetName(const std::string &name)
 /**
 **  Clear all player data excepts members which don't change.
 **
-**  The fields that are not cleared are
+**  The fields that are not cleared are 
 **  UnitLimit, BuildingLimit, TotalUnitLimit and Allow.
 */
 void CPlayer::Clear()
@@ -543,11 +556,11 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 	//  Check game limits.
 	//
 	if (NumUnits < UnitMax) {
-		if (type->Building && this->NumBuildings >= this->BuildingLimit) {
+		if (type->Building && NumBuildings >= BuildingLimit) {
 			Notify(NotifyYellow, -1, -1, _("Building Limit Reached"));
 			return -1;
 		}
-		if (!type->Building && (this->TotalNumUnits - this->NumBuildings) >= this->UnitLimit) {
+		if (!type->Building && (TotalNumUnits - NumBuildings) >= UnitLimit) {
 			Notify(NotifyYellow, -1, -1, _("Unit Limit Reached"));
 			return -2;
 		}
@@ -555,13 +568,13 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 			Notify(NotifyYellow, -1, -1, _("Insufficient Supply, increase Supply."));
 			return -3;
 		}
-		if (this->TotalNumUnits >= this->TotalUnitLimit) {
+		if (TotalNumUnits >= TotalUnitLimit) {
 			Notify(NotifyYellow, -1, -1, _("Total Unit Limit Reached"));
 			return -4;
 		}
-		if (this->UnitTypesCount[type->Slot] >=  this->Allow.Units[type->Slot]) {
+		if (UnitTypesCount[type->Slot] >=  Allow.Units[type->Slot]) {
 			Notify(NotifyYellow, -1, -1, _("Limit of %d reached for this unit type"),
-				this->Allow.Units[type->Slot]);
+				Allow.Units[type->Slot]);
 			return -6;
 		}
 		return 1;
@@ -689,7 +702,7 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 */
 int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 {
-	return this->UnitTypesCount[type->Slot];
+	return UnitTypesCount[type->Slot];
 }
 
 /**
@@ -703,7 +716,7 @@ int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 */
 int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
 {
-	return this->UnitTypesCount[UnitTypeByIdent(ident)->Slot];
+	return UnitTypesCount[UnitTypeByIdent(ident)->Slot];
 }
 
 /**
@@ -845,7 +858,7 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 	va_list va;
 
 	// Notify me, and my TEAM members
-	if (this != ThisPlayer && !this->IsTeamed(ThisPlayer)) {
+	if (this != ThisPlayer && !IsTeamed(ThisPlayer)) {
 		return;
 	}
 
@@ -870,7 +883,7 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 */
 bool CPlayer::IsEnemy(const CPlayer *x) const
 {
-	return (this->Enemy & (1 << x->Index)) != 0;
+	return (Enemy & (1 << x->Index)) != 0;
 }
 
 /**
@@ -878,7 +891,7 @@ bool CPlayer::IsEnemy(const CPlayer *x) const
 */
 bool CPlayer::IsEnemy(const CUnit *x) const
 {
-	return this->IsEnemy(x->Player);
+	return IsEnemy(x->Player);
 }
 
 /**
@@ -886,7 +899,7 @@ bool CPlayer::IsEnemy(const CUnit *x) const
 */
 bool CPlayer::IsAllied(const CPlayer *x) const
 {
-	return (this->Allied & (1 << x->Index)) != 0;
+	return (Allied & (1 << x->Index)) != 0;
 }
 
 /**
@@ -894,7 +907,7 @@ bool CPlayer::IsAllied(const CPlayer *x) const
 */
 bool CPlayer::IsAllied(const CUnit *x) const
 {
-	return this->IsAllied(x->Player);
+	return IsAllied(x->Player);
 }
 
 /**
@@ -902,7 +915,7 @@ bool CPlayer::IsAllied(const CUnit *x) const
 */
 bool CPlayer::IsSharedVision(const CPlayer *x) const
 {
-	return (this->SharedVision & (1 << x->Index)) != 0;
+	return (SharedVision & (1 << x->Index)) != 0;
 }
 
 /**
@@ -910,7 +923,7 @@ bool CPlayer::IsSharedVision(const CPlayer *x) const
 */
 bool CPlayer::IsSharedVision(const CUnit *x) const
 {
-	return this->IsSharedVision(x->Player);
+	return IsSharedVision(x->Player);
 }
 
 /**
@@ -918,8 +931,8 @@ bool CPlayer::IsSharedVision(const CUnit *x) const
 */
 bool CPlayer::IsBothSharedVision(const CPlayer *x) const
 {
-	return (this->SharedVision & (1 << x->Index)) != 0 &&
-		(x->SharedVision & (1 << this->Index)) != 0;
+	return (SharedVision & (1 << x->Index)) != 0 &&
+		(x->SharedVision & (1 << Index)) != 0;
 }
 
 /**
@@ -927,7 +940,7 @@ bool CPlayer::IsBothSharedVision(const CPlayer *x) const
 */
 bool CPlayer::IsBothSharedVision(const CUnit *x) const
 {
-	return this->IsBothSharedVision(x->Player);
+	return IsBothSharedVision(x->Player);
 }
 
 /**
@@ -935,7 +948,7 @@ bool CPlayer::IsBothSharedVision(const CUnit *x) const
 */
 bool CPlayer::IsTeamed(const CPlayer *x) const
 {
-	return this->Team == x->Team;
+	return Team == x->Team;
 }
 
 /**
@@ -943,7 +956,7 @@ bool CPlayer::IsTeamed(const CPlayer *x) const
 */
 bool CPlayer::IsTeamed(const CUnit *x) const
 {
-	return this->IsTeamed(x->Player);
+	return IsTeamed(x->Player);
 }
 
 //@}

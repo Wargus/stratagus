@@ -48,8 +48,10 @@
 #include "font.h"
 #include "util.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "spells.h"
+#include "title.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -248,7 +250,7 @@ static int CclSetTitleScreens(lua_State *l)
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
-				subargs = luaL_getn(l, -1);
+				subargs = lua_objlen(l, -1);
 				TitleScreens[j]->Labels = new TitleScreenLabel *[subargs + 1];
 				memset(TitleScreens[j]->Labels, 0, (subargs + 1) * sizeof(TitleScreenLabel *));
 				for (k = 0; k < subargs; ++k) {
@@ -265,7 +267,7 @@ static int CclSetTitleScreens(lua_State *l)
 						} else if (!strcmp(value, "Font")) {
 							TitleScreens[j]->Labels[k]->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+							if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 								LuaError(l, "incorrect argument");
 							}
 							lua_rawgeti(l, -1, 1);
@@ -281,7 +283,7 @@ static int CclSetTitleScreens(lua_State *l)
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
 							}
-							subsubargs = luaL_getn(l, -1);
+							subsubargs = lua_objlen(l, -1);
 							for (subk = 0; subk < subsubargs; ++subk) {
 								lua_rawgeti(l, -1, subk + 1);
 								value = LuaToString(l, -1);
@@ -343,7 +345,7 @@ static int CclDefineCursor(lua_State *l)
 		} else if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "HotSpot")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -353,7 +355,7 @@ static int CclDefineCursor(lua_State *l)
 			hoty = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -518,7 +520,7 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 			unsigned int i;
 
 			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-				if (!strcmp(key, UnitTypeVar.BoolFlagName[i].c_str())) {
+				if (!strcmp(key, UnitTypeVar.BoolFlagName[i])) {
 					if (!condition->BoolFlags) {
 						condition->BoolFlags = new char[UnitTypeVar.NumberBoolFlag];
 						memset(condition->BoolFlags, 0, UnitTypeVar.NumberBoolFlag * sizeof(char));
@@ -841,7 +843,7 @@ static int CclDefineViewports(lua_State *l)
 		if (!strcmp(value, "mode")) {
 			UI.ViewportMode = (ViewportModeType)(int)LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "viewport")) {
-			if (!lua_istable(l, j + 1) && luaL_getn(l, j + 1) != 3) {
+			if (!lua_istable(l, j + 1) && lua_objlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -927,7 +929,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 		if (!strcmp(value, "File")) {
 			file = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -946,7 +948,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 			while (lua_next(l, -2)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "Color")) {
-					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+					if (!lua_istable(l, -1) || lua_objlen(l, -1) != 3) {
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
@@ -966,7 +968,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "TextPos")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -1029,7 +1031,7 @@ static int CclDefineButtonStyle(lua_State *l)
 	while (lua_next(l, 2)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -1045,7 +1047,7 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (!strcmp(value, "TextReverseColor")) {
 			b->TextReverseColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "TextPos")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
@@ -1148,6 +1150,7 @@ static int CclDefineButton(lua_State *l)
 {
 	char buf[64];
 	const char *value;
+	const char *s2;
 	ButtonAction ba;
 
 	LuaCheckArgs(l, 1);
@@ -1217,11 +1220,12 @@ static int CclDefineButton(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isnumber(l, -1)) {
-				sprintf(buf, "%ld", (long int)lua_tonumber(l, -1));
-				ba.ValueStr = buf;
+				snprintf(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
+				s2 = buf;
 			} else {
-				ba.ValueStr = lua_tostring(l, -1);
+				s2 = lua_tostring(l, -1);
 			}
+			ba.ValueStr = s2;
 		} else if (!strcmp(value, "Allowed")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "check-true")) {
@@ -1257,19 +1261,19 @@ static int CclDefineButton(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			std::string s;
-			const unsigned int subargs = luaL_getn(l, -1);
+			std::string allowstr;
+			const unsigned int subargs = lua_objlen(l, -1);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-
-				s += LuaToString(l, -1);
+				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
+				allowstr += s2;
 				if (k != subargs - 1) {
-					s += ",";
+					allowstr += ",";
 				}
 			}
-			ba.AllowStr = s;
+			ba.AllowStr = allowstr;
 		} else if (!strcmp(value, "Key")) {
 			ba.Key = *LuaToString(l, -1);
 		} else if (!strcmp(value, "Hint")) {
@@ -1279,15 +1283,16 @@ static int CclDefineButton(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			// FIXME: ba.UnitMask shouldn't be a string
-			std::string s = ",";
-			const unsigned subargs = luaL_getn(l, -1);
+			std::string umask = ",";
+			const unsigned subargs = lua_objlen(l, -1);
 			for (unsigned int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
-				s += LuaToString(l, -1);
-				s += ",";
+				s2 = LuaToString(l, -1);
 				lua_pop(l, 1);
+				umask += s2;
+				umask += ",";
 			}
-			ba.UnitMask = s;
+			ba.UnitMask = umask;
 			if (!strncmp(ba.UnitMask.c_str(), ",*,", 3)) {
 				ba.UnitMask = "*";
 			}
@@ -1297,7 +1302,7 @@ static int CclDefineButton(lua_State *l)
 		lua_pop(l, 1);
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
-		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
+		ba.Allowed, ba.AllowStr, /*ba.Key,*/ ba.Hint, ba.UnitMask);
 	return 0;
 }
 

@@ -107,7 +107,7 @@ int DistanceSilent;              /// silent distance
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static CSample *SimpleChooseSample(CSound *sound)
+static CSample *SimpleChooseSample(const CSound *sound)
 {
 	if (sound->Number == ONE_SOUND) {
 		return sound->Sound.OneSound;
@@ -282,7 +282,7 @@ static char CalculateStereo(const CUnit *unit)
 }
 
 /**
-**  Ask to the sound server to play a sound attached to an unit. The
+**  Ask to the sound server to play a sound attached to a unit. The
 **  sound server may discard the sound if needed (e.g., when the same
 **  unit is already speaking).
 **
@@ -308,7 +308,7 @@ void PlayUnitSound(const CUnit *unit, UnitVoiceGroup voice)
 }
 
 /**
-**  Ask to the sound server to play a sound attached to an unit. The
+**  Ask to the sound server to play a sound attached to a unit. The
 **  sound server may discard the sound if needed (e.g., when the same
 **  unit is already speaking).
 **
@@ -356,7 +356,10 @@ void PlayMissileSound(const Missile *missile, CSound *sound)
 }
 
 /**
-**  FIXME: docu
+**  Play a game sound
+**
+**  @param sound   Sound to play
+**  @param volume  Volume level to play the sound
 */
 void PlayGameSound(CSound *sound, unsigned char volume)
 {
@@ -435,7 +438,7 @@ void SetSoundRange(CSound *sound, unsigned char range)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-CSound *RegisterSound(const std::string files[], unsigned number)
+CSound *RegisterSound(const char *files[], unsigned number)
 {
 	unsigned i;
 	CSound *id;
@@ -443,16 +446,17 @@ CSound *RegisterSound(const std::string files[], unsigned number)
 	id = new CSound;
 	if (number > 1) { // load a sound group
 		id->Sound.OneGroup = new CSample *[number];
+		memset(id->Sound.OneGroup, 0, sizeof(CSample *) * number);
+		id->Number = number;
 		for (i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {
-				delete[] id->Sound.OneGroup;
+				//delete[] id->Sound.OneGroup;
 				delete id;
 				return NO_SOUND;
 			}
 		}
-		id->Number = number;
-	} else { // load an unique sound
+	} else { // load a unique sound
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
 			delete id;
@@ -491,7 +495,7 @@ CSound *RegisterTwoGroups(CSound *first, CSound *second)
 /**
 **  Lookup the sound id's for the game sounds.
 */
-void InitSoundClient()
+void InitSoundClient(void)
 {
 	if (!SoundEnabled()) { // No sound enabled
 		return;
@@ -530,11 +534,30 @@ void InitSoundClient()
 				SoundForName(GameSounds.Rescue[i].Name);
 		}
 	}
+	if (!GameSounds.ChatMessage.Sound && !GameSounds.ChatMessage.Name.empty()) {
+		GameSounds.ChatMessage.Sound =
+			SoundForName(GameSounds.ChatMessage.Name);
+	}
 
 	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + TileSizeX) / TileSizeX;
 	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + TileSizeY) / TileSizeY;
-	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
-	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);
+	DistanceSilent = 3 * std::max(MapWidth, MapHeight);
+	ViewPointOffset = std::max(MapWidth / 2, MapHeight / 2);
 }
+
+CSound::~CSound()
+{
+	if (this->Number == ONE_SOUND) {
+		delete Sound.OneSound;
+	} else if (this->Number == TWO_GROUPS) {
+	} else {
+		for (int i = 0; i < this->Number; ++i) {
+			delete this->Sound.OneGroup[i];
+			this->Sound.OneGroup[i] = NULL;
+		}
+		delete[] this->Sound.OneGroup;
+	}
+}
+
 
 //@}

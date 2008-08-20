@@ -87,7 +87,7 @@ void CMap::Save(CFile *file) const
 		for (w = 0; w < this->Info.MapWidth; ++w) {
 			CMapField* mf;
 
-			mf = &this->Fields[h * this->Info.MapWidth + w];
+			mf = this->Field(w, h);
 			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
 			if (mf->Value) {
 				file->printf(" %d,", mf->Value);

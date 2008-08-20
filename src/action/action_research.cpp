@@ -77,8 +77,7 @@ void HandleActionResearch(CUnit *unit)
 			DebugPrint("Two researches running\n");
 			PlayerAddCosts(unit->Player, upgrade->Costs);
 
-			unit->Orders[0]->Action = UnitActionStill;
-			unit->SubAction = 0;
+			unit->ClearAction();
 			return;
 		}
 #endif
@@ -106,11 +105,7 @@ void HandleActionResearch(CUnit *unit)
 		}
 		UpgradeAcquire(unit->Player, upgrade);
 
-		unit->Orders[0]->Action = UnitActionStill;
-		unit->SubAction = 0;
-
-		// Upgrade can change all
-		SelectedUnitChanged();
+		unit->ClearAction();
 
 		return;
 	}

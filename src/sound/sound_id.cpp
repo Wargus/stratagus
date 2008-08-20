@@ -99,7 +99,7 @@ CSound *SoundForName(const std::string &name)
 **
 **  @return      the sound id of the created group
 */
-CSound *MakeSound(const std::string &name, const std::string file[], int nb)
+CSound *MakeSound(const std::string &name, const char *file[], int nb)
 {
 	CSound *sound;
 
@@ -143,5 +143,15 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 
 	return sound;
 }
+
+#ifdef DEBUG
+void FreeSounds()
+{
+	std::map<std::string, CSound *>::iterator i;
+	for (i = SoundMap.begin(); i != SoundMap.end(); ++i) {
+		delete (*i).second;
+	}
+}
+#endif
 
 //@}

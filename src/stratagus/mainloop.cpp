@@ -68,6 +68,8 @@
 #include "pathfinder.h"
 #include "editor.h"
 #include "sound.h"
+#include "replay.h"
+#include "particle.h"
 
 #include <guichan.h>
 void DrawGuichanWidgets();
@@ -244,6 +246,8 @@ static void InitGameCallbacks(void)
 	GameCallbacks.NetworkEvent = NetworkEvent;
 }
 
+//#define REALVIDEO
+
 /**
 **  Game main loop.
 **
@@ -262,7 +266,9 @@ void GameMainLoop(void)
 	bool showtip;
 #endif
 	int player;
+#ifdef REALVIDEO
 	int RealVideoSyncSpeed;
+#endif
 	const EventCallback *old_callbacks;
 
 	InitGameCallbacks();
@@ -274,9 +280,12 @@ void GameMainLoop(void)
 	GameCursor = UI.Point.Cursor;
 	GameRunning = true;
 
-	showtip = false;
-	RealVideoSyncSpeed = VideoSyncSpeed;
+	CParticleManager::init();
 
+	showtip = false;
+#ifdef REALVIDEO
+	RealVideoSyncSpeed = VideoSyncSpeed;
+#endif
 	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
 
 	MultiPlayerReplayEachCycle();
@@ -284,7 +293,7 @@ void GameMainLoop(void)
 	while (GameRunning) {
 
 		// Can't find a better place.
-		SaveGameLoading = 0;
+		SaveGameLoading = false;
 		//
 		// Game logic part
 		//
@@ -342,7 +351,7 @@ void GameMainLoop(void)
 
 		TriggersEachCycle();  // handle triggers
 		UpdateMessages();     // update messages
-
+		ParticleManager.update(); // handle particles
 		CheckMusicFinished(); // Check for next song
 
 		//
@@ -350,11 +359,13 @@ void GameMainLoop(void)
 		//
 		DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0);
 
+#ifdef REALVIDEO
 		if (FastForwardCycle > GameCycle &&
 				RealVideoSyncSpeed != VideoSyncSpeed) {
 			RealVideoSyncSpeed = VideoSyncSpeed;
 			VideoSyncSpeed = 3000;
 		}
+#endif		
 		if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
 			//FIXME: this might be better placed somewhere at front of the
 			// program, as we now still have a game on the background and
@@ -368,10 +379,11 @@ void GameMainLoop(void)
 			//
 			RealizeVideoMemory();
 		}
-
+#ifdef REALVIDEO
 		if (FastForwardCycle == GameCycle) {
 			VideoSyncSpeed = RealVideoSyncSpeed;
 		}
+#endif
 		if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
 			WaitEventsOneFrame();
 		}
@@ -383,13 +395,16 @@ void GameMainLoop(void)
 	//
 	// Game over
 	//
+#ifdef REALVIDEO	
 	if (FastForwardCycle > GameCycle) {
 		VideoSyncSpeed = RealVideoSyncSpeed;
 	}
+#endif	
 	NetworkQuit();
 	EndReplayLog();
 
-	GameCycle = 0;
+	GameCycle = 0;//????
+	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 	GamePaused = false;

@@ -45,6 +45,7 @@
 #include "actions.h"
 #include "interface.h"
 #include "pathfinder.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -140,8 +141,7 @@ static void EnterTransporter(CUnit *unit)
 {
 	CUnit *transporter;
 
-	unit->Orders[0]->Action = UnitActionStill;
-	unit->SubAction = 0;
+	unit->ClearAction();
 
 	transporter = unit->Orders[0]->Goal;
 	if (!transporter->IsVisibleAsGoal(unit->Player)) {
@@ -166,7 +166,7 @@ static void EnterTransporter(CUnit *unit)
 			// Don't make anything funny after going out of the transporter.
 			// FIXME: This is probably wrong, but it works for me (n0b0dy)
 			unit->OrderCount = 1;
-			unit->Orders[0]->Action = UnitActionStill;
+			unit->ClearAction();
 		}
 
 		if (IsOnlySelected(transporter)) {
@@ -223,12 +223,11 @@ void HandleActionBoard(CUnit *unit)
 				if ((i = MoveToTransporter(unit))) {
 					if (i == PF_UNREACHABLE) {
 						if (++unit->SubAction == 200) {
-							unit->Orders[0]->Action = UnitActionStill;
+							unit->ClearAction();
 							if ((goal = unit->Orders[0]->Goal)) {
 								goal->RefsDecrease();
 								unit->Orders[0]->Goal = NoUnitP;
 							}
-							unit->SubAction = 0;
 						} else {
 							//
 							// Try with a bigger range.

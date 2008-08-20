@@ -243,6 +243,16 @@ void DoRightButton(int sx, int sy)
 		//  Handle resource workers.
 		//
 		if (action == MouseActionHarvest) {
+			// Go and repair
+			if (type->RepairRange && dest &&
+					dest->Type->RepairHP &&
+					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
+					(dest->Player == unit->Player || unit->IsAllied(dest))) {
+				dest->Blink = 4;
+				SendCommandRepair(unit, x, y, dest, flush);
+				continue;
+			}
+			// Harvest
 			if (type->Harvester) {
 				if (dest) {
 					// Return a loaded harvester to deposit
@@ -282,15 +292,6 @@ void DoRightButton(int sx, int sy)
 					}
 				}
 			}
-			// Go and repair
-			if (type->RepairRange && dest &&
-					dest->Type->RepairHP &&
-					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
-					(dest->Player == unit->Player || unit->IsAllied(dest))) {
-				dest->Blink = 4;
-				SendCommandRepair(unit, x, y, dest, flush);
-				continue;
-			}
 			// Follow another unit
 			if (UnitUnderCursor && dest && dest != unit &&
 					(dest->Player == unit->Player || unit->IsAllied(dest))) {
@@ -307,7 +308,7 @@ void DoRightButton(int sx, int sy)
 		//  Fighters
 		//
 		if (action == MouseActionSpellCast || action == MouseActionAttack) {
-			if (dest) {
+			if (dest && unit->Orders[0]->Action != UnitActionBuilt) {
 				if (unit->IsEnemy(dest)) {
 					dest->Blink = 4;
 					if (action == MouseActionSpellCast) {
@@ -461,7 +462,8 @@ static void HandleMouseOn(int x, int y)
 {
 	int i;
 	bool on_ui;
-
+	size_t size;
+	
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
@@ -505,83 +507,89 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	for (i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
-		if (OnButton(x, y, &UI.ButtonPanel.Buttons[i])) {
+	size = UI.ButtonPanel.Buttons.size();
+	for (unsigned int j = 0; j < size; ++j) {
+		if (OnButton(x, y, &UI.ButtonPanel.Buttons[j])) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
-			if (CurrentButtons && CurrentButtons[i].Pos != -1) {
-				ButtonUnderCursor = i;
+			if (CurrentButtons && CurrentButtons[j].Pos != -1) {
+				ButtonUnderCursor = j;
 				CursorOn = CursorOnButton;
 				return;
 			}
 		}
 	}
-	if (NumSelected == 1 && Selected[0]->Type->CanTransport &&
-			Selected[0]->BoardCount) {
-		i = Selected[0]->BoardCount < (int)UI.TransportingButtons.size() ?
-			Selected[0]->BoardCount - 1 : (int)UI.TransportingButtons.size() - 1;
-		for (; i >= 0; --i) {
-			if (OnButton(x, y, &UI.TransportingButtons[i])) {
-				ButtonAreaUnderCursor = ButtonAreaTransporting;
-				ButtonUnderCursor = i;
-				CursorOn = CursorOnButton;
-				return;
+	if (NumSelected > 0) {
+	
+		if (NumSelected == 1 && Selected[0]->Type->CanTransport &&
+				Selected[0]->BoardCount) {
+			size = UI.TransportingButtons.size();
+			i = Selected[0]->BoardCount < (int)size ?
+				Selected[0]->BoardCount - 1 : size - 1;
+			for (; i >= 0; --i) {
+				if (OnButton(x, y, &UI.TransportingButtons[i])) {
+					ButtonAreaUnderCursor = ButtonAreaTransporting;
+					ButtonUnderCursor = i;
+					CursorOn = CursorOnButton;
+					return;
+				}
 			}
 		}
-	}
-	if (NumSelected == 1) {
-		if (Selected[0]->Orders[0]->Action == UnitActionTrain) {
-			if (Selected[0]->OrderCount == 1) {
-				if (OnButton(x, y, UI.SingleTrainingButton)) {
-					ButtonAreaUnderCursor = ButtonAreaTraining;
+		if (NumSelected == 1) {
+			if (Selected[0]->Orders[0]->Action == UnitActionTrain) {
+				if (Selected[0]->OrderCount == 1) {
+					if (OnButton(x, y, UI.SingleTrainingButton)) {
+						ButtonAreaUnderCursor = ButtonAreaTraining;
+						ButtonUnderCursor = 0;
+						CursorOn = CursorOnButton;
+						return;
+					}
+				} else {
+					size = UI.TrainingButtons.size();
+					i = Selected[0]->OrderCount < (int)size ?
+						Selected[0]->OrderCount - 1 : size - 1;
+					for (; i >= 0; --i) {
+						if (Selected[0]->Orders[i]->Action == UnitActionTrain &&
+								OnButton(x, y, &UI.TrainingButtons[i])) {
+							ButtonAreaUnderCursor = ButtonAreaTraining;
+							ButtonUnderCursor = i;
+							CursorOn = CursorOnButton;
+							return;
+						}
+					}
+				}
+			} else if (Selected[0]->Orders[0]->Action == UnitActionUpgradeTo) {
+				if (OnButton(x, y, UI.UpgradingButton)) {
+					ButtonAreaUnderCursor = ButtonAreaUpgrading;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
 				}
-			} else {
-				i = Selected[0]->OrderCount < (int)UI.TrainingButtons.size() ?
-					Selected[0]->OrderCount - 1 : UI.TrainingButtons.size() - 1;
-				for (; i >= 0; --i) {
-					if (Selected[0]->Orders[i]->Action == UnitActionTrain &&
-							OnButton(x, y, &UI.TrainingButtons[i])) {
-						ButtonAreaUnderCursor = ButtonAreaTraining;
-						ButtonUnderCursor = i;
-						CursorOn = CursorOnButton;
-						return;
-					}
+			} else if (Selected[0]->Orders[0]->Action == UnitActionResearch) {
+				if (OnButton(x, y, UI.ResearchingButton)) {
+					ButtonAreaUnderCursor = ButtonAreaResearching;
+					ButtonUnderCursor = 0;
+					CursorOn = CursorOnButton;
+					return;
 				}
 			}
-		} else if (Selected[0]->Orders[0]->Action == UnitActionUpgradeTo) {
-			if (OnButton(x, y, UI.UpgradingButton)) {
-				ButtonAreaUnderCursor = ButtonAreaUpgrading;
-				ButtonUnderCursor = 0;
-				CursorOn = CursorOnButton;
-				return;
-			}
-		} else if (Selected[0]->Orders[0]->Action == UnitActionResearch) {
-			if (OnButton(x, y, UI.ResearchingButton)) {
-				ButtonAreaUnderCursor = ButtonAreaResearching;
-				ButtonUnderCursor = 0;
-				CursorOn = CursorOnButton;
-				return;
-			}
 		}
-	}
-	if (NumSelected == 1) {
-		if (UI.SingleSelectedButton && OnButton(x, y, UI.SingleSelectedButton)) {
-			ButtonAreaUnderCursor = ButtonAreaSelected;
-			ButtonUnderCursor = 0;
-			CursorOn = CursorOnButton;
-			return;
-		}
-	} else {
-		i = NumSelected > (int)UI.SelectedButtons.size() ?
-			UI.SelectedButtons.size() - 1 : NumSelected - 1;
-		for (; i >= 0; --i) {
-			if (OnButton(x, y, &UI.SelectedButtons[i])) {
+		if (NumSelected == 1) {
+			if (UI.SingleSelectedButton && OnButton(x, y, UI.SingleSelectedButton)) {
 				ButtonAreaUnderCursor = ButtonAreaSelected;
-				ButtonUnderCursor = i;
+				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
 				return;
+			}
+		} else {
+			size = UI.SelectedButtons.size();
+			i = NumSelected > (int)size ? size - 1 : NumSelected - 1;
+			for (; i >= 0; --i) {
+				if (OnButton(x, y, &UI.SelectedButtons[i])) {
+					ButtonAreaUnderCursor = ButtonAreaSelected;
+					ButtonUnderCursor = i;
+					CursorOn = CursorOnButton;
+					return;
+				}
 			}
 		}
 	}
@@ -599,8 +607,9 @@ static void HandleMouseOn(int x, int y)
 	//  On UI graphic
 	//
 	on_ui = false;
-	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
-		if (OnGraphic(x, y, UI.Fillers[i].G, UI.Fillers[i].X, UI.Fillers[i].Y)) {
+	size = UI.Fillers.size();
+	for (unsigned int j = 0; j < size; ++j) {
+		if (UI.Fillers[j].OnGraphic(x, y)) {
 			on_ui = true;
 			break;
 		}
@@ -712,6 +721,29 @@ void RestrictCursorToMinimap(void)
 }
 
 /**
+**  Use the mouse to scroll the map
+**
+**  @param x  Screen X position.
+**  @param y  Screen Y position.
+*/
+void MouseScrollMap(int x, int y)
+{
+	int speed;
+
+	if (KeyModifiers & ModifierControl) {
+		speed = UI.MouseScrollSpeedControl;
+	} else {
+		speed = UI.MouseScrollSpeedDefault;
+	}
+
+	UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
+		UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
+		UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
+	UI.MouseWarpX = CursorStartX;
+	UI.MouseWarpY = CursorStartY;
+}
+
+/**
 **  Handle movement of the cursor.
 **
 **  @param x  Screen X position.
@@ -748,19 +780,7 @@ void UIHandleMouseMove(int x, int y)
 	//  Move map.
 	//
 	if (GameCursor == UI.Scroll.Cursor) {
-		int speed;
-
-		if (KeyModifiers & ModifierControl) {
-			speed = UI.MouseScrollSpeedControl;
-		} else {
-			speed = UI.MouseScrollSpeedDefault;
-		}
-
-		UI.MouseViewport->Set(UI.MouseViewport->MapX, UI.MouseViewport->MapY,
-			UI.MouseViewport->OffsetX + speed * (x - CursorStartX),
-			UI.MouseViewport->OffsetY + speed * (y - CursorStartY));
-		UI.MouseWarpX = CursorStartX;
-		UI.MouseWarpY = CursorStartY;
+		MouseScrollMap(x, y);
 		return;
 	}
 
@@ -817,7 +837,7 @@ void UIHandleMouseMove(int x, int y)
 		mx = UI.Minimap.Screen2MapX(x);
 		my = UI.Minimap.Screen2MapY(y);
 		if (Map.IsFieldExplored(ThisPlayer, mx, my) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnMapTile(mx, my);
+			UnitUnderCursor = UnitOnMapTile(mx, my,-1);
 		}
 	}
 
@@ -834,7 +854,8 @@ void UIHandleMouseMove(int x, int y)
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			GameCursor = UI.YellowHair.Cursor;
 			if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
-				if (ThisPlayer->IsAllied(UnitUnderCursor)) {
+				if (UnitUnderCursor->Player == ThisPlayer || 
+						ThisPlayer->IsAllied(UnitUnderCursor)) {
 					GameCursor = UI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
 					GameCursor = UI.RedHair.Cursor;
@@ -1461,7 +1482,7 @@ void UIHandleButtonDown(unsigned button)
 		// to redraw the cursor immediately (and avoid up to 1 sec delay
 		if (CursorBuilding) {
 			// Possible Selected[0] was removed from map
-			// need to make sure there is an unit to build
+			// need to make sure there is a unit to build
 			if (Selected[0] && (MouseButtons & LeftButton) &&
 					UI.MouseViewport->IsInsideMapArea(CursorX, CursorY)) {// enter select mode
 				int explored;
@@ -1484,8 +1505,10 @@ void UIHandleButtonDown(unsigned button)
 						(explored || ReplayRevealMap)) {
 					PlayGameSound(GameSounds.PlacementSuccess.Sound,
 						MaxSampleVolume);
-					SendCommandBuildBuilding(Selected[0], x, y, CursorBuilding,
-						!(KeyModifiers & ModifierShift));
+					for (int i = 0; i < NumSelected; ++i) {
+						SendCommandBuildBuilding(Selected[i], x, y, CursorBuilding,
+							!(KeyModifiers & ModifierShift));
+					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 						CancelBuildingMode();
 					}
@@ -1533,7 +1556,7 @@ void UIHandleButtonDown(unsigned button)
 				x = UI.MouseViewport->Viewport2MapX(CursorX);
 				y = UI.MouseViewport->Viewport2MapY(CursorY);
 
-				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y)) &&
+				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y,-1)) &&
 						!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;                // if right click on building -- blink
 				} else { // if not not click on building -- green cross
@@ -1897,11 +1920,11 @@ void UIHandleButtonUp(unsigned button)
 				if (Selected[0]->Player == ThisPlayer) {
 					char buf[64];
 					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
-						sprintf(buf, _("You have ~<%d~> %ss"),
+						snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name.c_str());
 					} else {
-						sprintf(buf, _("You have ~<%d~> %s(s)"),
+						snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name.c_str());
 					}
@@ -1978,13 +2001,13 @@ void DrawPieMenu(void)
 
 			// Tutorial show command key in icons
 			if (UI.ButtonPanel.ShowCommandKey) {
-				char *text;
+				const char *text;
 
 				if (CurrentButtons[i].Key == 27) {
 					text = "ESC";
 				} else {
 					buf[0] = toupper(CurrentButtons[i].Key);
-					text = buf;
+					text = (const char *)buf;
 				}
 				VideoDrawTextClip(x + 4, y + 4, GameFont, text);
 			}

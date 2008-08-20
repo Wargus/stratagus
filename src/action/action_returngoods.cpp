@@ -67,12 +67,7 @@ void HandleActionReturnGoods(CUnit *unit)
 		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
 		unit->Player->Notify(NotifyYellow, unit->X, unit->Y, _("No Resources to Return."));
 
-		if (unit->Orders[0]->Goal) { // Depot (if not destroyed)
-			unit->Orders[0]->Goal->RefsDecrease();
-			unit->Orders[0]->Goal = NULL;
-		}
-		unit->Orders[0]->Init();
-		unit->Orders[0]->Action = UnitActionStill;
+		ResourceGiveUp(unit);
 		return;
 	}
 
@@ -82,8 +77,7 @@ void HandleActionReturnGoods(CUnit *unit)
 
 		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
 				unit->CurrentResource))) {
-			unit->Orders[0]->Init();
-			unit->Orders[0]->Action = UnitActionStill;
+			ResourceGiveUp(unit);
 			return;
 		}
 		unit->Orders[0]->Goal = destu;
@@ -93,7 +87,9 @@ void HandleActionReturnGoods(CUnit *unit)
 	unit->Orders[0]->Action = UnitActionResource;
 	// Somewhere on the way the loaded worker could have change Arg1
 	// Bummer, go get the closest resource to the depot
-	unit->Orders[0]->Arg1.ResourcePos = -1;
+	//FIXME!!!!!!!!!!!!!!!!!!!!
+	//unit->Orders[0]->Arg1.ResourcePos = -1;
+
 	NewResetPath(unit);
 	unit->SubAction = 70; // FIXME : Define value.
 }

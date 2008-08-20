@@ -36,6 +36,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sstream>
 
 #include "stratagus.h"
 #include "unittype.h"
@@ -58,6 +59,7 @@
 #include "iocompat.h"
 #include "commands.h"
 #include "guichan.h"
+#include "replay.h"
 
 #include "script.h"
 
@@ -306,7 +308,8 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 		int n;
 		CUnit *table[UnitMax];
 
-		n = UnitCacheOnTile(x, y, table);
+		//FIXME: rb: use tile functor find here.
+		n = Map.Select(x, y, table);
 		while (n--) {
 			if (table[n]->Type == b->Parent) {
 				unit->ResourcesHeld = table[n]->ResourcesHeld; // We capture the value of what is beneath.
@@ -1189,9 +1192,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				EditTiles(UI.MouseViewport->Viewport2MapX(CursorX),
 					UI.MouseViewport->Viewport2MapY(CursorY), TileCursor,
 					TileCursorSize);
-			}
-			if (!UnitPlacedThisPress) {
-				if (Editor.State == EditorEditUnit && CursorBuilding) {
+			} else if (Editor.State == EditorEditUnit) {
+				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, CursorBuilding,
 							UI.MouseViewport->Viewport2MapX(CursorX),
 							UI.MouseViewport->Viewport2MapY(CursorY), 1)) {
@@ -1208,8 +1210,7 @@ static void EditorCallbackButtonDown(unsigned button)
 							MaxSampleVolume);
 					}
 				}
-			}
-			if (Editor.State == EditorSetStartLocation) {
+			} else if (Editor.State == EditorSetStartLocation) {
 				Players[Editor.SelectedPlayer].StartX = UI.MouseViewport->Viewport2MapX(CursorX);
 				Players[Editor.SelectedPlayer].StartY = UI.MouseViewport->Viewport2MapY(CursorY);
 			}
@@ -1805,7 +1806,6 @@ void CEditor::Init(void)
 		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.Visible[0] = new unsigned[Map.Info.MapWidth * Map.Info.MapHeight / 2];
 		memset(Map.Visible[0], 0, Map.Info.MapWidth * Map.Info.MapHeight / 2 * sizeof(unsigned));
-		InitUnitCache();
 
 		for (i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			Map.Fields[i].Tile = Map.Fields[i].SeenTile = 0;
@@ -1814,7 +1814,7 @@ void CEditor::Init(void)
 			Map.Fields[i].Flags = Map.Tileset.FlagsTable[0x50];
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
-		CreateGame(NULL, &Map);
+		CreateGame("", &Map);
 	} else {
 		CreateGame(CurrentMapPath, &Map);
 	}

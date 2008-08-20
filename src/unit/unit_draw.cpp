@@ -88,12 +88,12 @@ public:
 
 
 /**
-**  Structure grouping all Sprites for decoration.
+**	Structure grouping all Sprites for decoration.
 */
 class DecoSpriteType {
 public:
-	std::vector<std::string> Name;       /// Name of the sprite.
-	std::vector<Decoration> SpriteArray; /// Sprite to display variable.
+	std::vector<std::string> Name;            /// Name of the sprite.
+	std::vector<Decoration> SpriteArray;      /// Sprite to display variable.
 };
 
 static DecoSpriteType DecoSprite; /// All sprite's infos.
@@ -133,12 +133,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 */
 void DrawUnitSelection(const CUnit *unit)
 {
-	int x;
-	int y;
-	CUnitType *type;
 	Uint32 color;
-
-	type = unit->Type;
 
 	// FIXME: make these colors customizable with scripts.
 
@@ -177,12 +172,14 @@ void DrawUnitSelection(const CUnit *unit)
 		return;
 	}
 
-	x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
+	const CUnitType *type = unit->Type;
+	int x = CurrentViewport->Map2ViewportX(unit->X) + unit->IX +
 		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
 		(type->Width - type->Sprite->Width) / 2;
-	y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
-		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
+	int y = CurrentViewport->Map2ViewportY(unit->Y) + unit->IY +
+		type->TileHeight * TileSizeY / 2 - type->BoxHeight / 2 -
 		(type->Height - type->Sprite->Height) / 2;
+
 	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
 }
 
@@ -326,7 +323,7 @@ static int CclDefineSprites(lua_State *l)
 			} else if (!strcmp(key, "File")) {
 				deco.File = LuaToString(l, -1);
 			} else if (!strcmp(key, "Offset")) {
-				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1); // offsetX
@@ -335,7 +332,7 @@ static int CclDefineSprites(lua_State *l)
 				deco.HotY = LuaToNumber(l, -1);
 				lua_pop(l, 2); // Pop offsetX and Y
 			} else if (!strcmp(key, "Size")) {
-				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				if (!lua_istable(l, -1) || lua_objlen(l, -1) != 2) {
 					LuaError(l, "incorrect argument");
 				}
 				lua_rawgeti(l, -1, 1); // Width
@@ -348,7 +345,7 @@ static int CclDefineSprites(lua_State *l)
 			}
 			lua_pop(l, 1); // pop the value;
 		}
-		if (name == 0) {
+		if (name == NULL) {
 			LuaError(l, "CclDefineSprites requires the Name flag for sprite.");
 		}
 		index = GetSpriteIndex(name);
@@ -372,7 +369,7 @@ static int CclDefineSprites(lua_State *l)
 /**
 **  Register CCL features for decorations.
 */
-void DecorationCclRegister()
+void DecorationCclRegister(void)
 {
 	memset(&DecoSprite, 0, sizeof(DecoSprite));
 
@@ -395,7 +392,7 @@ void LoadDecorations(void)
 /**
 **  Clean decorations.
 */
-void CleanDecorations()
+void CleanDecorations(void)
 {
 	for (unsigned int i = 0; i < DecoSprite.SpriteArray.size(); ++i) {
 		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);
@@ -580,7 +577,7 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 	UpdateUnitVariables(unit);
 	// Now show decoration for each variable.
 	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
-		i < UnitTypeVar.DecoVar.end(); ++i) {
+			i < UnitTypeVar.DecoVar.end(); ++i) {
 		int value;
 		int max;
 
@@ -602,23 +599,21 @@ static void DrawDecoration(const CUnit *unit, const CUnitType *type, int x, int 
 				unit);
 		}
 	}
+
 	//
 	// Draw group number
 	//
 	if (unit->Selected && unit->GroupId != 0) {
-		char buf[2];
 		int num;
-		int f;
+		int width;
 
 		for (num = 0; !(unit->GroupId & (1 << num)); ++num) {
 			;
 		}
-		buf[0] = num + '0';
-		buf[1] = '\0';
-		f = GameFont->Width(buf);
-		x += (type->TileWidth * TileSizeX + type->BoxWidth) / 2 - f;
-		f = GameFont->Height();
-		y += (type->TileHeight * TileSizeY + type->BoxHeight) / 2 - f;
+		width = GameFont->Width(std::string(1, '0' + num));
+		x += (type->TileWidth * TileSizeX + type->BoxWidth) / 2 - width;
+		width = GameFont->Height();
+		y += (type->TileHeight * TileSizeY + type->BoxHeight) / 2 - width;
 		VideoDrawNumberClip(x, y, GameFont, num);
 	}
 }
@@ -651,10 +646,8 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 
 	// Draw normal shadow sprite if available
 	if (type->ShadowSprite) {
-		x -= (type->ShadowWidth -
-			type->TileWidth * TileSizeX) / 2;
-		y -= (type->ShadowHeight -
-			type->TileHeight * TileSizeY) / 2;
+		x -= (type->ShadowWidth - type->TileWidth * TileSizeX) / 2;
+		y -= (type->ShadowHeight - type->TileHeight * TileSizeY) / 2;
 		x += type->OffsetX + type->ShadowOffsetX;
 		y += type->OffsetY + type->ShadowOffsetY;
 
@@ -665,9 +658,7 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 				type->ShadowSprite->DrawFrameClip(frame, x, y);
 			}
 		} else {
-			int row;
-
-			row = type->NumDirections / 2 + 1;
+			int row = type->NumDirections / 2 + 1;
 			if (frame < 0) {
 				frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 			} else {
@@ -731,11 +722,11 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 	int y2;
 	Uint32 color;
 	Uint32 e_color;
-	int dest;
+	bool dest;
 
 	GetOrderPosition(unit, order, &x2, &y2);
 
-	dest = 0;
+	dest = false;
 	switch (order->Action) {
 		case UnitActionNone:
 			e_color = color = ColorGray;
@@ -752,22 +743,20 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 		case UnitActionFollow:
 		case UnitActionMove:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionPatrol:
 			Video.DrawLineClip(ColorGreen, x1, y1, x2, y2);
 			e_color = color = ColorBlue;
-			x1 = CurrentViewport->Map2ViewportX(
-				order->Arg1.Patrol.X) + TileSizeX / 2;
-			y1 = CurrentViewport->Map2ViewportY(
-				order->Arg1.Patrol.Y) + TileSizeY / 2;
-			dest = 1;
+			x1 = CurrentViewport->Map2ViewportX(order->Arg1.Patrol.X) + TileSizeX / 2;
+			y1 = CurrentViewport->Map2ViewportY(order->Arg1.Patrol.Y) + TileSizeY / 2;
+			dest = true;
 			break;
 
 		case UnitActionRepair:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionAttackGround:
@@ -781,17 +770,17 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 				e_color = ColorRed;
 			}
 			color = ColorRed;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionBoard:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionUnload:
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionDie:
@@ -800,7 +789,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 
 		case UnitActionSpellCast:
 			e_color = color = ColorBlue;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionTrain:
@@ -821,7 +810,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 				x2 + order->Type->BoxWidth / 2,
 				y2 + order->Type->BoxHeight / 2);
 			e_color = color = ColorGreen;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionBuilt:
@@ -830,12 +819,12 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 
 		case UnitActionResource:
 			e_color = color = ColorYellow;
-			dest = 1;
+			dest = true;
 			break;
 
 		case UnitActionReturnGoods:
 			e_color = color = ColorYellow;
-			dest = 1;
+			dest = true;
 			break;
 
 		default:
@@ -843,6 +832,7 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 			DebugPrint("Unknown action %d\n" _C_ order->Action);
 			break;
 	}
+
 	Video.FillCircleClip(color, x1, y1, 2);
 	if (dest) {
 		Video.DrawLineClip(color, x1, y1, x2, y2);
@@ -1245,6 +1235,7 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 	} else {
 		drawlevel2 = c2->Type->DrawLevel;
 	}
+
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
@@ -1268,10 +1259,10 @@ int FindAndSortUnits(const CViewport *vp, CUnit **table)
 	//
 	//  Select all units touching the viewpoint.
 	//
-	unsigned int n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	int n = Map.Select(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
-	for (unsigned int i = 0; i < n; i++) {
+	for (int i = 0; i < n; ++i) {
 		if (!table[i]->IsVisibleInViewport(vp)) {
 			table[i--] = table[--n];
 		}
