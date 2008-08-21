@@ -488,7 +488,15 @@ void HandleActionBuilt(CUnit *unit)
 				_C_ unit->Type->Name.c_str());
 		// Drop out unit
 		if ((worker = unit->Data.Built.Worker)) {
+		
+			if(worker->Orders[0]->Goal) {
+				worker->Orders[0]->Goal->RefsDecrease();
+				worker->Orders[0]->Goal = NULL;
+			}
+		
 			worker->ClearAction();
+			//worker->State = 0;
+			
 			unit->Data.Built.Worker = NoUnitP;
 			// HACK: make sure the sight is updated correctly
 			unit->CurrentSightRange = 1;
