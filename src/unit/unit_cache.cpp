@@ -52,20 +52,20 @@
 void CMap::Insert(CUnit *unit)
 {
 	Assert(!unit->Removed);
-	unsigned int index = unit->Y * Info.MapWidth;//Map.Info.MapWidth;
-	for (int i = 0; i < unit->Type->TileHeight &&
-						 unit->Y + i < Map.Info.MapHeight; ++i) {
-#if 0
-		CMapField *mf = Field(index + unit->X);
-#else
-		CMapField *mf = Field(unit->X, i + unit->Y);
-#endif
-		for (int j = 0; j < unit->Type->TileWidth &&
-				 unit->X + j < Info.MapWidth; ++j) {
-			mf[j].UnitCache.Insert(unit);
-		}
+	unsigned int index = unit->Y * Info.MapWidth;
+	const int w = unit->Type->TileWidth;
+	const int h = unit->Type->TileHeight;
+	int j,i = h;
+	CMapField *mf;
+	do {	
+		mf = Field(index + unit->X);
+		j = w;
+		do {
+			mf->UnitCache.Insert(unit);
+			++mf;
+		} while( --j && unit->X + (j - w) < Info.MapWidth);
 		index += Info.MapWidth;
-	}
+	} while( --i && unit->Y + (i - h) < Info.MapHeight);
 }
 
 /**
@@ -77,19 +77,19 @@ void CMap::Remove(CUnit *unit)
 {
 	Assert(!unit->Removed);
 	unsigned int index = unit->Y * Info.MapWidth;
-	for (int i = 0; i < unit->Type->TileHeight &&
-						 unit->Y + i < Info.MapHeight; ++i) {
-#if 0
-		CMapField *mf = Field(index + unit->X);
-#else
-		CMapField *mf = Field(unit->X, i + unit->Y);
-#endif
-		for (int j = 0; j < unit->Type->TileWidth &&
-				 unit->X + j < Info.MapWidth; ++j) {
-			mf[j].UnitCache.Remove(unit);
-		}
-		index += Map.Info.MapWidth;
-	}
+	const int w = unit->Type->TileWidth;
+	const int h = unit->Type->TileHeight;
+	int j,i = h;
+	CMapField *mf;
+	do {	
+		mf = Field(index + unit->X);
+		j = w;
+		do {
+			mf->UnitCache.Remove(unit);
+			++mf;
+		} while( --j && unit->X + (j - w) < Info.MapWidth);
+		index += Info.MapWidth;
+	} while( --i && unit->Y + (i - h) < Info.MapHeight);
 }
 
 /**

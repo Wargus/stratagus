@@ -2065,14 +2065,14 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	int ep;
 	int i;
 	int w;
-	int n;
+	int n = 0;
 	unsigned char *m;
 	unsigned char *matrix;
 	CUnit *mine;
 	CUnit *bestmine;
 	int destx;
 	int desty;
-	int bestd, bestw = 0;
+	int bestd = 99999, bestw = 99999, besta = 99999;
 	int cdist;
 	const ResourceInfo *resinfo = unit->Type->ResInfo[resource];
 	
@@ -2087,7 +2087,6 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 		NearestOfUnit(destu, x, y, &destx, &desty);
 	}
 	
-	bestd = 99999;
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
 	w = Map.Info.MapWidth + 2;
@@ -2100,7 +2099,8 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	//matrix[x + y * w] = 1; // mark start point
+	if(unit->X == x && unit->Y == y)
+		matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
 	bestmine = NoUnitP;
@@ -2139,37 +2139,84 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 							mine->Player->Index == PlayerMax - 1 ||
 							mine->Player == unit->Player ||
 							(unit->IsAllied(mine) && mine->IsAllied(unit)))
-							/*
-						&& !(check_usage && 
-							(mine->Type->MaxOnBoard && 
-							 mine->Data.Resource.Active >= mine->Type->MaxOnBoard ||
-							 mine->Orders[0]->Action == UnitActionBuilt))
-							 */
 							 ) {
-					int waiting = 
-						mine->Orders[0]->Action != UnitActionBuilt ?
-											 GetNumWaitingWorkers(mine) : -1;
 					if (destu) {
-						int absx = abs(destx - x);
-						int absy = abs(desty - y);
-						n = (absx > absy) ? absx : absy;
-						if (n < bestd && (bestmine == NoUnitP || !(check_usage && 
-								waiting >= bestw)) ) {
+						bool better = (mine != bestmine &&
+							(!mine->Type->MaxOnBoard ||
+							//Durring construction Data.Resource is corrupted
+							check_usage && mine->Orders[0]->Action != UnitActionBuilt));
+				
+						if(better) {
+							n = std::max(MyAbs(destx - x), MyAbs(desty - y));
+							if(check_usage && mine->Type->MaxOnBoard) {
+								int assign = mine->Data.Resource.Assigned - 
+														mine->Type->MaxOnBoard;
+								int waiting = 
+										(assign > 0 ?
+											 GetNumWaitingWorkers(mine) : 0);							
+								if(bestmine != NoUnitP) {	
+									if(besta >= assign)
+									{
+										if(assign > 0) {
+											waiting = GetNumWaitingWorkers(mine);
+											if(besta == assign) {
+												if(bestw < waiting) {
+													better = false;
+												} else {
+												  	if(bestw == waiting && bestd < n)
+													{
+														better = false;
+													}
+												}
+											}
+										} else {
+											if(besta == assign && bestd < n)
+											{
+												better = false;
+											}								
+										}
+									} else {
+										if(assign > 0 || bestd < n) {
+											better = false;
+										}
+									}
+								}
+								if(better) {
+									besta = assign;
+									bestw = waiting;						
+								}
+							} else {
+								if(bestmine != NoUnitP && bestd < n)
+								{
+									better = false;
+								}
+							}
+						}
+						if(better) {
 							bestd = n;
-							bestw = waiting;
-							bestmine = mine;
+							bestmine = mine;	
 						}
 						*m = 99;
-					} else { // no goal take the first
-						if (check_usage) {
-							if (bestmine == NoUnitP || 
-								waiting <= bestw)  {
-								bestmine = mine;
-								bestw = waiting;
-								bestd = 0;
+					} else { 
+						if (check_usage && mine->Type->MaxOnBoard) {
+							bool better = (mine != bestmine &&
+							//Durring construction Data.Resource is corrupted
+								mine->Orders[0]->Action != UnitActionBuilt);
+							if(better) {
+								int assign = mine->Data.Resource.Assigned - 
+														mine->Type->MaxOnBoard;
+								int waiting = (assign > 0 ? 
+									GetNumWaitingWorkers(mine) : 0);
+								if(assign < besta || 
+									(assign == besta && waiting < bestw)) {
+									bestd = n;
+									besta = assign;
+									bestw = waiting;
+									bestmine = mine;	
+								}
 							}
 							*m = 99;
-						} else {
+						} else { // no goal take the first
 							delete[] points;
 							return mine;
 						}
@@ -2278,7 +2325,8 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	//matrix[x + y * w] = 1; // mark start point
+	if(unit->X == x && unit->Y == y)
+		matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
 	bestmine = NoUnitP;
@@ -2313,9 +2361,7 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 				//
 				if ((mine = ResourceOnMap(x, y, resource, false))) {
 					if (destu) {
-						int absx = abs(destx - x);
-						int absy = abs(desty - y);
-						n = (absx > absy) ? absx : absy;
+						n = std::max(MyAbs(destx - x), MyAbs(desty - y));
 						if (n < bestd) {
 							bestd = n;
 							bestmine = mine;
@@ -2419,7 +2465,8 @@ CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	matrix[x + y * w] = 1; // mark start point
+	if(unit->X == x && unit->Y == y)
+		matrix[x + y * w] = 1; // mark start point
 	ep = wp = 1; // start with one point
 	cdist = 0; // current distance is 0
 

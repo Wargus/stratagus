@@ -203,7 +203,8 @@ static int StartGathering(CUnit *unit)
 		goal->RefsDecrease();
 		// Find an alternative, but don't look too far.
 		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
-		if ((goal = UnitFindResource(unit, unit->X, unit->Y, 10, unit->CurrentResource, true))) {
+		if ((goal = UnitFindResource(unit, unit->X, unit->Y, 
+					15, unit->CurrentResource, unit->Player->AiEnabled))) {
 			unit->SubAction = SUB_START_RESOURCE;
 			unit->Orders[0]->Goal = goal;
 			goal->RefsIncrease();
@@ -329,7 +330,7 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 	}
 	unit->Orders[0]->X = unit->Orders[0]->Y = -1;
 	if ((unit->Orders[0]->Goal = UnitFindResource(unit, unit->X, unit->Y,
-			10, unit->CurrentResource, true))) {
+			15, unit->CurrentResource, unit->Player->AiEnabled))) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n" 
 			_C_ unit->Player->Index _C_ unit->Slot);
 		unit->SubAction = SUB_START_RESOURCE;
@@ -454,7 +455,8 @@ static int GatherResource(CUnit *unit)
 				// Improved version of DropOutAll that makes workers go to the depot.
 				//
 				LoseResource(unit,source);
-				for (i = source->InsideCount, uins = source->UnitInside; i; --i, uins = uins->NextContained) {
+				for (i = source->InsideCount, uins = source->UnitInside; 
+										i; --i, uins = uins->NextContained) {
 					if (uins->Orders[0]->Action == UnitActionResource) {
 						LoseResource(uins,source);
 					}
@@ -752,23 +754,25 @@ static int WaitInDepot(CUnit *unit)
 		if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 10,
 				unit->Player, x, y, &x, &y)) {
 			if(depot)
-				DropOutNearest(unit, x, y, depot->Type->TileWidth, depot->Type->TileHeight);
+				DropOutNearest(unit, x, y, depot->Type->TileWidth,
+						 depot->Type->TileHeight);
 			unit->Orders[0]->X = x;
 			unit->Orders[0]->Y = y;
 		} else {
 			if(depot)
-				DropOutOnSide(unit, LookingW, depot->Type->TileWidth, depot->Type->TileHeight);
+				DropOutOnSide(unit, LookingW, depot->Type->TileWidth, 
+						depot->Type->TileHeight);
 			unit->ClearAction();
 		}
 	} else {
 		CUnit *goal;	
 		CUnit *mine = unit->Orders[0]->Arg1.Resource.Mine;
-		const int range = (mine ? 10 : 1000);
+		const int range = (mine ? 15 : 1000);
 		x = mine ? mine->X : unit->X;
 		y = mine ? mine->Y : unit->Y;
 
 		goal = UnitFindResource(unit, x, y, range, 
-								unit->CurrentResource, true, depot);
+					unit->CurrentResource, unit->Player->AiEnabled, depot);
 		if (goal) {
 			if(depot)		
 				DropOutNearest(unit, goal->X + goal->Type->TileWidth / 2,
@@ -903,7 +907,7 @@ void HandleActionResource(CUnit *unit)
 					goal->RefsIncrease();
 					order->Arg1.Resource.Mine = goal;
 				}
-			}		
+			}
 			UnitGotoGoal(unit, goal, SUB_MOVE_TO_RESOURCE);
 			//NewResetPath(unit);
 			//unit->SubAction = SUB_MOVE_TO_RESOURCE;

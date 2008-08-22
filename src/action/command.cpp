@@ -713,7 +713,7 @@ void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 		}
 
 		// Max Value > 1
-		if ((abs(nx - x) | abs(ny - y)) > 1) {
+		if ((MyAbs(nx - x) | MyAbs(ny - y)) > 1) {
 			if (!FindTerrainType(0, MapFieldForest, 0, 20, unit->Player,
 					nx, ny, &nx, &ny)) {
 				DebugPrint("FIXME: Give up???\n");

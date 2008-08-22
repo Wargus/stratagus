@@ -39,13 +39,21 @@
 
 class CMinimap
 {
+	template <const int BPP>
+	void UpdateMapTerrain(void *const mpixels, const int mpitch,
+		 const void *const tpixels, const int tpitch);
+		 
+	void UpdateTerrain(void);
+	
+	template <const int BPP>
+	void UpdateSeen(void *const pixels, const int pitch);
+	
 public:
 	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
 		WithTerrain(false), ShowSelected(false), Transparent(false) {}
 
 	void UpdateXY(int tx, int ty);
 	void UpdateSeenXY(int tx, int ty) {}
-	void UpdateTerrain(void);
 	void Update(void);
 	void Create(void);
 #ifdef USE_OPENGL

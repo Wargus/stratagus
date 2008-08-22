@@ -26,6 +26,179 @@ struct CPrimitives {
 	virtual void FillCircle(Uint32 color, int x, int y, int r) = 0;
 	virtual void FillTransCircle(Uint32 color, int x, int y,
 			int r, unsigned char alpha) = 0;
+};
+
+namespace DRAW {
+template <const int BPP>
+static inline Uint32 GetPixel(const void *const pixels, unsigned int index)
+{
+	if(BPP == 1) {
+		return (((Uint8 *)pixels)[index]);
+	} else if(BPP == 2) {
+		return (((Uint16 *)pixels)[index]);
+	} else if(BPP == 4) {
+		return (((Uint32 *)pixels)[index]);
+	} else {
+		assert(0);
+	}
+	return 0;
+};// __attribute__ ((nothrow,nonnull (1)));
+
+template <const int BPP>
+static inline void PutPixel(void *const pixels,
+			 unsigned int index, Uint32 color)
+{
+	if(BPP == 1) {
+		((Uint8 *)pixels)[index] = color;
+	} else if(BPP == 2) {
+		((Uint16 *)pixels)[index] = color;
+	} else if(BPP == 4) {
+		((Uint32 *)pixels)[index] = color;
+	} else {
+		assert(0);
+	}
+};// __attribute__ ((nothrow,nonnull (1)));
+
+template <const int BPP>
+static inline void 
+PutPixelDouble(void *pixels, const unsigned int index, Uint32 color)
+{
+	if(BPP == 1) {
+		color &= 0xFF;
+		color |= color << 8;
+		*((Uint16*)(((Uint8 *)pixels) + index)) = color;
+	} else if(BPP == 2) {
+		color &= 0xFFFF;
+		color |= color << 16;
+		*((Uint32*)(((Uint16 *)pixels) + index)) = color;
+	} else if(BPP == 4) {
+		Uint32 *ptr = ((Uint32 *)pixels) + index;
+#ifdef __x86_64__
+		Uint64 tmp = color;
+		tmp <<= 32;
+		//tmp |= color;
+		*((Uint64*)ptr) = tmp | color;
+#else
+		*ptr++ = color;
+		*ptr = color;
+#endif
+	} else {
+		assert(0);
+	}
+};// __attribute__ ((nothrow,nonnull (1)));
+
+template <const int BPP>
+static inline void 
+PutPixelQuatro(void *pixels, unsigned int index, Uint32 color)
+{
+	if(BPP == 1) {
+		color &= 0xFF;
+		color |= color << 8;
+		color |= color << 16;
+		*((Uint32*)(((Uint8 *)pixels) + index)) = color;	
+	} else if(BPP == 2) {
+		Uint32 *ptr = (Uint32*)(((Uint16 *)pixels) + index);
+		color &= 0xFFFF;
+		color |= color << 16;		
+#ifdef __x86_64__
+		Uint64 tmp = color;
+		tmp <<= 32;
+		//tmp |= color;
+		*((Uint64*)ptr) = tmp | color;
+#else
+		*ptr++ = color;
+		*ptr = color;
+#endif		
+	} else if(BPP == 4) {
+		Uint32 *ptr = ((Uint32 *)pixels) + index;
+#ifdef __x86_64__
+		Uint64 tmp = color;
+		tmp <<= 32;
+		tmp |= color;
+		*((Uint64*)ptr) = tmp;
+		*((Uint64*)(ptr + 2)) = tmp;
+#else
+		*ptr++ = color;
+		*ptr++ = color;
+		*ptr++ = color;
+		*ptr = color;
+#endif
+	} else {
+		assert(0);
+	}
+};// __attribute__ ((nothrow,nonnull (1)));
+
+template <const int BPP>
+static inline void DrawHLine(void *pixels, unsigned int index,
+										int width, Uint32 color)
+{
+#if 0
+	//if(width < 1) return;
+	do {
+		PutPixel(pixels, index, color);
+		index++;
+	} while (--width);
+#else
+	if(BPP == 1) {
+		memset((void*)(((Uint8 *)pixels) + index), color, width );
+	} else if(BPP == 2) {
+#ifdef __x86_64__
+		switch(((uintptr_t)pixels) & 6 )
+		{
+			case 6:
+				PutPixel<BPP>(pixels, index, color);
+				index++;
+				--width;
+			case 4:
+				PutPixel<BPP>(pixels, index, color);
+				index++;
+				--width;
+			case 2:
+				PutPixel<BPP>(pixels, index, color);
+				index++;
+				--width;
+			default:
+			break;
+		}			
+#else
+		if(((uintptr_t)pixels) & BPP ) {
+			PutPixel<BPP>(pixels, index, color);
+			index++;
+			--width;
+		}
+#endif	
+	}
+#ifdef __x86_64__
+	else if(BPP == 4 && ((uintptr_t)pixels) & BPP) { 
+		PutPixel<BPP>(pixels, index, color);
+		index++;
+		--width;
+	}
+#endif
+	while (width > 3) {
+			PutPixelQuatro<BPP>(pixels, index, color);
+			index+=4;
+			width-=4;
+	};
+    switch(width & 3) {
+    	case 3:
+			PutPixel<BPP>(pixels, index, color);
+			index++;
+    		//--width;
+    	case 2:
+    		PutPixel<BPP>(pixels, index, color);
+			index++;
+    		//--width;
+    	case 1:
+    		PutPixel<BPP>(pixels, index, color);
+			index++;
+    		//--width;
+    	default:
+    	break;
+    }
+
+#endif
+};
 
 };
 
@@ -34,73 +207,6 @@ struct CPrimitives {
 //RGB888 -> MASK = 0
 template <const int BPP, const int MASK>
 class CRenderer : public CPrimitives {
-
-	static inline void PutPixel(void *pixels, unsigned int index, Uint32 color)
-	{
-		if(BPP == 2) {
-			((Uint16 *)pixels)[index] = color;
-		} else if(BPP == 4) {
-			((Uint32 *)pixels)[index] = color;
-		} else {
-			assert(0);
-		}
-	} __attribute__ ((nothrow,nonnull (1)));
-
-	static inline void PutPixelDouble(void *pixels, const unsigned int index, Uint32 color)
-	{
-		if(BPP == 2) {
-			color &= 0xFFFF;
-			color |= color << 16;
-			*((Uint32*)(((Uint16 *)pixels) + index)) = color;
-		} else if(BPP == 4) {
-			Uint32 *ptr = ((Uint32 *)pixels) + index;
-#ifdef __x86_64__
-			Uint64 tmp = color;
-			tmp <<= 32;
-			//tmp |= color;
-			*((Uint64*)ptr) = tmp | color;
-#else
-			*ptr++ = color;
-			*ptr = color;
-#endif
-		} else {
-			assert(0);
-		}
-	} __attribute__ ((nothrow,nonnull (1)));
-
-	static inline void PutPixelQuatro(void *pixels, unsigned int index, Uint32 color)
-	{
-		if(BPP == 2) {
-			Uint32 *ptr = (Uint32*)(((Uint16 *)pixels) + index);
-			color &= 0xFFFF;
-			color |= color << 16;		
-#ifdef __x86_64__
-			Uint64 tmp = color;
-			tmp <<= 32;
-			//tmp |= color;
-			*((Uint64*)ptr) = tmp | color;
-#else
-			*ptr++ = color;
-			*ptr = color;
-#endif		
-		} else if(BPP == 4) {
-			Uint32 *ptr = ((Uint32 *)pixels) + index;
-#ifdef __x86_64__
-			Uint64 tmp = color;
-			tmp <<= 32;
-			tmp |= color;
-			*((Uint64*)ptr) = tmp;
-			*((Uint64*)(ptr + 2)) = tmp;
-#else
-			*ptr++ = color;
-			*ptr++ = color;
-			*ptr++ = color;
-			*ptr = color;
-#endif
-		} else {
-			assert(0);
-		}
-	} __attribute__ ((nothrow,nonnull (1)));;
 
 	static inline void PutTransPixel(void *pixels, unsigned int index,
 							 Uint32 color, unsigned int alpha)
@@ -306,7 +412,7 @@ class CRenderer : public CPrimitives {
 	{
 		if(height < 1) return;
 		do {
-			PutPixel(pixels, index, color);
+			DRAW::PutPixel<BPP>(pixels, index, color);
 			index += pitch;
 		} while (--height);
 	}__attribute__ ((nothrow,nonnull (1)));
@@ -327,76 +433,6 @@ class CRenderer : public CPrimitives {
 			} while (--height);
 		}
 	} __attribute__ ((nothrow,nonnull (1)));
-
-	static inline void DrawHLine(void *pixels, unsigned int index,
-											int width, Uint32 color)
-	{
-#if 0
-		//if(width < 1) return;
-		do {
-			PutPixel(pixels, index, color);
-			index++;
-		} while (--width);
-#else
-
-		if(BPP == 2) {
-#ifdef __x86_64__
-			switch(((uintptr_t)pixels) & 6 )
-			{
-				case 6:
-					PutPixel(pixels, index, color);
-					index++;
-					--width;
-				case 4:
-					PutPixel(pixels, index, color);
-					index++;
-					--width;
-				case 2:
-					PutPixel(pixels, index, color);
-					index++;
-					--width;
-				default:
-				break;
-			}			
-#else
-			if(((uintptr_t)pixels) & BPP ) {
-				PutPixel(pixels, index, color);
-				index++;
-				--width;
-			}
-#endif	
-		}
-#ifdef __x86_64__
-		else if(BPP == 4 && ((uintptr_t)pixels) & BPP) { 
-			PutPixel(pixels, index, color);
-			index++;
-			--width;
-		}
-#endif
-		while (width > 3) {
-				PutPixelQuatro(pixels, index, color);
-				index+=4;
-				width-=4;
-		};
-	    switch(width & 3) {
-	    	case 3:
-				PutPixel(pixels, index, color);
-				index++;
-	    		//--width;
-	    	case 2:
-	    		PutPixel(pixels, index, color);
-				index++;
-	    		//--width;
-	    	case 1:
-	    		PutPixel(pixels, index, color);
-				index++;
-	    		//--width;
-	    	default:
-	    	break;
-	    }
-
-#endif
-	};
 
 	static inline void DrawTransHLine128(void *pixels,
 				 unsigned int index, int width, Uint32 color)
@@ -463,7 +499,7 @@ class CRenderer : public CPrimitives {
 		unsigned int index =  TheScreen->pitch / BPP;
 		index *= y;
 		index += x;
-		PutPixel(TheScreen->pixels, index, color);
+		DRAW::PutPixel<BPP>(TheScreen->pixels, index, color);
 	};
 	
 	void DrawTransPixel(Uint32 color, int x, int y,  unsigned char alpha)
@@ -505,7 +541,7 @@ class CRenderer : public CPrimitives {
 				index = dx + dy * pitch;
 				len += sx - dx;
 			}
-			DrawHLine(TheScreen->pixels, index, len, color);
+			DRAW::DrawHLine<BPP>(TheScreen->pixels, index, len, color);
 			return;
 		}
 
@@ -551,7 +587,7 @@ class CRenderer : public CPrimitives {
 			index = y * pitch;
 			incr *= pitch;
 			for (x = sx; x < dx; ++x) {
-				PutPixel(TheScreen->pixels, x + index, color);
+				DRAW::PutPixel<BPP>(TheScreen->pixels, x + index, color);
 				if (p >= 0) {
 					//y += incr;
 					index += incr;
@@ -569,7 +605,7 @@ class CRenderer : public CPrimitives {
 			p = (xlen << 1) - ylen;
 			index = sy * pitch;
 			for (y = sy; y < dy; ++y) {
-				PutPixel(TheScreen->pixels, x + index, color);
+				DRAW::PutPixel<BPP>(TheScreen->pixels, x + index, color);
 				if (p >= 0) {
 					x += incr;
 					p += (xlen - ylen) << 1;
@@ -586,7 +622,7 @@ class CRenderer : public CPrimitives {
 		if (ylen == xlen) {
 			index = y * pitch;
 			while (y != dy) {
-				PutPixel(TheScreen->pixels, x + index, color);
+				DRAW::PutPixel<BPP>(TheScreen->pixels, x + index, color);
 				x += incr;
 				++y;
 				index += pitch;
@@ -607,11 +643,11 @@ class CRenderer : public CPrimitives {
 		unsigned int index = y * pitch;
 		unsigned int y_offset = (h - 1) * pitch;
 		PutTransPixel128(TheScreen->pixels, x + index, color);
-		DrawHLine(TheScreen->pixels, x + index + 1, w - 2, color); ///(x,y,w)
+		DRAW::DrawHLine<BPP>(TheScreen->pixels, x + index + 1, w - 2, color); ///(x,y,w)
 		PutTransPixel128(TheScreen->pixels, x + index + w - 1, color);
 		
 		PutTransPixel128(TheScreen->pixels, x + index + y_offset, color);
-		DrawHLine(TheScreen->pixels, x + index + y_offset + 1, w - 2, color); // (x, y + h - 1, w)
+		DRAW::DrawHLine<BPP>(TheScreen->pixels, x + index + y_offset + 1, w - 2, color); // (x, y + h - 1, w)
 		PutTransPixel128(TheScreen->pixels, x + index + y_offset + w - 1, color);
 		
 		DrawVLine(TheScreen->pixels, pitch, x + index + pitch,
@@ -673,18 +709,18 @@ class CRenderer : public CPrimitives {
 			unsigned int index_plus = (y + py) * pitch;
 			unsigned int index_minus = (y - py) * pitch;
 
-			PutPixel(TheScreen->pixels, x + px + index_plus, color);
-			PutPixel(TheScreen->pixels, x + px + index_minus, color);
-			PutPixel(TheScreen->pixels, x - px + index_plus, color);
-			PutPixel(TheScreen->pixels, x - px + index_minus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x + px + index_plus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x + px + index_minus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x - px + index_plus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x - px + index_minus, color);
 	
 			index_plus = (y + px) * pitch;
 			index_minus = (y - px) * pitch;
 
-			PutPixel(TheScreen->pixels, x + py + index_plus, color);
-			PutPixel(TheScreen->pixels, x + py + index_minus, color);
-			PutPixel(TheScreen->pixels, x - py + index_plus, color);
-			PutPixel(TheScreen->pixels, x - py + index_minus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x + py + index_plus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x + py + index_minus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x - py + index_plus, color);
+			DRAW::PutPixel<BPP>(TheScreen->pixels, x - py + index_minus, color);
 
 			if (p < 0) {
 				p += 2 * px + 3;

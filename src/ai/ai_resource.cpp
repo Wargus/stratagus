@@ -424,7 +424,8 @@ void AiNewDepotRequest(CUnit *worker) {
 	
 	if(best_type) {
 		//if(!best_mask)	{
-			ResourceInfo *resinfo = worker->Type->ResInfo[worker->CurrentResource];
+			ResourceInfo *resinfo = 
+					worker->Type->ResInfo[worker->CurrentResource];
 						
 			AiBuildQueue queue;
 
@@ -1024,13 +1025,6 @@ static void AiCheckingWork(void)
 static int AiAssignHarvester(CUnit *unit, int resource)
 {
 	ResourceInfo *resinfo;
-	// These will hold the coordinates of the forest.
-	int forestx;
-	int foresty;
-	std::vector<CUnitType *>::iterator i;
-	int exploremask;
-	//  This will hold the resulting gather destination.
-	CUnit *dest;
 
 	// It can't.
 	if (unit->Removed) {
@@ -1040,6 +1034,9 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	resinfo = unit->Type->ResInfo[resource];
 	Assert(resinfo);
 	if (resinfo->TerrainHarvester) {
+		// These will hold the coordinates of the forest.
+		int forestx, foresty;
+	
 		//
 		// Code for terrain harvesters. Search for piece of terrain to mine.
 		//
@@ -1051,10 +1048,14 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 		// Ask the AI to explore...
 		AiExplore(unit->X, unit->Y, MapFieldLandUnit);
 	} else {
+		int exploremask = 0;
 		//
 		// Find a resource to harvest from.
 		//
-		if ((dest = UnitFindResource(unit, unit->X, unit->Y, 1000, resource,true))) {
+		CUnit *dest = UnitFindResource(unit,
+				unit->X, unit->Y, 1000, resource, true);
+
+		if (dest) {
 			//FIXME: rb - when workers can speedup building then such assign may be ok. 
 			//if(dest->Orders[0]->Action == UnitActionBuilt)
 				//CommandBuildBuilding(unit, dest->X, dest->Y, dest->Type, FlushCommands);
@@ -1104,10 +1105,10 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 			
 			return 0;
 		}
-#endif		
-		
-		exploremask = 0;
-		for (i = UnitTypes.begin(); i != UnitTypes.end(); i++) {
+#endif
+
+		for (std::vector<CUnitType *>::iterator i = UnitTypes.begin();
+			 i != UnitTypes.end(); i++) {
 			if (*i && (*i)->GivesResource == resource) {
 				switch ((*i)->UnitType) {
 				case UnitTypeLand:

@@ -472,7 +472,8 @@ void AiAttackWithForceAt(unsigned int force, int x, int y)
 		DebugPrint("Force out of range: %d" _C_ force);
 		return ;
 	}
-	if (!(x < static_cast<int>(Map.Info.MapWidth) && y < static_cast<int>(Map.Info.MapHeight))) {
+	
+	if (!Map.Info.IsPointOnMap(x,y)) {
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ x _C_ y
 			_C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
 		return ;

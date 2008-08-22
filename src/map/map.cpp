@@ -86,11 +86,18 @@ void CMap::MarkSeenTile(const unsigned int index)
 	}
 	mf->SeenTile = tile;
 
+#ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
 	int y = index / Info.MapWidth;
 	int x = index - (y * Info.MapWidth);
+#endif
 
 	if (this->Tileset.TileTypeTable) {
+#ifndef MINIMAP_UPDATE
+		//rb - GRRRRRRRRRRRR
+		int y = index / Info.MapWidth;
+		int x = index - (y * Info.MapWidth);
+#endif
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
 		if (seentile != this->Tileset.RemovedTree &&
@@ -124,7 +131,9 @@ void CMap::MarkSeenTile(const unsigned int index)
 		}
 	}
 
+#ifdef MINIMAP_UPDATE
 	UI.Minimap.UpdateXY(x, y);
+#endif
 }
 
 /**

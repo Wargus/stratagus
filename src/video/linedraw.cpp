@@ -327,7 +327,7 @@ void CVideo::DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 			return;//FIXME: add cliping code insteed of return
 		}				
 	}
-		
+
 	LockScreen();
 	Renderer->DrawLine(color, sx, sy, dx, dy);
 	UnlockScreen();
