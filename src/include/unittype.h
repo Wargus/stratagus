@@ -797,7 +797,7 @@ class CBuildRestrictionAddOn : public CBuildRestriction {
 		const CUnitType *const Parent;   /// building that is unit is an addon too.	
 		const int x,y;	//functor work position
 		functor(const CUnitType *type, int _x, int _y): Parent(type), x(_x), y(_y) {}
-		inline bool operator() (CUnit *const unit);
+		inline bool operator() (const CUnit *const unit) const;
 	};
 public:
 	CBuildRestrictionAddOn() : OffsetX(0), OffsetY(0), Parent(NULL) {};

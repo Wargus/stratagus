@@ -120,7 +120,7 @@ public:
 		Defending = false;
 		Attacking = false;
 		//UnitTypes.clear();
-		Units.clear();
+		Units.Units.clear();
 		State = 0;
 		GoalX = GoalY = 0;
 		MustTransport = false;
@@ -132,7 +132,7 @@ public:
 	char Role;          /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
-	std::vector<CUnit *> Units;        /// Units in the force
+	CUnitCache Units;						/// Units in the force
 
 	//
 	// If attacking

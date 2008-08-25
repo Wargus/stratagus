@@ -87,11 +87,10 @@ struct _filter_flags {
 	const CPlayer *player;
 	int fogmask;
 	_filter_flags(const CPlayer *p, int m) : player(p), fogmask(m) {}
-	inline bool operator() (const CUnit *const unit) {
+	inline void operator() (const CUnit *const unit) {
 		if (!unit->IsVisibleAsGoal(player)) {
 			fogmask &= ~unit->Type->FieldFlags;
 		}
-		return true;
 	}
 };
 

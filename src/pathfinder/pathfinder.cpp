@@ -41,6 +41,20 @@
 #include "unit.h"
 #include "pathfinder.h"
 
+//astar.cpp
+
+/// Init the a* data structures
+extern void InitAStar(int mapWidth, int mapHeight,
+	 int (STDCALL *costMoveTo)(unsigned int index, void *data));
+
+/// free the a* data structures
+extern void FreeAStar(void);
+
+/// Find and a* path for a unit
+extern int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
+	int tilesizex, int tilesizey, int minrange,
+	 int maxrange, char *path, int pathlen, void *data);
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -55,7 +69,6 @@
 */
 static unsigned char Matrix[(MaxMapWidth + 2) * (MaxMapHeight + 3) + 2];  /// Path matrix
 
-static int STDCALL CostMoveTo(int x, int y, void *data);
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -66,7 +79,7 @@ static int STDCALL CostMoveTo(int x, int y, void *data);
 */
 void InitPathfinder()
 {
-	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight, CostMoveTo);
+	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight, NULL);
 }
 
 /**
@@ -197,76 +210,6 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 	return depth;
 }
 
-extern CUnit *UnitOnMapTile(const unsigned int index, unsigned int type);
-
-/**
-**  Compute the cost of crossing tile (dx,dy)
-**
-**  @param data  user data.
-**  @param x     X tile where to move.
-**  @param y     Y tile where to move.
-**
-**  @return      -1 -> impossible to cross.
-**                0 -> no induced cost, except move
-**               >0 -> costly tile
-*/
-static int STDCALL CostMoveTo(int x, int y, void *data)
-{
-	int i;
-	int j;
-	int flag;
-	int cost = 0;
-	CUnit *goal;
-	const CUnit *unit = (const CUnit *)data;
-	int mask = unit->Type->MovementMask;
-
-	// Doesn't cost anything to move to ourselves :)
-	// Used when marking goals mainly.  Could cause speed problems
-	if (unit->X == x && unit->Y == y) {
-		return 0;
-	}
-
-	// verify each tile of the unit.
-	unsigned int index = y * Map.Info.MapWidth;
-	for (j = y; j < y + unit->Type->TileHeight; ++j) {
-		for (i = x; i < x + unit->Type->TileWidth; ++i) {
-			flag = Map.Field(i + index)->Flags & mask;
-			if (flag && (AStarKnowUnseenTerrain || Map.IsFieldExplored(unit->Player, i + index))) {
-				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
-					// we can't cross fixed units and other unpassable things
-					return -1;
-				}
-				//goal = UnitOnMapTile(i, j, unit->Type->UnitType);
-				goal = UnitOnMapTile(i + index, unit->Type->UnitType);
-				if (!goal) {
-					// Shouldn't happen, mask says there is something on this tile
-					Assert(0);
-					return -1;
-				}
-				if (goal->Moving)  {
-					// moving unit are crossable
-					cost += AStarMovingUnitCrossingCost;
-				} else {
-					// for non moving unit Always Fail
-					// FIXME: Need support for moving a fixed unit to add cost
-					return -1;
-					//cost += AStarFixedUnitCrossingCost;
-				}
-			}
-			// Add cost of crossing unknown tiles if required
-			if (!AStarKnowUnseenTerrain &&
-				 !Map.IsFieldExplored(unit->Player, i + index)) {
-				// Tend against unknown tiles.
-				cost += AStarUnknownTerrainCost;
-			}
-			// Add tile movement cost
-			cost += Map.Field(i + index)->Cost;
-		}
-		index += Map.Info.MapWidth;
-	}
-	return cost;
-}
-
 /*----------------------------------------------------------------------------
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
@@ -322,7 +265,8 @@ int NewPath(CUnit *unit)
 	}
 	path = unit->Data.Move.Path;
 	i = AStarFindPath(unit->X, unit->Y, gx, gy, gw, gh,
-		unit->Type->TileWidth, unit->Type->TileHeight, minrange, maxrange, path, MAX_PATH_LENGTH, unit);
+		unit->Type->TileWidth, unit->Type->TileHeight,
+		 minrange, maxrange, path, MAX_PATH_LENGTH, unit);
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;
 	}

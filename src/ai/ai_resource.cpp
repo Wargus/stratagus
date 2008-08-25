@@ -961,33 +961,32 @@ static void AiCheckingWork(void)
 	int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
 		queue = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		if (queue->Want > queue->Made) {
-			type = queue->Type;
+		type = queue->Type;
 
-			//
-			// FIXME: must check if requirements are fulfilled.
-			// Buildings can be destroyed.
+		//
+		// FIXME: must check if requirements are fulfilled.
+		// Buildings can be destroyed.
 
+		//
+		// Check if we have enough food.
+		//
+		if (type->Demand && !AiCheckSupply(AiPlayer, type)) {
+			//AiPlayer->NeedSupply = true;
+			//AiRequestSupply();
+			AiPlayer->NeedSupply = AiRequestSupply();
+		}
+		//
+		// Check limits, AI should be broken if reached.
+		//
+		if (queue->Want > queue->Made && AiPlayer->Player->CheckLimits(type) < 0) {
+			continue;
+		}
+		//
+		// Check if resources available.
+		//
+		if ((c = AiCheckUnitTypeCosts(type))) {
+			AiPlayer->NeededMask |= c;
 			//
-			// Check if we have enough food.
-			//
-			if (type->Demand && !AiCheckSupply(AiPlayer, type)) {
-				//AiPlayer->NeedSupply = true;
-				//AiRequestSupply();
-				AiPlayer->NeedSupply = AiRequestSupply();
-			}
-			//
-			// Check limits, AI should be broken if reached.
-			//
-			if (AiPlayer->Player->CheckLimits(type) < 0) {
-				continue;
-			}
-			//
-			// Check if resources available.
-			//
-			if ((c = AiCheckUnitTypeCosts(type))) {
-				AiPlayer->NeededMask |= c;
-				//
 			// NOTE: we can continue and build things with lesser
 			//  resource or other resource need!
 			continue;
@@ -1003,7 +1002,6 @@ static void AiCheckingWork(void)
 					queue->Wait = GameCycle + 150;
 				} else {
 					queue->Wait = GameCycle + 450;
-					}
 				}
 			}
 		}

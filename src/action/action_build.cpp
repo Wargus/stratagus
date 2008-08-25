@@ -136,15 +136,20 @@ static void MoveToLocation(CUnit *unit)
 	}
 }
 
-struct CheckAlreadyBuilding {
+struct AlreadyBuildingFinder {
 	const CUnit *const worker;
 	const CUnitType *const type;
-	CheckAlreadyBuilding(const CUnit *unit,	const CUnitType *t):
+	AlreadyBuildingFinder(const CUnit *unit, const CUnitType *t):
 			 worker(unit), type(t) {}
-	inline bool operator() (CUnit *const unit) {
+	inline bool operator() (const CUnit *const unit) const
+	{
 		return (!unit->Destroyed && unit->Type == type &&
 				(worker->Player == unit->Player || worker->IsAllied(unit)));
 	}
+	inline CUnit *FindOnTile(const CMapField *const mf) const
+	{
+		return mf->UnitCache.find(*this);
+	}	
 };
 
 /**
@@ -173,12 +178,13 @@ static CUnit *CheckCanBuild(CUnit *unit)
 	// Check if the building could be built there.
 	//
 	if ((ontop = CanBuildUnitType(unit, type, x, y, 1)) == NULL) {
-		CheckAlreadyBuilding filter(unit, type);
 		/*
 		 *	FIXME: rb - CheckAlreadyBuilding should be somehow
 		 *	ebabled/disable via game lua scripting
-		 */
-		if ((ontop = Map.Field(x,y)->UnitCache.find(filter)) != NULL) {
+		 */		 
+		if ((ontop = 
+			AlreadyBuildingFinder(unit, type).FindOnTile(Map.Field(x,y))
+			) != NULL) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n" 
 					_C_ unit->Player->Index _C_ unit->Slot 
 					_C_ ontop->Type->Name.c_str()

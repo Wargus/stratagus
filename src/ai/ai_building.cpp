@@ -181,25 +181,26 @@ static int AiFindBuildingPlace2(const CUnit *worker, const CUnitType *type,
 	int backupy = -1;
 	bool backupok;
 
-	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-	points = new p[size];
-
 	x = ox;
 	y = oy;
 	//
 	// Look if we can build at current place.
 	//
-	if (CanBuildUnitType(worker, type, x, y, 1)) {
+	if (CanBuildUnitType(worker, type, x, y, 1) &&
+		!AiEnemyUnitsInDistance(worker->Player, NULL, x, y, 8)) {
 		if (AiCheckSurrounding(worker, type, x, y, backupok)) {
 			*dx = x;
 			*dy = y;
-			delete[] points;
 			return 1;
 		} else if (backupok) {
 			backupx = x;
 			backupy = y;
 		}
 	}
+	
+	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
+	points = new p[size];
+	
 	//
 	//  Make movement matrix.
 	//
@@ -579,6 +580,113 @@ static int AiFindLumberMillPlace(const CUnit *worker, const CUnitType *type,
 	return 0;
 }
 
+static int AiFindMiningPlace(const CUnit *worker,
+						 const CUnitType *type,
+						 int nx, int ny, 
+						 int *dx, int *dy, 
+						 int resource)
+{
+	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
+	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
+	struct p {
+		unsigned short X;
+		unsigned short Y;
+	} *points;
+	int size;
+	int x;
+	int y;
+	int rx;
+	int ry;
+	int mask;
+	int wp;
+	int rp;
+	int ep;
+	int i;
+	int w;
+	unsigned char *m;
+	unsigned char *morg;
+	unsigned char *matrix;
+	CUnit *mine;
+	int destx;
+	int desty;
+
+	destx = x = (nx != -1 ? nx : worker->X);
+	desty = y = (ny != -1 ? ny : worker->Y);
+	size = Map.Info.MapWidth * Map.Info.MapHeight / 4;
+	points = new p[size];
+
+	//
+	// Make movement matrix. FIXME: can create smaller matrix.
+	//
+	morg = MakeMatrix();
+	w = Map.Info.MapWidth + 2;
+	matrix = morg + w + w + 2;
+
+	points[0].X = x;
+	points[0].Y = y;
+	rp = 0;
+	//if(worker->X == x && worker->Y == y)
+		matrix[x + y * w] = 1; // mark start point
+	ep = wp = 1; // start with one point
+
+	mask = worker->Type->MovementMask;
+
+	//
+	// Pop a point from stack, push all neighbors which could be entered.
+	//
+	for (;;) {
+		while (rp != ep) {
+			rx = points[rp].X;
+			ry = points[rp].Y;
+			for (i = 0; i < 8; ++i) { // mark all neighbors
+				x = rx + xoffset[i];
+				y = ry + yoffset[i];
+				m = matrix + x + y * w;
+				if (*m) { // already checked
+					continue;
+				}
+				//
+				// Look if there is a mine area
+				//
+				if ((mine = ResourceOnMap(x, y, resource, false)) &&
+						 AiFindBuildingPlace2(worker, type, mine->X, mine->Y, dx, dy)) {
+							delete[] morg;
+							delete[] points;
+							return 1;
+				}
+
+				if (CanMoveToMask(x, y, mask)) { // reachable
+					*m = 1;
+					points[wp].X = x; // push the point
+					points[wp].Y = y;
+					if (++wp >= size) { // round about
+						wp = 0;
+					}
+				} else { // unreachable
+					*m = 99;
+				}
+			}
+			if (++rp >= size) { // round about
+				rp = 0;
+			}
+		}
+
+		//
+		// Continue with next frame.
+		//
+		if (rp == wp) { // unreachable, no more points available
+			break;
+		}
+		ep = wp;
+	}
+
+	delete[] morg;
+	delete[] points;
+	return 0;
+}
+
+
+
 /**
 **  Find free building place.
 **
@@ -602,36 +710,34 @@ int AiFindBuildingPlace(const CUnit *worker, const CUnitType *type,
 	//
 	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index 
 		_C_ type->Ident.c_str() _C_ type->Name.c_str());
-	if (type->CanStore[GoldCost] && AiFindHallPlace(worker, type, nx, ny, dx, dy)) {
-		DebugPrint("%d: Found place for town hall (%s,%s) on [%d,%d]\n" 
-			_C_ AiPlayer->Player->Index _C_ type->Ident.c_str() _C_
-			type->Name.c_str() _C_ *dx _C_ *dy);
-		return 1;
+
+	//Mines and Depots
+	for (int i = 0; i < MaxCosts; ++i) {
+		ResourceInfo *resinfo= worker->Type->ResInfo[i];
+		//Depots
+		if(type->CanStore[i]) {
+			if (resinfo && resinfo->TerrainHarvester) {
+				return AiFindLumberMillPlace(worker, type, 	nx, ny,dx, dy);
+			} else {
+				return AiFindHallPlace(worker, type, nx, ny, dx, dy, i);
+			}
+		} else
+			//mines
+			if(type->GivesResource == i) {
+				if (resinfo && resinfo->RefineryHarvester) {
+					//Mine have to be build ONTOP resources
+					return AiFindMiningPlace(worker, type, nx, ny,  dx, dy, i);
+				} else {
+					//Mine can be build without resource restrictions: solar panels, etc
+					return AiFindBuildingPlace2(worker, type, 
+							(nx != -1 ? nx : worker->X),
+							(ny != -1 ? ny : worker->Y), dx, dy);
+				}
+			}
 	}
 	
-	//
-	// Find a place near wood for a lumber mill
-	//
-	if (type->CanStore[WoodCost] && AiFindLumberMillPlace(worker, type, 
-			nx, ny,dx, dy)) {
-		DebugPrint("%d: Found place for Lumber Mill (%s,%s) on [%d,%d]\n" 
-			_C_ AiPlayer->Player->Index _C_ type->Ident.c_str() _C_
-			type->Name.c_str() _C_ *dx _C_ *dy);			
-		return 1;
-	}
-	//
-	// Platforms can only be built on oil patches
-	//
-	if (type->GivesResource != OilCost &&
-			AiFindBuildingPlace2(worker, type, 
-			(nx != -1 ? nx : worker->X), (ny != -1 ? ny : worker->Y), dx, dy)) {
-		return 1;
-	}
-	// FIXME: Should do this if all units can't build better!
 	return AiFindBuildingPlace2(worker, type, 
 			(nx != -1 ? nx : worker->X), (ny != -1 ? ny : worker->Y), dx, dy);
-
-	// return 0;
 }
 
 //@}

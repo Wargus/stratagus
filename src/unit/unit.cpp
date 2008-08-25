@@ -523,17 +523,20 @@ void UpdateUnitSightRange(CUnit *unit)
 void MarkUnitFieldFlags(const CUnit *unit)
 {
 	Assert(unit);
+	CMapField *mf;
 	const unsigned int flags = unit->Type->FieldFlags; //
-	const int h = unit->Type->TileHeight;          // Tile height of the unit.
-	const int w = unit->Type->TileWidth;          // Tile width of the unit.
-    int y = 0, x;
+	int w, h = unit->Type->TileHeight;          // Tile height of the unit.
+	const int width = unit->Type->TileWidth;          // Tile width of the unit.
 	unsigned int index = Map.getIndex(unit->X, unit->Y);
-	for (; y < h; ++y) {
-		for (x = 0; x < w; ++x) {
-			Map.Fields[x + index].Flags |= flags;
-		}
+	do {
+		mf = Map.Field(index);
+		w = width;
+		do {
+			mf->Flags |= flags;
+			++mf;
+		} while (--w);
 		index += Map.Info.MapWidth;
-	}
+	} while (--h);
 }
 
 struct _UnmarkUnitFieldFlags {
@@ -541,11 +544,10 @@ struct _UnmarkUnitFieldFlags {
 	CMapField *mf;
 	_UnmarkUnitFieldFlags(const CUnit *const unit)
 		 : main(unit) {}
-	inline bool operator () (CUnit *const unit) {
+	inline void operator () (CUnit *const unit) {
 		if (main != unit && unit->Orders[0]->Action != UnitActionDie) {
 			mf->Flags |= unit->Type->FieldFlags;
 		}
-		return true;
 	}
 };
 
@@ -558,24 +560,25 @@ struct _UnmarkUnitFieldFlags {
 void UnmarkUnitFieldFlags(const CUnit *unit)
 {
 	Assert(unit);
-	const unsigned int flags = unit->Type->FieldFlags; //
-	const int h = unit->Type->TileHeight;          // Tile height of the unit.
-	const int w = unit->Type->TileWidth;          // Tile width of the unit.
-    int y = 0, x;
+	CMapField *mf;	
+	const unsigned int flags = ~unit->Type->FieldFlags; //
+	int w, h = unit->Type->TileHeight;          // Tile height of the unit.
+	const int width = unit->Type->TileWidth;          // Tile width of the unit.
 	unsigned int index = Map.getIndex(unit->X, unit->Y);
 
 	_UnmarkUnitFieldFlags funct(unit);
 
-	for (; y < h; ++y) {
-		CMapField *mf = Map.Field(index);
-		for (x = 0; x < w; ++x) {
-			mf->Flags &= ~flags;
+	do {
+		mf = Map.Field(index);
+		w = width;
+		do {
+			mf->Flags &= flags;//clean flags
 			funct.mf = mf;
 			mf->UnitCache.for_each(funct);
 			++mf;
-		}
+		} while(--w);
 		index += Map.Info.MapWidth;
-	}
+	} while(--h);
 }
 
 /**
@@ -1066,17 +1069,17 @@ void UnitGoesOutOfFog(CUnit *unit, const CPlayer *player)
 	}
 }
 
-template<const bool mark>
+template<const bool MARK>
 struct _TileSeen {
 	const CPlayer *player;
 	int cloak;
 
 	_TileSeen(const CPlayer *p , int c): player(p), cloak(c) {}
 	
-	inline bool operator() (CUnit *const unit) {
+	inline void operator() ( CUnit *const unit) {
 		if (cloak == (int)unit->Type->PermanentCloak) {	
 			const int p = player->Index;	
-			if(mark) {
+			if(MARK) {
 				//
 				//  If the unit goes out of fog, this can happen for any player that
 				//  this player shares vision with, and can't YET see the unit.
@@ -1101,7 +1104,7 @@ struct _TileSeen {
 				 */
 				if(!unit->VisCount[p] && unit->Orders[0]->Action == UnitActionDie)
 				{
-					return true;
+					return;
 				}
 			
 				Assert(unit->VisCount[p]);
@@ -1124,7 +1127,6 @@ struct _TileSeen {
 				}
 			}
 		}
-		return true;
 	}	
 };
 
@@ -1199,27 +1201,35 @@ void UnitCountSeen(CUnit *unit)
 		}
 	}
 
-	const unsigned int start_index = unit->Y * Map.Info.MapWidth;
+	const unsigned int start_index = Map.getIndex(unit->X, unit->Y);
+	const int height = unit->Type->TileHeight;          // Tile height of the unit.
+	const int width = unit->Type->TileWidth;          // Tile width of the unit.
+	unsigned int index;
+	CMapField *mf;
 	//  Calculate new VisCount values.
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Type != PlayerNobody) {
 			newv = 0;
-			unsigned int index = start_index;
-			for (y = 0; y < unit->Type->TileHeight; ++y) {
-				for (x = 0; x < unit->Type->TileWidth; ++x) {				
+			y = height;
+			index = start_index;
+			do {
+				mf = Map.Field(index);
+				x = width;
+				do {
 					if (unit->Type->PermanentCloak && unit->Player != &Players[p]) {
-						if (Map.Field(index + unit->X + x)->VisCloak[p]) {
+						if (mf->VisCloak[p]) {
 							newv++;
 						}
 					} else {
 						//  Icky ugly code trick. With NoFogOfWar we haveto be > 0;
-						if (Map.Field(index + unit->X + x)->Visible[p] > 1 - (Map.NoFogOfWar ? 1 : 0)) {
+						if (mf->Visible[p] > 1 - (Map.NoFogOfWar ? 1 : 0)) {
 							newv++;
 						}
 					}
-				}
+					++mf;
+				} while(--x);
 				index += Map.Info.MapWidth;
-			}
+			} while(--y);
 			unit->VisCount[p] = newv;
 		}
 	}
@@ -3072,34 +3082,6 @@ int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2)
 }
 
 /**
-**  Returns the map distance to unit.
-**
-**  @param x     X map tile position.
-**  @param y     Y map tile position.
-**  @param dest  Distance to this unit.
-**
-**  @return      The distance between in tiles.
-*/
-int MapDistanceToUnit(int x, int y, const CUnit *dest)
-{
-	return MapDistanceToType(x, y, dest->Type, dest->X, dest->Y);
-}
-
-/**
-**  Returns the map distance between two units.
-**
-**  @param src  Distance from this unit.
-**  @param dst  Distance to this unit.
-**
-**  @return     The distance between in tiles.
-*/
-int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst)
-{
-	return MapDistanceBetweenTypes(src->Type, src->X, src->Y,
-		dst->Type, dst->X, dst->Y);
-}
-
-/**
 **  Returns the map distance between two points with unit type.
 **
 **  @param src  src unittype
@@ -3170,8 +3152,8 @@ int ViewPointDistance(int x, int y)
 int ViewPointDistanceToUnit(const CUnit *dest)
 {
 	const CViewport *vp = UI.SelectedViewport;;
-	return MapDistanceToUnit(vp->MapX + vp->MapWidth / 2,
-		vp->MapY + vp->MapHeight / 2, dest);
+	return dest->MapDistanceTo(vp->MapX + vp->MapWidth / 2,
+		vp->MapY + vp->MapHeight / 2);
 }
 
 /**

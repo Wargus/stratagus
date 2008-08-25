@@ -59,7 +59,7 @@ struct _EnemyOnMapTile {
 	const CUnit *const source;
 	const int x,y;
 	_EnemyOnMapTile(const CUnit *unit, int _x, int _y): best(0), source(unit) , x(_x), y(_y) {}
-	inline bool operator() (CUnit *const unit) {
+	inline void operator() (CUnit *const unit) {
 		const CUnitType *const type = unit->Type;
 		// unusable unit ?
 		// if (unit->IsUnusable()) can't attack constructions
@@ -68,17 +68,17 @@ struct _EnemyOnMapTile {
 		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
 				//(!UnitVisible(unit, source->Player)) ||
 				unit->Orders[0]->Action == UnitActionDie) {
-			return true;
+			return;
 		}
 		if (x < unit->X || x >= unit->X + type->TileWidth ||
 				y < unit->Y || y >= unit->Y + type->TileHeight) {
-			return true;
+			return;
 		}
 		if (!CanTarget(source->Type, type)) {
-			return true;
+			return;
 		}
 		if (!source->Player->IsEnemy(unit)) { // a friend or neutral
-			return true;
+			return;
 		}
 		//
 		// Choose the best target.
@@ -86,7 +86,7 @@ struct _EnemyOnMapTile {
 		if (!best || best->Type->Priority < type->Priority) {
 			best = unit;
 		}
-		return true;
+		return;
 	}
 };
 
@@ -559,28 +559,23 @@ int AiPlanAttack(AiForce *force)
 		// FIXME: should tell the resource manager we need a transporter!
 		return 0;
 	}
+
 	//
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	//
-	for (i = 0; i < force->Units.size(); ++i) {
-		aiunit = force->Units[i];
-		if (aiunit->Type->UnitType == UnitTypeLand) {
-			DebugPrint("%d: Land unit %d\n" _C_ AiPlayer->Player->Index _C_ UnitNumber(aiunit));
-			break;
-		}
-	}
-	if (i == force->Units.size()) {
+	if(CUnitTypeFinder(UnitTypeLand).FindInCache(force->Units) == NULL) {
 		DebugPrint("%d: No land unit in force\n" _C_ AiPlayer->Player->Index);
 		return 0;
 	}
+
 	x = force->GoalX;
 	y = force->GoalY;
 	if (AiFindTarget(aiunit, watermatrix, &x, &y, &state)) {
 		if (state != 1) { // Need transporter.
 			if (transporter) {
 				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
-				force->Units.insert(force->Units.begin(), transporter);
+				force->Units.Insert(transporter);
 				transporter->RefsIncrease();
 			}
 			int totalBoardCapacity = 0;
@@ -589,30 +584,30 @@ int AiPlanAttack(AiForce *force)
 			// Verify we have enough transporter.
 			// @note: Minimal check for unitType (flyers...)
 			for (unsigned int i = 0; i < force->Units.size(); ++i) {
-				CUnit &aiunit = *force->Units[i];
+				CUnit *aiunit = force->Units[i];
 
-				if (aiunit.Type->CanTransport) {
-					totalBoardCapacity += aiunit.Type->MaxOnBoard - aiunit.BoardCount;
-					transporter = &aiunit;
+				if (aiunit->Type->CanTransport) {
+					totalBoardCapacity += aiunit->Type->MaxOnBoard - aiunit->BoardCount;
+					transporter = aiunit;
 				}
 			}
 			for (unsigned int i = 0; i < force->Units.size(); ++i) {
-				CUnit &aiunit = *force->Units[i];
+				CUnit *aiunit = force->Units[i];
 
-				if (CanTransport(transporter, &aiunit)) {
+				if (CanTransport(transporter, aiunit)) {
 					totalBoardCapacity--;
 				}
 			}
 			if (totalBoardCapacity < 0) { // Not enough transporter.
 				// Add all other idle transporter.
 				for (unsigned i = 0; i < static_cast<unsigned int>(AiPlayer->Player->TotalNumUnits); ++i) {
-					CUnit &aiunit = *AiPlayer->Player->Units[i];
+					CUnit *aiunit = AiPlayer->Player->Units[i];
 
-					if (transporterAdded != &aiunit && aiunit.Type->CanTransport && aiunit.IsIdle()) {
+					if (transporterAdded != aiunit && aiunit->Type->CanTransport && aiunit->IsIdle()) {
 						DebugPrint("%d: Assign another transporter.\n"_C_ AiPlayer->Player->Index);
-						force->Units.insert(force->Units.begin(), &aiunit);
-						aiunit.RefsIncrease();
-						totalBoardCapacity += aiunit.Type->MaxOnBoard - aiunit.BoardCount;
+						force->Units.Insert(aiunit);
+						aiunit->RefsIncrease();
+						totalBoardCapacity += aiunit->Type->MaxOnBoard - aiunit->BoardCount;
 						if (totalBoardCapacity >= 0) {
 							break;
 						}

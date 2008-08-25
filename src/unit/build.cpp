@@ -1,15 +1,16 @@
-//     ____                _       __               
-//    / __ )____  _____   | |     / /___ ___________
-//   / __  / __ \/ ___/   | | /| / / __ `/ ___/ ___/
-//  / /_/ / /_/ (__  )    | |/ |/ / /_/ / /  (__  ) 
-// /_____/\____/____/     |__/|__/\__,_/_/  /____/  
-//                                              
-//       A futuristic real-time strategy game.
-//          This file is part of Bos Wars.
+//       _________ __                 __
+//      /   _____//  |_____________ _/  |______     ____  __ __  ______
+//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
+//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+//             \/                  \/          \//_____/            \/
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name build.cpp - The units. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2008 by Lutz Sammer, Jimmy Salmon and Rafal Bursig
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -170,7 +171,7 @@ bool CBuildRestrictionDistance::Check(const CUnitType *type, int x, int y, CUnit
 	return false;
 }
 
-inline bool CBuildRestrictionAddOn::functor::operator() (CUnit *const unit)
+inline bool CBuildRestrictionAddOn::functor::operator() (const CUnit *const unit) const
 {
 	return (unit->Type == Parent &&
 				unit->X == x && unit->Y == y);
@@ -200,8 +201,8 @@ bool CBuildRestrictionAddOn::Check(const CUnitType *type, int x, int y, CUnit *&
 */
 inline bool CBuildRestrictionOnTop::functor::operator() (CUnit *const unit)
 {
-	if (unit->X == x && unit->Y == y && !unit->Destroyed &&
-			unit->Orders[0]->Action != UnitActionDie) {
+	if (unit->X == x && unit->Y == y &&
+		!unit->Destroyed &&	unit->Orders[0]->Action != UnitActionDie) {
 		if (unit->Type == this->Parent &&
 				unit->Orders[0]->Action != UnitActionBuilt) {
 			// Available to build on
@@ -240,7 +241,7 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 	}
 #else
 		functor f(Parent, x, y);
-		Map.Field(x,y)->UnitCache.for_each(f);
+		Map.Field(x,y)->UnitCache.for_each_if(f);
 		ontoptarget = f.ontop;
 #endif
 
@@ -263,8 +264,6 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 {
 	CUnit *ontoptarget;
-	int w;
-	int h = type->TileHeight;
 
 	//
 	//  Can't build outside the map
@@ -272,52 +271,57 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 	if (x + type->TileWidth > Map.Info.MapWidth) {
 		return NULL;
 	}
-	if (y + h /*type->TileHeight*/ > Map.Info.MapHeight) {
+	if (y + type->TileHeight > Map.Info.MapHeight) {
 		return NULL;
 	}
 
 	// Must be checked before oil!
 	if (type->ShoreBuilding) {
+		const int width = type->TileWidth;
+		int w, h = type->TileHeight;
 		bool success = false;
+		CMapField *mf; 
 
 		// Need at least one coast tile
-		//unsigned int index = (y + h) * Map.Info.MapWidth;
-		unsigned int index = y * Map.Info.MapWidth;
-		//for (; h--;) {
-			//for (w = type->TileWidth; w--;) {
-		for (h = 0; h < type->TileHeight; ++h) {
-			for (w = 0; w < type->TileWidth; ++w) {
-				if (Map.CoastOnMap(x + w + index)) {
-					h = w = 0;
+		unsigned int index = Map.getIndex(x, y);
+		do {
+			mf = Map.Field(index);
+			w = width;
+			do {
+				//if (Map.CoastOnMap(x ,y)) {			
+				if((mf->Flags & MapFieldCoastAllowed) == MapFieldCoastAllowed) {
 					success = true;
-					break;
 				}
-			}
+				++mf;
+			} while(!success && --w);
 			index += Map.Info.MapWidth; 
-		}
+		} while(!success && --h);
 		if (!success) {
 			return NULL;
 		}
 	}
 
-	if (type->BuildingRules.empty()) {
-		return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
-	}
-
-	ontoptarget = NULL;
-	for (std::vector<CBuildRestriction *>::const_iterator ib = type->BuildingRules.begin(), 
-		ib_end = type->BuildingRules.end(); ib != ib_end; ++ib) {
-		// All checks processed, did we really have success
-		if ((*ib)->Check(type, x, y, ontoptarget)) {
-			// We passed a full ruleset return
-			if (unit == NULL) {
-				return ontoptarget ? ontoptarget : (CUnit *)1;
-			} else {
-				return ontoptarget ? ontoptarget : (CUnit *)unit;
+	size_t count = type->BuildingRules.size();
+	if (count > 0) {
+		ontoptarget = NULL;
+		//for (std::vector<CBuildRestriction *>::const_iterator ib = type->BuildingRules.begin(), 
+			//ib_end = type->BuildingRules.end(); ib != ib_end; ++ib) {
+		for(unsigned int i = 0; i < count; ++i) {
+			CBuildRestriction *rule = type->BuildingRules[i];
+			// All checks processed, did we really have success
+			//if ((*ib)->Check(type, x, y, ontoptarget)) {
+			if (rule->Check(type, x, y, ontoptarget)) {
+				// We passed a full ruleset return
+				if (unit == NULL) {
+					return ontoptarget ? ontoptarget : (CUnit *)1;
+				} else {
+					return ontoptarget ? ontoptarget : (CUnit *)unit;
+				}
 			}
 		}
-	}
-	return NULL;
+		return NULL;		
+	}	
+	return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 }
 
 /**

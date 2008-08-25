@@ -129,7 +129,7 @@ void HandleActionFollow(CUnit *unit)
 			// FIXME: BAD HACK
 			if ((goal = unit->Orders[0]->Goal) &&
 					goal->Type->Teleporter && goal->Goal &&
-					MapDistanceBetweenUnits(unit, goal) <= 1) {
+					unit->MapDistanceTo(goal) <= 1) {
 				CUnit *dest;
 
 				// Teleport the unit

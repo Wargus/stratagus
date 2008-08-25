@@ -308,6 +308,48 @@ static int GetButtonStatus(const ButtonAction *button)
 	return res;
 }
 
+static int GetPopupCostsWidth(const CFont *font, const int Costs[])
+{
+	int popupWidth = 0;
+	for (unsigned int i = 1; i < MaxCosts; ++i) {	
+		if (Costs[i]) {
+			popupWidth += 5;
+			if(UI.Resources[i].IconWidth != -1)
+			{
+				popupWidth += (UI.Resources[i].IconWidth + 5);
+			} else {
+				const CGraphic *G = UI.Resources[i].G;
+				if (G) {
+					popupWidth +=  (G->Width + 5);
+				}
+			}
+			popupWidth += font->Width(Costs[i]);
+		}
+	}
+	return popupWidth;
+}
+
+static int DrawPopupCosts(int x, int y, const CFont *font, const int Costs[])
+{
+	for (unsigned int i = 1; i < MaxCosts; ++i) {
+		if (Costs[i]) {
+			int y_offset = 0;
+			const CGraphic *G = UI.Resources[i].G;		
+			if (G) {
+				int x_offset = UI.Resources[i].IconWidth;
+				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
+				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
+				y_offset = G->Height;
+				y_offset -= font->Height();
+				y_offset /= 2;
+			}
+			x += VideoDrawNumber(x, y + y_offset, font, Costs[i]);
+			x += 5;
+		}
+	}
+	return x;
+}
+
 /**
 **  Draw popup
 */
@@ -322,171 +364,240 @@ static void DrawPopup()
 	const int font_height = font->Height();
 	std::string nc, rc;
 	
+	int start_x, x, popupWidth = 5;
+	int y, popupHeight = 115;//
+	
+	GetDefaultTextColors(nc, rc);
+	
 	//GameFont
 	// Draw hint
-	if (button->Action != ButtonBuild && button->Action != ButtonTrain) {
-		int popupWidth = font->Width(button->Hint) + 10;
-		int popupHeight = font_height + 10;//19;
-		int x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
-		int y = uibutton->Y - popupHeight - 10;
-		
-		GetDefaultTextColors(nc, rc);
-		//SetDefaultTextColors("black", "red");
-		SetDefaultTextColors("white", "red");
-
-		// Background
-		Video.FillTransRectangle(backgroundColor, x, y, popupWidth, popupHeight, 128);
-		Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
-
-		// Hint
-		VideoDrawText(x + 5, y + (popupHeight - font_height)/2, font, button->Hint);
-
-		SetDefaultTextColors(nc, rc);
-		return;
-	}
-
-	const CUnitType *type = UnitTypes[button->Value];
-	const CUnitStats *stats = &type->Stats[ThisPlayer->Index];
-	int popupWidth = 5;
-	const CGraphic *G;
+	switch(button->Action) {
 	
-	//detect max Width
-	{
-		for (unsigned int i = 1; i < MaxCosts; ++i) {	
-			if (stats->Costs[i]) {
+		case ButtonResearch:
+		{
+			int *Costs = AllUpgrades[button->Value]->Costs;
+			popupWidth += GetPopupCostsWidth(font, Costs);
+			popupWidth = std::max(popupWidth, font->Width(button->Hint) + 10);
+	
+			popupHeight	= 40;
+	
+			start_x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+			
+			y = uibutton->Y - popupHeight - 10;
+			x = start_x;
+			
+			SetDefaultTextColors("white", "red");
+
+			// Background
+			Video.FillTransRectangle(backgroundColor, x, y,
+												 popupWidth, popupHeight, 128);
+			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
+
+			// Name
+			VideoDrawText(x + 5, y + 5, font, button->Hint);
+			Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
+
+			y += 20;
+			x = start_x;
+			DrawPopupCosts(x + 5, y, font, Costs);
+
+		}
+		break;
+		case ButtonSpellCast:
+		{
+			// FIXME: hardcoded image!!!
+			const int IconID = GoldCost;
+			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
+			const CGraphic *G = UI.Resources[IconID].G; 
+			const SpellType *spell = SpellTypeTable[button->Value];
+			
+			if(spell->ManaCost) {
 				popupWidth += 5;
-				if(UI.Resources[i].IconWidth != -1)
+				if(UI.Resources[IconID].IconWidth != -1)
 				{
-					popupWidth += (UI.Resources[i].IconWidth + 5);
+					popupWidth += (UI.Resources[IconID].IconWidth + 5);
 				} else {
-					G = UI.Resources[i].G;
 					if (G) {
 						popupWidth +=  (G->Width + 5);
 					}
 				}
-				popupWidth += font->Width(stats->Costs[i]);
+				popupWidth += font->Width(spell->ManaCost);
+				popupHeight = 40;
+				popupWidth = std::max(popupWidth, font->Width(spell->Name) + 10);
+			} else {
+				popupWidth = font->Width(button->Hint) + 10;
+				popupHeight = font_height + 10;
+			}
+
+			popupWidth = std::max(popupWidth, 140);
+			
+			x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+			y = uibutton->Y - popupHeight - 10;
+			
+			SetDefaultTextColors("white", "red");
+
+			// Background
+			Video.FillTransRectangle(backgroundColor, x, y,
+												 popupWidth, popupHeight, 128);
+			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
+
+			if(spell->ManaCost) {
+				int y_offset = 0;
+				// Name
+				VideoDrawText(x + 5, y + 5, font, spell->Name);
+				Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);			
+				y += 20;
+				if (G) {
+					int x_offset =  UI.Resources[IconID].IconWidth;
+					x += 5;
+					// FIXME: hardcoded image!!!
+					G->DrawFrameClip(3, x, y);
+					x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
+					y_offset = G->Height;
+					y_offset -= font_height;
+					y_offset /= 2;
+				}
+				VideoDrawNumber(x, y + y_offset, font, spell->ManaCost );			
+			} else {
+				// Only Hint
+				VideoDrawText(x + 5, y + (popupHeight - font_height)/2, font, button->Hint);
 			}
 		}
-		if(type->Demand) {
-			popupWidth += 5;
-			if(UI.Resources[FoodCost].IconWidth != -1)
+		break;	
+	
+		case ButtonBuild: 	
+		case ButtonTrain:
+		case ButtonUpgradeTo:
+		{
+			const CUnitType *type = UnitTypes[button->Value];
+			const CUnitStats *stats = &type->Stats[ThisPlayer->Index];
+			const CGraphic *G;
+	
+			//detect max Width
 			{
-				popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
-			} else {
-				G = UI.Resources[FoodCost].G;
-				if (G) {
-					popupWidth +=  (G->Width + 5);
+				popupWidth += GetPopupCostsWidth(font, stats->Costs);
+				if(type->Demand) {
+					popupWidth += 5;
+					if(UI.Resources[FoodCost].IconWidth != -1)
+					{
+						popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
+					} else {
+						G = UI.Resources[FoodCost].G;
+						if (G) {
+							popupWidth +=  (G->Width + 5);
+						}
+					}
+					popupWidth += font->Width(type->Demand);
 				}
 			}
-			popupWidth += font->Width(type->Demand);
-		}
-	}
-	popupWidth = std::max(popupWidth, 140);
+			popupWidth = std::max(popupWidth, 140);
 	
-	int popupHeight = 115;//
+			start_x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+			y = uibutton->Y - popupHeight - 10;
+			x = start_x;
+
+			//SetDefaultTextColors("black", "red");
+			SetDefaultTextColors("white", "red");
+
+			// Background
+			Video.FillTransRectangle(backgroundColor, x, y,
+												 popupWidth, popupHeight, 128);
+			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
+
+			// Name
+			VideoDrawText(x + 5, y + 5, font, type->Name);
+			Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
+
+			y += 20;
+
+			// Costs
+			x += DrawPopupCosts(x + 5, y, font,  stats->Costs);
 	
-	int start_x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
-	int y = uibutton->Y - popupHeight - 10;
-	int x = start_x;
-	
-	GetDefaultTextColors(nc, rc);
-	//SetDefaultTextColors("black", "red");
-	SetDefaultTextColors("white", "red");
-
-	// Background
-	Video.FillTransRectangle(backgroundColor, x, y,
-										 popupWidth, popupHeight, 128);
-	Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
-
-	// Name
-	VideoDrawText(x + 5, y + 5, font, type->Name);
-	Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
-
-	y += 20;
-
-	// Costs
-	for (unsigned int i = 1; i < MaxCosts; ++i) {
-		if (stats->Costs[i]) {
-			int y_offset = 0;
-			int x_offset = 0;
-			G = UI.Resources[i].G;		
-			x += 5;
-			if (G) {
-				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
-				x_offset = UI.Resources[i].IconWidth;
-				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
-				y_offset = G->Height;
-				y_offset -= font_height;
-				y_offset /= 2;
+			if(type->Demand) {
+					int y_offset = 0;
+					G = UI.Resources[FoodCost].G;
+					if (G) {
+						int x_offset =  UI.Resources[FoodCost].IconWidth;
+						G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
+						x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
+						y_offset = G->Height;
+						y_offset -= font_height;
+						y_offset /= 2;
+					}
+					VideoDrawNumber(x, y + y_offset, font, type->Demand );
+					//x += 5;
 			}
-			x += VideoDrawNumber(x, y + y_offset, font, stats->Costs[i] );
-		}
-	}
 	
-	if(type->Demand) {
-			int y_offset = 0;
-			int x_offset = 0;
-			G = UI.Resources[FoodCost].G;
-			x += 5;
-			if (G) {
-				G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
-				x_offset = UI.Resources[FoodCost].IconWidth;
-				x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
-				y_offset = G->Height;
-				y_offset -= font_height;
-				y_offset /= 2;
+			y += 20;//15;
+			x = start_x;
+	
+			// Hit Points
+			{
+				std::ostringstream hitPoints;
+				hitPoints << "Hit Points: " << type->Variable[HP_INDEX].Value;
+				VideoDrawText(x + 5, y, font, hitPoints.str());
+				y += 15;
 			}
-			VideoDrawNumber(x, y + y_offset, font, type->Demand );
-	}
 	
-	y += 20;//15;
-	x = start_x;
-	
-	// Hit Points
-	{
-		std::ostringstream hitPoints;
-		hitPoints << "Hit Points: " << type->Variable[HP_INDEX].Value;
-		VideoDrawText(x + 5, y, font, hitPoints.str());
-		y += 15;
-	}
-	
-	if (type->CanAttack) {
-		// Damage
-		int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
-		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value + type->Variable[BASICDAMAGE_INDEX].Value;
-		std::ostringstream damage;
-		damage << "Damage: " << min_damage << "-" << max_damage;
-		VideoDrawText(x + 5, y, font, damage.str());
-		y += 15;
+			if (type->CanAttack) {
+				// Damage
+				int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
+				int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value + type->Variable[BASICDAMAGE_INDEX].Value;
+				std::ostringstream damage;
+				damage << "Damage: " << min_damage << "-" << max_damage;
+				VideoDrawText(x + 5, y, font, damage.str());
+				y += 15;
 
-		// Attack Range
-		std::ostringstream attackRange;
-		attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
-		VideoDrawText(x + 5, y, font, attackRange.str());
-		y += 15;
-	}
+				// Attack Range
+				std::ostringstream attackRange;
+				attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
+				VideoDrawText(x + 5, y, font, attackRange.str());
+				y += 15;
+			}
 
-	// Armor
-	{
-		std::ostringstream armor;
-		armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
-		VideoDrawText(x + 5, y, font, armor.str());
-		y += 15;
+			// Armor
+			{
+				std::ostringstream armor;
+				armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
+				VideoDrawText(x + 5, y, font, armor.str());
+				y += 15;
+			}
+	
+			if (type->Variable[RADAR_INDEX].Value) {
+				// Radar Range
+				std::ostringstream radarRange;
+				radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
+				VideoDrawText(x + 5, y, font, radarRange.str());
+			} else {
+				// Sight Range
+				std::ostringstream sightRange;
+				sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
+				VideoDrawText(x + 5, y, font, sightRange.str());
+			}
+			//y += 15;
+		}
+		break;
+
+
+		default:
+			popupWidth = font->Width(button->Hint) + 10;
+			popupHeight = font_height + 10;//19;
+			x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
+			y = uibutton->Y - popupHeight - 10;
+		
+			//SetDefaultTextColors("black", "red");
+			SetDefaultTextColors("white", "red");
+
+			// Background
+			Video.FillTransRectangle(backgroundColor, x, y, popupWidth, popupHeight, 128);
+			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
+
+			// Hint
+			VideoDrawText(x + 5, y + (popupHeight - font_height)/2, font, button->Hint);
+		break;
+	
 	}
 	
-	if (type->Variable[RADAR_INDEX].Value) {
-		// Radar Range
-		std::ostringstream radarRange;
-		radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
-		VideoDrawText(x + 5, y, font, radarRange.str());
-	} else {
-		// Sight Range
-		std::ostringstream sightRange;
-		sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
-		VideoDrawText(x + 5, y, font, sightRange.str());
-	}
-	y += 15;
-
 	SetDefaultTextColors(nc, rc);
 }
 

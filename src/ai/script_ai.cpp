@@ -1360,7 +1360,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						lua_rawgeti(l, -1, subk + 1);
 						ident = LuaToString(l, -1);
 						lua_pop(l, 1);
-						ai->Force[i].Units.push_back(UnitSlots[num]);
+						ai->Force[i].Units.Insert(UnitSlots[num]);
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "state")) {

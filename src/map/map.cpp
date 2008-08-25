@@ -431,14 +431,15 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 	int removedtile;
 	int flags;
 	CMapField *mf;
-
+	unsigned int index;
 	//  Outside of map or no wood.
 	if (!Info.IsPointOnMap(x, y))
 	{
 		return;
 	}
 	
-	mf = this->Field(x, y);
+	index = getIndex(x,y);
+	mf = this->Field(index);
 
 	if (seen && !Tileset.IsSeenTile(type, mf->SeenTile)) {
 		return;
@@ -566,7 +567,8 @@ void CMap::FixTile(unsigned short type, int seen, int x, int y)
 		}
 	}
 
-	if(mf->IsVisible(ThisPlayer, NoFogOfWar) > 0) {
+	//maybe isExplored
+	if(IsTileVisible(ThisPlayer, index) > 0) {
 		UI.Minimap.UpdateSeenXY(x, y);
 		if (!seen) {
 			MarkSeenTile(x, y);
@@ -603,11 +605,11 @@ void CMap::FixNeighbors(unsigned short type, int seen, int x, int y)
 */
 void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 {
-	CMapField *mf;
 	int removedtile;
 	int flags;
 
-	mf = this->Fields + x + y * this->Info.MapWidth;
+	unsigned int index = getIndex(x,y);
+	CMapField *mf = this->Field(index);
 
 	// Select Table to lookup
 	switch (type) {
@@ -630,7 +632,8 @@ void CMap::ClearTile(unsigned short type, unsigned x, unsigned y)
 	UI.Minimap.UpdateXY(x, y);
 	FixNeighbors(type, 0, x, y);
 
-	if(mf->IsVisible(ThisPlayer, NoFogOfWar) > 0) {
+	//maybe isExplored
+	if(IsTileVisible(ThisPlayer, index) > 0) {
 		UI.Minimap.UpdateSeenXY(x, y);
 		MarkSeenTile(x, y);
 	}

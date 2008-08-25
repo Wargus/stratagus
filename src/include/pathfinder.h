@@ -118,15 +118,6 @@ extern int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
 //
 // in astar.cpp
 //
-	/// Init the a* data structures
-extern void InitAStar(int mapWidth, int mapHeight, int (STDCALL *costMoveTo)(int x, int y, void *data));
-
-	/// free the a* data structures
-extern void FreeAStar(void);
-
-	/// Find and a* path for a unit
-extern int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
-	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data);
 
 extern void SetAStarFixedUnitCrossingCost(int cost);
 extern int GetAStarFixedUnitCrossingCost();

@@ -216,7 +216,7 @@ static int StartGathering(CUnit *unit)
 	}
 
 	// FIXME: 0 can happen, if to near placed by map designer.
-	Assert(MapDistanceBetweenUnits(unit, goal) <= 1);
+	Assert(unit->MapDistanceTo(goal) <= 1);
 
 	//
 	// Update the heading of a harvesting unit to looks straight at the resource.
@@ -470,8 +470,10 @@ static int GatherResource(CUnit *unit)
 							source->Data.Resource.Assigned--;
 							/* next == mine */
 							next = worker->Orders[0]->Arg1.Resource.Mine;
-							Assert(next == source);
-							next->RefsDecrease();
+							if(next) {
+								Assert(next == source);
+								next->RefsDecrease();
+							}
 							worker->Orders[0]->Arg1.Resource.Mine = NULL;
 							
 							next = worker->NextWorker;
@@ -825,10 +827,10 @@ void DropResource(CUnit *unit)
 			unit->ResourcesHeld < resinfo->ResourceCapacity) {
 			unit->ResourcesHeld = 0;
 
-		}// else {
+		} else {
 			//FIXME: Add support for droping resource on map
-			//unit->ResourcesHeld = 0;
-		//}
+			unit->ResourcesHeld = 0;
+		}
 		if(!resinfo->TerrainHarvester) { 
 			CUnit *mine = order->Arg1.Resource.Mine;
 			if(mine) {

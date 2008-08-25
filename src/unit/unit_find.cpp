@@ -40,6 +40,7 @@
 #include <limits.h>
 
 #include "stratagus.h"
+#include "map.h"
 #include "video.h"
 #include "sound.h"
 #include "unitsound.h"
@@ -50,7 +51,6 @@
 #include "unit.h"
 #include "interface.h"
 #include "tileset.h"
-#include "map.h"
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
@@ -128,17 +128,6 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 	return num;
 }
 
-struct _UnitOnMapTile {
-	const UnitTypeType type;
-	_UnitOnMapTile(const UnitTypeType t) : type(t) {}
-	inline bool operator() (CUnit *const unit) {
-		const CUnitType *const t = unit->Type;
-		if (t->Vanishes || (type != (UnitTypeType)-1 && t->UnitType != type))
-			return false;
-		return true;
-	}
-};
-
 /**
 **  Unit on map tile.
 **
@@ -149,8 +138,7 @@ struct _UnitOnMapTile {
 */
 CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
 {
-	_UnitOnMapTile filter((UnitTypeType)type);
-	return Map.Field(index)->UnitCache.find(filter);
+	return CUnitTypeFinder((UnitTypeType)type).FindOnTile(Map.Field(index));
 }
 
 /**
@@ -216,22 +204,6 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 --  Finding special units
 ----------------------------------------------------------------------------*/
 
-struct _ResourceOnMap {
-	const int resource;
-	const int mine_on_top;
-	_ResourceOnMap(const int r, int on_top) : 
-		resource(r), mine_on_top(on_top) {}
-	inline bool operator () (CUnit *const unit) {
-
-		CUnitType *type = unit->Type;
-		return (type->GivesResource == resource 
-			&& unit->ResourcesHeld != 0 
-			&& (mine_on_top ? type->CanHarvest : !type->CanHarvest)
-			&& !unit->IsUnusable(true) //allow mines under construction
-			);
-	}
-};
-
 /**
 **  Resource on map tile
 **
@@ -244,18 +216,8 @@ struct _ResourceOnMap {
 */
 CUnit *ResourceOnMap(int tx, int ty, int resource, bool mine_on_top)
 {
-	_ResourceOnMap filter(resource, mine_on_top);
-	return Map.Field(tx,ty)->UnitCache.find(filter);
+	return CResourceFinder(resource, mine_on_top).FindOnTile(Map.Field(tx,ty));
 }
-
-struct _ResourceDepositOnMap {
-	const int resource;
-	_ResourceDepositOnMap(const int r) : 
-		resource(r) {}
-	inline bool operator () (CUnit *const unit) {
-		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
-	}
-};
 
 /**
 **  Resource deposit on map tile
@@ -268,8 +230,7 @@ struct _ResourceDepositOnMap {
 */
 CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
 {
-	_ResourceDepositOnMap filter(resource);
-	return Map.Field(tx,ty)->UnitCache.find(filter);
+	return CResourceDepositFinder(resource).FindOnTile(Map.Field(tx,ty));
 }
 
 /*----------------------------------------------------------------------------
@@ -452,9 +413,9 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 			// Removed Unit's are in bunkers
 			//
 			if (u->Removed) {
-				d = MapDistanceBetweenUnits(u->Container, dest);
+				d = u->Container->MapDistanceTo(dest);
 			} else {
-				d = MapDistanceBetweenUnits(u, dest);
+				d = u->MapDistanceTo(dest);
 			}
 
 			if (d <= attackrange || (d <= range && UnitReachable(u, dest, attackrange))) {
@@ -573,8 +534,8 @@ static int CompareUnitDistance(const void *v1, const void *v2)
 	CUnit *c1 = *(CUnit **)v1;
 	CUnit *c2  = *(CUnit **)v2;
 
-	int d1 = MapDistanceBetweenUnits(referenceunit, c1);
-	int d2 = MapDistanceBetweenUnits(referenceunit, c2);
+	int d1 = referenceunit->MapDistanceTo(c1);
+	int d2 = referenceunit->MapDistanceTo(c2);
 
 	if (d1 - d2 != 0) {
 		return d1 - d2;
@@ -675,7 +636,7 @@ CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 		//
 		// Unit in attack range?
 		//
-		d = MapDistanceBetweenUnits(unit, dest);
+		d = unit->MapDistanceTo(dest);
 
 		// Use Circle, not square :)
 		if (d > range) {

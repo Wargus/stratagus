@@ -287,7 +287,7 @@ int CFont::Width(const int number) const
 	int utf8;
 	size_t pos = 0;
 	char text[ sizeof(int) * 10 + 2];
-	const int len = FormatNumber(number, text) + 1;
+	const int len = FormatNumber(number, text);
 	
 	while (GetUTF8(text, len, pos, utf8)) {
 #if 0
@@ -449,7 +449,7 @@ static void VideoDrawCharClip(const CGraphic *g, int gx, int gy, int w, int h,
 **
 **  @return      The length of the printed text.
 */
-static int DoDrawText(int x, int y, CFont *font, const std::string &text,
+static int DoDrawText(int x, int y, const CFont *font, const std::string &text,
 	int clip)
 {
 	int w;
@@ -576,7 +576,7 @@ static int DoDrawText(int x, int y, CFont *font, const std::string &text,
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawText(int x, int y, CFont *font, const std::string &text)
+int VideoDrawText(int x, int y, const CFont *font, const std::string &text)
 {
 	return DoDrawText(x, y, font, text, 0);
 }
@@ -593,7 +593,7 @@ int VideoDrawText(int x, int y, CFont *font, const std::string &text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawTextClip(int x, int y, CFont *font, const std::string &text)
+int VideoDrawTextClip(int x, int y, const CFont *font, const std::string &text)
 {
 	return DoDrawText(x, y, font, text, 1);
 }
@@ -610,7 +610,7 @@ int VideoDrawTextClip(int x, int y, CFont *font, const std::string &text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawReverseText(int x, int y, CFont *font, const std::string &text)
+int VideoDrawReverseText(int x, int y, const CFont *font, const std::string &text)
 {
 	int w;
 
@@ -633,7 +633,8 @@ int VideoDrawReverseText(int x, int y, CFont *font, const std::string &text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawReverseTextClip(int x, int y, CFont *font, const std::string &text)
+int VideoDrawReverseTextClip(int x, int y, const CFont *font,
+ const std::string &text)
 {
 	int w;
 
@@ -656,7 +657,7 @@ int VideoDrawReverseTextClip(int x, int y, CFont *font, const std::string &text)
 **
 **  @return      The length of the printed text.
 */
-int VideoDrawTextCentered(int x, int y, CFont *font, const std::string &text)
+int VideoDrawTextCentered(int x, int y, const CFont *font, const std::string &text)
 {
 	int dx;
 
@@ -777,7 +778,7 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawNumber(int x, int y, CFont *font, int number)
+int VideoDrawNumber(int x, int y, const CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -795,7 +796,7 @@ int VideoDrawNumber(int x, int y, CFont *font, int number)
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawNumberClip(int x, int y, CFont *font, int number)
+int VideoDrawNumberClip(int x, int y, const CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -813,7 +814,7 @@ int VideoDrawNumberClip(int x, int y, CFont *font, int number)
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawReverseNumber(int x, int y, CFont *font, int number)
+int VideoDrawReverseNumber(int x, int y, const CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -831,7 +832,7 @@ int VideoDrawReverseNumber(int x, int y, CFont *font, int number)
 **
 **  @return        The length of the printed text.
 */
-int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number)
+int VideoDrawReverseNumberClip(int x, int y, const CFont *font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 

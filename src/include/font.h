@@ -154,23 +154,23 @@ extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
 	///  Return the 'line' line of the string 's'.
 extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, CFont *font);
 	/// Draw text unclipped
-extern int VideoDrawText(int x, int y, CFont *font, const std::string &text);
+extern int VideoDrawText(int x, int y, const CFont *font, const std::string &text);
 	/// Draw text unclipped
-extern int VideoDrawTextClip(int x, int y, CFont *font, const std::string &text);
+extern int VideoDrawTextClip(int x, int y, const CFont *font, const std::string &text);
 	/// Draw reverse text unclipped
-extern int VideoDrawReverseText(int x, int y, CFont *font, const std::string &text);
+extern int VideoDrawReverseText(int x, int y, const CFont *font, const std::string &text);
 	/// Draw reverse text clipped
-extern int VideoDrawReverseTextClip(int x, int y, CFont *font, const std::string &text);
+extern int VideoDrawReverseTextClip(int x, int y, const CFont *font, const std::string &text);
 	/// Draw text centered and unclipped
-extern int VideoDrawTextCentered(int x, int y, CFont *font, const std::string &text);
+extern int VideoDrawTextCentered(int x, int y, const CFont *font, const std::string &text);
 	/// Draw number unclipped
-extern int VideoDrawNumber(int x, int y, CFont *font, int number);
+extern int VideoDrawNumber(int x, int y, const CFont *font, int number);
 	/// Draw number clipped
-extern int VideoDrawNumberClip(int x, int y, CFont *font, int number);
+extern int VideoDrawNumberClip(int x, int y, const CFont *font, int number);
 	/// Draw reverse number unclipped
-extern int VideoDrawReverseNumber(int x, int y, CFont *font, int number);
+extern int VideoDrawReverseNumber(int x, int y, const CFont *font, int number);
 	/// Draw reverse number clipped
-extern int VideoDrawReverseNumberClip(int x, int y, CFont *font, int number);
+extern int VideoDrawReverseNumberClip(int x, int y, const CFont *font, int number);
 
 	/// Get the hot key from a string
 extern int GetHotKey(const std::string &text);

@@ -110,7 +110,7 @@ static int WaitForTransporter(CUnit *unit)
 		return 0;
 	}
 
-	if (MapDistanceBetweenUnits(unit, trans) == 1) {
+	if (unit->MapDistanceTo(trans) == 1) {
 		// enter transporter
 		return 1;
 	}

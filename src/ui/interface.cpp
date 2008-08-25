@@ -699,7 +699,7 @@ int HandleCheats(const std::string &input)
 {
 	int ret;
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(PROF)
 	if (input == "ai me") {
 		if (ThisPlayer->AiEnabled) {
 			// FIXME: UnitGoesUnderFog and UnitGoesOutOfFog change unit refs

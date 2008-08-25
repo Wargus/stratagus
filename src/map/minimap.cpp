@@ -628,7 +628,7 @@ static void DrawUnitOn(CUnit *unit, int red_phase)
 	}
 	
 
-	{
+	if (w && h) {
 #ifdef USE_OPENGL
 		const int pitch = MinimapTextureWidth;
 		void *pixels = (void *)MinimapSurface;

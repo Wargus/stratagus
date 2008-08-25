@@ -445,9 +445,9 @@ void FireMissile(CUnit *unit)
 		//
 		// Moved out of attack range?
 		//
-		if (MapDistanceBetweenUnits(unit, goal) < unit->Type->MinAttackRange) {
+		if (unit->MapDistanceTo(goal) < unit->Type->MinAttackRange) {
 			DebugPrint("Missile target too near %d,%d\n" _C_
-				MapDistanceBetweenUnits(unit, goal) _C_ unit->Type->MinAttackRange);
+				unit->MapDistanceTo(goal) _C_ unit->Type->MinAttackRange);
 			// FIXME: do something other?
 			return;
 		}
@@ -976,7 +976,7 @@ void MissileHit(Missile *missile)
 		// NOTE: perhaps this should be come a property of the missile.
 		//
 		if (CanTarget(missile->SourceUnit->Type, goal->Type)) {
-			splash = MapDistanceToUnit(x, y, goal);
+			splash = goal->MapDistanceTo(x, y);
 			if (splash) {
 				splash *= missile->Type->SplashFactor;
 			} else {
@@ -1622,18 +1622,23 @@ void MissileFlameShield::Action()
 	}
 }
 
-struct _MissileLandMineExp {
+struct LandMineTargetFinder {
 	const CUnit *const source;
 	int CanHitOwner;
-	_MissileLandMineExp(const CUnit *unit, int hit):
+	LandMineTargetFinder(const CUnit *unit, int hit):
 		 source(unit), CanHitOwner(hit) {}
-	inline bool operator() (CUnit *const unit) {
+	inline bool operator() (const CUnit *const unit) const
+	{
 		return (
 				!(unit == source && !CanHitOwner) &&
 				unit->Type->UnitType != UnitTypeFly &&
 				unit->Orders[0]->Action != UnitActionDie
 				);
 	}
+	inline CUnit *FindOnTile(const CMapField *const mf) const
+	{
+		return mf->UnitCache.find(*this);
+	}	
 };
 
 /**
@@ -1646,8 +1651,8 @@ void MissileLandMine::Action()
 	int x = this->X / TileSizeX;
 	int y = this->Y / TileSizeY;
 
-	_MissileLandMineExp filter(this->SourceUnit, this->Type->CanHitOwner);
-	if(Map.Field(x,y)->UnitCache.find(filter) != NULL) {
+	if(LandMineTargetFinder(this->SourceUnit,
+		 this->Type->CanHitOwner).FindOnTile(Map.Field(x,y)) != NULL) {
 		DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);	
 		MissileHit(this);
 		this->TTL = 0;

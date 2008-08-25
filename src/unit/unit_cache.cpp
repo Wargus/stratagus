@@ -106,16 +106,15 @@ int CMap::Select(int x, int y, CUnit *table[],
 							const int tablesize)
 {
 	int n = 0;
-	CMapField *mf = Map.Field(x, y);
-	std::vector<CUnit *>::const_iterator i(mf->UnitCache.begin()),
-		 end(mf->UnitCache.end());
-	for (; n < tablesize && i != end; ++i) {
-		Assert(!(*i)->Removed);
-		table[n++] = *i;
+	CMapField *mf = Field(x, y);
+	const size_t size = mf->UnitCache.size();
+	for(unsigned int i = 0; n < tablesize && i < size; ++i) {
+		CUnit *unit = mf->UnitCache.Units[i];
+		Assert(!unit->Removed);
+		table[n++] = unit;
 	}
 	return n;
 }
-
 
 /**
 **  Select units in rectangle range.
@@ -139,10 +138,9 @@ int CMap::Select(int x1, int y1,
 	}
 
 	int i;
-	int j;
 	int n = 0;
 	CUnit *unit;
-	CMapField *mf;
+	const CMapField *mf;
 	bool unitAdded[UnitMax];
 	bool *m;
 	//
@@ -155,32 +153,30 @@ int CMap::Select(int x1, int y1,
 
 	memset(unitAdded, 0, sizeof(unitAdded));
 	
-	std::vector<CUnit *>::const_iterator k, end;
-	unsigned int index = y1 * Info.MapWidth;
-	for (j = y1; j <= y2 && n < tablesize; ++j) {
-		mf = Map.Field(index + x1);	
-		for (i = x1; i <= x2 && n < tablesize; ++i) {
-			k = mf->UnitCache.begin();
-			end = mf->UnitCache.end();
-			for (; n < tablesize && k != end; ++k) {
-				//
-				// To avoid getting a unit in multiple times we use a cache lock.
-				// It should only be used in here, unless you somehow want the unit
-				// to be out of cache.
-				//
-				unit = (*k);
-				m = &(unitAdded[unit->Slot]);
-				if (!(*m) && !unit->Type->Revealer) {
-					Assert(!unit->Removed);
-					*m = true;
-					table[n++] = unit;
-				}
+	unsigned int index = x1 + y1 * Info.MapWidth;
+	int j = y2 - y1 + 1;
+	do {
+		mf = Field(index);
+		i = x2 - x1 + 1;
+		do {
+			const size_t count = mf->UnitCache.size();
+			if(count) {
+				unsigned int k = 0;
+				do {
+					unit = mf->UnitCache.Units[k];
+					m = &(unitAdded[unit->Slot]);
+					if (!(*m) && !unit->Type->Revealer) {
+						Assert(!unit->Removed);
+						*m = true;
+						table[n++] = unit;
+					}				
+				} while(++k < count && n < tablesize);
 			}
 			++mf;
-		}
+		} while(--i && n < tablesize);
 		index += Info.MapWidth;
-	}
-
+	} while(--j && n < tablesize);
+	
 	return n;
 }
 

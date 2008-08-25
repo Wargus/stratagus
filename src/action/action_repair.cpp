@@ -218,7 +218,7 @@ void HandleActionRepair(CUnit *unit)
 				//
 				// Have reached target? FIXME: could use return value
 				//
-				if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange &&
+				if (goal && unit->MapDistanceTo(goal) <= unit->Type->RepairRange &&
 						goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 					unit->State = 0;
 					unit->SubAction = 2;
@@ -267,7 +267,7 @@ void HandleActionRepair(CUnit *unit)
 						unit->Orders[0]->Goal = goal = NULL;
 						NewResetPath(unit);
 					} else {
-						int dist = MapDistanceBetweenUnits(unit, goal);
+						int dist = unit->MapDistanceTo(goal);
 						if (dist <= unit->Type->RepairRange) {
 							RepairUnit(unit, goal);
 							goal = unit->Orders[0]->Goal;

@@ -150,7 +150,7 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 		n = Map.Select(xmin, ymin, xmax + 1, ymax + 1, table);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
-					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
+					table[i]->MapDistanceTo(x, y) <= this->Range) {
 				// Don't hit flying units!
 				HitUnit(caster, table[i], this->Damage);
 			}

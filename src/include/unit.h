@@ -358,8 +358,17 @@
 #include <vector>
 #include "SDL.h"
 
+#ifndef __UNITTYPE_H__
 #include "unittype.h"
+#endif
+
+#ifndef __MAP_TILE_H__
+#include "tile.h"
+#endif
+
+#ifndef __PLAYER_H__
 #include "player.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -379,8 +388,33 @@ class CFile;
 struct lua_State;
 class CViewport;
 class CAnimation;
+
 	/// Called whenever the selected unit was updated
 extern void SelectedUnitChanged(void);
+
+/**
+**  Returns the map distance between two points.
+**
+**  @param x1  X map tile position.
+**  @param y1  Y map tile position.
+**  @param x2  X map tile position.
+**  @param y2  Y map tile position.
+**
+**  @return    The distance between in tiles.
+*/
+static inline int MapDistance(int x1, int y1, int x2, int y2)
+{
+	return isqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+	/// Returns the map distance between two points with unit-type
+extern int MapDistanceToType(int x1, int y1,
+	const CUnitType *type, int x2, int y2);
+
+	/// Returns the map diestance between to unittype as locations
+extern int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1,
+	 const CUnitType *dst, int x2, int y2);
+
 
 /**
 **  Unit references over network, or for memory saving.
@@ -867,6 +901,90 @@ public:
 	bool IsTeamed(const CUnit *x) const;
 
 	bool IsUnusable(bool ignore_built_state = false) const;
+	
+	/**
+	 **  Returns the map distance between this unit and dst units.
+	 **
+	 **  @param dst  Distance to this unit.
+	 **
+	 **  @return     The distance between in tiles.
+	 */
+	int MapDistanceTo(const CUnit *const dst) const
+	{
+		return MapDistanceBetweenTypes(Type, X, Y,
+			dst->Type, dst->X, dst->Y);
+	}
+	
+	/**
+	 **  Returns the map distance to unit.
+	 **
+	 **  @param x     X map tile position.
+	 **  @param y     Y map tile position.
+	 **  @param dest  Distance to this unit.
+	 **
+	 **  @return      The distance between in tiles.
+	 */
+	int MapDistanceTo(int x, int y) const
+	{
+		return MapDistanceToType(x, y, Type, X, Y);
+	}	
+	
+	
+};
+
+//unit_find
+struct CUnitTypeFinder {
+	const UnitTypeType type;
+	CUnitTypeFinder(const UnitTypeType t) : type(t)  {}
+	inline bool operator() (const CUnit *const unit) const
+	{
+		const CUnitType *const t = unit->Type;
+		if (t->Vanishes || (type != (UnitTypeType)-1 && t->UnitType != type))
+			return false;
+		return true;
+	}
+
+	inline CUnit *FindInCache(const CUnitCache &cache) const
+	{
+			return cache.find(*this);
+	}
+	
+	inline CUnit *FindOnTile(const CMapField *const mf) const
+	{
+			return mf->UnitCache.find(*this);
+	}
+};
+
+struct CResourceFinder {
+	const int resource;
+	const int mine_on_top;
+	CResourceFinder(const int r, int on_top) : resource(r), mine_on_top(on_top) {}
+	inline bool operator () (const CUnit *const unit) const
+	{
+		const CUnitType *const type = unit->Type;
+		return (type->GivesResource == resource 
+			&& unit->ResourcesHeld != 0 
+			&& (mine_on_top ? type->CanHarvest : !type->CanHarvest)
+			&& !unit->IsUnusable(true) //allow mines under construction
+			);
+	}
+	inline CUnit *FindOnTile(const CMapField *const mf) const
+	{
+		return mf->UnitCache.find(*this);
+	}	
+};
+
+struct CResourceDepositFinder {
+	const int resource;
+	CResourceDepositFinder(const int r) : resource(r) {}
+	inline bool operator () (const CUnit *const unit) const
+	{
+		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+	}
+	inline CUnit *FindOnTile(const CMapField *const mf) const
+	{
+		return mf->UnitCache.find(*this);
+	}	
 };
 
 #define NoUnitP (CUnit *)0        /// return value: for no unit found
@@ -1016,33 +1134,6 @@ extern void LetUnitDie(CUnit *unit);
 extern void DestroyAllInside(CUnit *source);
 	/// Hit unit with damage, if destroyed give attacker the points
 extern void HitUnit(CUnit *attacker, CUnit *target, int damage);
-
-	/// Returns the map distance between two points
-//extern int MapDistance(int x1, int y1, int x2, int y2);
-/**
-**  Returns the map distance between two points.
-**
-**  @param x1  X map tile position.
-**  @param y1  Y map tile position.
-**  @param x2  X map tile position.
-**  @param y2  Y map tile position.
-**
-**  @return    The distance between in tiles.
-*/
-static inline int MapDistance(int x1, int y1, int x2, int y2)
-{
-	return isqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-}
-
-
-	/// Returns the map distance between two points with unit-type
-extern int MapDistanceToType(int x1, int y1, const CUnitType *type, int x2, int y2);
-	/// Returns the map distance to unit
-extern int MapDistanceToUnit(int x, int y, const CUnit *dest);
-	/// Returns the map diestance between to unittype as locations
-extern int MapDistanceBetweenTypes(const CUnitType *src, int x1, int y1, const CUnitType *dst, int x2, int y2);
-	/// Returns the map distance between two units
-extern int MapDistanceBetweenUnits(const CUnit *src, const CUnit *dst);
 
 	/// Calculate the distance from current view point to coordinate
 extern int ViewPointDistance(int x, int y);

@@ -108,8 +108,7 @@ static void SpellMoveToTarget(CUnit *unit)
 	// FIXME: use return codes from pathfinder
 	goal = unit->Orders[0]->Goal;
 
-	if (goal && MapDistanceBetweenUnits(unit, goal) <=
-			unit->Orders[0]->Range) {
+	if (goal && unit->MapDistanceTo(goal) <=	unit->Orders[0]->Range) {
 
 		// there is goal and it is in range
 		unit->State = 0;
@@ -118,8 +117,8 @@ static void SpellMoveToTarget(CUnit *unit)
 			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
-	} else if (!goal && MapDistanceToUnit(unit->Orders[0]->X,
-			unit->Orders[0]->Y, unit) <= unit->Orders[0]->Range) {
+	} else if (!goal && unit->MapDistanceTo(unit->Orders[0]->X,
+			unit->Orders[0]->Y) <= unit->Orders[0]->Range) {
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit,
 			unit->Orders[0]->X + unit->Orders[0]->Arg1.Spell->Range - unit->X,
