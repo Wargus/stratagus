@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Fri Aug 15 18:07:05 2008.
+** Generated automatically by tolua++-1.0.92 on Mon Aug 25 16:48:57 2008.
 */
 
 #ifndef __cplusplus
@@ -16996,21 +16996,6 @@ static int tolua_get_unsigned_GameCycle(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* set function: GameCycle */
-#ifndef TOLUA_DISABLE_tolua_set_unsigned_GameCycle
-static int tolua_set_unsigned_GameCycle(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  GameCycle = ((unsigned long)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: Race of class  SettingsPresets */
 #ifndef TOLUA_DISABLE_tolua_get_SettingsPresets_Race
 static int tolua_get_SettingsPresets_Race(lua_State* tolua_S)
@@ -20069,7 +20054,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
   tolua_function(tolua_S,"GetGameSpeed",tolua_stratagus_GetGameSpeed00);
   tolua_variable(tolua_S,"GameSpeed",tolua_get_GameSpeed,tolua_set_GameSpeed);
   tolua_variable(tolua_S,"GameObserve",tolua_get_GameObserve,tolua_set_GameObserve);
-  tolua_variable(tolua_S,"GameCycle",tolua_get_unsigned_GameCycle,tolua_set_unsigned_GameCycle);
+  tolua_variable(tolua_S,"GameCycle",tolua_get_unsigned_GameCycle,NULL);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"SettingsPresets","SettingsPresets","",tolua_collect_SettingsPresets);
   #else
