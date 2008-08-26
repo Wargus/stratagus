@@ -32,6 +32,9 @@
 #define __ACTIONS_H__
 
 //@{
+#ifndef __UNIT_CACHE_H__
+#include "unit_cache.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations

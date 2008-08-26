@@ -53,6 +53,7 @@
 #include "interface.h"
 #include "iolib.h"
 #include "ui.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
