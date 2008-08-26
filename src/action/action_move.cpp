@@ -92,6 +92,7 @@ int DoActionMove(CUnit *unit)
 	int x;      // Unit->X
 	int y;      // Unit->Y
 	int move;
+	int off;
 
 	Assert(CanMove(unit));
 	if (!unit->Moving &&
@@ -129,13 +130,14 @@ int DoActionMove(CUnit *unit)
 		}
 		x = unit->X;
 		y = unit->Y;
+		off = unit->Offset;
 		//
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
 		if (unit->Type->CanTransport &&
-				((Map.WaterOnMap(x, y) && Map.CoastOnMap(x + xd, y + yd)) ||
-				(Map.CoastOnMap(x, y) && Map.WaterOnMap(x + xd, y + yd)))) {
+				((Map.WaterOnMap(off) && Map.CoastOnMap(x + xd, y + yd)) ||
+				(Map.CoastOnMap(off) && Map.WaterOnMap(x + xd, y + yd)))) {
 			PlayUnitSound(unit, VoiceDocking);
 		}
 
@@ -166,7 +168,8 @@ int DoActionMove(CUnit *unit)
 
 	unit->Data.Move.Cycles++;//reset have to be manualy controled by caller.
 	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
-			Map.Field(unit->X, unit->Y)->Cost);
+			Map.Field(unit->Offset)->Cost);
+
 
 	unit->IX += xd * move;
 	unit->IY += yd * move;

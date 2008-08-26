@@ -73,7 +73,7 @@ static std::string DefaultReverseColorIndex;    /// Default reverse color index
 **  Font color graphics
 **  Usage: FontColorGraphics[CFont *font][CFontColor *color]
 */
-static std::map<CFont *, std::map<CFontColor *, CGraphic *> > FontColorGraphics;
+static std::map< const CFont *, std::map<CFontColor *, CGraphic *> > FontColorGraphics;
 #endif
 
 // FIXME: remove these
@@ -168,7 +168,7 @@ void GetDefaultTextColors(std::string &normalp, std::string &reversep)
 /**
 **  Get the next utf8 character from a string
 */
-static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
+static inline bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 {
 	// end of string
 	if (pos >= text.size()) {
@@ -220,7 +220,7 @@ static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 /**
 **  Get the next utf8 character from a array of chars 
 */
-static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
+static inline bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 {
 	// end of string
 	if (pos >= len) {
@@ -893,7 +893,7 @@ void CFont::MeasureWidths()
 **  @param font  Font number
 */
 #ifdef USE_OPENGL
-void MakeFontColorTextures(CFont *font)
+void MakeFontColorTextures(const CFont *font)
 {
 	SDL_Surface *s;
 	CGraphic *g;
@@ -908,14 +908,14 @@ void MakeFontColorTextures(CFont *font)
 	s = g->Surface;
 	for (int i = 0; i < (int)AllFontColors.size(); ++i) {
 		CFontColor *fc = AllFontColors[i];
-		newg = FontColorGraphics[font][fc] = new CGraphic;
+		newg = new CGraphic;
 		newg->Width = g->Width;
 		newg->Height = g->Height;
 		newg->NumFrames = g->NumFrames;
 		newg->GraphicWidth = g->GraphicWidth;
 		newg->GraphicHeight = g->GraphicHeight;
 		newg->Surface = g->Surface;
-
+		FontColorGraphics[font][fc] = newg;
 		SDL_LockSurface(s);
 		for (int j = 0; j < MaxFontColors; ++j) {
 			s->format->palette->colors[j] = fc->Colors[j];
@@ -976,7 +976,7 @@ void FreeOpenGLFonts(void)
 void ReloadFonts(void)
 {
 	for (int i = 0; i < (int)AllFonts.size(); ++i) {
-		CFont *font = AllFonts[i];
+		const CFont *font = AllFonts[i];
 		if (font->G) {
 			for (int j = 0; j < (int)AllFontColors.size(); ++j) {
 				//CGraphic::Free(FontColorGraphics[font][AllFontColors[j]]);
@@ -1092,7 +1092,7 @@ void CleanFonts(void)
 	int i;
 
 	for (i = 0; i < (int)AllFonts.size(); ++i) {
-		CFont *font = AllFonts[i];
+		const CFont *font = AllFonts[i];
 
 #ifdef USE_OPENGL
 		if (!FontColorGraphics[font].empty()) {

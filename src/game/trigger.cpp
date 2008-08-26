@@ -256,6 +256,22 @@ static int CclGetNumUnitsAt(lua_State *l)
 	return 1;
 }
 
+static int SelectAroundUnit(CUnit *unit, CUnit **around)
+{
+	// FIXME: I hope SelectUnits checks bounds?
+	// FIXME: Yes, but caller should check.
+	// NOTE: +1 right,bottom isn't inclusive :(
+	if (unit->Type->UnitType == UnitTypeLand) {
+		return Map.Select(unit->X - 1, unit->Y - 1,
+			unit->X + unit->Type->TileWidth + 1,
+			unit->Y + unit->Type->TileHeight + 1, around);
+	} else {
+		return Map.Select(unit->X - 2, unit->Y - 2,
+			unit->X + unit->Type->TileWidth + 2,
+			unit->Y + unit->Type->TileHeight + 2, around);
+	}
+}
+
 /**
 **  Player has the quantity of unit-type near to unit-type.
 */
@@ -300,19 +316,8 @@ static int CclIfNearUnit(lua_State *l)
 		int s;
 
 		unit = table[i];
+		an = SelectAroundUnit(unit, around);
 
-		// FIXME: I hope SelectUnits checks bounds?
-		// FIXME: Yes, but caller should check.
-		// NOTE: +1 right,bottom isn't inclusive :(
-		if (unit->Type->UnitType == UnitTypeLand) {
-			an = Map.Select(unit->X - 1, unit->Y - 1,
-				unit->X + unit->Type->TileWidth + 1,
-				unit->Y + unit->Type->TileHeight + 1, around);
-		} else {
-			an = Map.Select(unit->X - 2, unit->Y - 2,
-				unit->X + unit->Type->TileWidth + 2,
-				unit->Y + unit->Type->TileHeight + 2, around);
-		}
 		//
 		// Count the requested units
 		//
@@ -394,19 +399,8 @@ static int CclIfRescuedNearUnit(lua_State *l)
 		int s;
 
 		unit = table[i];
+		an = SelectAroundUnit(unit, around);		
 
-		// FIXME: I hope SelectUnits checks bounds?
-		// FIXME: Yes, but caller should check.
-		// NOTE: +1 right,bottom isn't inclusive :(
-		if (unit->Type->UnitType == UnitTypeLand) {
-			an = Map.Select(unit->X - 1, unit->Y - 1,
-				unit->X + unit->Type->TileWidth + 1,
-				unit->Y + unit->Type->TileHeight + 1, around);
-		} else {
-			an = Map.Select(unit->X - 2, unit->Y - 2,
-				unit->X + unit->Type->TileWidth + 2,
-				unit->Y + unit->Type->TileHeight + 2, around);
-		}
 		//
 		// Count the requested units
 		//

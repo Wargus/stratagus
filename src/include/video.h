@@ -49,7 +49,8 @@ class CGraphic : public gcn::Image {
 		short int y;
 	};
 	
-protected:
+//protected:
+public:
 	CGraphic() : Surface(NULL),frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)

@@ -527,7 +527,7 @@ void MarkUnitFieldFlags(const CUnit *unit)
 	const unsigned int flags = unit->Type->FieldFlags; //
 	int w, h = unit->Type->TileHeight;          // Tile height of the unit.
 	const int width = unit->Type->TileWidth;          // Tile width of the unit.
-	unsigned int index = Map.getIndex(unit->X, unit->Y);
+	unsigned int index = unit->Offset;
 	do {
 		mf = Map.Field(index);
 		w = width;
@@ -564,7 +564,7 @@ void UnmarkUnitFieldFlags(const CUnit *unit)
 	const unsigned int flags = ~unit->Type->FieldFlags; //
 	int w, h = unit->Type->TileHeight;          // Tile height of the unit.
 	const int width = unit->Type->TileWidth;          // Tile width of the unit.
-	unsigned int index = Map.getIndex(unit->X, unit->Y);
+	unsigned int index = unit->Offset;
 
 	_UnmarkUnitFieldFlags funct(unit);
 
@@ -643,10 +643,22 @@ static void UnitInXY(CUnit *unit, int x, int y)
 {
 	Assert(unit);
 	CUnit *unit_inside = unit->UnitInside;
-	
+		
 	unit->X = x;
 	unit->Y = y;
-
+	unit->Offset = Map.getIndex(x,y);
+	
+	if(!unit->Container) {
+		//Only Top Units
+		const CMapField *const mf = Map.Field(unit->Offset);
+		const CPlayer *const p = unit->Player;
+		for (int player = 0; player < NumPlayers; ++player) {
+			if(player != p->Index && mf->Guard[player] && p->IsEnemy(player)) {
+				Players[player].AutoAttackTargets.InsertS(unit);
+				unit->RefsIncrease();
+			}
+		}
+	}
 	for (int i = unit->InsideCount; i--; unit_inside = unit_inside->NextContained) {
 		UnitInXY(unit_inside, x, y);
 	}
@@ -1201,7 +1213,6 @@ void UnitCountSeen(CUnit *unit)
 		}
 	}
 
-	const unsigned int start_index = Map.getIndex(unit->X, unit->Y);
 	const int height = unit->Type->TileHeight;          // Tile height of the unit.
 	const int width = unit->Type->TileWidth;          // Tile width of the unit.
 	unsigned int index;
@@ -1211,7 +1222,7 @@ void UnitCountSeen(CUnit *unit)
 		if (Players[p].Type != PlayerNobody) {
 			newv = 0;
 			y = height;
-			index = start_index;
+			index = unit->Offset;
 			do {
 				mf = Map.Field(index);
 				x = width;

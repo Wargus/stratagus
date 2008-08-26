@@ -90,11 +90,12 @@ IsTileRadarVisible(const CPlayer *const pradar,
 
 bool CUnit::IsVisibleOnRadar(const CPlayer *pradar) const
 {
+	const CMapField *mf;
 	const int x_max = Type->TileWidth;
-	unsigned int index = Y * Map.Info.MapWidth;
+	unsigned int index = Offset;
 	int j = Type->TileHeight;
 	do {
-		const CMapField *mf = Map.Field(index + X);
+		mf = Map.Field(index);
 		int i = x_max;
 		do {
 			if (IsTileRadarVisible(pradar, Player, mf) != 0) {

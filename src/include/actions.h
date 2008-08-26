@@ -149,6 +149,7 @@ extern void CommandMoveOrder(CUnit *unit, int src, int dst);
 extern void DropResource(CUnit *unit);
 extern void ResourceGiveUp(CUnit *unit);
 extern int GetNumWaitingWorkers(const CUnit *mine);
+extern void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground);
 
 	/// Generic still action
 extern void ActionStillGeneric(CUnit *unit, bool stand_ground);

@@ -111,25 +111,15 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	ymin = y - this->Range - 2;
 	xmax = x + this->Range + 2;
 	ymax = y + this->Range + 2;
-	if (xmin < 0) {
-		xmin = 0;
-	}
-	if (xmax > Map.Info.MapWidth - 1) {
-		xmax = Map.Info.MapWidth - 1;
-	}
-	if (ymin < 0) {
-		ymin = 0;
-	}
-	if (ymax > Map.Info.MapHeight - 1) {
-		ymax = Map.Info.MapHeight - 1;
-	}
+
+	Map.FixSelectionArea(xmin, ymin, xmax, ymax);
 
 	//
 	// Terrain effect of the explosion
 	//
 	for (ix = xmin; ix <= xmax; ++ix) {
 		for (iy = ymin; iy <= ymax; ++iy) {
-			n = Map.Fields[ix + iy * Map.Info.MapWidth].Flags;
+			n = Map.Field(ix + iy)->Flags;
 			if (MapDistance(ix, iy, x, y ) > this->Range) {
 				// Not in circle range
 				continue;
@@ -147,7 +137,7 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		n = Map.Select(xmin, ymin, xmax + 1, ymax + 1, table);
+		n = Map.Select(xmin, ymin, xmax + 1, ymax + 1, table, true);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
 					table[i]->MapDistanceTo(x, y) <= this->Range) {

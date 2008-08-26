@@ -304,12 +304,9 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType *type, int x, int y)
 	size_t count = type->BuildingRules.size();
 	if (count > 0) {
 		ontoptarget = NULL;
-		//for (std::vector<CBuildRestriction *>::const_iterator ib = type->BuildingRules.begin(), 
-			//ib_end = type->BuildingRules.end(); ib != ib_end; ++ib) {
 		for(unsigned int i = 0; i < count; ++i) {
 			CBuildRestriction *rule = type->BuildingRules[i];
 			// All checks processed, did we really have success
-			//if ((*ib)->Check(type, x, y, ontoptarget)) {
 			if (rule->Check(type, x, y, ontoptarget)) {
 				// We passed a full ruleset return
 				if (unit == NULL) {

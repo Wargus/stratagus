@@ -196,8 +196,8 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 {
 	const CUnit *dest;
 	CUnit *table[UnitMax];
-	unsigned n;
-	unsigned i;
+	unsigned int n;
+	unsigned int i;
 	int e;
 
 	//
@@ -206,7 +206,6 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 	n = Map.Select(x - range, y - range, 
 		x + range + (type ? type->TileWidth :0),
 		y + range + (type ? type->TileHeight:0), table);
-
 
 	//
 	// Find the enemy units which can attack

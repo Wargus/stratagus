@@ -286,6 +286,10 @@
 #include "upgrade_structs.h"
 #include "video.h"
 
+#ifndef __MAP_TILE_H__
+#include "tile.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -355,7 +359,7 @@ public:
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
-
+	CUnitCache	AutoAttackTargets; /// Current know autoattack targets
 
 	/// Change player side
 	void SetSide(int side);
@@ -396,6 +400,14 @@ public:
 
 	/// Notify player about a problem
 	void Notify(int type, int x, int y, const char *fmt, ...) const;
+
+	/**
+	**  Check if the player index is an enemy
+	*/
+	bool IsEnemy(const int index) const
+	{
+		return (Index != index && (Enemy & (1 << index)) != 0);
+	}
 
 	bool IsEnemy(const CPlayer *x) const;
 	bool IsEnemy(const CUnit *x) const;

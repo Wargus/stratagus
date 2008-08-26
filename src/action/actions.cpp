@@ -62,6 +62,8 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 --  Functions
 ----------------------------------------------------------------------------*/
 
+extern void MapUnmarkUnitGuard(CUnit *unit);
+
 /*----------------------------------------------------------------------------
 --  Animation
 ----------------------------------------------------------------------------*/
@@ -481,6 +483,7 @@ static void HandleUnitAction(CUnit *unit)
 				return;
 			}
 			COrder *order = unit->Orders[0];
+			int old_action = order->Action;
 			//
 			// Release pending references.
 			//
@@ -520,7 +523,15 @@ static void HandleUnitAction(CUnit *unit)
 				unit->Orders[z] = unit->Orders[z + 1];
 			}
 			unit->Orders.pop_back();
-
+			
+			if((old_action == UnitActionStill || 
+				old_action == UnitActionStandGround )&& 
+				unit->Orders[0]->Action != UnitActionStill &&
+				unit->Orders[0]->Action != UnitActionStandGround)
+			{
+				MapUnmarkUnitGuard(unit);
+			}
+				
 			//
 			// Note subaction 0 should reset.
 			//

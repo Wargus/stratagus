@@ -237,272 +237,344 @@ CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
 --  Finding units for attack
 ----------------------------------------------------------------------------*/
 
+struct BestTargetFinder {
+	const CUnit *attacker;
+	const int range;
+	CUnit *best_unit;
+	int best_cost;
+	
+	BestTargetFinder(const CUnit *a, int r): attacker(a), range(r),
+		 best_unit(0), best_cost(INT_MAX) {};
+	
+	inline void operator() (CUnit *const dest) {
+		const CPlayer *const player = attacker->Player;
+
+		if (!player->IsEnemy(dest)) { // a friend or neutral
+			return;
+		}
+		
+		if (!dest->IsVisibleAsGoal(player)) {
+			return;
+		}
+
+		const CUnitType *const type =  attacker->Type;
+		const CUnitType *const dtype = dest->Type;
+		if (!CanTarget(type, dtype)) { // can't be attacked.
+			return;
+		}
+
+		//
+		// Unit in attack range?
+		//
+		int d = attacker->MapDistanceTo(dest);
+
+		// Use Circle, not square :)
+		if (d > range) {
+			return;
+		}
+
+		//
+		// Calculate the costs to attack the unit.
+		// Unit with the smallest attack costs will be taken.
+		//
+		int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+		int cost = 0;
+
+		//
+		// Priority 0-255
+		//
+		cost -= dtype->Priority * PRIORITY_FACTOR;
+		//
+		// Remaining HP (Health) 0-65535
+		//
+		cost += dest->Variable[HP_INDEX].Value * HEALTH_FACTOR;
+
+		if (d <= attackrange && d >= type->MinAttackRange) {
+			cost += d * INRANGE_FACTOR;
+			cost -= INRANGE_BONUS;
+		} else {
+			cost += d * DISTANCE_FACTOR;
+		}
+
+		//
+		// Unit can attack back.
+		//
+		if (CanTarget(dtype, type)) {
+			cost -= CANATTACK_BONUS;
+		}
+
+		//
+		// Take this target?
+		//
+		if (cost < best_cost && (d <= attackrange ||
+				UnitReachable(attacker, dest, attackrange))) {
+			best_unit = dest;
+			best_cost = cost;
+		}
+	}
+
+	CUnit *Find(CUnit **table, const int table_size) {
+		for (int i = 0; i < table_size; ++i) {
+			this->operator() (table[i]);
+		}
+		return best_unit;
+	}
+
+	CUnit *Find(CUnitCache &cache) {
+		cache.for_each(*this);
+		return best_unit;
+	}
+
+};
+
 /**
 **  Attack units in distance, with large missile
 **
 **  Choose the best target, that can be attacked. It takes into
 **  account allied unit which could be hit by the missile
 **
-**  @param u      Find in distance for this unit.
-**  @param range  Distance range to look.
-**
-**  @return       Unit to be attacked.
 **
 **  @note This could be improved, for better performance / better trade.
 **  @note   Limited to attack range smaller than 16.
 **  @note Will be moved to unit_ai.c soon.
 */
-static CUnit *FindRangeAttack(const CUnit *u, int range)
-{
-	int x;
-	int y;
-	int n;
-	int cost;
-	int d;
-	int effective_hp;
-	int enemy_count;
-	int missile_range;
-	int attackrange;
-	int hp_damage_evaluate;
-	int good[32][32];
-	int bad[32][32];
-	CUnit *table[UnitMax];
-	CUnit *dest;
-	const CUnitType *dtype;
-	const CUnitType *type;
-	const CPlayer *player;
-	int xx;
-	int yy;
-	int best_x;
-	int best_y;
+struct BestRangeTargetFinder {
+	const CUnit *attacker;
+	const int range;
+	CUnit *best_unit;
 	int best_cost;
-	int i;
-	int sbad;
-	int sgood;
-	CUnit *best;
+	int good[32*32];
+	int bad[32*32];
+	
+	/**
+	**  @param a      Find in distance for this unit.
+	**  @param range  Distance range to look.
+	**
+	*/
+	BestRangeTargetFinder(const CUnit *a, const int r) : attacker(a), range(r),
+		 best_unit(0), best_cost(INT_MIN) {
+		memset(good, 0 , sizeof(int) * 32 * 32);
+		memset(bad, 0 , sizeof(int) * 32 * 32);		 
+	};
 
-	type = u->Type;
-	player = u->Player;
-
-	//  If catapult, count units near the target...
-	//   FIXME : make it configurable
-	//
-
-	missile_range = type->Missile.Missile->Range + range - 1;
-	attackrange = u->Stats->Variables[ATTACKRANGE_INDEX].Max;
-	// Evaluation of possible damage...
-	hp_damage_evaluate = u->Stats->Variables[BASICDAMAGE_INDEX].Value
-						+ u->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
-
-	Assert(2 * missile_range + 1 < 32);
-
-	//
-	// If unit is removed, use containers x and y
-	if (u->Removed) {
-		x = u->Container->X;
-		y = u->Container->Y;
-		n = Map.Select(x - missile_range, y - missile_range,
-			x + missile_range + u->Container->Type->TileWidth,
-			y + missile_range + u->Container->Type->TileHeight, table);
-	} else {
-		x = u->X;
-		y = u->Y;
-		n = Map.Select(x - missile_range, y - missile_range,
-			x + missile_range + u->Type->TileWidth,
-			y + missile_range + u->Type->TileHeight, table);
-	}
-
-	if (!n) {
-		return NoUnitP;
-	}
-
-	for (y = 0; y < 2 * missile_range + 1; ++y) {
-		for (x = 0; x < 2 * missile_range + 1; ++x) {
-			good[y][x] = 0;
-			bad[y][x] = 0;
+	struct FillBadGood {
+		const CUnit *attacker;
+		const int range;
+		int enemy_count;
+		int *good;
+		int *bad;
+		
+		FillBadGood(const CUnit *a, int r, int *g, int *b): 
+			attacker(a), range(r),
+			enemy_count(0), good(g), bad(b) {
 		}
-	}
-
-	enemy_count = 0;
-	// FILL good/bad...
-	for (i = 0; i < n; ++i) {
-		dest = table[i];
-		dtype = dest->Type;
-		if (!dest->IsVisibleAsGoal(u->Player)) {
-			table[i] = 0;
-			continue;
-		}
-
-		// won't be a target...
-		if (!CanTarget(type, dtype)) { // can't be attacked.
-			table[i] = 0;
-			continue;
-		}
-
-		if (!player->IsEnemy(dest)) { // a friend or neutral
-			table[i] = 0;
-
-			// Calc a negative cost
-			// The gost is more important when the unit would be killed
-			// by our fire.
-
-			// It costs (is positive) if hp_damage_evaluate>dest->HP ...)
-			// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
-			cost = HEALTH_FACTOR * (2 * hp_damage_evaluate - dest->Variable[HP_INDEX].Value) /
-				(dtype->TileWidth * dtype->TileWidth);
-			if (cost < 1) {
-				cost = 1;
+				
+		inline void operator() (CUnit *const dest)
+		{
+			const CPlayer *const player = attacker->Player;		
+			
+			if (!dest->IsVisibleAsGoal(player)) {
+				dest->CacheLock = 1;
+				return;
 			}
-			cost = (-cost);
-		} else {
+
+			const CUnitType *const type =  attacker->Type;
+			const CUnitType *const dtype = dest->Type;
+			// won't be a target...
+			if (!CanTarget(type, dtype)) { // can't be attacked.
+				dest->CacheLock = 1;
+				return;
+			}
+
 			//
 			//  Calculate the costs to attack the unit.
 			//  Unit with the smallest attack costs will be taken.
 			//
-			cost = 0;
-			//
-			//  Priority 0-255
-			//
-			cost += dtype->Priority * PRIORITY_FACTOR;
-			//
-			//  Remaining HP (Health) 0-65535
-			//
-			// Give a boost to unit we can kill in one shoot only
 
-			//
-			// calculate HP which will remain in the enemy unit, after hit
-			//
-			effective_hp = (dest->Variable[HP_INDEX].Value - 2 * hp_damage_evaluate);
+			int cost = 0;
+			const int hp_damage_evaluate = 
+				attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
+						+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+						
+			if (!player->IsEnemy(dest)) { // a friend or neutral
+				dest->CacheLock = 1;
 
-			//
-			// Unit we won't kill are evaluated the same
-			//
-			if (effective_hp > 0) {
-				effective_hp = 0;
-			}
+				// Calc a negative cost
+				// The gost is more important when the unit would be killed
+				// by our fire.
 
-			//
-			// Unit we are sure to kill are all evaluated the same (except PRIORITY)
-			//
-			if (effective_hp < -hp_damage_evaluate) {
-				effective_hp = -hp_damage_evaluate;
-			}
-
-			//
-			// Here, effective_hp vary from -hp_damage_evaluate (unit will be killed) to 0 (unit can't be killed)
-			// => we prefer killing rather than only hitting...
-			//
-			cost += -effective_hp * HEALTH_FACTOR;
-
-			//
-			//  Unit can attack back.
-			//
-			if (CanTarget(dtype, type)) {
-				cost += CANATTACK_BONUS;
-			}
-
-			//
-			// the cost may be divided accros multiple cells
-			//
-			cost = cost / (dtype->TileWidth * dtype->TileWidth);
-			if (cost < 1) {
-				cost = 1;
-			}
-
-			//
-			// Removed Unit's are in bunkers
-			//
-			if (u->Removed) {
-				d = u->Container->MapDistanceTo(dest);
-			} else {
-				d = u->MapDistanceTo(dest);
-			}
-
-			if (d <= attackrange || (d <= range && UnitReachable(u, dest, attackrange))) {
-				++enemy_count;
-			} else {
-					table[i] = 0;
-			}
-		}
-
-		x = dest->X - u->X + missile_range + 1;
-		y = dest->Y - u->Y + missile_range + 1;
-
-		// Mark the good/bad array...
-		for (xx = 0; xx < dtype->TileWidth; ++xx) {
-			for (yy = 0; yy < dtype->TileWidth; ++yy) {
-				if ((x + xx < 0) || (y + yy < 0) ||
-						(x + xx >= 2 * missile_range + 1) ||
-						(y + yy >= 2 * missile_range + 1)) {
-					continue;
+				// It costs (is positive) if hp_damage_evaluate>dest->HP ...)
+				// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
+				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate -
+						 dest->Variable[HP_INDEX].Value) /
+					(dtype->TileWidth * dtype->TileWidth);
+				if (cost < 1) {
+					cost = 1;
 				}
-				if (cost < 0) {
-					good[y + yy][x + xx] -= cost;
+				cost = (-cost);
+			} else {
+				//
+				//  Priority 0-255
+				//
+				cost += dtype->Priority * PRIORITY_FACTOR;
+				//
+				//  Remaining HP (Health) 0-65535
+				//
+				// Give a boost to unit we can kill in one shoot only
+
+				//
+				// calculate HP which will remain in the enemy unit, after hit
+				//
+				int effective_hp = 
+					(dest->Variable[HP_INDEX].Value - 2 * hp_damage_evaluate);
+
+				//
+				// Unit we won't kill are evaluated the same
+				//
+				if (effective_hp > 0) {
+					effective_hp = 0;
+				}
+
+				//
+				// Unit we are sure to kill are all evaluated the same (except PRIORITY)
+				//
+				if (effective_hp < -hp_damage_evaluate) {
+					effective_hp = -hp_damage_evaluate;
+				}
+
+				//
+				// Here, effective_hp vary from -hp_damage_evaluate (unit will be killed) to 0 (unit can't be killed)
+				// => we prefer killing rather than only hitting...
+				//
+				cost += -effective_hp * HEALTH_FACTOR;
+
+				//
+				//  Unit can attack back.
+				//
+				if (CanTarget(dtype, type)) {
+					cost += CANATTACK_BONUS;
+				}
+
+				//
+				// the cost may be divided accros multiple cells
+				//
+				cost = cost / (dtype->TileWidth * dtype->TileWidth);
+				if (cost < 1) {
+					cost = 1;
+				}
+
+				//
+				// Removed Unit's are in bunkers
+				//
+				int d;
+				if (attacker->Removed) {
+					d = attacker->Container->MapDistanceTo(dest);
 				} else {
-					bad[y + yy][x + xx] += cost;
+					d = attacker->MapDistanceTo(dest);
+				}
+
+				int attackrange = 
+					attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+				if (d <= attackrange || 
+					(d <= range && UnitReachable(attacker, dest, attackrange))) {
+					++enemy_count;
+				} else {
+					dest->CacheLock = 1;
 				}
 			}
-		}
-	}
 
-	if (!enemy_count) {
-		return NoUnitP;
-	}
+			const int missile_range = type->Missile.Missile->Range + range - 1;
+			const int x = dest->X - attacker->X + missile_range + 1;
+			const int y = dest->Y - attacker->Y + missile_range + 1;
 
-	// Find the best area...
-	// The target which provide the best bad/good ratio is choosen...
-	best_x = -1;
-	best_y = -1;
-	best_cost = -1;
-	best = NoUnitP;
-	for (i = 0; i < n; ++i) {
-		if (!table[i]) {
-			continue;
+			// Mark the good/bad array...
+			int yy_offset = x + y * 32;
+			for (int yy = 0; yy < dtype->TileWidth; ++yy) {
+				if ((y + yy >= 0) && (y + yy < 2 * missile_range + 1)) {
+					for (int xx = 0; xx < dtype->TileWidth; ++xx) {
+						if ((x + xx >= 0) && (x + xx < 2 * missile_range + 1)) {
+							if (cost < 0) {
+								good[yy_offset + xx] -= cost;
+							} else {
+								bad[yy_offset + xx] += cost;
+							}
+						}
+					}
+				}
+				yy_offset += 32;
+			}
+		
 		}
-		dest = table[i];
-		dtype = dest->Type;
+		
+		inline int Fill(CUnit **table, const int table_size) {
+			for (int i = 0; i < table_size; ++i) {		
+				this->operator() (table[i]);
+			}
+			return enemy_count;
+		}
+				
+		inline int Fill(CUnitCache &cache) {
+			cache.for_each(*this);
+			return enemy_count;
+		}
+
+	
+	};
+	
+	inline void operator() (CUnit *const dest) {
+	
+		if (dest->CacheLock) {
+			dest->CacheLock = 0;
+			return;
+		}
+
+		const CUnitType *const type =  attacker->Type;	
+		const CUnitType *const dtype = dest->Type;
+		const int missile_range = type->Missile.Missile->Range + range - 1;		
+		int x,y;
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileWidth > 1)
-		if (u->X < dest->X) {
+		if (attacker->X < dest->X) {
 			x = dest->X;
-		} else if (u->X > dest->X + dtype->TileWidth - 1) {
+		} else if (attacker->X > dest->X + dtype->TileWidth - 1) {
 			x = dest->X + dtype->TileWidth - 1;
 		} else {
-			x = u->X;
+			x = attacker->X;
 		}
 
-		if (u->Y < dest->Y) {
+		if (attacker->Y < dest->Y) {
 			y = dest->Y;
-		} else if (u->Y > dest->Y + dtype->TileHeight - 1) {
+		} else if (attacker->Y > dest->Y + dtype->TileHeight - 1) {
 			y = dest->Y + dtype->TileHeight - 1;
 		} else {
-			y = u->Y;
+			y = attacker->Y;
 		}
 
 		// Make x,y relative to u->x...
-		x = x - u->X + missile_range + 1;
-		y = y - u->Y + missile_range + 1;
+		
+		x = x - attacker->X + missile_range + 1;
+		y = y - attacker->Y + missile_range + 1;
 
-		sbad = 0;
-		sgood = 0;
-		for (yy = -(type->Missile.Missile->Range - 1);
+		int sbad = 0;
+		int sgood = 0;
+		int yy_offset = x + -(type->Missile.Missile->Range - 1) * 32;
+		for (int yy = -(type->Missile.Missile->Range - 1);
 			yy <= type->Missile.Missile->Range - 1; ++yy) {
-			for (xx = -(type->Missile.Missile->Range - 1);
-				xx <= type->Missile.Missile->Range - 1; ++xx) {
-				if ((x + xx < 0) || (y + yy < 0) ||
-						((x + xx) >= 2 * missile_range + 1) ||
-						((y + yy) >= 2 * missile_range + 1)) {
-					continue;
-				}
-
-				sbad += bad[y + yy][x + xx];
-				sgood += good[y + yy][x + xx];
-				if (!yy && !xx) {
-					sbad += bad[y + yy][x + xx];
-					sgood += good[y + yy][x + xx];
+			if ((y + yy >= 0) && ((y + yy) < 2 * missile_range + 1)) {		
+				for (int xx = -(type->Missile.Missile->Range - 1);
+					xx <= type->Missile.Missile->Range - 1; ++xx) {
+					if ((x + xx >= 0) && ((x + xx) < 2 * missile_range + 1)) {
+						sbad += bad[yy_offset + xx];
+						sgood += good[yy_offset + xx];
+						if (!yy && !xx) {
+							sbad += bad[yy_offset + xx];
+							sgood += good[yy_offset + xx];
+						}
+					}
 				}
 			}
+			yy_offset += 32;
 		}
 
 		// don't consider small damages...
@@ -510,14 +582,29 @@ static CUnit *FindRangeAttack(const CUnit *u, int range)
 			sgood = 20;
 		}
 
-		cost = sbad / sgood;
+		int cost = sbad / sgood;
 		if (cost > best_cost) {
 			best_cost = cost;
-			best = dest;
+			best_unit = dest;
 		}
 	}
-	return best;
-}
+
+
+	inline CUnit *Find(CUnit **table, const int table_size) {
+		FillBadGood(attacker, range, good, bad).Fill(table, table_size);
+		for (int i = 0; i < table_size; ++i) {		
+			this->operator() (table[i]);
+		}
+		return best_unit;
+	}
+
+	inline CUnit *Find(CUnitCache &cache) {
+		FillBadGood(attacker, range, good, bad).Fill(cache);
+		cache.for_each(*this);
+		return best_unit;
+	}
+
+};
 
 /**
 **  Reference unit used by CompareUnitDistance.
@@ -544,6 +631,33 @@ static int CompareUnitDistance(const void *v1, const void *v2)
 	}
 }
 
+/**
+**  AutoAttack units in distance.
+**
+**  If the unit can attack must be handled by caller.
+**  Choose the best target, that can be attacked.
+**
+**  @param unit   Find in distance for this unit.
+**  @param range  Distance range to look.
+**  @param autotargets  Know enemy targets to chose in range.
+**
+**  @return       Unit to be attacked.
+**
+*/
+CUnit *AutoAttackUnitsInDistance(const CUnit *unit, int range, 
+		CUnitCache &autotargets)
+{
+	// if necessary, take possible damage on allied units into account...
+	if (unit->Type->Missile.Missile->Range > 1 &&
+			(range + unit->Type->Missile.Missile->Range < 15)) {
+		return BestRangeTargetFinder(unit, range).Find(autotargets);
+	} else {			
+		//
+		// Find the best unit to auto attack
+		//
+		return BestTargetFinder	(unit, range).Find(autotargets);
+	}
+}
 
 /**
 **  Attack units in distance.
@@ -559,113 +673,55 @@ static int CompareUnitDistance(const void *v1, const void *v2)
 */
 CUnit *AttackUnitsInDistance(const CUnit *unit, int range)
 {
-	CUnit *dest;
-	const CUnitType *type;
-	const CUnitType *dtype;
 	CUnit *table[UnitMax];
-	int x;
-	int y;
 	int n;
-	int i;
-	int d;
-	int attackrange;
-	int cost;
-	int best_cost;
-	const CPlayer *player;
-	CUnit *best_unit;
-
 	// if necessary, take possible damage on allied units into account...
 	if (unit->Type->Missile.Missile->Range > 1 &&
 			(range + unit->Type->Missile.Missile->Range < 15)) {
-		return FindRangeAttack(unit, range);
-	}
 
-	//
-	// Select all units in range.
-	//
-	x = unit->X;
-	y = unit->Y;
-	type = unit->Type;
-	n = Map.Select(x - range, y - range, x + range + type->TileWidth,
-		y + range + type->TileHeight, table);
-	
-	if (range > 25 && n > 9) {
-		referenceunit = unit;
-		qsort((void*)table, n, sizeof(CUnit*), &CompareUnitDistance);
-	}
-
-	best_unit = NoUnitP;
-	best_cost = INT_MAX;
-
-	player = unit->Player;
-	attackrange = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
-
-	//
-	// Find the best unit to attack
-	//
-
-	for (i = 0; i < n; ++i) {
-		dest = table[i];
-
-		if (!dest->IsVisibleAsGoal(unit->Player)) {
-			continue;
-		}
-
-		if (!player->IsEnemy(dest)) { // a friend or neutral
-			continue;
-		}
-
-		dtype = dest->Type;
-		if (!CanTarget(type, dtype)) { // can't be attacked.
-			continue;
-		}
-
+		//  If catapult, count units near the target...
+		//   FIXME : make it configurable
 		//
-		// Calculate the costs to attack the unit.
-		// Unit with the smallest attack costs will be taken.
-		//
-		cost = 0;
-		//
-		// Priority 0-255
-		//
-		cost -= dtype->Priority * PRIORITY_FACTOR;
-		//
-		// Remaining HP (Health) 0-65535
-		//
-		cost += dest->Variable[HP_INDEX].Value * HEALTH_FACTOR;
-		//
-		// Unit in attack range?
-		//
-		d = unit->MapDistanceTo(dest);
 
-		// Use Circle, not square :)
-		if (d > range) {
-			continue;
-		}
-		if (d <= attackrange && d >= type->MinAttackRange) {
-			cost += d * INRANGE_FACTOR;
-			cost -= INRANGE_BONUS;
+		int missile_range = unit->Type->Missile.Missile->Range + range - 1;
+		
+		Assert(2 * missile_range + 1 < 32);
+		//
+		// If unit is removed, use containers x and y
+		if (unit->Removed) {
+			int x = unit->Container->X;
+			int y = unit->Container->Y;
+			n = Map.Select(x - missile_range, y - missile_range,
+				x + missile_range + unit->Container->Type->TileWidth,
+				y + missile_range + unit->Container->Type->TileHeight, table);
 		} else {
-			cost += d * DISTANCE_FACTOR;
-		}
-		//
-		// Unit can attack back.
-		//
-		if (CanTarget(dtype, type)) {
-			cost -= CANATTACK_BONUS;
+			int x = unit->X;
+			int y = unit->Y;
+			n = Map.Select(x - missile_range, y - missile_range,
+				x + missile_range + unit->Type->TileWidth,
+				y + missile_range + unit->Type->TileHeight, table);
 		}
 
-		//
-		// Take this target?
-		//
-		if (cost < best_cost && (d <= attackrange ||
-				UnitReachable(unit, dest, attackrange))) {
-			best_unit = dest;
-			best_cost = cost;
+		if (n) {
+			return BestRangeTargetFinder(unit, range).Find(table, n);
 		}
+		return NoUnitP;
+
+	} else {
+		n = Map.Select(unit->X - range, unit->Y - range,
+			unit->X + range + unit->Type->TileWidth,
+			unit->Y + range + unit->Type->TileHeight, table);
+			
+		if (range > 25 && n > 9) {
+			referenceunit = unit;
+			qsort((void*)table, n, sizeof(CUnit*), &CompareUnitDistance);
+		}
+			
+		//
+		// Find the best unit to attack
+		//
+		return BestTargetFinder	(unit, range).Find(table, n);
 	}
-
-	return best_unit;
 }
 
 /**
@@ -690,19 +746,8 @@ CUnit *AttackUnitsInRange(const CUnit *unit)
 */
 CUnit *AttackUnitsInReactRange(const CUnit *unit)
 {
-	int range;
-	const CUnitType *type;
-
-	type = unit->Type;
 	Assert(unit->Type->CanAttack);
-
-	if (unit->Player->Type == PlayerPerson) {
-		range = type->ReactRangePerson;
-	} else {
-		range = type->ReactRangeComputer;
-	}
-
-	return AttackUnitsInDistance(unit, range);
+	return AttackUnitsInDistance(unit, unit->GetReactRange());
 }
 
 //@}

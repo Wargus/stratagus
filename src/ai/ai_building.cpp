@@ -399,13 +399,12 @@ static int AiFindHallPlace(const CUnit *worker,
 					//
 					// Check units around mine
 					//
-					minx = std::max(mine->X - 5, 0);
-					miny = std::max(mine->Y - 5, 0);
-					maxx = std::min(mine->X + mine->Type->TileWidth + 5, 
-															Map.Info.MapWidth);
-					maxy = std::min(mine->Y + mine->Type->TileHeight + 5,
-															Map.Info.MapHeight);
-					nunits = Map.Select(minx, miny, maxx, maxy, units);
+					minx = mine->X - 5;
+					miny = mine->Y - 5;
+					maxx = mine->X + mine->Type->TileWidth + 5; 
+					maxy = mine->Y + mine->Type->TileHeight + 5;
+					Map.FixSelectionArea(minx, miny, maxx, maxy);
+					nunits = Map.Select(minx, miny, maxx, maxy, units, true);
 					for (j = 0; j < nunits; ++j) {
 						// Enemy near mine
 						if (AiPlayer->Player->Enemy &

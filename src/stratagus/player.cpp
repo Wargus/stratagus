@@ -288,6 +288,7 @@ void SavePlayers(CFile *file)
 		file->printf("})\n\n");
 	}
 
+	DebugPrint("FIXME: HAVE TO ADD AUTO ATTACK TARGETS SAVE/LOAD SUPPORT!!!!!\n");
 	DebugPrint("FIXME: must save unit-stats?\n");
 
 	//
@@ -318,6 +319,8 @@ void CreatePlayer(int type)
 	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
 	memset(player->Units, 0, sizeof(player->Units));
+
+	player->AutoAttackTargets.Units.clear();
 
 	//
 	//  Take first slot for person on this computer,
@@ -524,6 +527,7 @@ void CPlayer::Clear()
 	TotalKills = 0;
 	Color = 0;
 	UpgradeTimers.Clear();
+	AutoAttackTargets.Units.clear();
 }
 
 /*----------------------------------------------------------------------------
@@ -737,8 +741,35 @@ void PlayersInitAi(void)
 void PlayersEachCycle(void)
 {
 	for (int player = 0; player < NumPlayers; ++player) {
-		if (Players[player].AiEnabled) {
-			AiEachCycle(&Players[player]);
+		CPlayer *p = &Players[player];
+		if(p->AutoAttackTargets.size() > 0) {
+			CUnitCache &autoatacktargets = p->AutoAttackTargets;
+			/* both loops can not be connected !!!! */
+			for(unsigned int i = 0; i < autoatacktargets.size(); ++i) {
+				CUnit *aatarget = autoatacktargets[i];
+				if(!aatarget->IsAliveOnMap() ||
+					Map.Field(aatarget->X, aatarget->Y)->Guard[player] == 0) {
+					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + i);
+					aatarget->RefsDecrease();
+				}
+			}
+			if(autoatacktargets.size() > 0) {
+				for (int j = 0; j < p->TotalNumUnits; ++j) {
+					CUnit *guard = p->Units[j];
+					bool stand_ground = 
+						guard->Orders[0]->Action == UnitActionStandGround;
+					if (guard->Type->CanAttack && 
+								(stand_ground || guard->IsIdle()) &&
+								 !guard->IsUnusable()) {
+						DebugPrint("%d: Gaurd %d (%s) call autoattack\n"
+							 _C_ p->Index _C_ guard->Slot _C_ guard->Type->Name.c_str()); 
+						AutoAttack(guard, autoatacktargets, stand_ground);
+					}
+				}
+			}
+		}	
+		if (p->AiEnabled) {
+			AiEachCycle(p);
 		}
 	}
 }
@@ -883,7 +914,7 @@ void CPlayer::Notify(int type, int x, int y, const char *fmt, ...) const
 */
 bool CPlayer::IsEnemy(const CPlayer *x) const
 {
-	return (Enemy & (1 << x->Index)) != 0;
+	return IsEnemy(x->Index);
 }
 
 /**

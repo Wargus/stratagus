@@ -308,7 +308,7 @@ void PreprocessMap(void)
 #ifdef _MSC_VER
 	for (ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			mf = Map.Fields + ix + iy * Map.Info.MapWidth;
+			mf = Map.Field(ix, iy);
 			mf->SeenTile = mf->Tile;
 		}
 	}

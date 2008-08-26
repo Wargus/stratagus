@@ -80,8 +80,7 @@ static int MapIsSeenTileWall(int x, int y, int walltype)
 {
 	int t;
 
-	t = Map.Tileset.TileTypeTable[
-		Map.Fields[x + y * Map.Info.MapWidth].SeenTile];
+	t = Map.Tileset.TileTypeTable[Map.Field(x, y)->SeenTile];
 	if (walltype == -1) {
 		return t == TileTypeHumanWall || t == TileTypeOrcWall;
 	}
@@ -104,7 +103,7 @@ void MapFixSeenWallTile(int x, int y)
 	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		return;
 	}
-	mf = Map.Fields + x + y * Map.Info.MapWidth;
+	mf = Map.Field(x, y);
 	t = Map.Tileset.TileTypeTable[mf->SeenTile];
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
@@ -198,7 +197,7 @@ void MapFixWallTile(int x, int y)
 	if (x < 0 || y < 0 || x >= Map.Info.MapWidth || y >= Map.Info.MapHeight) {
 		return;
 	}
-	mf = Map.Fields + x + y * Map.Info.MapWidth;
+	mf = Map.Field(x, y);
 	if (!(mf->Flags & MapFieldWall)) {
 		return;
 	}
@@ -208,19 +207,19 @@ void MapFixWallTile(int x, int y)
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
 	tile = 0;
-	if ((y - 1) < 0 || (Map.Fields[x + (y - 1) * Map.Info.MapWidth].
+	if ((y - 1) < 0 || (Map.Field(x, (y - 1))->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 0;
 	}
-	if ((x + 1) >= Map.Info.MapWidth || (Map.Fields[x + 1 + y * Map.Info.MapWidth].
+	if ((x + 1) >= Map.Info.MapWidth || (Map.Field(x + 1, y)->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 1;
 	}
-	if ((y + 1) >= Map.Info.MapHeight || (Map.Fields[x + (y + 1) * Map.Info.MapWidth].
+	if ((y + 1) >= Map.Info.MapHeight || (Map.Field(x, (y + 1))->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 2;
 	}
-	if ((x - 1) < 0 || (Map.Fields[x - 1 + y * Map.Info.MapWidth].
+	if ((x - 1) < 0 || (Map.Field(x - 1, y)->
 			Flags & (MapFieldHuman | MapFieldWall)) == t) {
 		tile |= 1 << 3;
 	}

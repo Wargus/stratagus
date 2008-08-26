@@ -587,6 +587,7 @@ public:
 		NextWorker = NULL;
 		X = 0;
 		Y = 0;
+		Offset = 0;
 		Type = NULL;
 		Player = NULL;
 		Stats = NULL;
@@ -619,6 +620,7 @@ public:
 		Blink = 0;
 		Moving = 0;
 		ReCast = 0;
+		CacheLock = 0;
 		memset(&Anim, 0, sizeof(Anim));
 		CurrentResource = 0;
 		OrderCount = 0;
@@ -651,6 +653,7 @@ public:
 	
 	int X; /// Map position X
 	int Y; /// Map position Y
+	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
 	CUnitType  *Type;              /// Pointer to unit-type (peon,...)
 	CPlayer    *Player;            /// Owner of this unit
@@ -663,11 +666,17 @@ public:
 	
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position
+	unsigned char Direction; //: 8; /// angle (0-255) unit looking
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
 
 	unsigned long Attacked; /// gamecycle unit was last attacked
-	unsigned Direction : 8; /// angle (0-255) unit looking
+	unsigned SubAction : 8; /// sub-action of unit
+	unsigned State : 8;     /// action state
+	unsigned Blink : 3;     /// Let selection rectangle blink
+	unsigned Moving : 1;    /// The unit is moving
+	unsigned ReCast : 1;    /// Recast again next cycle
+	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 
 	unsigned Burning : 1;   /// unit is burning
 	unsigned Destroyed : 1; /// unit is destroyed pending reference
@@ -678,6 +687,8 @@ public:
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
+	unsigned CacheLock : 1;        /// Unit is on board a transporter.
+
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 							     /// NULL if the unit was not rescued.
@@ -705,12 +716,6 @@ public:
 	int LastGroup;      /// unit belongs to this last group
 
 	unsigned int Wait;          /// action counter
-	unsigned SubAction : 8; /// sub-action of unit
-	unsigned State : 8;     /// action state
-	unsigned Blink : 3;     /// Let selection rectangle blink
-	unsigned Moving : 1;    /// The unit is moving
-	unsigned ReCast : 1;    /// Recast again next cycle
-	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 
 	struct _unit_anim_ {
 		const CAnimation *Anim;                     /// Anim
@@ -772,7 +777,7 @@ public:
 
 
 	inline bool IsIdle() const {
-		return Orders[0]->Action == UnitActionStill && OrderCount == 1;
+		return OrderCount == 1 && Orders[0]->Action == UnitActionStill;
 	}
 
 	inline void ClearAction() {
@@ -781,6 +786,12 @@ public:
 		if (Selected) {
 			SelectedUnitChanged();
 		}
+	}
+
+	inline int GetReactRange() const 
+	{
+		return (Player->Type == PlayerPerson ?
+			Type->ReactRangePerson : Type->ReactRangeComputer);
 	}
 
 	/// Increase a unit's reference count
@@ -813,6 +824,12 @@ public:
 	
 	/// Release a unit
 	void Release();
+	
+	// Cowards and invisible units don't attack unless ordered.
+	bool IsAgressive(void) {
+		return (Type->CanAttack && !Type->Coward &&
+			Variable[INVISIBLE_INDEX].Value == 0);
+	}
 
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer *player) const;
@@ -1214,6 +1231,10 @@ extern CUnit *AttackUnitsInDistance(const CUnit *unit, int range);
 extern CUnit *AttackUnitsInRange(const CUnit *unit);
 	/// Find best enemy in reaction range to attack
 extern CUnit *AttackUnitsInReactRange(const CUnit *unit);
+
+extern CUnit *
+AutoAttackUnitsInDistance(const CUnit *unit, int range, 
+		CUnitCache &autotargets);
 
 // in groups.c
 

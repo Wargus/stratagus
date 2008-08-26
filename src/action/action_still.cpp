@@ -53,6 +53,40 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+static void MapMarkTileGuard(const CPlayer *player,
+	 const unsigned int index)
+{
+	++Map.Field(index)->Guard[player->Index];
+}
+
+
+static void MapUnmarkTileGuard(const CPlayer *player,
+	 const unsigned int index)
+{
+	Assert(Map.Field(index)->Guard[player->Index] > 0);
+	--Map.Field(index)->Guard[player->Index];
+}
+
+static void MapMarkUnitGuard(CUnit *unit)
+{
+	if (unit->IsAgressive()) {
+		MapSight(unit->Player, unit->X, unit->Y,
+		 	unit->Type->TileWidth, unit->Type->TileHeight,
+		 	unit->GetReactRange(),
+		 	MapMarkTileGuard);
+	}
+}
+
+void MapUnmarkUnitGuard(CUnit *unit)
+{
+	if (unit->IsAgressive()) {
+		MapSight(unit->Player, unit->X, unit->Y,
+		 	unit->Type->TileWidth, unit->Type->TileHeight,
+		 	unit->GetReactRange(),
+		 	MapUnmarkTileGuard);
+	}
+}
+
 /**
 **  Move in a random direction
 **
@@ -102,10 +136,12 @@ static bool MoveRandomly(CUnit *unit)
 				unit->Orders[0]->X = x;
 				unit->Orders[0]->Y = y;
 				unit->State = 0;
+				MapUnmarkUnitGuard(unit);
+				return true;//TESTME: new localization
 			}
 			MarkUnitFieldFlags(unit);
 		}
-		return true;
+		//return true;//TESTME: old localization
 	}
 	return false;
 }
@@ -140,9 +176,7 @@ static bool AutoCast(CUnit *unit)
 static CUnit *UnitToRepairInRange(CUnit *unit, int range)
 {
 	CUnit *table[UnitMax];
-	int n;
-
-	n = Map.Select(unit->X - range, unit->Y - range,
+	int n = Map.Select(unit->X - range, unit->Y - range,
 		unit->X + unit->Type->TileWidth + range,
 		unit->Y + unit->Type->TileHeight + range,
 		table);
@@ -184,15 +218,14 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 {
 	CUnit *temp;
 	CUnit *goal;
-
+/*
 	if (unit->Wait) {
 		unit->Wait--;
 		return;
 	}
-
+*/
 	// Cowards and invisible units don't attack unless ordered.
-	if (unit->Type->CanAttack && !unit->Type->Coward &&
-			unit->Variable[INVISIBLE_INDEX].Value == 0) {
+	if (unit->IsAgressive()) {
 		// Normal units react in reaction range.
 		if (CanMove(unit) && !unit->Removed && !stand_ground) {
 			if ((goal = AttackUnitsInReactRange(unit))) {
@@ -205,44 +238,118 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 				unit->SavedOrder.X = unit->X;
 				unit->SavedOrder.Y = unit->Y;
 				unit->SavedOrder.Goal = NoUnitP;
-			} else {
-				unit->Wait = 15;
-			}
+			} //else {
+				//unit->Wait = 15;
+			//}
 		// Removed units can only attack in AttackRange, from bunker
-		} else if ((goal = AttackUnitsInRange(unit))) {
-			temp = unit->Orders[0]->Goal;
-			if (temp && temp->Orders[0]->Action == UnitActionDie) {
-				temp->RefsDecrease();
-				unit->Orders[0]->Goal = temp = NoUnitP;
-			}
-			if (!unit->SubAction || temp != goal) {
-				// New target.
-				if (temp) {
+		} else  {
+			if ((goal = AttackUnitsInRange(unit))) {
+				temp = unit->Orders[0]->Goal;
+				if (temp && temp->Orders[0]->Action == UnitActionDie) {
 					temp->RefsDecrease();
+					unit->Orders[0]->Goal = temp = NoUnitP;
 				}
-				unit->Orders[0]->Goal = goal;
-				goal->RefsIncrease();
-				unit->State = 0;
-				unit->SubAction = 1; // Mark attacking.
-				UnitHeadingFromDeltaXY(unit,
-					goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
-					goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+				if (unit->SubAction < 2|| temp != goal) {
+					// New target.
+					if (temp) {
+						temp->RefsDecrease();
+					}
+					unit->Orders[0]->Goal = goal;
+					goal->RefsIncrease();
+					unit->State = 0;
+					unit->SubAction = 2; // Mark attacking.
+					UnitHeadingFromDeltaXY(unit,
+						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+				}
+				return;
 			}
-			return;
 		}
-	} else {
-		unit->Wait = 15;
-	}
+	} //else {
+		//unit->Wait = 15;
+	//}
 
-	if (unit->SubAction) { // was attacking.
+	if (unit->SubAction > 1) { // was attacking.
 		if ((temp = unit->Orders[0]->Goal)) {
 			temp->RefsDecrease();
 			unit->Orders[0]->Goal = NoUnitP;
 		}
-		unit->SubAction = unit->State = 0; // No attacking, restart
+		unit->State = 0;
+		unit->SubAction = 1; // No attacking, restart
 	}
 	Assert(!unit->Orders[0]->Goal);
 }
+
+void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground)
+{
+	CUnit *temp;
+	CUnit *goal;
+/*
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
+*/
+	// Cowards and invisible units don't attack unless ordered.
+	if (unit->IsAgressive()) {
+		// Normal units react in reaction range.
+		if (CanMove(unit) && !unit->Removed && !stand_ground) {
+			if ((goal = AutoAttackUnitsInDistance(unit,
+			   	 unit->GetReactRange(), targets))) {
+				// Weak goal, can choose other unit, come back after attack
+				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
+				Assert(unit->SavedOrder.Action == UnitActionStill);
+				Assert(!unit->SavedOrder.Goal);
+				unit->SavedOrder.Action = UnitActionAttack;
+				unit->SavedOrder.Range = 0;
+				unit->SavedOrder.X = unit->X;
+				unit->SavedOrder.Y = unit->Y;
+				unit->SavedOrder.Goal = NoUnitP;
+			} //else {
+				//unit->Wait = 15;
+			//}
+		// Removed units can only attack in AttackRange, from bunker
+		} else  {
+			if ((goal = AutoAttackUnitsInDistance(unit, 
+					unit->Stats->Variables[ATTACKRANGE_INDEX].Max, targets))) {
+				temp = unit->Orders[0]->Goal;
+				if (temp && temp->Orders[0]->Action == UnitActionDie) {
+					temp->RefsDecrease();
+					unit->Orders[0]->Goal = temp = NoUnitP;
+				}
+				if (unit->SubAction < 2|| temp != goal) {
+					// New target.
+					if (temp) {
+						temp->RefsDecrease();
+					}
+					unit->Orders[0]->Goal = goal;
+					goal->RefsIncrease();
+					unit->State = 0;
+					unit->SubAction = 2; // Mark attacking.
+					UnitHeadingFromDeltaXY(unit,
+						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
+				}
+				return;
+			}
+		}
+	} //else {
+		//unit->Wait = 15;
+	//}
+/*
+	if (unit->SubAction > 1) { // was attacking.
+		if ((temp = unit->Orders[0]->Goal)) {
+			temp->RefsDecrease();
+			unit->Orders[0]->Goal = NoUnitP;
+		}
+		unit->State = 0;
+		unit->SubAction = 1; // No attacking, restart
+	}
+	Assert(!unit->Orders[0]->Goal);
+	*/
+}
+
+
 
 /**
 **  Unit stands still or stand ground.
@@ -260,16 +367,24 @@ void ActionStillGeneric(CUnit *unit, bool stand_ground)
 		// If unit is in building or transporter it is removed.
 		return;
 	}
-
+	bool first_entrly = false;
 //	if (unit->Anim.Unbreakable) { // animation can't be aborted here
 //		return;
 //	}
 
-	// Animations
-	if (unit->SubAction) { // attacking unit in attack range.
-		AnimateActionAttack(unit);
-	} else {
-		UnitShowAnimation(unit, unit->Type->Animations->Still);
+	switch(unit->SubAction)
+	{
+		case 0:
+			//first entry
+			MapMarkUnitGuard(unit);
+			unit->SubAction = 1;
+			first_entrly = true;
+		case 1:	
+			UnitShowAnimation(unit, unit->Type->Animations->Still);
+		break;
+		case 2: // attacking unit in attack range.
+			AnimateActionAttack(unit);
+		break;
 	}
 
 	if (unit->Anim.Unbreakable) { // animation can't be aborted here
@@ -280,7 +395,17 @@ void ActionStillGeneric(CUnit *unit, bool stand_ground)
 		return;
 	}
 
-	AutoAttack(unit, stand_ground);
+	if (first_entrly) { 
+		// during first entry make autoattack test 
+		//and attack units in attack range.
+		AutoAttack(unit, stand_ground);
+	}
+	
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
+
 }
 
 /**

@@ -308,28 +308,26 @@ static int GetButtonStatus(const ButtonAction *button)
 	return res;
 }
 
-static int GetPopupCostsWidth(const CFont *font, const int Costs[])
+static int GetPopupCostsWidth(const CFont *font, const int *Costs)
 {
 	int popupWidth = 0;
 	for (unsigned int i = 1; i < MaxCosts; ++i) {	
 		if (Costs[i]) {
-			popupWidth += 5;
-			if(UI.Resources[i].IconWidth != -1)
-			{
+			if(UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5);
 			} else {
 				const CGraphic *G = UI.Resources[i].G;
 				if (G) {
-					popupWidth +=  (G->Width + 5);
+					popupWidth += (G->Width + 5);
 				}
 			}
-			popupWidth += font->Width(Costs[i]);
+			popupWidth += (font->Width(Costs[i]) + 5);
 		}
 	}
 	return popupWidth;
 }
 
-static int DrawPopupCosts(int x, int y, const CFont *font, const int Costs[])
+static int DrawPopupCosts(int x, int y, const CFont *font, const int *Costs)
 {
 	for (unsigned int i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
@@ -364,8 +362,8 @@ static void DrawPopup()
 	const int font_height = font->Height();
 	std::string nc, rc;
 	
-	int start_x, x, popupWidth = 5;
-	int y, popupHeight = 115;//
+	int start_x, x, popupWidth;
+	int y, popupHeight;//
 	
 	GetDefaultTextColors(nc, rc);
 	
@@ -376,7 +374,7 @@ static void DrawPopup()
 		case ButtonResearch:
 		{
 			int *Costs = AllUpgrades[button->Value]->Costs;
-			popupWidth += GetPopupCostsWidth(font, Costs);
+			popupWidth = GetPopupCostsWidth(font, Costs);
 			popupWidth = std::max(popupWidth, font->Width(button->Hint) + 10);
 	
 			popupHeight	= 40;
@@ -412,17 +410,17 @@ static void DrawPopup()
 			const SpellType *spell = SpellTypeTable[button->Value];
 			
 			if(spell->ManaCost) {
-				popupWidth += 5;
+				popupHeight = 40;
+				popupWidth = 10;
 				if(UI.Resources[IconID].IconWidth != -1)
 				{
 					popupWidth += (UI.Resources[IconID].IconWidth + 5);
 				} else {
 					if (G) {
-						popupWidth +=  (G->Width + 5);
+						popupWidth += (G->Width + 5);
 					}
 				}
 				popupWidth += font->Width(spell->ManaCost);
-				popupHeight = 40;
 				popupWidth = std::max(popupWidth, font->Width(spell->Name) + 10);
 			} else {
 				popupWidth = font->Width(button->Hint) + 10;
@@ -474,24 +472,27 @@ static void DrawPopup()
 			const CGraphic *G;
 	
 			//detect max Width
-			{
-				popupWidth += GetPopupCostsWidth(font, stats->Costs);
-				if(type->Demand) {
-					popupWidth += 5;
-					if(UI.Resources[FoodCost].IconWidth != -1)
-					{
-						popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
-					} else {
-						G = UI.Resources[FoodCost].G;
-						if (G) {
-							popupWidth +=  (G->Width + 5);
-						}
+			popupWidth = GetPopupCostsWidth(font, stats->Costs);
+			if(type->Demand) {
+				if(UI.Resources[FoodCost].IconWidth != -1)
+				{
+					popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
+				} else {
+					G = UI.Resources[FoodCost].G;
+					if (G) {
+						popupWidth += (G->Width + 5);
 					}
-					popupWidth += font->Width(type->Demand);
 				}
+				popupWidth += (font->Width(type->Demand) + 5);
 			}
-			popupWidth = std::max(popupWidth, 140);
-	
+			popupWidth += 10;
+			if(popupWidth < 140)
+				popupWidth = 140;
+			popupHeight = 85;//
+			if (type->CanAttack) {
+				popupHeight += 30;
+			}
+			
 			start_x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
 			x = start_x;
@@ -511,13 +512,13 @@ static void DrawPopup()
 			y += 20;
 
 			// Costs
-			x += DrawPopupCosts(x + 5, y, font,  stats->Costs);
+			x = DrawPopupCosts(x + 5, y, font,  stats->Costs);
 	
 			if(type->Demand) {
 					int y_offset = 0;
 					G = UI.Resources[FoodCost].G;
 					if (G) {
-						int x_offset =  UI.Resources[FoodCost].IconWidth;
+						int x_offset = UI.Resources[FoodCost].IconWidth;
 						G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
 						x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
 						y_offset = G->Height;

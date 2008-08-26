@@ -85,29 +85,30 @@ struct CUnitCache {
 		const size_t size = Units.size();
 		if(size) {
 			const CUnit *unit;
-			int i = 0, n = (size+3)/4;
+			int n = (size+3)/4;
+			const CUnit **cache = (const CUnit **)Units.data();
 			switch (size & 3) {
 				case 0: 
 				do {
-					unit = Units[i];
+					unit = *cache;
 					if(pred(unit))
 						return (CUnit *)unit;
-					i++;	
+					cache++;
 				case 3:	
-					unit = Units[i];
+					unit = *cache;
 					if(pred(unit))
 						return (CUnit *)unit;
-					i++;	
+					cache++;
 				case 2:	
-					unit = Units[i];
+					unit = *cache;
 					if(pred(unit))
 						return (CUnit *)unit;
-					i++;	
+					cache++;
 				case 1:
-					unit = Units[i];
+					unit = *cache;
 					if(pred(unit))
 						return (CUnit *)unit;
-					i++;	
+					cache++;
 				} while ( --n > 0 );
 			}
 		}
@@ -132,14 +133,14 @@ struct CUnitCache {
 			functor(Units[i]);
 #else
 		if(size) {
-			int count = 0;
 			int n = (size+3)/4;
+			CUnit **cache = (CUnit **)Units.data();
 			switch (size & 3) {
 				case 0: do { 
-								functor(Units[count++]);
-				case 3:			functor(Units[count++]);
-				case 2:			functor(Units[count++]);
-				case 1:			functor(Units[count++]);
+								functor(*cache++);
+				case 3:			functor(*cache++);
+				case 2:			functor(*cache++);
+				case 1:			functor(*cache++);
 					} while ( --n > 0 );
 			}
 		}
@@ -243,6 +244,39 @@ struct CUnitCache {
 		}
 #endif
 	}
+
+	/**
+	**  Remove unit from unit cache.
+	**
+	**  @param unit  Unit pointer to remove from container.
+	*/	
+	inline void RemoveS(CUnit *const unit)
+	{
+		for(std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end());
+			 i != end; ++i) {
+			if ((*i) == unit) {
+				Units.erase(i);
+				return;
+			}
+		}
+	}
+ 
+	/**
+	**  Insert new unit into tile cache.
+	**	Sorted version for binary searching.
+	**
+	**  @param unit  Unit pointer to place in cache.
+	**  @return false if unit is already in cache and nothing is added.
+	*/
+	inline bool InsertS(CUnit *unit) {
+		if (!binary_search(Units.begin(), Units.end(), unit))
+		{
+  			Units.insert(std::lower_bound(Units.begin(), Units.end(), unit), unit);
+  			return true;
+		}
+		return false;
+	}
+
 
 	/**
 	**  Insert new unit into tile cache.

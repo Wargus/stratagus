@@ -106,10 +106,10 @@ int CMap::Select(int x, int y, CUnit *table[],
 							const int tablesize)
 {
 	int n = 0;
-	CMapField *mf = Field(x, y);
-	const size_t size = mf->UnitCache.size();
+	CUnitCache &cache = Field(x,y)->UnitCache;
+	const size_t size = cache.size();
 	for(unsigned int i = 0; n < tablesize && i < size; ++i) {
-		CUnit *unit = mf->UnitCache.Units[i];
+		CUnit *unit = cache.Units[i];
 		Assert(!unit->Removed);
 		table[n++] = unit;
 	}
@@ -129,7 +129,7 @@ int CMap::Select(int x, int y, CUnit *table[],
 **  @return           Returns the number of units found
 */
 int CMap::Select(int x1, int y1,  
-		int x2, int y2, CUnit *table[], const int tablesize)
+		int x2, int y2, CUnit *table[], bool fixed, const int tablesize)
 {
 
 	// Optimize small searches.
@@ -141,17 +141,17 @@ int CMap::Select(int x1, int y1,
 	int n = 0;
 	CUnit *unit;
 	const CMapField *mf;
-	bool unitAdded[UnitMax];
-	bool *m;
+
 	//
 	//  Reduce to map limits.
 	//
-	x1 = std::max(x1, 0);
-	y1 = std::max(y1, 0);
-	x2 = std::min(x2, Info.MapWidth - 1);
-	y2 = std::min(y2, Info.MapHeight - 1);
+	if(!fixed) {
+		x1 = std::max(x1, 0);
+		y1 = std::max(y1, 0);
+		x2 = std::min(x2, Info.MapWidth - 1);
+		y2 = std::min(y2, Info.MapHeight - 1);
+	}
 
-	memset(unitAdded, 0, sizeof(unitAdded));
 	
 	unsigned int index = x1 + y1 * Info.MapWidth;
 	int j = y2 - y1 + 1;
@@ -159,24 +159,36 @@ int CMap::Select(int x1, int y1,
 		mf = Field(index);
 		i = x2 - x1 + 1;
 		do {
-			const size_t count = mf->UnitCache.size();
+			size_t count = mf->UnitCache.size();
 			if(count) {
-				unsigned int k = 0;
+				CUnit **cache = (CUnit **)mf->UnitCache.Units.data();
 				do {
-					unit = mf->UnitCache.Units[k];
-					m = &(unitAdded[unit->Slot]);
-					if (!(*m) && !unit->Type->Revealer) {
+					unit = *cache;
+					//
+					// To avoid getting a unit in multiple times we use a cache lock.
+					// It should only be used in here, unless you somehow want the unit
+					// to be out of cache.
+					//
+					if (!unit->CacheLock && !unit->Type->Revealer) {
 						Assert(!unit->Removed);
-						*m = true;
+						unit->CacheLock = 1;
 						table[n++] = unit;
 					}				
-				} while(++k < count && n < tablesize);
+				++cache;
+				} while(--count && n < tablesize);
 			}
 			++mf;
 		} while(--i && n < tablesize);
 		index += Info.MapWidth;
 	} while(--j && n < tablesize);
-	
+
+	//
+	// Clean the cache locks, restore to original situation.
+	//
+	for (i = 0; i < n; ++i) {
+		table[i]->CacheLock = 0;
+	}
+
 	return n;
 }
 
