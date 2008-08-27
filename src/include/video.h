@@ -49,8 +49,7 @@ class CGraphic : public gcn::Image {
 		short int y;
 	};
 	
-//protected:
-public:
+protected:
 	CGraphic() : Surface(NULL),frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
@@ -143,7 +142,7 @@ public:
 #endif
 
 #ifdef USE_OPENGL
-	friend void MakeFontColorTextures(CFont *font);
+	friend void MakeFontColorTextures(const CFont *font);
 	friend void CleanFonts(void);
 	friend void ReloadFonts(void);
 #endif
