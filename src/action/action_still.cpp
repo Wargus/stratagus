@@ -218,12 +218,7 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 {
 	CUnit *temp;
 	CUnit *goal;
-/*
-	if (unit->Wait) {
-		unit->Wait--;
-		return;
-	}
-*/
+
 	// Cowards and invisible units don't attack unless ordered.
 	if (unit->IsAgressive()) {
 		// Normal units react in reaction range.
@@ -249,7 +244,7 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 					temp->RefsDecrease();
 					unit->Orders[0]->Goal = temp = NoUnitP;
 				}
-				if (unit->SubAction < 2|| temp != goal) {
+				if (unit->SubAction < 3 || temp != goal) {
 					// New target.
 					if (temp) {
 						temp->RefsDecrease();
@@ -269,15 +264,6 @@ static void AutoAttack(CUnit *unit, bool stand_ground)
 		//unit->Wait = 15;
 	//}
 
-	if (unit->SubAction > 1) { // was attacking.
-		if ((temp = unit->Orders[0]->Goal)) {
-			temp->RefsDecrease();
-			unit->Orders[0]->Goal = NoUnitP;
-		}
-		unit->State = 0;
-		unit->SubAction = 1; // No attacking, restart
-	}
-	Assert(!unit->Orders[0]->Goal);
 }
 
 void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground)
@@ -317,7 +303,7 @@ void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground)
 					temp->RefsDecrease();
 					unit->Orders[0]->Goal = temp = NoUnitP;
 				}
-				if (unit->SubAction < 2|| temp != goal) {
+				if (unit->SubAction < 3 || temp != goal) {
 					// New target.
 					if (temp) {
 						temp->RefsDecrease();
@@ -336,17 +322,7 @@ void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground)
 	} //else {
 		//unit->Wait = 15;
 	//}
-/*
-	if (unit->SubAction > 1) { // was attacking.
-		if ((temp = unit->Orders[0]->Goal)) {
-			temp->RefsDecrease();
-			unit->Orders[0]->Goal = NoUnitP;
-		}
-		unit->State = 0;
-		unit->SubAction = 1; // No attacking, restart
-	}
-	Assert(!unit->Orders[0]->Goal);
-	*/
+
 }
 
 
@@ -401,10 +377,22 @@ void ActionStillGeneric(CUnit *unit, bool stand_ground)
 		AutoAttack(unit, stand_ground);
 	}
 	
+	//rb - do we need this ?
 	if (unit->Wait) {
 		unit->Wait--;
 		return;
 	}
+
+	if (unit->SubAction > 1) { // was attacking.
+		if(unit->Orders[0]->Goal)
+		{
+			unit->Orders[0]->Goal->RefsDecrease();
+			unit->Orders[0]->Goal = NULL;
+		}
+		unit->State = 0;
+		unit->SubAction = 1; // No attacking, restart
+	}
+	Assert(unit->Orders[0]->Goal != NULL);
 
 }
 

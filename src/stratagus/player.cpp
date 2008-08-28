@@ -746,13 +746,15 @@ void PlayersEachCycle(void)
 		if(p->AutoAttackTargets.size() > 0) {
 			CUnitCache &autoatacktargets = p->AutoAttackTargets;
 			/* both loops can not be connected !!!! */
-			for(unsigned int i = 0; i < autoatacktargets.size(); ++i) {
+			for(unsigned int i = 0; i < autoatacktargets.size();) {
 				CUnit *aatarget = autoatacktargets[i];
 				if(!aatarget->IsAliveOnMap() ||
 					Map.Field(aatarget->X, aatarget->Y)->Guard[player] == 0) {
 					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + i);
 					aatarget->RefsDecrease();
+					continue;
 				}
+				++i;
 			}
 			if(autoatacktargets.size() > 0) {
 				for (int j = 0; j < p->TotalNumUnits; ++j) {

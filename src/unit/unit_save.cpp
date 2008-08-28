@@ -179,24 +179,6 @@ void SaveOrder(const COrder *order, CFile *file)
 		case UnitActionResource :
 		case UnitActionReturnGoods :
 			if (order->CurrentResource) {
-#if 0			
-				file->printf(", \"order-data-resource\", {\"current-resource\", \"%s\"", 
-					DefaultResourceNames[order->CurrentResource].c_str());
-				//FIXME: hardcoded wood	
-				if(order->CurrentResource == WoodCost) {
-					file->printf(", \"mine-pos\", {%d, %d}",
-						order->Arg1.Resource.Pos.X, order->Arg1.Resource.Pos.Y);
-				} else {
-					if (order->Arg1.Resource.Mine->Destroyed) {
-						/* this unit is destroyed so it's not in the global unit
-						 * array - this means it won't be saved!!! */
-						printf ("FIXME: storing destroyed Mine - loading will fail.\n");
-					}				
-					file->printf(", \"mine\", \"%s\"", 
-						UnitReference(order->Arg1.Resource.Mine).c_str());
-				}
-				file->printf("}");
-#else
 				file->printf(", \"current-resource\", \"%s\",", 
 					DefaultResourceNames[order->CurrentResource].c_str());
 				if(order->CurrentResource == WoodCost) {
@@ -211,10 +193,7 @@ void SaveOrder(const COrder *order, CFile *file)
 					file->printf(" \"resource-mine\", \"%s\"", 
 						UnitReference(order->Arg1.Resource.Mine).c_str());
 				}
-#endif
-
 			}
-			//file->printf(" \"mine\", %d,", order->Arg1.ResourcePos);
 			break;
 		default:
 			break;

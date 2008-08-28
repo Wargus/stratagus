@@ -52,13 +52,13 @@
 void CMap::Insert(CUnit *unit)
 {
 	Assert(!unit->Removed);
-	unsigned int index = unit->Y * Info.MapWidth;
+	unsigned int index = unit->Offset;
 	const int w = unit->Type->TileWidth;
 	const int h = unit->Type->TileHeight;
 	int j,i = h;
 	CMapField *mf;
 	do {	
-		mf = Field(index + unit->X);
+		mf = Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Insert(unit);
@@ -76,13 +76,13 @@ void CMap::Insert(CUnit *unit)
 void CMap::Remove(CUnit *unit)
 {
 	Assert(!unit->Removed);
-	unsigned int index = unit->Y * Info.MapWidth;
+	unsigned int index = unit->Offset;
 	const int w = unit->Type->TileWidth;
 	const int h = unit->Type->TileHeight;
 	int j,i = h;
 	CMapField *mf;
 	do {	
-		mf = Field(index + unit->X);
+		mf = Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Remove(unit);
@@ -153,12 +153,14 @@ int CMap::Select(int x1, int y1,
 	}
 
 	
-	unsigned int index = x1 + y1 * Info.MapWidth;
+	unsigned int index = getIndex(x1, y1);
 	int j = y2 - y1 + 1;
 	do {
 		mf = Field(index);
 		i = x2 - x1 + 1;
 		do {
+#ifdef __GNUG__		
+			//GCC version only, since std::vector::data() is not in STL		
 			size_t count = mf->UnitCache.size();
 			if(count) {
 				CUnit **cache = (CUnit **)mf->UnitCache.Units.data();
@@ -174,20 +176,57 @@ int CMap::Select(int x1, int y1,
 						unit->CacheLock = 1;
 						table[n++] = unit;
 					}				
-				++cache;
+					++cache;
 				} while(--count && n < tablesize);
 			}
+#else
+			const size_t count = mf->UnitCache.size();
+			if(count) {	
+				unsigned int k = 0;
+				const CUnitCache &cache = mf->UnitCache;
+				do {
+					unit = cache[k];
+					//
+					// To avoid getting a unit in multiple times we use a cache lock.
+					// It should only be used in here, unless you somehow want the unit
+					// to be out of cache.
+					//
+					if (!unit->CacheLock && !unit->Type->Revealer) {
+						Assert(!unit->Removed);
+						unit->CacheLock = 1;
+						table[n++] = unit;
+					}				
+				} while(++k < count && n < tablesize);
+			}
+#endif			
 			++mf;
 		} while(--i && n < tablesize);
 		index += Info.MapWidth;
 	} while(--j && n < tablesize);
 
+	if(!n) return 0;
+
 	//
 	// Clean the cache locks, restore to original situation.
 	//
+#ifndef __GNUG__
 	for (i = 0; i < n; ++i) {
 		table[i]->CacheLock = 0;
 	}
+#else
+	i = 0;
+	j = (n+3)/4;
+	switch (n & 3) {
+		case 0: do { 
+						table[i++]->CacheLock = 0;
+		case 3:			table[i++]->CacheLock = 0;
+		case 2:			table[i++]->CacheLock = 0;
+		case 1:			table[i++]->CacheLock = 0;
+			} while ( --j > 0 );
+	}
+
+#endif
+
 
 	return n;
 }

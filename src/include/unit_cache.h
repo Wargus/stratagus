@@ -56,6 +56,11 @@ struct CUnitCache {
 		return Units.size();
 	}
 
+	inline CUnit * operator[] (const unsigned int index) const
+	{
+		Assert(index < Units.size());
+		return Units[index];
+	}
 	inline CUnit * operator[] (const unsigned int index) {
 		Assert(index < Units.size());
 		return Units[index];
@@ -70,18 +75,15 @@ struct CUnitCache {
 	template<typename _T>
 	inline CUnit *find(const _T &pred) const
 	{
-#ifdef _MSC_VER			
+#ifndef __GNUG__
 		if(Units.size()) {
 			std::vector<CUnit *>::const_iterator beg(Units.begin()), end(Units.end());
 			std::vector<CUnit *>::const_iterator ret = std::find_if(beg, end, pred);
 			return ret != end ? (*ret) : NULL;
 		}
 		return NULL;
-		//const size_t size = Units.size();
-		//int i = 0;
-		//while(size && !pred(Units[i]) && ++i < size);
-		//return (i < size ? Units[i] : NULL);
 #else
+		//GCC version only since std::vector::data() is not in STL
 		const size_t size = Units.size();
 		if(size) {
 			const CUnit *unit;
@@ -128,10 +130,11 @@ struct CUnitCache {
 	inline void for_each(_T &functor)
 	{	
 		const size_t size = Units.size();
-#ifdef _MSC_VER
+#ifndef __GNUG__
 		for(unsigned int i = 0; i < size; ++i)
 			functor(Units[i]);
 #else
+		//GCC version only since std::vector::data() is not in STL
 		if(size) {
 			int n = (size+3)/4;
 			CUnit **cache = (CUnit **)Units.data();

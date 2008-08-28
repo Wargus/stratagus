@@ -961,12 +961,12 @@ struct CUnitTypeFinder {
 		return true;
 	}
 
-	inline CUnit *FindInCache(const CUnitCache &cache) const
+	inline CUnit *Find(const CUnitCache &cache) const
 	{
 			return cache.find(*this);
 	}
 	
-	inline CUnit *FindOnTile(const CMapField *const mf) const
+	inline CUnit *Find(const CMapField *const mf) const
 	{
 			return mf->UnitCache.find(*this);
 	}
@@ -985,7 +985,7 @@ struct CResourceFinder {
 			&& !unit->IsUnusable(true) //allow mines under construction
 			);
 	}
-	inline CUnit *FindOnTile(const CMapField *const mf) const
+	inline CUnit *Find(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}	
@@ -998,7 +998,7 @@ struct CResourceDepositFinder {
 	{
 		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
 	}
-	inline CUnit *FindOnTile(const CMapField *const mf) const
+	inline CUnit *Find(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}	

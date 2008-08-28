@@ -624,7 +624,7 @@ static inline int CostMoveTo(unsigned int index, void *data)
 						*c = -1;
 						return -1;
 					}
-					goal = unit_finder.FindOnTile(mf);
+					goal = unit_finder.Find(mf);
 					if (!goal) {
 						// Shouldn't happen, mask says there is something on this tile
 						Assert(0);

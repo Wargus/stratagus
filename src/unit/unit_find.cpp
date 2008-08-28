@@ -138,7 +138,7 @@ int FindPlayerUnitsByType(const CPlayer *player, const CUnitType *type,
 */
 CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
 {
-	return CUnitTypeFinder((UnitTypeType)type).FindOnTile(Map.Field(index));
+	return CUnitTypeFinder((UnitTypeType)type).Find(Map.Field(index));
 }
 
 /**
@@ -216,7 +216,7 @@ CUnit *TargetOnMap(const CUnit *source, int x1, int y1, int x2, int y2)
 */
 CUnit *ResourceOnMap(int tx, int ty, int resource, bool mine_on_top)
 {
-	return CResourceFinder(resource, mine_on_top).FindOnTile(Map.Field(tx,ty));
+	return CResourceFinder(resource, mine_on_top).Find(Map.Field(tx,ty));
 }
 
 /**
@@ -230,7 +230,7 @@ CUnit *ResourceOnMap(int tx, int ty, int resource, bool mine_on_top)
 */
 CUnit *ResourceDepositOnMap(int tx, int ty, int resource)
 {
-	return CResourceDepositFinder(resource).FindOnTile(Map.Field(tx,ty));
+	return CResourceDepositFinder(resource).Find(Map.Field(tx,ty));
 }
 
 /*----------------------------------------------------------------------------
