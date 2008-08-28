@@ -72,7 +72,7 @@ void HandleActionReturnGoods(CUnit *unit)
 	}
 
 	// If depot was destroyed search for another one.
-	if (!unit->Orders[0]->Goal) {
+	if (!unit->CurrentOrder()->HasGoal()) {
 		CUnit *destu;
 
 		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
@@ -80,15 +80,14 @@ void HandleActionReturnGoods(CUnit *unit)
 			ResourceGiveUp(unit);
 			return;
 		}
-		unit->Orders[0]->Goal = destu;
-		destu->RefsIncrease();
+		unit->CurrentOrder()->SetGoal(destu);
 	}
 
-	unit->Orders[0]->Action = UnitActionResource;
+	unit->CurrentOrder()->Action = UnitActionResource;
 	// Somewhere on the way the loaded worker could have change Arg1
 	// Bummer, go get the closest resource to the depot
 	//FIXME!!!!!!!!!!!!!!!!!!!!
-	//unit->Orders[0]->Arg1.ResourcePos = -1;
+	//unit->CurrentOrder()->Arg1.ResourcePos = -1;
 
 	NewResetPath(unit);
 	unit->SubAction = 70; // FIXME : Define value.

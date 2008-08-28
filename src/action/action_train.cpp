@@ -64,7 +64,7 @@
 **
 **  @return  1 if the the unit can do it, 0 otherwise.
 */
-static int CanHandleOrder(CUnit *unit, COrder *order)
+static int CanHandleOrder(CUnit *unit, COrderPtr order)
 {
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
@@ -72,7 +72,8 @@ static int CanHandleOrder(CUnit *unit, COrder *order)
 			return 0;
 		}
 		//  Also check if new unit can harvest this specific resource.
-		if (order->Goal && !unit->Type->ResInfo[order->Goal->Type->GivesResource]) {
+		CUnit *goal = order->GetGoal();
+		if (goal && !unit->Type->ResInfo[goal->Type->GivesResource]) {
 			return 0;
 		}
 		return 1;
@@ -94,9 +95,9 @@ static int CanHandleOrder(CUnit *unit, COrder *order)
 void HandleActionTrain(CUnit *unit)
 {
 	CUnit *nunit;
-	const CUnitType *type;
+	CUnitType *ntype;
 	CPlayer *player;
-	int food;
+	int food, cost;
 
 	//
 	// First entry
@@ -109,19 +110,21 @@ void HandleActionTrain(CUnit *unit)
 	unit->Type->Animations->Train ?
 		UnitShowAnimation(unit, unit->Type->Animations->Train) :
 		UnitShowAnimation(unit, unit->Type->Animations->Still);
+
 	if (unit->Wait) {
 		unit->Wait--;
 		return;
 	}
 
 	player = unit->Player;
+	ntype = unit->CurrentOrder()->Arg1.Type;
+	cost = ntype->Stats[player->Index].Costs[TimeCost];
+	
 	unit->Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
-	if (unit->Data.Train.Ticks >=
-			unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost]) {
+	if (unit->Data.Train.Ticks >= cost) {
 
-		unit->Data.Train.Ticks =
-			unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
+		unit->Data.Train.Ticks = cost;
 
 		//
 		// Check if there are still unit slots.
@@ -134,23 +137,22 @@ void HandleActionTrain(CUnit *unit)
 		//
 		// Check if enough supply available.
 		//
-		food = player->CheckLimits(unit->Orders[0]->Type);
+		food = player->CheckLimits(ntype);
 		if (food < 0) {
 			if (food == -3 && unit->Player->AiEnabled) {
-				AiNeedMoreSupply(unit, unit->Orders[0]->Type);
+				AiNeedMoreSupply(unit, ntype);
 			}
 
-			unit->Data.Train.Ticks =
-				unit->Orders[0]->Type->Stats[player->Index].Costs[TimeCost];
+			unit->Data.Train.Ticks = cost;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
-		nunit = MakeUnit(unit->Orders[0]->Type, player);
+		nunit = MakeUnit(ntype, player);
 		if (nunit != NoUnitP) {
+			const CUnitType *type = unit->Type;
 			nunit->X = unit->X;
 			nunit->Y = unit->Y;
-			type = unit->Type;
 
 			// DropOutOnSide set unit to belong to the building
 			// training it. This was an ugly hack, setting X and Y is enough,
@@ -188,30 +190,20 @@ void HandleActionTrain(CUnit *unit)
 				DebugPrint("Wrong order for unit\n");
 
 				// Tell the unit to move instead of trying any funny stuff.
-				*nunit->Orders[0] = unit->NewOrder;
-				nunit->Orders[0]->Action = UnitActionMove;
-				if (nunit->Orders[0]->Goal) {
-					nunit->Orders[0]->Goal->RefsIncrease();
-				}
+				*(nunit->CurrentOrder()) = unit->NewOrder;
+				nunit->CurrentOrder()->Action = UnitActionMove;
+				nunit->CurrentOrder()->ClearGoal();
 			} else {
-				if (unit->NewOrder.Goal) {
-					if (unit->NewOrder.Goal->Destroyed) {
+				if (unit->NewOrder.HasGoal()) {
+					if (unit->NewOrder.GetGoal()->Destroyed) {
 						// FIXME: perhaps we should use another goal?
 						DebugPrint("Destroyed unit in train unit\n");
-						unit->NewOrder.Goal->RefsDecrease();
-						unit->NewOrder.Goal = NoUnitP;
+						unit->NewOrder.ClearGoal();
 						unit->NewOrder.Action = UnitActionStill;
 					}
 				}
 
-				*nunit->Orders[0] = unit->NewOrder;
-
-				//
-				// FIXME: Pending command uses any references?
-				//
-				if (nunit->Orders[0]->Goal) {
-					nunit->Orders[0]->Goal->RefsIncrease();
-				}
+				*(nunit->CurrentOrder()) = unit->NewOrder;
 			}
 
 			if (IsOnlySelected(unit)) {
@@ -220,7 +212,7 @@ void HandleActionTrain(CUnit *unit)
 			return;
 		} else {
 			player->Notify(NotifyYellow, unit->X, unit->Y,
-				_("Unable to train %s"), unit->Orders[0]->Type->Name.c_str());
+				_("Unable to train %s"), ntype->Name.c_str());
 		}
 	}
 

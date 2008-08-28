@@ -159,7 +159,7 @@ int CMap::Select(int x1, int y1,
 		mf = Field(index);
 		i = x2 - x1 + 1;
 		do {
-#ifdef __GNUG__		
+#if __GNUC__ >  3
 			//GCC version only, since std::vector::data() is not in STL		
 			size_t count = mf->UnitCache.size();
 			if(count) {

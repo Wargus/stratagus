@@ -139,7 +139,7 @@ int Demolish::Cast(CUnit *caster, const SpellType *spell,
 	if (this->Damage) {
 		n = Map.Select(xmin, ymin, xmax + 1, ymax + 1, table, true);
 		for (i = 0; i < n; ++i) {
-			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0]->Action != UnitActionDie &&
+			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->CurrentAction() != UnitActionDie &&
 					table[i]->MapDistanceTo(x, y) <= this->Range) {
 				// Don't hit flying units!
 				HitUnit(caster, table[i], this->Damage);
@@ -675,7 +675,7 @@ int Summon::Cast(CUnit *caster, const SpellType *spell,
 		while (n) {
 			n--;
 			unit = table[n];
-			if (unit->Orders[0]->Action == UnitActionDie && !unit->Type->Building) {
+			if (unit->CurrentAction() == UnitActionDie && !unit->Type->Building) {
 				//
 				//  Found a corpse. eliminate it and proceed to summoning.
 				//
@@ -774,7 +774,7 @@ static bool PassCondition(const CUnit *caster, const SpellType *spell, const CUn
 		return false;
 	}
 	if (spell->Target == TargetUnit) { // Casting a unit spell without a target.
-		if ((!target) || target->Destroyed || target->Orders[0]->Action == UnitActionDie) {
+		if ((!target) || target->Destroyed || target->CurrentAction() == UnitActionDie) {
 			return false;
 		}
 	}

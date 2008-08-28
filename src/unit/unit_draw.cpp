@@ -164,7 +164,7 @@ void DrawUnitSelection(const CUnit *unit)
 			}
 		}
 	} else if (CursorBuilding && unit->Type->Building &&
-			unit->Orders[0]->Action != UnitActionDie &&
+			unit->CurrentAction() != UnitActionDie &&
 			(unit->Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
 		// If building mark all own buildings
 		color = ColorGray;
@@ -640,7 +640,7 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 	Assert(!unit || unit->Type == type);
 
 	// unit == NULL for the editor
-	if (unit && unit->Orders[0]->Action == UnitActionDie) {
+	if (unit && unit->CurrentAction() == UnitActionDie) {
 		return;
 	}
 
@@ -677,12 +677,12 @@ void DrawShadow(const CUnit *unit, const CUnitType *type, int frame,
 **  @param x      Resulting screen X cordinate.
 **  @param y      Resulting screen Y cordinate.
 */
-static void GetOrderPosition(const CUnit *unit, const COrder *order, int *x, int *y)
+static void GetOrderPosition(const CUnit *unit, const COrderPtr order, int *x, int *y)
 {
 	CUnit *goal;
 
 	// FIXME: n0body: Check for goal gone?
-	if ((goal = order->Goal) && (!goal->Removed)) {
+	if ((goal = order->GetGoal()) && (!goal->Removed)) {
 		// Order has a goal, get it's location.
 		*x = CurrentViewport->Map2ViewportX(goal->X) + goal->IX +
 			goal->Type->TileWidth * TileSizeX / 2;
@@ -702,8 +702,8 @@ static void GetOrderPosition(const CUnit *unit, const COrder *order, int *x, int
 				unit->Type->TileHeight * TileSizeY / 2;
 		}
 		if (order->Action == UnitActionBuild) {
-			*x += (order->Type->TileWidth - 1) * TileSizeX / 2;
-			*y += (order->Type->TileHeight - 1) * TileSizeY / 2;
+			*x += (order->Arg1.Type->TileWidth - 1) * TileSizeX / 2;
+			*y += (order->Arg1.Type->TileHeight - 1) * TileSizeY / 2;
 		}
 	}
 }
@@ -716,7 +716,7 @@ static void GetOrderPosition(const CUnit *unit, const COrder *order, int *x, int
 **  @param y1     Y pixel coordinate.
 **  @param order  Order to display.
 */
-static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *order)
+static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrderPtr order)
 {
 	int x2;
 	int y2;
@@ -805,12 +805,14 @@ static void ShowSingleOrder(const CUnit *unit, int x1, int y1, const COrder *ord
 			break;
 
 		case UnitActionBuild:
-			DrawSelection(ColorGray, x2 - order->Type->BoxWidth / 2,
-				y2 - order->Type->BoxHeight / 2,
-				x2 + order->Type->BoxWidth / 2,
-				y2 + order->Type->BoxHeight / 2);
+		{
+			int w = order->Arg1.Type->BoxWidth;
+			int h = order->Arg1.Type->BoxHeight;
+			DrawSelection(ColorGray, x2 - w / 2, y2 - h / 2, x2 + w / 2,
+				y2 + h / 2);
 			e_color = color = ColorGreen;
 			dest = true;
+		}
 			break;
 
 		case UnitActionBuilt:
@@ -849,7 +851,7 @@ void ShowOrder(const CUnit *unit)
 {
 	int x1;
 	int y1;
-	COrder *order;
+	COrderPtr order;
 
 	if (unit->Destroyed) {
 		return;
@@ -877,7 +879,7 @@ void ShowOrder(const CUnit *unit)
 
 	// Show order for new trained units
 	if (!CanMove(unit)) {
-		ShowSingleOrder(unit, x1, y1, &unit->NewOrder);
+		ShowSingleOrder(unit, x1, y1, (COrderPtr)(&unit->NewOrder));
 	}
 }
 
@@ -940,7 +942,7 @@ static void DrawInformations(const CUnit *unit, const CUnitType *type, int x, in
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit->Orders[0]->Action != UnitActionDie && unit->IsVisible(ThisPlayer)) {
+	if (unit->CurrentAction() != UnitActionDie && unit->IsVisible(ThisPlayer)) {
 		DrawDecoration(unit, type, x, y);
 	}
 }
@@ -1116,12 +1118,12 @@ void CUnit::Draw() const
 		x = this->IX;
 		x += CurrentViewport->Map2ViewportX(this->X);
 		y += CurrentViewport->Map2ViewportY(this->Y);
-		state = (this->Orders[0]->Action == UnitActionBuilt) |
-			((this->Orders[0]->Action == UnitActionUpgradeTo) << 1);
+		state = (this->CurrentAction() == UnitActionBuilt) |
+			((this->CurrentAction() == UnitActionUpgradeTo) << 1);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
 		if (state == 2) {
-			type = this->Orders[0]->Type;
+			type = this->CurrentOrder()->Arg1.Type;
 		}
 		// This is trash unless the unit is being built, and that's when we use it.
 		cframe = this->Data.Built.Frame;
@@ -1225,12 +1227,12 @@ static int DrawLevelCompare(const void *v1, const void *v2) {
 	c1 = *(CUnit **)v1;
 	c2 = *(CUnit **)v2;
 
-	if (c1->Orders[0]->Action == UnitActionDie && c1->Type->CorpseType) {
+	if (c1->CurrentAction() == UnitActionDie && c1->Type->CorpseType) {
 		drawlevel1 = c1->Type->CorpseType->DrawLevel;
 	} else {
 		drawlevel1 = c1->Type->DrawLevel;
 	}
-	if (c2->Orders[0]->Action == UnitActionDie && c2->Type->CorpseType) {
+	if (c2->CurrentAction() == UnitActionDie && c2->Type->CorpseType) {
 		drawlevel2 = c2->Type->CorpseType->DrawLevel;
 	} else {
 		drawlevel2 = c2->Type->DrawLevel;

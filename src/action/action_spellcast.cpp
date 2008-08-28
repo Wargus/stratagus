@@ -106,9 +106,10 @@ static void SpellMoveToTarget(CUnit *unit)
 
 	// when reached DoActionMove changes unit action
 	// FIXME: use return codes from pathfinder
-	goal = unit->Orders[0]->Goal;
+	COrderPtr order = unit->CurrentOrder();
+	goal = order->GetGoal();
 
-	if (goal && unit->MapDistanceTo(goal) <=	unit->Orders[0]->Range) {
+	if (goal && unit->MapDistanceTo(goal) <= order->Range) {
 
 		// there is goal and it is in range
 		unit->State = 0;
@@ -117,12 +118,11 @@ static void SpellMoveToTarget(CUnit *unit)
 			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
-	} else if (!goal && unit->MapDistanceTo(unit->Orders[0]->X,
-			unit->Orders[0]->Y) <= unit->Orders[0]->Range) {
+	} else if (!goal && unit->MapDistanceTo(order->X, order->Y) <= order->Range) {
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit,
-			unit->Orders[0]->X + unit->Orders[0]->Arg1.Spell->Range - unit->X,
-			unit->Orders[0]->Y + unit->Orders[0]->Arg1.Spell->Range - unit->Y);
+			order->X + order->Arg1.Spell->Range - unit->X,
+			order->Y + order->Arg1.Spell->Range - unit->Y);
 		unit->SubAction++; // cast the spell
 		return;
 	} else if (err == PF_UNREACHABLE) {
@@ -131,11 +131,7 @@ static void SpellMoveToTarget(CUnit *unit)
 		//
 		unit->ClearAction();
 		unit->State = 0;
-
-		if (unit->Orders[0]->Goal) { // Release references
-			unit->Orders[0]->Goal->RefsDecrease();
-			unit->Orders[0]->Goal = NoUnitP;
-		}
+		order->ClearGoal(); // Release references
 	}
 	Assert(!unit->Type->Vanishes && !unit->Destroyed);
 }
@@ -154,15 +150,14 @@ void HandleActionSpellCast(CUnit *unit)
 		unit->Wait--;
 		return;
 	}
-
+	COrderPtr order = unit->CurrentOrder();
 	switch (unit->SubAction) {
 		case 0:
 			//
 			// Check if we can cast the spell.
 			//
-			spell = unit->Orders[0]->Arg1.Spell;
-			if (!CanCastSpell(unit, spell, unit->Orders[0]->Goal,
-					unit->Orders[0]->X, unit->Orders[0]->Y)) {
+			spell = order->Arg1.Spell;
+			if (!CanCastSpell(unit, spell, order->GetGoal(), order->X, order->Y)) {
 
 				//
 				// Notify player about this problem
@@ -181,10 +176,7 @@ void HandleActionSpellCast(CUnit *unit)
 					DebugPrint("FIXME: do we need an AI callback?\n");
 				}
 				unit->ClearAction();
-				if (unit->Orders[0]->Goal) {
-					unit->Orders[0]->Goal->RefsDecrease();
-					unit->Orders[0]->Goal = NoUnitP;
-				}
+				order->ClearGoal(); // Release references
 				return;
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
@@ -193,7 +185,8 @@ void HandleActionSpellCast(CUnit *unit)
 			unit->SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
-			if ((spell = unit->Orders[0]->Arg1.Spell)->Range != INFINITE_RANGE) {
+			spell = order->Arg1.Spell;
+			if (spell->Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
 			} else {
@@ -209,20 +202,17 @@ void HandleActionSpellCast(CUnit *unit)
 				}
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
-				if (unit->Orders[0]->Goal && !unit->Orders[0]->Goal->IsVisibleAsGoal(unit->Player)) {
+				CUnit *goal = order->GetGoal();
+				if (goal && !goal->IsVisibleAsGoal(unit->Player)) {
 					unit->ReCast = 0;
 				} else {
-					spell = unit->Orders[0]->Arg1.Spell;
-					unit->ReCast = SpellCast(unit, spell, unit->Orders[0]->Goal,
-						unit->Orders[0]->X, unit->Orders[0]->Y);
+					spell = order->Arg1.Spell;
+					unit->ReCast = SpellCast(unit, spell, goal, order->X, order->Y);
 				}
 			}
-			if (!unit->ReCast && unit->Orders[0]->Action != UnitActionDie) {
+			if (!unit->ReCast && unit->CurrentAction() != UnitActionDie) {
 				unit->ClearAction();
-				if (unit->Orders[0]->Goal) {
-					unit->Orders[0]->Goal->RefsDecrease();
-					unit->Orders[0]->Goal = NoUnitP;
-				}
+				order->ClearGoal(); // Release references
 			}
 			break;
 

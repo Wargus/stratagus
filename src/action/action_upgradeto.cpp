@@ -149,7 +149,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 void HandleActionTransformInto(CUnit *unit)
 {
 	// What to do if an error occurs ?
-	TransformUnitIntoType(unit, unit->CriticalOrder.Type);
+	TransformUnitIntoType(unit, unit->CriticalOrder.Arg1.Type);
 	unit->CriticalOrder.Action = UnitActionStill;
 }
 
@@ -174,13 +174,14 @@ void HandleActionUpgradeTo(CUnit *unit)
 	unit->Type->Animations->Upgrade ?
 		UnitShowAnimation(unit, unit->Type->Animations->Upgrade) :
 		UnitShowAnimation(unit, unit->Type->Animations->Still);
+
 	if (unit->Wait) {
 		unit->Wait--;
 		return;
 	}
 
 	player = unit->Player;
-	newtype = unit->Orders[0]->Type;
+	newtype = unit->CurrentOrder()->Arg1.Type;
 	newstats = &newtype->Stats[player->Index];
 
 	// FIXME: Should count down here

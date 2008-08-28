@@ -96,7 +96,7 @@ static int AiCheckCosts(const int *costs)
 		for (k = 0; k < units[i]->OrderCount; ++k) {
 			if (units[i]->Orders[k]->Action == UnitActionBuild) {
 				building_costs =
-					units[i]->Orders[k]->Type->Stats[AiPlayer->Player->Index].Costs;
+					units[i]->Orders[k]->Arg1.Type->Stats[AiPlayer->Player->Index].Costs;
 				for (j = 1; j < MaxCosts; ++j) {
 					used[j] += building_costs[j];
 				}
@@ -216,7 +216,7 @@ int AiEnemyUnitsInDistance(const CPlayer *player,
 		// Those can't attack anyway.
 		//
 		if (dest->Removed || dest->Variable[INVISIBLE_INDEX].Value ||
-			dest->Orders[0]->Action == UnitActionDie) {
+			dest->CurrentAction() == UnitActionDie) {
 			continue;
 		}
 
@@ -433,10 +433,10 @@ void AiNewDepotRequest(CUnit *worker) {
 			queue.Made = 0;
 			
 			if(resinfo->TerrainHarvester) {
-				queue.X = worker->Orders[0]->Arg1.Resource.Pos.X;
-				queue.Y = worker->Orders[0]->Arg1.Resource.Pos.Y;
+				queue.X = worker->CurrentOrder()->Arg1.Resource.Pos.X;
+				queue.Y = worker->CurrentOrder()->Arg1.Resource.Pos.Y;
 			} else {
-				CUnit *mine = worker->Orders[0]->Arg1.Resource.Mine;
+				CUnit *mine = worker->CurrentOrder()->Arg1.Resource.Mine;
 				if(mine) {
 					queue.X = mine->X;
 					queue.Y = mine->Y;
@@ -1054,7 +1054,7 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 
 		if (dest) {
 			//FIXME: rb - when workers can speedup building then such assign may be ok. 
-			//if(dest->Orders[0]->Action == UnitActionBuilt)
+			//if(dest->CurrentAction() == UnitActionBuilt)
 				//CommandBuildBuilding(unit, dest->X, dest->Y, dest->Type, FlushCommands);
 			//else	
 				CommandResource(unit, dest, FlushCommands);
@@ -1183,7 +1183,8 @@ static void AiCollectResources(void)
 		//
 		// See if it's assigned already
 		//
-		if (unit->Orders[0]->Action == UnitActionResource && unit->OrderCount == 1 && c) {
+		if (c && unit->OrderCount == 1 && 
+			unit->CurrentAction() == UnitActionResource) {
 			units_assigned[num_units_assigned[c]++][c] = unit;
 			total_harvester++;
 			continue;
@@ -1410,9 +1411,9 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
-		if (unit->Type->RepairRange &&
-			(unit->Orders[0]->Action == UnitActionResource ||
-				unit->Orders[0]->Action == UnitActionStill) && unit->OrderCount == 1) {
+		if (unit->Type->RepairRange && unit->OrderCount == 1 &&
+			(unit->CurrentAction() == UnitActionResource ||
+				unit->CurrentAction() == UnitActionStill)) {
 			table[num++] = unit;
 		}
 	}
@@ -1545,8 +1546,8 @@ static void AiCheckRepair(void)
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit->Type->RepairHP &&
-				unit->Orders[0]->Action != UnitActionBuilt &&
-				unit->Orders[0]->Action != UnitActionUpgradeTo &&
+				unit->CurrentAction() != UnitActionBuilt &&
+				unit->CurrentAction() != UnitActionUpgradeTo &&
 				unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max &&
 				unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
@@ -1577,11 +1578,11 @@ static void AiCheckRepair(void)
 			}
 		}
 		// Building under construction but no worker
-		if (unit->Orders[0]->Action == UnitActionBuilt) {
+		if (unit->CurrentAction() == UnitActionBuilt) {
 			int j;
 			for (j = 0; j < AiPlayer->Player->TotalNumUnits; ++j) {
-				COrder *order = AiPlayer->Player->Units[j]->Orders[0];
-				if (order->Action == UnitActionRepair && order->Goal == unit) {
+				COrderPtr order = AiPlayer->Player->Units[j]->CurrentOrder();
+				if (order->Action == UnitActionRepair && order->GetGoal() == unit) {
 					break;
 				}
 			}

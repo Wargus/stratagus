@@ -70,11 +70,11 @@ static int MoveToTransporter(CUnit *unit)
 	i = DoActionMove(unit);
 	// We have to reset a lot, or else they will circle each other and stuff.
 	if (x != unit->X || y != unit->Y) {
-		unit->Orders[0]->Range = 1;
+		unit->CurrentOrder()->Range = 1;
 		NewResetPath(unit);
 	}
 	// New code has this as default.
-	Assert(unit->Orders[0]->Action == UnitActionBoard);
+	Assert(unit->CurrentAction() == UnitActionBoard);
 	return i;
 }
 
@@ -87,14 +87,13 @@ static int MoveToTransporter(CUnit *unit)
 */
 static int WaitForTransporter(CUnit *unit)
 {
-	CUnit *trans;
 
 	if (unit->Wait) {
 		unit->Wait--;
 		return 0;
 	}
 
-	trans = unit->Orders[0]->Goal;
+	CUnit *trans = unit->CurrentOrder()->GetGoal();
 
 	if (!trans || !CanTransport(trans, unit)) {
 		// FIXME: destination destroyed??
@@ -104,8 +103,7 @@ static int WaitForTransporter(CUnit *unit)
 
 	if (!trans->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Transporter Gone\n");
-		trans->RefsDecrease();
-		unit->Orders[0]->Goal = NoUnitP;
+		unit->CurrentOrder()->ClearGoal();
 		unit->Wait = 6;
 		return 0;
 	}
@@ -125,7 +123,7 @@ static int WaitForTransporter(CUnit *unit)
 	// it's there. This is why we reset the search. The transporter
 	// should be a lot closer now, so it's not as bad as it seems.
 	unit->SubAction = 0;
-	unit->Orders[0]->Range = 1;
+	unit->CurrentOrder()->Range = 1;
 	// Uhh wait a bit.
 	unit->Wait = 10;
 
@@ -143,16 +141,14 @@ static void EnterTransporter(CUnit *unit)
 
 	unit->ClearAction();
 
-	transporter = unit->Orders[0]->Goal;
+	transporter = unit->CurrentOrder()->GetGoal();
 	if (!transporter->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Transporter gone\n");
-		transporter->RefsDecrease();
-		unit->Orders[0]->Goal = NoUnitP;
+		unit->CurrentOrder()->ClearGoal();
 		return;
 	}
 
-	transporter->RefsDecrease();
-	unit->Orders[0]->Goal = NoUnitP;
+	unit->CurrentOrder()->ClearGoal();
 
 	//
 	// Place the unit inside the transporter.
@@ -186,9 +182,6 @@ static void EnterTransporter(CUnit *unit)
 */
 void HandleActionBoard(CUnit *unit)
 {
-	int i;
-	CUnit *goal;
-
 	switch (unit->SubAction) {
 		//
 		// Wait for transporter
@@ -219,22 +212,19 @@ void HandleActionBoard(CUnit *unit)
 			// FALL THROUGH
 		default:
 			if (unit->SubAction <= 200) {
+				int i;
 				// FIXME: if near transporter wait for enter
 				if ((i = MoveToTransporter(unit))) {
 					if (i == PF_UNREACHABLE) {
 						if (++unit->SubAction == 200) {
 							unit->ClearAction();
-							if ((goal = unit->Orders[0]->Goal)) {
-								goal->RefsDecrease();
-								unit->Orders[0]->Goal = NoUnitP;
-							}
+							unit->CurrentOrder()->ClearGoal();
 						} else {
 							//
 							// Try with a bigger range.
 							//
-							if (unit->Orders[0]->Range <= Map.Info.MapWidth ||
-									unit->Orders[0]->Range <= Map.Info.MapHeight) {
-								unit->Orders[0]->Range++;
+							if (unit->CurrentOrder()->CheckRange()) {
+								unit->CurrentOrder()->Range++;
 								unit->SubAction--;
 							}
 						}

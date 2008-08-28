@@ -297,7 +297,7 @@ static void AiCleanForce(const unsigned int force)
 	i = 0;
 	while (i != units.size()) {
 		aiunit = units[i];
-		if (aiunit->Destroyed || aiunit->Orders[0]->Action == UnitActionDie) {
+		if (aiunit->Destroyed || aiunit->CurrentAction() == UnitActionDie) {
 			aiunit->RefsDecrease();
 			units.Remove(i);
 			continue;
@@ -677,7 +677,7 @@ static void AiForceAttacks(AiForce *force)
 					unit = aiunit;
 				}
 				// If the unit has a goal use it
-				if (aiunit->Orders[0]->Goal != NoUnitP) {
+				if (aiunit->CurrentOrder()->HasGoal()) {
 					unit = aiunit;
 					break;
 				}
@@ -687,12 +687,13 @@ static void AiForceAttacks(AiForce *force)
 	if (unit != NoUnitP) {
 		// Give idle units a new goal
 		// FIXME: may not be a good goal
-		if (unit->Orders[0]->Goal) {
-			x = unit->Orders[0]->Goal->X;
-			y = unit->Orders[0]->Goal->Y;
-		} else if (unit->Orders[0]->X != -1 && unit->Orders[0]->Y != -1) {
-			x = unit->Orders[0]->X;
-			y = unit->Orders[0]->Y;
+		COrderPtr order = unit->CurrentOrder();
+		if (order->HasGoal()) {
+			x = order->GetGoal()->X;
+			y = order->GetGoal()->Y;
+		} else if (order->X != -1 && order->Y != -1) {
+			x = order->X;
+			y = order->Y;
 		} else {
 			x = force->GoalX;
 			y = force->GoalY;

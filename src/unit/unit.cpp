@@ -120,17 +120,71 @@ void CUnit::RefsDecrease()
 	}
 }
 
-void COrder::Release(void) {
+void CUnit::COrder::Release(void) {
 	if (Goal) {
 		Goal->RefsDecrease();
 		Goal = NoUnitP;
 	}
+	//FIXME: Hardcoded wood		
 	if (Action == UnitActionResource && CurrentResource != WoodCost && 
 		Arg1.Resource.Mine ) {
 		Arg1.Resource.Mine->RefsDecrease();
 		Arg1.Resource.Mine = NoUnitP;
 	}
 }
+
+CUnit::COrder::COrder(const CUnit::COrder &ths): Goal(ths.Goal), Range(ths.Range),
+	 MinRange(ths.MinRange), Width(ths.Width), Height(ths.Height),
+	 Action(ths.Action), CurrentResource(ths.CurrentResource), 
+	 X(ths.X), Y(ths.Y)
+ {
+	if (Goal) {
+		Goal->RefsIncrease();
+	}
+	
+	memcpy(&Arg1, &ths.Arg1, sizeof(Arg1));
+	
+	//FIXME: Hardcoded wood	
+	if (Action == UnitActionResource &&
+		 CurrentResource != WoodCost && Arg1.Resource.Mine) {
+		 Arg1.Resource.Mine->RefsIncrease();
+	}
+}
+
+CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
+	if (this != &rhs) {
+	
+		//FIXME: Hardcoded wood		
+		if (Action == UnitActionResource &&
+			 CurrentResource != WoodCost && Arg1.Resource.Mine) {
+			 Arg1.Resource.Mine->RefsDecrease();
+		}
+
+		Action = rhs.Action;
+		Range = rhs.Range;
+		MinRange = rhs.MinRange;
+		Width = rhs.Width;
+		Height = rhs.Height;
+		CurrentResource = rhs.CurrentResource;
+		SetGoal(rhs.Goal);
+		X = rhs.X;
+		Y = rhs.Y;
+		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
+		
+		//FIXME: Hardcoded wood		
+		if(Action == UnitActionResource &&
+			 CurrentResource != WoodCost && Arg1.Resource.Mine) {
+			 Arg1.Resource.Mine->RefsIncrease();
+		}
+	}
+	return *this;
+}
+
+bool CUnit::COrder::CheckRange(void)
+{
+	return (Range <= Map.Info.MapWidth || Range <= Map.Info.MapHeight);
+}
+
 
 /**
 **  Release an unit.
@@ -143,7 +197,7 @@ void CUnit::Release()
 
 	Assert(Type); // already free.
 	Assert(OrderCount == 1);
-	Assert(!Orders[0]->Goal);
+	Assert(!CurrentOrder()->HasGoal());
 	// Must be removed before here
 	Assert(Removed);
 
@@ -256,18 +310,74 @@ void CUnit::Init(CUnitType *type)
 	Orders.push_back(new COrder);
 
 	OrderCount = 1; // No orders
-	Orders[0]->Action = UnitActionStill;
-	Orders[0]->X = Orders[0]->Y = -1;
-	Assert(!Orders[0]->Goal);
+	CurrentOrder()->Action = UnitActionStill;
+	CurrentOrder()->X = CurrentOrder()->Y = -1;
+	Assert(!CurrentOrder()->HasGoal());
 	NewOrder.Action = UnitActionStill;
 	NewOrder.X = NewOrder.Y = -1;
-	Assert(!NewOrder.Goal);
+	Assert(!NewOrder.HasGoal());
 	SavedOrder.Action = UnitActionStill;
 	SavedOrder.X = SavedOrder.Y = -1;
-	Assert(!SavedOrder.Goal);
+	Assert(!SavedOrder.HasGoal());
 	CriticalOrder.Action = UnitActionStill;
 	CriticalOrder.X = CriticalOrder.Y = -1;
-	Assert(!CriticalOrder.Goal);
+	Assert(!CriticalOrder.HasGoal());
+}
+
+/**
+**  Restore the saved order
+**
+**  @return      True if the saved order was restored
+*/
+bool CUnit::RestoreOrder(void)
+{
+	if (this->SavedOrder.Action != UnitActionStill) {
+		// Restart order state.
+		this->State = 0;	
+		this->SubAction = 0;
+		
+		Assert(!this->CurrentOrder()->HasGoal());
+		
+		//copy
+		*(this->CurrentOrder()) = this->SavedOrder;
+		
+		this->CurrentResource = this->SavedOrder.CurrentResource;
+		
+		NewResetPath(this);
+
+		// This isn't supported
+		Assert(!this->SavedOrder.HasGoal());
+		
+		this->SavedOrder.Action = UnitActionStill;
+		this->SavedOrder.ClearGoal();
+		return true;
+	}
+	return false;
+}
+
+/**
+**  Store the Current order
+**
+**  @return      True if the current order was saved
+*/
+bool CUnit::StoreOrder(void)
+{
+	if (this->SavedOrder.Action == UnitActionStill) {
+		// Save current order to come back or to continue it.
+		this->SavedOrder = *(this->CurrentOrder());
+		CUnit *temp = this->SavedOrder.GetGoal();
+		if (temp) {
+			DebugPrint("Have goal to come back %d\n" _C_
+					UnitNumber(temp));
+			this->SavedOrder.X = temp->X + temp->Type->TileWidth / 2;
+			this->SavedOrder.Y = temp->Y + temp->Type->TileHeight / 2;
+			this->SavedOrder.MinRange = 0;
+			this->SavedOrder.Range = 0;
+			this->SavedOrder.ClearGoal();
+		}
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -285,7 +395,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 	//
 	// Build player unit table
 	//
-	if (!type->Vanishes && Orders[0]->Action != UnitActionDie) {
+	if (!type->Vanishes && CurrentAction() != UnitActionDie) {
 		PlayerSlot = player->Units + player->TotalNumUnits++;
 		if (!SaveGameLoading) {
 			// If unit is dieing, it's already been lost by all players
@@ -307,7 +417,7 @@ void CUnit::AssignToPlayer(CPlayer *player)
 
 
 	// Don't Add the building if it's dieing, used to load a save game
-	if (type->Building && Orders[0]->Action != UnitActionDie) {
+	if (type->Building && CurrentAction() != UnitActionDie) {
 		// FIXME: support more races
 		if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
 			player->NumBuildings++;
@@ -545,7 +655,7 @@ struct _UnmarkUnitFieldFlags {
 	_UnmarkUnitFieldFlags(const CUnit *const unit)
 		 : main(unit) {}
 	inline void operator () (CUnit *const unit) {
-		if (main != unit && unit->Orders[0]->Action != UnitActionDie) {
+		if (main != unit && unit->CurrentAction() != UnitActionDie) {
 			mf->Flags |= unit->Type->FieldFlags;
 		}
 	}
@@ -635,8 +745,8 @@ static void RemoveUnitFromContainer(CUnit *unit)
 **  @param x     X map tile position.
 **  @param y     Y map tile position.
 **
-**  @internal before use it, UnitCacheRemove(unit), MapUnmarkUnitSight(unit)
-**  and after UnitCacheInsert(unit), MapMarkUnitSight(unit)
+**  @internal before use it, Map.Remove(unit), MapUnmarkUnitSight(unit)
+**  and after Map.Insert(unit), MapMarkUnitSight(unit)
 **  are often necessary. Check Flag also for Pathfinder.
 */
 static void UnitInXY(CUnit *unit, int x, int y)
@@ -700,6 +810,7 @@ void CUnit::Place(int x, int y)
 	Assert(Removed);
 
 	if (Container) {
+		MapUnmarkUnitGuard(this);
 		MapUnmarkUnitSight(this);
 		RemoveUnitFromContainer(this);
 	}
@@ -759,6 +870,7 @@ void CUnit::Remove(CUnit *host)
 	Map.Remove(this);
 	MapUnmarkUnitSight(this);
 	UnmarkUnitFieldFlags(this);
+	MapUnmarkUnitGuard(this);
 
 	if (host) {
 		AddInContainer(host);
@@ -840,7 +952,7 @@ void UnitLost(CUnit *unit)
 			}
 		}
 
-		if (unit->Orders[0]->Action != UnitActionBuilt) {
+		if (unit->CurrentAction() != UnitActionBuilt) {
 			player->UnitTypesCount[type->Slot]--;
 		}
 	}
@@ -854,7 +966,7 @@ void UnitLost(CUnit *unit)
 	//
 	//  Update information.
 	//
-	if (unit->Orders[0]->Action != UnitActionBuilt) {
+	if (unit->CurrentAction() != UnitActionBuilt) {
 		player->Supply -= type->Supply;
 
 		//
@@ -881,7 +993,7 @@ void UnitLost(CUnit *unit)
 	//
 	//  Handle research cancels.
 	//
-	if (unit->Orders[0]->Action == UnitActionResearch) {
+	if (unit->CurrentAction() == UnitActionResearch) {
 		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID] = 0;
 	}
 
@@ -919,17 +1031,16 @@ void UnitClearOrders(CUnit *unit)
 	//  Release all references of the unit.
 	//
 	for (i = unit->OrderCount; i-- > 0;) {
-		unit->Orders[i]->Release();
 		if (i != 0) {
-			COrder *order = unit->Orders.back();
+			COrderPtr order = unit->Orders.back();
 			delete order;
 			unit->Orders.pop_back();
-		}
+		} else unit->Orders[0]->Release();
 	}
 	unit->OrderCount = 1;
 	unit->NewOrder.Release();
 	unit->SavedOrder.Release();
-	unit->Orders[0]->Action = UnitActionStill;
+	unit->CurrentOrder()->Action = UnitActionStill;
 	unit->SubAction = unit->State = 0;
 }
 
@@ -1006,14 +1117,14 @@ static void UnitFillSeenValues(CUnit *unit)
 	unit->Seen.IY = unit->IY;
 	unit->Seen.IX = unit->IX;
 	unit->Seen.Frame = unit->Frame;
-	unit->Seen.State = (unit->Orders[0]->Action == UnitActionBuilt) |
-			((unit->Orders[0]->Action == UnitActionUpgradeTo) << 1);
-	if (unit->Orders[0]->Action == UnitActionDie) {
+	unit->Seen.State = (unit->CurrentAction() == UnitActionBuilt) |
+			((unit->CurrentAction() == UnitActionUpgradeTo) << 1);
+	if (unit->CurrentAction() == UnitActionDie) {
 		unit->Seen.State = 3;
 	}
 	unit->Seen.Type = unit->Type;
 	unit->Seen.Constructed = unit->Constructed;
-	if (unit->Orders[0]->Action == UnitActionBuilt) {
+	if (unit->CurrentAction() == UnitActionBuilt) {
 		unit->Seen.CFrame = unit->Data.Built.Frame;
 	} else {
 		unit->Seen.CFrame = NULL;
@@ -1114,7 +1225,7 @@ struct _TileSeen {
 				 * There is bug in Seen code conneded with 
 				 * UnitActionDie and Cloacked units.
 				 */
-				if(!unit->VisCount[p] && unit->Orders[0]->Action == UnitActionDie)
+				if(!unit->VisCount[p] && unit->CurrentAction() == UnitActionDie)
 				{
 					return;
 				}
@@ -1905,8 +2016,8 @@ void DropOutAll(const CUnit *source)
 	for (i = source->InsideCount; i; --i, unit = unit->NextContained) {
 		DropOutOnSide(unit, LookingW,
 			source->Type->TileWidth, source->Type->TileHeight);
-		Assert(!unit->Orders[0]->Goal);
-		unit->Orders[0]->Action = UnitActionStill;
+		Assert(!unit->CurrentOrder()->HasGoal());
+		unit->CurrentOrder()->Action = UnitActionStill;
 		unit->SubAction = 0;
 	}
 	DebugPrint("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
@@ -2165,7 +2276,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 						bool better = (mine != bestmine &&
 							(!mine->Type->MaxOnBoard ||
 							//Durring construction Data.Resource is corrupted
-							check_usage && mine->Orders[0]->Action != UnitActionBuilt));
+							check_usage && mine->CurrentAction() != UnitActionBuilt));
 				
 						if(better) {
 							n = std::max(MyAbs(destx - x), MyAbs(desty - y));
@@ -2222,7 +2333,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 						if (check_usage && mine->Type->MaxOnBoard) {
 							bool better = (mine != bestmine &&
 							//Durring construction Data.Resource is corrupted
-								mine->Orders[0]->Action != UnitActionBuilt);
+								mine->CurrentAction() != UnitActionBuilt);
 							if(better) {
 								int assign = mine->Data.Resource.Assigned - 
 														mine->Type->MaxOnBoard;
@@ -2582,7 +2693,7 @@ CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last)
 	for (i = 0; i < nunits; ++i) {
 		unit = player->Units[i];
 		if (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed) {
-			if (unit->Orders[0]->Action == UnitActionStill) {
+			if (unit->CurrentAction() == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return unit;
 				}
@@ -2748,7 +2859,7 @@ void LetUnitDie(CUnit *unit)
 	// but if canceling building the platform, the worker is already
 	// outside.
 	if (type->GivesResource &&
-			unit->Orders[0]->Action == UnitActionBuilt &&
+			unit->CurrentAction() == UnitActionBuilt &&
 			unit->Data.Built.Worker) {
 		// Restore value for oil-patch
 		unit->ResourcesHeld = unit->Data.Built.Worker->ResourcesHeld;
@@ -2770,7 +2881,7 @@ void LetUnitDie(CUnit *unit)
 	// Not good: UnitUpdateHeading(unit);
 	unit->SubAction = 0;
 	unit->State = 0;
-	unit->Orders[0]->Action = UnitActionDie;
+	unit->CurrentOrder()->Action = UnitActionDie;
 	if (type->CorpseType) {
 #ifdef DYNAMIC_LOAD
 		if (!type->Sprite) {
@@ -2850,7 +2961,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		return;
 	}
 
-	Assert(damage != 0 && target->Orders[0]->Action != UnitActionDie && !target->Type->Vanishes);
+	Assert(damage != 0 && target->CurrentAction() != UnitActionDie && !target->Type->Vanishes);
 
 	if (target->Variable[UNHOLYARMOR_INDEX].Value > 0 || target->Type->Indestructible) {
 		// vladi: units with active UnholyArmour are invulnerable
@@ -2991,7 +3102,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	//
 	// Unit is working?
 	//
-	if (target->Orders[0]->Action != UnitActionStill) {
+	if (target->CurrentAction() != UnitActionStill) {
 		return;
 	}
 
@@ -3212,7 +3323,7 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 	if (!transporter->Type->CanTransport) {
 		return 0;
 	}
-	if (transporter->Orders[0]->Action == UnitActionBuilt) { // Under construction
+	if (transporter->CurrentAction() == UnitActionBuilt) { // Under construction
 		return 0;
 	}
 	if (transporter == unit) { // Cannot transporter itself.
@@ -3348,9 +3459,7 @@ bool CUnit::IsTeamed(const CUnit *x) const
 */
 bool CUnit::IsUnusable(bool ignore_built_state) const
 {
-	return this->Removed || this->Destroyed ||
-			this->Orders[0]->Action == UnitActionDie ||
-		 	!ignore_built_state && this->Orders[0]->Action == UnitActionBuilt;
+	return !IsAliveOnMap() || !ignore_built_state && CurrentAction() == UnitActionBuilt;
 }
 
 
@@ -3382,7 +3491,8 @@ void CleanUnits(void)
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		delete[] (*table)->AutoCastSpell;
 		delete[] (*table)->Variable;
-		for (std::vector<COrder *>::iterator order = (*table)->Orders.begin(); order != (*table)->Orders.end(); ++order) {
+		for (std::vector<COrderPtr>::iterator order = (*table)->Orders.begin();
+			 order != (*table)->Orders.end(); ++order) {
 			delete *order;
 		}
 		(*table)->Orders.clear();

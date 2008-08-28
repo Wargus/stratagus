@@ -1797,45 +1797,46 @@ void UpdateUnitVariables(const CUnit *unit)
 		unit->Variable[i].Enable = 1;
 	}
 
-	// Build
-	if (unit->Orders[0]->Action == UnitActionBuilt) {
-		unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
-		unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Index].Costs[TimeCost] * 600;
-
-		// This should happen when building unit with several peons
-		// Maybe also with only one.
-		// FIXME : Should be better to fix it in action_{build,repair}.c ?
-		if (unit->Variable[BUILD_INDEX].Value > unit->Variable[BUILD_INDEX].Max) {
-			// assume value is wrong.
-			unit->Variable[BUILD_INDEX].Value = unit->Variable[BUILD_INDEX].Max;
-		}
-	}
-
 	// Transport
 	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;
 	unit->Variable[TRANSPORT_INDEX].Max = unit->Type->MaxOnBoard;
 
-	// Research.
-	if (unit->Orders[0]->Action == UnitActionResearch) {
-		unit->Variable[RESEARCH_INDEX].Value =
-			unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID];
-		unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
-	}
+	switch(unit->CurrentAction()) {
+		// Build
+		case UnitActionBuilt:
+			unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
+			unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Index].Costs[TimeCost] * 600;
 
-	// Training
-	if (unit->Orders[0]->Action == UnitActionTrain) {
-		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
-		unit->Variable[TRAINING_INDEX].Max =
-			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[TimeCost];
+			// This should happen when building unit with several peons
+			// Maybe also with only one.
+			// FIXME : Should be better to fix it in action_{build,repair}.c ?
+			if (unit->Variable[BUILD_INDEX].Value > unit->Variable[BUILD_INDEX].Max) {
+				// assume value is wrong.
+				unit->Variable[BUILD_INDEX].Value = unit->Variable[BUILD_INDEX].Max;
+			}
+		break;
+		// Research.
+		case UnitActionResearch:
+			unit->Variable[RESEARCH_INDEX].Value =
+				unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID];
+			unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
+		break;
+		// Training
+		case UnitActionTrain:
+			unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
+			unit->Variable[TRAINING_INDEX].Max =
+				unit->CurrentOrder()->Arg1.Type->Stats[unit->Player->Index].Costs[TimeCost];
+		break;
+		// UpgradeTo
+		case UnitActionUpgradeTo:
+			unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
+			unit->Variable[UPGRADINGTO_INDEX].Max =
+				unit->CurrentOrder()->Arg1.Type->Stats[unit->Player->Index].Costs[TimeCost];
+		break;
+		default:
+		break;
 	}
-
-	// UpgradeTo
-	if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
-		unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
-		unit->Variable[UPGRADINGTO_INDEX].Max =
-			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs[TimeCost];
-	}
-
+	
 	// Resources.
 	if (unit->Type->GivesResource) {
 		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;

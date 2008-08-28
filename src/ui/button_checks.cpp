@@ -182,7 +182,7 @@ bool ButtonCheckNoNetwork(const CUnit *unit, const ButtonAction *button)
 */
 bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 {
-	int action = unit->Orders[0]->Action; 
+	int action = unit->CurrentAction(); 
 	return action != UnitActionTrain &&
 		action != UnitActionUpgradeTo &&
 		action != UnitActionResearch;
@@ -198,7 +198,7 @@ bool ButtonCheckNoWork(const CUnit *unit, const ButtonAction *button)
 */
 bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
 {
-	int action = unit->Orders[0]->Action;
+	int action = unit->CurrentAction();
 	return action != UnitActionUpgradeTo &&
 		action != UnitActionResearch;
 }
@@ -214,7 +214,7 @@ bool ButtonCheckNoResearch(const CUnit *unit, const ButtonAction *button)
 */
 bool ButtonCheckUpgradeTo(const CUnit *unit, const ButtonAction *button)
 {
-	if (unit->Orders[0]->Action != UnitActionStill) {
+	if (unit->CurrentAction() != UnitActionStill) {
 		return false;
 	}
 	return CheckDependByIdent(unit->Player, button->ValueStr);

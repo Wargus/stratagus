@@ -459,77 +459,6 @@ typedef enum _unit_action_ {
 } UnitAction;
 
 /**
-**  Unit order structure.
-*/
-class COrder {
-public:
-	COrder() : Range(0), MinRange(0), Width(0),
-		Height(0),Action(UnitActionNone), CurrentResource(0),
-		Goal(NULL), X(-1), Y(-1), Type(NULL)
-	{
-		memset(&Arg1, 0, sizeof(Arg1));
-	};
-
-	void Release(void);
-	void Init() {
-		Assert(Action != UnitActionResource || 
-				Action == UnitActionResource && Arg1.Resource.Mine == NULL);
-		Action = UnitActionNone;
-		Range = 0;
-		MinRange = 0;
-		Width = 0;
-		Height = 0;
-		CurrentResource = 0;
-		Assert(!Goal);
-		X = -1; Y = -1;
-		Type = NULL;
-		memset(&Arg1, 0, sizeof(Arg1));
-	};
-
-	int Range;              /// How far away
-	unsigned int  MinRange; /// How far away minimum
-	unsigned char Width;    /// Goal Width (used when Goal is not)
-	unsigned char Height;   /// Goal Height (used when Goal is not)
-	unsigned char Action;   /// global action
-	unsigned char CurrentResource;	 //used in 	UnitActionResource and 
-										//UnitActionReturnGoods
-
-	
-	CUnit *Goal;            /// goal of the order (if any)
-	int X;                  /// or X tile coordinate of destination
-	int Y;                  /// or Y tile coordinate of destination
-	CUnitType *Type;        /// Unit-type argument
-
-	union {
-		struct {
-#ifdef __x86_64__
-			int X;                    /// X position for patroling.
-			int Y;                    /// Y position for patroling.
-#else
-			short int X;                    /// X position for patroling.
-			short int Y;                    /// Y position for patroling.
-#endif
-		} Patrol;                     /// position.
-		union {
-			struct {
-#ifdef __x86_64__
-				int X;                    /// X position for terrain resource.
-				int Y;                    /// Y position for terrain resource.
-#else
-				short int X;                    /// X position for terrain resource.
-				short int Y;                    /// Y position for terrain resource.
-#endif
-			} Pos;                     /// position.
-			CUnit *Mine;
-		} Resource;
-		//int ResourcePos;              /// ResourcePos == (X<<16 | Y).
-		SpellType *Spell;             /// spell when casting.
-		CUpgrade *Upgrade;            /// upgrade.
-	} Arg1;             /// Extra command argument.
-	
-};
-
-/**
 **  Voice groups for a unit
 */
 enum UnitVoiceGroup {
@@ -570,6 +499,112 @@ enum _directions_ {
 	/// The big unit structure
 class CUnit {
 public:
+
+	/**
+	**  Unit order structure.
+	*/
+	class COrder {
+		friend void CclParseOrder(lua_State *l, COrder *order);
+		CUnit *Goal;            /// goal of the order (if any)
+		
+	public:
+		COrder() : Goal(NULL), Range(0), MinRange(0), Width(0),
+			Height(0),Action(UnitActionNone), CurrentResource(0),
+			X(-1), Y(-1)
+		{
+			memset(&Arg1, 0, sizeof(Arg1));
+		};
+		COrder(const COrder &ths);
+		~COrder() { Release(); }
+
+		void Release(void);
+		COrder& operator=(const COrder &rhs);
+		bool CheckRange(void);
+		
+		void Init() {
+			Assert(Action != UnitActionResource || 
+					Action == UnitActionResource && Arg1.Resource.Mine == NULL);
+			Action = UnitActionNone;
+			Range = 0;
+			MinRange = 0;
+			Width = 0;
+			Height = 0;
+			CurrentResource = 0;
+			Assert(!Goal);
+			X = -1; Y = -1;
+			memset(&Arg1, 0, sizeof(Arg1));
+		};
+
+		int Range;              /// How far away
+		unsigned int  MinRange; /// How far away minimum
+		unsigned char Width;    /// Goal Width (used when Goal is not)
+		unsigned char Height;   /// Goal Height (used when Goal is not)
+		unsigned char Action;   /// global action
+		unsigned char CurrentResource;	 //used in 	UnitActionResource and 
+											//UnitActionReturnGoods
+
+		int X;                  /// or X tile coordinate of destination
+		int Y;                  /// or Y tile coordinate of destination
+
+		union {
+			struct {
+#if defined(__x86_64__) && defined(__LP64__)//pointers and long are 64bits but int is still 32bits
+				int X;                    /// X position for patroling.
+				int Y;                    /// Y position for patroling.
+#else
+				short int X;                    /// X position for patroling.
+				short int Y;                    /// Y position for patroling.
+#endif
+			} Patrol;                     /// position.
+			union {
+				struct {
+#if defined(__x86_64__) && defined(__LP64__)//pointers and long are 64bits but int is still 32bits
+					int X;                    /// X position for terrain resource.
+					int Y;                    /// Y position for terrain resource.
+#else
+					short int X;                    /// X position for terrain resource.
+					short int Y;                    /// Y position for terrain resource.
+#endif
+				} Pos;                     /// position.
+				CUnit *Mine;
+			} Resource;
+			SpellType *Spell;             /// spell when casting.
+			CUpgrade *Upgrade;            /// upgrade.
+			CUnitType *Type;        /// Unit-type argument used mostly for traning/building, etc.
+		} Arg1;             /// Extra command argument.
+
+		inline bool HasGoal(void) const
+		{
+			return Goal != NULL;
+		};
+
+		inline CUnit * GetGoal(void) const
+		{
+			return Goal;
+		};
+
+		inline void SetGoal(CUnit *const new_goal)
+		{
+			if (new_goal)
+			{
+				new_goal->RefsIncrease();
+			}
+			if (Goal) {
+				Goal->RefsDecrease();
+			}
+			Goal = new_goal;
+		};
+	
+		inline void ClearGoal(void)
+		{
+			if (Goal) {
+				Goal->RefsDecrease();
+			}
+			Goal = NULL;
+		};
+
+	};
+	
 	CUnit() { Init(); }
 
 	void Init() {
@@ -621,6 +656,7 @@ public:
 		Moving = 0;
 		ReCast = 0;
 		CacheLock = 0;
+		GuardLock = 0;
 		memset(&Anim, 0, sizeof(Anim));
 		CurrentResource = 0;
 		OrderCount = 0;
@@ -687,7 +723,8 @@ public:
 	unsigned Constructed : 1;    /// Unit is in construction
 	unsigned Active : 1;         /// Unit is active for AI
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
-	unsigned CacheLock : 1;        /// Unit is on board a transporter.
+	unsigned CacheLock : 1;        /// Unit is on lock by unitcache operations.
+	unsigned GuardLock : 1;        /// Unit is on lock by guard operations.
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
@@ -773,15 +810,32 @@ public:
 	} Train; /// Train units action
 	} Data; /// Storage room for different commands
 
-	CUnit *Goal; /// Generic goal pointer
+	CUnit *Goal; /// Generic/Teleporter goal pointer
 
+	inline COrder * CreateOrder(void) {
+		Orders.push_back(new COrder);
+		return Orders[(int)OrderCount++];	
+	}
 
+	inline COrder *CurrentOrder() const 
+	{
+#if __GNUC__ <  4
+		return Orders[0];
+#else
+		return *(Orders.data());
+#endif		
+	}
+	inline UnitAction CurrentAction() const
+	{
+		return (UnitAction)(CurrentOrder()->Action);
+	}
+	
 	inline bool IsIdle() const {
-		return OrderCount == 1 && Orders[0]->Action == UnitActionStill;
+		return OrderCount == 1 && CurrentOrder()->Action == UnitActionStill;
 	}
 
 	inline void ClearAction() {
-		Orders[0]->Action = UnitActionStill;
+		CurrentOrder()->Action = UnitActionStill;
 		SubAction = 0;
 		if (Selected) {
 			SelectedUnitChanged();
@@ -824,6 +878,9 @@ public:
 	
 	/// Release a unit
 	void Release();
+
+	bool RestoreOrder(void);
+	bool StoreOrder(void);
 	
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive(void) {
@@ -848,7 +905,7 @@ public:
 	*/
 	inline bool IsAliveOnMap() const
 	{
-		return !Removed && !Destroyed && Orders[0]->Action != UnitActionDie;
+		return !Removed && !Destroyed && CurrentOrder()->Action != UnitActionDie;
 	}
 
 	/**
@@ -948,6 +1005,8 @@ public:
 	
 	
 };
+
+typedef CUnit::COrder* COrderPtr;
 
 //unit_find
 struct CUnitTypeFinder {
@@ -1168,7 +1227,7 @@ extern bool CanMove(const CUnit *unit);
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit *unit);
 	/// Save an order
-extern void SaveOrder(const COrder *order, CFile *file);
+extern void SaveOrder(const COrderPtr order, CFile *file);
 	/// save unit-structure
 extern void SaveUnit(const CUnit *unit, CFile *file);
 	/// save all units
@@ -1320,7 +1379,7 @@ extern void SelectionCclRegister(void);
 // in ccl_unit.c
 
 	/// Parse order
-extern void CclParseOrder(lua_State *l, COrder *order);
+extern void CclParseOrder(lua_State *l, COrderPtr order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
 

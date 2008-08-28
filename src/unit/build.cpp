@@ -227,9 +227,9 @@ bool CBuildRestrictionOnTop::Check(const CUnitType *type, int x, int y, CUnit *&
 	n = Map.Select(x, y, table, UnitMax);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->X == x && table[i]->Y == y && !table[i]->Destroyed &&
-				table[i]->Orders[0]->Action != UnitActionDie) {
+				table[i]->CurrentAction() != UnitActionDie) {
 			if (table[i]->Type == this->Parent &&
-					table[i]->Orders[0]->Action != UnitActionBuilt) {
+					table[i]->CurrentAction() != UnitActionBuilt) {
 				// Available to build on
 				ontoptarget = table[i];
 			} else {

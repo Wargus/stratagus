@@ -245,7 +245,7 @@ static int GetButtonStatus(const ButtonAction *button)
 	// Simple case.
 	if (action != UnitActionNone) {
 		for (i = 0; i < NumSelected; ++i) {
-			if (Selected[i]->Orders[0]->Action != action) {
+			if (Selected[i]->CurrentAction() != action) {
 				break;
 			}
 		}
@@ -258,9 +258,10 @@ static int GetButtonStatus(const ButtonAction *button)
 	switch (button->Action) {
 		case ButtonMove:
 			for (i = 0; i < NumSelected; ++i) {
-				if (Selected[i]->Orders[0]->Action != UnitActionMove &&
-						Selected[i]->Orders[0]->Action != UnitActionBuild &&
-						Selected[i]->Orders[0]->Action != UnitActionFollow) {
+				int saction = Selected[i]->CurrentAction();
+				if (saction != UnitActionMove &&
+					saction != UnitActionBuild &&
+					saction != UnitActionFollow) {
 					break;
 				}
 			}
@@ -284,7 +285,7 @@ static int GetButtonStatus(const ButtonAction *button)
 			break;
 		case ButtonRepair:
 			for (i = 0; i < NumSelected; ++i) {
-				if (Selected[i]->Orders[0]->Action != UnitActionRepair) {
+				if (Selected[i]->CurrentAction() != UnitActionRepair) {
 					break;
 				}
 			}
@@ -772,7 +773,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 		case ButtonTrain:
 			// Check if building queue is enabled
 			if (!EnableTrainingQueue &&
-					unit->Orders[0]->Action == UnitActionTrain) {
+					unit->CurrentAction() == UnitActionTrain) {
 				break;
 			}
 			// FALL THROUGH
@@ -794,14 +795,14 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			res = true;
 			break;
 		case ButtonCancelUpgrade:
-			res = unit->Orders[0]->Action == UnitActionUpgradeTo ||
-				unit->Orders[0]->Action == UnitActionResearch;
+			res = unit->CurrentAction() == UnitActionUpgradeTo ||
+				unit->CurrentAction() == UnitActionResearch;
 			break;
 		case ButtonCancelTrain:
-			res = unit->Orders[0]->Action == UnitActionTrain;
+			res = unit->CurrentAction() == UnitActionTrain;
 			break;
 		case ButtonCancelBuild:
-			res = unit->Orders[0]->Action == UnitActionBuilt;
+			res = unit->CurrentAction() == UnitActionBuilt;
 			break;
 	}
 #if 0
@@ -893,13 +894,13 @@ static ButtonAction *UpdateButtonPanelSingleUnit(const CUnit *unit)
 	//
 	//  FIXME: johns: some hacks for cancel buttons
 	//
-	if (unit->Orders[0]->Action == UnitActionBuilt) {
+	if (unit->CurrentAction() == UnitActionBuilt) {
 		// Trick 17 to get the cancel-build button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
-	} else if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
+	} else if (unit->CurrentAction() == UnitActionUpgradeTo) {
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else if (unit->Orders[0]->Action == UnitActionResearch) {
+	} else if (unit->CurrentAction() == UnitActionResearch) {
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
@@ -1013,7 +1014,7 @@ void CButtonPanel::DoClicked(int button)
 			//  Unload on coast, transporter standing, unload all units right now.
 			//  That or a bunker.
 			//
-			if ((NumSelected == 1 && Selected[0]->Orders[0]->Action == UnitActionStill &&
+			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill &&
 					Map.CoastOnMap(Selected[0]->X, Selected[0]->Y)) || !CanMove(Selected[0])) {
 				SendCommandUnload(Selected[0],
 					Selected[0]->X, Selected[0]->Y, NoUnitP,
@@ -1118,10 +1119,15 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCancel:
 		case ButtonCancelUpgrade:
 			if (NumSelected == 1) {
-				if (Selected[0]->Orders[0]->Action == UnitActionUpgradeTo) {
-					SendCommandCancelUpgradeTo(Selected[0]);
-				} else if (Selected[0]->Orders[0]->Action == UnitActionResearch) {
-					SendCommandCancelResearch(Selected[0]);
+				switch(Selected[0]->CurrentAction()) {
+					case UnitActionUpgradeTo:
+						SendCommandCancelUpgradeTo(Selected[0]);
+					break;
+					case UnitActionResearch:
+						SendCommandCancelResearch(Selected[0]);
+					break;
+					default:
+					break;
 				}
 			}
 			UI.StatusLine.Clear();
@@ -1134,7 +1140,7 @@ void CButtonPanel::DoClicked(int button)
 			break;
 
 		case ButtonCancelTrain:
-			Assert(Selected[0]->Orders[0]->Action == UnitActionTrain);
+			Assert(Selected[0]->CurrentAction() == UnitActionTrain);
 			SendCommandCancelTraining(Selected[0], -1, NULL);
 			UI.StatusLine.Clear();
 			ClearCosts();
@@ -1142,7 +1148,7 @@ void CButtonPanel::DoClicked(int button)
 
 		case ButtonCancelBuild:
 			// FIXME: johns is this not sure, only building should have this?
-			Assert(Selected[0]->Orders[0]->Action == UnitActionBuilt);
+			Assert(Selected[0]->CurrentAction() == UnitActionBuilt);
 			if (NumSelected == 1) {
 				SendCommandDismiss(Selected[0]);
 			}
@@ -1170,7 +1176,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME:        enough resources are available.
 			// FIXME: training queue full check is not correct for network.
 			// FIXME: this can be correct written, with a little more code.
-			if (Selected[0]->Orders[0]->Action == UnitActionTrain &&
+			if (Selected[0]->CurrentAction() == UnitActionTrain &&
 					!EnableTrainingQueue) {
 				Selected[0]->Player->Notify(NotifyYellow, Selected[0]->X,
 					Selected[0]->Y, _("Unit training queue is full"));

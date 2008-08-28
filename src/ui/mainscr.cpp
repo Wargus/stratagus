@@ -300,7 +300,7 @@ const CUnit *GetUnitRef(const CUnit *unit, EnumUnit e)
 		case UnitRefContainer:
 			return unit->Container;
 		case UnitRefWorker :
-			if (unit->Orders[0]->Action == UnitActionBuilt) {
+			if (unit->CurrentAction() == UnitActionBuilt) {
 				return unit->Data.Built.Worker;
 			} else {
 				return NoUnitP;
@@ -625,73 +625,75 @@ static void DrawUnitInfo(CUnit *unit)
 	//  Show progress if they are selected.
 	//
 	if (NumSelected == 1 && Selected[0] == unit) {
-		//
-		//  Building training units.
-		//
-		if (unit->Orders[0]->Action == UnitActionTrain) {
-			if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
-				if (!UI.SingleTrainingText.empty()) {
-					VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
-						UI.SingleTrainingFont, UI.SingleTrainingText);
-				}
-				if (UI.SingleTrainingButton) {
-					unit->Orders[0]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
-						UI.SingleTrainingButton->Style,
-						(ButtonAreaUnderCursor == ButtonAreaTraining &&
-							ButtonUnderCursor == 0) ?
-							(IconActive | (MouseButtons & LeftButton)) : 0,
-						UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
-				}
-			} else {
-				if (!UI.TrainingText.empty()) {
-					VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
-						UI.TrainingFont, UI.TrainingText);
-				}
-				if (!UI.TrainingButtons.empty()) {
-					for (i = 0; i < unit->OrderCount &&
-							i < (int)UI.TrainingButtons.size(); ++i) {
-						if (unit->Orders[i]->Action == UnitActionTrain) {
-							unit->Orders[i]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
-								 UI.TrainingButtons[i].Style,
-								(ButtonAreaUnderCursor == ButtonAreaTraining &&
-									ButtonUnderCursor == i) ?
-									(IconActive | (MouseButtons & LeftButton)) : 0,
-								UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
+		switch(unit->CurrentAction()) {
+		
+			//
+			//  Building training units.
+			//
+			case UnitActionTrain:
+				if (unit->OrderCount == 1 || unit->Orders[1]->Action != UnitActionTrain) {
+					if (!UI.SingleTrainingText.empty()) {
+						VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
+							UI.SingleTrainingFont, UI.SingleTrainingText);
+					}
+					if (UI.SingleTrainingButton) {
+						unit->CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit->Player,
+							UI.SingleTrainingButton->Style,
+							(ButtonAreaUnderCursor == ButtonAreaTraining &&
+								ButtonUnderCursor == 0) ?
+								(IconActive | (MouseButtons & LeftButton)) : 0,
+							UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, "");
+					}
+				} else {
+					if (!UI.TrainingText.empty()) {
+						VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
+							UI.TrainingFont, UI.TrainingText);
+					}
+					if (!UI.TrainingButtons.empty()) {
+						for (i = 0; i < unit->OrderCount &&
+								i < (int)UI.TrainingButtons.size(); ++i) {
+							if (unit->Orders[i]->Action == UnitActionTrain) {
+								unit->Orders[i]->Arg1.Type->Icon.Icon->DrawUnitIcon(unit->Player,
+									 UI.TrainingButtons[i].Style,
+									(ButtonAreaUnderCursor == ButtonAreaTraining &&
+										ButtonUnderCursor == i) ?
+										(IconActive | (MouseButtons & LeftButton)) : 0,
+									UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, "");
+							}
 						}
 					}
 				}
-			}
 			return;
-		}
 
-		//
-		//  Building upgrading to better type.
-		//
-		if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
-			if (UI.UpgradingButton) {
-				unit->Orders[0]->Type->Icon.Icon->DrawUnitIcon(unit->Player,
-					UI.UpgradingButton->Style,
-					(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
-						ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.UpgradingButton->X, UI.UpgradingButton->Y, "");
-			}
+			//
+			//  Building upgrading to better type.
+			//
+			case UnitActionUpgradeTo:
+				if (UI.UpgradingButton) {
+					unit->CurrentOrder()->Arg1.Type->Icon.Icon->DrawUnitIcon(unit->Player,
+						UI.UpgradingButton->Style,
+						(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
+							ButtonUnderCursor == 0) ?
+							(IconActive | (MouseButtons & LeftButton)) : 0,
+						UI.UpgradingButton->X, UI.UpgradingButton->Y, "");
+				}
 			return;
-		}
 
-		//
-		//  Building research new technology.
-		//
-		if (unit->Orders[0]->Action == UnitActionResearch) {
-			if (UI.ResearchingButton) {
-				unit->Data.Research.Upgrade->Icon->DrawUnitIcon(unit->Player,
-					UI.ResearchingButton->Style,
-					(ButtonAreaUnderCursor == ButtonAreaResearching &&
-						ButtonUnderCursor == 0) ?
-						(IconActive | (MouseButtons & LeftButton)) : 0,
-					UI.ResearchingButton->X, UI.ResearchingButton->Y, "");
-			}
+			//
+			//  Building research new technology.
+			//
+			case UnitActionResearch:
+				if (UI.ResearchingButton) {
+					unit->Data.Research.Upgrade->Icon->DrawUnitIcon(unit->Player,
+						UI.ResearchingButton->Style,
+						(ButtonAreaUnderCursor == ButtonAreaResearching &&
+							ButtonUnderCursor == 0) ?
+							(IconActive | (MouseButtons & LeftButton)) : 0,
+						UI.ResearchingButton->X, UI.ResearchingButton->Y, "");
+				}
 			return;
+			default:
+			break;
 		}
 	}
 

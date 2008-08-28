@@ -67,7 +67,7 @@ struct _EnemyOnMapTile {
 		// Invisible and not Visible
 		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
 				//(!UnitVisible(unit, source->Player)) ||
-				unit->Orders[0]->Action == UnitActionDie) {
+				unit->CurrentAction() == UnitActionDie) {
 			return;
 		}
 		if (x < unit->X || x >= unit->X + type->TileWidth ||

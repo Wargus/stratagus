@@ -66,7 +66,6 @@ static void ReleaseOrders(CUnit *unit)
 
 	if ((n = unit->OrderCount) > 1) {
 		while (--n) {
-			unit->Orders[n]->Release();
 			delete unit->Orders[n];
 			unit->Orders.pop_back();
 		}
@@ -84,7 +83,7 @@ static void ReleaseOrders(CUnit *unit)
 **
 **  @return       Pointer to next free order slot.
 */
-static COrder *GetNextOrder(CUnit *unit, int flush)
+static COrderPtr GetNextOrder(CUnit *unit, int flush)
 {
 	if (flush) {
 		// empty command queue
@@ -93,10 +92,7 @@ static COrder *GetNextOrder(CUnit *unit, int flush)
 	if (unit->OrderCount == 0x7F) {
 		return NULL;
 	}
-
-	unit->Orders.push_back(new COrder);
-
-	return unit->Orders[(int)unit->OrderCount++];
+	return unit->CreateOrder();
 }
 
 /**
@@ -127,7 +123,7 @@ static void RemoveOrder(CUnit *unit, int order)
 		}
 	} else {
 		Assert(i == 0);
-		unit->Orders[0]->Init();
+		unit->CurrentOrder()->Init();
 		unit->ClearAction();
 	}
 }
@@ -158,7 +154,7 @@ static void ClearSavedAction(CUnit *unit)
 */
 void CommandStopUnit(CUnit *unit)
 {
-	COrder *order;
+	COrderPtr order;
 
 	// Ignore that the unit could be removed.
 
@@ -179,18 +175,15 @@ void CommandStopUnit(CUnit *unit)
 **  @param cpyorder  pointer to valid order
 **  @param flush     if true, flush command queue.
 */
-void CommandAnyOrder(CUnit *unit, COrder *cpyorder, int flush)
+void CommandAnyOrder(CUnit *unit, COrderPtr cpyorder, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	if (!(order = GetNextOrder(unit, flush))) {
 		return;
 	}
 
 	*order = *cpyorder;
-	if (order->Goal) {
-		order->Goal->RefsIncrease();
-	}
 	ClearSavedAction(unit);
 }
 
@@ -204,7 +197,7 @@ void CommandAnyOrder(CUnit *unit, COrder *cpyorder, int flush)
 */
 void CommandMoveOrder(CUnit *unit, int src, int dst)
 {
-	COrder *tmp;
+	COrderPtr tmp;
 	int i;
 
 	Assert(src != 0 && dst != 0 && src < unit->OrderCount && dst < unit->OrderCount);
@@ -237,7 +230,7 @@ void CommandMoveOrder(CUnit *unit, int src, int dst)
 */
 void CommandStandGround(CUnit *unit, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	// Ignore that the unit could be removed.
 
@@ -262,12 +255,12 @@ void CommandStandGround(CUnit *unit, int flush)
 */
 void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -287,8 +280,7 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 			order->X = dest->X + dest->Type->TileWidth / 2;
 			order->Y = dest->Y + dest->Type->TileHeight / 2;
 		} else {
-			order->Goal = dest;
-			dest->RefsIncrease();
+			order->SetGoal(dest);
 			order->Range = 1;
 		}
 	}
@@ -305,14 +297,14 @@ void CommandFollow(CUnit *unit, CUnit *dest, int flush)
 */
 void CommandMove(CUnit *unit, int x, int y, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
 	//
 	//  Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -340,12 +332,12 @@ void CommandMove(CUnit *unit, int x, int y, int flush)
 */
 void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	//  Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -366,8 +358,7 @@ void CommandRepair(CUnit *unit, int x, int y, CUnit *dest, int flush)
 				order->X = dest->X + dest->Type->TileWidth / 2;
 				order->Y = dest->Y + dest->Type->TileHeight / 2;
 			} else {
-				order->Goal = dest;
-				dest->RefsIncrease();
+				order->SetGoal(dest);
 				order->Range = unit->Type->RepairRange;
 			}
 		} else {
@@ -389,7 +380,7 @@ void CommandAutoRepair(CUnit *unit, int on)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		unit->AutoRepair = on;
 	}
 }
@@ -405,14 +396,14 @@ void CommandAutoRepair(CUnit *unit, int on)
 */
 void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (!unit->Type->CanAttack) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -434,8 +425,7 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 				order->Y = attack->Y + attack->Type->TileHeight / 2;
 			} else {
 				// Removed, Dying handled by action routine.
-				order->Goal = attack;
-				attack->RefsIncrease();
+				order->SetGoal(attack);
 				order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				order->MinRange = unit->Type->MinAttackRange;
 			}
@@ -463,14 +453,14 @@ void CommandAttack(CUnit *unit, int x, int y, CUnit *attack, int flush)
 */
 void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -503,14 +493,14 @@ void CommandAttackGround(CUnit *unit, int x, int y, int flush)
 */
 void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (!CanMove(unit)) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -539,12 +529,12 @@ void CommandPatrolUnit(CUnit *unit, int x, int y, int flush)
 */
 void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		//
 		// Destination could be killed.
 		// Should be handled in action, but is not possible!
@@ -564,8 +554,7 @@ void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 		order->Init();
 
 		order->Action = UnitActionBoard;
-		order->Goal = dest;
-		dest->RefsIncrease();
+		order->SetGoal(dest);
 		order->Range = 1;
 	}
 	ClearSavedAction(unit);
@@ -582,12 +571,12 @@ void CommandBoard(CUnit *unit, CUnit *dest, int flush)
 */
 void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
@@ -602,8 +591,7 @@ void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 		// Unit::Refs is used as timeout counter.
 		//
 		if (what && !what->Destroyed) {
-			order->Goal = what;
-			what->RefsIncrease();
+			order->SetGoal(what);
 		}
 	}
 	ClearSavedAction(unit);
@@ -621,12 +609,12 @@ void CommandUnload(CUnit *unit, int x, int y, CUnit *what, int flush)
 void CommandBuildBuilding(CUnit *unit, int x, int y,
 	CUnitType *what, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -650,7 +638,7 @@ void CommandBuildBuilding(CUnit *unit, int x, int y,
 				order->Range = 1;
 			}
 		}
-		order->Type = what;
+		order->Arg1.Type = what;
 		if (what->BuilderOutside) {
 			order->MinRange = 1;
 		}
@@ -668,7 +656,7 @@ void CommandDismiss(CUnit *unit)
 	//
 	// Check if building is still under construction? (NETWORK!)
 	//
-	if (unit->Orders[0]->Action == UnitActionBuilt) {
+	if (unit->CurrentAction() == UnitActionBuilt) {
 		unit->Data.Built.Cancel = 1;
 	} else {
 		DebugPrint("Suicide unit ... \n");
@@ -687,14 +675,14 @@ void CommandDismiss(CUnit *unit)
 */
 void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 	int nx;
 	int ny;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		if (unit->Type->Building) {
 			// FIXME: should find a better way for pending orders.
 			order = &unit->NewOrder;
@@ -740,12 +728,12 @@ void CommandResourceLoc(CUnit *unit, int x, int y, int flush)
 */
 void CommandResource(CUnit *unit, CUnit *dest, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie &&
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie &&
 			!dest->Destroyed) {
 		// FIXME: more races, could happen with many orders in queue.
 		if (!unit->Type->Building && !unit->Type->Harvester) {
@@ -764,8 +752,7 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 		}
 		order->Init();
 		order->Action = UnitActionResource;
-		order->Goal = dest;
-		dest->RefsIncrease();
+		order->SetGoal(dest);
 		order->Range = 1;
 	}
 	ClearSavedAction(unit);
@@ -780,12 +767,12 @@ void CommandResource(CUnit *unit, CUnit *dest, int flush)
 */
 void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		// FIXME: more races, could happen with many orders in queue.
 		if (!unit->Type->Building && !unit->Type->Harvester && !unit->ResourcesHeld) {
 			ClearSavedAction(unit);
@@ -806,8 +793,7 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 		// Destination could be killed. NETWORK!
 		//
 		if (goal && !goal->Destroyed) {
-			order->Goal = goal;
-			goal->RefsIncrease();
+			order->SetGoal(goal);
 		}
 		order->Range = 1;
 	}
@@ -823,12 +809,12 @@ void CommandReturnGoods(CUnit *unit, CUnit *goal, int flush)
 */
 void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		//
 		// Check if enough resources remains? (NETWORK!)
 		// FIXME: wrong if append to message queue!!!
@@ -841,7 +827,7 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 		//
 		// Not already training?
 		//
-		if (!EnableTrainingQueue && unit->Orders[0]->Action == UnitActionTrain) {
+		if (!EnableTrainingQueue && unit->CurrentAction() == UnitActionTrain) {
 			DebugPrint("Unit queue full!\n");
 			return;
 		}
@@ -851,7 +837,7 @@ void CommandTrainUnit(CUnit *unit, CUnitType *type, int flush)
 		order->Init();
 
 		order->Action = UnitActionTrain;
-		order->Type = type;
+		order->Arg1.Type = type;
 		// FIXME: if you give quick an other order, the resources are lost!
 		unit->Player->SubUnitType(type);
 	}
@@ -878,9 +864,9 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 
 	if (slot == -1) {
 		// Cancel All training
-		while (unit->Orders[0]->Action == UnitActionTrain) {
+		while (unit->CurrentAction() == UnitActionTrain) {
 			unit->Player->AddCostsFactor(
-				unit->Orders[0]->Type->Stats[unit->Player->Index].Costs,
+				unit->CurrentOrder()->Arg1.Type->Stats[unit->Player->Index].Costs,
 				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
 		}
@@ -896,7 +882,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 		return;
 	} else if (unit->Orders[slot]->Action == UnitActionTrain) {
 		// Still training this order, same unit?
-		if (type && unit->Orders[slot]->Type != type) {
+		if (type && unit->Orders[slot]->Arg1.Type != type) {
 			// Different unit being trained
 			return;
 		}
@@ -904,7 +890,7 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 		DebugPrint("Cancel training\n");
 
 		unit->Player->AddCostsFactor(
-			unit->Orders[slot]->Type->Stats[unit->Player->Index].Costs,
+			unit->Orders[slot]->Arg1.Type->Stats[unit->Player->Index].Costs,
 			CancelTrainingCostsFactor);
 
 	
@@ -931,12 +917,12 @@ void CommandCancelTraining(CUnit *unit, int slot, const CUnitType *type)
 */
 void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		//
 		// Check if enough resources remains? (NETWORK!)
 		//
@@ -956,7 +942,7 @@ void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 		unit->Player->SubUnitType(type);
 
 		order->Action = UnitActionUpgradeTo;
-		order->Type = type;
+		order->Arg1.Type = type;
 	}
 	ClearSavedAction(unit);
 }
@@ -969,14 +955,14 @@ void CommandUpgradeTo(CUnit *unit, CUnitType *type, int flush)
 */
 void CommandTransformIntoType(CUnit *unit, CUnitType *type)
 {
-	COrder *order;
+	COrderPtr order;
 
 	Assert(unit->CriticalOrder.Action == UnitActionStill);
 	order = &unit->CriticalOrder;
 	order->Init();
 
 	order->Action = UnitActionTransformInto;
-	order->Type = type;
+	order->Arg1.Type = type;
 }
 
 /**
@@ -991,13 +977,13 @@ void CommandCancelUpgradeTo(CUnit *unit)
 	//
 	// Check if unit is still upgrading? (NETWORK!)
 	//
-	if (unit->Orders[0]->Action == UnitActionUpgradeTo) {
+	if (unit->CurrentAction() == UnitActionUpgradeTo) {
 
 		unit->Player->AddCostsFactor(
-			unit->Orders[0]->Type->Stats[unit->Player->Index].Costs,
+			unit->CurrentOrder()->Arg1.Type->Stats[unit->Player->Index].Costs,
 			CancelUpgradeCostsFactor);
 
-		unit->Orders[0]->Init();
+		unit->CurrentOrder()->Init();
 		unit->ClearAction();
 	}
 	ClearSavedAction(unit);
@@ -1012,12 +998,12 @@ void CommandCancelUpgradeTo(CUnit *unit)
 */
 void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	//
 	// Check if unit is still valid and Goal still alive? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		//
 		// Check if enough resources remains? (NETWORK!)
 		//
@@ -1028,7 +1014,7 @@ void CommandResearch(CUnit *unit, CUpgrade *what, int flush)
 		if (!flush) {
 			DebugPrint("FIXME: must support order queing!!");
 		} else {
-			if (unit->Orders[0]->Action == UnitActionResearch) {
+			if (unit->CurrentAction() == UnitActionResearch) {
 				const CUpgrade *upgrade;
 
 				// Cancel current research
@@ -1067,7 +1053,7 @@ void CommandCancelResearch(CUnit *unit)
 	//
 	// Check if unit is still researching? (NETWORK!)
 	//
-	if (unit->Orders[0]->Action == UnitActionResearch) {
+	if (unit->CurrentAction() == UnitActionResearch) {
 		const CUpgrade *upgrade;
 
 		upgrade = unit->Data.Research.Upgrade;
@@ -1075,7 +1061,7 @@ void CommandCancelResearch(CUnit *unit)
 
 		unit->Player->AddCostsFactor(upgrade->Costs,
 			CancelResearchCostsFactor);
-		unit->Orders[0]->Init();
+		unit->CurrentOrder()->Init();
 		unit->ClearAction();
 	}
 	ClearSavedAction(unit);
@@ -1094,7 +1080,7 @@ void CommandCancelResearch(CUnit *unit)
 void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 	SpellType *spell, int flush)
 {
-	COrder *order;
+	COrderPtr order;
 
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 
@@ -1105,7 +1091,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		// FIXME: should I check here, if there is still enough mana?
 
 		if (!(order = GetNextOrder(unit, flush))) {
@@ -1128,8 +1114,7 @@ void CommandSpellCast(CUnit *unit, int x, int y, CUnit *dest,
 				order->Y = dest->Y /*+ dest->Type->TileHeight / 2*/ - order->Range;
 				order->Range <<= 1;
 			} else {
-				order->Goal = dest;
-				dest->RefsIncrease();
+				order->SetGoal(dest);
 			}
 		} else {
 			order->Range = 1;
@@ -1153,7 +1138,7 @@ void CommandAutoSpellCast(CUnit *unit, int spellid, int on)
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//
-	if (!unit->Removed && unit->Orders[0]->Action != UnitActionDie) {
+	if (!unit->Removed && unit->CurrentAction() != UnitActionDie) {
 		unit->AutoCastSpell[spellid] = on;
 	}
 }

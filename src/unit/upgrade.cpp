@@ -493,7 +493,7 @@ static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *
 		} else {
 			for (j = 0; j < unit->OrderCount; ++j) {
 				if (unit->Orders[j]->Action == UnitActionTrain &&
-						unit->Orders[j]->Type == src) {
+						unit->Orders[j]->Arg1.Type == src) {
 						if (j == 0) {
 							// Must Adjust Ticks to the fraction that was trained
 							unit->Data.Train.Ticks =
@@ -501,7 +501,7 @@ static void ConvertUnitTypeTo(CPlayer *player, const CUnitType *src, CUnitType *
 								dst->Stats[player->Index].Costs[TimeCost] /
 								src->Stats[player->Index].Costs[TimeCost];
 						}
-					unit->Orders[j]->Type = dst;
+					unit->Orders[j]->Arg1.Type = dst;
 				}
 			}
 		}

@@ -72,22 +72,21 @@ void HandleActionFollow(CUnit *unit)
 	// Reached target
 	//
 	if (unit->SubAction == 128) {
-		goal = unit->Orders[0]->Goal;
+		COrderPtr order = unit->CurrentOrder();
+		goal = order->GetGoal();
+
 		if (!goal || !goal->IsVisibleAsGoal(unit->Player)) {
 			DebugPrint("Goal gone\n");
-			if (goal) {
-				goal->RefsDecrease();
-			}
-			unit->Orders[0]->Goal = NoUnitP;
+			order->ClearGoal();
 			unit->ClearAction();
 			return;
 		}
 
-		if (goal->X == unit->Orders[0]->X && goal->Y == unit->Orders[0]->Y) {
+		if (goal->X == order->X && goal->Y == order->Y) {
+
 			// Move to the next order
 			if (unit->OrderCount > 1) {
-				goal->RefsDecrease();
-				unit->Orders[0]->Goal = NoUnitP;
+				order->ClearGoal();
 				unit->ClearAction();
 				return;
 			}
@@ -97,8 +96,8 @@ void HandleActionFollow(CUnit *unit)
 			unit->Frame = unit->Type->StillFrame;
 			UnitUpdateHeading(unit);
 			unit->Wait = 10;
-			if (unit->Orders[0]->Range > 1) {
-				unit->Orders[0]->Range = 1;
+			if (order->Range > 1) {
+				order->Range = 1;
 				unit->SubAction = 0;
 			}
 			return;
@@ -118,16 +117,15 @@ void HandleActionFollow(CUnit *unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit->Orders[0]->Range <= Map.Info.MapWidth ||
-					unit->Orders[0]->Range <= Map.Info.MapHeight) {
-				unit->Orders[0]->Range++;
+			if (unit->CurrentOrder()->CheckRange()) {
+				unit->CurrentOrder()->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
-			if ((goal = unit->Orders[0]->Goal) &&
+			if ((goal = unit->CurrentOrder()->GetGoal()) &&
 					goal->Type->Teleporter && goal->Goal &&
 					unit->MapDistanceTo(goal) <= 1) {
 				CUnit *dest;
@@ -163,38 +161,33 @@ void HandleActionFollow(CUnit *unit)
 								unit->Type->UnitType != UnitTypeLand)) {
 						DebugPrint("Wrong order for unit\n");
 						unit->ClearAction();
-						unit->Orders[0]->Goal = NoUnitP;
+						unit->CurrentOrder()->ClearGoal();
 					} else {
-						if (dest->NewOrder.Goal) {
-							if (dest->NewOrder.Goal->Destroyed) {
+						if (dest->NewOrder.HasGoal()) {
+							if (dest->NewOrder.GetGoal()->Destroyed) {
 								// FIXME: perhaps we should use another dest?
 								DebugPrint("Destroyed unit in teleport unit\n");
-								dest->RefsDecrease();
-								dest->NewOrder.Goal = NoUnitP;
+								dest->RefsDecrease();///???????
+								dest->NewOrder.ClearGoal();
 								dest->NewOrder.Action = UnitActionStill;
 							}
 						}
 
-						*unit->Orders[0] = dest->NewOrder;
+						*(unit->CurrentOrder()) = dest->NewOrder;
 						unit->CurrentResource = dest->CurrentResource;
 						
-						//
-						// FIXME: Pending command uses any references?
-						//
-						if (unit->Orders[0]->Goal) {
-							unit->Orders[0]->Goal->RefsIncrease();
-						}
 					}
 				}
 				return;
 			}
 
-			if (!(goal = unit->Orders[0]->Goal)) { // goal has died
+			goal = unit->CurrentOrder()->GetGoal();
+			if (!goal) { // goal has died
 				unit->ClearAction();
 				return;
 			}
-			unit->Orders[0]->X = goal->X;
-			unit->Orders[0]->Y = goal->Y;
+			unit->CurrentOrder()->X = goal->X;
+			unit->CurrentOrder()->Y = goal->Y;
 			unit->SubAction = 128;
 
 			// FALL THROUGH
@@ -205,12 +198,12 @@ void HandleActionFollow(CUnit *unit)
 	//
 	// Target destroyed?
 	//
-	if ((goal = unit->Orders[0]->Goal) && !goal->IsVisibleAsGoal(unit->Player)) {
+	goal = unit->CurrentOrder()->GetGoal();
+	if (goal && !goal->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("Goal gone\n");
-		unit->Orders[0]->X = goal->X + goal->Type->TileWidth / 2;
-		unit->Orders[0]->Y = goal->Y + goal->Type->TileHeight / 2;
-		unit->Orders[0]->Goal = NoUnitP;
-		goal->RefsDecrease();
+		unit->CurrentOrder()->X = goal->X + goal->Type->TileWidth / 2;
+		unit->CurrentOrder()->Y = goal->Y + goal->Type->TileHeight / 2;
+		unit->CurrentOrder()->ClearGoal();
 		goal = NoUnitP;
 		NewResetPath(unit);
 	}
@@ -223,16 +216,16 @@ void HandleActionFollow(CUnit *unit)
 		//  better goal if moving nearer to enemy.
 		//
 		if (unit->Type->CanAttack &&
-				(!goal || goal->Orders[0]->Action == UnitActionAttack ||
-					goal->Orders[0]->Action == UnitActionStill)) {
+				(!goal || goal->CurrentAction() == UnitActionAttack ||
+					goal->CurrentAction() == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 				// Save current command to come back.
-				unit->SavedOrder = *unit->Orders[0];
+				unit->SavedOrder = *(unit->CurrentOrder());
 				// This stops the follow command and the attack is executed
 				unit->ClearAction();
-				unit->Orders[0]->Goal = NoUnitP;
+				unit->CurrentOrder()->ClearGoal();
 			}
 		}
 	}

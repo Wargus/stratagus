@@ -75,7 +75,7 @@ struct CUnitCache {
 	template<typename _T>
 	inline CUnit *find(const _T &pred) const
 	{
-#ifndef __GNUG__
+#if __GNUC__ <  4
 		if(Units.size()) {
 			std::vector<CUnit *>::const_iterator beg(Units.begin()), end(Units.end());
 			std::vector<CUnit *>::const_iterator ret = std::find_if(beg, end, pred);
@@ -130,7 +130,7 @@ struct CUnitCache {
 	inline void for_each(_T &functor)
 	{	
 		const size_t size = Units.size();
-#ifndef __GNUG__
+#if __GNUC__ <  4
 		for(unsigned int i = 0; i < size; ++i)
 			functor(Units[i]);
 #else

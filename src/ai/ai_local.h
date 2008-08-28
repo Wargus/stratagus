@@ -180,7 +180,7 @@ public:
 	AiTransportRequest() : Unit(NULL) {}
 
 	CUnit *Unit;
-	COrder Order;
+	CUnit::COrder Order;
 };
 
 /**

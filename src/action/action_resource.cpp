@@ -76,24 +76,19 @@
 */
 static int MoveToResource(CUnit *unit)
 {
-	CUnit *goal;
-	ResourceInfo *resinfo;
-	int x;
-	int y;
-
-	resinfo = unit->Type->ResInfo[unit->CurrentResource];
+	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 	if (resinfo->TerrainHarvester) {
-		x = unit->Orders[0]->X;
-		y = unit->Orders[0]->Y;
+		int x = unit->CurrentOrder()->X;
+		int y = unit->CurrentOrder()->Y;
 		// Wood gone, look somewhere else.
 		if ((!Map.ForestOnMap(x, y)) && (!unit->IX) && (!unit->IY)) {
 			if (!FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 16,
-					unit->Player, unit->Orders[0]->X, unit->Orders[0]->Y, &x, &y)) {
+					unit->Player, unit->CurrentOrder()->X, unit->CurrentOrder()->Y, &x, &y)) {
 				// no wood in range
 				return -1;
 			} else {
-				unit->Orders[0]->X = x;
-				unit->Orders[0]->Y = y;
+				unit->CurrentOrder()->X = x;
+				unit->CurrentOrder()->Y = y;
 				NewResetPath(unit);
 			}
 		}
@@ -102,8 +97,8 @@ static int MoveToResource(CUnit *unit)
 				unit->Wait = 10;
 				if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 9999,
 						unit->Player, unit->X, unit->Y, &x, &y)) {
-					unit->Orders[0]->X = x;
-					unit->Orders[0]->Y = y;
+					unit->CurrentOrder()->X = x;
+					unit->CurrentOrder()->Y = y;
 					NewResetPath(unit);
 					DebugPrint("Found a better place to harvest %d,%d\n" _C_ x _C_ y);
 					// FIXME: can't this overflow? It really shouldn't, since
@@ -118,7 +113,7 @@ static int MoveToResource(CUnit *unit)
 				return 0;
 		}
 	} else {
-		goal = unit->Orders[0]->Goal;
+		CUnit *goal = unit->CurrentOrder()->GetGoal();
 		Assert(goal);
 		switch (DoActionMove(unit)) { // reached end-point?
 			case PF_UNREACHABLE:
@@ -139,15 +134,10 @@ static int MoveToResource(CUnit *unit)
 
 static void UnitGotoGoal(CUnit *const unit, CUnit *const goal, int mode)
 {
-	COrder *order = unit->Orders[0];
-	if(order->Goal != goal) {
-		if(order->Goal) {
-			order->Goal->RefsDecrease();
-			order->Goal = NoUnitP;
-		}
+	COrderPtr order = unit->CurrentOrder();
+	if(order->GetGoal() != goal) {
+		order->SetGoal(goal);
 		if(goal) {
-			order->Goal = goal;
-			goal->RefsIncrease();
 			order->X = order->Y = -1;
 		}
 	}
@@ -170,11 +160,10 @@ static void UnitGotoGoal(CUnit *const unit, CUnit *const goal, int mode)
 static int StartGathering(CUnit *unit)
 {
 	CUnit *goal;
-	ResourceInfo *resinfo;
-
-	resinfo = unit->Type->ResInfo[unit->CurrentResource];
+	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 	Assert(!unit->IX);
 	Assert(!unit->IY);
+
 	if (resinfo->TerrainHarvester) {
 		// This shouldn't happend?
 #if 0
@@ -183,8 +172,8 @@ static int StartGathering(CUnit *unit)
 			return 0;
 		}
 #endif
-		UnitHeadingFromDeltaXY(unit, unit->Orders[0]->X - unit->X,
-			unit->Orders[0]->Y - unit->Y);
+		UnitHeadingFromDeltaXY(unit, unit->CurrentOrder()->X - unit->X,
+			unit->CurrentOrder()->Y - unit->Y);
 		if (resinfo->WaitAtResource) {
 			unit->Data.ResWorker.TimeToHarvest = resinfo->WaitAtResource /
 				SpeedResourcesHarvest[resinfo->ResourceId];
@@ -195,21 +184,19 @@ static int StartGathering(CUnit *unit)
 		return 1;
 	}
 
-	goal = unit->Orders[0]->Goal;
+	goal = unit->CurrentOrder()->GetGoal();
 	//
 	// Target is dead, stop getting resources.
 	//
 	if (!goal->IsVisibleAsGoal(unit->Player)) {
-		goal->RefsDecrease();
 		// Find an alternative, but don't look too far.
-		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
+		unit->CurrentOrder()->X = unit->CurrentOrder()->Y = -1;
 		if ((goal = UnitFindResource(unit, unit->X, unit->Y, 
 					15, unit->CurrentResource, unit->Player->AiEnabled))) {
 			unit->SubAction = SUB_START_RESOURCE;
-			unit->Orders[0]->Goal = goal;
-			goal->RefsIncrease();
+			unit->CurrentOrder()->SetGoal(goal);
 		} else {
-			unit->Orders[0]->Goal = NoUnitP;
+			unit->CurrentOrder()->ClearGoal();
 			unit->ClearAction();
 		}
 		return 0;
@@ -230,8 +217,9 @@ static int StartGathering(CUnit *unit)
 	//
 	// If resource is still under construction, wait!
 	//
-	if ((goal->Type->MaxOnBoard && goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
-			goal->Orders[0]->Action == UnitActionBuilt) {
+	if ((goal->Type->MaxOnBoard &&
+		 goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
+			goal->CurrentAction() == UnitActionBuilt) {
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
 		// FIXME: We should add a flag for that, and a limited range.
@@ -248,9 +236,7 @@ static int StartGathering(CUnit *unit)
 	// Place unit inside the resource
 	//
 	if (!resinfo->HarvestFromOutside) {
-		goal->RefsDecrease();
-		unit->Orders[0]->Goal = NoUnitP;
-
+		unit->CurrentOrder()->ClearGoal();
 		unit->Remove(goal);
 	}
 
@@ -287,16 +273,13 @@ static void AnimateActionHarvest(CUnit *unit)
 static void LoseResource(CUnit *unit, const CUnit *source)
 {
 	CUnit *depot;
-	ResourceInfo *resinfo;
-
-	resinfo = unit->Type->ResInfo[unit->CurrentResource];
+	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
 	Assert((unit->Container && !resinfo->HarvestFromOutside) ||
 		(!unit->Container && resinfo->HarvestFromOutside));
 
 	if (resinfo->HarvestFromOutside) {
-		unit->Orders[0]->Goal->RefsDecrease();
-		unit->Orders[0]->Goal = NoUnitP;
+		unit->CurrentOrder()->ClearGoal();
 	}
 
 	//
@@ -313,7 +296,7 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 		// Remember were it mined, so it can look around for another resource.
 		//
 		//FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//unit->Orders[0]->Arg1.ResourcePos = (unit->X << 16) | unit->Y;
+		//unit->CurrentOrder()->Arg1.ResourcePos = (unit->X << 16) | unit->Y;
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Going to depot\n" 
 			_C_ unit->Player->Index _C_ unit->Slot);
@@ -328,18 +311,21 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 		DropOutOnSide(unit, LookingW, source->Type->TileWidth,
 			source->Type->TileHeight);
 	}
-	unit->Orders[0]->X = unit->Orders[0]->Y = -1;
-	if ((unit->Orders[0]->Goal = UnitFindResource(unit, unit->X, unit->Y,
-			15, unit->CurrentResource, unit->Player->AiEnabled))) {
+	unit->CurrentOrder()->X = unit->CurrentOrder()->Y = -1;
+	//use depot as goal
+	depot = UnitFindResource(unit, unit->X, unit->Y,
+					15, unit->CurrentResource, unit->Player->AiEnabled);
+	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n" 
 			_C_ unit->Player->Index _C_ unit->Slot);
 		unit->SubAction = SUB_START_RESOURCE;
 		unit->State = 0;
-		unit->Orders[0]->Goal->RefsIncrease();
+		unit->CurrentOrder()->SetGoal(depot);
 	} else {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Just sits around confused.\n" 
 			_C_ unit->Player->Index _C_ unit->Slot);
 		unit->ClearAction();
+		unit->CurrentOrder()->ClearGoal(); //just in case
 		unit->State = 0;
 	}
 }
@@ -353,14 +339,12 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 */
 static int GatherResource(CUnit *unit)
 {
-	CUnit *source;
+	CUnit *source = 0;
 	CUnit *uins;
-	ResourceInfo *resinfo;
+	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 	int i;
 	int addload;
 
-	resinfo = unit->Type->ResInfo[unit->CurrentResource];
-	source = 0;
 
 	if (resinfo->HarvestFromOutside || resinfo->TerrainHarvester) {
 		AnimateActionHarvest(unit);
@@ -376,7 +360,8 @@ static int GatherResource(CUnit *unit)
 	}
 
 	// Target gone?
-	if (resinfo->TerrainHarvester && !Map.ForestOnMap(unit->Orders[0]->X, unit->Orders[0]->Y)) {
+	if (resinfo->TerrainHarvester && 
+		!Map.ForestOnMap(unit->CurrentOrder()->X, unit->CurrentOrder()->Y)) {
 		if (!unit->Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
@@ -415,11 +400,12 @@ static int GatherResource(CUnit *unit)
 			unit->ResourcesHeld += addload;
 
 			if (addload && unit->ResourcesHeld == resinfo->ResourceCapacity) {
-				Map.ClearTile(MapFieldForest, unit->Orders[0]->X, unit->Orders[0]->Y);
+				Map.ClearTile(MapFieldForest, 
+					unit->CurrentOrder()->X, unit->CurrentOrder()->Y);
 			}
 		} else {
 			if (resinfo->HarvestFromOutside) {
-				source = unit->Orders[0]->Goal;
+				source = unit->CurrentOrder()->GetGoal();
 			} else {
 				source = unit->Container;
 			}
@@ -450,14 +436,14 @@ static int GatherResource(CUnit *unit)
 				}
 				DebugPrint("%d: Worker %d report: Resource is destroyed\n" 
 					_C_ unit->Player->Index _C_ unit->Slot);
-				bool dead = source->Orders[0]->Action == UnitActionDie;
+				bool dead = source->CurrentAction() == UnitActionDie;
 				//
 				// Improved version of DropOutAll that makes workers go to the depot.
 				//
 				LoseResource(unit,source);
 				for (i = source->InsideCount, uins = source->UnitInside; 
 										i; --i, uins = uins->NextContained) {
-					if (uins->Orders[0]->Action == UnitActionResource) {
+					if (uins->CurrentOrder()->Action == UnitActionResource) {
 						LoseResource(uins,source);
 					}
 				}
@@ -469,12 +455,12 @@ static int GatherResource(CUnit *unit)
 							worker->RefsDecrease();
 							source->Data.Resource.Assigned--;
 							/* next == mine */
-							next = worker->Orders[0]->Arg1.Resource.Mine;
+							next = worker->CurrentOrder()->Arg1.Resource.Mine;
 							if(next) {
 								Assert(next == source);
 								next->RefsDecrease();
 							}
-							worker->Orders[0]->Arg1.Resource.Mine = NULL;
+							worker->CurrentOrder()->Arg1.Resource.Mine = NULL;
 							
 							next = worker->NextWorker;
 							worker->NextWorker = NULL;
@@ -537,17 +523,13 @@ int GetNumWaitingWorkers(const CUnit *mine) {
 static int StopGathering(CUnit *unit)
 {
 	CUnit *depot;
-	CUnit *source;
-	ResourceInfo *resinfo;
+	CUnit *source = 0;
+	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
-	resinfo = unit->Type->ResInfo[unit->CurrentResource];
-
-	source = 0;
 	if (!resinfo->TerrainHarvester) {
 		if (resinfo->HarvestFromOutside) {
-			source = unit->Orders[0]->Goal;
-			source->RefsDecrease();
-			unit->Orders[0]->Goal = NoUnitP;
+			source = unit->CurrentOrder()->GetGoal();
+			unit->CurrentOrder()->ClearGoal();
 		} else {
 			source = unit->Container;
 		}
@@ -592,8 +574,8 @@ static int StopGathering(CUnit *unit)
 		
 	} else {
 		// Store resource position.
-		unit->Orders[0]->Arg1.Resource.Pos.X = unit->X;
-		unit->Orders[0]->Arg1.Resource.Pos.Y = unit->Y;
+		unit->CurrentOrder()->Arg1.Resource.Pos.X = unit->X;
+		unit->CurrentOrder()->Arg1.Resource.Pos.Y = unit->Y;
 	}
 
 
@@ -613,7 +595,7 @@ static int StopGathering(CUnit *unit)
 		}
 		DebugPrint("%d: Worker %d report: Can't find a resource deposit.\n" 
 				_C_ unit->Player->Index _C_ unit->Slot);
-		unit->Orders[0]->Goal = NoUnitP;
+		unit->CurrentOrder()->ClearGoal();
 		unit->ClearAction();
 		// should return 0, done below!
 		return 0;
@@ -631,7 +613,7 @@ static int StopGathering(CUnit *unit)
 		SelectedUnitChanged();
 	}
 
-	return unit->Orders[0]->Action != UnitActionStill;
+	return unit->CurrentAction() != UnitActionStill;
 }
 
 extern void AiNewDepotRequest(CUnit *worker);
@@ -645,12 +627,9 @@ extern void AiNewDepotRequest(CUnit *worker);
 */
 static int MoveToDepot(CUnit *unit)
 {
-	CUnit *goal;
-	ResourceInfo *resinfo;
+	ResourceInfo *resinfo = unit->Type->ResInfo[unit->CurrentResource];
+	CUnit *goal = unit->CurrentOrder()->GetGoal();
 
-	resinfo = unit->Type->ResInfo[unit->CurrentResource];
-
-	goal = unit->Orders[0]->Goal;
 	Assert(goal);
 
 	switch (DoActionMove(unit)) { // reached end-point?
@@ -671,8 +650,8 @@ static int MoveToDepot(CUnit *unit)
 	if (!goal->IsVisibleAsGoal(unit->Player)) {
 		DebugPrint("%d: Worker %d report: Destroyed depot\n" 
 			_C_ unit->Player->Index _C_ unit->Slot);
-		goal->RefsDecrease();
-		unit->Orders[0]->Goal = NoUnitP;
+
+		unit->CurrentOrder()->ClearGoal();
 		
 		CUnit *depot = 
 			FindDeposit(unit, unit->X, unit->Y, 1000, unit->CurrentResource);
@@ -697,13 +676,12 @@ static int MoveToDepot(CUnit *unit)
 
 	// If resource depot is still under construction, wait!
 	//
-	if (goal->Orders[0]->Action == UnitActionBuilt) {
+	if (goal->CurrentOrder()->Action == UnitActionBuilt) {
 		unit->Wait = 10;
 		return 0;
 	}
 
-	goal->RefsDecrease();
-	unit->Orders[0]->Goal = NoUnitP;
+	unit->CurrentOrder()->ClearGoal();
 	unit->Wait = resinfo->WaitAtDepot;
 	
 	//
@@ -750,16 +728,16 @@ static int WaitInDepot(CUnit *unit)
 	
 	// Range hardcoded. don't stray too far though
 	if (resinfo->TerrainHarvester) {
-		x = unit->Orders[0]->Arg1.Resource.Pos.X;
-		y = unit->Orders[0]->Arg1.Resource.Pos.Y;
+		x = unit->CurrentOrder()->Arg1.Resource.Pos.X;
+		y = unit->CurrentOrder()->Arg1.Resource.Pos.Y;
 	
 		if (FindTerrainType(unit->Type->MovementMask, MapFieldForest, 0, 10,
 				unit->Player, x, y, &x, &y)) {
 			if(depot)
 				DropOutNearest(unit, x, y, depot->Type->TileWidth,
 						 depot->Type->TileHeight);
-			unit->Orders[0]->X = x;
-			unit->Orders[0]->Y = y;
+			unit->CurrentOrder()->X = x;
+			unit->CurrentOrder()->Y = y;
 		} else {
 			if(depot)
 				DropOutOnSide(unit, LookingW, depot->Type->TileWidth, 
@@ -768,7 +746,7 @@ static int WaitInDepot(CUnit *unit)
 		}
 	} else {
 		CUnit *goal;	
-		CUnit *mine = unit->Orders[0]->Arg1.Resource.Mine;
+		CUnit *mine = unit->CurrentOrder()->Arg1.Resource.Mine;
 		const int range = (mine ? 15 : 1000);
 		x = mine ? mine->X : unit->X;
 		y = mine ? mine->Y : unit->Y;
@@ -788,13 +766,12 @@ static int WaitInDepot(CUnit *unit)
 				}
 				unit->AssignWorkerToMine(goal);
 				goal->RefsIncrease();
-				unit->Orders[0]->Arg1.Resource.Mine = goal;
+				unit->CurrentOrder()->Arg1.Resource.Mine = goal;
 			}
 			
-			unit->Orders[0]->Goal = goal;
-			goal->RefsIncrease();
-			unit->Orders[0]->Range = 1;
-			unit->Orders[0]->X = unit->Orders[0]->Y = -1;
+			unit->CurrentOrder()->SetGoal(goal);
+			unit->CurrentOrder()->Range = 1;
+			unit->CurrentOrder()->X = unit->CurrentOrder()->Y = -1;
 		} else {
 			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit and play dumb.\n" 
 				_C_ unit->Player->Index _C_ unit->Slot 
@@ -807,20 +784,20 @@ static int WaitInDepot(CUnit *unit)
 			if(mine) {
 				unit->DeAssignWorkerFromMine(mine);
 				mine->RefsDecrease();
-				unit->Orders[0]->Arg1.Resource.Mine = NULL;
+				unit->CurrentOrder()->Arg1.Resource.Mine = NULL;
 			}
 			
 			unit->ClearAction();
 		}
 	}
 
-	return unit->Orders[0]->Action != UnitActionStill;
+	return unit->CurrentAction() != UnitActionStill;
 }
 
 void DropResource(CUnit *unit)
 {
 	if (unit->CurrentResource) {
-		COrder *order = unit->Orders[0];
+		COrderPtr order = unit->CurrentOrder();
 		ResourceInfo *resinfo = 
 						unit->Type->ResInfo[unit->CurrentResource];	
 		if(resinfo->LoseResources &&
@@ -853,13 +830,9 @@ void DropResource(CUnit *unit)
 void ResourceGiveUp(CUnit *unit)
 {
 	DebugPrint("%d: Worker %d report: Gave up on resource gathering.\n" _C_ unit->Player->Index _C_ unit->Slot);
-	COrder *order = unit->Orders[0];
-	if (order->Goal) {
-		order->Goal->RefsDecrease();
-		order->Goal = NULL;
-	}
+	unit->CurrentOrder()->ClearGoal();
 	DropResource(unit);
-	order->Init();
+	unit->CurrentOrder()->Init();
 	unit->ClearAction();
 }
 
@@ -883,7 +856,7 @@ void HandleActionResource(CUnit *unit)
 
 	// Let's start mining.
 	if (unit->SubAction == SUB_START_RESOURCE) {
-		CUnit *const goal = unit->Orders[0]->Goal;
+		CUnit *const goal = unit->CurrentOrder()->GetGoal();
 		if (goal) {
 			newres = goal->Type->GivesResource;
 		} else {
@@ -895,7 +868,7 @@ void HandleActionResource(CUnit *unit)
 		}
 		if ((unit->CurrentResource = newres))
 		{	
-			COrder *order = unit->Orders[0];
+			COrderPtr order = unit->CurrentOrder();
 			order->CurrentResource = newres;
 			if (goal && order->Arg1.Resource.Mine != goal) {
 				CUnit *mine = order->Arg1.Resource.Mine;			
@@ -904,7 +877,7 @@ void HandleActionResource(CUnit *unit)
 					mine->RefsDecrease();
 					order->Arg1.Resource.Mine = NULL;				
 				}
-				if(goal->Orders[0]->Action != UnitActionBuilt) {
+				if(goal->CurrentAction() != UnitActionBuilt) {
 					unit->AssignWorkerToMine(goal);
 					goal->RefsIncrease();
 					order->Arg1.Resource.Mine = goal;

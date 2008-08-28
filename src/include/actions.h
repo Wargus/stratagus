@@ -51,7 +51,6 @@ class CUnit;
 class CUnitType;
 class CUpgrade;
 class SpellType;
-class COrder;
 class CAnimation;
 
 /*----------------------------------------------------------------------------
@@ -141,7 +140,7 @@ extern void CommandDiplomacy(int player, int state, int opponent);
 	/// Prepare shared vision command
 extern void CommandSharedVision(int player, bool state, int opponent);
 	/// Send any command
-extern void CommandAnyOrder(CUnit *unit, COrder *order, int flush);
+//extern void CommandAnyOrder(CUnit *unit, COrder *order, int flush);
 	/// Move an order in command queue
 extern void CommandMoveOrder(CUnit *unit, int src, int dst);
 
@@ -153,6 +152,7 @@ extern void DropResource(CUnit *unit);
 extern void ResourceGiveUp(CUnit *unit);
 extern int GetNumWaitingWorkers(const CUnit *mine);
 extern void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground);
+extern void MapUnmarkUnitGuard(CUnit *unit);
 
 	/// Generic still action
 extern void ActionStillGeneric(CUnit *unit, bool stand_ground);

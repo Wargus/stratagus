@@ -760,7 +760,7 @@ void PlayersEachCycle(void)
 				for (int j = 0; j < p->TotalNumUnits; ++j) {
 					CUnit *guard = p->Units[j];
 					bool stand_ground = 
-						guard->Orders[0]->Action == UnitActionStandGround;
+						guard->CurrentAction() == UnitActionStandGround;
 					if (guard->Type->CanAttack && 
 								(stand_ground || guard->IsIdle()) &&
 								 !guard->IsUnusable()) {

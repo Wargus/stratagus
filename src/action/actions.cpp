@@ -62,7 +62,6 @@ unsigned SyncHash; /// Hash calculated to find sync failures
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void MapUnmarkUnitGuard(CUnit *unit);
 
 /*----------------------------------------------------------------------------
 --  Animation
@@ -168,13 +167,14 @@ int UnitShowAnimationScaled(CUnit *unit, const CAnimation *anim, int scale)
 				break;
 
 			case AnimationAttack:
-				if (unit->Orders[0]->Action == UnitActionSpellCast) {
-					if (unit->Orders[0]->Goal &&
-							!unit->Orders[0]->Goal->IsVisibleAsGoal(unit->Player)) {
+				if (unit->CurrentAction() == UnitActionSpellCast) {
+					CUnit *goal = unit->CurrentOrder()->GetGoal();
+					if (goal &&	!goal->IsVisibleAsGoal(unit->Player)) {
 						unit->ReCast = 0;
 					} else {
-						unit->ReCast = SpellCast(unit, unit->Orders[0]->Arg1.Spell,
-							unit->Orders[0]->Goal, unit->Orders[0]->X, unit->Orders[0]->Y);
+						COrderPtr order = unit->CurrentOrder();
+						unit->ReCast = SpellCast(unit, order->Arg1.Spell,
+											goal, order->X, order->Y);
 					}
 				} else {
 					FireMissile(unit);
@@ -265,7 +265,7 @@ static void HandleActionNotWritten(CUnit *unit)
 {
 	DebugPrint("FIXME: Not written!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
-		UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_ unit->Orders[0]->Action);
+		UnitNumber(unit) _C_ unit->Type->Ident.c_str() _C_ unit->CurrentAction());
 }
 
 /**
@@ -389,8 +389,8 @@ static void HandleRegenerations(CUnit *unit)
 
 	// Burn
 	if (!unit->Removed && !unit->Destroyed && unit->Variable[HP_INDEX].Max &&
-			unit->Orders[0]->Action != UnitActionBuilt &&
-			unit->Orders[0]->Action != UnitActionDie) {
+			unit->CurrentAction() != UnitActionBuilt &&
+			unit->CurrentAction() != UnitActionDie) {
 		f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
 		if (f <= unit->Type->BurnPercent && unit->Type->BurnDamageRate) {
 			HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);
@@ -475,20 +475,19 @@ static void HandleUnitAction(CUnit *unit)
 		// o Or the order queue should be flushed.
 		//
 		if (unit->OrderCount > 1 &&
-				(unit->Orders[0]->Action == UnitActionStill || unit->OrderFlush)) {
+				(unit->CurrentAction() == UnitActionStill || unit->OrderFlush)) {
 
 			if (unit->Removed) { // FIXME: johns I see this as an error
 				DebugPrint("Flushing removed unit\n");
 				// This happens, if building with ALT+SHIFT.
 				return;
 			}
-			COrder *order = unit->Orders[0];
-			int old_action = order->Action;
+			COrderPtr order = unit->CurrentOrder();
 			//
 			// Release pending references.
 			//
-			if (order->Goal) {
-				CUnit *goal = order->Goal;
+			if (order->HasGoal()) {
+				CUnit *goal = order->GetGoal();
 				// If mining decrease the active count on the resource.
 				if (order->Action == UnitActionResource) {
 					if(unit->SubAction == 60) {
@@ -499,8 +498,7 @@ static void HandleUnitAction(CUnit *unit)
 				}
 				// Still shouldn't have a reference unless attacking
 				Assert(!(order->Action == UnitActionStill && !unit->SubAction));
-				goal->RefsDecrease();
-				order->Goal = NULL;
+				order->ClearGoal();
 			}
 #ifdef DEBUG
 			 else {
@@ -524,14 +522,6 @@ static void HandleUnitAction(CUnit *unit)
 			}
 			unit->Orders.pop_back();
 			
-			if((old_action == UnitActionStill || 
-				old_action == UnitActionStandGround )&& 
-				unit->Orders[0]->Action != UnitActionStill &&
-				unit->Orders[0]->Action != UnitActionStandGround)
-			{
-				MapUnmarkUnitGuard(unit);
-			}
-				
 			//
 			// Note subaction 0 should reset.
 			//
@@ -547,7 +537,7 @@ static void HandleUnitAction(CUnit *unit)
 	//
 	// Select action.
 	//
-	RunAction(unit->Orders[0]->Action, unit);
+	RunAction(unit->CurrentAction(), unit);
 }
 
 /**
@@ -677,7 +667,7 @@ void UnitActions(void)
 		fprintf(logf, "%d %s S%d/%d-%d P%d Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit->Type ? unit->Type->Ident.c_str() : "unit-killed",
 			unit->State, unit->SubAction,
-			!unit->Orders.empty() ? unit->Orders[0]->Action : -1,
+			!unit->Orders.empty() ? unit->CurrentAction() : -1,
 			unit->Player ? unit->Player->Index : -1, unit->Refs,SyncRandSeed,
 			unit->X, unit->Y, unit->IX, unit->IY);
 
@@ -691,7 +681,7 @@ void UnitActions(void)
 		// Calculate some hash.
 		//
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
-		SyncHash ^= !unit->Orders.empty() ? unit->Orders[0]->Action << 18 : 0;
+		SyncHash ^= unit->Orders.size() > 0 ? unit->CurrentAction() << 18 : 0;
 		SyncHash ^= unit->State << 12;
 		SyncHash ^= unit->SubAction << 6;
 		SyncHash ^= unit->Refs << 3;

@@ -86,14 +86,16 @@ void HandleActionDie(CUnit *unit)
 		// Update sight for new corpse
 		// We have to unmark BEFORE changing the type.
 		// Always do that, since types can have different vision properties.
+		MapUnmarkUnitGuard(unit);
 		MapUnmarkUnitSight(unit);
 		unit->Type = unit->Type->CorpseType;
-		unit->CurrentSightRange = unit->Type->Stats[unit->Player->Index].Variables[SIGHTRANGE_INDEX].Max;
+		unit->CurrentSightRange = 
+			unit->Type->Stats[unit->Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 		MapMarkUnitSight(unit);
 
 		// We must be dead to get here, it we aren't we need to know why
 		// This assert replaces and old DEBUG message "Reset to die is really needed"
-		Assert(unit->Orders[0]->Action == UnitActionDie);
+		Assert(unit->CurrentAction() == UnitActionDie);
 
 		unit->SubAction = 0;
 		unit->Frame = 0;

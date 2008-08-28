@@ -120,7 +120,7 @@ static void MoveToLocation(CUnit *unit)
 			unit->Player->Notify(NotifyYellow, unit->X, unit->Y,
 				_("You cannot reach building place"));
 			if (unit->Player->AiEnabled) {
-				AiCanNotReach(unit, unit->Orders[0]->Type);
+				AiCanNotReach(unit, unit->CurrentOrder()->Arg1.Type);
 			}
 
 			unit->ClearAction();
@@ -146,7 +146,7 @@ struct AlreadyBuildingFinder {
 		return (!unit->Destroyed && unit->Type == type &&
 				(worker->Player == unit->Player || worker->IsAllied(unit)));
 	}
-	inline CUnit *FindOnTile(const CMapField *const mf) const
+	inline CUnit *Find(const CMapField *const mf) const
 	{
 		return mf->UnitCache.find(*this);
 	}	
@@ -170,9 +170,10 @@ static CUnit *CheckCanBuild(CUnit *unit)
 		return NULL;
 	}
 
-	x = unit->Orders[0]->X;
-	y = unit->Orders[0]->Y;
-	type = unit->Orders[0]->Type;
+	COrderPtr order = unit->CurrentOrder();
+	x = order->X;
+	y = order->Y;
+	type = order->Arg1.Type;
 
 	//
 	// Check if the building could be built there.
@@ -183,17 +184,16 @@ static CUnit *CheckCanBuild(CUnit *unit)
 		 *	ebabled/disable via game lua scripting
 		 */		 
 		if ((ontop = 
-			AlreadyBuildingFinder(unit, type).FindOnTile(Map.Field(x,y))
+			AlreadyBuildingFinder(unit, type).Find(Map.Field(x,y))
 			) != NULL) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n" 
 					_C_ unit->Player->Index _C_ unit->Slot 
 					_C_ ontop->Type->Name.c_str()
 					_C_ ontop->Slot);
-			unit->Orders[0]->Init();
-			unit->Orders[0]->Action = UnitActionRepair;
-			unit->Orders[0]->Goal = ontop;
-			unit->Orders[0]->Goal->RefsIncrease();
-			unit->Orders[0]->Range = unit->Type->RepairRange;
+			order->Init();
+			order->Action = UnitActionRepair;
+			order->SetGoal(ontop);
+			order->Range = unit->Type->RepairRange;
 			unit->SubAction = 0;
 			return NULL;
 		}
@@ -260,10 +260,11 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	CUnitType *type;
 	CUnit *build;
 	const CUnitStats *stats;
-
-	x = unit->Orders[0]->X;
-	y = unit->Orders[0]->Y;
-	type = unit->Orders[0]->Type;
+	COrderPtr order = unit->CurrentOrder();
+	
+	x = order->X;
+	y = order->Y;
+	type = order->Arg1.Type;
 
 	unit->Player->SubUnitType(type);
 
@@ -301,7 +302,7 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 	}
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
-	build->Orders[0]->Action = UnitActionBuilt;
+	build->CurrentOrder()->Action = UnitActionBuilt;
 
 	// Must place after previous for map flags
 	build->Place(x, y);
@@ -332,25 +333,23 @@ static void StartBuilding(CUnit *unit, CUnit *ontop)
 		build->CurrentSightRange = 0;
 		unit->X = x;
 		unit->Y = y;
-		unit->Orders[0]->Action = UnitActionBuild;
+		order->Action = UnitActionBuild;
 		unit->Data.Build.Cycles = 0;
 		unit->SubAction = 40;
-		unit->Orders[0]->Goal = build;
-		build->RefsIncrease();
+		order->SetGoal(build);
 		if (unit->Selected) {
 			SelectedUnitChanged();
 		}
 	} else {
 		// Use repair to do the building
-		unit->Orders[0]->Action = UnitActionRepair;
-		unit->Orders[0]->Goal = build;
-		unit->Orders[0]->X = unit->Orders[0]->Y = -1;
+		order->Action = UnitActionRepair;
+		order->SetGoal(build);
+		order->X = order->Y = -1;
 		// FIXME: Should have a BuildRange?
-		unit->Orders[0]->Range = unit->Type->RepairRange;
+		order->Range = unit->Type->RepairRange;
 		unit->SubAction = 0;
 		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
 		UnitUpdateHeading(unit);
-		build->RefsIncrease();
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
 	}
@@ -382,15 +381,14 @@ static void BuildBuilding(CUnit *unit)
 	
 	//goal hp are mod by HandleActionBuilt
 	//and outsid builder use repair now.		
-	goal = unit->Orders[0]->Goal;
+	goal = unit->CurrentOrder()->GetGoal();
 	//Assert(goal);
 	if(!goal) {
 		return;
 	}
 
-	if (goal->Orders[0]->Action == UnitActionDie) {
-		goal->RefsDecrease();
-		unit->Orders[0]->Goal = NULL;
+	if (goal->CurrentAction() == UnitActionDie) {
+		unit->CurrentOrder()->ClearGoal();
 		unit->State = 0;
 		unit->ClearAction();
 		return;
@@ -414,8 +412,7 @@ static void BuildBuilding(CUnit *unit)
 	// Building is gone or finished
 	//
 	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
-		goal->RefsDecrease();
-		unit->Orders[0]->Goal = NULL;
+		unit->CurrentOrder()->ClearGoal();
 		unit->State = 0;
 		unit->ClearAction();
 	}
@@ -495,11 +492,7 @@ void HandleActionBuilt(CUnit *unit)
 		// Drop out unit
 		if ((worker = unit->Data.Built.Worker)) {
 		
-			if(worker->Orders[0]->Goal) {
-				worker->Orders[0]->Goal->RefsDecrease();
-				worker->Orders[0]->Goal = NULL;
-			}
-		
+			worker->CurrentOrder()->ClearGoal();
 			worker->ClearAction();
 			//worker->State = 0;
 			
@@ -562,11 +555,7 @@ void HandleActionBuilt(CUnit *unit)
 				unit->CurrentSightRange = 1;
 				DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
 				
-				CUnit *goal = worker->Orders[0]->Goal;
-				if(goal) {
-					goal->RefsDecrease();
-					worker->Orders[0]->Goal = NULL;				
-				}
+				worker->CurrentOrder()->ClearGoal();
 				
 				//
 				// If we can harvest from the new building, do it.

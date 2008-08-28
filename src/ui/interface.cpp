@@ -718,7 +718,7 @@ int HandleCheats(const std::string &input)
 			for (int j = 0; j < ThisPlayer->TotalNumUnits; ++j) {
 				CUnit *guard = ThisPlayer->Units[j];
 				bool stand_ground = 
-					guard->Orders[0]->Action == UnitActionStandGround;
+					guard->CurrentAction() == UnitActionStandGround;
 				if ((stand_ground || guard->IsIdle()) &&
 							 !guard->IsUnusable()) {
 					MapUnmarkUnitGuard(guard);

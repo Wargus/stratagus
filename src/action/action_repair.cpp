@@ -54,32 +54,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Restore the saved order
-**  FIXME: this should be moved to a more central location
-**
-**  @param unit  Unit to restore
-**
-**  @return      True if the saved order was restored
-*/
-static bool RestoreSavedOrder(CUnit *unit)
-{
-	if (unit->SavedOrder.Action != UnitActionStill) {
-		unit->SubAction = 0;
-		Assert(unit->Orders[0]->Goal == NoUnitP);
-		//copy
-		*unit->Orders[0] = unit->SavedOrder;
-		
-		unit->CurrentResource = unit->SavedOrder.CurrentResource;
-		NewResetPath(unit);
-		
-		unit->SavedOrder.Action = UnitActionStill;
-		// This isn't supported
-		Assert(unit->SavedOrder.Goal == NoUnitP);
-		return true;
-	}
-	return false;
-}
 
 /**
 **  Repair a unit.
@@ -97,7 +71,7 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 
 	player = unit->Player;
 
-	if (goal->Orders[0]->Action != UnitActionBuilt) {
+	if (goal->CurrentAction() != UnitActionBuilt) {
 		//
 		// Calculate the repair costs.
 		//
@@ -113,9 +87,8 @@ static void RepairUnit(CUnit *unit, CUnit *goal)
 				player->Notify(NotifyYellow, unit->X, unit->Y, buf);
 				if (player->AiEnabled) {
 					// FIXME: call back to AI?
-					goal->RefsDecrease();
-					unit->Orders[0]->Goal = NULL;
-					if (!RestoreSavedOrder(unit)) {
+					unit->CurrentOrder()->ClearGoal();
+					if (!unit->RestoreOrder()) {
 						unit->ClearAction();
 						unit->State = 0;
 					}
@@ -194,7 +167,7 @@ void HandleActionRepair(CUnit *unit)
 				//
 				// No goal: if meeting damaged building repair it.
 				//
-				goal = unit->Orders[0]->Goal;
+				goal = unit->CurrentOrder()->GetGoal();
 
 				//
 				// Target is dead, choose new one.
@@ -203,11 +176,11 @@ void HandleActionRepair(CUnit *unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair target gone.\n");
-						unit->Orders[0]->X = goal->X;
-						unit->Orders[0]->Y = goal->Y;
-						goal->RefsDecrease();
+						unit->CurrentOrder()->X = goal->X;
+						unit->CurrentOrder()->Y = goal->Y;
 						// FIXME: should I clear this here?
-						unit->Orders[0]->Goal = goal = NULL;
+						unit->CurrentOrder()->ClearGoal(); 
+						goal = NULL;
 						NewResetPath(unit);
 					}
 				} else if (unit->Player->AiEnabled) {
@@ -227,11 +200,8 @@ void HandleActionRepair(CUnit *unit)
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 				} else if (err < 0) {
-					if (goal) { // release reference
-						goal->RefsDecrease();
-						unit->Orders[0]->Goal = NoUnitP;
-					}
-					if (!RestoreSavedOrder(unit)) {
+					unit->CurrentOrder()->ClearGoal();
+					if (!unit->RestoreOrder()) {
 						unit->ClearAction();
 						unit->State = 0;
 					}
@@ -239,7 +209,7 @@ void HandleActionRepair(CUnit *unit)
 				}
 
 				// FIXME: Should be it already?
-				Assert(unit->Orders[0]->Action == UnitActionRepair);
+				Assert(unit->CurrentAction() == UnitActionRepair);
 			}
 			break;
 
@@ -250,7 +220,7 @@ void HandleActionRepair(CUnit *unit)
 			AnimateActionRepair(unit);
 			unit->Data.Repair.Cycles++;
 			if (!unit->Anim.Unbreakable) {
-				goal = unit->Orders[0]->Goal;
+				goal = unit->CurrentOrder()->GetGoal();
 
 				//
 				// Target is dead, choose new one.
@@ -260,17 +230,17 @@ void HandleActionRepair(CUnit *unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(unit->Player)) {
 						DebugPrint("repair goal is gone\n");
-						unit->Orders[0]->X = goal->X;
-						unit->Orders[0]->Y = goal->Y;
-						goal->RefsDecrease();
+						unit->CurrentOrder()->X = goal->X;
+						unit->CurrentOrder()->Y = goal->Y;
 						// FIXME: should I clear this here?
-						unit->Orders[0]->Goal = goal = NULL;
+						unit->CurrentOrder()->ClearGoal();
+						goal = NULL;
 						NewResetPath(unit);
 					} else {
 						int dist = unit->MapDistanceTo(goal);
 						if (dist <= unit->Type->RepairRange) {
 							RepairUnit(unit, goal);
-							goal = unit->Orders[0]->Goal;
+							goal = unit->CurrentOrder()->GetGoal();
 						} else if (dist > unit->Type->RepairRange) {
 							// If goal has move, chase after it
 							unit->State = 0;
@@ -283,12 +253,10 @@ void HandleActionRepair(CUnit *unit)
 				//
 				// Target is fine, choose new one.
 				//
-				if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
-					if (goal) { // release reference
-						goal->RefsDecrease();
-						unit->Orders[0]->Goal = NULL;
-					}
-					if (!RestoreSavedOrder(unit)) {
+				if (!goal || goal->Variable[HP_INDEX].Value >=
+					 goal->Variable[HP_INDEX].Max) {
+					unit->CurrentOrder()->ClearGoal();
+					if (!unit->RestoreOrder()) {
 						unit->ClearAction();
 						unit->State = 0;
 					}

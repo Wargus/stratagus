@@ -67,7 +67,7 @@ std::string UnitReference(const CUnit *unit)
 **  @param order  Order who should be saved.
 **  @param file   Output file.
 */
-void SaveOrder(const COrder *order, CFile *file)
+void SaveOrder(const COrderPtr order, CFile *file)
 {
 	file->printf("{");
 	switch (order->Action) {
@@ -147,21 +147,25 @@ void SaveOrder(const COrder *order, CFile *file)
 	file->printf(" \"width\", %d,", order->Width);
 	file->printf(" \"height\", %d,", order->Height);
 	file->printf(" \"min-range\", %d,", order->MinRange);
-	if (order->Goal) {
-		if (order->Goal->Destroyed) {
+	if (order->HasGoal()) {
+		CUnit *goal = order->GetGoal();
+		if (goal->Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
-		file->printf(" \"goal\", \"%s\",", UnitReference(order->Goal).c_str());
+		file->printf(" \"goal\", \"%s\",", UnitReference(goal).c_str());
 	}
 	file->printf(" \"tile\", {%d, %d}", order->X, order->Y);
-	if (order->Type) {
-		file->printf(", \"type\", \"%s\"", order->Type->Ident.c_str());
-	}
 
 	// Extra arg.
 	switch (order->Action) {
+		case UnitActionTrain:
+		case UnitActionUpgradeTo:
+		case UnitActionBuild:
+		case UnitActionTransformInto:
+			file->printf(", \"type\", \"%s\"", order->Arg1.Type->Ident.c_str());
+		break;	
 		case UnitActionPatrol:
 			file->printf(", \"patrol\", {%d, %d}",
 				order->Arg1.Patrol.X, order->Arg1.Patrol.Y);
@@ -381,16 +385,16 @@ void SaveUnit(const CUnit *unit, CFile *file)
 		}
 	}
 	file->printf("},\n  \"saved-order\", ");
-	SaveOrder(&unit->SavedOrder, file);
+	SaveOrder((COrderPtr)(&unit->SavedOrder), file);
 	file->printf(",\n  \"critical-order\", ");
-	SaveOrder(&unit->CriticalOrder, file);
+	SaveOrder((COrderPtr)(&unit->CriticalOrder), file);
 	file->printf(",\n  \"new-order\", ");
-	SaveOrder(&unit->NewOrder, file);
+	SaveOrder((COrderPtr)(&unit->NewOrder), file);
 
 	//
 	//  Order data part
 	//
-	switch (unit->Orders[0]->Action) {
+	switch (unit->CurrentAction()) {
 		case UnitActionStill:
 			// FIXME: support other resource types
 			if (unit->Type->GivesResource) {

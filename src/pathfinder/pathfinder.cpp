@@ -234,34 +234,32 @@ int NewPath(CUnit *unit)
 	int gh;
 	int gx;
 	int gy;
-	int minrange;
-	int maxrange;
+	COrderPtr order = unit->CurrentOrder();
+	int minrange = order->MinRange;
+	int maxrange = order->Range;
 	char *path;
 
-	if (unit->Orders[0]->Goal) {
-		gw = unit->Orders[0]->Goal->Type->TileWidth;
-		gh = unit->Orders[0]->Goal->Type->TileHeight;
-		gx = unit->Orders[0]->Goal->X;
-		gy = unit->Orders[0]->Goal->Y;
-		maxrange = unit->Orders[0]->Range;
-		minrange = unit->Orders[0]->MinRange;
+	if (order->HasGoal()) {
+		CUnit *goal = order->GetGoal();
+		gw = goal->Type->TileWidth;
+		gh = goal->Type->TileHeight;
+		gx = goal->X;
+		gy = goal->Y;
 	} else {
 		// Take care of non square goals :)
 		// If goal is non square, range states a non-existant goal rather
 		// than a tile.
-		gw = unit->Orders[0]->Width;
-		gh = unit->Orders[0]->Height;
-		maxrange = unit->Orders[0]->Range;
-		minrange = unit->Orders[0]->MinRange;
+		gw = order->Width;
+		gh = order->Height;
 		// Large units may have a goal that goes outside the map, fix it here
-		if (unit->Orders[0]->X + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
-			unit->Orders[0]->X = Map.Info.MapWidth - unit->Type->TileWidth;
+		if (order->X + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
+			order->X = Map.Info.MapWidth - unit->Type->TileWidth;
 		}
-		if (unit->Orders[0]->Y + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
-			unit->Orders[0]->Y = Map.Info.MapHeight - unit->Type->TileHeight;
+		if (order->Y + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
+			order->Y = Map.Info.MapHeight - unit->Type->TileHeight;
 		}
-		gx = unit->Orders[0]->X;
-		gy = unit->Orders[0]->Y;
+		gx = order->X;
+		gy = order->Y;
 	}
 	path = unit->Data.Move.Path;
 	i = AStarFindPath(unit->X, unit->Y, gx, gy, gw, gh,
@@ -300,7 +298,8 @@ int NewPath(CUnit *unit)
 int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 {
 	int result;
-
+	COrderPtr order = unit->CurrentOrder();
+	CUnit *goal;
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
 	*pxd = 0;
@@ -308,8 +307,8 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 
 	// Goal has moved, need to recalculate path or no cached path
 	if (unit->Data.Move.Length <= 0 ||
-		(unit->Orders[0]->Goal && (unit->Orders[0]->Goal->X != unit->Orders[0]->X ||
-			unit->Orders[0]->Goal->Y != unit->Orders[0]->Y))) {
+		((goal = order->GetGoal()) && (goal->X != order->X || 
+			goal->Y != order->Y))) {
 		result = NewPath(unit);
 
 		if (result == PF_UNREACHABLE) {
@@ -321,8 +320,8 @@ int NextPathElement(CUnit *unit, int *pxd, int *pyd)
 		}
 		if (unit->Goal) {
 			// Update Orders
-			unit->Orders[0]->X = unit->Goal->X;
-			unit->Orders[0]->Y = unit->Goal->Y;
+			order->X = unit->Goal->X;
+			order->Y = unit->Goal->Y;
 		}
 	}
 

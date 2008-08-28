@@ -163,7 +163,7 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 **  @param l      Lua state.
 **  @param order  OUT: resulting order.
 */
-void CclParseOrder(lua_State *l, COrder *order)
+void CclParseOrder(lua_State *l, COrderPtr order)
 {
 	const char *value;
 
@@ -250,7 +250,7 @@ void CclParseOrder(lua_State *l, COrder *order)
 		} else if (!strcmp(value, "type")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
-			order->Type = UnitTypeByIdent(LuaToString(l, -1));
+			order->Arg1.Type = UnitTypeByIdent(LuaToString(l, -1));
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "patrol")) {
@@ -328,17 +328,20 @@ void CclParseOrder(lua_State *l, COrder *order)
 */
 static void CclParseOrders(lua_State *l, CUnit *unit)
 {
-	for (std::vector<COrder *>::iterator order = unit->Orders.begin();
+	COrderPtr order;
+	const int n = unit->OrderCount;	
+	for (std::vector<COrderPtr>::iterator order = unit->Orders.begin();
 			order != unit->Orders.end();
 			++order) {
-		(*order)->Release();	
 		delete *order;
 	}
 	unit->Orders.clear();
-	for (int j = 0; j < unit->OrderCount; ++j) {
+	unit->OrderCount = 0;
+	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
-		unit->Orders.push_back(new COrder);
-		CclParseOrder(l, unit->Orders[j]);
+		order = unit->CreateOrder();
+		Assert(order == unit->Orders[j]);
+		CclParseOrder(l, order);
 		lua_pop(l, 1);
 	}
 }
@@ -659,7 +662,7 @@ static int CclUnit(lua_State *l)
 			// be put on player's unit list!  However, this state is not
 			// easily detected from this place.  It seems that it is
 			// characterized by
-			// unit->Orders[0]->Action==UnitActionDie so we have to wait
+			// unit->CurrentAction()==UnitActionDie so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
 			unit = UnitSlots[slot];
@@ -845,7 +848,7 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
 			unit->AssignToPlayer (player);
-			if (unit->Orders[0]->Action == UnitActionBuilt) {
+			if (unit->CurrentAction() == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;

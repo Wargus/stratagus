@@ -49,7 +49,7 @@
 ----------------------------------------------------------------------------*/
 
 extern bool AutoRepair(CUnit *unit);
-
+extern bool AutoCast(CUnit *unit);
 
 /**
 **  Swap the patrol points.
@@ -57,13 +57,13 @@ extern bool AutoRepair(CUnit *unit);
 static void SwapPatrolPoints(CUnit *unit)
 {
 	int tmp;
-
-	tmp = unit->Orders[0]->Arg1.Patrol.X;
-	unit->Orders[0]->Arg1.Patrol.X = unit->Orders[0]->X;
-	unit->Orders[0]->X = tmp;
-	tmp = unit->Orders[0]->Arg1.Patrol.Y;
-	unit->Orders[0]->Arg1.Patrol.Y = unit->Orders[0]->Y;
-	unit->Orders[0]->Y = tmp;
+	COrderPtr order = unit->CurrentOrder();
+	tmp = order->Arg1.Patrol.X;
+	order->Arg1.Patrol.X = order->X;
+	order->X = tmp;
+	tmp = order->Arg1.Patrol.Y;
+	order->Arg1.Patrol.Y = order->Y;
+	order->Y = tmp;
 
 	unit->Data.Move.Cycles = 0; //moving counter
 	NewResetPath(unit);
@@ -100,15 +100,14 @@ void HandleActionPatrol(CUnit *unit)
 		case PF_UNREACHABLE:
 			// Increase range and try again
 			unit->SubAction = 1;
-			if (unit->Orders[0]->Range <= Map.Info.MapWidth ||
-					unit->Orders[0]->Range <= Map.Info.MapHeight) {
-				unit->Orders[0]->Range++;
+			if (unit->CurrentOrder()->CheckRange()) {
+				unit->CurrentOrder()->Range++;
 				break;
 			}
 			// FALL THROUGH
 		case PF_REACHED:
 			unit->SubAction = 1;
-			unit->Orders[0]->Range = 0;
+			unit->CurrentOrder()->Range = 0;
 			SwapPatrolPoints(unit);
 			break;
 		case PF_WAIT:
@@ -116,7 +115,7 @@ void HandleActionPatrol(CUnit *unit)
 			unit->SubAction++;
 			if (unit->SubAction == 5) {
 				unit->SubAction = 1;
-				unit->Orders[0]->Range = 0;
+				unit->CurrentOrder()->Range = 0;
 				SwapPatrolPoints(unit);
 			}
 			break;
@@ -135,10 +134,11 @@ void HandleActionPatrol(CUnit *unit)
 			const CUnit *goal = AttackUnitsInReactRange(unit);
 			if (goal) {
 				// Save current command to come back.
-				unit->SavedOrder = *unit->Orders[0];
+				//FIXME: rb - will this work? Since Command* clean saved orders
+				unit->SavedOrder = *unit->CurrentOrder();
+
 				unit->ClearAction();
-				//FIXME: rb - should we dec unit ref
-				unit->Orders[0]->Goal = NoUnitP;
+				unit->CurrentOrder()->ClearGoal();
 				
 				DebugPrint("Patrol attack %d\n" _C_ UnitNumber(goal));
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
@@ -146,8 +146,8 @@ void HandleActionPatrol(CUnit *unit)
 			}
 		}
 
-		// Look for something to auto repair
-		if (AutoRepair(unit)) {
+		// Look for something to auto repair or auto cast
+		if (AutoRepair(unit) || AutoCast(unit)) {
 			return;
 		}
 	}
