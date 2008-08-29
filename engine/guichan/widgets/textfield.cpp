@@ -205,6 +205,7 @@ namespace gcn
 		{
 			mCaretPosition = getFont()->getStringIndexAt(mText, x + mXScroll);
 			mSelectEndOffset = mCaretPosition - mSelectStart;
+			setDirty(true);
 		}
 	}
 

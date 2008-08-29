@@ -110,6 +110,7 @@ void initGuichan()
 	Gui->setGraphics(graphics);
 	Gui->setInput(Input);
 	Gui->setTop(NULL);
+	Gui->setUseDirtyDrawing(!UseOpenGL);
 
 	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
 	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
@@ -159,6 +160,7 @@ void handleInput(const SDL_Event *event)
 void DrawGuichanWidgets() 
 {
 	if (Gui) {
+		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running && !PatchEditorRunning);
 		Gui->draw();
 	}
 }
@@ -1050,6 +1052,7 @@ void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
 */
 void ScrollingWidget::logic()
 {
+	setDirty(true);
 	if (container.getHeight() + containerY - speedY > 0 ) {
 		// the bottom of the container is lower than the top 
 		// of the widget. It is thus still visible.
@@ -1441,6 +1444,7 @@ const std::string &StatBoxWidget::getCaption() const
 */
 void StatBoxWidget::setPercent(const int percent)
 {
+	this->setDirty(true);
 	this->percent = percent;
 }
 

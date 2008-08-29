@@ -48,7 +48,7 @@
 
 extern void DrawGuichanWidgets();
 
-static bool PatchEditorRunning;
+bool PatchEditorRunning;
 
 extern gcn::Gui *Gui;
 static gcn::Container *PatchEditorContainer;

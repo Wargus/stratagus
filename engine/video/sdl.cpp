@@ -65,6 +65,7 @@
 #include "interface.h"
 #include "minimap.h"
 #include "widgets.h"
+#include "editor.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -724,7 +725,7 @@ void WaitEventsOneFrame()
 		SkipGameCycle = SkipFrames;
 	}
 
-	if (!UseOpenGL) {
+	if (!UseOpenGL && (GameRunning || Editor.Running || PatchEditorRunning)) {
 		Video.ClearScreen();
 	}
 }
@@ -743,6 +744,7 @@ void RealizeVideoMemory(void)
 			NumRects = 0;
 		}
 	}
+	HideCursor();
 }
 
 /**

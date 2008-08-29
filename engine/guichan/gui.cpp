@@ -71,6 +71,7 @@ namespace gcn
         mFocusHandler = new FocusHandler();
         mTopHasMouse = false;
         mTabbing = true;
+		mUseDirtyDrawing = true;
     }
 
     Gui::~Gui()
@@ -92,6 +93,7 @@ namespace gcn
         if (top)
         {
             top->_setFocusHandler(mFocusHandler);
+            top->setDirty(true);
         }
     
         mTop = top;
@@ -129,7 +131,7 @@ namespace gcn
             throw GCN_EXCEPTION("No top widget set");
         }
 
-        if(mInput)
+        if (mInput)
         {
             mInput->_pollInput();
 
@@ -251,28 +253,31 @@ namespace gcn
             throw GCN_EXCEPTION("No graphics set");
         }
 
-        mGraphics->_beginDraw();
-
-        // If top has a border,
-        // draw it before drawing top
-        if (mTop->getBorderSize() > 0)
+        if (!mUseDirtyDrawing || mTop->getDirty())
         {
-            Rectangle rec = mTop->getDimension();
-            rec.x -= mTop->getBorderSize();
-            rec.y -= mTop->getBorderSize();
-            rec.width += 2 * mTop->getBorderSize();
-            rec.height += 2 * mTop->getBorderSize();                    
-            mGraphics->pushClipArea(rec);
-            mTop->drawBorder(mGraphics);
+            mGraphics->_beginDraw();
+
+            // If top has a border,
+            // draw it before drawing top
+            if (mTop->getBorderSize() > 0)
+            {
+                Rectangle rec = mTop->getDimension();
+                rec.x -= mTop->getBorderSize();
+                rec.y -= mTop->getBorderSize();
+                rec.width += 2 * mTop->getBorderSize();
+                rec.height += 2 * mTop->getBorderSize();                    
+                mGraphics->pushClipArea(rec);
+                mTop->drawBorder(mGraphics);
+                mGraphics->popClipArea();
+            }
+
+            mGraphics->pushClipArea(mTop->getDimension());    
+            mTop->draw(mGraphics);
+            mTop->setDirty(false);
             mGraphics->popClipArea();
+
+            mGraphics->_endDraw();    
         }
-
-        mGraphics->pushClipArea(mTop->getDimension());    
-        mTop->draw(mGraphics);
-        mGraphics->popClipArea();
-
-
-        mGraphics->_endDraw();    
     }
 
     void Gui::focusNone()
@@ -288,5 +293,10 @@ namespace gcn
     bool Gui::isTabbingEnabled()
     {
         return mTabbing;
-    }    
+    }
+
+	void Gui::setUseDirtyDrawing(bool useDirtyDrawing)
+	{
+		mUseDirtyDrawing = useDirtyDrawing;
+	}
 }
