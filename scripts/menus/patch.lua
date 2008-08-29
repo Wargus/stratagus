@@ -2,7 +2,7 @@
 function RunNewPatchMenu()
   local menu
   local x = Video.Width / 2 - 100
-  local y = 260
+  local y = Video.Height * 4 / 10
   local name = ""
   local image = ""
   local width = 1
@@ -10,29 +10,26 @@ function RunNewPatchMenu()
 
   menu = BosMenu(_("Patch Editor"))
 
-  menu:addLabel(_("Name:"), Video.Width / 2 - 30, y)
+  menu:addLabel(_("Name:"), Video.Width / 2 - 80, y)
   local nameInput = menu:addTextInputField(name,
-    Video.Width / 2, y, 100)
+    Video.Width / 2 - 50, y, 100)
 
-  y = y + 40
+  y = y + 30
 
-  menu:addLabel(_("Image:"), Video.Width / 2 - 30, y)
+  menu:addLabel(_("Image:"), Video.Width / 2 - 80, y)
   local imageInput = menu:addTextInputField(image,
-    Video.Width / 2, y)
+    Video.Width / 2 - 50, y)
 
-  y = y + 40
+  y = y + 30
 
-  menu:addLabel(_("Size:"), Video.Width / 2 - 30, y)
-
+  menu:addLabel(_("Size:"), Video.Width / 2 - 80, y)
   local widthInput = menu:addTextInputField(tostring(width),
-    Video.Width / 2, y, 24)
-
-  menu:addLabel(_("x"), Video.Width / 2 + 34, y)
-
+    Video.Width / 2 - 50, y, 24)
+  menu:addLabel(_("x"), Video.Width / 2 + 34 - 50, y)
   local heightInput = menu:addTextInputField(tostring(height),
-    Video.Width / 2 + 44, y, 24)
+    Video.Width / 2 + 44 - 50, y, 24)
 
-  y = y + 40
+  y = y + 30
 
   menu:addButton(_("Create ~!Patch"), x, Video.Height - 140,
     function()
