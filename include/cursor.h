@@ -180,6 +180,8 @@ extern CCursor *CursorByIdent(const std::string &ident);
 
 	/// Draw any cursor
 extern void DrawCursor(void);
+	/// Hide the cursor
+extern void HideCursor(void);
 	/// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
 

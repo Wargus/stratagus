@@ -285,14 +285,14 @@ namespace gcn
         virtual bool isEnabled() const; 
         
         /**
-         * Called if the Widget looses focus.
+         * Called if the Widget loses focus.
          */
-        virtual void lostFocus() { };
+        virtual void lostFocus() { setDirty(true); };
     
         /**
          * Called if the Widget recieves focus.       
          */
-        virtual void gotFocus() { };
+        virtual void gotFocus() { setDirty(true); };
     
         /**
          * Checks if the Widget has the mouse.
@@ -664,6 +664,9 @@ namespace gcn
          */
         virtual bool hasModalFocus() const;
 
+        virtual void setDirty(bool dirty);
+        virtual bool getDirty() const;
+
         
     protected:
         /**
@@ -707,6 +710,7 @@ namespace gcn
         static DefaultFont mDefaultFont;
         static Font* mGlobalFont;
         static std::list<Widget*> mWidgets;
+        bool mDirty;
     };  
 }
 

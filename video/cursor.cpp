@@ -88,6 +88,8 @@ CUnitType *CursorBuilding;           /// building cursor
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
 CCursor *GameCursor;                 /// current shown cursor-type
 
+static SDL_Surface *HiddenSurface;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -280,6 +282,34 @@ void DrawCursor(void)
 		DrawBuildingCursor();
 	}
 
+	if (!UseOpenGL && !GameRunning && !Editor.Running && !PatchEditorRunning && GameCursor) {
+		if (!HiddenSurface ||
+			HiddenSurface->w != GameCursor->G->getWidth() ||
+			HiddenSurface->h != GameCursor->G->getHeight())
+		{
+			if (HiddenSurface) {
+				SDL_FreeSurface(HiddenSurface);
+			}
+
+			HiddenSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+				GameCursor->G->getWidth(),
+				GameCursor->G->getHeight(),
+				TheScreen->format->BitsPerPixel,
+				TheScreen->format->Rmask,
+				TheScreen->format->Gmask,
+				TheScreen->format->Bmask,
+				TheScreen->format->Amask);
+		}
+
+		SDL_Rect srcRect = {
+			CursorX - GameCursor->HotX,
+			CursorY - GameCursor->HotY,
+			GameCursor->G->getWidth(),
+			GameCursor->G->getHeight()
+		};
+		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
+	}
+
 	//
 	//  Last, Normal cursor.
 	//  Cursor may not exist if we are loading a game or something. Only
@@ -288,6 +318,22 @@ void DrawCursor(void)
 	if (GameCursor) {
 		GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame,
 			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY);
+	}
+}
+
+/**
+**  Hide the cursor
+*/
+void HideCursor(void)
+{
+	if (!UseOpenGL && !GameRunning && !Editor.Running && !PatchEditorRunning && GameCursor) {
+		SDL_Rect dstRect = {
+			CursorX - GameCursor->HotX,
+			CursorY - GameCursor->HotY,
+			0,
+			0
+		};
+ 		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
 	}
 }
 

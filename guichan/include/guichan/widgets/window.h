@@ -242,6 +242,9 @@ namespace gcn
 
         virtual void mouseMotion(int x, int y);
     
+        virtual void setDirty(bool dirty);
+        virtual bool getDirty() const;
+
     protected:
         /**
          * Moves the content to the top left corner of the window,
