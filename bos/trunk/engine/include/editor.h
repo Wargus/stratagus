@@ -117,6 +117,8 @@ extern CEditor Editor;
 
 extern const char *EditorStartFile;  /// Editor CCL start file
 
+extern bool PatchEditorRunning;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
