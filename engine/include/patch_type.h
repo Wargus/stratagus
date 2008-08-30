@@ -104,7 +104,7 @@ public:
 	/**
 	**  Get the tile flag at a tile location
 	*/
-	unsigned short getFlag(int x, int y)
+	unsigned short getFlag(int x, int y) const
 	{
 		Assert(0 <= x && x < this->tileWidth && 0 <= y && y < this->tileHeight);
 		return flags[y * this->tileWidth + x];

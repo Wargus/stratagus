@@ -54,6 +54,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
+#include <deque>
 
 #include "stratagus.h"
 #include "unittype.h"
@@ -126,6 +127,29 @@ enum _mode_buttons_ {
 	PatchButton,         /// Patch mode button
 	StartButton
 };
+
+enum EditorActionType
+{
+	EditorActionTypePlaceUnit,
+	EditorActionTypeRemoveUnit,
+};
+
+struct EditorAction
+{
+	EditorActionType Type;
+	int X;
+	int Y;
+	CUnitType *UnitType;
+	CPlayer *Player;
+	CUnit *Unit;
+};
+
+static std::deque<EditorAction> EditorUndoActions;
+static std::deque<EditorAction> EditorRedoActions;
+
+static void EditorUndoAction();
+static void EditorRedoAction();
+static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
 static gcn::Container *editorContainer;
@@ -215,18 +239,18 @@ void SetEditorStartUnit(const std::string &name)
 }
 
 /*----------------------------------------------------------------------------
---  Edit
+--  Actions
 ----------------------------------------------------------------------------*/
 
 /**
-**  Edit unit.
+**  Place unit.
 **
 **  @param x       X map tile coordinate.
 **  @param y       Y map tile coordinate.
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
+static CUnit *EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 	CBuildRestrictionOnTop *b;
@@ -238,7 +262,7 @@ static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 	unit = MakeUnitAndPlace(x, y, type, player);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate Unit");
-		return;
+		return NoUnitP;
 	}
 
 	b = OnTopDetails(unit, NULL);
@@ -261,7 +285,123 @@ static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
 	}
 
 	UpdateMinimap = true;
+	return unit;
 }
+
+/**
+**  Edit unit.
+**
+**  @param x       X map tile coordinate.
+**  @param y       Y map tile coordinate.
+**  @param type    Unit type to edit.
+**  @param player  Player owning the unit.
+*/
+static void EditorPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
+{
+	CUnit *unit = EditorActionPlaceUnit(x, y, type, player);
+
+	EditorAction editorAction;
+	editorAction.Type = EditorActionTypePlaceUnit;
+	editorAction.X = x;
+	editorAction.Y = y;
+	editorAction.UnitType = type;
+	editorAction.Player = player;
+	editorAction.Unit = unit;
+
+	EditorAddUndoAction(editorAction);
+}
+
+/**
+**  Remove a unit
+*/
+static void EditorActionRemoveUnit(CUnit *unit)
+{
+	unit->Remove(NULL);
+	UnitLost(unit);
+	UnitClearOrders(unit);
+	unit->Release();
+	UI.StatusLine.Set(_("Unit deleted"));
+	UpdateMinimap = true;
+}
+
+/**
+**  Remove a unit
+*/
+static void EditorRemoveUnit(CUnit *unit)
+{
+	EditorAction editorAction;
+	editorAction.Type = EditorActionTypeRemoveUnit;
+	editorAction.X = unit->X;
+	editorAction.Y = unit->Y;
+	editorAction.UnitType = unit->Type;
+	editorAction.Player = unit->Player;
+	editorAction.Unit = NoUnitP;
+
+	EditorActionRemoveUnit(unit);
+	EditorAddUndoAction(editorAction);
+}
+
+/*----------------------------------------------------------------------------
+--  Undo/Redo
+----------------------------------------------------------------------------*/
+
+static void EditorUndoAction()
+{
+	if (EditorUndoActions.empty()) {
+		return;
+	}
+
+	EditorAction action = EditorUndoActions.back();
+	EditorUndoActions.pop_back();
+
+	switch (action.Type)
+	{
+		case EditorActionTypePlaceUnit:
+			EditorActionRemoveUnit(action.Unit);
+			action.Unit = NoUnitP;
+			break;
+
+		case EditorActionTypeRemoveUnit:
+			action.Unit = EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			break;
+	}
+
+	EditorRedoActions.push_back(action);
+}
+
+static void EditorRedoAction()
+{
+	if (EditorRedoActions.empty()) {
+		return;
+	}
+
+	EditorAction action = EditorRedoActions.back();
+	EditorRedoActions.pop_back();
+
+	switch (action.Type)
+	{
+		case EditorActionTypePlaceUnit:
+			action.Unit = EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			break;
+
+		case EditorActionTypeRemoveUnit:
+			EditorActionRemoveUnit(action.Unit);
+			action.Unit = NoUnitP;
+			break;
+	}
+
+	EditorUndoActions.push_back(action);
+}
+
+static void EditorAddUndoAction(EditorAction action)
+{
+	EditorRedoActions.clear();
+	EditorUndoActions.push_back(action);
+}
+
+/*----------------------------------------------------------------------------
+--  Other
+----------------------------------------------------------------------------*/
 
 /**
 **  Calculate the number of icons that can be displayed
@@ -986,7 +1126,7 @@ static void EditorCallbackButtonDown(unsigned button)
 							UI.MouseViewport->Viewport2MapY(CursorY), 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess.Sound,
 							MaxSampleVolume);
-						EditUnit(UI.MouseViewport->Viewport2MapX(CursorX),
+						EditorPlaceUnit(UI.MouseViewport->Viewport2MapX(CursorX),
 							UI.MouseViewport->Viewport2MapY(CursorY),
 							CursorBuilding, Players + Editor.SelectedPlayer);
 						UnitPlacedThisPress = true;
@@ -1044,6 +1184,17 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			Exit(0);
 
+		case 'z':
+			if (KeyModifiers & ModifierControl) {
+				EditorUndoAction();
+			}
+			break;
+		case 'y':
+			if (KeyModifiers & ModifierControl) {
+				EditorRedoAction();
+			}
+			break;
+
 		case SDLK_DELETE: // Delete
 			if (PatchUnderCursor) {
 				Map.PatchManager.remove(PatchUnderCursor);
@@ -1051,14 +1202,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				UI.StatusLine.Set(_("Patch deleted"));
 				UpdateMinimapTerrain = true;
 			} else if (UnitUnderCursor) {
-				CUnit *unit = UnitUnderCursor;
-
-				unit->Remove(NULL);
-				UnitLost(unit);
-				UnitClearOrders(unit);
-				unit->Release();
-				UI.StatusLine.Set(_("Unit deleted"));
-				UpdateMinimap = true;
+				EditorRemoveUnit(UnitUnderCursor);
 			}
 			break;
 
@@ -1133,8 +1277,20 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-static void EditorCallbackKeyRepeated(unsigned dummy1, unsigned dummy2)
+static void EditorCallbackKeyRepeated(unsigned key, unsigned keychar)
 {
+	switch (key) {
+		case 'z':
+			if (KeyModifiers & ModifierControl) {
+				EditorUndoAction();
+			}
+			break;
+		case 'y':
+			if (KeyModifiers & ModifierControl) {
+				EditorRedoAction();
+			}
+			break;
+	}
 }
 
 /**
@@ -1222,7 +1378,7 @@ static void EditorCallbackMouse(int x, int y)
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, CursorBuilding, tileX, tileY, 1)) {
-					EditUnit(tileX, tileY, CursorBuilding, Players + Editor.SelectedPlayer);
+					EditorPlaceUnit(tileX, tileY, CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}

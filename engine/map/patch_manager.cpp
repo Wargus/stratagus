@@ -162,15 +162,21 @@ CPatch *
 CPatchManager::getPatch(int x, int y, int *xOffset, int *yOffset) const
 {
 	std::list<CPatch *>::const_reverse_iterator i;
+	std::list<CPatch *>::const_reverse_iterator rend;
 
 	// Search the patches from top to bottom
-	for (i = this->patches.rbegin(); i != this->patches.rend(); ++i) {
+	rend = this->patches.rend();
+	for (i = this->patches.rbegin(); i != rend; ++i) {
+		int patchX = (*i)->getX();
+		int patchY = (*i)->getY();
+		CPatchType *patchType = (*i)->getType();
+
 		// See if the patch is at location x,y
-		if ((*i)->getX() <= x && x < (*i)->getX() + (*i)->getType()->getTileWidth() &&
-				(*i)->getY() <= y && y < (*i)->getY() + (*i)->getType()->getTileHeight()) {
-			int xPatchOffset = x - (*i)->getX();
-			int yPatchOffset = y - (*i)->getY();
-			unsigned short flag = (*i)->getType()->getFlag(xPatchOffset, yPatchOffset);
+		if (patchX <= x && x < patchX + patchType->getTileWidth() &&
+				patchY <= y && y < patchY + patchType->getTileHeight()) {
+			int xPatchOffset = x - patchX;
+			int yPatchOffset = y - patchY;
+			unsigned short flag = patchType->getFlag(xPatchOffset, yPatchOffset);
 
 			// Make sure the patch tile isn't transparent
 			if (!(flag & MapFieldTransparent)) {
