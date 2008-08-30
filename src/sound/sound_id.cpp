@@ -57,6 +57,15 @@ static std::map<std::string, CSound *> SoundMap;
 -- Functions
 ----------------------------------------------------------------------------*/
 
+static CSound *FindSound(const std::string &name)
+{
+	std::map<std::string, CSound *>::iterator ret = SoundMap.find(name);
+	if (ret != SoundMap.end()) {
+		return  (*ret).second;
+	}
+	return NULL;	
+};
+
 /**
 **  Add a new mapping (sound name to sound id) in the hash table
 **  Create a new mapping between a name and an already valid sound id.
@@ -66,6 +75,11 @@ static std::map<std::string, CSound *> SoundMap;
 */
 void MapSound(const std::string &name, CSound *id)
 {
+	if (!id) {
+		DebugPrint("Null Sound for %s is not acceptable by sound table\n" _C_ name.c_str());
+		return;
+	}
+	id->Mapref++;
 	SoundMap[name] = id;
 }
 
@@ -79,12 +93,12 @@ void MapSound(const std::string &name, CSound *id)
 CSound *SoundForName(const std::string &name)
 {
 	Assert(!name.empty());
-
-	CSound *result = SoundMap[name];
-	if (!result) {
-		DebugPrint("Can't find sound `%s' in sound table\n" _C_ name.c_str());
+	CSound *sound = FindSound(name);
+	if (sound) {
+		return sound;
 	}
-	return result;
+	DebugPrint("Can't find sound `%s' in sound table\n" _C_ name.c_str());
+	return NULL;	
 }
 
 /**
@@ -105,13 +119,14 @@ CSound *MakeSound(const std::string &name, const char *file[], int nb)
 
 	Assert(nb <= 255);
 
-	if ((sound = SoundMap[name])) {
+	if ((sound = FindSound(name))) {
 		DebugPrint("re-register sound `%s'\n" _C_ name.c_str());
 		return sound;
 	}
 
 	sound = RegisterSound(file, nb);
-	MapSound(name, sound);
+	if(sound != NO_SOUND)
+		MapSound(name, sound);
 
 	return sound;
 }
@@ -133,13 +148,14 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 {
 	CSound *sound;
 
-	if ((sound = SoundMap[name])) {
+	if ((sound = FindSound(name))) {
 		DebugPrint("re-register sound `%s'\n" _C_ name.c_str());
 		return sound;
 	}
 
 	sound = RegisterTwoGroups(first, second);
-	MapSound(name, sound);
+	if(sound != NO_SOUND)
+		MapSound(name, sound);
 
 	return sound;
 }
@@ -149,7 +165,10 @@ void FreeSounds()
 {
 	std::map<std::string, CSound *>::iterator i;
 	for (i = SoundMap.begin(); i != SoundMap.end(); ++i) {
-		delete (*i).second;
+		CSound *sound = (*i).second;
+		Assert(sound && sound->Mapref != 0);
+		if(sound && !--sound->Mapref)
+			delete sound;
 	}
 }
 #endif

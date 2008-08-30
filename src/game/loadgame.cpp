@@ -72,7 +72,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void InitDefinedVariables();
 
 /**
 **  Cleanup modules.
@@ -111,7 +110,8 @@ void CleanModules(void)
 	CleanSpells();
 	FreeVisionTable();
 	FreePathfinder();
-	InitDefinedVariables(); // internal script. should be to a better place, don't find for restart.
+	
+	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 }
 
 /**

@@ -84,12 +84,12 @@ public:
 */
 class CSound {
 public:
-	CSound() : Range(0), Number(0)
+	CSound() : Mapref(0), Range(0), Number(0)
 	{
 		memset(&Sound, 0, sizeof(Sound));
 	}
 	~CSound();
-
+	unsigned int Mapref;
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.

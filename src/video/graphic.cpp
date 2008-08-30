@@ -1384,6 +1384,17 @@ void CGraphic::MakeShadow()
 #endif
 }
 
+#ifdef DEBUG
+void FreeGraphics()
+{
+	std::map<std::string, CGraphic *>::iterator i;
+	while (!GraphicHash.empty()) {
+		i = GraphicHash.begin();
+		CGraphic::Free((*i).second);
+	}
+}
+#endif
+
 CFiller::bits_map::~bits_map()
 {
 	if(bstore) {

@@ -1928,38 +1928,6 @@ void UpdateUnitVariables(const CUnit *unit)
 	type->BoolFlag[TELEPORTER_INDEX]            = type->Teleporter;
 }
 
-/**
-**  Define already variables, useful for drawing now.
-*/
-void InitDefinedVariables()
-{
-	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
-		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
-		"Xp", "Kill", "Supply", "Demand", "Armor", "SightRange",
-		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
-		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
-		"UnholyArmor", "Slot"
-		}; // names of the variable.
-	const char *boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
-		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
-		"\"VisibleUnderFog\", \"PermanentCloack\", \"DetectCloak\", \"AttackFromTransporter\","
-		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
-		"\"BuilderOutside\", \"BuilderLost\", \"CanHarvest\", \"Harvester\","
-		"\"SelectableByRectangle\", \"IsNotSelectable\", \"Decoration\","
-		"\"Indestructible\", \"Teleporter\")";
-	int i;
-
-	// Variables.
-	UnitTypeVar.VariableName = new const char *[NVARALREADYDEFINED];
-	for (i = 0; i < NVARALREADYDEFINED; ++i) {
-		UnitTypeVar.VariableName[i] = new_strdup(var[i]);
-	}
-	UnitTypeVar.Variable = new CVariable[i];
-	UnitTypeVar.NumberVariable = i;
-
-	// Boolflags.
-	CclCommand(boolflag);
-}
 
 /**
 **  Register CCL features for unit-type.
@@ -1972,7 +1940,7 @@ void UnitTypeCclRegister(void)
 	lua_register(Lua, "DefineVariables", CclDefineVariables);
 	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
 
-	InitDefinedVariables();
+	UnitTypeVar.Init();
 
 	lua_register(Lua, "UnitType", CclUnitType);
 	lua_register(Lua, "UnitTypeArray", CclUnitTypeArray);

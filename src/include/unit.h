@@ -831,7 +831,7 @@ public:
 	}
 	
 	inline bool IsIdle() const {
-		return OrderCount == 1 && CurrentOrder()->Action == UnitActionStill;
+		return OrderCount == 1 && CurrentAction() == UnitActionStill;
 	}
 
 	inline void ClearAction() {
@@ -905,7 +905,7 @@ public:
 	*/
 	inline bool IsAliveOnMap() const
 	{
-		return !Removed && !Destroyed && CurrentOrder()->Action != UnitActionDie;
+		return !Removed && !Destroyed && CurrentAction() != UnitActionDie;
 	}
 
 	/**

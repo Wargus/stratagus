@@ -225,6 +225,10 @@ extern int getopt(int argc, char *const *argv, const char *opt);
 #include "title.h"
 #include "map.h"
 
+#ifdef DEBUG
+#include "missile.h" //for FreeBurningBuildingFrames
+#endif
+
 #if defined(_MSC_VER) && SDL_VERSION_ATLEAST(1, 2, 13)
 #define REDIRECT_OUTPUT
 #endif
@@ -240,7 +244,7 @@ std::string LocalPlayerName;         /// Name of local player
 
 	/// Name, Version, Copyright
 const char NameLine[] =
-	"Stratagus V" VERSION ", (c) 1998-2007 by The Stratagus Project.";
+	"Stratagus V" VERSION ", (c) 1998-2008 by The Stratagus Project.";
 
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string CompileOptions;          /// Compile options.
@@ -352,7 +356,6 @@ static int MenuLoop(void)
 }
 
 extern void CleanMissiles();
-extern void InitDefinedVariables();
 extern void CleanTriggers();
 /**
 **  Cleanup game.
@@ -604,9 +607,9 @@ void Exit(int err)
 	ExitNetwork1();
 #ifdef DEBUG
 	CleanModules();
-	//FreeBurningBuildingFrames();
-	//FreeSounds();
-	//FreeGraphics();
+	FreeBurningBuildingFrames();
+	FreeSounds();
+	FreeGraphics();
 	FreePlayerColors();
 	FreeButtonStyles();
 	for (size_t i = 0; i < Containers.size(); ++i) {

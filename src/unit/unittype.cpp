@@ -624,6 +624,67 @@ static void CleanAnimation(CAnimation *anim)
 	delete[] anim;
 }
 
+void CUnitTypeVar::Init()
+{
+	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
+		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
+		"Xp", "Kill", "Supply", "Demand", "Armor", "SightRange",
+		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
+		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
+		"UnholyArmor", "Slot"
+		}; // names of the variable.
+	const char *boolflag[NBARALREADYDEFINED] = {"Coward", "Building", "Flip",
+		"Revealer", "LandUnit", "AirUnit", "SeaUnit", "ExplodeWhenKilled",
+		"VisibleUnderFog", "PermanentCloack", "DetectCloak", "AttackFromTransporter",
+		"Vanishes", "GroundAttack", "ShoreBuilding", "CanAttack",
+		"BuilderOutside", "BuilderLost", "CanHarvest", "Harvester",
+		"SelectableByRectangle", "IsNotSelectable", "Decoration",
+		"Indestructible", "Teleporter"
+		}; // names of boolflags
+	int i;
+
+	BoolFlagName = (const char **)malloc(sizeof(const char *) * NBARALREADYDEFINED);
+	for (i = 0; i < NBARALREADYDEFINED; ++i) {
+		BoolFlagName[i] = new_strdup(boolflag[i]);
+	}	
+	NumberBoolFlag = i;
+
+	// Variables.
+	VariableName = (const char **)malloc(sizeof(const char *) * NVARALREADYDEFINED);
+	for (i = 0; i < NVARALREADYDEFINED; ++i) {
+		VariableName[i] = new_strdup(var[i]);
+	}
+	Variable = new CVariable[i];
+	NumberVariable = i;
+};
+
+void CUnitTypeVar::Clear()
+{
+	unsigned int j;
+	for (j = 0; j < NumberBoolFlag; ++j) { // User defined variables
+		delete[] BoolFlagName[j];
+	}
+	free(BoolFlagName);
+	BoolFlagName = NULL;
+	NumberBoolFlag = 0;
+	
+	for (j = 0; j < NumberVariable; ++j) { // User defined variables
+		delete[] VariableName[j];
+	}
+	free(VariableName);
+	VariableName = NULL;
+	
+	delete[] Variable;
+	Variable = NULL;
+	NumberVariable = 0;
+	
+	for (std::vector<CDecoVar *>::iterator it = DecoVar.begin();
+		it != DecoVar.end(); ++it) {
+		delete (*it);
+	}
+	DecoVar.clear();
+}
+
 /**
 **  Cleanup the unit-type module.
 */
@@ -652,23 +713,7 @@ void CleanUnitTypes(void)
 	}
 	UnitTypes.clear();
 	UnitTypeMap.clear();
-
-	delete[] UnitTypeVar.BoolFlagName;
-	UnitTypeVar.BoolFlagName = NULL;
-	UnitTypeVar.NumberBoolFlag = 0;
-	for (unsigned int j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
-		delete[] UnitTypeVar.VariableName[j];
-	}
-	delete[] UnitTypeVar.VariableName;
-	UnitTypeVar.VariableName = NULL;
-	delete[] UnitTypeVar.Variable;
-	UnitTypeVar.Variable = NULL;
-	UnitTypeVar.NumberVariable = 0;
-	for (std::vector<CDecoVar *>::iterator it = UnitTypeVar.DecoVar.begin();
-		it != UnitTypeVar.DecoVar.end(); ++it) {
-		delete (*it);
-	}
-	UnitTypeVar.DecoVar.clear();
+	UnitTypeVar.Clear();
 
 	//
 	// Clean hardcoded unit types.

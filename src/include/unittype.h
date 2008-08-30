@@ -610,6 +610,7 @@ enum {
 	DECORATION_INDEX,
 	INDESTRUCTIBLE_INDEX,
 	TELEPORTER_INDEX,
+	NBARALREADYDEFINED
 };
 
 // Index for variable already defined.
@@ -1011,7 +1012,10 @@ class CUnitTypeVar {
 public:
 	CUnitTypeVar() : BoolFlagName(NULL), NumberBoolFlag(0),
 		VariableName(NULL), Variable(NULL), NumberVariable(0) {}
-
+	
+	void Init();
+	void Clear();
+	
 	const char **BoolFlagName;          /// Array of name of user defined bool flag.
 	unsigned int NumberBoolFlag;        /// Number of user defined bool flag.
 

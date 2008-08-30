@@ -3483,20 +3483,31 @@ void InitUnits(void)
 */
 void CleanUnits(void)
 {
-	CUnit **table;
-
 	//
 	//  Free memory for all units in unit table.
 	//
+/*
+	int count = NumUnits;
+	for (int i = 0; i < count; ++i) {
+		Units[i]->RefsDecrease();
+	}
+	Assert(NumUnits == 0);	
+	memset(Units, 0 , sizeof(CUnit*) * MAX_UNIT_SLOTS);
+*/
+	CUnit **table;
+	//Splited on 2 loops due Orders referces to Units
 	for (table = Units; table < &Units[NumUnits]; ++table) {
-		delete[] (*table)->AutoCastSpell;
-		delete[] (*table)->Variable;
 		for (std::vector<COrderPtr>::iterator order = (*table)->Orders.begin();
 			 order != (*table)->Orders.end(); ++order) {
 			delete *order;
 		}
 		(*table)->Orders.clear();
-		delete *table;
+	}
+	for (table = Units; table < &Units[NumUnits]; ++table) {
+
+		delete[] (*table)->AutoCastSpell;
+		delete[] (*table)->Variable;
+		delete *table;		
 		*table = NULL;
 	}
 	NumUnits = 0;
