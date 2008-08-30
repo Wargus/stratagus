@@ -213,9 +213,9 @@ CColor GetColor(CPatch *patch, int xoffset, int yoffset, int mx, int my, int sca
 			SDL_GetRGBA(*(Uint16 *)pixel, f, &r, &g, &b, &a);
 			break;
 		case 3:
-			r = pixel[f->Rshift >> 3] << f->Rshift;
-			g = pixel[f->Gshift >> 3] << f->Gshift;
-			b = pixel[f->Bshift >> 3] << f->Bshift;
+			r = pixel[f->Rshift >> 3];
+			g = pixel[f->Gshift >> 3];
+			b = pixel[f->Bshift >> 3];
 			a = 0;
 			break;
 		case 4:
