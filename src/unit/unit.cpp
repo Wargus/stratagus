@@ -3098,25 +3098,65 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			target->RefsIncrease();
 		}
 	}
-
-	//
-	// Unit is working?
-	//
-	if (target->CurrentAction() != UnitActionStill) {
-		return;
+	
+	/* Target Reaction on Hit */
+	switch(target->CurrentAction()) {
+		case UnitActionTrain:
+		case UnitActionUpgradeTo:
+		case UnitActionResearch:
+		case UnitActionBuilt:
+		case UnitActionBuild:
+		case UnitActionTransformInto:
+		case UnitActionBoard:
+		case UnitActionUnload:
+		case UnitActionReturnGoods:
+			//
+			// Unit is working?
+			// Maybe AI should cance action and save resources???
+			//
+			return;
+		case UnitActionResource:
+			if (target->SubAction >= 65/* SUB_STOP_GATHERING */) 
+			{
+				//Normal return to depot
+				return;
+			}
+			if (target->SubAction > 55 /* SUB_START_GATHERING */ &&
+				target->ResourcesHeld > 0) {
+				//escape to Depot with this what you have;
+				target->Data.ResWorker.DoneHarvesting = 1;
+				return;	
+			}
+		break;	
+		case UnitActionAttack:
+			goal = target->CurrentOrder()->GetGoal();
+			if (goal) {
+				if (goal == attacker || 
+					(goal->CurrentAction() == UnitActionAttack &&
+					goal->CurrentOrder()->GetGoal() == target))
+				{
+					//we already fight with one of attackers;
+					return;
+				}
+			}
+		default:
+		break;			
 	}
 
 	//
 	// Attack units in range (which or the attacker?)
 	//
-	if (attacker && !type->Coward) {
-		if (type->CanAttack) {
+	if (attacker && target->IsAgressive()) {
 			if (RevealAttacker && CanTarget(target->Type, attacker->Type)) {
 				// Reveal Unit that is attacking
 				goal = attacker;
 			} else {
-				// Check for any other units in range
-				goal = AttackUnitsInReactRange(target);
+				if (target->CurrentAction() == UnitActionStandGround) {
+					goal = AttackUnitsInRange(target);				
+				} else {
+					// Check for any other units in range
+					goal = AttackUnitsInReactRange(target);
+				}
 			}
 			if (goal) {
 				if (target->SavedOrder.Action == UnitActionStill) {
@@ -3128,9 +3168,15 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 				CommandAttack(target, goal->X, goal->Y, NoUnitP, FlushCommands);
 				return;
 			}
-		}
 	}
 
+	/* 
+		What should we do with workers on :
+		case UnitActionRepair:
+	
+		Drop orders and run away or return after escape?
+	*/
+	
 	//
 	// Can't attack run away.
 	//

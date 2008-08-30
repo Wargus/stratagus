@@ -883,7 +883,8 @@ public:
 	bool StoreOrder(void);
 	
 	// Cowards and invisible units don't attack unless ordered.
-	bool IsAgressive(void) {
+	bool IsAgressive(void) const 
+	{
 		return (Type->CanAttack && !Type->Coward &&
 			Variable[INVISIBLE_INDEX].Value == 0);
 	}

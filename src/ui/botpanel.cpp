@@ -428,7 +428,7 @@ static void DrawPopup()
 				popupHeight = font_height + 10;
 			}
 
-			popupWidth = std::max(popupWidth, 140);
+			popupWidth = std::max(popupWidth, 100);
 			
 			x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
@@ -487,8 +487,8 @@ static void DrawPopup()
 				popupWidth += (font->Width(type->Demand) + 5);
 			}
 			popupWidth += 10;
-			if(popupWidth < 140)
-				popupWidth = 140;
+			if(popupWidth < 120)
+				popupWidth = 120;
 			popupHeight = 85;//
 			if (type->CanAttack) {
 				popupHeight += 30;
@@ -544,7 +544,8 @@ static void DrawPopup()
 			if (type->CanAttack) {
 				// Damage
 				int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
-				int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value + type->Variable[BASICDAMAGE_INDEX].Value;
+				int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value +
+					 type->Variable[BASICDAMAGE_INDEX].Value;
 				std::ostringstream damage;
 				damage << "Damage: " << min_damage << "-" << max_damage;
 				VideoDrawText(x + 5, y, font, damage.str());

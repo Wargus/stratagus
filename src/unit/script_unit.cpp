@@ -125,7 +125,7 @@ static CUnit *CclGetUnit(lua_State *l)
 **
 **  @return   The unit pointer
 */
-static CUnit *CclGetUnitFromRef(lua_State *l)
+CUnit *CclGetUnitFromRef(lua_State *l)
 {
 	const char *const value = LuaToString(l, -1);
 	int slot = strtol(value + 1, NULL, 16);
@@ -707,6 +707,7 @@ static int CclUnit(lua_State *l)
 
 		} else if (!strcmp(value, "tile")) {
 			CclGetPos(l, &unit->X , &unit->Y, j + 1);
+			unit->Offset = Map.getIndex(unit->X, unit->Y);
 		} else if (!strcmp(value, "stats")) {
 			unit->Stats = &type->Stats[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "pixel")) {

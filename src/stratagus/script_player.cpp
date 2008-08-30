@@ -55,6 +55,8 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+extern CUnit *CclGetUnitFromRef(lua_State *l);
+
 /**
 **  Get a player pointer
 **
@@ -336,6 +338,17 @@ static int CclPlayer(lua_State *l)
 				player->UpgradeTimers.Upgrades[k] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
+		} else if (!strcmp(value, "enemy-targets")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = lua_objlen(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				CclGetUnitFromRef(l);
+				player->AutoAttackTargets.Insert(CclGetUnitFromRef(l));
+				lua_pop(l, 1);
+			}					
 		} else {
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

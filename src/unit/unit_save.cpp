@@ -321,8 +321,17 @@ void SaveUnit(const CUnit *unit, CFile *file)
 		file->printf("\"current-resource\", \"%s\",\n  ",
 			DefaultResourceNames[unit->CurrentResource].c_str());
 	}
-
-	file->printf("\"sub-action\", %d, ", unit->SubAction);
+	if (unit->SubAction && unit->IsAgressive() &&
+		(unit->CurrentAction() == UnitActionStill ||
+		unit->CurrentAction() == UnitActionStandGround))
+	{
+		//Force recalculate Guard points
+		//if unit atack from StandGround then attac target is recalculate
+		//When unit first time handle action code.
+		file->printf("\"sub-action\", 0, ");
+	} else	{
+		file->printf("\"sub-action\", %d, ", unit->SubAction);
+	}
 	file->printf("\"wait\", %d, ", unit->Wait);
 	file->printf("\"state\", %d,", unit->State);
 	file->printf("\"anim-wait\", %d,", unit->Anim.Wait);

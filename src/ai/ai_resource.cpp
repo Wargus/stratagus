@@ -282,7 +282,9 @@ static int AiBuildBuilding(const CUnitType *type, CUnitType *building,
 			int action = unit->Orders[x]->Action;
 			if (action == UnitActionBuild ||
 				action == UnitActionRepair ||
-				action == UnitActionReturnGoods) {
+				action == UnitActionReturnGoods ||
+				action == UnitActionResource &&
+					 unit->SubAction > 55 /* SUB_START_GATHERING */) {
 				break;
 			}
 		}
@@ -1130,6 +1132,13 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 	return 0;
 }
 
+static int CmpWorkers(const void *w0,const void *w1) {
+	const CUnit*const worker0 = (const CUnit*const)w0;
+	const CUnit*const worker1 = (const CUnit*const)w1;
+	
+	return worker0->ResourcesHeld < worker1->ResourcesHeld ? 1 : -1;
+}
+
 /**
 **  Assign workers to collect resources.
 **
@@ -1138,9 +1147,9 @@ static int AiAssignHarvester(CUnit *unit, int resource)
 */
 static void AiCollectResources(void)
 {
-	CUnit *units_with_resource[UnitMax][MaxCosts]; // Worker with resource
-	CUnit *units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
-	CUnit *units_unassigned[UnitMax][MaxCosts]; // Unassigned workers
+	CUnit *units_with_resource[MaxCosts][UnitMax]; // Worker with resource
+	CUnit *units_assigned[MaxCosts][UnitMax]; // Worker assigned to resource
+	CUnit *units_unassigned[MaxCosts][UnitMax]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];
 	int num_units_assigned[MaxCosts];
 	int num_units_unassigned[MaxCosts];
@@ -1185,7 +1194,7 @@ static void AiCollectResources(void)
 		//
 		if (c && unit->OrderCount == 1 && 
 			unit->CurrentAction() == UnitActionResource) {
-			units_assigned[num_units_assigned[c]++][c] = unit;
+			units_assigned[c][num_units_assigned[c]++] = unit;
 			total_harvester++;
 			continue;
 		}
@@ -1201,7 +1210,7 @@ static void AiCollectResources(void)
 		// Send workers with resources back home.
 		//
 		if (unit->ResourcesHeld && c) {
-			units_with_resource[num_units_with_resource[c]++][c] = unit;
+			units_with_resource[c][num_units_with_resource[c]++] = unit;
 			CommandReturnGoods(unit, 0, FlushCommands);
 			total_harvester++;
 			continue;
@@ -1210,9 +1219,9 @@ static void AiCollectResources(void)
 		//
 		// Look what the unit can do
 		//
-		for (c = 0; c < MaxCosts; ++c) {
+		for (c = 1; c < MaxCosts; ++c) {
 			if (unit->Type->ResInfo[c]) {
-				units_unassigned[num_units_unassigned[c]++][c] = unit;
+				units_unassigned[c][num_units_unassigned[c]++] = unit;
 			}
 		}
 		++total_harvester;
@@ -1226,7 +1235,7 @@ static void AiCollectResources(void)
 	
 	percent_total = 100;
 	total = 0;
-	for (c = 0; c < MaxCosts; ++c) {
+	for (c = 1; c < MaxCosts; ++c) {
 		percent[c] = AiPlayer->Collect[c];
 		//FIXME: rb- where is total used?
 		total += num_units_assigned[c] + num_units_with_resource[c];
@@ -1239,7 +1248,7 @@ static void AiCollectResources(void)
 	//
 	// Turn percent values into harvester numbers.
 	//
-	for (c = 0; c < MaxCosts; ++c ) {
+	for (c = 1; c < MaxCosts; ++c ) {
 		if(percent[c]) {
 			// Wanted needs to be representative.		
 			if (total_harvester < 5) {
@@ -1273,6 +1282,11 @@ static void AiCollectResources(void)
 					priority_resource[i] = c;
 				}
 			}
+			
+			if (i) {
+				//first should go workers with lower ResourcesHeld value
+				qsort(units_assigned[i], UnitMax, sizeof(CUnit*), CmpWorkers);
+			}
 		}
 
 		//
@@ -1288,15 +1302,15 @@ static void AiCollectResources(void)
 			if (num_units_unassigned[c]) {
 				// Take the unit.
 				j = 0;
-				while (j < num_units_unassigned[c] && !AiAssignHarvester(units_unassigned[j][c], c)) {
+				while (j < num_units_unassigned[c] && !AiAssignHarvester(units_unassigned[c][j], c)) {
 					// can't assign to c => remove from units_unassigned !
-					units_unassigned[j][c] = units_unassigned[--num_units_unassigned[c]][c];
+					units_unassigned[c][j] = units_unassigned[c][--num_units_unassigned[c]];
 				}
 
 				// unit is assigned
 				if (j < num_units_unassigned[c]) {
-					unit = units_unassigned[j][c];
-					units_unassigned[j][c] = units_unassigned[--num_units_unassigned[c]][c];
+					unit = units_unassigned[c][j];
+					units_unassigned[c][j] = units_unassigned[c][--num_units_unassigned[c]];
 
 					// remove it from other ressources
 					for (j = 0; j < MaxCosts; ++j) {
@@ -1304,8 +1318,8 @@ static void AiCollectResources(void)
 							continue;
 						}
 						for (k = 0; k < num_units_unassigned[j]; ++k) {
-							if (units_unassigned[k][j] == unit) {
-								units_unassigned[k][j] = units_unassigned[--num_units_unassigned[j]][j];
+							if (units_unassigned[j][k] == unit) {
+								units_unassigned[j][k] = units_unassigned[j][--num_units_unassigned[j]];
 								break;
 							}
 						}
@@ -1330,7 +1344,12 @@ static void AiCollectResources(void)
 					}
 
 					for (k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
-						unit = units_assigned[k][src_c];
+						unit = units_assigned[src_c][k];
+
+						if (unit->SubAction >= 65 /* SUB_STOP_GATHERING */ ) {
+							//worker returning with resource
+							continue;
+						}
 
 						// unit can't harvest : next one
 						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(unit, c)) {
@@ -1339,7 +1358,7 @@ static void AiCollectResources(void)
 						}
 
 						// Remove from src_c
-						units_assigned[k][src_c] = units_assigned[--num_units_assigned[src_c]][src_c];
+						units_assigned[src_c][k] = units_assigned[src_c][--num_units_assigned[src_c]];
 
 						// j need one more
 						priority_needed[j]++;
@@ -1355,7 +1374,7 @@ static void AiCollectResources(void)
 				priority_needed[i]--;
 
 				// Add to the assigned
-				units_assigned[num_units_assigned[c]++][c] = unit;
+				units_assigned[c][num_units_assigned[c]++] = unit;
 
 				// Recompute priority now
 				break;

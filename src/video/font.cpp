@@ -691,7 +691,7 @@ static int FormatNumber(int number, char *buf)
 		}
 		buf[d++] = bufs[s++];
 	} while (s <= sl);
-	return d;
+	return d - 1;
 }
 
 /**

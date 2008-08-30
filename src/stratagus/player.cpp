@@ -286,10 +286,36 @@ void SavePlayers(CFile *file)
 			}
 			file->printf("%d", p->UpgradeTimers.Upgrades[j]);
 		}
-		file->printf("})\n\n");
+		file->printf("}");
+		
+		if(p->AutoAttackTargets.size() > 0) {
+		
+			file->printf("\n  \"enemy-targets\", {");
+			
+			CUnitCache &autoatacktargets = p->AutoAttackTargets;
+			for(unsigned int k = 0; k < autoatacktargets.size();)
+			{
+				CUnit *aatarget = autoatacktargets[k];
+				
+				//Additional security
+				if(!aatarget->IsAliveOnMap() ||
+					Map.Field(aatarget->X, aatarget->Y)->Guard[i] == 0) {
+					autoatacktargets.Units.erase(autoatacktargets.Units.begin() + k);
+					aatarget->RefsDecrease();
+					continue;
+				}
+				if (k) {
+					file->printf(" ,");
+				}				
+				file->printf("\"%s\"", UnitReference(aatarget).c_str());
+				++k;
+			}
+			file->printf("}");
+		}
+		
+		file->printf(")\n\n");
 	}
 
-	DebugPrint("FIXME: HAVE TO ADD AUTO ATTACK TARGETS SAVE/LOAD SUPPORT!!!!!\n");
 	DebugPrint("FIXME: must save unit-stats?\n");
 
 	//
