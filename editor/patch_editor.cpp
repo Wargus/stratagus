@@ -159,8 +159,16 @@ static void PatchEditorCallbackButtonDown(unsigned button)
 
 	// Patch area
 	if (MouseOverTileX != -1) {
+		unsigned short newFlag;
 		unsigned short flag = Patch->getType()->getFlag(MouseOverTileX, MouseOverTileY);
-		Patch->getType()->setFlag(MouseOverTileX, MouseOverTileY, (flag ^ FlagMap[CurrentButton]));
+		if (ButtonSpeed0 <= CurrentButton && CurrentButton <= ButtonSpeed7) {
+			// replace speed value
+			newFlag = (flag & ~MapFieldSpeedMask) | FlagMap[CurrentButton];
+		} else {
+			// toggle flag
+			newFlag = flag ^ FlagMap[CurrentButton];
+		}
+		Patch->getType()->setFlag(MouseOverTileX, MouseOverTileY, newFlag);
 	}
 }
 
