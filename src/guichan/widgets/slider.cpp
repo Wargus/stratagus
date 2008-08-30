@@ -254,8 +254,9 @@ namespace gcn
             {
                 setValue(markerPositionToValue(getHeight() - y - getMarkerLength() / 2));
             }
-      
+
             generateAction();
+            setDirty(true);
         }
     }
     

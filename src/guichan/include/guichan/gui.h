@@ -176,6 +176,8 @@ namespace gcn
          * @return true if tabbing is enabled.
          */
         virtual bool isTabbingEnabled();
+
+		virtual void setUseDirtyDrawing(bool useDirtyDrawing);
             
     protected:
         bool mTopHasMouse;
@@ -184,7 +186,8 @@ namespace gcn
         Widget* mTop;
         Graphics* mGraphics;
         Input* mInput;
-        FocusHandler* mFocusHandler;    
+        FocusHandler* mFocusHandler;
+		bool mUseDirtyDrawing;
     };  
 }
 

@@ -167,7 +167,9 @@ namespace gcn
 
         virtual void getDrawSize(int& width, int& height, Widget* widget);
 
-        
+        virtual void setDirty(bool dirty);
+        virtual bool getDirty() const;
+
     protected:
 
         /**
@@ -188,6 +190,7 @@ namespace gcn
         Widget* mWidgetWithMouse;
         typedef std::list<Widget*> WidgetList;
         typedef WidgetList::iterator WidgetIterator;
+        typedef WidgetList::const_iterator WidgetConstIterator;
         WidgetList mWidgets;
         bool mOpaque;    
     };  

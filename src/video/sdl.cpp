@@ -75,6 +75,7 @@
 #include "interface.h"
 #include "minimap.h"
 #include "widgets.h"
+#include "editor.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -749,7 +750,9 @@ void WaitEventsOneFrame()
 	}
 
 #ifndef USE_OPENGL
-	Video.ClearScreen();
+	if (GameRunning || Editor.Running) {
+		Video.ClearScreen();
+	}
 #endif
 }
 
@@ -767,6 +770,7 @@ void RealizeVideoMemory(void)
 		NumRects = 0;
 	}
 #endif
+	HideCursor();
 }
 
 /**

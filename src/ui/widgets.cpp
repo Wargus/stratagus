@@ -90,10 +90,8 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 /**
 **  Initializes the GUI stuff
 **
-**  @param width   FIXME: docu
-**  @param height  FIXME: docu
 */
-void initGuichan(int width, int height)
+void initGuichan(void)
 {
 #ifdef USE_OPENGL
 	MyOpenGLGraphics *graphics = new MyOpenGLGraphics();
@@ -112,6 +110,11 @@ void initGuichan(int width, int height)
 	Gui->setGraphics(graphics);
 	Gui->setInput(Input);
 	Gui->setTop(NULL);
+#ifndef USE_OPENGL
+	Gui->setUseDirtyDrawing(true);
+#else
+	Gui->setUseDirtyDrawing(false);
+#endif
 
 	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
 	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
@@ -161,6 +164,9 @@ void handleInput(const SDL_Event *event)
 void DrawGuichanWidgets() 
 {
 	if (Gui) {
+#ifndef USE_OPENGL
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
+#endif
 		Gui->draw();
 	}
 }
@@ -941,7 +947,7 @@ void MultiLineLabel::wordWrap()
 	gcn::Font *font = this->getFont();
 	int lineWidth = this->getLineWidth();
 	std::string str = this->getCaption();
-	std::string::size_type pos, lastPos;
+	size_t pos, lastPos;
 	std::string substr;
 	bool done = false;
 	bool first = true;
@@ -1062,6 +1068,7 @@ void ScrollingWidget::add(gcn::Widget *widget, int x, int y)
 */
 void ScrollingWidget::logic()
 {
+	setDirty(true);
 	if (container.getHeight() + containerY - speedY > 0 ) {
 		// the bottom of the container is lower than the top 
 		// of the widget. It is thus still visible.
@@ -1453,6 +1460,7 @@ const std::string &StatBoxWidget::getCaption() const
 */
 void StatBoxWidget::setPercent(const int percent)
 {
+	this->setDirty(true);
 	this->percent = percent;
 }
 

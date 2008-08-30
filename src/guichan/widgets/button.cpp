@@ -203,7 +203,7 @@ namespace gcn
         highlightColor.a = alpha;
         shadowColor = faceColor - 0x303030;
         shadowColor.a = alpha;
- 
+
         unsigned int i;
         for (i = 0; i < getBorderSize(); ++i)
         {

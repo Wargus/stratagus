@@ -396,7 +396,8 @@ namespace gcn
             else
             {
                 setVerticalScrollAmount(0);
-            }     
+            }
+            setDirty(true);
         }
         if (mHorizontalMarkerPressed)
         {
@@ -414,6 +415,7 @@ namespace gcn
             {
                 setHorizontalScrollAmount(0);
             }     
+            setDirty(true);
         }
     }
 

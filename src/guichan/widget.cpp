@@ -104,6 +104,7 @@ namespace gcn
         
         mCurrentFont = NULL;
         mWidgets.push_back(this); 
+        mDirty = true;
     }
 
     Widget::~Widget()
@@ -453,6 +454,7 @@ namespace gcn
                       (*iter)->mouseWheelDown(x, y);
                   }
               }
+              setDirty(true);
               break;
 
           case MouseInput::RELEASE:
@@ -489,6 +491,7 @@ namespace gcn
                   mClickCount = 0;
                   mClickTimeStamp = 0;
               }
+              setDirty(true);
               break;
         }    
     }
@@ -544,6 +547,7 @@ namespace gcn
         }
 
         mHasMouse = true;
+		setDirty(true);
 
         MouseListenerIterator iter;
         for (iter = mMouseListeners.begin(); iter != mMouseListeners.end(); ++iter)
@@ -555,6 +559,7 @@ namespace gcn
     void Widget::_mouseOutMessage()
     {
         mHasMouse = false;
+		setDirty(true);
 
         MouseListenerIterator iter;
         for (iter = mMouseListeners.begin(); iter != mMouseListeners.end(); ++iter)
@@ -748,6 +753,16 @@ namespace gcn
         }
 
         return mFocusHandler->getModalFocused() == this;
+    }
+
+    void Widget::setDirty(bool dirty)
+    {
+        mDirty = dirty;
+    }
+
+    bool Widget::getDirty() const
+    {
+        return mDirty;
     }
 }
 

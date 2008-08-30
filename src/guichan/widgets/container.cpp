@@ -384,5 +384,34 @@ namespace gcn
         }
 
         Widget::_mouseOutMessage();
-    }  
+    }
+
+	void Container::setDirty(bool dirty)
+	{
+        WidgetConstIterator iter;
+        for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
+		{
+			(*iter)->setDirty(dirty);
+		}
+		mDirty = dirty;
+	}
+
+	bool Container::getDirty() const
+	{
+		if (mDirty == true)
+		{
+			return true;
+		}
+
+		WidgetConstIterator iter;
+        for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
+		{
+			if ((*iter)->getDirty())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

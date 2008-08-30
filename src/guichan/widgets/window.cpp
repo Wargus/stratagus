@@ -339,6 +339,7 @@ namespace gcn
         {
             setPosition(x - mMouseXOffset + getX(),
                         y - mMouseYOffset + getY());
+			setDirty(true);
         }
     }
   
@@ -474,5 +475,29 @@ namespace gcn
         {
             getContent()->logic();
         }
-    }   
+    }
+
+	void Window::setDirty(bool dirty)
+	{
+		if (mContent != NULL)
+		{
+			mContent->setDirty(dirty);
+		}
+		mDirty = dirty;
+	}
+
+	bool Window::getDirty() const
+	{
+		if (mDirty == true)
+		{
+			return true;
+		}
+
+		if (mContent != NULL && mContent->getDirty())
+		{
+			return true;
+		}
+
+		return false;
+	}
 }
