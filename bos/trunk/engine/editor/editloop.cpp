@@ -1181,21 +1181,29 @@ static void EditorCallbackMouse(int x, int y)
 		if (CursorX <= UI.SelectedViewport->X) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX - 1,
-				UI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY,
+				UI.SelectedViewport->OffsetX,
+				UI.SelectedViewport->OffsetY);
 		} else if (CursorX >= UI.SelectedViewport->EndX) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX + 1,
-				UI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY,
+				UI.SelectedViewport->OffsetX,
+				UI.SelectedViewport->OffsetY);
 		}
 
 		if (CursorY <= UI.SelectedViewport->Y) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX,
-				UI.SelectedViewport->MapY - 1, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY - 1,
+				UI.SelectedViewport->OffsetX,
+				UI.SelectedViewport->OffsetY);
 		} else if (CursorY >= UI.SelectedViewport->EndY) {
 			UI.SelectedViewport->Set(
 				UI.SelectedViewport->MapX,
-				UI.SelectedViewport->MapY + 1, TileSizeX / 2, TileSizeY / 2);
+				UI.SelectedViewport->MapY + 1,
+				UI.SelectedViewport->OffsetX,
+				UI.SelectedViewport->OffsetY);
 		}
 
 		//
