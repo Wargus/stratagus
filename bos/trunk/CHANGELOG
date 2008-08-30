@@ -2,6 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 Development version:
+- Added undo and redo to the editor (Jimmy Salmon)
 - Add new defeat background graphic (Johannes Engelhardt)
 - Quick drawing in the main menus (Jimmy Salmon)
 - Added patch support to the editor (Jimmy Salmon)
