@@ -18,6 +18,6 @@ function LoadPatches(path)
   end
 end
 
-LoadPatches("scripts/patches/")
+LoadPatches("patches/")
 LoadPatches("~patches/")
 
