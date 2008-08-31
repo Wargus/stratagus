@@ -141,7 +141,6 @@ struct EditorAction
 	int Y;
 	CUnitType *UnitType;
 	CPlayer *Player;
-	CUnit *Unit;
 };
 
 static std::deque<EditorAction> EditorUndoActions;
@@ -250,7 +249,7 @@ void SetEditorStartUnit(const std::string &name)
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
 */
-static CUnit *EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
+static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 	CBuildRestrictionOnTop *b;
@@ -262,7 +261,7 @@ static CUnit *EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *play
 	unit = MakeUnitAndPlace(x, y, type, player);
 	if (unit == NoUnitP) {
 		DebugPrint("Unable to allocate Unit");
-		return NoUnitP;
+		return;
 	}
 
 	b = OnTopDetails(unit, NULL);
@@ -285,7 +284,6 @@ static CUnit *EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *play
 	}
 
 	UpdateMinimap = true;
-	return unit;
 }
 
 /**
@@ -298,16 +296,14 @@ static CUnit *EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *play
 */
 static void EditorPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
-	CUnit *unit = EditorActionPlaceUnit(x, y, type, player);
-
 	EditorAction editorAction;
 	editorAction.Type = EditorActionTypePlaceUnit;
 	editorAction.X = x;
 	editorAction.Y = y;
 	editorAction.UnitType = type;
 	editorAction.Player = player;
-	editorAction.Unit = unit;
 
+	EditorActionPlaceUnit(x, y, type, player);
 	EditorAddUndoAction(editorAction);
 }
 
@@ -335,7 +331,6 @@ static void EditorRemoveUnit(CUnit *unit)
 	editorAction.Y = unit->Y;
 	editorAction.UnitType = unit->Type;
 	editorAction.Player = unit->Player;
-	editorAction.Unit = NoUnitP;
 
 	EditorActionRemoveUnit(unit);
 	EditorAddUndoAction(editorAction);
@@ -357,12 +352,14 @@ static void EditorUndoAction()
 	switch (action.Type)
 	{
 		case EditorActionTypePlaceUnit:
-			EditorActionRemoveUnit(action.Unit);
-			action.Unit = NoUnitP;
+		{
+			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
+			EditorActionRemoveUnit(unit);
 			break;
+		}
 
 		case EditorActionTypeRemoveUnit:
-			action.Unit = EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
 			break;
 	}
 
@@ -381,13 +378,15 @@ static void EditorRedoAction()
 	switch (action.Type)
 	{
 		case EditorActionTypePlaceUnit:
-			action.Unit = EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
 			break;
 
 		case EditorActionTypeRemoveUnit:
-			EditorActionRemoveUnit(action.Unit);
-			action.Unit = NoUnitP;
+		{
+			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
+			EditorActionRemoveUnit(unit);
 			break;
+		}
 	}
 
 	EditorUndoActions.push_back(action);
