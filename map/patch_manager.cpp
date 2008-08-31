@@ -56,6 +56,11 @@ CPatchManager::CPatchManager() :
 
 CPatchManager::~CPatchManager()
 {
+	std::map<std::string, CPatchType *>::iterator i;
+
+	for (i = this->patchTypesMap.begin(); i != this->patchTypesMap.end(); ++i) {
+		delete i->second;
+	}
 }
 
 
