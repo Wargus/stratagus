@@ -1778,6 +1778,9 @@ void CEditor::Init()
 
 	RecalculateShownUnits();
 
+	EditorUndoActions.clear();
+	EditorRedoActions.clear();
+
 	EditorCallbacks.ButtonPressed = EditorCallbackButtonDown;
 	EditorCallbacks.ButtonReleased = EditorCallbackButtonUp;
 	EditorCallbacks.MouseMoved = EditorCallbackMouse;
