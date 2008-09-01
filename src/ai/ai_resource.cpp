@@ -1265,8 +1265,14 @@ static void AiCollectResources(void)
 	for (c = 0; c < MaxCosts; ++c) {
 		priority_resource[c] = c;
 		priority_needed[c] = wanted[c] - num_units_assigned[c] - num_units_with_resource[c];
+		
+		if (c && num_units_assigned[c] > 1) {
+			//first should go workers with lower ResourcesHeld value
+			qsort(units_assigned[c], num_units_assigned[c],
+							 sizeof(CUnit*), CmpWorkers);
+		}		
+		
 	}
-
 	do {
 		//
 		// sort resources by priority
@@ -1281,11 +1287,6 @@ static void AiCollectResources(void)
 					priority_resource[j] = priority_resource[i];
 					priority_resource[i] = c;
 				}
-			}
-			
-			if (i) {
-				//first should go workers with lower ResourcesHeld value
-				qsort(units_assigned[i], UnitMax, sizeof(CUnit*), CmpWorkers);
 			}
 		}
 
@@ -1332,7 +1333,7 @@ static void AiCollectResources(void)
 			//
 			if (!unit) {
 				// Take from lower priority only (i+1).
-				for (j = i + 1; j < MaxCosts; ++j) {
+				for (j = i + 1; j < MaxCosts && !unit; ++j) {
 					// Try to move worker from src_c to c
 					src_c = priority_resource[j];
 
