@@ -66,8 +66,8 @@
 */
 class CNetworkHost {
 public:
-	unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
+	unsigned char *Serialize(unsigned char *buf) const;
+	const unsigned char *Deserialize(const unsigned char *p);
 	static size_t Size() { return 4+2+2+16; }
 
 	Uint32 Host;         /// Host address
@@ -90,8 +90,8 @@ typedef struct _network_state_ {
 */
 class CServerSetup {
 public:
-	unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
+	unsigned char *Serialize(unsigned char *buf) const;
+	const unsigned char *Deserialize(const unsigned char *p);
 	static size_t Size() { return 1+1+1+1+1+1+1+1+ 1*PlayerMax + 1*PlayerMax + 1*PlayerMax + 4*PlayerMax; }
 	void Clear() {
 		ResourcesOption = UnitsOption = FogOfWar = RevealMap =
@@ -124,9 +124,13 @@ public:
 */
 class CInitMessage {
 public:
-	unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
-	static size_t Size() { return 1+1+4+4+4+4+4+4+1+256; }
+	unsigned char *Serialize(unsigned char *buf) const;
+	const unsigned char *Deserialize(const unsigned char *p);
+	static const int DeserializeSubType(const unsigned char *p) {
+		return (int)p[1];
+	};
+	
+	static const size_t Size(int subtype);
 
 	Uint8  Type;        /// Init message type
 	Uint8  SubType;     /// Init message subtype

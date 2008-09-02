@@ -102,10 +102,8 @@ static int NetworkServerPort = NetworkDefaultPort; /// Server network port to us
 CServerSetup ServerSetupState;
 CServerSetup LocalSetupState;
 
-
-unsigned char *CNetworkHost::Serialize() const
+unsigned char *CNetworkHost::Serialize(unsigned char *buf) const
 {
-	unsigned char *buf = new unsigned char[CNetworkHost::Size()];
 	unsigned char *p = buf;
 
 	*(Uint32 *)p = this->Host;
@@ -115,11 +113,11 @@ unsigned char *CNetworkHost::Serialize() const
 	*(Uint16 *)p = this->PlyNr;
 	p += 2;
 	memcpy(p, this->PlyName, sizeof(this->PlyName));
-
-	return buf;
+	p += sizeof(this->PlyName);
+	return p;
 }
 
-void CNetworkHost::Deserialize(const unsigned char *p)
+const unsigned char *CNetworkHost::Deserialize(const unsigned char *p)
 {
 	this->Host = *(Uint32 *)p;
 	p += 4;
@@ -128,11 +126,11 @@ void CNetworkHost::Deserialize(const unsigned char *p)
 	this->PlyNr = *(Uint16 *)p;
 	p += 2;
 	memcpy(this->PlyName, p, sizeof(this->PlyName));
+	return p + sizeof(this->PlyName);
 }
 
-unsigned char *CServerSetup::Serialize() const
+unsigned char *CServerSetup::Serialize(unsigned char *buf) const
 {
-	unsigned char *buf = new unsigned char[CServerSetup::Size()];
 	unsigned char *p = buf;
 	int i;
 
@@ -158,10 +156,10 @@ unsigned char *CServerSetup::Serialize() const
 		p += 4;
 	}
 
-	return buf;
+	return p;
 }
 
-void CServerSetup::Deserialize(const unsigned char *p)
+const unsigned char *CServerSetup::Deserialize(const unsigned char *p)
 {
 	int i;
 
@@ -186,13 +184,29 @@ void CServerSetup::Deserialize(const unsigned char *p)
 		this->LastFrame[i] = *(Uint32 *)p;
 		p += 4;
 	}
+	return p;
 }
 
-unsigned char *CInitMessage::Serialize() const
+const size_t CInitMessage::Size(int type) { 
+	const size_t len = 1+1+4+4+4+4+4+4+1;
+	switch(type) {
+		case ICMHello:
+		case ICMConfig:
+		case ICMWelcome:
+		case ICMResync:
+		case ICMGo:
+			return len + PlayerMax * CNetworkHost::Size();
+		case ICMMap:
+			return len + 256;
+		case ICMState:	
+			return len + CServerSetup::Size();	
+	}
+	return len;
+}
+
+unsigned char *CInitMessage::Serialize(unsigned char *buf) const
 {
-	unsigned char *buf = new unsigned char[CInitMessage::Size()];
 	unsigned char *p = buf;
-	unsigned char *x;
 
 	*p++ = this->Type;
 	*p++ = this->SubType;
@@ -217,28 +231,22 @@ unsigned char *CInitMessage::Serialize() const
 		case ICMResync:
 		case ICMGo:
 			for (int i = 0; i < PlayerMax; ++i) {
-				x = this->u.Hosts[i].Serialize();
-				memcpy(p, x, CNetworkHost::Size());
-				p += CNetworkHost::Size();
-				delete[] x;
-			}
+				p = this->u.Hosts[i].Serialize(p);
+			}			
 			break;
 		case ICMMap:
 			memcpy(p, this->u.MapPath, sizeof(this->u.MapPath));
 			p += sizeof(this->u.MapPath);
 			break;
 		case ICMState:
-			x = this->u.State.Serialize();
-			memcpy(p, x, CServerSetup::Size());
-			p += CServerSetup::Size();
-			delete[] x;
+			p = this->u.State.Serialize(p);
 			break;
 	}
 
-	return buf;
+	return p;
 }
 
-void CInitMessage::Deserialize(const unsigned char *p)
+const unsigned char *CInitMessage::Deserialize(const unsigned char *p)
 {
 	this->Type = *p++;
 	this->SubType = *p++;
@@ -263,8 +271,7 @@ void CInitMessage::Deserialize(const unsigned char *p)
 		case ICMResync:
 		case ICMGo:
 			for (int i = 0; i < PlayerMax; ++i) {
-				this->u.Hosts[i].Deserialize(p);
-				p += CNetworkHost::Size();
+				p = this->u.Hosts[i].Deserialize(p);
 			}
 			break;
 		case ICMMap:
@@ -272,10 +279,10 @@ void CInitMessage::Deserialize(const unsigned char *p)
 			p += sizeof(this->u.MapPath);
 			break;
 		case ICMState:
-			this->u.State.Deserialize(p);
-			p += CServerSetup::Size();
+			p = this->u.State.Deserialize(p);
 			break;
 	}
+	return p;
 }
 
 //----------------------------------------------------------------------------
@@ -294,15 +301,14 @@ void CInitMessage::Deserialize(const unsigned char *p)
 */
 static int NetworkSendICMessage(unsigned long host, int port, CInitMessage *msg)
 {
+	unsigned char buf[512];
 	msg->Stratagus = htonl(StratagusVersion);
 	msg->Version = htonl(NetworkProtocolVersion);
 	msg->Lag = htonl(NetworkLag);
 	msg->Updates = htonl(NetworkUpdates);
-
-	unsigned char *buf = msg->Serialize();
-	int ret = NetSendUDP(NetworkFildes, host, port, buf, CInitMessage::Size());
-	delete[] buf;
-	return ret;
+	Assert(sizeof(buf) >= CInitMessage::Size(msg->SubType));
+	unsigned char *p = msg->Serialize(buf);
+	return NetSendUDP(NetworkFildes, host, port, buf, p - buf);
 }
 
 #ifdef DEBUG
@@ -776,7 +782,7 @@ breakout:
 				continue;
 			}
 
-			if (n != (int)CInitMessage::Size()) {
+			if (n != (int)CInitMessage::Size(CInitMessage::DeserializeSubType(buf))) {
 				DebugPrint("Unexpected message size\n");
 				continue;
 			}
@@ -1693,7 +1699,7 @@ static void ServerParseWaiting(const int h)
 			// this code path happens until client acknowledges the map
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
-			//memset(message.u.MapPath, 0, sizeof(message.u.MapPath));
+			memset(message.u.MapPath, 0, sizeof(message.u.MapPath));
 			strncpy_s(message.u.MapPath, sizeof(message.u.MapPath), NetworkMapName.c_str(), NetworkMapName.size());
 			message.MapUID = htonl(Map.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -2101,7 +2107,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size)
 {
 	CInitMessage msg;
 
-	if (size != (int)CInitMessage::Size()) {
+	if (size != (int)CInitMessage::Size(CInitMessage::DeserializeSubType(buf))) {
 		// FIXME: could be a bad packet
 		if (NetConnectRunning == 2 && NetLocalState == ccs_started) {
 			// Client has acked ready to start and receives first real network packet.

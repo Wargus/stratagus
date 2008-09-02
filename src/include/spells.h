@@ -376,6 +376,12 @@ public:
 
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
+	
+	bool IsCasterOnly() const
+	{
+		return !Range && Target == TargetSelf;
+	}
+	
 };
 
 /*----------------------------------------------------------------------------

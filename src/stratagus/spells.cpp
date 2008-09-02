@@ -498,7 +498,14 @@ int AdjustVitals::Cast(CUnit *caster, const SpellType *spell,
 
 	caster->Variable[MANA_INDEX].Value -= castcount * manacost;
 	if (hp < 0) {
-		HitUnit(caster, target, -(castcount * hp));
+		if (caster != target) {
+			HitUnit(caster, target, -(castcount * hp));
+		} else {
+			target->Variable[HP_INDEX].Value += castcount * hp;
+			if (target->Variable[HP_INDEX].Value < 0) {
+				target->Variable[HP_INDEX].Value = 0;
+			}			
+		}
 	} else {
 		target->Variable[HP_INDEX].Value += castcount * hp;
 		if (target->Variable[HP_INDEX].Value > target->Variable[HP_INDEX].Max) {

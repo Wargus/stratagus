@@ -432,27 +432,6 @@ static inline bool OnButton(int x, int y, CUIButton *button)
 }
 
 /**
-**  Check if the mouse is on a graphic
-**
-**  @param x   X coordinate.
-**  @param y   Y coordinate.
-**  @param g   Graphic.
-**  @param gx  Graphic X coordinate.
-**  @param gy  Graphic Y coordinate.
-**
-**  @return    True if mouse is on the graphic, False otherwise.
-*/
-static inline bool OnGraphic(int x, int y, CGraphic *g, int gx, int gy)
-{
-	x -= gx;
-	y -= gy;
-	if (x >= 0 && x < g->Width && y >= 0 && y < g->Height) {
-		return !g->TransparentPixel(x, y);
-	}
-	return false;
-}
-
-/**
 **  Set flag on which area is the cursor.
 **
 **  @param x  X coordinate.

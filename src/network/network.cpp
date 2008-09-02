@@ -378,9 +378,8 @@ void CNetworkPacketHeader::Deserialize(unsigned char *p)
 	}
 }
 
-unsigned char *CNetworkPacket::Serialize(int numcommands) const
+unsigned char *CNetworkPacket::Serialize(unsigned char *buf, int numcommands) const
 {
-	unsigned char *buf = new unsigned char[CNetworkPacket::Size(numcommands)];
 	unsigned char *p = buf;
 
 	this->Header.Serialize(p);
@@ -397,7 +396,7 @@ unsigned char *CNetworkPacket::Serialize(int numcommands) const
 		p += CNetworkCommand::Size();
 	}
 
-	return buf;
+	return p;
 }
 
 int CNetworkPacket::Deserialize(unsigned char *p, unsigned int len)
@@ -445,14 +444,17 @@ int CNetworkPacket::Deserialize(unsigned char *p, unsigned int len)
 */
 static void NetworkBroadcast(const CNetworkPacket *packet, int numcommands)
 {
-	unsigned char *buf = packet->Serialize(numcommands);
+	unsigned char buf[1 + 1 * MaxNetworkCommands  + //header
+		(2+2+2+2) * MaxNetworkCommands];
+
+	Assert(sizeof(buf) >= CNetworkPacket::Size(numcommands));
+
+	unsigned char *p = packet->Serialize(buf, numcommands);
 
 	// Send to all clients.
 	for (int i = 0; i < HostsCount; ++i) {
-		NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port, buf,
-			CNetworkPacket::Size(numcommands));
+		NetSendUDP(NetworkFildes, Hosts[i].Host, Hosts[i].Port, buf, p - buf);
 	}
-	delete[] buf;
 }
 
 /**
@@ -778,6 +780,9 @@ void NetworkSendSelection(CUnit **units, int count)
 		return;
 	}
 
+	unsigned char buf[1 + 1 * MaxNetworkCommands  + //header
+		(2+2+2+2) * MaxNetworkCommands];
+
 	//
 	//  Build and send packets to cover all units.
 	//
@@ -817,11 +822,12 @@ void NetworkSendSelection(CUnit **units, int count)
 		// Send the Constructed packet to team members
 		//
 		int numcommands = (nosent + 3) / 4;
-		unsigned char *buf = packet.Serialize(numcommands);
+		Assert(numcommands <= MaxNetworkCommands);
+		Assert(sizeof(buf) >= CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
+		unsigned char *p = packet.Serialize(buf, numcommands);
 
 		for (i = 0; i < numteammates; ++i) {
-			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,
-				buf, CNetworkPacketHeader::Size() + CNetworkSelection::Size() * numcommands);
+			ref = NetSendUDP(NetworkFildes, Hosts[teammates[i]].Host, Hosts[teammates[i]].Port,	buf, p - buf);
 		}
 	}
 

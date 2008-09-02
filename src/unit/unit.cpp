@@ -2273,10 +2273,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 							(unit->IsAllied(mine) && mine->IsAllied(unit)))
 							 ) {
 					if (destu) {
-						bool better = (mine != bestmine &&
-							(!mine->Type->MaxOnBoard ||
-							//Durring construction Data.Resource is corrupted
-							check_usage && mine->CurrentAction() != UnitActionBuilt));
+						bool better = (mine != bestmine);
 				
 						if(better) {
 							n = std::max(MyAbs(destx - x), MyAbs(desty - y));

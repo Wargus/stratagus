@@ -1031,18 +1031,18 @@ void CButtonPanel::DoClicked(int button)
 			UI.StatusLine.Set(_("Select Target"));
 			break;
 		case ButtonSpellCast:
+		{
+			int spellId = CurrentButtons[button].Value;		
 			if (KeyModifiers & ModifierControl) {
-				int autocast;
-				int spellId;
+				int autocast = 0;
 
-				spellId = CurrentButtons[button].Value;
 				if (!SpellTypeTable[spellId]->AutoCast) {
 					PlayGameSound(GameSounds.PlacementError.Sound,
 						MaxSampleVolume);
 					break;
 				}
 
-				autocast = 0;
+				//autocast = 0;
 				// If any selected unit doesn't have autocast on turn it on
 				// for everyone
 				for (i = 0; i < NumSelected; ++i) {
@@ -1059,6 +1059,17 @@ void CButtonPanel::DoClicked(int button)
 				}
 				break;
 			}
+			if(SpellTypeTable[spellId]->IsCasterOnly()) {
+				CUnit *unit;
+				for (i = 0; i < NumSelected; ++i) {
+					unit = Selected[i];
+					// CursorValue here holds the spell type id
+					SendCommandSpellCast(unit, unit->X, unit->Y, unit, spellId, 
+										!(KeyModifiers & ModifierShift));					
+				}
+				break;
+			}
+		}
 			// Follow Next -> Select target.
 		case ButtonRepair:
 			if (KeyModifiers & ModifierControl) {

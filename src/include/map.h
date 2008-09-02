@@ -92,7 +92,10 @@
 #endif
 
 #include "iocompat.h"
+
+#ifndef __TILESET_H__
 #include "tileset.h"
+#endif
 
 #ifndef __PLAYER_H__
 #include "player.h"
