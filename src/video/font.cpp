@@ -218,7 +218,7 @@ static inline bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 }
 
 /**
-**  Get the next utf8 character from a array of chars 
+**  Get the next utf8 character from a array of chars
 */
 static inline bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 {
@@ -252,7 +252,7 @@ static inline bool GetUTF8(const char text[], const size_t len, size_t &pos, int
 		utf8 = (c & 0x01);
 		count = 5;
 	} else {
-		DebugPrint("Invalid utf8 I %c <%s> [%lu]\n" _C_ c _C_ text _C_ pos);
+		DebugPrint("Invalid utf8 I %c <%s> [%lu]\n" _C_ c _C_ text _C_ (long) pos);
 		return false;
 	}
 
@@ -288,7 +288,7 @@ int CFont::Width(const int number) const
 	size_t pos = 0;
 	char text[ sizeof(int) * 10 + 2];
 	const int len = FormatNumber(number, text);
-	
+
 	while (GetUTF8(text, len, pos, utf8)) {
 #if 0
 		if (utf8 == '~') {
@@ -316,7 +316,7 @@ int CFont::Width(const int number) const
 		//}
 	}
 	return width;
-	
+
 }
 
 /**
@@ -677,17 +677,18 @@ int VideoDrawTextCentered(int x, int y, const CFont *font, const std::string &te
 */
 static int FormatNumber(int number, char *buf)
 {
+	const char sep = ',';
 	char bufs[sizeof(int) * 10 + 2];
 	int sl;
 	int s;
 	int d;
 
 	sl = s = d = 0;
-	sl = snprintf(bufs,sizeof(buf), "%d", number);
+	sl = snprintf(bufs, sizeof (bufs), "%d", number);
 	//sl = strlen(bufs);
 	do {
 		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
-			buf[d++] = ',';
+			buf[d++] = sep;
 		}
 		buf[d++] = bufs[s++];
 	} while (s <= sl);
