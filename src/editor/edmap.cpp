@@ -421,7 +421,7 @@ void ChangeTile(int x, int y, int tile)
 	Assert(x >= 0 && y >= 0 && x < Map.Info.MapWidth && y < Map.Info.MapHeight);
 	Assert(tile >= 0 && tile < Map.Tileset.NumTiles);
 
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf = Map.Field(x, y);
 	mf->Tile = mf->SeenTile = Map.Tileset.Table[tile];
 }
 
@@ -449,7 +449,7 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 	//
 	// Change the flags
 	//
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf = Map.Field(x, y);
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
@@ -486,7 +486,7 @@ static void EditorTileChanged2(int x, int y, int d)
 	//
 	// Special case 1) Walls.
 	//
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf = Map.Field(x, y);
 	if (mf->Flags & MapFieldWall) {
 		Map.SetWall(x, y, mf->Flags & MapFieldHuman);
 		return;

@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
+#include <deque>
 
 #include "stratagus.h"
 #include "unittype.h"
@@ -91,10 +92,11 @@ static int ButtonPanelHeight;
 static char TileToolRandom;      /// Tile tool draws random
 static char TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
-static int TileCursor;           /// Tile type number
-
+static bool UnitPlacedThisPress = false;    /// Only allow one unit per press
+static bool UpdateMinimap = false;          /// Update units on the minimap
 static int MirrorEdit = 0;                /// Mirror editing enabled
-static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
+static int VisibleUnitIcons;                    /// Number of icons that are visible at a time
+static int VisibleTileIcons;
 
 enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
@@ -103,22 +105,61 @@ enum _mode_buttons_ {
 	StartButton
 };
 
+enum EditorActionType
+{
+	EditorActionTypePlaceUnit,
+	EditorActionTypeRemoveUnit,
+};
+
+struct EditorAction
+{
+	EditorActionType Type;
+	int X;
+	int Y;
+	CUnitType *UnitType;
+	CPlayer *Player;
+};
+
+static std::deque<EditorAction> EditorUndoActions;
+static std::deque<EditorAction> EditorRedoActions;
+
+static void EditorUndoAction();
+static void EditorRedoAction();
+static void EditorAddUndoAction(EditorAction action);
+
 extern gcn::Gui *Gui;
 static gcn::Container *editorContainer;
+static gcn::Slider *editorUnitSlider;
 static gcn::Slider *editorSlider;
 
-static int CalculateUnitIcons(void);
+class EditorUnitSliderListener : public gcn::ActionListener
+{
+public:
+	virtual void action(const std::string &eventId) {
+		int iconsPerStep = VisibleUnitIcons;
+		int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		double value = editorUnitSlider->getValue();
+		for (int i = 1; i <= steps; ++i) {
+			if (value <= (double)i / steps) {
+				Editor.UnitIndex = iconsPerStep * (i - 1);
+				break;
+			}
+		}
+	}
+};
+
+static EditorUnitSliderListener *editorUnitSliderListener;
 
 class EditorSliderListener : public gcn::ActionListener
 {
 public:
 	virtual void action(const std::string &eventId) {
-		int iconsPerStep = CalculateUnitIcons();
-		int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		int iconsPerStep = VisibleTileIcons;
+		int steps = (Editor.ShownTileTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		double value = editorSlider->getValue();
 		for (int i = 1; i <= steps; ++i) {
 			if (value <= (double)i / steps) {
-				Editor.UnitIndex = iconsPerStep * (i - 1);
+				Editor.TileIndex = iconsPerStep * (i - 1);
 				break;
 			}
 		}
@@ -146,14 +187,11 @@ static EditorSliderListener *editorSliderListener;
 **
 **  @todo  FIXME: Solid tiles are here still hardcoded.
 */
-int GetTileNumber(int basic, int random, int filler)
+static int GetTileNumber(int basic, int random, int filler)
 {
-	int tile;
-	int i;
-	int n;
-
-	tile = 16 + basic * 16;
+	int tile = basic;
 	if (random) {
+		int i,n;
 		for (n = i = 0; i < 16; ++i) {
 			if (!Map.Tileset.Table[tile + i]) {
 				if (!filler) {
@@ -173,7 +211,8 @@ int GetTileNumber(int basic, int random, int filler)
 		return tile + i;
 	}
 	if (filler) {
-		for (i = 0; i < 16 && Map.Tileset.Table[tile + i]; ++i) {
+		int i = 0;
+		for (; i < 16 && Map.Tileset.Table[tile + i]; ++i) {
 		}
 		for (; i < 16 && !Map.Tileset.Table[tile + i]; ++i) {
 		}
@@ -202,17 +241,18 @@ void EditTile(int x, int y, int tile)
 	//
 	// Change the flags
 	//
-	mf = &Map.Fields[y * Map.Info.MapWidth + x];
+	mf = Map.Field(x, y);
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= Map.Tileset.FlagsTable[16 + tile * 16];
+	mf->Flags |= Map.Tileset.FlagsTable[GetTileNumber(tile, 0, 0)];
 
 	UI.Minimap.UpdateSeenXY(x, y);
 	UI.Minimap.UpdateXY(x, y);
 
 	EditorTileChanged(x, y);
+	UpdateMinimap = true;
 }
 
 /**
@@ -285,8 +325,12 @@ void EditTiles(int x, int y, int tile, int size)
 	EditTilesInternal(mx - x - size, my - y - size, tile, size);
 }
 
+/*----------------------------------------------------------------------------
+--  Actions
+----------------------------------------------------------------------------*/
+
 /**
-**  Edit unit (internal, used by EditUnit()).
+**  Place unit.
 **
 **  @param x       X map tile coordinate.
 **  @param y       Y map tile coordinate.
@@ -296,13 +340,22 @@ void EditTiles(int x, int y, int tile, int size)
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
 */
-static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
+static void EditorActionPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
 	CUnit *unit;
 	CBuildRestrictionOnTop *b;
 
+	if (type->Neutral) {
+		player = &Players[PlayerNumNeutral];
+	}
+
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	unit = MakeUnitAndPlace(x, y, type, player);
+	if (unit == NoUnitP) {
+		DebugPrint("Unable to allocate Unit");
+		return;
+	}
+
 	b = OnTopDetails(unit, NULL);
 	if (b && b->ReplaceOnBuild) {
 		int n;
@@ -329,6 +382,7 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 	} else {
 		DebugPrint("Unable to allocate Unit");
 	}
+	UpdateMinimap = true;
 }
 
 /**
@@ -338,55 +392,145 @@ static void EditUnitInternal(int x, int y, CUnitType *type, CPlayer *player)
 **  @param y       Y map tile coordinate.
 **  @param type    Unit type to edit.
 **  @param player  Player owning the unit.
-**
-**  @todo  FIXME: Check if the player has already a start-point.
 */
-static void EditUnit(int x, int y, CUnitType *type, CPlayer *player)
+static void EditorPlaceUnit(int x, int y, CUnitType *type, CPlayer *player)
 {
-	int mx;
-	int my;
+	EditorAction editorAction;
+	editorAction.Type = EditorActionTypePlaceUnit;
+	editorAction.X = x;
+	editorAction.Y = y;
+	editorAction.UnitType = type;
+	editorAction.Player = player;
 
-	mx = Map.Info.MapWidth;
-	my = Map.Info.MapHeight;
-
-	EditUnitInternal(x, y, type, player);
-
-	if (!MirrorEdit) {
-		return;
-	}
-
-	EditUnitInternal(mx - x - 1, y, type, player);
-
-	if (MirrorEdit == 1) {
-		return;
-	}
-
-	EditUnitInternal(x, my - y - 1, type, player);
-	EditUnitInternal(mx - x - 1, my - y - 1, type, player);
+	EditorActionPlaceUnit(x, y, type, player);
+	EditorAddUndoAction(editorAction);
 }
 
 /**
-**  Calculate the number of unit icons that can be displayed
-**
-**  @return  Number of unit icons that can be displayed.
+**  Remove a unit
 */
-static int CalculateUnitIcons(void)
+static void EditorActionRemoveUnit(CUnit *unit)
 {
-	int i;
+	unit->Remove(NULL);
+	UnitLost(unit);
+	UnitClearOrders(unit);
+	unit->Release();
+	UI.StatusLine.Set(_("Unit deleted"));
+	UpdateMinimap = true;
+}
+
+/**
+**  Remove a unit
+*/
+static void EditorRemoveUnit(CUnit *unit)
+{
+	EditorAction editorAction;
+	editorAction.Type = EditorActionTypeRemoveUnit;
+	editorAction.X = unit->X;
+	editorAction.Y = unit->Y;
+	editorAction.UnitType = unit->Type;
+	editorAction.Player = unit->Player;
+
+	EditorActionRemoveUnit(unit);
+	EditorAddUndoAction(editorAction);
+}
+
+/*----------------------------------------------------------------------------
+--  Undo/Redo
+----------------------------------------------------------------------------*/
+
+static void EditorUndoAction()
+{
+	if (EditorUndoActions.empty()) {
+		return;
+	}
+
+	EditorAction action = EditorUndoActions.back();
+	EditorUndoActions.pop_back();
+
+	switch (action.Type)
+	{
+		case EditorActionTypePlaceUnit:
+		{
+			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
+			EditorActionRemoveUnit(unit);
+			break;
+		}
+
+		case EditorActionTypeRemoveUnit:
+			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			break;
+	}
+
+	EditorRedoActions.push_back(action);
+}
+
+static void EditorRedoAction()
+{
+	if (EditorRedoActions.empty()) {
+		return;
+	}
+
+	EditorAction action = EditorRedoActions.back();
+	EditorRedoActions.pop_back();
+
+	switch (action.Type)
+	{
+		case EditorActionTypePlaceUnit:
+			EditorActionPlaceUnit(action.X, action.Y, action.UnitType, action.Player);
+			break;
+
+		case EditorActionTypeRemoveUnit:
+		{
+			CUnit *unit = UnitOnMapTile(action.X, action.Y, action.UnitType->UnitType);
+			EditorActionRemoveUnit(unit);
+			break;
+		}
+	}
+
+	EditorUndoActions.push_back(action);
+}
+
+static void EditorAddUndoAction(EditorAction action)
+{
+	EditorRedoActions.clear();
+	EditorUndoActions.push_back(action);
+}
+
+/*----------------------------------------------------------------------------
+--  Other
+----------------------------------------------------------------------------*/
+
+/**
+**  Calculate the number of icons that can be displayed
+**
+**  @return  Number of icons that can be displayed.
+*/
+static int CalculateVisibleIcons(bool tiles = false)
+{
+	int i,w,h;
 	int x;
 	int count;
+
+	if (tiles) {
+		w = TileSizeX;//+2,
+		h = TileSizeY;//+2
+	} else {
+		w = IconWidth;
+		h = IconHeight;
+	}
 
 	i = 0;
 	count = 0;
 	x = UI.ButtonPanel.Y + 24;
-	while (x < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
+	while (x < UI.ButtonPanel.Y + ButtonPanelHeight - h) {
 		++i;
-		x += IconHeight + 2;
+		x += h + 2;
 	}
 	x = UI.ButtonPanel.X + 10;
-	while (x < UI.ButtonPanel.X + ButtonPanelWidth - IconWidth) {
+	while (x < UI.ButtonPanel.X + ButtonPanelWidth - w) {
 		count += i;
-		x += IconWidth + 8;
+		x += w + 8;
 	}
 	return count;
 }
@@ -431,8 +575,7 @@ static void RecalculateShownUnits(void)
 	}
 
 	if (Editor.UnitIndex >= (int)Editor.ShownUnitTypes.size()) {
-		int count = CalculateUnitIcons();
-		Editor.UnitIndex = Editor.ShownUnitTypes.size() / count * count;
+		Editor.UnitIndex = Editor.ShownUnitTypes.size() / VisibleUnitIcons * VisibleUnitIcons;
 	}
 	// Quick & dirty make them invalid
 	Editor.CursorUnitIndex = -1;
@@ -446,84 +589,15 @@ static void RecalculateShownUnits(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Draw tile icons.
-**
-**  @todo for the start the solid tiles are hardcoded
-**        If we have more solid tiles, than they fit into the panel, we need
-**        some new ideas.
-*/
-static void DrawTileIcons(void)
-{
-	int x;
-	int y;
-	int i;
-
-	x = UI.InfoPanel.X + 46;
-	y = UI.InfoPanel.Y + 4 + IconHeight + 11;
-
-	if (CursorOn == CursorOnButton &&
-			ButtonUnderCursor >= 300 && ButtonUnderCursor < 306) {
-		Video.DrawRectangle(ColorGray, x - 42,
-				y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
-	}
-
-	VideoDrawTextCentered(x, y, GameFont, "1x1");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
-	y += 20;
-	VideoDrawTextCentered(x, y, GameFont, "2x2");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
-	y += 20;
-	VideoDrawTextCentered(x, y, GameFont, "3x3");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
-	y += 20;
-	VideoDrawTextCentered(x, y, GameFont, "4x4");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
-	y += 20;
-	VideoDrawTextCentered(x, y, GameFont, "Random");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
-	y += 20;
-	VideoDrawTextCentered(x, y, GameFont, "Filler");
-	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
-	y += 20;
-
-	y = UI.ButtonPanel.Y + 4;
-	i = 0;
-
-	while (y < UI.ButtonPanel.Y + 100) {
-		x = UI.ButtonPanel.X + 4;
-		while (x < UI.ButtonPanel.X + 144) {
-			if (!Map.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
-				y = UI.ButtonPanel.Y + 100;
-				break;
-			}
-			Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[0x10 + i * 16], x, y);
-			Video.DrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
-			if (TileCursor == i) {
-				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
-
-			}
-			if (CursorOn == CursorOnButton && ButtonUnderCursor == i + 100) {
-				Video.DrawRectangle(ColorWhite, x - 1, y - 1, TileSizeX+2, TileSizeY+2);
-			}
-			x += TileSizeX+2;
-			++i;
-		}
-		y += TileSizeY+2;
-	}
-}
-
-/**
 **  Draw a table with the players
 */
 static void DrawPlayers(void)
 {
-	int x;
-	int y;
 	int i;
 	char buf[256];
 
-	x = UI.InfoPanel.X + 8;
-	y = UI.InfoPanel.Y + 4 + IconHeight + 10;
+	int x = UI.InfoPanel.X + 8;
+	int y = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
 	for (i = 0; i < PlayerMax; ++i) {
 		if (i == PlayerMax / 2) {
@@ -576,6 +650,21 @@ static void DrawPlayers(void)
 	}
 }
 
+extern void DrawPopupUnitInfo(const CUnitType *type, 
+		int player_index, CFont *font,
+		Uint32 backgroundColor, int buttonX, int buttonY);
+
+static void DrawPopup(void) {
+	if (Editor.State == EditorEditUnit && Editor.CursorUnitIndex != -1) {
+		std::string nc, rc;
+		GetDefaultTextColors(nc, rc);
+		DrawPopupUnitInfo(Editor.ShownUnitTypes[Editor.CursorUnitIndex], 
+				Editor.SelectedPlayer, SmallFont, 
+				Video.MapRGB(TheScreen->format, 38, 38, 78),
+				Editor.PopUpX, Editor.PopUpY);
+		SetDefaultTextColors(nc, rc);
+	}
+}
 
 /**
 **  Draw unit icons.
@@ -599,7 +688,7 @@ static void DrawUnitIcons(void)
 	y = UI.ButtonPanel.Y + 24;
 	i = Editor.UnitIndex;
 	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
+		if (i >= (int)Editor.ShownUnitTypes.size()) {
 			break;
 		}
 		x = UI.ButtonPanel.X + 10;
@@ -618,6 +707,8 @@ static void DrawUnitIcons(void)
 			if (i == Editor.CursorUnitIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 					icon->G->Width + 2, icon->G->Height + 2);
+				Editor.PopUpX = x;
+				Editor.PopUpY = y;				
 			}
 
 			x += IconWidth + 8;
@@ -670,6 +761,83 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 }
 
 /**
+**  Draw tile icons.
+**
+**  @todo for the start the solid tiles are hardcoded
+**        If we have more solid tiles, than they fit into the panel, we need
+**        some new ideas.
+*/
+static void DrawTileIcons(void)
+{
+	int x;
+	int y;
+	int i;
+
+	x = UI.InfoPanel.X + 46;
+	y = UI.InfoPanel.Y + 4 + IconHeight + 11;
+
+	if (CursorOn == CursorOnButton &&
+			ButtonUnderCursor >= 300 && ButtonUnderCursor < 306) {
+		Video.DrawRectangle(ColorGray, x - 42,
+				y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
+	}
+
+	VideoDrawTextCentered(x, y, GameFont, "1x1");
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
+	y += 20;
+	VideoDrawTextCentered(x, y, GameFont, "2x2");
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
+	y += 20;
+	VideoDrawTextCentered(x, y, GameFont, "3x3");
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
+	y += 20;
+	VideoDrawTextCentered(x, y, GameFont, "4x4");
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
+	y += 20;
+	VideoDrawTextCentered(x, y, GameFont, "Random");
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
+	y += 20;
+	VideoDrawTextCentered(x, y, GameFont, "Filler");
+	//MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
+	y += 20;
+
+	unsigned int tile;
+	i = Editor.TileIndex;
+	Assert(Editor.TileIndex != -1);
+	y = UI.ButtonPanel.Y + 24;
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - TileSizeY) {
+		if (i >= (int)Editor.ShownTileTypes.size()) {
+			break;
+		}
+		x = UI.ButtonPanel.X + 10;
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - TileSizeX) {
+			if (i >= (int) Editor.ShownTileTypes.size()) {
+				break;
+			}
+			tile = Editor.ShownTileTypes[i];
+
+			Map.TileGraphic->DrawFrameClip(Map.Tileset.Table[tile], x, y);
+			Video.DrawRectangleClip(ColorGray, x, y, TileSizeX, TileSizeY);
+
+			if (i == Editor.SelectedTileIndex) {
+				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
+					TileSizeX-2, TileSizeY-2);
+			}
+			if (i == Editor.CursorTileIndex) {
+				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1, 
+					TileSizeX+2, TileSizeY+2);
+				Editor.PopUpX = x;
+				Editor.PopUpY = y;	
+			}
+
+			x += TileSizeX + 8;
+			++i;
+		}
+		y += TileSizeY + 2;
+	}
+}
+
+/**
 **  Draw the editor panels.
 */
 static void DrawEditorPanel(void)
@@ -682,7 +850,7 @@ static void DrawEditorPanel(void)
 	y = UI.InfoPanel.Y + 4;
 
 	//
-	// Select / Units / Tiles
+	// Select / Units / Tiles / Start
 	//
 	icon = Editor.Select.Icon;
 	Assert(icon);
@@ -805,7 +973,8 @@ static void DrawMapCursor(void)
 						break;
 					}
 					Map.TileGraphic->DrawFrameClip(
-						Map.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
+						Map.Tileset.Table[Editor.ShownTileTypes[Editor.SelectedTileIndex]]
+						, tx, ty);
 				}
 			}
 			Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
@@ -832,24 +1001,26 @@ static void DrawMapCursor(void)
 */
 static void DrawStartLocations(void)
 {
-	int i;
-	int x, y;
-	const CUnitType *type;
+	const CUnitType *type = Editor.StartUnit;
+	for (const CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+		PushClipping();
+		SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
-	type = Editor.StartUnit;
-	for (i = 0; i < PlayerMax; i++) {
-		if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
-			x = CurrentViewport->Map2ViewportX(Players[i].StartX);
-			y = CurrentViewport->Map2ViewportY(Players[i].StartY);
-			if (type) {
-				DrawUnitType(type, type->Sprite, i, 0, x, y);
-			} else {
-				PushClipping();
-				Video.DrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
-				Video.DrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
-				PopClipping();
+		for (int i = 0; i < PlayerMax; i++) {
+			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
+				int x = vp->Map2ViewportX(Players[i].StartX);
+				int y = vp->Map2ViewportY(Players[i].StartY);
+
+				if (type) {
+					DrawUnitType(type, type->Sprite, i, 0, x, y);
+				} else {
+					Video.DrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
+					Video.DrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
+				}
 			}
 		}
+
+		PopClipping();
 	}
 }
 
@@ -874,15 +1045,15 @@ static void DrawEditorInfo(void)
 		y = Viewport2MapY(UI.MouseViewport, CursorY);
 	}
 
-	sprintf(buf, "Editor (%d %d)", x, y);
+	snprintf(buf, sizeof(buf),"Editor (%d %d)", x, y);
 	VideoDrawText(UI.ResourceX + 2, UI.ResourceY + 2, GameFont, buf);
-
+	CMapField *mf = Map.Field(x, y);
 	//
 	// Flags info
 	//
-	flags = Map.Fields[x + y * Map.Info.MapWidth].Flags;
+	flags = mf->Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-		Map.Fields[x + y * Map.Info.MapWidth].Value, flags,
+		mf->Value, flags,
 		flags & MapFieldUnpassable   ? 'u' : '-',
 		flags & MapFieldNoBuilding   ? 'n' : '-',
 		flags & MapFieldHuman        ? 'h' : '-',
@@ -901,7 +1072,7 @@ static void DrawEditorInfo(void)
 	//
 	// Tile info
 	//
-	tile = Map.Fields[x + y * Map.Info.MapWidth].Tile;
+	tile = mf->Tile;
 
 	for (i = 0; i < Map.Tileset.NumTiles; ++i) {
 		if (tile == Map.Tileset.Table[i]) {
@@ -911,7 +1082,7 @@ static void DrawEditorInfo(void)
 
 	Assert(i != Map.Tileset.NumTiles);
 
-	sprintf(buf, "%d %s %s", tile,
+	snprintf(buf, sizeof(buf),"%d %s %s", tile,
 		Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].BaseTerrain].TerrainName,
 		Map.Tileset.Tiles[i].MixTerrain
 			? Map.Tileset.SolidTerrainTypes[Map.Tileset.Tiles[i].MixTerrain].TerrainName
@@ -945,8 +1116,6 @@ static void ShowUnitInfo(const CUnit *unit)
 */
 void EditorUpdateDisplay(void)
 {
-	int i;
-
 	DrawMapArea(); // draw the map area
 
 	DrawStartLocations();
@@ -954,14 +1123,11 @@ void EditorUpdateDisplay(void)
 	//
 	// Fillers
 	//
-	for (i = 0; i < (int)UI.Fillers.size(); ++i) {
-		UI.Fillers[i].G->DrawSub(0, 0,
-			UI.Fillers[i].G->Width,
-			UI.Fillers[i].G->Height,
-			UI.Fillers[i].X, UI.Fillers[i].Y);
+	for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
+		UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
 	}
 
-	if (CursorOn == CursorOnMap && !GamePaused) {
+	if (CursorOn == CursorOnMap && Gui->getTop() == editorContainer && !GamePaused) {
 		DrawMapCursor(); // cursor on map
 	}
 
@@ -987,18 +1153,13 @@ void EditorUpdateDisplay(void)
 	// Info panel
 	//
 	if (UI.InfoPanel.G) {
-		UI.InfoPanel.G->DrawSub(0, 0,
-			UI.InfoPanel.G->Width, UI.InfoPanel.G->Height,
-			UI.InfoPanel.X, UI.InfoPanel.Y);
+		UI.InfoPanel.G->DrawClip(UI.InfoPanel.X, UI.InfoPanel.Y);
 	}
 	//
 	// Button panel
 	//
 	if (UI.ButtonPanel.G) {
-		UI.ButtonPanel.G->DrawSub(0, 0,
-			UI.ButtonPanel.G->Width,
-			UI.ButtonPanel.G->Height, UI.ButtonPanel.X,
-			UI.ButtonPanel.Y);
+		UI.ButtonPanel.G->DrawClip(UI.ButtonPanel.X, UI.ButtonPanel.Y);
 	}
 	DrawEditorPanel();
 
@@ -1012,6 +1173,8 @@ void EditorUpdateDisplay(void)
 	UI.StatusLine.Draw();
 
 	DrawGuichanWidgets();
+
+	DrawPopup();
 
 	DrawCursor();
 
@@ -1058,7 +1221,10 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (GamePaused) {
 		return;
 	}
-
+	if ((button >> MouseHoldShift) != 0) {
+		// Ignore repeated events when holding down a button
+		return;
+	}
 	//
 	// Click on menu button
 	//
@@ -1089,20 +1255,28 @@ static void EditorCallbackButtonDown(unsigned button)
 		switch (ButtonUnderCursor) {
 			case SelectButton :
 				Editor.State = EditorSelecting;
+				editorUnitSlider->setVisible(false);
 				editorSlider->setVisible(false);
 				return;
 			case UnitButton:
 				Editor.State = EditorEditUnit;
-				editorSlider->setVisible(true);
+		 		if (VisibleUnitIcons < (int)Editor.ShownUnitTypes.size()) {
+					editorUnitSlider->setVisible(true);
+				}
+				editorSlider->setVisible(false);
 				return;
 			case TileButton :
 				if (EditorEditTile) {
 					Editor.State = EditorEditTile;
 				}
-				editorSlider->setVisible(false);
+				editorUnitSlider->setVisible(false);
+		 		if (VisibleTileIcons < (int)Editor.ShownTileTypes.size()) {
+					editorSlider->setVisible(true);
+				}	
 				return;
 			case StartButton:
 				Editor.State = EditorSetStartLocation;
+				editorUnitSlider->setVisible(false);
 				editorSlider->setVisible(false);
 				return;
 			default:
@@ -1112,32 +1286,33 @@ static void EditorCallbackButtonDown(unsigned button)
 	//
 	// Click on tile area
 	//
-	if (CursorOn == CursorOnButton && ButtonUnderCursor >= 100 &&
-			Editor.State == EditorEditTile) {
-		switch (ButtonUnderCursor) {
-			case 300:
-				TileCursorSize = 1;
-				return;
-			case 301:
-				TileCursorSize = 2;
-				return;
-			case 302:
-				TileCursorSize = 3;
-				return;
-			case 303:
-				TileCursorSize = 4;
-				return;
-			case 304:
-				TileToolRandom ^= 1;
-				return;
-			case 305:
-				TileToolDecoration ^= 1;
-				return;
+	if (Editor.State == EditorEditTile) {
+		if(CursorOn == CursorOnButton && ButtonUnderCursor >= 100) {
+			switch (ButtonUnderCursor) {
+				case 300:
+					TileCursorSize = 1;
+					return;
+				case 301:
+					TileCursorSize = 2;
+					return;
+				case 302:
+					TileCursorSize = 3;
+					return;
+				case 303:
+					TileCursorSize = 4;
+					return;
+				case 304:
+					TileToolRandom ^= 1;
+					return;
+				case 305:
+					TileToolDecoration ^= 1;
+					return;
+			}
 		}
-		if (Map.Tileset.Tiles[16 + (ButtonUnderCursor - 100) * 16].BaseTerrain) {
-			TileCursor = ButtonUnderCursor - 100;
+		if (Editor.CursorTileIndex != -1) {
+			Editor.SelectedTileIndex = Editor.CursorTileIndex;
+			return;
 		}
-		return;
 	}
 
 	// Click on player area
@@ -1178,9 +1353,22 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on map area
 	//
 	if (CursorOn == CursorOnMap) {
-		CViewport *vp;
-
-		vp = GetViewport(CursorX, CursorY);
+	
+		if (MouseButtons & RightButton) {
+			if (Editor.State == EditorEditUnit &&
+				 Editor.SelectedUnitIndex != -1) {
+				 Editor.SelectedUnitIndex = -1;
+				 CursorBuilding = NULL;
+				 return;
+			} else if (Editor.State == EditorEditTile &&
+					 Editor.SelectedTileIndex != -1) {
+				 	Editor.SelectedTileIndex = -1;
+				 	CursorBuilding = NULL;
+				 	return;
+				}
+		}	
+	
+		CViewport *vp = GetViewport(CursorX, CursorY);
 		Assert(vp);
 		if ((MouseButtons & LeftButton) && UI.SelectedViewport != vp) {
 			// viewport changed
@@ -1188,19 +1376,20 @@ static void EditorCallbackButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & LeftButton) {
+			int tileX = UI.MouseViewport->Viewport2MapX(CursorX);
+			int tileY = UI.MouseViewport->Viewport2MapY(CursorY);				
+
 			if (Editor.State == EditorEditTile) {
-				EditTiles(UI.MouseViewport->Viewport2MapX(CursorX),
-					UI.MouseViewport->Viewport2MapY(CursorY), TileCursor,
+				EditTiles(tileX, tileY, 
+					Editor.ShownTileTypes[Editor.SelectedTileIndex],
 					TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, CursorBuilding,
-							UI.MouseViewport->Viewport2MapX(CursorX),
-							UI.MouseViewport->Viewport2MapY(CursorY), 1)) {
+							tileX, tileY, 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess.Sound,
 							MaxSampleVolume);
-						EditUnit(UI.MouseViewport->Viewport2MapX(CursorX),
-							UI.MouseViewport->Viewport2MapY(CursorY),
+						EditorPlaceUnit(tileX, tileY,
 							CursorBuilding, Players + Editor.SelectedPlayer);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
@@ -1211,8 +1400,8 @@ static void EditorCallbackButtonDown(unsigned button)
 					}
 				}
 			} else if (Editor.State == EditorSetStartLocation) {
-				Players[Editor.SelectedPlayer].StartX = UI.MouseViewport->Viewport2MapX(CursorX);
-				Players[Editor.SelectedPlayer].StartY = UI.MouseViewport->Viewport2MapY(CursorY);
+				Players[Editor.SelectedPlayer].StartX = tileX;
+				Players[Editor.SelectedPlayer].StartY = tileY;
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1287,16 +1476,26 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				  }
 			}
 			break;
+		case 'x': // ALT+X, CTRL+X: Exit editor
+			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				break;
+			}
+			Exit(0);
+
+		case 'z':
+			if (KeyModifiers & ModifierControl) {
+				EditorUndoAction();
+			}
+			break;
+		case 'y':
+			if (KeyModifiers & ModifierControl) {
+				EditorRedoAction();
+			}
+			break;
 
 		case SDLK_DELETE: // Delete
 			if (UnitUnderCursor) {
-				CUnit *unit = UnitUnderCursor;
-
-				unit->Remove(NULL);
-				UnitLost(unit);
-				UnitClearOrders(unit);
-				unit->Release();
-				UI.StatusLine.Set(_("Unit deleted"));
+				EditorRemoveUnit(UnitUnderCursor);
 			}
 			break;
 
@@ -1329,6 +1528,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			if (UnitUnderCursor && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(&Players[(int) key - '1']);
 				UI.StatusLine.Set(_("Unit owner modified"));
+				UpdateMinimap = true;
 			}
 			break;
 
@@ -1376,8 +1576,20 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-static void EditorCallbackKey3(unsigned dummy1, unsigned dummy2)
+static void EditorCallbackKeyRepeated(unsigned key, unsigned keychar)
 {
+	switch (key) {
+		case 'z':
+			if (KeyModifiers & ModifierControl) {
+				EditorUndoAction();
+			}
+			break;
+		case 'y':
+			if (KeyModifiers & ModifierControl) {
+				EditorRedoAction();
+			}
+			break;
+	}
 }
 
 /**
@@ -1480,18 +1692,18 @@ static void EditorCallbackMouse(int x, int y)
 		//
 		RestrictCursorToViewport();
 
+		int tileX = UI.SelectedViewport->Viewport2MapX(CursorX);
+		int tileY = UI.SelectedViewport->Viewport2MapY(CursorY);
+
 		if (Editor.State == EditorEditTile) {
-			EditTiles(UI.SelectedViewport->Viewport2MapX(CursorX),
-				UI.SelectedViewport->Viewport2MapY(CursorY), TileCursor,
+			EditTiles(tileX, tileY,
+				Editor.ShownTileTypes[Editor.SelectedTileIndex],
 				TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
-				if (CanBuildUnitType(NULL, CursorBuilding,
-					UI.SelectedViewport->Viewport2MapX(CursorX),
-					UI.SelectedViewport->Viewport2MapY(CursorY), 1)) {
-					EditUnit(UI.SelectedViewport->Viewport2MapX(CursorX),
-						UI.SelectedViewport->Viewport2MapY(CursorY),
-						CursorBuilding, Players + Editor.SelectedPlayer);
+				if (CanBuildUnitType(NULL, CursorBuilding, tileX, tileY, 1)) {
+					EditorPlaceUnit(tileX, tileY, CursorBuilding,
+					Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
 				}
@@ -1521,6 +1733,7 @@ static void EditorCallbackMouse(int x, int y)
 	CursorOn = CursorOnUnknown;
 	Editor.CursorPlayer = -1;
 	Editor.CursorUnitIndex = -1;
+	Editor.CursorTileIndex = -1;
 	ButtonUnderCursor = -1;
 
 	//
@@ -1551,7 +1764,7 @@ static void EditorCallbackMouse(int x, int y)
 			}
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
 				if (Map.Info.PlayerType[i] != PlayerNobody) {
-					sprintf(buf,"Select player #%d",i);
+					snprintf(buf,sizeof(buf),"Select player #%d",i);
 					UI.StatusLine.Set(buf);
 				} else {
 					UI.StatusLine.Clear();
@@ -1569,17 +1782,17 @@ static void EditorCallbackMouse(int x, int y)
 		i = Editor.UnitIndex;
 		by = UI.ButtonPanel.Y + 24;
 		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - IconHeight) {
-			if (i >= (int) Editor.ShownUnitTypes.size()) {
+			if (i >= (int)Editor.ShownUnitTypes.size()) {
 				break;
 			}
 			bx = UI.ButtonPanel.X + 10;
 			while (bx < UI.ButtonPanel.X + 146) {
-				if (i >= (int) Editor.ShownUnitTypes.size()) {
+				if (i >= (int)Editor.ShownUnitTypes.size()) {
 					break;
 				}
 				if (bx < x && x < bx + IconWidth &&
 						by < y && y < by + IconHeight) {
-					sprintf(buf,"%s \"%s\"",
+					snprintf(buf,sizeof(buf),"%s \"%s\"",
 						Editor.ShownUnitTypes[i]->Ident.c_str(),
 						Editor.ShownUnitTypes[i]->Name.c_str());
 					UI.StatusLine.Set(buf);
@@ -1613,32 +1826,31 @@ static void EditorCallbackMouse(int x, int y)
 			}
 			++i;
 			by += 20;
-		}
-
-		i = 0;
-		by = UI.ButtonPanel.Y + 4;
-		while (by < UI.ButtonPanel.Y + 100) {
-			bx = UI.ButtonPanel.X + 4;
-			while (bx < UI.ButtonPanel.X + 144) {
-				if (!Map.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
-					by = UI.ButtonPanel.Y + 100;
+		}	
+	
+		i = Editor.TileIndex;
+		by = UI.ButtonPanel.Y + 24;
+		while (by < UI.ButtonPanel.Y + ButtonPanelHeight - TileSizeY) {
+			if (i >= (int)Editor.ShownTileTypes.size()) {
+				break;
+			}
+			bx = UI.ButtonPanel.X + 10;
+			while (bx < UI.ButtonPanel.X + ButtonPanelWidth - TileSizeX) {
+			//while (bx < UI.ButtonPanel.X + 144) {
+				if (i >= (int)Editor.ShownTileTypes.size()) {
 					break;
 				}
 				if (bx < x && x < bx + TileSizeX &&
 						by < y && y < by + TileSizeY) {
-					int j;
-
-					// FIXME: i is wrong, must find the solid type
-					j = Map.Tileset.Tiles[i * 16 + 16].BaseTerrain;
-					//MAPTODO UI.StatusLine.Set(Map.Tileset.SolidTerrainTypes[j].TerrainName);
-					ButtonUnderCursor = i + 100;
-					CursorOn = CursorOnButton;
+					int base = Map.Tileset.Tiles[Editor.ShownTileTypes[i]].BaseTerrain;
+					UI.StatusLine.Set(Map.Tileset.SolidTerrainTypes[base].TerrainName);
+					Editor.CursorTileIndex = i;
 					return;
 				}
-				bx += TileSizeX+2;
-				++i;
+				bx += TileSizeX + 8;
+				i++;
 			}
-			by += TileSizeY+2;
+			by += TileSizeY + 2;
 		}
 	}
 
@@ -1646,9 +1858,9 @@ static void EditorCallbackMouse(int x, int y)
 	// Handle buttons
 	//
 	if (UI.InfoPanel.X + 4 < CursorX &&
-			CursorX < UI.InfoPanel.X + 4 + IconWidth + 7 &&
+			CursorX < UI.InfoPanel.X + 4 + Editor.Select.Icon->G->Width &&
 			UI.InfoPanel.Y + 4 < CursorY &&
-			CursorY < UI.InfoPanel.Y + 4 + IconHeight + 7) {
+			CursorY < UI.InfoPanel.Y + 4 + Editor.Select.Icon->G->Width) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -1657,9 +1869,9 @@ static void EditorCallbackMouse(int x, int y)
 		return;
 	}
 	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorX &&
-			CursorX < UI.InfoPanel.X + 4 + UNIT_ICON_X + IconWidth + 7 &&
+			CursorX < UI.InfoPanel.X + 4 + UNIT_ICON_X + Editor.Units.Icon->G->Width &&
 			UI.InfoPanel.Y + 4 + UNIT_ICON_Y < CursorY &&
-			CursorY < UI.InfoPanel.Y + 4 + UNIT_ICON_Y + IconHeight + 7) {
+			CursorY < UI.InfoPanel.Y + 4 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
@@ -1678,10 +1890,15 @@ static void EditorCallbackMouse(int x, int y)
 			return;
 		}
 	}
+	
+	int StartUnitWidth = Editor.StartUnit ? 
+			Editor.StartUnit->Icon.Icon->G->Width : TileSizeX + 7;
+	int StartUnitHeight = Editor.StartUnit ? 
+			Editor.StartUnit->Icon.Icon->G->Height : TileSizeY + 7;
 	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorX &&
-			CursorX < UI.InfoPanel.X + 4 + START_ICON_X + TileSizeX + 7 &&
+			CursorX < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth &&
 			UI.InfoPanel.Y + 4 + START_ICON_Y < CursorY &&
-			CursorY < UI.InfoPanel.Y + 4 + START_ICON_Y + TileSizeY + 7) {
+			CursorY < UI.InfoPanel.Y + 4 + START_ICON_Y + StartUnitHeight) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
@@ -1715,9 +1932,7 @@ static void EditorCallbackMouse(int x, int y)
 	UnitUnderCursor = NULL;
 	if (x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
 			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
-		CViewport *vp;
-
-		vp = GetViewport(x, y);
+		CViewport *vp = GetViewport(x, y);
 		Assert(vp);
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
@@ -1757,6 +1972,27 @@ static void EditorCallbackMouse(int x, int y)
 */
 static void EditorCallbackExit(void)
 {
+}
+
+/**
+**  Create the tile icons
+*/
+static void CreateTileIcons(void)
+{
+	for(int i = 0; 0x10 + i < Map.Tileset.NumTiles; i+=16) {
+		TileInfo *info = &Map.Tileset.Tiles[0x10 + i];
+		if (info->BaseTerrain && !info->MixTerrain) {
+			Editor.ShownTileTypes.push_back(0x10 + i);			
+		}
+	}	
+}
+
+/**
+**  Clean up the tile icons
+*/
+static void CleanTileIcons(void)
+{
+	Editor.ShownTileTypes.clear();
 }
 
 /**
@@ -1831,11 +2067,15 @@ void CEditor::Init(void)
 			// Set SelectedPlayer to a valid player
 			if (Editor.SelectedPlayer == PlayerNumNeutral) {
 				Editor.SelectedPlayer = i;
+				break;
 			}
 		}
 	}
+	ButtonPanelWidth = 170;//200;
+	ButtonPanelHeight = 160 + (Video.Height - 480);
 
 	CalculateMaxIconSize();
+	VisibleUnitIcons = CalculateVisibleIcons();
 
 	if (!StartUnitName.empty()) {
 		StartUnit = UnitTypeByIdent(StartUnitName);
@@ -1845,10 +2085,13 @@ void CEditor::Init(void)
 	Units.Icon = NULL;
 	Units.Load();
 
+	CreateTileIcons();
+	VisibleTileIcons = CalculateVisibleIcons(true);
+	
 	RecalculateShownUnits();
 
-	ButtonPanelWidth = 200;
-	ButtonPanelHeight = 144;
+	EditorUndoActions.clear();
+	EditorRedoActions.clear();
 
 	EditorCallbacks.ButtonPressed = EditorCallbackButtonDown;
 	EditorCallbacks.ButtonReleased = EditorCallbackButtonUp;
@@ -1856,7 +2099,7 @@ void CEditor::Init(void)
 	EditorCallbacks.MouseExit = EditorCallbackExit;
 	EditorCallbacks.KeyPressed = EditorCallbackKeyDown;
 	EditorCallbacks.KeyReleased = EditorCallbackKeyUp;
-	EditorCallbacks.KeyRepeated = EditorCallbackKey3;
+	EditorCallbacks.KeyRepeated = EditorCallbackKeyRepeated;
 	EditorCallbacks.NetworkEvent = NetworkEvent;
 }
 
@@ -1871,13 +2114,13 @@ void CEditor::Init(void)
 **         At least two players, one human slot, every player a startpoint
 **         ...
 */
-int EditorSaveMap(const char *file)
+int EditorSaveMap(const std::string &file)
 {
-	char path[PATH_MAX];
+	std::string fullName;
 
-	sprintf(path, "%s/%s", StratagusLibPath.c_str(), file);
-	if (SaveStratagusMap(path, &Map, Editor.TerrainEditable) == -1) {
-		printf("Cannot save map\n");
+	fullName = StratagusLibPath + "/" + file;
+	if (SaveStratagusMap(fullName, &Map, Editor.TerrainEditable) == -1) {
+		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
 
@@ -1893,10 +2136,11 @@ int EditorSaveMap(const char *file)
 */
 void EditorMainLoop(void)
 {
-	int OldCommandLogDisabled = CommandLogDisabled;
+	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();
+	bool first_init = true;
 
-	CommandLogDisabled = 1;
+	CommandLogDisabled = true;
 	SetCallbacks(&EditorCallbacks);
 
 	gcn::Widget *oldTop = Gui->getTop();
@@ -1906,17 +2150,24 @@ void EditorMainLoop(void)
 	editorContainer->setOpaque(false);
 	Gui->setTop(editorContainer);
 
+	editorUnitSliderListener = new EditorUnitSliderListener();
 	editorSliderListener = new EditorSliderListener();
 
+	editorUnitSlider = new gcn::Slider();
+	editorUnitSlider->setBaseColor(gcn::Color(38, 38, 78));
+	editorUnitSlider->setForegroundColor(gcn::Color(200, 200, 120));
+	editorUnitSlider->setBackgroundColor(gcn::Color(200, 200, 120));
+	editorUnitSlider->setVisible(false);
+	editorUnitSlider->addActionListener(editorUnitSliderListener);
+
 	editorSlider = new gcn::Slider();
-	editorSlider->setBaseColor(gcn::Color(38, 38, 78, 130));
+	editorSlider->setBaseColor(gcn::Color(38, 38, 78));
 	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setBackgroundColor(gcn::Color(200, 200, 120));
-	editorSlider->setSize(176, 16);
 	editorSlider->setVisible(false);
 	editorSlider->addActionListener(editorSliderListener);
 
-	editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+	UpdateMinimap = true;
 
 	while (1) {
 		Editor.MapLoaded = false;
@@ -1924,6 +2175,13 @@ void EditorMainLoop(void)
 
 		Editor.Init();
 
+		if(first_init) {
+			first_init = false;
+			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
+			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
+			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);
+			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y + 4);			
+		}
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;
 
@@ -1938,7 +2196,12 @@ void EditorMainLoop(void)
 		while (Editor.Running) {
 			CheckMusicFinished();
 
-			UI.Minimap.Update();
+			if (FrameCounter % FRAMES_PER_SECOND == 0) {
+				if (UpdateMinimap) {
+					UI.Minimap.Update();
+					UpdateMinimap = false;
+				}
+			}
 
 			EditorUpdateDisplay();
 
@@ -1981,7 +2244,9 @@ void EditorMainLoop(void)
 	SetCallbacks(old_callbacks);
 	Gui->setTop(oldTop);
 	delete editorContainer;
+	delete editorUnitSliderListener;
 	delete editorSliderListener;
+	delete editorUnitSlider;
 	delete editorSlider;
 }
 
@@ -1992,6 +2257,9 @@ void EditorMainLoop(void)
 */
 void StartEditor(const char *filename)
 {
+	std::string nc, rc;
+
+	GetDefaultTextColors(nc, rc);
 	if (filename) {
 		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
 			filename = NULL;
@@ -2014,8 +2282,11 @@ void StartEditor(const char *filename)
 
 	Editor.TerrainEditable = true;
 
+	CleanTileIcons();
 	CleanGame();
 	CleanPlayers();
+
+	SetDefaultTextColors(nc, rc);
 }
 
 //@}

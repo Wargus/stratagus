@@ -349,6 +349,125 @@ static int DrawPopupCosts(int x, int y, const CFont *font, const int *Costs)
 	return x;
 }
 
+void DrawPopupUnitInfo(const CUnitType *type, 
+		int player_index, CFont *font, Uint32 backgroundColor,
+		int buttonX, int buttonY) {
+
+	const CGraphic *G;
+	const CUnitStats *stats = &type->Stats[player_index];
+	
+	//detect max Height	
+	int popupHeight = 85;//
+	if (type->CanAttack) {
+		popupHeight += 30;
+	}
+
+	//detect max Width	
+	int popupWidth = GetPopupCostsWidth(font, stats->Costs);
+	if(type->Demand) {
+		if(UI.Resources[FoodCost].IconWidth != -1)
+		{
+			popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
+		} else {
+			G = UI.Resources[FoodCost].G;
+			if (G) {
+				popupWidth += (G->Width + 5);
+			}
+		}
+		popupWidth += (font->Width(type->Demand) + 5);
+	}
+	popupWidth += 10;
+	if(popupWidth < 120)
+		popupWidth = 120;
+		
+	int start_x = std::min(buttonX, Video.Width - 1 - popupWidth);
+	int y = buttonY - popupHeight - 10;
+	int x = start_x;
+
+	//SetDefaultTextColors("black", "red");
+	SetDefaultTextColors("white", "red");
+
+	// Background
+	Video.FillTransRectangle(backgroundColor, x, y,
+										 popupWidth, popupHeight, 128);
+	Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
+
+	// Name
+	VideoDrawText(x + 5, y + 5, font, type->Name);
+	Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
+
+	y += 20;
+
+	// Costs
+	x = DrawPopupCosts(x + 5, y, font,  stats->Costs);
+
+	if(type->Demand) {
+			int y_offset = 0;
+			G = UI.Resources[FoodCost].G;
+			if (G) {
+				int x_offset = UI.Resources[FoodCost].IconWidth;
+				G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
+				x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
+				y_offset = G->Height;
+				y_offset -= font->Height();
+				y_offset /= 2;
+			}
+			VideoDrawNumber(x, y + y_offset, font, type->Demand );
+			//x += 5;
+	}
+
+	y += 20;//15;
+	x = start_x;
+
+	// Hit Points
+	{
+		std::ostringstream hitPoints;
+		hitPoints << "Hit Points: " << type->Variable[HP_INDEX].Value;
+		VideoDrawText(x + 5, y, font, hitPoints.str());
+		y += 15;
+	}
+
+	if (type->CanAttack) {
+		// Damage
+		int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
+		int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value +
+			 type->Variable[BASICDAMAGE_INDEX].Value;
+		std::ostringstream damage;
+		damage << "Damage: " << min_damage << "-" << max_damage;
+		VideoDrawText(x + 5, y, font, damage.str());
+		y += 15;
+
+		// Attack Range
+		std::ostringstream attackRange;
+		attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
+		VideoDrawText(x + 5, y, font, attackRange.str());
+		y += 15;
+	}
+
+	// Armor
+	{
+		std::ostringstream armor;
+		armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
+		VideoDrawText(x + 5, y, font, armor.str());
+		y += 15;
+	}
+
+	if (type->Variable[RADAR_INDEX].Value) {
+		// Radar Range
+		std::ostringstream radarRange;
+		radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
+		VideoDrawText(x + 5, y, font, radarRange.str());
+	} else {
+		// Sight Range
+		std::ostringstream sightRange;
+		sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
+		VideoDrawText(x + 5, y, font, sightRange.str());
+	}
+	//y += 15;
+
+
+}
+
 /**
 **  Draw popup
 */
@@ -467,118 +586,9 @@ static void DrawPopup()
 		case ButtonBuild: 	
 		case ButtonTrain:
 		case ButtonUpgradeTo:
-		{
-			const CUnitType *type = UnitTypes[button->Value];
-			const CUnitStats *stats = &type->Stats[ThisPlayer->Index];
-			const CGraphic *G;
-	
-			//detect max Width
-			popupWidth = GetPopupCostsWidth(font, stats->Costs);
-			if(type->Demand) {
-				if(UI.Resources[FoodCost].IconWidth != -1)
-				{
-					popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
-				} else {
-					G = UI.Resources[FoodCost].G;
-					if (G) {
-						popupWidth += (G->Width + 5);
-					}
-				}
-				popupWidth += (font->Width(type->Demand) + 5);
-			}
-			popupWidth += 10;
-			if(popupWidth < 120)
-				popupWidth = 120;
-			popupHeight = 85;//
-			if (type->CanAttack) {
-				popupHeight += 30;
-			}
-			
-			start_x = std::min(uibutton->X, Video.Width - 1 - popupWidth);
-			y = uibutton->Y - popupHeight - 10;
-			x = start_x;
-
-			//SetDefaultTextColors("black", "red");
-			SetDefaultTextColors("white", "red");
-
-			// Background
-			Video.FillTransRectangle(backgroundColor, x, y,
-												 popupWidth, popupHeight, 128);
-			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
-
-			// Name
-			VideoDrawText(x + 5, y + 5, font, type->Name);
-			Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
-
-			y += 20;
-
-			// Costs
-			x = DrawPopupCosts(x + 5, y, font,  stats->Costs);
-	
-			if(type->Demand) {
-					int y_offset = 0;
-					G = UI.Resources[FoodCost].G;
-					if (G) {
-						int x_offset = UI.Resources[FoodCost].IconWidth;
-						G->DrawFrameClip(UI.Resources[FoodCost].IconFrame, x, y);
-						x += ( (x_offset != -1 ? x_offset : G->Width) + 5 );
-						y_offset = G->Height;
-						y_offset -= font_height;
-						y_offset /= 2;
-					}
-					VideoDrawNumber(x, y + y_offset, font, type->Demand );
-					//x += 5;
-			}
-	
-			y += 20;//15;
-			x = start_x;
-	
-			// Hit Points
-			{
-				std::ostringstream hitPoints;
-				hitPoints << "Hit Points: " << type->Variable[HP_INDEX].Value;
-				VideoDrawText(x + 5, y, font, hitPoints.str());
-				y += 15;
-			}
-	
-			if (type->CanAttack) {
-				// Damage
-				int min_damage = std::max(1, type->Variable[PIERCINGDAMAGE_INDEX].Value / 2);
-				int max_damage = type->Variable[PIERCINGDAMAGE_INDEX].Value +
-					 type->Variable[BASICDAMAGE_INDEX].Value;
-				std::ostringstream damage;
-				damage << "Damage: " << min_damage << "-" << max_damage;
-				VideoDrawText(x + 5, y, font, damage.str());
-				y += 15;
-
-				// Attack Range
-				std::ostringstream attackRange;
-				attackRange << "Attack Range: " << type->Variable[ATTACKRANGE_INDEX].Value;
-				VideoDrawText(x + 5, y, font, attackRange.str());
-				y += 15;
-			}
-
-			// Armor
-			{
-				std::ostringstream armor;
-				armor << "Armor: " << type->Variable[ARMOR_INDEX].Value;
-				VideoDrawText(x + 5, y, font, armor.str());
-				y += 15;
-			}
-	
-			if (type->Variable[RADAR_INDEX].Value) {
-				// Radar Range
-				std::ostringstream radarRange;
-				radarRange << "Radar Range: " << type->Variable[RADAR_INDEX].Value;
-				VideoDrawText(x + 5, y, font, radarRange.str());
-			} else {
-				// Sight Range
-				std::ostringstream sightRange;
-				sightRange << "Sight Range: " << type->Variable[SIGHTRANGE_INDEX].Value;
-				VideoDrawText(x + 5, y, font, sightRange.str());
-			}
-			//y += 15;
-		}
+			DrawPopupUnitInfo(UnitTypes[button->Value], 
+				ThisPlayer->Index, font, backgroundColor,
+				uibutton->X, uibutton->Y);
 		break;
 
 

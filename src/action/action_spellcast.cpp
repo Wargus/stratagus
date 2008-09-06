@@ -180,13 +180,15 @@ void HandleActionSpellCast(CUnit *unit)
 				return;
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
-			NewResetPath(unit);
+			if (!spell->IsCasterOnly()) {
+				NewResetPath(unit);
+			}
 			unit->ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			unit->SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
 			spell = order->Arg1.Spell;
-			if (spell->Range != INFINITE_RANGE) {
+			if (spell->Range && spell->Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
 			} else {
@@ -195,7 +197,7 @@ void HandleActionSpellCast(CUnit *unit)
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
 			// FIXME: should use AnimateActionSpellCast here
-			if (unit->Type->Animations->Attack) {
+			if (unit->Type->Animations->Attack && !spell->IsCasterOnly()) {
 				flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 				if (unit->Anim.Unbreakable) { // end of animation
 					return;
@@ -203,7 +205,7 @@ void HandleActionSpellCast(CUnit *unit)
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
 				CUnit *goal = order->GetGoal();
-				if (goal && !goal->IsVisibleAsGoal(unit->Player)) {
+				if (goal && goal != unit && !goal->IsVisibleAsGoal(unit->Player)) {
 					unit->ReCast = 0;
 				} else {
 					spell = order->Arg1.Spell;

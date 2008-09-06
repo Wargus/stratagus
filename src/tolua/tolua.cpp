@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.92 on Mon Aug 25 16:48:57 2008.
+** Generated automatically by tolua++-1.0.92 on Wed Sep  3 21:32:27 2008.
 */
 
 #ifndef __cplusplus
@@ -16561,20 +16561,21 @@ static int tolua_stratagus_EditorSaveMap00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* filename = ((const char*)  tolua_tostring(tolua_S,1,0));
+  const std::string file = ((const std::string)  tolua_tocppstring(tolua_S,1,0));
   {
-   int tolua_ret = (int)  EditorSaveMap(filename);
+   int tolua_ret = (int)  EditorSaveMap(file);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)file);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'EditorSaveMap'.",&tolua_err);

@@ -62,9 +62,10 @@ class CEditor {
 public:
 	CEditor() : TerrainEditable(true),
 		StartUnit(NULL),
-		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
+		UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1), 
+		TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
 		CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
-		MapLoaded(false), WriteCompressedMaps(true)
+		MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
 		{};
 	~CEditor() {};
 
@@ -75,6 +76,7 @@ public:
 
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
+	std::vector<unsigned int> ShownTileTypes;        /// Shown editor tile-type table.
 
 	bool TerrainEditable;        /// Is the terrain editable ?
 	IconConfig Select;           /// Editor's select icon.
@@ -86,6 +88,10 @@ public:
 	int CursorUnitIndex;         /// Unit icon under cursor.
 	int SelectedUnitIndex;       /// Unit type to draw.
 
+	int TileIndex;              /// tile icon draw index.
+	int CursorTileIndex;		/// tile icon under cursor.
+	int SelectedTileIndex;       /// tile type to draw.
+	
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
 
@@ -95,6 +101,10 @@ public:
 	EditorRunningType Running;   /// Editor is running
 
 	EditorStateType State;       /// Current editor state
+	
+	int PopUpX;
+	int PopUpY;
+	
 };
 
 /*----------------------------------------------------------------------------
@@ -118,7 +128,7 @@ extern void EditorMainLoop(void);
 extern void EditorUpdateDisplay(void);
 
 	/// Save a map from editor
-extern int EditorSaveMap(const char *file);
+extern int EditorSaveMap(const std::string &file);
 
 	/// Register ccl features
 extern void EditorCclRegister(void);

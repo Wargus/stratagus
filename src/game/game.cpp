@@ -377,7 +377,7 @@ static void LoadMap(const char *filename, CMap *map)
 		}
 	}
 
-	fprintf(stderr, "Unrecognized map format\n");
+	fprintf(stderr, "%s : Unrecognized map format\n", filename ? filename : "NULL");
 	ExitFatal(-1);
 }
 
@@ -557,6 +557,9 @@ static void GameTypeManTeamVsMachine(void)
 /*----------------------------------------------------------------------------
 --  Game creation
 ----------------------------------------------------------------------------*/
+static inline bool IsStringEmpty(const char*const name) {
+	return !(name && *name != '\0');
+}
 
 /**
 **  CreateGame.
@@ -582,7 +585,7 @@ void CreateGame(const char *filename, CMap *map)
 	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 
-	if (Map.Info.Filename.empty() && filename) {
+	if (Map.Info.Filename.empty() && !IsStringEmpty(filename)) {
 		char path[PATH_MAX];
 
 		Assert(filename);
@@ -601,7 +604,7 @@ void CreateGame(const char *filename, CMap *map)
 		CreatePlayer(playertype);
 	}
 
-	if (filename) {
+	if (!IsStringEmpty(filename)) {
 		if (CurrentMapPath != filename) {
 			strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename);
 		}
