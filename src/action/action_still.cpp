@@ -351,7 +351,7 @@ void ActionStillGeneric(CUnit *unit, bool stand_ground)
 {
 	// If unit is not bunkered and removed, wait
 	if (unit->Removed && (!unit->Container ||
-			!unit->Container->Type->CanTransport ||
+			!unit->Container->Type->CanTransport() ||
 			!unit->Container->Type->AttackFromTransporter ||
 			unit->Type->Missile.Missile->Class == MissileClassNone)) {
 		// If unit is in building or transporter it is removed.

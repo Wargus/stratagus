@@ -110,8 +110,7 @@ CUnitType::CUnitType() :
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 	CanCastSpell(NULL), AutoCastActive(NULL),
 	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),
-	CanTransport(NULL), MaxOnBoard(0),
-	StartingResources(0),
+	MaxOnBoard(0), StartingResources(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0),
 	MouseAction(0), Points(0), CanTarget(0),
 	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
@@ -121,8 +120,7 @@ CUnitType::CUnitType() :
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-	Indestructible(0), Teleporter(0),
-	BoolFlag(NULL), Variable(NULL), CanTargetFlag(NULL),
+	Indestructible(0), Teleporter(0), Variable(NULL), 
 	GivesResource(0), Supply(0), Demand(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
@@ -142,10 +140,8 @@ CUnitType::~CUnitType()
 	delete DeathExplosion;
 
 	delete[] Variable;
-	delete[] BoolFlag;
-	delete[] CanTargetFlag;
-	delete[] CanTransport;
-
+	BoolFlag.clear();
+	
 	for (int i = 0; i < PlayerMax; ++i) {
 		delete[] Stats[i].Variables;
 	}
@@ -187,6 +183,18 @@ CUnitType::~CUnitType()
 
 }
 
+
+bool CUnitType::CheckUserBoolFlags(char *BoolFlags) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
+		if (BoolFlags[i] != CONDITION_TRUE && 
+			((BoolFlags[i] == CONDITION_ONLY) ^ (BoolFlag[i].value))) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
 /**
 **  Update the player stats for changed unit types.
 **  @param reset indicates wether default value should be set to each stat (level, upgrades)
@@ -209,11 +217,9 @@ void UpdateStats(int reset)
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (!stats->Variables) {
-					stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
+					stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 				}
-				for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-					stats->Variables[i] = type->Variable[i];
-				}
+				memcpy(stats->Variables, type->Variable, UnitTypeVar.GetNumberVariable() * sizeof(*type->Variable));
 			}
 		}
 
@@ -235,7 +241,7 @@ void UpdateStats(int reset)
 					MapFieldAirUnit; // already occuppied
 				break;
 			case UnitTypeNaval:                             // on water
-				if (type->CanTransport) {
+				if (type->CanTransport()) {
 					type->MovementMask =
 						MapFieldLandUnit |
 						MapFieldSeaUnit |
@@ -319,9 +325,9 @@ static void SaveUnitStats(const CUnitStats *stats, const std::string &ident, int
 {
 	Assert(plynr < PlayerMax);
 	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident.c_str(), plynr);
-	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
-			UnitTypeVar.VariableName[i], stats->Variables[i].Value,
+			UnitTypeVar.VariableNameLookup[i], stats->Variables[i].Value,
 			stats->Variables[i].Max, stats->Variables[i].Increase,
 			stats->Variables[i].Enable ? ", Enable = true" : "");
 	}
@@ -380,6 +386,7 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 CUnitType *NewUnitTypeSlot(const std::string &ident)
 {
 	CUnitType *type;
+	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
 
 	type = new CUnitType;
 	if (!type) {
@@ -388,14 +395,12 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 	}
 	type->Slot = UnitTypes.size();
 	type->Ident = ident;
-	type->BoolFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
-	memset(type->BoolFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
-	type->CanTargetFlag = new unsigned char[UnitTypeVar.NumberBoolFlag];
-	memset(type->CanTargetFlag, 0, UnitTypeVar.NumberBoolFlag * sizeof(unsigned char));
-	type->Variable = new CVariable[UnitTypeVar.NumberVariable];
-	memcpy(type->Variable, UnitTypeVar.Variable,
-		UnitTypeVar.NumberVariable * sizeof(*type->Variable));
+	type->BoolFlag.resize(new_bool_size);
 
+	type->Variable = new CVariable[UnitTypeVar.GetNumberVariable()];
+	for (unsigned int i = 0;i < UnitTypeVar.GetNumberVariable(); ++i) {
+		type->Variable[i] = UnitTypeVar.Variable[i];
+	}
 	UnitTypes.push_back(type);
 	UnitTypeMap[type->Ident] = type;
 	return type;
@@ -626,57 +631,17 @@ static void CleanAnimation(CAnimation *anim)
 
 void CUnitTypeVar::Init()
 {
-	const char *var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
-		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
-		"Xp", "Kill", "Supply", "Demand", "Armor", "SightRange",
-		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
-		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
-		"UnholyArmor", "Slot"
-		}; // names of the variable.
-	const char *boolflag[NBARALREADYDEFINED] = {"Coward", "Building", "Flip",
-		"Revealer", "LandUnit", "AirUnit", "SeaUnit", "ExplodeWhenKilled",
-		"VisibleUnderFog", "PermanentCloack", "DetectCloak", "AttackFromTransporter",
-		"Vanishes", "GroundAttack", "ShoreBuilding", "CanAttack",
-		"BuilderOutside", "BuilderLost", "CanHarvest", "Harvester",
-		"SelectableByRectangle", "IsNotSelectable", "Decoration",
-		"Indestructible", "Teleporter"
-		}; // names of boolflags
-	int i;
-
-	BoolFlagName = (const char **)malloc(sizeof(const char *) * NBARALREADYDEFINED);
-	for (i = 0; i < NBARALREADYDEFINED; ++i) {
-		BoolFlagName[i] = new_strdup(boolflag[i]);
-	}	
-	NumberBoolFlag = i;
-
 	// Variables.
-	VariableName = (const char **)malloc(sizeof(const char *) * NVARALREADYDEFINED);
-	for (i = 0; i < NVARALREADYDEFINED; ++i) {
-		VariableName[i] = new_strdup(var[i]);
+	Variable.resize(GetNumberVariable());
+	size_t new_size = UnitTypeVar.GetNumberBoolFlag();
+	for (unsigned int i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
+		UnitTypes[i]->BoolFlag.resize(new_size);
 	}
-	Variable = new CVariable[i];
-	NumberVariable = i;
 };
 
 void CUnitTypeVar::Clear()
 {
-	unsigned int j;
-	for (j = 0; j < NumberBoolFlag; ++j) { // User defined variables
-		delete[] BoolFlagName[j];
-	}
-	free(BoolFlagName);
-	BoolFlagName = NULL;
-	NumberBoolFlag = 0;
-	
-	for (j = 0; j < NumberVariable; ++j) { // User defined variables
-		delete[] VariableName[j];
-	}
-	free(VariableName);
-	VariableName = NULL;
-	
-	delete[] Variable;
-	Variable = NULL;
-	NumberVariable = 0;
+	Variable.clear();
 	
 	for (std::vector<CDecoVar *>::iterator it = DecoVar.begin();
 		it != DecoVar.end(); ++it) {

@@ -436,7 +436,7 @@ static void HandleBuffs(CUnit *unit, int amount)
 	unit->Variable[UNHOLYARMOR_INDEX].Increase = -amount;
 
 	// User defined variables
-	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (unit->Variable[i].Enable && unit->Variable[i].Increase) {
 			unit->Variable[i].Value += unit->Variable[i].Increase;
 			if (unit->Variable[i].Value <= 0) {

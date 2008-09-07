@@ -223,7 +223,7 @@ static int CclDefineModifier(lua_State *l)
 
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
-	um->Modifier.Variables = new CVariable[UnitTypeVar.NumberVariable];
+	um->Modifier.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 
 	um->UpgradeId = UpgradeIdByIdent(LuaToString(l, 1));
 
@@ -306,9 +306,7 @@ static int CclDefineModifier(lua_State *l)
 			lua_pop(l, 1);
 			um->ConvertTo = UnitTypeByIdent(value);
 		} else {
-			int index; // variable index;
-
-			index = GetVariableIndex(key);
+			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
 			if (index != -1) {
 				lua_rawgeti(l, j + 1, 2);
 				if (lua_istable(l, -1)) {
@@ -580,7 +578,7 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 			}
 
 			varModified = 0;
-			for (unsigned int j = 0; j < UnitTypeVar.NumberVariable; j++) {
+			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 				varModified |= um->Modifier.Variables[j].Value
 					| um->Modifier.Variables[j].Max
 					| um->Modifier.Variables[j].Increase;
@@ -607,7 +605,7 @@ static void ApplyUpgradeModifier(CPlayer *player, const CUpgradeModifier *um)
 					if (unit->Player->Index != player->Index) {
 						continue;
 					}
-					for (unsigned int j = 0; j < UnitTypeVar.NumberVariable; j++) {
+					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 						unit->Variable[j].Value += um->Modifier.Variables[j].Value;
 						if (unit->Variable[j].Value < 0) {
 							unit->Variable[j].Value = 0;

@@ -800,7 +800,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			res = SpellIsAvailable(unit->Player, buttonaction->Value);
 			break;
 		case ButtonUnload:
-			res = (Selected[0]->Type->CanTransport && Selected[0]->BoardCount);
+			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
 			break;
 		case ButtonCancel:
 			res = true;

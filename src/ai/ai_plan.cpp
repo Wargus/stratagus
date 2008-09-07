@@ -528,7 +528,7 @@ int AiPlanAttack(AiForce *force)
 	state = 1;
 	for (i = 0; i < force->Units.size(); ++i) {
 		aiunit = force->Units[i];
-		if (aiunit->Type->CanTransport) {
+		if (aiunit->Type->CanTransport()) {
 			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index
 			 _C_ UnitNumber(aiunit));
 			AiMarkWaterTransporter(aiunit, watermatrix);
@@ -544,7 +544,7 @@ int AiPlanAttack(AiForce *force)
 		for (i = 0; i < static_cast<unsigned int>(AiPlayer->Player->TotalNumUnits); ++i) {
 			CUnit *unit = AiPlayer->Player->Units[i];
 
-			if (unit->Type->CanTransport && unit->IsIdle()) {
+			if (unit->Type->CanTransport() && unit->IsIdle()) {
 				DebugPrint("%d: Assign any transporter\n" _C_ AiPlayer->Player->Index);
 				AiMarkWaterTransporter(unit, watermatrix);
 				// FIXME: can be the wrong transporter.
@@ -586,7 +586,7 @@ int AiPlanAttack(AiForce *force)
 			for (unsigned int i = 0; i < force->Units.size(); ++i) {
 				CUnit *aiunit = force->Units[i];
 
-				if (aiunit->Type->CanTransport) {
+				if (aiunit->Type->CanTransport()) {
 					totalBoardCapacity += aiunit->Type->MaxOnBoard - aiunit->BoardCount;
 					transporter = aiunit;
 				}
@@ -603,7 +603,7 @@ int AiPlanAttack(AiForce *force)
 				for (unsigned i = 0; i < static_cast<unsigned int>(AiPlayer->Player->TotalNumUnits); ++i) {
 					CUnit *aiunit = AiPlayer->Player->Units[i];
 
-					if (transporterAdded != aiunit && aiunit->Type->CanTransport && aiunit->IsIdle()) {
+					if (transporterAdded != aiunit && aiunit->Type->CanTransport() && aiunit->IsIdle()) {
 						DebugPrint("%d: Assign another transporter.\n"_C_ AiPlayer->Player->Index);
 						force->Units.Insert(aiunit);
 						aiunit->RefsIncrease();

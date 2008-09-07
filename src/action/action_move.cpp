@@ -136,7 +136,7 @@ int DoActionMove(CUnit *unit)
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
-		if (unit->Type->CanTransport &&
+		if (unit->Type->CanTransport() &&
 				((Map.WaterOnMap(off) && Map.CoastOnMap(x + xd, y + yd)) ||
 				(Map.CoastOnMap(off) && Map.WaterOnMap(x + xd, y + yd)))) {
 			PlayUnitSound(unit, VoiceDocking);

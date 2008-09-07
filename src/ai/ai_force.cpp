@@ -705,7 +705,7 @@ static void AiForceAttacks(AiForce *force)
 			}
 			if (aiunit->Type->CanAttack) {
 				CommandAttack(aiunit, x, y, NULL, FlushCommands);
-			} else if (aiunit->Type->CanTransport) {
+			} else if (aiunit->Type->CanTransport()) {
 				// FIXME : Retrieve unit blocked (transport previously full)
 				CommandMove(aiunit, aiunit->Player->StartX, aiunit->Player->StartY, FlushCommands);
 			} else {

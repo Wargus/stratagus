@@ -79,9 +79,102 @@ struct LabelsLaterStruct {
 };
 static std::vector<LabelsLaterStruct> LabelsLater;
 
+// names of boolflags
+static const char COWARD_KEY[] = "Coward";
+static const char BUILDING_KEY[] = "Building";
+static const char FLIP_KEY[] = "Flip";
+static const char REVEALER_KEY[] = "Revealer";
+static const char LANDUNIT_KEY[] = "LandUnit";
+static const char AIRUNIT_KEY[] = "AirUnit";
+static const char SEAUNIT_KEY[] = "SeaUnit";
+static const char EXPLODEWHENKILLED_KEY[] = "ExplodeWhenKilled";
+static const char VISIBLEUNDERFOG_KEY[] = "VisibleUnderFog";
+static const char PERMANENTCLOACK_KEY[] = "PermanentCloack";
+static const char DETECTCLOAK_KEY[] = "DetectCloak";
+static const char ATTACKFROMTRANSPORTER_KEY[] = "AttackFromTransporter";
+static const char VANISHES_KEY[] = "Vanishes";
+static const char GROUNDATTACK_KEY[] = "GroundAttack";
+static const char SHOREBUILDING_KEY[] = "ShoreBuilding";
+static const char CANATTACK_KEY[] = "CanAttack";
+static const char BUILDEROUTSIDE_KEY[] = "BuilderOutside";
+static const char BUILDERLOST_KEY[] = "BuilderLost";
+static const char CANHARVEST_KEY[] = "CanHarvest";
+static const char HARVESTER_KEY[] = "Harvester";
+static const char SELECTABLEBYRECTANGLE_KEY[] = "SelectableByRectangle";
+static const char ISNOTSELECTABLE_KEY[] = "IsNotSelectable";
+static const char DECORATION_KEY[] = "Decoration";
+static const char INDESTRUCTIBLE_KEY[] = "Indestructible";
+static const char TELEPORTER_KEY[] = "Teleporter";
+// names of the variable.
+static const char HITPOINTS_KEY[] = "HitPoints";
+static const char BUILD_KEY[] = "Build";
+static const char MANA_KEY[] = "Mana";
+static const char TRANSPORT_KEY[] = "Transport";
+static const char RESEARCH_KEY[] = "Research";
+static const char TRAINING_KEY[] = "Training";
+static const char UPGRADETO_KEY[] = "UpgradeTo";
+static const char GIVERESOURCE_KEY[] = "GiveResource";
+static const char CARRYRESOURCE_KEY[] = "CarryResource";
+static const char XP_KEY[] = "Xp";
+static const char KILL_KEY[] = "Kill";
+static const char SUPPLY_KEY[] = "Supply";
+static const char DEMAND_KEY[] = "Demand";
+static const char ARMOR_KEY[] = "Armor";
+static const char SIGHTRANGE_KEY[] = "SightRange";
+static const char ATTACKRANGE_KEY[] = "AttackRange";
+static const char PIERCINGDAMAGE_KEY[] = "PiercingDamage";
+static const char BASICDAMAGE_KEY[] = "BasicDamage";
+static const char POSX_KEY[] = "PosX";
+static const char POSY_KEY[] = "PosY";
+static const char RADARRANGE_KEY[] = "RadarRange";
+static const char RADARJAMMERRANGE_KEY[] = "RadarJammerRange";
+static const char AUTOREPAIRRANGE_KEY[] = "AutoRepairRange";
+static const char BLOODLUST_KEY[] = "Bloodlust";
+static const char HASTE_KEY[] = "Haste";
+static const char SLOW_KEY[] = "Slow";
+static const char INVISIBLE_KEY[] = "Invisible";
+static const char UNHOLYARMOR_KEY[] = "UnholyArmor";
+static const char SLOT_KEY[] = "Slot";	
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+		
+CUnitTypeVar::CBoolKeys::CBoolKeys() {
+
+	const char *const tmp[] = {COWARD_KEY,BUILDING_KEY,FLIP_KEY,REVEALER_KEY, 
+		LANDUNIT_KEY,AIRUNIT_KEY,SEAUNIT_KEY,EXPLODEWHENKILLED_KEY,
+		VISIBLEUNDERFOG_KEY, PERMANENTCLOACK_KEY,DETECTCLOAK_KEY,
+		ATTACKFROMTRANSPORTER_KEY,VANISHES_KEY,GROUNDATTACK_KEY,
+		SHOREBUILDING_KEY, CANATTACK_KEY,BUILDEROUTSIDE_KEY,
+		BUILDERLOST_KEY,CANHARVEST_KEY,HARVESTER_KEY,SELECTABLEBYRECTANGLE_KEY,
+		ISNOTSELECTABLE_KEY,DECORATION_KEY,INDESTRUCTIBLE_KEY,TELEPORTER_KEY};
+
+	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
+		buildin[i].offset = i;
+		buildin[i].keylen = strlen(tmp[i]);
+		buildin[i].key = tmp[i];
+	}
+	Init();
+}
+
+CUnitTypeVar::CVariableKeys::CVariableKeys() {
+
+	const char *const tmp[] = {HITPOINTS_KEY,BUILD_KEY,MANA_KEY,TRANSPORT_KEY, 
+		RESEARCH_KEY,TRAINING_KEY,UPGRADETO_KEY,GIVERESOURCE_KEY,
+		CARRYRESOURCE_KEY, XP_KEY,KILL_KEY,	SUPPLY_KEY,DEMAND_KEY,ARMOR_KEY,
+		SIGHTRANGE_KEY, ATTACKRANGE_KEY,PIERCINGDAMAGE_KEY,
+		BASICDAMAGE_KEY,POSX_KEY,POSY_KEY,RADARRANGE_KEY,
+		RADARJAMMERRANGE_KEY,AUTOREPAIRRANGE_KEY,BLOODLUST_KEY,HASTE_KEY,
+		SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY};
+
+	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
+		buildin[i].offset = i;
+		buildin[i].keylen = strlen(tmp[i]);
+		buildin[i].key = tmp[i];
+	}
+	Init();
+}
 
 int GetSpriteIndex(const char *SpriteName);
 
@@ -216,7 +309,6 @@ static int CclDefineUnitType(lua_State *l)
 	CUnitType *type;
 	ResourceInfo *res;
 	const char *str;
-	unsigned int i;
 	int redefine;
 	int subargs;
 	int k;
@@ -617,10 +709,11 @@ static int CclDefineUnitType(lua_State *l)
 			if (type->MaxOnBoard == 0) { // set default value.
 				type->MaxOnBoard = 1;
 			}
-			if (!type->CanTransport) {
-				type->CanTransport = new char[UnitTypeVar.NumberBoolFlag];
-				memset(type->CanTransport, 0, UnitTypeVar.NumberBoolFlag * sizeof(char));
+
+			if (type->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 			}
+
 			// FIXME : add flag for kill/unload units inside.
 			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -628,16 +721,13 @@ static int CclDefineUnitType(lua_State *l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-					if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
-						lua_rawgeti(l, -1, k + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						type->CanTransport[i] = Ccl2Condition(l, value);
-						break;
-					}
-				}
-				if (i != UnitTypeVar.NumberBoolFlag) {
+
+				int index = UnitTypeVar.BoolFlagNameLookup[value];
+				if (index != -1) {
+					lua_rawgeti(l, -1, k + 1);
+					value = LuaToString(l, -1);
+					lua_pop(l, 1);
+					type->BoolFlag[index].CanTransport = Ccl2Condition(l, value);
 					continue;
 				}
 				LuaError(l, "Unsupported flag tag for CanTransport: %s" _C_ value);
@@ -809,22 +899,21 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
+			if (type->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+			}			
 			subargs = lua_objlen(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-					if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
-						lua_rawgeti(l, -1, k + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						type->CanTargetFlag[i] = Ccl2Condition(l, value);
-						break;
-					}
-				}
-				if (i != UnitTypeVar.NumberBoolFlag) {
+				int index = UnitTypeVar.BoolFlagNameLookup[value];
+				if (index != -1) {
+					lua_rawgeti(l, -1, k + 1);
+					value = LuaToString(l, -1);
+					lua_pop(l, 1);
+					type->BoolFlag[index].CanTargetFlag = Ccl2Condition(l, value);
 					continue;
 				}
 				LuaError(l, "Unsupported flag tag for can-target-flag: %s" _C_ value);
@@ -893,28 +982,30 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		} else {
-			i = GetVariableIndex(value);
-			if (i != (unsigned int) -1) { // valid index
+			int index = UnitTypeVar.VariableNameLookup[value];
+			if (index != -1) { // valid index
 				if (lua_isboolean(l, -1)) {
-					type->Variable[i].Enable = LuaToBoolean(l, -1);
+					type->Variable[index].Enable = LuaToBoolean(l, -1);
 				} else if (lua_istable(l, -1)) {
-					DefineVariableField(l, type->Variable + i, -1);
+					DefineVariableField(l, type->Variable + index, -1);
 				} else if (lua_isnumber(l, -1)) {
-					type->Variable[i].Enable = 1;
-					type->Variable[i].Value = LuaToNumber(l, -1);
-					type->Variable[i].Max = LuaToNumber(l, -1);
+					type->Variable[index].Enable = 1;
+					type->Variable[index].Value = LuaToNumber(l, -1);
+					type->Variable[index].Max = LuaToNumber(l, -1);
 				} else { // Error
 					LuaError(l, "incorrect argument for the variable in unittype");
 				}
 				continue;
 			}
-			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined bool flags
-				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
-					type->BoolFlag[i] = LuaToBoolean(l, -1);
-					break;
-				}
+
+			if (type->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 			}
-			if (i == UnitTypeVar.NumberBoolFlag) {
+
+			index = UnitTypeVar.BoolFlagNameLookup[value];
+			if (index != -1) {
+				type->BoolFlag[index].value = LuaToBoolean(l, -1);
+			} else {
 				printf("\n%s\n", type->Name.c_str());
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
@@ -964,7 +1055,7 @@ static int CclDefineUnitStats(lua_State *l)
 
 	stats = &type->Stats[i];
 	if (!stats->Variables) {
-		stats->Variables = new CVariable[UnitTypeVar.NumberVariable];
+		stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 	}
 
 	//
@@ -1004,7 +1095,7 @@ static int CclDefineUnitStats(lua_State *l)
 				}
 			}
 		} else {
-			i = GetVariableIndex(value);
+			i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index
 				if (lua_istable(l, j + 1)) {
 					DefineVariableField(l, stats->Variables + i, j + 1);
@@ -1485,23 +1576,6 @@ void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
 }
 
 /**
-**  Return the index of the variable.
-**
-**  @param varname  Name of the variable.
-**
-**  @return         Index of the variable, -1 if not found.
-*/
-int GetVariableIndex(const char *varname)
-{
-	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-		if (!strcmp(varname, UnitTypeVar.VariableName[i])) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-/**
 **  Define user variables.
 **
 **  @param l  Lua state.
@@ -1509,28 +1583,19 @@ int GetVariableIndex(const char *varname)
 static int CclDefineVariables(lua_State *l)
 {
 	const char *str;
-	unsigned int i;
+	int index;
 	int j;
 	int args;
+	int old = UnitTypeVar.GetNumberVariable();
 
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		str = LuaToString(l, j + 1);
-		i = GetVariableIndex(str);
-		if (i == (unsigned int) -1) { // new variable.
-			i = UnitTypeVar.NumberVariable;
 
-			UnitTypeVar.VariableName = (const char**)
-				realloc(UnitTypeVar.VariableName, (i + 1) * sizeof(const char *));
-			UnitTypeVar.VariableName[i] = new_strdup(str);
-
-			CVariable *t = new CVariable[i + 1];
-			for (unsigned int x = 0; x < i; ++x) {
-				t[x] = UnitTypeVar.Variable[x];
-			}
-			delete[] UnitTypeVar.Variable;
-			UnitTypeVar.Variable = t;
-			UnitTypeVar.NumberVariable++;
+		index = UnitTypeVar.VariableNameLookup.AddKey(str);
+		if(index == old) {
+			old++;		
+			UnitTypeVar.Variable.resize(old);
 		} else {
 			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
 		}
@@ -1538,7 +1603,7 @@ static int CclDefineVariables(lua_State *l)
 			continue;
 		}
 		++j;
-		DefineVariableField(l, UnitTypeVar.Variable + i, j + 1);
+		DefineVariableField(l, &(UnitTypeVar.Variable[index]), j + 1);
 	}
 	return 0;
 }
@@ -1551,46 +1616,22 @@ static int CclDefineVariables(lua_State *l)
 static int CclDefineBoolFlags(lua_State *l)
 {
 	const char *str;    // Name of the bool flags to define.
-	unsigned int i;     // iterator for flags.
 	int args;           // number of arguments.
 	unsigned int old;   // Old number of defined bool flags
 
-	old = UnitTypeVar.NumberBoolFlag;
+	old = UnitTypeVar.GetNumberBoolFlag();
 	args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
 		str = LuaToString(l, j + 1);
-		for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-			if (!strcmp(str, UnitTypeVar.BoolFlagName[i])) {
-				DebugPrint("Warning, Bool flags already defined\n");
-				break;
-			}
-		}
-		if (i != UnitTypeVar.NumberBoolFlag) {
-			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ UnitTypeVar.BoolFlagName[i]);
-			continue;
-		}
-		UnitTypeVar.BoolFlagName = (const char**)
-				realloc(UnitTypeVar.BoolFlagName,
-			(UnitTypeVar.NumberBoolFlag + 1) * sizeof(const char *));
-		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = new_strdup(str);
+		//int index = 
+		UnitTypeVar.BoolFlagNameLookup.AddKey(str);
+
 	}
-	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
+
+	if (0 < old && old != UnitTypeVar.GetNumberBoolFlag()) {
+		size_t new_size = UnitTypeVar.GetNumberBoolFlag();
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-			unsigned char *b;
-
-			b = new unsigned char[UnitTypeVar.NumberBoolFlag];
-			memcpy(b, UnitTypes[i]->BoolFlag, old * sizeof(char *));
-			delete[] UnitTypes[i]->BoolFlag;
-			UnitTypes[i]->BoolFlag = b;
-			memset(UnitTypes[i]->BoolFlag + old, 0,
-				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->BoolFlag));
-
-			b = new unsigned char[UnitTypeVar.NumberBoolFlag];
-			memcpy(b, UnitTypes[i]->CanTargetFlag, old * sizeof(char *));
-			delete[] UnitTypes[i]->CanTargetFlag;
-			UnitTypes[i]->CanTargetFlag = b;
-			memset(UnitTypes[i]->CanTargetFlag + old, 0,
-				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->CanTargetFlag));
+			UnitTypes[i]->BoolFlag.resize(new_size);
 		}
 	}
 	return 0;
@@ -1637,7 +1678,8 @@ static int CclDefineDecorations(lua_State *l)
 		while (lua_next(l, i + 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Index")) {
-				tmp.Index = GetVariableIndex(LuaToString(l, -1));
+				const char *const value = LuaToString(l, -1);
+				tmp.Index = UnitTypeVar.VariableNameLookup[value];// User variables
 				Assert(tmp.Index != -1);
 			} else if (!strcmp(key, "Offset")) {
 				Assert(lua_istable(l, -1));
@@ -1782,9 +1824,8 @@ static int CclDefineDecorations(lua_State *l)
 void UpdateUnitVariables(const CUnit *unit)
 {
 	int i;
-	const CUnitType *type; // unit->Type.
+	CUnitType *type = unit->Type;
 
-	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
@@ -1892,7 +1933,7 @@ void UpdateUnitVariables(const CUnit *unit)
 		if (unit->Variable[i].Value > unit->Variable[i].Max) {
 			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
 						" value = %d, max = %d\n"
-						_C_ type->Ident.c_str() _C_ unit->Slot _C_ UnitTypeVar.VariableName[i]
+						_C_ type->Ident.c_str() _C_ unit->Slot _C_ UnitTypeVar.VariableNameLookup[i]
 						_C_ unit->Variable[i].Value _C_ unit->Variable[i].Max);
 		}
 #endif
@@ -1900,32 +1941,32 @@ void UpdateUnitVariables(const CUnit *unit)
 	}
 
 	// BoolFlag
+	type->BoolFlag[COWARD_INDEX].value                = type->Coward;
+	type->BoolFlag[BUILDING_INDEX].value              = type->Building;
+	type->BoolFlag[FLIP_INDEX].value                  = type->Flip;
+	type->BoolFlag[REVEALER_INDEX].value              = type->Revealer;
+	type->BoolFlag[LANDUNIT_INDEX].value              = type->LandUnit;
+	type->BoolFlag[AIRUNIT_INDEX].value               = type->AirUnit;
+	type->BoolFlag[SEAUNIT_INDEX].value               = type->SeaUnit;
+	type->BoolFlag[EXPLODEWHENKILLED_INDEX].value     = type->ExplodeWhenKilled;
+	type->BoolFlag[VISIBLEUNDERFOG_INDEX].value       = type->VisibleUnderFog;
+	type->BoolFlag[PERMANENTCLOAK_INDEX].value        = type->PermanentCloak;
+	type->BoolFlag[DETECTCLOAK_INDEX].value           = type->DetectCloak;
+	type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type->AttackFromTransporter;
+	type->BoolFlag[VANISHES_INDEX].value              = type->Vanishes;
+	type->BoolFlag[GROUNDATTACK_INDEX].value          = type->GroundAttack;
+	type->BoolFlag[SHOREBUILDING_INDEX].value         = type->ShoreBuilding;
+	type->BoolFlag[CANATTACK_INDEX].value             = type->CanAttack;
+	type->BoolFlag[BUILDEROUTSIDE_INDEX].value        = type->BuilderOutside;
+	type->BoolFlag[BUILDERLOST_INDEX].value           = type->BuilderLost;
+	type->BoolFlag[CANHARVEST_INDEX].value            = type->CanHarvest;
+	type->BoolFlag[HARVESTER_INDEX].value             = type->Harvester;
+	type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type->SelectableByRectangle;
+	type->BoolFlag[ISNOTSELECTABLE_INDEX].value       = type->IsNotSelectable;
+	type->BoolFlag[DECORATION_INDEX].value            = type->Decoration;
+	type->BoolFlag[INDESTRUCTIBLE_INDEX].value        = type->Indestructible;
+	type->BoolFlag[TELEPORTER_INDEX].value            = type->Teleporter;
 
-	type->BoolFlag[COWARD_INDEX]                = type->Coward;
-	type->BoolFlag[BUILDING_INDEX]              = type->Building;
-	type->BoolFlag[FLIP_INDEX]                  = type->Flip;
-	type->BoolFlag[REVEALER_INDEX]              = type->Revealer;
-	type->BoolFlag[LANDUNIT_INDEX]              = type->LandUnit;
-	type->BoolFlag[AIRUNIT_INDEX]               = type->AirUnit;
-	type->BoolFlag[SEAUNIT_INDEX]               = type->SeaUnit;
-	type->BoolFlag[EXPLODEWHENKILLED_INDEX]     = type->ExplodeWhenKilled;
-	type->BoolFlag[VISIBLEUNDERFOG_INDEX]       = type->VisibleUnderFog;
-	type->BoolFlag[PERMANENTCLOAK_INDEX]        = type->PermanentCloak;
-	type->BoolFlag[DETECTCLOAK_INDEX]           = type->DetectCloak;
-	type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX] = type->AttackFromTransporter;
-	type->BoolFlag[VANISHES_INDEX]              = type->Vanishes;
-	type->BoolFlag[GROUNDATTACK_INDEX]          = type->GroundAttack;
-	type->BoolFlag[SHOREBUILDING_INDEX]         = type->ShoreBuilding;
-	type->BoolFlag[CANATTACK_INDEX]             = type->CanAttack;
-	type->BoolFlag[BUILDEROUTSIDE_INDEX]        = type->BuilderOutside;
-	type->BoolFlag[BUILDERLOST_INDEX]           = type->BuilderLost;
-	type->BoolFlag[CANHARVEST_INDEX]            = type->CanHarvest;
-	type->BoolFlag[HARVESTER_INDEX]             = type->Harvester;
-	type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX] = type->SelectableByRectangle;
-	type->BoolFlag[ISNOTSELECTABLE_INDEX]       = type->IsNotSelectable;
-	type->BoolFlag[DECORATION_INDEX]            = type->Decoration;
-	type->BoolFlag[INDESTRUCTIBLE_INDEX]        = type->Indestructible;
-	type->BoolFlag[TELEPORTER_INDEX]            = type->Teleporter;
 }
 
 

@@ -517,28 +517,24 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 			} else if (!strcmp(key, "ShowOpponent")) {
 				condition->ShowOpponent = LuaToBoolean(l, -1);
 		} else {
-			unsigned int i;
-
-			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-				if (!strcmp(key, UnitTypeVar.BoolFlagName[i])) {
-					if (!condition->BoolFlags) {
-						condition->BoolFlags = new char[UnitTypeVar.NumberBoolFlag];
-						memset(condition->BoolFlags, 0, UnitTypeVar.NumberBoolFlag * sizeof(char));
-					}
-					condition->BoolFlags[i] = Ccl2Condition(l, LuaToString(l, -1));
-					break;
+			int index = UnitTypeVar.BoolFlagNameLookup[key];
+			if (index != -1) {
+				if (!condition->BoolFlags) {
+					size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
+					condition->BoolFlags = new char[new_bool_size];
+					memset(condition->BoolFlags, 0, new_bool_size * sizeof(char));
 				}
-			}
-			if (i != UnitTypeVar.NumberBoolFlag) { // key is a flag
+				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));	
 				continue;
 			}
-			i = GetVariableIndex(key);
-			if (i != (unsigned int) -1) {
+			index = UnitTypeVar.VariableNameLookup[key];
+			if (index != -1) {
 				if (!condition->Variables) {
-					condition->Variables = new char[UnitTypeVar.NumberVariable];
-					memset(condition->Variables, 0, UnitTypeVar.NumberVariable * sizeof(char));
+					size_t new_variables_size = UnitTypeVar.GetNumberVariable();
+					condition->Variables = new char[new_variables_size];
+					memset(condition->Variables, 0, new_variables_size * sizeof(char));
 				}
-				condition->Variables[i] = Ccl2Condition(l, LuaToString(l, -1));
+				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
 			LuaError(l, "'%s' invalid for Condition in DefinePanels" _C_ key);
@@ -590,7 +586,8 @@ static CContentType *CclParseContent(lua_State *l)
 						} else if (!strcmp(key, "Centered")) {
 							contenttext->Centered = LuaToBoolean(l, -1);
 						} else if (!strcmp(key, "Variable")) {
-							contenttext->Index = GetVariableIndex(LuaToString(l, -1));
+							const char *const name = LuaToString(l, -1);
+							contenttext->Index = UnitTypeVar.VariableNameLookup[name];
 							if (contenttext->Index == -1) {
 								LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 							}
@@ -617,9 +614,10 @@ static CContentType *CclParseContent(lua_State *l)
 					} else if (!strcmp(key, "Font")) {
 						contentformattedtext->Font = CFont::Get(LuaToString(l, -1));
 					} else if (!strcmp(key, "Variable")) {
-						contentformattedtext->Index = GetVariableIndex(LuaToString(l, -1));
+						const char *const name = LuaToString(l, -1);
+						contentformattedtext->Index = UnitTypeVar.VariableNameLookup[name];
 						if (contentformattedtext->Index == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+							LuaError(l, "unknown variable '%s'" _C_ name);
 						}
 					} else if (!strcmp(key, "Component")) {
 						contentformattedtext->Component = Str2EnumVariable(l, LuaToString(l, -1));
@@ -641,23 +639,26 @@ static CContentType *CclParseContent(lua_State *l)
 						} else if (!strcmp(key, "Font")) {
 							contentformattedtext2->Font = CFont::Get(LuaToString(l, -1));
 						} else if (!strcmp(key, "Variable")) {
-						contentformattedtext2->Index1 = GetVariableIndex(LuaToString(l, -1));
-						contentformattedtext2->Index2 = GetVariableIndex(LuaToString(l, -1));
+						const char *const name = LuaToString(l, -1);
+						contentformattedtext2->Index1 = UnitTypeVar.VariableNameLookup[name];
+						contentformattedtext2->Index2 = contentformattedtext2->Index1;
 						if (contentformattedtext2->Index1 == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+							LuaError(l, "unknown variable '%s'" _C_ name);
 						}
 					} else if (!strcmp(key, "Component")) {
 						contentformattedtext2->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 						contentformattedtext2->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
 					} else if (!strcmp(key, "Variable1")) {
-						contentformattedtext2->Index1 = GetVariableIndex(LuaToString(l, -1));
+						const char *const name = LuaToString(l, -1);
+						contentformattedtext2->Index1 = UnitTypeVar.VariableNameLookup[name];
 						if (contentformattedtext2->Index1 == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+							LuaError(l, "unknown variable '%s'" _C_ name);
 						}
 					} else if (!strcmp(key, "Component1")) {
 						contentformattedtext2->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 					} else if (!strcmp(key, "Variable2")) {
-						contentformattedtext2->Index2 = GetVariableIndex(LuaToString(l, -1));
+						const char *const name = LuaToString(l, -1);
+						contentformattedtext2->Index2 = UnitTypeVar.VariableNameLookup[name];					
 						if (contentformattedtext2->Index2 == -1) {
 							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 						}
@@ -688,9 +689,10 @@ static CContentType *CclParseContent(lua_State *l)
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					key = LuaToString(l, -2);
 					if (!strcmp(key, "Variable")) {
-						contentlifebar->Index = GetVariableIndex(LuaToString(l, -1));
+						const char *const name = LuaToString(l, -1);
+						contentlifebar->Index = UnitTypeVar.VariableNameLookup[name];					
 						if (contentlifebar->Index == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+							LuaError(l, "unknown variable '%s'" _C_ name);
 						}
 					} else if (!strcmp(key, "Height")) {
 						contentlifebar->Height = LuaToNumber(l, -1);
@@ -717,9 +719,10 @@ static CContentType *CclParseContent(lua_State *l)
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					key = LuaToString(l, -2);
 					if (!strcmp(key, "Variable")) {
-						contenttypecompletebar->Index = GetVariableIndex(LuaToString(l, -1));
+						const char *const name = LuaToString(l, -1);
+						contenttypecompletebar->Index = UnitTypeVar.VariableNameLookup[name];					
 						if (contenttypecompletebar->Index == -1) {
-							LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+							LuaError(l, "unknown variable '%s'" _C_ name);
 						}
 					} else if (!strcmp(key, "Height")) {
 						contenttypecompletebar->Height = LuaToNumber(l, -1);

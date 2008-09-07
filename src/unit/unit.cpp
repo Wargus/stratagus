@@ -278,11 +278,11 @@ void CUnit::Init(CUnitType *type)
 
 	Frame = type->StillFrame;
 
-	if (UnitTypeVar.NumberVariable) {
+	if (UnitTypeVar.GetNumberVariable()) {
 		Assert(!Variable);
-		Variable = new CVariable[UnitTypeVar.NumberVariable];
+		Variable = new CVariable[UnitTypeVar.GetNumberVariable()];
 		memcpy(Variable, Type->Variable,
-			UnitTypeVar.NumberVariable * sizeof(*Variable));
+			UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
 	}
 
 	// Set a heading for the unit if it Handles Directions
@@ -427,11 +427,11 @@ void CUnit::AssignToPlayer(CPlayer *player)
 	Stats = &type->Stats[Player->Index];
 	Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
-		if (UnitTypeVar.NumberVariable) {
+		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(Variable);
 			Assert(Stats->Variables);
 			memcpy(Variable, Stats->Variables,
-				UnitTypeVar.NumberVariable * sizeof(*Variable));
+				UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
 		}
 	}
 }
@@ -3331,9 +3331,10 @@ int ViewPointDistanceToUnit(const CUnit *dest)
 */
 int CanTarget(const CUnitType *source, const CUnitType *dest)
 {
-	for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
-		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
-			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+		if (source->BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
+			if ((source->BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^ 
+				(dest->BoolFlag[i].value)) {
 				return 0;
 			}
 		}
@@ -3363,7 +3364,7 @@ int CanTarget(const CUnitType *source, const CUnitType *dest)
 */
 int CanTransport(const CUnit *transporter, const CUnit *unit)
 {
-	if (!transporter->Type->CanTransport) {
+	if (!transporter->Type->CanTransport()) {
 		return 0;
 	}
 	if (transporter->CurrentAction() == UnitActionBuilt) { // Under construction
@@ -3384,10 +3385,10 @@ int CanTransport(const CUnit *transporter, const CUnit *unit)
 	if (!transporter->IsTeamed(unit)) {
 		return 0;
 	}
-	for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
-		if (transporter->Type->CanTransport[i] != CONDITION_TRUE) {
-			if ((transporter->Type->CanTransport[i] == CONDITION_ONLY) ^
-					unit->Type->BoolFlag[i]) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+		if (transporter->Type->BoolFlag[i].CanTransport != CONDITION_TRUE) {
+			if ((transporter->Type->BoolFlag[i].CanTransport == CONDITION_ONLY) ^
+					unit->Type->BoolFlag[i].value) {
 				return 0;
 			}
 		}

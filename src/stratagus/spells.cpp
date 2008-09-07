@@ -392,7 +392,7 @@ int SpawnMissile::Cast(CUnit *caster, const SpellType *spell,
 int AdjustVariable::Cast(CUnit *caster, const SpellType *spell,
 	CUnit *target, int x, int y)
 {
-	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? caster : target;
 
 		if (!unit) {
@@ -788,7 +788,7 @@ static bool PassCondition(const CUnit *caster, const SpellType *spell, const CUn
 	if (!condition) { // no condition, pass.
 		return true;
 	}
-	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; i++) { // for custom variables
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) { // for custom variables
 		const CUnit *unit;
 
 		unit = (condition->Variable[i].ConditionApplyOnCaster) ? caster : target;
@@ -831,12 +831,8 @@ static bool PassCondition(const CUnit *caster, const SpellType *spell, const CUn
 	if (!target) {
 		return true;
 	}
-	for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
-		if (condition->BoolFlag[i] != CONDITION_TRUE) {
-			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
-				return false;
-			}
-		}
+	if (!target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
+		return false;
 	}
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^

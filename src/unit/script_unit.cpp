@@ -901,7 +901,7 @@ static int CclUnit(lua_State *l)
 			}
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
 		} else {
-			i = GetVariableIndex(value); // User variables
+			i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // Valid index
 				DefineVariableField(l, unit->Variable + i, j + 1);
 				continue;
@@ -1326,9 +1326,10 @@ static int CclGetUnitVariable(lua_State *l)
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
-	index = GetVariableIndex(LuaToString(l, 2));
+	const char *const value = LuaToString(l, 2);
+	index = UnitTypeVar.VariableNameLookup[value];// User variables
 	if (index == -1) {
-		LuaError(l, "Bad variable name '%s'\n" _C_ LuaToString(l, 2));
+		LuaError(l, "Bad variable name '%s'\n" _C_ value);
 	}
 	lua_pushnumber(l, unit->Variable[index].Value);
 	return 1;
@@ -1352,9 +1353,10 @@ static int CclSetUnitVariable(lua_State *l)
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	index = GetVariableIndex(LuaToString(l, 2));
+	const char *const name = LuaToString(l, 2);
+	index = UnitTypeVar.VariableNameLookup[name];// User variables
 	if (index == -1) {
-		LuaError(l, "Bad variable name '%s'\n" _C_ LuaToString(l, 2));
+		LuaError(l, "Bad variable name '%s'\n" _C_ name);
 	}
 	value = LuaToNumber(l, 3);
 	if (value > unit->Variable[index].Max) {

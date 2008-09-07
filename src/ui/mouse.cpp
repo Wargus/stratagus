@@ -160,7 +160,7 @@ void DoRightButton(int sx, int sy)
 		return;
 	}
 
-	if (dest && dest->Type->CanTransport) {
+	if (dest && dest->Type->CanTransport()) {
 		for (i = 0; i < NumSelected; i++) {
 			if (CanTransport(dest, Selected[i])) {
 				// We are clicking on a transporter. We have to:
@@ -205,7 +205,7 @@ void DoRightButton(int sx, int sy)
 		//
 		if (dest) {
 			// dest is the transporter
-			if (dest->Type->CanTransport) {
+			if (dest->Type->CanTransport()) {
 				// Let the transporter move to the unit. And QUEUE!!!
 				if (CanMove(dest) && CanTransport(dest, unit)) {
 					DebugPrint("Send command follow\n");
@@ -499,7 +499,7 @@ static void HandleMouseOn(int x, int y)
 	}
 	if (NumSelected > 0) {
 	
-		if (NumSelected == 1 && Selected[0]->Type->CanTransport &&
+		if (NumSelected == 1 && Selected[0]->Type->CanTransport() &&
 				Selected[0]->BoardCount) {
 			size = UI.TransportingButtons.size();
 			i = Selected[0]->BoardCount < (int)size ?
@@ -931,7 +931,7 @@ static int SendMove(int sx, int sy)
 
 	ret = 0;
 	// Move to a transporter.
-	if ((transporter = UnitUnderCursor) && transporter->Type->CanTransport) {
+	if ((transporter = UnitUnderCursor) && transporter->Type->CanTransport()) {
 		for (i = 0; i < NumSelected; ++i) {
 			if (CanTransport(transporter, Selected[i])) {
 				SendCommandStopUnit(transporter);

@@ -102,7 +102,7 @@ int TransformUnitIntoType(CUnit *unit, CUnitType *newtype)
 	//  adjust Variables with percent.
 	newstats = &newtype->Stats[player->Index];
 
-	for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		if (unit->Variable[i].Max) {
 			unit->Variable[i].Value = newstats->Variables[i].Max *
 				unit->Variable[i].Value / unit->Variable[i].Max;

@@ -268,11 +268,11 @@ static SpellActionType *CclSpellAction(lua_State *l)
 		if (!lua_istable(l, -1)) {
 			LuaError(l, "Table expected for adjust-variable.");
 		}
-		spellaction->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.NumberVariable];
+		spellaction->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-			int i;
+			const char *const name = LuaToString(l, -2);
+			int i = UnitTypeVar.VariableNameLookup[name];
 
-			i = GetVariableIndex(LuaToString(l, -2));
 			if (i == -1) {
 				LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ LuaToString(l, -2));
 			}
@@ -285,9 +285,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 				spellaction->Var[i].ModifMax = 1;
 			} else if (lua_istable(l, -1)) {
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					const char *key;
-
-					key = LuaToString(l, -2);
+					const char *const key = LuaToString(l, -2);
 					if (!strcmp(key, "Enable")) {
 						spellaction->Var[i].Enable = LuaToBoolean(l, -1);
 						spellaction->Var[i].ModifEnable = 1;
@@ -511,13 +509,14 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 	//
 
 	// Flags are defaulted to 0(CONDITION_TRUE)
-	condition->BoolFlag = new char[UnitTypeVar.NumberBoolFlag];
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-		condition->BoolFlag[i] = 0;
-	}
-	condition->Variable = new ConditionInfoVariable[UnitTypeVar.NumberVariable];
+	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
+
+	condition->BoolFlag = new char[new_bool_size];
+	memset(condition->BoolFlag, 0, new_bool_size * sizeof(char));
+
+	condition->Variable = new ConditionInfoVariable[UnitTypeVar.GetNumberVariable()];
 	// Initialize min/max stuff to values with no effect.
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		condition->Variable[i].MinValue = -1;
 		condition->Variable[i].MaxValue = -1;
 		condition->Variable[i].MinMax = -1;
@@ -547,41 +546,35 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1));
 			lua_pop(l, 1);
 		} else {
-			for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
-				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
-					lua_rawgeti(l, -1, j + 1);
-					condition->BoolFlag[i] = Ccl2Condition(l, LuaToString(l, -1));
-					lua_pop(l, 1);
-					break;
-				}
-			}
-			if (i != UnitTypeVar.NumberBoolFlag) {
+			int index = UnitTypeVar.BoolFlagNameLookup[value];
+			if (index != -1) {
+				lua_rawgeti(l, -1, j + 1);
+				condition->BoolFlag[index] = Ccl2Condition(l, LuaToString(l, -1));
+				lua_pop(l, 1);
 				continue;
 			}
-			i = GetVariableIndex(value);
-			if (i != (unsigned int) -1) { // Valid index.
+			index = UnitTypeVar.VariableNameLookup[value];
+			if (index != -1) { // Valid index.
 				lua_rawgeti(l, -1, j + 1);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "Table expected in variable in condition");
 				}
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					const char *key;
-
-					key = LuaToString(l, -2);
+					const char *const key = LuaToString(l, -2);
 					if (!strcmp(key, "Enable")) {
-						condition->Variable[i].Enable = Ccl2Condition(l, LuaToString(l, -1));
+						condition->Variable[index].Enable = Ccl2Condition(l, LuaToString(l, -1));
 					} else if (!strcmp(key, "MinValue")) {
-						condition->Variable[i].MinValue = LuaToNumber(l, -1);
+						condition->Variable[index].MinValue = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "MaxValue")) {
-						condition->Variable[i].MaxValue = LuaToNumber(l, -1);
+						condition->Variable[index].MaxValue = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "MinMax")) {
-						condition->Variable[i].MinMax = LuaToNumber(l, -1);
+						condition->Variable[index].MinMax = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "MinValuePercent")) {
-						condition->Variable[i].MinValuePercent = LuaToNumber(l, -1);
+						condition->Variable[index].MinValuePercent = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "MaxValuePercent")) {
-						condition->Variable[i].MaxValuePercent = LuaToNumber(l, -1);
+						condition->Variable[index].MaxValuePercent = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "ConditionApplyOnCaster")) {
-						condition->Variable[i].ConditionApplyOnCaster = LuaToBoolean(l, -1);
+						condition->Variable[index].ConditionApplyOnCaster = LuaToBoolean(l, -1);
 					} else { // Error
 						LuaError(l, "%s invalid for Variable in condition" _C_ key);
 					}

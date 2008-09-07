@@ -585,7 +585,7 @@ public:
 
 // Index for boolflag aready defined
 enum {
-	COWARD_INDEX,
+	COWARD_INDEX = 0,
 	BUILDING_INDEX,
 	FLIP_INDEX,
 	REVEALER_INDEX,
@@ -615,7 +615,7 @@ enum {
 
 // Index for variable already defined.
 enum {
-	HP_INDEX,
+	HP_INDEX = 0,
 	BUILD_INDEX,
 	MANA_INDEX,
 	TRANSPORT_INDEX,
@@ -644,7 +644,7 @@ enum {
 	INVISIBLE_INDEX,
 	UNHOLYARMOR_INDEX,
 	SLOT_INDEX,
-	NVARALREADYDEFINED,
+	NVARALREADYDEFINED
 };
 
 class CUnit;
@@ -912,7 +912,6 @@ public:
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.
 	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
-	char *CanTransport;             /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int StartingResources;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
@@ -960,12 +959,20 @@ public:
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
+
+	CVariable *Variable;            /// Array of user defined variables.	
+	struct BoolFlags {
+		bool value;					/// User defined flag. Used for (dis)allow target.
+		char CanTransport;			/// Can transport units with this flag.	
+		char CanTargetFlag;			/// Flag needed to target with missile.
+	};
+	std::vector<BoolFlags> BoolFlag;
 	
-	unsigned char *BoolFlag;        /// User defined flag. Used for (dis)allow target.
-	CVariable *Variable;            /// Array of user defined variables.
-	unsigned char *CanTargetFlag;   /// Flag needed to target with missile.
-
-
+	bool CheckUserBoolFlags(char *BoolFlags);
+	bool CanTransport(void) {
+		return MaxOnBoard > 0 && !GivesResource;
+	}
+	
 	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
@@ -1010,21 +1017,118 @@ extern CUnitType *UnitTypeOrcWall;            /// Orc wall
 */
 class CUnitTypeVar {
 public:
-	CUnitTypeVar() : BoolFlagName(NULL), NumberBoolFlag(0),
-		VariableName(NULL), Variable(NULL), NumberVariable(0) {}
+
+	template <const unsigned int SIZE>
+	struct CKeys {
+
+		struct DataKey
+		{			
+			static bool key_pred(const DataKey& lhs, 
+									const DataKey& rhs)
+			{
+				return ((lhs.keylen == rhs.keylen) ? 
+					(strcmp(lhs.key, rhs.key) < 0) : (lhs.keylen < rhs.keylen));
+			}
+			int offset;
+			unsigned int keylen;
+			const char* key;
+		};
+
+		CKeys(): TotalKeys(SIZE) {}
+	
+		DataKey buildin[SIZE];
+		std::map<std::string, int> user;
+		unsigned int TotalKeys;
+		
+		void Init() {
+			std::sort(buildin, buildin+SIZE, DataKey::key_pred);	
+		}
+	
+		const char *operator[](int index) {
+			for (unsigned int i = 0; i < SIZE; ++i) {
+				if (buildin[i].offset == index) {
+					return buildin[i].key;
+				}
+			}
+			for (std::map<std::string, int>::iterator 
+				it(user.begin()), end(user.end());
+				it != end; ++it) {
+				if ((*it).second == index) {
+					return ((*it).first).c_str();
+				}
+			}
+			return NULL;
+		}
+		
+		/**
+		**  Return the index of the external storage array/vector.
+		**
+		**  @param varname  Name of the variable.
+		**
+		**  @return         Index of the variable, -1 if not found.
+		*/	
+		int operator[](const char*const key) {
+			DataKey k;
+			k.key = key;
+			k.keylen = strlen(key);
+		   	const DataKey* p = std::lower_bound(buildin, buildin + SIZE, 
+		   		k, DataKey::key_pred);
+		   	if ((p != buildin + SIZE) && p->keylen == k.keylen && 
+		   		0 == strcmp(p->key, key)) {
+				return p->offset;
+			} else {
+				std::map<std::string, int>::iterator 
+						ret(user.find(key));
+				if (ret != user.end()) {
+					return  (*ret).second;
+				}
+			}
+			return -1;	
+		}
+
+		int AddKey(const char*const key)
+		{
+			int index = this->operator[](key);
+			if (index != -1) {
+				DebugPrint("Warning, Key '%s' already defined\n" _C_ key);
+				return index;
+			}
+			user[key] = TotalKeys++;
+			return TotalKeys - 1;
+		}
+		
+	};
+
+	struct CBoolKeys : public CKeys<NBARALREADYDEFINED> {
+		CBoolKeys();
+	};
+
+	struct CVariableKeys : public CKeys<NVARALREADYDEFINED> {
+		CVariableKeys();
+	};
+
+	CUnitTypeVar() {}
 	
 	void Init();
 	void Clear();
+		
+	CBoolKeys BoolFlagNameLookup;		/// Container of name of user defined bool flag.
+	CVariableKeys VariableNameLookup;	/// Container of names of user defined variables.
 	
-	const char **BoolFlagName;          /// Array of name of user defined bool flag.
-	unsigned int NumberBoolFlag;        /// Number of user defined bool flag.
-
-	const char **VariableName;          /// Array of names of user defined variables.
-	CVariable *Variable;                /// Array of user defined variables (default value for unittype).
 //	EventType *Event;                   /// Array of functions sets to call when en event occurs.
-	unsigned int NumberVariable;        /// Number of defined variables.
-
+	std::vector<CVariable> Variable;	/// Array of user defined variables (default value for unittype).	
 	std::vector<CDecoVar *> DecoVar;    /// Array to describe how showing variable.
+	
+	unsigned int GetNumberBoolFlag(void) {
+		return BoolFlagNameLookup.TotalKeys;
+	}
+
+	unsigned int GetNumberVariable(void) {
+		return VariableNameLookup.TotalKeys;
+	}
+
+	
+	
 };
 
 extern CUnitTypeVar UnitTypeVar;
@@ -1038,7 +1142,6 @@ extern void UnitTypeCclRegister(void);               /// Register ccl features
 
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
-extern int GetVariableIndex(const char *VarName);    /// Get index of the variable
 
 extern void SaveUnitTypes(CFile *file);              /// Save the unit-type table
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot

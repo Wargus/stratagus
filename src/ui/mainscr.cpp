@@ -180,17 +180,12 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit *unit)
 			(ThisPlayer->IsAllied(unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
 		return false;
 	}
-	if (condition->BoolFlags) {
-		for (unsigned int i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
-			if (condition->BoolFlags[i] != CONDITION_TRUE) {
-				if ((condition->BoolFlags[i] == CONDITION_ONLY) ^ unit->Type->BoolFlag[i]) {
-					return false;
-				}
-			}
-		}
+	if (condition->BoolFlags && !unit->Type->CheckUserBoolFlags(condition->BoolFlags)) {
+		return false;
 	}
+
 	if (condition->Variables) {
-		for (unsigned int i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit->Variable[i].Enable) {
 					return false;
@@ -225,7 +220,7 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 	CVariable *var;
 
 	Assert(unit);
-	Assert((unsigned int) index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
 	switch (t) {
 		case 0: // Unit:
@@ -274,7 +269,7 @@ UStrInt GetComponent(const CUnit *unit, int index, EnumVariable e, int t)
 				val.s = DefaultResourceNames[unit->CurrentResource].c_str();
 			} else {
 				val.type = USTRINT_STR;
-				val.s = UnitTypeVar.VariableName[index];
+				val.s = UnitTypeVar.VariableNameLookup[index];
 			}
 			break;
 	}
@@ -333,7 +328,7 @@ void CContentTypeText::Draw(const CUnit *unit, CFont *defaultfont) const
 	Assert(font);
 
 	Assert(unit || this->Index == -1);
-	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.NumberVariable));
+	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	if (this->Text) {
 		text = EvalString(this->Text);
@@ -402,7 +397,7 @@ void CContentTypeFormattedText::Draw(const CUnit *unit, CFont *defaultfont) cons
 	font = this->Font ? this->Font : defaultfont;
 	Assert(font);
 
-	Assert((unsigned int) this->Index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	usi1 = GetComponent(unit, this->Index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
 		sprintf(buf, this->Format.c_str(), usi1.s);
@@ -486,7 +481,7 @@ void CContentTypeIcon::Draw(const CUnit *unit, CFont *defaultfont) const
 void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	Assert(unit);
-	Assert((unsigned int) this->Index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	if (!unit->Variable[this->Index].Max) {
 		return;
 	}
@@ -524,7 +519,7 @@ void CContentTypeLifeBar::Draw(const CUnit *unit, CFont *defaultfont) const
 void CContentTypeCompleteBar::Draw(const CUnit *unit, CFont *defaultfont) const
 {
 	Assert(unit);
-	Assert((unsigned int) this->Index < UnitTypeVar.NumberVariable);
+	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	if (!unit->Variable[this->Index].Max) {
 		return;
 	}
@@ -700,7 +695,7 @@ static void DrawUnitInfo(CUnit *unit)
 	//
 	//  Transporting units.
 	//
-	if (type->CanTransport && unit->BoardCount) {
+	if (type->CanTransport() && unit->BoardCount) {
 		int j;
 
 		uins = unit->UnitInside;
