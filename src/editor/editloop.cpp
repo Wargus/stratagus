@@ -1379,7 +1379,8 @@ static void EditorCallbackButtonDown(unsigned button)
 			int tileX = UI.MouseViewport->Viewport2MapX(CursorX);
 			int tileY = UI.MouseViewport->Viewport2MapY(CursorY);				
 
-			if (Editor.State == EditorEditTile) {
+			if (Editor.State == EditorEditTile &&
+				Editor.SelectedTileIndex != -1) {
 				EditTiles(tileX, tileY, 
 					Editor.ShownTileTypes[Editor.SelectedTileIndex],
 					TileCursorSize);

@@ -3177,7 +3177,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 	//
 	// Can't attack run away.
 	//
-	if (CanMove(target)) {
+	if (target->CanMove()) {
 		int x;
 		int y;
 		int d;

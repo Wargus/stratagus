@@ -377,6 +377,8 @@ void DrawPopupUnitInfo(const CUnitType *type,
 		popupWidth += (font->Width(type->Demand) + 5);
 	}
 	popupWidth += 10;
+	popupWidth = std::max(popupWidth, font->Width(type->Name) + 10);
+
 	if(popupWidth < 120)
 		popupWidth = 120;
 		
@@ -578,7 +580,8 @@ static void DrawPopup()
 				VideoDrawNumber(x, y + y_offset, font, spell->ManaCost );			
 			} else {
 				// Only Hint
-				VideoDrawText(x + 5, y + (popupHeight - font_height)/2, font, button->Hint);
+				VideoDrawText(x + 5, y + (popupHeight - font_height)/2,
+					 font, button->Hint);
 			}
 		}
 		break;	
@@ -755,7 +758,7 @@ static bool IsButtonAllowed(const CUnit *unit, const ButtonAction *buttonaction)
 			res = unit->Type->RepairRange > 0;
 			break;
 		case ButtonPatrol:
-			res = CanMove(unit);
+			res = unit->CanMove();
 			break;
 		case ButtonHarvest:
 			if (!unit->CurrentResource ||
@@ -1026,7 +1029,7 @@ void CButtonPanel::DoClicked(int button)
 			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->CurrentAction() == UnitActionStill &&
-					Map.CoastOnMap(Selected[0]->X, Selected[0]->Y)) || !CanMove(Selected[0])) {
+					Map.CoastOnMap(Selected[0]->X, Selected[0]->Y)) || !Selected[0]->CanMove()) {
 				SendCommandUnload(Selected[0],
 					Selected[0]->X, Selected[0]->Y, NoUnitP,
 					!(KeyModifiers & ModifierShift));

@@ -205,7 +205,7 @@ static void MoveToTarget(CUnit *unit)
 	Assert(!unit->Type->Vanishes && !unit->Destroyed && !unit->Removed);
 	Assert(unit->CurrentAction() == UnitActionAttack ||
 		unit->CurrentAction() == UnitActionAttackGround);
-	Assert(CanMove(unit));
+	Assert(unit->CanMove());
 	Assert(unit->CurrentOrder()->HasGoal()
 		 || (unit->CurrentOrder()->X != -1 && unit->CurrentOrder()->Y != -1));
 
@@ -467,7 +467,7 @@ void HandleActionAttack(CUnit *unit)
 		//
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + WEAK_TARGET:
-			if (!CanMove(unit)) {
+			if (!unit->CanMove()) {
 				unit->RestoreOrder();
 				return;
 			}

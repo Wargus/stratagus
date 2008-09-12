@@ -712,7 +712,7 @@ void AiSendExplorers(void)
 
 			type = (*unit)->Type;
 
-			if (!CanMove(*unit)) {
+			if (!(*unit)->CanMove()) {
 				continue;
 			}
 

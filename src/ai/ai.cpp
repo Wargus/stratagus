@@ -980,7 +980,7 @@ static void AiMoveUnitInTheWay(CUnit *unit)
 			continue;
 		}
 
-		if (!CanMove(blocker)) {
+		if (!blocker->CanMove()) {
 			continue;
 		}
 

@@ -207,13 +207,13 @@ void DoRightButton(int sx, int sy)
 			// dest is the transporter
 			if (dest->Type->CanTransport()) {
 				// Let the transporter move to the unit. And QUEUE!!!
-				if (CanMove(dest) && CanTransport(dest, unit)) {
+				if (dest->CanMove() && CanTransport(dest, unit)) {
 					DebugPrint("Send command follow\n");
 					// is flush value correct ?
 					SendCommandFollow(dest, unit, 0);
 				}
 				// FIXME : manage correctly production units.
-				if (!CanMove(unit) || CanTransport(dest, unit)) {
+				if (!unit->CanMove() || CanTransport(dest, unit)) {
 					dest->Blink = 4;
 					DebugPrint("Board transporter\n");
 					SendCommandBoard(unit, -1, -1, dest, flush);
@@ -224,11 +224,11 @@ void DoRightButton(int sx, int sy)
 			//  FIXME : Make it more configurable ? NumSelect == 1, lua option
 			if (CanTransport(unit, dest)) {
 				// Let the transporter move to the unit. And QUEUE!!!
-				if (CanMove(unit)) {
+				if (unit->CanMove()) {
 					DebugPrint("Send command follow\n");
 					// is flush value correct ?
 					SendCommandFollow(unit, dest, 0);
-				} else if (!CanMove(dest)) {
+				} else if (!dest->CanMove()) {
 					DebugPrint("Want to transport but no unit can move\n");
 					continue;
 				}
@@ -396,7 +396,7 @@ void DoRightButton(int sx, int sy)
 		}
 
 		// Manage new order.
-		if (!CanMove(unit)) {
+		if (!unit->CanMove()) {
 			// Go and harvest from a unit
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest &&
 					(dest->Player == unit->Player || dest->Player->Index == PlayerNumNeutral)) {
@@ -1003,7 +1003,7 @@ static int SendAttack(int sx, int sy)
 				ret = 1;
 			}
 		} else {
-			if (CanMove(unit)) {
+			if (unit->CanMove()) {
 				SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY,
 					!(KeyModifiers & ModifierShift));
 				ret = 1;
@@ -1114,7 +1114,7 @@ static int SendResource(int sx, int sy)
 				}
 			}
 		}
-		if (!CanMove(unit)) {
+		if (!unit->CanMove()) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));

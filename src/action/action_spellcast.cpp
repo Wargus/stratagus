@@ -97,7 +97,7 @@ static void SpellMoveToTarget(CUnit *unit)
 
 	// Unit can't move
 	err = 1;
-	if (CanMove(unit)) {
+	if (unit->CanMove()) {
 		err = DoActionMove(unit);
 		if (unit->Anim.Unbreakable) {
 			return;

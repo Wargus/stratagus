@@ -385,7 +385,7 @@ void HandleActionUnload(CUnit *unit)
 	int x;
 	int y;
 
-	if (!CanMove(unit)) {
+	if (!unit->CanMove()) {
 		unit->SubAction = 2;
 	}
 	switch (unit->SubAction) {
@@ -427,7 +427,7 @@ void HandleActionUnload(CUnit *unit)
 		case 2:
 			// FIXME: show still animations ?
 			LeaveTransporter(unit);
-			if (CanMove(unit) && unit->CurrentAction() != UnitActionStill) {
+			if (unit->CanMove() && unit->CurrentAction() != UnitActionStill) {
 				HandleActionUnload(unit);
 			}
 			break;

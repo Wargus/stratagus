@@ -1002,8 +1002,18 @@ public:
 	int MapDistanceTo(int x, int y) const
 	{
 		return MapDistanceToType(x, y, Type, X, Y);
-	}	
-	
+	}
+
+	/**
+	**  Test if unit can move.
+	**  For the moment only check for move animation.
+	**
+	**  @return 0 if unit cannot move.
+	*/
+	bool CanMove(void) const
+	{
+		return Type->CanMove();
+	}
 	
 };
 
@@ -1221,9 +1231,6 @@ extern int ViewPointDistanceToUnit(const CUnit *dest);
 extern int CanTarget(const CUnitType *type, const CUnitType *dest);
 	/// Can transporter transport the other unit
 extern int CanTransport(const CUnit *transporter, const CUnit *unit);
-
-	/// Check if unit can move.
-extern bool CanMove(const CUnit *unit);
 
 	/// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit *unit);

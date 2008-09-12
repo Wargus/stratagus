@@ -249,7 +249,7 @@ static bool AutoAttack(CUnit *unit, bool stand_ground)
 	// Cowards and invisible units don't attack unless ordered.
 	if (unit->IsAgressive()) {
 		// Normal units react in reaction range.
-		if (!stand_ground && !unit->Removed && CanMove(unit)) {
+		if (!stand_ground && !unit->Removed && unit->CanMove()) {
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
@@ -297,7 +297,7 @@ void AutoAttack(CUnit *unit, CUnitCache &targets, bool stand_ground)
 	// Cowards and invisible units don't attack unless ordered.
 	if (unit->IsAgressive()) {
 		// Normal units react in reaction range.
-		if (!stand_ground && !unit->Removed && CanMove(unit)) {
+		if (!stand_ground && !unit->Removed && unit->CanMove()) {
 			if ((goal = AutoAttackUnitsInDistance(unit,
 			   	 unit->GetReactRange(), targets))) {
 				// Weak goal, can choose other unit, come back after attack

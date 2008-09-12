@@ -505,12 +505,27 @@
 ----------------------------------------------------------------------------*/
 
 #include "SDL.h"
-
 #include <vector>
+
+#ifndef __UPGRADE_STRUCTS_H__
 #include "upgrade_structs.h"
+#endif
+
+#ifndef __UTIL_H__
 #include "util.h"
+#endif
+
+#ifndef __UNITSOUND_H__
 #include "unitsound.h"
+#endif
+
+#ifndef __ICONS_H__
 #include "icons.h"
+#endif
+
+#ifndef __ANIMATIONS_H__
+#include "animation.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -518,7 +533,6 @@
 
 class CPlayerColorGraphic;
 class CConstruction;
-class CAnimations;
 class MissileType;
 class CFile;
 struct lua_State;
@@ -967,12 +981,7 @@ public:
 		char CanTargetFlag;			/// Flag needed to target with missile.
 	};
 	std::vector<BoolFlags> BoolFlag;
-	
-	bool CheckUserBoolFlags(char *BoolFlags);
-	bool CanTransport(void) {
-		return MaxOnBoard > 0 && !GivesResource;
-	}
-	
+
 	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
@@ -996,6 +1005,19 @@ public:
 
 	CPlayerColorGraphic *Sprite;     /// Sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
+
+	/* API */
+	
+	bool CheckUserBoolFlags(char *BoolFlags);
+	bool CanTransport(void)  const
+	{
+		return MaxOnBoard > 0 && !GivesResource;
+	}
+	bool CanMove(void) const
+	{
+		return Animations && Animations->Move;
+	}
+
 };
 
 	/// @todo ARI: should be dynamic (lua..).

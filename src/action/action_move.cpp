@@ -61,22 +61,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Test if unit can move.
-**  For the moment only check for move animation.
-**
-**  @param unit unit to test if it can move.
-**
-**  @return 0 if unit cannot move.
-*/
-bool CanMove(const CUnit *unit)
-{
-	Assert(unit);
-	Assert(unit->Type);
-	return unit->Type->Animations && unit->Type->Animations->Move;
-}
-
-
-/**
 **  Unit moves! Generic function called from other actions.
 **
 **  @param unit  Pointer to unit.
@@ -94,7 +78,7 @@ int DoActionMove(CUnit *unit)
 	int move;
 	int off;
 
-	Assert(CanMove(unit));
+	Assert(unit->CanMove());
 	if (!unit->Moving &&
 			(unit->Type->Animations->Move != unit->Anim.CurrAnim || !unit->Anim.Wait)) {
 		Assert(!unit->Anim.Unbreakable);
@@ -200,7 +184,7 @@ void HandleActionMove(CUnit *unit)
 	CUnit *goal;
 
 	Assert(unit);
-	Assert(CanMove(unit));
+	Assert(unit->CanMove());
 
 	if (unit->Wait) {
 		unit->Wait--;
