@@ -1202,7 +1202,7 @@ extern CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range,
 extern CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 		 int range, int resource);		 
 	/// Find nearest deposit
-extern CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource);
+extern CUnit *FindDeposit(const CUnit *unit, int range, int resource);
 	/// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer *player, const CUnit *last);
 
@@ -1328,6 +1328,8 @@ extern void SetGroup(CUnit **units, int nunits, int num);
 extern void RemoveUnitFromGroups(CUnit *unit);
 	/// Register CCL group features
 extern void GroupCclRegister(void);
+	/// ask group members for help
+void GroupHelpMe(CUnit *attacker, CUnit *defender);
 
 // in selection.c
 

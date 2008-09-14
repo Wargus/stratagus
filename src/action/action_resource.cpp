@@ -285,8 +285,7 @@ static void LoseResource(CUnit *unit, const CUnit *source)
 	//
 	// If we are loaded first search for a depot.
 	//
-	if (unit->ResourcesHeld && (depot = FindDeposit(unit, unit->X, unit->Y,
-			1000, unit->CurrentResource))) {
+	if (unit->ResourcesHeld && (depot = FindDeposit(unit, 1000, unit->CurrentResource))) {
 		if (unit->Container) {
 			DropOutNearest(unit, depot->X + depot->Type->TileWidth / 2,
 				depot->Y + depot->Type->TileHeight / 2,
@@ -586,15 +585,15 @@ static int StopGathering(CUnit *unit)
 #endif
 
 	// Find and send to resource deposit.
-	if (!(depot = FindDeposit(unit, unit->X, unit->Y, 1000, unit->CurrentResource)) ||
+	if (!(depot = FindDeposit(unit, 1000, unit->CurrentResource)) ||
 			!unit->ResourcesHeld) {
 		if (!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester)) {
 			Assert(unit->Container);
 			DropOutOnSide(unit, LookingW, source->Type->TileWidth,
 				source->Type->TileHeight);
 		}
-		DebugPrint("%d: Worker %d report: Can't find a resource deposit.\n" 
-				_C_ unit->Player->Index _C_ unit->Slot);
+		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n" 
+				_C_ unit->Player->Index _C_ unit->Slot _C_ unit->CurrentResource);
 		unit->CurrentOrder()->ClearGoal();
 		unit->ClearAction();
 		// should return 0, done below!
@@ -654,7 +653,7 @@ static int MoveToDepot(CUnit *unit)
 		unit->CurrentOrder()->ClearGoal();
 		
 		CUnit *depot = 
-			FindDeposit(unit, unit->X, unit->Y, 1000, unit->CurrentResource);
+			FindDeposit(unit, 1000, unit->CurrentResource);
 		if(depot) {
 			UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 			DebugPrint("%d: Worker %d report: Going to new deposit.\n" 
@@ -669,7 +668,8 @@ static int MoveToDepot(CUnit *unit)
 		return 0;
 	}
 
-	if(unit->Player->AiEnabled && unit->Data.Move.Cycles > 300)
+	// Not ready
+	if(0 && unit->Player->AiEnabled && unit->Data.Move.Cycles > 300)
 	{
 		AiNewDepotRequest(unit);		
 	}

@@ -912,7 +912,8 @@ static int AStarSavePath(int startX, int startY, int endX, int endY, char *path,
 **  Check if we're at the goal or if it's 1 tile away
 */
 static int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
-	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data)
+	int tilesizex, int tilesizey, int minrange, int maxrange,
+	 char *path, int pathlen, void *data)
 {
 	ProfileBegin("AStarFindSimplePath");
 	// At exact destination point already
@@ -959,7 +960,8 @@ static int AStarFindSimplePath(int sx, int sy, int gx, int gy, int gw, int gh,
 **  Find path.
 */
 int AStarFindPath(int sx, int sy, int gx, int gy, int gw, int gh,
-	int tilesizex, int tilesizey, int minrange, int maxrange, char *path, int pathlen, void *data)
+	int tilesizex, int tilesizey, int minrange, int maxrange,
+	char *path, int pathlen, void *data)
 {
 	ProfileBegin("AStarFindPath");
 

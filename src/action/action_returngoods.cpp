@@ -75,8 +75,7 @@ void HandleActionReturnGoods(CUnit *unit)
 	if (!unit->CurrentOrder()->HasGoal()) {
 		CUnit *destu;
 
-		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
-				unit->CurrentResource))) {
+		if (!(destu = FindDeposit(unit, 1000, unit->CurrentResource))) {
 			ResourceGiveUp(unit);
 			return;
 		}

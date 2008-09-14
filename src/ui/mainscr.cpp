@@ -782,7 +782,7 @@ static int  MessagesEventIndex;                  /// FIXME: docu
 class MessagesDisplay
 {
 public:
-	MessagesDisplay()
+	MessagesDisplay() : show(true)
 	{
 		CleanMessages();
 	}
@@ -791,7 +791,9 @@ public:
 	void AddUniqueMessage(const char *s);
 	void DrawMessages();
 	void CleanMessages();
-
+	void ToggleShowMessages() {
+		show = !show;
+	};
 protected:
 	void ShiftMessages();
 	void AddMessage(const char *msg);
@@ -803,6 +805,7 @@ private:
 	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
+	bool show;
 };
 
 /**
@@ -848,29 +851,37 @@ void MessagesDisplay::UpdateMessages()
 */
 void MessagesDisplay::DrawMessages()
 {
-	// background so the text is easier to read
-	if (MessagesCount) {
-		Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
-		Video.FillTransRectangleClip(color, UI.MapArea.X + 8, UI.MapArea.Y + 8,
-			UI.MapArea.EndX - UI.MapArea.X - 16, MessagesCount * (UI.MessageFont->Height() + 1) - MessagesScrollY, 0x80);
-	}
+	if (show) {
+		// background so the text is easier to read
+		if (MessagesCount) {
+			int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
+			Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
+			Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,
+				UI.MapArea.EndX - UI.MapArea.X - 16, 
+				textHeight - MessagesScrollY + 1, 0x80);
+			
+			Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.Y + 6,
+				UI.MapArea.EndX - UI.MapArea.X - 15,
+				textHeight - MessagesScrollY + 2);	
+		}
 
-	// Draw message line(s)
-	for (int z = 0; z < MessagesCount; ++z) {
-		if (z == 0) {
-			PushClipping();
-			SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
-				Video.Height - 1);
+		// Draw message line(s)
+		for (int z = 0; z < MessagesCount; ++z) {
+			if (z == 0) {
+				PushClipping();
+				SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+					Video.Height - 1);
+			}
+			VideoDrawTextClip(UI.MapArea.X + 8,
+				UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+				UI.MessageFont, Messages[z]);
+			if (z == 0) {
+				PopClipping();
+			}
 		}
-		VideoDrawTextClip(UI.MapArea.X + 8,
-			UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
-			UI.MessageFont, Messages[z]);
-		if (z == 0) {
-			PopClipping();
+		if (MessagesCount < 1) {
+			MessagesSameCount = 0;
 		}
-	}
-	if (MessagesCount < 1) {
-		MessagesSameCount = 0;
 	}
 }
 
@@ -1109,6 +1120,10 @@ void CenterOnMessage(void)
 		TileSizeX / 2, TileSizeY / 2);
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
+}
+
+void ToggleShowMessages(void) {
+	allmessages.ToggleShowMessages();
 }
 
 

@@ -97,7 +97,7 @@ public:
 **  Roles for forces
 */
 enum AiForceRole {
-	AiForceRoleAttack, /// Force should attack
+	AiForceRoleAttack = 0, /// Force should attack
 	AiForceRoleDefend, /// Force should defend
 };
 
@@ -109,23 +109,29 @@ enum AiForceRole {
 */
 class AiForce {
 public:
-	AiForce() : Completed(false), Defending(false), Attacking(false), Role(0),
-		State(AiForceRoleDefend), GoalX(0), GoalY(0), MustTransport(false) {}
+	AiForce() : Completed(false), Defending(false), Attacking(false),
+		Role(0), State(0), GoalX(0), GoalY(0),
+		MustTransport(false) {}
 
 	/**
 	**  Reset the force. But don't change its role and its demand.
 	*/
-	void Reset() {
+	void Reset(bool types = false) {
 		Completed = false;
 		Defending = false;
 		Attacking = false;
-		//UnitTypes.clear();
-		Units.Units.clear();
+		if (types) {
+			UnitTypes.clear();
+		}
+		Units.clear();
 		State = 0;
 		GoalX = GoalY = 0;
 		MustTransport = false;
 	}
-
+	inline size_t Size(void) const
+	{
+		return Units.size();
+	}
 	bool Completed;     /// Flag saying force is complete build
 	bool Defending;     /// Flag saying force is defending
 	bool Attacking;     /// Flag saying force is attacking
@@ -208,7 +214,7 @@ public:
 
 	// forces
 #define AI_MAX_FORCES 10                    /// How many forces are supported
-#define AI_MAX_ATTACKING_FORCES 30          /// Attacking forces
+#define AI_MAX_ATTACKING_FORCES 30          /// Attacking forces (max supported 32)
 	AiForce Force[AI_MAX_ATTACKING_FORCES]; /// Forces controlled by AI
 
 	// resource manager
@@ -345,7 +351,7 @@ extern int AiFindBuildingPlace(const CUnit *worker,
 	/// Cleanup units in force
 extern void AiCleanForces(void);
 	/// Assign a new unit to a force
-extern void AiAssignToForce(CUnit *unit);
+extern bool AiAssignToForce(CUnit *unit);
 	/// Assign a free units to a force
 extern void AiAssignFreeUnitsToForce(void);
 	/// Attack with force at position

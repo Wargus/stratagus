@@ -636,6 +636,8 @@ void FreeAi()
 	AiHelpers.Repair.clear();
 	AiHelpers.UnitLimit.clear();
 	AiHelpers.Equiv.clear();
+	AiHelpers.Refinery.clear();
+	AiHelpers.Depots.clear();
 
 	AiResetUnitTypeEquiv();
 }
@@ -773,6 +775,12 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 	CUnit *aiunit;
 	int force;
 	int x, y;
+	
+	/* Freandly Fire - typical splash */
+	if (attacker->Player->Index == defender->Player->Index) {
+		//FIXME - try react somehow
+		return;
+	}
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
 		defender->Player->Index _C_ UnitNumber(defender) _C_
@@ -786,28 +794,63 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 	}
 
 	AiPlayer = pai = defender->Player->Ai;
-	if (pai->Force[0].Attacking) {  // Force 0 busy
-		return;
-	}
 
 	//
-	//  If unit belongs to an attacking force, don't defend it.
+	//  If unit belongs to an attacking force, check if force members can help.
 	//
-	for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
-		if (!pai->Force[force].Attacking) {  // none attacking
-			// FIXME, send the force for help
-			continue;
-		}
-		for (unsigned int i = 0; i < pai->Force[force].Units.size(); ++i) {
-			aiunit = pai->Force[force].Units[i];
-			if (defender == aiunit) {
-				return;
+	if (defender->GroupId) {
+		for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
+			AiForce *aiForce = &pai->Force[force];
+
+			//  Unit belongs to an force, check if brothers in arms can help
+			if (defender->GroupId == (1<<force)) {
+				for (unsigned int i = 0; i < aiForce->Units.size(); ++i) {
+					aiunit = aiForce->Units[i];
+					
+					if (defender == aiunit) {
+						continue;
+					}
+					
+					// if brother is idle or attack no-agressive target and
+					// can attack our attacker then ask for help
+					// FIXME ad support for help from Coward type units
+					if (aiunit->IsAgressive() && (aiunit->IsIdle() || 
+						!(aiunit->CurrentAction() == UnitActionAttack && 
+					 	aiunit->CurrentOrder()->HasGoal() &&
+					 	aiunit->CurrentOrder()->GetGoal()->IsAgressive()))
+					 	&& CanTarget(aiunit->Type, attacker->Type)) {
+					 	
+						if (aiunit->SavedOrder.Action == UnitActionStill) {
+							// FIXME: should rewrite command handling
+							CommandAttack(aiunit, aiunit->X, aiunit->Y, NoUnitP,
+								FlushCommands);
+							aiunit->SavedOrder = *aiunit->Orders[1];
+						}
+						CommandAttack(aiunit, attacker->X, attacker->Y,
+							 (CUnit*)attacker, FlushCommands);					 						 	
+					}
+				}
+				
+				if (!aiForce->Defending && aiForce->State) {
+					// unit belongs to an attacking force, 
+					// so don't send others force in such case.
+					// FIXME: there may be other attacking the same place force who can help
+					return;
+				} else {
+					// unit belongs to an defending force or
+					// unit belongs to an preparing (not send to attack)
+					// attacking force so we can call other forces for help.
+					// Defending Home
+					break;
+				}
+
 			}
 		}
 	}
 
 	//
-	//  Send force 0 defending, also send force 1 if this is home.
+	//  Send defending forces, also send attacking forces if they are home/traning.
+	//	This is still basic model where we suspect only one base ;(
 	//
 	if (attacker) {
 		x = attacker->X;
@@ -819,7 +862,9 @@ void AiHelpMe(const CUnit *attacker, CUnit *defender)
 	for (unsigned int i = 0; i < AI_MAX_FORCES; ++i) {
 		AiForce *aiForce = &pai->Force[i];
 
-		if (aiForce->Role == AiForceRoleDefend && !aiForce->Attacking) {  // none attacking
+		if (aiForce->Size() > 0 && (aiForce->Role == AiForceRoleDefend && !aiForce->Attacking ||
+			aiForce->Role == AiForceRoleAttack && !aiForce->Attacking &&
+			!aiForce->State)) {  // none attacking
 			aiForce->Defending = true;
 			AiAttackWithForceAt(i, x, y);
 		}

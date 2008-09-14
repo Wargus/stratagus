@@ -878,7 +878,7 @@ void ShowOrder(const CUnit *unit)
 	}
 
 	// Show order for new trained units
-	if (!CanMove(unit)) {
+	if (!unit->CanMove()) {
 		ShowSingleOrder(unit, x1, y1, (COrderPtr)(&unit->NewOrder));
 	}
 }

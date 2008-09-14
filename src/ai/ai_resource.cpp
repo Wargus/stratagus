@@ -951,9 +951,8 @@ static void AiCheckingWork(void)
 	if (AiPlayer->NeedSupply) {
 		if (!(!AiPlayer->UnitTypeBuilt.empty() &&
 				AiPlayer->UnitTypeBuilt[0].Type->Supply)) {
-			//AiPlayer->NeedSupply = false;
-			//AiRequestSupply();
-			AiPlayer->NeedSupply = AiRequestSupply();
+			AiPlayer->NeedSupply = false;
+			AiRequestSupply();
 		}
 	}
 	//
@@ -972,9 +971,8 @@ static void AiCheckingWork(void)
 		// Check if we have enough food.
 		//
 		if (type->Demand && !AiCheckSupply(AiPlayer, type)) {
-			//AiPlayer->NeedSupply = true;
-			//AiRequestSupply();
-			AiPlayer->NeedSupply = AiRequestSupply();
+			AiPlayer->NeedSupply = true;
+			AiRequestSupply();
 		}
 		//
 		// Check limits, AI should be broken if reached.
@@ -1432,7 +1430,7 @@ static int AiRepairBuilding(const CUnitType *type, CUnit *building)
 	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (unit->Type->RepairRange && unit->OrderCount == 1 &&
-			(unit->CurrentAction() == UnitActionResource ||
+			(unit->CurrentAction() == UnitActionResource && unit->SubAction <= 55 /* SUB_START_GATHERING */ ||
 				unit->CurrentAction() == UnitActionStill)) {
 			table[num++] = unit;
 		}
@@ -1676,8 +1674,7 @@ void AiResourceManager(void)
 	// Look if we can build a farm in advance.
 	//
 	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
-		//AiRequestSupply();
-		AiPlayer->NeedSupply = AiRequestSupply();
+		AiRequestSupply();
 	}
 	//
 	// Collect resources.

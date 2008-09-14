@@ -342,6 +342,8 @@ extern void SetMessageEvent(int x, int y, const char *fmt, ...);
 extern void CenterOnMessage(void);
 	/// Cleanup all messages
 extern void CleanMessages(void);
+	/// show/hide messages
+extern void ToggleShowMessages(void);
 
 	/// Draw costs in status line
 extern void DrawCosts(void);

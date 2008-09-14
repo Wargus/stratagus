@@ -512,7 +512,6 @@ int AiPlanAttack(AiForce *force)
 	const CUnit *aiunit = NULL;
 	int x;
 	int y;
-	unsigned int i;
 	int state;
 	CUnit *transporter;
 
@@ -526,7 +525,7 @@ int AiPlanAttack(AiForce *force)
 	// NOTE: finding free transportes was too much work for me.
 	//
 	state = 1;
-	for (i = 0; i < force->Units.size(); ++i) {
+	for (unsigned int i = 0; i < force->Units.size(); ++i) {
 		aiunit = force->Units[i];
 		if (aiunit->Type->CanTransport()) {
 			DebugPrint("%d: Transporter #%d\n" _C_ AiPlayer->Player->Index
@@ -541,7 +540,7 @@ int AiPlanAttack(AiForce *force)
 	//
 	transporter = NULL;
 	if (state) {
-		for (i = 0; i < static_cast<unsigned int>(AiPlayer->Player->TotalNumUnits); ++i) {
+		for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
 			CUnit *unit = AiPlayer->Player->Units[i];
 
 			if (unit->Type->CanTransport() && unit->IsIdle()) {
@@ -600,7 +599,7 @@ int AiPlanAttack(AiForce *force)
 			}
 			if (totalBoardCapacity < 0) { // Not enough transporter.
 				// Add all other idle transporter.
-				for (unsigned i = 0; i < static_cast<unsigned int>(AiPlayer->Player->TotalNumUnits); ++i) {
+				for (int i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
 					CUnit *aiunit = AiPlayer->Player->Units[i];
 
 					if (transporterAdded != aiunit && aiunit->Type->CanTransport() && aiunit->IsIdle()) {

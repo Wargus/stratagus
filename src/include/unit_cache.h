@@ -55,7 +55,10 @@ struct CUnitCache {
 	{
 		return Units.size();
 	}
-
+	inline void clear()
+	{
+		Units.clear();
+	}
 	inline CUnit * operator[] (const unsigned int index) const
 	{
 		Assert(index < Units.size());

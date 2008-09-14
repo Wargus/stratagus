@@ -144,19 +144,18 @@ static void SpellMoveToTarget(CUnit *unit)
 void HandleActionSpellCast(CUnit *unit)
 {
 	int flags;
-	const SpellType *spell;
 
 	if (unit->Wait) {
 		unit->Wait--;
 		return;
 	}
 	COrderPtr order = unit->CurrentOrder();
+	const SpellType *spell = order->Arg1.Spell;	
 	switch (unit->SubAction) {
 		case 0:
 			//
 			// Check if we can cast the spell.
 			//
-			spell = order->Arg1.Spell;
 			if (!CanCastSpell(unit, spell, order->GetGoal(), order->X, order->Y)) {
 
 				//
@@ -187,7 +186,6 @@ void HandleActionSpellCast(CUnit *unit)
 			unit->SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
-			spell = order->Arg1.Spell;
 			if (spell->Range && spell->Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
@@ -208,7 +206,6 @@ void HandleActionSpellCast(CUnit *unit)
 				if (goal && goal != unit && !goal->IsVisibleAsGoal(unit->Player)) {
 					unit->ReCast = 0;
 				} else {
-					spell = order->Arg1.Spell;
 					unit->ReCast = SpellCast(unit, spell, goal, order->X, order->Y);
 				}
 			}

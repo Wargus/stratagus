@@ -162,16 +162,22 @@ unsigned char *MakeMatrix(void)
 **
 **  @return          Distance to place.
 */
-int PlaceReachable(const CUnit *src, int x, int y, int w, int h, int minrange, int range)
+int PlaceReachable(const CUnit *src, int x, int y, int w, int h,
+	 int minrange, int range)
 {
 	int i = AStarFindPath(src->X, src->Y, x, y, w, h,
-		src->Type->TileWidth, src->Type->TileHeight, minrange, range, NULL, 0, (void *)src);
+		src->Type->TileWidth, src->Type->TileHeight,
+		 minrange, range, NULL, 0, (void *)src);
 
 	switch (i) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
-		case PF_REACHED:
 			i = 0;
+			break;		
+		case PF_REACHED:
+			/* sice most of this function usage check return value as bool
+			 * then reached state should be track as true value */
+			i = 1;
 			break;
 		case PF_WAIT:
 			Assert(0);
@@ -202,7 +208,8 @@ int UnitReachable(const CUnit *src, const CUnit *dst, int range)
 	//
 	//  Find a path to the goal.
 	//
-	depth = PlaceReachable(src, dst->X, dst->Y, dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
+	depth = PlaceReachable(src, dst->X, dst->Y,
+	 dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
 	if (depth <= 0) {
 		return 0;
 	}

@@ -347,7 +347,7 @@ void CreatePlayer(int type)
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
 	memset(player->Units, 0, sizeof(player->Units));
 
-	player->AutoAttackTargets.Units.clear();
+	player->AutoAttackTargets.clear();
 
 	//
 	//  Take first slot for person on this computer,
@@ -554,7 +554,7 @@ void CPlayer::Clear()
 	TotalKills = 0;
 	Color = 0;
 	UpgradeTimers.Clear();
-	AutoAttackTargets.Units.clear();
+	AutoAttackTargets.clear();
 }
 
 /*----------------------------------------------------------------------------
@@ -790,8 +790,6 @@ void PlayersEachCycle(void)
 					if (guard->Type->CanAttack && 
 								(stand_ground || guard->IsIdle()) &&
 								 !guard->IsUnusable()) {
-						DebugPrint("%d: Gaurd %d (%s) call autoattack\n"
-							 _C_ p->Index _C_ guard->Slot _C_ guard->Type->Name.c_str()); 
 						AutoAttack(guard, autoatacktargets, stand_ground);
 					}
 				}

@@ -219,7 +219,8 @@ void UpdateStats(int reset)
 				if (!stats->Variables) {
 					stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 				}
-				memcpy(stats->Variables, type->Variable, UnitTypeVar.GetNumberVariable() * sizeof(*type->Variable));
+				memcpy(stats->Variables, type->Variable, 
+					UnitTypeVar.GetNumberVariable() * sizeof(*type->Variable));
 			}
 		}
 

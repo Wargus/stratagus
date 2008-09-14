@@ -655,6 +655,12 @@ static bool CommandKey(int key)
 			}
 			break;
 
+		case 'e': // CTRL+E Turn messages on / off
+			if (KeyModifiers & ModifierControl) {
+				ToggleShowMessages();
+			}
+			break;
+
 		case SDLK_TAB: // TAB toggles minimap.
 					// FIXME: more...
 					// FIXME: shift+TAB

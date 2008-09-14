@@ -931,7 +931,9 @@ void UnitLost(CUnit *unit)
 	//  Remove unit from its groups
 	//
 	if (unit->GroupId) {
-		RemoveUnitFromGroups(unit);
+		if (player && !player->AiEnabled) {
+			RemoveUnitFromGroups(unit);
+		}
 	}
 
 	//
@@ -2165,6 +2167,128 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	return 0;
 }
 
+template <const bool NEARLOCATION>
+class BestDepotFinder {
+	union {
+		const CUnit *worker;
+		struct {
+			int x;
+			int y;
+		} loc;
+	} near;
+	const int resource;
+	const int range;
+	int best_dist;
+	
+	inline void operator() (CUnit *const dest) {
+		/* Only resource depots */
+		if (dest->Type->CanStore[resource] &&
+			 dest->IsAliveOnMap() && 
+			 dest->CurrentAction() != UnitActionBuilt) {
+			// Unit in range?
+
+			if(NEARLOCATION) {
+				int d = dest->MapDistanceTo(near.loc.x,near.loc.y);
+						
+				//
+				// Take this depot?
+				//
+				if (d <= range && d < best_dist) {
+					best_depot = dest;
+					best_dist = d;
+				}			
+			} else {
+				int d;
+				const CUnit *worker = near.worker;
+				if (!worker->Container) {
+					d = worker->MapDistanceTo(dest);
+				} else {
+					d = worker->Container->MapDistanceTo(dest);
+				}
+			
+				// Use Circle, not square :)
+				if (d > range) {
+					return;
+				}
+
+				// calck real travel distance
+				if (!worker->Container) {
+					d = UnitReachable(worker, dest, 1);
+				}
+				//
+				// Take this depot?
+				//
+				if (d && d < best_dist) {
+					best_depot = dest;
+					best_dist = d;
+				}
+				
+			}
+		}
+	}
+
+public:
+	CUnit *best_depot;
+	
+	BestDepotFinder(const CUnit *w, int x, int y, int res, int ran):
+		resource(res), range(ran),
+		best_dist(INT_MAX), best_depot(0) {
+			if(NEARLOCATION) {
+				near.loc.x = x;
+				near.loc.y = y;
+			} else {
+				near.worker = w;
+			}
+		};
+
+
+	CUnit *Find(CUnit **table, const int table_size) {
+#ifdef _MSC_VER
+		for (int i = 0; i < table_size; ++i) {
+			this->operator() (table[i]);
+		}
+#else
+		if(table_size) {
+			int i = 0, n = (table_size+3)/4;
+			switch (table_size & 3) {
+				case 0: do { 
+								this->operator() (table[i++]);
+				case 3:			this->operator() (table[i++]);
+				case 2:			this->operator() (table[i++]);
+				case 1:			this->operator() (table[i++]);
+					} while ( --n > 0 );
+			}
+		}
+#endif
+		return best_depot;
+	}
+
+
+	CUnit *Find(CUnitCache &cache) {
+		cache.for_each(*this);
+		return best_depot;
+	}
+
+};
+
+static CUnit *FindDepositNearLoc(CPlayer *p, 
+				int x, int y, int range, int resource)
+{
+	BestDepotFinder<true> finder(NULL,x,y,resource,range);
+	CUnit *depot = finder.Find(p->Units, p->TotalNumUnits);
+	if (!depot) {
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (i != p->Index && 
+				Players[i].IsAllied(p) &&
+				p->IsAllied(&Players[i])) {
+				finder.Find(Players[i].Units, Players[i].TotalNumUnits);
+			}
+		}
+		depot = finder.best_depot;
+	}
+	return depot;
+}
+
 /**
 **  Find Resource.
 **
@@ -2214,7 +2338,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	points = new p[size];
 
 	// Find the nearest gold depot
-	if (!destu) destu = FindDeposit(unit, x, y,range,resource);
+	if (!destu) destu = FindDepositNearLoc(unit->Player,x,y,range,resource);
 	if (destu) {
 		NearestOfUnit(destu, x, y, &destx, &desty);
 	}
@@ -2437,7 +2561,8 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 	points = new p[size];
 
 	// Find the nearest resource depot
-	if ((destu = FindDeposit(unit, x, y,range,resource))) {
+	if ((destu = FindDepositNearLoc(unit->Player,x,y,range,resource)))
+	{
 		NearestOfUnit(destu, x, y, &destx, &desty);
 	}
 	bestd = 99999;
@@ -2550,116 +2675,21 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 **
 **  @return            NoUnitP or deposit unit
 */
-CUnit *FindDeposit(const CUnit *unit, int x, int y, int range, int resource)
+CUnit *FindDeposit(const CUnit *unit, int range, int resource)
 {
-	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
-	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
-	struct p {
-		unsigned short X;
-		unsigned short Y;
-	} *points;
-	int size;
-	int rx;
-	int ry;
-	int mask;
-	int wp;
-	int rp;
-	int ep;
-	int i;
-	int w;
-	int nodes_searched;
-	unsigned char *m;
-	unsigned char *matrix;
-	CUnit *depot;
-	int destx;
-	int desty;
-	int cdist;
-
-	nodes_searched = 0;
-
-	destx = x;
-	desty = y;
-	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
-	points = new p[size];
-
-	// Make movement matrix. FIXME: can create smaller matrix.
-	matrix = CreateMatrix();
-	w = Map.Info.MapWidth + 2;
-	matrix += w + w + 2;
-	//  Unit movement mask
-	mask = unit->Type->MovementMask;
-	//  Ignore all units along the way. Might seem wierd, but otherwise
-	//  peasants would lock at a mine with a lot of workers.
-	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit | MapFieldBuilding);
-	points[0].X = x;
-	points[0].Y = y;
-	rp = 0;
-	if(unit->X == x && unit->Y == y)
-		matrix[x + y * w] = 1; // mark start point
-	ep = wp = 1; // start with one point
-	cdist = 0; // current distance is 0
-
-	//
-	// Pop a point from stack, push all neighbors which could be entered.
-	//
-	for (;;) {
-		while (rp != ep) {
-			rx = points[rp].X;
-			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) { // mark all neighbors
-				x = rx + xoffset[i];
-				y = ry + yoffset[i];
-				++nodes_searched;
-				//  Make sure we don't leave the map.
-				if (!Map.Info.IsPointOnMap(x, y)) {
-					continue;
-				}
-				m = matrix + x + y * w;
-				//  Check if visited or unexplored
-				if (*m 
-					//|| (!unit->Player->AiEnabled && 
-						//!Map.IsFieldExplored(unit->Player, x, y))
-						) {
-					continue;
-				}
-				//
-				// Look if there is a deposit
-				//
-				if ((depot = ResourceDepositOnMap(x, y, resource)) &&
-						((unit->IsAllied(depot) && depot->IsAllied(unit)) ||
-							(unit->Player == depot->Player))) {
-					delete[] points;
-					return depot;
-				}
-				if (CanMoveToMask(x, y, mask)) { // reachable
-					*m = 1;
-					points[wp].X = x; // push the point
-					points[wp].Y = y;
-					if (++wp >= size) { // round about
-						wp = 0;
-					}
-					if (wp == ep) {
-						//  We are out of points, give up!
-						DebugPrint("Ran out of points the hard way, beware.\n");
-						break;
-					}
-				} else { // unreachable
-					*m = 99;
-				}
-			}
-			if (++rp >= size) { // round about
-				rp = 0;
+	BestDepotFinder<false> finder(unit,0,0,resource, range);
+	CUnit *depot = finder.Find(unit->Player->Units, unit->Player->TotalNumUnits);
+	if (!depot) {
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (i != unit->Player->Index && 
+				Players[i].IsAllied(unit->Player) &&
+				unit->Player->IsAllied(&Players[i])) {
+				finder.Find(Players[i].Units, Players[i].TotalNumUnits);
 			}
 		}
-		++cdist;
-		if (rp == wp || cdist >= range) { // unreachable, no more points available
-			break;
-		}
-		// Continue with next set.
-		ep = wp;
+		depot = finder.best_depot;
 	}
-	delete[] points;
-	return NoUnitP;
+	return depot;
 }
 
 /**
@@ -3009,8 +3039,13 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 		}
 		target->Player->Notify(NotifyRed, target->X, target->Y,
 			_("%s attacked"), target->Type->Name.c_str());
+
 		if (target->Player->AiEnabled) {
 			AiHelpMe(attacker, target);
+		} else {
+			if (target->GroupId) {
+				GroupHelpMe(attacker, target);
+			}
 		}
 	}
 
