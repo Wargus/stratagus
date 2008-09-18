@@ -125,8 +125,8 @@ void CUnit::COrder::Release(void) {
 		Goal->RefsDecrease();
 		Goal = NoUnitP;
 	}
-	//FIXME: Hardcoded wood		
-	if (Action == UnitActionResource && CurrentResource != WoodCost && 
+	//FIXME: Hardcoded wood
+	if (Action == UnitActionResource && CurrentResource != WoodCost &&
 		Arg1.Resource.Mine ) {
 		Arg1.Resource.Mine->RefsDecrease();
 		Arg1.Resource.Mine = NoUnitP;
@@ -135,16 +135,16 @@ void CUnit::COrder::Release(void) {
 
 CUnit::COrder::COrder(const CUnit::COrder &ths): Goal(ths.Goal), Range(ths.Range),
 	 MinRange(ths.MinRange), Width(ths.Width), Height(ths.Height),
-	 Action(ths.Action), CurrentResource(ths.CurrentResource), 
+	 Action(ths.Action), CurrentResource(ths.CurrentResource),
 	 X(ths.X), Y(ths.Y)
  {
 	if (Goal) {
 		Goal->RefsIncrease();
 	}
-	
+
 	memcpy(&Arg1, &ths.Arg1, sizeof(Arg1));
-	
-	//FIXME: Hardcoded wood	
+
+	//FIXME: Hardcoded wood
 	if (Action == UnitActionResource &&
 		 CurrentResource != WoodCost && Arg1.Resource.Mine) {
 		 Arg1.Resource.Mine->RefsIncrease();
@@ -153,8 +153,8 @@ CUnit::COrder::COrder(const CUnit::COrder &ths): Goal(ths.Goal), Range(ths.Range
 
 CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
 	if (this != &rhs) {
-	
-		//FIXME: Hardcoded wood		
+
+		//FIXME: Hardcoded wood
 		if (Action == UnitActionResource &&
 			 CurrentResource != WoodCost && Arg1.Resource.Mine) {
 			 Arg1.Resource.Mine->RefsDecrease();
@@ -170,8 +170,8 @@ CUnit::COrder& CUnit::COrder::operator=(const CUnit::COrder &rhs) {
 		X = rhs.X;
 		Y = rhs.Y;
 		memcpy(&Arg1, &rhs.Arg1, sizeof(Arg1));
-		
-		//FIXME: Hardcoded wood		
+
+		//FIXME: Hardcoded wood
 		if(Action == UnitActionResource &&
 			 CurrentResource != WoodCost && Arg1.Resource.Mine) {
 			 Arg1.Resource.Mine->RefsIncrease();
@@ -333,21 +333,21 @@ bool CUnit::RestoreOrder(void)
 {
 	if (this->SavedOrder.Action != UnitActionStill) {
 		// Restart order state.
-		this->State = 0;	
+		this->State = 0;
 		this->SubAction = 0;
-		
+
 		Assert(!this->CurrentOrder()->HasGoal());
-		
+
 		//copy
 		*(this->CurrentOrder()) = this->SavedOrder;
-		
+
 		this->CurrentResource = this->SavedOrder.CurrentResource;
-		
+
 		NewResetPath(this);
 
 		// This isn't supported
 		Assert(!this->SavedOrder.HasGoal());
-		
+
 		this->SavedOrder.Action = UnitActionStill;
 		this->SavedOrder.ClearGoal();
 		return true;
@@ -670,7 +670,7 @@ struct _UnmarkUnitFieldFlags {
 void UnmarkUnitFieldFlags(const CUnit *unit)
 {
 	Assert(unit);
-	CMapField *mf;	
+	CMapField *mf;
 	const unsigned int flags = ~unit->Type->FieldFlags; //
 	int w, h = unit->Type->TileHeight;          // Tile height of the unit.
 	const int width = unit->Type->TileWidth;          // Tile width of the unit.
@@ -753,11 +753,11 @@ static void UnitInXY(CUnit *unit, int x, int y)
 {
 	Assert(unit);
 	CUnit *unit_inside = unit->UnitInside;
-		
+
 	unit->X = x;
 	unit->Y = y;
 	unit->Offset = Map.getIndex(x,y);
-	
+
 	if(!unit->Container) {
 		//Only Top Units
 		const CMapField *const mf = Map.Field(unit->Offset);
@@ -999,9 +999,9 @@ void UnitLost(CUnit *unit)
 		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID] = 0;
 	}
 
-	DebugPrint("%d: Lost %s(%d)\n" 
-		_C_ unit->Player->Index 
-		_C_ unit->Type->Ident.c_str() 
+	DebugPrint("%d: Lost %s(%d)\n"
+		_C_ unit->Player->Index
+		_C_ unit->Type->Ident.c_str()
 		_C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
@@ -1200,10 +1200,10 @@ struct _TileSeen {
 	int cloak;
 
 	_TileSeen(const CPlayer *p , int c): player(p), cloak(c) {}
-	
+
 	inline void operator() ( CUnit *const unit) {
-		if (cloak == (int)unit->Type->PermanentCloak) {	
-			const int p = player->Index;	
+		if (cloak == (int)unit->Type->PermanentCloak) {
+			const int p = player->Index;
 			if(MARK) {
 				//
 				//  If the unit goes out of fog, this can happen for any player that
@@ -1212,7 +1212,7 @@ struct _TileSeen {
 				//
 				if (!unit->VisCount[p]) {
 					for (int pi = 0; pi < PlayerMax; ++pi) {
-						if ((pi == p /*player->Index*/) || 
+						if ((pi == p /*player->Index*/) ||
 								player->IsBothSharedVision(&Players[pi])) {
 							if (!unit->IsVisible(Players + pi)) {
 								UnitGoesOutOfFog(unit, Players + pi);
@@ -1222,16 +1222,16 @@ struct _TileSeen {
 				}
 				unit->VisCount[p/*player->Index*/]++;
 			} else {
-				/* 
-				 * HACK: UGLY !!! 
-				 * There is bug in Seen code conneded with 
+				/*
+				 * HACK: UGLY !!!
+				 * There is bug in Seen code conneded with
 				 * UnitActionDie and Cloacked units.
 				 */
 				if(!unit->VisCount[p] && unit->CurrentAction() == UnitActionDie)
 				{
 					return;
 				}
-			
+
 				Assert(unit->VisCount[p]);
 				unit->VisCount[p]--;
 				//
@@ -1242,7 +1242,7 @@ struct _TileSeen {
 				//
 				if (!unit->VisCount[p]) {
 					for (int pi = 0; pi < PlayerMax; ++pi) {
-						if (pi == p/*player->Index*/ || 
+						if (pi == p/*player->Index*/ ||
 							player->IsBothSharedVision(&Players[pi])) {
 							if (!unit->IsVisible(Players + pi)) {
 								UnitGoesUnderFog(unit, Players + pi);
@@ -1252,7 +1252,7 @@ struct _TileSeen {
 				}
 			}
 		}
-	}	
+	}
 };
 
 /**
@@ -1283,7 +1283,7 @@ void UnitsOnTileMarkSeen(const CPlayer *player, int x, int y, int cloak)
 **  @param y         y location to check if building is on, and mark as seen
 **  @param cloak     If this is for cloaked units.
 */
-void UnitsOnTileUnmarkSeen(const CPlayer *player, 
+void UnitsOnTileUnmarkSeen(const CPlayer *player,
 				const unsigned int index, int cloak)
 {
 	_TileSeen<false> seen(player, cloak);
@@ -1584,11 +1584,11 @@ void CUnit::ChangeOwner(CPlayer *newplayer)
 void CUnit::AssignWorkerToMine(CUnit *mine)
 {
 	CUnit *head = mine->Data.Resource.Workers;
-/*	
-	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n" 
-					_C_ this->Player->Index _C_ this->Slot 
+/*
+	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
+					_C_ this->Player->Index _C_ this->Slot
 					_C_ mine->Type->Name.c_str()
-					_C_ mine->Slot 
+					_C_ mine->Slot
 					_C_ mine->Data.Resource.Assigned);
 */
 	this->RefsIncrease();
@@ -1601,21 +1601,21 @@ void CUnit::DeAssignWorkerFromMine(CUnit *mine)
 {
 	CUnit *prev = NULL,*worker = mine->Data.Resource.Workers;
 /*
-	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n" 
-					_C_ this->Player->Index _C_ this->Slot 
+	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
+					_C_ this->Player->Index _C_ this->Slot
 					_C_ mine->Type->Name.c_str()
-					_C_ mine->Slot 
+					_C_ mine->Slot
 					_C_ mine->Data.Resource.Assigned);
 */
 	for(int i = 0; NULL != worker; worker = worker->NextWorker,++i)
 	{
 		if(worker == this) {
 			CUnit *next = worker->NextWorker;
-			if(prev) 
+			if(prev)
 				prev->NextWorker = next;
 			if(worker == mine->Data.Resource.Workers)
 				mine->Data.Resource.Workers = next;
-			worker->RefsDecrease();							
+			worker->RefsDecrease();
 			break;
 		}
 		prev = worker;
@@ -2121,7 +2121,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				}
 				m = matrix + x + y * w;
 				/*
-				 *  Check if visited or unexplored for non 
+				 *  Check if visited or unexplored for non
 				 *	AI players (our exploration code is too week for real
 				 *	competition with human players)
 				 */
@@ -2175,37 +2175,37 @@ class BestDepotFinder {
 			int x;
 			int y;
 		} loc;
-	} near;
+	} u_near;
 	const int resource;
 	const int range;
 	int best_dist;
-	
+
 	inline void operator() (CUnit *const dest) {
 		/* Only resource depots */
 		if (dest->Type->CanStore[resource] &&
-			 dest->IsAliveOnMap() && 
+			 dest->IsAliveOnMap() &&
 			 dest->CurrentAction() != UnitActionBuilt) {
 			// Unit in range?
 
-			if(NEARLOCATION) {
-				int d = dest->MapDistanceTo(near.loc.x,near.loc.y);
-						
+			if (NEARLOCATION) {
+				int d = dest->MapDistanceTo(u_near.loc.x, u_near.loc.y);
+
 				//
 				// Take this depot?
 				//
 				if (d <= range && d < best_dist) {
 					best_depot = dest;
 					best_dist = d;
-				}			
+				}
 			} else {
 				int d;
-				const CUnit *worker = near.worker;
+				const CUnit *worker = u_near.worker;
 				if (!worker->Container) {
 					d = worker->MapDistanceTo(dest);
 				} else {
 					d = worker->Container->MapDistanceTo(dest);
 				}
-			
+
 				// Use Circle, not square :)
 				if (d > range) {
 					return;
@@ -2222,22 +2222,22 @@ class BestDepotFinder {
 					best_depot = dest;
 					best_dist = d;
 				}
-				
+
 			}
 		}
 	}
 
 public:
 	CUnit *best_depot;
-	
+
 	BestDepotFinder(const CUnit *w, int x, int y, int res, int ran):
 		resource(res), range(ran),
 		best_dist(INT_MAX), best_depot(0) {
-			if(NEARLOCATION) {
-				near.loc.x = x;
-				near.loc.y = y;
+			if (NEARLOCATION) {
+				u_near.loc.x = x;
+				u_near.loc.y = y;
 			} else {
-				near.worker = w;
+				u_near.worker = w;
 			}
 		};
 
@@ -2251,7 +2251,7 @@ public:
 		if(table_size) {
 			int i = 0, n = (table_size+3)/4;
 			switch (table_size & 3) {
-				case 0: do { 
+				case 0: do {
 								this->operator() (table[i++]);
 				case 3:			this->operator() (table[i++]);
 				case 2:			this->operator() (table[i++]);
@@ -2271,14 +2271,14 @@ public:
 
 };
 
-static CUnit *FindDepositNearLoc(CPlayer *p, 
+static CUnit *FindDepositNearLoc(CPlayer *p,
 				int x, int y, int range, int resource)
 {
 	BestDepotFinder<true> finder(NULL,x,y,resource,range);
 	CUnit *depot = finder.Find(p->Units, p->TotalNumUnits);
 	if (!depot) {
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (i != p->Index && 
+			if (i != p->Index &&
 				Players[i].IsAllied(p) &&
 				p->IsAllied(&Players[i])) {
 				finder.Find(Players[i].Units, Players[i].TotalNumUnits);
@@ -2331,7 +2331,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	int bestd = 99999, bestw = 99999, besta = 99999;
 	int cdist;
 	const ResourceInfo *resinfo = unit->Type->ResInfo[resource];
-	
+
 	destx = x;
 	desty = y;
 	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
@@ -2342,7 +2342,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 	if (destu) {
 		NearestOfUnit(destu, x, y, &destx, &desty);
 	}
-	
+
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
 	w = Map.Info.MapWidth + 2;
@@ -2391,23 +2391,23 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 				//
 				if ((mine = ResourceOnMap(x, y, resource)) &&
 						mine->Type->CanHarvest &&
-						(resinfo->HarvestFromOutside || 
+						(resinfo->HarvestFromOutside ||
 							mine->Player->Index == PlayerMax - 1 ||
 							mine->Player == unit->Player ||
 							(unit->IsAllied(mine) && mine->IsAllied(unit)))
 							 ) {
 					if (destu) {
 						bool better = (mine != bestmine);
-				
+
 						if(better) {
 							n = std::max(MyAbs(destx - x), MyAbs(desty - y));
 							if(check_usage && mine->Type->MaxOnBoard) {
-								int assign = mine->Data.Resource.Assigned - 
+								int assign = mine->Data.Resource.Assigned -
 														mine->Type->MaxOnBoard;
-								int waiting = 
+								int waiting =
 										(assign > 0 ?
-											 GetNumWaitingWorkers(mine) : 0);							
-								if(bestmine != NoUnitP) {	
+											 GetNumWaitingWorkers(mine) : 0);
+								if(bestmine != NoUnitP) {
 									if(besta >= assign)
 									{
 										if(assign > 0) {
@@ -2426,7 +2426,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 											if(besta == assign && bestd < n)
 											{
 												better = false;
-											}								
+											}
 										}
 									} else {
 										if(assign > 0 || bestd < n) {
@@ -2436,7 +2436,7 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 								}
 								if(better) {
 									besta = assign;
-									bestw = waiting;						
+									bestw = waiting;
 								}
 							} else {
 								if(bestmine != NoUnitP && bestd < n)
@@ -2447,25 +2447,25 @@ CUnit *UnitFindResource(const CUnit *unit, int x, int y, int range, int resource
 						}
 						if(better) {
 							bestd = n;
-							bestmine = mine;	
+							bestmine = mine;
 						}
 						*m = 99;
-					} else { 
+					} else {
 						if (check_usage && mine->Type->MaxOnBoard) {
 							bool better = (mine != bestmine &&
 							//Durring construction Data.Resource is corrupted
 								mine->CurrentAction() != UnitActionBuilt);
-							if(better) {
-								int assign = mine->Data.Resource.Assigned - 
+							if (better) {
+								int assign = mine->Data.Resource.Assigned -
 														mine->Type->MaxOnBoard;
-								int waiting = (assign > 0 ? 
+								int waiting = (assign > 0 ?
 									GetNumWaitingWorkers(mine) : 0);
-								if(assign < besta || 
+								if (assign < besta ||
 									(assign == besta && waiting < bestw)) {
 									bestd = n;
 									besta = assign;
 									bestw = waiting;
-									bestmine = mine;	
+									bestmine = mine;
 								}
 							}
 							*m = 99;
@@ -2554,7 +2554,7 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 	int bestd;
 	int cdist;
 	//const ResourceInfo *resinfo = unit->Type->ResInfo[resource];
-	
+
 	destx = x;
 	desty = y;
 	size = std::min(Map.Info.MapWidth * Map.Info.MapHeight / 4, range * range * 5);
@@ -2575,7 +2575,7 @@ CUnit *UnitFindMiningArea(const CUnit *unit, int x, int y,
 	//  Ignore all units along the way. Might seem wierd, but otherwise
 	//  peasants would lock at a mine with a lot of workers.
 	mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit);
-	
+
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
@@ -2681,7 +2681,7 @@ CUnit *FindDeposit(const CUnit *unit, int range, int resource)
 	CUnit *depot = finder.Find(unit->Player->Units, unit->Player->TotalNumUnits);
 	if (!depot) {
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (i != unit->Player->Index && 
+			if (i != unit->Player->Index &&
 				Players[i].IsAllied(unit->Player) &&
 				unit->Player->IsAllied(&Players[i])) {
 				finder.Find(Players[i].Units, Players[i].TotalNumUnits);
@@ -2789,7 +2789,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 		// Check if mouse is over the unit.
 		//
 		gx = unit->X * TileSizeX + unit->IX;
-		
+
 		{
 			const int local_width = type->TileWidth * TileSizeX;
 			if (x + (type->BoxWidth - local_width) / 2 < gx) {
@@ -2799,7 +2799,7 @@ CUnit *UnitOnScreen(CUnit *ounit, int x, int y)
 				continue;
 			}
 		}
-		
+
 		gy = unit->Y * TileSizeY + unit->IY;
 		{
 			const int local_height = type->TileHeight * TileSizeY;
@@ -2867,9 +2867,9 @@ void LetUnitDie(CUnit *unit)
 	}
 	if (type->DeathExplosion) {
 		type->DeathExplosion->pushPreamble();
-		type->DeathExplosion->pushInteger(unit->X * TileSizeX + 
+		type->DeathExplosion->pushInteger(unit->X * TileSizeX +
 				type->TileWidth * TileSizeX / 2);
-		type->DeathExplosion->pushInteger(unit->Y * TileSizeY + 
+		type->DeathExplosion->pushInteger(unit->Y * TileSizeY +
 				type->TileHeight * TileSizeY / 2);
 		type->DeathExplosion->run();
 	}
@@ -2928,10 +2928,10 @@ void LetUnitDie(CUnit *unit)
 	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
 		unit->Removed = 0;
 		Map.Insert(unit);
-		
-		// FIXME: rb: Maybe we need this here because corpse of cloaked units 
+
+		// FIXME: rb: Maybe we need this here because corpse of cloaked units
 		//	may crash Sign code
-		
+
 		// Recalculate the seen count.
 		//UnitCountSeen(unit);
 	}
@@ -3130,7 +3130,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			target->RefsIncrease();
 		}
 	}
-	
+
 	/* Target Reaction on Hit */
 	switch(target->CurrentAction()) {
 		case UnitActionTrain:
@@ -3148,7 +3148,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			//
 			return;
 		case UnitActionResource:
-			if (target->SubAction >= 65/* SUB_STOP_GATHERING */) 
+			if (target->SubAction >= 65/* SUB_STOP_GATHERING */)
 			{
 				//Normal return to depot
 				return;
@@ -3157,13 +3157,13 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 				target->ResourcesHeld > 0) {
 				//escape to Depot with this what you have;
 				target->Data.ResWorker.DoneHarvesting = 1;
-				return;	
+				return;
 			}
-		break;	
+		break;
 		case UnitActionAttack:
 			goal = target->CurrentOrder()->GetGoal();
 			if (goal) {
-				if (goal == attacker || 
+				if (goal == attacker ||
 					(goal->CurrentAction() == UnitActionAttack &&
 					goal->CurrentOrder()->GetGoal() == target))
 				{
@@ -3172,7 +3172,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 				}
 			}
 		default:
-		break;			
+		break;
 	}
 
 	//
@@ -3184,7 +3184,7 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 				goal = attacker;
 			} else {
 				if (target->CurrentAction() == UnitActionStandGround) {
-					goal = AttackUnitsInRange(target);				
+					goal = AttackUnitsInRange(target);
 				} else {
 					// Check for any other units in range
 					goal = AttackUnitsInReactRange(target);
@@ -3202,13 +3202,13 @@ void HitUnit(CUnit *attacker, CUnit *target, int damage)
 			}
 	}
 
-	/* 
+	/*
 		What should we do with workers on :
 		case UnitActionRepair:
-	
+
 		Drop orders and run away or return after escape?
 	*/
-	
+
 	//
 	// Can't attack run away.
 	//
@@ -3368,7 +3368,7 @@ int CanTarget(const CUnitType *source, const CUnitType *dest)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 		if (source->BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
-			if ((source->BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^ 
+			if ((source->BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
 				(dest->BoolFlag[i].value)) {
 				return 0;
 			}
@@ -3570,7 +3570,7 @@ void CleanUnits(void)
 	for (int i = 0; i < count; ++i) {
 		Units[i]->RefsDecrease();
 	}
-	Assert(NumUnits == 0);	
+	Assert(NumUnits == 0);
 	memset(Units, 0 , sizeof(CUnit*) * MAX_UNIT_SLOTS);
 */
 	CUnit **table;
@@ -3586,7 +3586,7 @@ void CleanUnits(void)
 
 		delete[] (*table)->AutoCastSpell;
 		delete[] (*table)->Variable;
-		delete *table;		
+		delete *table;
 		*table = NULL;
 	}
 	NumUnits = 0;
