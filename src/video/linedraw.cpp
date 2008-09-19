@@ -49,15 +49,122 @@
 -- Declarations
 ----------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------
+-- Clipping
+----------------------------------------------------------------------------*/
+
 /**
 ** Bitmask, denoting a postion left/right/above/below clip rectangle
-** (mainly used by VideoDrawLineClip)
+** (mainly used by DrawLineClip)
 */
 #define ClipCodeInside 0 /// Clipping inside rectangle
 #define ClipCodeAbove  1 /// Clipping above rectangle
 #define ClipCodeBelow  2 /// Clipping below rectangle
 #define ClipCodeLeft   4 /// Clipping left rectangle
 #define ClipCodeRight  8 /// Clipping right rectangle
+
+/**
+**  Delivers bitmask denoting given point is left/right/above/below
+**      clip rectangle, used for faster determinination of clipped position.
+**
+**  @param x  pixel's x position (not restricted to screen width)
+**  @param y  pixel's y position (not restricted to screen height)
+*/
+static inline int ClipCodeLine(int x, int y)
+{
+	int result = ClipCodeInside;
+
+	if (y < ClipY1) {
+		result = ClipCodeAbove;
+	} else if (y > ClipY2) {
+		result = ClipCodeBelow;
+	} /*else {
+		result = ClipCodeInside;
+	}*/
+
+	if (x < ClipX1) {
+		result |= ClipCodeLeft;
+	} else if (x > ClipX2) {
+		result |= ClipCodeRight;
+	}
+
+	return result;
+}
+
+/**
+**  Denotes entire line located at the same side outside clip rectangle
+**      (point 1 and 2 are both as left/right/above/below the clip rectangle)
+**
+**  @param code1  ClipCode of one point of line
+**  @param code2  ClipCode of second point of line
+*/
+static inline int LineIsUnclippedOnSameSide(int code1, int code2)
+{
+	return code1 & code2;
+}
+
+/**
+**  Denotes part of (or entire) line located outside clip rectangle
+**      (point 1 and/or 2 is outside clip rectangle)
+**
+**  @param code1  ClipCode of one point of line
+**  @param code2  ClipCode of second point of line
+*/
+static inline int LineIsUnclipped(int code1, int code2)
+{
+	return code1 | code2;
+}
+
+/**
+**  Clip line coordinate.
+**      Based on Sutherland-Cohen clipping technique
+**      (Replaces Liang/Barksy clipping algorithm in CVS version 1.18, which
+**       might be faster, but that one contained some BUGs)
+**
+**  @param x1     Source x coordinate on the screen
+**  @param y1     Source y coordinate on the screen
+**  @param x2     Destination x coordinate on the screen
+**  @param y2     Destination y coordinate on the screen
+*/
+static bool ClipLine(int &x1, int &y1, int &x2, int &y2)
+{
+	int code1;
+	int code2;
+	int temp;
+
+	// Make sure coordinates or on/in clipped rectangle
+	while (code1 = ClipCodeLine(x1, y1), code2 = ClipCodeLine(x2, y2),
+		LineIsUnclipped(code1, code2)) {
+		if (LineIsUnclippedOnSameSide(code1, code2)) {
+			return false;
+		}
+
+		if (!code1) {
+			temp = x1; x1 = x2; x2 = temp;
+			temp = y1; y1 = y2; y2 = temp;
+			code1 = code2;
+		}
+
+		if (code1 & ClipCodeAbove) {
+			temp = ClipY1;
+			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
+			y1 = temp;
+		} else if (code1 & ClipCodeBelow) {
+			temp = ClipY2;
+			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
+			y1 = temp;
+		} else if (code1 & ClipCodeLeft) {
+			temp = ClipX1;
+			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
+			x1 = temp;
+		} else {  /* code1 & ClipCodeRight */
+			temp = ClipX2;
+			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
+			x1 = temp;
+		}
+	}
+	return true;
+}
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -143,8 +250,8 @@ void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
 	if (x < ClipX1 || x > ClipX2 ||
 	 	y > ClipY2 || y + height < ClipY1) return;
 	
-	if(y < ClipY1) y = ClipY1;
-	if(y + height > ClipY2) height = ClipY2 - y;
+	if (y < ClipY1) y = ClipY1;
+	if (y + height > ClipY2) height = ClipY2 - y;
 	
 	LockScreen();
 	Renderer->DrawTransLine(color, x, y, x, y + height, alpha);
@@ -191,44 +298,12 @@ void CVideo::DrawTransHLineClip(Uint32 color, int x, int y,
 	if (y < ClipY1 || y > ClipY2 ||
 		x >ClipX2 || x + width < ClipX1) return;	
 	
-	if(x < ClipX1) x = ClipX1;
-	if(x + width > ClipX2) width = ClipX2 - x;
+	if (x < ClipX1) x = ClipX1;
+	if (x + width > ClipX2) width = ClipX2 - x;
 	
 	LockScreen();
 	Renderer->DrawTransLine(color, x, y, x + width, y, alpha);
 	UnlockScreen();
-}
-
-/** Check to see if a line intersects another */
-static inline
-bool LineIntersectLine( const int v1[2], const int v2[2], 
-				const int v3[2], const int v4[2] )
-{
-#define X 0
-#define Y 1
-    float denom = ((v4[Y] - v3[Y]) * (v2[X] - v1[X])) - ((v4[X] - v3[X]) * (v2[Y] - v1[Y]));
-
-    if ( denom < 0.000000001f && denom > -0.000000001f )
-    {
-//        if ( numerator == 0.0f && numerator2 == 0.0f )
-//        {
- //           return false;//COINCIDENT;
- //       }
-        return false;// PARALLEL;
-    }
-    
-    float numerator = ((v4[X] - v3[X]) * (v1[Y] - v3[Y])) - ((v4[Y] - v3[Y]) * (v1[X] - v3[X]));
-    float ua = numerator / denom;
-    
-    if(ua < 0.0f || ua > 1.0f) return false;
-    
-    float numerator2 = ((v2[X] - v1[X]) * (v1[Y] - v3[Y])) - ((v2[Y] - v1[Y]) * (v1[X] - v3[X]));
-    float ub = numerator2/ denom;
-
-	return (ub >= 0.0f && ub <= 1.0f);
-    //return (ua >= 0.0f && ua <= 1.0f && ub >= 0.0f && ub <= 1.0f);
-#undef X
-#undef Y
 }
 
 /**
@@ -246,91 +321,23 @@ void CVideo::DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 */
 void CVideo::DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
-	if(dy > sy)
-		if(dy < ClipY1 || sy > ClipY2) return;
-	else
-		if(sy < ClipY1 || dy > ClipY2) return;
-
-	if(dx > sx)
-		if(dx < ClipX1 || sx > ClipX2) return;
-	else
-		if(sx < ClipX1 || dx > ClipX2) return;
-	
-	bool s_is_on_screen = sx >= ClipX1 && sx <= ClipX2 &&
-							sy >= ClipY1 && sy <= ClipY2;
-	bool d_is_on_screen = dx >= ClipX1 && dx <= ClipX2 &&
-							dy >= ClipY1 && dy <= ClipY2;
-
-	if(!(s_is_on_screen && d_is_on_screen)) {
-	
-
-		if(!s_is_on_screen && d_is_on_screen) {
-			// exchange coordinates
-			int t = dx;
-			dx = sx;
-			sx = t;
-			t = dy;
-			dy = sy;
-			sy = t;
-			s_is_on_screen = true; 
-			d_is_on_screen = false;
-		}
-
-			const int v1[] = {sx, sy};
-			const int v2[] = {dx, dy};
-			const int v3[] = {ClipX1, ClipY1};
-			const int v4[] = {ClipX1, ClipY2};
-			const int v5[] = {ClipX2, ClipY1};
-			const int v6[] = {ClipX2, ClipY2};
-
-	
-		if(s_is_on_screen && !d_is_on_screen) {
-						
-			//Thanks for good geometric Mr. Talles :)
-			
-			if(LineIntersectLine(v1, v2, v3, v4) ||
-				LineIntersectLine(v1, v2, v5, v6))
-			{
-				const int x_max = dx <= ClipX1 ? ClipX1 : ClipX2;
-				float tmp = (dy - sy);
-				tmp /= (dx - sx);
-				tmp *= (x_max - sx);
-				tmp += sy;
-		 		dy = tmp;
-		 		dx = x_max;
-		 	} else {
-		 		const int y_max = dy <= ClipY1 ? ClipY1 : ClipY2;
-		 		float tmp = (dx - sx);
-		 		tmp /= (dy - sy);
-		 		tmp *= (y_max - sy);
-		 		tmp += sx;
-		 		dx = tmp;
-		 		dy = y_max;
-		 	}
-		} else {
-			const int v7[] = {ClipX1, ClipY1};
-			const int v8[] = {ClipX2, ClipY1};
-			const int v9[] = {ClipX1, ClipY2};
-			const int v0[] = {ClipX2, ClipY2};
-					
-		 	//both are out of screen we have to check Intersection		
-			if(!LineIntersectLine(v1, v2, v3, v4) &&
-				!LineIntersectLine(v1, v2, v5, v6) &&
-				!LineIntersectLine(v1, v2, v7, v8) &&
-				!LineIntersectLine(v1, v2, v9, v0))
-			{
-				return;
-			}
-			DebugPrint("FIXME: Corrupted Line coordinates: [%d,%d]: [%d,%d]\n" 
-						_C_ sx _C_ sy _C_ dx _C_ dy);
-
-			return;//FIXME: add cliping code insteed of return
-		}				
+	if (dy > sy) {
+		if (dy < ClipY1 || sy > ClipY2) return;
+	} else {
+		if (sy < ClipY1 || dy > ClipY2) return;
 	}
-
-	LockScreen();
-	Renderer->DrawLine(color, sx, sy, dx, dy);
-	UnlockScreen();
+	
+	if (dx > sx) {
+		if (dx < ClipX1 || sx > ClipX2) return;
+	} else {
+		if (sx < ClipX1 || dx > ClipX2) return;
+	}
+	
+	if (ClipLine(sx,sy,dx,dy)) {
+		LockScreen();
+		Renderer->DrawLine(color, sx, sy, dx, dy);
+		UnlockScreen();
+	}
 }
 
 /**
@@ -587,37 +594,33 @@ void CVideo::FillTransCircle(Uint32 color, int x, int y,
 */
 void CVideo::FillCircleClip(Uint32 color, int x, int y, int r)
 {
-	int p;
-	int px;
-	int py;
+	int cx = 0;
+	int cy = r;
+	int df = 1 - r;
+	int d_e = 3;
+	int d_se = -2 * r + 5;
 
-	p = 1 - r;
-	py = r;
-
-	for (px = 0; px <= py; ++px) {
-
-		// Fill up the middle half of the circle
-		DrawVLineClip(color, x + px, y, py + 1);
-		DrawVLineClip(color, x + px, y - py, py);
-		if (px) {
-			DrawVLineClip(color, x - px, y, py + 1);
-			DrawVLineClip(color, x - px, y - py, py);
+	// FIXME: could be much improved :)
+	do {
+		DrawHLineClip(color, x - cy, y - cx, 1 + cy * 2);
+		if (cx) {
+			DrawHLineClip(color, x - cy, y + cx, 1 + cy * 2);
 		}
-
-		if (p < 0) {
-			p += 2 * px + 3;
+		if (df < 0) {
+			df += d_e;
+			d_se += 2;
 		} else {
-			p += 2 * (px - py) + 5;
-			py -= 1;
-			// Fill up the left/right half of the circle
-			if (py >= px) {
-				DrawVLineClip(color, x + py + 1, y, px + 1);
-				DrawVLineClip(color, x + py + 1, y - px, px);
-				DrawVLineClip(color, x - py - 1, y, px + 1);
-				DrawVLineClip(color, x - py - 1, y - px,  px);
+			if (cx != cy) {
+				DrawHLineClip(color, x - cx, y - cy, 1 + cx * 2);
+				DrawHLineClip(color, x - cx, y + cy, 1 + cx * 2);
 			}
+			df += d_se;
+			d_se += 4;
+			--cy;
 		}
-	}
+		d_e += 2;
+		++cx;
+	} while (cx <= cy);	
 }
 
 /**
@@ -974,58 +977,6 @@ void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 }
 
 /**
-**  Delivers bitmask denoting given point is left/right/above/below
-**      clip rectangle, used for faster determinination of clipped position.
-**
-**  @param x  pixel's x position (not restricted to screen width)
-**  @param y  pixel's y position (not restricted to screen height)
-*/
-static int ClipCodeLine(int x, int y)
-{
-	int result;
-
-	if (y < ClipY1) {
-		result = ClipCodeAbove;
-	} else if (y > ClipY2) {
-		result = ClipCodeBelow;
-	} else {
-		result = ClipCodeInside;
-	}
-
-	if (x < ClipX1) {
-		result |= ClipCodeLeft;
-	} else if (x > ClipX2) {
-		result |= ClipCodeRight;
-	}
-
-	return result;
-}
-
-/**
-**  Denotes entire line located at the same side outside clip rectangle
-**      (point 1 and 2 are both as left/right/above/below the clip rectangle)
-**
-**  @param code1  ClipCode of one point of line
-**  @param code2  ClipCode of second point of line
-*/
-static int LineIsUnclippedOnSameSide(int code1, int code2)
-{
-	return code1 & code2;
-}
-
-/**
-**  Denotes part of (or entire) line located outside clip rectangle
-**      (point 1 and/or 2 is outside clip rectangle)
-**
-**  @param code1  ClipCode of one point of line
-**  @param code2  ClipCode of second point of line
-*/
-static int LineIsUnclipped(int code1, int code2)
-{
-	return code1 | code2;
-}
-
-/**
 **  Draw line clipped.
 **      Based on Sutherland-Cohen clipping technique
 **      (Replaces Liang/Barksy clipping algorithm in CVS version 1.18, which
@@ -1039,50 +990,16 @@ static int LineIsUnclipped(int code1, int code2)
 */
 void CVideo::DrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 {
-	int code1;
-	int code2;
-	int temp;
-
-	// Make sure coordinates or on/in clipped rectangle
-	while (code1 = ClipCodeLine(x1, y1), code2 = ClipCodeLine(x2, y2),
-		LineIsUnclipped(code1, code2)) {
-		if (LineIsUnclippedOnSameSide(code1, code2)) {
-			return;
-		}
-
-		if (!code1) {
-			temp = x1; x1 = x2; x2 = temp;
-			temp = y1; y1 = y2; y2 = temp;
-			code1 = code2;
-		}
-
-		if (code1 & ClipCodeAbove) {
-			temp = ClipY1;
-			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
-			y1 = temp;
-		} else if (code1 & ClipCodeBelow) {
-			temp = ClipY2;
-			x1 += (int)(((long)(temp - y1) * (x2 - x1)) / (y2 - y1));
-			y1 = temp;
-		} else if (code1 & ClipCodeLeft) {
-			temp = ClipX1;
-			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
-			x1 = temp;
-		} else {  /* code1 & ClipCodeRight */
-			temp = ClipX2;
-			y1 += (int)(((long)(temp - x1) * (y2 - y1)) / (x2 - x1));
-			x1 = temp;
-		}
+	if (ClipLine(x1,y1,x2,y2)) {
+		// Draw line based on clipped coordinates
+		// FIXME: As the clipped coordinates are rounded to integers, the line's
+		//        direction vector might be slightly off. Somehow, the sub-pixel
+		//        position(s) on the clipped retangle should be denoted to the line
+		//        drawing routine..
+		Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
+			y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
+		DrawLine(color, x1, y1, x2, y2);
 	}
-
-	// Draw line based on clipped coordinates
-	// FIXME: As the clipped coordinates are rounded to integers, the line's
-	//        direction vector might be slightly off. Somehow, the sub-pixel
-	//        position(s) on the clipped retangle should be denoted to the line
-	//        drawing routine..
-	Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
-		y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
-	DrawLine(color, x1, y1, x2, y2);
 }
 
 /**
