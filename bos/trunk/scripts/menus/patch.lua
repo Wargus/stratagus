@@ -70,11 +70,11 @@ function RunLoadPatchMenu()
    table.insert(names, typeNames[i])
   end
 
-  menu:addLabel(_("Name:"), Video.Width / 2 - 30, y)
+  menu:addLabel(_("Name:"), Video.Width / 2 - 80, y)
   local nameDropDown = menu:addDropDown(names,
-    Video.Width / 2, y,
+    Video.Width / 2 - 50, y,
     function() end)
-  nameDropDown:setSize(130, nameDropDown:getHeight())
+  nameDropDown:setSize(210, nameDropDown:getHeight())
 
   y = y + 40
 
