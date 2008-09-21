@@ -692,5 +692,14 @@ namespace gcn
         Widget::setFont(font);
         mListBox->setFont(font);
     }     
+
+	bool DropDown::getDirty() const
+	{
+		if (mDroppedDown)
+		{
+			return mScrollArea->getDirty();
+		}
+		return mDirty;
+	}
 }
 
